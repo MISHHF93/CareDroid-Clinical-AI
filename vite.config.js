@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   server: {
     port: 8000,
     host: true,
@@ -23,14 +26,8 @@ export default defineConfig({
     sourcemap: true,
     // Performance optimizations
     target: 'esnext',
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // Remove console.log in production
-        drop_debugger: true,
-        pure_funcs: ['console.log', 'console.info', 'console.debug'],
-      },
-    },
+    // esbuild minify (default); avoids optional terser peer on CI (e.g. Vercel)
+    minify: 'esbuild',
     // Code splitting - manual chunks for better caching
     rollupOptions: {
       output: {
