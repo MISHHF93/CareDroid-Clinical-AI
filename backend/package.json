@@ -1,7 +1,7 @@
 {
-  "name": "CareDroid-Ai-Backend",
+  "name": "caredroid-clinical-ai-backend",
   "version": "1.0.0",
-  "description": "HIPAA-compliant backend for CareDroid-AI - Tool Orchestration, Emergency Escalation, RBAC",
+  "description": "HIPAA-compliant backend for CareDroid-Clinical-AI - tool orchestration, emergency escalation, RBAC",
   "author": "CareDroid Team",
   "private": true,
   "license": "PROPRIETARY",

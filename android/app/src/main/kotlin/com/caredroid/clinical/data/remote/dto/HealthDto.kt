@@ -11,7 +11,7 @@ package com.caredroid.clinical.data.remote.dto
 data class HealthResponse(
     val status: String, // "healthy", "degraded", "unhealthy"
     val timestamp: String,
-    val service: String = "CareDroid API",
+    val service: String = "CareDroid-Clinical-AI API",
     val version: String,
     val uptime: Long? = null
 )

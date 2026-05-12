@@ -53,13 +53,13 @@ fun LoginScreen(
             // Logo and Title
             Icon(
                 imageVector = Icons.Default.Email,
-                contentDescription = "CareDroid Logo",
+                contentDescription = "CareDroid-Clinical-AI logo",
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(80.dp)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "CareDroid Clinical",
+                text = "CareDroid-Clinical-AI",
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onBackground
             )

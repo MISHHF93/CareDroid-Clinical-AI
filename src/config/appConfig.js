@@ -23,7 +23,7 @@ const normalizeUrl = (value) => {
 
 const appConfig = {
   app: {
-    name: getEnvValue('VITE_APP_NAME', 'CareDroid Clinical AI'),
+    name: getEnvValue('VITE_APP_NAME', 'CareDroid-Clinical-AI'),
     version: getEnvValue('VITE_APP_VERSION', '1.0.0'),
     environment: getEnvValue('VITE_APP_ENVIRONMENT', 'development'),
     buildDate: getEnvValue('VITE_APP_BUILD_DATE', ''),

@@ -65,8 +65,8 @@ object AppConstants {
      */
     object Notifications {
         const val CHANNEL_ID = "caredroid_channel"
-        const val CHANNEL_NAME = "CareDroid Notifications"
-        const val CHANNEL_DESCRIPTION = "Notifications from CareDroid Clinical Assistant"
+        const val CHANNEL_NAME = "CareDroid-Clinical-AI notifications"
+        const val CHANNEL_DESCRIPTION = "Notifications from CareDroid-Clinical-AI"
     }
     
     /**

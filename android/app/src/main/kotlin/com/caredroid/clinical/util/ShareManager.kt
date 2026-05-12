@@ -37,7 +37,7 @@ class ShareManager @Inject constructor(
      */
     fun shareConversation(conversationTitle: String, messages: String) {
         val text = buildString {
-            appendLine("CareDroid Conversation: $conversationTitle")
+            appendLine("CareDroid-Clinical-AI conversation: $conversationTitle")
             appendLine()
             appendLine(messages)
         }

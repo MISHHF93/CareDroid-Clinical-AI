@@ -26,7 +26,7 @@ const AuthShell = ({ children }) => {
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent'
         }}>
-          CareDroid Clinical AI
+          CareDroid-Clinical-AI
         </div>
         <p style={{ fontSize: '16px', color: 'var(--muted-text)', maxWidth: '480px' }}>
           A premium clinical AI workspace for fast, structured guidance. Secure, compliant, and built for teams.

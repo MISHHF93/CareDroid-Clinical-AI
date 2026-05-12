@@ -1,8 +1,8 @@
 {
-  "name": "CareDroid-Ai-Android",
+  "name": "caredroid-clinical-ai-android",
   "private": true,
   "version": "1.0.0",
-  "description": "CareDroid Clinical Companion - Native Android App with NestJS Backend",
+  "description": "CareDroid-Clinical-AI - native Android app with NestJS backend",
   "type": "module",
   "scripts": {
     "backend:dev": "cd backend && npm install && npm run start:dev",
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/MISHHF93/CareDroid-Ai.git"
+    "url": "https://github.com/MISHHF93/CareDroid-Clinical-AI.git"
   },
   "keywords": [
     "android",

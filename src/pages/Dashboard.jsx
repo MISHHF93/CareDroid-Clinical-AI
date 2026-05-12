@@ -181,7 +181,7 @@ function Dashboard() {
                 <div style={{ fontSize: '48px' }}>🏥</div>
                 <div style={{ textAlign: 'center', maxWidth: '400px' }}>
                   <div style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px', color: 'var(--text-color)' }}>
-                    Welcome to CareDroid
+                    Welcome to CareDroid-Clinical-AI
                   </div>
                   <div style={{ fontSize: '14px' }}>
                     Ask me anything about medicine, drugs, lab values, clinical protocols, and more.

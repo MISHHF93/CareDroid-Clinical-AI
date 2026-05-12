@@ -146,7 +146,7 @@ const BiometricSetup = () => {
       // Prompt biometric authentication
       const biometricOptions = {
         reason: 'Authenticate with biometrics',
-        title: 'CareDroid-AI Authentication',
+        title: 'CareDroid-Clinical-AI authentication',
         subtitle: 'Use your biometric to login',
         description: 'Place your finger on the sensor',
       };
@@ -274,7 +274,7 @@ const BiometricSetup = () => {
         <div className="biometric-header">
           <h1>Biometric Authentication</h1>
           <p>
-            Secure your CareDroid-AI account with {biometricType === 'face' ? 'Face ID' : 'fingerprint'}
+            Secure your CareDroid-Clinical-AI account with {biometricType === 'face' ? 'Face ID' : 'fingerprint'}
           </p>
         </div>
 

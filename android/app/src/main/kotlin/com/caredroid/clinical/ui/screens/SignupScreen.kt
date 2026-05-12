@@ -68,7 +68,7 @@ fun SignupScreen(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Join CareDroid Clinical",
+                text = "Join CareDroid-Clinical-AI",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
             )

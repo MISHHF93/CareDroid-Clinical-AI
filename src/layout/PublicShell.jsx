@@ -111,9 +111,9 @@ export const PublicShell = ({ children }) => {
         </div>
 
         <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} CareDroid. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} CareDroid-Clinical-AI. All rights reserved.</p>
           <p className="footer-disclaimer">
-            CareDroid is a clinical decision support tool. Always use clinical judgment and follow your facility's protocols.
+            CareDroid-Clinical-AI is a clinical decision support tool. Always use clinical judgment and follow your facility's protocols.
           </p>
         </div>
       </footer>

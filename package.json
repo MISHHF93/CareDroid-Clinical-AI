@@ -1,8 +1,8 @@
 {
-  "name": "CareDroid-Ai",
+  "name": "caredroid-clinical-ai",
   "private": true,
   "version": "1.0.0",
-  "description": "CareDroid-AI - Medical AI Clinical Co-Pilot Platform with Emergency Escalation & RBAC",
+  "description": "CareDroid-Clinical-AI - Medical AI clinical co-pilot with emergency escalation and RBAC",
   "type": "module",
   "scripts": {
     "dev": "vite --port 8000",

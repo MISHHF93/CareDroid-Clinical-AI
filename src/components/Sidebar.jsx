@@ -213,8 +213,7 @@ const Sidebar = ({
           <div className="logo-icon">🏥</div>
           {!isCollapsed && (
             <div className="logo-text">
-              <h1>CareDroid</h1>
-              <span className="logo-subtitle">Clinical AI</span>
+              <h1>CareDroid-Clinical-AI</h1>
             </div>
           )}
         </div>

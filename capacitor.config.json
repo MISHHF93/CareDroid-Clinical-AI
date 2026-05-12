@@ -1,6 +1,6 @@
 {
   "appId": "com.caredroid.clinical",
-  "appName": "CareDroid",
+  "appName": "CareDroid-Clinical-AI",
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {

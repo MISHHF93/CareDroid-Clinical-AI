@@ -191,7 +191,7 @@ if ('PushManager' in self) {
     };
 
     event.waitUntil(
-      self.registration.showNotification('CareDroid', options)
+      self.registration.showNotification('CareDroid-Clinical-AI', options)
     );
   });
 

@@ -11,16 +11,16 @@ export default registerAs('email', () => ({
     },
   },
   from: {
-    name: 'CareDroid',
+    name: 'CareDroid-Clinical-AI',
     address: process.env.SMTP_FROM_EMAIL || 'noreply@caredroid.health',
   },
   templates: {
     verification: {
-      subject: 'Verify your email - CareDroid',
+      subject: 'Verify your email - CareDroid-Clinical-AI',
       expiryMinutes: parseInt(process.env.EMAIL_VERIFICATION_EXPIRY || '60', 10),
     },
     passwordReset: {
-      subject: 'Reset your password - CareDroid',
+      subject: 'Reset your password - CareDroid-Clinical-AI',
       expiryMinutes: parseInt(process.env.PASSWORD_RESET_EXPIRY || '30', 10),
     },
     twoFactorCode: {

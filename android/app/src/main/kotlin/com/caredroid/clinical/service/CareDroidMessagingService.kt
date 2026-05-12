@@ -49,7 +49,7 @@ class CareDroidMessagingService : FirebaseMessagingService() {
         // Handle notification payload
         message.notification?.let { notification ->
             showNotification(
-                title = notification.title ?: "CareDroid",
+                title = notification.title ?: "CareDroid-Clinical-AI",
                 body = notification.body ?: "",
                 data = message.data
             )

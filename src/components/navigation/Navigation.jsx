@@ -310,10 +310,10 @@ export const HeaderNav = ({ user, notificationCount = 0, showBreadcrumbs = true 
           <button
             className="header-logo-btn"
             onClick={() => navigate('/dashboard')}
-            title="CareDroid Home"
+            title="CareDroid-Clinical-AI Home"
           >
             <span className="header-logo-icon">🏥</span>
-            <span className="header-logo-text">CareDroid</span>
+            <span className="header-logo-text">CareDroid-Clinical-AI</span>
           </button>
         </div>
 

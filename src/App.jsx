@@ -141,7 +141,7 @@ function WelcomePage() {
           WebkitTextFillColor: 'transparent',
           backgroundClip: 'text'
         }}>
-          CareDroid Clinical AI
+          CareDroid-Clinical-AI
         </h1>
 
         <p style={{
