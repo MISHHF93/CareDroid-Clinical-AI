@@ -156,7 +156,7 @@ const Auth = ({ onAuthSuccess }) => {
   };
 
   return (
-    <div className="auth-panel">
+    <div className="auth-root">
       {requiresTwoFactor ? (
         <section className="auth-twofa" aria-labelledby="auth-twofa-title">
           <div className="auth-twofa__icon" aria-hidden>
