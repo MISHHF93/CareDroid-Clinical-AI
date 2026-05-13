@@ -32,6 +32,7 @@ export const Drawer = ({
 }) => {
   const drawerRef = useRef(null);
   const previousFocusRef = useRef(null);
+  const previousBodyOverflowRef = useRef('');
 
   // Handle escape key
   useEffect(() => {
@@ -61,14 +62,15 @@ export const Drawer = ({
         }
       }, 10);
 
+      previousBodyOverflowRef.current = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
     } else {
       previousFocusRef.current?.focus();
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = previousBodyOverflowRef.current;
     }
 
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = previousBodyOverflowRef.current;
     };
   }, [isOpen]);
 

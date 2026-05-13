@@ -158,6 +158,7 @@ function AppShellPage({ children }) {
     setActiveTool,
   } = useConversation();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSignOut = () => {
     signOut();
@@ -189,6 +190,8 @@ function AppShellPage({ children }) {
     }
   };
 
+  const isConversationViewport = location.pathname === '/dashboard';
+
   return (
     <AppShell
       isAuthed={true}
@@ -201,7 +204,11 @@ function AppShellPage({ children }) {
       currentTool={selectedTool}
       onToolSelect={handleToolSelect}
     >
-      <div className="app-shell-page-body">{children}</div>
+      <div
+        className={`app-shell-page-body${isConversationViewport ? ' app-shell-page-body--conversation' : ''}`}
+      >
+        {children}
+      </div>
     </AppShell>
   );
 }

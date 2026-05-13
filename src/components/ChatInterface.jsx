@@ -39,6 +39,11 @@ const ChatInterface = ({
     scroller.scrollTo({ top: scroller.scrollHeight, behavior });
   }, []);
 
+  const keepComposerVisible = useCallback(() => {
+    if (!shouldStickToBottomRef.current) return;
+    window.setTimeout(() => scrollToBottom('smooth'), 80);
+  }, [scrollToBottom]);
+
   useEffect(() => {
     if (!shouldStickToBottomRef.current) return;
     const raf = window.requestAnimationFrame(() => scrollToBottom('smooth'));
@@ -60,6 +65,7 @@ const ChatInterface = ({
       timestamp: new Date()
     };
 
+    shouldStickToBottomRef.current = true;
     onAppendMessage?.(conversationId, userMessage);
     onTrackEvent?.('message_sent', {
       conversationId,
@@ -215,9 +221,9 @@ const ChatInterface = ({
         <div className="chat-interface__composer">
           <textarea
             value={input}
-            onFocus={() => window.setTimeout(() => scrollToBottom('smooth'), 120)}
+            onFocus={keepComposerVisible}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder="Ask CareDroid anything clinical..."
             disabled={isLoading}
             className="chat-interface__textarea"

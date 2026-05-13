@@ -162,11 +162,18 @@ window.addEventListener('unhandledrejection', (event) => {
 // ================================
 const syncViewportMetrics = () => {
   if (typeof window === 'undefined' || !document?.documentElement) return;
+
   const viewport = window.visualViewport;
-  const height = viewport?.height || window.innerHeight;
-  const keyboardInset = Math.max(0, window.innerHeight - height - (viewport?.offsetTop || 0));
-  document.documentElement.style.setProperty('--app-viewport-height', `${height}px`);
+  const layoutHeight = window.innerHeight || document.documentElement.clientHeight;
+  const visualHeight = viewport?.height || layoutHeight;
+  const offsetTop = viewport?.offsetTop || 0;
+  const viewportHeight = Math.max(320, Math.round(visualHeight));
+  const keyboardInset = Math.max(0, Math.round(layoutHeight - visualHeight - offsetTop));
+
+  document.documentElement.style.setProperty('--app-viewport-height', `${viewportHeight}px`);
+  document.documentElement.style.setProperty('--app-visual-viewport-offset-top', `${Math.round(offsetTop)}px`);
   document.documentElement.style.setProperty('--app-keyboard-inset-bottom', `${keyboardInset}px`);
+  document.documentElement.classList.toggle('app-keyboard-visible', keyboardInset > 80);
 };
 
 let viewportRaf = 0;

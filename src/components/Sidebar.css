@@ -742,3 +742,28 @@
     box-shadow: var(--sidebar-mobile-drawer-shadow);
   }
 }
+
+.sidebar {
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
+}
+
+.app-keyboard-visible .sidebar {
+  min-height: var(--app-viewport-height, 100dvh);
+  height: var(--app-viewport-height, 100dvh);
+  max-height: var(--app-viewport-height, 100dvh);
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .sidebar-header,
+  .sidebar-user,
+  .sidebar-footer {
+    padding-block: 10px;
+  }
+
+  .sidebar-content {
+    gap: 12px;
+    padding-block: 12px;
+  }
+}

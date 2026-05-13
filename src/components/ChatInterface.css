@@ -7,6 +7,7 @@
   min-height: 0;
   max-width: 100%;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .chat-interface__messages {
@@ -15,7 +16,8 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding: clamp(12px, 2vw, 24px);
+  padding: clamp(12px, 2vw, 24px) clamp(12px, 2vw, 24px)
+    max(clamp(12px, 2vw, 24px), env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: clamp(12px, 2vw, 20px);
@@ -138,9 +140,11 @@
   padding: 12px 16px;
   color: var(--text-color);
   font-size: 16px;
-  resize: vertical;
+  resize: none;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   min-height: 44px;
-  max-height: min(32dvh, 200px);
+  max-height: min(30dvh, 200px);
   font-family: inherit;
   outline: none;
   box-shadow: var(--shadow-1);
@@ -216,7 +220,8 @@
 
 @media (max-width: 900px) {
   .chat-interface__messages {
-    padding: clamp(10px, 3vw, 18px);
+    padding: clamp(10px, 3vw, 18px) clamp(10px, 3vw, 18px)
+      max(clamp(10px, 3vw, 18px), env(safe-area-inset-bottom, 0px));
     gap: 12px;
   }
 
@@ -244,5 +249,35 @@
 
   .chat-interface__messages {
     padding-block: 8px;
+  }
+}
+
+
+.app-keyboard-visible .chat-interface {
+  height: var(--app-viewport-height, 100dvh);
+  max-height: var(--app-viewport-height, 100dvh);
+}
+
+.app-keyboard-visible .chat-interface__messages {
+  scroll-padding-bottom: max(18px, var(--app-keyboard-inset-bottom, 0px));
+}
+
+.app-keyboard-visible .chat-interface__input-area {
+  padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 2200px) {
+  .chat-interface__messages {
+    padding-inline: max(96px, calc((100vw - 1900px) / 2));
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .chat-interface__input-area {
+    padding-block: 8px;
+  }
+
+  .chat-interface__textarea {
+    max-height: min(24svh, 120px);
   }
 }

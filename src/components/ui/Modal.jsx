@@ -29,6 +29,7 @@ export const Modal = ({
 }) => {
   const modalRef = useRef(null);
   const previousFocusRef = useRef(null);
+  const previousBodyOverflowRef = useRef('');
 
   // Handle escape key
   useEffect(() => {
@@ -60,18 +61,19 @@ export const Modal = ({
         }
       }, 10);
 
-      // Prevent body scroll
+      // Prevent background scroll without clobbering the app's default overflow state.
+      previousBodyOverflowRef.current = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
     } else {
       // Restore focus to previous element
       previousFocusRef.current?.focus();
       
       // Restore body scroll
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = previousBodyOverflowRef.current;
     }
 
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = previousBodyOverflowRef.current;
     };
   }, [isOpen]);
 
