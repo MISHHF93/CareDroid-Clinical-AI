@@ -6,6 +6,7 @@
   height: 100%;
   max-height: 100%;
   position: relative;
+  isolation: isolate;
   overflow: hidden;
 }
 
@@ -25,7 +26,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding: var(--space-5) var(--space-6) var(--space-3);
+  padding: var(--space-5) var(--space-6) max(var(--space-3), env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -143,7 +144,11 @@
 }
 
 .dashboard-composer {
-  flex-shrink: 0;
+  flex: 0 0 auto;
+  max-height: min(44dvh, 320px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: var(--space-3) var(--space-6)
     max(var(--space-3), env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--panel-border);
@@ -264,8 +269,8 @@
   .dashboard-drawer {
     width: 100%;
     max-width: 100%;
-    flex: 0 0 auto;
-    max-height: min(52dvh, 480px);
+    flex: 0 1 min(42dvh, 420px);
+    max-height: min(42dvh, 420px);
     min-height: 0;
     border-left: none;
     border-top: 1px solid var(--panel-border);
@@ -372,7 +377,7 @@
   }
 
   .dashboard-drawer {
-    max-height: min(48svh, 440px);
+    max-height: min(40svh, 400px);
   }
 }
 
@@ -401,6 +406,43 @@
   }
 
   .dashboard-drawer {
-    max-height: min(42svh, 340px);
+    max-height: min(34svh, 300px);
+  }
+}
+
+
+.app-keyboard-visible .dashboard-root {
+  height: var(--app-viewport-height, 100dvh);
+  max-height: var(--app-viewport-height, 100dvh);
+}
+
+.app-keyboard-visible .dashboard-scroll {
+  overscroll-behavior-y: contain;
+  scroll-padding-bottom: max(18px, var(--app-keyboard-inset-bottom, 0px));
+}
+
+.app-keyboard-visible .dashboard-composer {
+  max-height: min(38dvh, 260px);
+  padding-bottom: max(var(--space-3), env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 2200px) {
+  .dashboard-scroll {
+    padding-inline: max(96px, calc((100vw - 1900px) / 2));
+  }
+
+  .dashboard-input-row,
+  .dashboard-recs {
+    width: min(100%, 1160px);
+  }
+}
+
+@media (max-width: 640px) and (orientation: landscape) {
+  .dashboard-scroll {
+    padding-block: var(--space-2);
+  }
+
+  .dashboard-composer {
+    max-height: min(46dvh, 220px);
   }
 }

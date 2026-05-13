@@ -114,6 +114,11 @@ function Dashboard() {
     scroller.scrollTo({ top: scroller.scrollHeight, behavior });
   }, []);
 
+  const keepComposerVisible = useCallback(() => {
+    if (!shouldStickToBottomRef.current) return;
+    window.setTimeout(() => scrollToConversationEnd('smooth'), 80);
+  }, [scrollToConversationEnd]);
+
   useEffect(() => {
     if (!shouldStickToBottomRef.current) return;
     const raf = window.requestAnimationFrame(() => scrollToConversationEnd('smooth'));
@@ -155,6 +160,7 @@ function Dashboard() {
   const handleSendMessage = async () => {
     if (!input.trim() || sending) return;
     const text = input.trim();
+    shouldStickToBottomRef.current = true;
     addMessage(text, 'user');
     setInput('');
     setSending(true);
@@ -367,7 +373,7 @@ function Dashboard() {
               ref={composerInputRef}
               className="dashboard-input"
               value={input}
-              onFocus={() => window.setTimeout(() => scrollToConversationEnd('smooth'), 120)}
+              onFocus={keepComposerVisible}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
               placeholder="Ask anything clinical…"

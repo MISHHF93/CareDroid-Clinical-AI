@@ -9,7 +9,10 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  padding: var(--space-4);
+  padding: max(var(--space-4), env(safe-area-inset-top, 0px))
+    max(var(--space-4), env(safe-area-inset-right, 0px))
+    max(var(--space-4), env(safe-area-inset-bottom, 0px))
+    max(var(--space-4), env(safe-area-inset-left, 0px));
   animation: fadeIn 0.2s ease-out;
 }
 
@@ -27,7 +30,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-2);
-  max-height: min(90vh, calc(var(--app-viewport-height, 100dvh) - var(--space-8)));
+  max-height: min(90dvh, calc(var(--app-viewport-height, 100dvh) - var(--space-8)));
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -68,7 +71,7 @@
 .modal-full {
   width: 100%;
   max-width: 95vw;
-  max-height: min(95vh, calc(var(--app-viewport-height, 100dvh) - var(--space-4)));
+  max-height: min(95dvh, calc(var(--app-viewport-height, 100dvh) - var(--space-4)));
 }
 
 /* Modal Header */
@@ -178,7 +181,7 @@
 
   .modal {
     width: 100%;
-    max-height: min(90vh, calc(var(--app-viewport-height, 100dvh) - var(--space-8)));
+    max-height: min(90dvh, calc(var(--app-viewport-height, 100dvh) - var(--space-8)));
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     animation: slideUpMobile 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
