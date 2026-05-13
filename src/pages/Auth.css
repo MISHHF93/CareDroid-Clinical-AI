@@ -2,6 +2,7 @@
 .auth-root {
   box-sizing: border-box;
   width: 100%;
+  min-width: 0;
 }
 
 .auth-panel__header {
@@ -110,7 +111,7 @@
 }
 
 .auth-extras__body {
-  padding: 0 14px 14px;
+  padding: 0 14px max(14px, env(safe-area-inset-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: 14px;
@@ -125,7 +126,7 @@
 
 .auth-row-inline > *:first-child {
   flex: 1;
-  min-width: 160px;
+  min-width: min(100%, 160px);
 }
 
 .auth-link-btn {
@@ -174,6 +175,7 @@
 .auth-panel__footer {
   margin-top: 22px;
   padding-top: 16px;
+  padding-bottom: 4px;
   border-top: 1px solid var(--panel-border, rgba(255, 255, 255, 0.08));
 }
 
@@ -214,9 +216,11 @@
 
 .auth-twofa__input {
   text-align: center;
-  font-size: 1.35rem;
-  letter-spacing: 0.35em;
+  font-size: clamp(1rem, 4vw, 1.35rem);
+  letter-spacing: 0.22em;
   font-family: ui-monospace, monospace;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .auth-twofa__actions {
@@ -246,4 +250,29 @@
 
 .auth-text-btn:hover {
   color: var(--accent-primary, #00ff88);
+}
+
+@media (max-width: 420px) {
+  .auth-row-inline {
+    flex-direction: column;
+  }
+
+  .auth-row-inline > * {
+    width: 100%;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .auth-panel__header {
+    margin-bottom: 14px;
+  }
+
+  .auth-segment {
+    margin-bottom: 14px;
+  }
+
+  .auth-form {
+    gap: 12px;
+  }
 }
