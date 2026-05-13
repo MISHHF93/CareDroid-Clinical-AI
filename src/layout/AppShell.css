@@ -152,3 +152,23 @@
     gap: var(--space-1);
   }
 }
+
+@supports (height: 100svh) {
+  .app-shell,
+  .app-shell-main-wrap,
+  .app-shell-page-body {
+    min-height: min(var(--app-viewport-height, 100dvh), 100svh);
+  }
+}
+
+@media (min-width: 1920px) {
+  .app-shell-page-body {
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .app-shell--compact.app-shell--authed .app-shell-main-wrap {
+    padding-top: 44px;
+  }
+}

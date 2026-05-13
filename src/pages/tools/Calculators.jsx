@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import './Calculators.css';
-import { apiFetch } from '../../services/apiClient';
+import { apiFetch, parseApiResponse } from '../../services/apiClient';
 import { parseToolExecutionResponse } from '../../utils/toolExecutionResponse';
 import { NavIcon } from '../../navigation/NavIcon';
 import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
@@ -200,7 +200,7 @@ const SOFACalculator = ({ onResultChange }) => {
 
       if (!response.ok) throw new Error('Failed to calculate SOFA score');
 
-      const data = await response.json();
+      const data = await parseApiResponse(response, { fallback: {} });
       const parsed = parseToolExecutionResponse(data);
       if (parsed.ok && parsed.data != null) {
         setResult(parsed.data);

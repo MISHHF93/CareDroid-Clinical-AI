@@ -88,6 +88,7 @@ function Dashboard() {
   const [sending, setSending] = useState(false);
   const scrollRef = useRef(null);
   const scrollEndRef = useRef(null);
+  const composerInputRef = useRef(null);
   const shouldStickToBottomRef = useRef(true);
 
   const {
@@ -107,11 +108,17 @@ function Dashboard() {
     shouldStickToBottomRef.current = distanceFromBottom < 96;
   }, []);
 
+  const scrollToConversationEnd = useCallback((behavior = 'smooth') => {
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+    scroller.scrollTo({ top: scroller.scrollHeight, behavior });
+  }, []);
+
   useEffect(() => {
-    if (shouldStickToBottomRef.current) {
-      scrollEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
-  }, [messages, sending]);
+    if (!shouldStickToBottomRef.current) return;
+    const raf = window.requestAnimationFrame(() => scrollToConversationEnd('smooth'));
+    return () => window.cancelAnimationFrame(raf);
+  }, [messages, sending, scrollToConversationEnd]);
 
   const panelRegistryId = searchParams.get('tool');
   const calcFromUrl = searchParams.get('calc');
@@ -357,8 +364,10 @@ function Dashboard() {
           <div className="dashboard-input-row">
             <input
               type="text"
+              ref={composerInputRef}
               className="dashboard-input"
               value={input}
+              onFocus={() => window.setTimeout(() => scrollToConversationEnd('smooth'), 120)}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
               placeholder="Ask anything clinical…"

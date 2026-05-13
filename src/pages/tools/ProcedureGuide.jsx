@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
-import { apiFetch } from '../../services/apiClient';
+import { apiFetch, parseApiResponse } from '../../services/apiClient';
 
 const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
@@ -47,7 +47,7 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
         }),
       });
 
-      const data = await response.json();
+      const data = await parseApiResponse(response, { fallback: {} });
       setResults(data.response);
     } catch (err) {
       setResults('Error loading procedure guide. Please try again.');

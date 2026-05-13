@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ToolPanel from './ToolPanel';
 import ToolCard from './ToolCard';
 import ToolVisualization from './ToolVisualization';
@@ -33,13 +33,17 @@ const ChatInterface = ({
     shouldStickToBottomRef.current = distanceFromBottom < 96;
   };
 
-  const scrollToBottom = (behavior = 'smooth') => {
-    messagesEndRef.current?.scrollIntoView({ behavior, block: 'end' });
-  };
+  const scrollToBottom = useCallback((behavior = 'smooth') => {
+    const scroller = messagesRef.current;
+    if (!scroller) return;
+    scroller.scrollTo({ top: scroller.scrollHeight, behavior });
+  }, []);
 
   useEffect(() => {
-    if (shouldStickToBottomRef.current) scrollToBottom('smooth');
-  }, [messages, isLoading]);
+    if (!shouldStickToBottomRef.current) return;
+    const raf = window.requestAnimationFrame(() => scrollToBottom('smooth'));
+    return () => window.cancelAnimationFrame(raf);
+  }, [messages, isLoading, scrollToBottom]);
 
   useEffect(() => {
     if (prefillText && !input.trim()) {
@@ -211,6 +215,7 @@ const ChatInterface = ({
         <div className="chat-interface__composer">
           <textarea
             value={input}
+            onFocus={() => window.setTimeout(() => scrollToBottom('smooth'), 120)}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask CareDroid anything clinical..."

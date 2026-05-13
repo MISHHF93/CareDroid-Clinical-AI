@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import './LabInterpreter.css';
-import { apiFetch } from '../../services/apiClient';
+import { apiFetch, parseApiResponse } from '../../services/apiClient';
 import { parseToolExecutionResponse } from '../../utils/toolExecutionResponse';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getLabCategoryIcon, getToolIcon } from '../../navigation/iconRegistry';
@@ -94,7 +94,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
         throw new Error('Failed to interpret lab values');
       }
 
-      const data = await response.json();
+      const data = await parseApiResponse(response, { fallback: {} });
       const parsed = parseToolExecutionResponse(data);
       if (parsed.ok && parsed.data != null) {
         setResults(parsed.data);

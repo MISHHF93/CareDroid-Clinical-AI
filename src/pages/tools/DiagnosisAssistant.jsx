@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import './ToolPageLayout.css';
-import { apiFetch } from '../../services/apiClient';
+import { apiFetch, parseApiResponse } from '../../services/apiClient';
 
 const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
@@ -48,7 +48,7 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
 
       if (!response.ok) throw new Error('Failed to generate differential diagnosis');
 
-      const data = await response.json();
+      const data = await parseApiResponse(response, { fallback: {} });
       setResults(data.response);
     } catch (err) {
       setError(err.message);

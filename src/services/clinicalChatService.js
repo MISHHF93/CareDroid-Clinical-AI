@@ -1,4 +1,4 @@
-import { apiFetch, buildApiUrl } from './apiClient';
+import { apiFetch, buildApiUrl, parseApiResponse } from './apiClient';
 
 /**
  * Maps UI tool registry ids (sidebar) to backend orchestrator tool ids for the chat API.
@@ -54,13 +54,7 @@ export async function sendClinicalChatMessage({
     body: JSON.stringify(body),
   });
 
-  let data = {};
-  try {
-    data = await response.json();
-  } catch {
-    data = {};
-  }
-
+  const data = await parseApiResponse(response, { fallback: {} });
   return { ok: response.ok, status: response.status, data };
 }
 
