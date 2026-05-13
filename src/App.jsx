@@ -21,7 +21,6 @@ import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
 import { getToolById } from './data/toolRegistry';
 import { AUTH_PATH_ALIASES } from './routing/authPathAliases';
-import appConfig from './config/appConfig';
 
 // Page imports - Public
 import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
@@ -134,12 +133,6 @@ function WelcomePage() {
         <button type="button" className="welcome-page-cta" onClick={() => navigate('/auth')}>
           Sign In or Create Account
         </button>
-
-        {!appConfig.features.hideDivisionMode && (
-          <button type="button" className="welcome-page-division" onClick={() => navigate('/auth')}>
-            Division mode — enter without verification
-          </button>
-        )}
 
         <p className="welcome-page-footnote">Healthcare professionals only. Secure login required.</p>
       </div>
