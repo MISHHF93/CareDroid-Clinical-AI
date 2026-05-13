@@ -6,12 +6,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 8000",
+    "dev:lan": "vite --port 8000 --host",
     "build": "vite build",
     "build:frontend": "vite build",
     "preview": "vite preview",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
+    "test:run:parallel": "vitest run --maxWorkers 4",
+    "test:run:frontend": "vitest run src",
     "test:coverage": "vitest run --coverage",
     "test:frontend": "vitest",
     "android-debug": "npm run build && npx cap sync android && cd android && .\\gradlew.bat assembleDebug",
@@ -21,8 +24,10 @@
     "backend:start": "cd backend && npm run start:prod",
     "start:backend": "cd backend && npm run start:dev",
     "start:all": "concurrently \"npm run backend:dev\" \"npm run dev\"",
+    "mcp:server": "cd mcp && npm run start",
+    "smoke": "node scripts/print-smoke-checklist.mjs",
     "start:single": "npm run build:frontend && npm run backend:start",
-    "lint": "eslint . --ext .js,.jsx",
+    "lint": "eslint src",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css}\""
   },
   "dependencies": {
@@ -31,6 +36,7 @@
     "axios": "^1.7.8",
     "dexie": "^4.3.0",
     "firebase": "^10.12.5",
+    "lucide-react": "^0.468.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.22.3",
@@ -38,6 +44,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "^8.0.2",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -45,10 +52,12 @@
     "concurrently": "^8.2.2",
     "eslint": "^9.39.2",
     "eslint-plugin-react": "^7.33.2",
+    "globals": "^17.6.0",
     "jsdom": "^28.0.0",
     "prettier": "^3.2.4",
     "terser": "^5.47.1",
     "vite": "^7.3.1",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "zod": "^4.4.3"
   }
 }

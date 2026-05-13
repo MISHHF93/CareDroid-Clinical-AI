@@ -1,7 +1,9 @@
 import React from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSharedSession } from '../../utils/sharedSessions';
-import toolRegistry, { toolRegistryById } from '../../data/toolRegistry';
+import { toolRegistryById } from '../../data/toolRegistry';
+import { NavIcon } from '../../navigation/NavIcon';
+import { getToolIcon } from '../../navigation/iconRegistry';
 import './SharedToolSession.css';
 
 const SharedToolSession = () => {
@@ -26,7 +28,12 @@ const SharedToolSession = () => {
     <div className="shared-session">
       <div className="shared-session-card">
         <span className="shared-tag">Shared Session</span>
-        <h1>{tool?.icon || '🧰'} {session.toolName || 'Clinical Tool'}</h1>
+        <h1 className="shared-session-title">
+          <span className="shared-session-title-icon" aria-hidden>
+            <NavIcon icon={getToolIcon(session.toolId)} size={28} />
+          </span>
+          <span>{session.toolName || 'Clinical Tool'}</span>
+        </h1>
         <p>{session.toolDescription || 'Shared tool session from CareDroid.'}</p>
         <div className="shared-meta">
           <span>Created: {new Date(session.createdAt).toLocaleString()}</span>

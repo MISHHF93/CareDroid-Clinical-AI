@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AIService } from '../ai/ai.service';
 import { IntentClassifierService } from '../medical-control-plane/intent-classifier/intent-classifier.service';
@@ -7,7 +7,7 @@ import { EmergencyEscalationService } from '../medical-control-plane/emergency-e
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { NluMetricsService } from '../metrics/nlu-metrics.service';
-import { PrimaryIntent, EmergencySeverity } from '../medical-control-plane/intent-classifier/dto/intent-classification.dto';
+import { PrimaryIntent, EmergencySeverity, IntentClassification } from '../medical-control-plane/intent-classifier/dto/intent-classification.dto';
 import { RAGService } from '../rag/rag.service';
 import { MedicalSource } from '../rag/dto/medical-source.dto';
 import {
@@ -131,6 +131,8 @@ export class ChatService {
       this.logger.error(`❌ Intent classification failed: ${error instanceof Error ? error.message : String(error)}`);
       classification = null;
     }
+
+    classification = this.mergeUiToolRegistryHint(tool, classification);
 
     // ========================================
     // STEP 2: EMERGENCY DETECTION & ESCALATION
@@ -327,6 +329,106 @@ export class ChatService {
   }
 
   /**
+   * When the client sends a sidebar tool id that maps to a registered orchestrator,
+   * bias routing toward that executor (deterministic tool runs).
+   */
+  private mergeUiToolRegistryHint(
+    toolHint: string | undefined,
+    classification: IntentClassification | null,
+  ): IntentClassification | null {
+    if (!toolHint || !classification) {
+      return classification;
+    }
+    const registryToOrchestrator: Record<string, string> = {
+      'drug-check': 'drug-interactions',
+      'lab-interp': 'lab-interpreter',
+    };
+    const targetId = registryToOrchestrator[toolHint];
+    if (!targetId) {
+      return classification;
+    }
+    try {
+      this.toolOrchestrator.getToolMetadata(targetId);
+    } catch {
+      return classification;
+    }
+    return {
+      ...classification,
+      primaryIntent: PrimaryIntent.CLINICAL_TOOL,
+      toolId: targetId,
+      confidence: Math.max(classification.confidence, 0.72),
+    };
+  }
+
+  /**
+   * Intent classification for client-side tool recommendations (matches frontend contract).
+   */
+  async classifyIntentBrief(
+    message: string,
+    userId?: string,
+    userRole?: string,
+    conversationId?: number,
+  ): Promise<{
+    intent: string;
+    confidence: number;
+    entities: Array<{ type: string; value: string }>;
+    emergencyScore: number;
+    context: Record<string, any>;
+  }> {
+    const classification = await this.intentClassifier.classify(message, {
+      userId: userId || 'anonymous',
+      conversationId,
+      userRole: userRole || 'clinician',
+    });
+
+    const intent = this.mapClassificationToRecommendationIntent(classification);
+
+    const entities = Object.entries(classification.extractedParameters || {})
+      .filter(([, v]) => v !== null && v !== undefined && v !== '')
+      .map(([name, value]) => ({
+        type: 'extracted_parameter',
+        value: `${name}:${String(value)}`,
+      }));
+
+    const emergencyScore = classification.isEmergency
+      ? Math.min(0.99, 0.55 + classification.confidence * 0.4)
+      : classification.emergencyKeywords?.length
+        ? Math.min(0.85, 0.35 + classification.confidence * 0.25)
+        : 0;
+
+    return {
+      intent,
+      confidence: classification.confidence,
+      entities,
+      emergencyScore,
+      context: {
+        primaryIntent: classification.primaryIntent,
+        toolId: classification.toolId,
+        isEmergency: classification.isEmergency,
+        method: classification.method,
+      },
+    };
+  }
+
+  private mapClassificationToRecommendationIntent(c: IntentClassification): string {
+    if (c.isEmergency || c.primaryIntent === PrimaryIntent.EMERGENCY) {
+      return 'emergency_assessment';
+    }
+    if (c.primaryIntent === PrimaryIntent.MEDICAL_REFERENCE) {
+      return 'protocol_lookup';
+    }
+    if (c.primaryIntent === PrimaryIntent.CLINICAL_TOOL && c.toolId) {
+      if (c.toolId.includes('drug')) return 'drug_interaction';
+      if (c.toolId.includes('lab')) return 'lab_interpretation';
+      return 'risk_assessment';
+    }
+    if (c.primaryIntent === PrimaryIntent.ADMINISTRATIVE) {
+      return 'protocol_lookup';
+    }
+    return 'diagnosis';
+  }
+
+  /**
    * Map Claude tool names to internal tool IDs
    */
   private mapToolName(claudeToolName: string): string {
@@ -497,12 +599,28 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
           },
         }],
         intentClassification: classification,
-        toolResult: toolResult.result,
+        toolResult: {
+          toolId,
+          toolName: toolResult.toolName,
+          result: toolResult.result,
+        },
       };
 
     } catch (error) {
       this.logger.error(`Tool execution failed: ${error instanceof Error ? error.message : String(error)}`);
-      
+
+      if (error instanceof NotFoundException) {
+        this.logger.warn(`No orchestrator registered for toolId=${toolId}; falling back to general clinical response`);
+        const fallback = await this.generateAIResponse(
+          `${message}\n\n(Note: Clinical tool "${toolId}" is not available as an automated executor in this deployment. Provide general educational guidance and state limitations clearly.)`,
+          { intentClassification: classification },
+        );
+        return {
+          ...fallback,
+          intentClassification: classification,
+        };
+      }
+
       const toolInfo = this.getToolInfo(toolId);
       return {
         text: `❌ **Error executing ${toolInfo.name}**\n\n${error instanceof Error ? error.message : 'An unexpected error occurred'}\n\nPlease try again or contact support if the issue persists.`,

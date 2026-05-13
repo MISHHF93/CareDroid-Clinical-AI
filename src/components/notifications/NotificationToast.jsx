@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import './NotificationToast.css';
 
 /**
@@ -88,7 +88,7 @@ const NotificationToast = ({ toast, onDismiss }) => {
  * addToast({ type: 'success', title: 'Success!', message: 'Operation completed.' });
  */
 export const useToasts = () => {
-  const [toasts, setToasts] = React.useState([]);
+  const [toasts, setToasts] = useState([]);
 
   const addToast = (toast) => {
     const id = Date.now().toString();

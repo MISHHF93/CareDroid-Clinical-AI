@@ -26,6 +26,7 @@ const ConversationContext = createContext({
   
   // Tool actions
   selectTool: () => {},
+  setActiveTool: () => {},
   clearTool: () => {},
   
   // Loading state
@@ -96,12 +97,29 @@ export const ConversationProvider = ({ children }) => {
   }, [activeConversationId]);
 
   // Add a message to the active conversation
-  const addMessage = useCallback((content, role = 'user') => {
+  // Supports (content, role) or a full message object: { role, content, citations?, toolResult?, ... }
+  const addMessage = useCallback((contentOrPayload, role = 'user') => {
+    if (
+      contentOrPayload &&
+      typeof contentOrPayload === 'object' &&
+      !Array.isArray(contentOrPayload) &&
+      contentOrPayload.role
+    ) {
+      const message = {
+        id: contentOrPayload.id || `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+        ...contentOrPayload,
+        timestamp: contentOrPayload.timestamp || new Date(),
+      };
+      setMessages((prev) => [...prev, message]);
+      logger.debug('Message added', { messageId: message.id, role: message.role, conversationId: activeConversationId });
+      return message;
+    }
+
     const message = {
       id: Date.now().toString(),
       role,
-      content,
-      timestamp: new Date()
+      content: contentOrPayload,
+      timestamp: new Date(),
     };
     setMessages((prev) => [...prev, message]);
     logger.debug('Message added', { messageId: message.id, role, conversationId: activeConversationId });
@@ -114,7 +132,12 @@ export const ConversationProvider = ({ children }) => {
     logger.debug('Messages cleared', { conversationId: activeConversationId });
   }, [activeConversationId]);
 
-  // Select a clinical tool
+  const setActiveTool = useCallback((toolId) => {
+    setSelectedTool(toolId ?? null);
+    logger.debug('Tool set explicitly', { toolId });
+  }, []);
+
+  // Select a clinical tool (toggle when clicking same tool in UI)
   const selectTool = useCallback((toolId) => {
     setSelectedTool((prev) => (prev === toolId ? null : toolId));
     logger.debug('Tool selected', { toolId });
@@ -132,13 +155,14 @@ export const ConversationProvider = ({ children }) => {
     messages,
     selectedTool,
     isLoading,
-    
+
     addConversation,
     selectConversation,
     deleteConversation,
     addMessage,
     clearMessages,
     selectTool,
+    setActiveTool,
     clearTool,
     setIsLoading,
   };

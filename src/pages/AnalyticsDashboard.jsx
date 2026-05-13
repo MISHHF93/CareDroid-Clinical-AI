@@ -5,6 +5,8 @@ import analyticsService from '../services/analyticsService';
 import offlineService from '../services/offlineService';
 import toolRegistry, { toolRegistryById } from '../data/toolRegistry';
 import LiveCostDashboard from '../components/LiveCostDashboard';
+import { NavIcon } from '../navigation/NavIcon';
+import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import './AnalyticsDashboard.css';
 
 const AnalyticsDashboard = () => {
@@ -84,7 +86,6 @@ const AnalyticsDashboard = () => {
         count,
         name: tool?.name || toolType,
         color: tool?.color || '#64748B',
-        icon: tool?.icon || '🧰'
       };
     });
 
@@ -97,7 +98,12 @@ const AnalyticsDashboard = () => {
     <div className="analytics-dashboard">
       <header className="analytics-header">
         <div>
-          <h1>📊 Clinical Analytics</h1>
+          <h1 className="analytics-page-title">
+            <span className="analytics-page-title-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.lineChart} size={28} />
+            </span>
+            <span>Clinical Analytics</span>
+          </h1>
           <p>Usage insights for CareDroid tools and conversations.</p>
         </div>
         <div className="analytics-header-actions">
@@ -143,7 +149,9 @@ const AnalyticsDashboard = () => {
           {toolUsage.map((tool) => (
             <div key={tool.toolType} className="analytics-row">
               <div className="analytics-row-label">
-                <span className="tool-icon">{tool.icon}</span>
+                <span className="tool-icon" aria-hidden>
+                  <NavIcon icon={getToolIcon(tool.toolType)} size={20} />
+                </span>
                 <span>{tool.name}</span>
               </div>
               <div className="analytics-row-bar">
@@ -215,7 +223,9 @@ const AnalyticsDashboard = () => {
         <div className="recommendation-grid">
           {toolRegistry.slice(0, 3).map((tool) => (
             <div key={tool.id} className="recommendation-card">
-              <span className="recommendation-icon">{tool.icon}</span>
+              <span className="recommendation-icon" aria-hidden>
+                <NavIcon icon={getToolIcon(tool.id)} size={24} />
+              </span>
               <div>
                 <h3>{tool.name}</h3>
                 <p>{tool.description}</p>

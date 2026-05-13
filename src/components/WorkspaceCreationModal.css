@@ -162,7 +162,10 @@
 }
 
 .template-icon {
-  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color, #0f172a);
 }
 
 .template-name {
@@ -250,7 +253,10 @@
 }
 
 .preview-icon {
-  font-size: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-color, #1a1a1a);
 }
 
 .preview-name {
@@ -321,7 +327,11 @@
 }
 
 .tool-item-icon {
-  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-color, #1a1a1a);
 }
 
 .tool-item-name {

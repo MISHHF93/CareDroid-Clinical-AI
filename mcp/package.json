@@ -1,0 +1,17 @@
+{
+  "name": "caredroid-mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol (stdio) bridge to CareDroid clinical tools API",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --check src/server.mjs"
+  },
+  "keywords": ["mcp", "model-context-protocol", "caredroid"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  }
+}

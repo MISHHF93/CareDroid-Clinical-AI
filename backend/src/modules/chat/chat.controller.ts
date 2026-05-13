@@ -23,6 +23,11 @@ interface ChatMessageDto {
   conversationId?: number;
 }
 
+interface IntentClassifyDto {
+  message: string;
+  conversationId?: number;
+}
+
 interface ChatResponse3DDto {
   id: string;
   response: string;
@@ -76,6 +81,14 @@ export class ChatController {
       visualizations: response.visualizations,
       timestamp: Date.now(),
     };
+  }
+
+  @Post('intent-classify')
+  @RequirePermission(Permission.USE_AI_CHAT)
+  async classifyIntent(@Body() dto: IntentClassifyDto, @Req() req?: any) {
+    const userId = req?.user?.id || 'anonymous';
+    const userRole = req?.user?.role || null;
+    return this.chatService.classifyIntentBrief(dto.message, userId, userRole, dto.conversationId);
   }
 
   @Post('message')

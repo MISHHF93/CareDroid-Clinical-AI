@@ -232,9 +232,10 @@ describe('ChatInterface Component Integration', () => {
         />
       );
 
-      const input: HTMLInputElement = screen.getByPlaceholderText(/Type your message/i) ||
-                                     screen.getByRole('textbox') ||
-                                     document.querySelector('input[type="text"]');
+      const input =
+        screen.getByPlaceholderText(/Type your message/i) ||
+        screen.getByRole('textbox') ||
+        document.querySelector('input[type="text"]');
 
       const sendButton = screen.getByRole('button', { name: /send|submit/i }) ||
                         screen.getByTestId('send-button');

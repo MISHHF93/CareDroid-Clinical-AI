@@ -128,7 +128,7 @@
   - If user has permission: Renders TeamManagement component ✅
   - If user lacks permission: Redirects to /chat ✅
   - Sidebar nav item hidden if denied ✅
-  - HeaderNav menu item visible but may be disabled ✅
+  - Sidebar / app chrome reflects permission state (no duplicate top header nav) ✅
 
 #### Audit Logs Route (`/audit-logs`)
 - **Required Permission**: `Permission.VIEW_AUDIT_LOGS`
@@ -136,7 +136,7 @@
   - If user has permission: Renders AuditLogs component ✅
   - If user lacks permission: Redirects to /chat ✅
   - Sidebar nav item hidden if denied ✅
-  - HeaderNav menu item not visible ✅
+  - Sidebar nav item hidden if denied ✅
 
 ---
 
@@ -309,7 +309,7 @@ These are gracefully handled by the app.
 
 ### ✅ Verified Working
 1. **Routing**: All 23 routes accessible, guards applied
-2. **Navigation**: Sidebar, Header, Breadcrumbs, Footer all wired
+2. **Navigation**: Sidebar + AppShell chrome (Lucide icons); tool pages use breadcrumb/header icons
 3. **Layouts**: PublicShell, AuthShell, AppShell all render correctly
 4. **Contexts**: UserProvider, NotificationProvider, OfflineProvider functioning
 5. **Hooks**: useUser, useNotifications, useNotificationActions functional

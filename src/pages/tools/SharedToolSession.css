@@ -25,6 +25,20 @@
   margin: 0;
 }
 
+.shared-session-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.shared-session-title-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-1, #00ff88);
+}
+
 .shared-session-card p {
   color: rgba(226, 232, 240, 0.75);
   margin: 0;

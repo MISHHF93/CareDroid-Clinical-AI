@@ -35,7 +35,7 @@ export const computeRiskScore = (tool, results) => {
   }
 
   // Lab Interpreter Risk Assessment
-  if (tool === 'lab-interpreter' && results.criticalCount !== undefined) {
+  if ((tool === 'lab-interpreter' || tool === 'lab-interp') && results.criticalCount !== undefined) {
     const criticalCount = results.criticalCount || 0;
     const abnormalCount = results.abnormalCount || 0;
     
@@ -149,7 +149,7 @@ export const generateClinicalAlerts = (tool, results, riskData) => {
       });
     }
 
-    if (tool === 'lab-interpreter' && results.criticalCount > 0) {
+    if ((tool === 'lab-interpreter' || tool === 'lab-interp') && results.criticalCount > 0) {
       alerts.push({
         id: `alert-lab-${Date.now()}`,
         severity: 'critical',

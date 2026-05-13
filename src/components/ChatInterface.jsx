@@ -4,9 +4,7 @@ import ToolCard from './ToolCard';
 import ToolVisualization from './ToolVisualization';
 import Citations, { CitationModal } from './Citations';
 import ConfidenceBadge from './ConfidenceBadge';
-import { getInventoryItem } from '../data/featureInventory';
-import { featureInventory } from '../data/featureInventory';
-import { apiFetch } from '../services/apiClient';
+import { sendClinicalChatMessage, mapChatResponseToAssistantMessage } from '../services/clinicalChatService';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 
 const ChatInterface = ({
@@ -59,47 +57,19 @@ const ChatInterface = ({
     setIsLoading(true);
 
     try {
-      const headers = { 'Content-Type': 'application/json' };
-      if (authToken) {
-        headers.Authorization = `Bearer ${authToken}`;
-      }
-
-      const response = await apiFetch('/api/chat/message', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          message: input,
-          tool: currentTool,
-          feature: currentFeature,
-          conversationId
-        })
+      const { ok, data } = await sendClinicalChatMessage({
+        message: input,
+        tool: currentTool,
+        feature: currentFeature,
+        conversationId,
+        authToken,
       });
 
-      if (!response.ok) {
-        throw new Error(`Request failed with status ${response.status}`);
+      if (!ok) {
+        throw new Error(`Request failed with status`);
       }
 
-      let data = {};
-      try {
-        data = await response.json();
-      } catch (parseError) {
-        data = {};
-      }
-      
-      const assistantMessage = {
-        role: 'assistant',
-        content: data.response || 'I encountered an error processing your request.',
-        citations: data.citations || [],
-        confidence: data.confidence,
-        ragContext: data.ragContext,
-        timestamp: new Date()
-      };
-
-      // Include tool result if present
-      if (data.toolResult) {
-        assistantMessage.toolResult = data.toolResult;
-      }
-
+      const assistantMessage = mapChatResponseToAssistantMessage(data);
       onAppendMessage?.(conversationId, assistantMessage);
     } catch (error) {
       onAppendMessage?.(conversationId, {
@@ -192,7 +162,7 @@ const ChatInterface = ({
               lineHeight: '1.6',
               boxShadow: 'var(--shadow-1)'
             }}>
-              {/* Confidence Badge (RAG-augmented responses) */}
+              <div>{message.content}</div>
               {message.confidence !== undefined && message.role === 'assistant' && (
                 <div style={{ marginTop: '12px' }}>
                   <ConfidenceBadge confidence={message.confidence} />

@@ -9,27 +9,43 @@ import advancedRecommendationService from '../services/advancedRecommendationSer
 // Fallback keyword rules (used when NLU service is offline)
 const FALLBACK_RULES = [
   {
-    toolId: 'drug-checker',
+    toolId: 'drug-check',
     keywords: ['drug', 'medication', 'interaction', 'contraindication', 'dose', 'dosing', 'warfarin', 'antibiotic']
   },
   {
-    toolId: 'lab-interpreter',
+    toolId: 'lab-interp',
     keywords: ['lab', 'labs', 'cbc', 'bmp', 'cmp', 'creatinine', 'troponin', 'lactate', 'abnormal', 'reference range']
   },
   {
-    toolId: 'calculator',
-    keywords: ['score', 'calculator', 'gfr', 'bmi', 'sofa', 'qsofa', 'chads', 'heart score', 'risk']
+    toolId: 'sofa-score',
+    keywords: ['sofa', 'qsofa', 'organ failure', 'sequential organ', 'sepsis score icu']
   },
   {
-    toolId: 'protocol-lookup',
+    toolId: 'calc-gfr',
+    keywords: ['gfr', 'egfr', 'ckd-epi', 'glomerular', 'creatinine clearance', 'kidney function']
+  },
+  {
+    toolId: 'calc-bmi',
+    keywords: ['bmi', 'body mass index', 'obesity class', 'underweight', 'overweight']
+  },
+  {
+    toolId: 'calc-chads2vasc',
+    keywords: ['chads', 'cha2ds2', 'stroke risk afib', 'anticoagulation score', 'atrial fibrillation stroke']
+  },
+  {
+    toolId: 'calculators',
+    keywords: ['calculator', 'risk score', 'heart score', 'wells', 'curb']
+  },
+  {
+    toolId: 'protocols',
     keywords: ['protocol', 'guideline', 'pathway', 'acls', 'atls', 'sepsis bundle', 'stroke']
   },
   {
-    toolId: 'diagnosis-assistant',
+    toolId: 'diagnosis',
     keywords: ['differential', 'diagnosis', 'etiology', 'workup', 'ddx', 'rule out']
   },
   {
-    toolId: 'procedure-guide',
+    toolId: 'procedures',
     keywords: ['procedure', 'intubation', 'central line', 'thoracentesis', 'steps', 'consent']
   }
 ];

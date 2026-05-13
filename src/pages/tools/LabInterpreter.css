@@ -40,7 +40,10 @@
 }
 
 .lab-panel-icon {
-  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary, #fff);
 }
 
 /* Patient Context */
@@ -296,6 +299,10 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .lab-clear-button:hover,
@@ -362,9 +369,12 @@
 }
 
 .lab-results-empty-icon {
-  font-size: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 16px;
-  opacity: 0.3;
+  opacity: 0.35;
+  color: var(--text-secondary, rgba(255,255,255,0.5));
 }
 
 .lab-results-error {
@@ -443,6 +453,13 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.lab-category-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-1, #00ffff);
 }
 
 .lab-values-table {
@@ -572,7 +589,9 @@
 }
 
 .lab-critical-alert-icon {
-  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   animation: shake 0.5s ease-in-out infinite;
 }
 
@@ -603,4 +622,18 @@
   font-size: 13px;
   color: var(--text-secondary, rgba(255,255,255,0.7));
   line-height: 1.5;
+}
+
+.lab-disclaimer-strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-primary, #fff);
+}
+
+.lab-disclaimer-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffc107;
 }

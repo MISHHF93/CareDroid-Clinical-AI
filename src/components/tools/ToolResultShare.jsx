@@ -1,13 +1,22 @@
 import { useState } from 'react';
 import { getExportService } from '../../services/export/ExportService';
+import { apiFetch } from '../../services/apiClient';
+import { NavIcon } from '../../navigation/NavIcon';
+import { getToolIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
 import './ToolResultShare.css';
 
-const ToolResultShare = ({ toolName, toolIcon, results, onClose }) => {
+const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
   const [shareMode, setShareMode] = useState('link'); // 'link' | 'export' | 'email'
   const [selectedFormat, setSelectedFormat] = useState('pdf');
   const [recipientEmail, setRecipientEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
+  const [feedback, setFeedback] = useState({ text: '', variant: 'info' });
+
+  const EXPORT_FORMAT_ICON = {
+    json: CHROME_ICONS.formatJson,
+    csv: CHROME_ICONS.formatCsv,
+    pdf: CHROME_ICONS.formatPdf,
+  };
 
   const generateShareLink = () => {
     const shareData = {
@@ -25,8 +34,8 @@ const ToolResultShare = ({ toolName, toolIcon, results, onClose }) => {
     try {
       const url = generateShareLink();
       await navigator.clipboard.writeText(url);
-      setMessage('✅ Share link copied to clipboard!');
-      setTimeout(() => setMessage(''), 3000);
+      setFeedback({ text: 'Share link copied to clipboard.', variant: 'success' });
+      setTimeout(() => setFeedback({ text: '', variant: 'info' }), 3000);
     } catch (err) {
       const url = generateShareLink();
       window.prompt('Copy this link to share:', url);
@@ -66,13 +75,13 @@ const ToolResultShare = ({ toolName, toolIcon, results, onClose }) => {
         });
       }
 
-      setMessage(`✅ Results exported as ${selectedFormat.toUpperCase()}!`);
+      setFeedback({ text: `Results exported as ${selectedFormat.toUpperCase()}.`, variant: 'success' });
       setTimeout(() => {
-        setMessage('');
+        setFeedback({ text: '', variant: 'info' });
         onClose();
       }, 2000);
     } catch (err) {
-      setMessage(`❌ Export failed: ${err.message}`);
+      setFeedback({ text: `Export failed: ${err.message}`, variant: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -80,24 +89,22 @@ const ToolResultShare = ({ toolName, toolIcon, results, onClose }) => {
 
   const handleEmailShare = async () => {
     if (!recipientEmail.trim()) {
-      setMessage('⚠️ Please enter an email address');
+      setFeedback({ text: 'Please enter an email address.', variant: 'error' });
       return;
     }
 
     setIsLoading(true);
     try {
-      const token = localStorage.getItem('caredroid_access_token');
       const shareData = {
         tool: toolName,
         results: results,
         timestamp: new Date().toISOString(),
       };
 
-      const response = await fetch('/api/tools/share-results', {
+      const response = await apiFetch('/api/tools/share-results', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           recipientEmail,
@@ -108,17 +115,17 @@ const ToolResultShare = ({ toolName, toolIcon, results, onClose }) => {
       });
 
       if (response.ok) {
-        setMessage(`✅ Results sent to ${recipientEmail}`);
+        setFeedback({ text: `Results sent to ${recipientEmail}.`, variant: 'success' });
         setRecipientEmail('');
         setTimeout(() => {
-          setMessage('');
+          setFeedback({ text: '', variant: 'info' });
           onClose();
         }, 2000);
       } else {
-        setMessage('❌ Failed to send results');
+        setFeedback({ text: 'Failed to send results.', variant: 'error' });
       }
     } catch (err) {
-      setMessage(`❌ Email share failed: ${err.message}`);
+      setFeedback({ text: `Email share failed: ${err.message}`, variant: 'error' });
     } finally {
       setIsLoading(false);
     }
@@ -130,29 +137,46 @@ const ToolResultShare = ({ toolName, toolIcon, results, onClose }) => {
       <div className="share-modal-content">
         <div className="share-modal-header">
           <h2>
-            <span>{toolIcon}</span> Share {toolName} Results
+            <span className="share-modal-tool-icon" aria-hidden>
+              <NavIcon icon={getToolIcon(toolId)} size={24} />
+            </span>{' '}
+            Share {toolName} Results
           </h2>
-          <button className="share-modal-close" onClick={onClose}>✕</button>
+          <button type="button" className="share-modal-close" onClick={onClose} aria-label="Close">
+            <NavIcon icon={CHROME_ICONS.close} size={22} />
+          </button>
         </div>
 
         <div className="share-modal-tabs">
           <button
+            type="button"
             className={`share-tab ${shareMode === 'link' ? 'active' : ''}`}
             onClick={() => setShareMode('link')}
           >
-            🔗 Share Link
+            <span className="share-tab-inner">
+              <NavIcon icon={CHROME_ICONS.shareLink} size={18} />
+              Share Link
+            </span>
           </button>
           <button
+            type="button"
             className={`share-tab ${shareMode === 'export' ? 'active' : ''}`}
             onClick={() => setShareMode('export')}
           >
-            💾 Export
+            <span className="share-tab-inner">
+              <NavIcon icon={CHROME_ICONS.download} size={18} />
+              Export
+            </span>
           </button>
           <button
+            type="button"
             className={`share-tab ${shareMode === 'email' ? 'active' : ''}`}
             onClick={() => setShareMode('email')}
           >
-            📧 Email
+            <span className="share-tab-inner">
+              <NavIcon icon={CHROME_ICONS.mail} size={18} />
+              Email
+            </span>
           </button>
         </div>
 
@@ -165,11 +189,13 @@ const ToolResultShare = ({ toolName, toolIcon, results, onClose }) => {
                 <code className="link-preview">{generateShareLink().substring(0, 50)}...</code>
               </div>
               <button
-                className="btn-primary btn-large"
+                type="button"
+                className="btn-primary btn-large share-btn-primary"
                 onClick={handleCopyLink}
                 disabled={isLoading}
               >
-                📋 Copy Share Link
+                <NavIcon icon={CHROME_ICONS.copy} size={20} />
+                Copy Share Link
               </button>
               <p className="share-note">
                 Share this link with colleagues. Link expires after 30 days for security.
@@ -191,21 +217,32 @@ const ToolResultShare = ({ toolName, toolIcon, results, onClose }) => {
                       checked={selectedFormat === format}
                       onChange={(e) => setSelectedFormat(e.target.value)}
                     />
-                    <span className="format-icon">
-                      {format === 'json' && '{ }'}
-                      {format === 'csv' && '📊'}
-                      {format === 'pdf' && '📄'}
+                    <span className="format-icon" aria-hidden>
+                      <NavIcon icon={EXPORT_FORMAT_ICON[format]} size={22} />
                     </span>
                     <span className="format-label">{format.toUpperCase()}</span>
                   </label>
                 ))}
               </div>
               <button
-                className="btn-primary btn-large"
+                type="button"
+                className="btn-primary btn-large share-btn-primary"
                 onClick={handleExport}
                 disabled={isLoading}
               >
-                {isLoading ? '⏳ Exporting...' : `📥 Export as ${selectedFormat.toUpperCase()}`}
+                {isLoading ? (
+                  <>
+                    <span className="share-inline-icon share-inline-icon--spin" aria-hidden>
+                      <NavIcon icon={CHROME_ICONS.loader} size={20} />
+                    </span>
+                    Exporting…
+                  </>
+                ) : (
+                  <>
+                    <NavIcon icon={CHROME_ICONS.download} size={20} />
+                    {`Export as ${selectedFormat.toUpperCase()}`}
+                  </>
+                )}
               </button>
               <p className="share-note">
                 Download results locally for records or further analysis.
@@ -226,11 +263,24 @@ const ToolResultShare = ({ toolName, toolIcon, results, onClose }) => {
                 disabled={isLoading}
               />
               <button
-                className="btn-primary btn-large"
+                type="button"
+                className="btn-primary btn-large share-btn-primary"
                 onClick={handleEmailShare}
                 disabled={isLoading || !recipientEmail.trim()}
               >
-                {isLoading ? '⏳ Sending...' : '📧 Send via Email'}
+                {isLoading ? (
+                  <>
+                    <span className="share-inline-icon share-inline-icon--spin" aria-hidden>
+                      <NavIcon icon={CHROME_ICONS.loader} size={20} />
+                    </span>
+                    Sending…
+                  </>
+                ) : (
+                  <>
+                    <NavIcon icon={CHROME_ICONS.mail} size={20} />
+                    Send via Email
+                  </>
+                )}
               </button>
               <p className="share-note">
                 Recipient will receive results with a secure access link.
@@ -239,18 +289,17 @@ const ToolResultShare = ({ toolName, toolIcon, results, onClose }) => {
           )}
 
           {/* Message Display */}
-          {message && (
-            <div className={`share-message ${message.includes('✅') ? 'success' : 'error'}`}>
-              {message}
-            </div>
+          {feedback.text && (
+            <div className={`share-message share-message--${feedback.variant}`}>{feedback.text}</div>
           )}
         </div>
 
         <div className="share-modal-footer">
-          <p className="share-privacy-note">
-            🔒 Your shared results are encrypted and accessible only to intended recipients.
+          <p className="share-privacy-note share-privacy-note--with-icon">
+            <NavIcon icon={CHROME_ICONS.lock} size={18} aria-hidden />
+            <span>Your shared results are encrypted and accessible only to intended recipients.</span>
           </p>
-          <button className="btn-secondary" onClick={onClose}>
+          <button type="button" className="btn-secondary" onClick={onClose}>
             Close
           </button>
         </div>

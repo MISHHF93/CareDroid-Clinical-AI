@@ -1,0 +1,37 @@
+/**
+ * Maps historical variable names to semantic --app-* tokens.
+ */
+html {
+  --navy-bg: var(--app-bg);
+  --navy-ink: var(--app-navy-ink);
+  --navy-lighter: var(--app-surface-elevated);
+  --text-color: var(--app-fg);
+  --text-primary: var(--app-fg);
+  --muted-text: var(--app-fg-muted);
+  --text-muted: var(--app-fg-muted);
+  --panel-bg: var(--app-panel-bg);
+  --panel-border: var(--app-panel-border);
+  --surface-0: var(--app-surface-0);
+  --surface-1: var(--app-surface-1);
+  --surface-2: var(--app-surface-2);
+  --surface-glass: var(--app-surface-glass);
+  --border-subtle: var(--app-border-subtle);
+  --shadow-1: var(--app-shadow-1);
+  --shadow-2: var(--app-shadow-2);
+  --accent-1: var(--app-accent);
+  --accent-2: var(--app-accent-2);
+  --accent-cyan: var(--app-accent-2);
+  --accent-green: var(--app-accent);
+  --accent-gradient: linear-gradient(135deg, var(--app-accent), var(--app-accent-2));
+  --gradient-accent: linear-gradient(135deg, var(--app-accent), var(--app-accent-2));
+  --danger: var(--app-danger);
+  --warning: var(--app-warning);
+  --primary-color: var(--app-accent-interactive);
+  --space-xs: var(--space-1);
+  --space-sm: var(--space-2);
+  --space-md: var(--space-3);
+  --space-lg: var(--space-4);
+  --space-xl: var(--space-5);
+  --space-2xs: var(--space-1);
+  --nav-glyph-muted: var(--app-fg-muted);
+}

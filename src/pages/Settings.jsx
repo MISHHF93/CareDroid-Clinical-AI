@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import Card from '../components/ui/card';
 import Button from '../components/ui/button';
 import { useNotificationActions } from '../hooks/useNotificationActions';
+import { useTheme } from '../contexts/ThemeContext';
 
 const Settings = () => {
   const [notifications, setNotifications] = useState(true);
   const [safetyBanner, setSafetyBanner] = useState(true);
-  const [themePref, setThemePref] = useState('system');
+  const { preference, resolvedTheme, setPreference } = useTheme();
   const { success } = useNotificationActions();
 
   const handleSave = () => {
@@ -33,11 +34,13 @@ const Settings = () => {
           }}>
             <div>
               <div style={{ fontWeight: 600 }}>Theme preference</div>
-              <div style={{ fontSize: '12px', color: 'var(--muted-text)' }}>System, light, or dark</div>
+              <div style={{ fontSize: '12px', color: 'var(--muted-text)' }}>
+                System, light, or dark (active: {resolvedTheme})
+              </div>
             </div>
             <select
-              value={themePref}
-              onChange={(e) => setThemePref(e.target.value)}
+              value={preference}
+              onChange={(e) => setPreference(e.target.value)}
               style={{
                 background: 'transparent',
                 color: 'var(--text-color)',
@@ -93,7 +96,7 @@ const Settings = () => {
 
         <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
           <Button onClick={handleSave}>Save changes</Button>
-          <Link to="/" style={{ color: '#00FF88', textDecoration: 'none', alignSelf: 'center' }}>
+          <Link to="/" style={{ color: 'var(--accent-green)', textDecoration: 'none', alignSelf: 'center' }}>
             Back to chat
           </Link>
         </div>

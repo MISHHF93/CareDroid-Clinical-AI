@@ -2,6 +2,8 @@
  * Offline Service - Manages offline data storage and retrieval
  */
 import logger from '../utils/logger';
+import { db } from '../db/offline.db';
+
 class OfflineService {
   constructor() {
     this.isInitialized = false;

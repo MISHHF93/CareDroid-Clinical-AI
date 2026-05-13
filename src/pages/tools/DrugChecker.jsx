@@ -5,7 +5,7 @@ import offlineService from '../../services/offlineService';
 import ToolPageLayout from './ToolPageLayout';
 import './DrugChecker.css';
 
-const DrugChecker = () => {
+const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
   const { user } = useUser();
   const [medications, setMedications] = useState(['']);
   const [results, setResults] = useState(null);
@@ -13,7 +13,6 @@ const DrugChecker = () => {
 
   const toolConfig = {
     id: 'drug-check',
-    icon: '💊',
     name: 'Drug Checker',
     path: '/tools/drug-checker',
     color: '#FF6B9D',
@@ -100,7 +99,7 @@ const DrugChecker = () => {
   };
 
   return (
-    <ToolPageLayout tool={toolConfig}>
+    <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded}>
       <div className="drug-checker">
         <div className="drug-input-section">
           <h2>Enter Medications</h2>

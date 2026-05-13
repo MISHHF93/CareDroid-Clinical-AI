@@ -11,13 +11,17 @@ import AnomalyBanner from '../../components/clinical/AnomalyBanner';
 import RiskFactorsList from '../../components/clinical/RiskFactorsList';
 import ClinicalAlertBanner from '../../components/clinical/ClinicalAlertBanner';
 import analyticsService from '../../services/analyticsService';
+import { NavIcon } from '../../navigation/NavIcon';
+import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './ToolPageLayout.css';
 
-const ToolPageLayout = ({ 
-  tool, 
+const ToolPageLayout = ({
+  tool,
   children,
   actions = null,
-  results = null
+  results = null,
+  embedded = false,
+  onCloseEmbedded,
 }) => {
   const navigate = useNavigate();
   const { addMessage, selectTool } = useConversation();
@@ -44,9 +48,27 @@ const ToolPageLayout = ({
   }, [recordToolAccess, tool]);
 
   const handleSendToChat = (data) => {
-    const message = `📊 ${tool.name} Result:\n${JSON.stringify(data, null, 2)}`;
-    addMessage(message, 'assistant');
-    navigate('/dashboard');
+    const summary =
+      typeof data === 'object' && data !== null
+        ? Object.keys(data)
+            .slice(0, 8)
+            .map((k) => `${k}: ${JSON.stringify(data[k]).slice(0, 120)}`)
+            .join('\n')
+        : String(data);
+    addMessage({
+      role: 'assistant',
+      content: `**${tool.name}** — result snapshot (from clinical tool). Use chat for interpretation.\n\n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\`\n\n_Key fields:_\n${summary}`,
+      visualizations: [
+        {
+          type: 'calculator',
+          data: typeof data === 'object' && data !== null && !Array.isArray(data) ? data : { value: data },
+        },
+      ],
+      timestamp: new Date(),
+    });
+    const dest = embedded ? undefined : '/dashboard';
+    if (dest) navigate(dest);
+    onCloseEmbedded?.();
   };
 
   const handleAcknowledgeAlert = (alertId) => {
@@ -85,25 +107,34 @@ const ToolPageLayout = ({
   };
 
   return (
-    <div className="tool-page">
-      {/* Breadcrumb Navigation */}
-      <div className="tool-breadcrumb">
-        <button onClick={() => navigate('/dashboard')} className="breadcrumb-link">
-          💬 Dashboard
-        </button>
-        <span className="breadcrumb-separator">›</span>
-        <button onClick={() => navigate('/tools')} className="breadcrumb-link">
-          🔧 Tools
-        </button>
-        <span className="breadcrumb-separator">›</span>
-        <span className="breadcrumb-current">{tool.name}</span>
-      </div>
+    <div className={`tool-page${embedded ? ' tool-page--embedded' : ''}`}>
+      {!embedded && (
+        <div className="tool-breadcrumb">
+          <button type="button" onClick={() => navigate('/dashboard')} className="breadcrumb-link">
+            <span className="breadcrumb-link-inner">
+              <NavIcon icon={CHROME_ICONS.message} size={16} decorative />
+              <span>Dashboard</span>
+            </span>
+          </button>
+          <span className="breadcrumb-separator">›</span>
+          <button type="button" onClick={() => navigate('/tools')} className="breadcrumb-link">
+            <span className="breadcrumb-link-inner">
+              <NavIcon icon={CHROME_ICONS.tools} size={16} decorative />
+              <span>Tools</span>
+            </span>
+          </button>
+          <span className="breadcrumb-separator">›</span>
+          <span className="breadcrumb-current">{tool.name}</span>
+        </div>
+      )}
 
       {/* Tool Header */}
       <div className="tool-header" style={{ borderColor: tool.color }}>
         <div className="tool-header-left">
           <div className="tool-header-icon" style={{ backgroundColor: `${tool.color}20` }}>
-            <span>{tool.icon}</span>
+            <span className="tool-header-icon-inner" aria-hidden>
+              <NavIcon icon={getToolIcon(tool.id)} size={28} />
+            </span>
           </div>
           <div className="tool-header-info">
             <h1>{tool.name}</h1>
@@ -122,11 +153,13 @@ const ToolPageLayout = ({
           {actions}
           {results && (
             <button
-              className="btn-share-tool"
+              className="btn-share-tool btn-share-tool--with-icon"
               onClick={() => setShowShareModal(true)}
               title="Export or share your results"
+              type="button"
             >
-              📤 Share Results
+              <NavIcon icon={CHROME_ICONS.upload} size={16} aria-hidden />
+              <span>Share Results</span>
             </button>
           )}
           <button
@@ -135,12 +168,17 @@ const ToolPageLayout = ({
           >
             Share Session
           </button>
-          <button 
-            className="btn-back-to-tools"
-            onClick={() => navigate('/tools')}
-          >
-            ← All Tools
-          </button>
+          {embedded ? (
+            <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => onCloseEmbedded?.()}>
+              <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
+              <span>Close panel</span>
+            </button>
+          ) : (
+            <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => navigate('/tools')}>
+              <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
+              <span>All Tools</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -154,7 +192,7 @@ const ToolPageLayout = ({
           <div className="clinical-insights-header">
             <h3>Clinical Intelligence</h3>
             <span className={`clinical-insights-badge ${riskData?.severity || clinicalInsights?.severity}`}>
-              {(riskData?.severity || clinicalInsights?.severity).toUpperCase()}
+              {String(riskData?.severity || clinicalInsights?.severity || '').toUpperCase()}
             </span>
           </div>
 
@@ -242,48 +280,61 @@ const ToolPageLayout = ({
         </div>
       )}
 
-      {/* AI Integration Panel */}
-      <div className="ai-integration-panel">
-        <div className="ai-panel-header">
-          <h3>🤖 AI Integration</h3>
-          <p>This tool can interact with CareDroid AI for enhanced analysis</p>
+      {!embedded && (
+        <div className="ai-integration-panel">
+          <div className="ai-panel-header">
+            <h3 className="ai-panel-title-with-icon">
+              <NavIcon icon={CHROME_ICONS.bot} size={22} aria-hidden />
+              <span>AI Integration</span>
+            </h3>
+            <p>This tool can interact with CareDroid AI for enhanced analysis</p>
+          </div>
+          <div className="ai-panel-actions">
+            <button
+              type="button"
+              className="btn-ai-action"
+              onClick={() => {
+                selectTool(tool.id);
+                navigate(`/dashboard?tool=${encodeURIComponent(tool.id)}`);
+              }}
+            >
+              <span className="btn-icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.message} size={18} />
+              </span>
+              <span>Discuss Results with AI</span>
+            </button>
+            <button
+              type="button"
+              className="btn-ai-action"
+              onClick={() => {
+                navigate(`/dashboard?tool=${encodeURIComponent(tool.id)}`);
+              }}
+            >
+              <span className="btn-icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.bolt} size={18} />
+              </span>
+              <span>Use in Active Conversation</span>
+            </button>
+          </div>
+          <div className="ai-panel-tip">
+            <span className="tip-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.lightbulb} size={16} />
+            </span>
+            <span>
+              Tip: Type <code>/{tool.id}</code> in chat to invoke this tool
+            </span>
+          </div>
         </div>
-        <div className="ai-panel-actions">
-          <button 
-            className="btn-ai-action"
-            onClick={() => {
-              selectTool(tool.id);
-              navigate('/dashboard', { state: { toolContext: tool.id } });
-            }}
-          >
-            <span className="btn-icon">💬</span>
-            <span>Discuss Results with AI</span>
-          </button>
-          <button 
-            className="btn-ai-action"
-            onClick={() => {
-              navigate('/dashboard', { state: { toolMention: `/${tool.id}` } });
-            }}
-          >
+      )}
 
-      {/* Share Results Modal */}
       {showShareModal && (
         <ToolResultShare
           toolName={tool.name}
-          toolIcon={tool.icon}
+          toolId={tool.id}
           results={results}
           onClose={() => setShowShareModal(false)}
         />
       )}
-            <span className="btn-icon">⚡</span>
-            <span>Use in Active Conversation</span>
-          </button>
-        </div>
-        <div className="ai-panel-tip">
-          <span className="tip-icon">💡</span>
-          <span>Tip: Type <code>/{tool.id}</code> in any chat to invoke this tool</span>
-        </div>
-      </div>
     </div>
   );
 };

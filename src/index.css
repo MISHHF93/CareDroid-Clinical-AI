@@ -5,16 +5,6 @@
 }
 
 :root {
-  --navy-bg: #0b1220;
-  --navy-ink: #0b1220;
-  --text-color: #f8fafc;
-  --muted-text: rgba(248, 250, 252, 0.6);
-  --panel-bg: rgba(255, 255, 255, 0.04);
-  --panel-border: rgba(255, 255, 255, 0.12);
-  --surface-1: rgba(15, 23, 42, 0.7);
-  --surface-2: rgba(15, 23, 42, 0.4);
-  --shadow-1: 0 8px 24px rgba(2, 6, 23, 0.25);
-  --shadow-2: 0 14px 40px rgba(2, 6, 23, 0.35);
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 18px;
@@ -34,49 +24,14 @@
   --font-22: 22px;
   --font-28: 28px;
   --font-36: 36px;
-  --accent-1: #00ff88;
-  --accent-2: #00ffff;
-  --accent-cyan: #00ffff;
-  --accent-green: #00ff88;
-  --accent-gradient: linear-gradient(135deg, #00ff88, #00ffff);
-  --gradient-accent: linear-gradient(135deg, #00ff88, #00ffff);
-  --danger: #ff6b6b;
-  --warning: #ffd166;
-  --text-primary: #f8fafc;
-  --text-muted: rgba(248, 250, 252, 0.6);
   --text-xs: 12px;
   --text-sm: 14px;
   --text-md: 16px;
   --text-lg: 18px;
   --text-xl: 22px;
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 12px;
-  --space-lg: 16px;
-  --space-xl: 20px;
-  --space-2xs: 4px;
-  --border-subtle: rgba(255, 255, 255, 0.12);
-  --surface-glass: rgba(15, 23, 42, 0.7);
-  
-  /* Animation timing functions */
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    --navy-bg: #f5f7fb;
-    --navy-ink: #1b2340;
-    --text-color: #1b2340;
-    --muted-text: rgba(27, 35, 64, 0.7);
-    --panel-bg: rgba(27, 35, 64, 0.04);
-    --panel-border: rgba(27, 35, 64, 0.12);
-    --surface-1: rgba(255, 255, 255, 0.9);
-    --surface-2: rgba(255, 255, 255, 0.6);
-    --shadow-1: 0 8px 24px rgba(15, 23, 42, 0.12);
-    --shadow-2: 0 14px 40px rgba(15, 23, 42, 0.16);
-  }
 }
 
 /* Smooth scrolling */
@@ -84,46 +39,17 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background: radial-gradient(circle at top, rgba(0, 255, 255, 0.08), transparent 40%),
-    radial-gradient(circle at 20% 20%, rgba(0, 255, 136, 0.1), transparent 45%),
-    var(--navy-bg);
-  color: var(--text-color);
-  overflow: hidden;
-  transition: background 0.5s ease;
-}
-
 #root {
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100dvh;
+  min-height: 100vh;
+  height: 100dvh;
   height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 136, 0.3);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 136, 0.5);
+  box-sizing: border-box;
 }
 
 /* Textarea auto-resize */
@@ -384,11 +310,144 @@ a, button, input, select, textarea {
   }
 }
 
-@keyframes slideInLeft {
-  from {
-    transform: translateX(-100%);
-  }
-  to {
-    transform: translateX(0);
-  }
+/* Route loaders & marketing shell (token-driven) */
+.page-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  flex-direction: column;
+  gap: var(--space-4);
 }
+
+.page-loader-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid var(--panel-border);
+  border-top-color: var(--accent-green);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.page-loader-label {
+  font-size: var(--font-14);
+  color: var(--muted-text);
+}
+
+.app-init-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  background: var(--navy-bg);
+  color: var(--text-color);
+  box-sizing: border-box;
+  padding: env(safe-area-inset-top, 0) env(safe-area-inset-right, 0) env(safe-area-inset-bottom, 0)
+    env(safe-area-inset-left, 0);
+}
+
+.welcome-page-root {
+  min-height: 100dvh;
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  background: var(--navy-bg);
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(16px, 5vw, 40px);
+  box-sizing: border-box;
+}
+
+.welcome-page-inner {
+  text-align: center;
+  max-width: 600px;
+}
+
+.welcome-page-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-6);
+  color: var(--accent-1, #00ff88);
+}
+
+.welcome-page-title {
+  font-size: clamp(1.75rem, 6vw, 3rem);
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.welcome-page-lead {
+  font-size: var(--font-18);
+  color: var(--muted-text);
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.welcome-page-grid {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: 40px;
+}
+
+.welcome-page-card {
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--accent-green) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent-green) 32%, transparent);
+  border-radius: var(--radius-md);
+  text-align: left;
+}
+
+.welcome-page-card-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.welcome-page-card-title--icon {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-color);
+}
+
+.welcome-page-card-title--icon .nav-icon-svg {
+  flex-shrink: 0;
+  color: var(--accent-1, #00ff88);
+}
+
+.welcome-page-card-desc {
+  font-size: var(--font-14);
+  color: var(--muted-text);
+}
+
+.welcome-page-cta {
+  padding: 14px 32px;
+  font-size: var(--font-16);
+  font-weight: 600;
+  background: var(--accent-gradient);
+  color: var(--navy-ink);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+}
+
+.welcome-page-cta:hover {
+  box-shadow: var(--shadow-2);
+}
+
+.welcome-page-footnote {
+  margin-top: var(--space-6);
+  font-size: var(--font-14);
+  color: var(--muted-text);
+}
+

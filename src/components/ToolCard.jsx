@@ -1,24 +1,33 @@
 /**
- * Tool Card Component
- * 
- * Displays clinical tool results within chat messages
- * Supports SOFA Calculator, Drug Checker, Lab Interpreter, and other tools
+ * Clinical tool results in chat — token-themed, no external UI kit.
  */
 
 import React from 'react';
+import './ToolCard.css';
+import { NavIcon } from '../navigation/NavIcon';
+import { getToolIcon } from '../navigation/iconRegistry';
+
+function Notice({ variant, title, children }) {
+  return (
+    <div className={`tool-card-notice tool-card-notice--${variant}`} role="status">
+      {title && <div className="tool-card-strong" style={{ marginBottom: 8 }}>{title}</div>}
+      {children}
+    </div>
+  );
+}
 
 const ToolCard = ({ toolResult }) => {
   if (!toolResult) return null;
 
   const { toolId, toolName, result } = toolResult;
-  const { data, interpretation, citations, warnings, errors, disclaimer, timestamp } = result;
+  const { data, interpretation, citations, warnings, errors, disclaimer, timestamp } = result || {};
 
-  // Determine tool-specific rendering
   const renderToolContent = () => {
     switch (toolId) {
       case 'sofa-calculator':
         return renderSofaCalculator(data);
       case 'drug-interaction-checker':
+      case 'drug-interactions':
         return renderDrugChecker(data);
       case 'lab-interpreter':
         return renderLabInterpreter(data);
@@ -27,119 +36,72 @@ const ToolCard = ({ toolResult }) => {
     }
   };
 
+  const interpVariant = errors?.length > 0 ? 'error' : warnings?.length > 0 ? 'warning' : 'info';
+
   return (
-    <Card
-      className="tool-result-card"
-      title={
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ExperimentOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
-          <span>{toolName}</span>
-        </div>
-      }
-      bordered
-      style={{
-        marginTop: '12px',
-        marginBottom: '12px',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(255, 255, 255, 0.18)',
-        borderRadius: '12px',
-      }}
-      headStyle={{
-        background: 'rgba(255, 255, 255, 0.1)',
-        borderBottom: '1px solid rgba(255, 255, 255, 0.18)',
-        color: '#fff',
-        fontWeight: 600,
-      }}
-      bodyStyle={{
-        background: 'rgba(255, 255, 255, 0.95)',
-        padding: '20px',
-      }}
-    >
-      {/* Interpretation */}
-      {interpretation && (
-        <Alert
-          message={interpretation}
-          type={errors?.length > 0 ? 'error' : warnings?.length > 0 ? 'warning' : 'info'}
-          showIcon
-          style={{ marginBottom: '16px' }}
-        />
-      )}
+    <section className="tool-result-card" aria-label={toolName || 'Tool result'}>
+      <header className="tool-result-card-header">
+        <span className="tool-result-card-icon" aria-hidden>
+          <NavIcon icon={getToolIcon(toolId)} size={18} />
+        </span>
+        <span>{toolName}</span>
+      </header>
+      <div className="tool-result-card-body">
+        {interpretation && (
+          <Notice variant={interpVariant}>
+            {interpretation}
+          </Notice>
+        )}
 
-      {/* Tool-specific content */}
-      {renderToolContent()}
+        {renderToolContent()}
 
-      {/* Warnings */}
-      {warnings && warnings.length > 0 && (
-        <Alert
-          message="Warnings"
-          description={
-            <ul style={{ margin: 0, paddingLeft: '20px' }}>
+        {warnings && warnings.length > 0 && (
+          <Notice variant="warning" title="Warnings">
+            <ul style={{ margin: 0, paddingLeft: 20 }}>
               {warnings.map((warning, idx) => (
                 <li key={idx}>{warning}</li>
               ))}
             </ul>
-          }
-          type="warning"
-          icon={<WarningOutlined />}
-          style={{ marginTop: '16px' }}
-        />
-      )}
+          </Notice>
+        )}
 
-      {/* Citations */}
-      {citations && citations.length > 0 && (
-        <div style={{ marginTop: '16px' }}>
-          <Divider />
-          <Text type="secondary" style={{ fontSize: '12px' }}>
-            <InfoCircleOutlined /> <strong>References:</strong>
-          </Text>
-          <ul style={{ margin: '8px 0 0 0', paddingLeft: '20px', fontSize: '12px' }}>
-            {citations.map((citation, idx) => (
-              <li key={idx}>
-                {citation.title} - {citation.reference}
-                {citation.url && (
-                  <>
-                    {' '}
-                    <a href={citation.url} target="_blank" rel="noopener noreferrer">
-                      [Link]
-                    </a>
-                  </>
-                )}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+        {citations && citations.length > 0 && (
+          <div style={{ marginTop: 16 }}>
+            <hr className="tool-card-divider" />
+            <div className="tool-card-muted" style={{ marginBottom: 8 }}>
+              <strong>References:</strong>
+            </div>
+            <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, fontSize: 12 }}>
+              {citations.map((citation, idx) => (
+                <li key={idx}>
+                  {citation.title} - {citation.reference}
+                  {citation.url && (
+                    <>
+                      {' '}
+                      <a href={citation.url} target="_blank" rel="noopener noreferrer">
+                        [Link]
+                      </a>
+                    </>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
-      {/* Disclaimer */}
-      {disclaimer && (
-        <Paragraph
-          type="secondary"
-          style={{
-            fontSize: '11px',
-            marginTop: '16px',
-            marginBottom: 0,
-            fontStyle: 'italic',
-          }}
-        >
-          ⚠️ {disclaimer}
-        </Paragraph>
-      )}
+        {disclaimer && <p className="tool-card-disclaimer">⚠️ {disclaimer}</p>}
 
-      {/* Timestamp */}
-      {timestamp && (
-        <Text type="secondary" style={{ fontSize: '11px', display: 'block', marginTop: '8px' }}>
-          Executed at {new Date(timestamp).toLocaleString()}
-        </Text>
-      )}
-    </Card>
+        {timestamp && (
+          <span className="tool-card-ts">Executed at {new Date(timestamp).toLocaleString()}</span>
+        )}
+      </div>
+    </section>
   );
 };
 
-// ========================================
-// SOFA Calculator Renderer
-// ========================================
-const renderSofaCalculator = (data) => {
+function renderSofaCalculator(data) {
+  if (!data) return null;
+
   const componentScores = [
     { label: 'Respiration', value: data.respirationScore, key: 'respiration' },
     { label: 'Coagulation', value: data.coagulationScore, key: 'coagulation' },
@@ -151,72 +113,58 @@ const renderSofaCalculator = (data) => {
 
   return (
     <div>
-      {/* Total Score */}
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <Title level={2} style={{ margin: 0, color: '#1890ff' }}>
-          {data.totalScore}
-        </Title>
-        <Text type="secondary">Total SOFA Score (0-24)</Text>
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <h2 className="tool-card-title-lg">{data.totalScore}</h2>
+        <div className="tool-card-muted">Total SOFA Score (0-24)</div>
       </div>
 
-      {/* Component Scores */}
-      <Table
-        dataSource={componentScores}
-        columns={[
-          {
-            title: 'Organ System',
-            dataIndex: 'label',
-            key: 'label',
-          },
-          {
-            title: 'Score',
-            dataIndex: 'value',
-            key: 'value',
-            align: 'center',
-            render: (score) => (
-              <Badge
-                count={score}
-                style={{
-                  backgroundColor: score === 0 ? '#52c41a' : score <= 2 ? '#faad14' : '#f5222d',
-                }}
-              />
-            ),
-          },
-        ]}
-        pagination={false}
-        size="small"
-      />
+      <div className="tool-card-table-wrap">
+        <table className="tool-card-table">
+          <thead>
+            <tr>
+              <th>Organ System</th>
+              <th style={{ textAlign: 'center' }}>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {componentScores.map((row) => {
+              const score = row.value;
+              const bg =
+                score === 0 ? '#16a34a' : score <= 2 ? '#ca8a04' : '#dc2626';
+              return (
+                <tr key={row.key}>
+                  <td>{row.label}</td>
+                  <td style={{ textAlign: 'center' }}>
+                    <span className="tool-card-score-pill" style={{ backgroundColor: bg }}>
+                      {score}
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
-      {/* Mortality Estimate */}
       {data.mortalityEstimate && (
-        <Alert
-          message="Mortality Estimate"
-          description={data.mortalityEstimate}
-          type="info"
-          showIcon
-          style={{ marginTop: '16px' }}
-        />
+        <Notice variant="info" title="Mortality Estimate">
+          {data.mortalityEstimate}
+        </Notice>
       )}
     </div>
   );
-};
+}
 
-// ========================================
-// Drug Checker Renderer
-// ========================================
-const renderDrugChecker = (data) => {
-  if (!data.interactions || data.interactions.length === 0) {
+function renderDrugChecker(data) {
+  if (!data?.interactions || data.interactions.length === 0) {
     return (
-      <Alert
-        message="No Interactions Detected"
-        description="No significant drug interactions were found."
-        type="success"
-        icon={<CheckCircleOutlined />}
-      />
+      <Notice variant="success">
+        <span className="tool-card-strong">No Interactions Detected</span>
+        <div style={{ marginTop: 8 }}>No significant drug interactions were found.</div>
+      </Notice>
     );
   }
 
-  // Group by severity
   const groupedInteractions = {
     contraindicated: data.interactions.filter((i) => i.severity === 'contraindicated'),
     major: data.interactions.filter((i) => i.severity === 'major'),
@@ -226,26 +174,23 @@ const renderDrugChecker = (data) => {
 
   return (
     <div>
-      <Text strong>Found {data.interactions.length} interaction(s)</Text>
-      <Divider style={{ margin: '12px 0' }} />
+      <span className="tool-card-strong">Found {data.interactions.length} interaction(s)</span>
+      <hr className="tool-card-divider" />
 
-      {/* Contraindicated */}
       {groupedInteractions.contraindicated.length > 0 && (
-        <div style={{ marginBottom: '16px' }}>
-          <Badge status="error" text={<Text strong>Contraindicated</Text>} />
-          <ul style={{ marginTop: '8px' }}>
+        <div style={{ marginBottom: 16 }}>
+          <span className="tool-card-pill tool-card-pill--error">Contraindicated</span>
+          <ul style={{ marginTop: 8 }}>
             {groupedInteractions.contraindicated.map((interaction, idx) => (
               <li key={idx}>
-                <Text strong>
+                <span className="tool-card-strong">
                   {interaction.drug1} + {interaction.drug2}
-                </Text>
+                </span>
                 : {interaction.description}
                 {interaction.recommendation && (
                   <>
                     <br />
-                    <Text type="danger" style={{ fontSize: '12px' }}>
-                      ⚠️ {interaction.recommendation}
-                    </Text>
+                    <span className="tool-card-danger">⚠️ {interaction.recommendation}</span>
                   </>
                 )}
               </li>
@@ -254,41 +199,40 @@ const renderDrugChecker = (data) => {
         </div>
       )}
 
-      {/* Major */}
       {groupedInteractions.major.length > 0 && (
-        <div style={{ marginBottom: '16px' }}>
-          <Badge status="warning" text={<Text strong>Major</Text>} />
-          <ul style={{ marginTop: '8px' }}>
+        <div style={{ marginBottom: 16 }}>
+          <span className="tool-card-pill tool-card-pill--warn">Major</span>
+          <ul style={{ marginTop: 8 }}>
             {groupedInteractions.major.map((interaction, idx) => (
               <li key={idx}>
-                <Text strong>
+                <span className="tool-card-strong">
                   {interaction.drug1} + {interaction.drug2}
-                </Text>
+                </span>
                 : {interaction.description}
+                {interaction.recommendation && (
+                  <>
+                    <br />
+                    <span className="tool-card-danger">⚠️ {interaction.recommendation}</span>
+                  </>
+                )}
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* Moderate */}
       {groupedInteractions.moderate.length > 0 && (
-        <div style={{ marginBottom: '16px' }}>
-          <Badge status="processing" text={<Text strong>Moderate</Text>} />
-          <ul style={{ marginTop: '8px' }}>
+        <div style={{ marginBottom: 16 }}>
+          <span className="tool-card-pill tool-card-pill--info">Moderate</span>
+          <ul style={{ marginTop: 8 }}>
             {groupedInteractions.moderate.slice(0, 3).map((interaction, idx) => (
               <li key={idx}>
-                <Text>
-                  {interaction.drug1} + {interaction.drug2}
-                </Text>
-                : {interaction.description}
+                {interaction.drug1} + {interaction.drug2}: {interaction.description}
               </li>
             ))}
             {groupedInteractions.moderate.length > 3 && (
-              <li>
-                <Text type="secondary">
-                  ... and {groupedInteractions.moderate.length - 3} more moderate interaction(s)
-                </Text>
+              <li className="tool-card-muted">
+                ... and {groupedInteractions.moderate.length - 3} more moderate interaction(s)
               </li>
             )}
           </ul>
@@ -296,137 +240,136 @@ const renderDrugChecker = (data) => {
       )}
     </div>
   );
-};
+}
 
-// ========================================
-// Lab Interpreter Renderer
-// ========================================
-const renderLabInterpreter = (data) => {
-  const hasAbnormal = data.summary?.abnormal > 0;
+function statusTagClass(status) {
+  const map = {
+    normal: 'tool-card-tag--ok',
+    high: 'tool-card-tag--warn',
+    low: 'tool-card-tag--warn',
+    'critical-high': 'tool-card-tag--err',
+    'critical-low': 'tool-card-tag--err',
+  };
+  return map[status] || 'tool-card-tag--ok';
+}
+
+function statusLabel(status) {
+  const labels = {
+    normal: 'Normal',
+    high: 'High',
+    low: 'Low',
+    'critical-high': 'Critical High',
+    'critical-low': 'Critical Low',
+  };
+  return labels[status] || status;
+}
+
+function renderLabInterpreter(data) {
+  if (!data) return null;
+
   const hasCritical = data.summary?.critical > 0;
 
   return (
     <div>
-      {/* Summary */}
       {data.summary && (
-        <div style={{ marginBottom: '16px', textAlign: 'center' }}>
-          <Text>
+        <div style={{ marginBottom: 16, textAlign: 'center' }}>
+          <span>
             {data.summary.abnormal} of {data.summary.total} values abnormal
-          </Text>
+          </span>
           {hasCritical && (
             <>
               {' '}
-              <Badge count={`${data.summary.critical} critical`} style={{ backgroundColor: '#f5222d' }} />
+              <span className="tool-card-score-pill" style={{ backgroundColor: '#dc2626' }}>
+                {data.summary.critical} critical
+              </span>
             </>
           )}
         </div>
       )}
 
-      {/* Critical Values */}
       {data.criticalValues && data.criticalValues.length > 0 && (
-        <Alert
-          message="Critical Values"
-          description={
-            <ul style={{ margin: 0, paddingLeft: '20px' }}>
-              {data.criticalValues.map((lab, idx) => (
-                <li key={idx}>
-                  <Text strong>{lab.name}</Text>: {lab.value} {lab.unit} (
-                  <Text type="danger">{lab.status}</Text>)
-                </li>
-              ))}
-            </ul>
-          }
-          type="error"
-          showIcon
-          style={{ marginBottom: '16px' }}
-        />
+        <Notice variant="error" title="Critical Values">
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {data.criticalValues.map((lab, idx) => (
+              <li key={idx}>
+                <span className="tool-card-strong">{lab.name}</span>: {lab.value} {lab.unit} (
+                <span className="tool-card-danger">{lab.status}</span>)
+              </li>
+            ))}
+          </ul>
+        </Notice>
       )}
 
-      {/* Interpretations by Category */}
       {data.interpretations && data.interpretations.length > 0 && (
         <div>
           {data.interpretations.map((interp, idx) => (
-            <div key={idx} style={{ marginBottom: '16px' }}>
-              <Title level={5} style={{ marginBottom: '8px' }}>
-                {interp.category}
-              </Title>
-              <Paragraph style={{ margin: '0 0 8px 0' }}>{interp.clinicalSignificance}</Paragraph>
+            <div key={idx} style={{ marginBottom: 16 }}>
+              <h3 className="tool-card-title-sm">{interp.category}</h3>
+              <p style={{ margin: '0 0 8px 0' }}>{interp.clinicalSignificance}</p>
               {interp.suggestedActions && interp.suggestedActions.length > 0 && (
                 <>
-                  <Text type="secondary" style={{ fontSize: '12px' }}>
+                  <div className="tool-card-muted" style={{ fontSize: 12 }}>
                     Suggested Actions:
-                  </Text>
-                  <ul style={{ marginTop: '4px', paddingLeft: '20px', fontSize: '12px' }}>
+                  </div>
+                  <ul style={{ marginTop: 4, paddingLeft: 20, fontSize: 12 }}>
                     {interp.suggestedActions.map((action, actionIdx) => (
                       <li key={actionIdx}>{action}</li>
                     ))}
                   </ul>
                 </>
               )}
-              {idx < data.interpretations.length - 1 && <Divider />}
+              {idx < data.interpretations.length - 1 && <hr className="tool-card-divider" />}
             </div>
           ))}
         </div>
       )}
 
-      {/* All Lab Values Table */}
       {data.labValues && data.labValues.length > 0 && (
-        <div style={{ marginTop: '16px' }}>
-          <Divider />
-          <Text strong>All Lab Values</Text>
-          <Table
-            dataSource={data.labValues}
-            columns={[
-              { title: 'Test', dataIndex: 'name', key: 'name' },
-              {
-                title: 'Value',
-                dataIndex: 'value',
-                key: 'value',
-                render: (value, record) => (
-                  <>
-                    {value} {record.unit}
-                  </>
-                ),
-              },
-              { title: 'Reference', dataIndex: 'referenceRange', key: 'referenceRange' },
-              {
-                title: 'Status',
-                dataIndex: 'status',
-                key: 'status',
-                render: (status) => {
-                  const statusConfig = {
-                    normal: { color: 'success', text: 'Normal' },
-                    high: { color: 'warning', text: 'High' },
-                    low: { color: 'warning', text: 'Low' },
-                    'critical-high': { color: 'error', text: 'Critical High' },
-                    'critical-low': { color: 'error', text: 'Critical Low' },
-                  };
-                  const config = statusConfig[status] || { color: 'default', text: status };
-                  return <Badge status={config.color} text={config.text} />;
-                },
-              },
-            ]}
-            pagination={false}
-            size="small"
-            style={{ marginTop: '8px' }}
-          />
+        <div style={{ marginTop: 16 }}>
+          <hr className="tool-card-divider" />
+          <div className="tool-card-strong" style={{ marginBottom: 8 }}>
+            All Lab Values
+          </div>
+          <div className="tool-card-table-wrap">
+            <table className="tool-card-table">
+              <thead>
+                <tr>
+                  <th>Test</th>
+                  <th>Value</th>
+                  <th>Reference</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.labValues.map((row) => (
+                  <tr key={row.name || row.key}>
+                    <td>{row.name}</td>
+                    <td>
+                      {row.value} {row.unit}
+                    </td>
+                    <td>{row.referenceRange}</td>
+                    <td>
+                      <span className={`tool-card-tag ${statusTagClass(row.status)}`}>
+                        {statusLabel(row.status)}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
   );
-};
+}
 
-// ========================================
-// Generic Tool Renderer
-// ========================================
-const renderGenericTool = (data) => {
+function renderGenericTool(data) {
   return (
     <div>
-      <pre style={{ background: '#f5f5f5', padding: '12px', borderRadius: '4px', overflow: 'auto' }}>
-        {JSON.stringify(data, null, 2)}
-      </pre>
+      <pre className="tool-card-pre">{JSON.stringify(data ?? {}, null, 2)}</pre>
     </div>
   );
-};
+}
 
 export default ToolCard;

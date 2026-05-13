@@ -74,8 +74,12 @@
   gap: 12px;
 }
 
-.share-modal-header span {
-  font-size: 28px;
+.share-modal-tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  color: var(--text-primary);
 }
 
 .share-modal-close {
@@ -105,6 +109,13 @@
   padding: 0;
   border-bottom: 1px solid var(--border-color);
   background: rgba(0, 0, 0, 0.2);
+}
+
+.share-tab-inner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .share-tab {
@@ -206,8 +217,10 @@
 }
 
 .format-icon {
-  font-size: 24px;
-  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-primary);
 }
 
 .format-label {
@@ -282,6 +295,32 @@
   border-color: rgba(255, 255, 255, 0.25);
 }
 
+.share-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.share-inline-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.share-inline-icon--spin {
+  animation: share-spin 1s linear infinite;
+}
+
+@keyframes share-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .share-note {
   font-size: 13px;
   color: var(--text-secondary);
@@ -313,16 +352,22 @@
   }
 }
 
-.share-message.success {
+.share-message--success {
   background: rgba(0, 255, 136, 0.15);
   border: 1px solid rgba(0, 255, 136, 0.3);
   color: #00ff88;
 }
 
-.share-message.error {
+.share-message--error {
   background: rgba(255, 107, 107, 0.15);
   border: 1px solid rgba(255, 107, 107, 0.3);
   color: #ff6b6b;
+}
+
+.share-message--info {
+  background: rgba(100, 150, 255, 0.1);
+  border: 1px solid rgba(100, 150, 255, 0.25);
+  color: var(--text-secondary);
 }
 
 .share-modal-footer {
@@ -334,6 +379,19 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 16px;
+}
+
+.share-privacy-note--with-icon {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: min(420px, 70%);
+}
+
+.share-privacy-note--with-icon svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--text-secondary);
 }
 
 .share-privacy-note {

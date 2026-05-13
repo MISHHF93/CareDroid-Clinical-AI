@@ -3,6 +3,8 @@ import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import toolRegistry, { toolRegistryById } from '../../data/toolRegistry';
+import { NavIcon } from '../../navigation/NavIcon';
+import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './ToolsOverview.css';
 
 const ToolsOverview = () => {
@@ -31,7 +33,10 @@ const ToolsOverview = () => {
   const handleToolClick = (tool) => {
     recordToolAccess(tool.id);
     selectTool(tool.id);
-    navigate(tool.path);
+    const params = new URLSearchParams();
+    params.set('tool', tool.id);
+    if (tool.initialCalc) params.set('calc', tool.initialCalc);
+    navigate(`/dashboard?${params.toString()}`);
   };
 
   const categories = [...new Set(filteredTools.map(t => t.category))];
@@ -44,7 +49,12 @@ const ToolsOverview = () => {
     <div className="tools-overview">
       <div className="tools-overview-header">
         <div className="header-content">
-          <h1>🔧 Clinical Tools Suite</h1>
+          <h1>
+            <span className="tools-overview-title-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.tools} size={28} />
+            </span>{' '}
+            Clinical Tools Suite
+          </h1>
           <p className="header-subtitle">
             Comprehensive medical decision support tools powered by AI and evidence-based guidelines
           </p>
@@ -82,7 +92,12 @@ const ToolsOverview = () => {
       {recentToolItems.length > 0 && (
         <div className="tools-recent">
           <div className="tools-recent-header">
-            <h2>🕓 Recent Tools</h2>
+            <h2 className="tools-recent-title">
+              <span className="tools-recent-title-icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.clock} size={22} />
+              </span>
+              <span>Recent Tools</span>
+            </h2>
             <p>Pick up where you left off with your most used tools.</p>
           </div>
           <div className="tools-recent-list">
@@ -93,7 +108,9 @@ const ToolsOverview = () => {
                 onClick={() => handleToolClick(tool)}
                 type="button"
               >
-                <span className="tools-recent-icon">{tool.icon}</span>
+                <span className="tools-recent-icon" aria-hidden>
+                  <NavIcon icon={getToolIcon(tool.id)} size={22} />
+                </span>
                 <div className="tools-recent-info">
                   <span className="tools-recent-name">{tool.name}</span>
                   <span className="tools-recent-category">{tool.category}</span>
@@ -115,7 +132,9 @@ const ToolsOverview = () => {
           >
             <div className="tool-card-header">
               <div className="tool-icon" style={{ backgroundColor: `${tool.color}20` }}>
-                <span>{tool.icon}</span>
+                <span aria-hidden>
+                  <NavIcon icon={getToolIcon(tool.id)} size={28} />
+                </span>
               </div>
               <div className="tool-meta">
                 <h3>{tool.name}</h3>
@@ -133,7 +152,12 @@ const ToolsOverview = () => {
                   }}
                   type="button"
                 >
-                  ★
+                  <NavIcon
+                    icon={CHROME_ICONS.star}
+                    size={16}
+                    fill={favorites.includes(tool.id) ? 'currentColor' : 'none'}
+                    aria-hidden
+                  />
                 </button>
                 <button
                   className={`tool-card-action ${pinned.includes(tool.id) ? 'active' : ''}`}
@@ -144,7 +168,7 @@ const ToolsOverview = () => {
                   }}
                   type="button"
                 >
-                  📌
+                  <NavIcon icon={CHROME_ICONS.pin} size={16} aria-hidden />
                 </button>
                 <div className="tool-shortcut">
                   {tool.shortcut.replace('Ctrl+', '⌘')}
@@ -159,7 +183,9 @@ const ToolsOverview = () => {
               <ul>
                 {tool.features.map((feature, idx) => (
                   <li key={idx}>
-                    <span className="feature-icon">✓</span>
+                    <span className="feature-icon" aria-hidden>
+                      <NavIcon icon={CHROME_ICONS.check} size={14} />
+                    </span>
                     {feature}
                   </li>
                 ))}
@@ -193,7 +219,7 @@ const ToolsOverview = () => {
                 onClick={(e) => {
                   e.stopPropagation();
                   recordToolAccess(tool.id);
-                  navigate('/dashboard', { state: { toolMention: `/${tool.id}` } });
+                  navigate(`/dashboard?tool=${encodeURIComponent(tool.id)}`);
                 }}
               >
                 Use in Chat
@@ -205,25 +231,36 @@ const ToolsOverview = () => {
 
       {/* Quick Tips Section */}
       <div className="tools-tips">
-        <h2>💡 Quick Tips</h2>
+        <h2 className="tools-tips-title">
+          <NavIcon icon={CHROME_ICONS.lightbulb} size={28} />
+          Quick Tips
+        </h2>
         <div className="tips-grid">
           <div className="tip-card">
-            <span className="tip-icon">⌨️</span>
+            <span className="tip-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.keyboard} size={32} />
+            </span>
             <h3>Keyboard Shortcuts</h3>
             <p>Use Ctrl+1 through Ctrl+6 to quickly access tools from anywhere</p>
           </div>
           <div className="tip-card">
-            <span className="tip-icon">💬</span>
+            <span className="tip-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.messageCircle} size={32} />
+            </span>
             <h3>Chat Integration</h3>
             <p>Type /tool-name in chat to invoke tools directly in conversation</p>
           </div>
           <div className="tip-card">
-            <span className="tip-icon">💾</span>
+            <span className="tip-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.download} size={32} />
+            </span>
             <h3>State Persistence</h3>
             <p>Tool inputs are saved per conversation for easy reference</p>
           </div>
           <div className="tip-card">
-            <span className="tip-icon">🤖</span>
+            <span className="tip-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.bot} size={32} />
+            </span>
             <h3>AI Awareness</h3>
             <p>CareDroid can read and reference tool data in responses</p>
           </div>

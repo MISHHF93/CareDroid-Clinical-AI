@@ -33,7 +33,7 @@ describe('WorkspaceContext', () => {
     it('should load persisted workspaces from localStorage', () => {
       const customWorkspaces = [
         { id: 'all', name: 'All Tools', toolIds: ['tool1', 'tool2'] },
-        { id: 'emergency', name: 'Emergency', toolIds: ['tool1'], color: '#ff6b6b', icon: '🚨' }
+        { id: 'emergency', name: 'Emergency', toolIds: ['tool1'], color: '#ff6b6b', icon: 'Siren' }
       ];
 
       localStorage.setItem('careDroid.workspaces.v1', JSON.stringify({
@@ -48,7 +48,7 @@ describe('WorkspaceContext', () => {
       
       const emergencyWs = result.current.workspaces.find(w => w.id === 'emergency');
       expect(emergencyWs.color).toBe('#ff6b6b');
-      expect(emergencyWs.icon).toBe('🚨');
+      expect(emergencyWs.icon).toBe('Siren');
     });
   });
 
@@ -61,7 +61,7 @@ describe('WorkspaceContext', () => {
         name: 'My Custom Workspace',
         toolIds: ['drug-checker', 'lab-interpreter'],
         color: '#00ff88',
-        icon: '🏥'
+        icon: 'Hospital'
       };
 
       act(() => {
@@ -353,7 +353,7 @@ describe('WorkspaceContext', () => {
         id: 'icon-ws',
         name: 'Icon Workspace',
         toolIds: [],
-        icon: '🚀'
+        icon: 'Rocket'
       };
 
       act(() => {
@@ -361,7 +361,7 @@ describe('WorkspaceContext', () => {
       });
 
       const workspace = result.current.workspaces.find(w => w.id === 'icon-ws');
-      expect(workspace.icon).toBe('🚀');
+      expect(workspace.icon).toBe('Rocket');
     });
 
     it('should allow both color and icon customization', () => {
@@ -372,7 +372,7 @@ describe('WorkspaceContext', () => {
         name: 'Fully Customized',
         toolIds: ['tool1'],
         color: '#a855f7',
-        icon: '🧬'
+        icon: 'Dna'
       };
 
       act(() => {
@@ -381,7 +381,7 @@ describe('WorkspaceContext', () => {
 
       const workspace = result.current.workspaces.find(w => w.id === 'full-custom');
       expect(workspace.color).toBe('#a855f7');
-      expect(workspace.icon).toBe('🧬');
+      expect(workspace.icon).toBe('Dna');
       expect(workspace.toolIds).toEqual(['tool1']);
     });
   });

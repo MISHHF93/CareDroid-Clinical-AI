@@ -14,10 +14,25 @@
   gap: 16px;
 }
 
-.analytics-header h1 {
+.analytics-header h1,
+.analytics-page-title {
   font-size: 32px;
   margin-bottom: 6px;
   color: var(--text-primary);
+}
+
+.analytics-page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 0;
+}
+
+.analytics-page-title-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color, #4f46e5);
 }
 
 .analytics-header p {
@@ -194,8 +209,20 @@
   position: relative;
 }
 
+.analytics-row-label .tool-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: inherit;
+}
+
 .recommendation-icon {
-  font-size: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #e2e8f0;
 }
 
 .recommendation-card h3 {

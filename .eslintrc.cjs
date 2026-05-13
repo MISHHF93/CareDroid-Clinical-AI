@@ -1,4 +1,4 @@
-# ESLint configuration for CareDroid
+// ESLint configuration for CareDroid
 module.exports = {
   root: true,
   env: {

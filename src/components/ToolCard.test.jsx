@@ -8,7 +8,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import ToolCard from '../../../src/components/ToolCard';
+import ToolCard from './ToolCard';
 
 describe('ToolCard Component', () => {
   const mockSofaResult = {
@@ -143,7 +143,7 @@ describe('ToolCard Component', () => {
   describe('Drug Checker rendering', () => {
     it('should display interaction count', () => {
       render(<ToolCard toolResult={mockDrugResult} />);
-      expect(screen.getByText(/1 Interaction/)).toBeInTheDocument();
+      expect(screen.getByText(/Found 1 interaction/i)).toBeInTheDocument();
     });
 
     it('should display drug names', () => {
@@ -195,8 +195,12 @@ describe('ToolCard Component', () => {
 
     it('should display lab values with units', () => {
       render(<ToolCard toolResult={mockLabResult} />);
-      expect(screen.getByText(/2.0 K\/μL/)).toBeInTheDocument();
-      expect(screen.getByText(/14.0 g\/dL/)).toBeInTheDocument();
+      const wbcRow = screen.getByText('WBC').closest('tr');
+      expect(wbcRow).toHaveTextContent('2');
+      expect(wbcRow).toHaveTextContent('K/μL');
+      const hgbRow = screen.getByText('Hemoglobin').closest('tr');
+      expect(hgbRow).toHaveTextContent('14');
+      expect(hgbRow).toHaveTextContent('g/dL');
     });
 
     it('should display category interpretations', () => {
@@ -247,8 +251,7 @@ describe('ToolCard Component', () => {
 
     it('should not display warnings section when empty', () => {
       render(<ToolCard toolResult={mockSofaResult} />);
-      const warningSection = screen.queryByText(/Warnings/);
-      expect(warningSection).not.toBeInTheDocument();
+      expect(screen.queryByText(/^Warnings$/)).not.toBeInTheDocument();
     });
   });
 
@@ -349,8 +352,6 @@ describe('ToolCard Component', () => {
     it('should have gradient background', () => {
       const { container } = render(<ToolCard toolResult={mockSofaResult} />);
       const card = container.firstChild;
-      const style = window.getComputedStyle(card as Element);
-      // Card should be rendered without errors
       expect(card).toBeDefined();
     });
   });
@@ -373,8 +374,8 @@ describe('ToolCard Component', () => {
     it('should display all provided data', () => {
       render(<ToolCard toolResult={mockSofaResult} />);
 
-      // Check all organ system scores are displayed
-      expect(screen.getByText('2')).toBeInTheDocument(); // Respiration score
+      const respRow = screen.getByText('Respiration').closest('tr');
+      expect(respRow).toHaveTextContent('2');
       expect(screen.getByText('Respiration')).toBeInTheDocument();
       expect(screen.getByText('Renal')).toBeInTheDocument();
     });

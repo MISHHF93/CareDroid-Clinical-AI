@@ -15,6 +15,40 @@ class AdvancedRecommendationService {
   }
 
   /**
+   * Map legacy / NLU tool ids to sidebar toolRegistry ids.
+   */
+  normalizeRecommendationToolIds(recommendations) {
+    const nluToRegistry = {
+      'drug-checker': 'drug-check',
+      'lab-interpreter': 'lab-interp',
+      'calculator': 'calculators',
+      'protocol-lookup': 'protocols',
+      'diagnosis-assistant': 'diagnosis',
+      'procedure-guide': 'procedures',
+      sofa: 'sofa-score',
+      qsofa: 'sofa-score',
+      gfr: 'calc-gfr',
+      egfr: 'calc-gfr',
+      bmi: 'calc-bmi',
+      chads: 'calc-chads2vasc',
+      'abc-assessment': 'calculators',
+      'trauma-score': 'calculators',
+      'vitals-monitor': 'calculators',
+      'antibiotic-scripts': 'drug-check',
+      'bleeding-risk': 'calculators',
+      'chemo-calculator': 'calculators',
+      'cancer-calculator': 'calculators',
+      'tumor-staging': 'diagnosis',
+    };
+    return recommendations
+      .map((rec) => ({
+        ...rec,
+        toolId: nluToRegistry[rec.toolId] || rec.toolId,
+      }))
+      .filter((rec) => toolRegistry.some((t) => t.id === rec.toolId));
+  }
+
+  /**
    * Get tool recommendations using backend NLU intent classifier
    * @param {string} userMessage - User's input message
    * @param {Object} context - Additional context (conversation history, user preferences)
@@ -43,8 +77,9 @@ class AdvancedRecommendationService {
         context
       );
 
-      // Apply user feedback learning
-      const personalizedRecs = this.applyPersonalization(recommendations, context);
+      const personalizedRecs = this.normalizeRecommendationToolIds(
+        this.applyPersonalization(recommendations, context),
+      );
 
       // Cache results
       this.setCache(cacheKey, personalizedRecs);
@@ -301,7 +336,7 @@ class AdvancedRecommendationService {
         confidence: 0.85
       },
       {
-        keywords: ['calculate', 'risk', 'score', 'gfr', 'bmi'],
+        keywords: ['calculate', 'risk score', 'heart score', 'wells score', 'curb-65'],
         tool: 'calculator',
         confidence: 0.80
       },
@@ -331,7 +366,7 @@ class AdvancedRecommendationService {
         source: 'fallback'
       }));
 
-    return matches.slice(0, 3);
+    return this.normalizeRecommendationToolIds(matches.slice(0, 3));
   }
 
   /**

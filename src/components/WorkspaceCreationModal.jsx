@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import toolRegistry from '../data/toolRegistry';
+import { NavIcon } from '../navigation/NavIcon';
+import { getToolIcon, getWorkspaceIcon, WORKSPACE_ICON_CHOICES, WORKSPACE_PICK_KEYS, CHROME_ICONS } from '../navigation/iconRegistry';
 import './WorkspaceCreationModal.css';
 
 /**
@@ -9,7 +11,7 @@ import './WorkspaceCreationModal.css';
 const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
   const [workspaceName, setWorkspaceName] = useState('');
   const [selectedColor, setSelectedColor] = useState('#00ff88');
-  const [selectedIcon, setSelectedIcon] = useState('🏥');
+  const [selectedIcon, setSelectedIcon] = useState('Hospital');
   const [selectedTools, setSelectedTools] = useState([]);
   const [errors, setErrors] = useState({});
 
@@ -24,52 +26,46 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
     { name: 'Teal', value: '#4ecdc4' }
   ];
 
-  const availableIcons = [
-    '🏥', '⚕️', '🩺', '💊', '🧬', '🔬', '💉', '🩹',
-    '🧪', '📊', '📈', '🎯', '⚡', '🔥', '💡', '🎨',
-    '🚀', '⭐', '🏆', '💪', '🧠', '❤️', '🔔', '📱'
-  ];
-
   const workspaceTemplates = [
     {
       name: 'Emergency Medicine',
-      icon: '🚨',
+      iconKey: 'Siren',
       color: '#ff6b6b',
-      tools: ['abc-assessment', 'trauma-score', 'drug-checker', 'vitals-monitor', 'sofa']
+      tools: ['drug-check', 'sofa-score', 'lab-interp', 'protocols', 'calc-gfr'],
     },
     {
       name: 'ICU/Critical Care',
-      icon: '🏥',
+      iconKey: 'Hospital',
       color: '#4ecdc4',
-      tools: ['sofa', 'vitals-monitor', 'drug-checker', 'lab-interpreter', 'calculator']
+      tools: ['sofa-score', 'lab-interp', 'drug-check', 'calc-gfr', 'protocols'],
     },
     {
       name: 'Ambulatory Care',
-      icon: '🩺',
+      iconKey: 'Stethoscope',
       color: '#00ff88',
-      tools: ['diagnosis-assistant', 'drug-checker', 'protocol-lookup', 'calculator']
+      tools: ['diagnosis', 'drug-check', 'protocols', 'calc-bmi', 'calc-chads2vasc'],
     },
     {
       name: 'Oncology',
-      icon: '🧬',
+      iconKey: 'Dna',
       color: '#a855f7',
-      tools: ['cancer-calculator', 'tumor-staging', 'chemo-calculator', 'drug-checker']
-    }
+      tools: ['drug-check', 'lab-interp', 'protocols', 'calculators'],
+    },
   ];
 
   const handleTemplateSelect = (template) => {
     setWorkspaceName(template.name);
-    setSelectedIcon(template.icon);
+    setSelectedIcon(template.iconKey);
     setSelectedColor(template.color);
-    setSelectedTools(template.tools.filter(toolId => 
+    setSelectedTools(template.tools.filter(toolId =>
       toolRegistry.some(t => t.id === toolId)
     ));
     setErrors({});
   };
 
   const handleToolToggle = (toolId) => {
-    setSelectedTools(prev => 
-      prev.includes(toolId) 
+    setSelectedTools(prev =>
+      prev.includes(toolId)
         ? prev.filter(id => id !== toolId)
         : [...prev, toolId]
     );
@@ -80,11 +76,11 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
 
   const validate = () => {
     const newErrors = {};
-    
+
     if (!workspaceName.trim()) {
       newErrors.name = 'Workspace name is required';
     }
-    
+
     if (selectedTools.length === 0) {
       newErrors.tools = 'Select at least one tool';
     }
@@ -112,7 +108,7 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
   const handleClose = () => {
     setWorkspaceName('');
     setSelectedColor('#00ff88');
-    setSelectedIcon('🏥');
+    setSelectedIcon('Hospital');
     setSelectedTools([]);
     setErrors({});
     onClose();
@@ -135,7 +131,9 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
       <div className="workspace-modal" onClick={(e) => e.stopPropagation()}>
         <div className="workspace-modal-header">
           <h2 className="workspace-modal-title">Create New Workspace</h2>
-          <button className="workspace-modal-close" onClick={handleClose}>✕</button>
+          <button type="button" className="workspace-modal-close" onClick={handleClose} aria-label="Close">
+            <NavIcon icon={CHROME_ICONS.close} size={20} />
+          </button>
         </div>
 
         <div className="workspace-modal-content">
@@ -150,7 +148,9 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
                   onClick={() => handleTemplateSelect(template)}
                   style={{ borderColor: template.color }}
                 >
-                  <span className="template-icon">{template.icon}</span>
+                  <span className="template-icon" aria-hidden>
+                    <NavIcon icon={WORKSPACE_ICON_CHOICES[template.iconKey]} size={22} />
+                  </span>
                   <span className="template-name">{template.name}</span>
                 </button>
               ))}
@@ -180,15 +180,21 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
           <div className="workspace-section">
             <label className="workspace-label">Icon</label>
             <div className="workspace-icon-grid">
-              {availableIcons.map((icon, idx) => (
-                <button
-                  key={idx}
-                  className={`workspace-icon-btn ${selectedIcon === icon ? 'selected' : ''}`}
-                  onClick={() => setSelectedIcon(icon)}
-                >
-                  {icon}
-                </button>
-              ))}
+              {WORKSPACE_PICK_KEYS.map((key) => {
+                const IconComp = WORKSPACE_ICON_CHOICES[key];
+                if (!IconComp) return null;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    className={`workspace-icon-btn ${selectedIcon === key ? 'selected' : ''}`}
+                    onClick={() => setSelectedIcon(key)}
+                    title={key}
+                  >
+                    <NavIcon icon={IconComp} size={22} />
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -213,14 +219,16 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
           {/* Preview */}
           <div className="workspace-section">
             <label className="workspace-label">Preview</label>
-            <div 
+            <div
               className="workspace-preview"
-              style={{ 
+              style={{
                 borderColor: selectedColor,
                 background: `linear-gradient(135deg, ${selectedColor}15, ${selectedColor}05)`
               }}
             >
-              <span className="preview-icon">{selectedIcon}</span>
+              <span className="preview-icon" aria-hidden>
+                <NavIcon icon={getWorkspaceIcon(selectedIcon)} size={28} />
+              </span>
               <span className="preview-name">{workspaceName || 'Workspace Name'}</span>
               <span className="preview-count">{selectedTools.length} tools</span>
             </div>
@@ -235,7 +243,7 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
               )}
             </label>
             {errors.tools && <div className="workspace-error">{errors.tools}</div>}
-            
+
             <div className="workspace-tools-container">
               {Object.entries(toolsByCategory).map(([category, tools]) => (
                 <div key={category} className="workspace-tool-category">
@@ -248,7 +256,9 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
                           checked={selectedTools.includes(tool.id)}
                           onChange={() => handleToolToggle(tool.id)}
                         />
-                        <span className="tool-item-icon">{tool.icon}</span>
+                        <span className="tool-item-icon" aria-hidden>
+                          <NavIcon icon={getToolIcon(tool.id)} size={18} />
+                        </span>
                         <span className="tool-item-name">{tool.name}</span>
                       </label>
                     ))}
@@ -263,8 +273,8 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
           <button className="workspace-btn workspace-btn-cancel" onClick={handleClose}>
             Cancel
           </button>
-          <button 
-            className="workspace-btn workspace-btn-create" 
+          <button
+            className="workspace-btn workspace-btn-create"
             onClick={handleCreate}
             style={{ background: selectedColor }}
           >

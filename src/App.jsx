@@ -1,5 +1,6 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider, useUser, Permission } from './contexts/UserContext';
 import { NotificationProvider, useNotifications } from './contexts/NotificationContext';
 import { ConversationProvider, useConversation } from './contexts/ConversationContext';
@@ -15,8 +16,10 @@ import AppShell from './layout/AppShell';
 import AuthShell from './layout/AuthShell';
 import { PublicShell } from './layout/PublicShell';
 import Auth from './pages/Auth';
-import { useNotificationActions } from './hooks/useNotificationActions';
 import logger from './utils/logger';
+import { NavIcon } from './navigation/NavIcon';
+import { CHROME_ICONS } from './navigation/iconRegistry';
+import { getToolById } from './data/toolRegistry';
 
 // Page imports - Public
 import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
@@ -44,14 +47,8 @@ const ConsentHistory = lazy(() => import('./pages/legal/ConsentHistory').then(m 
 const TeamManagement = lazy(() => import('./pages/team/TeamManagement').then(m => ({ default: m.TeamManagement })));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 
-// Tool pages - lazy loaded
+// Tool pages - lazy loaded inside Dashboard drawer only
 const ToolsOverview = lazy(() => import('./pages/tools/ToolsOverview'));
-const DrugChecker = lazy(() => import('./pages/tools/DrugChecker'));
-const LabInterpreter = lazy(() => import('./pages/tools/LabInterpreter'));
-const Calculators = lazy(() => import('./pages/tools/Calculators'));
-const Protocols = lazy(() => import('./pages/tools/Protocols'));
-const DiagnosisAssistant = lazy(() => import('./pages/tools/DiagnosisAssistant'));
-const ProcedureGuide = lazy(() => import('./pages/tools/ProcedureGuide'));
 const SharedToolSession = lazy(() => import('./pages/tools/SharedToolSession'));
 
 // Clinical Intelligence pages
@@ -59,26 +56,9 @@ const ClinicalAlertsPage = lazy(() => import('./pages/ClinicalAlertsPage'));
 
 // Loading fallback component
 const PageLoader = () => (
-  <div style={{
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: '400px',
-    flexDirection: 'column',
-    gap: '16px'
-  }}>
-    <div style={{
-      width: '48px',
-      height: '48px',
-      border: '4px solid var(--panel-border)',
-      borderTopColor: 'var(--accent-green)',
-      borderRadius: '50%',
-      animation: 'spin 1s linear infinite'
-    }}></div>
-    <div style={{
-      fontSize: '14px',
-      color: 'var(--muted-text)'
-    }}>Loading...</div>
+  <div className="page-loader">
+    <div className="page-loader-spinner" aria-hidden />
+    <div className="page-loader-label">Loading...</div>
   </div>
 );
 
@@ -113,107 +93,47 @@ function WelcomePage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      width: '100vw',
-      background: 'var(--navy-bg)',
-      color: 'var(--text-color)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '40px'
-    }}>
-      <div style={{
-        textAlign: 'center',
-        maxWidth: '600px'
-      }}>
-        <div style={{
-          fontSize: '64px',
-          marginBottom: '24px'
-        }}>🏥</div>
-        
-        <h1 style={{
-          fontSize: '48px',
-          fontWeight: 700,
-          marginBottom: '16px',
-          background: 'linear-gradient(135deg, #00ff88, #00ffff)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          backgroundClip: 'text'
-        }}>
-          CareDroid-Clinical-AI
-        </h1>
+    <div className="welcome-page-root">
+      <div className="welcome-page-inner">
+        <div className="welcome-page-icon" aria-hidden>
+          <NavIcon icon={CHROME_ICONS.hospital} size={56} />
+        </div>
 
-        <p style={{
-          fontSize: '18px',
-          color: 'var(--muted-text)',
-          marginBottom: '40px',
-          lineHeight: 1.6
-        }}>
+        <h1 className="welcome-page-title">CareDroid-Clinical-AI</h1>
+
+        <p className="welcome-page-lead">
           Your universal medical AI doctor. Get instant clinical guidance, drug interaction checks, lab interpretations, and evidence-based recommendations.
         </p>
 
-        <div style={{
-          display: 'grid',
-          gap: '16px',
-          marginBottom: '40px'
-        }}>
-          <div style={{
-            padding: '16px',
-            background: 'rgba(0, 255, 136, 0.1)',
-            border: '1px solid rgba(0, 255, 136, 0.3)',
-            borderRadius: '12px'
-          }}>
-            <div style={{ fontWeight: 600, marginBottom: '4px' }}>✅ Clinical Tools</div>
-            <div style={{ fontSize: '14px', color: 'var(--muted-text)' }}>Drug checker, calculators, lab interpreter, protocols</div>
+        <div className="welcome-page-grid">
+          <div className="welcome-page-card">
+            <div className="welcome-page-card-title welcome-page-card-title--icon">
+              <NavIcon icon={CHROME_ICONS.checkCircle} size={20} aria-hidden />
+              <span>Clinical Tools</span>
+            </div>
+            <div className="welcome-page-card-desc">Drug checker, calculators, lab interpreter, protocols</div>
           </div>
-          <div style={{
-            padding: '16px',
-            background: 'rgba(0, 255, 136, 0.1)',
-            border: '1px solid rgba(0, 255, 136, 0.3)',
-            borderRadius: '12px'
-          }}>
-            <div style={{ fontWeight: 600, marginBottom: '4px' }}>🔒 Secure & Compliant</div>
-            <div style={{ fontSize: '14px', color: 'var(--muted-text)' }}>HIPAA-ready, encrypted conversations, audit logging</div>
+          <div className="welcome-page-card">
+            <div className="welcome-page-card-title welcome-page-card-title--icon">
+              <NavIcon icon={CHROME_ICONS.shield} size={20} aria-hidden />
+              <span>Secure & Compliant</span>
+            </div>
+            <div className="welcome-page-card-desc">HIPAA-ready, encrypted conversations, audit logging</div>
           </div>
-          <div style={{
-            padding: '16px',
-            background: 'rgba(0, 255, 136, 0.1)',
-            border: '1px solid rgba(0, 255, 136, 0.3)',
-            borderRadius: '12px'
-          }}>
-            <div style={{ fontWeight: 600, marginBottom: '4px' }}>🚀 Always On</div>
-            <div style={{ fontSize: '14px', color: 'var(--muted-text)' }}>Works offline, stores conversations, available everywhere</div>
+          <div className="welcome-page-card">
+            <div className="welcome-page-card-title welcome-page-card-title--icon">
+              <NavIcon icon={CHROME_ICONS.rocket} size={20} aria-hidden />
+              <span>Always On</span>
+            </div>
+            <div className="welcome-page-card-desc">Works offline, stores conversations, available everywhere</div>
           </div>
         </div>
 
-        <button
-          onClick={() => navigate('/auth')}
-          style={{
-            padding: '14px 32px',
-            fontSize: '16px',
-            fontWeight: 600,
-            background: 'linear-gradient(135deg, #00ff88, #00ffff)',
-            color: 'var(--navy-ink)',
-            border: 'none',
-            borderRadius: '12px',
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            boxShadow: '0 8px 24px rgba(0, 255, 136, 0.3)'
-          }}
-          onMouseOver={(e) => e.target.style.boxShadow = '0 12px 32px rgba(0, 255, 136, 0.5)'}
-          onMouseOut={(e) => e.target.style.boxShadow = '0 8px 24px rgba(0, 255, 136, 0.3)'}
-        >
+        <button type="button" className="welcome-page-cta" onClick={() => navigate('/auth')}>
           Sign In or Create Account
         </button>
 
-        <p style={{
-          marginTop: '24px',
-          fontSize: '14px',
-          color: 'var(--muted-text)'
-        }}>
-          Healthcare professionals only. Secure login required.
-        </p>
+        <p className="welcome-page-footnote">Healthcare professionals only. Secure login required.</p>
       </div>
     </div>
   );
@@ -221,7 +141,14 @@ function WelcomePage() {
 
 function AppShellPage({ children }) {
   const { signOut } = useUser();
-  const { conversations, activeConversationId, selectConversation, addConversation } = useConversation();
+  const {
+    conversations,
+    activeConversationId,
+    selectConversation,
+    addConversation,
+    selectedTool,
+    setActiveTool,
+  } = useConversation();
   const navigate = useNavigate();
 
   const handleSignOut = () => {
@@ -231,11 +158,27 @@ function AppShellPage({ children }) {
 
   const handleNewConversation = () => {
     addConversation();
+    navigate({ pathname: '/dashboard', search: '' }, { replace: true });
   };
 
   const handleSelectConversation = (conversationId) => {
     selectConversation(conversationId);
-    navigate('/dashboard', { replace: true });
+    navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+  };
+
+  const handleToolSelect = (toolId) => {
+    if (toolId) {
+      setActiveTool(toolId);
+      const tool = getToolById(toolId);
+      const q = new URLSearchParams();
+      q.set('tool', toolId);
+      if (tool?.initialCalc) q.set('calc', tool.initialCalc);
+      else q.delete('calc');
+      navigate(`/dashboard?${q.toString()}`, { replace: true });
+    } else {
+      setActiveTool(null);
+      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+    }
   };
 
   return (
@@ -247,13 +190,18 @@ function AppShellPage({ children }) {
       onNewConversation={handleNewConversation}
       onSignOut={handleSignOut}
       healthStatus="online"
+      currentTool={selectedTool}
+      onToolSelect={handleToolSelect}
     >
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        minWidth: 0
-      }}>
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          minWidth: 0,
+          minHeight: 0,
+        }}
+      >
         {children}
       </div>
     </AppShell>
@@ -272,14 +220,7 @@ function AppRoutes() {
 
   if (isChecking || isLoading) {
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        background: 'var(--navy-bg)',
-        color: 'var(--text-color)'
-      }}>
+      <div className="app-init-screen">
         <h1>Initializing...</h1>
       </div>
     );
@@ -310,16 +251,20 @@ function AppRoutes() {
     { path: '/auth', element: <AuthShell><AuthPage /></AuthShell>, publicOnly: true },
     { path: '/auth-callback', element: <AuthShell><AuthCallback /></AuthShell>, publicOnly: true },
 
-    { path: '/dashboard', element: <Dashboard />, requiresAuth: true },
+    { path: '/dashboard', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
 
-    // Tool routes - all require authentication
+    // Tool routes redirect into unified chat + tool panel (deep links preserved)
     { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/lab-interpreter', element: <AppShellPage><LabInterpreter /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators', element: <AppShellPage><Calculators /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/protocols', element: <AppShellPage><Protocols /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/diagnosis', element: <AppShellPage><DiagnosisAssistant /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/procedures', element: <AppShellPage><ProcedureGuide /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/drug-checker', element: <Navigate to="/dashboard?tool=drug-check" replace />, requiresAuth: true },
+    { path: '/tools/lab-interpreter', element: <Navigate to="/dashboard?tool=lab-interp" replace />, requiresAuth: true },
+    { path: '/tools/calculator/sofa', element: <Navigate to="/dashboard?tool=sofa-score" replace />, requiresAuth: true },
+    { path: '/tools/calculator/gfr', element: <Navigate to="/dashboard?tool=calc-gfr" replace />, requiresAuth: true },
+    { path: '/tools/calculator/bmi', element: <Navigate to="/dashboard?tool=calc-bmi" replace />, requiresAuth: true },
+    { path: '/tools/calculator/chads2vasc', element: <Navigate to="/dashboard?tool=calc-chads2vasc" replace />, requiresAuth: true },
+    { path: '/tools/calculators', element: <Navigate to="/dashboard?tool=calculators" replace />, requiresAuth: true },
+    { path: '/tools/protocols', element: <Navigate to="/dashboard?tool=protocols" replace />, requiresAuth: true },
+    { path: '/tools/diagnosis', element: <Navigate to="/dashboard?tool=diagnosis" replace />, requiresAuth: true },
+    { path: '/tools/procedures', element: <Navigate to="/dashboard?tool=procedures" replace />, requiresAuth: true },
 
     // Clinical Intelligence routes
     { path: '/clinical/alerts', element: <AppShellPage><ClinicalAlertsPage /></AppShellPage>, requiresAuth: true },
@@ -388,6 +333,7 @@ function AppRoutes() {
 function App() {
   return (
     <BrowserRouter>
+      <ThemeProvider>
       <UserProvider>
         <NotificationProvider>
           <WorkspaceProvider>
@@ -410,6 +356,7 @@ function App() {
           </WorkspaceProvider>
         </NotificationProvider>
       </UserProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }

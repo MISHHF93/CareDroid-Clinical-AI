@@ -1,19 +1,33 @@
 import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { useUser } from './UserContext';
-import offlineService from '../services/offlineService';
 
 const CostTrackingContext = createContext(null);
 
-// Tool cost configuration (per execution in USD)
+/** Map legacy / API ids to canonical ids from `toolRegistry` */
+const TOOL_ID_ALIASES = {
+  'drug-checker': 'drug-check',
+  'lab-interpreter': 'lab-interp',
+  calculator: 'calculators',
+  'protocol-lookup': 'protocols',
+  'diagnosis-assistant': 'diagnosis',
+  'procedure-guide': 'procedures',
+};
+
+function canonicalToolId(toolId) {
+  if (!toolId) return toolId;
+  return TOOL_ID_ALIASES[toolId] || toolId;
+}
+
+// Tool cost configuration (per execution in USD) — keys match `src/data/toolRegistry` ids where applicable
 const TOOL_COSTS = {
-  'drug-checker': 0.05,
-  'lab-interpreter': 0.08,
-  'calculator': 0.02,
-  'protocol-lookup': 0.03,
-  'diagnosis-assistant': 0.10,
-  'procedure-guide': 0.04,
+  'drug-check': 0.05,
+  'lab-interp': 0.08,
+  calculators: 0.02,
+  protocols: 0.03,
+  diagnosis: 0.10,
+  procedures: 0.04,
   'vitals-monitor': 0.06,
-  'sofa': 0.07,
+  sofa: 0.07,
   'antibiotic-scripts': 0.09,
   'trauma-score': 0.05,
   'abc-assessment': 0.04,
@@ -21,17 +35,16 @@ const TOOL_COSTS = {
   'cancer-calculator': 0.08,
   'tumor-staging': 0.07,
   'chemo-calculator': 0.09,
-  // Default cost for unknown tools
-  'default': 0.05
+  default: 0.05,
 };
 
-// Cost categories for analytics
+// Cost categories for analytics (canonical tool ids)
 const COST_CATEGORIES = {
-  CLINICAL_DECISION_SUPPORT: ['diagnosis-assistant', 'protocol-lookup', 'sofa'],
-  MEDICATION_MANAGEMENT: ['drug-checker', 'antibiotic-scripts', 'chemo-calculator'],
+  CLINICAL_DECISION_SUPPORT: ['diagnosis', 'protocols', 'sofa'],
+  MEDICATION_MANAGEMENT: ['drug-check', 'antibiotic-scripts', 'chemo-calculator'],
   RISK_ASSESSMENT: ['trauma-score', 'bleeding-risk', 'cancer-calculator'],
-  DIAGNOSTIC_TOOLS: ['lab-interpreter', 'vitals-monitor'],
-  CALCULATIONS: ['calculator', 'tumor-staging']
+  DIAGNOSTIC_TOOLS: ['lab-interp', 'vitals-monitor'],
+  CALCULATIONS: ['calculators', 'tumor-staging'],
 };
 
 export const CostTrackingProvider = ({ children }) => {
@@ -88,23 +101,25 @@ export const CostTrackingProvider = ({ children }) => {
 
   // Track tool execution cost
   const trackToolCost = (toolId, metadata = {}) => {
-    const cost = TOOL_COSTS[toolId] || TOOL_COSTS.default;
+    const canonicalId = canonicalToolId(toolId);
+    const cost = TOOL_COSTS[canonicalId] || TOOL_COSTS.default;
     const execution = {
+      ...metadata,
       toolId,
+      canonicalToolId: canonicalId,
       cost,
       timestamp: new Date().toISOString(),
       userId: user?.id,
-      ...metadata
     };
 
     setCostData(prev => {
       const newToolCosts = { ...prev.toolCosts };
-      newToolCosts[toolId] = (newToolCosts[toolId] || 0) + cost;
+      newToolCosts[canonicalId] = (newToolCosts[canonicalId] || 0) + cost;
 
       // Calculate category costs
       const newCategoryCosts = { ...prev.categoryCosts };
       Object.entries(COST_CATEGORIES).forEach(([category, tools]) => {
-        if (tools.includes(toolId)) {
+        if (tools.includes(canonicalId)) {
           newCategoryCosts[category] = (newCategoryCosts[category] || 0) + cost;
         }
       });
@@ -133,7 +148,8 @@ export const CostTrackingProvider = ({ children }) => {
 
   // Get cost for specific tool
   const getToolCost = (toolId) => {
-    return TOOL_COSTS[toolId] || TOOL_COSTS.default;
+    const canonicalId = canonicalToolId(toolId);
+    return TOOL_COSTS[canonicalId] || TOOL_COSTS.default;
   };
 
   // Get top spending tools
@@ -159,7 +175,7 @@ export const CostTrackingProvider = ({ children }) => {
     // Aggregate costs by day
     costData.executions.forEach(exec => {
       const dateKey = exec.timestamp.split('T')[0];
-      if (trends.hasOwnProperty(dateKey)) {
+      if (Object.prototype.hasOwnProperty.call(trends, dateKey)) {
         trends[dateKey] += exec.cost;
       }
     });

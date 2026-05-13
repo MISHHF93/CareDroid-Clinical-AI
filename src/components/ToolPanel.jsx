@@ -1,5 +1,7 @@
 import React from 'react';
 import { getInventoryItem } from '../data/featureInventory';
+import { NavIcon } from '../navigation/NavIcon';
+import { getFeatureIcon } from '../navigation/iconRegistry';
 
 const ToolPanel = ({ tool, feature }) => {
   const selectedId = feature || tool;
@@ -30,7 +32,9 @@ const ToolPanel = ({ tool, feature }) => {
             gap: '10px',
             marginBottom: '10px'
           }}>
-            <div style={{ fontSize: '20px' }}>{item.icon}</div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', color: 'var(--text-color)' }} aria-hidden>
+              <NavIcon icon={getFeatureIcon(item.id)} size={22} />
+            </div>
             <h3 style={{ margin: 0, fontSize: '16px', fontWeight: 600 }}>
               {item.name}
             </h3>

@@ -3,6 +3,8 @@ import { useCostTracking } from '../contexts/CostTrackingContext';
 import { useUser } from '../contexts/UserContext';
 import analyticsService from '../services/analyticsService';
 import toolRegistry, { toolRegistryById } from '../data/toolRegistry';
+import { NavIcon } from '../navigation/NavIcon';
+import { getToolIcon, CHROME_ICONS } from '../navigation/iconRegistry';
 import './CostAnalyticsDashboard.css';
 
 const CostAnalyticsDashboard = () => {
@@ -66,7 +68,10 @@ const CostAnalyticsDashboard = () => {
     <div className="cost-analytics-dashboard">
       <header className="cost-header">
         <div>
-          <h1>💰 Cost Analytics</h1>
+          <h1 className="cost-header-title">
+            <NavIcon icon={CHROME_ICONS.circleDollar} size={32} aria-hidden />
+            Cost Analytics
+          </h1>
           <p>Track tool usage costs and ROI for CareDroid platform.</p>
         </div>
         <div className="cost-header-actions">
@@ -82,13 +87,19 @@ const CostAnalyticsDashboard = () => {
       {/* Cost Limit Warning */}
       {isCostLimitExceeded && (
         <div className="cost-alert cost-alert-danger">
-          <strong>⚠️ Budget Exceeded</strong>
+          <strong className="cost-alert-title">
+            <NavIcon icon={CHROME_ICONS.alert} size={18} aria-hidden />
+            Budget Exceeded
+          </strong>
           <p>Monthly cost (${costData.monthlyCost.toFixed(2)}) has exceeded your limit of ${costLimit.toFixed(2)}.</p>
         </div>
       )}
       {isCostLimitApproaching && !isCostLimitExceeded && (
         <div className="cost-alert cost-alert-warning">
-          <strong>⚡ Approaching Budget</strong>
+          <strong className="cost-alert-title">
+            <NavIcon icon={CHROME_ICONS.bolt} size={18} aria-hidden />
+            Approaching Budget
+          </strong>
           <p>You've used {((costData.monthlyCost / costLimit) * 100).toFixed(0)}% of your ${costLimit.toFixed(2)} monthly budget.</p>
         </div>
       )}
@@ -171,14 +182,16 @@ const CostAnalyticsDashboard = () => {
           <p className="cost-empty">No tool usage recorded yet.</p>
         ) : (
           topTools.map((item, index) => {
-            const tool = toolRegistryById[item.toolId] || { name: item.toolId, icon: '🧰', color: '#64748B' };
+            const tool = toolRegistryById[item.toolId] || { name: item.toolId, color: '#64748B' };
             const percentage = (item.cost / costData.totalCost) * 100;
             
             return (
               <div key={item.toolId} className="cost-row">
                 <div className="cost-row-label">
                   <span className="cost-rank">#{index + 1}</span>
-                  <span className="tool-icon">{tool.icon}</span>
+                  <span className="tool-icon" aria-hidden>
+                    <NavIcon icon={getToolIcon(item.toolId)} size={20} />
+                  </span>
                   <span>{tool.name}</span>
                 </div>
                 <div className="cost-row-bar">

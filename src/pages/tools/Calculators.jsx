@@ -2,56 +2,91 @@ import { useEffect, useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import './Calculators.css';
 import { apiFetch } from '../../services/apiClient';
+import { parseToolExecutionResponse } from '../../utils/toolExecutionResponse';
+import { NavIcon } from '../../navigation/NavIcon';
+import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
 
 const CALCULATORS = [
   {
     id: 'sofa',
     name: 'SOFA Score',
-    icon: '🏥',
     description: 'Sequential Organ Failure Assessment for ICU patients',
     category: 'ICU/Critical Care',
   },
   {
     id: 'gfr',
     name: 'eGFR Calculator',
-    icon: '🫘',
     description: 'Estimated Glomerular Filtration Rate (CKD-EPI)',
     category: 'Renal',
   },
   {
     id: 'bmi',
     name: 'BMI Calculator',
-    icon: '⚖️',
     description: 'Body Mass Index and weight classification',
     category: 'General',
   },
   {
     id: 'chads2vasc',
     name: 'CHA2DS2-VASc',
-    icon: '💓',
     description: 'Stroke risk in atrial fibrillation',
     category: 'Cardiology',
   },
 ];
 
-const Calculators = () => {
+function CalcPanelTitle({ icon, children }) {
+  return (
+    <div className="calculator-panel-title">
+      <NavIcon icon={icon} size={22} />
+      {children}
+    </div>
+  );
+}
+
+function ResultsPanelTitle() {
+  return (
+    <div className="calculator-panel-title">
+      <NavIcon icon={CHROME_ICONS.barChart} size={22} />
+      Results
+    </div>
+  );
+}
+
+function CalcResultsEmptyIcon({ icon, size = 56 }) {
+  return (
+    <div className="calc-results-empty-icon" aria-hidden>
+      <NavIcon icon={icon} size={size} />
+    </div>
+  );
+}
+
+const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = null } = {}) => {
   const toolConfig = {
     id: 'calculators',
-    icon: '📊',
     name: 'Medical Calculators',
     path: '/tools/calculators',
     color: '#95E1D3',
     description: 'Medical calculators (GFR, BMI, scores, etc.)',
-    shortcut: 'Ctrl+3',
+    shortcut: 'Ctrl+7',
     category: 'Calculator'
   };
 
   const [selectedCalculator, setSelectedCalculator] = useState(null);
   const [sharedResult, setSharedResult] = useState(null);
 
+  useEffect(() => {
+    if (!initialCalculatorId) return;
+    const match = CALCULATORS.find((c) => c.id === initialCalculatorId);
+    if (match) {
+      setSelectedCalculator(match);
+      setSharedResult(null);
+    }
+  }, [initialCalculatorId]);
+
   return (
     <ToolPageLayout
       tool={toolConfig}
+      embedded={embedded}
+      onCloseEmbedded={onCloseEmbedded}
       results={selectedCalculator && sharedResult ? { calculator: selectedCalculator.id, ...sharedResult } : null}
     >
       <div className="calculators-content">
@@ -67,7 +102,9 @@ const Calculators = () => {
               }}
             >
               <div className="calculator-card-header">
-                <span className="calculator-icon">{calc.icon}</span>
+                <span className="calculator-icon" aria-hidden>
+                  <NavIcon icon={getCalculatorSubIcon(calc.id)} size={22} />
+                </span>
                 <span className="calculator-name">{calc.name}</span>
               </div>
               <div className="calculator-description">{calc.description}</div>
@@ -82,12 +119,10 @@ const Calculators = () => {
         {selectedCalculator ? (
           <CalculatorInterface calculator={selectedCalculator} onResultChange={setSharedResult} />
         ) : (
-          <div style={{
-            textAlign: 'center',
-            padding: '60px 20px',
-            color: 'var(--text-secondary)',
-          }}>
-            <div style={{ fontSize: '64px', marginBottom: '16px', opacity: 0.3 }}>📊</div>
+          <div className="calculators-select-placeholder">
+            <div className="calculators-select-placeholder-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.barChart} size={56} />
+            </div>
             <p>Select a calculator above to begin</p>
           </div>
         )}
@@ -166,10 +201,11 @@ const SOFACalculator = ({ onResultChange }) => {
       if (!response.ok) throw new Error('Failed to calculate SOFA score');
 
       const data = await response.json();
-      if (data.data?.success) {
-        setResult(data.data.data);
+      const parsed = parseToolExecutionResponse(data);
+      if (parsed.ok && parsed.data != null) {
+        setResult(parsed.data);
       } else {
-        throw new Error(data.data?.errors?.[0] || 'Calculation failed');
+        throw new Error(parsed.errors?.[0] || 'Calculation failed');
       }
     } catch (err) {
       setError(err.message);
@@ -208,7 +244,7 @@ const SOFACalculator = ({ onResultChange }) => {
     <div className="calculator-interface">
       {/* Inputs */}
       <div className="calculator-inputs">
-        <div className="calculator-panel-title">🩺 Patient Parameters</div>
+        <CalcPanelTitle icon={CHROME_ICONS.stethoscope}>Patient Parameters</CalcPanelTitle>
 
         {/* Respiration */}
         <div className="calc-input-group">
@@ -394,7 +430,10 @@ const SOFACalculator = ({ onResultChange }) => {
                 Calculating...
               </>
             ) : (
-              <>🧮 Calculate SOFA Score</>
+              <>
+                <NavIcon icon={CHROME_ICONS.calculator} size={20} />
+                Calculate SOFA Score
+              </>
             )}
           </button>
           <button className="calc-reset-btn" onClick={handleReset}>
@@ -405,7 +444,7 @@ const SOFACalculator = ({ onResultChange }) => {
 
       {/* Results */}
       <div className="calculator-results">
-        <div className="calculator-panel-title">📊 Results</div>
+        <ResultsPanelTitle />
 
         {loading ? (
           <div className="calc-loading">
@@ -461,7 +500,7 @@ const SOFACalculator = ({ onResultChange }) => {
           </>
         ) : (
           <div className="calc-results-empty">
-            <div className="calc-results-empty-icon">🏥</div>
+            <CalcResultsEmptyIcon icon={CHROME_ICONS.hospital} />
             <p>Enter patient parameters and calculate</p>
           </div>
         )}
@@ -545,7 +584,7 @@ const GFRCalculator = ({ onResultChange }) => {
   return (
     <div className="calculator-interface">
       <div className="calculator-inputs">
-        <div className="calculator-panel-title">🫘 Patient Information</div>
+        <CalcPanelTitle icon={CHROME_ICONS.activity}>Patient Information</CalcPanelTitle>
 
         <div className="calc-input-group">
           <label className="calc-input-label">Age (years)</label>
@@ -599,10 +638,12 @@ const GFRCalculator = ({ onResultChange }) => {
 
         <div className="calc-actions">
           <button
+            type="button"
             className="calc-calculate-btn"
             onClick={calculateGFR}
           >
-            🧮 Calculate eGFR
+            <NavIcon icon={CHROME_ICONS.calculator} size={20} />
+            Calculate eGFR
           </button>
           <button
             className="calc-reset-btn"
@@ -614,7 +655,7 @@ const GFRCalculator = ({ onResultChange }) => {
       </div>
 
       <div className="calculator-results">
-        <div className="calculator-panel-title">📊 Results</div>
+        <ResultsPanelTitle />
 
         {result ? (
           <>
@@ -643,7 +684,7 @@ const GFRCalculator = ({ onResultChange }) => {
           </>
         ) : (
           <div className="calc-results-empty">
-            <div className="calc-results-empty-icon">🫘</div>
+            <CalcResultsEmptyIcon icon={CHROME_ICONS.activity} />
             <p>Enter patient information and calculate</p>
           </div>
         )}
@@ -725,7 +766,7 @@ const BMICalculator = ({ onResultChange }) => {
   return (
     <div className="calculator-interface">
       <div className="calculator-inputs">
-        <div className="calculator-panel-title">⚖️ Body Measurements</div>
+        <CalcPanelTitle icon={CHROME_ICONS.scale}>Body Measurements</CalcPanelTitle>
 
         <div className="calc-input-group">
           <label className="calc-input-label">Unit System</label>
@@ -766,8 +807,9 @@ const BMICalculator = ({ onResultChange }) => {
         </div>
 
         <div className="calc-actions">
-          <button className="calc-calculate-btn" onClick={calculateBMI}>
-            🧮 Calculate BMI
+          <button type="button" className="calc-calculate-btn" onClick={calculateBMI}>
+            <NavIcon icon={CHROME_ICONS.calculator} size={20} />
+            Calculate BMI
           </button>
           <button
             className="calc-reset-btn"
@@ -779,7 +821,7 @@ const BMICalculator = ({ onResultChange }) => {
       </div>
 
       <div className="calculator-results">
-        <div className="calculator-panel-title">📊 Results</div>
+        <ResultsPanelTitle />
 
         {result ? (
           <>
@@ -809,7 +851,7 @@ const BMICalculator = ({ onResultChange }) => {
           </>
         ) : (
           <div className="calc-results-empty">
-            <div className="calc-results-empty-icon">⚖️</div>
+            <CalcResultsEmptyIcon icon={CHROME_ICONS.scale} />
             <p>Enter measurements and calculate</p>
           </div>
         )}
@@ -882,7 +924,7 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
   return (
     <div className="calculator-interface">
       <div className="calculator-inputs">
-        <div className="calculator-panel-title">💓 Risk Factors</div>
+        <CalcPanelTitle icon={CHROME_ICONS.heartPulse}>Risk Factors</CalcPanelTitle>
 
         <div className="calc-input-group">
           <div className="calc-checkbox-group">
@@ -984,8 +1026,9 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
         </div>
 
         <div className="calc-actions">
-          <button className="calc-calculate-btn" onClick={calculateScore}>
-            🧮 Calculate Score
+          <button type="button" className="calc-calculate-btn" onClick={calculateScore}>
+            <NavIcon icon={CHROME_ICONS.calculator} size={20} />
+            Calculate Score
           </button>
           <button
             className="calc-reset-btn"
@@ -1008,7 +1051,7 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
       </div>
 
       <div className="calculator-results">
-        <div className="calculator-panel-title">📊 Results</div>
+        <ResultsPanelTitle />
 
         {result ? (
           <>
@@ -1032,7 +1075,7 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
           </>
         ) : (
           <div className="calc-results-empty">
-            <div className="calc-results-empty-icon">💓</div>
+            <CalcResultsEmptyIcon icon={CHROME_ICONS.heartPulse} />
             <p>Select risk factors and calculate</p>
           </div>
         )}

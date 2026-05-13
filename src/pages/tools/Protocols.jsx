@@ -2,10 +2,9 @@ import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import { apiFetch } from '../../services/apiClient';
 
-const Protocols = () => {
+const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
     id: 'protocols',
-    icon: '📋',
     name: 'Clinical Protocols',
     path: '/tools/protocols',
     color: '#A8E6CF',
@@ -58,7 +57,7 @@ const Protocols = () => {
   };
 
   return (
-    <ToolPageLayout tool={toolConfig} results={results}>
+    <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded} results={results}>
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '24px' }}>
         <div style={{ marginBottom: '24px' }}>
           <input

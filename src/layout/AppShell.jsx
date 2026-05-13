@@ -1,11 +1,13 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useNotifications } from '../contexts/NotificationContext';
-import { useUser } from '../contexts/UserContext';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 import Sidebar from '../components/Sidebar';
+import { NavIcon } from '../navigation/NavIcon';
+import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { COMPACT_MEDIA_QUERY, getIsCompactViewport } from './breakpoints';
+import './AppShell.css';
 
 const AppShell = ({
-  isAuthed,
+  isAuthed = false,
   conversations,
   activeConversation,
   onSelectConversation,
@@ -17,23 +19,62 @@ const AppShell = ({
   currentFeature = null,
   onToolSelect = null,
   onFeatureSelect = null,
-  children
+  children,
 }) => {
-  const { notifications } = useNotifications();
-  const { user } = useUser();
-  const navigate = useNavigate();
+  const { preference, resolvedTheme, setPreference } = useTheme();
+
+  const [isCompact, setIsCompact] = useState(getIsCompactViewport);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia(COMPACT_MEDIA_QUERY);
+    const onChange = () => {
+      setIsCompact(mq.matches);
+      if (!mq.matches) setMobileNavOpen(false);
+    };
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+
+  const mainInsetPx = useMemo(() => {
+    if (isCompact) return 0;
+    return sidebarCollapsed ? 70 : 280;
+  }, [isCompact, sidebarCollapsed]);
+
+  const cycleTheme = () => {
+    const order = ['system', 'light', 'dark'];
+    const i = order.indexOf(preference);
+    setPreference(order[(i + 1) % order.length]);
+  };
+
+  const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
+
+  useEffect(() => {
+    if (!mobileNavOpen || !isCompact) return;
+    const onKey = (e) => {
+      if (e.key === 'Escape') closeMobileNav();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileNavOpen, isCompact, closeMobileNav]);
 
   return (
-    <div className="app-shell" style={{
-      display: 'flex',
-      height: '100vh',
-      width: '100vw',
-      background: 'var(--navy-bg)',
-      color: 'var(--text-color)',
-      overflow: 'hidden',
-      position: 'relative'
-    }}>
-      {/* Sidebar - Fixed Position */}
+    <div
+      className={`app-shell ${isCompact ? 'app-shell--compact' : ''} ${isAuthed ? 'app-shell--authed' : ''}`}
+      style={{
+        ['--app-main-inset']: `${mainInsetPx}px`,
+      }}
+    >
+      {isAuthed && isCompact && mobileNavOpen && (
+        <button
+          type="button"
+          className="app-shell-nav-backdrop"
+          aria-label="Close navigation menu"
+          onClick={closeMobileNav}
+        />
+      )}
+
       <Sidebar
         conversations={conversations}
         activeConversation={activeConversation}
@@ -43,19 +84,51 @@ const AppShell = ({
         healthStatus={healthStatus}
         currentTool={currentTool}
         onToolSelect={onToolSelect}
+        layoutCompact={isCompact}
+        mobileNavOpen={mobileNavOpen}
+        onCloseMobileNav={closeMobileNav}
+        sidebarCollapsed={sidebarCollapsed}
+        onSidebarCollapsedChange={setSidebarCollapsed}
       />
 
-      {/* Main Content Area - Pushed by sidebar width */}
-      <div style={{ 
-        flex: 1, 
-        display: 'flex', 
-        flexDirection: 'column',
-        marginLeft: '280px',
-        minWidth: 0,
-        height: '100vh',
-        overflow: 'hidden',
-        transition: 'margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-      }}>
+      <div className="app-shell-main-wrap">
+        {isAuthed && isCompact && (
+          <button
+            type="button"
+            className="app-shell-menu-btn"
+            onClick={() => setMobileNavOpen(true)}
+            aria-expanded={mobileNavOpen}
+            aria-controls="app-sidebar-nav"
+            aria-label="Open navigation menu"
+          >
+            <span className="app-shell-menu-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.menu} size={22} />
+            </span>
+          </button>
+        )}
+        {isAuthed && (
+          <button
+            type="button"
+            className="app-shell-theme-fab"
+            onClick={cycleTheme}
+            title="Cycle theme (system / light / dark)"
+            aria-label={`Theme: ${preference}, active ${resolvedTheme}. Click to cycle.`}
+          >
+            <span aria-hidden>
+              <NavIcon
+                icon={
+                  preference === 'system'
+                    ? CHROME_ICONS.contrast
+                    : resolvedTheme === 'dark'
+                      ? CHROME_ICONS.moon
+                      : CHROME_ICONS.sun
+                }
+                size={22}
+              />
+            </span>
+            <span className="app-shell-theme-fab-label">{preference}</span>
+          </button>
+        )}
         {children}
       </div>
     </div>

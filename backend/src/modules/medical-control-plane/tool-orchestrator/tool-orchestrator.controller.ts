@@ -98,7 +98,7 @@ export class ToolOrchestratorController {
     const dto: ExecuteToolDto = {
       toolId,
       parameters: body.parameters,
-      userId: req.user?.userId || 'anonymous',
+      userId: req.user?.id || 'anonymous',
       conversationId: body.conversationId || 'direct-execution',
     };
 
@@ -116,7 +116,7 @@ export class ToolOrchestratorController {
     @Request() req: any,
   ): Promise<ToolExecutionResponseDto> {
     // Override userId with authenticated user
-    dto.userId = req.user?.userId || dto.userId || 'anonymous';
+    dto.userId = req.user?.id || dto.userId || 'anonymous';
     return this.toolOrchestratorService.executeTool(dto);
   }
 
@@ -130,7 +130,7 @@ export class ToolOrchestratorController {
     @Body() body: { toolType: string; input?: any; output?: any; timestamp?: string },
     @Request() req: any,
   ) {
-    const userId = req.user?.userId || req.user?.id || 'anonymous';
+    const userId = req.user?.id || 'anonymous';
 
     const result = await this.toolOrchestratorService.saveToolResult({
       userId,

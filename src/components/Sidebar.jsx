@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser, Permission } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
@@ -7,23 +7,31 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import PermissionGate from './PermissionGate';
 import WorkspaceCreationModal from './WorkspaceCreationModal';
 import toolRegistry, { toolRegistryById } from '../data/toolRegistry';
+import { NavIcon } from '../navigation/NavIcon';
+import { CHROME_ICONS, getNavIcon, getToolIcon } from '../navigation/iconRegistry';
 import './Sidebar.css';
 
 /**
  * CareDroid Professional Sidebar
  * Clinical AI Platform Navigation
  */
-const Sidebar = ({ 
-  conversations = [], 
-  activeConversation, 
+const Sidebar = ({
+  conversations = [],
+  activeConversation,
   onSelectConversation,
   onNewConversation,
   onSignOut,
   healthStatus = 'online',
   currentTool = null,
-  onToolSelect
+  onToolSelect,
+  layoutCompact = false,
+  mobileNavOpen = false,
+  onCloseMobileNav = () => {},
+  sidebarCollapsed = false,
+  onSidebarCollapsedChange = () => {},
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useUser();
   const { notifications } = useNotifications();
   const {
@@ -41,7 +49,6 @@ const Sidebar = ({
     setActiveWorkspaceId,
     addWorkspace
   } = useWorkspace();
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const [showToolsSection, setShowToolsSection] = useState(true);
   const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
   
@@ -64,36 +71,50 @@ const Sidebar = ({
 
   // Navigation Items
   const navItems = [
-    { id: 'chat', icon: '💬', label: 'Dashboard', path: '/dashboard' },
-    { id: 'profile', icon: '👤', label: 'Profile', path: '/profile' },
-    { id: 'team', icon: '👥', label: 'Team', path: '/team', permission: Permission.MANAGE_USERS },
-    { id: 'audit', icon: '📜', label: 'Audit Logs', path: '/audit-logs', permission: Permission.VIEW_AUDIT_LOGS },
-    { id: 'analytics', icon: '📊', label: 'Analytics', path: '/analytics', permission: Permission.VIEW_ANALYTICS },
-    { id: 'settings', icon: '⚙️', label: 'Settings', path: '/settings' }
+    { id: 'chat', label: 'Dashboard', path: '/dashboard' },
+    { id: 'clinical-alerts', label: 'Alerts', path: '/clinical/alerts' },
+    { id: 'profile', label: 'Profile', path: '/profile' },
+    { id: 'team', label: 'Team', path: '/team', permission: Permission.MANAGE_USERS },
+    { id: 'audit', label: 'Audit Logs', path: '/audit-logs', permission: Permission.VIEW_AUDIT_LOGS },
+    { id: 'analytics', label: 'Analytics', path: '/analytics', permission: Permission.VIEW_ANALYTICS },
+    { id: 'settings', label: 'Settings', path: '/settings' }
   ];
 
   const recentConversations = conversations.slice(-5).reverse();
 
+  const effectiveCollapsed = layoutCompact ? false : sidebarCollapsed;
+
   const handleNavClick = (path) => {
-    navigate(path);
+    if (path === '/dashboard') {
+      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+    } else {
+      onToolSelect?.(null);
+      navigate(path);
+    }
+    onCloseMobileNav();
   };
 
   const handleToolClick = (tool) => {
     recordToolAccess(tool.id);
-    navigate(tool.path);
+    const params = new URLSearchParams();
+    params.set('tool', tool.id);
+    if (tool.initialCalc) params.set('calc', tool.initialCalc);
+    navigate(`/dashboard?${params.toString()}`);
     onToolSelect?.(tool.id);
+    onCloseMobileNav();
   };
 
+  const dashboardToolFromUrl = new URLSearchParams(location.search).get('tool');
+
   const renderToolCard = (tool) => {
-    const isActive = location.pathname === tool.path;
-    const isSelected = currentTool === tool.id;
+    const isSelected = currentTool === tool.id || dashboardToolFromUrl === tool.id;
     const isFavorite = favorites.includes(tool.id);
     const isPinned = pinned.includes(tool.id);
 
     return (
       <div
         key={tool.id}
-        className={`tool-card ${isActive || isSelected ? 'active' : ''}`}
+        className={`tool-card ${isSelected ? 'active' : ''}`}
         onClick={(e) => {
           e.stopPropagation();
           handleToolClick(tool);
@@ -102,8 +123,8 @@ const Sidebar = ({
           padding: '10px',
           margin: '6px 0',
           borderRadius: '8px',
-          border: `2px solid ${isActive || isSelected ? tool.color : 'transparent'}`,
-          backgroundColor: isActive || isSelected
+          border: `2px solid ${isSelected ? tool.color : 'transparent'}`,
+          backgroundColor: isSelected
             ? `${tool.color}15`
             : 'var(--panel-background)',
           cursor: 'pointer',
@@ -111,13 +132,13 @@ const Sidebar = ({
           position: 'relative'
         }}
         onMouseEnter={(e) => {
-          if (!isActive && !isSelected) {
+          if (!isSelected) {
             e.currentTarget.style.backgroundColor = 'var(--panel-hover, #f5f5f5)';
             e.currentTarget.style.borderColor = `${tool.color}40`;
           }
         }}
         onMouseLeave={(e) => {
-          if (!isActive && !isSelected) {
+          if (!isSelected) {
             e.currentTarget.style.backgroundColor = 'var(--panel-background, white)';
             e.currentTarget.style.borderColor = 'transparent';
           }
@@ -133,7 +154,12 @@ const Sidebar = ({
               toggleFavorite(tool.id);
             }}
           >
-            ★
+            <NavIcon
+              icon={CHROME_ICONS.star}
+              size={14}
+              fill={isFavorite ? 'currentColor' : 'none'}
+              aria-hidden
+            />
           </button>
           <button
             className={`tool-action-btn ${isPinned ? 'active' : ''}`}
@@ -143,18 +169,21 @@ const Sidebar = ({
               togglePinned(tool.id);
             }}
           >
-            📌
+            <NavIcon icon={CHROME_ICONS.pin} size={14} aria-hidden />
           </button>
         </div>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
           <span
+            className="tool-card-icon-wrap"
             style={{
-              fontSize: '22px',
-              filter: isActive || isSelected ? 'none' : 'grayscale(0.2)',
-              lineHeight: 1
+              filter: isSelected ? 'none' : 'grayscale(0.2)',
+              lineHeight: 1,
+              display: 'inline-flex',
+              color: tool.color,
             }}
+            aria-hidden
           >
-            {tool.icon}
+            <NavIcon icon={getToolIcon(tool.id)} size={22} />
           </span>
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{
@@ -206,28 +235,53 @@ const Sidebar = ({
 
   return (
     <>
-    <aside className={`sidebar ${isCollapsed ? 'sidebar-collapsed' : ''}`}>
+    <aside
+      id="app-sidebar-nav"
+      className={[
+        'sidebar',
+        !layoutCompact && effectiveCollapsed ? 'sidebar-collapsed' : '',
+        layoutCompact ? 'sidebar--compact' : '',
+        layoutCompact && mobileNavOpen ? 'sidebar--open' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       {/* Header */}
       <div className="sidebar-header">
         <div className="sidebar-logo">
-          <div className="logo-icon">🏥</div>
-          {!isCollapsed && (
+          <div className="logo-icon" aria-hidden>
+            <NavIcon icon={CHROME_ICONS.hospital} size={28} />
+          </div>
+          {!effectiveCollapsed && (
             <div className="logo-text">
               <h1>CareDroid-Clinical-AI</h1>
             </div>
           )}
         </div>
-        <button 
+        <button
+          type="button"
           className="sidebar-toggle"
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          onClick={() => {
+            if (layoutCompact) {
+              onCloseMobileNav();
+            } else {
+              onSidebarCollapsedChange(!sidebarCollapsed);
+            }
+          }}
+          aria-label={layoutCompact ? 'Close menu' : effectiveCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {isCollapsed ? '→' : '←'}
+          {layoutCompact ? (
+            <NavIcon icon={CHROME_ICONS.close} size={20} aria-hidden />
+          ) : effectiveCollapsed ? (
+            <NavIcon icon={CHROME_ICONS.chevronRight} size={20} aria-hidden />
+          ) : (
+            <NavIcon icon={CHROME_ICONS.chevronLeft} size={20} aria-hidden />
+          )}
         </button>
       </div>
 
       {/* User Profile */}
-      {!isCollapsed && (
+      {!effectiveCollapsed && (
         <div className="sidebar-user">
           <div className="user-avatar">
             {user?.name?.charAt(0).toUpperCase() || 'U'}
@@ -245,29 +299,37 @@ const Sidebar = ({
       {/* Main Content */}
       <div className="sidebar-content">
         {/* New Conversation Button */}
-        <button 
+        <button
+          type="button"
           className="btn-new-conversation"
-          onClick={onNewConversation}
+          onClick={() => {
+            onNewConversation();
+            onCloseMobileNav();
+          }}
         >
-          <span className="btn-icon">✨</span>
-          {!isCollapsed && <span>New Conversation</span>}
+          <span className="btn-icon" aria-hidden>
+            <NavIcon icon={CHROME_ICONS.sparkles} size={18} />
+          </span>
+          {!effectiveCollapsed && <span>New Conversation</span>}
         </button>
 
         {/* Navigation */}
         <nav className="sidebar-nav">
           <div className="nav-section-title">
-            {!isCollapsed && 'Navigation'}
+            {!effectiveCollapsed && 'Navigation'}
           </div>
           {navItems.map(item => {
             const NavButton = (
               <button
                 key={item.id}
-                className={`nav-item ${window.location.pathname === item.path ? 'active' : ''}`}
+                className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
                 onClick={() => handleNavClick(item.path)}
-                title={isCollapsed ? item.label : ''}
+                title={effectiveCollapsed ? item.label : ''}
               >
-                <span className="nav-icon">{item.icon}</span>
-                {!isCollapsed && <span className="nav-label">{item.label}</span>}
+                <span className="nav-icon" aria-hidden>
+                  <NavIcon icon={getNavIcon(item.id)} />
+                </span>
+                {!effectiveCollapsed && <span className="nav-label">{item.label}</span>}
               </button>
             );
 
@@ -280,22 +342,29 @@ const Sidebar = ({
         </nav>
 
         {/* Medical Tools Section - Enhanced */}
-        {!isCollapsed && (
+        {!effectiveCollapsed && (
           <div className="sidebar-section">
             <div 
               className="section-header"
               onClick={() => setShowToolsSection(!showToolsSection)}
               style={{ cursor: 'pointer', userSelect: 'none' }}
             >
-              <span className="section-icon">🔧</span>
+              <span className="section-icon section-icon--svg" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.tools} size={16} />
+              </span>
               <span className="section-title">Clinical Tools</span>
-              <span style={{ 
-                marginLeft: 'auto', 
-                transform: showToolsSection ? 'rotate(0deg)' : 'rotate(-90deg)',
-                transition: 'transform 0.2s',
-                fontSize: '10px'
-              }}>
-                ▼
+              <span
+                style={{
+                  marginLeft: 'auto',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  transform: showToolsSection ? 'rotate(0deg)' : 'rotate(-90deg)',
+                  transition: 'transform 0.2s',
+                  color: 'var(--nav-glyph-muted, rgba(255,255,255,0.5))',
+                }}
+                aria-hidden
+              >
+                <NavIcon icon={CHROME_ICONS.chevronDown} size={14} />
               </span>
             </div>
 
@@ -315,7 +384,7 @@ const Sidebar = ({
               >
                 {workspaces.map((workspace) => (
                   <option key={workspace.id} value={workspace.id}>
-                    {workspace.icon ? `${workspace.icon} ` : ''}{workspace.name}
+                    {workspace.name}
                   </option>
                 ))}
               </select>
@@ -349,7 +418,12 @@ const Sidebar = ({
               <div className="medical-tools-list" style={{ marginTop: '8px' }}>
                 {favoriteTools.length > 0 && (
                   <div className="tools-subsection">
-                    <div className="tools-subsection-header">★ Favorites</div>
+                    <div className="tools-subsection-header tools-subsection-header--with-icon">
+                      <span className="tools-subsection-header-icon" aria-hidden>
+                        <NavIcon icon={CHROME_ICONS.star} size={14} fill="currentColor" />
+                      </span>
+                      <span>Favorites</span>
+                    </div>
                     <div className="tools-subsection-list">
                       {favoriteTools.map(renderToolCard)}
                     </div>
@@ -359,7 +433,12 @@ const Sidebar = ({
                 {recentToolItems.length > 0 && (
                   <div className="tools-subsection">
                     <div className="tools-subsection-header tools-subsection-header-row">
-                      <span>🕓 Recent Tools</span>
+                      <span className="tools-subsection-header-row-title">
+                        <span className="tools-subsection-header-icon" aria-hidden>
+                          <NavIcon icon={CHROME_ICONS.clock} size={14} />
+                        </span>
+                        <span>Recent Tools</span>
+                      </span>
                       <button
                         className="tools-clear-btn"
                         onClick={(e) => {
@@ -382,7 +461,9 @@ const Sidebar = ({
                           }}
                           type="button"
                         >
-                          <span className="recent-tool-icon">{tool.icon}</span>
+                          <span className="recent-tool-icon" aria-hidden>
+                            <NavIcon icon={getToolIcon(tool.id)} size={18} />
+                          </span>
                           <span className="recent-tool-name">{tool.name}</span>
                         </button>
                       ))}
@@ -399,7 +480,11 @@ const Sidebar = ({
                 
                 {/* Quick Action: View All Tools */}
                 <button
-                  onClick={() => navigate('/tools')}
+                  type="button"
+                  onClick={() => {
+                    navigate('/tools');
+                    onCloseMobileNav();
+                  }}
                   style={{
                     width: '100%',
                     padding: '8px',
@@ -426,7 +511,9 @@ const Sidebar = ({
                     e.currentTarget.style.color = 'var(--text-secondary, #666)';
                   }}
                 >
-                  <span>⚡</span>
+                  <span className="section-icon--svg" aria-hidden>
+                    <NavIcon icon={CHROME_ICONS.bolt} size={14} />
+                  </span>
                   <span>View All Tools</span>
                 </button>
               </div>
@@ -435,10 +522,12 @@ const Sidebar = ({
         )}
 
         {/* Recent Conversations */}
-        {!isCollapsed && recentConversations.length > 0 && (
+        {!effectiveCollapsed && recentConversations.length > 0 && (
           <div className="sidebar-section">
             <div className="section-header">
-              <span className="section-icon">💭</span>
+              <span className="section-icon section-icon--svg" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.messageCircle} size={16} />
+              </span>
               <span className="section-title">Recent</span>
             </div>
             <div className="conversations-list">
@@ -446,13 +535,19 @@ const Sidebar = ({
                 <button
                   key={conv.id}
                   className={`conversation-item ${activeConversation === conv.id ? 'active' : ''}`}
-                  onClick={() => onSelectConversation(conv.id)}
+                  onClick={() => {
+                    onSelectConversation(conv.id);
+                    onCloseMobileNav();
+                  }}
                 >
                   <span className="conversation-title">
                     {conv.title.length > 25 ? conv.title.substring(0, 25) + '...' : conv.title}
                   </span>
                   <span className="conversation-time">
-                    {new Date(conv.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    {new Date(conv.date || conv.timestamp).toLocaleDateString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                    })}
                   </span>
                 </button>
               ))}
@@ -464,33 +559,47 @@ const Sidebar = ({
       {/* Footer */}
       <div className="sidebar-footer">
         {/* Notifications */}
-        <button 
+        <button
+          type="button"
           className="footer-action"
-          onClick={() => navigate('/notifications')}
+          onClick={() => {
+            navigate('/notifications');
+            onCloseMobileNav();
+          }}
           title="Notifications"
         >
-          <span className="action-icon">🔔</span>
+          <span className="action-icon" aria-hidden>
+            <NavIcon icon={CHROME_ICONS.bell} size={18} />
+          </span>
           {unreadCount > 0 && (
             <span className="notification-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>
           )}
         </button>
 
         {/* HIPAA Badge */}
-        {!isCollapsed && (
+        {!effectiveCollapsed && (
           <div className="hipaa-badge">
-            <span className="hipaa-icon">🔒</span>
+            <span className="hipaa-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.lock} size={14} />
+            </span>
             <span className="hipaa-text">HIPAA Compliant</span>
           </div>
         )}
 
         {/* Sign Out */}
-        <button 
+        <button
+          type="button"
           className="btn-signout"
-          onClick={onSignOut}
+          onClick={() => {
+            onCloseMobileNav();
+            onSignOut();
+          }}
           title="Sign Out"
         >
-          <span className="signout-icon">🚪</span>
-          {!isCollapsed && <span>Sign Out</span>}
+          <span className="signout-icon" aria-hidden>
+            <NavIcon icon={CHROME_ICONS.logOut} size={18} />
+          </span>
+          {!effectiveCollapsed && <span>Sign Out</span>}
         </button>
       </div>
     </aside>

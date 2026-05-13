@@ -103,9 +103,9 @@ export class ToolOrchestratorService {
    */
   getToolsBySubscriptionTier(tier: SubscriptionTier): ToolListDto {
     const toolAccessMap: Record<SubscriptionTier, string[]> = {
-      [SubscriptionTier.FREE]: ['sofa_calculator'],
-      [SubscriptionTier.PROFESSIONAL]: ['sofa_calculator', 'drug_checker'],
-      [SubscriptionTier.INSTITUTIONAL]: ['sofa_calculator', 'drug_checker', 'lab_interpreter'],
+      [SubscriptionTier.FREE]: ['sofa-calculator'],
+      [SubscriptionTier.PROFESSIONAL]: ['sofa-calculator', 'drug-interactions'],
+      [SubscriptionTier.INSTITUTIONAL]: ['sofa-calculator', 'drug-interactions', 'lab-interpreter'],
     };
 
     const allowedToolIds = toolAccessMap[tier] || toolAccessMap[SubscriptionTier.FREE];
@@ -331,7 +331,7 @@ export class ToolOrchestratorService {
     // Add key data points (tool-specific formatting)
     if (response.toolId === 'sofa-calculator') {
       output += this.formatSofaResult(response.result.data);
-    } else if (response.toolId === 'drug-interaction-checker') {
+    } else if (response.toolId === 'drug-interactions' || response.toolId === 'drug-interaction-checker') {
       output += this.formatDrugCheckerResult(response.result.data);
     } else if (response.toolId === 'lab-interpreter') {
       output += this.formatLabInterpreterResult(response.result.data);

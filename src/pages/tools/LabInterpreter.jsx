@@ -2,11 +2,13 @@ import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import './LabInterpreter.css';
 import { apiFetch } from '../../services/apiClient';
+import { parseToolExecutionResponse } from '../../utils/toolExecutionResponse';
+import { NavIcon } from '../../navigation/NavIcon';
+import { CHROME_ICONS, getLabCategoryIcon, getToolIcon } from '../../navigation/iconRegistry';
 
-const LabInterpreter = () => {
+const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
-    id: 'lab-interpreter',
-    icon: '🧪',
+    id: 'lab-interp',
     name: 'Lab Interpreter',
     path: '/tools/lab-interpreter',
     color: '#4ECDC4',
@@ -93,11 +95,11 @@ const LabInterpreter = () => {
       }
 
       const data = await response.json();
-      
-      if (data.data?.success) {
-        setResults(data.data.data);
+      const parsed = parseToolExecutionResponse(data);
+      if (parsed.ok && parsed.data != null) {
+        setResults(parsed.data);
       } else {
-        throw new Error(data.data?.errors?.[0] || 'Unknown error occurred');
+        throw new Error(parsed.errors?.[0] || 'Unknown error occurred');
       }
     } catch (err) {
       setError(err.message);
@@ -131,8 +133,10 @@ const LabInterpreter = () => {
   };
 
   return (
-    <ToolPageLayout 
+    <ToolPageLayout
       tool={toolConfig}
+      embedded={embedded}
+      onCloseEmbedded={onCloseEmbedded}
       results={results}
     >
       <div className="lab-interpreter-content">
@@ -140,7 +144,9 @@ const LabInterpreter = () => {
         <div className="lab-input-panel">
           <div className="lab-panel-header">
             <div className="lab-panel-title">
-              <span className="lab-panel-icon">📝</span>
+              <span className="lab-panel-icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.fileEdit} size={22} />
+              </span>
               Lab Values Input
             </div>
           </div>
@@ -267,6 +273,7 @@ const LabInterpreter = () => {
           {/* Action Buttons */}
           <div className="lab-action-buttons">
             <button
+              type="button"
               className="lab-interpret-button"
               onClick={handleInterpret}
               disabled={labValues.length === 0 || loading}
@@ -277,18 +284,24 @@ const LabInterpreter = () => {
                   Interpreting...
                 </>
               ) : (
-                <>🔬 Interpret Lab Values</>
+                <>
+                  <NavIcon icon={getToolIcon('lab-interp')} size={20} />
+                  Interpret Lab Values
+                </>
               )}
             </button>
-            <button className="lab-load-example-button" onClick={loadExample}>
-              📋 Load Example
+            <button type="button" className="lab-load-example-button" onClick={loadExample}>
+              <NavIcon icon={CHROME_ICONS.clipboardList} size={18} />
+              Load Example
             </button>
             <button
+              type="button"
               className="lab-clear-button"
               onClick={handleClear}
               disabled={labValues.length === 0 && !results}
             >
-              🗑️ Clear All
+              <NavIcon icon={CHROME_ICONS.trash} size={18} />
+              Clear All
             </button>
           </div>
         </div>
@@ -297,7 +310,9 @@ const LabInterpreter = () => {
         <div className="lab-results-panel">
           <div className="lab-panel-header">
             <div className="lab-panel-title">
-              <span className="lab-panel-icon">📊</span>
+              <span className="lab-panel-icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.barChart} size={22} />
+              </span>
               Interpretation Results
             </div>
           </div>
@@ -315,7 +330,9 @@ const LabInterpreter = () => {
             <LabResults results={results} />
           ) : (
             <div className="lab-results-empty">
-              <div className="lab-results-empty-icon">🧪</div>
+              <div className="lab-results-empty-icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.microscope} size={56} />
+              </div>
               <p>No results yet</p>
               <p style={{ fontSize: '14px', marginTop: '8px' }}>
                 Add lab values and click "Interpret Lab Values" to see results
@@ -362,7 +379,9 @@ const LabResults = ({ results }) => {
       {criticalValues && criticalValues.length > 0 && (
         <div className="lab-critical-alert">
           <div className="lab-critical-alert-header">
-            <span className="lab-critical-alert-icon">🚨</span>
+            <span className="lab-critical-alert-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.siren} size={24} />
+            </span>
             CRITICAL VALUES DETECTED
           </div>
           <ul className="lab-critical-values-list">
@@ -392,7 +411,10 @@ const LabResults = ({ results }) => {
         return (
           <div key={category} className="lab-category-section">
             <div className="lab-category-header">
-              {getCategoryIcon(category)} {category}
+              <span className="lab-category-header-icon" aria-hidden>
+                <NavIcon icon={getLabCategoryIcon(category)} size={18} />
+              </span>
+              <span>{category}</span>
             </div>
 
             {/* Lab Values Table */}
@@ -466,22 +488,16 @@ const LabResults = ({ results }) => {
 
       {/* Disclaimer */}
       <div className="lab-disclaimer">
-        <strong>⚠️ Clinical Disclaimer:</strong> Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history. This tool provides educational information only and should not replace professional medical judgment.
+        <strong className="lab-disclaimer-strong">
+          <span className="lab-disclaimer-icon" aria-hidden>
+            <NavIcon icon={CHROME_ICONS.alert} size={16} />
+          </span>
+          Clinical Disclaimer:
+        </strong>{' '}
+        Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history. This tool provides educational information only and should not replace professional medical judgment.
       </div>
     </>
   );
-};
-
-const getCategoryIcon = (category) => {
-  const icons = {
-    'CBC': '🩸',
-    'Electrolytes': '⚡',
-    'Renal Function': '🫘',
-    'Liver Function': '🫀',
-    'Coagulation': '🩹',
-    'Other': '🧪',
-  };
-  return icons[category] || '🧪';
 };
 
 export default LabInterpreter;

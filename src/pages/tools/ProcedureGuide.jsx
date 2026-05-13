@@ -2,10 +2,9 @@ import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import { apiFetch } from '../../services/apiClient';
 
-const ProcedureGuide = () => {
+const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
     id: 'procedures',
-    icon: '⚕️',
     name: 'Procedure Guide',
     path: '/tools/procedures',
     color: '#6BCB77',
@@ -58,7 +57,7 @@ const ProcedureGuide = () => {
   };
 
   return (
-    <ToolPageLayout tool={toolConfig} results={results}>
+    <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded} results={results}>
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '24px' }}>
         <div style={{ marginBottom: '24px' }}>
           <input

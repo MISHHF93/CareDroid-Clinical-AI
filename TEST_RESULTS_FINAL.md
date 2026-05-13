@@ -154,7 +154,7 @@ Console Errors: 0
 
 ### ✅ What's Working Perfectly
 1. **Routing System**: All 23 routes properly defined and guarded
-2. **Navigation Wiring**: All nav surfaces (Sidebar, Header, Breadcrumbs, Footer) correctly linked
+2. **Navigation Wiring**: Sidebar + AppShell; tool layouts include breadcrumb/header icons (no legacy `components/navigation` package)
 3. **Layouts**: PublicShell, AuthShell, AppShell all applied to correct routes
 4. **Permissions**: MANAGE_USERS and VIEW_AUDIT_LOGS gates configured
 5. **Imports**: No broken relative paths, all components importable

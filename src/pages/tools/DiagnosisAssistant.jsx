@@ -3,10 +3,9 @@ import ToolPageLayout from './ToolPageLayout';
 import './ToolPageLayout.css';
 import { apiFetch } from '../../services/apiClient';
 
-const DiagnosisAssistant = () => {
+const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
     id: 'diagnosis',
-    icon: '🔍',
     name: 'Diagnosis Assistant',
     path: '/tools/diagnosis',
     color: '#FFD93D',
@@ -59,7 +58,7 @@ const DiagnosisAssistant = () => {
   };
 
   return (
-    <ToolPageLayout tool={toolConfig} results={results}>
+    <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded} results={results}>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
         {/* Input Panel */}
         <div style={{ background: 'var(--panel-bg)', borderRadius: '16px', padding: '24px', border: '1px solid var(--border-color)' }}>

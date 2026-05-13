@@ -13,6 +13,18 @@
   font-size: 42px;
   margin-bottom: 12px;
   color: var(--text-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tools-overview-title-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color, #4f46e5);
 }
 
 .header-subtitle {
@@ -83,10 +95,20 @@
   padding: 24px;
 }
 
-.tools-recent-header h2 {
+.tools-recent-title {
   font-size: 20px;
   margin-bottom: 6px;
   color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tools-recent-title-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color, #4f46e5);
 }
 
 .tools-recent-header p {
@@ -120,7 +142,11 @@
 }
 
 .tools-recent-icon {
-  font-size: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-primary);
 }
 
 .tools-recent-info {
@@ -188,15 +214,18 @@
 }
 
 .tool-card-action {
-  width: 26px;
-  height: 26px;
+  width: 28px;
+  height: 28px;
   border-radius: 6px;
   border: 1px solid var(--panel-border, #e0e0e0);
   background: var(--panel-hover, #f5f5f5);
   color: var(--text-secondary);
-  font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
 .tool-card-action.active {
@@ -217,8 +246,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 32px;
   flex-shrink: 0;
+  color: var(--text-primary);
 }
 
 .tool-meta {
@@ -287,9 +316,11 @@
 }
 
 .feature-icon {
-  color: #10B981;
-  font-weight: bold;
-  font-size: 14px;
+  color: #10b981;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .tool-use-cases {
@@ -370,10 +401,18 @@
   margin-top: 48px;
 }
 
-.tools-tips h2 {
+.tools-tips h2,
+.tools-tips-title {
   text-align: center;
   font-size: 32px;
   margin-bottom: 32px;
+}
+
+.tools-tips-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
 }
 
 .tips-grid {
@@ -397,9 +436,11 @@
 }
 
 .tip-icon {
-  font-size: 36px;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .tip-card h3 {

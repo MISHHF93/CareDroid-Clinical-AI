@@ -18,7 +18,23 @@ export const buildApiUrl = (path = '') => {
   return `${API_BASE_URL}${normalizePath(path)}`;
 };
 
-export const apiFetch = (path, options) => fetch(buildApiUrl(path), options);
+const AUTH_TOKEN_KEY = 'caredroid_access_token';
+
+export const getStoredAccessToken = () => {
+  if (typeof localStorage === 'undefined') return null;
+  return localStorage.getItem(AUTH_TOKEN_KEY);
+};
+
+export const apiFetch = (path, options = {}) => {
+  const mergedHeaders = { ...(options.headers || {}) };
+  if (!mergedHeaders.Authorization) {
+    const token = getStoredAccessToken();
+    if (token) {
+      mergedHeaders.Authorization = `Bearer ${token}`;
+    }
+  }
+  return fetch(buildApiUrl(path), { ...options, headers: mergedHeaders });
+};
 
 export const buildStreamUrl = (path = '') => {
   const wsBase = appConfig.api.wsUrl
@@ -39,4 +55,5 @@ export default {
   apiAxios,
   buildApiUrl,
   buildStreamUrl,
+  getStoredAccessToken,
 };
