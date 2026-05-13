@@ -6,6 +6,7 @@ import App from './App';
 import './index.css';
 import './styles/theme-legacy-bridge.css';
 import './styles/theme-surfaces.css';
+import './styles/layout-breakpoints.css';
 import appConfig from './config/appConfig';
 import logger from './utils/logger';
 

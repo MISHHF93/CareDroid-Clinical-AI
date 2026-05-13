@@ -207,7 +207,9 @@ function Dashboard() {
   return (
     <div className="dashboard-root">
       <div className="dashboard-main">
-        <div className="dashboard-scroll">
+        <div
+          className={`dashboard-scroll${messages.length === 0 && !sending ? ' dashboard-scroll--empty' : ''}`}
+        >
           {messages.length === 0 ? (
             <div className="dashboard-empty">
               <div className="dashboard-empty-icon" aria-hidden>

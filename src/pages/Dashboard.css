@@ -25,8 +25,8 @@
   gap: var(--space-4);
 }
 
-/* Center empty state in the chat pane without stretching content to the full viewport */
-.dashboard-scroll:has(> .dashboard-empty) {
+/* Center empty state (class set from Dashboard.jsx; avoids :has() for older engines) */
+.dashboard-scroll--empty {
   justify-content: center;
 }
 
@@ -270,5 +270,53 @@
     min-width: 120px;
     min-height: 44px;
     height: 44px;
+  }
+}
+
+/* Narrow phones: tighter chrome, full-width composer, readable bubbles */
+@media (max-width: 600px) {
+  .dashboard-scroll {
+    padding: var(--space-3) var(--space-3) var(--space-2);
+    gap: var(--space-3);
+  }
+
+  .dashboard-composer {
+    padding: var(--space-2) var(--space-3)
+      max(var(--space-2), env(safe-area-inset-bottom, 0px));
+    gap: var(--space-2);
+  }
+
+  .dashboard-recs {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .dashboard-input-row {
+    gap: var(--space-2);
+  }
+
+  .dashboard-msg-bubble {
+    max-width: min(94%, 100%);
+  }
+
+  .dashboard-empty {
+    padding: var(--space-4) 0;
+    gap: var(--space-4);
+  }
+
+  .dashboard-empty-title {
+    font-size: var(--font-16);
+  }
+}
+
+@media (max-width: 400px) {
+  .dashboard-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dashboard-send {
+    flex: 0 0 auto;
+    width: 100%;
+    min-width: 0;
   }
 }

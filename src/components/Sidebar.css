@@ -4,8 +4,13 @@
   position: fixed;
   left: 0;
   top: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
   height: 100vh;
+  height: 100dvh;
   width: 280px;
+  max-height: 100vh;
+  max-height: 100dvh;
   background: linear-gradient(
     180deg,
     var(--sidebar-gradient-from) 0%,

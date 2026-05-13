@@ -1,0 +1,16 @@
+/**
+ * Responsive layout reference (keep media queries aligned with JS where noted).
+ *
+ * - 900px: `COMPACT_MEDIA_QUERY` in src/layout/breakpoints.js — AppShell compact,
+ *   sidebar off-canvas, Dashboard column + tool drawer stack.
+ * - 768px / 640px / 480px: feature pages (tools, settings, analytics, etc.).
+ * - 600px: Dashboard narrow density (Dashboard.css).
+ * - 520px: Theme FAB label hidden (AppShell.css).
+ * - 400px: Dashboard stacked composer send (Dashboard.css).
+ * - 380px: Tighter menu / theme controls (AppShell.css).
+ */
+@media (min-width: 0) {
+  :root {
+    --layout-breakpoints-doc: 1;
+  }
+}

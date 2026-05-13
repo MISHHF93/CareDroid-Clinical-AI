@@ -122,3 +122,30 @@
 .app-shell-theme-fab:hover {
   border-color: var(--accent-green);
 }
+
+/* Authed page column: fills shell; keeps flex min-size math correct on all widths */
+.app-shell-page-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  max-width: 100%;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+@media (max-width: 380px) {
+  .app-shell-menu-btn {
+    width: 38px;
+    height: 38px;
+    left: calc(var(--space-2) + env(safe-area-inset-left, 0px));
+  }
+
+  .app-shell-theme-fab {
+    top: calc(var(--space-2) + env(safe-area-inset-top, 0px));
+    right: calc(var(--space-2) + env(safe-area-inset-right, 0px));
+    padding: var(--space-2);
+    gap: var(--space-1);
+  }
+}
