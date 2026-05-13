@@ -30,12 +30,17 @@ const Auth = ({ onAuthSuccess }) => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const h = window.location.hostname;
-    setAllowLocalQuickDev(h === 'localhost' || h === '127.0.0.1' || h === '[::1]');
+    const p = window.location.port;
+    const localHost =
+      h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h.endsWith('.local');
+    const vitePreview = p === '4173';
+    setAllowLocalQuickDev(localHost || vitePreview);
   }, []);
 
-  const showQuickDev =
-    Boolean(bypassToken) &&
-    (import.meta.env.DEV || appConfig.features.showDemoAuth || allowLocalQuickDev);
+  const devBypassAllowedHost =
+    import.meta.env.DEV || appConfig.features.showDemoAuth || allowLocalQuickDev;
+  const showQuickDev = Boolean(bypassToken) && devBypassAllowedHost;
+  const showDevBypassHiddenHint = Boolean(bypassToken) && !devBypassAllowedHost;
   const googleAuthUrl = buildApiUrl('/api/auth/google');
   const linkedinAuthUrl = buildApiUrl('/api/auth/linkedin');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -274,7 +279,8 @@ const Auth = ({ onAuthSuccess }) => {
               </Button>
               <p className="auth-dev-oneclick__hint">
                 No password — opens the app immediately using{' '}
-                <code className="auth-dev-code">VITE_DEV_BEARER_TOKEN</code>. Only on dev server, localhost, or when{' '}
+                <code className="auth-dev-code">VITE_DEV_BEARER_TOKEN</code>. Only on dev server, localhost,{' '}
+                <code className="auth-dev-code">vite preview</code> (port 4173), or when{' '}
                 <code className="auth-dev-code">VITE_SHOW_DEMO_AUTH=true</code>. Your API must accept that token or
                 requests will return 401.
               </p>
@@ -284,7 +290,27 @@ const Auth = ({ onAuthSuccess }) => {
             </section>
           )}
 
-          <div className="auth-segment" role="tablist" aria-label="Account mode">
+          {showDevBypassHiddenHint && (
+            <section className="auth-dev-hidden-hint" role="status">
+              <p className="auth-dev-hidden-hint__title">Developer one-click sign-in is configured but hidden here</p>
+              <p className="auth-dev-hidden-hint__body">
+                This host is not treated as a dev environment. Add{' '}
+                <code className="auth-dev-code">VITE_SHOW_DEMO_AUTH=true</code> to this deployment&apos;s build
+                environment (e.g. Vercel), or open the app on <code className="auth-dev-code">localhost</code> /{' '}
+                <code className="auth-dev-code">npm run dev</code>. Sign-in and create-account use the tabs below.
+              </p>
+            </section>
+          )}
+
+          <p className="auth-segment-caption" id="auth-mode-caption">
+            Choose <strong>Sign in</strong> or <strong>Create account</strong> (same page as <code className="auth-dev-code">/auth</code>).
+          </p>
+          <div
+            className="auth-segment"
+            role="tablist"
+            aria-label="Sign in or create account"
+            aria-describedby="auth-mode-caption"
+          >
             <button
               type="button"
               role="tab"

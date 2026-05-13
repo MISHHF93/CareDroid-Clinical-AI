@@ -58,6 +58,40 @@
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
+.auth-segment-caption {
+  margin: 0 0 8px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--muted-text, #94a3b8);
+}
+
+.auth-segment-caption strong {
+  color: var(--text-color, #e2e8f0);
+}
+
+/* When VITE_DEV_BEARER_TOKEN is set but host is not dev (e.g. Vercel prod) */
+.auth-dev-hidden-hint {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(251, 191, 36, 0.45);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.auth-dev-hidden-hint__title {
+  margin: 0 0 6px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #fcd34d;
+}
+
+.auth-dev-hidden-hint__body {
+  margin: 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: var(--muted-text, #cbd5e1);
+}
+
 /* OAuth primary row (Google / LinkedIn) */
 .auth-oauth-stack {
   display: flex;

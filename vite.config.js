@@ -8,6 +8,23 @@ export default defineConfig({
   },
   server: {
     port: 8000,
+    strictPort: false,
+    host: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      '/socket.io': {
+        target: 'http://localhost:3000',
+        ws: true,
+      },
+    },
+  },
+  /** Same proxy as dev so `vite preview` can reach the API on relative /api (direct LAN access). */
+  preview: {
+    port: 4173,
+    strictPort: false,
     host: true,
     proxy: {
       '/api': {

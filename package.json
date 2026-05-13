@@ -7,9 +7,12 @@
   "scripts": {
     "dev": "vite --port 8000",
     "dev:lan": "vite --port 8000 --host",
+    "clean": "node scripts/clean.mjs",
     "build": "vite build",
     "build:frontend": "vite build",
+    "rebuild": "npm run clean && npm run build",
     "preview": "vite preview",
+    "preview:lan": "vite preview --host",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",

@@ -214,6 +214,12 @@ function LegacyOAuthCallbackRedirect() {
   return <Navigate to={{ pathname: '/auth-callback', search: location.search }} replace />;
 }
 
+/** This SPA only implements sign-in at `/auth`; common paths redirect here. */
+function AuthPathRedirect() {
+  const location = useLocation();
+  return <Navigate to={{ pathname: '/auth', search: location.search, hash: location.hash }} replace />;
+}
+
 // ==================== ROUTING ====================
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useUser();
@@ -257,6 +263,12 @@ function AppRoutes() {
     { path: '/auth', element: <AuthShell><AuthPage /></AuthShell>, publicOnly: true },
     { path: '/auth-callback', element: <AuthShell><AuthCallback /></AuthShell>, publicOnly: true },
     { path: '/auth/callback', element: <AuthShell><LegacyOAuthCallbackRedirect /></AuthShell>, publicOnly: true },
+    { path: '/login', element: <AuthPathRedirect />, publicOnly: true },
+    { path: '/signin', element: <AuthPathRedirect />, publicOnly: true },
+    { path: '/sign-in', element: <AuthPathRedirect />, publicOnly: true },
+    { path: '/signup', element: <AuthPathRedirect />, publicOnly: true },
+    { path: '/sign-up', element: <AuthPathRedirect />, publicOnly: true },
+    { path: '/register', element: <AuthPathRedirect />, publicOnly: true },
 
     { path: '/dashboard', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
 
