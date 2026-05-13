@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import Button from '../components/ui/button';
 import Input from '../components/ui/input';
 import appConfig from '../config/appConfig';
-import { apiFetch } from '../services/apiClient';
+import { apiFetch, buildApiUrl } from '../services/apiClient';
+import {
+  GoogleLogo,
+  LinkedInLogo,
+  InstitutionOidcIcon,
+  InstitutionSamlIcon,
+} from '../components/auth/AuthProviderIcons';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import logger from '../utils/logger';
 import { NavIcon } from '../navigation/NavIcon';
@@ -17,9 +23,27 @@ const Auth = ({ onAuthSuccess }) => {
   const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
   const [userId, setUserId] = useState(null);
   const [twoFactorToken, setTwoFactorToken] = useState('');
-  const bypassToken = appConfig.dev.bearerToken;
+  const bypassToken = (appConfig.dev.bearerToken || '').trim();
   const { success, error, info } = useNotificationActions();
-  const showDevBypass = !import.meta.env.PROD && Boolean(bypassToken);
+  const showQuickDev =
+    Boolean(bypassToken) && (import.meta.env.DEV || appConfig.features.showDemoAuth);
+  const googleAuthUrl = buildApiUrl('/api/auth/google');
+  const linkedinAuthUrl = buildApiUrl('/api/auth/linkedin');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const oauthBannerShown = useRef(false);
+
+  useEffect(() => {
+    if (oauthBannerShown.current) return;
+    if (searchParams.get('error') !== 'oauth') return;
+    oauthBannerShown.current = true;
+    error(
+      'Sign-in failed',
+      'OAuth did not return a token. Confirm provider credentials and FRONTEND_URL on the API server.',
+    );
+    const next = new URLSearchParams(searchParams);
+    next.delete('error');
+    setSearchParams(next, { replace: true });
+  }, [searchParams, setSearchParams, error]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -129,9 +153,40 @@ const Auth = ({ onAuthSuccess }) => {
     }
   };
 
-  const handleDevBypass = () => {
+  const applyDevSession = (mockUser, label) => {
     try {
-      const mockUser = {
+      localStorage.setItem('caredroid_user_profile', JSON.stringify(mockUser));
+      localStorage.setItem('caredroid_access_token', bypassToken);
+      logger.info('Dev bypass: stored token and profile', { label });
+
+      if (onAuthSuccess) {
+        onAuthSuccess(bypassToken, mockUser);
+      }
+      info('Signing in', `${label} — local session started.`);
+    } catch (err) {
+      logger.error('Dev bypass failed', { err });
+    }
+  };
+
+  const handleDemoSession = () => {
+    applyDevSession(
+      {
+        id: 'demo-user',
+        email: 'demo@caredroid.local',
+        name: 'Demo Clinician',
+        role: 'physician',
+        fullName: 'Demo Clinician',
+        isEmailVerified: true,
+        twoFactorEnabled: false,
+        createdAt: new Date().toISOString(),
+      },
+      'Free demo session',
+    );
+  };
+
+  const handleDeveloperSession = () => {
+    applyDevSession(
+      {
         id: 'dev-user',
         email: 'dev@caredroid.local',
         name: 'Development User',
@@ -140,19 +195,9 @@ const Auth = ({ onAuthSuccess }) => {
         isEmailVerified: true,
         twoFactorEnabled: false,
         createdAt: new Date().toISOString(),
-      };
-
-      localStorage.setItem('caredroid_user_profile', JSON.stringify(mockUser));
-      localStorage.setItem('caredroid_access_token', bypassToken);
-      logger.info('Dev bypass: stored token and profile');
-
-      if (onAuthSuccess) {
-        onAuthSuccess(bypassToken, mockUser);
-      }
-      info('Signing in', 'Development session started.');
-    } catch (err) {
-      logger.error('Dev bypass failed', { err });
-    }
+      },
+      'Developer (admin)',
+    );
   };
 
   return (
@@ -228,6 +273,47 @@ const Auth = ({ onAuthSuccess }) => {
             </button>
           </div>
 
+          <div className="auth-oauth-stack" aria-label="Social sign-in">
+            <a className="auth-oauth-btn" href={googleAuthUrl}>
+              <span className="auth-oauth-btn__brand" aria-hidden>
+                <GoogleLogo size={22} />
+              </span>
+              <span className="auth-oauth-btn__label">
+                {mode === 'signup' ? 'Sign up with Google' : 'Continue with Google'}
+              </span>
+            </a>
+            <a className="auth-oauth-btn" href={linkedinAuthUrl}>
+              <span className="auth-oauth-btn__brand" aria-hidden>
+                <LinkedInLogo size={22} />
+              </span>
+              <span className="auth-oauth-btn__label">
+                {mode === 'signup' ? 'Sign up with LinkedIn' : 'Continue with LinkedIn'}
+              </span>
+            </a>
+          </div>
+
+          <p className="auth-or-divider" role="presentation">
+            <span>or use email</span>
+          </p>
+
+          {showQuickDev && (
+            <section className="auth-quick-dev" aria-label="Quick access for development">
+              <p className="auth-quick-dev__title">Quick access while building</p>
+              <p className="auth-quick-dev__hint">
+                Uses <code className="auth-quick-dev__code">VITE_DEV_BEARER_TOKEN</code> — backend must accept this
+                token in dev, or APIs will return 401.
+              </p>
+              <div className="auth-quick-dev__row">
+                <button type="button" className="auth-quick-dev__btn" onClick={handleDemoSession}>
+                  Free demo (clinician)
+                </button>
+                <button type="button" className="auth-quick-dev__btn" onClick={handleDeveloperSession}>
+                  Developer (admin)
+                </button>
+              </div>
+            </section>
+          )}
+
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
             {mode === 'signup' && (
               <Input
@@ -283,8 +369,8 @@ const Auth = ({ onAuthSuccess }) => {
                 className="auth-link-btn"
                 onClick={() => pingSso('/api/auth/oidc', 'OIDC SSO')}
               >
-                <span className="auth-link-btn__icon" aria-hidden>
-                  <NavIcon icon={CHROME_ICONS.shield} size={18} />
+                <span className="auth-link-btn__icon auth-link-btn__icon--brand" aria-hidden>
+                  <InstitutionOidcIcon size={20} />
                 </span>
                 Sign in with OIDC (organization)
               </button>
@@ -293,37 +379,11 @@ const Auth = ({ onAuthSuccess }) => {
                 className="auth-link-btn"
                 onClick={() => pingSso('/api/auth/saml', 'SAML SSO')}
               >
-                <span className="auth-link-btn__icon" aria-hidden>
-                  <NavIcon icon={CHROME_ICONS.lock} size={18} />
+                <span className="auth-link-btn__icon auth-link-btn__icon--brand" aria-hidden>
+                  <InstitutionSamlIcon size={20} />
                 </span>
                 Sign in with SAML (organization)
               </button>
-
-              <p className="auth-divider">Social</p>
-              <a className="auth-link-btn" href="/api/auth/google">
-                <span className="auth-link-btn__icon" aria-hidden>
-                  <NavIcon icon={CHROME_ICONS.user} size={18} />
-                </span>
-                Continue with Google
-              </a>
-              <a className="auth-link-btn" href="/api/auth/linkedin">
-                <span className="auth-link-btn__icon" aria-hidden>
-                  <NavIcon icon={CHROME_ICONS.users} size={18} />
-                </span>
-                Continue with LinkedIn
-              </a>
-
-              {showDevBypass && (
-                <>
-                  <p className="auth-divider">Development</p>
-                  <button type="button" className="auth-link-btn auth-dev" onClick={handleDevBypass}>
-                    <span className="auth-link-btn__icon" aria-hidden>
-                      <NavIcon icon={CHROME_ICONS.zap} size={18} />
-                    </span>
-                    Skip auth (local dev only)
-                  </button>
-                </>
-              )}
             </div>
           </details>
 

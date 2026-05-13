@@ -50,6 +50,8 @@ const appConfig = {
     enablePushNotifications: toBoolean(getEnvValue('VITE_ENABLE_PUSH_NOTIFICATIONS', 'false')),
     enableOfflineMode: toBoolean(getEnvValue('VITE_ENABLE_OFFLINE_MODE', 'false')),
     enableBiometricAuth: toBoolean(getEnvValue('VITE_ENABLE_BIOMETRIC_AUTH', 'false')),
+    /** When true, show demo / developer quick-sign-in on /auth even in production builds (staging only). */
+    showDemoAuth: toBoolean(getEnvValue('VITE_SHOW_DEMO_AUTH', 'false')),
   },
   legal: {
     privacyPolicyUrl: getEnvValue('VITE_PRIVACY_POLICY_URL', ''),

@@ -54,7 +54,8 @@ import { AuthorizationGuard } from './guards/authorization.guard';
     {
       provide: GoogleStrategy,
       useFactory: (configService: ConfigService, authService: AuthService) => {
-        const clientId = configService.get<string>('GOOGLE_CLIENT_ID');
+        const oauth = configService.get<{ google?: { clientId?: string } }>('oauth');
+        const clientId = oauth?.google?.clientId;
         if (!clientId) return null;
         return new GoogleStrategy(configService, authService);
       },
@@ -63,7 +64,8 @@ import { AuthorizationGuard } from './guards/authorization.guard';
     {
       provide: LinkedInStrategy,
       useFactory: (configService: ConfigService, authService: AuthService) => {
-        const clientId = configService.get<string>('LINKEDIN_CLIENT_ID');
+        const oauth = configService.get<{ linkedin?: { clientId?: string } }>('oauth');
+        const clientId = oauth?.linkedin?.clientId;
         if (!clientId) return null;
         return new LinkedInStrategy(configService, authService);
       },

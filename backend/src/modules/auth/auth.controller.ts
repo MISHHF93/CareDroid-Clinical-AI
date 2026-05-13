@@ -10,10 +10,10 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Response, Request } from 'express';
+import { ConfigService } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -21,7 +21,26 @@ import { LoginDto } from './dto/login.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
+
+  private getFrontendBaseUrl(): string {
+    const raw =
+      this.configService.get<string>('FRONTEND_URL') ||
+      process.env.FRONTEND_URL ||
+      'http://localhost:5173';
+    return raw.replace(/\/$/, '');
+  }
+
+  private redirectOAuthSuccess(res: Response, accessToken: string | undefined) {
+    if (!accessToken) {
+      return res.redirect(`${this.getFrontendBaseUrl()}/auth?error=oauth`);
+    }
+    const target = `${this.getFrontendBaseUrl()}/auth-callback?token=${encodeURIComponent(accessToken)}`;
+    return res.redirect(target);
+  }
 
   @Post('register')
   @ApiOperation({ summary: 'Register new user with email and password' })
@@ -76,7 +95,7 @@ export class AuthController {
   async googleCallback(@Req() req: any, @Res() res: Response) {
     const accessToken = req.user?.accessToken;
     if (accessToken) {
-      return res.redirect(`/auth/callback?token=${encodeURIComponent(accessToken)}`);
+      return this.redirectOAuthSuccess(res, accessToken);
     }
     return res.json({
       accessToken: req.user?.accessToken,
@@ -99,7 +118,7 @@ export class AuthController {
   async linkedinCallback(@Req() req: any, @Res() res: Response) {
     const accessToken = req.user?.accessToken;
     if (accessToken) {
-      return res.redirect(`/auth/callback?token=${encodeURIComponent(accessToken)}`);
+      return this.redirectOAuthSuccess(res, accessToken);
     }
     return res.json({
       accessToken: req.user?.accessToken,

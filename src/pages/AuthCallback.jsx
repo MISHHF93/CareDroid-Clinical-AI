@@ -1,29 +1,59 @@
-import React, { useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Card from '../components/ui/card';
 import Button from '../components/ui/button';
 import { useNotificationActions } from '../hooks/useNotificationActions';
+import { useUser } from '../contexts/UserContext';
 
-const AuthCallback = ({ onAuthSuccess }) => {
+/**
+ * OAuth completes with ?token=... on this route (backend redirects to FRONTEND_URL/auth-callback).
+ * Manual paste remains for troubleshooting.
+ */
+const AuthCallback = () => {
   const [params] = useSearchParams();
+  const navigate = useNavigate();
+  const { setAuthToken } = useUser();
+  const { info } = useNotificationActions();
   const initialToken = params.get('token') || '';
   const [token, setToken] = useState(initialToken);
-  const { info } = useNotificationActions();
+  const autoHandled = useRef(false);
+
+  useEffect(() => {
+    const fromUrl = params.get('token');
+    if (!fromUrl || autoHandled.current) return;
+    autoHandled.current = true;
+    setAuthToken(fromUrl);
+    navigate('/dashboard', { replace: true });
+  }, [params, setAuthToken, navigate]);
 
   const handleSave = () => {
-    if (!token) {
+    const trimmed = token.trim();
+    if (!trimmed) {
       info('Token required', 'Paste an access token to continue.');
       return;
     }
-    onAuthSuccess?.(token);
+    setAuthToken(trimmed);
+    navigate('/dashboard', { replace: true });
   };
+
+  if (initialToken) {
+    return (
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
+        <Card style={{ width: '100%', maxWidth: '480px' }}>
+          <h2 style={{ marginTop: 0 }}>Completing sign-in…</h2>
+          <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>You will be redirected to the dashboard.</p>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
       <Card style={{ width: '100%', maxWidth: '720px' }}>
-        <h2 style={{ marginTop: 0 }}>Complete Sign-In</h2>
+        <h2 style={{ marginTop: 0 }}>Complete sign-in</h2>
         <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
-          Paste the access token returned from your OAuth provider to finish signing in.
+          If your browser did not receive a token automatically, paste the access token from your provider or API
+          response.
         </p>
         <textarea
           value={token}
@@ -37,7 +67,7 @@ const AuthCallback = ({ onAuthSuccess }) => {
             border: '1px solid var(--panel-border)',
             background: 'var(--panel-bg)',
             color: 'var(--text-color)',
-            marginTop: '12px'
+            marginTop: '12px',
           }}
         />
         <Button onClick={handleSave} style={{ marginTop: '14px' }}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider, useUser, Permission } from './contexts/UserContext';
 import { NotificationProvider, useNotifications } from './contexts/NotificationContext';
@@ -208,6 +208,12 @@ function AppShellPage({ children }) {
   );
 }
 
+/** Old backend path: redirect to canonical /auth-callback preserving ?token= */
+function LegacyOAuthCallbackRedirect() {
+  const location = useLocation();
+  return <Navigate to={{ pathname: '/auth-callback', search: location.search }} replace />;
+}
+
 // ==================== ROUTING ====================
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useUser();
@@ -250,6 +256,7 @@ function AppRoutes() {
     { path: '/', element: <PublicShell><WelcomePage /></PublicShell>, publicOnly: true },
     { path: '/auth', element: <AuthShell><AuthPage /></AuthShell>, publicOnly: true },
     { path: '/auth-callback', element: <AuthShell><AuthCallback /></AuthShell>, publicOnly: true },
+    { path: '/auth/callback', element: <AuthShell><LegacyOAuthCallbackRedirect /></AuthShell>, publicOnly: true },
 
     { path: '/dashboard', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
 
