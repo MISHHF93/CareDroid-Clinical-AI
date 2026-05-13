@@ -1,4 +1,4 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider, useUser, Permission } from './contexts/UserContext';
@@ -21,6 +21,7 @@ import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
 import { getToolById } from './data/toolRegistry';
 import { AUTH_PATH_ALIASES } from './routing/authPathAliases';
+import { lazyWithRetry } from './utils/lazyWithRetry';
 
 // Page imports - Public
 import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
@@ -36,24 +37,30 @@ import ProfileSettings from './pages/ProfileSettings';
 import Settings from './pages/Settings';
 
 // Lazy-loaded pages for better performance (loaded on demand)
-const NotificationPreferences = lazy(() => import('./pages/NotificationPreferences'));
-const TwoFactorSetup = lazy(() => import('./pages/TwoFactorSetup'));
-const BiometricSetup = lazy(() => import('./pages/BiometricSetup'));
-const Onboarding = lazy(() => import('./pages/Onboarding'));
-const AuditLogs = lazy(() => import('./pages/AuditLogs'));
-const AnalyticsDashboard = lazy(() => import('./pages/AnalyticsDashboard'));
-const CostAnalyticsDashboard = lazy(() => import('./pages/CostAnalyticsDashboard'));
-const ConsentFlow = lazy(() => import('./pages/legal/ConsentFlow').then(m => ({ default: m.ConsentFlow })));
-const ConsentHistory = lazy(() => import('./pages/legal/ConsentHistory').then(m => ({ default: m.ConsentHistory })));
-const TeamManagement = lazy(() => import('./pages/team/TeamManagement').then(m => ({ default: m.TeamManagement })));
-const AuthCallback = lazy(() => import('./pages/AuthCallback'));
+const NotificationPreferences = lazyWithRetry(() => import('./pages/NotificationPreferences'));
+const TwoFactorSetup = lazyWithRetry(() => import('./pages/TwoFactorSetup'));
+const BiometricSetup = lazyWithRetry(() => import('./pages/BiometricSetup'));
+const Onboarding = lazyWithRetry(() => import('./pages/Onboarding'));
+const AuditLogs = lazyWithRetry(() => import('./pages/AuditLogs'));
+const AnalyticsDashboard = lazyWithRetry(() => import('./pages/AnalyticsDashboard'));
+const CostAnalyticsDashboard = lazyWithRetry(() => import('./pages/CostAnalyticsDashboard'));
+const ConsentFlow = lazyWithRetry(() =>
+  import('./pages/legal/ConsentFlow').then((m) => ({ default: m.ConsentFlow }))
+);
+const ConsentHistory = lazyWithRetry(() =>
+  import('./pages/legal/ConsentHistory').then((m) => ({ default: m.ConsentHistory }))
+);
+const TeamManagement = lazyWithRetry(() =>
+  import('./pages/team/TeamManagement').then((m) => ({ default: m.TeamManagement }))
+);
+const AuthCallback = lazyWithRetry(() => import('./pages/AuthCallback'));
 
 // Tool pages - lazy loaded inside Dashboard drawer only
-const ToolsOverview = lazy(() => import('./pages/tools/ToolsOverview'));
-const SharedToolSession = lazy(() => import('./pages/tools/SharedToolSession'));
+const ToolsOverview = lazyWithRetry(() => import('./pages/tools/ToolsOverview'));
+const SharedToolSession = lazyWithRetry(() => import('./pages/tools/SharedToolSession'));
 
 // Clinical Intelligence pages
-const ClinicalAlertsPage = lazy(() => import('./pages/ClinicalAlertsPage'));
+const ClinicalAlertsPage = lazyWithRetry(() => import('./pages/ClinicalAlertsPage'));
 
 // Loading fallback component
 const PageLoader = () => (

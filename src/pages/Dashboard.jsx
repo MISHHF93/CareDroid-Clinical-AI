@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useConversation } from '../contexts/ConversationContext';
@@ -19,13 +19,14 @@ import {
 import { NavIcon } from '../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../navigation/iconRegistry';
 import './Dashboard.css';
+import { lazyWithRetry } from '../utils/lazyWithRetry';
 
-const DrugChecker = lazy(() => import('./tools/DrugChecker'));
-const LabInterpreter = lazy(() => import('./tools/LabInterpreter'));
-const Calculators = lazy(() => import('./tools/Calculators'));
-const Protocols = lazy(() => import('./tools/Protocols'));
-const DiagnosisAssistant = lazy(() => import('./tools/DiagnosisAssistant'));
-const ProcedureGuide = lazy(() => import('./tools/ProcedureGuide'));
+const DrugChecker = lazyWithRetry(() => import('./tools/DrugChecker'));
+const LabInterpreter = lazyWithRetry(() => import('./tools/LabInterpreter'));
+const Calculators = lazyWithRetry(() => import('./tools/Calculators'));
+const Protocols = lazyWithRetry(() => import('./tools/Protocols'));
+const DiagnosisAssistant = lazyWithRetry(() => import('./tools/DiagnosisAssistant'));
+const ProcedureGuide = lazyWithRetry(() => import('./tools/ProcedureGuide'));
 
 const drawerFallback = <div className="dashboard-drawer-fallback">Loading tool…</div>;
 
