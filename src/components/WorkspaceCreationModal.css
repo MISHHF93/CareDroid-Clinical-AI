@@ -2,10 +2,7 @@
 
 .workspace-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   background: rgba(0, 0, 0, 0.75);
   display: flex;
   align-items: center;
@@ -20,7 +17,7 @@
   border-radius: 16px;
   width: 90%;
   max-width: 600px;
-  max-height: 90vh;
+  max-height: min(90vh, calc(var(--app-viewport-height, 100dvh) - var(--space-8)));
   display: flex;
   flex-direction: column;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -75,6 +72,8 @@
 .workspace-modal-content {
   flex: 1;
   overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -400,7 +399,7 @@
 @media (max-width: 768px) {
   .workspace-modal {
     width: 95%;
-    max-height: 95vh;
+    max-height: min(95vh, calc(var(--app-viewport-height, 100dvh) - var(--space-4)));
   }
 
   .workspace-templates {

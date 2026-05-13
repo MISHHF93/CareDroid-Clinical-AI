@@ -156,6 +156,31 @@ window.addEventListener('unhandledrejection', (event) => {
   }
 });
 
+
+// ================================
+// Viewport sizing for mobile keyboards and embedded WebViews
+// ================================
+const syncViewportMetrics = () => {
+  if (typeof window === 'undefined' || !document?.documentElement) return;
+  const viewport = window.visualViewport;
+  const height = viewport?.height || window.innerHeight;
+  const keyboardInset = Math.max(0, window.innerHeight - height - (viewport?.offsetTop || 0));
+  document.documentElement.style.setProperty('--app-viewport-height', `${height}px`);
+  document.documentElement.style.setProperty('--app-keyboard-inset-bottom', `${keyboardInset}px`);
+};
+
+let viewportRaf = 0;
+const requestViewportSync = () => {
+  window.cancelAnimationFrame(viewportRaf);
+  viewportRaf = window.requestAnimationFrame(syncViewportMetrics);
+};
+
+syncViewportMetrics();
+window.addEventListener('resize', requestViewportSync);
+window.addEventListener('orientationchange', requestViewportSync);
+window.visualViewport?.addEventListener('resize', requestViewportSync);
+window.visualViewport?.addEventListener('scroll', requestViewportSync);
+
 // ================================
 // Mount React App
 // ================================

@@ -3,10 +3,8 @@
   position: relative;
   width: 100%;
   max-width: 100%;
-  min-height: 100dvh;
-  min-height: 100vh;
-  height: 100dvh;
-  height: 100vh;
+  min-height: var(--app-viewport-height, 100dvh);
+  height: var(--app-viewport-height, 100dvh);
   background: var(--navy-bg);
   color: var(--text-color);
   overflow: hidden;
@@ -37,6 +35,7 @@
   min-width: 0;
   min-height: 0;
   height: 100%;
+  max-height: 100%;
   overflow: hidden;
   margin-left: var(--app-main-inset, 280px);
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -132,7 +131,11 @@
   max-width: 100%;
   min-height: 0;
   height: 100%;
-  overflow: hidden;
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
 }
 
 @media (max-width: 380px) {
