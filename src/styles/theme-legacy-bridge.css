@@ -33,5 +33,5 @@ html {
   --space-lg: var(--space-4);
   --space-xl: var(--space-5);
   --space-2xs: var(--space-1);
-  --nav-glyph-muted: var(--app-fg-muted);
+  --nav-glyph-muted: var(--sidebar-fg-muted);
 }

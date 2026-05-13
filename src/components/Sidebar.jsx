@@ -360,7 +360,7 @@ const Sidebar = ({
                   alignItems: 'center',
                   transform: showToolsSection ? 'rotate(0deg)' : 'rotate(-90deg)',
                   transition: 'transform 0.2s',
-                  color: 'var(--nav-glyph-muted, rgba(255,255,255,0.5))',
+                  color: 'var(--sidebar-fg-muted)',
                 }}
                 aria-hidden
               >

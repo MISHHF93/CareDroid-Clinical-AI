@@ -2,6 +2,7 @@
   flex: 1;
   display: flex;
   min-width: 0;
+  min-height: 0;
   height: 100%;
   position: relative;
 }
@@ -15,22 +16,29 @@
 }
 
 .dashboard-scroll {
-  flex: 1;
+  flex: 1 1 0;
+  min-height: 0;
   overflow-y: auto;
-  padding: var(--space-6);
+  padding: var(--space-5) var(--space-6) var(--space-3);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
 }
 
+/* Center empty state in the chat pane without stretching content to the full viewport */
+.dashboard-scroll:has(> .dashboard-empty) {
+  justify-content: center;
+}
+
 .dashboard-empty {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   gap: var(--space-6);
   color: var(--muted-text);
+  padding: var(--space-6) 0;
 }
 
 .dashboard-empty-icon {
@@ -125,8 +133,11 @@
 }
 
 .dashboard-composer {
-  padding: var(--space-4) var(--space-6);
+  flex-shrink: 0;
+  padding: var(--space-3) var(--space-6)
+    max(var(--space-3), env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--panel-border);
+  background: var(--surface-0);
   display: flex;
   gap: var(--space-3);
   position: relative;
@@ -158,29 +169,44 @@
 
 .dashboard-input-row {
   display: flex;
+  align-items: center;
   gap: var(--space-3);
   width: 100%;
 }
 
 .dashboard-input {
   flex: 1;
-  padding: var(--space-3) var(--space-4);
+  min-width: 0;
+  min-height: 44px;
+  height: 44px;
+  padding: 0 var(--space-4);
+  box-sizing: border-box;
   background: var(--surface-1);
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-sm);
   color: var(--text-color);
   font-size: var(--font-14);
+  line-height: 1.25;
   outline: none;
 }
 
 .dashboard-send {
-  padding: var(--space-3) var(--space-6);
+  flex-shrink: 0;
+  min-height: 44px;
+  height: 44px;
+  padding: 0 var(--space-5);
+  box-sizing: border-box;
   background: var(--accent-gradient);
   color: var(--navy-ink);
   border: none;
   border-radius: var(--radius-sm);
   font-weight: 600;
+  font-size: var(--font-14);
+  line-height: 1;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .dashboard-send:disabled {
@@ -215,7 +241,7 @@
   }
 
   .dashboard-scroll {
-    padding: var(--space-4);
+    padding: var(--space-4) var(--space-4) var(--space-3);
     min-height: 0;
   }
 
@@ -236,10 +262,13 @@
 
   .dashboard-input-row {
     flex-wrap: wrap;
+    align-items: center;
   }
 
   .dashboard-send {
     flex: 1 1 auto;
     min-width: 120px;
+    min-height: 44px;
+    height: 44px;
   }
 }

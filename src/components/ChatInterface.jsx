@@ -262,9 +262,10 @@ const ChatInterface = ({
 
       {/* Input Area */}
       <div style={{
-        padding: '20px 24px 28px',
+        padding: '14px 24px max(14px, env(safe-area-inset-bottom, 0px))',
         borderTop: '1px solid var(--panel-border)',
-        background: 'var(--surface-2)'
+        background: 'var(--surface-0)',
+        flexShrink: 0,
       }}>
         <div style={{
           maxWidth: '900px',
@@ -289,7 +290,7 @@ const ChatInterface = ({
           margin: '0 auto',
           display: 'flex',
           gap: '10px',
-          alignItems: 'flex-end'
+          alignItems: 'center',
         }}>
           <textarea
             value={input}
@@ -302,15 +303,17 @@ const ChatInterface = ({
               background: 'var(--surface-1)',
               border: '1px solid var(--panel-border)',
               borderRadius: '16px',
-              padding: '16px',
+              padding: '12px 16px',
               color: 'var(--text-color)',
               fontSize: '15px',
               resize: 'none',
-              minHeight: '28px',
+              minHeight: '44px',
               maxHeight: '200px',
               fontFamily: 'inherit',
               outline: 'none',
-              boxShadow: 'var(--shadow-1)'
+              boxShadow: 'var(--shadow-1)',
+              lineHeight: 1.35,
+              boxSizing: 'border-box',
             }}
             rows={1}
           />
@@ -319,9 +322,14 @@ const ChatInterface = ({
             disabled={!input.trim() || isLoading}
             className="btn-primary"
             style={{
-              padding: '14px 26px',
+              flexShrink: 0,
+              minHeight: '44px',
+              padding: '0 22px',
               opacity: input.trim() && !isLoading ? 1 : 0.6,
-              cursor: input.trim() && !isLoading ? 'pointer' : 'not-allowed'
+              cursor: input.trim() && !isLoading ? 'pointer' : 'not-allowed',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}
           >
             {isLoading ? '...' : 'Send'}
@@ -329,10 +337,10 @@ const ChatInterface = ({
         </div>
         <div style={{
           maxWidth: '900px',
-          margin: '10px auto 0',
+          margin: '8px auto 0',
           fontSize: '12px',
           color: 'var(--muted-text)',
-          textAlign: 'center'
+          textAlign: 'center',
         }}>
           CareDroid can make mistakes. Verify medical information.
         </div>

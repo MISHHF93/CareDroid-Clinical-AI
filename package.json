@@ -5,6 +5,7 @@
   "description": "CareDroid-Clinical-AI - Medical AI clinical co-pilot with emergency escalation and RBAC",
   "type": "module",
   "scripts": {
+    "start": "npm run dev",
     "dev": "vite --port 8000",
     "dev:lan": "vite --port 8000 --host",
     "clean": "node scripts/clean.mjs",

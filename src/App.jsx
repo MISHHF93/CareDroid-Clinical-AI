@@ -202,12 +202,15 @@ function AppShellPage({ children }) {
       onToolSelect={handleToolSelect}
     >
       <div
+        className="app-shell-page-body"
         style={{
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
           minWidth: 0,
           minHeight: 0,
+          height: '100%',
+          overflow: 'hidden',
         }}
       >
         {children}
