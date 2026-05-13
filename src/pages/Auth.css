@@ -1,4 +1,4 @@
-/* Form lives inside AuthShell single card; no second panel chrome. */
+/* Single-column auth: one shell card, no nested marketing panel. */
 .auth-root {
   box-sizing: border-box;
   width: 100%;
@@ -63,7 +63,12 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+}
+
+.auth-oauth-stack .auth-divider {
+  margin-top: 4px;
+  margin-bottom: 2px;
 }
 
 .auth-oauth-btn {
@@ -79,9 +84,16 @@
   color: var(--text-color, #f1f5f9);
   font-size: 0.875rem;
   font-weight: 600;
+  font-family: inherit;
   text-decoration: none;
+  text-align: left;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+button.auth-oauth-btn {
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .auth-oauth-btn:hover {
@@ -121,30 +133,30 @@
   background: var(--panel-border, rgba(255, 255, 255, 0.1));
 }
 
-/* Demo / developer shortcuts */
-.auth-quick-dev {
-  margin-bottom: 18px;
-  padding: 12px 14px;
+/* One-click developer sign-in (dev / localhost / VITE_SHOW_DEMO_AUTH) */
+.auth-dev-oneclick {
+  margin-bottom: 20px;
+  padding: 14px;
   border-radius: 12px;
-  border: 1px dashed rgba(0, 255, 136, 0.35);
-  background: rgba(0, 255, 136, 0.06);
+  border: 1px solid rgba(0, 255, 136, 0.45);
+  background: rgba(0, 255, 136, 0.09);
 }
 
-.auth-quick-dev__title {
-  margin: 0 0 6px;
-  font-size: 0.8125rem;
+.auth-dev-oneclick .btn {
+  width: 100%;
+  min-height: 48px;
+  font-size: 0.95rem;
   font-weight: 700;
-  color: var(--text-color, #f1f5f9);
 }
 
-.auth-quick-dev__hint {
-  margin: 0 0 12px;
-  font-size: 0.7rem;
+.auth-dev-oneclick__hint {
+  margin: 10px 0 0;
+  font-size: 0.72rem;
   line-height: 1.45;
   color: var(--muted-text, #94a3b8);
 }
 
-.auth-quick-dev__code {
+.auth-dev-code {
   font-family: ui-monospace, monospace;
   font-size: 0.68rem;
   padding: 0.1em 0.35em;
@@ -153,30 +165,11 @@
   color: var(--accent-secondary, #22d3ee);
 }
 
-.auth-quick-dev__row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.auth-quick-dev__btn {
-  flex: 1;
-  min-width: min(100%, 140px);
-  min-height: 42px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(0, 255, 136, 0.35);
-  background: rgba(0, 0, 0, 0.2);
-  color: var(--text-color, #f1f5f9);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.auth-quick-dev__btn:hover {
-  background: rgba(0, 255, 136, 0.12);
-  border-color: rgba(0, 255, 136, 0.55);
+.auth-dev-oneclick__alt {
+  display: block;
+  width: 100%;
+  margin-top: 10px;
+  text-align: center;
 }
 
 .auth-form {
@@ -189,53 +182,13 @@
   margin-top: 4px;
 }
 
-.auth-extras {
-  margin-top: 20px;
-  border-radius: 12px;
-  border: 1px dashed var(--panel-border, rgba(255, 255, 255, 0.12));
-  background: rgba(0, 0, 0, 0.12);
-}
-
-.auth-extras > summary::-webkit-details-marker {
-  display: none;
-}
-
-.auth-extras > summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  list-style: none;
-  cursor: pointer;
-  padding: 12px 14px;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: var(--muted-text, #94a3b8);
-  user-select: none;
-}
-
-.auth-extras > summary::after {
-  content: '';
-  width: 0.45em;
-  height: 0.45em;
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  transform: rotate(45deg);
-  opacity: 0.6;
-  flex-shrink: 0;
-  margin-top: -0.15em;
-}
-
-.auth-extras[open] > summary::after {
-  transform: rotate(-135deg);
-  margin-top: 0.2em;
-}
-
-.auth-extras__body {
-  padding: 0 14px max(14px, env(safe-area-inset-bottom, 0px));
+.auth-magic {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--panel-border, rgba(255, 255, 255, 0.08));
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .auth-row-inline {

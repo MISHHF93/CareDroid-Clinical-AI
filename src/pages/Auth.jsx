@@ -25,8 +25,17 @@ const Auth = ({ onAuthSuccess }) => {
   const [twoFactorToken, setTwoFactorToken] = useState('');
   const bypassToken = (appConfig.dev.bearerToken || '').trim();
   const { success, error, info } = useNotificationActions();
+  const [allowLocalQuickDev, setAllowLocalQuickDev] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const h = window.location.hostname;
+    setAllowLocalQuickDev(h === 'localhost' || h === '127.0.0.1' || h === '[::1]');
+  }, []);
+
   const showQuickDev =
-    Boolean(bypassToken) && (import.meta.env.DEV || appConfig.features.showDemoAuth);
+    Boolean(bypassToken) &&
+    (import.meta.env.DEV || appConfig.features.showDemoAuth || allowLocalQuickDev);
   const googleAuthUrl = buildApiUrl('/api/auth/google');
   const linkedinAuthUrl = buildApiUrl('/api/auth/linkedin');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -252,6 +261,29 @@ const Auth = ({ onAuthSuccess }) => {
             </p>
           </header>
 
+          {showQuickDev && (
+            <section className="auth-dev-oneclick" aria-label="Developer bypass sign-in">
+              <Button
+                type="button"
+                variant="success"
+                size="lg"
+                onClick={handleDeveloperSession}
+                leftIcon={<NavIcon icon={CHROME_ICONS.zap} size={20} aria-hidden />}
+              >
+                One-click developer sign-in
+              </Button>
+              <p className="auth-dev-oneclick__hint">
+                No password — opens the app immediately using{' '}
+                <code className="auth-dev-code">VITE_DEV_BEARER_TOKEN</code>. Only on dev server, localhost, or when{' '}
+                <code className="auth-dev-code">VITE_SHOW_DEMO_AUTH=true</code>. Your API must accept that token or
+                requests will return 401.
+              </p>
+              <button type="button" className="auth-text-btn auth-dev-oneclick__alt" onClick={handleDemoSession}>
+                Use demo clinician profile instead
+              </button>
+            </section>
+          )}
+
           <div className="auth-segment" role="tablist" aria-label="Account mode">
             <button
               type="button"
@@ -273,7 +305,7 @@ const Auth = ({ onAuthSuccess }) => {
             </button>
           </div>
 
-          <div className="auth-oauth-stack" aria-label="Social sign-in">
+          <div className="auth-oauth-stack" aria-label="Sign-in options">
             <a className="auth-oauth-btn" href={googleAuthUrl}>
               <span className="auth-oauth-btn__brand" aria-hidden>
                 <GoogleLogo size={22} />
@@ -290,29 +322,33 @@ const Auth = ({ onAuthSuccess }) => {
                 {mode === 'signup' ? 'Sign up with LinkedIn' : 'Continue with LinkedIn'}
               </span>
             </a>
+
+            <p className="auth-divider">Institution</p>
+            <button
+              type="button"
+              className="auth-oauth-btn"
+              onClick={() => pingSso('/api/auth/oidc', 'OIDC SSO')}
+            >
+              <span className="auth-oauth-btn__brand" aria-hidden>
+                <InstitutionOidcIcon size={22} />
+              </span>
+              <span className="auth-oauth-btn__label">Sign in with OIDC (organization)</span>
+            </button>
+            <button
+              type="button"
+              className="auth-oauth-btn"
+              onClick={() => pingSso('/api/auth/saml', 'SAML SSO')}
+            >
+              <span className="auth-oauth-btn__brand" aria-hidden>
+                <InstitutionSamlIcon size={22} />
+              </span>
+              <span className="auth-oauth-btn__label">Sign in with SAML (organization)</span>
+            </button>
           </div>
 
           <p className="auth-or-divider" role="presentation">
             <span>or use email</span>
           </p>
-
-          {showQuickDev && (
-            <section className="auth-quick-dev" aria-label="Quick access for development">
-              <p className="auth-quick-dev__title">Quick access while building</p>
-              <p className="auth-quick-dev__hint">
-                Uses <code className="auth-quick-dev__code">VITE_DEV_BEARER_TOKEN</code> — backend must accept this
-                token in dev, or APIs will return 401.
-              </p>
-              <div className="auth-quick-dev__row">
-                <button type="button" className="auth-quick-dev__btn" onClick={handleDemoSession}>
-                  Free demo (clinician)
-                </button>
-                <button type="button" className="auth-quick-dev__btn" onClick={handleDeveloperSession}>
-                  Developer (admin)
-                </button>
-              </div>
-            </section>
-          )}
 
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
             {mode === 'signup' && (
@@ -348,44 +384,19 @@ const Auth = ({ onAuthSuccess }) => {
             </Button>
           </form>
 
-          <details className="auth-extras">
-            <summary>More sign-in options</summary>
-            <div className="auth-extras__body">
-              <p className="auth-divider">Magic link</p>
-              <form className="auth-row-inline" onSubmit={handleMagicLink}>
-                <Input
-                  type="email"
-                  placeholder="Work email"
-                  value={magicEmail}
-                  onChange={(e) => setMagicEmail(e.target.value)}
-                  autoComplete="email"
-                />
-                <Button type="submit">Send link</Button>
-              </form>
-
-              <p className="auth-divider">Institution</p>
-              <button
-                type="button"
-                className="auth-link-btn"
-                onClick={() => pingSso('/api/auth/oidc', 'OIDC SSO')}
-              >
-                <span className="auth-link-btn__icon auth-link-btn__icon--brand" aria-hidden>
-                  <InstitutionOidcIcon size={20} />
-                </span>
-                Sign in with OIDC (organization)
-              </button>
-              <button
-                type="button"
-                className="auth-link-btn"
-                onClick={() => pingSso('/api/auth/saml', 'SAML SSO')}
-              >
-                <span className="auth-link-btn__icon auth-link-btn__icon--brand" aria-hidden>
-                  <InstitutionSamlIcon size={20} />
-                </span>
-                Sign in with SAML (organization)
-              </button>
-            </div>
-          </details>
+          <section className="auth-magic" aria-label="Magic link sign-in">
+            <p className="auth-divider">Magic link</p>
+            <form className="auth-row-inline" onSubmit={handleMagicLink}>
+              <Input
+                type="email"
+                placeholder="Work email"
+                value={magicEmail}
+                onChange={(e) => setMagicEmail(e.target.value)}
+                autoComplete="email"
+              />
+              <Button type="submit">Send link</Button>
+            </form>
+          </section>
 
           <footer className="auth-panel__footer">
             <Link className="auth-back-link" to="/">
