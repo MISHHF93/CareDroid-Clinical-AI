@@ -1,4 +1,4 @@
-import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useConversation } from '../contexts/ConversationContext';
@@ -86,6 +86,9 @@ function Dashboard() {
   const [recommendedTools, setRecommendedTools] = useState([]);
   const [selectedCitation, setSelectedCitation] = useState(null);
   const [sending, setSending] = useState(false);
+  const scrollRef = useRef(null);
+  const scrollEndRef = useRef(null);
+  const shouldStickToBottomRef = useRef(true);
 
   const {
     activeConversationId,
@@ -96,6 +99,19 @@ function Dashboard() {
     setActiveTool,
     clearTool,
   } = useConversation();
+
+  const updateScrollStickiness = useCallback(() => {
+    const scroller = scrollRef.current;
+    if (!scroller) return;
+    const distanceFromBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
+    shouldStickToBottomRef.current = distanceFromBottom < 96;
+  }, []);
+
+  useEffect(() => {
+    if (shouldStickToBottomRef.current) {
+      scrollEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [messages, sending]);
 
   const panelRegistryId = searchParams.get('tool');
   const calcFromUrl = searchParams.get('calc');
@@ -208,7 +224,9 @@ function Dashboard() {
     <div className="dashboard-root">
       <div className="dashboard-main">
         <div
-          className={`dashboard-scroll${messages.length === 0 && !sending ? ' dashboard-scroll--empty' : ''}`}
+          ref={scrollRef}
+          className={`dashboard-scroll app-scroll-container${messages.length === 0 && !sending ? ' dashboard-scroll--empty' : ''}`}
+          onScroll={updateScrollStickiness}
         >
           {messages.length === 0 ? (
             <div className="dashboard-empty">
@@ -279,6 +297,7 @@ function Dashboard() {
               <div className="dashboard-msg-thinking">Thinking…</div>
             </div>
           )}
+          <div ref={scrollEndRef} aria-hidden />
         </div>
 
         <div className="dashboard-composer">

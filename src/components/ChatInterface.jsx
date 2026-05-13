@@ -6,6 +6,7 @@ import Citations, { CitationModal } from './Citations';
 import ConfidenceBadge from './ConfidenceBadge';
 import { sendClinicalChatMessage, mapChatResponseToAssistantMessage } from '../services/clinicalChatService';
 import { useNotificationActions } from '../hooks/useNotificationActions';
+import './ChatInterface.css';
 
 const ChatInterface = ({
   currentTool,
@@ -16,20 +17,29 @@ const ChatInterface = ({
   onAppendMessage,
   onTrackEvent,
   authToken,
-  onToolSelect,
-  onFeatureSelect
 }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCitation, setSelectedCitation] = useState(null);
+  const messagesRef = useRef(null);
   const messagesEndRef = useRef(null);
-  const { error } = useNotificationActions();
+  const shouldStickToBottomRef = useRef(true);
+  const { error: notifyError } = useNotificationActions();
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  const updateStickToBottom = () => {
+    const scroller = messagesRef.current;
+    if (!scroller) return;
+    const distanceFromBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
+    shouldStickToBottomRef.current = distanceFromBottom < 96;
   };
 
-  useEffect(scrollToBottom, [messages]);
+  const scrollToBottom = (behavior = 'smooth') => {
+    messagesEndRef.current?.scrollIntoView({ behavior, block: 'end' });
+  };
+
+  useEffect(() => {
+    if (shouldStickToBottomRef.current) scrollToBottom('smooth');
+  }, [messages, isLoading]);
 
   useEffect(() => {
     if (prefillText && !input.trim()) {
@@ -71,13 +81,13 @@ const ChatInterface = ({
 
       const assistantMessage = mapChatResponseToAssistantMessage(data);
       onAppendMessage?.(conversationId, assistantMessage);
-    } catch (error) {
+    } catch {
       onAppendMessage?.(conversationId, {
         role: 'assistant',
         content: 'I\'m having trouble connecting to the server. Please try again in a moment.',
         timestamp: new Date()
       });
-      error('Connection failed', 'Unable to reach the server. Please try again.');
+      notifyError('Connection failed', 'Unable to reach the server. Please try again.');
       onTrackEvent?.('message_error', {
         conversationId,
         tool: currentTool,
@@ -96,79 +106,40 @@ const ChatInterface = ({
   };
 
   return (
-    <div style={{
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative'
-    }}>
-      {/* Messages Area */}
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '20px'
-      }}>
+    <div className="chat-interface">
+      <div
+        ref={messagesRef}
+        className="chat-interface__messages app-scroll-container"
+        onScroll={updateStickToBottom}
+      >
         {messages.length === 0 && (
-          <div style={{
-            padding: '30px',
-            borderRadius: '12px',
-            border: '1px dashed var(--panel-border)',
-            color: 'var(--muted-text)',
-            textAlign: 'center'
-          }}>
+          <div className="chat-interface__empty">
             Start a conversation to see messages here.
           </div>
         )}
         {messages.map((message, index) => (
           <div
             key={index}
-            style={{
-              display: 'flex',
-              gap: '15px',
-              alignItems: 'flex-start',
-              maxWidth: '860px',
-              margin: message.role === 'user' ? '0 0 0 auto' : '0 auto 0 0',
-              width: '100%'
-            }}
+            className={`chat-interface__message-row chat-interface__message-row--${message.role}`}
           >
             {message.role === 'assistant' && (
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #00FF88, #00FFFF)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '20px',
-                flexShrink: 0
-              }}>
+              <div className="chat-interface__avatar chat-interface__avatar--assistant" aria-hidden>
                 🤖
               </div>
             )}
-            <div style={{
-              flex: 1,
-              background: message.role === 'user'
-                ? 'rgba(0, 255, 136, 0.1)'
-                : 'var(--surface-2)',
-              padding: '16px 20px',
-              borderRadius: '16px',
-              border: message.role === 'user'
-                ? '1px solid rgba(0, 255, 136, 0.3)'
-                : '1px solid var(--panel-border)',
-              lineHeight: '1.6',
-              boxShadow: 'var(--shadow-1)'
-            }}>
+            <div
+              className={`chat-interface__bubble ${
+                message.role === 'user'
+                  ? 'chat-interface__bubble--user'
+                  : 'chat-interface__bubble--assistant'
+              }`}
+            >
               <div>{message.content}</div>
               {message.confidence !== undefined && message.role === 'assistant' && (
                 <div style={{ marginTop: '12px' }}>
                   <ConfidenceBadge confidence={message.confidence} />
                 </div>
               )}
-              {/* Tool Result Card */}
               {message.toolResult && (
                 <div style={{ marginTop: '12px' }}>
                   <ToolCard toolResult={message.toolResult} />
@@ -181,18 +152,13 @@ const ChatInterface = ({
                   ))}
                 </div>
               )}
-              {/* Citations */}
               {message.citations && message.citations.length > 0 && message.role === 'assistant' && (
-                <Citations 
+                <Citations
                   citations={message.citations}
                   onViewDetails={(citation) => setSelectedCitation(citation)}
                 />
               )}
-              <div style={{
-                fontSize: '12px',
-                color: 'var(--muted-text)',
-                marginTop: '8px'
-              }}>
+              <div className="chat-interface__meta">
                 {message.timestamp
                   ? new Date(message.timestamp).toLocaleTimeString()
                   : 'Unknown time'}
@@ -204,48 +170,18 @@ const ChatInterface = ({
               </div>
             </div>
             {message.role === 'user' && (
-              <div style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '50%',
-                background: 'rgba(255, 255, 255, 0.1)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '20px',
-                flexShrink: 0
-              }}>
+              <div className="chat-interface__avatar chat-interface__avatar--user" aria-hidden>
                 👤
               </div>
             )}
           </div>
         ))}
         {isLoading && (
-          <div style={{
-            display: 'flex',
-            gap: '15px',
-            alignItems: 'flex-start',
-            maxWidth: '900px',
-            margin: '0 auto 0 0'
-          }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #00FF88, #00FFFF)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '20px'
-            }}>
+          <div className="chat-interface__message-row chat-interface__message-row--assistant">
+            <div className="chat-interface__avatar chat-interface__avatar--assistant" aria-hidden>
               🤖
             </div>
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.05)',
-              padding: '15px 20px',
-              borderRadius: '12px',
-              border: '1px solid rgba(255, 255, 255, 0.1)'
-            }}>
+            <div className="chat-interface__loading-bubble">
               <div style={{ display: 'flex', gap: '8px' }}>
                 <div className="dot-pulse">●</div>
                 <div className="dot-pulse" style={{ animationDelay: '0.2s' }}>●</div>
@@ -257,23 +193,10 @@ const ChatInterface = ({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Tool Panel */}
       {(currentTool || currentFeature) && <ToolPanel tool={currentTool} feature={currentFeature} />}
 
-      {/* Input Area */}
-      <div style={{
-        padding: '14px 24px max(14px, env(safe-area-inset-bottom, 0px))',
-        borderTop: '1px solid var(--panel-border)',
-        background: 'var(--surface-0)',
-        flexShrink: 0,
-      }}>
-        <div style={{
-          maxWidth: '900px',
-          margin: '0 auto 12px',
-          display: 'flex',
-          gap: '10px',
-          flexWrap: 'wrap'
-        }}>
+      <div className="chat-interface__input-area">
+        <div className="chat-interface__quick-actions">
           {['Summarize a protocol', 'Check drug interaction', 'Interpret labs'].map((hint) => (
             <button
               key={hint}
@@ -285,70 +208,35 @@ const ChatInterface = ({
             </button>
           ))}
         </div>
-        <div style={{
-          maxWidth: '900px',
-          margin: '0 auto',
-          display: 'flex',
-          gap: '10px',
-          alignItems: 'center',
-        }}>
+        <div className="chat-interface__composer">
           <textarea
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask CareDroid anything clinical..."
             disabled={isLoading}
-            style={{
-              flex: 1,
-              background: 'var(--surface-1)',
-              border: '1px solid var(--panel-border)',
-              borderRadius: '16px',
-              padding: '12px 16px',
-              color: 'var(--text-color)',
-              fontSize: '15px',
-              resize: 'none',
-              minHeight: '44px',
-              maxHeight: '200px',
-              fontFamily: 'inherit',
-              outline: 'none',
-              boxShadow: 'var(--shadow-1)',
-              lineHeight: 1.35,
-              boxSizing: 'border-box',
-            }}
+            className="chat-interface__textarea"
             rows={1}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="btn-primary"
+            className="btn-primary chat-interface__send"
             style={{
-              flexShrink: 0,
-              minHeight: '44px',
-              padding: '0 22px',
               opacity: input.trim() && !isLoading ? 1 : 0.6,
               cursor: input.trim() && !isLoading ? 'pointer' : 'not-allowed',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
             }}
           >
             {isLoading ? '...' : 'Send'}
           </button>
         </div>
-        <div style={{
-          maxWidth: '900px',
-          margin: '8px auto 0',
-          fontSize: '12px',
-          color: 'var(--muted-text)',
-          textAlign: 'center',
-        }}>
+        <div className="chat-interface__disclaimer">
           CareDroid can make mistakes. Verify medical information.
         </div>
       </div>
 
-      {/* Citation Modal */}
       {selectedCitation && (
-        <CitationModal 
+        <CitationModal
           citation={selectedCitation}
           onClose={() => setSelectedCitation(null)}
         />
