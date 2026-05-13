@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useUser } from '../contexts/UserContext';
-import { apiFetch } from '../services/apiClient';
+import { apiFetchJson } from '../services/apiClient';
 import analyticsService from '../services/analyticsService';
 import offlineService from '../services/offlineService';
 import toolRegistry, { toolRegistryById } from '../data/toolRegistry';
@@ -30,13 +30,11 @@ const AnalyticsDashboard = () => {
       try {
         const token = localStorage.getItem('caredroid_access_token');
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const response = await apiFetch('/api/analytics/metrics', { headers });
+        const { response, data } = await apiFetchJson('/api/analytics/metrics', { headers });
 
         if (!response.ok) {
-          throw new Error(`Analytics request failed: ${response.status}`);
+          throw new Error(data?.message || `Analytics request failed: ${response.status}`);
         }
-
-        const data = await response.json();
 
         if (isMounted) {
           setMetrics(data);

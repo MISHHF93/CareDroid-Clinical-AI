@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import './TeamManagement.css';
-import { apiFetch } from '../../services/apiClient';
+import { apiFetch, apiFetchJson, getStoredAccessToken } from '../../services/apiClient';
 
 /**
  * TeamManagement Page Component
@@ -27,17 +27,15 @@ export const TeamManagement = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const response = await apiFetch('/api/team/users', {
+      const { response, data } = await apiFetchJson('/api/team/users', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${getStoredAccessToken() || ''}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch users');
+        throw new Error(data?.message || 'Failed to fetch users');
       }
-
-      const data = await response.json();
       setUsers(data);
       setError(null);
     } catch (err) {
@@ -83,7 +81,7 @@ export const TeamManagement = () => {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${getStoredAccessToken() || ''}`,
         },
         body: JSON.stringify(updatedUser),
       });
@@ -111,7 +109,7 @@ export const TeamManagement = () => {
       const response = await apiFetch(`/api/team/users/${userId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${getStoredAccessToken() || ''}`,
         },
       });
 
@@ -133,7 +131,7 @@ export const TeamManagement = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${getStoredAccessToken() || ''}`,
         },
         body: JSON.stringify({ email: inviteEmail }),
       });

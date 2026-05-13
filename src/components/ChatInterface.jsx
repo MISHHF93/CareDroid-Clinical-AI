@@ -51,6 +51,22 @@ const ChatInterface = ({
   }, [messages, isLoading, scrollToBottom]);
 
   useEffect(() => {
+    const handleViewportChange = () => {
+      if (!shouldStickToBottomRef.current) return;
+      window.requestAnimationFrame(() => scrollToBottom('auto'));
+    };
+
+    window.visualViewport?.addEventListener('resize', handleViewportChange);
+    window.visualViewport?.addEventListener('scroll', handleViewportChange);
+    window.addEventListener('orientationchange', handleViewportChange);
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleViewportChange);
+      window.visualViewport?.removeEventListener('scroll', handleViewportChange);
+      window.removeEventListener('orientationchange', handleViewportChange);
+    };
+  }, [scrollToBottom]);
+
+  useEffect(() => {
     if (prefillText && !input.trim()) {
       setInput(prefillText);
     }

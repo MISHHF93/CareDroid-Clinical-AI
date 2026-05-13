@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { apiFetch } from '../services/apiClient';
+import { apiFetchJson } from '../services/apiClient';
 import logger from '../utils/logger';
 
 /**
@@ -166,7 +166,7 @@ export const UserProvider = ({ children }) => {
 
     const fetchUserProfile = async () => {
       try {
-        const response = await apiFetch('/api/users/profile', {
+        const { response, data: profile } = await apiFetchJson('/api/users/profile', {
           headers: {
             'Authorization': `Bearer ${authToken}`,
             'Content-Type': 'application/json',
@@ -174,7 +174,6 @@ export const UserProvider = ({ children }) => {
         });
 
         if (response.ok) {
-          const profile = await response.json();
           setUserState(profile);
           localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
         } else {
