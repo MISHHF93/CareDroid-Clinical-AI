@@ -36,6 +36,66 @@ export const apiFetch = (path, options = {}) => {
   return fetch(buildApiUrl(path), { ...options, headers: mergedHeaders });
 };
 
+
+export class ApiResponseError extends Error {
+  constructor(message, { status = 0, statusText = '', url = '', contentType = '', bodyPreview = '', cause } = {}) {
+    super(message, cause ? { cause } : undefined);
+    this.name = 'ApiResponseError';
+    this.status = status;
+    this.statusText = statusText;
+    this.url = url;
+    this.contentType = contentType;
+    this.bodyPreview = bodyPreview;
+  }
+}
+
+const getBodyPreview = (body = '') => body.replace(/\s+/g, ' ').trim().slice(0, 220);
+
+const isProbablyHtml = (body = '', contentType = '') => {
+  const normalizedType = contentType.toLowerCase();
+  const trimmed = body.trim().toLowerCase();
+  return normalizedType.includes('text/html') || trimmed.startsWith('<!doctype') || trimmed.startsWith('<html');
+};
+
+export const parseApiResponse = async (response, { fallback = {} } = {}) => {
+  const contentType = response.headers?.get?.('content-type') || '';
+  const body = await response.text();
+
+  if (!body) return fallback;
+
+  if (isProbablyHtml(body, contentType)) {
+    throw new ApiResponseError(
+      'The API returned an HTML page instead of JSON. Check the API URL, proxy, backend availability, or authentication redirect.',
+      {
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url,
+        contentType,
+        bodyPreview: getBodyPreview(body),
+      },
+    );
+  }
+
+  try {
+    return JSON.parse(body);
+  } catch (error) {
+    throw new ApiResponseError('The API returned malformed JSON.', {
+      status: response.status,
+      statusText: response.statusText,
+      url: response.url,
+      contentType,
+      bodyPreview: getBodyPreview(body),
+      cause: error,
+    });
+  }
+};
+
+export const apiFetchJson = async (path, options = {}) => {
+  const response = await apiFetch(path, options);
+  const data = await parseApiResponse(response);
+  return { response, data };
+};
+
 export const buildStreamUrl = (path = '') => {
   const wsBase = appConfig.api.wsUrl
     ? appConfig.api.wsUrl.replace(/^ws/i, 'http')
@@ -52,6 +112,8 @@ export const apiAxios = axios.create({
 
 export default {
   apiFetch,
+  apiFetchJson,
+  parseApiResponse,
   apiAxios,
   buildApiUrl,
   buildStreamUrl,

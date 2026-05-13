@@ -11,17 +11,11 @@ class OfflineService {
   }
 
   /**
-   * Lazy-load the database
+   * Return the initialized offline database instance.
    */
   async getDb() {
     if (!this.db) {
-      try {
-        const module = await import('../db/offline.db');
-        this.db = module.db;
-      } catch (error) {
-        logger.error('Failed to load offline database', { error });
-        throw error;
-      }
+      this.db = db;
     }
     return this.db;
   }

@@ -469,3 +469,62 @@ a, button, input, select, textarea {
   color: var(--muted-text);
 }
 
+
+/* Responsive viewport and scroll stabilization */
+:root {
+  --app-min-touch-target: 44px;
+  --app-content-max-width: 1760px;
+  --app-fluid-page-gutter: clamp(12px, 2.2vw, 40px);
+  font-size: clamp(15px, 0.22vw + 14px, 17px);
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100svh;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button,
+[role='button'],
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+
+.app-scroll-container {
+  min-height: 0;
+  min-width: 0;
+  overflow-anchor: none;
+  contain: layout paint;
+}
+
+@supports (height: 100dvh) {
+  #root {
+    min-height: 100dvh;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

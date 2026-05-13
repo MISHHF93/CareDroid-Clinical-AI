@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
-import { apiFetch } from '../../services/apiClient';
+import { apiFetch, parseApiResponse } from '../../services/apiClient';
 
 const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
@@ -47,7 +47,7 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
         }),
       });
 
-      const data = await response.json();
+      const data = await parseApiResponse(response, { fallback: {} });
       setResults(data.response);
     } catch (err) {
       setResults('Error loading protocol. Please try again.');

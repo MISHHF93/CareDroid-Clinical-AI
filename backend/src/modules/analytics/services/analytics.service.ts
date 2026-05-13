@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Between, MoreThan } from 'typeorm';
 import { AnalyticsEvent } from '../entities/analytics-event.entity';
 
-interface EventMetrics {
+export interface EventMetrics {
   totalEvents: number;
   uniqueUsers: number;
   topEvents: Array<{ event: string; count: number }>;

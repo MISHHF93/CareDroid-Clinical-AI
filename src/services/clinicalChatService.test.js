@@ -8,6 +8,7 @@ import {
 vi.mock('./apiClient', () => ({
   apiFetch: vi.fn(),
   buildApiUrl: vi.fn((p) => p || ''),
+  parseApiResponse: vi.fn(async (response) => response.json()),
 }));
 
 import { apiFetch } from './apiClient';
