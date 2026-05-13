@@ -23,24 +23,10 @@ const Auth = ({ onAuthSuccess }) => {
   const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
   const [userId, setUserId] = useState(null);
   const [twoFactorToken, setTwoFactorToken] = useState('');
-  const bypassToken = (appConfig.dev.bearerToken || '').trim();
+  /** Token stored for Division mode bypass (defaults in appConfig when env unset). */
+  const divisionToken = (appConfig.dev.bearerToken || '').trim() || 'dev-bypass-token';
+  const showDivisionMode = !appConfig.features.hideDivisionMode;
   const { success, error, info } = useNotificationActions();
-  const [allowLocalQuickDev, setAllowLocalQuickDev] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const h = window.location.hostname;
-    const p = window.location.port;
-    const localHost =
-      h === 'localhost' || h === '127.0.0.1' || h === '[::1]' || h.endsWith('.local');
-    const vitePreview = p === '4173';
-    setAllowLocalQuickDev(localHost || vitePreview);
-  }, []);
-
-  const devBypassAllowedHost =
-    import.meta.env.DEV || appConfig.features.showDemoAuth || allowLocalQuickDev;
-  const showQuickDev = Boolean(bypassToken) && devBypassAllowedHost;
-  const showDevBypassHiddenHint = Boolean(bypassToken) && !devBypassAllowedHost;
   const googleAuthUrl = buildApiUrl('/api/auth/google');
   const linkedinAuthUrl = buildApiUrl('/api/auth/linkedin');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -170,13 +156,13 @@ const Auth = ({ onAuthSuccess }) => {
   const applyDevSession = (mockUser, label) => {
     try {
       localStorage.setItem('caredroid_user_profile', JSON.stringify(mockUser));
-      localStorage.setItem('caredroid_access_token', bypassToken);
-      logger.info('Dev bypass: stored token and profile', { label });
+      localStorage.setItem('caredroid_access_token', divisionToken);
+      logger.info('Division mode bypass: stored token and profile', { label });
 
       if (onAuthSuccess) {
-        onAuthSuccess(bypassToken, mockUser);
+        onAuthSuccess(divisionToken, mockUser);
       }
-      info('Signing in', `${label} — local session started.`);
+      info('Signing in', `${label} — entering app without verification.`);
     } catch (err) {
       logger.error('Dev bypass failed', { err });
     }
@@ -210,7 +196,38 @@ const Auth = ({ onAuthSuccess }) => {
         twoFactorEnabled: false,
         createdAt: new Date().toISOString(),
       },
-      'Developer (admin)',
+      'Division mode (admin)',
+    );
+  };
+
+  const divisionModeSection = (opts = {}) => {
+    const { compact } = opts;
+    if (!showDivisionMode) return null;
+    return (
+      <section
+        className={`auth-dev-oneclick${compact ? ' auth-dev-oneclick--compact' : ''}`}
+        aria-label="Division mode — bypass verification"
+      >
+        <p className="auth-division-tag">Division mode</p>
+        <Button
+          type="button"
+          variant="success"
+          size="lg"
+          onClick={handleDeveloperSession}
+          leftIcon={<NavIcon icon={CHROME_ICONS.zap} size={20} aria-hidden />}
+        >
+          Enter app — no verification
+        </Button>
+        <p className="auth-dev-oneclick__hint">
+          Skips password, OAuth, and 2FA for UI work. Uses token from{' '}
+          <code className="auth-dev-code">VITE_DEV_BEARER_TOKEN</code> (default <code className="auth-dev-code">dev-bypass-token</code>).
+          Your API must accept that JWT or calls return 401. Hide on real PHI deploys:{' '}
+          <code className="auth-dev-code">VITE_HIDE_DIVISION_MODE=true</code>.
+        </p>
+        <button type="button" className="auth-text-btn auth-dev-oneclick__alt" onClick={handleDemoSession}>
+          Demo clinician profile instead
+        </button>
+      </section>
     );
   };
 
@@ -218,6 +235,8 @@ const Auth = ({ onAuthSuccess }) => {
     <div className="auth-root">
       {requiresTwoFactor ? (
         <section className="auth-twofa" aria-labelledby="auth-twofa-title">
+          {divisionModeSection({ compact: true })}
+
           <div className="auth-twofa__icon" aria-hidden>
             <NavIcon icon={CHROME_ICONS.lock} size={40} />
           </div>
@@ -257,6 +276,8 @@ const Auth = ({ onAuthSuccess }) => {
         </section>
       ) : (
         <>
+          {divisionModeSection()}
+
           <header className="auth-panel__header">
             <h1 className="auth-panel__title">{mode === 'login' ? 'Sign in' : 'Create account'}</h1>
             <p className="auth-panel__subtitle">
@@ -265,42 +286,6 @@ const Auth = ({ onAuthSuccess }) => {
                 : 'Set up access for your clinical workspace.'}
             </p>
           </header>
-
-          {showQuickDev && (
-            <section className="auth-dev-oneclick" aria-label="Developer bypass sign-in">
-              <Button
-                type="button"
-                variant="success"
-                size="lg"
-                onClick={handleDeveloperSession}
-                leftIcon={<NavIcon icon={CHROME_ICONS.zap} size={20} aria-hidden />}
-              >
-                One-click developer sign-in
-              </Button>
-              <p className="auth-dev-oneclick__hint">
-                No password — opens the app immediately using{' '}
-                <code className="auth-dev-code">VITE_DEV_BEARER_TOKEN</code>. Only on dev server, localhost,{' '}
-                <code className="auth-dev-code">vite preview</code> (port 4173), or when{' '}
-                <code className="auth-dev-code">VITE_SHOW_DEMO_AUTH=true</code>. Your API must accept that token or
-                requests will return 401.
-              </p>
-              <button type="button" className="auth-text-btn auth-dev-oneclick__alt" onClick={handleDemoSession}>
-                Use demo clinician profile instead
-              </button>
-            </section>
-          )}
-
-          {showDevBypassHiddenHint && (
-            <section className="auth-dev-hidden-hint" role="status">
-              <p className="auth-dev-hidden-hint__title">Developer one-click sign-in is configured but hidden here</p>
-              <p className="auth-dev-hidden-hint__body">
-                This host is not treated as a dev environment. Add{' '}
-                <code className="auth-dev-code">VITE_SHOW_DEMO_AUTH=true</code> to this deployment&apos;s build
-                environment (e.g. Vercel), or open the app on <code className="auth-dev-code">localhost</code> /{' '}
-                <code className="auth-dev-code">npm run dev</code>. Sign-in and create-account use the tabs below.
-              </p>
-            </section>
-          )}
 
           <p className="auth-segment-caption" id="auth-mode-caption">
             Choose <strong>Sign in</strong> or <strong>Create account</strong> (same page as <code className="auth-dev-code">/auth</code>).

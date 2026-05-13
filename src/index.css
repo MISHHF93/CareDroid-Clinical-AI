@@ -449,6 +449,25 @@ a, button, input, select, textarea {
   box-shadow: var(--shadow-2);
 }
 
+.welcome-page-division {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  margin: var(--space-4) auto 0;
+  padding: 12px 20px;
+  font-size: var(--font-14);
+  font-weight: 600;
+  color: var(--accent-1, #00ff88);
+  background: rgba(0, 255, 136, 0.08);
+  border: 1px dashed rgba(0, 255, 136, 0.45);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+}
+
+.welcome-page-division:hover {
+  background: rgba(0, 255, 136, 0.14);
+}
+
 .welcome-page-footnote {
   margin-top: var(--space-6);
   font-size: var(--font-14);

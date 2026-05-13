@@ -52,6 +52,8 @@ const appConfig = {
     enableBiometricAuth: toBoolean(getEnvValue('VITE_ENABLE_BIOMETRIC_AUTH', 'false')),
     /** When true, show demo / developer quick-sign-in on /auth even in production builds (staging only). */
     showDemoAuth: toBoolean(getEnvValue('VITE_SHOW_DEMO_AUTH', 'false')),
+    /** When true, hide Division mode (instant bypass) on /auth — use for real production PHI. Default: false. */
+    hideDivisionMode: toBoolean(getEnvValue('VITE_HIDE_DIVISION_MODE', 'false')),
   },
   legal: {
     privacyPolicyUrl: getEnvValue('VITE_PRIVACY_POLICY_URL', ''),

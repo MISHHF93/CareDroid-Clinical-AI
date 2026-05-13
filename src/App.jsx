@@ -20,6 +20,8 @@ import logger from './utils/logger';
 import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
 import { getToolById } from './data/toolRegistry';
+import { AUTH_PATH_ALIASES } from './routing/authPathAliases';
+import appConfig from './config/appConfig';
 
 // Page imports - Public
 import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
@@ -132,6 +134,12 @@ function WelcomePage() {
         <button type="button" className="welcome-page-cta" onClick={() => navigate('/auth')}>
           Sign In or Create Account
         </button>
+
+        {!appConfig.features.hideDivisionMode && (
+          <button type="button" className="welcome-page-division" onClick={() => navigate('/auth')}>
+            Division mode — enter without verification
+          </button>
+        )}
 
         <p className="welcome-page-footnote">Healthcare professionals only. Secure login required.</p>
       </div>
@@ -263,12 +271,11 @@ function AppRoutes() {
     { path: '/auth', element: <AuthShell><AuthPage /></AuthShell>, publicOnly: true },
     { path: '/auth-callback', element: <AuthShell><AuthCallback /></AuthShell>, publicOnly: true },
     { path: '/auth/callback', element: <AuthShell><LegacyOAuthCallbackRedirect /></AuthShell>, publicOnly: true },
-    { path: '/login', element: <AuthPathRedirect />, publicOnly: true },
-    { path: '/signin', element: <AuthPathRedirect />, publicOnly: true },
-    { path: '/sign-in', element: <AuthPathRedirect />, publicOnly: true },
-    { path: '/signup', element: <AuthPathRedirect />, publicOnly: true },
-    { path: '/sign-up', element: <AuthPathRedirect />, publicOnly: true },
-    { path: '/register', element: <AuthPathRedirect />, publicOnly: true },
+    ...AUTH_PATH_ALIASES.map((path) => ({
+      path,
+      element: <AuthPathRedirect />,
+      publicOnly: true,
+    })),
 
     { path: '/dashboard', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
 
