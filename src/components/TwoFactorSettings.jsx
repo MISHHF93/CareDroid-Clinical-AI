@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/button';
 import Card from '../components/ui/card';
-import { apiFetch } from '../services/apiClient';
+import { apiFetch, apiFetchJson } from '../services/apiClient';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import logger from '../utils/logger';
 
@@ -18,7 +18,7 @@ const TwoFactorSettings = ({ authToken }) => {
   const [disabling, setDisabling] = useState(false);
   const [disableToken, setDisableToken] = useState('');
   const [showDisableModal, setShowDisableModal] = useState(false);
-  const { success, error, info } = useNotificationActions();
+  const { success, error: notifyError, info } = useNotificationActions();
 
   useEffect(() => {
     fetchTwoFactorStatus();
@@ -27,21 +27,19 @@ const TwoFactorSettings = ({ authToken }) => {
   const fetchTwoFactorStatus = async () => {
     setLoading(true);
     try {
-      const response = await apiFetch('/api/two-factor/status', {
+      const { response, data } = await apiFetchJson('/api/two-factor/status', {
         headers: {
           'Authorization': `Bearer ${authToken}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch 2FA status');
+        throw new Error(data?.message || 'Failed to fetch 2FA status');
       }
-
-      const data = await response.json();
       setTwoFactorStatus(data);
     } catch (error) {
       logger.error('Failed to load 2FA status', { error });
-      error('2FA status', 'Failed to load 2FA status.');
+      notifyError('2FA status', 'Failed to load 2FA status.');
     } finally {
       setLoading(false);
     }
@@ -77,7 +75,7 @@ const TwoFactorSettings = ({ authToken }) => {
       setDisableToken('');
       fetchTwoFactorStatus();
     } catch (error) {
-      error('Disable failed', 'Failed to disable 2FA. Check your code.');
+      notifyError('Disable failed', 'Failed to disable 2FA. Check your code.');
       logger.error('Failed to disable 2FA', { error });
     } finally {
       setDisabling(false);

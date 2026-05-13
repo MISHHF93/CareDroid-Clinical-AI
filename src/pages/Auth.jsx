@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import Button from '../components/ui/button';
 import Input from '../components/ui/input';
 import appConfig from '../config/appConfig';
-import { apiFetch, buildApiUrl } from '../services/apiClient';
+import { apiFetch, apiFetchJson, buildApiUrl } from '../services/apiClient';
 import {
   GoogleLogo,
   LinkedInLogo,
@@ -54,17 +54,15 @@ const Auth = ({ onAuthSuccess }) => {
           ? { email: form.email, password: form.password }
           : { email: form.email, password: form.password, fullName: form.name };
 
-      const response = await apiFetch(endpoint, {
+      const { response, data } = await apiFetchJson(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error('Authentication failed');
+        throw new Error(data?.message || 'Authentication failed');
       }
-
-      const data = await response.json();
 
       if (data?.requiresTwoFactor) {
         setRequiresTwoFactor(true);
@@ -92,17 +90,15 @@ const Auth = ({ onAuthSuccess }) => {
     }
 
     try {
-      const response = await apiFetch('/api/auth/verify-2fa', {
+      const { response, data } = await apiFetchJson('/api/auth/verify-2fa', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, token: twoFactorToken }),
       });
 
       if (!response.ok) {
-        throw new Error('Invalid 2FA code');
+        throw new Error(data?.message || 'Invalid 2FA code');
       }
-
-      const data = await response.json();
 
       if (data?.accessToken) {
         onAuthSuccess?.(data.accessToken);

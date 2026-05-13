@@ -125,6 +125,22 @@ function Dashboard() {
     return () => window.cancelAnimationFrame(raf);
   }, [messages, sending, scrollToConversationEnd]);
 
+  useEffect(() => {
+    const handleViewportChange = () => {
+      if (!shouldStickToBottomRef.current) return;
+      window.requestAnimationFrame(() => scrollToConversationEnd('auto'));
+    };
+
+    window.visualViewport?.addEventListener('resize', handleViewportChange);
+    window.visualViewport?.addEventListener('scroll', handleViewportChange);
+    window.addEventListener('orientationchange', handleViewportChange);
+    return () => {
+      window.visualViewport?.removeEventListener('resize', handleViewportChange);
+      window.visualViewport?.removeEventListener('scroll', handleViewportChange);
+      window.removeEventListener('orientationchange', handleViewportChange);
+    };
+  }, [scrollToConversationEnd]);
+
   const panelRegistryId = searchParams.get('tool');
   const calcFromUrl = searchParams.get('calc');
   const registryEntry = panelRegistryId ? toolRegistryById[panelRegistryId] : null;

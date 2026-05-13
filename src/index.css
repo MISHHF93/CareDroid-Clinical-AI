@@ -371,8 +371,7 @@ a, button, input, select, textarea {
 }
 
 .welcome-page-root {
-  min-height: 100dvh;
-  min-height: 100vh;
+  min-height: clamp(540px, calc(var(--app-viewport-height, 100dvh) - 180px), 860px);
   width: 100%;
   max-width: 100%;
   background: var(--navy-bg);
@@ -380,13 +379,14 @@ a, button, input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: clamp(16px, 5vw, 40px);
+  padding: clamp(12px, 4vw, 40px) 0;
   box-sizing: border-box;
 }
 
 .welcome-page-inner {
   text-align: center;
-  max-width: 600px;
+  width: min(100%, 980px);
+  max-width: 100%;
 }
 
 .welcome-page-icon {
@@ -398,7 +398,7 @@ a, button, input, select, textarea {
 }
 
 .welcome-page-title {
-  font-size: clamp(1.75rem, 6vw, 3rem);
+  font-size: clamp(1.8rem, 4vw, 4.75rem);
   font-weight: 700;
   margin-bottom: var(--space-4);
   background: var(--accent-gradient);
@@ -408,20 +408,24 @@ a, button, input, select, textarea {
 }
 
 .welcome-page-lead {
-  font-size: var(--font-18);
+  max-width: 760px;
+  margin-inline: auto;
+  font-size: clamp(1rem, 1.2vw, 1.4rem);
   color: var(--muted-text);
-  margin-bottom: 40px;
+  margin-bottom: clamp(24px, 4svh, 40px);
   line-height: 1.6;
 }
 
 .welcome-page-grid {
   display: grid;
-  gap: var(--space-4);
-  margin-bottom: 40px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(var(--space-3), 2vw, var(--space-5));
+  margin-bottom: clamp(24px, 4svh, 40px);
 }
 
 .welcome-page-card {
-  padding: var(--space-4);
+  min-width: 0;
+  padding: clamp(var(--space-4), 2vw, var(--space-6));
   background: color-mix(in srgb, var(--accent-green) 12%, transparent);
   border: 1px solid color-mix(in srgb, var(--accent-green) 32%, transparent);
   border-radius: var(--radius-md);
@@ -446,7 +450,7 @@ a, button, input, select, textarea {
 }
 
 .welcome-page-card-desc {
-  font-size: var(--font-14);
+  font-size: clamp(var(--font-14), 1vw, var(--font-16));
   color: var(--muted-text);
 }
 
@@ -470,6 +474,39 @@ a, button, input, select, textarea {
   margin-top: var(--space-6);
   font-size: var(--font-14);
   color: var(--muted-text);
+}
+
+@media (max-width: 760px) {
+  .welcome-page-root {
+    align-items: flex-start;
+    min-height: auto;
+  }
+
+  .welcome-page-inner {
+    width: min(100%, 640px);
+  }
+
+  .welcome-page-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .welcome-page-icon {
+    margin-bottom: var(--space-4);
+  }
+
+  .welcome-page-lead {
+    line-height: 1.45;
+  }
+
+  .welcome-page-card {
+    border-radius: var(--radius-lg);
+  }
+
+  .welcome-page-cta {
+    width: min(100%, 320px);
+  }
 }
 
 

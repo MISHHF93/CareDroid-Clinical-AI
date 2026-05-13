@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../components/ui/button';
 import Card from '../components/ui/card';
 import Input from '../components/ui/input';
-import { apiFetch } from '../services/apiClient';
+import { apiFetchJson } from '../services/apiClient';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import logger from '../utils/logger';
 
@@ -24,7 +24,7 @@ const TwoFactorSetup = ({ authToken }) => {
   const [token, setToken] = useState('');
   const [backupCodes, setBackupCodes] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { success, error, info } = useNotificationActions();
+  const { success, error: notifyError, info } = useNotificationActions();
 
   useEffect(() => {
     generateSecret();
@@ -33,22 +33,20 @@ const TwoFactorSetup = ({ authToken }) => {
   const generateSecret = async () => {
     setLoading(true);
     try {
-      const response = await apiFetch('/api/two-factor/generate', {
+      const { response, data } = await apiFetchJson('/api/two-factor/generate', {
         headers: {
           'Authorization': `Bearer ${authToken}`,
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate 2FA secret');
+        throw new Error(data?.message || 'Failed to generate 2FA secret');
       }
-
-      const data = await response.json();
       setQrCode(data.qrCode);
       setSecret(data.secret);
-    } catch (error) {
-      error('2FA setup failed', 'Failed to generate 2FA secret. Please try again.');
-      logger.error('Failed to generate 2FA secret', { error });
+    } catch (err) {
+      notifyError('2FA setup failed', 'Failed to generate 2FA secret. Please try again.');
+      logger.error('Failed to generate 2FA secret', { error: err });
     } finally {
       setLoading(false);
     }
@@ -64,7 +62,7 @@ const TwoFactorSetup = ({ authToken }) => {
 
     setLoading(true);
     try {
-      const response = await apiFetch('/api/two-factor/enable', {
+      const { response, data } = await apiFetchJson('/api/two-factor/enable', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${authToken}`,
@@ -74,16 +72,14 @@ const TwoFactorSetup = ({ authToken }) => {
       });
 
       if (!response.ok) {
-        throw new Error('Invalid verification code');
+        throw new Error(data?.message || 'Invalid verification code');
       }
-
-      const data = await response.json();
       setBackupCodes(data.backupCodes || []);
       setStep('backup');
       success('2FA enabled', 'Save your backup codes.');
-    } catch (error) {
-      error('Invalid code', 'Please try again.');
-      logger.error('Invalid 2FA verification code', { error });
+    } catch (err) {
+      notifyError('Invalid code', 'Please try again.');
+      logger.error('Invalid 2FA verification code', { error: err });
     } finally {
       setLoading(false);
     }
@@ -94,7 +90,7 @@ const TwoFactorSetup = ({ authToken }) => {
     navigator.clipboard.writeText(codesText).then(() => {
       success('Backup codes copied', 'Backup codes copied to clipboard.');
     }).catch(() => {
-      error('Copy failed', 'Failed to copy backup codes.');
+      notifyError('Copy failed', 'Failed to copy backup codes.');
     });
   };
 
