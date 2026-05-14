@@ -34,7 +34,7 @@ export default function HIPAANotice() {
             fontSize: '32px',
             fontWeight: 700,
             marginBottom: '12px',
-            background: 'linear-gradient(135deg, #00ff88, #00ffff)',
+            background: 'linear-gradient(135deg, var(--accent-1), var(--accent-2))',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -110,9 +110,9 @@ export default function HIPAANotice() {
             padding: '16px',
             marginBottom: '32px'
           }}>
-            <h3 style={{ margin: '0 0 8px 0', color: '#00ff88' }}>HIPAA Privacy Officer</h3>
+            <h3 style={{ margin: '0 0 8px 0', color: 'var(--accent-1)' }}>HIPAA Privacy Officer</h3>
             <p style={{ margin: '0', color: 'var(--muted-text)', fontSize: '14px' }}>
-              For HIPAA-related inquiries: <a href="mailto:hipaa@caredroid.ai" style={{ color: '#00ff88' }}>hipaa@caredroid.ai</a>
+              For HIPAA-related inquiries: <a href="mailto:hipaa@caredroid.ai" style={{ color: 'var(--accent-1)' }}>hipaa@caredroid.ai</a>
             </p>
           </div>
 

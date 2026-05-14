@@ -361,11 +361,11 @@ const LabResults = ({ results }) => {
             <div className="lab-stat-label">Total Values</div>
           </div>
           <div className="lab-stat-card">
-            <div className="lab-stat-value" style={{ color: '#00ff88' }}>{summary.normal}</div>
+            <div className="lab-stat-value" style={{ color: 'var(--accent-1)' }}>{summary.normal}</div>
             <div className="lab-stat-label">Normal</div>
           </div>
           <div className="lab-stat-card">
-            <div className="lab-stat-value" style={{ color: '#ffc107' }}>{summary.abnormal}</div>
+            <div className="lab-stat-value" style={{ color: 'var(--warning)' }}>{summary.abnormal}</div>
             <div className="lab-stat-label">Abnormal</div>
           </div>
           <div className="lab-stat-card critical">
@@ -431,7 +431,7 @@ const LabResults = ({ results }) => {
                 {labs.map((lab, index) => (
                   <tr key={index}>
                     <td style={{ fontWeight: 500 }}>{lab.name}</td>
-                    <td style={{ fontFamily: 'monospace', color: '#00ffff' }}>
+                    <td style={{ fontFamily: 'monospace', color: 'var(--accent-2)' }}>
                       {lab.value} {lab.unit}
                     </td>
                     <td style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>

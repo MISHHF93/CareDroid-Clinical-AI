@@ -118,7 +118,7 @@
   height: 28px;
   border-radius: 50%;
   background: linear-gradient(135deg, #dc2626, #991b1b);
-  color: white;
+  color: var(--app-on-solid);
   font-size: var(--font-14);
   font-weight: 700;
   display: flex;
@@ -177,7 +177,7 @@
 
 .btn-emergency-primary {
   background: linear-gradient(135deg, #dc2626, #991b1b);
-  color: white;
+  color: var(--app-on-solid);
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
   min-height: 72px;
 }
@@ -190,7 +190,7 @@
 
 .btn-emergency-secondary {
   background: linear-gradient(135deg, #ea580c, #c2410c);
-  color: white;
+  color: var(--app-on-solid);
   box-shadow: 0 4px 12px rgba(234, 88, 12, 0.4);
   min-height: 64px;
 }

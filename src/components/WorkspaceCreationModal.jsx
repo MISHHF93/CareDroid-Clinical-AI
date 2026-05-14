@@ -10,13 +10,13 @@ import './WorkspaceCreationModal.css';
  */
 const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
   const [workspaceName, setWorkspaceName] = useState('');
-  const [selectedColor, setSelectedColor] = useState('#00ff88');
+  const [selectedColor, setSelectedColor] = useState('var(--accent-1)');
   const [selectedIcon, setSelectedIcon] = useState('Hospital');
   const [selectedTools, setSelectedTools] = useState([]);
   const [errors, setErrors] = useState({});
 
   const availableColors = [
-    { name: 'Green', value: '#00ff88' },
+    { name: 'Green', value: 'var(--accent-1)' },
     { name: 'Blue', value: '#00d4ff' },
     { name: 'Purple', value: '#a855f7' },
     { name: 'Orange', value: '#ff922b' },
@@ -42,7 +42,7 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
     {
       name: 'Ambulatory Care',
       iconKey: 'Stethoscope',
-      color: '#00ff88',
+      color: 'var(--accent-1)',
       tools: ['diagnosis', 'drug-check', 'protocols', 'calc-bmi', 'calc-chads2vasc'],
     },
     {
@@ -107,7 +107,7 @@ const WorkspaceCreationModal = ({ isOpen, onClose, onCreateWorkspace }) => {
 
   const handleClose = () => {
     setWorkspaceName('');
-    setSelectedColor('#00ff88');
+    setSelectedColor('var(--accent-1)');
     setSelectedIcon('Hospital');
     setSelectedTools([]);
     setErrors({});

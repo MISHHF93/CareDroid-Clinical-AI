@@ -254,7 +254,7 @@ button.auth-oauth-btn {
 .auth-link-btn__icon {
   flex-shrink: 0;
   opacity: 0.9;
-  color: var(--accent-primary, #00ff88);
+  color: var(--accent-primary, var(--accent-1));
 }
 
 .auth-link-btn__icon--brand {
@@ -285,7 +285,7 @@ button.auth-oauth-btn {
 .auth-back-link {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--accent-primary, #00ff88);
+  color: var(--accent-primary, var(--accent-1));
   text-decoration: none;
 }
 
@@ -301,7 +301,7 @@ button.auth-oauth-btn {
 .auth-twofa__icon {
   display: inline-flex;
   margin-bottom: 12px;
-  color: var(--accent-primary, #00ff88);
+  color: var(--accent-primary, var(--accent-1));
 }
 
 .auth-twofa__title {
@@ -352,7 +352,7 @@ button.auth-oauth-btn {
 }
 
 .auth-text-btn:hover {
-  color: var(--accent-primary, #00ff88);
+  color: var(--accent-primary, var(--accent-1));
 }
 
 @media (max-width: 420px) {

@@ -85,7 +85,7 @@
 }
 
 .cost-card {
-  background: white;
+  background: var(--app-surface-1);
   border: 1px solid var(--border-color, #E5E7EB);
   border-radius: 8px;
   padding: 1.5rem;
@@ -128,7 +128,7 @@
 
 /* Cost Panel */
 .cost-panel {
-  background: white;
+  background: var(--app-surface-1);
   border: 1px solid var(--border-color, #E5E7EB);
   border-radius: 8px;
   padding: 1.5rem;
@@ -169,7 +169,7 @@
 
 .roi-metric-highlight {
   background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-  color: white;
+  color: var(--app-on-solid);
 }
 
 .roi-label {
@@ -191,7 +191,7 @@
 }
 
 .roi-metric-highlight .roi-value {
-  color: white;
+  color: var(--app-on-solid);
 }
 
 .roi-value-large {
@@ -304,7 +304,7 @@
 }
 
 .modal {
-  background: white;
+  background: var(--app-surface-1);
   border-radius: 12px;
   padding: 2rem;
   max-width: 400px;
@@ -366,7 +366,7 @@
 
 .btn-primary {
   background-color: var(--primary-color, #4F46E5);
-  color: white;
+  color: var(--app-on-solid);
 }
 
 .btn-primary:hover {
@@ -374,7 +374,7 @@
 }
 
 .btn-secondary {
-  background-color: white;
+  background-color: var(--app-surface-1);
   color: var(--text-primary, #1F2937);
   border: 1px solid var(--border-color, #E5E7EB);
 }
@@ -385,7 +385,7 @@
 
 .btn-danger {
   background-color: #EF4444;
-  color: white;
+  color: var(--app-on-solid);
 }
 
 .btn-danger:hover {

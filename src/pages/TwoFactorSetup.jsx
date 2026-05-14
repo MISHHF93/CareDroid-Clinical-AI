@@ -193,7 +193,7 @@ const TwoFactorSetup = ({ authToken }) => {
                       border: '2px solid var(--border)',
                       borderRadius: '12px',
                       padding: '16px',
-                      background: 'white',
+                      background: 'var(--app-surface-1)',
                     }}
                   />
                   <p style={{

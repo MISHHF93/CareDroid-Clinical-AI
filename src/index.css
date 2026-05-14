@@ -394,7 +394,7 @@ a, button, input, select, textarea {
   align-items: center;
   justify-content: center;
   margin-bottom: var(--space-6);
-  color: var(--accent-1, #00ff88);
+  color: var(--accent-1, var(--accent-1));
 }
 
 .welcome-page-title {
@@ -446,7 +446,7 @@ a, button, input, select, textarea {
 
 .welcome-page-card-title--icon .nav-icon-svg {
   flex-shrink: 0;
-  color: var(--accent-1, #00ff88);
+  color: var(--accent-1, var(--accent-1));
 }
 
 .welcome-page-card-desc {

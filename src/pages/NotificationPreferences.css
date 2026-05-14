@@ -18,7 +18,7 @@
 .back-button {
   display: inline-flex;
   align-items: center;
-  color: var(--primary-color, #4a9eff);
+  color: var(--primary-color, var(--primary-color));
   text-decoration: none;
   font-size: 0.95rem;
   margin-bottom: 1rem;
@@ -142,7 +142,7 @@
 .preference-details h4 {
   font-size: 1.05rem;
   margin: 0 0 0.25rem 0;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
 }
 
 .preference-details p {
@@ -185,13 +185,13 @@
   width: 20px;
   left: 4px;
   bottom: 4px;
-  background-color: white;
+  background-color: var(--app-surface-1);
   transition: 0.3s;
   border-radius: 50%;
 }
 
 .toggle-switch input:checked + .slider {
-  background-color: var(--primary-color, #4a9eff);
+  background-color: var(--primary-color, var(--primary-color));
 }
 
 .toggle-switch input:checked + .slider:before {
@@ -229,14 +229,14 @@
   background: var(--bg-secondary, #1a1b1e);
   border: 1px solid var(--border-color, #2a2b2e);
   border-radius: 8px;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
   font-size: 1rem;
   font-family: inherit;
 }
 
 .time-input-group input[type="time"]:focus {
   outline: none;
-  border-color: var(--primary-color, #4a9eff);
+  border-color: var(--primary-color, var(--primary-color));
 }
 
 /* Messages */
@@ -269,8 +269,8 @@
   padding: 1rem 2rem;
   font-size: 1.05rem;
   font-weight: 600;
-  background: var(--primary-color, #4a9eff);
-  color: #ffffff;
+  background: var(--primary-color, var(--primary-color));
+  color: var(--app-on-solid);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -292,7 +292,7 @@
 
 .preferences-footer {
   background: rgba(74, 158, 255, 0.1);
-  border: 1px solid var(--primary-color, #4a9eff);
+  border: 1px solid var(--primary-color, var(--primary-color));
   padding: 1rem;
   border-radius: 8px;
   margin-top: 2rem;

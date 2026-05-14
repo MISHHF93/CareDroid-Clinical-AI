@@ -82,3 +82,149 @@ body {
     transition: none;
   }
 }
+
+/* Global themed defaults and legacy component normalisation. */
+:where(input, select, textarea) {
+  background: var(--app-input-bg);
+  border-color: var(--app-input-border);
+  color: var(--app-fg);
+  caret-color: var(--app-accent);
+}
+
+:where(input, select, textarea):hover:not(:disabled) {
+  background: var(--app-input-bg-hover);
+  border-color: color-mix(in srgb, var(--app-accent) 32%, var(--app-input-border));
+}
+
+:where(input, select, textarea):focus,
+:where(button, [role='button'], a):focus-visible {
+  outline: none;
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 3px var(--app-focus);
+}
+
+:where(input, select, textarea)::placeholder {
+  color: var(--app-fg-muted);
+}
+
+:where(input, select, textarea, button):disabled,
+:where([aria-disabled='true']) {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+:where(select) {
+  color-scheme: dark;
+}
+
+html[data-theme='light'] :where(select) {
+  color-scheme: light;
+}
+
+:where(option, optgroup) {
+  background: var(--app-surface-elevated);
+  color: var(--app-fg);
+}
+
+:where(table) {
+  color: var(--app-fg);
+}
+
+:where(thead, th) {
+  background: var(--app-table-header-bg);
+  color: var(--app-fg);
+}
+
+:where(tr:hover) {
+  background: var(--app-table-row-hover);
+}
+
+/* Medical tools and legacy panels that previously fell back to white/light defaults. */
+:where(
+  .tool-header,
+  .tool-content,
+  .clinical-insights-panel,
+  .tools-workspace,
+  .tools-recent,
+  .tools-recent-card,
+  .tool-card-large,
+  .calculator-card,
+  .calculator-inputs,
+  .calculator-results,
+  .lab-input-panel,
+  .lab-results-panel,
+  .drug-results,
+  .drug-interaction-card,
+  .protocol-card,
+  .diagnosis-card,
+  .form-section,
+  .settings-section,
+  .analytics-card,
+  .cost-card,
+  .notification-card,
+  .audit-card,
+  .stat-card,
+  .empty-state,
+  .modal,
+  .drawer,
+  .dropdown-menu
+) {
+  background: var(--app-surface-1) !important;
+  border-color: var(--app-panel-border) !important;
+  color: var(--app-fg);
+  box-shadow: var(--app-shadow-1);
+}
+
+:where(
+  .tools-recent-card,
+  .tool-card-large,
+  .calculator-card,
+  .drug-interaction-card,
+  .protocol-card,
+  .diagnosis-card
+):hover {
+  background: color-mix(in srgb, var(--app-surface-1) 88%, var(--app-accent) 8%) !important;
+  border-color: color-mix(in srgb, var(--app-accent) 42%, var(--app-panel-border)) !important;
+}
+
+:where(
+  .tool-shortcut-badge,
+  .tool-card-action,
+  .calc-checkbox-group,
+  .calc-breakdown-item,
+  .calc-interpretation-box,
+  .lab-value-item,
+  .lab-clear-button,
+  .lab-load-example-button,
+  .calc-reset-btn,
+  .btn-back-to-tools
+) {
+  background: var(--app-surface-2) !important;
+  border-color: var(--app-panel-border) !important;
+  color: var(--app-fg-muted);
+}
+
+:where(
+  .calc-calculate-btn,
+  .lab-add-button,
+  .lab-interpret-button,
+  .btn-primary
+) {
+  background: var(--accent-gradient) !important;
+  color: var(--app-accent-contrast) !important;
+}
+
+:where(.btn-danger, .btn-remove-med:hover, .lab-value-remove:hover) {
+  background: linear-gradient(135deg, var(--app-danger), color-mix(in srgb, var(--app-danger) 78%, #020617)) !important;
+  color: var(--app-danger-contrast) !important;
+}
+
+:where(.medication-input, .calc-input-field, .calc-select-field, .context-input, .context-select, .context-textarea, .lab-input-field) {
+  background: var(--app-input-bg) !important;
+  border-color: var(--app-input-border) !important;
+  color: var(--app-fg) !important;
+}
+
+:where(.tool-header-info p, .section-subtitle, .calculator-description, .calc-input-help, .lab-input-label, .context-label, .tool-card-muted) {
+  color: var(--app-fg-muted) !important;
+}

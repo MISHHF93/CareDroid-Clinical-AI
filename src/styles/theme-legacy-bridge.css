@@ -9,8 +9,12 @@ html {
   --text-primary: var(--app-fg);
   --muted-text: var(--app-fg-muted);
   --text-muted: var(--app-fg-muted);
+  --text-secondary: var(--app-fg-muted);
   --panel-bg: var(--app-panel-bg);
+  --panel-background: var(--app-surface-1);
+  --panel-hover: var(--app-hover);
   --panel-border: var(--app-panel-border);
+  --border-color: var(--app-panel-border);
   --surface-0: var(--app-surface-0);
   --surface-1: var(--app-surface-1);
   --surface-2: var(--app-surface-2);
@@ -25,7 +29,15 @@ html {
   --accent-gradient: linear-gradient(135deg, var(--app-accent), var(--app-accent-2));
   --gradient-accent: linear-gradient(135deg, var(--app-accent), var(--app-accent-2));
   --danger: var(--app-danger);
+  --error-color: var(--app-danger);
   --warning: var(--app-warning);
+  --success: var(--app-success);
+  --success-color: var(--app-success);
+  --info: var(--app-info);
+  --input-bg: var(--app-input-bg);
+  --input-border: var(--app-input-border);
+  --focus-ring: var(--app-focus);
+  --disabled: var(--app-disabled);
   --primary-color: var(--app-accent-interactive);
   --space-xs: var(--space-1);
   --space-sm: var(--space-2);

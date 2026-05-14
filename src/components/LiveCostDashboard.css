@@ -45,7 +45,7 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: white;
+  background: var(--app-surface-1);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   font-size: 0.9rem;
@@ -60,7 +60,7 @@
 
 .alert-badge {
   background: #ff4444;
-  color: white;
+  color: var(--app-on-solid);
   border-radius: 50%;
   padding: 0.2rem 0.6rem;
 }
@@ -84,7 +84,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
-  background: white;
+  background: var(--app-surface-1);
   padding: 1rem;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -101,7 +101,7 @@
   border-radius: 4px;
   font-size: 0.9rem;
   cursor: pointer;
-  background-color: white;
+  background-color: var(--app-surface-1);
 }
 
 .filter-group select:hover {
@@ -116,7 +116,7 @@
 .export-btn {
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, #2196F3, #1976D2);
-  color: white;
+  color: var(--app-on-solid);
   border: none;
   border-radius: 8px;
   font-weight: 500;
@@ -144,7 +144,7 @@
 }
 
 .dashboard-section {
-  background: white;
+  background: var(--app-surface-1);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -178,7 +178,7 @@
 
 .tool-item {
   padding: 1rem;
-  background: #f5f5f5;
+  background: var(--app-surface-1);
   border-radius: 8px;
   transition: all 0.3s ease;
 }
@@ -308,7 +308,7 @@
   grid-template-columns: 1.5fr 1fr 1fr 1fr;
   gap: 1rem;
   padding: 0.75rem;
-  background: #f5f5f5;
+  background: var(--app-surface-1);
   border-radius: 6px;
   font-size: 0.85rem;
   align-items: center;

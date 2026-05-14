@@ -39,7 +39,7 @@
 }
 
 .preferences-section {
-  background: white;
+  background: var(--app-surface-1);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -140,7 +140,7 @@
   width: 22px;
   left: 3px;
   bottom: 3px;
-  background-color: white;
+  background-color: var(--app-surface-1);
   transition: 0.4s;
   border-radius: 50%;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -157,7 +157,7 @@ input:checked + .slider:before {
 /* Channel Toggles */
 .channel-toggle {
   padding: 1.5rem;
-  background: #f5f5f5;
+  background: var(--app-surface-1);
   border-radius: 8px;
   margin-bottom: 1rem;
   transition: all 0.3s ease;
@@ -189,7 +189,7 @@ input:checked + .slider:before {
 /* Alert Types */
 .alert-type {
   padding: 1.5rem;
-  background: #f5f5f5;
+  background: var(--app-surface-1);
   border-radius: 8px;
   margin-bottom: 1rem;
   border-left: 4px solid #2196F3;
@@ -222,7 +222,7 @@ input:checked + .slider:before {
 .cost-threshold {
   margin-top: 1rem;
   padding: 1rem;
-  background: white;
+  background: var(--app-surface-1);
   border-radius: 6px;
 }
 
@@ -276,7 +276,7 @@ input:checked + .slider:before {
 /* Digest Toggle */
 .digest-toggle {
   padding: 1.5rem;
-  background: #f5f5f5;
+  background: var(--app-surface-1);
   border-radius: 8px;
   border-left: 4px solid #FF9800;
 }
@@ -297,7 +297,7 @@ input:checked + .slider:before {
 .digest-time {
   margin-top: 1rem;
   padding: 1rem;
-  background: white;
+  background: var(--app-surface-1);
   border-radius: 6px;
 }
 
@@ -336,7 +336,7 @@ input:checked + .slider:before {
 .save-btn {
   padding: 1rem 2.5rem;
   background: linear-gradient(135deg, #2196F3, #1976D2);
-  color: white;
+  color: var(--app-on-solid);
   border: none;
   border-radius: 8px;
   font-size: 1rem;
@@ -362,7 +362,7 @@ input:checked + .slider:before {
   right: 2rem;
   padding: 1rem 1.5rem;
   background: #4CAF50;
-  color: white;
+  color: var(--app-on-solid);
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
   animation: slideInRight 0.3s ease;
@@ -382,7 +382,7 @@ input:checked + .slider:before {
 
 /* Summary Section */
 .preferences-summary {
-  background: white;
+  background: var(--app-surface-1);
   border-radius: 12px;
   padding: 2rem;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
@@ -406,7 +406,7 @@ input:checked + .slider:before {
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
-  background: #f5f5f5;
+  background: var(--app-surface-1);
   border-radius: 8px;
 }
 

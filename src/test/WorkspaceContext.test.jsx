@@ -60,7 +60,7 @@ describe('WorkspaceContext', () => {
         id: 'custom-1',
         name: 'My Custom Workspace',
         toolIds: ['drug-checker', 'lab-interpreter'],
-        color: '#00ff88',
+        color: 'var(--accent-1)',
         icon: 'Hospital'
       };
 
