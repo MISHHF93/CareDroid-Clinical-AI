@@ -1,8 +1,7 @@
 /**
  * Clinical tools registry (sidebar, workspaces, deep links).
  *
- * Optional `panelTool` + `initialCalc`: open the shared Calculators drawer on a specific calculator
- * while keeping a first-class sidebar id (flattened UX).
+ * `panelTool` + `initialCalc`: sidebar entries that open the shared Calculators UI on a specific calculator.
  */
 const toolRegistry = [
   {
@@ -163,7 +162,7 @@ export const toolRegistryById = toolRegistry.reduce((acc, tool) => {
 export const getToolById = (toolId) => toolRegistryById[toolId] || null;
 
 /**
- * Map a registry id from the URL (?tool=) to the drawer component id and optional calculator slug.
+ * Map a registry id from a legacy URL (?tool=) to the calculators panel id and optional calculator slug.
  */
 export function resolveToolDrawerParams(registryToolId) {
   const entry = registryToolId ? toolRegistryById[registryToolId] : null;

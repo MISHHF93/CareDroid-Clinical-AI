@@ -1,10 +1,9 @@
-import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';import { useUser } from '../contexts/UserContext';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
-import { toolRegistryById, resolveToolDrawerParams } from '../data/toolRegistry';
+import { toolRegistryById, getToolById } from '../data/toolRegistry';
 import ToolVisualization from '../components/ToolVisualization';
 import ToolCard from '../components/ToolCard';
 import Citations, { CitationModal } from '../components/Citations';
@@ -19,69 +18,17 @@ import {
 import { NavIcon } from '../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../navigation/iconRegistry';
 import './Dashboard.css';
-import { lazyWithRetry } from '../utils/lazyWithRetry';
-
-const DrugChecker = lazyWithRetry(() => import('./tools/DrugChecker'));
-const LabInterpreter = lazyWithRetry(() => import('./tools/LabInterpreter'));
-const Calculators = lazyWithRetry(() => import('./tools/Calculators'));
-const Protocols = lazyWithRetry(() => import('./tools/Protocols'));
-const DiagnosisAssistant = lazyWithRetry(() => import('./tools/DiagnosisAssistant'));
-const ProcedureGuide = lazyWithRetry(() => import('./tools/ProcedureGuide'));
-
-const drawerFallback = <div className="dashboard-drawer-fallback">Loading tool…</div>;
-
-function ClinicalToolDrawer({ toolId, initialCalc, onClose }) {
-  const common = { embedded: true, onCloseEmbedded: onClose };
-  switch (toolId) {
-    case 'drug-check':
-      return (
-        <Suspense fallback={drawerFallback}>
-          <DrugChecker {...common} />
-        </Suspense>
-      );
-    case 'lab-interp':
-      return (
-        <Suspense fallback={drawerFallback}>
-          <LabInterpreter {...common} />
-        </Suspense>
-      );
-    case 'calculators':
-      return (
-        <Suspense fallback={drawerFallback}>
-          <Calculators {...common} initialCalculatorId={initialCalc || undefined} />
-        </Suspense>
-      );
-    case 'protocols':
-      return (
-        <Suspense fallback={drawerFallback}>
-          <Protocols {...common} />
-        </Suspense>
-      );
-    case 'diagnosis':
-      return (
-        <Suspense fallback={drawerFallback}>
-          <DiagnosisAssistant {...common} />
-        </Suspense>
-      );
-    case 'procedures':
-      return (
-        <Suspense fallback={drawerFallback}>
-          <ProcedureGuide {...common} />
-        </Suspense>
-      );
-    default:
-      return null;
-  }
-}
 
 /**
- * Dashboard — main clinical chat (real API). Optional tool drawer from ?tool= registry id.
+ * Dashboard — clinical chat (full width). Tools open on dedicated /tools/* routes.
+ * Legacy URLs `/dashboard?tool=…` redirect to the matching tool page.
  */
 function Dashboard() {
   const { authToken } = useUser();
   const { error } = useNotificationActions();
   const { recordToolAccess } = useToolPreferences();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [input, setInput] = useState('');
   const [recommendedTools, setRecommendedTools] = useState([]);
   const [selectedCitation, setSelectedCitation] = useState(null);
@@ -143,35 +90,25 @@ function Dashboard() {
 
   const panelRegistryId = searchParams.get('tool');
   const calcFromUrl = searchParams.get('calc');
-  const registryEntry = panelRegistryId ? toolRegistryById[panelRegistryId] : null;
-  const { drawerToolId, initialCalc: initialCalcFromRegistry } = resolveToolDrawerParams(panelRegistryId);
-  const initialCalc =
-    drawerToolId === 'calculators'
-      ? initialCalcFromRegistry || calcFromUrl || undefined
-      : undefined;
-  const drawerOpen = Boolean(panelRegistryId && registryEntry && drawerToolId);
-
-  const closeDrawer = useCallback(() => {
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        next.delete('tool');
-        next.delete('calc');
-        return next;
-      },
-      { replace: true },
-    );
-    clearTool();
-  }, [setSearchParams, clearTool]);
 
   useEffect(() => {
-    if (panelRegistryId && toolRegistryById[panelRegistryId]) {
-      setActiveTool(panelRegistryId);
-      recordToolAccess(panelRegistryId);
-    } else if (!panelRegistryId) {
-      clearTool();
+    if (!panelRegistryId) {
+      return;
     }
-  }, [panelRegistryId, setActiveTool, recordToolAccess, clearTool]);
+    const entry = toolRegistryById[panelRegistryId];
+    if (!entry) {
+      clearTool();
+      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+      return;
+    }
+    setActiveTool(panelRegistryId);
+    recordToolAccess(panelRegistryId);
+    const dest =
+      entry.id === 'calculators' && calcFromUrl
+        ? `/tools/calculators?calc=${encodeURIComponent(calcFromUrl)}`
+        : entry.path;
+    navigate(dest, { replace: true });
+  }, [panelRegistryId, calcFromUrl, navigate, setActiveTool, recordToolAccess, clearTool]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || sending) return;
@@ -182,7 +119,7 @@ function Dashboard() {
     setSending(true);
 
     try {
-      const apiTool = registryIdToChatToolParam(selectedTool || panelRegistryId);
+      const apiTool = registryIdToChatToolParam(selectedTool);
       const { ok, data } = await sendClinicalChatMessage({
         message: text,
         tool: apiTool,
@@ -265,8 +202,9 @@ function Dashboard() {
               <div className="dashboard-empty-inner">
                 <div className="dashboard-empty-title">CareDroid clinical chat</div>
                 <div className="dashboard-empty-copy">
-                  Ask about medications, labs, scores, protocols, and procedures. Open a tool from the
-                  sidebar to use forms beside this conversation.
+                  Ask about medications, labs, scores, protocols, and procedures. Open a clinical tool from
+                  the sidebar or Tools — each tool has its own page; use &quot;Discuss with AI&quot; there to
+                  bring results back into this chat.
                 </div>
               </div>
             </div>
@@ -348,17 +286,15 @@ function Dashboard() {
                         },
                       });
                       recordRecommendationFeedback(tool.id, true);
+                      const entry = getToolById(tool.id);
+                      if (!entry?.path) return;
                       selectTool(tool.id);
-                      setSearchParams(
-                        (prev) => {
-                          const next = new URLSearchParams(prev);
-                          next.set('tool', tool.id);
-                          if (tool.initialCalc) next.set('calc', tool.initialCalc);
-                          else next.delete('calc');
-                          return next;
-                        },
-                        { replace: true },
-                      );
+                      const calcSlug = tool.initialCalc ?? entry.initialCalc;
+                      const dest =
+                        entry.id === 'calculators' && calcSlug
+                          ? `/tools/calculators?calc=${encodeURIComponent(calcSlug)}`
+                          : entry.path;
+                      navigate(dest);
                     }}
                     style={{
                       display: 'inline-flex',
@@ -406,12 +342,6 @@ function Dashboard() {
           </div>
         </div>
       </div>
-
-      {drawerOpen && (
-        <div className="dashboard-drawer">
-          <ClinicalToolDrawer toolId={drawerToolId} initialCalc={initialCalc} onClose={closeDrawer} />
-        </div>
-      )}
 
       {selectedCitation && (
         <CitationModal citation={selectedCitation} onClose={() => setSelectedCitation(null)} />

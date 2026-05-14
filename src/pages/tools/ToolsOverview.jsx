@@ -33,10 +33,7 @@ const ToolsOverview = () => {
   const handleToolClick = (tool) => {
     recordToolAccess(tool.id);
     selectTool(tool.id);
-    const params = new URLSearchParams();
-    params.set('tool', tool.id);
-    if (tool.initialCalc) params.set('calc', tool.initialCalc);
-    navigate(`/dashboard?${params.toString()}`);
+    navigate(tool.path);
   };
 
   const categories = [...new Set(filteredTools.map(t => t.category))];
@@ -219,7 +216,8 @@ const ToolsOverview = () => {
                 onClick={(e) => {
                   e.stopPropagation();
                   recordToolAccess(tool.id);
-                  navigate(`/dashboard?tool=${encodeURIComponent(tool.id)}`);
+                  selectTool(tool.id);
+                  navigate('/dashboard');
                 }}
               >
                 Use in Chat

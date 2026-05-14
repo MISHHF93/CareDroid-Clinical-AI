@@ -96,18 +96,17 @@ const Sidebar = ({
 
   const handleToolClick = (tool) => {
     recordToolAccess(tool.id);
-    const params = new URLSearchParams();
-    params.set('tool', tool.id);
-    if (tool.initialCalc) params.set('calc', tool.initialCalc);
-    navigate(`/dashboard?${params.toString()}`);
     onToolSelect?.(tool.id);
     onCloseMobileNav();
   };
 
-  const dashboardToolFromUrl = new URLSearchParams(location.search).get('tool');
+  const isToolRouteActive = (tool) =>
+    location.pathname === tool.path || location.pathname.startsWith(`${tool.path}/`);
 
   const renderToolCard = (tool) => {
-    const isSelected = currentTool === tool.id || dashboardToolFromUrl === tool.id;
+    const isSelected =
+      currentTool === tool.id &&
+      (location.pathname === '/dashboard' || isToolRouteActive(tool));
     const isFavorite = favorites.includes(tool.id);
     const isPinned = pinned.includes(tool.id);
 

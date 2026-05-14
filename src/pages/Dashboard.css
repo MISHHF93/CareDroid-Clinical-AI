@@ -1,6 +1,7 @@
 .dashboard-root {
   flex: 1 1 auto;
   display: flex;
+  flex-direction: column;
   min-width: 0;
   min-height: 0;
   height: 100%;
@@ -229,26 +230,9 @@
   opacity: 0.5;
 }
 
-.dashboard-drawer {
-  width: min(440px, 42vw);
-  border-left: 1px solid var(--panel-border);
-  background: var(--surface-0);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  flex-shrink: 0;
-  box-shadow: var(--shadow-1);
-}
-
-.dashboard-drawer-fallback {
-  padding: var(--space-6);
-  color: var(--muted-text);
-}
-
 @media (max-width: 900px) {
   .dashboard-root {
-    flex-direction: column;
-    min-height: 0;
+    height: 100%;
   }
 
   .dashboard-main {
@@ -264,17 +248,6 @@
 
   .dashboard-msg-bubble {
     max-width: min(92%, 520px);
-  }
-
-  .dashboard-drawer {
-    width: 100%;
-    max-width: 100%;
-    flex: 0 1 min(42dvh, 420px);
-    max-height: min(42dvh, 420px);
-    min-height: 0;
-    border-left: none;
-    border-top: 1px solid var(--panel-border);
-    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.12);
   }
 
   .dashboard-input-row {
@@ -371,16 +344,6 @@
   }
 }
 
-@media (max-width: 900px) {
-  .dashboard-root {
-    height: 100%;
-  }
-
-  .dashboard-drawer {
-    max-height: min(40svh, 400px);
-  }
-}
-
 @media (max-width: 600px) {
   .dashboard-msg-row {
     gap: var(--space-2);
@@ -403,10 +366,6 @@
 
   .dashboard-composer {
     padding-block: var(--space-2);
-  }
-
-  .dashboard-drawer {
-    max-height: min(34svh, 300px);
   }
 }
 

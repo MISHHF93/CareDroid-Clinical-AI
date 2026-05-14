@@ -55,9 +55,14 @@ const TeamManagement = lazyWithRetry(() =>
 );
 const AuthCallback = lazyWithRetry(() => import('./pages/AuthCallback'));
 
-// Tool pages - lazy loaded inside Dashboard drawer only
 const ToolsOverview = lazyWithRetry(() => import('./pages/tools/ToolsOverview'));
 const SharedToolSession = lazyWithRetry(() => import('./pages/tools/SharedToolSession'));
+const DrugChecker = lazyWithRetry(() => import('./pages/tools/DrugChecker'));
+const LabInterpreter = lazyWithRetry(() => import('./pages/tools/LabInterpreter'));
+const Calculators = lazyWithRetry(() => import('./pages/tools/Calculators'));
+const Protocols = lazyWithRetry(() => import('./pages/tools/Protocols'));
+const DiagnosisAssistant = lazyWithRetry(() => import('./pages/tools/DiagnosisAssistant'));
+const ProcedureGuide = lazyWithRetry(() => import('./pages/tools/ProcedureGuide'));
 
 // Clinical Intelligence pages
 const ClinicalAlertsPage = lazyWithRetry(() => import('./pages/ClinicalAlertsPage'));
@@ -179,11 +184,11 @@ function AppShellPage({ children }) {
     if (toolId) {
       setActiveTool(toolId);
       const tool = getToolById(toolId);
-      const q = new URLSearchParams();
-      q.set('tool', toolId);
-      if (tool?.initialCalc) q.set('calc', tool.initialCalc);
-      else q.delete('calc');
-      navigate(`/dashboard?${q.toString()}`, { replace: true });
+      if (tool?.path) {
+        navigate(tool.path, { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
     } else {
       setActiveTool(null);
       navigate({ pathname: '/dashboard', search: '' }, { replace: true });
@@ -276,18 +281,18 @@ function AppRoutes() {
 
     { path: '/dashboard', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
 
-    // Tool routes redirect into unified chat + tool panel (deep links preserved)
+    // Clinical tools: full-page routes (chat stays on /dashboard only)
     { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/drug-checker', element: <Navigate to="/dashboard?tool=drug-check" replace />, requiresAuth: true },
-    { path: '/tools/lab-interpreter', element: <Navigate to="/dashboard?tool=lab-interp" replace />, requiresAuth: true },
-    { path: '/tools/calculator/sofa', element: <Navigate to="/dashboard?tool=sofa-score" replace />, requiresAuth: true },
-    { path: '/tools/calculator/gfr', element: <Navigate to="/dashboard?tool=calc-gfr" replace />, requiresAuth: true },
-    { path: '/tools/calculator/bmi', element: <Navigate to="/dashboard?tool=calc-bmi" replace />, requiresAuth: true },
-    { path: '/tools/calculator/chads2vasc', element: <Navigate to="/dashboard?tool=calc-chads2vasc" replace />, requiresAuth: true },
-    { path: '/tools/calculators', element: <Navigate to="/dashboard?tool=calculators" replace />, requiresAuth: true },
-    { path: '/tools/protocols', element: <Navigate to="/dashboard?tool=protocols" replace />, requiresAuth: true },
-    { path: '/tools/diagnosis', element: <Navigate to="/dashboard?tool=diagnosis" replace />, requiresAuth: true },
-    { path: '/tools/procedures', element: <Navigate to="/dashboard?tool=procedures" replace />, requiresAuth: true },
+    { path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/lab-interpreter', element: <AppShellPage><LabInterpreter /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/calculator/sofa', element: <AppShellPage><Calculators initialCalculatorId="sofa" /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/calculator/gfr', element: <AppShellPage><Calculators initialCalculatorId="gfr" /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/calculator/bmi', element: <AppShellPage><Calculators initialCalculatorId="bmi" /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/calculator/chads2vasc', element: <AppShellPage><Calculators initialCalculatorId="chads2vasc" /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/calculators', element: <AppShellPage><Calculators /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/protocols', element: <AppShellPage><Protocols /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/diagnosis', element: <AppShellPage><DiagnosisAssistant /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/procedures', element: <AppShellPage><ProcedureGuide /></AppShellPage>, requiresAuth: true },
 
     // Clinical Intelligence routes
     { path: '/clinical/alerts', element: <AppShellPage><ClinicalAlertsPage /></AppShellPage>, requiresAuth: true },

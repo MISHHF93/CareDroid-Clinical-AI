@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ToolPageLayout from './ToolPageLayout';
 import './Calculators.css';
 import { apiFetch, parseApiResponse } from '../../services/apiClient';
@@ -60,6 +61,9 @@ function CalcResultsEmptyIcon({ icon, size = 56 }) {
 }
 
 const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = null } = {}) => {
+  const [searchParams] = useSearchParams();
+  const calcFromUrl = searchParams.get('calc');
+
   const toolConfig = {
     id: 'calculators',
     name: 'Medical Calculators',
@@ -74,13 +78,14 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
   const [sharedResult, setSharedResult] = useState(null);
 
   useEffect(() => {
-    if (!initialCalculatorId) return;
-    const match = CALCULATORS.find((c) => c.id === initialCalculatorId);
+    const slug = initialCalculatorId || calcFromUrl;
+    if (!slug) return;
+    const match = CALCULATORS.find((c) => c.id === slug);
     if (match) {
       setSelectedCalculator(match);
       setSharedResult(null);
     }
-  }, [initialCalculatorId]);
+  }, [initialCalculatorId, calcFromUrl]);
 
   return (
     <ToolPageLayout

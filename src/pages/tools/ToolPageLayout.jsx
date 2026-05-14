@@ -295,7 +295,7 @@ const ToolPageLayout = ({
               className="btn-ai-action"
               onClick={() => {
                 selectTool(tool.id);
-                navigate(`/dashboard?tool=${encodeURIComponent(tool.id)}`);
+                navigate('/dashboard');
               }}
             >
               <span className="btn-icon" aria-hidden>
@@ -307,7 +307,8 @@ const ToolPageLayout = ({
               type="button"
               className="btn-ai-action"
               onClick={() => {
-                navigate(`/dashboard?tool=${encodeURIComponent(tool.id)}`);
+                selectTool(tool.id);
+                navigate('/dashboard');
               }}
             >
               <span className="btn-icon" aria-hidden>
