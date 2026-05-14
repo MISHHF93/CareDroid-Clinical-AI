@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
-import './ToolPageLayout.css';
 import { apiFetch, parseApiResponse } from '../../services/apiClient';
 
 const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
@@ -30,7 +29,6 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
     setError(null);
 
     try {
-      // Use AI chat endpoint for diagnosis generation
       const message = `Generate a differential diagnosis for: ${symptoms}${
         patientInfo.age ? `\nPatient age: ${patientInfo.age}` : ''
       }${patientInfo.sex ? `\nSex: ${patientInfo.sex}` : ''}${
@@ -59,30 +57,18 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
 
   return (
     <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded} results={results}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
-        {/* Input Panel */}
-        <div style={{ background: 'var(--panel-bg)', borderRadius: '16px', padding: '24px', border: '1px solid var(--border-color)' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '20px' }}>
+      <div className="diagnosis-tool-grid">
+        <div className="diagnosis-panel">
+          <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--app-fg)', marginBottom: '20px' }}>
             📋 Patient Presentation
           </h2>
 
           <div style={{ marginBottom: '20px' }}>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)', marginBottom: '8px' }}>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: 500, color: 'var(--app-fg)', marginBottom: '8px' }}>
               Presenting Symptoms / Chief Complaint
             </label>
             <textarea
-              style={{
-                width: '100%',
-                minHeight: '120px',
-                padding: '12px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: '8px',
-                color: 'var(--text-primary)',
-                fontSize: '14px',
-                fontFamily: 'inherit',
-                resize: 'vertical',
-              }}
+              className="diagnosis-field diagnosis-field--tall"
               placeholder="e.g., Chest pain with diaphoresis and nausea, onset 2 hours ago, radiating to left arm..."
               value={symptoms}
               onChange={(e) => setSymptoms(e.target.value)}
@@ -91,37 +77,23 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '20px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: 'var(--app-fg-muted)', marginBottom: '6px' }}>
                 Age (optional)
               </label>
               <input
                 type="number"
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  borderRadius: '8px',
-                  color: 'var(--text-primary)',
-                }}
+                className="diagnosis-field"
                 placeholder="Years"
                 value={patientInfo.age}
                 onChange={(e) => setPatientInfo({ ...patientInfo, age: e.target.value })}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+              <label style={{ display: 'block', fontSize: '13px', color: 'var(--app-fg-muted)', marginBottom: '6px' }}>
                 Sex (optional)
               </label>
               <select
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  borderRadius: '8px',
-                  color: 'var(--text-primary)',
-                }}
+                className="diagnosis-field"
                 value={patientInfo.sex}
                 onChange={(e) => setPatientInfo({ ...patientInfo, sex: e.target.value })}
               >
@@ -133,22 +105,12 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
           </div>
 
           <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+            <label style={{ display: 'block', fontSize: '13px', color: 'var(--app-fg-muted)', marginBottom: '6px' }}>
               Relevant Medical History (optional)
             </label>
             <textarea
-              style={{
-                width: '100%',
-                minHeight: '80px',
-                padding: '10px 12px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: '8px',
-                color: 'var(--text-primary)',
-                fontSize: '13px',
-                fontFamily: 'inherit',
-                resize: 'vertical',
-              }}
+              className="diagnosis-field"
+              style={{ minHeight: '80px', resize: 'vertical' }}
               placeholder="e.g., HTN, DM, prior MI..."
               value={patientInfo.history}
               onChange={(e) => setPatientInfo({ ...patientInfo, history: e.target.value })}
@@ -157,33 +119,16 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
 
           <div style={{ display: 'flex', gap: '12px' }}>
             <button
-              style={{
-                flex: 1,
-                padding: '14px 24px',
-                background: 'linear-gradient(135deg, var(--accent-1), var(--accent-2))',
-                border: 'none',
-                borderRadius: '10px',
-                color: 'var(--app-accent-contrast)',
-                fontSize: '16px',
-                fontWeight: 600,
-                cursor: loading ? 'not-allowed' : 'pointer',
-                opacity: loading ? 0.6 : 1,
-              }}
+              type="button"
+              className="diagnosis-primary-btn"
               onClick={handleGenerate}
               disabled={loading}
             >
               {loading ? 'Generating...' : '🔍 Generate DDx'}
             </button>
             <button
-              style={{
-                padding: '14px 20px',
-                background: 'rgba(255,255,255,0.05)',
-                border: '1px solid rgba(255,255,255,0.15)',
-                borderRadius: '10px',
-                color: 'var(--text-secondary)',
-                fontSize: '14px',
-                cursor: 'pointer',
-              }}
+              type="button"
+              className="btn-diagnosis-secondary"
               onClick={() => {
                 setSymptoms('');
                 setPatientInfo({ age: '', sex: '', history: '' });
@@ -196,36 +141,28 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
           </div>
         </div>
 
-        {/* Results Panel */}
-        <div style={{ background: 'var(--panel-bg)', borderRadius: '16px', padding: '24px', border: '1px solid var(--border-color)', maxHeight: '80vh', overflowY: 'auto' }}>
-          <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '20px' }}>
+        <div className="diagnosis-panel diagnosis-panel--scroll">
+          <h2 style={{ fontSize: '20px', fontWeight: 600, color: 'var(--app-fg)', marginBottom: '20px' }}>
             🎯 Differential Diagnosis
           </h2>
 
           {loading ? (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '60px 20px', gap: '16px' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                border: '4px solid rgba(0,255,136,0.2)',
-                borderTopColor: 'var(--accent-1)',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite',
-              }}></div>
-              <p>Analyzing symptoms and generating differential diagnosis...</p>
+              <div className="simple-tool-spinner diagnosis-spinner" />
+              <p style={{ color: 'var(--app-fg-muted)' }}>Analyzing symptoms and generating differential diagnosis...</p>
             </div>
           ) : error ? (
-            <div style={{ padding: '20px', background: 'rgba(255,107,107,0.1)', border: '1px solid rgba(255,107,107,0.3)', borderRadius: '12px', color: '#ff6b6b' }}>
+            <div className="diagnosis-error-box">
               <strong>Error:</strong> {error}
             </div>
           ) : results ? (
-            <div style={{ color: 'var(--text-primary)', lineHeight: 1.8, fontSize: '15px', whiteSpace: 'pre-wrap' }}>
+            <div className="diagnosis-results-body">
               {results}
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
               <div style={{ fontSize: '64px', marginBottom: '16px', opacity: 0.3 }}>🔍</div>
-              <p>Enter patient symptoms and click "Generate DDx" to begin</p>
+              <p>Enter patient symptoms and click &quot;Generate DDx&quot; to begin</p>
             </div>
           )}
         </div>

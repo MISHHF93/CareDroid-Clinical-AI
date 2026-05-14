@@ -156,6 +156,9 @@ html[data-theme='light'] :where(select) {
   .drug-results,
   .drug-interaction-card,
   .protocol-card,
+  .simple-tool-result-panel,
+  .simple-tool-chip-btn,
+  .diagnosis-panel,
   .diagnosis-card,
   .form-section,
   .settings-section,
@@ -181,7 +184,8 @@ html[data-theme='light'] :where(select) {
   .calculator-card,
   .drug-interaction-card,
   .protocol-card,
-  .diagnosis-card
+  .diagnosis-card,
+  .simple-tool-chip-btn
 ):hover {
   background: color-mix(in srgb, var(--app-surface-1) 88%, var(--app-accent) 8%) !important;
   border-color: color-mix(in srgb, var(--app-accent) 42%, var(--app-panel-border)) !important;
@@ -219,7 +223,7 @@ html[data-theme='light'] :where(select) {
   color: var(--app-danger-contrast) !important;
 }
 
-:where(.medication-input, .calc-input-field, .calc-select-field, .context-input, .context-select, .context-textarea, .lab-input-field) {
+:where(.medication-input, .calc-input-field, .calc-select-field, .context-input, .context-select, .context-textarea, .lab-input-field, .simple-tool-search-input, .diagnosis-field) {
   background: var(--app-input-bg) !important;
   border-color: var(--app-input-border) !important;
   color: var(--app-fg) !important;

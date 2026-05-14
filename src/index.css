@@ -459,7 +459,7 @@ a, button, input, select, textarea {
   font-size: var(--font-16);
   font-weight: 600;
   background: var(--accent-gradient);
-  color: var(--navy-ink);
+  color: var(--app-accent-contrast);
   border: none;
   border-radius: var(--radius-md);
   cursor: pointer;

@@ -229,7 +229,7 @@
 }
 
 .tool-card-action.active {
-  color: #f59e0b;
+  color: var(--app-warning);
   border-color: rgba(245, 158, 11, 0.5);
   background: rgba(245, 158, 11, 0.15);
 }
@@ -316,7 +316,7 @@
 }
 
 .feature-icon {
-  color: #10b981;
+  color: var(--app-success);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -422,16 +422,16 @@
 }
 
 .tip-card {
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--app-on-solid) 14%, transparent);
   backdrop-filter: blur(10px);
   padding: 24px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid color-mix(in srgb, var(--app-on-solid) 22%, transparent);
   transition: all 0.3s;
 }
 
 .tip-card:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: color-mix(in srgb, var(--app-on-solid) 20%, transparent);
   transform: translateY(-4px);
 }
 
@@ -440,7 +440,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 12px;
-  color: rgba(255, 255, 255, 0.95);
+  color: color-mix(in srgb, var(--app-on-solid) 94%, transparent);
 }
 
 .tip-card h3 {

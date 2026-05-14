@@ -31,8 +31,8 @@
 
 .calculator-card {
   padding: 20px;
-  background: var(--panel-bg, #1a1f35);
-  border: 2px solid rgba(255,255,255,0.1);
+  background: var(--app-surface-1);
+  border: 2px solid var(--app-panel-border);
   border-radius: 16px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -91,7 +91,7 @@
 
 .calculator-inputs,
 .calculator-results {
-  background: var(--panel-bg, #1a1f35);
+  background: var(--app-surface-1);
   border-radius: 16px;
   padding: 24px;
   border: 1px solid var(--border-color);
@@ -132,8 +132,8 @@
 .calc-select-field {
   width: 100%;
   padding: 12px 16px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: var(--app-overlay-on-surface);
+  border: 1px solid var(--app-input-border);
   border-radius: 8px;
   color: var(--text-primary);
   font-size: 15px;
@@ -145,7 +145,7 @@
 .calc-select-field:focus {
   outline: none;
   border-color: var(--accent-1);
-  background: rgba(255,255,255,0.08);
+  background: var(--app-overlay-on-surface-strong);
 }
 
 .calc-checkbox-group {
@@ -153,7 +153,7 @@
   align-items: center;
   gap: 10px;
   padding: 12px;
-  background: rgba(255,255,255,0.03);
+  background: color-mix(in srgb, var(--app-fg) 5%, transparent);
   border-radius: 8px;
 }
 
@@ -206,8 +206,8 @@
 
 .calc-reset-btn {
   padding: 14px 20px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: var(--app-overlay-on-surface);
+  border: 1px solid var(--app-input-border);
   border-radius: 10px;
   color: var(--text-secondary);
   font-size: 14px;
@@ -217,8 +217,8 @@
 }
 
 .calc-reset-btn:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.25);
+  background: var(--app-overlay-on-surface-strong);
+  border-color: var(--app-panel-border);
   color: var(--text-primary);
 }
 
@@ -300,7 +300,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: rgba(255,255,255,0.03);
+  background: color-mix(in srgb, var(--app-fg) 5%, transparent);
   border-radius: 8px;
   margin-bottom: 8px;
 }
@@ -315,14 +315,14 @@
   font-weight: 600;
   color: var(--accent-2);
   padding: 4px 12px;
-  background: rgba(0,255,255,0.1);
+  background: color-mix(in srgb, var(--app-accent-2) 14%, transparent);
   border-radius: 6px;
 }
 
 /* Clinical Interpretation */
 .calc-interpretation-box {
   padding: 20px;
-  background: rgba(255,255,255,0.03);
+  background: color-mix(in srgb, var(--app-fg) 5%, transparent);
   border-radius: 12px;
   border-left: 4px solid var(--accent-1);
   margin-bottom: 20px;
@@ -330,12 +330,12 @@
 
 .calc-interpretation-box.critical {
   border-left-color: var(--danger);
-  background: rgba(255,107,107,0.05);
+  background: color-mix(in srgb, var(--app-danger) 12%, transparent);
 }
 
 .calc-interpretation-box.warning {
   border-left-color: var(--warning);
-  background: rgba(255,193,7,0.05);
+  background: color-mix(in srgb, var(--app-warning) 14%, transparent);
 }
 
 .calc-interpretation-title {
@@ -356,7 +356,7 @@
 /* References */
 .calc-references {
   padding: 16px;
-  background: rgba(255,255,255,0.02);
+  background: color-mix(in srgb, var(--app-fg) 3%, transparent);
   border-radius: 8px;
   margin-top: 20px;
 }
@@ -406,8 +406,8 @@
 /* Error State */
 .calc-error {
   padding: 16px;
-  background: rgba(255,107,107,0.1);
-  border: 1px solid rgba(255,107,107,0.3);
+  background: color-mix(in srgb, var(--app-danger) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-danger) 40%, transparent);
   border-radius: 10px;
   color: var(--danger);
   margin-bottom: 20px;

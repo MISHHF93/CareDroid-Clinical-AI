@@ -17,7 +17,7 @@
 
 /* Input Panel */
 .lab-input-panel {
-  background: var(--panel-bg, #1a1f35);
+  background: var(--app-surface-1);
   border-radius: 16px;
   padding: 24px;
   border: 1px solid var(--border-color);
@@ -87,7 +87,7 @@
 .context-select:focus {
   outline: none;
   border-color: var(--accent-1);
-  background: rgba(255,255,255,0.08);
+  background: var(--app-overlay-on-surface-strong);
 }
 
 .context-textarea {
@@ -106,7 +106,7 @@
 .context-textarea:focus {
   outline: none;
   border-color: var(--accent-1);
-  background: rgba(255,255,255,0.08);
+  background: var(--app-overlay-on-surface-strong);
 }
 
 /* Lab Entry Form */
@@ -144,7 +144,7 @@
 .lab-input-field:focus {
   outline: none;
   border-color: var(--accent-1);
-  background: rgba(255,255,255,0.08);
+  background: var(--app-overlay-on-surface-strong);
 }
 
 .lab-add-button {
@@ -187,7 +187,7 @@
 }
 
 .lab-values-list::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.05);
+  background: var(--app-overlay-on-surface);
   border-radius: 3px;
 }
 
@@ -201,15 +201,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px;
-  background: rgba(255,255,255,0.03);
+  background: color-mix(in srgb, var(--app-fg) 5%, transparent);
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--app-input-border);
   transition: all 0.2s ease;
 }
 
 .lab-value-item:hover {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.15);
+  background: var(--app-overlay-on-surface);
+  border-color: var(--app-input-border);
 }
 
 .lab-value-info {
@@ -232,8 +232,8 @@
 
 .lab-value-remove {
   padding: 6px 12px;
-  background: rgba(255,107,107,0.1);
-  border: 1px solid rgba(255,107,107,0.2);
+  background: color-mix(in srgb, var(--app-danger) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-danger) 35%, transparent);
   border-radius: 6px;
   color: var(--danger);
   font-size: 13px;
@@ -242,8 +242,8 @@
 }
 
 .lab-value-remove:hover {
-  background: rgba(255,107,107,0.2);
-  border-color: rgba(255,107,107,0.4);
+  background: color-mix(in srgb, var(--app-danger) 22%, transparent);
+  border-color: color-mix(in srgb, var(--app-danger) 50%, transparent);
 }
 
 .lab-values-empty {
@@ -291,8 +291,8 @@
 .lab-clear-button,
 .lab-load-example-button {
   padding: 14px 20px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.15);
+  background: var(--app-overlay-on-surface);
+  border: 1px solid var(--app-input-border);
   border-radius: 10px;
   color: var(--text-secondary);
   font-size: 14px;
@@ -307,14 +307,14 @@
 
 .lab-clear-button:hover,
 .lab-load-example-button:hover {
-  background: rgba(255,255,255,0.08);
-  border-color: rgba(255,255,255,0.25);
+  background: var(--app-overlay-on-surface-strong);
+  border-color: var(--app-panel-border);
   color: var(--text-primary);
 }
 
 /* Results Panel */
 .lab-results-panel {
-  background: var(--panel-bg, #1a1f35);
+  background: var(--app-surface-1);
   border-radius: 16px;
   padding: 24px;
   border: 1px solid var(--border-color);
@@ -327,7 +327,7 @@
 }
 
 .lab-results-panel::-webkit-scrollbar-track {
-  background: rgba(255,255,255,0.05);
+  background: var(--app-overlay-on-surface);
   border-radius: 4px;
 }
 
@@ -379,8 +379,8 @@
 
 .lab-results-error {
   padding: 20px;
-  background: rgba(255,107,107,0.1);
-  border: 1px solid rgba(255,107,107,0.3);
+  background: color-mix(in srgb, var(--app-danger) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--app-danger) 40%, transparent);
   border-radius: 12px;
   color: var(--danger);
 }
@@ -395,9 +395,9 @@
 
 .lab-stat-card {
   padding: 16px;
-  background: rgba(255,255,255,0.03);
+  background: color-mix(in srgb, var(--app-fg) 5%, transparent);
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--app-panel-border);
   text-align: center;
 }
 
@@ -416,8 +416,8 @@
 }
 
 .lab-stat-card.critical {
-  background: rgba(255,107,107,0.1);
-  border-color: rgba(255,107,107,0.3);
+  background: color-mix(in srgb, var(--app-danger) 14%, transparent);
+  border-color: color-mix(in srgb, var(--app-danger) 38%, transparent);
 }
 
 .lab-stat-card.critical .lab-stat-value {
@@ -427,7 +427,7 @@
 /* Overall Interpretation */
 .lab-overall-interpretation {
   padding: 20px;
-  background: rgba(0,255,136,0.05);
+  background: color-mix(in srgb, var(--app-accent) 10%, transparent);
   border-left: 4px solid var(--accent-1);
   border-radius: 10px;
   margin-bottom: 24px;
@@ -436,7 +436,7 @@
 }
 
 .lab-overall-interpretation.critical {
-  background: rgba(255,107,107,0.1);
+  background: color-mix(in srgb, var(--app-danger) 14%, transparent);
   border-left-color: var(--danger);
 }
 
@@ -476,12 +476,12 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid var(--app-divider-on-surface);
 }
 
 .lab-values-table td {
   padding: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid var(--app-divider-on-surface);
 }
 
 .lab-status-badge {
@@ -495,19 +495,19 @@
 }
 
 .lab-status-badge.normal {
-  background: rgba(0,255,136,0.15);
+  background: color-mix(in srgb, var(--app-accent) 16%, transparent);
   color: var(--accent-1);
 }
 
 .lab-status-badge.high,
 .lab-status-badge.low {
-  background: rgba(255,193,7,0.15);
+  background: color-mix(in srgb, var(--app-warning) 18%, transparent);
   color: var(--warning);
 }
 
 .lab-status-badge.critical-high,
 .lab-status-badge.critical-low {
-  background: rgba(255,107,107,0.15);
+  background: color-mix(in srgb, var(--app-danger) 18%, transparent);
   color: var(--danger);
   animation: pulse 2s ease-in-out infinite;
 }
@@ -519,9 +519,9 @@
 
 .lab-interpretation-box {
   padding: 16px;
-  background: rgba(255,255,255,0.03);
+  background: color-mix(in srgb, var(--app-fg) 5%, transparent);
   border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--app-input-border);
 }
 
 .lab-interpretation-section {
@@ -560,8 +560,8 @@
 /* Critical Values Alert */
 .lab-critical-alert {
   padding: 20px;
-  background: rgba(255,107,107,0.1);
-  border: 2px solid rgba(255,107,107,0.4);
+  background: color-mix(in srgb, var(--app-danger) 16%, transparent);
+  border: 2px solid color-mix(in srgb, var(--app-danger) 45%, transparent);
   border-radius: 12px;
   margin-bottom: 24px;
   animation: alertPulse 2s ease-in-out infinite;
@@ -569,12 +569,12 @@
 
 @keyframes alertPulse {
   0%, 100% {
-    border-color: rgba(255,107,107,0.4);
-    box-shadow: 0 0 0 0 rgba(255,107,107,0.4);
+    border-color: color-mix(in srgb, var(--app-danger) 45%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--app-danger) 35%, transparent);
   }
   50% {
-    border-color: rgba(255,107,107,0.6);
-    box-shadow: 0 0 0 8px rgba(255,107,107,0);
+    border-color: color-mix(in srgb, var(--app-danger) 58%, transparent);
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--app-danger) 0%, transparent);
   }
 }
 
@@ -615,7 +615,7 @@
 /* Disclaimer */
 .lab-disclaimer {
   padding: 16px;
-  background: rgba(255,193,7,0.1);
+  background: color-mix(in srgb, var(--app-warning) 14%, transparent);
   border-left: 4px solid var(--warning);
   border-radius: 8px;
   margin-top: 24px;

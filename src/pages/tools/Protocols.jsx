@@ -58,19 +58,11 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
 
   return (
     <ToolPageLayout tool={toolConfig} embedded={embedded} onCloseEmbedded={onCloseEmbedded} results={results}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '24px' }}>
+      <div className="simple-tool-page-inner">
         <div style={{ marginBottom: '24px' }}>
           <input
             type="text"
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: '10px',
-              color: 'var(--text-primary)',
-              fontSize: '16px',
-            }}
+            className="simple-tool-search-input"
             placeholder="Search for a protocol (e.g., Sepsis, STEMI, DKA)..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -82,15 +74,8 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
           {commonProtocols.map(protocol => (
             <button
               key={protocol}
-              style={{
-                padding: '12px 16px',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.1)',
-                borderRadius: '8px',
-                color: 'var(--text-primary)',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-              }}
+              type="button"
+              className="simple-tool-chip-btn"
               onClick={() => { setQuery(protocol); handleSearch(protocol); }}
             >
               {protocol}
@@ -100,15 +85,15 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div style={{ display: 'inline-block', width: '40px', height: '40px', border: '4px solid rgba(0,255,136,0.2)', borderTopColor: 'var(--accent-1)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
-            <p style={{ marginTop: '16px' }}>Loading protocol...</p>
+            <div className="simple-tool-spinner" />
+            <p style={{ marginTop: '16px', color: 'var(--app-fg-muted)' }}>Loading protocol...</p>
           </div>
         ) : results ? (
-          <div style={{ background: 'var(--panel-bg)', borderRadius: '16px', padding: '24px', border: '1px solid var(--border-color)', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+          <div className="simple-tool-result-panel">
             {results}
           </div>
         ) : (
-          <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-secondary)' }}>
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--app-fg-muted)' }}>
             <div style={{ fontSize: '64px', marginBottom: '16px', opacity: 0.3 }}>📋</div>
             <p>Search for a protocol or click a common protocol above</p>
           </div>

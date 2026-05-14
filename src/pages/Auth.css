@@ -14,14 +14,14 @@
   font-size: clamp(1.25rem, 4vw, 1.5rem);
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--text-color, #f1f5f9);
+  color: var(--text-color);
 }
 
 .auth-panel__subtitle {
   margin: 8px 0 0;
   font-size: 0.875rem;
   line-height: 1.45;
-  color: var(--muted-text, #94a3b8);
+  color: var(--muted-text);
 }
 
 /* Sign in / Create account toggle */
@@ -31,8 +31,8 @@
   margin-bottom: 20px;
   padding: 4px;
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.08));
+  background: var(--app-overlay-on-surface);
+  border: 1px solid var(--app-panel-border);
 }
 
 .auth-segment__btn {
@@ -43,30 +43,30 @@
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
-  color: var(--muted-text, #94a3b8);
+  color: var(--muted-text);
   background: transparent;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
 .auth-segment__btn:hover {
-  color: var(--text-color, #f1f5f9);
+  color: var(--text-color);
 }
 
 .auth-segment__btn[aria-selected='true'] {
-  background: rgba(0, 255, 136, 0.12);
-  color: var(--text-color, #f1f5f9);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  background: color-mix(in srgb, var(--app-accent) 14%, transparent);
+  color: var(--text-color);
+  box-shadow: 0 1px 0 var(--app-divider-on-surface);
 }
 
 .auth-segment-caption {
   margin: 0 0 8px;
   font-size: 0.75rem;
   line-height: 1.4;
-  color: var(--muted-text, #94a3b8);
+  color: var(--muted-text);
 }
 
 .auth-segment-caption strong {
-  color: var(--text-color, #e2e8f0);
+  color: var(--text-color);
 }
 
 /* OAuth primary row (Google / LinkedIn) */
@@ -90,9 +90,9 @@
   min-height: 46px;
   padding: 10px 14px;
   border-radius: 10px;
-  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.12));
-  background: rgba(255, 255, 255, 0.04);
-  color: var(--text-color, #f1f5f9);
+  border: 1px solid var(--app-input-border);
+  background: var(--app-input-bg);
+  color: var(--text-color);
   font-size: 0.875rem;
   font-weight: 600;
   font-family: inherit;
@@ -108,8 +108,8 @@ button.auth-oauth-btn {
 }
 
 .auth-oauth-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.18);
+  background: var(--app-input-bg-hover);
+  border-color: var(--app-panel-border);
 }
 
 .auth-oauth-btn__brand {
@@ -133,7 +133,7 @@ button.auth-oauth-btn {
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--muted-text, #64748b);
+  color: var(--muted-text);
 }
 
 .auth-or-divider::before,
@@ -141,7 +141,7 @@ button.auth-oauth-btn {
   content: '';
   flex: 1;
   height: 1px;
-  background: var(--panel-border, rgba(255, 255, 255, 0.1));
+  background: var(--app-divider-on-surface);
 }
 
 /* One-click developer sign-in (dev / localhost / VITE_SHOW_DEMO_AUTH) */
@@ -178,7 +178,7 @@ button.auth-oauth-btn {
   margin: 10px 0 0;
   font-size: 0.72rem;
   line-height: 1.45;
-  color: var(--muted-text, #94a3b8);
+  color: var(--muted-text);
 }
 
 .auth-dev-code {
@@ -186,8 +186,8 @@ button.auth-oauth-btn {
   font-size: 0.68rem;
   padding: 0.1em 0.35em;
   border-radius: 4px;
-  background: rgba(0, 0, 0, 0.25);
-  color: var(--accent-secondary, #22d3ee);
+  background: var(--app-code-bg);
+  color: var(--accent-2);
 }
 
 .auth-dev-oneclick__alt {
@@ -210,7 +210,7 @@ button.auth-oauth-btn {
 .auth-magic {
   margin-top: 18px;
   padding-top: 16px;
-  border-top: 1px solid var(--panel-border, rgba(255, 255, 255, 0.08));
+  border-top: 1px solid var(--app-divider-on-surface);
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -236,9 +236,9 @@ button.auth-oauth-btn {
   min-height: 44px;
   padding: 10px 14px;
   border-radius: 10px;
-  border: 1px solid var(--panel-border, rgba(255, 255, 255, 0.1));
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-color, #f1f5f9);
+  border: 1px solid var(--app-input-border);
+  background: var(--app-input-bg);
+  color: var(--text-color);
   font-size: 0.875rem;
   text-align: left;
   text-decoration: none;
@@ -247,8 +247,8 @@ button.auth-oauth-btn {
 }
 
 .auth-link-btn:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(0, 255, 136, 0.25);
+  background: var(--app-input-bg-hover);
+  border-color: color-mix(in srgb, var(--app-accent) 28%, var(--app-input-border));
 }
 
 .auth-link-btn__icon {
@@ -258,7 +258,7 @@ button.auth-oauth-btn {
 }
 
 .auth-link-btn__icon--brand {
-  color: var(--text-color, #e2e8f0);
+  color: var(--text-color);
   opacity: 1;
 }
 
@@ -272,14 +272,14 @@ button.auth-oauth-btn {
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--muted-text, #64748b);
+  color: var(--muted-text);
 }
 
 .auth-panel__footer {
   margin-top: 22px;
   padding-top: 16px;
   padding-bottom: 4px;
-  border-top: 1px solid var(--panel-border, rgba(255, 255, 255, 0.08));
+  border-top: 1px solid var(--app-divider-on-surface);
 }
 
 .auth-back-link {
@@ -314,7 +314,7 @@ button.auth-oauth-btn {
   margin: 8px 0 20px;
   font-size: 0.875rem;
   line-height: 1.5;
-  color: var(--muted-text, #94a3b8);
+  color: var(--muted-text);
 }
 
 .auth-twofa__input {

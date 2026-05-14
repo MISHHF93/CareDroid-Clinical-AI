@@ -53,12 +53,14 @@
   border-radius: 8px;
   font-size: 15px;
   transition: all 0.2s;
+  color: var(--app-fg);
+  background: var(--app-input-bg);
 }
 
 .medication-input:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 0 3px var(--app-focus);
 }
 
 .btn-remove-med {
@@ -98,7 +100,7 @@
 .btn-add-med:hover {
   border-color: var(--primary-color);
   color: var(--primary-color);
-  background: rgba(79, 70, 229, 0.05);
+  background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
 }
 
 .btn-check-interactions {
@@ -130,8 +132,8 @@
 }
 
 .result-card {
-  background: var(--panel-background);
-  border: 1px solid var(--panel-border);
+  background: var(--app-surface-1);
+  border: 1px solid var(--app-panel-border);
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 24px;
@@ -185,8 +187,8 @@
 }
 
 .warning-item {
-  background: #FEF3C7;
-  border: 1px solid #FCD34D;
+  background: color-mix(in srgb, var(--app-warning) 22%, var(--app-surface-1));
+  border: 1px solid color-mix(in srgb, var(--app-warning) 42%, transparent);
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 12px;
@@ -195,42 +197,44 @@
 .warning-drug {
   font-weight: 700;
   font-size: 15px;
-  color: #92400E;
+  color: var(--app-warning-contrast);
   margin-bottom: 8px;
 }
 
 .warning-text {
-  color: #78350F;
+  color: var(--app-warning-contrast);
   margin-bottom: 8px;
   font-size: 14px;
+  opacity: 0.92;
 }
 
 .warning-recommendation {
   font-size: 13px;
-  color: #92400E;
+  color: var(--app-warning-contrast);
+  opacity: 0.88;
 }
 
 .success-card {
-  background: #ECFDF5;
-  border-color: #10B981;
+  background: color-mix(in srgb, var(--app-success) 14%, var(--app-surface-1));
+  border: 1px solid color-mix(in srgb, var(--app-success) 38%, transparent);
 }
 
 .success-card .result-title {
-  color: #065F46;
+  color: var(--app-success);
 }
 
 .success-card p {
-  color: #047857;
+  color: var(--app-fg-muted);
   margin-bottom: 8px;
 }
 
 .disclaimer {
   font-size: 12px;
   font-style: italic;
-  color: #059669 !important;
+  color: var(--app-success) !important;
   margin-top: 12px;
   padding-top: 12px;
-  border-top: 1px solid #6EE7B7;
+  border-top: 1px solid color-mix(in srgb, var(--app-success) 35%, transparent);
 }
 
 .quick-reference {
@@ -254,17 +258,17 @@
 }
 
 .reference-item {
-  background: rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--app-on-solid) 14%, transparent);
   backdrop-filter: blur(10px);
   padding: 20px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid color-mix(in srgb, var(--app-on-solid) 24%, transparent);
 }
 
 .reference-item h4 {
   font-size: 16px;
   margin-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid color-mix(in srgb, var(--app-on-solid) 22%, transparent);
   padding-bottom: 8px;
 }
 

@@ -21,6 +21,9 @@ html {
   --app-surface-elevated: #121a2e;
   --app-surface-glass: rgba(15, 23, 42, 0.72);
   --app-border-subtle: rgba(255, 255, 255, 0.12);
+  --app-divider-on-surface: color-mix(in srgb, var(--app-fg) 12%, transparent);
+  --app-overlay-on-surface: color-mix(in srgb, var(--app-fg) 7%, transparent);
+  --app-overlay-on-surface-strong: color-mix(in srgb, var(--app-fg) 14%, transparent);
   --app-shadow-1: 0 8px 24px rgba(2, 6, 23, 0.28);
   --app-shadow-2: 0 14px 40px rgba(2, 6, 23, 0.38);
   --app-accent: #00ff88;
@@ -130,6 +133,9 @@ html[data-theme='dark'] {
   --app-surface-elevated: #121a2e;
   --app-surface-glass: rgba(15, 23, 42, 0.72);
   --app-border-subtle: rgba(255, 255, 255, 0.12);
+  --app-divider-on-surface: color-mix(in srgb, var(--app-fg) 12%, transparent);
+  --app-overlay-on-surface: color-mix(in srgb, var(--app-fg) 7%, transparent);
+  --app-overlay-on-surface-strong: color-mix(in srgb, var(--app-fg) 14%, transparent);
   --app-shadow-1: 0 8px 24px rgba(2, 6, 23, 0.28);
   --app-shadow-2: 0 14px 40px rgba(2, 6, 23, 0.38);
   --app-accent: #00ff88;
@@ -238,6 +244,9 @@ html[data-theme='light'] {
   --app-surface-elevated: #e8edf7;
   --app-surface-glass: rgba(255, 255, 255, 0.78);
   --app-border-subtle: rgba(15, 23, 42, 0.1);
+  --app-divider-on-surface: color-mix(in srgb, var(--app-fg) 12%, transparent);
+  --app-overlay-on-surface: color-mix(in srgb, var(--app-fg) 7%, transparent);
+  --app-overlay-on-surface-strong: color-mix(in srgb, var(--app-fg) 14%, transparent);
   --app-shadow-1: 0 8px 24px rgba(15, 23, 42, 0.1);
   --app-shadow-2: 0 14px 40px rgba(15, 23, 42, 0.14);
   --app-accent: #00c978;

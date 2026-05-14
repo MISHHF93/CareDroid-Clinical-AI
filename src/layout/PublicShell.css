@@ -78,7 +78,7 @@
 .btn-public-primary {
   padding: var(--space-2) var(--space-4);
   background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
-  color: var(--navy-bg);
+  color: var(--app-accent-contrast);
   border: none;
   border-radius: var(--radius-md);
   font-size: var(--font-14);
@@ -104,8 +104,8 @@
 
 /* Footer */
 .public-footer {
-  background: var(--navy-ink);
-  border-top: 1px solid var(--panel-border);
+  background: var(--app-surface-elevated);
+  border-top: 1px solid var(--app-panel-border);
   padding: var(--space-8) var(--space-6) var(--space-6);
 }
 
@@ -147,15 +147,15 @@
 }
 
 .badge-hipaa {
-  background: rgba(0, 255, 136, 0.15);
+  background: color-mix(in srgb, var(--app-accent) 16%, transparent);
   color: var(--accent-1);
-  border: 1px solid rgba(0, 255, 136, 0.3);
+  border: 1px solid color-mix(in srgb, var(--app-accent) 32%, transparent);
 }
 
 .badge-version {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--muted-text);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--app-overlay-on-surface);
+  color: var(--app-fg-muted);
+  border: 1px solid var(--app-panel-border);
 }
 
 .footer-links {
@@ -182,7 +182,7 @@
   max-width: min(1760px, 100%);
   margin: 0 auto;
   padding-top: var(--space-6);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--app-divider-on-surface);
   text-align: center;
 }
 
@@ -194,7 +194,7 @@
 
 .footer-disclaimer {
   font-style: italic;
-  color: rgba(248, 250, 252, 0.4);
+  color: var(--app-fg-muted);
 }
 
 /* Mobile responsiveness */
@@ -230,7 +230,7 @@
   }
 
   .footer-section:first-child {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--app-divider-on-surface);
     padding-bottom: var(--space-5);
   }
 }

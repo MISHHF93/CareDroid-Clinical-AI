@@ -1,5 +1,10 @@
 /**
  * Maps historical variable names to semantic --app-* tokens.
+ *
+ * Authoring guide:
+ * - Prefer --app-* from theme-tokens.css for new CSS (especially --app-fg, --app-surface-1,
+ *   --app-panel-border, --app-divider-on-surface, --app-overlay-on-surface).
+ * - Legacy aliases below stay for existing components; migrate toward --app-* when touching files.
  */
 html {
   --navy-bg: var(--app-bg);
@@ -20,6 +25,8 @@ html {
   --surface-2: var(--app-surface-2);
   --surface-glass: var(--app-surface-glass);
   --border-subtle: var(--app-border-subtle);
+  --divider-on-surface: var(--app-divider-on-surface);
+  --overlay-on-surface: var(--app-overlay-on-surface);
   --shadow-1: var(--app-shadow-1);
   --shadow-2: var(--app-shadow-2);
   --accent-1: var(--app-accent);
