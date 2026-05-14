@@ -24,7 +24,7 @@
 .back-button {
   display: inline-flex;
   align-items: center;
-  color: var(--primary-color, #4a9eff);
+  color: var(--primary-color, var(--primary-color));
   text-decoration: none;
   font-size: 0.95rem;
   margin-bottom: 1rem;
@@ -38,7 +38,7 @@
 .legal-header h1 {
   font-size: 2.5rem;
   margin: 0;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
 }
 
 .legal-content {
@@ -49,7 +49,7 @@
 
 .legal-content h2 {
   font-size: 1.8rem;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
   margin-top: 2.5rem;
   margin-bottom: 1rem;
   border-bottom: 1px solid var(--border-color, #2a2b2e);
@@ -58,14 +58,14 @@
 
 .legal-content h3 {
   font-size: 1.4rem;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
   margin-top: 2rem;
   margin-bottom: 0.8rem;
 }
 
 .legal-content h4 {
   font-size: 1.2rem;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
   margin-top: 1.5rem;
   margin-bottom: 0.6rem;
 }
@@ -83,14 +83,14 @@
 }
 
 .legal-content a {
-  color: var(--primary-color, #4a9eff);
+  color: var(--primary-color, var(--primary-color));
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s;
 }
 
 .legal-content a:hover {
-  border-bottom-color: var(--primary-color, #4a9eff);
+  border-bottom-color: var(--primary-color, var(--primary-color));
 }
 
 .legal-content code {
@@ -125,11 +125,11 @@
 .legal-content th {
   background: var(--bg-primary, #0a0b0d);
   font-weight: 600;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
 }
 
 .legal-content blockquote {
-  border-left: 4px solid var(--primary-color, #4a9eff);
+  border-left: 4px solid var(--primary-color, var(--primary-color));
   padding-left: 1rem;
   margin: 1rem 0;
   color: var(--text-secondary, #b8bcc2);
@@ -156,7 +156,7 @@
 }
 
 .legal-links a {
-  color: var(--primary-color, #4a9eff);
+  color: var(--primary-color, var(--primary-color));
   text-decoration: none;
   font-weight: 500;
   transition: color 0.2s;

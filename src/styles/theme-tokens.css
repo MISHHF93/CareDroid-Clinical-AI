@@ -28,14 +28,29 @@ html {
   --app-accent-interactive: #5b8def;
   --app-danger: #ff6b6b;
   --app-warning: #ffd166;
+  --app-success: #00ff88;
+  --app-info: #00ffff;
+  --app-focus: rgba(0, 255, 136, 0.34);
+  --app-hover: rgba(0, 255, 136, 0.08);
+  --app-disabled: rgba(148, 163, 184, 0.38);
+  --app-input-bg: rgba(255, 255, 255, 0.055);
+  --app-input-bg-hover: rgba(255, 255, 255, 0.085);
+  --app-input-border: rgba(255, 255, 255, 0.15);
+  --app-table-header-bg: rgba(0, 255, 136, 0.08);
+  --app-table-row-hover: rgba(0, 255, 136, 0.055);
+  --app-accent-contrast: #04111f;
+  --app-danger-contrast: #fff7f7;
+  --app-warning-contrast: #1f1600;
+  --app-success-contrast: #04111f;
+  --app-on-solid: #ffffff;
   --app-mesh-cyan: rgba(0, 255, 255, 0.09);
   --app-mesh-green: rgba(0, 255, 136, 0.11);
   --app-scrollbar-track: rgba(255, 255, 255, 0.06);
   --app-scrollbar-thumb: rgba(0, 255, 136, 0.32);
   --app-scrollbar-thumb-hover: rgba(0, 255, 136, 0.52);
   --app-code-bg: rgba(15, 23, 42, 0.85);
-  --app-tool-card-body-bg: rgba(248, 250, 252, 0.97);
-  --app-tool-card-body-fg: #0f172a;
+  --app-tool-card-body-bg: color-mix(in srgb, var(--app-surface-0) 92%, var(--app-accent) 4%);
+  --app-tool-card-body-fg: var(--app-fg);
 
   /* Sidebar rail (aligned to medical --app-* palette) */
   --sidebar-gradient-from: rgba(15, 23, 42, 0.96);
@@ -65,7 +80,7 @@ html {
   --sidebar-cta-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 35%, transparent);
   --sidebar-logo-surface: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--app-accent-interactive) 92%, white),
+    color-mix(in srgb, var(--app-accent-interactive) 92%, var(--app-on-solid)),
     color-mix(in srgb, var(--app-accent-interactive) 55%, #020617)
   );
   --sidebar-logo-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 32%, transparent);
@@ -90,7 +105,7 @@ html {
   --sidebar-hipaa-fg: var(--app-accent);
   --sidebar-signout-bg: color-mix(in srgb, var(--app-danger) 14%, transparent);
   --sidebar-signout-border: color-mix(in srgb, var(--app-danger) 32%, transparent);
-  --sidebar-signout-fg: color-mix(in srgb, var(--app-danger) 88%, white);
+  --sidebar-signout-fg: color-mix(in srgb, var(--app-danger) 88%, var(--app-on-solid));
   --sidebar-signout-hover-bg: color-mix(in srgb, var(--app-danger) 22%, transparent);
   --sidebar-signout-hover-border: color-mix(in srgb, var(--app-danger) 45%, transparent);
   --sidebar-signout-hover-fg: var(--app-danger);
@@ -98,49 +113,6 @@ html {
   --sidebar-tool-action-border: color-mix(in srgb, var(--app-fg) 14%, transparent);
   --sidebar-tool-action-fg: var(--app-fg-muted);
   --sidebar-mobile-drawer-shadow: 12px 0 40px rgba(2, 6, 23, 0.38);
-}
-
-/* No inline theme yet (e.g. static HTML): follow OS */
-@media (prefers-color-scheme: light) {
-  html:not([data-theme]) {
-    --app-blur-glass: 16px;
-    color-scheme: light;
-    --app-bg: #f4f7fc;
-    --app-navy-ink: #0f172a;
-    --app-fg: #0f172a;
-    --app-fg-muted: rgba(15, 23, 42, 0.68);
-    --app-panel-bg: rgba(15, 23, 42, 0.04);
-    --app-panel-border: rgba(15, 23, 42, 0.12);
-    --app-surface-0: rgba(255, 255, 255, 0.94);
-    --app-surface-1: rgba(255, 255, 255, 0.88);
-    --app-surface-2: rgba(255, 255, 255, 0.62);
-    --app-surface-elevated: #e8edf7;
-    --app-surface-glass: rgba(255, 255, 255, 0.78);
-    --app-border-subtle: rgba(15, 23, 42, 0.1);
-    --app-shadow-1: 0 8px 24px rgba(15, 23, 42, 0.1);
-    --app-shadow-2: 0 14px 40px rgba(15, 23, 42, 0.14);
-    --app-accent: #00c978;
-    --app-accent-2: #00c2d4;
-    --app-accent-interactive: #2563eb;
-    --app-danger: #dc2626;
-    --app-warning: #d97706;
-    --app-mesh-cyan: rgba(0, 194, 212, 0.07);
-    --app-mesh-green: rgba(0, 201, 120, 0.08);
-    --app-scrollbar-track: rgba(15, 23, 42, 0.06);
-    --app-scrollbar-thumb: rgba(37, 99, 235, 0.35);
-    --app-scrollbar-thumb-hover: rgba(37, 99, 235, 0.55);
-    --app-code-bg: rgba(241, 245, 249, 0.95);
-    --app-tool-card-body-bg: rgba(255, 255, 255, 0.98);
-    --app-tool-card-body-fg: #0f172a;
-
-    --sidebar-gradient-from: rgba(255, 255, 255, 0.97);
-    --sidebar-gradient-to: color-mix(in srgb, var(--app-surface-elevated) 88%, var(--app-bg));
-    --sidebar-fg-subtle: rgba(15, 23, 42, 0.42);
-    --sidebar-shadow: 4px 0 20px rgba(15, 23, 42, 0.08);
-    --sidebar-avatar-fg: var(--app-navy-ink);
-    --sidebar-cta-fg: #ffffff;
-    --sidebar-mobile-drawer-shadow: 12px 0 36px rgba(15, 23, 42, 0.14);
-  }
 }
 
 html[data-theme='dark'] {
@@ -165,14 +137,29 @@ html[data-theme='dark'] {
   --app-accent-interactive: #5b8def;
   --app-danger: #ff6b6b;
   --app-warning: #ffd166;
+  --app-success: #00ff88;
+  --app-info: #00ffff;
+  --app-focus: rgba(0, 255, 136, 0.34);
+  --app-hover: rgba(0, 255, 136, 0.08);
+  --app-disabled: rgba(148, 163, 184, 0.38);
+  --app-input-bg: rgba(255, 255, 255, 0.055);
+  --app-input-bg-hover: rgba(255, 255, 255, 0.085);
+  --app-input-border: rgba(255, 255, 255, 0.15);
+  --app-table-header-bg: rgba(0, 255, 136, 0.08);
+  --app-table-row-hover: rgba(0, 255, 136, 0.055);
+  --app-accent-contrast: #04111f;
+  --app-danger-contrast: #fff7f7;
+  --app-warning-contrast: #1f1600;
+  --app-success-contrast: #04111f;
+  --app-on-solid: #ffffff;
   --app-mesh-cyan: rgba(0, 255, 255, 0.09);
   --app-mesh-green: rgba(0, 255, 136, 0.11);
   --app-scrollbar-track: rgba(255, 255, 255, 0.06);
   --app-scrollbar-thumb: rgba(0, 255, 136, 0.32);
   --app-scrollbar-thumb-hover: rgba(0, 255, 136, 0.52);
   --app-code-bg: rgba(15, 23, 42, 0.85);
-  --app-tool-card-body-bg: rgba(248, 250, 252, 0.97);
-  --app-tool-card-body-fg: #0f172a;
+  --app-tool-card-body-bg: color-mix(in srgb, var(--app-surface-0) 92%, var(--app-accent) 4%);
+  --app-tool-card-body-fg: var(--app-fg);
 
   --sidebar-gradient-from: rgba(15, 23, 42, 0.96);
   --sidebar-gradient-to: rgba(8, 12, 22, 0.98);
@@ -201,7 +188,7 @@ html[data-theme='dark'] {
   --sidebar-cta-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 35%, transparent);
   --sidebar-logo-surface: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--app-accent-interactive) 92%, white),
+    color-mix(in srgb, var(--app-accent-interactive) 92%, var(--app-on-solid)),
     color-mix(in srgb, var(--app-accent-interactive) 55%, #020617)
   );
   --sidebar-logo-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 32%, transparent);
@@ -226,7 +213,7 @@ html[data-theme='dark'] {
   --sidebar-hipaa-fg: var(--app-accent);
   --sidebar-signout-bg: color-mix(in srgb, var(--app-danger) 14%, transparent);
   --sidebar-signout-border: color-mix(in srgb, var(--app-danger) 32%, transparent);
-  --sidebar-signout-fg: color-mix(in srgb, var(--app-danger) 88%, white);
+  --sidebar-signout-fg: color-mix(in srgb, var(--app-danger) 88%, var(--app-on-solid));
   --sidebar-signout-hover-bg: color-mix(in srgb, var(--app-danger) 22%, transparent);
   --sidebar-signout-hover-border: color-mix(in srgb, var(--app-danger) 45%, transparent);
   --sidebar-signout-hover-fg: var(--app-danger);
@@ -258,6 +245,21 @@ html[data-theme='light'] {
   --app-accent-interactive: #2563eb;
   --app-danger: #dc2626;
   --app-warning: #d97706;
+  --app-success: #047857;
+  --app-info: #0284c7;
+  --app-focus: rgba(0, 201, 120, 0.26);
+  --app-hover: rgba(0, 201, 120, 0.08);
+  --app-disabled: rgba(100, 116, 139, 0.34);
+  --app-input-bg: rgba(255, 255, 255, 0.9);
+  --app-input-bg-hover: rgba(255, 255, 255, 0.98);
+  --app-input-border: rgba(15, 23, 42, 0.14);
+  --app-table-header-bg: rgba(0, 201, 120, 0.08);
+  --app-table-row-hover: rgba(0, 201, 120, 0.06);
+  --app-accent-contrast: #04111f;
+  --app-danger-contrast: #fff7f7;
+  --app-warning-contrast: #1f1600;
+  --app-success-contrast: #f0fdf4;
+  --app-on-solid: #ffffff;
   --app-mesh-cyan: rgba(0, 194, 212, 0.07);
   --app-mesh-green: rgba(0, 201, 120, 0.08);
   --app-scrollbar-track: rgba(15, 23, 42, 0.06);
@@ -290,11 +292,11 @@ html[data-theme='light'] {
   --sidebar-control-hover-fg: var(--app-fg);
   --sidebar-cta-from: var(--app-accent-interactive);
   --sidebar-cta-to: color-mix(in srgb, var(--app-accent-interactive) 65%, #0f172a);
-  --sidebar-cta-fg: #ffffff;
+  --sidebar-cta-fg: var(--app-on-solid);
   --sidebar-cta-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 28%, transparent);
   --sidebar-logo-surface: linear-gradient(
     135deg,
-    color-mix(in srgb, var(--app-accent-interactive) 88%, white),
+    color-mix(in srgb, var(--app-accent-interactive) 88%, var(--app-on-solid)),
     color-mix(in srgb, var(--app-accent-interactive) 48%, #0f172a)
   );
   --sidebar-logo-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 22%, transparent);
@@ -323,7 +325,7 @@ html[data-theme='light'] {
   --sidebar-signout-hover-bg: color-mix(in srgb, var(--app-danger) 16%, transparent);
   --sidebar-signout-hover-border: color-mix(in srgb, var(--app-danger) 40%, transparent);
   --sidebar-signout-hover-fg: color-mix(in srgb, var(--app-danger) 92%, #450a0a);
-  --sidebar-tool-action-bg: color-mix(in srgb, var(--app-surface-elevated) 75%, white);
+  --sidebar-tool-action-bg: color-mix(in srgb, var(--app-surface-elevated) 75%, var(--app-on-solid));
   --sidebar-tool-action-border: color-mix(in srgb, var(--app-navy-ink) 10%, transparent);
   --sidebar-tool-action-fg: var(--app-fg-muted);
   --sidebar-mobile-drawer-shadow: 12px 0 36px rgba(15, 23, 42, 0.14);

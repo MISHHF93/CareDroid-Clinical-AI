@@ -234,8 +234,8 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete }) => {
   const getRoleColor = (role) => {
     const colors = {
       'Admin': { bg: '#ff6b6b', text: 'Admin' },
-      'Physician': { bg: '#00ffff', text: 'Physician' },
-      'Nurse': { bg: '#00ff88', text: 'Nurse' },
+      'Physician': { bg: 'var(--accent-2)', text: 'Physician' },
+      'Nurse': { bg: 'var(--accent-1)', text: 'Nurse' },
       'Student': { bg: '#9c27b0', text: 'Student' },
     };
     return colors[role] || colors['Student'];

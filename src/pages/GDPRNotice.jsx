@@ -34,7 +34,7 @@ export default function GDPRNotice() {
             fontSize: '32px',
             fontWeight: 700,
             marginBottom: '12px',
-            background: 'linear-gradient(135deg, #00ff88, #00ffff)',
+            background: 'linear-gradient(135deg, var(--accent-1), var(--accent-2))',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -106,9 +106,9 @@ export default function GDPRNotice() {
             padding: '16px',
             marginBottom: '32px'
           }}>
-            <h3 style={{ margin: '0 0 8px 0', color: '#00ff88' }}>Contact Our Data Protection Officer</h3>
+            <h3 style={{ margin: '0 0 8px 0', color: 'var(--accent-1)' }}>Contact Our Data Protection Officer</h3>
             <p style={{ margin: '0', color: 'var(--muted-text)', fontSize: '14px' }}>
-              For GDPR-related inquiries: <a href="mailto:dpo@caredroid.ai" style={{ color: '#00ff88' }}>dpo@caredroid.ai</a>
+              For GDPR-related inquiries: <a href="mailto:dpo@caredroid.ai" style={{ color: 'var(--accent-1)' }}>dpo@caredroid.ai</a>
             </p>
           </div>
 

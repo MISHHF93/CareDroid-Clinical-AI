@@ -123,7 +123,7 @@ export default function HelpCenter() {
             fontSize: '32px',
             fontWeight: 700,
             marginBottom: '12px',
-            background: 'linear-gradient(135deg, #00ff88, #00ffff)',
+            background: 'linear-gradient(135deg, var(--accent-1), var(--accent-2))',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             backgroundClip: 'text'
@@ -185,7 +185,7 @@ export default function HelpCenter() {
                           margin: '0 0 8px 0',
                           fontSize: '14px',
                           fontWeight: 600,
-                          color: '#00ff88'
+                          color: 'var(--accent-1)'
                         }}>
                           Q: {item.q}
                         </h3>
@@ -215,7 +215,7 @@ export default function HelpCenter() {
           borderRadius: '12px',
           textAlign: 'center'
         }}>
-          <h2 style={{ margin: '0 0 12px 0', fontSize: '18px', color: '#00ff88' }}>
+          <h2 style={{ margin: '0 0 12px 0', fontSize: '18px', color: 'var(--accent-1)' }}>
             Need Help?
           </h2>
           <p style={{ margin: '0 0 16px 0', color: 'var(--muted-text)', fontSize: '14px' }}>
@@ -223,7 +223,7 @@ export default function HelpCenter() {
           </p>
           <div style={{ display: 'grid', gap: '12px', fontSize: '14px' }}>
             <div>
-              Email: <a href="mailto:support@caredroid.ai" style={{ color: '#00ff88' }}>support@caredroid.ai</a>
+              Email: <a href="mailto:support@caredroid.ai" style={{ color: 'var(--accent-1)' }}>support@caredroid.ai</a>
             </div>
             <div>
               Response time: Within 24 hours

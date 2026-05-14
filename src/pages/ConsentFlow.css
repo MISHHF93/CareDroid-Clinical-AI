@@ -25,7 +25,7 @@
 .consent-header h1 {
   font-size: 2.2rem;
   margin: 0 0 0.5rem 0;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
 }
 
 .consent-header p {
@@ -58,9 +58,9 @@
 }
 
 .progress-step.active {
-  background: var(--primary-color, #4a9eff);
-  border-color: var(--primary-color, #4a9eff);
-  color: #ffffff;
+  background: var(--primary-color, var(--primary-color));
+  border-color: var(--primary-color, var(--primary-color));
+  color: var(--app-on-solid);
 }
 
 .progress-line {
@@ -87,7 +87,7 @@
 .consent-step h2 {
   font-size: 1.8rem;
   margin: 0 0 0.5rem 0;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
 }
 
 .step-description {
@@ -111,7 +111,7 @@
 }
 
 .consent-item:hover {
-  border-color: var(--primary-color, #4a9eff);
+  border-color: var(--primary-color, var(--primary-color));
 }
 
 .consent-checkbox {
@@ -143,12 +143,12 @@
 }
 
 .consent-checkbox:hover input ~ .checkmark {
-  border-color: var(--primary-color, #4a9eff);
+  border-color: var(--primary-color, var(--primary-color));
 }
 
 .consent-checkbox input:checked ~ .checkmark {
-  background-color: var(--primary-color, #4a9eff);
-  border-color: var(--primary-color, #4a9eff);
+  background-color: var(--primary-color, var(--primary-color));
+  border-color: var(--primary-color, var(--primary-color));
 }
 
 .checkmark:after {
@@ -159,7 +159,7 @@
   top: 3px;
   width: 6px;
   height: 11px;
-  border: solid white;
+  border: solid var(--app-on-solid);
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
@@ -169,21 +169,21 @@
 }
 
 .consent-label {
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
   font-size: 1.05rem;
   font-weight: 500;
   line-height: 1.5;
 }
 
 .consent-label a {
-  color: var(--primary-color, #4a9eff);
+  color: var(--primary-color, var(--primary-color));
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: border-color 0.2s;
 }
 
 .consent-label a:hover {
-  border-bottom-color: var(--primary-color, #4a9eff);
+  border-bottom-color: var(--primary-color, var(--primary-color));
 }
 
 .required {
@@ -209,7 +209,7 @@
 }
 
 .data-processors strong {
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
 }
 
 .medical-disclaimer {
@@ -227,7 +227,7 @@
 }
 
 .medical-disclaimer p {
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
   font-size: 0.95rem;
   margin: 0;
   line-height: 1.6;
@@ -235,14 +235,14 @@
 
 .info-box {
   background: rgba(74, 158, 255, 0.1);
-  border: 2px solid var(--primary-color, #4a9eff);
+  border: 2px solid var(--primary-color, var(--primary-color));
   border-radius: 12px;
   padding: 1.5rem;
   margin: 2rem 0;
 }
 
 .info-box h4 {
-  color: var(--primary-color, #4a9eff);
+  color: var(--primary-color, var(--primary-color));
   font-size: 1.1rem;
   margin: 0 0 1rem 0;
 }
@@ -292,8 +292,8 @@
 }
 
 .btn-primary {
-  background: var(--primary-color, #4a9eff);
-  color: #ffffff;
+  background: var(--primary-color, var(--primary-color));
+  color: var(--app-on-solid);
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -311,13 +311,13 @@
 
 .btn-secondary {
   background: transparent;
-  color: var(--text-primary, #ffffff);
+  color: var(--text-primary, var(--app-on-solid));
   border: 2px solid var(--border-color, #2a2b2e);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  border-color: var(--primary-color, #4a9eff);
-  color: var(--primary-color, #4a9eff);
+  border-color: var(--primary-color, var(--primary-color));
+  color: var(--primary-color, var(--primary-color));
 }
 
 .consent-footer {

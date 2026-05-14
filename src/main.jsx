@@ -211,7 +211,7 @@ try {
   logger.error('Failed to mount React app', { error, stack: error?.stack });
   
   document.body.innerHTML = `
-    <div style="padding: 20px; font-family: monospace; color: red; white-space: pre-wrap; background: #f5f5f5;">
+    <div style="padding: 20px; font-family: monospace; color: red; white-space: pre-wrap; background: var(--app-surface-1);">
       <h1>Error Loading Application</h1>
       <p>Error: ${error.message}</p>
       <p>Stack: ${error.stack}</p>

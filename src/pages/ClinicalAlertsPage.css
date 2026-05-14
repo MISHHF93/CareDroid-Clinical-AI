@@ -70,7 +70,7 @@
 
 .severity-select option {
   background: #1a1a1a;
-  color: white;
+  color: var(--app-on-solid);
 }
 
 .summary-badges {

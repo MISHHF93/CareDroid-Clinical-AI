@@ -17,7 +17,7 @@
 
 .offline-indicator-offline {
   background: linear-gradient(135deg, #ff6b6b, #ff8a80);
-  color: white;
+  color: var(--app-on-solid);
   box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
 }
 

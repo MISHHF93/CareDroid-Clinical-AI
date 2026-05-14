@@ -139,7 +139,7 @@ const Sidebar = ({
         }}
         onMouseLeave={(e) => {
           if (!isSelected) {
-            e.currentTarget.style.backgroundColor = 'var(--panel-background, white)';
+            e.currentTarget.style.backgroundColor = 'var(--panel-background)';
             e.currentTarget.style.borderColor = 'transparent';
           }
         }}
@@ -392,7 +392,7 @@ const Sidebar = ({
                 onClick={() => setShowWorkspaceModal(true)}
                 style={{
                   width: '100%',
-                  background: 'linear-gradient(135deg, #00ff88, #00ffff)',
+                  background: 'linear-gradient(135deg, var(--accent-1), var(--accent-2))',
                   border: 'none',
                   color: 'var(--navy-ink)',
                   borderRadius: '8px',

@@ -45,7 +45,7 @@
 
 .auth-shell-brand-icon {
   display: inline-flex;
-  color: var(--accent-primary, #00ff88);
+  color: var(--accent-primary, var(--accent-1));
 }
 
 .auth-shell-brand-text {

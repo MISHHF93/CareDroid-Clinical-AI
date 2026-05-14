@@ -212,8 +212,8 @@ export const Tag = ({
   size = 'sm',
 }) => {
   const colorMap = {
-    blue: '#00ffff',
-    green: '#00ff88',
+    blue: 'var(--accent-2)',
+    green: 'var(--accent-1)',
     red: '#ff6b6b',
     yellow: '#ffa502',
     purple: '#9c27b0',

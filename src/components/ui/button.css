@@ -102,7 +102,7 @@
 
 .btn-danger {
   background: linear-gradient(135deg, #ff6b6b, #ff5252);
-  color: white;
+  color: var(--app-on-solid);
   box-shadow: 0 4px 12px rgba(255, 107, 107, 0.25);
 }
 
@@ -112,7 +112,7 @@
 }
 
 .btn-success {
-  background: linear-gradient(135deg, #00ff88, #00e676);
+  background: linear-gradient(135deg, var(--accent-1), var(--app-success));
   color: var(--navy-ink);
   box-shadow: 0 4px 12px rgba(0, 255, 136, 0.25);
 }

@@ -234,8 +234,8 @@
 /* Print Styles */
 @media print {
   .legal-page {
-    color: #000;
-    background: #fff;
+    color: var(--app-accent-contrast);
+    background: var(--app-surface-1);
   }
 
   .legal-page a {
@@ -245,11 +245,11 @@
 
   .legal-warning {
     border: 2px solid #cc0000;
-    background: #fff;
+    background: var(--app-surface-1);
   }
 
   .legal-highlight {
     border-left: 4px solid #00cc66;
-    background: #fff;
+    background: var(--app-surface-1);
   }
 }

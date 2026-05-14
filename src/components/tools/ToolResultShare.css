@@ -137,8 +137,8 @@
 }
 
 .share-tab.active {
-  color: #00ff88;
-  border-bottom-color: #00ff88;
+  color: var(--accent-1);
+  border-bottom-color: var(--accent-1);
   background: rgba(0, 255, 136, 0.08);
 }
 
@@ -173,7 +173,7 @@
   flex: 1;
   font-family: 'Monaco', 'Courier New', monospace;
   font-size: 12px;
-  color: #00ff88;
+  color: var(--accent-1);
   background: rgba(0, 0, 0, 0.3);
   padding: 8px 12px;
   border-radius: 6px;
@@ -213,7 +213,7 @@
 
 .export-format-option.selected {
   background: rgba(0, 255, 136, 0.15);
-  border-color: #00ff88;
+  border-color: var(--accent-1);
 }
 
 .format-icon {
@@ -243,7 +243,7 @@
 .share-email-input:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.08);
-  border-color: #00ff88;
+  border-color: var(--accent-1);
   box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
 }
 
@@ -253,10 +253,10 @@
 
 .btn-primary {
   padding: 12px 24px;
-  background: linear-gradient(135deg, #00ff88, #00dd70);
+  background: linear-gradient(135deg, var(--accent-1), var(--app-success));
   border: none;
   border-radius: 10px;
-  color: #000;
+  color: var(--app-accent-contrast);
   font-weight: 600;
   font-size: 14px;
   cursor: pointer;
@@ -355,7 +355,7 @@
 .share-message--success {
   background: rgba(0, 255, 136, 0.15);
   border: 1px solid rgba(0, 255, 136, 0.3);
-  color: #00ff88;
+  color: var(--accent-1);
 }
 
 .share-message--error {

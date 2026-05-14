@@ -100,7 +100,7 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div style={{ display: 'inline-block', width: '40px', height: '40px', border: '4px solid rgba(0,255,136,0.2)', borderTopColor: '#00ff88', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
+            <div style={{ display: 'inline-block', width: '40px', height: '40px', border: '4px solid rgba(0,255,136,0.2)', borderTopColor: 'var(--accent-1)', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>
             <p style={{ marginTop: '16px' }}>Loading protocol...</p>
           </div>
         ) : results ? (

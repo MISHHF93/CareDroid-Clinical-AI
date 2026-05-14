@@ -62,7 +62,7 @@
 }
 
 .chat-interface__avatar--assistant {
-  background: linear-gradient(135deg, #00ff88, #00ffff);
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
 }
 
 .chat-interface__avatar--user {

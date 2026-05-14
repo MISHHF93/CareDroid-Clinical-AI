@@ -75,7 +75,7 @@
 }
 
 .summary-card {
-  background: var(--panel-background, white);
+  background: var(--panel-background);
   border: 1px solid var(--panel-border, #e0e0e0);
   padding: 18px;
   border-radius: 16px;
@@ -109,7 +109,7 @@
 }
 
 .analytics-panel {
-  background: var(--panel-background, white);
+  background: var(--panel-background);
   border: 1px solid var(--panel-border, #e0e0e0);
   border-radius: 16px;
   padding: 20px;

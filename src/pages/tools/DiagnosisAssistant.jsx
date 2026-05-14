@@ -160,10 +160,10 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
               style={{
                 flex: 1,
                 padding: '14px 24px',
-                background: 'linear-gradient(135deg, #00ff88, #00ffff)',
+                background: 'linear-gradient(135deg, var(--accent-1), var(--accent-2))',
                 border: 'none',
                 borderRadius: '10px',
-                color: '#0a0e27',
+                color: 'var(--app-accent-contrast)',
                 fontSize: '16px',
                 fontWeight: 600,
                 cursor: loading ? 'not-allowed' : 'pointer',
@@ -208,7 +208,7 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
                 width: '48px',
                 height: '48px',
                 border: '4px solid rgba(0,255,136,0.2)',
-                borderTopColor: '#00ff88',
+                borderTopColor: 'var(--accent-1)',
                 borderRadius: '50%',
                 animation: 'spin 1s linear infinite',
               }}></div>

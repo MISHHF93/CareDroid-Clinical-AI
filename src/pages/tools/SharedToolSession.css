@@ -36,7 +36,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--accent-1, #00ff88);
+  color: var(--accent-1, var(--accent-1));
 }
 
 .shared-session-card p {
