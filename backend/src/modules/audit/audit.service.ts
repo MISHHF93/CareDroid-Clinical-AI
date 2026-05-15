@@ -47,8 +47,9 @@ export class AuditService {
     const timestamp = new Date();
 
     // Get the last audit log to get its hash for chaining
-    const lastLog = await this.auditRepository.findOne({
+    const [lastLog] = await this.auditRepository.find({
       order: { timestamp: 'DESC' },
+      take: 1,
     });
 
     const previousHash = lastLog?.hash || '0'; // Genesis block uses '0'

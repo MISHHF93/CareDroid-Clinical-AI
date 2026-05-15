@@ -50,6 +50,8 @@
 
 .app-shell--compact.app-shell--authed .app-shell-main-wrap {
   padding-top: 52px;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  box-sizing: border-box;
 }
 
 .app-shell-menu-btn {
@@ -143,6 +145,8 @@
 }
 
 .app-shell-page-body--conversation {
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
   padding-bottom: 0;
   scrollbar-gutter: auto;

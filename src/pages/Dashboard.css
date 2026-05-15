@@ -13,15 +13,18 @@
 
 .dashboard-main {
   flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  grid-template-columns: 1fr;
   min-width: 0;
   min-height: 0;
   max-width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
 .dashboard-scroll {
+  grid-row: 1;
   flex: 1 1 0;
   min-height: 0;
   overflow-y: auto;
@@ -145,19 +148,20 @@
 }
 
 .dashboard-composer {
+  grid-row: 2;
   flex: 0 0 auto;
-  max-height: min(44dvh, 320px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+  max-height: none;
+  overflow: visible;
   padding: var(--space-3) var(--space-6)
-    max(var(--space-3), env(safe-area-inset-bottom, 0px));
+    max(var(--space-4), env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--panel-border);
   background: var(--surface-0);
   display: flex;
   gap: var(--space-3);
   position: relative;
+  z-index: 4;
   flex-direction: column;
+  box-shadow: 0 -8px 32px rgba(2, 6, 23, 0.18);
 }
 
 .dashboard-recs {
@@ -168,6 +172,12 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  max-height: min(28dvh, 220px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  flex-shrink: 1;
+  min-height: 0;
 }
 
 .dashboard-recs-label {
@@ -188,6 +198,9 @@
   align-items: center;
   gap: var(--space-3);
   width: 100%;
+  flex-shrink: 0;
+  padding-top: var(--space-1);
+  background: var(--surface-0);
 }
 
 .dashboard-input {
@@ -381,8 +394,11 @@
 }
 
 .app-keyboard-visible .dashboard-composer {
-  max-height: min(38dvh, 260px);
   padding-bottom: max(var(--space-3), env(safe-area-inset-bottom, 0px));
+}
+
+.app-keyboard-visible .dashboard-recs {
+  max-height: min(22dvh, 160px);
 }
 
 @media (min-width: 2200px) {
@@ -401,7 +417,7 @@
     padding-block: var(--space-2);
   }
 
-  .dashboard-composer {
-    max-height: min(46dvh, 220px);
+  .dashboard-recs {
+    max-height: min(24dvh, 140px);
   }
 }

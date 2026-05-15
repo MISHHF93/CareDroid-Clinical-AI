@@ -62,6 +62,15 @@ export class AuthController {
     return this.authService.login(loginDto, ipAddress, userAgent);
   }
 
+  @Post('dev-session')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Development only: issue JWT for local UI bypass' })
+  async devSession(@Req() req: Request) {
+    const ipAddress = req.ip || '0.0.0.0';
+    const userAgent = req.headers['user-agent'] || 'unknown';
+    return this.authService.createDevSession(ipAddress, userAgent);
+  }
+
   @Post('verify-2fa')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify 2FA token during login' })

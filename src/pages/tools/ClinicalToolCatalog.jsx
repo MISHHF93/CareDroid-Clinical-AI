@@ -8,6 +8,20 @@ import {
   getCatalogSummary,
   ORCHESTRATOR_TO_REGISTRY_ID,
 } from '../../data/clinicalIntentToolCatalog';
+import {
+  chatAndAiCapabilities,
+  clinicalDataApis,
+  emergencyCapabilities,
+  getFullCapabilitiesSummary,
+  platformFeatures,
+} from '../../data/platformCapabilitiesCatalog';
+import {
+  getAllDiscoveredTools,
+  getSourceCodeDiscoverySummary,
+  phantomToolReferences,
+  SOURCE_SCAN_LOCATIONS,
+  toolIdAliases,
+} from '../../data/sourceCodeToolDiscovery';
 import { fetchBackendClinicalTools } from '../../services/clinicalToolsApi';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
@@ -19,7 +33,43 @@ const CATEGORY_CLASS = {
   interpreter: 'catalog-badge--interpreter',
   protocol: 'catalog-badge--protocol',
   reference: 'catalog-badge--reference',
+  ai: 'catalog-badge--ai',
+  data: 'catalog-badge--data',
+  emergency: 'catalog-badge--emergency',
+  platform: 'catalog-badge--platform',
+  enterprise: 'catalog-badge--enterprise',
+  clinical: 'catalog-badge--checker',
+  integration: 'catalog-badge--data',
+  support: 'catalog-badge--platform',
+  phantom: 'catalog-badge--phantom',
+  monitoring: 'catalog-badge--ai',
+  oncology: 'catalog-badge--reference',
+  medication: 'catalog-badge--checker',
 };
+
+const STATUS_LABEL = {
+  'shipped-page': 'Shipped page',
+  'shipped-calculator': 'Calculator UI',
+  'backend-executor': 'Backend executor',
+  'nlu-chat': 'NLU / chat',
+  'chat-api': 'Chat / API',
+  phantom: 'In code only',
+  'marketing-copy': 'Marketing copy',
+  alias: 'Alias',
+};
+
+function StatusBadge({ status }) {
+  const label = STATUS_LABEL[status] || status;
+  const cls =
+    status === 'phantom' || status === 'marketing-copy'
+      ? 'catalog-badge--phantom'
+      : status === 'backend-executor'
+        ? 'catalog-badge--backend'
+        : status === 'chat-api'
+          ? 'catalog-badge--ai'
+          : 'catalog-badge--client';
+  return <span className={`catalog-badge ${cls}`}>{label}</span>;
+}
 
 function CategoryBadge({ category }) {
   return (
@@ -63,6 +113,9 @@ const ClinicalToolCatalog = () => {
     sidebarCount: toolRegistry.length,
     backendToolCount: backendTools.length || undefined,
   });
+  const platformSummary = getFullCapabilitiesSummary();
+  const discoverySummary = getSourceCodeDiscoverySummary();
+  const allDiscovered = useMemo(() => getAllDiscoveredTools(), []);
 
   const query = search.trim().toLowerCase();
 
@@ -90,6 +143,39 @@ const ClinicalToolCatalog = () => {
     matchesQuery(`${t.name || ''} ${t.description || ''} ${t.id || ''} ${t.category || ''}`)
   );
 
+  const filterCapabilityRows = (rows) =>
+    rows.filter(
+      (row) =>
+        matchesQuery(`${row.name} ${row.description} ${row.id} ${row.category} ${row.apiPath || ''}`) &&
+        (categoryFilter === 'all' || row.category === categoryFilter)
+    );
+
+  const filteredChatAi = filterCapabilityRows(chatAndAiCapabilities);
+  const filteredDataApis = filterCapabilityRows(clinicalDataApis);
+  const filteredEmergency = filterCapabilityRows(emergencyCapabilities);
+  const filteredDiscovered = allDiscovered.filter((row) => {
+    if (
+      !matchesQuery(
+        `${row.id} ${row.name} ${row.notes} ${row.source} ${row.status} ${row.category || ''}`
+      )
+    ) {
+      return false;
+    }
+    if (categoryFilter === 'phantom') {
+      return row.status === 'phantom' || row.status === 'marketing-copy';
+    }
+    if (categoryFilter === 'all') return true;
+    return row.category === categoryFilter;
+  });
+
+  const filteredPlatform = platformFeatures.filter(
+    (row) =>
+      matchesQuery(`${row.name} ${row.description} ${row.id} ${row.category} ${row.type || ''}`) &&
+      (categoryFilter === 'all' ||
+        row.category === categoryFilter ||
+        (categoryFilter === 'platform' && row.type === 'platform'))
+  );
+
   const handleOpenPath = (path) => {
     if (path) navigate(path);
   };
@@ -102,6 +188,16 @@ const ClinicalToolCatalog = () => {
       addMessage(chatSeed, 'user');
     }
     navigate('/dashboard');
+  };
+
+  const handleCapabilityAction = (row) => {
+    if (row.chatSeed) {
+      handleTryInChat(null, row.chatSeed);
+      return;
+    }
+    if (row.path) {
+      handleOpenPath(row.path);
+    }
   };
 
   const isBackendExecutable = (toolId) =>
@@ -121,12 +217,15 @@ const ClinicalToolCatalog = () => {
         </h1>
         <p className="clinical-tool-catalog-subtitle">
           Every capability wired in CareDroid today: sidebar shortcuts, calculator forms, AI clinical
-          tool profiles, and backend executors.
+          tool profiles, backend executors, chat/AI APIs, and platform features.
         </p>
         <p className="clinical-tool-catalog-notice">
-          This repository ships {summary.aiClinicalProfiles} AI-recognized clinical profiles and{' '}
-          {summary.backendExecutors} server-side executors—not 188 separate calculator pages. Tools
-          without a dedicated page open in chat with a clinical prompt seed.
+          <strong>Source-code scan:</strong> {discoverySummary.totalUniqueIds} unique tool-related
+          IDs across this repo ({discoverySummary.nluPatternCount} NLU patterns,{' '}
+          {discoverySummary.orchestratorExecutorCount} backend executors,{' '}
+          {discoverySummary.phantomOrPlanned} phantom/roadmap IDs,{' '}
+          {discoverySummary.externalCatalogInRepo} external “188-tool” import files). There is no
+          hidden file with 188 calculators—only the entries listed below.
         </p>
         <div className="catalog-stats">
           <div className="catalog-stat">
@@ -144,6 +243,28 @@ const ClinicalToolCatalog = () => {
           <div className="catalog-stat">
             <span className="catalog-stat-number">{summary.backendExecutors}</span>
             <span className="catalog-stat-label">Backend executors</span>
+          </div>
+          <div className="catalog-stat">
+            <span className="catalog-stat-number">{summary.chatOnlyProfiles}</span>
+            <span className="catalog-stat-label">Chat-only NLU</span>
+          </div>
+          <div className="catalog-stat">
+            <span className="catalog-stat-number">
+              {platformSummary.chatAndAi + platformSummary.clinicalData + platformSummary.emergency}
+            </span>
+            <span className="catalog-stat-label">Hidden APIs</span>
+          </div>
+          <div className="catalog-stat">
+            <span className="catalog-stat-number">{platformSummary.platform}</span>
+            <span className="catalog-stat-label">Platform features</span>
+          </div>
+          <div className="catalog-stat">
+            <span className="catalog-stat-number">{discoverySummary.totalUniqueIds}</span>
+            <span className="catalog-stat-label">IDs in source scan</span>
+          </div>
+          <div className="catalog-stat">
+            <span className="catalog-stat-number">{discoverySummary.phantomOrPlanned}</span>
+            <span className="catalog-stat-label">Phantom / planned</span>
           </div>
         </div>
       </header>
@@ -170,8 +291,305 @@ const ClinicalToolCatalog = () => {
           <option value="protocol">Protocol</option>
           <option value="reference">Reference</option>
           <option value="diagnostic">Diagnostic (sidebar)</option>
+          <option value="ai">AI / Chat API</option>
+          <option value="data">Clinical data API</option>
+          <option value="emergency">Emergency</option>
+          <option value="enterprise">Enterprise</option>
+          <option value="platform">Platform (filter)</option>
+          <option value="phantom">Phantom / in-code only</option>
         </select>
       </div>
+
+      <section className="catalog-section catalog-section--highlight">
+        <h2>Complete source-code scan</h2>
+        <p className="catalog-section-desc">
+          Every tool-like ID found in this repository (registry, NLU, calculators, cost tracking,
+          recommendations, tests, and docs references).
+        </p>
+        <ul className="catalog-scan-locations">
+          {SOURCE_SCAN_LOCATIONS.map((loc) => (
+            <li key={loc.path}>
+              <strong>{loc.label}</strong> — <code>{loc.path}</code> ({loc.count} entries)
+            </li>
+          ))}
+        </ul>
+        <div className="catalog-table-wrap">
+          <table className="catalog-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Category</th>
+                <th>Source file(s)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredDiscovered.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="catalog-empty">
+                    No discovered entries match your search.
+                  </td>
+                </tr>
+              ) : (
+                filteredDiscovered.map((row) => (
+                  <tr key={`${row.id}-${row.status}`}>
+                    <td>
+                      <code>{row.id}</code>
+                    </td>
+                    <td>{row.name}</td>
+                    <td>
+                      <StatusBadge status={row.status} />
+                    </td>
+                    <td>
+                      {row.category ? <CategoryBadge category={row.category} /> : '—'}
+                    </td>
+                    <td className="catalog-source-cell">
+                      {(row.sources || [row.source]).filter(Boolean).join('; ')}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+        <details className="catalog-details">
+          <summary>Phantom / roadmap IDs ({phantomToolReferences.length})</summary>
+          <p className="catalog-section-desc">
+            Referenced in recommendation or cost code but not implemented as pages or orchestrator
+            tools: {phantomToolReferences.map((p) => p.id).join(', ')}.
+          </p>
+        </details>
+        <details className="catalog-details">
+          <summary>ID aliases ({toolIdAliases.length})</summary>
+          <ul className="catalog-alias-list">
+            {toolIdAliases.map((a) => (
+              <li key={a.id}>
+                <code>{a.id}</code> → <code>{a.mapsTo}</code> ({a.source})
+              </li>
+            ))}
+          </ul>
+        </details>
+      </section>
+
+      <section className="catalog-section">
+        <h2>Chat &amp; AI APIs (backend)</h2>
+        <p className="catalog-section-desc">
+          Endpoints implemented on the server; most are reached through the dashboard chat or
+          integrations—not separate tool pages.
+        </p>
+        <div className="catalog-table-wrap">
+          <table className="catalog-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>API</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredChatAi.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="catalog-empty">
+                    No chat/AI APIs match your search.
+                  </td>
+                </tr>
+              ) : (
+                filteredChatAi.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      <code>{row.id}</code>
+                    </td>
+                    <td>{row.name}</td>
+                    <td>
+                      <CategoryBadge category={row.category} />
+                    </td>
+                    <td>
+                      <span className="catalog-api-hint">{row.apiPath}</span>
+                    </td>
+                    <td>
+                      <div className="catalog-actions">
+                        {row.path && (
+                          <button
+                            type="button"
+                            className="catalog-btn catalog-btn--primary"
+                            onClick={() => handleOpenPath(row.path)}
+                          >
+                            Open
+                          </button>
+                        )}
+                        {row.chatSeed && (
+                          <button
+                            type="button"
+                            className="catalog-btn catalog-btn--secondary"
+                            onClick={() => handleCapabilityAction(row)}
+                          >
+                            Try in chat
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="catalog-section">
+        <h2>Clinical data APIs</h2>
+        <p className="catalog-section-desc">Drug and protocol reference stores (CRUD + chat context).</p>
+        <div className="catalog-table-wrap">
+          <table className="catalog-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>API</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredDataApis.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="catalog-empty">
+                    No data APIs match your search.
+                  </td>
+                </tr>
+              ) : (
+                filteredDataApis.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      <code>{row.id}</code>
+                    </td>
+                    <td>{row.name}</td>
+                    <td>
+                      <span className="catalog-api-hint">{row.apiPath}</span>
+                    </td>
+                    <td>
+                      <div className="catalog-actions">
+                        <button
+                          type="button"
+                          className="catalog-btn catalog-btn--primary"
+                          onClick={() => handleCapabilityAction(row)}
+                        >
+                          {row.path ? 'Open / chat' : 'Try in chat'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="catalog-section">
+        <h2>Emergency &amp; alerts</h2>
+        <p className="catalog-section-desc">
+          Automatic emergency NLU on chat plus the clinical alerts hub.
+        </p>
+        <div className="catalog-table-wrap">
+          <table className="catalog-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredEmergency.map((row) => (
+                <tr key={row.id}>
+                  <td>
+                    <code>{row.id}</code>
+                  </td>
+                  <td>{row.name}</td>
+                  <td>
+                    <div className="catalog-actions">
+                      {row.path && (
+                        <button
+                          type="button"
+                          className="catalog-btn catalog-btn--primary"
+                          onClick={() => handleOpenPath(row.path)}
+                        >
+                          Open
+                        </button>
+                      )}
+                      {row.chatSeed && (
+                        <button
+                          type="button"
+                          className="catalog-btn catalog-btn--secondary"
+                          onClick={() => handleCapabilityAction(row)}
+                        >
+                          Try in chat
+                        </button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="catalog-section">
+        <h2>Platform &amp; enterprise features</h2>
+        <p className="catalog-section-desc">
+          From featureInventory.js—team, audit, SSO, FHIR, offline mode, and related capabilities.
+        </p>
+        <div className="catalog-table-wrap">
+          <table className="catalog-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Category</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredPlatform.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="catalog-empty">
+                    No platform features match your search.
+                  </td>
+                </tr>
+              ) : (
+                filteredPlatform.map((row) => (
+                  <tr key={row.id}>
+                    <td>
+                      <code>{row.id}</code>
+                    </td>
+                    <td>{row.name}</td>
+                    <td>{row.type}</td>
+                    <td>
+                      <CategoryBadge category={row.category} />
+                    </td>
+                    <td>
+                      <div className="catalog-actions">
+                        <button
+                          type="button"
+                          className="catalog-btn catalog-btn--primary"
+                          onClick={() => handleCapabilityAction(row)}
+                        >
+                          {row.path && row.path !== '/dashboard' ? 'Open' : 'Try in chat'}
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <section className="catalog-section">
         <h2>Backend executors (API)</h2>

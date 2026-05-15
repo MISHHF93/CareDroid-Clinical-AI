@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';import { useUser } from '../contexts/UserContext';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useUser } from '../contexts/UserContext';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';

@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, BadRequestException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -223,6 +223,70 @@ export class AuthService {
     });
 
     return this.generateTokens(user);
+  }
+
+  /**
+   * Development-only: issue a real JWT for local UI bypass (Division mode).
+   */
+  async createDevSession(ipAddress: string, userAgent: string) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new ForbiddenException('Dev session is not available in production');
+    }
+
+    const email = process.env.DEV_LOGIN_EMAIL || 'dev@caredroid.local';
+    let user = await this.userRepository.findOne({
+      where: { email },
+      relations: ['profile', 'subscription', 'twoFactor'],
+    });
+
+    if (!user) {
+      const passwordHash = await bcrypt.hash(randomBytes(32).toString('hex'), 12);
+      user = this.userRepository.create({
+        email,
+        passwordHash,
+        emailVerified: true,
+        role: UserRole.PHYSICIAN,
+        isActive: true,
+      });
+      await this.userRepository.save(user);
+
+      const profile = this.profileRepository.create({
+        userId: user.id,
+        fullName: 'Dev Clinician',
+      });
+      await this.profileRepository.save(profile);
+
+      const subscription = this.subscriptionRepository.create({
+        userId: user.id,
+        tier: SubscriptionTier.FREE,
+        status: SubscriptionStatus.ACTIVE,
+      });
+      await this.subscriptionRepository.save(subscription);
+
+      user = await this.userRepository.findOne({
+        where: { id: user.id },
+        relations: ['profile', 'subscription', 'twoFactor'],
+      });
+    }
+
+    user.lastLoginAt = new Date();
+    user.lastLoginIp = ipAddress;
+    await this.userRepository.save(user);
+
+    await this.auditService.log({
+      userId: user.id,
+      action: AuditAction.LOGIN,
+      resource: 'auth:dev-session',
+      ipAddress,
+      userAgent,
+      metadata: { mode: 'development' },
+    });
+
+    const tokens = await this.generateTokens(user);
+    return {
+      ...tokens,
+      user: this.sanitizeUser(user),
+    };
   }
 
   async generateTokens(user: User) {

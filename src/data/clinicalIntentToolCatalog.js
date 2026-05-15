@@ -213,10 +213,15 @@ export const clinicalIntentToolsById = clinicalIntentTools.reduce((acc, row) => 
 }, {});
 
 export function getCatalogSummary({ sidebarCount = 0, backendToolCount = 0 } = {}) {
+  const chatOnlyProfiles = clinicalIntentTools.filter((t) => !t.path).length;
   return {
     sidebarShortcuts: sidebarCount,
     calculatorForms: builtinUiCalculators.length,
     aiClinicalProfiles: clinicalIntentTools.length,
+    chatOnlyProfiles,
     backendExecutors: backendToolCount || clinicalIntentTools.filter((t) => t.backendExecutable).length,
   };
 }
+
+/** NLU tools with no dedicated page — launch via chat from suite or catalog */
+export const chatOnlyClinicalTools = clinicalIntentTools.filter((t) => !t.path);

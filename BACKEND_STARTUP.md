@@ -11,7 +11,7 @@ npm install
 # Start development server
 npm run start:dev
 
-# API will be available at: http://localhost:8000
+# API will be available at: http://localhost:3000 (global prefix /api)
 ```
 
 ## Backend Services
@@ -62,11 +62,10 @@ FIREBASE_PRIVATE_KEY=your-key
 FIREBASE_CLIENT_EMAIL=your-email
 
 # API
-API_PORT=8000
-API_HOST=localhost
+PORT=3000
 
-# CORS
-CORS_ORIGIN=http://localhost:5173
+# CORS / OAuth redirects (Vite dev server)
+FRONTEND_URL=http://localhost:8000
 
 # AI Models
 OPENAI_API_KEY=your-openai-key

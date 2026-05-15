@@ -64,6 +64,14 @@ body {
   box-sizing: border-box;
   overflow: hidden;
   overscroll-behavior: none;
+  display: flex;
+  flex-direction: column;
+}
+
+#root > * {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
 }
 
 .app-scroll-container {

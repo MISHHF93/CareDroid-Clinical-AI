@@ -149,16 +149,31 @@ const Auth = ({ onAuthSuccess }) => {
     }
   };
 
-  const applyDevSession = (mockUser, label) => {
+  const applyDevSession = async (mockUser, label) => {
+    try {
+      const { response, data } = await apiFetchJson('/api/auth/dev-session', { method: 'POST' });
+      if (response.ok && data?.accessToken && data?.user) {
+        localStorage.setItem('caredroid_user_profile', JSON.stringify(data.user));
+        localStorage.setItem('caredroid_access_token', data.accessToken);
+        if (onAuthSuccess) {
+          onAuthSuccess(data.accessToken, data.user);
+        }
+        info('Signing in', `${label} — development session with API access.`);
+        return;
+      }
+    } catch (err) {
+      logger.warn('Dev session API unavailable, using local bypass only', { err });
+    }
+
     try {
       localStorage.setItem('caredroid_user_profile', JSON.stringify(mockUser));
       localStorage.setItem('caredroid_access_token', divisionToken);
-      logger.info('Division mode bypass: stored token and profile', { label });
+      logger.info('Division mode bypass: stored token and profile (no API)', { label });
 
       if (onAuthSuccess) {
         onAuthSuccess(divisionToken, mockUser);
       }
-      info('Signing in', `${label} — entering app without verification.`);
+      info('Signing in', `${label} — UI only (start backend for tool APIs).`);
     } catch (err) {
       logger.error('Dev bypass failed', { err });
     }

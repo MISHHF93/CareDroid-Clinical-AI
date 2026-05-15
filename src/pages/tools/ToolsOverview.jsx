@@ -3,14 +3,19 @@ import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import toolRegistry, { toolRegistryById } from '../../data/toolRegistry';
-import { clinicalIntentTools, getCatalogSummary } from '../../data/clinicalIntentToolCatalog';
+import {
+  chatOnlyClinicalTools,
+  clinicalIntentTools,
+  getCatalogSummary,
+} from '../../data/clinicalIntentToolCatalog';
+import { getFullCapabilitiesSummary } from '../../data/platformCapabilitiesCatalog';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './ToolsOverview.css';
 
 const ToolsOverview = () => {
   const navigate = useNavigate();
-  const { selectTool } = useConversation();
+  const { selectTool, setActiveTool, addMessage } = useConversation();
   const {
     favorites,
     pinned,
@@ -39,6 +44,19 @@ const ToolsOverview = () => {
 
   const categories = [...new Set(filteredTools.map(t => t.category))];
   const catalogSummary = getCatalogSummary({ sidebarCount: tools.length });
+  const hiddenApiCount = getFullCapabilitiesSummary();
+
+  const handleChatOnlyTool = (tool) => {
+    const registryId = tool.sidebarToolId;
+    if (registryId) {
+      selectTool(registryId);
+      setActiveTool(registryId);
+    }
+    const seed =
+      tool.chatSeed || `Help me use the ${tool.toolName}. ${tool.description}`;
+    addMessage(seed, 'user');
+    navigate('/dashboard');
+  };
   const orderedTools = [
     ...filteredTools.filter((tool) => pinned.includes(tool.id)),
     ...filteredTools.filter((tool) => !pinned.includes(tool.id))
@@ -77,7 +95,9 @@ const ToolsOverview = () => {
               className="tools-catalog-link"
               onClick={() => navigate('/tools/catalog')}
             >
-              Full clinical catalog ({clinicalIntentTools.length} AI profiles) →
+              Full clinical catalog ({clinicalIntentTools.length} AI profiles,{' '}
+              {hiddenApiCount.chatAndAi + hiddenApiCount.clinicalData + hiddenApiCount.emergency}{' '}
+              hidden APIs) →
             </button>
           </p>
           <div className="header-stats">
@@ -96,6 +116,32 @@ const ToolsOverview = () => {
           </div>
         </div>
       </div>
+
+      {chatOnlyClinicalTools.length > 0 && (
+        <div className="tools-chat-only">
+          <div className="tools-chat-only-header">
+            <h2 className="tools-chat-only-title">Available via chat (no dedicated page)</h2>
+            <p>
+              These NLU clinical tools are recognized in conversation—open the dashboard with a
+              starter prompt.
+            </p>
+          </div>
+          <div className="tools-chat-only-grid">
+            {chatOnlyClinicalTools.map((tool) => (
+              <button
+                key={tool.toolId}
+                type="button"
+                className="tools-chat-only-card"
+                onClick={() => handleChatOnlyTool(tool)}
+              >
+                <span className="tools-chat-only-name">{tool.toolName}</span>
+                <span className="tools-chat-only-desc">{tool.description}</span>
+                <span className="tools-chat-only-action">Open in chat →</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {recentToolItems.length > 0 && (
         <div className="tools-recent">
