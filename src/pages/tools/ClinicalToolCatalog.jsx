@@ -13,16 +13,26 @@ import {
   clinicalDataApis,
   emergencyCapabilities,
   getFullCapabilitiesSummary,
-  platformFeatures,
 } from '../../data/platformCapabilitiesCatalog';
+import { emergencyPatternGroups } from '../../data/emergencyPatternCatalog';
 import {
+  clientClinicalCapabilities,
+  collaborationCapabilities,
   getAllDiscoveredTools,
   getSourceCodeDiscoverySummary,
+  orchestratorApiCapabilities,
   phantomToolReferences,
+  routingCapabilities,
   SOURCE_SCAN_LOCATIONS,
   toolIdAliases,
 } from '../../data/sourceCodeToolDiscovery';
+import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
+import {
+  getMedicalCatalogSummary,
+  getMedicalToolsCatalogRows,
+} from '../../data/medicalToolsCatalogIndex';
 import { fetchBackendClinicalTools } from '../../services/clinicalToolsApi';
+import { sortCatalogRows } from '../../utils/catalogSort';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import './ClinicalToolCatalog.css';
@@ -56,19 +66,252 @@ const STATUS_LABEL = {
   phantom: 'In code only',
   'marketing-copy': 'Marketing copy',
   alias: 'Alias',
+  platform: 'Platform feature',
+  client: 'Client helper',
+  orchestrator: 'Orchestrator API',
+  routing: 'NLU routing',
+  'emergency-pattern': 'Emergency NLU',
+  collaboration: 'Collaboration',
+  configuration: 'Configuration',
 };
+
+function statusBadgeClass(status) {
+  if (status === 'phantom' || status === 'marketing-copy') return 'catalog-badge--phantom';
+  if (status === 'backend-executor') return 'catalog-badge--backend';
+  if (status === 'chat-api' || status === 'routing') return 'catalog-badge--ai';
+  if (status === 'alias') return 'catalog-badge--platform';
+  if (status === 'platform') return 'catalog-badge--enterprise';
+  if (status === 'emergency-pattern') return 'catalog-badge--emergency';
+  if (status === 'orchestrator') return 'catalog-badge--data';
+  return 'catalog-badge--client';
+}
 
 function StatusBadge({ status }) {
   const label = STATUS_LABEL[status] || status;
-  const cls =
-    status === 'phantom' || status === 'marketing-copy'
-      ? 'catalog-badge--phantom'
-      : status === 'backend-executor'
-        ? 'catalog-badge--backend'
-        : status === 'chat-api'
-          ? 'catalog-badge--ai'
-          : 'catalog-badge--client';
-  return <span className={`catalog-badge ${cls}`}>{label}</span>;
+  return <span className={`catalog-badge ${statusBadgeClass(status)}`}>{label}</span>;
+}
+
+function SortableTh({ label, sortKey, activeKey, sortDir, onSort }) {
+  const active = activeKey === sortKey;
+  const indicator = active ? (sortDir === 'asc' ? ' ▲' : ' ▼') : '';
+  return (
+    <th>
+      <button
+        type="button"
+        className={`catalog-sort-btn${active ? ' catalog-sort-btn--active' : ''}`}
+        onClick={() => onSort(sortKey)}
+      >
+        {label}
+        <span className="catalog-sort-indicator" aria-hidden>
+          {indicator}
+        </span>
+      </button>
+    </th>
+  );
+}
+
+function useTableSort(defaultKey = 'name') {
+  const [sortKey, setSortKey] = useState(defaultKey);
+  const [sortDir, setSortDir] = useState('asc');
+  const toggleSort = (key) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortKey(key);
+      setSortDir('asc');
+    }
+  };
+  const applySort = (rows, getValue) => sortCatalogRows(rows, sortKey, sortDir, getValue);
+  return { sortKey, sortDir, toggleSort, applySort };
+}
+
+function MedicalToolsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSort }) {
+  if (rows.length === 0) {
+    return <p className="catalog-empty catalog-empty--block">No medical tools match your search.</p>;
+  }
+  return (
+    <div className="catalog-table-wrap">
+      <table className="catalog-table catalog-table--medical">
+        <thead>
+          <tr>
+            <SortableTh label="ID" sortKey="id" activeKey={sortKey} sortDir={sortDir} onSort={onSort} />
+            <SortableTh
+              label="Name"
+              sortKey="name"
+              activeKey={sortKey}
+              sortDir={sortDir}
+              onSort={onSort}
+            />
+            <SortableTh
+              label="Category"
+              sortKey="category"
+              activeKey={sortKey}
+              sortDir={sortDir}
+              onSort={onSort}
+            />
+            <SortableTh
+              label="Access"
+              sortKey="access"
+              activeKey={sortKey}
+              sortDir={sortDir}
+              onSort={onSort}
+            />
+            <SortableTh
+              label="Chat"
+              sortKey="chat"
+              activeKey={sortKey}
+              sortDir={sortDir}
+              onSort={onSort}
+            />
+            <th>Page / form</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.primaryId || row.id}>
+              <td>
+                <code>{row.primaryId || row.id}</code>
+              </td>
+              <td>
+                {row.name}
+                {row.chatOnlyForm && (
+                  <span className="catalog-inline-badge" title="Chat + calculators hub; no dedicated form">
+                    Chat on request
+                  </span>
+                )}
+              </td>
+              <td>
+                <CategoryBadge category={row.category} />
+              </td>
+              <td>{row.accessSummary}</td>
+              <td>{row.chatOnRequest ? 'Yes' : '—'}</td>
+              <td className="catalog-source-cell">
+                {row.pagePath && <code>{row.pagePath}</code>}
+                {row.uiCalculatorSlug && (
+                  <span>
+                    {row.pagePath ? ' · ' : ''}
+                    form: <code>{row.uiCalculatorSlug}</code>
+                  </span>
+                )}
+                {!row.pagePath && !row.uiCalculatorSlug && '—'}
+              </td>
+              <td>
+                <div className="catalog-actions">
+                  {row.pagePath && (
+                    <button
+                      type="button"
+                      className="catalog-btn catalog-btn--primary"
+                      onClick={() => onOpenPath(row.pagePath)}
+                    >
+                      Open
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="catalog-btn catalog-btn--secondary"
+                    onClick={() => onLaunch(row)}
+                  >
+                    Launch
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function DiscoveredRowsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSort }) {
+  if (rows.length === 0) {
+    return <p className="catalog-empty catalog-empty--block">No entries match your search.</p>;
+  }
+  return (
+    <div className="catalog-table-wrap">
+      <table className="catalog-table">
+        <thead>
+          <tr>
+            <SortableTh label="ID" sortKey="id" activeKey={sortKey} sortDir={sortDir} onSort={onSort} />
+            <SortableTh
+              label="Name"
+              sortKey="name"
+              activeKey={sortKey}
+              sortDir={sortDir}
+              onSort={onSort}
+            />
+            <SortableTh
+              label="Status"
+              sortKey="status"
+              activeKey={sortKey}
+              sortDir={sortDir}
+              onSort={onSort}
+            />
+            <SortableTh
+              label="Category"
+              sortKey="category"
+              activeKey={sortKey}
+              sortDir={sortDir}
+              onSort={onSort}
+            />
+            <th>Notes / source</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((row) => (
+            <tr key={`${row.id}-${row.status}`}>
+              <td>
+                <code>{row.id}</code>
+              </td>
+              <td>{row.name}</td>
+              <td>
+                <StatusBadge status={row.status} />
+              </td>
+              <td>{row.category ? <CategoryBadge category={row.category} /> : '—'}</td>
+              <td className="catalog-source-cell">
+                {row.mapsTo && (
+                  <span>
+                    → <code>{row.mapsTo}</code>{' '}
+                  </span>
+                )}
+                {row.apiPath && <span className="catalog-api-hint">{row.apiPath} </span>}
+                {row.protocolReference && (
+                  <span>
+                    Protocol: <code>{row.protocolReference}</code>{' '}
+                  </span>
+                )}
+                {row.notes || (row.sources || [row.source]).filter(Boolean).join('; ')}
+              </td>
+              <td>
+                <div className="catalog-actions">
+                  {row.path && !String(row.path).includes(':') && (
+                    <button
+                      type="button"
+                      className="catalog-btn catalog-btn--primary"
+                      onClick={() => onOpenPath(row.path)}
+                    >
+                      Open
+                    </button>
+                  )}
+                  {onLaunch && (
+                    <button
+                      type="button"
+                      className="catalog-btn catalog-btn--secondary"
+                      onClick={() => onLaunch(row)}
+                    >
+                      Launch
+                    </button>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 function CategoryBadge({ category }) {
@@ -86,6 +329,8 @@ const ClinicalToolCatalog = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [backendTools, setBackendTools] = useState([]);
   const [backendLoadError, setBackendLoadError] = useState(null);
+  const medicalSort = useTableSort('name');
+  const scanSort = useTableSort('name');
 
   useEffect(() => {
     let cancelled = false;
@@ -115,7 +360,9 @@ const ClinicalToolCatalog = () => {
   });
   const platformSummary = getFullCapabilitiesSummary();
   const discoverySummary = getSourceCodeDiscoverySummary();
+  const medicalSummary = getMedicalCatalogSummary();
   const allDiscovered = useMemo(() => getAllDiscoveredTools(), []);
+  const allMedicalRows = useMemo(() => getMedicalToolsCatalogRows(), []);
 
   const query = search.trim().toLowerCase();
 
@@ -153,41 +400,97 @@ const ClinicalToolCatalog = () => {
   const filteredChatAi = filterCapabilityRows(chatAndAiCapabilities);
   const filteredDataApis = filterCapabilityRows(clinicalDataApis);
   const filteredEmergency = filterCapabilityRows(emergencyCapabilities);
+  const discoverQueryMatch = (row) =>
+    matchesQuery(
+      `${row.id} ${row.name} ${row.notes} ${row.source} ${row.status} ${row.category || ''} ${row.mapsTo || ''} ${row.apiPath || ''} ${row.protocolReference || ''}`
+    );
+
+  const statusFilterFns = {
+    phantom: (row) => row.status === 'phantom' || row.status === 'marketing-copy',
+    alias: (row) => row.status === 'alias',
+    platform: (row) => row.status === 'platform',
+    client: (row) => row.status === 'client',
+    orchestrator: (row) => row.status === 'orchestrator',
+    routing: (row) => row.status === 'routing',
+    'emergency-pattern': (row) => row.status === 'emergency-pattern',
+    collaboration: (row) => row.status === 'collaboration',
+  };
+
   const filteredDiscovered = allDiscovered.filter((row) => {
-    if (
-      !matchesQuery(
-        `${row.id} ${row.name} ${row.notes} ${row.source} ${row.status} ${row.category || ''}`
-      )
-    ) {
-      return false;
-    }
-    if (categoryFilter === 'phantom') {
-      return row.status === 'phantom' || row.status === 'marketing-copy';
-    }
-    if (categoryFilter === 'all') return true;
+    if (!discoverQueryMatch(row)) return false;
+    const statusFn = statusFilterFns[categoryFilter];
+    if (statusFn) return statusFn(row);
+    if (categoryFilter === 'all' || categoryFilter === 'medical') return true;
     return row.category === categoryFilter;
   });
 
-  const filteredPlatform = platformFeatures.filter(
-    (row) =>
-      matchesQuery(`${row.name} ${row.description} ${row.id} ${row.category} ${row.type || ''}`) &&
-      (categoryFilter === 'all' ||
-        row.category === categoryFilter ||
-        (categoryFilter === 'platform' && row.type === 'platform'))
+  const sortedDiscovered = useMemo(
+    () => scanSort.applySort(filteredDiscovered),
+    [filteredDiscovered, scanSort.sortKey, scanSort.sortDir]
   );
+
+  const filteredMedical = allMedicalRows.filter((row) => {
+    if (!matchesQuery(`${row.name} ${row.primaryId} ${row.id} ${row.category} ${row.description}`)) {
+      return false;
+    }
+    if (categoryFilter === 'all' || categoryFilter === 'medical') return true;
+    return row.category === categoryFilter;
+  });
+
+  const sortedMedical = useMemo(
+    () => medicalSort.applySort(filteredMedical),
+    [filteredMedical, medicalSort.sortKey, medicalSort.sortDir]
+  );
+
+  const rowsForStatus = (status) =>
+    scanSort.applySort(
+      allDiscovered.filter((row) => row.status === status && discoverQueryMatch(row))
+    );
+
+  const showMedicalOnly = categoryFilter === 'medical';
+  const showFocusedSections = categoryFilter === 'all';
 
   const handleOpenPath = (path) => {
     if (path) navigate(path);
   };
 
+  const launchCatalogItem = (id) => {
+    const launch = resolveCatalogLaunch(id);
+    if (launch.registryId) {
+      setActiveTool(launch.registryId);
+    }
+    if (launch.chatSeed) {
+      addMessage(launch.chatSeed, 'user');
+    }
+    if (launch.path) {
+      navigate(launch.path);
+      return;
+    }
+    if (launch.chatSeed) {
+      navigate('/dashboard');
+    }
+  };
+
+  const launchFromRow = (row) => {
+    const launchId = row?.primaryId || row?.id;
+    if (launchId) {
+      launchCatalogItem(launchId);
+    }
+  };
+
   const handleTryInChat = (sidebarToolId, chatSeed) => {
     if (sidebarToolId) {
-      setActiveTool(sidebarToolId);
+      launchCatalogItem(sidebarToolId);
+      if (chatSeed) {
+        addMessage(chatSeed, 'user');
+        navigate('/dashboard');
+      }
+      return;
     }
     if (chatSeed) {
       addMessage(chatSeed, 'user');
+      navigate('/dashboard');
     }
-    navigate('/dashboard');
   };
 
   const handleCapabilityAction = (row) => {
@@ -197,7 +500,9 @@ const ClinicalToolCatalog = () => {
     }
     if (row.path) {
       handleOpenPath(row.path);
+      return;
     }
+    launchFromRow(row);
   };
 
   const isBackendExecutable = (toolId) =>
@@ -266,6 +571,14 @@ const ClinicalToolCatalog = () => {
             <span className="catalog-stat-number">{discoverySummary.phantomOrPlanned}</span>
             <span className="catalog-stat-label">Phantom / planned</span>
           </div>
+          <div className="catalog-stat catalog-stat--highlight">
+            <span className="catalog-stat-number">{medicalSummary.total}</span>
+            <span className="catalog-stat-label">Medical catalog rows</span>
+          </div>
+          <div className="catalog-stat">
+            <span className="catalog-stat-number">{medicalSummary.chatOnRequest}</span>
+            <span className="catalog-stat-label">Chat on request</span>
+          </div>
         </div>
       </header>
 
@@ -285,6 +598,7 @@ const ClinicalToolCatalog = () => {
           aria-label="Filter by category"
         >
           <option value="all">All categories</option>
+          <option value="medical">Medical tools &amp; calculators only</option>
           <option value="calculator">Calculator</option>
           <option value="checker">Checker</option>
           <option value="interpreter">Interpreter</option>
@@ -297,9 +611,37 @@ const ClinicalToolCatalog = () => {
           <option value="enterprise">Enterprise</option>
           <option value="platform">Platform (filter)</option>
           <option value="phantom">Phantom / in-code only</option>
+          <option value="alias">ID aliases</option>
+          <option value="platform">Platform features</option>
+          <option value="client">Client helpers</option>
+          <option value="orchestrator">Orchestrator APIs</option>
+          <option value="routing">NLU routing</option>
+          <option value="emergency-pattern">Emergency NLU patterns</option>
+          <option value="collaboration">Collaboration / analytics</option>
         </select>
       </div>
 
+      <section className="catalog-section catalog-section--medical">
+        <h2>
+          Medical tools &amp; calculators ({medicalSummary.total})
+        </h2>
+        <p className="catalog-section-desc">
+          Complete list of shipped clinical tools: all {medicalSummary.nluProfiles} NLU profiles
+          (chat on request), {medicalSummary.calculatorForms} calculator forms,{' '}
+          {medicalSummary.sidebarTools} sidebar shortcuts, and {medicalSummary.hubOnlyCalculators}{' '}
+          hub-only calculators (APACHE, CURB-65, GCS, Wells). Click column headers to sort.
+        </p>
+        <MedicalToolsTable
+          rows={sortedMedical}
+          onOpenPath={handleOpenPath}
+          onLaunch={launchFromRow}
+          sortKey={medicalSort.sortKey}
+          sortDir={medicalSort.sortDir}
+          onSort={medicalSort.toggleSort}
+        />
+      </section>
+
+      {!showMedicalOnly && (
       <section className="catalog-section catalog-section--highlight">
         <h2>Complete source-code scan</h2>
         <p className="catalog-section-desc">
@@ -317,22 +659,47 @@ const ClinicalToolCatalog = () => {
           <table className="catalog-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Category</th>
+                <SortableTh
+                  label="ID"
+                  sortKey="id"
+                  activeKey={scanSort.sortKey}
+                  sortDir={scanSort.sortDir}
+                  onSort={scanSort.toggleSort}
+                />
+                <SortableTh
+                  label="Name"
+                  sortKey="name"
+                  activeKey={scanSort.sortKey}
+                  sortDir={scanSort.sortDir}
+                  onSort={scanSort.toggleSort}
+                />
+                <SortableTh
+                  label="Status"
+                  sortKey="status"
+                  activeKey={scanSort.sortKey}
+                  sortDir={scanSort.sortDir}
+                  onSort={scanSort.toggleSort}
+                />
+                <SortableTh
+                  label="Category"
+                  sortKey="category"
+                  activeKey={scanSort.sortKey}
+                  sortDir={scanSort.sortDir}
+                  onSort={scanSort.toggleSort}
+                />
                 <th>Source file(s)</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredDiscovered.length === 0 ? (
+              {sortedDiscovered.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="catalog-empty">
+                  <td colSpan={6} className="catalog-empty">
                     No discovered entries match your search.
                   </td>
                 </tr>
               ) : (
-                filteredDiscovered.map((row) => (
+                sortedDiscovered.map((row) => (
                   <tr key={`${row.id}-${row.status}`}>
                     <td>
                       <code>{row.id}</code>
@@ -346,6 +713,26 @@ const ClinicalToolCatalog = () => {
                     </td>
                     <td className="catalog-source-cell">
                       {(row.sources || [row.source]).filter(Boolean).join('; ')}
+                    </td>
+                    <td>
+                      <div className="catalog-actions">
+                        {row.path && !String(row.path).includes(':') && (
+                          <button
+                            type="button"
+                            className="catalog-btn catalog-btn--primary"
+                            onClick={() => handleOpenPath(row.path)}
+                          >
+                            Open
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          className="catalog-btn catalog-btn--secondary"
+                          onClick={() => launchFromRow(row)}
+                        >
+                          Launch
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))
@@ -371,7 +758,91 @@ const ClinicalToolCatalog = () => {
           </ul>
         </details>
       </section>
+      )}
 
+      {showFocusedSections && (
+        <>
+          <section className="catalog-section">
+            <h2>Emergency NLU patterns ({emergencyPatternGroups.length})</h2>
+            <p className="catalog-section-desc">
+              Keyword groups from emergency.patterns.ts — evaluated on every chat message before
+              clinical tool routing.
+            </p>
+            <DiscoveredRowsTable
+              rows={rowsForStatus('emergency-pattern')}
+              onOpenPath={handleOpenPath}
+              onLaunch={launchFromRow}
+              sortKey={scanSort.sortKey}
+              sortDir={scanSort.sortDir}
+              onSort={scanSort.toggleSort}
+            />
+          </section>
+
+          <section className="catalog-section">
+            <h2>Client-side clinical helpers ({clientClinicalCapabilities.length})</h2>
+            <p className="catalog-section-desc">
+              Risk scoring, insights, visualizations, and share UI on tool pages and chat.
+            </p>
+            <DiscoveredRowsTable
+              rows={rowsForStatus('client')}
+              onOpenPath={handleOpenPath}
+              onLaunch={launchFromRow}
+              sortKey={scanSort.sortKey}
+              sortDir={scanSort.sortDir}
+              onSort={scanSort.toggleSort}
+            />
+          </section>
+
+          <section className="catalog-section">
+            <h2>Tool orchestrator API ({orchestratorApiCapabilities.length})</h2>
+            <p className="catalog-section-desc">
+              REST surface beyond execute — list, validate, statistics, persisted results.
+            </p>
+            <DiscoveredRowsTable
+              rows={rowsForStatus('orchestrator')}
+              onOpenPath={handleOpenPath}
+              onLaunch={launchFromRow}
+              sortKey={scanSort.sortKey}
+              sortDir={scanSort.sortDir}
+              onSort={scanSort.toggleSort}
+            />
+          </section>
+
+          <section className="catalog-section">
+            <h2>NLU routing intents ({routingCapabilities.length})</h2>
+            <p className="catalog-section-desc">
+              Primary intents and chat parameters that route messages before a specific tool is
+              selected.
+            </p>
+            <DiscoveredRowsTable
+              rows={rowsForStatus('routing')}
+              onOpenPath={handleOpenPath}
+              onLaunch={launchFromRow}
+              sortKey={scanSort.sortKey}
+              sortDir={scanSort.sortDir}
+              onSort={scanSort.toggleSort}
+            />
+          </section>
+
+          <section className="catalog-section">
+            <h2>Collaboration and analytics ({collaborationCapabilities.length})</h2>
+            <p className="catalog-section-desc">
+              Shared sessions, cost tracking, analytics routes, and Android client parity.
+            </p>
+            <DiscoveredRowsTable
+              rows={rowsForStatus('collaboration')}
+              onOpenPath={handleOpenPath}
+              onLaunch={launchFromRow}
+              sortKey={scanSort.sortKey}
+              sortDir={scanSort.sortDir}
+              onSort={scanSort.toggleSort}
+            />
+          </section>
+        </>
+      )}
+
+      {!showMedicalOnly && (
+      <>
       <section className="catalog-section">
         <h2>Chat &amp; AI APIs (backend)</h2>
         <p className="catalog-section-desc">
@@ -533,59 +1004,6 @@ const ClinicalToolCatalog = () => {
                   </td>
                 </tr>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="catalog-section">
-        <h2>Platform &amp; enterprise features</h2>
-        <p className="catalog-section-desc">
-          From featureInventory.js—team, audit, SSO, FHIR, offline mode, and related capabilities.
-        </p>
-        <div className="catalog-table-wrap">
-          <table className="catalog-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Category</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPlatform.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="catalog-empty">
-                    No platform features match your search.
-                  </td>
-                </tr>
-              ) : (
-                filteredPlatform.map((row) => (
-                  <tr key={row.id}>
-                    <td>
-                      <code>{row.id}</code>
-                    </td>
-                    <td>{row.name}</td>
-                    <td>{row.type}</td>
-                    <td>
-                      <CategoryBadge category={row.category} />
-                    </td>
-                    <td>
-                      <div className="catalog-actions">
-                        <button
-                          type="button"
-                          className="catalog-btn catalog-btn--primary"
-                          onClick={() => handleCapabilityAction(row)}
-                        >
-                          {row.path && row.path !== '/dashboard' ? 'Open' : 'Try in chat'}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
             </tbody>
           </table>
         </div>
@@ -839,6 +1257,8 @@ const ClinicalToolCatalog = () => {
           </table>
         </div>
       </section>
+      </>
+      )}
     </div>
   );
 };

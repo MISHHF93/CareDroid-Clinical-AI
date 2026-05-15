@@ -6,6 +6,43 @@ This document is a **living inventory** of clinical tools and medical calculator
 
 **Maintenance:** When you add or change a tool or calculator, update `toolRegistry.js`, `Calculators.jsx` (if applicable), routes in `App.jsx`, and **this file** so the inventory stays accurate.
 
+**Full catalog UI:** [`/tools/catalog`](../src/App.jsx) — [`ClinicalToolCatalog.jsx`](../src/pages/tools/ClinicalToolCatalog.jsx) indexes everything below plus hidden APIs, client helpers, emergency NLU, and phantom IDs.
+
+---
+
+## Catalog coverage (source-code audit)
+
+Last expanded: 2026-05-15. Discovery modules (update together when adding capabilities):
+
+| Module | Path | What it indexes |
+|--------|------|-----------------|
+| Sidebar + calculators + NLU | [`clinicalIntentToolCatalog.js`](../src/data/clinicalIntentToolCatalog.js) | 15 NLU profiles, 4 calculator UIs, orchestrator mapping |
+| Platform / chat APIs | [`platformCapabilitiesCatalog.js`](../src/data/platformCapabilitiesCatalog.js) | Chat & AI endpoints, drugs/protocols APIs, emergency summary |
+| Emergency NLU groups | [`emergencyPatternCatalog.js`](../src/data/emergencyPatternCatalog.js) | 17 pattern groups (mirror of `emergency.patterns.ts`) |
+| Unified scan | [`sourceCodeToolDiscovery.js`](../src/data/sourceCodeToolDiscovery.js) | Merges all of the above + phantoms, aliases, client helpers, orchestrator REST |
+| Launch wiring | [`clinicalCatalogWiring.js`](../src/data/clinicalCatalogWiring.js) | Maps any catalog id → route, sidebar tool, chat seed, orchestrator param |
+
+There is **no** external “188 tools” JSON in this repository. Import would be a separate content task.
+
+---
+
+## Tool ID aliases (canonical mapping)
+
+Use these canonical ids in new code (`toolRegistry`, routes, cost tracking).
+
+| Alias (legacy / tests) | Canonical id / executor |
+|------------------------|-------------------------|
+| `drug-checker` | `drug-check` |
+| `drug-interaction-checker` | `drug-interactions` (orchestrator metadata id) |
+| `drug-interactions` (NLU) | `drug-check` (UI registry) |
+| `lab-interpreter` | `lab-interp` |
+| `sofa-calculator` | `sofa-score` (sidebar) / `sofa-calculator` (API execute) |
+| `sofa_calculator` | `sofa-calculator` (OpenAI function name, Android) |
+| `calculator` | `calculators` |
+| `diagnosis-assistant` | `diagnosis` |
+| `procedure-guide` | `procedures` |
+| `protocol-lookup` | `protocols` |
+
 ---
 
 ## Distinct full-page clinical tools

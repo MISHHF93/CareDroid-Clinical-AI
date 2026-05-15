@@ -335,3 +335,54 @@
 .catalog-backend-status--error {
   color: #dc2626;
 }
+
+.catalog-section--medical {
+  border: 2px solid var(--primary-color);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  background: var(--panel-background);
+}
+
+.catalog-stat--highlight .catalog-stat-number {
+  color: var(--primary-color);
+}
+
+.catalog-sort-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.catalog-sort-btn:hover {
+  color: var(--primary-color);
+}
+
+.catalog-sort-btn--active {
+  color: var(--primary-color);
+}
+
+.catalog-sort-indicator {
+  font-size: 10px;
+  opacity: 0.85;
+}
+
+.catalog-inline-badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary-color);
+  vertical-align: middle;
+}

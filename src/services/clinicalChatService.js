@@ -1,22 +1,18 @@
 import { apiFetch, buildApiUrl, parseApiResponse } from './apiClient';
 
-/**
- * Maps UI tool registry ids (sidebar) to backend orchestrator tool ids for the chat API.
- * Only registered executors should appear here; other tools rely on intent + RAG/LLM.
- */
-export const REGISTRY_ID_TO_ORCHESTRATOR_TOOL = {
-  'drug-check': 'drug-interactions',
-  'lab-interp': 'lab-interpreter',
-  'sofa-score': 'sofa-calculator',
-};
+import {
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
+  registryIdToOrchestratorTool,
+} from '../data/clinicalCatalogWiring';
+
+export { REGISTRY_ID_TO_ORCHESTRATOR_TOOL };
 
 /**
  * @param {string} registryId
  * @returns {string|undefined} backend tool id for `tool` field, or undefined
  */
 export function registryIdToChatToolParam(registryId) {
-  if (!registryId) return undefined;
-  return REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId];
+  return registryIdToOrchestratorTool(registryId);
 }
 
 /**

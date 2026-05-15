@@ -4,10 +4,11 @@ import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import toolRegistry, { toolRegistryById } from '../../data/toolRegistry';
 import {
-  chatOnlyClinicalTools,
   clinicalIntentTools,
   getCatalogSummary,
+  nluCalculatorHubOnly,
 } from '../../data/clinicalIntentToolCatalog';
+import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
 import { getFullCapabilitiesSummary } from '../../data/platformCapabilitiesCatalog';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
@@ -46,16 +47,21 @@ const ToolsOverview = () => {
   const catalogSummary = getCatalogSummary({ sidebarCount: tools.length });
   const hiddenApiCount = getFullCapabilitiesSummary();
 
-  const handleChatOnlyTool = (tool) => {
-    const registryId = tool.sidebarToolId;
-    if (registryId) {
-      selectTool(registryId);
-      setActiveTool(registryId);
+  const handleNluHubTool = (toolId) => {
+    const launch = resolveCatalogLaunch(toolId);
+    if (launch.registryId) {
+      recordToolAccess(launch.registryId);
+      selectTool(launch.registryId);
+      setActiveTool(launch.registryId);
     }
-    const seed =
-      tool.chatSeed || `Help me use the ${tool.toolName}. ${tool.description}`;
-    addMessage(seed, 'user');
-    navigate('/dashboard');
+    if (launch.chatSeed) {
+      addMessage(launch.chatSeed, 'user');
+    }
+    if (launch.path) {
+      navigate(launch.path);
+    } else {
+      navigate('/dashboard');
+    }
   };
   const orderedTools = [
     ...filteredTools.filter((tool) => pinned.includes(tool.id)),
@@ -117,28 +123,33 @@ const ToolsOverview = () => {
         </div>
       </div>
 
-      {chatOnlyClinicalTools.length > 0 && (
+      {nluCalculatorHubOnly.length > 0 && (
         <div className="tools-chat-only">
           <div className="tools-chat-only-header">
-            <h2 className="tools-chat-only-title">Available via chat (no dedicated page)</h2>
+            <h2 className="tools-chat-only-title">NLU calculators (chat-assisted)</h2>
             <p>
               These NLU clinical tools are recognized in conversation—open the dashboard with a
               starter prompt.
             </p>
           </div>
           <div className="tools-chat-only-grid">
-            {chatOnlyClinicalTools.map((tool) => (
-              <button
-                key={tool.toolId}
-                type="button"
-                className="tools-chat-only-card"
-                onClick={() => handleChatOnlyTool(tool)}
-              >
-                <span className="tools-chat-only-name">{tool.toolName}</span>
-                <span className="tools-chat-only-desc">{tool.description}</span>
-                <span className="tools-chat-only-action">Open in chat →</span>
-              </button>
-            ))}
+            {nluCalculatorHubOnly.map((tool) => {
+              const meta = clinicalIntentTools.find((t) => t.toolId === tool.toolId);
+              return (
+                <button
+                  key={tool.toolId}
+                  type="button"
+                  className="tools-chat-only-card"
+                  onClick={() => handleNluHubTool(tool.toolId)}
+                >
+                  <span className="tools-chat-only-name">{tool.name}</span>
+                  <span className="tools-chat-only-desc">
+                    {meta?.description || 'Chat-assisted scoring'}
+                  </span>
+                  <span className="tools-chat-only-action">Launch →</span>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}

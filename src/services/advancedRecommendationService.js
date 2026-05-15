@@ -1,5 +1,6 @@
 import { apiFetch } from './apiClient';
 import toolRegistry from '../data/toolRegistry';
+import { NLU_TO_REGISTRY_ID } from '../data/clinicalCatalogWiring';
 
 /**
  * Advanced Tool Recommendation Service using NLU (Natural Language Understanding)
@@ -18,46 +19,10 @@ class AdvancedRecommendationService {
    * Map legacy / NLU tool ids to sidebar toolRegistry ids.
    */
   normalizeRecommendationToolIds(recommendations) {
-    const nluToRegistry = {
-      'drug-checker': 'drug-check',
-      'drug-interactions': 'drug-check',
-      'lab-interpreter': 'lab-interp',
-      'lab-interp': 'lab-interp',
-      'sofa-calculator': 'sofa-score',
-      'apache2-calculator': 'calculators',
-      'cha2ds2vasc-calculator': 'calc-chads2vasc',
-      'curb65-calculator': 'calculators',
-      'gcs-calculator': 'calculators',
-      'wells-dvt-calculator': 'calculators',
-      'dose-calculator': 'calculators',
-      'abg-interpreter': 'lab-interp',
-      'acls-protocol': 'protocols',
-      'atls-protocol': 'protocols',
-      'differential-diagnosis': 'diagnosis',
-      'antibiotic-guide': 'diagnosis',
-      'calculator': 'calculators',
-      'protocol-lookup': 'protocols',
-      'diagnosis-assistant': 'diagnosis',
-      'procedure-guide': 'procedures',
-      sofa: 'sofa-score',
-      qsofa: 'sofa-score',
-      gfr: 'calc-gfr',
-      egfr: 'calc-gfr',
-      bmi: 'calc-bmi',
-      chads: 'calc-chads2vasc',
-      'abc-assessment': 'calculators',
-      'trauma-score': 'calculators',
-      'vitals-monitor': 'calculators',
-      'antibiotic-scripts': 'drug-check',
-      'bleeding-risk': 'calculators',
-      'chemo-calculator': 'calculators',
-      'cancer-calculator': 'calculators',
-      'tumor-staging': 'diagnosis',
-    };
     return recommendations
       .map((rec) => ({
         ...rec,
-        toolId: nluToRegistry[rec.toolId] || rec.toolId,
+        toolId: NLU_TO_REGISTRY_ID[rec.toolId] || rec.toolId,
       }))
       .filter((rec) => toolRegistry.some((t) => t.id === rec.toolId));
   }

@@ -18,9 +18,9 @@ export const clinicalIntentTools = [
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
     category: 'calculator',
-    description: 'ICU mortality prediction (no dedicated calculator page yet).',
-    path: null,
-    sidebarToolId: null,
+    description: 'ICU mortality prediction (chat-assisted; no dedicated form yet).',
+    path: '/tools/calculators',
+    sidebarToolId: 'calculators',
     chatSeed:
       'Help me estimate an APACHE-II score. I will provide age, vitals, labs, and GCS as available.',
     backendExecutable: false,
@@ -38,9 +38,9 @@ export const clinicalIntentTools = [
     toolId: 'curb65-calculator',
     toolName: 'CURB-65 Score',
     category: 'calculator',
-    description: 'CAP severity (no dedicated calculator page yet).',
-    path: null,
-    sidebarToolId: null,
+    description: 'CAP severity (chat-assisted; no dedicated form yet).',
+    path: '/tools/calculators',
+    sidebarToolId: 'calculators',
     chatSeed:
       'Help me apply CURB-65 for pneumonia severity using confusion, urea, RR, BP, and age.',
     backendExecutable: false,
@@ -49,9 +49,9 @@ export const clinicalIntentTools = [
     toolId: 'gcs-calculator',
     toolName: 'Glasgow Coma Scale',
     category: 'calculator',
-    description: 'Level of consciousness scoring.',
-    path: null,
-    sidebarToolId: null,
+    description: 'Level of consciousness scoring (chat-assisted).',
+    path: '/tools/calculators',
+    sidebarToolId: 'calculators',
     chatSeed:
       'Help me score and interpret the Glasgow Coma Scale from eye, verbal, and motor responses.',
     backendExecutable: false,
@@ -60,9 +60,9 @@ export const clinicalIntentTools = [
     toolId: 'wells-dvt-calculator',
     toolName: 'Wells DVT Score',
     category: 'calculator',
-    description: 'Pre-test probability for DVT.',
-    path: null,
-    sidebarToolId: null,
+    description: 'Pre-test probability for DVT (chat-assisted).',
+    path: '/tools/calculators',
+    sidebarToolId: 'calculators',
     chatSeed: 'Help me complete a Wells score for suspected DVT using my clinical findings.',
     backendExecutable: false,
   },
@@ -109,6 +109,7 @@ export const clinicalIntentTools = [
     description: 'Evidence-based protocols and pathways.',
     path: '/tools/protocols',
     sidebarToolId: 'protocols',
+    chatSeed: 'Summarize the evidence-based protocol for this condition:',
     backendExecutable: false,
   },
   {
@@ -118,6 +119,7 @@ export const clinicalIntentTools = [
     description: 'Resuscitation algorithms.',
     path: '/tools/protocols',
     sidebarToolId: 'protocols',
+    chatSeed: 'Walk me through the ACLS algorithm for this cardiac arrest scenario:',
     backendExecutable: false,
   },
   {
@@ -127,6 +129,7 @@ export const clinicalIntentTools = [
     description: 'Trauma algorithms.',
     path: '/tools/protocols',
     sidebarToolId: 'protocols',
+    chatSeed: 'Guide me through the ATLS primary survey for this trauma patient:',
     backendExecutable: false,
   },
   {
@@ -136,6 +139,7 @@ export const clinicalIntentTools = [
     description: 'Symptom-based differentials.',
     path: '/tools/diagnosis',
     sidebarToolId: 'diagnosis',
+    chatSeed: 'Generate a differential diagnosis for:',
     backendExecutable: false,
   },
   {
@@ -145,8 +149,17 @@ export const clinicalIntentTools = [
     description: 'Empiric antimicrobial choice.',
     path: '/tools/diagnosis',
     sidebarToolId: 'diagnosis',
+    chatSeed: 'Recommend empiric antibiotics for this infection scenario:',
     backendExecutable: false,
   },
+];
+
+/** Built-in calculator slugs not yet in Calculators.jsx UI — NLU + catalog only */
+export const nluCalculatorHubOnly = [
+  { toolId: 'apache2-calculator', name: 'APACHE-II', hubPath: '/tools/calculators' },
+  { toolId: 'curb65-calculator', name: 'CURB-65', hubPath: '/tools/calculators' },
+  { toolId: 'gcs-calculator', name: 'GCS', hubPath: '/tools/calculators' },
+  { toolId: 'wells-dvt-calculator', name: 'Wells DVT', hubPath: '/tools/calculators' },
 ];
 
 export const builtinUiCalculators = [
