@@ -35,6 +35,26 @@
   line-height: 1.6;
 }
 
+.tools-catalog-link-wrap {
+  margin: 0 auto 20px;
+}
+
+.tools-catalog-link {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0;
+}
+
+.tools-catalog-link:hover {
+  opacity: 0.85;
+}
+
 .tools-workspace {
   display: inline-flex;
   align-items: center;

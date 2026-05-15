@@ -477,6 +477,36 @@ const Sidebar = ({
                   </div>
                 </div>
                 
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigate('/tools/catalog');
+                    onCloseMobileNav();
+                  }}
+                  style={{
+                    width: '100%',
+                    padding: '8px',
+                    marginTop: '8px',
+                    borderRadius: '6px',
+                    border: '1px dashed var(--panel-border, #e0e0e0)',
+                    backgroundColor: 'transparent',
+                    color: 'var(--text-secondary, #666)',
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                  }}
+                >
+                  <span className="section-icon--svg" aria-hidden>
+                    <NavIcon icon={CHROME_ICONS.tools} size={14} />
+                  </span>
+                  <span>Full Catalog</span>
+                </button>
+
                 {/* Quick Action: View All Tools */}
                 <button
                   type="button"

@@ -3,6 +3,7 @@ import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import toolRegistry, { toolRegistryById } from '../../data/toolRegistry';
+import { clinicalIntentTools, getCatalogSummary } from '../../data/clinicalIntentToolCatalog';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './ToolsOverview.css';
@@ -37,6 +38,7 @@ const ToolsOverview = () => {
   };
 
   const categories = [...new Set(filteredTools.map(t => t.category))];
+  const catalogSummary = getCatalogSummary({ sidebarCount: tools.length });
   const orderedTools = [
     ...filteredTools.filter((tool) => pinned.includes(tool.id)),
     ...filteredTools.filter((tool) => !pinned.includes(tool.id))
@@ -69,18 +71,27 @@ const ToolsOverview = () => {
               ))}
             </select>
           </div>
+          <p className="tools-catalog-link-wrap">
+            <button
+              type="button"
+              className="tools-catalog-link"
+              onClick={() => navigate('/tools/catalog')}
+            >
+              Full clinical catalog ({clinicalIntentTools.length} AI profiles) →
+            </button>
+          </p>
           <div className="header-stats">
             <div className="stat">
-              <span className="stat-number">{tools.length}</span>
-              <span className="stat-label">Tools Available</span>
+              <span className="stat-number">{filteredTools.length}</span>
+              <span className="stat-label">Suite shortcuts</span>
             </div>
             <div className="stat">
-              <span className="stat-number">{categories.length}</span>
-              <span className="stat-label">Categories</span>
+              <span className="stat-number">{catalogSummary.aiClinicalProfiles}</span>
+              <span className="stat-label">AI tool profiles</span>
             </div>
             <div className="stat">
-              <span className="stat-number">24/7</span>
-              <span className="stat-label">Availability</span>
+              <span className="stat-number">{catalogSummary.backendExecutors}</span>
+              <span className="stat-label">Backend executors</span>
             </div>
           </div>
         </div>

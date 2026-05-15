@@ -63,6 +63,7 @@ const Calculators = lazyWithRetry(() => import('./pages/tools/Calculators'));
 const Protocols = lazyWithRetry(() => import('./pages/tools/Protocols'));
 const DiagnosisAssistant = lazyWithRetry(() => import('./pages/tools/DiagnosisAssistant'));
 const ProcedureGuide = lazyWithRetry(() => import('./pages/tools/ProcedureGuide'));
+const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
 
 // Clinical Intelligence pages
 const ClinicalAlertsPage = lazyWithRetry(() => import('./pages/ClinicalAlertsPage'));
@@ -283,6 +284,7 @@ function AppRoutes() {
 
     // Clinical tools: full-page routes (chat stays on /dashboard only)
     { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/catalog', element: <AppShellPage><ClinicalToolCatalog /></AppShellPage>, requiresAuth: true },
     { path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>, requiresAuth: true },
     { path: '/tools/lab-interpreter', element: <AppShellPage><LabInterpreter /></AppShellPage>, requiresAuth: true },
     { path: '/tools/calculator/sofa', element: <AppShellPage><Calculators initialCalculatorId="sofa" /></AppShellPage>, requiresAuth: true },

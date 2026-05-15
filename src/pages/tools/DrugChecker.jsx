@@ -2,14 +2,49 @@ import { useState } from 'react';
 import { useUser } from '../../contexts/UserContext';
 import analyticsService from '../../services/analyticsService';
 import offlineService from '../../services/offlineService';
+import { apiFetch, parseApiResponse } from '../../services/apiClient';
+import { parseToolExecutionResponse } from '../../utils/toolExecutionResponse';
 import ToolPageLayout from './ToolPageLayout';
 import './DrugChecker.css';
+
+function normalizeDrugCheckResults(apiData) {
+  if (!apiData || typeof apiData !== 'object') {
+    return { interactions: [], contraindications: [], warnings: [] };
+  }
+
+  const rawInteractions = apiData.interactions || [];
+  const interactions = rawInteractions.map((item) => ({
+    severity: item.severity || 'moderate',
+    drugs: [item.drug1, item.drug2].filter(Boolean),
+    description: item.clinicalSignificance || item.mechanism || '',
+    evidence: item.mechanism || 'Clinical pharmacology reference',
+    management: item.management || '',
+  }));
+
+  const contraindicated = apiData.groupedBySeverity?.contraindicated || [];
+  const contraindications = contraindicated.map((item) => ({
+    severity: 'contraindicated',
+    drugs: [item.drug1, item.drug2].filter(Boolean),
+    description: item.clinicalSignificance || item.mechanism || '',
+    evidence: item.mechanism || 'Contraindicated combination',
+    management: item.management || '',
+  }));
+
+  return {
+    interactions: [...contraindications, ...interactions],
+    contraindications,
+    warnings: [],
+    interpretation: apiData.interpretation,
+    disclaimer: apiData.disclaimer,
+  };
+}
 
 const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
   const { user } = useUser();
   const [medications, setMedications] = useState(['']);
   const [results, setResults] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
+  const [error, setError] = useState(null);
 
   const toolConfig = {
     id: 'drug-check',
@@ -44,36 +79,43 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
     }
 
     setIsChecking(true);
+    setError(null);
+    setResults(null);
 
-    // Simulate API call
-    setTimeout(() => {
-      const mockResults = {
-        interactions: [
-          {
-            severity: 'major',
-            drugs: [activeMeds[0], activeMeds[1]],
-            description: 'May increase risk of bleeding',
-            evidence: 'Well-documented',
-            management: 'Monitor INR closely, consider dose adjustment'
-          }
-        ],
-        contraindications: [],
-        warnings: [
-          {
-            drug: activeMeds[0],
-            warning: 'Use with caution in renal impairment',
-            recommendation: 'Adjust dose based on CrCl'
-          }
-        ]
-      };
+    try {
+      const response = await apiFetch('/api/tools/drug-interactions/execute', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('caredroid_access_token')}`,
+        },
+        body: JSON.stringify({
+          parameters: { medications: activeMeds, severityFilter: 'all' },
+        }),
+      });
 
-      setResults(mockResults);
+      const data = await parseApiResponse(response, { fallback: {} });
+      if (!response.ok) {
+        throw new Error(data?.message || 'Failed to check drug interactions');
+      }
+
+      const parsed = parseToolExecutionResponse(data);
+      if (!parsed.ok || parsed.data == null) {
+        throw new Error(parsed.errors?.[0] || 'Drug interaction check failed');
+      }
+
+      const normalized = normalizeDrugCheckResults(parsed.data);
+      const interpretation = data?.result?.interpretation;
+      if (interpretation) {
+        normalized.summary = interpretation;
+      }
+      setResults(normalized);
 
       offlineService.saveToolResult({
         userId: user?.id,
         toolType: toolConfig.id,
         input: { medications: activeMeds },
-        output: mockResults,
+        output: normalized,
         timestamp: new Date().toISOString(),
       }).catch(() => {});
 
@@ -84,13 +126,16 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
           medicationCount: activeMeds.length,
         },
       });
-
+    } catch (err) {
+      setError(err.message || 'Unable to check interactions. Try again or use chat.');
+    } finally {
       setIsChecking(false);
-    }, 1500);
+    }
   };
 
   const getSeverityColor = (severity) => {
     switch (severity) {
+      case 'contraindicated': return '#7F1D1D';
       case 'major': return '#EF4444';
       case 'moderate': return '#F59E0B';
       case 'minor': return '#10B981';
@@ -145,8 +190,19 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
           </div>
         </div>
 
+        {error && (
+          <div className="result-card" role="alert" style={{ borderColor: '#EF4444' }}>
+            <p>{error}</p>
+          </div>
+        )}
+
         {results && (
           <div className="results-section">
+            {results.summary && (
+              <div className="result-card">
+                <p className="interaction-description">{results.summary}</p>
+              </div>
+            )}
             {/* Interactions */}
             {results.interactions.length > 0 && (
               <div className="result-card">
