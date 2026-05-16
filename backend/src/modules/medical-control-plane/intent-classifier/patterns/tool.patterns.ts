@@ -49,6 +49,89 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     category: 'calculator',
   },
   {
+    toolId: 'qsofa',
+    toolName: 'qSOFA (quick SOFA)',
+    keywords: [
+      'qsofa',
+      'q sofa',
+      'quick sofa',
+      'quick sepsis score',
+      'sepsis bedside score',
+      'bedside sepsis score',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['respiratory_rate', 'systolic_bp', 'gcs', 'altered_mentation'],
+    description:
+      'Bedside qSOFA: RR ≥22, SBP ≤100, altered mentation or GCS <15 for suspected infection (Sepsis-3)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'news2',
+    toolName: 'NEWS2 (National Early Warning Score 2)',
+    keywords: [
+      'news2',
+      'news 2',
+      'national early warning score',
+      'early warning score',
+      'deterioration score',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'respiratory_rate',
+      'spo2',
+      'oxygen',
+      'systolic_bp',
+      'pulse',
+      'temperature',
+      'consciousness',
+    ],
+    description:
+      'Calculates NEWS2 from routine observations including SpO₂ Scale 1 or 2 per RCP chart',
+    category: 'calculator',
+  },
+  {
+    toolId: 'child-pugh',
+    toolName: 'Child-Pugh score',
+    keywords: [
+      'child pugh',
+      'child-pugh',
+      'ctp score',
+      'cirrhosis score',
+      'liver severity score',
+      'child turcotte pugh',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['bilirubin', 'albumin', 'inr', 'ascites', 'encephalopathy'],
+    description: 'Child–Turcotte–Pugh cirrhosis severity classification (class A/B/C)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'has-bled',
+    toolName: 'HAS-BLED score',
+    keywords: [
+      'has bled',
+      'has-bled',
+      'hasbled',
+      'bleeding risk',
+      'af bleeding risk',
+      'anticoagulation bleeding risk',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'hypertension',
+      'renal_dysfunction',
+      'liver_dysfunction',
+      'stroke',
+      'bleeding',
+      'inr',
+      'age',
+      'medications',
+      'alcohol',
+    ],
+    description: 'HAS-BLED bleeding risk score for anticoagulation decisions in atrial fibrillation',
+    category: 'calculator',
+  },
+  {
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
     keywords: [
@@ -369,8 +452,19 @@ export function matchToolPatterns(message: string): Array<{
     }
   }
 
+  // "qsofa" contains substring "sofa" — prefer qSOFA tool when user clearly asked for bedside qSOFA / quick SOFA.
+  const preferQsofa =
+    /\bqsofa\b/.test(lowerMessage) ||
+    lowerMessage.includes('quick sofa') ||
+    lowerMessage.includes('quick sepsis score') ||
+    lowerMessage.includes('sepsis bedside score') ||
+    lowerMessage.includes('bedside sepsis score');
+  const filtered = preferQsofa
+    ? matches.filter((m) => m.toolId !== 'sofa-calculator')
+    : matches;
+
   // Sort by confidence descending
-  return matches.sort((a, b) => b.confidence - a.confidence);
+  return filtered.sort((a, b) => b.confidence - a.confidence);
 }
 
 /**

@@ -2,13 +2,34 @@
  * Single source for linking catalog entries → UI routes, sidebar tools, and chat API params.
  */
 
-import toolRegistry, { toolRegistryById } from './toolRegistry';
+import { toolRegistryById } from './toolRegistry';
 import {
   clinicalIntentTools,
   clinicalIntentToolsById,
   builtinUiCalculators,
   ORCHESTRATOR_TO_REGISTRY_ID,
 } from './clinicalIntentToolCatalog';
+
+/**
+ * Built-in calculator slug (`builtinUiCalculators.id`, `?calc=` param) → sidebar registry id.
+ * Used by resolveCatalogLaunch for catalog rows keyed by calculator id.
+ */
+export const BUILTIN_CALC_ID_TO_REGISTRY_ID = {
+  sofa: 'sofa-score',
+  chads2vasc: 'calc-chads2vasc',
+  qsofa: 'qsofa',
+  news2: 'news2',
+  'child-pugh': 'child-pugh',
+  'has-bled': 'has-bled',
+};
+
+/** Tier-A calculators: dedicated NLU profile + registry row + shipped form (audit list). */
+export const PR1_CALCULATOR_REGISTRY_IDS = Object.freeze([
+  'qsofa',
+  'news2',
+  'child-pugh',
+  'has-bled',
+]);
 
 /** NLU / legacy / phantom ids → sidebar registry id (used by recommendations + catalog) */
 export const NLU_TO_REGISTRY_ID = {
@@ -35,7 +56,13 @@ export const NLU_TO_REGISTRY_ID = {
   'diagnosis-assistant': 'diagnosis',
   'procedure-guide': 'procedures',
   sofa: 'sofa-score',
-  qsofa: 'sofa-score',
+  qsofa: 'qsofa',
+  news2: 'news2',
+  'child-pugh': 'child-pugh',
+  'ctp-score': 'child-pugh',
+  'cirrhosis-score': 'child-pugh',
+  'has-bled': 'has-bled',
+  hasbled: 'has-bled',
   gfr: 'calc-gfr',
   egfr: 'calc-gfr',
   bmi: 'calc-bmi',
@@ -45,7 +72,7 @@ export const NLU_TO_REGISTRY_ID = {
   'trauma-score': 'calculators',
   'vitals-monitor': 'calculators',
   'antibiotic-scripts': 'drug-check',
-  'bleeding-risk': 'calculators',
+  'bleeding-risk': 'has-bled',
   'chemo-calculator': 'calculators',
   'cancer-calculator': 'calculators',
   'tumor-staging': 'diagnosis',
@@ -108,8 +135,7 @@ export function resolveCatalogLaunch(id) {
 
   const calc = builtinUiCalculators.find((c) => c.id === id);
   if (calc) {
-    const registryId =
-      id === 'sofa' ? 'sofa-score' : id === 'chads2vasc' ? 'calc-chads2vasc' : 'calculators';
+    const registryId = BUILTIN_CALC_ID_TO_REGISTRY_ID[id] ?? 'calculators';
     return {
       path: calc.path || calc.calcQuery?.split('?')[0] || '/tools/calculators',
       registryId,

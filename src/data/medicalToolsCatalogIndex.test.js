@@ -36,8 +36,49 @@ describe('medicalToolsCatalogIndex', () => {
 
   it('reports summary aligned with NLU count', () => {
     const summary = getMedicalCatalogSummary();
-    expect(summary.nluProfiles).toBe(15);
-    expect(summary.total).toBeGreaterThanOrEqual(15);
-    expect(summary.chatOnRequest).toBeGreaterThanOrEqual(15);
+    expect(summary.nluProfiles).toBe(19);
+    expect(summary.total).toBeGreaterThanOrEqual(19);
+    expect(summary.chatOnRequest).toBeGreaterThanOrEqual(19);
+  });
+
+  it('indexes HAS-BLED with dedicated page and calculator slug', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const hb = rows.find((r) => r.primaryId === 'has-bled' || r.id === 'has-bled');
+    expect(hb?.pagePath).toBe('/tools/calculators/has-bled');
+    expect(hb?.uiCalculatorSlug).toBe('has-bled');
+    expect(hb?.chatOnRequest).toBe(true);
+  });
+
+  it('indexes Child-Pugh with dedicated page and calculator slug', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const cp = rows.find((r) => r.primaryId === 'child-pugh' || r.id === 'child-pugh');
+    expect(cp?.pagePath).toBe('/tools/calculators/child-pugh');
+    expect(cp?.uiCalculatorSlug).toBe('child-pugh');
+    expect(cp?.chatOnRequest).toBe(true);
+  });
+
+  it('indexes qSOFA with dedicated page and calculator slug', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const qsofa = rows.find((r) => r.primaryId === 'qsofa' || r.id === 'qsofa');
+    expect(qsofa?.pagePath).toBe('/tools/calculators/qsofa');
+    expect(qsofa?.uiCalculatorSlug).toBe('qsofa');
+    expect(qsofa?.chatOnRequest).toBe(true);
+  });
+
+  it('indexes NEWS2 with dedicated page and calculator slug', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const news2 = rows.find((r) => r.primaryId === 'news2' || r.id === 'news2');
+    expect(news2?.pagePath).toBe('/tools/calculators/news2');
+    expect(news2?.uiCalculatorSlug).toBe('news2');
+    expect(news2?.chatOnRequest).toBe(true);
+  });
+
+  it('marks all PR1 NLU tools as client-side (no backend executor flag)', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const pr1 = ['qsofa', 'news2', 'child-pugh', 'has-bled'];
+    for (const id of pr1) {
+      const row = rows.find((r) => r.primaryId === id);
+      expect(row?.backendExecutor).toBe(false);
+    }
   });
 });

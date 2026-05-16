@@ -98,6 +98,10 @@ const TOOL_ICONS = {
   'calc-gfr': Activity,
   'calc-bmi': Scale,
   'calc-chads2vasc': HeartPulse,
+  qsofa: Siren,
+  news2: ClipboardList,
+  'child-pugh': Microscope,
+  'has-bled': Bandage,
   protocols: ClipboardList,
   diagnosis: Stethoscope,
   procedures: BookOpen,
@@ -113,6 +117,10 @@ const TOOL_ID_ALIASES = {
 /** Calculator sub-cards (Calculators.jsx) */
 const CALCULATOR_SUB_ICONS = {
   sofa: Hospital,
+  qsofa: Siren,
+  news2: ClipboardList,
+  'child-pugh': Microscope,
+  'has-bled': Bandage,
   gfr: Activity,
   bmi: Scale,
   chads2vasc: HeartPulse,
@@ -286,6 +294,7 @@ export const CHROME_ICONS = {
   calculator: Calculator,
   stethoscope: Stethoscope,
   heartPulse: HeartPulse,
+  bandage: Bandage,
   activity: Activity,
   scale: Scale,
 };

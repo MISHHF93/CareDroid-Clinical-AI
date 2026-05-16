@@ -58,7 +58,8 @@ export const phantomToolReferences = [
     source: 'CostTrackingContext.jsx',
     status: 'phantom',
     category: 'calculator',
-    notes: 'Cost category only; HAS-BLED mentioned in TermsOfService, not implemented.',
+    notes:
+      'Cost category id; launch resolves to HAS-BLED registry (/tools/calculators/has-bled) via NLU_TO_REGISTRY_ID + toolIdAliases.',
   },
   {
     id: 'cancer-calculator',
@@ -103,25 +104,7 @@ export const phantomToolReferences = [
 ];
 
 /** Marketing / legal copy not backed by code */
-export const marketingOnlyMentions = [
-  {
-    id: 'qsofa',
-    name: 'qSOFA',
-    source: 'src/pages/legal/TermsOfService.jsx, toolRecommendations.js',
-    status: 'marketing-copy',
-    category: 'calculator',
-    notes: 'Keyword routes to SOFA sidebar entry; no qSOFA-specific calculator UI.',
-    mapsTo: 'sofa-score',
-  },
-  {
-    id: 'has-bled',
-    name: 'HAS-BLED',
-    source: 'src/pages/legal/TermsOfService.jsx',
-    status: 'marketing-copy',
-    category: 'calculator',
-    notes: 'Listed in terms; not in Calculators.jsx or tool.patterns.',
-  },
-];
+export const marketingOnlyMentions = [];
 
 /** ID aliases (same capability, different string in tests vs registry) */
 export const toolIdAliases = [
@@ -139,6 +122,11 @@ export const toolIdAliases = [
   { id: 'diagnosis-assistant', mapsTo: 'diagnosis', source: 'CostTrackingContext TOOL_ID_ALIASES' },
   { id: 'procedure-guide', mapsTo: 'procedures', source: 'CostTrackingContext TOOL_ID_ALIASES' },
   { id: 'protocol-lookup', mapsTo: 'protocols', source: 'NLU id vs registry' },
+  {
+    id: 'bleeding-risk',
+    mapsTo: 'has-bled',
+    source: 'CostTrackingContext — canonical UI is HAS-BLED (see NLU_TO_REGISTRY_ID)',
+  },
 ];
 
 /** Client-side clinical helpers on tool pages and chat */
@@ -624,9 +612,9 @@ export function getSourceCodeDiscoverySummary() {
 }
 
 export const SOURCE_SCAN_LOCATIONS = [
-  { label: 'NLU clinical tools', path: 'backend/.../tool.patterns.ts', count: 15 },
+  { label: 'NLU clinical tools', path: 'backend/.../tool.patterns.ts', count: 19 },
   { label: 'Backend executors', path: 'backend/.../tool-orchestrator/', count: 3 },
-  { label: 'Calculator UI slugs', path: 'src/pages/tools/Calculators.jsx', count: 4 },
+  { label: 'Calculator UI slugs', path: 'src/pages/tools/Calculators.jsx', count: 8 },
   { label: 'Sidebar registry', path: 'src/data/toolRegistry.js', count: toolRegistry.length },
   { label: 'Emergency NLU patterns', path: 'src/data/emergencyPatternCatalog.js', count: emergencyPatternGroups.length },
   { label: 'Phantom / roadmap IDs', path: 'CostTrackingContext, advancedRecommendationService', count: phantomToolReferences.length },

@@ -4,6 +4,30 @@ import ToolPageLayout from './ToolPageLayout';
 import './Calculators.css';
 import { apiFetch, parseApiResponse } from '../../services/apiClient';
 import { parseToolExecutionResponse } from '../../utils/toolExecutionResponse';
+import {
+  calculateQsofaScore,
+  interpretQsofaScore,
+  qsofaCriteriaFromInputs,
+  validateQsofaInputs,
+} from '../../utils/qsofaCalculator';
+import {
+  computeNews2Breakdown,
+  interpretNews2Risk,
+  sumNews2Score,
+  validateNews2Inputs,
+} from '../../utils/news2Calculator';
+import {
+  computeChildPughBreakdown,
+  interpretChildPughClass,
+  sumChildPughScore,
+  validateChildPughInputs,
+} from '../../utils/childPughCalculator';
+import {
+  HAS_BLED_CRITERIA_META,
+  calculateHasBledScore,
+  computeHasBledBreakdown,
+  interpretHasBled,
+} from '../../utils/hasBledCalculator';
 import { NavIcon } from '../../navigation/NavIcon';
 import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
 
@@ -13,6 +37,30 @@ const CALCULATORS = [
     name: 'SOFA Score',
     description: 'Sequential Organ Failure Assessment for ICU patients',
     category: 'ICU/Critical Care',
+  },
+  {
+    id: 'qsofa',
+    name: 'qSOFA (quick SOFA)',
+    description: 'Bedside sepsis screen: RR, SBP, mentation / GCS (Sepsis-3)',
+    category: 'ICU/Emergency',
+  },
+  {
+    id: 'news2',
+    name: 'NEWS2',
+    description: 'National Early Warning Score 2 (RCP) — vitals, SpO₂ scale, escalation',
+    category: 'Acute / ward',
+  },
+  {
+    id: 'child-pugh',
+    name: 'Child-Pugh',
+    description: 'Cirrhosis severity (bilirubin, albumin, INR/PT, ascites, encephalopathy)',
+    category: 'Hepatology',
+  },
+  {
+    id: 'has-bled',
+    name: 'HAS-BLED',
+    description: 'Bleeding-risk factors when considering anticoagulation (e.g. AF)',
+    category: 'Cardiology',
   },
   {
     id: 'gfr',
@@ -57,6 +105,25 @@ function CalcResultsEmptyIcon({ icon, size = 56 }) {
     <div className="calc-results-empty-icon" aria-hidden>
       <NavIcon icon={icon} size={size} />
     </div>
+  );
+}
+
+/** Shared PR1 lead line: clinical decision support, not diagnostic or prescriptive. */
+function CalcDecisionSupportLead() {
+  return (
+    <p className="calc-ds-lead">
+      <strong>Decision support only.</strong> Does not establish a diagnosis or replace clinician judgment; follow
+      local protocols.
+    </p>
+  );
+}
+
+function CalcResultSafetyFooter() {
+  return (
+    <p className="calc-result-safety-footer" role="note">
+      Output reflects the values you entered and may omit important clinical context. Do not treat this screen as
+      definitive proof of illness severity, eligibility, or treatment requirement.
+    </p>
   );
 }
 
@@ -143,6 +210,14 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
   switch (calculator.id) {
     case 'sofa':
       return <SOFACalculator onResultChange={onResultChange} />;
+    case 'qsofa':
+      return <QSOFACalculator onResultChange={onResultChange} />;
+    case 'news2':
+      return <NEWS2Calculator onResultChange={onResultChange} />;
+    case 'child-pugh':
+      return <ChildPughCalculator onResultChange={onResultChange} />;
+    case 'has-bled':
+      return <HasBledCalculator onResultChange={onResultChange} />;
     case 'gfr':
       return <GFRCalculator onResultChange={onResultChange} />;
     case 'bmi':
@@ -152,6 +227,1180 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
     default:
       return <div>Calculator not implemented</div>;
   }
+};
+
+/**
+ * qSOFA — bedside screening (Sepsis-3). Decision support only; not a substitute for clinical judgment.
+ */
+const QSOFACalculator = ({ onResultChange }) => {
+  const [respiratoryRate, setRespiratoryRate] = useState('');
+  const [systolicBloodPressure, setSystolicBloodPressure] = useState('');
+  const [alteredMentation, setAlteredMentation] = useState(false);
+  const [gcs, setGcs] = useState('');
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    if (onResultChange) {
+      onResultChange(
+        result
+          ? {
+              qsofaScore: result.score,
+              severity: result.severity,
+              criteria: result.criteria,
+            }
+          : null
+      );
+    }
+  }, [onResultChange, result]);
+
+  const runCalculate = () => {
+    const v = validateQsofaInputs({
+      respiratoryRate,
+      systolicBloodPressure,
+      alteredMentation,
+      gcs,
+    });
+    setValidationErrors(v.errors);
+    if (!v.ok) {
+      setResult(null);
+      return;
+    }
+    const criteria = qsofaCriteriaFromInputs({
+      respiratoryRate,
+      systolicBloodPressure,
+      alteredMentation,
+      gcs,
+    });
+    const score = calculateQsofaScore(criteria);
+    const interp = interpretQsofaScore(score);
+    setResult({
+      score,
+      severity: interp.severity,
+      interpretation: interp.interpretation,
+      referenceLine: interp.referenceLine,
+      criteria,
+    });
+  };
+
+  const reset = () => {
+    setRespiratoryRate('');
+    setSystolicBloodPressure('');
+    setAlteredMentation(false);
+    setGcs('');
+    setValidationErrors([]);
+    setResult(null);
+  };
+
+  return (
+    <div className="calculator-interface calculator-interface--qsofa">
+      <div className="calculator-inputs">
+        <CalcPanelTitle icon={CHROME_ICONS.siren}>qSOFA</CalcPanelTitle>
+
+        <div className="calc-qsofa-disclaimer" role="note">
+          <CalcDecisionSupportLead />
+          <p className="calc-disclaimer-detail">
+            <strong>Clinical use:</strong> qSOFA is bedside screening in suspected infection. It does not diagnose
+            sepsis. Score ≥2 suggests higher risk of poor outcome per Sepsis-3 — always interpret in clinical context.
+            Not for use as sole basis for treatment decisions.
+          </p>
+        </div>
+
+        <form
+          className="calc-pr1-form"
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            runCalculate();
+          }}
+        >
+        <div className="calc-input-grid calc-input-grid--responsive">
+          <div className="calc-input-group calc-input-group--grow">
+            <label className="calc-input-label" htmlFor="qsofa-rr">
+              Respiratory rate (breaths/min)
+            </label>
+            <span className="calc-input-help" id="qsofa-rr-help">
+              1 point if ≥ 22
+            </span>
+            <input
+              id="qsofa-rr"
+              type="number"
+              inputMode="decimal"
+              className="calc-input-field"
+              aria-describedby="qsofa-rr-help"
+              min={0}
+              max={120}
+              value={respiratoryRate}
+              onChange={(e) => setRespiratoryRate(e.target.value)}
+            />
+          </div>
+          <div className="calc-input-group calc-input-group--grow">
+            <label className="calc-input-label" htmlFor="qsofa-sbp">
+              Systolic blood pressure (mmHg)
+            </label>
+            <span className="calc-input-help" id="qsofa-sbp-help">
+              1 point if ≤ 100
+            </span>
+            <input
+              id="qsofa-sbp"
+              type="number"
+              inputMode="decimal"
+              className="calc-input-field"
+              aria-describedby="qsofa-sbp-help"
+              min={40}
+              max={300}
+              value={systolicBloodPressure}
+              onChange={(e) => setSystolicBloodPressure(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="calc-input-group">
+          <div className="calc-checkbox-group">
+            <input
+              type="checkbox"
+              id="qsofa-alt"
+              className="calc-checkbox"
+              checked={alteredMentation}
+              onChange={(e) => setAlteredMentation(e.target.checked)}
+              aria-describedby="qsofa-ment-help"
+            />
+            <label htmlFor="qsofa-alt" className="calc-checkbox-label">
+              Altered mentation (e.g. disorientation, lethargy)
+            </label>
+          </div>
+          <span className="calc-input-help" id="qsofa-ment-help">
+            1 point if altered, or if GCS below is &lt; 15 (either satisfies the mentation criterion).
+          </span>
+        </div>
+
+        <div className="calc-input-group">
+          <label className="calc-input-label" htmlFor="qsofa-gcs">
+            GCS total (optional)
+          </label>
+          <span className="calc-input-help" id="qsofa-gcs-help">
+            3–15. If provided and &lt; 15, counts toward mentation criterion. May leave blank if you used
+            “altered mentation” only.
+          </span>
+          <input
+            id="qsofa-gcs"
+            type="number"
+            className="calc-input-field"
+            aria-describedby="qsofa-gcs-help"
+            min={3}
+            max={15}
+            value={gcs}
+            onChange={(e) => setGcs(e.target.value)}
+            placeholder="e.g. 15"
+          />
+        </div>
+
+        {validationErrors.length > 0 && (
+          <div className="calc-error" role="alert">
+            <strong>Please fix:</strong>
+            <ul className="calc-validation-list">
+              {validationErrors.map((err) => (
+                <li key={err}>{err}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="calc-actions">
+          <button type="submit" className="calc-calculate-btn">
+            <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
+            Calculate qSOFA
+          </button>
+          <button type="button" className="calc-reset-btn" onClick={reset}>
+            Reset
+          </button>
+        </div>
+        </form>
+      </div>
+
+      <div className="calculator-results" aria-live="polite">
+        <ResultsPanelTitle />
+
+        {result ? (
+          <>
+            <div className={`calc-score-display ${result.severity}`}>
+              <div className="calc-score-label">qSOFA score</div>
+              <div className="calc-score-value">{result.score}</div>
+              <div className="calc-score-interpretation">of 3 criteria present</div>
+            </div>
+
+            <div className="calc-breakdown">
+              <div className="calc-breakdown-title">Criteria</div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">RR ≥ 22/min</span>
+                <span className="calc-breakdown-score">{result.criteria.respiratoryRateGte22 ? '1' : '0'}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">SBP ≤ 100 mmHg</span>
+                <span className="calc-breakdown-score">{result.criteria.systolicBpLte100 ? '1' : '0'}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Altered mentation or GCS &lt; 15</span>
+                <span className="calc-breakdown-score">{result.criteria.alteredMentationOrGcsLt15 ? '1' : '0'}</span>
+              </div>
+            </div>
+
+            <div
+              className={`calc-interpretation-box ${result.severity}${
+                result.score >= 2 ? ' calc-interpretation-box--risk-emphasis' : ''
+              }`}
+            >
+              <div className="calc-interpretation-title">Interpretation</div>
+              <div className="calc-interpretation-text">{result.interpretation}</div>
+            </div>
+
+            <div className="calc-references">
+              <div className="calc-references-title">Reference</div>
+              <ul className="calc-references-list">
+                <li>{result.referenceLine}</li>
+              </ul>
+            </div>
+            <CalcResultSafetyFooter />
+          </>
+        ) : (
+          <div className="calc-results-empty">
+            <CalcResultsEmptyIcon icon={CHROME_ICONS.siren} />
+            <p>Enter vitals and mentation, then calculate</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * NEWS2 — RCP standard acute physiology score. Decision support only; follow local escalation policy.
+ */
+const NEWS2Calculator = ({ onResultChange }) => {
+  const [respiratoryRate, setRespiratoryRate] = useState('');
+  const [spo2, setSpo2] = useState('');
+  const [spo2Scale, setSpo2Scale] = useState('1');
+  const [supplementalOxygen, setSupplementalOxygen] = useState(false);
+  const [systolicBp, setSystolicBp] = useState('');
+  const [pulse, setPulse] = useState('');
+  const [newConfusion, setNewConfusion] = useState(false);
+  const [temperature, setTemperature] = useState('');
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    if (onResultChange) {
+      onResultChange(
+        result
+          ? {
+              news2Score: result.total,
+              severity: result.severity,
+              riskBand: result.riskBand,
+            }
+          : null
+      );
+    }
+  }, [onResultChange, result]);
+
+  const runCalculate = () => {
+    const v = validateNews2Inputs({
+      respiratoryRate,
+      spo2,
+      spo2Scale,
+      supplementalOxygen,
+      systolicBp,
+      pulse,
+      newConfusion,
+      temperature,
+    });
+    setValidationErrors(v.errors);
+    if (!v.ok) {
+      setResult(null);
+      return;
+    }
+    const breakdown = computeNews2Breakdown({
+      respiratoryRate,
+      spo2,
+      spo2Scale,
+      supplementalOxygen,
+      systolicBp,
+      pulse,
+      newConfusion,
+      temperature,
+    });
+    const total = sumNews2Score(breakdown);
+    if (total === null) {
+      setValidationErrors(['Unable to compute score from inputs.']);
+      setResult(null);
+      return;
+    }
+    const interp = interpretNews2Risk(total, breakdown);
+    setResult({
+      total,
+      breakdown,
+      ...interp,
+    });
+  };
+
+  const reset = () => {
+    setRespiratoryRate('');
+    setSpo2('');
+    setSpo2Scale('1');
+    setSupplementalOxygen(false);
+    setSystolicBp('');
+    setPulse('');
+    setNewConfusion(false);
+    setTemperature('');
+    setValidationErrors([]);
+    setResult(null);
+  };
+
+  return (
+    <div className="calculator-interface calculator-interface--news2">
+      <div className="calculator-inputs">
+        <CalcPanelTitle icon={CHROME_ICONS.clipboardList}>NEWS2</CalcPanelTitle>
+
+        <div className="calc-news2-disclaimer" role="note">
+          <CalcDecisionSupportLead />
+          <p className="calc-disclaimer-detail">
+            <strong>Clinical use:</strong> NEWS2 supports detection of acute illness severity and guides monitoring
+            frequency and escalation. It is an adjunct to clinical judgement, not a substitute. Follow your
+            organisation’s response policy and senior review where indicated.
+          </p>
+        </div>
+
+        <fieldset className="calc-news2-scale-fieldset">
+          <legend className="calc-news2-legend" id="news2-scale-legend">
+            SpO₂ scoring scale
+          </legend>
+          <div className="calc-news2-scale-options" role="radiogroup" aria-labelledby="news2-scale-legend">
+            <label className="calc-news2-scale-option">
+              <input
+                id="news2-scale-1"
+                type="radio"
+                name="news2-spo2-scale"
+                value="1"
+                checked={spo2Scale === '1'}
+                onChange={() => setSpo2Scale('1')}
+              />
+              <span>
+                <strong>Scale 1</strong> — usual scale for most patients (target SpO₂ typically 94–98% per BTS when
+                using oxygen).
+              </span>
+            </label>
+            <label className="calc-news2-scale-option calc-news2-scale-option--scale2">
+              <input
+                id="news2-scale-2"
+                type="radio"
+                name="news2-spo2-scale"
+                value="2"
+                checked={spo2Scale === '2'}
+                onChange={() => setSpo2Scale('2')}
+              />
+              <span>
+                <strong>Scale 2</strong> — only for patients with a <strong>prescribed</strong> target SpO₂ range of
+                88–92% (e.g. confirmed hypercapnic respiratory failure), under direction of a competent clinician and
+                documented in the notes.
+              </span>
+            </label>
+          </div>
+          {spo2Scale === '2' && (
+            <div className="calc-news2-scale2-warning" role="alert">
+              <strong>Scale 2 warning:</strong> Using Scale 2 inappropriately (e.g. for patients who should be on
+              Scale 1) will mis-score SpO₂ and may delay recognition of hypoxaemia or cause inappropriate oxygen
+              targets. If unsure, use Scale 1 and seek respiratory / senior advice.
+            </div>
+          )}
+        </fieldset>
+
+        <form
+          className="calc-pr1-form"
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            runCalculate();
+          }}
+        >
+        <div className="calc-input-grid calc-input-grid--responsive">
+          <div className="calc-input-group calc-input-group--grow">
+            <label className="calc-input-label" htmlFor="news2-rr">
+              Respiratory rate (breaths/min)
+            </label>
+            <span className="calc-input-help" id="news2-rr-help">
+              Values outside 0–60 cannot be calculated; use the chart for extreme physiology.
+            </span>
+            <input
+              id="news2-rr"
+              type="number"
+              inputMode="numeric"
+              className="calc-input-field"
+              aria-describedby="news2-rr-help"
+              min={0}
+              max={60}
+              value={respiratoryRate}
+              onChange={(e) => setRespiratoryRate(e.target.value)}
+            />
+          </div>
+          <div className="calc-input-group calc-input-group--grow">
+            <label className="calc-input-label" htmlFor="news2-spo2">
+              SpO₂ (%)
+            </label>
+            <span className="calc-input-help" id="news2-spo2-help">
+              Pulse oximetry on current scale ({spo2Scale === '2' ? 'Scale 2' : 'Scale 1'}).
+            </span>
+            <input
+              id="news2-spo2"
+              type="number"
+              inputMode="decimal"
+              className="calc-input-field"
+              aria-describedby="news2-spo2-help"
+              min={70}
+              max={100}
+              value={spo2}
+              onChange={(e) => setSpo2(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="calc-input-group">
+          <div className="calc-checkbox-group">
+            <input
+              type="checkbox"
+              id="news2-o2"
+              className="calc-checkbox"
+              checked={supplementalOxygen}
+              onChange={(e) => setSupplementalOxygen(e.target.checked)}
+              aria-describedby="news2-o2-help"
+            />
+            <label htmlFor="news2-o2" className="calc-checkbox-label">
+              Supplemental oxygen in use (any delivery device)
+            </label>
+          </div>
+          <span className="calc-input-help" id="news2-o2-help">
+            NEWS2 adds 2 points when supplemental oxygen is required (Air vs oxygen row), in addition to the SpO₂
+            score for the scale you selected.
+          </span>
+        </div>
+
+        <div className="calc-input-grid calc-input-grid--responsive">
+          <div className="calc-input-group calc-input-group--grow">
+            <label className="calc-input-label" htmlFor="news2-sbp">
+              Systolic BP (mmHg)
+            </label>
+            <input
+              id="news2-sbp"
+              type="number"
+              inputMode="decimal"
+              className="calc-input-field"
+              min={50}
+              max={280}
+              value={systolicBp}
+              onChange={(e) => setSystolicBp(e.target.value)}
+            />
+          </div>
+          <div className="calc-input-group calc-input-group--grow">
+            <label className="calc-input-label" htmlFor="news2-pulse">
+              Pulse (bpm)
+            </label>
+            <input
+              id="news2-pulse"
+              type="number"
+              inputMode="numeric"
+              className="calc-input-field"
+              min={20}
+              max={220}
+              value={pulse}
+              onChange={(e) => setPulse(e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div className="calc-input-group">
+          <label className="calc-input-label" htmlFor="news2-temp">
+            Temperature (°C)
+          </label>
+          <span className="calc-input-help" id="news2-temp-help">
+            Core or equivalent temperature. Values outside 30–43 °C are blocked from calculation.
+          </span>
+          <input
+            id="news2-temp"
+            type="number"
+            inputMode="decimal"
+            className="calc-input-field"
+            aria-describedby="news2-temp-help"
+            step="0.1"
+            min={30}
+            max={43}
+            value={temperature}
+            onChange={(e) => setTemperature(e.target.value)}
+          />
+        </div>
+
+        <div className="calc-input-group">
+          <div className="calc-checkbox-group">
+            <input
+              type="checkbox"
+              id="news2-conf"
+              className="calc-checkbox"
+              checked={newConfusion}
+              onChange={(e) => setNewConfusion(e.target.checked)}
+              aria-describedby="news2-conf-help"
+            />
+            <label htmlFor="news2-conf" className="calc-checkbox-label">
+              New confusion (or not alert — ACVPU not “alert”)
+            </label>
+          </div>
+          <span className="calc-input-help" id="news2-conf-help">
+            Score 3 if new confusion / CVPU applies; leave unchecked if the patient is alert.
+          </span>
+        </div>
+
+        {validationErrors.length > 0 && (
+          <div className="calc-error" role="alert">
+            <strong>Please fix:</strong>
+            <ul className="calc-validation-list">
+              {validationErrors.map((err) => (
+                <li key={err}>{err}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="calc-actions">
+          <button type="submit" className="calc-calculate-btn">
+            <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
+            Calculate NEWS2
+          </button>
+          <button type="button" className="calc-reset-btn" onClick={reset}>
+            Reset
+          </button>
+        </div>
+        </form>
+      </div>
+
+      <div className="calculator-results" aria-live="polite">
+        <ResultsPanelTitle />
+
+        {result ? (
+          <>
+            <div className={`calc-score-display ${result.severity}`}>
+              <div className="calc-score-label">NEWS2 total</div>
+              <div className="calc-score-value">{result.total}</div>
+              <div className="calc-score-interpretation">{result.label}</div>
+            </div>
+
+            <div className="calc-breakdown">
+              <div className="calc-breakdown-title">Parameter scores</div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Respiratory rate</span>
+                <span className="calc-breakdown-score">{result.breakdown.respiratoryRate}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">
+                  SpO₂ (scale {result.breakdown.spo2ScaleUsed})
+                </span>
+                <span className="calc-breakdown-score">{result.breakdown.spo2}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Supplemental oxygen</span>
+                <span className="calc-breakdown-score">{result.breakdown.supplementalOxygen}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Systolic BP</span>
+                <span className="calc-breakdown-score">{result.breakdown.systolicBp}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Pulse</span>
+                <span className="calc-breakdown-score">{result.breakdown.pulse}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Consciousness</span>
+                <span className="calc-breakdown-score">{result.breakdown.consciousness}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Temperature</span>
+                <span className="calc-breakdown-score">{result.breakdown.temperature}</span>
+              </div>
+            </div>
+
+            <div
+              className={`calc-interpretation-box ${result.severity}${
+                result.severity !== 'normal' ? ' calc-interpretation-box--risk-emphasis' : ''
+              }`}
+            >
+              <div className="calc-interpretation-title">Escalation (RCP guidance)</div>
+              <div className="calc-interpretation-text">{result.interpretation}</div>
+              <div className="calc-interpretation-text calc-interpretation-text--secondary">{result.escalationHint}</div>
+            </div>
+
+            <div className="calc-references">
+              <div className="calc-references-title">Reference</div>
+              <ul className="calc-references-list">
+                <li>{result.referenceLine}</li>
+              </ul>
+            </div>
+            <CalcResultSafetyFooter />
+          </>
+        ) : (
+          <div className="calc-results-empty">
+            <CalcResultsEmptyIcon icon={CHROME_ICONS.clipboardList} />
+            <p>Enter observations, choose SpO₂ scale, then calculate</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Child-Pugh — cirrhosis severity class. Prognostic index only; not for directing therapy without specialist context.
+ */
+const ChildPughCalculator = ({ onResultChange }) => {
+  const [bilirubin, setBilirubin] = useState('');
+  const [bilirubinUnit, setBilirubinUnit] = useState('mg_dl');
+  const [albumin, setAlbumin] = useState('');
+  const [albuminUnit, setAlbuminUnit] = useState('g_dl');
+  const [coagulationMode, setCoagulationMode] = useState('inr');
+  const [inr, setInr] = useState('');
+  const [ptProlongationSec, setPtProlongationSec] = useState('');
+  const [ascites, setAscites] = useState('none');
+  const [encephalopathy, setEncephalopathy] = useState('none');
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    if (onResultChange) {
+      onResultChange(
+        result
+          ? {
+              childPughScore: result.total,
+              childPughClass: result.childPughClass,
+              severity: result.severity,
+            }
+          : null
+      );
+    }
+  }, [onResultChange, result]);
+
+  const runCalculate = () => {
+    const raw = {
+      bilirubin,
+      bilirubinUnit,
+      albumin,
+      albuminUnit,
+      coagulationMode,
+      inr,
+      ptProlongationSec,
+      ascites,
+      encephalopathy,
+    };
+    const v = validateChildPughInputs(raw);
+    setValidationErrors(v.errors);
+    if (!v.ok) {
+      setResult(null);
+      return;
+    }
+    const breakdown = computeChildPughBreakdown(raw);
+    const total = sumChildPughScore(breakdown);
+    if (total === null) {
+      setValidationErrors(['Unable to compute score from inputs.']);
+      setResult(null);
+      return;
+    }
+    const interp = interpretChildPughClass(total);
+    if (!interp) {
+      setValidationErrors(['Total score out of expected range.']);
+      setResult(null);
+      return;
+    }
+    setResult({ total, breakdown, ...interp });
+  };
+
+  const reset = () => {
+    setBilirubin('');
+    setBilirubinUnit('mg_dl');
+    setAlbumin('');
+    setAlbuminUnit('g_dl');
+    setCoagulationMode('inr');
+    setInr('');
+    setPtProlongationSec('');
+    setAscites('none');
+    setEncephalopathy('none');
+    setValidationErrors([]);
+    setResult(null);
+  };
+
+  return (
+    <div className="calculator-interface calculator-interface--child-pugh">
+      <div className="calculator-inputs">
+        <CalcPanelTitle icon={CHROME_ICONS.microscope}>Child-Pugh</CalcPanelTitle>
+
+        <div className="calc-child-pugh-disclaimer" role="note">
+          <CalcDecisionSupportLead />
+          <p className="calc-disclaimer-detail">
+            <strong>Clinical use:</strong> Child-Pugh is a severity / prognostic classification for cirrhosis. It does
+            not replace hepatology assessment, transplant listing criteria, or institution-specific pathways. Do not use
+            this tool alone to prescribe treatments or procedures.
+          </p>
+        </div>
+
+        <form
+          className="calc-pr1-form"
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            runCalculate();
+          }}
+        >
+        <div className="calc-input-grid calc-input-grid--responsive">
+          <div className="calc-input-group calc-input-group--grow">
+            <label className="calc-input-label" htmlFor="cp-bili">
+              Total bilirubin
+            </label>
+            <div className="calc-input-inline-units">
+              <input
+                id="cp-bili"
+                type="number"
+                inputMode="decimal"
+                className="calc-input-field"
+                step="0.1"
+                min={0}
+                value={bilirubin}
+                onChange={(e) => setBilirubin(e.target.value)}
+              />
+              <div className="calc-unit-field">
+                <label className="calc-input-label calc-input-label--unit" htmlFor="cp-bili-unit">
+                  Unit
+                </label>
+                <select
+                  id="cp-bili-unit"
+                  className="calc-select-field"
+                  aria-describedby="cp-bili-unit-hint"
+                  value={bilirubinUnit}
+                  onChange={(e) => setBilirubinUnit(e.target.value)}
+                >
+                  <option value="mg_dl">mg/dL</option>
+                  <option value="umol_l">μmol/L</option>
+                </select>
+                <span id="cp-bili-unit-hint" className="calc-sr-only">
+                  Milligrams per decilitre or micromoles per litre
+                </span>
+              </div>
+            </div>
+          </div>
+          <div className="calc-input-group calc-input-group--grow">
+            <label className="calc-input-label" htmlFor="cp-alb">
+              Albumin
+            </label>
+            <div className="calc-input-inline-units">
+              <input
+                id="cp-alb"
+                type="number"
+                inputMode="decimal"
+                className="calc-input-field"
+                step="0.1"
+                min={0}
+                value={albumin}
+                onChange={(e) => setAlbumin(e.target.value)}
+              />
+              <div className="calc-unit-field">
+                <label className="calc-input-label calc-input-label--unit" htmlFor="cp-alb-unit">
+                  Unit
+                </label>
+                <select
+                  id="cp-alb-unit"
+                  className="calc-select-field"
+                  aria-describedby="cp-alb-unit-hint"
+                  value={albuminUnit}
+                  onChange={(e) => setAlbuminUnit(e.target.value)}
+                >
+                  <option value="g_dl">g/dL</option>
+                  <option value="g_l">g/L</option>
+                </select>
+                <span id="cp-alb-unit-hint" className="calc-sr-only">
+                  Grams per decilitre or grams per litre
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="calc-input-group">
+          <label className="calc-input-label" htmlFor="cp-coag-mode">
+            Coagulation (choose one)
+          </label>
+          <span className="calc-input-help" id="cp-coag-help">
+            Enter <strong>either</strong> INR <strong>or</strong> prothrombin time prolongation vs control (seconds) —
+            not both.
+          </span>
+          <select
+            id="cp-coag-mode"
+            className="calc-select-field"
+            aria-describedby="cp-coag-help"
+            value={coagulationMode}
+            onChange={(e) => {
+              setCoagulationMode(e.target.value);
+              setInr('');
+              setPtProlongationSec('');
+            }}
+          >
+            <option value="inr">INR</option>
+            <option value="pt">PT prolongation (sec above control)</option>
+          </select>
+        </div>
+
+        {coagulationMode === 'inr' ? (
+          <div className="calc-input-group">
+            <label className="calc-input-label" htmlFor="cp-inr">
+              INR
+            </label>
+            <input
+              id="cp-inr"
+              type="number"
+              inputMode="decimal"
+              className="calc-input-field"
+              step="0.1"
+              min={0.5}
+              max={15}
+              value={inr}
+              onChange={(e) => setInr(e.target.value)}
+            />
+          </div>
+        ) : (
+          <div className="calc-input-group">
+            <label className="calc-input-label" htmlFor="cp-pt">
+              PT prolongation (seconds above control)
+            </label>
+            <input
+              id="cp-pt"
+              type="number"
+              inputMode="decimal"
+              className="calc-input-field"
+              step="0.1"
+              min={0}
+              max={80}
+              value={ptProlongationSec}
+              onChange={(e) => setPtProlongationSec(e.target.value)}
+            />
+          </div>
+        )}
+
+        <div className="calc-input-grid calc-input-grid--responsive">
+          <div className="calc-input-group calc-input-group--grow">
+            <label className="calc-input-label" htmlFor="cp-ascites">
+              Ascites
+            </label>
+            <select
+              id="cp-ascites"
+              className="calc-select-field"
+              value={ascites}
+              onChange={(e) => setAscites(e.target.value)}
+            >
+              <option value="none">None</option>
+              <option value="slight">Slight / controlled (diuretic-responsive)</option>
+              <option value="moderate">Moderate / tense (refractory or significant)</option>
+            </select>
+          </div>
+          <div className="calc-input-group calc-input-group--grow">
+            <label className="calc-input-label" htmlFor="cp-enceph">
+              Hepatic encephalopathy
+            </label>
+            <select
+              id="cp-enceph"
+              className="calc-select-field"
+              value={encephalopathy}
+              onChange={(e) => setEncephalopathy(e.target.value)}
+            >
+              <option value="none">None</option>
+              <option value="grade12">Grade 1–2 (mild)</option>
+              <option value="grade34">Grade 3–4 (severe)</option>
+            </select>
+          </div>
+        </div>
+
+        {validationErrors.length > 0 && (
+          <div className="calc-error" role="alert">
+            <strong>Please fix:</strong>
+            <ul className="calc-validation-list">
+              {validationErrors.map((err) => (
+                <li key={err}>{err}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="calc-actions">
+          <button type="submit" className="calc-calculate-btn">
+            <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
+            Calculate Child-Pugh
+          </button>
+          <button type="button" className="calc-reset-btn" onClick={reset}>
+            Reset
+          </button>
+        </div>
+        </form>
+      </div>
+
+      <div className="calculator-results" aria-live="polite">
+        <ResultsPanelTitle />
+
+        {result ? (
+          <>
+            <div className={`calc-score-display ${result.severity}`}>
+              <div className="calc-score-label">Child-Pugh score</div>
+              <div className="calc-score-value">{result.total}</div>
+              <div className="calc-score-interpretation">{result.label}</div>
+            </div>
+
+            <div className="calc-breakdown">
+              <div className="calc-breakdown-title">Components (each 1–3)</div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Bilirubin (scored as mg/dL)</span>
+                <span className="calc-breakdown-score">{result.breakdown.bilirubin}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Albumin (scored as g/dL)</span>
+                <span className="calc-breakdown-score">{result.breakdown.albumin}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">
+                  Coagulation ({result.breakdown.parsed.coagulationMode === 'pt' ? 'PT prolongation' : 'INR'})
+                </span>
+                <span className="calc-breakdown-score">{result.breakdown.coagulation}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Ascites</span>
+                <span className="calc-breakdown-score">{result.breakdown.ascites}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Encephalopathy</span>
+                <span className="calc-breakdown-score">{result.breakdown.encephalopathy}</span>
+              </div>
+            </div>
+
+            <div
+              className={`calc-interpretation-box ${result.severity}${
+                result.severity !== 'normal' ? ' calc-interpretation-box--risk-emphasis' : ''
+              }`}
+            >
+              <div className="calc-interpretation-title">Interpretation</div>
+              <div className="calc-interpretation-text">{result.interpretation}</div>
+            </div>
+
+            <div className="calc-references">
+              <div className="calc-references-title">Reference</div>
+              <ul className="calc-references-list">
+                <li>{result.referenceLine}</li>
+              </ul>
+            </div>
+            <CalcResultSafetyFooter />
+          </>
+        ) : (
+          <div className="calc-results-empty">
+            <CalcResultsEmptyIcon icon={CHROME_ICONS.microscope} />
+            <p>Enter labs and clinical grades, then calculate</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * HAS-BLED — bleeding risk factors (anticoagulation context). Decision support only.
+ */
+const HasBledCalculator = ({ onResultChange }) => {
+  const [hypertension, setHypertension] = useState(false);
+  const [renalDysfunction, setRenalDysfunction] = useState(false);
+  const [liverDysfunction, setLiverDysfunction] = useState(false);
+  const [strokeHistory, setStrokeHistory] = useState(false);
+  const [bleedingHistory, setBleedingHistory] = useState(false);
+  const [labileInr, setLabileInr] = useState(false);
+  const [ageOver65, setAgeOver65] = useState(false);
+  const [bleedingPredisposingDrugs, setBleedingPredisposingDrugs] = useState(false);
+  const [alcoholUse, setAlcoholUse] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const inputs = {
+    hypertension,
+    renalDysfunction,
+    liverDysfunction,
+    strokeHistory,
+    bleedingHistory,
+    labileInr,
+    ageOver65,
+    bleedingPredisposingDrugs,
+    alcoholUse,
+  };
+
+  const setters = {
+    hypertension: setHypertension,
+    renalDysfunction: setRenalDysfunction,
+    liverDysfunction: setLiverDysfunction,
+    strokeHistory: setStrokeHistory,
+    bleedingHistory: setBleedingHistory,
+    labileInr: setLabileInr,
+    ageOver65: setAgeOver65,
+    bleedingPredisposingDrugs: setBleedingPredisposingDrugs,
+    alcoholUse: setAlcoholUse,
+  };
+
+  useEffect(() => {
+    if (onResultChange) {
+      onResultChange(
+        result
+          ? {
+              hasBledScore: result.total,
+              severity: result.severity,
+            }
+          : null
+      );
+    }
+  }, [onResultChange, result]);
+
+  const runCalculate = () => {
+    const total = calculateHasBledScore(inputs);
+    const breakdown = computeHasBledBreakdown(inputs);
+    const interp = interpretHasBled(total);
+    if (!interp) {
+      setResult(null);
+      return;
+    }
+    setResult({ total, breakdown, ...interp });
+  };
+
+  const reset = () => {
+    setHypertension(false);
+    setRenalDysfunction(false);
+    setLiverDysfunction(false);
+    setStrokeHistory(false);
+    setBleedingHistory(false);
+    setLabileInr(false);
+    setAgeOver65(false);
+    setBleedingPredisposingDrugs(false);
+    setAlcoholUse(false);
+    setResult(null);
+  };
+
+  return (
+    <div className="calculator-interface calculator-interface--has-bled">
+      <div className="calculator-inputs">
+        <CalcPanelTitle icon={CHROME_ICONS.bandage}>HAS-BLED</CalcPanelTitle>
+
+        <div className="calc-has-bled-disclaimer" role="note">
+          <CalcDecisionSupportLead />
+          <p className="calc-disclaimer-detail">
+            <strong>Clinical use:</strong> HAS-BLED summarises bleeding-risk factors and is commonly used alongside
+            stroke-risk assessment in atrial fibrillation. It does not replace shared decision-making, bleeding-risk
+            clinics, or institutional anticoagulation protocols.
+          </p>
+        </div>
+
+        <div className="calc-has-bled-anticoag-warning" role="alert">
+          <strong>Anticoagulation safety:</strong> Any anticoagulant carries bleeding risk. This calculator does not
+          recommend starting, stopping, or switching therapy — document decisions and monitoring per local policy.
+        </div>
+
+        <form
+          className="calc-pr1-form"
+          noValidate
+          onSubmit={(e) => {
+            e.preventDefault();
+            runCalculate();
+          }}
+        >
+        <fieldset className="calc-has-bled-fieldset">
+          <legend className="calc-has-bled-legend" id="has-bled-criteria-legend">
+            Risk factors (check all that apply)
+          </legend>
+          <div className="calc-has-bled-criteria" role="group" aria-labelledby="has-bled-criteria-legend">
+            {HAS_BLED_CRITERIA_META.map((row) => {
+              const id = `has-bled-${row.key}`;
+              const checked = Boolean(inputs[row.key]);
+              return (
+                <div key={row.key} className="calc-has-bled-row">
+                  <div className="calc-checkbox-group">
+                    <input
+                      type="checkbox"
+                      id={id}
+                      className="calc-checkbox"
+                      checked={checked}
+                      onChange={(e) => setters[row.key](e.target.checked)}
+                      aria-describedby={`${id}-help`}
+                    />
+                    <label htmlFor={id} className="calc-checkbox-label">
+                      {row.shortLabel}
+                    </label>
+                  </div>
+                  <span className="calc-input-help calc-has-bled-help" id={`${id}-help`}>
+                    {row.help}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        <div className="calc-actions">
+          <button type="submit" className="calc-calculate-btn">
+            <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
+            Calculate HAS-BLED
+          </button>
+          <button type="button" className="calc-reset-btn" onClick={reset}>
+            Reset
+          </button>
+        </div>
+        </form>
+      </div>
+
+      <div className="calculator-results" aria-live="polite">
+        <ResultsPanelTitle />
+
+        {result ? (
+          <>
+            <div className={`calc-score-display ${result.severity}`}>
+              <div className="calc-score-label">HAS-BLED score</div>
+              <div className="calc-score-value">{result.total}</div>
+              <div className="calc-score-interpretation">of 9 possible factor points</div>
+            </div>
+
+            <div className="calc-breakdown">
+              <div className="calc-breakdown-title">Factors present</div>
+              {HAS_BLED_CRITERIA_META.map((row) => (
+                <div key={row.key} className="calc-breakdown-item">
+                  <span className="calc-breakdown-label">{row.shortLabel}</span>
+                  <span className="calc-breakdown-score">{result.breakdown[row.key]}</span>
+                </div>
+              ))}
+            </div>
+
+            <div
+              className={`calc-interpretation-box ${result.severity}${
+                result.total >= 3 ? ' calc-interpretation-box--risk-emphasis' : ''
+              }`}
+            >
+              <div className="calc-interpretation-title">{result.label}</div>
+              <div className="calc-interpretation-text">{result.interpretation}</div>
+              <div className="calc-interpretation-text calc-interpretation-text--secondary">{result.bleedingRiskNote}</div>
+            </div>
+
+            <div className="calc-references">
+              <div className="calc-references-title">Reference</div>
+              <ul className="calc-references-list">
+                <li>{result.referenceLine}</li>
+              </ul>
+            </div>
+            <CalcResultSafetyFooter />
+          </>
+        ) : (
+          <div className="calc-results-empty">
+            <CalcResultsEmptyIcon icon={CHROME_ICONS.bandage} />
+            <p>Select applicable factors, then calculate</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
 /**

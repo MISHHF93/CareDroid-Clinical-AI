@@ -13,20 +13,7 @@ import {
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 
 /** Keyword-routed in chat but not separate NLU tool profiles */
-export const chatKeywordExtras = [
-  {
-    primaryId: 'qsofa',
-    name: 'qSOFA (keyword)',
-    category: 'calculator',
-    description: 'Routes to SOFA via toolRecommendations / emergency keywords—not a separate NLU profile.',
-    chatOnRequest: true,
-    pagePath: '/tools/calculator/sofa',
-    sidebarToolId: 'sofa-score',
-    uiCalculatorSlug: 'sofa',
-    backendExecutor: false,
-    source: 'toolRecommendations.js',
-  },
-];
+export const chatKeywordExtras = [];
 
 function accessSummary(row) {
   const parts = [];

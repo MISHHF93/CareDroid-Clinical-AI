@@ -15,6 +15,54 @@ export const clinicalIntentTools = [
     backendExecutable: true,
   },
   {
+    toolId: 'qsofa',
+    toolName: 'qSOFA (quick SOFA)',
+    category: 'calculator',
+    description:
+      'Bedside screening: RR ≥22/min, SBP ≤100 mmHg, altered mentation or GCS <15. Score ≥2 suggests higher risk of poor outcome in suspected infection (Sepsis-3).',
+    path: '/tools/calculators/qsofa',
+    sidebarToolId: 'qsofa',
+    chatSeed:
+      'Help me apply qSOFA for suspected infection using respiratory rate, blood pressure, and mentation / GCS.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'news2',
+    toolName: 'NEWS2 (National Early Warning Score 2)',
+    category: 'calculator',
+    description:
+      'RCP NEWS2: RR, SpO₂ (Scale 1 or 2), supplemental oxygen, systolic BP, pulse, consciousness, temperature — total score and escalation band.',
+    path: '/tools/calculators/news2',
+    sidebarToolId: 'news2',
+    chatSeed:
+      'Help me calculate and interpret NEWS2 from respiratory rate, SpO₂ (and which SpO₂ scale), oxygen use, blood pressure, pulse, consciousness, and temperature.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'child-pugh',
+    toolName: 'Child-Pugh score',
+    category: 'calculator',
+    description:
+      'Cirrhosis severity (Child–Turcotte–Pugh): bilirubin, albumin, INR or PT prolongation, ascites, hepatic encephalopathy — total 5–15 and class A/B/C.',
+    path: '/tools/calculators/child-pugh',
+    sidebarToolId: 'child-pugh',
+    chatSeed:
+      'Help me calculate Child-Pugh from bilirubin, albumin, INR or PT prolongation, ascites, and hepatic encephalopathy.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'has-bled',
+    toolName: 'HAS-BLED score',
+    category: 'calculator',
+    description:
+      'Bleeding-risk factors (0–9) when anticoagulation is considered, e.g. in atrial fibrillation; score ≥3 suggests higher bleeding risk warranting closer review.',
+    path: '/tools/calculators/has-bled',
+    sidebarToolId: 'has-bled',
+    chatSeed:
+      'Help me score HAS-BLED for bleeding risk: hypertension, renal/liver dysfunction, stroke, bleeding history, labile INR, age over 65, predisposing drugs, and alcohol.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
     category: 'calculator',
@@ -171,6 +219,42 @@ export const builtinUiCalculators = [
     calcQuery: '/tools/calculators?calc=sofa',
     implementation: 'UI + POST /api/tools/sofa-calculator/execute',
     orchestratorId: 'sofa-calculator',
+  },
+  {
+    id: 'qsofa',
+    name: 'qSOFA (quick SOFA)',
+    description: 'Bedside sepsis risk screen (RR, SBP, mentation / GCS).',
+    path: '/tools/calculators/qsofa',
+    calcQuery: '/tools/calculators?calc=qsofa',
+    implementation: 'Client-side in Calculators.jsx (qsofaCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'news2',
+    name: 'NEWS2',
+    description: 'National Early Warning Score 2 (RCP) — vitals, SpO₂ scale, escalation.',
+    path: '/tools/calculators/news2',
+    calcQuery: '/tools/calculators?calc=news2',
+    implementation: 'Client-side in Calculators.jsx (news2Calculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'child-pugh',
+    name: 'Child-Pugh',
+    description: 'Cirrhosis severity class (bilirubin, albumin, coagulation, ascites, encephalopathy).',
+    path: '/tools/calculators/child-pugh',
+    calcQuery: '/tools/calculators?calc=child-pugh',
+    implementation: 'Client-side in Calculators.jsx (childPughCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'has-bled',
+    name: 'HAS-BLED',
+    description: 'Bleeding risk (anticoagulation context); 9 binary factors.',
+    path: '/tools/calculators/has-bled',
+    calcQuery: '/tools/calculators?calc=has-bled',
+    implementation: 'Client-side in Calculators.jsx (hasBledCalculator.js)',
+    orchestratorId: null,
   },
   {
     id: 'gfr',
