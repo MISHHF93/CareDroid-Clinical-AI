@@ -525,6 +525,18 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+.tools-chat-only-card:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.tools-chat-only-safety {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+}
+
 .tools-chat-only-name {
   font-weight: 600;
   font-size: 15px;

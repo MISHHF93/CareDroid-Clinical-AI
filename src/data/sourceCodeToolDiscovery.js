@@ -127,6 +127,53 @@ export const toolIdAliases = [
     mapsTo: 'has-bled',
     source: 'CostTrackingContext — canonical UI is HAS-BLED (see NLU_TO_REGISTRY_ID)',
   },
+  { id: 'meld-score', mapsTo: 'meld', source: 'NLU alias — meld score' },
+  { id: 'liver-transplant-score', mapsTo: 'meld-na', source: 'NLU alias — liver transplant score' },
+  {
+    id: 'end-stage-liver-disease-score',
+    mapsTo: 'meld',
+    source: 'NLU alias — end stage liver disease score',
+  },
+  { id: 'timi', mapsTo: 'timi-ua-nstemi', source: 'NLU alias — timi' },
+  { id: 'timi-score', mapsTo: 'timi-ua-nstemi', source: 'NLU alias — timi score' },
+  { id: 'timi-acs', mapsTo: 'timi-ua-nstemi', source: 'NLU alias — timi acs' },
+  { id: 'timi-nstemi', mapsTo: 'timi-ua-nstemi', source: 'NLU alias — timi nstemi' },
+  { id: 'timi-unstable-angina', mapsTo: 'timi-ua-nstemi', source: 'NLU alias — timi unstable angina' },
+  { id: 'wells-pe-score', mapsTo: 'wells-pe', source: 'NLU alias — wells pe / pe score' },
+  { id: 'pulmonary-embolism-wells', mapsTo: 'wells-pe', source: 'NLU alias — pulmonary embolism wells' },
+  { id: 'wells-pulmonary-embolism', mapsTo: 'wells-pe', source: 'NLU alias — wells pulmonary embolism' },
+  { id: 'pe-score', mapsTo: 'wells-pe', source: 'NLU alias — pe score (Wells PE context)' },
+  { id: 'perc-rule', mapsTo: 'perc', source: 'NLU alias — perc rule' },
+  { id: 'pe-rule-out', mapsTo: 'perc', source: 'NLU alias — pe rule out' },
+  { id: 'pulmonary-embolism-rule-out', mapsTo: 'perc', source: 'NLU alias — pulmonary embolism rule out' },
+  { id: 'grace-score', mapsTo: 'grace-acs', source: 'NLU alias — grace score' },
+  { id: 'grace-acs-risk', mapsTo: 'grace-acs', source: 'NLU alias — grace acs risk' },
+  { id: 'acs-mortality-risk', mapsTo: 'grace-acs', source: 'NLU alias — acs mortality risk' },
+  {
+    id: 'acute-coronary-syndrome-risk',
+    mapsTo: 'grace-acs',
+    source: 'NLU alias — acute coronary syndrome risk',
+  },
+  { id: 'nih-stroke-scale', mapsTo: 'nihss', source: 'NLU alias — nih stroke scale' },
+  {
+    id: 'national-institutes-of-health-stroke-scale',
+    mapsTo: 'nihss',
+    source: 'NLU alias — national institutes of health stroke scale',
+  },
+  { id: 'stroke-scale', mapsTo: 'nihss', source: 'NLU alias — stroke scale' },
+  { id: 'stroke-severity-score', mapsTo: 'nihss', source: 'NLU alias — stroke severity score' },
+  { id: 'canadian-c-spine-rule', mapsTo: 'canadian-c-spine', source: 'NLU alias — canadian c-spine rule' },
+  { id: 'c-spine-rule', mapsTo: 'canadian-c-spine', source: 'NLU alias — c spine rule' },
+  { id: 'cervical-spine-rule', mapsTo: 'canadian-c-spine', source: 'NLU alias — cervical spine rule' },
+  {
+    id: 'neck-trauma-imaging-rule',
+    mapsTo: 'canadian-c-spine',
+    source: 'NLU alias — neck trauma imaging rule',
+  },
+  { id: 'ottawa-ankle-rule', mapsTo: 'ottawa-ankle', source: 'NLU alias — ottawa ankle rule' },
+  { id: 'ankle-xray-rule', mapsTo: 'ottawa-ankle', source: 'NLU alias — ankle xray rule' },
+  { id: 'ankle-injury-imaging', mapsTo: 'ottawa-ankle', source: 'NLU alias — ankle injury imaging' },
+  { id: 'foot-xray-rule', mapsTo: 'ottawa-ankle', source: 'NLU alias — foot xray rule' },
 ];
 
 /** Client-side clinical helpers on tool pages and chat */
@@ -612,7 +659,7 @@ export function getSourceCodeDiscoverySummary() {
 }
 
 export const SOURCE_SCAN_LOCATIONS = [
-  { label: 'NLU clinical tools', path: 'backend/.../tool.patterns.ts', count: 19 },
+  { label: 'NLU clinical tools', path: 'backend/.../tool.patterns.ts', count: 24 },
   { label: 'Backend executors', path: 'backend/.../tool-orchestrator/', count: 3 },
   { label: 'Calculator UI slugs', path: 'src/pages/tools/Calculators.jsx', count: 8 },
   { label: 'Sidebar registry', path: 'src/data/toolRegistry.js', count: toolRegistry.length },

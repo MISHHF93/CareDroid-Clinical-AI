@@ -9,6 +9,7 @@ import {
   nluCalculatorHubOnly,
 } from '../../data/clinicalIntentToolCatalog';
 import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
+import { chatAssistedLaunchAriaLabel } from '../../data/chatAssistedHubGroups';
 import { getFullCapabilitiesSummary } from '../../data/platformCapabilitiesCatalog';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
@@ -126,10 +127,14 @@ const ToolsOverview = () => {
       {nluCalculatorHubOnly.length > 0 && (
         <div className="tools-chat-only">
           <div className="tools-chat-only-header">
-            <h2 className="tools-chat-only-title">NLU calculators (chat-assisted)</h2>
+            <h2 className="tools-chat-only-title">Chat-assisted decision support</h2>
+            <p className="tools-chat-only-safety" role="note">
+              <strong>Decision support only.</strong> These tools guide risk stratification, exam scoring, or
+              imaging decisions in chat — they do not diagnose or rule out disease with certainty. Urgent ACS,
+              stroke, trauma, and PE pathways take priority; do not delay emergency care to finish chat.
+            </p>
             <p>
-              These NLU clinical tools are recognized in conversation—open the dashboard with a
-              starter prompt.
+              Open the dashboard with a guided starter prompt, or launch from the Calculators hub.
             </p>
           </div>
           <div className="tools-chat-only-grid">
@@ -140,11 +145,16 @@ const ToolsOverview = () => {
                   key={tool.toolId}
                   type="button"
                   className="tools-chat-only-card"
+                  aria-label={chatAssistedLaunchAriaLabel(tool.name)}
+                  aria-describedby={`tools-chat-only-desc-${tool.toolId}`}
                   onClick={() => handleNluHubTool(tool.toolId)}
                 >
                   <span className="tools-chat-only-name">{tool.name}</span>
-                  <span className="tools-chat-only-desc">
-                    {meta?.description || 'Chat-assisted scoring'}
+                  <span
+                    id={`tools-chat-only-desc-${tool.toolId}`}
+                    className="tools-chat-only-desc"
+                  >
+                    {meta?.description || 'Chat-assisted decision support'}
                   </span>
                   <span className="tools-chat-only-action">Launch →</span>
                 </button>

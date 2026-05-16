@@ -393,6 +393,8 @@ If the intent is "clinical_tool", identify which tool:
 - curb65-calculator: Pneumonia severity
 - gcs-calculator: Glasgow Coma Scale
 - wells-dvt-calculator: DVT probability
+- wells-pe: Pulmonary embolism Wells rule (chat-assisted)
+- perc: PERC rule-out criteria (low pre-test probability; chat-assisted)
 - drug-interactions: Drug-drug interaction checker
 - dose-calculator: Medication dosing
 - lab-interpreter: Lab result interpretation

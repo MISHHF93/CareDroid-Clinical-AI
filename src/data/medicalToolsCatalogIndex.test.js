@@ -36,9 +36,9 @@ describe('medicalToolsCatalogIndex', () => {
 
   it('reports summary aligned with NLU count', () => {
     const summary = getMedicalCatalogSummary();
-    expect(summary.nluProfiles).toBe(19);
-    expect(summary.total).toBeGreaterThanOrEqual(19);
-    expect(summary.chatOnRequest).toBeGreaterThanOrEqual(19);
+    expect(summary.nluProfiles).toBe(24);
+    expect(summary.total).toBeGreaterThanOrEqual(24);
+    expect(summary.chatOnRequest).toBeGreaterThanOrEqual(24);
   });
 
   it('indexes HAS-BLED with dedicated page and calculator slug', () => {
@@ -80,5 +80,47 @@ describe('medicalToolsCatalogIndex', () => {
       const row = rows.find((r) => r.primaryId === id);
       expect(row?.backendExecutor).toBe(false);
     }
+  });
+
+  it('indexes MELD with dedicated page and calculator slug', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const meld = rows.find((r) => r.primaryId === 'meld' || r.id === 'meld');
+    expect(meld?.pagePath).toBe('/tools/calculators/meld');
+    expect(meld?.uiCalculatorSlug).toBe('meld');
+    expect(meld?.chatOnRequest).toBe(true);
+  });
+
+  it('indexes PERC as chat-only on calculator hub', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const perc = rows.find((r) => r.primaryId === 'perc' || r.id === 'perc');
+    expect(perc?.pagePath).toBe('/tools/calculators');
+    expect(perc?.chatOnlyForm).toBe(true);
+    expect(perc?.chatOnRequest).toBe(true);
+  });
+
+  it('indexes Wells PE as chat-only on calculator hub', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const wells = rows.find((r) => r.primaryId === 'wells-pe' || r.id === 'wells-pe');
+    expect(wells?.pagePath).toBe('/tools/calculators');
+    expect(wells?.chatOnlyForm).toBe(true);
+    expect(wells?.chatOnRequest).toBe(true);
+    expect(wells?.uiCalculatorSlug).toBeNull();
+  });
+
+  it('indexes TIMI UA/NSTEMI with dedicated page and calculator slug', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const timi = rows.find((r) => r.primaryId === 'timi-ua-nstemi' || r.id === 'timi-ua-nstemi');
+    expect(timi?.pagePath).toBe('/tools/calculators/timi-ua-nstemi');
+    expect(timi?.uiCalculatorSlug).toBe('timi-ua-nstemi');
+    expect(timi?.chatOnRequest).toBe(true);
+    expect(timi?.backendExecutor).toBe(false);
+  });
+
+  it('indexes MELD-Na with dedicated page and calculator slug', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const meldNa = rows.find((r) => r.primaryId === 'meld-na' || r.id === 'meld-na');
+    expect(meldNa?.pagePath).toBe('/tools/calculators/meld-na');
+    expect(meldNa?.uiCalculatorSlug).toBe('meld-na');
+    expect(meldNa?.chatOnRequest).toBe(true);
   });
 });

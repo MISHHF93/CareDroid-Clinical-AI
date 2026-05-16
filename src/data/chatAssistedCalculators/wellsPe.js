@@ -1,0 +1,42 @@
+/**
+ * Tier-B chat-assisted configuration for Wells PE (no dedicated Calculators.jsx form).
+ * Consumed by clinicalIntentToolCatalog and chat launch flows.
+ */
+
+export const WELLS_PE_TOOL_ID = 'wells-pe';
+
+export const wellsPeChatConfig = {
+  toolId: WELLS_PE_TOOL_ID,
+  name: 'Wells PE',
+  hubPath: '/tools/calculators',
+  registryId: 'wells-pe',
+  category: 'calculator',
+  description:
+    'Wells pulmonary embolism rule — guided chat scoring for pre-test probability only (does not rule in or rule out PE).',
+  /** Starter prompt for dashboard / catalog chat launch */
+  chatSeed: `Help me calculate the Wells score for suspected pulmonary embolism using a guided step-by-step approach.
+
+Ask me about each criterion in turn:
+1) Clinical signs or symptoms of DVT
+2) Whether PE is the most likely diagnosis
+3) Heart rate over 100/min
+4) Immobilization ≥3 days or surgery in the past 4 weeks
+5) Previous DVT or PE
+6) Hemoptysis
+7) Active malignancy
+
+After collecting answers, compute the Wells PE score (with fractional points per the validated rule), report low / intermediate / high probability bands in plain language, and clearly state:
+- This is clinical decision support only, not a diagnosis
+- The score does not rule in or rule out pulmonary embolism
+- Do not state that PE is "confirmed", "excluded", or "ruled out"
+- Do not recommend a specific imaging study, anticoagulation, or disposition — refer to local PE pathways`,
+  guidedCriteria: [
+    'clinical signs of DVT',
+    'PE most likely diagnosis',
+    'heart rate > 100',
+    'immobilization or recent surgery',
+    'previous DVT or PE',
+    'hemoptysis',
+    'malignancy',
+  ],
+};

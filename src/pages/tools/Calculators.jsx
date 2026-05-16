@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useConversation } from '../../contexts/ConversationContext';
+import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import ToolPageLayout from './ToolPageLayout';
 import './Calculators.css';
 import { apiFetch, parseApiResponse } from '../../services/apiClient';
@@ -28,6 +30,22 @@ import {
   computeHasBledBreakdown,
   interpretHasBled,
 } from '../../utils/hasBledCalculator';
+import { computeMeldResult, formatMeldLabValue } from '../../utils/meldCalculator';
+import {
+  resolveCatalogLaunch,
+  TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
+} from '../../data/clinicalCatalogWiring';
+import { clinicalIntentTools, nluCalculatorHubOnly } from '../../data/clinicalIntentToolCatalog';
+import {
+  CHAT_ASSISTED_HUB_GROUPS,
+  chatAssistedLaunchAriaLabel,
+} from '../../data/chatAssistedHubGroups';
+import {
+  TIMI_UA_NSTEMI_CRITERIA_META,
+  calculateTimiUaNstemiScore,
+  computeTimiBreakdown,
+  interpretTimiUaNstemi,
+} from '../../utils/timiUaNstemiCalculator';
 import { NavIcon } from '../../navigation/NavIcon';
 import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
 
@@ -60,6 +78,24 @@ const CALCULATORS = [
     id: 'has-bled',
     name: 'HAS-BLED',
     description: 'Bleeding-risk factors when considering anticoagulation (e.g. AF)',
+    category: 'Cardiology',
+  },
+  {
+    id: 'meld',
+    name: 'MELD',
+    description: 'Model for End-stage Liver Disease (bilirubin, INR, creatinine / dialysis)',
+    category: 'Hepatology',
+  },
+  {
+    id: 'meld-na',
+    name: 'MELD-Na',
+    description: 'MELD with UNOS sodium adjustment for hyponatremia',
+    category: 'Hepatology',
+  },
+  {
+    id: 'timi-ua-nstemi',
+    name: 'TIMI (UA/NSTEMI)',
+    description: 'TIMI risk score for unstable angina / NSTEMI (7 criteria)',
     category: 'Cardiology',
   },
   {
@@ -122,14 +158,88 @@ function CalcResultSafetyFooter() {
   return (
     <p className="calc-result-safety-footer" role="note">
       Output reflects the values you entered and may omit important clinical context. Do not treat this screen as
-      definitive proof of illness severity, eligibility, or treatment requirement.
+      definitive proof of illness severity, eligibility, or treatment requirement, and do not use it alone to rule
+      in or rule out a diagnosis.
     </p>
   );
 }
 
+/** Distinct interpretation panel (region + heading id for screen readers). */
+function CalcInterpretationRegion({ headingId, title, severity, emphasizeRisk, children }) {
+  return (
+    <section
+      className={`calc-interpretation-box ${severity}${emphasizeRisk ? ' calc-interpretation-box--risk-emphasis' : ''}`}
+      role="region"
+      aria-labelledby={headingId}
+    >
+      <div id={headingId} className="calc-interpretation-title">
+        {title}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function CalculatorSelectCard({ calc, isActive, onSelect }) {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onSelect();
+    }
+  };
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      aria-pressed={isActive}
+      aria-label={`${calc.name}. ${calc.description}`}
+      className={`calculator-card ${isActive ? 'active' : ''}`}
+      onClick={onSelect}
+      onKeyDown={handleKeyDown}
+    >
+      <div className="calculator-card-header">
+        <span className="calculator-icon" aria-hidden>
+          <NavIcon icon={getCalculatorSubIcon(calc.id)} size={22} />
+        </span>
+        <span className="calculator-name">{calc.name}</span>
+      </div>
+      <div className="calculator-description">{calc.description}</div>
+      <div className="calculator-card-category">{calc.category}</div>
+    </div>
+  );
+}
+
+const CHAT_ASSISTED_TOOLS = nluCalculatorHubOnly.filter((t) =>
+  TIER_B_CHAT_CALCULATOR_REGISTRY_IDS.includes(t.toolId)
+);
+
+const CHAT_ASSISTED_TOOL_BY_ID = Object.fromEntries(
+  CHAT_ASSISTED_TOOLS.map((tool) => [tool.toolId, tool])
+);
+
 const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = null } = {}) => {
+  const navigate = useNavigate();
+  const { addMessage, selectTool, setActiveTool } = useConversation();
+  const { recordToolAccess } = useToolPreferences();
   const [searchParams] = useSearchParams();
   const calcFromUrl = searchParams.get('calc');
+
+  const handleChatAssistedLaunch = useCallback(
+    (toolId) => {
+      const launch = resolveCatalogLaunch(toolId);
+      if (launch.registryId) {
+        recordToolAccess(launch.registryId);
+        selectTool(launch.registryId);
+        setActiveTool(launch.registryId);
+      }
+      if (launch.chatSeed) {
+        addMessage(launch.chatSeed, 'user');
+      }
+      navigate(launch.path || '/dashboard');
+    },
+    [addMessage, navigate, recordToolAccess, selectTool, setActiveTool]
+  );
 
   const toolConfig = {
     id: 'calculators',
@@ -138,7 +248,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
     color: '#95E1D3',
     description: 'Medical calculators (GFR, BMI, scores, etc.)',
     shortcut: 'Ctrl+7',
-    category: 'Calculator'
+    category: 'Calculator',
   };
 
   const [selectedCalculator, setSelectedCalculator] = useState(null);
@@ -162,29 +272,81 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
       results={selectedCalculator && sharedResult ? { calculator: selectedCalculator.id, ...sharedResult } : null}
     >
       <div className="calculators-content">
-        {/* Calculator Selection */}
-        <div className="calculator-selection">
-          {CALCULATORS.map(calc => (
-            <div
+        {CHAT_ASSISTED_TOOLS.length > 0 ? (
+          <section className="calc-chat-assisted" aria-labelledby="calc-chat-assisted-heading">
+            <div className="calc-chat-assisted-header">
+              <h2 id="calc-chat-assisted-heading" className="calc-chat-assisted-title">
+                Chat-assisted clinical decision support
+              </h2>
+              <p className="calc-chat-assisted-lead" role="note">
+                <strong>Decision support only.</strong> Guided chat supports risk stratification, structured exam
+                scoring, or imaging decisions — it does not diagnose, rule out disease with certainty, or replace
+                urgent ACS, stroke, trauma, or PE pathways. Use Tab and Enter to launch; emergency care takes
+                priority over completing chat.
+              </p>
+            </div>
+            {CHAT_ASSISTED_HUB_GROUPS.map((group) => {
+              const toolsInGroup = group.toolIds
+                .map((id) => CHAT_ASSISTED_TOOL_BY_ID[id])
+                .filter(Boolean);
+              if (toolsInGroup.length === 0) return null;
+              const groupHeadingId = `calc-chat-assisted-group-${group.groupId}`;
+              return (
+                <div
+                  key={group.groupId}
+                  className="calc-chat-assisted-group"
+                  role="group"
+                  aria-labelledby={groupHeadingId}
+                >
+                  <h3 id={groupHeadingId} className="calc-chat-assisted-group-title">
+                    {group.heading}
+                  </h3>
+                  <p className="calc-chat-assisted-group-lead" role="note">
+                    {group.lead}
+                  </p>
+                  <div className="calc-chat-assisted-grid">
+                    {toolsInGroup.map((tool) => {
+                      const meta = clinicalIntentTools.find((t) => t.toolId === tool.toolId);
+                      const description = meta?.description || 'Chat-assisted decision support';
+                      return (
+                        <button
+                          key={tool.toolId}
+                          type="button"
+                          className="calc-chat-assisted-card"
+                          aria-label={chatAssistedLaunchAriaLabel(tool.name)}
+                          aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}
+                          onClick={() => handleChatAssistedLaunch(tool.toolId)}
+                        >
+                          <span className="calc-chat-assisted-name">{tool.name}</span>
+                          <span
+                            id={`calc-chat-assisted-desc-${tool.toolId}`}
+                            className="calc-chat-assisted-desc"
+                          >
+                            {description}
+                          </span>
+                          <span className="calc-chat-assisted-action">Start guided chat</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </section>
+        ) : null}
+
+        <div className="calculator-selection" role="list" aria-label="Built-in calculator forms">
+          {CALCULATORS.map((calc) => (
+            <CalculatorSelectCard
               key={calc.id}
-              className={`calculator-card ${selectedCalculator?.id === calc.id ? 'active' : ''}`}
-              onClick={() => {
+              calc={calc}
+              isActive={selectedCalculator?.id === calc.id}
+              onSelect={() => {
                 setSelectedCalculator(calc);
                 setSharedResult(null);
               }}
-            >
-              <div className="calculator-card-header">
-                <span className="calculator-icon" aria-hidden>
-                  <NavIcon icon={getCalculatorSubIcon(calc.id)} size={22} />
-                </span>
-                <span className="calculator-name">{calc.name}</span>
-              </div>
-              <div className="calculator-description">{calc.description}</div>
-              <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginTop: '8px' }}>
-                {calc.category}
-              </div>
-            </div>
-          ))}
+            />
+          ))
         </div>
 
         {/* Calculator Interface */}
@@ -218,6 +380,12 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <ChildPughCalculator onResultChange={onResultChange} />;
     case 'has-bled':
       return <HasBledCalculator onResultChange={onResultChange} />;
+    case 'meld':
+      return <MeldCalculator mode="meld" onResultChange={onResultChange} />;
+    case 'meld-na':
+      return <MeldCalculator mode="meld-na" onResultChange={onResultChange} />;
+    case 'timi-ua-nstemi':
+      return <TimiUaNstemiCalculator onResultChange={onResultChange} />;
     case 'gfr':
       return <GFRCalculator onResultChange={onResultChange} />;
     case 'bmi':
@@ -1396,6 +1564,491 @@ const HasBledCalculator = ({ onResultChange }) => {
           <div className="calc-results-empty">
             <CalcResultsEmptyIcon icon={CHROME_ICONS.bandage} />
             <p>Select applicable factors, then calculate</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * TIMI — UA/NSTEMI risk score (Antman et al.). Decision support only; no treatment recommendations.
+ */
+const TimiUaNstemiCalculator = ({ onResultChange }) => {
+  const [inputs, setInputs] = useState(() =>
+    Object.fromEntries(TIMI_UA_NSTEMI_CRITERIA_META.map((r) => [r.key, false]))
+  );
+  const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    if (onResultChange) {
+      onResultChange(
+        result
+          ? {
+              timiScore: result.total,
+              severity: result.severity,
+              riskBand: result.riskBand,
+            }
+          : null
+      );
+    }
+  }, [onResultChange, result]);
+
+  const runCalculate = () => {
+    const total = calculateTimiUaNstemiScore(inputs);
+    const breakdown = computeTimiBreakdown(inputs);
+    const interp = interpretTimiUaNstemi(total);
+    if (!interp) {
+      setResult(null);
+      return;
+    }
+    setResult({ total, breakdown, ...interp });
+  };
+
+  const reset = () => {
+    setInputs(Object.fromEntries(TIMI_UA_NSTEMI_CRITERIA_META.map((r) => [r.key, false])));
+    setResult(null);
+  };
+
+  const timiInterpretationHeadingId = 'timi-interpretation-heading';
+
+  return (
+    <div className="calculator-interface calculator-interface--timi">
+      <div className="calculator-inputs">
+        <CalcPanelTitle icon={CHROME_ICONS.heartPulse}>
+          <span id="timi-form-title">TIMI (UA/NSTEMI)</span>
+        </CalcPanelTitle>
+
+        <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
+          <CalcDecisionSupportLead />
+          <p className="calc-disclaimer-detail">
+            <strong>ACS context:</strong> Apply only when unstable angina or NSTEMI is already suspected or
+            diagnosed. TIMI estimates 14-day adverse-event risk in the validation cohort — it does not confirm ACS
+            and does not direct antiplatelet, anticoagulant, or revascularisation therapy.
+          </p>
+        </div>
+
+        <form
+          className="calc-pr1-form"
+          noValidate
+          aria-labelledby="timi-form-title"
+          onSubmit={(e) => {
+            e.preventDefault();
+            runCalculate();
+          }}
+        >
+          <fieldset className="calc-timi-fieldset calc-has-bled-fieldset">
+            <legend className="calc-timi-legend calc-has-bled-legend" id="timi-criteria-legend">
+              TIMI criteria (check all that apply)
+            </legend>
+            <div className="calc-timi-criteria calc-has-bled-criteria" role="group" aria-labelledby="timi-criteria-legend">
+              {TIMI_UA_NSTEMI_CRITERIA_META.map((row) => {
+                const id = `timi-${row.key}`;
+                const checked = Boolean(inputs[row.key]);
+                return (
+                  <div key={row.key} className="calc-timi-row">
+                    <div className="calc-checkbox-group">
+                      <input
+                        type="checkbox"
+                        id={id}
+                        className="calc-checkbox"
+                        checked={checked}
+                        onChange={(e) =>
+                          setInputs((prev) => ({ ...prev, [row.key]: e.target.checked }))
+                        }
+                        aria-describedby={`${id}-help`}
+                      />
+                      <label htmlFor={id} className="calc-checkbox-label">
+                        {row.shortLabel}
+                      </label>
+                    </div>
+                    <span className="calc-input-help calc-timi-help" id={`${id}-help`}>
+                      {row.help}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </fieldset>
+
+          <div className="calc-actions">
+            <button type="submit" className="calc-calculate-btn" aria-label="Calculate TIMI UA/NSTEMI score">
+              <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
+              Calculate TIMI
+            </button>
+            <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset TIMI form">
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div className="calculator-results" aria-live="polite" aria-label="TIMI results">
+        <ResultsPanelTitle />
+
+        {result ? (
+          <>
+            <div className={`calc-score-display ${result.severity}`}>
+              <div className="calc-score-label">TIMI score</div>
+              <div className="calc-score-value">{result.total}</div>
+              <div className="calc-score-interpretation">of 7 points</div>
+            </div>
+
+            <div className="calc-breakdown">
+              <div className="calc-breakdown-title">Criteria</div>
+              {TIMI_UA_NSTEMI_CRITERIA_META.map((row) => (
+                <div key={row.key} className="calc-breakdown-item">
+                  <span className="calc-breakdown-label">{row.shortLabel}</span>
+                  <span className="calc-breakdown-score">{result.breakdown[row.key]}</span>
+                </div>
+              ))}
+            </div>
+
+            <CalcInterpretationRegion
+              headingId={timiInterpretationHeadingId}
+              title={result.label}
+              severity={result.severity}
+              emphasizeRisk={result.total >= 5}
+            >
+              <div className="calc-interpretation-text">{result.riskBand}</div>
+              <div className="calc-interpretation-text calc-interpretation-text--secondary">
+                {result.approximateEventRate}
+              </div>
+              <div className="calc-interpretation-text">{result.interpretation}</div>
+              <div className="calc-interpretation-text calc-interpretation-text--secondary">{result.acsDisclaimer}</div>
+            </CalcInterpretationRegion>
+
+            <div className="calc-references">
+              <div className="calc-references-title">Reference</div>
+              <ul className="calc-references-list">
+                <li>{result.referenceLine}</li>
+              </ul>
+            </div>
+            <CalcResultSafetyFooter />
+          </>
+        ) : (
+          <div className="calc-results-empty">
+            <CalcResultsEmptyIcon icon={CHROME_ICONS.heartPulse} />
+            <p>Check applicable criteria, then calculate</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * MELD / MELD-Na — liver disease severity (UNOS laboratory model). Decision support only.
+ */
+const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
+  const includeMeldNa = mode === 'meld-na';
+  const [bilirubin, setBilirubin] = useState('');
+  const [bilirubinUnit, setBilirubinUnit] = useState('mg_dl');
+  const [inr, setInr] = useState('');
+  const [creatinine, setCreatinine] = useState('');
+  const [creatinineUnit, setCreatinineUnit] = useState('mg_dl');
+  const [onDialysis, setOnDialysis] = useState(false);
+  const [sodium, setSodium] = useState('');
+  const [validationErrors, setValidationErrors] = useState([]);
+  const [result, setResult] = useState(null);
+
+  useEffect(() => {
+    if (onResultChange) {
+      onResultChange(
+        result
+          ? {
+              meldScore: result.meld,
+              meldNaScore: result.meldNa,
+              severity: result.severity,
+            }
+          : null
+      );
+    }
+  }, [onResultChange, result]);
+
+  const runCalculate = () => {
+    const raw = {
+      bilirubin,
+      bilirubinUnit,
+      inr,
+      creatinine,
+      creatinineUnit,
+      onDialysis,
+      sodium: includeMeldNa ? sodium : undefined,
+    };
+    const out = computeMeldResult(raw, { includeMeldNa });
+    setValidationErrors(out.ok ? [] : out.errors);
+    setResult(out.ok ? out : null);
+  };
+
+  const reset = () => {
+    setBilirubin('');
+    setBilirubinUnit('mg_dl');
+    setInr('');
+    setCreatinine('');
+    setCreatinineUnit('mg_dl');
+    setOnDialysis(false);
+    setSodium('');
+    setValidationErrors([]);
+    setResult(null);
+  };
+
+  const title = includeMeldNa ? 'MELD-Na' : 'MELD';
+  const icon = getCalculatorSubIcon('meld');
+  const formTitleId = includeMeldNa ? 'meld-na-form-title' : 'meld-form-title';
+  const interpretationHeadingId = includeMeldNa ? 'meld-na-interpretation-heading' : 'meld-interpretation-heading';
+  const hasValidationErrors = validationErrors.length > 0;
+
+  return (
+    <div className="calculator-interface calculator-interface--meld">
+      <div className="calculator-inputs">
+        <CalcPanelTitle icon={icon}>
+          <span id={formTitleId}>{title}</span>
+        </CalcPanelTitle>
+
+        <div className="calc-meld-disclaimer" role="note">
+          <CalcDecisionSupportLead />
+          <p className="calc-disclaimer-detail">
+            <strong>Clinical use:</strong> MELD and MELD-Na summarise laboratory severity in chronic liver disease.
+            They do not diagnose acute liver failure, do not replace specialist assessment, and{' '}
+            <strong>do not recommend transplant evaluation or listing</strong>.
+          </p>
+        </div>
+
+        <form
+          className="calc-pr1-form"
+          noValidate
+          aria-labelledby={formTitleId}
+          onSubmit={(e) => {
+            e.preventDefault();
+            runCalculate();
+          }}
+        >
+          {hasValidationErrors ? (
+            <div className="calc-validation-errors" role="alert" aria-live="assertive">
+              <ul>
+                {validationErrors.map((err) => (
+                  <li key={err}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          <fieldset className="calc-meld-fieldset calc-has-bled-fieldset">
+            <legend className="calc-has-bled-legend" id="meld-labs-legend">
+              Laboratory values
+            </legend>
+
+          <div className="calc-input-group">
+            <label className="calc-input-label" htmlFor="meld-bili">
+              Total bilirubin
+            </label>
+            <div className="calc-input-row calc-input-row--with-unit">
+              <input
+                id="meld-bili"
+                type="number"
+                min="0"
+                step="any"
+                className="calc-input-field"
+                value={bilirubin}
+                onChange={(e) => setBilirubin(e.target.value)}
+                aria-required="true"
+                aria-invalid={hasValidationErrors && !bilirubin.trim()}
+                inputMode="decimal"
+              />
+              <select
+                className="calc-select-field"
+                value={bilirubinUnit}
+                onChange={(e) => setBilirubinUnit(e.target.value)}
+                aria-label="Bilirubin unit"
+              >
+                <option value="mg_dl">mg/dL</option>
+                <option value="umol_l">μmol/L</option>
+              </select>
+            </div>
+            <span className="calc-input-help">Values &lt;1 mg/dL are floored to 1.0 for MELD per UNOS.</span>
+          </div>
+
+          <div className="calc-input-group">
+            <label className="calc-input-label" htmlFor="meld-inr">
+              INR
+            </label>
+            <input
+              id="meld-inr"
+              type="number"
+              min="0"
+              step="any"
+              className="calc-input-field"
+              value={inr}
+              onChange={(e) => setInr(e.target.value)}
+              aria-required="true"
+              aria-invalid={hasValidationErrors && !inr.trim()}
+              inputMode="decimal"
+            />
+            <span className="calc-input-help">Values &lt;1.0 are floored to 1.0 for MELD.</span>
+          </div>
+
+          <div className="calc-input-group">
+            <label className="calc-input-label" htmlFor="meld-cr">
+              Serum creatinine
+            </label>
+            <div className="calc-input-row calc-input-row--with-unit">
+              <input
+                id="meld-cr"
+                type="number"
+                min="0"
+                step="any"
+                className="calc-input-field"
+                value={creatinine}
+                onChange={(e) => setCreatinine(e.target.value)}
+                disabled={onDialysis}
+                aria-required={!onDialysis}
+                aria-invalid={hasValidationErrors && !onDialysis && !creatinine.trim()}
+                inputMode="decimal"
+              />
+              <select
+                className="calc-select-field"
+                value={creatinineUnit}
+                onChange={(e) => setCreatinineUnit(e.target.value)}
+                aria-label="Creatinine unit"
+                disabled={onDialysis}
+              >
+                <option value="mg_dl">mg/dL</option>
+                <option value="umol_l">μmol/L</option>
+              </select>
+            </div>
+            <div className="calc-checkbox-group">
+              <input
+                type="checkbox"
+                id="meld-dialysis"
+                className="calc-checkbox"
+                checked={onDialysis}
+                onChange={(e) => setOnDialysis(e.target.checked)}
+                aria-describedby="meld-dialysis-help"
+              />
+              <label htmlFor="meld-dialysis" className="calc-checkbox-label">
+                Dialysis at least twice in the past week (creatinine set to 4.0 mg/dL)
+              </label>
+            </div>
+            <span id="meld-dialysis-help" className="calc-input-help">
+              Creatinine is capped at 4.0 mg/dL when not on dialysis; dialysis applies UNOS creatinine = 4.0 mg/dL.
+            </span>
+          </div>
+
+          {includeMeldNa ? (
+            <div className="calc-input-group">
+              <label className="calc-input-label" htmlFor="meld-sodium">
+                Serum sodium
+              </label>
+              <input
+                id="meld-sodium"
+                type="number"
+                min="100"
+                max="180"
+                step="any"
+                className="calc-input-field"
+                value={sodium}
+                onChange={(e) => setSodium(e.target.value)}
+                aria-required="true"
+                aria-describedby="meld-sodium-help"
+                aria-invalid={hasValidationErrors && !sodium.trim()}
+                inputMode="decimal"
+              />
+              <span id="meld-sodium-help" className="calc-input-help">
+                mEq/L (mmol/L). Sodium is clamped to 125–140 for MELD-Na; MELD-Na will not fall below laboratory MELD.
+              </span>
+            </div>
+          ) : null}
+
+          </fieldset>
+
+          <div className="calc-actions">
+            <button type="submit" className="calc-calculate-btn" aria-label={`Calculate ${title} score`}>
+              <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
+              Calculate {title}
+            </button>
+            <button type="button" className="calc-reset-btn" onClick={reset} aria-label={`Reset ${title} form`}>
+              Reset
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div className="calculator-results" aria-live="polite" aria-label={`${title} results`}>
+        <ResultsPanelTitle />
+
+        {result ? (
+          <>
+            <div className={`calc-score-display ${result.severity}`}>
+              <div className="calc-score-label">Laboratory MELD</div>
+              <div className="calc-score-value">{result.meld}</div>
+              <div className="calc-score-interpretation">6–40 (UNOS laboratory model)</div>
+            </div>
+
+            {includeMeldNa && result.meldNa !== null ? (
+              <div className={`calc-score-display calc-score-display--secondary ${result.severity}`}>
+                <div className="calc-score-label">MELD-Na</div>
+                <div className="calc-score-value">{result.meldNa}</div>
+                {result.sodiumUsed !== null ? (
+                  <div className="calc-score-interpretation">
+                    Sodium used: {result.sodiumUsed} mEq/L
+                    {result.sodiumEntered !== result.sodiumUsed
+                      ? ` (entered ${result.sodiumEntered})`
+                      : ''}
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            <div className="calc-breakdown">
+              <div className="calc-breakdown-title">Values used in formula (after UNOS clamps)</div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Bilirubin</span>
+                <span className="calc-breakdown-score">{formatMeldLabValue(result.clamped.bilirubinMgDl)} mg/dL</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">INR</span>
+                <span className="calc-breakdown-score">{formatMeldLabValue(result.clamped.inr)}</span>
+              </div>
+              <div className="calc-breakdown-item">
+                <span className="calc-breakdown-label">Creatinine</span>
+                <span className="calc-breakdown-score">{formatMeldLabValue(result.clamped.creatinineMgDl)} mg/dL</span>
+              </div>
+              {includeMeldNa && result.meldForNa !== undefined ? (
+                <div className="calc-breakdown-item">
+                  <span className="calc-breakdown-label">MELD for Na step (≥11 floor)</span>
+                  <span className="calc-breakdown-score">{result.meldForNa}</span>
+                </div>
+              ) : null}
+            </div>
+
+            <CalcInterpretationRegion
+              headingId={interpretationHeadingId}
+              title={result.mortalityBand}
+              severity={result.severity}
+              emphasizeRisk={(result.meldNa ?? result.meld) >= 30}
+            >
+              <div className="calc-interpretation-text">{result.interpretation}</div>
+              {result.meldNaNote ? (
+                <div className="calc-interpretation-text calc-interpretation-text--secondary">{result.meldNaNote}</div>
+              ) : null}
+              <div className="calc-interpretation-text calc-interpretation-text--secondary">
+                {result.transplantDisclaimer}
+              </div>
+            </CalcInterpretationRegion>
+
+            <div className="calc-references">
+              <div className="calc-references-title">Reference</div>
+              <ul className="calc-references-list">
+                <li>{result.referenceLine}</li>
+              </ul>
+            </div>
+            <CalcResultSafetyFooter />
+          </>
+        ) : (
+          <div className="calc-results-empty">
+            <CalcResultsEmptyIcon icon={icon} />
+            <p>Enter labs{includeMeldNa ? ' and sodium' : ''}, then calculate</p>
           </div>
         )}
       </div>

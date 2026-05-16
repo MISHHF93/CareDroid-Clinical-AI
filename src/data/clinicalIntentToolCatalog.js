@@ -4,6 +4,13 @@
  * backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts
  */
 
+import { graceAcsChatConfig } from './chatAssistedCalculators/graceAcs';
+import { canadianCSpineChatConfig } from './chatAssistedCalculators/canadianCSpine';
+import { ottawaAnkleChatConfig } from './chatAssistedCalculators/ottawaAnkle';
+import { nihssChatConfig } from './chatAssistedCalculators/nihss';
+import { percChatConfig } from './chatAssistedCalculators/perc';
+import { wellsPeChatConfig } from './chatAssistedCalculators/wellsPe';
+
 export const clinicalIntentTools = [
   {
     toolId: 'sofa-calculator',
@@ -63,6 +70,42 @@ export const clinicalIntentTools = [
     backendExecutable: false,
   },
   {
+    toolId: 'meld',
+    toolName: 'MELD score',
+    category: 'calculator',
+    description:
+      'Model for End-stage Liver Disease: total bilirubin, INR, creatinine (dialysis rule) — 6–40 severity index for chronic liver disease.',
+    path: '/tools/calculators/meld',
+    sidebarToolId: 'meld',
+    chatSeed:
+      'Help me calculate MELD from bilirubin, INR, and creatinine (including dialysis if applicable) and interpret short-term mortality context.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'meld-na',
+    toolName: 'MELD-Na score',
+    category: 'calculator',
+    description:
+      'MELD with UNOS sodium adjustment (MELD-Na) for hyponatremia in chronic liver disease — laboratory MELD plus serum sodium.',
+    path: '/tools/calculators/meld-na',
+    sidebarToolId: 'meld-na',
+    chatSeed:
+      'Help me calculate MELD-Na from bilirubin, INR, creatinine, and serum sodium per UNOS rules.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'timi-ua-nstemi',
+    toolName: 'TIMI risk score (UA/NSTEMI)',
+    category: 'calculator',
+    description:
+      'TIMI for unstable angina / NSTEMI: age, CAD risk factors, known CAD, aspirin, severe angina, ST deviation, elevated cardiac markers (0–7).',
+    path: '/tools/calculators/timi-ua-nstemi',
+    sidebarToolId: 'timi-ua-nstemi',
+    chatSeed:
+      'Help me calculate the TIMI risk score for UA/NSTEMI using age, risk factors, known CAD, aspirin use, angina severity, ST deviation, and cardiac markers.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
     category: 'calculator',
@@ -112,6 +155,66 @@ export const clinicalIntentTools = [
     path: '/tools/calculators',
     sidebarToolId: 'calculators',
     chatSeed: 'Help me complete a Wells score for suspected DVT using my clinical findings.',
+    backendExecutable: false,
+  },
+  {
+    toolId: wellsPeChatConfig.toolId,
+    toolName: 'Wells PE Score',
+    category: wellsPeChatConfig.category,
+    description: wellsPeChatConfig.description,
+    path: wellsPeChatConfig.hubPath,
+    sidebarToolId: wellsPeChatConfig.registryId,
+    chatSeed: wellsPeChatConfig.chatSeed,
+    backendExecutable: false,
+  },
+  {
+    toolId: percChatConfig.toolId,
+    toolName: 'PERC (PE rule-out criteria)',
+    category: percChatConfig.category,
+    description: percChatConfig.description,
+    path: percChatConfig.hubPath,
+    sidebarToolId: percChatConfig.registryId,
+    chatSeed: percChatConfig.chatSeed,
+    backendExecutable: false,
+  },
+  {
+    toolId: graceAcsChatConfig.toolId,
+    toolName: 'GRACE ACS (prognosis support)',
+    category: graceAcsChatConfig.category,
+    description: graceAcsChatConfig.description,
+    path: graceAcsChatConfig.hubPath,
+    sidebarToolId: graceAcsChatConfig.registryId,
+    chatSeed: graceAcsChatConfig.chatSeed,
+    backendExecutable: false,
+  },
+  {
+    toolId: nihssChatConfig.toolId,
+    toolName: 'NIH Stroke Scale (NIHSS)',
+    category: nihssChatConfig.category,
+    description: nihssChatConfig.description,
+    path: nihssChatConfig.hubPath,
+    sidebarToolId: nihssChatConfig.registryId,
+    chatSeed: nihssChatConfig.chatSeed,
+    backendExecutable: false,
+  },
+  {
+    toolId: canadianCSpineChatConfig.toolId,
+    toolName: 'Canadian C-Spine Rule',
+    category: canadianCSpineChatConfig.category,
+    description: canadianCSpineChatConfig.description,
+    path: canadianCSpineChatConfig.hubPath,
+    sidebarToolId: canadianCSpineChatConfig.registryId,
+    chatSeed: canadianCSpineChatConfig.chatSeed,
+    backendExecutable: false,
+  },
+  {
+    toolId: ottawaAnkleChatConfig.toolId,
+    toolName: 'Ottawa Ankle Rule',
+    category: ottawaAnkleChatConfig.category,
+    description: ottawaAnkleChatConfig.description,
+    path: ottawaAnkleChatConfig.hubPath,
+    sidebarToolId: ottawaAnkleChatConfig.registryId,
+    chatSeed: ottawaAnkleChatConfig.chatSeed,
     backendExecutable: false,
   },
   {
@@ -208,6 +311,24 @@ export const nluCalculatorHubOnly = [
   { toolId: 'curb65-calculator', name: 'CURB-65', hubPath: '/tools/calculators' },
   { toolId: 'gcs-calculator', name: 'GCS', hubPath: '/tools/calculators' },
   { toolId: 'wells-dvt-calculator', name: 'Wells DVT', hubPath: '/tools/calculators' },
+  { toolId: wellsPeChatConfig.toolId, name: wellsPeChatConfig.name, hubPath: wellsPeChatConfig.hubPath },
+  { toolId: percChatConfig.toolId, name: percChatConfig.name, hubPath: percChatConfig.hubPath },
+  {
+    toolId: graceAcsChatConfig.toolId,
+    name: graceAcsChatConfig.name,
+    hubPath: graceAcsChatConfig.hubPath,
+  },
+  { toolId: nihssChatConfig.toolId, name: nihssChatConfig.name, hubPath: nihssChatConfig.hubPath },
+  {
+    toolId: canadianCSpineChatConfig.toolId,
+    name: canadianCSpineChatConfig.name,
+    hubPath: canadianCSpineChatConfig.hubPath,
+  },
+  {
+    toolId: ottawaAnkleChatConfig.toolId,
+    name: ottawaAnkleChatConfig.name,
+    hubPath: ottawaAnkleChatConfig.hubPath,
+  },
 ];
 
 export const builtinUiCalculators = [
@@ -257,6 +378,33 @@ export const builtinUiCalculators = [
     orchestratorId: null,
   },
   {
+    id: 'meld',
+    name: 'MELD',
+    description: 'Model for End-stage Liver Disease (bilirubin, INR, creatinine / dialysis).',
+    path: '/tools/calculators/meld',
+    calcQuery: '/tools/calculators?calc=meld',
+    implementation: 'Client-side in Calculators.jsx (meldCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'meld-na',
+    name: 'MELD-Na',
+    description: 'MELD with UNOS sodium adjustment for hyponatremia.',
+    path: '/tools/calculators/meld-na',
+    calcQuery: '/tools/calculators?calc=meld-na',
+    implementation: 'Client-side in Calculators.jsx (meldCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'timi-ua-nstemi',
+    name: 'TIMI (UA/NSTEMI)',
+    description: 'TIMI risk score for unstable angina / NSTEMI (7 binary criteria).',
+    path: '/tools/calculators/timi-ua-nstemi',
+    calcQuery: '/tools/calculators?calc=timi-ua-nstemi',
+    implementation: 'Client-side in Calculators.jsx (timiUaNstemiCalculator.js)',
+    orchestratorId: null,
+  },
+  {
     id: 'gfr',
     name: 'eGFR (CKD-EPI)',
     description: 'Kidney function estimate.',
@@ -295,6 +443,12 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = {
   'curb65-calculator': 'calculators',
   'gcs-calculator': 'calculators',
   'wells-dvt-calculator': 'calculators',
+  'wells-pe': 'wells-pe',
+  perc: 'perc',
+  'grace-acs': 'grace-acs',
+  nihss: 'nihss',
+  'canadian-c-spine': 'canadian-c-spine',
+  'ottawa-ankle': 'ottawa-ankle',
   'dose-calculator': 'calculators',
   'abg-interpreter': 'lab-interp',
   'protocol-lookup': 'protocols',

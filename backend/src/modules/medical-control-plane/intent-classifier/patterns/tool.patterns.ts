@@ -132,6 +132,70 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     category: 'calculator',
   },
   {
+    toolId: 'meld',
+    toolName: 'MELD score',
+    keywords: [
+      'meld',
+      'meld score',
+      'model for end stage liver disease',
+      'model for end-stage liver disease',
+      'end stage liver disease score',
+      'end-stage liver disease score',
+      'liver disease severity score',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['bilirubin', 'inr', 'creatinine', 'dialysis'],
+    description:
+      'Calculates MELD (Model for End-stage Liver Disease) from bilirubin, INR, and creatinine with UNOS laboratory rules',
+    category: 'calculator',
+  },
+  {
+    toolId: 'meld-na',
+    toolName: 'MELD-Na score',
+    keywords: [
+      'meld-na',
+      'meld na',
+      'meld sodium',
+      'meld with sodium',
+      'meld-na score',
+      'liver transplant score',
+      'unos meld sodium',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['bilirubin', 'inr', 'creatinine', 'sodium', 'dialysis'],
+    description:
+      'Calculates MELD-Na (MELD with UNOS sodium adjustment) for chronic liver disease severity',
+    category: 'calculator',
+  },
+  {
+    toolId: 'timi-ua-nstemi',
+    toolName: 'TIMI risk score (UA/NSTEMI)',
+    keywords: [
+      'timi',
+      'timi score',
+      'timi acs',
+      'timi nstemi',
+      'timi unstable angina',
+      'timi ua nstemi',
+      'timi risk score',
+      'unstable angina timi',
+      'nstemi timi',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'age',
+      'cad_risk_factors',
+      'known_cad',
+      'aspirin',
+      'angina',
+      'st_deviation',
+      'troponin',
+    ],
+    description:
+      'TIMI risk score for unstable angina / NSTEMI (7 binary criteria, 0–7) for 14-day event risk context',
+    category: 'calculator',
+  },
+  {
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
     keywords: [
@@ -238,6 +302,187 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'alternative_diagnosis',
     ],
     description: 'Estimates probability of deep vein thrombosis (DVT)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'wells-pe',
+    toolName: 'Wells PE Score',
+    keywords: [
+      'wells pe',
+      'wells pulmonary embolism',
+      'pulmonary embolism wells',
+      'pe score',
+      'wells score',
+      'wells score pe',
+      'pe wells',
+      'pulmonary embolism score',
+      'wells rule pe',
+      'wells for pulmonary embolism',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'dvt_signs',
+      'pe_likely',
+      'heart_rate',
+      'immobilization',
+      'previous_pe',
+      'hemoptysis',
+      'malignancy',
+    ],
+    description:
+      'Wells clinical prediction rule for pulmonary embolism — chat-assisted pre-test probability',
+    category: 'calculator',
+  },
+  {
+    toolId: 'perc',
+    toolName: 'PERC (PE rule-out criteria)',
+    keywords: [
+      'perc',
+      'perc rule',
+      'pulmonary embolism rule out',
+      'pulmonary embolism rule-out',
+      'pe rule out',
+      'pe rule-out',
+      'rule out pe',
+      'rule out pulmonary embolism',
+      'perc criteria',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'age',
+      'heart_rate',
+      'spo2',
+      'leg_swelling',
+      'hemoptysis',
+      'surgery',
+      'prior_pe',
+      'estrogen',
+    ],
+    description:
+      'PERC checklist for pulmonary embolism rule-out in low pre-test probability patients (chat-assisted)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'grace-acs',
+    toolName: 'GRACE ACS Risk',
+    keywords: [
+      'grace',
+      'grace score',
+      'grace acs',
+      'grace 2.0',
+      'grace 2',
+      'acs mortality risk',
+      'acute coronary syndrome risk',
+      'global registry acute coronary',
+      'grace risk',
+      'grace mortality',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'age',
+      'heart_rate',
+      'systolic_bp',
+      'creatinine',
+      'killip',
+      'cardiac_arrest',
+      'st_deviation',
+      'troponin',
+    ],
+    description:
+      'GRACE ACS mortality risk stratification for acute coronary syndrome (chat-assisted; prognosis only)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'nihss',
+    toolName: 'NIH Stroke Scale (NIHSS)',
+    keywords: [
+      'nihss',
+      'nih stroke scale',
+      'national institutes of health stroke scale',
+      'stroke scale',
+      'stroke severity score',
+      'nih stroke score',
+      'national institute stroke scale',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'loc',
+      'loc_questions',
+      'loc_commands',
+      'gaze',
+      'visual_fields',
+      'facial_palsy',
+      'motor_arm_left',
+      'motor_arm_right',
+      'motor_leg_left',
+      'motor_leg_right',
+      'ataxia',
+      'sensory',
+      'language',
+      'dysarthria',
+      'extinction',
+    ],
+    description:
+      'NIH Stroke Scale structured neurologic deficit scoring (chat-assisted; does not replace urgent stroke evaluation)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'canadian-c-spine',
+    toolName: 'Canadian C-Spine Rule',
+    keywords: [
+      'canadian c spine',
+      'canadian c-spine',
+      'canadian c-spine rule',
+      'canadian c spine rule',
+      'c spine rule',
+      'c-spine rule',
+      'cervical spine rule',
+      'neck trauma imaging',
+      'neck trauma imaging rule',
+      'c spine imaging rule',
+      'canadian cervical spine',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'age',
+      'dangerous_mechanism',
+      'paresthesias',
+      'rear_end_mvc',
+      'midline_tenderness',
+      'distracting_injury',
+      'neck_rotation',
+    ],
+    description:
+      'Canadian C-Spine Rule for cervical spine imaging in alert stable blunt trauma (chat-assisted)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'ottawa-ankle',
+    toolName: 'Ottawa Ankle Rule',
+    keywords: [
+      'ottawa ankle',
+      'ottawa ankle rule',
+      'ottawa foot rule',
+      'ankle xray rule',
+      'ankle x-ray rule',
+      'ankle injury imaging',
+      'foot xray rule',
+      'foot x-ray rule',
+      'ottawa rules ankle',
+      'ankle radiograph rule',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'malleolar_pain',
+      'lateral_malleolus_tenderness',
+      'medial_malleolus_tenderness',
+      'midfoot_pain',
+      'navicular_tenderness',
+      'fifth_metatarsal_tenderness',
+      'weight_bearing',
+    ],
+    description:
+      'Ottawa ankle and foot rules for radiography after acute ankle/foot injury (chat-assisted)',
     category: 'calculator',
   },
 
@@ -459,9 +704,106 @@ export function matchToolPatterns(message: string): Array<{
     lowerMessage.includes('quick sepsis score') ||
     lowerMessage.includes('sepsis bedside score') ||
     lowerMessage.includes('bedside sepsis score');
-  const filtered = preferQsofa
+  let filtered = preferQsofa
     ? matches.filter((m) => m.toolId !== 'sofa-calculator')
     : matches;
+
+  const preferWellsPe =
+    /\bwells\s+pe\b/.test(lowerMessage) ||
+    lowerMessage.includes('wells pulmonary embolism') ||
+    lowerMessage.includes('pulmonary embolism wells') ||
+    lowerMessage.includes('wells score pe') ||
+    lowerMessage.includes('pe score') ||
+    (lowerMessage.includes('wells') &&
+      (lowerMessage.includes('pulmonary embolism') || /\bpe\b/.test(lowerMessage)) &&
+      !lowerMessage.includes('dvt'));
+  const preferWellsDvt =
+    /\bwells\s+dvt\b/.test(lowerMessage) ||
+    lowerMessage.includes('wells score for dvt') ||
+    lowerMessage.includes('deep vein thrombosis');
+
+  if (preferWellsPe) {
+    filtered = filtered.filter((m) => m.toolId !== 'wells-dvt-calculator');
+  } else if (preferWellsDvt) {
+    filtered = filtered.filter((m) => m.toolId !== 'wells-pe');
+  }
+
+  const preferPerc =
+    /\bperc\b/.test(lowerMessage) ||
+    lowerMessage.includes('perc rule') ||
+    lowerMessage.includes('pulmonary embolism rule out') ||
+    lowerMessage.includes('pulmonary embolism rule-out') ||
+    lowerMessage.includes('pe rule out') ||
+    lowerMessage.includes('pe rule-out') ||
+    (lowerMessage.includes('rule out') &&
+      (lowerMessage.includes('pulmonary embolism') || /\bpe\b/.test(lowerMessage)) &&
+      !lowerMessage.includes('wells'));
+
+  if (preferPerc) {
+    filtered = filtered.filter((m) => m.toolId !== 'wells-pe' && m.toolId !== 'wells-dvt-calculator');
+  }
+
+  const preferGraceAcs =
+    /\bgrace\b/.test(lowerMessage) ||
+    lowerMessage.includes('grace score') ||
+    lowerMessage.includes('grace acs') ||
+    lowerMessage.includes('acs mortality risk') ||
+    lowerMessage.includes('acute coronary syndrome risk') ||
+    lowerMessage.includes('global registry acute coronary');
+
+  const preferTimiAcs =
+    /\btimi\b/.test(lowerMessage) && !/\bgrace\b/.test(lowerMessage) && !lowerMessage.includes('grace acs');
+
+  if (preferGraceAcs) {
+    filtered = filtered.filter((m) => m.toolId !== 'timi-ua-nstemi');
+  } else if (preferTimiAcs) {
+    filtered = filtered.filter((m) => m.toolId !== 'grace-acs');
+  }
+
+  const preferNihss =
+    /\bnihss\b/.test(lowerMessage) ||
+    lowerMessage.includes('nih stroke scale') ||
+    lowerMessage.includes('national institutes of health stroke scale') ||
+    lowerMessage.includes('stroke severity score') ||
+    (lowerMessage.includes('stroke scale') && !lowerMessage.includes('trauma'));
+
+  if (preferNihss) {
+    filtered = filtered.filter(
+      (m) => m.toolId !== 'gcs-calculator' && m.toolId !== 'news2' && m.toolId !== 'qsofa',
+    );
+  }
+
+  const preferCanadianCSpine =
+    lowerMessage.includes('canadian c spine') ||
+    lowerMessage.includes('canadian c-spine') ||
+    lowerMessage.includes('canadian c-spine rule') ||
+    lowerMessage.includes('c spine rule') ||
+    lowerMessage.includes('c-spine rule') ||
+    lowerMessage.includes('cervical spine rule') ||
+    lowerMessage.includes('neck trauma imaging rule') ||
+    (lowerMessage.includes('cervical spine') &&
+      (lowerMessage.includes('imaging') || lowerMessage.includes('x-ray') || lowerMessage.includes('xray')) &&
+      !lowerMessage.includes('stroke'));
+
+  if (preferCanadianCSpine) {
+    filtered = filtered.filter((m) => m.toolId !== 'nihss' && m.toolId !== 'gcs-calculator');
+  }
+
+  const preferOttawaAnkle =
+    lowerMessage.includes('ottawa ankle') ||
+    lowerMessage.includes('ottawa ankle rule') ||
+    lowerMessage.includes('ankle xray rule') ||
+    lowerMessage.includes('ankle x-ray rule') ||
+    lowerMessage.includes('ankle injury imaging') ||
+    lowerMessage.includes('foot xray rule') ||
+    lowerMessage.includes('foot x-ray rule') ||
+    (lowerMessage.includes('ankle') &&
+      (lowerMessage.includes('xray') || lowerMessage.includes('x-ray') || lowerMessage.includes('radiograph')) &&
+      !lowerMessage.includes('pulmonary'));
+
+  if (preferOttawaAnkle) {
+    filtered = filtered.filter((m) => m.toolId !== 'canadian-c-spine');
+  }
 
   // Sort by confidence descending
   return filtered.sort((a, b) => b.confidence - a.confidence);

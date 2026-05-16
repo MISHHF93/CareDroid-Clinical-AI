@@ -26,9 +26,9 @@ const COST_TRACKING_EXTRA_TOOL_KEYS = [
 ];
 
 describe('sourceCodeToolDiscovery', () => {
-  it('indexes 19 NLU clinical tool profiles', () => {
-    expect(clinicalIntentTools).toHaveLength(19);
-    expect(getSourceCodeDiscoverySummary().nluPatternCount).toBe(19);
+  it('indexes NLU clinical tool profiles (PR3 adds GRACE ACS, NIHSS, C-Spine, Ottawa Ankle)', () => {
+    expect(clinicalIntentTools.length).toBeGreaterThanOrEqual(28);
+    expect(clinicalIntentTools).toHaveLength(getSourceCodeDiscoverySummary().nluPatternCount);
   });
 
   it('includes every sidebar registry id in the discovered list', () => {
@@ -161,5 +161,65 @@ describe('sourceCodeToolDiscovery', () => {
     const appSrc = readFileSync(appPath, 'utf8');
     expect(appSrc).toContain("path: '/tools/calculators/qsofa'");
     expect(appSrc).toContain('initialCalculatorId="qsofa"');
+  });
+
+  it('resolves PERC as hub-only chat-assisted (no dedicated App route)', () => {
+    const launch = resolveCatalogLaunch('perc');
+    expect(launch.path).toBe('/tools/calculators');
+    expect(launch.registryId).toBe('perc');
+    expect(launch.chatSeed).toMatch(/PERC rule/i);
+    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
+    const appSrc = readFileSync(appPath, 'utf8');
+    expect(appSrc).not.toContain("path: '/tools/calculators/perc'");
+  });
+
+  it('resolves Wells PE as hub-only chat-assisted (no dedicated App route)', () => {
+    const launch = resolveCatalogLaunch('wells-pe');
+    expect(launch.path).toBe('/tools/calculators');
+    expect(launch.registryId).toBe('wells-pe');
+    expect(launch.chatSeed).toMatch(/pulmonary embolism/i);
+    expect(toolRegistryById['wells-pe']?.path).toBe('/tools/calculators');
+    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
+    const appSrc = readFileSync(appPath, 'utf8');
+    expect(appSrc).not.toContain("path: '/tools/calculators/wells-pe'");
+  });
+
+  it.each([
+    ['grace-acs', /GRACE ACS/i, 'grace'],
+    ['nihss', /NIH Stroke Scale/i, 'stroke scale'],
+    ['canadian-c-spine', /Canadian C-Spine Rule/i, 'cervical-spine-rule'],
+    ['ottawa-ankle', /Ottawa Ankle Rule/i, 'ankle-injury-imaging'],
+  ])(
+    'resolves PR3 %s as hub-only with guided chatSeed for aliases',
+    (id, seedPattern, alias) => {
+      const launch = resolveCatalogLaunch(id);
+      expect(launch.path).toBe('/tools/calculators');
+      expect(launch.registryId).toBe(id);
+      expect(launch.chatSeed).toMatch(seedPattern);
+      const fromAlias = resolveCatalogLaunch(alias);
+      expect(fromAlias.chatSeed).toBe(launch.chatSeed);
+      const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
+      const appSrc = readFileSync(appPath, 'utf8');
+      expect(appSrc).not.toContain(`path: '/tools/calculators/${id}'`);
+    }
+  );
+
+  it('registers TIMI UA/NSTEMI sidebar entry and App route', () => {
+    expect(toolRegistryById['timi-ua-nstemi']?.path).toBe('/tools/calculators/timi-ua-nstemi');
+    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
+    const appSrc = readFileSync(appPath, 'utf8');
+    expect(appSrc).toContain("path: '/tools/calculators/timi-ua-nstemi'");
+    expect(appSrc).toContain('initialCalculatorId="timi-ua-nstemi"');
+  });
+
+  it('registers MELD and MELD-Na sidebar entries and App routes', () => {
+    expect(toolRegistryById.meld?.path).toBe('/tools/calculators/meld');
+    expect(toolRegistryById['meld-na']?.path).toBe('/tools/calculators/meld-na');
+    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
+    const appSrc = readFileSync(appPath, 'utf8');
+    expect(appSrc).toContain("path: '/tools/calculators/meld'");
+    expect(appSrc).toContain('initialCalculatorId="meld"');
+    expect(appSrc).toContain("path: '/tools/calculators/meld-na'");
+    expect(appSrc).toContain('initialCalculatorId="meld-na"');
   });
 });

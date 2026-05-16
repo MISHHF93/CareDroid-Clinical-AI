@@ -21,6 +21,9 @@ export const BUILTIN_CALC_ID_TO_REGISTRY_ID = {
   news2: 'news2',
   'child-pugh': 'child-pugh',
   'has-bled': 'has-bled',
+  meld: 'meld',
+  'meld-na': 'meld-na',
+  'timi-ua-nstemi': 'timi-ua-nstemi',
 };
 
 /** Tier-A calculators: dedicated NLU profile + registry row + shipped form (audit list). */
@@ -30,6 +33,44 @@ export const PR1_CALCULATOR_REGISTRY_IDS = Object.freeze([
   'child-pugh',
   'has-bled',
 ]);
+
+/** Tier-A MELD calculators (PR2). */
+export const PR2_MELD_CALCULATOR_REGISTRY_IDS = Object.freeze(['meld', 'meld-na']);
+
+/** Tier-A TIMI UA/NSTEMI (PR2). */
+export const PR2_TIMI_CALCULATOR_REGISTRY_IDS = Object.freeze(['timi-ua-nstemi']);
+
+/** Tier-A PR2 calculators with dedicated forms (MELD + TIMI). */
+export const PR2_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
+  ...PR2_MELD_CALCULATOR_REGISTRY_IDS,
+  ...PR2_TIMI_CALCULATOR_REGISTRY_IDS,
+]);
+
+/** Tier-B chat-assisted calculators (hub + NLU; no dedicated form). */
+export const PR2_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze(['wells-pe', 'perc']);
+
+/** Tier-B chat-assisted calculators (PR3). */
+export const PR3_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze([
+  'grace-acs',
+  'nihss',
+  'canadian-c-spine',
+  'ottawa-ankle',
+]);
+
+/** All Tier-B chat-assisted calculator registry ids (hub section + audits). */
+export const TIER_B_CHAT_CALCULATOR_REGISTRY_IDS = Object.freeze([
+  ...PR2_TIER_B_CHAT_CALCULATOR_IDS,
+  ...PR3_TIER_B_CHAT_CALCULATOR_IDS,
+]);
+
+/** All PR2 calculator registry ids (audit / consistency tests). */
+export const PR2_CALCULATOR_REGISTRY_IDS = Object.freeze([
+  ...PR2_TIER_A_CALCULATOR_REGISTRY_IDS,
+  ...PR2_TIER_B_CHAT_CALCULATOR_IDS,
+]);
+
+/** All PR3 calculator registry ids (audit / consistency tests). */
+export const PR3_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR3_TIER_B_CHAT_CALCULATOR_IDS]);
 
 /** NLU / legacy / phantom ids → sidebar registry id (used by recommendations + catalog) */
 export const NLU_TO_REGISTRY_ID = {
@@ -73,6 +114,81 @@ export const NLU_TO_REGISTRY_ID = {
   'vitals-monitor': 'calculators',
   'antibiotic-scripts': 'drug-check',
   'bleeding-risk': 'has-bled',
+  'meld score': 'meld',
+  'meld-score': 'meld',
+  'liver transplant score': 'meld-na',
+  'liver-transplant-score': 'meld-na',
+  'end stage liver disease score': 'meld',
+  'end-stage-liver-disease-score': 'meld',
+  'meld na': 'meld-na',
+  'meld-sodium': 'meld-na',
+  timi: 'timi-ua-nstemi',
+  'timi score': 'timi-ua-nstemi',
+  'timi-score': 'timi-ua-nstemi',
+  'timi acs': 'timi-ua-nstemi',
+  'timi-acs': 'timi-ua-nstemi',
+  'timi nstemi': 'timi-ua-nstemi',
+  'timi-nstemi': 'timi-ua-nstemi',
+  'timi unstable angina': 'timi-ua-nstemi',
+  'timi-unstable-angina': 'timi-ua-nstemi',
+  'wells pe': 'wells-pe',
+  'wells-pe': 'wells-pe',
+  'wells pe score': 'wells-pe',
+  'wells-pe-score': 'wells-pe',
+  'pulmonary embolism wells': 'wells-pe',
+  'pulmonary-embolism-wells': 'wells-pe',
+  'pe score': 'wells-pe',
+  'pe-score': 'wells-pe',
+  'wells pulmonary embolism': 'wells-pe',
+  'wells-pulmonary-embolism': 'wells-pe',
+  perc: 'perc',
+  'perc rule': 'perc',
+  'perc-rule': 'perc',
+  'pulmonary embolism rule out': 'perc',
+  'pulmonary-embolism-rule-out': 'perc',
+  'pe rule out': 'perc',
+  'pe-rule-out': 'perc',
+  grace: 'grace-acs',
+  'grace score': 'grace-acs',
+  'grace-score': 'grace-acs',
+  'grace acs': 'grace-acs',
+  'grace-acs': 'grace-acs',
+  'grace acs risk': 'grace-acs',
+  'grace-acs-risk': 'grace-acs',
+  'acs mortality risk': 'grace-acs',
+  'acs-mortality-risk': 'grace-acs',
+  'acute coronary syndrome risk': 'grace-acs',
+  'acute-coronary-syndrome-risk': 'grace-acs',
+  'global registry acute coronary events': 'grace-acs',
+  nihss: 'nihss',
+  'nih stroke scale': 'nihss',
+  'nih-stroke-scale': 'nihss',
+  'national institutes of health stroke scale': 'nihss',
+  'national-institutes-of-health-stroke-scale': 'nihss',
+  'stroke scale': 'nihss',
+  'stroke-scale': 'nihss',
+  'stroke severity score': 'nihss',
+  'stroke-severity-score': 'nihss',
+  'canadian c spine': 'canadian-c-spine',
+  'canadian-c-spine': 'canadian-c-spine',
+  'canadian c-spine rule': 'canadian-c-spine',
+  'canadian-c-spine-rule': 'canadian-c-spine',
+  'c spine rule': 'canadian-c-spine',
+  'c-spine-rule': 'canadian-c-spine',
+  'cervical spine rule': 'canadian-c-spine',
+  'cervical-spine-rule': 'canadian-c-spine',
+  'neck trauma imaging rule': 'canadian-c-spine',
+  'neck-trauma-imaging-rule': 'canadian-c-spine',
+  'ottawa ankle': 'ottawa-ankle',
+  'ottawa-ankle': 'ottawa-ankle',
+  'ottawa ankle rule': 'ottawa-ankle',
+  'ottawa-ankle-rule': 'ottawa-ankle',
+  'ankle xray rule': 'ottawa-ankle',
+  'ankle-xray-rule': 'ottawa-ankle',
+  'ankle injury imaging': 'ottawa-ankle',
+  'ankle-injury-imaging': 'ottawa-ankle',
+  'foot xray rule': 'ottawa-ankle',
+  'foot-xray-rule': 'ottawa-ankle',
   'chemo-calculator': 'calculators',
   'cancer-calculator': 'calculators',
   'tumor-staging': 'diagnosis',
@@ -146,6 +262,11 @@ export function resolveCatalogLaunch(id) {
   }
 
   const registryId = resolveRegistryId(id);
+  // Alias → registry id: prefer NLU guided chatSeed over generic registry fallback.
+  if (registryId && registryId !== id && clinicalIntentToolsById[registryId]) {
+    return resolveCatalogLaunch(registryId);
+  }
+
   const registryEntry = registryId ? toolRegistryById[registryId] : null;
   if (registryEntry) {
     return {
