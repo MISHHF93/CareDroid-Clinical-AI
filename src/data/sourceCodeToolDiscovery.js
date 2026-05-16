@@ -63,10 +63,10 @@ export const phantomToolReferences = [
   {
     id: 'cancer-calculator',
     name: 'Oncology Risk Calculator',
-    source: 'advancedRecommendationService.js, PHASE_3_ARCHITECTURE.md',
+    source: 'advancedRecommendationService.js',
     status: 'phantom',
     category: 'oncology',
-    notes: 'Documented in phase docs; not in tool.patterns or Calculators.jsx.',
+    notes: 'NLU recommendations only; not in tool.patterns or Calculators.jsx.',
   },
   {
     id: 'tumor-staging',

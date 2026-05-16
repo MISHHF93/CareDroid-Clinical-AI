@@ -134,7 +134,7 @@ if [ $REMOVED_COUNT -gt 0 ]; then
     echo "  backend/          - Backend API server (KEEP)"
     echo "  config/           - Infrastructure configs (KEEP)"
     echo "  .github/          - GitHub workflows (KEEP)"
-    echo "  *.md files        - Documentation (KEEP)"
+    echo "  README.md         - Platform documentation (KEEP)"
     echo ""
     echo "Next steps:"
     echo "  1. Test the Android app: cd android && ./gradlew assembleDebug"

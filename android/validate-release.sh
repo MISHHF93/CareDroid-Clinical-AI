@@ -131,10 +131,10 @@ else
     print_check "FAIL" "Screenshot directory not found"
 fi
 
-if [ -f "play-store-listing.md" ]; then
-    print_check "PASS" "Store listing prepared"
+if [ -f "../README.md" ]; then
+    print_check "PASS" "Repository README present (store listing: maintain in Play Console or append to README)"
 else
-    print_check "WARN" "Store listing not found"
+    print_check "WARN" "Repository README.md not found at repo root"
 fi
 echo ""
 
