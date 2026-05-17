@@ -48,6 +48,7 @@ import {
 } from '../../utils/timiUaNstemiCalculator';
 import { NavIcon } from '../../navigation/NavIcon';
 import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
+import { Phq9Calculator, Gad7Calculator } from './mentalHealthCalculators';
 
 const CALCULATORS = [
   {
@@ -116,6 +117,18 @@ const CALCULATORS = [
     description: 'Stroke risk in atrial fibrillation',
     category: 'Cardiology',
   },
+  {
+    id: 'phq9',
+    name: 'PHQ-9',
+    description: 'Depression symptom screen (0–27) with question 9 safety escalation',
+    category: 'Behavioral health',
+  },
+  {
+    id: 'gad7',
+    name: 'GAD-7',
+    description: 'Anxiety symptom screen (0–21) with severe-range escalation messaging',
+    category: 'Behavioral health',
+  },
 ];
 
 function CalcPanelTitle({ icon, children }) {
@@ -172,9 +185,9 @@ function CalcInterpretationRegion({ headingId, title, severity, emphasizeRisk, c
       role="region"
       aria-labelledby={headingId}
     >
-      <div id={headingId} className="calc-interpretation-title">
+      <h3 id={headingId} className="calc-interpretation-title">
         {title}
-      </div>
+      </h3>
       {children}
     </section>
   );
@@ -313,6 +326,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                           key={tool.toolId}
                           type="button"
                           className="calc-chat-assisted-card"
+                          data-calc-id={tool.toolId}
                           aria-label={chatAssistedLaunchAriaLabel(tool.name)}
                           aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}
                           onClick={() => handleChatAssistedLaunch(tool.toolId)}
@@ -392,8 +406,12 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <BMICalculator onResultChange={onResultChange} />;
     case 'chads2vasc':
       return <CHA2DS2VAScCalculator onResultChange={onResultChange} />;
+    case 'phq9':
+      return <Phq9Calculator onResultChange={onResultChange} />;
+    case 'gad7':
+      return <Gad7Calculator onResultChange={onResultChange} />;
     default:
-      return <div>Calculator not implemented</div>;
+      return <motion.div>Calculator not implemented</motion.div>;
   }
 };
 

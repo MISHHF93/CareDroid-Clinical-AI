@@ -32,6 +32,20 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
       'Wells and PERC inform pre-test probability when PE is being considered. They do not rule in or rule out PE with certainty and are not a substitute for imaging or clinical judgment when PE cannot be safely excluded.',
     toolIds: ['wells-pe', 'perc'],
   },
+  {
+    groupId: 'pulmonary-copd',
+    heading: 'COPD (GOLD grouping)',
+    lead:
+      'COPD GOLD grouping support uses symptom burden and exacerbation history to suggest A/B/E groups for discussion. It does not diagnose COPD, does not replace spirometry for GOLD grades 1–4, and does not recommend inhalers or other therapy — acute exacerbation requires urgent evaluation per local protocols.',
+    toolIds: ['copd-gold'],
+  },
+  {
+    groupId: 'gastrointestinal',
+    heading: 'Rome IV IBS criteria',
+    lead:
+      'Rome IV criteria support reviews abdominal pain frequency, duration, and stool-related features for discussion. It is informational only, does not diagnose irritable bowel syndrome, and does not replace alarm-feature workup — red-flag symptoms require clinician evaluation without delay.',
+    toolIds: ['rome-iv-ibs'],
+  },
 ]);
 
 /**

@@ -35,10 +35,11 @@ describe('medicalToolsCatalogIndex', () => {
   });
 
   it('reports summary aligned with NLU count', () => {
+    const nluCount = clinicalIntentTools.length;
     const summary = getMedicalCatalogSummary();
-    expect(summary.nluProfiles).toBe(24);
-    expect(summary.total).toBeGreaterThanOrEqual(24);
-    expect(summary.chatOnRequest).toBeGreaterThanOrEqual(24);
+    expect(summary.nluProfiles).toBe(nluCount);
+    expect(summary.total).toBeGreaterThanOrEqual(nluCount);
+    expect(summary.chatOnRequest).toBeGreaterThanOrEqual(nluCount);
   });
 
   it('indexes HAS-BLED with dedicated page and calculator slug', () => {

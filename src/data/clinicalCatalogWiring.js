@@ -24,6 +24,15 @@ export const BUILTIN_CALC_ID_TO_REGISTRY_ID = {
   meld: 'meld',
   'meld-na': 'meld-na',
   'timi-ua-nstemi': 'timi-ua-nstemi',
+  'ascvd-risk': 'ascvd-risk',
+  'ckd-staging': 'ckd-staging',
+  'stop-bang': 'stop-bang',
+  'audit-c': 'audit-c',
+  phq9: 'phq9',
+  gad7: 'gad7',
+  gfr: 'calc-gfr',
+  egfr: 'calc-gfr',
+  bmi: 'calc-bmi',
 };
 
 /** Tier-A calculators: dedicated NLU profile + registry row + shipped form (audit list). */
@@ -57,11 +66,25 @@ export const PR3_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze([
   'ottawa-ankle',
 ]);
 
+/** Tier-B chat-assisted calculators (PR6). */
+export const PR6_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze(['copd-gold']);
+
+/** Tier-B chat-assisted calculators (PR7). */
+export const PR7_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze(['rome-iv-ibs']);
+
 /** All Tier-B chat-assisted calculator registry ids (hub section + audits). */
 export const TIER_B_CHAT_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...PR2_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR3_TIER_B_CHAT_CALCULATOR_IDS,
+  ...PR6_TIER_B_CHAT_CALCULATOR_IDS,
+  ...PR7_TIER_B_CHAT_CALCULATOR_IDS,
 ]);
+
+/** All PR6 calculator registry ids (audit / consistency tests). */
+export const PR6_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR6_TIER_B_CHAT_CALCULATOR_IDS]);
+
+/** All PR7 calculator registry ids (audit / consistency tests). */
+export const PR7_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR7_TIER_B_CHAT_CALCULATOR_IDS]);
 
 /** All PR2 calculator registry ids (audit / consistency tests). */
 export const PR2_CALCULATOR_REGISTRY_IDS = Object.freeze([
@@ -71,6 +94,23 @@ export const PR2_CALCULATOR_REGISTRY_IDS = Object.freeze([
 
 /** All PR3 calculator registry ids (audit / consistency tests). */
 export const PR3_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR3_TIER_B_CHAT_CALCULATOR_IDS]);
+
+/** Tier-A PR4A calculators with dedicated forms. */
+export const PR4A_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
+  'ascvd-risk',
+  'ckd-staging',
+  'stop-bang',
+  'audit-c',
+]);
+
+/** All PR4A calculator registry ids (audit / consistency tests). */
+export const PR4A_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR4A_TIER_A_CALCULATOR_REGISTRY_IDS]);
+
+/** Tier-A PR5 calculators with dedicated forms. */
+export const PR5_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze(['phq9', 'gad7']);
+
+/** All PR5 calculator registry ids (audit / consistency tests). */
+export const PR5_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR5_TIER_A_CALCULATOR_REGISTRY_IDS]);
 
 /** NLU / legacy / phantom ids → sidebar registry id (used by recommendations + catalog) */
 export const NLU_TO_REGISTRY_ID = {
@@ -189,6 +229,79 @@ export const NLU_TO_REGISTRY_ID = {
   'ankle-injury-imaging': 'ottawa-ankle',
   'foot xray rule': 'ottawa-ankle',
   'foot-xray-rule': 'ottawa-ankle',
+  ascvd: 'ascvd-risk',
+  'ascvd-score': 'ascvd-risk',
+  'cardiovascular risk': 'ascvd-risk',
+  'cardiovascular-risk': 'ascvd-risk',
+  'heart disease risk': 'ascvd-risk',
+  'heart-disease-risk': 'ascvd-risk',
+  'cv risk': 'ascvd-risk',
+  'cv-risk': 'ascvd-risk',
+  'ascvd score': 'ascvd-risk',
+  'ascvd-risk': 'ascvd-risk',
+  'pooled cohort': 'ascvd-risk',
+  'pooled cohort equations': 'ascvd-risk',
+  '10 year ascvd': 'ascvd-risk',
+  '10-year ascvd': 'ascvd-risk',
+  'ckd stage': 'ckd-staging',
+  'ckd-stage': 'ckd-staging',
+  'kidney stage': 'ckd-staging',
+  'kidney-stage': 'ckd-staging',
+  'kidney disease staging': 'ckd-staging',
+  'kidney-disease-staging': 'ckd-staging',
+  'gfr stage': 'ckd-staging',
+  'gfr-stage': 'ckd-staging',
+  'albuminuria stage': 'ckd-staging',
+  'albuminuria-stage': 'ckd-staging',
+  'ckd-staging': 'ckd-staging',
+  'stop bang': 'stop-bang',
+  'stop-bang': 'stop-bang',
+  'sleep apnea score': 'stop-bang',
+  'sleep-apnea-score': 'stop-bang',
+  'osa risk': 'stop-bang',
+  'osa-risk': 'stop-bang',
+  'sleep risk score': 'stop-bang',
+  'sleep-risk-score': 'stop-bang',
+  'audit c': 'audit-c',
+  'audit-c': 'audit-c',
+  'alcohol screen': 'audit-c',
+  'alcohol-screen': 'audit-c',
+  'alcohol use screen': 'audit-c',
+  'alcohol-use-screen': 'audit-c',
+  'drinking screen': 'audit-c',
+  'drinking-screen': 'audit-c',
+  phq9: 'phq9',
+  'phq-9': 'phq9',
+  'depression screen': 'phq9',
+  'depression-screen': 'phq9',
+  'depression questionnaire': 'phq9',
+  'depression-questionnaire': 'phq9',
+  'mood screen': 'phq9',
+  'mood-screen': 'phq9',
+  gad7: 'gad7',
+  'gad-7': 'gad7',
+  'anxiety screen': 'gad7',
+  'anxiety-screen': 'gad7',
+  'anxiety questionnaire': 'gad7',
+  'anxiety-questionnaire': 'gad7',
+  'generalized anxiety screen': 'gad7',
+  'generalized-anxiety-screen': 'gad7',
+  'copd-gold': 'copd-gold',
+  'gold copd': 'copd-gold',
+  'gold-copd': 'copd-gold',
+  'copd assessment': 'copd-gold',
+  'copd-assessment': 'copd-gold',
+  'copd risk': 'copd-gold',
+  'copd-risk': 'copd-gold',
+  'gold classification': 'copd-gold',
+  'gold-classification': 'copd-gold',
+  'rome-iv-ibs': 'rome-iv-ibs',
+  'rome iv': 'rome-iv-ibs',
+  'rome-iv': 'rome-iv-ibs',
+  'ibs criteria': 'rome-iv-ibs',
+  'ibs-criteria': 'rome-iv-ibs',
+  'irritable bowel syndrome criteria': 'rome-iv-ibs',
+  'irritable-bowel-syndrome-criteria': 'rome-iv-ibs',
   'chemo-calculator': 'calculators',
   'cancer-calculator': 'calculators',
   'tumor-staging': 'diagnosis',

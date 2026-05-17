@@ -196,6 +196,190 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     category: 'calculator',
   },
   {
+    toolId: 'ascvd-risk',
+    toolName: 'ASCVD 10-year risk (PCE)',
+    keywords: [
+      'ascvd',
+      'ascvd risk',
+      'ascvd score',
+      'cardiovascular risk',
+      'heart disease risk',
+      'cv risk',
+      'pooled cohort',
+      'pooled cohort equations',
+      '10 year ascvd',
+      '10-year ascvd',
+      'primary prevention ascvd',
+      'atherosclerotic cardiovascular disease risk',
+    ],
+    requiredParameters: ['age', 'sex'],
+    optionalParameters: [
+      'race',
+      'total_cholesterol',
+      'hdl',
+      'systolic_bp',
+      'hypertension_treatment',
+      'diabetes',
+      'smoking',
+    ],
+    description:
+      'ACC/AHA pooled cohort equations for 10-year ASCVD risk in primary prevention (ages 40–79)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'ckd-staging',
+    toolName: 'CKD staging (KDIGO)',
+    keywords: [
+      'ckd staging',
+      'ckd stage',
+      'kidney stage',
+      'kidney disease staging',
+      'gfr stage',
+      'albuminuria stage',
+      'kdigo ckd',
+      'ckd heat map',
+      'albuminuria category',
+      'gfr category',
+    ],
+    requiredParameters: ['age', 'sex'],
+    optionalParameters: ['creatinine', 'acr', 'albuminuria'],
+    description:
+      'KDIGO CKD staging with CKD-EPI 2021 eGFR, urine ACR albuminuria category, and combined prognostic risk',
+    category: 'calculator',
+  },
+  {
+    toolId: 'stop-bang',
+    toolName: 'STOP-Bang (OSA screening)',
+    keywords: [
+      'stop bang',
+      'stop-bang',
+      'stopbang',
+      'sleep apnea score',
+      'osa risk',
+      'sleep risk score',
+      'obstructive sleep apnea screening',
+      'sleep apnea screening',
+      'osa screening questionnaire',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'snoring',
+      'tiredness',
+      'observed_apnea',
+      'hypertension',
+      'bmi',
+      'age',
+      'neck_circumference',
+      'sex',
+    ],
+    description:
+      'STOP-Bang questionnaire for obstructive sleep apnea screening (8 binary criteria, 0–8 score)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'audit-c',
+    toolName: 'AUDIT-C (alcohol screen)',
+    keywords: [
+      'audit c',
+      'audit-c',
+      'auditc',
+      'alcohol screen',
+      'alcohol use screen',
+      'drinking screen',
+      'audit consumption',
+      'brief alcohol screen',
+      'alcohol screening questionnaire',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['drinking_frequency', 'drinks_per_day', 'binge_frequency'],
+    description:
+      'AUDIT-C brief alcohol consumption screen (3 questions, 0–12) with sex-specific positive thresholds',
+    category: 'calculator',
+  },
+  {
+    toolId: 'phq9',
+    toolName: 'PHQ-9 (depression screen)',
+    keywords: [
+      'phq9',
+      'phq-9',
+      'phq 9',
+      'patient health questionnaire 9',
+      'depression screen',
+      'depression questionnaire',
+      'mood screen',
+      'depression symptom screen',
+      'phq nine',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'q1_interest',
+      'q2_mood',
+      'q3_sleep',
+      'q4_energy',
+      'q5_appetite',
+      'q6_self_esteem',
+      'q7_concentration',
+      'q8_psychomotor',
+      'q9_self_harm',
+    ],
+    description:
+      'PHQ-9 depression symptom screen (9 items, 0–27) with severity range; question 9 safety escalation',
+    category: 'calculator',
+  },
+  {
+    toolId: 'gad7',
+    toolName: 'GAD-7 (anxiety screen)',
+    keywords: [
+      'gad7',
+      'gad-7',
+      'gad 7',
+      'generalized anxiety disorder 7',
+      'anxiety screen',
+      'anxiety questionnaire',
+      'generalized anxiety screen',
+      'anxiety symptom screen',
+      'gad seven',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'q1_nervous',
+      'q2_worry_control',
+      'q3_excessive_worry',
+      'q4_relaxing',
+      'q5_restless',
+      'q6_irritable',
+      'q7_afraid',
+    ],
+    description: 'GAD-7 anxiety symptom screen (7 items, 0–21) with severity range',
+    category: 'calculator',
+  },
+  {
+    toolId: 'rome-iv-ibs',
+    toolName: 'Rome IV IBS Criteria',
+    keywords: [
+      'rome iv ibs',
+      'rome-iv-ibs',
+      'rome iv',
+      'rome 4',
+      'ibs criteria',
+      'irritable bowel syndrome criteria',
+      'rome foundation ibs',
+      'rome iv criteria',
+      'ibs rome',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'abdominal_pain_frequency',
+      'symptom_duration',
+      'relation_to_defecation',
+      'stool_frequency_change',
+      'stool_form_change',
+    ],
+    description:
+      'Rome IV IBS symptom criteria support (informational; does not diagnose irritable bowel syndrome)',
+    category: 'calculator',
+  },
+  {
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
     keywords: [
@@ -390,6 +574,34 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     ],
     description:
       'GRACE ACS mortality risk stratification for acute coronary syndrome (chat-assisted; prognosis only)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'copd-gold',
+    toolName: 'COPD GOLD Assessment',
+    keywords: [
+      'copd gold',
+      'copd-gold',
+      'gold copd',
+      'gold copd classification',
+      'copd assessment',
+      'copd risk',
+      'gold classification',
+      'gold group',
+      'gold a b e',
+      'copd exacerbation group',
+      'chronic obstructive pulmonary disease gold',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'symptom_burden',
+      'mmrc',
+      'cat_score',
+      'exacerbation_history',
+      'hospitalization_history',
+    ],
+    description:
+      'COPD GOLD A/B/E grouping support from symptoms and exacerbations (chat-assisted; no therapy recommendations)',
     category: 'calculator',
   },
   {
@@ -758,6 +970,126 @@ export function matchToolPatterns(message: string): Array<{
     filtered = filtered.filter((m) => m.toolId !== 'timi-ua-nstemi');
   } else if (preferTimiAcs) {
     filtered = filtered.filter((m) => m.toolId !== 'grace-acs');
+  }
+
+  const preferAscvdRisk =
+    /\bascvd\b/.test(lowerMessage) ||
+    lowerMessage.includes('ascvd risk') ||
+    lowerMessage.includes('ascvd score') ||
+    lowerMessage.includes('cardiovascular risk') ||
+    lowerMessage.includes('heart disease risk') ||
+    lowerMessage.includes('cv risk') ||
+    lowerMessage.includes('pooled cohort') ||
+    lowerMessage.includes('10 year ascvd') ||
+    lowerMessage.includes('10-year ascvd') ||
+    (lowerMessage.includes('primary prevention') &&
+      (lowerMessage.includes('ascvd') || lowerMessage.includes('cardiovascular')));
+
+  if (preferAscvdRisk) {
+    filtered = filtered.filter(
+      (m) => m.toolId !== 'cha2ds2vasc-calculator' && m.toolId !== 'timi-ua-nstemi',
+    );
+  }
+
+  const preferCkdStaging =
+    lowerMessage.includes('ckd stage') ||
+    lowerMessage.includes('ckd staging') ||
+    lowerMessage.includes('kidney stage') ||
+    lowerMessage.includes('kidney disease staging') ||
+    lowerMessage.includes('gfr stage') ||
+    lowerMessage.includes('albuminuria stage') ||
+    lowerMessage.includes('kdigo') ||
+    (lowerMessage.includes('albuminuria') && lowerMessage.includes('gfr')) ||
+    (lowerMessage.includes('acr') && lowerMessage.includes('ckd'));
+
+  if (preferCkdStaging) {
+    filtered = filtered.filter(
+      (m) =>
+        m.toolId !== 'gfr-calculator' &&
+        m.toolId !== 'cha2ds2vasc-calculator',
+    );
+  }
+
+  const preferStopBang =
+    lowerMessage.includes('stop bang') ||
+    lowerMessage.includes('stop-bang') ||
+    lowerMessage.includes('stopbang') ||
+    lowerMessage.includes('sleep apnea score') ||
+    lowerMessage.includes('osa risk') ||
+    lowerMessage.includes('sleep risk score') ||
+    (lowerMessage.includes('sleep apnea') && lowerMessage.includes('screen')) ||
+    (lowerMessage.includes('obstructive sleep apnea') && !lowerMessage.includes('treatment'));
+
+  if (preferStopBang) {
+    filtered = filtered.filter((m) => m.toolId !== 'news2' && m.toolId !== 'qsofa');
+  }
+
+  const preferAuditC =
+    lowerMessage.includes('audit c') ||
+    lowerMessage.includes('audit-c') ||
+    lowerMessage.includes('auditc') ||
+    lowerMessage.includes('alcohol screen') ||
+    lowerMessage.includes('alcohol use screen') ||
+    lowerMessage.includes('drinking screen') ||
+    (lowerMessage.includes('alcohol') && lowerMessage.includes('screen'));
+
+  if (preferAuditC) {
+    filtered = filtered.filter((m) => m.toolId !== 'has-bled' && m.toolId !== 'cha2ds2vasc-calculator');
+  }
+
+  const preferPhq9 =
+    lowerMessage.includes('phq9') ||
+    lowerMessage.includes('phq-9') ||
+    lowerMessage.includes('phq 9') ||
+    lowerMessage.includes('patient health questionnaire') ||
+    lowerMessage.includes('depression screen') ||
+    lowerMessage.includes('depression questionnaire') ||
+    lowerMessage.includes('mood screen') ||
+    (lowerMessage.includes('depression') && lowerMessage.includes('screen'));
+
+  if (preferPhq9) {
+    filtered = filtered.filter((m) => m.toolId !== 'differential-diagnosis');
+  }
+
+  const preferCopdGold =
+    lowerMessage.includes('copd gold') ||
+    lowerMessage.includes('copd-gold') ||
+    lowerMessage.includes('gold copd') ||
+    lowerMessage.includes('gold classification') ||
+    lowerMessage.includes('copd assessment') ||
+    lowerMessage.includes('copd risk') ||
+    (lowerMessage.includes('copd') && lowerMessage.includes('gold'));
+
+  if (preferCopdGold) {
+    filtered = filtered.filter((m) => m.toolId !== 'differential-diagnosis');
+  }
+
+  const preferRomeIvIbs =
+    lowerMessage.includes('rome iv') ||
+    lowerMessage.includes('rome-iv') ||
+    lowerMessage.includes('rome 4') ||
+    lowerMessage.includes('ibs criteria') ||
+    lowerMessage.includes('irritable bowel syndrome criteria') ||
+    (lowerMessage.includes('rome') && lowerMessage.includes('ibs')) ||
+    (lowerMessage.includes('irritable bowel') && lowerMessage.includes('criteria'));
+
+  if (preferRomeIvIbs) {
+    filtered = filtered.filter((m) => m.toolId !== 'differential-diagnosis');
+  }
+
+  const preferGad7 =
+    lowerMessage.includes('gad7') ||
+    lowerMessage.includes('gad-7') ||
+    lowerMessage.includes('gad 7') ||
+    lowerMessage.includes('generalized anxiety screen') ||
+    lowerMessage.includes('anxiety screen') ||
+    lowerMessage.includes('anxiety questionnaire') ||
+    (lowerMessage.includes('anxiety') && lowerMessage.includes('screen'));
+
+  if (preferGad7) {
+    filtered = filtered.filter(
+      (m) => m.toolId !== 'differential-diagnosis' && m.toolId !== 'phq9',
+    );
   }
 
   const preferNihss =

@@ -10,6 +10,8 @@ import { ottawaAnkleChatConfig } from './chatAssistedCalculators/ottawaAnkle';
 import { nihssChatConfig } from './chatAssistedCalculators/nihss';
 import { percChatConfig } from './chatAssistedCalculators/perc';
 import { wellsPeChatConfig } from './chatAssistedCalculators/wellsPe';
+import { copdGoldChatConfig } from './chatAssistedCalculators/copdGold';
+import { romeIvIbsChatConfig } from './chatAssistedCalculators/romeIvIbs';
 
 export const clinicalIntentTools = [
   {
@@ -103,6 +105,78 @@ export const clinicalIntentTools = [
     sidebarToolId: 'timi-ua-nstemi',
     chatSeed:
       'Help me calculate the TIMI risk score for UA/NSTEMI using age, risk factors, known CAD, aspirin use, angina severity, ST deviation, and cardiac markers.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'ascvd-risk',
+    toolName: 'ASCVD 10-year risk (PCE)',
+    category: 'calculator',
+    description:
+      'Decision support: ACC/AHA pooled cohort equations for primary prevention ASCVD risk (age 40–79). Does not recommend statins or other therapies.',
+    path: '/tools/calculators/ascvd-risk',
+    sidebarToolId: 'ascvd-risk',
+    chatSeed:
+      'Help me estimate 10-year ASCVD risk using the pooled cohort equations (age, sex, race, lipids, blood pressure, diabetes, smoking) and interpret the risk category for prevention discussion.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'ckd-staging',
+    toolName: 'CKD stage / staging (KDIGO)',
+    category: 'calculator',
+    description:
+      'Decision support: KDIGO CKD stage and staging (CKD-EPI 2021 eGFR, ACR, G×A prognostic risk). Does not establish chronicity or recommend dialysis or drug therapy.',
+    path: '/tools/calculators/ckd-staging',
+    sidebarToolId: 'ckd-staging',
+    chatSeed:
+      'Help me stage CKD using age, sex, serum creatinine, and urine albumin-creatinine ratio — eGFR category, albuminuria category, and KDIGO combined risk for discussion.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'stop-bang',
+    toolName: 'STOP-Bang / stop bang (OSA screening)',
+    category: 'calculator',
+    description:
+      'STOP-Bang (stop bang) questionnaire for obstructive sleep apnea screening: snoring, tiredness, observed apnea, hypertension, BMI, age, neck size, male sex (0–8).',
+    path: '/tools/calculators/stop-bang',
+    sidebarToolId: 'stop-bang',
+    chatSeed:
+      'Help me complete the STOP-Bang questionnaire for obstructive sleep apnea screening and interpret the OSA risk category.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'audit-c',
+    toolName: 'AUDIT-C / audit c (alcohol screen)',
+    category: 'calculator',
+    description:
+      'Screening only: AUDIT-C brief alcohol consumption screen (0–12). Does not diagnose alcohol use disorder or provide withdrawal-management advice.',
+    path: '/tools/calculators/audit-c',
+    sidebarToolId: 'audit-c',
+    chatSeed:
+      'Help me complete the AUDIT-C alcohol screen (drinking frequency, drinks per day, binge frequency) and interpret the score against screening thresholds.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'phq9',
+    toolName: 'PHQ-9 / phq9 (depression screen)',
+    category: 'calculator',
+    description:
+      'Screening only: PHQ-9 depression symptom questionnaire (0–27). Does not diagnose depression or recommend medications. Question 9 requires urgent safety review when non-zero.',
+    path: '/tools/calculators/phq9',
+    sidebarToolId: 'phq9',
+    chatSeed:
+      'STEP 0 — Before routine scoring: if PHQ-9 question 9 (self-harm or suicidal ideation) is non-zero, stop screening, arrange immediate safety assessment, and ensure crisis resources (e.g. 988 Suicide & Crisis Lifeline in the U.S. when applicable). Then help me complete the PHQ-9 mood screen (nine questions, past two weeks) and interpret the total score and severity range as screening only — do not diagnose depression or recommend medications.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'gad7',
+    toolName: 'GAD-7 / gad7 (anxiety screen)',
+    category: 'calculator',
+    description:
+      'Screening only: GAD-7 anxiety symptom questionnaire (0–21). Does not diagnose anxiety disorders or recommend medications.',
+    path: '/tools/calculators/gad7',
+    sidebarToolId: 'gad7',
+    chatSeed:
+      'Help me complete the GAD-7 anxiety screen (seven questions, past two weeks) and interpret the total score and severity range as screening only — do not diagnose an anxiety disorder or recommend medications. If suicidal thoughts are present, prioritize PHQ-9 question 9 safety pathways and crisis resources (e.g. 988 in the U.S. when applicable). For severe scores or acute panic or overwhelming distress, emphasize urgent clinical evaluation without diagnosing.',
     backendExecutable: false,
   },
   {
@@ -218,6 +292,26 @@ export const clinicalIntentTools = [
     backendExecutable: false,
   },
   {
+    toolId: copdGoldChatConfig.toolId,
+    toolName: 'COPD GOLD (grouping support)',
+    category: copdGoldChatConfig.category,
+    description: copdGoldChatConfig.description,
+    path: copdGoldChatConfig.hubPath,
+    sidebarToolId: copdGoldChatConfig.registryId,
+    chatSeed: copdGoldChatConfig.chatSeed,
+    backendExecutable: false,
+  },
+  {
+    toolId: romeIvIbsChatConfig.toolId,
+    toolName: 'Rome IV IBS (criteria support)',
+    category: romeIvIbsChatConfig.category,
+    description: romeIvIbsChatConfig.description,
+    path: romeIvIbsChatConfig.hubPath,
+    sidebarToolId: romeIvIbsChatConfig.registryId,
+    chatSeed: romeIvIbsChatConfig.chatSeed,
+    backendExecutable: false,
+  },
+  {
     toolId: 'drug-interactions',
     toolName: 'Drug Interaction Checker',
     category: 'checker',
@@ -329,6 +423,16 @@ export const nluCalculatorHubOnly = [
     name: ottawaAnkleChatConfig.name,
     hubPath: ottawaAnkleChatConfig.hubPath,
   },
+  {
+    toolId: copdGoldChatConfig.toolId,
+    name: copdGoldChatConfig.name,
+    hubPath: copdGoldChatConfig.hubPath,
+  },
+  {
+    toolId: romeIvIbsChatConfig.toolId,
+    name: romeIvIbsChatConfig.name,
+    hubPath: romeIvIbsChatConfig.hubPath,
+  },
 ];
 
 export const builtinUiCalculators = [
@@ -405,6 +509,60 @@ export const builtinUiCalculators = [
     orchestratorId: null,
   },
   {
+    id: 'ascvd-risk',
+    name: 'ASCVD 10-year risk',
+    description: 'ACC/AHA pooled cohort equations for primary prevention ASCVD risk.',
+    path: '/tools/calculators/ascvd-risk',
+    calcQuery: '/tools/calculators?calc=ascvd-risk',
+    implementation: 'Client-side in Calculators.jsx (ascvdPceCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'ckd-staging',
+    name: 'CKD stage / staging (KDIGO)',
+    description: 'KDIGO CKD stage and staging: eGFR, albuminuria, and combined prognostic risk.',
+    path: '/tools/calculators/ckd-staging',
+    calcQuery: '/tools/calculators?calc=ckd-staging',
+    implementation: 'Client-side in Calculators.jsx (ckdStagingCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'stop-bang',
+    name: 'STOP-Bang / stop bang',
+    description: 'STOP-Bang (stop bang) obstructive sleep apnea screening questionnaire (0–8).',
+    path: '/tools/calculators/stop-bang',
+    calcQuery: '/tools/calculators?calc=stop-bang',
+    implementation: 'Client-side in Calculators.jsx (stopBangCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'audit-c',
+    name: 'AUDIT-C / audit c',
+    description: 'AUDIT-C (audit c) brief alcohol consumption screen (0–12).',
+    path: '/tools/calculators/audit-c',
+    calcQuery: '/tools/calculators?calc=audit-c',
+    implementation: 'Client-side in Calculators.jsx (auditCCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'phq9',
+    name: 'PHQ-9 / phq9',
+    description: 'PHQ-9 (phq9) depression symptom screen (0–27) with question 9 safety escalation.',
+    path: '/tools/calculators/phq9',
+    calcQuery: '/tools/calculators?calc=phq9',
+    implementation: 'Client-side in Calculators.jsx (phq9Calculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'gad7',
+    name: 'GAD-7 / gad7',
+    description: 'GAD-7 (gad7) anxiety symptom screen (0–21) with severity range.',
+    path: '/tools/calculators/gad7',
+    calcQuery: '/tools/calculators?calc=gad7',
+    implementation: 'Client-side in Calculators.jsx (gad7Calculator.js)',
+    orchestratorId: null,
+  },
+  {
     id: 'gfr',
     name: 'eGFR (CKD-EPI)',
     description: 'Kidney function estimate.',
@@ -449,6 +607,14 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = {
   nihss: 'nihss',
   'canadian-c-spine': 'canadian-c-spine',
   'ottawa-ankle': 'ottawa-ankle',
+  'ascvd-risk': 'ascvd-risk',
+  'ckd-staging': 'ckd-staging',
+  'stop-bang': 'stop-bang',
+  'audit-c': 'audit-c',
+  phq9: 'phq9',
+  gad7: 'gad7',
+  'copd-gold': 'copd-gold',
+  'rome-iv-ibs': 'rome-iv-ibs',
   'dose-calculator': 'calculators',
   'abg-interpreter': 'lab-interp',
   'protocol-lookup': 'protocols',
