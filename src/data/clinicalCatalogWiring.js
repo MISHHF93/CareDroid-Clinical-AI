@@ -72,12 +72,16 @@ export const PR6_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze(['copd-gold']);
 /** Tier-B chat-assisted calculators (PR7). */
 export const PR7_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze(['rome-iv-ibs']);
 
+/** Tier-B fleet tools: calculators hub + NLU chat workflow (no dedicated form). */
+export const PR_FLEET_TIER_B_CHAT_REGISTRY_IDS = Object.freeze(['dispatch-ai']);
+
 /** All Tier-B chat-assisted calculator registry ids (hub section + audits). */
 export const TIER_B_CHAT_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...PR2_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR3_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR6_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR7_TIER_B_CHAT_CALCULATOR_IDS,
+  ...PR_FLEET_TIER_B_CHAT_REGISTRY_IDS,
 ]);
 
 /** All PR6 calculator registry ids (audit / consistency tests). */
@@ -111,6 +115,19 @@ export const PR5_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze(['phq9', 'gad7']
 
 /** All PR5 calculator registry ids (audit / consistency tests). */
 export const PR5_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR5_TIER_A_CALCULATOR_REGISTRY_IDS]);
+
+/** Tier-A fleet tools with dedicated UI pages (PR-FLEET). */
+export const PR_FLEET_TIER_A_REGISTRY_IDS = Object.freeze([
+  'fleet-command',
+  'predictive-maintenance',
+  'route-optimizer',
+]);
+
+/** All fleet registry ids (Tier-A pages + Tier-B chat). */
+export const PR_FLEET_ALL_REGISTRY_IDS = Object.freeze([
+  ...PR_FLEET_TIER_A_REGISTRY_IDS,
+  ...PR_FLEET_TIER_B_CHAT_REGISTRY_IDS,
+]);
 
 /** NLU / legacy / phantom ids → sidebar registry id (used by recommendations + catalog) */
 export const NLU_TO_REGISTRY_ID = {
@@ -302,6 +319,34 @@ export const NLU_TO_REGISTRY_ID = {
   'ibs-criteria': 'rome-iv-ibs',
   'irritable bowel syndrome criteria': 'rome-iv-ibs',
   'irritable-bowel-syndrome-criteria': 'rome-iv-ibs',
+  'fleet command': 'fleet-command',
+  'fleet dashboard': 'fleet-command',
+  'fleet overview': 'fleet-command',
+  'fleet-command': 'fleet-command',
+  'fleet-dashboard': 'fleet-command',
+  'fleet-overview': 'fleet-command',
+  'predictive maintenance': 'predictive-maintenance',
+  'predictive-maintenance': 'predictive-maintenance',
+  'maintenance assistant': 'predictive-maintenance',
+  'maintenance-assistant': 'predictive-maintenance',
+  'fleet maintenance risk': 'predictive-maintenance',
+  'fleet-maintenance-risk': 'predictive-maintenance',
+  'route optimizer': 'route-optimizer',
+  'route-optimizer': 'route-optimizer',
+  'route optimization': 'route-optimizer',
+  'route-optimization': 'route-optimizer',
+  'fleet route planner': 'route-optimizer',
+  'fleet-route-planner': 'route-optimizer',
+  dispatch: 'dispatch-ai',
+  'dispatch assistant': 'dispatch-ai',
+  'dispatch-assistant': 'dispatch-ai',
+  'dispatch-ai': 'dispatch-ai',
+  'vehicle dispatch': 'dispatch-ai',
+  'vehicle-dispatch': 'dispatch-ai',
+  'fleet dispatch': 'dispatch-ai',
+  'fleet-dispatch': 'dispatch-ai',
+  'dispatch intelligence': 'dispatch-ai',
+  'dispatch-intelligence': 'dispatch-ai',
   'chemo-calculator': 'calculators',
   'cancer-calculator': 'calculators',
   'tumor-staging': 'diagnosis',
@@ -312,6 +357,7 @@ export const REGISTRY_ID_TO_ORCHESTRATOR_TOOL = {
   'drug-check': 'drug-interactions',
   'lab-interp': 'lab-interpreter',
   'sofa-score': 'sofa-calculator',
+  'dispatch-ai': 'dispatch-ai',
 };
 
 export function registryIdToOrchestratorTool(registryId) {

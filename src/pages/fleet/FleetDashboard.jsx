@@ -1,0 +1,311 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import {
+  fetchFleetCommandSnapshot,
+  FLEET_MAINTENANCE_LABELS,
+  FLEET_VEHICLE_STATUS_LABELS,
+} from '../../services/fleetTelemetryService';
+import { NavIcon } from '../../navigation/NavIcon';
+import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
+import FleetPageChrome, { FleetOperationalBanner } from './FleetPageChrome';
+import './FleetDashboard.css';
+import './fleetUxShared.css';
+
+const TOOL_ID = 'fleet-command';
+
+function FleetStatCard({ label, value, hint, accent }) {
+  const hintId = hint ? `fleet-stat-hint-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined;
+  return (
+    <article
+      className={`fleet-stat-card${accent ? ' fleet-stat-card--accent' : ''}`}
+      aria-label={hint ? `${label}: ${value}. ${hint}` : `${label}: ${value}`}
+    >
+      <p className="fleet-stat-label">{label}</p>
+      <p className="fleet-stat-value" aria-describedby={hintId}>
+        {value}
+      </p>
+      {hint ? (
+        <p id={hintId} className="fleet-stat-hint">
+          {hint}
+        </p>
+      ) : null}
+    </article>
+  );
+}
+
+function statusBadgeClass(status) {
+  if (status === 'maintenance') return 'fleet-badge--maintenance';
+  if (status === 'available') return 'fleet-badge--available';
+  if (status === 'occupied') return 'fleet-badge--occupied';
+  return 'fleet-badge--active';
+}
+
+function maintenanceBadgeClass(maintenanceStatus) {
+  if (maintenanceStatus === 'ok') return 'fleet-badge--available';
+  if (maintenanceStatus === 'warning') return 'fleet-badge--warning';
+  return 'fleet-badge--maintenance';
+}
+
+function formatEnergy(vehicle) {
+  const unit = vehicle.energyType === 'electric' ? 'Battery' : 'Fuel';
+  return `${unit} ${vehicle.energyPercent}%`;
+}
+
+function formatEta(etaMinutes) {
+  if (etaMinutes == null) return '—';
+  return `${etaMinutes} min`;
+}
+
+export default function FleetDashboard() {
+  const { recordToolAccess } = useToolPreferences();
+  const [phase, setPhase] = useState('loading');
+  const [snapshot, setSnapshot] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const requestSeqRef = useRef(0);
+
+  const loadSnapshot = useCallback(async (_signal, { forceLoading = false } = {}) => {
+    const requestId = ++requestSeqRef.current;
+    setPhase((current) => {
+      if (forceLoading) return 'loading';
+      if (current === 'ready' || current === 'empty' || current === 'error') return current;
+      return 'loading';
+    });
+    setErrorMessage(null);
+    try {
+      const data = await fetchFleetCommandSnapshot();
+      if (requestId !== requestSeqRef.current) return;
+      setSnapshot(data);
+      setPhase(data.vehicles.length === 0 ? 'empty' : 'ready');
+    } catch (err) {
+      if (requestId !== requestSeqRef.current) return;
+      setErrorMessage(err?.message || 'Unable to load fleet telemetry.');
+      setPhase('error');
+    }
+  }, []);
+
+  useEffect(() => {
+    recordToolAccess(TOOL_ID);
+    loadSnapshot();
+  }, [loadSnapshot, recordToolAccess]);
+
+  const summary = snapshot?.summary;
+  const lowEnergyVehicles =
+    snapshot?.vehicles?.filter((v) => v.energyPercent < 35) ?? [];
+
+  return (
+    <div className="fleet-dashboard">
+      <FleetPageChrome
+        toolId={TOOL_ID}
+        title="Fleet Command Dashboard"
+        lead="Operational snapshot of active fleet units — vehicle availability, maintenance, ETAs, energy levels, and utilization."
+        safetyNote={
+          <>
+            <strong>Decision support only.</strong> Verify all metrics against your dispatch system of
+            record. This dashboard does not assign vehicles, change routes, or control fleet
+            telematics. Mock telemetry in development builds.
+          </>
+        }
+        mainId="fleet-dashboard-main"
+      >
+        {phase === 'loading' ? (
+          <div
+            className="fleet-dashboard-loading"
+            role="status"
+            aria-live="polite"
+            aria-busy="true"
+            aria-label="Loading fleet telemetry"
+          >
+            <NavIcon
+              icon={CHROME_ICONS.loader}
+              size={32}
+              aria-hidden
+              className="fleet-page-loading-icon"
+            />
+            <p>Loading fleet telemetry…</p>
+          </div>
+        ) : null}
+
+        {phase === 'error' ? (
+          <div className="fleet-dashboard-error" role="alert">
+            <NavIcon icon={CHROME_ICONS.alert} size={28} aria-hidden />
+            <p>{errorMessage}</p>
+            <button
+              type="button"
+              className="fleet-btn fleet-btn--secondary"
+              aria-label="Retry loading fleet telemetry"
+              onClick={() => loadSnapshot(undefined, { forceLoading: true })}
+            >
+              Retry
+            </button>
+          </div>
+        ) : null}
+
+        {phase === 'empty' ? (
+          <div className="fleet-dashboard-empty" role="status">
+            <NavIcon icon={CHROME_ICONS.tools} size={32} aria-hidden />
+            <p>No vehicles are reporting telemetry right now.</p>
+            <p className="fleet-dashboard-empty-hint">
+              Check telematics connectivity or refresh when units come online.
+            </p>
+            <button
+              type="button"
+              className="fleet-btn fleet-btn--secondary"
+              aria-label="Refresh fleet telemetry"
+              onClick={() => loadSnapshot(undefined, { forceLoading: true })}
+            >
+              Refresh
+            </button>
+          </div>
+        ) : null}
+
+        {phase === 'ready' && summary ? (
+          <>
+            <div className="fleet-toolbar">
+              <button
+                type="button"
+                className="fleet-btn fleet-btn--secondary"
+                aria-label="Refresh fleet telemetry snapshot"
+                onClick={() => loadSnapshot(undefined, { forceLoading: true })}
+              >
+                Refresh snapshot
+              </button>
+            </div>
+
+            {summary.lowEnergyCount > 0 || summary.maintenanceCount > 0 ? (
+              <div
+                className="fleet-operational-warning"
+                role="alert"
+                aria-labelledby="fleet-ops-alert-heading"
+              >
+                <p id="fleet-ops-alert-heading">
+                  <strong>Operational attention:</strong> review flagged units before dispatch
+                  decisions.
+                </p>
+                <ul>
+                  {summary.maintenanceCount > 0 ? (
+                    <li>{summary.maintenanceCount} unit(s) in maintenance status</li>
+                  ) : null}
+                  {summary.lowEnergyCount > 0 ? (
+                    <li>{summary.lowEnergyCount} unit(s) below 35% energy</li>
+                  ) : null}
+                </ul>
+              </div>
+            ) : null}
+
+            <section aria-labelledby="fleet-summary-heading">
+              <h2 id="fleet-summary-heading" className="fleet-section-title">
+                Fleet summary
+              </h2>
+              <div className="fleet-stat-grid" role="group" aria-label="Fleet summary metrics">
+                <FleetStatCard label="Active" value={summary.activeVehicles} />
+                <FleetStatCard label="Available" value={summary.availableVehicles} />
+                <FleetStatCard label="On job" value={summary.occupiedVehicles} />
+                <FleetStatCard
+                  label="Maintenance"
+                  value={summary.maintenanceCount}
+                  hint={summary.lowEnergyCount ? `${summary.lowEnergyCount} low energy` : null}
+                />
+                <FleetStatCard
+                  label="Avg utilization"
+                  value={`${summary.averageUtilizationPercent}%`}
+                  accent
+                />
+                <FleetStatCard
+                  label="Avg ETA (on job)"
+                  value={
+                    summary.averageEtaMinutes != null ? `${summary.averageEtaMinutes} min` : '—'
+                  }
+                />
+              </div>
+            </section>
+
+            <section aria-labelledby="fleet-vehicles-heading">
+              <h2 id="fleet-vehicles-heading" className="fleet-section-title">
+                Vehicles ({snapshot.vehicles.length})
+              </h2>
+              <ul className="fleet-vehicle-list">
+                {snapshot.vehicles.map((vehicle) => (
+                  <li key={vehicle.id}>
+                    <article
+                      className="fleet-vehicle-card"
+                      aria-labelledby={`vehicle-${vehicle.id}-title`}
+                    >
+                      <div className="fleet-vehicle-card-header">
+                        <div>
+                          <h3 id={`vehicle-${vehicle.id}-title`} className="fleet-vehicle-title">
+                            {vehicle.label}
+                          </h3>
+                          <span className="fleet-vehicle-id">{vehicle.id}</span>
+                        </div>
+                        <div className="fleet-badge-row" role="list" aria-label="Vehicle status">
+                          <span
+                            className={`fleet-badge ${statusBadgeClass(vehicle.status)}`}
+                            role="listitem"
+                          >
+                            <span className="fleet-sr-only">Status: </span>
+                            {FLEET_VEHICLE_STATUS_LABELS[vehicle.status] || vehicle.status}
+                          </span>
+                          <span
+                            className={`fleet-badge ${maintenanceBadgeClass(vehicle.maintenanceStatus)}`}
+                            role="listitem"
+                          >
+                            <span className="fleet-sr-only">Maintenance: </span>
+                            {FLEET_MAINTENANCE_LABELS[vehicle.maintenanceStatus] ||
+                              vehicle.maintenanceStatus}
+                          </span>
+                          {vehicle.energyPercent < 35 ? (
+                            <span
+                              className="fleet-badge fleet-badge--critical"
+                              role="listitem"
+                            >
+                              <span className="fleet-sr-only">Alert: </span>
+                              Low energy
+                            </span>
+                          ) : null}
+                        </div>
+                      </div>
+                      <dl className="fleet-vehicle-metrics">
+                        <div className="fleet-vehicle-metric">
+                          <dt>ETA</dt>
+                          <dd>{formatEta(vehicle.etaMinutes)}</dd>
+                        </div>
+                        <div className="fleet-vehicle-metric">
+                          <dt>Energy</dt>
+                          <dd>{formatEnergy(vehicle)}</dd>
+                        </div>
+                        <div className="fleet-vehicle-metric">
+                          <dt>Utilization</dt>
+                          <dd>{vehicle.utilizationPercent}%</dd>
+                        </div>
+                        <div className="fleet-vehicle-metric">
+                          <dt>Driver</dt>
+                          <dd>{vehicle.driver || 'Unassigned'}</dd>
+                        </div>
+                      </dl>
+                    </article>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {lowEnergyVehicles.length > 0 ? (
+              <FleetOperationalBanner variant="critical">
+                Low-energy units: {lowEnergyVehicles.map((v) => v.label).join(', ')}. Confirm
+                range and charging before assignment.
+              </FleetOperationalBanner>
+            ) : null}
+
+            <p className="fleet-dashboard-footer" role="note">
+              Last updated {new Date(summary.updatedAt).toLocaleString()} · Source: {summary.source}
+            </p>
+
+            <p className="fleet-no-automation-note" role="note">
+              Human dispatchers must approve all assignments. This view does not modify live fleet
+              operations.
+            </p>
+          </>
+        ) : null}
+      </FleetPageChrome>
+    </div>
+  );
+}

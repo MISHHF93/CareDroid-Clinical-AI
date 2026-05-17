@@ -118,6 +118,50 @@ export function messageTriggersBackendDisambiguation(message, toolId) {
         (lower.includes('rome') && lower.includes('ibs')) ||
         (lower.includes('irritable bowel') && lower.includes('criteria'))
       );
+    case 'dispatch-ai':
+      return (
+        lower.includes('dispatch intelligence') ||
+        lower.includes('dispatch assistant') ||
+        lower.includes('dispatch-ai') ||
+        lower.includes('dispatch ai') ||
+        lower.includes('vehicle dispatch') ||
+        lower.includes('fleet dispatch') ||
+        (lower.includes('dispatch') &&
+          (lower.includes('assign') ||
+            lower.includes('bottleneck') ||
+            lower.includes('priorit') ||
+            lower.includes('queue')))
+      );
+    case 'fleet-command':
+      return (
+        lower.includes('fleet command') ||
+        lower.includes('fleet dashboard') ||
+        lower.includes('fleet overview') ||
+        lower.includes('fleet status') ||
+        lower.includes('fleet telemetry') ||
+        lower.includes('vehicle fleet') ||
+        (lower.includes('fleet') && lower.includes('utilization'))
+      );
+    case 'predictive-maintenance':
+      return (
+        lower.includes('predictive maintenance') ||
+        lower.includes('maintenance assistant') ||
+        lower.includes('maintenance risk score') ||
+        lower.includes('fleet maintenance risk') ||
+        (lower.includes('maintenance') &&
+          (lower.includes('anomaly') ||
+            lower.includes('inspection window') ||
+            lower.includes('diagnostic code')))
+      );
+    case 'route-optimizer':
+      return (
+        lower.includes('route optimizer') ||
+        lower.includes('route optimization') ||
+        lower.includes('optimize route') ||
+        lower.includes('route planner') ||
+        lower.includes('delivery route') ||
+        (lower.includes('fleet') && lower.includes('route') && lower.includes('stop'))
+      );
     default:
       return false;
   }

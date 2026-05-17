@@ -623,6 +623,13 @@ ul.calc-breakdown-list .calc-breakdown-item {
   margin-top: 18px;
 }
 
+.calc-chat-assisted-group--fleet {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid color-mix(in srgb, var(--app-accent, #4a7c9e) 35%, transparent);
+  background: color-mix(in srgb, var(--app-accent, #4a7c9e) 6%, transparent);
+}
+
 .calc-chat-assisted-group:first-of-type {
   margin-top: 14px;
 }

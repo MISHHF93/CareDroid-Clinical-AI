@@ -219,6 +219,53 @@ export const toolIdAliases = [
     mapsTo: 'rome-iv-ibs',
     source: 'NLU alias — irritable bowel syndrome criteria',
   },
+  { id: 'fleet-command', mapsTo: 'fleet-command', source: 'NLU alias — fleet command' },
+  { id: 'fleet-dashboard', mapsTo: 'fleet-command', source: 'NLU alias — fleet dashboard' },
+  { id: 'fleet-overview', mapsTo: 'fleet-command', source: 'NLU alias — fleet overview' },
+  {
+    id: 'predictive-maintenance',
+    mapsTo: 'predictive-maintenance',
+    source: 'NLU alias — predictive maintenance',
+  },
+  {
+    id: 'maintenance-assistant',
+    mapsTo: 'predictive-maintenance',
+    source: 'NLU alias — maintenance assistant',
+  },
+  {
+    id: 'fleet-maintenance-risk',
+    mapsTo: 'predictive-maintenance',
+    source: 'NLU alias — fleet maintenance risk',
+  },
+  { id: 'route-optimizer', mapsTo: 'route-optimizer', source: 'NLU alias — route optimizer' },
+  {
+    id: 'route-optimization',
+    mapsTo: 'route-optimizer',
+    source: 'NLU alias — route optimization',
+  },
+  {
+    id: 'fleet-route-planner',
+    mapsTo: 'route-optimizer',
+    source: 'NLU alias — fleet route planner',
+  },
+  { id: 'dispatch-ai', mapsTo: 'dispatch-ai', source: 'NLU alias — dispatch ai' },
+  { id: 'dispatch', mapsTo: 'dispatch-ai', source: 'NLU alias — dispatch' },
+  {
+    id: 'dispatch-assistant',
+    mapsTo: 'dispatch-ai',
+    source: 'NLU alias — dispatch assistant',
+  },
+  {
+    id: 'vehicle-dispatch',
+    mapsTo: 'dispatch-ai',
+    source: 'NLU alias — vehicle dispatch',
+  },
+  { id: 'fleet-dispatch', mapsTo: 'dispatch-ai', source: 'NLU alias — fleet dispatch' },
+  {
+    id: 'dispatch-intelligence',
+    mapsTo: 'dispatch-ai',
+    source: 'NLU alias — dispatch intelligence',
+  },
 ];
 
 /** Client-side clinical helpers on tool pages and chat */

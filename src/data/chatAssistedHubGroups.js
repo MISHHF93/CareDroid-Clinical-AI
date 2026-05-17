@@ -46,6 +46,13 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
       'Rome IV criteria support reviews abdominal pain frequency, duration, and stool-related features for discussion. It is informational only, does not diagnose irritable bowel syndrome, and does not replace alarm-feature workup — red-flag symptoms require clinician evaluation without delay.',
     toolIds: ['rome-iv-ibs'],
   },
+  {
+    groupId: 'fleet-dispatch',
+    heading: 'Fleet dispatch intelligence',
+    lead:
+      'Dispatch Intelligence supports assignment options, prioritization, and bottleneck review in chat. It does not auto-assign vehicles, change live routes, or override dispatcher authority — verify all actions against your dispatch system of record.',
+    toolIds: ['dispatch-ai'],
+  },
 ]);
 
 /**
@@ -54,4 +61,12 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
  */
 export function chatAssistedLaunchAriaLabel(toolName) {
   return `Start guided chat: ${toolName}. Clinical decision support only; does not diagnose or replace urgent emergency pathways.`;
+}
+
+/**
+ * Accessible name for fleet dispatch chat launches (no clinical emergency framing).
+ * @param {string} toolName
+ */
+export function fleetChatAssistedLaunchAriaLabel(toolName) {
+  return `Start guided chat: ${toolName}. Fleet dispatch decision support only; does not auto-assign vehicles or change live routes. Human dispatcher approval required.`;
 }

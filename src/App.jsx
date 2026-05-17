@@ -64,6 +64,9 @@ const Protocols = lazyWithRetry(() => import('./pages/tools/Protocols'));
 const DiagnosisAssistant = lazyWithRetry(() => import('./pages/tools/DiagnosisAssistant'));
 const ProcedureGuide = lazyWithRetry(() => import('./pages/tools/ProcedureGuide'));
 const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
+const FleetDashboard = lazyWithRetry(() => import('./pages/fleet/FleetDashboard'));
+const PredictiveMaintenance = lazyWithRetry(() => import('./pages/fleet/PredictiveMaintenance'));
+const RouteOptimizer = lazyWithRetry(() => import('./pages/fleet/RouteOptimizer'));
 
 // Clinical Intelligence pages
 const ClinicalAlertsPage = lazyWithRetry(() => import('./pages/ClinicalAlertsPage'));
@@ -308,6 +311,18 @@ function AppRoutes() {
     { path: '/tools/protocols', element: <AppShellPage><Protocols /></AppShellPage>, requiresAuth: true },
     { path: '/tools/diagnosis', element: <AppShellPage><DiagnosisAssistant /></AppShellPage>, requiresAuth: true },
     { path: '/tools/procedures', element: <AppShellPage><ProcedureGuide /></AppShellPage>, requiresAuth: true },
+
+    { path: '/fleet/command', element: <AppShellPage><FleetDashboard /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/fleet/predictive-maintenance',
+      element: <AppShellPage><PredictiveMaintenance /></AppShellPage>,
+      requiresAuth: true,
+    },
+    {
+      path: '/fleet/route-optimizer',
+      element: <AppShellPage><RouteOptimizer /></AppShellPage>,
+      requiresAuth: true,
+    },
 
     // Clinical Intelligence routes
     { path: '/clinical/alerts', element: <AppShellPage><ClinicalAlertsPage /></AppShellPage>, requiresAuth: true },

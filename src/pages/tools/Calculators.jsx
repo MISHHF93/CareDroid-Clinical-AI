@@ -39,6 +39,7 @@ import { clinicalIntentTools, nluCalculatorHubOnly } from '../../data/clinicalIn
 import {
   CHAT_ASSISTED_HUB_GROUPS,
   chatAssistedLaunchAriaLabel,
+  fleetChatAssistedLaunchAriaLabel,
 } from '../../data/chatAssistedHubGroups';
 import {
   TIMI_UA_NSTEMI_CRITERIA_META,
@@ -304,10 +305,11 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                 .filter(Boolean);
               if (toolsInGroup.length === 0) return null;
               const groupHeadingId = `calc-chat-assisted-group-${group.groupId}`;
+              const isFleetDispatch = group.groupId === 'fleet-dispatch';
               return (
                 <div
                   key={group.groupId}
-                  className="calc-chat-assisted-group"
+                  className={`calc-chat-assisted-group${isFleetDispatch ? ' calc-chat-assisted-group--fleet' : ''}`}
                   role="group"
                   aria-labelledby={groupHeadingId}
                 >
@@ -327,7 +329,11 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                           type="button"
                           className="calc-chat-assisted-card"
                           data-calc-id={tool.toolId}
-                          aria-label={chatAssistedLaunchAriaLabel(tool.name)}
+                          aria-label={
+                            isFleetDispatch
+                              ? fleetChatAssistedLaunchAriaLabel(tool.name)
+                              : chatAssistedLaunchAriaLabel(tool.name)
+                          }
                           aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}
                           onClick={() => handleChatAssistedLaunch(tool.toolId)}
                         >

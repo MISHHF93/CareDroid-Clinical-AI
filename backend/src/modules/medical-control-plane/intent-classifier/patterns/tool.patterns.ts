@@ -861,6 +861,110 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     description: 'Recommends antibiotic selection based on infection and patient factors',
     category: 'reference',
   },
+
+  // ========================================
+  // FLEET / LOGISTICS (operations decision support)
+  // ========================================
+  {
+    toolId: 'dispatch-ai',
+    toolName: 'Dispatch Intelligence Assistant',
+    keywords: [
+      'dispatch-ai',
+      'dispatch ai',
+      'dispatch intelligence',
+      'dispatch assistant',
+      'dispatch',
+      'vehicle dispatch',
+      'fleet dispatch',
+      'assign vehicle',
+      'vehicle assignment',
+      'dispatch bottleneck',
+      'prioritize requests',
+      'dispatch queue',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'open_requests',
+      'fleet_availability',
+      'priorities',
+      'constraints',
+      'bottlenecks',
+    ],
+    description:
+      'Conversational dispatch decision support: assignment options, prioritization, bottlenecks, and suggested actions (human approval required)',
+    category: 'fleet',
+  },
+  {
+    toolId: 'route-optimizer',
+    toolName: 'Route Optimization Assistant',
+    keywords: [
+      'route optimizer',
+      'route optimization',
+      'optimize route',
+      'fleet route',
+      'route planner',
+      'delivery route',
+      'stop sequence',
+      'travel estimates',
+      'time windows route',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'destinations',
+      'priorities',
+      'traffic_constraints',
+      'vehicle_limitations',
+      'time_windows',
+    ],
+    description:
+      'Multi-stop route sequencing with travel estimates and savings (decision support only)',
+    category: 'fleet',
+  },
+  {
+    toolId: 'predictive-maintenance',
+    toolName: 'Predictive Maintenance Assistant',
+    keywords: [
+      'predictive maintenance',
+      'maintenance assistant',
+      'maintenance risk',
+      'fleet maintenance',
+      'vehicle maintenance score',
+      'inspection window',
+      'maintenance anomaly',
+      'diagnostic codes maintenance',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'vehicle_age',
+      'mileage',
+      'maintenance_history',
+      'diagnostic_codes',
+      'battery_health',
+      'telemetry',
+    ],
+    description:
+      'Rule-based maintenance risk scoring, inspection windows, and anomaly indicators (decision support only)',
+    category: 'fleet',
+  },
+  {
+    toolId: 'fleet-command',
+    toolName: 'Fleet Command Dashboard',
+    keywords: [
+      'fleet command',
+      'fleet dashboard',
+      'fleet overview',
+      'fleet status',
+      'vehicle fleet',
+      'fleet telemetry',
+      'fleet utilization',
+      'active vehicles',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['region', 'vehicle_type', 'maintenance_window'],
+    description:
+      'Fleet operations dashboard: vehicle availability, maintenance, ETAs, energy, and utilization (decision support only)',
+    category: 'fleet',
+  },
 ];
 
 /**
@@ -1089,6 +1193,78 @@ export function matchToolPatterns(message: string): Array<{
   if (preferGad7) {
     filtered = filtered.filter(
       (m) => m.toolId !== 'differential-diagnosis' && m.toolId !== 'phq9',
+    );
+  }
+
+  const preferFleetCommand =
+    lowerMessage.includes('fleet command') ||
+    lowerMessage.includes('fleet dashboard') ||
+    lowerMessage.includes('fleet overview') ||
+    lowerMessage.includes('fleet status') ||
+    lowerMessage.includes('fleet telemetry') ||
+    lowerMessage.includes('vehicle fleet') ||
+    (lowerMessage.includes('fleet') && lowerMessage.includes('utilization'));
+
+  if (preferFleetCommand) {
+    filtered = filtered.filter((m) => m.toolId !== 'differential-diagnosis');
+  }
+
+  const preferPredictiveMaintenance =
+    lowerMessage.includes('predictive maintenance') ||
+    lowerMessage.includes('maintenance assistant') ||
+    lowerMessage.includes('maintenance risk score') ||
+    lowerMessage.includes('fleet maintenance risk') ||
+    (lowerMessage.includes('maintenance') &&
+      (lowerMessage.includes('anomaly') ||
+        lowerMessage.includes('inspection window') ||
+        lowerMessage.includes('diagnostic code')));
+
+  if (preferPredictiveMaintenance) {
+    filtered = filtered.filter(
+      (m) =>
+        m.toolId !== 'differential-diagnosis' &&
+        m.toolId !== 'fleet-command' &&
+        m.toolId !== 'antibiotic-guide',
+    );
+  }
+
+  const preferRouteOptimizer =
+    lowerMessage.includes('route optimizer') ||
+    lowerMessage.includes('route optimization') ||
+    lowerMessage.includes('optimize route') ||
+    lowerMessage.includes('route planner') ||
+    lowerMessage.includes('delivery route') ||
+    (lowerMessage.includes('fleet') && lowerMessage.includes('route') && lowerMessage.includes('stop'));
+
+  if (preferRouteOptimizer) {
+    filtered = filtered.filter(
+      (m) =>
+        m.toolId !== 'differential-diagnosis' &&
+        m.toolId !== 'fleet-command' &&
+        m.toolId !== 'predictive-maintenance',
+    );
+  }
+
+  const preferDispatchAi =
+    lowerMessage.includes('dispatch intelligence') ||
+    lowerMessage.includes('dispatch assistant') ||
+    lowerMessage.includes('dispatch-ai') ||
+    lowerMessage.includes('dispatch ai') ||
+    lowerMessage.includes('vehicle dispatch') ||
+    lowerMessage.includes('fleet dispatch') ||
+    (lowerMessage.includes('dispatch') &&
+      (lowerMessage.includes('assign') ||
+        lowerMessage.includes('bottleneck') ||
+        lowerMessage.includes('priorit') ||
+        lowerMessage.includes('queue')));
+
+  if (preferDispatchAi) {
+    filtered = filtered.filter(
+      (m) =>
+        m.toolId !== 'differential-diagnosis' &&
+        m.toolId !== 'fleet-command' &&
+        m.toolId !== 'route-optimizer' &&
+        m.toolId !== 'predictive-maintenance',
     );
   }
 

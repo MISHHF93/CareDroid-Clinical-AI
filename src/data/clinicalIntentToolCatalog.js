@@ -12,6 +12,7 @@ import { percChatConfig } from './chatAssistedCalculators/perc';
 import { wellsPeChatConfig } from './chatAssistedCalculators/wellsPe';
 import { copdGoldChatConfig } from './chatAssistedCalculators/copdGold';
 import { romeIvIbsChatConfig } from './chatAssistedCalculators/romeIvIbs';
+import { dispatchAiChatConfig } from './chatAssistedFleet/dispatchAi';
 
 export const clinicalIntentTools = [
   {
@@ -312,6 +313,16 @@ export const clinicalIntentTools = [
     backendExecutable: false,
   },
   {
+    toolId: dispatchAiChatConfig.toolId,
+    toolName: 'Dispatch Intelligence Assistant',
+    category: dispatchAiChatConfig.category,
+    description: dispatchAiChatConfig.description,
+    path: dispatchAiChatConfig.hubPath,
+    sidebarToolId: dispatchAiChatConfig.registryId,
+    chatSeed: dispatchAiChatConfig.chatSeed,
+    backendExecutable: true,
+  },
+  {
     toolId: 'drug-interactions',
     toolName: 'Drug Interaction Checker',
     category: 'checker',
@@ -378,6 +389,42 @@ export const clinicalIntentTools = [
     backendExecutable: false,
   },
   {
+    toolId: 'route-optimizer',
+    toolName: 'Route Optimization Assistant',
+    category: 'fleet',
+    description:
+      'Plan and reorder multi-stop routes using priorities, traffic, vehicle limits, and time windows. Provides travel estimates and savings — does not auto-dispatch.',
+    path: '/fleet/route-optimizer',
+    sidebarToolId: 'route-optimizer',
+    chatSeed:
+      'Help me optimize a multi-stop fleet route: review destinations, priorities, traffic constraints, vehicle limits, and time windows. Suggest stop order and travel estimates — do not auto-dispatch or modify live routes without human approval.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'predictive-maintenance',
+    toolName: 'Predictive Maintenance Assistant',
+    category: 'fleet',
+    description:
+      'Rule-based maintenance risk score, inspection windows, and anomaly indicators from vehicle age, mileage, service history, diagnostic codes, battery health, and telemetry. Does not schedule service automatically.',
+    path: '/fleet/predictive-maintenance',
+    sidebarToolId: 'predictive-maintenance',
+    chatSeed:
+      'Help me interpret predictive maintenance risk for a fleet vehicle: review age, mileage, service history, diagnostic codes, battery health, and telemetry. Suggest inspection timing and anomalies — do not auto-schedule shop work without human maintenance approval.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'fleet-command',
+    toolName: 'Fleet Command Dashboard',
+    category: 'fleet',
+    description:
+      'Operational fleet snapshot: active and available vehicles, maintenance status, ETAs, energy levels, and utilization metrics. Decision support only — does not dispatch or control vehicles.',
+    path: '/fleet/command',
+    sidebarToolId: 'fleet-command',
+    chatSeed:
+      'Help me review fleet operations using the Fleet Command dashboard context: summarize active vs available vs on-job vehicles, flag maintenance and low-energy units, and discuss utilization and ETA patterns. Do not auto-dispatch or change assignments — recommend human dispatcher review.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'differential-diagnosis',
     toolName: 'Differential Diagnosis Generator',
     category: 'reference',
@@ -432,6 +479,11 @@ export const nluCalculatorHubOnly = [
     toolId: romeIvIbsChatConfig.toolId,
     name: romeIvIbsChatConfig.name,
     hubPath: romeIvIbsChatConfig.hubPath,
+  },
+  {
+    toolId: dispatchAiChatConfig.toolId,
+    name: dispatchAiChatConfig.name,
+    hubPath: dispatchAiChatConfig.hubPath,
   },
 ];
 
@@ -615,6 +667,11 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = {
   gad7: 'gad7',
   'copd-gold': 'copd-gold',
   'rome-iv-ibs': 'rome-iv-ibs',
+  'fleet-command': 'fleet-command',
+  'predictive-maintenance': 'predictive-maintenance',
+  'route-optimizer': 'route-optimizer',
+  'dispatch-ai': 'dispatch-ai',
+  dispatch: 'dispatch-ai',
   'dose-calculator': 'calculators',
   'abg-interpreter': 'lab-interp',
   'protocol-lookup': 'protocols',

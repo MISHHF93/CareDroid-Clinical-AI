@@ -52,6 +52,7 @@ const CATEGORY_CLASS = {
   integration: 'catalog-badge--data',
   support: 'catalog-badge--platform',
   phantom: 'catalog-badge--phantom',
+  fleet: 'catalog-badge--data',
   monitoring: 'catalog-badge--ai',
   oncology: 'catalog-badge--reference',
   medication: 'catalog-badge--checker',
