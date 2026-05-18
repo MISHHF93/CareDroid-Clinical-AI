@@ -1008,7 +1008,8 @@ ul.calc-breakdown-list .calc-breakdown-item {
     padding: 14px 16px;
   }
 
-  .calc-ckd-prognostic-badge {
+  .calc-ckd-prognostic-badge,
+  .calc-pr4a-risk-badge {
     padding: 12px 14px;
     margin-bottom: 16px;
   }
@@ -1156,6 +1157,10 @@ ul.calc-breakdown-list .calc-breakdown-item {
 .calc-has-bled-disclaimer,
 .calc-meld-disclaimer,
 .calc-timi-disclaimer,
+.calculator-interface--ascvd-risk .calc-timi-disclaimer,
+.calculator-interface--ckd-staging .calc-timi-disclaimer,
+.calculator-interface--stop-bang .calc-timi-disclaimer,
+.calculator-interface--audit-c .calc-timi-disclaimer,
 .calc-validation-errors,
 .calc-has-bled-anticoag-warning,
 .calc-news2-scale2-warning,
@@ -1238,6 +1243,48 @@ ul.calc-breakdown-list .calc-breakdown-item {
 }
 
 .calc-ckd-prognostic-badge--very_high {
+  border-color: color-mix(in srgb, var(--danger) 60%, transparent);
+  background: color-mix(in srgb, var(--app-danger) 14%, transparent);
+  color: var(--text-primary);
+}
+
+/* PR4A shared risk / screening status badges (ASCVD, STOP-Bang, AUDIT-C) */
+.calc-pr4a-risk-badge {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  font-size: clamp(0.875rem, 2.5vw + 0.5rem, 0.9375rem);
+  font-weight: 600;
+  line-height: 1.45;
+  text-align: center;
+  border: 2px solid var(--app-panel-border);
+  background: color-mix(in srgb, var(--app-fg) 6%, transparent);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.calc-pr4a-risk-badge--low {
+  border-color: color-mix(in srgb, var(--accent-1) 45%, transparent);
+  color: var(--accent-1);
+}
+
+.calc-pr4a-risk-badge--moderately_increased,
+.calc-pr4a-risk-badge--borderline {
+  border-color: color-mix(in srgb, var(--warning) 55%, transparent);
+  background: color-mix(in srgb, var(--app-warning) 12%, transparent);
+  color: var(--text-primary);
+}
+
+.calc-pr4a-risk-badge--high,
+.calc-pr4a-risk-badge--intermediate {
+  border-color: color-mix(in srgb, var(--warning) 65%, transparent);
+  background: color-mix(in srgb, var(--app-warning) 16%, transparent);
+  color: var(--text-primary);
+}
+
+.calc-pr4a-risk-badge--very_high {
   border-color: color-mix(in srgb, var(--danger) 60%, transparent);
   background: color-mix(in srgb, var(--app-danger) 14%, transparent);
   color: var(--text-primary);

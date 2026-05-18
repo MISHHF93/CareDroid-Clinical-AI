@@ -18,12 +18,18 @@ import {
 } from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   resolveRegistryId,
   NLU_TO_REGISTRY_ID,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
   PR4A_CALCULATOR_REGISTRY_IDS,
   PR4A_TIER_A_CALCULATOR_REGISTRY_IDS,
 } from './clinicalCatalogWiring';
+import {
+  CALCULATOR_ROUTE_DEFS,
+  expectedLaunchPath,
+  matchCalculatorRoute,
+} from '../routes/clinicalToolRoutes';
 import { getMedicalCatalogSummary, getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { getToolIcon } from '../navigation/iconRegistry';
@@ -234,7 +240,7 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
       expect(fromId.path).toBe(`${PR4A_HUB_PATH}/${id}`);
       expect(fromId.registryId).toBe(id);
       expect(fromId.openLabel).toBe('Open');
-      expect(fromId.orchestratorTool).toBeUndefined();
+      expect(fromId.orchestratorTool).toBeNull();
       expect(fromNlu.chatSeed.length).toBeGreaterThan(40);
     }
   });
@@ -298,4 +304,23 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
     expect(empty.registryId).toBeNull();
     expect(empty.chatSeed).toBeNull();
   });
+
+  it.each(PR4A_CALCULATOR_REGISTRY_IDS)(
+    'resolveNavigationPathForLaunch keeps Tier-A path for %s',
+    (id) => {
+      const launch = resolveCatalogLaunch(id);
+      expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
+      expect(resolveNavigationPathForLaunch(launch)).not.toBe('/dashboard');
+    }
+  );
+
+  it.each(PR4A_CALCULATOR_REGISTRY_IDS)(
+    'clinicalToolRoutes deep-link helpers align for %s',
+    (id) => {
+      const path = `${PR4A_HUB_PATH}/${id}`;
+      expect(expectedLaunchPath(id)).toBe(path);
+      expect(matchCalculatorRoute(path)?.calculatorSlug).toBe(id);
+      expect(CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === id)?.path).toBe(path);
+    }
+  );
 });

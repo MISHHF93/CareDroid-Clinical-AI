@@ -100,9 +100,12 @@ describe('ckdStagingCalculator — full result', () => {
     expect(out.albuminuriaCategory).toBe('A2');
     expect(out.combinedStage).toMatch(/^G\d/);
     expect(out.combinedStageLabel).toMatch(/G×A category/);
-    expect(out.clinicianPatientDisclaimer).toMatch(/decision-support/i);
+    expect(out.clinicianPatientDisclaimer).toBe(
+      'Use as decision-support for clinician-patient discussions.'
+    );
     expect(out.pathwayDisclaimer.toLowerCase()).not.toMatch(/\bprescribe\b/);
     expect(out.stagingDiscussion.toLowerCase()).not.toMatch(/\bstart (ace|arb|sglt2)\b/);
+    expect(out.prognosticRisk).toBe(combineCkdPrognosticRisk(out.gfrCategory, out.albuminuriaCategory));
   });
 });
 

@@ -55,10 +55,13 @@ describe('STOP-Bang calculator wiring (stop-bang)', () => {
   });
 
   it('resolves required NLU aliases', () => {
-    expect(NLU_TO_REGISTRY_ID['stop bang']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['sleep apnea score']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['osa risk']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['sleep risk score']).toBe(id);
+    const aliases = ['stop bang', 'sleep apnea score', 'osa risk', 'sleep risk score'];
+    for (const alias of aliases) {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(id);
+      expect(resolveCatalogLaunch(alias).path).toBe('/tools/calculators/stop-bang');
+      expect(resolveCatalogLaunch(alias).registryId).toBe(id);
+      expect(resolveCatalogLaunch(alias).openLabel).toBe('Open');
+    }
     expect(resolveCatalogLaunch('stop-bang').path).toBe('/tools/calculators/stop-bang');
     expect(resolveCatalogLaunch('sleep-apnea-score').registryId).toBe(id);
   });
@@ -76,6 +79,12 @@ describe('STOP-Bang calculator wiring (stop-bang)', () => {
     expect(ids).toContain('stop-bang');
     expect(ids).toContain('sleep-apnea-score');
     expect(ids).toContain('osa-risk');
+  });
+
+  it('includes Calculators.jsx switch case for stop-bang', () => {
+    const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+    expect(calculatorsSource).toContain("case 'stop-bang':");
+    expect(calculatorsSource).toContain('StopBangCalculator');
   });
 
   it('registers App.jsx route before calculators hub', () => {

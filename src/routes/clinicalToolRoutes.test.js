@@ -31,6 +31,10 @@ const REQUIRED_CALCULATOR_PATHS = [
   '/tools/calculators/meld',
   '/tools/calculators/meld-na',
   '/tools/calculators/timi-ua-nstemi',
+  '/tools/calculators/ascvd-risk',
+  '/tools/calculators/ckd-staging',
+  '/tools/calculators/stop-bang',
+  '/tools/calculators/audit-c',
 ];
 
 const REQUIRED_OVERVIEW_PATHS = ['/tools', '/tools/catalog'];

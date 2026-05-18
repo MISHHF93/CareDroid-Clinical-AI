@@ -55,10 +55,13 @@ describe('AUDIT-C calculator wiring (audit-c)', () => {
   });
 
   it('resolves required NLU aliases', () => {
-    expect(NLU_TO_REGISTRY_ID['audit c']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['alcohol screen']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['alcohol use screen']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['drinking screen']).toBe(id);
+    const aliases = ['audit c', 'alcohol screen', 'alcohol use screen', 'drinking screen'];
+    for (const alias of aliases) {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(id);
+      expect(resolveCatalogLaunch(alias).path).toBe('/tools/calculators/audit-c');
+      expect(resolveCatalogLaunch(alias).registryId).toBe(id);
+      expect(resolveCatalogLaunch(alias).openLabel).toBe('Open');
+    }
     expect(resolveCatalogLaunch('audit-c').path).toBe('/tools/calculators/audit-c');
     expect(resolveCatalogLaunch('alcohol-screen').registryId).toBe(id);
   });
@@ -75,6 +78,12 @@ describe('AUDIT-C calculator wiring (audit-c)', () => {
     const ids = toolIdAliases.map((a) => a.id);
     expect(ids).toContain('alcohol-screen');
     expect(ids).toContain('drinking-screen');
+  });
+
+  it('includes Calculators.jsx switch case for audit-c', () => {
+    const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+    expect(calculatorsSource).toContain("case 'audit-c':");
+    expect(calculatorsSource).toContain('AuditCCalculator');
   });
 
   it('registers App.jsx route before calculators hub', () => {

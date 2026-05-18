@@ -3,6 +3,8 @@ import {
   AUDIT_C_MEN_POSITIVE_THRESHOLD,
   AUDIT_C_WOMEN_POSITIVE_THRESHOLD,
   AUDIT_C_FREQUENCY_OPTIONS,
+  AUDIT_C_DRINKS_PER_DAY_OPTIONS,
+  AUDIT_C_BINGE_OPTIONS,
   categorizeAuditCScreening,
   computeAuditCResult,
   computeAuditCBreakdown,
@@ -12,6 +14,12 @@ import {
 } from './auditCCalculator';
 
 describe('auditCCalculator — scoring', () => {
+  it('defines three AUDIT-C consumption questions', () => {
+    expect(AUDIT_C_FREQUENCY_OPTIONS.length).toBe(5);
+    expect(AUDIT_C_DRINKS_PER_DAY_OPTIONS.length).toBe(5);
+    expect(AUDIT_C_BINGE_OPTIONS.length).toBe(5);
+  });
+
   it('sums three question points (0–12)', () => {
     const breakdown = computeAuditCBreakdown({
       drinkingFrequency: 'never',
@@ -69,6 +77,21 @@ describe('auditCCalculator — interpretation', () => {
     const combined = `${out.screeningDiscussion} ${out.pathwayDisclaimer} ${out.screeningDisclaimer}`.toLowerCase();
     expect(combined).not.toMatch(/\bdetox\b/);
     expect(combined).not.toMatch(/\bdiagnosed with alcohol use disorder\b/);
+    expect(out.screeningDisclaimer).toMatch(/^Screening only\./i);
+    expect(out.screeningDisclaimer).toMatch(/does not diagnose alcohol use disorder/i);
+    expect(out.screeningDisclaimer).toMatch(/withdrawal-management/i);
+  });
+
+  it('reports negative screen interpretation at score 2', () => {
+    const out = computeAuditCResult({
+      drinkingFrequency: 'monthly_or_less',
+      drinksPerDay: 'one_or_two',
+      bingeFrequency: 'never',
+    });
+    expect(out.ok).toBe(true);
+    expect(out.totalScore).toBe(1);
+    expect(out.screeningResult).toBe('negative');
+    expect(out.label).toMatch(/negative/i);
   });
 });
 

@@ -13,6 +13,20 @@ const ALL_FALSE = Object.fromEntries(STOP_BANG_CRITERIA_META.map((r) => [r.key, 
 const ALL_TRUE = Object.fromEntries(STOP_BANG_CRITERIA_META.map((r) => [r.key, true]));
 
 describe('stopBangCalculator — scoring', () => {
+  it('defines all eight STOP-Bang criteria', () => {
+    expect(STOP_BANG_CRITERIA_META).toHaveLength(8);
+    expect(STOP_BANG_CRITERIA_META.map((r) => r.key)).toEqual([
+      'snoring',
+      'tiredness',
+      'observedApnea',
+      'hypertension',
+      'bmiOver35',
+      'ageOver50',
+      'largeNeckCircumference',
+      'maleSex',
+    ]);
+  });
+
   it('sums one point per positive criterion (0–8)', () => {
     expect(calculateStopBangScore(ALL_FALSE)).toBe(0);
     expect(calculateStopBangScore(ALL_TRUE)).toBe(8);

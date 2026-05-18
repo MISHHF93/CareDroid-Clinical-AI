@@ -100,6 +100,32 @@ function focusFirstFieldById(ids) {
   }
 }
 
+function fieldClass(baseClass, isInvalid) {
+  return isInvalid ? `${baseClass} ${baseClass}--invalid` : baseClass;
+}
+
+/** Maps clinical risk keys to shared badge tone classes (aligns with CKD prognostic badge). */
+const PR4A_RISK_BADGE_TONE = {
+  low: 'low',
+  borderline: 'moderately_increased',
+  intermediate: 'high',
+  high: 'very_high',
+  moderately_increased: 'moderately_increased',
+  very_high: 'very_high',
+  negative: 'low',
+  positive_women: 'moderately_increased',
+  positive_men: 'very_high',
+};
+
+function CalcRiskStatusBadge({ label, toneKey }) {
+  const tone = PR4A_RISK_BADGE_TONE[toneKey] ?? 'low';
+  return (
+    <div className={`calc-pr4a-risk-badge calc-pr4a-risk-badge--${tone}`} role="status">
+      {label}
+    </div>
+  );
+}
+
 export function AscvdRiskCalculator({ onResultChange }) {
   const [ageYears, setAgeYears] = useState('');
   const [sex, setSex] = useState('');
@@ -171,7 +197,10 @@ export function AscvdRiskCalculator({ onResultChange }) {
   const formTitleId = 'ascvd-form-title';
   const interpretationHeadingId = 'ascvd-interpretation-heading';
   const validationSummaryId = 'ascvd-validation-summary';
+  const ascvdAgeHelpId = 'ascvd-age-help';
+  const ascvdScoreLabelId = 'ascvd-score-label';
   const hasValidationErrors = validationErrors.length > 0;
+  const fieldInvalid = (isEmpty) => hasValidationErrors && isEmpty;
 
   return (
     <div className="calculator-interface calculator-interface--ascvd-risk">
@@ -182,6 +211,9 @@ export function AscvdRiskCalculator({ onResultChange }) {
 
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
+          <p className="calc-disclaimer-detail">
+            Use as decision-support for clinician-patient discussions.
+          </p>
           <p className="calc-disclaimer-detail">
             <strong>Primary prevention context:</strong> PCE estimates 10-year risk of first hard ASCVD event in adults
             aged 40–79. Does not recommend statins or other therapies — use with ACC/AHA prevention guidance and shared
@@ -230,14 +262,17 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 min="40"
                 max="79"
                 step="1"
-                className="calc-input-field"
+                className={fieldClass('calc-input-field', fieldInvalid(!ageYears.trim()))}
                 value={ageYears}
                 onChange={(e) => setAgeYears(e.target.value)}
                 aria-required="true"
-                aria-invalid={hasValidationErrors && !ageYears.trim()}
+                aria-invalid={fieldInvalid(!ageYears.trim())}
+                aria-describedby={ascvdAgeHelpId}
                 inputMode="numeric"
               />
-              <span className="calc-input-help">Valid range 40–79 years for pooled cohort equations.</span>
+              <span className="calc-input-help" id={ascvdAgeHelpId}>
+                Valid range 40–79 years for pooled cohort equations.
+              </span>
             </div>
 
             <div className="calc-input-group">
@@ -246,11 +281,11 @@ export function AscvdRiskCalculator({ onResultChange }) {
               </label>
               <select
                 id="ascvd-sex"
-                className="calc-select-field"
+                className={fieldClass('calc-select-field', fieldInvalid(!sex))}
                 value={sex}
                 onChange={(e) => setSex(e.target.value)}
                 aria-required="true"
-                aria-invalid={hasValidationErrors && !sex}
+                aria-invalid={fieldInvalid(!sex)}
               >
                 <option value="">Select…</option>
                 <option value="female">Female</option>
@@ -264,11 +299,11 @@ export function AscvdRiskCalculator({ onResultChange }) {
               </label>
               <select
                 id="ascvd-race"
-                className="calc-select-field"
+                className={fieldClass('calc-select-field', fieldInvalid(!race))}
                 value={race}
                 onChange={(e) => setRace(e.target.value)}
                 aria-required="true"
-                aria-invalid={hasValidationErrors && !race}
+                aria-invalid={fieldInvalid(!race)}
               >
                 <option value="">Select…</option>
                 <option value="white">White</option>
@@ -287,15 +322,15 @@ export function AscvdRiskCalculator({ onResultChange }) {
                   type="number"
                   min="0"
                   step="any"
-                  className="calc-input-field"
+                  className={fieldClass('calc-input-field', fieldInvalid(!totalCholesterol.trim()))}
                   value={totalCholesterol}
                   onChange={(e) => setTotalCholesterol(e.target.value)}
                   aria-required="true"
-                  aria-invalid={hasValidationErrors && !totalCholesterol.trim()}
+                  aria-invalid={fieldInvalid(!totalCholesterol.trim())}
                   inputMode="decimal"
                 />
                 <select
-                  className="calc-select-field"
+                  className={fieldClass('calc-select-field', false)}
                   value={cholesterolUnit}
                   onChange={(e) => setCholesterolUnit(e.target.value)}
                   aria-label="Cholesterol unit"
@@ -316,15 +351,15 @@ export function AscvdRiskCalculator({ onResultChange }) {
                   type="number"
                   min="0"
                   step="any"
-                  className="calc-input-field"
+                  className={fieldClass('calc-input-field', fieldInvalid(!hdlCholesterol.trim()))}
                   value={hdlCholesterol}
                   onChange={(e) => setHdlCholesterol(e.target.value)}
                   aria-required="true"
-                  aria-invalid={hasValidationErrors && !hdlCholesterol.trim()}
+                  aria-invalid={fieldInvalid(!hdlCholesterol.trim())}
                   inputMode="decimal"
                 />
                 <select
-                  className="calc-select-field"
+                  className={fieldClass('calc-select-field', false)}
                   value={cholesterolUnit}
                   onChange={(e) => setCholesterolUnit(e.target.value)}
                   aria-label="HDL cholesterol unit"
@@ -345,11 +380,11 @@ export function AscvdRiskCalculator({ onResultChange }) {
                 min="70"
                 max="260"
                 step="1"
-                className="calc-input-field"
+                className={fieldClass('calc-input-field', fieldInvalid(!systolicBpMmHg.trim()))}
                 value={systolicBpMmHg}
                 onChange={(e) => setSystolicBpMmHg(e.target.value)}
                 aria-required="true"
-                aria-invalid={hasValidationErrors && !systolicBpMmHg.trim()}
+                aria-invalid={fieldInvalid(!systolicBpMmHg.trim())}
                 inputMode="numeric"
               />
             </div>
@@ -423,12 +458,16 @@ export function AscvdRiskCalculator({ onResultChange }) {
 
         {result ? (
           <>
+            <CalcRiskStatusBadge label={result.label} toneKey={result.riskCategory} />
+
             <div
               className={`calc-score-display ${result.severity}`}
               role="group"
-              aria-label={`10-year ASCVD risk ${result.tenYearRiskPct.toFixed(1)} percent, ${result.label}`}
+              aria-labelledby={ascvdScoreLabelId}
             >
-              <div className="calc-score-label">10-year ASCVD risk</div>
+              <div id={ascvdScoreLabelId} className="calc-score-label">
+                10-year ASCVD risk — {result.tenYearRiskPct.toFixed(1)}% (estimated)
+              </div>
               <div className="calc-score-value" aria-hidden="true">
                 {result.tenYearRiskPct.toFixed(1)}%
               </div>
@@ -439,7 +478,7 @@ export function AscvdRiskCalculator({ onResultChange }) {
 
             <CalcInterpretationRegion
               headingId={interpretationHeadingId}
-              title={result.label}
+              title="Risk interpretation (decision support)"
               severity={result.severity}
               emphasizeRisk={result.riskCategory !== 'low'}
             >
@@ -538,7 +577,9 @@ export function CkdStagingCalculator({ onResultChange }) {
   const formTitleId = 'ckd-form-title';
   const interpretationHeadingId = 'ckd-interpretation-heading';
   const validationSummaryId = 'ckd-validation-summary';
+  const ckdScoreLabelId = 'ckd-score-label';
   const hasValidationErrors = validationErrors.length > 0;
+  const fieldInvalid = (isEmpty) => hasValidationErrors && isEmpty;
 
   return (
     <div className="calculator-interface calculator-interface--ckd-staging">
@@ -549,6 +590,9 @@ export function CkdStagingCalculator({ onResultChange }) {
 
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
+          <p className="calc-disclaimer-detail">
+            Use as decision-support for clinician-patient discussions.
+          </p>
           <p className="calc-disclaimer-detail">
             <strong>KDIGO staging context:</strong> CKD is defined by kidney damage or GFR &lt;60 for ≥3 months. A
             single eGFR and ACR do not establish chronicity. Does not recommend dialysis or specific drug therapy.
@@ -596,11 +640,11 @@ export function CkdStagingCalculator({ onResultChange }) {
                 min="18"
                 max="120"
                 step="1"
-                className="calc-input-field"
+                className={fieldClass('calc-input-field', fieldInvalid(!ageYears.trim()))}
                 value={ageYears}
                 onChange={(e) => setAgeYears(e.target.value)}
                 aria-required="true"
-                aria-invalid={hasValidationErrors && !ageYears.trim()}
+                aria-invalid={fieldInvalid(!ageYears.trim())}
                 inputMode="numeric"
               />
             </div>
@@ -611,11 +655,11 @@ export function CkdStagingCalculator({ onResultChange }) {
               </label>
               <select
                 id="ckd-sex"
-                className="calc-select-field"
+                className={fieldClass('calc-select-field', fieldInvalid(!sex))}
                 value={sex}
                 onChange={(e) => setSex(e.target.value)}
                 aria-required="true"
-                aria-invalid={hasValidationErrors && !sex}
+                aria-invalid={fieldInvalid(!sex)}
               >
                 <option value="">Select…</option>
                 <option value="female">Female</option>
@@ -633,11 +677,11 @@ export function CkdStagingCalculator({ onResultChange }) {
                   type="number"
                   min="0"
                   step="any"
-                  className="calc-input-field"
+                  className={fieldClass('calc-input-field', fieldInvalid(!serumCreatinine.trim()))}
                   value={serumCreatinine}
                   onChange={(e) => setSerumCreatinine(e.target.value)}
                   aria-required="true"
-                  aria-invalid={hasValidationErrors && !serumCreatinine.trim()}
+                  aria-invalid={fieldInvalid(!serumCreatinine.trim())}
                   inputMode="decimal"
                 />
                 <select
@@ -662,11 +706,11 @@ export function CkdStagingCalculator({ onResultChange }) {
                   type="number"
                   min="0"
                   step="any"
-                  className="calc-input-field"
+                  className={fieldClass('calc-input-field', fieldInvalid(!urineAcr.trim()))}
                   value={urineAcr}
                   onChange={(e) => setUrineAcr(e.target.value)}
                   aria-required="true"
-                  aria-invalid={hasValidationErrors && !urineAcr.trim()}
+                  aria-invalid={fieldInvalid(!urineAcr.trim())}
                   inputMode="decimal"
                 />
                 <select
@@ -715,9 +759,11 @@ export function CkdStagingCalculator({ onResultChange }) {
             <div
               className={`calc-score-display ${result.severity}`}
               role="group"
-              aria-label={`Estimated eGFR ${result.egfrMlMin} milliliters per minute, ${result.combinedStageLabel}`}
+              aria-labelledby={ckdScoreLabelId}
             >
-              <div className="calc-score-label">eGFR (CKD-EPI 2021)</div>
+              <div id={ckdScoreLabelId} className="calc-score-label">
+                eGFR (CKD-EPI 2021) — {result.egfrMlMin} mL/min/1.73 m²
+              </div>
               <div className="calc-score-value" aria-hidden="true">
                 {result.egfrMlMin}
               </div>
@@ -733,22 +779,26 @@ export function CkdStagingCalculator({ onResultChange }) {
               <ul className="calc-breakdown-list" aria-labelledby="ckd-breakdown-heading">
                 <li className="calc-breakdown-item">
                   <span className="calc-breakdown-label">GFR category</span>
-                  <span className="calc-breakdown-score">{result.gfrCategory}</span>
+                  <span className="calc-breakdown-score">{result.gfrCategoryLabel}</span>
                 </li>
                 <li className="calc-breakdown-item">
                   <span className="calc-breakdown-label">Albuminuria</span>
-                  <span className="calc-breakdown-score">{result.albuminuriaCategory}</span>
+                  <span className="calc-breakdown-score">{result.albuminuriaCategoryLabel}</span>
                 </li>
                 <li className="calc-breakdown-item">
-                  <span className="calc-breakdown-label">Combined G×A</span>
+                  <span className="calc-breakdown-label">Combined G×A stage</span>
                   <span className="calc-breakdown-score">{result.combinedStage}</span>
+                </li>
+                <li className="calc-breakdown-item">
+                  <span className="calc-breakdown-label">Prognostic risk</span>
+                  <span className="calc-breakdown-score">{result.prognosticRiskLabel}</span>
                 </li>
               </ul>
             </div>
 
             <CalcInterpretationRegion
               headingId={interpretationHeadingId}
-              title={result.combinedStageLabel}
+              title="Staging interpretation (decision support)"
               severity={result.severity}
               emphasizeRisk={result.prognosticRisk !== 'low'}
             >
@@ -916,6 +966,8 @@ export function StopBangCalculator({ onResultChange }) {
 
         {result ? (
           <>
+            <CalcRiskStatusBadge label={result.label} toneKey={result.osaRiskCategory} />
+
             <div
               className={`calc-score-display ${result.severity}`}
               role="group"
@@ -946,7 +998,7 @@ export function StopBangCalculator({ onResultChange }) {
 
             <CalcInterpretationRegion
               headingId={interpretationHeadingId}
-              title={result.label}
+              title="Screening interpretation (decision support)"
               severity={result.severity}
               emphasizeRisk={result.osaRiskCategory !== 'low'}
             >
@@ -1054,6 +1106,7 @@ export function AuditCCalculator({ onResultChange }) {
   const interpretationHeadingId = 'audit-c-interpretation-heading';
   const validationSummaryId = 'audit-c-validation-summary';
   const hasValidationErrors = validationErrors.length > 0;
+  const fieldInvalid = (isEmpty) => hasValidationErrors && isEmpty;
 
   return (
     <div className="calculator-interface calculator-interface--audit-c">
@@ -1113,11 +1166,11 @@ export function AuditCCalculator({ onResultChange }) {
                   </label>
                   <select
                     id={id}
-                    className="calc-select-field"
+                    className={fieldClass('calc-select-field', fieldInvalid(responses[item.key] === ''))}
                     value={responses[item.key]}
                     onChange={(e) => setItem(item.key, e.target.value)}
                     aria-required="true"
-                    aria-invalid={hasValidationErrors && responses[item.key] === ''}
+                    aria-invalid={fieldInvalid(responses[item.key] === '')}
                     aria-describedby={hasValidationErrors ? validationSummaryId : undefined}
                   >
                     <option value="">Select…</option>
@@ -1155,6 +1208,8 @@ export function AuditCCalculator({ onResultChange }) {
 
         {result ? (
           <>
+            <CalcRiskStatusBadge label={result.label} toneKey={result.screeningResult} />
+
             <div
               className={`calc-score-display ${result.severity}`}
               role="group"
@@ -1186,7 +1241,7 @@ export function AuditCCalculator({ onResultChange }) {
 
             <CalcInterpretationRegion
               headingId={interpretationHeadingId}
-              title={result.label}
+              title="Screening interpretation (decision support)"
               severity={result.severity}
               emphasizeRisk={result.screeningResult !== 'negative'}
             >

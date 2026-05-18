@@ -123,7 +123,7 @@ export function interpretAuditCScore(score) {
     interpretation: `${labels[screeningResult]}. Per AUDIT-C guidance, scores ≥${AUDIT_C_WOMEN_POSITIVE_THRESHOLD} (women) or ≥${AUDIT_C_MEN_POSITIVE_THRESHOLD} (men) suggest further alcohol assessment.`,
     screeningDiscussion: discussion[screeningResult],
     screeningDisclaimer:
-      'AUDIT-C is a brief alcohol consumption screen. Apply the sex-appropriate positive threshold (≥3 women, ≥4 men). It does not diagnose alcohol use disorder and does not provide withdrawal-management advice.',
+      'Screening only. AUDIT-C is a brief alcohol consumption screen. Apply the sex-appropriate positive threshold (≥3 women, ≥4 men). It does not diagnose alcohol use disorder and does not provide withdrawal-management advice.',
     safetyDisclaimer:
       'Screening results reflect the answers entered and may omit important context. Do not use this score alone to rule in or rule out alcohol use disorder or to mandate treatment.',
     pathwayDisclaimer:

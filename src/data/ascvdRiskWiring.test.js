@@ -57,11 +57,19 @@ describe('ASCVD risk calculator wiring (ascvd-risk)', () => {
   });
 
   it('resolves required NLU aliases to ascvd-risk', () => {
-    expect(NLU_TO_REGISTRY_ID.ascvd).toBe('ascvd-risk');
-    expect(NLU_TO_REGISTRY_ID['cardiovascular risk']).toBe('ascvd-risk');
-    expect(NLU_TO_REGISTRY_ID['heart disease risk']).toBe('ascvd-risk');
-    expect(NLU_TO_REGISTRY_ID['cv risk']).toBe('ascvd-risk');
-    expect(NLU_TO_REGISTRY_ID['ascvd score']).toBe('ascvd-risk');
+    const aliases = [
+      'ascvd',
+      'cardiovascular risk',
+      'heart disease risk',
+      'cv risk',
+      'ascvd score',
+    ];
+    for (const alias of aliases) {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe('ascvd-risk');
+      expect(resolveCatalogLaunch(alias).path).toBe('/tools/calculators/ascvd-risk');
+      expect(resolveCatalogLaunch(alias).registryId).toBe('ascvd-risk');
+      expect(resolveCatalogLaunch(alias).openLabel).toBe('Open');
+    }
     expect(resolveCatalogLaunch('ascvd-score').path).toBe('/tools/calculators/ascvd-risk');
     expect(resolveCatalogLaunch('cardiovascular-risk').registryId).toBe('ascvd-risk');
   });

@@ -55,11 +55,19 @@ describe('CKD staging calculator wiring (ckd-staging)', () => {
   });
 
   it('resolves required NLU aliases', () => {
-    expect(NLU_TO_REGISTRY_ID['ckd stage']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['kidney stage']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['kidney disease staging']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['gfr stage']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['albuminuria stage']).toBe(id);
+    const aliases = [
+      'ckd stage',
+      'kidney stage',
+      'kidney disease staging',
+      'gfr stage',
+      'albuminuria stage',
+    ];
+    for (const alias of aliases) {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(id);
+      expect(resolveCatalogLaunch(alias).path).toBe('/tools/calculators/ckd-staging');
+      expect(resolveCatalogLaunch(alias).registryId).toBe(id);
+      expect(resolveCatalogLaunch(alias).openLabel).toBe('Open');
+    }
     expect(resolveCatalogLaunch('ckd-stage').path).toBe('/tools/calculators/ckd-staging');
     expect(resolveCatalogLaunch('gfr-stage').registryId).toBe(id);
   });

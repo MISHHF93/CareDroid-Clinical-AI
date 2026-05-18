@@ -1,8 +1,9 @@
 /**
  * Cross-layer PR4A coverage (mirrors pr2Coverage.test.js / pr3Coverage.test.js).
  * Formula / clinical edge cases: src/utils/*Calculator.test.js
+ * Comprehensive matrix: pr4aComprehensive.test.js, pr4aTenAreaCoverage.test.js
  * Per-tool wiring: ascvdRiskWiring, ckdStagingWiring, stopBangWiring, auditCWiring
- * Cross-cutting matrix: pr4aConsistency.test.js
+ * Cross-cutting matrix: pr4aConsistency.test.js, pr4aRegistrationAudit.test.js
  * UX / safety: pr4aUxSafetyAccessibility.test.js
  */
 

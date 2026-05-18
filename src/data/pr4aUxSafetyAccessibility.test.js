@@ -87,6 +87,7 @@ describe('PR4A UX & clinical safety — interpretation copy', () => {
 
   it('AUDIT-C interpretation avoids AUD diagnosis and withdrawal management', () => {
     const i = interpretAuditCScore(5);
+    expect(i.screeningDisclaimer).toMatch(/^Screening only\./i);
     expect(i.screeningDisclaimer).toMatch(/does not diagnose alcohol use disorder/i);
     expect(i.pathwayDisclaimer).toMatch(/does not recommend specific medications/i);
     expect(i.interpretation).not.toMatch(/\bdetox\b/i);
@@ -148,6 +149,34 @@ describe('PR4A UX & clinical safety — input validation', () => {
   });
 });
 
+describe('PR4A accessibility & UX — reset and validation affordances', () => {
+  it.each([
+    ['AscvdRiskCalculator', 'ascvd-age', true],
+    ['CkdStagingCalculator', 'ckd-age', true],
+    ['StopBangCalculator', 'stop-bang-snoring', false],
+    ['AuditCCalculator', 'audit-c-drinkingFrequency', true],
+  ])('%s clears result on reset and restores focus to %s', (component, focusId, clearsValidation) => {
+    const slice = sliceCalculatorComponent(pr4aCalculatorsSource, component);
+    expect(slice).toContain('setResult(null)');
+    if (clearsValidation) {
+      expect(slice).toContain('setValidationErrors([])');
+    }
+    expect(slice).toContain(focusId);
+    expect(slice).toMatch(/aria-label="Reset/i);
+  });
+
+  it.each([
+    ['AscvdRiskCalculator', 'fieldClass'],
+    ['CkdStagingCalculator', 'fieldClass'],
+    ['AuditCCalculator', 'fieldClass'],
+  ])('%s applies invalid field styling when validation fails', (component, helper) => {
+    const slice = sliceCalculatorComponent(pr4aCalculatorsSource, component);
+    expect(slice).toContain(helper);
+    expect(slice).toMatch(/fieldClass\(['"]calc-(input|select)-field/);
+    expect(slice).toContain('role="alert"');
+  });
+});
+
 describe('PR4A accessibility & UX — pr4aCalculators.jsx contracts', () => {
   it('ASCVD form uses labels, validation alert, interpretation region, and safety footer', () => {
     expect(ascvdUi).toContain('CalcDecisionSupportLead');
@@ -158,9 +187,16 @@ describe('PR4A accessibility & UX — pr4aCalculators.jsx contracts', () => {
     expect(ascvdUi).toMatch(/aria-label="Calculate ASCVD/i);
     expect(ascvdUi).toMatch(/aria-label="Reset ASCVD/i);
     expect(ascvdUi).toContain('Does not recommend statins');
+    expect(ascvdUi).toContain('Use as decision-support for clinician-patient discussions.');
+    expect(ascvdUi).toContain('CalcRiskStatusBadge');
+    expect(ascvdUi).toContain('aria-labelledby={ascvdScoreLabelId}');
+    expect(ascvdUi).toContain('Risk interpretation (decision support)');
   });
 
   it('CKD staging form exposes prognostic risk badge and KDIGO disclaimers', () => {
+    expect(ckdUi).toContain('Use as decision-support for clinician-patient discussions.');
+    expect(ckdUi).toContain('gfrCategoryLabel');
+    expect(ckdUi).toContain('albuminuriaCategoryLabel');
     expect(ckdUi).toContain('CalcDecisionSupportLead');
     expect(ckdUi).toContain('calc-ckd-prognostic-badge');
     expect(ckdUi).toContain('role="status"');
@@ -169,10 +205,13 @@ describe('PR4A accessibility & UX — pr4aCalculators.jsx contracts', () => {
     expect(ckdUi).toMatch(/aria-label="Calculate CKD/i);
     expect(ckdUi).toContain('Does not recommend dialysis');
     expect(ckdUi).toMatch(/≥3 months/i);
+    expect(ckdUi).toContain('aria-labelledby={ckdScoreLabelId}');
+    expect(ckdUi).toContain('Staging interpretation (decision support)');
   });
 
   it('STOP-Bang uses checkbox labels, screening lead, and risk emphasis', () => {
     expect(stopBangUi).toContain('CalcDecisionSupportLead');
+    expect(stopBangUi).toContain('Screening tool only.');
     expect(stopBangUi).toMatch(/Screening tool only/i);
     expect(stopBangUi).toContain('htmlFor={id}');
     expect(stopBangUi).toContain('aria-describedby');
@@ -180,16 +219,40 @@ describe('PR4A accessibility & UX — pr4aCalculators.jsx contracts', () => {
     expect(stopBangUi).toContain('CalcResultSafetyFooter');
     expect(stopBangUi).toMatch(/recommend CPAP, surgery/i);
     expect(stopBangUi).toMatch(/osaRiskCategory !== 'low'/);
+    expect(stopBangUi).toContain('CalcRiskStatusBadge');
+    expect(stopBangUi).toContain('Screening interpretation (decision support)');
   });
 
   it('AUDIT-C uses labeled selects, screening disclaimer, and reset', () => {
     expect(auditCUi).toContain('CalcDecisionSupportLead');
     expect(auditCUi).toMatch(/Screening only/i);
+    expect(auditCUi).toContain('does not diagnose alcohol use disorder');
+    expect(auditCUi).toContain('calc-select-field');
     expect(auditCUi).toContain('htmlFor={id}');
     expect(auditCUi).toContain('aria-required="true"');
     expect(auditCUi).toContain('CalcInterpretationRegion');
     expect(auditCUi).toContain('CalcResultSafetyFooter');
     expect(auditCUi).toMatch(/aria-label="Reset AUDIT-C/i);
     expect(auditCUi).toMatch(/sex-specific/i);
+    expect(auditCUi).toContain('CalcRiskStatusBadge');
+    expect(auditCUi).toContain('Screening interpretation (decision support)');
+  });
+});
+
+describe('PR4A accessibility & UX — Calculators.css contracts', () => {
+  const calculatorsCss = readFileSync(join(__dirname, '../pages/tools/Calculators.css'), 'utf8');
+
+  it('styles PR4A risk badges with distinct severity tones', () => {
+    expect(calculatorsCss).toContain('.calc-pr4a-risk-badge--low');
+    expect(calculatorsCss).toContain('.calc-pr4a-risk-badge--very_high');
+    expect(calculatorsCss).toContain('.calc-pr4a-risk-badge--borderline');
+    expect(calculatorsCss).toContain('.calc-interpretation-box--risk-emphasis');
+  });
+
+  it('scopes PR4A calculator disclaimer compaction selectors', () => {
+    expect(calculatorsCss).toContain('.calculator-interface--ascvd-risk .calc-timi-disclaimer');
+    expect(calculatorsCss).toContain('.calculator-interface--ckd-staging .calc-timi-disclaimer');
+    expect(calculatorsCss).toContain('.calculator-interface--stop-bang .calc-timi-disclaimer');
+    expect(calculatorsCss).toContain('.calculator-interface--audit-c .calc-timi-disclaimer');
   });
 });

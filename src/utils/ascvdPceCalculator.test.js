@@ -99,10 +99,21 @@ describe('ascvdPceCalculator — interpretation', () => {
   it('includes clinician disclaimer and avoids treatment directives', () => {
     const out = computeAscvdPceResult({ ...TABLE_A_DEMO, sex: 'male', race: 'white' });
     expect(out.ok).toBe(true);
-    expect(out.clinicianPatientDisclaimer).toMatch(/decision-support/i);
+    expect(out.clinicianPatientDisclaimer).toBe(
+      'Use as decision-support for clinician-patient discussions.'
+    );
     expect(out.preventionDiscussion).toBeTruthy();
     expect(out.preventionDiscussion.toLowerCase()).not.toMatch(/\b(start|prescribe|statin dose)\b/);
     expect(out.pathwayDisclaimer.toLowerCase()).not.toMatch(/\bprescribe\b/);
+  });
+
+  it('returns prevention discussion for each risk category', () => {
+    for (const pct of [3, 6, 12, 25]) {
+      const i = interpretAscvdTenYearRisk(pct);
+      expect(i.preventionDiscussion).toBeTruthy();
+      expect(i.preventionDiscussion.toLowerCase()).not.toMatch(/\bprescribe\b/);
+      expect(i.riskCategory).toBe(categorizeAscvdTenYearRisk(pct));
+    }
   });
 
   it('returns null interpretation for non-finite risk', () => {
