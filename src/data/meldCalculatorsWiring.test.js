@@ -13,9 +13,22 @@ import {
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
+import {
+  MELD_REQUIRED_NLU_ALIAS_PAIRS,
+  MELD_ROUTE_BY_REGISTRY_ID,
+  MELD_CATALOG_SEARCH_QUERIES,
+  MELD_TOOL_IDS,
+} from './pr2MeldTestConstants';
+import { catalogRowsMatchingQuery } from '../utils/catalogSearch';
+import {
+  CALCULATOR_ROUTE_DEFS,
+  expectedLaunchPath,
+  matchCalculatorRoute,
+} from '../routes/clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -76,10 +89,11 @@ describe('MELD calculator wiring (meld, meld-na)', () => {
     }
   });
 
-  it('documents discovery aliases for meld-score and liver-transplant-score', () => {
+  it('documents discovery aliases for MELD hyphenated slugs', () => {
     const ids = toolIdAliases.map((a) => a.id);
     expect(ids).toContain('meld-score');
     expect(ids).toContain('liver-transplant-score');
+    expect(ids).toContain('meld-sodium');
     expect(ids).toContain('end-stage-liver-disease-score');
   });
 
@@ -98,5 +112,51 @@ describe('MELD calculator wiring (meld, meld-na)', () => {
     expect(resolveRegistryId('meld-na')).toBe('meld-na');
     expect(resolveRegistryId('meld-score')).toBe('meld');
     expect(resolveRegistryId('liver-transplant-score')).toBe('meld-na');
+  });
+
+  it.each(MELD_REQUIRED_NLU_ALIAS_PAIRS)(
+    'NLU_TO_REGISTRY_ID maps "%s" → %s',
+    (alias, canonical) => {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
+      expect(resolveRegistryId(alias)).toBe(canonical);
+    }
+  );
+
+  it.each(MELD_TOOL_IDS)('resolveRegistryId maps canonical id %s', (id) => {
+    expect(resolveRegistryId(id)).toBe(id);
+    expect(NLU_TO_REGISTRY_ID[id]).toBeUndefined();
+  });
+
+  it.each(MELD_TOOL_IDS)('registers App.jsx deep link for %s', (id) => {
+    const path = MELD_ROUTE_BY_REGISTRY_ID[id];
+    expect(appSource).toContain(`path: '${path}'`);
+    expect(appSource).toContain(`initialCalculatorId="${id}"`);
+  });
+
+  it.each(MELD_TOOL_IDS)('CalculatorInterface switch includes case for %s', (id) => {
+    expect(calculatorsSource).toMatch(new RegExp(`case\\s+'${id.replace(/-/g, '\\-')}'\\s*:`));
+  });
+
+  it.each(MELD_TOOL_IDS)('clinicalToolRoutes resolves %s deep link', (id) => {
+    const path = MELD_ROUTE_BY_REGISTRY_ID[id];
+    expect(matchCalculatorRoute(path)?.calculatorSlug).toBe(id);
+    expect(expectedLaunchPath(id)).toBe(path);
+    expect(CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === id)?.path).toBe(path);
+  });
+
+  it.each(MELD_CATALOG_SEARCH_QUERIES)(
+    'catalog search for %s finds primary %s',
+    (primaryId, query) => {
+      const rows = getMedicalToolsCatalogRows();
+      const hits = catalogRowsMatchingQuery(rows, query);
+      expect(hits.some((r) => r.primaryId === primaryId)).toBe(true);
+    }
+  );
+
+  it('lists meld and meld-na in toolRegistry export', () => {
+    const ids = new Set(toolRegistry.map((t) => t.id));
+    for (const id of MELD_TOOL_IDS) {
+      expect(ids.has(id)).toBe(true);
+    }
   });
 });

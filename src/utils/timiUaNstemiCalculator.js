@@ -102,7 +102,7 @@ export function interpretTimiUaNstemi(score) {
     'Antman EM, Cohen M, Bernink PJ, et al. The TIMI risk score for unstable angina/non-ST elevation MI. JAMA. 2000;284(7):835–842.';
 
   const acsDisclaimer =
-    'For patients with suspected acute coronary syndrome only. This score does not confirm ACS, does not establish a diagnosis, and does not recommend antiplatelet, anticoagulant, or invasive strategy — follow institutional ACS pathways and cardiology consultation.';
+    'For patients with suspected acute coronary syndrome (UA/NSTEMI) only — not for STEMI. This score does not confirm ACS, does not establish a diagnosis, and does not recommend antiplatelet, anticoagulant, or invasive strategy — follow institutional ACS pathways and cardiology consultation.';
 
   if (score >= 5) {
     return {

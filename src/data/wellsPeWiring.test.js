@@ -12,7 +12,15 @@ import {
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
-import { toolRegistryById } from './toolRegistry';
+import toolRegistry, { toolRegistryById } from './toolRegistry';
+import {
+  WELLS_PE_REQUIRED_NLU_ALIAS_PAIRS,
+  WELLS_PE_REGISTRY_ID,
+  WELLS_PE_HUB_PATH,
+  WELLS_PE_CATALOG_SEARCH_QUERIES,
+} from './pr2WellsPeTestConstants';
+import { catalogRowsMatchingQuery } from '../utils/catalogSearch';
+import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -58,20 +66,31 @@ describe('Wells PE (Tier B chat-assisted) wiring', () => {
     expect(reg?.initialCalc).toBeUndefined();
   });
 
-  it('resolves launch to hub path and chat seed', () => {
+  it('resolves launch to hub path and chat seed (Tier B guided chat)', () => {
     const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe('/tools/calculators');
+    expect(launch.path).toBe(WELLS_PE_HUB_PATH);
     expect(launch.registryId).toBe(id);
+    expect(launch.chatSeed).toBe(wellsPeChatConfig.chatSeed);
     expect(launch.chatSeed).toMatch(/Wells score for suspected pulmonary embolism/i);
-    expect(launch.openLabel).toBe('Open');
+    expect(launch.chatSeed).toMatch(/low \/ intermediate \/ high probability/i);
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(launch.orchestratorTool).toBeNull();
   });
 
-  it('resolves NLU aliases', () => {
-    expect(NLU_TO_REGISTRY_ID['wells pe']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['pe score']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['wells pulmonary embolism']).toBe(id);
-    expect(resolveCatalogLaunch('wells-pe-score').path).toBe('/tools/calculators');
-    expect(resolveRegistryId('pulmonary-embolism-wells')).toBe(id);
+  it.each(WELLS_PE_REQUIRED_NLU_ALIAS_PAIRS)(
+    'NLU_TO_REGISTRY_ID maps "%s" → %s',
+    (alias, canonical) => {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
+      expect(resolveRegistryId(alias)).toBe(canonical);
+      const launch = resolveCatalogLaunch(alias);
+      expect(launch.path).toBe(WELLS_PE_HUB_PATH);
+      expect(launch.registryId).toBe(canonical);
+    }
+  );
+
+  it('separates pe-score (Wells) from pe-rule-out (PERC) launches', () => {
+    expect(resolveCatalogLaunch('pe-score').registryId).toBe('wells-pe');
+    expect(resolveCatalogLaunch('pe-rule-out').registryId).toBe('perc');
   });
 
   it('mirrors backend patterns and discovery rows', () => {
@@ -88,5 +107,26 @@ describe('Wells PE (Tier B chat-assisted) wiring', () => {
     const ids = toolIdAliases.map((a) => a.id);
     expect(ids).toContain('wells-pe-score');
     expect(ids).toContain('pulmonary-embolism-wells');
+    expect(ids).toContain('wells-pulmonary-embolism');
+    expect(ids).toContain('pe-score');
+  });
+
+  it('appears in calculator hub PE chat-assisted group', () => {
+    const peGroup = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'pe');
+    expect(peGroup?.toolIds).toContain(WELLS_PE_REGISTRY_ID);
+    expect(peGroup?.lead).toMatch(/do not rule in or rule out/i);
+  });
+
+  it.each(WELLS_PE_CATALOG_SEARCH_QUERIES)(
+    'catalog search for %s via "%s"',
+    (primaryId, query) => {
+      const rows = getMedicalToolsCatalogRows();
+      const hits = catalogRowsMatchingQuery(rows, query);
+      expect(hits.some((r) => r.primaryId === primaryId)).toBe(true);
+    }
+  );
+
+  it('lists wells-pe in toolRegistry export', () => {
+    expect(toolRegistry.some((t) => t.id === WELLS_PE_REGISTRY_ID)).toBe(true);
   });
 });

@@ -1,0 +1,101 @@
+/**
+ * Shared PR2 audit constants (MELD, MELD-Na, TIMI UA/NSTEMI, Wells PE, PERC).
+ * Per-tool slices live in pr2MeldTestConstants, pr2TimiTestConstants, etc.
+ */
+
+import {
+  PR2_CALCULATOR_REGISTRY_IDS,
+  PR2_TIER_A_CALCULATOR_REGISTRY_IDS,
+  PR2_TIER_B_CHAT_CALCULATOR_IDS,
+} from './clinicalToolIdContract';
+import {
+  MELD_ALL_ALIAS_PAIRS,
+  MELD_CALC_QUERY_BY_REGISTRY_ID,
+  MELD_CATALOG_SEARCH_QUERIES,
+  MELD_DISCOVERY_ALIAS_PAIRS,
+  MELD_REQUIRED_NLU_ALIAS_PAIRS,
+  MELD_ROUTE_BY_REGISTRY_ID,
+  MELD_TOOL_IDS,
+} from './pr2MeldTestConstants';
+import {
+  TIMI_ALL_ALIAS_PAIRS,
+  TIMI_CALC_QUERY,
+  TIMI_CATALOG_SEARCH_QUERIES,
+  TIMI_DISCOVERY_ALIAS_PAIRS,
+  TIMI_REGISTRY_ID,
+  TIMI_REQUIRED_NLU_ALIAS_PAIRS,
+  TIMI_ROUTE,
+  TIMI_TOOL_IDS,
+} from './pr2TimiTestConstants';
+import {
+  WELLS_PE_ALL_ALIAS_PAIRS,
+  WELLS_PE_CATALOG_SEARCH_QUERIES,
+  WELLS_PE_DISCOVERY_ALIAS_PAIRS,
+  WELLS_PE_HUB_PATH,
+  WELLS_PE_REGISTRY_ID,
+  WELLS_PE_REQUIRED_NLU_ALIAS_PAIRS,
+} from './pr2WellsPeTestConstants';
+import {
+  PERC_ALL_ALIAS_PAIRS,
+  PERC_CATALOG_SEARCH_QUERIES,
+  PERC_DISCOVERY_ALIAS_PAIRS,
+  PERC_HUB_PATH,
+  PERC_REGISTRY_ID,
+  PERC_REQUIRED_NLU_ALIAS_PAIRS,
+} from './pr2PercTestConstants';
+
+export const PR2_HUB_PATH = '/tools/calculators';
+
+export const PR2_TOOL_IDS = Object.freeze([...PR2_CALCULATOR_REGISTRY_IDS]);
+
+export const PR2_TIER_A_TOOL_IDS = Object.freeze([...PR2_TIER_A_CALCULATOR_REGISTRY_IDS]);
+
+export const PR2_TIER_B_TOOL_IDS = Object.freeze([...PR2_TIER_B_CHAT_CALCULATOR_IDS]);
+
+/** Canonical Tier-A route for each dedicated calculator registry id */
+export const PR2_ROUTE_BY_REGISTRY_ID = Object.freeze({
+  ...MELD_ROUTE_BY_REGISTRY_ID,
+  [TIMI_REGISTRY_ID]: TIMI_ROUTE,
+});
+
+/** Tier-B hub tools resolve to the calculators hub path */
+export const PR2_HUB_ROUTE_BY_REGISTRY_ID = Object.freeze({
+  [WELLS_PE_REGISTRY_ID]: WELLS_PE_HUB_PATH,
+  [PERC_REGISTRY_ID]: PERC_HUB_PATH,
+});
+
+export const PR2_CALC_QUERY_BY_REGISTRY_ID = Object.freeze({
+  ...MELD_CALC_QUERY_BY_REGISTRY_ID,
+  [TIMI_REGISTRY_ID]: TIMI_CALC_QUERY,
+});
+
+export const PR2_REQUIRED_NLU_ALIAS_PAIRS = Object.freeze([
+  ...MELD_REQUIRED_NLU_ALIAS_PAIRS,
+  ...TIMI_REQUIRED_NLU_ALIAS_PAIRS,
+  ...WELLS_PE_REQUIRED_NLU_ALIAS_PAIRS,
+  ...PERC_REQUIRED_NLU_ALIAS_PAIRS,
+]);
+
+export const PR2_DISCOVERY_ALIAS_PAIRS = Object.freeze([
+  ...MELD_DISCOVERY_ALIAS_PAIRS,
+  ...TIMI_DISCOVERY_ALIAS_PAIRS,
+  ...WELLS_PE_DISCOVERY_ALIAS_PAIRS,
+  ...PERC_DISCOVERY_ALIAS_PAIRS,
+]);
+
+export const PR2_CATALOG_SEARCH_QUERIES = Object.freeze([
+  ...MELD_CATALOG_SEARCH_QUERIES,
+  ...TIMI_CATALOG_SEARCH_QUERIES,
+  ...WELLS_PE_CATALOG_SEARCH_QUERIES,
+  ...PERC_CATALOG_SEARCH_QUERIES,
+]);
+
+export const PR2_ALL_ALIAS_PAIRS = Object.freeze([
+  ...MELD_ALL_ALIAS_PAIRS,
+  ...TIMI_ALL_ALIAS_PAIRS,
+  ...WELLS_PE_ALL_ALIAS_PAIRS,
+  ...PERC_ALL_ALIAS_PAIRS,
+]);
+
+/** Re-export per-tool id lists for audits that scope to one family */
+export { MELD_TOOL_IDS, TIMI_TOOL_IDS, TIMI_REGISTRY_ID, WELLS_PE_REGISTRY_ID, PERC_REGISTRY_ID };

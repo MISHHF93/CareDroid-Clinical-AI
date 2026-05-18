@@ -63,6 +63,7 @@ export const NLU_TOOL_IDS_WITHOUT_EXECUTOR = [
   'wells-dvt-calculator',
   'wells-pe',
   'perc',
+  /** Tier-B chat; deterministic scoring in `graceAcsCalculator.js` — Tier C candidate if execute API required */
   'grace-acs',
   'nihss',
   'canadian-c-spine',

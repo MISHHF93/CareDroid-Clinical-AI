@@ -1,7 +1,7 @@
 /**
  * Cross-layer PR2 coverage (mirrors pr1Coverage.test.js).
  * Formula correctness & clinical edge cases: src/utils/*Calculator.test.js
- * Wiring matrices: meldCalculatorsWiring, timiCalculatorsWiring, wellsPeWiring, percWiring, pr2Consistency
+ * Wiring matrices: meldCalculatorsWiring, timiCalculatorsWiring, wellsPeWiring, percWiring, pr2Consistency, pr2Comprehensive
  */
 
 import { readFileSync } from 'node:fs';
@@ -24,6 +24,7 @@ import {
 import { getMedicalCatalogSummary, getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { computeMeldResult } from '../utils/meldCalculator';
+import { PR2_DISCOVERY_ALIAS_PAIRS } from './pr2TestConstants';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -36,16 +37,6 @@ const EMPTY_LAUNCH = {
   orchestratorTool: null,
   openLabel: 'Try in chat',
 };
-
-const PR2_ALIAS_PAIRS = [
-  ['meld-score', 'meld'],
-  ['liver-transplant-score', 'meld-na'],
-  ['timi-score', 'timi-ua-nstemi'],
-  ['wells-pe-score', 'wells-pe'],
-  ['pe-score', 'wells-pe'],
-  ['pe-rule-out', 'perc'],
-  ['perc-rule', 'perc'],
-];
 
 describe('PR2 coverage — catalog & discovery', () => {
   it('includes each PR2 tool in catalog rows with NLU source and chat affordances', () => {
@@ -123,7 +114,7 @@ describe('PR2 coverage — registry mappings', () => {
 
 describe('PR2 coverage — NLU aliases & resolveCatalogLaunch', () => {
   it('resolves NLU alias keys to the same launch as canonical PR2 ids', () => {
-    for (const [alias, canonical] of PR2_ALIAS_PAIRS) {
+    for (const [alias, canonical] of PR2_DISCOVERY_ALIAS_PAIRS) {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
       const fromAlias = resolveCatalogLaunch(alias);
       const fromCanonical = resolveCatalogLaunch(canonical);

@@ -395,6 +395,10 @@ If the intent is "clinical_tool", identify which tool:
 - wells-dvt-calculator: DVT probability
 - wells-pe: Pulmonary embolism Wells rule (chat-assisted)
 - perc: PERC rule-out criteria (low pre-test probability; chat-assisted)
+- grace-acs: GRACE ACS mortality risk stratification (chat-assisted; prognosis only, not ACS diagnosis)
+- nihss: NIH Stroke Scale structured neurologic deficit scoring (chat-assisted; does not replace urgent stroke evaluation)
+- canadian-c-spine: Canadian C-Spine Rule imaging decision support in alert stable blunt trauma (chat-assisted; not clearance)
+- ottawa-ankle: Ottawa ankle/foot rules for radiography after acute injury (chat-assisted; not fracture clearance)
 - drug-interactions: Drug-drug interaction checker
 - dose-calculator: Medication dosing
 - lab-interpreter: Lab result interpretation

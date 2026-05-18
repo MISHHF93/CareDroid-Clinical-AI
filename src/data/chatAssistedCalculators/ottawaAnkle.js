@@ -1,5 +1,8 @@
 /**
  * Tier-B chat-assisted configuration for Ottawa Ankle / Foot Rules.
+ *
+ * Rule logic: `src/utils/ottawaAnkleCalculator.js` (ankle + foot radiograph criteria, applicability).
+ * Tier B chat-assisted only — not fracture clearance; hard stops override the rule.
  */
 
 export const OTTAWA_ANKLE_TOOL_ID = 'ottawa-ankle';
@@ -11,7 +14,7 @@ export const ottawaAnkleChatConfig = {
   registryId: OTTAWA_ANKLE_TOOL_ID,
   category: 'calculator',
   description:
-    'Ottawa ankle and foot rules for radiography after acute ankle/foot injury (chat-assisted; not a fracture clearance tool).',
+    'Ottawa ankle and foot rules — radiography decision support after acute ankle/foot injury (clinical decision support only; not fracture clearance).',
   chatSeed: `Help me apply the Ottawa Ankle Rule and Ottawa foot rules using a structured workflow for an acute ankle or foot injury.
 
 STEP 0 — Applicability and immediate safety (confirm first)
@@ -51,6 +54,8 @@ State clearly:
 - A negative rule result does not prove absence of fracture (high NPV in validation, not 100%)
 - Do not recommend withholding care, discharge, splinting, orthopaedic referral, or specific imaging modalities beyond what the rule states
 - Do not delay urgent evaluation, neurovascular reassessment, or hard-stop trauma care to finish this chat
-- Proximal fibula (Maisonneuve), high ankle sprain, and other injuries are not fully addressed by these rules alone`,
+- Proximal fibula (Maisonneuve), high ankle sprain, and other injuries are not fully addressed by these rules alone
+
+Reference: Stiell IG, et al. JAMA. 1994;271(11):827–832; BMJ. 1995;311(7005):594–597 (Ottawa ankle rules).`,
   guidedSteps: ['applicability', 'weight bearing', 'malleolar zone', 'midfoot zone'],
 };

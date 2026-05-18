@@ -147,6 +147,7 @@ export const toolIdAliases = [
   },
   { id: 'meld-score', mapsTo: 'meld', source: 'NLU alias — meld score' },
   { id: 'liver-transplant-score', mapsTo: 'meld-na', source: 'NLU alias — liver transplant score' },
+  { id: 'meld-sodium', mapsTo: 'meld-na', source: 'NLU alias — meld sodium / meld na' },
   {
     id: 'end-stage-liver-disease-score',
     mapsTo: 'meld',

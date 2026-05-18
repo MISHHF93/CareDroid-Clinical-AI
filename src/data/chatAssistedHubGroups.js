@@ -8,7 +8,7 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     groupId: 'cardiac',
     heading: 'Acute coronary syndrome',
     lead:
-      'GRACE supports mortality risk stratification in suspected or confirmed ACS. It does not diagnose ACS. Unstable patients, STEMI, shock, or arrest need immediate local ACS/STEMI pathways — do not delay emergency care to finish chat.',
+      'GRACE supports ACS mortality risk stratification (decision support only). It does not diagnose or rule out ACS. Unstable patients, STEMI, shock, or arrest need immediate local ACS/STEMI pathways — do not delay emergency care to finish chat.',
     toolIds: ['grace-acs'],
   },
   {
@@ -61,6 +61,25 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
  */
 export function chatAssistedLaunchAriaLabel(toolName) {
   return `Start guided chat: ${toolName}. Clinical decision support only; does not diagnose or replace urgent emergency pathways.`;
+}
+
+/** PR3 tools — extra urgency context for screen readers (stroke / ACS / trauma). */
+const PR3_LAUNCH_ARIA_CONTEXT = Object.freeze({
+  'grace-acs': 'Unstable ACS or STEMI pathways take priority over chat.',
+  nihss: 'Emergency stroke pathways take priority over completing scoring in chat.',
+  'canadian-c-spine': 'Unstable trauma and primary survey take priority over chat.',
+  'ottawa-ankle': 'Hard-stop injuries and urgent evaluation take priority over chat.',
+});
+
+/**
+ * Context-aware aria-label for PR3 and other clinical chat-assisted launches.
+ * @param {string} toolId
+ * @param {string} toolName
+ */
+export function chatAssistedLaunchAriaLabelForTool(toolId, toolName) {
+  const base = chatAssistedLaunchAriaLabel(toolName);
+  const extra = PR3_LAUNCH_ARIA_CONTEXT[toolId];
+  return extra ? `${base} ${extra}` : base;
 }
 
 /**

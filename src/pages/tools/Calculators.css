@@ -766,6 +766,7 @@ ul.calc-breakdown-list .calc-breakdown-item {
   border: 1px solid var(--app-panel-border);
   background: var(--app-surface-1);
   cursor: pointer;
+  touch-action: manipulation;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -787,6 +788,8 @@ ul.calc-breakdown-list .calc-breakdown-item {
   font-size: 13px;
   line-height: 1.45;
   color: var(--text-secondary);
+  word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .calc-chat-assisted-action {
@@ -1258,6 +1261,12 @@ ul.calc-breakdown-list .calc-breakdown-item {
   outline-offset: 2px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .calc-chat-assisted-card {
+    transition: none;
+  }
+}
+
 @media (max-width: 480px) {
   .calculator-selection {
     grid-template-columns: 1fr;
@@ -1271,6 +1280,10 @@ ul.calc-breakdown-list .calc-breakdown-item {
     padding: 14px 16px;
   }
 
+  .calc-chat-assisted-lead {
+    font-size: 12px;
+  }
+
   .calc-chat-assisted-grid {
     grid-template-columns: 1fr;
   }
@@ -1278,6 +1291,12 @@ ul.calc-breakdown-list .calc-breakdown-item {
   .calc-chat-assisted-card {
     width: 100%;
     max-width: 100%;
+    min-height: 48px;
+    padding: 16px;
+  }
+
+  .calc-chat-assisted-name {
+    font-size: 15px;
   }
 }
 

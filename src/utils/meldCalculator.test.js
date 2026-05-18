@@ -150,6 +150,20 @@ describe('meldCalculator', () => {
     expect(score).toBe(15);
   });
 
+  it('matches UNOS MELD-Na adjustment for laboratory MELD 15 and sodium 125', () => {
+    const meld = 15;
+    const meldNa = calculateMeldNaScore(meld, 125);
+    expect(meldNa).toBe(25);
+    expect(meldNa).toBeGreaterThanOrEqual(meld);
+  });
+
+  it('clamps entered sodium above 140 before MELD-Na formula', () => {
+    const meld = 20;
+    const meldNaAt140 = calculateMeldNaScore(meld, 140);
+    const meldNaAt150 = calculateMeldNaScore(meld, 150);
+    expect(meldNaAt150).toBe(meldNaAt140);
+  });
+
   it('treats low creatinine the same as creatinine floored to 1.0 mg/dL', () => {
     const low = calculateMeldScore({
       bilirubinMgDl: 1,

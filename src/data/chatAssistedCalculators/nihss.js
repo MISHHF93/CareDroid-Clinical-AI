@@ -1,6 +1,9 @@
 /**
  * Tier-B chat-assisted configuration for NIHSS (no dedicated Calculators.jsx form).
  * Structured domain-by-domain collection — not a single-page checkbox calculator.
+ *
+ * Scoring reference: `src/utils/nihssCalculator.js` (item validation, total 0–42, severity bands).
+ * No Calculators.jsx wizard — remain chat-assisted unless institution governs server-side scoring.
  */
 
 export const NIHSS_TOOL_ID = 'nihss';
@@ -12,7 +15,7 @@ export const nihssChatConfig = {
   registryId: NIHSS_TOOL_ID,
   category: 'calculator',
   description:
-    'NIH Stroke Scale — structured neurologic deficit scoring (chat-assisted; does not replace urgent stroke evaluation).',
+    'NIH Stroke Scale — structured neurologic deficit scoring (clinical decision support; does not replace urgent stroke evaluation or treatment decisions).',
   chatSeed: `Help me complete the NIH Stroke Scale (NIHSS) using a structured, domain-by-domain neurologic exam interview.
 
 STEP 0 — Time-critical stroke presentation
@@ -36,7 +39,13 @@ Work through each NIHSS item in order. For each domain, ask what was observed on
 14) 10 — Dysarthria (0–1)
 15) 11 — Extinction / inattention (0–2)
 
-After all scored items are collected, sum the total NIHSS score (0–42), list each item score, and provide a severity interpretation band in plain language.
+After all scored items are collected, sum the total NIHSS score (0–42), list each item score with its allowed range, and provide a severity interpretation band in plain language:
+- 0: no measurable deficit
+- 1–4: minor
+- 5–15: moderate
+- 16–20: moderate-to-severe
+- 21–42: severe
+(Untestable items scored as 9 contribute 0 to the total per standard NIHSS summation.)
 
 State clearly:
 - NIHSS quantifies neurologic deficit severity; it does not diagnose stroke and does not by itself determine treatment
@@ -53,8 +62,10 @@ Remain informational and documentation-focused unless your institution has gover
     'best gaze',
     'visual fields',
     'facial palsy',
-    'motor arm',
-    'motor leg',
+    'motor arm left',
+    'motor arm right',
+    'motor leg left',
+    'motor leg right',
     'limb ataxia',
     'sensory',
     'best language',

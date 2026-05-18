@@ -257,7 +257,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: graceAcsChatConfig.toolId,
-    toolName: 'GRACE ACS (prognosis support)',
+    toolName: graceAcsChatConfig.name,
     category: graceAcsChatConfig.category,
     description: graceAcsChatConfig.description,
     path: graceAcsChatConfig.hubPath,

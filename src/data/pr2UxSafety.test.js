@@ -31,6 +31,7 @@ describe('PR2 UX & clinical safety — interpretation copy', () => {
   it('TIMI interpretation does not confirm ACS or prescribe therapy', () => {
     const i = interpretTimiUaNstemi(5);
     expect(i.acsDisclaimer).toMatch(/does not confirm ACS/i);
+    expect(i.acsDisclaimer).toMatch(/not for STEMI/i);
     expect(i.interpretation).not.toMatch(/start heparin|give aspirin|pci now/i);
   });
 
@@ -60,6 +61,7 @@ describe('PR2 UX & clinical safety — interpretation copy', () => {
 
 describe('PR2 UX & clinical safety — chat-assisted seeds', () => {
   it('Wells PE chat seed forbids diagnostic certainty phrasing', () => {
+    expect(wellsPeChatConfig.chatSeed).toMatch(/STEP 0/i);
     expect(wellsPeChatConfig.chatSeed).toMatch(/does not rule in or rule out/i);
     expect(wellsPeChatConfig.chatSeed).toMatch(/not a diagnosis/i);
     expect(wellsPeChatConfig.description).toMatch(/pre-test probability/i);

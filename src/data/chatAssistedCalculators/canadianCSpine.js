@@ -1,6 +1,9 @@
 /**
  * Tier-B chat-assisted configuration for Canadian C-Spine Rule (CCR).
  * No dedicated Calculators.jsx form — guided workflow only.
+ *
+ * Rule logic: `src/utils/canadianCSpineCalculator.js` (high/low-risk, ROM 45°, applicability).
+ * Informational chat-assisted only unless local governance approves executable trauma workflow.
  */
 
 export const CANADIAN_C_SPINE_TOOL_ID = 'canadian-c-spine';
@@ -12,7 +15,7 @@ export const canadianCSpineChatConfig = {
   registryId: CANADIAN_C_SPINE_TOOL_ID,
   category: 'calculator',
   description:
-    'Canadian C-Spine Rule for alert, stable blunt trauma (chat-assisted imaging decision support; not clearance).',
+    'Canadian C-Spine Rule — cervical imaging decision support for alert, stable blunt trauma (clinical decision support only; not c-spine clearance).',
   chatSeed: `Help me apply the Canadian C-Spine Rule (CCR) using a structured step-by-step workflow for an alert, stable adult with blunt neck trauma.
 
 STEP 0 — Applicability and emergencies (must confirm before using the rule)
@@ -51,6 +54,9 @@ State clearly:
 - CCR must not be used for unstable patients or when it would delay primary trauma survey, resuscitation, or urgent imaging when clinically warranted
 - Do not override clinician judgment or institutional trauma protocols
 - Do not tell the user to defer all trauma evaluation to finish this chat
-- High negative predictive value in validation does not equal zero miss rate — document shared decision-making`,
+- High negative predictive value in validation does not equal zero miss rate — document shared decision-making
+- Remain informational unless your institution has governed workflows for chat-assisted trauma imaging decisions
+
+Reference: Stiell IG, et al. JAMA. 2001;286(15):1841–1848 (Canadian C-spine rule).`,
   guidedSteps: ['applicability', 'high-risk factors', 'low-risk factors', 'active ROM 45°'],
 };

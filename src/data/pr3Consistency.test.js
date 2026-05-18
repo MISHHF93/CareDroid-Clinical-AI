@@ -2,7 +2,7 @@
  * Cross-layer PR3 consistency: registry, hub launch, NLU, catalog, discovery,
  * resolveCatalogLaunch, backend patterns, chat seeds, sidebar, deep links.
  * Per-tool detail: graceAcsWiring, nihssWiring, canadianCSpineWiring, ottawaAnkleWiring.
- * Broad coverage matrix: pr3Coverage.test.js
+ * Broad coverage matrix: pr3Coverage.test.js, pr3Comprehensive.test.js
  */
 
 import { readFileSync } from 'node:fs';
@@ -33,9 +33,12 @@ import {
   PR3_CHAT_CONFIGS,
   PR3_NLU_ALIAS_PAIRS,
   PR3_DISCOVERY_ALIAS_PAIRS,
+  PR3_REQUIRED_NLU_ALIAS_PAIRS,
   PR3_CATALOG_SEARCH_QUERIES,
   catalogRowsMatchingQuery,
 } from './pr3TestConstants';
+import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
+import { CALCULATOR_ROUTE_DEFS, expectedLaunchPath, isKnownToolAreaPath } from '../routes/clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -123,7 +126,17 @@ describe('PR3 consistency — registry, NLU, and chat config alignment', () => {
 });
 
 describe('PR3 consistency — aliases and duplicate detection', () => {
-  it('resolves all required product aliases via NLU_TO_REGISTRY_ID and resolveCatalogLaunch', () => {
+  it('resolves all product-required aliases via NLU_TO_REGISTRY_ID and resolveCatalogLaunch', () => {
+    for (const [alias, canonical] of PR3_REQUIRED_NLU_ALIAS_PAIRS) {
+      expect(NLU_TO_REGISTRY_ID[alias], `required NLU alias missing: ${alias}`).toBe(canonical);
+      const launch = resolveCatalogLaunch(alias);
+      expect(launch.registryId).toBe(canonical);
+      expect(launch.path).toBe(PR3_HUB_PATH);
+      expect(launch.chatSeed.length).toBeGreaterThan(50);
+    }
+  });
+
+  it('resolves extended NLU alias pairs via NLU_TO_REGISTRY_ID and resolveCatalogLaunch', () => {
     for (const [alias, canonical] of PR3_NLU_ALIAS_PAIRS) {
       expect(NLU_TO_REGISTRY_ID[alias], `NLU alias missing: ${alias}`).toBe(canonical);
       const launch = resolveCatalogLaunch(alias);
@@ -222,8 +235,8 @@ describe('PR3 consistency — resolveCatalogLaunch, routes, sidebar, deep links'
       const fromNlu = resolveCatalogLaunch(id);
       expect(fromId.path).toBe(PR3_HUB_PATH);
       expect(fromId.registryId).toBe(id);
-      expect(fromId.openLabel).toBe('Open');
-      expect(fromId.orchestratorTool).toBeUndefined();
+      expect(fromId.openLabel).toBe('Start guided chat');
+      expect(fromId.orchestratorTool).toBeNull();
       expect(fromNlu.chatSeed.length).toBeGreaterThan(80);
     }
   });
@@ -266,5 +279,18 @@ describe('PR3 consistency — resolveCatalogLaunch, routes, sidebar, deep links'
     expect(patternsSource).toContain('preferNihss');
     expect(patternsSource).toContain('preferCanadianCSpine');
     expect(patternsSource).toContain('preferOttawaAnkle');
+  });
+
+  it('places all PR3 tools in CHAT_ASSISTED_HUB_GROUPS', () => {
+    const grouped = new Set(CHAT_ASSISTED_HUB_GROUPS.flatMap((g) => g.toolIds));
+    for (const id of PR3_CALCULATOR_REGISTRY_IDS) {
+      expect(grouped.has(id)).toBe(true);
+    }
+  });
+
+  it.each(PR3_CALCULATOR_REGISTRY_IDS)('deep link expectedLaunchPath(%s) → hub', (id) => {
+    expect(expectedLaunchPath(id)).toBe(PR3_HUB_PATH);
+    expect(isKnownToolAreaPath(PR3_HUB_PATH)).toBe(true);
+    expect(CALCULATOR_ROUTE_DEFS.some((d) => d.calculatorSlug === id)).toBe(false);
   });
 });

@@ -23,6 +23,10 @@ import {
   REGISTRY,
 } from './clinicalToolIdContract';
 import { PR1_ALL_ALIAS_PAIRS } from './pr1TestConstants';
+import { MELD_ALL_ALIAS_PAIRS } from './pr2MeldTestConstants';
+import { TIMI_ALL_ALIAS_PAIRS } from './pr2TimiTestConstants';
+import { WELLS_PE_ALL_ALIAS_PAIRS } from './pr2WellsPeTestConstants';
+import { PERC_ALL_ALIAS_PAIRS } from './pr2PercTestConstants';
 import { PR4A_ALL_ALIAS_PAIRS } from './pr4aTestConstants';
 import { PR5_ALL_ALIAS_PAIRS } from './pr5TestConstants';
 import { PR6_ALL_ALIAS_PAIRS } from './pr6TestConstants';
@@ -104,6 +108,10 @@ export const AUDITED_CLINICAL_REGISTRY_IDS = Object.freeze([
 /** All product-required NLU / discovery alias pairs (PR1–PR7 + fleet). */
 export const ALL_REQUIRED_CATALOG_ALIAS_PAIRS = Object.freeze([
   ...PR1_ALL_ALIAS_PAIRS,
+  ...MELD_ALL_ALIAS_PAIRS,
+  ...TIMI_ALL_ALIAS_PAIRS,
+  ...WELLS_PE_ALL_ALIAS_PAIRS,
+  ...PERC_ALL_ALIAS_PAIRS,
   ...PR4A_ALL_ALIAS_PAIRS,
   ...PR5_ALL_ALIAS_PAIRS,
   ...PR6_ALL_ALIAS_PAIRS,

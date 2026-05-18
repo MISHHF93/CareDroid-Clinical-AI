@@ -32,15 +32,17 @@ import {
 } from '../../utils/hasBledCalculator';
 import { computeMeldResult, formatMeldLabValue } from '../../utils/meldCalculator';
 import {
+  BUILTIN_CALC_ID_TO_REGISTRY_ID,
+  PR3_CALCULATOR_REGISTRY_IDS,
   resolveCatalogLaunch,
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
 } from '../../data/clinicalCatalogWiring';
 import { builtinUiCalculators, clinicalIntentTools, nluCalculatorHubOnly } from '../../data/clinicalIntentToolCatalog';
-import { BUILTIN_CALC_ID_TO_REGISTRY_ID } from '../../data/clinicalCatalogWiring';
 import { toolRegistryById } from '../../data/toolRegistry';
 import {
   CHAT_ASSISTED_HUB_GROUPS,
   chatAssistedLaunchAriaLabel,
+  chatAssistedLaunchAriaLabelForTool,
   fleetChatAssistedLaunchAriaLabel,
 } from '../../data/chatAssistedHubGroups';
 import {
@@ -323,7 +325,9 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                           aria-label={
                             isFleetDispatch
                               ? fleetChatAssistedLaunchAriaLabel(tool.name)
-                              : chatAssistedLaunchAriaLabel(tool.name)
+                              : PR3_CALCULATOR_REGISTRY_IDS.includes(tool.toolId)
+                                ? chatAssistedLaunchAriaLabelForTool(tool.toolId, tool.name)
+                                : chatAssistedLaunchAriaLabel(tool.name)
                           }
                           aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}
                           onClick={() => handleChatAssistedLaunch(tool.toolId)}
@@ -1701,6 +1705,7 @@ const HasBledCalculator = ({ onResultChange }) => {
  * TIMI — UA/NSTEMI risk score (Antman et al.). Decision support only; no treatment recommendations.
  */
 const TimiUaNstemiCalculator = ({ onResultChange }) => {
+  const resultsRef = useRef(null);
   const [inputs, setInputs] = useState(() =>
     Object.fromEntries(TIMI_UA_NSTEMI_CRITERIA_META.map((r) => [r.key, false]))
   );
@@ -1720,6 +1725,10 @@ const TimiUaNstemiCalculator = ({ onResultChange }) => {
     }
   }, [onResultChange, result]);
 
+  useEffect(() => {
+    if (result) scrollCalcResultsIntoView(resultsRef.current);
+  }, [result]);
+
   const runCalculate = () => {
     const total = calculateTimiUaNstemiScore(inputs);
     const breakdown = computeTimiBreakdown(inputs);
@@ -1734,9 +1743,11 @@ const TimiUaNstemiCalculator = ({ onResultChange }) => {
   const reset = () => {
     setInputs(Object.fromEntries(TIMI_UA_NSTEMI_CRITERIA_META.map((r) => [r.key, false])));
     setResult(null);
+    requestAnimationFrame(() => document.getElementById('timi-age65OrOlder')?.focus());
   };
 
   const timiInterpretationHeadingId = 'timi-interpretation-heading';
+  const timiScoreLabelId = 'timi-score-label';
 
   return (
     <div className="calculator-interface calculator-interface--timi">
@@ -1748,9 +1759,9 @@ const TimiUaNstemiCalculator = ({ onResultChange }) => {
         <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
-            <strong>ACS context:</strong> Apply only when unstable angina or NSTEMI is already suspected or
-            diagnosed. TIMI estimates 14-day adverse-event risk in the validation cohort — it does not confirm ACS
-            and does not direct antiplatelet, anticoagulant, or revascularisation therapy.
+            <strong>ACS context:</strong>             Apply only when unstable angina or NSTEMI is already suspected or
+            diagnosed (not for STEMI). TIMI estimates 14-day adverse-event risk in the validation cohort — it does not
+            confirm ACS and does not direct antiplatelet, anticoagulant, or revascularisation therapy.
           </p>
         </div>
 
@@ -1767,7 +1778,7 @@ const TimiUaNstemiCalculator = ({ onResultChange }) => {
             <legend className="calc-timi-legend calc-has-bled-legend" id="timi-criteria-legend">
               TIMI criteria (check all that apply)
             </legend>
-            <div className="calc-timi-criteria calc-has-bled-criteria" role="group" aria-labelledby="timi-criteria-legend">
+            <div className="calc-timi-criteria calc-has-bled-criteria">
               {TIMI_UA_NSTEMI_CRITERIA_META.map((row) => {
                 const id = `timi-${row.key}`;
                 const checked = Boolean(inputs[row.key]);
@@ -1809,13 +1820,18 @@ const TimiUaNstemiCalculator = ({ onResultChange }) => {
         </form>
       </div>
 
-      <div className="calculator-results" aria-live="polite" aria-label="TIMI results">
+      <CalcResultsPanel id="calc-results-timi" resultsRef={resultsRef}>
         <ResultsPanelTitle />
 
         {result ? (
           <>
-            <div className={`calc-score-display ${result.severity}`}>
-              <div className="calc-score-label">TIMI score</div>
+            <div
+              className={`calc-score-display ${result.severity}`}
+              aria-labelledby={timiScoreLabelId}
+            >
+              <div id={timiScoreLabelId} className="calc-score-label">
+                TIMI score
+              </div>
               <div className="calc-score-value">{result.total}</div>
               <div className="calc-score-interpretation">of 7 points</div>
             </div>
@@ -1858,7 +1874,7 @@ const TimiUaNstemiCalculator = ({ onResultChange }) => {
             <p>Check applicable criteria, then calculate</p>
           </div>
         )}
-      </div>
+      </CalcResultsPanel>
     </div>
   );
 };
@@ -1868,6 +1884,7 @@ const TimiUaNstemiCalculator = ({ onResultChange }) => {
  */
 const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
   const includeMeldNa = mode === 'meld-na';
+  const resultsRef = useRef(null);
   const [bilirubin, setBilirubin] = useState('');
   const [bilirubinUnit, setBilirubinUnit] = useState('mg_dl');
   const [inr, setInr] = useState('');
@@ -1892,6 +1909,10 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
     }
   }, [onResultChange, result]);
 
+  useEffect(() => {
+    if (result) scrollCalcResultsIntoView(resultsRef.current);
+  }, [result]);
+
   const runCalculate = () => {
     const raw = {
       bilirubin,
@@ -1903,8 +1924,18 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
       sodium: includeMeldNa ? sodium : undefined,
     };
     const out = computeMeldResult(raw, { includeMeldNa });
-    setValidationErrors(out.ok ? [] : out.errors);
-    setResult(out.ok ? out : null);
+    if (!out.ok) {
+      setValidationErrors(out.errors);
+      setResult(null);
+      focusFirstFieldById(
+        includeMeldNa
+          ? ['meld-bili', 'meld-inr', 'meld-cr', 'meld-sodium']
+          : ['meld-bili', 'meld-inr', 'meld-cr']
+      );
+      return;
+    }
+    setValidationErrors([]);
+    setResult(out);
   };
 
   const reset = () => {
@@ -1917,13 +1948,28 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
     setSodium('');
     setValidationErrors([]);
     setResult(null);
+    requestAnimationFrame(() => document.getElementById('meld-bili')?.focus());
   };
 
   const title = includeMeldNa ? 'MELD-Na' : 'MELD';
   const icon = getCalculatorSubIcon('meld');
   const formTitleId = includeMeldNa ? 'meld-na-form-title' : 'meld-form-title';
   const interpretationHeadingId = includeMeldNa ? 'meld-na-interpretation-heading' : 'meld-interpretation-heading';
+  const errorSummaryId = includeMeldNa ? 'meld-na-errors' : 'meld-errors';
+  const resultsPanelId = includeMeldNa ? 'calc-results-meld-na' : 'calc-results-meld';
+  const meldScoreLabelId = includeMeldNa ? 'meld-na-score-label' : 'meld-score-label';
   const hasValidationErrors = validationErrors.length > 0;
+  const fieldError = (pattern) =>
+    hasValidationErrors && validationErrors.some((err) => pattern.test(err));
+  const biliInvalid = !bilirubin.trim() || fieldError(/bilirubin/i);
+  const inrInvalid = !inr.trim() || fieldError(/\binr\b/i);
+  const crInvalid = !onDialysis && (!creatinine.trim() || fieldError(/creatinine|dialysis/i));
+  const sodiumInvalid = includeMeldNa && (!sodium.trim() || fieldError(/sodium/i));
+  const meldNaSecondaryScoreLabelId = includeMeldNa ? 'meld-na-lab-score-label' : null;
+
+  const clearValidationIfPresent = () => {
+    if (validationErrors.length > 0) setValidationErrors([]);
+  };
 
   return (
     <div className="calculator-interface calculator-interface--meld">
@@ -1951,7 +1997,12 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
           }}
         >
           {hasValidationErrors ? (
-            <div className="calc-validation-errors" role="alert" aria-live="assertive">
+            <div
+              id={errorSummaryId}
+              className="calc-validation-errors"
+              role="alert"
+              aria-live="assertive"
+            >
               <ul>
                 {validationErrors.map((err) => (
                   <li key={err}>{err}</li>
@@ -1975,11 +2026,15 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                 type="number"
                 min="0"
                 step="any"
-                className="calc-input-field"
+                className={calcFieldClass('calc-input-field', biliInvalid)}
                 value={bilirubin}
-                onChange={(e) => setBilirubin(e.target.value)}
+                onChange={(e) => {
+                  clearValidationIfPresent();
+                  setBilirubin(e.target.value);
+                }}
                 aria-required="true"
-                aria-invalid={hasValidationErrors && !bilirubin.trim()}
+                aria-invalid={biliInvalid}
+                aria-describedby={calcDescribedBy(hasValidationErrors ? errorSummaryId : null, 'meld-labs-legend')}
                 inputMode="decimal"
               />
               <select
@@ -2004,11 +2059,15 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
               type="number"
               min="0"
               step="any"
-              className="calc-input-field"
+              className={calcFieldClass('calc-input-field', inrInvalid)}
               value={inr}
-              onChange={(e) => setInr(e.target.value)}
+              onChange={(e) => {
+                clearValidationIfPresent();
+                setInr(e.target.value);
+              }}
               aria-required="true"
-              aria-invalid={hasValidationErrors && !inr.trim()}
+              aria-invalid={inrInvalid}
+              aria-describedby={calcDescribedBy(hasValidationErrors ? errorSummaryId : null)}
               inputMode="decimal"
             />
             <span className="calc-input-help">Values &lt;1.0 are floored to 1.0 for MELD.</span>
@@ -2024,12 +2083,19 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                 type="number"
                 min="0"
                 step="any"
-                className="calc-input-field"
+                className={calcFieldClass('calc-input-field', crInvalid)}
                 value={creatinine}
-                onChange={(e) => setCreatinine(e.target.value)}
+                onChange={(e) => {
+                  clearValidationIfPresent();
+                  setCreatinine(e.target.value);
+                }}
                 disabled={onDialysis}
                 aria-required={!onDialysis}
-                aria-invalid={hasValidationErrors && !onDialysis && !creatinine.trim()}
+                aria-invalid={crInvalid}
+                aria-describedby={calcDescribedBy(
+                  hasValidationErrors ? errorSummaryId : null,
+                  'meld-dialysis-help'
+                )}
                 inputMode="decimal"
               />
               <select
@@ -2049,7 +2115,10 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                 id="meld-dialysis"
                 className="calc-checkbox"
                 checked={onDialysis}
-                onChange={(e) => setOnDialysis(e.target.checked)}
+                onChange={(e) => {
+                  clearValidationIfPresent();
+                  setOnDialysis(e.target.checked);
+                }}
                 aria-describedby="meld-dialysis-help"
               />
               <label htmlFor="meld-dialysis" className="calc-checkbox-label">
@@ -2072,12 +2141,18 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
                 min="100"
                 max="180"
                 step="any"
-                className="calc-input-field"
+                className={calcFieldClass('calc-input-field', sodiumInvalid)}
                 value={sodium}
-                onChange={(e) => setSodium(e.target.value)}
+                onChange={(e) => {
+                  clearValidationIfPresent();
+                  setSodium(e.target.value);
+                }}
                 aria-required="true"
-                aria-describedby="meld-sodium-help"
-                aria-invalid={hasValidationErrors && !sodium.trim()}
+                aria-describedby={calcDescribedBy(
+                  'meld-sodium-help',
+                  hasValidationErrors ? errorSummaryId : null
+                )}
+                aria-invalid={sodiumInvalid}
                 inputMode="decimal"
               />
               <span id="meld-sodium-help" className="calc-input-help">
@@ -2100,20 +2175,30 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
         </form>
       </div>
 
-      <div className="calculator-results" aria-live="polite" aria-label={`${title} results`}>
+      <CalcResultsPanel id={resultsPanelId} resultsRef={resultsRef}>
         <ResultsPanelTitle />
 
         {result ? (
           <>
-            <div className={`calc-score-display ${result.severity}`}>
-              <div className="calc-score-label">Laboratory MELD</div>
+            <div
+              className={`calc-score-display ${result.severity}`}
+              aria-labelledby={meldScoreLabelId}
+            >
+              <div id={meldScoreLabelId} className="calc-score-label">
+                Laboratory MELD
+              </div>
               <div className="calc-score-value">{result.meld}</div>
               <div className="calc-score-interpretation">6–40 (UNOS laboratory model)</div>
             </div>
 
             {includeMeldNa && result.meldNa !== null ? (
-              <div className={`calc-score-display calc-score-display--secondary ${result.severity}`}>
-                <div className="calc-score-label">MELD-Na</div>
+              <div
+                className={`calc-score-display calc-score-display--secondary ${result.severity}`}
+                aria-labelledby={meldNaSecondaryScoreLabelId}
+              >
+                <div id={meldNaSecondaryScoreLabelId} className="calc-score-label">
+                  MELD-Na
+                </div>
                 <div className="calc-score-value">{result.meldNa}</div>
                 {result.sodiumUsed !== null ? (
                   <div className="calc-score-interpretation">
@@ -2177,7 +2262,7 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
             <p>Enter labs{includeMeldNa ? ' and sodium' : ''}, then calculate</p>
           </div>
         )}
-      </div>
+      </CalcResultsPanel>
     </div>
   );
 };

@@ -44,6 +44,20 @@ describe('timiUaNstemiCalculator', () => {
     expect(interpretTimiUaNstemi(7)?.severity).toBe('critical');
   });
 
+  it('applies interpretation thresholds at band boundaries', () => {
+    expect(interpretTimiUaNstemi(2)?.riskBand).toBe('0–2 points');
+    expect(interpretTimiUaNstemi(3)?.riskBand).toBe('3–4 points');
+    expect(interpretTimiUaNstemi(4)?.riskBand).toBe('3–4 points');
+    expect(interpretTimiUaNstemi(5)?.riskBand).toBe('5–7 points');
+  });
+
+  it('scores each criterion independently (one point each)', () => {
+    for (const row of TIMI_UA_NSTEMI_CRITERIA_META) {
+      const single = { ...none, [row.key]: true };
+      expect(calculateTimiUaNstemiScore(single)).toBe(1);
+    }
+  });
+
   it('includes ACS disclaimer without treatment directives', () => {
     const i = interpretTimiUaNstemi(4);
     expect(i.acsDisclaimer).toMatch(/does not recommend/i);

@@ -35,6 +35,9 @@ describe('GRACE ACS (Tier B chat-assisted) wiring', () => {
 
   it('exposes chat config with ACS risk stratification safety seed', () => {
     expect(graceAcsChatConfig.toolId).toBe(id);
+    expect(graceAcsChatConfig.description).toMatch(/risk stratification/i);
+    expect(graceAcsChatConfig.description).toMatch(/clinical decision support/i);
+    expect(graceAcsChatConfig.description).toMatch(/not a diagnosis/i);
     expect(graceAcsChatConfig.chatSeed).toMatch(/risk stratification support only/i);
     expect(graceAcsChatConfig.chatSeed).toMatch(/does not confirm or exclude ACS/i);
     expect(graceAcsChatConfig.chatSeed).toMatch(/Do not recommend specific treatments/i);
@@ -55,7 +58,8 @@ describe('GRACE ACS (Tier B chat-assisted) wiring', () => {
     expect(launch.path).toBe('/tools/calculators');
     expect(launch.registryId).toBe(id);
     expect(launch.chatSeed).toMatch(/GRACE ACS/i);
-    expect(launch.orchestratorTool).toBeUndefined();
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(launch.orchestratorTool).toBeNull();
 
     expect(NLU_TO_REGISTRY_ID.grace).toBe(id);
     expect(NLU_TO_REGISTRY_ID['grace score']).toBe(id);

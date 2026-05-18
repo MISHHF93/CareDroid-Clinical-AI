@@ -16,6 +16,8 @@ export const wellsPeChatConfig = {
   /** Starter prompt for dashboard / catalog chat launch */
   chatSeed: `Help me calculate the Wells score for suspected pulmonary embolism using a guided step-by-step approach.
 
+STEP 0 — Safety: If the patient is hemodynamically unstable, has arrest, or needs immediate resuscitation, activate emergency PE / critical-care pathways first. Do not delay urgent care to finish this chat.
+
 Ask me about each criterion in turn:
 1) Clinical signs or symptoms of DVT
 2) Whether PE is the most likely diagnosis

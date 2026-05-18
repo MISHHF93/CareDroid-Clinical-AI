@@ -2,7 +2,7 @@
  * Cross-layer PR3 coverage (mirrors pr2Coverage.test.js).
  * Formula / clinical edge cases: src/utils/*Calculator.test.js
  * Per-tool wiring: graceAcsWiring, nihssWiring, canadianCSpineWiring, ottawaAnkleWiring
- * Cross-cutting matrix: pr3Consistency.test.js
+ * Cross-cutting matrix: pr3Consistency.test.js, pr3Comprehensive.test.js
  */
 
 import { readFileSync } from 'node:fs';
@@ -194,8 +194,8 @@ describe('PR3 coverage — NLU alias matching & resolveCatalogLaunch', () => {
       expect(launch.path).toBe(cfg.hubPath);
       expect(launch.registryId).toBe(id);
       expect(launch.chatSeed).toBe(cfg.chatSeed);
-      expect(launch.openLabel).toBe('Open');
-      expect(launch.orchestratorTool).toBeUndefined();
+      expect(launch.openLabel).toBe('Start guided chat');
+      expect(launch.orchestratorTool).toBeNull();
     }
   });
 

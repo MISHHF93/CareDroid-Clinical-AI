@@ -13,9 +13,23 @@ import {
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
+import toolRegistry from './toolRegistry';
+import {
+  TIMI_REQUIRED_NLU_ALIAS_PAIRS,
+  TIMI_REGISTRY_ID,
+  TIMI_ROUTE,
+  TIMI_CATALOG_SEARCH_QUERIES,
+} from './pr2TimiTestConstants';
+import { catalogRowsMatchingQuery } from '../utils/catalogSearch';
+import {
+  CALCULATOR_ROUTE_DEFS,
+  expectedLaunchPath,
+  matchCalculatorRoute,
+} from '../routes/clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
 const patternsSource = readFileSync(
   join(
     __dirname,
@@ -87,5 +101,42 @@ describe('TIMI UA/NSTEMI calculator wiring', () => {
     expect(resolveRegistryId('timi')).toBe(id);
     expect(resolveRegistryId('timi-score')).toBe(id);
     expect(resolveRegistryId('timi-nstemi')).toBe(id);
+  });
+
+  it.each(TIMI_REQUIRED_NLU_ALIAS_PAIRS)(
+    'NLU_TO_REGISTRY_ID maps "%s" → %s',
+    (alias, canonical) => {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
+      expect(resolveRegistryId(alias)).toBe(canonical);
+    }
+  );
+
+  it('registers CalculatorInterface case and App deep link', () => {
+    expect(appSource).toContain(`path: '${TIMI_ROUTE}'`);
+    expect(appSource).toContain(`initialCalculatorId="${TIMI_REGISTRY_ID}"`);
+    expect(calculatorsSource).toMatch(/case\s+'timi-ua-nstemi'\s*:/);
+    expect(calculatorsSource).toContain('calc-results-timi');
+    expect(calculatorsSource).toContain('timiScoreLabelId');
+  });
+
+  it('clinicalToolRoutes resolves TIMI deep link', () => {
+    expect(matchCalculatorRoute(TIMI_ROUTE)?.calculatorSlug).toBe(TIMI_REGISTRY_ID);
+    expect(expectedLaunchPath(TIMI_REGISTRY_ID)).toBe(TIMI_ROUTE);
+    expect(CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === TIMI_REGISTRY_ID)?.path).toBe(
+      TIMI_ROUTE
+    );
+  });
+
+  it.each(TIMI_CATALOG_SEARCH_QUERIES)(
+    'catalog search for %s finds primary via "%s"',
+    (primaryId, query) => {
+      const rows = getMedicalToolsCatalogRows();
+      const hits = catalogRowsMatchingQuery(rows, query);
+      expect(hits.some((r) => r.primaryId === primaryId)).toBe(true);
+    }
+  );
+
+  it('lists timi-ua-nstemi in toolRegistry export', () => {
+    expect(toolRegistry.some((t) => t.id === TIMI_REGISTRY_ID)).toBe(true);
   });
 });

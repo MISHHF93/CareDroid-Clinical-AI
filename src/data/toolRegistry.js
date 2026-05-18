@@ -348,7 +348,7 @@ const toolRegistry = [
     panelTool: 'calculators',
     color: '#C45C5C',
     description:
-      'GRACE ACS mortality risk stratification (chat-assisted; prognosis support, not ACS diagnosis)',
+      'GRACE ACS mortality risk stratification (clinical decision support; not ACS diagnosis or treatment)',
     shortcut: 'Ctrl+Shift+G',
     category: 'Calculator',
     features: [
@@ -405,12 +405,12 @@ const toolRegistry = [
   },
   {
     id: 'nihss',
-    name: 'NIHSS',
+    name: 'NIH Stroke Scale (NIHSS)',
     path: '/tools/calculators',
     panelTool: 'calculators',
     color: '#6B7FD4',
     description:
-      'NIH Stroke Scale — neurologic deficit scoring (chat-assisted; does not replace urgent stroke evaluation)',
+      'NIH Stroke Scale — neurologic deficit scoring (clinical decision support; does not replace urgent stroke care)',
     shortcut: 'Ctrl+Shift+I',
     category: 'Calculator',
     features: [
@@ -428,7 +428,7 @@ const toolRegistry = [
     panelTool: 'calculators',
     color: '#7A9E8E',
     description:
-      'Cervical spine imaging decision support in alert, stable blunt trauma (chat-assisted; not c-spine clearance)',
+      'Cervical spine imaging decision support — alert, stable blunt trauma only (not c-spine clearance)',
     shortcut: 'Ctrl+Shift+C',
     category: 'Calculator',
     features: ['High-risk factors', 'Low-risk criteria', 'Active ROM 45°', 'Applicability checks'],
@@ -441,7 +441,7 @@ const toolRegistry = [
     panelTool: 'calculators',
     color: '#8E9A7A',
     description:
-      'Ottawa ankle/foot radiography rules after acute injury (chat-assisted; not fracture clearance)',
+      'Ottawa ankle/foot radiography rules — acute injury only (clinical decision support; not fracture clearance)',
     shortcut: 'Ctrl+Shift+O',
     category: 'Calculator',
     features: ['Malleolar zone', 'Midfoot zone', 'Weight bearing', 'Separate ankle/foot x-ray'],

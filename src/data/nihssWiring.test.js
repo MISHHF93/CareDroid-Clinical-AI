@@ -35,9 +35,14 @@ describe('NIHSS (Tier B chat-assisted) wiring', () => {
 
   it('exposes chat config with stroke safety seed', () => {
     expect(nihssChatConfig.toolId).toBe(id);
+    expect(nihssChatConfig.description).toMatch(/clinical decision support/i);
+    expect(nihssChatConfig.description).toMatch(/does not replace urgent stroke evaluation/i);
     expect(nihssChatConfig.chatSeed).toMatch(/domain-by-domain/i);
+    expect(nihssChatConfig.chatSeed).toMatch(/STEP 0/i);
     expect(nihssChatConfig.chatSeed).toMatch(/does not replace urgent stroke evaluation/i);
     expect(nihssChatConfig.chatSeed).toMatch(/Do not delay or defer emergency stroke pathways/i);
+    expect(nihssChatConfig.chatSeed).toMatch(/Remain informational and documentation-focused/i);
+    expect(nihssChatConfig.guidedDomains).toHaveLength(15);
     expect(nihssChatConfig.chatSeed).not.toMatch(/\*\*/);
   });
 
@@ -55,13 +60,18 @@ describe('NIHSS (Tier B chat-assisted) wiring', () => {
     expect(launch.path).toBe('/tools/calculators');
     expect(launch.registryId).toBe(id);
     expect(launch.chatSeed).toMatch(/NIH Stroke Scale/i);
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(launch.orchestratorTool).toBeNull();
 
     expect(NLU_TO_REGISTRY_ID.nihss).toBe(id);
     expect(NLU_TO_REGISTRY_ID['nih stroke scale']).toBe(id);
+    expect(NLU_TO_REGISTRY_ID['national institutes of health stroke scale']).toBe(id);
     expect(NLU_TO_REGISTRY_ID['stroke scale']).toBe(id);
     expect(NLU_TO_REGISTRY_ID['stroke severity score']).toBe(id);
     expect(resolveRegistryId('nih-stroke-scale')).toBe(id);
+    expect(resolveRegistryId('national-institutes-of-health-stroke-scale')).toBe(id);
     expect(resolveCatalogLaunch('stroke-severity-score').registryId).toBe(id);
+    expect(resolveCatalogLaunch('stroke scale').registryId).toBe(id);
   });
 
   it('includes registry, discovery, and catalog rows', () => {

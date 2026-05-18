@@ -131,6 +131,35 @@ describe('clinicalSafetyGuardrails — Tier B hub tools', () => {
   );
 });
 
+describe('clinicalSafetyGuardrails — PR3 stroke and trauma', () => {
+  it.each(['nihss', 'canadian-c-spine', 'ottawa-ankle'])(
+    '%s chat seed includes urgent-care warning',
+    (id) => {
+      const seed = resolveCatalogLaunch(id).chatSeed || '';
+      expect(SAFETY_AUDIT_PATTERNS.URGENT_CARE_RE.test(seed)).toBe(true);
+    }
+  );
+
+  it.each(['grace-acs', 'nihss'])('%s avoids diagnostic certainty phrasing', (id) => {
+    const seed = resolveCatalogLaunch(id).chatSeed || '';
+    expect(seed).not.toMatch(SAFETY_AUDIT_PATTERNS.PE_ACS_CERTAINTY_FORBIDDEN_RE);
+  });
+
+  it('Canadian C-Spine seed does not claim cervical spine clearance', () => {
+    const seed = resolveCatalogLaunch('canadian-c-spine').chatSeed || '';
+    expect(seed).toMatch(/does not "clear" the cervical spine/i);
+    expect(seed).not.toMatch(/\bcleared the cervical spine\b/i);
+  });
+
+  it('Ottawa Ankle seed is scoped to acute injury with hard-stop warnings', () => {
+    const seed = resolveCatalogLaunch('ottawa-ankle').chatSeed || '';
+    expect(seed).toMatch(/acute ankle/i);
+    expect(seed).toMatch(/neurovascular compromise/i);
+    expect(seed).toMatch(/open fracture/i);
+    expect(seed).toMatch(/gross deformity/i);
+  });
+});
+
 describe('clinicalSafetyGuardrails — tool registry coverage', () => {
   it('every shipped clinical tool registry row has description', () => {
     for (const tool of toolRegistry) {
