@@ -3,7 +3,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
-import { graceAcsChatConfig } from './chatAssistedCalculators/graceAcs';
+import {
+  graceAcsChatConfig,
+  GRACE_ACS_REQUIRED_NLU_ALIASES,
+} from './chatAssistedCalculators/graceAcs';
 import {
   resolveCatalogLaunch,
   NLU_TO_REGISTRY_ID,
@@ -53,21 +56,23 @@ describe('GRACE ACS (Tier B chat-assisted) wiring', () => {
     expect(appSource).not.toContain("path: '/tools/calculators/grace-acs'");
   });
 
-  it('resolves launch and NLU aliases', () => {
-    const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe('/tools/calculators');
-    expect(launch.registryId).toBe(id);
-    expect(launch.chatSeed).toMatch(/GRACE ACS/i);
-    expect(launch.openLabel).toBe('Start guided chat');
-    expect(launch.orchestratorTool).toBeNull();
+  it.each(GRACE_ACS_REQUIRED_NLU_ALIASES)(
+    'resolves required NLU alias "%s" to grace-acs with hub launch',
+    (alias) => {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(id);
+      const launch = resolveCatalogLaunch(alias);
+      expect(launch.path).toBe('/tools/calculators');
+      expect(launch.registryId).toBe(id);
+      expect(launch.openLabel).toBe('Start guided chat');
+      expect(launch.orchestratorTool).toBeNull();
+      expect(launch.chatSeed).toMatch(/GRACE ACS/i);
+    }
+  );
 
-    expect(NLU_TO_REGISTRY_ID.grace).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['grace score']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['grace acs']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['acs mortality risk']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['acute coronary syndrome risk']).toBe(id);
+  it('resolves discovery slug aliases to grace-acs', () => {
     expect(resolveRegistryId('grace-score')).toBe(id);
     expect(resolveCatalogLaunch('acs-mortality-risk').registryId).toBe(id);
+    expect(resolveCatalogLaunch('acute-coronary-syndrome-risk').registryId).toBe(id);
   });
 
   it('includes registry, discovery, and catalog rows', () => {

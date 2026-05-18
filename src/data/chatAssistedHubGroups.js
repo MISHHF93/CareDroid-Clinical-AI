@@ -8,21 +8,21 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     groupId: 'cardiac',
     heading: 'Acute coronary syndrome',
     lead:
-      'GRACE supports ACS mortality risk stratification (decision support only). It does not diagnose or rule out ACS. Unstable patients, STEMI, shock, or arrest need immediate local ACS/STEMI pathways — do not delay emergency care to finish chat.',
+      'GRACE supports ACS mortality risk stratification (clinical decision support only). It does not diagnose ACS, does not confirm or exclude acute coronary syndrome, and does not recommend treatments. Unstable patients, STEMI, shock, or arrest need immediate local ACS/STEMI pathways — do not delay emergency care to finish chat.',
     toolIds: ['grace-acs'],
   },
   {
     groupId: 'neurology',
     heading: 'Acute stroke severity (NIHSS)',
     lead:
-      'NIHSS documents neurologic deficit severity on exam. Suspected acute stroke requires emergency stroke pathways, imaging, and stroke team activation first — do not defer urgent care to complete scoring in chat.',
+      'NIHSS documents neurologic deficit severity on exam (clinical decision support only). It does not diagnose stroke and does not determine treatment. Suspected acute stroke requires emergency stroke pathways, imaging, and stroke team activation first — do not defer urgent care to complete scoring in chat.',
     toolIds: ['nihss'],
   },
   {
     groupId: 'trauma',
     heading: 'Trauma imaging decision support',
     lead:
-      'Canadian C-Spine and Ottawa ankle/foot rules support selected imaging decisions. They do not clear the spine, prove absence of fracture, or replace primary trauma survey — unstable or hard-stop presentations need full evaluation without delay.',
+      'Canadian C-Spine and Ottawa ankle/foot rules support selected imaging decisions (clinical decision support only). They do not clear the spine, prove absence of fracture, or rule out injury with certainty. Unstable patients, neurovascular compromise, open fractures, and severe trauma need full evaluation without delay — do not defer urgent care to finish chat.',
     toolIds: ['canadian-c-spine', 'ottawa-ankle'],
   },
   {

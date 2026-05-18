@@ -1,77 +1,77 @@
 # Tier roadmap — PR3 tools (future Tier A and Tier C)
 
-**Context:** PR3 ships all four tools as **Tier B** (hub + guided chat). Client-side utils exist for deterministic testing and future promotion. This document supports backlog grooming and governance conversations—not commitments in PR3.
+**Context:** PR3 ships all four tools as **Tier B** (hub + guided chat + dashboard navigation). Client-side utils support deterministic testing and future promotion. This document supports backlog grooming and governance—not commitments in PR3.
 
 ---
 
-## Current state (PR3 merged)
+## Current state (PR3)
 
-| Registry ID | Tier | Route | Scoring in UI |
-|-------------|------|-------|----------------|
-| `grace-acs` | B | `/tools/calculators` | Chat-guided; utils in `graceAcsCalculator.js` |
-| `nihss` | B | `/tools/calculators` | Chat-guided; utils in `nihssCalculator.js` |
-| `canadian-c-spine` | B | `/tools/calculators` | Chat-guided; utils in `canadianCSpineCalculator.js` |
-| `ottawa-ankle` | B | `/tools/calculators` | Chat-guided; utils in `ottawaAnkleCalculator.js` |
+| Registry ID | Tier | Catalog path | Navigation (chat) | Scoring in UI |
+|-------------|------|--------------|-------------------|----------------|
+| `grace-acs` | B | `/tools/calculators` | `/dashboard` | Chat-guided; `graceAcsCalculator.js` |
+| `nihss` | B | `/tools/calculators` | `/dashboard` | Chat-guided; `nihssCalculator.js` |
+| `canadian-c-spine` | B | `/tools/calculators` | `/dashboard` | Chat-guided; `canadianCSpineCalculator.js` |
+| `ottawa-ankle` | B | `/tools/calculators` | `/dashboard` | Chat-guided; `ottawaAnkleCalculator.js` |
 
 ---
 
 ## Future Tier A candidates
 
-Tier A = dedicated `/tools/calculators/{slug}`, `Calculators.jsx` form, `builtinUiCalculators` row, `openLabel: "Open"`, `uiCalculatorSlug` set in catalog.
+**Tier A** = dedicated `/tools/calculators/{slug}`, `Calculators.jsx` form, `builtinUiCalculators` row, `openLabel: "Open"`, `uiCalculatorSlug` in catalog, `resolveCatalogLaunch` returns dedicated path (Tier-A navigation keeps `launch.path`).
 
-Promote when: institution requires structured bedside documentation, offline form completion, or audit trail of field-level inputs independent of LLM transcript.
+**Promote when:** institution requires structured bedside documentation, offline field capture, or audit trail of inputs independent of LLM transcript.
 
-| Tool | Tier A rationale | Implementation notes | Priority |
-|------|------------------|----------------------|----------|
-| **NIHSS** | Highest clinical demand for itemized exam capture; 15 domains map cleanly to form fields | Reuse `nihssCalculator.js`; wizard or checkbox grid; preserve STEP 0 stroke gate on form mount | **P1** |
-| **GRACE ACS** | Admission variables are finite; form reduces unit errors (creatinine units, Killip class) | Reuse `graceAcsCalculator.js`; mode toggle mg/dL vs µmol/L; ACS disclaimer banner | **P2** |
-| **Canadian C-Spine** | High-risk / low-risk / ROM checklist fits fieldset UI | Reuse `canadianCSpineCalculator.js`; applicability banner before criteria | **P2** |
-| **Ottawa Ankle** | Ankle vs foot zones + weight-bearing map to compact form | Reuse `ottawaAnkleCalculator.js`; hard-stop panel above criteria | **P3** |
+| Tool | Rationale | Implementation notes | Priority |
+|------|-----------|----------------------|----------|
+| **NIHSS** | Highest demand for itemized exam capture; 15 domains map to form fields | Reuse `nihssCalculator.js`; preserve STEP 0 stroke gate on mount | **P1** |
+| **GRACE ACS** | Finite admission variables; form reduces unit errors (creatinine, Killip) | Reuse `graceAcsCalculator.js`; mg/dL vs µmol/L toggle; ACS disclaimer banner | **P2** |
+| **Canadian C-Spine** | High/low-risk / ROM checklist fits fieldset UI | Reuse `canadianCSpineCalculator.js`; applicability banner first | **P2** |
+| **Ottawa Ankle** | Ankle vs foot zones + weight-bearing → compact form | Reuse `ottawaAnkleCalculator.js`; hard-stop panel above criteria | **P3** |
 
-**Tier A non-goals:** Do not auto-promote solely because utils exist—chat workflow may remain preferred for documentation flexibility.
+**Do not promote solely because utils exist** — chat may remain preferred for narrative documentation.
 
-**Migration checklist (any Tier A promotion):**
+**Tier A migration checklist (any tool):**
 
 1. Add `CALCULATOR_ROUTE_DEFS` + `App.jsx` route with `initialCalculatorId`  
 2. Set `toolRegistry.initialCalc` and dedicated `path`  
-3. Flip catalog `chatOnlyForm: false`, set `uiCalculatorSlug`  
-4. Update `resolveCatalogLaunch` to return dedicated path + `openLabel: "Open"`  
-5. Extend `pr*N*Comprehensive` and wiring tests (mirror PR2 MELD/TIMI pattern)  
-6. Re-run clinical governance checklist for form-level copy  
+3. Catalog: `chatOnlyForm: false`, set `uiCalculatorSlug`  
+4. `resolveCatalogLaunch` → dedicated path + `openLabel: "Open"`  
+5. Extend PR3 tests (mirror PR2 MELD/TIMI pattern)  
+6. Re-sign clinical governance for form-level copy  
 
 ---
 
 ## Future Tier C candidates
 
-Tier C = Nest `registerTool()` + `POST /tools/:id/execute`, optional `tool_results` persistence, server-attested scoring.
+**Tier C** = Nest `registerTool()` + `POST /tools/:id/execute`, optional `tool_results` persistence, server-attested scoring.
 
-Promote when: external EHR/API integrators require execute endpoint, institutional policy mandates server-side score logging, or native clients cannot ship shared JS formula module.
+**Promote when:** EHR/API integrators require execute endpoint, institutional policy mandates server-side score logging, or native clients cannot ship shared JS formula module.
 
-| Tool | Proposed executor id | Tier C justification | PR3 decision |
-|------|---------------------|----------------------|--------------|
-| **GRACE ACS** | `grace-acs-calculator` (or `grace-acs-risk`) | API attestation of GRACE 2.0 outputs; map `grace-acs` registry → executor in `REGISTRY_ID_TO_ORCHESTRATOR_TOOL` | **Deferred** — client utils sufficient |
-| **NIHSS** | `nihss-calculator` | Server-side NIHSS total for EMR write-back | **Deferred** — governance for item-level attestation needed first |
-| **Canadian C-Spine** | `ccr-calculator` | Executable trauma workflow with audit log | **Deferred** — local trauma governance required |
+| Tool | Proposed executor id | Justification | PR3 decision |
+|------|---------------------|---------------|--------------|
+| **GRACE ACS** | `grace-acs-calculator` | API attestation of GRACE 2.0; EMR write-back | **Deferred** |
+| **NIHSS** | `nihss-calculator` | Server NIHSS total for EMR | **Deferred** — item attestation governance first |
+| **Canadian C-Spine** | `ccr-calculator` | Executable trauma workflow + audit log | **Deferred** — local trauma governance |
 | **Ottawa Ankle** | `ottawa-ankle-calculator` | Same as CCR | **Deferred** |
 
 **Tier C implementation pattern (when triggered):**
 
-1. Extract shared formula package (TS) consumed by Nest executor and optionally retained in SPA  
-2. `registerTool()` in `tool-orchestrator.service.ts` with validation + deterministic flag  
+1. Shared formula package (TS) for Nest + optional SPA  
+2. `registerTool()` with validation + deterministic flag  
 3. Remove id from `NLU_TOOL_IDS_WITHOUT_EXECUTOR` only after contract tests pass  
-4. Document request/response schema in `EXECUTOR_REQUEST_CONTRACTS`  
+4. Document schema in `EXECUTOR_REQUEST_CONTRACTS`  
 5. Clinical governance re-sign for server-attested outputs  
 
-**Do not promote to Tier C for:** formula complexity alone, marketing "server calculated" badge, or duplicating chat without persistence requirement.
+**Do not promote for:** formula complexity alone, “server calculated” marketing, or duplicating chat without persistence requirement.
 
 ---
 
-## Tools that should remain Tier B
+## Tools that should remain Tier B (near term)
 
 | Tool | Reason |
 |------|--------|
-| GRACE ACS (short term) | Conversational collection of Killip / arrest context may be faster than form for some users |
-| Canadian C-Spine / Ottawa (short term) | Applicability narrative and hard-stop counseling fit chat; executable trauma without governance is high risk |
+| GRACE ACS | Conversational Killip / arrest context may be faster than form for some workflows |
+| Canadian C-Spine / Ottawa | Applicability narrative and hard-stop counseling fit chat; executable trauma without governance is high risk |
 
 ---
 
@@ -79,9 +79,9 @@ Promote when: external EHR/API integrators require execute endpoint, institution
 
 | Dependency | Impact |
 |------------|--------|
-| PR2 Wells / PERC | Same hub PE group; no ID collision with PR3 |
-| PR6 COPD GOLD / PR7 Rome IV | Independent Tier-B; shared hub layout patterns |
-| Production hardening | `resolveCatalogLaunch`, alias sync, safety guardrails |
+| PR2 Wells / PERC | Same hub PE group; no ID collision |
+| PR6 COPD GOLD / PR7 Rome IV | Independent Tier-B; shared hub patterns |
+| Production hardening | `resolveCatalogLaunch`, `resolveNavigationPathForLaunch`, alias sync, safety guardrails |
 
 ---
 

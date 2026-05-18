@@ -3,7 +3,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
-import { canadianCSpineChatConfig } from './chatAssistedCalculators/canadianCSpine';
+import {
+  canadianCSpineChatConfig,
+  CANADIAN_C_SPINE_REQUIRED_NLU_ALIASES,
+} from './chatAssistedCalculators/canadianCSpine';
 import {
   resolveCatalogLaunch,
   NLU_TO_REGISTRY_ID,
@@ -61,24 +64,25 @@ describe('Canadian C-Spine Rule (Tier B chat-assisted) wiring', () => {
     expect(appSource).not.toContain("path: '/tools/calculators/canadian-c-spine'");
   });
 
-  it('resolves launch and NLU aliases', () => {
-    const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe('/tools/calculators');
-    expect(launch.registryId).toBe(id);
-    expect(launch.chatSeed).toMatch(/Canadian C-Spine Rule/i);
-    expect(launch.openLabel).toBe('Start guided chat');
-    expect(launch.orchestratorTool).toBeNull();
+  it.each(CANADIAN_C_SPINE_REQUIRED_NLU_ALIASES)(
+    'resolves required NLU alias "%s" to canadian-c-spine with hub launch',
+    (alias) => {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(id);
+      const launch = resolveCatalogLaunch(alias);
+      expect(launch.path).toBe('/tools/calculators');
+      expect(launch.registryId).toBe(id);
+      expect(launch.openLabel).toBe('Start guided chat');
+      expect(launch.orchestratorTool).toBeNull();
+      expect(launch.chatSeed).toMatch(/Canadian C-Spine Rule/i);
+    }
+  );
 
-    expect(NLU_TO_REGISTRY_ID['canadian c spine']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['canadian c-spine rule']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['c spine rule']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['cervical spine rule']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['neck trauma imaging rule']).toBe(id);
+  it('resolves discovery slug aliases to canadian-c-spine', () => {
     expect(resolveRegistryId('c-spine-rule')).toBe(id);
     expect(resolveRegistryId('canadian-c-spine-rule')).toBe(id);
     expect(resolveRegistryId('neck-trauma-imaging-rule')).toBe(id);
     expect(resolveCatalogLaunch('cervical-spine-rule').registryId).toBe(id);
-    expect(resolveCatalogLaunch('neck trauma imaging rule').registryId).toBe(id);
+    expect(NLU_TO_REGISTRY_ID['canadian-c-spine']).toBe(id);
   });
 
   it('includes registry, discovery, and catalog rows', () => {

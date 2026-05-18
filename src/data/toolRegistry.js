@@ -343,7 +343,7 @@ const toolRegistry = [
   },
   {
     id: 'grace-acs',
-    name: 'GRACE ACS',
+    name: 'GRACE ACS Risk',
     path: '/tools/calculators',
     panelTool: 'calculators',
     color: '#C45C5C',
@@ -428,7 +428,7 @@ const toolRegistry = [
     panelTool: 'calculators',
     color: '#7A9E8E',
     description:
-      'Cervical spine imaging decision support — alert, stable blunt trauma only (not c-spine clearance)',
+      'Cervical spine imaging decision support for alert, stable blunt trauma (clinical decision support; not c-spine clearance)',
     shortcut: 'Ctrl+Shift+C',
     category: 'Calculator',
     features: ['High-risk factors', 'Low-risk criteria', 'Active ROM 45°', 'Applicability checks'],

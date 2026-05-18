@@ -1,8 +1,9 @@
 /**
  * Cross-layer PR3 coverage (mirrors pr2Coverage.test.js).
+ * Ten-area matrix: pr3TenAreaCoverage.test.js
  * Formula / clinical edge cases: src/utils/*Calculator.test.js
  * Per-tool wiring: graceAcsWiring, nihssWiring, canadianCSpineWiring, ottawaAnkleWiring
- * Cross-cutting matrix: pr3Consistency.test.js, pr3Comprehensive.test.js
+ * Cross-cutting matrix: pr3Consistency.test.js, pr3Comprehensive.test.js, pr3LaunchAudit.test.js
  */
 
 import { readFileSync } from 'node:fs';
@@ -17,6 +18,7 @@ import {
 } from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   resolveRegistryId,
   NLU_TO_REGISTRY_ID,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
@@ -199,10 +201,16 @@ describe('PR3 coverage — NLU alias matching & resolveCatalogLaunch', () => {
     }
   });
 
+  it.each(PR3_TOOL_IDS)('resolveNavigationPathForLaunch(%s) routes guided chat to dashboard', (id) => {
+    const launch = resolveCatalogLaunch(id);
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+  });
+
   it('returns empty launch for falsy or unknown ids without throwing', () => {
     expect(resolveCatalogLaunch('')).toEqual(PR3_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(PR3_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch('not-a-pr3-tool-xyz').path).toBeNull();
+    expect(resolveNavigationPathForLaunch(resolveCatalogLaunch('not-a-pr3-tool-xyz'))).toBeNull();
   });
 
   it('separates stroke scale (NIHSS) from cervical spine rule aliases', () => {

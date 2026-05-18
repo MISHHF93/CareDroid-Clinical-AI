@@ -106,6 +106,8 @@ describe('PR3 accessibility — launch labels and hub UI', () => {
     expect(calculatorsCss).toMatch(/@media \(max-width: 480px\)[\s\S]*min-height: 48px/);
     expect(calculatorsCss).toContain('overflow-wrap: anywhere');
     expect(calculatorsCss).toContain('prefers-reduced-motion');
+    expect(calculatorsCss).toContain('safe-area-inset');
+    expect(calculatorsSource).toContain('aria-hidden="true"');
   });
 });
 
@@ -117,7 +119,7 @@ describe('PR3 clinical safety — registry and catalog labels', () => {
   });
 
   it('uses clear sidebar names for PR3 tools', () => {
-    expect(toolRegistryById['grace-acs']?.name).toBe('GRACE ACS');
+    expect(toolRegistryById['grace-acs']?.name).toMatch(/GRACE ACS/i);
     expect(toolRegistryById.nihss?.name).toMatch(/NIH Stroke Scale/i);
     expect(toolRegistryById['canadian-c-spine']?.name).toMatch(/Canadian C-Spine/i);
     expect(toolRegistryById['ottawa-ankle']?.name).toMatch(/Ottawa Ankle/i);
@@ -198,8 +200,40 @@ describe('PR3 launch flow — hub path without dashboard fallback for PR3', () =
     expect(launch.chatSeed?.length).toBeGreaterThan(80);
   });
 
-  it('hub launch handler prefers tool path over dashboard', () => {
-    expect(calculatorsSource).toMatch(/navigate\(launch\.path \|\| '\/dashboard'\)/);
+  it('hub launch handler routes chat-assisted tools to dashboard for visible conversation', () => {
+    expect(calculatorsSource).toContain('resolveNavigationPathForLaunch(launch)');
     expect(calculatorsSource).toContain('resolveCatalogLaunch(toolId)');
+    expect(calculatorsSource).not.toMatch(/navigate\(launch\.path \|\| '\/dashboard'\)/);
+  });
+
+  it('catalog launch uses resolveNavigationPathForLaunch for hub chat tools', () => {
+    const catalogSource = readFileSync(
+      join(__dirname, '../pages/tools/ClinicalToolCatalog.jsx'),
+      'utf8'
+    );
+    expect(catalogSource).toContain('resolveNavigationPathForLaunch(launch)');
+  });
+});
+
+describe('PR3 clinical safety — hub group leads', () => {
+  it('cardiac group lead avoids diagnostic certainty and treatment directives', () => {
+    const cardiac = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'cardiac');
+    expect(cardiac.lead).toMatch(/clinical decision support only/i);
+    expect(cardiac.lead).toMatch(/does not confirm or exclude/i);
+    expect(cardiac.lead).not.toMatch(TREATMENT_PATTERN);
+  });
+
+  it('neurology group lead prioritizes stroke pathways over chat', () => {
+    const neuro = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'neurology');
+    expect(neuro.lead).toMatch(/does not diagnose stroke/i);
+    expect(neuro.lead).toMatch(/do not defer urgent care/i);
+  });
+
+  it('trauma group lead covers hard stops and does not claim clearance', () => {
+    const trauma = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'trauma');
+    expect(trauma.lead).toMatch(/neurovascular compromise/i);
+    expect(trauma.lead).toMatch(/open fracture/i);
+    expect(trauma.lead).toMatch(/do not defer urgent care/i);
+    expect(trauma.lead).toMatch(/rule out injury with certainty/i);
   });
 });

@@ -1,12 +1,17 @@
 import { matchToolPatterns } from '../src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns';
 
-describe('matchToolPatterns — GRACE ACS', () => {
-  it('matches grace and acs mortality risk phrases', () => {
-    const a = matchToolPatterns('calculate grace acs risk');
-    expect(a.some((m) => m.toolId === 'grace-acs')).toBe(true);
+const GRACE_ACS_REQUIRED_PHRASES = [
+  'grace',
+  'grace score',
+  'grace acs',
+  'acs mortality risk',
+  'acute coronary syndrome risk',
+] as const;
 
-    const b = matchToolPatterns('acs mortality risk score');
-    expect(b.some((m) => m.toolId === 'grace-acs')).toBe(true);
+describe('matchToolPatterns — GRACE ACS', () => {
+  it.each(GRACE_ACS_REQUIRED_PHRASES)('matches required phrase "%s"', (phrase) => {
+    const matches = matchToolPatterns(`calculate ${phrase}`);
+    expect(matches.some((m) => m.toolId === 'grace-acs')).toBe(true);
   });
 
   it('prefers grace-acs over timi-ua-nstemi for grace acs wording', () => {

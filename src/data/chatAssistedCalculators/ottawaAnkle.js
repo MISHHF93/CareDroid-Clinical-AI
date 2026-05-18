@@ -7,6 +7,15 @@
 
 export const OTTAWA_ANKLE_TOOL_ID = 'ottawa-ankle';
 
+/** Product-required NLU phrases → `ottawa-ankle` (also in `NLU_TO_REGISTRY_ID`). */
+export const OTTAWA_ANKLE_REQUIRED_NLU_ALIASES = Object.freeze([
+  'ottawa ankle',
+  'ottawa ankle rule',
+  'ankle xray rule',
+  'ankle injury imaging',
+  'foot xray rule',
+]);
+
 export const ottawaAnkleChatConfig = {
   toolId: OTTAWA_ANKLE_TOOL_ID,
   name: 'Ottawa Ankle Rule',

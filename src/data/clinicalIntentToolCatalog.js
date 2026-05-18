@@ -267,7 +267,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: nihssChatConfig.toolId,
-    toolName: 'NIH Stroke Scale (NIHSS)',
+    toolName: nihssChatConfig.name,
     category: nihssChatConfig.category,
     description: nihssChatConfig.description,
     path: nihssChatConfig.hubPath,
@@ -277,7 +277,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: canadianCSpineChatConfig.toolId,
-    toolName: 'Canadian C-Spine Rule',
+    toolName: canadianCSpineChatConfig.name,
     category: canadianCSpineChatConfig.category,
     description: canadianCSpineChatConfig.description,
     path: canadianCSpineChatConfig.hubPath,
@@ -287,7 +287,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: ottawaAnkleChatConfig.toolId,
-    toolName: 'Ottawa Ankle Rule',
+    toolName: ottawaAnkleChatConfig.name,
     category: ottawaAnkleChatConfig.category,
     description: ottawaAnkleChatConfig.description,
     path: ottawaAnkleChatConfig.hubPath,

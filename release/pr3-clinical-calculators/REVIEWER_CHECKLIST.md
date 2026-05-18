@@ -2,70 +2,72 @@
 
 **PR title:** Add GRACE ACS, NIHSS, Canadian C-Spine, and Ottawa Ankle Clinical Tools
 
-Use with `release/pr3-clinical-calculators/PR_BODY.md`.
+Use with [`PR_BODY.md`](./PR_BODY.md). Mark items before merge.
 
 ---
 
 ## Pre-review
 
-- [ ] PR does **not** include `backend/dist/`, `.env`, credentials, or unrelated refactors
-- [ ] No new `registerTool()` handlers added (Tier C unchanged)
-- [ ] Scope limited to four registry ids: `grace-acs`, `nihss`, `canadian-c-spine`, `ottawa-ankle`
+- [ ] No `backend/dist/`, `.env`, credentials, or unrelated refactors
+- [ ] No new `registerTool()` handlers (Tier C unchanged)
+- [ ] Scope limited to: `grace-acs`, `nihss`, `canadian-c-spine`, `ottawa-ankle`
 
 ---
 
 ## Architecture & contracts
 
-- [ ] `PR3_CALCULATOR_REGISTRY_IDS` frozen in `clinicalToolIdContract.js` matches four tools above
+- [ ] `PR3_CALCULATOR_REGISTRY_IDS` in `clinicalToolIdContract.js` matches four ids above
 - [ ] All four in `PR3_TIER_B_CHAT_CALCULATOR_IDS` and `TIER_B_CHAT_CALCULATOR_REGISTRY_IDS`
-- [ ] All four in backend `NLU_TOOL_IDS_WITHOUT_EXECUTOR` (`tool-orchestrator.registry.ts`)
-- [ ] `ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS` still **only** drug-check, lab-interp, sofa-score (3 executors)
+- [ ] All four in backend `NLU_TOOL_IDS_WITHOUT_EXECUTOR`
+- [ ] `ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS` still only drug-check, lab-interp, sofa-score (3 executors)
 - [ ] No PR3 id in `BUILTIN_CALC_ID_TO_REGISTRY_ID` or `builtinUiCalculators`
 
 ---
 
 ## Routing & launch
 
-- [ ] `resolveCatalogLaunch('grace-acs' | 'nihss' | 'canadian-c-spine' | 'ottawa-ankle')` → `/tools/calculators`, `openLabel: "Start guided chat"`, `orchestratorTool: null`
+- [ ] `resolveCatalogLaunch(pr3-id)` → `path: /tools/calculators`, `openLabel: "Start guided chat"`, `orchestratorTool: null`, non-empty `chatSeed`
+- [ ] `resolveNavigationPathForLaunch(resolveCatalogLaunch(pr3-id))` → **`/dashboard`**
+- [ ] Wired in `Calculators.jsx`, `ClinicalToolCatalog.jsx`, `ToolsOverview.jsx`
 - [ ] No `path: '/tools/calculators/{pr3-id}'` in `App.jsx`
-- [ ] No `initialCalculatorId` for PR3 tools in `App.jsx`
-- [ ] `expectedLaunchPath(id)` → `/tools/calculators` for all four
-- [ ] `CALCULATOR_ROUTE_DEFS` has **no** slug for PR3 ids
+- [ ] No `initialCalculatorId` for PR3 in `App.jsx`
+- [ ] `CALCULATOR_ROUTE_DEFS` has no PR3 slugs
 
 ---
 
 ## Catalog & discovery
 
-- [ ] Catalog: one row per `primaryId`; `chatOnlyForm: true`; `uiCalculatorSlug: null`; `pagePath: /tools/calculators`
-- [ ] Catalog search: `grace acs`, `nih stroke`, `c-spine`, `ottawa ankle` resolve
-- [ ] Discovery: one canonical row per id; alias rows map with correct `mapsTo`
-- [ ] `stroke scale` → `nihss`; `cervical-spine-rule` → `canadian-c-spine` (not cross-mapped)
+- [ ] One catalog row per `primaryId`; `chatOnlyForm: true`; `uiCalculatorSlug: null`; `pagePath: /tools/calculators`
+- [ ] Search: `grace acs`, `nih stroke`, `c-spine`, `ottawa ankle` resolve
+- [ ] Discovery: one canonical row per id; hyphenated aliases map correctly
+- [ ] `stroke scale` → `nihss`; `cervical-spine-rule` → `canadian-c-spine` (no cross-map)
 
 ---
 
 ## Hub UI (manual)
 
-- [ ] Open `/tools/calculators` → cardiac / neurology / trauma groups show four tools
-- [ ] Tab to each card → Enter launches guided chat (stays on hub path per Tier B)
+- [ ] `/tools/calculators` — cardiac / neurology / trauma groups show four tools
+- [ ] Launch from hub **or catalog** → user lands on dashboard with chat visible
+- [ ] Tab + Enter on each card launches guided chat
 - [ ] Group leads mention decision support and emergency-pathway priority
-- [ ] Mobile width: cards single-column; tap targets ≥44px
+- [ ] Mobile: single-column cards; tap targets ≥44px
 
 ---
 
 ## Safety copy (spot check)
 
-- [ ] GRACE seed: unstable ACS / STEMI STEP 0; does not confirm/exclude ACS; no treatment orders
-- [ ] NIHSS seed: stroke pathways first; no tPA dosing; low NIHSS does not exclude LVO
-- [ ] CCR seed: does not "clear" c-spine; unstable trauma STOP
-- [ ] Ottawa seed: hard stops (neurovascular, open fracture, etc.); not fracture clearance
+- [ ] GRACE: unstable ACS / STEMI STEP 0; no ACS diagnosis or treatment orders
+- [ ] NIHSS: stroke pathways first; no tPA dosing; low NIHSS ≠ exclude LVO
+- [ ] CCR: does not “clear” c-spine; unstable trauma STOP
+- [ ] Ottawa: hard stops; not fracture clearance
 
 ---
 
 ## Backend NLU
 
-- [ ] `tool.patterns.ts`: each PR3 `toolId` appears exactly once
-- [ ] Disambiguation: `preferGraceAcs`, `preferNihss`, `preferCanadianCSpine`, `preferOttawaAnkle` present
-- [ ] `intent-classifier.service.ts` LLM fallback lines describe chat-assisted scope
+- [ ] `tool.patterns.ts`: each PR3 `toolId` exactly once
+- [ ] `preferGraceAcs`, `preferNihss`, `preferCanadianCSpine`, `preferOttawaAnkle` present
+- [ ] `intent-classifier.service.ts` fallback lines describe chat-assisted scope
 
 ---
 
@@ -73,18 +75,25 @@ Use with `release/pr3-clinical-calculators/PR_BODY.md`.
 
 ```bash
 npm test -- --run \
+  src/data/pr3TenAreaCoverage.test.js \
   src/data/pr3Comprehensive.test.js \
   src/data/pr3RegistrationAudit.test.js \
   src/data/pr3Consistency.test.js \
   src/data/pr3Coverage.test.js \
+  src/data/pr3LaunchAudit.test.js \
   src/data/pr3UxSafetyAccessibility.test.js \
-  src/data/clinicalSafetyGuardrails.test.js \
+  src/data/clinicalCatalogLaunch.test.js \
   src/data/clinicalToolAliasSync.test.js \
-  src/data/e2eToolValidationMatrix.test.js
+  src/data/clinicalSafetyGuardrails.test.js \
+  src/data/e2eToolValidationMatrix.test.js \
+  src/data/graceAcsWiring.test.js \
+  src/data/nihssWiring.test.js \
+  src/data/canadianCSpineWiring.test.js \
+  src/data/ottawaAnkleWiring.test.js
 ```
 
-- [ ] All commands above pass locally or in CI
-- [ ] `e2eToolValidationMatrix` lists `pr3Comprehensive.test.js` for all four PR3 registry ids
+- [ ] All commands above pass
+- [ ] `e2eToolValidationMatrix` lists `pr3TenAreaCoverage.test.js` for all four PR3 ids
 
 ---
 

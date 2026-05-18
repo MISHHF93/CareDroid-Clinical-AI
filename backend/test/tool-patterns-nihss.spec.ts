@@ -1,12 +1,17 @@
 import { matchToolPatterns } from '../src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns';
 
-describe('matchToolPatterns — NIHSS', () => {
-  it('matches nihss and stroke scale phrases', () => {
-    const a = matchToolPatterns('calculate nihss score');
-    expect(a.some((m) => m.toolId === 'nihss')).toBe(true);
+const NIHSS_REQUIRED_PHRASES = [
+  'nihss',
+  'nih stroke scale',
+  'national institutes of health stroke scale',
+  'stroke scale',
+  'stroke severity score',
+] as const;
 
-    const b = matchToolPatterns('national institutes of health stroke scale');
-    expect(b.some((m) => m.toolId === 'nihss')).toBe(true);
+describe('matchToolPatterns — NIHSS', () => {
+  it.each(NIHSS_REQUIRED_PHRASES)('matches required phrase "%s"', (phrase) => {
+    const matches = matchToolPatterns(`calculate ${phrase}`);
+    expect(matches.some((m) => m.toolId === 'nihss')).toBe(true);
   });
 
   it('prefers nihss over gcs-calculator for nihss wording', () => {

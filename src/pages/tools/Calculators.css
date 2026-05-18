@@ -1278,6 +1278,8 @@ ul.calc-breakdown-list .calc-breakdown-item {
 
   .calc-chat-assisted {
     padding: 14px 16px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
   }
 
   .calc-chat-assisted-lead {

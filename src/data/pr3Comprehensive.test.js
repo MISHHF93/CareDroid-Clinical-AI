@@ -22,6 +22,7 @@ import { canadianCSpineChatConfig } from './chatAssistedCalculators/canadianCSpi
 import { ottawaAnkleChatConfig } from './chatAssistedCalculators/ottawaAnkle';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   resolveRegistryId,
   NLU_TO_REGISTRY_ID,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
@@ -228,6 +229,11 @@ describe('PR3 comprehensive — 5. resolveCatalogLaunch behavior', () => {
     }
   );
 
+  it.each(PR3_TOOL_IDS)('resolveNavigationPathForLaunch(%s) opens dashboard for chat visibility', (id) => {
+    const launch = resolveCatalogLaunch(id);
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+  });
+
   it('returns empty launch shape for unknown ids', () => {
     expect(resolveCatalogLaunch('')).toEqual(PR3_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(PR3_EMPTY_LAUNCH);
@@ -235,6 +241,7 @@ describe('PR3 comprehensive — 5. resolveCatalogLaunch behavior', () => {
     expect(unknown.path).toBeNull();
     expect(unknown.registryId).toBeNull();
     expect(unknown.chatSeed).toBeNull();
+    expect(resolveNavigationPathForLaunch(unknown)).toBeNull();
   });
 });
 

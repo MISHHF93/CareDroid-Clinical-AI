@@ -1,12 +1,17 @@
 import { matchToolPatterns } from '../src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns';
 
-describe('matchToolPatterns — Canadian C-Spine Rule', () => {
-  it('matches canadian c-spine and cervical spine rule phrases', () => {
-    const a = matchToolPatterns('apply canadian c-spine rule');
-    expect(a.some((m) => m.toolId === 'canadian-c-spine')).toBe(true);
+const CANADIAN_C_SPINE_REQUIRED_PHRASES = [
+  'canadian c spine',
+  'canadian c-spine rule',
+  'c spine rule',
+  'cervical spine rule',
+  'neck trauma imaging rule',
+] as const;
 
-    const b = matchToolPatterns('cervical spine rule neck trauma');
-    expect(b.some((m) => m.toolId === 'canadian-c-spine')).toBe(true);
+describe('matchToolPatterns — Canadian C-Spine Rule', () => {
+  it.each(CANADIAN_C_SPINE_REQUIRED_PHRASES)('matches required phrase "%s"', (phrase) => {
+    const matches = matchToolPatterns(`apply ${phrase}`);
+    expect(matches.some((m) => m.toolId === 'canadian-c-spine')).toBe(true);
   });
 
   it('prefers canadian-c-spine for neck trauma imaging rule', () => {

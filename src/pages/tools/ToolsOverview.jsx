@@ -8,7 +8,10 @@ import {
   getCatalogSummary,
   nluCalculatorHubOnly,
 } from '../../data/clinicalIntentToolCatalog';
-import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
+import {
+  resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
+} from '../../data/clinicalCatalogWiring';
 import { chatAssistedLaunchAriaLabel } from '../../data/chatAssistedHubGroups';
 import { getFullCapabilitiesSummary } from '../../data/platformCapabilitiesCatalog';
 import { NavIcon } from '../../navigation/NavIcon';
@@ -58,11 +61,7 @@ const ToolsOverview = () => {
     if (launch.chatSeed) {
       addMessage(launch.chatSeed, 'user');
     }
-    if (launch.path) {
-      navigate(launch.path);
-    } else {
-      navigate('/dashboard');
-    }
+    navigate(resolveNavigationPathForLaunch(launch) || '/dashboard');
   };
   const orderedTools = [
     ...filteredTools.filter((tool) => pinned.includes(tool.id)),

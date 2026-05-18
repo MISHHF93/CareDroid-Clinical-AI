@@ -7,6 +7,7 @@ import toolRegistry, { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools, clinicalIntentToolsById, builtinUiCalculators } from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   resolveRegistryId,
   resolveOrchestratorToolForLaunch,
   findClinicalIntentProfile,
@@ -79,6 +80,34 @@ describe('resolveCatalogLaunch — Tier A dedicated calculator routes', () => {
     expect(launch.path).toBeTruthy();
     expect(launch.registryId).toBeTruthy();
   });
+});
+
+describe('resolveNavigationPathForLaunch — chat visibility', () => {
+  it.each(PR3_CALCULATOR_REGISTRY_IDS)(
+    'PR3 %s navigates to dashboard after hub chat launch',
+    (registryId) => {
+      const launch = resolveCatalogLaunch(registryId);
+      expect(launch.path).toBe(HUB);
+      expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    }
+  );
+
+  it.each(PR2_TIER_B_CHAT_CALCULATOR_IDS)(
+    'PR2 Tier-B %s navigates to dashboard for guided chat',
+    (registryId) => {
+      const launch = resolveCatalogLaunch(registryId);
+      expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    }
+  );
+
+  it.each(CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS)(
+    'Tier-A %s keeps dedicated calculator navigation path',
+    (registryId) => {
+      const launch = resolveCatalogLaunch(registryId);
+      expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
+      expect(resolveNavigationPathForLaunch(launch)).not.toBe('/dashboard');
+    }
+  );
 });
 
 describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () => {

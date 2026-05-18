@@ -3,7 +3,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
-import { nihssChatConfig } from './chatAssistedCalculators/nihss';
+import {
+  nihssChatConfig,
+  NIHSS_REQUIRED_NLU_ALIASES,
+} from './chatAssistedCalculators/nihss';
 import {
   resolveCatalogLaunch,
   NLU_TO_REGISTRY_ID,
@@ -55,23 +58,24 @@ describe('NIHSS (Tier B chat-assisted) wiring', () => {
     expect(appSource).not.toContain("path: '/tools/calculators/nihss'");
   });
 
-  it('resolves launch and NLU aliases', () => {
-    const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe('/tools/calculators');
-    expect(launch.registryId).toBe(id);
-    expect(launch.chatSeed).toMatch(/NIH Stroke Scale/i);
-    expect(launch.openLabel).toBe('Start guided chat');
-    expect(launch.orchestratorTool).toBeNull();
+  it.each(NIHSS_REQUIRED_NLU_ALIASES)(
+    'resolves required NLU alias "%s" to nihss with hub launch',
+    (alias) => {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(id);
+      const launch = resolveCatalogLaunch(alias);
+      expect(launch.path).toBe('/tools/calculators');
+      expect(launch.registryId).toBe(id);
+      expect(launch.openLabel).toBe('Start guided chat');
+      expect(launch.orchestratorTool).toBeNull();
+      expect(launch.chatSeed).toMatch(/NIH Stroke Scale/i);
+    }
+  );
 
-    expect(NLU_TO_REGISTRY_ID.nihss).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['nih stroke scale']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['national institutes of health stroke scale']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['stroke scale']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['stroke severity score']).toBe(id);
+  it('resolves discovery slug aliases to nihss', () => {
     expect(resolveRegistryId('nih-stroke-scale')).toBe(id);
     expect(resolveRegistryId('national-institutes-of-health-stroke-scale')).toBe(id);
     expect(resolveCatalogLaunch('stroke-severity-score').registryId).toBe(id);
-    expect(resolveCatalogLaunch('stroke scale').registryId).toBe(id);
+    expect(resolveCatalogLaunch('stroke-scale').registryId).toBe(id);
   });
 
   it('includes registry, discovery, and catalog rows', () => {

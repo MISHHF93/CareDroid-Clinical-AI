@@ -29,10 +29,26 @@ export {
 
 const CALCULATORS_HUB_PATH = '/tools/calculators';
 
-function isCalculatorsHubPath(path) {
+export function isCalculatorsHubPath(path) {
   if (!path) return false;
   const normalized = String(path).replace(/\/+$/, '');
   return normalized === CALCULATORS_HUB_PATH;
+}
+
+/**
+ * Where to navigate after a catalog launch so chat seeds are visible.
+ * Tier-B hub tools (PR3, Wells/PERC, etc.) open /dashboard; Tier-A keeps dedicated routes.
+ * @param {{ path: string|null, chatSeed: string|null }} launch
+ * @returns {string|null}
+ */
+export function resolveNavigationPathForLaunch(launch) {
+  if (!launch) return null;
+  if (launch.chatSeed && isCalculatorsHubPath(launch.path)) {
+    return '/dashboard';
+  }
+  if (launch.path) return launch.path;
+  if (launch.chatSeed) return '/dashboard';
+  return null;
 }
 
 const EMPTY_LAUNCH = Object.freeze({

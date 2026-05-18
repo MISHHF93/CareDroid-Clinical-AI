@@ -8,6 +8,15 @@
 
 export const CANADIAN_C_SPINE_TOOL_ID = 'canadian-c-spine';
 
+/** Product-required NLU phrases → `canadian-c-spine` (also in `NLU_TO_REGISTRY_ID`). */
+export const CANADIAN_C_SPINE_REQUIRED_NLU_ALIASES = Object.freeze([
+  'canadian c spine',
+  'canadian c-spine rule',
+  'c spine rule',
+  'cervical spine rule',
+  'neck trauma imaging rule',
+]);
+
 export const canadianCSpineChatConfig = {
   toolId: CANADIAN_C_SPINE_TOOL_ID,
   name: 'Canadian C-Spine Rule',

@@ -3,7 +3,10 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
-import { ottawaAnkleChatConfig } from './chatAssistedCalculators/ottawaAnkle';
+import {
+  ottawaAnkleChatConfig,
+  OTTAWA_ANKLE_REQUIRED_NLU_ALIASES,
+} from './chatAssistedCalculators/ottawaAnkle';
 import {
   resolveCatalogLaunch,
   NLU_TO_REGISTRY_ID,
@@ -61,24 +64,25 @@ describe('Ottawa Ankle Rule (Tier B chat-assisted) wiring', () => {
     expect(appSource).not.toContain("path: '/tools/calculators/ottawa-ankle'");
   });
 
-  it('resolves launch and NLU aliases', () => {
-    const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe('/tools/calculators');
-    expect(launch.registryId).toBe(id);
-    expect(launch.chatSeed).toMatch(/Ottawa Ankle Rule/i);
-    expect(launch.openLabel).toBe('Start guided chat');
-    expect(launch.orchestratorTool).toBeNull();
+  it.each(OTTAWA_ANKLE_REQUIRED_NLU_ALIASES)(
+    'resolves required NLU alias "%s" to ottawa-ankle with hub launch',
+    (alias) => {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(id);
+      const launch = resolveCatalogLaunch(alias);
+      expect(launch.path).toBe('/tools/calculators');
+      expect(launch.registryId).toBe(id);
+      expect(launch.openLabel).toBe('Start guided chat');
+      expect(launch.orchestratorTool).toBeNull();
+      expect(launch.chatSeed).toMatch(/Ottawa Ankle Rule/i);
+    }
+  );
 
-    expect(NLU_TO_REGISTRY_ID['ottawa ankle']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['ottawa ankle rule']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['ankle xray rule']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['ankle injury imaging']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['foot xray rule']).toBe(id);
+  it('resolves discovery slug aliases to ottawa-ankle', () => {
     expect(resolveRegistryId('ottawa-ankle-rule')).toBe(id);
     expect(resolveRegistryId('ankle-xray-rule')).toBe(id);
     expect(resolveRegistryId('foot-xray-rule')).toBe(id);
     expect(resolveCatalogLaunch('ankle-injury-imaging').registryId).toBe(id);
-    expect(resolveCatalogLaunch('ankle xray rule').registryId).toBe(id);
+    expect(NLU_TO_REGISTRY_ID['ottawa-ankle']).toBe(id);
   });
 
   it('includes registry, discovery, and catalog rows', () => {

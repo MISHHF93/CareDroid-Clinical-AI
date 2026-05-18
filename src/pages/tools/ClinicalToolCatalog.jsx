@@ -26,7 +26,10 @@ import {
   SOURCE_SCAN_LOCATIONS,
   toolIdAliases,
 } from '../../data/sourceCodeToolDiscovery';
-import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
+import {
+  resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
+} from '../../data/clinicalCatalogWiring';
 import {
   getMedicalCatalogSummary,
   getMedicalToolsCatalogRows,
@@ -505,12 +508,9 @@ const ClinicalToolCatalog = () => {
     if (launch.chatSeed) {
       addMessage(launch.chatSeed, 'user');
     }
-    if (launch.path) {
-      navigate(launch.path);
-      return;
-    }
-    if (launch.chatSeed) {
-      navigate('/dashboard');
+    const navPath = resolveNavigationPathForLaunch(launch);
+    if (navPath) {
+      navigate(navPath);
     }
   };
 

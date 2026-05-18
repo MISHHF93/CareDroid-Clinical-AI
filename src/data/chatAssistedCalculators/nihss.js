@@ -8,9 +8,18 @@
 
 export const NIHSS_TOOL_ID = 'nihss';
 
+/** Product-required NLU phrases → `nihss` (also in `NLU_TO_REGISTRY_ID`). */
+export const NIHSS_REQUIRED_NLU_ALIASES = Object.freeze([
+  'nihss',
+  'nih stroke scale',
+  'national institutes of health stroke scale',
+  'stroke scale',
+  'stroke severity score',
+]);
+
 export const nihssChatConfig = {
   toolId: NIHSS_TOOL_ID,
-  name: 'NIHSS',
+  name: 'NIH Stroke Scale (NIHSS)',
   hubPath: '/tools/calculators',
   registryId: NIHSS_TOOL_ID,
   category: 'calculator',

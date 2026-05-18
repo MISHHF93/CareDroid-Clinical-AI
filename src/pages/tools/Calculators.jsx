@@ -35,6 +35,7 @@ import {
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
   PR3_CALCULATOR_REGISTRY_IDS,
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
 } from '../../data/clinicalCatalogWiring';
 import { builtinUiCalculators, clinicalIntentTools, nluCalculatorHubOnly } from '../../data/clinicalIntentToolCatalog';
@@ -234,7 +235,8 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
       if (launch.chatSeed) {
         addMessage(launch.chatSeed, 'user');
       }
-      navigate(launch.path || '/dashboard');
+      const navPath = resolveNavigationPathForLaunch(launch);
+      navigate(navPath || '/dashboard');
     },
     [addMessage, navigate, recordToolAccess, selectTool, setActiveTool]
   );
@@ -339,7 +341,9 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                           >
                             {description}
                           </span>
-                          <span className="calc-chat-assisted-action">Start guided chat</span>
+                          <span className="calc-chat-assisted-action" aria-hidden="true">
+                            Start guided chat
+                          </span>
                         </button>
                       );
                     })}

@@ -8,9 +8,18 @@
 
 export const GRACE_ACS_TOOL_ID = 'grace-acs';
 
+/** Product-required NLU phrases → `grace-acs` (also in `NLU_TO_REGISTRY_ID`). */
+export const GRACE_ACS_REQUIRED_NLU_ALIASES = Object.freeze([
+  'grace',
+  'grace score',
+  'grace acs',
+  'acs mortality risk',
+  'acute coronary syndrome risk',
+]);
+
 export const graceAcsChatConfig = {
   toolId: GRACE_ACS_TOOL_ID,
-  name: 'GRACE ACS',
+  name: 'GRACE ACS Risk',
   hubPath: '/tools/calculators',
   registryId: GRACE_ACS_TOOL_ID,
   category: 'calculator',
