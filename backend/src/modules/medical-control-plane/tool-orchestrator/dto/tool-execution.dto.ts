@@ -2,6 +2,8 @@
  * Tool Execution DTOs
  */
 
+import { ToolExecutionErrorCode } from '../tool-orchestrator.registry';
+
 export class ExecuteToolDto {
   toolId: string;
   parameters: Record<string, any>;
@@ -13,6 +15,11 @@ export class ToolExecutionResponseDto {
   success: boolean;
   toolId: string;
   toolName: string;
+  /** Original id from the request (may differ when aliases are used). */
+  requestedToolId?: string;
+  /** Canonical executor id after alias / registry resolution. */
+  resolvedToolId?: string;
+  errorCode?: ToolExecutionErrorCode;
   result: {
     success: boolean;
     data: Record<string, any>;

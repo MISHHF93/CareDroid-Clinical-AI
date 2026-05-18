@@ -13,6 +13,11 @@ import {
   sumNews2Score,
   validateNews2Inputs,
 } from './news2Calculator';
+import {
+  NEWS2_SCALE2_SPO2_EDGE,
+  NEWS2_SCALE_SWITCH_FIXTURE,
+  NEWS2_VALID_BASE_INPUTS,
+} from '../data/testHelpers/pr1TestFixtures';
 
 describe('news2Calculator', () => {
   it('scores respiratory rate per RCP bands', () => {
@@ -143,46 +148,27 @@ describe('news2Calculator', () => {
     expect(bad.ok).toBe(false);
     expect(bad.errors.length).toBeGreaterThan(0);
 
-    const good = validateNews2Inputs({
-      respiratoryRate: '18',
-      spo2: '96',
-      spo2Scale: '2',
-      supplementalOxygen: true,
-      systolicBp: '110',
-      pulse: '88',
-      newConfusion: false,
-      temperature: '37.2',
-    });
-    expect(good.ok).toBe(true);
+    expect(validateNews2Inputs({ ...NEWS2_VALID_BASE_INPUTS, spo2Scale: '2', supplementalOxygen: true }).ok).toBe(
+      true
+    );
   });
 
   it('changes SpO₂ sub-score when switching between Scale 1 and Scale 2 at the same saturation', () => {
-    const spo2 = 96;
-    const b1 = computeNews2Breakdown({
-      respiratoryRate: 16,
-      spo2,
-      spo2Scale: '1',
-      supplementalOxygen: true,
-      systolicBp: 120,
-      pulse: 72,
-      newConfusion: false,
-      temperature: 36.8,
-    });
-    const b2 = computeNews2Breakdown({
-      respiratoryRate: 16,
-      spo2,
-      spo2Scale: '2',
-      supplementalOxygen: true,
-      systolicBp: 120,
-      pulse: 72,
-      newConfusion: false,
-      temperature: 36.8,
-    });
+    const base = NEWS2_SCALE_SWITCH_FIXTURE;
+    const b1 = computeNews2Breakdown({ ...base, spo2Scale: '1' });
+    const b2 = computeNews2Breakdown({ ...base, spo2Scale: '2' });
     expect(b1.spo2ScaleUsed).toBe('1');
     expect(b2.spo2ScaleUsed).toBe('2');
-    expect(b1.spo2).toBe(scoreSpo2Scale1(spo2));
-    expect(b2.spo2).toBe(scoreSpo2Scale2(spo2, true));
+    expect(b1.spo2).toBe(scoreSpo2Scale1(base.spo2));
+    expect(b2.spo2).toBe(scoreSpo2Scale2(base.spo2, true));
     expect(b1.spo2).not.toBe(b2.spo2);
+  });
+
+  it('Scale 2 room air vs O₂ at SpO₂ 93% increases spo2 sub-score on oxygen', () => {
+    const base = NEWS2_SCALE2_SPO2_EDGE;
+    const roomAir = computeNews2Breakdown({ ...base, spo2Scale: '2', supplementalOxygen: false });
+    const onO2 = computeNews2Breakdown({ ...base, spo2Scale: '2', supplementalOxygen: true });
+    expect(onO2.spo2).toBeGreaterThan(roomAir.spo2);
   });
 
   it('interpretNews2Risk applies aggregate 5–6 as medium and ≥7 as high severity', () => {

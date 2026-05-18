@@ -1,6 +1,6 @@
 /**
  * PR4A clinical safety, UX, and accessibility contracts.
- * UI: Calculators.jsx (AscvdRisk, CkdStaging, StopBang, AuditC).
+ * UI: pr4aCalculators.jsx (AscvdRisk, CkdStaging, StopBang, AuditC).
  * Logic: src/utils/*Calculator.js
  */
 
@@ -17,7 +17,7 @@ import {
 } from './clinicalIntentToolCatalog';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const pr4aCalculatorsSource = readFileSync(join(__dirname, '../pages/tools/pr4aCalculators.jsx'), 'utf8');
 
 const CERTAINTY_PATTERN =
   /\b(confirmed diagnosis|definitely has|diagnosis established|rules out ckd|ruled out|excluded osa|has alcohol use disorder)\b/i;
@@ -28,18 +28,19 @@ const TREATMENT_PATTERN =
 const PR4A_REGISTRY_IDS = ['ascvd-risk', 'ckd-staging', 'stop-bang', 'audit-c'];
 
 function sliceCalculatorComponent(source, componentName) {
-  const start = source.indexOf(`const ${componentName}`);
+  const marker = `export function ${componentName}`;
+  const start = source.indexOf(marker);
   if (start < 0) {
-    throw new Error(`${componentName} not found in Calculators.jsx`);
+    throw new Error(`${componentName} not found in pr4aCalculators.jsx`);
   }
-  const next = source.indexOf('\nconst ', start + 1);
+  const next = source.indexOf('\nexport function ', start + marker.length);
   return next === -1 ? source.slice(start) : source.slice(start, next);
 }
 
-const ascvdUi = sliceCalculatorComponent(calculatorsSource, 'AscvdRiskCalculator');
-const ckdUi = sliceCalculatorComponent(calculatorsSource, 'CkdStagingCalculator');
-const stopBangUi = sliceCalculatorComponent(calculatorsSource, 'StopBangCalculator');
-const auditCUi = sliceCalculatorComponent(calculatorsSource, 'AuditCCalculator');
+const ascvdUi = sliceCalculatorComponent(pr4aCalculatorsSource, 'AscvdRiskCalculator');
+const ckdUi = sliceCalculatorComponent(pr4aCalculatorsSource, 'CkdStagingCalculator');
+const stopBangUi = sliceCalculatorComponent(pr4aCalculatorsSource, 'StopBangCalculator');
+const auditCUi = sliceCalculatorComponent(pr4aCalculatorsSource, 'AuditCCalculator');
 
 describe('PR4A NLU — chat seeds avoid diagnostic certainty and treatment directives', () => {
   it.each(PR4A_REGISTRY_IDS)('%s chat seed is decision-support scoped', (toolId) => {
@@ -147,7 +148,7 @@ describe('PR4A UX & clinical safety — input validation', () => {
   });
 });
 
-describe('PR4A accessibility & UX — Calculators.jsx contracts', () => {
+describe('PR4A accessibility & UX — pr4aCalculators.jsx contracts', () => {
   it('ASCVD form uses labels, validation alert, interpretation region, and safety footer', () => {
     expect(ascvdUi).toContain('CalcDecisionSupportLead');
     expect(ascvdUi).toContain('aria-labelledby={formTitleId}');

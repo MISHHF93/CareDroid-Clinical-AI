@@ -1,7 +1,9 @@
 /**
  * Catalog of clinical tools the NLU layer can recognize (mirrors backend patterns).
  * Keep in sync with:
- * backend/src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns.ts
+ * - backend/.../intent-classifier/patterns/tool.patterns.ts (toolId + keywords)
+ * - src/data/clinicalToolAliasSync.js (catalog alias drift tests)
+ * - src/data/clinicalToolIdContract.js (NLU_TO_REGISTRY_ID precise aliases)
  */
 
 import { graceAcsChatConfig } from './chatAssistedCalculators/graceAcs';
@@ -13,8 +15,9 @@ import { wellsPeChatConfig } from './chatAssistedCalculators/wellsPe';
 import { copdGoldChatConfig } from './chatAssistedCalculators/copdGold';
 import { romeIvIbsChatConfig } from './chatAssistedCalculators/romeIvIbs';
 import { dispatchAiChatConfig } from './chatAssistedFleet/dispatchAi';
+import { ensureChatSeedGuardrails } from './clinicalSafetyGuardrails';
 
-export const clinicalIntentTools = [
+const clinicalIntentToolsRaw = [
   {
     toolId: 'sofa-calculator',
     toolName: 'SOFA Score Calculator',
@@ -335,9 +338,12 @@ export const clinicalIntentTools = [
     toolId: 'dose-calculator',
     toolName: 'Medication Dose Calculator',
     category: 'calculator',
-    description: 'Dosing from patient factors.',
+    description:
+      'Reference-only: explains dosing concepts and where to find institutional protocols. Does not calculate or recommend patient-specific doses.',
     path: '/tools/calculators',
     sidebarToolId: 'calculators',
+    chatSeed:
+      'Help me understand how weight-based and renal-adjusted dosing are typically approached for a medication class — educational reference only. Do not calculate mg/kg doses or recommend a specific dose for this patient; direct prescribing to licensed clinicians and pharmacy resources.',
     backendExecutable: false,
   },
   {
@@ -431,7 +437,8 @@ export const clinicalIntentTools = [
     description: 'Symptom-based differentials.',
     path: '/tools/diagnosis',
     sidebarToolId: 'diagnosis',
-    chatSeed: 'Generate a differential diagnosis for:',
+    chatSeed:
+      'Generate a ranked differential diagnosis list for discussion as clinical decision support — not a confirmed diagnosis. Require clinician review before testing or treatment decisions:',
     backendExecutable: false,
   },
   {
@@ -441,10 +448,16 @@ export const clinicalIntentTools = [
     description: 'Empiric antimicrobial choice.',
     path: '/tools/diagnosis',
     sidebarToolId: 'diagnosis',
-    chatSeed: 'Recommend empiric antibiotics for this infection scenario:',
+    chatSeed:
+      'Discuss empiric antibiotic considerations for this infection scenario as educational decision support — cite guideline principles, resistance patterns, and patient factors. Do not prescribe, dose, or order antibiotics; require clinician review and local antimicrobial stewardship pathways.',
     backendExecutable: false,
   },
 ];
+
+export const clinicalIntentTools = clinicalIntentToolsRaw.map((row) => ({
+  ...row,
+  chatSeed: row.chatSeed ? ensureChatSeedGuardrails(row) : row.chatSeed,
+}));
 
 /** Built-in calculator slugs not yet in Calculators.jsx UI — NLU + catalog only */
 export const nluCalculatorHubOnly = [
@@ -643,43 +656,7 @@ export const builtinUiCalculators = [
   },
 ];
 
-/** NLU / orchestrator id → sidebar registry id */
-export const ORCHESTRATOR_TO_REGISTRY_ID = {
-  'sofa-calculator': 'sofa-score',
-  'drug-interactions': 'drug-check',
-  'lab-interpreter': 'lab-interp',
-  'apache2-calculator': 'calculators',
-  'cha2ds2vasc-calculator': 'calc-chads2vasc',
-  'curb65-calculator': 'calculators',
-  'gcs-calculator': 'calculators',
-  'wells-dvt-calculator': 'calculators',
-  'wells-pe': 'wells-pe',
-  perc: 'perc',
-  'grace-acs': 'grace-acs',
-  nihss: 'nihss',
-  'canadian-c-spine': 'canadian-c-spine',
-  'ottawa-ankle': 'ottawa-ankle',
-  'ascvd-risk': 'ascvd-risk',
-  'ckd-staging': 'ckd-staging',
-  'stop-bang': 'stop-bang',
-  'audit-c': 'audit-c',
-  phq9: 'phq9',
-  gad7: 'gad7',
-  'copd-gold': 'copd-gold',
-  'rome-iv-ibs': 'rome-iv-ibs',
-  'fleet-command': 'fleet-command',
-  'predictive-maintenance': 'predictive-maintenance',
-  'route-optimizer': 'route-optimizer',
-  'dispatch-ai': 'dispatch-ai',
-  dispatch: 'dispatch-ai',
-  'dose-calculator': 'calculators',
-  'abg-interpreter': 'lab-interp',
-  'protocol-lookup': 'protocols',
-  'acls-protocol': 'protocols',
-  'atls-protocol': 'protocols',
-  'differential-diagnosis': 'diagnosis',
-  'antibiotic-guide': 'diagnosis',
-};
+export { ORCHESTRATOR_TO_REGISTRY_ID } from './clinicalToolIdContract';
 
 export const clinicalIntentToolsById = clinicalIntentTools.reduce((acc, row) => {
   acc[row.toolId] = row;

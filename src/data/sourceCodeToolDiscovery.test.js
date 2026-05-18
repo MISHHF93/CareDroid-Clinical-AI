@@ -74,26 +74,49 @@ describe('sourceCodeToolDiscovery', () => {
     expect(apache.registryId).toBe('calculators');
     expect(apache.chatSeed).toMatch(/APACHE/i);
 
-    expect(NLU_TO_REGISTRY_ID['drug-interaction-checker']).toBe('drug-interactions');
+    expect(NLU_TO_REGISTRY_ID['drug-interaction-checker']).toBe('drug-check');
     expect(resolveCatalogLaunch('sofa').path).toBe('/tools/calculator/sofa');
 
     expect(NLU_TO_REGISTRY_ID.qsofa).toBe('qsofa');
     expect(resolveCatalogLaunch('qsofa').path).toBe('/tools/calculators/qsofa');
     expect(resolveCatalogLaunch('qsofa').registryId).toBe('qsofa');
 
+    expect(NLU_TO_REGISTRY_ID['quick sofa']).toBe('qsofa');
+    expect(NLU_TO_REGISTRY_ID['quick sepsis score']).toBe('qsofa');
+    expect(NLU_TO_REGISTRY_ID['sepsis bedside score']).toBe('qsofa');
+    expect(resolveCatalogLaunch('quick sofa').path).toBe('/tools/calculators/qsofa');
+    expect(resolveCatalogLaunch('sepsis bedside score').registryId).toBe('qsofa');
+
     expect(NLU_TO_REGISTRY_ID.news2).toBe('news2');
     const news2Launch = resolveCatalogLaunch('news2');
     expect(news2Launch.path).toBe('/tools/calculators/news2');
     expect(news2Launch.registryId).toBe('news2');
 
+    expect(NLU_TO_REGISTRY_ID['news 2']).toBe('news2');
+    expect(NLU_TO_REGISTRY_ID['national early warning score']).toBe('news2');
+    expect(NLU_TO_REGISTRY_ID['early warning score']).toBe('news2');
+    expect(NLU_TO_REGISTRY_ID['deterioration score']).toBe('news2');
+    expect(resolveCatalogLaunch('early warning score').path).toBe('/tools/calculators/news2');
+    expect(resolveCatalogLaunch('deterioration-score').registryId).toBe('news2');
+
     expect(NLU_TO_REGISTRY_ID['child-pugh']).toBe('child-pugh');
     expect(NLU_TO_REGISTRY_ID['ctp-score']).toBe('child-pugh');
+    expect(NLU_TO_REGISTRY_ID['child pugh']).toBe('child-pugh');
+    expect(NLU_TO_REGISTRY_ID['ctp score']).toBe('child-pugh');
+    expect(NLU_TO_REGISTRY_ID['cirrhosis score']).toBe('child-pugh');
+    expect(NLU_TO_REGISTRY_ID['liver severity score']).toBe('child-pugh');
     const cpLaunch = resolveCatalogLaunch('child-pugh');
     expect(cpLaunch.path).toBe('/tools/calculators/child-pugh');
     expect(cpLaunch.registryId).toBe('child-pugh');
+    expect(resolveCatalogLaunch('ctp score').path).toBe('/tools/calculators/child-pugh');
+    expect(resolveCatalogLaunch('liver-severity-score').registryId).toBe('child-pugh');
 
     expect(NLU_TO_REGISTRY_ID['has-bled']).toBe('has-bled');
     expect(NLU_TO_REGISTRY_ID.hasbled).toBe('has-bled');
+    expect(NLU_TO_REGISTRY_ID['has bled']).toBe('has-bled');
+    expect(NLU_TO_REGISTRY_ID['bleeding risk']).toBe('has-bled');
+    expect(NLU_TO_REGISTRY_ID['af bleeding risk']).toBe('has-bled');
+    expect(NLU_TO_REGISTRY_ID['anticoagulation bleeding risk']).toBe('has-bled');
     const hbLaunch = resolveCatalogLaunch('has-bled');
     expect(hbLaunch.path).toBe('/tools/calculators/has-bled');
     expect(hbLaunch.registryId).toBe('has-bled');
@@ -101,6 +124,7 @@ describe('sourceCodeToolDiscovery', () => {
     expect(NLU_TO_REGISTRY_ID['bleeding-risk']).toBe('has-bled');
     expect(resolveCatalogLaunch('bleeding-risk').path).toBe('/tools/calculators/has-bled');
     expect(resolveCatalogLaunch('bleeding-risk').registryId).toBe('has-bled');
+    expect(resolveCatalogLaunch('af bleeding risk').path).toBe('/tools/calculators/has-bled');
   });
 
   it('exposes HAS-BLED in discovery with calculator path', () => {

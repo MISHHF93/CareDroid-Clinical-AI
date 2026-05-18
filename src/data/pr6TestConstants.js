@@ -38,11 +38,4 @@ export const PR6_ALL_ALIAS_PAIRS = Object.freeze([
   ...PR6_DISCOVERY_ALIAS_PAIRS,
 ]);
 
-export function catalogRowsMatchingQuery(rows, query) {
-  const q = query.trim().toLowerCase();
-  if (!q) return rows;
-  return rows.filter((row) => {
-    const blob = `${row.name} ${row.primaryId} ${row.id} ${row.category} ${row.description}`.toLowerCase();
-    return blob.includes(q);
-  });
-}
+export { catalogRowsMatchingQuery } from '../utils/catalogSearch';

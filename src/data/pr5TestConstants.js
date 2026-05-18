@@ -45,7 +45,9 @@ export const PR5_DISCOVERY_ALIAS_PAIRS = Object.freeze([
 /** [canonicalId, catalog search query] */
 export const PR5_CATALOG_SEARCH_QUERIES = Object.freeze([
   ['phq9', 'phq9'],
+  ['phq9', 'depression screen'],
   ['gad7', 'gad7'],
+  ['gad7', 'anxiety screen'],
 ]);
 
 export const PR5_BACKEND_DISAMBIGUATION_HELPERS = Object.freeze(['preferPhq9', 'preferGad7']);
@@ -56,12 +58,4 @@ export const PR5_ALL_ALIAS_PAIRS = Object.freeze([
   ...PR5_DISCOVERY_ALIAS_PAIRS,
 ]);
 
-/** ClinicalToolCatalog.jsx row filter (mirrors pr4a consistency tests) */
-export function catalogRowsMatchingQuery(rows, query) {
-  const q = query.trim().toLowerCase();
-  if (!q) return rows;
-  return rows.filter((row) => {
-    const blob = `${row.name} ${row.primaryId} ${row.id} ${row.category} ${row.description}`.toLowerCase();
-    return blob.includes(q);
-  });
-}
+export { catalogRowsMatchingQuery } from '../utils/catalogSearch';

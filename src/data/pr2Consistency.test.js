@@ -29,6 +29,7 @@ import {
 import { getMedicalCatalogSummary, getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { getToolIcon } from '../navigation/iconRegistry';
+import { catalogRowsMatchingQuery } from '../utils/catalogSearch';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -41,16 +42,6 @@ const patternsSource = readFileSync(
 );
 
 const PR2_HUB_PATH = '/tools/calculators';
-
-/** Mirrors ClinicalToolCatalog.jsx row filter */
-function catalogRowsMatchingQuery(rows, query) {
-  const q = query.trim().toLowerCase();
-  if (!q) return rows;
-  return rows.filter((row) => {
-    const blob = `${row.name} ${row.primaryId} ${row.id} ${row.category} ${row.description}`.toLowerCase();
-    return blob.includes(q);
-  });
-}
 
 const PR2_DISCOVERY_ALIAS_IDS = toolIdAliases
   .filter((a) => PR2_CALCULATOR_REGISTRY_IDS.includes(a.mapsTo))

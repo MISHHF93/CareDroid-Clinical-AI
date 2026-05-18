@@ -33,11 +33,19 @@ import {
 } from '../../data/medicalToolsCatalogIndex';
 import { fetchBackendClinicalTools } from '../../services/clinicalToolsApi';
 import { sortCatalogRows } from '../../utils/catalogSort';
+import {
+  catalogRowsMatchingQuery,
+  isDiscoveredRowLaunchable,
+  getDiscoveredLaunchLabel,
+  isOrchestratorRegisteredNlu,
+  matchesDiscoveredRow,
+} from '../../utils/catalogSearch';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import './ClinicalToolCatalog.css';
 
 const CATEGORY_CLASS = {
+  'chat-assisted': 'catalog-badge--ai',
   calculator: 'catalog-badge--calculator',
   checker: 'catalog-badge--checker',
   interpreter: 'catalog-badge--interpreter',
@@ -126,13 +134,14 @@ function useTableSort(defaultKey = 'name') {
   return { sortKey, sortDir, toggleSort, applySort };
 }
 
-function MedicalToolsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSort }) {
+function MedicalToolsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSort, hideEmpty }) {
   if (rows.length === 0) {
+    if (hideEmpty) return null;
     return <p className="catalog-empty catalog-empty--block">No medical tools match your search.</p>;
   }
   return (
-    <div className="catalog-table-wrap">
-      <table className="catalog-table catalog-table--medical">
+    <div className="catalog-table-wrap catalog-table-wrap--stacked">
+      <table className="catalog-table catalog-table--medical catalog-table--stacked">
         <thead>
           <tr>
             <SortableTh label="ID" sortKey="id" activeKey={sortKey} sortDir={sortDir} onSort={onSort} />
@@ -171,35 +180,51 @@ function MedicalToolsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSor
         <tbody>
           {rows.map((row) => (
             <tr key={row.primaryId || row.id}>
-              <td>
+              <td data-label="ID">
                 <code>{row.primaryId || row.id}</code>
               </td>
-              <td>
+              <td data-label="Name" className="catalog-tool-name-cell">
                 {row.name}
                 {row.chatOnlyForm && (
-                  <span className="catalog-inline-badge" title="Chat + calculators hub; no dedicated form">
-                    Chat on request
+                  <span className="catalog-inline-badge" title="Guided chat from calculators hub; no dedicated form">
+                    Chat-assisted
+                  </span>
+                )}
+                {row.backendApiIntentOnly && (
+                  <span
+                    className="catalog-inline-badge catalog-inline-badge--muted"
+                    title="NLU routes to API; not a registered POST /api/tools executor"
+                  >
+                    NLU API intent
+                  </span>
+                )}
+                {row.backendApiRegistered && (
+                  <span className="catalog-inline-badge" title="Registered backend tool executor">
+                    Backend API
                   </span>
                 )}
               </td>
-              <td>
+              <td data-label="Category">
                 <CategoryBadge category={row.category} />
               </td>
-              <td>{row.accessSummary}</td>
-              <td>{row.chatOnRequest ? 'Yes' : '—'}</td>
-              <td className="catalog-source-cell">
+              <td data-label="Access">{row.accessSummary}</td>
+              <td data-label="Chat">{row.chatOnRequest ? 'Yes' : '—'}</td>
+              <td className="catalog-source-cell" data-label="Page / form">
                 {row.pagePath && <code>{row.pagePath}</code>}
-                {row.uiCalculatorSlug && (
+                {row.uiCalculatorSlug && !row.chatOnlyForm && (
                   <span>
                     {row.pagePath ? ' · ' : ''}
                     form: <code>{row.uiCalculatorSlug}</code>
                   </span>
                 )}
-                {!row.pagePath && !row.uiCalculatorSlug && '—'}
+                {row.chatOnlyForm && row.pagePath && (
+                  <span>{row.pagePath ? ' · ' : ''}hub (chat-assisted)</span>
+                )}
+                {!row.pagePath && !row.uiCalculatorSlug && !row.chatOnlyForm && '—'}
               </td>
-              <td>
+              <td className="catalog-actions-cell" data-label="Actions">
                 <div className="catalog-actions">
-                  {row.pagePath && (
+                  {row.pagePath && !row.chatOnlyForm && (
                     <button
                       type="button"
                       className="catalog-btn catalog-btn--primary"
@@ -208,13 +233,21 @@ function MedicalToolsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSor
                       Open
                     </button>
                   )}
-                  <button
-                    type="button"
-                    className="catalog-btn catalog-btn--secondary"
-                    onClick={() => onLaunch(row)}
-                  >
-                    Launch
-                  </button>
+                  {row.launchable ? (
+                    <button
+                      type="button"
+                      className={`catalog-btn ${
+                        row.chatOnlyForm ? 'catalog-btn--primary' : 'catalog-btn--secondary'
+                      }`}
+                      onClick={() => onLaunch(row)}
+                    >
+                      {row.launchLabel || 'Launch'}
+                    </button>
+                  ) : (
+                    <span className="catalog-action-muted" title="No page or chat route wired">
+                      Not launchable
+                    </span>
+                  )}
                 </div>
               </td>
             </tr>
@@ -225,13 +258,14 @@ function MedicalToolsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSor
   );
 }
 
-function DiscoveredRowsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSort }) {
+function DiscoveredRowsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSort, hideEmpty }) {
   if (rows.length === 0) {
+    if (hideEmpty) return null;
     return <p className="catalog-empty catalog-empty--block">No entries match your search.</p>;
   }
   return (
-    <div className="catalog-table-wrap">
-      <table className="catalog-table">
+    <div className="catalog-table-wrap catalog-table-wrap--stacked">
+      <table className="catalog-table catalog-table--stacked">
         <thead>
           <tr>
             <SortableTh label="ID" sortKey="id" activeKey={sortKey} sortDir={sortDir} onSort={onSort} />
@@ -263,15 +297,15 @@ function DiscoveredRowsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onS
         <tbody>
           {rows.map((row) => (
             <tr key={`${row.id}-${row.status}`}>
-              <td>
+              <td data-label="ID">
                 <code>{row.id}</code>
               </td>
-              <td>{row.name}</td>
-              <td>
+              <td data-label="Name">{row.name}</td>
+              <td data-label="Status">
                 <StatusBadge status={row.status} />
               </td>
-              <td>{row.category ? <CategoryBadge category={row.category} /> : '—'}</td>
-              <td className="catalog-source-cell">
+              <td data-label="Category">{row.category ? <CategoryBadge category={row.category} /> : '—'}</td>
+              <td className="catalog-source-cell" data-label="Notes / source">
                 {row.mapsTo && (
                   <span>
                     → <code>{row.mapsTo}</code>{' '}
@@ -285,7 +319,7 @@ function DiscoveredRowsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onS
                 )}
                 {row.notes || (row.sources || [row.source]).filter(Boolean).join('; ')}
               </td>
-              <td>
+              <td className="catalog-actions-cell" data-label="Actions">
                 <div className="catalog-actions">
                   {row.path && !String(row.path).includes(':') && (
                     <button
@@ -296,14 +330,23 @@ function DiscoveredRowsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onS
                       Open
                     </button>
                   )}
-                  {onLaunch && (
+                  {onLaunch && isDiscoveredRowLaunchable(row) && (
                     <button
                       type="button"
-                      className="catalog-btn catalog-btn--secondary"
+                      className={`catalog-btn ${
+                        row.status === 'nlu-chat' || row.chatOnly
+                          ? 'catalog-btn--primary'
+                          : 'catalog-btn--secondary'
+                      }`}
                       onClick={() => onLaunch(row)}
                     >
-                      Launch
+                      {getDiscoveredLaunchLabel(row)}
                     </button>
+                  )}
+                  {onLaunch && !isDiscoveredRowLaunchable(row) && (
+                    <span className="catalog-action-muted" title="Roadmap or reference only">
+                      Not launchable
+                    </span>
                   )}
                 </div>
               </td>
@@ -401,10 +444,7 @@ const ClinicalToolCatalog = () => {
   const filteredChatAi = filterCapabilityRows(chatAndAiCapabilities);
   const filteredDataApis = filterCapabilityRows(clinicalDataApis);
   const filteredEmergency = filterCapabilityRows(emergencyCapabilities);
-  const discoverQueryMatch = (row) =>
-    matchesQuery(
-      `${row.id} ${row.name} ${row.notes} ${row.source} ${row.status} ${row.category || ''} ${row.mapsTo || ''} ${row.apiPath || ''} ${row.protocolReference || ''}`
-    );
+  const discoverQueryMatch = (row) => matchesDiscoveredRow(row, query);
 
   const statusFilterFns = {
     phantom: (row) => row.status === 'phantom' || row.status === 'marketing-copy',
@@ -430,10 +470,7 @@ const ClinicalToolCatalog = () => {
     [filteredDiscovered, scanSort.sortKey, scanSort.sortDir]
   );
 
-  const filteredMedical = allMedicalRows.filter((row) => {
-    if (!matchesQuery(`${row.name} ${row.primaryId} ${row.id} ${row.category} ${row.description}`)) {
-      return false;
-    }
+  const filteredMedical = catalogRowsMatchingQuery(allMedicalRows, query).filter((row) => {
     if (categoryFilter === 'all' || categoryFilter === 'medical') return true;
     return row.category === categoryFilter;
   });
@@ -450,6 +487,11 @@ const ClinicalToolCatalog = () => {
 
   const showMedicalOnly = categoryFilter === 'medical';
   const showFocusedSections = categoryFilter === 'all';
+
+  const showGlobalEmpty =
+    Boolean(query) &&
+    sortedMedical.length === 0 &&
+    (showMedicalOnly || sortedDiscovered.length === 0);
 
   const handleOpenPath = (path) => {
     if (path) navigate(path);
@@ -473,7 +515,8 @@ const ClinicalToolCatalog = () => {
   };
 
   const launchFromRow = (row) => {
-    const launchId = row?.primaryId || row?.id;
+    if (row?.status === 'phantom' || row?.status === 'marketing-copy') return;
+    const launchId = row?.mapsTo || row?.primaryId || row?.id;
     if (launchId) {
       launchCatalogItem(launchId);
     }
@@ -587,7 +630,7 @@ const ClinicalToolCatalog = () => {
         <input
           type="search"
           className="catalog-search"
-          placeholder="Search tools by name, id, or description…"
+          placeholder="Search by name, id, alias, or description…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           aria-label="Search clinical catalog"
@@ -600,7 +643,8 @@ const ClinicalToolCatalog = () => {
         >
           <option value="all">All categories</option>
           <option value="medical">Medical tools &amp; calculators only</option>
-          <option value="calculator">Calculator</option>
+          <option value="calculator">Calculator (form)</option>
+          <option value="chat-assisted">Chat-assisted (Tier B / hub)</option>
           <option value="checker">Checker</option>
           <option value="interpreter">Interpreter</option>
           <option value="protocol">Protocol</option>
@@ -610,10 +654,9 @@ const ClinicalToolCatalog = () => {
           <option value="data">Clinical data API</option>
           <option value="emergency">Emergency</option>
           <option value="enterprise">Enterprise</option>
-          <option value="platform">Platform (filter)</option>
+          <option value="platform">Platform features</option>
           <option value="phantom">Phantom / in-code only</option>
           <option value="alias">ID aliases</option>
-          <option value="platform">Platform features</option>
           <option value="client">Client helpers</option>
           <option value="orchestrator">Orchestrator APIs</option>
           <option value="routing">NLU routing</option>
@@ -621,6 +664,20 @@ const ClinicalToolCatalog = () => {
           <option value="collaboration">Collaboration / analytics</option>
         </select>
       </div>
+
+      {showGlobalEmpty && (
+        <div className="catalog-empty catalog-empty--global" role="status">
+          <p>
+            No tools match <strong>&quot;{search.trim()}&quot;</strong>.
+            Try an alias (e.g. pe-score, depression screen) or clear the search.
+          </p>
+          <div className="catalog-empty-actions">
+            <button type="button" className="catalog-btn catalog-btn--secondary" onClick={() => setSearch('')}>
+              Clear search
+            </button>
+          </div>
+        </div>
+      )}
 
       <section className="catalog-section catalog-section--medical">
         <h2>
@@ -639,6 +696,7 @@ const ClinicalToolCatalog = () => {
           sortKey={medicalSort.sortKey}
           sortDir={medicalSort.sortDir}
           onSort={medicalSort.toggleSort}
+          hideEmpty={showGlobalEmpty}
         />
       </section>
 
@@ -726,13 +784,23 @@ const ClinicalToolCatalog = () => {
                             Open
                           </button>
                         )}
-                        <button
-                          type="button"
-                          className="catalog-btn catalog-btn--secondary"
-                          onClick={() => launchFromRow(row)}
-                        >
-                          Launch
-                        </button>
+                        {isDiscoveredRowLaunchable(row) ? (
+                          <button
+                            type="button"
+                            className={`catalog-btn ${
+                              row.status === 'nlu-chat' || row.chatOnly
+                                ? 'catalog-btn--primary'
+                                : 'catalog-btn--secondary'
+                            }`}
+                            onClick={() => launchFromRow(row)}
+                          >
+                            {getDiscoveredLaunchLabel(row)}
+                          </button>
+                        ) : (
+                          <span className="catalog-action-muted" title="Roadmap or reference only">
+                            Not launchable
+                          </span>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -1045,7 +1113,17 @@ const ClinicalToolCatalog = () => {
                     <td>
                       <code>{id}</code>
                     </td>
-                    <td>{tool.name || intentRow?.toolName}</td>
+                    <td>
+                      {tool.name || intentRow?.toolName}
+                      {intentRow?.backendExecutable && !isOrchestratorRegisteredNlu(id) && (
+                        <span
+                          className="catalog-inline-badge catalog-inline-badge--muted"
+                          title="NLU profile only — not registered for POST /api/tools/:id/execute"
+                        >
+                          NLU API intent
+                        </span>
+                      )}
+                    </td>
                     <td>
                       <CategoryBadge category={tool.category || intentRow?.category} />
                     </td>
@@ -1061,15 +1139,17 @@ const ClinicalToolCatalog = () => {
                             Open
                           </button>
                         )}
-                        <button
-                          type="button"
-                          className="catalog-btn catalog-btn--secondary"
-                          onClick={() =>
-                            handleTryInChat(registryId, intentRow?.chatSeed)
-                          }
-                        >
-                          Try in chat
-                        </button>
+                        {intentRow && (
+                          <button
+                            type="button"
+                            className="catalog-btn catalog-btn--secondary"
+                            onClick={() =>
+                              handleTryInChat(registryId, intentRow?.chatSeed)
+                            }
+                          >
+                            {isOrchestratorRegisteredNlu(id) ? 'Try in chat' : 'Chat-assisted'}
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

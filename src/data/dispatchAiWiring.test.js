@@ -84,8 +84,8 @@ describe('Dispatch Intelligence (dispatch-ai) wiring', () => {
     expect(launch.registryId).toBe(id);
     expect(launch.chatSeed).toBe(dispatchAiChatConfig.chatSeed);
     expect(launch.chatSeed).toMatch(/requires dispatcher approval/i);
-    expect(launch.orchestratorTool).toBe('dispatch-ai');
-    expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id]).toBe('dispatch-ai');
+    expect(launch.orchestratorTool).toBeNull();
+    expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id]).toBeUndefined();
   });
 
   it.each(ALIAS_PAIRS)('alias "%s" resolves same launch as dispatch-ai', (alias, expected) => {

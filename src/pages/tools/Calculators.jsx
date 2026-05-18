@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
@@ -35,7 +35,9 @@ import {
   resolveCatalogLaunch,
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
 } from '../../data/clinicalCatalogWiring';
-import { clinicalIntentTools, nluCalculatorHubOnly } from '../../data/clinicalIntentToolCatalog';
+import { builtinUiCalculators, clinicalIntentTools, nluCalculatorHubOnly } from '../../data/clinicalIntentToolCatalog';
+import { BUILTIN_CALC_ID_TO_REGISTRY_ID } from '../../data/clinicalCatalogWiring';
+import { toolRegistryById } from '../../data/toolRegistry';
 import {
   CHAT_ASSISTED_HUB_GROUPS,
   chatAssistedLaunchAriaLabel,
@@ -50,93 +52,30 @@ import {
 import { NavIcon } from '../../navigation/NavIcon';
 import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
 import { Phq9Calculator, Gad7Calculator } from './mentalHealthCalculators';
+import {
+  AscvdRiskCalculator,
+  AuditCCalculator,
+  CkdStagingCalculator,
+  StopBangCalculator,
+} from './pr4aCalculators';
+import ToolNotFound from './ToolNotFound';
 
-const CALCULATORS = [
-  {
-    id: 'sofa',
-    name: 'SOFA Score',
-    description: 'Sequential Organ Failure Assessment for ICU patients',
-    category: 'ICU/Critical Care',
-  },
-  {
-    id: 'qsofa',
-    name: 'qSOFA (quick SOFA)',
-    description: 'Bedside sepsis screen: RR, SBP, mentation / GCS (Sepsis-3)',
-    category: 'ICU/Emergency',
-  },
-  {
-    id: 'news2',
-    name: 'NEWS2',
-    description: 'National Early Warning Score 2 (RCP) — vitals, SpO₂ scale, escalation',
-    category: 'Acute / ward',
-  },
-  {
-    id: 'child-pugh',
-    name: 'Child-Pugh',
-    description: 'Cirrhosis severity (bilirubin, albumin, INR/PT, ascites, encephalopathy)',
-    category: 'Hepatology',
-  },
-  {
-    id: 'has-bled',
-    name: 'HAS-BLED',
-    description: 'Bleeding-risk factors when considering anticoagulation (e.g. AF)',
-    category: 'Cardiology',
-  },
-  {
-    id: 'meld',
-    name: 'MELD',
-    description: 'Model for End-stage Liver Disease (bilirubin, INR, creatinine / dialysis)',
-    category: 'Hepatology',
-  },
-  {
-    id: 'meld-na',
-    name: 'MELD-Na',
-    description: 'MELD with UNOS sodium adjustment for hyponatremia',
-    category: 'Hepatology',
-  },
-  {
-    id: 'timi-ua-nstemi',
-    name: 'TIMI (UA/NSTEMI)',
-    description: 'TIMI risk score for unstable angina / NSTEMI (7 criteria)',
-    category: 'Cardiology',
-  },
-  {
-    id: 'gfr',
-    name: 'eGFR Calculator',
-    description: 'Estimated Glomerular Filtration Rate (CKD-EPI)',
-    category: 'Renal',
-  },
-  {
-    id: 'bmi',
-    name: 'BMI Calculator',
-    description: 'Body Mass Index and weight classification',
-    category: 'General',
-  },
-  {
-    id: 'chads2vasc',
-    name: 'CHA2DS2-VASc',
-    description: 'Stroke risk in atrial fibrillation',
-    category: 'Cardiology',
-  },
-  {
-    id: 'phq9',
-    name: 'PHQ-9',
-    description: 'Depression symptom screen (0–27) with question 9 safety escalation',
-    category: 'Behavioral health',
-  },
-  {
-    id: 'gad7',
-    name: 'GAD-7',
-    description: 'Anxiety symptom screen (0–21) with severe-range escalation messaging',
-    category: 'Behavioral health',
-  },
-];
+const CALCULATORS = builtinUiCalculators.map((calc) => {
+  const registryId = BUILTIN_CALC_ID_TO_REGISTRY_ID[calc.id] ?? calc.id;
+  const reg = toolRegistryById[registryId];
+  return {
+    id: calc.id,
+    name: calc.name,
+    description: calc.description || reg?.description || '',
+    category: reg?.category || 'Calculator',
+  };
+});
 
 function CalcPanelTitle({ icon, children }) {
   return (
     <div className="calculator-panel-title">
-      <NavIcon icon={icon} size={22} />
-      {children}
+      <NavIcon icon={icon} size={22} aria-hidden />
+      <span className="calculator-panel-title-text">{children}</span>
     </div>
   );
 }
@@ -144,8 +83,8 @@ function CalcPanelTitle({ icon, children }) {
 function ResultsPanelTitle() {
   return (
     <div className="calculator-panel-title">
-      <NavIcon icon={CHROME_ICONS.barChart} size={22} />
-      Results
+      <NavIcon icon={CHROME_ICONS.barChart} size={22} aria-hidden />
+      <span className="calculator-panel-title-text">Results</span>
     </div>
   );
 }
@@ -162,8 +101,8 @@ function CalcResultsEmptyIcon({ icon, size = 56 }) {
 function CalcDecisionSupportLead() {
   return (
     <p className="calc-ds-lead">
-      <strong>Decision support only.</strong> Does not establish a diagnosis or replace clinician judgment; follow
-      local protocols.
+      <strong>Decision support only.</strong> Does not establish a diagnosis, confer diagnostic certainty, or replace
+      clinician judgment; follow local protocols.
     </p>
   );
 }
@@ -191,6 +130,49 @@ function CalcInterpretationRegion({ headingId, title, severity, emphasizeRisk, c
       </h3>
       {children}
     </section>
+  );
+}
+
+function scrollCalcResultsIntoView(resultsEl) {
+  if (!resultsEl) return;
+  const reduceMotion =
+    typeof window !== 'undefined' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  resultsEl.focus({ preventScroll: true });
+  resultsEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+}
+
+function focusFirstFieldById(fieldIds) {
+  for (const id of fieldIds) {
+    const el = document.getElementById(id);
+    if (el && !el.disabled) {
+      el.focus();
+      return;
+    }
+  }
+}
+
+function calcFieldClass(base, invalid) {
+  return invalid ? `${base} calc-input-field--invalid` : base;
+}
+
+function calcDescribedBy(...ids) {
+  const joined = ids.filter(Boolean).join(' ');
+  return joined || undefined;
+}
+
+function CalcResultsPanel({ id, resultsRef, children }) {
+  return (
+    <div
+      ref={resultsRef}
+      id={id}
+      className="calculator-results"
+      aria-live="polite"
+      aria-atomic="true"
+      tabIndex={-1}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -267,14 +249,23 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
 
   const [selectedCalculator, setSelectedCalculator] = useState(null);
   const [sharedResult, setSharedResult] = useState(null);
+  const [unknownSlug, setUnknownSlug] = useState(null);
 
   useEffect(() => {
     const slug = initialCalculatorId || calcFromUrl;
-    if (!slug) return;
+    if (!slug) {
+      setUnknownSlug(null);
+      return;
+    }
     const match = CALCULATORS.find((c) => c.id === slug);
     if (match) {
       setSelectedCalculator(match);
       setSharedResult(null);
+      setUnknownSlug(null);
+    } else {
+      setSelectedCalculator(null);
+      setSharedResult(null);
+      setUnknownSlug(slug);
     }
   }, [initialCalculatorId, calcFromUrl]);
 
@@ -366,11 +357,18 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                 setSharedResult(null);
               }}
             />
-          ))
+          ))}
         </div>
 
         {/* Calculator Interface */}
-        {selectedCalculator ? (
+        {unknownSlug ? (
+          <ToolNotFound
+            toolId={unknownSlug}
+            title="Calculator not found"
+            description={`No built-in form is available for calculator id “${unknownSlug}”. Choose another calculator above or browse the clinical catalog.`}
+            showCatalogLink
+          />
+        ) : selectedCalculator ? (
           <CalculatorInterface calculator={selectedCalculator} onResultChange={setSharedResult} />
         ) : (
           <div className="calculators-select-placeholder">
@@ -416,8 +414,22 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <Phq9Calculator onResultChange={onResultChange} />;
     case 'gad7':
       return <Gad7Calculator onResultChange={onResultChange} />;
+    case 'ascvd-risk':
+      return <AscvdRiskCalculator onResultChange={onResultChange} />;
+    case 'ckd-staging':
+      return <CkdStagingCalculator onResultChange={onResultChange} />;
+    case 'stop-bang':
+      return <StopBangCalculator onResultChange={onResultChange} />;
+    case 'audit-c':
+      return <AuditCCalculator onResultChange={onResultChange} />;
     default:
-      return <motion.div>Calculator not implemented</motion.div>;
+      return (
+        <ToolNotFound
+          toolId={calculator.id}
+          title="Calculator not implemented"
+          description={`The calculator “${calculator.name || calculator.id}” does not have a form in this build yet.`}
+        />
+      );
   }
 };
 
@@ -431,6 +443,8 @@ const QSOFACalculator = ({ onResultChange }) => {
   const [gcs, setGcs] = useState('');
   const [validationErrors, setValidationErrors] = useState([]);
   const [result, setResult] = useState(null);
+  const resultsRef = useRef(null);
+  const errorSummaryId = 'qsofa-errors';
 
   useEffect(() => {
     if (onResultChange) {
@@ -446,6 +460,10 @@ const QSOFACalculator = ({ onResultChange }) => {
     }
   }, [onResultChange, result]);
 
+  useEffect(() => {
+    if (result) scrollCalcResultsIntoView(resultsRef.current);
+  }, [result]);
+
   const runCalculate = () => {
     const v = validateQsofaInputs({
       respiratoryRate,
@@ -456,6 +474,7 @@ const QSOFACalculator = ({ onResultChange }) => {
     setValidationErrors(v.errors);
     if (!v.ok) {
       setResult(null);
+      focusFirstFieldById(['qsofa-rr', 'qsofa-sbp', 'qsofa-alt', 'qsofa-gcs']);
       return;
     }
     const criteria = qsofaCriteriaFromInputs({
@@ -483,6 +502,11 @@ const QSOFACalculator = ({ onResultChange }) => {
     setValidationErrors([]);
     setResult(null);
   };
+
+  const rrInvalid = validationErrors.some((e) => /respiratory/i.test(e));
+  const sbpInvalid = validationErrors.some((e) => /systolic|blood pressure/i.test(e));
+  const gcsInvalid = validationErrors.some((e) => /GCS/i.test(e));
+  const mentationInvalid = validationErrors.some((e) => /mentation/i.test(e));
 
   return (
     <div className="calculator-interface calculator-interface--qsofa">
@@ -518,8 +542,9 @@ const QSOFACalculator = ({ onResultChange }) => {
               id="qsofa-rr"
               type="number"
               inputMode="decimal"
-              className="calc-input-field"
-              aria-describedby="qsofa-rr-help"
+              className={calcFieldClass('calc-input-field', rrInvalid)}
+              aria-describedby={calcDescribedBy('qsofa-rr-help', validationErrors.length ? errorSummaryId : '')}
+              aria-invalid={rrInvalid || undefined}
               min={0}
               max={120}
               value={respiratoryRate}
@@ -537,8 +562,9 @@ const QSOFACalculator = ({ onResultChange }) => {
               id="qsofa-sbp"
               type="number"
               inputMode="decimal"
-              className="calc-input-field"
-              aria-describedby="qsofa-sbp-help"
+              className={calcFieldClass('calc-input-field', sbpInvalid)}
+              aria-describedby={calcDescribedBy('qsofa-sbp-help', validationErrors.length ? errorSummaryId : '')}
+              aria-invalid={sbpInvalid || undefined}
               min={40}
               max={300}
               value={systolicBloodPressure}
@@ -555,7 +581,11 @@ const QSOFACalculator = ({ onResultChange }) => {
               className="calc-checkbox"
               checked={alteredMentation}
               onChange={(e) => setAlteredMentation(e.target.checked)}
-              aria-describedby="qsofa-ment-help"
+              aria-describedby={calcDescribedBy(
+                'qsofa-ment-help',
+                validationErrors.length ? errorSummaryId : ''
+              )}
+              aria-invalid={mentationInvalid || undefined}
             />
             <label htmlFor="qsofa-alt" className="calc-checkbox-label">
               Altered mentation (e.g. disorientation, lethargy)
@@ -577,8 +607,9 @@ const QSOFACalculator = ({ onResultChange }) => {
           <input
             id="qsofa-gcs"
             type="number"
-            className="calc-input-field"
-            aria-describedby="qsofa-gcs-help"
+            className={calcFieldClass('calc-input-field', gcsInvalid)}
+            aria-describedby={calcDescribedBy('qsofa-gcs-help', validationErrors.length ? errorSummaryId : '')}
+            aria-invalid={gcsInvalid || undefined}
             min={3}
             max={15}
             value={gcs}
@@ -588,7 +619,7 @@ const QSOFACalculator = ({ onResultChange }) => {
         </div>
 
         {validationErrors.length > 0 && (
-          <div className="calc-error" role="alert">
+          <div id={errorSummaryId} className="calc-error calc-validation-errors" role="alert" aria-live="assertive">
             <strong>Please fix:</strong>
             <ul className="calc-validation-list">
               {validationErrors.map((err) => (
@@ -603,20 +634,22 @@ const QSOFACalculator = ({ onResultChange }) => {
             <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
             Calculate qSOFA
           </button>
-          <button type="button" className="calc-reset-btn" onClick={reset}>
+          <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset qSOFA form">
             Reset
           </button>
         </div>
         </form>
       </div>
 
-      <div className="calculator-results" aria-live="polite">
+      <CalcResultsPanel id="calc-results-qsofa" resultsRef={resultsRef}>
         <ResultsPanelTitle />
 
         {result ? (
           <>
-            <div className={`calc-score-display ${result.severity}`}>
-              <div className="calc-score-label">qSOFA score</div>
+            <div className={`calc-score-display ${result.severity}`} aria-labelledby="qsofa-score-label">
+              <div id="qsofa-score-label" className="calc-score-label">
+                qSOFA score
+              </div>
               <div className="calc-score-value">{result.score}</div>
               <div className="calc-score-interpretation">of 3 criteria present</div>
             </div>
@@ -637,14 +670,14 @@ const QSOFACalculator = ({ onResultChange }) => {
               </div>
             </div>
 
-            <div
-              className={`calc-interpretation-box ${result.severity}${
-                result.score >= 2 ? ' calc-interpretation-box--risk-emphasis' : ''
-              }`}
+            <CalcInterpretationRegion
+              headingId="qsofa-interpretation-heading"
+              title="Interpretation"
+              severity={result.severity}
+              emphasizeRisk={result.score >= 2}
             >
-              <div className="calc-interpretation-title">Interpretation</div>
-              <div className="calc-interpretation-text">{result.interpretation}</div>
-            </div>
+              <p className="calc-interpretation-text">{result.interpretation}</p>
+            </CalcInterpretationRegion>
 
             <div className="calc-references">
               <div className="calc-references-title">Reference</div>
@@ -660,7 +693,7 @@ const QSOFACalculator = ({ onResultChange }) => {
             <p>Enter vitals and mentation, then calculate</p>
           </div>
         )}
-      </div>
+      </CalcResultsPanel>
     </div>
   );
 };
@@ -679,6 +712,8 @@ const NEWS2Calculator = ({ onResultChange }) => {
   const [temperature, setTemperature] = useState('');
   const [validationErrors, setValidationErrors] = useState([]);
   const [result, setResult] = useState(null);
+  const resultsRef = useRef(null);
+  const errorSummaryId = 'news2-errors';
 
   useEffect(() => {
     if (onResultChange) {
@@ -694,6 +729,10 @@ const NEWS2Calculator = ({ onResultChange }) => {
     }
   }, [onResultChange, result]);
 
+  useEffect(() => {
+    if (result) scrollCalcResultsIntoView(resultsRef.current);
+  }, [result]);
+
   const runCalculate = () => {
     const v = validateNews2Inputs({
       respiratoryRate,
@@ -708,6 +747,7 @@ const NEWS2Calculator = ({ onResultChange }) => {
     setValidationErrors(v.errors);
     if (!v.ok) {
       setResult(null);
+      focusFirstFieldById(['news2-rr', 'news2-spo2', 'news2-scale-1', 'news2-sbp', 'news2-pulse', 'news2-temp']);
       return;
     }
     const breakdown = computeNews2Breakdown({
@@ -746,6 +786,12 @@ const NEWS2Calculator = ({ onResultChange }) => {
     setValidationErrors([]);
     setResult(null);
   };
+
+  const rrInvalid = validationErrors.some((e) => /respiratory/i.test(e));
+  const spo2Invalid = validationErrors.some((e) => /SpO/i.test(e));
+  const sbpInvalid = validationErrors.some((e) => /systolic/i.test(e));
+  const pulseInvalid = validationErrors.some((e) => /pulse/i.test(e));
+  const tempInvalid = validationErrors.some((e) => /temperature/i.test(e));
 
   return (
     <div className="calculator-interface calculator-interface--news2">
@@ -825,8 +871,9 @@ const NEWS2Calculator = ({ onResultChange }) => {
               id="news2-rr"
               type="number"
               inputMode="numeric"
-              className="calc-input-field"
-              aria-describedby="news2-rr-help"
+              className={calcFieldClass('calc-input-field', rrInvalid)}
+              aria-describedby={calcDescribedBy('news2-rr-help', validationErrors.length ? errorSummaryId : '')}
+              aria-invalid={rrInvalid || undefined}
               min={0}
               max={60}
               value={respiratoryRate}
@@ -844,8 +891,9 @@ const NEWS2Calculator = ({ onResultChange }) => {
               id="news2-spo2"
               type="number"
               inputMode="decimal"
-              className="calc-input-field"
-              aria-describedby="news2-spo2-help"
+              className={calcFieldClass('calc-input-field', spo2Invalid)}
+              aria-describedby={calcDescribedBy('news2-spo2-help', validationErrors.length ? errorSummaryId : '')}
+              aria-invalid={spo2Invalid || undefined}
               min={70}
               max={100}
               value={spo2}
@@ -879,11 +927,16 @@ const NEWS2Calculator = ({ onResultChange }) => {
             <label className="calc-input-label" htmlFor="news2-sbp">
               Systolic BP (mmHg)
             </label>
+            <span className="calc-input-help" id="news2-sbp-help">
+              Values outside 50–280 mmHg are blocked from calculation.
+            </span>
             <input
               id="news2-sbp"
               type="number"
               inputMode="decimal"
-              className="calc-input-field"
+              className={calcFieldClass('calc-input-field', sbpInvalid)}
+              aria-describedby={calcDescribedBy('news2-sbp-help', validationErrors.length ? errorSummaryId : '')}
+              aria-invalid={sbpInvalid || undefined}
               min={50}
               max={280}
               value={systolicBp}
@@ -894,11 +947,16 @@ const NEWS2Calculator = ({ onResultChange }) => {
             <label className="calc-input-label" htmlFor="news2-pulse">
               Pulse (bpm)
             </label>
+            <span className="calc-input-help" id="news2-pulse-help">
+              Values outside 20–220 bpm are blocked from calculation.
+            </span>
             <input
               id="news2-pulse"
               type="number"
               inputMode="numeric"
-              className="calc-input-field"
+              className={calcFieldClass('calc-input-field', pulseInvalid)}
+              aria-describedby={calcDescribedBy('news2-pulse-help', validationErrors.length ? errorSummaryId : '')}
+              aria-invalid={pulseInvalid || undefined}
               min={20}
               max={220}
               value={pulse}
@@ -914,18 +972,19 @@ const NEWS2Calculator = ({ onResultChange }) => {
           <span className="calc-input-help" id="news2-temp-help">
             Core or equivalent temperature. Values outside 30–43 °C are blocked from calculation.
           </span>
-          <input
-            id="news2-temp"
-            type="number"
-            inputMode="decimal"
-            className="calc-input-field"
-            aria-describedby="news2-temp-help"
-            step="0.1"
-            min={30}
-            max={43}
-            value={temperature}
-            onChange={(e) => setTemperature(e.target.value)}
-          />
+            <input
+              id="news2-temp"
+              type="number"
+              inputMode="decimal"
+              className={calcFieldClass('calc-input-field', tempInvalid)}
+              aria-describedby={calcDescribedBy('news2-temp-help', validationErrors.length ? errorSummaryId : '')}
+              aria-invalid={tempInvalid || undefined}
+              step="0.1"
+              min={30}
+              max={43}
+              value={temperature}
+              onChange={(e) => setTemperature(e.target.value)}
+            />
         </div>
 
         <div className="calc-input-group">
@@ -948,7 +1007,7 @@ const NEWS2Calculator = ({ onResultChange }) => {
         </div>
 
         {validationErrors.length > 0 && (
-          <div className="calc-error" role="alert">
+          <div id={errorSummaryId} className="calc-error calc-validation-errors" role="alert" aria-live="assertive">
             <strong>Please fix:</strong>
             <ul className="calc-validation-list">
               {validationErrors.map((err) => (
@@ -963,20 +1022,22 @@ const NEWS2Calculator = ({ onResultChange }) => {
             <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
             Calculate NEWS2
           </button>
-          <button type="button" className="calc-reset-btn" onClick={reset}>
+          <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset NEWS2 form">
             Reset
           </button>
         </div>
         </form>
       </div>
 
-      <div className="calculator-results" aria-live="polite">
+      <CalcResultsPanel id="calc-results-news2" resultsRef={resultsRef}>
         <ResultsPanelTitle />
 
         {result ? (
           <>
-            <div className={`calc-score-display ${result.severity}`}>
-              <div className="calc-score-label">NEWS2 total</div>
+            <div className={`calc-score-display ${result.severity}`} aria-labelledby="news2-score-label">
+              <div id="news2-score-label" className="calc-score-label">
+                NEWS2 total
+              </div>
               <div className="calc-score-value">{result.total}</div>
               <div className="calc-score-interpretation">{result.label}</div>
             </div>
@@ -1015,15 +1076,15 @@ const NEWS2Calculator = ({ onResultChange }) => {
               </div>
             </div>
 
-            <div
-              className={`calc-interpretation-box ${result.severity}${
-                result.severity !== 'normal' ? ' calc-interpretation-box--risk-emphasis' : ''
-              }`}
+            <CalcInterpretationRegion
+              headingId="news2-interpretation-heading"
+              title="Escalation (RCP guidance)"
+              severity={result.severity}
+              emphasizeRisk={result.severity !== 'normal'}
             >
-              <div className="calc-interpretation-title">Escalation (RCP guidance)</div>
-              <div className="calc-interpretation-text">{result.interpretation}</div>
-              <div className="calc-interpretation-text calc-interpretation-text--secondary">{result.escalationHint}</div>
-            </div>
+              <p className="calc-interpretation-text">{result.interpretation}</p>
+              <p className="calc-interpretation-text calc-interpretation-text--secondary">{result.escalationHint}</p>
+            </CalcInterpretationRegion>
 
             <div className="calc-references">
               <div className="calc-references-title">Reference</div>
@@ -1039,7 +1100,7 @@ const NEWS2Calculator = ({ onResultChange }) => {
             <p>Enter observations, choose SpO₂ scale, then calculate</p>
           </div>
         )}
-      </div>
+      </CalcResultsPanel>
     </div>
   );
 };
@@ -1059,6 +1120,8 @@ const ChildPughCalculator = ({ onResultChange }) => {
   const [encephalopathy, setEncephalopathy] = useState('none');
   const [validationErrors, setValidationErrors] = useState([]);
   const [result, setResult] = useState(null);
+  const resultsRef = useRef(null);
+  const errorSummaryId = "cp-errors";
 
   useEffect(() => {
     if (onResultChange) {
@@ -1073,6 +1136,10 @@ const ChildPughCalculator = ({ onResultChange }) => {
       );
     }
   }, [onResultChange, result]);
+
+  useEffect(() => {
+    if (result) scrollCalcResultsIntoView(resultsRef.current);
+  }, [result]);
 
   const runCalculate = () => {
     const raw = {
@@ -1090,6 +1157,7 @@ const ChildPughCalculator = ({ onResultChange }) => {
     setValidationErrors(v.errors);
     if (!v.ok) {
       setResult(null);
+      focusFirstFieldById(["cp-bili", "cp-alb", coagulationMode === "inr" ? "cp-inr" : "cp-pt"]);
       return;
     }
     const breakdown = computeChildPughBreakdown(raw);
@@ -1122,6 +1190,11 @@ const ChildPughCalculator = ({ onResultChange }) => {
     setResult(null);
   };
 
+  const biliInvalid = validationErrors.some((e) => /bilirubin/i.test(e));
+  const albInvalid = validationErrors.some((e) => /albumin/i.test(e));
+  const inrInvalid = validationErrors.some((e) => /INR/i.test(e));
+  const ptInvalid = validationErrors.some((e) => /PT prolongation/i.test(e));
+
   return (
     <div className="calculator-interface calculator-interface--child-pugh">
       <div className="calculator-inputs">
@@ -1149,12 +1222,17 @@ const ChildPughCalculator = ({ onResultChange }) => {
             <label className="calc-input-label" htmlFor="cp-bili">
               Total bilirubin
             </label>
+            <span className="calc-input-help" id="cp-bili-help">
+              Required. Valid ranges depend on unit; out-of-range values are blocked.
+            </span>
             <div className="calc-input-inline-units">
               <input
                 id="cp-bili"
                 type="number"
                 inputMode="decimal"
-                className="calc-input-field"
+                className={calcFieldClass('calc-input-field', biliInvalid)}
+                aria-describedby={calcDescribedBy('cp-bili-help', validationErrors.length ? errorSummaryId : '')}
+                aria-invalid={biliInvalid || undefined}
                 step="0.1"
                 min={0}
                 value={bilirubin}
@@ -1184,12 +1262,17 @@ const ChildPughCalculator = ({ onResultChange }) => {
             <label className="calc-input-label" htmlFor="cp-alb">
               Albumin
             </label>
+            <span className="calc-input-help" id="cp-alb-help">
+              Required. Valid ranges depend on unit; out-of-range values are blocked.
+            </span>
             <div className="calc-input-inline-units">
               <input
                 id="cp-alb"
                 type="number"
                 inputMode="decimal"
-                className="calc-input-field"
+                className={calcFieldClass('calc-input-field', albInvalid)}
+                aria-describedby={calcDescribedBy('cp-alb-help', validationErrors.length ? errorSummaryId : '')}
+                aria-invalid={albInvalid || undefined}
                 step="0.1"
                 min={0}
                 value={albumin}
@@ -1246,11 +1329,16 @@ const ChildPughCalculator = ({ onResultChange }) => {
             <label className="calc-input-label" htmlFor="cp-inr">
               INR
             </label>
+            <span className="calc-input-help" id="cp-inr-help">
+              0.5–15. Values outside this range are blocked from calculation.
+            </span>
             <input
               id="cp-inr"
               type="number"
               inputMode="decimal"
-              className="calc-input-field"
+              className={calcFieldClass('calc-input-field', inrInvalid)}
+              aria-describedby={calcDescribedBy('cp-inr-help', validationErrors.length ? errorSummaryId : '')}
+              aria-invalid={inrInvalid || undefined}
               step="0.1"
               min={0.5}
               max={15}
@@ -1263,11 +1351,16 @@ const ChildPughCalculator = ({ onResultChange }) => {
             <label className="calc-input-label" htmlFor="cp-pt">
               PT prolongation (seconds above control)
             </label>
+            <span className="calc-input-help" id="cp-pt-help">
+              0–80 seconds above control. Values outside this range are blocked.
+            </span>
             <input
               id="cp-pt"
               type="number"
               inputMode="decimal"
-              className="calc-input-field"
+              className={calcFieldClass('calc-input-field', ptInvalid)}
+              aria-describedby={calcDescribedBy('cp-pt-help', validationErrors.length ? errorSummaryId : '')}
+              aria-invalid={ptInvalid || undefined}
               step="0.1"
               min={0}
               max={80}
@@ -1311,7 +1404,7 @@ const ChildPughCalculator = ({ onResultChange }) => {
         </div>
 
         {validationErrors.length > 0 && (
-          <div className="calc-error" role="alert">
+          <div id={errorSummaryId} className="calc-error calc-validation-errors" role="alert" aria-live="assertive">
             <strong>Please fix:</strong>
             <ul className="calc-validation-list">
               {validationErrors.map((err) => (
@@ -1326,20 +1419,22 @@ const ChildPughCalculator = ({ onResultChange }) => {
             <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
             Calculate Child-Pugh
           </button>
-          <button type="button" className="calc-reset-btn" onClick={reset}>
+          <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset Child-Pugh form">
             Reset
           </button>
         </div>
         </form>
       </div>
 
-      <div className="calculator-results" aria-live="polite">
+      <CalcResultsPanel id="calc-results-child-pugh" resultsRef={resultsRef}>
         <ResultsPanelTitle />
 
         {result ? (
           <>
-            <div className={`calc-score-display ${result.severity}`}>
-              <div className="calc-score-label">Child-Pugh score</div>
+            <div className={`calc-score-display ${result.severity}`} aria-labelledby="cp-score-label">
+              <div id="cp-score-label" className="calc-score-label">
+                Child-Pugh score
+              </div>
               <div className="calc-score-value">{result.total}</div>
               <div className="calc-score-interpretation">{result.label}</div>
             </div>
@@ -1370,14 +1465,14 @@ const ChildPughCalculator = ({ onResultChange }) => {
               </div>
             </div>
 
-            <div
-              className={`calc-interpretation-box ${result.severity}${
-                result.severity !== 'normal' ? ' calc-interpretation-box--risk-emphasis' : ''
-              }`}
+            <CalcInterpretationRegion
+              headingId="cp-interpretation-heading"
+              title="Interpretation"
+              severity={result.severity}
+              emphasizeRisk={result.severity !== 'normal'}
             >
-              <div className="calc-interpretation-title">Interpretation</div>
-              <div className="calc-interpretation-text">{result.interpretation}</div>
-            </div>
+              <p className="calc-interpretation-text">{result.interpretation}</p>
+            </CalcInterpretationRegion>
 
             <div className="calc-references">
               <div className="calc-references-title">Reference</div>
@@ -1393,7 +1488,7 @@ const ChildPughCalculator = ({ onResultChange }) => {
             <p>Enter labs and clinical grades, then calculate</p>
           </div>
         )}
-      </div>
+      </CalcResultsPanel>
     </div>
   );
 };
@@ -1412,6 +1507,7 @@ const HasBledCalculator = ({ onResultChange }) => {
   const [bleedingPredisposingDrugs, setBleedingPredisposingDrugs] = useState(false);
   const [alcoholUse, setAlcoholUse] = useState(false);
   const [result, setResult] = useState(null);
+  const resultsRef = useRef(null);
 
   const inputs = {
     hypertension,
@@ -1449,6 +1545,10 @@ const HasBledCalculator = ({ onResultChange }) => {
       );
     }
   }, [onResultChange, result]);
+
+  useEffect(() => {
+    if (result) scrollCalcResultsIntoView(resultsRef.current);
+  }, [result]);
 
   const runCalculate = () => {
     const total = calculateHasBledScore(inputs);
@@ -1505,7 +1605,7 @@ const HasBledCalculator = ({ onResultChange }) => {
           <legend className="calc-has-bled-legend" id="has-bled-criteria-legend">
             Risk factors (check all that apply)
           </legend>
-          <div className="calc-has-bled-criteria" role="group" aria-labelledby="has-bled-criteria-legend">
+          <div className="calc-has-bled-criteria">
             {HAS_BLED_CRITERIA_META.map((row) => {
               const id = `has-bled-${row.key}`;
               const checked = Boolean(inputs[row.key]);
@@ -1538,20 +1638,22 @@ const HasBledCalculator = ({ onResultChange }) => {
             <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
             Calculate HAS-BLED
           </button>
-          <button type="button" className="calc-reset-btn" onClick={reset}>
+          <button type="button" className="calc-reset-btn" onClick={reset} aria-label="Reset HAS-BLED form">
             Reset
           </button>
         </div>
         </form>
       </div>
 
-      <div className="calculator-results" aria-live="polite">
+      <CalcResultsPanel id="calc-results-has-bled" resultsRef={resultsRef}>
         <ResultsPanelTitle />
 
         {result ? (
           <>
-            <div className={`calc-score-display ${result.severity}`}>
-              <div className="calc-score-label">HAS-BLED score</div>
+            <div className={`calc-score-display ${result.severity}`} aria-labelledby="has-bled-score-label">
+              <div id="has-bled-score-label" className="calc-score-label">
+                HAS-BLED score
+              </div>
               <div className="calc-score-value">{result.total}</div>
               <div className="calc-score-interpretation">of 9 possible factor points</div>
             </div>
@@ -1566,15 +1668,15 @@ const HasBledCalculator = ({ onResultChange }) => {
               ))}
             </div>
 
-            <div
-              className={`calc-interpretation-box ${result.severity}${
-                result.total >= 3 ? ' calc-interpretation-box--risk-emphasis' : ''
-              }`}
+            <CalcInterpretationRegion
+              headingId="has-bled-interpretation-heading"
+              title={result.label}
+              severity={result.severity}
+              emphasizeRisk={result.total >= 3}
             >
-              <div className="calc-interpretation-title">{result.label}</div>
-              <div className="calc-interpretation-text">{result.interpretation}</div>
-              <div className="calc-interpretation-text calc-interpretation-text--secondary">{result.bleedingRiskNote}</div>
-            </div>
+              <p className="calc-interpretation-text">{result.interpretation}</p>
+              <p className="calc-interpretation-text calc-interpretation-text--secondary">{result.bleedingRiskNote}</p>
+            </CalcInterpretationRegion>
 
             <div className="calc-references">
               <div className="calc-references-title">Reference</div>
@@ -1590,7 +1692,7 @@ const HasBledCalculator = ({ onResultChange }) => {
             <p>Select applicable factors, then calculate</p>
           </div>
         )}
-      </div>
+      </CalcResultsPanel>
     </div>
   );
 };
@@ -2792,7 +2894,7 @@ const BMICalculator = ({ onResultChange }) => {
 };
 
 /**
- * CHA2DS2-VASc Calculator (simplified)
+ * CHA2DS2-VASc Calculator (simplified) — stroke risk stratum only; no anticoagulation directives.
  */
 const CHA2DS2VAScCalculator = ({ onResultChange }) => {
   const [inputs, setInputs] = useState({
@@ -2832,21 +2934,25 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
     let recommendation = '';
 
     if (score === 0) {
-      interpretation = 'Very low stroke risk';
+      interpretation = 'Low estimated stroke risk stratum (score 0)';
       severity = 'normal';
-      recommendation = 'No anticoagulation recommended';
+      recommendation =
+        'Discuss stroke risk with guidelines and shared decision-making — this tool does not recommend for or against anticoagulation.';
     } else if (score === 1) {
-      interpretation = 'Low stroke risk';
+      interpretation = 'Intermediate estimated stroke risk stratum (score 1)';
       severity = 'normal';
-      recommendation = 'Consider anticoagulation';
+      recommendation =
+        'Discuss stroke and bleeding risk with guidelines — does not direct anticoagulant initiation or cessation.';
     } else if (score === 2) {
-      interpretation = 'Moderate stroke risk';
+      interpretation = 'Moderate estimated stroke risk stratum (score 2)';
       severity = 'warning';
-      recommendation = 'Anticoagulation recommended';
+      recommendation =
+        'Higher stroke-risk stratum for discussion with guidelines — not a directive to start or stop anticoagulation.';
     } else {
-      interpretation = 'High stroke risk';
+      interpretation = 'High estimated stroke risk stratum (score ≥3)';
       severity = 'critical';
-      recommendation = 'Anticoagulation strongly recommended';
+      recommendation =
+        'Higher stroke-risk stratum for discussion with guidelines and bleeding-risk assessment (e.g. HAS-BLED) — not a directive to start or stop therapy.';
     }
 
     setResult({ score, interpretation, severity, recommendation });
@@ -2993,9 +3099,10 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
             </div>
 
             <div className={`calc-interpretation-box ${result.severity}`}>
-              <div className="calc-interpretation-title">Clinical Recommendation</div>
+              <div className="calc-interpretation-title">Stroke risk discussion (not a treatment order)</div>
               <div className="calc-interpretation-text">{result.recommendation}</div>
             </div>
+            <CalcResultSafetyFooter />
 
             <div className="calc-references">
               <div className="calc-references-title">Reference</div>

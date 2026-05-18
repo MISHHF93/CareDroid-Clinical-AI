@@ -20,8 +20,8 @@ import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistr
 function CalcPanelTitle({ icon, children }) {
   return (
     <div className="calculator-panel-title">
-      <NavIcon icon={icon} size={22} />
-      {children}
+      <NavIcon icon={icon} size={22} aria-hidden />
+      <span className="calculator-panel-title-text">{children}</span>
     </div>
   );
 }
@@ -29,8 +29,8 @@ function CalcPanelTitle({ icon, children }) {
 function ResultsPanelTitle() {
   return (
     <div className="calculator-panel-title">
-      <NavIcon icon={CHROME_ICONS.barChart} size={22} />
-      Results
+      <NavIcon icon={CHROME_ICONS.barChart} size={22} aria-hidden />
+      <span className="calculator-panel-title-text">Results</span>
     </div>
   );
 }

@@ -13,7 +13,18 @@ import ClinicalAlertBanner from '../../components/clinical/ClinicalAlertBanner';
 import analyticsService from '../../services/analyticsService';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
+import ClinicalDecisionSupportDisclaimer from '../../components/clinical/ClinicalDecisionSupportDisclaimer';
 import './ToolPageLayout.css';
+
+const AI_DOCUMENTATION_TOOL_IDS = new Set(['diagnosis', 'procedures', 'protocols']);
+const FLEET_TOOL_IDS = new Set(['route-optimizer', 'predictive-maintenance', 'fleet-command', 'dispatch-ai']);
+
+function disclaimerVariantForTool(toolId) {
+  if (toolId === 'drug-check') return 'drug-interaction';
+  if (FLEET_TOOL_IDS.has(toolId)) return 'fleet';
+  if (AI_DOCUMENTATION_TOOL_IDS.has(toolId)) return 'ai-documentation';
+  return 'clinical';
+}
 
 const ToolPageLayout = ({
   tool,
@@ -184,6 +195,7 @@ const ToolPageLayout = ({
 
       {/* Tool Content */}
       <div className="tool-content">
+        <ClinicalDecisionSupportDisclaimer variant={disclaimerVariantForTool(tool.id)} />
         {children}
       </div>
 

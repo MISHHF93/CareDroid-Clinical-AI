@@ -12,6 +12,11 @@ import {
   sumChildPughScore,
   validateChildPughInputs,
 } from './childPughCalculator';
+import {
+  CHILD_PUGH_CLASS_A_INPUTS,
+  CHILD_PUGH_CLASS_BOUNDARIES,
+  CHILD_PUGH_CLASS_BY_TOTAL,
+} from '../data/testHelpers/pr1TestFixtures';
 
 describe('childPughCalculator', () => {
   it('scores bilirubin, albumin, INR, PT prolongation', () => {
@@ -46,38 +51,26 @@ describe('childPughCalculator', () => {
   });
 
   it('computes minimum score (class A) with INR path', () => {
-    const b = computeChildPughBreakdown({
-      bilirubin: '1',
-      bilirubinUnit: 'mg_dl',
-      albumin: '4',
-      albuminUnit: 'g_dl',
-      coagulationMode: 'inr',
-      inr: '1.2',
-      ptProlongationSec: '',
-      ascites: 'none',
-      encephalopathy: 'none',
-    });
+    const b = computeChildPughBreakdown(CHILD_PUGH_CLASS_A_INPUTS);
     expect(sumChildPughScore(b)).toBe(5);
-    const interp = interpretChildPughClass(5);
-    expect(interp?.childPughClass).toBe('A');
+    expect(interpretChildPughClass(5)?.childPughClass).toBe('A');
   });
 
-  it('computes class B and C boundaries', () => {
-    expect(interpretChildPughClass(6)?.childPughClass).toBe('A');
-    expect(interpretChildPughClass(7)?.childPughClass).toBe('B');
-    expect(interpretChildPughClass(9)?.childPughClass).toBe('B');
-    expect(interpretChildPughClass(10)?.childPughClass).toBe('C');
-    expect(interpretChildPughClass(15)?.childPughClass).toBe('C');
-  });
+  it.each(CHILD_PUGH_CLASS_BOUNDARIES)(
+    'class boundary total $total → $childPughClass',
+    ({ total, childPughClass }) => {
+      expect(interpretChildPughClass(total)?.childPughClass).toBe(childPughClass);
+    }
+  );
 
-  it('interpretChildPughClass assigns severity bands at class boundaries', () => {
-    expect(interpretChildPughClass(5)?.severity).toBe('normal');
-    expect(interpretChildPughClass(6)?.severity).toBe('normal');
-    expect(interpretChildPughClass(7)?.severity).toBe('warning');
-    expect(interpretChildPughClass(9)?.severity).toBe('warning');
-    expect(interpretChildPughClass(10)?.severity).toBe('critical');
-    expect(interpretChildPughClass(15)?.severity).toBe('critical');
-  });
+  it.each(CHILD_PUGH_CLASS_BY_TOTAL)(
+    'interpretChildPughClass($total) → $childPughClass severity $severity',
+    ({ total, childPughClass, severity }) => {
+      const interp = interpretChildPughClass(total);
+      expect(interp?.childPughClass).toBe(childPughClass);
+      expect(interp?.severity).toBe(severity);
+    }
+  );
 
   it('uses PT prolongation when selected', () => {
     const b = computeChildPughBreakdown({

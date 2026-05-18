@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import Sidebar from '../components/Sidebar';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { useDrawerFocus } from '../hooks/useDrawerFocus';
 import { COMPACT_MEDIA_QUERY, getIsCompactViewport } from './breakpoints';
 import './AppShell.css';
 
@@ -18,6 +19,8 @@ const AppShell = ({
   currentTool = null,
   currentFeature = null,
   onToolSelect = null,
+  onOpenToolsOverview = null,
+  onOpenToolsCatalog = null,
   onFeatureSelect = null,
   children,
 }) => {
@@ -26,6 +29,8 @@ const AppShell = ({
   const [isCompact, setIsCompact] = useState(getIsCompactViewport);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const menuButtonRef = useRef(null);
+  const sidebarRef = useRef(null);
 
   useEffect(() => {
     const mq = window.matchMedia(COMPACT_MEDIA_QUERY);
@@ -49,6 +54,12 @@ const AppShell = ({
   };
 
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
+
+  useDrawerFocus({
+    isOpen: isAuthed && isCompact && mobileNavOpen,
+    containerRef: sidebarRef,
+    restoreFocusRef: menuButtonRef,
+  });
 
   useEffect(() => {
     if (!mobileNavOpen || !isCompact) return;
@@ -76,6 +87,7 @@ const AppShell = ({
       )}
 
       <Sidebar
+        ref={sidebarRef}
         conversations={conversations}
         activeConversation={activeConversation}
         onSelectConversation={onSelectConversation}
@@ -84,6 +96,8 @@ const AppShell = ({
         healthStatus={healthStatus}
         currentTool={currentTool}
         onToolSelect={onToolSelect}
+        onOpenToolsOverview={onOpenToolsOverview}
+        onOpenToolsCatalog={onOpenToolsCatalog}
         layoutCompact={isCompact}
         mobileNavOpen={mobileNavOpen}
         onCloseMobileNav={closeMobileNav}
@@ -94,6 +108,7 @@ const AppShell = ({
       <div className="app-shell-main-wrap">
         {isAuthed && isCompact && (
           <button
+            ref={menuButtonRef}
             type="button"
             className="app-shell-menu-btn"
             onClick={() => setMobileNavOpen(true)}

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import toolRegistry from './toolRegistry';
 import { getMedicalCatalogSummary, getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
+import { catalogRowsMatchingQuery } from '../utils/catalogSearch';
 
 describe('medicalToolsCatalogIndex', () => {
   it('includes every NLU clinical tool profile', () => {
@@ -28,6 +29,7 @@ describe('medicalToolsCatalogIndex', () => {
     const apache = rows.find((r) => r.primaryId === 'apache2-calculator');
     expect(apache?.chatOnRequest).toBe(true);
     expect(apache?.chatOnlyForm).toBe(true);
+    expect(apache?.category).toBe('chat-assisted');
 
     const gfr = rows.find((r) => r.id === 'calc-gfr');
     expect(gfr?.chatOnRequest).toBe(true);
@@ -115,6 +117,12 @@ describe('medicalToolsCatalogIndex', () => {
     expect(timi?.uiCalculatorSlug).toBe('timi-ua-nstemi');
     expect(timi?.chatOnRequest).toBe(true);
     expect(timi?.backendExecutor).toBe(false);
+  });
+
+  it('finds wells-pe via pe-score alias search', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const hits = catalogRowsMatchingQuery(rows, 'pe-score');
+    expect(hits.some((r) => r.primaryId === 'wells-pe')).toBe(true);
   });
 
   it('indexes MELD-Na with dedicated page and calculator slug', () => {

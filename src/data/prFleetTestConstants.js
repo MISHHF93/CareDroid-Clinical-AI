@@ -144,11 +144,4 @@ export const PR_FLEET_TOOL_SPECS = Object.freeze({
   },
 });
 
-export function catalogRowsMatchingQuery(rows, query) {
-  const q = query.trim().toLowerCase();
-  if (!q) return rows;
-  return rows.filter((row) => {
-    const blob = `${row.name} ${row.primaryId} ${row.id} ${row.category} ${row.description}`.toLowerCase();
-    return blob.includes(q);
-  });
-}
+export { catalogRowsMatchingQuery } from '../utils/catalogSearch';

@@ -165,7 +165,8 @@ export class DrugCheckerService implements ClinicalToolService {
         },
       ],
       warnings: validation.warnings,
-      disclaimer: 'This tool provides educational information about potential drug interactions. Always verify with clinical pharmacology resources and consider patient-specific factors before making prescribing decisions.',
+      disclaimer:
+        'Educational decision support only. Does not recommend specific doses or starting, stopping, or switching medications. Verify with clinical pharmacology resources and qualified clinician judgment.',
       timestamp: new Date(),
     };
   }

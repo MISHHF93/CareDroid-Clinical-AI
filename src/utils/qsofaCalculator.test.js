@@ -5,6 +5,10 @@ import {
   qsofaCriteriaFromInputs,
   validateQsofaInputs,
 } from './qsofaCalculator';
+import {
+  QSOFA_SCORE_PERMUTATIONS,
+  QSOFA_INTERPRETATION_BY_SCORE,
+} from '../data/testHelpers/pr1TestFixtures';
 
 describe('qsofaCalculator', () => {
   it('calculateQsofaScore counts three binary criteria', () => {
@@ -93,30 +97,25 @@ describe('qsofaCalculator', () => {
     ).toBe(true);
   });
 
-  it('enumerates all eight qSOFA score permutations from boolean criteria', () => {
-    const bits = [false, true];
-    for (const rr of bits) {
-      for (const sbp of bits) {
-        for (const ment of bits) {
-          const expected = (rr ? 1 : 0) + (sbp ? 1 : 0) + (ment ? 1 : 0);
-          expect(
-            calculateQsofaScore({
-              respiratoryRateGte22: rr,
-              systolicBpLte100: sbp,
-              alteredMentationOrGcsLt15: ment,
-            })
-          ).toBe(expected);
-        }
-      }
+  it.each(QSOFA_SCORE_PERMUTATIONS)(
+    'score permutation RR=$respiratoryRateGte22 SBP=$systolicBpLte100 ment=$alteredMentationOrGcsLt15 → $expected',
+    ({ respiratoryRateGte22, systolicBpLte100, alteredMentationOrGcsLt15, expected }) => {
+      expect(
+        calculateQsofaScore({
+          respiratoryRateGte22,
+          systolicBpLte100,
+          alteredMentationOrGcsLt15,
+        })
+      ).toBe(expected);
     }
-  });
+  );
 
-  it('interpretQsofaScore distinguishes 0, 1, and ≥2 for severity bands', () => {
-    expect(interpretQsofaScore(0).severity).toBe('normal');
-    expect(interpretQsofaScore(1).severity).toBe('normal');
-    expect(interpretQsofaScore(2).severity).toBe('critical');
-    expect(interpretQsofaScore(3).severity).toBe('critical');
-  });
+  it.each(QSOFA_INTERPRETATION_BY_SCORE)(
+    'interpretQsofaScore($score) → $severity',
+    ({ score, severity }) => {
+      expect(interpretQsofaScore(score).severity).toBe(severity);
+    }
+  );
 
   it('qsofaCriteriaFromInputs uses inclusive RR ≥22 and SBP ≤100 boundaries', () => {
     expect(qsofaCriteriaFromInputs({ respiratoryRate: 21, systolicBloodPressure: 120, alteredMentation: false, gcs: '' }).respiratoryRateGte22).toBe(false);

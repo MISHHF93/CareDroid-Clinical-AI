@@ -1,0 +1,66 @@
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { resolveCatalogLaunch, resolveRegistryId } from '../../data/clinicalCatalogWiring';
+import { NavIcon } from '../../navigation/NavIcon';
+import { CHROME_ICONS } from '../../navigation/iconRegistry';
+import './ToolNotFound.css';
+
+/**
+ * Friendly missing-tool state for unknown registry ids, calculator slugs, or /tools/* paths.
+ */
+export default function ToolNotFound({
+  toolId = null,
+  title = 'Tool not found',
+  description = null,
+  showCatalogLink = true,
+}) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const resolvedId = toolId || location.state?.toolId || null;
+  const registryId = resolvedId ? resolveRegistryId(resolvedId) : null;
+  const launch = registryId ? resolveCatalogLaunch(registryId) : resolveCatalogLaunch(resolvedId || '');
+
+  const suggestedPath = launch?.path;
+  const message =
+    description ||
+    (resolvedId
+      ? `We could not open “${resolvedId}”. It may be unavailable, renamed, or not yet available in this build.`
+      : 'This clinical tool link is not recognized. Check the URL or choose a tool from the catalog.');
+
+  return (
+    <div className="tool-not-found" role="alert">
+      <div className="tool-not-found-icon" aria-hidden>
+        <NavIcon icon={CHROME_ICONS.alert} size={48} />
+      </div>
+      <h1 className="tool-not-found-title">{title}</h1>
+      <p className="tool-not-found-message">{message}</p>
+      {location.pathname ? (
+        <p className="tool-not-found-path">
+          <span className="tool-not-found-path-label">Requested path:</span>{' '}
+          <code>{location.pathname}</code>
+        </p>
+      ) : null}
+      <div className="tool-not-found-actions">
+        {suggestedPath && suggestedPath !== location.pathname ? (
+          <button
+            type="button"
+            className="tool-not-found-btn tool-not-found-btn--primary"
+            onClick={() => navigate(suggestedPath)}
+          >
+            Open suggested tool
+          </button>
+        ) : null}
+        {showCatalogLink ? (
+          <Link to="/tools/catalog" className="tool-not-found-btn tool-not-found-btn--secondary">
+            Browse clinical catalog
+          </Link>
+        ) : null}
+        <Link to="/tools" className="tool-not-found-btn tool-not-found-btn--ghost">
+          Tools overview
+        </Link>
+        <Link to="/dashboard" className="tool-not-found-btn tool-not-found-btn--ghost">
+          Back to dashboard
+        </Link>
+      </div>
+    </div>
+  );
+}

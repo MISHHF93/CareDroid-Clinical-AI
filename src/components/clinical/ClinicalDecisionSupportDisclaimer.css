@@ -1,0 +1,49 @@
+.clinical-ds-disclaimer {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--app-border, rgba(148, 163, 184, 0.35));
+  background: var(--app-surface-muted, rgba(15, 23, 42, 0.04));
+  font-size: clamp(0.8125rem, 2vw + 0.45rem, 0.875rem);
+  line-height: 1.45;
+  color: var(--app-fg-muted, #475569);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.clinical-ds-disclaimer__icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  color: var(--app-warning, #d97706);
+}
+
+.clinical-ds-disclaimer__text {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+@media (max-width: 640px) {
+  .clinical-ds-disclaimer {
+    padding: 0.625rem 0.75rem;
+    margin-bottom: 0.875rem;
+    font-size: 0.8125rem;
+  }
+}
+
+.clinical-ds-disclaimer--fleet {
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+.clinical-ds-disclaimer--ai-documentation {
+  border-color: rgba(168, 85, 247, 0.35);
+}
+
+.clinical-ds-disclaimer--drug-interaction {
+  border-color: rgba(239, 68, 68, 0.3);
+}

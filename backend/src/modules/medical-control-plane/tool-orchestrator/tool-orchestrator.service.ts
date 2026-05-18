@@ -22,6 +22,12 @@ import { DrugCheckerService } from './services/drug-checker.service';
 import { LabInterpreterService } from './services/lab-interpreter.service';
 import { ExecuteToolDto, ToolExecutionResponseDto, ToolListDto } from './dto/tool-execution.dto';
 import { ToolResult } from './entities/tool-result.entity';
+import {
+  classifyToolExecutionError,
+  resolveExecutorToolId,
+  ToolExecutionErrorCode,
+  validateExecutorRequestPayload,
+} from './tool-orchestrator.registry';
 
 interface ToolRegistry {
   [toolId: string]: ClinicalToolService;
@@ -91,7 +97,11 @@ export class ToolOrchestratorService {
    * Get metadata for a specific tool
    */
   getToolMetadata(toolId: string): ToolMetadata & { parameters: any[] } {
-    const tool = this.getTool(toolId);
+    const resolved = resolveExecutorToolId(toolId);
+    if (!resolved) {
+      throw new NotFoundException(`Tool not found: ${toolId}`);
+    }
+    const tool = this.getTool(resolved.resolvedId);
     return {
       ...tool.getMetadata(),
       parameters: tool.getSchema(),
@@ -138,24 +148,36 @@ export class ToolOrchestratorService {
     valid: boolean;
     errors: string[];
     warnings: string[];
+    errorCode?: ToolExecutionErrorCode;
+    resolvedToolId?: string;
   }> {
-    try {
-      const tool = this.getTool(dto.toolId);
-      return tool.validate(dto.parameters);
-    } catch (error) {
-      if (error instanceof Error) {
-        return {
-          valid: false,
-          errors: [error.message],
-          warnings: [],
-        };
-      }
+    const requestCheck = validateExecutorRequestPayload(dto.parameters);
+    if (!requestCheck.valid) {
       return {
         valid: false,
-        errors: ['Unknown validation error'],
+        errors: requestCheck.errors,
         warnings: [],
+        errorCode: ToolExecutionErrorCode.INVALID_REQUEST,
       };
     }
+
+    const resolved = resolveExecutorToolId(dto.toolId);
+    if (!resolved) {
+      return {
+        valid: false,
+        errors: [`Tool not found: ${dto.toolId}`],
+        warnings: [],
+        errorCode: classifyToolExecutionError(dto.toolId),
+      };
+    }
+
+    const tool = this.getTool(resolved.resolvedId);
+    const validation = tool.validate(dto.parameters);
+    return {
+      ...validation,
+      resolvedToolId: resolved.resolvedId,
+      errorCode: validation.valid ? undefined : ToolExecutionErrorCode.VALIDATION_FAILED,
+    };
   }
 
   /**
@@ -163,41 +185,95 @@ export class ToolOrchestratorService {
    */
   async executeTool(dto: ExecuteToolDto): Promise<ToolExecutionResponseDto> {
     const startTime = Date.now();
-    this.logger.log(`Executing tool: ${dto.toolId}`);
+    const requestedToolId = dto.toolId;
+    this.logger.log(`Executing tool: ${requestedToolId}`);
+
+    const requestCheck = validateExecutorRequestPayload(dto.parameters);
+    if (!requestCheck.valid) {
+      return this.buildExecutionErrorResponse({
+        requestedToolId,
+        toolName: requestedToolId,
+        errors: requestCheck.errors,
+        errorCode: ToolExecutionErrorCode.INVALID_REQUEST,
+        startTime,
+        auditStatus: 'invalid_request',
+        userId: dto.userId,
+      });
+    }
+
+    const resolved = resolveExecutorToolId(requestedToolId);
+    if (!resolved) {
+      const errorCode = classifyToolExecutionError(requestedToolId);
+      await this.auditService.log({
+        userId: dto.userId,
+        action: AuditAction.SECURITY_EVENT,
+        resource: `tools/${requestedToolId}`,
+        ipAddress: '0.0.0.0',
+        userAgent: 'tool-orchestrator',
+        metadata: {
+          status: errorCode === ToolExecutionErrorCode.UNSUPPORTED_TOOL ? 'unsupported' : 'not_found',
+          errorCode,
+          requestedToolId,
+        },
+      });
+
+      return this.buildExecutionErrorResponse({
+        requestedToolId,
+        toolName: requestedToolId,
+        errors: [
+          errorCode === ToolExecutionErrorCode.UNSUPPORTED_TOOL
+            ? `Tool is not available for server execution: ${requestedToolId}`
+            : `Tool not found: ${requestedToolId}`,
+        ],
+        errorCode,
+        startTime,
+        auditStatus: 'skipped',
+        userId: dto.userId,
+      });
+    }
+
+    const canonicalToolId = resolved.resolvedId;
 
     try {
-      // Get the tool
-      const tool = this.getTool(dto.toolId);
+      const tool = this.getTool(canonicalToolId);
       const metadata = tool.getMetadata();
 
-      // Calculate and record parameter complexity
       const complexity = this.toolMetrics.calculateParameterComplexity(dto.parameters);
       const complexityLabel = complexity.category;
-      this.toolMetrics.setToolParameterComplexity(dto.toolId, complexityLabel, complexity.score);
+      this.toolMetrics.setToolParameterComplexity(
+        canonicalToolId,
+        complexityLabel,
+        complexity.score,
+      );
 
-      // Validate parameters
       const validation = tool.validate(dto.parameters);
       if (!validation.valid) {
-        // Record validation error
-        this.toolMetrics.recordToolError(dto.toolId, 'validation');
+        this.toolMetrics.recordToolError(canonicalToolId, 'validation');
 
         await this.auditService.log({
           userId: dto.userId,
           action: AuditAction.AI_QUERY,
-          resource: `tools/${dto.toolId}`,
+          resource: `tools/${canonicalToolId}`,
           ipAddress: '0.0.0.0',
           userAgent: 'tool-orchestrator',
           metadata: {
             status: 'validation_failed',
+            errorCode: ToolExecutionErrorCode.VALIDATION_FAILED,
+            requestedToolId,
+            resolvedToolId: canonicalToolId,
+            aliased: resolved.aliased,
             errors: validation.errors,
-            parameters: dto.parameters,
+            parametersCount: Object.keys(dto.parameters).length,
           },
         });
 
         return {
-          toolId: dto.toolId,
+          toolId: canonicalToolId,
+          requestedToolId,
+          resolvedToolId: canonicalToolId,
           toolName: metadata.name,
           success: false,
+          errorCode: ToolExecutionErrorCode.VALIDATION_FAILED,
           result: {
             success: false,
             data: {},
@@ -209,23 +285,24 @@ export class ToolOrchestratorService {
         };
       }
 
-      // Execute the tool
       const result = await tool.execute(dto.parameters);
       const executionTime = Date.now() - startTime;
 
-      // Record execution time tier metrics
-      this.toolMetrics.recordToolExecutionTier(dto.toolId, executionTime);
+      this.toolMetrics.recordToolExecutionTier(canonicalToolId, executionTime);
 
-      // Audit the execution
       await this.auditService.log({
         userId: dto.userId,
         action: AuditAction.AI_QUERY,
-        resource: `tools/${dto.toolId}`,
+        resource: `tools/${canonicalToolId}`,
         ipAddress: '0.0.0.0',
         userAgent: 'tool-orchestrator',
         metadata: {
           status: result.success ? 'success' : 'failed',
+          errorCode: result.success ? undefined : ToolExecutionErrorCode.EXECUTION_FAILED,
           executionTimeMs: executionTime,
+          requestedToolId,
+          resolvedToolId: canonicalToolId,
+          aliased: resolved.aliased,
           parametersCount: Object.keys(dto.parameters).length,
           hasWarnings: (result.warnings?.length || 0) > 0,
           hasErrors: (result.errors?.length || 0) > 0,
@@ -233,52 +310,81 @@ export class ToolOrchestratorService {
       });
 
       this.logger.log(
-        `Tool execution completed: ${dto.toolId} (${result.success ? 'success' : 'failed'}) in ${executionTime}ms`
+        `Tool execution completed: ${canonicalToolId} (${result.success ? 'success' : 'failed'}) in ${executionTime}ms`,
       );
 
       return {
-        toolId: dto.toolId,
+        toolId: canonicalToolId,
+        requestedToolId,
+        resolvedToolId: canonicalToolId,
         toolName: metadata.name,
         success: result.success,
+        errorCode: result.success ? undefined : ToolExecutionErrorCode.EXECUTION_FAILED,
         result,
         executionTimeMs: executionTime,
       };
     } catch (error) {
       const executionTime = Date.now() - startTime;
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      
-      // Categorize and record error
       const errorType = this.toolMetrics.categorizeError(error);
-      this.toolMetrics.recordToolError(dto.toolId, errorType);
-      
-      this.logger.error(`Tool execution error: ${dto.toolId}`, error);
+      this.toolMetrics.recordToolError(canonicalToolId, errorType);
+
+      this.logger.error(`Tool execution error: ${canonicalToolId}`, error);
 
       await this.auditService.log({
         userId: dto.userId,
         action: AuditAction.SECURITY_EVENT,
-        resource: `tools/${dto.toolId}`,
+        resource: `tools/${canonicalToolId}`,
         ipAddress: '0.0.0.0',
         userAgent: 'tool-orchestrator',
         metadata: {
           status: 'error',
+          errorCode: ToolExecutionErrorCode.EXECUTION_FAILED,
           error: errorMessage,
           executionTimeMs: executionTime,
+          requestedToolId,
+          resolvedToolId: canonicalToolId,
         },
       });
 
-      return {
-        toolId: dto.toolId,
-        toolName: dto.toolId,
-        success: false,
-        result: {
-          success: false,
-          data: {},
-          errors: [errorMessage],
-          timestamp: new Date(),
-        },
-        executionTimeMs: executionTime,
-      };
+      return this.buildExecutionErrorResponse({
+        requestedToolId,
+        resolvedToolId: canonicalToolId,
+        toolName: canonicalToolId,
+        errors: [errorMessage],
+        errorCode: ToolExecutionErrorCode.EXECUTION_FAILED,
+        startTime,
+        auditStatus: 'skipped',
+        userId: dto.userId,
+      });
     }
+  }
+
+  private buildExecutionErrorResponse(args: {
+    requestedToolId: string;
+    resolvedToolId?: string;
+    toolName: string;
+    errors: string[];
+    errorCode: ToolExecutionErrorCode;
+    startTime: number;
+    auditStatus: string;
+    userId?: string;
+  }): ToolExecutionResponseDto {
+    return {
+      toolId: args.resolvedToolId ?? args.requestedToolId,
+      requestedToolId: args.requestedToolId,
+      resolvedToolId: args.resolvedToolId,
+      toolName: args.toolName,
+      success: false,
+      errorCode: args.errorCode,
+      result: {
+        success: false,
+        data: {},
+        errors: args.errors,
+        timestamp: new Date(),
+      },
+      executionTimeMs: Date.now() - args.startTime,
+    };
   }
 
   /**
@@ -331,7 +437,7 @@ export class ToolOrchestratorService {
     // Add key data points (tool-specific formatting)
     if (response.toolId === 'sofa-calculator') {
       output += this.formatSofaResult(response.result.data);
-    } else if (response.toolId === 'drug-interactions' || response.toolId === 'drug-interaction-checker') {
+    } else if (response.toolId === 'drug-interactions') {
       output += this.formatDrugCheckerResult(response.result.data);
     } else if (response.toolId === 'lab-interpreter') {
       output += this.formatLabInterpreterResult(response.result.data);

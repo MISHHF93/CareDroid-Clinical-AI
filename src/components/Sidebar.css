@@ -56,12 +56,20 @@
   box-shadow: var(--sidebar-logo-shadow);
 }
 
+.logo-text {
+  min-width: 0;
+  flex: 1;
+}
+
 .logo-text h1 {
   margin: 0;
   font-size: 18px;
   font-weight: 700;
   color: var(--sidebar-fg);
   letter-spacing: -0.5px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.2;
 }
 
 .logo-subtitle {
@@ -318,6 +326,9 @@
 
 .nav-label {
   flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .sidebar-collapsed .nav-item {
@@ -553,6 +564,42 @@
   outline-offset: 1px;
 }
 
+.sidebar-tools-quick-action {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 6px;
+  border: 1px dashed var(--panel-border, #e0e0e0);
+  background-color: transparent;
+  color: var(--text-secondary, #666);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.sidebar-tools-quick-action:hover {
+  border-color: var(--primary-color, #4f46e5);
+  color: var(--primary-color, #4f46e5);
+}
+
+.sidebar-tools-quick-action:focus-visible {
+  outline: 2px solid var(--sidebar-focus-ring);
+  outline-offset: 2px;
+}
+
+.sidebar-tools-quick-action--active {
+  border-color: var(--primary-color, #4f46e5);
+  border-style: solid;
+  color: var(--primary-color, #4f46e5);
+  background-color: color-mix(in srgb, var(--primary-color, #4f46e5) 10%, transparent);
+}
+
 .tool-icon {
   font-size: 24px;
 }
@@ -603,9 +650,12 @@
 
 .conversation-title {
   flex: 1;
+  min-width: 0;
   font-size: 13px;
   color: var(--sidebar-fg);
   font-weight: 500;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .conversation-time {
@@ -728,18 +778,53 @@
   padding: 10px;
 }
 
-/* Compact shell: off-canvas (classes set from AppShell + Sidebar) */
+/* Sidebar list tool cards (inline-styled in Sidebar.jsx) */
+.medical-tools-list .sidebar-tool-card {
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.medical-tools-list .sidebar-tool-card > div:last-child {
+  min-width: 0;
+}
+
+.medical-tools-list .sidebar-tool-card > div:last-child > div:last-child {
+  min-width: 0;
+}
+
+.medical-tools-list .sidebar-tool-card > div:last-child > div:last-child > div {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.medical-tools-list .sidebar-tool-card span,
+.medical-tools-list .sidebar-tool-card p {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.sidebar-tools-quick-action span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+/* Compact shell: off-canvas drawer (classes set from AppShell + Sidebar) */
 @media (max-width: 900px) {
   .sidebar.sidebar--compact {
     width: min(280px, 88vw);
+    max-width: 100vw;
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 950;
+    pointer-events: none;
   }
 
   .sidebar.sidebar--compact.sidebar--open {
     transform: translateX(0);
     box-shadow: var(--sidebar-mobile-drawer-shadow);
+    pointer-events: auto;
   }
 }
 

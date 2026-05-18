@@ -16,6 +16,7 @@ import {
 } from './clinicalCatalogWiring';
 import { getMedicalCatalogSummary, getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools } from './sourceCodeToolDiscovery';
+import { PR1_ALL_ALIAS_PAIRS, PR1_CALC_QUERY_BY_REGISTRY_ID } from './pr1TestConstants';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -59,13 +60,7 @@ describe('PR1 coverage — catalog & discovery', () => {
 
 describe('PR1 coverage — NLU aliases & resolveCatalogLaunch', () => {
   it('resolves NLU alias keys to the same launch as canonical PR1 ids', () => {
-    const aliasPairs = [
-      ['ctp-score', 'child-pugh'],
-      ['cirrhosis-score', 'child-pugh'],
-      ['hasbled', 'has-bled'],
-      ['bleeding-risk', 'has-bled'],
-    ];
-    for (const [alias, canonical] of aliasPairs) {
+    for (const [alias, canonical] of PR1_ALL_ALIAS_PAIRS) {
       expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
       const a = resolveCatalogLaunch(alias);
       const c = resolveCatalogLaunch(canonical);
@@ -88,6 +83,12 @@ describe('PR1 coverage — NLU aliases & resolveCatalogLaunch', () => {
     for (const id of PR1_CALCULATOR_REGISTRY_IDS) {
       const fromNlu = resolveCatalogLaunch(id);
       expect(fromNlu.path).toBe(`/tools/calculators/${id}`);
+    }
+  });
+
+  it('maps each PR1 id to hub calc-query deep link', () => {
+    for (const id of PR1_CALCULATOR_REGISTRY_IDS) {
+      expect(PR1_CALC_QUERY_BY_REGISTRY_ID[id]).toBe(`/tools/calculators?calc=${id}`);
     }
   });
 });

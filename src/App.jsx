@@ -21,6 +21,7 @@ import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
 import { getToolById } from './data/toolRegistry';
 import { AUTH_PATH_ALIASES } from './routing/authPathAliases';
+import { CALCULATOR_ROUTE_DEFS } from './routes/clinicalToolRoutes';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 
 // Page imports - Public
@@ -64,6 +65,7 @@ const Protocols = lazyWithRetry(() => import('./pages/tools/Protocols'));
 const DiagnosisAssistant = lazyWithRetry(() => import('./pages/tools/DiagnosisAssistant'));
 const ProcedureGuide = lazyWithRetry(() => import('./pages/tools/ProcedureGuide'));
 const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
+const ToolsAreaFallback = lazyWithRetry(() => import('./pages/tools/ToolsAreaFallback'));
 const FleetDashboard = lazyWithRetry(() => import('./pages/fleet/FleetDashboard'));
 const PredictiveMaintenance = lazyWithRetry(() => import('./pages/fleet/PredictiveMaintenance'));
 const RouteOptimizer = lazyWithRetry(() => import('./pages/fleet/RouteOptimizer'));
@@ -199,6 +201,16 @@ function AppShellPage({ children }) {
     }
   };
 
+  const handleOpenToolsOverview = () => {
+    setActiveTool(null);
+    navigate('/tools');
+  };
+
+  const handleOpenToolsCatalog = () => {
+    setActiveTool(null);
+    navigate('/tools/catalog');
+  };
+
   const isConversationViewport = location.pathname === '/dashboard';
 
   return (
@@ -212,6 +224,8 @@ function AppShellPage({ children }) {
       healthStatus="online"
       currentTool={selectedTool}
       onToolSelect={handleToolSelect}
+      onOpenToolsOverview={handleOpenToolsOverview}
+      onOpenToolsCatalog={handleOpenToolsCatalog}
     >
       <div
         className={`app-shell-page-body${isConversationViewport ? ' app-shell-page-body--conversation' : ''}`}
@@ -323,6 +337,8 @@ function AppRoutes() {
       element: <AppShellPage><RouteOptimizer /></AppShellPage>,
       requiresAuth: true,
     },
+    { path: '/tools/*', element: <AppShellPage><ToolsAreaFallback /></AppShellPage>, requiresAuth: true },
+    { path: '/fleet/*', element: <AppShellPage><ToolsAreaFallback /></AppShellPage>, requiresAuth: true },
 
     // Clinical Intelligence routes
     { path: '/clinical/alerts', element: <AppShellPage><ClinicalAlertsPage /></AppShellPage>, requiresAuth: true },

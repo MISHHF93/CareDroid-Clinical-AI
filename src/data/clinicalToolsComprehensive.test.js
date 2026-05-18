@@ -200,8 +200,8 @@ describe('4. COPD GOLD launch behavior', () => {
     expect(launch.path).toBe(copdGoldChatConfig.hubPath);
     expect(launch.chatSeed).toBe(copdGoldChatConfig.chatSeed);
     expect(launch.chatSeed).toBe(clinicalIntentToolsById[canonical].chatSeed);
-    expect(launch.openLabel).toBe('Open');
-    expect(launch.orchestratorTool).toBeUndefined();
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(launch.orchestratorTool).toBeNull();
   });
 
   it.each(PR6_ALL_ALIAS_PAIRS)('alias "%s" resolves same launch as copd-gold', (alias, expected) => {
@@ -233,8 +233,8 @@ describe('5. Rome IV IBS launch behavior', () => {
     expect(launch.path).toBe(romeIvIbsChatConfig.hubPath);
     expect(launch.chatSeed).toBe(romeIvIbsChatConfig.chatSeed);
     expect(launch.chatSeed).toBe(clinicalIntentToolsById[canonical].chatSeed);
-    expect(launch.openLabel).toBe('Open');
-    expect(launch.orchestratorTool).toBeUndefined();
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(launch.orchestratorTool).toBeNull();
   });
 
   it.each(PR7_ALL_ALIAS_PAIRS)('alias "%s" resolves same launch as rome-iv-ibs', (alias, expected) => {

@@ -24,3 +24,10 @@ dist-ssr
 *.sw?
 
 .env
+
+# Playwright / responsive QA artifacts
+/test-results/
+/playwright-report/
+/qa/playwright-responsive-report.json
+/qa/responsive-qa-summary.json
+/e2e/.auth/qa-user.json

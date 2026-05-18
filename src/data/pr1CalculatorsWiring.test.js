@@ -13,6 +13,8 @@ import {
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
+import { PR1_ALL_ALIAS_PAIRS, PR1_CATALOG_SEARCH_QUERIES } from './pr1TestConstants';
+import { catalogRowsMatchingQuery } from '../utils/catalogSearch';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -129,5 +131,16 @@ describe('PR1 calculator wiring (qSOFA, NEWS2, Child-Pugh, HAS-BLED)', () => {
     expect(resolveRegistryId('hasbled')).toBe('has-bled');
     expect(resolveRegistryId('qsofa')).toBe('qsofa');
     expect(resolveRegistryId('news2')).toBe('news2');
+  });
+
+  it.each(PR1_ALL_ALIAS_PAIRS)('NLU/catalog alias %s → %s', (alias, canonical) => {
+    expect(resolveRegistryId(alias)).toBe(canonical);
+    expect(resolveCatalogLaunch(alias).path).toBe(`/tools/calculators/${canonical}`);
+    expect(resolveCatalogLaunch(alias).registryId).toBe(canonical);
+  });
+
+  it.each(PR1_CATALOG_SEARCH_QUERIES)('catalog search finds %s for query %s', (registryId, query) => {
+    const rows = catalogRowsMatchingQuery(getMedicalToolsCatalogRows(), query);
+    expect(rows.some((r) => r.sidebarToolId === registryId || r.primaryId === registryId)).toBe(true);
   });
 });

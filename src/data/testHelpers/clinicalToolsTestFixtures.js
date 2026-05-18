@@ -39,26 +39,7 @@ export function buildGad7Responses(scores) {
   return Object.fromEntries(GAD7_ITEMS.map((item) => [item.key, scores[item.key] ?? 0]));
 }
 
-/**
- * Extract keyword strings from backend tool.patterns.ts for a toolId block.
- * @param {string} patternsSource
- * @param {string} toolId
- */
-export function extractToolPatternKeywords(patternsSource, toolId) {
-  const idMarker = `toolId: '${toolId}'`;
-  const idIdx = patternsSource.indexOf(idMarker);
-  if (idIdx < 0) {
-    throw new Error(`toolId ${toolId} not found in tool.patterns.ts`);
-  }
-  const kwIdx = patternsSource.indexOf('keywords:', idIdx);
-  const startBracket = patternsSource.indexOf('[', kwIdx);
-  const endBracket = patternsSource.indexOf('],', startBracket);
-  if (startBracket < 0 || endBracket < 0) {
-    throw new Error(`keywords array not found for ${toolId}`);
-  }
-  const chunk = patternsSource.slice(startBracket + 1, endBracket);
-  return [...chunk.matchAll(/'([^']+)'/g)].map((m) => m[1]);
-}
+export { extractToolPatternKeywords } from '../parseToolPatterns';
 
 /**
  * @param {string} message

@@ -1,0 +1,227 @@
+/**
+ * Launch path coverage: resolveCatalogLaunch for Tier A/B/C calculators and chat-assisted tools.
+ */
+
+import { describe, it, expect } from 'vitest';
+import toolRegistry, { toolRegistryById } from './toolRegistry';
+import { clinicalIntentTools, clinicalIntentToolsById, builtinUiCalculators } from './clinicalIntentToolCatalog';
+import {
+  resolveCatalogLaunch,
+  resolveRegistryId,
+  resolveOrchestratorToolForLaunch,
+  findClinicalIntentProfile,
+  CATALOG_EMPTY_LAUNCH,
+  NLU_HUB_ONLY_TOOL_IDS,
+} from './clinicalCatalogWiring';
+import {
+  CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
+  TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
+  REGISTRY,
+  NLU,
+  PR_FLEET_TIER_A_REGISTRY_IDS,
+  PR_FLEET_TIER_B_CHAT_REGISTRY_IDS,
+  PR2_TIER_B_CHAT_CALCULATOR_IDS,
+  PR3_CALCULATOR_REGISTRY_IDS,
+  PR6_CALCULATOR_REGISTRY_IDS,
+  PR7_CALCULATOR_REGISTRY_IDS,
+} from './clinicalToolIdContract';
+import { PR5_ALL_ALIAS_PAIRS } from './pr5TestConstants';
+
+const HUB = '/tools/calculators';
+
+const TIER_B_ALL = [
+  ...TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
+  ...PR_FLEET_TIER_B_CHAT_REGISTRY_IDS,
+];
+
+/** Substrings chat seeds for clinical tools should include (safety / scope). */
+const CLINICAL_CHAT_SEED_GUARDRAILS = [
+  /decision support|screening only|does not diagnose|do not diagnose|informational only|clinical decision support|does not recommend|not a substitute|not a diagnosis|must not be used|do not recommend/i,
+];
+
+const PE_CHAT_SEED_FORBIDDEN = [
+  /PE is (confirmed|ruled out|excluded)/i,
+  /rule(s)? out PE with certainty/i,
+];
+
+describe('resolveCatalogLaunch — empty / unknown', () => {
+  it('returns empty launch for falsy or unknown ids', () => {
+    expect(resolveCatalogLaunch('')).toEqual(CATALOG_EMPTY_LAUNCH);
+    expect(resolveCatalogLaunch(null)).toEqual(CATALOG_EMPTY_LAUNCH);
+    expect(resolveCatalogLaunch('not-a-shipped-tool-xyz-999')).toEqual(CATALOG_EMPTY_LAUNCH);
+  });
+});
+
+describe('resolveCatalogLaunch — Tier A dedicated calculator routes', () => {
+  it.each(CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS)(
+    '%s deep-links to dedicated calculator page',
+    (registryId) => {
+      const launch = resolveCatalogLaunch(registryId);
+      const reg = toolRegistryById[registryId];
+      expect(launch.registryId).toBe(registryId);
+      expect(launch.path).toBe(reg?.path);
+      expect(launch.path).toMatch(/^\/tools\/calculator(s)?\//);
+      expect(launch.path).not.toBe(HUB);
+      expect(launch.chatSeed?.length).toBeGreaterThan(20);
+      const expectedOrchestrator = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId];
+      if (expectedOrchestrator) {
+        expect(launch.orchestratorTool).toBe(expectedOrchestrator);
+      } else {
+        expect(launch.orchestratorTool).toBeNull();
+      }
+    }
+  );
+
+  it.each(['sofa', 'gfr', 'bmi', 'chads2vasc'])('builtin slug %s resolves to registry path', (slug) => {
+    const launch = resolveCatalogLaunch(slug);
+    expect(launch.path).toBeTruthy();
+    expect(launch.registryId).toBeTruthy();
+  });
+});
+
+describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () => {
+  it.each(TIER_B_ALL)('%s launches via calculators hub with guided chat seed', (registryId) => {
+    const launch = resolveCatalogLaunch(registryId);
+    const nlu = clinicalIntentTools.find(
+      (t) => t.toolId === registryId || t.sidebarToolId === registryId
+    );
+    expect(launch.path).toBe(HUB);
+    expect(launch.registryId).toBe(registryId);
+    expect(launch.chatSeed).toBe(nlu?.chatSeed);
+    expect(launch.chatSeed?.length).toBeGreaterThan(40);
+    expect(launch.openLabel).toMatch(/guided chat|Try in chat/i);
+    expect(launch.orchestratorTool).toBeNull();
+  });
+
+  it.each(PR2_TIER_B_CHAT_CALCULATOR_IDS)('alias launch for %s matches hub path', (registryId) => {
+    const aliasLaunch = resolveCatalogLaunch('pe-score');
+    if (registryId === 'wells-pe') {
+      expect(aliasLaunch.registryId).toBe('wells-pe');
+      expect(aliasLaunch.path).toBe(HUB);
+    }
+    const percAlias = resolveCatalogLaunch('pe-rule-out');
+    if (registryId === 'perc') {
+      expect(percAlias.registryId).toBe('perc');
+      expect(percAlias.path).toBe(HUB);
+    }
+  });
+});
+
+describe('resolveCatalogLaunch — NLU hub-only scores', () => {
+  it.each(NLU_HUB_ONLY_TOOL_IDS)('%s uses hub path and NLU chatSeed', (toolId) => {
+    const launch = resolveCatalogLaunch(toolId);
+    const nlu = clinicalIntentToolsById[toolId];
+    expect(launch.path).toBe(HUB);
+    expect(launch.chatSeed).toBe(nlu?.chatSeed);
+    expect(launch.orchestratorTool).toBeNull();
+  });
+
+  it('resolves apache2 alias via NLU profile not generic calculators registry row', () => {
+    const launch = resolveCatalogLaunch('apache2-calculator');
+    expect(launch.path).toBe(HUB);
+    expect(launch.chatSeed).toMatch(/APACHE/i);
+    expect(launch.registryId).toBe(REGISTRY.calculatorsHub);
+  });
+});
+
+describe('resolveCatalogLaunch — Tier C orchestrator (registered executors only)', () => {
+  it('maps only registered NLU ids through REGISTRY_ID_TO_ORCHESTRATOR_TOOL', () => {
+    expect(Object.values(REGISTRY_ID_TO_ORCHESTRATOR_TOOL).sort()).toEqual(
+      [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort()
+    );
+  });
+
+  it.each([
+    [REGISTRY.drugCheck, NLU.drugInteractions],
+    [REGISTRY.labInterp, NLU.labInterpreter],
+    [REGISTRY.sofaScore, NLU.sofaCalculator],
+  ])('registry %s → orchestrator %s', (registryId, nluId) => {
+    const launch = resolveCatalogLaunch(registryId);
+    expect(launch.orchestratorTool).toBe(nluId);
+    expect(resolveOrchestratorToolForLaunch(nluId, registryId, true)).toBe(nluId);
+  });
+
+  it('does not assign orchestrator tool for dispatch-ai (NLU intent only)', () => {
+    const launch = resolveCatalogLaunch('dispatch-ai');
+    expect(launch.path).toBe(HUB);
+    expect(launch.chatSeed?.length).toBeGreaterThan(30);
+    expect(launch.orchestratorTool).toBeNull();
+    expect(resolveOrchestratorToolForLaunch(NLU.dispatchAi, REGISTRY.dispatchAi, true)).toBeNull();
+  });
+
+  it('does not assign orchestrator for Tier B clinical calculators', () => {
+    for (const id of [...PR3_CALCULATOR_REGISTRY_IDS, ...PR6_CALCULATOR_REGISTRY_IDS, ...PR7_CALCULATOR_REGISTRY_IDS]) {
+      expect(resolveCatalogLaunch(id).orchestratorTool).toBeNull();
+    }
+  });
+});
+
+describe('resolveCatalogLaunch — fleet Tier A pages', () => {
+  it.each(PR_FLEET_TIER_A_REGISTRY_IDS)('%s opens dedicated fleet route', (registryId) => {
+    const launch = resolveCatalogLaunch(registryId);
+    expect(launch.path).toBe(toolRegistryById[registryId]?.path);
+    expect(launch.path).toMatch(/^\/fleet\//);
+    expect(launch.orchestratorTool).toBeNull();
+  });
+});
+
+describe('resolveCatalogLaunch — NLU alias resolution', () => {
+  it.each(PR5_ALL_ALIAS_PAIRS)('alias "%s" → %s', (alias, canonical) => {
+    const launch = resolveCatalogLaunch(alias);
+    expect(launch.registryId).toBe(canonical);
+    expect(launch.path).toBe(`/tools/calculators/${canonical}`);
+    expect(launch.chatSeed).toBe(clinicalIntentToolsById[canonical]?.chatSeed);
+  });
+
+  it('findClinicalIntentProfile resolves sofa-calculator NLU id to sofa-score sidebar', () => {
+    const profile = findClinicalIntentProfile({
+      toolId: 'sofa-calculator',
+      registryId: resolveRegistryId('sofa-calculator'),
+    });
+    expect(profile?.toolId).toBe('sofa-calculator');
+    expect(profile?.sidebarToolId).toBe('sofa-score');
+  });
+});
+
+describe('resolveCatalogLaunch — clinically safe chat seeds', () => {
+  it.each(TIER_B_ALL)('%s chat seed includes decision-support guardrails', (registryId) => {
+    const launch = resolveCatalogLaunch(registryId);
+    const seed = launch.chatSeed || '';
+    expect(CLINICAL_CHAT_SEED_GUARDRAILS.some((re) => re.test(seed))).toBe(true);
+  });
+
+  it.each(['wells-pe', 'perc'])('%s PE chat seed forbids false rule-out language', (registryId) => {
+    const seed = resolveCatalogLaunch(registryId).chatSeed || '';
+    expect(PE_CHAT_SEED_FORBIDDEN.some((re) => re.test(seed))).toBe(false);
+    expect(seed).toMatch(/does not rule|do not state|never say|not definitively rule out/i);
+  });
+
+  it('PHQ-9 seed references screening-only and crisis pathways', () => {
+    const seed = resolveCatalogLaunch('phq9').chatSeed || '';
+    expect(seed).toMatch(/screening only/i);
+    expect(seed).toMatch(/988|suicidal|question 9/i);
+  });
+
+  it('GAD-7 seed references screening-only without diagnosing', () => {
+    const seed = resolveCatalogLaunch('gad7').chatSeed || '';
+    expect(seed).toMatch(/screening only/i);
+    expect(seed).toMatch(/do not diagnose/i);
+  });
+
+  it('dispatch-ai seed requires human approval', () => {
+    const seed = resolveCatalogLaunch('dispatch-ai').chatSeed || '';
+    expect(seed).toMatch(/human approval|do not auto-dispatch/i);
+  });
+});
+
+describe('resolveCatalogLaunch — builtinUiCalculators alignment', () => {
+  it('every builtin calculator slug resolves with path and registry', () => {
+    for (const calc of builtinUiCalculators) {
+      const launch = resolveCatalogLaunch(calc.id);
+      expect(launch.path).toBeTruthy();
+      expect(launch.registryId).toBeTruthy();
+    }
+  });
+});

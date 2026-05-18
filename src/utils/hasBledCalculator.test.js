@@ -5,18 +5,12 @@ import {
   interpretHasBled,
   sumHasBledScore,
 } from './hasBledCalculator';
+import {
+  HAS_BLED_NONE,
+  HAS_BLED_SEVERITY_BY_SCORE,
+} from '../data/testHelpers/pr1TestFixtures';
 
-const none = {
-  hypertension: false,
-  renalDysfunction: false,
-  liverDysfunction: false,
-  strokeHistory: false,
-  bleedingHistory: false,
-  labileInr: false,
-  ageOver65: false,
-  bleedingPredisposingDrugs: false,
-  alcoholUse: false,
-};
+const none = HAS_BLED_NONE;
 
 describe('hasBledCalculator', () => {
   it('scores zero when no factors present', () => {
@@ -35,24 +29,19 @@ describe('hasBledCalculator', () => {
     expect(sumHasBledScore(b)).toBe(9);
   });
 
-  it('flags elevated bleeding-risk interpretation at ≥3', () => {
-    const low = interpretHasBled(2);
-    expect(low?.severity).toBe('normal');
-    const high = interpretHasBled(3);
-    expect(high?.severity).toBe('critical');
-    expect(high?.interpretation).toMatch(/3 or more/i);
-    expect(high?.label).toMatch(/elevated/i);
-  });
-
-  it('interpretHasBled stays on lower band below threshold and covers maximum score', () => {
-    const one = interpretHasBled(1);
-    expect(one?.severity).toBe('normal');
-    expect(one?.interpretation).toMatch(/below 3/i);
-
-    const nine = interpretHasBled(9);
-    expect(nine?.severity).toBe('critical');
-    expect(nine?.interpretation).toMatch(/3 or more/i);
-  });
+  it.each(HAS_BLED_SEVERITY_BY_SCORE)(
+    'interpretHasBled($score) elevated=$elevated severity=$severity',
+    ({ score, elevated, severity }) => {
+      const interp = interpretHasBled(score);
+      expect(interp?.severity).toBe(severity);
+      if (elevated) {
+        expect(interp?.interpretation).toMatch(/3 or more/i);
+        expect(interp?.label).toMatch(/elevated/i);
+      } else {
+        expect(interp?.interpretation).toMatch(/below 3/i);
+      }
+    }
+  );
 
   it('calculateHasBledScore counts a subset of factors', () => {
     const three = { ...none, hypertension: true, renalDysfunction: true, strokeHistory: true };

@@ -122,8 +122,9 @@ describe('PR-FLEET consistency — NLU and orchestrator maps', () => {
     expect(ORCHESTRATOR_TO_REGISTRY_ID[id]).toBe(id);
   });
 
-  it('maps dispatch-ai for backend chat execution', () => {
-    expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBe('dispatch-ai');
+  it('flags dispatch-ai as NLU backendExecutable without POST orchestrator mapping', () => {
+    expect(clinicalIntentToolsById['dispatch-ai']?.backendExecutable).toBe(true);
+    expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBeUndefined();
   });
 
   it('documents backend disambiguation helpers', () => {
@@ -218,13 +219,8 @@ describe('PR-FLEET consistency — resolveCatalogLaunch', () => {
     expect(launch.path).toBe(spec.routePath);
     expect(launch.chatSeed).toBe(nlu.chatSeed);
     expect(launch.chatSeed).toMatch(spec.chatSeedPattern);
-    expect(launch.openLabel).toBe('Open');
-
-    if (spec.backendExecutable) {
-      expect(launch.orchestratorTool).toBe('dispatch-ai');
-    } else {
-      expect(launch.orchestratorTool).toBeUndefined();
-    }
+    expect(launch.openLabel).toBe(spec.tier === 'B' ? 'Start guided chat' : 'Open');
+    expect(launch.orchestratorTool).toBeNull();
   });
 
   it.each(PR_FLEET_ALL_ALIAS_PAIRS)(

@@ -287,7 +287,7 @@ describe('4. Dispatch launch behavior', () => {
     const launch = resolveCatalogLaunch('dispatch-ai');
     expect(launch.path).toBe(PR_FLEET_HUB_PATH);
     expect(launch.registryId).toBe('dispatch-ai');
-    expect(launch.orchestratorTool).toBe('dispatch-ai');
+    expect(launch.orchestratorTool).toBeNull();
     expect(launch.chatSeed).toBe(dispatchAiChatConfig.chatSeed);
     expect(launch.chatSeed).toMatch(/human dispatcher must approve/i);
     expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBe('dispatch-ai');

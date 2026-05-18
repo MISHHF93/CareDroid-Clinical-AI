@@ -268,9 +268,9 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
     }
   });
 
-  it('lists each PR4A tool in Calculators.jsx CALCULATORS hub and switch', () => {
+  it('lists each PR4A tool in Calculators.jsx hub (builtinUiCalculators) and switch', () => {
+    expect(calculatorsSource).toContain('builtinUiCalculators.map');
     for (const id of PR4A_CALCULATOR_REGISTRY_IDS) {
-      expect(calculatorsSource).toContain(`id: '${id}'`);
       expect(calculatorsSource).toContain(`case '${id}':`);
     }
   });

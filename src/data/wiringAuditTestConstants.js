@@ -118,11 +118,4 @@ export const WIRING_AUDIT_DISCOVERY_ALIAS_PAIRS = Object.freeze([
 
 export const WIRING_AUDIT_CHAT_CONFIGS = Object.freeze([copdGoldChatConfig, romeIvIbsChatConfig]);
 
-export function catalogRowsMatchingQuery(rows, query) {
-  const q = query.trim().toLowerCase();
-  if (!q) return rows;
-  return rows.filter((row) => {
-    const blob = `${row.name} ${row.primaryId} ${row.id} ${row.category} ${row.description}`.toLowerCase();
-    return blob.includes(q);
-  });
-}
+export { catalogRowsMatchingQuery } from '../utils/catalogSearch';

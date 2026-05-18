@@ -11,6 +11,7 @@ import {
   nluCalculatorHubOnly,
 } from './clinicalIntentToolCatalog';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
+import { enrichMedicalCatalogRow } from '../utils/catalogSearch';
 
 /** Keyword-routed in chat but not separate NLU tool profiles */
 export const chatKeywordExtras = [];
@@ -120,7 +121,7 @@ export function getMedicalToolsCatalogRows() {
     }
   }
 
-  return [...byId.values()];
+  return [...byId.values()].map(enrichMedicalCatalogRow);
 }
 
 export function getMedicalCatalogSummary() {

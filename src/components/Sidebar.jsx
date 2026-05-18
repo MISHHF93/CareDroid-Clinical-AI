@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser, Permission } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -15,7 +15,8 @@ import './Sidebar.css';
  * CareDroid Professional Sidebar
  * Clinical AI Platform Navigation
  */
-const Sidebar = ({
+const Sidebar = forwardRef(function Sidebar(
+  {
   conversations = [],
   activeConversation,
   onSelectConversation,
@@ -24,12 +25,16 @@ const Sidebar = ({
   healthStatus = 'online',
   currentTool = null,
   onToolSelect,
+  onOpenToolsOverview,
+  onOpenToolsCatalog,
   layoutCompact = false,
   mobileNavOpen = false,
   onCloseMobileNav = () => {},
   sidebarCollapsed = false,
   onSidebarCollapsedChange = () => {},
-}) => {
+},
+  ref
+) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useUser();
@@ -97,11 +102,41 @@ const Sidebar = ({
   const handleToolClick = (tool) => {
     recordToolAccess(tool.id);
     onToolSelect?.(tool.id);
+    if (tool?.path) {
+      navigate(tool.path);
+    }
     onCloseMobileNav();
   };
 
-  const isToolRouteActive = (tool) =>
-    location.pathname === tool.path || location.pathname.startsWith(`${tool.path}/`);
+  const handleViewAllTools = () => {
+    if (onOpenToolsOverview) {
+      onOpenToolsOverview();
+    } else {
+      navigate('/tools');
+    }
+    onCloseMobileNav();
+  };
+
+  const handleOpenCatalog = () => {
+    if (onOpenToolsCatalog) {
+      onOpenToolsCatalog();
+    } else {
+      navigate('/tools/catalog');
+    }
+    onCloseMobileNav();
+  };
+
+  const isOnToolsOverview = location.pathname === '/tools';
+  const isOnToolsCatalog = location.pathname === '/tools/catalog';
+
+  const isToolRouteActive = (tool) => {
+    if (!tool.path) return false;
+    if (location.pathname === tool.path) return true;
+    if (tool.path === '/tools/calculators') {
+      return location.pathname === '/tools/calculators';
+    }
+    return location.pathname.startsWith(`${tool.path}/`);
+  };
 
   const renderToolCard = (tool) => {
     const isSelected =
@@ -113,7 +148,7 @@ const Sidebar = ({
     return (
       <div
         key={tool.id}
-        className={`tool-card ${isSelected ? 'active' : ''}`}
+        className={`tool-card sidebar-tool-card ${isSelected ? 'active' : ''}`}
         onClick={(e) => {
           e.stopPropagation();
           handleToolClick(tool);
@@ -235,6 +270,7 @@ const Sidebar = ({
   return (
     <>
     <aside
+      ref={ref}
       id="app-sidebar-nav"
       className={[
         'sidebar',
@@ -244,6 +280,10 @@ const Sidebar = ({
       ]
         .filter(Boolean)
         .join(' ')}
+      aria-hidden={layoutCompact && !mobileNavOpen ? true : undefined}
+      aria-modal={layoutCompact && mobileNavOpen ? 'true' : undefined}
+      role={layoutCompact && mobileNavOpen ? 'dialog' : undefined}
+      aria-label={layoutCompact && mobileNavOpen ? 'Navigation menu' : undefined}
     >
       {/* Header */}
       <div className="sidebar-header">
@@ -479,27 +519,10 @@ const Sidebar = ({
                 
                 <button
                   type="button"
-                  onClick={() => {
-                    navigate('/tools/catalog');
-                    onCloseMobileNav();
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    marginTop: '8px',
-                    borderRadius: '6px',
-                    border: '1px dashed var(--panel-border, #e0e0e0)',
-                    backgroundColor: 'transparent',
-                    color: 'var(--text-secondary, #666)',
-                    fontSize: '11px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px',
-                  }}
+                  onClick={handleOpenCatalog}
+                  aria-label="Open full clinical tools catalog"
+                  aria-current={isOnToolsCatalog ? 'page' : undefined}
+                  className={`sidebar-tools-quick-action${isOnToolsCatalog ? ' sidebar-tools-quick-action--active' : ''}`}
                 >
                   <span className="section-icon--svg" aria-hidden>
                     <NavIcon icon={CHROME_ICONS.tools} size={14} />
@@ -507,38 +530,12 @@ const Sidebar = ({
                   <span>Full Catalog</span>
                 </button>
 
-                {/* Quick Action: View All Tools */}
                 <button
                   type="button"
-                  onClick={() => {
-                    navigate('/tools');
-                    onCloseMobileNav();
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: '8px',
-                    marginTop: '8px',
-                    borderRadius: '6px',
-                    border: '1px dashed var(--panel-border, #e0e0e0)',
-                    backgroundColor: 'transparent',
-                    color: 'var(--text-secondary, #666)',
-                    fontSize: '11px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '6px'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--primary-color, #4F46E5)';
-                    e.currentTarget.style.color = 'var(--primary-color, #4F46E5)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.borderColor = 'var(--panel-border, #e0e0e0)';
-                    e.currentTarget.style.color = 'var(--text-secondary, #666)';
-                  }}
+                  onClick={handleViewAllTools}
+                  aria-label="Open tools overview — browse all suite shortcuts"
+                  aria-current={isOnToolsOverview ? 'page' : undefined}
+                  className={`sidebar-tools-quick-action${isOnToolsOverview ? ' sidebar-tools-quick-action--active' : ''}`}
                 >
                   <span className="section-icon--svg" aria-hidden>
                     <NavIcon icon={CHROME_ICONS.bolt} size={14} />
@@ -645,6 +642,6 @@ const Sidebar = ({
     />
     </>
   );
-};
+});
 
 export default Sidebar;
