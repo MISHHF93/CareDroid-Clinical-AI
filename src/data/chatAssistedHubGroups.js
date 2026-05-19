@@ -63,12 +63,18 @@ export function chatAssistedLaunchAriaLabel(toolName) {
   return `Start guided chat: ${toolName}. Clinical decision support only; does not diagnose or replace urgent emergency pathways.`;
 }
 
-/** PR3 tools — extra urgency context for screen readers (stroke / ACS / trauma). */
-const PR3_LAUNCH_ARIA_CONTEXT = Object.freeze({
+/** Extra urgency context for screen readers on chat-assisted launch buttons. */
+const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'grace-acs': 'Unstable ACS or STEMI pathways take priority over chat.',
   nihss: 'Emergency stroke pathways take priority over completing scoring in chat.',
   'canadian-c-spine': 'Unstable trauma and primary survey take priority over chat.',
   'ottawa-ankle': 'Hard-stop injuries and urgent evaluation take priority over chat.',
+  'wells-pe': 'PE cannot be ruled out with certainty; unstable patients need urgent evaluation first.',
+  perc: 'PERC does not rule out pulmonary embolism with certainty.',
+  'copd-gold': 'Acute COPD exacerbation or severe respiratory distress takes priority over grouping chat.',
+  'rome-iv-ibs': 'Alarm features and urgent gastrointestinal evaluation take priority over criteria chat.',
+  phq9: 'Question 9 self-harm or suicidal ideation requires immediate safety assessment before routine scoring.',
+  gad7: 'Suicidal ideation or acute psychiatric emergency takes priority over anxiety screening chat.',
 });
 
 /**
@@ -78,9 +84,12 @@ const PR3_LAUNCH_ARIA_CONTEXT = Object.freeze({
  */
 export function chatAssistedLaunchAriaLabelForTool(toolId, toolName) {
   const base = chatAssistedLaunchAriaLabel(toolName);
-  const extra = PR3_LAUNCH_ARIA_CONTEXT[toolId];
+  const extra = CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT[toolId];
   return extra ? `${base} ${extra}` : base;
 }
+
+/** @deprecated Use CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT */
+export const PR3_LAUNCH_ARIA_CONTEXT = CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT;
 
 /**
  * Accessible name for fleet dispatch chat launches (no clinical emergency framing).

@@ -866,7 +866,8 @@ ul.calc-breakdown-list .calc-breakdown-item {
   min-height: 44px;
 }
 
-.calculator-interface--gad7 .calc-gad7-severe-warning {
+.calculator-interface--gad7 .calc-gad7-severe-warning,
+.calculator-interface--gad7 .calc-gad7-moderate-warning {
   margin-bottom: 16px;
 }
 
@@ -985,7 +986,8 @@ ul.calc-breakdown-list .calc-breakdown-item {
   .calc-phq9-q9-form-warning,
   .calc-phq9-q9-result-warning,
   .calc-phq9-high-symptom-warning,
-  .calculator-interface--gad7 .calc-gad7-severe-warning {
+  .calculator-interface--gad7 .calc-gad7-severe-warning,
+  .calculator-interface--gad7 .calc-gad7-moderate-warning {
     padding: 10px 12px;
     margin-bottom: 12px;
     font-size: 12px;
@@ -1168,7 +1170,8 @@ ul.calc-breakdown-list .calc-breakdown-item {
 .calc-phq9-q9-form-warning,
 .calc-phq9-q9-result-warning,
 .calc-phq9-high-symptom-warning,
-.calculator-interface--gad7 .calc-gad7-severe-warning {
+.calculator-interface--gad7 .calc-gad7-severe-warning,
+.calculator-interface--gad7 .calc-gad7-moderate-warning {
   max-width: 100%;
   box-sizing: border-box;
   overflow-wrap: anywhere;

@@ -327,9 +327,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                           aria-label={
                             isFleetDispatch
                               ? fleetChatAssistedLaunchAriaLabel(tool.name)
-                              : PR3_CALCULATOR_REGISTRY_IDS.includes(tool.toolId)
-                                ? chatAssistedLaunchAriaLabelForTool(tool.toolId, tool.name)
-                                : chatAssistedLaunchAriaLabel(tool.name)
+                              : chatAssistedLaunchAriaLabelForTool(tool.toolId, tool.name)
                           }
                           aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}
                           onClick={() => handleChatAssistedLaunch(tool.toolId)}

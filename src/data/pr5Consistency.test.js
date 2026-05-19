@@ -192,7 +192,7 @@ describe('PR5 consistency — resolveCatalogLaunch, routes, sidebar', () => {
       expect(launch.registryId).toBe(id);
       expect(launch.chatSeed).toBe(nlu?.chatSeed);
       expect(launch.openLabel).toBe('Open');
-      expect(launch.orchestratorTool).toBeUndefined();
+      expect(launch.orchestratorTool).toBeNull();
     }
   });
 

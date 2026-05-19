@@ -14,6 +14,7 @@ import {
 } from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   NLU_TO_REGISTRY_ID,
   PR6_CALCULATOR_REGISTRY_IDS,
   PR6_TIER_B_CHAT_CALCULATOR_IDS,
@@ -142,6 +143,7 @@ describe('PR6 consistency — sidebar and canonical launch', () => {
     expect(launch.registryId).toBe('copd-gold');
     expect(launch.path).toBe(PR6_HUB_PATH);
     expect(launch.chatSeed).toBe(nlu?.chatSeed);
-    expect(launch.openLabel).toBe('Open');
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
   });
 });

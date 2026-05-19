@@ -62,10 +62,11 @@ describe('gad7Calculator — interpretation guardrails', () => {
     expect(out.ok).toBe(true);
     expect(out.totalScore).toBe(21);
     expect(out.severityCategory).toBe('severe');
-    const combined = `${out.screeningDiscussion} ${out.screeningDisclaimer} ${out.safetyDisclaimer}`.toLowerCase();
+    const combined = `${out.screeningDiscussion} ${out.screeningDisclaimer} ${out.safetyDisclaimer} ${out.clinicianReviewDisclaimer}`.toLowerCase();
     expect(combined).not.toMatch(/\bdiagnosed with generalized anxiety\b/);
     expect(combined).not.toMatch(/\bprescribe\b/);
     expect(combined).toMatch(/does not diagnose/);
+    expect(combined).toMatch(/clinician/);
   });
 });
 
@@ -79,6 +80,8 @@ describe('gad7Calculator — severe-range safety', () => {
   it('does not flag acute distress alert below severe range', () => {
     const interp = interpretGad7Score(14);
     expect(interp.acuteDistressSafetyAlert.elevated).toBe(false);
+    expect(interp.moderateSymptomEscalation.warranted).toBe(true);
+    expect(interp.moderateSymptomEscalation.message).toMatch(/PHQ-9 question 9/i);
   });
 });
 

@@ -46,6 +46,8 @@ export const WIRING_AUDIT_ALL_IDS = Object.freeze([
  *   catalogSearchQueries: readonly (readonly [string, string])[],
  *   chatSeedPattern: RegExp,
  *   calcSwitchCase: string | null,
+ *   openLabel: string,
+ *   navigationPath: string,
  * }>}
  */
 export const WIRING_AUDIT_TOOL_SPECS = Object.freeze({
@@ -61,6 +63,8 @@ export const WIRING_AUDIT_TOOL_SPECS = Object.freeze({
     catalogSearchQueries: PR5_CATALOG_SEARCH_QUERIES.filter(([id]) => id === 'phq9'),
     chatSeedPattern: /PHQ-9|question 9/i,
     calcSwitchCase: 'phq9',
+    openLabel: 'Open',
+    navigationPath: '/tools/calculators/phq9',
   },
   gad7: {
     tier: 'A',
@@ -74,6 +78,8 @@ export const WIRING_AUDIT_TOOL_SPECS = Object.freeze({
     catalogSearchQueries: PR5_CATALOG_SEARCH_QUERIES.filter(([id]) => id === 'gad7'),
     chatSeedPattern: /GAD-7|anxiety screen/i,
     calcSwitchCase: 'gad7',
+    openLabel: 'Open',
+    navigationPath: '/tools/calculators/gad7',
   },
   'copd-gold': {
     tier: 'B',
@@ -87,6 +93,8 @@ export const WIRING_AUDIT_TOOL_SPECS = Object.freeze({
     catalogSearchQueries: PR6_CATALOG_SEARCH_QUERIES,
     chatSeedPattern: /COPD GOLD/i,
     calcSwitchCase: null,
+    openLabel: 'Start guided chat',
+    navigationPath: '/dashboard',
   },
   'rome-iv-ibs': {
     tier: 'B',
@@ -100,6 +108,8 @@ export const WIRING_AUDIT_TOOL_SPECS = Object.freeze({
     catalogSearchQueries: PR7_CATALOG_SEARCH_QUERIES,
     chatSeedPattern: /Rome IV/i,
     calcSwitchCase: null,
+    openLabel: 'Start guided chat',
+    navigationPath: '/dashboard',
   },
 });
 

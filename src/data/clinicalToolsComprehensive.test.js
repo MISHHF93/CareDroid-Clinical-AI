@@ -31,9 +31,11 @@ import {
 import {
   resolveCatalogLaunch,
   resolveRegistryId,
+  resolveNavigationPathForLaunch,
   NLU_TO_REGISTRY_ID,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
 } from './clinicalCatalogWiring';
+import { builtinUiCalculators } from './clinicalIntentToolCatalog';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
@@ -48,8 +50,10 @@ import {
   WIRING_AUDIT_HUB_PATH,
   WIRING_AUDIT_TIER_A_IDS,
   WIRING_AUDIT_TIER_B_IDS,
+  WIRING_AUDIT_DISCOVERY_ALIAS_PAIRS,
   catalogRowsMatchingQuery,
 } from './wiringAuditTestConstants';
+import { parseClinicalToolPatterns } from './parseToolPatterns';
 import {
   PHQ9_SEVERITY_BOUNDARIES,
   GAD7_SEVERITY_BOUNDARIES,
@@ -114,6 +118,20 @@ describe('1. PHQ-9 scoring', () => {
     expect(sumPhq9Score(computePhq9Breakdown(zeros))).toBe(0);
     expect(sumPhq9Score(computePhq9Breakdown(threes))).toBe(27);
   });
+
+  it('reports one validation error per unanswered item', () => {
+    const partial = { q1: 0, q2: 1 };
+    const out = computePhq9Result(partial);
+    expect(out.ok).toBe(false);
+    expect(out.errors).toHaveLength(7);
+  });
+
+  it('maps moderately severe band to warning UI severity when q9 is zero', () => {
+    const interp = interpretPhq9Score(17, 0);
+    expect(interp.severityCategory).toBe('moderately_severe');
+    expect(interp.severity).toBe('warning');
+    expect(interp.severityLabel).toMatch(/Moderately severe/i);
+  });
 });
 
 describe('2. GAD-7 scoring', () => {
@@ -148,6 +166,32 @@ describe('2. GAD-7 scoring', () => {
     );
     expect(sumGad7Score(computeGad7Breakdown(zeros))).toBe(0);
     expect(sumGad7Score(computeGad7Breakdown(threes))).toBe(21);
+  });
+
+  it('reports one validation error per unanswered item', () => {
+    const partial = { q1: 0, q2: 1, q3: 2 };
+    const out = computeGad7Result(partial);
+    expect(out.ok).toBe(false);
+    expect(out.errors).toHaveLength(4);
+  });
+
+  it('warrants moderate symptom escalation for scores 10–14 only', () => {
+    const moderate = interpretGad7Score(12);
+    const mild = interpretGad7Score(9);
+    const severe = interpretGad7Score(15);
+    expect(moderate.moderateSymptomEscalation.warranted).toBe(true);
+    expect(moderate.acuteDistressSafetyAlert.elevated).toBe(false);
+    expect(mild.moderateSymptomEscalation.warranted).toBe(false);
+    expect(severe.moderateSymptomEscalation.warranted).toBe(false);
+    expect(severe.acuteDistressSafetyAlert.elevated).toBe(true);
+  });
+
+  it('computeGad7Result returns moderate escalation fields for total 12', () => {
+    const out = computeGad7Result(buildGad7Responses({ q1: 2, q2: 2, q3: 2, q4: 2, q5: 2, q6: 1, q7: 1 }));
+    expect(out.ok).toBe(true);
+    expect(out.totalScore).toBe(12);
+    expect(out.severityCategory).toBe('moderate');
+    expect(out.moderateSymptomEscalation.warranted).toBe(true);
   });
 });
 
@@ -221,6 +265,12 @@ describe('4. COPD GOLD launch behavior', () => {
     expect(calculatorsSource).not.toContain(`case '${canonical}':`);
     expect(appSource).not.toContain(`path: '/tools/calculators/${canonical}'`);
   });
+
+  it('resolveNavigationPathForLaunch routes to dashboard for chat visibility', () => {
+    const launch = resolveCatalogLaunch(canonical);
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(launch.chatSeed).toMatch(WIRING_AUDIT_TOOL_SPECS[canonical].chatSeedPattern);
+  });
 });
 
 describe('5. Rome IV IBS launch behavior', () => {
@@ -253,6 +303,12 @@ describe('5. Rome IV IBS launch behavior', () => {
     expect(calculatorsSource).not.toContain(`case '${canonical}':`);
     expect(appSource).not.toContain(`path: '/tools/calculators/${canonical}'`);
   });
+
+  it('resolveNavigationPathForLaunch routes to dashboard for chat visibility', () => {
+    const launch = resolveCatalogLaunch(canonical);
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(launch.chatSeed).toMatch(WIRING_AUDIT_TOOL_SPECS[canonical].chatSeedPattern);
+  });
 });
 
 describe('6. Registry mappings', () => {
@@ -277,6 +333,18 @@ describe('6. Registry mappings', () => {
   it('lists each audited tool exactly once in toolRegistry array', () => {
     const audited = toolRegistry.filter((t) => WIRING_AUDIT_ALL_IDS.includes(t.id));
     expect(audited).toHaveLength(WIRING_AUDIT_ALL_IDS.length);
+  });
+
+  it.each(WIRING_AUDIT_TIER_A_IDS)('%s is registered in builtinUiCalculators with matching path', (id) => {
+    const spec = WIRING_AUDIT_TOOL_SPECS[id];
+    const builtin = builtinUiCalculators.find((c) => c.id === id);
+    expect(builtin?.id).toBe(id);
+    expect(builtin?.path).toBe(spec.routePath);
+    expect(BUILTIN_CALC_ID_TO_REGISTRY_ID[builtin.id]).toBe(id);
+  });
+
+  it.each(WIRING_AUDIT_TIER_B_IDS)('%s is absent from builtinUiCalculators (chat-only)', (id) => {
+    expect(builtinUiCalculators.some((c) => c.id === id)).toBe(false);
   });
 });
 
@@ -303,6 +371,18 @@ describe('7. Catalog inclusion', () => {
       expect(hits.some((r) => r.primaryId === canonical), `query "${query}"`).toBe(true);
     }
   });
+
+  it.each(WIRING_AUDIT_ALL_IDS)('clinicalIntentToolsById[%s] matches registry path and seed', (id) => {
+    const spec = WIRING_AUDIT_TOOL_SPECS[id];
+    const intent = clinicalIntentToolsById[id];
+    expect(intent?.toolId).toBe(id);
+    expect(intent?.path).toBe(spec.routePath);
+    expect(intent?.sidebarToolId).toBe(id);
+    expect(intent?.backendExecutable).toBe(false);
+    if (spec.tier === 'B') {
+      expect(intent?.chatSeed).toMatch(spec.chatSeedPattern);
+    }
+  });
 });
 
 describe('8. Discovery inclusion', () => {
@@ -323,6 +403,14 @@ describe('8. Discovery inclusion', () => {
       }
     }
   });
+
+  it.each(WIRING_AUDIT_DISCOVERY_ALIAS_PAIRS)(
+    'discovery slug "%s" resolves to %s',
+    (alias, canonical) => {
+      expect(resolveRegistryId(alias)).toBe(canonical);
+      expect(resolveCatalogLaunch(alias).registryId).toBe(canonical);
+    }
+  );
 });
 
 describe('9. Route resolution', () => {
@@ -341,6 +429,7 @@ describe('9. Route resolution', () => {
     expect(launch.path).toBe(spec.routePath);
     expect(launch.registryId).toBe(id);
     expect(launch.openLabel).toBe('Open');
+    expect(resolveNavigationPathForLaunch(launch)).toBe(spec.routePath);
   });
 
   it.each(WIRING_AUDIT_TIER_B_IDS)('%s resolves hub path only', (id) => {
@@ -406,4 +495,22 @@ describe('10. NLU matching', () => {
   ])('disambiguation triggers for %s on representative message', (toolId, message) => {
     expect(messageTriggersBackendDisambiguation(message, toolId)).toBe(true);
   });
+
+  it.each(WIRING_AUDIT_ALL_IDS)('parsed backend keywords align with tool.patterns for %s', (id) => {
+    const parsed = parseClinicalToolPatterns(patternsSource).find((p) => p.toolId === id);
+    expect(parsed?.keywords).toEqual(BACKEND_KEYWORDS_BY_TOOL[id]);
+  });
+
+  it.each([
+    ['phq9', 'copd gold classification', 'copd-gold'],
+    ['gad7', 'rome iv ibs criteria', 'rome-iv-ibs'],
+    ['copd-gold', 'depression screen phq9', 'phq9'],
+    ['rome-iv-ibs', 'gad 7 anxiety screen', 'gad7'],
+  ])(
+    'phrase for %s does not match %s backend keywords alone',
+    (intendedTool, phrase, otherTool) => {
+      expect(messageTriggersBackendDisambiguation(phrase, intendedTool)).toBe(false);
+      expect(messageMatchesToolKeywords(phrase, BACKEND_KEYWORDS_BY_TOOL[otherTool])).toBe(true);
+    }
+  );
 });

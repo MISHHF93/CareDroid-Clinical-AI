@@ -35,6 +35,8 @@ const REQUIRED_CALCULATOR_PATHS = [
   '/tools/calculators/ckd-staging',
   '/tools/calculators/stop-bang',
   '/tools/calculators/audit-c',
+  '/tools/calculators/phq9',
+  '/tools/calculators/gad7',
 ];
 
 const REQUIRED_OVERVIEW_PATHS = ['/tools', '/tools/catalog'];

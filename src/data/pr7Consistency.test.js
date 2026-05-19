@@ -14,6 +14,7 @@ import {
 } from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   NLU_TO_REGISTRY_ID,
   PR7_CALCULATOR_REGISTRY_IDS,
   PR7_TIER_B_CHAT_CALCULATOR_IDS,
@@ -139,6 +140,7 @@ describe('PR7 consistency — sidebar and canonical launch', () => {
     expect(launch.registryId).toBe('rome-iv-ibs');
     expect(launch.path).toBe(PR7_HUB_PATH);
     expect(launch.chatSeed).toBe(nlu?.chatSeed);
-    expect(launch.openLabel).toBe('Open');
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
   });
 });

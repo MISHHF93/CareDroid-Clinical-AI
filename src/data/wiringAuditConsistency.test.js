@@ -18,6 +18,7 @@ import {
 } from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   resolveRegistryId,
   NLU_TO_REGISTRY_ID,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
@@ -53,6 +54,10 @@ const patternsSource = readFileSync(
   'utf8'
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
+const mentalHealthSource = readFileSync(
+  join(__dirname, '../pages/tools/mentalHealthCalculators.jsx'),
+  'utf8'
+);
 const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
 
 describe('Wiring audit — frozen tool id lists', () => {
@@ -126,8 +131,13 @@ describe('Wiring audit — hub-only vs Tier-A form wiring', () => {
   it.each(WIRING_AUDIT_TIER_A_IDS)('%s is not hub-only and has Calculators.jsx switch', (id) => {
     const spec = WIRING_AUDIT_TOOL_SPECS[id];
     expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(false);
-    expect(calculatorsSource).toContain(`id: '${id}'`);
+    const builtin = builtinUiCalculators.find((c) => c.id === id);
+    expect(builtin?.path).toBe(spec.routePath);
     expect(calculatorsSource).toContain(`case '${spec.calcSwitchCase}':`);
+    expect(calculatorsSource).toContain("from './mentalHealthCalculators'");
+    expect(mentalHealthSource).toMatch(
+      id === 'phq9' ? /Phq9Calculator/ : /Gad7Calculator/
+    );
   });
 
   it.each(WIRING_AUDIT_TIER_B_IDS)('%s is hub-only with chat hub group', (id) => {
@@ -140,6 +150,17 @@ describe('Wiring audit — hub-only vs Tier-A form wiring', () => {
 });
 
 describe('Wiring audit — duplicate aliases', () => {
+  it('has no alias string shared across different canonical registry ids', () => {
+    const ownerByAlias = new Map();
+    for (const [alias, canonical] of WIRING_AUDIT_ALL_ALIAS_PAIRS) {
+      const prior = ownerByAlias.get(alias);
+      if (prior && prior !== canonical) {
+        throw new Error(`Alias "${alias}" maps to both ${prior} and ${canonical}`);
+      }
+      ownerByAlias.set(alias, canonical);
+    }
+  });
+
   it('has no duplicate toolIdAliases.id entries among audited tools', () => {
     const auditedCanonicals = new Set(WIRING_AUDIT_ALL_IDS);
     const auditedAliasIds = toolIdAliases
@@ -180,9 +201,10 @@ describe('Wiring audit — resolveCatalogLaunch', () => {
     expect(launch.registryId).toBe(id);
     expect(launch.path).toBe(spec.routePath);
     expect(launch.chatSeed).toBe(nlu.chatSeed);
-    expect(launch.orchestratorTool).toBeUndefined();
-    expect(launch.openLabel).toBe('Open');
+    expect(launch.orchestratorTool).toBeNull();
+    expect(launch.openLabel).toBe(spec.openLabel);
     expect(launch.chatSeed).toMatch(spec.chatSeedPattern);
+    expect(resolveNavigationPathForLaunch(launch)).toBe(spec.navigationPath);
   });
 
   it.each(WIRING_AUDIT_ALL_ALIAS_PAIRS)(
@@ -197,6 +219,8 @@ describe('Wiring audit — resolveCatalogLaunch', () => {
       expect(fromAlias.path).toBe(fromCanonical.path);
       expect(fromAlias.registryId).toBe(fromCanonical.registryId);
       expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
+      expect(fromAlias.openLabel).toBe(fromCanonical.openLabel);
+      expect(resolveNavigationPathForLaunch(fromAlias)).toBe(spec.navigationPath);
     }
   );
 

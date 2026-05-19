@@ -55,12 +55,19 @@ describe('PHQ-9 calculator wiring (phq9)', () => {
   });
 
   it('resolves required NLU aliases', () => {
-    expect(NLU_TO_REGISTRY_ID.phq9).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['depression screen']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['depression questionnaire']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['mood screen']).toBe(id);
-    expect(resolveCatalogLaunch('phq9').path).toBe('/tools/calculators/phq9');
-    expect(resolveCatalogLaunch('depression-screen').registryId).toBe(id);
+    const aliases = [
+      'phq9',
+      'depression screen',
+      'depression questionnaire',
+      'mood screen',
+      'depression-screen',
+    ];
+    for (const alias of aliases) {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(id);
+      expect(resolveCatalogLaunch(alias).path).toBe('/tools/calculators/phq9');
+      expect(resolveCatalogLaunch(alias).registryId).toBe(id);
+      expect(resolveCatalogLaunch(alias).openLabel).toBe('Open');
+    }
   });
 
   it('includes phq9 in discovery and medical catalog rows', () => {

@@ -6,11 +6,13 @@ import { clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolC
 import { romeIvIbsChatConfig } from './chatAssistedCalculators/romeIvIbs';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   NLU_TO_REGISTRY_ID,
   PR7_TIER_B_CHAT_CALCULATOR_IDS,
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
   resolveRegistryId,
 } from './clinicalCatalogWiring';
+import { PR7_HUB_PATH, PR7_REQUIRED_NLU_ALIAS_PAIRS } from './pr7TestConstants';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { toolRegistryById } from './toolRegistry';
@@ -50,18 +52,39 @@ describe('Rome IV IBS (Tier B chat-assisted) wiring', () => {
     expect(appSource).not.toContain("path: '/tools/calculators/rome-iv-ibs'");
   });
 
-  it('resolves launch and NLU aliases', () => {
+  it('resolves launch to hub path and guided chat seed (Tier B)', () => {
     const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe('/tools/calculators');
+    expect(launch.path).toBe(PR7_HUB_PATH);
     expect(launch.registryId).toBe(id);
+    expect(launch.chatSeed).toBe(romeIvIbsChatConfig.chatSeed);
     expect(launch.chatSeed).toMatch(/Rome IV/i);
-    expect(launch.orchestratorTool).toBeUndefined();
+    expect(launch.chatSeed).toMatch(/abdominal pain frequency/i);
+    expect(launch.chatSeed).toMatch(/symptom duration/i);
+    expect(launch.chatSeed).toMatch(/relation to defecation/i);
+    expect(launch.chatSeed).toMatch(/stool frequency change/i);
+    expect(launch.chatSeed).toMatch(/stool form change/i);
+    expect(launch.chatSeed).toMatch(/criteria support assessment/i);
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(launch.orchestratorTool).toBeNull();
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+  });
 
-    expect(NLU_TO_REGISTRY_ID['ibs criteria']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['rome iv']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['irritable bowel syndrome criteria']).toBe(id);
+  it.each(PR7_REQUIRED_NLU_ALIAS_PAIRS)(
+    'NLU alias "%s" resolves to hub launch for %s',
+    (alias, canonical) => {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
+      expect(resolveRegistryId(alias)).toBe(canonical);
+      const launch = resolveCatalogLaunch(alias);
+      expect(launch.path).toBe(PR7_HUB_PATH);
+      expect(launch.registryId).toBe(canonical);
+      expect(launch.chatSeed).toBe(romeIvIbsChatConfig.chatSeed);
+    }
+  );
+
+  it('resolves hyphenated discovery aliases', () => {
     expect(resolveRegistryId('rome-iv')).toBe(id);
     expect(resolveCatalogLaunch('ibs-criteria').registryId).toBe(id);
+    expect(resolveCatalogLaunch('irritable-bowel-syndrome-criteria').registryId).toBe(id);
   });
 
   it('includes registry, discovery, and catalog rows', () => {

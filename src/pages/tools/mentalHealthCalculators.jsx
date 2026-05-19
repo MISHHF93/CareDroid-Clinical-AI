@@ -92,6 +92,16 @@ function focusFirstEmptyLikertItem(items, responses, idPrefix) {
   document.getElementById(`${idPrefix}-${missing.key}`)?.focus();
 }
 
+function likertSelectClassName(hasValidationErrors, value) {
+  return `calc-select-field${
+    hasValidationErrors && value === '' ? ' calc-select-field--invalid' : ''
+  }`;
+}
+
+function formDescribedByIds(disclaimerId, validationSummaryId, hasValidationErrors) {
+  return [disclaimerId, hasValidationErrors ? validationSummaryId : null].filter(Boolean).join(' ') || undefined;
+}
+
 export function Phq9Calculator({ onResultChange }) {
   const [responses, setResponses] = useState(() =>
     Object.fromEntries(PHQ9_ITEMS.map((item) => [item.key, '']))
@@ -139,6 +149,7 @@ export function Phq9Calculator({ onResultChange }) {
 
   const icon = getCalculatorSubIcon('phq9');
   const formTitleId = 'phq9-form-title';
+  const formDisclaimerId = 'phq9-form-disclaimer';
   const interpretationHeadingId = 'phq9-interpretation-heading';
   const validationSummaryId = 'phq9-validation-summary';
   const hasValidationErrors = validationErrors.length > 0;
@@ -162,7 +173,7 @@ export function Phq9Calculator({ onResultChange }) {
         </label>
         <select
           id={id}
-          className="calc-select-field"
+          className={likertSelectClassName(hasValidationErrors, responses[item.key])}
           value={responses[item.key]}
           onChange={(e) => setItem(item.key, e.target.value)}
           aria-required="true"
@@ -203,7 +214,7 @@ export function Phq9Calculator({ onResultChange }) {
           <span id={formTitleId}>PHQ-9 (depression symptom screen)</span>
         </CalcPanelTitle>
 
-        <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
+        <div id={formDisclaimerId} className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
             <strong>Screening only.</strong> PHQ-9 assesses depressive symptoms over the past two weeks. It does
@@ -214,10 +225,14 @@ export function Phq9Calculator({ onResultChange }) {
             Results require review by a qualified clinician. Follow institutional behavioral health and suicide-risk
             pathways when indicated.
           </p>
+          <p className="calc-disclaimer-detail">
+            If you or someone else is in immediate danger or crisis, contact emergency services (e.g. 911 in the U.S.)
+            or the 988 Suicide &amp; Crisis Lifeline when applicable. This tool does not provide emergency care.
+          </p>
         </div>
 
         {q9Live ? (
-          <div className="calc-has-bled-anticoag-warning calc-phq9-q9-form-warning" role="alert">
+          <div className="calc-has-bled-anticoag-warning calc-phq9-q9-form-warning" role="alert" aria-live="assertive">
             <strong>Question 9 safety:</strong> A non-zero response on self-harm or suicidal ideation requires urgent
             evaluation before routine disposition. Do not use this screen alone to clear safety concerns.
           </div>
@@ -227,7 +242,7 @@ export function Phq9Calculator({ onResultChange }) {
           className="calc-pr1-form"
           noValidate
           aria-labelledby={formTitleId}
-          aria-describedby={hasValidationErrors ? validationSummaryId : undefined}
+          aria-describedby={formDescribedByIds(formDisclaimerId, validationSummaryId, hasValidationErrors)}
           onSubmit={(e) => {
             e.preventDefault();
             runCalculate();
@@ -363,7 +378,7 @@ export function Phq9Calculator({ onResultChange }) {
             <CalcResultSafetyFooter />
           </>
         ) : (
-          <div className="calc-results-empty">
+          <div className="calc-results-empty" role="status">
             <CalcResultsEmptyIcon icon={icon} />
             <p>Answer all nine questions, then calculate</p>
           </div>
@@ -419,6 +434,7 @@ export function Gad7Calculator({ onResultChange }) {
 
   const icon = getCalculatorSubIcon('gad7');
   const formTitleId = 'gad7-form-title';
+  const formDisclaimerId = 'gad7-form-disclaimer';
   const interpretationHeadingId = 'gad7-interpretation-heading';
   const validationSummaryId = 'gad7-validation-summary';
   const hasValidationErrors = validationErrors.length > 0;
@@ -435,7 +451,7 @@ export function Gad7Calculator({ onResultChange }) {
         </label>
         <select
           id={id}
-          className="calc-select-field"
+          className={likertSelectClassName(hasValidationErrors, responses[item.key])}
           value={responses[item.key]}
           onChange={(e) => setItem(item.key, e.target.value)}
           aria-required="true"
@@ -473,7 +489,7 @@ export function Gad7Calculator({ onResultChange }) {
           <span id={formTitleId}>GAD-7 (anxiety symptom screen)</span>
         </CalcPanelTitle>
 
-        <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
+        <div id={formDisclaimerId} className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
           <CalcDecisionSupportLead />
           <p className="calc-disclaimer-detail">
             <strong>Screening only.</strong> GAD-7 assesses anxiety symptoms over the past two weeks. It does not
@@ -485,13 +501,17 @@ export function Gad7Calculator({ onResultChange }) {
             indicated. For suicidal thoughts, use suicide-risk protocols (e.g. PHQ-9 question 9 pathways). For acute
             panic or overwhelming distress, follow local psychiatric emergency pathways.
           </p>
+          <p className="calc-disclaimer-detail">
+            If you or someone else is in immediate danger or crisis, contact emergency services (e.g. 911 in the U.S.)
+            or the 988 Suicide &amp; Crisis Lifeline when applicable. This tool does not provide emergency care.
+          </p>
         </div>
 
         <form
           className="calc-pr1-form"
           noValidate
           aria-labelledby={formTitleId}
-          aria-describedby={hasValidationErrors ? validationSummaryId : undefined}
+          aria-describedby={formDescribedByIds(formDisclaimerId, validationSummaryId, hasValidationErrors)}
           onSubmit={(e) => {
             e.preventDefault();
             runCalculate();
@@ -539,7 +559,11 @@ export function Gad7Calculator({ onResultChange }) {
         ref={resultsRef}
         tabIndex={-1}
         className="calculator-results"
-        aria-live={result?.acuteDistressSafetyAlert?.elevated ? 'assertive' : 'polite'}
+        aria-live={
+          result?.acuteDistressSafetyAlert?.elevated || result?.moderateSymptomEscalation?.warranted
+            ? 'assertive'
+            : 'polite'
+        }
         aria-label="GAD-7 results"
       >
         <ResultsPanelTitle />
@@ -550,6 +574,13 @@ export function Gad7Calculator({ onResultChange }) {
               <div className="calc-has-bled-anticoag-warning calc-gad7-severe-warning" role="alert">
                 <strong>{result.acuteDistressSafetyAlert.headline}</strong>
                 <p>{result.acuteDistressSafetyAlert.message}</p>
+              </div>
+            ) : null}
+
+            {result.moderateSymptomEscalation?.warranted ? (
+              <div className="calc-has-bled-anticoag-warning calc-gad7-moderate-warning" role="alert">
+                <strong>Moderate symptom burden:</strong>
+                <p>{result.moderateSymptomEscalation.message}</p>
               </div>
             ) : null}
 
@@ -586,7 +617,9 @@ export function Gad7Calculator({ onResultChange }) {
               title={result.label}
               severity={result.severity}
               emphasizeRisk={
-                result.severityCategory !== 'none_minimal' || result.acuteDistressSafetyAlert?.elevated
+                result.severityCategory !== 'none_minimal' ||
+                result.acuteDistressSafetyAlert?.elevated ||
+                result.moderateSymptomEscalation?.warranted
               }
             >
               <div className="calc-interpretation-text">{result.interpretation}</div>
@@ -616,7 +649,7 @@ export function Gad7Calculator({ onResultChange }) {
             <CalcResultSafetyFooter />
           </>
         ) : (
-          <div className="calc-results-empty">
+          <div className="calc-results-empty" role="status">
             <CalcResultsEmptyIcon icon={icon} />
             <p>Answer all seven questions, then calculate</p>
           </div>

@@ -180,7 +180,7 @@ const clinicalIntentToolsRaw = [
     path: '/tools/calculators/gad7',
     sidebarToolId: 'gad7',
     chatSeed:
-      'Help me complete the GAD-7 anxiety screen (seven questions, past two weeks) and interpret the total score and severity range as screening only — do not diagnose an anxiety disorder or recommend medications. If suicidal thoughts are present, prioritize PHQ-9 question 9 safety pathways and crisis resources (e.g. 988 in the U.S. when applicable). For severe scores or acute panic or overwhelming distress, emphasize urgent clinical evaluation without diagnosing.',
+      'STEP 0 — Before routine scoring: if suicidal thoughts, self-harm, or immediate safety concerns are present, stop screening, arrange immediate safety assessment, and ensure crisis resources (e.g. 988 Suicide & Crisis Lifeline in the U.S. when applicable; emergency services if in immediate danger). Then help me complete the GAD-7 anxiety screen (seven questions, past two weeks) and interpret the total score and severity range as screening only — do not diagnose an anxiety disorder or recommend medications. For moderate or severe scores, acute panic, or overwhelming distress, emphasize timely or urgent clinical evaluation without diagnosing or recommending treatment.',
     backendExecutable: false,
   },
   {

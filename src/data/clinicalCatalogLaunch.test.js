@@ -237,6 +237,8 @@ describe('resolveCatalogLaunch — clinically safe chat seeds', () => {
     const seed = resolveCatalogLaunch('gad7').chatSeed || '';
     expect(seed).toMatch(/screening only/i);
     expect(seed).toMatch(/do not diagnose/i);
+    expect(seed).toMatch(/STEP 0/i);
+    expect(seed).toMatch(/988|suicidal/i);
   });
 
   it('dispatch-ai seed requires human approval', () => {

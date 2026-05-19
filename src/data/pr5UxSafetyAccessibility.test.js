@@ -51,8 +51,9 @@ describe('PR5 NLU — chat seed safety', () => {
     expect(nlu.chatSeed).not.toMatch(ANXIETY_DIAGNOSIS_PATTERN);
     expect(nlu.chatSeed).not.toMatch(MEDICATION_PATTERN);
     expect(`${nlu.description} ${nlu.chatSeed}`).toMatch(/screen|does not diagnose/i);
-    expect(nlu.chatSeed).toMatch(/suicidal thoughts/i);
+    expect(nlu.chatSeed).toMatch(/STEP 0/i);
     expect(nlu.chatSeed).toMatch(/988/i);
+    expect(nlu.chatSeed).toMatch(/suicidal thoughts|self-harm/i);
   });
 });
 

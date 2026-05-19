@@ -6,11 +6,13 @@ import { clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolC
 import { copdGoldChatConfig } from './chatAssistedCalculators/copdGold';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   NLU_TO_REGISTRY_ID,
   PR6_TIER_B_CHAT_CALCULATOR_IDS,
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
   resolveRegistryId,
 } from './clinicalCatalogWiring';
+import { PR6_HUB_PATH, PR6_REQUIRED_NLU_ALIAS_PAIRS } from './pr6TestConstants';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { toolRegistryById } from './toolRegistry';
@@ -51,19 +53,37 @@ describe('COPD GOLD (Tier B chat-assisted) wiring', () => {
     expect(appSource).not.toContain("path: '/tools/calculators/copd-gold'");
   });
 
-  it('resolves launch and NLU aliases', () => {
+  it('resolves launch to hub path and guided chat seed (Tier B)', () => {
     const launch = resolveCatalogLaunch(id);
-    expect(launch.path).toBe('/tools/calculators');
+    expect(launch.path).toBe(PR6_HUB_PATH);
     expect(launch.registryId).toBe(id);
+    expect(launch.chatSeed).toBe(copdGoldChatConfig.chatSeed);
     expect(launch.chatSeed).toMatch(/COPD GOLD/i);
-    expect(launch.orchestratorTool).toBeUndefined();
+    expect(launch.chatSeed).toMatch(/symptom burden/i);
+    expect(launch.chatSeed).toMatch(/exacerbation history/i);
+    expect(launch.chatSeed).toMatch(/hospitalization history/i);
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(launch.orchestratorTool).toBeNull();
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+  });
 
-    expect(NLU_TO_REGISTRY_ID['gold copd']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['copd assessment']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['copd risk']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['gold classification']).toBe(id);
-    expect(resolveRegistryId('gold-copd')).toBe(id);
+  it.each(PR6_REQUIRED_NLU_ALIAS_PAIRS)(
+    'NLU alias "%s" resolves to hub launch for %s',
+    (alias, canonical) => {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(canonical);
+      expect(resolveRegistryId(alias)).toBe(canonical);
+      const launch = resolveCatalogLaunch(alias);
+      expect(launch.path).toBe(PR6_HUB_PATH);
+      expect(launch.registryId).toBe(canonical);
+      expect(launch.chatSeed).toBe(copdGoldChatConfig.chatSeed);
+    }
+  );
+
+  it('resolves hyphenated discovery aliases', () => {
+    expect(resolveCatalogLaunch('gold-copd').registryId).toBe(id);
     expect(resolveCatalogLaunch('copd-assessment').registryId).toBe(id);
+    expect(resolveCatalogLaunch('copd-risk').registryId).toBe(id);
+    expect(resolveCatalogLaunch('gold-classification').registryId).toBe(id);
   });
 
   it('includes registry, discovery, and catalog rows', () => {

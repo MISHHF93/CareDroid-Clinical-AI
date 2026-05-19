@@ -103,6 +103,8 @@ export function interpretGad7Score(total) {
     ? `Total score ${total}/21 falls in the ${severityLabel} range on this symptom screen and usually warrants prompt clinical evaluation per institutional guidance. Higher scores suggest more frequent anxiety symptoms over the past two weeks; use clinical judgment and local pathways for follow-up. If suicidal thoughts are present, follow suicide-risk protocols — this screen does not assess self-harm.`
     : `Total score ${total}/21 falls in the ${severityLabel} range on this symptom screen. Higher scores suggest more frequent anxiety symptoms over the past two weeks; use clinical judgment and local pathways for follow-up.`;
 
+  const moderateSymptoms = severityCategory === 'moderate';
+
   const acuteDistressSafetyAlert = severeSymptoms
     ? {
         elevated: true,
@@ -115,6 +117,15 @@ export function interpretGad7Score(total) {
         headline: null,
         message: null,
       };
+
+  const moderateSymptomEscalation =
+    moderateSymptoms && !severeSymptoms
+      ? {
+          warranted: true,
+          message:
+            'Moderate-range scores on this screen often warrant clinical follow-up per institutional guidance. This tool does not establish an anxiety disorder diagnosis. A low or moderate score does not rule out suicide risk — use PHQ-9 question 9 and local suicide-risk pathways when self-harm is a concern.',
+        }
+      : { warranted: false, message: null };
 
   const screeningDiscussion = {
     none_minimal:
@@ -144,6 +155,7 @@ export function interpretGad7Score(total) {
     pathwayDisclaimer:
       'Follow institutional behavioral health pathways when indicated. For suicidal ideation, use suicide-risk protocols (e.g. PHQ-9 question 9 pathways). This tool does not replace emergency services for acute psychiatric crises, panic, or overwhelming distress.',
     acuteDistressSafetyAlert,
+    moderateSymptomEscalation,
     referenceLine,
   };
 }

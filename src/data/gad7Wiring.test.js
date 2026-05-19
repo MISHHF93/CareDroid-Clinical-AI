@@ -54,13 +54,20 @@ describe('GAD-7 calculator wiring (gad7)', () => {
     expect(patternsSource).toContain('preferGad7');
   });
 
-  it('resolves required NLU aliases', () => {
-    expect(NLU_TO_REGISTRY_ID.gad7).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['anxiety screen']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['anxiety questionnaire']).toBe(id);
-    expect(NLU_TO_REGISTRY_ID['generalized anxiety screen']).toBe(id);
-    expect(resolveCatalogLaunch('gad7').path).toBe('/tools/calculators/gad7');
-    expect(resolveCatalogLaunch('anxiety-screen').registryId).toBe(id);
+  it('resolves required NLU aliases to dedicated calculator route', () => {
+    const aliases = [
+      'gad7',
+      'anxiety screen',
+      'anxiety questionnaire',
+      'generalized anxiety screen',
+      'anxiety-screen',
+    ];
+    for (const alias of aliases) {
+      expect(NLU_TO_REGISTRY_ID[alias]).toBe(id);
+      expect(resolveCatalogLaunch(alias).path).toBe('/tools/calculators/gad7');
+      expect(resolveCatalogLaunch(alias).registryId).toBe(id);
+      expect(resolveCatalogLaunch(alias).openLabel).toBe('Open');
+    }
   });
 
   it('includes gad7 in discovery and medical catalog rows', () => {
