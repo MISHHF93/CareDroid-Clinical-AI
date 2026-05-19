@@ -196,6 +196,29 @@ describe('resolveCatalogLaunch — fleet Tier A pages', () => {
   });
 });
 
+describe('resolveCatalogLaunch — fleet Tier B dispatch hub', () => {
+  it('dispatch-ai launches calculators hub and navigates to dashboard', () => {
+    const launch = resolveCatalogLaunch('dispatch-ai');
+    expect(launch.path).toBe('/tools/calculators');
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(launch.orchestratorTool).toBeNull();
+  });
+
+  it.each([
+    'dispatch',
+    'dispatch assistant',
+    'vehicle dispatch',
+    'fleet dispatch',
+  ])('alias "%s" resolves same dispatch-ai launch', (alias) => {
+    const fromAlias = resolveCatalogLaunch(alias);
+    const fromCanonical = resolveCatalogLaunch('dispatch-ai');
+    expect(fromAlias.registryId).toBe('dispatch-ai');
+    expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
+    expect(resolveNavigationPathForLaunch(fromAlias)).toBe('/dashboard');
+  });
+});
+
 describe('resolveCatalogLaunch — NLU alias resolution', () => {
   it.each(PR5_ALL_ALIAS_PAIRS)('alias "%s" → %s', (alias, canonical) => {
     const launch = resolveCatalogLaunch(alias);

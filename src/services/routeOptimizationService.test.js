@@ -123,6 +123,53 @@ describe('routeOptimizationService', () => {
     expect(result.note).toMatch(/sort-based/i);
   });
 
+  it('flags late window when arrival exceeds clock window end', () => {
+    const result = optimizeRoute({
+      routeStart: '08:00',
+      destinations: [
+        {
+          label: 'Tight Window',
+          priority: 'urgent',
+          distanceKm: 80,
+          serviceMinutes: 30,
+          windowEnd: '08:30',
+        },
+      ],
+      trafficConstraints: { level: 'heavy' },
+    });
+
+    expect(result.optimizedSequence[0].windowStatus).toBe('late');
+    expect(result.warnings.some((w) => /time window/i.test(w))).toBe(true);
+  });
+
+  it('warns when estimated distance exceeds vehicle range', () => {
+    const result = optimizeRoute({
+      destinations: [
+        { label: 'Far A', priority: 'high', distanceKm: 200 },
+        { label: 'Far B', priority: 'medium', distanceKm: 200 },
+        { label: 'Far C', priority: 'low', distanceKm: 200 },
+      ],
+      vehicleLimitations: { maxStops: 12, maxDistanceKm: 100 },
+    });
+
+    expect(result.warnings.some((w) => /exceeds vehicle range/i.test(w))).toBe(true);
+  });
+
+  it('is deterministic for identical inputs', () => {
+    const input = {
+      destinations: [
+        { label: 'B', priority: 'medium', distanceKm: 10 },
+        { label: 'A', priority: 'urgent', distanceKm: 5 },
+      ],
+    };
+    const a = optimizeRoute(input);
+    const b = optimizeRoute(input);
+    expect(a.optimizedSequence.map((s) => s.destination.label)).toEqual(
+      b.optimizedSequence.map((s) => s.destination.label)
+    );
+    expect(a.routeSavings).toEqual(b.routeSavings);
+  });
+
   it('delegates to graphProvider when configured', () => {
     const result = optimizeRoute(
       { destinations: [{ label: 'A' }] },

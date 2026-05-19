@@ -247,6 +247,97 @@
   color: var(--text-secondary);
 }
 
+.fleet-maintenance-widget {
+  margin-bottom: 24px;
+}
+
+.fleet-maintenance-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.fleet-maintenance-card {
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--app-panel-border);
+  background: var(--app-surface-1);
+  text-align: center;
+}
+
+.fleet-maintenance-count {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.fleet-maintenance-label {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  line-height: 1.35;
+}
+
+.fleet-energy-meter {
+  margin: 10px 0 12px;
+}
+
+.fleet-energy-meter__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 12px;
+}
+
+.fleet-energy-meter__unit {
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.fleet-energy-meter__value {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.fleet-energy-meter__track {
+  height: 8px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--app-panel-border) 80%, transparent);
+  overflow: hidden;
+}
+
+.fleet-energy-meter__fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.fleet-energy-meter__fill--ok {
+  background: color-mix(in srgb, var(--app-accent-2, #5b8a72) 85%, transparent);
+}
+
+.fleet-energy-meter__fill--warning {
+  background: color-mix(in srgb, var(--app-warning) 85%, transparent);
+}
+
+.fleet-energy-meter__fill--critical {
+  background: color-mix(in srgb, var(--app-danger) 85%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fleet-energy-meter__fill {
+    transition: none;
+  }
+}
+
 @media (max-width: 640px) {
   .fleet-dashboard {
     padding: 16px 14px 32px;
@@ -262,5 +353,18 @@
 
   .fleet-stat-value {
     font-size: 1.5rem;
+  }
+
+  .fleet-vehicle-card-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .fleet-badge-row {
+    width: 100%;
+  }
+
+  .fleet-vehicle-metrics {
+    grid-template-columns: 1fr 1fr;
   }
 }

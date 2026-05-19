@@ -21,6 +21,8 @@ export const TRAFFIC_MULTIPLIERS = Object.freeze({
 
 const DEFAULT_AVG_SPEED_KMH = 40;
 const DEFAULT_LEG_DISTANCE_KM = 5;
+/** Default depot departure when comparing HH:MM delivery windows (08:00). */
+const DEFAULT_ROUTE_START_MINUTES = 8 * 60;
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
@@ -90,8 +92,13 @@ export function normalizeRouteOptimizationInput(input = {}) {
 
   const labeledDestinations = destinations.filter((dest) => dest.label.length > 0);
 
+  const routeStartMinutes =
+    parseWindowMinutes(input.routeStart ?? input.routeStartMinutes) ??
+    DEFAULT_ROUTE_START_MINUTES;
+
   return {
     depotLabel: String(input.depotLabel || 'Depot').trim() || 'Depot',
+    routeStartMinutes,
     destinations: labeledDestinations,
     trafficConstraints: {
       level: TRAFFIC_MULTIPLIERS[trafficLevel] != null ? trafficLevel : 'moderate',
@@ -119,7 +126,11 @@ function estimateLegMinutes(distanceKm, trafficMultiplier) {
   return Math.round(hours * 60 * trafficMultiplier);
 }
 
-function buildSequence(destinations, trafficMultiplier, { enforceLimits, vehicleLimitations }) {
+function buildSequence(
+  destinations,
+  trafficMultiplier,
+  { enforceLimits, vehicleLimitations, routeStartMinutes = DEFAULT_ROUTE_START_MINUTES },
+) {
   const warnings = [];
   let cumulativeMinutes = 0;
   let totalDistanceKm = 0;
@@ -137,22 +148,24 @@ function buildSequence(destinations, trafficMultiplier, { enforceLimits, vehicle
   selected.forEach((destination, index) => {
     const distanceKm = legDistanceKm(destination, index);
     const travelMinutes = estimateLegMinutes(distanceKm, trafficMultiplier);
-    cumulativeMinutes += travelMinutes + destination.serviceMinutes;
+    const arrivalClockMinutes = routeStartMinutes + cumulativeMinutes + travelMinutes;
     totalDistanceKm += distanceKm;
 
     let windowStatus = 'ok';
     if (
       destination.windowEndMinutes != null &&
-      cumulativeMinutes > destination.windowEndMinutes
+      arrivalClockMinutes > destination.windowEndMinutes
     ) {
       windowStatus = 'late';
       warnings.push(`Stop "${destination.label}" may miss its time window.`);
     } else if (
       destination.windowStartMinutes != null &&
-      cumulativeMinutes < destination.windowStartMinutes
+      arrivalClockMinutes < destination.windowStartMinutes
     ) {
       windowStatus = 'early';
     }
+
+    cumulativeMinutes += travelMinutes + destination.serviceMinutes;
 
     sequence.push({
       stopNumber: index + 1,
@@ -161,6 +174,7 @@ function buildSequence(destinations, trafficMultiplier, { enforceLimits, vehicle
       travelMinutes,
       serviceMinutes: destination.serviceMinutes,
       cumulativeMinutes,
+      arrivalClockMinutes,
       windowStatus,
     });
   });
@@ -183,14 +197,19 @@ export function optimizeRouteBySort(normalized) {
   const sorted = [...normalized.destinations].sort(compareDestinations);
   const trafficMultiplier = normalized.trafficConstraints.multiplier;
 
-  const baseline = buildSequence(normalized.destinations, trafficMultiplier, {
-    enforceLimits: false,
+  const sequenceOpts = {
+    routeStartMinutes: normalized.routeStartMinutes,
     vehicleLimitations: normalized.vehicleLimitations,
+  };
+
+  const baseline = buildSequence(normalized.destinations, trafficMultiplier, {
+    ...sequenceOpts,
+    enforceLimits: false,
   });
 
   const optimized = buildSequence(sorted, trafficMultiplier, {
+    ...sequenceOpts,
     enforceLimits: true,
-    vehicleLimitations: normalized.vehicleLimitations,
   });
 
   const minutesSaved = Math.max(0, baseline.totalMinutes - optimized.totalMinutes);

@@ -28,6 +28,7 @@ export const PR_FLEET_REQUIRED_NLU_ALIAS_PAIRS = Object.freeze([
   ['maintenance assistant', 'predictive-maintenance'],
   ['route optimizer', 'route-optimizer'],
   ['route optimization', 'route-optimizer'],
+  ['dispatch', 'dispatch-ai'],
   ['dispatch assistant', 'dispatch-ai'],
   ['vehicle dispatch', 'dispatch-ai'],
   ['fleet dispatch', 'dispatch-ai'],

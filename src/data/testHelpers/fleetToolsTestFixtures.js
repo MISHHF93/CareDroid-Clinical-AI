@@ -54,6 +54,37 @@ export const FLEET_ROUTE_DISTANCE_TIE_INPUT = Object.freeze({
   ],
 });
 
+/** Late window: heavy traffic + long leg vs tight window end */
+export const FLEET_ROUTE_LATE_WINDOW_INPUT = Object.freeze({
+  routeStart: '08:00',
+  destinations: [
+    {
+      id: 'late',
+      label: 'Late Clinic',
+      priority: 'urgent',
+      distanceKm: 100,
+      serviceMinutes: 60,
+      windowEnd: '09:00',
+    },
+  ],
+  trafficConstraints: { level: 'heavy' },
+});
+
+/** Mid-life vehicle — moderate band */
+export const FLEET_PM_MODERATE_INPUT = Object.freeze({
+  vehicleAgeYears: 11,
+  mileage: 120_000,
+  monthsSinceLastService: 13,
+  servicesLast12Months: 1,
+  batteryHealthPercent: 72,
+});
+
+export const FLEET_TIER_A_ROUTE_PATHS = Object.freeze([
+  '/fleet/command',
+  '/fleet/predictive-maintenance',
+  '/fleet/route-optimizer',
+]);
+
 /** Fixed mock snapshot shape for dashboard UI tests */
 export function buildFleetDashboardSnapshot(overrides = {}) {
   const vehicles = overrides.vehicles ?? [

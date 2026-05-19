@@ -333,6 +333,11 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                           onClick={() => handleChatAssistedLaunch(tool.toolId)}
                         >
                           <span className="calc-chat-assisted-name">{tool.name}</span>
+                          {isFleetDispatch ? (
+                            <span className="calc-chat-assisted-safety-pill" role="note">
+                              Human approval required — no auto-assign
+                            </span>
+                          ) : null}
                           <span
                             id={`calc-chat-assisted-desc-${tool.toolId}`}
                             className="calc-chat-assisted-desc"

@@ -11,6 +11,7 @@ import { clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolC
 import { dispatchAiChatConfig } from './chatAssistedFleet/dispatchAi';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   NLU_TO_REGISTRY_ID,
   PR_FLEET_TIER_B_CHAT_REGISTRY_IDS,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
@@ -84,8 +85,14 @@ describe('Dispatch Intelligence (dispatch-ai) wiring', () => {
     expect(launch.registryId).toBe(id);
     expect(launch.chatSeed).toBe(dispatchAiChatConfig.chatSeed);
     expect(launch.chatSeed).toMatch(/requires dispatcher approval/i);
+    expect(launch.openLabel).toBe('Start guided chat');
     expect(launch.orchestratorTool).toBeNull();
     expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id]).toBeUndefined();
+  });
+
+  it('maps hub launch to dashboard for conversational workflow', () => {
+    const launch = resolveCatalogLaunch(id);
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
   });
 
   it.each(ALIAS_PAIRS)('alias "%s" resolves same launch as dispatch-ai', (alias, expected) => {

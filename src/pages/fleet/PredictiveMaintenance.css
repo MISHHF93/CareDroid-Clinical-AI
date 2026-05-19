@@ -1,7 +1,44 @@
 .predictive-maintenance {
   max-width: 960px;
+  width: 100%;
+  min-width: 0;
   margin: 0 auto;
   padding: 24px 20px 48px;
+  box-sizing: border-box;
+}
+
+.predictive-maintenance-subheading {
+  margin: 20px 0 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.predictive-maintenance-subheading:first-of-type {
+  margin-top: 0;
+}
+
+.predictive-maintenance-list-title {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.predictive-maintenance-engine-tag {
+  margin: 10px 0 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .predictive-maintenance {
+    padding: 16px 14px 32px;
+  }
+
+  .predictive-maintenance-panel {
+    padding: 16px;
+  }
 }
 
 .predictive-maintenance-header {

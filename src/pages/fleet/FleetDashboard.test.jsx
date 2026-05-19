@@ -4,6 +4,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import FleetDashboard from './FleetDashboard';
 
@@ -101,7 +102,17 @@ describe('FleetDashboard page', () => {
     expect(screen.getByText('Avg utilization')).toBeInTheDocument();
     expect(screen.getByText('Test Van')).toBeInTheDocument();
     expect(screen.getByText('VH-TEST')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Maintenance status/i })).toBeInTheDocument();
+    expect(screen.getByRole('meter', { name: /Battery level for Test Van/i })).toBeInTheDocument();
     expect(mockFetchFleetCommandSnapshot).toHaveBeenCalled();
+  });
+
+  it('renders total units summary widget', async () => {
+    renderDashboard();
+
+    await waitFor(() => {
+      expect(screen.getByText('Total units')).toBeInTheDocument();
+    });
   });
 
   it('shows empty state when no vehicles report telemetry', async () => {
@@ -142,6 +153,43 @@ describe('FleetDashboard page', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Human dispatchers must approve/i)).toBeInTheDocument();
+    });
+  });
+
+  it('disables refresh while in-flight', async () => {
+    const user = userEvent.setup();
+    let resolveRefresh;
+    let fetchCalls = 0;
+    mockFetchFleetCommandSnapshot.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          fetchCalls += 1;
+          if (fetchCalls === 1) {
+            resolve(sampleSnapshot);
+            return;
+          }
+          resolveRefresh = resolve;
+        })
+    );
+
+    renderDashboard();
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /Fleet summary/i })).toBeInTheDocument();
+    });
+
+    const refreshBtn = screen.getByRole('button', { name: /Refresh fleet telemetry snapshot/i });
+    await user.click(refreshBtn);
+
+    await waitFor(() => {
+      expect(refreshBtn).toBeDisabled();
+      expect(refreshBtn).toHaveAttribute('aria-busy', 'true');
+    });
+
+    resolveRefresh(sampleSnapshot);
+
+    await waitFor(() => {
+      expect(refreshBtn).toBeEnabled();
     });
   });
 

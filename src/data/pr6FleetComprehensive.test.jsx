@@ -1,7 +1,7 @@
 /**
- * Comprehensive deterministic coverage for PR-FLEET (fleet operations tools).
+ * PR6 comprehensive fleet operations coverage (PR-FLEET tools).
  * Fleet dashboard UI, scoring, route optimization, dispatch launch, registry,
- * catalog, discovery, and App route validation. No snapshots.
+ * catalog, discovery, and route validation. Deterministic; no snapshots.
  */
 
 import { readFileSync } from 'node:fs';
@@ -30,16 +30,25 @@ import {
 } from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   resolveRegistryId,
   NLU_TO_REGISTRY_ID,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
 } from './clinicalCatalogWiring';
+import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
+import {
+  expectedLaunchPath,
+  isFleetAreaPath,
+  isKnownToolAreaPath,
+  REGISTRY_TOOL_PATHS,
+} from '../routes/clinicalToolRoutes';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { fleetChatAssistedLaunchAriaLabel } from './chatAssistedHubGroups';
 import { dispatchAiChatConfig } from './chatAssistedFleet/dispatchAi';
 import {
   PR_FLEET_ALL_ALIAS_PAIRS,
+  PR_FLEET_DISCOVERY_ALIAS_PAIRS,
   PR_FLEET_HUB_PATH,
   PR_FLEET_REQUIRED_NLU_ALIAS_PAIRS,
   PR_FLEET_TIER_A_IDS,
@@ -52,10 +61,13 @@ import {
   FLEET_DISPATCH_LAUNCH_PHRASES,
   FLEET_PM_HIGH_RISK_INPUT,
   FLEET_PM_MINIMAL_INPUT,
+  FLEET_PM_MODERATE_INPUT,
   FLEET_REGISTRY_NLU_PHRASES,
   FLEET_RISK_BAND_BOUNDARIES,
   FLEET_ROUTE_DISTANCE_TIE_INPUT,
+  FLEET_ROUTE_LATE_WINDOW_INPUT,
   FLEET_ROUTE_PRIORITY_INPUT,
+  FLEET_TIER_A_ROUTE_PATHS,
   buildFleetDashboardSnapshot,
 } from './testHelpers/fleetToolsTestFixtures';
 import {
@@ -195,6 +207,36 @@ describe('1. Fleet dashboard rendering', () => {
       screen.getByRole('button', { name: /Retry loading fleet telemetry/i })
     ).toBeInTheDocument();
   });
+
+  it('renders maintenance breakdown and per-vehicle energy meters', async () => {
+    const base = buildFleetDashboardSnapshot();
+    mockFetchFleetCommandSnapshot.mockResolvedValue(
+      buildFleetDashboardSnapshot({
+        vehicles: [
+          ...base.vehicles,
+          {
+            id: 'VH-FUEL',
+            label: 'Fuel Truck',
+            status: 'maintenance',
+            maintenanceStatus: 'warning',
+            etaMinutes: 5,
+            energyType: 'fuel',
+            energyPercent: 50,
+            utilizationPercent: 20,
+            driver: 'Driver A',
+          },
+        ],
+      })
+    );
+
+    renderFleetDashboard();
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /Maintenance status/i })).toBeInTheDocument();
+    });
+    expect(screen.getByRole('meter', { name: /Battery level for Test Van/i })).toBeInTheDocument();
+    expect(screen.getByRole('meter', { name: /Fuel level for Fuel Truck/i })).toBeInTheDocument();
+  });
 });
 
 describe('2. Predictive maintenance scoring', () => {
@@ -234,6 +276,24 @@ describe('2. Predictive maintenance scoring', () => {
     expect(a.maintenanceRiskScore).toBe(b.maintenanceRiskScore);
     expect(a.riskBand).toBe(b.riskBand);
     expect(a.anomalyIndicators.map((x) => x.id)).toEqual(b.anomalyIndicators.map((x) => x.id));
+  });
+
+  it('scores moderate profile in moderate or high band', () => {
+    const result = scorePredictiveMaintenance(FLEET_PM_MODERATE_INPUT);
+    expect(result.maintenanceRiskScore).toBeGreaterThanOrEqual(25);
+    expect(result.maintenanceRiskScore).toBeLessThan(75);
+    expect(['moderate', 'high']).toContain(result.riskBand);
+    expect(result.contributingFactors.length).toBeGreaterThan(0);
+  });
+
+  it('normalizes negative numeric fields without treating them as substantive input', () => {
+    const normalized = normalizePredictiveMaintenanceInput({
+      vehicleAgeYears: -1,
+      mileage: -100,
+    });
+    expect(normalized.vehicleAgeYears).toBeNull();
+    expect(normalized.mileage).toBeNull();
+    expect(hasMinimumScoringInput(normalized)).toBe(false);
   });
 });
 
@@ -280,6 +340,24 @@ describe('3. Route optimization behavior', () => {
     );
     expect(a.routeSavings.minutesSaved).toBe(b.routeSavings.minutesSaved);
   });
+
+  it('flags late delivery window on optimized sequence leg', () => {
+    const result = optimizeRoute(FLEET_ROUTE_LATE_WINDOW_INPUT);
+    expect(result.optimizedSequence).toHaveLength(1);
+    expect(result.optimizedSequence[0].windowStatus).toBe('late');
+  });
+
+  it('warns when planned stops exceed vehicle maxStops', () => {
+    const result = optimizeRoute({
+      destinations: [
+        { label: 'Stop A', priority: 'urgent' },
+        { label: 'Stop B', priority: 'high' },
+        { label: 'Stop C', priority: 'medium' },
+      ],
+      vehicleLimitations: { maxStops: 2 },
+    });
+    expect(result.warnings.some((w) => /max stop/i.test(w))).toBe(true);
+  });
 });
 
 describe('4. Dispatch launch behavior', () => {
@@ -290,7 +368,8 @@ describe('4. Dispatch launch behavior', () => {
     expect(launch.orchestratorTool).toBeNull();
     expect(launch.chatSeed).toBe(dispatchAiChatConfig.chatSeed);
     expect(launch.chatSeed).toMatch(/human dispatcher must approve/i);
-    expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBe('dispatch-ai');
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBeUndefined();
   });
 
   it('exposes fleet-specific chat launch aria label', () => {
@@ -321,6 +400,19 @@ describe('4. Dispatch launch behavior', () => {
       expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
     }
   );
+
+  it('navigates dispatch-ai chat launch to dashboard (not calculators slug)', () => {
+    const launch = resolveCatalogLaunch('dispatch-ai');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(launch.path).toBe(PR_FLEET_HUB_PATH);
+  });
+
+  it('registers dispatch-ai in fleet-dispatch chat hub group', () => {
+    const group = CHAT_ASSISTED_HUB_GROUPS.find((g) => g.groupId === 'fleet-dispatch');
+    expect(group?.toolIds).toEqual(['dispatch-ai']);
+    expect(group?.lead).toMatch(/does not auto-assign/i);
+    expect(toolRegistryById['dispatch-ai']?.panelTool).toBe('calculators');
+  });
 });
 
 describe('5. Registry mappings', () => {
@@ -352,6 +444,15 @@ describe('5. Registry mappings', () => {
     const fleetRows = toolRegistry.filter((t) => PR_FLEET_TOOL_IDS.includes(t.id));
     expect(fleetRows).toHaveLength(PR_FLEET_TOOL_IDS.length);
   });
+
+  it.each(PR_FLEET_TOOL_IDS)('%s has no POST orchestrator executor mapping', (id) => {
+    expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id]).toBeUndefined();
+  });
+
+  it('maps dispatch-ai as NLU-executable without orchestrator POST id', () => {
+    expect(clinicalIntentToolsById['dispatch-ai']?.backendExecutable).toBe(true);
+    expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBeUndefined();
+  });
 });
 
 describe('6. Catalog inclusion', () => {
@@ -375,6 +476,15 @@ describe('6. Catalog inclusion', () => {
     for (const [, query] of spec.catalogSearchQueries) {
       const hits = catalogRowsMatchingQuery(rows, query);
       expect(hits.some((r) => r.primaryId === id), `query "${query}"`).toBe(true);
+    }
+  });
+
+  it('includes fleet tools only in fleet category rows', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const fleetRows = rows.filter((r) => PR_FLEET_TOOL_IDS.includes(r.primaryId));
+    expect(fleetRows).toHaveLength(PR_FLEET_TOOL_IDS.length);
+    for (const row of fleetRows) {
+      expect(row.category).toBe('fleet');
     }
   });
 });
@@ -406,6 +516,15 @@ describe('7. Discovery inclusion', () => {
       targetByAlias.set(alias, canonical);
     }
   });
+
+  it.each(PR_FLEET_DISCOVERY_ALIAS_PAIRS)(
+    'discovery alias "%s" resolves to %s',
+    (alias, canonical) => {
+      expect(resolveRegistryId(alias)).toBe(canonical);
+      const merged = getAllDiscoveredTools();
+      expect(merged.some((r) => r.id === alias || r.id === canonical)).toBe(true);
+    }
+  );
 });
 
 describe('8. Route validation', () => {
@@ -431,7 +550,8 @@ describe('8. Route validation', () => {
     const launch = resolveCatalogLaunch(id);
     expect(launch.registryId).toBe(id);
     expect(launch.path).toBe(spec.routePath);
-    expect(launch.openLabel).toBe('Open');
+    const expectedLabel = spec.hubOnly ? 'Start guided chat' : 'Open';
+    expect(launch.openLabel).toBe(expectedLabel);
   });
 
   it.each(PR_FLEET_ALL_ALIAS_PAIRS)(
@@ -464,5 +584,16 @@ describe('8. Route validation', () => {
   ])('disambiguation triggers for %s', (toolId, message) => {
     expect(messageTriggersBackendDisambiguation(message, toolId)).toBe(true);
     expect(messageMatchesToolKeywords(message, BACKEND_KEYWORDS_BY_TOOL[toolId])).toBe(true);
+  });
+
+  it.each(FLEET_TIER_A_ROUTE_PATHS)('%s is a known fleet area path in route registry', (path) => {
+    expect(isFleetAreaPath(path)).toBe(true);
+    expect(isKnownToolAreaPath(path)).toBe(true);
+    expect(REGISTRY_TOOL_PATHS).toContain(path);
+  });
+
+  it.each(PR_FLEET_TOOL_IDS)('expectedLaunchPath(%s) matches catalog launch path', (id) => {
+    expect(expectedLaunchPath(id)).toBe(resolveCatalogLaunch(id).path);
+    expect(expectedLaunchPath(id)).toBe(PR_FLEET_TOOL_SPECS[id].routePath);
   });
 });

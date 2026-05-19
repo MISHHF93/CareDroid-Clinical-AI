@@ -9,7 +9,8 @@ import { describe, it, expect } from 'vitest';
 import toolRegistry from '../data/toolRegistry';
 import { builtinUiCalculators } from '../data/clinicalIntentToolCatalog';
 import { resolveCatalogLaunch } from '../data/clinicalCatalogWiring';
-import { PR_FLEET_ALL_REGISTRY_IDS } from '../data/clinicalToolIdContract';
+import { PR_FLEET_ALL_REGISTRY_IDS, PR_FLEET_TIER_A_REGISTRY_IDS } from '../data/clinicalToolIdContract';
+import { PR_FLEET_TOOL_SPECS } from '../data/prFleetTestConstants';
 import {
   CALCULATOR_ROUTE_DEFS,
   KNOWN_TOOL_AREA_PATHS,
@@ -96,6 +97,11 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
   it('chat-assisted tools launch to calculators hub', () => {
     expect(expectedLaunchPath('wells-pe')).toBe('/tools/calculators');
     expect(expectedLaunchPath('dispatch-ai')).toBe('/tools/calculators');
+  });
+
+  it.each(PR_FLEET_TIER_A_REGISTRY_IDS)('fleet Tier A %s launch path matches PR_FLEET_TOOL_SPECS', (id) => {
+    expect(expectedLaunchPath(id)).toBe(PR_FLEET_TOOL_SPECS[id].routePath);
+    expect(resolveCatalogLaunch(id).path).toBe(PR_FLEET_TOOL_SPECS[id].routePath);
   });
 
   it('registers tools and fleet catch-all fallbacks', () => {

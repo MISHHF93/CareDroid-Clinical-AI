@@ -76,15 +76,73 @@ describe('predictiveMaintenanceScoring', () => {
   it('clamps invalid telemetry and negative numbers', () => {
     const normalized = normalizePredictiveMaintenanceInput({
       vehicleAgeYears: -5,
-      mileage: 'not-a-number',
+      mileage: -1000,
+      monthsSinceLastService: -2,
       servicesLast12Months: -3,
       telemetry: { harshBrakingEvents: -10 },
     });
 
-    expect(normalized.vehicleAgeYears).toBe(-5);
+    expect(normalized.vehicleAgeYears).toBeNull();
     expect(normalized.mileage).toBeNull();
+    expect(normalized.monthsSinceLastService).toBeNull();
     expect(normalized.servicesLast12Months).toBe(0);
     expect(normalized.telemetry.harshBrakingEvents).toBe(0);
+  });
+
+  it('scores healthy young vehicle in low band with quarterly windows', () => {
+    const result = scorePredictiveMaintenance({
+      vehicleAgeYears: 3,
+      mileage: 25_000,
+      monthsSinceLastService: 4,
+      servicesLast12Months: 3,
+      batteryHealthPercent: 92,
+    });
+
+    expect(result.maintenanceRiskScore).toBeLessThan(25);
+    expect(result.riskBand).toBe('low');
+    expect(result.anomalyIndicators).toHaveLength(0);
+    expect(result.suggestedInspectionWindows[0].daysFromNow).toBe(90);
+  });
+
+  it('caps maintenance risk score at 100', () => {
+    const result = scorePredictiveMaintenance({
+      vehicleAgeYears: 25,
+      mileage: 300_000,
+      monthsSinceLastService: 24,
+      servicesLast12Months: 0,
+      diagnosticCodes: 'P0301, P0420, P0171, BMS_CRITICAL',
+      batteryHealthPercent: 20,
+      telemetry: {
+        engineTempSpikes: 20,
+        harshBrakingEvents: 50,
+        idleHoursPerWeek: 50,
+        faultCodesLast30Days: 12,
+      },
+    });
+
+    expect(result.maintenanceRiskScore).toBe(100);
+    expect(result.riskBand).toBe('critical');
+  });
+
+  it('accepts diagnostic codes alone as minimum input', () => {
+    const normalized = normalizePredictiveMaintenanceInput({ diagnosticCodes: 'P0301' });
+    expect(hasMinimumScoringInput(normalized)).toBe(true);
+    const result = scorePredictiveMaintenance({ diagnosticCodes: 'P0301' });
+    expect(result.maintenanceRiskScore).toBeGreaterThan(0);
+  });
+
+  it('is deterministic for identical inputs', () => {
+    const input = {
+      vehicleAgeYears: 12,
+      mileage: 140_000,
+      monthsSinceLastService: 11,
+      batteryHealthPercent: 68,
+    };
+    const a = scorePredictiveMaintenance(input);
+    const b = scorePredictiveMaintenance(input);
+    expect(a.maintenanceRiskScore).toBe(b.maintenanceRiskScore);
+    expect(a.riskBand).toBe(b.riskBand);
+    expect(a.anomalyIndicators.map((x) => x.id)).toEqual(b.anomalyIndicators.map((x) => x.id));
   });
 
   it('resolves risk bands at documented thresholds', () => {

@@ -50,6 +50,13 @@ describe('RouteOptimizer page', () => {
     ).toBeInTheDocument();
   });
 
+  it('validates /fleet/route-optimizer route renders planner inputs', () => {
+    renderPage();
+    expect(screen.getByLabelText(/Start depot/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/Traffic constraints/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Route planner/i })).toBeInTheDocument();
+  });
+
   it('shows empty results state before optimization', () => {
     renderPage();
     expect(screen.getByText(/Add destinations and run Optimize route/i)).toBeInTheDocument();
@@ -92,5 +99,18 @@ describe('RouteOptimizer page', () => {
     const items = within(routeList).getAllByRole('listitem');
     expect(items[0]).toHaveTextContent(/Urgent Clinic/i);
     expect(items[1]).toHaveTextContent(/Routine Lab/i);
+  });
+
+  it('resets planner and clears results', async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    const labels = screen.getAllByLabelText(/^Destination$/i);
+    await user.type(labels[0], 'Stop A');
+    await user.click(screen.getByRole('button', { name: /Optimize route/i }));
+    expect(screen.getByRole('list', { name: /Optimized stop sequence/i })).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Reset route planner/i }));
+    expect(screen.getByText(/Add destinations and run Optimize route/i)).toBeInTheDocument();
   });
 });

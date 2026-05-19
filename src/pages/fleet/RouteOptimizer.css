@@ -1,7 +1,24 @@
 .route-optimizer {
   max-width: 1040px;
+  width: 100%;
+  min-width: 0;
   margin: 0 auto;
   padding: 24px 20px 48px;
+  box-sizing: border-box;
+}
+
+.route-optimizer-subheading {
+  margin: 8px 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.route-optimizer-route-title {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
 }
 
 .route-optimizer-header {
@@ -274,9 +291,27 @@
   background: color-mix(in srgb, var(--app-danger) 20%, transparent);
 }
 
+.route-optimizer-badge--early {
+  background: color-mix(in srgb, var(--app-warning) 18%, transparent);
+}
+
 .route-optimizer-warnings {
   margin: 12px 0 0;
   padding-left: 18px;
   font-size: 13px;
   color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .route-optimizer {
+    padding: 16px 14px 32px;
+  }
+
+  .route-optimizer-panel {
+    padding: 16px;
+  }
+
+  .route-optimizer-savings {
+    grid-template-columns: 1fr;
+  }
 }

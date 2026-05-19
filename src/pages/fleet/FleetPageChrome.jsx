@@ -32,7 +32,16 @@ export default function FleetPageChrome({
 
   return (
     <>
-      <a href={`#${mainId}`} className="fleet-skip-link">
+      <a
+        href={`#${mainId}`}
+        className="fleet-skip-link"
+        onClick={(event) => {
+          const main = document.getElementById(mainId);
+          if (!main) return;
+          event.preventDefault();
+          main.focus({ preventScroll: false });
+        }}
+      >
         Skip to main content
       </a>
       <header className="fleet-page-header">

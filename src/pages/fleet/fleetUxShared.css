@@ -179,6 +179,54 @@
   color: var(--text-secondary);
 }
 
+.fleet-live-region {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.fleet-content-region {
+  position: relative;
+}
+
+.fleet-content-region--busy {
+  pointer-events: none;
+}
+
+.fleet-content-region--busy::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--app-surface-1) 55%, transparent);
+  z-index: 1;
+}
+
+.fleet-stat-value,
+.fleet-maintenance-count,
+.fleet-energy-meter__value,
+.fleet-vehicle-metric dd {
+  font-variant-numeric: tabular-nums;
+}
+
+.fleet-field input:focus-visible,
+.fleet-field select:focus-visible,
+.fleet-field textarea:focus-visible {
+  outline: 2px solid var(--app-accent, #4a7c9e);
+  outline-offset: 2px;
+}
+
+.fleet-field input[aria-invalid='true'],
+.fleet-field textarea[aria-invalid='true'] {
+  border-color: color-mix(in srgb, var(--app-danger) 55%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fleet-dashboard-loading [class*='loader'],
   .fleet-page-loading-icon {

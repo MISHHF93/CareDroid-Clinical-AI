@@ -12,8 +12,14 @@ import { dispatchAiChatConfig } from '../../data/chatAssistedFleet/dispatchAi';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const fleetDashboard = readFileSync(join(__dirname, 'FleetDashboard.jsx'), 'utf8');
+const fleetDashboardWidgets = readFileSync(join(__dirname, 'FleetDashboardWidgets.jsx'), 'utf8');
 const predictiveMaintenance = readFileSync(join(__dirname, 'PredictiveMaintenance.jsx'), 'utf8');
+const predictiveMaintenanceWidgets = readFileSync(
+  join(__dirname, 'PredictiveMaintenanceWidgets.jsx'),
+  'utf8'
+);
 const routeOptimizer = readFileSync(join(__dirname, 'RouteOptimizer.jsx'), 'utf8');
+const routeOptimizerWidgets = readFileSync(join(__dirname, 'RouteOptimizerWidgets.jsx'), 'utf8');
 const fleetPageChrome = readFileSync(join(__dirname, 'FleetPageChrome.jsx'), 'utf8');
 const fleetUxShared = readFileSync(join(__dirname, 'fleetUxShared.css'), 'utf8');
 const calculators = readFileSync(join(__dirname, '../tools/Calculators.jsx'), 'utf8');
@@ -23,6 +29,7 @@ describe('Fleet shared chrome — keyboard & landmarks', () => {
   it('exposes skip link, back control, and main landmark', () => {
     expect(fleetPageChrome).toContain('fleet-skip-link');
     expect(fleetPageChrome).toContain('Skip to main content');
+    expect(fleetPageChrome).toContain('main.focus');
     expect(fleetPageChrome).toContain('aria-label="Back to tools catalog"');
     expect(fleetPageChrome).toContain('<main id={mainId}');
     expect(fleetPageChrome).toContain('tabIndex={-1}');
@@ -32,6 +39,9 @@ describe('Fleet shared chrome — keyboard & landmarks', () => {
     expect(fleetUxShared).toContain(':focus-visible');
     expect(fleetUxShared).toContain('prefers-reduced-motion');
     expect(fleetUxShared).toContain('min-height: 44px');
+    expect(fleetUxShared).toContain('fleet-live-region');
+    expect(fleetUxShared).toContain('tabular-nums');
+    expect(fleetUxShared).toContain('aria-invalid');
   });
 });
 
@@ -43,7 +53,15 @@ describe('Fleet Command Dashboard — states & safety', () => {
     expect(fleetDashboard).toContain('role="alert"');
     expect(fleetDashboard).toContain('fleet-operational-warning');
     expect(fleetDashboard).toContain('fleet-no-automation-note');
-    expect(fleetDashboard).toContain('fleet-sr-only');
+    expect(fleetDashboard).toContain('fleet-live-region');
+    expect(fleetDashboard).toContain('isRefreshing');
+    expect(fleetDashboardWidgets).toContain('fleet-sr-only');
+  });
+
+  it('widgets expose energy meters and maintenance breakdown', () => {
+    expect(fleetDashboardWidgets).toContain('role="meter"');
+    expect(fleetDashboardWidgets).toContain('FleetMaintenanceWidget');
+    expect(fleetDashboardWidgets).toContain('FleetEnergyMeter');
   });
 });
 
@@ -55,6 +73,17 @@ describe('Predictive Maintenance — form a11y & automation guardrails', () => {
     expect(predictiveMaintenance).toContain('fleet-operational-warning');
     expect(predictiveMaintenance).toContain('fleet-no-automation-note');
     expect(predictiveMaintenance).toContain('aria-label="Calculate maintenance risk score"');
+    expect(predictiveMaintenance).toContain('aria-invalid={validationError');
+    expect(predictiveMaintenance).toContain('getMaintenanceOpsWarningItems');
+  });
+
+  it('widgets expose risk, inspection, and anomaly sections', () => {
+    expect(predictiveMaintenanceWidgets).toContain('PredictiveMaintenanceRiskCard');
+    expect(predictiveMaintenanceWidgets).toContain('PredictiveMaintenanceInspectionList');
+    expect(predictiveMaintenanceWidgets).toContain('PredictiveMaintenanceAnomalyList');
+    expect(predictiveMaintenanceWidgets).toContain('shouldShowMaintenanceOpsWarning');
+    expect(predictiveMaintenanceWidgets).toContain('getMaintenanceOpsWarningItems');
+    expect(predictiveMaintenanceWidgets).toContain('role="status"');
   });
 });
 
@@ -65,6 +94,16 @@ describe('Route Optimizer — form a11y & window-risk alerts', () => {
     expect(routeOptimizer).toContain('fleet-operational-warning');
     expect(routeOptimizer).toContain('fleet-no-automation-note');
     expect(routeOptimizer).toContain('role="alert"');
+    expect(routeOptimizer).toContain('getRouteOpsWarningItems');
+    expect(routeOptimizer).toContain('type="time"');
+  });
+
+  it('widgets expose savings, sequence, and warning helpers', () => {
+    expect(routeOptimizerWidgets).toContain('RouteSavingsWidget');
+    expect(routeOptimizerWidgets).toContain('RouteSequenceList');
+    expect(routeOptimizerWidgets).toContain('shouldShowRouteOpsWarning');
+    expect(routeOptimizerWidgets).toContain('getRouteOpsWarningItems');
+    expect(routeOptimizerWidgets).toContain('aria-label="Optimized stop sequence"');
   });
 });
 
@@ -73,6 +112,8 @@ describe('Dispatch Intelligence — hub & chat safety', () => {
     expect(chatHubGroups).toMatch(/fleet-dispatch[\s\S]*does not auto-assign/i);
     expect(calculators).toContain('fleetChatAssistedLaunchAriaLabel');
     expect(calculators).toContain('calc-chat-assisted-group--fleet');
+    expect(calculators).toContain('calc-chat-assisted-safety-pill');
+    expect(calculators).toContain('Human approval required');
     const label = fleetChatAssistedLaunchAriaLabel('Dispatch Intelligence');
     expect(label).toMatch(/does not auto-assign/i);
     expect(label).toMatch(/Human dispatcher approval/i);

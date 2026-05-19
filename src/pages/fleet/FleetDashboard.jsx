@@ -1,91 +1,73 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
-import {
-  fetchFleetCommandSnapshot,
-  FLEET_MAINTENANCE_LABELS,
-  FLEET_VEHICLE_STATUS_LABELS,
-} from '../../services/fleetTelemetryService';
+import { fetchFleetCommandSnapshot } from '../../services/fleetTelemetryService';
 import { NavIcon } from '../../navigation/NavIcon';
-import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
+import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import FleetPageChrome, { FleetOperationalBanner } from './FleetPageChrome';
+import {
+  FleetMaintenanceWidget,
+  FleetSummaryWidget,
+  FleetVehicleListWidget,
+} from './FleetDashboardWidgets';
 import './FleetDashboard.css';
 import './fleetUxShared.css';
 
 const TOOL_ID = 'fleet-command';
-
-function FleetStatCard({ label, value, hint, accent }) {
-  const hintId = hint ? `fleet-stat-hint-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined;
-  return (
-    <article
-      className={`fleet-stat-card${accent ? ' fleet-stat-card--accent' : ''}`}
-      aria-label={hint ? `${label}: ${value}. ${hint}` : `${label}: ${value}`}
-    >
-      <p className="fleet-stat-label">{label}</p>
-      <p className="fleet-stat-value" aria-describedby={hintId}>
-        {value}
-      </p>
-      {hint ? (
-        <p id={hintId} className="fleet-stat-hint">
-          {hint}
-        </p>
-      ) : null}
-    </article>
-  );
-}
-
-function statusBadgeClass(status) {
-  if (status === 'maintenance') return 'fleet-badge--maintenance';
-  if (status === 'available') return 'fleet-badge--available';
-  if (status === 'occupied') return 'fleet-badge--occupied';
-  return 'fleet-badge--active';
-}
-
-function maintenanceBadgeClass(maintenanceStatus) {
-  if (maintenanceStatus === 'ok') return 'fleet-badge--available';
-  if (maintenanceStatus === 'warning') return 'fleet-badge--warning';
-  return 'fleet-badge--maintenance';
-}
-
-function formatEnergy(vehicle) {
-  const unit = vehicle.energyType === 'electric' ? 'Battery' : 'Fuel';
-  return `${unit} ${vehicle.energyPercent}%`;
-}
-
-function formatEta(etaMinutes) {
-  if (etaMinutes == null) return '—';
-  return `${etaMinutes} min`;
-}
 
 export default function FleetDashboard() {
   const { recordToolAccess } = useToolPreferences();
   const [phase, setPhase] = useState('loading');
   const [snapshot, setSnapshot] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [statusMessage, setStatusMessage] = useState('');
   const requestSeqRef = useRef(0);
+  const snapshotRef = useRef(null);
+  snapshotRef.current = snapshot;
 
-  const loadSnapshot = useCallback(async (_signal, { forceLoading = false } = {}) => {
+  const loadSnapshot = useCallback(async (signal, { forceLoading = false } = {}) => {
     const requestId = ++requestSeqRef.current;
-    setPhase((current) => {
-      if (forceLoading) return 'loading';
-      if (current === 'ready' || current === 'empty' || current === 'error') return current;
-      return 'loading';
-    });
+    const refreshInPlace = forceLoading && snapshotRef.current != null;
+    if (refreshInPlace) {
+      setIsRefreshing(true);
+    } else {
+      setPhase((current) => {
+        if (forceLoading) return 'loading';
+        if (current === 'ready' || current === 'empty' || current === 'error') return current;
+        return 'loading';
+      });
+    }
     setErrorMessage(null);
     try {
-      const data = await fetchFleetCommandSnapshot();
+      const data = await fetchFleetCommandSnapshot({ signal });
       if (requestId !== requestSeqRef.current) return;
       setSnapshot(data);
       setPhase(data.vehicles.length === 0 ? 'empty' : 'ready');
+      if (refreshInPlace && data.vehicles.length > 0) {
+        setStatusMessage(
+          `Fleet snapshot updated at ${new Date(data.summary?.updatedAt || Date.now()).toLocaleTimeString()}.`
+        );
+      }
     } catch (err) {
       if (requestId !== requestSeqRef.current) return;
+      if (err?.name === 'AbortError') return;
       setErrorMessage(err?.message || 'Unable to load fleet telemetry.');
       setPhase('error');
+    } finally {
+      if (requestId === requestSeqRef.current) {
+        setIsRefreshing(false);
+      }
     }
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
     recordToolAccess(TOOL_ID);
-    loadSnapshot();
+    loadSnapshot(controller.signal);
+    return () => {
+      controller.abort();
+      requestSeqRef.current += 1;
+    };
   }, [loadSnapshot, recordToolAccess]);
 
   const summary = snapshot?.summary;
@@ -107,6 +89,10 @@ export default function FleetDashboard() {
         }
         mainId="fleet-dashboard-main"
       >
+        <p className="fleet-live-region" role="status" aria-live="polite" aria-atomic="true">
+          {statusMessage}
+        </p>
+
         {phase === 'loading' ? (
           <div
             className="fleet-dashboard-loading"
@@ -159,15 +145,20 @@ export default function FleetDashboard() {
         ) : null}
 
         {phase === 'ready' && summary ? (
-          <>
+          <div
+            className={`fleet-content-region${isRefreshing ? ' fleet-content-region--busy' : ''}`}
+            aria-busy={isRefreshing}
+          >
             <div className="fleet-toolbar">
               <button
                 type="button"
                 className="fleet-btn fleet-btn--secondary"
                 aria-label="Refresh fleet telemetry snapshot"
+                aria-busy={isRefreshing}
+                disabled={isRefreshing}
                 onClick={() => loadSnapshot(undefined, { forceLoading: true })}
               >
-                Refresh snapshot
+                {isRefreshing ? 'Refreshing…' : 'Refresh snapshot'}
               </button>
             </div>
 
@@ -192,101 +183,9 @@ export default function FleetDashboard() {
               </div>
             ) : null}
 
-            <section aria-labelledby="fleet-summary-heading">
-              <h2 id="fleet-summary-heading" className="fleet-section-title">
-                Fleet summary
-              </h2>
-              <div className="fleet-stat-grid" role="group" aria-label="Fleet summary metrics">
-                <FleetStatCard label="Active" value={summary.activeVehicles} />
-                <FleetStatCard label="Available" value={summary.availableVehicles} />
-                <FleetStatCard label="On job" value={summary.occupiedVehicles} />
-                <FleetStatCard
-                  label="Maintenance"
-                  value={summary.maintenanceCount}
-                  hint={summary.lowEnergyCount ? `${summary.lowEnergyCount} low energy` : null}
-                />
-                <FleetStatCard
-                  label="Avg utilization"
-                  value={`${summary.averageUtilizationPercent}%`}
-                  accent
-                />
-                <FleetStatCard
-                  label="Avg ETA (on job)"
-                  value={
-                    summary.averageEtaMinutes != null ? `${summary.averageEtaMinutes} min` : '—'
-                  }
-                />
-              </div>
-            </section>
-
-            <section aria-labelledby="fleet-vehicles-heading">
-              <h2 id="fleet-vehicles-heading" className="fleet-section-title">
-                Vehicles ({snapshot.vehicles.length})
-              </h2>
-              <ul className="fleet-vehicle-list">
-                {snapshot.vehicles.map((vehicle) => (
-                  <li key={vehicle.id}>
-                    <article
-                      className="fleet-vehicle-card"
-                      aria-labelledby={`vehicle-${vehicle.id}-title`}
-                    >
-                      <div className="fleet-vehicle-card-header">
-                        <div>
-                          <h3 id={`vehicle-${vehicle.id}-title`} className="fleet-vehicle-title">
-                            {vehicle.label}
-                          </h3>
-                          <span className="fleet-vehicle-id">{vehicle.id}</span>
-                        </div>
-                        <div className="fleet-badge-row" role="list" aria-label="Vehicle status">
-                          <span
-                            className={`fleet-badge ${statusBadgeClass(vehicle.status)}`}
-                            role="listitem"
-                          >
-                            <span className="fleet-sr-only">Status: </span>
-                            {FLEET_VEHICLE_STATUS_LABELS[vehicle.status] || vehicle.status}
-                          </span>
-                          <span
-                            className={`fleet-badge ${maintenanceBadgeClass(vehicle.maintenanceStatus)}`}
-                            role="listitem"
-                          >
-                            <span className="fleet-sr-only">Maintenance: </span>
-                            {FLEET_MAINTENANCE_LABELS[vehicle.maintenanceStatus] ||
-                              vehicle.maintenanceStatus}
-                          </span>
-                          {vehicle.energyPercent < 35 ? (
-                            <span
-                              className="fleet-badge fleet-badge--critical"
-                              role="listitem"
-                            >
-                              <span className="fleet-sr-only">Alert: </span>
-                              Low energy
-                            </span>
-                          ) : null}
-                        </div>
-                      </div>
-                      <dl className="fleet-vehicle-metrics">
-                        <div className="fleet-vehicle-metric">
-                          <dt>ETA</dt>
-                          <dd>{formatEta(vehicle.etaMinutes)}</dd>
-                        </div>
-                        <div className="fleet-vehicle-metric">
-                          <dt>Energy</dt>
-                          <dd>{formatEnergy(vehicle)}</dd>
-                        </div>
-                        <div className="fleet-vehicle-metric">
-                          <dt>Utilization</dt>
-                          <dd>{vehicle.utilizationPercent}%</dd>
-                        </div>
-                        <div className="fleet-vehicle-metric">
-                          <dt>Driver</dt>
-                          <dd>{vehicle.driver || 'Unassigned'}</dd>
-                        </div>
-                      </dl>
-                    </article>
-                  </li>
-                ))}
-              </ul>
-            </section>
+            <FleetSummaryWidget summary={summary} />
+            <FleetMaintenanceWidget vehicles={snapshot.vehicles} />
+            <FleetVehicleListWidget vehicles={snapshot.vehicles} />
 
             {lowEnergyVehicles.length > 0 ? (
               <FleetOperationalBanner variant="critical">
@@ -303,7 +202,7 @@ export default function FleetDashboard() {
               Human dispatchers must approve all assignments. This view does not modify live fleet
               operations.
             </p>
-          </>
+          </div>
         ) : null}
       </FleetPageChrome>
     </div>

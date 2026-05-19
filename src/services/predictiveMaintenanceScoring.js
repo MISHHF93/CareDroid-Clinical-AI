@@ -67,10 +67,17 @@ export function resolveRiskBand(score) {
 export function normalizePredictiveMaintenanceInput(input = {}) {
   const telemetry = { ...DEFAULT_TELEMETRY, ...(input.telemetry || {}) };
 
+  const vehicleAgeYears = toOptionalNumber(input.vehicleAgeYears);
+  const mileage = toOptionalNumber(input.mileage);
+
   return {
-    vehicleAgeYears: toOptionalNumber(input.vehicleAgeYears),
-    mileage: toOptionalNumber(input.mileage),
-    monthsSinceLastService: toOptionalNumber(input.monthsSinceLastService),
+    vehicleAgeYears:
+      vehicleAgeYears != null && vehicleAgeYears < 0 ? null : vehicleAgeYears,
+    mileage: mileage != null && mileage < 0 ? null : mileage,
+    monthsSinceLastService: (() => {
+      const n = toOptionalNumber(input.monthsSinceLastService);
+      return n != null && n < 0 ? null : n;
+    })(),
     servicesLast12Months:
       input.servicesLast12Months === '' || input.servicesLast12Months == null
         ? null

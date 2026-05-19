@@ -17,6 +17,7 @@ import {
 } from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
   resolveRegistryId,
   NLU_TO_REGISTRY_ID,
   PR_FLEET_ALL_REGISTRY_IDS,
@@ -25,6 +26,17 @@ import {
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
 } from './clinicalCatalogWiring';
+import {
+  AI_EXECUTABLE_NLU_TOOL_IDS,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+} from './clinicalToolIdContract';
+import { buildUnsupportedOrchestratorToolDocs } from './unsupportedOrchestratorTools';
+import {
+  expectedLaunchPath,
+  isFleetAreaPath,
+  isKnownToolAreaPath,
+  KNOWN_TOOL_AREA_PATHS,
+} from '../routes/clinicalToolRoutes';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { getToolIcon } from '../navigation/iconRegistry';
@@ -122,9 +134,15 @@ describe('PR-FLEET consistency — NLU and orchestrator maps', () => {
     expect(ORCHESTRATOR_TO_REGISTRY_ID[id]).toBe(id);
   });
 
-  it('flags dispatch-ai as NLU backendExecutable without POST orchestrator mapping', () => {
+  it('dispatch-ai is AI_EXECUTABLE (NLU/chat) but not POST-orchestrator registered', () => {
     expect(clinicalIntentToolsById['dispatch-ai']?.backendExecutable).toBe(true);
+    expect(AI_EXECUTABLE_NLU_TOOL_IDS).toContain('dispatch-ai');
+    expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS).not.toContain('dispatch-ai');
     expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBeUndefined();
+  });
+
+  it.each(PR_FLEET_TOOL_IDS)('%s has no REGISTRY_ID_TO_ORCHESTRATOR_TOOL mapping', (id) => {
+    expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id]).toBeUndefined();
   });
 
   it('documents backend disambiguation helpers', () => {
@@ -206,6 +224,36 @@ describe('PR-FLEET consistency — aliases (no orphans or conflicts)', () => {
         throw new Error(`Orphaned fleet discovery alias ${row.id} → ${row.mapsTo}`);
       }
     }
+  });
+});
+
+describe('PR-FLEET consistency — launch behavior', () => {
+  it.each(PR_FLEET_TIER_A_IDS)('%s navigates to dedicated fleet route', (id) => {
+    const spec = PR_FLEET_TOOL_SPECS[id];
+    const launch = resolveCatalogLaunch(id);
+    expect(launch.path).toBe(spec.routePath);
+    expect(launch.path).toMatch(/^\/fleet\//);
+    expect(isFleetAreaPath(launch.path)).toBe(true);
+    expect(isKnownToolAreaPath(launch.path)).toBe(true);
+    expect(KNOWN_TOOL_AREA_PATHS).toContain(launch.path);
+    expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
+    expect(expectedLaunchPath(id)).toBe(spec.routePath);
+  });
+
+  it.each(PR_FLEET_TIER_B_IDS)('%s uses calculators hub path and dashboard navigation', (id) => {
+    const launch = resolveCatalogLaunch(id);
+    expect(launch.path).toBe(PR_FLEET_HUB_PATH);
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(launch.openLabel).toBe('Start guided chat');
+    expect(isKnownToolAreaPath(PR_FLEET_HUB_PATH)).toBe(true);
+  });
+
+  it('includes required standalone dispatch alias', () => {
+    expect(NLU_TO_REGISTRY_ID.dispatch).toBe('dispatch-ai');
+    expect(resolveRegistryId('dispatch')).toBe('dispatch-ai');
+    expect(
+      PR_FLEET_REQUIRED_NLU_ALIAS_PAIRS.some(([alias, canonical]) => alias === 'dispatch' && canonical === 'dispatch-ai')
+    ).toBe(true);
   });
 });
 
@@ -297,5 +345,20 @@ describe('PR-FLEET consistency — no stray fleet NLU without registry', () => {
     const fleetNlu = clinicalIntentTools.filter((t) => t.category === 'fleet');
     const ids = fleetNlu.map((t) => t.toolId).sort();
     expect(ids).toEqual([...PR_FLEET_TOOL_IDS].sort());
+  });
+});
+
+describe('PR-FLEET consistency — unsupported orchestrator documentation', () => {
+  it.each(PR_FLEET_TOOL_IDS)('%s is documented without POST executor', (id) => {
+    const docs = buildUnsupportedOrchestratorToolDocs();
+    const row = docs.find((d) => d.nluToolId === id);
+    expect(row, `missing unsupported doc for ${id}`).toBeTruthy();
+    expect(row.registryId).toBe(id);
+  });
+
+  it('documents dispatch-ai as chat-assisted fleet surface', () => {
+    const row = buildUnsupportedOrchestratorToolDocs().find((d) => d.nluToolId === 'dispatch-ai');
+    expect(row?.surface).toBe('chat-assisted');
+    expect(row?.reason).toMatch(/Chat\/NLU routing only/i);
   });
 });

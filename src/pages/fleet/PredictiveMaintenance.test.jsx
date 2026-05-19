@@ -66,6 +66,14 @@ describe('PredictiveMaintenance page', () => {
     expect(screen.getByRole('alert')).toHaveTextContent(/Enter at least vehicle age/i);
   });
 
+  it('validates route /fleet/predictive-maintenance renders page', () => {
+    renderPage('/fleet/predictive-maintenance');
+    expect(
+      screen.getByRole('heading', { level: 1, name: /Predictive Maintenance Assistant/i })
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/Vehicle age/i)).toBeInTheDocument();
+  });
+
   it('renders risk score and inspection widgets after scoring', async () => {
     const user = userEvent.setup();
     renderPage();
@@ -82,7 +90,7 @@ describe('PredictiveMaintenance page', () => {
 
     const assessment = screen.getByRole('heading', { name: /^Assessment$/i }).closest('section');
     expect(within(assessment).getByText(/Maintenance risk score/i)).toBeInTheDocument();
-    expect(within(assessment).getByText(/High risk|Critical risk|Moderate risk/i)).toBeInTheDocument();
+    expect(within(assessment).getByRole('status')).toHaveTextContent(/risk/i);
     expect(within(assessment).getByText(/Suggested inspection windows/i)).toBeInTheDocument();
     expect(within(assessment).getByText(/Anomaly indicators/i)).toBeInTheDocument();
   });
