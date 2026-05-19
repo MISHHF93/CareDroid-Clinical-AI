@@ -1,7 +1,12 @@
 .tools-overview {
-  padding: 32px;
+  padding: clamp(12px, 3vw, 32px);
+  padding-block: clamp(16px, 3vw, 32px);
   max-width: 1400px;
+  width: 100%;
+  min-width: 0;
   margin: 0 auto;
+  box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .tools-overview-header {
@@ -144,8 +149,10 @@
 
 .tools-recent-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .tools-recent-card {
@@ -445,8 +452,10 @@
 
 .tips-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
   gap: 24px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .tip-card {

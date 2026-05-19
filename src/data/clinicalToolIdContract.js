@@ -67,6 +67,10 @@ export const REGISTRY = Object.freeze({
   canadianCSpine: 'canadian-c-spine',
   ottawaAnkle: 'ottawa-ankle',
   calculatorsHub: 'calculators',
+  apache2Calculator: 'apache2-calculator',
+  curb65Calculator: 'curb65-calculator',
+  gcsCalculator: 'gcs-calculator',
+  wellsDvtCalculator: 'wells-dvt-calculator',
   protocols: 'protocols',
   diagnosis: 'diagnosis',
   procedures: 'procedures',
@@ -211,6 +215,14 @@ export const CLINICAL_TIER_B_CHAT_REGISTRY_IDS = Object.freeze([
   ...PR7_TIER_B_CHAT_CALCULATOR_IDS,
 ]);
 
+/** NLU hub chat tools with dedicated sidebar registry rows (guided chat from calculators hub). */
+export const CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS = Object.freeze([
+  NLU.apache2Calculator,
+  NLU.curb65Calculator,
+  NLU.gcsCalculator,
+  NLU.wellsDvtCalculator,
+]);
+
 export const PR2_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...PR2_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR2_TIER_B_CHAT_CALCULATOR_IDS,
@@ -224,6 +236,7 @@ export const PR7_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR7_TIER_B_CHAT_CAL
 
 export const TIER_B_CHAT_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+  ...CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS,
   REGISTRY.dispatchAi,
 ]);
 
@@ -349,11 +362,11 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
   [NLU.sofaCalculator]: REGISTRY.sofaScore,
   [NLU.drugInteractions]: REGISTRY.drugCheck,
   [NLU.labInterpreter]: REGISTRY.labInterp,
-  [NLU.apache2Calculator]: REGISTRY.calculatorsHub,
+  [NLU.apache2Calculator]: REGISTRY.apache2Calculator,
   [NLU.cha2ds2vascCalculator]: REGISTRY.calcChads2vasc,
-  [NLU.curb65Calculator]: REGISTRY.calculatorsHub,
-  [NLU.gcsCalculator]: REGISTRY.calculatorsHub,
-  [NLU.wellsDvtCalculator]: REGISTRY.calculatorsHub,
+  [NLU.curb65Calculator]: REGISTRY.curb65Calculator,
+  [NLU.gcsCalculator]: REGISTRY.gcsCalculator,
+  [NLU.wellsDvtCalculator]: REGISTRY.wellsDvtCalculator,
   [NLU.wellsPe]: REGISTRY.wellsPe,
   [NLU.perc]: REGISTRY.perc,
   [NLU.graceAcs]: REGISTRY.graceAcs,
@@ -417,6 +430,7 @@ export const CANONICAL_TOOL_GROUPS = Object.freeze({
   aiOperationsPages: CLINICAL_AI_PAGE_REGISTRY_IDS,
   clinicalCalculatorsTierA: CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
   clinicalChatAssistedTierB: CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+  clinicalNluHubChat: CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS,
   clinicalCalculatorsHub: Object.freeze([REGISTRY.calculatorsHub]),
   fleetLogisticsTierA: FLEET_TIER_A_REGISTRY_IDS,
   fleetLogisticsTierBChat: FLEET_TIER_B_CHAT_REGISTRY_IDS,
@@ -429,6 +443,7 @@ export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
   ...CANONICAL_TOOL_GROUPS.aiOperationsPages,
   ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsTierA,
   ...CANONICAL_TOOL_GROUPS.clinicalChatAssistedTierB,
+  ...CANONICAL_TOOL_GROUPS.clinicalNluHubChat,
   ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsHub,
   ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierA,
   ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierBChat,
@@ -443,11 +458,11 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'lab-interp': REGISTRY.labInterp,
   'sofa-calculator': REGISTRY.sofaScore,
   sofa_calculator: REGISTRY.sofaScore,
-  'apache2-calculator': REGISTRY.calculatorsHub,
+  'apache2-calculator': REGISTRY.apache2Calculator,
   'cha2ds2vasc-calculator': REGISTRY.calcChads2vasc,
-  'curb65-calculator': REGISTRY.calculatorsHub,
-  'gcs-calculator': REGISTRY.calculatorsHub,
-  'wells-dvt-calculator': REGISTRY.calculatorsHub,
+  'curb65-calculator': REGISTRY.curb65Calculator,
+  'gcs-calculator': REGISTRY.gcsCalculator,
+  'wells-dvt-calculator': REGISTRY.wellsDvtCalculator,
   'dose-calculator': REGISTRY.calculatorsHub,
   'abg-interpreter': REGISTRY.labInterp,
   'protocol-lookup': REGISTRY.protocols,

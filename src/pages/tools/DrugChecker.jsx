@@ -3,6 +3,7 @@ import { useUser } from '../../contexts/UserContext';
 import analyticsService from '../../services/analyticsService';
 import offlineService from '../../services/offlineService';
 import { executeClinicalTool } from '../../services/clinicalOrchestratorApi';
+import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPageLayout from './ToolPageLayout';
 import './DrugChecker.css';
 
@@ -44,6 +45,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
   const [results, setResults] = useState(null);
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState(null);
+  const [unsupported, setUnsupported] = useState(false);
 
   const toolConfig = {
     id: 'drug-check',
@@ -79,6 +81,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
 
     setIsChecking(true);
     setError(null);
+    setUnsupported(false);
     setResults(null);
 
     try {
@@ -86,6 +89,12 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
         medications: activeMeds,
         severityFilter: 'all',
       });
+
+      if (execution.unsupported) {
+        setUnsupported(true);
+        setError(execution.message);
+        return;
+      }
 
       if (!execution.ok) {
         throw new Error(execution.message || 'Failed to check drug interactions');
@@ -184,11 +193,11 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
           </div>
         </div>
 
-        {error && (
-          <div className="result-card" role="alert" style={{ borderColor: '#EF4444' }}>
-            <p>{error}</p>
-          </div>
-        )}
+        <ClinicalExecutorFeedback
+          loading={isChecking}
+          unsupported={unsupported}
+          error={!unsupported && error && !isChecking ? error : null}
+        />
 
         {results && (
           <div className="results-section">

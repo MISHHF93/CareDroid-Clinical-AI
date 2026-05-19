@@ -72,6 +72,13 @@ describe('ClinicalToolCatalog — launch buttons', () => {
     const input = screen.getByRole('searchbox', { name: /search clinical catalog/i });
     fireEvent.change(input, { target: { value: 'pe-score' } });
     expect((await screen.findAllByText('Wells PE Score')).length).toBeGreaterThan(0);
-    expect(screen.getByRole('button', { name: /start guided chat/i })).toBeInTheDocument();
+    const medicalHeading = screen.getByRole('heading', {
+      level: 2,
+      name: /medical tools & calculators/i,
+    });
+    const medicalSection = medicalHeading.closest('.catalog-section--medical');
+    expect(
+      within(medicalSection).getAllByRole('button', { name: /start guided chat/i }).length
+    ).toBeGreaterThan(0);
   });
 });

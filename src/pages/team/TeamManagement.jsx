@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import './TeamManagement.css';
 import { apiFetch, apiFetchJson, getStoredAccessToken } from '../../services/apiClient';
+import {
+  isBackendCapabilityEnabled,
+  UNSUPPORTED_CAPABILITY_MESSAGE,
+} from '../../config/backendApiCapabilities';
 
 /**
  * TeamManagement Page Component
@@ -24,7 +28,16 @@ export const TeamManagement = () => {
     fetchUsers();
   }, []);
 
+  const teamApiEnabled = isBackendCapabilityEnabled('teamManagement');
+
   const fetchUsers = async () => {
+    if (!teamApiEnabled) {
+      setLoading(false);
+      setError(UNSUPPORTED_CAPABILITY_MESSAGE);
+      setUsers([]);
+      return;
+    }
+
     try {
       setLoading(true);
       const { response, data } = await apiFetchJson('/api/team/users', {

@@ -26,9 +26,9 @@ const ROADMAP_TIER_A_REGISTRY_IDS = [
 ];
 
 describe('Calculators.jsx route wiring', () => {
-  it('builds CALCULATORS from builtinUiCalculators', () => {
-    expect(calculatorsSource).toContain('builtinUiCalculators.map');
-    expect(calculatorsSource).toContain('BUILTIN_CALC_ID_TO_REGISTRY_ID');
+  it('builds CALCULATORS from calculatorHubManifest', () => {
+    expect(calculatorsSource).toContain('buildBuiltinHubCalculatorCards');
+    expect(calculatorsSource).toContain('getHubChatAssistedTools');
   });
 
   it('handles unknown calculator slugs with ToolNotFound', () => {

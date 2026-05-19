@@ -79,6 +79,15 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellCss).toMatch(/\.app-shell-page-body > \*[\s\S]*min-width:\s*0/);
     expect(appShellCss).toMatch(/\.app-shell-page-body > \*[\s\S]*max-width:\s*100%/);
   });
+
+  it('scroll routes grow with content instead of clipping inside page-body', () => {
+    expect(appShellCss).toMatch(
+      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*min-height:\s*min-content/
+    );
+    expect(appShellCss).toMatch(
+      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*overflow:\s*visible/
+    );
+  });
 });
 
 describe('App shell layout — JS/CSS alignment', () => {

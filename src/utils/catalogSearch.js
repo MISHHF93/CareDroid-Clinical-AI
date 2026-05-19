@@ -135,9 +135,36 @@ function resolveLaunchLabel(row, launch) {
   ) {
     return 'Start guided chat';
   }
+  if (row.uiCalculatorSlug && row.pagePath && !row.chatOnlyForm) {
+    return 'Open calculator';
+  }
   if (launch.path) return 'Open';
   if (launch.chatSeed) return 'Try in chat';
   return 'Launch';
+}
+
+/**
+ * Category quick-filter / dropdown matching for medical catalog rows.
+ * @param {object} row
+ * @param {string} categoryFilter
+ */
+export function matchesMedicalCatalogCategoryFilter(row, categoryFilter) {
+  if (!categoryFilter || categoryFilter === 'all' || categoryFilter === 'medical') {
+    return true;
+  }
+  if (categoryFilter === 'calculator') {
+    return Boolean(row.uiCalculatorSlug) || row.category === 'calculator';
+  }
+  if (categoryFilter === 'chat-assisted') {
+    return Boolean(row.chatOnlyForm) || row.category === 'chat-assisted';
+  }
+  if (categoryFilter === 'checker') {
+    return row.category === 'checker' || row.category === 'diagnostic';
+  }
+  if (categoryFilter === 'diagnostic') {
+    return row.category === 'diagnostic' || row.category === 'checker';
+  }
+  return row.category === categoryFilter;
 }
 
 /**
@@ -182,7 +209,6 @@ export function enrichMedicalCatalogRow(row) {
     row.sidebarToolId,
     launch.registryId
   );
-  const launchable = Boolean(launch.path || launch.chatSeed);
   const primaryId = row.primaryId || row.id;
   const nluToolId =
     clinicalIntentPrimaryId(primaryId) ||
@@ -191,6 +217,10 @@ export function enrichMedicalCatalogRow(row) {
     nluToolId && isOrchestratorRegisteredNlu(nluToolId)
   );
   const backendApiIntentOnly = Boolean(row.backendExecutor && !backendApiRegistered);
+  const launchable =
+    !row.hiddenFromCatalog &&
+    Boolean(launch.path || launch.chatSeed) &&
+    !(row.backendExecutor && !backendApiRegistered && !launch.chatSeed);
 
   return {
     ...row,

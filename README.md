@@ -56,7 +56,8 @@ Medical AI clinical co-pilot: React + Vite SPA, NestJS API, optional Capacitor A
 Copy examples and tune for your environment:
 
 - **Frontend / shared:** [.env.example](.env.example) — `VITE_*` feature flags, `VITE_API_URL`, optional Sentry, Firebase, demo auth flags.
-- **Proxy / API client audit:** [docs/proxy-config-audit.md](docs/proxy-config-audit.md) — dev vs split deploy, Vite proxy paths, centralized `apiClient`.
+- **Proxy / API client audit:** [docs/proxy-config-audit.md](docs/proxy-config-audit.md) — dev vs split deploy, Vite proxy paths, centralized `apiClient`, `backendApiCapabilities.js` gating, layout scroll visibility (`layout-visibility.css`).
+- **Backend exposure:** [docs/backend-exposure-report.md](docs/backend-exposure-report.md) — which routes exist vs phantom frontend calls.
 - **Orchestrator executors:** [docs/unsupported-orchestrator-tools.md](docs/unsupported-orchestrator-tools.md) — three POST executors vs NLU-only tools (`npm run orchestrator:write-docs` to regenerate).
 - **Executor readiness (candidates):** [docs/executor-readiness-report.md](docs/executor-readiness-report.md) — MELD, GRACE, ASCVD, CKD, fleet route/maintenance; planning only, no new executors on mapping branches.
 - **Render / execute matrix:** [docs/tool-render-execute-matrix.md](docs/tool-render-execute-matrix.md) — per-tool route, Tier A/B/C mode, smoke paths (`npm run tool-matrix:write-docs` to regenerate; `npm run test:tool-render-smoke` for automated checks).

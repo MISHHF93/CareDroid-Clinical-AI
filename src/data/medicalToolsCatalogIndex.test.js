@@ -132,4 +132,23 @@ describe('medicalToolsCatalogIndex', () => {
     expect(meldNa?.uiCalculatorSlug).toBe('meld-na');
     expect(meldNa?.chatOnRequest).toBe(true);
   });
+
+  it('includes calculators hub and procedures registry shortcuts', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const hub = rows.find((r) => r.id === 'calculators');
+    expect(hub?.pagePath).toBe('/tools/calculators');
+    expect(hub?.launchable).toBe(true);
+
+    const procedures = rows.find((r) => r.id === 'procedures');
+    expect(procedures?.pagePath).toBe('/tools/procedures');
+    expect(procedures?.launchable).toBe(true);
+  });
+
+  it('marks dose-calculator as chat-assisted hub tool (informational)', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const dose = rows.find((r) => r.primaryId === 'dose-calculator');
+    expect(dose?.chatOnlyForm).toBe(true);
+    expect(dose?.category).toBe('chat-assisted');
+    expect(dose?.launchLabel).toBe('Start guided chat');
+  });
 });

@@ -45,6 +45,14 @@ All REST paths should start with `/api/...` (or rely on `normalizeApiPath` via `
 
 [configService.js](../src/services/configService.js) uses `apiFetchJson`. [SystemConfigContext](../src/contexts/SystemConfigContext.jsx) shows [ApiConfigDegradedBanner](../src/components/ApiConfigDegradedBanner.jsx) when defaults are used after API failure.
 
+## Layout visibility
+
+[src/styles/layout-visibility.css](../src/styles/layout-visibility.css) ensures tool/catalog/calculator pages **grow inside** `.app-shell-page-body` vertical scroll (not clipped at `height: 100%`). Dashboard chat keeps `.app-shell-page-body--conversation` internal scroll. Run `npx vitest run src/styles/layout-visibility.test.js src/layout/AppShell.layout.test.js`.
+
+## Backend capability gating
+
+[src/config/backendApiCapabilities.js](../src/config/backendApiCapabilities.js) lists which Nest routes exist. Frontend clients **must not** POST to routes marked `false` (share-results, team, bulk sync, etc.). Registered executors only: `sofa-calculator`, `drug-interactions`, `lab-interpreter` via [clinicalOrchestratorApi.js](../src/services/clinicalOrchestratorApi.js).
+
 ## Fixes applied in this audit
 
 - **Audit API**: `@Controller('audit')` (was `api/audit`, doubling global prefix to `/api/api/audit`).

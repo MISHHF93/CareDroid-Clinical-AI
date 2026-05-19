@@ -132,108 +132,60 @@ describe('ExportService', () => {
   });
 
   describe('PDF Export', () => {
-    it('should export data to PDF', async () => {
-      global.fetch.mockResolvedValue({
-        ok: true,
-        blob: async () => new Blob(['pdf content']),
-      });
-
+    it('should export data to PDF via client JSON when server PDF API is unavailable', async () => {
       const data = [{ tool: 'drug-checker', cost: '100.00' }];
+      const downloadSpy = vi.spyOn(service, 'downloadFile').mockImplementation(() => true);
 
-      const result = await service.exportToPDF(data, 'test.pdf');
+      await service.exportToPDF(data, 'test.pdf');
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/exports/pdf',
-        expect.objectContaining({
-          method: 'POST',
-        })
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(downloadSpy).toHaveBeenCalledWith(
+        expect.stringContaining('drug-checker'),
+        'test.json',
+        'application/json',
       );
+      downloadSpy.mockRestore();
     });
 
-    it('should include PDF options', async () => {
-      global.fetch.mockResolvedValue({
-        ok: true,
-        blob: async () => new Blob(['pdf']),
-      });
-
-      const data = [];
-
-      await service.exportToPDF(data, 'test.pdf', {
-        title: 'Custom Title',
-        includeCharts: true,
-        orientation: 'landscape',
-      });
-
-      const call = global.fetch.mock.calls[0];
-      const body = JSON.parse(call[1].body);
-
-      expect(body.options.title).toBe('Custom Title');
-      expect(body.options.orientation).toBe('landscape');
+    it('should fall back to JSON download when server PDF is unavailable', async () => {
+      const downloadSpy = vi.spyOn(service, 'downloadFile').mockImplementation(() => true);
+      await service.exportToPDF({ title: 'Custom Title' }, 'report.pdf');
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(downloadSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Custom Title'),
+        'report.json',
+        'application/json',
+      );
+      downloadSpy.mockRestore();
     });
   });
 
   describe('Excel Export', () => {
-    it('should export data to Excel', async () => {
-      global.fetch.mockResolvedValue({
-        ok: true,
-        blob: async () => new Blob(['excel content']),
-      });
-
+    it('should export data to CSV when server Excel API is unavailable', async () => {
       const data = [{ tool: 'drug-checker', cost: '100.00' }];
+      const csvSpy = vi.spyOn(service, 'exportToCSV').mockResolvedValue(true);
 
-      const result = await service.exportToExcel(data, 'test.xlsx');
+      await service.exportToExcel(data, 'test.xlsx');
 
-      expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/exports/excel',
-        expect.objectContaining({
-          method: 'POST',
-        })
-      );
-    });
-
-    it('should include Excel options', async () => {
-      global.fetch.mockResolvedValue({
-        ok: true,
-        blob: async () => new Blob(['xlsx']),
-      });
-
-      const data = [];
-
-      await service.exportToExcel(data, 'test.xlsx', {
-        sheetName: 'Cost Report',
-        autoFilter: true,
-      });
-
-      const call = global.fetch.mock.calls[0];
-      const body = JSON.parse(call[1].body);
-
-      expect(body.options.sheetName).toBe('Cost Report');
-      expect(body.options.autoFilter).toBe(true);
+      expect(global.fetch).not.toHaveBeenCalled();
+      expect(csvSpy).toHaveBeenCalledWith(data, 'test.csv');
+      csvSpy.mockRestore();
     });
   });
 
   describe('Report Generation', () => {
-    it('should generate report from template', async () => {
+    it('should reject generateReport when server reports API is unavailable', async () => {
       await service.initialize('test-token');
-
-      global.fetch.mockResolvedValue({
-        ok: true,
-        blob: async () => new Blob(['report']),
-      });
 
       const dateRange = {
         start: new Date('2024-01-01'),
         end: new Date('2024-01-31'),
       };
 
-      await service.generateReport('cost_summary', dateRange, 'pdf');
-
-      expect(global.fetch).toHaveBeenCalledWith(
-        'http://localhost:3000/api/reports/generate',
-        expect.objectContaining({
-          method: 'POST',
-        })
+      await expect(service.generateReport('cost_summary', dateRange, 'pdf')).rejects.toThrow(
+        /not available on this server/i,
       );
+      expect(global.fetch).not.toHaveBeenCalled();
     });
 
     it('should reject invalid template', async () => {

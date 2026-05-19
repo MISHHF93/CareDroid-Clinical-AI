@@ -31,14 +31,18 @@ import {
 } from '../../utils/hasBledCalculator';
 import { computeMeldResult, formatMeldLabValue } from '../../utils/meldCalculator';
 import {
-  BUILTIN_CALC_ID_TO_REGISTRY_ID,
-  PR3_CALCULATOR_REGISTRY_IDS,
   resolveCatalogLaunch,
   resolveNavigationPathForLaunch,
-  TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
+  resolveRegistryId,
 } from '../../data/clinicalCatalogWiring';
-import { builtinUiCalculators, clinicalIntentTools, nluCalculatorHubOnly } from '../../data/clinicalIntentToolCatalog';
 import { toolRegistryById } from '../../data/toolRegistry';
+import { isRegisteredCalculatorSlug } from '../../routes/clinicalToolRoutes';
+import {
+  buildBuiltinHubCalculatorCards,
+  getHubChatAssistedTools,
+} from '../../data/calculatorHubManifest';
+import { getRegistryToolNavigation } from '../../navigation/registryToolLaunch';
+import { clinicalIntentTools } from '../../data/clinicalIntentToolCatalog';
 import {
   CHAT_ASSISTED_HUB_GROUPS,
   chatAssistedLaunchAriaLabel,
@@ -62,16 +66,11 @@ import {
 } from './pr4aCalculators';
 import ToolNotFound from './ToolNotFound';
 
-const CALCULATORS = builtinUiCalculators.map((calc) => {
-  const registryId = BUILTIN_CALC_ID_TO_REGISTRY_ID[calc.id] ?? calc.id;
-  const reg = toolRegistryById[registryId];
-  return {
-    id: calc.id,
-    name: calc.name,
-    description: calc.description || reg?.description || '',
-    category: reg?.category || 'Calculator',
-  };
-});
+const CALCULATORS = buildBuiltinHubCalculatorCards();
+const CHAT_ASSISTED_TOOLS = getHubChatAssistedTools();
+const CHAT_ASSISTED_TOOL_BY_ID = Object.fromEntries(
+  CHAT_ASSISTED_TOOLS.map((tool) => [tool.toolId, tool])
+);
 
 function CalcPanelTitle({ icon, children }) {
   return (
@@ -191,7 +190,7 @@ function CalculatorSelectCard({ calc, isActive, onSelect }) {
       role="button"
       tabIndex={0}
       aria-pressed={isActive}
-      aria-label={`${calc.name}. ${calc.description}`}
+      aria-label={`${calc.name}. ${calc.description}${calc.route ? `. Route ${calc.route}` : ''}`}
       className={`calculator-card ${isActive ? 'active' : ''}`}
       onClick={onSelect}
       onKeyDown={handleKeyDown}
@@ -204,17 +203,14 @@ function CalculatorSelectCard({ calc, isActive, onSelect }) {
       </div>
       <div className="calculator-description">{calc.description}</div>
       <div className="calculator-card-category">{calc.category}</div>
+      {calc.route ? (
+        <div className="calculator-card-route" aria-hidden="true">
+          {calc.route}
+        </div>
+      ) : null}
     </div>
   );
 }
-
-const CHAT_ASSISTED_TOOLS = nluCalculatorHubOnly.filter((t) =>
-  TIER_B_CHAT_CALCULATOR_REGISTRY_IDS.includes(t.toolId)
-);
-
-const CHAT_ASSISTED_TOOL_BY_ID = Object.fromEntries(
-  CHAT_ASSISTED_TOOLS.map((tool) => [tool.toolId, tool])
-);
 
 const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = null } = {}) => {
   const navigate = useNavigate();
@@ -265,12 +261,27 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
       setSelectedCalculator(match);
       setSharedResult(null);
       setUnknownSlug(null);
-    } else {
-      setSelectedCalculator(null);
-      setSharedResult(null);
-      setUnknownSlug(slug);
+      return;
     }
-  }, [initialCalculatorId, calcFromUrl]);
+
+    const registryId = resolveRegistryId(slug);
+    const knownRegistry = Boolean(registryId && toolRegistryById[registryId]);
+    if (knownRegistry || isRegisteredCalculatorSlug(slug)) {
+      const plan = getRegistryToolNavigation(slug);
+      if (plan.mode === 'chat-assisted' && plan.shouldSeedChat) {
+        handleChatAssistedLaunch(slug);
+        return;
+      }
+      if (plan.mode === 'calculator-route') {
+        navigate({ pathname: plan.pathname, search: plan.search || '' });
+        return;
+      }
+    }
+
+    setSelectedCalculator(null);
+    setSharedResult(null);
+    setUnknownSlug(slug);
+  }, [initialCalculatorId, calcFromUrl, handleChatAssistedLaunch, navigate]);
 
   return (
     <ToolPageLayout
@@ -365,6 +376,10 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
               onSelect={() => {
                 setSelectedCalculator(calc);
                 setSharedResult(null);
+                setUnknownSlug(null);
+                if (calc.route) {
+                  navigate(calc.route);
+                }
               }}
             />
           ))}
@@ -2708,7 +2723,8 @@ const GFRCalculator = ({ onResultChange }) => {
   };
 
   return (
-    <div className="calculator-interface">
+    <div className="calculator-interface calculator-interface--gfr">
+      <CalcDecisionSupportLead />
       <div className="calculator-inputs">
         <CalcPanelTitle icon={CHROME_ICONS.activity}>Patient Information</CalcPanelTitle>
 
@@ -2807,6 +2823,7 @@ const GFRCalculator = ({ onResultChange }) => {
                 <li>Levey AS, et al. A new equation to estimate glomerular filtration rate. Ann Intern Med. 2009;150(9):604-612.</li>
               </ul>
             </div>
+            <CalcResultSafetyFooter />
           </>
         ) : (
           <div className="calc-results-empty">
@@ -2890,7 +2907,8 @@ const BMICalculator = ({ onResultChange }) => {
   };
 
   return (
-    <div className="calculator-interface">
+    <div className="calculator-interface calculator-interface--bmi">
+      <CalcDecisionSupportLead />
       <div className="calculator-inputs">
         <CalcPanelTitle icon={CHROME_ICONS.scale}>Body Measurements</CalcPanelTitle>
 
@@ -2974,6 +2992,7 @@ const BMICalculator = ({ onResultChange }) => {
                 <li>Obese: BMI ≥ 30.0</li>
               </ul>
             </div>
+            <CalcResultSafetyFooter />
           </>
         ) : (
           <div className="calc-results-empty">
@@ -3052,7 +3071,8 @@ const CHA2DS2VAScCalculator = ({ onResultChange }) => {
   };
 
   return (
-    <div className="calculator-interface">
+    <div className="calculator-interface calculator-interface--chads2vasc">
+      <CalcDecisionSupportLead />
       <div className="calculator-inputs">
         <CalcPanelTitle icon={CHROME_ICONS.heartPulse}>Risk Factors</CalcPanelTitle>
 

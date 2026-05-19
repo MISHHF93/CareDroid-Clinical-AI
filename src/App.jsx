@@ -4,7 +4,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider, useUser, Permission } from './contexts/UserContext';
 import { NotificationProvider, useNotifications } from './contexts/NotificationContext';
 import { ConversationProvider, useConversation } from './contexts/ConversationContext';
-import { ToolPreferencesProvider } from './contexts/ToolPreferencesContext';
+import { ToolPreferencesProvider, useToolPreferences } from './contexts/ToolPreferencesContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { CostTrackingProvider } from './contexts/CostTrackingContext';
 import { SystemConfigProvider } from './contexts/SystemConfigContext';
@@ -19,7 +19,7 @@ import Auth from './pages/Auth';
 import logger from './utils/logger';
 import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
-import { getToolById } from './data/toolRegistry';
+import { applyRegistryToolLaunch } from './navigation/registryToolLaunch';
 import { AUTH_PATH_ALIASES } from './routing/authPathAliases';
 import { CALCULATOR_ROUTE_DEFS } from './routes/clinicalToolRoutes';
 import { lazyWithRetry } from './utils/lazyWithRetry';
@@ -167,7 +167,10 @@ function AppShellPage({ children }) {
     addConversation,
     selectedTool,
     setActiveTool,
+    selectTool,
+    addMessage,
   } = useConversation();
+  const { recordToolAccess } = useToolPreferences();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -188,13 +191,14 @@ function AppShellPage({ children }) {
 
   const handleToolSelect = (toolId) => {
     if (toolId) {
-      setActiveTool(toolId);
-      const tool = getToolById(toolId);
-      if (tool?.path) {
-        navigate(tool.path, { replace: true });
-      } else {
-        navigate('/dashboard', { replace: true });
-      }
+      applyRegistryToolLaunch(toolId, {
+        navigate,
+        addMessage,
+        selectTool,
+        setActiveTool,
+        recordToolAccess,
+        replace: true,
+      });
     } else {
       setActiveTool(null);
       navigate({ pathname: '/dashboard', search: '' }, { replace: true });

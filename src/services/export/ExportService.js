@@ -5,6 +5,7 @@
  */
 
 import { resolveApiRoot } from '../../config/apiEnv';
+import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
 
 const getDefaultApiBaseUrl = () => resolveApiRoot();
 
@@ -112,6 +113,11 @@ class ExportService {
    * Export cost data to PDF
    */
   async exportToPDF(data, filename = 'cost-report.pdf', options = {}) {
+    if (!isBackendCapabilityEnabled('exportsPdf')) {
+      const jsonName = filename.replace(/\.pdf$/i, '.json') || 'export.json';
+      return this.downloadFile(JSON.stringify(data, null, 2), jsonName, 'application/json');
+    }
+
     try {
       const payload = {
         data,
@@ -152,6 +158,11 @@ class ExportService {
    * Export cost data to Excel
    */
   async exportToExcel(data, filename = 'cost-report.xlsx', options = {}) {
+    if (!isBackendCapabilityEnabled('exportsExcel')) {
+      const csvName = filename.replace(/\.xlsx$/i, '.csv') || 'export.csv';
+      return this.exportToCSV(data, csvName);
+    }
+
     try {
       const payload = {
         data,
@@ -199,6 +210,10 @@ class ExportService {
 
     if (!template.formats.includes(format)) {
       throw new Error(`Format not supported by template: ${format}`);
+    }
+
+    if (!isBackendCapabilityEnabled('reportsGenerate')) {
+      throw new Error('Scheduled reports are not available on this server.');
     }
 
     try {

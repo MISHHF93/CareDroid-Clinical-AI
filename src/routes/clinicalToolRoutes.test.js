@@ -127,6 +127,20 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
     expect(resolveToolsAreaRedirect('/tools/calculators/not-a-real-calc-xyz')).toBeNull();
   });
 
+  it('redirects Tier B hub subpaths to dashboard with ?tool= for chat launch', () => {
+    const redirect = resolveToolsAreaRedirect('/tools/calculators/wells-pe');
+    expect(redirect).toEqual({
+      pathname: '/dashboard',
+      search: '?tool=wells-pe',
+    });
+  });
+
+  it('redirects mistyped dedicated calculator paths to canonical route', () => {
+    expect(resolveToolsAreaRedirect('/tools/calculators/qsofa')).toBeNull();
+    const sofaMispath = resolveToolsAreaRedirect('/tools/calculator/sofa-extra');
+    expect(sofaMispath).toBeNull();
+  });
+
   it('toolRegistry paths are subset of known tool area paths', () => {
     for (const reg of toolRegistry) {
       if (reg.path?.startsWith('/tools') || reg.path?.startsWith('/fleet')) {

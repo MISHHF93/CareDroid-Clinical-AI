@@ -7,6 +7,10 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import PermissionGate from './PermissionGate';
 import WorkspaceCreationModal from './WorkspaceCreationModal';
 import toolRegistry, { toolRegistryById } from '../data/toolRegistry';
+import { partitionSidebarTools, SIDEBAR_CATEGORY_ORDER } from '../data/sidebarToolPresentation';
+import { useConversation } from '../contexts/ConversationContext';
+import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
+import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon, getToolIcon } from '../navigation/iconRegistry';
 import './Sidebar.css';
@@ -54,8 +58,12 @@ const Sidebar = forwardRef(function Sidebar(
     setActiveWorkspaceId,
     addWorkspace
   } = useWorkspace();
+  const { addMessage, selectTool, setActiveTool } = useConversation();
   const [showToolsSection, setShowToolsSection] = useState(true);
   const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState(() =>
+    Object.fromEntries(SIDEBAR_CATEGORY_ORDER.map((category) => [category, true]))
+  );
   
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -66,10 +74,11 @@ const Sidebar = forwardRef(function Sidebar(
     ? activeWorkspace.toolIds
     : medicalTools.map((tool) => tool.id);
   const workspaceTools = medicalTools.filter((tool) => workspaceToolIds.includes(tool.id));
-  const favoriteTools = workspaceTools.filter((tool) => favorites.includes(tool.id));
-  const pinnedTools = workspaceTools.filter((tool) => pinned.includes(tool.id));
-  const unpinnedTools = workspaceTools.filter((tool) => !pinned.includes(tool.id));
-  const orderedTools = [...pinnedTools, ...unpinnedTools];
+  const { pinnedTools, favoriteTools, categoryGroups } = partitionSidebarTools(
+    workspaceTools,
+    pinned,
+    favorites
+  );
   const recentToolItems = recentTools
     .map((toolId) => toolRegistryById[toolId])
     .filter((tool) => tool && workspaceToolIds.includes(tool.id));
@@ -100,11 +109,14 @@ const Sidebar = forwardRef(function Sidebar(
   };
 
   const handleToolClick = (tool) => {
-    recordToolAccess(tool.id);
+    applyRegistryToolLaunch(tool.id, {
+      navigate,
+      addMessage,
+      selectTool,
+      setActiveTool,
+      recordToolAccess,
+    });
     onToolSelect?.(tool.id);
-    if (tool?.path) {
-      navigate(tool.path);
-    }
     onCloseMobileNav();
   };
 
@@ -137,12 +149,32 @@ const Sidebar = forwardRef(function Sidebar(
   };
 
   const isToolRouteActive = (tool) => {
-    if (!tool.path) return false;
-    if (location.pathname === tool.path) return true;
-    if (tool.path === '/tools/calculators') {
-      return location.pathname === '/tools/calculators';
+    const path = location.pathname;
+    const calcParam = new URLSearchParams(location.search).get('calc');
+
+    if (tool.initialCalc) {
+      const calcMatch = matchCalculatorRoute(path);
+      if (calcMatch?.calculatorSlug === tool.initialCalc) return true;
+      if (path === '/tools/calculators' && calcParam === tool.initialCalc) return true;
     }
-    return location.pathname.startsWith(`${tool.path}/`);
+
+    if (tool.path && path === tool.path) {
+      if (tool.path === '/tools/calculators' && tool.id !== 'calculators') {
+        return !matchCalculatorRoute(path);
+      }
+      return true;
+    }
+
+    if (tool.path && path.startsWith(`${tool.path}/`)) return true;
+
+    return false;
+  };
+
+  const toggleCategoryGroup = (category) => {
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [category]: !prev[category],
+    }));
   };
 
   useEffect(() => {
@@ -493,13 +525,58 @@ const Sidebar = forwardRef(function Sidebar(
                   </div>
                 )}
 
-                <div className="tools-subsection">
-                  <div className="tools-subsection-header">All Tools</div>
-                  <div className="tools-subsection-list">
-                    {orderedTools.map(renderToolCard)}
+                {pinnedTools.length > 0 && (
+                  <div className="tools-subsection">
+                    <div className="tools-subsection-header tools-subsection-header--with-icon">
+                      <span className="tools-subsection-header-icon" aria-hidden>
+                        <NavIcon icon={CHROME_ICONS.pin} size={14} />
+                      </span>
+                      <span>Pinned</span>
+                    </div>
+                    <div className="tools-subsection-list">{pinnedTools.map(renderToolCard)}</div>
                   </div>
-                </div>
-                
+                )}
+
+                {categoryGroups.map(({ category, tools }) => {
+                  const groupId = `sidebar-tools-cat-${category.replace(/\s+/g, '-').toLowerCase()}`;
+                  const isExpanded = expandedCategories[category] !== false;
+                  return (
+                    <div key={category} className="tools-subsection tools-subsection--category">
+                      <div
+                        className="tools-subsection-header tools-subsection-header-toggle"
+                        role="button"
+                        tabIndex={0}
+                        aria-expanded={isExpanded}
+                        aria-controls={groupId}
+                        onClick={() => toggleCategoryGroup(category)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            toggleCategoryGroup(category);
+                          }
+                        }}
+                      >
+                        <span>{category}</span>
+                        <span className="tools-subsection-chevron" aria-hidden>
+                          <NavIcon
+                            icon={CHROME_ICONS.chevronDown}
+                            size={14}
+                            style={{
+                              transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)',
+                              transition: 'transform 0.2s',
+                            }}
+                          />
+                        </span>
+                      </div>
+                      {isExpanded ? (
+                        <div id={groupId} className="tools-subsection-list">
+                          {tools.map(renderToolCard)}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                })}
+
                 <button
                   type="button"
                   onClick={handleOpenCatalog}

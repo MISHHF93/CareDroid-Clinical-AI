@@ -1,0 +1,45 @@
+.clinical-executor-feedback {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.clinical-executor-feedback--loading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary, #4b5563);
+}
+
+.clinical-executor-feedback__icon--spin {
+  display: inline-flex;
+  animation: clinical-executor-spin 1s linear infinite;
+}
+
+@keyframes clinical-executor-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.clinical-executor-feedback--unsupported {
+  border: 1px solid #f59e0b;
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.clinical-executor-feedback__title {
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+}
+
+.clinical-executor-feedback__body {
+  margin: 0;
+}
+
+.clinical-executor-feedback--error {
+  border: 1px solid #ef4444;
+  background: #fef2f2;
+  color: #991b1b;
+}

@@ -587,9 +587,10 @@ function nluHubOnlyRows() {
     name: `${c.name} (NLU hub)`,
     source: 'clinicalIntentToolCatalog.nluCalculatorHubOnly',
     status: 'nlu-chat',
-    category: 'calculator',
+    category: 'chat-assisted',
     path: c.hubPath,
-    notes: 'No Calculators.jsx form — launch via chat from catalog',
+    chatOnly: true,
+    notes: 'No Calculators.jsx form — launch via guided chat from calculators hub',
   }));
 }
 
@@ -649,11 +650,13 @@ function calculatorRows() {
     id: c.id,
     name: c.name,
     source: 'src/pages/tools/Calculators.jsx',
-    status: c.orchestratorId ? 'backend-executor' : 'shipped-calculator',
+    status: c.orchestratorId ? 'shipped-calculator' : 'shipped-calculator',
     category: 'calculator',
     path: c.path,
     orchestratorId: c.orchestratorId,
-    notes: c.implementation,
+    notes: c.orchestratorId
+      ? `${c.implementation} · POST executor registered separately (sofa-calculator)`
+      : c.implementation,
   }));
 }
 

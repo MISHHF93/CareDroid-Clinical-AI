@@ -8,10 +8,8 @@ import {
   getCatalogSummary,
   nluCalculatorHubOnly,
 } from '../../data/clinicalIntentToolCatalog';
-import {
-  resolveCatalogLaunch,
-  resolveNavigationPathForLaunch,
-} from '../../data/clinicalCatalogWiring';
+import { resolveCatalogLaunch, resolveNavigationPathForLaunch } from '../../data/clinicalCatalogWiring';
+import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import { chatAssistedLaunchAriaLabel } from '../../data/chatAssistedHubGroups';
 import { getFullCapabilitiesSummary } from '../../data/platformCapabilitiesCatalog';
 import { NavIcon } from '../../navigation/NavIcon';
@@ -42,9 +40,13 @@ const ToolsOverview = () => {
     .filter((tool) => tool && workspaceToolIds.includes(tool.id));
 
   const handleToolClick = (tool) => {
-    recordToolAccess(tool.id);
-    selectTool(tool.id);
-    navigate(tool.path);
+    applyRegistryToolLaunch(tool.id, {
+      navigate,
+      addMessage,
+      selectTool,
+      setActiveTool,
+      recordToolAccess,
+    });
   };
 
   const categories = [...new Set(filteredTools.map(t => t.category))];

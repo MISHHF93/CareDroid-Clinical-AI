@@ -38,8 +38,8 @@ describe('View All Tools navigation wiring', () => {
     expect(sidebarSource).toContain('sidebar-tools-quick-action--active');
   });
 
-  it('navigates sidebar tool cards to registry paths', () => {
-    expect(sidebarSource).toContain('navigate(tool.path)');
+  it('navigates sidebar tool cards via centralized registry launch', () => {
+    expect(sidebarSource).toContain('applyRegistryToolLaunch');
     expect(sidebarSource).toMatch(/onToolSelect\?\.\(tool\.id\)/);
   });
 
@@ -47,5 +47,17 @@ describe('View All Tools navigation wiring', () => {
     expect(sidebarSource).toContain('onCloseMobileNav');
     expect(sidebarSource).toContain('handleNavClick');
     expect(sidebarSource).toContain('handleToolClick');
+  });
+
+  it('groups clinical tools by category with expand/collapse', () => {
+    expect(sidebarSource).toContain('partitionSidebarTools');
+    expect(sidebarSource).toContain('categoryGroups.map');
+    expect(sidebarSource).toContain('toggleCategoryGroup');
+    expect(sidebarSource).toContain('aria-expanded={isExpanded}');
+  });
+
+  it('highlights calculator routes via matchCalculatorRoute and initialCalc', () => {
+    expect(sidebarSource).toContain('matchCalculatorRoute');
+    expect(sidebarSource).toContain('tool.initialCalc');
   });
 });

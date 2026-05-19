@@ -138,9 +138,24 @@ export function findClinicalIntentProfile({ toolId, registryId }) {
   return null;
 }
 
+/**
+ * Prefer a dedicated registry row keyed by NLU id, then canonical maps, then sidebar fallback.
+ * @param {{ toolId: string, sidebarToolId?: string }} nlu
+ */
+export function resolveNluRegistryId(nlu) {
+  if (nlu.toolId && toolRegistryById[nlu.toolId]) {
+    return nlu.toolId;
+  }
+  return (
+    ORCHESTRATOR_TO_REGISTRY_ID[nlu.toolId] ||
+    NLU_TO_REGISTRY_ID[nlu.toolId] ||
+    nlu.sidebarToolId ||
+    null
+  );
+}
+
 function launchFromNlu(nlu) {
-  const registryId =
-    nlu.sidebarToolId || ORCHESTRATOR_TO_REGISTRY_ID[nlu.toolId] || NLU_TO_REGISTRY_ID[nlu.toolId];
+  const registryId = resolveNluRegistryId(nlu);
   const registryEntry = registryId ? toolRegistryById[registryId] : null;
   const hubOnly = isHubOnlyNluToolId(nlu.toolId) || isCalculatorsHubPath(nlu.path);
   const path =
@@ -258,7 +273,7 @@ export function resolveCatalogLaunchFallback(id) {
       toolId: primaryNlu || id,
       sidebarToolId: registryId || undefined,
       category: 'calculator',
-      chatSeed: `Help me find and use the clinical tool "${id}" in CareDroid. Clinical decision support only — does not establish a diagnosis.`,
+      chatSeed: `The tool "${id}" is not recognized in CareDroid. Help me open the clinical tools catalog and pick the right calculator, score, checker, or protocol. Clinical decision support only — does not establish a diagnosis or replace clinician judgment.`,
     }),
   };
 }
@@ -287,7 +302,10 @@ export function resolveCatalogLaunch(id) {
   }
 
   if (registryId && registryId !== id) {
-    return resolveCatalogLaunch(registryId);
+    const viaRegistry = resolveCatalogLaunch(registryId);
+    if (viaRegistry.path || viaRegistry.chatSeed) {
+      return viaRegistry;
+    }
   }
 
   return resolveCatalogLaunchFallback(id);

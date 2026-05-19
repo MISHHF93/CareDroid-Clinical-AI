@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Checkbox } from '../../components/forms/Checkbox';
-import { apiFetch } from '../../services/apiClient';
+import { recordConsentPreferences } from '../../services/complianceApi';
+import { getStoredAccessToken } from '../../services/apiClient';
 import './ConsentFlow.css';
 import logger from '../../utils/logger';
 
@@ -60,31 +61,18 @@ export const ConsentFlow = ({ onComplete }) => {
     setIsSubmitting(true);
 
     try {
-      // Submit consents to backend
-      const response = await apiFetch('/api/consent/record', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        },
-        body: JSON.stringify({
-          consents: {
-            hipaa_authorization: consents.hipaa,
-            privacy_policy: consents.privacy,
-            terms_of_service: consents.terms,
-            data_sharing: consents.dataSharing,
-            marketing_communications: consents.communications,
-          },
-          consentDate: new Date().toISOString(),
-          ipAddress: await fetch('https://api.ipify.org?format=json')
-            .then(r => r.json())
-            .then(d => d.ip)
-            .catch(() => 'unknown'),
-        }),
+      if (!getStoredAccessToken()) {
+        throw new Error('Sign in required to record consent on the server.');
+      }
+
+      const result = await recordConsentPreferences({
+        dataProcessing: consents.hipaa && consents.privacy && consents.terms,
+        thirdPartySharing: consents.dataSharing,
+        marketing: consents.communications,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to record consent');
+      if (!result.ok) {
+        throw new Error(result.message || 'Failed to record consent');
       }
 
       // Mark onboarding as complete

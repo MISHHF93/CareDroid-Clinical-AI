@@ -5,6 +5,7 @@ import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import { toolRegistryById, getToolById } from '../data/toolRegistry';
+import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import ToolVisualization from '../components/ToolVisualization';
 import ToolCard from '../components/ToolCard';
 import Citations, { CitationModal } from '../components/Citations';
@@ -102,14 +103,27 @@ function Dashboard() {
       navigate({ pathname: '/dashboard', search: '' }, { replace: true });
       return;
     }
-    setActiveTool(panelRegistryId);
-    recordToolAccess(panelRegistryId);
-    const dest =
-      entry.id === 'calculators' && calcFromUrl
-        ? `/tools/calculators?calc=${encodeURIComponent(calcFromUrl)}`
-        : entry.path;
-    navigate(dest, { replace: true });
-  }, [panelRegistryId, calcFromUrl, navigate, setActiveTool, recordToolAccess, clearTool]);
+
+    if (entry.id === 'calculators' && calcFromUrl) {
+      setActiveTool(panelRegistryId);
+      recordToolAccess(panelRegistryId);
+      navigate(`/tools/calculators?calc=${encodeURIComponent(calcFromUrl)}`, { replace: true });
+      return;
+    }
+
+    const plan = applyRegistryToolLaunch(panelRegistryId, {
+      navigate,
+      addMessage,
+      selectTool,
+      setActiveTool,
+      recordToolAccess,
+      replace: true,
+    });
+
+    if (plan.mode === 'chat-assisted') {
+      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+    }
+  }, [panelRegistryId, calcFromUrl, navigate, setActiveTool, recordToolAccess, clearTool, addMessage, selectTool]);
 
   const handleSendMessage = async () => {
     if (!input.trim() || sending) return;

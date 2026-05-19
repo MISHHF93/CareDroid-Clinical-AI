@@ -6,7 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Calculators from './Calculators';
-import { TIER_A_FORM_SMOKE_SLUGS } from '../../test/responsiveRegression.routes';
+import { BUILTIN_CALCULATOR_FORM_SMOKE_ROWS } from '../../data/calculatorHubManifest';
 import { mockCompactViewport, mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 
 /** Avoid jsdom/cssstyle crash on `border-left: 4px solid var(--primary-color)` in ToolPageLayout.css */
@@ -24,6 +24,13 @@ vi.mock('../../contexts/ConversationContext', () => ({
 vi.mock('../../services/apiClient', () => ({
   apiFetch: vi.fn(),
   parseApiResponse: vi.fn(),
+}));
+
+vi.mock('../../services/clinicalOrchestratorApi', () => ({
+  executeClinicalTool: vi.fn().mockResolvedValue({
+    ok: true,
+    data: { totalScore: 0, score: 0, severity: 'low' },
+  }),
 }));
 
 function renderCalculator(slug) {
@@ -63,15 +70,17 @@ describe('Calculators — Tier-A form sections', () => {
     mockCompactViewport(false);
   });
 
-  it.each(TIER_A_FORM_SMOKE_SLUGS)(
+  it.each(BUILTIN_CALCULATOR_FORM_SMOKE_ROWS)(
     '$slug renders calculator interface, inputs, and calculate action',
     async ({ slug, interfaceClass }) => {
       const { container } = renderCalculator(slug);
-      const iface = container.querySelector(`.${interfaceClass}`);
+      const iface = container.querySelector(`.${interfaceClass.split(' ')[0]}`);
 
       expect(iface).toBeTruthy();
       expect(
-        iface.querySelector('.calc-input-group, .calc-has-bled-fieldset, .calc-timi-criteria')
+        iface.querySelector(
+          '.calc-input-group, .calc-has-bled-fieldset, .calc-timi-criteria, .calc-input-grid, select, input'
+        )
       ).toBeTruthy();
       expect(within(iface).getByRole('button', { name: /calculate/i })).toBeInTheDocument();
       expect(within(iface).getByText(/decision support only/i)).toBeInTheDocument();

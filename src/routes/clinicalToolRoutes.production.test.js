@@ -156,9 +156,10 @@ describe('Production routes — tools area fallback redirects', () => {
     expect(redirect?.pathname).toBe('/tools/calculator/sofa');
   });
 
-  it('redirects chat-assisted mistyped subpath to dashboard', () => {
+  it('redirects chat-assisted mistyped subpath to dashboard with legacy tool param', () => {
     const redirect = resolveToolsAreaRedirect('/tools/calculators/wells-pe');
     expect(redirect?.pathname).toBe('/dashboard');
+    expect(redirect?.search).toBe('?tool=wells-pe');
   });
 
   it('returns null redirect for unknown calculator subpath', () => {

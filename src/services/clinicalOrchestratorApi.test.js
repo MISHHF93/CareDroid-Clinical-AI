@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 vi.mock('./apiClient', () => ({
   apiFetch: vi.fn(),
   parseApiResponse: vi.fn(async (response) => response._json ?? {}),
+  getApiErrorMessage: vi.fn((err) => err?.message || 'API error'),
 }));
 
 import { apiFetch } from './apiClient';
@@ -48,6 +49,16 @@ describe('clinicalOrchestratorApi', () => {
     );
     expect(result.ok).toBe(true);
     expect(result.nluToolId).toBe('drug-interactions');
+  });
+
+  it('returns network error without faking success', async () => {
+    apiFetch.mockRejectedValueOnce(new Error('Failed to fetch'));
+
+    const result = await executeClinicalTool('lab-interpreter', { labValues: [] });
+
+    expect(result.ok).toBe(false);
+    expect(result.errorCode).toBe('NETWORK_ERROR');
+    expect(result.message).toBeTruthy();
   });
 
   it('resolves registry id drug-check to drug-interactions execute path', async () => {

@@ -5,6 +5,7 @@
 import { db } from '../db/offline.db';
 import offlineService from './offlineService';
 import { apiFetch } from './apiClient';
+import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import logger from '../utils/logger';
 
 class SyncService {
@@ -139,6 +140,10 @@ class SyncService {
    */
   async syncMessages(messages, token) {
     if (messages.length === 0) return;
+    if (!isBackendCapabilityEnabled('chatPersistence')) {
+      logger.info('Skipping message sync — chat persistence API not available on server');
+      return;
+    }
 
     logger.info(`Syncing ${messages.length} messages`);
 
@@ -187,6 +192,10 @@ class SyncService {
    */
   async syncConversations(conversations, token) {
     if (conversations.length === 0) return;
+    if (!isBackendCapabilityEnabled('chatPersistence')) {
+      logger.info('Skipping conversation sync — chat persistence API not available on server');
+      return;
+    }
 
     logger.info(`Syncing ${conversations.length} conversations`);
 

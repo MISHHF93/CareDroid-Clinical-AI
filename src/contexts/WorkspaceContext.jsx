@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import toolRegistry from '../data/toolRegistry';
+import { mergeWorkspacesWithRegistry } from '../data/sidebarToolPresentation';
 import logger from '../utils/logger';
 
 const STORAGE_KEY = 'careDroid.workspaces.v1';
@@ -16,6 +17,7 @@ const defaultWorkspaces = () => {
     { id: 'diagnostic', name: 'Diagnostic', toolIds: byCategory.Diagnostic || [] },
     { id: 'calculator', name: 'Calculator', toolIds: byCategory.Calculator || [] },
     { id: 'reference', name: 'Reference', toolIds: byCategory.Reference || [] },
+    { id: 'fleet', name: 'Fleet', toolIds: byCategory.Fleet || [] },
   ];
 };
 
@@ -46,7 +48,8 @@ export const WorkspaceProvider = ({ children }) => {
       if (stored) {
         const parsed = JSON.parse(stored);
         if (Array.isArray(parsed.workspaces) && parsed.workspaces.length > 0) {
-          setWorkspaces(parsed.workspaces);
+          const defaults = defaultWorkspaces();
+          setWorkspaces(mergeWorkspacesWithRegistry(parsed.workspaces, defaults));
           setActiveWorkspaceId(parsed.activeWorkspaceId || 'all');
         }
       }

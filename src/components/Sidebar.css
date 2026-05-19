@@ -802,6 +802,37 @@
 }
 
 /* Sidebar list tool cards (inline-styled in Sidebar.jsx) */
+.medical-tools-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  overflow: visible;
+}
+
+.tools-subsection-header-toggle {
+  cursor: pointer;
+  user-select: none;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.tools-subsection-header-toggle:focus-visible {
+  outline: 2px solid var(--sidebar-focus-ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.tools-subsection-chevron {
+  display: inline-flex;
+  align-items: center;
+  color: var(--sidebar-fg-muted);
+  flex-shrink: 0;
+}
+
+.tools-subsection--category .tools-subsection-list {
+  padding-bottom: 4px;
+}
+
 .medical-tools-list .sidebar-tool-card {
   max-width: 100%;
   box-sizing: border-box;

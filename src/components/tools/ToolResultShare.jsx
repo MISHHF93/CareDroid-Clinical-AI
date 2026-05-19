@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { getExportService } from '../../services/export/ExportService';
-import { apiFetch } from '../../services/apiClient';
+import {
+  isBackendCapabilityEnabled,
+  UNSUPPORTED_CAPABILITY_MESSAGE,
+} from '../../config/backendApiCapabilities';
 import { NavIcon } from '../../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
 import './ToolResultShare.css';
@@ -87,48 +90,29 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
     }
   };
 
+  const emailShareAvailable = isBackendCapabilityEnabled('toolsShareResults');
+
   const handleEmailShare = async () => {
+    if (!emailShareAvailable) {
+      setFeedback({
+        text: `${UNSUPPORTED_CAPABILITY_MESSAGE} Use “Share Link” or “Export” instead.`,
+        variant: 'error',
+      });
+      return;
+    }
+
     if (!recipientEmail.trim()) {
       setFeedback({ text: 'Please enter an email address.', variant: 'error' });
       return;
     }
 
     setIsLoading(true);
-    try {
-      const shareData = {
-        tool: toolName,
-        results: results,
-        timestamp: new Date().toISOString(),
-      };
-
-      const response = await apiFetch('/api/tools/share-results', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          recipientEmail,
-          toolName,
-          results: shareData,
-          message: `I'm sharing ${toolName} results with you from CareDroid`,
-        }),
-      });
-
-      if (response.ok) {
-        setFeedback({ text: `Results sent to ${recipientEmail}.`, variant: 'success' });
-        setRecipientEmail('');
-        setTimeout(() => {
-          setFeedback({ text: '', variant: 'info' });
-          onClose();
-        }, 2000);
-      } else {
-        setFeedback({ text: 'Failed to send results.', variant: 'error' });
-      }
-    } catch (err) {
-      setFeedback({ text: `Email share failed: ${err.message}`, variant: 'error' });
-    } finally {
-      setIsLoading(false);
-    }
+    setFeedback({ text: '', variant: 'info' });
+    setIsLoading(false);
+    setFeedback({
+      text: 'Email share is not available on this server. Use Share Link or Export.',
+      variant: 'error',
+    });
   };
 
   return (
@@ -172,6 +156,8 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
             type="button"
             className={`share-tab ${shareMode === 'email' ? 'active' : ''}`}
             onClick={() => setShareMode('email')}
+            disabled={!emailShareAvailable}
+            title={emailShareAvailable ? undefined : 'Email share is not available on the server'}
           >
             <span className="share-tab-inner">
               <NavIcon icon={CHROME_ICONS.mail} size={18} />
@@ -253,6 +239,11 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
           {/* Email Share */}
           {shareMode === 'email' && (
             <div className="share-mode-content">
+              {!emailShareAvailable && (
+                <p className="share-note share-note--warning" role="status">
+                  Server email share is not available. Use Share Link or Export, or copy results manually.
+                </p>
+              )}
               <p>Send results to a colleague via email:</p>
               <input
                 type="email"

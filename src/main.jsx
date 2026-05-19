@@ -8,6 +8,7 @@ import './styles/theme-legacy-bridge.css';
 import './styles/theme-surfaces.css';
 import './styles/layout-breakpoints.css';
 import './styles/responsive-ux.css';
+import './styles/layout-visibility.css';
 import appConfig from './config/appConfig';
 import logger from './utils/logger';
 

@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
+import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import toolRegistry from '../../data/toolRegistry';
 import {
   builtinUiCalculators,
@@ -28,10 +30,6 @@ import {
   toolIdAliases,
 } from '../../data/sourceCodeToolDiscovery';
 import {
-  resolveCatalogLaunch,
-  resolveNavigationPathForLaunch,
-} from '../../data/clinicalCatalogWiring';
-import {
   getMedicalCatalogSummary,
   getMedicalToolsCatalogRows,
 } from '../../data/medicalToolsCatalogIndex';
@@ -44,6 +42,7 @@ import {
   getDiscoveredLaunchLabel,
   isOrchestratorRegisteredNlu,
   matchesDiscoveredRow,
+  matchesMedicalCatalogCategoryFilter,
   normalizeCatalogCategory,
   textMatchesCatalogQuery,
 } from '../../utils/catalogSearch';
@@ -80,6 +79,8 @@ const CATEGORY_QUICK_FILTERS = [
   { value: 'calculator', label: 'Calculators' },
   { value: 'chat-assisted', label: 'Chat-assisted' },
   { value: 'checker', label: 'Checkers' },
+  { value: 'interpreter', label: 'Interpreters' },
+  { value: 'reference', label: 'Reference' },
   { value: 'phantom', label: 'Phantom' },
 ];
 
@@ -203,6 +204,11 @@ function MedicalToolsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSor
               </td>
               <td data-label="Name" className="catalog-tool-name-cell">
                 {row.name}
+                {row.registryShortcut && (
+                  <span className="catalog-inline-badge" title="Sidebar shortcut from toolRegistry.js">
+                    Sidebar shortcut
+                  </span>
+                )}
                 {row.chatOnlyForm && (
                   <span className="catalog-inline-badge" title="Guided chat from calculators hub; no dedicated form">
                     Chat-assisted
@@ -386,7 +392,8 @@ function CategoryBadge({ category }) {
 
 const ClinicalToolCatalog = () => {
   const navigate = useNavigate();
-  const { setActiveTool, addMessage } = useConversation();
+  const { setActiveTool, addMessage, selectTool } = useConversation();
+  const { recordToolAccess } = useToolPreferences();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [backendTools, setBackendTools] = useState([]);
@@ -446,18 +453,31 @@ const ClinicalToolCatalog = () => {
         (row.status === 'nlu-chat' && row.path === '/tools/calculators'),
     });
 
+  const sidebarMatchesCategory = (category) => {
+    const normalized = normalizeCatalogCategory(category);
+    if (categoryFilter === 'all' || categoryFilter === 'medical') return true;
+    if (categoryFilter === 'checker') {
+      return normalized === 'checker' || normalized === 'diagnostic';
+    }
+    if (categoryFilter === 'diagnostic') {
+      return normalized === 'diagnostic' || normalized === 'checker';
+    }
+    return normalized === categoryFilter;
+  };
+
   const filteredSidebar = toolRegistry.filter(
     (t) =>
       textMatchesCatalogQuery(`${t.name} ${t.description} ${t.category} ${t.id}`, query, {
         ids: [t.id],
-      }) &&
-      (categoryFilter === 'all' || normalizeCatalogCategory(t.category) === categoryFilter)
+      }) && sidebarMatchesCategory(t.category)
   );
 
   const filteredCalculators = builtinUiCalculators.filter(
     (c) =>
       textMatchesCatalogQuery(`${c.name} ${c.description} ${c.id}`, query, { ids: [c.id] }) &&
-      (categoryFilter === 'all' || categoryFilter === 'calculator')
+      (categoryFilter === 'all' ||
+        categoryFilter === 'medical' ||
+        categoryFilter === 'calculator')
   );
 
   const filteredIntent = clinicalIntentTools.filter(
@@ -520,10 +540,9 @@ const ClinicalToolCatalog = () => {
     [enrichedDiscovered, scanSort.sortKey, scanSort.sortDir]
   );
 
-  const filteredMedical = catalogRowsMatchingQuery(allMedicalRows, query).filter((row) => {
-    if (categoryFilter === 'all' || categoryFilter === 'medical') return true;
-    return row.category === categoryFilter;
-  });
+  const filteredMedical = catalogRowsMatchingQuery(allMedicalRows, query).filter((row) =>
+    matchesMedicalCatalogCategoryFilter(row, categoryFilter)
+  );
 
   const sortedMedical = useMemo(
     () => medicalSort.applySort(filteredMedical),
@@ -555,22 +574,19 @@ const ClinicalToolCatalog = () => {
   };
 
   const launchCatalogItem = (id) => {
-    const launch = resolveCatalogLaunch(id);
-    if (launch.registryId) {
-      setActiveTool(launch.registryId);
-    }
-    if (launch.chatSeed) {
-      addMessage(launch.chatSeed, 'user');
-    }
-    const navPath = resolveNavigationPathForLaunch(launch);
-    if (navPath) {
-      navigate(navPath);
-    }
+    applyRegistryToolLaunch(id, {
+      navigate,
+      addMessage,
+      selectTool,
+      setActiveTool,
+      recordToolAccess,
+    });
   };
 
   const launchFromRow = (row) => {
     if (row?.status === 'phantom' || row?.status === 'marketing-copy') return;
-    const launchId = row?.mapsTo || row?.primaryId || row?.id;
+    if (row?.launchable === false) return;
+    const launchId = row?.sidebarToolId || row?.mapsTo || row?.primaryId || row?.id;
     if (launchId) {
       launchCatalogItem(launchId);
     }

@@ -5,6 +5,7 @@
  */
 
 import { apiFetch, buildStreamUrl } from './apiClient';
+import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import appConfig from '../config/appConfig';
 import { getFirebaseMessagingToken } from './firebaseClient';
 import logger from '../utils/logger';
@@ -206,6 +207,12 @@ export const NotificationService = {
    * Subscribe to real-time notifications via Server-Sent Events (SSE)
    */
   subscribeToNotifications(onNotification, onError) {
+    if (!isBackendCapabilityEnabled('notificationStream')) {
+      logger.info('Notification stream API not available — skipping SSE subscription');
+      onError?.(new Error('Real-time notification stream is not available on this server.'));
+      return null;
+    }
+
     const token = localStorage.getItem('authToken');
     
     const eventSource = new EventSource(

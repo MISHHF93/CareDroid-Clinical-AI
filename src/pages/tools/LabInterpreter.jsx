@@ -2,6 +2,7 @@ import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import './LabInterpreter.css';
 import { executeClinicalTool } from '../../services/clinicalOrchestratorApi';
+import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getLabCategoryIcon, getToolIcon } from '../../navigation/iconRegistry';
 
@@ -24,6 +25,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [unsupported, setUnsupported] = useState(false);
 
   const commonLabs = [
     { name: 'WBC', unit: 'K/μL' },
@@ -71,6 +73,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
 
     setLoading(true);
     setError(null);
+    setUnsupported(false);
 
     try {
       const parameters = {
@@ -81,6 +84,11 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
       };
 
       const execution = await executeClinicalTool('lab-interpreter', parameters);
+      if (execution.unsupported) {
+        setUnsupported(true);
+        setError(execution.message);
+        return;
+      }
       if (!execution.ok) {
         throw new Error(execution.message || 'Failed to interpret lab values');
       }
@@ -307,12 +315,15 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
 
           {loading ? (
             <div className="lab-results-loading">
-              <div className="lab-spinner"></div>
-              <p>Analyzing lab values...</p>
+              <ClinicalExecutorFeedback loading />
             </div>
           ) : error ? (
             <div className="lab-results-error">
-              <strong>Error:</strong> {error}
+              <ClinicalExecutorFeedback
+                unsupported={unsupported}
+                error={!unsupported ? error : null}
+              />
+              {unsupported ? <p>{error}</p> : <p><strong>Error:</strong> {error}</p>}
             </div>
           ) : results ? (
             <LabResults results={results} />

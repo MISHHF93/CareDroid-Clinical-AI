@@ -191,7 +191,7 @@ const clinicalIntentToolsRaw = [
     category: 'calculator',
     description: 'ICU mortality prediction (chat-assisted; no dedicated form yet).',
     path: '/tools/calculators',
-    sidebarToolId: 'calculators',
+    sidebarToolId: 'apache2-calculator',
     chatSeed:
       'Help me estimate an APACHE-II score. I will provide age, vitals, labs, and GCS as available.',
     backendExecutable: false,
@@ -212,7 +212,7 @@ const clinicalIntentToolsRaw = [
     category: 'calculator',
     description: 'CAP severity (chat-assisted; no dedicated form yet).',
     path: '/tools/calculators',
-    sidebarToolId: 'calculators',
+    sidebarToolId: 'curb65-calculator',
     chatSeed:
       'Help me apply CURB-65 for pneumonia severity using confusion, urea, RR, BP, and age.',
     backendExecutable: false,
@@ -223,7 +223,7 @@ const clinicalIntentToolsRaw = [
     category: 'calculator',
     description: 'Level of consciousness scoring (chat-assisted).',
     path: '/tools/calculators',
-    sidebarToolId: 'calculators',
+    sidebarToolId: 'gcs-calculator',
     chatSeed:
       'Help me score and interpret the Glasgow Coma Scale from eye, verbal, and motor responses.',
     backendExecutable: false,
@@ -234,7 +234,7 @@ const clinicalIntentToolsRaw = [
     category: 'calculator',
     description: 'Pre-test probability for DVT (chat-assisted).',
     path: '/tools/calculators',
-    sidebarToolId: 'calculators',
+    sidebarToolId: 'wells-dvt-calculator',
     chatSeed: 'Help me complete a Wells score for suspected DVT using my clinical findings.',
     backendExecutable: false,
   },

@@ -4,6 +4,7 @@
  */
 
 import { resolveApiRoot } from '../../config/apiEnv';
+import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
 
 const getDefaultApiBaseUrl = () => resolveApiRoot();
 
@@ -203,6 +204,10 @@ class NotificationService {
    * Send notification via specific channel
    */
   async sendViaChannel(channel, notification) {
+    if (!isBackendCapabilityEnabled('notificationSendChannel')) {
+      throw new Error(`Server send channel "${channel}" is not available.`);
+    }
+
     const payload = this.buildChannelPayload(channel, notification);
 
     const response = await fetch(

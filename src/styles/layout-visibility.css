@@ -1,0 +1,142 @@
+/**
+ * Layout visibility — tools, calculators, and dashboards remain reachable at all breakpoints.
+ * Complements AppShell.css (scrollport) and responsive-ux.css (typography/touch).
+ */
+
+/* —— Scroll routes: content grows; vertical scroll stays on .app-shell-page-body —— */
+.app-shell-page-body:not(.app-shell-page-body--conversation) > * {
+  flex: 1 0 auto;
+  min-height: min-content;
+  height: auto;
+  max-height: none;
+  overflow: visible;
+}
+
+/* Block horizontal page bleed from media and preformatted text */
+.app-shell-page-body:not(.app-shell-page-body--conversation) img,
+.app-shell-page-body:not(.app-shell-page-body--conversation) video,
+.app-shell-page-body:not(.app-shell-page-body--conversation) canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.app-shell-page-body:not(.app-shell-page-body--conversation) pre {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* —— Standard tool / catalog / analytics page roots —— */
+.tools-overview,
+.calculators-content,
+.clinical-tool-catalog,
+.tool-page,
+.lab-interpreter-content,
+.simple-tool-page-inner,
+.diagnosis-tool-grid,
+.audit-logs-container,
+.analytics-dashboard,
+.cost-analytics-dashboard,
+.notification-preferences-page,
+.settings-page,
+.profile-page {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.tools-overview,
+.clinical-tool-catalog,
+.calculators-content {
+  overflow-x: clip;
+}
+
+/* —— Flex/grid children: allow shrink in nested layouts —— */
+.calculator-interface,
+.calculator-inputs,
+.calculator-results,
+.calculator-selection,
+.calc-input-grid,
+.calc-input-grid--responsive,
+.calc-chat-assisted-grid,
+.catalog-toolbar,
+.catalog-section,
+.tools-grid,
+.tools-chat-only-grid,
+.tools-recent-list,
+.tips-grid,
+.analytics-header,
+.analytics-panel-grid {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.calculator-results {
+  overflow-x: clip;
+  overflow-y: visible;
+}
+
+/* Wide tables scroll inside their wrapper only */
+.catalog-table-wrap,
+.app-table-scroll-x {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* —— Responsive grids: wrap cards, stack on narrow viewports —— */
+.tools-overview .tools-grid,
+.tools-overview .tools-recent-list,
+.tools-overview .tools-chat-only-grid,
+.tools-overview .tips-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+}
+
+.catalog-stats {
+  grid-template-columns: repeat(auto-fill, minmax(min(120px, 100%), 1fr));
+}
+
+@media (max-width: 768px) {
+  .tools-overview .header-stats {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px 28px;
+  }
+
+  .analytics-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .tool-header {
+    flex-wrap: wrap;
+  }
+
+  .tool-header-actions {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .calculator-selection {
+    grid-template-columns: 1fr;
+  }
+
+  .tools-overview .header-content h1 {
+    font-size: clamp(1.2rem, 6vw, 1.75rem);
+  }
+}
+
+@media (max-width: 320px) {
+  .calculators-content,
+  .clinical-tool-catalog,
+  .tools-overview {
+    padding-inline: 10px;
+  }
+
+  .calc-actions {
+    position: static;
+  }
+}

@@ -13,6 +13,7 @@ import {
   isOrchestratorRegisteredNlu,
   matchesCatalogRow,
   matchesDiscoveredRow,
+  matchesMedicalCatalogCategoryFilter,
   normalizeCatalogCategory,
   textMatchesCatalogQuery,
   validateMedicalCatalogRow,
@@ -134,5 +135,22 @@ describe('catalogSearch', () => {
     const phantom = { id: 'fake-tool', status: 'phantom', name: 'Fake' };
     expect(isDiscoveredRowLaunchable(phantom)).toBe(false);
     expect(enrichDiscoveredCatalogRow(phantom).launchable).toBe(false);
+  });
+
+  it('matchesMedicalCatalogCategoryFilter maps checker to diagnostic tools', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const drugCheck = rows.find((r) => r.sidebarToolId === 'drug-check' || r.id === 'drug-check');
+    expect(drugCheck).toBeTruthy();
+    expect(matchesMedicalCatalogCategoryFilter(drugCheck, 'checker')).toBe(true);
+
+    const qsofa = rows.find((r) => r.primaryId === 'qsofa');
+    expect(matchesMedicalCatalogCategoryFilter(qsofa, 'calculator')).toBe(true);
+    expect(matchesMedicalCatalogCategoryFilter(qsofa, 'chat-assisted')).toBe(false);
+  });
+
+  it('labels Tier-A calculator rows with Open calculator launch label', () => {
+    const rows = getMedicalToolsCatalogRows();
+    const qsofa = rows.find((r) => r.primaryId === 'qsofa');
+    expect(qsofa?.launchLabel).toBe('Open calculator');
   });
 });

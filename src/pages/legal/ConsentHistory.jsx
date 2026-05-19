@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Spinner } from '../../components/ui/Spinner';
 import { EmptyState } from '../../components/ui/EmptyState';
-import { apiFetch } from '../../services/apiClient';
+import { fetchConsentStatus } from '../../services/complianceApi';
+import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
 import './ConsentHistory.css';
 import logger from '../../utils/logger';
 
@@ -16,6 +17,7 @@ export const ConsentHistory = () => {
   const [consents, setConsents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [notice, setNotice] = useState(null);
 
   useEffect(() => {
     fetchConsentHistory();
@@ -23,21 +25,56 @@ export const ConsentHistory = () => {
 
   const fetchConsentHistory = async () => {
     try {
-      const response = await apiFetch('/api/consent/history', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch consent history');
+      if (!isBackendCapabilityEnabled('complianceConsent')) {
+        setError('Consent status API is not available.');
+        setConsents([]);
+        return;
       }
 
-      const data = await response.json();
-      setConsents(data.consents || []);
+      const result = await fetchConsentStatus();
+      if (!result.ok) {
+        throw new Error(result.message || 'Failed to fetch consent status');
+      }
+
+      const status = result.status || {};
+      const snapshot = [
+        {
+          key: 'termsAccepted',
+          granted: status.termsAccepted,
+          updatedAt: status.lastUpdated,
+        },
+        {
+          key: 'privacyPolicyAccepted',
+          granted: status.privacyPolicyAccepted,
+          updatedAt: status.lastUpdated,
+        },
+        {
+          key: 'dataProcessingConsent',
+          granted: status.dataProcessingConsent,
+          updatedAt: status.lastUpdated,
+        },
+        {
+          key: 'marketingConsent',
+          granted: status.marketingConsent,
+          updatedAt: status.lastUpdated,
+        },
+      ];
+      setConsents(
+        snapshot.map((row) => ({
+          id: row.key,
+          consentDate: row.updatedAt,
+          action: row.granted ? 'granted' : 'revoked',
+          consents: { [row.key]: row.granted },
+        }))
+      );
+      setNotice(
+        !isBackendCapabilityEnabled('consentHistory')
+          ? 'Detailed consent event history is not available on the server. Showing current snapshot from GET /api/compliance/consent.'
+          : null
+      );
     } catch (err) {
       logger.error('Error fetching consent history', { err });
-      setError('Failed to load consent history');
+      setError(err.message || 'Failed to load consent history');
     } finally {
       setLoading(false);
     }
@@ -61,6 +98,10 @@ export const ConsentHistory = () => {
       hipaa_authorization: 'HIPAA Authorization',
       privacy_policy: 'Privacy Policy',
       terms_of_service: 'Terms of Service',
+      termsAccepted: 'Terms of Service',
+      privacyPolicyAccepted: 'Privacy Policy',
+      dataProcessingConsent: 'Data processing (HIPAA / clinical use)',
+      marketingConsent: 'Marketing communications',
       data_sharing: 'Anonymized Data for Research',
       marketing_communications: 'Communications Preferences',
     };
@@ -113,6 +154,11 @@ export const ConsentHistory = () => {
       <div className="consent-history-container">
         <div className="consent-history-header">
           <h1>Consent History</h1>
+          {notice && (
+            <p className="consent-history-notice" role="status">
+              {notice}
+            </p>
+          )}
           <p className="consent-history-intro">
             Your complete consent and authorization history as required by HIPAA. 
             All consent actions are permanently logged for audit purposes.

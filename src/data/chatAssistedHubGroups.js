@@ -53,6 +53,13 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
       'Dispatch Intelligence supports assignment options, prioritization, and bottleneck review in chat. It does not auto-assign vehicles, change live routes, or override dispatcher authority — verify all actions against your dispatch system of record.',
     toolIds: ['dispatch-ai'],
   },
+  {
+    groupId: 'nlu-hub-screening',
+    heading: 'Screening & severity (chat)',
+    lead:
+      'APACHE-II, CURB-65, GCS, and Wells DVT support structured scoring in guided chat (clinical decision support only). They do not diagnose, establish prognosis with certainty, or replace ICU admission, sepsis, or VTE pathways — unstable patients need urgent evaluation first.',
+    toolIds: ['apache2-calculator', 'curb65-calculator', 'gcs-calculator', 'wells-dvt-calculator'],
+  },
 ]);
 
 /**
@@ -75,6 +82,10 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'rome-iv-ibs': 'Alarm features and urgent gastrointestinal evaluation take priority over criteria chat.',
   phq9: 'Question 9 self-harm or suicidal ideation requires immediate safety assessment before routine scoring.',
   gad7: 'Suicidal ideation or acute psychiatric emergency takes priority over anxiety screening chat.',
+  'apache2-calculator': 'ICU-level illness and organ support decisions take priority over completing APACHE-II in chat.',
+  'curb65-calculator': 'Severe pneumonia, sepsis, or respiratory failure take priority over CURB-65 chat.',
+  'gcs-calculator': 'Declining consciousness or trauma requires immediate evaluation before GCS chat alone.',
+  'wells-dvt-calculator': 'Wells DVT does not rule in or rule out DVT with certainty; suspected PE or limb-threatening ischemia need urgent pathways.',
 });
 
 /**

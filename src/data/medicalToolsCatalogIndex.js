@@ -10,7 +10,7 @@ import {
   clinicalIntentTools,
   nluCalculatorHubOnly,
 } from './clinicalIntentToolCatalog';
-import { resolveCatalogLaunch } from './clinicalCatalogWiring';
+import { isCalculatorsHubPath, resolveCatalogLaunch } from './clinicalCatalogWiring';
 import {
   BUILTIN_CALC,
   KEYWORD_ROUTED_REGISTRY_IDS,
@@ -38,7 +38,9 @@ function buildFromNlu(nlu) {
       c.id === nlu.toolId ||
       (nlu.toolId === 'cha2ds2vasc-calculator' && c.id === 'chads2vasc')
   );
-  const hubOnly = nluCalculatorHubOnly.some((h) => h.toolId === nlu.toolId);
+  const hubOnly =
+    nluCalculatorHubOnly.some((h) => h.toolId === nlu.toolId) ||
+    Boolean(!uiCalc && nlu.path && isCalculatorsHubPath(nlu.path) && !nlu.backendExecutable);
 
   return {
     primaryId: nlu.toolId,
@@ -115,7 +117,25 @@ export function getMedicalToolsCatalogRows() {
       });
     } else if (row.registryOnly) {
       row.accessSummary = accessSummary(row);
-      byId.set(row.id, row);
+      byId.set(reg.id, row);
+    }
+
+    // Sidebar shortcuts (e.g. calculators hub, procedures) must appear even when NLU rows share sidebarToolId.
+    if (!byId.has(reg.id)) {
+      const shortcut = buildFromRegistry(reg);
+      shortcut.primaryId = reg.id;
+      shortcut.id = reg.id;
+      shortcut.sidebarToolId = reg.id;
+      shortcut.name = reg.name;
+      shortcut.description = reg.description || shortcut.description;
+      shortcut.pagePath = reg.path;
+      shortcut.registryShortcut = true;
+      shortcut.chatOnRequest = shortcut.chatOnRequest || Boolean(shortcut.chatSeed);
+      if (reg.initialCalc) {
+        shortcut.uiCalculatorSlug = reg.initialCalc;
+      }
+      shortcut.accessSummary = accessSummary(shortcut);
+      byId.set(reg.id, shortcut);
     }
   }
 

@@ -200,7 +200,7 @@ describe('resolveCatalogLaunch — NLU hub-only scores', () => {
     const launch = resolveCatalogLaunch('apache2-calculator');
     expect(launch.path).toBe(HUB);
     expect(launch.chatSeed).toMatch(/APACHE/i);
-    expect(launch.registryId).toBe(REGISTRY.calculatorsHub);
+    expect(launch.registryId).toBe(REGISTRY.apache2Calculator);
   });
 });
 

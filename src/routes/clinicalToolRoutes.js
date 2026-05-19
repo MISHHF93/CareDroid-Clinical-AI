@@ -11,6 +11,7 @@ import {
   resolveNavigationPathForLaunch,
   resolveRegistryId,
 } from '../data/clinicalCatalogWiring';
+import { getRegistryToolNavigation } from '../navigation/registryToolLaunch';
 import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
 
 /** Overview pages (not in toolRegistry as navigable tools). */
@@ -129,6 +130,20 @@ export function resolveToolsAreaRedirect(pathname) {
     return null;
   }
 
+  const plan = getRegistryToolNavigation(subpathSlug);
+  if (plan.mode === 'calculator-route' && normalizeToolPathname(plan.pathname) !== normalized) {
+    return { pathname: plan.pathname, search: plan.search || undefined };
+  }
+  if (plan.mode === 'chat-assisted') {
+    return {
+      pathname: '/dashboard',
+      search: `?tool=${encodeURIComponent(plan.registryId || subpathSlug)}`,
+    };
+  }
+  if (plan.mode === 'tool-page' && normalizeToolPathname(plan.pathname) !== normalized) {
+    return { pathname: plan.pathname, search: plan.search || undefined };
+  }
+
   const canonicalPath = launch.path ? normalizeToolPathname(launch.path) : null;
   if (canonicalPath && canonicalPath !== normalized) {
     if (matchCalculatorRoute(canonicalPath)) {
@@ -136,9 +151,21 @@ export function resolveToolsAreaRedirect(pathname) {
     }
     const navPath = resolveNavigationPathForLaunch(launch);
     if (navPath && normalizeToolPathname(navPath) !== normalized) {
+      if (navPath === '/dashboard' && launch.chatSeed) {
+        return {
+          pathname: '/dashboard',
+          search: `?tool=${encodeURIComponent(registryId || subpathSlug)}`,
+        };
+      }
       return { pathname: navPath };
     }
     if (canonicalPath === TOOL_LAUNCH_PATHS.calculatorsHub) {
+      if (isRegisteredCalculatorSlug(subpathSlug)) {
+        return { pathname: canonicalPath, search: `?calc=${encodeURIComponent(subpathSlug)}` };
+      }
+      if (plan.mode === 'calculator-hub') {
+        return { pathname: plan.pathname, search: plan.search || undefined };
+      }
       return { pathname: canonicalPath, search: `?calc=${encodeURIComponent(subpathSlug)}` };
     }
   }

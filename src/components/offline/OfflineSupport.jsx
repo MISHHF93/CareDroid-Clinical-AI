@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, forwardRef } from 'react';
 import { apiFetch } from '../../services/apiClient';
+import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
 import './OfflineSupport.css';
 import logger from '../../utils/logger';
 
@@ -253,6 +254,11 @@ export const useOfflineStatus = () => {
 
     try {
       // Example: Sync conversations
+      if (!isBackendCapabilityEnabled('bulkSync')) {
+        logger.info('Bulk sync API not available — skipping download sync');
+        return;
+      }
+
       const response = await apiFetch('/api/sync', {
         method: 'POST',
         headers: {

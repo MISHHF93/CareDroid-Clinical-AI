@@ -4,6 +4,8 @@
  */
 
 import NotificationService from '../services/NotificationService';
+import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
+import { apiFetch } from '../services/apiClient';
 
 export const sendClinicalAlert = async (alertData, options = {}) => {
   const {
@@ -101,18 +103,23 @@ export const sendBatchClinicalAlerts = async (alerts, options = {}) => {
 };
 
 export const acknowledgeClinicalAlert = async (alertId, userId = null) => {
+  if (!isBackendCapabilityEnabled('clinicalAlerts')) {
+    return {
+      success: true,
+      alertId,
+      localOnly: true,
+      message: 'Acknowledged locally — clinical alerts API is not on the server.',
+    };
+  }
+
   try {
-    // This would typically call your backend API
-    const response = await fetch(`/api/clinical/alerts/${alertId}/acknowledge`, {
+    const response = await apiFetch(`/api/clinical/alerts/${alertId}/acknowledge`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         userId,
-        acknowledgedAt: new Date().toISOString()
-      })
+        acknowledgedAt: new Date().toISOString(),
+      }),
     });
 
     if (!response.ok) {
@@ -127,18 +134,23 @@ export const acknowledgeClinicalAlert = async (alertId, userId = null) => {
 };
 
 export const dismissClinicalAlert = async (alertId, reason = '') => {
+  if (!isBackendCapabilityEnabled('clinicalAlerts')) {
+    return {
+      success: true,
+      alertId,
+      localOnly: true,
+      message: 'Dismissed locally — clinical alerts API is not on the server.',
+    };
+  }
+
   try {
-    // This would typically call your backend API
-    const response = await fetch(`/api/clinical/alerts/${alertId}/dismiss`, {
+    const response = await apiFetch(`/api/clinical/alerts/${alertId}/dismiss`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('authToken') || ''}`
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         reason,
-        dismissedAt: new Date().toISOString()
-      })
+        dismissedAt: new Date().toISOString(),
+      }),
     });
 
     if (!response.ok) {
