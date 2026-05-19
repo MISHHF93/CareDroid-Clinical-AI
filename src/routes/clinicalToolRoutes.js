@@ -6,6 +6,7 @@
 import toolRegistry from '../data/toolRegistry';
 import { builtinUiCalculators } from '../data/clinicalIntentToolCatalog';
 import {
+  CATALOG_UNKNOWN_TOOL_LAUNCH,
   resolveCatalogLaunch,
   resolveNavigationPathForLaunch,
   resolveRegistryId,
@@ -118,6 +119,15 @@ export function resolveToolsAreaRedirect(pathname) {
   const registryId = resolveRegistryId(subpathSlug);
   const launch = resolveCatalogLaunch(subpathSlug);
   if (!launch?.path && !launch?.chatSeed && !registryId) return null;
+
+  // Unknown tool-shaped slugs: show ToolNotFound on the hub, do not bounce to dashboard.
+  if (
+    !registryId &&
+    launch.path === CATALOG_UNKNOWN_TOOL_LAUNCH.path &&
+    !launch.registryId
+  ) {
+    return null;
+  }
 
   const canonicalPath = launch.path ? normalizeToolPathname(launch.path) : null;
   if (canonicalPath && canonicalPath !== normalized) {

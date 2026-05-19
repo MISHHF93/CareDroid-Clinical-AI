@@ -7,6 +7,7 @@
   margin: 0 auto;
   box-sizing: border-box;
   min-width: 0;
+  overflow-x: clip;
 }
 
 .calculators-select-placeholder {
@@ -109,6 +110,7 @@
   max-width: 100%;
   min-width: 0;
   box-sizing: border-box;
+  overflow-x: clip;
 }
 
 @media (max-width: 1024px) {
@@ -158,6 +160,8 @@
 /* Input Groups */
 .calc-input-group {
   margin-bottom: 20px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .calc-input-label {
@@ -170,6 +174,10 @@
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.45;
 }
 
 .calc-input-label-text {
@@ -253,7 +261,8 @@
 }
 
 .calc-calculate-btn {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   min-height: 44px;
   padding: 14px 24px;
   background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
@@ -372,6 +381,8 @@
 /* Score Breakdown */
 .calc-breakdown {
   margin-bottom: 24px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .calc-breakdown-title {
@@ -421,6 +432,10 @@
   border-radius: 12px;
   border-left: 4px solid var(--accent-1);
   margin-bottom: 20px;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .calc-interpretation-box.critical {
@@ -1086,6 +1101,37 @@ ul.calc-breakdown-list .calc-breakdown-item {
   max-width: 100%;
 }
 
+.calc-timi-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.calc-timi-row .calc-checkbox-group {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+}
+
+.calc-timi-help {
+  margin-left: 0;
+  max-width: 100%;
+}
+
+.calc-timi-legend,
+.calc-has-bled-legend,
+.calc-news2-legend {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+  line-height: 1.4;
+}
+
 .calc-error {
   padding: 16px;
   background: color-mix(in srgb, var(--app-danger) 16%, transparent);
@@ -1382,5 +1428,68 @@ ul.calc-breakdown-list .calc-breakdown-item {
 
   .calc-score-value {
     font-size: 2.25rem;
+  }
+}
+
+/* Tier-A forms: 320px minimum width (acceptance target) */
+@media (max-width: 320px) {
+  .calculators-content {
+    padding: 8px 10px;
+  }
+
+  .calculator-interface {
+    gap: 16px;
+  }
+
+  .calculator-inputs,
+  .calculator-results {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .calculator-panel-title {
+    gap: 6px 8px;
+  }
+
+  .calc-input-grid--responsive {
+    gap: 12px;
+  }
+
+  .calc-input-group {
+    margin-bottom: 16px;
+  }
+
+  .calc-actions {
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .calc-score-display {
+    padding: 16px 10px;
+  }
+
+  .calc-interpretation-box {
+    padding: 12px;
+  }
+
+  .calc-breakdown-item {
+    padding: 10px;
+  }
+
+  .calc-has-bled-fieldset,
+  .calc-news2-scale-fieldset,
+  .calc-meld-fieldset {
+    padding: 10px;
+  }
+
+  .calc-has-bled-help,
+  .calc-timi-help {
+    margin-left: 0;
+  }
+
+  .calc-pr4a-risk-badge,
+  .calc-ckd-prognostic-badge {
+    padding: 10px 12px;
+    font-size: 0.8125rem;
   }
 }

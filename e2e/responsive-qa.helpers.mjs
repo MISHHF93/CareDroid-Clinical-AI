@@ -1,15 +1,24 @@
 /**
  * Horizontal overflow detection for responsive QA.
- * Allows scroll inside `.catalog-table-wrap` (data tables only).
+ * Allows scroll inside designated data-table / chart scroll hosts only.
  */
 
 const TOLERANCE_PX = 2;
+
+/** Selectors where horizontal scroll is permitted (must match page CSS). */
+const ALLOWED_OVERFLOW_ANCESTORS = [
+  '.catalog-table-wrap',
+  '.fleet-data-table-wrap',
+  '.logs-table-container',
+  '.tool-card-table-wrap',
+  '.cost-chart',
+];
 
 /**
  * @param {import('@playwright/test').Page} page
  */
 export async function measurePageOverflow(page) {
-  return page.evaluate((tolerance) => {
+  return page.evaluate(({ tolerance, allowedAncestors }) => {
     const doc = document.documentElement;
     const docOverflow = doc.scrollWidth - doc.clientWidth;
 
@@ -41,7 +50,14 @@ export async function measurePageOverflow(page) {
       if (rect.width < 1 || rect.height < 1) continue;
 
       if (el.closest('table')) continue;
-      if (el.closest('.catalog-table-wrap')) continue;
+      let allowed = false;
+      for (const sel of allowedAncestors) {
+        if (el.closest(sel)) {
+          allowed = true;
+          break;
+        }
+      }
+      if (allowed) continue;
 
       const overflowRight = rect.right - vw;
       if (overflowRight > tolerance) {
@@ -65,7 +81,7 @@ export async function measurePageOverflow(page) {
       docOverflowPx: docOverflow,
       offenders: offenders.slice(0, 8),
     };
-  }, TOLERANCE_PX);
+  }, { tolerance: TOLERANCE_PX, allowedAncestors: ALLOWED_OVERFLOW_ANCESTORS });
 }
 
 export const QA_AUTH_STORAGE = {
@@ -94,6 +110,28 @@ export async function seedQaAuth(page) {
 }
 
 /**
+ * Stub slow backend calls so layout QA does not flake when API is down.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function installQaNetworkStubs(page) {
+  const profile = JSON.parse(QA_AUTH_STORAGE.caredroid_user_profile);
+  await page.route('**/api/users/profile**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(profile),
+    });
+  });
+  await page.route('**/api/tools**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: '[]',
+    });
+  });
+}
+
+/**
  * @param {import('@playwright/test').Page} page
  */
 export async function dismissOverlays(page) {
@@ -101,4 +139,29 @@ export async function dismissOverlays(page) {
   if (await backdrop.isVisible().catch(() => false)) {
     await backdrop.click({ force: true }).catch(() => {});
   }
+}
+
+/**
+ * Wait until route shell and lazy chunks finish (Suspense `PageLoader` cleared).
+ * @param {import('@playwright/test').Page} page
+ */
+export async function waitForAppReady(page) {
+  await page.waitForFunction(
+    () => !document.querySelector('.app-init-screen'),
+    undefined,
+    { timeout: 30_000 }
+  );
+
+  await page.waitForFunction(
+    () => {
+      const loader = document.querySelector('.page-loader');
+      const shell = document.querySelector('.app-shell-page-body');
+      if (loader) return false;
+      if (!shell) return false;
+      const rect = shell.getBoundingClientRect();
+      return rect.width > 0 && rect.height > 0;
+    },
+    undefined,
+    { timeout: 120_000 }
+  );
 }

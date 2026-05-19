@@ -7,7 +7,11 @@ import {
   countResponsiveQaCells,
   buildResponsiveQaPages,
 } from './responsiveQaMatrix.js';
-import { CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS, CLINICAL_TIER_B_CHAT_REGISTRY_IDS } from './clinicalToolIdContract.js';
+import {
+  CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
+  CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+  FLEET_TIER_B_CHAT_REGISTRY_IDS,
+} from './clinicalToolIdContract.js';
 
 describe('responsiveQaMatrix', () => {
   it('defines nine viewports and four browsers', () => {
@@ -31,6 +35,10 @@ describe('responsiveQaMatrix', () => {
     for (const registryId of CLINICAL_TIER_B_CHAT_REGISTRY_IDS) {
       expect(ids).toContain(`tier-b-${registryId}`);
     }
+    for (const registryId of FLEET_TIER_B_CHAT_REGISTRY_IDS) {
+      expect(ids).toContain(`tier-b-${registryId}`);
+    }
+    expect(ids).toContain('tier-b-dispatch-ai');
   });
 
   it('has a positive cell count', () => {

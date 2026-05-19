@@ -2,15 +2,47 @@
 
 .lab-interpreter-content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 24px;
   padding: 24px;
-  max-width: 1400px;
+  width: 100%;
+  max-width: min(1400px, 100%);
+  min-width: 0;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 @media (max-width: 1024px) {
   .lab-interpreter-content {
+    grid-template-columns: 1fr;
+    padding: clamp(12px, 2.2vw, 24px);
+  }
+}
+
+@media (max-width: 768px) {
+  .lab-interpreter-content {
+    padding: var(--app-shell-page-gutter-block, 16px) var(--app-fluid-page-gutter, 16px);
+  }
+
+  .lab-input-panel {
+    padding: clamp(16px, 3vw, 24px);
+  }
+
+  .patient-context {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-entry-form {
+    grid-template-columns: 1fr;
+  }
+
+  .lab-summary-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .lab-summary-stats {
     grid-template-columns: 1fr;
   }
 }
@@ -443,6 +475,10 @@
 /* Category Sections */
 .lab-category-section {
   margin-bottom: 28px;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .lab-category-header {
@@ -464,6 +500,7 @@
 
 .lab-values-table {
   width: 100%;
+  min-width: 0;
   margin-bottom: 16px;
   border-collapse: collapse;
 }

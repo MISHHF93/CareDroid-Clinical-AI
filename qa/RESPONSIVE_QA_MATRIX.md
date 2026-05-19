@@ -1,6 +1,6 @@
 # Responsive QA matrix
 
-Generated from `src/data/responsiveQaMatrix.js`. Total cells: **1116** (31 pages × 9 viewports × 4 browsers).
+Generated from `src/data/responsiveQaMatrix.js`. Total cells: **1152** (32 pages × 9 viewports × 4 browsers).
 
 ## Browsers
 
@@ -57,12 +57,13 @@ Generated from `src/data/responsiveQaMatrix.js`. Total cells: **1116** (31 pages
 | tier-b-ottawa-ankle | tier-b | `/tools/calculators` | Tier B launch: Ottawa Ankle |
 | tier-b-copd-gold | tier-b | `/tools/calculators` | Tier B launch: COPD GOLD |
 | tier-b-rome-iv-ibs | tier-b | `/tools/calculators` | Tier B launch: Rome IV IBS |
+| tier-b-dispatch-ai | tier-b | `/tools/calculators` | Tier B launch: Dispatch Intelligence Assistant |
 | fleet-command | fleet | `/fleet/command` | Fleet dashboard |
 | fleet-route-optimizer | fleet | `/fleet/route-optimizer` | Route optimizer |
 | fleet-predictive-maintenance | fleet | `/fleet/predictive-maintenance` | Predictive maintenance |
 
 ## Rules
 
-- No horizontal scroll on `document` except inside designated data-table wrappers (`.catalog-table-wrap`).
+- No horizontal scroll on `document` except inside designated data-table wrappers (`.catalog-table-wrap`, `.fleet-data-table-wrap`, `.logs-table-container`, `.tool-card-table-wrap`, `.cost-chart`).
 - Small-screen failures are blocking.
 

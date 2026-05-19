@@ -20,8 +20,9 @@ export function useDrawerFocus({ isOpen, containerRef, restoreFocusRef }) {
 
     const container = containerRef.current;
     const focusFirst = () => {
+      const initial = container?.querySelector('[data-drawer-initial-focus]');
       const nodes = container?.querySelectorAll(FOCUSABLE_SELECTOR);
-      nodes?.[0]?.focus();
+      (initial ?? nodes?.[0])?.focus();
     };
     const focusTimer = window.setTimeout(focusFirst, 0);
 

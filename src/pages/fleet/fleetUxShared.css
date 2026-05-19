@@ -234,6 +234,80 @@
   }
 }
 
+/* —— Responsive wide content (dashboards, tables, charts) —— */
+.fleet-dashboard,
+.predictive-maintenance,
+.route-optimizer {
+  overflow-x: clip;
+}
+
+.fleet-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+  gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.fleet-metric-grid > * {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.fleet-data-table-wrap {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+}
+
+.fleet-data-table-wrap > table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.fleet-data-table-wrap--wide > table {
+  min-width: min(100%, 36rem);
+}
+
+.fleet-data-table-wrap thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.fleet-wrap-text,
+.fleet-wrap-text > * {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.fleet-chart-host {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  box-sizing: border-box;
+}
+
+.fleet-chart-host canvas,
+.fleet-chart-host svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.fleet-state-panel {
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 640px) {
   .fleet-toolbar {
     flex-direction: column;
@@ -241,5 +315,17 @@
 
   .fleet-toolbar .fleet-btn {
     width: 100%;
+  }
+
+  .fleet-metric-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 320px) {
+  .fleet-page-lead,
+  .fleet-safety-banner {
+    padding: 10px 12px;
+    font-size: 12px;
   }
 }

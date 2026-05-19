@@ -74,6 +74,15 @@ const CATEGORY_CLASS = {
   medication: 'catalog-badge--checker',
 };
 
+const CATEGORY_QUICK_FILTERS = [
+  { value: 'all', label: 'All' },
+  { value: 'medical', label: 'Medical' },
+  { value: 'calculator', label: 'Calculators' },
+  { value: 'chat-assisted', label: 'Chat-assisted' },
+  { value: 'checker', label: 'Checkers' },
+  { value: 'phantom', label: 'Phantom' },
+];
+
 const STATUS_LABEL = {
   'shipped-page': 'Shipped page',
   'shipped-calculator': 'Calculator UI',
@@ -713,6 +722,22 @@ const ClinicalToolCatalog = () => {
         </select>
       </div>
 
+      <div className="catalog-category-chips" role="group" aria-label="Quick category filters">
+        {CATEGORY_QUICK_FILTERS.map((chip) => (
+          <button
+            key={chip.value}
+            type="button"
+            className={`catalog-category-chip${
+              categoryFilter === chip.value ? ' catalog-category-chip--active' : ''
+            }`}
+            aria-pressed={categoryFilter === chip.value}
+            onClick={() => setCategoryFilter(chip.value)}
+          >
+            {chip.label}
+          </button>
+        ))}
+      </div>
+
       {showGlobalEmpty && (
         <div className="catalog-empty catalog-empty--global" role="status">
           <p>
@@ -780,8 +805,8 @@ const ClinicalToolCatalog = () => {
             </li>
           ))}
         </ul>
-        <div className="catalog-table-wrap">
-          <table className="catalog-table">
+        <div className="catalog-table-wrap catalog-table-wrap--stacked">
+          <table className="catalog-table catalog-table--stacked">
             <thead>
               <tr>
                 <SortableTh
@@ -819,27 +844,29 @@ const ClinicalToolCatalog = () => {
             <tbody>
               {sortedDiscovered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="catalog-empty">
+                  <td colSpan={6} className="catalog-empty catalog-empty-row">
                     No discovered entries match your search.
                   </td>
                 </tr>
               ) : (
                 sortedDiscovered.map((row) => (
                   <tr key={`${row.id}-${row.status}`}>
-                    <td>
+                    <td data-label="ID">
                       <code>{row.id}</code>
                     </td>
-                    <td>{row.name}</td>
-                    <td>
+                    <td data-label="Name" className="catalog-tool-name-cell">
+                      {row.name}
+                    </td>
+                    <td data-label="Status">
                       <StatusBadge status={row.displayStatus || row.status} />
                     </td>
-                    <td>
+                    <td data-label="Category">
                       {row.category ? <CategoryBadge category={row.category} /> : '—'}
                     </td>
-                    <td className="catalog-source-cell">
+                    <td className="catalog-source-cell" data-label="Source file(s)">
                       {(row.sources || [row.source]).filter(Boolean).join('; ')}
                     </td>
-                    <td>
+                    <td className="catalog-actions-cell" data-label="Actions">
                       <div className="catalog-actions">
                         {row.path && !String(row.path).includes(':') && (
                           <button
@@ -986,8 +1013,8 @@ const ClinicalToolCatalog = () => {
           Endpoints implemented on the server; most are reached through the dashboard chat or
           integrations—not separate tool pages.
         </p>
-        <div className="catalog-table-wrap">
-          <table className="catalog-table">
+        <div className="catalog-table-wrap catalog-table-wrap--stacked">
+          <table className="catalog-table catalog-table--stacked">
             <thead>
               <tr>
                 <th>ID</th>
@@ -1000,24 +1027,26 @@ const ClinicalToolCatalog = () => {
             <tbody>
               {filteredChatAi.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="catalog-empty">
+                  <td colSpan={5} className="catalog-empty catalog-empty-row">
                     No chat/AI APIs match your search.
                   </td>
                 </tr>
               ) : (
                 filteredChatAi.map((row) => (
                   <tr key={row.id}>
-                    <td>
+                    <td data-label="ID">
                       <code>{row.id}</code>
                     </td>
-                    <td>{row.name}</td>
-                    <td>
+                    <td data-label="Name" className="catalog-tool-name-cell">
+                      {row.name}
+                    </td>
+                    <td data-label="Category">
                       <CategoryBadge category={row.category} />
                     </td>
-                    <td>
+                    <td data-label="API">
                       <span className="catalog-api-hint">{row.apiPath}</span>
                     </td>
-                    <td>
+                    <td className="catalog-actions-cell" data-label="Actions">
                       <div className="catalog-actions">
                         {row.path && (
                           <button
@@ -1050,8 +1079,8 @@ const ClinicalToolCatalog = () => {
       <section className="catalog-section">
         <h2>Clinical data APIs</h2>
         <p className="catalog-section-desc">Drug and protocol reference stores (CRUD + chat context).</p>
-        <div className="catalog-table-wrap">
-          <table className="catalog-table">
+        <div className="catalog-table-wrap catalog-table-wrap--stacked">
+          <table className="catalog-table catalog-table--stacked">
             <thead>
               <tr>
                 <th>ID</th>
@@ -1063,21 +1092,23 @@ const ClinicalToolCatalog = () => {
             <tbody>
               {filteredDataApis.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="catalog-empty">
+                  <td colSpan={4} className="catalog-empty catalog-empty-row">
                     No data APIs match your search.
                   </td>
                 </tr>
               ) : (
                 filteredDataApis.map((row) => (
                   <tr key={row.id}>
-                    <td>
+                    <td data-label="ID">
                       <code>{row.id}</code>
                     </td>
-                    <td>{row.name}</td>
-                    <td>
+                    <td data-label="Name" className="catalog-tool-name-cell">
+                      {row.name}
+                    </td>
+                    <td data-label="API">
                       <span className="catalog-api-hint">{row.apiPath}</span>
                     </td>
-                    <td>
+                    <td className="catalog-actions-cell" data-label="Actions">
                       <div className="catalog-actions">
                         <button
                           type="button"
@@ -1101,8 +1132,8 @@ const ClinicalToolCatalog = () => {
         <p className="catalog-section-desc">
           Automatic emergency NLU on chat plus the clinical alerts hub.
         </p>
-        <div className="catalog-table-wrap">
-          <table className="catalog-table">
+        <div className="catalog-table-wrap catalog-table-wrap--stacked">
+          <table className="catalog-table catalog-table--stacked">
             <thead>
               <tr>
                 <th>ID</th>
@@ -1113,11 +1144,13 @@ const ClinicalToolCatalog = () => {
             <tbody>
               {filteredEmergency.map((row) => (
                 <tr key={row.id}>
-                  <td>
+                  <td data-label="ID">
                     <code>{row.id}</code>
                   </td>
-                  <td>{row.name}</td>
-                  <td>
+                  <td data-label="Name" className="catalog-tool-name-cell">
+                    {row.name}
+                  </td>
+                  <td className="catalog-actions-cell" data-label="Actions">
                     <div className="catalog-actions">
                       {row.path && (
                         <button
@@ -1157,8 +1190,8 @@ const ClinicalToolCatalog = () => {
             executable.
           </p>
         )}
-        <div className="catalog-table-wrap">
-          <table className="catalog-table">
+        <div className="catalog-table-wrap catalog-table-wrap--stacked">
+          <table className="catalog-table catalog-table--stacked">
             <thead>
               <tr>
                 <th>ID</th>
@@ -1178,10 +1211,10 @@ const ClinicalToolCatalog = () => {
                 const registryId = ORCHESTRATOR_TO_REGISTRY_ID[id];
                 return (
                   <tr key={id}>
-                    <td>
+                    <td data-label="ID">
                       <code>{id}</code>
                     </td>
-                    <td>
+                    <td data-label="Name" className="catalog-tool-name-cell">
                       {tool.name || intentRow?.toolName}
                       {intentRow?.backendExecutable && !isOrchestratorRegisteredNlu(id) && (
                         <span
@@ -1192,11 +1225,11 @@ const ClinicalToolCatalog = () => {
                         </span>
                       )}
                     </td>
-                    <td>
+                    <td data-label="Category">
                       <CategoryBadge category={tool.category || intentRow?.category} />
                     </td>
-                    <td>{intentRow?.path || '—'}</td>
-                    <td>
+                    <td data-label="UI page">{intentRow?.path || '—'}</td>
+                    <td className="catalog-actions-cell" data-label="Actions">
                       <div className="catalog-actions">
                         {intentRow?.path && (
                           <button
@@ -1233,8 +1266,8 @@ const ClinicalToolCatalog = () => {
         <p className="catalog-section-desc">
           Recognized by the intent classifier when users ask in natural language.
         </p>
-        <div className="catalog-table-wrap">
-          <table className="catalog-table">
+        <div className="catalog-table-wrap catalog-table-wrap--stacked">
+          <table className="catalog-table catalog-table--stacked">
             <thead>
               <tr>
                 <th>Tool ID</th>
@@ -1248,29 +1281,31 @@ const ClinicalToolCatalog = () => {
             <tbody>
               {filteredIntent.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="catalog-empty">
+                  <td colSpan={6} className="catalog-empty catalog-empty-row">
                     No tools match your search.
                   </td>
                 </tr>
               ) : (
                 filteredIntent.map((tool) => (
                   <tr key={tool.toolId}>
-                    <td>
+                    <td data-label="Tool ID">
                       <code>{tool.toolId}</code>
                     </td>
-                    <td>{tool.toolName}</td>
-                    <td>
+                    <td data-label="Name" className="catalog-tool-name-cell">
+                      {tool.toolName}
+                    </td>
+                    <td data-label="Category">
                       <CategoryBadge category={tool.category} />
                     </td>
-                    <td>{tool.path ? 'Yes' : 'Chat only'}</td>
-                    <td>
+                    <td data-label="Page">{tool.path ? 'Yes' : 'Chat only'}</td>
+                    <td data-label="Backend">
                       {isBackendExecutable(tool.toolId) ? (
                         <span className="catalog-badge catalog-badge--backend">API</span>
                       ) : (
                         <span className="catalog-badge catalog-badge--client">Chat / UI</span>
                       )}
                     </td>
-                    <td>
+                    <td className="catalog-actions-cell" data-label="Actions">
                       <div className="catalog-actions">
                         {tool.path ? (
                           <button
@@ -1307,8 +1342,8 @@ const ClinicalToolCatalog = () => {
       <section className="catalog-section">
         <h2>Calculator forms (built-in UI)</h2>
         <p className="catalog-section-desc">Interactive forms in the Calculators module.</p>
-        <div className="catalog-table-wrap">
-          <table className="catalog-table">
+        <div className="catalog-table-wrap catalog-table-wrap--stacked">
+          <table className="catalog-table catalog-table--stacked">
             <thead>
               <tr>
                 <th>Slug</th>
@@ -1320,19 +1355,21 @@ const ClinicalToolCatalog = () => {
             <tbody>
               {filteredCalculators.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="catalog-empty">
+                  <td colSpan={4} className="catalog-empty catalog-empty-row">
                     No calculators match your search.
                   </td>
                 </tr>
               ) : (
                 filteredCalculators.map((calc) => (
                   <tr key={calc.id}>
-                    <td>
+                    <td data-label="Slug">
                       <code>{calc.id}</code>
                     </td>
-                    <td>{calc.name}</td>
-                    <td>{calc.implementation}</td>
-                    <td>
+                    <td data-label="Name" className="catalog-tool-name-cell">
+                      {calc.name}
+                    </td>
+                    <td data-label="Implementation">{calc.implementation}</td>
+                    <td className="catalog-actions-cell" data-label="Actions">
                       <div className="catalog-actions">
                         <button
                           type="button"
@@ -1354,8 +1391,8 @@ const ClinicalToolCatalog = () => {
       <section className="catalog-section">
         <h2>Sidebar shortcuts</h2>
         <p className="catalog-section-desc">Entries from toolRegistry.js shown in navigation.</p>
-        <div className="catalog-table-wrap">
-          <table className="catalog-table">
+        <div className="catalog-table-wrap catalog-table-wrap--stacked">
+          <table className="catalog-table catalog-table--stacked">
             <thead>
               <tr>
                 <th>Registry ID</th>
@@ -1368,20 +1405,22 @@ const ClinicalToolCatalog = () => {
             <tbody>
               {filteredSidebar.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="catalog-empty">
+                  <td colSpan={5} className="catalog-empty catalog-empty-row">
                     No shortcuts match your search.
                   </td>
                 </tr>
               ) : (
                 filteredSidebar.map((tool) => (
                   <tr key={tool.id}>
-                    <td>
+                    <td data-label="Registry ID">
                       <code>{tool.id}</code>
                     </td>
-                    <td>{tool.name}</td>
-                    <td>{tool.category}</td>
-                    <td>{tool.path}</td>
-                    <td>
+                    <td data-label="Name" className="catalog-tool-name-cell">
+                      {tool.name}
+                    </td>
+                    <td data-label="Category">{tool.category}</td>
+                    <td data-label="Path">{tool.path}</td>
+                    <td className="catalog-actions-cell" data-label="Actions">
                       <div className="catalog-actions">
                         <button
                           type="button"

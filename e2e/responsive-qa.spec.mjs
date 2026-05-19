@@ -11,7 +11,20 @@ import {
   RESPONSIVE_QA_PAGES,
   groupResponsiveQaPagesByPath,
 } from '../src/data/responsiveQaMatrix.js';
-import { dismissOverlays, measurePageOverflow } from './responsive-qa.helpers.mjs';
+import {
+  dismissOverlays,
+  installQaNetworkStubs,
+  measurePageOverflow,
+  seedQaAuth,
+  waitForAppReady,
+} from './responsive-qa.helpers.mjs';
+
+test.setTimeout(120_000);
+
+test.beforeEach(async ({ page }) => {
+  await seedQaAuth(page);
+  await installQaNetworkStubs(page);
+});
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const RESULTS_PATH = join(__dirname, '..', 'qa', 'responsive-qa-results.json');
@@ -21,6 +34,20 @@ const PAGES = RESPONSIVE_QA_PAGES;
 
 const pathGroups = groupResponsiveQaPagesByPath();
 
+/** Warm Vite bundles before parallel cells (avoids first-test cold-start timeouts). */
+test.beforeAll(async ({ request }) => {
+  const warmPaths = [
+    '/dashboard',
+    '/tools/catalog',
+    '/tools/calculators',
+    '/tools/calculators/has-bled',
+    '/fleet/command',
+  ];
+  for (const path of warmPaths) {
+    await request.get(path).catch(() => {});
+  }
+});
+
 for (const pageDef of PAGES) {
   for (const viewport of RESPONSIVE_QA_VIEWPORTS) {
     test(`${pageDef.id} @ ${viewport.id}`, async ({ page }, testInfo) => {
@@ -28,13 +55,8 @@ for (const pageDef of PAGES) {
 
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
 
-      await page.goto(pageDef.path, { waitUntil: 'domcontentloaded', timeout: 60_000 });
-      await page.waitForFunction(
-        () => !document.querySelector('.app-init-screen'),
-        undefined,
-        { timeout: 45_000 }
-      );
-      await page.waitForSelector('.app-shell-page-body', { state: 'visible', timeout: 45_000 });
+      await page.goto(pageDef.path, { waitUntil: 'commit', timeout: 90_000 });
+      await waitForAppReady(page);
 
       await page.waitForTimeout(150);
       await dismissOverlays(page);

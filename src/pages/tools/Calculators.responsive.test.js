@@ -57,6 +57,10 @@ describe('Calculators.jsx — Tier-A interface hooks', () => {
     expect(calculatorsJsx).toContain(`calculator-interface--${slug}`);
   });
 
+  it('declares calculator-interface--meld-na when MELD-Na mode is active', () => {
+    expect(calculatorsJsx).toContain('calculator-interface--meld-na');
+  });
+
   it('uses responsive input grids for multi-field PR1/PR2 forms', () => {
     expect(calculatorsJsx).toContain('calc-input-grid calc-input-grid--responsive');
   });
@@ -105,15 +109,27 @@ describe('Calculators.css — responsive layout', () => {
   });
 
   it('prevents horizontal overflow on inputs and result panels', () => {
+    expect(calculatorsCss).toMatch(/\.calculators-content[\s\S]*overflow-x:\s*clip/);
+    expect(calculatorsCss).toMatch(/\.calculator-interface[\s\S]*overflow-x:\s*clip/);
     expect(calculatorsCss).toMatch(/\.calculator-inputs[\s\S]*overflow-x:\s*clip/);
     expect(calculatorsCss).toMatch(/\.calc-input-field[\s\S]*max-width:\s*100%/);
     expect(calculatorsCss).toMatch(/\.calc-score-display[\s\S]*max-width:\s*100%/);
+    expect(calculatorsCss).toMatch(/\.calc-interpretation-box[\s\S]*max-width:\s*100%/);
+  });
+
+  it('defines 320px Tier-A layout compaction', () => {
+    expect(calculatorsCss).toMatch(/@media \(max-width: 320px\)/);
   });
 
   it('wraps long labels and breakdown text', () => {
     expect(calculatorsCss).toMatch(/\.calc-input-label-text[\s\S]*overflow-wrap:\s*anywhere/);
     expect(calculatorsCss).toMatch(/\.calc-breakdown-label[\s\S]*overflow-wrap:\s*anywhere/);
     expect(calculatorsCss).toMatch(/\.calc-interpretation-text[\s\S]*word-break:\s*break-word/);
+  });
+
+  it('styles TIMI criteria rows for narrow viewports', () => {
+    expect(calculatorsCss).toContain('.calc-timi-row');
+    expect(calculatorsCss).toMatch(/\.calc-timi-legend[\s\S]*overflow-wrap:\s*anywhere/);
   });
 
   it('stacks unit rows and full-width selects on mobile', () => {

@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser, Permission } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -129,6 +129,13 @@ const Sidebar = forwardRef(function Sidebar(
   const isOnToolsOverview = location.pathname === '/tools';
   const isOnToolsCatalog = location.pathname === '/tools/catalog';
 
+  const isNavPathActive = (path) => {
+    if (path === '/dashboard') {
+      return location.pathname === '/dashboard';
+    }
+    return location.pathname === path || location.pathname.startsWith(`${path}/`);
+  };
+
   const isToolRouteActive = (tool) => {
     if (!tool.path) return false;
     if (location.pathname === tool.path) return true;
@@ -137,6 +144,17 @@ const Sidebar = forwardRef(function Sidebar(
     }
     return location.pathname.startsWith(`${tool.path}/`);
   };
+
+  useEffect(() => {
+    const node = ref?.current;
+    if (!node || !layoutCompact) return undefined;
+    if (mobileNavOpen) {
+      node.removeAttribute('inert');
+    } else {
+      node.setAttribute('inert', '');
+    }
+    return () => node.removeAttribute('inert');
+  }, [layoutCompact, mobileNavOpen, ref]);
 
   const renderToolCard = (tool) => {
     const isSelected =
@@ -219,46 +237,21 @@ const Sidebar = forwardRef(function Sidebar(
           >
             <NavIcon icon={getToolIcon(tool.id)} size={22} />
           </span>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{
-              fontWeight: '600',
-              fontSize: '12px',
-              color: 'var(--text-primary, #1a1a1a)',
-              marginBottom: '2px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '4px'
-            }}>
-              {tool.name}
-              <span style={{
-                fontSize: '9px',
-                padding: '1px 4px',
-                borderRadius: '3px',
-                backgroundColor: 'var(--panel-border, #e0e0e0)',
-                color: 'var(--text-secondary, #666)',
-                fontFamily: 'monospace',
-                fontWeight: '500'
-              }}>
+          <div className="sidebar-tool-card-body">
+            <div className="sidebar-tool-card-title-row">
+              <span className="sidebar-tool-card-name">{tool.name}</span>
+              <span className="sidebar-tool-card-shortcut">
                 {tool.shortcut.replace('Ctrl+', '⌘')}
               </span>
             </div>
-            <div style={{
-              fontSize: '10px',
-              color: 'var(--text-secondary, #666)',
-              lineHeight: '1.3',
-              marginBottom: '4px'
-            }}>
-              {tool.description}
-            </div>
-            <div style={{
-              fontSize: '9px',
-              padding: '2px 5px',
-              borderRadius: '3px',
-              backgroundColor: `${tool.color}20`,
-              color: tool.color,
-              display: 'inline-block',
-              fontWeight: '600'
-            }}>
+            <div className="sidebar-tool-card-desc">{tool.description}</div>
+            <div
+              className="sidebar-tool-card-category"
+              style={{
+                backgroundColor: `${tool.color}20`,
+                color: tool.color,
+              }}
+            >
               {tool.category}
             </div>
           </div>
@@ -299,7 +292,13 @@ const Sidebar = forwardRef(function Sidebar(
         </div>
         <button
           type="button"
-          className="sidebar-toggle"
+          className={[
+            'sidebar-toggle',
+            layoutCompact ? 'sidebar-toggle--mobile-close' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          {...(layoutCompact ? { 'data-drawer-initial-focus': '' } : {})}
           onClick={() => {
             if (layoutCompact) {
               onCloseMobileNav();
@@ -361,7 +360,7 @@ const Sidebar = forwardRef(function Sidebar(
             const NavButton = (
               <button
                 key={item.id}
-                className={`nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                className={`nav-item ${isNavPathActive(item.path) ? 'active' : ''}`}
                 onClick={() => handleNavClick(item.path)}
                 title={effectiveCollapsed ? item.label : ''}
               >
@@ -383,10 +382,18 @@ const Sidebar = forwardRef(function Sidebar(
         {/* Medical Tools Section - Enhanced */}
         {!effectiveCollapsed && (
           <div className="sidebar-section">
-            <div 
-              className="section-header"
+            <div
+              className="section-header sidebar-section-header-toggle"
+              role="button"
+              tabIndex={0}
+              aria-expanded={showToolsSection}
               onClick={() => setShowToolsSection(!showToolsSection)}
-              style={{ cursor: 'pointer', userSelect: 'none' }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setShowToolsSection((open) => !open);
+                }
+              }}
             >
               <span className="section-icon section-icon--svg" aria-hidden>
                 <NavIcon icon={CHROME_ICONS.tools} size={16} />
@@ -407,19 +414,11 @@ const Sidebar = forwardRef(function Sidebar(
               </span>
             </div>
 
-            <div style={{ padding: '8px 4px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="sidebar-workspace-controls">
               <select
+                className="sidebar-workspace-select"
                 value={activeWorkspaceId}
                 onChange={(e) => setActiveWorkspaceId(e.target.value)}
-                style={{
-                  width: '100%',
-                  background: 'var(--panel-background)',
-                  border: '1px solid var(--panel-border)',
-                  color: 'var(--text-color)',
-                  borderRadius: '8px',
-                  padding: '6px 8px',
-                  fontSize: '12px'
-                }}
               >
                 {workspaces.map((workspace) => (
                   <option key={workspace.id} value={workspace.id}>
@@ -428,25 +427,9 @@ const Sidebar = forwardRef(function Sidebar(
                 ))}
               </select>
               <button
+                type="button"
+                className="sidebar-workspace-new-btn"
                 onClick={() => setShowWorkspaceModal(true)}
-                style={{
-                  width: '100%',
-                  background: 'linear-gradient(135deg, var(--accent-1), var(--accent-2))',
-                  border: 'none',
-                  color: 'var(--navy-ink)',
-                  borderRadius: '8px',
-                  padding: '6px 8px',
-                  fontSize: '12px',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
               >
                 <span>+</span>
                 <span>New Workspace</span>

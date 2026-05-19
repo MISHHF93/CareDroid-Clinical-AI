@@ -7,6 +7,8 @@
   min-height: var(--app-viewport-height, 100dvh);
   height: var(--app-viewport-height, 100dvh);
   width: 280px;
+  max-width: 100%;
+  min-width: 0;
   max-height: var(--app-viewport-height, 100dvh);
   background: linear-gradient(
     180deg,
@@ -17,10 +19,12 @@
   border-right: 1px solid var(--sidebar-border);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   z-index: 1000;
   transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--sidebar-shadow);
   color: var(--sidebar-fg);
+  box-sizing: border-box;
 }
 
 .sidebar-collapsed {
@@ -35,6 +39,7 @@
   align-items: center;
   justify-content: space-between;
   min-height: 72px;
+  flex-shrink: 0;
 }
 
 .sidebar-logo {
@@ -104,6 +109,15 @@
 .sidebar-toggle:focus-visible {
   outline: 2px solid var(--sidebar-focus-ring);
   outline-offset: 2px;
+}
+
+.sidebar-toggle--mobile-close {
+  flex-shrink: 0;
+  min-width: var(--app-min-touch-target, 44px);
+  min-height: var(--app-min-touch-target, 44px);
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
 }
 
 /* User Profile */
@@ -366,7 +380,7 @@
 /* Clinical Tools */
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -541,6 +555,10 @@
 .recent-tool-name {
   font-weight: 600;
   text-align: left;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .tools-clear-btn {
@@ -610,6 +628,10 @@
   color: var(--sidebar-tool-name-fg);
   text-align: center;
   line-height: 1.3;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+  min-width: 0;
 }
 
 /* Conversations */
@@ -671,6 +693,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .footer-action {
@@ -804,6 +827,117 @@
   word-break: break-word;
 }
 
+.sidebar-tool-card-body {
+  flex: 1;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sidebar-tool-card-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-primary, #1a1a1a);
+  margin-bottom: 2px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sidebar-tool-card-title-row .sidebar-tool-card-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.sidebar-tool-card-shortcut {
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background-color: var(--panel-border, #e0e0e0);
+  color: var(--text-secondary, #666);
+  font-family: monospace;
+  font-weight: 500;
+  flex-shrink: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.sidebar-tool-card-desc {
+  font-size: 10px;
+  color: var(--text-secondary, #666);
+  line-height: 1.3;
+  margin-bottom: 4px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.sidebar-tool-card-category {
+  font-size: 9px;
+  padding: 2px 5px;
+  border-radius: 3px;
+  display: inline-block;
+  font-weight: 600;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.sidebar-workspace-controls {
+  padding: 8px 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.sidebar-workspace-select,
+.sidebar-workspace-new-btn {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.sidebar-workspace-select {
+  background: var(--panel-background);
+  border: 1px solid var(--panel-border);
+  color: var(--text-color);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  min-height: var(--app-min-touch-target, 44px);
+}
+
+.sidebar-workspace-new-btn {
+  background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+  border: none;
+  color: var(--navy-ink);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--app-min-touch-target, 44px);
+}
+
+.sidebar-section-header-toggle {
+  cursor: pointer;
+  user-select: none;
+}
+
+.sidebar-section-header-toggle:focus-visible {
+  outline: 2px solid var(--sidebar-focus-ring);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
 .sidebar-tools-quick-action span:last-child {
   min-width: 0;
   overflow-wrap: anywhere;
@@ -813,18 +947,51 @@
 /* Compact shell: off-canvas drawer (classes set from AppShell + Sidebar) */
 @media (max-width: 900px) {
   .sidebar.sidebar--compact {
-    width: min(280px, 88vw);
+    width: min(280px, min(100vw, 88vw));
     max-width: 100vw;
     transform: translateX(-100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    visibility: hidden;
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      visibility 0s linear 0.3s;
     z-index: 950;
     pointer-events: none;
   }
 
   .sidebar.sidebar--compact.sidebar--open {
     transform: translateX(0);
+    visibility: visible;
+    transition:
+      transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      visibility 0s linear 0s;
     box-shadow: var(--sidebar-mobile-drawer-shadow);
     pointer-events: auto;
+  }
+
+  .sidebar.sidebar--compact .tools-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar.sidebar--compact .sidebar-header {
+    padding-inline: 12px 16px;
+  }
+
+  .sidebar.sidebar--compact .sidebar-content {
+    padding-inline: 12px;
+  }
+
+  .sidebar.sidebar--compact .sidebar-footer {
+    padding-inline: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar.sidebar--compact {
+    transition: none;
+  }
+
+  .sidebar.sidebar--compact.sidebar--open {
+    transition: none;
   }
 }
 

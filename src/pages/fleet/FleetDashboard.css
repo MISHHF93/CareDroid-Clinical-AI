@@ -5,6 +5,7 @@
   margin: 0 auto;
   padding: 24px 20px 48px;
   box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .fleet-dashboard-header {
@@ -97,9 +98,11 @@
 
 .fleet-stat-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
   gap: 12px;
   margin-bottom: 24px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .fleet-stat-card {
@@ -108,6 +111,9 @@
   border: 1px solid var(--app-panel-border);
   background: var(--app-surface-1);
   box-shadow: var(--app-shadow-1);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .fleet-stat-card--accent {
@@ -121,14 +127,16 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.03em;
+  overflow-wrap: anywhere;
 }
 
 .fleet-stat-value {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: clamp(1.25rem, 6vw, 1.75rem);
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
+  overflow-wrap: anywhere;
 }
 
 .fleet-stat-hint {
@@ -158,6 +166,9 @@
   border-radius: 12px;
   border: 1px solid var(--app-panel-border);
   background: var(--app-surface-1);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .fleet-vehicle-card-header {
@@ -174,12 +185,15 @@
   font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .fleet-vehicle-id {
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
+  overflow-wrap: anywhere;
 }
 
 .fleet-badge-row {
@@ -221,10 +235,11 @@
 
 .fleet-vehicle-metrics {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr));
   gap: 10px;
   margin: 0;
   padding: 0;
+  min-width: 0;
 }
 
 .fleet-vehicle-metric dt {
@@ -256,8 +271,10 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 120px), 1fr));
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .fleet-maintenance-card {
@@ -266,6 +283,9 @@
   border: 1px solid var(--app-panel-border);
   background: var(--app-surface-1);
   text-align: center;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .fleet-maintenance-count {
@@ -348,11 +368,7 @@
   }
 
   .fleet-stat-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .fleet-stat-value {
-    font-size: 1.5rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .fleet-vehicle-card-header {
@@ -365,6 +381,29 @@
   }
 
   .fleet-vehicle-metrics {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
+  }
+
+  .fleet-maintenance-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 380px) {
+  .fleet-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 320px) {
+  .fleet-dashboard {
+    padding: 12px 10px 28px;
+  }
+
+  .fleet-dashboard-loading,
+  .fleet-dashboard-error,
+  .fleet-dashboard-empty {
+    padding: 24px 12px;
+    min-height: 180px;
   }
 }

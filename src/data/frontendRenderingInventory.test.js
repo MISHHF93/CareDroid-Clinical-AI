@@ -135,17 +135,18 @@ describe('frontend rendering — App.jsx routes', () => {
     expect(appSource).toContain('<ClinicalToolCatalog />');
   });
 
-  it.each(CALCULATOR_ROUTE_DEFS.filter((d) =>
-    ROADMAP_TIER_A_IDS.some((id) => d.calculatorSlug === id || d.calculatorSlug.replace(/-/g, '') === id)
-  ))('App route for calculator slug %s', (def) => {
+  it('derives Tier A calculator routes from CALCULATOR_ROUTE_DEFS in App.jsx', () => {
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('initialCalculatorId={calculatorSlug}');
     const roadmapSlugs = buildFrontendRenderingInventory()
       .filter((r) => r.tier === 'A')
       .map((r) => r.builtinSlug);
-    if (!roadmapSlugs.includes(def.calculatorSlug)) return;
-    expect(
-      appSource.includes(`path: '${def.path}'`) ||
-        appSource.includes(`initialCalculatorId="${def.calculatorSlug}"`)
-    ).toBe(true);
+    for (const slug of roadmapSlugs) {
+      expect(
+        CALCULATOR_ROUTE_DEFS.some((d) => d.calculatorSlug === slug),
+        slug
+      ).toBe(true);
+    }
   });
 
   it('registers fleet catch-all fallback', () => {

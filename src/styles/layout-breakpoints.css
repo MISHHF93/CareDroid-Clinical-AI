@@ -12,5 +12,11 @@
 @media (min-width: 0) {
   :root {
     --layout-breakpoints-doc: 1;
+    /* Compact shell: floating menu + theme control row (see AppShell.css) */
+    --app-compact-chrome-height: 52px;
+    --app-compact-chrome-height-landscape: 44px;
+    --app-compact-content-offset-top: var(--app-compact-chrome-height);
+    --app-shell-page-gutter-inline: var(--app-fluid-page-gutter, clamp(12px, 2.2vw, 32px));
+    --app-shell-page-gutter-block: clamp(12px, 2vw, 24px);
   }
 }

@@ -1,10 +1,14 @@
 .analytics-dashboard {
   padding: 32px;
   max-width: 1280px;
+  width: 100%;
+  min-width: 0;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .analytics-header {
@@ -16,13 +20,19 @@
 
 .analytics-header h1,
 .analytics-page-title {
-  font-size: 32px;
+  font-size: clamp(1.25rem, 4vw + 0.5rem, 2rem);
   margin-bottom: 6px;
   color: var(--text-primary);
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.25;
 }
 
 .analytics-page-title {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
   margin-top: 0;
@@ -70,8 +80,10 @@
 
 .analytics-summary {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .summary-card {
@@ -104,8 +116,10 @@
 
 .analytics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .analytics-panel {
@@ -116,6 +130,9 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .analytics-panel h2 {
@@ -125,17 +142,23 @@
 
 .analytics-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .analytics-row-label {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex: 1;
+  flex: 1 1 8rem;
+  min-width: 0;
   font-size: 13px;
   color: var(--text-primary);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .analytics-row-bar {
@@ -194,8 +217,10 @@
 
 .recommendation-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .recommendation-card {
@@ -255,5 +280,31 @@
   .analytics-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .analytics-summary,
+  .analytics-grid,
+  .recommendation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-row-bar {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 320px) {
+  .analytics-dashboard {
+    padding: 12px 10px;
+  }
+
+  .analytics-panel,
+  .summary-card {
+    padding: 14px;
+  }
+
+  .analytics-recommendations {
+    padding: 16px;
   }
 }

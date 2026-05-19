@@ -1979,7 +1979,11 @@ const MeldCalculator = ({ mode = 'meld', onResultChange }) => {
   };
 
   return (
-    <div className="calculator-interface calculator-interface--meld">
+    <div
+      className={`calculator-interface calculator-interface--meld${
+        includeMeldNa ? ' calculator-interface--meld-na' : ''
+      }`}
+    >
       <div className="calculator-inputs">
         <CalcPanelTitle icon={icon}>
           <span id={formTitleId}>{title}</span>

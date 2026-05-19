@@ -1,0 +1,260 @@
+/**
+ * App-wide responsive typography, spacing, and touch targets.
+ * Loaded after layout-breakpoints.css; feature CSS may override locally.
+ */
+
+:root {
+  --app-type-display: clamp(1.35rem, 5vw + 0.5rem, 2.625rem);
+  --app-type-title: clamp(1.25rem, 4vw + 0.5rem, 2rem);
+  --app-type-heading: clamp(1.0625rem, 3vw + 0.5rem, 1.5rem);
+  --app-type-body: clamp(0.875rem, 1.5vw + 0.5rem, 1rem);
+  --app-type-caption: clamp(0.75rem, 1vw + 0.45rem, 0.8125rem);
+  --app-space-field: clamp(12px, 2.5vw, 16px);
+  --app-space-field-lg: clamp(16px, 3vw, 20px);
+  --app-card-padding-compact: clamp(12px, 3vw, 18px);
+  --app-callout-padding-compact: clamp(10px, 2.5vw, 12px);
+}
+
+/* —— Headings: prevent overflow in primary app surfaces —— */
+.app-scroll-container h1,
+.app-scroll-container h2,
+:is(
+    .tool-page,
+    .calculators-content,
+    .clinical-tool-catalog,
+    .analytics-dashboard,
+    .cost-analytics-dashboard,
+    .tools-overview,
+    .audit-logs-container,
+    [class*='fleet-page'],
+    [class*='fleet-dashboard'],
+    [class*='predictive-maintenance'],
+    [class*='route-optimizer']
+  )
+  :is(h1, h2, h3) {
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.3;
+}
+
+.analytics-header h1,
+.analytics-page-title {
+  font-size: var(--app-type-title);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.tools-overview .header-content h1 {
+  font-size: var(--app-type-display);
+  max-width: 100%;
+}
+
+.tools-overview .header-subtitle {
+  font-size: var(--app-type-body);
+  overflow-wrap: anywhere;
+}
+
+.cost-header h1,
+.cost-header-title {
+  font-size: var(--app-type-title);
+  overflow-wrap: anywhere;
+}
+
+/* —— Long clinical / tool names —— */
+.catalog-tool-name-cell,
+.calculator-name,
+.calculator-panel-title-text,
+.tools-chat-only-name,
+.tools-recent-name,
+.tool-name,
+.recent-tool-name,
+.sidebar-tool-label,
+.catalog-tool-name-cell strong {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* —— Icon + text rows —— */
+.calculator-panel-title,
+.calculator-card-header,
+.tool-header-left,
+.analytics-page-title,
+.fleet-page-header h1,
+.tool-result-card-header,
+.catalog-tool-name-cell {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.calculator-panel-title > svg,
+.calculator-panel-title [class*='nav-icon'],
+.calculator-panel-title [class*='icon'],
+.tool-header-icon,
+.analytics-page-title-icon,
+.tool-result-card-icon {
+  flex-shrink: 0;
+}
+
+/* —— Badges, chips, pills —— */
+[class*='badge'],
+[class*='chip'],
+[class*='pill'],
+[class*='tag'],
+.badge,
+.catalog-badge,
+.catalog-inline-badge,
+.tool-category-badge,
+.tool-shortcut-badge,
+.tool-card-pill,
+.tool-card-tag,
+.analytics-badge {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  box-sizing: border-box;
+}
+
+.catalog-category-chips,
+.tool-header-meta,
+.analytics-header-actions {
+  flex-wrap: wrap;
+}
+
+/* —— Form control spacing (dense clinical forms) —— */
+.calculators-content .calc-input-group,
+.calculators-content .calc-input-row,
+.tool-page .input-wrapper,
+.tool-page .input-field,
+.app-scroll-container select.input-field,
+.app-scroll-container textarea.input-field {
+  margin-bottom: var(--app-space-field);
+}
+
+.calculators-content .calc-input-group:last-child,
+.calculators-content .calc-has-bled-criteria,
+.calculators-content .calc-timi-criteria {
+  margin-bottom: var(--app-space-field-lg);
+}
+
+/* —— Touch targets (primary actions; not icon-only / sr-only) —— */
+@media (max-width: 640px) {
+  .app-scroll-container
+    :is(
+      button.btn,
+      a.btn,
+      .btn,
+      .btn-primary,
+      .btn-secondary,
+      .btn-ghost,
+      .btn-danger,
+      .btn-success,
+      .btn-share-tool,
+      .catalog-btn,
+      .calc-calculate-btn,
+      .calc-chat-assisted-card,
+      .tools-chat-only-card,
+      .tool-card-large,
+      .btn-chat-tool
+    ):not(.btn-icon-only):not([class*='sr-only']) {
+    min-height: var(--app-min-touch-target, 44px);
+    touch-action: manipulation;
+  }
+
+  .app-scroll-container input:not([type='checkbox']):not([type='radio']),
+  .app-scroll-container select,
+  .app-scroll-container textarea,
+  .calc-input-field,
+  .calc-select-field {
+    min-height: var(--app-min-touch-target, 44px);
+    font-size: max(16px, var(--app-type-body));
+  }
+}
+
+/* —— Card padding on small screens —— */
+@media (max-width: 640px) {
+  :is(
+      .tool-header,
+      .calculator-card,
+      .summary-card,
+      .cost-card,
+      .analytics-panel,
+      .catalog-stat,
+      .tool-card-large,
+      .tip-card
+    ) {
+    padding: var(--app-card-padding-compact);
+  }
+
+  .tool-page {
+    padding: clamp(12px, 3vw, 20px);
+  }
+
+  .calculators-content,
+  .clinical-tool-catalog {
+    padding: clamp(12px, 3vw, 20px);
+  }
+}
+
+/* —— Warning / disclaimer callouts: visible but not layout-breaking —— */
+@media (max-width: 640px) {
+  :is(
+      .clinical-ds-disclaimer,
+      .tool-card-notice,
+      .calc-qsofa-disclaimer,
+      .calc-news2-disclaimer,
+      .calc-child-pugh-disclaimer,
+      .calc-has-bled-disclaimer,
+      .calc-meld-disclaimer,
+      .calc-timi-disclaimer,
+      .calc-validation-errors,
+      .calc-has-bled-anticoag-warning,
+      .calc-news2-scale2-warning,
+      .calc-phq9-q9-inline-warning,
+      .calc-phq9-q9-form-warning,
+      .calc-phq9-q9-result-warning,
+      .calc-phq9-high-symptom-warning,
+      .calc-gad7-severe-warning,
+      .calc-gad7-moderate-warning,
+      .calc-interpretation-box
+    ) {
+    padding: var(--app-callout-padding-compact);
+    font-size: var(--app-type-caption);
+    line-height: 1.5;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .calc-interpretation-title {
+    font-size: var(--app-type-body);
+  }
+
+  .tools-tips {
+    padding: clamp(20px, 5vw, 32px);
+  }
+
+  .tools-tips h2,
+  .tools-tips-title {
+    font-size: var(--app-type-heading);
+    flex-wrap: wrap;
+    text-align: center;
+  }
+}
+
+@media (max-width: 320px) {
+  .tools-overview .header-stats {
+    gap: 16px;
+  }
+
+  .stat-number {
+    font-size: clamp(1.5rem, 8vw, 2rem);
+  }
+}

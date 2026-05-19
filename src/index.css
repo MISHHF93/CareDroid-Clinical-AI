@@ -56,6 +56,7 @@ body {
 #root {
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   min-height: 100dvh;
   min-height: var(--app-viewport-height, 100dvh);
   height: 100dvh;
@@ -63,6 +64,7 @@ body {
   position: relative;
   box-sizing: border-box;
   overflow: hidden;
+  overflow-x: clip;
   overscroll-behavior: none;
   display: flex;
   flex-direction: column;
@@ -116,6 +118,8 @@ code {
   padding: 12px 18px;
   font-weight: 600;
   cursor: pointer;
+  min-height: var(--app-min-touch-target, 44px);
+  box-sizing: border-box;
 }
 
 .btn-ghost {
@@ -125,6 +129,8 @@ code {
   border-radius: var(--radius-md);
   padding: 10px 14px;
   cursor: pointer;
+  min-height: var(--app-min-touch-target, 44px);
+  box-sizing: border-box;
 }
 
 .badge {

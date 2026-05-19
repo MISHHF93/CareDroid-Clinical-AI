@@ -1,0 +1,78 @@
+/**
+ * Sidebar responsive navigation contracts — drawer, scroll, labels, a11y.
+ */
+
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { describe, it, expect } from 'vitest';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const sidebarCss = readFileSync(join(__dirname, 'Sidebar.css'), 'utf8');
+const sidebarJsx = readFileSync(join(__dirname, 'Sidebar.jsx'), 'utf8');
+const drawerFocusJs = readFileSync(join(__dirname, '../hooks/useDrawerFocus.js'), 'utf8');
+const appShellJsx = readFileSync(join(__dirname, '../layout/AppShell.jsx'), 'utf8');
+
+describe('Sidebar responsive — mobile drawer', () => {
+  it('off-canvas drawer does not intercept pointer events when closed', () => {
+    expect(sidebarCss).toMatch(
+      /\.sidebar\.sidebar--compact[\s\S]*pointer-events:\s*none/
+    );
+    expect(sidebarCss).toMatch(
+      /\.sidebar\.sidebar--compact\.sidebar--open[\s\S]*pointer-events:\s*auto/
+    );
+    expect(sidebarCss).toMatch(/translateX\(-100%\)/);
+  });
+
+  it('provides mobile close control with touch target and initial focus hook', () => {
+    expect(sidebarJsx).toContain('sidebar-toggle--mobile-close');
+    expect(sidebarJsx).toContain('data-drawer-initial-focus');
+    expect(sidebarJsx).toMatch(/layoutCompact \? 'Close menu'/);
+    expect(drawerFocusJs).toContain('[data-drawer-initial-focus]');
+  });
+
+  it('marks closed compact drawer inert and hides from assistive tech', () => {
+    expect(sidebarJsx).toContain("setAttribute('inert'");
+    expect(sidebarJsx).toMatch(/aria-hidden=\{layoutCompact && !mobileNavOpen/);
+  });
+
+  it('AppShell wires backdrop, escape, and focus trap', () => {
+    expect(appShellJsx).toContain('app-shell-nav-backdrop');
+    expect(appShellJsx).toContain('useDrawerFocus');
+    expect(appShellJsx).toMatch(/e\.key === 'Escape'/);
+  });
+});
+
+describe('Sidebar responsive — scroll and labels', () => {
+  it('sidebar content scrolls independently with overflow hidden on shell', () => {
+    expect(sidebarCss).toMatch(/\.sidebar-content[\s\S]*overflow-y:\s*auto/);
+    expect(sidebarCss).toMatch(/\.sidebar-content[\s\S]*min-height:\s*0/);
+    expect(sidebarCss).toMatch(/\.sidebar[\s\S]*overflow:\s*hidden/);
+  });
+
+  it('tool and nav labels wrap without horizontal overflow', () => {
+    expect(sidebarCss).toContain('.sidebar-tool-card-title-row');
+    expect(sidebarCss).toMatch(/\.nav-label[\s\S]*overflow-wrap:\s*anywhere/);
+    expect(sidebarCss).toMatch(/\.sidebar-tool-card-name[\s\S]*overflow-wrap:\s*anywhere/);
+  });
+});
+
+describe('Sidebar responsive — desktop collapse unchanged', () => {
+  it('keeps collapsed width token at 70px', () => {
+    expect(sidebarCss).toMatch(/\.sidebar-collapsed[\s\S]*width:\s*70px/);
+    expect(sidebarJsx).toContain('sidebar-collapsed');
+    expect(sidebarJsx).toMatch(/effectiveCollapsed = layoutCompact \? false : sidebarCollapsed/);
+  });
+});
+
+describe('Sidebar responsive — active routes and keyboard', () => {
+  it('uses nested path matching for nav items', () => {
+    expect(sidebarJsx).toContain('isNavPathActive');
+    expect(sidebarJsx).toMatch(/isNavPathActive\(item\.path\)/);
+  });
+
+  it('tools section header is keyboard operable', () => {
+    expect(sidebarJsx).toContain('sidebar-section-header-toggle');
+    expect(sidebarJsx).toMatch(/e\.key === 'Enter' \|\| e\.key === ' '/);
+  });
+});

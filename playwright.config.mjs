@@ -6,15 +6,21 @@ export default defineConfig({
   testDir: './e2e',
   testMatch: 'responsive-qa.spec.mjs',
   globalSetup: './e2e/global-setup.mjs',
-  timeout: 90_000,
+  timeout: 120_000,
   expect: { timeout: 15_000 },
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
-  retries: 1,
-  workers: 2,
+  retries: process.env.QA_RETRIES != null ? Number(process.env.QA_RETRIES) : 1,
+  workers: Number(process.env.QA_WORKERS) || 2,
   reporter: [
     ['list'],
-    ['json', { outputFile: 'qa/playwright-responsive-report.json' }],
+    [
+      'json',
+      {
+        outputFile:
+          process.env.QA_JSON_REPORT || 'qa/playwright-responsive-report.json',
+      },
+    ],
   ],
   use: {
     baseURL,

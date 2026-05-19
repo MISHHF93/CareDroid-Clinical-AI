@@ -2,10 +2,14 @@
 
 .audit-logs-container {
   max-width: 1400px;
+  width: 100%;
+  min-width: 0;
   margin: 0 auto;
   padding: 2rem;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .audit-logs-header {
@@ -116,10 +120,12 @@
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
   gap: 1rem;
   padding: 1rem;
   background: var(--app-surface-1);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .stat-card {
@@ -168,9 +174,11 @@
 
 .filter-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
   gap: 1rem;
   margin-bottom: 1rem;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .filter-group {
@@ -257,6 +265,9 @@
   background: var(--app-surface-1);
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
 }
 
 .spinner {
@@ -288,24 +299,33 @@
   text-align: center;
   color: #999;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
 }
 
 /* Logs Table */
 .logs-table-container {
   background: var(--app-surface-1);
   border-radius: 8px;
-  overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .logs-table {
   width: 100%;
+  min-width: min(100%, 40rem);
   border-collapse: collapse;
   font-size: 0.9rem;
 }
 
 .logs-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
   color: var(--app-on-solid);
   font-weight: 600;
@@ -315,6 +335,14 @@
   padding: 1rem;
   text-align: left;
   border-bottom: 2px solid var(--primary-color);
+  white-space: nowrap;
+}
+
+.logs-table td {
+  padding: 1rem;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 20rem;
 }
 
 .logs-table tbody tr {
@@ -324,10 +352,6 @@
 
 .logs-table tbody tr:hover {
   background: #f8f9fa;
-}
-
-.logs-table td {
-  padding: 1rem;
 }
 
 .logs-table .timestamp {

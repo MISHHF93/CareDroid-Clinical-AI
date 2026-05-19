@@ -8,6 +8,7 @@
 import {
   CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+  FLEET_TIER_B_CHAT_REGISTRY_IDS,
   REGISTRY,
 } from './clinicalToolIdContract.js';
 
@@ -133,7 +134,10 @@ export function buildResponsiveQaPages() {
     });
   }
 
-  for (const registryId of CLINICAL_TIER_B_CHAT_REGISTRY_IDS) {
+  for (const registryId of [
+    ...CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+    ...FLEET_TIER_B_CHAT_REGISTRY_IDS,
+  ]) {
     pages.push({
       id: `tier-b-${registryId}`,
       label: `Tier B launch: ${TIER_B_LABEL_BY_REGISTRY_ID[registryId] || registryId}`,
@@ -207,7 +211,7 @@ export function formatResponsiveQaMatrixMarkdown() {
     '',
     '## Rules',
     '',
-    '- No horizontal scroll on `document` except inside designated data-table wrappers (`.catalog-table-wrap`).',
+    '- No horizontal scroll on `document` except inside designated data-table wrappers (`.catalog-table-wrap`, `.fleet-data-table-wrap`, `.logs-table-container`, `.tool-card-table-wrap`, `.cost-chart`).',
     '- Small-screen failures are blocking.',
     '',
   ];

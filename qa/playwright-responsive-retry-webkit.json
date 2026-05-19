@@ -1,0 +1,332 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\borah\\CareDroid-Clinical-AI\\playwright.config.mjs",
+    "rootDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "C:\\Users\\borah\\CareDroid-Clinical-AI\\e2e\\global-setup.mjs",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/borah/CareDroid-Clinical-AI/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "responsive-qa.spec.mjs"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "C:/Users/borah/CareDroid-Clinical-AI/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "responsive-qa.spec.mjs"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "C:/Users/borah/CareDroid-Clinical-AI/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "responsive-qa.spec.mjs"
+        ],
+        "timeout": 120000
+      },
+      {
+        "outputDir": "C:/Users/borah/CareDroid-Clinical-AI/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "msedge",
+        "name": "msedge",
+        "testDir": "C:/Users/borah/CareDroid-Clinical-AI/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "responsive-qa.spec.mjs"
+        ],
+        "timeout": 120000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\playwright-responsive-retry-webkit.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:8000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "responsive-qa.spec.mjs",
+      "file": "responsive-qa.spec.mjs",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "dashboard @ 320x568",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 11909,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-19T15:45:35.625Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "overflow-report",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYXNzIjogdHJ1ZSwKICAiZG9jT3ZlcmZsb3dQeCI6IDAsCiAgIm9mZmVuZGVycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b41ae717b7742383aa53-ca20254f1723b0f894bf",
+          "file": "responsive-qa.spec.mjs",
+          "line": 53,
+          "column": 5
+        },
+        {
+          "title": "tier-a-has-bled @ 414x896",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 16455,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-19T15:45:49.334Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "overflow-report",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYXNzIjogdHJ1ZSwKICAiZG9jT3ZlcmZsb3dQeCI6IDAsCiAgIm9mZmVuZGVycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b41ae717b7742383aa53-6ab4d9cba3c56af3e2db",
+          "file": "responsive-qa.spec.mjs",
+          "line": 53,
+          "column": 5
+        },
+        {
+          "title": "tier-a-has-bled @ 768x1024",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 18521,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-19T15:46:05.821Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "overflow-report",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYXNzIjogdHJ1ZSwKICAiZG9jT3ZlcmZsb3dQeCI6IDAsCiAgIm9mZmVuZGVycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b41ae717b7742383aa53-1229a5a1e86cdc3fb878",
+          "file": "responsive-qa.spec.mjs",
+          "line": 53,
+          "column": 5
+        },
+        {
+          "title": "tier-b-wells-pe @ 1280x720",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 18430,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-19T15:46:24.365Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "overflow-report",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYXNzIjogdHJ1ZSwKICAiZG9jT3ZlcmZsb3dQeCI6IDAsCiAgIm9mZmVuZGVycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b41ae717b7742383aa53-5301ce96b488325363a8",
+          "file": "responsive-qa.spec.mjs",
+          "line": 53,
+          "column": 5
+        },
+        {
+          "title": "tier-b-wells-pe @ 1440x900",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "webkit",
+              "projectName": "webkit",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 17667,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-05-19T15:46:42.825Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "overflow-report",
+                      "contentType": "application/json",
+                      "body": "ewogICJwYXNzIjogdHJ1ZSwKICAiZG9jT3ZlcmZsb3dQeCI6IDAsCiAgIm9mZmVuZGVycyI6IFtdCn0="
+                    }
+                  ]
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "b41ae717b7742383aa53-69492737022fdd307f60",
+          "file": "responsive-qa.spec.mjs",
+          "line": 53,
+          "column": 5
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-05-19T15:45:30.047Z",
+    "duration": 91033.42599999999,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

@@ -19,6 +19,7 @@ import {
   expectedLaunchPath,
   isKnownToolAreaPath,
   matchCalculatorRoute,
+  resolveToolsAreaRedirect,
 } from './clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -120,6 +121,10 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
   it('unknown tool paths are not marked known', () => {
     expect(isKnownToolAreaPath('/tools/not-a-real-tool-xyz')).toBe(false);
     expect(isKnownToolAreaPath('/fleet/unknown-fleet-page')).toBe(false);
+  });
+
+  it('does not redirect unknown calculator subpaths (ToolsAreaFallback shows not found)', () => {
+    expect(resolveToolsAreaRedirect('/tools/calculators/not-a-real-calc-xyz')).toBeNull();
   });
 
   it('toolRegistry paths are subset of known tool area paths', () => {

@@ -56,5 +56,22 @@ describe('ClinicalToolCatalog responsive layout', () => {
   it('scopes catalog container to full width with safe box sizing', () => {
     expect(catalogCss).toMatch(/\.clinical-tool-catalog[\s\S]*width:\s*100%/);
     expect(catalogCss).toMatch(/\.clinical-tool-catalog[\s\S]*box-sizing:\s*border-box/);
+    expect(catalogCss).toMatch(/\.clinical-tool-catalog[\s\S]*overflow-x:\s*clip/);
+  });
+
+  it('uses wrapping category quick-filter chips', () => {
+    expect(catalogJsx).toContain('catalog-category-chips');
+    expect(catalogJsx).toContain('CATEGORY_QUICK_FILTERS');
+    expect(catalogCss).toMatch(/\.catalog-category-chips[\s\S]*flex-wrap:\s*wrap/);
+  });
+
+  it('stacks all catalog tables on mobile with data-label cards', () => {
+    expect(catalogJsx).toMatch(/catalog-table-wrap catalog-table-wrap--stacked/);
+    expect(catalogJsx).toContain('data-label="Actions"');
+    expect(catalogCss).toMatch(/@media \(max-width: 320px\)/);
+  });
+
+  it('avoids fixed unsafe widths on source cells', () => {
+    expect(catalogCss).toContain('max-width: min(280px, 100%)');
   });
 });

@@ -3,6 +3,7 @@
   position: relative;
   width: 100%;
   max-width: 100%;
+  min-width: 0;
   min-height: 100dvh;
   min-height: var(--app-viewport-height, 100dvh);
   height: 100dvh;
@@ -29,16 +30,20 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Main column: flex child beside fixed sidebar; scroll lives in .app-shell-page-body */
 .app-shell-main-wrap {
   position: relative;
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100%;
   min-width: 0;
   min-height: 0;
   height: 100%;
   max-height: 100%;
   overflow: hidden;
+  overflow-x: clip;
   box-sizing: border-box;
   margin-left: var(--app-main-inset, 280px);
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -46,12 +51,8 @@
 
 .app-shell--compact .app-shell-main-wrap {
   margin-left: 0;
-}
-
-.app-shell--compact.app-shell--authed .app-shell-main-wrap {
-  padding-top: 52px;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
 }
 
 .app-shell-menu-btn {
@@ -127,38 +128,63 @@
   border-color: var(--accent-green);
 }
 
-/* Authed page column: fills shell; keeps flex min-size math correct on all widths */
+/* Authed page column: primary vertical scrollport for tool/fleet/settings pages */
 .app-shell-page-body {
-  flex: 1;
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  min-width: 0;
+  align-items: stretch;
+  width: 100%;
   max-width: 100%;
+  min-width: 0;
   min-height: 0;
   height: 100%;
   max-height: 100%;
+  overflow-x: clip;
   overflow-y: auto;
-  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
+  overscroll-behavior-x: none;
   -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable;
-  padding-bottom: var(--app-keyboard-inset-bottom, 0px);
+  padding-bottom: max(var(--app-shell-page-gutter-block, 12px), var(--app-keyboard-inset-bottom, 0px));
+  box-sizing: border-box;
+}
+
+/* Reserve space under absolute menu/theme controls when compact (scroll + initial layout) */
+.app-shell--compact.app-shell--authed .app-shell-page-body {
+  padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
+  scroll-padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
 }
 
 .app-shell-page-body--conversation {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  overflow-x: clip;
   padding-bottom: 0;
   scrollbar-gutter: auto;
 }
 
+.app-shell--compact.app-shell--authed .app-shell-page-body--conversation {
+  padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
+  scroll-padding-top: 0;
+}
+
+/* Page roots fill scrollport without forcing horizontal overflow */
 .app-shell-page-body > * {
+  flex: 0 1 auto;
+  width: 100%;
   max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .app-shell-page-body--conversation > * {
   flex: 1 1 auto;
   min-height: 0;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 @media (max-width: 380px) {
@@ -193,10 +219,15 @@
   .app-shell-page-body {
     align-items: stretch;
   }
+
+  .app-shell-page-body > * {
+    max-width: min(100%, var(--app-content-max-width, 1760px));
+    margin-inline: auto;
+  }
 }
 
 @media (max-width: 900px) and (orientation: landscape) {
-  .app-shell--compact.app-shell--authed .app-shell-main-wrap {
-    padding-top: 44px;
+  .app-shell--compact.app-shell--authed {
+    --app-compact-content-offset-top: var(--app-compact-chrome-height-landscape, 44px);
   }
 }

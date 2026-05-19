@@ -5,6 +5,7 @@
   margin: 0 auto;
   box-sizing: border-box;
   min-width: 0;
+  overflow-x: clip;
 }
 
 .clinical-tool-catalog-header {
@@ -81,8 +82,54 @@
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  align-items: center;
+  align-items: stretch;
   margin-bottom: 24px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.catalog-category-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  margin: -8px 0 16px;
+}
+
+.catalog-category-chip {
+  flex: 0 1 auto;
+  max-width: 100%;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--panel-border);
+  background: var(--panel-background);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-align: center;
+  min-height: 36px;
+  box-sizing: border-box;
+}
+
+.catalog-category-chip:hover {
+  border-color: var(--primary-color);
+  color: var(--text-primary);
+}
+
+.catalog-category-chip:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.catalog-category-chip--active {
+  background: color-mix(in srgb, var(--primary-color) 14%, var(--panel-background));
+  border-color: var(--primary-color);
+  color: var(--primary-color);
 }
 
 .catalog-search {
@@ -127,12 +174,17 @@
 
 .catalog-section {
   margin-bottom: 40px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .catalog-section h2 {
-  font-size: 22px;
+  font-size: clamp(1rem, 4vw + 0.5rem, 1.375rem);
   margin-bottom: 8px;
   color: var(--text-primary);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.3;
 }
 
 .catalog-section-desc {
@@ -145,9 +197,11 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   max-width: 100%;
+  min-width: 0;
   border: 1px solid var(--panel-border);
   border-radius: 12px;
   background: var(--panel-background);
+  box-sizing: border-box;
 }
 
 .catalog-table {
@@ -323,7 +377,22 @@
 .catalog-source-cell {
   font-size: 12px;
   color: var(--text-secondary);
-  max-width: 280px;
+  max-width: min(280px, 100%);
+}
+
+.catalog-table td code,
+.catalog-scan-locations code,
+.catalog-alias-list code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.catalog-table td:has(.catalog-badge) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 4px;
 }
 
 .catalog-details {
@@ -460,6 +529,10 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 4px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .catalog-tool-name-cell .catalog-inline-badge {
@@ -481,8 +554,9 @@
     padding: 16px;
   }
 
-  .catalog-table th:last-child,
-  .catalog-table td:last-child {
+  /* Sticky actions only on wide tables that still scroll horizontally */
+  .catalog-table-wrap:not(.catalog-table-wrap--stacked) .catalog-table th:last-child,
+  .catalog-table-wrap:not(.catalog-table-wrap--stacked) .catalog-table td:last-child {
     position: sticky;
     right: 0;
     z-index: 1;
@@ -490,7 +564,7 @@
     box-shadow: -8px 0 12px -8px rgba(15, 23, 42, 0.12);
   }
 
-  .catalog-table thead th:last-child {
+  .catalog-table-wrap:not(.catalog-table-wrap--stacked) .catalog-table thead th:last-child {
     background: var(--background-secondary, rgba(0, 0, 0, 0.03));
   }
 }
@@ -531,6 +605,17 @@
     flex: 1 1 auto;
     width: 100%;
     min-width: 0;
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .catalog-category-chips {
+    margin-bottom: 12px;
+  }
+
+  .catalog-category-chip {
+    min-height: 44px;
+    padding: 8px 12px;
   }
 
   .catalog-stats {
@@ -565,14 +650,18 @@
     padding: 10px 14px;
   }
 
-  /* Stacked card rows for primary catalog tables */
+  /* Stacked card rows for all catalog tables on mobile */
   .catalog-table-wrap--stacked {
     overflow-x: visible;
+    border: none;
+    background: transparent;
   }
 
   .catalog-table--stacked {
     width: 100%;
     min-width: 0;
+    border: none;
+    background: transparent;
   }
 
   .catalog-table--stacked thead {
@@ -586,6 +675,8 @@
     border: 1px solid var(--panel-border);
     border-radius: 12px;
     background: var(--panel-background);
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   .catalog-table--stacked tbody tr:last-child {
@@ -643,14 +734,24 @@
     gap: 6px;
   }
 
-  /* Secondary tables: hide non-critical columns, keep horizontal scroll */
-  .catalog-table:not(.catalog-table--stacked) {
-    font-size: 13px;
+  .catalog-table--stacked td.catalog-empty-row {
+    display: block;
+    grid-template-columns: 1fr;
+    text-align: center;
+    padding: 16px 8px;
   }
 
-  .catalog-table:not(.catalog-table--stacked) th,
-  .catalog-table:not(.catalog-table--stacked) td {
-    padding: 10px 8px;
+  .catalog-table--stacked td.catalog-empty-row::before {
+    content: none;
+    display: none;
+  }
+
+  .catalog-empty--global {
+    padding: 16px 12px;
+  }
+
+  .catalog-empty--global p {
+    font-size: 14px;
   }
 }
 
@@ -662,5 +763,40 @@
   .catalog-table--stacked .catalog-actions .catalog-btn {
     min-width: 100%;
     flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 320px) {
+  .clinical-tool-catalog {
+    padding: 8px 8px 20px;
+  }
+
+  .catalog-section--medical,
+  .catalog-section--highlight {
+    padding: 10px;
+  }
+
+  .catalog-table--stacked td {
+    grid-template-columns: minmax(60px, 36%) 1fr;
+    gap: 4px 8px;
+    padding: 8px 0;
+  }
+
+  .catalog-table--stacked tbody tr {
+    padding: 4px 8px 8px;
+  }
+
+  .catalog-stat-number {
+    font-size: 20px;
+  }
+
+  .catalog-category-chip {
+    flex: 1 1 calc(50% - 4px);
+    min-width: min(100%, 140px);
+  }
+
+  .catalog-empty-actions .catalog-btn {
+    width: 100%;
+    min-width: 0;
   }
 }

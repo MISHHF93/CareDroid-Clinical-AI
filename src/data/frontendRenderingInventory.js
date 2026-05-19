@@ -108,6 +108,13 @@ function nluApplies(registryId) {
   );
 }
 
+function appUsesDynamicCalculatorRoutes() {
+  return (
+    appSource.includes('CALCULATOR_ROUTE_DEFS.map') &&
+    appSource.includes('initialCalculatorId={calculatorSlug}')
+  );
+}
+
 function appRouteRegistered(registryId, builtinSlug, regPath) {
   if (FLEET_TIER_A_REGISTRY_IDS.includes(registryId)) {
     const spec = PR_FLEET_TOOL_SPECS[registryId];
@@ -118,8 +125,9 @@ function appRouteRegistered(registryId, builtinSlug, regPath) {
     );
   }
   if (builtinSlug) {
-    if (appSource.includes(`initialCalculatorId="${builtinSlug}"`)) return true;
     const def = CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === builtinSlug);
+    if (def && appUsesDynamicCalculatorRoutes()) return true;
+    if (appSource.includes(`initialCalculatorId="${builtinSlug}"`)) return true;
     if (def && appSource.includes(`path: '${def.path}'`)) return true;
   }
   if (regPath && appSource.includes(`path: '${regPath}'`)) return true;
