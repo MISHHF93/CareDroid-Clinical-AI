@@ -566,7 +566,7 @@ describe('8. Route validation', () => {
 
   it('returns empty launch for unknown fleet-like ids', () => {
     const empty = resolveCatalogLaunch('not-a-fleet-tool-xyz-123');
-    expect(empty.path).toBeNull();
+    expect(empty.path).toBe('/dashboard');
     expect(empty.registryId).toBeNull();
   });
 

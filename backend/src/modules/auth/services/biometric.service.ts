@@ -35,7 +35,7 @@ export class BiometricService {
    */
   async enrollBiometric(
     user: User,
-    dto: EnrollBiometricDto
+    dto: EnrollBiometricDto,
   ): Promise<{ challengeToken: string; config: BiometricConfig }> {
     try {
       // Check if biometric already enrolled for this device
@@ -74,9 +74,7 @@ export class BiometricService {
 
       await this.biometricRepository.save(config);
 
-      this.logger.log(
-        `Biometric enrolled for user ${user.id} on device ${dto.deviceId}`
-      );
+      this.logger.log(`Biometric enrolled for user ${user.id} on device ${dto.deviceId}`);
 
       return {
         challengeToken, // Return plaintext token to client (only once)
@@ -113,19 +111,14 @@ export class BiometricService {
 
       // Check if account is locked
       if (config.lockedUntil && config.lockedUntil > new Date()) {
-        const remainingTime = Math.ceil(
-          (config.lockedUntil.getTime() - Date.now()) / 60000
-        );
+        const remainingTime = Math.ceil((config.lockedUntil.getTime() - Date.now()) / 60000);
         throw new UnauthorizedException(
-          `Account temporarily locked. Try again in ${remainingTime} minutes.`
+          `Account temporarily locked. Try again in ${remainingTime} minutes.`,
         );
       }
 
       // Verify challenge response
-      const isValid = await this.verifyToken(
-        dto.challengeResponse,
-        config.challengeToken
-      );
+      const isValid = await this.verifyToken(dto.challengeResponse, config.challengeToken);
 
       if (!isValid) {
         // Increment failed attempts
@@ -137,11 +130,11 @@ export class BiometricService {
           await this.biometricRepository.save(config);
 
           this.logger.warn(
-            `Biometric locked for user ${dto.userId} due to ${config.failedAttempts} failed attempts`
+            `Biometric locked for user ${dto.userId} due to ${config.failedAttempts} failed attempts`,
           );
 
           throw new UnauthorizedException(
-            `Too many failed attempts. Account locked for 15 minutes.`
+            `Too many failed attempts. Account locked for 15 minutes.`,
           );
         }
 
@@ -242,7 +235,7 @@ export class BiometricService {
       {
         failedAttempts: 0,
         lockedUntil: null,
-      }
+      },
     );
 
     this.logger.log(`Reset failed attempts for user ${userId} on device ${deviceId}`);
@@ -267,10 +260,7 @@ export class BiometricService {
    */
   private async verifyToken(token: string, hashedToken: string): Promise<boolean> {
     const hash = await this.hashToken(token);
-    return crypto.timingSafeEqual(
-      Buffer.from(hash),
-      Buffer.from(hashedToken)
-    );
+    return crypto.timingSafeEqual(Buffer.from(hash), Buffer.from(hashedToken));
   }
 
   /**
@@ -300,7 +290,7 @@ export class BiometricService {
       totalDevices: configs.length,
       totalUsages,
       lastUsed,
-      devices: configs.map(config => ({
+      devices: configs.map((config) => ({
         deviceId: config.deviceId,
         deviceName: config.deviceName,
         biometricType: config.biometricType,

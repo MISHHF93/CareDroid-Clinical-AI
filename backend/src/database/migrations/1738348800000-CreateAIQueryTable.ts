@@ -143,7 +143,7 @@ export class CreateAIQueryTable1738348800000 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('ai_queries');
-    
+
     if (table) {
       // Drop foreign keys
       const foreignKeys = table.foreignKeys;

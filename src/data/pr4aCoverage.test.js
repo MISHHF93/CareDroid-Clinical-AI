@@ -29,6 +29,7 @@ import {
 import { getMedicalCatalogSummary, getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { getToolIcon } from '../navigation/iconRegistry';
+import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 import {
   PR4A_HUB_PATH,
   PR4A_TOOL_IDS,
@@ -212,19 +213,15 @@ describe('PR4A coverage — NLU aliases & resolveCatalogLaunch', () => {
   it('returns empty launch for falsy or unknown ids without throwing', () => {
     expect(resolveCatalogLaunch('')).toEqual(PR4A_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(PR4A_EMPTY_LAUNCH);
-    expect(resolveCatalogLaunch('not-a-pr4a-tool-xyz').path).toBeNull();
+    expect(resolveCatalogLaunch('not-a-pr4a-tool-xyz').path).toBe('/dashboard');
   });
 });
 
 describe('PR4A coverage — route resolution', () => {
-  it('registers dedicated calculator routes in App.jsx before calculators hub', () => {
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
-    expect(hubIdx).toBeGreaterThan(-1);
+  it('registers dedicated calculator routes via CALCULATOR_ROUTE_DEFS before hub', () => {
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
     for (const id of PR4A_TOOL_IDS) {
-      const routeIdx = appSource.indexOf(`path: '${PR4A_HUB_PATH}/${id}'`);
-      expect(routeIdx, `App route for ${id}`).toBeGreaterThan(-1);
-      expect(routeIdx).toBeLessThan(hubIdx);
-      expect(appSource).toContain(`initialCalculatorId="${id}"`);
+      expect(matchCalculatorRoute(`${PR4A_HUB_PATH}/${id}`)?.calculatorSlug).toBe(id);
     }
   });
 

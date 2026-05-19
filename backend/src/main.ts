@@ -115,7 +115,7 @@ async function bootstrap() {
   console.log(`   - Grafana dashboards: http://localhost:3001`);
   console.log(`   - Prometheus: http://localhost:9090`);
   console.log(`   - Kibana logs: http://localhost:5601`);
-  console.log(`   - Sentry errors: http://localhost:9000`)
+  console.log(`   - Sentry errors: http://localhost:9000`);
 }
 
 bootstrap();

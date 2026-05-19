@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,7 +13,11 @@ import { randomBytes } from 'crypto';
 import { User, UserRole } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { OAuthAccount, OAuthProvider } from '../users/entities/oauth-account.entity';
-import { Subscription, SubscriptionTier, SubscriptionStatus } from '../subscriptions/entities/subscription.entity';
+import {
+  Subscription,
+  SubscriptionTier,
+  SubscriptionStatus,
+} from '../subscriptions/entities/subscription.entity';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { TwoFactorService } from '../two-factor/two-factor.service';
@@ -341,12 +350,7 @@ export class AuthService {
     return { success: true };
   }
 
-  async verifyTwoFactorLogin(
-    userId: string,
-    token: string,
-    ipAddress: string,
-    userAgent: string,
-  ) {
+  async verifyTwoFactorLogin(userId: string, token: string, ipAddress: string, userAgent: string) {
     // Find user
     const user = await this.userRepository.findOne({
       where: { id: userId },

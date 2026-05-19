@@ -28,7 +28,8 @@ export class LoggingMiddleware implements NestMiddleware {
     }
 
     // Add request ID for tracing
-    const requestId = req.headers['x-request-id'] || req.header('x-trace-id') || this.generateRequestId();
+    const requestId =
+      req.headers['x-request-id'] || req.header('x-trace-id') || this.generateRequestId();
     Sentry.setTag('request_id', String(requestId));
 
     // Intercept response.end() to capture when response is sent
@@ -91,9 +92,7 @@ export class LoggingMiddleware implements NestMiddleware {
         return null;
       }
 
-      const decoded = JSON.parse(
-        Buffer.from(parts[1], 'base64').toString('utf-8'),
-      );
+      const decoded = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'));
       return decoded.sub || decoded.userId || null;
     } catch (error) {
       return null;

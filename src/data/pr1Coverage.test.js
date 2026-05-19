@@ -75,8 +75,9 @@ describe('PR1 coverage — NLU aliases & resolveCatalogLaunch', () => {
     expect(resolveCatalogLaunch('')).toEqual(empty);
     expect(resolveCatalogLaunch(null)).toEqual(empty);
     const unknown = resolveCatalogLaunch('not-a-real-tool-id-xyz');
-    expect(unknown.path).toBeNull();
+    expect(unknown.path).toBe('/dashboard');
     expect(unknown.registryId).toBeNull();
+    expect(unknown.chatSeed).toBeTruthy();
   });
 
   it('resolves builtin calculator slug for PR1 via catalog path when NLU row exists', () => {
@@ -94,11 +95,9 @@ describe('PR1 coverage — NLU aliases & resolveCatalogLaunch', () => {
 });
 
 describe('PR1 coverage — registry & routes', () => {
-  it('keeps hub route and four PR1 calculator routes in App.jsx', () => {
+  it('keeps hub route and PR1 calculator routes via CALCULATOR_ROUTE_DEFS in App.jsx', () => {
     expect(appSource).toContain("path: '/tools/calculators'");
-    for (const id of PR1_CALCULATOR_REGISTRY_IDS) {
-      expect(appSource).toContain(`path: '/tools/calculators/${id}'`);
-    }
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
   });
 
   it('exposes each PR1 registry id exactly once in toolRegistry export', () => {

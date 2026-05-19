@@ -12,6 +12,9 @@ import {
 } from './sourceCodeToolDiscovery';
 import { emergencyPatternGroups } from './emergencyPatternCatalog';
 import { resolveCatalogLaunch, NLU_TO_REGISTRY_ID } from './clinicalCatalogWiring';
+import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
+
+const appSrc = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../App.jsx'), 'utf8');
 
 /** Keys in CostTrackingContext TOOL_COSTS that are phantom / non-registry tools */
 const COST_TRACKING_EXTRA_TOOL_KEYS = [
@@ -154,37 +157,25 @@ describe('sourceCodeToolDiscovery', () => {
   it('registers HAS-BLED sidebar entry and App route', () => {
     expect(toolRegistryById['has-bled']?.path).toBe('/tools/calculators/has-bled');
     expect(toolRegistryById['has-bled']?.initialCalc).toBe('has-bled');
-    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
-    const appSrc = readFileSync(appPath, 'utf8');
-    expect(appSrc).toContain("path: '/tools/calculators/has-bled'");
-    expect(appSrc).toContain('initialCalculatorId="has-bled"');
+    assertAppCalculatorRouteWiring(appSrc, ['has-bled']);
   });
 
   it('registers Child-Pugh sidebar entry and App route', () => {
     expect(toolRegistryById['child-pugh']?.path).toBe('/tools/calculators/child-pugh');
     expect(toolRegistryById['child-pugh']?.initialCalc).toBe('child-pugh');
-    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
-    const appSrc = readFileSync(appPath, 'utf8');
-    expect(appSrc).toContain("path: '/tools/calculators/child-pugh'");
-    expect(appSrc).toContain('initialCalculatorId="child-pugh"');
+    assertAppCalculatorRouteWiring(appSrc, ['child-pugh']);
   });
 
   it('registers NEWS2 sidebar entry and App route', () => {
     expect(toolRegistryById.news2?.path).toBe('/tools/calculators/news2');
     expect(toolRegistryById.news2?.initialCalc).toBe('news2');
-    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
-    const appSrc = readFileSync(appPath, 'utf8');
-    expect(appSrc).toContain("path: '/tools/calculators/news2'");
-    expect(appSrc).toContain('initialCalculatorId="news2"');
+    assertAppCalculatorRouteWiring(appSrc, ['news2']);
   });
 
   it('registers qSOFA sidebar entry and App route', () => {
     expect(toolRegistryById.qsofa?.path).toBe('/tools/calculators/qsofa');
     expect(toolRegistryById.qsofa?.initialCalc).toBe('qsofa');
-    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
-    const appSrc = readFileSync(appPath, 'utf8');
-    expect(appSrc).toContain("path: '/tools/calculators/qsofa'");
-    expect(appSrc).toContain('initialCalculatorId="qsofa"');
+    assertAppCalculatorRouteWiring(appSrc, ['qsofa']);
   });
 
   it('resolves PERC as hub-only chat-assisted (no dedicated App route)', () => {
@@ -230,20 +221,12 @@ describe('sourceCodeToolDiscovery', () => {
 
   it('registers TIMI UA/NSTEMI sidebar entry and App route', () => {
     expect(toolRegistryById['timi-ua-nstemi']?.path).toBe('/tools/calculators/timi-ua-nstemi');
-    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
-    const appSrc = readFileSync(appPath, 'utf8');
-    expect(appSrc).toContain("path: '/tools/calculators/timi-ua-nstemi'");
-    expect(appSrc).toContain('initialCalculatorId="timi-ua-nstemi"');
+    assertAppCalculatorRouteWiring(appSrc, ['timi-ua-nstemi']);
   });
 
   it('registers MELD and MELD-Na sidebar entries and App routes', () => {
     expect(toolRegistryById.meld?.path).toBe('/tools/calculators/meld');
     expect(toolRegistryById['meld-na']?.path).toBe('/tools/calculators/meld-na');
-    const appPath = join(dirname(fileURLToPath(import.meta.url)), '../App.jsx');
-    const appSrc = readFileSync(appPath, 'utf8');
-    expect(appSrc).toContain("path: '/tools/calculators/meld'");
-    expect(appSrc).toContain('initialCalculatorId="meld"');
-    expect(appSrc).toContain("path: '/tools/calculators/meld-na'");
-    expect(appSrc).toContain('initialCalculatorId="meld-na"');
+    assertAppCalculatorRouteWiring(appSrc, ['meld', 'meld-na']);
   });
 });

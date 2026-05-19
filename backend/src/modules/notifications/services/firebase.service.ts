@@ -30,7 +30,7 @@ export class FirebaseService implements OnModuleInit {
       if (!serviceAccount && !credentialsPath) {
         this.logger.warn(
           'Firebase credentials not configured. Push notifications will fail. ' +
-            'Set FIREBASE_SERVICE_ACCOUNT or GOOGLE_APPLICATION_CREDENTIALS environment variable.'
+            'Set FIREBASE_SERVICE_ACCOUNT or GOOGLE_APPLICATION_CREDENTIALS environment variable.',
         );
         return;
       }
@@ -52,7 +52,8 @@ export class FirebaseService implements OnModuleInit {
           };
 
       if (messagingSenderId) {
-        (config as admin.AppOptions & { messagingSenderId?: string }).messagingSenderId = messagingSenderId;
+        (config as admin.AppOptions & { messagingSenderId?: string }).messagingSenderId =
+          messagingSenderId;
       }
 
       this.firebaseApp = admin.initializeApp(config);
@@ -76,7 +77,7 @@ export class FirebaseService implements OnModuleInit {
       ttl?: number;
       badge?: number;
       sound?: string;
-    }
+    },
   ): Promise<{ success: boolean; messageId?: string; error?: string }> {
     try {
       if (!this.firebaseApp) {
@@ -130,10 +131,12 @@ export class FirebaseService implements OnModuleInit {
     } catch (error) {
       this.logger.error(`Failed to send notification to ${token}:`, error);
 
-      // Handle specific error codes  
+      // Handle specific error codes
       const firebaseError = error as any;
-      if (firebaseError.code === 'messaging/invalid-registration-token' ||
-          firebaseError.code === 'messaging/registration-token-not-registered') {
+      if (
+        firebaseError.code === 'messaging/invalid-registration-token' ||
+        firebaseError.code === 'messaging/registration-token-not-registered'
+      ) {
         return {
           success: false,
           error: 'invalid_token',
@@ -158,7 +161,7 @@ export class FirebaseService implements OnModuleInit {
     options?: {
       priority?: 'normal' | 'high';
       ttl?: number;
-    }
+    },
   ): Promise<{
     successCount: number;
     failureCount: number;
@@ -208,7 +211,7 @@ export class FirebaseService implements OnModuleInit {
       });
 
       this.logger.log(
-        `Multicast notification sent: ${response.successCount} successes, ${response.failureCount} failures`
+        `Multicast notification sent: ${response.successCount} successes, ${response.failureCount} failures`,
       );
 
       return {
@@ -263,7 +266,7 @@ export class FirebaseService implements OnModuleInit {
     topic: string,
     title: string,
     body: string,
-    data?: Record<string, string>
+    data?: Record<string, string>,
   ): Promise<string> {
     try {
       if (!this.firebaseApp) {

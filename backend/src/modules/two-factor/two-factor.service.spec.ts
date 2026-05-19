@@ -83,7 +83,8 @@ describe('TwoFactorService', () => {
       const userId = '1';
       const mockSecret = {
         base32: 'test_secret',
-        otpauth_url: 'otpauth://totp/CareDroid:test@example.com?secret=test_secret&issuer=CareDroid',
+        otpauth_url:
+          'otpauth://totp/CareDroid:test@example.com?secret=test_secret&issuer=CareDroid',
       };
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
@@ -120,7 +121,7 @@ describe('TwoFactorService', () => {
 
     it('should throw error when user not found', async () => {
       const userId = 'nonexistent';
-      
+
       mockUserRepository.findOne.mockResolvedValue(null);
 
       await expect(service.generateSecret(userId)).rejects.toThrow('User not found');
@@ -130,7 +131,8 @@ describe('TwoFactorService', () => {
       const userId = '1';
       const mockSecret = {
         ascii: 'test_secret',
-        otpauth_url: 'otpauth://totp/CareDroid:test@example.com?secret=test_secret&issuer=CareDroid',
+        otpauth_url:
+          'otpauth://totp/CareDroid:test@example.com?secret=test_secret&issuer=CareDroid',
       };
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
@@ -155,7 +157,7 @@ describe('TwoFactorService', () => {
     it('should verify valid TOTP token', async () => {
       const userId = '1';
       const token = '123456';
-      
+
       mockTwoFactorRepository.findOne.mockResolvedValue(mockTwoFactor);
       (bcrypt.compare as jest.Mock).mockImplementation((plain, hash) => {
         if (hash === 'encrypted_secret') return Promise.resolve(true);
@@ -185,7 +187,7 @@ describe('TwoFactorService', () => {
         ...mockTwoFactor,
         backupCodes: ['hashed_backup1', 'hashed_backup2'],
       };
-      
+
       mockTwoFactorRepository.findOne.mockResolvedValue(twoFactorWithBackup);
       (speakeasy.totp.verify as jest.Mock).mockReturnValue(false);
       (bcrypt.compare as jest.Mock).mockImplementation((plain, hash) => {
@@ -200,7 +202,7 @@ describe('TwoFactorService', () => {
     it('should return false for invalid token', async () => {
       const userId = '1';
       const token = 'invalid';
-      
+
       mockTwoFactorRepository.findOne.mockResolvedValue(mockTwoFactor);
       (speakeasy.totp.verify as jest.Mock).mockReturnValue(false);
 
@@ -212,7 +214,7 @@ describe('TwoFactorService', () => {
     it('should return false when 2FA not enabled', async () => {
       const userId = '1';
       const token = '123456';
-      
+
       mockTwoFactorRepository.findOne.mockResolvedValue(null);
 
       const result = await service.verifyToken(userId, token);
@@ -225,7 +227,7 @@ describe('TwoFactorService', () => {
     it('should enable 2FA with valid token', async () => {
       const userId = '1';
       const token = '123456';
-      
+
       (speakeasy.totp.verify as jest.Mock).mockReturnValue(true);
 
       // Mock backup code generation
@@ -258,20 +260,24 @@ describe('TwoFactorService', () => {
     it('should throw error with invalid token', async () => {
       const userId = '1';
       const token = 'invalid';
-      
+
       (speakeasy.totp.verify as jest.Mock).mockReturnValue(false);
 
-      await expect(service.enable(userId, 'test_secret', token)).rejects.toThrow('Invalid verification code');
+      await expect(service.enable(userId, 'test_secret', token)).rejects.toThrow(
+        'Invalid verification code',
+      );
     });
 
     it('should throw error when 2FA not set up', async () => {
       const userId = '1';
       const token = '123456';
-      
+
       // This test doesn't make sense because enable creates 2FA, let me change it
       (speakeasy.totp.verify as jest.Mock).mockReturnValue(false);
 
-      await expect(service.enable(userId, 'test_secret', token)).rejects.toThrow('Invalid verification code');
+      await expect(service.enable(userId, 'test_secret', token)).rejects.toThrow(
+        'Invalid verification code',
+      );
     });
   });
 
@@ -279,7 +285,7 @@ describe('TwoFactorService', () => {
     it('should disable 2FA with valid token', async () => {
       const userId = '1';
       const token = '123456';
-      
+
       mockTwoFactorRepository.findOne.mockResolvedValue(mockTwoFactor);
       jest.spyOn(service, 'verifyToken').mockResolvedValue(true);
       mockTwoFactorRepository.remove.mockResolvedValue(undefined);
@@ -299,7 +305,7 @@ describe('TwoFactorService', () => {
     it('should throw error with invalid token', async () => {
       const userId = '1';
       const token = 'invalid';
-      
+
       mockTwoFactorRepository.findOne.mockResolvedValue({ ...mockTwoFactor, enabled: false });
       jest.spyOn(service, 'verifyToken').mockResolvedValue(false);
 
@@ -309,7 +315,7 @@ describe('TwoFactorService', () => {
     it('should throw error when 2FA not enabled', async () => {
       const userId = '1';
       const token = '123456';
-      
+
       mockTwoFactorRepository.findOne.mockResolvedValue(null);
 
       await expect(service.disable(userId, token)).rejects.toThrow('2FA is not enabled');
@@ -319,7 +325,7 @@ describe('TwoFactorService', () => {
   describe('getStatus', () => {
     it('should return enabled status', async () => {
       const userId = '1';
-      
+
       mockTwoFactorRepository.findOne.mockResolvedValue({ ...mockTwoFactor, enabled: true });
 
       const result = await service.getStatus(userId);
@@ -333,7 +339,7 @@ describe('TwoFactorService', () => {
 
     it('should return disabled status when not set up', async () => {
       const userId = '1';
-      
+
       mockTwoFactorRepository.findOne.mockResolvedValue(null);
 
       const result = await service.getStatus(userId);

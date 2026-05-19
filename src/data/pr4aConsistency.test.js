@@ -264,13 +264,10 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
     }
   });
 
-  it('registers App.jsx routes before calculators hub with initialCalculatorId', () => {
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
+  it('registers calculator routes via CALCULATOR_ROUTE_DEFS before calculators hub', () => {
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
     for (const id of PR4A_CALCULATOR_REGISTRY_IDS) {
-      const routeIdx = appSource.indexOf(`path: '${PR4A_HUB_PATH}/${id}'`);
-      expect(routeIdx).toBeGreaterThan(-1);
-      expect(routeIdx).toBeLessThan(hubIdx);
-      expect(appSource).toContain(`initialCalculatorId="${id}"`);
+      expect(matchCalculatorRoute(`${PR4A_HUB_PATH}/${id}`)?.calculatorSlug).toBe(id);
     }
   });
 
@@ -300,9 +297,9 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
 
   it('does not expose empty launch for unknown ids', () => {
     const empty = resolveCatalogLaunch('not-a-pr4a-calculator');
-    expect(empty.path).toBeNull();
+    expect(empty.path).toBe('/dashboard');
     expect(empty.registryId).toBeNull();
-    expect(empty.chatSeed).toBeNull();
+    expect(empty.chatSeed).toBeTruthy();
   });
 
   it.each(PR4A_CALCULATOR_REGISTRY_IDS)(

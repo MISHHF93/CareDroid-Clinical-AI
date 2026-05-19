@@ -33,6 +33,10 @@ import {
   expectedLaunchPath,
   matchCalculatorRoute,
 } from '../routes/clinicalToolRoutes';
+import {
+  assertAppCalculatorRouteWiring,
+  registeredCalculatorPathsForSet,
+} from './testHelpers/calculatorRouteAudit';
 import { TOOL_PATTERNS_PATH } from './clinicalToolAliasSync';
 import {
   aliasToSlug,
@@ -94,19 +98,13 @@ describe('PR1 registration audit — routes & path naming', () => {
     );
   });
 
-  it('registers each PR1 route in App.jsx with matching initialCalculatorId (deep link)', () => {
-    for (const id of PR1_TOOL_IDS) {
-      const path = PR1_ROUTE_BY_REGISTRY_ID[id];
-      expect(appSource).toContain(`path: '${path}'`);
-      expect(appSource).toContain(`initialCalculatorId="${id}"`);
-    }
+  it('registers each PR1 route in App.jsx via CALCULATOR_ROUTE_DEFS before hub', () => {
+    assertAppCalculatorRouteWiring(appSource, PR1_TOOL_IDS);
   });
 
-  it('has no orphaned PR1 App routes (route slug must be a PR1 registry id)', () => {
-    const appCalcRoutes = extractAppCalculatorRoutes(appSource).filter((p) =>
-      PR1_PATH_SET.has(p)
-    );
-    expect(appCalcRoutes.sort()).toEqual([...PR1_PATH_SET].sort());
+  it('has no orphaned PR1 calculator routes in CALCULATOR_ROUTE_DEFS', () => {
+    const registered = registeredCalculatorPathsForSet(PR1_PATH_SET);
+    expect(registered.sort()).toEqual([...PR1_PATH_SET].sort());
   });
 
   it.each(PR1_TOOL_IDS)('clinicalToolRoutes matches %s for deep links', (id) => {

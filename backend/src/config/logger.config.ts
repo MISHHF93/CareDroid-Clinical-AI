@@ -32,11 +32,11 @@ export default registerAs('logger', () => {
   const logDir = process.env.LOG_DIR || 'logs';
   const maxSize = process.env.LOG_MAX_SIZE || '20m';
   const maxDaysCombined = isProduction
-    ? (process.env.LOG_MAX_DAYS_PROD_COMBINED || '30')
-    : (process.env.LOG_MAX_DAYS_COMBINED || '7');
+    ? process.env.LOG_MAX_DAYS_PROD_COMBINED || '30'
+    : process.env.LOG_MAX_DAYS_COMBINED || '7';
   const maxDaysErrors = isProduction
-    ? (process.env.LOG_MAX_DAYS_PROD_ERRORS || '60')
-    : (process.env.LOG_MAX_DAYS_ERRORS || '14');
+    ? process.env.LOG_MAX_DAYS_PROD_ERRORS || '60'
+    : process.env.LOG_MAX_DAYS_ERRORS || '14';
 
   const transports: winston.transport[] = [
     new winston.transports.Console({
@@ -67,18 +67,19 @@ export default registerAs('logger', () => {
       }) as any,
     );
   }
-  
+
   return {
     level: logLevel,
     format: jsonFormatter,
-    createLogger: () => winston.createLogger({
-      level: logLevel,
-      format: jsonFormatter,
-      defaultMeta: {
-        service: 'caredroid-backend',
-        environment: process.env.NODE_ENV || 'development',
-      },
-      transports,
-    }),
+    createLogger: () =>
+      winston.createLogger({
+        level: logLevel,
+        format: jsonFormatter,
+        defaultMeta: {
+          service: 'caredroid-backend',
+          environment: process.env.NODE_ENV || 'development',
+        },
+        transports,
+      }),
   };
 });

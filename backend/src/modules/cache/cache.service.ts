@@ -114,11 +114,7 @@ export class CacheService implements OnModuleInit {
     }
   }
 
-  async getOrSet<T = any>(
-    key: string,
-    factory: () => Promise<T>,
-    ttl?: number,
-  ): Promise<T> {
+  async getOrSet<T = any>(key: string, factory: () => Promise<T>, ttl?: number): Promise<T> {
     // Try to get from cache
     const cached = await this.get<T>(key);
     if (cached !== null) {

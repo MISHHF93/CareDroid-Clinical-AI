@@ -110,7 +110,7 @@ export class AuthController {
       accessToken: req.user?.accessToken,
       refreshToken: req.user?.refreshToken,
       expiresIn: req.user?.expiresIn,
-      provider: 'google'
+      provider: 'google',
     });
   }
 
@@ -133,7 +133,7 @@ export class AuthController {
       accessToken: req.user?.accessToken,
       refreshToken: req.user?.refreshToken,
       expiresIn: req.user?.expiresIn,
-      provider: 'linkedin'
+      provider: 'linkedin',
     });
   }
 

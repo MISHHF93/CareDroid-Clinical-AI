@@ -1,5 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IntentClassification, EmergencySeverity } from '../intent-classifier/dto/intent-classification.dto';
+import {
+  IntentClassification,
+  EmergencySeverity,
+} from '../intent-classifier/dto/intent-classification.dto';
 import { AuditService } from '../../audit/audit.service';
 import { AuditAction } from '../../audit/entities/audit-log.entity';
 import { MetricsService } from '../../metrics/metrics.service';
@@ -58,13 +61,13 @@ export interface EscalationAction {
 
 /**
  * Emergency Escalation Service
- * 
+ *
  * Handles automatic escalation of medical emergencies:
  * - 911 dispatch for critical emergencies
  * - Medical director notification
  * - Protocol activation
  * - Audit trail logging
- * 
+ *
  * Batch 15 Phase 2: Emergency Escalation Intelligence
  */
 @Injectable()
@@ -127,7 +130,7 @@ export class EmergencyEscalationService {
         category: dto.category,
         keywords: dto.keywords,
         message: dto.context.message.substring(0, 200),
-        actions: executedActions.map(a => a.type),
+        actions: executedActions.map((a) => a.type),
         requires911,
         medicalDirectorNotified,
         conversationId: dto.context.conversationId,
@@ -137,8 +140,12 @@ export class EmergencyEscalationService {
     });
 
     // Record metrics using existing MetricsService methods
-    const severityLabel = dto.severity === EmergencySeverity.CRITICAL ? 'critical' : 
-                         dto.severity === EmergencySeverity.URGENT ? 'high' : 'low';
+    const severityLabel =
+      dto.severity === EmergencySeverity.CRITICAL
+        ? 'critical'
+        : dto.severity === EmergencySeverity.URGENT
+          ? 'high'
+          : 'low';
     this.metricsService.recordEmergencyDetection(dto.category, severityLabel);
 
     const latencyMs = Date.now() - startTime;
@@ -163,10 +170,7 @@ export class EmergencyEscalationService {
   /**
    * Determine escalation actions based on severity and category
    */
-  private getEscalationActions(
-    severity: EmergencySeverity,
-    category: string,
-  ): EscalationAction[] {
+  private getEscalationActions(severity: EmergencySeverity, category: string): EscalationAction[] {
     const actions: EscalationAction[] = [];
 
     // CRITICAL: Immediate life-threatening emergencies

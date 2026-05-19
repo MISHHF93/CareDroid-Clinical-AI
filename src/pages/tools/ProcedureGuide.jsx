@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
-import { apiFetch, parseApiResponse } from '../../services/apiClient';
+import ToolApiErrorBanner from '../../components/ToolApiErrorBanner';
+import { apiFetch, parseApiResponse, getApiErrorMessage } from '../../services/apiClient';
 
 const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
@@ -16,6 +17,7 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const commonProcedures = [
     'Central Line Placement',
@@ -34,6 +36,8 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
     if (!procedureName.trim()) return;
 
     setLoading(true);
+    setError(null);
+    setResults(null);
     try {
       const response = await apiFetch('/api/chat/message', {
         method: 'POST',
@@ -47,10 +51,13 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
         }),
       });
 
+      if (!response.ok) {
+        throw new Error(getApiErrorMessage(null, response));
+      }
       const data = await parseApiResponse(response, { fallback: {} });
-      setResults(data.response);
+      setResults(data.response || data.message || 'No procedure content returned.');
     } catch (err) {
-      setResults('Error loading procedure guide. Please try again.');
+      setError(err.message || 'Unable to load procedure guide. Check your connection or try chat from the dashboard.');
     } finally {
       setLoading(false);
     }
@@ -82,6 +89,8 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
             </button>
           ))}
         </div>
+
+        {error ? <ToolApiErrorBanner message={error} onRetry={() => handleSearch()} /> : null}
 
         {loading ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>

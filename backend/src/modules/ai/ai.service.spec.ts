@@ -110,7 +110,7 @@ describe('AIService', () => {
     it('should throw error when daily limit exceeded', async () => {
       const userId = '1';
       const prompt = 'Test prompt';
-      
+
       // Mock subscription with FREE tier (10 daily limit)
       mockSubscriptionRepository.findOne.mockResolvedValue({
         tier: SubscriptionTier.FREE,
@@ -119,13 +119,15 @@ describe('AIService', () => {
       // Mock getUsageToday to return limit exceeded
       jest.spyOn(service as any, 'getUsageToday').mockResolvedValue(10);
 
-      await expect(service.invokeLLM(userId, prompt)).rejects.toThrow('Daily AI query limit reached');
+      await expect(service.invokeLLM(userId, prompt)).rejects.toThrow(
+        'Daily AI query limit reached',
+      );
     });
 
     it('should allow usage when under daily limit', async () => {
       const userId = '1';
       const prompt = 'Test prompt';
-      
+
       mockSubscriptionRepository.findOne.mockResolvedValue({
         tier: SubscriptionTier.FREE,
       });
@@ -136,7 +138,7 @@ describe('AIService', () => {
       // Since we can't easily mock OpenAI API, this will throw an error
       // but it should get past the rate limiting check
       await expect(service.invokeLLM(userId, prompt)).rejects.toThrow();
-      
+
       // Verify it got past the rate limit check
       expect(mockSubscriptionRepository.findOne).toHaveBeenCalled();
     });

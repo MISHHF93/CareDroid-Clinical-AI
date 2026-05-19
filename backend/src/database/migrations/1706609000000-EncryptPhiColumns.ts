@@ -2,12 +2,12 @@ import { MigrationInterface, QueryRunner, TableColumn, Table } from 'typeorm';
 
 /**
  * Migration to add encrypted PHI columns
- * 
+ *
  * This migration:
  * 1. Creates the encryption_keys table for key management
  * 2. Adds encrypted_* columns for sensitive fields in users table
  * 3. Adds encryption_key_version column to track which key was used
- * 
+ *
  * The original fields are kept initially for backward compatibility during transition.
  * Once all data is encrypted and verified, original fields can be dropped in a follow-up migration.
  */

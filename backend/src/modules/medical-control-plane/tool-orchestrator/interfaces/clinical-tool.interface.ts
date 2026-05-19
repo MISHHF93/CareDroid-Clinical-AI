@@ -1,6 +1,6 @@
 /**
  * Clinical Tool Service Interface
- * 
+ *
  * All clinical tools must implement this interface to ensure
  * consistent behavior and integration with the Tool Orchestrator.
  */
@@ -22,7 +22,7 @@ export interface ToolMetadata {
   id: string;
   name: string;
   description: string;
-  category: 'calculator' | 'checker' | 'interpreter' | 'protocol' | 'reference';
+  category: 'calculator' | 'checker' | 'interpreter' | 'protocol' | 'reference' | 'fleet';
   version: string;
   author?: string;
   references?: string[];

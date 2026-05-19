@@ -32,13 +32,18 @@ export class SubscriptionsService {
     }
   }
 
-  async createCheckoutSession(userId: string, tier: SubscriptionTier, successUrl?: string, cancelUrl?: string) {
+  async createCheckoutSession(
+    userId: string,
+    tier: SubscriptionTier,
+    successUrl?: string,
+    cancelUrl?: string,
+  ) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    let subscription = await this.subscriptionRepository.findOne({ where: { userId } });
+    const subscription = await this.subscriptionRepository.findOne({ where: { userId } });
 
     // Create or get Stripe customer
     let customerId = subscription?.stripeCustomerId;

@@ -149,11 +149,11 @@ export class ComplianceService {
     await this.oauthRepository.delete({ userId });
     await this.subscriptionRepository.delete({ userId });
     await this.profileRepository.delete({ userId });
-    
+
     // Anonymize audit logs instead of deleting (HIPAA requirement)
     await this.auditLogRepository.update(
       { userId },
-      { 
+      {
         userId: null,
         metadata: { anonymized: true, originalUserId: userId } as any,
       },

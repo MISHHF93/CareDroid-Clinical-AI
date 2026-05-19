@@ -10,10 +10,7 @@ export class LinkedInStrategy extends PassportStrategy(Strategy, 'linkedin') {
   private readonly configService: ConfigService;
   private readonly authService: AuthService;
 
-  constructor(
-    configService: ConfigService,
-    authService: AuthService,
-  ) {
+  constructor(configService: ConfigService, authService: AuthService) {
     const config = configService.get<any>('oauth');
     super({
       clientID: config.linkedin.clientId,
@@ -25,12 +22,7 @@ export class LinkedInStrategy extends PassportStrategy(Strategy, 'linkedin') {
     this.authService = authService;
   }
 
-  async validate(
-    accessToken: string,
-    refreshToken: string,
-    profile: any,
-    done: any,
-  ): Promise<any> {
+  async validate(accessToken: string, refreshToken: string, profile: any, done: any): Promise<any> {
     const { id, emails, displayName } = profile;
 
     const user = {

@@ -149,19 +149,23 @@ describe('AuthService', () => {
 
     it('should throw error when user not found', async () => {
       const loginDto = { email: 'nonexistent@example.com', password: 'testpassword' };
-      
+
       mockUserRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.login(loginDto, '192.168.1.1', 'test-agent')).rejects.toThrow('Invalid credentials');
+      await expect(service.login(loginDto, '192.168.1.1', 'test-agent')).rejects.toThrow(
+        'Invalid credentials',
+      );
     });
 
     it('should throw error when password is invalid', async () => {
       const loginDto = { email: 'test@example.com', password: 'wrongpassword' };
-      
+
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(service.login(loginDto, '192.168.1.1', 'test-agent')).rejects.toThrow('Invalid credentials');
+      await expect(service.login(loginDto, '192.168.1.1', 'test-agent')).rejects.toThrow(
+        'Invalid credentials',
+      );
     });
   });
 
@@ -174,8 +178,8 @@ describe('AuthService', () => {
       };
 
       const hashedPassword = '$2b$10$hashedpassword';
-      const newUser = { 
-        id: '2', 
+      const newUser = {
+        id: '2',
         email: registerDto.email,
         password: hashedPassword,
         emailVerified: false,

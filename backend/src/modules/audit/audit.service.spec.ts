@@ -266,7 +266,7 @@ describe('AuditService', () => {
     });
   });
 
-describe('hash chaining and integrity verification', () => {
+  describe('hash chaining and integrity verification', () => {
     it('should calculate hash for audit log entries', async () => {
       const logData = {
         userId: '1',
@@ -373,7 +373,7 @@ describe('hash chaining and integrity verification', () => {
 
     it('should detect tampering when hash is modified', async () => {
       const timestamp = new Date('2023-01-01T10:00:00Z');
-      
+
       // Create mock logs where one has been tampered with
       const logs = [
         {
@@ -482,10 +482,7 @@ describe('hash chaining and integrity verification', () => {
 
       const result = await service.verifyIntegrity();
 
-      expect(mockAuditRepository.update).toHaveBeenCalledWith(
-        {},
-        { integrityVerified: false }
-      );
+      expect(mockAuditRepository.update).toHaveBeenCalledWith({}, { integrityVerified: false });
     });
 
     it('should mark all logs as verified when chain is valid', async () => {
@@ -511,10 +508,7 @@ describe('hash chaining and integrity verification', () => {
       const result = await service.verifyIntegrity();
 
       if (result.isValid) {
-        expect(mockAuditRepository.update).toHaveBeenCalledWith(
-          {},
-          { integrityVerified: true }
-        );
+        expect(mockAuditRepository.update).toHaveBeenCalledWith({}, { integrityVerified: true });
       }
     });
 
@@ -563,9 +557,7 @@ describe('hash chaining and integrity verification', () => {
   describe('findByAction', () => {
     it('should find logs by action type', async () => {
       const action = AuditAction.PHI_ACCESS;
-      const mockLogs = [
-        { ...mockAuditLog, action: AuditAction.PHI_ACCESS },
-      ];
+      const mockLogs = [{ ...mockAuditLog, action: AuditAction.PHI_ACCESS }];
 
       mockAuditRepository.find.mockResolvedValue(mockLogs);
 

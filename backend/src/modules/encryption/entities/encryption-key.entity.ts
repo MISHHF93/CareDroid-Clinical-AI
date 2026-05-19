@@ -1,10 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  CreateDateColumn,
-  Index,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, Index } from 'typeorm';
 
 @Entity('encryption_keys')
 @Index(['keyVersion'])
@@ -17,9 +11,9 @@ export class EncryptionKey {
   @Column({ type: 'int' })
   keyVersion: number;
 
-  @Column({ 
+  @Column({
     type: 'text',
-    comment: 'Encrypted key material - store in secure vault (AWS KMS, HashiCorp Vault, etc.)'
+    comment: 'Encrypted key material - store in secure vault (AWS KMS, HashiCorp Vault, etc.)',
   })
   keyMaterial: string;
 
@@ -29,11 +23,12 @@ export class EncryptionKey {
   @Column({ type: 'boolean', default: false })
   isActive: boolean;
 
-  @Column({ 
-    type: 'varchar', 
+  @Column({
+    type: 'varchar',
     length: 50,
     default: 'pending_rotation',
-    comment: 'pending_rotation | in_progress | re_encryption_complete | active | scheduled_for_deletion'
+    comment:
+      'pending_rotation | in_progress | re_encryption_complete | active | scheduled_for_deletion',
   })
   status: string;
 
@@ -58,10 +53,10 @@ export class EncryptionKey {
   @Column({ type: 'datetime', nullable: true })
   deletionScheduledAt: Date;
 
-  @Column({ 
-    type: 'text', 
+  @Column({
+    type: 'text',
     nullable: true,
-    comment: 'Audit information about the rotation'
+    comment: 'Audit information about the rotation',
   })
   auditInfo: string;
 }

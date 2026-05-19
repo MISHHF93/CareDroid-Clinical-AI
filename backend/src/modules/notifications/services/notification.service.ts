@@ -1,7 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { Notification, NotificationType, NotificationStatus } from '../entities/notification.entity';
+import {
+  Notification,
+  NotificationType,
+  NotificationStatus,
+} from '../entities/notification.entity';
 import { FirebaseService } from './firebase.service';
 import { DeviceTokenService } from './device-token.service';
 import { NotificationPreferenceService } from './notification-preference.service';
@@ -43,15 +47,10 @@ export class NotificationService {
   async sendNotification(dto: SendNotificationDto): Promise<Notification> {
     try {
       // Check if user can receive this notification type
-      const canReceive = await this.preferenceService.canReceiveNotification(
-        dto.userId,
-        dto.type
-      );
+      const canReceive = await this.preferenceService.canReceiveNotification(dto.userId, dto.type);
 
       if (!canReceive) {
-        this.logger.log(
-          `User ${dto.userId} has disabled ${dto.type} notifications`
-        );
+        this.logger.log(`User ${dto.userId} has disabled ${dto.type} notifications`);
         // Still create the notification record but don't send
         return await this.createNotificationRecord(dto, NotificationStatus.PENDING);
       }
@@ -65,14 +64,11 @@ export class NotificationService {
       }
 
       // Create notification record
-      const notification = await this.createNotificationRecord(
-        dto,
-        NotificationStatus.PENDING
-      );
+      const notification = await this.createNotificationRecord(dto, NotificationStatus.PENDING);
 
       // Send to all user devices
       const results = await Promise.all(
-        tokens.map(token =>
+        tokens.map((token) =>
           this.firebaseService.sendPushNotification(
             token,
             dto.title,
@@ -81,14 +77,14 @@ export class NotificationService {
             {
               priority: dto.priority,
               ttl: dto.expiresIn,
-            }
-          )
-        )
+            },
+          ),
+        ),
       );
 
       // Process results
-      const successfulSends = results.filter(r => r.success);
-      const failedSends = results.filter(r => !r.success);
+      const successfulSends = results.filter((r) => r.success);
+      const failedSends = results.filter((r) => !r.success);
 
       // Mark invalid tokens
       for (let i = 0; i < results.length; i++) {
@@ -110,7 +106,7 @@ export class NotificationService {
       await this.notificationRepository.save(notification);
 
       this.logger.log(
-        `Notification sent to user ${dto.userId}: ${successfulSends.length}/${tokens.length} successful`
+        `Notification sent to user ${dto.userId}: ${successfulSends.length}/${tokens.length} successful`,
       );
 
       return notification;
@@ -156,9 +152,7 @@ export class NotificationService {
       }
     }
 
-    this.logger.log(
-      `Bulk notification sent: ${successCount} successes, ${failureCount} failures`
-    );
+    this.logger.log(`Bulk notification sent: ${successCount} successes, ${failureCount} failures`);
 
     return {
       successCount,
@@ -174,7 +168,7 @@ export class NotificationService {
     userId: string,
     title: string,
     body: string,
-    data?: Record<string, any>
+    data?: Record<string, any>,
   ): Promise<Notification> {
     return await this.sendNotification({
       userId,
@@ -192,7 +186,7 @@ export class NotificationService {
   async getUserNotifications(
     userId: string,
     limit: number = 50,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<{ notifications: Notification[]; total: number }> {
     const [notifications, total] = await this.notificationRepository.findAndCount({
       where: { userId },
@@ -302,11 +296,9 @@ export class NotificationService {
    */
   private async createNotificationRecord(
     dto: SendNotificationDto,
-    status: NotificationStatus
+    status: NotificationStatus,
   ): Promise<Notification> {
-    const expiresAt = dto.expiresIn
-      ? new Date(Date.now() + dto.expiresIn)
-      : null;
+    const expiresAt = dto.expiresIn ? new Date(Date.now() + dto.expiresIn) : null;
 
     const notification = this.notificationRepository.create({
       userId: dto.userId,
@@ -324,9 +316,7 @@ export class NotificationService {
   /**
    * Helper: Convert data object to string values (FCM requirement)
    */
-  private convertDataToStrings(
-    data?: Record<string, any>
-  ): Record<string, string> | undefined {
+  private convertDataToStrings(data?: Record<string, any>): Record<string, string> | undefined {
     if (!data) return undefined;
 
     const stringData: Record<string, string> = {};
@@ -345,22 +335,16 @@ export class NotificationService {
   /**
    * Schedule a notification for future delivery
    */
-  async scheduleNotification(
-    dto: SendNotificationDto,
-    scheduledFor: Date
-  ): Promise<Notification> {
+  async scheduleNotification(dto: SendNotificationDto, scheduledFor: Date): Promise<Notification> {
     // Create notification record with pending status
-    const notification = await this.createNotificationRecord(
-      dto,
-      NotificationStatus.PENDING
-    );
+    const notification = await this.createNotificationRecord(dto, NotificationStatus.PENDING);
 
     // In a production system, you would integrate with a job queue
     // (e.g., Bull, Agenda) to schedule the actual sending
     // For now, we just create the record
 
     this.logger.log(
-      `Notification scheduled for ${scheduledFor.toISOString()} (user: ${dto.userId})`
+      `Notification scheduled for ${scheduledFor.toISOString()} (user: ${dto.userId})`,
     );
 
     return notification;

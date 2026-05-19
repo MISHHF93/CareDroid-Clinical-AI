@@ -13,7 +13,7 @@ import { ChunkMetadata } from '../dto/rag-context.dto';
 
 /**
  * Pinecone Vector Database Service
- * 
+ *
  * Implements vector storage and retrieval using Pinecone's managed service.
  * Provides high-performance similarity search for RAG.
  */
@@ -31,7 +31,7 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
   constructor(private readonly configService: ConfigService) {
     const ragConfig = this.configService.get<any>('rag');
     const pineconeConfig = ragConfig?.pinecone || {};
-    
+
     this.indexName = pineconeConfig.indexName || 'caredroid-medical';
     this.dimension = pineconeConfig.dimension || 1536;
     this.namespace = (pineconeConfig.namespace || '').trim();
@@ -55,12 +55,14 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       const apiKey = pineconeConfig.apiKey;
 
       if (!apiKey) {
-        this.logger.warn('PINECONE_API_KEY is not configured. Vector database functionality will be disabled.');
+        this.logger.warn(
+          'PINECONE_API_KEY is not configured. Vector database functionality will be disabled.',
+        );
         return; // Optional for development
       }
 
       this.logger.log('Initializing Pinecone client...');
-      
+
       this.pinecone = new Pinecone({
         apiKey,
       });
@@ -74,7 +76,7 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
       this.initialized = true;
       this.logger.log(
         `Successfully connected to Pinecone index: ${this.indexName}` +
-          (this.namespace ? ` (namespace: ${this.namespace})` : '')
+          (this.namespace ? ` (namespace: ${this.namespace})` : ''),
       );
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
@@ -87,10 +89,7 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
   /**
    * Query the vector database with a query embedding
    */
-  async query(
-    queryVector: number[],
-    options: VectorQueryOptions,
-  ): Promise<QueryResult> {
+  async query(queryVector: number[], options: VectorQueryOptions): Promise<QueryResult> {
     if (!this.initialized) {
       await this.initialize();
     }

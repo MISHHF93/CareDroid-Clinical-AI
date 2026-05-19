@@ -1,9 +1,9 @@
 /**
  * Permission Enum for RBAC System
- * 
+ *
  * Defines granular permissions for access control across the application.
  * Each permission represents a specific capability that can be assigned to roles.
- * 
+ *
  * HIPAA Compliance: Fine-grained permissions ensure principle of least privilege
  * and enable comprehensive audit logging of access to PHI.
  */

@@ -24,7 +24,14 @@ import { AuthorizationGuard } from './guards/authorization.guard';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, UserProfile, OAuthAccount, Subscription, AuditLog, BiometricConfig]),
+    TypeOrmModule.forFeature([
+      User,
+      UserProfile,
+      OAuthAccount,
+      Subscription,
+      AuditLog,
+      BiometricConfig,
+    ]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

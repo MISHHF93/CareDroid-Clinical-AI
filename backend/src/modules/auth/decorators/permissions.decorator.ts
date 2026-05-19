@@ -3,19 +3,19 @@ import { Permission } from '../enums/permission.enum';
 
 /**
  * Permissions Decorator
- * 
+ *
  * Marks routes with required permissions for authorization checks.
  * Used in conjunction with AuthorizationGuard to enforce RBAC.
- * 
+ *
  * @param permissions - Single permission or array of permissions required to access the route
- * 
+ *
  * @example Single permission:
  * ```typescript
  * @Permissions(Permission.READ_PHI)
  * @Get('patients/:id')
  * getPatient(@Param('id') id: string) { ... }
  * ```
- * 
+ *
  * @example Multiple permissions (user must have ALL):
  * ```typescript
  * @Permissions([Permission.READ_PHI, Permission.EXPORT_PHI])
@@ -32,11 +32,11 @@ export const Permissions = (...permissions: (Permission | Permission[])[]) => {
 
 /**
  * RequirePermission Decorator (Alias for single permission)
- * 
+ *
  * Syntactic sugar for requiring a single permission.
- * 
+ *
  * @param permission - Permission required to access the route
- * 
+ *
  * @example
  * ```typescript
  * @RequirePermission(Permission.MANAGE_USERS)
@@ -50,11 +50,11 @@ export const RequirePermission = (permission: Permission) => {
 
 /**
  * AnyPermission Decorator
- * 
+ *
  * User must have at least ONE of the specified permissions (OR logic).
- * 
+ *
  * @param permissions - Array of permissions (user needs at least one)
- * 
+ *
  * @example User needs either VIEW or MANAGE permission:
  * ```typescript
  * @AnyPermission([Permission.VIEW_USERS, Permission.MANAGE_USERS])
@@ -69,10 +69,10 @@ export const AnyPermission = (...permissions: Permission[]) => {
 
 /**
  * Public Decorator
- * 
+ *
  * Marks a route as publicly accessible (no authentication required).
  * Bypasses both AuthGuard and AuthorizationGuard.
- * 
+ *
  * @example
  * ```typescript
  * @Public()

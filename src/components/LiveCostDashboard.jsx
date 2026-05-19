@@ -2,23 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { getRealTimeCostService } from '../services/realtime/RealTimeCostService';
 import { getNotificationService } from '../services/notifications/NotificationService';
+import { resolveApiRoot } from '../config/apiEnv';
 import './LiveCostDashboard.css';
 
 /**
  * Live Cost Dashboard Component
  * Real-time cost tracking with WebSocket updates
  */
-const getApiBaseUrl = () => {
-  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-
-  if (typeof window !== 'undefined' && window.location) {
-    return `${window.location.origin}/api`;
-  }
-
-  return 'http://localhost:3000/api';
-};
+const getApiBaseUrl = () => resolveApiRoot();
 
 function LiveCostDashboard({ embedded = false }) {
   const { authToken, user } = useUser();

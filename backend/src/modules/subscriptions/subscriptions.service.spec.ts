@@ -91,10 +91,10 @@ describe('SubscriptionsService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Mock Stripe
     (service as any).stripe = mockStripe;
-    
+
     // Mock the getPriceIdForTier method
     jest.spyOn(service as any, 'getPriceIdForTier').mockReturnValue('price_test123');
   });
@@ -107,7 +107,7 @@ describe('SubscriptionsService', () => {
     it('should create checkout session for existing customer', async () => {
       const userId = '1';
       const tier = SubscriptionTier.PROFESSIONAL;
-      
+
       mockUserRepository.findOne.mockResolvedValue(mockUser);
       mockStripe.checkout.sessions.create.mockResolvedValue({
         id: 'cs_test123',
@@ -128,7 +128,7 @@ describe('SubscriptionsService', () => {
       const userId = '1';
       const tier = SubscriptionTier.PROFESSIONAL;
       const userWithoutCustomer = { ...mockUser, stripeCustomerId: null };
-      
+
       mockUserRepository.findOne.mockResolvedValue(userWithoutCustomer);
       mockStripe.customers.create.mockResolvedValue({
         id: 'cus_new123',
@@ -154,7 +154,7 @@ describe('SubscriptionsService', () => {
     it('should throw error when user not found', async () => {
       const userId = 'nonexistent';
       const tier = SubscriptionTier.PROFESSIONAL;
-      
+
       mockUserRepository.findOne.mockResolvedValue(null);
 
       await expect(service.createCheckoutSession(userId, tier)).rejects.toThrow('User not found');
@@ -165,7 +165,7 @@ describe('SubscriptionsService', () => {
     it('should create customer portal session', async () => {
       const userId = '1';
       const returnUrl = 'https://app.example.com/billing';
-      
+
       mockSubscriptionRepository.findOne.mockResolvedValue(mockSubscription);
       mockStripe.billingPortal.sessions.create.mockResolvedValue({
         url: 'https://billing.stripe.com/session/test123',
@@ -184,10 +184,12 @@ describe('SubscriptionsService', () => {
 
     it('should throw error when user has no stripe customer ID', async () => {
       const userId = '1';
-      
+
       mockSubscriptionRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.createCustomerPortalSession(userId)).rejects.toThrow('No active subscription found');
+      await expect(service.createCustomerPortalSession(userId)).rejects.toThrow(
+        'No active subscription found',
+      );
     });
   });
 

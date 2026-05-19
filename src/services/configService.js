@@ -1,97 +1,80 @@
 /**
  * Configuration Service
- * Fetches system-level configuration from backend
+ * Fetches system-level configuration from backend via centralized apiClient.
  */
 
-import apiClient from './apiClient';
+import { apiFetchJson, getApiErrorMessage } from './apiClient';
 import logger from '../utils/logger';
 
+const SYSTEM_CONFIG_DEFAULTS = {
+  rag: {
+    enabled: false,
+    topK: 5,
+    minScore: 0.7,
+  },
+  session: {
+    idleTimeoutMs: 1800000,
+    absoluteTimeoutMs: 28800000,
+  },
+};
+
+const AI_USAGE_DEFAULTS = {
+  tier: 'free',
+  dailyLimit: 10,
+  usedToday: 0,
+  remaining: 10,
+  resetAt: new Date(Date.now() + 86400000).toISOString(),
+};
+
+const TOOLS_DEFAULTS = {
+  tools: [],
+  count: 0,
+  tier: 'free',
+};
+
+async function fetchConfigEndpoint(path, defaults) {
+  try {
+    const { response, data } = await apiFetchJson(path);
+    if (!response.ok) {
+      const message = getApiErrorMessage(null, response);
+      logger.error(`Config fetch failed: ${path}`, { status: response.status, message });
+      return { ok: false, data: defaults, error: message, fromDefaults: true };
+    }
+    return { ok: true, data, fromDefaults: false };
+  } catch (error) {
+    const message = getApiErrorMessage(error);
+    logger.error(`Config fetch error: ${path}`, { error: message });
+    return { ok: false, data: defaults, error: message, fromDefaults: true };
+  }
+}
+
 class ConfigService {
-  /**
-   * Get system configuration (RAG status, session timeouts, etc.)
-   */
   async getSystemConfig() {
-    try {
-      const response = await apiClient.get('/config/system');
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to fetch system config', { error });
-      // Return sensible defaults if fetch fails
-      return {
-        rag: {
-          enabled: false,
-          topK: 5,
-          minScore: 0.7,
-        },
-        session: {
-          idleTimeoutMs: 1800000, // 30 min
-          absoluteTimeoutMs: 28800000, // 8 hours
-        },
-      };
-    }
+    const result = await fetchConfigEndpoint('/api/config/system', SYSTEM_CONFIG_DEFAULTS);
+    return { ...result.data, _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
   }
 
-  /**
-   * Get AI usage and remaining queries for current user
-   */
   async getAIRemainingQueries() {
-    try {
-      const response = await apiClient.get('/ai/remaining-queries');
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to fetch AI remaining queries', { error });
-      return {
-        tier: 'free',
-        dailyLimit: 10,
-        usedToday: 0,
-        remaining: 10,
-        resetAt: new Date(Date.now() + 86400000).toISOString(),
-      };
-    }
+    const result = await fetchConfigEndpoint('/api/ai/remaining-queries', AI_USAGE_DEFAULTS);
+    return { ...result.data, _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
   }
 
-  /**
-   * Get tools available for current user's subscription
-   */
   async getAvailableTools() {
-    try {
-      const response = await apiClient.get('/tools/available');
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to fetch available tools', { error });
-      // Return empty tools list on error
-      return {
-        tools: [],
-        count: 0,
-        tier: 'free',
-      };
-    }
+    const result = await fetchConfigEndpoint('/api/tools/available', TOOLS_DEFAULTS);
+    return { ...result.data, _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
   }
 
-  /**
-   * Get current subscription details
-   */
   async getCurrentSubscription() {
-    try {
-      const response = await apiClient.get('/subscriptions/current');
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to fetch subscription', { error });
-      return null;
+    const result = await fetchConfigEndpoint('/api/subscriptions/current', null);
+    if (!result.ok) {
+      return { tier: 'free', status: 'active', _meta: { ok: false, error: result.error, fromDefaults: true } };
     }
+    return { ...(result.data || { tier: 'free', status: 'active' }), _meta: { ok: true, fromDefaults: false } };
   }
 
-  /**
-   * Get available subscription plans
-   */
   async getSubscriptionPlans() {
-    try {
-      const response = await apiClient.get('/subscriptions/plans');
-      return response.data;
-    } catch (error) {
-      logger.error('Failed to fetch subscription plans', { error });
-      return [];
-    }
+    const result = await fetchConfigEndpoint('/api/subscriptions/plans', []);
+    return result.data;
   }
 }
 

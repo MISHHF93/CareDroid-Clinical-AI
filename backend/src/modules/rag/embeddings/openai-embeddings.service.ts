@@ -4,7 +4,7 @@ import OpenAI from 'openai';
 
 /**
  * OpenAI Embeddings Service
- * 
+ *
  * Generates embeddings using OpenAI's text-embedding-ada-002 model.
  * Embeddings are 1536-dimensional vectors used for semantic search.
  */
@@ -27,7 +27,7 @@ export class OpenAIEmbeddingsService {
     this.maxBatchSize = ragEmbeddings.batchSize || 100;
 
     const apiKey = openaiConfig?.apiKey;
-    
+
     if (!apiKey) {
       this.logger.warn('OPENAI_API_KEY is not configured. Embeddings service will not function.');
       // Create a dummy OpenAI client to prevent null errors
@@ -45,7 +45,7 @@ export class OpenAIEmbeddingsService {
     if (!this.openai) {
       throw new Error('OpenAI API key not configured. Cannot generate embeddings.');
     }
-    
+
     try {
       const response = await this.openai.embeddings.create({
         model: this.model,
@@ -76,11 +76,13 @@ export class OpenAIEmbeddingsService {
         batches.push(texts.slice(i, i + this.maxBatchSize));
       }
 
-      this.logger.log(`Generating embeddings for ${texts.length} texts in ${batches.length} batch(es)`);
+      this.logger.log(
+        `Generating embeddings for ${texts.length} texts in ${batches.length} batch(es)`,
+      );
 
       // Process batches sequentially to avoid rate limits
       const allEmbeddings: number[][] = [];
-      
+
       for (let i = 0; i < batches.length; i++) {
         const batch = batches[i];
         this.logger.debug(`Processing batch ${i + 1}/${batches.length} (${batch.length} texts)`);

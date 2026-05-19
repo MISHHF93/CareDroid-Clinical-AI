@@ -1,11 +1,11 @@
 /**
  * Intent Classifier Service
- * 
+ *
  * Three-Phase Classification Pipeline:
  * 1. Keyword Matching (fast, rule-based)
  * 2. NLU Model (fine-tuned BERT - not yet implemented, falls through to Phase 3)
  * 3. LLM Fallback (GPT-4 for complex cases)
- * 
+ *
  * Emergency Detection: 100% recall (no false negatives)
  */
 
@@ -25,11 +25,7 @@ import {
   getHighestSeverity,
   EmergencyPattern,
 } from './patterns/emergency.patterns';
-import {
-  matchToolPatterns,
-  extractToolParameters,
-  getToolPattern,
-} from './patterns/tool.patterns';
+import { matchToolPatterns, extractToolParameters, getToolPattern } from './patterns/tool.patterns';
 import { classifyClinicalQuery } from './patterns/clinical.patterns';
 
 @Injectable()
@@ -95,14 +91,21 @@ export class IntentClassifierService {
     const keywordDurationSec = (Date.now() - keywordStartMs) / 1000;
 
     // Record Phase 1 metrics
-    this.nluMetrics.recordKeywordPhaseDuration(keywordDurationSec, keywordResult.confidence >= 0.5 ? 'match' : 'no_match');
-    this.nluMetrics.recordConfidenceScore(keywordResult.confidence, keywordResult.primaryIntent, 'keyword');
+    this.nluMetrics.recordKeywordPhaseDuration(
+      keywordDurationSec,
+      keywordResult.confidence >= 0.5 ? 'match' : 'no_match',
+    );
+    this.nluMetrics.recordConfidenceScore(
+      keywordResult.confidence,
+      keywordResult.primaryIntent,
+      'keyword',
+    );
 
     if (keywordResult.confidence >= 0.7) {
       this.logger.log(
         `✅ Phase 1 (Keyword): High confidence (${keywordResult.confidence.toFixed(2)}) - ${keywordResult.primaryIntent}`,
       );
-      
+
       // Record successful classification
       this.nluMetrics.recordIntentClassification(keywordResult.primaryIntent, 'keyword');
 
@@ -136,7 +139,7 @@ export class IntentClassifierService {
         this.logger.log(
           `✅ Phase 2 (NLU): High confidence (${nluResult.confidence.toFixed(2)}) - ${nluResult.primaryIntent}`,
         );
-        
+
         // Record successful classification
         this.nluMetrics.recordIntentClassification(nluResult.primaryIntent, 'model');
 
@@ -180,9 +183,11 @@ export class IntentClassifierService {
     } catch (error) {
       const llmDurationSec = (Date.now() - llmStartMs) / 1000;
       this.nluMetrics.recordLlmPhaseDuration(llmDurationSec, 'failure');
-      
-      this.logger.error(`❌ Phase 3 (LLM) failed: ${error instanceof Error ? error.message : String(error)}. Returning keyword result.`);
-      
+
+      this.logger.error(
+        `❌ Phase 3 (LLM) failed: ${error instanceof Error ? error.message : String(error)}. Returning keyword result.`,
+      );
+
       // Fallback to keyword result
       this.nluMetrics.recordIntentClassification(keywordResult.primaryIntent, 'keyword');
 
@@ -203,7 +208,10 @@ export class IntentClassifierService {
   private keywordMatcher(
     message: string,
     emergencyPatterns: EmergencyPattern[],
-  ): Omit<IntentClassification, 'isEmergency' | 'emergencyKeywords' | 'emergencySeverity' | 'method' | 'classifiedAt'> {
+  ): Omit<
+    IntentClassification,
+    'isEmergency' | 'emergencyKeywords' | 'emergencySeverity' | 'method' | 'classifiedAt'
+  > {
     const matchedPatterns: string[] = [];
 
     // Priority 1: Emergency always takes precedence
@@ -212,7 +220,7 @@ export class IntentClassifierService {
         primaryIntent: PrimaryIntent.EMERGENCY,
         confidence: 1.0, // 100% confidence for emergency detection
         extractedParameters: {},
-        matchedPatterns: emergencyPatterns.map(p => p.category),
+        matchedPatterns: emergencyPatterns.map((p) => p.category),
       };
     }
 
@@ -230,7 +238,7 @@ export class IntentClassifierService {
         confidence: bestMatch.confidence,
         extractedParameters,
         matchedPatterns,
-        alternativeIntents: toolMatches.slice(1, 3).map(m => ({
+        alternativeIntents: toolMatches.slice(1, 3).map((m) => ({
           intent: PrimaryIntent.CLINICAL_TOOL,
           toolId: m.toolId,
           confidence: m.confidence,
@@ -240,7 +248,7 @@ export class IntentClassifierService {
 
     // Priority 3: Clinical query classification
     const clinicalQuery = classifyClinicalQuery(message);
-    
+
     if (clinicalQuery.category === 'medical_reference') {
       return {
         primaryIntent: PrimaryIntent.MEDICAL_REFERENCE,
@@ -274,7 +282,10 @@ export class IntentClassifierService {
   private async nluMatcher(
     message: string,
     context?: IntentClassificationContext,
-  ): Promise<Omit<IntentClassification, 'isEmergency' | 'emergencyKeywords' | 'emergencySeverity' | 'method' | 'classifiedAt'> | null> {
+  ): Promise<Omit<
+    IntentClassification,
+    'isEmergency' | 'emergencyKeywords' | 'emergencySeverity' | 'method' | 'classifiedAt'
+  > | null> {
     if (!this.nluEnabled) {
       this.logger.warn('NLU service disabled by configuration. Skipping NLU phase.');
       return null;
@@ -326,7 +337,9 @@ export class IntentClassifierService {
         matchedPatterns: ['nlu-model'],
       };
     } catch (error) {
-      this.logger.warn(`NLU service unavailable: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.warn(
+        `NLU service unavailable: ${error instanceof Error ? error.message : String(error)}`,
+      );
       this.recordFailure(this.nluCircuitBreaker, this.nluFailureThreshold, this.nluResetMs);
       return null;
     } finally {
@@ -362,7 +375,12 @@ export class IntentClassifierService {
   private async llmMatcher(
     message: string,
     context?: IntentClassificationContext,
-  ): Promise<Omit<IntentClassification, 'isEmergency' | 'emergencyKeywords' | 'emergencySeverity' | 'method' | 'classifiedAt'>> {
+  ): Promise<
+    Omit<
+      IntentClassification,
+      'isEmergency' | 'emergencyKeywords' | 'emergencySeverity' | 'method' | 'classifiedAt'
+    >
+  > {
     const userId = context?.userId || 'system';
 
     if (this.isCircuitOpen(this.llmCircuitBreaker)) {
@@ -375,7 +393,7 @@ export class IntentClassifierService {
       contextStr = '\n\nConversation History:\n';
       contextStr += context.previousMessages
         .slice(-3) // Last 3 messages
-        .map(m => `${m.role}: ${m.content}`)
+        .map((m) => `${m.role}: ${m.content}`)
         .join('\n');
     }
 
@@ -438,7 +456,9 @@ Respond in JSON format:
       };
     } catch (error) {
       this.recordFailure(this.llmCircuitBreaker, this.llmFailureThreshold, this.llmResetMs);
-      throw new Error(`LLM classification failed: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `LLM classification failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 
@@ -454,8 +474,10 @@ Respond in JSON format:
     breaker.failureCount += 1;
     if (breaker.failureCount >= threshold) {
       breaker.openUntil = Date.now() + resetMs;
-      this.logger.warn(`Circuit breaker opened for ${resetMs}ms after ${breaker.failureCount} failures.`);
-      
+      this.logger.warn(
+        `Circuit breaker opened for ${resetMs}ms after ${breaker.failureCount} failures.`,
+      );
+
       // Update metrics: circuit breaker opened
       const serviceName = breaker === this.nluCircuitBreaker ? 'nlu_model' : 'llm';
       this.nluMetrics.setCircuitBreakerState(serviceName, true);
@@ -466,7 +488,7 @@ Respond in JSON format:
     const wasOpen = breaker.openUntil > Date.now();
     breaker.failureCount = 0;
     breaker.openUntil = 0;
-    
+
     // Update metrics: circuit breaker closed if it was open
     if (wasOpen) {
       const serviceName = breaker === this.nluCircuitBreaker ? 'nlu_model' : 'llm';
@@ -479,7 +501,7 @@ Respond in JSON format:
    */
   private mapEmergencyKeywords(patterns: EmergencyPattern[]): EmergencyKeyword[] {
     const keywords: EmergencyKeyword[] = [];
-    
+
     for (const pattern of patterns) {
       // Add first keyword from each pattern (representative)
       if (pattern.keywords.length > 0) {
@@ -490,7 +512,7 @@ Respond in JSON format:
         });
       }
     }
-    
+
     return keywords;
   }
 
@@ -499,9 +521,9 @@ Respond in JSON format:
    */
   getEmergencyEscalationMessage(patterns: EmergencyPattern[]): string {
     if (patterns.length === 0) return '';
-    
+
     // Return the most critical pattern's escalation message
-    const criticalPattern = patterns.find(p => p.severity === EmergencySeverity.CRITICAL);
+    const criticalPattern = patterns.find((p) => p.severity === EmergencySeverity.CRITICAL);
     return (criticalPattern || patterns[0]).escalationMessage;
   }
 
@@ -510,8 +532,7 @@ Respond in JSON format:
    */
   requiresEscalation(classification: IntentClassification): boolean {
     return (
-      classification.isEmergency &&
-      classification.emergencySeverity === EmergencySeverity.CRITICAL
+      classification.isEmergency && classification.emergencySeverity === EmergencySeverity.CRITICAL
     );
   }
 }

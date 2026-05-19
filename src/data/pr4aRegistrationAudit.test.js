@@ -31,6 +31,10 @@ import {
   expectedLaunchPath,
   matchCalculatorRoute,
 } from '../routes/clinicalToolRoutes';
+import {
+  assertAppCalculatorRouteWiring,
+  registeredCalculatorPathsForSet,
+} from './testHelpers/calculatorRouteAudit';
 import { TOOL_PATTERNS_PATH } from './clinicalToolAliasSync';
 import {
   aliasToSlug,
@@ -116,21 +120,13 @@ describe('PR4A registration audit — routes, deep links, navigation', () => {
     );
   });
 
-  it('registers each PR4A route in App.jsx with matching initialCalculatorId', () => {
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
-    for (const id of PR4A_TOOL_IDS) {
-      const path = PR4A_ROUTE_BY_REGISTRY_ID[id];
-      expect(appSource).toContain(`path: '${path}'`);
-      expect(appSource).toContain(`initialCalculatorId="${id}"`);
-      expect(appSource.indexOf(`path: '${path}'`)).toBeLessThan(hubIdx);
-    }
+  it('registers each PR4A route via CALCULATOR_ROUTE_DEFS before hub', () => {
+    assertAppCalculatorRouteWiring(appSource, PR4A_TOOL_IDS);
   });
 
-  it('has no orphaned PR4A App routes (every dedicated route maps to a PR4A registry id)', () => {
-    const appPr4aRoutes = extractAppCalculatorRoutes(appSource).filter((p) =>
-      PR4A_ROUTE_PATH_SET.has(p)
-    );
-    expect(appPr4aRoutes.sort()).toEqual([...PR4A_ROUTE_PATH_SET].sort());
+  it('has no orphaned PR4A routes in CALCULATOR_ROUTE_DEFS', () => {
+    const registered = registeredCalculatorPathsForSet(PR4A_ROUTE_PATH_SET);
+    expect(registered.sort()).toEqual([...PR4A_ROUTE_PATH_SET].sort());
   });
 
   it.each(PR4A_TOOL_IDS)('clinicalToolRoutes matches %s for deep links', (id) => {

@@ -1,6 +1,6 @@
 /**
  * Tool Orchestrator Controller
- * 
+ *
  * REST API endpoints for clinical tool execution
  */
 

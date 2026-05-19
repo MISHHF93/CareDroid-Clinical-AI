@@ -2,13 +2,15 @@ import { IsString, IsOptional, IsObject } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class AIQueryDto {
-  @ApiProperty({ example: 'What are the differential diagnoses for chest pain in a 45-year-old male?' })
+  @ApiProperty({
+    example: 'What are the differential diagnoses for chest pain in a 45-year-old male?',
+  })
   @IsString()
   prompt: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: { patientAge: 45, gender: 'male', symptoms: ['chest pain'] },
-    required: false 
+    required: false,
   })
   @IsOptional()
   @IsObject()
@@ -20,10 +22,10 @@ export class StructuredJSONDto {
   @IsString()
   prompt: string;
 
-  @ApiProperty({ 
-    example: { 
-      diagnoses: [{ name: 'string', probability: 'string', reasoning: 'string' }] 
-    } 
+  @ApiProperty({
+    example: {
+      diagnoses: [{ name: 'string', probability: 'string', reasoning: 'string' }],
+    },
   })
   @IsObject()
   schema: any;

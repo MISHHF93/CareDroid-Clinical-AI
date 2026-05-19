@@ -57,10 +57,11 @@ describe('EncryptionService', () => {
 
     it('should fail decryption with modified ciphertext', () => {
       const plaintext = 'secret-token-123';
-      let encrypted = service.encrypt(plaintext);
+      const encrypted = service.encrypt(plaintext);
 
       // Modify the ciphertext
-      encrypted.encryptedText = encrypted.encryptedText.substring(0, encrypted.encryptedText.length - 2) + 'xx';
+      encrypted.encryptedText =
+        encrypted.encryptedText.substring(0, encrypted.encryptedText.length - 2) + 'xx';
 
       expect(() => {
         service.decrypt(encrypted);
@@ -69,7 +70,7 @@ describe('EncryptionService', () => {
 
     it('should fail decryption with modified auth tag', () => {
       const plaintext = 'medical-record-id';
-      let encrypted = service.encrypt(plaintext);
+      const encrypted = service.encrypt(plaintext);
 
       // Modify the auth tag (GCM provides authentication)
       encrypted.authTag = encrypted.authTag.substring(0, encrypted.authTag.length - 2) + 'ff';
@@ -81,7 +82,7 @@ describe('EncryptionService', () => {
 
     it('should fail decryption with modified IV', () => {
       const plaintext = 'patient-ssn-123-45-6789';
-      let encrypted = service.encrypt(plaintext);
+      const encrypted = service.encrypt(plaintext);
 
       // Modify the IV
       encrypted.iv = encrypted.iv.substring(0, encrypted.iv.length - 2) + 'aa';
@@ -93,7 +94,7 @@ describe('EncryptionService', () => {
 
     it('should fail decryption with different salt', () => {
       const plaintext = 'license-number-xyz';
-      let encrypted = service.encrypt(plaintext);
+      const encrypted = service.encrypt(plaintext);
 
       // Modify the salt (this changes the derived key)
       encrypted.salt = encrypted.salt.substring(0, encrypted.salt.length - 2) + 'bb';
@@ -141,7 +142,8 @@ describe('EncryptionService', () => {
     });
 
     it('should handle medical data with special characters', () => {
-      const plaintext = 'Patient: John O\'Brien, Allergy: Penicillin/Cephalosporin; Contact: +1 (555) 123-4567';
+      const plaintext =
+        "Patient: John O'Brien, Allergy: Penicillin/Cephalosporin; Contact: +1 (555) 123-4567";
       const encrypted = service.encrypt(plaintext);
       const decrypted = service.decrypt(encrypted);
 
@@ -151,25 +153,17 @@ describe('EncryptionService', () => {
 
   describe('Batch Operations', () => {
     it('should encrypt multiple values', () => {
-      const plaintexts = [
-        'email@example.com',
-        '+1-555-0123',
-        'License#ABC123XY',
-      ];
+      const plaintexts = ['email@example.com', '+1-555-0123', 'License#ABC123XY'];
 
       const encrypted = service.encryptBatch(plaintexts);
 
       expect(encrypted).toHaveLength(3);
-      expect(encrypted.every(e => e.encryptedText)).toBe(true);
-      expect(encrypted.every(e => e.authTag)).toBe(true);
+      expect(encrypted.every((e) => e.encryptedText)).toBe(true);
+      expect(encrypted.every((e) => e.authTag)).toBe(true);
     });
 
     it('should decrypt multiple values', () => {
-      const plaintexts = [
-        'user@hospital.com',
-        '+1-555-9876',
-        'SSN: 123-45-6789',
-      ];
+      const plaintexts = ['user@hospital.com', '+1-555-9876', 'SSN: 123-45-6789'];
 
       const encrypted = service.encryptBatch(plaintexts);
       const decrypted = service.decryptBatch(encrypted);

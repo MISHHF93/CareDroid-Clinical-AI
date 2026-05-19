@@ -13,6 +13,7 @@ import {
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
+import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -85,11 +86,8 @@ describe('PHQ-9 calculator wiring (phq9)', () => {
     expect(ids).toContain('phq-9');
   });
 
-  it('registers App.jsx route before calculators hub', () => {
-    const idx = appSource.indexOf("path: '/tools/calculators/phq9'");
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
-    expect(idx).toBeGreaterThan(-1);
-    expect(idx).toBeLessThan(hubIdx);
+  it('registers calculator routes in App.jsx via CALCULATOR_ROUTE_DEFS before hub', () => {
+    assertAppCalculatorRouteWiring(appSource, ['phq9']);
   });
 
   it('resolveRegistryId maps phq9 aliases', () => {

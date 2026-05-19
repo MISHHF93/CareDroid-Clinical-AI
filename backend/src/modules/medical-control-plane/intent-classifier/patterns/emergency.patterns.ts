@@ -1,9 +1,9 @@
 /**
  * Emergency Detection Patterns
- * 
+ *
  * CRITICAL: 100% recall required for emergency keywords
  * This module defines patterns for detecting medical emergencies in user messages.
- * 
+ *
  * Categories:
  * - Cardiac emergencies
  * - Neurological emergencies
@@ -43,7 +43,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'cardiac',
     severity: EmergencySeverity.CRITICAL,
-    escalationMessage: '🚨 CRITICAL: Cardiac arrest detected. Initiate ACLS immediately. Call code blue.',
+    escalationMessage:
+      '🚨 CRITICAL: Cardiac arrest detected. Initiate ACLS immediately. Call code blue.',
     protocolReference: 'ACLS-2024',
   },
   {
@@ -61,7 +62,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'cardiac',
     severity: EmergencySeverity.URGENT,
-    escalationMessage: '⚠️ URGENT: Possible acute coronary syndrome. Obtain ECG, troponins, and activate cath lab if STEMI.',
+    escalationMessage:
+      '⚠️ URGENT: Possible acute coronary syndrome. Obtain ECG, troponins, and activate cath lab if STEMI.',
     protocolReference: 'ACS-Protocol-2024',
   },
 
@@ -86,7 +88,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'neurological',
     severity: EmergencySeverity.CRITICAL,
-    escalationMessage: '🚨 CRITICAL: Stroke suspected. Time is brain. Activate stroke team, obtain CT head, check tPA eligibility.',
+    escalationMessage:
+      '🚨 CRITICAL: Stroke suspected. Time is brain. Activate stroke team, obtain CT head, check tPA eligibility.',
     protocolReference: 'Stroke-Protocol-2024',
   },
   {
@@ -101,7 +104,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'neurological',
     severity: EmergencySeverity.URGENT,
-    escalationMessage: '⚠️ URGENT: Seizure activity. Protect airway, administer benzodiazepines if status epilepticus.',
+    escalationMessage:
+      '⚠️ URGENT: Seizure activity. Protect airway, administer benzodiazepines if status epilepticus.',
     protocolReference: 'Seizure-Protocol-2024',
   },
   {
@@ -119,7 +123,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'neurological',
     severity: EmergencySeverity.URGENT,
-    escalationMessage: '⚠️ URGENT: Altered mental status. Assess GCS, check glucose, consider CT head and toxicology.',
+    escalationMessage:
+      '⚠️ URGENT: Altered mental status. Assess GCS, check glucose, consider CT head and toxicology.',
   },
 
   // ========================================
@@ -136,13 +141,14 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'respiratory',
     severity: EmergencySeverity.CRITICAL,
-    escalationMessage: '🚨 CRITICAL: Respiratory arrest. Initiate BVM ventilation, prepare for intubation.',
+    escalationMessage:
+      '🚨 CRITICAL: Respiratory arrest. Initiate BVM ventilation, prepare for intubation.',
     protocolReference: 'Airway-Protocol-2024',
   },
   {
     keywords: [
       'severe dyspnea',
-      'can\'t breathe',
+      "can't breathe",
       'shortness of breath',
       'struggling to breathe',
       'hypoxia',
@@ -154,7 +160,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'respiratory',
     severity: EmergencySeverity.URGENT,
-    escalationMessage: '⚠️ URGENT: Respiratory distress. Administer oxygen, assess for airway obstruction, consider bronchodilators.',
+    escalationMessage:
+      '⚠️ URGENT: Respiratory distress. Administer oxygen, assess for airway obstruction, consider bronchodilators.',
   },
   {
     keywords: [
@@ -168,7 +175,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'respiratory',
     severity: EmergencySeverity.CRITICAL,
-    escalationMessage: '🚨 CRITICAL: Anaphylaxis. Administer epinephrine IM immediately. Prepare for airway management.',
+    escalationMessage:
+      '🚨 CRITICAL: Anaphylaxis. Administer epinephrine IM immediately. Prepare for airway management.',
     protocolReference: 'Anaphylaxis-Protocol-2024',
   },
 
@@ -188,21 +196,16 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'psychiatric',
     severity: EmergencySeverity.CRITICAL,
-    escalationMessage: '🚨 CRITICAL: Suicide risk. Immediate psychiatric evaluation required. Do not leave patient alone. Remove means.',
+    escalationMessage:
+      '🚨 CRITICAL: Suicide risk. Immediate psychiatric evaluation required. Do not leave patient alone. Remove means.',
     protocolReference: 'Suicide-Risk-Protocol-2024',
   },
   {
-    keywords: [
-      'homicidal',
-      'want to hurt',
-      'kill someone',
-      'harm others',
-      'violent',
-      'aggressive',
-    ],
+    keywords: ['homicidal', 'want to hurt', 'kill someone', 'harm others', 'violent', 'aggressive'],
     category: 'psychiatric',
     severity: EmergencySeverity.CRITICAL,
-    escalationMessage: '🚨 CRITICAL: Violence risk. Ensure safety of staff and others. Consider restraints and security.',
+    escalationMessage:
+      '🚨 CRITICAL: Violence risk. Ensure safety of staff and others. Consider restraints and security.',
   },
   {
     keywords: [
@@ -215,7 +218,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'psychiatric',
     severity: EmergencySeverity.URGENT,
-    escalationMessage: '⚠️ URGENT: Acute psychosis. Psychiatric consultation needed. Assess for danger to self/others.',
+    escalationMessage:
+      '⚠️ URGENT: Acute psychosis. Psychiatric consultation needed. Assess for danger to self/others.',
   },
 
   // ========================================
@@ -232,7 +236,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'trauma',
     severity: EmergencySeverity.CRITICAL,
-    escalationMessage: '🚨 CRITICAL: Massive hemorrhage. Apply direct pressure, consider tourniquet, activate MTP (massive transfusion protocol).',
+    escalationMessage:
+      '🚨 CRITICAL: Massive hemorrhage. Apply direct pressure, consider tourniquet, activate MTP (massive transfusion protocol).',
     protocolReference: 'Hemorrhage-Protocol-2024',
   },
   {
@@ -248,7 +253,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'trauma',
     severity: EmergencySeverity.CRITICAL,
-    escalationMessage: '🚨 CRITICAL: Major trauma. Activate trauma team. Follow ATLS protocol: ABC assessment.',
+    escalationMessage:
+      '🚨 CRITICAL: Major trauma. Activate trauma team. Follow ATLS protocol: ABC assessment.',
     protocolReference: 'ATLS-2024',
   },
 
@@ -268,7 +274,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'hemodynamic',
     severity: EmergencySeverity.CRITICAL,
-    escalationMessage: '🚨 CRITICAL: Shock state. Assess type of shock, fluid resuscitation, vasopressors, identify source.',
+    escalationMessage:
+      '🚨 CRITICAL: Shock state. Assess type of shock, fluid resuscitation, vasopressors, identify source.',
     protocolReference: 'Shock-Protocol-2024',
   },
 
@@ -288,7 +295,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'infectious',
     severity: EmergencySeverity.CRITICAL,
-    escalationMessage: '🚨 CRITICAL: Sepsis suspected. Initiate sepsis bundle: blood cultures, broad-spectrum antibiotics, IV fluids within 1 hour.',
+    escalationMessage:
+      '🚨 CRITICAL: Sepsis suspected. Initiate sepsis bundle: blood cultures, broad-spectrum antibiotics, IV fluids within 1 hour.',
     protocolReference: 'Sepsis-Bundle-2024',
   },
 
@@ -307,7 +315,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'metabolic',
     severity: EmergencySeverity.URGENT,
-    escalationMessage: '⚠️ URGENT: Diabetic emergency. Check glucose, ketones, electrolytes. Initiate DKA/HHS protocol if confirmed.',
+    escalationMessage:
+      '⚠️ URGENT: Diabetic emergency. Check glucose, ketones, electrolytes. Initiate DKA/HHS protocol if confirmed.',
     protocolReference: 'DKA-Protocol-2024',
   },
   {
@@ -319,7 +328,8 @@ export const EMERGENCY_PATTERNS: EmergencyPattern[] = [
     ],
     category: 'metabolic',
     severity: EmergencySeverity.URGENT,
-    escalationMessage: '⚠️ URGENT: Severe hypoglycemia. Administer D50 IV or glucagon IM immediately. Recheck glucose.',
+    escalationMessage:
+      '⚠️ URGENT: Severe hypoglycemia. Administer D50 IV or glucagon IM immediately. Recheck glucose.',
   },
 ];
 
@@ -356,7 +366,7 @@ export function getHighestSeverity(patterns: EmergencyPattern[]): EmergencySever
   };
 
   let highestSeverity = patterns[0].severity;
-  
+
   for (const pattern of patterns) {
     if (severityOrder[pattern.severity] > severityOrder[highestSeverity]) {
       highestSeverity = pattern.severity;

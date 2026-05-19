@@ -1,0 +1,28 @@
+.tool-api-error-banner {
+  background: var(--color-error-bg, #fef2f2);
+  border: 1px solid var(--color-error-border, #fecaca);
+  border-radius: 8px;
+  color: var(--color-error-text, #991b1b);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+}
+
+.tool-api-error-banner__text {
+  flex: 1;
+  margin: 0;
+  min-width: 200px;
+}
+
+.tool-api-error-banner__retry {
+  background: transparent;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  color: inherit;
+  cursor: pointer;
+  font-size: inherit;
+  padding: 0.25rem 0.75rem;
+}

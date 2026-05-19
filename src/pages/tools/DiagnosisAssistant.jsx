@@ -21,7 +21,7 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
 
   const handleGenerate = async () => {
     if (!symptoms.trim()) {
-      alert('Please enter presenting symptoms');
+      setError('Please enter presenting symptoms before generating a differential.');
       return;
     }
 

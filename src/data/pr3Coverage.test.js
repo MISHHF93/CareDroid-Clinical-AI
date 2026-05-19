@@ -209,8 +209,8 @@ describe('PR3 coverage — NLU alias matching & resolveCatalogLaunch', () => {
   it('returns empty launch for falsy or unknown ids without throwing', () => {
     expect(resolveCatalogLaunch('')).toEqual(PR3_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(PR3_EMPTY_LAUNCH);
-    expect(resolveCatalogLaunch('not-a-pr3-tool-xyz').path).toBeNull();
-    expect(resolveNavigationPathForLaunch(resolveCatalogLaunch('not-a-pr3-tool-xyz'))).toBeNull();
+    expect(resolveCatalogLaunch('not-a-pr3-tool-xyz').path).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(resolveCatalogLaunch('not-a-pr3-tool-xyz'))).toBe('/dashboard');
   });
 
   it('separates stroke scale (NIHSS) from cervical spine rule aliases', () => {

@@ -1,6 +1,6 @@
 /**
  * Clinical Query Patterns
- * 
+ *
  * Patterns for identifying general clinical queries, medical reference questions,
  * and administrative requests.
  */
@@ -70,14 +70,7 @@ export const CLINICAL_QUERY_PATTERNS: ClinicalQueryPattern[] = [
   },
   {
     category: 'administrative',
-    keywords: [
-      'schedule',
-      'appointment',
-      'referral',
-      'consult',
-      'patient list',
-      'census',
-    ],
+    keywords: ['schedule', 'appointment', 'referral', 'consult', 'patient list', 'census'],
     description: 'Scheduling and workflow queries',
   },
 
@@ -109,7 +102,7 @@ export function classifyClinicalQuery(message: string): {
   confidence: number;
 } {
   const lowerMessage = message.toLowerCase();
-  
+
   let bestMatch: {
     category: 'medical_reference' | 'administrative' | 'general_query';
     confidence: number;
@@ -120,7 +113,7 @@ export function classifyClinicalQuery(message: string): {
 
   for (const pattern of CLINICAL_QUERY_PATTERNS) {
     let matchCount = 0;
-    
+
     for (const keyword of pattern.keywords) {
       if (lowerMessage.includes(keyword.toLowerCase())) {
         matchCount++;
@@ -128,8 +121,8 @@ export function classifyClinicalQuery(message: string): {
     }
 
     if (matchCount > 0) {
-      const confidence = Math.min(0.4 + (matchCount * 0.15), 0.85);
-      
+      const confidence = Math.min(0.4 + matchCount * 0.15, 0.85);
+
       if (confidence > bestMatch.confidence) {
         bestMatch = {
           category: pattern.category,

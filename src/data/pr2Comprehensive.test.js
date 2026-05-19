@@ -429,7 +429,8 @@ describe('PR2 comprehensive — NLU aliases, routes, resolveCatalogLaunch', () =
 
   it('resolveCatalogLaunch returns empty shape for unknown id', () => {
     const launch = resolveCatalogLaunch('not-a-pr2-tool-xyz');
-    expect(launch.path).toBeNull();
+    expect(launch.path).toBe('/dashboard');
+    expect(launch.chatSeed).toBeTruthy();
     expect(launch.registryId).toBeNull();
   });
 });

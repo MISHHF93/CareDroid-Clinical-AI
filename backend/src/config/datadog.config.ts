@@ -5,7 +5,7 @@ export default registerAs('datadog', () => ({
   apiKey: process.env.DATADOG_API_KEY || '',
   appKey: process.env.DATADOG_APP_KEY || '',
   site: process.env.DATADOG_SITE || 'datadoghq.com',
-  
+
   // APM Configuration
   apm: {
     enabled: process.env.DATADOG_APM_ENABLED === 'true',

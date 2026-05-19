@@ -3,7 +3,7 @@ import { createHash } from 'crypto';
 
 /**
  * Device Fingerprinting Service
- * 
+ *
  * Creates device fingerprints from request metadata for:
  * - Anomaly detection (login from new device)
  * - Device tracking (remember this device)
@@ -15,7 +15,7 @@ export class DeviceFingerprintService {
    * Generate device fingerprint from request
    * Components:
    * - User-Agent
-   * - IP address  
+   * - IP address
    * - Accept headers
    */
   generateFingerprint(req: any): string {
@@ -75,16 +75,14 @@ export class DeviceFingerprintService {
     }
 
     // Check if fingerprint matches any known device
-    const fingerprintMatches = previousDevices.some(
-      d => d.fingerprint === currentFingerprint,
-    );
+    const fingerprintMatches = previousDevices.some((d) => d.fingerprint === currentFingerprint);
 
     if (!fingerprintMatches) {
       anomalies.push('new_device_detected');
       riskScore = 0.7;
 
       // Additional risk if multiple new devices in short time
-      const recentNewDevices = previousDevices.filter(d => {
+      const recentNewDevices = previousDevices.filter((d) => {
         const daysSinceUse = (Date.now() - d.lastUsedAt.getTime()) / (1000 * 60 * 60 * 24);
         return daysSinceUse < 7;
       });

@@ -1,12 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  createCipheriv,
-  createDecipheriv,
-  randomBytes,
-  createHash,
-  scryptSync,
-} from 'crypto';
+import { createCipheriv, createDecipheriv, randomBytes, createHash, scryptSync } from 'crypto';
 
 /**
  * Encryption algorithms supported
@@ -45,7 +39,7 @@ export class EncryptionService {
     if (!keyString) {
       throw new Error(
         'ENCRYPTION_MASTER_KEY environment variable not set. ' +
-        'Generate with: node -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"'
+          "Generate with: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"",
       );
     }
 
@@ -56,7 +50,8 @@ export class EncryptionService {
 
     this.masterKey = Buffer.from(keyString, 'hex');
     this.algorithm = encryptionConfig?.algorithm || EncryptionAlgorithm.AES_256_GCM;
-    this.keyVersion = encryptionConfig?.keyVersion || parseInt(process.env.ENCRYPTION_KEY_VERSION || '1', 10);
+    this.keyVersion =
+      encryptionConfig?.keyVersion || parseInt(process.env.ENCRYPTION_KEY_VERSION || '1', 10);
 
     this.logger.log(`✅ Encryption service initialized with ${this.algorithm}`);
   }
@@ -100,7 +95,9 @@ export class EncryptionService {
         keyVersion: this.keyVersion,
       };
     } catch (error) {
-      this.logger.error(`Encryption failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Encryption failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw new Error('Failed to encrypt data');
     }
   }
@@ -114,16 +111,14 @@ export class EncryptionService {
   decrypt(encryptedData: EncryptedData | string): string {
     try {
       // Handle both EncryptedData object and JSON string
-      const data = typeof encryptedData === 'string'
-        ? JSON.parse(encryptedData)
-        : encryptedData;
+      const data = typeof encryptedData === 'string' ? JSON.parse(encryptedData) : encryptedData;
 
       // Validate key version (fail if data was encrypted with newer key version)
       if (data.keyVersion > this.keyVersion) {
         throw new Error(
           `Cannot decrypt data encrypted with key version ${data.keyVersion} ` +
-          `using key version ${this.keyVersion}. ` +
-          `Please load the correct encryption key.`
+            `using key version ${this.keyVersion}. ` +
+            `Please load the correct encryption key.`,
         );
       }
 
@@ -138,7 +133,7 @@ export class EncryptionService {
 
       // Create decipher
       const decipher = createDecipheriv(data.algorithm, derivedKey, iv);
-      
+
       // Set authentication tag for verification
       decipher.setAuthTag(authTag);
 
@@ -148,8 +143,12 @@ export class EncryptionService {
 
       return decrypted.toString('utf8');
     } catch (error) {
-      this.logger.error(`Decryption failed: ${error instanceof Error ? error.message : String(error)}`);
-      throw new Error('Failed to decrypt data. Data may be corrupted or encrypted with different key.');
+      this.logger.error(
+        `Decryption failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      throw new Error(
+        'Failed to decrypt data. Data may be corrupted or encrypted with different key.',
+      );
     }
   }
 
@@ -167,12 +166,14 @@ export class EncryptionService {
 
       return scryptSync(masterKey, salt, keyLength, {
         N: 16384, // CPU/memory cost parameter (2^14)
-        r: 8,     // Block size parameter
-        p: 1,     // Parallelization parameter
+        r: 8, // Block size parameter
+        p: 1, // Parallelization parameter
         maxmem: 128 * 1024 * 1024, // 128MB max memory
       });
     } catch (error) {
-      this.logger.error(`Key derivation failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Key derivation failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw new Error('Failed to derive encryption key');
     }
   }
@@ -208,7 +209,7 @@ export class EncryptionService {
    * @returns Array of encrypted data objects
    */
   encryptBatch(plaintexts: string[]): EncryptedData[] {
-    return plaintexts.map(plaintext => this.encrypt(plaintext));
+    return plaintexts.map((plaintext) => this.encrypt(plaintext));
   }
 
   /**
@@ -218,7 +219,7 @@ export class EncryptionService {
    * @returns Array of decrypted strings
    */
   decryptBatch(encryptedDataArray: (EncryptedData | string)[]): string[] {
-    return encryptedDataArray.map(encryptedData => this.decrypt(encryptedData));
+    return encryptedDataArray.map((encryptedData) => this.decrypt(encryptedData));
   }
 
   /**
@@ -229,10 +230,7 @@ export class EncryptionService {
    * @param newMasterKey - New master key (should be set in environment before calling)
    * @returns Data re-encrypted with new key
    */
-  reEncryptWithNewKey(
-    encryptedData: EncryptedData,
-    currentMasterKey: Buffer,
-  ): EncryptedData {
+  reEncryptWithNewKey(encryptedData: EncryptedData, currentMasterKey: Buffer): EncryptedData {
     try {
       // Decrypt with old key
       const decrypted = this.decryptWithSpecificKey(encryptedData, currentMasterKey);
@@ -240,7 +238,9 @@ export class EncryptionService {
       // Re-encrypt with current master key (which is the new one)
       return this.encrypt(decrypted);
     } catch (error) {
-      this.logger.error(`Re-encryption failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Re-encryption failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       throw new Error('Failed to re-encrypt data during key rotation');
     }
   }
@@ -252,10 +252,7 @@ export class EncryptionService {
    * @param masterKey - Specific master key to use for decryption
    * @returns Decrypted plaintext
    */
-  private decryptWithSpecificKey(
-    encryptedData: EncryptedData,
-    masterKey: Buffer,
-  ): string {
+  private decryptWithSpecificKey(encryptedData: EncryptedData, masterKey: Buffer): string {
     try {
       const iv = Buffer.from(encryptedData.iv, 'hex');
       const salt = Buffer.from(encryptedData.salt, 'hex');
@@ -273,7 +270,7 @@ export class EncryptionService {
       return decrypted.toString('utf8');
     } catch (error) {
       this.logger.error(
-        `Decryption with specific key failed: ${error instanceof Error ? error.message : String(error)}`
+        `Decryption with specific key failed: ${error instanceof Error ? error.message : String(error)}`,
       );
       throw new Error('Failed to decrypt with specific key');
     }

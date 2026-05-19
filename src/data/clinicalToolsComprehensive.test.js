@@ -38,6 +38,7 @@ import {
 import { builtinUiCalculators } from './clinicalIntentToolCatalog';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
+import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import { copdGoldChatConfig } from './chatAssistedCalculators/copdGold';
 import { romeIvIbsChatConfig } from './chatAssistedCalculators/romeIvIbs';
@@ -414,12 +415,10 @@ describe('8. Discovery inclusion', () => {
 });
 
 describe('9. Route resolution', () => {
-  it.each(WIRING_AUDIT_TIER_A_IDS)('%s has dedicated App route before hub', (id) => {
+  it.each(WIRING_AUDIT_TIER_A_IDS)('%s has dedicated calculator route before hub', (id) => {
     const spec = WIRING_AUDIT_TOOL_SPECS[id];
-    const routeIdx = appSource.indexOf(`path: '${spec.routePath}'`);
-    expect(routeIdx).toBeGreaterThan(-1);
-    expect(routeIdx).toBeLessThan(hubRouteIdx);
-    expect(appSource).toContain(`initialCalculatorId="${id}"`);
+    expect(matchCalculatorRoute(spec.routePath)?.calculatorSlug).toBe(id);
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
     expect(calculatorsSource).toContain(`case '${id}':`);
   });
 
@@ -440,9 +439,9 @@ describe('9. Route resolution', () => {
 
   it('returns empty launch for unknown tool ids', () => {
     const empty = resolveCatalogLaunch('not-a-clinical-tool-xyz-123');
-    expect(empty.path).toBeNull();
+    expect(empty.path).toBe('/dashboard');
     expect(empty.registryId).toBeNull();
-    expect(empty.chatSeed).toBeNull();
+    expect(empty.chatSeed).toBeTruthy();
   });
 });
 

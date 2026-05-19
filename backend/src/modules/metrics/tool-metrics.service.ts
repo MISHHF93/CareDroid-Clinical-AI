@@ -83,7 +83,7 @@ export class ToolMetricsService {
    */
   recordToolError(
     toolName: string,
-    errorType: 'timeout' | 'validation' | 'external_api' | 'internal_error'
+    errorType: 'timeout' | 'validation' | 'external_api' | 'internal_error',
   ) {
     this.toolErrorsTotal.inc({ tool: toolName, error_type: errorType });
   }
@@ -118,7 +118,7 @@ export class ToolMetricsService {
   setToolParameterComplexity(
     toolName: string,
     complexity: 'simple' | 'complex' | 'unknown',
-    score: number
+    score: number,
   ) {
     this.toolParamComplexityScore.set({ tool: toolName, complexity }, score);
   }

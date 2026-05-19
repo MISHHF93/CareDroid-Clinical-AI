@@ -238,10 +238,10 @@ describe('PR3 comprehensive — 5. resolveCatalogLaunch behavior', () => {
     expect(resolveCatalogLaunch('')).toEqual(PR3_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(PR3_EMPTY_LAUNCH);
     const unknown = resolveCatalogLaunch('not-a-pr3-tool-xyz');
-    expect(unknown.path).toBeNull();
+    expect(unknown.path).toBe('/dashboard');
     expect(unknown.registryId).toBeNull();
-    expect(unknown.chatSeed).toBeNull();
-    expect(resolveNavigationPathForLaunch(unknown)).toBeNull();
+    expect(unknown.chatSeed).toBeTruthy();
+    expect(resolveNavigationPathForLaunch(unknown)).toBe('/dashboard');
   });
 });
 

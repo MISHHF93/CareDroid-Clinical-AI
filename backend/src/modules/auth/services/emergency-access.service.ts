@@ -7,10 +7,10 @@ import { AuditAction } from '../../audit/entities/audit-log.entity';
 
 /**
  * Emergency Access Service
- * 
+ *
  * Allows users with saved emergency bypass codes to access their account
  * when 2FA device is unavailable (phone lost, etc.)
- * 
+ *
  * Bypass codes:
  * - Generated during 2FA setup
  * - Pre-hashed in database
@@ -45,7 +45,7 @@ export class EmergencyAccessService {
     }
 
     const backupCodes = user.twoFactor.backupCodes || [];
-    const codeIndex = backupCodes.findIndex(c => c === code);
+    const codeIndex = backupCodes.findIndex((c) => c === code);
 
     if (codeIndex === -1) {
       // Log failed attempt

@@ -73,21 +73,18 @@ describe('AdvancedRecommendationService', () => {
     });
 
     it('should boost emergency tools for high emergency score', async () => {
-      global.fetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => ({
-          intent: 'emergency_assessment',
-          confidence: 0.90,
+      const recommendations = await advancedRecommendationService.generateRecommendations(
+        {
+          primaryIntent: 'emergency_assessment',
+          confidence: 0.9,
           entities: [],
-          emergencyScore: 0.85 // High emergency
-        })
-      });
-
-      const recommendations = await advancedRecommendationService.getRecommendations(
-        'patient unresponsive and not breathing'
+          emergencyScore: 0.85,
+        },
+        'patient unresponsive and not breathing',
+        {}
       );
 
-      const emergencyRec = recommendations.find(r => r.toolId === 'calculators' && r.urgent);
+      const emergencyRec = recommendations.find((r) => r.toolId === 'sofa' && r.urgent);
       expect(emergencyRec).toBeDefined();
       expect(emergencyRec.urgent).toBe(true);
       expect(emergencyRec.confidence).toBeGreaterThan(0.9);

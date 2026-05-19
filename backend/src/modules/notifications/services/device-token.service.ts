@@ -24,10 +24,7 @@ export class DeviceTokenService {
   /**
    * Register or update a device token for a user
    */
-  async registerDeviceToken(
-    user: User,
-    dto: RegisterDeviceDto
-  ): Promise<DeviceToken> {
+  async registerDeviceToken(user: User, dto: RegisterDeviceDto): Promise<DeviceToken> {
     try {
       // Check if token already exists for this user
       let deviceToken = await this.deviceTokenRepository.findOne({
@@ -90,7 +87,7 @@ export class DeviceTokenService {
    */
   async getActiveTokens(userId: string): Promise<string[]> {
     const devices = await this.getUserDeviceTokens(userId);
-    return devices.map(device => device.token);
+    return devices.map((device) => device.token);
   }
 
   /**
@@ -134,10 +131,7 @@ export class DeviceTokenService {
    * Mark token as invalid (e.g., FCM reports invalid token)
    */
   async markTokenAsInvalid(token: string): Promise<void> {
-    await this.deviceTokenRepository.update(
-      { token },
-      { isActive: false }
-    );
+    await this.deviceTokenRepository.update({ token }, { isActive: false });
 
     this.logger.log(`Marked token as invalid: ${token.substring(0, 20)}...`);
   }
@@ -146,10 +140,7 @@ export class DeviceTokenService {
    * Update last used timestamp
    */
   async updateLastUsed(token: string): Promise<void> {
-    await this.deviceTokenRepository.update(
-      { token },
-      { lastUsedAt: new Date() }
-    );
+    await this.deviceTokenRepository.update({ token }, { lastUsedAt: new Date() });
   }
 
   /**
@@ -166,7 +157,7 @@ export class DeviceTokenService {
 
     const tokenMap = new Map<string, string[]>();
 
-    devices.forEach(device => {
+    devices.forEach((device) => {
       const userId = device.user.id;
       if (!tokenMap.has(userId)) {
         tokenMap.set(userId, []);

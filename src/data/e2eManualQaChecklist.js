@@ -121,6 +121,29 @@ export const E2E_MANUAL_QA_SECTIONS = Object.freeze([
       },
     ],
   },
+  {
+    id: 'render-execute-10pt',
+    title: 'Render / execute (10-point) — per tool',
+    items: [
+      {
+        id: 'matrix-automated',
+        steps: 'Run `npm run test:tool-render-smoke` and `npm run test:e2e-matrix`.',
+        expected: 'All matrix and smoke tests pass.',
+      },
+      {
+        id: 'per-tool-deep-link',
+        steps:
+          'For each tool in docs/tool-render-execute-matrix.md: open deep link, confirm non-empty page, run Tier A calculate or Tier C check or Tier B chat launch.',
+        expected:
+          'Route renders; Tier A forms work locally; Tier C only hits POST executors; Tier B has chat seed; API errors show alert banner.',
+      },
+      {
+        id: 'catalog-sidebar',
+        steps: 'From /tools/catalog and sidebar, open drug-check, qSOFA, Wells PE, fleet command.',
+        expected: 'Catalog and sidebar navigation match matrix smoke paths.',
+      },
+    ],
+  },
 ]);
 
 /** Flat checklist for spreadsheets / test management tools. */

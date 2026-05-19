@@ -31,13 +31,18 @@ export class EmailService {
         host: emailConfig.smtp.host,
         port: emailConfig.smtp.port,
         secure: emailConfig.smtp.secure,
-        auth: emailConfig.smtp.auth.user && emailConfig.smtp.auth.pass ? {
-          user: emailConfig.smtp.auth.user,
-          pass: emailConfig.smtp.auth.pass,
-        } : undefined,
+        auth:
+          emailConfig.smtp.auth.user && emailConfig.smtp.auth.pass
+            ? {
+                user: emailConfig.smtp.auth.user,
+                pass: emailConfig.smtp.auth.pass,
+              }
+            : undefined,
       });
 
-      this.logger.log(`✅ Email service initialized with SMTP server: ${emailConfig.smtp.host}:${emailConfig.smtp.port}`);
+      this.logger.log(
+        `✅ Email service initialized with SMTP server: ${emailConfig.smtp.host}:${emailConfig.smtp.port}`,
+      );
     } catch (error) {
       this.logger.error('Failed to initialize email service:', error);
     }

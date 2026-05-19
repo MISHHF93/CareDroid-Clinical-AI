@@ -253,9 +253,9 @@ describe('PR3 consistency — resolveCatalogLaunch, routes, sidebar, deep links'
 
   it('does not expose empty launch for unknown ids', () => {
     const empty = resolveCatalogLaunch('not-a-pr3-calculator');
-    expect(empty.path).toBeNull();
+    expect(empty.path).toBe('/dashboard');
     expect(empty.registryId).toBeNull();
-    expect(empty.chatSeed).toBeNull();
+    expect(empty.chatSeed).toBeTruthy();
   });
 
   it('exposes each PR3 registry id exactly once in toolRegistry (sidebar visibility)', () => {

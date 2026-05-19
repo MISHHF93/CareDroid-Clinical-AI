@@ -8,10 +8,7 @@ import { OAuthAccount } from './entities/oauth-account.entity';
 import { AuditModule } from '../audit/audit.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User, UserProfile, OAuthAccount]),
-    AuditModule,
-  ],
+  imports: [TypeOrmModule.forFeature([User, UserProfile, OAuthAccount]), AuditModule],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],

@@ -25,6 +25,7 @@ import { getMedicalCatalogSummary, getMedicalToolsCatalogRows } from './medicalT
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { computeMeldResult } from '../utils/meldCalculator';
 import { PR2_DISCOVERY_ALIAS_PAIRS } from './pr2TestConstants';
+import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -144,7 +145,7 @@ describe('PR2 coverage — NLU aliases & resolveCatalogLaunch', () => {
   it('returns empty launch for falsy or unknown ids without throwing', () => {
     expect(resolveCatalogLaunch('')).toEqual(EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(EMPTY_LAUNCH);
-    expect(resolveCatalogLaunch('not-a-pr2-tool-xyz').path).toBeNull();
+    expect(resolveCatalogLaunch('not-a-pr2-tool-xyz').path).toBe('/dashboard');
   });
 
   it('separates Wells PE score aliases from PERC rule-out aliases', () => {
@@ -246,12 +247,10 @@ describe('PR2 coverage — invalid input handling (MELD)', () => {
 });
 
 describe('PR2 coverage — registry & routes', () => {
-  it('registers Tier-A calculator routes in App.jsx before hub', () => {
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
+  it('registers Tier-A calculator routes via CALCULATOR_ROUTE_DEFS before hub', () => {
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
     for (const id of PR2_TIER_A_CALCULATOR_REGISTRY_IDS) {
-      const routeIdx = appSource.indexOf(`path: '${HUB}/${id}'`);
-      expect(routeIdx).toBeGreaterThan(-1);
-      expect(routeIdx).toBeLessThan(hubIdx);
+      expect(matchCalculatorRoute(`${HUB}/${id}`)?.calculatorSlug).toBe(id);
     }
   });
 

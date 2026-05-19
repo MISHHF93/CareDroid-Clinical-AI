@@ -1,7 +1,11 @@
 import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Permission } from '../enums/permission.enum';
-import { PERMISSIONS_KEY, ANY_PERMISSIONS_KEY, IS_PUBLIC_KEY } from '../decorators/permissions.decorator';
+import {
+  PERMISSIONS_KEY,
+  ANY_PERMISSIONS_KEY,
+  IS_PUBLIC_KEY,
+} from '../decorators/permissions.decorator';
 import { hasPermissionWithHierarchy, hasAnyPermission } from '../config/role-permissions.config';
 import { UserRole } from '../../users/entities/user.entity';
 import { AuditService } from '../../audit/audit.service';
@@ -9,15 +13,15 @@ import { AuditAction } from '../../audit/entities/audit-log.entity';
 
 /**
  * Authorization Guard
- * 
+ *
  * Enforces role-based access control (RBAC) by checking if the authenticated user
  * has the required permissions to access a route.
- * 
+ *
  * - Works with @Permissions() and @RequirePermission() decorators
  * - Logs all permission checks to audit trail (HIPAA requirement)
  * - Returns 403 Forbidden if user lacks required permissions
  * - Considers permission hierarchy (e.g., EXPORT_PHI implies READ_PHI)
- * 
+ *
  * HIPAA Compliance: Implements access control as required by HIPAA Security Rule
  * § 164.308(a)(4) - Information Access Management
  */

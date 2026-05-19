@@ -354,7 +354,7 @@ class SyncService {
       logger.info('Downloading latest data from server');
 
       // Get user profile
-      const profileResponse = await apiFetch('/api/user/profile', {
+      const profileResponse = await apiFetch('/api/users/profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
 

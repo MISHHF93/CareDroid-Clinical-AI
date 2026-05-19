@@ -3,14 +3,9 @@
  * Handles real-time updates for cost tracking, notifications, and collaboration
  */
 
-const getDefaultWebSocketBaseUrl = () => {
-  if (typeof window !== 'undefined' && window.location) {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    return `${protocol}//${window.location.host}`;
-  }
+import { resolveWebSocketOrigin } from '../../config/apiEnv';
 
-  return 'ws://localhost:3000';
-};
+const getDefaultWebSocketBaseUrl = () => resolveWebSocketOrigin();
 
 class WebSocketManager {
   constructor(baseUrl) {

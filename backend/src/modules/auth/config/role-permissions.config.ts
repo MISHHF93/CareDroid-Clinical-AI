@@ -3,11 +3,11 @@ import { Permission } from '../enums/permission.enum';
 
 /**
  * Role-Permission Mapping Configuration
- * 
+ *
  * Defines which permissions are granted to each role in the system.
  * Follows the principle of least privilege - users only get permissions
  * necessary for their role.
- * 
+ *
  * HIPAA Compliance: Implements role-based access control (RBAC) as required
  * by HIPAA Security Rule § 164.308(a)(4)(i) - Information Access Management
  */
@@ -136,7 +136,7 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
 
 /**
  * Check if a role has a specific permission
- * 
+ *
  * @param role - User role to check
  * @param permission - Permission to verify
  * @returns true if role has permission, false otherwise
@@ -148,7 +148,7 @@ export function hasPermission(role: UserRole, permission: Permission): boolean {
 
 /**
  * Check if a role has ALL of the specified permissions
- * 
+ *
  * @param role - User role to check
  * @param permissions - Array of permissions to verify
  * @returns true if role has all permissions, false otherwise
@@ -160,7 +160,7 @@ export function hasAllPermissions(role: UserRole, permissions: Permission[]): bo
 
 /**
  * Check if a role has ANY of the specified permissions
- * 
+ *
  * @param role - User role to check
  * @param permissions - Array of permissions to verify
  * @returns true if role has at least one permission, false otherwise
@@ -172,7 +172,7 @@ export function hasAnyPermission(role: UserRole, permissions: Permission[]): boo
 
 /**
  * Get all permissions for a specific role
- * 
+ *
  * @param role - User role
  * @returns Array of permissions
  */
@@ -183,47 +183,47 @@ export function getRolePermissions(role: UserRole): Permission[] {
 /**
  * Permission Hierarchy Configuration
  * Defines which permissions imply others (permission inheritance)
- * 
+ *
  * Example: EXPORT_PHI implies READ_PHI (can't export what you can't read)
  */
 export const PermissionHierarchy: Partial<Record<Permission, Permission[]>> = {
   // Export implies read
   [Permission.EXPORT_PHI]: [Permission.READ_PHI],
-  
+
   // Write implies read
   [Permission.WRITE_PHI]: [Permission.READ_PHI],
-  
+
   // Delete implies read and write
   [Permission.DELETE_PHI]: [Permission.READ_PHI, Permission.WRITE_PHI],
-  
+
   // Manage users implies view users
   [Permission.MANAGE_USERS]: [Permission.VIEW_USERS],
-  
+
   // Manage roles implies view users
   [Permission.MANAGE_ROLES]: [Permission.VIEW_USERS],
-  
+
   // Export audit logs implies view audit logs
   [Permission.EXPORT_AUDIT_LOGS]: [Permission.VIEW_AUDIT_LOGS],
-  
+
   // Manage MFA implies view users
   [Permission.MANAGE_MFA]: [Permission.VIEW_USERS],
 };
 
 /**
  * Check if a user has a permission, considering permission hierarchy
- * 
+ *
  * @param role - User role to check
  * @param permission - Permission to verify
  * @returns true if role has permission (directly or via hierarchy), false otherwise
  */
 export function hasPermissionWithHierarchy(role: UserRole, permission: Permission): boolean {
   const rolePermissions = RolePermissions[role];
-  
+
   // Direct permission check
   if (rolePermissions.includes(permission)) {
     return true;
   }
-  
+
   // Check if any of the user's permissions imply the requested permission
   for (const userPermission of rolePermissions) {
     const impliedPermissions = PermissionHierarchy[userPermission] || [];
@@ -231,25 +231,25 @@ export function hasPermissionWithHierarchy(role: UserRole, permission: Permissio
       return true;
     }
   }
-  
+
   return false;
 }
 
 /**
  * Get effective permissions for a role (including inherited permissions)
- * 
+ *
  * @param role - User role
  * @returns Array of all effective permissions
  */
 export function getEffectivePermissions(role: UserRole): Permission[] {
   const directPermissions = RolePermissions[role] || [];
   const effectivePermissions = new Set(directPermissions);
-  
+
   // Add implied permissions
   for (const permission of directPermissions) {
     const impliedPermissions = PermissionHierarchy[permission] || [];
     impliedPermissions.forEach((p) => effectivePermissions.add(p));
   }
-  
+
   return Array.from(effectivePermissions);
 }

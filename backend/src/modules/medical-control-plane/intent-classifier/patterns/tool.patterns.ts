@@ -1,6 +1,6 @@
 /**
  * Clinical Tool Patterns
- * 
+ *
  * Defines patterns for detecting which clinical tool the user wants to invoke.
  * Each pattern includes keywords, parameter extraction patterns, and tool metadata.
  */
@@ -13,7 +13,7 @@ export interface ToolPattern {
   optionalParameters?: string[];
   parameterExtractors?: Record<string, RegExp>;
   description: string;
-  category: 'calculator' | 'checker' | 'interpreter' | 'protocol' | 'reference';
+  category: 'calculator' | 'checker' | 'interpreter' | 'protocol' | 'reference' | 'fleet';
 }
 
 export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
@@ -128,7 +128,8 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'medications',
       'alcohol',
     ],
-    description: 'HAS-BLED bleeding risk score for anticoagulation decisions in atrial fibrillation',
+    description:
+      'HAS-BLED bleeding risk score for anticoagulation decisions in atrial fibrillation',
     category: 'calculator',
   },
   {
@@ -382,13 +383,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
-    keywords: [
-      'apache',
-      'apache-ii',
-      'apache 2',
-      'apache ii',
-      'acute physiology',
-    ],
+    keywords: ['apache', 'apache-ii', 'apache 2', 'apache ii', 'acute physiology'],
     requiredParameters: ['age'],
     optionalParameters: [
       'temperature',
@@ -418,13 +413,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'atrial fibrillation risk',
     ],
     requiredParameters: ['age', 'sex'],
-    optionalParameters: [
-      'chf',
-      'hypertension',
-      'diabetes',
-      'stroke_tia',
-      'vascular_disease',
-    ],
+    optionalParameters: ['chf', 'hypertension', 'diabetes', 'stroke_tia', 'vascular_disease'],
     description: 'Calculates stroke risk in atrial fibrillation patients',
     category: 'calculator',
   },
@@ -439,12 +428,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'community acquired pneumonia',
     ],
     requiredParameters: ['age'],
-    optionalParameters: [
-      'confusion',
-      'urea',
-      'respiratory_rate',
-      'blood_pressure',
-    ],
+    optionalParameters: ['confusion', 'urea', 'respiratory_rate', 'blood_pressure'],
     description: 'Assesses pneumonia severity and need for hospitalization',
     category: 'calculator',
   },
@@ -467,13 +451,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'wells-dvt-calculator',
     toolName: 'Wells DVT Score',
-    keywords: [
-      'wells',
-      'wells dvt',
-      'wells score',
-      'dvt risk',
-      'deep vein thrombosis',
-    ],
+    keywords: ['wells', 'wells dvt', 'wells score', 'dvt risk', 'deep vein thrombosis'],
     requiredParameters: [],
     optionalParameters: [
       'active_cancer',
@@ -816,12 +794,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'atls-protocol',
     toolName: 'ATLS Protocol',
-    keywords: [
-      'atls',
-      'advanced trauma life support',
-      'trauma protocol',
-      'trauma algorithm',
-    ],
+    keywords: ['atls', 'advanced trauma life support', 'trauma protocol', 'trauma algorithm'],
     requiredParameters: [],
     optionalParameters: ['injury_type'],
     description: 'Provides ATLS protocols for trauma management',
@@ -987,7 +960,7 @@ export function matchToolPatterns(message: string): Array<{
 
   for (const pattern of CLINICAL_TOOL_PATTERNS) {
     const matchedKeywords: string[] = [];
-    
+
     for (const keyword of pattern.keywords) {
       if (lowerMessage.includes(keyword.toLowerCase())) {
         matchedKeywords.push(keyword);
@@ -998,10 +971,11 @@ export function matchToolPatterns(message: string): Array<{
       // Confidence based on:
       // - Number of keywords matched
       // - Length of keywords (longer = more specific)
-      const avgKeywordLength = matchedKeywords.reduce((sum, kw) => sum + kw.length, 0) / matchedKeywords.length;
+      const avgKeywordLength =
+        matchedKeywords.reduce((sum, kw) => sum + kw.length, 0) / matchedKeywords.length;
       const confidence = Math.min(
-        0.5 + (matchedKeywords.length * 0.15) + (avgKeywordLength / 100),
-        0.95
+        0.5 + matchedKeywords.length * 0.15 + avgKeywordLength / 100,
+        0.95,
       );
 
       matches.push({
@@ -1020,9 +994,7 @@ export function matchToolPatterns(message: string): Array<{
     lowerMessage.includes('quick sepsis score') ||
     lowerMessage.includes('sepsis bedside score') ||
     lowerMessage.includes('bedside sepsis score');
-  let filtered = preferQsofa
-    ? matches.filter((m) => m.toolId !== 'sofa-calculator')
-    : matches;
+  let filtered = preferQsofa ? matches.filter((m) => m.toolId !== 'sofa-calculator') : matches;
 
   const preferWellsPe =
     /\bwells\s+pe\b/.test(lowerMessage) ||
@@ -1056,7 +1028,9 @@ export function matchToolPatterns(message: string): Array<{
       !lowerMessage.includes('wells'));
 
   if (preferPerc) {
-    filtered = filtered.filter((m) => m.toolId !== 'wells-pe' && m.toolId !== 'wells-dvt-calculator');
+    filtered = filtered.filter(
+      (m) => m.toolId !== 'wells-pe' && m.toolId !== 'wells-dvt-calculator',
+    );
   }
 
   const preferGraceAcs =
@@ -1068,7 +1042,9 @@ export function matchToolPatterns(message: string): Array<{
     lowerMessage.includes('global registry acute coronary');
 
   const preferTimiAcs =
-    /\btimi\b/.test(lowerMessage) && !/\bgrace\b/.test(lowerMessage) && !lowerMessage.includes('grace acs');
+    /\btimi\b/.test(lowerMessage) &&
+    !/\bgrace\b/.test(lowerMessage) &&
+    !lowerMessage.includes('grace acs');
 
   if (preferGraceAcs) {
     filtered = filtered.filter((m) => m.toolId !== 'timi-ua-nstemi');
@@ -1108,9 +1084,7 @@ export function matchToolPatterns(message: string): Array<{
 
   if (preferCkdStaging) {
     filtered = filtered.filter(
-      (m) =>
-        m.toolId !== 'gfr-calculator' &&
-        m.toolId !== 'cha2ds2vasc-calculator',
+      (m) => m.toolId !== 'gfr-calculator' && m.toolId !== 'cha2ds2vasc-calculator',
     );
   }
 
@@ -1138,7 +1112,9 @@ export function matchToolPatterns(message: string): Array<{
     (lowerMessage.includes('alcohol') && lowerMessage.includes('screen'));
 
   if (preferAuditC) {
-    filtered = filtered.filter((m) => m.toolId !== 'has-bled' && m.toolId !== 'cha2ds2vasc-calculator');
+    filtered = filtered.filter(
+      (m) => m.toolId !== 'has-bled' && m.toolId !== 'cha2ds2vasc-calculator',
+    );
   }
 
   const preferPhq9 =
@@ -1191,9 +1167,7 @@ export function matchToolPatterns(message: string): Array<{
     (lowerMessage.includes('anxiety') && lowerMessage.includes('screen'));
 
   if (preferGad7) {
-    filtered = filtered.filter(
-      (m) => m.toolId !== 'differential-diagnosis' && m.toolId !== 'phq9',
-    );
+    filtered = filtered.filter((m) => m.toolId !== 'differential-diagnosis' && m.toolId !== 'phq9');
   }
 
   const preferFleetCommand =
@@ -1234,7 +1208,9 @@ export function matchToolPatterns(message: string): Array<{
     lowerMessage.includes('optimize route') ||
     lowerMessage.includes('route planner') ||
     lowerMessage.includes('delivery route') ||
-    (lowerMessage.includes('fleet') && lowerMessage.includes('route') && lowerMessage.includes('stop'));
+    (lowerMessage.includes('fleet') &&
+      lowerMessage.includes('route') &&
+      lowerMessage.includes('stop'));
 
   if (preferRouteOptimizer) {
     filtered = filtered.filter(
@@ -1290,7 +1266,9 @@ export function matchToolPatterns(message: string): Array<{
     lowerMessage.includes('cervical spine rule') ||
     lowerMessage.includes('neck trauma imaging rule') ||
     (lowerMessage.includes('cervical spine') &&
-      (lowerMessage.includes('imaging') || lowerMessage.includes('x-ray') || lowerMessage.includes('xray')) &&
+      (lowerMessage.includes('imaging') ||
+        lowerMessage.includes('x-ray') ||
+        lowerMessage.includes('xray')) &&
       !lowerMessage.includes('stroke'));
 
   if (preferCanadianCSpine) {
@@ -1306,7 +1284,9 @@ export function matchToolPatterns(message: string): Array<{
     lowerMessage.includes('foot xray rule') ||
     lowerMessage.includes('foot x-ray rule') ||
     (lowerMessage.includes('ankle') &&
-      (lowerMessage.includes('xray') || lowerMessage.includes('x-ray') || lowerMessage.includes('radiograph')) &&
+      (lowerMessage.includes('xray') ||
+        lowerMessage.includes('x-ray') ||
+        lowerMessage.includes('radiograph')) &&
       !lowerMessage.includes('pulmonary'));
 
   if (preferOttawaAnkle) {
@@ -1321,16 +1301,13 @@ export function matchToolPatterns(message: string): Array<{
  * Get tool pattern by ID
  */
 export function getToolPattern(toolId: string): ToolPattern | undefined {
-  return CLINICAL_TOOL_PATTERNS.find(p => p.toolId === toolId);
+  return CLINICAL_TOOL_PATTERNS.find((p) => p.toolId === toolId);
 }
 
 /**
  * Extract parameters from message for a specific tool
  */
-export function extractToolParameters(
-  message: string,
-  toolId: string
-): Record<string, any> {
+export function extractToolParameters(message: string, toolId: string): Record<string, any> {
   const pattern = getToolPattern(toolId);
   if (!pattern) return {};
 
@@ -1357,7 +1334,10 @@ export function extractToolParameters(
   };
 
   for (const [param, regex] of Object.entries(numberPatterns)) {
-    if (pattern.requiredParameters?.includes(param) || pattern.optionalParameters?.includes(param)) {
+    if (
+      pattern.requiredParameters?.includes(param) ||
+      pattern.optionalParameters?.includes(param)
+    ) {
       const match = message.match(regex);
       if (match) {
         const value = match[1] || match[2];

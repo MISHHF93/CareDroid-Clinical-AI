@@ -4,17 +4,9 @@
  * Also manages custom report generation and scheduling
  */
 
-const getDefaultApiBaseUrl = () => {
-  if (typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
+import { resolveApiRoot } from '../../config/apiEnv';
 
-  if (typeof window !== 'undefined' && window.location) {
-    return `${window.location.origin}/api`;
-  }
-
-  return 'http://localhost:3000/api';
-};
+const getDefaultApiBaseUrl = () => resolveApiRoot();
 
 class ExportService {
   constructor(apiBaseUrl) {

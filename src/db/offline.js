@@ -1,5 +1,5 @@
 // Offline database using LocalStorage with sync queue
-import appConfig from '../config/appConfig';
+import { apiFetchJson } from '../services/apiClient';
 import logger from '../utils/logger';
 
 class OfflineDB {
@@ -130,9 +130,7 @@ class OfflineDB {
 
   // Sync individual item
   async syncItem(item) {
-    const apiUrl = appConfig.api.baseUrl || 'http://localhost:8000';
-    
-    const response = await fetch(`${apiUrl}/api/sync`, {
+    const { response, data } = await apiFetchJson('/api/sync', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -144,7 +142,7 @@ class OfflineDB {
       throw new Error(`Sync failed: ${response.statusText}`);
     }
 
-    return response.json();
+    return data;
   }
 
   // Patient data methods

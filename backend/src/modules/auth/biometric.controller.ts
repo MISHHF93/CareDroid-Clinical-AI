@@ -12,7 +12,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
-import { BiometricService, EnrollBiometricDto, VerifyBiometricDto } from './services/biometric.service';
+import {
+  BiometricService,
+  EnrollBiometricDto,
+  VerifyBiometricDto,
+} from './services/biometric.service';
 import { BiometricType } from './entities/biometric-config.entity';
 
 @ApiTags('auth/biometric')
@@ -28,14 +32,8 @@ export class BiometricController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Enroll biometric authentication' })
   @ApiResponse({ status: 201, description: 'Biometric enrolled successfully' })
-  async enrollBiometric(
-    @Request() req,
-    @Body() dto: EnrollBiometricDto
-  ) {
-    const { challengeToken, config } = await this.biometricService.enrollBiometric(
-      req.user,
-      dto
-    );
+  async enrollBiometric(@Request() req, @Body() dto: EnrollBiometricDto) {
+    const { challengeToken, config } = await this.biometricService.enrollBiometric(req.user, dto);
 
     return {
       success: true,
@@ -86,7 +84,7 @@ export class BiometricController {
 
     return {
       success: true,
-      configs: configs.map(config => ({
+      configs: configs.map((config) => ({
         id: config.id,
         biometricType: config.biometricType,
         deviceId: config.deviceId,
@@ -165,11 +163,7 @@ export class BiometricController {
       success: true,
       serverSupport: true,
       enrolledDevices: configs.length,
-      supportedTypes: [
-        BiometricType.FINGERPRINT,
-        BiometricType.FACE,
-        BiometricType.IRIS,
-      ],
+      supportedTypes: [BiometricType.FINGERPRINT, BiometricType.FACE, BiometricType.IRIS],
     };
   }
 }

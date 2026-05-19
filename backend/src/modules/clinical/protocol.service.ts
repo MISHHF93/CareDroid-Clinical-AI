@@ -23,10 +23,9 @@ export class ProtocolService {
     const queryBuilder = this.protocolRepository.createQueryBuilder('protocol');
 
     if (search) {
-      queryBuilder.where(
-        '(protocol.name ILIKE :search OR protocol.description ILIKE :search)',
-        { search: `%${search}%` },
-      );
+      queryBuilder.where('(protocol.name ILIKE :search OR protocol.description ILIKE :search)', {
+        search: `%${search}%`,
+      });
     }
 
     if (category) {
@@ -73,7 +72,7 @@ export class ProtocolService {
       .createQueryBuilder('protocol')
       .select('DISTINCT protocol.category', 'category')
       .getRawMany();
-    
-    return result.map(r => r.category);
+
+    return result.map((r) => r.category);
   }
 }

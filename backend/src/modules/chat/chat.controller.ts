@@ -97,7 +97,7 @@ export class ChatController {
     // Extract userId and role from request if authenticated
     const userId = req?.user?.id || 'anonymous';
     const userRole = req?.user?.role || null;
-    
+
     const response = await this.chatService.processMessage(
       dto.message,
       dto.tool,

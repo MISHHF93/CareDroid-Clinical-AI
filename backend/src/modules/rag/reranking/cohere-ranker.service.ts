@@ -4,7 +4,7 @@ import { RetrievedChunk } from '../dto/rag-context.dto';
 
 /**
  * Cohere Reranker Service
- * 
+ *
  * Reranks retrieved chunks using Cohere's semantic reranking API
  * Improves retrieval quality by reordering results based on semantic relevance to the query
  */
@@ -41,7 +41,11 @@ export class CohereRankerService {
    * @param topK Number of top results to return after reranking
    * @returns Reranked chunks sorted by relevance
    */
-  async rerank(query: string, chunks: RetrievedChunk[], topK: number = 5): Promise<RetrievedChunk[]> {
+  async rerank(
+    query: string,
+    chunks: RetrievedChunk[],
+    topK: number = 5,
+  ): Promise<RetrievedChunk[]> {
     if (!this.enabled) {
       this.logger.warn('Reranking disabled, returning original order');
       return chunks.slice(0, topK);
@@ -52,7 +56,9 @@ export class CohereRankerService {
     }
 
     try {
-      this.logger.debug(`Reranking ${chunks.length} chunks for query: "${query.substring(0, 50)}..."`);
+      this.logger.debug(
+        `Reranking ${chunks.length} chunks for query: "${query.substring(0, 50)}..."`,
+      );
 
       // Prepare documents for Cohere
       const documents = chunks.map((chunk) => ({

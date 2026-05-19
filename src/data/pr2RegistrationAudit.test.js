@@ -34,6 +34,10 @@ import {
   expectedLaunchPath,
   matchCalculatorRoute,
 } from '../routes/clinicalToolRoutes';
+import {
+  assertAppCalculatorRouteWiring,
+  registeredCalculatorPathsForSet,
+} from './testHelpers/calculatorRouteAudit';
 import { TOOL_PATTERNS_PATH } from './clinicalToolAliasSync';
 import {
   aliasToSlug,
@@ -130,19 +134,13 @@ describe('PR2 registration audit — routes & path naming', () => {
     );
   });
 
-  it('registers each Tier-A PR2 route in App.jsx with matching initialCalculatorId (deep link)', () => {
-    for (const id of PR2_TIER_A_TOOL_IDS) {
-      const path = PR2_ROUTE_BY_REGISTRY_ID[id];
-      expect(appSource).toContain(`path: '${path}'`);
-      expect(appSource).toContain(`initialCalculatorId="${id}"`);
-    }
+  it('registers each Tier-A PR2 route via CALCULATOR_ROUTE_DEFS before hub', () => {
+    assertAppCalculatorRouteWiring(appSource, PR2_TIER_A_TOOL_IDS);
   });
 
-  it('has no orphaned Tier-A PR2 App routes (route slug must be a Tier-A registry id)', () => {
-    const appCalcRoutes = extractAppCalculatorRoutes(appSource).filter((p) =>
-      PR2_TIER_A_PATH_SET.has(p)
-    );
-    expect(appCalcRoutes.sort()).toEqual([...PR2_TIER_A_PATH_SET].sort());
+  it('has no orphaned Tier-A PR2 routes in CALCULATOR_ROUTE_DEFS', () => {
+    const registered = registeredCalculatorPathsForSet(PR2_TIER_A_PATH_SET);
+    expect(registered.sort()).toEqual([...PR2_TIER_A_PATH_SET].sort());
   });
 
   it('does not register Tier-B standalone calculator App routes', () => {

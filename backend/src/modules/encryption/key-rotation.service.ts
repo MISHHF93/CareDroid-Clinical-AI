@@ -96,7 +96,7 @@ export class KeyRotationService {
               createdAt: activeKey.createdAt,
             }
           : null,
-        pendingRotations: pendingKeys.map(k => ({
+        pendingRotations: pendingKeys.map((k) => ({
           version: k.keyVersion,
           status: k.status,
           createdAt: k.createdAt,
@@ -131,15 +131,12 @@ export class KeyRotationService {
       if (key.status !== 're_encryption_complete') {
         throw new Error(
           `Cannot activate key in status '${key.status}'. ` +
-          `Re-encryption must be complete before activation.`,
+            `Re-encryption must be complete before activation.`,
         );
       }
 
       // Deactivate previous key
-      await this.keyRepository.update(
-        { isActive: true },
-        { isActive: false },
-      );
+      await this.keyRepository.update({ isActive: true }, { isActive: false });
 
       // Activate new key
       key.isActive = true;
@@ -180,9 +177,7 @@ export class KeyRotationService {
 
       await this.keyRepository.save(rotation);
 
-      this.logger.log(
-        `✅ Key rotation scheduled for ${scheduledTime}`,
-      );
+      this.logger.log(`✅ Key rotation scheduled for ${scheduledTime}`);
 
       return {
         scheduledTime,
@@ -220,7 +215,7 @@ export class KeyRotationService {
         take: limit,
       });
 
-      return keys.map(key => ({
+      return keys.map((key) => ({
         version: key.keyVersion,
         algorithm: key.algorithm,
         isActive: key.isActive,
@@ -245,7 +240,8 @@ export class KeyRotationService {
    *
    * @param olderThanDays - Delete keys older than this many days
    */
-  async scheduleOldKeyDeletion(olderThanDays: number = 2555) { // ~7 years
+  async scheduleOldKeyDeletion(olderThanDays: number = 2555) {
+    // ~7 years
     try {
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - olderThanDays);
@@ -271,9 +267,7 @@ export class KeyRotationService {
         await this.keyRepository.save(key);
       }
 
-      this.logger.log(
-        `✅ Scheduled ${keysToDelete.length} keys for deletion`,
-      );
+      this.logger.log(`✅ Scheduled ${keysToDelete.length} keys for deletion`);
 
       return {
         message: `${keysToDelete.length} keys scheduled for deletion`,
@@ -295,11 +289,7 @@ export class KeyRotationService {
    * @param percentage - Progress percentage (0-100)
    * @param recordsProcessed - Number of records processed
    */
-  async updateRotationProgress(
-    keyVersion: number,
-    percentage: number,
-    recordsProcessed: number,
-  ) {
+  async updateRotationProgress(keyVersion: number, percentage: number, recordsProcessed: number) {
     try {
       const key = await this.keyRepository.findOne({
         where: { keyVersion },
@@ -319,9 +309,7 @@ export class KeyRotationService {
       await this.keyRepository.save(key);
 
       if (percentage % 10 === 0) {
-        this.logger.log(
-          `🔄 Key rotation progress: ${percentage}% (${recordsProcessed} records)`,
-        );
+        this.logger.log(`🔄 Key rotation progress: ${percentage}% (${recordsProcessed} records)`);
       }
     } catch (error) {
       this.logger.error(

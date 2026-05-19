@@ -58,9 +58,7 @@ describe('tool-orchestrator.registry', () => {
   });
 
   it('classifies dispatch-ai as unsupported', () => {
-    expect(classifyToolExecutionError('dispatch-ai')).toBe(
-      ToolExecutionErrorCode.UNSUPPORTED_TOOL,
-    );
+    expect(classifyToolExecutionError('dispatch-ai')).toBe(ToolExecutionErrorCode.UNSUPPORTED_TOOL);
   });
 
   it('documents contracts for every registered executor', () => {
@@ -88,7 +86,9 @@ describe('tool-orchestrator.registry', () => {
     const patterns = patternToolIds();
     const registered = new Set(REGISTERED_EXECUTOR_TOOL_IDS);
     const unsupported = new Set(NLU_TOOL_IDS_WITHOUT_EXECUTOR);
-    const expected = patterns.filter((id) => !registered.has(id as (typeof REGISTERED_EXECUTOR_TOOL_IDS)[number]));
+    const expected = patterns.filter(
+      (id) => !registered.has(id as (typeof REGISTERED_EXECUTOR_TOOL_IDS)[number]),
+    );
     expect([...unsupported].sort()).toEqual([...expected].sort());
   });
 
@@ -96,9 +96,9 @@ describe('tool-orchestrator.registry', () => {
     expect(
       validateExecutorContractParameters('drug-interactions', { medications: ['aspirin'] }).valid,
     ).toBe(true);
-    expect(
-      validateExecutorContractParameters('drug-interactions', { medications: [] }).valid,
-    ).toBe(false);
+    expect(validateExecutorContractParameters('drug-interactions', { medications: [] }).valid).toBe(
+      false,
+    );
     expect(validateExecutorContractParameters('drug-interactions', {}).valid).toBe(false);
   });
 

@@ -5,22 +5,14 @@ import { PineconeService } from './vector-db/pinecone.service';
 import { CohereRankerService } from './reranking/cohere-ranker.service';
 import { DocumentChunker } from './utils/document-chunker';
 import { ToolMetricsService } from '../metrics/tool-metrics.service';
-import {
-  RAGContext,
-  RAGRetrievalOptions,
-  RetrievedChunk,
-} from './dto/rag-context.dto';
-import {
-  MedicalSource,
-  IngestDocumentDto,
-  DocumentChunk,
-} from './dto/medical-source.dto';
+import { RAGContext, RAGRetrievalOptions, RetrievedChunk } from './dto/rag-context.dto';
+import { MedicalSource, IngestDocumentDto, DocumentChunk } from './dto/medical-source.dto';
 import { VectorRecord } from './vector-db/vector-db.interface';
 import { v4 as uuidv4 } from 'uuid';
 
 /**
  * RAG Service
- * 
+ *
  * Main service for Retrieval-Augmented Generation.
  * Orchestrates document ingestion, embedding generation, vector storage, and retrieval.
  */
@@ -42,29 +34,28 @@ export class RAGService {
   ) {
     const ragConfig = this.configService.get<any>('rag') || {};
     this.enabled = ragConfig?.enabled !== false;
-    
+
     // Wire RAG configuration parameters
     const chunkingConfig = ragConfig.chunking || {};
     const retrievalConfig = ragConfig.retrieval || {};
-    
+
     this.defaultTopK = retrievalConfig.defaultTopK || 5;
     this.defaultMinScore = retrievalConfig.minScore || 0.7;
-    
+
     const chunkSize = chunkingConfig.chunkSize || 512;
     const chunkOverlap = chunkingConfig.overlap || 50;
-    
+
     this.documentChunker = new DocumentChunker(chunkSize, chunkOverlap);
-    this.logger.log(`RAG configured: topK=${this.defaultTopK}, minScore=${this.defaultMinScore}, chunkSize=${chunkSize}, overlap=${chunkOverlap}`);
+    this.logger.log(
+      `RAG configured: topK=${this.defaultTopK}, minScore=${this.defaultMinScore}, chunkSize=${chunkSize}, overlap=${chunkOverlap}`,
+    );
   }
 
   /**
    * Retrieve relevant context for a query
    * This is the main method used by AI chat to augment responses
    */
-  async retrieve(
-    query: string,
-    options: RAGRetrievalOptions = {},
-  ): Promise<RAGContext> {
+  async retrieve(query: string, options: RAGRetrievalOptions = {}): Promise<RAGContext> {
     if (!this.enabled) {
       this.logger.warn('RAG is disabled. Returning empty context.');
       return {
@@ -130,7 +121,6 @@ export class RAGService {
       } else {
         // Record retrieval count (commented out - method not available)
         // this.toolMetrics.recordRagRetrieval(chunks.length);
-        
         // Record relevance scores for each chunk (commented out - method not available)
         // chunks.forEach(chunk => {
         //   this.toolMetrics.recordRagRelevanceScore(chunk.score);
@@ -365,8 +355,8 @@ export class RAGService {
     }
 
     // Validate and normalize chunk scores (should be 0-1 from vector DB)
-    const validChunks = chunks.filter(chunk => 
-      typeof chunk.score === 'number' && chunk.score >= 0 && chunk.score <= 1
+    const validChunks = chunks.filter(
+      (chunk) => typeof chunk.score === 'number' && chunk.score >= 0 && chunk.score <= 1,
     );
 
     if (validChunks.length === 0) {

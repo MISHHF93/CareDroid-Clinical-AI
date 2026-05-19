@@ -1,11 +1,11 @@
 /**
  * Intent Classifier Service - Unit Tests
- * 
+ *
  * Tests the 3-phase intent classification pipeline:
  * - Phase 1: Keyword matching
  * - Phase 2: NLU model (mocked, not yet implemented)
  * - Phase 3: LLM fallback
- * 
+ *
  * Critical requirement: 100% recall for emergency detection
  */
 
@@ -76,7 +76,7 @@ describe('IntentClassifierService', () => {
 
       expect(result.isEmergency).toBe(true);
       expect(result.emergencySeverity).toBe(EmergencySeverity.CRITICAL);
-      expect(result.emergencyKeywords.some(k => k.category === 'neurological')).toBe(true);
+      expect(result.emergencyKeywords.some((k) => k.category === 'neurological')).toBe(true);
     });
 
     it('should detect chest pain (urgent)', async () => {
@@ -84,7 +84,7 @@ describe('IntentClassifierService', () => {
 
       expect(result.isEmergency).toBe(true);
       expect(result.emergencySeverity).toBe(EmergencySeverity.URGENT);
-      expect(result.emergencyKeywords.some(k => k.category === 'cardiac')).toBe(true);
+      expect(result.emergencyKeywords.some((k) => k.category === 'cardiac')).toBe(true);
     });
 
     it('should detect respiratory failure', async () => {
@@ -92,7 +92,7 @@ describe('IntentClassifierService', () => {
 
       expect(result.isEmergency).toBe(true);
       expect(result.emergencySeverity).toBe(EmergencySeverity.CRITICAL);
-      expect(result.emergencyKeywords.some(k => k.category === 'respiratory')).toBe(true);
+      expect(result.emergencyKeywords.some((k) => k.category === 'respiratory')).toBe(true);
     });
 
     it('should detect suicide risk', async () => {
@@ -100,7 +100,7 @@ describe('IntentClassifierService', () => {
 
       expect(result.isEmergency).toBe(true);
       expect(result.emergencySeverity).toBe(EmergencySeverity.CRITICAL);
-      expect(result.emergencyKeywords.some(k => k.category === 'psychiatric')).toBe(true);
+      expect(result.emergencyKeywords.some((k) => k.category === 'psychiatric')).toBe(true);
     });
 
     it('should detect sepsis', async () => {
@@ -115,7 +115,7 @@ describe('IntentClassifierService', () => {
 
       expect(result.isEmergency).toBe(true);
       expect(result.emergencySeverity).toBe(EmergencySeverity.CRITICAL);
-      expect(result.emergencyKeywords.some(k => k.category === 'trauma')).toBe(true);
+      expect(result.emergencyKeywords.some((k) => k.category === 'trauma')).toBe(true);
     });
 
     it('should NOT false positive on non-emergency queries', async () => {
@@ -350,8 +350,8 @@ describe('IntentClassifierService', () => {
 
     it('should provide escalation message for emergencies', async () => {
       const classification = await service.classify('Stroke suspected - facial droop');
-      
-      const patterns = classification.emergencyKeywords.map(kw => ({
+
+      const patterns = classification.emergencyKeywords.map((kw) => ({
         keywords: [kw.keyword],
         category: kw.category,
         severity: kw.severity,

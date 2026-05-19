@@ -1,9 +1,9 @@
 /**
  * Drug Interaction Checker Service
- * 
+ *
  * Checks for clinically significant drug-drug interactions.
  * Uses AI service with medical knowledge base.
- * 
+ *
  * Note: In production, integrate with DailyMed, First Databank, or Lexicomp API
  */
 
@@ -36,7 +36,8 @@ export class DrugCheckerService implements ClinicalToolService {
     return {
       id: 'drug-interactions',
       name: 'Drug Interaction Checker',
-      description: 'Identifies clinically significant drug-drug interactions and provides management recommendations',
+      description:
+        'Identifies clinically significant drug-drug interactions and provides management recommendations',
       category: 'checker',
       version: '1.0.0',
       author: 'CareDroid Medical Team',
@@ -79,7 +80,9 @@ export class DrugCheckerService implements ClinicalToolService {
     } else if (parameters.medications.length < 2) {
       errors.push('At least 2 medications are required to check interactions');
     } else if (parameters.medications.length > 20) {
-      warnings.push('Checking more than 20 medications may take longer and could miss interactions');
+      warnings.push(
+        'Checking more than 20 medications may take longer and could miss interactions',
+      );
     }
 
     if (parameters.severityFilter) {
@@ -121,23 +124,26 @@ export class DrugCheckerService implements ClinicalToolService {
     try {
       aiInteractions = await this.checkWithAI(medications);
     } catch (error) {
-      this.logger.warn(`AI interaction check failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.warn(
+        `AI interaction check failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     // Merge results
     const allInteractions = [...knownInteractions, ...aiInteractions];
 
     // Filter by severity
-    const filteredInteractions = severityFilter === 'all'
-      ? allInteractions
-      : allInteractions.filter(i => i.severity === severityFilter);
+    const filteredInteractions =
+      severityFilter === 'all'
+        ? allInteractions
+        : allInteractions.filter((i) => i.severity === severityFilter);
 
     // Group by severity
     const groupedBySeverity = {
-      contraindicated: filteredInteractions.filter(i => i.severity === 'contraindicated'),
-      major: filteredInteractions.filter(i => i.severity === 'major'),
-      moderate: filteredInteractions.filter(i => i.severity === 'moderate'),
-      minor: filteredInteractions.filter(i => i.severity === 'minor'),
+      contraindicated: filteredInteractions.filter((i) => i.severity === 'contraindicated'),
+      major: filteredInteractions.filter((i) => i.severity === 'major'),
+      moderate: filteredInteractions.filter((i) => i.severity === 'moderate'),
+      minor: filteredInteractions.filter((i) => i.severity === 'minor'),
     };
 
     const interpretation = this.generateInterpretation(groupedBySeverity, medications.length);
@@ -173,7 +179,7 @@ export class DrugCheckerService implements ClinicalToolService {
 
   private checkKnownInteractions(medications: string[]): DrugInteraction[] {
     const interactions: DrugInteraction[] = [];
-    const medSet = new Set(medications.map(m => m.toLowerCase()));
+    const medSet = new Set(medications.map((m) => m.toLowerCase()));
 
     // High-risk interactions database (sample)
     const knownPairs: Record<string, DrugInteraction> = {
@@ -183,15 +189,18 @@ export class DrugCheckerService implements ClinicalToolService {
         severity: 'major',
         mechanism: 'Additive antiplatelet effects and gastric mucosal injury',
         clinicalSignificance: 'Significantly increased risk of bleeding, especially GI bleeding',
-        management: 'Monitor INR closely. Consider PPI for GI protection. Use lowest effective aspirin dose.',
+        management:
+          'Monitor INR closely. Consider PPI for GI protection. Use lowest effective aspirin dose.',
       },
       'warfarin-nsaid': {
         drug1: 'Warfarin',
         drug2: 'NSAID',
         severity: 'major',
-        mechanism: 'Increased anticoagulant effect via protein displacement and platelet inhibition',
+        mechanism:
+          'Increased anticoagulant effect via protein displacement and platelet inhibition',
         clinicalSignificance: 'Increased bleeding risk by 2-3 fold',
-        management: 'Avoid concurrent use if possible. If necessary, monitor INR closely and consider PPI.',
+        management:
+          'Avoid concurrent use if possible. If necessary, monitor INR closely and consider PPI.',
       },
       'metformin-contrast': {
         drug1: 'Metformin',
@@ -199,15 +208,18 @@ export class DrugCheckerService implements ClinicalToolService {
         severity: 'major',
         mechanism: 'Contrast-induced nephropathy can lead to metformin accumulation',
         clinicalSignificance: 'Risk of lactic acidosis in setting of renal dysfunction',
-        management: 'Hold metformin 48 hours before and after IV contrast. Check renal function before resuming.',
+        management:
+          'Hold metformin 48 hours before and after IV contrast. Check renal function before resuming.',
       },
       'ssri-tramadol': {
         drug1: 'SSRI',
         drug2: 'Tramadol',
         severity: 'major',
         mechanism: 'Both increase serotonin levels',
-        clinicalSignificance: 'Risk of serotonin syndrome (confusion, agitation, tachycardia, hyperthermia)',
-        management: 'Avoid combination. Use alternative analgesic. Monitor for serotonin syndrome if unavoidable.',
+        clinicalSignificance:
+          'Risk of serotonin syndrome (confusion, agitation, tachycardia, hyperthermia)',
+        management:
+          'Avoid combination. Use alternative analgesic. Monitor for serotonin syndrome if unavoidable.',
       },
       'acei-spironolactone': {
         drug1: 'ACE Inhibitor',
@@ -215,7 +227,8 @@ export class DrugCheckerService implements ClinicalToolService {
         severity: 'major',
         mechanism: 'Additive effects on potassium retention',
         clinicalSignificance: 'Risk of life-threatening hyperkalemia',
-        management: 'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
+        management:
+          'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
       },
     };
 
@@ -262,14 +275,16 @@ Respond in JSON format as an array of interactions.`;
 
       return result.interactions || [];
     } catch (error) {
-      this.logger.error(`AI interaction analysis failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `AI interaction analysis failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       return [];
     }
   }
 
   private generateInterpretation(
     grouped: Record<string, DrugInteraction[]>,
-    totalMeds: number
+    totalMeds: number,
   ): string {
     const contraindicated = grouped.contraindicated.length;
     const major = grouped.major.length;

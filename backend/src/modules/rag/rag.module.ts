@@ -8,7 +8,7 @@ import { MetricsModule } from '../metrics/metrics.module';
 
 /**
  * RAG Module
- * 
+ *
  * Provides Retrieval-Augmented Generation capabilities using:
  * - OpenAI embeddings for semantic encoding
  * - Pinecone vector database for similarity search
@@ -17,15 +17,7 @@ import { MetricsModule } from '../metrics/metrics.module';
 
 @Module({
   imports: [ConfigModule, MetricsModule],
-  providers: [
-    RAGService,
-    OpenAIEmbeddingsService,
-    PineconeService,
-    CohereRankerService,
-  ],
-  exports: [
-    RAGService,
-    CohereRankerService,
-  ],
+  providers: [RAGService, OpenAIEmbeddingsService, PineconeService, CohereRankerService],
+  exports: [RAGService, CohereRankerService],
 })
 export class RAGModule {}

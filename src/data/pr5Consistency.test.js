@@ -27,7 +27,6 @@ import {
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
-import { getToolIcon } from '../navigation/iconRegistry';
 import {
   PR5_HUB_PATH,
   PR5_REQUIRED_NLU_ALIAS_PAIRS,
@@ -37,6 +36,7 @@ import {
   PR5_ALL_ALIAS_PAIRS,
   catalogRowsMatchingQuery,
 } from './pr5TestConstants';
+import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -141,14 +141,8 @@ describe('PR5 consistency — catalog, routes, and UI wiring', () => {
     }
   });
 
-  it('registers dedicated App routes before calculators hub for each Tier-A tool', () => {
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
-    for (const id of PR5_CALCULATOR_REGISTRY_IDS) {
-      const routeIdx = appSource.indexOf(`path: '${PR5_HUB_PATH}/${id}'`);
-      expect(routeIdx).toBeGreaterThan(-1);
-      expect(routeIdx).toBeLessThan(hubIdx);
-      expect(appSource).toContain(`initialCalculatorId="${id}"`);
-    }
+  it('registers dedicated calculator routes via CALCULATOR_ROUTE_DEFS before hub', () => {
+    assertAppCalculatorRouteWiring(appSource, [...PR5_CALCULATOR_REGISTRY_IDS]);
   });
 
   it('wires PR5 calculators in Calculators.jsx switch and mental health module', () => {

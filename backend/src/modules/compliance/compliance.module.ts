@@ -12,14 +12,7 @@ import { AuditModule } from '../audit/audit.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      User,
-      UserProfile,
-      OAuthAccount,
-      Subscription,
-      TwoFactor,
-      AuditLog,
-    ]),
+    TypeOrmModule.forFeature([User, UserProfile, OAuthAccount, Subscription, TwoFactor, AuditLog]),
     AuditModule,
   ],
   controllers: [ComplianceController],

@@ -56,7 +56,7 @@ export class AnalyticsService {
       timestamp?: string;
     }>,
   ): Promise<void> {
-    const analyticsEvents = events.map(e =>
+    const analyticsEvents = events.map((e) =>
       this.analyticsEventRepository.create({
         event: e.event,
         userId: e.userId,
@@ -77,11 +77,7 @@ export class AnalyticsService {
   /**
    * Get event metrics for a date range
    */
-  async getEventMetrics(
-    startDate: Date,
-    endDate: Date,
-    userId?: string,
-  ): Promise<EventMetrics> {
+  async getEventMetrics(startDate: Date, endDate: Date, userId?: string): Promise<EventMetrics> {
     const whereClause: any = {
       createdAt: Between(startDate, endDate),
     };
@@ -95,13 +91,16 @@ export class AnalyticsService {
     });
 
     const totalEvents = events.length;
-    const uniqueUsers = new Set(events.map(e => e.userId).filter(Boolean)).size;
+    const uniqueUsers = new Set(events.map((e) => e.userId).filter(Boolean)).size;
 
     // Count events by type
-    const eventCounts = events.reduce((acc, event) => {
-      acc[event.event] = (acc[event.event] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    const eventCounts = events.reduce(
+      (acc, event) => {
+        acc[event.event] = (acc[event.event] || 0) + 1;
+        return acc;
+      },
+      {} as Record<string, number>,
+    );
 
     const topEvents = Object.entries(eventCounts)
       .map(([event, count]) => ({ event, count }))
@@ -116,7 +115,7 @@ export class AnalyticsService {
       .select('COUNT(DISTINCT event.userId)', 'count')
       .where('event.createdAt > :yesterday', { yesterday })
       .getRawOne()
-      .then(result => parseInt(result.count) || 0);
+      .then((result) => parseInt(result.count) || 0);
 
     // WAU (Weekly Active Users)
     const lastWeek = new Date();
@@ -126,7 +125,7 @@ export class AnalyticsService {
       .select('COUNT(DISTINCT event.userId)', 'count')
       .where('event.createdAt > :lastWeek', { lastWeek })
       .getRawOne()
-      .then(result => parseInt(result.count) || 0);
+      .then((result) => parseInt(result.count) || 0);
 
     // MAU (Monthly Active Users)
     const lastMonth = new Date();
@@ -136,7 +135,7 @@ export class AnalyticsService {
       .select('COUNT(DISTINCT event.userId)', 'count')
       .where('event.createdAt > :lastMonth', { lastMonth })
       .getRawOne()
-      .then(result => parseInt(result.count) || 0);
+      .then((result) => parseInt(result.count) || 0);
 
     return {
       totalEvents,
@@ -151,10 +150,7 @@ export class AnalyticsService {
   /**
    * Get events by user
    */
-  async getEventsByUser(
-    userId: string,
-    limit: number = 100,
-  ): Promise<AnalyticsEvent[]> {
+  async getEventsByUser(userId: string, limit: number = 100): Promise<AnalyticsEvent[]> {
     return await this.analyticsEventRepository.find({
       where: { userId },
       order: { createdAt: 'DESC' },
@@ -219,7 +215,7 @@ export class AnalyticsService {
       .andWhere('DATE(event.createdAt) = DATE(:startDate)', { startDate })
       .getRawMany();
 
-    const cohortUserIds = cohortUsers.map(u => u.userId);
+    const cohortUserIds = cohortUsers.map((u) => u.userId);
     const cohortSize = cohortUserIds.length;
 
     if (cohortSize === 0) {

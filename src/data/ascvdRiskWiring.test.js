@@ -13,6 +13,7 @@ import {
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
+import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -89,11 +90,8 @@ describe('ASCVD risk calculator wiring (ascvd-risk)', () => {
     expect(ids).toContain('cardiovascular-risk');
   });
 
-  it('registers App.jsx route before calculators hub', () => {
-    const ascvdIdx = appSource.indexOf("path: '/tools/calculators/ascvd-risk'");
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
-    expect(ascvdIdx).toBeGreaterThan(-1);
-    expect(ascvdIdx).toBeLessThan(hubIdx);
+  it('registers calculator routes in App.jsx via CALCULATOR_ROUTE_DEFS before hub', () => {
+    assertAppCalculatorRouteWiring(appSource, ['ascvd-risk']);
   });
 
   it('resolveRegistryId maps ascvd aliases', () => {

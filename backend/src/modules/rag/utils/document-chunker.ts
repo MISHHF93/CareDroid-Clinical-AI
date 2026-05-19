@@ -3,7 +3,7 @@ import { DocumentChunk, IngestDocumentDto } from '../dto/medical-source.dto';
 
 /**
  * Document Chunker
- * 
+ *
  * Splits documents into overlapping chunks for optimal RAG retrieval.
  * Uses tiktoken for accurate token counting compatible with OpenAI models.
  */
@@ -31,11 +31,7 @@ export class DocumentChunker {
    * Split document into chunks with overlap
    */
   chunkDocument(dto: IngestDocumentDto): DocumentChunk[] {
-    const {
-      content,
-      source,
-      chunkingOptions = {},
-    } = dto;
+    const { content, source, chunkingOptions = {} } = dto;
 
     const chunkSize = chunkingOptions.chunkSize || this.chunkSize;
     const overlap = chunkingOptions.overlap || this.overlap;
@@ -43,7 +39,7 @@ export class DocumentChunker {
 
     // Split into sentences for boundary-aware chunking
     const sentences = this.splitIntoSentences(content);
-    
+
     const chunks: DocumentChunk[] = [];
     let currentChunk: string[] = [];
     let currentTokenCount = 0;
@@ -59,15 +55,17 @@ export class DocumentChunker {
         // Save current chunk if not empty
         if (currentChunk.length > 0) {
           const chunkText = currentChunk.join(' ');
-          chunks.push(this.createChunk(
-            chunkText,
-            charPosition,
-            charPosition + chunkText.length,
-            chunkIndex++,
-            currentTokenCount,
-            source,
-            Math.ceil(content.length / chunkSize), // Estimate total chunks
-          ));
+          chunks.push(
+            this.createChunk(
+              chunkText,
+              charPosition,
+              charPosition + chunkText.length,
+              chunkIndex++,
+              currentTokenCount,
+              source,
+              Math.ceil(content.length / chunkSize), // Estimate total chunks
+            ),
+          );
           charPosition += chunkText.length + 1;
         }
 
@@ -76,15 +74,17 @@ export class DocumentChunker {
         for (const largeSentenceChunk of largeSentenceChunks) {
           const chunkText = largeSentenceChunk;
           const tokenCount = this.countTokens(chunkText);
-          chunks.push(this.createChunk(
-            chunkText,
-            charPosition,
-            charPosition + chunkText.length,
-            chunkIndex++,
-            tokenCount,
-            source,
-            Math.ceil(content.length / chunkSize),
-          ));
+          chunks.push(
+            this.createChunk(
+              chunkText,
+              charPosition,
+              charPosition + chunkText.length,
+              chunkIndex++,
+              tokenCount,
+              source,
+              Math.ceil(content.length / chunkSize),
+            ),
+          );
           charPosition += chunkText.length + 1;
         }
 
@@ -97,15 +97,17 @@ export class DocumentChunker {
       if (currentTokenCount + sentenceTokens > chunkSize && currentChunk.length > 0) {
         // Save current chunk
         const chunkText = currentChunk.join(' ');
-        chunks.push(this.createChunk(
-          chunkText,
-          charPosition,
-          charPosition + chunkText.length,
-          chunkIndex++,
-          currentTokenCount,
-          source,
-          Math.ceil(content.length / chunkSize),
-        ));
+        chunks.push(
+          this.createChunk(
+            chunkText,
+            charPosition,
+            charPosition + chunkText.length,
+            chunkIndex++,
+            currentTokenCount,
+            source,
+            Math.ceil(content.length / chunkSize),
+          ),
+        );
 
         // Start new chunk with overlap
         if (overlap > 0 && respectBoundaries) {
@@ -129,15 +131,17 @@ export class DocumentChunker {
     // Save final chunk
     if (currentChunk.length > 0) {
       const chunkText = currentChunk.join(' ');
-      chunks.push(this.createChunk(
-        chunkText,
-        charPosition,
-        charPosition + chunkText.length,
-        chunkIndex,
-        currentTokenCount,
-        source,
-        chunkIndex + 1, // Total chunks is now known
-      ));
+      chunks.push(
+        this.createChunk(
+          chunkText,
+          charPosition,
+          charPosition + chunkText.length,
+          chunkIndex,
+          currentTokenCount,
+          source,
+          chunkIndex + 1, // Total chunks is now known
+        ),
+      );
     }
 
     // Update totalChunks for all chunks
@@ -157,20 +161,20 @@ export class DocumentChunker {
     // This regex preserves the punctuation
     const sentencePattern = /([.!?])\s+(?=[A-Z])/g;
     const sentences: string[] = [];
-    
+
     let lastIndex = 0;
     let match: RegExpExecArray | null;
-    
+
     while ((match = sentencePattern.exec(text)) !== null) {
       sentences.push(text.slice(lastIndex, match.index + 1).trim());
       lastIndex = match.index + match[0].length;
     }
-    
+
     // Add remaining text as final sentence
     if (lastIndex < text.length) {
       sentences.push(text.slice(lastIndex).trim());
     }
-    
+
     return sentences.filter((s) => s.length > 0);
   }
 
@@ -180,13 +184,13 @@ export class DocumentChunker {
   private splitLargeSentence(sentence: string, chunkSize: number): string[] {
     const tokens = this.encoder.encode(sentence);
     const chunks: string[] = [];
-    
+
     for (let i = 0; i < tokens.length; i += chunkSize) {
       const chunkTokens = tokens.slice(i, i + chunkSize);
       const chunkText = this.encoder.decode(chunkTokens);
       chunks.push(chunkText);
     }
-    
+
     return chunks;
   }
 
@@ -196,19 +200,19 @@ export class DocumentChunker {
   private getOverlapSentences(sentences: string[], overlapTokens: number): string[] {
     const overlap: string[] = [];
     let tokenCount = 0;
-    
+
     for (let i = sentences.length - 1; i >= 0; i--) {
       const sentence = sentences[i];
       const sentenceTokens = this.countTokens(sentence);
-      
+
       if (tokenCount + sentenceTokens > overlapTokens) {
         break;
       }
-      
+
       overlap.unshift(sentence);
       tokenCount += sentenceTokens;
     }
-    
+
     return overlap;
   }
 

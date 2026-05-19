@@ -196,11 +196,7 @@ export class AuditService {
   /**
    * Find logs by user within date range
    */
-  async findByUserAndDateRange(
-    userId: string,
-    startDate: Date,
-    endDate: Date,
-  ) {
+  async findByUserAndDateRange(userId: string, startDate: Date, endDate: Date) {
     return this.auditRepository
       .createQueryBuilder('log')
       .where('log.userId = :userId', { userId })

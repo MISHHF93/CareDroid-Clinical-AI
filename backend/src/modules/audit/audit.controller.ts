@@ -17,7 +17,7 @@ import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 
-@Controller('api/audit')
+@Controller('audit')
 @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 export class AuditController {
   private readonly logger = new Logger(AuditController.name);
@@ -31,15 +31,7 @@ export class AuditController {
   @Get('logs')
   @RequirePermission(Permission.VIEW_AUDIT_LOGS)
   async getLogs(@Query() query: any, @Req() req: any) {
-
-    const {
-      userId,
-      startDate,
-      endDate,
-      action,
-      limit = 100,
-      offset = 0,
-    } = query;
+    const { userId, startDate, endDate, action, limit = 100, offset = 0 } = query;
 
     try {
       let logs: any[];
@@ -56,10 +48,7 @@ export class AuditController {
       } else if (action) {
         logs = await this.auditService.findByAction(action, parseInt(limit));
       } else if (startDate && endDate) {
-        logs = await this.auditService.findByDateRange(
-          new Date(startDate),
-          new Date(endDate),
-        );
+        logs = await this.auditService.findByDateRange(new Date(startDate), new Date(endDate));
       } else {
         // Return all logs (limited)
         logs = [];
@@ -91,10 +80,7 @@ export class AuditController {
    * Get audit logs for current user
    */
   @Get('my-logs')
-  async getMyLogs(
-    @Query('limit') limit: string = '100',
-    @Req() req: any,
-  ) {
+  async getMyLogs(@Query('limit') limit: string = '100', @Req() req: any) {
     const userId = req.user?.id;
     if (!userId) {
       throw new HttpException(
@@ -167,13 +153,10 @@ export class AuditController {
   @Get('verify-integrity')
   @RequirePermission(Permission.VERIFY_AUDIT_INTEGRITY)
   async verifyIntegrity() {
-
     try {
       const result = await this.auditService.verifyIntegrity();
 
-      this.logger.log(
-        `Integrity verification complete: ${result.isValid ? 'VALID' : 'TAMPERED'}`,
-      );
+      this.logger.log(`Integrity verification complete: ${result.isValid ? 'VALID' : 'TAMPERED'}`);
 
       return {
         success: true,
@@ -198,12 +181,11 @@ export class AuditController {
    */
   @Get('statistics')
   @RequirePermission(Permission.VIEW_AUDIT_LOGS)
-  async getStatistics(
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-  ) {
+  async getStatistics(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
     try {
-      const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // Default last 30 days
+      const start = startDate
+        ? new Date(startDate)
+        : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // Default last 30 days
       const end = endDate ? new Date(endDate) : new Date();
 
       const logs = await this.auditService.findByDateRange(start, end);
@@ -269,7 +251,8 @@ export class AuditController {
    */
   @Post('sync')
   async syncAuditLog(
-    @Body() body: { action: string; resourceType?: string; resourceId?: string; timestamp?: string },
+    @Body()
+    body: { action: string; resourceType?: string; resourceId?: string; timestamp?: string },
     @Req() req: any,
   ) {
     const userId = req.user?.id || req.user?.userId;

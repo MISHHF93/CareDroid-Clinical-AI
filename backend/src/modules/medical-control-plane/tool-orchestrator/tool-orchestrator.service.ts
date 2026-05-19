@@ -1,6 +1,6 @@
 /**
  * Tool Orchestrator Service
- * 
+ *
  * Central coordinator for all clinical tools.
  * Manages tool registry, execution, validation, and result formatting.
  */
@@ -67,8 +67,10 @@ export class ToolOrchestratorService {
     this.registerTool(this.sofaCalculatorService);
     this.registerTool(this.drugCheckerService);
     this.registerTool(this.labInterpreterService);
-    
-    this.logger.log(`Initialized tool registry with ${Object.keys(this.toolRegistry).length} tools`);
+
+    this.logger.log(
+      `Initialized tool registry with ${Object.keys(this.toolRegistry).length} tools`,
+    );
   }
 
   /**
@@ -84,7 +86,7 @@ export class ToolOrchestratorService {
    * Get list of all available tools
    */
   listAvailableTools(): ToolListDto {
-    const tools = Object.values(this.toolRegistry).map(tool => ({
+    const tools = Object.values(this.toolRegistry).map((tool) => ({
       ...tool.getMetadata(),
       parameters: tool.getSchema(),
     }));
@@ -127,7 +129,7 @@ export class ToolOrchestratorService {
 
     const allowedToolIds = toolAccessMap[tier] || toolAccessMap[SubscriptionTier.FREE];
     const tools = allowedToolIds
-      .map(toolId => {
+      .map((toolId) => {
         try {
           const tool = this.getTool(toolId);
           return {
@@ -138,7 +140,7 @@ export class ToolOrchestratorService {
           return null;
         }
       })
-      .filter(tool => tool !== null);
+      .filter((tool) => tool !== null);
 
     return {
       tools,
@@ -232,7 +234,8 @@ export class ToolOrchestratorService {
         ipAddress: '0.0.0.0',
         userAgent: 'tool-orchestrator',
         metadata: {
-          status: errorCode === ToolExecutionErrorCode.UNSUPPORTED_TOOL ? 'unsupported' : 'not_found',
+          status:
+            errorCode === ToolExecutionErrorCode.UNSUPPORTED_TOOL ? 'unsupported' : 'not_found',
           errorCode,
           requestedToolId,
         },
@@ -504,7 +507,7 @@ export class ToolOrchestratorService {
 
     // Add warnings if present
     if (response.result.warnings && response.result.warnings.length > 0) {
-      output += `\n⚠️ **Warnings:**\n${response.result.warnings.map(w => `- ${w}`).join('\n')}\n`;
+      output += `\n⚠️ **Warnings:**\n${response.result.warnings.map((w) => `- ${w}`).join('\n')}\n`;
     }
 
     // Add disclaimer
@@ -520,15 +523,16 @@ export class ToolOrchestratorService {
 
   private formatSofaResult(data: any): string {
     let output = `**Total SOFA Score: ${data.totalScore}** (Range: 0-24)\n\n`;
-    
+
     output += '**Component Scores:**\n';
     if (data.respirationScore !== undefined) output += `- Respiration: ${data.respirationScore}\n`;
     if (data.coagulationScore !== undefined) output += `- Coagulation: ${data.coagulationScore}\n`;
     if (data.liverScore !== undefined) output += `- Liver: ${data.liverScore}\n`;
-    if (data.cardiovascularScore !== undefined) output += `- Cardiovascular: ${data.cardiovascularScore}\n`;
+    if (data.cardiovascularScore !== undefined)
+      output += `- Cardiovascular: ${data.cardiovascularScore}\n`;
     if (data.cnsScore !== undefined) output += `- CNS: ${data.cnsScore}\n`;
     if (data.renalScore !== undefined) output += `- Renal: ${data.renalScore}\n`;
-    
+
     if (data.mortalityEstimate) {
       output += `\n**Mortality Estimate:** ${data.mortalityEstimate}\n`;
     }
@@ -653,8 +657,8 @@ export class ToolOrchestratorService {
     toolsByCategory: Record<string, number>;
     tools: Array<{ id: string; name: string; category: string }>;
   } {
-    const tools = Object.values(this.toolRegistry).map(tool => tool.getMetadata());
-    
+    const tools = Object.values(this.toolRegistry).map((tool) => tool.getMetadata());
+
     const byCategory: Record<string, number> = {};
     for (const tool of tools) {
       byCategory[tool.category] = (byCategory[tool.category] || 0) + 1;
@@ -663,7 +667,7 @@ export class ToolOrchestratorService {
     return {
       totalTools: tools.length,
       toolsByCategory: byCategory,
-      tools: tools.map(t => ({ id: t.id, name: t.name, category: t.category })),
+      tools: tools.map((t) => ({ id: t.id, name: t.name, category: t.category })),
     };
   }
 }

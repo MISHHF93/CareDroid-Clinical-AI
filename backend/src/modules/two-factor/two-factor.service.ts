@@ -56,9 +56,7 @@ export class TwoFactorService {
 
     // Generate backup codes
     const backupCodes = this.generateBackupCodes(10);
-    const hashedBackupCodes = await Promise.all(
-      backupCodes.map(code => bcrypt.hash(code, 10))
-    );
+    const hashedBackupCodes = await Promise.all(backupCodes.map((code) => bcrypt.hash(code, 10)));
 
     let twoFactor = await this.twoFactorRepository.findOne({ where: { userId } });
 

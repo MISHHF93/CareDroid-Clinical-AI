@@ -2,7 +2,7 @@ import { RAGContext } from '../../rag/dto/rag-context.dto';
 
 /**
  * Confidence Scorer
- * 
+ *
  * Calculates and interprets confidence scores for RAG-augmented responses.
  * Helps determine when to add disclaimers or suggest additional resources.
  */
@@ -58,9 +58,17 @@ export function calculateConfidence(ragContext: RAGContext): ConfidenceScore {
   }
 
   // Adjust based on source quality (authoritative organizations)
-  const authoritativeSources = sources.filter(s => s.authoritative || 
-    ['American Heart Association', 'American College of Cardiology', 'FDA', 'CDC', 'WHO', 'NIH']
-      .some(org => s.organization?.includes(org))
+  const authoritativeSources = sources.filter(
+    (s) =>
+      s.authoritative ||
+      [
+        'American Heart Association',
+        'American College of Cardiology',
+        'FDA',
+        'CDC',
+        'WHO',
+        'NIH',
+      ].some((org) => s.organization?.includes(org)),
   ).length;
 
   if (authoritativeSources >= 2) {
@@ -68,7 +76,7 @@ export function calculateConfidence(ragContext: RAGContext): ConfidenceScore {
   }
 
   // Adjust based on source recency
-  const recentSources = sources.filter(s => {
+  const recentSources = sources.filter((s) => {
     if (!s.date) return false;
     const year = parseInt(s.date.substring(0, 4));
     return year >= new Date().getFullYear() - 3; // Within 3 years
@@ -95,13 +103,13 @@ export function calculateConfidence(ragContext: RAGContext): ConfidenceScore {
 
   // Generate suggested actions
   const suggestedActions: string[] = [];
-  
+
   if (level === 'very-low' || level === 'low') {
     suggestedActions.push('Consult current guidelines or textbooks');
     suggestedActions.push('Consider specialist consultation');
     suggestedActions.push('Review institutional protocols');
   }
-  
+
   if (level === 'moderate') {
     suggestedActions.push('Verify with current guidelines for critical decisions');
     suggestedActions.push('Consider additional evidence sources');
@@ -118,7 +126,7 @@ export function calculateConfidence(ragContext: RAGContext): ConfidenceScore {
 
   // Generate explanation
   let explanation = '';
-  
+
   if (level === 'high') {
     explanation = `High-quality evidence retrieved from ${sources.length} authoritative source${sources.length > 1 ? 's' : ''}. `;
     if (authoritativeSources > 0) {
@@ -138,13 +146,15 @@ export function calculateConfidence(ragContext: RAGContext): ConfidenceScore {
     } else {
       explanation += `Only ${chunks.length} relevant chunk${chunks.length > 1 ? 's' : ''} found. `;
     }
-    explanation += 'Response is based on general principles. Consult specialists or current resources.';
+    explanation +=
+      'Response is based on general principles. Consult specialists or current resources.';
   } else {
     explanation = `Very low confidence. `;
     if (totalRetrieved === 0) {
       explanation += 'No relevant evidence found in knowledge base. ';
     }
-    explanation += 'Strongly recommend consulting authoritative sources or specialists before making clinical decisions.';
+    explanation +=
+      'Strongly recommend consulting authoritative sources or specialists before making clinical decisions.';
   }
 
   return {
@@ -209,13 +219,13 @@ export function getConfidenceDisclaimer(confidenceScore: ConfidenceScore): strin
   switch (confidenceScore.level) {
     case 'moderate':
       return '⚠️ **Note:** This response is based on available evidence, but may not comprehensively cover all aspects. Consider consulting current guidelines or specialists for critical clinical decisions.';
-    
+
     case 'low':
       return '⚠️ **Limited Evidence:** Specific evidence-based resources were limited for this query. This response is based on general clinical principles. Please consult current guidelines, textbooks, or specialists for authoritative guidance.';
-    
+
     case 'very-low':
       return '⚠️ **Important:** Very limited evidence was found for this specific query. This response should NOT be used for clinical decision-making without consulting authoritative sources or specialists. Consider seeking guidance from experienced clinicians.';
-    
+
     default:
       return null;
   }

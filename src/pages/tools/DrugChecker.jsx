@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { useUser } from '../../contexts/UserContext';
 import analyticsService from '../../services/analyticsService';
 import offlineService from '../../services/offlineService';
-import { apiFetch, parseApiResponse } from '../../services/apiClient';
-import { parseToolExecutionResponse } from '../../utils/toolExecutionResponse';
+import { executeClinicalTool } from '../../services/clinicalOrchestratorApi';
 import ToolPageLayout from './ToolPageLayout';
 import './DrugChecker.css';
 
@@ -83,26 +82,21 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
     setResults(null);
 
     try {
-      const response = await apiFetch('/api/tools/drug-interactions/execute', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('caredroid_access_token')}`,
-        },
-        body: JSON.stringify({
-          parameters: { medications: activeMeds, severityFilter: 'all' },
-        }),
+      const execution = await executeClinicalTool('drug-interactions', {
+        medications: activeMeds,
+        severityFilter: 'all',
       });
 
-      const data = await parseApiResponse(response, { fallback: {} });
-      if (!response.ok) {
-        throw new Error(data?.message || 'Failed to check drug interactions');
+      if (!execution.ok) {
+        throw new Error(execution.message || 'Failed to check drug interactions');
       }
 
-      const parsed = parseToolExecutionResponse(data);
-      if (!parsed.ok || parsed.data == null) {
+      const parsed = { ok: true, data: execution.data, errors: execution.errors || [] };
+      if (!parsed.data) {
         throw new Error(parsed.errors?.[0] || 'Drug interaction check failed');
       }
+
+      const data = execution.raw || {};
 
       const normalized = normalizeDrugCheckResults(parsed.data);
       const interpretation = data?.result?.interpretation;

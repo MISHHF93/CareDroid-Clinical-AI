@@ -2,7 +2,7 @@ import { RetrievedChunk, ChunkMetadata } from '../dto/rag-context.dto';
 
 /**
  * Vector Database Interface
- * 
+ *
  * Abstract interface for vector database implementations.
  * Allows switching between Pinecone, Weaviate, or other vector stores.
  */
@@ -109,10 +109,7 @@ export interface IVectorDatabase {
   /**
    * Query the vector database with a query embedding
    */
-  query(
-    queryVector: number[],
-    options: VectorQueryOptions,
-  ): Promise<QueryResult>;
+  query(queryVector: number[], options: VectorQueryOptions): Promise<QueryResult>;
 
   /**
    * Insert a single vector record

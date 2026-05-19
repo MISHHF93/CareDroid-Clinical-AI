@@ -29,6 +29,7 @@ import {
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { getToolIcon } from '../navigation/iconRegistry';
+import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import { copdGoldChatConfig } from './chatAssistedCalculators/copdGold';
 import { romeIvIbsChatConfig } from './chatAssistedCalculators/romeIvIbs';
@@ -94,12 +95,10 @@ describe('Wiring audit — registry IDs and route slugs', () => {
     expect(patternsSource).toContain(spec.backendHelper);
   });
 
-  it.each(WIRING_AUDIT_TIER_A_IDS)('%s registers dedicated App route before calculators hub', (id) => {
+  it.each(WIRING_AUDIT_TIER_A_IDS)('%s registers dedicated calculator route before hub', (id) => {
     const spec = WIRING_AUDIT_TOOL_SPECS[id];
-    const routeIdx = appSource.indexOf(`path: '${spec.routePath}'`);
-    expect(routeIdx).toBeGreaterThan(-1);
-    expect(routeIdx).toBeLessThan(hubIdx);
-    expect(appSource).toContain(`initialCalculatorId="${id}"`);
+    expect(matchCalculatorRoute(spec.routePath)?.calculatorSlug).toBe(id);
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
   });
 
   it.each(WIRING_AUDIT_TIER_B_IDS)('%s has no dedicated /tools/calculators/<id> App route', (id) => {
@@ -226,9 +225,9 @@ describe('Wiring audit — resolveCatalogLaunch', () => {
 
   it('returns empty launch for unknown ids', () => {
     const empty = resolveCatalogLaunch('not-in-wiring-audit-xyz');
-    expect(empty.path).toBeNull();
+    expect(empty.path).toBe('/dashboard');
     expect(empty.registryId).toBeNull();
-    expect(empty.chatSeed).toBeNull();
+    expect(empty.chatSeed).toBeTruthy();
   });
 });
 

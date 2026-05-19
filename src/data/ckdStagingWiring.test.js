@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
+import { assertAppCalculatorRouteWiring, registeredCalculatorPathsForSet } from './testHelpers/calculatorRouteAudit';
 import { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools, builtinUiCalculators } from './clinicalIntentToolCatalog';
 import {
@@ -86,11 +87,8 @@ describe('CKD staging calculator wiring (ckd-staging)', () => {
     expect(ids).toContain('albuminuria-stage');
   });
 
-  it('registers App.jsx route before calculators hub', () => {
-    const ckdIdx = appSource.indexOf("path: '/tools/calculators/ckd-staging'");
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
-    expect(ckdIdx).toBeGreaterThan(-1);
-    expect(ckdIdx).toBeLessThan(hubIdx);
+    it('registers calculator routes in App.jsx via CALCULATOR_ROUTE_DEFS before hub', () => {
+    assertAppCalculatorRouteWiring(appSource, ['ckd-staging']);
   });
 
   it('resolveRegistryId maps ckd aliases without overriding legacy gfr', () => {

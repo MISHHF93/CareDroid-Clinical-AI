@@ -1,6 +1,6 @@
 /**
  * RAG Context DTO
- * 
+ *
  * Represents the context retrieved from the RAG system for augmenting
  * AI responses with relevant medical knowledge.
  */
@@ -85,7 +85,14 @@ export interface ChunkMetadata {
   /**
    * Type of medical knowledge
    */
-  type: 'protocol' | 'guideline' | 'drug_info' | 'clinical_pathway' | 'reference' | 'textbook' | 'journal';
+  type:
+    | 'protocol'
+    | 'guideline'
+    | 'drug_info'
+    | 'clinical_pathway'
+    | 'reference'
+    | 'textbook'
+    | 'journal';
 
   /**
    * Organization that published the document

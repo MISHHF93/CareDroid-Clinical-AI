@@ -66,10 +66,14 @@ export class AIQuery {
   @Column({ type: 'varchar', length: 50, nullable: true })
   toolUsed: string; // Tool ID if a tool was executed
 
-  @Column({ type: 'text', nullable: true, transformer: {
-    to: (value: any) => value ? JSON.stringify(value) : null,
-    from: (value: string) => value ? JSON.parse(value) : null,
-  }})
+  @Column({
+    type: 'text',
+    nullable: true,
+    transformer: {
+      to: (value: any) => (value ? JSON.stringify(value) : null),
+      from: (value: string) => (value ? JSON.parse(value) : null),
+    },
+  })
   metadata: Record<string, any>; // Additional metadata (temperature, top_p, etc.)
 
   @CreateDateColumn({ type: 'datetime' })

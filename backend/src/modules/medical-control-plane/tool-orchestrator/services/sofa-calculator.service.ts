@@ -1,9 +1,9 @@
 /**
  * SOFA Score Calculator Service
- * 
+ *
  * Sequential Organ Failure Assessment (SOFA) score for ICU patients.
  * Assesses organ dysfunction across 6 systems.
- * 
+ *
  * Reference: Vincent JL, et al. Intensive Care Med. 1996;22(7):707-10.
  */
 
@@ -24,7 +24,8 @@ export class SofaCalculatorService implements ClinicalToolService {
     return {
       id: 'sofa-calculator',
       name: 'SOFA Score Calculator',
-      description: 'Sequential Organ Failure Assessment score for evaluating organ dysfunction in ICU patients',
+      description:
+        'Sequential Organ Failure Assessment score for evaluating organ dysfunction in ICU patients',
       category: 'calculator',
       version: '1.0.0',
       author: 'CareDroid Medical Team',
@@ -136,11 +137,13 @@ export class SofaCalculatorService implements ClinicalToolService {
 
     // Check if at least one parameter is provided
     const providedParams = Object.keys(parameters).filter(
-      key => parameters[key] !== undefined && parameters[key] !== null
+      (key) => parameters[key] !== undefined && parameters[key] !== null,
     );
 
     if (providedParams.length === 0) {
-      warnings.push('No parameters provided. SOFA score cannot be calculated without clinical data.');
+      warnings.push(
+        'No parameters provided. SOFA score cannot be calculated without clinical data.',
+      );
     }
 
     // Validate PaO2/FiO2 ratio parameters
@@ -229,7 +232,8 @@ export class SofaCalculatorService implements ClinicalToolService {
         },
       ],
       warnings: validation.warnings,
-      disclaimer: 'This calculator is for educational purposes. Clinical decisions should be made by qualified healthcare providers based on complete patient assessment.',
+      disclaimer:
+        'This calculator is for educational purposes. Clinical decisions should be made by qualified healthcare providers based on complete patient assessment.',
       timestamp: new Date(),
     };
   }

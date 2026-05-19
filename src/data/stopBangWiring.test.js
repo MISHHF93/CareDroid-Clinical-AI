@@ -13,6 +13,7 @@ import {
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
+import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -87,11 +88,8 @@ describe('STOP-Bang calculator wiring (stop-bang)', () => {
     expect(calculatorsSource).toContain('StopBangCalculator');
   });
 
-  it('registers App.jsx route before calculators hub', () => {
-    const idx = appSource.indexOf("path: '/tools/calculators/stop-bang'");
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
-    expect(idx).toBeGreaterThan(-1);
-    expect(idx).toBeLessThan(hubIdx);
+  it('registers calculator routes in App.jsx via CALCULATOR_ROUTE_DEFS before hub', () => {
+    assertAppCalculatorRouteWiring(appSource, ['stop-bang']);
   });
 
   it('resolveRegistryId maps stop-bang aliases', () => {

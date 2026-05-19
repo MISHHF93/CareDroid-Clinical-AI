@@ -52,7 +52,22 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
-      load: [jwtConfig, oauthConfig, sessionConfig, emailConfig, redisConfig, stripeConfig, datadogConfig, openaiConfig, encryptionConfig, loggerConfig, ragConfig, anomalyDetectionConfig, nluConfig, firebaseConfig],
+      load: [
+        jwtConfig,
+        oauthConfig,
+        sessionConfig,
+        emailConfig,
+        redisConfig,
+        stripeConfig,
+        datadogConfig,
+        openaiConfig,
+        encryptionConfig,
+        loggerConfig,
+        ragConfig,
+        anomalyDetectionConfig,
+        nluConfig,
+        firebaseConfig,
+      ],
     }),
 
     // Database (load after ConfigModule so .env is available)
@@ -110,7 +125,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     ChatModule,
     AnalyticsModule,
     NotificationModule,
-    
+
     // Medical Control Plane (Intent Classification, Tool Orchestration)
     MedicalControlPlaneModule,
 

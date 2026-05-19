@@ -89,7 +89,7 @@ describe('PR3 accessibility — launch labels and hub UI', () => {
 
   it('Calculators hub exposes keyboard-accessible chat-assisted cards', () => {
     expect(calculatorsSource).toContain('chatAssistedLaunchAriaLabelForTool');
-    expect(calculatorsSource).toContain('PR3_CALCULATOR_REGISTRY_IDS.includes(tool.toolId)');
+    expect(calculatorsSource).toContain('calc-chat-assisted-card');
     expect(calculatorsSource).toContain('type="button"');
     expect(calculatorsSource).toContain('aria-describedby={`calc-chat-assisted-desc-${tool.toolId}`}');
     expect(calculatorsSource).toContain('calc-chat-assisted-lead');

@@ -7,7 +7,11 @@ import { EmergencyEscalationService } from '../medical-control-plane/emergency-e
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { NluMetricsService } from '../metrics/nlu-metrics.service';
-import { PrimaryIntent, EmergencySeverity, IntentClassification } from '../medical-control-plane/intent-classifier/dto/intent-classification.dto';
+import {
+  PrimaryIntent,
+  EmergencySeverity,
+  IntentClassification,
+} from '../medical-control-plane/intent-classifier/dto/intent-classification.dto';
 import { RAGService } from '../rag/rag.service';
 import { MedicalSource } from '../rag/dto/medical-source.dto';
 import {
@@ -63,11 +67,7 @@ export class ChatService {
     this.anomalyDetectionUrl = anomalyConfig.url || '';
   }
 
-  async processQuery(
-    patientId: string,
-    message: string,
-    context?: any
-  ): Promise<QueryResponse> {
+  async processQuery(patientId: string, message: string, context?: any): Promise<QueryResponse> {
     console.log(`💬 Processing query for patient ${patientId}: "${message}"`);
 
     const response = await this.generateAIResponse(message, context);
@@ -128,7 +128,9 @@ export class ChatService {
         });
       }
     } catch (error) {
-      this.logger.error(`❌ Intent classification failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `❌ Intent classification failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
       classification = null;
     }
 
@@ -146,7 +148,7 @@ export class ChatService {
       const escalationResult = await this.emergencyEscalation.escalate(classification, {
         severity: classification.emergencySeverity!,
         category: classification.emergencyKeywords[0]?.category || 'unknown',
-        keywords: classification.emergencyKeywords.map(k => k.keyword),
+        keywords: classification.emergencyKeywords.map((k) => k.keyword),
         context: {
           userId: userId || 'anonymous',
           conversationId,
@@ -163,7 +165,7 @@ export class ChatService {
           severity: classification.emergencySeverity!,
           message: escalationResult.message,
           requiresEscalation: true,
-          escalationActions: escalationResult.actions.map(a => a.type),
+          escalationActions: escalationResult.actions.map((a) => a.type),
           requires911: escalationResult.requiresImmediate911,
           medicalDirectorNotified: escalationResult.medicalDirectorNotified,
         },
@@ -212,7 +214,7 @@ export class ChatService {
 
         if (ragContext.chunks.length > 0) {
           this.logger.log(`📖 RAG: Retrieved ${ragContext.chunks.length} chunks for general query`);
-          
+
           // Use RAG-augmented prompt
           const retrievedContext = ragContext.chunks
             .map((chunk, i) => `[${i + 1}] ${chunk.text}`)
@@ -235,7 +237,7 @@ export class ChatService {
 
           responseText = aiResponse.content || 'No response returned from AI service.';
           toolCalls = aiResponse.toolCalls || [];
-          
+
           // Add citations
           const citationsText = formatCitations(ragContext.sources);
           if (citationsText) {
@@ -264,8 +266,10 @@ export class ChatService {
         }
       } catch (ragError) {
         // RAG failed, fall back to tool-calling AI
-        this.logger.warn(`RAG retrieval failed, using tool-calling AI: ${ragError instanceof Error ? ragError.message : String(ragError)}`);
-        
+        this.logger.warn(
+          `RAG retrieval failed, using tool-calling AI: ${ragError instanceof Error ? ragError.message : String(ragError)}`,
+        );
+
         const aiResponse = await this.aiService.invokeLLMWithTools(
           userId || 'anonymous',
           message,
@@ -279,10 +283,10 @@ export class ChatService {
       // If there are tool calls, process them
       if (toolCalls && toolCalls.length > 0) {
         this.logger.log(`🔧 Processing ${toolCalls.length} tool calls from Claude`);
-        
+
         // Take the first tool call for MVP (can extend for multi-tool support later)
         const toolCall = toolCalls[0];
-        
+
         try {
           // Execute the tool
           const toolResult = await this.toolOrchestrator.executeInChat(
@@ -304,7 +308,9 @@ export class ChatService {
             this.logger.log(`✅ Tool ${toolCall.toolName} executed successfully`);
           }
         } catch (toolError) {
-          this.logger.warn(`Tool execution failed: ${toolError instanceof Error ? toolError.message : String(toolError)}`);
+          this.logger.warn(
+            `Tool execution failed: ${toolError instanceof Error ? toolError.message : String(toolError)}`,
+          );
         }
       }
 
@@ -433,9 +439,9 @@ export class ChatService {
    */
   private mapToolName(claudeToolName: string): string {
     const toolMap = {
-      'sofa_calculator': 'sofa-calculator',
-      'drug_checker': 'drug-interactions',
-      'lab_interpreter': 'lab-interpreter',
+      sofa_calculator: 'sofa-calculator',
+      drug_checker: 'drug-interactions',
+      lab_interpreter: 'lab-interpreter',
     };
     return toolMap[claudeToolName] || claudeToolName;
   }
@@ -506,20 +512,23 @@ export class ChatService {
     try {
       // Check if we have enough parameters to execute the tool
       const toolMetadata = this.toolOrchestrator.getToolMetadata(toolId);
-      const requiredParams = toolMetadata.parameters.filter(p => p.required);
+      const requiredParams = toolMetadata.parameters.filter((p) => p.required);
       const providedParams = Object.keys(parameters);
 
       // If missing required parameters, ask AI to extract them
       if (requiredParams.length > 0 && providedParams.length === 0) {
         this.logger.log(`📝 Attempting to extract parameters from message with AI`);
-        
+
         const extractionPrompt = `Extract the following parameters from this medical query: "${message}"
 
 Required parameters for ${toolMetadata.name}:
-${requiredParams.map(p => `- ${p.name} (${p.type}): ${p.description}`).join('\n')}
+${requiredParams.map((p) => `- ${p.name} (${p.type}): ${p.description}`).join('\n')}
 
 Optional parameters:
-${toolMetadata.parameters.filter(p => !p.required).map(p => `- ${p.name} (${p.type}): ${p.description}`).join('\n')}
+${toolMetadata.parameters
+  .filter((p) => !p.required)
+  .map((p) => `- ${p.name} (${p.type}): ${p.description}`)
+  .join('\n')}
 
 Return ONLY a JSON object with the extracted values. Return null for any parameter that cannot be extracted.`;
 
@@ -528,12 +537,15 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
             userId || 'anonymous',
             extractionPrompt,
             Object.fromEntries(
-              toolMetadata.parameters.map(p => [p.name, p.type === 'number' ? 0 : p.type === 'boolean' ? false : ''])
-            )
+              toolMetadata.parameters.map((p) => [
+                p.name,
+                p.type === 'number' ? 0 : p.type === 'boolean' ? false : '',
+              ]),
+            ),
           );
 
           // Filter out null values
-          Object.keys(extractedParams).forEach(key => {
+          Object.keys(extractedParams).forEach((key) => {
             if (extractedParams[key] !== null && extractedParams[key] !== '') {
               parameters[key] = extractedParams[key];
             }
@@ -541,7 +553,9 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
 
           this.logger.log(`✅ Extracted ${Object.keys(parameters).length} parameters`);
         } catch (error) {
-          this.logger.warn(`Parameter extraction failed: ${error instanceof Error ? error.message : String(error)}`);
+          this.logger.warn(
+            `Parameter extraction failed: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
       }
 
@@ -556,14 +570,23 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
       // If validation fails but tool might still be useful, show what's needed
       if (!validation.valid && Object.keys(parameters).length === 0) {
         const toolInfo = this.getToolInfo(toolId);
-        
+
         return {
-          text: `**${toolMetadata.name}**\n\n${toolMetadata.description}\n\n**To use this tool, please provide the following information:**\n${requiredParams.map(p => `- **${p.name}**: ${p.description}`).join('\n')}\n\n${toolMetadata.parameters.filter(p => !p.required).length > 0 ? `**Optional parameters:**\n${toolMetadata.parameters.filter(p => !p.required).map(p => `- ${p.name}: ${p.description}`).join('\n')}` : ''}`,
+          text: `**${toolMetadata.name}**\n\n${toolMetadata.description}\n\n**To use this tool, please provide the following information:**\n${requiredParams.map((p) => `- **${p.name}**: ${p.description}`).join('\n')}\n\n${
+            toolMetadata.parameters.filter((p) => !p.required).length > 0
+              ? `**Optional parameters:**\n${toolMetadata.parameters
+                  .filter((p) => !p.required)
+                  .map((p) => `- ${p.name}: ${p.description}`)
+                  .join('\n')}`
+              : ''
+          }`,
           suggestions: ['Show example', 'View documentation'],
-          visualizations: [{
-            type: 'tool-preview',
-            data: { toolId, toolName: toolMetadata.name },
-          }],
+          visualizations: [
+            {
+              type: 'tool-preview',
+              data: { toolId, toolName: toolMetadata.name },
+            },
+          ],
           intentClassification: classification,
         };
       }
@@ -589,15 +612,17 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
       return {
         text: toolResult.formattedForChat,
         suggestions: ['Calculate again', 'Export results', 'View more details'],
-        visualizations: [{
-          type: 'tool-result',
-          data: {
-            toolId,
-            toolName: toolResult.toolName,
-            result: toolResult.result.data,
-            timestamp: toolResult.result.timestamp,
+        visualizations: [
+          {
+            type: 'tool-result',
+            data: {
+              toolId,
+              toolName: toolResult.toolName,
+              result: toolResult.result.data,
+              timestamp: toolResult.result.timestamp,
+            },
           },
-        }],
+        ],
         intentClassification: classification,
         toolResult: {
           toolId,
@@ -605,12 +630,15 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
           result: toolResult.result,
         },
       };
-
     } catch (error) {
-      this.logger.error(`Tool execution failed: ${error instanceof Error ? error.message : String(error)}`);
+      this.logger.error(
+        `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
 
       if (error instanceof NotFoundException) {
-        this.logger.warn(`No orchestrator registered for toolId=${toolId}; falling back to general clinical response`);
+        this.logger.warn(
+          `No orchestrator registered for toolId=${toolId}; falling back to general clinical response`,
+        );
         const fallback = await this.generateAIResponse(
           `${message}\n\n(Note: Clinical tool "${toolId}" is not available as an automated executor in this deployment. Provide general educational guidance and state limitations clearly.)`,
           { intentClassification: classification },
@@ -676,7 +704,7 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
           details: {
             query: message.substring(0, 100),
             chunksRetrieved: ragContext.chunks.length,
-            sources: ragContext.sources.map(s => s.id),
+            sources: ragContext.sources.map((s) => s.id),
             confidence: ragContext.confidence,
             latencyMs: ragContext.latencyMs,
           },
@@ -689,7 +717,9 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
       // STEP 2: CALCULATE CONFIDENCE SCORE
       // ========================================
       const confidenceScore = calculateConfidence(ragContext);
-      this.logger.log(`🎯 Confidence: ${confidenceScore.level} (${(confidenceScore.score * 100).toFixed(0)}%)`);
+      this.logger.log(
+        `🎯 Confidence: ${confidenceScore.level} (${(confidenceScore.score * 100).toFixed(0)}%)`,
+      );
 
       // ========================================
       // STEP 3: BUILD PROMPT WITH RAG CONTEXT
@@ -697,7 +727,7 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
       if (ragContext.chunks.length === 0) {
         // No relevant context found
         return {
-          text: `I wasn't able to find specific evidence-based resources in my knowledge base for this query.\n\n**Suggestions:**\n${confidenceScore.suggestedActions.map(a => `- ${a}`).join('\n')}\n\n${getConfidenceDisclaimer(confidenceScore) || ''}\n\n_Would you like me to provide general clinical information, or would you prefer to rephrase your query?_`,
+          text: `I wasn't able to find specific evidence-based resources in my knowledge base for this query.\n\n**Suggestions:**\n${confidenceScore.suggestedActions.map((a) => `- ${a}`).join('\n')}\n\n${getConfidenceDisclaimer(confidenceScore) || ''}\n\n_Would you like me to provide general clinical information, or would you prefer to rephrase your query?_`,
           suggestions: ['Rephrase query', 'General information', 'Search protocols'],
           confidence: confidenceScore.score,
           ragContext: {
@@ -717,14 +747,22 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
       let prompt: string;
       const lowerMessage = message.toLowerCase();
 
-      if (lowerMessage.includes('drug') || lowerMessage.includes('medication') || lowerMessage.includes('pharmacology')) {
+      if (
+        lowerMessage.includes('drug') ||
+        lowerMessage.includes('medication') ||
+        lowerMessage.includes('pharmacology')
+      ) {
         prompt = buildDrugInformationPrompt({
           retrievedContext,
           sources: ragContext.sources,
           userQuery: message,
           confidence: ragContext.confidence,
         });
-      } else if (lowerMessage.includes('protocol') || lowerMessage.includes('guideline') || lowerMessage.includes('algorithm')) {
+      } else if (
+        lowerMessage.includes('protocol') ||
+        lowerMessage.includes('guideline') ||
+        lowerMessage.includes('algorithm')
+      ) {
         prompt = buildClinicalProtocolPrompt({
           retrievedContext,
           sources: ragContext.sources,
@@ -743,15 +781,11 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
       // ========================================
       // STEP 4: GENERATE AI RESPONSE
       // ========================================
-      const aiResponse = await this.aiService.invokeLLM(
-        userId || 'anonymous',
-        prompt,
-        { 
-          intentType: 'medical_reference',
-          ragEnabled: true,
-          confidence: confidenceScore.score,
-        },
-      );
+      const aiResponse = await this.aiService.invokeLLM(userId || 'anonymous', prompt, {
+        intentType: 'medical_reference',
+        ragEnabled: true,
+        confidence: confidenceScore.score,
+      });
 
       let responseText = aiResponse.content || 'Unable to generate response.';
 
@@ -791,10 +825,11 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
         },
         intentClassification: classification,
       };
-
     } catch (error) {
-      this.logger.error(`Medical reference query with RAG failed: ${error instanceof Error ? error.message : String(error)}`);
-      
+      this.logger.error(
+        `Medical reference query with RAG failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
+
       // Fallback to non-RAG response
       return {
         text: `I encountered an error retrieving evidence-based information for your query. Let me provide a general response:\n\n_Please consult current guidelines or specialists for authoritative guidance._`,
@@ -817,7 +852,14 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
       'sofa-calculator': {
         name: 'SOFA Score Calculator',
         description: 'Sequential Organ Failure Assessment for ICU patients',
-        requiredParams: ['PaO2/FiO2', 'Platelets', 'Bilirubin', 'MAP or Vasopressors', 'GCS', 'Creatinine'],
+        requiredParams: [
+          'PaO2/FiO2',
+          'Platelets',
+          'Bilirubin',
+          'MAP or Vasopressors',
+          'GCS',
+          'Creatinine',
+        ],
       },
       'drug-interactions': {
         name: 'Drug Interaction Checker',
@@ -836,11 +878,13 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
       },
     };
 
-    return toolMap[toolId] || {
-      name: 'Clinical Tool',
-      description: 'Clinical decision support tool',
-      requiredParams: [],
-    };
+    return (
+      toolMap[toolId] || {
+        name: 'Clinical Tool',
+        description: 'Clinical decision support tool',
+        requiredParams: [],
+      }
+    );
   }
 
   /**
@@ -895,7 +939,11 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
     ) {
       return {
         text: `Analyzing drug interactions for current medications. Checking for significant interactions with the patient's regimen.`,
-        suggestions: ['View interaction network', 'Check contraindications', 'Suggest alternatives'],
+        suggestions: [
+          'View interaction network',
+          'Check contraindications',
+          'Suggest alternatives',
+        ],
         visualizations: [
           {
             type: 'drug-interaction',
@@ -937,8 +985,9 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
     }
 
     if (lowerMessage.includes('vital')) {
-      const vitalsSuggestions = ['Vital trends', 'Anomaly detection', 'Alert thresholds']
-        .filter((suggestion) => this.anomalyDetectionEnabled || suggestion !== 'Anomaly detection');
+      const vitalsSuggestions = ['Vital trends', 'Anomaly detection', 'Alert thresholds'].filter(
+        (suggestion) => this.anomalyDetectionEnabled || suggestion !== 'Anomaly detection',
+      );
       const anomalyInsights = await this.fetchAnomalyInsights(context?.vitals);
       return {
         text: `Current vital signs analysis. Patient vitals are being monitored in real-time.`,
@@ -994,7 +1043,9 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
     });
   }
 
-  private async fetchAnomalyInsights(vitals?: Record<string, any>): Promise<{ summary?: any; suggestions?: string[] } | null> {
+  private async fetchAnomalyInsights(
+    vitals?: Record<string, any>,
+  ): Promise<{ summary?: any; suggestions?: string[] } | null> {
     if (!this.anomalyDetectionEnabled || !this.anomalyDetectionUrl || !vitals) {
       return null;
     }

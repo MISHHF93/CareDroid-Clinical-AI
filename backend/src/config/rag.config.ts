@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 
 /**
  * RAG Configuration
- * 
+ *
  * Configuration for the RAG (Retrieval-Augmented Generation) system.
  * Includes settings for vector database, embeddings, and chunking.
  */

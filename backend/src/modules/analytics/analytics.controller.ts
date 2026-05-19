@@ -38,13 +38,17 @@ export class AnalyticsController {
   constructor(private readonly analyticsService: AnalyticsService) {}
 
   @Post('analytics/events')
-  async submitAnalyticsEvents(@Body() payload: AnalyticsPayloadDto): Promise<{ status: string; recorded: number }> {
+  async submitAnalyticsEvents(
+    @Body() payload: AnalyticsPayloadDto,
+  ): Promise<{ status: string; recorded: number }> {
     const events = payload.events || [];
 
     const normalizedEvents = events.map((event) => {
       const eventName = event.eventName || event.event || 'unknown_event';
       const parameters = event.parameters || event.properties || {};
-      const timestamp = event.timestamp ? new Date(event.timestamp).toISOString() : new Date().toISOString();
+      const timestamp = event.timestamp
+        ? new Date(event.timestamp).toISOString()
+        : new Date().toISOString();
 
       return {
         event: eventName,

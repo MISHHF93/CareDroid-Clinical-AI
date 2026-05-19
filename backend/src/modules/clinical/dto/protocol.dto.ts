@@ -14,9 +14,9 @@ export class CreateProtocolDto {
   @IsString()
   description: string;
 
-  @ApiProperty({ 
+  @ApiProperty({
     example: ['Check responsiveness', 'Call for help', 'Begin CPR', 'Attach AED/defibrillator'],
-    type: [String] 
+    type: [String],
   })
   @IsArray()
   @IsString({ each: true })

@@ -1,6 +1,6 @@
 /**
  * Lab Interpreter Service
- * 
+ *
  * Interprets laboratory results and provides clinical significance.
  * Handles common lab panels: CBC, BMP, CMP, LFTs, Coags, etc.
  */
@@ -40,14 +40,12 @@ export class LabInterpreterService implements ClinicalToolService {
     return {
       id: 'lab-interpreter',
       name: 'Lab Results Interpreter',
-      description: 'Interprets laboratory results and provides clinical significance and recommended actions',
+      description:
+        'Interprets laboratory results and provides clinical significance and recommended actions',
       category: 'interpreter',
       version: '1.0.0',
       author: 'CareDroid Medical Team',
-      references: [
-        'Clinical Laboratory Reference Values',
-        'Tietz Textbook of Clinical Chemistry',
-      ],
+      references: ['Clinical Laboratory Reference Values', 'Tietz Textbook of Clinical Chemistry'],
     };
   }
 
@@ -96,7 +94,11 @@ export class LabInterpreterService implements ClinicalToolService {
     }
 
     if (parameters.patientAge !== undefined) {
-      if (typeof parameters.patientAge !== 'number' || parameters.patientAge < 0 || parameters.patientAge > 120) {
+      if (
+        typeof parameters.patientAge !== 'number' ||
+        parameters.patientAge < 0 ||
+        parameters.patientAge > 120
+      ) {
         errors.push('patientAge must be a number between 0 and 120');
       }
     }
@@ -139,7 +141,11 @@ export class LabInterpreterService implements ClinicalToolService {
     // Generate interpretations
     const interpretations: LabInterpretation[] = [];
     for (const [category, labs] of Object.entries(grouped)) {
-      const interpretation = await this.interpretCategory(category, labs, parameters.clinicalContext);
+      const interpretation = await this.interpretCategory(
+        category,
+        labs,
+        parameters.clinicalContext,
+      );
       if (interpretation) {
         interpretations.push(interpretation);
       }
@@ -147,14 +153,14 @@ export class LabInterpreterService implements ClinicalToolService {
 
     // Identify critical values
     const criticalValues = labValues.filter(
-      l => l.status === 'critical-high' || l.status === 'critical-low'
+      (l) => l.status === 'critical-high' || l.status === 'critical-low',
     );
 
     // Overall interpretation
     const overallInterpretation = this.generateOverallInterpretation(
       labValues,
       criticalValues,
-      interpretations
+      interpretations,
     );
 
     return {
@@ -166,8 +172,8 @@ export class LabInterpreterService implements ClinicalToolService {
         criticalValues: criticalValues.length > 0 ? criticalValues : undefined,
         summary: {
           total: labValues.length,
-          normal: labValues.filter(l => l.status === 'normal').length,
-          abnormal: labValues.filter(l => l.status !== 'normal').length,
+          normal: labValues.filter((l) => l.status === 'normal').length,
+          abnormal: labValues.filter((l) => l.status !== 'normal').length,
           critical: criticalValues.length,
         },
       },
@@ -180,16 +186,13 @@ export class LabInterpreterService implements ClinicalToolService {
         },
       ],
       warnings: validation.warnings,
-      disclaimer: 'Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history.',
+      disclaimer:
+        'Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history.',
       timestamp: new Date(),
     };
   }
 
-  private processLabValue(
-    lab: any,
-    patientAge?: number,
-    patientSex?: string
-  ): LabValue | null {
+  private processLabValue(lab: any, patientAge?: number, patientSex?: string): LabValue | null {
     if (!lab.name || lab.value === undefined) {
       return null;
     }
@@ -209,7 +212,7 @@ export class LabInterpreterService implements ClinicalToolService {
   private getReferenceRange(
     labName: string,
     age?: number,
-    sex?: string
+    sex?: string,
   ): { min?: number; max?: number; display: string; criticalLow?: number; criticalHigh?: number } {
     const name = labName.toLowerCase();
 
@@ -217,30 +220,80 @@ export class LabInterpreterService implements ClinicalToolService {
     const ranges: Record<string, any> = {
       // CBC
       wbc: { min: 4.5, max: 11.0, display: '4.5-11.0 K/μL', criticalLow: 2.0, criticalHigh: 30.0 },
-      hemoglobin: sex === 'male'
-        ? { min: 13.5, max: 17.5, display: '13.5-17.5 g/dL', criticalLow: 7.0, criticalHigh: 20.0 }
-        : { min: 12.0, max: 16.0, display: '12.0-16.0 g/dL', criticalLow: 7.0, criticalHigh: 20.0 },
-      platelets: { min: 150, max: 400, display: '150-400 K/μL', criticalLow: 50, criticalHigh: 1000 },
-      
+      hemoglobin:
+        sex === 'male'
+          ? {
+              min: 13.5,
+              max: 17.5,
+              display: '13.5-17.5 g/dL',
+              criticalLow: 7.0,
+              criticalHigh: 20.0,
+            }
+          : {
+              min: 12.0,
+              max: 16.0,
+              display: '12.0-16.0 g/dL',
+              criticalLow: 7.0,
+              criticalHigh: 20.0,
+            },
+      platelets: {
+        min: 150,
+        max: 400,
+        display: '150-400 K/μL',
+        criticalLow: 50,
+        criticalHigh: 1000,
+      },
+
       // BMP/CMP
       sodium: { min: 136, max: 145, display: '136-145 mEq/L', criticalLow: 120, criticalHigh: 160 },
-      potassium: { min: 3.5, max: 5.0, display: '3.5-5.0 mEq/L', criticalLow: 2.5, criticalHigh: 6.5 },
+      potassium: {
+        min: 3.5,
+        max: 5.0,
+        display: '3.5-5.0 mEq/L',
+        criticalLow: 2.5,
+        criticalHigh: 6.5,
+      },
       chloride: { min: 98, max: 107, display: '98-107 mEq/L', criticalLow: 80, criticalHigh: 120 },
       co2: { min: 23, max: 29, display: '23-29 mEq/L', criticalLow: 10, criticalHigh: 40 },
-      glucose: { min: 70, max: 100, display: '70-100 mg/dL (fasting)', criticalLow: 40, criticalHigh: 500 },
+      glucose: {
+        min: 70,
+        max: 100,
+        display: '70-100 mg/dL (fasting)',
+        criticalLow: 40,
+        criticalHigh: 500,
+      },
       bun: { min: 7, max: 20, display: '7-20 mg/dL', criticalLow: 2, criticalHigh: 100 },
-      creatinine: sex === 'male'
-        ? { min: 0.7, max: 1.3, display: '0.7-1.3 mg/dL', criticalLow: 0.2, criticalHigh: 10.0 }
-        : { min: 0.6, max: 1.1, display: '0.6-1.1 mg/dL', criticalLow: 0.2, criticalHigh: 10.0 },
-      calcium: { min: 8.5, max: 10.5, display: '8.5-10.5 mg/dL', criticalLow: 6.5, criticalHigh: 13.0 },
-      
+      creatinine:
+        sex === 'male'
+          ? { min: 0.7, max: 1.3, display: '0.7-1.3 mg/dL', criticalLow: 0.2, criticalHigh: 10.0 }
+          : { min: 0.6, max: 1.1, display: '0.6-1.1 mg/dL', criticalLow: 0.2, criticalHigh: 10.0 },
+      calcium: {
+        min: 8.5,
+        max: 10.5,
+        display: '8.5-10.5 mg/dL',
+        criticalLow: 6.5,
+        criticalHigh: 13.0,
+      },
+
       // LFTs
       alt: { min: 7, max: 56, display: '7-56 U/L', criticalLow: 0, criticalHigh: 1000 },
       ast: { min: 10, max: 40, display: '10-40 U/L', criticalLow: 0, criticalHigh: 1000 },
-      'alkaline phosphatase': { min: 44, max: 147, display: '44-147 U/L', criticalLow: 0, criticalHigh: 1000 },
-      bilirubin: { min: 0.1, max: 1.2, display: '0.1-1.2 mg/dL', criticalLow: 0, criticalHigh: 15.0 },
+      'alkaline phosphatase': {
+        min: 44,
+        max: 147,
+        display: '44-147 U/L',
+        criticalLow: 0,
+        criticalHigh: 1000,
+      },
+      bilirubin: {
+        min: 0.1,
+        max: 1.2,
+        display: '0.1-1.2 mg/dL',
+        criticalLow: 0,
+        criticalHigh: 15.0,
+      },
       albumin: { min: 3.5, max: 5.5, display: '3.5-5.5 g/dL', criticalLow: 2.0, criticalHigh: 6.0 },
-      
+
       // Coags
       pt: { min: 11, max: 13.5, display: '11-13.5 seconds', criticalLow: 0, criticalHigh: 30 },
       inr: { min: 0.8, max: 1.2, display: '0.8-1.2', criticalLow: 0.5, criticalHigh: 5.0 },
@@ -253,7 +306,7 @@ export class LabInterpreterService implements ClinicalToolService {
   private classifyLabStatus(
     labName: string,
     value: any,
-    range: any
+    range: any,
   ): 'normal' | 'high' | 'low' | 'critical-high' | 'critical-low' {
     if (typeof value !== 'number') return 'normal';
 
@@ -284,16 +337,16 @@ export class LabInterpreterService implements ClinicalToolService {
   private groupLabsByCategory(labValues: LabValue[]): Record<string, LabValue[]> {
     const groups: Record<string, LabValue[]> = {
       CBC: [],
-      'Electrolytes': [],
+      Electrolytes: [],
       'Renal Function': [],
       'Liver Function': [],
-      'Coagulation': [],
-      'Other': [],
+      Coagulation: [],
+      Other: [],
     };
 
     for (const lab of labValues) {
       const name = lab.name.toLowerCase();
-      
+
       if (['wbc', 'hemoglobin', 'platelets', 'hematocrit'].includes(name)) {
         groups.CBC.push(lab);
       } else if (['sodium', 'potassium', 'chloride', 'co2', 'calcium'].includes(name)) {
@@ -310,18 +363,16 @@ export class LabInterpreterService implements ClinicalToolService {
     }
 
     // Remove empty groups
-    return Object.fromEntries(
-      Object.entries(groups).filter(([_, labs]) => labs.length > 0)
-    );
+    return Object.fromEntries(Object.entries(groups).filter(([_, labs]) => labs.length > 0));
   }
 
   private async interpretCategory(
     category: string,
     labs: LabValue[],
-    clinicalContext?: string
+    clinicalContext?: string,
   ): Promise<LabInterpretation | null> {
-    const abnormalLabs = labs.filter(l => l.status !== 'normal');
-    
+    const abnormalLabs = labs.filter((l) => l.status !== 'normal');
+
     if (abnormalLabs.length === 0) {
       return {
         category,
@@ -334,7 +385,7 @@ export class LabInterpreterService implements ClinicalToolService {
     // Use AI for detailed interpretation
     const prompt = `Interpret the following ${category} lab results:
 
-${labs.map(l => `- ${l.name}: ${l.value} ${l.unit} (${l.status}, ref: ${l.referenceRange})`).join('\n')}
+${labs.map((l) => `- ${l.name}: ${l.value} ${l.unit} (${l.status}, ref: ${l.referenceRange})`).join('\n')}
 
 ${clinicalContext ? `Clinical context: ${clinicalContext}` : ''}
 
@@ -360,7 +411,7 @@ Be concise and clinically relevant.`;
       // Fallback to rule-based interpretation
       return {
         category,
-        findings: abnormalLabs.map(l => `${l.name} is ${l.status.replace('-', ' ')}`),
+        findings: abnormalLabs.map((l) => `${l.name} is ${l.status.replace('-', ' ')}`),
         clinicalSignificance: 'Abnormal values detected. Clinical correlation recommended.',
         suggestedActions: ['Review in clinical context', 'Consider repeat testing if acute change'],
       };
@@ -370,14 +421,14 @@ Be concise and clinically relevant.`;
   private generateOverallInterpretation(
     labs: LabValue[],
     criticalValues: LabValue[],
-    interpretations: LabInterpretation[]
+    interpretations: LabInterpretation[],
   ): string {
     if (criticalValues.length > 0) {
-      const criticalList = criticalValues.map(l => `${l.name} (${l.value})`).join(', ');
+      const criticalList = criticalValues.map((l) => `${l.name} (${l.value})`).join(', ');
       return `🚨 **CRITICAL VALUES DETECTED**: ${criticalList}. Immediate clinical review and intervention required.`;
     }
 
-    const abnormalCount = labs.filter(l => l.status !== 'normal').length;
+    const abnormalCount = labs.filter((l) => l.status !== 'normal').length;
     if (abnormalCount === 0) {
       return `All ${labs.length} lab values are within normal limits. No acute abnormalities detected.`;
     }

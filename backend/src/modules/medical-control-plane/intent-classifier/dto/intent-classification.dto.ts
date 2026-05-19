@@ -1,6 +1,6 @@
 /**
  * Intent Classification DTOs
- * 
+ *
  * Data transfer objects for the intent classification system.
  * Defines the structure of intent classification results.
  */
@@ -14,9 +14,9 @@ export enum PrimaryIntent {
 }
 
 export enum EmergencySeverity {
-  CRITICAL = 'critical',   // Immediate life threat (e.g., cardiac arrest, stroke)
-  URGENT = 'urgent',       // Serious but not immediate (e.g., chest pain, severe bleeding)
-  MODERATE = 'moderate',   // Concerning but stable (e.g., persistent pain, abnormal labs)
+  CRITICAL = 'critical', // Immediate life threat (e.g., cardiac arrest, stroke)
+  URGENT = 'urgent', // Serious but not immediate (e.g., chest pain, severe bleeding)
+  MODERATE = 'moderate', // Concerning but stable (e.g., persistent pain, abnormal labs)
 }
 
 export interface EmergencyKeyword {
@@ -34,24 +34,24 @@ export interface ExtractedParameter {
 export interface IntentClassification {
   // Primary intent classification
   primaryIntent: PrimaryIntent;
-  
+
   // Tool identification (if clinical_tool intent)
   toolId?: string;
-  
+
   // Confidence score (0-1)
   confidence: number;
-  
+
   // Classification method used
   method: 'keyword' | 'nlu' | 'llm';
-  
+
   // Extracted parameters from the message
   extractedParameters: Record<string, any>;
-  
+
   // Emergency detection
   isEmergency: boolean;
   emergencyKeywords: EmergencyKeyword[];
   emergencySeverity?: EmergencySeverity;
-  
+
   // Supporting information
   matchedPatterns: string[];
   alternativeIntents?: Array<{
@@ -59,7 +59,7 @@ export interface IntentClassification {
     toolId?: string;
     confidence: number;
   }>;
-  
+
   // Timestamp
   classifiedAt: Date;
 }

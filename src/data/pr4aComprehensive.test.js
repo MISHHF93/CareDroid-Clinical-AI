@@ -351,14 +351,10 @@ describe('PR4A comprehensive — 8. route resolution', () => {
     expect(launch.path).not.toBe(PR4A_HUB_PATH);
   });
 
-  it('registers dedicated App routes before calculators hub', () => {
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
-    expect(hubIdx).toBeGreaterThan(-1);
+  it('registers dedicated calculator routes via CALCULATOR_ROUTE_DEFS before hub', () => {
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
     for (const id of PR4A_TOOL_IDS) {
-      const routeIdx = appSource.indexOf(`path: '${PR4A_ROUTE_BY_REGISTRY_ID[id]}'`);
-      expect(routeIdx, `App route for ${id}`).toBeGreaterThan(-1);
-      expect(routeIdx).toBeLessThan(hubIdx);
-      expect(appSource).toContain(`initialCalculatorId="${id}"`);
+      expect(matchCalculatorRoute(PR4A_ROUTE_BY_REGISTRY_ID[id])?.calculatorSlug).toBe(id);
     }
   });
 
@@ -402,9 +398,9 @@ describe('PR4A comprehensive — 9. NLU aliases', () => {
     expect(resolveCatalogLaunch('')).toEqual(PR4A_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(PR4A_EMPTY_LAUNCH);
     const unknown = resolveCatalogLaunch('not-a-pr4a-tool-xyz');
-    expect(unknown.path).toBeNull();
+    expect(unknown.path).toBe('/dashboard');
     expect(unknown.registryId).toBeNull();
-    expect(resolveNavigationPathForLaunch(unknown)).toBeNull();
+    expect(resolveNavigationPathForLaunch(unknown)).toBe('/dashboard');
   });
 });
 

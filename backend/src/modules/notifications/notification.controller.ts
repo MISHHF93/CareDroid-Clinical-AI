@@ -40,14 +40,8 @@ export class NotificationController {
   @Post('devices/register')
   @ApiOperation({ summary: 'Register device for push notifications' })
   @ApiResponse({ status: 201, description: 'Device registered successfully' })
-  async registerDevice(
-    @Request() req,
-    @Body() dto: RegisterDeviceDto
-  ) {
-    const device = await this.deviceTokenService.registerDeviceToken(
-      req.user,
-      dto
-    );
+  async registerDevice(@Request() req, @Body() dto: RegisterDeviceDto) {
+    const device = await this.deviceTokenService.registerDeviceToken(req.user, dto);
 
     return {
       success: true,
@@ -62,13 +56,11 @@ export class NotificationController {
   @Get('devices')
   @ApiOperation({ summary: 'Get registered devices' })
   async getDevices(@Request() req) {
-    const devices = await this.deviceTokenService.getUserDeviceTokens(
-      req.user.id
-    );
+    const devices = await this.deviceTokenService.getUserDeviceTokens(req.user.id);
 
     return {
       success: true,
-      devices: devices.map(d => ({
+      devices: devices.map((d) => ({
         id: d.id,
         platform: d.platform,
         deviceModel: d.deviceModel,
@@ -97,9 +89,7 @@ export class NotificationController {
   @Get('preferences')
   @ApiOperation({ summary: 'Get notification preferences' })
   async getPreferences(@Request() req) {
-    const preferences = await this.preferenceService.getPreferences(
-      req.user.id
-    );
+    const preferences = await this.preferenceService.getPreferences(req.user.id);
 
     return {
       success: true,
@@ -126,14 +116,8 @@ export class NotificationController {
    */
   @Patch('preferences')
   @ApiOperation({ summary: 'Update notification preferences' })
-  async updatePreferences(
-    @Request() req,
-    @Body() dto: UpdatePreferencesDto
-  ) {
-    const preferences = await this.preferenceService.updatePreferences(
-      req.user.id,
-      dto
-    );
+  async updatePreferences(@Request() req, @Body() dto: UpdatePreferencesDto) {
+    const preferences = await this.preferenceService.updatePreferences(req.user.id, dto);
 
     return {
       success: true,
@@ -147,14 +131,8 @@ export class NotificationController {
    */
   @Post('preferences/toggle-all')
   @ApiOperation({ summary: 'Enable/disable all notifications' })
-  async toggleAllNotifications(
-    @Request() req,
-    @Body() body: { enabled: boolean }
-  ) {
-    await this.preferenceService.toggleAllNotifications(
-      req.user.id,
-      body.enabled
-    );
+  async toggleAllNotifications(@Request() req, @Body() body: { enabled: boolean }) {
+    await this.preferenceService.toggleAllNotifications(req.user.id, body.enabled);
 
     return {
       success: true,
@@ -170,17 +148,17 @@ export class NotificationController {
   async getNotifications(
     @Request() req,
     @Query('limit') limit: string = '50',
-    @Query('offset') offset: string = '0'
+    @Query('offset') offset: string = '0',
   ) {
     const { notifications, total } = await this.notificationService.getUserNotifications(
       req.user.id,
       parseInt(limit, 10),
-      parseInt(offset, 10)
+      parseInt(offset, 10),
     );
 
     return {
       success: true,
-      notifications: notifications.map(n => ({
+      notifications: notifications.map((n) => ({
         id: n.id,
         type: n.type,
         title: n.title,

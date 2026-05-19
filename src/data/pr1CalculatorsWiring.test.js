@@ -15,6 +15,7 @@ import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
 import { PR1_ALL_ALIAS_PAIRS, PR1_CATALOG_SEARCH_QUERIES } from './pr1TestConstants';
 import { catalogRowsMatchingQuery } from '../utils/catalogSearch';
+import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -55,12 +56,8 @@ describe('PR1 calculator wiring (qSOFA, NEWS2, Child-Pugh, HAS-BLED)', () => {
     }
   });
 
-  it('registers App.jsx deep-link routes with matching initialCalculatorId', () => {
-    for (const id of PR1_CALCULATOR_REGISTRY_IDS) {
-      const path = `/tools/calculators/${id}`;
-      expect(appSource).toContain(`path: '${path}'`);
-      expect(appSource).toContain(`initialCalculatorId="${id}"`);
-    }
+  it('registers App.jsx deep-link routes via CALCULATOR_ROUTE_DEFS', () => {
+    assertAppCalculatorRouteWiring(appSource, [...PR1_CALCULATOR_REGISTRY_IDS]);
   });
 
   it('mirrors backend tool.patterns.ts toolId for each PR1 calculator', () => {

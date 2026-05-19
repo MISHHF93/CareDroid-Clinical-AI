@@ -21,9 +21,7 @@ export const EXECUTOR_ID_ALIASES: Readonly<Record<string, RegisteredExecutorTool
 /**
  * Sidebar registry id → canonical executor id (mirrors frontend REGISTRY_ID_TO_ORCHESTRATOR_TOOL).
  */
-export const REGISTRY_ID_TO_EXECUTOR_TOOL_ID: Readonly<
-  Record<string, RegisteredExecutorToolId>
-> = {
+export const REGISTRY_ID_TO_EXECUTOR_TOOL_ID: Readonly<Record<string, RegisteredExecutorToolId>> = {
   'drug-check': 'drug-interactions',
   'lab-interp': 'lab-interpreter',
   'sofa-score': 'sofa-calculator',
@@ -229,9 +227,10 @@ export const EXECUTOR_MAPPING_AUDIT = {
   unsupportedDoc: 'src/data/unsupportedOrchestratorTools.js',
 } as const;
 
-export function validateExecutorRequestPayload(
-  parameters: unknown,
-): { valid: boolean; errors: string[] } {
+export function validateExecutorRequestPayload(parameters: unknown): {
+  valid: boolean;
+  errors: string[];
+} {
   const errors: string[] = [];
   if (parameters === null || parameters === undefined) {
     errors.push('parameters is required');

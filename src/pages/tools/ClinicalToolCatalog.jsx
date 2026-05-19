@@ -745,7 +745,12 @@ const ClinicalToolCatalog = () => {
             Try an alias (e.g. pe-score, depression screen) or clear the search.
           </p>
           <div className="catalog-empty-actions">
-            <button type="button" className="catalog-btn catalog-btn--secondary" onClick={() => setSearch('')}>
+            <button
+              type="button"
+              className="catalog-btn catalog-btn--secondary"
+              aria-label="Clear search"
+              onClick={() => setSearch('')}
+            >
               Clear search
             </button>
           </div>

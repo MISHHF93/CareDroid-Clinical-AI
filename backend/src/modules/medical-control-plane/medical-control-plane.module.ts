@@ -1,8 +1,8 @@
 /**
  * Medical Control Plane Module
- * 
+ *
  * The "clinical brain" of CareDroid - middleware layer between user input and AI/tools.
- * 
+ *
  * Components:
  * - Intent Classifier: 3-phase pipeline (keyword → NLU → LLM) ✅
  * - Tool Orchestrator: Clinical tool execution and coordination ✅

@@ -55,6 +55,10 @@ Medical AI clinical co-pilot: React + Vite SPA, NestJS API, optional Capacitor A
 Copy examples and tune for your environment:
 
 - **Frontend / shared:** [.env.example](.env.example) — `VITE_*` feature flags, `VITE_API_URL`, optional Sentry, Firebase, demo auth flags.
+- **Proxy / API client audit:** [docs/proxy-config-audit.md](docs/proxy-config-audit.md) — dev vs split deploy, Vite proxy paths, centralized `apiClient`.
+- **Orchestrator executors:** [docs/unsupported-orchestrator-tools.md](docs/unsupported-orchestrator-tools.md) — three POST executors vs NLU-only tools (`npm run orchestrator:write-docs` to regenerate).
+- **Executor readiness (candidates):** [docs/executor-readiness-report.md](docs/executor-readiness-report.md) — MELD, GRACE, ASCVD, CKD, fleet route/maintenance; planning only, no new executors on mapping branches.
+- **Render / execute matrix:** [docs/tool-render-execute-matrix.md](docs/tool-render-execute-matrix.md) — per-tool route, Tier A/B/C mode, smoke paths (`npm run tool-matrix:write-docs` to regenerate; `npm run test:tool-render-smoke` for automated checks).
 - **Backend:** [backend/.env.example](backend/.env.example) — `PORT`, `FRONTEND_URL`, `DATABASE_*` / `SQLITE_PATH`, Redis, JWT, OAuth, OpenAI, Stripe, etc.
 
 Root `.env.example` documents `PORT=8000` for documentation symmetry; the **API** listens on **`PORT` in `backend/.env`** (default **3000**). Align `FRONTEND_URL` with where users load the SPA (e.g. `http://localhost:8000` when using Vite on 8000).
@@ -160,13 +164,18 @@ Canonical **frontend** definitions and wiring (keep in sync with backend pattern
 | Concern | File |
 |---------|------|
 | Sidebar registry | [src/data/toolRegistry.js](src/data/toolRegistry.js) |
-| NLU-facing catalog (15 profiles + calculator metadata) | [src/data/clinicalIntentToolCatalog.js](src/data/clinicalIntentToolCatalog.js) |
+| NLU-facing catalog (40 profiles + calculator metadata) | [src/data/clinicalIntentToolCatalog.js](src/data/clinicalIntentToolCatalog.js) |
+| **Backend ↔ frontend contract matrix** (regenerate) | [docs/backend-frontend-tool-contract.md](docs/backend-frontend-tool-contract.md) |
 | Launch map: registry id, routes, chat seeds, orchestrator `tool` param | [src/data/clinicalCatalogWiring.js](src/data/clinicalCatalogWiring.js) |
 | Source-code discovery merge (IDs, phantoms, APIs) | [src/data/sourceCodeToolDiscovery.js](src/data/sourceCodeToolDiscovery.js) |
 | Unified medical index for the catalog UI | [src/data/medicalToolsCatalogIndex.js](src/data/medicalToolsCatalogIndex.js) |
 | Full in-app inventory | `/tools/catalog` → [src/pages/tools/ClinicalToolCatalog.jsx](src/pages/tools/ClinicalToolCatalog.jsx) |
 
-Backend POST executors are limited to SOFA, drug interactions, and lab interpreter. See [docs/clinical-tool-executors.md](docs/clinical-tool-executors.md), `REGISTRY_ID_TO_ORCHESTRATOR_TOOL` in [src/data/clinicalToolIdContract.js](src/data/clinicalToolIdContract.js), and [src/data/unsupportedOrchestratorTools.js](src/data/unsupportedOrchestratorTools.js) for the full mapping and frontend-only tools.
+Backend POST executors are limited to SOFA, drug interactions, and lab interpreter. See [docs/backend-frontend-tool-contract.md](docs/backend-frontend-tool-contract.md) (full 17-column matrix), [docs/clinical-tool-executors.md](docs/clinical-tool-executors.md), `REGISTRY_ID_TO_ORCHESTRATOR_TOOL` in [src/data/clinicalToolIdContract.js](src/data/clinicalToolIdContract.js), and [src/data/unsupportedOrchestratorTools.js](src/data/unsupportedOrchestratorTools.js) for the full mapping and frontend-only tools.
+
+Regenerate the contract doc after wiring changes: `npm run contract:write-docs` (runs `npm run test:contract-matrix` drift gates).
+
+Backend route inventory and frontend call audit: [docs/backend-api-inventory.md](docs/backend-api-inventory.md).
 
 ---
 

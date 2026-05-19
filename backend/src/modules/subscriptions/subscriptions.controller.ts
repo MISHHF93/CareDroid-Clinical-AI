@@ -83,14 +83,20 @@ export class SubscriptionsController {
   @Post('webhook')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Stripe webhook handler' })
-  async handleWebhook(@Req() req: RawBodyRequest<Request>, @Headers('stripe-signature') signature: string) {
+  async handleWebhook(
+    @Req() req: RawBodyRequest<Request>,
+    @Headers('stripe-signature') signature: string,
+  ) {
     let event: Stripe.Event;
 
     try {
       const webhookSecret = this.configService.get<string>('stripe.webhookSecret');
       event = this.stripe.webhooks.constructEvent(req.rawBody, signature, webhookSecret);
     } catch (err) {
-      console.error('Webhook signature verification failed:', err instanceof Error ? err.message : String(err));
+      console.error(
+        'Webhook signature verification failed:',
+        err instanceof Error ? err.message : String(err),
+      );
       return { error: 'Webhook signature verification failed' };
     }
 

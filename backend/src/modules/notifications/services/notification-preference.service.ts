@@ -73,7 +73,7 @@ export class NotificationPreferenceService {
    */
   async updatePreferences(
     userId: string,
-    dto: UpdatePreferencesDto
+    dto: UpdatePreferencesDto,
   ): Promise<NotificationPreference> {
     let preferences = await this.preferenceRepository.findOne({
       where: { user: { id: userId } },
@@ -96,10 +96,7 @@ export class NotificationPreferenceService {
   /**
    * Check if user can receive a specific notification type
    */
-  async canReceiveNotification(
-    userId: string,
-    notificationType: string
-  ): Promise<boolean> {
+  async canReceiveNotification(userId: string, notificationType: string): Promise<boolean> {
     const preferences = await this.getPreferences(userId);
 
     // Always allow emergency notifications
@@ -128,7 +125,7 @@ export class NotificationPreferenceService {
     if (allowed && preferences.quietHoursEnabled && notificationType !== 'emergency') {
       const isQuietTime = this.isWithinQuietHours(
         preferences.quietHoursStart,
-        preferences.quietHoursEnd
+        preferences.quietHoursEnd,
       );
 
       if (isQuietTime) {

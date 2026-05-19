@@ -25,6 +25,7 @@ import {
   expectedLaunchPath,
   matchCalculatorRoute,
 } from '../routes/clinicalToolRoutes';
+import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -97,14 +98,8 @@ describe('MELD calculator wiring (meld, meld-na)', () => {
     expect(ids).toContain('end-stage-liver-disease-score');
   });
 
-  it('registers App.jsx routes before calculators hub', () => {
-    const meldIdx = appSource.indexOf("path: '/tools/calculators/meld'");
-    const meldNaIdx = appSource.indexOf("path: '/tools/calculators/meld-na'");
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
-    expect(meldIdx).toBeGreaterThan(-1);
-    expect(meldNaIdx).toBeGreaterThan(-1);
-    expect(meldIdx).toBeLessThan(hubIdx);
-    expect(meldNaIdx).toBeLessThan(hubIdx);
+  it('registers MELD routes via CALCULATOR_ROUTE_DEFS before calculators hub', () => {
+    assertAppCalculatorRouteWiring(appSource, [...MELD_TOOL_IDS]);
   });
 
   it('resolveRegistryId maps meld aliases', () => {
@@ -127,10 +122,8 @@ describe('MELD calculator wiring (meld, meld-na)', () => {
     expect(NLU_TO_REGISTRY_ID[id]).toBeUndefined();
   });
 
-  it.each(MELD_TOOL_IDS)('registers App.jsx deep link for %s', (id) => {
-    const path = MELD_ROUTE_BY_REGISTRY_ID[id];
-    expect(appSource).toContain(`path: '${path}'`);
-    expect(appSource).toContain(`initialCalculatorId="${id}"`);
+  it('registers MELD calculator routes via CALCULATOR_ROUTE_DEFS in App.jsx', () => {
+    assertAppCalculatorRouteWiring(appSource, [...MELD_TOOL_IDS]);
   });
 
   it.each(MELD_TOOL_IDS)('CalculatorInterface switch includes case for %s', (id) => {

@@ -10,13 +10,7 @@ import { DeviceToken } from './entities/device-token.entity';
 import { NotificationPreference } from './entities/notification-preference.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([
-      Notification,
-      DeviceToken,
-      NotificationPreference,
-    ]),
-  ],
+  imports: [TypeOrmModule.forFeature([Notification, DeviceToken, NotificationPreference])],
   controllers: [NotificationController],
   providers: [
     NotificationService,

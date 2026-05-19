@@ -26,6 +26,7 @@ import {
   expectedLaunchPath,
   matchCalculatorRoute,
 } from '../routes/clinicalToolRoutes';
+import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -89,12 +90,8 @@ describe('TIMI UA/NSTEMI calculator wiring', () => {
     expect(ids).toContain('timi-unstable-angina');
   });
 
-  it('registers App route before calculators hub', () => {
-    const routeIdx = appSource.indexOf("path: '/tools/calculators/timi-ua-nstemi'");
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
-    expect(routeIdx).toBeGreaterThan(-1);
-    expect(routeIdx).toBeLessThan(hubIdx);
-    expect(appSource).toContain('initialCalculatorId="timi-ua-nstemi"');
+  it('registers TIMI route via CALCULATOR_ROUTE_DEFS before calculators hub', () => {
+    assertAppCalculatorRouteWiring(appSource, [TIMI_REGISTRY_ID]);
   });
 
   it('resolveRegistryId maps timi aliases', () => {
@@ -111,9 +108,8 @@ describe('TIMI UA/NSTEMI calculator wiring', () => {
     }
   );
 
-  it('registers CalculatorInterface case and App deep link', () => {
-    expect(appSource).toContain(`path: '${TIMI_ROUTE}'`);
-    expect(appSource).toContain(`initialCalculatorId="${TIMI_REGISTRY_ID}"`);
+  it('registers CalculatorInterface case and route defs deep link', () => {
+    assertAppCalculatorRouteWiring(appSource, [TIMI_REGISTRY_ID]);
     expect(calculatorsSource).toMatch(/case\s+'timi-ua-nstemi'\s*:/);
     expect(calculatorsSource).toContain('calc-results-timi');
     expect(calculatorsSource).toContain('timiScoreLabelId');

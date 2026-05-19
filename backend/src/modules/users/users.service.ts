@@ -16,7 +16,12 @@ export class UsersService {
     private readonly auditService: AuditService,
   ) {}
 
-  async findById(id: string, requestingUserId?: string, ipAddress = '0.0.0.0', userAgent = 'system') {
+  async findById(
+    id: string,
+    requestingUserId?: string,
+    ipAddress = '0.0.0.0',
+    userAgent = 'system',
+  ) {
     const user = await this.userRepository.findOne({
       where: { id },
       relations: ['profile', 'subscription'],
@@ -42,7 +47,12 @@ export class UsersService {
     return user;
   }
 
-  async findByEmail(email: string, requestingUserId?: string, ipAddress = '0.0.0.0', userAgent = 'system') {
+  async findByEmail(
+    email: string,
+    requestingUserId?: string,
+    ipAddress = '0.0.0.0',
+    userAgent = 'system',
+  ) {
     const user = await this.userRepository.findOne({
       where: { email },
       relations: ['profile', 'subscription'],
@@ -67,7 +77,13 @@ export class UsersService {
     return user;
   }
 
-  async updateProfile(userId: string, updates: Partial<UserProfile>, requestingUserId?: string, ipAddress = '0.0.0.0', userAgent = 'system') {
+  async updateProfile(
+    userId: string,
+    updates: Partial<UserProfile>,
+    requestingUserId?: string,
+    ipAddress = '0.0.0.0',
+    userAgent = 'system',
+  ) {
     const profile = await this.profileRepository.findOne({ where: { userId } });
     if (!profile) {
       throw new Error('Profile not found');
@@ -100,4 +116,3 @@ export class UsersService {
     return savedProfile;
   }
 }
-

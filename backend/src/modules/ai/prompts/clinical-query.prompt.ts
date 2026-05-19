@@ -2,7 +2,7 @@ import { MedicalSource } from '../../rag/dto/medical-source.dto';
 
 /**
  * Clinical Query Prompt Templates
- * 
+ *
  * Templates for constructing prompts that incorporate RAG-retrieved context
  * for evidence-based clinical responses.
  */
@@ -43,7 +43,8 @@ export interface PromptContext {
  * Build clinical query prompt with RAG context
  */
 export function buildClinicalQueryPrompt(context: PromptContext): string {
-  const { retrievedContext, sources, userQuery, conversationHistory, confidence, userRole } = context;
+  const { retrievedContext, sources, userQuery, conversationHistory, confidence, userRole } =
+    context;
 
   // Different prompts based on confidence level
   if (confidence >= 0.8) {
@@ -213,29 +214,34 @@ export function formatCitations(sources: MedicalSource[]): string {
     return '';
   }
 
-  return '\n\n**References:**\n' + sources.map((source, index) => {
-    let citation = `[${index + 1}] ${source.title}`;
-    
-    if (source.authors && source.authors.length > 0) {
-      citation += `. ${source.authors.join(', ')}`;
-    }
-    
-    if (source.organization) {
-      citation += `. ${source.organization}`;
-    }
-    
-    if (source.date) {
-      citation += `. ${source.date}`;
-    }
-    
-    if (source.url) {
-      citation += `\n    ${source.url}`;
-    }
-    
-    if (source.evidenceLevel) {
-      citation += `\n    Evidence Level: ${source.evidenceLevel}`;
-    }
-    
-    return citation;
-  }).join('\n\n');
+  return (
+    '\n\n**References:**\n' +
+    sources
+      .map((source, index) => {
+        let citation = `[${index + 1}] ${source.title}`;
+
+        if (source.authors && source.authors.length > 0) {
+          citation += `. ${source.authors.join(', ')}`;
+        }
+
+        if (source.organization) {
+          citation += `. ${source.organization}`;
+        }
+
+        if (source.date) {
+          citation += `. ${source.date}`;
+        }
+
+        if (source.url) {
+          citation += `\n    ${source.url}`;
+        }
+
+        if (source.evidenceLevel) {
+          citation += `\n    Evidence Level: ${source.evidenceLevel}`;
+        }
+
+        return citation;
+      })
+      .join('\n\n')
+  );
 }

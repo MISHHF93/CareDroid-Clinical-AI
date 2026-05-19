@@ -133,7 +133,13 @@ describe('ComplianceService', () => {
         createdAt: new Date('2023-01-05'),
       };
       const mockAuditLogs = [
-        { id: '1', action: 'login', resource: 'auth', timestamp: new Date('2023-06-01'), phiAccessed: false },
+        {
+          id: '1',
+          action: 'login',
+          resource: 'auth',
+          timestamp: new Date('2023-06-01'),
+          phiAccessed: false,
+        },
       ];
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
@@ -274,7 +280,9 @@ describe('ComplianceService', () => {
 
       mockUserRepository.findOne.mockResolvedValue(mockUser);
 
-      await expect(service.deleteUserData(userId, confirmEmail)).rejects.toThrow('Email confirmation does not match');
+      await expect(service.deleteUserData(userId, confirmEmail)).rejects.toThrow(
+        'Email confirmation does not match',
+      );
     });
 
     it('should throw error when user not found', async () => {
@@ -364,7 +372,9 @@ describe('ComplianceService', () => {
 
       mockUserRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.updateConsent(userId, consentType, granted)).rejects.toThrow('User not found');
+      await expect(service.updateConsent(userId, consentType, granted)).rejects.toThrow(
+        'User not found',
+      );
     });
   });
 });

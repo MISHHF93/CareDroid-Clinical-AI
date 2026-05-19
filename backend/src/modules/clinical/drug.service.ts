@@ -23,10 +23,9 @@ export class DrugService {
     const queryBuilder = this.drugRepository.createQueryBuilder('drug');
 
     if (search) {
-      queryBuilder.where(
-        '(drug.name ILIKE :search OR drug.genericName ILIKE :search)',
-        { search: `%${search}%` },
-      );
+      queryBuilder.where('(drug.name ILIKE :search OR drug.genericName ILIKE :search)', {
+        search: `%${search}%`,
+      });
     }
 
     if (category) {
@@ -73,7 +72,7 @@ export class DrugService {
       .createQueryBuilder('drug')
       .select('DISTINCT drug.category', 'category')
       .getRawMany();
-    
-    return result.map(r => r.category);
+
+    return result.map((r) => r.category);
   }
 }

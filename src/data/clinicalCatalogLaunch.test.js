@@ -204,6 +204,14 @@ describe('resolveCatalogLaunch — NLU hub-only scores', () => {
   });
 });
 
+describe('resolveCatalogLaunch — invalid orchestrator requests', () => {
+  it('never assigns orchestratorTool for invalid POST ids', () => {
+    expect(resolveCatalogLaunch('qsofa').orchestratorTool).toBeNull();
+    expect(resolveCatalogLaunch('wells-pe').orchestratorTool).toBeNull();
+    expect(resolveOrchestratorToolForLaunch('qsofa', 'qsofa', true)).toBeNull();
+  });
+});
+
 describe('resolveCatalogLaunch — Tier C orchestrator (registered executors only)', () => {
   it('maps only registered NLU ids through REGISTRY_ID_TO_ORCHESTRATOR_TOOL', () => {
     expect(Object.values(REGISTRY_ID_TO_ORCHESTRATOR_TOOL).sort()).toEqual(

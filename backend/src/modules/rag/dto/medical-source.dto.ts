@@ -1,6 +1,6 @@
 /**
  * Medical Source DTO
- * 
+ *
  * Represents a citable medical source that can be referenced in AI responses.
  * Used for providing citations and maintaining clinical accuracy.
  */
@@ -19,7 +19,14 @@ export interface MedicalSource {
   /**
    * Type of medical source
    */
-  type: 'protocol' | 'guideline' | 'drug_info' | 'clinical_pathway' | 'reference' | 'textbook' | 'journal';
+  type:
+    | 'protocol'
+    | 'guideline'
+    | 'drug_info'
+    | 'clinical_pathway'
+    | 'reference'
+    | 'textbook'
+    | 'journal';
 
   /**
    * Organization that published the source

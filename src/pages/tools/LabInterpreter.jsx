@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import './LabInterpreter.css';
-import { apiFetch, parseApiResponse } from '../../services/apiClient';
-import { parseToolExecutionResponse } from '../../utils/toolExecutionResponse';
+import { executeClinicalTool } from '../../services/clinicalOrchestratorApi';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getLabCategoryIcon, getToolIcon } from '../../navigation/iconRegistry';
 
@@ -81,25 +80,14 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
         ...(clinicalContext && { clinicalContext }),
       };
 
-      const response = await apiFetch(`/api/tools/lab-interpreter/execute`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('caredroid_access_token')}`,
-        },
-        body: JSON.stringify({ parameters }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to interpret lab values');
+      const execution = await executeClinicalTool('lab-interpreter', parameters);
+      if (!execution.ok) {
+        throw new Error(execution.message || 'Failed to interpret lab values');
       }
-
-      const data = await parseApiResponse(response, { fallback: {} });
-      const parsed = parseToolExecutionResponse(data);
-      if (parsed.ok && parsed.data != null) {
-        setResults(parsed.data);
+      if (execution.data != null) {
+        setResults(execution.data);
       } else {
-        throw new Error(parsed.errors?.[0] || 'Unknown error occurred');
+        throw new Error(execution.errors?.[0] || 'Unknown error occurred');
       }
     } catch (err) {
       setError(err.message);

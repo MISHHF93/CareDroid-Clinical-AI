@@ -101,7 +101,8 @@ export class AIService {
     this.toolDefinitions = [
       {
         name: 'sofa_calculator',
-        description: 'Calculate SOFA (Sequential Organ Failure Assessment) score from vital signs and lab values',
+        description:
+          'Calculate SOFA (Sequential Organ Failure Assessment) score from vital signs and lab values',
         input_schema: {
           type: 'object',
           properties: {
@@ -119,7 +120,8 @@ export class AIService {
             },
             cardiovascular: {
               type: 'string',
-              description: 'Hypotension classification (none/diastolic_reduction/hypotension/shock)',
+              description:
+                'Hypotension classification (none/diastolic_reduction/hypotension/shock)',
             },
             cns: {
               type: 'number',
@@ -150,7 +152,8 @@ export class AIService {
             },
             renal_function: {
               type: 'string',
-              description: 'Renal function status (normal/mild_impairment/moderate_impairment/severe_impairment)',
+              description:
+                'Renal function status (normal/mild_impairment/moderate_impairment/severe_impairment)',
             },
             hepatic_function: {
               type: 'string',
@@ -162,7 +165,8 @@ export class AIService {
       },
       {
         name: 'lab_interpreter',
-        description: 'Interpret lab test results and identify abnormalities with clinical significance',
+        description:
+          'Interpret lab test results and identify abnormalities with clinical significance',
         input_schema: {
           type: 'object',
           properties: {
@@ -388,7 +392,9 @@ export class AIService {
 
       return result;
     } catch (error) {
-      throw new Error(`Structured JSON generation failed: ${error instanceof Error ? error.message : String(error)}`);
+      throw new Error(
+        `Structured JSON generation failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 

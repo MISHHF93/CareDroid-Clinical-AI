@@ -4,8 +4,7 @@ import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import ToolPageLayout from './ToolPageLayout';
 import './Calculators.css';
-import { apiFetch, parseApiResponse } from '../../services/apiClient';
-import { parseToolExecutionResponse } from '../../utils/toolExecutionResponse';
+import { executeClinicalTool } from '../../services/clinicalOrchestratorApi';
 import {
   calculateQsofaScore,
   interpretQsofaScore,
@@ -2318,23 +2317,14 @@ const SOFACalculator = ({ onResultChange }) => {
         return acc;
       }, {});
 
-      const response = await apiFetch(`/api/tools/sofa-calculator/execute`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('caredroid_access_token')}`,
-        },
-        body: JSON.stringify({ parameters }),
-      });
-
-      if (!response.ok) throw new Error('Failed to calculate SOFA score');
-
-      const data = await parseApiResponse(response, { fallback: {} });
-      const parsed = parseToolExecutionResponse(data);
-      if (parsed.ok && parsed.data != null) {
-        setResult(parsed.data);
+      const execution = await executeClinicalTool('sofa-calculator', parameters);
+      if (!execution.ok) {
+        throw new Error(execution.message || 'Failed to calculate SOFA score');
+      }
+      if (execution.data != null) {
+        setResult(execution.data);
       } else {
-        throw new Error(parsed.errors?.[0] || 'Calculation failed');
+        throw new Error(execution.errors?.[0] || 'Calculation failed');
       }
     } catch (err) {
       setError(err.message);

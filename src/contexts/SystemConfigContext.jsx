@@ -7,8 +7,17 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import configService from '../services/configService';
 import logger from '../utils/logger';
+import ApiConfigDegradedBanner from '../components/ApiConfigDegradedBanner';
 
 const SystemConfigContext = createContext();
+
+const stripMeta = (payload) => {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    return { value: payload, meta: null };
+  }
+  const { _meta, ...value } = payload;
+  return { value, meta: _meta };
+};
 
 export function SystemConfigProvider({ children }) {
   const [systemConfig, setSystemConfig] = useState({
@@ -29,18 +38,18 @@ export function SystemConfigProvider({ children }) {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [configDegraded, setConfigDegraded] = useState(false);
 
   const loadSystemConfig = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
 
-      // Fetch all system data in parallel with timeout
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('Config load timeout')), 5000)
+        setTimeout(() => reject(new Error('Config load timeout')), 5000),
       );
 
-      const [config, usage, tools, sub] = await Promise.race([
+      const [configRaw, usageRaw, toolsRaw, subRaw] = await Promise.race([
         Promise.all([
           configService.getSystemConfig(),
           configService.getAIRemainingQueries(),
@@ -50,14 +59,33 @@ export function SystemConfigProvider({ children }) {
         timeoutPromise,
       ]);
 
-      setSystemConfig(config || systemConfig);
-      setAiUsage(usage || aiUsage);
-      setAvailableTools(tools || []);
-      setSubscription(sub || { tier: 'free', status: 'active' });
+      const config = stripMeta(configRaw);
+      const usage = stripMeta(usageRaw);
+      const tools = stripMeta(toolsRaw);
+      const sub = stripMeta(subRaw);
+
+      const degraded =
+        config.meta?.fromDefaults ||
+        usage.meta?.fromDefaults ||
+        tools.meta?.fromDefaults ||
+        sub.meta?.fromDefaults;
+
+      setConfigDegraded(Boolean(degraded));
+      if (degraded) {
+        const messages = [config.meta, usage.meta, tools.meta, sub.meta]
+          .filter((m) => m?.error)
+          .map((m) => m.error);
+        setError(messages[0] || 'API configuration unavailable');
+      }
+
+      setSystemConfig(config.value || systemConfig);
+      setAiUsage(usage.value || aiUsage);
+      setAvailableTools(tools.value?.tools ?? tools.value ?? []);
+      setSubscription(sub.value || { tier: 'free', status: 'active' });
     } catch (err) {
       logger.warn('Failed to load system config (using defaults)', { message: err.message });
       setError(err.message);
-      // Keep defaults
+      setConfigDegraded(true);
     } finally {
       setLoading(false);
     }
@@ -66,9 +94,10 @@ export function SystemConfigProvider({ children }) {
   useEffect(() => {
     loadSystemConfig();
 
-    // Refresh AI usage every 5 minutes
-    const interval = setInterval(() => {
-      configService.getAIRemainingQueries().then(setAiUsage);
+    const interval = setInterval(async () => {
+      const usageRaw = await configService.getAIRemainingQueries();
+      const { value } = stripMeta(usageRaw);
+      if (value) setAiUsage(value);
     }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
@@ -81,6 +110,7 @@ export function SystemConfigProvider({ children }) {
     subscription,
     loading,
     error,
+    configDegraded,
     refresh: loadSystemConfig,
     isRagEnabled: systemConfig?.rag?.enabled ?? false,
     sessionConfig: systemConfig?.session,
@@ -88,6 +118,7 @@ export function SystemConfigProvider({ children }) {
 
   return (
     <SystemConfigContext.Provider value={value}>
+      <ApiConfigDegradedBanner />
       {children}
     </SystemConfigContext.Provider>
   );

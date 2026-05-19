@@ -22,6 +22,7 @@ import {
   registryToPrimaryNluToolId,
 } from './clinicalToolIdContract';
 import { ensureChatSeedGuardrails } from './clinicalSafetyGuardrails';
+import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
 
 export * from './clinicalToolIdContract';
 
@@ -104,10 +105,10 @@ export function resolveRegistryId(id) {
  */
 export function resolveOrchestratorToolForLaunch(nluToolId, registryId, backendExecutable = false) {
   const fromRegistry = registryIdToOrchestratorTool(registryId);
-  if (fromRegistry && ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(fromRegistry)) {
+  if (fromRegistry && isOrchestratorPostExecutable(fromRegistry)) {
     return fromRegistry;
   }
-  if (backendExecutable && ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(nluToolId)) {
+  if (backendExecutable && nluToolId && isOrchestratorPostExecutable(nluToolId)) {
     return nluToolId;
   }
   return null;
@@ -189,7 +190,7 @@ function launchFromBuiltinCalc(calc) {
     orchestratorTool: resolveOrchestratorToolForLaunch(
       calc.orchestratorId,
       registryId,
-      Boolean(calc.orchestratorId)
+      calc.orchestratorId ? isOrchestratorPostExecutable(calc.orchestratorId) : false
     ),
     openLabel: 'Open calculator',
   };
