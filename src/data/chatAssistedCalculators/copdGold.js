@@ -3,13 +3,15 @@
  * Supports GOLD A/B/E grouping from symptom burden and exacerbation history — not pharmacotherapy.
  */
 
-export const COPD_GOLD_TOOL_ID = 'copd-gold';
+import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from '../clinicalToolIdContract';
+
+export const COPD_GOLD_TOOL_ID = NLU.copdGold;
 
 export const copdGoldChatConfig = {
-  toolId: COPD_GOLD_TOOL_ID,
+  toolId: NLU.copdGold,
   name: 'COPD GOLD',
-  hubPath: '/tools/calculators',
-  registryId: COPD_GOLD_TOOL_ID,
+  hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  registryId: REGISTRY.copdGold,
   category: 'calculator',
   description:
     'COPD GOLD grouping support from symptoms and exacerbation history (decision support only; does not diagnose COPD or recommend inhalers).',

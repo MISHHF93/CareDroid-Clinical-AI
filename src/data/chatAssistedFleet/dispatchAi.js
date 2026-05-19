@@ -3,13 +3,15 @@
  * Recommends assignments and prioritization — human dispatcher retains authority.
  */
 
-export const DISPATCH_AI_TOOL_ID = 'dispatch-ai';
+import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from '../clinicalToolIdContract';
+
+export const DISPATCH_AI_TOOL_ID = NLU.dispatchAi;
 
 export const dispatchAiChatConfig = {
-  toolId: DISPATCH_AI_TOOL_ID,
+  toolId: NLU.dispatchAi,
   name: 'Dispatch Intelligence',
-  hubPath: '/tools/calculators',
-  registryId: DISPATCH_AI_TOOL_ID,
+  hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  registryId: REGISTRY.dispatchAi,
   category: 'fleet',
   description:
     'Conversational dispatch decision support: vehicle assignment options, request prioritization, bottleneck review, and suggested actions. Does not auto-assign vehicles or override dispatcher judgment.',

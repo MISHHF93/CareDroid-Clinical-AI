@@ -3,13 +3,15 @@
  * Informational criteria support only — does not diagnose irritable bowel syndrome.
  */
 
-export const ROME_IV_IBS_TOOL_ID = 'rome-iv-ibs';
+import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from '../clinicalToolIdContract';
+
+export const ROME_IV_IBS_TOOL_ID = NLU.romeIvIbs;
 
 export const romeIvIbsChatConfig = {
-  toolId: ROME_IV_IBS_TOOL_ID,
+  toolId: NLU.romeIvIbs,
   name: 'Rome IV IBS',
-  hubPath: '/tools/calculators',
-  registryId: ROME_IV_IBS_TOOL_ID,
+  hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  registryId: REGISTRY.romeIvIbs,
   category: 'calculator',
   description:
     'Rome IV irritable bowel syndrome criteria support from abdominal pain pattern and stool changes (informational only; does not diagnose IBS).',

@@ -2,13 +2,15 @@
  * Tier-B chat-assisted configuration for PERC (no dedicated Calculators.jsx form).
  */
 
-export const PERC_TOOL_ID = 'perc';
+import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from '../clinicalToolIdContract';
+
+export const PERC_TOOL_ID = NLU.perc;
 
 export const percChatConfig = {
-  toolId: PERC_TOOL_ID,
+  toolId: NLU.perc,
   name: 'PERC',
-  hubPath: '/tools/calculators',
-  registryId: 'perc',
+  hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  registryId: REGISTRY.perc,
   category: 'calculator',
   description:
     'PERC checklist for low pre-test probability only — does not definitively exclude pulmonary embolism.',

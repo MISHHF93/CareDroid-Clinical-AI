@@ -9,9 +9,13 @@ import { resolveRegistryId } from './clinicalCatalogWiring';
 import {
   ALL_REQUIRED_CATALOG_ALIAS_PAIRS,
   AUDITED_CLINICAL_REGISTRY_IDS,
+  CHAT_ASSISTED_NLU_TOOL_IDS,
   PHANTOM_BLOCKED_CATALOG_ALIASES,
+  buildChatAssistedBackendCoverageReport,
   buildClinicalToolAliasSyncReport,
+  buildMetadataParityReport,
   buildSynchronizedAliasMap,
+  exportSynchronizedAliasMapJson,
   formatAliasSyncReport,
 } from './clinicalToolAliasSync';
 import { aliasToSlug, extractToolPatternKeywords } from './parseToolPatterns';
@@ -72,6 +76,46 @@ describe('clinicalToolAliasSync — catalog aliases (PR1–PR7 + fleet)', () => 
   );
 });
 
+describe('clinicalToolAliasSync — metadata parity', () => {
+  it('matches toolName and category for every NLU profile in frontend vs backend', () => {
+    const mismatches = buildMetadataParityReport(patternsSource);
+    if (mismatches.length) {
+      console.log('metadata mismatches:', mismatches);
+    }
+    expect(mismatches).toEqual([]);
+  });
+});
+
+describe('clinicalToolAliasSync — chat-assisted tools', () => {
+  it('includes every Tier B / hub-only chat tool in CHAT_ASSISTED_NLU_TOOL_IDS', () => {
+    for (const toolId of [
+      'wells-pe',
+      'perc',
+      'grace-acs',
+      'nihss',
+      'canadian-c-spine',
+      'ottawa-ankle',
+      'copd-gold',
+      'rome-iv-ibs',
+      'dispatch-ai',
+      'apache2-calculator',
+      'curb65-calculator',
+      'gcs-calculator',
+      'wells-dvt-calculator',
+    ]) {
+      expect(CHAT_ASSISTED_NLU_TOOL_IDS).toContain(toolId);
+    }
+  });
+
+  it('has backend keyword coverage for chat-assisted NLU tools and config aliases', () => {
+    const gaps = buildChatAssistedBackendCoverageReport(patternsSource);
+    if (gaps.length) {
+      console.log('chat-assisted gaps:', gaps);
+    }
+    expect(gaps).toEqual([]);
+  });
+});
+
 describe('clinicalToolAliasSync — safety and collisions', () => {
   const report = buildClinicalToolAliasSyncReport({ patternsSource });
 
@@ -123,5 +167,18 @@ describe('clinicalToolAliasSync — synchronized alias map', () => {
       const keywords = extractToolPatternKeywords(patternsSource, id);
       expect(keywords.length).toBeGreaterThan(3);
     }
+  });
+
+  it('exports a JSON synchronized alias map with keywords and catalog aliases', () => {
+    const json = exportSynchronizedAliasMapJson(patternsSource);
+    const map = JSON.parse(json);
+    expect(map['wells-pe']?.backendKeywords).toContain('pe score');
+    expect(map['dispatch-ai']?.catalogAliases).toContain('dispatch');
+    expect(map['wells-pe']?.toolName).toBeTruthy();
+  });
+
+  it('reports isClean when full sync report has no drift', () => {
+    const report = buildClinicalToolAliasSyncReport({ patternsSource });
+    expect(report.isClean).toBe(true);
   });
 });

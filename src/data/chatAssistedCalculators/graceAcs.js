@@ -6,7 +6,9 @@
  * integrators require POST /tools/:id/execute; client utils are sufficient for validated math.
  */
 
-export const GRACE_ACS_TOOL_ID = 'grace-acs';
+import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from '../clinicalToolIdContract';
+
+export const GRACE_ACS_TOOL_ID = NLU.graceAcs;
 
 /** Product-required NLU phrases → `grace-acs` (also in `NLU_TO_REGISTRY_ID`). */
 export const GRACE_ACS_REQUIRED_NLU_ALIASES = Object.freeze([
@@ -18,10 +20,10 @@ export const GRACE_ACS_REQUIRED_NLU_ALIASES = Object.freeze([
 ]);
 
 export const graceAcsChatConfig = {
-  toolId: GRACE_ACS_TOOL_ID,
+  toolId: NLU.graceAcs,
   name: 'GRACE ACS Risk',
-  hubPath: '/tools/calculators',
-  registryId: GRACE_ACS_TOOL_ID,
+  hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  registryId: REGISTRY.graceAcs,
   category: 'calculator',
   description:
     'GRACE ACS mortality risk stratification — in-hospital and 6-month estimates (clinical decision support only; not a diagnosis of ACS).',

@@ -494,7 +494,7 @@ const LabResults = ({ results }) => {
           </span>
           Clinical Disclaimer:
         </strong>{' '}
-        Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history. This tool provides educational information only and should not replace professional medical judgment.
+        Clinical decision support only — does not establish a diagnosis. Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history. This tool provides educational information only and is not a substitute for professional medical judgment.
       </div>
     </>
   );

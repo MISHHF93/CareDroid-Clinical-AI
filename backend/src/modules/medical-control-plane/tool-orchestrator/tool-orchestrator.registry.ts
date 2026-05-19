@@ -240,3 +240,58 @@ export function validateExecutorRequestPayload(
   }
   return { valid: errors.length === 0, errors };
 }
+
+function hasRequiredParameterValue(value: unknown): boolean {
+  if (value === undefined || value === null) return false;
+  if (typeof value === 'string' && !value.trim()) return false;
+  if (Array.isArray(value) && value.length === 0) return false;
+  return true;
+}
+
+/**
+ * Contract-level validation before tool-specific validate() (deterministic SOFA + required fields).
+ */
+export function validateExecutorContractParameters(
+  resolvedId: RegisteredExecutorToolId,
+  parameters: Record<string, unknown>,
+): { valid: boolean; errors: string[] } {
+  const contract = EXECUTOR_REQUEST_CONTRACTS[resolvedId];
+  const errors: string[] = [];
+
+  for (const key of contract.requiredParameters) {
+    if (!hasRequiredParameterValue(parameters[key])) {
+      errors.push(`Missing required parameter: ${key}`);
+    }
+  }
+
+  if (resolvedId === 'drug-interactions' && Array.isArray(parameters.medications)) {
+    const meds = parameters.medications as unknown[];
+    if (meds.some((m) => typeof m !== 'string' || !String(m).trim())) {
+      errors.push('medications must be an array of non-empty drug name strings');
+    }
+  }
+
+  if (resolvedId === 'lab-interpreter' && Array.isArray(parameters.labValues)) {
+    const labs = parameters.labValues as unknown[];
+    if (labs.length === 0) {
+      errors.push('labValues must be a non-empty array');
+    }
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+export function isKnownUnsupportedNluTool(toolId: string): boolean {
+  return UNSUPPORTED_SET.has(String(toolId || '').trim());
+}
+
+export function getExecutorCatalogSnapshot() {
+  return {
+    audit: EXECUTOR_MAPPING_AUDIT,
+    contracts: EXECUTOR_REQUEST_CONTRACTS,
+    registeredExecutorToolIds: [...REGISTERED_EXECUTOR_TOOL_IDS],
+    registryIdToExecutor: { ...REGISTRY_ID_TO_EXECUTOR_TOOL_ID },
+    executorAliases: { ...EXECUTOR_ID_ALIASES },
+    unsupportedTools: [...UNSUPPORTED_ORCHESTRATOR_TOOL_DOCS],
+  };
+}

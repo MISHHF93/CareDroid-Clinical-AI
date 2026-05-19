@@ -442,4 +442,96 @@ export function assertNluResolvesToRegistry(nluToolId, expectedRegistryId) {
   return resolveRegistryId(nluToolId) === expectedRegistryId;
 }
 
-export { KNOWN_TOOL_AREA_PATHS, expectedLaunchPath, matchCalculatorRoute, toolIdAliases };
+const MATRIX_COLUMNS = [
+  'id',
+  'tier',
+  'route',
+  'registry',
+  'catalog',
+  'discovery',
+  'nlu',
+  'postExecutor',
+  'launchPath',
+  'testCoverage',
+];
+
+function yesNo(value) {
+  return value ? 'yes' : '—';
+}
+
+/**
+ * Markdown inventory table for docs / CI reports (deterministic sort).
+ * @param {ReturnType<typeof getE2eValidationMatrixDocument>} [doc]
+ */
+export function formatE2eMatrixMarkdown(doc = getE2eValidationMatrixDocument()) {
+  const lines = [
+    '# E2E tool validation matrix',
+    '',
+    `Generated: ${doc.generatedAt}`,
+    '',
+    '## Summary',
+    '',
+    `| Metric | Value |`,
+    `|--------|-------|`,
+    `| Total inventory rows | ${doc.summary.totalRows} |`,
+    `| Registry tools | ${doc.summary.registryTools} |`,
+    `| NLU supplemental rows | ${doc.summary.nluSupplementalRows} |`,
+    `| POST executors | ${doc.summary.withPostExecutor} |`,
+    `| Catalog coverage | ${doc.summary.withCatalog} |`,
+    `| Discovery coverage | ${doc.summary.withDiscovery} |`,
+    '',
+    '### Tier distribution (registry)',
+    '',
+    ...Object.entries(doc.summary.tierCounts)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([tier, count]) => `- **${tier}**: ${count}`),
+    '',
+    '## Column definitions',
+    '',
+    '| Column | Meaning |',
+    '|--------|---------|',
+    '| id | Canonical registry id or NLU-only profile id |',
+    '| tier | A / B / C / clinical-page / fleet-A / fleet-B / hub / nlu-hub-only |',
+    '| route | SPA path from registry or launch resolution |',
+    '| registry | Row exists in `toolRegistry.js` |',
+    '| catalog | Row in `getMedicalToolsCatalogRows()` |',
+    '| discovery | Mentioned in `getAllDiscoveredTools()` |',
+    '| nlu | NLU profile in `clinicalIntentTools` |',
+    '| postExecutor | Registered POST `/api/tools/:id/execute` |',
+    '| launchPath | `resolveCatalogLaunch` path |',
+    '| testCoverage | Vitest files associated with the tool |',
+    '',
+    '## Inventory',
+    '',
+    `| ${MATRIX_COLUMNS.join(' | ')} |`,
+    `| ${MATRIX_COLUMNS.map(() => '---').join(' | ')} |`,
+  ];
+
+  for (const row of doc.inventory) {
+    const nlu = row.nluToolIds?.length ? row.nluToolIds.join(', ') : '—';
+    const tests =
+      row.testCoverage?.length > 4
+        ? `${row.testCoverage.length} files`
+        : row.testCoverage?.join(', ') || '—';
+    lines.push(
+      `| ${row.id} | ${row.tier} | ${row.route || '—'} | ${yesNo(row.registryPresence)} | ${yesNo(row.catalogPresence)} | ${yesNo(row.discoveryPresence)} | ${yesNo(row.nluPresence)}${row.nluPresence && nlu !== row.id ? ` (${nlu})` : ''} | ${yesNo(row.backendPostExecutor)} | ${row.launch?.path || '—'} | ${tests} |`
+    );
+  }
+
+  lines.push(
+    '',
+    '## Automated gates',
+    '',
+    '```bash',
+    'npm run test:e2e-matrix',
+    'npm run e2e-matrix:report',
+    '```',
+    '',
+    'See also: `docs/e2e-manual-qa-checklist.md`, `docs/e2e-regression-checklist.md`.',
+    ''
+  );
+
+  return lines.join('\n');
+}
+
+export { KNOWN_TOOL_AREA_PATHS, expectedLaunchPath, matchCalculatorRoute, toolIdAliases, MATRIX_COLUMNS };

@@ -7,7 +7,7 @@ export const E2E_REGRESSION_CHECKLIST = Object.freeze([
     id: 'automated-gates',
     title: 'Automated gates (CI / local)',
     checks: [
-      'npm test / vitest: e2eToolValidationMatrix.test.js',
+      'npm run test:e2e-matrix (e2eToolValidationMatrix.test.js)',
       'vitest: clinicalToolIdContract.test.js',
       'vitest: clinicalCatalogLaunch.test.js',
       'vitest: clinicalToolAliasSync.test.js',
@@ -80,4 +80,22 @@ export function flattenRegressionChecklist() {
       check,
     }))
   );
+}
+
+/** Markdown export for release notes / ops runbooks. */
+export function formatRegressionMarkdown() {
+  const lines = [
+    '# Regression checklist — production promotion',
+    '',
+    'Canonical source: `src/data/e2eRegressionChecklist.js`.',
+    '',
+  ];
+  for (const group of E2E_REGRESSION_CHECKLIST) {
+    lines.push(`## ${group.title}`, '');
+    for (const check of group.checks) {
+      lines.push(`- [ ] ${check}`);
+    }
+    lines.push('');
+  }
+  return lines.join('\n');
 }

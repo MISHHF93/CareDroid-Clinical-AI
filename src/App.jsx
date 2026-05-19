@@ -304,23 +304,15 @@ function AppRoutes() {
     { path: '/tools/catalog', element: <AppShellPage><ClinicalToolCatalog /></AppShellPage>, requiresAuth: true },
     { path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>, requiresAuth: true },
     { path: '/tools/lab-interpreter', element: <AppShellPage><LabInterpreter /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculator/sofa', element: <AppShellPage><Calculators initialCalculatorId="sofa" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculator/gfr', element: <AppShellPage><Calculators initialCalculatorId="gfr" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculator/bmi', element: <AppShellPage><Calculators initialCalculatorId="bmi" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculator/chads2vasc', element: <AppShellPage><Calculators initialCalculatorId="chads2vasc" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/qsofa', element: <AppShellPage><Calculators initialCalculatorId="qsofa" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/news2', element: <AppShellPage><Calculators initialCalculatorId="news2" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/child-pugh', element: <AppShellPage><Calculators initialCalculatorId="child-pugh" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/has-bled', element: <AppShellPage><Calculators initialCalculatorId="has-bled" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/meld', element: <AppShellPage><Calculators initialCalculatorId="meld" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/meld-na', element: <AppShellPage><Calculators initialCalculatorId="meld-na" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/timi-ua-nstemi', element: <AppShellPage><Calculators initialCalculatorId="timi-ua-nstemi" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/ascvd-risk', element: <AppShellPage><Calculators initialCalculatorId="ascvd-risk" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/ckd-staging', element: <AppShellPage><Calculators initialCalculatorId="ckd-staging" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/stop-bang', element: <AppShellPage><Calculators initialCalculatorId="stop-bang" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/audit-c', element: <AppShellPage><Calculators initialCalculatorId="audit-c" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/phq9', element: <AppShellPage><Calculators initialCalculatorId="phq9" /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/gad7', element: <AppShellPage><Calculators initialCalculatorId="gad7" /></AppShellPage>, requiresAuth: true },
+    ...CALCULATOR_ROUTE_DEFS.map(({ path, calculatorSlug }) => ({
+      path,
+      element: (
+        <AppShellPage>
+          <Calculators initialCalculatorId={calculatorSlug} />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    })),
     { path: '/tools/calculators', element: <AppShellPage><Calculators /></AppShellPage>, requiresAuth: true },
     { path: '/tools/protocols', element: <AppShellPage><Protocols /></AppShellPage>, requiresAuth: true },
     { path: '/tools/diagnosis', element: <AppShellPage><DiagnosisAssistant /></AppShellPage>, requiresAuth: true },

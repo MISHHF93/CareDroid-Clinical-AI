@@ -7,7 +7,20 @@
  * @param {string} source - contents of tool.patterns.ts
  * @returns {{ toolId: string, keywords: string[] }[]}
  */
-export function parseClinicalToolPatterns(source) {
+function readQuotedField(source, fieldName, fromIndex) {
+  const marker = source.indexOf(`${fieldName}: '`, fromIndex);
+  if (marker < 0) return { value: null, end: fromIndex };
+  const start = marker + fieldName.length + 3;
+  const end = source.indexOf("'", start);
+  if (end < 0) return { value: null, end: fromIndex };
+  return { value: source.slice(start, end), end: end + 1 };
+}
+
+/**
+ * @param {string} source
+ * @returns {{ toolId: string, toolName: string, category: string, keywords: string[] }[]}
+ */
+export function parseClinicalToolPatternRecords(source) {
   const patterns = [];
   let searchFrom = 0;
   while (searchFrom < source.length) {
@@ -17,16 +30,34 @@ export function parseClinicalToolPatterns(source) {
     const toolIdEnd = source.indexOf("'", toolIdStart);
     if (toolIdEnd < 0) break;
     const toolId = source.slice(toolIdStart, toolIdEnd);
+    const { value: toolName } = readQuotedField(source, 'toolName', toolIdEnd);
+    const { value: category } = readQuotedField(source, 'category', toolIdEnd);
     const kwMarker = source.indexOf('keywords:', toolIdEnd);
     const startBracket = source.indexOf('[', kwMarker);
     const endBracket = source.indexOf('],', startBracket);
     if (startBracket < 0 || endBracket < 0) break;
     const chunk = source.slice(startBracket + 1, endBracket);
     const keywords = [...chunk.matchAll(/'([^']+)'/g)].map((m) => m[1]);
-    patterns.push({ toolId, keywords });
+    patterns.push({
+      toolId,
+      toolName: toolName || '',
+      category: category || '',
+      keywords,
+    });
     searchFrom = endBracket + 2;
   }
   return patterns;
+}
+
+/**
+ * @param {string} source - contents of tool.patterns.ts
+ * @returns {{ toolId: string, keywords: string[] }[]}
+ */
+export function parseClinicalToolPatterns(source) {
+  return parseClinicalToolPatternRecords(source).map(({ toolId, keywords }) => ({
+    toolId,
+    keywords,
+  }));
 }
 
 /**

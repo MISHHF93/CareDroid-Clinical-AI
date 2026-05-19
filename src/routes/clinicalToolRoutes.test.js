@@ -54,8 +54,13 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
   });
 
   it('registers every registry tool path in App.jsx', () => {
+    const calculatorPaths = new Set(CALCULATOR_ROUTE_DEFS.map((d) => d.path));
     for (const path of REGISTRY_TOOL_PATHS) {
-      expect(appSource).toContain(`path: '${path}'`);
+      if (calculatorPaths.has(path)) {
+        expect(CALCULATOR_ROUTE_DEFS.some((d) => d.path === path)).toBe(true);
+      } else {
+        expect(appSource).toContain(`path: '${path}'`);
+      }
     }
   });
 
@@ -73,9 +78,12 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
     expect(defPaths.sort()).toEqual([...new Set(builtinPaths)].sort());
   });
 
-  it.each(REQUIRED_CALCULATOR_PATHS)('App.jsx declares calculator route %s', (path) => {
-    expect(appSource).toContain(`path: '${path}'`);
-    expect(appSource).toContain(`initialCalculatorId="${path.split('/').pop()}"`);
+  it.each(REQUIRED_CALCULATOR_PATHS)('App.jsx route contract includes calculator %s', (path) => {
+    const slug = path.split('/').pop();
+    const def = CALCULATOR_ROUTE_DEFS.find((d) => d.path === path);
+    expect(def?.calculatorSlug).toBe(slug);
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('initialCalculatorId={calculatorSlug}');
   });
 
   it('matches calculator slugs for deep links', () => {

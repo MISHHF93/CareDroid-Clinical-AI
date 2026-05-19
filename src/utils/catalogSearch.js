@@ -8,7 +8,9 @@ import {
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
   NLU_TO_REGISTRY_ID,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+  ORCHESTRATOR_TO_REGISTRY_ID,
 } from '../data/clinicalToolIdContract';
+import { clinicalIntentTools } from '../data/clinicalIntentToolCatalog';
 import { toolIdAliases } from '../data/sourceCodeToolDiscovery';
 
 const NON_EXECUTABLE_DISCOVERY_STATUSES = new Set(['phantom', 'marketing-copy']);
@@ -30,6 +32,10 @@ function getAliasesByCanonical() {
   for (const [alias, canonical] of Object.entries(NLU_TO_REGISTRY_ID)) {
     add(canonical, alias);
   }
+  for (const [nluId, registryId] of Object.entries(ORCHESTRATOR_TO_REGISTRY_ID)) {
+    add(registryId, nluId);
+    add(nluId, registryId);
+  }
   for (const { id, mapsTo } of toolIdAliases) {
     add(mapsTo, id);
   }
@@ -41,6 +47,20 @@ export function normalizeCatalogCategory(category, { chatOnlyForm = false } = {}
   const base = !category ? 'tool' : String(category).toLowerCase().trim();
   if (chatOnlyForm && base !== 'fleet') return 'chat-assisted';
   return base;
+}
+
+/**
+ * Match free text against a query, expanding optional catalog ids to NLU/registry aliases.
+ * @param {string} text
+ * @param {string} query
+ * @param {{ ids?: string[] }} [options]
+ */
+export function textMatchesCatalogQuery(text, query, { ids = [] } = {}) {
+  const q = String(query || '').trim().toLowerCase();
+  if (!q) return true;
+  const terms = getSearchTermsForCatalogIds(...ids);
+  const blob = [text, ...terms].filter(Boolean).join(' ').toLowerCase();
+  return blob.includes(q);
 }
 
 /** Alias and phrase terms that should match catalog search for the given ids. */
@@ -64,6 +84,7 @@ export function buildMedicalCatalogSearchBlob(row) {
     row.searchTerms ||
     getSearchTermsForCatalogIds(row.primaryId, row.id, row.sidebarToolId);
   return [
+    row.title,
     row.name,
     row.primaryId,
     row.id,
@@ -122,6 +143,33 @@ function resolveLaunchLabel(row, launch) {
 /**
  * Adds searchTerms, normalized category, launchable, launchLabel, and API tier flags.
  */
+const REQUIRED_MEDICAL_ROW_FIELDS = [
+  'primaryId',
+  'id',
+  'title',
+  'name',
+  'category',
+  'description',
+  'searchTerms',
+  'launchable',
+  'accessSummary',
+];
+
+/**
+ * @param {object} row
+ * @returns {{ ok: boolean, missing: string[] }}
+ */
+export function validateMedicalCatalogRow(row) {
+  const missing = REQUIRED_MEDICAL_ROW_FIELDS.filter((key) => {
+    const val = row[key];
+    if (val === null || val === undefined) return true;
+    if (typeof val === 'string' && !val.trim()) return true;
+    if (key === 'searchTerms' && (!Array.isArray(val) || val.length === 0)) return true;
+    return false;
+  });
+  return { ok: missing.length === 0, missing };
+}
+
 export function enrichMedicalCatalogRow(row) {
   const launchId = row.primaryId || row.id;
   const launch = resolveCatalogLaunch(launchId);
@@ -131,15 +179,23 @@ export function enrichMedicalCatalogRow(row) {
   const searchTerms = getSearchTermsForCatalogIds(
     row.primaryId,
     row.id,
-    row.sidebarToolId
+    row.sidebarToolId,
+    launch.registryId
   );
   const launchable = Boolean(launch.path || launch.chatSeed);
   const primaryId = row.primaryId || row.id;
-  const backendApiRegistered = isOrchestratorRegisteredNlu(primaryId);
+  const nluToolId =
+    clinicalIntentPrimaryId(primaryId) ||
+    (ORCHESTRATOR_TO_REGISTRY_ID[primaryId] ? primaryId : null);
+  const backendApiRegistered = Boolean(
+    nluToolId && isOrchestratorRegisteredNlu(nluToolId)
+  );
   const backendApiIntentOnly = Boolean(row.backendExecutor && !backendApiRegistered);
 
   return {
     ...row,
+    title: row.title || row.name,
+    name: row.name || row.title,
     category,
     searchTerms,
     launchable,
@@ -147,23 +203,73 @@ export function enrichMedicalCatalogRow(row) {
     accessTier: resolveAccessTier({ ...row, category }),
     backendApiRegistered,
     backendApiIntentOnly,
+    pagePath: row.pagePath || launch.path || null,
+  };
+}
+
+function clinicalIntentPrimaryId(id) {
+  if (!id) return null;
+  if (ORCHESTRATOR_TO_REGISTRY_ID[id]) return id;
+  return null;
+}
+
+/**
+ * Normalize discovery scan rows for display (categories, status labels, search).
+ */
+export function enrichDiscoveredCatalogRow(row) {
+  const chatOnly =
+    Boolean(row.chatOnly) ||
+    (row.status === 'nlu-chat' && !row.path) ||
+    (row.status === 'nlu-chat' && row.path === '/tools/calculators');
+  const category = normalizeCatalogCategory(row.category, { chatOnlyForm: chatOnly });
+  const nluId = row.mapsTo || row.id;
+  const nluProfile = clinicalIntentTools.find((t) => t.toolId === nluId);
+  const tierCIntent = Boolean(nluProfile?.backendExecutable);
+  const backendRegistered = isOrchestratorRegisteredNlu(nluId);
+  let displayStatus = row.status;
+  if ((row.status === 'backend-executor' || tierCIntent) && !backendRegistered) {
+    displayStatus = 'nlu-api-intent';
+  }
+  if (row.status === 'orchestrator') {
+    displayStatus = 'orchestrator';
+  }
+  const searchTerms = getSearchTermsForCatalogIds(row.id, row.mapsTo);
+  const launch = resolveCatalogLaunch(row.mapsTo || row.id);
+
+  return {
+    ...row,
+    title: row.title || row.name,
+    name: row.name || row.title,
+    category,
+    displayStatus,
+    searchTerms,
+    chatOnly,
+    launchable: isDiscoveredRowLaunchable(row),
+    launchLabel: getDiscoveredLaunchLabel(row),
+    backendApiRegistered: backendRegistered,
+    backendApiIntentOnly: tierCIntent && !backendRegistered,
+    mapsTo: row.mapsTo,
+    notes: row.notes || '',
+    path: row.path || launch.path || null,
   };
 }
 
 export function buildDiscoveredSearchBlob(row) {
-  const terms = getSearchTermsForCatalogIds(row.id, row.mapsTo);
+  const enriched = row.searchTerms ? row : enrichDiscoveredCatalogRow(row);
+  const terms = enriched.searchTerms || getSearchTermsForCatalogIds(enriched.id, enriched.mapsTo);
   return [
-    row.id,
-    row.name,
-    row.notes,
-    row.source,
-    row.status,
-    row.category,
-    row.mapsTo,
-    row.apiPath,
-    row.protocolReference,
+    enriched.id,
+    enriched.name,
+    enriched.title,
+    enriched.notes,
+    enriched.source,
+    enriched.displayStatus || enriched.status,
+    enriched.category,
+    enriched.mapsTo,
+    enriched.apiPath,
+    enriched.protocolReference,
     ...terms,
-    ...(row.sources || []),
+    ...(enriched.sources || []),
   ]
     .filter(Boolean)
     .join(' ')
@@ -205,5 +311,22 @@ export function getDiscoveredLaunchLabel(row) {
 
 /** Unique normalized categories for medical rows (filter dropdown integrity). */
 export function getMedicalCatalogCategories(rows) {
-  return [...new Set(rows.map((r) => r.category).filter(Boolean))].sort();
+  const normalized = rows.map((r) => normalizeCatalogCategory(r.category, { chatOnlyForm: r.chatOnlyForm }));
+  return [...new Set(normalized.filter(Boolean))].sort();
+}
+
+/** No duplicate categories that differ only by case/spacing. */
+export function assertCatalogCategoriesNormalized(rows) {
+  const byKey = new Map();
+  for (const row of rows) {
+    const key = String(row.category || '')
+      .toLowerCase()
+      .trim();
+    if (!key) continue;
+    const prior = byKey.get(key);
+    if (prior && prior !== row.category) {
+      throw new Error(`Category spelling drift: "${prior}" vs "${row.category}"`);
+    }
+    byKey.set(key, row.category);
+  }
 }

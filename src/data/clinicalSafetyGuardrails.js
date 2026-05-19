@@ -309,6 +309,303 @@ export function runClinicalSafetyComplianceAudit(tools) {
   };
 }
 
+/**
+ * Lint-style rules for shipped UI / backend executor surfaces (file content scans).
+ * @type {ReadonlyArray<{ surfaceId: string, path: string, required: RegExp[], forbidden?: RegExp[] }>}
+ */
+export const PRODUCTION_UI_SURFACE_RULES = Object.freeze([
+  {
+    surfaceId: 'calculators-hub-lead',
+    path: 'src/pages/tools/Calculators.jsx',
+    required: [/Decision support only/i],
+    forbidden: [/Anticoagulation strongly recommended/i, /\bNo anticoagulation recommended\b/i],
+  },
+  {
+    surfaceId: 'mental-health-forms',
+    path: 'src/pages/tools/mentalHealthCalculators.jsx',
+    required: [/988|crisis/i, /screening only|do not diagnose/i],
+  },
+  {
+    surfaceId: 'pr4a-calculators',
+    path: 'src/pages/tools/pr4aCalculators.jsx',
+    required: [/decision support|does not diagnose|does not recommend/i],
+    forbidden: [/Anticoagulation strongly recommended/i],
+  },
+  {
+    surfaceId: 'tool-page-layout',
+    path: 'src/pages/tools/ToolPageLayout.jsx',
+    required: [/ClinicalDecisionSupportDisclaimer/, /disclaimerVariantForTool/],
+  },
+  {
+    surfaceId: 'clinical-tool-catalog',
+    path: 'src/pages/tools/ClinicalToolCatalog.jsx',
+    required: [/ClinicalDecisionSupportDisclaimer|Decision support only/i],
+  },
+  {
+    surfaceId: 'lab-interpreter',
+    path: 'src/pages/tools/LabInterpreter.jsx',
+    required: [/decision support|not a substitute|does not establish a diagnosis|educational/i],
+  },
+  {
+    surfaceId: 'fleet-dashboard',
+    path: 'src/pages/fleet/FleetDashboard.jsx',
+    required: [/Decision support only/i],
+    forbidden: [FLEET_AUTO_FORBIDDEN_RE],
+  },
+  {
+    surfaceId: 'route-optimizer',
+    path: 'src/pages/fleet/RouteOptimizer.jsx',
+    required: [/Decision support only/i, /does not dispatch/i],
+  },
+  {
+    surfaceId: 'predictive-maintenance',
+    path: 'src/pages/fleet/PredictiveMaintenance.jsx',
+    required: [/Decision support only/i],
+  },
+  {
+    surfaceId: 'backend-sofa-executor',
+    path: 'backend/src/modules/medical-control-plane/tool-orchestrator/services/sofa-calculator.service.ts',
+    required: [/educational|qualified healthcare|clinical decisions/i],
+    forbidden: [DOSE_FORBIDDEN_RE],
+  },
+  {
+    surfaceId: 'backend-drug-executor',
+    path: 'backend/src/modules/medical-control-plane/tool-orchestrator/services/drug-checker.service.ts',
+    required: [/decision support|does not recommend/i],
+    forbidden: [ANTICOAG_THERAPY_FORBIDDEN_RE],
+  },
+  {
+    surfaceId: 'backend-lab-executor',
+    path: 'backend/src/modules/medical-control-plane/tool-orchestrator/services/lab-interpreter.service.ts',
+    required: [/qualified healthcare|context-dependent/i],
+    forbidden: [DOSE_FORBIDDEN_RE],
+  },
+]);
+
+/**
+ * @param {{ surfaceId: string, path: string, content: string, required?: RegExp[], forbidden?: RegExp[] }} rule
+ */
+export function auditUiSurfaceContent(rule) {
+  const issues = [];
+  const { content, surfaceId, path } = rule;
+  const required = rule.required || [];
+  const forbidden = rule.forbidden || [];
+
+  for (const re of required) {
+    if (!re.test(content)) {
+      issues.push({
+        code: 'missing-required-copy',
+        severity: 'high',
+        detail: `Pattern ${re} not found in ${path}`,
+      });
+    }
+  }
+
+  for (const re of forbidden) {
+    if (re.test(content)) {
+      issues.push({
+        code: 'forbidden-copy',
+        severity: 'critical',
+        detail: `Forbidden pattern ${re} found in ${path}`,
+      });
+    }
+  }
+
+  return { surfaceId, path, ok: issues.length === 0, issues };
+}
+
+/**
+ * @param {(relPath: string) => string} readFile
+ */
+export function runUiSurfaceSafetyAudit(readFile) {
+  const findings = PRODUCTION_UI_SURFACE_RULES.map((rule) => {
+    let content = '';
+    try {
+      content = readFile(rule.path);
+    } catch {
+      return {
+        surfaceId: rule.surfaceId,
+        path: rule.path,
+        ok: false,
+        issues: [{ code: 'file-missing', severity: 'critical', detail: `Could not read ${rule.path}` }],
+      };
+    }
+    return auditUiSurfaceContent({ ...rule, content });
+  });
+
+  const failures = findings.filter((f) => !f.ok);
+  return {
+    surfacesAudited: findings.length,
+    passing: findings.length - failures.length,
+    failing: failures.length,
+    criticalIssues: failures.flatMap((f) => f.issues.filter((i) => i.severity === 'critical')).length,
+    findings,
+    risks: failures.map((f) => ({
+      surfaceId: f.surfaceId,
+      path: f.path,
+      issues: f.issues,
+      remediation: 'Add or strengthen safety copy on the surface; do not weaken existing warnings.',
+    })),
+  };
+}
+
+/**
+ * Audit synthesized catalog launch chat seeds (post-guardrail normalization).
+ * @param {string[]} toolIds
+ * @param {(toolId: string) => { chatSeed?: string }} resolveLaunch
+ */
+export function auditCatalogLaunchSeeds(toolIds, resolveLaunch) {
+  return toolIds.map((toolId) => {
+    const launch = resolveLaunch(toolId);
+    const seed = launch?.chatSeed || '';
+    if (!seed) return { toolId, ok: true, issues: [] };
+    return auditChatSeed({ toolId, chatSeed: seed });
+  });
+}
+
+/**
+ * Tools without chat seeds must still frame decision support in metadata when they ship a page.
+ * @param {{ toolId: string, category?: string, description?: string, path?: string, chatSeed?: string }} row
+ */
+export function auditToolMetadata(row) {
+  if (row.chatSeed) return { toolId: row.toolId, ok: true, issues: [] };
+  if (!row.path && row.category !== 'fleet') {
+    return { toolId: row.toolId, ok: true, issues: [] };
+  }
+
+  const text = row.description || '';
+  const issues = [];
+  const isFleet = row.category === 'fleet';
+
+  if (isFleet) {
+    if (!FLEET_GUARDRAIL_RE.test(text) && !/decision support/i.test(text)) {
+      issues.push({ code: 'missing-fleet-metadata-framing', severity: 'medium' });
+    }
+  } else if (!DECISION_SUPPORT_RE.test(text) && !/educational|context-dependent|interaction/i.test(text)) {
+    issues.push({ code: 'missing-metadata-decision-support', severity: 'medium' });
+  }
+
+  return { toolId: row.toolId, ok: issues.length === 0, issues };
+}
+
+/**
+ * Full production audit: NLU chat seeds, UI surfaces, launch seeds, metadata.
+ * @param {object} options
+ * @param {import('./clinicalIntentToolCatalog.js').clinicalIntentTools} options.tools
+ * @param {(relPath: string) => string} [options.readFile]
+ * @param {(toolId: string) => { chatSeed?: string }} [options.resolveLaunch]
+ * @param {string[]} [options.launchToolIds]
+ */
+export function runProductionSafetyComplianceAudit(options) {
+  const { tools, readFile, resolveLaunch, launchToolIds } = options;
+  const chatAudit = runClinicalSafetyComplianceAudit(tools);
+  const uiAudit = readFile ? runUiSurfaceSafetyAudit(readFile) : null;
+
+  const metadataFindings = tools
+    .filter((t) => t.path && !t.chatSeed && t.category !== 'emergency')
+    .map((t) => auditToolMetadata(t));
+  const metadataFailures = metadataFindings.filter((f) => !f.ok);
+
+  let launchFindings = [];
+  if (resolveLaunch && launchToolIds?.length) {
+    launchFindings = auditCatalogLaunchSeeds(launchToolIds, resolveLaunch);
+  }
+  const launchFailures = launchFindings.filter((f) => !f.ok);
+
+  const criticalIssues =
+    chatAudit.summary.criticalIssues +
+    (uiAudit?.criticalIssues || 0) +
+    [...metadataFailures, ...launchFailures].flatMap((f) =>
+      f.issues.filter((i) => i.severity === 'critical')
+    ).length;
+
+  const totalFailing =
+    chatAudit.summary.failing +
+    (uiAudit?.failing || 0) +
+    metadataFailures.length +
+    launchFailures.length;
+
+  const riskLevel =
+    criticalIssues > 0 ? 'high' : totalFailing > 0 ? 'medium' : 'low';
+
+  return {
+    generatedAt: new Date().toISOString(),
+    riskLevel,
+    checklist: GUARDRAIL_CHECKLIST,
+    chatSeedAudit: chatAudit,
+    uiSurfaceAudit: uiAudit,
+    metadataFindings,
+    launchFindings,
+    summary: {
+      chatSeedPassing: chatAudit.summary.passing,
+      chatSeedFailing: chatAudit.summary.failing,
+      uiSurfacePassing: uiAudit?.passing ?? null,
+      uiSurfaceFailing: uiAudit?.failing ?? null,
+      metadataFailing: metadataFailures.length,
+      launchFailing: launchFailures.length,
+      criticalIssues,
+      totalFailing,
+    },
+    risks: [
+      ...chatAudit.risks,
+      ...(uiAudit?.risks || []),
+      ...metadataFailures.map((f) => ({
+        toolId: f.toolId,
+        issues: f.issues,
+        remediation: 'Add decision-support framing to catalog description or chat seed.',
+      })),
+      ...launchFailures.map((f) => ({
+        toolId: f.toolId,
+        issues: f.issues,
+        remediation: 'Fix launch chat seed in clinicalCatalogWiring or source chat config.',
+      })),
+    ],
+  };
+}
+
+/**
+ * @param {ReturnType<typeof runProductionSafetyComplianceAudit>} report
+ */
+export function formatClinicalSafetyComplianceMarkdown(report) {
+  const lines = [
+    '# Clinical safety & compliance report',
+    '',
+    `Generated: ${report.generatedAt}`,
+    `Risk level: **${report.riskLevel}**`,
+    '',
+    '## Summary',
+    '',
+    `- Chat seeds passing: ${report.summary.chatSeedPassing} (failing: ${report.summary.chatSeedFailing})`,
+    `- UI surfaces passing: ${report.summary.uiSurfacePassing ?? 'n/a'} (failing: ${report.summary.uiSurfaceFailing ?? 'n/a'})`,
+    `- Metadata gaps: ${report.summary.metadataFailing}`,
+    `- Launch seed gaps: ${report.summary.launchFailing}`,
+    `- Critical issues: ${report.summary.criticalIssues}`,
+    '',
+    '## Guardrail checklist',
+    '',
+  ];
+
+  for (const item of report.checklist) {
+    lines.push(`- **${item.id}**: ${item.requirement}`);
+  }
+
+  if (report.risks.length > 0) {
+    lines.push('', '## Findings', '');
+    for (const risk of report.risks) {
+      const id = risk.toolId || risk.surfaceId || risk.path;
+      lines.push(`### ${id}`);
+      for (const issue of risk.issues) {
+        lines.push(`- [${issue.severity}] ${issue.code}${issue.detail ? `: ${issue.detail}` : ''}`);
+      }
+      if (risk.remediation) lines.push(`  - Remediation: ${risk.remediation}`);
+    }
+  } else {
+    lines.push('', 'No open compliance findings.', '');
+  }
+
+  return lines.join('\n');
+}
+
 export const SAFETY_AUDIT_PATTERNS = Object.freeze({
   DECISION_SUPPORT_RE,
   MENTAL_HEALTH_CRISIS_RE,

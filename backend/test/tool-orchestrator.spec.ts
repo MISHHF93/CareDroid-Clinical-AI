@@ -337,6 +337,40 @@ describe('ToolOrchestratorService', () => {
       expect(result.success).toBe(false);
       expect(result.errorCode).toBe(ToolExecutionErrorCode.VALIDATION_FAILED);
     });
+
+    it('should return INVALID_REQUEST when parameters is not an object', async () => {
+      const result = await service.executeTool({
+        toolId: 'sofa-calculator',
+        parameters: null as unknown as Record<string, unknown>,
+        userId: 'test-user',
+        conversationId: 'test-conv',
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.errorCode).toBe(ToolExecutionErrorCode.INVALID_REQUEST);
+    });
+
+    it('should return contract VALIDATION_FAILED before tool execute for missing medications', async () => {
+      const result = await service.executeTool({
+        toolId: 'drug-interactions',
+        parameters: {},
+        userId: 'test-user',
+        conversationId: 'test-conv',
+      });
+
+      expect(result.success).toBe(false);
+      expect(result.errorCode).toBe(ToolExecutionErrorCode.VALIDATION_FAILED);
+      expect(result.result.errors?.some((e) => e.includes('medications'))).toBe(true);
+    });
+  });
+
+  describe('getExecutorCatalog', () => {
+    it('should expose registered executors and unsupported docs', () => {
+      const catalog = service.getExecutorCatalog();
+      expect(catalog.registeredExecutorToolIds).toEqual([...REGISTERED_EXECUTOR_TOOL_IDS]);
+      expect(catalog.unsupportedTools.some((t) => t.nluToolId === 'dispatch-ai')).toBe(true);
+      expect(catalog.contracts['sofa-calculator'].deterministic).toBe(true);
+    });
   });
 
   describe('executeInChat', () => {

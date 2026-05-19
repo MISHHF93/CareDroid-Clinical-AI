@@ -2,14 +2,20 @@ import { describe, it, expect } from 'vitest';
 import { getMedicalToolsCatalogRows } from '../data/medicalToolsCatalogIndex';
 import { phantomToolReferences } from '../data/sourceCodeToolDiscovery';
 import { resolveCatalogLaunch } from '../data/clinicalCatalogWiring';
+import { getAllDiscoveredTools } from '../data/sourceCodeToolDiscovery';
 import {
+  assertCatalogCategoriesNormalized,
   catalogRowsMatchingQuery,
+  enrichDiscoveredCatalogRow,
   enrichMedicalCatalogRow,
   getSearchTermsForCatalogIds,
   isDiscoveredRowLaunchable,
   isOrchestratorRegisteredNlu,
   matchesCatalogRow,
+  matchesDiscoveredRow,
   normalizeCatalogCategory,
+  textMatchesCatalogQuery,
+  validateMedicalCatalogRow,
 } from './catalogSearch';
 
 describe('catalogSearch', () => {
@@ -90,5 +96,43 @@ describe('catalogSearch', () => {
       searchTerms: ['depression screen'],
     });
     expect(matchesCatalogRow(row, 'depression screen')).toBe(true);
+  });
+
+  it('textMatchesCatalogQuery resolves NLU/registry alias ids', () => {
+    const terms = getSearchTermsForCatalogIds('sofa-calculator');
+    expect(terms).toContain('sofa-score');
+    expect(
+      textMatchesCatalogQuery('SOFA Score', 'sofa-score', { ids: ['sofa-calculator'] })
+    ).toBe(true);
+  });
+
+  it('validateMedicalCatalogRow passes for every medical index row', () => {
+    const rows = getMedicalToolsCatalogRows();
+    assertCatalogCategoriesNormalized(rows);
+    for (const row of rows) {
+      const result = validateMedicalCatalogRow(row);
+      expect(result.ok, `missing on ${row.primaryId}: ${result.missing.join(', ')}`).toBe(true);
+      expect(row.title).toBeTruthy();
+    }
+  });
+
+  it('labels dispatch-ai discovery rows as NLU API intent', () => {
+    const dispatch = getAllDiscoveredTools().find((r) => r.id === 'dispatch-ai');
+    expect(dispatch).toBeTruthy();
+    const enriched = enrichDiscoveredCatalogRow(dispatch);
+    expect(enriched.displayStatus).toBe('nlu-api-intent');
+    expect(enriched.backendApiIntentOnly).toBe(true);
+    expect(enriched.launchable).toBe(true);
+  });
+
+  it('matches discovered scan rows by alias terms', () => {
+    const rows = getAllDiscoveredTools();
+    expect(matchesDiscoveredRow(rows.find((r) => r.id === 'wells-pe'), 'pe-score')).toBe(true);
+  });
+
+  it('does not mark informational phantom tools launchable', () => {
+    const phantom = { id: 'fake-tool', status: 'phantom', name: 'Fake' };
+    expect(isDiscoveredRowLaunchable(phantom)).toBe(false);
+    expect(enrichDiscoveredCatalogRow(phantom).launchable).toBe(false);
   });
 });

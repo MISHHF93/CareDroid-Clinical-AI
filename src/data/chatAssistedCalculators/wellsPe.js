@@ -3,13 +3,15 @@
  * Consumed by clinicalIntentToolCatalog and chat launch flows.
  */
 
-export const WELLS_PE_TOOL_ID = 'wells-pe';
+import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from '../clinicalToolIdContract';
+
+export const WELLS_PE_TOOL_ID = NLU.wellsPe;
 
 export const wellsPeChatConfig = {
-  toolId: WELLS_PE_TOOL_ID,
+  toolId: NLU.wellsPe,
   name: 'Wells PE',
-  hubPath: '/tools/calculators',
-  registryId: 'wells-pe',
+  hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  registryId: REGISTRY.wellsPe,
   category: 'calculator',
   description:
     'Wells pulmonary embolism rule — guided chat scoring for pre-test probability only (does not rule in or rule out PE).',

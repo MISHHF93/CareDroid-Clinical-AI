@@ -7,14 +7,20 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
-import { clinicalIntentTools } from './clinicalIntentToolCatalog';
+import { clinicalIntentTools, builtinUiCalculators, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
 import {
   REGISTRY,
   NLU,
   ALL_REGISTRY_TOOL_IDS,
   NLU_PROFILE_TOOL_IDS,
+  NLU_HUB_ONLY_PROFILE_TOOL_IDS,
+  CANONICAL_TOOL_GROUPS,
+  KEYWORD_ROUTED_REGISTRY_IDS,
+  TOOL_ID_CONTRACT_VERSION,
+  TOOL_LAUNCH_PATHS,
   ORCHESTRATOR_TO_REGISTRY_ID,
   NLU_TO_REGISTRY_ID,
+  BUILTIN_CALC,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
@@ -24,6 +30,9 @@ import {
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
   PR_FLEET_ALL_REGISTRY_IDS,
   registryIdsReferencedByAliases,
+  registryIdValues,
+  nluToolIdValues,
+  registryToPrimaryNluToolId,
 } from './clinicalToolIdContract';
 import { resolveRegistryId } from './clinicalCatalogWiring';
 
@@ -71,6 +80,62 @@ function parseBackendRegistryIdToExecutor() {
   }
   return map;
 }
+
+describe('clinicalToolIdContract — canonical groups', () => {
+  it('exposes a contract version', () => {
+    expect(TOOL_ID_CONTRACT_VERSION).toMatch(/^\d+\.\d+\.\d+$/);
+  });
+
+  it('CANONICAL_TOOL_GROUPS registry slices partition ALL_REGISTRY_TOOL_IDS', () => {
+    const parts = [
+      ...CANONICAL_TOOL_GROUPS.aiOperationsPages,
+      ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsTierA,
+      ...CANONICAL_TOOL_GROUPS.clinicalChatAssistedTierB,
+      ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsHub,
+      ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierA,
+      ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierBChat,
+    ];
+    expect(sortedUnique(parts)).toEqual(sortedUnique([...ALL_REGISTRY_TOOL_IDS]));
+    expect(parts).toHaveLength(ALL_REGISTRY_TOOL_IDS.length);
+  });
+
+  it('NLU and REGISTRY constant values are unique', () => {
+    expect(new Set(registryIdValues()).size).toBe(registryIdValues().length);
+    expect(new Set(nluToolIdValues()).size).toBe(nluToolIdValues().length);
+  });
+
+  it('NLU_HUB_ONLY_PROFILE_TOOL_IDS matches nluCalculatorHubOnly NLU-only rows', () => {
+    const hubOnlyIds = nluCalculatorHubOnly
+      .map((row) => row.toolId)
+      .filter((id) => NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(id));
+    expect(sortedUnique(hubOnlyIds)).toEqual(sortedUnique([...NLU_HUB_ONLY_PROFILE_TOOL_IDS]));
+  });
+
+  it('builtinUiCalculators ids are canonical BUILTIN_CALC slugs', () => {
+    const allowed = new Set(Object.values(BUILTIN_CALC));
+    for (const calc of builtinUiCalculators) {
+      expect(allowed.has(calc.id), `unexpected builtin slug: ${calc.id}`).toBe(true);
+    }
+  });
+
+  it('KEYWORD_ROUTED_REGISTRY_IDS are registry ids without clinicalIntentTools rows', () => {
+    for (const registryId of KEYWORD_ROUTED_REGISTRY_IDS) {
+      expect(toolRegistryById[registryId]).toBeTruthy();
+      expect(clinicalIntentTools.some((t) => t.sidebarToolId === registryId)).toBe(false);
+    }
+  });
+
+  it('registryToPrimaryNluToolId resolves executor and self-mapped tools', () => {
+    expect(registryToPrimaryNluToolId(REGISTRY.sofaScore)).toBe(NLU.sofaCalculator);
+    expect(registryToPrimaryNluToolId(REGISTRY.wellsPe)).toBe(NLU.wellsPe);
+    expect(registryToPrimaryNluToolId(REGISTRY.calculatorsHub)).toBe(REGISTRY.calculatorsHub);
+  });
+
+  it('TOOL_LAUNCH_PATHS includes calculators hub and fleet routes', () => {
+    expect(TOOL_LAUNCH_PATHS.calculatorsHub).toBe('/tools/calculators');
+    expect(TOOL_LAUNCH_PATHS.fleetCommand).toBe('/fleet/command');
+  });
+});
 
 describe('clinicalToolIdContract — registry drift', () => {
   it('ALL_REGISTRY_TOOL_IDS matches toolRegistry.js exactly', () => {

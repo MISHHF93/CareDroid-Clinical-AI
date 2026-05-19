@@ -10,6 +10,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import {
+  CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+  NLU_HUB_ONLY_PROFILE_TOOL_IDS,
   NLU_PROFILE_TOOL_IDS,
   ORCHESTRATOR_TO_REGISTRY_ID,
   NLU_TO_REGISTRY_ID,
@@ -22,6 +24,10 @@ import {
   PR_FLEET_ALL_REGISTRY_IDS,
   REGISTRY,
 } from './clinicalToolIdContract';
+import { GRACE_ACS_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/graceAcs';
+import { NIHSS_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/nihss';
+import { CANADIAN_C_SPINE_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/canadianCSpine';
+import { OTTAWA_ANKLE_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/ottawaAnkle';
 import { PR1_ALL_ALIAS_PAIRS } from './pr1TestConstants';
 import { MELD_ALL_ALIAS_PAIRS } from './pr2MeldTestConstants';
 import { TIMI_ALL_ALIAS_PAIRS } from './pr2TimiTestConstants';
@@ -36,6 +42,7 @@ import { PR_FLEET_ALL_ALIAS_PAIRS } from './prFleetTestConstants';
 import {
   aliasToSlug,
   normalizeAliasKey,
+  parseClinicalToolPatternRecords,
   parseClinicalToolPatterns,
 } from './parseToolPatterns';
 
@@ -105,6 +112,26 @@ export const AUDITED_CLINICAL_REGISTRY_IDS = Object.freeze([
   REGISTRY.calculatorsHub,
 ]);
 
+/** Chat-assisted NLU tool ids (Tier B clinical + fleet dispatch hub). */
+export const CHAT_ASSISTED_NLU_TOOL_IDS = Object.freeze([
+  ...NLU_HUB_ONLY_PROFILE_TOOL_IDS,
+  ...clinicalIntentTools
+    .filter((t) => CLINICAL_TIER_B_CHAT_REGISTRY_IDS.includes(t.sidebarToolId || t.toolId))
+    .map((t) => t.toolId),
+  REGISTRY.dispatchAi,
+]);
+
+/** Per-tool NLU phrase lists co-located with chat configs (must match backend keywords). */
+export const CHAT_ASSISTED_REQUIRED_BACKEND_ALIASES = Object.freeze([
+  ...GRACE_ACS_REQUIRED_NLU_ALIASES.map((a) => ({ alias: a, nluToolId: 'grace-acs' })),
+  ...NIHSS_REQUIRED_NLU_ALIASES.map((a) => ({ alias: a, nluToolId: 'nihss' })),
+  ...CANADIAN_C_SPINE_REQUIRED_NLU_ALIASES.map((a) => ({
+    alias: a,
+    nluToolId: 'canadian-c-spine',
+  })),
+  ...OTTAWA_ANKLE_REQUIRED_NLU_ALIASES.map((a) => ({ alias: a, nluToolId: 'ottawa-ankle' })),
+]);
+
 /** All product-required NLU / discovery alias pairs (PR1–PR7 + fleet). */
 export const ALL_REQUIRED_CATALOG_ALIAS_PAIRS = Object.freeze([
   ...PR1_ALL_ALIAS_PAIRS,
@@ -149,8 +176,13 @@ export function buildRegistryToNluToolIdMap() {
  * Per-NLU-tool synchronized view: backend keywords + catalog aliases targeting same registry.
  * @param {string} [patternsSource]
  */
+/**
+ * @param {string} [patternsSource]
+ * @returns {Record<string, { toolId: string, registryId: string, toolName: string, category: string, backendKeywords: string[], catalogAliases: string[] }>}
+ */
 export function buildSynchronizedAliasMap(patternsSource = readToolPatternsSource()) {
-  const patterns = parseClinicalToolPatterns(patternsSource);
+  const records = parseClinicalToolPatternRecords(patternsSource);
+  const patterns = records.map(({ toolId, keywords }) => ({ toolId, keywords }));
   const registryToNlu = buildRegistryToNluToolIdMap();
   const catalogByRegistry = new Map();
 
@@ -160,16 +192,90 @@ export function buildSynchronizedAliasMap(patternsSource = readToolPatternsSourc
   }
 
   const map = {};
-  for (const { toolId, keywords } of patterns) {
+  for (const { toolId, toolName, category, keywords } of records) {
     const registryId = ORCHESTRATOR_TO_REGISTRY_ID[toolId] || toolId;
     map[toolId] = {
       toolId,
       registryId,
+      toolName,
+      category,
       backendKeywords: keywords,
       catalogAliases: [...(catalogByRegistry.get(registryId) || [])].sort(),
     };
   }
   return { map, registryToNlu, patterns };
+}
+
+function normalizeMetadataString(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Compare frontend clinicalIntentTools vs backend tool.patterns metadata.
+ * @param {string} [patternsSource]
+ */
+export function buildMetadataParityReport(patternsSource = readToolPatternsSource()) {
+  const backendById = new Map(
+    parseClinicalToolPatternRecords(patternsSource).map((r) => [r.toolId, r])
+  );
+  const mismatches = [];
+  for (const row of clinicalIntentTools) {
+    const backend = backendById.get(row.toolId);
+    if (!backend) {
+      mismatches.push({ toolId: row.toolId, field: 'toolId', issue: 'missing in backend' });
+      continue;
+    }
+    if (normalizeMetadataString(row.toolName) !== normalizeMetadataString(backend.toolName)) {
+      mismatches.push({
+        toolId: row.toolId,
+        field: 'toolName',
+        frontend: row.toolName,
+        backend: backend.toolName,
+      });
+    }
+    if (normalizeMetadataString(row.category) !== normalizeMetadataString(backend.category)) {
+      mismatches.push({
+        toolId: row.toolId,
+        field: 'category',
+        frontend: row.category,
+        backend: backend.category,
+      });
+    }
+  }
+  return mismatches;
+}
+
+/**
+ * Chat-assisted tools must expose backend keywords (NLU routing), not only catalog slugs.
+ * @param {string} [patternsSource]
+ */
+export function buildChatAssistedBackendCoverageReport(patternsSource = readToolPatternsSource()) {
+  const { map } = buildSynchronizedAliasMap(patternsSource);
+  const gaps = [];
+  for (const toolId of CHAT_ASSISTED_NLU_TOOL_IDS) {
+    const spec = map[toolId];
+    if (!spec?.backendKeywords?.length) {
+      gaps.push({ toolId, reason: 'no backend keywords' });
+    }
+  }
+  for (const { alias, nluToolId } of CHAT_ASSISTED_REQUIRED_BACKEND_ALIASES) {
+    const spec = map[nluToolId];
+    if (!spec) {
+      gaps.push({ alias, nluToolId, reason: 'tool not in synchronized map' });
+      continue;
+    }
+    const matches = spec.backendKeywords.some(
+      (kw) =>
+        normalizeAliasKey(kw) === normalizeAliasKey(alias) || aliasToSlug(kw) === aliasToSlug(alias)
+    );
+    if (!matches) {
+      gaps.push({ alias, nluToolId, reason: 'chat config alias missing from backend keywords' });
+    }
+  }
+  return gaps;
 }
 
 function isAllowedCollision(keyword, toolIds) {
@@ -290,6 +396,9 @@ export function buildClinicalToolAliasSyncReport(options = {}) {
   }
 
   const mentalHealthRegistry = new Set([REGISTRY.phq9, REGISTRY.gad7]);
+  const metadataMismatches = buildMetadataParityReport(patternsSource);
+  const chatAssistedBackendGaps = buildChatAssistedBackendCoverageReport(patternsSource);
+
   const highRiskMisroutes = [];
   for (const [alias, registryId] of Object.entries(nluToRegistry)) {
     const lower = normalizeAliasKey(alias);
@@ -302,7 +411,51 @@ export function buildClinicalToolAliasSyncReport(options = {}) {
     if (lower.includes('pulmonary embolism') && registryId === REGISTRY.phq9) {
       highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase → PHQ-9' });
     }
+    if (lower.includes('pulmonary embolism') && registryId === REGISTRY.gad7) {
+      highRiskMisroutes.push({ alias, registryId, reason: 'PE phrase → GAD-7' });
+    }
+    if (
+      (lower === 'screen' || lower === 'screening') &&
+      (mentalHealthRegistry.has(registryId) || registryId === REGISTRY.auditC)
+    ) {
+      highRiskMisroutes.push({
+        alias,
+        registryId,
+        reason: 'vague screen/screening → mental health or alcohol tool',
+      });
+    }
   }
+
+  const unsafeBackendKeywordRoutes = [];
+  const mentalHealthNlu = new Set(['phq9', 'gad7', 'audit-c']);
+  for (const { toolId, keywords } of patterns) {
+    if (!mentalHealthNlu.has(toolId)) continue;
+    for (const kw of keywords) {
+      const lower = normalizeAliasKey(kw);
+      if (
+        lower.includes('emergency') ||
+        lower.includes('trauma') ||
+        lower.startsWith('abc ') ||
+        lower === 'abc'
+      ) {
+        unsafeBackendKeywordRoutes.push({ toolId, keyword: kw, reason: 'emergency term on mental health tool' });
+      }
+    }
+  }
+
+  const isClean =
+    !idMismatches.missingInBackend.length &&
+    !idMismatches.missingInFrontend.length &&
+    !idMismatches.missingInContract.length &&
+    !missingCatalogAliases.length &&
+    !wrongCatalogTargets.length &&
+    !unsafeCatalogRoutes.length &&
+    !backendKeywordCollisions.length &&
+    !catalogAliasCollisions.length &&
+    !highRiskMisroutes.length &&
+    !metadataMismatches.length &&
+    !chatAssistedBackendGaps.length &&
+    !unsafeBackendKeywordRoutes.length;
 
   return {
     backendToolIds,
@@ -316,8 +469,17 @@ export function buildClinicalToolAliasSyncReport(options = {}) {
     backendKeywordCollisions,
     catalogAliasCollisions,
     highRiskMisroutes,
+    metadataMismatches,
+    chatAssistedBackendGaps,
+    unsafeBackendKeywordRoutes,
+    isClean,
     synchronized: buildSynchronizedAliasMap(patternsSource).map,
   };
+}
+
+/** JSON-serializable synchronized alias map for tooling and audits. */
+export function exportSynchronizedAliasMapJson(patternsSource = readToolPatternsSource()) {
+  return JSON.stringify(buildSynchronizedAliasMap(patternsSource).map, null, 2);
 }
 
 export function formatAliasSyncReport(report) {
@@ -363,6 +525,29 @@ export function formatAliasSyncReport(report) {
     for (const row of report.highRiskMisroutes) {
       lines.push(`  - ${row.alias} → ${row.registryId} (${row.reason})`);
     }
+  }
+  if (report.metadataMismatches?.length) {
+    lines.push('Metadata mismatches (frontend vs backend):');
+    for (const row of report.metadataMismatches) {
+      lines.push(`  - ${row.toolId} ${row.field}: ${JSON.stringify(row)}`);
+    }
+  }
+  if (report.chatAssistedBackendGaps?.length) {
+    lines.push('Chat-assisted backend keyword gaps:');
+    for (const row of report.chatAssistedBackendGaps) {
+      lines.push(`  - ${JSON.stringify(row)}`);
+    }
+  }
+  if (report.unsafeBackendKeywordRoutes?.length) {
+    lines.push('Unsafe backend keywords:');
+    for (const row of report.unsafeBackendKeywordRoutes) {
+      lines.push(`  - ${row.toolId}: "${row.keyword}" (${row.reason})`);
+    }
+  }
+  if (report.isClean) {
+    lines.push('Status: CLEAN — frontend catalog, backend patterns, and alias map are aligned.');
+  } else {
+    lines.push('Status: DRIFT DETECTED — see sections above.');
   }
   return lines.join('\n');
 }

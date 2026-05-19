@@ -6,6 +6,7 @@ import {
   builtinUiCalculators,
   clinicalIntentTools,
   getCatalogSummary,
+  nluCalculatorHubOnly,
   ORCHESTRATOR_TO_REGISTRY_ID,
 } from '../../data/clinicalIntentToolCatalog';
 import {
@@ -38,13 +39,17 @@ import { fetchBackendClinicalTools } from '../../services/clinicalToolsApi';
 import { sortCatalogRows } from '../../utils/catalogSort';
 import {
   catalogRowsMatchingQuery,
+  enrichDiscoveredCatalogRow,
   isDiscoveredRowLaunchable,
   getDiscoveredLaunchLabel,
   isOrchestratorRegisteredNlu,
   matchesDiscoveredRow,
+  normalizeCatalogCategory,
+  textMatchesCatalogQuery,
 } from '../../utils/catalogSearch';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
+import ClinicalDecisionSupportDisclaimer from '../../components/clinical/ClinicalDecisionSupportDisclaimer';
 import './ClinicalToolCatalog.css';
 
 const CATEGORY_CLASS = {
@@ -73,6 +78,7 @@ const STATUS_LABEL = {
   'shipped-page': 'Shipped page',
   'shipped-calculator': 'Calculator UI',
   'backend-executor': 'Backend executor',
+  'nlu-api-intent': 'NLU API intent',
   'nlu-chat': 'NLU / chat',
   'chat-api': 'Chat / API',
   phantom: 'In code only',
@@ -89,7 +95,7 @@ const STATUS_LABEL = {
 
 function statusBadgeClass(status) {
   if (status === 'phantom' || status === 'marketing-copy') return 'catalog-badge--phantom';
-  if (status === 'backend-executor') return 'catalog-badge--backend';
+  if (status === 'backend-executor' || status === 'nlu-api-intent') return 'catalog-badge--backend';
   if (status === 'chat-api' || status === 'routing') return 'catalog-badge--ai';
   if (status === 'alias') return 'catalog-badge--platform';
   if (status === 'platform') return 'catalog-badge--enterprise';
@@ -411,37 +417,64 @@ const ClinicalToolCatalog = () => {
   const allDiscovered = useMemo(() => getAllDiscoveredTools(), []);
   const allMedicalRows = useMemo(() => getMedicalToolsCatalogRows(), []);
 
-  const query = search.trim().toLowerCase();
+  const query = search.trim();
 
-  const matchesQuery = (text) => !query || String(text || '').toLowerCase().includes(query);
+  const hubOnlyToolIds = useMemo(
+    () => new Set(nluCalculatorHubOnly.map((h) => h.toolId)),
+    []
+  );
+
+  const intentToolCategory = (tool) =>
+    normalizeCatalogCategory(tool.category, {
+      chatOnlyForm: hubOnlyToolIds.has(tool.toolId),
+    });
+
+  const discoveryRowCategory = (row) =>
+    normalizeCatalogCategory(row.category, {
+      chatOnlyForm:
+        Boolean(row.chatOnly) ||
+        (row.status === 'nlu-chat' && !row.path) ||
+        (row.status === 'nlu-chat' && row.path === '/tools/calculators'),
+    });
 
   const filteredSidebar = toolRegistry.filter(
     (t) =>
-      matchesQuery(`${t.name} ${t.description} ${t.category} ${t.id}`) &&
-      (categoryFilter === 'all' || t.category.toLowerCase() === categoryFilter)
+      textMatchesCatalogQuery(`${t.name} ${t.description} ${t.category} ${t.id}`, query, {
+        ids: [t.id],
+      }) &&
+      (categoryFilter === 'all' || normalizeCatalogCategory(t.category) === categoryFilter)
   );
 
   const filteredCalculators = builtinUiCalculators.filter(
     (c) =>
-      matchesQuery(`${c.name} ${c.description} ${c.id}`) &&
+      textMatchesCatalogQuery(`${c.name} ${c.description} ${c.id}`, query, { ids: [c.id] }) &&
       (categoryFilter === 'all' || categoryFilter === 'calculator')
   );
 
   const filteredIntent = clinicalIntentTools.filter(
     (t) =>
-      matchesQuery(`${t.toolName} ${t.description} ${t.category} ${t.toolId}`) &&
-      (categoryFilter === 'all' || t.category === categoryFilter)
+      textMatchesCatalogQuery(`${t.toolName} ${t.description} ${t.category} ${t.toolId}`, query, {
+        ids: [t.toolId],
+      }) &&
+      (categoryFilter === 'all' || intentToolCategory(t) === categoryFilter)
   );
 
   const filteredBackend = backendTools.filter((t) =>
-    matchesQuery(`${t.name || ''} ${t.description || ''} ${t.id || ''} ${t.category || ''}`)
+    textMatchesCatalogQuery(
+      `${t.name || ''} ${t.description || ''} ${t.id || ''} ${t.category || ''}`,
+      query,
+      { ids: [t.id || t.toolId].filter(Boolean) }
+    )
   );
 
   const filterCapabilityRows = (rows) =>
     rows.filter(
       (row) =>
-        matchesQuery(`${row.name} ${row.description} ${row.id} ${row.category} ${row.apiPath || ''}`) &&
-        (categoryFilter === 'all' || row.category === categoryFilter)
+        textMatchesCatalogQuery(
+          `${row.name} ${row.description} ${row.id} ${row.category} ${row.apiPath || ''}`,
+          query,
+          { ids: [row.id] }
+        ) && (categoryFilter === 'all' || row.category === categoryFilter)
     );
 
   const filteredChatAi = filterCapabilityRows(chatAndAiCapabilities);
@@ -465,12 +498,17 @@ const ClinicalToolCatalog = () => {
     const statusFn = statusFilterFns[categoryFilter];
     if (statusFn) return statusFn(row);
     if (categoryFilter === 'all' || categoryFilter === 'medical') return true;
-    return row.category === categoryFilter;
+    return discoveryRowCategory(row) === categoryFilter;
   });
 
+  const enrichedDiscovered = useMemo(
+    () => filteredDiscovered.map(enrichDiscoveredCatalogRow),
+    [filteredDiscovered]
+  );
+
   const sortedDiscovered = useMemo(
-    () => scanSort.applySort(filteredDiscovered),
-    [filteredDiscovered, scanSort.sortKey, scanSort.sortDir]
+    () => scanSort.applySort(enrichedDiscovered),
+    [enrichedDiscovered, scanSort.sortKey, scanSort.sortDir]
   );
 
   const filteredMedical = catalogRowsMatchingQuery(allMedicalRows, query).filter((row) => {
@@ -495,6 +533,13 @@ const ClinicalToolCatalog = () => {
     Boolean(query) &&
     sortedMedical.length === 0 &&
     (showMedicalOnly || sortedDiscovered.length === 0);
+
+  const showCategoryEmpty =
+    !query &&
+    categoryFilter !== 'all' &&
+    categoryFilter !== 'medical' &&
+    sortedMedical.length === 0 &&
+    sortedDiscovered.length === 0;
 
   const handleOpenPath = (path) => {
     if (path) navigate(path);
@@ -626,6 +671,8 @@ const ClinicalToolCatalog = () => {
         </div>
       </header>
 
+      <ClinicalDecisionSupportDisclaimer className="catalog-safety-disclaimer" />
+
       <div className="catalog-toolbar">
         <input
           type="search"
@@ -654,6 +701,7 @@ const ClinicalToolCatalog = () => {
           <option value="data">Clinical data API</option>
           <option value="emergency">Emergency</option>
           <option value="enterprise">Enterprise</option>
+          <option value="fleet">Fleet</option>
           <option value="platform">Platform features</option>
           <option value="phantom">Phantom / in-code only</option>
           <option value="alias">ID aliases</option>
@@ -679,6 +727,24 @@ const ClinicalToolCatalog = () => {
         </div>
       )}
 
+      {showCategoryEmpty && (
+        <div className="catalog-empty catalog-empty--global" role="status">
+          <p>
+            No tools in the <strong>{categoryFilter}</strong> category. Choose another filter or show all
+            categories.
+          </p>
+          <div className="catalog-empty-actions">
+            <button
+              type="button"
+              className="catalog-btn catalog-btn--secondary"
+              onClick={() => setCategoryFilter('all')}
+            >
+              Show all categories
+            </button>
+          </div>
+        </div>
+      )}
+
       <section className="catalog-section catalog-section--medical">
         <h2>
           Medical tools &amp; calculators ({medicalSummary.total})
@@ -696,7 +762,7 @@ const ClinicalToolCatalog = () => {
           sortKey={medicalSort.sortKey}
           sortDir={medicalSort.sortDir}
           onSort={medicalSort.toggleSort}
-          hideEmpty={showGlobalEmpty}
+          hideEmpty={showGlobalEmpty || showCategoryEmpty}
         />
       </section>
 
@@ -765,7 +831,7 @@ const ClinicalToolCatalog = () => {
                     </td>
                     <td>{row.name}</td>
                     <td>
-                      <StatusBadge status={row.status} />
+                      <StatusBadge status={row.displayStatus || row.status} />
                     </td>
                     <td>
                       {row.category ? <CategoryBadge category={row.category} /> : '—'}
@@ -784,17 +850,19 @@ const ClinicalToolCatalog = () => {
                             Open
                           </button>
                         )}
-                        {isDiscoveredRowLaunchable(row) ? (
+                        {row.launchable ? (
                           <button
                             type="button"
                             className={`catalog-btn ${
-                              row.status === 'nlu-chat' || row.chatOnly
+                              row.chatOnly ||
+                              row.displayStatus === 'nlu-chat' ||
+                              row.displayStatus === 'nlu-api-intent'
                                 ? 'catalog-btn--primary'
                                 : 'catalog-btn--secondary'
                             }`}
                             onClick={() => launchFromRow(row)}
                           >
-                            {getDiscoveredLaunchLabel(row)}
+                            {row.launchLabel || getDiscoveredLaunchLabel(row)}
                           </button>
                         ) : (
                           <span className="catalog-action-muted" title="Roadmap or reference only">

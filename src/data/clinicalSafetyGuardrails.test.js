@@ -9,12 +9,14 @@ import { describe, it, expect } from 'vitest';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import toolRegistry from './toolRegistry';
 import {
-  runClinicalSafetyComplianceAudit,
+  runUiSurfaceSafetyAudit,
+  PRODUCTION_UI_SURFACE_RULES,
   GUARDRAIL_CHECKLIST,
   SAFETY_AUDIT_PATTERNS,
   DECISION_SUPPORT_DISCLAIMER_UI,
 } from './clinicalSafetyGuardrails';
 import { buildClinicalSafetyComplianceReport } from './clinicalSafetyComplianceReport';
+import { NLU_PROFILE_TOOL_IDS } from './clinicalToolIdContract';
 import { TIER_B_CHAT_CALCULATOR_REGISTRY_IDS } from './clinicalToolIdContract';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 
@@ -26,11 +28,25 @@ function readSrc(relPath) {
 }
 
 describe('clinicalSafetyGuardrails — compliance report', () => {
-  it('audit passes for all NLU chat seeds after normalization', () => {
+  it('production audit passes (chat seeds, UI surfaces, launches)', () => {
     const report = buildClinicalSafetyComplianceReport();
-    expect(report.summary.failing, JSON.stringify(report.risks, null, 2)).toBe(0);
+    expect(report.summary.chatSeedFailing, JSON.stringify(report.risks, null, 2)).toBe(0);
+    expect(report.summary.uiSurfaceFailing, JSON.stringify(report.risks, null, 2)).toBe(0);
     expect(report.summary.criticalIssues).toBe(0);
+    expect(report.summary.totalFailing).toBe(0);
     expect(report.riskLevel).toBe('low');
+  });
+
+  it('UI surface lint rules cover fleet, calculators, catalog, and backend executors', () => {
+    const ids = PRODUCTION_UI_SURFACE_RULES.map((r) => r.surfaceId);
+    expect(ids).toContain('fleet-dashboard');
+    expect(ids).toContain('clinical-tool-catalog');
+    expect(ids).toContain('backend-drug-executor');
+  });
+
+  it('runUiSurfaceSafetyAudit passes for all production surfaces', () => {
+    const ui = runUiSurfaceSafetyAudit(readSrc);
+    expect(ui.failing, JSON.stringify(ui.risks, null, 2)).toBe(0);
   });
 
   it('exports guardrail checklist with required domains', () => {
@@ -174,5 +190,37 @@ describe('clinicalSafetyGuardrails — UI disclaimer constant', () => {
   it('shared disclaimer copy mentions decision support', () => {
     expect(DECISION_SUPPORT_DISCLAIMER_UI).toMatch(/Decision support only/i);
     expect(DECISION_SUPPORT_DISCLAIMER_UI).toMatch(/does not establish a diagnosis/i);
+  });
+});
+
+describe('clinicalSafetyGuardrails — catalog launch seeds', () => {
+  it.each(
+    NLU_PROFILE_TOOL_IDS.filter((id) => {
+      const seed = resolveCatalogLaunch(id).chatSeed;
+      return Boolean(seed);
+    })
+  )('%s launch seed passes audit', (toolId) => {
+    const seed = resolveCatalogLaunch(toolId).chatSeed || '';
+    expect(SAFETY_AUDIT_PATTERNS.DECISION_SUPPORT_RE.test(seed)).toBe(true);
+    expect(seed).not.toMatch(SAFETY_AUDIT_PATTERNS.PE_ACS_CERTAINTY_FORBIDDEN_RE);
+    expect(seed).not.toMatch(SAFETY_AUDIT_PATTERNS.FLEET_AUTO_FORBIDDEN_RE);
+  });
+});
+
+describe('clinicalSafetyGuardrails — page-only tools metadata', () => {
+  it('drug-interactions and lab-interpreter descriptions frame decision support', () => {
+    const drug = clinicalIntentTools.find((t) => t.toolId === 'drug-interactions');
+    const lab = clinicalIntentTools.find((t) => t.toolId === 'lab-interpreter');
+    expect(drug?.description).toMatch(/decision support/i);
+    expect(lab?.description).toMatch(/decision support/i);
+  });
+});
+
+describe('clinicalSafetyGuardrails — SOFA calculator UI', () => {
+  it('SOFA form includes decision-support disclaimer block', () => {
+    const src = readSrc('src/pages/tools/Calculators.jsx');
+    const block = src.slice(src.indexOf('const SOFACalculator'));
+    expect(block).toMatch(/Clinical decision support only/i);
+    expect(block).not.toMatch(/diagnos(e|is) sepsis with certainty/i);
   });
 });

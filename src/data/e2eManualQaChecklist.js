@@ -133,3 +133,20 @@ export function flattenManualQaChecklist() {
     }))
   );
 }
+
+/** Markdown export for docs / release folders. */
+export function formatManualQaMarkdown() {
+  const lines = [
+    '# Manual QA checklist — wired clinical & fleet tools',
+    '',
+    'Run after automated `npm run test:e2e-matrix` passes. Canonical source: `src/data/e2eManualQaChecklist.js`.',
+    '',
+  ];
+  for (const section of E2E_MANUAL_QA_SECTIONS) {
+    lines.push(`## ${section.title}`, '');
+    for (const item of section.items) {
+      lines.push(`### ${item.id}`, '', '**Steps:**', item.steps, '', '**Expected:**', item.expected, '');
+    }
+  }
+  return lines.join('\n');
+}

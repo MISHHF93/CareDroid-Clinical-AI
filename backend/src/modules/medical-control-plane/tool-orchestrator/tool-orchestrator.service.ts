@@ -24,8 +24,10 @@ import { ExecuteToolDto, ToolExecutionResponseDto, ToolListDto } from './dto/too
 import { ToolResult } from './entities/tool-result.entity';
 import {
   classifyToolExecutionError,
+  getExecutorCatalogSnapshot,
   resolveExecutorToolId,
   ToolExecutionErrorCode,
+  validateExecutorContractParameters,
   validateExecutorRequestPayload,
 } from './tool-orchestrator.registry';
 
@@ -91,6 +93,11 @@ export class ToolOrchestratorService {
       tools,
       count: tools.length,
     };
+  }
+
+  /** Executor mapping audit + documented frontend-only NLU tools (no fake executors). */
+  getExecutorCatalog() {
+    return getExecutorCatalogSnapshot();
   }
 
   /**
@@ -171,6 +178,20 @@ export class ToolOrchestratorService {
       };
     }
 
+    const contractCheck = validateExecutorContractParameters(
+      resolved.resolvedId,
+      dto.parameters as Record<string, unknown>,
+    );
+    if (!contractCheck.valid) {
+      return {
+        valid: false,
+        errors: contractCheck.errors,
+        warnings: [],
+        resolvedToolId: resolved.resolvedId,
+        errorCode: ToolExecutionErrorCode.VALIDATION_FAILED,
+      };
+    }
+
     const tool = this.getTool(resolved.resolvedId);
     const validation = tool.validate(dto.parameters);
     return {
@@ -233,6 +254,44 @@ export class ToolOrchestratorService {
     }
 
     const canonicalToolId = resolved.resolvedId;
+
+    const contractCheck = validateExecutorContractParameters(
+      canonicalToolId,
+      dto.parameters as Record<string, unknown>,
+    );
+    if (!contractCheck.valid) {
+      await this.auditService.log({
+        userId: dto.userId,
+        action: AuditAction.AI_QUERY,
+        resource: `tools/${canonicalToolId}`,
+        ipAddress: '0.0.0.0',
+        userAgent: 'tool-orchestrator',
+        metadata: {
+          status: 'validation_failed',
+          errorCode: ToolExecutionErrorCode.VALIDATION_FAILED,
+          phase: 'contract',
+          requestedToolId,
+          resolvedToolId: canonicalToolId,
+          errors: contractCheck.errors,
+        },
+      });
+
+      return {
+        toolId: canonicalToolId,
+        requestedToolId,
+        resolvedToolId: canonicalToolId,
+        toolName: canonicalToolId,
+        success: false,
+        errorCode: ToolExecutionErrorCode.VALIDATION_FAILED,
+        result: {
+          success: false,
+          data: {},
+          errors: contractCheck.errors,
+          timestamp: new Date(),
+        },
+        executionTimeMs: Date.now() - startTime,
+      };
+    }
 
     try {
       const tool = this.getTool(canonicalToolId);

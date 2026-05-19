@@ -166,7 +166,7 @@ Canonical **frontend** definitions and wiring (keep in sync with backend pattern
 | Unified medical index for the catalog UI | [src/data/medicalToolsCatalogIndex.js](src/data/medicalToolsCatalogIndex.js) |
 | Full in-app inventory | `/tools/catalog` → [src/pages/tools/ClinicalToolCatalog.jsx](src/pages/tools/ClinicalToolCatalog.jsx) |
 
-Backend executors wired for chat `tool` param are a small subset (e.g. SOFA, drug interactions, lab interpreter); see `REGISTRY_ID_TO_ORCHESTRATOR_TOOL` in [src/data/clinicalCatalogWiring.js](src/data/clinicalCatalogWiring.js).
+Backend POST executors are limited to SOFA, drug interactions, and lab interpreter. See [docs/clinical-tool-executors.md](docs/clinical-tool-executors.md), `REGISTRY_ID_TO_ORCHESTRATOR_TOOL` in [src/data/clinicalToolIdContract.js](src/data/clinicalToolIdContract.js), and [src/data/unsupportedOrchestratorTools.js](src/data/unsupportedOrchestratorTools.js) for the full mapping and frontend-only tools.
 
 ---
 

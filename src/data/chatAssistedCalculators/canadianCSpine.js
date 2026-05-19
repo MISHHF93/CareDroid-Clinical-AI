@@ -6,7 +6,9 @@
  * Informational chat-assisted only unless local governance approves executable trauma workflow.
  */
 
-export const CANADIAN_C_SPINE_TOOL_ID = 'canadian-c-spine';
+import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from '../clinicalToolIdContract';
+
+export const CANADIAN_C_SPINE_TOOL_ID = NLU.canadianCSpine;
 
 /** Product-required NLU phrases → `canadian-c-spine` (also in `NLU_TO_REGISTRY_ID`). */
 export const CANADIAN_C_SPINE_REQUIRED_NLU_ALIASES = Object.freeze([
@@ -18,10 +20,10 @@ export const CANADIAN_C_SPINE_REQUIRED_NLU_ALIASES = Object.freeze([
 ]);
 
 export const canadianCSpineChatConfig = {
-  toolId: CANADIAN_C_SPINE_TOOL_ID,
+  toolId: NLU.canadianCSpine,
   name: 'Canadian C-Spine Rule',
-  hubPath: '/tools/calculators',
-  registryId: CANADIAN_C_SPINE_TOOL_ID,
+  hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  registryId: REGISTRY.canadianCSpine,
   category: 'calculator',
   description:
     'Canadian C-Spine Rule — cervical imaging decision support for alert, stable blunt trauma (clinical decision support only; not c-spine clearance).',

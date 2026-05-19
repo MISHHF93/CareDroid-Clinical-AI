@@ -16,19 +16,21 @@ import { copdGoldChatConfig } from './chatAssistedCalculators/copdGold';
 import { romeIvIbsChatConfig } from './chatAssistedCalculators/romeIvIbs';
 import { dispatchAiChatConfig } from './chatAssistedFleet/dispatchAi';
 import { ensureChatSeedGuardrails } from './clinicalSafetyGuardrails';
+import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from './clinicalToolIdContract';
 
 const clinicalIntentToolsRaw = [
   {
-    toolId: 'sofa-calculator',
+    toolId: NLU.sofaCalculator,
     toolName: 'SOFA Score Calculator',
     category: 'calculator',
-    description: 'Sequential Organ Failure Assessment (ICU sepsis / organ dysfunction).',
+    description:
+      'Sequential Organ Failure Assessment (ICU sepsis / organ dysfunction) — clinical decision support only; does not diagnose sepsis or direct therapy.',
     path: '/tools/calculator/sofa',
-    sidebarToolId: 'sofa-score',
+    sidebarToolId: REGISTRY.sofaScore,
     backendExecutable: true,
   },
   {
-    toolId: 'qsofa',
+    toolId: NLU.qsofa,
     toolName: 'qSOFA (quick SOFA)',
     category: 'calculator',
     description:
@@ -125,7 +127,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: 'ckd-staging',
-    toolName: 'CKD stage / staging (KDIGO)',
+    toolName: 'CKD staging (KDIGO)',
     category: 'calculator',
     description:
       'Decision support: KDIGO CKD stage and staging (CKD-EPI 2021 eGFR, ACR, G×A prognostic risk). Does not establish chronicity or recommend dialysis or drug therapy.',
@@ -137,7 +139,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: 'stop-bang',
-    toolName: 'STOP-Bang / stop bang (OSA screening)',
+    toolName: 'STOP-Bang (OSA screening)',
     category: 'calculator',
     description:
       'STOP-Bang (stop bang) questionnaire for obstructive sleep apnea screening: snoring, tiredness, observed apnea, hypertension, BMI, age, neck size, male sex (0–8).',
@@ -149,7 +151,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: 'audit-c',
-    toolName: 'AUDIT-C / audit c (alcohol screen)',
+    toolName: 'AUDIT-C (alcohol screen)',
     category: 'calculator',
     description:
       'Screening only: AUDIT-C brief alcohol consumption screen (0–12). Does not diagnose alcohol use disorder or provide withdrawal-management advice.',
@@ -161,7 +163,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: 'phq9',
-    toolName: 'PHQ-9 / phq9 (depression screen)',
+    toolName: 'PHQ-9 (depression screen)',
     category: 'calculator',
     description:
       'Screening only: PHQ-9 depression symptom questionnaire (0–27). Does not diagnose depression or recommend medications. Question 9 requires urgent safety review when non-zero.',
@@ -173,7 +175,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: 'gad7',
-    toolName: 'GAD-7 / gad7 (anxiety screen)',
+    toolName: 'GAD-7 (anxiety screen)',
     category: 'calculator',
     description:
       'Screening only: GAD-7 anxiety symptom questionnaire (0–21). Does not diagnose anxiety disorders or recommend medications.',
@@ -198,7 +200,8 @@ const clinicalIntentToolsRaw = [
     toolId: 'cha2ds2vasc-calculator',
     toolName: 'CHA2DS2-VASc Score',
     category: 'calculator',
-    description: 'Stroke risk in non-valvular atrial fibrillation.',
+    description:
+      'Stroke risk in non-valvular atrial fibrillation — clinical decision support only; does not recommend starting, stopping, or switching anticoagulation.',
     path: '/tools/calculator/chads2vasc',
     sidebarToolId: 'calc-chads2vasc',
     backendExecutable: false,
@@ -297,7 +300,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: copdGoldChatConfig.toolId,
-    toolName: 'COPD GOLD (grouping support)',
+    toolName: 'COPD GOLD Assessment',
     category: copdGoldChatConfig.category,
     description: copdGoldChatConfig.description,
     path: copdGoldChatConfig.hubPath,
@@ -307,7 +310,7 @@ const clinicalIntentToolsRaw = [
   },
   {
     toolId: romeIvIbsChatConfig.toolId,
-    toolName: 'Rome IV IBS (criteria support)',
+    toolName: 'Rome IV IBS Criteria',
     category: romeIvIbsChatConfig.category,
     description: romeIvIbsChatConfig.description,
     path: romeIvIbsChatConfig.hubPath,
@@ -329,7 +332,8 @@ const clinicalIntentToolsRaw = [
     toolId: 'drug-interactions',
     toolName: 'Drug Interaction Checker',
     category: 'checker',
-    description: 'Drug–drug interaction and contraindication context.',
+    description:
+      'Drug–drug interaction and contraindication context — clinical decision support only; does not recommend specific doses or starting, stopping, or switching therapy.',
     path: '/tools/drug-checker',
     sidebarToolId: 'drug-check',
     backendExecutable: true,
@@ -350,7 +354,8 @@ const clinicalIntentToolsRaw = [
     toolId: 'lab-interpreter',
     toolName: 'Lab Results Interpreter',
     category: 'interpreter',
-    description: 'Interpretation of labs and panels.',
+    description:
+      'Lab panel interpretation support — clinical decision support only; does not establish a diagnosis. Verify with clinician judgment and local protocols.',
     path: '/tools/lab-interpreter',
     sidebarToolId: 'lab-interp',
     backendExecutable: true,
@@ -359,7 +364,8 @@ const clinicalIntentToolsRaw = [
     toolId: 'abg-interpreter',
     toolName: 'ABG Interpreter',
     category: 'interpreter',
-    description: 'ABG and acid–base (closest page: Lab Interpreter).',
+    description:
+      'ABG and acid–base interpretation support (Lab Interpreter page) — clinical decision support only; does not establish a diagnosis.',
     path: '/tools/lab-interpreter',
     sidebarToolId: 'lab-interp',
     backendExecutable: false,
@@ -461,10 +467,22 @@ export const clinicalIntentTools = clinicalIntentToolsRaw.map((row) => ({
 
 /** Built-in calculator slugs not yet in Calculators.jsx UI — NLU + catalog only */
 export const nluCalculatorHubOnly = [
-  { toolId: 'apache2-calculator', name: 'APACHE-II', hubPath: '/tools/calculators' },
-  { toolId: 'curb65-calculator', name: 'CURB-65', hubPath: '/tools/calculators' },
-  { toolId: 'gcs-calculator', name: 'GCS', hubPath: '/tools/calculators' },
-  { toolId: 'wells-dvt-calculator', name: 'Wells DVT', hubPath: '/tools/calculators' },
+  {
+    toolId: NLU.apache2Calculator,
+    name: 'APACHE-II',
+    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  },
+  {
+    toolId: NLU.curb65Calculator,
+    name: 'CURB-65',
+    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  },
+  { toolId: NLU.gcsCalculator, name: 'GCS', hubPath: TOOL_LAUNCH_PATHS.calculatorsHub },
+  {
+    toolId: NLU.wellsDvtCalculator,
+    name: 'Wells DVT',
+    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  },
   { toolId: wellsPeChatConfig.toolId, name: wellsPeChatConfig.name, hubPath: wellsPeChatConfig.hubPath },
   { toolId: percChatConfig.toolId, name: percChatConfig.name, hubPath: percChatConfig.hubPath },
   {

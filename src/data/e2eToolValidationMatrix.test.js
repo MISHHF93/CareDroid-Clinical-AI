@@ -21,6 +21,7 @@ import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import {
   buildE2eToolInventory,
   buildMatrixRowForRegistry,
+  formatE2eMatrixMarkdown,
   getE2eValidationMatrixDocument,
   runMatrixValidation,
   tierForRegistryId,
@@ -116,9 +117,11 @@ describe('e2e matrix — route validity', () => {
     }
   });
 
-  it('every calculator route def path appears in App.jsx', () => {
+  it('calculator routes are registered via CALCULATOR_ROUTE_DEFS in App.jsx', () => {
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS');
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('initialCalculatorId={calculatorSlug}');
     for (const def of CALCULATOR_ROUTE_DEFS) {
-      expect(appSource, def.path).toContain(`path: '${def.path}'`);
       expect(matchCalculatorRoute(def.path)?.calculatorSlug).toBe(def.calculatorSlug);
     }
   });
@@ -236,5 +239,29 @@ describe('e2e QA artifacts', () => {
     const flat = flattenRegressionChecklist();
     expect(flat.some((c) => c.groupId === 'automated-gates')).toBe(true);
     expect(flat.some((c) => c.check.includes('e2eToolValidationMatrix'))).toBe(true);
+  });
+});
+
+describe('e2e matrix — inventory columns', () => {
+  it('every inventory row documents required wiring columns', () => {
+    const inventory = buildE2eToolInventory();
+    for (const row of inventory) {
+      expect(row).toHaveProperty('tier');
+      expect(row).toHaveProperty('route');
+      expect(row).toHaveProperty('registryPresence');
+      expect(row).toHaveProperty('catalogPresence');
+      expect(row).toHaveProperty('discoveryPresence');
+      expect(row).toHaveProperty('nluPresence');
+      expect(row).toHaveProperty('backendPostExecutor');
+      expect(row.launch).toHaveProperty('path');
+      expect(Array.isArray(row.testCoverage)).toBe(true);
+    }
+  });
+
+  it('markdown export includes all registry ids', () => {
+    const md = formatE2eMatrixMarkdown();
+    for (const id of ALL_REGISTRY_TOOL_IDS) {
+      expect(md).toContain(`| ${id} |`);
+    }
   });
 });

@@ -1,12 +1,41 @@
-import { useLocation } from 'react-router-dom';
-import { isKnownToolAreaPath, isFleetAreaPath, isToolsAreaPath } from '../../routes/clinicalToolRoutes';
+import { Navigate, useLocation } from 'react-router-dom';
+import {
+  isKnownToolAreaPath,
+  isFleetAreaPath,
+  isToolsAreaPath,
+  parseCalculatorSubpath,
+  resolveToolsAreaRedirect,
+} from '../../routes/clinicalToolRoutes';
 import ToolNotFound from './ToolNotFound';
 
 /**
  * Catch-all for /tools/* and /fleet/* when no more specific route matched.
  */
 export default function ToolsAreaFallback() {
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const { pathname } = location;
+
+  const redirect = resolveToolsAreaRedirect(pathname);
+  if (redirect) {
+    return (
+      <Navigate
+        to={{ pathname: redirect.pathname, search: redirect.search ?? '' }}
+        replace
+        state={{ from: pathname }}
+      />
+    );
+  }
+
+  const mistypedSlug = parseCalculatorSubpath(pathname);
+  if (mistypedSlug) {
+    return (
+      <ToolNotFound
+        toolId={mistypedSlug}
+        title="Calculator not found"
+        description={`“${mistypedSlug}” is not a built-in calculator at this URL. Pick a calculator from the hub, browse the catalog, or use a supported deep link.`}
+      />
+    );
+  }
 
   if (isKnownToolAreaPath(pathname)) {
     return (

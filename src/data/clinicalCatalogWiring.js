@@ -12,22 +12,20 @@ import {
 } from './clinicalIntentToolCatalog';
 import {
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
+  NLU_HUB_ONLY_PROFILE_TOOL_IDS,
+  NLU_PROFILE_TOOL_IDS,
   NLU_TO_REGISTRY_ID,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
   REGISTRY,
+  TOOL_LAUNCH_PATHS,
+  registryToPrimaryNluToolId,
 } from './clinicalToolIdContract';
+import { ensureChatSeedGuardrails } from './clinicalSafetyGuardrails';
 
 export * from './clinicalToolIdContract';
-export {
-  buildClinicalToolAliasSyncReport,
-  buildSynchronizedAliasMap,
-  formatAliasSyncReport,
-  ALL_REQUIRED_CATALOG_ALIAS_PAIRS,
-  PHANTOM_BLOCKED_CATALOG_ALIASES,
-} from './clinicalToolAliasSync';
 
-const CALCULATORS_HUB_PATH = '/tools/calculators';
+const CALCULATORS_HUB_PATH = TOOL_LAUNCH_PATHS.calculatorsHub;
 
 export function isCalculatorsHubPath(path) {
   if (!path) return false;
@@ -58,6 +56,34 @@ const EMPTY_LAUNCH = Object.freeze({
   orchestratorTool: null,
   openLabel: 'Try in chat',
 });
+
+/** Safe generic chat when an id cannot be mapped to a shipped tool (no fake routes). */
+export const CATALOG_UNKNOWN_TOOL_LAUNCH = Object.freeze({
+  path: '/dashboard',
+  registryId: null,
+  chatSeed: ensureChatSeedGuardrails({
+    toolId: 'unknown-clinical-tool',
+    category: 'calculator',
+    chatSeed:
+      'Help me find the right CareDroid clinical tool for my question. Ask which calculator, risk score, checker, or protocol applies. Clinical decision support only — does not establish a diagnosis or replace clinician judgment.',
+  }),
+  orchestratorTool: null,
+  openLabel: 'Try in chat',
+});
+
+function buildGuardedChatSeed({ toolId, sidebarToolId, category, chatSeed }) {
+  if (!chatSeed) return null;
+  return ensureChatSeedGuardrails({
+    toolId,
+    sidebarToolId,
+    category,
+    chatSeed,
+  });
+}
+
+function isHubOnlyNluToolId(toolId) {
+  return NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(toolId);
+}
 
 export function registryIdToOrchestratorTool(registryId) {
   if (!registryId) return undefined;
@@ -115,14 +141,21 @@ function launchFromNlu(nlu) {
   const registryId =
     nlu.sidebarToolId || ORCHESTRATOR_TO_REGISTRY_ID[nlu.toolId] || NLU_TO_REGISTRY_ID[nlu.toolId];
   const registryEntry = registryId ? toolRegistryById[registryId] : null;
+  const hubOnly = isHubOnlyNluToolId(nlu.toolId) || isCalculatorsHubPath(nlu.path);
   const path =
     nlu.path ||
     registryEntry?.path ||
-    (registryId === REGISTRY.calculatorsHub ? CALCULATORS_HUB_PATH : null);
+    (hubOnly || registryId === REGISTRY.calculatorsHub ? CALCULATORS_HUB_PATH : null);
 
-  const chatSeed =
+  const rawSeed =
     nlu.chatSeed ||
     `Help me use the ${nlu.toolName}. ${nlu.description || ''}`.trim();
+  const chatSeed = buildGuardedChatSeed({
+    toolId: nlu.toolId,
+    sidebarToolId: registryId,
+    category: nlu.category,
+    chatSeed: rawSeed,
+  });
 
   return {
     path,
@@ -143,10 +176,16 @@ function launchFromNlu(nlu) {
 
 function launchFromBuiltinCalc(calc) {
   const registryId = BUILTIN_CALC_ID_TO_REGISTRY_ID[calc.id] ?? REGISTRY.calculatorsHub;
+  const chatSeed = buildGuardedChatSeed({
+    toolId: calc.orchestratorId || calc.id,
+    sidebarToolId: registryId,
+    category: 'calculator',
+    chatSeed: `Open the ${calc.name} calculator and help me interpret the results as clinical decision support only.`,
+  });
   return {
     path: calc.path || calc.calcQuery?.split('?')[0] || CALCULATORS_HUB_PATH,
     registryId,
-    chatSeed: `Open the ${calc.name} calculator and help me interpret the results.`,
+    chatSeed,
     orchestratorTool: resolveOrchestratorToolForLaunch(
       calc.orchestratorId,
       registryId,
@@ -157,16 +196,69 @@ function launchFromBuiltinCalc(calc) {
 }
 
 function launchFromRegistry(registryEntry, registryId) {
-  const nlu = findClinicalIntentProfile({ registryId });
+  const nlu =
+    findClinicalIntentProfile({ registryId }) ||
+    (() => {
+      const primaryNlu = registryToPrimaryNluToolId(registryId);
+      return primaryNlu
+        ? findClinicalIntentProfile({ toolId: primaryNlu, registryId })
+        : null;
+    })();
   if (nlu) {
     return launchFromNlu(nlu);
   }
+  const chatSeed = buildGuardedChatSeed({
+    toolId: registryToPrimaryNluToolId(registryId) || registryId,
+    sidebarToolId: registryId,
+    category: registryEntry.category?.toLowerCase() || 'tool',
+    chatSeed: `Help me with ${registryEntry.name}: ${registryEntry.description}. Clinical decision support only.`,
+  });
   return {
     path: registryEntry.path,
     registryId,
-    chatSeed: `Help me with ${registryEntry.name}: ${registryEntry.description}`,
+    chatSeed,
     orchestratorTool: resolveOrchestratorToolForLaunch(null, registryId, false),
-    openLabel: 'Open',
+    openLabel: registryEntry.path ? 'Open' : 'Try in chat',
+  };
+}
+
+/**
+ * Last-resort launch when id is not in catalog rows but is tool-shaped (no invented routes).
+ * @param {string} id
+ */
+export function resolveCatalogLaunchFallback(id) {
+  if (!id) return { ...EMPTY_LAUNCH };
+
+  const registryId = resolveRegistryId(id);
+  if (registryId) {
+    const registryEntry = toolRegistryById[registryId];
+    if (registryEntry) {
+      return launchFromRegistry(registryEntry, registryId);
+    }
+  }
+
+  if (NLU_PROFILE_TOOL_IDS.includes(id) && clinicalIntentToolsById[id]) {
+    return launchFromNlu(clinicalIntentToolsById[id]);
+  }
+
+  const primaryNlu = registryId ? registryToPrimaryNluToolId(registryId) : null;
+  if (primaryNlu && clinicalIntentToolsById[primaryNlu]) {
+    return launchFromNlu(clinicalIntentToolsById[primaryNlu]);
+  }
+
+  if (!/^[a-z][a-z0-9-]*$/i.test(String(id))) {
+    return { ...EMPTY_LAUNCH };
+  }
+
+  return {
+    ...CATALOG_UNKNOWN_TOOL_LAUNCH,
+    registryId: registryId || null,
+    chatSeed: buildGuardedChatSeed({
+      toolId: primaryNlu || id,
+      sidebarToolId: registryId || undefined,
+      category: 'calculator',
+      chatSeed: `Help me find and use the clinical tool "${id}" in CareDroid. Clinical decision support only — does not establish a diagnosis.`,
+    }),
   };
 }
 
@@ -197,7 +289,7 @@ export function resolveCatalogLaunch(id) {
     return resolveCatalogLaunch(registryId);
   }
 
-  return { ...EMPTY_LAUNCH };
+  return resolveCatalogLaunchFallback(id);
 }
 
 /** NLU hub-only tools (no dedicated Calculators.jsx form). */

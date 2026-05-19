@@ -2367,6 +2367,13 @@ const SOFACalculator = ({ onResultChange }) => {
 
   return (
     <div className="calculator-interface">
+      <div className="calc-qsofa-disclaimer" role="note">
+        <p className="calc-disclaimer-detail">
+          <strong>Clinical use:</strong> SOFA scores organ dysfunction for context in sepsis and ICU care.
+          Clinical decision support only — does not diagnose sepsis, predict mortality for an individual patient,
+          or direct therapy. Verify against complete assessment and local protocols.
+        </p>
+      </div>
       {/* Inputs */}
       <div className="calculator-inputs">
         <CalcPanelTitle icon={CHROME_ICONS.stethoscope}>Patient Parameters</CalcPanelTitle>

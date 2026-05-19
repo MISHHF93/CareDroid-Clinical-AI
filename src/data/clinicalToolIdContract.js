@@ -1,15 +1,41 @@
 /**
  * Central tool ID contract — canonical registry, NLU, orchestrator, and alias maps.
  *
- * Migration: new tools add constants here first, then toolRegistry, clinicalIntentTools,
- * and backend tool.patterns.ts. PR audit slices (PR1, PR4A, …) are derived from tier lists below.
+ * ## Canonical layers (one direction of truth)
+ * | Layer | Constant | Used in |
+ * |-------|----------|---------|
+ * | Sidebar / workspace | `REGISTRY.*` | `toolRegistry.js`, App routes, catalog `sidebarToolId` |
+ * | NLU / backend patterns | `NLU.*` | `clinicalIntentTools`, `tool.patterns.ts` |
+ * | Calculator UI slug | `BUILTIN_CALC.*` | `Calculators.jsx`, `?calc=`, `builtinUiCalculators` |
  *
- * Alias strategy:
- * - Registry id (`toolRegistry.js` `id`) is the sidebar / catalog / workspace canonical key.
- * - NLU `toolId` (`clinicalIntentTools`, backend patterns) may differ; map via ORCHESTRATOR_TO_REGISTRY_ID
- *   or NLU_TO_REGISTRY_ID (legacy phrases, hyphen/space variants, cost-tracking ids).
- * - Built-in calculator slugs (`Calculators.jsx`, `?calc=`) map via BUILTIN_CALC_ID_TO_REGISTRY_ID.
+ * ## Migration (new tool)
+ * 1. Add `REGISTRY.*` and, if NLU id differs, `NLU.*` here.
+ * 2. Append to the correct `CANONICAL_TOOL_GROUPS` tier list below.
+ * 3. Update `toolRegistry.js`, `clinicalIntentToolCatalog.js`, `tool.patterns.ts`.
+ * 4. Add phrase aliases to `NLU_TO_REGISTRY_ID` only when needed for catalog/cost-tracking.
+ * 5. If POST `/api/tools/:id/execute` — add `registerTool()` backend + `ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS`.
+ *
+ * ## Alias strategy
+ * - **Registry id** is the canonical launch/sidebar key.
+ * - **NLU toolId** may differ; map 1:1 via `ORCHESTRATOR_TO_REGISTRY_ID` or phrases via `NLU_TO_REGISTRY_ID`.
+ * - **Calculator slugs** map via `BUILTIN_CALC_ID_TO_REGISTRY_ID`.
+ * - **Backend keywords** live only in `tool.patterns.ts`; do not duplicate every keyword in `NLU_TO_REGISTRY_ID`.
+ *
+ * @see CANONICAL_TOOL_GROUPS — product grouping for audits and drift tests
  */
+
+/** Bump when registry/NLU lists or maps change incompatibly. */
+export const TOOL_ID_CONTRACT_VERSION = '1.1.0';
+
+/** Shared SPA paths for tool launch (browser-safe). */
+export const TOOL_LAUNCH_PATHS = Object.freeze({
+  toolsOverview: '/tools',
+  toolsCatalog: '/tools/catalog',
+  calculatorsHub: '/tools/calculators',
+  fleetCommand: '/fleet/command',
+  predictiveMaintenance: '/fleet/predictive-maintenance',
+  routeOptimizer: '/fleet/route-optimizer',
+});
 
 /** Canonical sidebar / registry ids (`toolRegistry.js`). */
 export const REGISTRY = Object.freeze({
@@ -230,14 +256,24 @@ export const CLINICAL_AI_PAGE_REGISTRY_IDS = Object.freeze([
   REGISTRY.procedures,
 ]);
 
-/** Every `toolRegistry.js` id — must match registry file exactly (drift tests). */
-export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
-  ...CLINICAL_AI_PAGE_REGISTRY_IDS,
-  ...CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
-  ...CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
-  REGISTRY.calculatorsHub,
-  ...FLEET_TIER_A_REGISTRY_IDS,
-  REGISTRY.dispatchAi,
+/**
+ * Registry tools with NLU/chat coverage via backend keywords but no `clinicalIntentTools` row
+ * (e.g. legacy eGFR/BMI/SOFA keyword routing).
+ */
+export const KEYWORD_ROUTED_REGISTRY_IDS = Object.freeze([
+  REGISTRY.calcGfr,
+  REGISTRY.calcBmi,
+]);
+
+/**
+ * NLU profiles that route to the calculators hub only (no dedicated `Calculators.jsx` form).
+ * Tier-B chat-assisted tools have registry rows; these are NLU-only until promoted.
+ */
+export const NLU_HUB_ONLY_PROFILE_TOOL_IDS = Object.freeze([
+  NLU.apache2Calculator,
+  NLU.curb65Calculator,
+  NLU.gcsCalculator,
+  NLU.wellsDvtCalculator,
 ]);
 
 /**
@@ -371,6 +407,31 @@ export const REGISTRY_ID_TO_ORCHESTRATOR_TOOL = Object.freeze({
 export const AI_EXECUTABLE_NLU_TOOL_IDS = Object.freeze([
   ...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
   NLU.dispatchAi,
+]);
+
+/**
+ * Product-facing canonical ID map (registry ids unless noted).
+ * Disjoint registry groups union to `ALL_REGISTRY_TOOL_IDS`; NLU-only ids are separate.
+ */
+export const CANONICAL_TOOL_GROUPS = Object.freeze({
+  aiOperationsPages: CLINICAL_AI_PAGE_REGISTRY_IDS,
+  clinicalCalculatorsTierA: CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
+  clinicalChatAssistedTierB: CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+  clinicalCalculatorsHub: Object.freeze([REGISTRY.calculatorsHub]),
+  fleetLogisticsTierA: FLEET_TIER_A_REGISTRY_IDS,
+  fleetLogisticsTierBChat: FLEET_TIER_B_CHAT_REGISTRY_IDS,
+  nluHubOnlyProfiles: NLU_HUB_ONLY_PROFILE_TOOL_IDS,
+  backendExecutors: ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+});
+
+/** Every `toolRegistry.js` id — must match registry file exactly (drift tests). */
+export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
+  ...CANONICAL_TOOL_GROUPS.aiOperationsPages,
+  ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsTierA,
+  ...CANONICAL_TOOL_GROUPS.clinicalChatAssistedTierB,
+  ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsHub,
+  ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierA,
+  ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierBChat,
 ]);
 
 /** NLU / legacy / phrase aliases → registry id (recommendations, catalog, cost tracking). */
@@ -620,4 +681,30 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
 /** Values every NLU_TO_REGISTRY_ID target must resolve to (registry id or hub). */
 export function registryIdsReferencedByAliases() {
   return [...new Set(Object.values(NLU_TO_REGISTRY_ID))];
+}
+
+/** All canonical registry id strings (`REGISTRY` values). */
+export function registryIdValues() {
+  return [...new Set(Object.values(REGISTRY))];
+}
+
+/** All canonical NLU profile id strings (`NLU` values). */
+export function nluToolIdValues() {
+  return [...new Set(Object.values(NLU))];
+}
+
+/**
+ * Primary NLU tool id for a registry id when one exists in `ORCHESTRATOR_TO_REGISTRY_ID`.
+ * @param {string} registryId
+ * @returns {string|null}
+ */
+export function registryToPrimaryNluToolId(registryId) {
+  if (!registryId) return null;
+  if (nluToolIdValues().includes(registryId)) return registryId;
+  if (registryId === REGISTRY.calculatorsHub) return REGISTRY.calculatorsHub;
+  for (const [nluId, regId] of Object.entries(ORCHESTRATOR_TO_REGISTRY_ID)) {
+    if (nluId === 'dispatch') continue;
+    if (regId === registryId) return nluId;
+  }
+  return null;
 }

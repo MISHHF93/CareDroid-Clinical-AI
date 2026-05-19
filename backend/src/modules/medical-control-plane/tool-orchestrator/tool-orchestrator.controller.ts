@@ -57,6 +57,16 @@ export class ToolOrchestratorController {
   }
 
   /**
+   * GET /tools/catalog/executors
+   * Registered POST executors, contracts, and documented unsupported NLU tools.
+   */
+  @Get('catalog/executors')
+  @HttpCode(HttpStatus.OK)
+  getExecutorCatalog() {
+    return this.toolOrchestratorService.getExecutorCatalog();
+  }
+
+  /**
    * GET /tools/:id
    * Get metadata for a specific tool
    */
@@ -74,11 +84,11 @@ export class ToolOrchestratorController {
   @HttpCode(HttpStatus.OK)
   async validateTool(
     @Param('id') toolId: string,
-    @Body() body: { parameters: Record<string, any> },
+    @Body() body: { parameters?: Record<string, any> },
   ) {
     return this.toolOrchestratorService.validateToolExecution({
       toolId,
-      parameters: body.parameters,
+      parameters: body?.parameters ?? {},
       userId: 'system',
       conversationId: 'validation',
     });
@@ -92,12 +102,12 @@ export class ToolOrchestratorController {
   @HttpCode(HttpStatus.OK)
   async executeTool(
     @Param('id') toolId: string,
-    @Body() body: { parameters: Record<string, any>; conversationId?: string },
+    @Body() body: { parameters?: Record<string, any>; conversationId?: string },
     @Request() req: any,
   ): Promise<ToolExecutionResponseDto> {
     const dto: ExecuteToolDto = {
       toolId,
-      parameters: body.parameters,
+      parameters: body?.parameters ?? {},
       userId: req.user?.id || 'anonymous',
       conversationId: body.conversationId || 'direct-execution',
     };

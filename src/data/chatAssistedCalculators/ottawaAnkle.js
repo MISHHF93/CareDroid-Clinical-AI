@@ -5,7 +5,9 @@
  * Tier B chat-assisted only — not fracture clearance; hard stops override the rule.
  */
 
-export const OTTAWA_ANKLE_TOOL_ID = 'ottawa-ankle';
+import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from '../clinicalToolIdContract';
+
+export const OTTAWA_ANKLE_TOOL_ID = NLU.ottawaAnkle;
 
 /** Product-required NLU phrases → `ottawa-ankle` (also in `NLU_TO_REGISTRY_ID`). */
 export const OTTAWA_ANKLE_REQUIRED_NLU_ALIASES = Object.freeze([
@@ -17,10 +19,10 @@ export const OTTAWA_ANKLE_REQUIRED_NLU_ALIASES = Object.freeze([
 ]);
 
 export const ottawaAnkleChatConfig = {
-  toolId: OTTAWA_ANKLE_TOOL_ID,
+  toolId: NLU.ottawaAnkle,
   name: 'Ottawa Ankle Rule',
-  hubPath: '/tools/calculators',
-  registryId: OTTAWA_ANKLE_TOOL_ID,
+  hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  registryId: REGISTRY.ottawaAnkle,
   category: 'calculator',
   description:
     'Ottawa ankle and foot rules — radiography decision support after acute ankle/foot injury (clinical decision support only; not fracture clearance).',

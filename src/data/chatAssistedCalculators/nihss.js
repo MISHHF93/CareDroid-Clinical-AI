@@ -6,7 +6,9 @@
  * No Calculators.jsx wizard — remain chat-assisted unless institution governs server-side scoring.
  */
 
-export const NIHSS_TOOL_ID = 'nihss';
+import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from '../clinicalToolIdContract';
+
+export const NIHSS_TOOL_ID = NLU.nihss;
 
 /** Product-required NLU phrases → `nihss` (also in `NLU_TO_REGISTRY_ID`). */
 export const NIHSS_REQUIRED_NLU_ALIASES = Object.freeze([
@@ -18,10 +20,10 @@ export const NIHSS_REQUIRED_NLU_ALIASES = Object.freeze([
 ]);
 
 export const nihssChatConfig = {
-  toolId: NIHSS_TOOL_ID,
+  toolId: NLU.nihss,
   name: 'NIH Stroke Scale (NIHSS)',
-  hubPath: '/tools/calculators',
-  registryId: NIHSS_TOOL_ID,
+  hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  registryId: REGISTRY.nihss,
   category: 'calculator',
   description:
     'NIH Stroke Scale — structured neurologic deficit scoring (clinical decision support; does not replace urgent stroke evaluation or treatment decisions).',

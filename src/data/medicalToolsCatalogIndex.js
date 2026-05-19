@@ -11,7 +11,12 @@ import {
   nluCalculatorHubOnly,
 } from './clinicalIntentToolCatalog';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
-import { enrichMedicalCatalogRow } from '../utils/catalogSearch';
+import {
+  BUILTIN_CALC,
+  KEYWORD_ROUTED_REGISTRY_IDS,
+  REGISTRY,
+} from './clinicalToolIdContract';
+import { enrichMedicalCatalogRow, normalizeCatalogCategory } from '../utils/catalogSearch';
 
 /** Keyword-routed in chat but not separate NLU tool profiles */
 export const chatKeywordExtras = [];
@@ -58,19 +63,19 @@ function buildFromRegistry(reg) {
   const uiCalc = builtinUiCalculators.find(
     (c) =>
       c.id === reg.initialCalc ||
-      (reg.id === 'sofa-score' && c.id === 'sofa') ||
-      (reg.id === 'calc-gfr' && c.id === 'gfr')
+      (reg.id === REGISTRY.sofaScore && c.id === BUILTIN_CALC.sofa) ||
+      (reg.id === REGISTRY.calcGfr && c.id === BUILTIN_CALC.gfr)
   );
   const matchedNlu = clinicalIntentTools.find(
     (n) => n.sidebarToolId === reg.id || n.path === reg.path
   );
-  const keywordRouted = ['calc-gfr', 'calc-bmi', 'sofa-score'].includes(reg.id);
+  const keywordRouted = KEYWORD_ROUTED_REGISTRY_IDS.includes(reg.id);
 
   return {
     primaryId: matchedNlu?.toolId || reg.id,
     id: reg.id,
     name: reg.name,
-    category: reg.category?.toLowerCase() || 'tool',
+    category: normalizeCatalogCategory(reg.category),
     description: reg.description,
     pagePath: reg.path,
     sidebarToolId: reg.id,

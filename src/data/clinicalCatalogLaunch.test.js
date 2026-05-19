@@ -7,11 +7,13 @@ import toolRegistry, { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools, clinicalIntentToolsById, builtinUiCalculators } from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
+  resolveCatalogLaunchFallback,
   resolveNavigationPathForLaunch,
   resolveRegistryId,
   resolveOrchestratorToolForLaunch,
   findClinicalIntentProfile,
   CATALOG_EMPTY_LAUNCH,
+  CATALOG_UNKNOWN_TOOL_LAUNCH,
   NLU_HUB_ONLY_TOOL_IDS,
 } from './clinicalCatalogWiring';
 import {
@@ -19,6 +21,8 @@ import {
   TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
+  NLU_PROFILE_TOOL_IDS,
+  KEYWORD_ROUTED_REGISTRY_IDS,
   REGISTRY,
   NLU,
   PR_FLEET_TIER_A_REGISTRY_IDS,
@@ -28,6 +32,7 @@ import {
   PR6_CALCULATOR_REGISTRY_IDS,
   PR7_CALCULATOR_REGISTRY_IDS,
 } from './clinicalToolIdContract';
+import { runClinicalSafetyComplianceAudit } from './clinicalSafetyGuardrails';
 import { PR5_ALL_ALIAS_PAIRS } from './pr5TestConstants';
 
 const HUB = '/tools/calculators';
@@ -48,10 +53,54 @@ const PE_CHAT_SEED_FORBIDDEN = [
 ];
 
 describe('resolveCatalogLaunch — empty / unknown', () => {
-  it('returns empty launch for falsy or unknown ids', () => {
+  it('returns empty launch for falsy ids', () => {
     expect(resolveCatalogLaunch('')).toEqual(CATALOG_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(CATALOG_EMPTY_LAUNCH);
-    expect(resolveCatalogLaunch('not-a-shipped-tool-xyz-999')).toEqual(CATALOG_EMPTY_LAUNCH);
+    expect(resolveCatalogLaunch('   ')).toEqual(CATALOG_EMPTY_LAUNCH);
+  });
+
+  it('returns guarded dashboard fallback for unknown tool-shaped ids', () => {
+    const launch = resolveCatalogLaunch('not-a-shipped-tool-xyz-999');
+    expect(launch.path).toBe('/dashboard');
+    expect(launch.registryId).toBeNull();
+    expect(launch.chatSeed).toMatch(/decision support|does not establish a diagnosis/i);
+    expect(launch.orchestratorTool).toBeNull();
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+  });
+
+  it('resolveCatalogLaunchFallback matches unknown launch shape', () => {
+    const launch = resolveCatalogLaunchFallback('unknown-nlu-profile');
+    expect(launch.path).toBe(CATALOG_UNKNOWN_TOOL_LAUNCH.path);
+    expect(launch.chatSeed?.length).toBeGreaterThan(40);
+  });
+
+  it('rejects invalid id strings without navigation', () => {
+    expect(resolveCatalogLaunchFallback('bad id with spaces!')).toEqual(CATALOG_EMPTY_LAUNCH);
+  });
+});
+
+describe('resolveCatalogLaunch — every NLU profile', () => {
+  it.each(NLU_PROFILE_TOOL_IDS)('NLU toolId %s resolves path or chat', (toolId) => {
+    const launch = resolveCatalogLaunch(toolId);
+    expect(launch).not.toEqual(CATALOG_EMPTY_LAUNCH);
+    expect(launch.path || launch.chatSeed).toBeTruthy();
+    if (launch.chatSeed) {
+      expect(launch.chatSeed.length).toBeGreaterThan(20);
+    }
+  });
+
+  it.each(KEYWORD_ROUTED_REGISTRY_IDS)('keyword-routed registry %s launches', (registryId) => {
+    const launch = resolveCatalogLaunch(registryId);
+    expect(launch.registryId).toBe(registryId);
+    expect(launch.path).toBe(toolRegistryById[registryId]?.path);
+    expect(launch.chatSeed).toMatch(/decision support/i);
+  });
+
+  it('launches calc-gfr via registry alias gfr', () => {
+    const launch = resolveCatalogLaunch('gfr');
+    expect(launch.registryId).toBe(REGISTRY.calcGfr);
+    expect(launch.path).toBe('/tools/calculator/gfr');
+    expect(launch.orchestratorTool).toBeNull();
   });
 });
 
@@ -234,6 +283,22 @@ describe('resolveCatalogLaunch — NLU alias resolution', () => {
     });
     expect(profile?.toolId).toBe('sofa-calculator');
     expect(profile?.sidebarToolId).toBe('sofa-score');
+  });
+});
+
+describe('resolveCatalogLaunch — clinical safety compliance', () => {
+  it('passes chat seed audit for all clinicalIntentTools with chatSeed', () => {
+    const audit = runClinicalSafetyComplianceAudit(clinicalIntentTools);
+    if (audit.summary.failing > 0) {
+      console.log('chat seed audit failures:', audit.risks);
+    }
+    expect(audit.summary.failing).toBe(0);
+    expect(audit.summary.criticalIssues).toBe(0);
+  });
+
+  it('applies guardrails to synthesized registry-only launches', () => {
+    const launch = resolveCatalogLaunch(REGISTRY.calcGfr);
+    expect(launch.chatSeed).toMatch(/decision support/i);
   });
 });
 
