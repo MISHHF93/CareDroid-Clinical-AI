@@ -31,6 +31,7 @@
     "test:e2e-matrix": "vitest run src/data/e2eToolValidationMatrix.test.js",
     "e2e-matrix:report": "node scripts/print-e2e-matrix-report.mjs",
     "e2e-matrix:write-docs": "node scripts/write-e2e-docs.mjs",
+    "inventory:report": "node scripts/print-platform-inventory.mjs",
     "contract:write-docs": "node scripts/write-backend-frontend-tool-contract.mjs",
     "test:contract-matrix": "vitest run src/data/backendFrontendToolContract.test.js src/data/backendFrontendToolContract.report.test.js",
     "alias-sync:report": "node scripts/print-alias-sync-report.mjs",

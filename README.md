@@ -1,6 +1,6 @@
 # CareDroid Clinical AI
 
-Medical AI clinical co-pilot: React + Vite SPA, NestJS API, optional Capacitor Android shell. This document is generated from the **source tree and npm scripts** (there is no separate docs folder).
+Medical AI clinical co-pilot: React + Vite SPA, NestJS API, optional Capacitor Android shell. **This README is the only Markdown file in the repository root**; extended matrices and checklists live under `docs/`.
 
 ---
 
@@ -15,11 +15,12 @@ Medical AI clinical co-pilot: React + Vite SPA, NestJS API, optional Capacitor A
 7. [Repo `scripts/`](#repo-scripts)
 8. [Frontend (Vite + React)](#frontend-vite--react)
 9. [Backend (NestJS)](#backend-nestjs)
-10. [Clinical tools and catalog](#clinical-tools-and-catalog)
-11. [Android (Capacitor)](#android-capacitor)
-12. [MCP bridge](#mcp-bridge)
-13. [Testing and quality](#testing-and-quality)
-14. [Operational notes](#operational-notes)
+10. [Platform inventory](#platform-inventory)
+11. [Clinical tools and catalog](#clinical-tools-and-catalog)
+12. [Android (Capacitor)](#android-capacitor)
+13. [MCP bridge](#mcp-bridge)
+14. [Testing and quality](#testing-and-quality)
+15. [Operational notes](#operational-notes)
 
 ---
 
@@ -89,6 +90,7 @@ Root `.env.example` documents `PORT=8000` for documentation symmetry; the **API*
 | `android-release` | Same with `assembleRelease` |
 | `mcp:server` | `cd mcp && npm run start` |
 | `smoke` | `node scripts/print-smoke-checklist.mjs` |
+| `inventory:report` | `node scripts/print-platform-inventory.mjs` — registry, NLU, calculator, and feature counts |
 
 ---
 
@@ -157,6 +159,108 @@ Intent patterns for clinical tools live under `backend/src/modules/medical-contr
 
 ---
 
+## Platform inventory
+
+*Reverse-engineered from shipped source. Regenerate counts: `npm run inventory:report`. Programmatic source: [`src/data/platformInventory.js`](src/data/platformInventory.js).*
+
+### Summary
+
+| Layer | Count | Primary source |
+|-------|------:|----------------|
+| Sidebar registry tools | **35** | [`src/data/toolRegistry.js`](src/data/toolRegistry.js) |
+| NLU / AI clinical profiles | **40** | [`src/data/clinicalIntentToolCatalog.js`](src/data/clinicalIntentToolCatalog.js) |
+| Dedicated calculator UI forms | **17** | `builtinUiCalculators` in catalog |
+| Calculator SPA routes | **17** | [`src/routes/clinicalToolRoutes.js`](src/routes/clinicalToolRoutes.js) |
+| Unified catalog rows (search) | **43** | `/tools/catalog` index |
+| Known tool-area paths | **28** | `KNOWN_TOOL_AREA_PATHS` |
+| Backend POST executors | **3** | SOFA, drug interactions, lab interpreter |
+| E2E validation matrix rows | **35** | [`src/data/e2eToolValidationMatrix.js`](src/data/e2eToolValidationMatrix.js) |
+
+### Medical tools by delivery tier
+
+| Tier | Count | Shipped tools |
+|------|------:|---------------|
+| **A** | 16 | ASCVD 10-year risk, AUDIT-C, BMI, CHA₂DS₂-VASc, Child-Pugh, CKD staging (KDIGO), eGFR (CKD-EPI), GAD-7, HAS-BLED, MELD, MELD-Na, NEWS2, PHQ-9, qSOFA (quick SOFA), STOP-Bang, TIMI (UA/NSTEMI) |
+| **B** | 8 | Canadian C-Spine Rule, COPD GOLD, GRACE ACS Risk, NIH Stroke Scale (NIHSS), Ottawa Ankle Rule, PERC, Rome IV IBS, Wells PE |
+| **C** | 3 | Drug Checker, Lab Interpreter, SOFA Score |
+| **clinical-page** | 3 | Clinical Protocols, Diagnosis Assistant, Procedure Guide |
+| **fleet-A** | 3 | Fleet Command, Predictive Maintenance, Route Optimization |
+| **fleet-B** | 1 | Dispatch Intelligence |
+| **hub** | 1 | All calculators |
+
+**Tier semantics**
+
+- **A** — Dedicated calculator form in `Calculators.jsx` (client-side scoring).
+- **B** — Chat-assisted from calculators hub (structured chat seed, no standalone form).
+- **C** — Full page + registered POST `/api/tools/:id/execute`.
+- **clinical-page** — Protocols, diagnosis assistant, procedure guide (chat via `POST /api/chat/message`).
+- **fleet-A** — Fleet operations pages under `/fleet/*`.
+- **fleet-B** — Dispatch intelligence (chat-assisted via hub).
+- **hub** — Calculators overview (`/tools/calculators`).
+
+### Built-in calculator forms (17)
+
+| Calculator | Slug | Route |
+|------------|------|-------|
+| SOFA Score | `sofa` | `/tools/calculator/sofa` |
+| qSOFA (quick SOFA) | `qsofa` | `/tools/calculators/qsofa` |
+| NEWS2 | `news2` | `/tools/calculators/news2` |
+| Child-Pugh | `child-pugh` | `/tools/calculators/child-pugh` |
+| HAS-BLED | `has-bled` | `/tools/calculators/has-bled` |
+| MELD | `meld` | `/tools/calculators/meld` |
+| MELD-Na | `meld-na` | `/tools/calculators/meld-na` |
+| TIMI (UA/NSTEMI) | `timi-ua-nstemi` | `/tools/calculators/timi-ua-nstemi` |
+| ASCVD 10-year risk | `ascvd-risk` | `/tools/calculators/ascvd-risk` |
+| CKD staging (KDIGO) | `ckd-staging` | `/tools/calculators/ckd-staging` |
+| STOP-Bang | `stop-bang` | `/tools/calculators/stop-bang` |
+| AUDIT-C | `audit-c` | `/tools/calculators/audit-c` |
+| PHQ-9 | `phq9` | `/tools/calculators/phq9` |
+| GAD-7 | `gad7` | `/tools/calculators/gad7` |
+| eGFR (CKD-EPI) | `gfr` | `/tools/calculator/gfr` |
+| BMI | `bmi` | `/tools/calculator/bmi` |
+| CHA₂DS₂-VASc | `chads2vasc` | `/tools/calculator/chads2vasc` |
+
+### NLU hub-only profiles (4)
+
+Routed through the calculators hub without a dedicated form yet: `apache2-calculator`, `curb65-calculator`, `gcs-calculator`, `wells-dvt-calculator`.
+
+Additional NLU-only chat profiles (protocol lookup, ACLS/ATLS, dose calculator, ABG interpreter, differential diagnosis, antibiotic guide, fleet NLU, etc.) are included in the **40** NLU profiles and the unified catalog.
+
+### Sidebar registry categories
+
+| Category | Count |
+|----------|------:|
+| Calculator | 26 |
+| Diagnostic | 3 |
+| Fleet | 4 |
+| Reference | 2 |
+
+### Product & platform capabilities (SPA)
+
+| Area | Routes |
+|------|--------|
+| AI workspace | `/dashboard` |
+| Clinical tools hub | `/tools`, `/tools/catalog`, `/tools/calculators` |
+| Clinical intelligence | `/clinical/alerts` |
+| Account & security | `/profile`, `/profile-settings`, `/settings`, `/notifications`, `/two-factor-setup`, `/biometric-setup`, `/onboarding`, `/consent`, `/consent-history` |
+| Administration (RBAC) | `/team`, `/audit-logs`, `/analytics`, `/costs` |
+| Public & legal | `/`, `/auth`, `/privacy`, `/terms`, `/gdpr`, `/hipaa`, `/help`, `/shared/tools/:shareId` |
+
+### Marketing / discovery inventory (16)
+
+Six clinical tool prompts plus ten platform capability entries in [`src/data/featureInventory.js`](src/data/featureInventory.js) (AI workflow, audit logging, drug database, offline access, FHIR/HL7/DICOM, custom branding, dedicated support, SSO/SAML, team management, AI query limits).
+
+### Regenerate detailed matrices
+
+```bash
+npm run inventory:report           # print this summary to stdout
+npm run e2e-matrix:write-docs      # docs/e2e-tool-validation-matrix.md
+npm run contract:write-docs        # docs/backend-frontend-tool-contract.md
+npm run tool-matrix:write-docs     # docs/tool-render-execute-matrix.md
+```
+
+---
+
 ## Clinical tools and catalog
 
 Canonical **frontend** definitions and wiring (keep in sync with backend patterns when changing NLU):
@@ -212,4 +316,4 @@ Backend route inventory and frontend call audit: [docs/backend-api-inventory.md]
 
 ---
 
-*Single documentation file policy: do not reintroduce scattered root `PHASE_*.md` files; update this README and inline code comments when behavior changes.*
+*Root documentation policy: keep **only this `README.md`** at the repository root. Put matrices, PR bodies, and QA reports under `docs/`, `qa/`, or `release/`. Update counts via `npm run inventory:report` when tools ship or retire.*
