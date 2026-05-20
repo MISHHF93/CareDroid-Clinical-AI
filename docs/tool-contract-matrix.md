@@ -1,6 +1,6 @@
 # Tool contract matrix
 
-**Generated:** 2026-05-20T19:04:38.739Z
+**Generated:** 2026-05-20T20:48:31.394Z
 
 > **Source:** `src/data/toolContractMatrix.js` (derived from `backendFrontendToolContract.js`)
 > **Regenerate:** `npm run contract:write-docs`
@@ -23,6 +23,16 @@
 | backend-only | 0 |
 | broken | 0 |
 | planned | 9 |
+
+### Backend/frontend capability classification
+
+| Classification | Count |
+|----------------|------:|
+| user-facing and wired | 51 |
+| backend-only/internal | 28 |
+| user-facing but missing frontend route | 16 |
+| frontend-visible but backend missing | 0 |
+| planned/unsupported | 18 |
 
 ## Status definitions
 
@@ -49,7 +59,7 @@
 | abg-interpreter | /tools/lab-interpreter | src/pages/tools/LabInterpreter.jsx | yes | abg-interpreter | abg-interpreter | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | acls-protocol | /tools/protocols | src/pages/tools/Protocols.jsx | yes | acls-protocol | acls-protocol | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | antibiotic-guide | /tools/diagnosis | src/pages/tools/DiagnosisAssistant.jsx | yes | antibiotic-guide | antibiotic-guide | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
-| apache2-calculator | /tools/calculators | — | yes | apache2-calculator | apache2-calculator | no | — | — | — | frontend-only |
+| apache2-calculator | /tools/calculators | src/pages/tools/Calculators.jsx | yes | apache2-calculator | apache2-calculator | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | apgar-score | /tools/calculators/apgar-score | src/pages/tools/Calculators.jsx | yes | apgar-score | apgar-score | no | — | — | — | frontend-only |
 | ascvd-risk | /tools/calculators/ascvd-risk | src/pages/tools/Calculators.jsx | yes | ascvd-risk | ascvd-risk | no | — | — | — | frontend-only |
 | atls-protocol | /tools/protocols | src/pages/tools/Protocols.jsx | yes | atls-protocol | atls-protocol | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
@@ -63,16 +73,16 @@
 | child-pugh | /tools/calculators/child-pugh | src/pages/tools/Calculators.jsx | yes | child-pugh | child-pugh | no | — | — | — | frontend-only |
 | ckd-staging | /tools/calculators/ckd-staging | src/pages/tools/Calculators.jsx | yes | ckd-staging | ckd-staging | no | — | — | — | frontend-only |
 | copd-gold | /tools/calculators | src/pages/tools/Calculators.jsx | yes | copd-gold | copd-gold | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
-| curb65-calculator | /tools/calculators | — | yes | curb65-calculator | curb65-calculator | no | — | — | — | frontend-only |
+| curb65-calculator | /tools/calculators | src/pages/tools/Calculators.jsx | yes | curb65-calculator | curb65-calculator | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | differential-diagnosis | /tools/diagnosis | src/pages/tools/DiagnosisAssistant.jsx | yes | diagnosis | differential-diagnosis | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | dispatch-ai | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/pages/Dashboard.jsx (chat) | yes | dispatch-ai | dispatch-ai | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
-| dose-calculator | /tools/calculators | src/pages/tools/Calculators.jsx | yes | dose-calculator | dose-calculator | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
+| dose-calculator | /tools/calculators | src/pages/tools/Calculators.jsx | yes | dose-calculator | dose-calculator | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | drug-interactions | /tools/drug-checker | src/pages/tools/DrugChecker.jsx | yes | drug-check | drug-interactions | drug-interactions | /api/tools/drug-interactions/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.js | fully wired |
 | fib4 | /tools/calculators/fib4 | src/pages/tools/Calculators.jsx | yes | fib4 | fib4 | no | — | — | — | frontend-only |
 | fleet-command | /fleet/command | src/pages/fleet/FleetDashboard.jsx | yes | fleet-command | fleet-command | no | — | — | src/services/fleetTelemetryService.js | frontend-only |
 | framingham-risk | /tools/calculators/framingham-risk | src/pages/tools/Calculators.jsx | yes | framingham-risk | framingham-risk | no | — | — | — | frontend-only |
 | gad7 | /tools/calculators/gad7 | src/pages/tools/Calculators.jsx | yes | gad7 | gad7 | no | — | — | — | frontend-only |
-| gcs-calculator | /tools/calculators | — | yes | gcs-calculator | gcs-calculator | no | — | — | — | frontend-only |
+| gcs-calculator | /tools/calculators | src/pages/tools/Calculators.jsx | yes | gcs-calculator | gcs-calculator | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | grace-acs | /tools/calculators | src/pages/tools/Calculators.jsx | yes | grace-acs | grace-acs | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | has-bled | /tools/calculators/has-bled | src/pages/tools/Calculators.jsx | yes | has-bled | has-bled | no | — | — | — | frontend-only |
 | heart-score | /tools/calculators/heart-score | src/pages/tools/Calculators.jsx | yes | heart-score | heart-score | no | — | — | — | frontend-only |
@@ -97,7 +107,7 @@
 | sofa-calculator | /tools/calculator/sofa | src/pages/tools/Calculators.jsx | yes | sofa-score | sofa-calculator | sofa-calculator | /api/tools/sofa-calculator/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, ...) | src/services/clinicalOrchestratorApi.js | fully wired |
 | stop-bang | /tools/calculators/stop-bang | src/pages/tools/Calculators.jsx | yes | stop-bang | stop-bang | no | — | — | — | frontend-only |
 | timi-ua-nstemi | /tools/calculators/timi-ua-nstemi | src/pages/tools/Calculators.jsx | yes | timi-ua-nstemi | timi-ua-nstemi | no | — | — | — | frontend-only |
-| wells-dvt-calculator | /tools/calculators | — | yes | wells-dvt-calculator | wells-dvt-calculator | no | — | — | — | frontend-only |
+| wells-dvt-calculator | /tools/calculators | src/pages/tools/Calculators.jsx | yes | wells-dvt-calculator | wells-dvt-calculator | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | wells-pe | /tools/calculators | src/pages/tools/Calculators.jsx | yes | wells-pe | wells-pe | no | /api/chat/message | ChatMessageDto (`message`, `conversationId`, `tool?`, `feature?`) → QueryResponse (`text`, `intentClassification`, `toolResult?`, ...) | src/services/clinicalChatService.js | frontend-only |
 | calc-bmi | /tools/calculator/bmi | src/pages/tools/Calculators.jsx | yes | calc-bmi | — | no | — | — | — | frontend-only |
 | calc-gfr | /tools/calculator/gfr | src/pages/tools/Calculators.jsx | yes | calc-gfr | — | no | — | — | — | frontend-only |
@@ -118,6 +128,7 @@
 ## Notes
 
 - **abcd2:** Calculator slug: abcd2
+- **apache2-calculator:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **apgar-score:** Calculator slug: apgar-score
 - **ascvd-risk:** Calculator slug: ascvd-risk
 - **audit-c:** Calculator slug: audit-c
@@ -130,10 +141,12 @@
 - **child-pugh:** Calculator slug: child-pugh
 - **ckd-staging:** Calculator slug: ckd-staging
 - **copd-gold:** Tier-B: catalog launch seeds dashboard chat; no tool POST
+- **curb65-calculator:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **dispatch-ai:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **fib4:** Calculator slug: fib4
 - **framingham-risk:** Calculator slug: framingham-risk
 - **gad7:** Calculator slug: gad7
+- **gcs-calculator:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **grace-acs:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **has-bled:** Calculator slug: has-bled
 - **heart-score:** Calculator slug: heart-score
@@ -153,6 +166,7 @@
 - **sofa-calculator:** Calculator slug: sofa
 - **stop-bang:** Calculator slug: stop-bang
 - **timi-ua-nstemi:** Calculator slug: timi-ua-nstemi
+- **wells-dvt-calculator:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **wells-pe:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **calc-bmi:** No dedicated clinicalIntentTools row
 - **calc-gfr:** No dedicated clinicalIntentTools row

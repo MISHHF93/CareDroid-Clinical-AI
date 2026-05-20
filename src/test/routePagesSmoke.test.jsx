@@ -7,6 +7,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import ClinicalToolCatalog from '../pages/tools/ClinicalToolCatalog';
 import Calculators from '../pages/tools/Calculators';
+import ToolsOverview from '../pages/tools/ToolsOverview';
 import FleetDashboard from '../pages/fleet/FleetDashboard';
 import RouteOptimizer from '../pages/fleet/RouteOptimizer';
 import PredictiveMaintenance from '../pages/fleet/PredictiveMaintenance';
@@ -65,6 +66,7 @@ vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
 
 const PAGE_BY_ID = {
   dashboard: Dashboard,
+  'tools-overview': ToolsOverview,
   'tools-catalog': ClinicalToolCatalog,
   'calculators-hub': Calculators,
   'fleet-command': FleetDashboard,

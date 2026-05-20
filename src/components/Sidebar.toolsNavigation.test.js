@@ -38,6 +38,12 @@ describe('View All Tools navigation wiring', () => {
     expect(sidebarSource).toContain('sidebar-tools-quick-action--active');
   });
 
+  it('labels the catalog route as a developer source audit', () => {
+    expect(sidebarSource).toContain('Open developer catalog and source audit');
+    expect(sidebarSource).toContain('Source Audit');
+    expect(sidebarSource).toContain("navigate('/tools/catalog')");
+  });
+
   it('navigates sidebar tool cards via centralized registry launch', () => {
     expect(sidebarSource).toContain('applyRegistryToolLaunch');
     expect(sidebarSource).toContain('onToolSelect(tool.id)');

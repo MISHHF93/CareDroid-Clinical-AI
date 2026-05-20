@@ -7,7 +7,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import {
+  BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS,
   assertExposureScanPasses,
+  buildBackendFrontendCapabilityRows,
   readViteDevConfig,
   runBackendFrontendExposureScan,
 } from './backendFrontendExposure';
@@ -78,15 +80,34 @@ describe('backendFrontendExposure scan', () => {
     expect(scan.analyzed).toHaveLength(FRONTEND_API_CALLS.length);
     expect(scan.unguarded).toHaveLength(0);
   });
+
+  it('classifies frontend, backend-only, missing-route, and executor capabilities', () => {
+    const rows = buildBackendFrontendCapabilityRows();
+    const classifications = new Set(rows.map((row) => row.classification));
+    expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_WIRED);
+    expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.BACKEND_ONLY_INTERNAL);
+    expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_MISSING_FRONTEND_ROUTE);
+    expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.PLANNED_UNSUPPORTED);
+    expect(classifications).not.toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.FRONTEND_VISIBLE_BACKEND_MISSING);
+
+    const executorRows = rows.filter((row) => row.source === 'user-facing-tool');
+    expect(executorRows.map((row) => row.orchestratorToolId).sort()).toEqual(
+      [...BACKEND_EXECUTOR_NLU_TOOL_IDS].sort()
+    );
+    expect(executorRows.every((row) => row.classification === 'user-facing and wired')).toBe(true);
+  });
 });
 
 describe('Vite proxy and ports', () => {
-  it('serves frontend on port 8000 and proxies API to localhost:3000', () => {
+  it('serves frontend on port 8000 and proxies API/health/socket in dev and preview', () => {
     const vite = readViteDevConfig();
     expect(vite.devPort).toBe(8000);
+    expect(vite.previewPort).toBe(4173);
     expect(vite.proxyTarget).toBe('http://localhost:3000');
     expect(vite.proxiesApi).toBe(true);
     expect(vite.proxiesHealth).toBe(true);
     expect(vite.proxiesSocketIo).toBe(true);
+    expect(vite.serverUsesProxyHelper).toBe(true);
+    expect(vite.previewUsesProxyHelper).toBe(true);
   });
 });

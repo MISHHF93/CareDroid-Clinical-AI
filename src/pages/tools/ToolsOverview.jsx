@@ -2,16 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import {
-  clinicalIntentTools,
-  getCatalogSummary,
-  nluCalculatorHubOnly,
-} from '../../data/clinicalIntentToolCatalog';
-import { getSidebarToolRegistryProjection } from '../../data/toolInventory';
-import { resolveCatalogLaunch, resolveNavigationPathForLaunch } from '../../data/clinicalCatalogWiring';
+import { getUserFacingToolRegistryProjection } from '../../data/toolInventory';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
-import { chatAssistedLaunchAriaLabel } from '../../data/chatAssistedHubGroups';
-import { getFullCapabilitiesSummary } from '../../data/platformCapabilitiesCatalog';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './ToolsOverview.css';
@@ -29,16 +21,19 @@ const ToolsOverview = () => {
   } = useToolPreferences();
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
 
-  const tools = getSidebarToolRegistryProjection();
+  const tools = getUserFacingToolRegistryProjection();
   const toolById = Object.fromEntries(tools.map((tool) => [tool.id, tool]));
   const activeWorkspace = workspaces.find((workspace) => workspace.id === activeWorkspaceId);
-  const workspaceToolIds = activeWorkspace?.toolIds?.length
-    ? activeWorkspace.toolIds
+  const isAllToolsWorkspace = activeWorkspaceId === 'all';
+  const workspaceToolIds = isAllToolsWorkspace
+    ? tools.map((tool) => tool.id)
+    : activeWorkspace
+    ? activeWorkspace.toolIds || []
     : tools.map((tool) => tool.id);
   const filteredTools = tools.filter((tool) => workspaceToolIds.includes(tool.id));
   const recentToolItems = recentTools
     .map((toolId) => toolById[toolId])
-    .filter((tool) => tool && workspaceToolIds.includes(tool.id));
+    .filter((tool) => tool && (isAllToolsWorkspace || workspaceToolIds.includes(tool.id)));
 
   const handleToolClick = (tool) => {
     applyRegistryToolLaunch(tool.id, {
@@ -50,25 +45,13 @@ const ToolsOverview = () => {
     });
   };
 
-  const catalogSummary = getCatalogSummary({ sidebarCount: tools.length });
-  const hiddenApiCount = getFullCapabilitiesSummary();
-
-  const handleNluHubTool = (toolId) => {
-    const launch = resolveCatalogLaunch(toolId);
-    if (launch.registryId) {
-      recordToolAccess(launch.registryId);
-      selectTool(launch.registryId);
-      setActiveTool(launch.registryId);
-    }
-    if (launch.chatSeed) {
-      addMessage(launch.chatSeed, 'user');
-    }
-    navigate(resolveNavigationPathForLaunch(launch) || '/dashboard');
-  };
   const orderedTools = [
     ...filteredTools.filter((tool) => pinned.includes(tool.id)),
     ...filteredTools.filter((tool) => !pinned.includes(tool.id))
   ];
+  const calculatorCount = tools.filter((tool) => tool.category === 'Calculator').length;
+  const chatAssistedCount = tools.filter((tool) => tool.surface === 'chat-assisted').length;
+  const showWorkspaceEmpty = filteredTools.length === 0;
 
   return (
     <div className="tools-overview">
@@ -78,10 +61,10 @@ const ToolsOverview = () => {
             <span className="tools-overview-title-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.tools} size={28} />
             </span>{' '}
-            Clinical Tools Suite
+            All Tools
           </h1>
           <p className="header-subtitle">
-            Comprehensive medical decision support tools powered by AI and evidence-based guidelines
+            One launchable catalog for CareDroid clinical tools, calculators, chat-assisted workflows, and fleet tools.
           </p>
           <div className="tools-workspace">
             <label htmlFor="workspaceSelect">Workspace</label>
@@ -103,67 +86,29 @@ const ToolsOverview = () => {
               className="tools-catalog-link"
               onClick={() => navigate('/tools/catalog')}
             >
-              Full clinical catalog ({clinicalIntentTools.length} AI profiles,{' '}
-              {hiddenApiCount.chatAndAi + hiddenApiCount.clinicalData + hiddenApiCount.emergency}{' '}
-              hidden APIs) →
+              Developer Catalog / Source Audit →
             </button>
           </p>
           <div className="header-stats">
             <div className="stat">
+              <span className="stat-number">{tools.length}</span>
+              <span className="stat-label">Launchable tools</span>
+            </div>
+            <div className="stat">
               <span className="stat-number">{filteredTools.length}</span>
-              <span className="stat-label">Suite shortcuts</span>
+              <span className="stat-label">{isAllToolsWorkspace ? 'Shown' : 'Workspace tools'}</span>
             </div>
             <div className="stat">
-              <span className="stat-number">{catalogSummary.aiClinicalProfiles}</span>
-              <span className="stat-label">AI tool profiles</span>
+              <span className="stat-number">{calculatorCount}</span>
+              <span className="stat-label">Calculators</span>
             </div>
             <div className="stat">
-              <span className="stat-number">{catalogSummary.backendExecutors}</span>
-              <span className="stat-label">Backend executors</span>
+              <span className="stat-number">{chatAssistedCount}</span>
+              <span className="stat-label">Chat-assisted</span>
             </div>
           </div>
         </div>
       </div>
-
-      {nluCalculatorHubOnly.length > 0 && (
-        <div className="tools-chat-only">
-          <div className="tools-chat-only-header">
-            <h2 className="tools-chat-only-title">Chat-assisted decision support</h2>
-            <p className="tools-chat-only-safety" role="note">
-              <strong>Decision support only.</strong> These tools guide risk stratification, exam scoring, or
-              imaging decisions in chat — they do not diagnose or rule out disease with certainty. Urgent ACS,
-              stroke, trauma, and PE pathways take priority; do not delay emergency care to finish chat.
-            </p>
-            <p>
-              Open the dashboard with a guided starter prompt, or launch from the Calculators hub.
-            </p>
-          </div>
-          <div className="tools-chat-only-grid">
-            {nluCalculatorHubOnly.map((tool) => {
-              const meta = clinicalIntentTools.find((t) => t.toolId === tool.toolId);
-              return (
-                <button
-                  key={tool.toolId}
-                  type="button"
-                  className="tools-chat-only-card"
-                  aria-label={chatAssistedLaunchAriaLabel(tool.name)}
-                  aria-describedby={`tools-chat-only-desc-${tool.toolId}`}
-                  onClick={() => handleNluHubTool(tool.toolId)}
-                >
-                  <span className="tools-chat-only-name">{tool.name}</span>
-                  <span
-                    id={`tools-chat-only-desc-${tool.toolId}`}
-                    className="tools-chat-only-desc"
-                  >
-                    {meta?.description || 'Chat-assisted decision support'}
-                  </span>
-                  <span className="tools-chat-only-action">Launch →</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
       {recentToolItems.length > 0 && (
         <div className="tools-recent">
@@ -198,8 +143,19 @@ const ToolsOverview = () => {
         </div>
       )}
 
-      <div className="tools-grid">
-        {orderedTools.map(tool => (
+      {showWorkspaceEmpty ? (
+        <div className="tools-recent">
+          <div className="tools-recent-header">
+            <h2 className="tools-recent-title">No tools in this workspace</h2>
+            <p>This workspace does not include any launchable tools from the current inventory.</p>
+          </div>
+          <button type="button" className="btn-open-tool" onClick={() => setActiveWorkspaceId('all')}>
+            Show all tools →
+          </button>
+        </div>
+      ) : (
+        <div className="tools-grid">
+          {orderedTools.map(tool => (
           <div
             key={tool.id}
             className="tool-card-large"
@@ -217,6 +173,11 @@ const ToolsOverview = () => {
                 <span className="tool-category" style={{ backgroundColor: `${tool.color}20`, color: tool.color }}>
                   {tool.category}
                 </span>
+                {tool.surface === 'chat-assisted' ? (
+                  <span className="tool-category" style={{ backgroundColor: `${tool.color}15`, color: tool.color }}>
+                    Chat-assisted
+                  </span>
+                ) : null}
               </div>
               <div className="tool-card-actions">
                 <button
@@ -288,7 +249,7 @@ const ToolsOverview = () => {
                   handleToolClick(tool);
                 }}
               >
-                Open Tool →
+                {tool.surface === 'chat-assisted' ? 'Start Guided Chat →' : 'Open Tool →'}
               </button>
               <button
                 className="btn-chat-tool"
@@ -303,8 +264,9 @@ const ToolsOverview = () => {
               </button>
             </div>
           </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Quick Tips Section */}
       <div className="tools-tips">

@@ -1,6 +1,6 @@
 # Orphaned backend functions
 
-**Generated:** 2026-05-20T01:25:16.297Z
+**Generated:** 2026-05-20T20:48:44.998Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -18,7 +18,6 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/auth/linkedin/callback` | AuthController | OAuth callback |
 | `/api/two-factor/verify` | TwoFactorController | Used during login challenge |
 | `/api/subscriptions/webhook` | SubscriptionsController | Stripe webhook |
-| `/api/analytics/metrics` | AnalyticsController | Internal analytics dashboard |
 | `/api/health` | AnalyticsController | Client health ping (distinct from GET /health) |
 | `/api/ai/query` | AiController | Invoked via chat pipeline |
 | `/api/ai/structured` | AiController | Invoked via chat pipeline |
@@ -40,8 +39,6 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 
 | Route | Controller | Client hint |
 |-------|------------|-------------|
-| `/api/auth/biometric/verify` | BiometricController | BiometricSetup.jsx |
-| `/api/auth/biometric/disable/:deviceId` | BiometricController | BiometricSetup.jsx |
 | `/api/auth/biometric/delete/:deviceId` | BiometricController | BiometricSetup.jsx |
 | `/api/auth/biometric/available` | BiometricController | BiometricSetup.jsx |
 | `/api/users/profile` | UsersController | UserContext.jsx |
@@ -49,10 +46,6 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/subscriptions/portal` | SubscriptionsController | configService / settings |
 | `/api/chat/suggest-action` | ChatController | clinicalChatService.js |
 | `/api/chat/analyze-vitals` | ChatController | clinicalChatService.js |
-| `/api/tools/statistics` | ToolOrchestratorController | clinicalToolsApi.js |
-| `/api/tools/catalog/executors` | ToolOrchestratorController | clinicalToolsApi.js |
-| `/api/tools/:id` | ToolOrchestratorController | clinicalToolsApi.js |
-| `/api/tools/:id/validate` | ToolOrchestratorController | clinicalOrchestratorApi.js |
 | `/api/drugs/categories` | DrugController | clinicalContentApi.js |
 | `/api/drugs/:id` | DrugController | clinicalContentApi.js |
 | `/api/protocols/:id` | ProtocolController | Protocols.jsx |
@@ -70,7 +63,6 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/auth/oidc` | AuthController | SSO placeholder |
 | `/api/auth/saml` | AuthController | SSO placeholder |
 | `/api/auth/me` | AuthController | JWT introspection; SPA uses profile |
-| `/api/auth/biometric/stats` | BiometricController | Admin metrics |
 | `/api/subscriptions/config` | SubscriptionsController | Stripe config for checkout UI |
 | `/api/chat/message-3d` | ChatController | 3D avatar experiment |
 | `/api/tools/execute` | ToolOrchestratorController | Batch execute; UI uses per-id execute |
@@ -105,6 +97,8 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
 | exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |
 | reports-generate | POST | `/api/reports/generate` | reportsGenerate | export/ExportService.js |
+| reports-schedule-create | POST | `/api/reports/schedule` | reportsSchedule | export/ExportService.js |
+| reports-schedule-cancel | DELETE | `/api/reports/schedule/:reportId` | reportsSchedule | export/ExportService.js |
 
 ## E. POST executors
 
@@ -126,9 +120,9 @@ NLU profiles without POST executor (51): client-side / chat only.
 
 | Category | Count |
 |----------|------:|
-| Backend HTTP routes | 68 |
+| Backend HTTP routes | 62 |
 | Wired frontend → backend | see exposure report |
-| Backend-only / deferred (policy) | 52 |
-| Gated frontend (no route) | 16 |
+| Backend-only / deferred (policy) | 44 |
+| Gated frontend (no route) | 18 |
 | POST executors | 3 |
 

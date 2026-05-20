@@ -654,19 +654,21 @@ const ClinicalToolCatalog = () => {
     <div className="clinical-tool-catalog">
       <button type="button" className="catalog-back-link" onClick={() => navigate('/tools')}>
         <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
-        Back to Clinical Tools Suite
+        Back to All Tools
       </button>
 
       <header className="clinical-tool-catalog-header">
         <h1>
           <NavIcon icon={CHROME_ICONS.tools} size={32} aria-hidden />
-          Full Clinical Catalog
+          Developer Catalog / Source Audit
         </h1>
         <p className="clinical-tool-catalog-subtitle">
-          Every capability wired in CareDroid today: sidebar shortcuts, calculator forms, AI clinical
-          tool profiles, backend executors, chat/AI APIs, and platform features.
+          Developer-facing source inventory for CareDroid: launchable references, backend executors,
+          source-scan rows, aliases, platform APIs, and audit artifacts.
         </p>
         <p className="clinical-tool-catalog-notice">
+          <strong>User-facing tools now live at /tools.</strong> This page intentionally includes
+          internal and audit-only records that are not shown in the default user catalog.{' '}
           <strong>Source-code scan:</strong> {discoverySummary.totalUniqueIds} unique tool-related
           IDs across this repo ({discoverySummary.nluPatternCount} NLU patterns,{' '}
           {discoverySummary.orchestratorExecutorCount} backend executors,{' '}
@@ -827,10 +829,10 @@ const ClinicalToolCatalog = () => {
           )
         </h2>
         <p className="catalog-section-desc">
-          Complete list of shipped clinical tools: all {medicalSummary.nluProfiles} NLU profiles
+          Audit reference for shipped clinical rows: {medicalSummary.nluProfiles} NLU profiles
           (chat on request), {medicalSummary.calculatorForms} calculator forms,{' '}
-          {medicalSummary.sidebarTools} sidebar shortcuts, and {medicalSummary.hubOnlyCalculators}{' '}
-          hub-only calculators (APACHE, CURB-65, GCS, Wells). Click column headers to sort.
+          {medicalSummary.sidebarTools} registry shortcuts, and {medicalSummary.hubOnlyCalculators}{' '}
+          hub-only calculators. The canonical user-facing browser is /tools.
         </p>
         <MedicalToolsTable
           rows={sortedMedical}

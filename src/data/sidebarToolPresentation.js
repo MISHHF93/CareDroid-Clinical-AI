@@ -2,7 +2,7 @@
  * Sidebar tool grouping and list shaping (toolRegistry → visible nav).
  */
 
-import { getSidebarToolRegistryProjection } from './toolInventory';
+import { getUserFacingToolRegistryProjection } from './toolInventory';
 
 /** Category section order in Clinical Tools sidebar. */
 export const SIDEBAR_CATEGORY_ORDER = Object.freeze([
@@ -70,7 +70,7 @@ export function partitionSidebarTools(workspaceTools, pinned, favorites) {
  * @param {Array<{ id: string, name: string, toolIds: string[] }>} defaults
  */
 export function mergeWorkspacesWithRegistry(stored, defaults) {
-  const registryIds = getSidebarToolRegistryProjection().map((t) => t.id);
+  const registryIds = getUserFacingToolRegistryProjection().map((t) => t.id);
   const defaultById = Object.fromEntries(defaults.map((w) => [w.id, w]));
 
   return stored.map((workspace) => {

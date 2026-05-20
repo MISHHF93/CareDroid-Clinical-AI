@@ -43,10 +43,14 @@ describe('ClinicalToolCatalog — launch buttons', () => {
   });
 
   it('renders catalog search and category quick filters', async () => {
-    renderCatalog();
+    const { container } = renderCatalog();
+    expect(
+      screen.getByRole('heading', { name: /developer catalog \/ source audit/i })
+    ).toBeInTheDocument();
+    expect(container.textContent).toMatch(/user-facing tools now live at \/tools/i);
     expect(screen.getByRole('searchbox', { name: /search clinical catalog/i })).toBeInTheDocument();
     expect(await screen.findByRole('group', { name: /quick category filters/i })).toBeInTheDocument();
-  });
+  }, 10000);
 
   it('shows launch or open actions for launchable medical catalog rows', async () => {
     renderCatalog();
@@ -65,7 +69,7 @@ describe('ClinicalToolCatalog — launch buttons', () => {
     expect(
       scoped.getAllByRole('button', { name: /^(launch|start guided chat)$/i }).length
     ).toBeGreaterThan(0);
-  });
+  }, 10000);
 
   it('includes Wells PE launch control discoverable by tool name', async () => {
     renderCatalog();

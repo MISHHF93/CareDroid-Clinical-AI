@@ -47,6 +47,13 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     toolIds: ['rome-iv-ibs'],
   },
   {
+    groupId: 'medication-dosing-education',
+    heading: 'Medication dosing education',
+    lead:
+      'Medication dose support is educational only. It explains dosing concepts, renal adjustment considerations, and protocol lookup prompts, but does not calculate patient-specific mg/kg doses or recommend a prescription.',
+    toolIds: ['dose-calculator'],
+  },
+  {
     groupId: 'fleet-dispatch',
     heading: 'Fleet dispatch intelligence',
     lead:

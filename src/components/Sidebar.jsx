@@ -602,14 +602,14 @@ const Sidebar = forwardRef(function Sidebar(
                 <button
                   type="button"
                   onClick={handleOpenCatalog}
-                  aria-label="Open full clinical tools catalog"
+                  aria-label="Open developer catalog and source audit"
                   aria-current={isOnToolsCatalog ? 'page' : undefined}
                   className={`sidebar-tools-quick-action${isOnToolsCatalog ? ' sidebar-tools-quick-action--active' : ''}`}
                 >
                   <span className="section-icon--svg" aria-hidden>
                     <NavIcon icon={CHROME_ICONS.tools} size={14} />
                   </span>
-                  <span>Full Catalog</span>
+                  <span>Source Audit</span>
                 </button>
 
                 <button

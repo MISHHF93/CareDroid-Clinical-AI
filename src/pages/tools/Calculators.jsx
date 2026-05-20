@@ -46,7 +46,6 @@ import { getRegistryToolNavigation } from '../../navigation/registryToolLaunch';
 import { clinicalIntentTools } from '../../data/clinicalIntentToolCatalog';
 import {
   CHAT_ASSISTED_HUB_GROUPS,
-  chatAssistedLaunchAriaLabel,
   chatAssistedLaunchAriaLabelForTool,
   fleetChatAssistedLaunchAriaLabel,
 } from '../../data/chatAssistedHubGroups';
@@ -405,7 +404,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
           <ToolNotFound
             toolId={unknownSlug}
             title="Calculator not found"
-            description={`No built-in form is available for calculator id “${unknownSlug}”. Choose another calculator above or browse the clinical catalog.`}
+            description={`No built-in form is available for calculator id “${unknownSlug}”. Choose another calculator above, open All Tools, or inspect the Developer Catalog / Source Audit.`}
             showCatalogLink
           />
         ) : selectedCalculator ? (

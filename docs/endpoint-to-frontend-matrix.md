@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-05-20T01:25:15.576Z
+**Generated:** 2026-05-20T20:48:44.537Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
@@ -13,6 +13,10 @@
 | GET | `/api/drugs` | DrugController | clinicalContentApi.js | ✅ |
 | GET | `/api/tools` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
 | GET | `/api/tools/available` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
+| GET | `/api/tools/:id` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
+| POST | `/api/tools/:id/validate` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
+| GET | `/api/tools/catalog/executors` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
+| GET | `/api/tools/statistics` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
 | POST | `/api/tools/:id/execute` | ToolOrchestratorController | clinicalOrchestratorApi.js | ✅ |
 | POST | `/api/tools/results` | ToolOrchestratorController | syncService.js | ✅ |
 | POST | `/api/tools/share-results` | — | ToolResultShare.jsx | ⚠️ gated |
@@ -42,6 +46,12 @@
 | POST | `/api/exports/pdf` | — | export/ExportService.js | ⚠️ gated |
 | POST | `/api/exports/excel` | — | export/ExportService.js | ⚠️ gated |
 | POST | `/api/reports/generate` | — | export/ExportService.js | ⚠️ gated |
+| POST | `/api/reports/schedule` | — | export/ExportService.js | ⚠️ gated |
+| DELETE | `/api/reports/schedule/:reportId` | — | export/ExportService.js | ⚠️ gated |
+| GET | `/api/analytics/metrics` | AnalyticsController | AnalyticsDashboard.jsx | ✅ |
+| GET | `/api/auth/biometric/stats` | BiometricController | BiometricSetup.jsx | ✅ |
+| POST | `/api/auth/biometric/verify` | BiometricController | BiometricSetup.jsx | ✅ |
+| DELETE | `/api/auth/biometric/disable/:deviceId` | BiometricController | BiometricSetup.jsx | ✅ |
 | GET | `/api/config/system` | AppController | configService.js | ✅ |
 | GET | `/api/ai/remaining-queries` | AiController | configService.js | ✅ |
 | GET | `/api/users/profile` | UsersController | UserContext.jsx / syncService.js | ✅ |

@@ -3,8 +3,15 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
-import { NLU_PROFILE_TOOL_IDS, ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
+import {
+  NLU_PROFILE_TOOL_IDS,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+  REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
+} from './clinicalToolIdContract';
 import {
   buildBackendFrontendContractRows,
   deriveContractStatus,
@@ -12,6 +19,25 @@ import {
 } from './backendFrontendToolContract';
 import { parseClinicalToolPatterns } from './parseToolPatterns';
 import { readToolPatternsSource } from './clinicalToolAliasSync';
+import {
+  getUserFacingToolInventory,
+  TOOL_EXECUTOR_STATUS,
+  TOOL_LAUNCH_TYPES,
+} from './toolInventory';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const backendRegistrySource = readFileSync(
+  join(
+    __dirname,
+    '../../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts'
+  ),
+  'utf8'
+);
+
+function parseBackendRegisteredExecutorIds() {
+  const block = backendRegistrySource.match(/REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/);
+  return [...(block?.[1] || '').matchAll(/'([^']+)'/g)].map((match) => match[1]).sort();
+}
 
 describe('backendFrontendToolContract', () => {
   it('assigns POST executor only to registered orchestrator ids', () => {
@@ -20,6 +46,34 @@ describe('backendFrontendToolContract', () => {
     expect(withExecutor.map((r) => r.canonicalId).sort()).toEqual(
       [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort()
     );
+  });
+
+  it('keeps frontend registry executor map aligned with backend registered executors', () => {
+    const backendRegistered = parseBackendRegisteredExecutorIds();
+    expect(backendRegistered).toEqual([...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort());
+
+    for (const [registryId, executorId] of Object.entries(REGISTRY_ID_TO_ORCHESTRATOR_TOOL)) {
+      expect(backendRegistered, registryId).toContain(executorId);
+    }
+  });
+
+  it('backend-backed user-facing inventory records point to real registered executors', () => {
+    for (const record of getUserFacingToolInventory().filter(
+      (tool) => tool.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED
+    )) {
+      expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS, record.id).toContain(record.orchestratorToolId);
+      expect(record.endpoint, record.id).toBe(`/api/tools/${record.orchestratorToolId}/execute`);
+      expect(record.executorStatus, record.id).toBe(TOOL_EXECUTOR_STATUS.REGISTERED);
+      expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalOrchestratorApi.js');
+    }
+  });
+
+  it('frontend-only and unsupported rows do not claim POST executor support', () => {
+    const rows = buildBackendFrontendContractRows();
+    for (const row of rows.filter((r) => r.status === 'frontend-only' || r.status === 'planned')) {
+      expect(row.backendExecutor, row.canonicalId).not.toBe('yes');
+      expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS, row.canonicalId).not.toContain(row.canonicalId);
+    }
   });
 
   it('does not mark dispatch-ai as fully wired with POST executor', () => {

@@ -1,20 +1,20 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { mergeWorkspacesWithRegistry } from '../data/sidebarToolPresentation';
-import { getSidebarToolRegistryProjection } from '../data/toolInventory';
+import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import logger from '../utils/logger';
 
 const STORAGE_KEY = 'careDroid.workspaces.v1';
 
 const defaultWorkspaces = () => {
-  const sidebarTools = getSidebarToolRegistryProjection();
-  const byCategory = sidebarTools.reduce((acc, tool) => {
+  const userFacingTools = getUserFacingToolRegistryProjection();
+  const byCategory = userFacingTools.reduce((acc, tool) => {
     acc[tool.category] = acc[tool.category] || [];
     acc[tool.category].push(tool.id);
     return acc;
   }, {});
 
   return [
-    { id: 'all', name: 'All Tools', toolIds: sidebarTools.map((tool) => tool.id) },
+    { id: 'all', name: 'All Tools', toolIds: userFacingTools.map((tool) => tool.id) },
     { id: 'diagnostic', name: 'Diagnostic', toolIds: byCategory.Diagnostic || [] },
     { id: 'calculator', name: 'Calculator', toolIds: byCategory.Calculator || [] },
     { id: 'reference', name: 'Reference', toolIds: byCategory.Reference || [] },

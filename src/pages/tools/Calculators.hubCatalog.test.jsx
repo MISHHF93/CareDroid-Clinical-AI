@@ -10,7 +10,9 @@ import {
   BUILTIN_CALCULATOR_FORM_SMOKE_ROWS,
   HUB_CHAT_ASSISTED_TOOL_IDS,
   buildBuiltinHubCalculatorCards,
+  getHubChatAssistedTools,
 } from '../../data/calculatorHubManifest';
+import { getCalculatorToolInventory } from '../../data/toolInventory';
 import { NLU_HUB_ONLY_PROFILE_TOOL_IDS } from '../../data/clinicalToolIdContract';
 import { mockCompactViewport, mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 
@@ -79,21 +81,47 @@ describe('Calculators hub catalog', () => {
     }
   });
 
+  it('derives built-in calculator cards from dedicated calculator inventory records', () => {
+    const cards = buildBuiltinHubCalculatorCards();
+    const dedicated = getCalculatorToolInventory().filter((record) => record.hasDedicatedForm);
+
+    expect(cards).toHaveLength(dedicated.length);
+    for (const record of dedicated) {
+      const card = cards.find((candidate) => candidate.id === record.calculatorSlug);
+      expect(card, record.id).toBeTruthy();
+      expect(card.registryId, record.id).toBe(record.id);
+      expect(card.route, record.id).toBe(record.route);
+    }
+  });
+
   it('shows NLU hub-only chat-assisted calculators', async () => {
     renderHub();
     await screen.findByRole('heading', { name: /screening & severity \(chat\)/i });
 
     expect(screen.getByRole('button', { name: /start guided chat: apache-ii/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /start guided chat: curb-65/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /start guided chat: gcs/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /start guided chat: glasgow coma scale .*gcs/i })
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /start guided chat: wells dvt/i })
     ).toBeInTheDocument();
   });
 
-  it('includes thirteen chat-assisted tools in hub manifest', () => {
-    expect(HUB_CHAT_ASSISTED_TOOL_IDS.length).toBe(13);
+  it('deduplicates calculator-related chat-assisted tools in hub manifest', () => {
+    const tools = getHubChatAssistedTools();
+    const chatAssistedCalculatorRecords = getCalculatorToolInventory().filter(
+      (record) => record.surface === 'chat-assisted'
+    );
+    expect(tools.length).toBeGreaterThan(0);
+    expect(tools).toHaveLength(chatAssistedCalculatorRecords.length);
+    expect(new Set(tools.map((tool) => tool.toolId)).size).toBe(tools.length);
+    expect(tools.map((tool) => tool.toolId)).not.toContain('dispatch-ai');
+    for (const record of chatAssistedCalculatorRecords) {
+      expect(tools.map((tool) => tool.registryId), record.id).toContain(record.id);
+    }
     for (const toolId of NLU_HUB_ONLY_PROFILE_TOOL_IDS) {
+      if (toolId === 'dispatch-ai') continue;
       expect(HUB_CHAT_ASSISTED_TOOL_IDS).toContain(toolId);
     }
   });

@@ -12,6 +12,8 @@ import {
   ALL_REGISTRY_TOOL_IDS,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
   CLINICAL_AI_PAGE_REGISTRY_IDS,
+  CLINICAL_DOSE_HUB_REGISTRY_IDS,
+  CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS,
   CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
   FLEET_TIER_A_REGISTRY_IDS,
@@ -49,6 +51,22 @@ export const TOOL_EXECUTOR_STATUS = Object.freeze({
   UNSUPPORTED: 'unsupported',
   NONE: 'none',
   PLATFORM: 'platform',
+});
+
+export const TOOL_SURFACES = Object.freeze({
+  TOOL_PAGE: 'tool-page',
+  CALCULATOR_FORM: 'calculator-form',
+  CHAT_ASSISTED: 'chat-assisted',
+  FLEET_PAGE: 'fleet-page',
+  HUB: 'hub',
+  INTERNAL: 'internal',
+});
+
+export const AUDIT_RECORD_KINDS = Object.freeze({
+  LAUNCHABLE_REFERENCE: 'launchable-reference',
+  BACKEND_ENDPOINT: 'backend-endpoint',
+  PLATFORM_API: 'platform-api',
+  INTERNAL: 'internal',
 });
 
 const EXECUTOR_DTO = Object.freeze({
@@ -146,7 +164,13 @@ function registryTier(registryId) {
   if (FLEET_TIER_A_REGISTRY_IDS.includes(registryId)) return 'fleet-A';
   if (FLEET_TIER_B_CHAT_REGISTRY_IDS.includes(registryId)) return 'fleet-B';
   if (CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS.includes(registryId)) return 'A';
-  if (CLINICAL_TIER_B_CHAT_REGISTRY_IDS.includes(registryId)) return 'B';
+  if (
+    CLINICAL_TIER_B_CHAT_REGISTRY_IDS.includes(registryId) ||
+    CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS.includes(registryId) ||
+    CLINICAL_DOSE_HUB_REGISTRY_IDS.includes(registryId)
+  ) {
+    return 'B';
+  }
   if (CLINICAL_AI_PAGE_REGISTRY_IDS.includes(registryId)) return 'clinical-page';
   if (registryId === REGISTRY.calculatorsHub) return 'hub';
   return 'other';
@@ -221,6 +245,109 @@ function navigationPathFor(route, launchType, chatSeed) {
   if (chatSeed && route === TOOL_LAUNCH_PATHS.calculatorsHub) return '/dashboard';
   if (launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED && chatSeed) return '/dashboard';
   return route || TOOL_LAUNCH_PATHS.toolsCatalog;
+}
+
+function isCalculatorCategory(category) {
+  return normalizeCategory(category) === 'calculator';
+}
+
+function surfaceForRecord(record) {
+  if (record.sourceKind === 'platform') return TOOL_SURFACES.INTERNAL;
+  if (record.launchType === TOOL_LAUNCH_TYPES.HUB) return TOOL_SURFACES.HUB;
+  if (record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) return TOOL_SURFACES.CHAT_ASSISTED;
+  if (record.launchType === TOOL_LAUNCH_TYPES.FLEET_LOCAL) return TOOL_SURFACES.FLEET_PAGE;
+  if (record.calculatorSlug || isCalculatorCategory(record.category)) return TOOL_SURFACES.CALCULATOR_FORM;
+  return TOOL_SURFACES.TOOL_PAGE;
+}
+
+function isUserFacingInventoryRecord(record) {
+  if (!record || record.sourceKind === 'platform') return false;
+  if (record.launchType === TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED) return false;
+  if (!record.route && !record.navigationPath && !record.chatSeed) return false;
+  return true;
+}
+
+function userFacingRecordFromCanonical(record) {
+  const surface = surfaceForRecord(record);
+  const navigationPath = navigationPathFor(record.route, record.launchType, record.chatSeed);
+  return {
+    id: record.id,
+    label: record.label,
+    description: record.safetyCopy || record.notes || 'Clinical decision support tool',
+    category: record.category,
+    presentationCategory: presentationCategory(record.category),
+    tags: unique([
+      record.category,
+      record.tier,
+      record.launchType,
+      surface,
+      record.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED ? 'backend-backed' : null,
+      record.calculatorSlug ? 'calculator' : null,
+      record.chatSeed ? 'chat-assisted' : null,
+    ]),
+    searchText: unique([
+      record.id,
+      record.label,
+      record.category,
+      record.safetyCopy,
+      record.nluToolId,
+      ...(record.nluProfileIds || []),
+      ...(record.aliases || []),
+      record.orchestratorToolId,
+    ]).join(' ').toLowerCase(),
+    surface,
+    tier: record.tier,
+    launchType: record.launchType,
+    route: record.route,
+    navigationPath,
+    component: record.component,
+    calculatorSlug: record.calculatorSlug,
+    hasDedicatedForm: Boolean(record.calculatorSlug && surface === TOOL_SURFACES.CALCULATOR_FORM),
+    chatSeed: record.chatSeed,
+    nluToolId: record.nluToolId,
+    nluProfileIds: record.nluProfileIds || [],
+    aliases: record.aliases || [],
+    orchestratorToolId: record.orchestratorToolId,
+    endpoint: record.endpoint,
+    executorStatus: record.executorStatus,
+    favoriteable: true,
+    workspaceFilterable: true,
+    sidebarVisible: record.sidebarVisible,
+    userCatalogVisible: true,
+    auditRefs: {
+      canonicalStatus: record.status,
+      sourceKind: record.sourceKind,
+      backendPatternId: record.backendPatternId,
+      apiClient: record.apiClient,
+      testCoverage: record.testCoverage,
+    },
+    legacy: toolRegistryById[record.id] || null,
+  };
+}
+
+function auditRecordKind(record) {
+  if (record.sourceKind === 'platform') {
+    return record.endpoint ? AUDIT_RECORD_KINDS.PLATFORM_API : AUDIT_RECORD_KINDS.INTERNAL;
+  }
+  if (record.endpoint) return AUDIT_RECORD_KINDS.BACKEND_ENDPOINT;
+  return AUDIT_RECORD_KINDS.LAUNCHABLE_REFERENCE;
+}
+
+function auditRecordFromCanonical(record) {
+  return {
+    id: record.id,
+    label: record.label,
+    kind: auditRecordKind(record),
+    status: record.status,
+    sourceFiles: unique([record.component, record.apiClient]),
+    sourceModule: record.sourceKind,
+    notes: record.notes,
+    mapsTo: record.nluToolId,
+    apiPath: record.endpoint,
+    route: record.route,
+    launchable: isUserFacingInventoryRecord(record),
+    canonicalToolId: isUserFacingInventoryRecord(record) ? record.id : null,
+  };
 }
 
 function sourceStatusFor({ catalogVisible, sidebarVisible, component, route }) {
@@ -416,6 +543,35 @@ export function getSidebarToolInventory(records = getCanonicalToolInventory()) {
   return records.filter((record) => record.sidebarVisible);
 }
 
+export function getUserFacingToolInventory(records = getCanonicalToolInventory()) {
+  return records
+    .filter(isUserFacingInventoryRecord)
+    .map(userFacingRecordFromCanonical)
+    .sort((a, b) => {
+      const categoryCompare = a.presentationCategory.localeCompare(b.presentationCategory);
+      if (categoryCompare !== 0) return categoryCompare;
+      return a.label.localeCompare(b.label);
+    });
+}
+
+export function getCalculatorToolInventory(records = getCanonicalToolInventory()) {
+  return getUserFacingToolInventory(records)
+    .filter((record) => {
+      if (record.surface === TOOL_SURFACES.HUB) return false;
+      return record.presentationCategory === 'Calculator' || record.category === 'calculator';
+    })
+    .sort((a, b) => {
+      if (a.hasDedicatedForm !== b.hasDedicatedForm) return a.hasDedicatedForm ? -1 : 1;
+      return a.label.localeCompare(b.label);
+    });
+}
+
+export function getAuditToolInventory(records = getCanonicalToolInventory()) {
+  return records
+    .map(auditRecordFromCanonical)
+    .sort((a, b) => `${a.kind}:${a.label}`.localeCompare(`${b.kind}:${b.label}`));
+}
+
 export function getSidebarToolRegistryProjection(records = getCanonicalToolInventory()) {
   const order = new Map(ALL_REGISTRY_TOOL_IDS.map((id, index) => [id, index]));
   return getSidebarToolInventory(records)
@@ -445,6 +601,39 @@ export function getSidebarToolRegistryProjection(records = getCanonicalToolInven
       };
     })
     .sort((a, b) => (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.id) ?? Number.MAX_SAFE_INTEGER));
+}
+
+export function getUserFacingToolRegistryProjection(records = getCanonicalToolInventory()) {
+  return getUserFacingToolInventory(records).map((record) => {
+    const legacy = record.legacy || {};
+    const category = legacy.category || record.presentationCategory;
+    return {
+      ...legacy,
+      id: record.id,
+      name: record.label || legacy.name || record.id,
+      path: record.route || record.navigationPath || legacy.path || TOOL_LAUNCH_PATHS.toolsOverview,
+      color: legacy.color || DEFAULT_COLOR_BY_CATEGORY[category] || DEFAULT_COLOR_BY_CATEGORY.Other,
+      description: record.description || legacy.description || 'Clinical decision support tool',
+      shortcut: legacy.shortcut || null,
+      category,
+      features: legacy.features || [],
+      useCases: legacy.useCases || [],
+      panelTool:
+        legacy.panelTool ||
+        (record.calculatorSlug && record.id !== REGISTRY.calculatorsHub ? REGISTRY.calculatorsHub : undefined),
+      initialCalc: legacy.initialCalc || record.calculatorSlug || undefined,
+      canonicalInventoryId: record.id,
+      launchType: record.launchType,
+      surface: record.surface,
+      tier: record.tier,
+      nluToolId: record.nluToolId,
+      executorStatus: record.executorStatus,
+      userCatalogVisible: record.userCatalogVisible,
+      workspaceFilterable: record.workspaceFilterable,
+      favoriteable: record.favoriteable,
+      searchText: record.searchText,
+    };
+  });
 }
 
 export function getBackendBackedToolInventory(records = getCanonicalToolInventory()) {

@@ -14,9 +14,19 @@ import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
 import { buildBackendFrontendContractRows, getContractGaps } from './backendFrontendToolContract';
 import { findBackendRoute, BACKEND_HTTP_ROUTES, listBackendRoutePaths } from './backendHttpRouteInventory';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
+import { BACKEND_ROUTE_EXPOSURE_POLICY, routePolicyKey } from './backendRouteExposurePolicy';
+import { getUserFacingToolInventory, TOOL_LAUNCH_TYPES } from './toolInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '../..');
+
+export const BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS = Object.freeze({
+  USER_FACING_WIRED: 'user-facing and wired',
+  BACKEND_ONLY_INTERNAL: 'backend-only/internal',
+  USER_FACING_MISSING_FRONTEND_ROUTE: 'user-facing but missing frontend route',
+  FRONTEND_VISIBLE_BACKEND_MISSING: 'frontend-visible but backend missing',
+  PLANNED_UNSUPPORTED: 'planned/unsupported',
+});
 
 /**
  * @returns {import('./frontendApiCallsInventory.js').FrontendApiCall & {
@@ -67,11 +77,103 @@ export function runBackendFrontendExposureScan() {
     wired,
     falseExecutorClaims,
     contractGaps: getContractGaps(contractRows),
+    capabilityRows: buildBackendFrontendCapabilityRows(analyzed),
     backendRouteCount: BACKEND_HTTP_ROUTES.length,
     frontendCallCount: FRONTEND_API_CALLS.length,
     executorNluIds: [...BACKEND_EXECUTOR_NLU_TOOL_IDS],
     backendOnlyRouteCount: backendOnlyRoutes.length,
   };
+}
+
+function classifyBackendOnlyRoute(route) {
+  const policy = BACKEND_ROUTE_EXPOSURE_POLICY[routePolicyKey(route.method, route.path)];
+  if (policy?.strategy === 'expose-recommended') {
+    return BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_MISSING_FRONTEND_ROUTE;
+  }
+  return BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.BACKEND_ONLY_INTERNAL;
+}
+
+function frontendCallCapabilityRow(call) {
+  const route = findBackendRoute(call.method, call.path);
+  let classification = BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_WIRED;
+  if (call.exposure === 'gated-stub') {
+    classification = BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.PLANNED_UNSUPPORTED;
+  } else if (call.exposure === 'unguarded-missing') {
+    classification = BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.FRONTEND_VISIBLE_BACKEND_MISSING;
+  }
+
+  return {
+    id: `frontend:${call.id}`,
+    source: 'frontend-api',
+    classification,
+    method: call.method,
+    path: call.path,
+    backendPath: route?.path ?? null,
+    controller: route?.controller ?? null,
+    frontendClient: call.client,
+    capability: call.capability ?? null,
+    notes: call.notes ?? null,
+  };
+}
+
+function backendRouteCapabilityRow(route) {
+  const policy = BACKEND_ROUTE_EXPOSURE_POLICY[routePolicyKey(route.method, route.path)];
+  return {
+    id: `backend:${route.method}:${route.path}`,
+    source: 'backend-route',
+    classification: classifyBackendOnlyRoute(route),
+    method: route.method,
+    path: route.path,
+    backendPath: route.path,
+    controller: route.controller,
+    frontendClient: policy?.clientHint ?? null,
+    capability: null,
+    notes: policy?.reason ?? route.notes ?? null,
+  };
+}
+
+function userFacingExecutorCapabilityRows() {
+  return getUserFacingToolInventory()
+    .filter((record) => record.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED)
+    .map((record) => {
+      const route = record.endpoint ? findBackendRoute('POST', record.endpoint) : null;
+      const wired =
+        Boolean(route) &&
+        ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(record.orchestratorToolId) &&
+        BACKEND_EXECUTOR_NLU_TOOL_IDS.includes(record.orchestratorToolId);
+      return {
+        id: `tool-executor:${record.id}`,
+        source: 'user-facing-tool',
+        classification: wired
+          ? BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_WIRED
+          : BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.FRONTEND_VISIBLE_BACKEND_MISSING,
+        method: 'POST',
+        path: record.endpoint,
+        backendPath: route?.path ?? null,
+        controller: route?.controller ?? null,
+        frontendClient: record.auditRefs?.apiClient ?? null,
+        capability: 'toolsExecute',
+        toolId: record.id,
+        orchestratorToolId: record.orchestratorToolId,
+        notes: wired ? 'User-facing backend-backed executor.' : 'Executor route or registry id is missing.',
+      };
+    });
+}
+
+export function buildBackendFrontendCapabilityRows(analyzed = FRONTEND_API_CALLS.map(analyzeFrontendApiCall)) {
+  const wiredRouteKeys = new Set(
+    analyzed
+      .map((call) => findBackendRoute(call.method, call.path))
+      .filter(Boolean)
+      .map((route) => routePolicyKey(route.method, route.path))
+  );
+  return [
+    ...analyzed.map(frontendCallCapabilityRow),
+    ...BACKEND_HTTP_ROUTES.filter((route) => !wiredRouteKeys.has(routePolicyKey(route.method, route.path))).map(
+      backendRouteCapabilityRow
+    ),
+    ...userFacingExecutorCapabilityRows(),
+  ];
 }
 
 export function assertExposureScanPasses() {
@@ -110,13 +212,19 @@ export function readViteDevConfig() {
   const vitePath = join(repoRoot, 'vite.config.js');
   const source = readFileSync(vitePath, 'utf8');
   const portMatch = source.match(/server:\s*\{[\s\S]*?port:\s*(\d+)/);
+  const previewPortMatch = source.match(/preview:\s*\{[\s\S]*?port:\s*(\d+)/);
   const proxyMatch = source.match(/VITE_API_PROXY_TARGET\s*\|\|\s*['"]([^'"]+)['"]/);
+  const hasProxyHelper = source.includes('proxyPaths(proxyTarget)');
   return {
     devPort: portMatch ? Number(portMatch[1]) : null,
+    previewPort: previewPortMatch ? Number(previewPortMatch[1]) : null,
     proxyTarget: proxyMatch ? proxyMatch[1] : null,
     proxiesApi: source.includes("'/api'"),
     proxiesHealth: source.includes("'/health'"),
     proxiesSocketIo: source.includes("'/socket.io'"),
+    serverUsesProxyHelper: /server:\s*\{[\s\S]*?proxy:\s*proxyPaths\(proxyTarget\)/.test(source),
+    previewUsesProxyHelper: /preview:\s*\{[\s\S]*?proxy:\s*proxyPaths\(proxyTarget\)/.test(source),
+    hasProxyHelper,
   };
 }
 
@@ -146,10 +254,13 @@ export function formatBackendExposureReportMarkdown(scan = runBackendFrontendExp
     '| Setting | Value |',
     '|---------|-------|',
     `| Frontend dev port | ${vite.devPort ?? '—'} |`,
+    `| Preview port | ${vite.previewPort ?? '—'} |`,
     `| Proxy target | ${vite.proxyTarget ?? '—'} |`,
     `| Proxies \`/api\` | ${vite.proxiesApi ? 'yes' : 'no'} |`,
     `| Proxies \`/health\` | ${vite.proxiesHealth ? 'yes' : 'no'} |`,
     `| Proxies \`/socket.io\` | ${vite.proxiesSocketIo ? 'yes' : 'no'} |`,
+    `| Server uses shared proxy helper | ${vite.serverUsesProxyHelper ? 'yes' : 'no'} |`,
+    `| Preview uses shared proxy helper | ${vite.previewUsesProxyHelper ? 'yes' : 'no'} |`,
     '',
     '## Registered POST executors',
     '',

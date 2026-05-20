@@ -10,7 +10,8 @@ import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes.js';
 /** Core and fleet paths rendered in route smoke tests. */
 export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'dashboard', path: '/dashboard', match: 'composer' },
-  { id: 'tools-catalog', path: '/tools/catalog', match: 'heading', heading: /full clinical catalog/i },
+  { id: 'tools-overview', path: '/tools', match: 'heading', heading: /all tools/i },
+  { id: 'tools-catalog', path: '/tools/catalog', match: 'heading', heading: /developer catalog \/ source audit/i },
   { id: 'calculators-hub', path: '/tools/calculators', match: 'heading', heading: /medical calculators/i },
   { id: 'fleet-command', path: '/fleet/command', match: 'fleet-summary' },
   {

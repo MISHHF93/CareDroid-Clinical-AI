@@ -35,7 +35,7 @@ export default function ToolNotFound({
     description ||
     (resolvedId
       ? `We could not open “${resolvedId}”. It may be unavailable, renamed, or not yet available in this build.`
-      : 'This clinical tool link is not recognized. Check the URL or choose a tool from the catalog.');
+      : 'This clinical tool link is not recognized. Check the URL or choose a tool from All Tools.');
 
   return (
     <div className="tool-not-found" role="alert">
@@ -79,11 +79,11 @@ export default function ToolNotFound({
         ) : null}
         {showCatalogLink ? (
           <Link to="/tools/catalog" className="tool-not-found-btn tool-not-found-btn--secondary">
-            Browse clinical catalog
+            Open Developer Catalog / Source Audit
           </Link>
         ) : null}
         <Link to="/tools" className="tool-not-found-btn tool-not-found-btn--ghost">
-          Tools overview
+          All Tools
         </Link>
         <Link to="/dashboard" className="tool-not-found-btn tool-not-found-btn--ghost">
           Back to dashboard

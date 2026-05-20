@@ -4,12 +4,10 @@
  */
 
 import { builtinUiCalculators, clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
-import { BUILTIN_CALC_ID_TO_REGISTRY_ID } from './clinicalCatalogWiring';
 import { NLU_HUB_ONLY_PROFILE_TOOL_IDS } from './clinicalToolIdContract';
-import { toolRegistryById } from './toolRegistry';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes';
-import { resolveToolInventoryRecord } from './toolInventory';
+import { getCalculatorToolInventory, TOOL_SURFACES } from './toolInventory';
 
 /** Every built-in form slug implemented in CalculatorInterface. */
 export const BUILTIN_CALCULATOR_SWITCH_SLUGS = Object.freeze(
@@ -64,7 +62,25 @@ export const HUB_CHAT_ASSISTED_TOOL_IDS = Object.freeze([
  */
 export function getHubChatAssistedTools() {
   const idSet = new Set(HUB_CHAT_ASSISTED_TOOL_IDS);
-  return nluCalculatorHubOnly.filter((t) => idSet.has(t.toolId));
+  const calculatorRecords = getCalculatorToolInventory().filter(
+    (record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED
+  );
+  const hubRowsById = new Map(nluCalculatorHubOnly.map((tool) => [tool.toolId, tool]));
+  return calculatorRecords
+    .map((record) => {
+      const toolId = record.nluToolId || record.id;
+      const tool = hubRowsById.get(toolId);
+      return {
+        ...tool,
+        toolId,
+        name: record?.label || tool?.name || toolId,
+        description: record?.description,
+        registryId: record?.id,
+        hubPath: tool?.hubPath || record?.route,
+        path: record?.route || tool?.hubPath,
+      };
+    })
+    .filter((tool) => idSet.has(tool.toolId));
 }
 
 /**
@@ -72,17 +88,20 @@ export function getHubChatAssistedTools() {
  * @returns {Array<{ id: string, name: string, description: string, category: string, route: string, calcQuery: string }>}
  */
 export function buildBuiltinHubCalculatorCards() {
+  const dedicatedCalculatorRecords = getCalculatorToolInventory().filter((record) => record.hasDedicatedForm);
+  const recordBySlug = Object.fromEntries(
+    dedicatedCalculatorRecords.map((record) => [record.calculatorSlug, record])
+  );
   return builtinUiCalculators.map((calc) => {
-    const registryId = BUILTIN_CALC_ID_TO_REGISTRY_ID[calc.id] ?? calc.id;
-    const inventoryRecord = resolveToolInventoryRecord(registryId);
-    const reg = toolRegistryById[registryId];
+    const record = recordBySlug[calc.id];
     return {
       id: calc.id,
-      name: inventoryRecord?.label || calc.name,
-      description: inventoryRecord?.safetyCopy || calc.description || reg?.description || '',
-      category: reg?.category || inventoryRecord?.category || 'Calculator',
-      route: inventoryRecord?.route || calc.path,
+      name: record?.label || calc.name,
+      description: record?.description || calc.description || '',
+      category: record?.presentationCategory || 'Calculator',
+      route: record?.route || calc.path,
       calcQuery: calc.calcQuery,
+      registryId: record?.id,
     };
   });
 }
@@ -127,13 +146,15 @@ export function getBuiltinCalculatorRouteDef(slug) {
  * @param {string} toolId
  */
 export function getHubChatToolMeta(toolId) {
-  const inventoryRecord = resolveToolInventoryRecord(toolId);
+  const inventoryRecord = getCalculatorToolInventory().find(
+    (record) => record.id === toolId || record.nluToolId === toolId || record.nluProfileIds?.includes(toolId)
+  );
   const hubRow = nluCalculatorHubOnly.find((t) => t.toolId === toolId);
   const intent = clinicalIntentTools.find((t) => t.toolId === toolId);
   return {
     toolId,
-    name: inventoryRecord?.label || hubRow?.name || intent?.name || toolId,
+    name: inventoryRecord?.label || hubRow?.name || intent?.toolName || toolId,
     description:
-      inventoryRecord?.safetyCopy || intent?.description || 'Chat-assisted decision support',
+      inventoryRecord?.description || intent?.description || 'Chat-assisted decision support',
   };
 }

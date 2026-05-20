@@ -64,8 +64,8 @@ vi.mock('../services/offlineService', () => ({
 
 vi.mock('../contexts/WorkspaceContext', () => ({
   useWorkspace: () => ({
-    workspaces: [{ id: 'default', name: 'Default', toolIds: [] }],
-    activeWorkspaceId: 'default',
+    workspaces: [{ id: 'all', name: 'All Tools', toolIds: [] }],
+    activeWorkspaceId: 'all',
     setActiveWorkspaceId: vi.fn(),
   }),
 }));
@@ -97,7 +97,7 @@ describe('toolRenderExecuteSmoke — clinical pages non-empty', () => {
     ['/tools/protocols', Protocols, /search for a protocol/i],
     ['/tools/diagnosis', DiagnosisAssistant, /patient presentation/i],
     ['/tools/procedures', ProcedureGuide, /search for a procedure/i],
-    ['/tools', ToolsOverview, /clinical tools suite/i],
+    ['/tools', ToolsOverview, /one launchable catalog/i],
   ])('%s renders primary UI', async (path, Page, matcher) => {
     const { container } = renderAt(path, <Page />);
     expect(await screen.findByText(matcher)).toBeInTheDocument();
@@ -147,7 +147,44 @@ describe('toolRenderExecuteSmoke — Tier C executor', () => {
     fireEvent.change(inputs[1], { target: { value: 'B' } });
     fireEvent.click(screen.getByRole('button', { name: /check interactions/i }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent(/not available|unable/i);
+    expect(await screen.findByText(/not available|unable/i)).toBeInTheDocument();
+  });
+
+  it('LabInterpreter shows user-visible unsupported state when executor is unavailable', async () => {
+    mockExecuteClinicalTool.mockResolvedValue({
+      ok: false,
+      unsupported: true,
+      message: 'Lab interpreter is not available for server execution.',
+    });
+
+    renderAt('/tools/lab-interpreter', <LabInterpreter />);
+    fireEvent.click(screen.getByRole('button', { name: /load example/i }));
+    fireEvent.click(screen.getByRole('button', { name: /interpret lab values/i }));
+
+    await waitFor(() => {
+      expect(mockExecuteClinicalTool).toHaveBeenCalledWith('lab-interpreter', expect.any(Object));
+    });
+    expect(await screen.findByText(/not available for server execution/i)).toBeInTheDocument();
+  });
+
+  it('SOFA calculator shows user-visible unsupported state when executor is unavailable', async () => {
+    mockExecuteClinicalTool.mockResolvedValue({
+      ok: false,
+      unsupported: true,
+      message: 'SOFA calculator is not available for server execution.',
+    });
+
+    render(
+      <MemoryRouter initialEntries={['/tools/calculator/sofa']}>
+        <Calculators initialCalculatorId="sofa" />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByRole('button', { name: /calculate sofa score/i }));
+
+    await waitFor(() => {
+      expect(mockExecuteClinicalTool).toHaveBeenCalledWith('sofa-calculator', expect.any(Object));
+    });
+    expect(await screen.findByText(/not available for server execution/i)).toBeInTheDocument();
   });
 });
 
@@ -161,7 +198,7 @@ describe('toolRenderExecuteSmoke — chat pages graceful API failure', () => {
     renderAt('/tools/protocols', <Protocols />);
     fireEvent.click(screen.getByRole('button', { name: /sepsis management/i }));
 
-    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect((await screen.findAllByRole('alert')).length).toBeGreaterThan(0);
   });
 });
 

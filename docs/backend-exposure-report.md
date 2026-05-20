@@ -1,6 +1,6 @@
 # Backend exposure report
 
-**Generated:** 2026-05-20T01:25:15.574Z
+**Generated:** 2026-05-20T20:48:44.535Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -9,9 +9,9 @@
 | Metric | Count |
 |--------|------:|
 | Backend HTTP routes (inventory) | 92 |
-| Frontend API calls (inventory) | 56 |
-| Wired (route exists) | 40 |
-| Gated stubs (no route, capability off) | 16 |
+| Frontend API calls (inventory) | 66 |
+| Wired (route exists) | 48 |
+| Gated stubs (no route, capability off) | 18 |
 | Unguarded missing routes | 0 |
 | POST executors (backend) | 3 |
 | Contract gaps (matrix) | 0 |
@@ -21,10 +21,13 @@
 | Setting | Value |
 |---------|-------|
 | Frontend dev port | 8000 |
+| Preview port | 4173 |
 | Proxy target | http://localhost:3000 |
 | Proxies `/api` | yes |
 | Proxies `/health` | yes |
 | Proxies `/socket.io` | yes |
+| Server uses shared proxy helper | yes |
+| Preview uses shared proxy helper | yes |
 
 ## Registered POST executors
 
@@ -52,6 +55,8 @@
 | exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
 | exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |
 | reports-generate | POST | `/api/reports/generate` | reportsGenerate | export/ExportService.js |
+| reports-schedule-create | POST | `/api/reports/schedule` | reportsSchedule | export/ExportService.js |
+| reports-schedule-cancel | DELETE | `/api/reports/schedule/:reportId` | reportsSchedule | export/ExportService.js |
 
 ## Related docs
 

@@ -8,6 +8,7 @@ import { MemoryRouter } from 'react-router-dom';
 import Calculators from './Calculators';
 import { BUILTIN_CALCULATOR_FORM_SMOKE_ROWS } from '../../data/calculatorHubManifest';
 import { PR1_PR5_TIER_A_FORM_SLUGS } from '../../data/pr1Pr5CalculatorMobile.test.js';
+import { getCalculatorToolInventory } from '../../data/toolInventory';
 import { mockCompactViewport, mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 
 /** Avoid jsdom/cssstyle crash on `border-left: 4px solid var(--primary-color)` in ToolPageLayout.css */
@@ -87,6 +88,14 @@ describe('Calculators — Tier-A form sections', () => {
       expect(within(iface).getByText(/decision support only/i)).toBeInTheDocument();
     }
   );
+
+  it('covers every dedicated calculator inventory route with a form smoke row', () => {
+    const smokeSlugs = new Set(BUILTIN_CALCULATOR_FORM_SMOKE_ROWS.map((row) => row.slug));
+    for (const record of getCalculatorToolInventory().filter((tool) => tool.hasDedicatedForm)) {
+      expect(smokeSlugs.has(record.calculatorSlug), record.id).toBe(true);
+      expect(record.route, record.id).toBeTruthy();
+    }
+  });
 });
 
 describe('Calculators — compact viewport mock', () => {

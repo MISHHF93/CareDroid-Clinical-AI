@@ -26,6 +26,10 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'drugs-list', method: 'GET', path: '/api/drugs', client: 'clinicalContentApi.js' },
   { id: 'tools-list', method: 'GET', path: '/api/tools', client: 'clinicalToolsApi.js', capability: 'toolsList' },
   { id: 'tools-available', method: 'GET', path: '/api/tools/available', client: 'clinicalToolsApi.js', capability: 'toolsList' },
+  { id: 'tools-metadata', method: 'GET', path: '/api/tools/:id', client: 'clinicalToolsApi.js', capability: 'toolsList' },
+  { id: 'tools-validate', method: 'POST', path: '/api/tools/:id/validate', client: 'clinicalToolsApi.js', capability: 'toolsExecute' },
+  { id: 'tools-executor-catalog', method: 'GET', path: '/api/tools/catalog/executors', client: 'clinicalToolsApi.js', capability: 'toolsList' },
+  { id: 'tools-statistics', method: 'GET', path: '/api/tools/statistics', client: 'clinicalToolsApi.js', capability: 'toolsList' },
   { id: 'tools-execute', method: 'POST', path: '/api/tools/:id/execute', client: 'clinicalOrchestratorApi.js', capability: 'toolsExecute' },
   { id: 'tools-results', method: 'POST', path: '/api/tools/results', client: 'syncService.js', capability: 'toolsResultsSync' },
   { id: 'tools-share-results', method: 'POST', path: '/api/tools/share-results', client: 'ToolResultShare.jsx', capability: 'toolsShareResults' },
@@ -68,6 +72,7 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'analytics-metrics', method: 'GET', path: '/api/analytics/metrics', client: 'AnalyticsDashboard.jsx' },
   { id: 'auth-biometric-stats', method: 'GET', path: '/api/auth/biometric/stats', client: 'BiometricSetup.jsx' },
   { id: 'auth-biometric-verify', method: 'POST', path: '/api/auth/biometric/verify', client: 'BiometricSetup.jsx' },
+  { id: 'auth-biometric-disable', method: 'DELETE', path: '/api/auth/biometric/disable/:deviceId', client: 'BiometricSetup.jsx' },
 
   { id: 'config-system', method: 'GET', path: '/api/config/system', client: 'configService.js' },
   { id: 'ai-remaining-queries', method: 'GET', path: '/api/ai/remaining-queries', client: 'configService.js' },

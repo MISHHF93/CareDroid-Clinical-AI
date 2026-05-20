@@ -15,6 +15,10 @@ import {
 } from './clinicalToolIdContract';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import toolRegistry from './toolRegistry';
+import {
+  BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS,
+  buildBackendFrontendCapabilityRows,
+} from './backendFrontendExposure';
 
 /** @typedef {'fully wired'|'frontend-only'|'backend-only'|'broken'|'planned'} ToolContractStatus */
 
@@ -101,6 +105,11 @@ export function formatToolContractMatrixMarkdown(
     acc[r.status] = (acc[r.status] || 0) + 1;
     return acc;
   }, {});
+  const capabilityRows = buildBackendFrontendCapabilityRows();
+  const capabilityCounts = capabilityRows.reduce((acc, row) => {
+    acc[row.classification] = (acc[row.classification] || 0) + 1;
+    return acc;
+  }, {});
 
   const lines = [
     '# Tool contract matrix',
@@ -124,6 +133,14 @@ export function formatToolContractMatrixMarkdown(
     '| Status | Count |',
     '|--------|------:|',
     ...TOOL_CONTRACT_STATUSES.map((s) => `| ${s} | ${statusCounts[s] ?? 0} |`),
+    '',
+    '### Backend/frontend capability classification',
+    '',
+    '| Classification | Count |',
+    '|----------------|------:|',
+    ...Object.values(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS).map(
+      (classification) => `| ${classification} | ${capabilityCounts[classification] ?? 0} |`
+    ),
     '',
     '## Status definitions',
     '',
