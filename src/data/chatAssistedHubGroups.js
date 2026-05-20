@@ -22,8 +22,8 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     groupId: 'trauma',
     heading: 'Trauma imaging decision support',
     lead:
-      'Canadian C-Spine and Ottawa ankle/foot rules support selected imaging decisions (clinical decision support only). They do not clear the spine, prove absence of fracture, or rule out injury with certainty. Unstable patients, neurovascular compromise, open fractures, and severe trauma need full evaluation without delay — do not defer urgent care to finish chat.',
-    toolIds: ['canadian-c-spine', 'ottawa-ankle'],
+      'Canadian C-Spine, Ottawa ankle/foot, and PECARN pediatric head rules support selected imaging decisions (clinical decision support only). They do not clear the spine, prove absence of fracture, rule out brain injury, or mandate or defer CT. Unstable patients, neurovascular compromise, open fractures, declining mental status, and severe trauma need full evaluation without delay — do not defer urgent care to finish chat.',
+    toolIds: ['canadian-c-spine', 'nexus-cspine', 'ottawa-ankle', 'pecarn-head'],
   },
   {
     groupId: 'pe',
@@ -75,7 +75,9 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'grace-acs': 'Unstable ACS or STEMI pathways take priority over chat.',
   nihss: 'Emergency stroke pathways take priority over completing scoring in chat.',
   'canadian-c-spine': 'Unstable trauma and primary survey take priority over chat.',
+  'nexus-cspine': 'Unstable trauma and primary survey take priority over chat.',
   'ottawa-ankle': 'Hard-stop injuries and urgent evaluation take priority over chat.',
+  'pecarn-head': 'Declining consciousness, seizures, or hemodynamic instability take priority over chat.',
   'wells-pe': 'PE cannot be ruled out with certainty; unstable patients need urgent evaluation first.',
   perc: 'PERC does not rule out pulmonary embolism with certainty.',
   'copd-gold': 'Acute COPD exacerbation or severe respiratory distress takes priority over grouping chat.',

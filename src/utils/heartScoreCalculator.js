@@ -3,6 +3,11 @@
  * Reference: Six AJ, et al. Chest. 2008;134(6):1157–1164.
  */
 
+/** @typedef {'low' | 'intermediate' | 'high'} HeartRiskCategory */
+
+export const HEART_SCORE_DISCLAIMER =
+  'Clinical decision support only. Does not diagnose acute coronary syndrome, rule out myocardial infarction, or recommend treatment, disposition, observation duration, or invasive strategy.';
+
 export const HEART_DIMENSIONS_META = [
   {
     key: 'history',
@@ -58,6 +63,7 @@ export const HEART_DIMENSIONS_META = [
 
 /**
  * @param {Record<string, number>} inputs
+ * @returns {number | null}
  */
 export function calculateHeartScore(inputs) {
   let total = 0;
@@ -70,38 +76,77 @@ export function calculateHeartScore(inputs) {
 }
 
 /**
+ * @param {Record<string, unknown>} raw
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validateHeartScoreInputs(raw) {
+  const errors = [];
+  for (const dim of HEART_DIMENSIONS_META) {
+    const v = Number(raw[dim.key]);
+    if (!Number.isFinite(v) || v < 0 || v > 2) {
+      errors.push(`${dim.label}: select a score of 0, 1, or 2.`);
+    }
+  }
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * @param {number} score
+ * @returns {HeartRiskCategory | null}
+ */
+export function heartRiskCategoryFromScore(score) {
+  if (!Number.isFinite(score) || score < 0 || score > 10) return null;
+  if (score >= 7) return 'high';
+  if (score >= 4) return 'intermediate';
+  return 'low';
+}
+
+/**
+ * @param {HeartRiskCategory} riskCategory
+ */
+function riskCategoryLabel(riskCategory) {
+  if (riskCategory === 'high') return 'High risk';
+  if (riskCategory === 'intermediate') return 'Intermediate risk';
+  return 'Low risk';
+}
+
+/**
  * @param {number} score 0–10
  */
 export function interpretHeartScore(score) {
-  if (!Number.isFinite(score) || score < 0 || score > 10) return null;
+  const riskCategory = heartRiskCategoryFromScore(score);
+  if (!riskCategory) return null;
 
   const referenceLine =
     'Six AJ, et al. Chest pain in the emergency room: value of the HEART score. Chest. 2008;134(6):1157–1164.';
 
-  const disclaimer =
-    'For patients with acute chest pain — not a diagnosis of ACS. Does not direct disposition, observation time, or invasive strategy.';
+  const disclaimer = HEART_SCORE_DISCLAIMER;
 
-  if (score >= 7) {
+  if (riskCategory === 'high') {
     return {
       severity: 'critical',
+      riskCategory,
+      riskCategoryLabel: riskCategoryLabel(riskCategory),
       label: 'High HEART score',
       riskBand: '7–10 points',
-      maceContext: 'MACE ~50–65% in validation cohorts at 6 weeks',
+      maceContext: 'Approximate MACE ~50–65% at 6 weeks in validation cohorts',
       interpretation:
-        'Scores ≥7 are associated with a high rate of major adverse cardiac events (MACE) at 6 weeks in original validation studies. Consider expedited cardiology review and serial biomarkers per local chest-pain pathway.',
+        'Scores of 7–10 fall in the high-risk stratum in validation studies. This output stratifies short-term cardiac risk only — it does not diagnose acute coronary syndrome.',
       disclaimer,
       referenceLine,
     };
   }
 
-  if (score >= 4) {
+  if (riskCategory === 'intermediate') {
     return {
       severity: 'warning',
+      riskCategory,
+      riskCategoryLabel: riskCategoryLabel(riskCategory),
       label: 'Intermediate HEART score',
       riskBand: '4–6 points',
-      maceContext: 'MACE ~12–17% at 6 weeks in validation cohorts',
+      maceContext: 'Approximate MACE ~12–17% at 6 weeks in validation cohorts',
       interpretation:
-        'Intermediate-risk band — observation, serial ECG/troponin, and risk-factor management per institutional chest-pain protocol.',
+        'Scores of 4–6 fall in the intermediate-risk stratum in validation studies. Risk stratification only — does not direct testing, disposition, or therapy.',
       disclaimer,
       referenceLine,
     };
@@ -109,11 +154,13 @@ export function interpretHeartScore(score) {
 
   return {
     severity: 'normal',
+    riskCategory,
+    riskCategoryLabel: riskCategoryLabel(riskCategory),
     label: 'Low HEART score',
     riskBand: '0–3 points',
-    maceContext: 'MACE ~1–2% at 6 weeks in validation cohorts',
+    maceContext: 'Approximate MACE ~1–2% at 6 weeks in validation cohorts',
     interpretation:
-      'Lower short-term MACE rates in validation cohorts, but ACS can still occur. Continue appropriate evaluation per protocol.',
+      'Scores of 0–3 fall in the low-risk stratum in validation studies. Low short-term risk does not exclude acute coronary syndrome — clinical judgment and local chest-pain pathways still apply.',
     disclaimer,
     referenceLine,
   };

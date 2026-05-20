@@ -3,6 +3,9 @@
  * Reference: Bergstrom N, et al. The Braden Scale for Predicting Pressure Sore Risk. Nurs Res. 1987;36(4):205–210.
  */
 
+export const BRADEN_HOSPITAL_DISCLAIMER =
+  'Inpatient nursing risk screen for pressure-injury prevention documentation. Does not replace skin inspection, repositioning orders, support-surface selection, or wound care plans — follow institutional prevention bundles.';
+
 export const BRADEN_DIMENSIONS_META = [
   {
     key: 'sensoryPerception',
@@ -95,16 +98,17 @@ export function interpretBradenScore(score) {
   const referenceLine =
     'Bergstrom N, et al. The Braden Scale for Predicting Pressure Sore Risk. Nurs Res. 1987;36(4):205–210.';
 
-  const disclaimer =
-    'Nursing risk screen only — does not replace skin inspection, repositioning orders, or wound care plans.';
+  const disclaimer = BRADEN_HOSPITAL_DISCLAIMER;
 
   if (score <= 12) {
     return {
       severity: 'critical',
+      riskCategory: 'high',
+      riskCategoryLabel: 'High pressure-injury risk',
       label: 'High pressure-injury risk',
       riskBand: '≤ 12',
       interpretation:
-        'Scores ≤12 indicate high risk in validation studies — implement enhanced skin care, repositioning, and support surface per institutional pressure-injury prevention protocol.',
+        'Scores ≤12 fall in the high-risk stratum in validation studies — discuss enhanced prevention measures per institutional pressure-injury protocol.',
       disclaimer,
       referenceLine,
     };
@@ -113,10 +117,12 @@ export function interpretBradenScore(score) {
   if (score <= 14) {
     return {
       severity: 'warning',
+      riskCategory: 'moderate',
+      riskCategoryLabel: 'Moderate pressure-injury risk',
       label: 'Moderate pressure-injury risk',
       riskBand: '13–14',
       interpretation:
-        'Moderate risk band — reinforce prevention bundle and frequent skin assessment.',
+        'Moderate risk stratum — supports documentation for prevention bundle review and serial skin assessment.',
       disclaimer,
       referenceLine,
     };
@@ -125,9 +131,11 @@ export function interpretBradenScore(score) {
   if (score <= 16) {
     return {
       severity: 'warning',
+      riskCategory: 'mild',
+      riskCategoryLabel: 'Mild pressure-injury risk',
       label: 'Mild pressure-injury risk',
       riskBand: '15–16',
-      interpretation: 'Mild risk — continue standard prevention measures and documentation.',
+      interpretation: 'Mild risk stratum — continue standard prevention documentation and reassessment.',
       disclaimer,
       referenceLine,
     };
@@ -135,9 +143,11 @@ export function interpretBradenScore(score) {
 
   return {
     severity: 'normal',
+    riskCategory: 'low',
+    riskCategoryLabel: 'Lower pressure-injury risk',
     label: 'Lower pressure-injury risk',
     riskBand: '17–23',
-    interpretation: 'Lower risk band — maintain routine prevention and reassess with clinical changes.',
+    interpretation: 'Lower risk stratum — maintain routine prevention and reassess with clinical status changes.',
     disclaimer,
     referenceLine,
   };

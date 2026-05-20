@@ -21,6 +21,9 @@ import {
   PR4A_CALCULATOR_REGISTRY_IDS,
   PR5_CALCULATOR_REGISTRY_IDS,
   PR6_CALCULATOR_REGISTRY_IDS,
+  PR8_TIER_A_CALCULATOR_REGISTRY_IDS,
+  PR9_TIER_B_CHAT_CALCULATOR_IDS,
+  PR10_TIER_A_CALCULATOR_REGISTRY_IDS,
   PR_FLEET_ALL_REGISTRY_IDS,
   REGISTRY,
 } from './clinicalToolIdContract';
@@ -28,6 +31,8 @@ import { GRACE_ACS_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/graceA
 import { NIHSS_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/nihss';
 import { CANADIAN_C_SPINE_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/canadianCSpine';
 import { OTTAWA_ANKLE_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/ottawaAnkle';
+import { PECARN_HEAD_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/pecarnHead';
+import { NEXUS_CSPINE_REQUIRED_NLU_ALIASES } from './chatAssistedCalculators/nexusCSpine';
 import { PR1_ALL_ALIAS_PAIRS } from './pr1TestConstants';
 import { MELD_ALL_ALIAS_PAIRS } from './pr2MeldTestConstants';
 import { TIMI_ALL_ALIAS_PAIRS } from './pr2TimiTestConstants';
@@ -37,6 +42,8 @@ import { PR4A_ALL_ALIAS_PAIRS } from './pr4aTestConstants';
 import { PR5_ALL_ALIAS_PAIRS } from './pr5TestConstants';
 import { PR6_ALL_ALIAS_PAIRS } from './pr6TestConstants';
 import { PR7_ALL_ALIAS_PAIRS } from './pr7TestConstants';
+import { PR9_ALL_ALIAS_PAIRS, PR9_REQUIRED_NLU_ALIAS_PAIRS } from './pr9TestConstants';
+import { NEW_CLINICAL_TOOLS_ALL_ALIAS_PAIRS } from './newClinicalToolsAuditConstants';
 import { PR3_NLU_ALIAS_PAIRS, PR3_DISCOVERY_ALIAS_PAIRS } from './pr3TestConstants';
 import { PR_FLEET_ALL_ALIAS_PAIRS } from './prFleetTestConstants';
 import {
@@ -102,6 +109,9 @@ export const AUDITED_CLINICAL_REGISTRY_IDS = Object.freeze([
   ...PR4A_CALCULATOR_REGISTRY_IDS,
   ...PR5_CALCULATOR_REGISTRY_IDS,
   ...PR6_CALCULATOR_REGISTRY_IDS,
+  ...PR8_TIER_A_CALCULATOR_REGISTRY_IDS,
+  ...PR9_TIER_B_CHAT_CALCULATOR_IDS,
+  ...PR10_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR_FLEET_ALL_REGISTRY_IDS,
   REGISTRY.drugCheck,
   REGISTRY.labInterp,
@@ -130,6 +140,8 @@ export const CHAT_ASSISTED_REQUIRED_BACKEND_ALIASES = Object.freeze([
     nluToolId: 'canadian-c-spine',
   })),
   ...OTTAWA_ANKLE_REQUIRED_NLU_ALIASES.map((a) => ({ alias: a, nluToolId: 'ottawa-ankle' })),
+  ...PECARN_HEAD_REQUIRED_NLU_ALIASES.map((a) => ({ alias: a, nluToolId: 'pecarn-head' })),
+  ...NEXUS_CSPINE_REQUIRED_NLU_ALIASES.map((a) => ({ alias: a, nluToolId: 'nexus-cspine' })),
 ]);
 
 /** All product-required NLU / discovery alias pairs (PR1–PR7 + fleet). */
@@ -143,6 +155,9 @@ export const ALL_REQUIRED_CATALOG_ALIAS_PAIRS = Object.freeze([
   ...PR5_ALL_ALIAS_PAIRS,
   ...PR6_ALL_ALIAS_PAIRS,
   ...PR7_ALL_ALIAS_PAIRS,
+  ...PR9_ALL_ALIAS_PAIRS,
+  ...PR9_REQUIRED_NLU_ALIAS_PAIRS,
+  ...NEW_CLINICAL_TOOLS_ALL_ALIAS_PAIRS,
   ...PR3_NLU_ALIAS_PAIRS,
   ...PR3_DISCOVERY_ALIAS_PAIRS,
   ...PR_FLEET_ALL_ALIAS_PAIRS,

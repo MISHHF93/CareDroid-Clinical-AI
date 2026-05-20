@@ -15,7 +15,9 @@ describe('PR8 calculator utilities', () => {
     const inputs = { history: 2, ecg: 2, age: 2, riskFactors: 2, troponin: 2 };
     expect(calculateHeartScore(inputs)).toBe(10);
     expect(interpretHeartScore(10)?.severity).toBe('critical');
+    expect(interpretHeartScore(10)?.riskCategory).toBe('high');
     expect(interpretHeartScore(2)?.severity).toBe('normal');
+    expect(interpretHeartScore(2)?.riskCategory).toBe('low');
   });
 
   it('scores Centor/McIsaac with age band', () => {
@@ -42,6 +44,8 @@ describe('PR8 calculator utilities', () => {
       })
     ).toBe(13);
     expect(interpretBishopScore(8)?.label).toMatch(/Favourable/i);
+    expect(interpretBishopScore(8)?.riskCategory).toBe('favourable');
+    expect(interpretBishopScore(4)?.riskCategory).toBe('unfavourable');
     expect(calculateBradenScore({
       sensoryPerception: 1,
       moisture: 1,
@@ -51,6 +55,7 @@ describe('PR8 calculator utilities', () => {
       frictionShear: 1,
     })).toBe(6);
     expect(interpretBradenScore(6)?.severity).toBe('critical');
+    expect(interpretBradenScore(6)?.riskCategory).toBe('high');
   });
 
   it('scores Apgar and Morse', () => {
@@ -64,6 +69,8 @@ describe('PR8 calculator utilities', () => {
       })
     ).toBe(10);
     expect(interpretApgarScore(10)?.severity).toBe('normal');
+    expect(interpretApgarScore(10)?.riskCategory).toBe('reassuring');
+    expect(interpretApgarScore(3)?.riskCategory).toBe('severely_depressed');
     expect(
       calculateMorseFallScore({
         historyOfFalling: 25,
@@ -75,6 +82,8 @@ describe('PR8 calculator utilities', () => {
       })
     ).toBe(125);
     expect(interpretMorseFallScore(125)?.severity).toBe('critical');
+    expect(interpretMorseFallScore(125)?.riskCategory).toBe('high');
+    expect(interpretMorseFallScore(10)?.riskCategory).toBe('low');
   });
 
   it('scores Ranson and BISAP', () => {
@@ -95,12 +104,14 @@ describe('PR8 calculator utilities', () => {
       })
     ).toBe(3);
     expect(interpretBisapScore(3)?.severity).toBe('warning');
+    expect(interpretBisapScore(3)?.riskCategory).toBe('moderate');
   });
 
   it('computes FIB-4 and Framingham risk', () => {
     const fib4 = calculateFib4({ ageYears: 50, astUPerL: 40, altUPerL: 30, platelets10e9PerL: 200 });
     expect(fib4).toBeGreaterThan(0);
     expect(interpretFib4(fib4, 50)?.referenceLine).toMatch(/FIB-4/i);
+    expect(interpretFib4(fib4, 50)?.riskCategory).toBe('indeterminate');
     const framingham = computeFraminghamRisk({
       ageYears: 55,
       sex: 'male',

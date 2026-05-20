@@ -25,7 +25,7 @@
  */
 
 /** Bump when registry/NLU lists or maps change incompatibly. */
-export const TOOL_ID_CONTRACT_VERSION = '1.2.0';
+export const TOOL_ID_CONTRACT_VERSION = '1.5.0';
 
 /** Shared SPA paths for tool launch (browser-safe). */
 export const TOOL_LAUNCH_PATHS = Object.freeze({
@@ -76,6 +76,9 @@ export const REGISTRY = Object.freeze({
   nihss: 'nihss',
   canadianCSpine: 'canadian-c-spine',
   ottawaAnkle: 'ottawa-ankle',
+  pecarnHead: 'pecarn-head',
+  nexusCspine: 'nexus-cspine',
+  abcd2: 'abcd2',
   calculatorsHub: 'calculators',
   apache2Calculator: 'apache2-calculator',
   curb65Calculator: 'curb65-calculator',
@@ -127,6 +130,9 @@ export const NLU = Object.freeze({
   nihss: 'nihss',
   canadianCSpine: 'canadian-c-spine',
   ottawaAnkle: 'ottawa-ankle',
+  pecarnHead: 'pecarn-head',
+  nexusCspine: 'nexus-cspine',
+  abcd2: 'abcd2',
   copdGold: 'copd-gold',
   romeIvIbs: 'rome-iv-ibs',
   dispatchAi: 'dispatch-ai',
@@ -170,6 +176,7 @@ export const BUILTIN_CALC = Object.freeze({
   bisapScore: 'bisap-score',
   fib4: 'fib4',
   framinghamRisk: 'framingham-risk',
+  abcd2: 'abcd2',
   gfr: 'gfr',
   egfr: 'egfr',
   bmi: 'bmi',
@@ -229,6 +236,10 @@ export const PR8_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
 
 export const PR8_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR8_TIER_A_CALCULATOR_REGISTRY_IDS]);
 
+export const PR10_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([REGISTRY.abcd2]);
+
+export const PR10_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR10_TIER_A_CALCULATOR_REGISTRY_IDS]);
+
 /** All Tier-A calculator registry ids (dedicated routes + forms when shipped). */
 export const CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...LEGACY_TIER_A_CALCULATOR_REGISTRY_IDS,
@@ -237,6 +248,7 @@ export const CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...PR4A_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR5_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR8_TIER_A_CALCULATOR_REGISTRY_IDS,
+  ...PR10_TIER_A_CALCULATOR_REGISTRY_IDS,
 ]);
 
 // —— Chat-assisted clinical tools (Tier B hub) ——
@@ -254,11 +266,17 @@ export const PR6_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze([REGISTRY.copdGold])
 
 export const PR7_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze([REGISTRY.romeIvIbs]);
 
+export const PR9_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze([
+  REGISTRY.pecarnHead,
+  REGISTRY.nexusCspine,
+]);
+
 export const CLINICAL_TIER_B_CHAT_REGISTRY_IDS = Object.freeze([
   ...PR2_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR3_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR6_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR7_TIER_B_CHAT_CALCULATOR_IDS,
+  ...PR9_TIER_B_CHAT_CALCULATOR_IDS,
 ]);
 
 /** NLU hub chat tools with dedicated sidebar registry rows (guided chat from calculators hub). */
@@ -279,6 +297,8 @@ export const PR3_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR3_TIER_B_CHAT_CAL
 export const PR6_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR6_TIER_B_CHAT_CALCULATOR_IDS]);
 
 export const PR7_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR7_TIER_B_CHAT_CALCULATOR_IDS]);
+
+export const PR9_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR9_TIER_B_CHAT_CALCULATOR_IDS]);
 
 export const TIER_B_CHAT_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
@@ -375,6 +395,9 @@ export const NLU_PROFILE_TOOL_IDS = Object.freeze([
   NLU.nihss,
   NLU.canadianCSpine,
   NLU.ottawaAnkle,
+  NLU.pecarnHead,
+  NLU.nexusCspine,
+  NLU.abcd2,
   NLU.copdGold,
   NLU.romeIvIbs,
   NLU.dispatchAi,
@@ -418,6 +441,7 @@ export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
   [BUILTIN_CALC.bisapScore]: REGISTRY.bisapScore,
   [BUILTIN_CALC.fib4]: REGISTRY.fib4,
   [BUILTIN_CALC.framinghamRisk]: REGISTRY.framinghamRisk,
+  [BUILTIN_CALC.abcd2]: REGISTRY.abcd2,
   [BUILTIN_CALC.gfr]: REGISTRY.calcGfr,
   [BUILTIN_CALC.egfr]: REGISTRY.calcGfr,
   [BUILTIN_CALC.bmi]: REGISTRY.calcBmi,
@@ -439,6 +463,9 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
   [NLU.nihss]: REGISTRY.nihss,
   [NLU.canadianCSpine]: REGISTRY.canadianCSpine,
   [NLU.ottawaAnkle]: REGISTRY.ottawaAnkle,
+  [NLU.pecarnHead]: REGISTRY.pecarnHead,
+  [NLU.nexusCspine]: REGISTRY.nexusCspine,
+  [NLU.abcd2]: REGISTRY.abcd2,
   [NLU.ascvdRisk]: REGISTRY.ascvdRisk,
   [NLU.ckdStaging]: REGISTRY.ckdStaging,
   [NLU.stopBang]: REGISTRY.stopBang,
@@ -666,6 +693,52 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'ankle-injury-imaging': REGISTRY.ottawaAnkle,
   'foot xray rule': REGISTRY.ottawaAnkle,
   'foot-xray-rule': REGISTRY.ottawaAnkle,
+  pecarn: REGISTRY.pecarnHead,
+  'pecarn head': REGISTRY.pecarnHead,
+  'pecarn-head': REGISTRY.pecarnHead,
+  'pecarn head injury': REGISTRY.pecarnHead,
+  'pecarn head injury rule': REGISTRY.pecarnHead,
+  'pecarn-head-injury': REGISTRY.pecarnHead,
+  'pediatric head ct': REGISTRY.pecarnHead,
+  'pediatric-head-ct': REGISTRY.pecarnHead,
+  'pediatric head injury rule': REGISTRY.pecarnHead,
+  'pediatric head injury pecarn': REGISTRY.pecarnHead,
+  'pediatric-head-injury-pecarn': REGISTRY.pecarnHead,
+  'pediatric-head-injury-rule': REGISTRY.pecarnHead,
+  'child head trauma imaging rule': REGISTRY.pecarnHead,
+  'child-head-trauma-imaging-rule': REGISTRY.pecarnHead,
+  'pediatric head ct rule': REGISTRY.pecarnHead,
+  'pediatric-head-ct-rule': REGISTRY.pecarnHead,
+  'child head trauma ct': REGISTRY.pecarnHead,
+  'child-head-trauma-ct': REGISTRY.pecarnHead,
+  nexus: REGISTRY.nexusCspine,
+  'nexus c spine': REGISTRY.nexusCspine,
+  'nexus c-spine': REGISTRY.nexusCspine,
+  'nexus-c-spine': REGISTRY.nexusCspine,
+  'nexus-cspine': REGISTRY.nexusCspine,
+  'nexus criteria': REGISTRY.nexusCspine,
+  'nexus-criteria': REGISTRY.nexusCspine,
+  'nexus cervical spine': REGISTRY.nexusCspine,
+  'nexus-cervical-spine': REGISTRY.nexusCspine,
+  'c spine nexus': REGISTRY.nexusCspine,
+  'c-spine-nexus': REGISTRY.nexusCspine,
+  'nexus c-spine rule': REGISTRY.nexusCspine,
+  'nexus-c-spine-rule': REGISTRY.nexusCspine,
+  'cervical spine nexus': REGISTRY.nexusCspine,
+  'cervical-spine-nexus': REGISTRY.nexusCspine,
+  abcd2: REGISTRY.abcd2,
+  'abcd²': REGISTRY.abcd2,
+  'abcd squared': REGISTRY.abcd2,
+  'abcd-squared': REGISTRY.abcd2,
+  'abcd2 score': REGISTRY.abcd2,
+  'abcd2-score': REGISTRY.abcd2,
+  'abcd score': REGISTRY.abcd2,
+  'abcd-score': REGISTRY.abcd2,
+  tia: REGISTRY.abcd2,
+  'tia risk': REGISTRY.abcd2,
+  'tia-risk': REGISTRY.abcd2,
+  'tia stroke risk': REGISTRY.abcd2,
+  'tia-stroke-risk': REGISTRY.abcd2,
   ascvd: REGISTRY.ascvdRisk,
   'ascvd-score': REGISTRY.ascvdRisk,
   'cardiovascular risk': REGISTRY.ascvdRisk,
@@ -751,6 +824,8 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'pressure injury risk': REGISTRY.bradenScale,
   'pressure-injury-risk': REGISTRY.bradenScale,
   morse: REGISTRY.morseFallScale,
+  'morse fall': REGISTRY.morseFallScale,
+  'morse-fall': REGISTRY.morseFallScale,
   'morse fall scale': REGISTRY.morseFallScale,
   'morse-fall-scale': REGISTRY.morseFallScale,
   'fall risk score': REGISTRY.morseFallScale,

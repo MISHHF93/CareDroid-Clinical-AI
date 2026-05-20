@@ -47,6 +47,7 @@ export const CALCULATOR_INTERFACE_CLASS_BY_SLUG = Object.freeze({
   'bisap-score': 'calculator-interface--bisap-score',
   fib4: 'calculator-interface--fib4',
   'framingham-risk': 'calculator-interface--framingham-risk',
+  abcd2: 'calculator-interface--abcd2',
 });
 
 /** Registry tool ids shown in the calculators hub chat-assisted section. */

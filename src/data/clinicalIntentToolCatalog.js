@@ -14,6 +14,8 @@ import { percChatConfig } from './chatAssistedCalculators/perc';
 import { wellsPeChatConfig } from './chatAssistedCalculators/wellsPe';
 import { copdGoldChatConfig } from './chatAssistedCalculators/copdGold';
 import { romeIvIbsChatConfig } from './chatAssistedCalculators/romeIvIbs';
+import { pecarnHeadChatConfig } from './chatAssistedCalculators/pecarnHead';
+import { nexusCSpineChatConfig } from './chatAssistedCalculators/nexusCSpine';
 import { dispatchAiChatConfig } from './chatAssistedFleet/dispatchAi';
 import { ensureChatSeedGuardrails } from './clinicalSafetyGuardrails';
 import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from './clinicalToolIdContract';
@@ -193,8 +195,43 @@ const clinicalIntentToolsRaw = [
       'HEART score for chest pain risk stratification: history, ECG, age, risk factors, troponin (0–10).',
     path: '/tools/calculators/heart-score',
     sidebarToolId: 'heart-score',
-    chatSeed:
-      'Help me calculate the HEART score for a patient with chest pain using history, ECG, age, cardiovascular risk factors, and troponin.',
+    chatSeed: `Help me calculate the HEART score for a patient with chest pain using history, ECG, age, cardiovascular risk factors, and troponin (0–10 total).
+
+STEP 0 — If the patient is hemodynamically unstable, has ongoing severe chest pain with concern for STEMI, or needs immediate resuscitation, activate emergency chest-pain / ACS pathways first. Do not delay urgent care to finish this chat.
+
+Ask about each component in turn (0, 1, or 2 points each):
+1) History suspiciousness for ACS
+2) ECG findings at presentation
+3) Age band
+4) Cardiovascular risk factors
+5) Initial troponin relative to local ULN
+
+After collecting answers, report the total HEART score, risk category (low 0–3, intermediate 4–6, high 7–10), and validation-cohort MACE context. Clearly state:
+- Clinical decision support and risk stratification only — not a diagnosis of ACS or myocardial infarction
+- Does not rule in or rule out acute coronary syndrome
+- Do not recommend specific treatment, anticoagulation, disposition, observation duration, or invasive strategy`,
+    backendExecutable: false,
+  },
+  {
+    toolId: 'abcd2',
+    toolName: 'ABCD² score',
+    category: 'calculator',
+    description:
+      'ABCD² score for short-term stroke risk after TIA: age, blood pressure, clinical features, duration, diabetes (0–7).',
+    path: '/tools/calculators/abcd2',
+    sidebarToolId: 'abcd2',
+    chatSeed: `Help me calculate the ABCD² score for a patient with a suspected transient ischemic attack (TIA).
+
+STEP 0 — If acute stroke, crescendo neurologic symptoms, or new persistent focal deficit is present, activate emergency stroke pathways immediately. Do not delay urgent evaluation, imaging, or treatment to finish this chat.
+
+Collect at the time of the TIA:
+1) Age ≥60 years
+2) Blood pressure at event (systolic and diastolic mmHg) — 1 point if SBP ≥140 or DBP ≥90
+3) Clinical features: other (0), speech disturbance without weakness (1), or unilateral weakness (2)
+4) Duration: <10 min (0), 10–59 min (1), or ≥60 min (2)
+5) Diabetes (1 point)
+
+Report total score (0–7), risk category (low 0–3, moderate 4–5, high 6–7), and validation-cohort stroke-risk context. Clearly state this is TIA/stroke risk stratification only — does not diagnose TIA or stroke and does not recommend antithrombotic therapy, admission, or imaging timing.`,
     backendExecutable: false,
   },
   {
@@ -217,8 +254,11 @@ const clinicalIntentToolsRaw = [
       'Bishop score for cervical favourability before labour induction (dilation, effacement, station, consistency, position; 0–13).',
     path: '/tools/calculators/bishop-score',
     sidebarToolId: 'bishop-score',
-    chatSeed:
-      'Help me calculate the Bishop score from cervical exam findings for induction planning.',
+    chatSeed: `Help me calculate the Bishop score from a cervical examination for labour documentation.
+
+STEP 0 — Cervical favourability documentation only. Does not recommend induction method, ripening agents, timing, or mode of delivery — follow obstetric team and institutional protocols.
+
+Collect: dilation (cm), effacement (%), fetal station, consistency, and position. Total 0–13; classic teaching uses ≥8 favourable, 6–7 intermediate, <6 unfavourable.`,
     backendExecutable: false,
   },
   {
@@ -229,8 +269,11 @@ const clinicalIntentToolsRaw = [
       'Apgar score for newborn status at 1 and 5 minutes (appearance, pulse, grimace, activity, respiration; 0–10 each).',
     path: '/tools/calculators/apgar-score',
     sidebarToolId: 'apgar-score',
-    chatSeed:
-      'Help me score Apgar components at 1 and 5 minutes for a newborn.',
+    chatSeed: `Help me score Apgar components at 1 and 5 minutes for a newborn.
+
+STEP 0 — Newborn assessment documentation only. Does not replace neonatal resuscitation algorithms (e.g. NRP) or ongoing monitoring — follow delivery-unit and pediatric protocols.
+
+Score appearance, pulse, grimace, activity, and respiration (0–2 each) at 1 and 5 minutes. Interpretation bands: 0–3 severely depressed, 4–6 moderately depressed, 7–10 reassuring.`,
     backendExecutable: false,
   },
   {
@@ -241,8 +284,11 @@ const clinicalIntentToolsRaw = [
       'Braden scale for pressure injury risk (six subscales, 6–23; lower scores = higher risk).',
     path: '/tools/calculators/braden-scale',
     sidebarToolId: 'braden-scale',
-    chatSeed:
-      'Help me complete the Braden scale subscales and interpret pressure-ulcer risk.',
+    chatSeed: `Help me complete the Braden scale for an inpatient and document pressure-injury risk.
+
+STEP 0 — This is a nursing risk screen for prevention documentation. It does not replace skin inspection, repositioning orders, support-surface selection, or wound care plans — follow your unit's pressure-injury prevention bundle.
+
+Score all six subscales (sensory perception, moisture, activity, mobility, nutrition, friction & shear). Total 6–23; lower scores indicate higher risk in validation studies.`,
     backendExecutable: false,
   },
   {
@@ -253,8 +299,11 @@ const clinicalIntentToolsRaw = [
       'Morse Fall Scale for inpatient fall risk (history, diagnoses, ambulation, IV, gait, mental status; 0–125).',
     path: '/tools/calculators/morse-fall-scale',
     sidebarToolId: 'morse-fall-scale',
-    chatSeed:
-      'Help me score the Morse Fall Scale for an inpatient and interpret fall-risk category.',
+    chatSeed: `Help me score the Morse Fall Scale for an inpatient and document fall-risk category.
+
+STEP 0 — This is a nursing fall-risk screen for documentation. It does not replace environmental safety rounds, toileting plans, bed alarms, physiotherapy referral, or provider orders — follow your unit's fall-prevention pathway.
+
+Collect: history of falling (within 3 months), secondary diagnosis, ambulatory aid, IV/heparin lock, gait, and mental status. Total 0–125; bands: low <25, moderate 25–50, high >50.`,
     backendExecutable: false,
   },
   {
@@ -277,8 +326,11 @@ const clinicalIntentToolsRaw = [
       'BISAP score for early acute pancreatitis mortality risk (BUN, mental status, SIRS, age, pleural effusion; 0–5).',
     path: '/tools/calculators/bisap-score',
     sidebarToolId: 'bisap-score',
-    chatSeed:
-      'Help me calculate the BISAP score for acute pancreatitis using BUN, mental status, SIRS, age, and pleural effusion.',
+    chatSeed: `Help me calculate the BISAP score for acute pancreatitis within 24 hours of presentation.
+
+STEP 0 — Early severity estimate for risk documentation only. Does not replace imaging for necrosis, ICU criteria, fluid resuscitation, or serial reassessment — follow institutional acute pancreatitis pathways.
+
+Check: BUN >25 mg/dL, impaired mental status, SIRS, age >60, pleural effusion on imaging. Score 0–5; higher scores correlate with higher mortality in validation cohorts.`,
     backendExecutable: false,
   },
   {
@@ -289,8 +341,11 @@ const clinicalIntentToolsRaw = [
       'FIB-4 index for liver fibrosis risk using age, AST, ALT, and platelets.',
     path: '/tools/calculators/fib4',
     sidebarToolId: 'fib4',
-    chatSeed:
-      'Help me calculate FIB-4 from age, AST, ALT, and platelet count and interpret fibrosis risk.',
+    chatSeed: `Help me calculate the FIB-4 index from age, AST, ALT, and platelet count.
+
+STEP 0 — Non-invasive fibrosis screening only. Does not diagnose cirrhosis or replace elastography, biopsy, or hepatology referral — follow local NAFLD/hepatitis staging protocols.
+
+Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). Interpretation uses age <65 vs ≥65 cutoffs (<1.3 / 1.3–2.67 / >2.67 vs <2.0 / ≥2.0).`,
     backendExecutable: false,
   },
   {
@@ -416,6 +471,26 @@ const clinicalIntentToolsRaw = [
     path: ottawaAnkleChatConfig.hubPath,
     sidebarToolId: ottawaAnkleChatConfig.registryId,
     chatSeed: ottawaAnkleChatConfig.chatSeed,
+    backendExecutable: false,
+  },
+  {
+    toolId: pecarnHeadChatConfig.toolId,
+    toolName: pecarnHeadChatConfig.name,
+    category: pecarnHeadChatConfig.category,
+    description: pecarnHeadChatConfig.description,
+    path: pecarnHeadChatConfig.hubPath,
+    sidebarToolId: pecarnHeadChatConfig.registryId,
+    chatSeed: pecarnHeadChatConfig.chatSeed,
+    backendExecutable: false,
+  },
+  {
+    toolId: nexusCSpineChatConfig.toolId,
+    toolName: nexusCSpineChatConfig.name,
+    category: nexusCSpineChatConfig.category,
+    description: nexusCSpineChatConfig.description,
+    path: nexusCSpineChatConfig.hubPath,
+    sidebarToolId: nexusCSpineChatConfig.registryId,
+    chatSeed: nexusCSpineChatConfig.chatSeed,
     backendExecutable: false,
   },
   {
@@ -620,6 +695,16 @@ export const nluCalculatorHubOnly = [
     toolId: ottawaAnkleChatConfig.toolId,
     name: ottawaAnkleChatConfig.name,
     hubPath: ottawaAnkleChatConfig.hubPath,
+  },
+  {
+    toolId: pecarnHeadChatConfig.toolId,
+    name: pecarnHeadChatConfig.name,
+    hubPath: pecarnHeadChatConfig.hubPath,
+  },
+  {
+    toolId: nexusCSpineChatConfig.toolId,
+    name: nexusCSpineChatConfig.name,
+    hubPath: nexusCSpineChatConfig.hubPath,
   },
   {
     toolId: copdGoldChatConfig.toolId,
@@ -853,6 +938,15 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/framingham-risk',
     calcQuery: '/tools/calculators?calc=framingham-risk',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (framinghamRiskCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'abcd2',
+    name: 'ABCD² score',
+    description: 'TIA short-term stroke risk (age, BP, clinical features, duration, diabetes; 0–7).',
+    path: '/tools/calculators/abcd2',
+    calcQuery: '/tools/calculators?calc=abcd2',
+    implementation: 'Client-side in abcd2Calculator.jsx (abcd2Calculator.js)',
     orchestratorId: null,
   },
   {

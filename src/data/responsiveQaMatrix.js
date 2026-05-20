@@ -90,6 +90,7 @@ export const TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.auditC]: '/tools/calculators/audit-c',
   [REGISTRY.phq9]: '/tools/calculators/phq9',
   [REGISTRY.gad7]: '/tools/calculators/gad7',
+  [REGISTRY.abcd2]: '/tools/calculators/abcd2',
 });
 
 const TIER_B_LAUNCH_PATH = '/tools/calculators';
@@ -103,6 +104,8 @@ const TIER_B_LABEL_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.ottawaAnkle]: 'Ottawa Ankle',
   [REGISTRY.copdGold]: 'COPD GOLD',
   [REGISTRY.romeIvIbs]: 'Rome IV IBS',
+  [REGISTRY.pecarnHead]: 'PECARN head injury',
+  [REGISTRY.nexusCspine]: 'NEXUS C-Spine',
   [REGISTRY.dispatchAi]: 'Dispatch Intelligence Assistant',
 });
 

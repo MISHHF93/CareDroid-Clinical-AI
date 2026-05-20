@@ -71,11 +71,14 @@ describe('clinicalSafetyGuardrails — mental health', () => {
 });
 
 describe('clinicalSafetyGuardrails — PE / ACS', () => {
-  it.each(['wells-pe', 'perc', 'grace-acs'])('%s avoids diagnostic certainty in chat seed', (id) => {
-    const seed = resolveCatalogLaunch(id).chatSeed || '';
-    expect(seed).not.toMatch(SAFETY_AUDIT_PATTERNS.PE_ACS_CERTAINTY_FORBIDDEN_RE);
-    expect(seed).toMatch(SAFETY_AUDIT_PATTERNS.PE_ACS_GUARDRAIL_RE);
-  });
+  it.each(['wells-pe', 'perc', 'grace-acs', 'heart-score', 'timi-ua-nstemi'])(
+    '%s avoids diagnostic certainty in chat seed',
+    (id) => {
+      const seed = resolveCatalogLaunch(id).chatSeed || '';
+      expect(seed).not.toMatch(SAFETY_AUDIT_PATTERNS.PE_ACS_CERTAINTY_FORBIDDEN_RE);
+      expect(seed).toMatch(SAFETY_AUDIT_PATTERNS.PE_ACS_GUARDRAIL_RE);
+    }
+  );
 });
 
 describe('clinicalSafetyGuardrails — anticoagulation', () => {
@@ -148,7 +151,7 @@ describe('clinicalSafetyGuardrails — Tier B hub tools', () => {
 });
 
 describe('clinicalSafetyGuardrails — PR3 stroke and trauma', () => {
-  it.each(['nihss', 'canadian-c-spine', 'ottawa-ankle'])(
+  it.each(['nihss', 'canadian-c-spine', 'nexus-cspine', 'ottawa-ankle', 'pecarn-head'])(
     '%s chat seed includes urgent-care warning',
     (id) => {
       const seed = resolveCatalogLaunch(id).chatSeed || '';
@@ -173,6 +176,28 @@ describe('clinicalSafetyGuardrails — PR3 stroke and trauma', () => {
     expect(seed).toMatch(/neurovascular compromise/i);
     expect(seed).toMatch(/open fracture/i);
     expect(seed).toMatch(/gross deformity/i);
+  });
+
+  it('NEXUS C-Spine seed does not claim cervical spine clearance', () => {
+    const seed = resolveCatalogLaunch('nexus-cspine').chatSeed || '';
+    expect(seed).toMatch(/does not "clear" the cervical spine/i);
+    expect(seed).toMatch(/Trauma imaging decision support/i);
+    expect(seed).not.toMatch(/\bcleared the cervical spine\b/i);
+  });
+
+  it('ABCD² seed includes stroke urgent-care warning', () => {
+    const seed = resolveCatalogLaunch('abcd2').chatSeed || '';
+    expect(seed).toMatch(/do not delay urgent/i);
+    expect(seed).toMatch(/emergency stroke pathways/i);
+    expect(seed).not.toMatch(/\bprescribe anticoagul/i);
+  });
+
+  it('PECARN Head seed does not mandate or defer CT', () => {
+    const seed = resolveCatalogLaunch('pecarn-head').chatSeed || '';
+    expect(seed).toMatch(/does not recommend for or against head CT/i);
+    expect(seed).toMatch(/Do not override clinician judgment/i);
+    expect(seed).not.toMatch(/\bct is not needed\b/i);
+    expect(seed).not.toMatch(/\bno ct required\b/i);
   });
 });
 

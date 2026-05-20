@@ -18,21 +18,26 @@ import {
 } from '../../utils/centorMcisaacCalculator';
 import {
   BISHOP_DIMENSIONS_META,
+  BISHOP_OBSTETRIC_DISCLAIMER,
   calculateBishopScore,
   interpretBishopScore,
 } from '../../utils/bishopScoreCalculator';
 import {
   APGAR_COMPONENTS_META,
+  APGAR_OBSTETRIC_DISCLAIMER,
   calculateApgarScore,
   interpretApgarScore,
+  validateApgarMinuteInputs,
 } from '../../utils/apgarScoreCalculator';
 import {
   BRADEN_DIMENSIONS_META,
+  BRADEN_HOSPITAL_DISCLAIMER,
   calculateBradenScore,
   interpretBradenScore,
 } from '../../utils/bradenScaleCalculator';
 import {
   MORSE_DIMENSIONS_META,
+  MORSE_FALL_HOSPITAL_DISCLAIMER,
   calculateMorseFallScore,
   interpretMorseFallScore,
 } from '../../utils/morseFallScaleCalculator';
@@ -44,10 +49,12 @@ import {
 } from '../../utils/ransonCriteriaCalculator';
 import {
   BISAP_CRITERIA_META,
+  BISAP_SAFETY_DISCLAIMER,
   calculateBisapScore,
   interpretBisapScore,
 } from '../../utils/bisapScoreCalculator';
 import {
+  FIB4_SAFETY_DISCLAIMER,
   calculateFib4,
   interpretFib4,
   validateFib4Inputs,
@@ -116,9 +123,17 @@ function CalcInterpretationRegion({ headingId, title, severity, emphasizeRisk, c
   );
 }
 
-function CalcResultsPanel({ id, resultsRef, children }) {
+function CalcResultsPanel({ id, resultsRef, children, ariaLabel, ariaLive = 'off' }) {
   return (
-    <div className="calculator-results" id={id} ref={resultsRef} tabIndex={-1}>
+    <div
+      className="calculator-results"
+      id={id}
+      ref={resultsRef}
+      tabIndex={-1}
+      role="region"
+      aria-label={ariaLabel}
+      aria-live={ariaLive}
+    >
       {children}
     </div>
   );
@@ -146,6 +161,11 @@ function SelectDimensionCalculator({
   onResultChange,
   resultPayload,
   disclaimerNote,
+  fieldsetLegend = 'Criteria',
+  scoreDisplayLabel = 'Score',
+  calculateAriaLabel,
+  resetAriaLabel,
+  resultsRegionLabel,
 }) {
   const icon = getCalculatorSubIcon(slug);
   const resultsRef = useRef(null);
@@ -181,6 +201,9 @@ function SelectDimensionCalculator({
   };
 
   const headingId = `${slug}-interpretation-heading`;
+  const calcButtonLabel = calculateAriaLabel ?? `Calculate ${title}`;
+  const resetButtonLabel = resetAriaLabel ?? `Reset ${title} form`;
+  const resultsLabel = resultsRegionLabel ?? `${title} results`;
 
   return (
     <div className={`calculator-interface calculator-interface--${slug}`}>
@@ -206,9 +229,13 @@ function SelectDimensionCalculator({
           }}
         >
           <fieldset className="calc-timi-fieldset">
-            <legend className="calc-timi-legend">Criteria</legend>
+            <legend className="calc-timi-legend">{fieldsetLegend}</legend>
             {dimensionsMeta.map((dim) => {
               const id = `${slug}-${dim.key}`;
+              const selected = dim.options.find((o) => String(o.value) === inputs[dim.key]);
+              const selectAriaLabel = selected
+                ? `${dim.label}: ${selected.label}`
+                : dim.label;
               return (
                 <div key={dim.key} className="calc-form-group calc-timi-row">
                   <label htmlFor={id} className="calc-label">
@@ -225,6 +252,7 @@ function SelectDimensionCalculator({
                     value={inputs[dim.key]}
                     onChange={(e) => setInputs((p) => ({ ...p, [dim.key]: e.target.value }))}
                     aria-describedby={dim.help ? `${id}-help` : undefined}
+                    aria-label={selectAriaLabel}
                   >
                     {dim.options.map((opt) => (
                       <option key={opt.value} value={String(opt.value)}>
@@ -237,22 +265,27 @@ function SelectDimensionCalculator({
             })}
           </fieldset>
           <div className="calc-actions">
-            <button type="submit" className="calc-calculate-btn">
+            <button type="submit" className="calc-calculate-btn" aria-label={calcButtonLabel}>
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
               Calculate
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset}>
+            <button type="button" className="calc-reset-btn" onClick={reset} aria-label={resetButtonLabel}>
               Reset
             </button>
           </div>
         </form>
       </div>
-      <CalcResultsPanel id={`calc-results-${slug}`} resultsRef={resultsRef}>
+      <CalcResultsPanel
+        id={`calc-results-${slug}`}
+        resultsRef={resultsRef}
+        ariaLabel={resultsLabel}
+        ariaLive={result ? 'polite' : 'off'}
+      >
         <ResultsPanelTitle />
         {result ? (
           <>
             <div className={`calc-score-display ${result.severity}`}>
-              <div className="calc-score-label">Score</div>
+              <div className="calc-score-label">{scoreDisplayLabel}</div>
               <div className="calc-score-value">{result.total}</div>
               <div className="calc-score-interpretation">{maxScoreLabel}</div>
             </div>
@@ -262,6 +295,11 @@ function SelectDimensionCalculator({
               severity={result.severity}
               emphasizeRisk={result.severity === 'critical'}
             >
+              {result.riskCategoryLabel ? (
+                <div className="calc-interpretation-text calc-interpretation-text--emphasis">
+                  Risk category: {result.riskCategoryLabel}
+                </div>
+              ) : null}
               <div className="calc-interpretation-text">{result.riskBand}</div>
               {result.maceContext ? (
                 <div className="calc-interpretation-text calc-interpretation-text--secondary">{result.maceContext}</div>
@@ -315,6 +353,12 @@ function CriterionCheckboxCalculator({
   onResultChange,
   resultPayload,
   extraFields,
+  disclaimerNote,
+  fieldsetLegend = 'Criteria (check all that apply)',
+  scoreDisplayLabel = 'Score',
+  calculateAriaLabel,
+  resetAriaLabel,
+  resultsRegionLabel,
 }) {
   const icon = getCalculatorSubIcon(slug);
   const resultsRef = useRef(null);
@@ -351,6 +395,9 @@ function CriterionCheckboxCalculator({
   };
 
   const headingId = `${slug}-interpretation-heading`;
+  const calcButtonLabel = calculateAriaLabel ?? `Calculate ${title}`;
+  const resetButtonLabel = resetAriaLabel ?? `Reset ${title} form`;
+  const resultsLabel = resultsRegionLabel ?? `${title} results`;
 
   return (
     <div className={`calculator-interface calculator-interface--${slug}`}>
@@ -358,7 +405,14 @@ function CriterionCheckboxCalculator({
         <CalcPanelTitle icon={icon}>
           <span id={`${slug}-form-title`}>{title}</span>
         </CalcPanelTitle>
-        <CalcDecisionSupportLead />
+        {disclaimerNote ? (
+          <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
+            <CalcDecisionSupportLead />
+            <p className="calc-disclaimer-detail">{disclaimerNote}</p>
+          </div>
+        ) : (
+          <CalcDecisionSupportLead />
+        )}
         <form
           className="calc-pr1-form"
           noValidate
@@ -370,7 +424,7 @@ function CriterionCheckboxCalculator({
         >
           {extraFields?.render?.({ extra, setExtra })}
           <fieldset className="calc-timi-fieldset calc-has-bled-fieldset">
-            <legend className="calc-timi-legend">Criteria (check all that apply)</legend>
+            <legend className="calc-timi-legend">{fieldsetLegend}</legend>
             <div className="calc-timi-criteria calc-has-bled-criteria">
               {criteriaMeta.map((row) => {
                 const id = `${slug}-${row.key}`;
@@ -398,22 +452,27 @@ function CriterionCheckboxCalculator({
             </div>
           </fieldset>
           <div className="calc-actions">
-            <button type="submit" className="calc-calculate-btn">
+            <button type="submit" className="calc-calculate-btn" aria-label={calcButtonLabel}>
               <NavIcon icon={CHROME_ICONS.calculator} size={20} aria-hidden />
               Calculate
             </button>
-            <button type="button" className="calc-reset-btn" onClick={reset}>
+            <button type="button" className="calc-reset-btn" onClick={reset} aria-label={resetButtonLabel}>
               Reset
             </button>
           </div>
         </form>
       </div>
-      <CalcResultsPanel id={`calc-results-${slug}`} resultsRef={resultsRef}>
+      <CalcResultsPanel
+        id={`calc-results-${slug}`}
+        resultsRef={resultsRef}
+        ariaLabel={resultsLabel}
+        ariaLive={result ? 'polite' : 'off'}
+      >
         <ResultsPanelTitle />
         {result ? (
           <>
             <div className={`calc-score-display ${result.severity}`}>
-              <div className="calc-score-label">Score</div>
+              <div className="calc-score-label">{scoreDisplayLabel}</div>
               <div className="calc-score-value">{result.total}</div>
               <div className="calc-score-interpretation">{maxScoreLabel}</div>
             </div>
@@ -423,6 +482,11 @@ function CriterionCheckboxCalculator({
               severity={result.severity}
               emphasizeRisk={result.severity === 'critical'}
             >
+              {result.riskCategoryLabel ? (
+                <div className="calc-interpretation-text calc-interpretation-text--emphasis">
+                  Risk category: {result.riskCategoryLabel}
+                </div>
+              ) : null}
               <div className="calc-interpretation-text">{result.riskBand}</div>
               {result.strepProbability || result.mortalityContext ? (
                 <div className="calc-interpretation-text calc-interpretation-text--secondary">
@@ -430,6 +494,11 @@ function CriterionCheckboxCalculator({
                 </div>
               ) : null}
               <div className="calc-interpretation-text">{result.interpretation}</div>
+              {result.disclaimer ? (
+                <div className="calc-interpretation-text calc-interpretation-text--secondary">
+                  {result.disclaimer}
+                </div>
+              ) : null}
             </CalcInterpretationRegion>
             <div className="calc-references">
               <div className="calc-references-title">Reference</div>
@@ -460,8 +529,13 @@ export function HeartScoreCalculator({ onResultChange }) {
       interpret={interpretHeartScore}
       maxScoreLabel="of 10 points"
       onResultChange={onResultChange}
-      resultPayload={(r) => ({ heartScore: r.total, severity: r.severity, riskBand: r.riskBand })}
-      disclaimerNote="For acute chest pain in the ED — estimates 6-week MACE risk; does not diagnose ACS or direct therapy."
+      resultPayload={(r) => ({
+        heartScore: r.total,
+        severity: r.severity,
+        riskCategory: r.riskCategory,
+        riskBand: r.riskBand,
+      })}
+      disclaimerNote="Chest pain risk stratification only (0–10). Estimates 6-week MACE risk from validation cohorts; does not diagnose ACS or recommend treatment or disposition."
     />
   );
 }
@@ -520,8 +594,18 @@ export function BishopScoreCalculator({ onResultChange }) {
       calculate={calculateBishopScore}
       interpret={interpretBishopScore}
       maxScoreLabel="of 13 points"
+      disclaimerNote={BISHOP_OBSTETRIC_DISCLAIMER}
+      fieldsetLegend="Cervical examination (labour induction favourability)"
+      scoreDisplayLabel="Bishop total score"
+      calculateAriaLabel="Calculate Bishop score from cervical exam"
+      resetAriaLabel="Reset Bishop score form"
+      resultsRegionLabel="Bishop score results"
       onResultChange={onResultChange}
-      resultPayload={(r) => ({ bishopScore: r.total, severity: r.severity })}
+      resultPayload={(r) => ({
+        bishopScore: r.total,
+        severity: r.severity,
+        riskCategory: r.riskCategory,
+      })}
     />
   );
 }
@@ -535,8 +619,18 @@ export function BradenScaleCalculator({ onResultChange }) {
       calculate={calculateBradenScore}
       interpret={interpretBradenScore}
       maxScoreLabel="of 23 (lower = higher risk)"
+      disclaimerNote={BRADEN_HOSPITAL_DISCLAIMER}
+      fieldsetLegend="Braden subscales (inpatient pressure-injury risk)"
+      scoreDisplayLabel="Braden total score"
+      calculateAriaLabel="Calculate Braden scale total score"
+      resetAriaLabel="Reset Braden scale form"
+      resultsRegionLabel="Braden scale results"
       onResultChange={onResultChange}
-      resultPayload={(r) => ({ bradenScore: r.total, severity: r.severity })}
+      resultPayload={(r) => ({
+        bradenScore: r.total,
+        severity: r.severity,
+        riskCategory: r.riskCategory,
+      })}
     />
   );
 }
@@ -550,8 +644,18 @@ export function MorseFallScaleCalculator({ onResultChange }) {
       calculate={calculateMorseFallScore}
       interpret={interpretMorseFallScore}
       maxScoreLabel="of 125 points"
+      disclaimerNote={MORSE_FALL_HOSPITAL_DISCLAIMER}
+      fieldsetLegend="Morse fall-risk items (inpatient nursing assessment)"
+      scoreDisplayLabel="Morse total score"
+      calculateAriaLabel="Calculate Morse Fall Scale total score"
+      resetAriaLabel="Reset Morse Fall Scale form"
+      resultsRegionLabel="Morse Fall Scale results"
       onResultChange={onResultChange}
-      resultPayload={(r) => ({ morseScore: r.total, severity: r.severity })}
+      resultPayload={(r) => ({
+        morseScore: r.total,
+        severity: r.severity,
+        riskCategory: r.riskCategory,
+      })}
     />
   );
 }
@@ -565,8 +669,18 @@ export function BisapScoreCalculator({ onResultChange }) {
       calculate={calculateBisapScore}
       interpret={interpretBisapScore}
       maxScoreLabel="of 5 points"
+      disclaimerNote={BISAP_SAFETY_DISCLAIMER}
+      fieldsetLegend="BISAP criteria within 24 hours of presentation"
+      scoreDisplayLabel="BISAP score"
+      calculateAriaLabel="Calculate BISAP score"
+      resetAriaLabel="Reset BISAP score form"
+      resultsRegionLabel="BISAP score results"
       onResultChange={onResultChange}
-      resultPayload={(r) => ({ bisapScore: r.total, severity: r.severity })}
+      resultPayload={(r) => ({
+        bisapScore: r.total,
+        severity: r.severity,
+        riskCategory: r.riskCategory,
+      })}
     />
   );
 }
@@ -577,6 +691,7 @@ export function ApgarScoreCalculator({ onResultChange }) {
   const resultsRef = useRef(null);
   const [minute1, setMinute1] = useState(() => defaultSelectInputs(APGAR_COMPONENTS_META));
   const [minute5, setMinute5] = useState(() => defaultSelectInputs(APGAR_COMPONENTS_META));
+  const [validationErrors, setValidationErrors] = useState([]);
   const [result, setResult] = useState(null);
 
   useEffect(() => {
@@ -587,6 +702,7 @@ export function ApgarScoreCalculator({ onResultChange }) {
               apgar1: result.score1,
               apgar5: result.score5,
               severity: result.severity5,
+              riskCategory: result.riskCategory,
             }
           : null
       );
@@ -597,9 +713,13 @@ export function ApgarScoreCalculator({ onResultChange }) {
     if (result) scrollResultsIntoView(resultsRef.current);
   }, [result]);
 
-  const renderMinute = (label, inputs, setInputs, prefix) =>
+  const renderMinute = (inputs, setInputs, prefix) =>
     APGAR_COMPONENTS_META.map((comp) => {
       const id = `${prefix}-${comp.key}`;
+      const selected = comp.options.find((o) => String(o.value) === inputs[comp.key]);
+      const selectAriaLabel = selected
+        ? `${comp.label}: ${selected.label}`
+        : comp.label;
       return (
         <div key={comp.key} className="calc-form-group calc-timi-row">
           <label htmlFor={id} className="calc-label">
@@ -610,6 +730,7 @@ export function ApgarScoreCalculator({ onResultChange }) {
             className="calc-select"
             value={inputs[comp.key]}
             onChange={(e) => setInputs((p) => ({ ...p, [comp.key]: e.target.value }))}
+            aria-label={selectAriaLabel}
           >
             {comp.options.map((opt) => (
               <option key={opt.value} value={String(opt.value)}>
@@ -622,16 +743,40 @@ export function ApgarScoreCalculator({ onResultChange }) {
     });
 
   const runCalculate = () => {
+    const v1 = validateApgarMinuteInputs(minute1);
+    const v5 = validateApgarMinuteInputs(minute5);
+    const errors = [...v1.errors, ...v5.errors.map((e) => `5 minutes — ${e}`)];
+    setValidationErrors(errors);
+    if (!v1.valid || !v5.valid) {
+      setResult(null);
+      return;
+    }
+
     const n1 = Object.fromEntries(Object.entries(minute1).map(([k, v]) => [k, Number(v)]));
     const n5 = Object.fromEntries(Object.entries(minute5).map(([k, v]) => [k, Number(v)]));
     const score1 = calculateApgarScore(n1);
     const score5 = calculateApgarScore(n5);
-    const interp5 = interpretApgarScore(score5);
-    if (!interp5) {
+    const interp1 = interpretApgarScore(score1, { timingLabel: '1 minute' });
+    const interp5 = interpretApgarScore(score5, { timingLabel: '5 minutes' });
+    if (!interp5 || !interp1) {
       setResult(null);
       return;
     }
-    setResult({ score1, score5, interp1: interpretApgarScore(score1), ...interp5, severity5: interp5.severity });
+    setResult({
+      score1,
+      score5,
+      interp1,
+      ...interp5,
+      severity5: interp5.severity,
+      riskCategory: interp5.riskCategory,
+    });
+  };
+
+  const reset = () => {
+    setMinute1(defaultSelectInputs(APGAR_COMPONENTS_META));
+    setMinute5(defaultSelectInputs(APGAR_COMPONENTS_META));
+    setValidationErrors([]);
+    setResult(null);
   };
 
   return (
@@ -640,53 +785,74 @@ export function ApgarScoreCalculator({ onResultChange }) {
         <CalcPanelTitle icon={icon}>
           <span id="apgar-form-title">Apgar score</span>
         </CalcPanelTitle>
-        <CalcDecisionSupportLead />
+        <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
+          <CalcDecisionSupportLead />
+          <p className="calc-disclaimer-detail">{APGAR_OBSTETRIC_DISCLAIMER}</p>
+        </div>
         <form
           className="calc-pr1-form"
           noValidate
+          aria-labelledby="apgar-form-title"
           onSubmit={(e) => {
             e.preventDefault();
             runCalculate();
           }}
         >
+          {validationErrors.length ? (
+            <div className="calc-error-summary" role="alert" aria-live="polite">
+              <ul>
+                {validationErrors.map((err) => (
+                  <li key={err}>{err}</li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
           <fieldset className="calc-timi-fieldset">
-            <legend className="calc-timi-legend">1 minute</legend>
-            {renderMinute('1 min', minute1, setMinute1, 'apgar-1')}
+            <legend className="calc-timi-legend">Apgar at 1 minute (newborn assessment)</legend>
+            {renderMinute(minute1, setMinute1, 'apgar-1')}
           </fieldset>
           <fieldset className="calc-timi-fieldset">
-            <legend className="calc-timi-legend">5 minutes</legend>
-            {renderMinute('5 min', minute5, setMinute5, 'apgar-5')}
+            <legend className="calc-timi-legend">Apgar at 5 minutes (newborn reassessment)</legend>
+            {renderMinute(minute5, setMinute5, 'apgar-5')}
           </fieldset>
           <div className="calc-actions">
-            <button type="submit" className="calc-calculate-btn">
+            <button
+              type="submit"
+              className="calc-calculate-btn"
+              aria-label="Calculate Apgar scores at 1 and 5 minutes"
+            >
               Calculate Apgar
             </button>
             <button
               type="button"
               className="calc-reset-btn"
-              onClick={() => {
-                setMinute1(defaultSelectInputs(APGAR_COMPONENTS_META));
-                setMinute5(defaultSelectInputs(APGAR_COMPONENTS_META));
-                setResult(null);
-              }}
+              aria-label="Reset Apgar score form"
+              onClick={reset}
             >
               Reset
             </button>
           </div>
         </form>
       </div>
-      <CalcResultsPanel id="calc-results-apgar-score" resultsRef={resultsRef}>
+      <CalcResultsPanel
+        id="calc-results-apgar-score"
+        resultsRef={resultsRef}
+        ariaLabel="Apgar score results"
+        ariaLive={result ? 'polite' : 'off'}
+      >
         <ResultsPanelTitle />
         {result ? (
           <>
             <div className="calc-score-display-row">
               <div className={`calc-score-display ${result.interp1?.severity ?? 'normal'}`}>
-                <div className="calc-score-label">1 min</div>
+                <div className="calc-score-label">1 minute</div>
                 <div className="calc-score-value">{result.score1}</div>
+                <div className="calc-score-interpretation">{result.interp1?.riskBand}</div>
               </div>
               <div className={`calc-score-display ${result.severity}`}>
-                <div className="calc-score-label">5 min</div>
+                <div className="calc-score-label">5 minutes</div>
                 <div className="calc-score-value">{result.score5}</div>
+                <div className="calc-score-interpretation">{result.riskBand}</div>
               </div>
             </div>
             <CalcInterpretationRegion
@@ -695,15 +861,35 @@ export function ApgarScoreCalculator({ onResultChange }) {
               severity={result.severity}
               emphasizeRisk={result.severity === 'critical'}
             >
-              <div className="calc-interpretation-text">{result.riskBand} at 5 minutes</div>
-              <div className="calc-interpretation-text">{result.interpretation}</div>
+              {result.riskCategoryLabel ? (
+                <div className="calc-interpretation-text calc-interpretation-text--emphasis">
+                  Risk category (5 min): {result.riskCategoryLabel}
+                </div>
+              ) : null}
+              <div className="calc-interpretation-text">
+                1 minute: {result.score1} - {result.interp1?.interpretation}
+              </div>
+              <div className="calc-interpretation-text">
+                5 minutes: {result.score5} - {result.interpretation}
+              </div>
+              {result.disclaimer ? (
+                <div className="calc-interpretation-text calc-interpretation-text--secondary">
+                  {result.disclaimer}
+                </div>
+              ) : null}
             </CalcInterpretationRegion>
+            <div className="calc-references">
+              <div className="calc-references-title">Reference</div>
+              <ul className="calc-references-list">
+                <li>{result.referenceLine}</li>
+              </ul>
+            </div>
             <CalcResultSafetyFooter />
           </>
         ) : (
           <div className="calc-results-empty">
             <CalcResultsEmptyIcon icon={icon} />
-            <p>Score 1- and 5-minute components</p>
+            <p>Score appearance, pulse, grimace, activity, and respiration at 1 and 5 minutes</p>
           </div>
         )}
       </CalcResultsPanel>
@@ -828,7 +1014,11 @@ export function Fib4Calculator({ onResultChange }) {
 
   useEffect(() => {
     if (onResultChange) {
-      onResultChange(result ? { fib4: result.index, severity: result.severity } : null);
+      onResultChange(
+        result
+          ? { fib4: result.index, severity: result.severity, riskCategory: result.riskCategory }
+          : null
+      );
     }
   }, [onResultChange, result]);
 
@@ -837,9 +1027,9 @@ export function Fib4Calculator({ onResultChange }) {
   }, [result]);
 
   const runCalculate = () => {
-    const errors = validateFib4Inputs({ ageYears, astUPerL, altUPerL, platelets10e9PerL });
+    const { valid, errors } = validateFib4Inputs({ ageYears, astUPerL, altUPerL, platelets10e9PerL });
     setValidationErrors(errors);
-    if (errors.length) {
+    if (!valid) {
       setResult(null);
       return;
     }
@@ -859,17 +1049,21 @@ export function Fib4Calculator({ onResultChange }) {
         <CalcPanelTitle icon={icon}>
           <span id="fib4-form-title">FIB-4 index</span>
         </CalcPanelTitle>
-        <CalcDecisionSupportLead />
+        <div className="calc-timi-disclaimer calc-has-bled-disclaimer" role="note">
+          <CalcDecisionSupportLead />
+          <p className="calc-disclaimer-detail">{FIB4_SAFETY_DISCLAIMER}</p>
+        </div>
         <form
           className="calc-pr1-form"
           noValidate
+          aria-labelledby="fib4-form-title"
           onSubmit={(e) => {
             e.preventDefault();
             runCalculate();
           }}
         >
           {validationErrors.length ? (
-            <div className="calc-error-summary" role="alert">
+            <div className="calc-error-summary" role="alert" aria-live="polite">
               <ul>
                 {validationErrors.map((err) => (
                   <li key={err}>{err}</li>
@@ -884,10 +1078,16 @@ export function Fib4Calculator({ onResultChange }) {
             <input
               id="fib4-age"
               type="number"
+              min={18}
+              max={120}
               className="calc-input"
               value={ageYears}
               onChange={(e) => setAgeYears(e.target.value)}
+              aria-describedby="fib4-age-help"
             />
+            <span className="calc-input-help" id="fib4-age-help">
+              Patient age in years (18–120).
+            </span>
           </div>
           <div className="calc-form-group">
             <label htmlFor="fib4-ast" className="calc-label">
@@ -896,10 +1096,16 @@ export function Fib4Calculator({ onResultChange }) {
             <input
               id="fib4-ast"
               type="number"
+              min={1}
+              max={10000}
               className="calc-input"
               value={astUPerL}
               onChange={(e) => setAstUPerL(e.target.value)}
+              aria-describedby="fib4-ast-help"
             />
+            <span className="calc-input-help" id="fib4-ast-help">
+              Aspartate aminotransferase in U/L.
+            </span>
           </div>
           <div className="calc-form-group">
             <label htmlFor="fib4-alt" className="calc-label">
@@ -908,10 +1114,16 @@ export function Fib4Calculator({ onResultChange }) {
             <input
               id="fib4-alt"
               type="number"
+              min={1}
+              max={10000}
               className="calc-input"
               value={altUPerL}
               onChange={(e) => setAltUPerL(e.target.value)}
+              aria-describedby="fib4-alt-help"
             />
+            <span className="calc-input-help" id="fib4-alt-help">
+              Alanine aminotransferase in U/L.
+            </span>
           </div>
           <div className="calc-form-group">
             <label htmlFor="fib4-plt" className="calc-label">
@@ -920,23 +1132,54 @@ export function Fib4Calculator({ onResultChange }) {
             <input
               id="fib4-plt"
               type="number"
+              min={1}
+              max={2000}
               className="calc-input"
               value={platelets10e9PerL}
               onChange={(e) => setPlatelets10e9PerL(e.target.value)}
+              aria-describedby="fib4-plt-help"
             />
+            <span className="calc-input-help" id="fib4-plt-help">
+              Platelet count in ×10⁹/L (same as 10³/µL).
+            </span>
           </div>
           <div className="calc-actions">
-            <button type="submit" className="calc-calculate-btn">
+            <button
+              type="submit"
+              className="calc-calculate-btn"
+              aria-label="Calculate FIB-4 index from entered labs"
+            >
               Calculate FIB-4
+            </button>
+            <button
+              type="button"
+              className="calc-reset-btn"
+              aria-label="Reset FIB-4 form"
+              onClick={() => {
+                setAgeYears('');
+                setAstUPerL('');
+                setAltUPerL('');
+                setPlatelets10e9PerL('');
+                setValidationErrors([]);
+                setResult(null);
+              }}
+            >
+              Reset
             </button>
           </div>
         </form>
       </div>
-      <CalcResultsPanel id="calc-results-fib4" resultsRef={resultsRef}>
+      <CalcResultsPanel
+        id="calc-results-fib4"
+        resultsRef={resultsRef}
+        ariaLabel="FIB-4 index results"
+        ariaLive={result ? 'polite' : 'off'}
+      >
         <ResultsPanelTitle />
         {result ? (
           <>
             <div className={`calc-score-display ${result.severity}`}>
+              <div className="calc-score-label">FIB-4 index</div>
               <div className="calc-score-value">{result.index}</div>
             </div>
             <CalcInterpretationRegion
@@ -945,15 +1188,31 @@ export function Fib4Calculator({ onResultChange }) {
               severity={result.severity}
               emphasizeRisk={result.severity === 'critical'}
             >
+              {result.riskCategoryLabel ? (
+                <div className="calc-interpretation-text calc-interpretation-text--emphasis">
+                  Risk category: {result.riskCategoryLabel}
+                </div>
+              ) : null}
               <div className="calc-interpretation-text">{result.riskBand}</div>
               <div className="calc-interpretation-text">{result.interpretation}</div>
+              {result.disclaimer ? (
+                <div className="calc-interpretation-text calc-interpretation-text--secondary">
+                  {result.disclaimer}
+                </div>
+              ) : null}
             </CalcInterpretationRegion>
+            <div className="calc-references">
+              <div className="calc-references-title">Reference</div>
+              <ul className="calc-references-list">
+                <li>{result.referenceLine}</li>
+              </ul>
+            </div>
             <CalcResultSafetyFooter />
           </>
         ) : (
           <div className="calc-results-empty">
             <CalcResultsEmptyIcon icon={icon} />
-            <p>Enter labs and age</p>
+            <p>Enter age and labs in conventional units, then calculate</p>
           </div>
         )}
       </CalcResultsPanel>

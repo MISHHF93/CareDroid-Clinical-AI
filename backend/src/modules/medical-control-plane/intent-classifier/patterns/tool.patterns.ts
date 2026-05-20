@@ -356,7 +356,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   },
   {
     toolId: 'heart-score',
-    toolName: 'HEART score (chest pain)',
+    toolName: 'HEART score',
     keywords: [
       'heart score',
       'heart-score',
@@ -370,6 +370,31 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     requiredParameters: [],
     optionalParameters: ['history', 'ecg', 'age', 'risk_factors', 'troponin'],
     description: 'HEART score for ED chest pain risk stratification (0–10)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'abcd2',
+    toolName: 'ABCD² score',
+    keywords: [
+      'abcd2',
+      'abcd²',
+      'abcd squared',
+      'abcd score',
+      'abcd2 score',
+      'tia risk',
+      'tia stroke risk',
+      'stroke risk after tia',
+      'transient ischemic attack score',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'age',
+      'blood_pressure',
+      'clinical_features',
+      'duration',
+      'diabetes',
+    ],
+    description: 'ABCD² score for short-term stroke risk after TIA (0–7)',
     category: 'calculator',
   },
   {
@@ -453,10 +478,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     toolName: 'Morse Fall Scale',
     keywords: [
       'morse fall',
+      'morse-fall',
       'morse fall scale',
       'fall risk score',
       'inpatient fall risk',
       'hospital fall scale',
+      'nursing fall assessment',
       'morse score',
     ],
     requiredParameters: [],
@@ -473,7 +500,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   },
   {
     toolId: 'ranson-criteria',
-    toolName: 'Ranson criteria (pancreatitis)',
+    toolName: 'Ranson criteria',
     keywords: [
       'ranson',
       'ranson criteria',
@@ -488,7 +515,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   },
   {
     toolId: 'bisap-score',
-    toolName: 'BISAP score (pancreatitis)',
+    toolName: 'BISAP score',
     keywords: [
       'bisap',
       'bisap score',
@@ -861,6 +888,64 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     ],
     description:
       'Ottawa ankle and foot rules for radiography after acute ankle/foot injury (chat-assisted)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'pecarn-head',
+    toolName: 'PECARN Head Injury Rule',
+    keywords: [
+      'pecarn',
+      'pecarn head',
+      'pecarn head injury',
+      'pecarn rule',
+      'pediatric head injury',
+      'pediatric head ct',
+      'pediatric head trauma',
+      'child head injury',
+      'child head trauma',
+      'child head trauma ct',
+      'pediatric head injury rule',
+      'head ct decision child',
+      'minor head trauma child',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'age_category',
+      'mental_status',
+      'loss_of_consciousness',
+      'vomiting',
+      'severe_mechanism',
+      'skull_fracture_signs',
+    ],
+    description:
+      'PECARN pediatric head injury rule for CT decision support after minor blunt head trauma (chat-assisted)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'nexus-cspine',
+    toolName: 'NEXUS C-Spine Rule',
+    keywords: [
+      'nexus',
+      'nexus c spine',
+      'nexus c-spine',
+      'nexus criteria',
+      'nexus cervical spine',
+      'nexus c-spine rule',
+      'c spine nexus',
+      'cervical spine nexus',
+      'cervical spine imaging nexus',
+      'neck trauma nexus',
+    ],
+    requiredParameters: [],
+    optionalParameters: [
+      'midline_tenderness',
+      'intoxication',
+      'neurologic_deficit',
+      'distracting_injury',
+      'alertness',
+    ],
+    description:
+      'NEXUS criteria for cervical spine imaging decision support in blunt trauma (chat-assisted)',
     category: 'calculator',
   },
 

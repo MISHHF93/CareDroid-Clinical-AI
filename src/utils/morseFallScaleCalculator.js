@@ -3,6 +3,9 @@
  * Reference: Morse JM, et al. Predicting patient falls. Am J Nurs. 1989;89(3):334–337.
  */
 
+export const MORSE_FALL_HOSPITAL_DISCLAIMER =
+  'Inpatient fall-risk screening for nursing documentation. Does not replace environmental safety rounds, toileting plans, bed alarms, physiotherapy referral, or provider orders — follow institutional fall-prevention pathways.';
+
 export const MORSE_DIMENSIONS_META = [
   {
     key: 'historyOfFalling',
@@ -85,16 +88,17 @@ export function interpretMorseFallScore(score) {
   const referenceLine =
     'Morse JM, et al. Predicting patient falls. Am J Nurs. 1989;89(3):334–337.';
 
-  const disclaimer =
-    'Fall-risk screening only — does not replace environmental assessment, toileting plans, or physiotherapy referral.';
+  const disclaimer = MORSE_FALL_HOSPITAL_DISCLAIMER;
 
   if (score > 50) {
     return {
       severity: 'critical',
+      riskCategory: 'high',
+      riskCategoryLabel: 'High fall risk',
       label: 'High fall risk',
       riskBand: '> 50 points',
       interpretation:
-        'High fall-risk band in Morse validation — implement high-risk fall precautions per nursing protocol.',
+        'High fall-risk stratum in Morse validation — supports high-risk fall precaution documentation per nursing protocol.',
       disclaimer,
       referenceLine,
     };
@@ -103,10 +107,12 @@ export function interpretMorseFallScore(score) {
   if (score >= 25) {
     return {
       severity: 'warning',
+      riskCategory: 'moderate',
+      riskCategoryLabel: 'Moderate fall risk',
       label: 'Moderate fall risk',
       riskBand: '25–50 points',
       interpretation:
-        'Moderate fall-risk band — standard fall-prevention interventions and reassessment with status changes.',
+        'Moderate fall-risk stratum — supports standard fall-prevention documentation and reassessment with status changes.',
       disclaimer,
       referenceLine,
     };
@@ -114,9 +120,11 @@ export function interpretMorseFallScore(score) {
 
   return {
     severity: 'normal',
+    riskCategory: 'low',
+    riskCategoryLabel: 'Low fall risk',
     label: 'Low fall risk',
     riskBand: '< 25 points',
-    interpretation: 'Low fall-risk band — continue routine fall-prevention measures.',
+    interpretation: 'Low fall-risk stratum — continue routine fall-prevention documentation.',
     disclaimer,
     referenceLine,
   };

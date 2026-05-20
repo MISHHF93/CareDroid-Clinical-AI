@@ -77,6 +77,7 @@ import {
   Fib4Calculator,
   FraminghamRiskCalculator,
 } from './pr8ClinicalBatchCalculators';
+import { Abcd2Calculator } from './abcd2Calculator';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 
@@ -481,6 +482,8 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <Fib4Calculator onResultChange={onResultChange} />;
     case 'framingham-risk':
       return <FraminghamRiskCalculator onResultChange={onResultChange} />;
+    case 'abcd2':
+      return <Abcd2Calculator onResultChange={onResultChange} />;
     default:
       return (
         <ToolNotFound

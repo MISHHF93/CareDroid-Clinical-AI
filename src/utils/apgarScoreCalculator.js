@@ -3,6 +3,9 @@
  * Reference: Apgar V. A proposal for a new method of evaluation of the newborn infant. Curr Res Anesth Analg. 1953;32:260–267.
  */
 
+export const APGAR_OBSTETRIC_DISCLAIMER =
+  'Newborn assessment and documentation aid at 1 and 5 minutes. Does not replace neonatal resuscitation algorithms (e.g. NRP), cord management, or ongoing monitoring — follow delivery-unit and pediatric protocols.';
+
 export const APGAR_COMPONENTS_META = [
   {
     key: 'appearance',
@@ -51,38 +54,75 @@ export const APGAR_COMPONENTS_META = [
   },
 ];
 
+/** @param {number} score */
+export function apgarRiskCategoryFromScore(score) {
+  if (!Number.isFinite(score) || score < 0 || score > 10) return null;
+  if (score <= 3) return 'severely_depressed';
+  if (score <= 6) return 'moderately_depressed';
+  return 'reassuring';
+}
+
 /**
- * @param {Record<string, number>} inputs
+ * @param {Record<string, number|string>} inputs
  */
 export function calculateApgarScore(inputs) {
+  const validation = validateApgarMinuteInputs(inputs);
+  if (!validation.valid) return null;
+
   let total = 0;
   for (const comp of APGAR_COMPONENTS_META) {
-    const v = Number(inputs[comp.key]);
-    if (!Number.isFinite(v) || v < 0 || v > 2) return null;
-    total += v;
+    total += Number(inputs[comp.key]);
   }
   return total;
 }
 
 /**
- * @param {number} score 0–10
+ * @param {Record<string, unknown>} raw
+ * @returns {{ valid: boolean, errors: string[] }}
  */
-export function interpretApgarScore(score) {
+export function validateApgarMinuteInputs(raw) {
+  const errors = [];
+  for (const comp of APGAR_COMPONENTS_META) {
+    const v = Number(raw[comp.key]);
+    if (!Number.isFinite(v) || v < 0 || v > 2) {
+      errors.push(`${comp.label}: select a score of 0, 1, or 2.`);
+    }
+  }
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * @param {number} score 0–10
+ * @param {{ timingLabel?: string }} [options]
+ */
+export function interpretApgarScore(score, options = {}) {
   if (!Number.isFinite(score) || score < 0 || score > 10) return null;
+
+  const riskCategory = apgarRiskCategoryFromScore(score);
+  if (!riskCategory) return null;
+
+  const timingSuffix = options.timingLabel ? ` at ${options.timingLabel}` : '';
 
   const referenceLine =
     'Apgar V. A proposal for a new method of evaluation of the newborn infant. Curr Res Anesth Analg. 1953;32:260–267.';
 
-  const disclaimer =
-    'Neonatal assessment aid only — does not replace resuscitation algorithms (e.g. NRP) or ongoing monitoring.';
+  const disclaimer = APGAR_OBSTETRIC_DISCLAIMER;
+
+  const riskCategoryLabels = {
+    severely_depressed: 'Severely depressed Apgar stratum',
+    moderately_depressed: 'Moderately depressed Apgar stratum',
+    reassuring: 'Reassuring Apgar stratum',
+  };
 
   if (score <= 3) {
     return {
       severity: 'critical',
+      riskCategory,
+      riskCategoryLabel: riskCategoryLabels[riskCategory],
       label: 'Critically low Apgar',
-      riskBand: '0–3',
+      riskBand: `0–3${timingSuffix}`,
       interpretation:
-        'Scores 0–3 at 1 minute indicate need for immediate resuscitation and neonatal team support per NRP/local protocol.',
+        'Scores 0–3 fall in the severely depressed stratum in teaching — supports correlation with neonatal team assessment and institutional newborn resuscitation pathway documentation (e.g. NRP).',
       disclaimer,
       referenceLine,
     };
@@ -91,10 +131,12 @@ export function interpretApgarScore(score) {
   if (score <= 6) {
     return {
       severity: 'warning',
+      riskCategory,
+      riskCategoryLabel: riskCategoryLabels[riskCategory],
       label: 'Moderately depressed Apgar',
-      riskBand: '4–6',
+      riskBand: `4–6${timingSuffix}`,
       interpretation:
-        'Scores 4–6 suggest moderate depression — continued warming, stimulation, and respiratory support as indicated; reassess at 5 minutes.',
+        'Scores 4–6 suggest moderate depression in validation cohorts — supports serial reassessment and newborn observation per delivery-unit protocol.',
       disclaimer,
       referenceLine,
     };
@@ -102,10 +144,12 @@ export function interpretApgarScore(score) {
 
   return {
     severity: 'normal',
+    riskCategory,
+    riskCategoryLabel: riskCategoryLabels[riskCategory],
     label: 'Reassuring Apgar',
-    riskBand: '7–10',
+    riskBand: `7–10${timingSuffix}`,
     interpretation:
-      'Scores 7–10 are generally reassuring — continue routine newborn care and serial observation.',
+      'Scores 7–10 are generally reassuring in teaching — supports routine newborn observation and documentation.',
     disclaimer,
     referenceLine,
   };
