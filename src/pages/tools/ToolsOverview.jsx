@@ -1,3 +1,4 @@
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
@@ -8,8 +9,57 @@ import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './ToolsOverview.css';
 
+const TOOL_FILTER_OPTIONS = Object.freeze([
+  { value: 'all', label: 'All launchable tools' },
+  { value: 'calculator', label: 'Calculators' },
+  { value: 'chat-assisted', label: 'Chat-assisted' },
+  { value: 'backend-backed', label: 'Backend-backed' },
+  { value: 'clinical-page', label: 'Clinical pages' },
+  { value: 'fleet', label: 'Fleet tools' },
+  { value: 'reference', label: 'Reference' },
+]);
+
+function normalizeSearch(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function toolSearchBlob(tool) {
+  return [
+    tool.id,
+    tool.canonicalInventoryId,
+    tool.name,
+    tool.description,
+    tool.category,
+    tool.surface,
+    tool.launchType,
+    tool.tier,
+    tool.nluToolId,
+    tool.executorStatus,
+    tool.shortcut,
+    tool.searchText,
+    ...(tool.features || []),
+    ...(tool.useCases || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+function matchesToolFilter(tool, filter) {
+  if (!filter || filter === 'all') return true;
+  if (filter === 'calculator') return tool.category === 'Calculator' || tool.surface === 'calculator-form';
+  if (filter === 'chat-assisted') return tool.surface === 'chat-assisted' || tool.launchType === 'chat-assisted';
+  if (filter === 'backend-backed') return tool.launchType === 'backend-backed' || tool.executorStatus === 'registered';
+  if (filter === 'clinical-page') return tool.surface === 'tool-page' || tool.launchType === 'clinical-page';
+  if (filter === 'fleet') return tool.category === 'Fleet' || tool.surface === 'fleet-page';
+  if (filter === 'reference') return tool.category === 'Reference';
+  return true;
+}
+
 const ToolsOverview = () => {
   const navigate = useNavigate();
+  const [search, setSearch] = useState('');
+  const [toolFilter, setToolFilter] = useState('all');
   const { selectTool, setActiveTool, addMessage } = useConversation();
   const {
     favorites,
@@ -30,7 +80,17 @@ const ToolsOverview = () => {
     : activeWorkspace
     ? activeWorkspace.toolIds || []
     : tools.map((tool) => tool.id);
-  const filteredTools = tools.filter((tool) => workspaceToolIds.includes(tool.id));
+  const workspaceTools = tools.filter((tool) => workspaceToolIds.includes(tool.id));
+  const searchQuery = normalizeSearch(search);
+  const filteredTools = useMemo(
+    () =>
+      workspaceTools.filter((tool) => {
+        if (!matchesToolFilter(tool, toolFilter)) return false;
+        if (!searchQuery) return true;
+        return toolSearchBlob(tool).includes(searchQuery);
+      }),
+    [workspaceTools, searchQuery, toolFilter]
+  );
   const recentToolItems = recentTools
     .map((toolId) => toolById[toolId])
     .filter((tool) => tool && (isAllToolsWorkspace || workspaceToolIds.includes(tool.id)));
@@ -51,7 +111,8 @@ const ToolsOverview = () => {
   ];
   const calculatorCount = tools.filter((tool) => tool.category === 'Calculator').length;
   const chatAssistedCount = tools.filter((tool) => tool.surface === 'chat-assisted').length;
-  const showWorkspaceEmpty = filteredTools.length === 0;
+  const showWorkspaceEmpty = workspaceTools.length === 0;
+  const showSearchEmpty = !showWorkspaceEmpty && filteredTools.length === 0;
 
   return (
     <div className="tools-overview">
@@ -89,6 +150,32 @@ const ToolsOverview = () => {
               Developer Catalog / Source Audit →
             </button>
           </p>
+          <div className="tools-discovery-controls" role="search" aria-label="Search and filter all tools">
+            <label className="tools-search-field">
+              <span>Search tools</span>
+              <input
+                type="search"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Try pe-score, bleeding risk, kidney function…"
+                aria-label="Search all tools"
+              />
+            </label>
+            <label className="tools-filter-field">
+              <span>Filter</span>
+              <select
+                value={toolFilter}
+                onChange={(e) => setToolFilter(e.target.value)}
+                aria-label="Filter tools by type"
+              >
+                {TOOL_FILTER_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
           <div className="header-stats">
             <div className="stat">
               <span className="stat-number">{tools.length}</span>
@@ -96,7 +183,9 @@ const ToolsOverview = () => {
             </div>
             <div className="stat">
               <span className="stat-number">{filteredTools.length}</span>
-              <span className="stat-label">{isAllToolsWorkspace ? 'Shown' : 'Workspace tools'}</span>
+              <span className="stat-label">
+                {searchQuery || toolFilter !== 'all' ? 'Matching' : isAllToolsWorkspace ? 'Shown' : 'Workspace tools'}
+              </span>
             </div>
             <div className="stat">
               <span className="stat-number">{calculatorCount}</span>
@@ -153,11 +242,31 @@ const ToolsOverview = () => {
             Show all tools →
           </button>
         </div>
+      ) : showSearchEmpty ? (
+        <div className="tools-recent" role="status">
+          <div className="tools-recent-header">
+            <h2 className="tools-recent-title">No matching tools</h2>
+            <p>
+              No launchable tools match the current search and filter. Try a clinical alias or reset the filters.
+            </p>
+          </div>
+          <button
+            type="button"
+            className="btn-open-tool"
+            onClick={() => {
+              setSearch('');
+              setToolFilter('all');
+            }}
+          >
+            Clear search and filters →
+          </button>
+        </div>
       ) : (
         <div className="tools-grid">
           {orderedTools.map(tool => (
           <div
             key={tool.id}
+            data-tool-id={tool.id}
             className="tool-card-large"
             onClick={() => handleToolClick(tool)}
             style={{ borderColor: tool.color }}

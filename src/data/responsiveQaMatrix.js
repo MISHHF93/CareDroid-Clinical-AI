@@ -36,6 +36,8 @@ const VIEWPORT_DEFS = [
   { width: 390, height: 844, label: 'Phone tall (390)', tier: 'phone' },
   { width: 412, height: 915, label: 'Pixel 7 / 7 Pro (~412)', tier: 'phone' },
   { width: 430, height: 932, label: 'Phone large (430)', tier: 'phone' },
+  { width: 480, height: 960, label: 'Phone extra large (480)', tier: 'phone' },
+  { width: 600, height: 960, label: 'Small tablet / foldable (600)', tier: 'tablet' },
   { width: 768, height: 1024, label: 'Tablet portrait (768)', tier: 'tablet' },
   { width: 1024, height: 768, label: 'Tablet landscape (1024)', tier: 'tablet' },
   { width: 1280, height: 720, label: 'Desktop (1280)', tier: 'desktop' },
@@ -143,6 +145,12 @@ export function buildResponsiveQaPages() {
       id: 'dashboard',
       label: 'Home / Dashboard',
       path: '/dashboard',
+      category: 'core',
+    },
+    {
+      id: 'tools-overview',
+      label: 'All Tools',
+      path: '/tools',
       category: 'core',
     },
     {

@@ -9,6 +9,7 @@ import {
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
 } from './clinicalToolIdContract';
 import { builtinUiCalculators } from './clinicalIntentToolCatalog';
+import { getE2eValidationMatrixDocument } from './e2eToolValidationMatrix';
 import { getMedicalCatalogSummary } from './medicalToolsCatalogIndex';
 import { getPlatformInventory } from './platformInventory';
 
@@ -26,7 +27,7 @@ describe('platformInventory', () => {
     expect(c.backendPostExecutors).toBe(3);
     expect(c.tierACalculators).toBe(CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS.length);
     expect(c.tierBChatAssisted).toBe(CLINICAL_TIER_B_CHAT_REGISTRY_IDS.length);
-    expect(c.e2eMatrixRows).toBe(35);
+    expect(c.e2eMatrixRows).toBe(getE2eValidationMatrixDocument().summary.totalRows);
 
     const catalog = getMedicalCatalogSummary();
     expect(c.catalogSearchableRows).toBe(catalog.total);

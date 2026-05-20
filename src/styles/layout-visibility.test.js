@@ -26,6 +26,11 @@ describe('layout-visibility.css', () => {
     expect(layoutVisibilityCss).toMatch(/\.catalog-table-wrap[\s\S]*overflow-x:\s*auto/);
   });
 
+  it('keeps wide tables in local horizontal scroll containers', () => {
+    expect(layoutVisibilityCss).toMatch(/\.lab-category-section[\s\S]*overflow-x:\s*auto/);
+    expect(layoutVisibilityCss).toMatch(/\.fleet-data-table-wrap[\s\S]*overscroll-behavior-x:\s*contain/);
+  });
+
   it('prevents body-level horizontal overflow and unsafe dashboard grids', () => {
     expect(layoutVisibilityCss).toMatch(/body[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(

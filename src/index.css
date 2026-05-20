@@ -547,7 +547,7 @@ a, button, input, select, textarea {
 html,
 body,
 #root {
-  min-width: 320px;
+  min-width: 0;
   min-height: 100svh;
 }
 

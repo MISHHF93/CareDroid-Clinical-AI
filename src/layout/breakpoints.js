@@ -1,7 +1,7 @@
 /** Mobile-first acceptance widths (phones, tablets, desktop smoke). */
 export const MOBILE_FIRST_BREAKPOINTS = Object.freeze({
-  phone: Object.freeze([320, 360, 375, 390, 412, 430]),
-  tablet: Object.freeze([768, 1024]),
+  phone: Object.freeze([320, 360, 375, 390, 412, 430, 480]),
+  tablet: Object.freeze([600, 768, 1024]),
   desktop: Object.freeze([1280, 1440, 1920]),
 });
 

@@ -14,6 +14,15 @@ body {
   max-width: 100%;
 }
 
+#root,
+.app-shell,
+.app-shell-main-wrap,
+.app-shell-page-body {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
 /* —— Scroll routes: content grows; vertical scroll stays on .app-shell-page-body —— */
 .app-shell-page-body:not(.app-shell-page-body--conversation) > * {
   flex: 1 0 auto;
@@ -78,7 +87,13 @@ body {
 .tools-recent-list,
 .tips-grid,
 .analytics-header,
-.analytics-panel-grid {
+  .analytics-panel-grid,
+  .drug-checker,
+  .lab-input-panel,
+  .lab-results-panel,
+  .clinical-executor-feedback,
+  .fleet-page-main,
+  .fleet-toolbar {
   min-width: 0;
   max-width: 100%;
 }
@@ -90,11 +105,19 @@ body {
 
 /* Wide tables scroll inside their wrapper only */
 .catalog-table-wrap,
-.app-table-scroll-x {
+.app-table-scroll-x,
+.lab-category-section,
+.fleet-data-table-wrap {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   max-width: 100%;
   min-width: 0;
+}
+
+.catalog-table-wrap,
+.lab-category-section,
+.fleet-data-table-wrap {
+  overscroll-behavior-x: contain;
 }
 
 /* —— Responsive grids: wrap cards, stack on narrow viewports —— */

@@ -126,6 +126,21 @@ describe('Calculators hub catalog', () => {
     }
   });
 
+  it('renders exactly one hub affordance for every calculator inventory record', async () => {
+    const dedicated = getCalculatorToolInventory().filter((record) => record.hasDedicatedForm);
+    const chatAssisted = getCalculatorToolInventory().filter((record) => record.surface === 'chat-assisted');
+    renderHub();
+    await screen.findByRole('heading', { level: 1, name: /medical calculators/i });
+
+    for (const record of dedicated) {
+      expect(screen.getByText(record.label, { selector: '.calculator-name' })).toBeInTheDocument();
+    }
+    for (const record of chatAssisted) {
+      const pattern = new RegExp(record.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      expect(screen.getByRole('button', { name: pattern })).toBeInTheDocument();
+    }
+  });
+
   it('renders fallback UI for unknown calculator slug', async () => {
     render(
       <MemoryRouter>

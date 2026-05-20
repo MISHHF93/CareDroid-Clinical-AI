@@ -26,7 +26,7 @@ describe('ToolsAreaFallback', () => {
     expect(screen.getByRole('alert')).toBeTruthy();
     expect(screen.getByText(/Calculator not found/i)).toBeTruthy();
     expect(screen.getByText(/unknown-calc-xyz/, { selector: '.tool-not-found-message' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: /Browse clinical catalog/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Developer Catalog \/ Source Audit/i })).toHaveAttribute(
       'href',
       '/tools/catalog'
     );

@@ -141,7 +141,7 @@ export const PR_FLEET_TOOL_SPECS = Object.freeze({
     catalogSearchQueries: PR_FLEET_CATALOG_SEARCH_QUERIES.filter(([id]) => id === 'dispatch-ai'),
     chatSeedPattern: /human dispatcher must approve/i,
     panelTool: 'calculators',
-    backendExecutable: true,
+    backendExecutable: false,
   },
 });
 

@@ -1,6 +1,10 @@
 .drug-checker {
   max-width: 900px;
   margin: 0 auto;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .drug-input-section {
@@ -30,6 +34,8 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .medication-number {
@@ -48,6 +54,9 @@
 
 .medication-input {
   flex: 1;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--touch-target-min);
   padding: 12px 16px;
   border: 2px solid var(--panel-border);
   border-radius: 8px;
@@ -64,8 +73,10 @@
 }
 
 .btn-remove-med {
-  width: 36px;
-  height: 36px;
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
   border: 2px solid var(--danger);
   background: transparent;
   border-radius: 8px;
@@ -83,10 +94,14 @@
 
 .input-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .btn-add-med {
+  min-height: var(--touch-target-min);
   padding: 12px 24px;
   border: 2px dashed var(--panel-border);
   background: transparent;
@@ -105,6 +120,8 @@
 
 .btn-check-interactions {
   flex: 1;
+  min-width: min(100%, 12rem);
+  min-height: var(--touch-target-min);
   padding: 14px 28px;
   border: none;
   background: #FF6B9D;
@@ -137,6 +154,10 @@
   border-radius: 12px;
   padding: 24px;
   margin-bottom: 24px;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
 }
 
 .result-title {
@@ -156,6 +177,7 @@
 .interaction-header {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 12px;
 }
@@ -243,6 +265,10 @@
   padding: 32px;
   border-radius: 12px;
   margin-top: 32px;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
 }
 
 .quick-reference h3 {
@@ -294,7 +320,42 @@
     flex-wrap: wrap;
   }
 
+  .medication-input {
+    flex: 1 1 calc(100% - 100px);
+  }
+
+  .btn-add-med,
+  .btn-check-interactions {
+    width: 100%;
+  }
+
   .reference-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 380px) {
+  .medication-input-row {
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .medication-number {
+    width: 28px;
+    height: 28px;
+    align-self: center;
+  }
+
+  .medication-input {
+    flex-basis: calc(100% - 88px);
+    padding-inline: 12px;
+  }
+
+  .result-card,
+  .interaction-item,
+  .warning-item,
+  .quick-reference,
+  .reference-item {
+    padding: 14px;
   }
 }

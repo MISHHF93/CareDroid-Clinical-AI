@@ -1,7 +1,7 @@
 # Mobile-first responsive architecture audit
 
 **Audit date:** 2026-05-19  
-**Strategy:** Base CSS targets phones (320–430px); `min-width` media queries add tablet/desktop layout. No route changes.
+**Strategy:** Base CSS targets phones and small tablets (320–768px); `min-width` media queries add larger tablet/desktop layout. No route changes.
 
 ---
 
@@ -28,8 +28,8 @@
 
 | Tier | Widths (CSS px) | QA coverage |
 |------|-----------------|-------------|
-| Phones | 320, 360, 375, 390, 412, 430 | `MOBILE_FIRST_VIEWPORT_WIDTHS` + Playwright |
-| Tablets | 768, 1024 | Same |
+| Phones | 320, 360, 375, 390, 412, 430, 480 | `MOBILE_FIRST_VIEWPORT_WIDTHS` + Playwright |
+| Small tablets / foldables | 600, 768, 1024 | Same |
 | Desktop | 1280, 1440, 1920 | `RESPONSIVE_QA_VIEWPORTS` smoke |
 
 Constants: `src/layout/breakpoints.js` → `MOBILE_FIRST_BREAKPOINTS`

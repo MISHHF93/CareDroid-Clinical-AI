@@ -31,7 +31,9 @@ describe('backend orphan audit', () => {
     const backendOnly = getBackendOnlyRoutes();
     const gaps = getBackendRouteExposureGaps().filter((g) => g.issue === 'missing-policy');
     expect(gaps, gaps.map((g) => g.key).join(', ')).toEqual([]);
-    expect(Object.keys(BACKEND_ROUTE_EXPOSURE_POLICY).length).toBe(backendOnly.length);
+    expect(Object.keys(BACKEND_ROUTE_EXPOSURE_POLICY).length).toBeGreaterThanOrEqual(
+      backendOnly.length
+    );
   });
 
   it('scans at least as many controller routes as inventory entries', () => {

@@ -298,7 +298,7 @@ describe('PR3 registration audit — sidebar, hub launch, chat seeds', () => {
   it.each(PR3_TOOL_IDS)('%s is in nluCalculatorHubOnly for Calculators hub cards', (id) => {
     expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(true);
     expect(calculatorsSource).toContain('CHAT_ASSISTED_HUB_GROUPS');
-    expect(calculatorsSource).toContain('TIER_B_CHAT_CALCULATOR_REGISTRY_IDS');
+    expect(calculatorsSource).toContain('getHubChatAssistedTools');
   });
 });
 

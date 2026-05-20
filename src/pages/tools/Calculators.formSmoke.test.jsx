@@ -4,11 +4,12 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import Calculators from './Calculators';
 import { BUILTIN_CALCULATOR_FORM_SMOKE_ROWS } from '../../data/calculatorHubManifest';
 import { PR1_PR5_TIER_A_FORM_SLUGS } from '../../data/pr1Pr5CalculatorMobile.test.js';
 import { getCalculatorToolInventory } from '../../data/toolInventory';
+import { CALCULATOR_ROUTE_DEFS } from '../../routes/clinicalToolRoutes';
 import { mockCompactViewport, mockConversationValue, mockToolPreferencesValue } from '../../test/testRenderUtils';
 
 /** Avoid jsdom/cssstyle crash on `border-left: 4px solid var(--primary-color)` in ToolPageLayout.css */
@@ -96,6 +97,28 @@ describe('Calculators — Tier-A form sections', () => {
       expect(record.route, record.id).toBeTruthy();
     }
   });
+
+  it.each(CALCULATOR_ROUTE_DEFS)(
+    '$path route renders non-empty usable calculator form',
+    async ({ path, calculatorSlug }) => {
+      const smokeRow = BUILTIN_CALCULATOR_FORM_SMOKE_ROWS.find((row) => row.slug === calculatorSlug);
+      expect(smokeRow, calculatorSlug).toBeTruthy();
+
+      const { container } = render(
+        <MemoryRouter initialEntries={[path]}>
+          <Routes>
+            <Route path={path} element={<Calculators initialCalculatorId={calculatorSlug} />} />
+          </Routes>
+        </MemoryRouter>
+      );
+      const iface = container.querySelector(`.${smokeRow.interfaceClass.split(' ')[0]}`);
+
+      expect(iface).toBeTruthy();
+      expect(iface.querySelector('input, select, textarea, .calc-checkbox-group')).toBeTruthy();
+      expect(within(iface).getByRole('button', { name: /calculate/i })).toBeInTheDocument();
+      expect(iface.querySelector('.calculator-results')).toBeTruthy();
+    }
+  );
 });
 
 describe('Calculators — compact viewport mock', () => {

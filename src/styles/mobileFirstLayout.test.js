@@ -28,10 +28,10 @@ describe('mobile-first layout architecture', () => {
   });
 
   it('defines acceptance breakpoints in JS', () => {
-    expect(MOBILE_FIRST_BREAKPOINTS.phone).toEqual([320, 360, 375, 390, 412, 430]);
-    expect(MOBILE_FIRST_BREAKPOINTS.tablet).toEqual([768, 1024]);
+    expect(MOBILE_FIRST_BREAKPOINTS.phone).toEqual([320, 360, 375, 390, 412, 430, 480]);
+    expect(MOBILE_FIRST_BREAKPOINTS.tablet).toEqual([600, 768, 1024]);
     expect(MOBILE_FIRST_BREAKPOINTS.desktop).toEqual([1280, 1440, 1920]);
-    expect(MOBILE_FIRST_VIEWPORT_WIDTHS).toHaveLength(11);
+    expect(MOBILE_FIRST_VIEWPORT_WIDTHS).toHaveLength(13);
   });
 
   it('uses mobile-first split forms (1 col default, 2 col min-width 1024px)', () => {
@@ -59,8 +59,8 @@ describe('mobile-first layout architecture', () => {
   it('QA matrix includes phone, tablet, and desktop smoke viewports', () => {
     expect(QA_PHONE_TABLET_WIDTHS).toEqual([...MOBILE_FIRST_BREAKPOINTS.phone, ...MOBILE_FIRST_BREAKPOINTS.tablet]);
     const widths = RESPONSIVE_QA_VIEWPORTS.map((v) => v.width);
-    expect(widths).toEqual(expect.arrayContaining([375, 412, 768, 1280, 1920]));
-    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(11);
+    expect(widths).toEqual(expect.arrayContaining([375, 412, 480, 600, 768, 1280, 1920]));
+    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(13);
   });
 
   it('exposes fluid spacing and typography tokens via design-tokens.css', () => {

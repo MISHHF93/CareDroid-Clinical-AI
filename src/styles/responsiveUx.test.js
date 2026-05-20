@@ -9,6 +9,8 @@ import { describe, it, expect } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const responsiveUxCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8');
+const layoutVisibilityCss = readFileSync(join(__dirname, 'layout-visibility.css'), 'utf8');
+const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const mainJsx = readFileSync(join(__dirname, '../main.jsx'), 'utf8');
 const buttonCss = readFileSync(join(__dirname, '../components/ui/button.css'), 'utf8');
 const disclaimerCss = readFileSync(
@@ -36,6 +38,12 @@ describe('responsive-ux.css — global normalization', () => {
   it('prevents heading overflow in app scroll surfaces', () => {
     expect(responsiveUxCss).toMatch(/\.app-scroll-container h1[\s\S]*overflow-wrap:\s*anywhere/);
     expect(responsiveUxCss).toMatch(/overflow-wrap:\s*anywhere[\s\S]*word-break:\s*break-word/);
+  });
+
+  it('prevents body-level horizontal overflow without a fixed root minimum width', () => {
+    expect(indexCss).toMatch(/html,\s*body,\s*#root\s*\{[\s\S]*min-width:\s*0/);
+    expect(layoutVisibilityCss).toMatch(/body\s*\{[\s\S]*overflow-x:\s*clip/);
+    expect(layoutVisibilityCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*min-inline-size:\s*0/);
   });
 
   it('wraps long clinical tool names and catalog cells', () => {

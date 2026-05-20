@@ -1,4 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import {
   ANDROID_QA_VIEWPORT_WIDTHS,
   MOBILE_FIRST_VIEWPORT_WIDTHS,
@@ -16,6 +19,8 @@ import {
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
 } from './clinicalToolIdContract.js';
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
 describe('responsiveQaMatrix', () => {
   it('defines mobile-first phone + tablet widths and full QA viewports including desktop', () => {
     expect(MOBILE_FIRST_VIEWPORT_WIDTHS).toEqual([
@@ -23,17 +28,27 @@ describe('responsiveQaMatrix', () => {
       ...MOBILE_FIRST_BREAKPOINTS.tablet,
     ]);
     expect(ANDROID_QA_VIEWPORT_WIDTHS).toBe(MOBILE_FIRST_VIEWPORT_WIDTHS);
-    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(11);
+    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(13);
     expect(RESPONSIVE_QA_VIEWPORTS.map((v) => v.width)).toEqual(
-      expect.arrayContaining([375, 412, 768, 1024, 1280, 1920])
+      expect.arrayContaining([320, 360, 375, 390, 412, 430, 480, 600, 768, 1024, 1280, 1920])
     );
     expect(RESPONSIVE_QA_BROWSER_PROJECTS).toHaveLength(4);
+  });
+
+  it('keeps the production viewport meta Android-safe', () => {
+    const indexHtml = readFileSync(join(__dirname, '../../index.html'), 'utf8');
+    expect(indexHtml).toContain('name="viewport"');
+    expect(indexHtml).toContain('width=device-width');
+    expect(indexHtml).toContain('initial-scale=1');
+    expect(indexHtml).toContain('viewport-fit=cover');
+    expect(indexHtml).not.toMatch(/maximum-scale\s*=\s*1|user-scalable\s*=\s*no/);
   });
 
   it('includes dashboard, catalog, calculators hub, all Tier A routes, Tier B launches, and fleet pages', () => {
     const pages = buildResponsiveQaPages();
     const ids = pages.map((p) => p.id);
     expect(ids).toContain('dashboard');
+    expect(ids).toContain('tools-overview');
     expect(ids).toContain('tools-catalog');
     expect(ids).toContain('calculators-hub');
     expect(ids).toContain('fleet-command');

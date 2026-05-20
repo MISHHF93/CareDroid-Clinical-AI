@@ -3,6 +3,8 @@
 /* Mobile-first split grid — base rules in mobile-first-layout.css */
 .lab-interpreter-content {
   max-width: var(--app-fluid-container-max-wide, min(100%, 87.5rem));
+  min-width: 0;
+  overflow-x: clip;
 }
 
 @media (max-width: 768px) {
@@ -39,12 +41,18 @@
   border-radius: 16px;
   padding: 24px;
   border: 1px solid var(--border-color);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .lab-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
   margin-bottom: 20px;
 }
 
@@ -54,7 +62,11 @@
   color: var(--text-primary);
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .lab-panel-icon {
@@ -74,12 +86,16 @@
   background: rgba(0,255,136,0.05);
   border-radius: 12px;
   border: 1px solid rgba(0,255,136,0.2);
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .context-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .context-label {
@@ -91,6 +107,9 @@
 
 .context-input,
 .context-select {
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--touch-target-min);
   padding: 8px 12px;
   background: var(--input-bg);
   border: 1px solid var(--input-border);
@@ -109,6 +128,8 @@
 }
 
 .context-textarea {
+  min-width: 0;
+  max-width: 100%;
   padding: 10px 12px;
   background: var(--input-bg);
   border: 1px solid var(--input-border);
@@ -117,7 +138,7 @@
   font-size: 14px;
   font-family: inherit;
   resize: vertical;
-  min-height: 60px;
+  min-height: max(60px, var(--touch-target-min));
   transition: all 0.2s ease;
 }
 
@@ -133,12 +154,15 @@
   grid-template-columns: 2fr 1fr 1fr auto;
   gap: 12px;
   margin-bottom: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .lab-input-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
 }
 
 .lab-input-label {
@@ -149,6 +173,9 @@
 }
 
 .lab-input-field {
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--touch-target-min);
   padding: 10px 14px;
   background: var(--input-bg);
   border: 1px solid var(--input-border);
@@ -167,6 +194,7 @@
 
 .lab-add-button {
   align-self: flex-end;
+  min-height: var(--touch-target-min);
   padding: 10px 20px;
   background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
   border: none;
@@ -218,6 +246,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
   padding: 12px;
   background: color-mix(in srgb, var(--app-fg) 5%, transparent);
   border-radius: 8px;
@@ -235,6 +264,8 @@
   align-items: center;
   gap: 12px;
   flex: 1;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 
 .lab-value-name {
@@ -249,9 +280,12 @@
 .lab-value-display {
   color: var(--accent-2);
   font-weight: 600;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .lab-value-remove {
+  min-height: var(--touch-target-min);
   padding: 6px 12px;
   background: color-mix(in srgb, var(--app-danger) 14%, transparent);
   border: 1px solid color-mix(in srgb, var(--app-danger) 35%, transparent);
@@ -311,6 +345,7 @@
 
 .lab-clear-button,
 .lab-load-example-button {
+  min-height: var(--touch-target-min);
   padding: 14px 20px;
   background: var(--app-overlay-on-surface);
   border: 1px solid var(--app-input-border);
@@ -466,6 +501,8 @@
   margin-bottom: 24px;
   color: var(--text-primary);
   line-height: 1.6;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .lab-overall-interpretation.critical {
@@ -479,6 +516,7 @@
   max-width: 100%;
   min-width: 0;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -501,7 +539,7 @@
 
 .lab-values-table {
   width: 100%;
-  min-width: 0;
+  min-width: 520px;
   margin-bottom: 16px;
   border-collapse: collapse;
 }
@@ -520,6 +558,8 @@
 .lab-values-table td {
   padding: 12px;
   border-bottom: 1px solid var(--app-divider-on-surface);
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .lab-status-badge {
@@ -603,6 +643,8 @@
   border-radius: 12px;
   margin-bottom: 24px;
   animation: alertPulse 2s ease-in-out infinite;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 @keyframes alertPulse {
@@ -660,6 +702,8 @@
   font-size: 13px;
   color: var(--text-secondary);
   line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .lab-disclaimer-strong {
@@ -674,4 +718,49 @@
   align-items: center;
   justify-content: center;
   color: var(--warning);
+}
+
+@media (max-width: 640px) {
+  .lab-action-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .lab-interpret-button,
+  .lab-clear-button,
+  .lab-load-example-button,
+  .lab-add-button {
+    width: 100%;
+  }
+
+  .lab-value-item {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .lab-value-remove {
+    width: 100%;
+  }
+
+  .lab-results-empty,
+  .lab-results-loading,
+  .lab-values-empty {
+    padding: 32px 12px;
+  }
+}
+
+@media (max-width: 380px) {
+  .lab-input-panel,
+  .lab-results-panel,
+  .patient-context,
+  .lab-overall-interpretation,
+  .lab-critical-alert,
+  .lab-disclaimer,
+  .lab-interpretation-box {
+    padding: 12px;
+  }
+
+  .lab-values-table {
+    min-width: 460px;
+  }
 }

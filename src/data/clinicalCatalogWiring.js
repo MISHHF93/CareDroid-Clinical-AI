@@ -212,9 +212,17 @@ function launchFromBuiltinCalc(calc) {
 }
 
 function launchFromInventoryRecord(record) {
+  const chatSeed =
+    record.chatSeed ||
+    buildGuardedChatSeed({
+      toolId: record.nluToolId || record.id,
+      sidebarToolId: record.id,
+      category: record.category || 'tool',
+      chatSeed: `Open the ${record.label || record.id} tool and help me interpret it as clinical decision support only.`,
+    });
   const openLabel =
     record.launchType === TOOL_LAUNCH_TYPES.LOCAL_ONLY
-      ? 'Open calculator'
+      ? 'Open'
       : record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED
         ? 'Start guided chat'
         : record.route
@@ -224,7 +232,7 @@ function launchFromInventoryRecord(record) {
   return {
     path: record.route,
     registryId: record.sidebarVisible ? record.id : record.id || null,
-    chatSeed: record.chatSeed || null,
+    chatSeed,
     orchestratorTool: record.orchestratorToolId || null,
     openLabel,
   };

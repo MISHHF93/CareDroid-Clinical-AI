@@ -143,9 +143,9 @@ function hubCardRegistered(registryId) {
   if (!TIER_B_CHAT_CALCULATOR_REGISTRY_IDS.includes(registryId)) return null;
   const inHubOnly = nluCalculatorHubOnly.some((h) => h.toolId === registryId);
   const inHubGroups = HUB_GROUP_TOOL_IDS.has(registryId);
-  const inCalculatorsFilter = calculatorsSource.includes('TIER_B_CHAT_CALCULATOR_REGISTRY_IDS');
+  const inCalculatorsFilter = calculatorsSource.includes('getHubChatAssistedTools');
   const ariaPresent =
-    calculatorsSource.includes('chatAssistedLaunchAriaLabel') ||
+    calculatorsSource.includes('chatAssistedLaunchAriaLabelForTool') ||
     calculatorsSource.includes('fleetChatAssistedLaunchAriaLabel');
   return inHubOnly && inHubGroups && inCalculatorsFilter && ariaPresent;
 }
@@ -219,7 +219,7 @@ export function buildFrontendRenderingRow(registryId) {
       catalog: catalogHasRegistry(registryId),
       discovery: discoveryHasRegistry(registryId),
       nlu: nluApplies(registryId),
-      catalogLaunchHandler: catalogSource.includes('resolveCatalogLaunch'),
+      catalogLaunchHandler: catalogSource.includes('applyRegistryToolLaunch'),
       calculatorHub: Boolean(
         uiCalc || TIER_B_CHAT_CALCULATOR_REGISTRY_IDS.includes(registryId)
       ),
