@@ -19,6 +19,7 @@ import { buildMatrixRowForRegistry, buildE2eToolInventory } from './e2eToolValid
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { matchCalculatorRoute, isKnownToolAreaPath } from '../routes/clinicalToolRoutes';
 import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
+import { resolveToolInventoryRecord, TOOL_LAUNCH_TYPES } from './toolInventory';
 
 export const EXECUTION_MODES = Object.freeze({
   LOCAL_CALCULATOR: 'local-calculator',
@@ -61,6 +62,25 @@ const builtinSlugByRegistry = Object.freeze(
  * @param {string} registryId
  */
 export function executionModeForRegistry(registryId) {
+  const inventoryRecord = resolveToolInventoryRecord(registryId);
+  if (inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED) {
+    return EXECUTION_MODES.POST_EXECUTOR;
+  }
+  if (inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.FLEET_LOCAL) {
+    return EXECUTION_MODES.FLEET_LOCAL;
+  }
+  if (inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) {
+    return EXECUTION_MODES.CHAT_HUB;
+  }
+  if (inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.CLINICAL_PAGE) {
+    return EXECUTION_MODES.CHAT_PAGE;
+  }
+  if (inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.HUB) {
+    return EXECUTION_MODES.HUB;
+  }
+  if (inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.LOCAL_ONLY) {
+    return EXECUTION_MODES.LOCAL_CALCULATOR;
+  }
   if (REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]) return EXECUTION_MODES.POST_EXECUTOR;
   if (FLEET_TIER_A_REGISTRY_IDS.includes(registryId)) return EXECUTION_MODES.FLEET_LOCAL;
   if (registryId === REGISTRY.dispatchAi) return EXECUTION_MODES.CHAT_HUB;

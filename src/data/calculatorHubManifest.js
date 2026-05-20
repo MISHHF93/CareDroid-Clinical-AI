@@ -9,6 +9,7 @@ import { NLU_HUB_ONLY_PROFILE_TOOL_IDS } from './clinicalToolIdContract';
 import { toolRegistryById } from './toolRegistry';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes';
+import { resolveToolInventoryRecord } from './toolInventory';
 
 /** Every built-in form slug implemented in CalculatorInterface. */
 export const BUILTIN_CALCULATOR_SWITCH_SLUGS = Object.freeze(
@@ -73,13 +74,14 @@ export function getHubChatAssistedTools() {
 export function buildBuiltinHubCalculatorCards() {
   return builtinUiCalculators.map((calc) => {
     const registryId = BUILTIN_CALC_ID_TO_REGISTRY_ID[calc.id] ?? calc.id;
+    const inventoryRecord = resolveToolInventoryRecord(registryId);
     const reg = toolRegistryById[registryId];
     return {
       id: calc.id,
-      name: calc.name,
-      description: calc.description || reg?.description || '',
-      category: reg?.category || 'Calculator',
-      route: calc.path,
+      name: inventoryRecord?.label || calc.name,
+      description: inventoryRecord?.safetyCopy || calc.description || reg?.description || '',
+      category: reg?.category || inventoryRecord?.category || 'Calculator',
+      route: inventoryRecord?.route || calc.path,
       calcQuery: calc.calcQuery,
     };
   });
@@ -125,11 +127,13 @@ export function getBuiltinCalculatorRouteDef(slug) {
  * @param {string} toolId
  */
 export function getHubChatToolMeta(toolId) {
+  const inventoryRecord = resolveToolInventoryRecord(toolId);
   const hubRow = nluCalculatorHubOnly.find((t) => t.toolId === toolId);
   const intent = clinicalIntentTools.find((t) => t.toolId === toolId);
   return {
     toolId,
-    name: hubRow?.name || intent?.name || toolId,
-    description: intent?.description || 'Chat-assisted decision support',
+    name: inventoryRecord?.label || hubRow?.name || intent?.name || toolId,
+    description:
+      inventoryRecord?.safetyCopy || intent?.description || 'Chat-assisted decision support',
   };
 }

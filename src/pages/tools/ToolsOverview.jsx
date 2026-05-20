@@ -2,12 +2,13 @@ import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import toolRegistry, { toolRegistryById } from '../../data/toolRegistry';
+import { toolRegistryById } from '../../data/toolRegistry';
 import {
   clinicalIntentTools,
   getCatalogSummary,
   nluCalculatorHubOnly,
 } from '../../data/clinicalIntentToolCatalog';
+import { getSidebarToolInventory } from '../../data/toolInventory';
 import { resolveCatalogLaunch, resolveNavigationPathForLaunch } from '../../data/clinicalCatalogWiring';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import { chatAssistedLaunchAriaLabel } from '../../data/chatAssistedHubGroups';
@@ -29,7 +30,7 @@ const ToolsOverview = () => {
   } = useToolPreferences();
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
 
-  const tools = toolRegistry;
+  const tools = getSidebarToolInventory().map((tool) => toolRegistryById[tool.id] || tool);
   const activeWorkspace = workspaces.find((workspace) => workspace.id === activeWorkspaceId);
   const workspaceToolIds = activeWorkspace?.toolIds?.length
     ? activeWorkspace.toolIds
@@ -49,7 +50,6 @@ const ToolsOverview = () => {
     });
   };
 
-  const categories = [...new Set(filteredTools.map(t => t.category))];
   const catalogSummary = getCatalogSummary({ sidebarCount: tools.length });
   const hiddenApiCount = getFullCapabilitiesSummary();
 
@@ -247,7 +247,7 @@ const ToolsOverview = () => {
                   <NavIcon icon={CHROME_ICONS.pin} size={16} aria-hidden />
                 </button>
                 <div className="tool-shortcut">
-                  {tool.shortcut.replace('Ctrl+', '⌘')}
+                  {tool.shortcut ? tool.shortcut.replace('Ctrl+', '⌘') : 'Open'}
                 </div>
               </div>
             </div>
@@ -257,7 +257,7 @@ const ToolsOverview = () => {
             <div className="tool-features">
               <h4>Key Features:</h4>
               <ul>
-                {tool.features.map((feature, idx) => (
+                {(tool.features || []).map((feature, idx) => (
                   <li key={idx}>
                     <span className="feature-icon" aria-hidden>
                       <NavIcon icon={CHROME_ICONS.check} size={14} />

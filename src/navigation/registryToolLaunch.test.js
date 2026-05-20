@@ -3,6 +3,7 @@ import toolRegistry from '../data/toolRegistry';
 import { getRegistryToolNavigation } from './registryToolLaunch';
 import { TIER_B_CHAT_CALCULATOR_REGISTRY_IDS } from '../data/clinicalCatalogWiring';
 import { NLU_PROFILE_TOOL_IDS } from '../data/clinicalToolIdContract';
+import { getFrontendVisibleToolInventory } from '../data/toolInventory';
 
 describe('registryToolLaunch', () => {
   it.each([
@@ -48,6 +49,16 @@ describe('registryToolLaunch', () => {
         plan.mode
       );
       expect(plan.pathname).toBeTruthy();
+    }
+  });
+
+  it('does not produce blank navigation for any frontend-visible inventory record', () => {
+    for (const record of getFrontendVisibleToolInventory()) {
+      if (!record.sidebarVisible && !record.nluToolId) continue;
+      const plan = getRegistryToolNavigation(record.id);
+      expect(plan.pathname, record.id).toBeTruthy();
+      expect(plan.launch, record.id).toBeTruthy();
+      expect(plan.launch.path || plan.launch.chatSeed || record.fallbackRoute, record.id).toBeTruthy();
     }
   });
 });

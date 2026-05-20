@@ -3,7 +3,7 @@
  * Consumed by Vitest (`e2eToolValidationMatrix.test.js`) and QA checklists.
  */
 
-import toolRegistry, { toolRegistryById } from './toolRegistry';
+import { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
@@ -27,6 +27,7 @@ import {
   matchCalculatorRoute,
 } from '../routes/clinicalToolRoutes';
 import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
+import { resolveToolInventoryRecord, TOOL_EXECUTOR_STATUS } from './toolInventory';
 
 /** @typedef {'A'|'B'|'C'|'clinical-page'|'fleet-A'|'fleet-B'|'hub'|'nlu-hub-only'} ToolTier */
 
@@ -199,6 +200,8 @@ const MATRIX_BASE_TESTS = Object.freeze([
 
 /** @param {string} registryId */
 export function tierForRegistryId(registryId) {
+  const inventoryRecord = resolveToolInventoryRecord(registryId);
+  if (inventoryRecord?.tier && inventoryRecord.tier !== 'platform') return inventoryRecord.tier;
   if (REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]) return 'C';
   if (FLEET_TIER_A_REGISTRY_IDS.includes(registryId)) return 'fleet-A';
   if (registryId === REGISTRY.dispatchAi) return 'fleet-B';
@@ -253,23 +256,25 @@ function testCoverageFor(registryId) {
  * @param {string} registryId
  */
 export function buildMatrixRowForRegistry(registryId) {
+  const inventoryRecord = resolveToolInventoryRecord(registryId);
   const reg = toolRegistryById[registryId];
   const nlus = nluProfilesForRegistry(registryId);
-  const nluToolIds = [...new Set(nlus.map((t) => t.toolId))].sort();
+  const nluToolIds = [...new Set(inventoryRecord?.nluProfileIds?.length ? inventoryRecord.nluProfileIds : nlus.map((t) => t.toolId))].sort();
   const launch = resolveCatalogLaunch(registryId);
-  const orchestratorNluId = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] ?? null;
-  const postExecutor = orchestratorNluId
-    ? isOrchestratorPostExecutable(orchestratorNluId)
-    : false;
+  const orchestratorNluId =
+    inventoryRecord?.orchestratorToolId ?? REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] ?? null;
+  const postExecutor =
+    inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED ||
+    (orchestratorNluId ? isOrchestratorPostExecutable(orchestratorNluId) : false);
 
   return {
     id: registryId,
     kind: 'registry',
-    tier: tierForRegistryId(registryId),
+    tier: inventoryRecord?.tier ?? tierForRegistryId(registryId),
     accessModes: accessModesForRegistry(registryId),
-    route: reg?.path ?? launch.path,
+    route: inventoryRecord?.route ?? reg?.path ?? launch.path,
     registryPresence: Boolean(reg),
-    catalogPresence: catalogHasRegistry(registryId),
+    catalogPresence: inventoryRecord?.catalogVisible ?? catalogHasRegistry(registryId),
     discoveryPresence: discoveryIdsForRegistry(registryId, nluToolIds),
     nluPresence: nluToolIds.length > 0,
     nluToolIds,
@@ -277,11 +282,11 @@ export function buildMatrixRowForRegistry(registryId) {
     backendNluExecutable: nluToolIds.some((id) =>
       clinicalIntentTools.find((t) => t.toolId === id)?.backendExecutable
     ),
-    orchestratorToolId: launch.orchestratorTool,
+    orchestratorToolId: inventoryRecord?.orchestratorToolId ?? launch.orchestratorTool,
     launch: {
-      path: launch.path,
+      path: inventoryRecord?.route ?? launch.path,
       registryId: launch.registryId,
-      orchestratorTool: launch.orchestratorTool,
+      orchestratorTool: inventoryRecord?.orchestratorToolId ?? launch.orchestratorTool,
       openLabel: launch.openLabel,
       hasChatSeed: Boolean(launch.chatSeed && launch.chatSeed.length > 20),
     },

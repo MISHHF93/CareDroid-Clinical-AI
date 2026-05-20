@@ -24,12 +24,12 @@ import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
 import {
   TEST_COVERAGE_BY_REGISTRY_ID,
   tierForRegistryId,
-  buildMatrixRowForRegistry,
 } from './e2eToolValidationMatrix';
 import { buildFrontendRenderingRow } from './frontendRenderingInventory';
 import { PR_FLEET_TOOL_SPECS } from './prFleetTestConstants';
 import { readToolPatternsSource } from './clinicalToolAliasSync';
 import { parseClinicalToolPatterns } from './parseToolPatterns';
+import { resolveToolInventoryRecord } from './toolInventory';
 
 const MATRIX_BASE_TESTS = [
   'e2eToolValidationMatrix.test.js',
@@ -212,6 +212,7 @@ export function deriveContractStatus(row) {
 function buildRowFromNlu(nlu, patterns) {
   const registryId =
     nlu.sidebarToolId || ORCHESTRATOR_TO_REGISTRY_ID[nlu.toolId] || nlu.toolId;
+  const inventoryRecord = resolveToolInventoryRecord(nlu.toolId);
   const reg = toolRegistryById[registryId];
   const launch = resolveCatalogLaunch(nlu.toolId);
   const builtin = builtinUiCalculators.find(
@@ -237,22 +238,24 @@ function buildRowFromNlu(nlu, patterns) {
   const row = {
     kind: 'nlu',
     canonicalId: nlu.toolId,
+    canonicalInventoryId: inventoryRecord?.id || registryId,
     displayName: nlu.toolName,
-    frontendRoute: nlu.path || launch.path || reg?.path || '—',
-    frontendComponent: resolveComponent(registryId, nlu.toolId, builtinSlug),
+    frontendRoute: inventoryRecord?.route || nlu.path || launch.path || reg?.path || '—',
+    frontendComponent:
+      inventoryRecord?.component || resolveComponent(registryId, nlu.toolId, builtinSlug),
     registryEntry: reg ? registryId : registryId !== nlu.toolId ? registryId : '—',
     catalogEntry: catalogRowFor(nlu.toolId, registryId) ? 'yes' : 'no',
     discoveryEntry: discoveryHas(nlu.toolId) || discoveryHas(registryId) ? 'yes' : 'no',
     nluProfile: nlu.toolId,
     backendIntentPattern: pat ? `tool.patterns.ts → ${pat.toolId}` : '—',
-    orchestratorToolId: orchestratorId || '—',
+    orchestratorToolId: inventoryRecord?.orchestratorToolId || orchestratorId || '—',
     backendExecutor: postExecutor ? 'yes' : 'no',
-    apiEndpoint: api.endpoint,
-    requestDto: api.dto || '—',
-    responseDto: api.response || '—',
-    frontendApiClient: api.client || '—',
+    apiEndpoint: inventoryRecord?.endpoint || api.endpoint,
+    requestDto: inventoryRecord?.requestDto || api.dto || '—',
+    responseDto: inventoryRecord?.responseDto || api.response || '—',
+    frontendApiClient: inventoryRecord?.apiClient || api.client || '—',
     testCoverage: testFilesFor(registryId, nlu.toolId).join(', '),
-    tier: tierForRegistryId(registryId),
+    tier: inventoryRecord?.tier || tierForRegistryId(registryId),
     notes: [
       api.note,
       nlu.backendExecutable && !postExecutor ? 'NLU backendExecutable flag (chat routing only)' : null,
@@ -271,6 +274,7 @@ function buildRowFromNlu(nlu, patterns) {
 
 function buildRowFromRegistryOnly(registryId, patterns) {
   const reg = toolRegistryById[registryId];
+  const inventoryRecord = resolveToolInventoryRecord(registryId);
   const launch = resolveCatalogLaunch(registryId);
   const nlus = clinicalIntentTools.filter(
     (t) => t.sidebarToolId === registryId || t.toolId === registryId
@@ -282,9 +286,11 @@ function buildRowFromRegistryOnly(registryId, patterns) {
   const row = {
     kind: 'registry-only',
     canonicalId: registryId,
+    canonicalInventoryId: inventoryRecord?.id || registryId,
     displayName: reg?.name ?? registryId,
-    frontendRoute: reg?.path ?? launch.path ?? '—',
-    frontendComponent: resolveComponent(registryId, registryId, builtin?.id),
+    frontendRoute: inventoryRecord?.route ?? reg?.path ?? launch.path ?? '—',
+    frontendComponent:
+      inventoryRecord?.component ?? resolveComponent(registryId, registryId, builtin?.id),
     registryEntry: registryId,
     catalogEntry: catalogRowFor(registryId, registryId) ? 'yes' : 'no',
     discoveryEntry: discoveryHas(registryId) ? 'yes' : 'no',
@@ -292,18 +298,19 @@ function buildRowFromRegistryOnly(registryId, patterns) {
     backendIntentPattern: nlus.length
       ? nlus.map((t) => (patternFor(t.toolId, patterns) ? t.toolId : 'missing')).join(', ')
       : '—',
-    orchestratorToolId: REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] || '—',
+    orchestratorToolId:
+      inventoryRecord?.orchestratorToolId || REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] || '—',
     backendExecutor: REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]
       ? isOrchestratorPostExecutable(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId])
         ? 'yes'
         : 'no'
       : 'no',
-    apiEndpoint: '—',
-    requestDto: '—',
-    responseDto: '—',
-    frontendApiClient: '—',
+    apiEndpoint: inventoryRecord?.endpoint || '—',
+    requestDto: inventoryRecord?.requestDto || '—',
+    responseDto: inventoryRecord?.responseDto || '—',
+    frontendApiClient: inventoryRecord?.apiClient || '—',
     testCoverage: testFilesFor(registryId, registryId).join(', '),
-    tier: tierForRegistryId(registryId),
+    tier: inventoryRecord?.tier || tierForRegistryId(registryId),
     notes: nlus.length ? '' : 'No dedicated clinicalIntentTools row',
     brokenReasons: [],
     catalogGap: registryId === 'procedures' ? 'no-nlu-profile' : null,

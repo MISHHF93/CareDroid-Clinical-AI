@@ -3,8 +3,6 @@
  * Does not replace react-router — supplies path definitions and validation helpers.
  */
 
-import toolRegistry from '../data/toolRegistry';
-import { builtinUiCalculators } from '../data/clinicalIntentToolCatalog';
 import {
   CATALOG_UNKNOWN_TOOL_LAUNCH,
   resolveCatalogLaunch,
@@ -13,6 +11,7 @@ import {
 } from '../data/clinicalCatalogWiring';
 import { getRegistryToolNavigation } from '../navigation/registryToolLaunch';
 import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
+import { getCanonicalToolInventory, getFrontendVisibleToolInventory } from '../data/toolInventory';
 
 /** Overview pages (not in toolRegistry as navigable tools). */
 export const TOOLS_OVERVIEW_PATHS = Object.freeze([
@@ -25,19 +24,19 @@ export const TOOLS_OVERVIEW_PATHS = Object.freeze([
  * Sorted longest-path-first for prefix matching.
  */
 export const CALCULATOR_ROUTE_DEFS = Object.freeze(
-  builtinUiCalculators
-    .filter((c) => c.path)
-    .map((c) => ({
-      path: c.path,
-      calculatorSlug: c.id,
-      name: c.name,
+  getCanonicalToolInventory()
+    .filter((tool) => tool.calculatorSlug && tool.route)
+    .map((tool) => ({
+      path: tool.route,
+      calculatorSlug: tool.calculatorSlug,
+      name: tool.label,
     }))
     .sort((a, b) => b.path.length - a.path.length)
 );
 
 /** Registry tool paths under /tools and /fleet (includes hub + fleet pages). */
 export const REGISTRY_TOOL_PATHS = Object.freeze(
-  [...new Set(toolRegistry.map((t) => t.path).filter(Boolean))].sort()
+  [...new Set(getFrontendVisibleToolInventory().map((t) => t.route).filter(Boolean))].sort()
 );
 
 /** All tool-area paths that should resolve to a real screen (not dashboard fallback). */

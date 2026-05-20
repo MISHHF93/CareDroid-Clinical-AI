@@ -16,13 +16,13 @@ import {
   NLU_PROFILE_TOOL_IDS,
   NLU_TO_REGISTRY_ID,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
-  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
   REGISTRY,
   TOOL_LAUNCH_PATHS,
   registryToPrimaryNluToolId,
 } from './clinicalToolIdContract';
 import { ensureChatSeedGuardrails } from './clinicalSafetyGuardrails';
 import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
+import { resolveToolInventoryRecord, TOOL_LAUNCH_TYPES } from './toolInventory';
 
 export * from './clinicalToolIdContract';
 
@@ -211,6 +211,25 @@ function launchFromBuiltinCalc(calc) {
   };
 }
 
+function launchFromInventoryRecord(record) {
+  const openLabel =
+    record.launchType === TOOL_LAUNCH_TYPES.LOCAL_ONLY
+      ? 'Open calculator'
+      : record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED
+        ? 'Start guided chat'
+        : record.route
+          ? 'Open'
+          : 'Try in chat';
+
+  return {
+    path: record.route,
+    registryId: record.sidebarVisible ? record.id : record.id || null,
+    chatSeed: record.chatSeed || null,
+    orchestratorTool: record.orchestratorToolId || null,
+    openLabel,
+  };
+}
+
 function launchFromRegistry(registryEntry, registryId) {
   const nlu =
     findClinicalIntentProfile({ registryId }) ||
@@ -284,6 +303,11 @@ export function resolveCatalogLaunchFallback(id) {
  */
 export function resolveCatalogLaunch(id) {
   if (!id) return { ...EMPTY_LAUNCH };
+
+  const inventoryRecord = resolveToolInventoryRecord(id);
+  if (inventoryRecord && inventoryRecord.sourceKind !== 'platform') {
+    return launchFromInventoryRecord(inventoryRecord);
+  }
 
   const registryId = resolveRegistryId(id);
   const nlu = findClinicalIntentProfile({ toolId: id, registryId });

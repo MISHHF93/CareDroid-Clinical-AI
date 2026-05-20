@@ -16,6 +16,11 @@ import {
   KEYWORD_ROUTED_REGISTRY_IDS,
   REGISTRY,
 } from './clinicalToolIdContract';
+import {
+  resolveToolInventoryRecord,
+  TOOL_EXECUTOR_STATUS,
+  TOOL_LAUNCH_TYPES,
+} from './toolInventory';
 import { enrichMedicalCatalogRow, normalizeCatalogCategory } from '../utils/catalogSearch';
 
 /** Keyword-routed in chat but not separate NLU tool profiles */
@@ -31,6 +36,7 @@ function accessSummary(row) {
 }
 
 function buildFromNlu(nlu) {
+  const inventoryRecord = resolveToolInventoryRecord(nlu.toolId);
   const launch = resolveCatalogLaunch(nlu.toolId);
   const uiCalc = builtinUiCalculators.find(
     (c) =>
@@ -45,22 +51,23 @@ function buildFromNlu(nlu) {
   return {
     primaryId: nlu.toolId,
     id: nlu.toolId,
-    name: nlu.toolName,
-    category: nlu.category,
-    description: nlu.description,
-    pagePath: nlu.path || launch.path,
-    sidebarToolId: nlu.sidebarToolId || launch.registryId,
+    name: nlu.toolName || inventoryRecord?.label,
+    category: nlu.category || inventoryRecord?.category,
+    description: nlu.description || inventoryRecord?.safetyCopy,
+    pagePath: inventoryRecord?.route || nlu.path || launch.path,
+    sidebarToolId: nlu.sidebarToolId || launch.registryId || inventoryRecord?.id,
     chatOnRequest: true,
-    chatSeed: nlu.chatSeed || launch.chatSeed || '',
-    backendExecutor: Boolean(nlu.backendExecutable),
-    uiCalculatorSlug: uiCalc?.id || null,
-    chatOnlyForm: hubOnly,
+    chatSeed: inventoryRecord?.chatSeed || nlu.chatSeed || launch.chatSeed || '',
+    backendExecutor: inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED,
+    uiCalculatorSlug: inventoryRecord?.calculatorSlug || uiCalc?.id || null,
+    chatOnlyForm: hubOnly || inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED,
     accessSummary: null,
     source: 'NLU (tool.patterns.ts)',
   };
 }
 
 function buildFromRegistry(reg) {
+  const inventoryRecord = resolveToolInventoryRecord(reg.id);
   const launch = resolveCatalogLaunch(reg.id);
   const uiCalc = builtinUiCalculators.find(
     (c) =>
@@ -76,15 +83,15 @@ function buildFromRegistry(reg) {
   return {
     primaryId: matchedNlu?.toolId || reg.id,
     id: reg.id,
-    name: reg.name,
-    category: normalizeCatalogCategory(reg.category),
-    description: reg.description,
-    pagePath: reg.path,
+    name: inventoryRecord?.label || reg.name,
+    category: normalizeCatalogCategory(inventoryRecord?.category || reg.category),
+    description: inventoryRecord?.safetyCopy || reg.description,
+    pagePath: inventoryRecord?.route || reg.path,
     sidebarToolId: reg.id,
     chatOnRequest: Boolean(matchedNlu) || keywordRouted,
-    chatSeed: matchedNlu?.chatSeed || launch.chatSeed || '',
-    backendExecutor: Boolean(matchedNlu?.backendExecutable),
-    uiCalculatorSlug: uiCalc?.id || reg.initialCalc || null,
+    chatSeed: inventoryRecord?.chatSeed || matchedNlu?.chatSeed || launch.chatSeed || '',
+    backendExecutor: inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED,
+    uiCalculatorSlug: inventoryRecord?.calculatorSlug || uiCalc?.id || reg.initialCalc || null,
     chatOnlyForm: false,
     accessSummary: null,
     source: matchedNlu ? 'toolRegistry + NLU' : 'toolRegistry.js',

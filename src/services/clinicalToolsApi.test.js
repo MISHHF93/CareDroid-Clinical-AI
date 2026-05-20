@@ -12,7 +12,13 @@ vi.mock('../config/backendApiCapabilities', () => ({
 
 import { apiFetch } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
-import { fetchBackendClinicalTools } from './clinicalToolsApi';
+import {
+  fetchBackendClinicalTools,
+  fetchClinicalToolMetadata,
+  fetchToolExecutorCatalog,
+  fetchToolStatistics,
+  validateClinicalTool,
+} from './clinicalToolsApi';
 
 describe('clinicalToolsApi', () => {
   beforeEach(() => {
@@ -61,6 +67,60 @@ describe('clinicalToolsApi', () => {
     const result = await fetchBackendClinicalTools();
     expect(result.ok).toBe(false);
     expect(result.tools).toEqual([]);
+    expect(apiFetch).not.toHaveBeenCalled();
+  });
+
+  it('fetches tool metadata with an encoded id', async () => {
+    apiFetch.mockResolvedValueOnce({
+      ok: true,
+      _json: { id: 'sofa-calculator', parameters: [] },
+    });
+
+    const result = await fetchClinicalToolMetadata('sofa-calculator');
+    expect(result.ok).toBe(true);
+    expect(result.data.id).toBe('sofa-calculator');
+    expect(apiFetch).toHaveBeenCalledWith('/api/tools/sofa-calculator', expect.any(Object));
+  });
+
+  it('validates tool parameters without executing', async () => {
+    apiFetch.mockResolvedValueOnce({
+      ok: true,
+      _json: { valid: true, errors: [], warnings: [] },
+    });
+
+    const result = await validateClinicalTool('lab-interpreter', { labValues: [] });
+    expect(result.ok).toBe(true);
+    expect(apiFetch).toHaveBeenCalledWith('/api/tools/lab-interpreter/validate', {
+      method: 'POST',
+      headers: expect.objectContaining({ 'Content-Type': 'application/json' }),
+      body: JSON.stringify({ parameters: { labValues: [] } }),
+    });
+  });
+
+  it('fetches executor catalog and tool statistics through guarded clients', async () => {
+    apiFetch
+      .mockResolvedValueOnce({ ok: true, _json: { registeredExecutorToolIds: ['sofa-calculator'] } })
+      .mockResolvedValueOnce({ ok: true, _json: { totalTools: 3 } });
+
+    await expect(fetchToolExecutorCatalog()).resolves.toMatchObject({
+      ok: true,
+      data: { registeredExecutorToolIds: ['sofa-calculator'] },
+    });
+    await expect(fetchToolStatistics()).resolves.toMatchObject({
+      ok: true,
+      data: { totalTools: 3 },
+    });
+
+    expect(apiFetch).toHaveBeenNthCalledWith(1, '/api/tools/catalog/executors', expect.any(Object));
+    expect(apiFetch).toHaveBeenNthCalledWith(2, '/api/tools/statistics', expect.any(Object));
+  });
+
+  it('does not call validation route when tool execution capability is disabled', async () => {
+    vi.mocked(isBackendCapabilityEnabled).mockImplementation((capability) => capability !== 'toolsExecute');
+
+    const result = await validateClinicalTool('sofa-calculator', {});
+    expect(result.ok).toBe(false);
+    expect(result.error).toMatch(/validation API is not available/i);
     expect(apiFetch).not.toHaveBeenCalled();
   });
 });

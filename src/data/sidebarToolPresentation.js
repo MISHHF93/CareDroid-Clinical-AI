@@ -2,7 +2,7 @@
  * Sidebar tool grouping and list shaping (toolRegistry → visible nav).
  */
 
-import toolRegistry from './toolRegistry';
+import { getSidebarToolInventory } from './toolInventory';
 
 /** Category section order in Clinical Tools sidebar. */
 export const SIDEBAR_CATEGORY_ORDER = Object.freeze([
@@ -13,8 +13,8 @@ export const SIDEBAR_CATEGORY_ORDER = Object.freeze([
 ]);
 
 /**
- * @param {typeof toolRegistry} tools
- * @returns {Array<{ category: string, tools: typeof toolRegistry }>}
+ * @param {Array<{ category?: string, name: string }>} tools
+ * @returns {Array<{ category: string, tools: Array<{ category?: string, name: string }> }>}
  */
 export function groupSidebarToolsByCategory(tools) {
   const byCategory = new Map();
@@ -44,7 +44,7 @@ export function groupSidebarToolsByCategory(tools) {
 
 /**
  * Split workspace tools into pinned, favorites, and main catalog without duplicate cards.
- * @param {typeof toolRegistry} workspaceTools
+ * @param {Array<{ id: string }>} workspaceTools
  * @param {string[]} pinned
  * @param {string[]} favorites
  */
@@ -70,7 +70,7 @@ export function partitionSidebarTools(workspaceTools, pinned, favorites) {
  * @param {Array<{ id: string, name: string, toolIds: string[] }>} defaults
  */
 export function mergeWorkspacesWithRegistry(stored, defaults) {
-  const registryIds = toolRegistry.map((t) => t.id);
+  const registryIds = getSidebarToolInventory().map((t) => t.id);
   const defaultById = Object.fromEntries(defaults.map((w) => [w.id, w]));
 
   return stored.map((workspace) => {

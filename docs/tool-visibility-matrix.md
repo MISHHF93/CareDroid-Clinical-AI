@@ -16,9 +16,9 @@
 
 | Status | Count |
 |--------|------:|
-| component missing | 5 |
 | frontend-only | 27 |
-| fully visible | 25 |
+| fully visible | 29 |
+| hidden by layout | 1 |
 
 ## Tier semantics
 
@@ -53,14 +53,14 @@
 | Canonical ID | Display name | Category | Tier | Route | Calc slug | Registry | Catalog | Discovery | Sidebar | NLU | Pattern | Executor | Component | Renders | Launch OK | Status |
 |--------------|--------------|----------|------|-------|-----------|----------|---------|-----------|---------|-----|---------|----------|-----------|---------|----------|--------|
 | abcd2 | ABCD² score | calculator | A | /tools/calculators/abcd2 | abcd2 | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |
-| abg-interpreter | ABG Interpreter | diagnostic | clinical-page | /tools/lab-interpreter | — | yes | yes | yes | yes | yes | yes | no | no | yes | yes | component missing |
-| acls-protocol | ACLS Protocol | reference | clinical-page | /tools/protocols | — | yes | yes | yes | yes | yes | yes | no | no | yes | yes | component missing |
+| abg-interpreter | ABG Interpreter | diagnostic | clinical-page | /tools/lab-interpreter | — | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | fully visible |
+| acls-protocol | ACLS Protocol | reference | clinical-page | /tools/protocols | — | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | fully visible |
 | calculators | All calculators | calculator | hub | /tools/calculators | — | yes | yes | yes | yes | no | no | no | yes | yes | yes | fully visible |
-| antibiotic-guide | Antibiotic Guide | diagnostic | clinical-page | /tools/diagnosis | — | yes | yes | yes | yes | yes | yes | no | no | yes | yes | component missing |
+| antibiotic-guide | Antibiotic Guide | diagnostic | clinical-page | /tools/diagnosis | — | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | fully visible |
 | apache2-calculator | APACHE-II | calculator | other | /tools/calculators | — | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | fully visible |
 | apgar-score | Apgar score | calculator | A | /tools/calculators/apgar-score | apgar-score | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |
 | ascvd-risk | ASCVD 10-year risk | calculator | A | /tools/calculators/ascvd-risk | ascvd-risk | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |
-| atls-protocol | ATLS Protocol | reference | clinical-page | /tools/protocols | — | yes | yes | yes | yes | yes | yes | no | no | yes | yes | component missing |
+| atls-protocol | ATLS Protocol | reference | clinical-page | /tools/protocols | — | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | fully visible |
 | audit-c | AUDIT-C | calculator | A | /tools/calculators/audit-c | audit-c | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |
 | bisap-score | BISAP score | calculator | A | /tools/calculators/bisap-score | bisap-score | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |
 | bishop-score | Bishop score | calculator | A | /tools/calculators/bishop-score | bishop-score | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |
@@ -87,7 +87,7 @@
 | has-bled | HAS-BLED | calculator | A | /tools/calculators/has-bled | has-bled | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |
 | heart-score | HEART score | calculator | A | /tools/calculators/heart-score | heart-score | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |
 | lab-interp | Lab Interpreter | diagnostic | C | /tools/lab-interpreter | — | yes | yes | yes | yes | yes | yes | yes | yes | yes | yes | fully visible |
-| dose-calculator | Medication Dose Calculator | calculator | other | /tools/calculators | — | yes | yes | yes | yes | yes | yes | no | no | no | yes | component missing |
+| dose-calculator | Medication Dose Calculator | calculator | other | /tools/calculators | — | yes | yes | yes | yes | yes | yes | no | yes | no | yes | hidden by layout |
 | meld | MELD | calculator | A | /tools/calculators/meld | meld | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |
 | meld-na | MELD-Na | calculator | A | /tools/calculators/meld-na | meld-na | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |
 | morse-fall-scale | Morse Fall Scale | calculator | A | /tools/calculators/morse-fall-scale | morse-fall-scale | yes | yes | yes | yes | yes | yes | no | yes | yes | yes | frontend-only |

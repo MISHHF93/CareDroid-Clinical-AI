@@ -136,3 +136,29 @@ In chat, mention "PHQ9", "bleeding risk", "sofa calculator", "drug interactions"
 **Expected:**
 Correct tool suggestion or route; no phantom tool launches.
 
+## Render / execute (10-point) — per tool
+
+### matrix-automated
+
+**Steps:**
+Run `npm run test:tool-render-smoke` and `npm run test:e2e-matrix`.
+
+**Expected:**
+All matrix and smoke tests pass.
+
+### per-tool-deep-link
+
+**Steps:**
+For each tool in docs/tool-render-execute-matrix.md: open deep link, confirm non-empty page, run Tier A calculate or Tier C check or Tier B chat launch.
+
+**Expected:**
+Route renders; Tier A forms work locally; Tier C only hits POST executors; Tier B has chat seed; API errors show alert banner.
+
+### catalog-sidebar
+
+**Steps:**
+From /tools/catalog and sidebar, open drug-check, qSOFA, Wells PE, fleet command.
+
+**Expected:**
+Catalog and sidebar navigation match matrix smoke paths.
+

@@ -11,6 +11,7 @@ import {
   isCalculatorsHubPath,
 } from './clinicalCatalogWiring';
 import { ALL_REGISTRY_TOOL_IDS } from './clinicalToolIdContract';
+import { getFrontendVisibleToolInventory } from './toolInventory';
 
 describe('clinicalCatalogWiring helpers', () => {
   it('isCalculatorsHubPath recognizes hub route', () => {
@@ -42,5 +43,19 @@ describe('clinicalCatalogWiring helpers', () => {
     const launch = resolveCatalogLaunch(registryId);
     expect(launch.path || launch.chatSeed).toBeTruthy();
     expect(launch.openLabel?.length).toBeGreaterThan(0);
+  });
+
+  it('every frontend-visible inventory record resolves to a structured launch fallback', () => {
+    for (const record of getFrontendVisibleToolInventory()) {
+      const launch = resolveCatalogLaunch(record.id);
+      expect(launch, record.id).toEqual(
+        expect.objectContaining({
+          path: expect.anything(),
+          openLabel: expect.any(String),
+        })
+      );
+      expect(launch.path || launch.chatSeed || record.fallbackRoute, record.id).toBeTruthy();
+      expect(launch.openLabel.length, record.id).toBeGreaterThan(0);
+    }
   });
 });

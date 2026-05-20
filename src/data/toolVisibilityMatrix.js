@@ -6,7 +6,7 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import toolRegistry, { toolRegistryById } from './toolRegistry';
+import { toolRegistryById } from './toolRegistry';
 import { builtinUiCalculators, clinicalIntentTools } from './clinicalIntentToolCatalog';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools } from './sourceCodeToolDiscovery';
@@ -35,6 +35,7 @@ import {
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import { PR_FLEET_TOOL_SPECS } from './prFleetTestConstants';
 import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
+import { resolveToolInventoryRecord, TOOL_EXECUTOR_STATUS } from './toolInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -174,6 +175,7 @@ function catalogLaunchDiffersFromSidebar(registryId, tier) {
  * @param {object} opts
  */
 function buildVisibilityRow(canonicalId, opts = {}) {
+  const inventoryRecord = resolveToolInventoryRecord(canonicalId);
   const registryId =
     opts.registryId ??
     (toolRegistryById[canonicalId] ? canonicalId : ORCHESTRATOR_TO_REGISTRY_ID[canonicalId]) ??
@@ -183,6 +185,7 @@ function buildVisibilityRow(canonicalId, opts = {}) {
     opts.nluRow ?? clinicalIntentTools.find((t) => t.toolId === canonicalId) ?? null;
   const tier =
     opts.tier ??
+    inventoryRecord?.tier ??
     (NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(canonicalId) && !toolRegistryById[canonicalId]
       ? 'nlu-hub-only'
       : registryId
@@ -193,9 +196,9 @@ function buildVisibilityRow(canonicalId, opts = {}) {
     (registryId ? REGISTRY_ID_TO_BUILTIN_SLUG[registryId] : null) ??
     (builtinUiCalculators.some((c) => c.id === canonicalId) ? canonicalId : null);
 
-  const route = reg?.path ?? nlu?.path ?? resolveCatalogLaunch(canonicalId).path;
+  const route = inventoryRecord?.route ?? reg?.path ?? nlu?.path ?? resolveCatalogLaunch(canonicalId).path;
   const dedicatedRegistryEntry = Boolean(toolRegistryById[canonicalId]);
-  const sidebarVisible = dedicatedRegistryEntry;
+  const sidebarVisible = inventoryRecord?.sidebarVisible ?? dedicatedRegistryEntry;
   const nluProfiles = registryId
     ? clinicalIntentTools.filter(
         (t) => t.sidebarToolId === registryId || t.toolId === registryId
@@ -215,12 +218,13 @@ function buildVisibilityRow(canonicalId, opts = {}) {
       patternIds.has(registryToPrimaryNluToolId(registryId)));
   const primaryNlu = registryId ? registryToPrimaryNluToolId(registryId) : null;
   const backendExecutorExists =
+    inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED ||
     isOrchestratorPostExecutable(canonicalId) ||
     (canonicalId === registryId &&
       primaryNlu &&
       isOrchestratorPostExecutable(primaryNlu));
 
-  const frontendComponent = resolveFrontendComponent(
+  const frontendComponent = inventoryRecord?.component || resolveFrontendComponent(
     registryId || canonicalId,
     tier,
     builtinSlug,
@@ -232,11 +236,12 @@ function buildVisibilityRow(canonicalId, opts = {}) {
     canonicalId,
     displayName:
       opts.displayName ??
+      inventoryRecord?.label ??
       reg?.name ??
       nlu?.toolName ??
       builtinUiCalculators.find((c) => c.id === builtinSlug)?.name ??
       canonicalId,
-    category: normalizeCategory(reg?.category ?? nlu?.category ?? 'tool'),
+    category: inventoryRecord?.category ?? normalizeCategory(reg?.category ?? nlu?.category ?? 'tool'),
     tier: formatTierLabel(tier),
     route: route || '—',
     calculatorSlug: builtinSlug || '—',
@@ -298,7 +303,7 @@ function formatTierLabel(tier) {
 /**
  * @param {ReturnType<typeof buildVisibilityRow>} row
  */
-function deriveStatus(row, { registryId, tier, routeExists, catalogLaunchDiffers }) {
+function deriveStatus(row, { tier, routeExists, catalogLaunchDiffers }) {
   if (!routeExists && row.route !== '—') return 'route missing';
   if (!row.catalogEntryExists) return 'catalog missing';
   if (!row.frontendComponentExists) return 'component missing';

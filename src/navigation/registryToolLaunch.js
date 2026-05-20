@@ -10,6 +10,7 @@ import {
   resolveNavigationPathForLaunch,
   resolveRegistryId,
 } from '../data/clinicalCatalogWiring';
+import { resolveToolInventoryRecord, TOOL_LAUNCH_TYPES } from '../data/toolInventory';
 import {
   CALCULATOR_ROUTE_DEFS,
   isKnownToolAreaPath,
@@ -39,11 +40,13 @@ import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
  */
 export function getRegistryToolNavigation(toolId) {
   const launch = resolveCatalogLaunch(toolId);
+  const inventoryRecord = resolveToolInventoryRecord(toolId);
   const registryId = launch.registryId || resolveRegistryId(toolId) || toolId;
   const reg = toolRegistryById[registryId];
-  const navPath = resolveNavigationPathForLaunch(launch);
+  const navPath = inventoryRecord?.navigationPath || resolveNavigationPathForLaunch(launch);
+  const launchPath = inventoryRecord?.route || launch.path;
 
-  const calcMatch = launch.path ? matchCalculatorRoute(launch.path) : null;
+  const calcMatch = launchPath ? matchCalculatorRoute(launchPath) : null;
   if (calcMatch) {
     return {
       mode: 'calculator-route',
@@ -55,8 +58,9 @@ export function getRegistryToolNavigation(toolId) {
     };
   }
 
-  if (reg?.initialCalc && isRegisteredCalculatorSlug(reg.initialCalc)) {
-    const def = CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === reg.initialCalc);
+  const calculatorSlug = inventoryRecord?.calculatorSlug || reg?.initialCalc;
+  if (calculatorSlug && isRegisteredCalculatorSlug(calculatorSlug)) {
+    const def = CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === calculatorSlug);
     if (def) {
       return {
         mode: 'calculator-route',
@@ -69,7 +73,10 @@ export function getRegistryToolNavigation(toolId) {
     }
   }
 
-  if (navPath === '/dashboard' && launch.chatSeed) {
+  if (
+    (navPath === '/dashboard' && launch.chatSeed) ||
+    (inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED && inventoryRecord.chatSeed)
+  ) {
     return {
       mode: 'chat-assisted',
       pathname: '/dashboard',
@@ -91,21 +98,21 @@ export function getRegistryToolNavigation(toolId) {
     };
   }
 
-  if (reg?.initialCalc && isCalculatorsHubPath(launch.path)) {
+  if (calculatorSlug && isCalculatorsHubPath(launchPath)) {
     return {
       mode: 'calculator-hub',
       pathname: TOOL_LAUNCH_PATHS.calculatorsHub,
-      search: `?calc=${encodeURIComponent(reg.initialCalc)}`,
+      search: `?calc=${encodeURIComponent(calculatorSlug)}`,
       registryId,
       launch,
       shouldSeedChat: false,
     };
   }
 
-  if (reg?.path) {
+  if (inventoryRecord?.fallbackRoute || reg?.path) {
     return {
       mode: 'fallback',
-      pathname: reg.path,
+      pathname: inventoryRecord?.fallbackRoute || reg.path,
       search: '',
       registryId,
       launch,
