@@ -62,6 +62,12 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'exports-pdf', method: 'POST', path: '/api/exports/pdf', client: 'export/ExportService.js', capability: 'exportsPdf' },
   { id: 'exports-excel', method: 'POST', path: '/api/exports/excel', client: 'export/ExportService.js', capability: 'exportsExcel' },
   { id: 'reports-generate', method: 'POST', path: '/api/reports/generate', client: 'export/ExportService.js', capability: 'reportsGenerate' },
+  { id: 'reports-schedule-create', method: 'POST', path: '/api/reports/schedule', client: 'export/ExportService.js', capability: 'reportsSchedule', notes: 'No route — gated off' },
+  { id: 'reports-schedule-cancel', method: 'DELETE', path: '/api/reports/schedule/:reportId', client: 'export/ExportService.js', capability: 'reportsSchedule' },
+
+  { id: 'analytics-metrics', method: 'GET', path: '/api/analytics/metrics', client: 'AnalyticsDashboard.jsx' },
+  { id: 'auth-biometric-stats', method: 'GET', path: '/api/auth/biometric/stats', client: 'BiometricSetup.jsx' },
+  { id: 'auth-biometric-verify', method: 'POST', path: '/api/auth/biometric/verify', client: 'BiometricSetup.jsx' },
 
   { id: 'config-system', method: 'GET', path: '/api/config/system', client: 'configService.js' },
   { id: 'ai-remaining-queries', method: 'GET', path: '/api/ai/remaining-queries', client: 'configService.js' },

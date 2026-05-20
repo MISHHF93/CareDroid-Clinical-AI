@@ -22,6 +22,7 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('teamManagement')).toBe(false);
     expect(isBackendCapabilityEnabled('bulkSync')).toBe(false);
     expect(isBackendCapabilityEnabled('chatPersistence')).toBe(false);
+    expect(isBackendCapabilityEnabled('reportsSchedule')).toBe(false);
   });
 
   it('enables wired clinical routes', () => {

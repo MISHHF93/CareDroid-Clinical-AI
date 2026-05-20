@@ -5,10 +5,19 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import ExportService from '../services/export/ExportService';
 
+const capabilityEnabled = vi.hoisted(() => vi.fn());
+
+vi.mock('../config/backendApiCapabilities', () => ({
+  isBackendCapabilityEnabled: (cap) => capabilityEnabled(cap),
+  UNSUPPORTED_CAPABILITY_MESSAGE:
+    'This feature is not available on the server yet. Use on-device export, chat, or try again after an update.',
+}));
+
 describe('ExportService', () => {
   let service;
 
   beforeEach(() => {
+    capabilityEnabled.mockReturnValue(false);
     service = new ExportService('http://localhost:3000/api');
     service.token = 'test-token';
 
@@ -214,6 +223,26 @@ describe('ExportService', () => {
   });
 
   describe('Scheduled Reports', () => {
+    beforeEach(() => {
+      capabilityEnabled.mockImplementation((cap) =>
+        ['reportsSchedule', 'reportsGenerate'].includes(cap),
+      );
+    });
+
+    it('should not call network when reportsSchedule capability is disabled', async () => {
+      capabilityEnabled.mockImplementation((cap) => cap === 'reportsGenerate');
+
+      await expect(
+        service.scheduleReport(
+          'cost_summary',
+          { frequency: 'daily', time: '09:00' },
+          ['user@example.com'],
+        ),
+      ).rejects.toThrow(/not available on the server/i);
+
+      expect(global.fetch).not.toHaveBeenCalled();
+    });
+
     it('should schedule report', async () => {
       global.fetch.mockResolvedValue({
         ok: true,

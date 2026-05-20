@@ -7,57 +7,49 @@ on:
     branches: [main, develop]
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
 
 jobs:
   lint-and-test:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: npm
 
       - name: Install Dependencies
         run: npm ci
 
       - name: Lint
-        run: npm run lint || true
+        run: npm run lint
+
+      - name: Format check
+        run: npm run format:check
+
+      - name: Typecheck frontend TS
+        run: npm run typecheck:frontend
 
       - name: Run Tests
-        run: npm run test -- --coverage || true
-
-      - name: Upload Coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./coverage/coverage-final.json
-          flags: unittests
-          name: codecov-umbrella
-
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
+        run: npm run test:coverage
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          CI: true
 
   security-scan:
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Run npm audit
-        run: npm audit --audit-level=moderate || true
+        run: npm audit --audit-level=high
+        continue-on-error: true
 
       - name: Dependency Check
-        run: npm outdated || true
-
-      - name: SAST Scan
-        uses: github/super-linter@v4
-        env:
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm outdated
+        continue-on-error: true

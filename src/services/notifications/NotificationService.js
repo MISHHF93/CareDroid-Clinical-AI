@@ -340,7 +340,7 @@ class NotificationService {
       const response = await fetch(
         `${this.apiBaseUrl}/notifications/preferences`,
         {
-          method: 'PUT',
+          method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${this.token}`,

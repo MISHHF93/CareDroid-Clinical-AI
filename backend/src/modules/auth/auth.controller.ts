@@ -30,7 +30,7 @@ export class AuthController {
     const raw =
       this.configService.get<string>('FRONTEND_URL') ||
       process.env.FRONTEND_URL ||
-      'http://localhost:5173';
+      'http://localhost:8000';
     return raw.replace(/\/$/, '');
   }
 

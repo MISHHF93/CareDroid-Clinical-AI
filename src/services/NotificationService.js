@@ -4,7 +4,7 @@
  * Service for managing notification-related API calls and browser notifications
  */
 
-import { apiFetch, buildStreamUrl } from './apiClient';
+import { apiFetch, buildStreamUrl, getStoredAccessToken } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import appConfig from '../config/appConfig';
 import { getFirebaseMessagingToken } from './firebaseClient';
@@ -95,7 +95,7 @@ export const NotificationService = {
     try {
       const response = await apiFetch(`/api/notifications?limit=${limit}`, {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
         },
       });
 
@@ -118,7 +118,7 @@ export const NotificationService = {
       const response = await apiFetch(`/api/notifications/${notificationId}/read`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
         },
       });
 
@@ -141,7 +141,7 @@ export const NotificationService = {
       const response = await apiFetch(`/api/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
         },
       });
 
@@ -163,7 +163,7 @@ export const NotificationService = {
     try {
       const response = await apiFetch('/api/notifications/preferences', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
         },
       });
 
@@ -184,10 +184,10 @@ export const NotificationService = {
   async updatePreferences(preferences) {
     try {
       const response = await apiFetch('/api/notifications/preferences', {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
         },
         body: JSON.stringify(preferences),
       });
@@ -213,7 +213,7 @@ export const NotificationService = {
       return null;
     }
 
-    const token = localStorage.getItem('authToken');
+    const token = getStoredAccessToken();
     
     const eventSource = new EventSource(
       buildStreamUrl(`/api/notifications/stream?token=${token}`)
@@ -248,7 +248,7 @@ export const NotificationService = {
       const response = await apiFetch('/api/notifications/test', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
         },
       });
 

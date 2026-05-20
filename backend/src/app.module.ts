@@ -107,11 +107,16 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     EmailModule,
     CacheModule,
 
-    // Serve frontend static assets (single-port deployment)
-    // ServeStaticModule.forRoot({
-    //   rootPath: join(__dirname, '..', '..', 'public'),
-    //   exclude: ['/api*', '/health'],
-    // }),
+    // Serve Vite production build when running API in production (npm run start:single)
+    ...(process.env.NODE_ENV === 'production'
+      ? [
+          ServeStaticModule.forRoot({
+            rootPath: join(__dirname, '..', '..', 'dist'),
+            exclude: ['/api*', '/health', '/metrics*'],
+            serveRoot: '/',
+          }),
+        ]
+      : []),
 
     // Feature modules
     AuthModule,

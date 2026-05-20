@@ -61,9 +61,17 @@
     "start:all": "concurrently \"npm run backend:dev\" \"npm run dev\"",
     "mcp:server": "cd mcp && npm run start",
     "smoke": "node scripts/print-smoke-checklist.mjs",
-    "start:single": "npm run build:frontend && npm run backend:start",
     "lint": "eslint src",
-    "format": "prettier --write \"src/**/*.{js,jsx,json,css}\""
+    "lint:all": "npm run lint && cd backend && npm run lint",
+    "format": "prettier --write \"src/**/*.{js,jsx,json,css}\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,json,css}\"",
+    "typecheck:frontend": "tsc --noEmit -p tsconfig.frontend.json",
+    "test:all": "npm run test:run:frontend && cd backend && npm test",
+    "test:bundle-budget": "vitest run src/build/bundleBudget.test.js",
+    "build:analyze": "npm run build && node scripts/analyze-bundle.mjs",
+    "validate:ci": "npm run lint:all && npm run typecheck:frontend && npm run test:alias-sync && npm run test:catalog-launch && npm run test:registry-launch && npm run test:executor-mapping && npm run test:contract-matrix && npm run test:backend-exposure && npm run test:e2e-matrix && npm run test:tool-render-smoke && npm run test:safety-compliance && npm run test:visibility-matrix && npm run test:responsive-regression && npm run test:mobile-performance && vitest run src/data/toolRegistry.test.js src/data/clinicalCatalogWiring.test.js src/data/frontendApiCallsInventory.schedule.test.js src/services/apiClient.auth.test.js src/services/clinicalOrchestratorApi.registry.test.js src/components/ChatInterface.nlu.test.jsx src/test/ExportService.test.js && cd backend && npm run build && npm test && npm run test:e2e && cd .. && npm run build && npm run test:bundle-budget",
+    "validate:responsive": "playwright test e2e/responsive-qa.spec.mjs --config=playwright.config.mjs --project=chromium",
+    "start:single": "npm run build:frontend && npm run backend:build && npm run backend:start"
   },
   "dependencies": {
     "@capacitor/android": "^5.6.0",
@@ -92,6 +100,7 @@
     "jsdom": "^28.0.0",
     "prettier": "^3.2.4",
     "terser": "^5.47.1",
+    "typescript": "^5.7.3",
     "vite": "^7.3.1",
     "vitest": "^4.0.18",
     "zod": "^4.4.3"

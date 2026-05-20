@@ -40,6 +40,8 @@ export const BACKEND_API_CAPABILITIES = Object.freeze({
   exportsPdf: false,
   exportsExcel: false,
   reportsGenerate: false,
+  /** No Nest route — do not POST/DELETE scheduled reports */
+  reportsSchedule: false,
 });
 
 /**

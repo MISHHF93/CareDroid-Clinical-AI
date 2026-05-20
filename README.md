@@ -86,7 +86,12 @@ Root `.env.example` documents `PORT=8000` for documentation symmetry; the **API*
 | `start:all` | Concurrently: `backend:dev` + `dev` |
 | `backend:dev` | `cd backend && npm run start:dev` |
 | `backend:build` / `backend:start` | Nest build / prod start |
-| `start:single` | Build frontend then backend prod |
+| `start:single` | Build SPA + API; Nest serves `dist/` + `/api` on port 3000 |
+| `validate:ci` | Lint, format, typecheck, frontend matrix tests, backend tests, production builds |
+| `validate:responsive` | Playwright overflow QA at phone viewports |
+| `lint:all` | ESLint on `src` and `backend/src` |
+| `format:check` | Prettier check (no write) |
+| `build:analyze` | Production build + bundle budget report |
 | `android-debug` | Build SPA → `cap sync android` → `gradlew.bat assembleDebug` (Windows path) |
 | `android-release` | Same with `assembleRelease` |
 | `mcp:server` | `cd mcp && npm run start` |
@@ -306,9 +311,14 @@ Backend route inventory and frontend call audit: [docs/backend-api-inventory.md]
 
 | Layer | Command |
 |-------|---------|
+| Full CI gate (lint, matrix tests, builds) | `npm run validate:ci` |
 | Frontend unit / component tests | `npm run test:run` or `npm run test:run:frontend` |
-| Backend | `cd backend && npm test` |
+| Backend unit + E2E | `cd backend && npm test && npm run test:e2e` |
+| Responsive Playwright (360–430px) | `npm run validate:responsive` |
+| Bundle size report | `npm run build:analyze` |
 | Manual wiring checklist | `npm run smoke` |
+
+**Local dev:** `npm run start:all` (Vite **:8000** + API **:3000**). **Single-port prod preview:** `npm run start:single` (builds SPA to `dist/`, Nest serves API + static assets on **:3000**).
 
 ---
 

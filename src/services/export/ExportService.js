@@ -5,7 +5,10 @@
  */
 
 import { resolveApiRoot } from '../../config/apiEnv';
-import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
+import {
+  isBackendCapabilityEnabled,
+  UNSUPPORTED_CAPABILITY_MESSAGE,
+} from '../../config/backendApiCapabilities';
 
 const getDefaultApiBaseUrl = () => resolveApiRoot();
 
@@ -259,6 +262,10 @@ class ExportService {
    * Schedule recurring report
    */
   async scheduleReport(templateId, schedule, recipients, format = 'pdf') {
+    if (!isBackendCapabilityEnabled('reportsSchedule')) {
+      throw new Error(UNSUPPORTED_CAPABILITY_MESSAGE);
+    }
+
     // schedule: { frequency: 'daily'|'weekly'|'monthly', dayOfWeek?: 0-6, dayOfMonth?: 1-31, time: '09:00' }
     // recipients: email addresses
     const scheduledReport = {
@@ -344,6 +351,10 @@ class ExportService {
    * Cancel scheduled report
    */
   async cancelScheduledReport(reportId) {
+    if (!isBackendCapabilityEnabled('reportsSchedule')) {
+      return false;
+    }
+
     try {
       const response = await fetch(
         `${this.apiBaseUrl}/reports/schedule/${reportId}`,

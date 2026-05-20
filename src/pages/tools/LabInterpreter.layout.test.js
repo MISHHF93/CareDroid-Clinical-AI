@@ -14,7 +14,9 @@ describe('LabInterpreter.css layout', () => {
   it('uses minmax(0) columns and width constraints on root grid', () => {
     expect(css).toMatch(/\.lab-interpreter-content[\s\S]*minmax\(0,\s*1fr\)/);
     expect(css).toMatch(/\.lab-interpreter-content[\s\S]*min-width:\s*0/);
-    expect(css).toMatch(/\.lab-interpreter-content[\s\S]*max-width:\s*min\(1400px,\s*100%\)/);
+    expect(css).toMatch(
+      /\.lab-interpreter-content[\s\S]*max-width:\s*var\(--app-fluid-container-max-wide/,
+    );
   });
 
   it('stacks patient context and entry form below 768px', () => {

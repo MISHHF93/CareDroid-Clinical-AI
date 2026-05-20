@@ -26,8 +26,6 @@ export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'GET /api/auth/saml': { strategy: 'deferred', reason: 'SSO placeholder' },
   'GET /api/auth/me': { strategy: 'deferred', reason: 'JWT introspection; SPA uses profile' },
 
-  'POST /api/auth/biometric/verify': { strategy: 'expose-recommended', reason: 'Login flow', clientHint: 'BiometricSetup.jsx' },
-  'GET /api/auth/biometric/stats': { strategy: 'deferred', reason: 'Admin metrics' },
   'DELETE /api/auth/biometric/disable/:deviceId': { strategy: 'expose-recommended', reason: 'Device management', clientHint: 'BiometricSetup.jsx' },
   'DELETE /api/auth/biometric/delete/:deviceId': { strategy: 'expose-recommended', reason: 'Device management', clientHint: 'BiometricSetup.jsx' },
   'GET /api/auth/biometric/available': { strategy: 'expose-recommended', reason: 'Capability probe', clientHint: 'BiometricSetup.jsx' },
@@ -73,7 +71,6 @@ export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'GET /api/notifications/unread/count': { strategy: 'expose-recommended', reason: 'Badge count', clientHint: 'NotificationService.js' },
   'POST /api/notifications/read-all': { strategy: 'expose-recommended', reason: 'Inbox UX', clientHint: 'NotificationService.js' },
 
-  'GET /api/analytics/metrics': { strategy: 'backend-only', reason: 'Internal analytics dashboard' },
   'POST /api/health': { strategy: 'backend-only', reason: 'Client health ping (distinct from GET /health)' },
 
   'POST /api/ai/query': { strategy: 'backend-only', reason: 'Invoked via chat pipeline' },

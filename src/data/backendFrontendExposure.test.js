@@ -50,6 +50,7 @@ describe('backendFrontendExposure scan', () => {
       'notifications-stream',
       'clinical-alerts-ack',
       'exports-pdf',
+      'reports-schedule-create',
     ];
     const scan = runBackendFrontendExposureScan();
     for (const id of gatedIds) {

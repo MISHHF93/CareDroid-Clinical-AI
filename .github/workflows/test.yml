@@ -12,43 +12,48 @@ permissions:
   security-events: write
   checks: write
 
+env:
+  NODE_VERSION: '20'
+
 jobs:
   frontend-tests:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-        
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'npm'
-          
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run linter
-        run: npm run lint || true
-        continue-on-error: true
-        
+        run: npm run lint
+
       - name: Run frontend tests
-        run: npm run test:frontend || npm run test || echo "No tests configured"
+        run: npm run test:run:frontend
         env:
           CI: true
-        continue-on-error: true
-          
+
+      - name: Build frontend
+        run: npm run build
+
       - name: Upload coverage
+        if: false
         uses: codecov/codecov-action@v3
         with:
-          files: ./coverage/frontend/lcov.info
+          files: ./coverage/lcov.info
           flags: frontend
           name: frontend-coverage
-          
+
   backend-tests:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:15
@@ -63,7 +68,7 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-          
+
       redis:
         image: redis:7
         options: >-
@@ -73,76 +78,83 @@ jobs:
           --health-retries 5
         ports:
           - 6379:6379
-    
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-        
+        uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
-          cache: 'npm'
-          
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+
       - name: Install backend dependencies
-        run: |
-          cd backend
-          npm ci
-          
-      - name: Run database migrations
-        run: |
-          cd backend
-          npm run migration:run || echo "Migrations skipped or failed - continuing with tests"
+        working-directory: backend
+        run: npm ci
+
+      - name: Run backend unit tests
+        working-directory: backend
+        run: npm test
         env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/caredroid_test
-        continue-on-error: true
-          
-      - name: Run backend tests
-        run: |
-          cd backend
-          npm run test:e2e || npm run test:cov || npm run test || echo "No tests configured"
-        env:
-          DATABASE_URL: postgresql://test:test@localhost:5432/caredroid_test
-          REDIS_URL: redis://localhost:6379
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_USER: test
+          DATABASE_PASSWORD: test
+          DATABASE_NAME: caredroid_test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
           JWT_SECRET: test-secret-key
+          JWT_REFRESH_SECRET: test-refresh-secret
           NODE_ENV: test
-        continue-on-error: true
-          
-      - name: Upload coverage
-        uses: codecov/codecov-action@v3
-        with:
-          files: ./backend/coverage/lcov.info
-          flags: backend
-          name: backend-coverage
-          
+
+      - name: Run backend E2E tests
+        working-directory: backend
+        run: npm run test:e2e
+        env:
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_USER: test
+          DATABASE_PASSWORD: test
+          DATABASE_NAME: caredroid_test
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
+          JWT_SECRET: test-secret-key
+          JWT_REFRESH_SECRET: test-refresh-secret
+          NODE_ENV: test
+
+      - name: Build backend
+        working-directory: backend
+        run: npm run build
+
   security-scan:
     runs-on: ubuntu-latest
-    
+    continue-on-error: true
+
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
-        
+        uses: actions/checkout@v4
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
-        continue-on-error: true
-          
+          scan-type: fs
+          scan-ref: .
+          format: sarif
+          output: trivy-results.sarif
+
       - name: Upload Trivy results to GitHub Security
         uses: github/codeql-action/upload-sarif@v4
         with:
-          sarif_file: 'trivy-results.sarif'
+          sarif_file: trivy-results.sarif
         continue-on-error: true
-          
+
       - name: Run npm audit
-        run: npm audit --audit-level=moderate
+        run: npm audit --audit-level=high
         continue-on-error: true
-        
+
       - name: Run backend npm audit
-        run: |
-          cd backend
-          npm audit --audit-level=moderate
+        working-directory: backend
+        run: npm audit --audit-level=high
         continue-on-error: true

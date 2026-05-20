@@ -61,7 +61,7 @@ const BiometricSetup = () => {
 
   const loadBiometricConfig = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('caredroid_access_token');
       const response = await apiAxios.get('/api/auth/biometric/config', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -95,7 +95,7 @@ const BiometricSetup = () => {
       const deviceName = await getDeviceName();
 
       // Call backend to enroll
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('caredroid_access_token');
       const response = await apiAxios.post(
         '/api/auth/biometric/enroll',
         {
@@ -186,7 +186,7 @@ const BiometricSetup = () => {
     setError(null);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('caredroid_access_token');
       const deviceId = await getDeviceId();
 
       await apiAxios.delete(`/api/auth/biometric/disable/${deviceId}`, {
@@ -222,7 +222,7 @@ const BiometricSetup = () => {
   };
 
   const getUserIdFromToken = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('caredroid_access_token');
     if (!token) return null;
 
     try {
