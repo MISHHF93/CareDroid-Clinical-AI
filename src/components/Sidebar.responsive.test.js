@@ -16,12 +16,18 @@ const appShellJsx = readFileSync(join(__dirname, '../layout/AppShell.jsx'), 'utf
 describe('Sidebar responsive — mobile drawer', () => {
   it('off-canvas drawer does not intercept pointer events when closed', () => {
     expect(sidebarCss).toMatch(
-      /\.sidebar\.sidebar--compact[\s\S]*pointer-events:\s*none/
+      /@media \(max-width: 900px\)[\s\S]*\.sidebar[\s\S]*pointer-events:\s*none/
     );
     expect(sidebarCss).toMatch(
-      /\.sidebar\.sidebar--compact\.sidebar--open[\s\S]*pointer-events:\s*auto/
+      /\.sidebar\.sidebar--open[\s\S]*pointer-events:\s*auto/
     );
-    expect(sidebarCss).toMatch(/translateX\(-100%\)/);
+    expect(sidebarCss).toMatch(/translate3d\(-100%/);
+  });
+
+  it('CSS fallback clears main column inset on compact viewports', () => {
+    expect(readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8')).toMatch(
+      /@media \(max-width: 900px\)[\s\S]*\.app-shell-main-wrap[\s\S]*margin-left:\s*0/
+    );
   });
 
   it('provides mobile close control with touch target and initial focus hook', () => {
@@ -36,10 +42,12 @@ describe('Sidebar responsive — mobile drawer', () => {
     expect(sidebarJsx).toMatch(/aria-hidden=\{layoutCompact && !mobileNavOpen/);
   });
 
-  it('AppShell wires backdrop, escape, and focus trap', () => {
+  it('AppShell wires backdrop, escape, focus trap, and route-close', () => {
     expect(appShellJsx).toContain('app-shell-nav-backdrop');
     expect(appShellJsx).toContain('useDrawerFocus');
     expect(appShellJsx).toMatch(/e\.key === 'Escape'/);
+    expect(appShellJsx).toContain('useLocation');
+    expect(appShellJsx).toMatch(/location\.pathname/);
   });
 });
 
@@ -59,16 +67,22 @@ describe('Sidebar responsive — scroll and labels', () => {
 
 describe('Sidebar responsive — desktop collapse unchanged', () => {
   it('keeps collapsed width token at 70px', () => {
-    expect(sidebarCss).toMatch(/\.sidebar-collapsed[\s\S]*width:\s*70px/);
+    expect(sidebarCss).toMatch(/\.sidebar-collapsed[\s\S]*--sidebar-width-collapsed,\s*70px/);
     expect(sidebarJsx).toContain('sidebar-collapsed');
     expect(sidebarJsx).toMatch(/effectiveCollapsed = layoutCompact \? false : sidebarCollapsed/);
   });
 });
 
 describe('Sidebar responsive — active routes and keyboard', () => {
-  it('uses nested path matching for nav items', () => {
+  it('uses nested path matching and aria-current for nav items', () => {
     expect(sidebarJsx).toContain('isNavPathActive');
     expect(sidebarJsx).toMatch(/isNavPathActive\(item\.path\)/);
+    expect(sidebarJsx).toMatch(/aria-current=\{isNavPathActive\(item\.path\)/);
+  });
+
+  it('scrolls active item into view when mobile drawer opens', () => {
+    expect(sidebarJsx).toContain('scrollIntoView');
+    expect(sidebarJsx).toMatch(/\.nav-item\.active/);
   });
 
   it('tools section header is keyboard operable', () => {

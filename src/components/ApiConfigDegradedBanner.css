@@ -18,9 +18,12 @@
 }
 
 .api-config-degraded-banner__text {
-  flex: 1;
+  flex: 1 1 auto;
   margin: 0;
-  min-width: 200px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .api-config-degraded-banner__retry {

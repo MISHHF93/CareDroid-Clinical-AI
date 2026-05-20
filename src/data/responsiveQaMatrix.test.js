@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
+  ANDROID_QA_VIEWPORT_WIDTHS,
+  MOBILE_FIRST_VIEWPORT_WIDTHS,
   RESPONSIVE_QA_PAGES,
   RESPONSIVE_QA_VIEWPORTS,
   RESPONSIVE_QA_BROWSER_PROJECTS,
@@ -7,6 +9,7 @@ import {
   countResponsiveQaCells,
   buildResponsiveQaPages,
 } from './responsiveQaMatrix.js';
+import { MOBILE_FIRST_BREAKPOINTS } from '../layout/breakpoints.js';
 import {
   CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
@@ -14,8 +17,16 @@ import {
 } from './clinicalToolIdContract.js';
 
 describe('responsiveQaMatrix', () => {
-  it('defines nine viewports and four browsers', () => {
-    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(9);
+  it('defines mobile-first phone + tablet widths and full QA viewports including desktop', () => {
+    expect(MOBILE_FIRST_VIEWPORT_WIDTHS).toEqual([
+      ...MOBILE_FIRST_BREAKPOINTS.phone,
+      ...MOBILE_FIRST_BREAKPOINTS.tablet,
+    ]);
+    expect(ANDROID_QA_VIEWPORT_WIDTHS).toBe(MOBILE_FIRST_VIEWPORT_WIDTHS);
+    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(11);
+    expect(RESPONSIVE_QA_VIEWPORTS.map((v) => v.width)).toEqual(
+      expect.arrayContaining([375, 412, 768, 1024, 1280, 1920])
+    );
     expect(RESPONSIVE_QA_BROWSER_PROJECTS).toHaveLength(4);
   });
 

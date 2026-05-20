@@ -31,11 +31,11 @@ import GDPRNotice from './pages/GDPRNotice';
 import HIPAANotice from './pages/HIPAANotice';
 import HelpCenter from './pages/HelpCenter';
 
-// Page imports - Authenticated (Core pages loaded immediately)
-import Dashboard from './pages/Dashboard';
-import Profile from './pages/Profile';
-import ProfileSettings from './pages/ProfileSettings';
-import Settings from './pages/Settings';
+// Authenticated shell pages — lazy for smaller initial JS (mobile LCP)
+const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
+const Profile = lazyWithRetry(() => import('./pages/Profile'));
+const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
+const Settings = lazyWithRetry(() => import('./pages/Settings'));
 
 // Lazy-loaded pages for better performance (loaded on demand)
 const NotificationPreferences = lazyWithRetry(() => import('./pages/NotificationPreferences'));
@@ -258,9 +258,13 @@ function AppRoutes() {
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsChecking(false), 500);
+    if (!isLoading) {
+      setIsChecking(false);
+      return undefined;
+    }
+    const timer = setTimeout(() => setIsChecking(false), 150);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isLoading]);
 
   if (isChecking || isLoading) {
     return (

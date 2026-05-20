@@ -3,17 +3,7 @@
  * Loaded after layout-breakpoints.css; feature CSS may override locally.
  */
 
-:root {
-  --app-type-display: clamp(1.35rem, 5vw + 0.5rem, 2.625rem);
-  --app-type-title: clamp(1.25rem, 4vw + 0.5rem, 2rem);
-  --app-type-heading: clamp(1.0625rem, 3vw + 0.5rem, 1.5rem);
-  --app-type-body: clamp(0.875rem, 1.5vw + 0.5rem, 1rem);
-  --app-type-caption: clamp(0.75rem, 1vw + 0.45rem, 0.8125rem);
-  --app-space-field: clamp(12px, 2.5vw, 16px);
-  --app-space-field-lg: clamp(16px, 3vw, 20px);
-  --app-card-padding-compact: clamp(12px, 3vw, 18px);
-  --app-callout-padding-compact: clamp(10px, 2.5vw, 12px);
-}
+/* Type, spacing, and touch tokens: design-tokens.css (loaded before this file) */
 
 /* —— Headings: prevent overflow in primary app surfaces —— */
 .app-scroll-container h1,
@@ -45,7 +35,7 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-sm);
   min-width: 0;
 }
 
@@ -173,7 +163,7 @@
   .calc-input-field,
   .calc-select-field {
     min-height: var(--app-min-touch-target, 44px);
-    font-size: max(16px, var(--app-type-body));
+    font-size: max(var(--text-input-min), var(--text-body));
   }
 }
 
@@ -193,12 +183,12 @@
   }
 
   .tool-page {
-    padding: clamp(12px, 3vw, 20px);
+    padding: var(--app-page-padding-compact);
   }
 
   .calculators-content,
   .clinical-tool-catalog {
-    padding: clamp(12px, 3vw, 20px);
+    padding: var(--app-page-padding-compact);
   }
 }
 
@@ -251,7 +241,7 @@
 
 @media (max-width: 320px) {
   .tools-overview .header-stats {
-    gap: 16px;
+    gap: var(--space-md);
   }
 
   .stat-number {

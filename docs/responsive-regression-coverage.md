@@ -18,6 +18,7 @@ Vitest tests focus on **semantic render smoke**, **route non-emptiness**, and **
 | Global UX tokens | `src/styles/responsiveUx.test.js` | Typography, touch targets, callout compaction |
 | App shell | `src/layout/AppShell.layout.test.js` | Page body scroll, compact chrome offset |
 | Coverage inventory | `src/test/responsiveRegression.coverage.test.js` | QA matrix ↔ smoke route alignment |
+| Backend exposure scan | `src/data/backendFrontendExposure.test.js` | Frontend API ↔ Nest routes, executor parity, Vite proxy |
 
 **Run:**
 
@@ -29,7 +30,7 @@ npm run test:responsive-regression
 
 | Asset | Purpose |
 | --- | --- |
-| `src/data/responsiveQaMatrix.js` | 32 pages × 9 viewports × 4 browsers |
+| `src/data/responsiveQaMatrix.js` | 32+ pages × 11 viewports (9 Android widths incl. 412px Pixel) × 4 browsers |
 | `e2e/responsive-qa.spec.mjs` | Fails on document-level horizontal overflow |
 | `qa/RESPONSIVE_QA_MATRIX.md` | Human-readable matrix |
 | `qa/RESPONSIVE_QA_REPORT.md` | Last run summary |
@@ -43,7 +44,7 @@ npm run qa:responsive:retry   # re-run failed cells only
 
 ## Manual visual checks (not automated)
 
-Perform on **320×568**, **375×667**, and **768×1024** after UI changes:
+Perform on **320**, **412** (Pixel 7 / 7 Pro CSS width), **430**, and **768×1024** after UI changes:
 
 1. **Sidebar** — Open/close drawer; backdrop dismiss; focus returns to menu button; tool names wrap; no horizontal page scroll.
 2. **Dashboard chat** — Composer visible; message list scrolls; keyboard does not cover send on mobile.

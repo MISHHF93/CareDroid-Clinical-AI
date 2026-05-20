@@ -19,6 +19,7 @@ import {
   formatBackendFrontendContractMarkdown,
   getContractGaps,
 } from './backendFrontendToolContract';
+import { formatToolContractMatrixMarkdown } from './toolContractMatrix';
 import { parseClinicalToolPatterns } from './parseToolPatterns';
 import { readToolPatternsSource } from './clinicalToolAliasSync';
 
@@ -56,7 +57,11 @@ describe('backendFrontendToolContract report', () => {
     const md = formatBackendFrontendContractMarkdown(undefined, gaps);
     mkdirSync(docsDir, { recursive: true });
     writeFileSync(join(docsDir, 'backend-frontend-tool-contract.md'), `${md}\n`);
+    writeFileSync(
+      join(docsDir, 'tool-contract-matrix.md'),
+      `${formatToolContractMatrixMarkdown(undefined, gaps)}\n`
+    );
     // eslint-disable-next-line no-console
-    console.log('Wrote docs/backend-frontend-tool-contract.md');
+    console.log('Wrote docs/backend-frontend-tool-contract.md, docs/tool-contract-matrix.md');
   });
 });

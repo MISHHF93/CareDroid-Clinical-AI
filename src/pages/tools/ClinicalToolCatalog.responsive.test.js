@@ -36,7 +36,9 @@ describe('ClinicalToolCatalog responsive layout', () => {
   });
 
   it('keeps launch actions visible with touch-friendly buttons on mobile', () => {
-    expect(catalogCss).toMatch(/@media \(max-width: 640px\)[\s\S]*\.catalog-btn[\s\S]*min-height:\s*44px/);
+    expect(catalogCss).toMatch(
+      /@media \(max-width: 640px\)[\s\S]*\.catalog-btn[\s\S]*min-height:\s*var\(--touch-target-min\)/
+    );
     expect(catalogCss).toMatch(/\.catalog-table--stacked \.catalog-actions/);
   });
 
@@ -46,9 +48,16 @@ describe('ClinicalToolCatalog responsive layout', () => {
     expect(catalogCss).toMatch(/\.catalog-empty--global[\s\S]*padding:/);
   });
 
-  it('converts stacked tables to card rows at 640px', () => {
+  it('converts stacked tables to card rows at 640px and 900px via catalog-mobile.css', () => {
+    const catalogMobileCss = readFileSync(
+      join(__dirname, '../../styles/catalog-mobile.css'),
+      'utf8'
+    );
     expect(catalogCss).toMatch(
       /@media \(max-width: 640px\)[\s\S]*\.catalog-table--stacked tbody tr[\s\S]*display:\s*block/
+    );
+    expect(catalogMobileCss).toMatch(
+      /@media \(max-width: 900px\)[\s\S]*\.catalog-table--stacked tbody tr[\s\S]*display:\s*block/
     );
     expect(catalogCss).toMatch(/\.catalog-table--stacked td::before[\s\S]*attr\(data-label\)/);
   });

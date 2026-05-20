@@ -50,26 +50,37 @@ export default defineConfig(({ mode }) => {
       rollupOptions: {
         output: {
           manualChunks: (id) => {
-            // Vendor chunks - group by library
             if (id.includes('node_modules')) {
-              // React core
               if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
                 return 'vendor-react';
               }
-              // Charts library
               if (id.includes('recharts')) {
                 return 'vendor-charts';
               }
-              // Other vendors
+              if (id.includes('dexie')) {
+                return 'vendor-idb';
+              }
+              if (id.includes('firebase')) {
+                return 'vendor-firebase';
+              }
+              if (id.includes('lucide-react')) {
+                return 'vendor-icons';
+              }
               return 'vendor';
             }
 
-            // Analytics pages
+            if (id.includes('pages/tools/Calculators')) {
+              return 'calculators';
+            }
+            if (id.includes('ClinicalToolCatalog')) {
+              return 'clinical-catalog';
+            }
+            if (id.includes('pages/Dashboard')) {
+              return 'dashboard';
+            }
             if (id.includes('AnalyticsDashboard') || id.includes('CostAnalyticsDashboard')) {
               return 'analytics';
             }
-
-            // Chart components
             if (id.includes('components/charts/')) {
               return 'charts';
             }

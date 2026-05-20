@@ -1,0 +1,64 @@
+/**
+ * Mobile-first layout primitives — base styles target phones; min-width queries enhance up.
+ * Loaded after layout-visibility.css. Feature CSS should not assume a desktop minimum width.
+ *
+ * @see docs/mobile-first-responsive-audit.md
+ * @see src/layout/breakpoints.js
+ */
+
+/* Breakpoint + fluid shell tokens: design-tokens.css */
+
+/* Fluid tool-page containers — no fixed desktop width as minimum */
+.app-fluid-container,
+.calculators-content,
+.clinical-tool-catalog,
+.tools-overview,
+.lab-interpreter-content,
+.diagnosis-tool-grid,
+.tool-page {
+  width: 100%;
+  max-width: var(--app-fluid-container-max-wide);
+  min-width: 0;
+  margin-inline: auto;
+  box-sizing: border-box;
+}
+
+.calculators-content {
+  max-width: var(--app-fluid-container-max);
+}
+
+/* Split clinical forms: single column on phones (default) */
+.calculator-interface,
+.lab-interpreter-content,
+.diagnosis-tool-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--app-fluid-split-gap);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: clip;
+}
+
+.lab-interpreter-content,
+.diagnosis-tool-grid {
+  padding: var(--app-fluid-page-gutter);
+}
+
+/* Tablet+: side-by-side inputs / results when space allows */
+@media (min-width: 1024px) {
+  .calculator-interface,
+  .lab-interpreter-content,
+  .diagnosis-tool-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+/* Fluid auto-fit grids (replace fixed desktop track mins) */
+.ai-panel-actions,
+.tool-page-layout-grid--fluid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: var(--app-space-field);
+}

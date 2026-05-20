@@ -230,6 +230,15 @@ export const subscribeToClinicalAlerts = (callbacks = {}) => {
     onError = () => {}
   } = callbacks;
 
+  if (!isBackendCapabilityEnabled('clinicalAlerts')) {
+    onError(
+      new Error(
+        'Clinical alerts stream is not available on this server. Use in-app notifications or refresh the alerts page.'
+      )
+    );
+    return null;
+  }
+
   // Attempt WebSocket connection for real-time alerts
   if (!window.WebSocket) {
     onError(new Error('WebSocket not supported'));

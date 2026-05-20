@@ -127,6 +127,8 @@ const TOOL_SAFETY_PROFILES = Object.freeze({
   perc: ['peAcs'],
   'grace-acs': ['peAcs'],
   'timi-ua-nstemi': ['peAcs'],
+  'heart-score': ['peAcs'],
+  'framingham-risk': ['peAcs'],
   nihss: ['traumaStroke'],
   'canadian-c-spine': ['traumaStroke'],
   'ottawa-ankle': ['traumaStroke'],

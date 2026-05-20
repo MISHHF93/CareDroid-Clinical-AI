@@ -1,0 +1,60 @@
+/**
+ * Mobile Web Vitals — LCP, CLS, INP helpers.
+ * @see docs/mobile-performance-audit.md
+ */
+
+/* Reserve space for route loaders (avoid CLS while lazy chunks load) */
+.page-loader {
+  min-height: min(100dvh, 100vh);
+  min-height: var(--app-viewport-height, 100dvh);
+  contain: layout style;
+}
+
+.app-init-screen {
+  contain: layout style;
+}
+
+/* Dashboard chat — skip off-screen paint work on long threads */
+.dashboard-scroll {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 480px;
+}
+
+.dashboard-message,
+.dashboard-empty {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 72px;
+}
+
+/* Catalog / tool tables — large DOM on mobile */
+.catalog-table-wrap,
+.tools-overview-grid {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 360px;
+}
+
+/* Faster tap response — avoid 300ms where supported */
+button,
+a,
+[role='button'],
+input[type='submit'],
+.dashboard-composer-send {
+  touch-action: manipulation;
+}
+
+/* Respect reduced motion (also helps main-thread work) */
+@media (prefers-reduced-motion: reduce) {
+  .page-loader-spinner {
+    animation: none;
+    border-top-color: var(--accent-green);
+    opacity: 0.85;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

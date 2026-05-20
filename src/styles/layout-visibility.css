@@ -3,6 +3,17 @@
  * Complements AppShell.css (scrollport) and responsive-ux.css (typography/touch).
  */
 
+/* —— Document: no body-level horizontal scroll —— */
+html {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+body {
+  overflow-x: clip;
+  max-width: 100%;
+}
+
 /* —— Scroll routes: content grows; vertical scroll stays on .app-shell-page-body —— */
 .app-shell-page-body:not(.app-shell-page-body--conversation) > * {
   flex: 1 0 auto;
@@ -96,6 +107,16 @@
 
 .catalog-stats {
   grid-template-columns: repeat(auto-fill, minmax(min(120px, 100%), 1fr));
+}
+
+/* Auto-fit grids with large track mins must not exceed the scrollport (e.g. cost dashboard) */
+.app-shell-page-body:not(.app-shell-page-body--conversation) .dashboard-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
+}
+
+.analytics-summary,
+.analytics-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
 }
 
 @media (max-width: 768px) {

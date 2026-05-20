@@ -26,6 +26,13 @@ describe('layout-visibility.css', () => {
     expect(layoutVisibilityCss).toMatch(/\.catalog-table-wrap[\s\S]*overflow-x:\s*auto/);
   });
 
+  it('prevents body-level horizontal overflow and unsafe dashboard grids', () => {
+    expect(layoutVisibilityCss).toMatch(/body[\s\S]*overflow-x:\s*clip/);
+    expect(layoutVisibilityCss).toMatch(
+      /\.dashboard-grid[\s\S]*minmax\(min\(100%,\s*400px\)/
+    );
+  });
+
   it('sets min-width 0 on calculator flex children', () => {
     expect(layoutVisibilityCss).toMatch(/\.calculator-interface[\s\S]*min-width:\s*0/);
   });
@@ -42,9 +49,24 @@ describe('AppShell.css — scroll vs conversation', () => {
   });
 });
 
+describe('mobile-first-layout.css', () => {
+  const mobileFirstCss = readFileSync(join(__dirname, 'mobile-first-layout.css'), 'utf8');
+
+  it('defaults split clinical forms to one column and enhances at 1024px', () => {
+    expect(mobileFirstCss).toMatch(
+      /\.calculator-interface[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/
+    );
+    expect(mobileFirstCss).toMatch(
+      /@media \(min-width: 1024px\)[\s\S]*minmax\(0,\s*1fr\) minmax\(0,\s*1fr\)/
+    );
+  });
+});
+
 describe('Calculators.css — responsive calculator grid', () => {
-  it('stacks calculator interface on tablet', () => {
-    expect(calculatorsCss).toMatch(/@media \(max-width:\s*1024px\)[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+  it('does not use desktop-first two-column default on calculator-interface', () => {
+    expect(calculatorsCss).not.toMatch(
+      /\.calculator-interface\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(0,\s*1fr\)/
+    );
   });
 
   it('uses minmax hub cards', () => {

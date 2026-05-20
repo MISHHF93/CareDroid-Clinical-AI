@@ -12,6 +12,7 @@ import Citations, { CitationModal } from '../components/Citations';
 import ConfidenceBadge from '../components/ConfidenceBadge';
 import analyticsService from '../services/analyticsService';
 import { getToolRecommendationsNLU, recordRecommendationFeedback } from '../utils/toolRecommendations';
+import { scheduleIdleWork } from '../utils/scheduleIdleWork';
 import {
   sendClinicalChatMessage,
   mapChatResponseToAssistantMessage,
@@ -167,11 +168,13 @@ function Dashboard() {
 
   useEffect(() => {
     let cancelled = false;
-    const run = async () => {
-      if (!recommendationSource) {
-        setRecommendedTools([]);
-        return;
-      }
+    if (!recommendationSource) {
+      setRecommendedTools([]);
+      return undefined;
+    }
+
+    const cancelIdle = scheduleIdleWork(async () => {
+      if (cancelled) return;
       try {
         const tools = await getToolRecommendationsNLU(
           recommendationSource,
@@ -182,10 +185,11 @@ function Dashboard() {
       } catch {
         if (!cancelled) setRecommendedTools([]);
       }
-    };
-    run();
+    });
+
     return () => {
       cancelled = true;
+      cancelIdle();
     };
   }, [recommendationSource, activeConversationId]);
 

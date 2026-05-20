@@ -1,10 +1,16 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import Sidebar from '../components/Sidebar';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import { useDrawerFocus } from '../hooks/useDrawerFocus';
-import { COMPACT_MEDIA_QUERY, getIsCompactViewport } from './breakpoints';
+import {
+  COMPACT_MEDIA_QUERY,
+  getIsCompactViewport,
+  SIDEBAR_WIDTH_COLLAPSED_PX,
+  SIDEBAR_WIDTH_EXPANDED_PX,
+} from './breakpoints';
 import './AppShell.css';
 
 const AppShell = ({
@@ -25,6 +31,7 @@ const AppShell = ({
   children,
 }) => {
   const { preference, resolvedTheme, setPreference } = useTheme();
+  const location = useLocation();
 
   const [isCompact, setIsCompact] = useState(getIsCompactViewport);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -44,7 +51,7 @@ const AppShell = ({
 
   const mainInsetPx = useMemo(() => {
     if (isCompact) return 0;
-    return sidebarCollapsed ? 70 : 280;
+    return sidebarCollapsed ? SIDEBAR_WIDTH_COLLAPSED_PX : SIDEBAR_WIDTH_EXPANDED_PX;
   }, [isCompact, sidebarCollapsed]);
 
   const cycleTheme = () => {
@@ -54,6 +61,10 @@ const AppShell = ({
   };
 
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
+
+  useEffect(() => {
+    closeMobileNav();
+  }, [location.pathname, location.search, closeMobileNav]);
 
   useDrawerFocus({
     isOpen: isAuthed && isCompact && mobileNavOpen,
@@ -72,7 +83,14 @@ const AppShell = ({
 
   return (
     <div
-      className={`app-shell ${isCompact ? 'app-shell--compact' : ''} ${isAuthed ? 'app-shell--authed' : ''}`}
+      className={[
+        'app-shell',
+        isCompact ? 'app-shell--compact' : '',
+        isAuthed ? 'app-shell--authed' : '',
+        isCompact && mobileNavOpen ? 'app-shell--nav-open' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
       style={{
         ['--app-main-inset']: `${mainInsetPx}px`,
       }}
@@ -111,10 +129,10 @@ const AppShell = ({
             ref={menuButtonRef}
             type="button"
             className="app-shell-menu-btn"
-            onClick={() => setMobileNavOpen(true)}
+            onClick={() => setMobileNavOpen((open) => !open)}
             aria-expanded={mobileNavOpen}
             aria-controls="app-sidebar-nav"
-            aria-label="Open navigation menu"
+            aria-label={mobileNavOpen ? 'Close navigation menu' : 'Open navigation menu'}
           >
             <span className="app-shell-menu-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.menu} size={22} />

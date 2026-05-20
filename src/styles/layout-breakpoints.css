@@ -1,22 +1,18 @@
 /**
- * Responsive layout reference (keep media queries aligned with JS where noted).
+ * Mobile-first breakpoint reference (CSS custom properties + shell gutters).
+ * Enhance layout with min-width queries in feature CSS; do not require desktop width.
  *
- * - 900px: `COMPACT_MEDIA_QUERY` in src/layout/breakpoints.js — AppShell compact,
- *   sidebar off-canvas, Dashboard column + tool drawer stack.
- * - 768px / 640px / 480px: feature pages (tools, settings, analytics, etc.).
- * - 600px: Dashboard narrow density (Dashboard.css).
- * - 520px: Theme FAB label hidden (AppShell.css).
- * - 400px: Dashboard stacked composer send (Dashboard.css).
- * - 380px: Tighter menu / theme controls (AppShell.css).
+ * Phones: 320–430 | Tablets: 768, 1024 | Desktop: 1280, 1440, 1920+
+ * @see src/layout/breakpoints.js — MOBILE_FIRST_BREAKPOINTS
+ * @see docs/mobile-first-responsive-audit.md
  */
 @media (min-width: 0) {
   :root {
     --layout-breakpoints-doc: 1;
-    /* Compact shell: floating menu + theme control row (see AppShell.css) */
     --app-compact-chrome-height: 52px;
     --app-compact-chrome-height-landscape: 44px;
     --app-compact-content-offset-top: var(--app-compact-chrome-height);
-    --app-shell-page-gutter-inline: var(--app-fluid-page-gutter, clamp(12px, 2.2vw, 32px));
+    --app-shell-page-gutter-inline: var(--app-fluid-page-gutter, clamp(12px, 3.2vw, 32px));
     --app-shell-page-gutter-block: clamp(12px, 2vw, 24px);
   }
 }

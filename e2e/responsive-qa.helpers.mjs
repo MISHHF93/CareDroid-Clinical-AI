@@ -123,10 +123,38 @@ export async function installQaNetworkStubs(page) {
     });
   });
   await page.route('**/api/tools**', async (route) => {
+    if (route.request().method() !== 'GET') {
+      await route.continue();
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: '[]',
+      body: JSON.stringify({ tools: [], count: 0 }),
+    });
+  });
+
+  await page.route('**/api/config/system**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ rag: { enabled: true }, session: { idleTimeoutMs: 1800000 } }),
+    });
+  });
+
+  await page.route('**/api/ai/remaining-queries**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ remaining: 100, limit: 100 }),
+    });
+  });
+
+  await page.route('**/api/subscriptions/current**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ plan: 'professional', status: 'active' }),
     });
   });
 }

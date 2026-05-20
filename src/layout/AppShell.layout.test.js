@@ -49,6 +49,9 @@ describe('App shell layout — main column', () => {
     expect(appShellCss).toMatch(
       /\.app-shell--compact \.app-shell-main-wrap[\s\S]*margin-left:\s*0/
     );
+    expect(appShellCss).toMatch(
+      /@media \(max-width: 900px\)[\s\S]*\.app-shell-main-wrap[\s\S]*margin-left:\s*0/
+    );
   });
 });
 

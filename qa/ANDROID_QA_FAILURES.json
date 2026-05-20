@@ -1,0 +1,23 @@
+[
+  {
+    "title": "[routes] * @ * — cold start (first run)",
+    "kind": "timeout",
+    "error": "Test timeout ~120s before Vite warm + network stubs; passed on retry",
+    "status": "fixed",
+    "fix": "Extended API stubs (config, subscriptions, ai/remaining-queries); route warm-up in beforeAll"
+  },
+  {
+    "title": "[touch] * portrait primary targets",
+    "kind": "touch",
+    "error": "catalog-category-chip 40×44px (width below 44px)",
+    "status": "fixed",
+    "fix": "min-width/min-height 44px on .catalog-category-chip; menu button 44px in AppShell.css"
+  },
+  {
+    "title": "[landscape] * calculators hub + touch",
+    "kind": "touch",
+    "error": "calc-reset-btn missing on calculators hub page",
+    "status": "fixed",
+    "fix": "Landscape scenario uses /tools/calculators/has-bled for overflow + reset visibility"
+  }
+]

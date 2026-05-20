@@ -164,6 +164,12 @@ export function matchesMedicalCatalogCategoryFilter(row, categoryFilter) {
   if (categoryFilter === 'diagnostic') {
     return row.category === 'diagnostic' || row.category === 'checker';
   }
+  if (categoryFilter === 'interpreter' || categoryFilter === 'protocol' || categoryFilter === 'reference') {
+    return row.category === categoryFilter;
+  }
+  if (categoryFilter === 'apis') {
+    return false;
+  }
   return row.category === categoryFilter;
 }
 
@@ -217,10 +223,17 @@ export function enrichMedicalCatalogRow(row) {
     nluToolId && isOrchestratorRegisteredNlu(nluToolId)
   );
   const backendApiIntentOnly = Boolean(row.backendExecutor && !backendApiRegistered);
+  const resolvedPath = row.pagePath || launch.path;
   const launchable =
     !row.hiddenFromCatalog &&
-    Boolean(launch.path || launch.chatSeed) &&
-    !(row.backendExecutor && !backendApiRegistered && !launch.chatSeed);
+    Boolean(resolvedPath || launch.chatSeed || row.chatOnRequest) &&
+    !(
+      row.backendExecutor &&
+      !backendApiRegistered &&
+      !launch.chatSeed &&
+      !row.chatOnRequest &&
+      !resolvedPath
+    );
 
   return {
     ...row,

@@ -17,13 +17,20 @@ const disclaimerCss = readFileSync(
 );
 
 describe('responsive-ux.css — global normalization', () => {
-  it('is imported from main.jsx', () => {
+  it('is imported from main.jsx after design-tokens.css', () => {
+    expect(mainJsx).toContain("import './styles/design-tokens.css'");
     expect(mainJsx).toContain("import './styles/responsive-ux.css'");
+    expect(mainJsx).toContain("import './styles/mobile-first-layout.css'");
+    const tokensPos = mainJsx.indexOf("import './styles/design-tokens.css'");
+    const uxPos = mainJsx.indexOf("import './styles/responsive-ux.css'");
+    expect(uxPos).toBeGreaterThan(tokensPos);
   });
 
-  it('defines fluid type scale tokens', () => {
-    expect(responsiveUxCss).toContain('--app-type-title:');
-    expect(responsiveUxCss).toContain('clamp(');
+  it('relies on design-tokens for fluid type scale', () => {
+    const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
+    expect(designTokensCss).toContain('--app-type-title:');
+    expect(designTokensCss).toContain('clamp(');
+    expect(responsiveUxCss).toContain('var(--app-type-title)');
   });
 
   it('prevents heading overflow in app scroll surfaces', () => {

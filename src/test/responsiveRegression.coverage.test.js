@@ -7,6 +7,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  ANDROID_QA_VIEWPORT_WIDTHS,
   RESPONSIVE_QA_VIEWPORTS,
   RESPONSIVE_QA_BROWSER_PROJECTS,
   buildResponsiveQaPages,
@@ -53,7 +54,8 @@ describe('Responsive regression coverage inventory', () => {
   });
 
   it('Playwright matrix dimensions match product spec', () => {
-    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(9);
+    expect(ANDROID_QA_VIEWPORT_WIDTHS).toContain(412);
+    expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(11);
     expect(RESPONSIVE_QA_BROWSER_PROJECTS.map((b) => b.id)).toEqual([
       'chromium',
       'firefox',

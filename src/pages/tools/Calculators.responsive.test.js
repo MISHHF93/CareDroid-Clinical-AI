@@ -15,6 +15,14 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const calculatorsCss = readFileSync(join(__dirname, 'Calculators.css'), 'utf8');
+const mobileFirstCss = readFileSync(
+  join(__dirname, '../../styles/mobile-first-layout.css'),
+  'utf8'
+);
+const mobilePrCss = readFileSync(
+  join(__dirname, '../../styles/calculators-mobile-pr.css'),
+  'utf8'
+);
 const calculatorsJsx = readFileSync(join(__dirname, 'Calculators.jsx'), 'utf8');
 const pr4aJsx = readFileSync(join(__dirname, 'pr4aCalculators.jsx'), 'utf8');
 const mentalJsx = readFileSync(join(__dirname, 'mentalHealthCalculators.jsx'), 'utf8');
@@ -84,9 +92,15 @@ describe('PR4A & mental health calculator modules', () => {
 });
 
 describe('Calculators.css — responsive layout', () => {
-  it('stacks two-column calculator interface below 1024px', () => {
-    expect(calculatorsCss).toMatch(
-      /@media \(max-width: 1024px\)[\s\S]*\.calculator-interface[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/
+  it('defaults calculator interface to one column (mobile-first)', () => {
+    expect(mobileFirstCss).toMatch(
+      /\.calculator-interface[\s\S]*grid-template-columns:\s*minmax\(0,\s*1fr\)/
+    );
+    expect(mobileFirstCss).toMatch(
+      /@media \(min-width: 1024px\)[\s\S]*\.calculator-interface[\s\S]*minmax\(0,\s*1fr\) minmax\(0,\s*1fr\)/
+    );
+    expect(calculatorsCss).not.toMatch(
+      /\.calculator-interface\s*\{[^}]*grid-template-columns:\s*minmax\(0,\s*1fr\)\s*minmax\(0,\s*1fr\)/
     );
   });
 
@@ -104,7 +118,7 @@ describe('Calculators.css — responsive layout', () => {
       /@media \(max-width: 640px\)[\s\S]*\.calc-actions[\s\S]*flex-direction:\s*column/
     );
     expect(calculatorsCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*\.calc-calculate-btn[\s\S]*min-height:\s*44px/
+      /@media \(max-width: 640px\)[\s\S]*\.calc-calculate-btn[\s\S]*min-height:\s*var\(--touch-target-min\)/
     );
   });
 
@@ -137,7 +151,7 @@ describe('Calculators.css — responsive layout', () => {
       /@media \(max-width: 640px\)[\s\S]*\.calc-input-row--with-unit[\s\S]*flex-direction:\s*column/
     );
     expect(calculatorsCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*\.calc-select-field[\s\S]*min-height:\s*44px/
+      /@media \(max-width: 640px\)[\s\S]*\.calc-select-field[\s\S]*min-height:\s*var\(--touch-target-min\)/
     );
   });
 
@@ -153,8 +167,8 @@ describe('Calculators.css — responsive typography & touch', () => {
   });
 
   it('enforces minimum touch height on primary form controls', () => {
-    expect(calculatorsCss).toMatch(/\.calc-input-field[\s\S]*min-height:\s*44px/);
-    expect(calculatorsCss).toMatch(/\.calc-calculate-btn[\s\S]*min-height:\s*44px/);
+    expect(calculatorsCss).toMatch(/\.calc-input-field[\s\S]*min-height:\s*var\(--touch-target-min\)/);
+    expect(calculatorsCss).toMatch(/\.calc-calculate-btn[\s\S]*min-height:\s*var\(--touch-target-min\)/);
   });
 
   it('compacts callouts on mobile without removing them', () => {
@@ -167,5 +181,22 @@ describe('Calculators.css — responsive typography & touch', () => {
     expect(calculatorsJsx).toContain('calculator-panel-title-text');
     expect(pr4aJsx).toContain('calculator-panel-title-text');
     expect(mentalJsx).toContain('calculator-panel-title-text');
+  });
+});
+
+describe('PR1–PR5 mobile stylesheet', () => {
+  it('loads calculators-mobile-pr.css from Calculators.jsx', () => {
+    expect(calculatorsJsx).toContain("import '../../styles/calculators-mobile-pr.css'");
+  });
+
+  it('keeps reset buttons full-width on phones', () => {
+    expect(mobilePrCss).toMatch(
+      /@media \(max-width: 767px\)[\s\S]*\.calc-reset-btn[\s\S]*width:\s*100%/
+    );
+  });
+
+  it('resizes warnings and result badges on narrow viewports', () => {
+    expect(mobilePrCss).toMatch(/\.calc-gad7-severe-warning[\s\S]*max-width:\s*100%/);
+    expect(mobilePrCss).toMatch(/\.calc-pr4a-risk-badge[\s\S]*max-width:\s*100%/);
   });
 });

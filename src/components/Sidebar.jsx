@@ -188,6 +188,14 @@ const Sidebar = forwardRef(function Sidebar(
     return () => node.removeAttribute('inert');
   }, [layoutCompact, mobileNavOpen, ref]);
 
+  useEffect(() => {
+    if (!layoutCompact || !mobileNavOpen || !ref?.current) return;
+    const active = ref.current.querySelector(
+      '.nav-item.active, .sidebar-tool-card.active, .sidebar-tools-quick-action--active'
+    );
+    active?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [layoutCompact, mobileNavOpen, location.pathname, location.search, ref]);
+
   const renderToolCard = (tool) => {
     const isSelected =
       currentTool === tool.id &&
@@ -227,7 +235,7 @@ const Sidebar = forwardRef(function Sidebar(
             e.currentTarget.style.borderColor = 'transparent';
           }
         }}
-        title={`${tool.name} - ${tool.description}\n\nShortcut: ${tool.shortcut}\nClick to navigate or use in chat with /${tool.id}`}
+        title={`${tool.name} - ${tool.description}${tool.shortcut ? `\n\nShortcut: ${tool.shortcut}` : ''}\nClick to navigate or use in chat with /${tool.id}`}
       >
         <div className="tool-action-buttons">
           <button
@@ -272,9 +280,11 @@ const Sidebar = forwardRef(function Sidebar(
           <div className="sidebar-tool-card-body">
             <div className="sidebar-tool-card-title-row">
               <span className="sidebar-tool-card-name">{tool.name}</span>
-              <span className="sidebar-tool-card-shortcut">
-                {tool.shortcut.replace('Ctrl+', '⌘')}
-              </span>
+              {tool.shortcut ? (
+                <span className="sidebar-tool-card-shortcut">
+                  {tool.shortcut.replace('Ctrl+', '⌘')}
+                </span>
+              ) : null}
             </div>
             <div className="sidebar-tool-card-desc">{tool.description}</div>
             <div
@@ -395,6 +405,7 @@ const Sidebar = forwardRef(function Sidebar(
                 className={`nav-item ${isNavPathActive(item.path) ? 'active' : ''}`}
                 onClick={() => handleNavClick(item.path)}
                 title={effectiveCollapsed ? item.label : ''}
+                aria-current={isNavPathActive(item.path) ? 'page' : undefined}
               >
                 <span className="nav-icon" aria-hidden>
                   <NavIcon icon={getNavIcon(item.id)} />

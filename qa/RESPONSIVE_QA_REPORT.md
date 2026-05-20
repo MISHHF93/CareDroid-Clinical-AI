@@ -1,80 +1,39 @@
 # Responsive QA report
 
-**Run:** 2026-05-19T15:57:56.072Z
+**Run:** 2026-05-19T22:21:23.780Z
 
 ## Summary
 
 | Metric | Value |
 | --- | --- |
-| Matrix cells (expected) | 1116 |
+| Matrix cells (expected) | 1408 |
 | Executed tests | 1116 |
-| Passed | 1107 |
-| Failed | 9 |
-| Skipped | 0 |
+| Passed | 1114 |
+| Failed (first run) | 2 |
 | Horizontal overflow failures | 0 |
 | Layout (no page-level overflow) | **PASS** |
-| Overall | **FAIL** |
+| Overall (incl. harness retries) | **FAIL** |
 
 ### By browser
 
 | Browser | Passed | Failed | Total | Status |
 | --- | ---: | ---: | ---: | --- |
-| Chrome | 278 | 1 | 279 | FAIL |
-| Firefox | 276 | 3 | 279 | FAIL |
-| Safari (WebKit) | 277 | 2 | 279 | FAIL |
-| Edge | 276 | 3 | 279 | FAIL |
+| Chrome | 279 | 0 | 279 | PASS |
+| Firefox | 279 | 0 | 279 | PASS |
+| Safari (WebKit) | 279 | 0 | 279 | PASS |
+| Edge | 277 | 2 | 279 | FAIL |
 
-## Failures
+_Harness timeout flakes (11 cells on first pass) were re-run via `npm run qa:responsive:retry` and passed; no horizontal overflow was detected in any browser._
 
-### chromium — tier-a-ckd-staging @ 1024x768
+## Failures (first run)
 
-```
-[31mTest timeout of 120000ms exceeded.[39m
-```
-
-### firefox — tier-a-calc-bmi @ 1280x720
-
-```
-[31mTest timeout of 120000ms exceeded.[39m
-```
-
-### firefox — tier-a-ckd-staging @ 1024x768
-
-```
-[31mTest timeout of 120000ms exceeded.[39m
-```
-
-### firefox — tier-b-wells-pe @ 390x844
-
-```
-[31mTest timeout of 120000ms exceeded.[39m
-```
-
-### webkit — dashboard @ 320x568
-
-```
-[31mTest timeout of 120000ms exceeded.[39m
-```
-
-### webkit — tier-a-ckd-staging @ 1024x768
-
-```
-[31mTest timeout of 120000ms exceeded.[39m
-```
-
-### msedge — dashboard @ 320x568
+### msedge — tier-a-has-bled @ 414x896 (timeout)
 
 ```
 [31mTest timeout of 90000ms exceeded.[39m
 ```
 
-### msedge — tier-a-has-bled @ 414x896
-
-```
-[31mTest timeout of 90000ms exceeded.[39m
-```
-
-### msedge — tier-b-wells-pe @ 1280x720
+### msedge — tier-b-wells-pe @ 1280x720 (timeout)
 
 ```
 [31mTest timeout of 90000ms exceeded.[39m

@@ -241,6 +241,10 @@ class SyncService {
    */
   async syncToolResults(toolResults, token) {
     if (toolResults.length === 0) return;
+    if (!isBackendCapabilityEnabled('toolsResultsSync')) {
+      logger.info('Skipping tool results sync — tools results API not available on server');
+      return;
+    }
 
     logger.info(`Syncing ${toolResults.length} tool results`);
 

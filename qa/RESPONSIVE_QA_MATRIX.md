@@ -1,6 +1,6 @@
 # Responsive QA matrix
 
-Generated from `src/data/responsiveQaMatrix.js`. Total cells: **1152** (32 pages × 9 viewports × 4 browsers).
+Generated from `src/data/responsiveQaMatrix.js`. Total cells: **1408** (32 pages × 11 viewports × 4 browsers).
 
 ## Browsers
 
@@ -15,15 +15,17 @@ Generated from `src/data/responsiveQaMatrix.js`. Total cells: **1152** (32 pages
 
 | ID | Size | Label |
 | --- | --- | --- |
-| 320x568 | 320×568 | iPhone SE |
-| 375x667 | 375×667 | iPhone 8 |
-| 390x844 | 390×844 | iPhone 14 |
-| 414x896 | 414×896 | iPhone 11 Pro Max |
-| 768x1024 | 768×1024 | iPad portrait |
-| 1024x768 | 1024×768 | iPad landscape |
+| 320x568 | 320×568 | Android narrow (320) |
+| 360x800 | 360×800 | Galaxy / common Android (360) |
+| 384x854 | 384×854 | Android mid (384) |
+| 390x844 | 390×844 | Android tall (390) |
+| 412x915 | 412×915 | Pixel 7 / 7 Pro CSS viewport (~412) |
+| 430x932 | 430×932 | Large phone Android (430) |
+| 480x854 | 480×854 | Android phablet (480) |
+| 600x960 | 600×960 | Small tablet / fold cover (600) |
+| 768x1024 | 768×1024 | Tablet portrait (768) |
+| 1024x768 | 1024×768 | Tablet landscape |
 | 1280x720 | 1280×720 | HD laptop |
-| 1440x900 | 1440×900 | MacBook Air |
-| 1920x1080 | 1920×1080 | Full HD |
 
 ## Pages
 

@@ -1,0 +1,252 @@
+/**
+ * PR1–PR5 Tier-A calculator mobile layout (320px acceptance).
+ * Loaded after Calculators.css. Targets phones/tablets ≤767px; 320px compaction below.
+ *
+ * @see src/data/pr1Pr5CalculatorMobile.test.js
+ */
+
+/* —— Phones & small tablets: single-column forms, no horizontal overflow —— */
+@media (max-width: 767px) {
+  .calculators-content,
+  .calculator-interface,
+  .calculator-inputs,
+  .calculator-results,
+  .calc-pr1-form {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-x: clip;
+  }
+
+  .calculator-interface {
+    gap: var(--app-fluid-split-gap, clamp(12px, 3vw, 20px));
+  }
+
+  /* Multi-column field rows → one column */
+  .calc-input-grid--responsive,
+  .calc-input-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-md);
+  }
+
+  .calc-input-row--with-unit,
+  .calc-input-inline-units {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .calc-input-row--with-unit .calc-input-field,
+  .calc-input-row--with-unit .calc-select-field,
+  .calc-input-inline-units .calc-select-field {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* Result cards stack */
+  .calc-score-display-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .calc-score-display-row .calc-score-display {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 0;
+  }
+
+  .calc-score-display,
+  .calc-interpretation-box,
+  .calc-breakdown,
+  .calc-breakdown-list,
+  .calc-pr4a-risk-badge,
+  .calc-ckd-prognostic-badge {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .calc-score-unit {
+    display: block;
+    margin-left: 0;
+    margin-top: 4px;
+  }
+
+  /* Actions: full-width stack; reset always visible below primary */
+  .calc-actions {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+    max-width: 100%;
+  }
+
+  .calc-calculate-btn,
+  .calc-reset-btn {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    flex: none;
+    order: unset;
+  }
+
+  .calc-reset-btn {
+    /* Keep reset discoverable — not clipped by parent overflow */
+    position: relative;
+    z-index: 1;
+  }
+
+  .calculator-inputs {
+    overflow-x: clip;
+    overflow-y: visible;
+    padding-bottom: var(--space-xs);
+  }
+
+  /* Labels, legends, disclaimers, warnings */
+  .calc-input-label,
+  .calc-input-label-text,
+  .calc-timi-legend,
+  .calc-has-bled-legend,
+  .calc-news2-legend,
+  .calc-ds-lead,
+  .calc-disclaimer-detail,
+  .calc-result-safety-footer,
+  .calc-qsofa-disclaimer,
+  .calc-news2-disclaimer,
+  .calc-child-pugh-disclaimer,
+  .calc-has-bled-disclaimer,
+  .calc-meld-disclaimer,
+  .calc-timi-disclaimer,
+  .calc-validation-errors,
+  .calc-has-bled-anticoag-warning,
+  .calc-news2-scale2-warning,
+  .calc-phq9-q9-inline-warning,
+  .calc-phq9-q9-form-warning,
+  .calc-phq9-q9-result-warning,
+  .calc-phq9-high-symptom-warning,
+  .calc-gad7-severe-warning,
+  .calc-gad7-moderate-warning,
+  .calc-error,
+  .calc-news2-scale-option,
+  .calc-has-bled-row,
+  .calc-timi-row {
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    box-sizing: border-box;
+  }
+
+  .calc-has-bled-help,
+  .calc-timi-help {
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  .calc-has-bled-row .calc-checkbox-group,
+  .calc-timi-row .calc-checkbox-group {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .calc-news2-scale-options {
+    gap: var(--space-sm);
+  }
+
+  .calc-breakdown-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .calc-breakdown-label,
+  .calc-breakdown-value {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  /* PR5 / PR4A fieldsets */
+  .calc-has-bled-fieldset,
+  .calc-news2-scale-fieldset,
+  .calc-meld-fieldset {
+    max-width: 100%;
+    min-width: 0;
+    padding: var(--space-md);
+  }
+
+  .calc-phq9-q9-badge {
+    display: inline-block;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  /* Hub chat-assisted (PR2/PR3 Tier B) */
+  .calc-chat-assisted-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .calc-chat-assisted-card {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* —— 320px acceptance (Pixel 4a / SE class devices) —— */
+@media (max-width: 320px) {
+  .calculators-content {
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .calculator-inputs,
+  .calculator-results {
+    padding: var(--space-sm);
+    border-radius: var(--radius-md);
+  }
+
+  .calc-actions {
+    gap: var(--space-xs);
+    margin-top: var(--space-sm);
+  }
+
+  .calc-calculate-btn,
+  .calc-reset-btn {
+    padding: 12px var(--space-md);
+    font-size: var(--text-body);
+  }
+
+  .calc-score-display {
+    padding: var(--space-md) var(--space-sm);
+  }
+
+  .calc-score-value {
+    font-size: clamp(1.75rem, 12vw, 2.25rem);
+  }
+
+  .calc-qsofa-disclaimer,
+  .calc-news2-disclaimer,
+  .calc-child-pugh-disclaimer,
+  .calc-has-bled-disclaimer,
+  .calc-meld-disclaimer,
+  .calc-timi-disclaimer,
+  .calc-ds-lead,
+  .calc-disclaimer-detail,
+  .calc-result-safety-footer {
+    padding: var(--space-sm);
+    font-size: var(--text-caption);
+    line-height: 1.5;
+  }
+
+  .calc-interpretation-box {
+    padding: var(--space-sm);
+  }
+
+  .calc-pr4a-risk-badge,
+  .calc-ckd-prognostic-badge {
+    padding: var(--space-sm);
+    font-size: var(--text-caption);
+  }
+}

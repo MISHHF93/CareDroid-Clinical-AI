@@ -1,7 +1,7 @@
 /* Medical Calculators Styles */
 
 .calculators-content {
-  padding: clamp(12px, 3vw, 24px);
+  padding: var(--app-page-padding-compact);
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
@@ -108,22 +108,9 @@
   word-break: break-word;
 }
 
-/* Calculator Interface */
+/* Calculator Interface — mobile-first split (see mobile-first-layout.css) */
 .calculator-interface {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 24px;
-  width: 100%;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-  overflow-x: clip;
-}
-
-@media (max-width: 1024px) {
-  .calculator-interface {
-    grid-template-columns: minmax(0, 1fr);
-  }
+  gap: var(--app-fluid-split-gap, clamp(16px, 3vw, 24px));
 }
 
 .calculator-inputs,
@@ -206,7 +193,7 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  min-height: 44px;
+  min-height: var(--touch-target-min);
   padding: 12px 16px;
   background: var(--app-overlay-on-surface);
   border: 1px solid var(--app-input-border);
@@ -270,7 +257,7 @@
 .calc-calculate-btn {
   flex: 1 1 auto;
   min-width: 0;
-  min-height: 44px;
+  min-height: var(--touch-target-min);
   padding: 14px 24px;
   background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
   border: none;
@@ -298,7 +285,7 @@
 }
 
 .calc-reset-btn {
-  min-height: 44px;
+  min-height: var(--touch-target-min);
   padding: 14px 20px;
   background: var(--app-overlay-on-surface);
   border: 1px solid var(--app-input-border);
@@ -337,6 +324,18 @@
   color: var(--text-secondary);
 }
 
+.calc-score-display-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md, 1rem);
+  margin-bottom: 24px;
+}
+
+.calc-score-display-row .calc-score-display {
+  flex: 1 1 min(100%, 10rem);
+  margin-bottom: 0;
+}
+
 .calc-score-display {
   text-align: center;
   padding: 32px 24px;
@@ -365,6 +364,16 @@
   text-shadow: 0 0 20px rgba(0,255,136,0.5);
   line-height: 1.1;
   overflow-wrap: anywhere;
+}
+
+.calc-score-unit {
+  font-size: clamp(0.875rem, 3vw, 1.25rem);
+  display: inline-block;
+  max-width: 100%;
+  margin-left: 8px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  vertical-align: baseline;
 }
 
 .calc-score-interpretation {
@@ -800,7 +809,7 @@ ul.calc-breakdown-list .calc-breakdown-item {
   align-items: flex-start;
   gap: 6px;
   text-align: left;
-  min-height: 44px;
+  min-height: var(--touch-target-min);
   padding: 14px 16px;
   border-radius: 12px;
   border: 1px solid var(--app-panel-border);
@@ -903,7 +912,7 @@ ul.calc-breakdown-list .calc-breakdown-item {
 
 .calculator-interface--phq9 .calc-phq9-q9-group .calc-select-field,
 .calculator-interface--gad7 .calc-select-field {
-  min-height: 44px;
+  min-height: var(--touch-target-min);
 }
 
 .calculator-interface--gad7 .calc-gad7-severe-warning,
@@ -935,7 +944,7 @@ ul.calc-breakdown-list .calc-breakdown-item {
   .calc-select-field {
     width: 100%;
     max-width: 100%;
-    min-height: 44px;
+    min-height: var(--touch-target-min);
   }
 
   .calc-input-inline-units {
@@ -945,7 +954,7 @@ ul.calc-breakdown-list .calc-breakdown-item {
 
   .calc-input-inline-units .calc-select-field {
     width: 100%;
-    min-height: 44px;
+    min-height: var(--touch-target-min);
   }
 
   .calc-actions {
@@ -957,7 +966,7 @@ ul.calc-breakdown-list .calc-breakdown-item {
   .calc-reset-btn {
     width: 100%;
     min-width: 0;
-    min-height: 44px;
+    min-height: var(--touch-target-min);
     flex: none;
   }
 
@@ -1389,6 +1398,12 @@ ul.calc-breakdown-list .calc-breakdown-item {
 }
 
 @media (max-width: 480px) {
+  .calc-score-display .calc-score-unit {
+    display: block;
+    margin-left: 0;
+    margin-top: 6px;
+  }
+
   .calculator-selection {
     grid-template-columns: 1fr;
   }
@@ -1414,7 +1429,7 @@ ul.calc-breakdown-list .calc-breakdown-item {
   .calc-chat-assisted-card {
     width: 100%;
     max-width: 100%;
-    min-height: 48px;
+    min-height: var(--touch-target-comfortable);
     padding: 16px;
   }
 

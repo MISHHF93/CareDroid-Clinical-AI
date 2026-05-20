@@ -17,6 +17,13 @@
   --space-6: 24px;
   --space-7: 32px;
   --space-8: 48px;
+  /* Mobile-first fluid spacing (see mobile-first-layout.css) */
+  --space-fluid-1: clamp(4px, 1vw, 6px);
+  --space-fluid-2: clamp(8px, 1.5vw, 10px);
+  --space-fluid-3: clamp(12px, 2vw, 14px);
+  --space-fluid-4: clamp(16px, 2.5vw, 20px);
+  --space-fluid-5: clamp(20px, 3vw, 24px);
+  --space-fluid-6: clamp(24px, 3.5vw, 32px);
   --font-12: 12px;
   --font-14: 14px;
   --font-16: 16px;
@@ -24,6 +31,12 @@
   --font-22: 22px;
   --font-28: 28px;
   --font-36: 36px;
+  --text-display-fluid: clamp(1.35rem, 5vw + 0.5rem, 2.625rem);
+  --text-title-fluid: clamp(1.25rem, 4vw + 0.5rem, 2rem);
+  --text-heading-fluid: clamp(1.0625rem, 3vw + 0.5rem, 1.5rem);
+  --text-body-fluid: clamp(0.875rem, 1.5vw + 0.5rem, 1rem);
+  --text-caption-fluid: clamp(0.75rem, 1vw + 0.45rem, 0.8125rem);
+  /* Semantic aliases (--space-xs … --text-heading) live in design-tokens.css */
   --text-xs: 12px;
   --text-sm: 14px;
   --text-md: 16px;
@@ -45,8 +58,10 @@ html {
 
 body {
   width: 100%;
+  max-width: 100%;
   height: 100%;
   overflow: hidden;
+  overflow-x: clip;
   background: var(--navy-bg);
   color: var(--text-color);
   overscroll-behavior: none;
@@ -524,13 +539,8 @@ a, button, input, select, textarea {
 }
 
 
-/* Responsive viewport and scroll stabilization */
+/* Responsive viewport and scroll stabilization (touch/shell tokens → design-tokens.css) */
 :root {
-  --app-min-touch-target: 44px;
-  --app-content-max-width: 1760px;
-  --app-fluid-page-gutter: clamp(12px, 2.2vw, 40px);
-  --app-keyboard-inset-bottom: 0px;
-  --app-visual-viewport-offset-top: 0px;
   font-size: clamp(15px, 0.22vw + 14px, 17px);
 }
 

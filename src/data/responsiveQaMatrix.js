@@ -11,21 +11,47 @@ import {
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
   REGISTRY,
 } from './clinicalToolIdContract.js';
+import { MOBILE_FIRST_BREAKPOINTS } from '../layout/breakpoints.js';
 
-/** @typedef {{ id: string, width: number, height: number, label: string }} ResponsiveQaViewport */
+/** @typedef {{ id: string, width: number, height: number, label: string, tier?: string }} ResponsiveQaViewport */
 /** @typedef {{ id: string, label: string, path: string, category: string, registryId?: string }} ResponsiveQaPage */
 
-export const RESPONSIVE_QA_VIEWPORTS = Object.freeze([
-  { id: '320x568', width: 320, height: 568, label: 'iPhone SE' },
-  { id: '375x667', width: 375, height: 667, label: 'iPhone 8' },
-  { id: '390x844', width: 390, height: 844, label: 'iPhone 14' },
-  { id: '414x896', width: 414, height: 896, label: 'iPhone 11 Pro Max' },
-  { id: '768x1024', width: 768, height: 1024, label: 'iPad portrait' },
-  { id: '1024x768', width: 1024, height: 768, label: 'iPad landscape' },
-  { id: '1280x720', width: 1280, height: 720, label: 'HD laptop' },
-  { id: '1440x900', width: 1440, height: 900, label: 'MacBook Air' },
-  { id: '1920x1080', width: 1920, height: 1080, label: 'Full HD' },
+/**
+ * Mobile-first acceptance widths (phones + tablets for device QA).
+ * @see docs/mobile-first-responsive-audit.md
+ */
+export const MOBILE_FIRST_VIEWPORT_WIDTHS = Object.freeze([
+  ...MOBILE_FIRST_BREAKPOINTS.phone,
+  ...MOBILE_FIRST_BREAKPOINTS.tablet,
 ]);
+
+/** @deprecated Use MOBILE_FIRST_VIEWPORT_WIDTHS — kept for regression imports */
+export const ANDROID_QA_VIEWPORT_WIDTHS = MOBILE_FIRST_VIEWPORT_WIDTHS;
+
+/** @type {readonly { width: number, height: number, label: string, tier: string }[]} */
+const VIEWPORT_DEFS = [
+  { width: 320, height: 568, label: 'Phone narrow (320)', tier: 'phone' },
+  { width: 360, height: 800, label: 'Phone common (360)', tier: 'phone' },
+  { width: 375, height: 812, label: 'Phone (375)', tier: 'phone' },
+  { width: 390, height: 844, label: 'Phone tall (390)', tier: 'phone' },
+  { width: 412, height: 915, label: 'Pixel 7 / 7 Pro (~412)', tier: 'phone' },
+  { width: 430, height: 932, label: 'Phone large (430)', tier: 'phone' },
+  { width: 768, height: 1024, label: 'Tablet portrait (768)', tier: 'tablet' },
+  { width: 1024, height: 768, label: 'Tablet landscape (1024)', tier: 'tablet' },
+  { width: 1280, height: 720, label: 'Desktop (1280)', tier: 'desktop' },
+  { width: 1440, height: 900, label: 'Desktop (1440)', tier: 'desktop' },
+  { width: 1920, height: 1080, label: 'Desktop wide (1920)', tier: 'desktop' },
+];
+
+export const RESPONSIVE_QA_VIEWPORTS = Object.freeze(
+  VIEWPORT_DEFS.map((v) => ({
+    id: `${v.width}x${v.height}`,
+    width: v.width,
+    height: v.height,
+    label: v.label,
+    tier: v.tier,
+  }))
+);
 
 /** Playwright project names (Safari → webkit; Edge → msedge channel). */
 export const RESPONSIVE_QA_BROWSER_PROJECTS = Object.freeze([
@@ -49,6 +75,16 @@ export const TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.meldNa]: '/tools/calculators/meld-na',
   [REGISTRY.timiUaNstemi]: '/tools/calculators/timi-ua-nstemi',
   [REGISTRY.ascvdRisk]: '/tools/calculators/ascvd-risk',
+  [REGISTRY.heartScore]: '/tools/calculators/heart-score',
+  [REGISTRY.centorMcisaac]: '/tools/calculators/centor-mcisaac',
+  [REGISTRY.bishopScore]: '/tools/calculators/bishop-score',
+  [REGISTRY.apgarScore]: '/tools/calculators/apgar-score',
+  [REGISTRY.bradenScale]: '/tools/calculators/braden-scale',
+  [REGISTRY.morseFallScale]: '/tools/calculators/morse-fall-scale',
+  [REGISTRY.ransonCriteria]: '/tools/calculators/ranson-criteria',
+  [REGISTRY.bisapScore]: '/tools/calculators/bisap-score',
+  [REGISTRY.fib4]: '/tools/calculators/fib4',
+  [REGISTRY.framinghamRisk]: '/tools/calculators/framingham-risk',
   [REGISTRY.ckdStaging]: '/tools/calculators/ckd-staging',
   [REGISTRY.stopBang]: '/tools/calculators/stop-bang',
   [REGISTRY.auditC]: '/tools/calculators/audit-c',

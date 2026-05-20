@@ -186,6 +186,126 @@ const clinicalIntentToolsRaw = [
     backendExecutable: false,
   },
   {
+    toolId: 'heart-score',
+    toolName: 'HEART score',
+    category: 'calculator',
+    description:
+      'HEART score for chest pain risk stratification: history, ECG, age, risk factors, troponin (0–10).',
+    path: '/tools/calculators/heart-score',
+    sidebarToolId: 'heart-score',
+    chatSeed:
+      'Help me calculate the HEART score for a patient with chest pain using history, ECG, age, cardiovascular risk factors, and troponin.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'centor-mcisaac',
+    toolName: 'Centor / McIsaac score',
+    category: 'calculator',
+    description:
+      'Modified Centor (McIsaac) score for streptococcal pharyngitis probability (0–5).',
+    path: '/tools/calculators/centor-mcisaac',
+    sidebarToolId: 'centor-mcisaac',
+    chatSeed:
+      'Help me score Centor/McIsaac criteria for strep pharyngitis: exudates, lymph nodes, fever, cough, and age band.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'bishop-score',
+    toolName: 'Bishop score',
+    category: 'calculator',
+    description:
+      'Bishop score for cervical favourability before labour induction (dilation, effacement, station, consistency, position; 0–13).',
+    path: '/tools/calculators/bishop-score',
+    sidebarToolId: 'bishop-score',
+    chatSeed:
+      'Help me calculate the Bishop score from cervical exam findings for induction planning.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'apgar-score',
+    toolName: 'Apgar score',
+    category: 'calculator',
+    description:
+      'Apgar score for newborn status at 1 and 5 minutes (appearance, pulse, grimace, activity, respiration; 0–10 each).',
+    path: '/tools/calculators/apgar-score',
+    sidebarToolId: 'apgar-score',
+    chatSeed:
+      'Help me score Apgar components at 1 and 5 minutes for a newborn.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'braden-scale',
+    toolName: 'Braden scale',
+    category: 'calculator',
+    description:
+      'Braden scale for pressure injury risk (six subscales, 6–23; lower scores = higher risk).',
+    path: '/tools/calculators/braden-scale',
+    sidebarToolId: 'braden-scale',
+    chatSeed:
+      'Help me complete the Braden scale subscales and interpret pressure-ulcer risk.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'morse-fall-scale',
+    toolName: 'Morse Fall Scale',
+    category: 'calculator',
+    description:
+      'Morse Fall Scale for inpatient fall risk (history, diagnoses, ambulation, IV, gait, mental status; 0–125).',
+    path: '/tools/calculators/morse-fall-scale',
+    sidebarToolId: 'morse-fall-scale',
+    chatSeed:
+      'Help me score the Morse Fall Scale for an inpatient and interpret fall-risk category.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'ranson-criteria',
+    toolName: 'Ranson criteria',
+    category: 'calculator',
+    description:
+      'Ranson criteria for acute pancreatitis severity (5 admission + 6 at 48 hours; 0–11).',
+    path: '/tools/calculators/ranson-criteria',
+    sidebarToolId: 'ranson-criteria',
+    chatSeed:
+      'Help me apply Ranson criteria at admission and 48 hours for acute pancreatitis severity.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'bisap-score',
+    toolName: 'BISAP score',
+    category: 'calculator',
+    description:
+      'BISAP score for early acute pancreatitis mortality risk (BUN, mental status, SIRS, age, pleural effusion; 0–5).',
+    path: '/tools/calculators/bisap-score',
+    sidebarToolId: 'bisap-score',
+    chatSeed:
+      'Help me calculate the BISAP score for acute pancreatitis using BUN, mental status, SIRS, age, and pleural effusion.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'fib4',
+    toolName: 'FIB-4 index',
+    category: 'calculator',
+    description:
+      'FIB-4 index for liver fibrosis risk using age, AST, ALT, and platelets.',
+    path: '/tools/calculators/fib4',
+    sidebarToolId: 'fib4',
+    chatSeed:
+      'Help me calculate FIB-4 from age, AST, ALT, and platelet count and interpret fibrosis risk.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'framingham-risk',
+    toolName: 'Framingham 10-year CHD risk',
+    category: 'calculator',
+    description:
+      'Framingham ATP III point-based 10-year hard CHD risk (ages 30–74) — alternative cardiovascular risk context to ASCVD PCE.',
+    path: '/tools/calculators/framingham-risk',
+    sidebarToolId: 'framingham-risk',
+    chatSeed:
+      'Help me estimate 10-year hard CHD risk using Framingham point tables (age, sex, lipids, blood pressure, smoking).',
+    backendExecutable: false,
+  },
+  {
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
     category: 'calculator',
@@ -643,6 +763,96 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/gad7',
     calcQuery: '/tools/calculators?calc=gad7',
     implementation: 'Client-side in Calculators.jsx (gad7Calculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'heart-score',
+    name: 'HEART score',
+    description: 'Chest pain risk stratification (history, ECG, age, risk factors, troponin; 0–10).',
+    path: '/tools/calculators/heart-score',
+    calcQuery: '/tools/calculators?calc=heart-score',
+    implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (heartScoreCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'centor-mcisaac',
+    name: 'Centor / McIsaac',
+    description: 'Strep pharyngitis probability (modified Centor/McIsaac; 0–5).',
+    path: '/tools/calculators/centor-mcisaac',
+    calcQuery: '/tools/calculators?calc=centor-mcisaac',
+    implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (centorMcisaacCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'bishop-score',
+    name: 'Bishop score',
+    description: 'Cervical favourability for labour induction (0–13).',
+    path: '/tools/calculators/bishop-score',
+    calcQuery: '/tools/calculators?calc=bishop-score',
+    implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (bishopScoreCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'apgar-score',
+    name: 'Apgar score',
+    description: 'Newborn status at 1 and 5 minutes (0–10 per timepoint).',
+    path: '/tools/calculators/apgar-score',
+    calcQuery: '/tools/calculators?calc=apgar-score',
+    implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (apgarScoreCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'braden-scale',
+    name: 'Braden scale',
+    description: 'Pressure injury risk (6 subscales; 6–23).',
+    path: '/tools/calculators/braden-scale',
+    calcQuery: '/tools/calculators?calc=braden-scale',
+    implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (bradenScaleCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'morse-fall-scale',
+    name: 'Morse Fall Scale',
+    description: 'Inpatient fall risk (0–125).',
+    path: '/tools/calculators/morse-fall-scale',
+    calcQuery: '/tools/calculators?calc=morse-fall-scale',
+    implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (morseFallScaleCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'ranson-criteria',
+    name: 'Ranson criteria',
+    description: 'Acute pancreatitis severity (admission + 48 h; 0–11).',
+    path: '/tools/calculators/ranson-criteria',
+    calcQuery: '/tools/calculators?calc=ranson-criteria',
+    implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (ransonCriteriaCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'bisap-score',
+    name: 'BISAP score',
+    description: 'Early pancreatitis mortality risk (0–5).',
+    path: '/tools/calculators/bisap-score',
+    calcQuery: '/tools/calculators?calc=bisap-score',
+    implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (bisapScoreCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'fib4',
+    name: 'FIB-4',
+    description: 'Liver fibrosis risk index from age, AST, ALT, platelets.',
+    path: '/tools/calculators/fib4',
+    calcQuery: '/tools/calculators?calc=fib4',
+    implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (fib4Calculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'framingham-risk',
+    name: 'Framingham CHD risk',
+    description: '10-year hard CHD risk (Framingham ATP III points; ages 30–74).',
+    path: '/tools/calculators/framingham-risk',
+    calcQuery: '/tools/calculators?calc=framingham-risk',
+    implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (framinghamRiskCalculator.js)',
     orchestratorId: null,
   },
   {

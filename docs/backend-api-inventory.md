@@ -22,7 +22,7 @@ Effective route = `/api` + `@Controller(path)` + handler path.
 | ToolOrchestratorController | `modules/medical-control-plane/tool-orchestrator/tool-orchestrator.controller.ts` | `tools` | yes | `/api/tools` |
 | DrugController | `modules/clinical/drug.controller.ts` | `drugs` | yes | `/api/drugs` |
 | ProtocolController | `modules/clinical/protocol.controller.ts` | `protocols` | yes | `/api/protocols` |
-| AuditController | `modules/audit/audit.controller.ts` | **`api/audit`** ⚠️ | yes | **`/api/api/audit`** ⚠️ |
+| AuditController | `modules/audit/audit.controller.ts` | `audit` | yes | `/api/audit` |
 | ComplianceController | `modules/compliance/compliance.controller.ts` | `compliance` | yes | `/api/compliance` |
 | NotificationController | `modules/notifications/notification.controller.ts` | `notifications` | yes | `/api/notifications` |
 | AnalyticsController | `modules/analytics/analytics.controller.ts` | _(empty)_ | yes | `/api/analytics/*`, `/api/crashes`, `/api/health` |

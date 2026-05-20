@@ -37,6 +37,16 @@ export const CALCULATOR_INTERFACE_CLASS_BY_SLUG = Object.freeze({
   'ckd-staging': 'calculator-interface--ckd-staging',
   'stop-bang': 'calculator-interface--stop-bang',
   'audit-c': 'calculator-interface--audit-c',
+  'heart-score': 'calculator-interface--heart-score',
+  'centor-mcisaac': 'calculator-interface--centor-mcisaac',
+  'bishop-score': 'calculator-interface--bishop-score',
+  'apgar-score': 'calculator-interface--apgar-score',
+  'braden-scale': 'calculator-interface--braden-scale',
+  'morse-fall-scale': 'calculator-interface--morse-fall-scale',
+  'ranson-criteria': 'calculator-interface--ranson-criteria',
+  'bisap-score': 'calculator-interface--bisap-score',
+  fib4: 'calculator-interface--fib4',
+  'framingham-risk': 'calculator-interface--framingham-risk',
 });
 
 /** Registry tool ids shown in the calculators hub chat-assisted section. */

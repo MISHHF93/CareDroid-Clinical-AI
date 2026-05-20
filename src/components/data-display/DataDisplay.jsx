@@ -95,7 +95,15 @@ export const Avatar = ({
   return (
     <div className={`avatar avatar-${size} ${className}`}>
       {src ? (
-        <img src={src} alt={name} className="avatar-image" />
+        <img
+          src={src}
+          alt={name}
+          className="avatar-image"
+          width={48}
+          height={48}
+          loading="lazy"
+          decoding="async"
+        />
       ) : (
         <div className="avatar-initials">{getInitials(name)}</div>
       )}

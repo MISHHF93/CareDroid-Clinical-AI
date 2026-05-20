@@ -1,22 +1,8 @@
 /* Lab Interpreter Styles */
 
+/* Mobile-first split grid — base rules in mobile-first-layout.css */
 .lab-interpreter-content {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 24px;
-  padding: 24px;
-  width: 100%;
-  max-width: min(1400px, 100%);
-  min-width: 0;
-  margin: 0 auto;
-  box-sizing: border-box;
-}
-
-@media (max-width: 1024px) {
-  .lab-interpreter-content {
-    grid-template-columns: 1fr;
-    padding: clamp(12px, 2.2vw, 24px);
-  }
+  max-width: var(--app-fluid-container-max-wide, min(100%, 87.5rem));
 }
 
 @media (max-width: 768px) {
@@ -254,7 +240,10 @@
 .lab-value-name {
   font-weight: 500;
   color: var(--text-primary);
-  min-width: 120px;
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .lab-value-display {
@@ -307,7 +296,7 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  min-height: 48px;
+  min-height: var(--touch-target-comfortable);
 }
 
 .lab-interpret-button:hover:not(:disabled) {

@@ -1,119 +1,137 @@
 # Orphaned backend functions
 
-**Generated:** 2026-05-19  
+**Generated:** 2026-05-19T23:22:02.144Z
 
-Functions, services, and HTTP handlers that exist in the backend but have **no direct frontend API client** or **no UI trigger**. Grouped by recommendation.
+> Regenerate: `npm run exposure:write-docs`
 
----
+Every backend HTTP route is either **wired** to a frontend client or listed below with an exposure strategy. Gated frontend calls (no Nest route) are tracked in section D.
 
-## A. Remain backend-only (correct)
+## A. Backend-only (correct)
+
+| Route | Controller | Reason |
+|-------|------------|--------|
+| `/health` | AppController | Ops / load balancer probe |
+| `/api/auth/verify-email` | AuthController | Email link callback |
+| `/api/auth/google` | AuthController | OAuth redirect |
+| `/api/auth/google/callback` | AuthController | OAuth callback |
+| `/api/auth/linkedin` | AuthController | OAuth redirect |
+| `/api/auth/linkedin/callback` | AuthController | OAuth callback |
+| `/api/two-factor/verify` | TwoFactorController | Used during login challenge |
+| `/api/subscriptions/webhook` | SubscriptionsController | Stripe webhook |
+| `/api/analytics/metrics` | AnalyticsController | Internal analytics dashboard |
+| `/api/health` | AnalyticsController | Client health ping (distinct from GET /health) |
+| `/api/ai/query` | AiController | Invoked via chat pipeline |
+| `/api/ai/structured` | AiController | Invoked via chat pipeline |
+| `/api/metrics` | MetricsController | Prometheus scrape |
+
+### Internal services (no HTTP)
 
 | Symbol | Module | Reason |
 |--------|--------|--------|
-| `RagService.*` | `modules/rag` | Internal retrieval for chat |
-| `EncryptionService.*` | `modules/encryption` | At-rest / field crypto |
-| `CacheService.*` | `modules/cache` | Redis layer |
-| `EmailService.*` | `modules/email` | Transactional mail |
-| `EmergencyEscalationService.escalate` | `emergency-escalation` | Chat pipeline only |
-| `IntentClassifierService.classify` | `intent-classifier` | Only via chat HTTP |
-| `matchToolPatterns`, `getToolPattern` | `tool.patterns.ts` | Classifier internals |
-| `detectEmergencyKeywords` | `emergency.patterns.ts` | Classifier internals |
-| `ToolOrchestratorService.executeInChat` | `tool-orchestrator` | Called from `ChatService`, not standalone HTTP from UI |
-| `ToolOrchestratorService.getToolsBySubscriptionTier` | `tool-orchestrator` | Tier gating server-side |
-| `POST /api/subscriptions/webhook` | subscriptions | Stripe |
-| `GET /api/metrics` | metrics | Prometheus scrape |
-| `GET /api/auth/me` | auth | Optional; JWT introspection unused by SPA |
-| Auth `oidcLogin`, `samlLogin` | auth | Placeholder SSO |
+| `RagService` | `modules/rag` | Chat retrieval |
+| `EncryptionService` | `modules/encryption` | At-rest crypto |
+| `CacheService` | `modules/cache` | Redis layer |
+| `EmailService` | `modules/email` | Transactional mail |
+| `EmergencyEscalationService` | `emergency-escalation` | Chat pipeline |
+| `IntentClassifierService` | `intent-classifier` | Via POST /api/chat/* |
+| `ToolOrchestratorService.executeInChat` | `tool-orchestrator` | ChatService internal |
 
----
+## B. Expose through SPA (recommended)
 
-## B. Expose through orchestrator / catalog (recommended)
+| Route | Controller | Client hint |
+|-------|------------|-------------|
+| `/api/auth/biometric/verify` | BiometricController | BiometricSetup.jsx |
+| `/api/auth/biometric/disable/:deviceId` | BiometricController | BiometricSetup.jsx |
+| `/api/auth/biometric/delete/:deviceId` | BiometricController | BiometricSetup.jsx |
+| `/api/auth/biometric/available` | BiometricController | BiometricSetup.jsx |
+| `/api/users/profile` | UsersController | UserContext.jsx |
+| `/api/subscriptions/create-checkout` | SubscriptionsController | configService / settings |
+| `/api/subscriptions/portal` | SubscriptionsController | configService / settings |
+| `/api/chat/suggest-action` | ChatController | clinicalChatService.js |
+| `/api/chat/analyze-vitals` | ChatController | clinicalChatService.js |
+| `/api/tools/statistics` | ToolOrchestratorController | clinicalToolsApi.js |
+| `/api/tools/catalog/executors` | ToolOrchestratorController | clinicalToolsApi.js |
+| `/api/tools/:id` | ToolOrchestratorController | clinicalToolsApi.js |
+| `/api/tools/:id/validate` | ToolOrchestratorController | clinicalOrchestratorApi.js |
+| `/api/drugs` | DrugController | clinicalContentApi.js |
+| `/api/drugs/categories` | DrugController | clinicalContentApi.js |
+| `/api/drugs/:id` | DrugController | clinicalContentApi.js |
+| `/api/protocols` | ProtocolController | Protocols.jsx / clinicalContentApi.js |
+| `/api/protocols/categories` | ProtocolController | clinicalContentApi.js |
+| `/api/protocols/:id` | ProtocolController | Protocols.jsx |
+| `/api/audit/my-logs` | AuditController | profile / AuditLogs.jsx |
+| `/api/compliance/export` | ComplianceController | complianceApi.js |
+| `/api/compliance/delete-account` | ComplianceController | complianceApi.js |
+| `/api/notifications/preferences/toggle-all` | NotificationController | NotificationService.js |
+| `/api/notifications/unread/count` | NotificationController | NotificationService.js |
+| `/api/notifications/read-all` | NotificationController | NotificationService.js |
 
-| Symbol | HTTP route (if any) | Recommendation |
-|--------|---------------------|----------------|
-| `ToolOrchestratorService.validateToolExecution` | `POST /api/tools/:id/validate` | Add `validateClinicalTool()` in `clinicalOrchestratorApi.js`; call before execute |
-| `ToolOrchestratorService.getToolMetadata` | `GET /api/tools/:id` | Catalog detail / executor schema panel |
-| `ToolOrchestratorService.getExecutorCatalog` | `GET /api/tools/catalog/executors` | Replace or augment `GET /api/tools` in catalog UI |
-| `ToolOrchestratorService.getToolStatistics` | `GET /api/tools/statistics` | Analytics dashboard widget |
-| `ChatService.suggestNextAction` | `POST /api/chat/suggest-action` | Dashboard “suggested next step” card |
-| `ChatService.analyzeVitals` | `POST /api/chat/analyze-vitals` | Vitals form or ICU widgets |
-| `AiController.query`, `generateStructured` | `POST /api/ai/*` | Keep internal unless building admin/debug console |
-| `ComplianceController.exportData` | `POST /api/compliance/export` | Settings → “Download my data” |
-| `AuditController.getMyLogs` | `GET /api/audit/my-logs` | User profile → activity |
+## C. Deferred / admin / SSO
 
----
+| Route | Controller | Reason |
+|-------|------------|--------|
+| `/api/auth/oidc` | AuthController | SSO placeholder |
+| `/api/auth/saml` | AuthController | SSO placeholder |
+| `/api/auth/me` | AuthController | JWT introspection; SPA uses profile |
+| `/api/auth/biometric/stats` | BiometricController | Admin metrics |
+| `/api/subscriptions/config` | SubscriptionsController | Stripe config for checkout UI |
+| `/api/chat/message-3d` | ChatController | 3D avatar experiment |
+| `/api/tools/execute` | ToolOrchestratorController | Batch execute; UI uses per-id execute |
+| `/api/drugs` | DrugController | Admin content API |
+| `/api/drugs/:id` | DrugController | Admin content API |
+| `/api/drugs/:id` | DrugController | Admin content API |
+| `/api/protocols` | ProtocolController | Admin content API |
+| `/api/protocols/:id` | ProtocolController | Admin content API |
+| `/api/protocols/:id` | ProtocolController | Admin content API |
+| `/api/audit/phi-access` | AuditController | Compliance officer view |
+| `/api/notifications/devices` | NotificationController | Device list admin |
+| `/api/notifications/devices/:token` | NotificationController | Unregister device |
+| `/api/ai/usage` | AiController | Usage meter UI |
 
-## C. Surface in catalog / SPA only (no new executor)
+## D. Frontend calls without backend (gated)
 
-These NLU ids have patterns + `clinicalIntentTools` but **no** `registerTool()` — launch is already via `resolveCatalogLaunch` / chat:
+| ID | Method | Path | Capability | Client |
+|----|--------|------|------------|--------|
+| chat-messages-sync | POST | `/api/chat/messages` | chatPersistence | syncService.js |
+| chat-conversations-sync | POST | `/api/chat/conversations` | chatPersistence | syncService.js |
+| tools-share-results | POST | `/api/tools/share-results` | toolsShareResults | ToolResultShare.jsx |
+| notifications-stream | GET | `/api/notifications/stream` | notificationStream | NotificationService.js |
+| notifications-send-channel | POST | `/api/notifications/send/:channel` | notificationSendChannel | notifications/NotificationService.js |
+| team-users | GET | `/api/team/users` | teamManagement | TeamManagement.jsx |
+| team-user-update | PUT | `/api/team/users/:id` | teamManagement | TeamManagement.jsx |
+| team-user-delete | DELETE | `/api/team/users/:id` | teamManagement | TeamManagement.jsx |
+| team-invite | POST | `/api/team/invite` | teamManagement | TeamManagement.jsx |
+| bulk-sync | POST | `/api/sync` | bulkSync | offline.js / OfflineSupport.jsx |
+| clinical-alerts-ack | POST | `/api/clinical/alerts/:id/acknowledge` | clinicalAlerts | clinicalAlertNotifications.js |
+| clinical-alerts-dismiss | POST | `/api/clinical/alerts/:id/dismiss` | clinicalAlerts | clinicalAlertNotifications.js |
+| clinical-alerts-stream | GET | `/api/clinical/alerts/stream` | clinicalAlerts | clinicalAlertNotifications.js |
+| exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
+| exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |
+| reports-generate | POST | `/api/reports/generate` | reportsGenerate | export/ExportService.js |
 
-`qsofa`, `news2`, `child-pugh`, `has-bled`, `meld`, `meld-na`, `timi-ua-nstemi`, `ascvd-risk`, `ckd-staging`, `stop-bang`, `audit-c`, `phq9`, `gad7`, `apache2-calculator`, `cha2ds2vasc-calculator`, `curb65-calculator`, `gcs-calculator`, `wells-dvt-calculator`, `wells-pe`, `perc`, `grace-acs`, `nihss`, `canadian-c-spine`, `ottawa-ankle`, `copd-gold`, `rome-iv-ibs`, `dose-calculator`, `abg-interpreter`, `protocol-lookup`, `acls-protocol`, `atls-protocol`, `route-optimizer`, `predictive-maintenance`, `fleet-command`, `differential-diagnosis`, `antibiotic-guide`, `dispatch-ai`.
+## E. POST executors
 
-**Recommendation:** **Remain** without POST executors; optional future executors only where deterministic server-side logic exists.
+Registered: `sofa-calculator`, `drug-interactions`, `lab-interpreter`
 
----
+NLU profiles without POST executor (47): client-side / chat only.
 
-## D. Implement backend or remove frontend (broken)
+## F. Exposure strategy summary
 
-| Frontend caller | Missing backend | Action |
-|-----------------|-----------------|--------|
-| `ToolResultShare.jsx` | `POST /api/tools/share-results` | Implement or guard UI |
-| `TeamManagement.jsx` | `/api/team/*` | Implement module or remove page |
-| `ConsentFlow.jsx` | `/api/consent/record` | Redirect to `/api/compliance/consent` |
-| `ConsentHistory.jsx` | `/api/consent/history` | Add GET history or remove page |
-| `offline.js`, `OfflineSupport.jsx` | `POST /api/sync` | Implement bulk sync or disable |
-| `syncService.js` | `POST /api/chat/messages`, `/conversations` | Implement or stop queueing |
-| `NotificationService.buildStreamUrl` | `GET /api/notifications/stream` | SSE endpoint or remove |
-| `notifications/NotificationService.js` | `POST /api/notifications/send/:channel` | Admin API or remove |
-| `clinicalAlertNotifications.js` | `/api/clinical/alerts/*` | Module or client-only |
-| `export/ExportService.js` | `/api/exports/*`, `/api/reports/*` | Client-side export until backend |
-
----
-
-## E. Frontend mappings to nonexistent backend tools
-
-| Frontend reference | Issue | Fix |
-|--------------------|-------|-----|
-| `POST /api/tools/share-results` | No controller method | See D |
-| `procedures` registry id | No NLU profile / pattern | Add to `clinicalIntentToolCatalog.js` + `tool.patterns.ts` or mark registry-only in catalog |
-| `dispatch-ai` `backendExecutable: true` | No POST executor | Set `false` or relabel catalog badge |
-| Phantom ids in `phantomToolReferences` | Cost tracking / roadmap only | **Document** as non-shipped (`abc-assessment`, etc.) |
-| `ORCHESTRATOR_TO_REGISTRY_ID` for non-executors | Not a bug — maps to UI registry | No POST expected |
-
----
-
-## F. Missing DTO validation (orphaned safety)
-
-Classes exist but are **not enforced** at HTTP boundary:
-
-- `ExecuteToolDto`, `ToolExecutionResponseDto` — `tool-execution.dto.ts`
-- `ChatMessageDto`, `IntentClassifyDto` — `chat.controller.ts`
-- `ClassifyIntentDto`, `IntentClassificationResultDto` — intent-classifier DTO file
-- Notification controller bodies
-- Biometric DTOs in service file
-- Analytics event DTOs
-
-**Recommendation:** Add `class-validator` decorators; highest priority: **ExecuteToolDto** and **ChatMessageDto**.
-
----
-
-## G. Missing API client modules (backend exists, no `src/services/*` wrapper)
-
-| Endpoint group | Suggested module |
-|----------------|------------------|
-| `/api/compliance/*` | `complianceApi.js` |
-| `/api/drugs`, `/api/protocols` | `clinicalContentApi.js` (optional) |
-| `/api/tools/:id`, `/validate`, `/catalog/executors`, `/statistics` | extend `clinicalToolsApi.js` |
-| `/api/chat/suggest-action`, `/analyze-vitals` | extend `clinicalChatService.js` |
-
----
+| Tier | Action |
+|------|--------|
+| P0 | Keep capability gates on phantom frontend paths until Nest implements or UI removed |
+| P1 | Wire `clinicalToolsApi` → validate, catalog/executors, statistics |
+| P1 | Wire `complianceApi` → export + delete-account |
+| P2 | Protocol/drug GET clients for reference pages |
+| P3 | Chat suggest-action / analyze-vitals on dashboard |
 
 ## Quick counts
 
 | Category | Count |
 |----------|------:|
-| Registered executors (fully wired) | 3 |
-| NLU patterns without executor | 37 |
-| Backend HTTP routes without frontend caller | ~25 |
-| Frontend paths without backend route | 14+ |
-| Unvalidated HTTP DTO classes | 10+ |
+| Backend HTTP routes | 71 |
+| Wired frontend → backend | see exposure report |
+| Backend-only / deferred (policy) | 55 |
+| Gated frontend (no route) | 16 |
+| POST executors | 3 |
+

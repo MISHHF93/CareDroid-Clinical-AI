@@ -45,8 +45,9 @@
   overflow: hidden;
   overflow-x: clip;
   box-sizing: border-box;
-  margin-left: var(--app-main-inset, 280px);
+  margin-left: var(--app-main-inset, var(--sidebar-width-expanded, 280px));
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 2;
 }
 
 .app-shell--compact .app-shell-main-wrap {
@@ -55,16 +56,31 @@
   max-width: 100%;
 }
 
+/* CSS fallback: never inset main content on phone/tablet (Android WebView / pre-hydration) */
+@media (max-width: 900px) {
+  .app-shell .app-shell-main-wrap {
+    margin-left: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+.app-shell--nav-open .app-shell-main-wrap {
+  touch-action: none;
+}
+
 .app-shell-menu-btn {
   position: absolute;
   top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
   left: calc(var(--space-3) + env(safe-area-inset-left, 0px));
-  z-index: 6;
+  z-index: 960;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: var(--touch-target-min, 44px);
+  height: var(--touch-target-min, 44px);
+  min-width: var(--touch-target-min, 44px);
+  min-height: var(--touch-target-min, 44px);
   padding: 0;
   border-radius: var(--radius-md);
   border: 1px solid var(--panel-border);
@@ -201,8 +217,8 @@
 
 @media (max-width: 380px) {
   .app-shell-menu-btn {
-    width: 38px;
-    height: 38px;
+    width: var(--touch-target-min, 44px);
+    height: var(--touch-target-min, 44px);
     left: calc(var(--space-2) + env(safe-area-inset-left, 0px));
   }
 

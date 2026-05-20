@@ -1,0 +1,137 @@
+/**
+ * CareDroid design tokens — semantic spacing, typography, breakpoints, touch targets.
+ * Extends numeric primitives in index.css; do not duplicate palette (--app-*) here.
+ *
+ * @see src/layout/designTokens.js — JS mirror for tests and matchMedia
+ * @see docs/design-tokens-audit.md
+ */
+
+:root {
+  /* —— Breakpoint tiers (use literal px in @media; vars are for docs / calc) —— */
+  /* mobile: 0–767 | tablet: 768–1279 | desktop: 1280–1919 | wide: 1920+ */
+  --bp-tier-mobile-max: 767px;
+  --bp-tier-tablet: 768px;
+  --bp-tier-desktop: 1280px;
+  --bp-tier-wide: 1920px;
+  --bp-tier-split-form: 1024px;
+  --bp-tier-compact-shell: 900px;
+  --bp-tier-narrow: 600px;
+  --bp-tier-touch-enforce: 640px;
+
+  /* Acceptance phone / tablet / desktop widths (QA + documentation) */
+  --bp-phone-xs: 320px;
+  --bp-phone-sm: 360px;
+  --bp-phone-md: 375px;
+  --bp-phone-lg: 390px;
+  --bp-phone-xl: 412px;
+  --bp-phone-2xl: 430px;
+  --bp-tablet: 768px;
+  --bp-tablet-lg: 1024px;
+  --bp-desktop: 1280px;
+  --bp-desktop-lg: 1440px;
+  --bp-desktop-xl: 1920px;
+
+  /* —— Spacing (semantic → numeric scale in index.css) —— */
+  --space-xs: var(--space-2);
+  --space-sm: var(--space-3);
+  --space-md: var(--space-4);
+  --space-lg: var(--space-6);
+  --space-xl: var(--space-8);
+
+  --space-xs-fluid: var(--space-fluid-2);
+  --space-sm-fluid: var(--space-fluid-3);
+  --space-md-fluid: var(--space-fluid-4);
+  --space-lg-fluid: var(--space-fluid-6);
+  --space-xl-fluid: clamp(32px, 4vw, 48px);
+
+  /* —— Typography (semantic; responsive via clamp) —— */
+  --text-heading: var(--text-heading-fluid);
+  --text-body: var(--text-body-fluid);
+  --text-caption: var(--text-caption-fluid);
+
+  --type-heading-line-height: 1.3;
+  --type-body-line-height: 1.5;
+  --type-caption-line-height: 1.45;
+
+  /* Aliases used by responsive-ux.css and tool surfaces */
+  --app-type-display: var(--text-display-fluid);
+  --app-type-title: var(--text-title-fluid);
+  --app-type-heading: var(--text-heading);
+  --app-type-body: var(--text-body);
+  --app-type-caption: var(--text-caption);
+
+  /* iOS: inputs below 16px trigger zoom on focus (WCAG-friendly baseline) */
+  --text-input-min: 16px;
+
+  /* —— Touch targets (WCAG 2.5.5 — 44×44 minimum; 48px comfortable primary) —— */
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 48px;
+  --app-min-touch-target: var(--touch-target-min);
+  --app-min-touch-target-comfortable: var(--touch-target-comfortable);
+
+  /* —— Fluid page shell —— */
+  --app-fluid-page-gutter: clamp(var(--space-md), 3.2vw, var(--space-lg));
+  --app-fluid-page-gutter-tight: clamp(10px, 2.8vw, var(--space-lg));
+  --app-fluid-section-gap: clamp(var(--space-md), 4vw, var(--space-lg));
+  --app-fluid-split-gap: clamp(var(--space-md), 3vw, var(--space-lg));
+  --app-fluid-container-max: min(100%, 72rem);
+  --app-fluid-container-max-wide: min(100%, 87.5rem);
+
+  --app-page-padding-compact: clamp(var(--space-md), 3vw, var(--space-lg));
+  --app-page-padding-roomy: clamp(var(--space-md), 3vw, var(--space-xl));
+
+  --app-space-field: var(--space-sm-fluid);
+  --app-space-field-lg: var(--space-md-fluid);
+  --app-card-padding-compact: clamp(var(--space-md), 3vw, 18px);
+  --app-callout-padding-compact: clamp(10px, 2.5vw, var(--space-md));
+
+  /* App shell / sidebar layout */
+  --sidebar-width-expanded: 280px;
+  --sidebar-width-collapsed: 70px;
+  --sidebar-drawer-max-width: min(280px, 88vw);
+
+  --app-content-max-width: 1760px;
+  --app-keyboard-inset-bottom: 0px;
+  --app-visual-viewport-offset-top: 0px;
+}
+
+/* Semantic typography utilities */
+.type-heading {
+  font-size: var(--text-heading);
+  line-height: var(--type-heading-line-height);
+}
+
+.type-body {
+  font-size: var(--text-body);
+  line-height: var(--type-body-line-height);
+}
+
+.type-caption {
+  font-size: var(--text-caption);
+  line-height: var(--type-caption-line-height);
+}
+
+/* Touch-friendly control baseline (opt-in; responsive-ux also enforces globally) */
+.touch-target {
+  min-width: var(--touch-target-min);
+  min-height: var(--touch-target-min);
+  touch-action: manipulation;
+}
+
+.touch-target-comfortable {
+  min-width: var(--touch-target-comfortable);
+  min-height: var(--touch-target-comfortable);
+  touch-action: manipulation;
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --app-fluid-page-gutter: clamp(var(--space-md), 2vw, var(--space-lg));
+  }
+}
+
+@media (min-width: 1920px) {
+  :root {
+    --app-fluid-container-max-wide: min(100%, 96rem);
+  }
+}

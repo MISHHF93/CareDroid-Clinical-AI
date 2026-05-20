@@ -1,5 +1,5 @@
 .clinical-tool-catalog {
-  padding: clamp(12px, 3vw, 32px);
+  padding: var(--app-page-padding-roomy);
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
@@ -14,7 +14,7 @@
 }
 
 .clinical-tool-catalog-header h1 {
-  font-size: clamp(1.25rem, 5vw + 0.35rem, 2.25rem);
+  font-size: var(--app-type-title);
   margin-bottom: 8px;
   color: var(--text-primary);
   display: inline-flex;
@@ -112,7 +112,8 @@
   overflow-wrap: anywhere;
   word-break: break-word;
   text-align: center;
-  min-height: 36px;
+  min-width: var(--touch-target-min, 44px);
+  min-height: var(--touch-target-min, 44px);
   box-sizing: border-box;
 }
 
@@ -337,7 +338,7 @@
 }
 
 .catalog-empty-actions .catalog-btn {
-  min-height: 44px;
+  min-height: var(--touch-target-min);
   min-width: min(100%, 200px);
 }
 
@@ -535,11 +536,22 @@
   word-break: break-word;
 }
 
+.catalog-tool-desc {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+  font-weight: 400;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+}
+
 .catalog-tool-name-cell .catalog-inline-badge {
   margin-left: 0;
 }
 
-/* —— Responsive: tablet —— */
+/* Tablet padding — stacked card layout: catalog-mobile.css */
 @media (max-width: 900px) {
   .clinical-tool-catalog {
     padding: 20px 16px;
@@ -553,8 +565,10 @@
   .catalog-section--highlight {
     padding: 16px;
   }
+}
 
-  /* Sticky actions only on wide tables that still scroll horizontally */
+/* Sticky action column — desktop wide tables only (not stacked cards) */
+@media (min-width: 901px) {
   .catalog-table-wrap:not(.catalog-table-wrap--stacked) .catalog-table th:last-child,
   .catalog-table-wrap:not(.catalog-table-wrap--stacked) .catalog-table td:last-child {
     position: sticky;
@@ -605,7 +619,7 @@
     flex: 1 1 auto;
     width: 100%;
     min-width: 0;
-    min-height: 44px;
+    min-height: var(--touch-target-min);
     font-size: 16px;
   }
 
@@ -614,7 +628,7 @@
   }
 
   .catalog-category-chip {
-    min-height: 44px;
+    min-height: var(--touch-target-min);
     padding: 8px 12px;
   }
 
@@ -646,8 +660,11 @@
   }
 
   .catalog-btn {
-    min-height: 44px;
+    min-height: var(--touch-target-min);
     padding: 10px 14px;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.35;
   }
 
   /* Stacked card rows for all catalog tables on mobile */

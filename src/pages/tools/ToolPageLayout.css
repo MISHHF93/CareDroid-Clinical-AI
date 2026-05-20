@@ -100,7 +100,7 @@
 }
 
 .tool-header-info h1 {
-  font-size: clamp(1.35rem, 5vw + 0.5rem, 2rem);
+  font-size: var(--app-type-title);
   margin-bottom: 8px;
   color: var(--text-primary);
   line-height: 1.25;
@@ -110,7 +110,7 @@
 
 .tool-header-info p {
   color: var(--text-secondary);
-  font-size: clamp(0.875rem, 2.5vw + 0.5rem, 1rem);
+  font-size: var(--text-body);
   line-height: 1.5;
   margin-bottom: 16px;
   overflow-wrap: anywhere;
@@ -156,7 +156,7 @@
 }
 
 .btn-share-tool {
-  min-height: 44px;
+  min-height: var(--touch-target-min);
   padding: 10px 16px;
   border: 2px solid rgba(79, 70, 229, 0.4);
   background: rgba(79, 70, 229, 0.1);
@@ -181,7 +181,7 @@
 }
 
 .btn-back-to-tools {
-  min-height: 44px;
+  min-height: var(--touch-target-min);
   padding: 10px 20px;
   border: 2px solid var(--panel-border);
   background: transparent;
@@ -382,7 +382,7 @@
 
 .ai-panel-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 16px;
   margin-bottom: 24px;
 }
@@ -520,7 +520,7 @@
   }
 
   .breadcrumb-link {
-    min-height: 44px;
+    min-height: var(--touch-target-min);
     display: inline-flex;
     align-items: center;
   }
@@ -599,13 +599,9 @@
   animation: spin 1s linear infinite;
 }
 
+/* Mobile-first split — base rules in mobile-first-layout.css */
 .diagnosis-tool-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto;
+  max-width: var(--app-fluid-container-max-wide, min(100%, 87.5rem));
 }
 
 .diagnosis-panel {
@@ -693,8 +689,3 @@
   color: var(--app-fg);
 }
 
-@media (max-width: 900px) {
-  .diagnosis-tool-grid {
-    grid-template-columns: 1fr;
-  }
-}

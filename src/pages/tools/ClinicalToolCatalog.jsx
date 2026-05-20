@@ -50,6 +50,7 @@ import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import ClinicalDecisionSupportDisclaimer from '../../components/clinical/ClinicalDecisionSupportDisclaimer';
 import './ClinicalToolCatalog.css';
+import '../../styles/catalog-mobile.css';
 
 const CATEGORY_CLASS = {
   'chat-assisted': 'catalog-badge--ai',
@@ -81,8 +82,13 @@ const CATEGORY_QUICK_FILTERS = [
   { value: 'checker', label: 'Checkers' },
   { value: 'interpreter', label: 'Interpreters' },
   { value: 'reference', label: 'Reference' },
+  { value: 'ai', label: 'Chat/API' },
+  { value: 'data', label: 'Data APIs' },
+  { value: 'apis', label: 'All APIs' },
   { value: 'phantom', label: 'Phantom' },
 ];
+
+const PLATFORM_API_CATEGORIES = new Set(['ai', 'data', 'emergency']);
 
 const STATUS_LABEL = {
   'shipped-page': 'Shipped page',
@@ -203,7 +209,10 @@ function MedicalToolsTable({ rows, onOpenPath, onLaunch, sortKey, sortDir, onSor
                 <code>{row.primaryId || row.id}</code>
               </td>
               <td data-label="Name" className="catalog-tool-name-cell">
-                {row.name}
+                <span className="catalog-tool-name-text">{row.name}</span>
+                {row.description ? (
+                  <p className="catalog-tool-desc">{row.description}</p>
+                ) : null}
                 {row.registryShortcut && (
                   <span className="catalog-inline-badge" title="Sidebar shortcut from toolRegistry.js">
                     Sidebar shortcut
@@ -496,6 +505,12 @@ const ClinicalToolCatalog = () => {
     )
   );
 
+  const matchesPlatformCategory = (rowCategory) => {
+    if (categoryFilter === 'all' || categoryFilter === 'medical') return true;
+    if (categoryFilter === 'apis') return PLATFORM_API_CATEGORIES.has(rowCategory);
+    return rowCategory === categoryFilter;
+  };
+
   const filterCapabilityRows = (rows) =>
     rows.filter(
       (row) =>
@@ -503,7 +518,7 @@ const ClinicalToolCatalog = () => {
           `${row.name} ${row.description} ${row.id} ${row.category} ${row.apiPath || ''}`,
           query,
           { ids: [row.id] }
-        ) && (categoryFilter === 'all' || row.category === categoryFilter)
+        ) && matchesPlatformCategory(row.category)
     );
 
   const filteredChatAi = filterCapabilityRows(chatAndAiCapabilities);
@@ -555,7 +570,20 @@ const ClinicalToolCatalog = () => {
     );
 
   const showMedicalOnly = categoryFilter === 'medical';
-  const showFocusedSections = categoryFilter === 'all';
+  const showFocusedSections =
+    categoryFilter === 'all' || categoryFilter === 'phantom' || categoryFilter === 'alias';
+  const showPlatformSections =
+    categoryFilter === 'all' ||
+    categoryFilter === 'apis' ||
+    PLATFORM_API_CATEGORIES.has(categoryFilter);
+  const showLegacyToolSections =
+    showFocusedSections ||
+    categoryFilter === 'calculator' ||
+    categoryFilter === 'chat-assisted' ||
+    categoryFilter === 'checker' ||
+    categoryFilter === 'interpreter' ||
+    categoryFilter === 'reference' ||
+    categoryFilter === 'diagnostic';
 
   const showGlobalEmpty =
     Boolean(query) &&
@@ -721,6 +749,7 @@ const ClinicalToolCatalog = () => {
           <option value="interpreter">Interpreter</option>
           <option value="protocol">Protocol</option>
           <option value="reference">Reference</option>
+          <option value="apis">Platform APIs (chat / data / emergency)</option>
           <option value="diagnostic">Diagnostic (sidebar)</option>
           <option value="ai">AI / Chat API</option>
           <option value="data">Clinical data API</option>
@@ -791,9 +820,11 @@ const ClinicalToolCatalog = () => {
         </div>
       )}
 
-      <section className="catalog-section catalog-section--medical">
+      <section className="catalog-section catalog-section--medical" id="catalog-medical-tools">
         <h2>
-          Medical tools &amp; calculators ({medicalSummary.total})
+          Medical tools &amp; calculators (
+          {query || categoryFilter !== 'all' ? `${sortedMedical.length} shown` : medicalSummary.total})
+          )
         </h2>
         <p className="catalog-section-desc">
           Complete list of shipped clinical tools: all {medicalSummary.nluProfiles} NLU profiles
@@ -808,7 +839,7 @@ const ClinicalToolCatalog = () => {
           sortKey={medicalSort.sortKey}
           sortDir={medicalSort.sortDir}
           onSort={medicalSort.toggleSort}
-          hideEmpty={showGlobalEmpty || showCategoryEmpty}
+          hideEmpty={showCategoryEmpty}
         />
       </section>
 
@@ -947,7 +978,7 @@ const ClinicalToolCatalog = () => {
 
       {showFocusedSections && (
         <>
-          <section className="catalog-section">
+          <section className="catalog-section" id="catalog-discovery-sections">
             <h2>Emergency NLU patterns ({emergencyPatternGroups.length})</h2>
             <p className="catalog-section-desc">
               Keyword groups from emergency.patterns.ts — evaluated on every chat message before
@@ -1026,13 +1057,16 @@ const ClinicalToolCatalog = () => {
         </>
       )}
 
-      {!showMedicalOnly && (
+      {!showMedicalOnly && showPlatformSections && (
       <>
-      <section className="catalog-section">
-        <h2>Chat &amp; AI APIs (backend)</h2>
+      <section
+        className="catalog-section catalog-section--platform"
+        id="catalog-platform-apis"
+      >
+        <h2>Platform &amp; chat APIs (surfaced)</h2>
         <p className="catalog-section-desc">
-          Endpoints implemented on the server; most are reached through the dashboard chat or
-          integrations—not separate tool pages.
+          Backend chat, clinical data, and emergency capabilities—available from dashboard chat and
+          integrations, not as separate sidebar shortcuts.
         </p>
         <div className="catalog-table-wrap catalog-table-wrap--stacked">
           <table className="catalog-table catalog-table--stacked">
@@ -1199,7 +1233,11 @@ const ClinicalToolCatalog = () => {
           </table>
         </div>
       </section>
+      </>
+      )}
 
+      {!showMedicalOnly && showLegacyToolSections && (
+      <>
       <section className="catalog-section">
         <h2>Backend executors (API)</h2>
         <p className="catalog-section-desc">

@@ -4,6 +4,7 @@ import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import ToolPageLayout from './ToolPageLayout';
 import './Calculators.css';
+import '../../styles/calculators-mobile-pr.css';
 import { executeClinicalTool } from '../../services/clinicalOrchestratorApi';
 import {
   calculateQsofaScore,
@@ -64,7 +65,20 @@ import {
   CkdStagingCalculator,
   StopBangCalculator,
 } from './pr4aCalculators';
+import {
+  HeartScoreCalculator,
+  CentorMcisaacCalculator,
+  BishopScoreCalculator,
+  ApgarScoreCalculator,
+  BradenScaleCalculator,
+  MorseFallScaleCalculator,
+  RansonCriteriaCalculator,
+  BisapScoreCalculator,
+  Fib4Calculator,
+  FraminghamRiskCalculator,
+} from './pr8ClinicalBatchCalculators';
 import ToolNotFound from './ToolNotFound';
+import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 
 const CALCULATORS = buildBuiltinHubCalculatorCards();
 const CHAT_ASSISTED_TOOLS = getHubChatAssistedTools();
@@ -447,6 +461,26 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <StopBangCalculator onResultChange={onResultChange} />;
     case 'audit-c':
       return <AuditCCalculator onResultChange={onResultChange} />;
+    case 'heart-score':
+      return <HeartScoreCalculator onResultChange={onResultChange} />;
+    case 'centor-mcisaac':
+      return <CentorMcisaacCalculator onResultChange={onResultChange} />;
+    case 'bishop-score':
+      return <BishopScoreCalculator onResultChange={onResultChange} />;
+    case 'apgar-score':
+      return <ApgarScoreCalculator onResultChange={onResultChange} />;
+    case 'braden-scale':
+      return <BradenScaleCalculator onResultChange={onResultChange} />;
+    case 'morse-fall-scale':
+      return <MorseFallScaleCalculator onResultChange={onResultChange} />;
+    case 'ranson-criteria':
+      return <RansonCriteriaCalculator onResultChange={onResultChange} />;
+    case 'bisap-score':
+      return <BisapScoreCalculator onResultChange={onResultChange} />;
+    case 'fib4':
+      return <Fib4Calculator onResultChange={onResultChange} />;
+    case 'framingham-risk':
+      return <FraminghamRiskCalculator onResultChange={onResultChange} />;
     default:
       return (
         <ToolNotFound
@@ -2313,6 +2347,7 @@ const SOFACalculator = ({ onResultChange }) => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [unsupported, setUnsupported] = useState(false);
 
   useEffect(() => {
     if (onResultChange) {
@@ -2323,6 +2358,7 @@ const SOFACalculator = ({ onResultChange }) => {
   const handleCalculate = async () => {
     setLoading(true);
     setError(null);
+    setUnsupported(false);
 
     try {
       const parameters = Object.entries(inputs).reduce((acc, [key, value]) => {
@@ -2333,6 +2369,11 @@ const SOFACalculator = ({ onResultChange }) => {
       }, {});
 
       const execution = await executeClinicalTool('sofa-calculator', parameters);
+      if (execution.unsupported) {
+        setUnsupported(true);
+        setError(execution.message);
+        return;
+      }
       if (!execution.ok) {
         throw new Error(execution.message || 'Failed to calculate SOFA score');
       }
@@ -2588,13 +2629,19 @@ const SOFACalculator = ({ onResultChange }) => {
         <ResultsPanelTitle />
 
         {loading ? (
-          <div className="calc-loading">
-            <div className="calc-spinner"></div>
-            <p>Calculating...</p>
-          </div>
+          <ClinicalExecutorFeedback loading />
         ) : error ? (
           <div className="calc-error">
-            <strong>Error:</strong> {error}
+            <ClinicalExecutorFeedback
+              unsupported={unsupported}
+              error={!unsupported ? error : null}
+              unsupportedDetail={unsupported ? error : null}
+            />
+            {!unsupported ? (
+              <p>
+                <strong>Error:</strong> {error}
+              </p>
+            ) : null}
           </div>
         ) : result ? (
           <>
@@ -2805,7 +2852,7 @@ const GFRCalculator = ({ onResultChange }) => {
               <div className="calc-score-label">eGFR (CKD-EPI)</div>
               <div className="calc-score-value">
                 {result.gfr}
-                <span style={{ fontSize: '24px', marginLeft: '8px' }}>mL/min/1.73m²</span>
+                <span className="calc-score-unit">mL/min/1.73m²</span>
               </div>
               <div className="calc-score-interpretation">
                 CKD Stage {result.stage}
@@ -2973,7 +3020,7 @@ const BMICalculator = ({ onResultChange }) => {
               <div className="calc-score-label">Body Mass Index</div>
               <div className="calc-score-value">
                 {result.bmi}
-                <span style={{ fontSize: '24px', marginLeft: '8px' }}>kg/m²</span>
+                <span className="calc-score-unit">kg/m²</span>
               </div>
               <div className="calc-score-interpretation">{result.category}</div>
             </div>

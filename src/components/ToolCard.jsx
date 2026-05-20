@@ -16,7 +16,7 @@ function Notice({ variant, title, children }) {
   );
 }
 
-const ToolCard = ({ toolResult }) => {
+const ToolCard = React.memo(function ToolCard({ toolResult }) {
   if (!toolResult) return null;
 
   const { toolId, toolName, result } = toolResult;
@@ -97,7 +97,7 @@ const ToolCard = ({ toolResult }) => {
       </div>
     </section>
   );
-};
+});
 
 function renderSofaCalculator(data) {
   if (!data) return null;

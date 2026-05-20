@@ -6,7 +6,7 @@
   top: 0;
   min-height: var(--app-viewport-height, 100dvh);
   height: var(--app-viewport-height, 100dvh);
-  width: 280px;
+  width: var(--sidebar-width-expanded, 280px);
   max-width: 100%;
   min-width: 0;
   max-height: var(--app-viewport-height, 100dvh);
@@ -28,7 +28,7 @@
 }
 
 .sidebar-collapsed {
-  width: 70px;
+  width: var(--sidebar-width-collapsed, 70px);
 }
 
 /* Header */
@@ -584,7 +584,7 @@
 
 .sidebar-tools-quick-action {
   width: 100%;
-  min-height: 44px;
+  min-height: var(--touch-target-min);
   padding: 8px;
   margin-top: 8px;
   border-radius: 6px;
@@ -975,54 +975,72 @@
   text-align: center;
 }
 
-/* Compact shell: off-canvas drawer (classes set from AppShell + Sidebar) */
+/*
+ * Mobile / tablet drawer (≤900px) — CSS-first so Android never reserves sidebar width
+ * before React hydrates. Open state: .sidebar--open (from AppShell).
+ */
 @media (max-width: 900px) {
-  .sidebar.sidebar--compact {
-    width: min(280px, min(100vw, 88vw));
+  .sidebar {
+    width: var(--sidebar-drawer-max-width, min(280px, 88vw));
     max-width: 100vw;
-    transform: translateX(-100%);
+    transform: translate3d(-100%, 0, 0);
     visibility: hidden;
+    clip-path: inset(0 100% 0 0);
     transition:
       transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      visibility 0s linear 0.3s;
-    z-index: 950;
+      visibility 0s linear 0.3s,
+      clip-path 0s linear 0.3s;
+    z-index: 1;
     pointer-events: none;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
-  .sidebar.sidebar--compact.sidebar--open {
-    transform: translateX(0);
+  .sidebar.sidebar--open {
+    transform: translate3d(0, 0, 0);
     visibility: visible;
+    clip-path: none;
     transition:
       transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-      visibility 0s linear 0s;
+      visibility 0s linear 0s,
+      clip-path 0s linear 0s;
     box-shadow: var(--sidebar-mobile-drawer-shadow);
     pointer-events: auto;
+    z-index: 950;
   }
 
-  .sidebar.sidebar--compact .tools-grid {
+  .sidebar .tools-grid {
     grid-template-columns: 1fr;
   }
 
-  .sidebar.sidebar--compact .sidebar-header {
+  .sidebar .sidebar-header {
     padding-inline: 12px 16px;
   }
 
-  .sidebar.sidebar--compact .sidebar-content {
+  .sidebar .sidebar-content {
     padding-inline: 12px;
+    /* Independent scroll; long tool lists must not clip on Android */
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .sidebar.sidebar--compact .sidebar-footer {
+  .sidebar .sidebar-footer {
     padding-inline: 12px;
+    flex-shrink: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sidebar.sidebar--compact {
-    transition: none;
-  }
+  @media (max-width: 900px) {
+    .sidebar {
+      transition: none;
+    }
 
-  .sidebar.sidebar--compact.sidebar--open {
-    transition: none;
+    .sidebar.sidebar--open {
+      transition: none;
+    }
   }
 }
 

@@ -1,139 +1,85 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-05-19  
-**Legend:** ✅ wired · ⚠️ partial/mismatch · ❌ frontend calls missing backend · 🔒 backend-only (no frontend)
+**Generated:** 2026-05-19T23:22:01.491Z
 
----
+| Method | Path | Backend | Frontend client | Exposure |
+|--------|------|---------|-----------------|----------|
+| POST | `/api/chat/message` | ChatController | clinicalChatService.js | ✅ |
+| POST | `/api/chat/intent-classify` | ChatController | advancedRecommendationService.js | ✅ |
+| POST | `/api/chat/messages` | — | syncService.js | ⚠️ gated |
+| POST | `/api/chat/conversations` | — | syncService.js | ⚠️ gated |
+| GET | `/api/tools` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
+| GET | `/api/tools/available` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
+| POST | `/api/tools/:id/execute` | ToolOrchestratorController | clinicalOrchestratorApi.js | ✅ |
+| POST | `/api/tools/results` | ToolOrchestratorController | syncService.js | ✅ |
+| POST | `/api/tools/share-results` | — | ToolResultShare.jsx | ⚠️ gated |
+| GET | `/api/compliance/consent` | ComplianceController | complianceApi.js | ✅ |
+| POST | `/api/compliance/consent` | ComplianceController | complianceApi.js | ✅ |
+| GET | `/api/audit/logs` | AuditController | AuditLogs.jsx | ✅ |
+| GET | `/api/audit/verify-integrity` | AuditController | AuditLogs.jsx | ✅ |
+| GET | `/api/audit/statistics` | AuditController | AuditLogs.jsx | ✅ |
+| POST | `/api/audit/sync` | AuditController | syncService.js | ✅ |
+| GET | `/api/notifications` | NotificationController | NotificationService.js | ✅ |
+| PATCH | `/api/notifications/:id/read` | NotificationController | NotificationService.js | ✅ |
+| DELETE | `/api/notifications/:id` | NotificationController | NotificationService.js | ✅ |
+| GET | `/api/notifications/preferences` | NotificationController | NotificationService.js | ✅ |
+| PATCH | `/api/notifications/preferences` | NotificationController | NotificationService.js | ✅ |
+| POST | `/api/notifications/devices/register` | NotificationController | NotificationService.js | ✅ |
+| POST | `/api/notifications/test` | NotificationController | NotificationService.js | ✅ |
+| GET | `/api/notifications/stream` | — | NotificationService.js | ⚠️ gated |
+| POST | `/api/notifications/send/:channel` | — | notifications/NotificationService.js | ⚠️ gated |
+| GET | `/api/team/users` | — | TeamManagement.jsx | ⚠️ gated |
+| PUT | `/api/team/users/:id` | — | TeamManagement.jsx | ⚠️ gated |
+| DELETE | `/api/team/users/:id` | — | TeamManagement.jsx | ⚠️ gated |
+| POST | `/api/team/invite` | — | TeamManagement.jsx | ⚠️ gated |
+| POST | `/api/sync` | — | offline.js / OfflineSupport.jsx | ⚠️ gated |
+| POST | `/api/clinical/alerts/:id/acknowledge` | — | clinicalAlertNotifications.js | ⚠️ gated |
+| POST | `/api/clinical/alerts/:id/dismiss` | — | clinicalAlertNotifications.js | ⚠️ gated |
+| GET | `/api/clinical/alerts/stream` | — | clinicalAlertNotifications.js | ⚠️ gated |
+| POST | `/api/exports/pdf` | — | export/ExportService.js | ⚠️ gated |
+| POST | `/api/exports/excel` | — | export/ExportService.js | ⚠️ gated |
+| POST | `/api/reports/generate` | — | export/ExportService.js | ⚠️ gated |
+| GET | `/api/config/system` | AppController | configService.js | ✅ |
+| GET | `/api/ai/remaining-queries` | AiController | configService.js | ✅ |
+| GET | `/api/users/profile` | UsersController | UserContext.jsx / syncService.js | ✅ |
+| GET | `/api/subscriptions/current` | SubscriptionsController | configService.js | ✅ |
+| GET | `/api/subscriptions/plans` | SubscriptionsController | configService.js | ✅ |
+| POST | `/api/auth/login` | AuthController | Auth.jsx | ✅ |
+| POST | `/api/auth/register` | AuthController | Auth.jsx | ✅ |
+| POST | `/api/auth/verify-2fa` | AuthController | Auth.jsx | ✅ |
+| POST | `/api/auth/magic-link` | AuthController | Auth.jsx | ✅ |
+| POST | `/api/auth/dev-session` | AuthController | Auth.jsx | ✅ |
+| GET | `/api/auth/biometric/config` | BiometricController | BiometricSetup.jsx | ✅ |
+| POST | `/api/auth/biometric/enroll` | BiometricController | BiometricSetup.jsx | ✅ |
+| GET | `/api/two-factor/generate` | TwoFactorController | TwoFactorSetup.jsx | ✅ |
+| POST | `/api/two-factor/enable` | TwoFactorController | TwoFactorSetup.jsx | ✅ |
+| GET | `/api/two-factor/status` | TwoFactorController | TwoFactorSettings.jsx | ✅ |
+| DELETE | `/api/two-factor/disable` | TwoFactorController | TwoFactorSettings.jsx | ✅ |
+| POST | `/api/crashes` | AnalyticsController | ErrorBoundary.jsx | ✅ |
+| POST | `/api/analytics/events` | AnalyticsController | analyticsService.ts | ✅ |
 
-## Medical control plane & clinical chat
+## Backend route inventory (reference)
 
-| Method | Endpoint | Backend handler | Frontend client | Status |
-|--------|----------|-----------------|-----------------|--------|
-| POST | `/api/chat/message` | `ChatController.sendMessage` | `clinicalChatService.js`, Dashboard, Protocols, Diagnosis, ProcedureGuide | ✅ |
-| POST | `/api/chat/intent-classify` | `ChatController.classifyIntent` | `advancedRecommendationService.js` | ✅ |
-| POST | `/api/chat/suggest-action` | `ChatController.suggestAction` | — (catalog discovery only) | 🔒 |
-| POST | `/api/chat/analyze-vitals` | `ChatController.analyzeVitals` | — (catalog discovery only) | 🔒 |
-| POST | `/api/chat/message-3d` | `ChatController.sendMessage3D` | — | 🔒 |
-| POST | `/api/chat/messages` | — | `syncService.js` | ❌ |
-| POST | `/api/chat/conversations` | — | `syncService.js` | ❌ |
-| GET | `/api/tools` | `ToolOrchestratorController.listTools` | `clinicalToolsApi.js`, `configService.js` | ✅ |
-| GET | `/api/tools/available` | `getAvailableTools` | `clinicalToolsApi.js`, `configService.js` | ✅ |
-| GET | `/api/tools/:id` | `getToolMetadata` | — | 🔒 |
-| GET | `/api/tools/catalog/executors` | `getExecutorCatalog` | — | 🔒 |
-| GET | `/api/tools/statistics` | `getStatistics` | — | 🔒 |
-| POST | `/api/tools/:id/validate` | `validateTool` | — | 🔒 |
-| POST | `/api/tools/:id/execute` | `executeTool` | `clinicalOrchestratorApi.js`, DrugChecker, LabInterpreter, Calculators (SOFA) | ✅ (3 ids) |
-| POST | `/api/tools/execute` | `executeToolGeneric` | — | 🔒 |
-| POST | `/api/tools/results` | `recordToolResult` | `syncService.js` | ✅ |
-| POST | `/api/tools/share-results` | — | `ToolResultShare.jsx` | ❌ |
+- `GET /health`
+- `GET /api/config/system`
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/dev-session`
+- `POST /api/auth/verify-2fa`
+- `GET /api/auth/verify-email`
+- `GET /api/auth/google`
+- `GET /api/auth/google/callback`
+- `GET /api/auth/linkedin`
+- `GET /api/auth/linkedin/callback`
+- `POST /api/auth/magic-link`
+- `GET /api/auth/oidc`
+- `GET /api/auth/saml`
+- `GET /api/auth/me`
+- `POST /api/auth/biometric/enroll`
+- `POST /api/auth/biometric/verify`
+- `GET /api/auth/biometric/config`
+- `GET /api/auth/biometric/stats`
+- `DELETE /api/auth/biometric/disable/:deviceId`
 
-### Executor POST detail (only these ids succeed)
+_…and 72 more in src/data/backendHttpRouteInventory.js_
 
-| NLU / executor id | Registry id | UI |
-|-------------------|-------------|-----|
-| `sofa-calculator` | `sofa-score` | `Calculators.jsx` |
-| `drug-interactions` | `drug-check` | `DrugChecker.jsx` |
-| `lab-interpreter` | `lab-interp` | `LabInterpreter.jsx` |
-
-### NLU patterns → frontend (no POST execute)
-
-All 40 `tool.patterns.ts` toolIds → `resolveCatalogLaunch` + chat via Tier A/B/C paths. See [backend-frontend-tool-contract.md](./backend-frontend-tool-contract.md).
-
----
-
-## Auth, users, security
-
-| Method | Endpoint | Frontend | Status |
-|--------|----------|----------|--------|
-| POST | `/api/auth/register`, `/login`, `/dev-session`, `/verify-2fa`, `/magic-link` | `Auth.jsx` | ✅ |
-| GET | `/api/auth/google`, `/linkedin`, callbacks | `Auth.jsx` | ✅ |
-| GET | `/api/auth/oidc`, `/saml` | `Auth.jsx` (placeholder ping) | ⚠️ placeholder |
-| GET | `/api/auth/me` | — | 🔒 |
-| POST/GET/DELETE | `/api/auth/biometric/*` | `BiometricSetup.jsx` | ✅ |
-| GET/PATCH | `/api/users/profile` | `UserContext.jsx`, `syncService.js` | ✅ |
-| GET/POST/DELETE | `/api/two-factor/*` | `TwoFactorSetup.jsx`, `TwoFactorSettings.jsx` | ✅ |
-
----
-
-## Compliance, consent, audit
-
-| Method | Endpoint | Frontend | Status |
-|--------|----------|----------|--------|
-| POST | `/api/compliance/export` | — | 🔒 |
-| DELETE | `/api/compliance/delete-account` | — | 🔒 |
-| GET/POST | `/api/compliance/consent` | — | 🔒 |
-| POST | `/api/consent/record` | `ConsentFlow.jsx` | ❌ wrong path |
-| GET | `/api/consent/history` | `ConsentHistory.jsx` | ❌ |
-| GET | `/api/audit/logs`, `/verify-integrity`, `/statistics` | `AuditLogs.jsx` | ✅ |
-| GET | `/api/audit/my-logs` | — | 🔒 |
-| POST | `/api/audit/sync` | `syncService.js` | ✅ |
-
----
-
-## Subscriptions, AI, config
-
-| Method | Endpoint | Frontend | Status |
-|--------|----------|----------|--------|
-| GET | `/api/config/system` | `configService.js` | ✅ |
-| GET | `/api/subscriptions/plans`, `/current` | `configService.js` | ✅ |
-| POST | `/api/subscriptions/create-checkout`, `/portal` | — | 🔒 |
-| POST | `/api/subscriptions/webhook` | Stripe | 🔒 |
-| POST | `/api/ai/query`, `/structured` | — | 🔒 |
-| GET | `/api/ai/usage`, `/remaining-queries` | `configService.js` (remaining-queries) | ⚠️ partial |
-
----
-
-## Notifications, analytics, metrics
-
-| Method | Endpoint | Frontend | Status |
-|--------|----------|----------|--------|
-| POST | `/api/notifications/devices/register` | `NotificationService.js` | ✅ |
-| GET/PATCH/DELETE | `/api/notifications/*` | `NotificationService.js`, `syncService.js` | ✅ |
-| GET | `/api/notifications/stream` | `NotificationService.buildStreamUrl` | ❌ |
-| POST | `/api/notifications/send/:channel` | `notifications/NotificationService.js` | ❌ |
-| POST | `/api/analytics/events` | `analyticsService.ts` | ✅ |
-| GET | `/api/analytics/metrics` | `AnalyticsDashboard.jsx` | ✅ |
-| POST | `/api/crashes` | `ErrorBoundary.jsx` | ✅ |
-| POST | `/api/health` (analytics module) | — | 🔒 |
-| GET | `/api/metrics` | — | 🔒 (Prometheus) |
-
----
-
-## Clinical content REST
-
-| Method | Endpoint | Frontend | Status |
-|--------|----------|----------|--------|
-| GET/POST/PUT/DELETE | `/api/drugs/*` | — | 🔒 |
-| GET/POST/PUT/DELETE | `/api/protocols/*` | — (Protocols uses chat) | 🔒 |
-
----
-
-## Team, sync, alerts, export (frontend-only paths)
-
-| Method | Endpoint | Frontend | Status |
-|--------|----------|----------|--------|
-| GET/POST/PUT/DELETE | `/api/team/*` | `TeamManagement.jsx` | ❌ |
-| POST | `/api/sync` | `offline.js`, `OfflineSupport.jsx` | ❌ |
-| POST | `/api/clinical/alerts/:id/*` | `clinicalAlertNotifications.js` | ❌ |
-| POST | `/api/exports/*`, `/api/reports/*` | `export/ExportService.js` | ❌ |
-
----
-
-## SPA & health
-
-| Method | Endpoint | Frontend | Status |
-|--------|----------|----------|--------|
-| GET | `/health` | — | 🔒 |
-| GET | `/`, `/api/*` (SPA) | React router | ✅ |
-
----
-
-## Internal services (no HTTP; reached via chat/orchestrator)
-
-| Service | Called from | Frontend trigger |
-|---------|-------------|------------------|
-| `IntentClassifierService.classify` | `ChatService` | `POST /api/chat/message`, `/intent-classify` |
-| `ToolOrchestratorService.executeInChat` | `ChatService` | Chat with `tool` param |
-| `EmergencyEscalationService.escalate` | `ChatService` | Emergency keyword match in message |
-| `RagService` | `ChatService` | Embedded in chat response |
-| `SofaCalculatorService`, `DrugCheckerService`, `LabInterpreterService` | Orchestrator | POST execute or chat |

@@ -1,47 +1,5 @@
 [
   {
-    "project": "chromium",
-    "title": "tier-a-ckd-staging @ 1024x768",
-    "error": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
-    "kind": "timeout"
-  },
-  {
-    "project": "firefox",
-    "title": "tier-a-calc-bmi @ 1280x720",
-    "error": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
-    "kind": "timeout"
-  },
-  {
-    "project": "firefox",
-    "title": "tier-a-ckd-staging @ 1024x768",
-    "error": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
-    "kind": "timeout"
-  },
-  {
-    "project": "firefox",
-    "title": "tier-b-wells-pe @ 390x844",
-    "error": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
-    "kind": "timeout"
-  },
-  {
-    "project": "webkit",
-    "title": "dashboard @ 320x568",
-    "error": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
-    "kind": "timeout"
-  },
-  {
-    "project": "webkit",
-    "title": "tier-a-ckd-staging @ 1024x768",
-    "error": "\u001b[31mTest timeout of 120000ms exceeded.\u001b[39m",
-    "kind": "timeout"
-  },
-  {
-    "project": "msedge",
-    "title": "dashboard @ 320x568",
-    "error": "\u001b[31mTest timeout of 90000ms exceeded.\u001b[39m",
-    "kind": "timeout"
-  },
-  {
     "project": "msedge",
     "title": "tier-a-has-bled @ 414x896",
     "error": "\u001b[31mTest timeout of 90000ms exceeded.\u001b[39m",

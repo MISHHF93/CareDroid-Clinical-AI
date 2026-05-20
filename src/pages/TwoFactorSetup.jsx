@@ -187,6 +187,9 @@ const TwoFactorSetup = ({ authToken }) => {
                   <img
                     src={qrCode}
                     alt="2FA QR Code"
+                    width={280}
+                    height={280}
+                    decoding="async"
                     style={{
                       maxWidth: '280px',
                       width: '100%',
