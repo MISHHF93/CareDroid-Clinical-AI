@@ -91,6 +91,14 @@ const EXECUTOR_TEST_COVERAGE = Object.freeze({
   [REGISTRY.labInterp]: ['lab-interpreter.spec.ts', 'tool-orchestrator.spec.ts'],
 });
 
+const DEFAULT_COLOR_BY_CATEGORY = Object.freeze({
+  Diagnostic: '#FF6B9D',
+  Calculator: '#95E1D3',
+  Reference: '#A8E6CF',
+  Fleet: '#6C8CFF',
+  Other: '#94A3B8',
+});
+
 function unique(values) {
   return [...new Set(values.filter((v) => v !== null && v !== undefined && v !== ''))];
 }
@@ -105,6 +113,15 @@ function normalizeCategory(value) {
   if (category === 'reference') return 'reference';
   if (category === 'fleet') return 'fleet';
   return category;
+}
+
+function presentationCategory(value) {
+  const category = String(value || 'Other').toLowerCase();
+  if (category === 'diagnostic' || category === 'checker' || category === 'interpreter') return 'Diagnostic';
+  if (category === 'calculator') return 'Calculator';
+  if (category === 'reference' || category === 'protocol') return 'Reference';
+  if (category === 'fleet') return 'Fleet';
+  return 'Other';
 }
 
 function getPatternMaps() {
@@ -397,6 +414,37 @@ export function getCatalogToolInventory(records = getCanonicalToolInventory()) {
 
 export function getSidebarToolInventory(records = getCanonicalToolInventory()) {
   return records.filter((record) => record.sidebarVisible);
+}
+
+export function getSidebarToolRegistryProjection(records = getCanonicalToolInventory()) {
+  const order = new Map(ALL_REGISTRY_TOOL_IDS.map((id, index) => [id, index]));
+  return getSidebarToolInventory(records)
+    .map((record) => {
+      const legacy = toolRegistryById[record.id] || {};
+      const category = legacy.category || presentationCategory(record.category);
+      return {
+        ...legacy,
+        id: record.id,
+        name: record.label || legacy.name || record.id,
+        path: record.route || legacy.path || record.fallbackRoute || TOOL_LAUNCH_PATHS.toolsCatalog,
+        color: legacy.color || DEFAULT_COLOR_BY_CATEGORY[category] || DEFAULT_COLOR_BY_CATEGORY.Other,
+        description: record.safetyCopy || legacy.description || 'Clinical decision support tool',
+        shortcut: legacy.shortcut || null,
+        category,
+        features: legacy.features || [],
+        useCases: legacy.useCases || [],
+        panelTool:
+          legacy.panelTool ||
+          (record.calculatorSlug && record.id !== REGISTRY.calculatorsHub ? REGISTRY.calculatorsHub : undefined),
+        initialCalc: legacy.initialCalc || record.calculatorSlug || undefined,
+        canonicalInventoryId: record.id,
+        launchType: record.launchType,
+        tier: record.tier,
+        nluToolId: record.nluToolId,
+        executorStatus: record.executorStatus,
+      };
+    })
+    .sort((a, b) => (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.id) ?? Number.MAX_SAFE_INTEGER));
 }
 
 export function getBackendBackedToolInventory(records = getCanonicalToolInventory()) {

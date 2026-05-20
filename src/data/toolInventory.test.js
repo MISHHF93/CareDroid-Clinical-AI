@@ -4,6 +4,7 @@ import {
   getCanonicalToolInventory,
   getCatalogToolInventory,
   getFrontendVisibleToolInventory,
+  getSidebarToolRegistryProjection,
   getSidebarToolInventory,
   resolveToolInventoryRecord,
   TOOL_EXECUTOR_STATUS,
@@ -57,6 +58,21 @@ describe('canonical tool inventory', () => {
       expect(ids.has(registryId), `missing registry tool ${registryId}`).toBe(true);
     }
     expect(getSidebarToolInventory(records).length).toBe(ALL_REGISTRY_TOOL_IDS.length);
+  });
+
+  it('projects sidebar-visible tools with legacy card fields for app layout', () => {
+    const sidebarTools = getSidebarToolRegistryProjection(records);
+    expect(sidebarTools).toHaveLength(ALL_REGISTRY_TOOL_IDS.length);
+    expect(sidebarTools.map((tool) => tool.id)).toEqual(ALL_REGISTRY_TOOL_IDS);
+
+    for (const tool of sidebarTools) {
+      expect(tool.name, tool.id).toBeTruthy();
+      expect(tool.path, tool.id).toBeTruthy();
+      expect(tool.category, tool.id).toMatch(/Diagnostic|Calculator|Reference|Fleet|Other/);
+      expect(tool.color, tool.id).toMatch(/^#/);
+      expect(Array.isArray(tool.features), tool.id).toBe(true);
+      expect(tool.canonicalInventoryId, tool.id).toBe(tool.id);
+    }
   });
 
   it('covers every NLU profile through a canonical record', () => {

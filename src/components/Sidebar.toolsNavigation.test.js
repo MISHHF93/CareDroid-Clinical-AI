@@ -40,7 +40,14 @@ describe('View All Tools navigation wiring', () => {
 
   it('navigates sidebar tool cards via centralized registry launch', () => {
     expect(sidebarSource).toContain('applyRegistryToolLaunch');
-    expect(sidebarSource).toMatch(/onToolSelect\?\.\(tool\.id\)/);
+    expect(sidebarSource).toContain('onToolSelect(tool.id)');
+    expect(sidebarSource).toContain('if (onToolSelect)');
+  });
+
+  it('derives sidebar cards from canonical tool inventory projection', () => {
+    expect(sidebarSource).toContain('getSidebarToolRegistryProjection');
+    expect(sidebarSource).toContain('const medicalTools = getSidebarToolRegistryProjection()');
+    expect(appShellSource).toContain('<Sidebar');
   });
 
   it('closes mobile drawer after navigation', () => {

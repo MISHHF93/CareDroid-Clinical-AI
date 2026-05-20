@@ -1,23 +1,36 @@
 import { describe, it, expect } from 'vitest';
-import toolRegistry from './toolRegistry';
 import {
   groupSidebarToolsByCategory,
   mergeWorkspacesWithRegistry,
   partitionSidebarTools,
   SIDEBAR_CATEGORY_ORDER,
 } from './sidebarToolPresentation';
+import { getSidebarToolRegistryProjection } from './toolInventory';
 
 describe('sidebarToolPresentation', () => {
+  const sidebarTools = getSidebarToolRegistryProjection();
+
   it('includes NLU hub-only calculators in registry for sidebar visibility', () => {
-    const ids = toolRegistry.map((t) => t.id);
+    const ids = sidebarTools.map((t) => t.id);
     expect(ids).toContain('apache2-calculator');
     expect(ids).toContain('curb65-calculator');
     expect(ids).toContain('gcs-calculator');
     expect(ids).toContain('wells-dvt-calculator');
   });
 
+  it('projects inventory records into complete sidebar card metadata', () => {
+    for (const tool of sidebarTools) {
+      expect(tool.name, tool.id).toBeTruthy();
+      expect(tool.path, tool.id).toBeTruthy();
+      expect(tool.category, tool.id).toBeTruthy();
+      expect(tool.color, tool.id).toBeTruthy();
+      expect(Array.isArray(tool.features), tool.id).toBe(true);
+      expect(tool.canonicalInventoryId, tool.id).toBe(tool.id);
+    }
+  });
+
   it('partitionSidebarTools avoids duplicate cards across pinned, favorites, and catalog', () => {
-    const tools = toolRegistry.slice(0, 6);
+    const tools = sidebarTools.slice(0, 6);
     const { pinnedTools, favoriteTools, catalogTools } = partitionSidebarTools(
       tools,
       [tools[0].id, tools[1].id],
@@ -32,10 +45,10 @@ describe('sidebarToolPresentation', () => {
   });
 
   it('groups catalog tools by category in stable order', () => {
-    const groups = groupSidebarToolsByCategory(toolRegistry);
+    const groups = groupSidebarToolsByCategory(sidebarTools);
     expect(groups.map((g) => g.category)).toEqual(
       SIDEBAR_CATEGORY_ORDER.filter((c) =>
-        toolRegistry.some((t) => t.category === c)
+        sidebarTools.some((t) => t.category === c)
       )
     );
     const calculatorGroup = groups.find((g) => g.category === 'Calculator');

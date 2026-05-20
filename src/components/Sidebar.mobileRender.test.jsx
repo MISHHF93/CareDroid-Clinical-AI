@@ -70,15 +70,17 @@ describe('Sidebar mobile render state', () => {
   });
 
   it('exposes dialog semantics and close control when mobile drawer is open', () => {
-    renderSidebar({
+    const { container } = renderSidebar({
       layoutCompact: true,
       mobileNavOpen: true,
       onCloseMobileNav: vi.fn(),
     });
 
-    expect(screen.getByRole('dialog', { name: /navigation menu/i })).toBeInTheDocument();
+    const aside = container.querySelector('aside.sidebar.sidebar--compact.sidebar--open');
+    expect(aside).toHaveAttribute('role', 'dialog');
+    expect(aside).toHaveAttribute('aria-label', 'Navigation menu');
     expect(screen.getByRole('button', { name: /close menu/i })).toBeInTheDocument();
-    expect(screen.getByRole('navigation')).toBeInTheDocument();
+    expect(container.querySelector('nav.sidebar-nav')).toBeInTheDocument();
   });
 
   it('renders tool cards with accessible names in tools section', () => {

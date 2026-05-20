@@ -2,13 +2,12 @@ import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import { toolRegistryById } from '../../data/toolRegistry';
 import {
   clinicalIntentTools,
   getCatalogSummary,
   nluCalculatorHubOnly,
 } from '../../data/clinicalIntentToolCatalog';
-import { getSidebarToolInventory } from '../../data/toolInventory';
+import { getSidebarToolRegistryProjection } from '../../data/toolInventory';
 import { resolveCatalogLaunch, resolveNavigationPathForLaunch } from '../../data/clinicalCatalogWiring';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import { chatAssistedLaunchAriaLabel } from '../../data/chatAssistedHubGroups';
@@ -30,14 +29,15 @@ const ToolsOverview = () => {
   } = useToolPreferences();
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
 
-  const tools = getSidebarToolInventory().map((tool) => toolRegistryById[tool.id] || tool);
+  const tools = getSidebarToolRegistryProjection();
+  const toolById = Object.fromEntries(tools.map((tool) => [tool.id, tool]));
   const activeWorkspace = workspaces.find((workspace) => workspace.id === activeWorkspaceId);
   const workspaceToolIds = activeWorkspace?.toolIds?.length
     ? activeWorkspace.toolIds
     : tools.map((tool) => tool.id);
   const filteredTools = tools.filter((tool) => workspaceToolIds.includes(tool.id));
   const recentToolItems = recentTools
-    .map((toolId) => toolRegistryById[toolId])
+    .map((toolId) => toolById[toolId])
     .filter((tool) => tool && workspaceToolIds.includes(tool.id));
 
   const handleToolClick = (tool) => {

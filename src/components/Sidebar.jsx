@@ -6,8 +6,8 @@ import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import PermissionGate from './PermissionGate';
 import WorkspaceCreationModal from './WorkspaceCreationModal';
-import toolRegistry, { toolRegistryById } from '../data/toolRegistry';
 import { partitionSidebarTools, SIDEBAR_CATEGORY_ORDER } from '../data/sidebarToolPresentation';
+import { getSidebarToolRegistryProjection } from '../data/toolInventory';
 import { useConversation } from '../contexts/ConversationContext';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
@@ -69,7 +69,8 @@ const Sidebar = forwardRef(function Sidebar(
   const unreadCount = notifications.filter(n => !n.read).length;
 
   // Medical Tools - Enhanced with navigation
-  const medicalTools = toolRegistry;
+  const medicalTools = getSidebarToolRegistryProjection();
+  const sidebarToolById = Object.fromEntries(medicalTools.map((tool) => [tool.id, tool]));
   const activeWorkspace = workspaces.find((workspace) => workspace.id === activeWorkspaceId);
   const workspaceToolIds = activeWorkspace?.toolIds?.length
     ? activeWorkspace.toolIds
@@ -81,7 +82,7 @@ const Sidebar = forwardRef(function Sidebar(
     favorites
   );
   const recentToolItems = recentTools
-    .map((toolId) => toolRegistryById[toolId])
+    .map((toolId) => sidebarToolById[toolId])
     .filter((tool) => tool && workspaceToolIds.includes(tool.id));
 
   // Navigation Items
@@ -116,14 +117,17 @@ const Sidebar = forwardRef(function Sidebar(
   };
 
   const handleToolClick = (tool) => {
-    applyRegistryToolLaunch(tool.id, {
-      navigate,
-      addMessage,
-      selectTool,
-      setActiveTool,
-      recordToolAccess,
-    });
-    onToolSelect?.(tool.id);
+    if (onToolSelect) {
+      onToolSelect(tool.id);
+    } else {
+      applyRegistryToolLaunch(tool.id, {
+        navigate,
+        addMessage,
+        selectTool,
+        setActiveTool,
+        recordToolAccess,
+      });
+    }
     onCloseMobileNav();
   };
 
