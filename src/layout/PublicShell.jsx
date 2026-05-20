@@ -101,9 +101,11 @@ export const PublicShell = ({ children }) => {
                 {hipaaUrl ? (
                   <a href={hipaaUrl} target="_blank" rel="noopener noreferrer">HIPAA Compliance</a>
                 ) : (
-                  <a href="#hipaa">HIPAA Compliance</a>
+                  <Link to="/hipaa">HIPAA Compliance</Link>
                 )}
               </li>
+              <li><Link to="/gdpr">GDPR Notice</Link></li>
+              <li><Link to="/hipaa">HIPAA Notice</Link></li>
               <li><a href="#security">Security Practices</a></li>
               <li><a href="#audit">Audit Logs</a></li>
             </ul>

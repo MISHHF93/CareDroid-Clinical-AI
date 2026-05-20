@@ -28,9 +28,10 @@ describe('backendFrontendToolContract', () => {
     expect(dispatch?.status).not.toBe('fully wired');
   });
 
-  it('flags share-results platform row as broken', () => {
+  it('marks share-results platform row as frontend-only (capability gated)', () => {
     const share = buildBackendFrontendContractRows().find((r) => r.canonicalId === 'tools-share-results');
-    expect(share?.status).toBe('broken');
+    expect(share?.status).toBe('frontend-only');
+    expect(share?.brokenReasons).toEqual([]);
   });
 
   it('NLU row count matches clinicalIntentTools', () => {
@@ -57,10 +58,11 @@ describe('backendFrontendToolContract', () => {
     expect(deriveContractStatus({ kind: 'phantom', brokenReasons: [] })).toBe('planned');
   });
 
-  it('documents procedures registry-only gap without broken status', () => {
+  it('documents procedures NLU profile with frontend-only status', () => {
     const gaps = getContractGaps();
     const procedures = buildBackendFrontendContractRows().find((r) => r.canonicalId === 'procedures');
-    expect(gaps.some((g) => g.id === 'procedures')).toBe(true);
+    expect(gaps.some((g) => g.id === 'procedures')).toBe(false);
     expect(procedures?.status).toBe('frontend-only');
+    expect(procedures?.nluProfile).toBe('procedures');
   });
 });

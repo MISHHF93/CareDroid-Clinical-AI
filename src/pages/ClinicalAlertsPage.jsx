@@ -1,7 +1,13 @@
 import { useState, useEffect } from 'react';
+import ApiStateBanner from '../components/ApiStateBanner';
+import {
+  isBackendCapabilityEnabled,
+  UNSUPPORTED_CAPABILITY_MESSAGE,
+} from '../config/backendApiCapabilities';
 import './ClinicalAlertsPage.css';
 
 const ClinicalAlertsPage = () => {
+  const alertsApiEnabled = isBackendCapabilityEnabled('clinicalAlerts');
   const [alerts, setAlerts] = useState([]);
   const [filteredAlerts, setFilteredAlerts] = useState([]);
   const [selectedSeverity, setSelectedSeverity] = useState('all');
@@ -105,6 +111,12 @@ const ClinicalAlertsPage = () => {
         <h1>Clinical Alerts Management</h1>
         <p>Track and manage all clinical alerts from your tools</p>
       </div>
+
+      {!alertsApiEnabled ? (
+        <ApiStateBanner
+          unsupportedMessage={`${UNSUPPORTED_CAPABILITY_MESSAGE} Showing sample alerts on this device only.`}
+        />
+      ) : null}
 
       <div className="alerts-controls">
         <div className="control-group">

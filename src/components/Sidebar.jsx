@@ -13,6 +13,7 @@ import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon, getToolIcon } from '../navigation/iconRegistry';
+import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import './Sidebar.css';
 
 /**
@@ -91,8 +92,14 @@ const Sidebar = forwardRef(function Sidebar(
     { id: 'team', label: 'Team', path: '/team', permission: Permission.MANAGE_USERS },
     { id: 'audit', label: 'Audit Logs', path: '/audit-logs', permission: Permission.VIEW_AUDIT_LOGS },
     { id: 'analytics', label: 'Analytics', path: '/analytics', permission: Permission.VIEW_ANALYTICS },
-    { id: 'settings', label: 'Settings', path: '/settings' }
-  ];
+    { id: 'costs', label: 'Cost analytics', path: '/costs', permission: Permission.VIEW_ANALYTICS },
+    { id: 'settings', label: 'Settings', path: '/settings' },
+  ].filter((item) => {
+    if (item.id === 'team') {
+      return isBackendCapabilityEnabled('teamManagement');
+    }
+    return true;
+  });
 
   const recentConversations = conversations.slice(-5).reverse();
 

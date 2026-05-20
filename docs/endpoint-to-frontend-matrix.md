@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-05-19T23:22:01.491Z
+**Generated:** 2026-05-20T01:25:15.576Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
@@ -8,6 +8,9 @@
 | POST | `/api/chat/intent-classify` | ChatController | advancedRecommendationService.js | ✅ |
 | POST | `/api/chat/messages` | — | syncService.js | ⚠️ gated |
 | POST | `/api/chat/conversations` | — | syncService.js | ⚠️ gated |
+| GET | `/api/protocols` | ProtocolController | clinicalContentApi.js | ✅ |
+| GET | `/api/protocols/categories` | ProtocolController | clinicalContentApi.js | ✅ |
+| GET | `/api/drugs` | DrugController | clinicalContentApi.js | ✅ |
 | GET | `/api/tools` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
 | GET | `/api/tools/available` | ToolOrchestratorController | clinicalToolsApi.js | ✅ |
 | POST | `/api/tools/:id/execute` | ToolOrchestratorController | clinicalOrchestratorApi.js | ✅ |

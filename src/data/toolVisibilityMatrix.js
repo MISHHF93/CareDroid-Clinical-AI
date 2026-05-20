@@ -144,8 +144,10 @@ function rendersInUi(row) {
   if (tier === 'hub') return calculatorsSource.includes('CALCULATORS');
   if (tier === 'nlu-hub-only' || NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(canonicalId)) {
     return (
-      calculatorsSource.includes('nluCalculatorHubOnly') &&
-      toolsOverviewSource.includes('nluCalculatorHubOnly')
+      hubCardExists(registryId) ||
+      hubCardExists(canonicalId) ||
+      (calculatorsSource.includes('nluCalculatorHubOnly') &&
+        toolsOverviewSource.includes('nluCalculatorHubOnly'))
     );
   }
   if (tier === 'nlu-profile') return Boolean(row.catalogEntryExists);
@@ -181,7 +183,7 @@ function buildVisibilityRow(canonicalId, opts = {}) {
     opts.nluRow ?? clinicalIntentTools.find((t) => t.toolId === canonicalId) ?? null;
   const tier =
     opts.tier ??
-    (NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(canonicalId)
+    (NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(canonicalId) && !toolRegistryById[canonicalId]
       ? 'nlu-hub-only'
       : registryId
         ? tierForRegistryId(registryId)

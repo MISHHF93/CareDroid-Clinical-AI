@@ -396,9 +396,10 @@ function buildPlatformRows() {
       frontendApiClient: 'src/components/tools/ToolResultShare.jsx (`apiFetch`)',
       testCoverage: '—',
       tier: 'platform',
-      notes: 'No matching route in tool-orchestrator.controller.ts',
-      brokenReasons: ['missing-backend-route'],
-      status: 'broken',
+      notes:
+        'Email share gated via backendApiCapabilities.toolsShareResults; use Share Link or client export',
+      brokenReasons: [],
+      status: 'frontend-only',
     },
   ];
 }
@@ -436,13 +437,13 @@ export function buildBackendFrontendContractRows() {
 export function getContractGaps(rows = buildBackendFrontendContractRows()) {
   const gaps = [];
 
-  const dispatch = rows.find((r) => r.canonicalId === 'dispatch-ai');
-  if (dispatch?.nluProfile && dispatch.backendExecutor === 'no') {
+  const dispatchCatalog = clinicalIntentTools.find((t) => t.toolId === 'dispatch-ai');
+  if (dispatchCatalog?.backendExecutable && !isOrchestratorPostExecutable('dispatch-ai')) {
     gaps.push({
       id: 'dispatch-ai',
       severity: 'low',
       issue: 'clinicalIntentToolCatalog backendExecutable: true but no POST executor',
-      fix: gapFixFor(dispatch),
+      fix: gapFixFor({ canonicalId: 'dispatch-ai' }),
     });
   }
 

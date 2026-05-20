@@ -352,3 +352,32 @@ describe('resolveCatalogLaunch — builtinUiCalculators alignment', () => {
     }
   });
 });
+
+describe('resolveCatalogLaunch — secondary NLU sidebar tools', () => {
+  const secondaryIds = [
+    'dose-calculator',
+    'abg-interpreter',
+    'acls-protocol',
+    'atls-protocol',
+    'antibiotic-guide',
+    'procedures',
+    'apache2-calculator',
+    'curb65-calculator',
+    'gcs-calculator',
+    'wells-dvt-calculator',
+  ];
+
+  it.each(secondaryIds)('%s resolves non-null path and registry', (id) => {
+    const launch = resolveCatalogLaunch(id);
+    expect(launch.path).toBeTruthy();
+    expect(launch.registryId).toBeTruthy();
+    expect(resolveNavigationPathForLaunch(launch)).toBeTruthy();
+  });
+
+  it('procedures NLU profile resolves to procedure guide path', () => {
+    const launch = resolveCatalogLaunch('procedures');
+    expect(launch.path).toBe('/tools/procedures');
+    expect(launch.registryId).toBe('procedures');
+    expect(launch.chatSeed).toMatch(/step-by-step/i);
+  });
+});

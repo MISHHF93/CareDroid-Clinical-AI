@@ -49,13 +49,15 @@ describe('toolVisibilityMatrix', () => {
     expect(wells?.launchPathWorks).toBe(true);
   });
 
-  it('marks NLU hub-only profiles without dedicated registry rows', () => {
+  it('marks NLU hub-only profiles with sidebar registry rows as fully visible', () => {
     const rows = buildToolVisibilityMatrix();
     for (const nluId of NLU_HUB_ONLY_PROFILE_TOOL_IDS) {
       const row = rows.find((r) => r.canonicalId === nluId);
       expect(row, nluId).toBeTruthy();
-      expect(row.registryEntryExists).toBe(false);
-      expect(row.currentStatus).toBe('hidden by layout');
+      expect(row.registryEntryExists).toBe(true);
+      expect(row.sidebarVisible).toBe(true);
+      expect(row.launchPathWorks).toBe(true);
+      expect(row.currentStatus).toBe('fully visible');
     }
   });
 

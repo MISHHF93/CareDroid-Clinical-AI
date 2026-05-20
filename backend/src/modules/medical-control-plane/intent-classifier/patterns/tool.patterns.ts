@@ -1107,6 +1107,26 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     description: 'Recommends antibiotic selection based on infection and patient factors',
     category: 'reference',
   },
+  {
+    toolId: 'procedures',
+    toolName: 'Procedure Guide',
+    keywords: [
+      'procedure',
+      'procedural',
+      'step by step',
+      'how to perform',
+      'technique guide',
+      'procedure steps',
+      'central line',
+      'lumbar puncture',
+      'intubation steps',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['procedure_name', 'setting', 'complications'],
+    description:
+      'Step-by-step procedural guidance and checklists for clinical procedures (decision support only)',
+    category: 'reference',
+  },
 
   // ========================================
   // FLEET / LOGISTICS (operations decision support)

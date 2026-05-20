@@ -91,6 +91,7 @@ export const NLU_TOOL_IDS_WITHOUT_EXECUTOR = [
   'fleet-command',
   'differential-diagnosis',
   'antibiotic-guide',
+  'procedures',
 ] as const;
 
 export interface ExecutorRequestContract {

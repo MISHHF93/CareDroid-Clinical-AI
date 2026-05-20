@@ -1,6 +1,6 @@
 # Tool contract matrix
 
-**Generated:** 2026-05-19T23:25:03.841Z
+**Generated:** 2026-05-20T01:24:54.890Z
 
 > **Source:** `src/data/toolContractMatrix.js` (derived from `backendFrontendToolContract.js`)
 > **Regenerate:** `npm run contract:write-docs`
@@ -9,9 +9,9 @@
 
 | Metric | Count |
 |--------|------:|
-| Total rows | 64 |
-| NLU profiles | 50 |
-| Registry tools | 49 |
+| Total rows | 68 |
+| NLU profiles | 54 |
+| Registry tools | 57 |
 | POST executors | 3 |
 
 ### Status distribution
@@ -19,9 +19,9 @@
 | Status | Count |
 |--------|------:|
 | fully wired | 4 |
-| frontend-only | 50 |
+| frontend-only | 55 |
 | backend-only | 0 |
-| broken | 1 |
+| broken | 0 |
 | planned | 9 |
 
 ## Status definitions
@@ -45,13 +45,14 @@
 <!-- markdownlint-disable MD013 -->
 | ID | Route | Component | Catalog | Registry | NLU | Executor | Endpoint | DTO | API client | Status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| abg-interpreter | /tools/lab-interpreter | src/pages/tools/LabInterpreter.jsx | yes | lab-interp | abg-interpreter | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
-| acls-protocol | /tools/protocols | src/pages/tools/Protocols.jsx | yes | protocols | acls-protocol | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
-| antibiotic-guide | /tools/diagnosis | src/pages/tools/DiagnosisAssistant.jsx | yes | diagnosis | antibiotic-guide | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
+| abcd2 | /tools/calculators/abcd2 | src/pages/tools/Calculators.jsx (case 'abcd2') | yes | abcd2 | abcd2 | no | — | — | — | frontend-only |
+| abg-interpreter | /tools/lab-interpreter | src/pages/tools/LabInterpreter.jsx | yes | abg-interpreter | abg-interpreter | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
+| acls-protocol | /tools/protocols | src/pages/tools/Protocols.jsx | yes | acls-protocol | acls-protocol | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
+| antibiotic-guide | /tools/diagnosis | src/pages/tools/DiagnosisAssistant.jsx | yes | antibiotic-guide | antibiotic-guide | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | apache2-calculator | /tools/calculators | — | yes | apache2-calculator | apache2-calculator | no | — | — | — | frontend-only |
 | apgar-score | /tools/calculators/apgar-score | src/pages/tools/Calculators.jsx (case 'apgar-score') | yes | apgar-score | apgar-score | no | — | — | — | frontend-only |
 | ascvd-risk | /tools/calculators/ascvd-risk | src/pages/tools/Calculators.jsx (case 'ascvd-risk') | yes | ascvd-risk | ascvd-risk | no | — | — | — | frontend-only |
-| atls-protocol | /tools/protocols | src/pages/tools/Protocols.jsx | yes | protocols | atls-protocol | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
+| atls-protocol | /tools/protocols | src/pages/tools/Protocols.jsx | yes | atls-protocol | atls-protocol | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | audit-c | /tools/calculators/audit-c | src/pages/tools/Calculators.jsx (case 'audit-c') | yes | audit-c | audit-c | no | — | — | — | frontend-only |
 | bisap-score | /tools/calculators/bisap-score | src/pages/tools/Calculators.jsx (case 'bisap-score') | yes | bisap-score | bisap-score | no | — | — | — | frontend-only |
 | bishop-score | /tools/calculators/bishop-score | src/pages/tools/Calculators.jsx (case 'bishop-score') | yes | bishop-score | bishop-score | no | — | — | — | frontend-only |
@@ -65,7 +66,7 @@
 | curb65-calculator | /tools/calculators | — | yes | curb65-calculator | curb65-calculator | no | — | — | — | frontend-only |
 | differential-diagnosis | /tools/diagnosis | src/pages/tools/DiagnosisAssistant.jsx | yes | diagnosis | differential-diagnosis | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | dispatch-ai | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/pages/Dashboard.jsx (chat) | yes | dispatch-ai | dispatch-ai | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
-| dose-calculator | /tools/calculators | src/pages/tools/Calculators.jsx | yes | calculators | dose-calculator | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
+| dose-calculator | /tools/calculators | src/pages/tools/Calculators.jsx | yes | dose-calculator | dose-calculator | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | drug-interactions | /tools/drug-checker | src/pages/tools/DrugChecker.jsx | yes | drug-check | drug-interactions | drug-interactions | POST /api/tools/drug-interactions/execute | ExecuteToolDto (`toolId`, `parameters`, `userId?`, `conversationId?`) → ToolExecutionResponseDto (`success`, `toolId`, `result`, `errorCode?`, …) | src/pages/tools/DrugChecker.jsx (`apiFetch`) | fully wired |
 | fib4 | /tools/calculators/fib4 | src/pages/tools/Calculators.jsx (case 'fib4') | yes | fib4 | fib4 | no | — | — | — | frontend-only |
 | fleet-command | /fleet/command | src/pages/fleet/FleetDashboard.jsx | yes | fleet-command | fleet-command | no | — | — | — | frontend-only |
@@ -80,11 +81,14 @@
 | meld-na | /tools/calculators/meld-na | src/pages/tools/Calculators.jsx (case 'meld-na') | yes | meld-na | meld-na | no | — | — | — | frontend-only |
 | morse-fall-scale | /tools/calculators/morse-fall-scale | src/pages/tools/Calculators.jsx (case 'morse-fall-scale') | yes | morse-fall-scale | morse-fall-scale | no | — | — | — | frontend-only |
 | news2 | /tools/calculators/news2 | src/pages/tools/Calculators.jsx (case 'news2') | yes | news2 | news2 | no | — | — | — | frontend-only |
+| nexus-cspine | /tools/calculators | — | yes | nexus-cspine | nexus-cspine | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | nihss | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/pages/Dashboard.jsx (chat) | yes | nihss | nihss | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | ottawa-ankle | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/pages/Dashboard.jsx (chat) | yes | ottawa-ankle | ottawa-ankle | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
+| pecarn-head | /tools/calculators | — | yes | pecarn-head | pecarn-head | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | perc | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/pages/Dashboard.jsx (chat) | yes | perc | perc | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | phq9 | /tools/calculators/phq9 | src/pages/tools/Calculators.jsx (case 'phq9') | yes | phq9 | phq9 | no | — | — | — | frontend-only |
 | predictive-maintenance | /fleet/predictive-maintenance | src/pages/fleet/PredictiveMaintenance.jsx | yes | predictive-maintenance | predictive-maintenance | no | — | — | — | frontend-only |
+| procedures | /tools/procedures | src/pages/tools/ProcedureGuide.jsx | yes | procedures | procedures | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | protocol-lookup | /tools/protocols | src/pages/tools/Protocols.jsx | yes | protocols | protocol-lookup | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | qsofa | /tools/calculators/qsofa | src/pages/tools/Calculators.jsx (case 'qsofa') | yes | qsofa | qsofa | no | — | — | — | frontend-only |
 | ranson-criteria | /tools/calculators/ranson-criteria | src/pages/tools/Calculators.jsx (case 'ranson-criteria') | yes | ranson-criteria | ranson-criteria | no | — | — | — | frontend-only |
@@ -97,9 +101,9 @@
 | wells-pe | /tools/calculators | src/pages/tools/Calculators.jsx (hub card) + src/pages/Dashboard.jsx (chat) | yes | wells-pe | wells-pe | no | POST /api/chat/message | ChatMessageDto (message, conversationId, tool?, feature?) → QueryResponse (text, intentClassification, toolResult?, …) | src/services/apiClient.js (`apiFetch`) | frontend-only |
 | calc-bmi | /tools/calculator/bmi | src/pages/tools/Calculators.jsx (case 'bmi') | yes | calc-bmi | — | no | — | — | — | frontend-only |
 | calc-gfr | /tools/calculator/gfr | src/pages/tools/Calculators.jsx (case 'gfr') | yes | calc-gfr | — | no | — | — | — | frontend-only |
-| procedures | /tools/procedures | src/pages/tools/ProcedureGuide.jsx | yes | procedures | — | no | — | — | — | frontend-only |
+| calculators | /tools/calculators | src/pages/tools/Calculators.jsx | yes | calculators | — | no | — | — | — | frontend-only |
 | tools-list-api | — | src/pages/tools/ClinicalToolCatalog.jsx | — | — | — | n/a | GET /api/tools | — | src/services/clinicalToolsApi.js (`fetchBackendClinicalTools`) | fully wired |
-| tools-share-results | — | src/components/tools/ToolResultShare.jsx | — | — | — | no | POST /api/tools/share-results | — (undocumented) | src/components/tools/ToolResultShare.jsx (`apiFetch`) | broken |
+| tools-share-results | — | src/components/tools/ToolResultShare.jsx | — | — | — | no | POST /api/tools/share-results | — (undocumented) | src/components/tools/ToolResultShare.jsx (`apiFetch`) | frontend-only |
 | abc-assessment | — | — | no | — | — | no | — | — | src/services/advancedRecommendationService.js, src/contexts/CostTrackingContext.jsx | planned |
 | antibiotic-scripts | — | — | no | — | — | no | — | — | advancedRecommendationService.js, CostTrackingContext.jsx | planned |
 | bleeding-risk | — | — | no | — | — | no | — | — | CostTrackingContext.jsx | planned |
@@ -113,6 +117,7 @@
 
 ## Notes
 
+- **abcd2:** Calculator slug: abcd2
 - **apgar-score:** Calculator slug: apgar-score
 - **ascvd-risk:** Calculator slug: ascvd-risk
 - **audit-c:** Calculator slug: audit-c
@@ -125,7 +130,7 @@
 - **child-pugh:** Calculator slug: child-pugh
 - **ckd-staging:** Calculator slug: ckd-staging
 - **copd-gold:** Tier-B: catalog launch seeds dashboard chat; no tool POST
-- **dispatch-ai:** Tier-B: catalog launch seeds dashboard chat; no tool POST; NLU backendExecutable flag (chat routing only)
+- **dispatch-ai:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **fib4:** Calculator slug: fib4
 - **framingham-risk:** Calculator slug: framingham-risk
 - **gad7:** Calculator slug: gad7
@@ -136,8 +141,10 @@
 - **meld-na:** Calculator slug: meld-na
 - **morse-fall-scale:** Calculator slug: morse-fall-scale
 - **news2:** Calculator slug: news2
+- **nexus-cspine:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **nihss:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **ottawa-ankle:** Tier-B: catalog launch seeds dashboard chat; no tool POST
+- **pecarn-head:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **perc:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **phq9:** Calculator slug: phq9
 - **qsofa:** Calculator slug: qsofa
@@ -149,9 +156,9 @@
 - **wells-pe:** Tier-B: catalog launch seeds dashboard chat; no tool POST
 - **calc-bmi:** No dedicated clinicalIntentTools row
 - **calc-gfr:** No dedicated clinicalIntentTools row
-- **procedures:** No dedicated clinicalIntentTools row
+- **calculators:** No dedicated clinicalIntentTools row
 - **tools-list-api:** Catalog executor panel
-- **tools-share-results:** No matching route in tool-orchestrator.controller.ts
+- **tools-share-results:** Email share gated via backendApiCapabilities.toolsShareResults; use Share Link or client export
 - **abc-assessment:** Recommended for emergency_assessment intent; no UI or backend executor.
 - **antibiotic-scripts:** Overlaps NLU antibiotic-guide → diagnosis page; separate id unused in UI.
 - **bleeding-risk:** Cost category id; launch resolves to HAS-BLED registry (/tools/calculators/has-bled) via NLU_TO_REGISTRY_ID + toolIdAliases.
@@ -164,11 +171,7 @@
 
 ## Gaps
 
-| ID | Severity | Issue | Fix |
-|----|----------|-------|-----|
-| dispatch-ai | low | clinicalIntentToolCatalog backendExecutable: true but no POST executor | Set backendExecutable: false in clinicalIntentToolCatalog.js or relabel catalog badge as NLU-only (no POST executor) |
-| procedures | medium | Registry tool without NLU profile or tool.patterns entry | Add `procedures` NLU row to clinicalIntentToolCatalog.js + matching entry in tool.patterns.ts, or document registry-only in catalog UI |
-| tools-share-results | high | missing-backend-route | Implement POST /api/tools/share-results in ToolOrchestratorController or remove/guard ToolResultShare.jsx call |
+_No automated gaps._
 
 ## Related docs
 

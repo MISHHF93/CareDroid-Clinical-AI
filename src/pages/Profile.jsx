@@ -21,9 +21,24 @@ const Profile = () => {
           <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Role:</strong> —</div>
           <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Institution:</strong> —</div>
         </div>
+        <div
+          style={{
+            marginTop: '24px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '12px',
+            fontSize: '14px',
+          }}
+        >
+          <Link to="/profile-settings">Profile settings</Link>
+          <Link to="/settings">App settings</Link>
+          <Link to="/notifications">Notifications</Link>
+          <Link to="/onboarding">Onboarding</Link>
+          <Link to="/biometric-setup">Biometric setup</Link>
+        </div>
         <div style={{ marginTop: '18px', fontSize: '12px', color: 'var(--muted-text)' }}>
-          <Link to="/" style={{ color: '#00FF88', textDecoration: 'none' }}>
-            ← Back to chat
+          <Link to="/dashboard" style={{ color: '#00FF88', textDecoration: 'none' }}>
+            ← Back to dashboard
           </Link>
         </div>
       </Card>

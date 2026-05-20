@@ -521,7 +521,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     path: dispatchAiChatConfig.hubPath,
     sidebarToolId: dispatchAiChatConfig.registryId,
     chatSeed: dispatchAiChatConfig.chatSeed,
-    backendExecutable: true,
+    backendExecutable: false,
   },
   {
     toolId: 'drug-interactions',
@@ -540,7 +540,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     description:
       'Reference-only: explains dosing concepts and where to find institutional protocols. Does not calculate or recommend patient-specific doses.',
     path: '/tools/calculators',
-    sidebarToolId: 'calculators',
+    sidebarToolId: 'dose-calculator',
     chatSeed:
       'Help me understand how weight-based and renal-adjusted dosing are typically approached for a medication class — educational reference only. Do not calculate mg/kg doses or recommend a specific dose for this patient; direct prescribing to licensed clinicians and pharmacy resources.',
     backendExecutable: false,
@@ -562,7 +562,19 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     description:
       'ABG and acid–base interpretation support (Lab Interpreter page) — clinical decision support only; does not establish a diagnosis.',
     path: '/tools/lab-interpreter',
-    sidebarToolId: 'lab-interp',
+    sidebarToolId: 'abg-interpreter',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'procedures',
+    toolName: 'Procedure Guide',
+    category: 'reference',
+    description:
+      'Step-by-step procedural guidance and checklists — clinical decision support only; does not replace hands-on training, supervision, or institutional policy.',
+    path: '/tools/procedures',
+    sidebarToolId: 'procedures',
+    chatSeed:
+      'Walk me through a step-by-step clinical procedure with equipment checklist, key steps, common pitfalls, and when to stop or escalate. This is educational support only — confirm technique and indications with institutional policy and supervising clinician.',
     backendExecutable: false,
   },
   {
@@ -581,7 +593,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     category: 'protocol',
     description: 'Resuscitation algorithms.',
     path: '/tools/protocols',
-    sidebarToolId: 'protocols',
+    sidebarToolId: 'acls-protocol',
     chatSeed: 'Walk me through the ACLS algorithm for this cardiac arrest scenario:',
     backendExecutable: false,
   },
@@ -591,7 +603,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     category: 'protocol',
     description: 'Trauma algorithms.',
     path: '/tools/protocols',
-    sidebarToolId: 'protocols',
+    sidebarToolId: 'atls-protocol',
     chatSeed: 'Guide me through the ATLS primary survey for this trauma patient:',
     backendExecutable: false,
   },
@@ -648,7 +660,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     category: 'reference',
     description: 'Empiric antimicrobial choice.',
     path: '/tools/diagnosis',
-    sidebarToolId: 'diagnosis',
+    sidebarToolId: 'antibiotic-guide',
     chatSeed:
       'Discuss empiric antibiotic considerations for this infection scenario as educational decision support — cite guideline principles, resistance patterns, and patient factors. Do not prescribe, dose, or order antibiotics; require clinician review and local antimicrobial stewardship pathways.',
     backendExecutable: false,

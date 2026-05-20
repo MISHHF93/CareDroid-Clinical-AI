@@ -56,9 +56,9 @@ describe('toolContractMatrix', () => {
     }
   });
 
-  it('flags broken share-results row', () => {
+  it('marks share-results row as frontend-only (gated)', () => {
     const share = buildToolContractMatrixRows().find((r) => r.id === 'tools-share-results');
-    expect(share?.status).toBe('broken');
+    expect(share?.status).toBe('frontend-only');
     expect(share?.endpoint).toContain('share-results');
   });
 

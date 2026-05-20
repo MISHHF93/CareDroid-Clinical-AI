@@ -87,6 +87,11 @@ export const REGISTRY = Object.freeze({
   protocols: 'protocols',
   diagnosis: 'diagnosis',
   procedures: 'procedures',
+  doseCalculator: 'dose-calculator',
+  abgInterpreter: 'abg-interpreter',
+  aclsProtocol: 'acls-protocol',
+  atlsProtocol: 'atls-protocol',
+  antibioticGuide: 'antibiotic-guide',
   dispatchAi: 'dispatch-ai',
   routeOptimizer: 'route-optimizer',
   predictiveMaintenance: 'predictive-maintenance',
@@ -148,6 +153,7 @@ export const NLU = Object.freeze({
   fleetCommand: 'fleet-command',
   differentialDiagnosis: 'differential-diagnosis',
   antibioticGuide: 'antibiotic-guide',
+  procedures: 'procedures',
 });
 
 /** Built-in calculator UI slugs (`Calculators.jsx`, `?calc=`). */
@@ -330,10 +336,17 @@ export const PR_FLEET_ALL_REGISTRY_IDS = Object.freeze([
 export const CLINICAL_AI_PAGE_REGISTRY_IDS = Object.freeze([
   REGISTRY.drugCheck,
   REGISTRY.labInterp,
+  REGISTRY.abgInterpreter,
   REGISTRY.protocols,
+  REGISTRY.aclsProtocol,
+  REGISTRY.atlsProtocol,
   REGISTRY.diagnosis,
+  REGISTRY.antibioticGuide,
   REGISTRY.procedures,
 ]);
+
+/** Chat-assisted calculator hub entries with dedicated sidebar rows. */
+export const CLINICAL_DOSE_HUB_REGISTRY_IDS = Object.freeze([REGISTRY.doseCalculator]);
 
 /**
  * Registry tools with NLU/chat coverage via backend keywords but no `clinicalIntentTools` row
@@ -345,8 +358,7 @@ export const KEYWORD_ROUTED_REGISTRY_IDS = Object.freeze([
 ]);
 
 /**
- * NLU profiles that route to the calculators hub only (no dedicated `Calculators.jsx` form).
- * Tier-B chat-assisted tools have registry rows; these are NLU-only until promoted.
+ * NLU profiles that route to the calculators hub (chat-assisted; dedicated sidebar registry rows).
  */
 export const NLU_HUB_ONLY_PROFILE_TOOL_IDS = Object.freeze([
   NLU.apache2Calculator,
@@ -413,6 +425,7 @@ export const NLU_PROFILE_TOOL_IDS = Object.freeze([
   NLU.fleetCommand,
   NLU.differentialDiagnosis,
   NLU.antibioticGuide,
+  NLU.procedures,
 ]);
 
 export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
@@ -520,10 +533,7 @@ export const REGISTRY_ID_TO_ORCHESTRATOR_TOOL = Object.freeze({
  * Includes dispatch-ai (chat/NLU only). POST /tools/:id/execute applies only to
  * `ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS` (three registerTool executors).
  */
-export const AI_EXECUTABLE_NLU_TOOL_IDS = Object.freeze([
-  ...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
-  NLU.dispatchAi,
-]);
+export const AI_EXECUTABLE_NLU_TOOL_IDS = Object.freeze([...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS]);
 
 /**
  * Product-facing canonical ID map (registry ids unless noted).
@@ -544,6 +554,7 @@ export const CANONICAL_TOOL_GROUPS = Object.freeze({
 /** Every `toolRegistry.js` id — must match registry file exactly (drift tests). */
 export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
   ...CANONICAL_TOOL_GROUPS.aiOperationsPages,
+  ...CLINICAL_DOSE_HUB_REGISTRY_IDS,
   ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsTierA,
   ...CANONICAL_TOOL_GROUPS.clinicalChatAssistedTierB,
   ...CANONICAL_TOOL_GROUPS.clinicalNluHubChat,
@@ -566,13 +577,14 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'curb65-calculator': REGISTRY.curb65Calculator,
   'gcs-calculator': REGISTRY.gcsCalculator,
   'wells-dvt-calculator': REGISTRY.wellsDvtCalculator,
-  'dose-calculator': REGISTRY.calculatorsHub,
-  'abg-interpreter': REGISTRY.labInterp,
+  'dose-calculator': REGISTRY.doseCalculator,
+  'abg-interpreter': REGISTRY.abgInterpreter,
   'protocol-lookup': REGISTRY.protocols,
-  'acls-protocol': REGISTRY.protocols,
-  'atls-protocol': REGISTRY.protocols,
+  'acls-protocol': REGISTRY.aclsProtocol,
+  'atls-protocol': REGISTRY.atlsProtocol,
+  procedures: REGISTRY.procedures,
   'differential-diagnosis': REGISTRY.diagnosis,
-  'antibiotic-guide': REGISTRY.diagnosis,
+  'antibiotic-guide': REGISTRY.antibioticGuide,
   calculator: REGISTRY.calculatorsHub,
   'diagnosis-assistant': REGISTRY.diagnosis,
   'procedure-guide': REGISTRY.procedures,

@@ -21,6 +21,9 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'chat-messages-sync', method: 'POST', path: '/api/chat/messages', client: 'syncService.js', capability: 'chatPersistence', notes: 'No route — gated off' },
   { id: 'chat-conversations-sync', method: 'POST', path: '/api/chat/conversations', client: 'syncService.js', capability: 'chatPersistence' },
 
+  { id: 'protocols-list', method: 'GET', path: '/api/protocols', client: 'clinicalContentApi.js' },
+  { id: 'protocols-categories', method: 'GET', path: '/api/protocols/categories', client: 'clinicalContentApi.js' },
+  { id: 'drugs-list', method: 'GET', path: '/api/drugs', client: 'clinicalContentApi.js' },
   { id: 'tools-list', method: 'GET', path: '/api/tools', client: 'clinicalToolsApi.js', capability: 'toolsList' },
   { id: 'tools-available', method: 'GET', path: '/api/tools/available', client: 'clinicalToolsApi.js', capability: 'toolsList' },
   { id: 'tools-execute', method: 'POST', path: '/api/tools/:id/execute', client: 'clinicalOrchestratorApi.js', capability: 'toolsExecute' },

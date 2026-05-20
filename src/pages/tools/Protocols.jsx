@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
-import ToolApiErrorBanner from '../../components/ToolApiErrorBanner';
+import ApiStateBanner from '../../components/ApiStateBanner';
 import { apiFetch, parseApiResponse, getApiErrorMessage } from '../../services/apiClient';
+import { fetchProtocols } from '../../services/clinicalContentApi';
 
 const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
@@ -11,13 +12,16 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
     color: '#A8E6CF',
     description: 'Evidence-based clinical protocols and guidelines',
     shortcut: 'Ctrl+4',
-    category: 'Reference'
+    category: 'Reference',
   };
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [catalogLoading, setCatalogLoading] = useState(true);
+  const [catalogError, setCatalogError] = useState(null);
+  const [serverProtocols, setServerProtocols] = useState([]);
 
   const commonProtocols = [
     'Sepsis Management',
@@ -32,6 +36,24 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
     'Post-Op Care',
   ];
 
+  const loadCatalog = async () => {
+    setCatalogLoading(true);
+    setCatalogError(null);
+    const res = await fetchProtocols({ limit: 50 });
+    if (res.ok && res.items.length) {
+      setServerProtocols(res.items.map((p) => p.name || p.title).filter(Boolean));
+    } else if (!res.ok && res.error) {
+      setCatalogError(res.error);
+    }
+    setCatalogLoading(false);
+  };
+
+  useEffect(() => {
+    loadCatalog();
+  }, []);
+
+  const protocolChips = [...new Set([...serverProtocols, ...commonProtocols])];
+
   const handleSearch = async (protocolName = query) => {
     if (!protocolName.trim()) return;
 
@@ -43,11 +65,11 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('caredroid_access_token')}`,
+          Authorization: `Bearer ${localStorage.getItem('caredroid_access_token')}`,
         },
         body: JSON.stringify({
           message: `Provide the clinical protocol for: ${protocolName}`,
-          tool: 'protocols'
+          tool: 'protocols',
         }),
       });
 
@@ -57,7 +79,9 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
       const data = await parseApiResponse(response, { fallback: {} });
       setResults(data.response || data.message || 'No protocol content returned.');
     } catch (err) {
-      setError(err.message || 'Unable to load protocol. Check your connection or try chat from the dashboard.');
+      setError(
+        err.message || 'Unable to load protocol. Check your connection or try chat from the dashboard.'
+      );
     } finally {
       setLoading(false);
     }
@@ -77,30 +101,42 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
           />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '32px' }}>
-          {commonProtocols.map(protocol => (
+        <ApiStateBanner
+          loading={catalogLoading}
+          loadingMessage="Loading protocol catalog from server…"
+          error={catalogError}
+          onRetry={loadCatalog}
+        />
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+            gap: '12px',
+            marginBottom: '32px',
+          }}
+        >
+          {protocolChips.map((protocol) => (
             <button
               key={protocol}
               type="button"
               className="simple-tool-chip-btn"
-              onClick={() => { setQuery(protocol); handleSearch(protocol); }}
+              onClick={() => {
+                setQuery(protocol);
+                handleSearch(protocol);
+              }}
             >
               {protocol}
             </button>
           ))}
         </div>
 
-        {error ? <ToolApiErrorBanner message={error} onRetry={() => handleSearch()} /> : null}
+        <ApiStateBanner error={error} onRetry={() => handleSearch()} />
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-            <div className="simple-tool-spinner" />
-            <p style={{ marginTop: '16px', color: 'var(--app-fg-muted)' }}>Loading protocol...</p>
-          </div>
+          <ApiStateBanner loading loadingMessage="Loading protocol guidance…" />
         ) : results ? (
-          <div className="simple-tool-result-panel">
-            {results}
-          </div>
+          <div className="simple-tool-result-panel">{results}</div>
         ) : (
           <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--app-fg-muted)' }}>
             <div style={{ fontSize: '64px', marginBottom: '16px', opacity: 0.3 }}>📋</div>

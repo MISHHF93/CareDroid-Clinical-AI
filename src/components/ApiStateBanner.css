@@ -1,0 +1,36 @@
+.api-state-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.api-state-banner--unsupported {
+  background: var(--app-surface-muted, rgba(0, 0, 0, 0.04));
+  border: 1px solid var(--app-border, rgba(0, 0, 0, 0.08));
+  border-radius: 8px;
+}
+
+.api-state-banner__spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--app-border, #ddd);
+  border-top-color: var(--app-accent, #4a90d9);
+  border-radius: 50%;
+  animation: api-state-banner-spin 0.8s linear infinite;
+}
+
+.api-state-banner__text {
+  margin: 0;
+  color: var(--app-fg-muted, #666);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+@keyframes api-state-banner-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

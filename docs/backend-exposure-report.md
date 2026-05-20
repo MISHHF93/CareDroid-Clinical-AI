@@ -1,6 +1,6 @@
 # Backend exposure report
 
-**Generated:** 2026-05-19T23:22:01.489Z
+**Generated:** 2026-05-20T01:25:15.574Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -9,12 +9,12 @@
 | Metric | Count |
 |--------|------:|
 | Backend HTTP routes (inventory) | 92 |
-| Frontend API calls (inventory) | 53 |
-| Wired (route exists) | 37 |
+| Frontend API calls (inventory) | 56 |
+| Wired (route exists) | 40 |
 | Gated stubs (no route, capability off) | 16 |
 | Unguarded missing routes | 0 |
 | POST executors (backend) | 3 |
-| Contract gaps (matrix) | 3 |
+| Contract gaps (matrix) | 0 |
 
 ## Vite dev proxy
 
@@ -52,12 +52,6 @@
 | exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
 | exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |
 | reports-generate | POST | `/api/reports/generate` | reportsGenerate | export/ExportService.js |
-
-## Contract gaps
-
-- **dispatch-ai** (low): clinicalIntentToolCatalog backendExecutable: true but no POST executor
-- **procedures** (medium): Registry tool without NLU profile or tool.patterns entry
-- **tools-share-results** (high): missing-backend-route
 
 ## Related docs
 

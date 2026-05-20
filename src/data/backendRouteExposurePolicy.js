@@ -50,15 +50,12 @@ export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'POST /api/tools/:id/validate': { strategy: 'expose-recommended', reason: 'Pre-execute validation', clientHint: 'clinicalOrchestratorApi.js' },
   'POST /api/tools/execute': { strategy: 'deferred', reason: 'Batch execute; UI uses per-id execute' },
 
-  'GET /api/drugs': { strategy: 'expose-recommended', reason: 'Drug reference CRUD', clientHint: 'clinicalContentApi.js' },
   'GET /api/drugs/categories': { strategy: 'expose-recommended', reason: 'Drug reference', clientHint: 'clinicalContentApi.js' },
   'GET /api/drugs/:id': { strategy: 'expose-recommended', reason: 'Drug detail', clientHint: 'clinicalContentApi.js' },
   'POST /api/drugs': { strategy: 'deferred', reason: 'Admin content API' },
   'PUT /api/drugs/:id': { strategy: 'deferred', reason: 'Admin content API' },
   'DELETE /api/drugs/:id': { strategy: 'deferred', reason: 'Admin content API' },
 
-  'GET /api/protocols': { strategy: 'expose-recommended', reason: 'Protocol browser', clientHint: 'Protocols.jsx / clinicalContentApi.js' },
-  'GET /api/protocols/categories': { strategy: 'expose-recommended', reason: 'Protocol browser', clientHint: 'clinicalContentApi.js' },
   'GET /api/protocols/:id': { strategy: 'expose-recommended', reason: 'Protocol detail', clientHint: 'Protocols.jsx' },
   'POST /api/protocols': { strategy: 'deferred', reason: 'Admin content API' },
   'PUT /api/protocols/:id': { strategy: 'deferred', reason: 'Admin content API' },

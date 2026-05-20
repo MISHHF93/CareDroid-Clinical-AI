@@ -1,6 +1,6 @@
 # Orphaned backend functions
 
-**Generated:** 2026-05-19T23:22:02.144Z
+**Generated:** 2026-05-20T01:25:16.297Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -53,11 +53,8 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/tools/catalog/executors` | ToolOrchestratorController | clinicalToolsApi.js |
 | `/api/tools/:id` | ToolOrchestratorController | clinicalToolsApi.js |
 | `/api/tools/:id/validate` | ToolOrchestratorController | clinicalOrchestratorApi.js |
-| `/api/drugs` | DrugController | clinicalContentApi.js |
 | `/api/drugs/categories` | DrugController | clinicalContentApi.js |
 | `/api/drugs/:id` | DrugController | clinicalContentApi.js |
-| `/api/protocols` | ProtocolController | Protocols.jsx / clinicalContentApi.js |
-| `/api/protocols/categories` | ProtocolController | clinicalContentApi.js |
 | `/api/protocols/:id` | ProtocolController | Protocols.jsx |
 | `/api/audit/my-logs` | AuditController | profile / AuditLogs.jsx |
 | `/api/compliance/export` | ComplianceController | complianceApi.js |
@@ -113,7 +110,7 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 
 Registered: `sofa-calculator`, `drug-interactions`, `lab-interpreter`
 
-NLU profiles without POST executor (47): client-side / chat only.
+NLU profiles without POST executor (51): client-side / chat only.
 
 ## F. Exposure strategy summary
 
@@ -129,9 +126,9 @@ NLU profiles without POST executor (47): client-side / chat only.
 
 | Category | Count |
 |----------|------:|
-| Backend HTTP routes | 71 |
+| Backend HTTP routes | 68 |
 | Wired frontend → backend | see exposure report |
-| Backend-only / deferred (policy) | 55 |
+| Backend-only / deferred (policy) | 52 |
 | Gated frontend (no route) | 16 |
 | POST executors | 3 |
 
