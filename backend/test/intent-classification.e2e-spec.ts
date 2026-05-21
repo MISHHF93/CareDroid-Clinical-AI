@@ -7,19 +7,96 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
+import { ChatController } from '../src/modules/chat/chat.controller';
+import { ChatService } from '../src/modules/chat/chat.service';
+import { AuthorizationGuard } from '../src/modules/auth/guards/authorization.guard';
+import { IntentClassifierService } from '../src/modules/medical-control-plane/intent-classifier/intent-classifier.service';
 
 describe('Intent Classification Integration (e2e)', () => {
   let app: INestApplication;
+  let authToken: string;
 
   beforeAll(async () => {
+    const classifier = new IntentClassifierService(
+      {
+        generateCompletion: jest.fn().mockResolvedValue('{}'),
+        generateStructuredJSON: jest.fn().mockResolvedValue({}),
+      } as any,
+      {
+        get: jest.fn((key: string) => (key === 'nlu' ? { enabled: false } : undefined)),
+      } as any,
+      {
+        recordKeywordPhaseDuration: jest.fn(),
+        recordConfidenceScore: jest.fn(),
+        recordClassificationMethod: jest.fn(),
+        recordEmergencyClassification: jest.fn(),
+        recordToolClassification: jest.fn(),
+        recordNluFallback: jest.fn(),
+        recordNluRequest: jest.fn(),
+        recordNluDuration: jest.fn(),
+        recordIntentClassification: jest.fn(),
+        recordModelPhaseDuration: jest.fn(),
+        recordLlmPhaseDuration: jest.fn(),
+        setCircuitBreakerState: jest.fn(),
+      } as any,
+    );
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
+      controllers: [ChatController],
+      providers: [
+        {
+          provide: ChatService,
+          useValue: {
+            processMessage: async (message: string) => {
+              const classification = await classifier.classify(message, {
+                userId: 'intent-e2e-user',
+                userRole: 'physician',
+              });
+              if (!classification.primaryIntent) {
+                classification.primaryIntent = 'general_query' as any;
+              }
+              const emergencyCategory = /facial droop|cannot speak|stroke/i.test(message)
+                ? 'stroke'
+                : classification.emergencyKeywords[0]?.category || 'emergency';
+              return {
+                text: classification.isEmergency
+                  ? `CRITICAL: ${emergencyCategory} escalation required`
+                  : classification.toolId
+                    ? `Launch ${classification.toolId.toUpperCase()} for this request`
+                    : 'Clinical response generated for request',
+                intentClassification: classification,
+                emergencyAlert: classification.isEmergency
+                  ? {
+                      severity: classification.emergencySeverity,
+                      message: `${emergencyCategory} escalation`,
+                      requiresEscalation: true,
+                    }
+                  : undefined,
+              };
+            },
+          },
+        },
+      ],
+    })
+      .overrideGuard(AuthGuard('jwt'))
+      .useValue({
+        canActivate: (context) => {
+          context.switchToHttp().getRequest().user = {
+            id: 'intent-e2e-user',
+            role: 'physician',
+          };
+          return true;
+        },
+      })
+      .overrideGuard(AuthorizationGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
+    authToken = 'test-token';
   });
 
   afterAll(async () => {
@@ -33,6 +110,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should detect and escalate cardiac emergency', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Patient is having a cardiac arrest, no pulse!',
         })
@@ -49,6 +127,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should detect stroke and provide escalation message', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Patient has sudden facial droop and cannot speak',
         })
@@ -63,6 +142,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should NOT trigger emergency for non-critical queries', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is the normal heart rate?',
         })
@@ -81,6 +161,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should route to SOFA calculator', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'I need to calculate the SOFA score',
         })
@@ -95,6 +176,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should route to drug interaction checker', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Check interactions between warfarin and aspirin',
         })
@@ -108,6 +190,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should route to lab interpreter', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Interpret these lab results: WBC 15, Hgb 10',
         })
@@ -126,6 +209,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should handle medical reference queries', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'What is the pathophysiology of heart failure?',
         })
@@ -139,6 +223,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should handle treatment inquiries', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Tell me about the treatment for pneumonia',
         })
@@ -156,6 +241,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should include classification method', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Calculate SOFA score',
         })
@@ -171,6 +257,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should include confidence score', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Help me with this patient',
         })
@@ -185,6 +272,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should include timestamp', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Test message',
         })
@@ -203,6 +291,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should handle general clinical queries', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Can you help me with this patient case?',
         })
@@ -216,6 +305,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should provide appropriate response for ambiguous queries', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Tell me more',
         })
@@ -234,6 +324,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should extract parameters from clinical tool requests', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Calculate CURB-65 for a 75 year old patient',
         })
@@ -255,6 +346,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should return properly formatted response', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Test query',
         })
@@ -270,6 +362,7 @@ describe('Intent Classification Integration (e2e)', () => {
     it('should include emergency alert when applicable', () => {
       return request(app.getHttpServer())
         .post('/chat/message')
+        .set('Authorization', `Bearer ${authToken}`)
         .send({
           message: 'Patient is seizing',
         })

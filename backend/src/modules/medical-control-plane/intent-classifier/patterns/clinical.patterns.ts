@@ -123,7 +123,11 @@ export function classifyClinicalQuery(message: string): {
     if (matchCount > 0) {
       const confidence = Math.min(0.4 + matchCount * 0.15, 0.85);
 
-      if (confidence > bestMatch.confidence) {
+      const shouldReplace =
+        confidence > bestMatch.confidence ||
+        (confidence === bestMatch.confidence && pattern.category === 'administrative');
+
+      if (shouldReplace) {
         bestMatch = {
           category: pattern.category,
           confidence,

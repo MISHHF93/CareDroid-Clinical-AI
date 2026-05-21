@@ -26,6 +26,8 @@ export class AuditService {
   }): string {
     const content = JSON.stringify({
       ...data,
+      userId: data.userId ?? undefined,
+      metadata: data.metadata ?? undefined,
       previousHash: data.previousHash || '0', // First entry has '0' as previous hash
     });
     return createHash('sha256').update(content).digest('hex');
@@ -44,13 +46,16 @@ export class AuditService {
     metadata?: Record<string, any>;
     details?: Record<string, any>;
   }) {
-    const timestamp = new Date();
-
     // Get the last audit log to get its hash for chaining
     const [lastLog] = await this.auditRepository.find({
       order: { timestamp: 'DESC' },
       take: 1,
     });
+
+    let timestamp = new Date();
+    if (lastLog?.timestamp && timestamp <= lastLog.timestamp) {
+      timestamp = new Date(lastLog.timestamp.getTime() + 1);
+    }
 
     const previousHash = lastLog?.hash || '0'; // Genesis block uses '0'
 

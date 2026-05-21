@@ -204,6 +204,8 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'ascvd risk',
       'ascvd score',
       'cardiovascular risk',
+      'cardiac risk calculator',
+      'cardiac risk',
       'heart disease risk',
       'cv risk',
       'pooled cohort',
@@ -361,6 +363,8 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'heart score',
       'heart-score',
       'heart risk score',
+      'cardiac risk calculator',
+      'cardiac risk',
       'chest pain score',
       'chest pain risk',
       'ed chest pain score',
@@ -609,6 +613,10 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     toolName: 'CHA2DS2-VASc Score',
     keywords: [
       'cha2ds2vasc',
+      'cha2ds2-vasc',
+      'cha2ds2 vasc',
+      'cha2ds2-vasc score',
+      'cha2ds2 vasc score',
       'chads',
       'chads vasc',
       'afib stroke risk',
@@ -1337,6 +1345,8 @@ export function matchToolPatterns(message: string): Array<{
     lowerMessage.includes('ascvd risk') ||
     lowerMessage.includes('ascvd score') ||
     lowerMessage.includes('cardiovascular risk') ||
+    lowerMessage.includes('cardiac risk calculator') ||
+    lowerMessage.includes('cardiac risk') ||
     lowerMessage.includes('heart disease risk') ||
     lowerMessage.includes('cv risk') ||
     lowerMessage.includes('pooled cohort') ||
@@ -1605,7 +1615,7 @@ export function extractToolParameters(message: string, toolId: string): Record<s
 
   // Simple number extraction for common parameters
   const numberPatterns = {
-    age: /age[:\s]+(\d+)/i,
+    age: /age[:\s]+(\d+)|(\d+)\s*(?:year|yr)[-\s]*old/i,
     weight: /weight[:\s]+(\d+)/i,
     temperature: /temp[erature]*[:\s]+([\d.]+)/i,
     heart_rate: /hr[:\s]+(\d+)|heart rate[:\s]+(\d+)/i,
@@ -1620,7 +1630,7 @@ export function extractToolParameters(message: string, toolId: string): Record<s
     ) {
       const match = message.match(regex);
       if (match) {
-        const value = match[1] || match[2];
+        const value = match[1] || match[2] || match[3];
         if (value) {
           parameters[param] = param === 'blood_pressure' ? value : parseFloat(value);
         }

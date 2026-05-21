@@ -7,19 +7,25 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import * as request from 'supertest';
-import { ToolOrchestratorController } from '../../../src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.controller';
-import { ToolOrchestratorService } from '../../../src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.service';
-import { SofaCalculatorService } from '../../../src/modules/medical-control-plane/tool-orchestrator/services/sofa-calculator.service';
-import { DrugCheckerService } from '../../../src/modules/medical-control-plane/tool-orchestrator/services/drug-checker.service';
-import { LabInterpreterService } from '../../../src/modules/medical-control-plane/tool-orchestrator/services/lab-interpreter.service';
-import { AuditService } from '../../../src/modules/audit/audit.service';
-import { AIService } from '../../../src/modules/ai/ai.service';
+import { ToolOrchestratorController } from '../src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.controller';
+import { ToolOrchestratorService } from '../src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.service';
+import { SofaCalculatorService } from '../src/modules/medical-control-plane/tool-orchestrator/services/sofa-calculator.service';
+import { DrugCheckerService } from '../src/modules/medical-control-plane/tool-orchestrator/services/drug-checker.service';
+import { LabInterpreterService } from '../src/modules/medical-control-plane/tool-orchestrator/services/lab-interpreter.service';
+import { ToolResult } from '../src/modules/medical-control-plane/tool-orchestrator/entities/tool-result.entity';
+import { ToolMetricsService } from '../src/modules/metrics/tool-metrics.service';
+import { AuditService } from '../src/modules/audit/audit.service';
+import { AIService } from '../src/modules/ai/ai.service';
 
 describe('Tool Orchestrator API (e2e)', () => {
   let app: INestApplication;
   let mockAuditService: any;
   let mockAiService: any;
+  let mockToolMetricsService: any;
+  let mockToolResultRepository: any;
 
   beforeAll(async () => {
     mockAuditService = {
@@ -28,6 +34,17 @@ describe('Tool Orchestrator API (e2e)', () => {
 
     mockAiService = {
       generateStructuredJSON: jest.fn().mockResolvedValue({}),
+    };
+    mockToolMetricsService = {
+      calculateParameterComplexity: jest.fn().mockReturnValue({ score: 10, category: 'simple' }),
+      setToolParameterComplexity: jest.fn(),
+      recordToolError: jest.fn(),
+      recordToolExecutionTier: jest.fn(),
+      categorizeError: jest.fn().mockReturnValue('internal_error'),
+    };
+    mockToolResultRepository = {
+      create: jest.fn((data) => data),
+      save: jest.fn((data) => Promise.resolve({ id: 'tool-result-1', ...data })),
     };
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -45,8 +62,25 @@ describe('Tool Orchestrator API (e2e)', () => {
           provide: AIService,
           useValue: mockAiService,
         },
+        {
+          provide: ToolMetricsService,
+          useValue: mockToolMetricsService,
+        },
+        {
+          provide: getRepositoryToken(ToolResult),
+          useValue: mockToolResultRepository,
+        },
       ],
-    }).compile();
+    })
+      .overrideGuard(AuthGuard('jwt'))
+      .useValue({
+        canActivate: (context) => {
+          const req = context.switchToHttp().getRequest();
+          req.user = { id: 'test-user-123', subscriptionTier: 'institutional' };
+          return true;
+        },
+      })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
@@ -96,7 +130,7 @@ describe('Tool Orchestrator API (e2e)', () => {
         .get('/tools')
         .expect(200)
         .expect((res) => {
-          const drug = res.body.tools.find((t) => t.id === 'drug-interaction-checker');
+          const drug = res.body.tools.find((t) => t.id === 'drug-interactions');
           expect(drug).toBeDefined();
         });
     });
@@ -234,7 +268,8 @@ describe('Tool Orchestrator API (e2e)', () => {
         .expect(200)
         .expect((res) => {
           expect(res.body.success).toBe(true);
-          expect(res.body.toolId).toBe('drug-interaction-checker');
+          expect(res.body.toolId).toBe('drug-interactions');
+          expect(res.body.requestedToolId).toBe('drug-interaction-checker');
         });
     });
 
@@ -427,14 +462,22 @@ describe('Tool Orchestrator API (e2e)', () => {
         .send({
           parameters: {},
         })
-        .expect(404);
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.success).toBe(false);
+          expect(res.body.errorCode).toBe('TOOL_NOT_FOUND');
+        });
     });
 
     it('should handle missing parameters', () => {
       return request(app.getHttpServer())
-        .post('/tools/sofa-calculator/execute')
+        .post('/tools/drug-interactions/execute')
         .send({})
-        .expect(400);
+        .expect(200)
+        .expect((res) => {
+          expect(res.body.success).toBe(false);
+          expect(res.body.result.errors).toBeDefined();
+        });
     });
 
     it('should handle invalid JSON', () => {

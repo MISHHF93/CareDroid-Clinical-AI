@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UseGuards, Req, Delete } from '@nestjs/common';
+import { Controller, Post, Get, Body, UseGuards, Req, Delete, HttpCode } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { TwoFactorService } from './two-factor.service';
@@ -19,6 +19,7 @@ export class TwoFactorController {
   }
 
   @Post('enable')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Enable 2FA with verification' })
   @ApiResponse({ status: 200, description: '2FA enabled successfully' })
   async enable(@Req() req: any, @Body() dto: EnableTwoFactorDto) {
@@ -33,6 +34,7 @@ export class TwoFactorController {
   }
 
   @Post('verify')
+  @HttpCode(200)
   @ApiOperation({ summary: 'Verify 2FA token' })
   @ApiResponse({ status: 200, description: 'Token verified' })
   async verify(@Req() req: any, @Body() dto: VerifyTwoFactorDto) {

@@ -21,9 +21,11 @@ interface DrugInteraction {
   drug1: string;
   drug2: string;
   severity: 'contraindicated' | 'major' | 'moderate' | 'minor';
+  description?: string;
   mechanism: string;
   clinicalSignificance: string;
   management: string;
+  recommendation?: string;
 }
 
 @Injectable()
@@ -77,8 +79,13 @@ export class DrugCheckerService implements ClinicalToolService {
       errors.push('medications parameter is required');
     } else if (!Array.isArray(parameters.medications)) {
       errors.push('medications must be an array');
-    } else if (parameters.medications.length < 2) {
-      errors.push('At least 2 medications are required to check interactions');
+    } else if (
+      parameters.medications.length === 0 ||
+      parameters.medications.some(
+        (medication: unknown) => typeof medication !== 'string' || !medication.trim(),
+      )
+    ) {
+      errors.push('medications must include at least one valid medication name');
     } else if (parameters.medications.length > 20) {
       warnings.push(
         'Checking more than 20 medications may take longer and could miss interactions',
@@ -113,7 +120,7 @@ export class DrugCheckerService implements ClinicalToolService {
       };
     }
 
-    const medications = parameters.medications as string[];
+    const medications = (parameters.medications as string[]).map((medication) => medication.trim());
     const severityFilter = parameters.severityFilter || 'all';
 
     // Check for known high-risk interactions first (rule-based)
@@ -179,7 +186,9 @@ export class DrugCheckerService implements ClinicalToolService {
 
   private checkKnownInteractions(medications: string[]): DrugInteraction[] {
     const interactions: DrugInteraction[] = [];
-    const medSet = new Set(medications.map((m) => m.toLowerCase()));
+    const medSet = new Set(
+      medications.flatMap((medication) => this.normalizeMedicationAliases(medication)),
+    );
 
     // High-risk interactions database (sample)
     const knownPairs: Record<string, DrugInteraction> = {
@@ -187,47 +196,62 @@ export class DrugCheckerService implements ClinicalToolService {
         drug1: 'Warfarin',
         drug2: 'Aspirin',
         severity: 'major',
+        description: 'Significantly increased risk of bleeding, especially GI bleeding',
         mechanism: 'Additive antiplatelet effects and gastric mucosal injury',
         clinicalSignificance: 'Significantly increased risk of bleeding, especially GI bleeding',
         management:
+          'Monitor INR closely. Consider PPI for GI protection. Use lowest effective aspirin dose.',
+        recommendation:
           'Monitor INR closely. Consider PPI for GI protection. Use lowest effective aspirin dose.',
       },
       'warfarin-nsaid': {
         drug1: 'Warfarin',
         drug2: 'NSAID',
         severity: 'major',
+        description: 'Increased bleeding risk by 2-3 fold',
         mechanism:
           'Increased anticoagulant effect via protein displacement and platelet inhibition',
         clinicalSignificance: 'Increased bleeding risk by 2-3 fold',
         management:
+          'Avoid concurrent use if possible. If necessary, monitor INR closely and consider PPI.',
+        recommendation:
           'Avoid concurrent use if possible. If necessary, monitor INR closely and consider PPI.',
       },
       'metformin-contrast': {
         drug1: 'Metformin',
         drug2: 'IV Contrast',
         severity: 'major',
+        description: 'Risk of lactic acidosis in setting of renal dysfunction',
         mechanism: 'Contrast-induced nephropathy can lead to metformin accumulation',
         clinicalSignificance: 'Risk of lactic acidosis in setting of renal dysfunction',
         management:
+          'Hold metformin 48 hours before and after IV contrast. Check renal function before resuming.',
+        recommendation:
           'Hold metformin 48 hours before and after IV contrast. Check renal function before resuming.',
       },
       'ssri-tramadol': {
         drug1: 'SSRI',
         drug2: 'Tramadol',
         severity: 'major',
+        description: 'Risk of serotonin syndrome',
         mechanism: 'Both increase serotonin levels',
         clinicalSignificance:
           'Risk of serotonin syndrome (confusion, agitation, tachycardia, hyperthermia)',
         management:
+          'Avoid combination. Use alternative analgesic. Monitor for serotonin syndrome if unavoidable.',
+        recommendation:
           'Avoid combination. Use alternative analgesic. Monitor for serotonin syndrome if unavoidable.',
       },
       'acei-spironolactone': {
         drug1: 'ACE Inhibitor',
         drug2: 'Spironolactone',
         severity: 'major',
+        description: 'Risk of life-threatening hyperkalemia',
         mechanism: 'Additive effects on potassium retention',
         clinicalSignificance: 'Risk of life-threatening hyperkalemia',
         management:
+          'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
+        recommendation:
           'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
       },
     };
@@ -241,6 +265,32 @@ export class DrugCheckerService implements ClinicalToolService {
     }
 
     return interactions;
+  }
+
+  private normalizeMedicationAliases(medication: string): string[] {
+    const normalized = medication.trim().toLowerCase();
+    const aliases: Record<string, string[]> = {
+      coumadin: ['warfarin'],
+      bayer: ['aspirin'],
+      ibuprofen: ['nsaid'],
+      naproxen: ['nsaid'],
+      advil: ['nsaid'],
+      motrin: ['nsaid'],
+      aleve: ['nsaid'],
+      'contrast dye': ['contrast'],
+      'iv contrast': ['contrast'],
+      sertraline: ['ssri'],
+      fluoxetine: ['ssri'],
+      paroxetine: ['ssri'],
+      citalopram: ['ssri'],
+      escitalopram: ['ssri'],
+      lisinopril: ['acei'],
+      enalapril: ['acei'],
+      ramipril: ['acei'],
+      benazepril: ['acei'],
+    };
+
+    return [normalized, ...(aliases[normalized] ?? [])];
   }
 
   private async checkWithAI(medications: string[]): Promise<DrugInteraction[]> {

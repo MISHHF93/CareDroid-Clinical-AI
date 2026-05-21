@@ -9,6 +9,7 @@ import {
   Subscription,
   SubscriptionTier,
 } from '../src/modules/subscriptions/entities/subscription.entity';
+import { AIQuery } from '../src/modules/ai/entities/ai-query.entity';
 import { AuditService } from '../src/modules/audit/audit.service';
 import { MetricsService } from '../src/modules/metrics/metrics.service';
 import { IntentClassifierService } from '../src/modules/medical-control-plane/intent-classifier/intent-classifier.service';
@@ -36,6 +37,14 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
               };
               return config[key];
             },
+          },
+        },
+        {
+          provide: getRepositoryToken(AIQuery),
+          useValue: {
+            count: jest.fn().mockResolvedValue(0),
+            create: jest.fn((query) => query),
+            save: jest.fn((query) => Promise.resolve(query)),
           },
         },
         {

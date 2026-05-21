@@ -20,7 +20,7 @@ QA_BASE_URL=https://your-deployed-spa.example.com QA_AUTH_STATE=e2e/.auth/prod-u
 
 ## Deployment configuration report
 
-- `vercel.json` is a static Vite deployment: install `npm ci`, build `npm run validate:vercel-env && npm run build`, output `dist`.
+- `vercel.json` is a static Vite deployment: install `npm ci --audit=false --fund=false`, build `npm run validate:vercel-env && npm run build`, output `dist`.
 - `vercel.json` rewrites all paths to `/index.html`; it does not proxy `/api`, `/health`, or `/socket.io`.
 - `vite.config.js` proxies `/api`, `/health`, and `/socket.io` only for dev and preview. Production must use `VITE_API_URL` or a real same-origin reverse proxy.
 - `src/config/appConfig.js` reads `VITE_API_URL` as the API origin.

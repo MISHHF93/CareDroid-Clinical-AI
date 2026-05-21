@@ -4,6 +4,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Subscription, SubscriptionTier, SubscriptionStatus } from './entities/subscription.entity';
 import { User } from '../users/entities/user.entity';
 import { AuditService } from '../audit/audit.service';
+import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
 jest.mock('stripe');
@@ -47,6 +48,17 @@ describe('SubscriptionsService', () => {
     log: jest.fn(),
   };
 
+  const mockConfigService = {
+    get: jest.fn((key: string) => {
+      const values: Record<string, string> = {
+        'stripe.secretKey': 'sk_test_123',
+        'stripe.successUrl': 'https://app.example.com/billing/success',
+        'stripe.cancelUrl': 'https://app.example.com/billing/cancel',
+      };
+      return values[key];
+    }),
+  };
+
   const mockStripe = {
     checkout: {
       sessions: {
@@ -78,6 +90,10 @@ describe('SubscriptionsService', () => {
         {
           provide: AuditService,
           useValue: mockAuditService,
+        },
+        {
+          provide: ConfigService,
+          useValue: mockConfigService,
         },
       ],
     }).compile();

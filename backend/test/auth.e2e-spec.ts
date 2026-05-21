@@ -1,14 +1,46 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import * as request from 'supertest';
-import { AppModule } from '../src/app.module';
+import { AuthModule } from '../src/modules/auth/auth.module';
+import { jwtConfig, oauthConfig, sessionConfig } from '../src/config/auth.config';
+import { User } from '../src/modules/users/entities/user.entity';
+import { UserProfile } from '../src/modules/users/entities/user-profile.entity';
+import { OAuthAccount } from '../src/modules/users/entities/oauth-account.entity';
+import { Subscription } from '../src/modules/subscriptions/entities/subscription.entity';
+import { AuditLog } from '../src/modules/audit/entities/audit-log.entity';
+import { TwoFactor } from '../src/modules/two-factor/entities/two-factor.entity';
+import { BiometricConfig } from '../src/modules/auth/entities/biometric-config.entity';
 
 describe('Authentication E2E Tests', () => {
   let app: INestApplication;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          ignoreEnvFile: true,
+          load: [jwtConfig, oauthConfig, sessionConfig],
+        }),
+        TypeOrmModule.forRoot({
+          type: 'sqlite',
+          database: ':memory:',
+          entities: [
+            User,
+            UserProfile,
+            OAuthAccount,
+            Subscription,
+            AuditLog,
+            TwoFactor,
+            BiometricConfig,
+          ],
+          synchronize: true,
+          logging: false,
+        }),
+        AuthModule,
+      ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -27,10 +59,11 @@ describe('Authentication E2E Tests', () => {
         .send({
           email: `test${Date.now()}@example.com`,
           password: 'Password123!',
+          fullName: 'E2E Test User',
         })
         .expect(201)
         .expect((res) => {
-          expect(res.body).toHaveProperty('id');
+          expect(res.body).toHaveProperty('userId');
           expect(res.body).toHaveProperty('email');
           expect(res.body).not.toHaveProperty('password');
         });
@@ -61,6 +94,7 @@ describe('Authentication E2E Tests', () => {
     const testUser = {
       email: `login${Date.now()}@example.com`,
       password: 'Password123!',
+      fullName: 'Login Test User',
     };
 
     beforeAll(async () => {
@@ -96,6 +130,7 @@ describe('Authentication E2E Tests', () => {
       const user = {
         email: `me${Date.now()}@example.com`,
         password: 'Password123!',
+        fullName: 'Me Test User',
       };
       await request(app.getHttpServer()).post('/auth/register').send(user);
 

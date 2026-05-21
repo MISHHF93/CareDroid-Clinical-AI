@@ -2,13 +2,22 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuditLog, AuditAction } from '../modules/audit/entities/audit-log.entity';
-import { AuditService } from '../modules/audit/audit.service';
-import { AuditModule } from '../modules/audit/audit.module';
+import { DataSource } from 'typeorm';
+import { AuditLog, AuditAction } from '../src/modules/audit/entities/audit-log.entity';
+import { AuditService } from '../src/modules/audit/audit.service';
+import { AuditModule } from '../src/modules/audit/audit.module';
+import { User } from '../src/modules/users/entities/user.entity';
+import { UserProfile } from '../src/modules/users/entities/user-profile.entity';
+import { OAuthAccount } from '../src/modules/users/entities/oauth-account.entity';
+import { Subscription } from '../src/modules/subscriptions/entities/subscription.entity';
+import { TwoFactor } from '../src/modules/two-factor/entities/two-factor.entity';
+
+jest.setTimeout(120_000);
 
 describe('Audit Logging E2E', () => {
   let app: INestApplication;
   let auditService: AuditService;
+  let dataSource: DataSource;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -16,7 +25,7 @@ describe('Audit Logging E2E', () => {
         TypeOrmModule.forRoot({
           type: 'sqlite',
           database: ':memory:',
-          entities: [AuditLog],
+          entities: [AuditLog, User, UserProfile, OAuthAccount, Subscription, TwoFactor],
           synchronize: true,
         }),
         AuditModule,
@@ -24,12 +33,14 @@ describe('Audit Logging E2E', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    dataSource = moduleFixture.get<DataSource>(DataSource);
+    await dataSource.query('PRAGMA foreign_keys = OFF');
     auditService = moduleFixture.get<AuditService>(AuditService);
     await app.init();
   });
 
   afterAll(async () => {
-    await app.close();
+    await app?.close();
   });
 
   describe('Basic Audit Logging', () => {
@@ -87,13 +98,17 @@ describe('Audit Logging E2E', () => {
 
       const result = await auditService.log(logData);
 
-      expect(result.userId).toBeUndefined();
+      expect(result.userId).toBeNull();
       expect(result.action).toBe(AuditAction.SECURITY_EVENT);
       expect(result.metadata.reason).toBe('rate_limit_exceeded');
     });
   });
 
   describe('Hash Chaining', () => {
+    beforeEach(async () => {
+      await dataSource.getRepository(AuditLog).clear();
+    });
+
     it('should create hash chain across multiple logs', async () => {
       // Log 1: Genesis block
       const log1 = await auditService.log({
@@ -138,6 +153,7 @@ describe('Audit Logging E2E', () => {
 
   describe('Audit Log Filtering', () => {
     beforeEach(async () => {
+      await dataSource.getRepository(AuditLog).clear();
       // Create multiple logs
       await auditService.log({
         userId: 'user-1',
@@ -209,6 +225,7 @@ describe('Audit Logging E2E', () => {
   describe('Integrity Verification', () => {
     beforeEach(async () => {
       // Clear and create fresh logs
+      await dataSource.getRepository(AuditLog).clear();
       await auditService.log({
         userId: 'user-1',
         action: AuditAction.LOGIN,

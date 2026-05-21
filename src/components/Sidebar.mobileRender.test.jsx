@@ -79,7 +79,9 @@ describe('Sidebar mobile render state', () => {
     const aside = container.querySelector('aside.sidebar.sidebar--compact.sidebar--open');
     expect(aside).toHaveAttribute('role', 'dialog');
     expect(aside).toHaveAttribute('aria-label', 'Navigation menu');
-    expect(screen.getByRole('button', { name: /close menu/i })).toBeInTheDocument();
+    const closeButton = container.querySelector('.sidebar-toggle--mobile-close');
+    expect(closeButton).toBeInTheDocument();
+    expect(closeButton).toHaveAccessibleName(/close menu/i);
     expect(container.querySelector('nav.sidebar-nav')).toBeInTheDocument();
   });
 

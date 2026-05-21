@@ -35,6 +35,7 @@ async function bootstrap() {
           fontSrc: ["'self'"],
           connectSrc: ["'self'"],
           frameAncestors: ["'none'"],
+          upgradeInsecureRequests: [],
         },
       },
       // X-Frame-Options: prevent clickjacking
@@ -47,6 +48,10 @@ async function bootstrap() {
       referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
     }),
   );
+  app.use((_req, res, next) => {
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    next();
+  });
 
   // Sentry error tracking middleware (must be early in the middleware stack)
   app.use(Sentry.Handlers.requestHandler());

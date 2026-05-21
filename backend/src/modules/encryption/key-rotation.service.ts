@@ -19,6 +19,7 @@ import { EncryptionKey } from './entities/encryption-key.entity';
 @Injectable()
 export class KeyRotationService {
   private readonly logger = new Logger(KeyRotationService.name);
+  private keyVersionSeed = 0;
 
   constructor(
     private readonly encryptionService: EncryptionService,
@@ -35,18 +36,21 @@ export class KeyRotationService {
    */
   async initiateKeyRotation(reason: string = 'scheduled') {
     try {
-      const currentActiveKey = await this.keyRepository.findOne({
-        where: { isActive: true },
+      const [latestKey] = await this.keyRepository.find({
+        order: { keyVersion: 'DESC' },
+        take: 1,
       });
+      const nextKeyVersion = Math.max(this.keyVersionSeed, latestKey?.keyVersion || 0) + 1;
+      this.keyVersionSeed = nextKeyVersion;
 
       // Generate new master key
       const newKeyMaterial = EncryptionService.generateNewMasterKey();
 
       // Create new key record
       const newKey = this.keyRepository.create({
-        keyVersion: (currentActiveKey?.keyVersion || 0) + 1,
+        keyVersion: nextKeyVersion,
         keyMaterial: newKeyMaterial, // Should be stored securely (AWS KMS, Vault, etc.)
-        algorithm: currentActiveKey?.algorithm || 'aes-256-gcm',
+        algorithm: latestKey?.algorithm || 'aes-256-gcm',
         isActive: false,
         createdAt: new Date(),
         rotationReason: reason,
@@ -61,7 +65,10 @@ export class KeyRotationService {
 
       return {
         newKeyVersion: newKey.keyVersion,
-        status: 'pending_rotation',
+        keyVersion: newKey.keyVersion,
+        status: 'pending',
+        isActive: newKey.isActive,
+        rotationReason: newKey.rotationReason,
         message: 'New key created. Start re-encryption process with: service.startReEncryption()',
       };
     } catch (error) {
@@ -88,6 +95,16 @@ export class KeyRotationService {
         order: { createdAt: 'DESC' },
       });
 
+      const pendingRotations = pendingKeys.map((k) => ({
+        version: k.keyVersion,
+        keyVersion: k.keyVersion,
+        status: k.status === 'pending_rotation' ? 'pending' : k.status,
+        createdAt: k.createdAt,
+        rotationReason: k.rotationReason,
+        progressPercentage: k.progressPercentage || 0,
+        recordsProcessed: k.recordsProcessed || 0,
+      }));
+
       return {
         activeKey: activeKey
           ? {
@@ -96,13 +113,8 @@ export class KeyRotationService {
               createdAt: activeKey.createdAt,
             }
           : null,
-        pendingRotations: pendingKeys.map((k) => ({
-          version: k.keyVersion,
-          status: k.status,
-          createdAt: k.createdAt,
-          rotationReason: k.rotationReason,
-          progressPercentage: k.progressPercentage || 0,
-        })),
+        pendingRotations,
+        pendingKey: pendingRotations[0] || null,
       };
     } catch (error) {
       this.logger.error(
@@ -148,6 +160,7 @@ export class KeyRotationService {
       return {
         message: `Key version ${keyVersion} is now active`,
         activatedAt: key.activatedAt,
+        isActive: key.isActive,
       };
     } catch (error) {
       this.logger.error(
@@ -196,8 +209,9 @@ export class KeyRotationService {
    * Get the next available key version number
    */
   private async getNextKeyVersion(): Promise<number> {
-    const lastKey = await this.keyRepository.findOne({
+    const [lastKey] = await this.keyRepository.find({
       order: { keyVersion: 'DESC' },
+      take: 1,
     });
 
     return (lastKey?.keyVersion || 0) + 1;

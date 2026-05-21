@@ -1,12 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import * as request from 'supertest';
 import * as speakeasy from 'speakeasy';
-import { AppModule } from '../src/app.module';
+import { AuthModule } from '../src/modules/auth/auth.module';
 import { AuthService } from '../src/modules/auth/auth.service';
 import { TwoFactorService } from '../src/modules/two-factor/two-factor.service';
 import { AuditService } from '../src/modules/audit/audit.service';
-import { UserRole } from '../src/modules/users/entities/user.entity';
+import { jwtConfig, oauthConfig, sessionConfig } from '../src/config/auth.config';
+import { User, UserRole } from '../src/modules/users/entities/user.entity';
+import { UserProfile } from '../src/modules/users/entities/user-profile.entity';
+import { OAuthAccount } from '../src/modules/users/entities/oauth-account.entity';
+import { Subscription } from '../src/modules/subscriptions/entities/subscription.entity';
+import { AuditLog } from '../src/modules/audit/entities/audit-log.entity';
+import { TwoFactor } from '../src/modules/two-factor/entities/two-factor.entity';
+import { BiometricConfig } from '../src/modules/auth/entities/biometric-config.entity';
+
+jest.setTimeout(120_000);
 
 /**
  * Batch 8: Two-Factor Authentication (2FA) E2E Tests
@@ -25,12 +36,35 @@ describe('Two-Factor Authentication (e2e)', () => {
   let auditService: AuditService;
   let authToken: string;
   let userId: string;
+  let email: string;
   let testSecret: string;
   let testBackupCodes: string[];
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [
+        ConfigModule.forRoot({
+          isGlobal: true,
+          ignoreEnvFile: true,
+          load: [jwtConfig, oauthConfig, sessionConfig],
+        }),
+        TypeOrmModule.forRoot({
+          type: 'sqlite',
+          database: ':memory:',
+          entities: [
+            User,
+            UserProfile,
+            OAuthAccount,
+            Subscription,
+            AuditLog,
+            TwoFactor,
+            BiometricConfig,
+          ],
+          synchronize: true,
+          logging: false,
+        }),
+        AuthModule,
+      ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -48,8 +82,9 @@ describe('Two-Factor Authentication (e2e)', () => {
     auditService = moduleFixture.get<AuditService>(AuditService);
 
     // Create test user
+    email = `2fa-test-${Date.now()}@example.com`;
     const user = await authService.register({
-      email: '2fa-test@example.com',
+      email,
       password: 'Test1234!',
       fullName: '2FA Test User',
       role: UserRole.PHYSICIAN,
@@ -57,7 +92,7 @@ describe('Two-Factor Authentication (e2e)', () => {
     userId = user.userId;
 
     const loginResponse = await authService.login(
-      { email: '2fa-test@example.com', password: 'Test1234!' },
+      { email, password: 'Test1234!' },
       '127.0.0.1',
       'test-agent',
     );
@@ -71,13 +106,13 @@ describe('Two-Factor Authentication (e2e)', () => {
   });
 
   afterAll(async () => {
-    await app.close();
+    await app?.close();
   });
 
   describe('2FA Setup', () => {
     it('should generate 2FA secret and QR code', async () => {
       const response = await request(app.getHttpServer())
-        .get('/api/two-factor/generate')
+        .get('/two-factor/generate')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
@@ -98,7 +133,7 @@ describe('Two-Factor Authentication (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .post('/api/two-factor/enable')
+        .post('/two-factor/enable')
         .set('Authorization', `Bearer ${authToken}`)
         .send({ secret: testSecret, token })
         .expect(200);
@@ -120,7 +155,7 @@ describe('Two-Factor Authentication (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .post('/api/two-factor/enable')
+        .post('/two-factor/enable')
         .set('Authorization', `Bearer ${authToken}`)
         .send({ secret: testSecret, token: invalidToken })
         .expect(401);
@@ -136,7 +171,7 @@ describe('Two-Factor Authentication (e2e)', () => {
       });
 
       await request(app.getHttpServer())
-        .post('/api/two-factor/enable')
+        .post('/two-factor/enable')
         .set('Authorization', `Bearer ${authToken}`)
         .send({ secret: testSecret, token })
         .expect(400); // Already enabled
@@ -146,9 +181,9 @@ describe('Two-Factor Authentication (e2e)', () => {
   describe('2FA Login', () => {
     it('should require 2FA on login when enabled', async () => {
       const response = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/auth/login')
         .send({
-          email: '2fa-test@example.com',
+          email,
           password: 'Test1234!',
         })
         .expect(200);
@@ -161,9 +196,9 @@ describe('Two-Factor Authentication (e2e)', () => {
     it('should verify valid 2FA token and issue token', async () => {
       // First login to get userId
       const loginResponse = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/auth/login')
         .send({
-          email: '2fa-test@example.com',
+          email,
           password: 'Test1234!',
         })
         .expect(200);
@@ -177,7 +212,7 @@ describe('Two-Factor Authentication (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .post('/api/auth/verify-2fa')
+        .post('/auth/verify-2fa')
         .send({ userId, token })
         .expect(200);
 
@@ -188,9 +223,9 @@ describe('Two-Factor Authentication (e2e)', () => {
 
     it('should reject invalid 2FA token', async () => {
       const loginResponse = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/auth/login')
         .send({
-          email: '2fa-test@example.com',
+          email,
           password: 'Test1234!',
         })
         .expect(200);
@@ -198,7 +233,7 @@ describe('Two-Factor Authentication (e2e)', () => {
       const userId = loginResponse.body.userId;
 
       const response = await request(app.getHttpServer())
-        .post('/api/auth/verify-2fa')
+        .post('/auth/verify-2fa')
         .send({ userId, token: '000000' })
         .expect(401);
 
@@ -210,9 +245,9 @@ describe('Two-Factor Authentication (e2e)', () => {
     it('should accept backup code as alternative to TOTP', async () => {
       // First login
       const loginResponse = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/auth/login')
         .send({
-          email: '2fa-test@example.com',
+          email,
           password: 'Test1234!',
         })
         .expect(200);
@@ -223,7 +258,7 @@ describe('Two-Factor Authentication (e2e)', () => {
       const backupCode = testBackupCodes[0];
 
       const response = await request(app.getHttpServer())
-        .post('/api/auth/verify-2fa')
+        .post('/auth/verify-2fa')
         .send({ userId, token: backupCode })
         .expect(200);
 
@@ -233,9 +268,9 @@ describe('Two-Factor Authentication (e2e)', () => {
 
     it('should not reuse backup code', async () => {
       const loginResponse = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/auth/login')
         .send({
-          email: '2fa-test@example.com',
+          email,
           password: 'Test1234!',
         })
         .expect(200);
@@ -245,22 +280,22 @@ describe('Two-Factor Authentication (e2e)', () => {
 
       // First use should succeed
       await request(app.getHttpServer())
-        .post('/api/auth/verify-2fa')
+        .post('/auth/verify-2fa')
         .send({ userId, token: usedCode })
         .expect(200);
 
       // Second login attempt
       const secondLogin = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/auth/login')
         .send({
-          email: '2fa-test@example.com',
+          email,
           password: 'Test1234!',
         })
         .expect(200);
 
       // Trying to reuse same code should fail
       await request(app.getHttpServer())
-        .post('/api/auth/verify-2fa')
+        .post('/auth/verify-2fa')
         .send({ userId: secondLogin.body.userId, token: usedCode })
         .expect(401);
 
@@ -269,7 +304,7 @@ describe('Two-Factor Authentication (e2e)', () => {
 
     it('should track backup code usage in status', async () => {
       const response = await request(app.getHttpServer())
-        .get('/api/two-factor/status')
+        .get('/two-factor/status')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
@@ -282,7 +317,7 @@ describe('Two-Factor Authentication (e2e)', () => {
   describe('2FA Status', () => {
     it('should return 2FA status for enabled user', async () => {
       const response = await request(app.getHttpServer())
-        .get('/api/two-factor/status')
+        .get('/two-factor/status')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
@@ -297,7 +332,7 @@ describe('Two-Factor Authentication (e2e)', () => {
     it('should allow access to admin endpoints with 2FA enabled', async () => {
       // Physician role already has 2FA enabled
       const response = await request(app.getHttpServer())
-        .get('/api/auth/me')
+        .get('/auth/me')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
@@ -308,14 +343,14 @@ describe('Two-Factor Authentication (e2e)', () => {
     it('should deny access to admin endpoints without 2FA enabled', async () => {
       // Create non-physician user without 2FA
       const registerResp = await authService.register({
-        email: 'no2fa-test@example.com',
+        email: `no2fa-test-${Date.now()}@example.com`,
         password: 'Test1234!',
         fullName: 'No 2FA User',
         role: UserRole.ADMIN,
       });
 
       const loginResp = await authService.login(
-        { email: 'no2fa-test@example.com', password: 'Test1234!' },
+        { email: registerResp.email, password: 'Test1234!' },
         '127.0.0.1',
         'test-agent',
       );
@@ -341,9 +376,9 @@ describe('Two-Factor Authentication (e2e)', () => {
     it('should handle failed 2FA verification', async () => {
       // Test invalid 2FA code rejection
       const response = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/auth/login')
         .send({
-          email: '2fa-test@example.com',
+          email,
           password: 'Test1234!',
         })
         .expect(200);
@@ -351,7 +386,7 @@ describe('Two-Factor Authentication (e2e)', () => {
       // If 2FA is enabled, should require verification
       if (response.body.requiresTwoFactor) {
         await request(app.getHttpServer())
-          .post('/api/auth/verify-2fa')
+          .post('/auth/verify-2fa')
           .send({ userId: response.body.userId, token: '000000' })
           .expect(401);
       }
@@ -367,7 +402,7 @@ describe('Two-Factor Authentication (e2e)', () => {
       });
 
       const response = await request(app.getHttpServer())
-        .delete('/api/two-factor/disable')
+        .delete('/two-factor/disable')
         .set('Authorization', `Bearer ${authToken}`)
         .send({ token })
         .expect(200);
@@ -377,9 +412,9 @@ describe('Two-Factor Authentication (e2e)', () => {
 
     it('should login without 2FA after disabling', async () => {
       const response = await request(app.getHttpServer())
-        .post('/api/auth/login')
+        .post('/auth/login')
         .send({
-          email: '2fa-test@example.com',
+          email,
           password: 'Test1234!',
         })
         .expect(200);
@@ -392,7 +427,7 @@ describe('Two-Factor Authentication (e2e)', () => {
     it('should reject disable with invalid token', async () => {
       // First re-enable 2FA
       const secretResp = await request(app.getHttpServer())
-        .get('/api/two-factor/generate')
+        .get('/two-factor/generate')
         .set('Authorization', `Bearer ${authToken}`)
         .expect(200);
 
@@ -402,14 +437,14 @@ describe('Two-Factor Authentication (e2e)', () => {
       });
 
       await request(app.getHttpServer())
-        .post('/api/two-factor/enable')
+        .post('/two-factor/enable')
         .set('Authorization', `Bearer ${authToken}`)
         .send({ secret: secretResp.body.secret, token })
         .expect(200);
 
       // Try to disable with invalid token
       const disableResp = await request(app.getHttpServer())
-        .delete('/api/two-factor/disable')
+        .delete('/two-factor/disable')
         .set('Authorization', `Bearer ${authToken}`)
         .send({ token: '000000' })
         .expect(401);

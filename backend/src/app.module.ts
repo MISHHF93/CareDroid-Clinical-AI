@@ -108,7 +108,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     CacheModule,
 
     // Serve Vite production build when running API in production (npm run start:single)
-    ...(process.env.NODE_ENV === 'production'
+    ...(process.env.NODE_ENV === 'production' && !process.env.JEST_WORKER_ID
       ? [
           ServeStaticModule.forRoot({
             rootPath: join(__dirname, '..', '..', 'dist'),

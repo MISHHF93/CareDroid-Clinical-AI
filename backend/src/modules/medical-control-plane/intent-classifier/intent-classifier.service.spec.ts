@@ -13,6 +13,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { IntentClassifierService } from './intent-classifier.service';
 import { AIService } from '../../ai/ai.service';
 import { ConfigService } from '@nestjs/config';
+import { NluMetricsService } from '../../metrics/nlu-metrics.service';
 import { PrimaryIntent, EmergencySeverity } from './dto/intent-classification.dto';
 
 describe('IntentClassifierService', () => {
@@ -28,6 +29,15 @@ describe('IntentClassifierService', () => {
     get: jest.fn().mockReturnValue('http://localhost:8001'),
   };
 
+  const mockNluMetricsService = {
+    recordKeywordPhaseDuration: jest.fn(),
+    recordConfidenceScore: jest.fn(),
+    recordIntentClassification: jest.fn(),
+    recordModelPhaseDuration: jest.fn(),
+    recordLlmPhaseDuration: jest.fn(),
+    setCircuitBreakerState: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -39,6 +49,10 @@ describe('IntentClassifierService', () => {
         {
           provide: ConfigService,
           useValue: mockConfigService,
+        },
+        {
+          provide: NluMetricsService,
+          useValue: mockNluMetricsService,
         },
       ],
     }).compile();

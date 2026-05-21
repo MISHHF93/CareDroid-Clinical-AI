@@ -1,8 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import { Controller, Get, INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
-import { AppModule } from '../app.module';
 import * as helmet from 'helmet';
+
+@Controller()
+class TestSecurityController {
+  @Get()
+  root() {
+    return { ok: true };
+  }
+
+  @Get('health')
+  health() {
+    return { status: 'ok' };
+  }
+}
 
 /**
  * TLS 1.3 and Security Headers E2E Tests
@@ -15,7 +27,7 @@ describe('TLS 1.3 & Security Headers (E2E)', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      controllers: [TestSecurityController],
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -47,13 +59,12 @@ describe('TLS 1.3 & Security Headers (E2E)', () => {
         referrerPolicy: {
           policy: 'strict-origin-when-cross-origin',
         },
-        permissionsPolicy: {
-          camera: [],
-          microphone: [],
-          geolocation: [],
-        },
       }),
     );
+    app.use((_req, res, next) => {
+      res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+      next();
+    });
 
     await app.init();
   });

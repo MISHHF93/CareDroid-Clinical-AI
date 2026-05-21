@@ -99,6 +99,16 @@ export const ALLOWED_BACKEND_KEYWORD_COLLISIONS = Object.freeze([
     toolIds: ['has-bled', 'nihss', 'cha2ds2vasc-calculator'],
     reason: 'optional parameter / stroke scale; disambiguation prefers NIHSS when stroke scale phrased',
   },
+  {
+    keyword: 'cardiac risk',
+    toolIds: ['ascvd-risk', 'heart-score'],
+    reason: 'shared discovery phrase; downstream launcher disambiguates by explicit ASCVD vs HEART context',
+  },
+  {
+    keyword: 'cardiac risk calculator',
+    toolIds: ['ascvd-risk', 'heart-score'],
+    reason: 'shared discovery phrase; downstream launcher disambiguates by explicit ASCVD vs HEART context',
+  },
 ]);
 
 /** Registry ids shipped in PR1–PR6 + fleet audits. */

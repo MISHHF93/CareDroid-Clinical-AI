@@ -111,6 +111,8 @@ describe('ComplianceService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockProfileRepository.create.mockImplementation((profile) => profile);
+    mockProfileRepository.save.mockImplementation((profile) => Promise.resolve(profile));
   });
 
   it('should be defined', () => {
@@ -342,7 +344,7 @@ describe('ComplianceService', () => {
         userId,
         action: 'profile_update',
         resource: 'compliance/consent',
-        details: { consentType, granted },
+        details: { consentType, granted, timestamp: expect.any(String) },
         ipAddress: '0.0.0.0',
         userAgent: 'system',
       });

@@ -4,7 +4,9 @@ import { ConfigService } from '@nestjs/config';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Subscription, SubscriptionTier } from '../subscriptions/entities/subscription.entity';
 import { User } from '../users/entities/user.entity';
+import { AIQuery } from './entities/ai-query.entity';
 import { AuditService } from '../audit/audit.service';
+import { MetricsService } from '../metrics/metrics.service';
 
 // Mock OpenAI module
 jest.mock('openai', () => {
@@ -31,12 +33,23 @@ describe('AIService', () => {
     findOne: jest.fn(),
   };
 
+  const mockAiQueryRepository = {
+    find: jest.fn().mockResolvedValue([]),
+    count: jest.fn().mockResolvedValue(0),
+    create: jest.fn((query) => query),
+    save: jest.fn((query) => Promise.resolve(query)),
+  };
+
   const mockUserRepository = {
     findOne: jest.fn(),
   };
 
   const mockAuditService = {
     log: jest.fn(),
+  };
+
+  const mockMetricsService = {
+    recordOpenaiCost: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -46,6 +59,10 @@ describe('AIService', () => {
         {
           provide: ConfigService,
           useValue: mockConfigService,
+        },
+        {
+          provide: getRepositoryToken(AIQuery),
+          useValue: mockAiQueryRepository,
         },
         {
           provide: getRepositoryToken(Subscription),
@@ -58,6 +75,10 @@ describe('AIService', () => {
         {
           provide: AuditService,
           useValue: mockAuditService,
+        },
+        {
+          provide: MetricsService,
+          useValue: mockMetricsService,
         },
       ],
     }).compile();

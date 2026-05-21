@@ -38,7 +38,7 @@ describe('DrugCheckerService', () => {
     it('should return drug checker metadata', () => {
       const metadata = service.getMetadata();
 
-      expect(metadata.id).toBe('drug-interaction-checker');
+      expect(metadata.id).toBe('drug-interactions');
       expect(metadata.name).toBe('Drug Interaction Checker');
       expect(metadata.category).toBe('checker');
       expect(metadata.version).toBe('1.0.0');
@@ -103,8 +103,8 @@ describe('DrugCheckerService', () => {
       expect(result.data.interactions).toBeDefined();
       const warfarinAspirin = result.data.interactions.find(
         (i) =>
-          (i.drug1 === 'warfarin' || i.drug1 === 'aspirin') &&
-          (i.drug2 === 'warfarin' || i.drug2 === 'aspirin'),
+          ['warfarin', 'aspirin'].includes(i.drug1.toLowerCase()) &&
+          ['warfarin', 'aspirin'].includes(i.drug2.toLowerCase()),
       );
       expect(warfarinAspirin).toBeDefined();
     });

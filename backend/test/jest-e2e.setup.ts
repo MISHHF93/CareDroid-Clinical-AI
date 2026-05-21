@@ -1,0 +1,11 @@
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
+process.env.DATABASE_CLIENT = 'sqlite';
+process.env.SQLITE_PATH = ':memory:';
+process.env.REDIS_HOST = '';
+process.env.RAG_ENABLED = 'false';
+process.env.RERANK_ENABLED = 'false';
+process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-jwt-secret-for-e2e-validation';
+process.env.JWT_ACCESS_EXPIRY = process.env.JWT_ACCESS_EXPIRY || '15m';
+process.env.JWT_REFRESH_EXPIRY = process.env.JWT_REFRESH_EXPIRY || '30d';
+process.env.ENCRYPTION_MASTER_KEY = process.env.ENCRYPTION_MASTER_KEY || '1'.repeat(64);
+process.env.ENCRYPTION_KEY_VERSION = process.env.ENCRYPTION_KEY_VERSION || '1';

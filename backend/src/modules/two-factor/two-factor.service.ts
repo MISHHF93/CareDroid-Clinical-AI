@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as speakeasy from 'speakeasy';
@@ -22,7 +27,7 @@ export class TwoFactorService {
   async generateSecret(userId: string) {
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundException('User not found');
     }
 
     const secret = speakeasy.generateSecret({
@@ -51,7 +56,7 @@ export class TwoFactorService {
     });
 
     if (!isValid) {
-      throw new Error('Invalid verification code');
+      throw new UnauthorizedException('Invalid verification code');
     }
 
     // Generate backup codes
@@ -61,6 +66,9 @@ export class TwoFactorService {
     let twoFactor = await this.twoFactorRepository.findOne({ where: { userId } });
 
     if (twoFactor) {
+      if (twoFactor.enabled) {
+        throw new BadRequestException('2FA is already enabled');
+      }
       twoFactor.enabled = true;
       twoFactor.secret = secret;
       twoFactor.backupCodes = hashedBackupCodes;
@@ -90,13 +98,13 @@ export class TwoFactorService {
   async disable(userId: string, token: string) {
     const twoFactor = await this.twoFactorRepository.findOne({ where: { userId } });
     if (!twoFactor || !twoFactor.enabled) {
-      throw new Error('2FA is not enabled');
+      throw new BadRequestException('2FA is not enabled');
     }
 
     // Verify token before disabling
     const isValid = await this.verifyToken(userId, token);
     if (!isValid) {
-      throw new Error('Invalid verification code');
+      throw new UnauthorizedException('Invalid verification code');
     }
 
     twoFactor.enabled = false;

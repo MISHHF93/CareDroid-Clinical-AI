@@ -45,6 +45,7 @@ describe('AuditService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockAuditRepository.find.mockResolvedValue([]);
   });
 
   it('should be defined', () => {
@@ -75,6 +76,9 @@ describe('AuditService', () => {
       expect(mockAuditRepository.create).toHaveBeenCalledWith({
         ...logData,
         timestamp: expect.any(Date),
+        hash: expect.any(String),
+        previousHash: '0',
+        integrityVerified: true,
       });
       expect(mockAuditRepository.save).toHaveBeenCalled();
       expect(result).toEqual(mockAuditLog);
@@ -102,6 +106,9 @@ describe('AuditService', () => {
       expect(mockAuditRepository.create).toHaveBeenCalledWith({
         ...logData,
         timestamp: expect.any(Date),
+        hash: expect.any(String),
+        previousHash: '0',
+        integrityVerified: true,
       });
       expect(result).toBeDefined();
     });
@@ -131,6 +138,9 @@ describe('AuditService', () => {
       expect(mockAuditRepository.create).toHaveBeenCalledWith({
         ...logData,
         timestamp: expect.any(Date),
+        hash: expect.any(String),
+        previousHash: '0',
+        integrityVerified: true,
       });
       expect(result.phiAccessed).toBe(true);
     });
@@ -261,6 +271,9 @@ describe('AuditService', () => {
         expect(mockAuditRepository.create).toHaveBeenCalledWith({
           ...logData,
           timestamp: expect.any(Date),
+          hash: expect.any(String),
+          previousHash: '0',
+          integrityVerified: true,
         });
       }
     });
@@ -286,7 +299,7 @@ describe('AuditService', () => {
         integrityVerified: true,
       };
 
-      mockAuditRepository.findOne.mockResolvedValue(null); // No previous log
+      mockAuditRepository.find.mockResolvedValue([]); // No previous log
       mockAuditRepository.create.mockReturnValue(logWithHash);
       mockAuditRepository.save.mockResolvedValue(logWithHash);
 
@@ -312,12 +325,8 @@ describe('AuditService', () => {
         userAgent: 'Chrome',
       };
 
-      mockAuditRepository.findOne.mockResolvedValue(previousLog);
-      mockAuditRepository.create.mockReturnValue((data) => ({
-        ...newLogData,
-        ...data,
-        timestamp: data.timestamp,
-      }));
+      mockAuditRepository.find.mockResolvedValue([previousLog]);
+      mockAuditRepository.create.mockImplementation((data) => data);
       mockAuditRepository.save.mockImplementation((log) =>
         Promise.resolve({
           ...log,
@@ -335,6 +344,25 @@ describe('AuditService', () => {
       const timestamp1 = new Date('2023-01-01T10:00:00Z');
       const timestamp2 = new Date('2023-01-01T10:01:00Z');
 
+      const hash1 = (service as any).calculateHash({
+        userId: '1',
+        action: AuditAction.LOGIN,
+        resource: 'auth',
+        ipAddress: '192.168.1.1',
+        timestamp: timestamp1,
+        previousHash: '0',
+        metadata: {},
+      });
+      const hash2 = (service as any).calculateHash({
+        userId: '1',
+        action: AuditAction.LOGOUT,
+        resource: 'auth',
+        ipAddress: '192.168.1.1',
+        timestamp: timestamp2,
+        previousHash: hash1,
+        metadata: {},
+      });
+
       // Create mock logs with valid hashes
       const logs = [
         {
@@ -344,7 +372,7 @@ describe('AuditService', () => {
           resource: 'auth',
           ipAddress: '192.168.1.1',
           timestamp: timestamp1,
-          hash: expect.any(String),
+          hash: hash1,
           previousHash: '0',
           metadata: {},
         },
@@ -355,8 +383,8 @@ describe('AuditService', () => {
           resource: 'auth',
           ipAddress: '192.168.1.1',
           timestamp: timestamp2,
-          hash: expect.any(String),
-          previousHash: expect.any(String),
+          hash: hash2,
+          previousHash: hash1,
           metadata: {},
         },
       ];

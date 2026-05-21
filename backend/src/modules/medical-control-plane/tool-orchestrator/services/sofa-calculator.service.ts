@@ -164,10 +164,18 @@ export class SofaCalculatorService implements ClinicalToolService {
             errors.push(`${param.name} must be a valid number`);
           } else if (param.validation) {
             if (param.validation.min !== undefined && value < param.validation.min) {
-              errors.push(`${param.name} must be >= ${param.validation.min}`);
+              if (value < 0) {
+                errors.push(`${param.name} must be non-negative`);
+              } else {
+                warnings.push(
+                  `${param.name} is below the usual validated range (${param.validation.min})`,
+                );
+              }
             }
             if (param.validation.max !== undefined && value > param.validation.max) {
-              errors.push(`${param.name} must be <= ${param.validation.max}`);
+              warnings.push(
+                `${param.name} is above the usual validated range (${param.validation.max})`,
+              );
             }
           }
         }
@@ -215,8 +223,16 @@ export class SofaCalculatorService implements ClinicalToolService {
       success: true,
       data: {
         totalScore,
+        respirationScore: scores.respiration,
+        coagulationScore: scores.coagulation,
+        liverScore: scores.liver,
+        cardiovascularScore: scores.cardiovascular,
+        cnsScore: scores.cns,
+        renalScore: scores.renal,
         scores,
         mortality,
+        mortalityEstimate: mortality,
+        interpretation,
       },
       interpretation,
       citations: [
@@ -292,6 +308,7 @@ export class SofaCalculatorService implements ClinicalToolService {
     if (hasEpi && params.epinephrine <= 0.1) return 3;
     if (hasNorepi && params.norepinephrine <= 0.1) return 3;
     if (hasDopamine && params.dopamine > 5) return 3;
+    if (hasDopamine) return 2;
     if (hasDobutamine) return 2;
 
     // MAP-based scoring if no vasopressors
@@ -346,6 +363,8 @@ export class SofaCalculatorService implements ClinicalToolService {
   private interpretScore(score: number): string {
     if (score === 0) {
       return 'No organ dysfunction detected based on SOFA criteria.';
+    } else if (score <= 2) {
+      return `Minimal organ dysfunction (SOFA ${score}). Continue clinical monitoring and reassess with new data.`;
     } else if (score <= 6) {
       return `Mild organ dysfunction (SOFA ${score}). Monitor closely and optimize supportive care.`;
     } else if (score <= 11) {

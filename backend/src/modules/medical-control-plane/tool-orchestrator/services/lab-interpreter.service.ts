@@ -103,6 +103,13 @@ export class LabInterpreterService implements ClinicalToolService {
       }
     }
 
+    if (
+      parameters.patientSex !== undefined &&
+      !['male', 'female', 'other'].includes(parameters.patientSex)
+    ) {
+      errors.push('patientSex must be one of: male, female, other');
+    }
+
     return {
       valid: errors.length === 0,
       errors,
@@ -173,7 +180,9 @@ export class LabInterpreterService implements ClinicalToolService {
         summary: {
           total: labValues.length,
           normal: labValues.filter((l) => l.status === 'normal').length,
-          abnormal: labValues.filter((l) => l.status !== 'normal').length,
+          abnormal: labValues.filter(
+            (l) => l.status !== 'normal' && !l.status.startsWith('critical'),
+          ).length,
           critical: criticalValues.length,
         },
       },
@@ -311,7 +320,7 @@ export class LabInterpreterService implements ClinicalToolService {
     if (typeof value !== 'number') return 'normal';
 
     if (range.criticalHigh && value >= range.criticalHigh) return 'critical-high';
-    if (range.criticalLow && value <= range.criticalLow) return 'critical-low';
+    if (range.criticalLow && value < range.criticalLow) return 'critical-low';
     if (range.max && value > range.max) return 'high';
     if (range.min && value < range.min) return 'low';
     return 'normal';

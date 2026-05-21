@@ -2,11 +2,14 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import * as request from 'supertest';
-import { AuthorizationGuard } from '../guards/authorization.guard';
-import { Permission } from '../enums/permission.enum';
-import { UserRole } from '../../users/entities/user.entity';
-import { AuditService } from '../../audit/audit.service';
-import { hasPermission, hasAnyPermission } from '../config/role-permissions.config';
+import { AuthorizationGuard } from '../src/modules/auth/guards/authorization.guard';
+import { Permission } from '../src/modules/auth/enums/permission.enum';
+import { UserRole } from '../src/modules/users/entities/user.entity';
+import { AuditService } from '../src/modules/audit/audit.service';
+import {
+  hasPermission,
+  hasAnyPermission,
+} from '../src/modules/auth/config/role-permissions.config';
 
 /**
  * Role-Based Access Control (RBAC) E2E Tests
@@ -227,14 +230,18 @@ describe('RBAC System (E2E)', () => {
         }),
       } as any;
 
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([Permission.READ_PHI]);
+      jest
+        .spyOn(reflector, 'getAllAndOverride')
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce([Permission.READ_PHI])
+        .mockReturnValueOnce(undefined);
 
       const result = await guard.canActivate(context);
 
       expect(result).toBe(true);
       expect(auditService.log).toHaveBeenCalledWith(
         expect.objectContaining({
-          action: 'PERMISSION_GRANTED',
+          action: 'permission_granted',
           userId: 'user-1',
         }),
       );
@@ -255,12 +262,16 @@ describe('RBAC System (E2E)', () => {
         }),
       } as any;
 
-      jest.spyOn(reflector, 'getAllAndOverride').mockReturnValue([Permission.READ_PHI]);
+      jest
+        .spyOn(reflector, 'getAllAndOverride')
+        .mockReturnValueOnce(false)
+        .mockReturnValueOnce([Permission.READ_PHI])
+        .mockReturnValueOnce(undefined);
 
       await expect(guard.canActivate(context)).rejects.toThrow('Access denied');
       expect(auditService.log).toHaveBeenCalledWith(
         expect.objectContaining({
-          action: 'PERMISSION_DENIED',
+          action: 'permission_denied',
           userId: 'user-1',
         }),
       );

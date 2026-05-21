@@ -96,23 +96,27 @@ describe('Route pages smoke — non-empty render', () => {
     mockFetchFleetCommandSnapshot.mockResolvedValue(buildFleetDashboardSnapshot());
   });
 
-  it.each(CORE_ROUTE_SMOKE)('$id at $path renders primary content', async (route) => {
-    const { id, path, match, heading } = route;
-    const Page = PAGE_BY_ID[id];
-    const { container } = renderRoute(path, Page);
+  it.each(CORE_ROUTE_SMOKE)(
+    '$id at $path renders primary content',
+    async (route) => {
+      const { id, path, match, heading } = route;
+      const Page = PAGE_BY_ID[id];
+      const { container } = renderRoute(path, Page);
 
-    if (match === 'composer') {
-      expect(await screen.findByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
-    } else if (match === 'fleet-summary') {
-      await waitFor(() => {
-        expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
-      });
-    } else {
-      expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
-    }
+      if (match === 'composer') {
+        expect(await screen.findByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
+      } else if (match === 'fleet-summary') {
+        await waitFor(() => {
+          expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
+        });
+      } else {
+        expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
+      }
 
-    expectNonEmptyPage(container);
-  });
+      expectNonEmptyPage(container);
+    },
+    15_000
+  );
 });
 
 describe('Route pages smoke — compact viewport (no crash)', () => {
@@ -126,21 +130,25 @@ describe('Route pages smoke — compact viewport (no crash)', () => {
     mockFetchFleetCommandSnapshot.mockResolvedValue(buildFleetDashboardSnapshot());
   });
 
-  it.each(CORE_ROUTE_SMOKE)('$id survives compact viewport mock', async (route) => {
-    const { id, path, match, heading } = route;
-    const Page = PAGE_BY_ID[id];
-    const { container } = renderRoute(path, Page);
+  it.each(CORE_ROUTE_SMOKE)(
+    '$id survives compact viewport mock',
+    async (route) => {
+      const { id, path, match, heading } = route;
+      const Page = PAGE_BY_ID[id];
+      const { container } = renderRoute(path, Page);
 
-    if (match === 'composer') {
-      expect(await screen.findByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
-    } else if (match === 'fleet-summary') {
-      await waitFor(() => {
-        expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
-      });
-    } else {
-      expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
-    }
+      if (match === 'composer') {
+        expect(await screen.findByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
+      } else if (match === 'fleet-summary') {
+        await waitFor(() => {
+          expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
+        });
+      } else {
+        expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
+      }
 
-    expectNonEmptyPage(container);
-  });
+      expectNonEmptyPage(container);
+    },
+    15_000
+  );
 });

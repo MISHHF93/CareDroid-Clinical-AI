@@ -13,7 +13,7 @@
 ### Frontend
 
 ```bash
-npm ci
+npm ci --audit=false --fund=false
 npm run build
 # Artifact: dist/
 ```
