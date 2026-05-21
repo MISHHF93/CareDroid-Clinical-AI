@@ -35,9 +35,9 @@ describe('responsive-ux.css — global normalization', () => {
     expect(responsiveUxCss).toContain('var(--app-type-title)');
   });
 
-  it('prevents heading overflow in app scroll surfaces', () => {
-    expect(responsiveUxCss).toMatch(/\.app-scroll-container h1[\s\S]*overflow-wrap:\s*anywhere/);
-    expect(responsiveUxCss).toMatch(/overflow-wrap:\s*anywhere[\s\S]*word-break:\s*break-word/);
+  it('prevents heading overflow without character-stacking labels', () => {
+    expect(responsiveUxCss).toMatch(/\.app-scroll-container h1[\s\S]*overflow-wrap:\s*break-word/);
+    expect(responsiveUxCss).toMatch(/overflow-wrap:\s*break-word[\s\S]*word-break:\s*normal/);
   });
 
   it('prevents body-level horizontal overflow without a fixed root minimum width', () => {
@@ -49,7 +49,7 @@ describe('responsive-ux.css — global normalization', () => {
   it('wraps long clinical tool names and catalog cells', () => {
     expect(responsiveUxCss).toContain('.catalog-tool-name-cell');
     expect(responsiveUxCss).toContain('.calculator-name');
-    expect(responsiveUxCss).toMatch(/\.catalog-tool-name-cell[\s\S]*overflow-wrap:\s*anywhere/);
+    expect(responsiveUxCss).toMatch(/\.catalog-tool-name-cell[\s\S]*overflow-wrap:\s*break-word/);
   });
 
   it('enforces mobile touch targets on primary buttons and form controls', () => {
@@ -60,7 +60,7 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('wraps badges and chips', () => {
-    expect(responsiveUxCss).toMatch(/\[class\*='badge'\][\s\S]*overflow-wrap:\s*anywhere/);
+    expect(responsiveUxCss).toMatch(/\[class\*='badge'\][\s\S]*overflow-wrap:\s*break-word/);
     expect(responsiveUxCss).toMatch(/\.catalog-category-chips[\s\S]*flex-wrap:\s*wrap/);
   });
 
@@ -73,7 +73,7 @@ describe('responsive-ux.css — global normalization', () => {
     expect(responsiveUxCss).toMatch(
       /@media \(max-width: 640px\)[\s\S]*\.clinical-ds-disclaimer[\s\S]*--app-callout-padding-compact/
     );
-    expect(responsiveUxCss).toMatch(/\.calc-interpretation-box[\s\S]*overflow-wrap:\s*anywhere/);
+    expect(responsiveUxCss).toMatch(/\.calc-interpretation-box[\s\S]*overflow-wrap:\s*break-word/);
   });
 
   it('reduces card padding on small screens', () => {

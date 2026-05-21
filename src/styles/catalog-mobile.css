@@ -23,8 +23,8 @@
   .clinical-tool-catalog-notice,
   .catalog-section-desc {
     max-width: 100%;
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    overflow-wrap: break-word;
+    word-break: normal;
   }
 
   .catalog-category-chips {
@@ -86,7 +86,7 @@
 
   .catalog-table--stacked td {
     display: grid;
-    grid-template-columns: minmax(72px, 34%) 1fr;
+    grid-template-columns: minmax(72px, 28%) minmax(0, 1fr);
     gap: 6px 12px;
     align-items: start;
     padding: 10px 0;
@@ -109,7 +109,7 @@
     letter-spacing: 0.04em;
     color: var(--text-secondary);
     line-height: 1.4;
-    overflow-wrap: anywhere;
+    overflow-wrap: break-word;
   }
 
   .catalog-table--stacked td.catalog-actions-cell::before {
@@ -145,8 +145,8 @@
     font-size: 12px;
     line-height: 1.45;
     color: var(--text-secondary);
-    overflow-wrap: anywhere;
-    word-break: break-word;
+    overflow-wrap: break-word;
+    word-break: normal;
     max-width: 100%;
   }
 
@@ -200,8 +200,12 @@
   }
 
   .catalog-table--stacked td {
-    grid-template-columns: minmax(60px, 36%) 1fr;
+    grid-template-columns: 1fr;
     gap: 4px 8px;
+  }
+
+  .catalog-table--stacked td::before {
+    margin-bottom: 2px;
   }
 
   .catalog-table--stacked .catalog-actions .catalog-btn {

@@ -53,6 +53,7 @@ services:
     container_name: caredroid-backend
     environment:
       NODE_ENV: ${NODE_ENV:-development}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8000}
       DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-secure123}@postgres:5432/${DB_NAME:-caredroid}
       REDIS_URL: redis://:${REDIS_PASSWORD:-redis123}@redis:6379
       REDIS_HOST: redis
@@ -184,7 +185,7 @@ services:
       dockerfile: Dockerfile
     container_name: caredroid-frontend
     environment:
-      VITE_API_URL: http://localhost:8000/api
+      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
     ports:
       - "5173:5173"
     depends_on:

@@ -26,8 +26,8 @@
   flex-wrap: wrap;
   max-width: 100%;
   min-width: 0;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  overflow-wrap: break-word;
+  word-break: normal;
   line-height: 1.25;
 }
 
@@ -44,8 +44,8 @@
   max-width: 600px;
   margin: 0 auto 32px;
   line-height: 1.6;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .tools-catalog-link-wrap {
@@ -252,8 +252,8 @@
   font-size: 14px;
   font-weight: 600;
   color: var(--text-primary);
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  overflow-wrap: break-word;
+  word-break: normal;
   min-width: 0;
   max-width: 100%;
 }
@@ -291,7 +291,7 @@
   min-width: 0;
   max-width: 100%;
   box-sizing: border-box;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .tool-card-large:hover {
@@ -302,6 +302,7 @@
 .tool-card-header {
   display: flex;
   align-items: flex-start;
+  flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 16px;
   min-width: 0;
@@ -314,6 +315,7 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
+  margin-left: auto;
 }
 
 .tool-card-action {
@@ -355,7 +357,7 @@
 
 .tool-meta {
   flex: 1;
-  min-width: 0;
+  min-width: min(100%, 12rem);
   max-width: 100%;
 }
 
@@ -363,8 +365,8 @@
   font-size: 20px;
   margin-bottom: 6px;
   color: var(--text-primary);
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 .tool-category {
@@ -643,8 +645,8 @@
   font-weight: 600;
   font-size: 15px;
   color: var(--text-primary);
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  overflow-wrap: break-word;
+  word-break: normal;
   max-width: 100%;
   min-width: 0;
 }
@@ -687,6 +689,15 @@
   .tool-card-header,
   .tool-actions {
     align-items: stretch;
+  }
+
+  .tool-card-header {
+    flex-direction: column;
+  }
+
+  .tool-card-actions {
+    justify-content: flex-start;
+    margin-left: 0;
   }
 
   .tool-actions {
