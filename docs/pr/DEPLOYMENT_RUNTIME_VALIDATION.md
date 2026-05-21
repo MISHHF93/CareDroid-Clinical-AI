@@ -4,7 +4,7 @@ Date: 2026-05-20
 
 ## Summary
 
-Status: blocked for live deployed-runtime sign-off because no deployed URL was available in the workspace, no `.vercel` project metadata exists, and neither the Vercel CLI nor GitHub CLI is installed. Local production build validation passed, and deployed-runtime smoke automation was added so the remaining checks can run against the real environment with `QA_BASE_URL`.
+Status: blocked for production sign-off because the latest Vercel deployment failed correctly on missing API configuration, and the currently aliased production deployment returns SPA HTML for `/api/*` requests. Local production build validation passed, deployed-runtime smoke automation was added, and Vercel deployment logs confirm the frontend cannot safely deploy until a backend API origin or verified same-origin proxy exists.
 
 Run the deployed validation with:
 
@@ -31,22 +31,32 @@ QA_BASE_URL=https://your-deployed-spa.example.com QA_AUTH_STATE=e2e/.auth/prod-u
 
 ## Deployment log report
 
-Log retrieval was not possible from this machine:
+Latest deployment inspected:
 
-- `vercel --version` failed because Vercel CLI is not installed.
-- `gh --version` failed because GitHub CLI is not installed.
-- `.vercel/project.json` was not present, so no linked Vercel project metadata was available.
+- Project: `care-droid-clinical-ai`.
+- Failed deployment: `https://care-droid-clinical-pecg12uje-borahmasharai-6115s-projects.vercel.app`.
+- Commit: `a9cf594`.
+- Install step: `npm ci` completed successfully.
+- Build step: `npm run validate:vercel-env && npm run build` stopped before Vite build.
+- Failure: `VITE_API_URL is required for Vercel frontend deploys unless VITE_ALLOW_SAME_ORIGIN_API=true is set for a verified edge proxy.`
+- Output step: no `dist` published for the failed deployment.
+- Runtime warnings: not applicable to the failed deployment; previous aliased deployment remains live.
 
-Required log evidence for final sign-off:
+Current Vercel production environment variables:
 
-- Install step shows `npm ci` succeeded.
-- Build step shows `npm run validate:vercel-env && npm run build` succeeded.
-- Output step published `dist`.
-- Runtime/build logs contain no missing env warnings, asset upload failures, source map policy surprises, or API rewrite warnings.
+- Production env list is empty, including missing `VITE_API_URL`.
+- The production alias still points to the previous ready deployment: `https://care-droid-clinical-ai.vercel.app`.
 
 ## Runtime error report
 
-Live browser runtime was not executed because `QA_BASE_URL` was not available. The new production smoke suite records these failure classes when run against a deployment:
+Live browser runtime was executed against `https://care-droid-clinical-ai.vercel.app` for the homepage smoke. Result: failed because API requests returned HTML from the SPA fallback:
+
+- `GET /api/config/system` returned `200 text/html`.
+- `GET /api/ai/remaining-queries` returned `200 text/html`.
+- `GET /api/tools/available` returned `200 text/html`.
+- `GET /api/subscriptions/current` returned `200 text/html`.
+
+The new production smoke suite records these failure classes when run against a deployment:
 
 - Console errors and page errors.
 - Failed requests.
@@ -56,7 +66,7 @@ Live browser runtime was not executed because `QA_BASE_URL` was not available. T
 - API endpoints returning HTML, which indicates SPA rewrite leakage into API traffic.
 - Horizontal overflow on Android viewport checks.
 
-Local validation results:
+Local and live validation results:
 
 - `npm run validate:vercel-env` passed.
 - `npm run build` passed and produced `dist`.
@@ -64,10 +74,11 @@ Local validation results:
 - `npm run test:e2e:production` failed fast as expected without `QA_BASE_URL`.
 - `QA_BASE_URL=https://example.com npx playwright test e2e/production-smoke.spec.mjs --config=playwright.production.config.mjs --list` passed and listed 42 deployed-runtime checks.
 - `npx eslint e2e/production-smoke.spec.mjs playwright.production.config.mjs` passed.
+- `QA_BASE_URL=https://care-droid-clinical-ai.vercel.app npx playwright test e2e/production-smoke.spec.mjs --config=playwright.production.config.mjs --grep "homepage loads"` failed on `/api/*` HTML responses, confirming the production API routing issue.
 
 ## Android runtime report
 
-Live Android checks were not executed because `QA_BASE_URL` was not available. The added production smoke suite covers these deployed-url combinations:
+Live Android checks were not executed because the homepage smoke already fails on API routing. The added production smoke suite covers these deployed-url combinations once API routing is fixed:
 
 - Pixel 7 portrait and landscape.
 - Pixel 7 Pro portrait and landscape.
@@ -77,11 +88,10 @@ Live Android checks were not executed because `QA_BASE_URL` was not available. T
 
 ## Missing environment report
 
-Live validation inputs missing from this workspace:
+Live validation inputs missing from the deployment:
 
-- `QA_BASE_URL`: required deployed SPA URL for production smoke.
 - `QA_AUTH_STATE` or `QA_AUTH_TOKEN`: required for strict authenticated backend/API smoke.
-- Vercel or CI log access: required for deployment log verification.
+- Backend API origin or same-origin reverse proxy: required before the latest frontend can deploy successfully.
 
 Production frontend variables to verify in Vercel:
 

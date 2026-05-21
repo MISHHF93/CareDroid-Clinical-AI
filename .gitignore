@@ -31,3 +31,4 @@ dist-ssr
 /qa/playwright-responsive-report.json
 /qa/responsive-qa-summary.json
 /e2e/.auth/qa-user.json
+.vercel

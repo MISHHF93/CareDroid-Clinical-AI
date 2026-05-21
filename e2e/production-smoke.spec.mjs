@@ -220,7 +220,7 @@ test.describe('production browser runtime', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/', { waitUntil: 'domcontentloaded' });
     await waitForPublicPage(page);
-    await expect(page.getByRole('heading', { name: /caredroid-clinical-ai/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /caredroid-clinical-ai/i })).toBeVisible();
     await page.waitForLoadState('networkidle', { timeout: 15_000 }).catch(() => {});
 
     await attachAndAssertRuntimeClean(audit, testInfo);
