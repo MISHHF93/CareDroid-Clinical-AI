@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
@@ -106,17 +104,6 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     // Email & Caching
     EmailModule,
     CacheModule,
-
-    // Serve Vite production build when running API in production (npm run start:single)
-    ...(process.env.NODE_ENV === 'production' && !process.env.JEST_WORKER_ID
-      ? [
-          ServeStaticModule.forRoot({
-            rootPath: join(__dirname, '..', '..', 'dist'),
-            exclude: ['/api*', '/health', '/metrics*'],
-            serveRoot: '/',
-          }),
-        ]
-      : []),
 
     // Feature modules
     AuthModule,

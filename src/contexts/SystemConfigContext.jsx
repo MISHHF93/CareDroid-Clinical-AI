@@ -5,11 +5,30 @@
  */
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { useUser } from './UserContext';
 import configService from '../services/configService';
 import logger from '../utils/logger';
 import ApiConfigDegradedBanner from '../components/ApiConfigDegradedBanner';
 
 const SystemConfigContext = createContext();
+
+const DEFAULT_SYSTEM_CONFIG = Object.freeze({
+  rag: { enabled: false, topK: 5, minScore: 0.7 },
+  session: { idleTimeoutMs: 1800000, absoluteTimeoutMs: 28800000 },
+});
+
+const DEFAULT_AI_USAGE = Object.freeze({
+  tier: 'free',
+  dailyLimit: 10,
+  usedToday: 0,
+  remaining: 10,
+  resetAt: new Date(Date.now() + 86400000).toISOString(),
+});
+
+const DEFAULT_SUBSCRIPTION = Object.freeze({
+  tier: 'free',
+  status: 'active',
+});
 
 const stripMeta = (payload) => {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
@@ -20,27 +39,29 @@ const stripMeta = (payload) => {
 };
 
 export function SystemConfigProvider({ children }) {
-  const [systemConfig, setSystemConfig] = useState({
-    rag: { enabled: false, topK: 5, minScore: 0.7 },
-    session: { idleTimeoutMs: 1800000, absoluteTimeoutMs: 28800000 },
-  });
-  const [aiUsage, setAiUsage] = useState({
-    tier: 'free',
-    dailyLimit: 10,
-    usedToday: 0,
-    remaining: 10,
-    resetAt: new Date(Date.now() + 86400000).toISOString(),
-  });
+  const { isAuthenticated, isLoading: isUserLoading } = useUser();
+  const [systemConfig, setSystemConfig] = useState(DEFAULT_SYSTEM_CONFIG);
+  const [aiUsage, setAiUsage] = useState(DEFAULT_AI_USAGE);
   const [availableTools, setAvailableTools] = useState([]);
-  const [subscription, setSubscription] = useState({
-    tier: 'free',
-    status: 'active',
-  });
+  const [subscription, setSubscription] = useState(DEFAULT_SUBSCRIPTION);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [configDegraded, setConfigDegraded] = useState(false);
 
   const loadSystemConfig = useCallback(async () => {
+    if (isUserLoading) return;
+
+    if (!isAuthenticated) {
+      setSystemConfig(DEFAULT_SYSTEM_CONFIG);
+      setAiUsage(DEFAULT_AI_USAGE);
+      setAvailableTools([]);
+      setSubscription(DEFAULT_SUBSCRIPTION);
+      setConfigDegraded(false);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -78,10 +99,10 @@ export function SystemConfigProvider({ children }) {
         setError(messages[0] || 'API configuration unavailable');
       }
 
-      setSystemConfig(config.value || systemConfig);
-      setAiUsage(usage.value || aiUsage);
+      setSystemConfig(config.value || DEFAULT_SYSTEM_CONFIG);
+      setAiUsage(usage.value || DEFAULT_AI_USAGE);
       setAvailableTools(tools.value?.tools ?? tools.value ?? []);
-      setSubscription(sub.value || { tier: 'free', status: 'active' });
+      setSubscription(sub.value || DEFAULT_SUBSCRIPTION);
     } catch (err) {
       logger.warn('Failed to load system config (using defaults)', { message: err.message });
       setError(err.message);
@@ -89,10 +110,16 @@ export function SystemConfigProvider({ children }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated, isUserLoading]);
 
   useEffect(() => {
     loadSystemConfig();
+  }, [loadSystemConfig]);
+
+  useEffect(() => {
+    if (isUserLoading || !isAuthenticated || loading || configDegraded) {
+      return undefined;
+    }
 
     const interval = setInterval(async () => {
       const usageRaw = await configService.getAIRemainingQueries();
@@ -101,7 +128,7 @@ export function SystemConfigProvider({ children }) {
     }, 5 * 60 * 1000);
 
     return () => clearInterval(interval);
-  }, [loadSystemConfig]);
+  }, [configDegraded, isAuthenticated, isUserLoading, loading]);
 
   const value = {
     systemConfig,

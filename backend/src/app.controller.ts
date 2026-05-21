@@ -1,7 +1,5 @@
-import { Controller, Get, Res } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Response } from 'express';
-import { join } from 'path';
 
 @Controller()
 export class AppController {
@@ -33,16 +31,5 @@ export class AppController {
         absoluteTimeoutMs: authConfig.sessionConfig?.absoluteTimeout || 28800000, // 8 hours
       },
     };
-  }
-
-  @Get()
-  getRoot(@Res() res: Response) {
-    return res.sendFile(join(__dirname, '..', '..', 'public', 'index.html'));
-  }
-
-  // Frontend SPA routes (single-port deployment)
-  @Get('*')
-  getSpaRoutes(@Res() res: Response) {
-    return res.sendFile(join(__dirname, '..', '..', 'public', 'index.html'));
   }
 }

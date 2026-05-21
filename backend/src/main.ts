@@ -3,10 +3,67 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
+import * as express from 'express';
+import { join } from 'path';
 import * as Sentry from '@sentry/node';
 import { AppModule } from './app.module';
 import { initSentry } from './config/sentry.config';
 import { LoggingMiddleware } from './middleware/logging.middleware';
+import { SWAGGER_DOCS_PATH } from './server-routes';
+import {
+  resolveFrontendDistPath,
+  resolveFrontendIndexPath,
+  STATIC_ASSET_RENDER_PATH,
+} from './static-asset-excludes';
+
+function shouldServeFrontendAssets() {
+  return process.env.NODE_ENV === 'production' && !process.env.JEST_WORKER_ID;
+}
+
+function registerProductionFrontendAssets(app: Awaited<ReturnType<typeof NestFactory.create>>) {
+  const frontendDistPath = resolveFrontendDistPath(__dirname);
+  const frontendIndexPath = resolveFrontendIndexPath(__dirname);
+
+  app.use('/assets', express.static(join(frontendDistPath, 'assets'), { index: false }));
+  app.use('/vite.svg', (req, res, next) => {
+    if (!['GET', 'HEAD'].includes(req.method)) {
+      next();
+      return;
+    }
+
+    res.sendFile(join(frontendDistPath, 'vite.svg'));
+  });
+  app.use((req, res, next) => {
+    const requestPaths = [
+      req.originalUrl,
+      `${req.baseUrl || ''}${req.url || ''}`,
+      req.url,
+      req.path,
+    ]
+      .filter(Boolean)
+      .map((path) => path.split('?')[0]);
+    const isOperationalRoute = requestPaths.some(
+      (path) =>
+        path === '/api' ||
+        path.startsWith('/api/') ||
+        path === '/health' ||
+        path === '/metrics' ||
+        path.startsWith('/metrics/'),
+    );
+    const requestPath = requestPaths[0] || '/';
+
+    if (
+      isOperationalRoute ||
+      !['GET', 'HEAD'].includes(req.method) ||
+      !STATIC_ASSET_RENDER_PATH.test(requestPath)
+    ) {
+      next();
+      return;
+    }
+
+    res.sendFile(frontendIndexPath);
+  });
+}
 
 async function bootstrap() {
   // Initialize Sentry for error tracking BEFORE creating the app
@@ -87,6 +144,10 @@ async function bootstrap() {
     }),
   );
 
+  if (shouldServeFrontendAssets()) {
+    registerProductionFrontendAssets(app);
+  }
+
   // API prefix (health and root endpoints will be at /)
   app.setGlobalPrefix('api', { exclude: ['health', ''] });
 
@@ -106,13 +167,13 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup(SWAGGER_DOCS_PATH, app, document);
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
 
   console.log(`\n🚀 CareDroid Backend running on: http://localhost:${port}`);
-  console.log(`📚 Swagger docs available at: http://localhost:${port}/api`);
+  console.log(`📚 Swagger docs available at: http://localhost:${port}/${SWAGGER_DOCS_PATH}`);
   console.log(`📊 Prometheus metrics at: http://localhost:${port}/metrics`);
   console.log(`🔐 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔒 TLS 1.3: ENFORCED (only TLS 1.3+ allowed)`);
