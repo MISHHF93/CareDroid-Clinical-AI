@@ -1,0 +1,131 @@
+import { describe, expect, it } from 'vitest';
+import { BACKEND_API_CAPABILITIES } from '../config/backendApiCapabilities';
+import { BACKEND_HTTP_ROUTES } from '../data/backendHttpRouteInventory';
+import {
+  CHAT_SENSITIVE_CONFIRMATIONS,
+  getChatCapabilitySuggestions,
+  suggestionIds,
+} from './chatCapabilitySuggestions';
+
+const allowAll = () => true;
+const denyAll = () => false;
+
+function withoutRoutes(paths) {
+  return BACKEND_HTTP_ROUTES.filter((route) => !paths.includes(route.path));
+}
+
+describe('chat capability suggestions', () => {
+  it('shows only registered POST tool executors as executable suggestions', () => {
+    const suggestions = getChatCapabilitySuggestions({ hasPermission: allowAll });
+    const executorSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'executor');
+
+    expect(executorSuggestions.map((suggestion) => suggestion.executorId).sort()).toEqual([
+      'drug-interactions',
+      'lab-interpreter',
+      'sofa-calculator',
+    ]);
+    expect(executorSuggestions.every((suggestion) => suggestion.source.includes('/api/tools'))).toBe(true);
+  });
+
+  it('hides tool executor suggestions when execution capability is disabled', () => {
+    const suggestions = getChatCapabilitySuggestions({
+      capabilities: { ...BACKEND_API_CAPABILITIES, toolsExecute: false },
+      hasPermission: allowAll,
+    });
+
+    expect(suggestions.some((suggestion) => suggestion.kind === 'executor')).toBe(false);
+  });
+
+  it('hides notification actions when notification REST capability is disabled', () => {
+    const enabled = suggestionIds(getChatCapabilitySuggestions({ hasPermission: allowAll }));
+    const disabled = suggestionIds(
+      getChatCapabilitySuggestions({
+        capabilities: { ...BACKEND_API_CAPABILITIES, notificationsRest: false },
+        hasPermission: allowAll,
+      })
+    );
+
+    expect(enabled).toContain('notification-preferences');
+    expect(disabled).not.toContain('notification-preferences');
+  });
+
+  it('hides compliance export when the export capability or route is missing', () => {
+    const enabled = suggestionIds(getChatCapabilitySuggestions({ hasPermission: allowAll }));
+    const capabilityDisabled = suggestionIds(
+      getChatCapabilitySuggestions({
+        capabilities: { ...BACKEND_API_CAPABILITIES, complianceExport: false },
+        hasPermission: allowAll,
+      })
+    );
+    const routeMissing = suggestionIds(
+      getChatCapabilitySuggestions({
+        routes: withoutRoutes(['/api/compliance/export']),
+        hasPermission: allowAll,
+      })
+    );
+
+    expect(enabled).toContain('data-export');
+    expect(capabilityDisabled).not.toContain('data-export');
+    expect(routeMissing).not.toContain('data-export');
+  });
+
+  it('requires audit permission and route before showing audit suggestions', () => {
+    const enabled = suggestionIds(getChatCapabilitySuggestions({ hasPermission: allowAll }));
+    const permissionDenied = suggestionIds(getChatCapabilitySuggestions({ hasPermission: denyAll }));
+    const routeMissing = suggestionIds(
+      getChatCapabilitySuggestions({
+        routes: withoutRoutes(['/api/audit/logs']),
+        hasPermission: allowAll,
+      })
+    );
+
+    expect(enabled).toContain('audit-logs');
+    expect(permissionDenied).not.toContain('audit-logs');
+    expect(routeMissing).not.toContain('audit-logs');
+  });
+
+  it('shows billing only when the subscription routes exist', () => {
+    const enabled = suggestionIds(getChatCapabilitySuggestions({ hasPermission: allowAll }));
+    const routeMissing = suggestionIds(
+      getChatCapabilitySuggestions({
+        routes: withoutRoutes([
+          '/api/subscriptions/current',
+          '/api/subscriptions/plans',
+          '/api/subscriptions/portal',
+        ]),
+        hasPermission: allowAll,
+      })
+    );
+
+    expect(enabled).toContain('billing-account');
+    expect(routeMissing).not.toContain('billing-account');
+  });
+
+  it('prioritizes context-matching real capabilities', () => {
+    const suggestions = getChatCapabilitySuggestions({
+      input: 'I need billing and subscription help',
+      hasPermission: allowAll,
+    });
+
+    expect(suggestions[0].id).toBe('billing-account');
+  });
+
+  it('marks sensitive Chat actions with confirmation details', () => {
+    const suggestions = getChatCapabilitySuggestions({ hasPermission: allowAll });
+    const byId = Object.fromEntries(suggestions.map((suggestion) => [suggestion.id, suggestion]));
+
+    for (const id of [
+      'follow-up-planning',
+      'audit-logs',
+      'data-export',
+      'notification-preferences',
+      'billing-account',
+    ]) {
+      expect(byId[id].confirmation).toEqual(CHAT_SENSITIVE_CONFIRMATIONS[id]);
+      expect(byId[id].confirmation.whatWillHappen).toBeTruthy();
+      expect(byId[id].confirmation.affectedData).toBeTruthy();
+      expect(byId[id].confirmation.reversible).toBeTruthy();
+      expect(byId[id].confirmation.authRequirement).toBeTruthy();
+    }
+  });
+});

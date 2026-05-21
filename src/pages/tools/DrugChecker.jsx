@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useUser } from '../../contexts/UserContext';
 import analyticsService from '../../services/analyticsService';
 import offlineService from '../../services/offlineService';
 import { executeClinicalTool } from '../../services/clinicalOrchestratorApi';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
+import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
 import ToolPageLayout from './ToolPageLayout';
 import './DrugChecker.css';
 
@@ -46,6 +47,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
   const [isChecking, setIsChecking] = useState(false);
   const [error, setError] = useState(null);
   const [unsupported, setUnsupported] = useState(false);
+  const [preflightReady, setPreflightReady] = useState(false);
 
   const toolConfig = {
     id: 'drug-check',
@@ -56,6 +58,15 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
     shortcut: 'Ctrl+1',
     category: 'Diagnostic'
   };
+
+  const activeMeds = useMemo(() => medications.map((m) => m.trim()).filter(Boolean), [medications]);
+  const preflightParameters = useMemo(
+    () => ({
+      medications: activeMeds,
+      severityFilter: 'all',
+    }),
+    [activeMeds]
+  );
 
   const handleAddMedication = () => {
     setMedications([...medications, '']);
@@ -73,8 +84,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
   };
 
   const handleCheck = async () => {
-    const activeMeds = medications.filter(m => m.trim());
-    if (activeMeds.length < 2) {
+    if (!preflightReady || activeMeds.length < 2) {
       alert('Please enter at least 2 medications to check for interactions');
       return;
     }
@@ -179,6 +189,18 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
             ))}
           </div>
 
+          <ToolPreflightStatus
+            toolId="drug-interactions"
+            parameters={preflightParameters}
+            requiredInputs={[
+              {
+                label: 'At least 2 medication names',
+                present: activeMeds.length >= 2,
+              },
+            ]}
+            onReadyChange={setPreflightReady}
+          />
+
           <div className="input-actions">
             <button className="btn-add-med" onClick={handleAddMedication}>
               + Add Another Medication
@@ -186,7 +208,7 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
             <button 
               className="btn-check-interactions" 
               onClick={handleCheck}
-              disabled={isChecking || medications.filter(m => m.trim()).length < 2}
+              disabled={isChecking || !preflightReady}
             >
               {isChecking ? '🔄 Checking...' : '🔍 Check Interactions'}
             </button>

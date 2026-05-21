@@ -25,6 +25,12 @@ vi.mock('../components/ToolApiErrorBanner.css', () => ({}));
 const mockExecuteClinicalTool = vi.fn();
 vi.mock('../services/clinicalOrchestratorApi', () => ({
   executeClinicalTool: (...args) => mockExecuteClinicalTool(...args),
+  classifyOrchestratorExecution: (toolId) => ({
+    status: 'executable',
+    requestedId: toolId,
+    nluToolId: toolId,
+    message: `POST /api/tools/${toolId}/execute`,
+  }),
 }));
 
 const mockApiFetch = vi.fn();
@@ -72,6 +78,27 @@ vi.mock('../contexts/WorkspaceContext', () => ({
 
 vi.mock('../services/clinicalToolsApi', () => ({
   fetchBackendClinicalTools: vi.fn().mockResolvedValue({ ok: true, tools: [] }),
+  fetchClinicalToolMetadata: vi.fn((toolId) =>
+    Promise.resolve({
+      ok: true,
+      data: { id: toolId, name: toolId, parameters: [] },
+    })
+  ),
+  fetchToolStatistics: vi.fn().mockResolvedValue({
+    ok: true,
+    data: {
+      totalTools: 3,
+      tools: [
+        { id: 'drug-interactions', name: 'Drug interactions', category: 'diagnostic' },
+        { id: 'lab-interpreter', name: 'Lab interpreter', category: 'diagnostic' },
+        { id: 'sofa-calculator', name: 'SOFA calculator', category: 'calculator' },
+      ],
+    },
+  }),
+  validateClinicalTool: vi.fn().mockResolvedValue({
+    ok: true,
+    data: { valid: true, errors: [], warnings: [], resolvedToolId: 'test-tool' },
+  }),
 }));
 
 function renderAt(path, element) {
@@ -97,7 +124,7 @@ describe('toolRenderExecuteSmoke — clinical pages non-empty', () => {
     ['/tools/protocols', Protocols, /search for a protocol/i],
     ['/tools/diagnosis', DiagnosisAssistant, /patient presentation/i],
     ['/tools/procedures', ProcedureGuide, /search for a procedure/i],
-    ['/tools', ToolsOverview, /one launchable catalog/i],
+    ['/tools', ToolsOverview, /action library/i],
   ])('%s renders primary UI', async (path, Page, matcher) => {
     const { container } = renderAt(path, <Page />);
     expect(await screen.findByText(matcher)).toBeInTheDocument();
@@ -122,7 +149,9 @@ describe('toolRenderExecuteSmoke — Tier C executor', () => {
     const inputs = screen.getAllByPlaceholderText(/medication name/i);
     fireEvent.change(inputs[0], { target: { value: 'Warfarin' } });
     fireEvent.change(inputs[1], { target: { value: 'Aspirin' } });
-    fireEvent.click(screen.getByRole('button', { name: /check interactions/i }));
+    const checkButton = screen.getByRole('button', { name: /check interactions/i });
+    await waitFor(() => expect(checkButton).not.toBeDisabled());
+    fireEvent.click(checkButton);
 
     await waitFor(() => {
       expect(mockExecuteClinicalTool).toHaveBeenCalledWith(
@@ -145,7 +174,9 @@ describe('toolRenderExecuteSmoke — Tier C executor', () => {
     const inputs = screen.getAllByPlaceholderText(/medication name/i);
     fireEvent.change(inputs[0], { target: { value: 'A' } });
     fireEvent.change(inputs[1], { target: { value: 'B' } });
-    fireEvent.click(screen.getByRole('button', { name: /check interactions/i }));
+    const checkButton = screen.getByRole('button', { name: /check interactions/i });
+    await waitFor(() => expect(checkButton).not.toBeDisabled());
+    fireEvent.click(checkButton);
 
     expect(await screen.findByText(/not available|unable/i)).toBeInTheDocument();
   });
@@ -159,7 +190,9 @@ describe('toolRenderExecuteSmoke — Tier C executor', () => {
 
     renderAt('/tools/lab-interpreter', <LabInterpreter />);
     fireEvent.click(screen.getByRole('button', { name: /load example/i }));
-    fireEvent.click(screen.getByRole('button', { name: /interpret lab values/i }));
+    const interpretButton = screen.getByRole('button', { name: /interpret lab values/i });
+    await waitFor(() => expect(interpretButton).not.toBeDisabled());
+    fireEvent.click(interpretButton);
 
     await waitFor(() => {
       expect(mockExecuteClinicalTool).toHaveBeenCalledWith('lab-interpreter', expect.any(Object));
@@ -179,7 +212,10 @@ describe('toolRenderExecuteSmoke — Tier C executor', () => {
         <Calculators initialCalculatorId="sofa" />
       </MemoryRouter>
     );
-    fireEvent.click(screen.getByRole('button', { name: /calculate sofa score/i }));
+    fireEvent.change(screen.getByPlaceholderText('150'), { target: { value: '120' } });
+    const calculateButton = screen.getByRole('button', { name: /calculate sofa score/i });
+    await waitFor(() => expect(calculateButton).not.toBeDisabled());
+    fireEvent.click(calculateButton);
 
     await waitFor(() => {
       expect(mockExecuteClinicalTool).toHaveBeenCalledWith('sofa-calculator', expect.any(Object));

@@ -78,8 +78,8 @@ export class NotificationController {
   @Delete('devices/:token')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove device token' })
-  async removeDevice(@Request() req, @Param('token') token: string) {
-    await this.deviceTokenService.removeDeviceToken(req.user.id, token);
+  async removeDevice(@Request() req, @Param('token') tokenOrDeviceId: string) {
+    await this.deviceTokenService.removeDeviceToken(req.user.id, tokenOrDeviceId);
     return { success: true };
   }
 

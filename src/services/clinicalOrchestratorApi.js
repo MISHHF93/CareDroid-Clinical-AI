@@ -10,7 +10,7 @@ import { parseToolExecutionResponse } from '../utils/toolExecutionResponse';
 /**
  * @param {string} toolId - NLU or registry id
  * @param {Record<string, unknown>} parameters
- * @param {{ authToken?: string|null, userId?: string|number }} [options]
+ * @param {{ authToken?: string|null, userId?: string|number, conversationId?: string|number }} [options]
  */
 export async function executeClinicalTool(toolId, parameters, options = {}) {
   const classification = classifyOrchestratorExecution(toolId);
@@ -46,6 +46,9 @@ export async function executeClinicalTool(toolId, parameters, options = {}) {
   const body = { parameters: parameters ?? {} };
   if (options.userId != null) {
     body.userId = options.userId;
+  }
+  if (options.conversationId != null) {
+    body.conversationId = String(options.conversationId);
   }
 
   try {

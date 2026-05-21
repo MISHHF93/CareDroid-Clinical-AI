@@ -41,6 +41,8 @@ interface ChatResponse3DDto {
 
 interface ChatResponseDto {
   response: string;
+  suggestions?: string[];
+  visualizations?: any[];
   toolResult?: {
     toolName: string;
     toolId?: string;
@@ -109,6 +111,8 @@ export class ChatController {
 
     return {
       response: response.text,
+      suggestions: response.suggestions,
+      visualizations: response.visualizations,
       toolResult: response.toolResult,
       citations: response.citations,
       confidence: response.confidence,

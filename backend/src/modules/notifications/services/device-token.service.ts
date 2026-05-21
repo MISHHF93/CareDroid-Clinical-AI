@@ -114,15 +114,19 @@ export class DeviceTokenService {
   /**
    * Remove a device token completely
    */
-  async removeDeviceToken(userId: string, token: string): Promise<void> {
-    const result = await this.deviceTokenRepository.delete({
-      user: { id: userId },
-      token,
+  async removeDeviceToken(userId: string, tokenOrDeviceId: string): Promise<void> {
+    const deviceToken = await this.deviceTokenRepository.findOne({
+      where: [
+        { user: { id: userId }, token: tokenOrDeviceId },
+        { user: { id: userId }, id: tokenOrDeviceId },
+      ],
     });
 
-    if (result.affected === 0) {
+    if (!deviceToken) {
       throw new NotFoundException('Device token not found');
     }
+
+    await this.deviceTokenRepository.delete({ id: deviceToken.id });
 
     this.logger.log(`Removed device token for user ${userId}`);
   }

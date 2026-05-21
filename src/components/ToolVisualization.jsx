@@ -1,4 +1,5 @@
 import React from 'react';
+import OperationalResultCard from './chat/OperationalResultCard';
 import './ToolVisualization.css';
 
 const renderKeyValue = (data) => (
@@ -65,6 +66,27 @@ const ToolVisualization = ({ visualization }) => {
           <h4>Vitals Snapshot</h4>
           {renderKeyValue(data || {})}
         </div>
+      );
+    case 'tool-preview':
+      return (
+        <div className="viz-card">
+          <h4>Tool Preview</h4>
+          <div>
+            {data?.toolName || data?.toolId || 'This tool needs more input before it can execute.'}
+          </div>
+        </div>
+      );
+    case 'tool-result':
+      return (
+        <OperationalResultCard
+          toolResult={{
+            toolId: data?.toolId,
+            toolName: data?.toolName,
+            parameters: data?.parameters,
+            result: data?.result,
+          }}
+          parameters={data?.parameters}
+        />
       );
     case 'anomaly-detection':
       return (

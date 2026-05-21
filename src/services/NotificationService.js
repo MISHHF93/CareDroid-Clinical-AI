@@ -4,7 +4,7 @@
  * Service for managing notification-related API calls and browser notifications
  */
 
-import { apiFetch, buildStreamUrl, getStoredAccessToken } from './apiClient';
+import { apiFetch, buildStreamUrl, getApiErrorMessage, getStoredAccessToken, parseApiResponse } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import appConfig from '../config/appConfig';
 import { getFirebaseMessagingToken } from './firebaseClient';
@@ -111,6 +111,104 @@ export const NotificationService = {
   },
 
   /**
+   * Fetch server-side unread notification count.
+   */
+  async getUnreadCount() {
+    try {
+      const response = await apiFetch('/api/notifications/unread/count', {
+        headers: {
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
+        },
+      });
+      const data = await parseApiResponse(response, { fallback: {} });
+
+      if (!response.ok) {
+        throw new Error(data?.message || getApiErrorMessage(null, response));
+      }
+
+      return data.count ?? 0;
+    } catch (error) {
+      logger.error('Error fetching unread notification count', { error });
+      throw error;
+    }
+  },
+
+  /**
+   * Mark all current-user notifications as read.
+   */
+  async markAllAsRead() {
+    try {
+      const response = await apiFetch('/api/notifications/read-all', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
+        },
+      });
+      const data = await parseApiResponse(response, { fallback: {} });
+
+      if (!response.ok) {
+        throw new Error(data?.message || getApiErrorMessage(null, response));
+      }
+
+      return data;
+    } catch (error) {
+      logger.error('Error marking all notifications as read', { error });
+      throw error;
+    }
+  },
+
+  /**
+   * Fetch registered notification devices for the current user.
+   */
+  async fetchDevices() {
+    try {
+      const response = await apiFetch('/api/notifications/devices', {
+        headers: {
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
+        },
+      });
+      const data = await parseApiResponse(response, { fallback: {} });
+
+      if (!response.ok) {
+        throw new Error(data?.message || getApiErrorMessage(null, response));
+      }
+
+      return Array.isArray(data.devices) ? data.devices : [];
+    } catch (error) {
+      logger.error('Error fetching notification devices', { error });
+      throw error;
+    }
+  },
+
+  /**
+   * Remove or disable a registered notification device via the existing device delete route.
+   */
+  async removeDevice(deviceIdentifier) {
+    if (!deviceIdentifier) {
+      throw new Error('Device identifier is required.');
+    }
+
+    try {
+      const response = await apiFetch(`/api/notifications/devices/${encodeURIComponent(deviceIdentifier)}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
+        },
+      });
+
+      if (!response.ok) {
+        const data = await parseApiResponse(response, { fallback: {} });
+        throw new Error(data?.message || getApiErrorMessage(null, response));
+      }
+
+      return true;
+    } catch (error) {
+      logger.error('Error removing notification device', { error });
+      throw error;
+    }
+  },
+
+  /**
    * Mark notification as read
    */
   async markAsRead(notificationId) {
@@ -199,6 +297,32 @@ export const NotificationService = {
       return await response.json();
     } catch (error) {
       logger.error('Error updating preferences', { error });
+      throw error;
+    }
+  },
+
+  /**
+   * Enable or disable all notification preferences using the backend bulk route.
+   */
+  async toggleAllNotifications(enabled) {
+    try {
+      const response = await apiFetch('/api/notifications/preferences/toggle-all', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getStoredAccessToken()}`,
+        },
+        body: JSON.stringify({ enabled: Boolean(enabled) }),
+      });
+      const data = await parseApiResponse(response, { fallback: {} });
+
+      if (!response.ok) {
+        throw new Error(data?.message || getApiErrorMessage(null, response));
+      }
+
+      return data;
+    } catch (error) {
+      logger.error('Error toggling notification preferences', { error });
       throw error;
     }
   },

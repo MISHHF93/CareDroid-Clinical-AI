@@ -84,3 +84,54 @@ export async function fetchConsentStatus() {
     return { ok: false, message: getApiErrorMessage(error) };
   }
 }
+
+export async function requestComplianceDataExport() {
+  if (!isBackendCapabilityEnabled('complianceExport')) {
+    return {
+      ok: false,
+      unavailable: true,
+      message: 'Data export is not configured on this server.',
+    };
+  }
+
+  try {
+    const response = await apiFetch('/api/compliance/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    const data = await parseApiResponse(response, { fallback: {} });
+    if (!response.ok) {
+      return {
+        ok: false,
+        unavailable: false,
+        message: data?.message || getApiErrorMessage(null, response),
+        raw: data,
+      };
+    }
+    return { ok: true, data };
+  } catch (error) {
+    return { ok: false, unavailable: false, message: getApiErrorMessage(error) };
+  }
+}
+
+export async function requestComplianceAccountDeletion(confirmEmail) {
+  try {
+    const response = await apiFetch('/api/compliance/delete-account', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ confirmEmail }),
+    });
+    const data = await parseApiResponse(response, { fallback: {} });
+    if (!response.ok) {
+      return {
+        ok: false,
+        unavailable: false,
+        message: data?.message || getApiErrorMessage(null, response),
+        raw: data,
+      };
+    }
+    return { ok: true, data };
+  } catch (error) {
+    return { ok: false, unavailable: false, message: getApiErrorMessage(error) };
+  }
+}

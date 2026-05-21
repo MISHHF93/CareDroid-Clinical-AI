@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import './LabInterpreter.css';
 import { executeClinicalTool } from '../../services/clinicalOrchestratorApi';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
+import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getLabCategoryIcon, getToolIcon } from '../../navigation/iconRegistry';
 
@@ -26,6 +27,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [unsupported, setUnsupported] = useState(false);
+  const [preflightReady, setPreflightReady] = useState(false);
 
   const commonLabs = [
     { name: 'WBC', unit: 'K/μL' },
@@ -49,6 +51,16 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
     { name: 'PTT', unit: 'seconds' },
   ];
 
+  const preflightParameters = useMemo(
+    () => ({
+      labValues,
+      ...(patientAge && { patientAge: parseInt(patientAge) }),
+      ...(patientSex && { patientSex }),
+      ...(clinicalContext && { clinicalContext }),
+    }),
+    [clinicalContext, labValues, patientAge, patientSex]
+  );
+
   const handleAddLab = () => {
     if (!currentLab.name || !currentLab.value) return;
 
@@ -69,21 +81,14 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
   };
 
   const handleInterpret = async () => {
-    if (labValues.length === 0) return;
+    if (!preflightReady || labValues.length === 0) return;
 
     setLoading(true);
     setError(null);
     setUnsupported(false);
 
     try {
-      const parameters = {
-        labValues,
-        ...(patientAge && { patientAge: parseInt(patientAge) }),
-        ...(patientSex && { patientSex }),
-        ...(clinicalContext && { clinicalContext }),
-      };
-
-      const execution = await executeClinicalTool('lab-interpreter', parameters);
+      const execution = await executeClinicalTool('lab-interpreter', preflightParameters);
       if (execution.unsupported) {
         setUnsupported(true);
         setError(execution.message);
@@ -266,13 +271,25 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
             </div>
           )}
 
+          <ToolPreflightStatus
+            toolId="lab-interpreter"
+            parameters={preflightParameters}
+            requiredInputs={[
+              {
+                label: 'At least 1 lab value',
+                present: labValues.length > 0,
+              },
+            ]}
+            onReadyChange={setPreflightReady}
+          />
+
           {/* Action Buttons */}
           <div className="lab-action-buttons">
             <button
               type="button"
               className="lab-interpret-button"
               onClick={handleInterpret}
-              disabled={labValues.length === 0 || loading}
+              disabled={!preflightReady || loading}
             >
               {loading ? (
                 <>

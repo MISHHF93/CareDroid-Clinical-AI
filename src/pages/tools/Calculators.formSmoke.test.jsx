@@ -34,6 +34,26 @@ vi.mock('../../services/clinicalOrchestratorApi', () => ({
     ok: true,
     data: { totalScore: 0, score: 0, severity: 'low' },
   }),
+  classifyOrchestratorExecution: (toolId) => ({
+    status: 'executable',
+    requestedId: toolId,
+    nluToolId: toolId,
+    message: `POST /api/tools/${toolId}/execute`,
+  }),
+}));
+
+vi.mock('../../services/clinicalToolsApi', () => ({
+  fetchClinicalToolMetadata: vi.fn((toolId) =>
+    Promise.resolve({ ok: true, data: { id: toolId, name: toolId, parameters: [] } })
+  ),
+  fetchToolStatistics: vi.fn().mockResolvedValue({
+    ok: true,
+    data: { totalTools: 3, tools: [{ id: 'sofa-calculator', name: 'SOFA', category: 'calculator' }] },
+  }),
+  validateClinicalTool: vi.fn().mockResolvedValue({
+    ok: true,
+    data: { valid: true, errors: [], warnings: [], resolvedToolId: 'sofa-calculator' },
+  }),
 }));
 
 function renderCalculator(slug) {

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
@@ -79,6 +79,7 @@ import {
 import { Abcd2Calculator } from './abcd2Calculator';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
+import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
 
 // Hub cards still derive from builtinUiCalculators.map inside buildBuiltinHubCalculatorCards().
 const CALCULATORS = buildBuiltinHubCalculatorCards();
@@ -2351,6 +2352,7 @@ const SOFACalculator = ({ onResultChange }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [unsupported, setUnsupported] = useState(false);
+  const [preflightReady, setPreflightReady] = useState(false);
 
   useEffect(() => {
     if (onResultChange) {
@@ -2358,20 +2360,31 @@ const SOFACalculator = ({ onResultChange }) => {
     }
   }, [onResultChange, result]);
 
+  const sofaParameters = useMemo(
+    () =>
+      Object.entries(inputs).reduce((acc, [key, value]) => {
+        if (value !== '' && value !== false) {
+          if (typeof value === 'string') {
+            const parsedValue = parseFloat(value);
+            acc[key] = Number.isNaN(parsedValue) ? value : parsedValue;
+          } else {
+            acc[key] = value;
+          }
+        }
+        return acc;
+      }, {}),
+    [inputs]
+  );
+  const hasAnySofaInput = Object.keys(sofaParameters).length > 0;
+
   const handleCalculate = async () => {
+    if (!preflightReady) return;
     setLoading(true);
     setError(null);
     setUnsupported(false);
 
     try {
-      const parameters = Object.entries(inputs).reduce((acc, [key, value]) => {
-        if (value !== '' && value !== false) {
-          acc[key] = typeof value === 'string' ? parseFloat(value) || value : value;
-        }
-        return acc;
-      }, {});
-
-      const execution = await executeClinicalTool('sofa-calculator', parameters);
+      const execution = await executeClinicalTool('sofa-calculator', sofaParameters);
       if (execution.unsupported) {
         setUnsupported(true);
         setError(execution.message);
@@ -2603,11 +2616,23 @@ const SOFACalculator = ({ onResultChange }) => {
         </div>
 
         {/* Actions */}
+        <ToolPreflightStatus
+          toolId="sofa-calculator"
+          parameters={sofaParameters}
+          requiredInputs={[
+            {
+              label: 'At least 1 SOFA clinical parameter',
+              present: hasAnySofaInput,
+            },
+          ]}
+          onReadyChange={setPreflightReady}
+        />
+
         <div className="calc-actions">
           <button
             className="calc-calculate-btn"
             onClick={handleCalculate}
-            disabled={loading}
+            disabled={loading || !preflightReady}
           >
             {loading ? (
               <>

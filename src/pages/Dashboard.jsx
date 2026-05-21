@@ -7,13 +7,23 @@ import { useNotificationActions } from '../hooks/useNotificationActions';
 import { toolRegistryById, getToolById } from '../data/toolRegistry';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import ToolVisualization from '../components/ToolVisualization';
-import ToolCard from '../components/ToolCard';
+import ChatExecutionCard from '../components/chat/ChatExecutionCard';
+import OperationalResultCard from '../components/chat/OperationalResultCard';
 import Citations, { CitationModal } from '../components/Citations';
 import ConfidenceBadge from '../components/ConfidenceBadge';
 import { Drawer } from '../components/ui/Drawer';
 import analyticsService from '../services/analyticsService';
-import { getToolRecommendationsNLU, recordRecommendationFeedback } from '../utils/toolRecommendations';
-import { scheduleIdleWork } from '../utils/scheduleIdleWork';
+import { validateClinicalTool } from '../services/clinicalToolsApi';
+import { executeClinicalTool } from '../services/clinicalOrchestratorApi';
+import {
+  CHAT_SENSITIVE_CONFIRMATIONS,
+  getChatCapabilitySuggestions,
+} from '../utils/chatCapabilitySuggestions';
+import {
+  buildExecutionParameters,
+  createChatExecutionAction,
+  getExecutionInputIssue,
+} from '../utils/chatExecutionModel';
 import {
   sendClinicalChatMessage,
   mapChatResponseToAssistantMessage,
@@ -23,25 +33,106 @@ import { NavIcon } from '../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../navigation/iconRegistry';
 import './Dashboard.css';
 
+const OUTREACH_INTENTS = Object.freeze([
+  {
+    id: 'follow-up',
+    label: 'Follow-up',
+    description: 'Plan a clinician-reviewed post-visit or post-discharge check-in.',
+  },
+  {
+    id: 'patient outreach',
+    label: 'Patient outreach',
+    description: 'Draft a patient-safe message plan for manual outreach.',
+  },
+  {
+    id: 'care reminder',
+    label: 'Care reminder',
+    description: 'Prepare reminder wording for appointments, labs, or next steps.',
+  },
+  {
+    id: 'general message planning',
+    label: 'General message planning',
+    description: 'Structure a non-sending communication plan for review.',
+  },
+]);
+
+const OUTREACH_DRAFT_INITIAL_STATE = Object.freeze({
+  status: 'idle',
+  content: '',
+  error: '',
+  assistantMessage: null,
+  prompt: '',
+});
+
 const OUTREACH_INITIAL_FORM = {
+  intent: OUTREACH_INTENTS[0].id,
   target: '',
   reason: '',
   timing: 'within 48 hours',
   context: '',
 };
 
-function buildOutreachChatPrompt({ target, reason, timing, context }) {
+const CHAT_EMPTY_ACTIONS = Object.freeze([
+  {
+    title: 'Check medication safety',
+    body: 'Collect medications, preview the backend request, then run the registered interaction checker.',
+    prompt: 'Check for drug interactions between ',
+    toolId: 'drug-check',
+    icon: CHROME_ICONS.shield,
+    kind: 'executor',
+  },
+  {
+    title: 'Interpret labs',
+    body: 'Enter lab values, preview the payload, then run the backend lab interpreter.',
+    prompt: 'Interpret these lab results and flag critical values:',
+    toolId: 'lab-interp',
+    icon: CHROME_ICONS.microscope,
+    kind: 'executor',
+  },
+  {
+    title: 'Calculate SOFA',
+    body: 'Collect available organ-system inputs and execute the SOFA calculator with confirmation.',
+    prompt: 'Help me calculate a SOFA score using available ICU data.',
+    toolId: 'sofa-score',
+    icon: CHROME_ICONS.calculator,
+    kind: 'executor',
+  },
+  {
+    title: 'Plan outreach',
+    body: 'Draft a follow-up plan for clinician review. Chat will not send or schedule anything.',
+    prompt: 'Create a patient follow-up outreach plan for ',
+    workflow: 'outreach',
+    icon: CHROME_ICONS.messageCircle,
+    kind: 'guided',
+  },
+  {
+    title: 'Think through a case',
+    body: 'Use free text for clinical reasoning, citations, and next-step suggestions.',
+    prompt: 'Help me think through this patient presentation:',
+    icon: CHROME_ICONS.stethoscope,
+    kind: 'chat',
+  },
+]);
+
+function getOutreachIntent(intentId) {
+  return OUTREACH_INTENTS.find((intent) => intent.id === intentId) || OUTREACH_INTENTS[0];
+}
+
+function buildOutreachChatPrompt({ intent: intentId, target, reason, timing, context }) {
+  const intent = getOutreachIntent(intentId);
   const contextLine = context?.trim() ? `Additional context: ${context.trim()}` : 'Additional context: none provided';
   return [
-    'Create a patient follow-up outreach plan for clinician review.',
+    'Create a lightweight outreach/follow-up planning draft for clinician review.',
     '',
+    `Intent: ${intent.label}`,
     `Target/context: ${target.trim() || 'not specified yet'}`,
     `Reason for follow-up: ${reason.trim() || 'not specified yet'}`,
     `Timing/next step: ${timing}`,
     contextLine,
     '',
-    'Do not send any message or claim outreach has been completed.',
-    'Return a concise patient-safe draft, a clinician confirmation checklist, expected result state, and verification/documentation steps.',
+    'Use only this protected Chat response as a planning draft.',
+    'Do not send any message, schedule outreach, write to an external system, or claim outreach has been completed.',
+    'Return these sections: Draft message, Outreach plan, Clinician confirmation checklist, Verification/documentation steps, and Expected result state.',
   ].join('\n');
 }
 
@@ -50,18 +141,20 @@ function buildOutreachChatPrompt({ target, reason, timing, context }) {
  * Legacy URLs `/dashboard?tool=…` redirect to the matching tool page.
  */
 function Dashboard() {
-  const { authToken } = useUser();
-  const { error } = useNotificationActions();
+  const { authToken, hasPermission } = useUser();
+  const { error, success } = useNotificationActions();
   const { recordToolAccess } = useToolPreferences();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [input, setInput] = useState('');
-  const [recommendedTools, setRecommendedTools] = useState([]);
   const [selectedCitation, setSelectedCitation] = useState(null);
   const [sending, setSending] = useState(false);
   const [outreachDrawerOpen, setOutreachDrawerOpen] = useState(false);
   const [outreachForm, setOutreachForm] = useState(OUTREACH_INITIAL_FORM);
+  const [outreachDraft, setOutreachDraft] = useState(OUTREACH_DRAFT_INITIAL_STATE);
+  const [executionActions, setExecutionActions] = useState({});
+  const [pendingConfirmation, setPendingConfirmation] = useState(null);
   const scrollRef = useRef(null);
   const scrollEndRef = useRef(null);
   const composerInputRef = useRef(null);
@@ -122,32 +215,18 @@ function Dashboard() {
   const isChatMode = location.pathname === '/chat';
   const selectedToolEntry = selectedTool ? getToolById(selectedTool) : null;
   const activeConversationLabel = activeConversationId ? `Conversation ${activeConversationId}` : 'No conversation';
-  const starterPrompts = useMemo(
-    () => [
-      {
-        title: 'Review a patient concern',
-        prompt: 'Help me think through this patient presentation:',
-        icon: CHROME_ICONS.stethoscope,
-      },
-      {
-        title: 'Check medication safety',
-        prompt: 'Check for drug interactions between ',
-        icon: CHROME_ICONS.shield,
-      },
-      {
-        title: 'Interpret labs',
-        prompt: 'Interpret these lab results and flag critical values:',
-        icon: CHROME_ICONS.microscope,
-      },
-      {
-        title: 'Plan follow-up outreach',
-        prompt: 'Create a patient follow-up outreach plan for ',
-        workflow: 'outreach',
-        icon: CHROME_ICONS.messageCircle,
-      },
-    ],
-    []
+  const availableChatTools = useMemo(
+    () =>
+      getChatCapabilitySuggestions({ hasPermission })
+        .filter((suggestion) => suggestion.kind === 'executor')
+        .map((suggestion) => getToolById(suggestion.toolId))
+        .filter(Boolean),
+    [hasPermission]
   );
+  const latestExecutionAction = useMemo(() => {
+    const actions = Object.values(executionActions);
+    return actions.length ? actions[actions.length - 1] : null;
+  }, [executionActions]);
   const pulseActions = useMemo(
     () => [
       {
@@ -196,7 +275,28 @@ function Dashboard() {
     []
   );
   const outreachPreview = useMemo(() => buildOutreachChatPrompt(outreachForm), [outreachForm]);
-  const canConfirmOutreach = Boolean(outreachForm.target.trim() && outreachForm.reason.trim());
+  const canDraftOutreach = Boolean(outreachForm.target.trim() && outreachForm.reason.trim());
+  const canConfirmOutreach = outreachDraft.status === 'ready' && !sending;
+  const latestOutreachPlan = useMemo(
+    () =>
+      [...messages]
+        .reverse()
+        .find((msg) => msg.metadata?.outreachPlan?.status === 'confirmed'),
+    [messages]
+  );
+  const latestVisibleContext = useMemo(() => {
+    const parts = [];
+    if (selectedToolEntry) {
+      parts.push(`Current visible tool: ${selectedToolEntry.name}`);
+    }
+    const lastUserMessage = [...messages]
+      .reverse()
+      .find((msg) => msg.role === 'user' && typeof msg.content === 'string' && msg.content.trim());
+    if (lastUserMessage) {
+      parts.push(`Recent visible Chat context: ${lastUserMessage.content.trim().slice(0, 600)}`);
+    }
+    return parts.join('\n');
+  }, [messages, selectedToolEntry]);
 
   useEffect(() => {
     if (!panelRegistryId) {
@@ -278,9 +378,234 @@ function Dashboard() {
     setOutreachDrawerOpen(true);
   };
 
+  const addExecutionAction = (toolOrId, source = 'chat') => {
+    const action = createChatExecutionAction(toolOrId, { source });
+    shouldStickToBottomRef.current = true;
+    setExecutionActions((current) => ({ ...current, [action.id]: action }));
+    addMessage({
+      role: 'assistant',
+      content:
+        action.mode === 'executable'
+          ? `I can run ${action.toolName} here. Add the missing inputs, preview the request, then confirm execution.`
+          : `${action.toolName} is available as a guided workflow. I will not run an unsupported backend action.`,
+      metadata: { executionActionId: action.id, executionMode: action.mode },
+      timestamp: new Date(),
+    });
+    selectTool(action.registryId);
+    setActiveTool(action.registryId);
+    navigate('/chat');
+    return action;
+  };
+
+  const updateExecutionAction = (actionId, patch) => {
+    setExecutionActions((current) => ({
+      ...current,
+      [actionId]: {
+        ...current[actionId],
+        ...patch,
+        updatedAt: new Date().toISOString(),
+      },
+    }));
+  };
+
+  const handleExecutionParamChange = (actionId, field, value) => {
+    setExecutionActions((current) => {
+      const action = current[actionId];
+      if (!action) return current;
+      return {
+        ...current,
+        [actionId]: {
+          ...action,
+          status: ['preview', 'success', 'failure'].includes(action.status)
+            ? 'collecting'
+            : action.status,
+          error: '',
+          validation: null,
+          result: null,
+          normalizedParameters: null,
+          parameters: {
+            ...action.parameters,
+            [field]: value,
+          },
+          updatedAt: new Date().toISOString(),
+        },
+      };
+    });
+  };
+
+  const handleValidateExecutionAction = async (actionId) => {
+    const action = executionActions[actionId];
+    if (!action || action.mode !== 'executable') return;
+
+    const inputIssue = getExecutionInputIssue(action);
+    if (inputIssue) {
+      updateExecutionAction(actionId, { status: 'collecting', error: inputIssue });
+      return;
+    }
+
+    const parameters = buildExecutionParameters(action);
+    updateExecutionAction(actionId, {
+      status: 'validating',
+      error: '',
+      normalizedParameters: parameters,
+    });
+
+    try {
+      const validation = await validateClinicalTool(action.toolId, parameters, { authToken });
+      if (!validation.ok) {
+        throw new Error(validation.error || 'Validation failed.');
+      }
+
+      updateExecutionAction(actionId, {
+        status: validation.data?.valid === false ? 'collecting' : 'preview',
+        validation: validation.data,
+        error:
+          validation.data?.valid === false
+            ? validation.data?.errors?.join(', ') || 'Validation failed.'
+            : '',
+      });
+    } catch (err) {
+      updateExecutionAction(actionId, {
+        status: 'failure',
+        error: err?.message || 'Unable to validate this execution.',
+      });
+    }
+  };
+
+  const handleExecuteAction = async (actionId) => {
+    const action = executionActions[actionId];
+    if (!action || action.mode !== 'executable') return;
+
+    const inputIssue = getExecutionInputIssue(action);
+    if (inputIssue) {
+      updateExecutionAction(actionId, { status: 'collecting', error: inputIssue });
+      return;
+    }
+
+    const parameters = action.normalizedParameters || buildExecutionParameters(action);
+    updateExecutionAction(actionId, {
+      status: 'executing',
+      error: '',
+      normalizedParameters: parameters,
+    });
+
+    try {
+      const execution = await executeClinicalTool(action.toolId, parameters, {
+        authToken,
+        conversationId: activeConversationId,
+      });
+
+      if (execution.unsupported) {
+        updateExecutionAction(actionId, {
+          status: 'failure',
+          error: execution.message || 'This tool is not available for server execution.',
+        });
+        return;
+      }
+
+      if (!execution.ok) {
+        throw new Error(execution.message || execution.errors?.[0] || 'Tool execution failed.');
+      }
+
+      const result = execution.raw?.result || {
+        success: true,
+        data: execution.data,
+        errors: execution.errors || [],
+        timestamp: new Date().toISOString(),
+      };
+
+      updateExecutionAction(actionId, {
+        status: 'success',
+        result,
+        error: '',
+      });
+
+      addMessage({
+        role: 'assistant',
+        content: `${action.toolName} completed successfully.`,
+        toolResult: {
+          toolId: execution.toolId || action.toolId,
+          toolName: execution.toolName || action.toolName,
+          result,
+        },
+        metadata: {
+          sourceExecutionActionId: actionId,
+          executionStatus: 'success',
+          parameters,
+        },
+        timestamp: new Date(),
+      });
+      success('Execution complete', `${action.toolName} finished successfully.`);
+    } catch (err) {
+      updateExecutionAction(actionId, {
+        status: 'failure',
+        error: err?.message || 'Unable to execute this tool.',
+      });
+      error('Execution failed', err?.message || 'Unable to execute this tool.');
+    }
+  };
+
+  const handleRetryExecutionAction = (actionId) => {
+    const action = executionActions[actionId];
+    if (!action) return;
+    if (action.normalizedParameters) {
+      updateExecutionAction(actionId, { status: 'preview', error: '' });
+      window.requestAnimationFrame(() => handleExecuteAction(actionId));
+    } else {
+      handleValidateExecutionAction(actionId);
+    }
+  };
+
+  const handleEditExecutionAction = (actionId) => {
+    updateExecutionAction(actionId, {
+      status: 'collecting',
+      error: '',
+      validation: null,
+      result: null,
+    });
+  };
+
+  const handleOpenExecutionTool = (action) => {
+    if (!action?.path) return;
+    if (action.registryId) {
+      recordToolAccess(action.registryId);
+      selectTool(action.registryId);
+      setActiveTool(action.registryId);
+    }
+    navigate(action.path);
+  };
+
+  const handleUseGuidedExecution = (action) => {
+    if (action.registryId) {
+      selectTool(action.registryId);
+      setActiveTool(action.registryId);
+    }
+    if (action.chatSeed) {
+      setInput(action.chatSeed);
+      navigate('/chat');
+      window.requestAnimationFrame(() => composerInputRef.current?.focus());
+    }
+  };
+
   const handleStarterPrompt = (starter) => {
     if (starter.workflow === 'outreach') {
-      openOutreachPlanner();
+      if (!isChatMode) {
+        openOutreachPlanner();
+        return;
+      }
+      openSensitiveActionConfirmation(
+        {
+          id: 'follow-up-planning',
+          label: starter.title,
+          confirmation: CHAT_SENSITIVE_CONFIRMATIONS['follow-up-planning'],
+        },
+        openOutreachPlanner
+      );
+      return;
+    }
+    if (starter.toolId) {
+      setInput(starter.prompt);
+      addExecutionAction(starter.toolId, 'starter');
       return;
     }
     setInput(starter.prompt);
@@ -307,13 +632,111 @@ function Dashboard() {
 
   const updateOutreachField = (field, value) => {
     setOutreachForm((current) => ({ ...current, [field]: value }));
+    setOutreachDraft(OUTREACH_DRAFT_INITIAL_STATE);
+  };
+
+  const applyVisibleContextToOutreach = () => {
+    if (!latestVisibleContext) return;
+    updateOutreachField('context', latestVisibleContext);
+  };
+
+  const handleDraftOutreach = async () => {
+    if (!canDraftOutreach || outreachDraft.status === 'loading') return;
+
+    setOutreachDraft({
+      ...OUTREACH_DRAFT_INITIAL_STATE,
+      status: 'loading',
+      prompt: outreachPreview,
+    });
+
+    try {
+      const { ok, data } = await sendClinicalChatMessage({
+        message: outreachPreview,
+        conversationId: activeConversationId,
+        authToken,
+      });
+
+      if (!ok) {
+        throw new Error(data?.message || 'Unable to draft outreach plan');
+      }
+
+      const assistantMessage = mapChatResponseToAssistantMessage(data);
+      setOutreachDraft({
+        status: 'ready',
+        content: assistantMessage.content,
+        error: '',
+        assistantMessage,
+        prompt: outreachPreview,
+      });
+    } catch (err) {
+      const message = err?.message || 'Failed to draft outreach plan.';
+      error('Outreach draft failed', message);
+      setOutreachDraft({
+        ...OUTREACH_DRAFT_INITIAL_STATE,
+        status: 'error',
+        error: message,
+        prompt: outreachPreview,
+      });
+    }
   };
 
   const handleConfirmOutreach = () => {
-    if (!canConfirmOutreach || sending) return;
+    if (!canConfirmOutreach || !outreachDraft.assistantMessage) return;
+
+    const createdAt = new Date().toISOString();
+    const intent = getOutreachIntent(outreachForm.intent);
+    const outreachPlan = {
+      status: 'confirmed',
+      intent: intent.label,
+      target: outreachForm.target.trim(),
+      reason: outreachForm.reason.trim(),
+      timing: outreachForm.timing,
+      createdAt,
+    };
+
+    addMessage({
+      role: 'user',
+      content: [
+        `Confirmed outreach planning (${intent.label}).`,
+        `Target/context: ${outreachPlan.target}`,
+        `Reason: ${outreachPlan.reason}`,
+        `Timing/next step: ${outreachPlan.timing}`,
+        'Verification: Chat drafted this plan only; no external message was sent or scheduled.',
+      ].join('\n'),
+      metadata: { outreachPlan },
+      timestamp: new Date(createdAt),
+    });
+    addMessage({
+      ...outreachDraft.assistantMessage,
+      metadata: {
+        ...(outreachDraft.assistantMessage.metadata || {}),
+        outreachPlan,
+      },
+      timestamp: new Date(createdAt),
+    });
+
     setOutreachDrawerOpen(false);
+    setOutreachForm(OUTREACH_INITIAL_FORM);
+    setOutreachDraft(OUTREACH_DRAFT_INITIAL_STATE);
     navigate('/chat');
-    void submitChatMessage(outreachPreview);
+  };
+
+  const openSensitiveActionConfirmation = (suggestion, onConfirm) => {
+    const confirmation = suggestion.confirmation || CHAT_SENSITIVE_CONFIRMATIONS[suggestion.id];
+    if (!confirmation) {
+      onConfirm();
+      return;
+    }
+
+    setPendingConfirmation({
+      suggestion,
+      confirmation,
+      onConfirm,
+      blocked:
+        confirmation.requiredPermission && !hasPermission(confirmation.requiredPermission)
+          ? `Blocked: ${confirmation.authRequirement}`
+          : '',
+    });
   };
 
   const recommendationSource = useMemo(() => {
@@ -322,44 +745,69 @@ function Dashboard() {
     return lastUser?.content || '';
   }, [input, messages]);
 
-  useEffect(() => {
-    let cancelled = false;
-    if (!recommendationSource) {
-      setRecommendedTools([]);
-      return undefined;
-    }
-
-    const cancelIdle = scheduleIdleWork(async () => {
-      if (cancelled) return;
-      try {
-        const tools = await getToolRecommendationsNLU(
-          recommendationSource,
-          { userId: activeConversationId, recentTools: [] },
-          3
-        );
-        if (!cancelled) setRecommendedTools(tools);
-      } catch {
-        if (!cancelled) setRecommendedTools([]);
-      }
-    });
-
-    return () => {
-      cancelled = true;
-      cancelIdle();
-    };
-  }, [recommendationSource, activeConversationId]);
+  const capabilitySuggestions = useMemo(
+    () =>
+      getChatCapabilitySuggestions({
+        input: recommendationSource,
+        hasPermission,
+      }),
+    [hasPermission, recommendationSource]
+  );
 
   useEffect(() => {
-    if (recommendedTools.length > 0) {
+    if (capabilitySuggestions.length > 0) {
       analyticsService.trackEvent({
-        eventName: 'tool_recommendations_shown',
+        eventName: 'chat_capability_suggestions_shown',
         parameters: {
-          count: recommendedTools.length,
+          count: capabilitySuggestions.length,
           source: recommendationSource.slice(0, 120),
         },
       });
     }
-  }, [recommendedTools, recommendationSource]);
+  }, [capabilitySuggestions, recommendationSource]);
+
+  const performCapabilitySuggestion = (suggestion) => {
+    analyticsService.trackEvent({
+      eventName: 'chat_capability_suggestion_clicked',
+      parameters: {
+        suggestionId: suggestion.id,
+        kind: suggestion.kind,
+        source: suggestion.source,
+      },
+    });
+
+    if (suggestion.kind === 'executor') {
+      const entry = getToolById(suggestion.toolId);
+      if (entry) addExecutionAction(entry, 'capability-suggestion');
+      return;
+    }
+
+    if (suggestion.action === 'openOutreachPlanner') {
+      openOutreachPlanner();
+      return;
+    }
+
+    if (suggestion.prompt) {
+      setInput(suggestion.prompt);
+      window.requestAnimationFrame(() => composerInputRef.current?.focus());
+      return;
+    }
+
+    if (suggestion.path) {
+      navigate(suggestion.path);
+    }
+  };
+
+  const handleCapabilitySuggestion = (suggestion) => {
+    openSensitiveActionConfirmation(suggestion, () => performCapabilitySuggestion(suggestion));
+  };
+
+  const confirmPendingAction = () => {
+    if (pendingConfirmation?.blocked) return;
+    const action = pendingConfirmation?.onConfirm;
+    setPendingConfirmation(null);
+    action?.();
+  };
 
   return (
     <div className="dashboard-root">
@@ -378,18 +826,41 @@ function Dashboard() {
               </h1>
             </div>
           </div>
-          <div className="dashboard-chat-header__status" aria-label="Chat context">
-            <span className="dashboard-context-pill dashboard-context-pill--online">
-              <NavIcon icon={CHROME_ICONS.checkCircle} size={14} aria-hidden />
-              Online
-            </span>
-            <span className="dashboard-context-pill">{activeConversationLabel}</span>
-            {selectedToolEntry && (
-              <span className="dashboard-context-pill dashboard-context-pill--tool">
-                <NavIcon icon={getToolIcon(selectedToolEntry.id)} size={14} aria-hidden />
-                {selectedToolEntry.name}
+          <div className="dashboard-chat-header__status" aria-label="Chat context and workspace status">
+            <div className="dashboard-header-group" aria-label="Current context">
+              <span className="dashboard-header-group__label">Context</span>
+              <span className="dashboard-context-pill">{activeConversationLabel}</span>
+              {selectedToolEntry && (
+                <span className="dashboard-context-pill dashboard-context-pill--tool">
+                  <NavIcon icon={getToolIcon(selectedToolEntry.id)} size={14} aria-hidden />
+                  {selectedToolEntry.name}
+                </span>
+              )}
+            </div>
+            <div className="dashboard-header-group" aria-label="Workspace status">
+              <span className="dashboard-header-group__label">Workspace</span>
+              <span className="dashboard-context-pill dashboard-context-pill--online">
+                <NavIcon icon={CHROME_ICONS.checkCircle} size={14} aria-hidden />
+                Online
               </span>
-            )}
+              <span className="dashboard-context-pill">Protected</span>
+            </div>
+            <div className="dashboard-header-group" aria-label="Available tools">
+              <span className="dashboard-header-group__label">Available tools</span>
+              <div className="dashboard-header-tools">
+                {availableChatTools.map((tool) => (
+                  <button
+                    key={tool.id}
+                    type="button"
+                    className="dashboard-header-tool"
+                    onClick={() => addExecutionAction(tool, 'header')}
+                  >
+                    <NavIcon icon={getToolIcon(tool.id)} size={14} aria-hidden />
+                    {tool.name}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </header>
 
@@ -398,6 +869,27 @@ function Dashboard() {
           className={`dashboard-scroll app-scroll-container${messages.length === 0 && !sending ? ' dashboard-scroll--empty' : ''}`}
           onScroll={updateScrollStickiness}
         >
+          {!isChatMode && latestOutreachPlan && (
+            <section className="dashboard-today-card" aria-label="Today outreach planning">
+              <div>
+                <p className="dashboard-today-card__eyebrow">Today</p>
+                <h2 className="dashboard-today-card__title">Outreach plan ready for verification</h2>
+                <p className="dashboard-today-card__body">
+                  {latestOutreachPlan.metadata.outreachPlan.intent} for{' '}
+                  {latestOutreachPlan.metadata.outreachPlan.target}. No external message was sent or
+                  scheduled.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="dashboard-today-card__action"
+                onClick={() => navigate('/chat')}
+              >
+                Verify in Chat
+              </button>
+            </section>
+          )}
+
           {messages.length === 0 ? (
             <div className="dashboard-empty">
               <div className="dashboard-empty-icon" aria-hidden>
@@ -409,26 +901,38 @@ function Dashboard() {
                 </div>
                 <div className="dashboard-empty-copy">
                   {isChatMode
-                    ? 'Ask about medications, labs, scores, protocols, and procedures. Use guided prompts when you want a structured path.'
+                    ? 'Chat can reason over free text, suggest next actions, collect missing inputs, preview tool execution, confirm risky steps, and show structured results.'
                     : 'Review priority items, choose the next action, then use Chat to preview, confirm, and verify the result.'}
                 </div>
                 {isChatMode ? (
-                  <div className="dashboard-starter-grid" aria-label="Starter prompts">
-                    {starterPrompts.map((starter) => (
-                      <button
-                        key={starter.title}
-                        type="button"
-                        className="dashboard-starter-card"
-                        onClick={() => handleStarterPrompt(starter)}
-                      >
-                        <span className="dashboard-starter-card__icon" aria-hidden>
-                          <NavIcon icon={starter.icon} size={18} />
-                        </span>
-                        <span className="dashboard-starter-card__title">{starter.title}</span>
-                        <span className="dashboard-starter-card__prompt">{starter.prompt}</span>
-                      </button>
-                    ))}
-                  </div>
+                  <>
+                    <div className="dashboard-empty-capabilities" aria-label="What Chat can do">
+                      <span>Free-text clinical questions</span>
+                      <span>Suggested follow-up actions</span>
+                      <span>Validated executor previews</span>
+                      <span>Confirmation before execution</span>
+                      <span>Structured result cards</span>
+                    </div>
+                    <div className="dashboard-empty-section-title">Start with...</div>
+                    <div className="dashboard-starter-grid" aria-label="Starter prompts">
+                      {CHAT_EMPTY_ACTIONS.map((starter) => (
+                        <button
+                          key={starter.title}
+                          type="button"
+                          className="dashboard-starter-card"
+                          aria-label={starter.title}
+                          onClick={() => handleStarterPrompt(starter)}
+                        >
+                          <span className="dashboard-starter-card__icon" aria-hidden>
+                            <NavIcon icon={starter.icon} size={18} />
+                          </span>
+                          <span className="dashboard-starter-card__title">{starter.title}</span>
+                          <span className="dashboard-starter-card__body">{starter.body}</span>
+                          <span className="dashboard-starter-card__prompt">{starter.prompt}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
                 ) : (
                   <div className="dashboard-pulse-grid" aria-label="Priority actions">
                     {pulseActions.map((action) => (
@@ -436,6 +940,7 @@ function Dashboard() {
                         key={action.title}
                         type="button"
                         className="dashboard-pulse-card"
+                        aria-label={action.title}
                         onClick={() => handlePulseAction(action)}
                       >
                         <span className="dashboard-pulse-card__icon" aria-hidden>
@@ -451,52 +956,99 @@ function Dashboard() {
               </div>
             </div>
           ) : (
-            messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`dashboard-msg-row ${
-                  msg.role === 'user' ? 'dashboard-msg-row--user' : 'dashboard-msg-row--assistant'
-                }`}
-              >
-                {msg.role === 'assistant' && (
-                  <div className="dashboard-msg-avatar" aria-hidden>
-                    <NavIcon icon={CHROME_ICONS.bot} size={20} />
-                  </div>
-                )}
+            messages.map((msg) => {
+              const recoveryActionId = msg.metadata?.sourceExecutionActionId;
+              const canRecoverExecution = recoveryActionId && executionActions[recoveryActionId];
+              const visualizations = Array.isArray(msg.visualizations)
+                ? msg.visualizations.filter((viz) => !(msg.toolResult && viz?.type === 'tool-result'))
+                : [];
+
+              return (
                 <div
-                  className={`dashboard-msg-bubble ${
-                    msg.role === 'user' ? 'dashboard-msg-bubble--user' : 'dashboard-msg-bubble--assistant'
+                  key={msg.id}
+                  className={`dashboard-msg-row ${
+                    msg.role === 'user' ? 'dashboard-msg-row--user' : 'dashboard-msg-row--assistant'
                   }`}
                 >
-                  {msg.role === 'assistant' && msg.confidence !== undefined && (
-                    <div className="dashboard-msg-meta">
-                      <ConfidenceBadge confidence={msg.confidence} />
+                  {msg.role === 'assistant' && (
+                    <div className="dashboard-msg-avatar" aria-hidden>
+                      <NavIcon icon={CHROME_ICONS.bot} size={20} />
                     </div>
                   )}
-                  <div className="dashboard-msg-body">{msg.content}</div>
-                  {msg.toolResult && (
-                    <div style={{ marginTop: 12 }}>
-                      <ToolCard toolResult={msg.toolResult} />
+                  <div
+                    className={`dashboard-msg-bubble ${
+                      msg.role === 'user' ? 'dashboard-msg-bubble--user' : 'dashboard-msg-bubble--assistant'
+                    }`}
+                  >
+                    {msg.role === 'assistant' && msg.confidence !== undefined && (
+                      <div className="dashboard-msg-meta">
+                        <ConfidenceBadge confidence={msg.confidence} />
+                      </div>
+                    )}
+                    <div className="dashboard-msg-body">{msg.content}</div>
+                    {msg.toolResult && (
+                      <OperationalResultCard
+                        toolResult={msg.toolResult}
+                        parameters={msg.metadata?.parameters}
+                        timestamp={msg.timestamp}
+                        followUpSuggestions={msg.suggestions}
+                        onRetry={
+                          canRecoverExecution ? () => handleRetryExecutionAction(recoveryActionId) : undefined
+                        }
+                        onEdit={
+                          canRecoverExecution ? () => handleEditExecutionAction(recoveryActionId) : undefined
+                        }
+                      />
+                    )}
+                    {visualizations.length > 0 && (
+                      <div className="dashboard-msg-viz">
+                        {visualizations.map((viz, idx) => (
+                          <ToolVisualization key={`${viz.type || 'viz'}-${idx}`} visualization={viz} />
+                        ))}
+                      </div>
+                    )}
+                    {msg.citations && msg.citations.length > 0 && msg.role === 'assistant' && (
+                      <Citations citations={msg.citations} onViewDetails={(c) => setSelectedCitation(c)} />
+                    )}
+                    {msg.metadata?.executionActionId && executionActions[msg.metadata.executionActionId] && (
+                      <div className="dashboard-execution-slot" aria-label="Execution card">
+                        <ChatExecutionCard
+                          action={executionActions[msg.metadata.executionActionId]}
+                          onChangeParam={handleExecutionParamChange}
+                          onValidate={handleValidateExecutionAction}
+                          onExecute={handleExecuteAction}
+                          onRetry={handleRetryExecutionAction}
+                          onEdit={handleEditExecutionAction}
+                          onOpenTool={handleOpenExecutionTool}
+                          onUseGuidedChat={handleUseGuidedExecution}
+                        />
+                      </div>
+                    )}
+                    {Array.isArray(msg.suggestions) && msg.suggestions.length > 0 && (
+                      <div className="dashboard-msg-suggestions" aria-label="Suggested follow-up actions">
+                        {msg.suggestions.slice(0, 4).map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            type="button"
+                            onClick={() => {
+                              setInput(suggestion);
+                              window.requestAnimationFrame(() => composerInputRef.current?.focus());
+                            }}
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  {msg.role === 'user' && (
+                    <div className="dashboard-msg-avatar" aria-hidden>
+                      <NavIcon icon={CHROME_ICONS.user} size={20} />
                     </div>
-                  )}
-                  {Array.isArray(msg.visualizations) && msg.visualizations.length > 0 && (
-                    <div className="dashboard-msg-viz">
-                      {msg.visualizations.map((viz, idx) => (
-                        <ToolVisualization key={`${viz.type || 'viz'}-${idx}`} visualization={viz} />
-                      ))}
-                    </div>
-                  )}
-                  {msg.citations && msg.citations.length > 0 && msg.role === 'assistant' && (
-                    <Citations citations={msg.citations} onViewDetails={(c) => setSelectedCitation(c)} />
                   )}
                 </div>
-                {msg.role === 'user' && (
-                  <div className="dashboard-msg-avatar" aria-hidden>
-                    <NavIcon icon={CHROME_ICONS.user} size={20} />
-                  </div>
-                )}
-              </div>
-            ))
+              );
+            })
           )}
           {sending && (
             <div className="dashboard-thinking">
@@ -510,57 +1062,55 @@ function Dashboard() {
         </div>
 
         <div className="dashboard-composer">
-          {recommendedTools.length > 0 && (
-            <div className="dashboard-recs">
-              <div className="dashboard-recs-label">Suggested tools</div>
-              <div className="dashboard-recs-row">
-                {recommendedTools.map((tool) => (
-                  <button
-                    key={tool.id}
-                    type="button"
-                    onClick={() => {
-                      analyticsService.trackEvent({
-                        eventName: 'tool_recommendation_clicked',
-                        parameters: {
-                          toolId: tool.id,
-                          confidence: tool.confidence,
-                          reason: tool.recommendationReason,
-                        },
-                      });
-                      recordRecommendationFeedback(tool.id, true);
-                      const entry = getToolById(tool.id);
-                      if (!entry?.path) return;
-                      selectTool(tool.id);
-                      const calcSlug = tool.initialCalc ?? entry.initialCalc;
-                      const dest =
-                        entry.id === 'calculators' && calcSlug
-                          ? `/tools/calculators?calc=${encodeURIComponent(calcSlug)}`
-                          : entry.path;
-                      navigate(dest);
-                    }}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                      padding: '8px 12px',
-                      borderRadius: '999px',
-                      border: `1px solid ${tool.color}55`,
-                      background: `${tool.color}20`,
-                      color: 'var(--text-color)',
-                      fontSize: '13px',
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    <span aria-hidden>
-                      <NavIcon icon={getToolIcon(tool.id)} size={18} />
-                    </span>
-                    <span>{tool.name}</span>
-                  </button>
-                ))}
-              </div>
+          <div className="dashboard-action-rail" aria-label="Suggested actions">
+            <div className="dashboard-action-rail__meta">
+              <span className="dashboard-recs-label">Suggested actions</span>
+              {latestExecutionAction && (
+                <span className="dashboard-action-rail__status">
+                  Execution: {latestExecutionAction.toolName} · {latestExecutionAction.status}
+                </span>
+              )}
             </div>
-          )}
+            <div className="dashboard-recs-row">
+              {capabilitySuggestions.map((suggestion) => (
+                <button
+                  key={suggestion.id}
+                  type="button"
+                  className={`dashboard-action-chip dashboard-action-chip--${suggestion.kind}`}
+                  onClick={() => handleCapabilitySuggestion(suggestion)}
+                  disabled={sending && suggestion.kind === 'executor'}
+                  title={suggestion.description}
+                >
+                  <NavIcon icon={suggestion.icon} size={16} aria-hidden />
+                  {suggestion.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="dashboard-composer-actions" aria-label="Composer actions">
+            <button
+              type="button"
+              className="dashboard-guided-action"
+              onClick={() => {
+                if (!isChatMode) {
+                  openOutreachPlanner();
+                  return;
+                }
+                openSensitiveActionConfirmation(
+                  {
+                    id: 'follow-up-planning',
+                    label: 'Plan follow-up',
+                    confirmation: CHAT_SENSITIVE_CONFIRMATIONS['follow-up-planning'],
+                  },
+                  openOutreachPlanner
+                );
+              }}
+              disabled={sending}
+            >
+              <NavIcon icon={CHROME_ICONS.messageCircle} size={16} aria-hidden />
+              Plan outreach
+            </button>
+          </div>
           <form className="dashboard-input-row" onSubmit={handleSubmitMessage}>
             <textarea
               ref={composerInputRef}
@@ -598,6 +1148,77 @@ function Dashboard() {
       )}
 
       <Drawer
+        isOpen={Boolean(pendingConfirmation)}
+        onClose={() => setPendingConfirmation(null)}
+        side="right"
+        size="md"
+        title={pendingConfirmation?.confirmation?.title || 'Confirm sensitive action'}
+        className="dashboard-confirmation-drawer"
+        footer={
+          <div className="dashboard-confirmation-footer">
+            <button
+              type="button"
+              className="dashboard-outreach-secondary"
+              onClick={() => setPendingConfirmation(null)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="dashboard-outreach-primary"
+              onClick={confirmPendingAction}
+              disabled={Boolean(pendingConfirmation?.blocked)}
+            >
+              Confirm and continue
+            </button>
+          </div>
+        }
+      >
+        {pendingConfirmation && (
+          <div className="dashboard-confirmation">
+            <div className="dashboard-confirmation-alert" role="status">
+              <NavIcon icon={CHROME_ICONS.shield} size={18} aria-hidden />
+              <div>
+                <strong>{pendingConfirmation.confirmation.sensitivity}</strong>
+                <p>Backend authorization and validation remain unchanged. This is an added Chat safety step.</p>
+              </div>
+            </div>
+
+            <dl className="dashboard-confirmation-list">
+              <div>
+                <dt>What will happen</dt>
+                <dd>{pendingConfirmation.confirmation.whatWillHappen}</dd>
+              </div>
+              <div>
+                <dt>Affected data</dt>
+                <dd>{pendingConfirmation.confirmation.affectedData}</dd>
+              </div>
+              <div>
+                <dt>Reversible?</dt>
+                <dd>{pendingConfirmation.confirmation.reversible}</dd>
+              </div>
+              <div>
+                <dt>Auth or role requirement</dt>
+                <dd>{pendingConfirmation.confirmation.authRequirement}</dd>
+              </div>
+              {pendingConfirmation.suggestion?.source && (
+                <div>
+                  <dt>Source or route</dt>
+                  <dd>
+                    <code>{pendingConfirmation.suggestion.source}</code>
+                  </dd>
+                </div>
+              )}
+            </dl>
+
+            {pendingConfirmation.blocked && (
+              <p className="dashboard-confirmation-blocked">{pendingConfirmation.blocked}</p>
+            )}
+          </div>
+        )}
+      </Drawer>
+
+      <Drawer
         isOpen={outreachDrawerOpen}
         onClose={() => setOutreachDrawerOpen(false)}
         side="right"
@@ -609,17 +1230,29 @@ function Dashboard() {
             <button
               type="button"
               className="dashboard-outreach-secondary"
-              onClick={() => setOutreachForm(OUTREACH_INITIAL_FORM)}
+              disabled={outreachDraft.status === 'loading'}
+              onClick={() => {
+                setOutreachForm(OUTREACH_INITIAL_FORM);
+                setOutreachDraft(OUTREACH_DRAFT_INITIAL_STATE);
+              }}
             >
               Reset
             </button>
             <button
               type="button"
+              className="dashboard-outreach-secondary"
+              disabled={!canDraftOutreach || outreachDraft.status === 'loading'}
+              onClick={handleDraftOutreach}
+            >
+              {outreachDraft.status === 'loading' ? 'Drafting with Chat...' : 'Draft preview with Chat'}
+            </button>
+            <button
+              type="button"
               className="dashboard-outreach-primary"
-              disabled={!canConfirmOutreach || sending}
+              disabled={!canConfirmOutreach}
               onClick={handleConfirmOutreach}
             >
-              Confirm and ask Chat
+              Confirm creation
             </button>
           </div>
         }
@@ -631,7 +1264,7 @@ function Dashboard() {
           </p>
 
           <div className="dashboard-outreach-steps" aria-label="Outreach workflow steps">
-            {['Start', 'Choose target', 'Draft preview', 'Confirm', 'Result in Chat', 'Verify'].map(
+            {['Start', 'Choose intent', 'Add context', 'Draft via Chat', 'Preview', 'Confirm', 'Verify'].map(
               (step) => (
                 <span key={step} className="dashboard-outreach-step">
                   {step}
@@ -640,8 +1273,32 @@ function Dashboard() {
             )}
           </div>
 
+          <fieldset className="dashboard-outreach-intents">
+            <legend>Choose intent</legend>
+            <div className="dashboard-outreach-intent-grid">
+              {OUTREACH_INTENTS.map((intent) => (
+                <label
+                  key={intent.id}
+                  className={`dashboard-outreach-intent-card${
+                    outreachForm.intent === intent.id ? ' dashboard-outreach-intent-card--selected' : ''
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="outreach-intent"
+                    value={intent.id}
+                    checked={outreachForm.intent === intent.id}
+                    onChange={(event) => updateOutreachField('intent', event.target.value)}
+                  />
+                  <span className="dashboard-outreach-intent-card__label">{intent.label}</span>
+                  <span className="dashboard-outreach-intent-card__desc">{intent.description}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+
           <label className="dashboard-outreach-field">
-            <span>Patient or cohort target</span>
+            <span>Target/context</span>
             <input
               value={outreachForm.target}
               onChange={(event) => updateOutreachField('target', event.target.value)}
@@ -671,6 +1328,24 @@ function Dashboard() {
             </select>
           </label>
 
+          <section className="dashboard-outreach-visible-context">
+            <div>
+              <div className="dashboard-outreach-preview-heading">Existing visible context</div>
+              <p>
+                Use the latest visible Chat/tool context as optional background, or keep the plan fully
+                manual.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="dashboard-outreach-secondary"
+              disabled={!latestVisibleContext}
+              onClick={applyVisibleContextToOutreach}
+            >
+              Use latest visible context
+            </button>
+          </section>
+
           <label className="dashboard-outreach-field">
             <span>Optional clinical context</span>
             <textarea
@@ -682,10 +1357,23 @@ function Dashboard() {
           </label>
 
           <section className="dashboard-outreach-preview-section">
-            <div className="dashboard-outreach-preview-heading">Preview before execution</div>
-            <pre className="dashboard-outreach-preview" aria-label="Outreach Chat preview">
-              {outreachPreview}
-            </pre>
+            <div className="dashboard-outreach-preview-heading">Chat-drafted plan preview</div>
+            <div className="dashboard-outreach-draft-preview" aria-label="Outreach plan preview">
+              {outreachDraft.status === 'idle' && (
+                <p>Choose an intent, add the required context, then draft a preview through Chat.</p>
+              )}
+              {outreachDraft.status === 'loading' && <p>Drafting through protected Chat...</p>}
+              {outreachDraft.status === 'error' && (
+                <p className="dashboard-outreach-error">{outreachDraft.error}</p>
+              )}
+              {outreachDraft.status === 'ready' && <div>{outreachDraft.content}</div>}
+            </div>
+            <details className="dashboard-outreach-prompt-details">
+              <summary>Prompt sent through Chat</summary>
+              <pre className="dashboard-outreach-preview" aria-label="Outreach Chat prompt preview">
+                {outreachPreview}
+              </pre>
+            </details>
           </section>
         </div>
       </Drawer>

@@ -63,12 +63,17 @@ export function normalizeToolResultForUi(tr) {
   const toolId = tr.toolId;
   const toolName = tr.toolName;
   const inner = tr.result;
-  if (inner && typeof inner === 'object' && 'data' in inner) {
-    return { toolId, toolName, result: inner };
-  }
-  return {
+  const common = {
     toolId,
     toolName,
+    parameters: tr.parameters,
+    source: tr.source,
+  };
+  if (inner && typeof inner === 'object' && 'data' in inner) {
+    return { ...common, result: inner };
+  }
+  return {
+    ...common,
     result: { data: inner },
   };
 }
@@ -79,17 +84,21 @@ export function normalizeToolResultForUi(tr) {
  */
 export function mapChatResponseToAssistantMessage(data) {
   const toolResult = normalizeToolResultForUi(data.toolResult);
-  const viz = [];
+  const backendVisualizations = Array.isArray(data.visualizations) ? data.visualizations : [];
+  const viz = [...backendVisualizations];
   if (toolResult?.result?.data != null && (toolResult.toolId || toolResult.toolName)) {
-    viz.push({
-      type: 'tool-result',
-      data: {
-        toolId: toolResult.toolId,
-        toolName: toolResult.toolName,
-        result: toolResult.result,
-        parameters: data.toolResult?.parameters,
-      },
-    });
+    const hasToolResultViz = viz.some((item) => item?.type === 'tool-result');
+    if (!hasToolResultViz) {
+      viz.push({
+        type: 'tool-result',
+        data: {
+          toolId: toolResult.toolId,
+          toolName: toolResult.toolName,
+          result: toolResult.result,
+          parameters: data.toolResult?.parameters,
+        },
+      });
+    }
   }
 
   return {
@@ -97,6 +106,7 @@ export function mapChatResponseToAssistantMessage(data) {
     content: data.response || 'I could not generate a response.',
     citations: data.citations || [],
     confidence: data.confidence,
+    suggestions: Array.isArray(data.suggestions) ? data.suggestions : [],
     ragContext: data.ragContext,
     toolResult,
     visualizations: viz.length > 0 ? viz : undefined,
