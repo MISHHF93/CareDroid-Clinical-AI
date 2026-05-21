@@ -1,6 +1,6 @@
 {
   "note": "Playwright JSON reporter writes full results; see qa/RESPONSIVE_QA_REPORT.md from npm run qa:responsive",
-  "pages": 46,
+  "pages": 47,
   "viewports": 13,
-  "uniquePaths": 35
+  "uniquePaths": 36
 }

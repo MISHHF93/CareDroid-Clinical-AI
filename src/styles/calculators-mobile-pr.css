@@ -11,10 +11,12 @@
   .calculator-interface,
   .calculator-inputs,
   .calculator-results,
-  .calc-pr1-form {
+  .calc-pr1-form,
+  .calc-timi-fieldset {
     width: 100%;
     max-width: 100%;
     min-width: 0;
+    min-inline-size: 0;
     box-sizing: border-box;
     overflow-x: clip;
   }
@@ -170,12 +172,25 @@
   }
 
   /* PR5 / PR4A fieldsets */
+  .calc-timi-fieldset,
   .calc-has-bled-fieldset,
   .calc-news2-scale-fieldset,
   .calc-meld-fieldset {
+    width: 100%;
     max-width: 100%;
     min-width: 0;
+    min-inline-size: 0;
     padding: var(--space-md);
+  }
+
+  .calc-timi-row select,
+  .calc-timi-row input:not([type='checkbox']):not([type='radio']),
+  .calc-timi-row .calc-select,
+  .calc-timi-row .calc-input-field {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
   }
 
   .calc-phq9-q9-badge {

@@ -199,4 +199,10 @@ describe('PR1–PR5 mobile stylesheet', () => {
     expect(mobilePrCss).toMatch(/\.calc-gad7-severe-warning[\s\S]*max-width:\s*100%/);
     expect(mobilePrCss).toMatch(/\.calc-pr4a-risk-badge[\s\S]*max-width:\s*100%/);
   });
+
+  it('prevents TIMI-style fieldsets and selects from overflowing phones', () => {
+    expect(mobilePrCss).toMatch(/\.calc-pr1-form,[\s\S]*\.calc-timi-fieldset[\s\S]*min-inline-size:\s*0/);
+    expect(mobilePrCss).toMatch(/\.calc-timi-fieldset,[\s\S]*\.calc-meld-fieldset[\s\S]*width:\s*100%/);
+    expect(mobilePrCss).toMatch(/\.calc-timi-row select[\s\S]*max-width:\s*100%/);
+  });
 });
