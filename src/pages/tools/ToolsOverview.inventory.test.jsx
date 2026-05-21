@@ -45,7 +45,7 @@ describe('ToolsOverview unified inventory', () => {
       (heading) => heading.textContent
     );
 
-    expect(container.textContent).toMatch(/all tools/i);
+    expect(container.textContent).toMatch(/action library/i);
     expect([...container.querySelectorAll('.stat-number')].map((node) => node.textContent)).toContain(
       String(userFacing.length)
     );
@@ -53,7 +53,7 @@ describe('ToolsOverview unified inventory', () => {
     for (const record of userFacing) {
       expect(renderedCards, record.id).toContain(record.label);
     }
-    expect(container.textContent).toMatch(/developer catalog \/ source audit/i);
+    expect(container.textContent).toMatch(/trust and source details/i);
     expect(screen.queryByText(/hidden APIs/i)).not.toBeInTheDocument();
   }, 10000);
 
@@ -65,7 +65,7 @@ describe('ToolsOverview unified inventory', () => {
 
     expect(
       [...container.querySelectorAll('.btn-open-tool')].filter((button) =>
-        /start guided chat/i.test(button.textContent || '')
+        /start with chat/i.test(button.textContent || '')
       )
     ).toHaveLength(chatAssistedCount);
   });

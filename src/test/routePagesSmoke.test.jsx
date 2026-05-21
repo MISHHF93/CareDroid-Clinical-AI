@@ -66,6 +66,7 @@ vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
 
 const PAGE_BY_ID = {
   dashboard: Dashboard,
+  chat: Dashboard,
   'tools-overview': ToolsOverview,
   'tools-catalog': ClinicalToolCatalog,
   'calculators-hub': Calculators,

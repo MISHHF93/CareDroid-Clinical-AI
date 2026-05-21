@@ -181,12 +181,12 @@ function AppShellPage({ children }) {
 
   const handleNewConversation = () => {
     addConversation();
-    navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+    navigate({ pathname: '/chat', search: '' }, { replace: true });
   };
 
   const handleSelectConversation = (conversationId) => {
     selectConversation(conversationId);
-    navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+    navigate({ pathname: '/chat', search: '' }, { replace: true });
   };
 
   const handleToolSelect = (toolId) => {
@@ -215,7 +215,7 @@ function AppShellPage({ children }) {
     navigate('/tools/catalog');
   };
 
-  const isConversationViewport = location.pathname === '/dashboard';
+  const isConversationViewport = location.pathname === '/dashboard' || location.pathname === '/chat';
 
   return (
     <AppShell
@@ -306,8 +306,9 @@ function AppRoutes() {
     })),
 
     { path: '/dashboard', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
+    { path: '/chat', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
 
-    // Clinical tools: full-page routes (chat stays on /dashboard only)
+    // Clinical tools: full-page routes; chat-assisted actions use /chat while /dashboard remains Pulse.
     { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
     { path: '/tools/catalog', element: <AppShellPage><ClinicalToolCatalog /></AppShellPage>, requiresAuth: true },
     { path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>, requiresAuth: true },

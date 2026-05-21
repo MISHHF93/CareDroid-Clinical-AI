@@ -1,6 +1,6 @@
 /**
  * Central navigation for sidebar / deep links / legacy ?tool= params.
- * Every toolRegistry entry must resolve to a calculator route, tool page, or chat-assisted dashboard flow.
+ * Every toolRegistry entry must resolve to a calculator route, tool page, or chat-assisted flow.
  */
 
 import { toolRegistryById } from '../data/toolRegistry';
@@ -74,12 +74,12 @@ export function getRegistryToolNavigation(toolId) {
   }
 
   if (
-    (navPath === '/dashboard' && launch.chatSeed) ||
+    ((navPath === '/dashboard' || navPath === '/chat') && launch.chatSeed) ||
     (inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED && inventoryRecord.chatSeed)
   ) {
     return {
       mode: 'chat-assisted',
-      pathname: '/dashboard',
+      pathname: '/chat',
       search: '',
       registryId: launch.registryId || registryId,
       launch,

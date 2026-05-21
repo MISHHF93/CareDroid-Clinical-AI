@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import {
@@ -82,13 +82,17 @@ describe('Sidebar mobile render state', () => {
     const closeButton = container.querySelector('.sidebar-toggle--mobile-close');
     expect(closeButton).toBeInTheDocument();
     expect(closeButton).toHaveAccessibleName(/close menu/i);
-    expect(container.querySelector('nav.sidebar-nav')).toBeInTheDocument();
+    const nav = container.querySelector('nav.sidebar-nav');
+    expect(nav).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^pulse$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^chat$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^control$/i })).toBeInTheDocument();
   });
 
   it('renders tool cards with accessible names in tools section', () => {
     const { container } = renderSidebar({ layoutCompact: false, sidebarCollapsed: false });
 
-    expect(screen.getByText('Clinical Tools')).toBeInTheDocument();
+    expect(screen.getByText('Actions')).toBeInTheDocument();
     const toolCards = container.querySelectorAll('.sidebar-tool-card');
     expect(toolCards.length).toBeGreaterThan(0);
     expect(toolCards[0].querySelector('.sidebar-tool-card-name')?.textContent?.trim().length).toBeGreaterThan(

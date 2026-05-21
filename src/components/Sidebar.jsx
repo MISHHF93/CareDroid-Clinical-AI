@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useUser, Permission } from '../contexts/UserContext';
+import { useUser } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
@@ -13,7 +13,6 @@ import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon, getToolIcon } from '../navigation/iconRegistry';
-import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import './Sidebar.css';
 
 /**
@@ -85,30 +84,20 @@ const Sidebar = forwardRef(function Sidebar(
     .map((toolId) => sidebarToolById[toolId])
     .filter((tool) => tool && workspaceToolIds.includes(tool.id));
 
-  // Navigation Items
+  // Product modes stay simple while existing routes remain available.
   const navItems = [
-    { id: 'chat', label: 'Dashboard', path: '/dashboard' },
-    { id: 'clinical-alerts', label: 'Alerts', path: '/clinical/alerts' },
-    { id: 'profile', label: 'Profile', path: '/profile' },
-    { id: 'team', label: 'Team', path: '/team', permission: Permission.MANAGE_USERS },
-    { id: 'audit', label: 'Audit Logs', path: '/audit-logs', permission: Permission.VIEW_AUDIT_LOGS },
-    { id: 'analytics', label: 'Analytics', path: '/analytics', permission: Permission.VIEW_ANALYTICS },
-    { id: 'costs', label: 'Cost analytics', path: '/costs', permission: Permission.VIEW_ANALYTICS },
-    { id: 'settings', label: 'Settings', path: '/settings' },
-  ].filter((item) => {
-    if (item.id === 'team') {
-      return isBackendCapabilityEnabled('teamManagement');
-    }
-    return true;
-  });
+    { id: 'pulse', label: 'Pulse', path: '/dashboard' },
+    { id: 'chat', label: 'Chat', path: '/chat' },
+    { id: 'control', label: 'Control', path: '/settings' },
+  ];
 
   const recentConversations = conversations.slice(-5).reverse();
 
   const effectiveCollapsed = layoutCompact ? false : sidebarCollapsed;
 
   const handleNavClick = (path) => {
-    if (path === '/dashboard') {
-      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+    if (path === '/dashboard' || path === '/chat') {
+      navigate({ pathname: path, search: '' }, { replace: true });
     } else {
       onToolSelect?.(null);
       navigate(path);
@@ -210,7 +199,7 @@ const Sidebar = forwardRef(function Sidebar(
   const renderToolCard = (tool) => {
     const isSelected =
       currentTool === tool.id &&
-      (location.pathname === '/dashboard' || isToolRouteActive(tool));
+      (location.pathname === '/dashboard' || location.pathname === '/chat' || isToolRouteActive(tool));
     const isFavorite = favorites.includes(tool.id);
     const isPinned = pinned.includes(tool.id);
 
@@ -246,7 +235,7 @@ const Sidebar = forwardRef(function Sidebar(
             e.currentTarget.style.borderColor = 'transparent';
           }
         }}
-        title={`${tool.name} - ${tool.description}${tool.shortcut ? `\n\nShortcut: ${tool.shortcut}` : ''}\nClick to navigate or use in chat with /${tool.id}`}
+        title={`${tool.name} - ${tool.description}${tool.shortcut ? `\n\nShortcut: ${tool.shortcut}` : ''}\nOpen directly or send to Chat for guidance.`}
       >
         <div className="tool-action-buttons">
           <button
@@ -401,13 +390,13 @@ const Sidebar = forwardRef(function Sidebar(
           <span className="btn-icon" aria-hidden>
             <NavIcon icon={CHROME_ICONS.sparkles} size={18} />
           </span>
-          {!effectiveCollapsed && <span>New Conversation</span>}
+          {!effectiveCollapsed && <span>Start Chat</span>}
         </button>
 
         {/* Navigation */}
         <nav className="sidebar-nav">
           <div className="nav-section-title">
-            {!effectiveCollapsed && 'Navigation'}
+            {!effectiveCollapsed && 'Modes'}
           </div>
           {navItems.map(item => {
             const NavButton = (
@@ -452,7 +441,7 @@ const Sidebar = forwardRef(function Sidebar(
               <span className="section-icon section-icon--svg" aria-hidden>
                 <NavIcon icon={CHROME_ICONS.tools} size={16} />
               </span>
-              <span className="section-title">Clinical Tools</span>
+              <span className="section-title">Actions</span>
               <span
                 style={{
                   marginLeft: 'auto',
@@ -609,20 +598,20 @@ const Sidebar = forwardRef(function Sidebar(
                   <span className="section-icon--svg" aria-hidden>
                     <NavIcon icon={CHROME_ICONS.tools} size={14} />
                   </span>
-                  <span>Source Audit</span>
+                <span>Trust Details</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleViewAllTools}
-                  aria-label="Open tools overview — browse all suite shortcuts"
+                  aria-label="Open action library"
                   aria-current={isOnToolsOverview ? 'page' : undefined}
                   className={`sidebar-tools-quick-action${isOnToolsOverview ? ' sidebar-tools-quick-action--active' : ''}`}
                 >
                   <span className="section-icon--svg" aria-hidden>
                     <NavIcon icon={CHROME_ICONS.bolt} size={14} />
                   </span>
-                  <span>View All Tools</span>
+                  <span>Action Library</span>
                 </button>
               </div>
             )}

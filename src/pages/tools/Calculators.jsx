@@ -245,7 +245,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
       if (launch.chatSeed) {
         addMessage(launch.chatSeed, 'user');
       }
-      const navPath = resolveNavigationPathForLaunch(launch);
+      const navPath = launch.chatSeed ? '/chat' : resolveNavigationPathForLaunch(launch);
       navigate(navPath || '/dashboard');
     },
     [addMessage, navigate, recordToolAccess, selectTool, setActiveTool]

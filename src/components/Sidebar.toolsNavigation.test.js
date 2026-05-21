@@ -31,16 +31,16 @@ describe('View All Tools navigation wiring', () => {
     expect(sidebarSource).toContain('handleViewAllTools');
   });
 
-  it('exposes accessible View All Tools control with active state on /tools', () => {
-    expect(sidebarSource).toContain('Open tools overview');
+  it('exposes accessible action library control with active state on /tools', () => {
+    expect(sidebarSource).toContain('Open action library');
     expect(sidebarSource).toContain('isOnToolsOverview');
     expect(sidebarSource).toContain("location.pathname === '/tools'");
     expect(sidebarSource).toContain('sidebar-tools-quick-action--active');
   });
 
-  it('labels the catalog route as a developer source audit', () => {
+  it('keeps the catalog route available behind trust details', () => {
     expect(sidebarSource).toContain('Open developer catalog and source audit');
-    expect(sidebarSource).toContain('Source Audit');
+    expect(sidebarSource).toContain('Trust Details');
     expect(sidebarSource).toContain("navigate('/tools/catalog')");
   });
 

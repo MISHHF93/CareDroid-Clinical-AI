@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
@@ -32,6 +32,7 @@ function Dashboard() {
   const { recordToolAccess } = useToolPreferences();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [input, setInput] = useState('');
   const [recommendedTools, setRecommendedTools] = useState([]);
   const [selectedCitation, setSelectedCitation] = useState(null);
@@ -93,6 +94,7 @@ function Dashboard() {
 
   const panelRegistryId = searchParams.get('tool');
   const calcFromUrl = searchParams.get('calc');
+  const isChatMode = location.pathname === '/chat';
   const selectedToolEntry = selectedTool ? getToolById(selectedTool) : null;
   const activeConversationLabel = activeConversationId ? `Conversation ${activeConversationId}` : 'No conversation';
   const starterPrompts = useMemo(
@@ -103,7 +105,7 @@ function Dashboard() {
         icon: CHROME_ICONS.stethoscope,
       },
       {
-        title: 'Check medications',
+        title: 'Check medication safety',
         prompt: 'Check for drug interactions between ',
         icon: CHROME_ICONS.shield,
       },
@@ -111,6 +113,58 @@ function Dashboard() {
         title: 'Interpret labs',
         prompt: 'Interpret these lab results and flag critical values:',
         icon: CHROME_ICONS.microscope,
+      },
+      {
+        title: 'Plan follow-up outreach',
+        prompt: 'Create a patient follow-up outreach plan for ',
+        icon: CHROME_ICONS.messageCircle,
+      },
+    ],
+    []
+  );
+  const pulseActions = useMemo(
+    () => [
+      {
+        title: 'Review what needs attention',
+        body: 'Open active clinical alerts and verify the highest-risk items first.',
+        label: 'Review alerts',
+        icon: CHROME_ICONS.siren,
+        path: '/clinical/alerts',
+      },
+      {
+        title: 'Act with guidance',
+        body: 'Start from chat with context instead of memorizing a tool or command phrase.',
+        label: 'Open Chat',
+        icon: CHROME_ICONS.message,
+        path: '/chat',
+      },
+      {
+        title: 'Outreach and follow-up',
+        body: 'Draft a follow-up plan, preview the message, then confirm the next step.',
+        label: 'Plan outreach',
+        icon: CHROME_ICONS.messageCircle,
+        prompt: 'Create a patient follow-up outreach plan for ',
+      },
+      {
+        title: 'Medication safety',
+        body: 'Guide a drug interaction check with structured context and reviewable output.',
+        label: 'Check medications',
+        icon: CHROME_ICONS.shield,
+        path: '/tools/drug-checker',
+      },
+      {
+        title: 'Lab review',
+        body: 'Interpret labs with loading, success, and error states handled by the tool page.',
+        label: 'Interpret labs',
+        icon: CHROME_ICONS.microscope,
+        path: '/tools/lab-interpreter',
+      },
+      {
+        title: 'Control access and trust',
+        body: 'Manage account, integrations, audit visibility, and platform settings.',
+        label: 'Open Control',
+        icon: CHROME_ICONS.settings,
+        path: '/settings',
       },
     ],
     []
@@ -144,7 +198,7 @@ function Dashboard() {
     });
 
     if (plan.mode === 'chat-assisted') {
-      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+      navigate({ pathname: '/chat', search: '' }, { replace: true });
     }
   }, [panelRegistryId, calcFromUrl, navigate, setActiveTool, recordToolAccess, clearTool, addMessage, selectTool]);
 
@@ -190,6 +244,20 @@ function Dashboard() {
   const handleStarterPrompt = (prompt) => {
     setInput(prompt);
     window.requestAnimationFrame(() => composerInputRef.current?.focus());
+  };
+
+  const openChatWithPrompt = (prompt) => {
+    setInput(prompt);
+    navigate('/chat');
+    window.requestAnimationFrame(() => composerInputRef.current?.focus());
+  };
+
+  const handlePulseAction = (action) => {
+    if (action.prompt) {
+      openChatWithPrompt(action.prompt);
+      return;
+    }
+    navigate(action.path);
   };
 
   const recommendationSource = useMemo(() => {
@@ -243,12 +311,14 @@ function Dashboard() {
         <header className="dashboard-chat-header" aria-labelledby="dashboard-chat-title">
           <div className="dashboard-chat-header__identity">
             <div className="dashboard-chat-header__icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.bot} size={22} />
+              <NavIcon icon={isChatMode ? CHROME_ICONS.bot : CHROME_ICONS.barChart} size={22} />
             </div>
             <div>
-              <p className="dashboard-chat-eyebrow">Clinical copilot</p>
+              <p className="dashboard-chat-eyebrow">
+                {isChatMode ? 'Chat = act with guidance' : 'Pulse = see what matters'}
+              </p>
               <h1 id="dashboard-chat-title" className="dashboard-chat-title">
-                CareDroid clinical chat
+                {isChatMode ? 'CareDroid clinical chat' : 'Pulse'}
               </h1>
             </div>
           </div>
@@ -275,31 +345,53 @@ function Dashboard() {
           {messages.length === 0 ? (
             <div className="dashboard-empty">
               <div className="dashboard-empty-icon" aria-hidden>
-                <NavIcon icon={CHROME_ICONS.hospital} size={48} />
+                <NavIcon icon={isChatMode ? CHROME_ICONS.hospital : CHROME_ICONS.barChart} size={48} />
               </div>
               <div className="dashboard-empty-inner">
-                <div className="dashboard-empty-title">CareDroid clinical chat</div>
+                <div className="dashboard-empty-title">
+                  {isChatMode ? 'CareDroid clinical chat' : 'Start with what matters'}
+                </div>
                 <div className="dashboard-empty-copy">
-                  Ask about medications, labs, scores, protocols, and procedures. Open a clinical tool from
-                  the sidebar or Tools — each tool has its own page; use &quot;Discuss with AI&quot; there to
-                  bring results back into this chat.
+                  {isChatMode
+                    ? 'Ask about medications, labs, scores, protocols, and procedures. Use guided prompts when you want a structured path.'
+                    : 'Review priority items, choose the next action, then use Chat to preview, confirm, and verify the result.'}
                 </div>
-                <div className="dashboard-starter-grid" aria-label="Starter prompts">
-                  {starterPrompts.map((starter) => (
-                    <button
-                      key={starter.title}
-                      type="button"
-                      className="dashboard-starter-card"
-                      onClick={() => handleStarterPrompt(starter.prompt)}
-                    >
-                      <span className="dashboard-starter-card__icon" aria-hidden>
-                        <NavIcon icon={starter.icon} size={18} />
-                      </span>
-                      <span className="dashboard-starter-card__title">{starter.title}</span>
-                      <span className="dashboard-starter-card__prompt">{starter.prompt}</span>
-                    </button>
-                  ))}
-                </div>
+                {isChatMode ? (
+                  <div className="dashboard-starter-grid" aria-label="Starter prompts">
+                    {starterPrompts.map((starter) => (
+                      <button
+                        key={starter.title}
+                        type="button"
+                        className="dashboard-starter-card"
+                        onClick={() => handleStarterPrompt(starter.prompt)}
+                      >
+                        <span className="dashboard-starter-card__icon" aria-hidden>
+                          <NavIcon icon={starter.icon} size={18} />
+                        </span>
+                        <span className="dashboard-starter-card__title">{starter.title}</span>
+                        <span className="dashboard-starter-card__prompt">{starter.prompt}</span>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="dashboard-pulse-grid" aria-label="Priority actions">
+                    {pulseActions.map((action) => (
+                      <button
+                        key={action.title}
+                        type="button"
+                        className="dashboard-pulse-card"
+                        onClick={() => handlePulseAction(action)}
+                      >
+                        <span className="dashboard-pulse-card__icon" aria-hidden>
+                          <NavIcon icon={action.icon} size={18} />
+                        </span>
+                        <span className="dashboard-pulse-card__title">{action.title}</span>
+                        <span className="dashboard-pulse-card__body">{action.body}</span>
+                        <span className="dashboard-pulse-card__action">{action.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           ) : (

@@ -10,12 +10,12 @@ import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './ToolsOverview.css';
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
-  { value: 'all', label: 'All launchable tools' },
+  { value: 'all', label: 'All actions' },
   { value: 'calculator', label: 'Calculators' },
-  { value: 'chat-assisted', label: 'Chat-assisted' },
-  { value: 'backend-backed', label: 'Backend-backed' },
-  { value: 'clinical-page', label: 'Clinical pages' },
-  { value: 'fleet', label: 'Fleet tools' },
+  { value: 'chat-assisted', label: 'Guided chat' },
+  { value: 'backend-backed', label: 'Verified actions' },
+  { value: 'clinical-page', label: 'Forms and pages' },
+  { value: 'fleet', label: 'Operations' },
   { value: 'reference', label: 'Reference' },
 ]);
 
@@ -122,10 +122,10 @@ const ToolsOverview = () => {
             <span className="tools-overview-title-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.tools} size={28} />
             </span>{' '}
-            All Tools
+            Action Library
           </h1>
           <p className="header-subtitle">
-            One launchable catalog for CareDroid clinical tools, calculators, chat-assisted workflows, and fleet tools.
+            Pick what you want to do. CareDroid keeps the routes, validation, and execution details underneath.
           </p>
           <div className="tools-workspace">
             <label htmlFor="workspaceSelect">Workspace</label>
@@ -147,7 +147,7 @@ const ToolsOverview = () => {
               className="tools-catalog-link"
               onClick={() => navigate('/tools/catalog')}
             >
-              Developer Catalog / Source Audit →
+              Trust and source details →
             </button>
           </p>
           <div className="tools-discovery-controls" role="search" aria-label="Search and filter all tools">
@@ -179,7 +179,7 @@ const ToolsOverview = () => {
           <div className="header-stats">
             <div className="stat">
               <span className="stat-number">{tools.length}</span>
-              <span className="stat-label">Launchable tools</span>
+              <span className="stat-label">Actions</span>
             </div>
             <div className="stat">
               <span className="stat-number">{filteredTools.length}</span>
@@ -193,7 +193,7 @@ const ToolsOverview = () => {
             </div>
             <div className="stat">
               <span className="stat-number">{chatAssistedCount}</span>
-              <span className="stat-label">Chat-assisted</span>
+              <span className="stat-label">Guided</span>
             </div>
           </div>
         </div>
@@ -284,7 +284,7 @@ const ToolsOverview = () => {
                 </span>
                 {tool.surface === 'chat-assisted' ? (
                   <span className="tool-category" style={{ backgroundColor: `${tool.color}15`, color: tool.color }}>
-                    Chat-assisted
+                    Guided
                   </span>
                 ) : null}
               </div>
@@ -358,7 +358,7 @@ const ToolsOverview = () => {
                   handleToolClick(tool);
                 }}
               >
-                {tool.surface === 'chat-assisted' ? 'Start Guided Chat →' : 'Open Tool →'}
+                {tool.surface === 'chat-assisted' ? 'Start with Chat →' : 'Open →'}
               </button>
               <button
                 className="btn-chat-tool"
@@ -366,10 +366,10 @@ const ToolsOverview = () => {
                   e.stopPropagation();
                   recordToolAccess(tool.id);
                   selectTool(tool.id);
-                  navigate('/dashboard');
+                  navigate('/chat');
                 }}
               >
-                Use in Chat
+                Open in Chat
               </button>
             </div>
           </div>
@@ -377,40 +377,39 @@ const ToolsOverview = () => {
         </div>
       )}
 
-      {/* Quick Tips Section */}
       <div className="tools-tips">
         <h2 className="tools-tips-title">
           <NavIcon icon={CHROME_ICONS.lightbulb} size={28} />
-          Quick Tips
+          How to act
         </h2>
         <div className="tips-grid">
           <div className="tip-card">
             <span className="tip-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.keyboard} size={32} />
+              <NavIcon icon={CHROME_ICONS.checkCircle} size={32} />
             </span>
-            <h3>Keyboard Shortcuts</h3>
-            <p>Use Ctrl+1 through Ctrl+6 to quickly access tools from anywhere</p>
+            <h3>Choose an action</h3>
+            <p>Start from a card instead of learning route names or command phrasing.</p>
           </div>
           <div className="tip-card">
             <span className="tip-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.messageCircle} size={32} />
             </span>
-            <h3>Chat Integration</h3>
-            <p>Type /tool-name in chat to invoke tools directly in conversation</p>
+            <h3>Open in Chat</h3>
+            <p>Send context to Chat when you want guidance, preview, or confirmation before acting.</p>
           </div>
           <div className="tip-card">
             <span className="tip-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.download} size={32} />
             </span>
-            <h3>State Persistence</h3>
-            <p>Tool inputs are saved per conversation for easy reference</p>
+            <h3>Verify results</h3>
+            <p>Outputs remain attached to the session so you can review, edit, share, or retry.</p>
           </div>
           <div className="tip-card">
             <span className="tip-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.bot} size={32} />
             </span>
-            <h3>AI Awareness</h3>
-            <p>CareDroid can read and reference tool data in responses</p>
+            <h3>Power stays underneath</h3>
+            <p>Existing backend commands and deterministic executors still run behind the simpler surface.</p>
           </div>
         </div>
       </div>

@@ -86,7 +86,9 @@ const FALLBACK = Layers;
 
 /** Primary app routes (Sidebar / Navigation) */
 const NAV_ICONS = {
+  pulse: LayoutDashboard,
   chat: MessageSquare,
+  control: Settings,
   'clinical-alerts': Siren,
   profile: User,
   team: Users,

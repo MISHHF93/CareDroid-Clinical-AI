@@ -77,7 +77,7 @@ const ToolPageLayout = ({
       ],
       timestamp: new Date(),
     });
-    const dest = embedded ? undefined : '/dashboard';
+    const dest = embedded ? undefined : '/chat';
     if (dest) navigate(dest);
     onCloseEmbedded?.();
   };
@@ -124,14 +124,14 @@ const ToolPageLayout = ({
           <button type="button" onClick={() => navigate('/dashboard')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.message} size={16} decorative />
-              <span>Dashboard</span>
+              <span>Pulse</span>
             </span>
           </button>
           <span className="breadcrumb-separator">›</span>
           <button type="button" onClick={() => navigate('/tools')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.tools} size={16} decorative />
-              <span>Tools</span>
+              <span>Actions</span>
             </span>
           </button>
           <span className="breadcrumb-separator">›</span>
@@ -154,9 +154,7 @@ const ToolPageLayout = ({
               <span className="tool-category-badge" style={{ backgroundColor: `${tool.color}20`, color: tool.color }}>
                 {tool.category}
               </span>
-              <span className="tool-shortcut-badge">
-                Shortcut: {tool.shortcut}
-              </span>
+              {tool.shortcut ? <span className="tool-shortcut-badge">Quick access</span> : null}
             </div>
           </div>
         </div>
@@ -187,7 +185,7 @@ const ToolPageLayout = ({
           ) : (
             <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => navigate('/tools')}>
               <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
-              <span>All Tools</span>
+              <span>Action Library</span>
             </button>
           )}
         </div>
@@ -297,9 +295,9 @@ const ToolPageLayout = ({
           <div className="ai-panel-header">
             <h3 className="ai-panel-title-with-icon">
               <NavIcon icon={CHROME_ICONS.bot} size={22} aria-hidden />
-              <span>AI Integration</span>
+              <span>Open in Chat</span>
             </h3>
-            <p>This tool can interact with CareDroid AI for enhanced analysis</p>
+            <p>Bring this action into Chat to preview, confirm, or ask for guidance.</p>
           </div>
           <div className="ai-panel-actions">
             <button
@@ -307,26 +305,26 @@ const ToolPageLayout = ({
               className="btn-ai-action"
               onClick={() => {
                 selectTool(tool.id);
-                navigate('/dashboard');
+                navigate('/chat');
               }}
             >
               <span className="btn-icon" aria-hidden>
                 <NavIcon icon={CHROME_ICONS.message} size={18} />
               </span>
-              <span>Discuss Results with AI</span>
+              <span>Discuss Results</span>
             </button>
             <button
               type="button"
               className="btn-ai-action"
               onClick={() => {
                 selectTool(tool.id);
-                navigate('/dashboard');
+                navigate('/chat');
               }}
             >
               <span className="btn-icon" aria-hidden>
                 <NavIcon icon={CHROME_ICONS.bolt} size={18} />
               </span>
-              <span>Use in Active Conversation</span>
+              <span>Use in Chat</span>
             </button>
           </div>
           <div className="ai-panel-tip">
@@ -334,7 +332,7 @@ const ToolPageLayout = ({
               <NavIcon icon={CHROME_ICONS.lightbulb} size={16} />
             </span>
             <span>
-              Tip: Type <code>/{tool.id}</code> in chat to invoke this tool
+              Tip: use the buttons above when you want guidance without memorizing command phrases.
             </span>
           </div>
         </div>

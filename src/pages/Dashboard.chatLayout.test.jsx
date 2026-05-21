@@ -41,9 +41,9 @@ vi.mock('../utils/toolRecommendations', () => ({
   recordRecommendationFeedback: vi.fn(),
 }));
 
-function renderDashboard() {
+function renderDashboard(route = '/dashboard') {
   return render(
-    <MemoryRouter initialEntries={['/dashboard']}>
+    <MemoryRouter initialEntries={[route]}>
       <Dashboard />
     </MemoryRouter>
   );
@@ -57,8 +57,17 @@ describe('Dashboard chat layout', () => {
     mockConversationValue.selectedTool = null;
   });
 
-  it('renders a complete clinical chat shell', async () => {
+  it('renders Pulse as the simple home surface', async () => {
     renderDashboard();
+
+    expect(screen.getByRole('heading', { level: 1, name: /pulse/i })).toBeInTheDocument();
+    expect(screen.getByText(/see what matters/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /outreach and follow-up/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
+  });
+
+  it('renders a complete clinical chat shell', async () => {
+    renderDashboard('/chat');
 
     expect(screen.getByRole('heading', { level: 1, name: /caredroid clinical chat/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/chat context/i)).toHaveTextContent(/online/i);
@@ -68,10 +77,20 @@ describe('Dashboard chat layout', () => {
 
   it('prefills the composer from starter prompts', async () => {
     const user = userEvent.setup();
-    renderDashboard();
+    renderDashboard('/chat');
 
-    await user.click(screen.getByRole('button', { name: /check medications/i }));
+    await user.click(screen.getByRole('button', { name: /check medication safety/i }));
 
     expect(screen.getByLabelText(/clinical chat message/i).value).toMatch(/check for drug interactions/i);
+  });
+
+  it('makes outreach visible and opens it in Chat with context', async () => {
+    const user = userEvent.setup();
+    renderDashboard();
+
+    await user.click(screen.getByRole('button', { name: /outreach and follow-up/i }));
+
+    expect(screen.getByRole('heading', { level: 1, name: /caredroid clinical chat/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/clinical chat message/i).value).toMatch(/follow-up outreach plan/i);
   });
 });

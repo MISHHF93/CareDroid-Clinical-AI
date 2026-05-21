@@ -143,13 +143,19 @@ export function buildResponsiveQaPages() {
   const pages = [
     {
       id: 'dashboard',
-      label: 'Home / Dashboard',
+      label: 'Pulse',
       path: '/dashboard',
       category: 'core',
     },
     {
+      id: 'chat',
+      label: 'Chat',
+      path: '/chat',
+      category: 'core',
+    },
+    {
       id: 'tools-overview',
-      label: 'All Tools',
+      label: 'Action Library',
       path: '/tools',
       category: 'core',
     },

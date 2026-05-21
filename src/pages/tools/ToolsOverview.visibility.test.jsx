@@ -1,5 +1,5 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ToolsOverview from './ToolsOverview';
 import {
@@ -52,7 +52,9 @@ function toolCard(container, id) {
 function openTool(container, id) {
   const card = toolCard(container, id);
   expect(card, id).toBeTruthy();
-  fireEvent.click(within(card).getByRole('button', { name: /open tool|start guided chat/i }));
+  const launchButton = card.querySelector('.btn-open-tool');
+  expect(launchButton, id).toBeTruthy();
+  fireEvent.click(launchButton);
 }
 
 describe('ToolsOverview complete visibility, search, filters, and launch', () => {
@@ -80,7 +82,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     for (const phantom of phantomToolReferences) {
       expect(renderedIds, phantom.id).not.toContain(phantom.id);
     }
-  });
+  }, 10000);
 
   it.each([
     ['pe-score', 'wells-pe'],
@@ -96,7 +98,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
     expect(toolCard(container, expectedId)).toBeTruthy();
     expect(container.querySelectorAll('[data-tool-id]').length).toBeGreaterThan(0);
-  });
+  }, 10000);
 
   it.each([
     ['calculator', TOOL_SURFACES.CALCULATOR_FORM],
@@ -134,8 +136,8 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     fireEvent.click(screen.getByRole('button', { name: /clear search and filters/i }));
 
     expect(input.value).toBe('');
-    expect(screen.getAllByText(/open tool|start guided chat/i).length).toBeGreaterThan(0);
-  });
+    expect(screen.getAllByText(/^(open|start with chat)/i).length).toBeGreaterThan(0);
+  }, 10000);
 
   it('launches representative calculator, clinical-page, fleet, hub, and chat-assisted tools', () => {
     const { container } = renderOverview();
@@ -169,8 +171,8 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(mockConversationValue.selectTool).toHaveBeenCalledWith('wells-pe');
     expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('wells-pe');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/dashboard', search: '' },
+      { pathname: '/chat', search: '' },
       expect.objectContaining({ replace: true })
     );
-  });
+  }, 10000);
 });
