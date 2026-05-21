@@ -10,6 +10,7 @@ import ToolVisualization from '../components/ToolVisualization';
 import ToolCard from '../components/ToolCard';
 import Citations, { CitationModal } from '../components/Citations';
 import ConfidenceBadge from '../components/ConfidenceBadge';
+import { Drawer } from '../components/ui/Drawer';
 import analyticsService from '../services/analyticsService';
 import { getToolRecommendationsNLU, recordRecommendationFeedback } from '../utils/toolRecommendations';
 import { scheduleIdleWork } from '../utils/scheduleIdleWork';
@@ -21,6 +22,28 @@ import {
 import { NavIcon } from '../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../navigation/iconRegistry';
 import './Dashboard.css';
+
+const OUTREACH_INITIAL_FORM = {
+  target: '',
+  reason: '',
+  timing: 'within 48 hours',
+  context: '',
+};
+
+function buildOutreachChatPrompt({ target, reason, timing, context }) {
+  const contextLine = context?.trim() ? `Additional context: ${context.trim()}` : 'Additional context: none provided';
+  return [
+    'Create a patient follow-up outreach plan for clinician review.',
+    '',
+    `Target/context: ${target.trim() || 'not specified yet'}`,
+    `Reason for follow-up: ${reason.trim() || 'not specified yet'}`,
+    `Timing/next step: ${timing}`,
+    contextLine,
+    '',
+    'Do not send any message or claim outreach has been completed.',
+    'Return a concise patient-safe draft, a clinician confirmation checklist, expected result state, and verification/documentation steps.',
+  ].join('\n');
+}
 
 /**
  * Dashboard — clinical chat (full width). Tools open on dedicated /tools/* routes.
@@ -37,6 +60,8 @@ function Dashboard() {
   const [recommendedTools, setRecommendedTools] = useState([]);
   const [selectedCitation, setSelectedCitation] = useState(null);
   const [sending, setSending] = useState(false);
+  const [outreachDrawerOpen, setOutreachDrawerOpen] = useState(false);
+  const [outreachForm, setOutreachForm] = useState(OUTREACH_INITIAL_FORM);
   const scrollRef = useRef(null);
   const scrollEndRef = useRef(null);
   const composerInputRef = useRef(null);
@@ -117,6 +142,7 @@ function Dashboard() {
       {
         title: 'Plan follow-up outreach',
         prompt: 'Create a patient follow-up outreach plan for ',
+        workflow: 'outreach',
         icon: CHROME_ICONS.messageCircle,
       },
     ],
@@ -143,7 +169,7 @@ function Dashboard() {
         body: 'Draft a follow-up plan, preview the message, then confirm the next step.',
         label: 'Plan outreach',
         icon: CHROME_ICONS.messageCircle,
-        prompt: 'Create a patient follow-up outreach plan for ',
+        workflow: 'outreach',
       },
       {
         title: 'Medication safety',
@@ -169,6 +195,8 @@ function Dashboard() {
     ],
     []
   );
+  const outreachPreview = useMemo(() => buildOutreachChatPrompt(outreachForm), [outreachForm]);
+  const canConfirmOutreach = Boolean(outreachForm.target.trim() && outreachForm.reason.trim());
 
   useEffect(() => {
     if (!panelRegistryId) {
@@ -202,9 +230,9 @@ function Dashboard() {
     }
   }, [panelRegistryId, calcFromUrl, navigate, setActiveTool, recordToolAccess, clearTool, addMessage, selectTool]);
 
-  const handleSendMessage = async () => {
-    if (!input.trim() || sending) return;
-    const text = input.trim();
+  const submitChatMessage = async (messageText) => {
+    if (!messageText.trim() || sending) return false;
+    const text = messageText.trim();
     shouldStickToBottomRef.current = true;
     addMessage(text, 'user');
     setInput('');
@@ -234,6 +262,11 @@ function Dashboard() {
     } finally {
       setSending(false);
     }
+    return true;
+  };
+
+  const handleSendMessage = async () => {
+    await submitChatMessage(input);
   };
 
   const handleSubmitMessage = (event) => {
@@ -241,8 +274,16 @@ function Dashboard() {
     handleSendMessage();
   };
 
-  const handleStarterPrompt = (prompt) => {
-    setInput(prompt);
+  const openOutreachPlanner = () => {
+    setOutreachDrawerOpen(true);
+  };
+
+  const handleStarterPrompt = (starter) => {
+    if (starter.workflow === 'outreach') {
+      openOutreachPlanner();
+      return;
+    }
+    setInput(starter.prompt);
     window.requestAnimationFrame(() => composerInputRef.current?.focus());
   };
 
@@ -253,11 +294,26 @@ function Dashboard() {
   };
 
   const handlePulseAction = (action) => {
+    if (action.workflow === 'outreach') {
+      openOutreachPlanner();
+      return;
+    }
     if (action.prompt) {
       openChatWithPrompt(action.prompt);
       return;
     }
     navigate(action.path);
+  };
+
+  const updateOutreachField = (field, value) => {
+    setOutreachForm((current) => ({ ...current, [field]: value }));
+  };
+
+  const handleConfirmOutreach = () => {
+    if (!canConfirmOutreach || sending) return;
+    setOutreachDrawerOpen(false);
+    navigate('/chat');
+    void submitChatMessage(outreachPreview);
   };
 
   const recommendationSource = useMemo(() => {
@@ -363,7 +419,7 @@ function Dashboard() {
                         key={starter.title}
                         type="button"
                         className="dashboard-starter-card"
-                        onClick={() => handleStarterPrompt(starter.prompt)}
+                        onClick={() => handleStarterPrompt(starter)}
                       >
                         <span className="dashboard-starter-card__icon" aria-hidden>
                           <NavIcon icon={starter.icon} size={18} />
@@ -540,6 +596,99 @@ function Dashboard() {
       {selectedCitation && (
         <CitationModal citation={selectedCitation} onClose={() => setSelectedCitation(null)} />
       )}
+
+      <Drawer
+        isOpen={outreachDrawerOpen}
+        onClose={() => setOutreachDrawerOpen(false)}
+        side="right"
+        size="lg"
+        title="Plan follow-up outreach"
+        className="dashboard-outreach-drawer"
+        footer={
+          <div className="dashboard-outreach-footer">
+            <button
+              type="button"
+              className="dashboard-outreach-secondary"
+              onClick={() => setOutreachForm(OUTREACH_INITIAL_FORM)}
+            >
+              Reset
+            </button>
+            <button
+              type="button"
+              className="dashboard-outreach-primary"
+              disabled={!canConfirmOutreach || sending}
+              onClick={handleConfirmOutreach}
+            >
+              Confirm and ask Chat
+            </button>
+          </div>
+        }
+      >
+        <div className="dashboard-outreach">
+          <p className="dashboard-outreach-copy">
+            Build a reviewable outreach plan through the existing protected Chat route. No outreach
+            message will be sent, scheduled, or documented automatically.
+          </p>
+
+          <div className="dashboard-outreach-steps" aria-label="Outreach workflow steps">
+            {['Start', 'Choose target', 'Draft preview', 'Confirm', 'Result in Chat', 'Verify'].map(
+              (step) => (
+                <span key={step} className="dashboard-outreach-step">
+                  {step}
+                </span>
+              )
+            )}
+          </div>
+
+          <label className="dashboard-outreach-field">
+            <span>Patient or cohort target</span>
+            <input
+              value={outreachForm.target}
+              onChange={(event) => updateOutreachField('target', event.target.value)}
+              placeholder="Example: Mrs. A after ED discharge for pneumonia"
+            />
+          </label>
+
+          <label className="dashboard-outreach-field">
+            <span>Follow-up reason</span>
+            <input
+              value={outreachForm.reason}
+              onChange={(event) => updateOutreachField('reason', event.target.value)}
+              placeholder="Example: symptom check, med adherence, return precautions"
+            />
+          </label>
+
+          <label className="dashboard-outreach-field">
+            <span>Timing or next step</span>
+            <select
+              value={outreachForm.timing}
+              onChange={(event) => updateOutreachField('timing', event.target.value)}
+            >
+              <option value="today">Today</option>
+              <option value="within 48 hours">Within 48 hours</option>
+              <option value="within 1 week">Within 1 week</option>
+              <option value="at next scheduled visit">At next scheduled visit</option>
+            </select>
+          </label>
+
+          <label className="dashboard-outreach-field">
+            <span>Optional clinical context</span>
+            <textarea
+              value={outreachForm.context}
+              onChange={(event) => updateOutreachField('context', event.target.value)}
+              placeholder="Add relevant constraints, safety notes, language needs, or verification requirements."
+              rows={4}
+            />
+          </label>
+
+          <section className="dashboard-outreach-preview-section">
+            <div className="dashboard-outreach-preview-heading">Preview before execution</div>
+            <pre className="dashboard-outreach-preview" aria-label="Outreach Chat preview">
+              {outreachPreview}
+            </pre>
+          </section>
+        </div>
+      </Drawer>
     </div>
   );
 }
