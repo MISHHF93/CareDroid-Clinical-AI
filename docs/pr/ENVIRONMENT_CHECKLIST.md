@@ -6,7 +6,8 @@ Copy from [.env.example](../../.env.example).
 
 | Variable | Local dev | Staging / prod (same-origin) | Split API |
 |----------|-----------|------------------------------|-----------|
-| `VITE_API_URL` | empty | empty | `https://api.example.com` |
+| `VITE_API_URL` | empty | empty only with a verified same-origin `/api` proxy | `https://api.example.com` |
+| `VITE_ALLOW_SAME_ORIGIN_API` | `false` | `true` only when `/api` is edge-proxied to Nest | `false` |
 | `VITE_API_PROXY_TARGET` | `http://localhost:3000` | N/A (build-time) | N/A |
 | `VITE_WS_URL` | empty (same host) | optional override | `wss://api.example.com` |
 | `VITE_API_TIMEOUT_MS` | `30000` | `30000` | tune if needed |
@@ -56,3 +57,5 @@ Copy from [backend/.env.example](../../backend/.env.example).
 - [ ] Staging env vars documented in team vault
 - [ ] Production env vars documented in team vault
 - [ ] No `localhost` in production `VITE_API_URL`
+- [ ] Vercel frontend deploys set `VITE_API_URL` unless an edge proxy has been verified.
+- [ ] Production deploys do not set `VITE_HIDE_DIVISION_MODE=false`.

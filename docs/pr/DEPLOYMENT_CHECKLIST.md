@@ -21,6 +21,8 @@ npm run build
 - [ ] `VITE_API_URL` set for target environment:
   - **Same-origin:** empty → app served with `/api` reverse proxy to Nest
   - **Split API:** `https://api.<domain>` full origin (no trailing slash)
+- [ ] Vercel frontend deploys have `VITE_API_URL` set, or `VITE_ALLOW_SAME_ORIGIN_API=true` only after verifying an edge proxy forwards `/api` to Nest.
+- [ ] `VITE_HIDE_DIVISION_MODE` is unset or `true` in production; never deploy production with Division mode enabled.
 - [ ] `VITE_WS_URL` set if WebSockets on different host (optional)
 - [ ] Source maps policy decided (upload or omit)
 
