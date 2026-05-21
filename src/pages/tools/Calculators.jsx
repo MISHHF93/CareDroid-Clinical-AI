@@ -80,6 +80,7 @@ import { Abcd2Calculator } from './abcd2Calculator';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 
+// Hub cards still derive from builtinUiCalculators.map inside buildBuiltinHubCalculatorCards().
 const CALCULATORS = buildBuiltinHubCalculatorCards();
 const CHAT_ASSISTED_TOOLS = getHubChatAssistedTools();
 const CHAT_ASSISTED_TOOL_BY_ID = Object.fromEntries(

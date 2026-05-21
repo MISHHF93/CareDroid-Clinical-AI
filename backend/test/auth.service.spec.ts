@@ -98,7 +98,7 @@ describe('AuthService', () => {
       const result = await service.login(
         { email: 'test@example.com', password: 'password123' },
         '127.0.0.1',
-        'test-agent'
+        'test-agent',
       );
 
       expect(result).toHaveProperty('id', '1');
@@ -111,7 +111,7 @@ describe('AuthService', () => {
       const result = await service.login(
         { email: 'test@example.com', password: 'wrongpassword' },
         '127.0.0.1',
-        'test-agent'
+        'test-agent',
       );
 
       expect(result).toBeNull();

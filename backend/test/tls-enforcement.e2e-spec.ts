@@ -6,7 +6,7 @@ import * as helmet from 'helmet';
 
 /**
  * TLS 1.3 and Security Headers E2E Tests
- * 
+ *
  * Verifies that the application enforces TLS 1.3 and implements
  * all required security headers for HIPAA compliance
  */
@@ -19,7 +19,7 @@ describe('TLS 1.3 & Security Headers (E2E)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    
+
     // Apply helmet with enhanced security headers (matching main.ts)
     app.use(
       helmet.default({
@@ -52,7 +52,7 @@ describe('TLS 1.3 & Security Headers (E2E)', () => {
           microphone: [],
           geolocation: [],
         },
-      })
+      }),
     );
 
     await app.init();
@@ -241,9 +241,7 @@ describe('TLS 1.3 & Security Headers (E2E)', () => {
       const headersList = [];
 
       for (const route of routes) {
-        const response = await request(app.getHttpServer())
-          .get(route)
-          .expect([200, 404]); // Some routes may not exist
+        const response = await request(app.getHttpServer()).get(route).expect([200, 404]); // Some routes may not exist
 
         headersList.push({
           route,
@@ -293,17 +291,13 @@ describe('TLS 1.3 & Security Headers (E2E)', () => {
 
   describe('Security Configuration Consistency', () => {
     it('should enforce same security policy across all endpoints', async () => {
-      const response1 = await request(app.getHttpServer())
-        .get('/')
-        .expect([200, 404]);
-      const response2 = await request(app.getHttpServer())
-        .get('/api')
-        .expect([200, 404]);
+      const response1 = await request(app.getHttpServer()).get('/').expect([200, 404]);
+      const response2 = await request(app.getHttpServer()).get('/api').expect([200, 404]);
 
       // Both should have same security headers
       expect(response1.headers['strict-transport-security']).toBe(
-        response2.headers['strict-transport-security'] || 
-        response1.headers['strict-transport-security']
+        response2.headers['strict-transport-security'] ||
+          response1.headers['strict-transport-security'],
       );
     });
 
@@ -354,7 +348,7 @@ describe('TLS 1.3 & Security Headers (E2E)', () => {
       // Should limit referrer leakage
       expect(referrerPolicy).toBeDefined();
       expect(['strict-origin-when-cross-origin', 'strict-origin']).toContain(
-        referrerPolicy.toLowerCase()
+        referrerPolicy.toLowerCase(),
       );
     });
 

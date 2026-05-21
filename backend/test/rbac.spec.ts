@@ -18,7 +18,7 @@ import { AuditAction } from '../src/modules/audit/entities/audit-log.entity';
 
 /**
  * RBAC (Role-Based Access Control) Tests - Batch 15 Phase 3
- * 
+ *
  * Comprehensive test suite verifying:
  * - Role-permission mapping
  * - Authorization guard functionality
@@ -26,7 +26,7 @@ import { AuditAction } from '../src/modules/audit/entities/audit-log.entity';
  * - Audit logging of access control
  * - Multi-user environment support
  * - PHI masking by role
- * 
+ *
  * HIPAA Compliance: Tests verify principle of least privilege and comprehensive
  * audit logging of all access control decisions.
  */
@@ -224,23 +224,17 @@ describe('RBAC System (Batch 15 Phase 3)', () => {
       expect(PermissionMetadata[Permission.READ_PHI].category).toBe('PHI Access');
       expect(PermissionMetadata[Permission.USE_CALCULATORS].category).toBe('Clinical Tools');
       expect(PermissionMetadata[Permission.MANAGE_USERS].category).toBe('User Management');
-      expect(PermissionMetadata[Permission.VIEW_AUDIT_LOGS].category).toBe(
-        'Audit & Compliance',
-      );
+      expect(PermissionMetadata[Permission.VIEW_AUDIT_LOGS].category).toBe('Audit & Compliance');
     });
 
     it('should assign risk levels to sensitive permissions', () => {
       // PHI access should be high/critical
-      expect(['high', 'critical']).toContain(
-        PermissionMetadata[Permission.READ_PHI].riskLevel,
-      );
-      expect(['high', 'critical']).toContain(
-        PermissionMetadata[Permission.EXPORT_PHI].riskLevel,
-      );
-      
+      expect(['high', 'critical']).toContain(PermissionMetadata[Permission.READ_PHI].riskLevel);
+      expect(['high', 'critical']).toContain(PermissionMetadata[Permission.EXPORT_PHI].riskLevel);
+
       // System config should be critical
       expect(PermissionMetadata[Permission.CONFIGURE_SYSTEM].riskLevel).toBe('critical');
-      
+
       // Calculator should be low risk
       expect(PermissionMetadata[Permission.USE_CALCULATORS].riskLevel).toBe('low');
     });
@@ -337,9 +331,7 @@ describe('RBAC System (Batch 15 Phase 3)', () => {
 
   describe('Emergency Protocol Authorization (Step 9)', () => {
     it('should allow PHYSICIAN to trigger emergency protocol', () => {
-      expect(hasPermission(UserRole.PHYSICIAN, Permission.TRIGGER_EMERGENCY_PROTOCOL)).toBe(
-        true,
-      );
+      expect(hasPermission(UserRole.PHYSICIAN, Permission.TRIGGER_EMERGENCY_PROTOCOL)).toBe(true);
     });
 
     it('should allow NURSE to trigger emergency protocol', () => {
@@ -351,9 +343,7 @@ describe('RBAC System (Batch 15 Phase 3)', () => {
     });
 
     it('should deny STUDENT access to trigger emergency protocol', () => {
-      expect(hasPermission(UserRole.STUDENT, Permission.TRIGGER_EMERGENCY_PROTOCOL)).toBe(
-        false,
-      );
+      expect(hasPermission(UserRole.STUDENT, Permission.TRIGGER_EMERGENCY_PROTOCOL)).toBe(false);
     });
   });
 

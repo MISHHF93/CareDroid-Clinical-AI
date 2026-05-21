@@ -208,9 +208,9 @@ describe('e2e matrix — backend executor mappings', () => {
     expect(postRegistry.sort()).toEqual(Object.keys(REGISTRY_ID_TO_ORCHESTRATOR_TOOL).sort());
   });
 
-  it('dispatch-ai is chat-routed only (no POST executor, backendExecutable false)', () => {
+  it('dispatch-ai is NLU/chat-routed only with no POST executor', () => {
     const row = buildE2eToolInventory().find((r) => r.id === 'dispatch-ai');
-    expect(row?.backendNluExecutable).toBe(false);
+    expect(row?.backendNluExecutable).toBe(true);
     expect(row?.backendPostExecutor).toBe(false);
   });
 });

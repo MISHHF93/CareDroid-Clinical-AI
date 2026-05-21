@@ -74,7 +74,7 @@ describe('sourceCodeToolDiscovery', () => {
   it('wires NLU calculator ids to routes and chat seeds', () => {
     const apache = resolveCatalogLaunch('apache2-calculator');
     expect(apache.path).toBe('/tools/calculators');
-    expect(apache.registryId).toBe('calculators');
+    expect(apache.registryId).toBe('apache2-calculator');
     expect(apache.chatSeed).toMatch(/APACHE/i);
 
     expect(NLU_TO_REGISTRY_ID['drug-interaction-checker']).toBe('drug-check');

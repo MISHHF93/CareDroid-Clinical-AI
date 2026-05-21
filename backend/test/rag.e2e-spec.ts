@@ -9,14 +9,14 @@ import { RAGRetrievalOptions } from '../src/modules/rag/dto/rag-context.dto';
 
 /**
  * RAG System E2E Tests
- * 
+ *
  * Tests the complete RAG pipeline:
  * 1. Document chunking
  * 2. Embedding generation
  * 3. Vector storage
  * 4. Retrieval
  * 5. Source extraction
- * 
+ *
  * Note: These tests require valid API keys for OpenAI and Pinecone.
  * Set OPENAI_API_KEY and PINECONE_API_KEY in .env.test
  */
@@ -83,11 +83,7 @@ Stimulates alpha-1, beta-1, and beta-2 receptors:
           isGlobal: true,
         }),
       ],
-      providers: [
-        RAGService,
-        OpenAIEmbeddingsService,
-        PineconeService,
-      ],
+      providers: [RAGService, OpenAIEmbeddingsService, PineconeService],
     }).compile();
 
     ragService = module.get<RAGService>(RAGService);
@@ -477,7 +473,10 @@ Stimulates alpha-1, beta-1, and beta-2 receptors:
       expect(context.confidence).toBeGreaterThan(0.5);
 
       // 4. Check that retrieved text mentions anaphylaxis
-      const combinedText = context.chunks.map((c) => c.text).join(' ').toLowerCase();
+      const combinedText = context.chunks
+        .map((c) => c.text)
+        .join(' ')
+        .toLowerCase();
       expect(combinedText).toContain('anaphylaxis');
 
       // 5. Verify sources are citable
@@ -487,24 +486,28 @@ Stimulates alpha-1, beta-1, and beta-2 receptors:
     });
 
     it('should handle complex multi-concept query', async () => {
-      const complexQuery =
-        'What are the indications, dosing, and adverse effects of epinephrine?';
+      const complexQuery = 'What are the indications, dosing, and adverse effects of epinephrine?';
 
       const context = await ragService.retrieve(complexQuery, { topK: 10 });
 
       // Should retrieve multiple chunks covering different aspects
       expect(context.chunks.length).toBeGreaterThan(2);
 
-      const combinedText = context.chunks.map((c) => c.text).join(' ').toLowerCase();
-      
+      const combinedText = context.chunks
+        .map((c) => c.text)
+        .join(' ')
+        .toLowerCase();
+
       // Check for multiple concepts
-      const hasIndications = combinedText.includes('indication') || 
-                            combinedText.includes('cardiac arrest') ||
-                            combinedText.includes('anaphylaxis');
+      const hasIndications =
+        combinedText.includes('indication') ||
+        combinedText.includes('cardiac arrest') ||
+        combinedText.includes('anaphylaxis');
       const hasDosing = combinedText.includes('dos') || combinedText.includes('mg');
-      const hasAdverse = combinedText.includes('adverse') || 
-                        combinedText.includes('tachycardia') ||
-                        combinedText.includes('hypertension');
+      const hasAdverse =
+        combinedText.includes('adverse') ||
+        combinedText.includes('tachycardia') ||
+        combinedText.includes('hypertension');
 
       expect(hasIndications).toBe(true);
       expect(hasDosing).toBe(true);
@@ -513,7 +516,7 @@ Stimulates alpha-1, beta-1, and beta-2 receptors:
 
     it('should maintain retrieval performance', async () => {
       const startTime = Date.now();
-      
+
       const context = await ragService.retrieve('epinephrine cardiac arrest', {
         topK: 5,
       });

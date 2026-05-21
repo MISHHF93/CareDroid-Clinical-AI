@@ -1,12 +1,12 @@
 # Responsive QA report
 
-**Run:** 2026-05-19T22:21:23.780Z
+**Run:** 2026-05-20T21:03:25.383Z
 
 ## Summary
 
 | Metric | Value |
 | --- | --- |
-| Matrix cells (expected) | 1408 |
+| Matrix cells (expected) | 2392 |
 | Executed tests | 1116 |
 | Passed | 1114 |
 | Failed (first run) | 2 |

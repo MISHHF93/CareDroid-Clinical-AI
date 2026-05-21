@@ -10,7 +10,7 @@ import { UserRole } from '../src/modules/users/entities/user.entity';
 
 /**
  * Batch 8: Two-Factor Authentication (2FA) E2E Tests
- * 
+ *
  * Comprehensive testing of:
  * - TOTP setup and verification
  * - Backup codes (emergency access)

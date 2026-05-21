@@ -1,6 +1,6 @@
 /**
  * Tool Orchestrator Service Unit Tests
- * 
+ *
  * Tests for the main orchestrator service
  * Covers tool registry, execution, validation, formatting
  */
@@ -91,21 +91,21 @@ describe('ToolOrchestratorService', () => {
 
     it('should have SOFA calculator in registry', () => {
       const tools = service.listAvailableTools();
-      const sofa = tools.tools.find(t => t.id === 'sofa-calculator');
+      const sofa = tools.tools.find((t) => t.id === 'sofa-calculator');
       expect(sofa).toBeDefined();
       expect(sofa?.name).toBe('SOFA Score Calculator');
     });
 
     it('should have drug checker in registry', () => {
       const tools = service.listAvailableTools();
-      const drug = tools.tools.find(t => t.id === 'drug-interactions');
+      const drug = tools.tools.find((t) => t.id === 'drug-interactions');
       expect(drug).toBeDefined();
       expect(drug?.name).toBe('Drug Interaction Checker');
     });
 
     it('should have lab interpreter in registry', () => {
       const tools = service.listAvailableTools();
-      const lab = tools.tools.find(t => t.id === 'lab-interpreter');
+      const lab = tools.tools.find((t) => t.id === 'lab-interpreter');
       expect(lab).toBeDefined();
       expect(lab?.name).toBe('Lab Results Interpreter');
     });
@@ -130,7 +130,7 @@ describe('ToolOrchestratorService', () => {
     it('should include parameter schemas', () => {
       const result = service.listAvailableTools();
 
-      result.tools.forEach(tool => {
+      result.tools.forEach((tool) => {
         expect(tool.parameters).toBeDefined();
         expect(Array.isArray(tool.parameters)).toBe(true);
       });
@@ -160,7 +160,7 @@ describe('ToolOrchestratorService', () => {
     it('should return parameters for each tool', () => {
       const tools = ['sofa-calculator', 'drug-interaction-checker', 'lab-interpreter'];
 
-      tools.forEach(toolId => {
+      tools.forEach((toolId) => {
         const metadata = service.getToolMetadata(toolId);
         expect(metadata.parameters).toBeDefined();
         expect(metadata.parameters.length).toBeGreaterThan(0);
@@ -379,7 +379,7 @@ describe('ToolOrchestratorService', () => {
         'sofa-calculator',
         { pao2: 200, fio2: 1.0 },
         'test-user',
-        'test-conv'
+        'test-conv',
       );
 
       expect(result.type).toBe('tool_result');
@@ -393,7 +393,7 @@ describe('ToolOrchestratorService', () => {
         'sofa-calculator',
         { pao2: 200, fio2: 1.0 },
         'test-user',
-        'test-conv'
+        'test-conv',
       );
 
       expect(result.formattedForChat).toContain('SOFA');
@@ -404,7 +404,7 @@ describe('ToolOrchestratorService', () => {
         'drug-interaction-checker',
         { medications: ['warfarin', 'aspirin'] },
         'test-user',
-        'test-conv'
+        'test-conv',
       );
 
       expect(result.formattedForChat).toBeDefined();
@@ -415,7 +415,7 @@ describe('ToolOrchestratorService', () => {
         'sofa-calculator',
         { pao2: 200, fio2: 1.0 },
         'test-user',
-        'test-conv'
+        'test-conv',
       );
 
       expect(result.result).toBeDefined();
@@ -429,7 +429,7 @@ describe('ToolOrchestratorService', () => {
         'sofa-calculator',
         { pao2: 200, fio2: 1.0, platelets: 100 },
         'test-user',
-        'test-conv'
+        'test-conv',
       );
 
       expect(result.formattedForChat).toContain('SOFA Score');
@@ -440,7 +440,7 @@ describe('ToolOrchestratorService', () => {
         'drug-interaction-checker',
         { medications: ['warfarin', 'aspirin'] },
         'test-user',
-        'test-conv'
+        'test-conv',
       );
 
       expect(result.formattedForChat).toBeDefined();
@@ -451,7 +451,7 @@ describe('ToolOrchestratorService', () => {
         'drug-interaction-checker',
         { medications: [] },
         'test-user',
-        'test-conv'
+        'test-conv',
       );
 
       expect(result.formattedForChat).toContain('❌');
@@ -462,7 +462,7 @@ describe('ToolOrchestratorService', () => {
         'sofa-calculator',
         { pao2: 200, fio2: 1.0 },
         'test-user',
-        'test-conv'
+        'test-conv',
       );
 
       expect(result.formattedForChat).toContain('Executed in');
@@ -489,7 +489,7 @@ describe('ToolOrchestratorService', () => {
     it('should include all tools in statistics', () => {
       const stats = service.getToolStatistics();
 
-      const toolIds = stats.tools.map(t => t.id);
+      const toolIds = stats.tools.map((t) => t.id);
       expect(toolIds.sort()).toEqual([...REGISTERED_EXECUTOR_TOOL_IDS].sort());
     });
   });
@@ -529,12 +529,7 @@ describe('ToolOrchestratorService', () => {
     });
 
     it('should provide user-friendly error messages', async () => {
-      const result = await service.executeInChat(
-        'invalid-tool',
-        {},
-        'test-user',
-        'test-conv'
-      );
+      const result = await service.executeInChat('invalid-tool', {}, 'test-user', 'test-conv');
 
       expect(result.formattedForChat).toContain('Error');
     });
@@ -553,7 +548,7 @@ describe('ToolOrchestratorService', () => {
         expect.objectContaining({
           userId: 'test-user',
           resource: expect.stringContaining('sofa-calculator'),
-        })
+        }),
       );
     });
 
@@ -581,7 +576,7 @@ describe('ToolOrchestratorService', () => {
           metadata: expect.objectContaining({
             status: 'success',
           }),
-        })
+        }),
       );
     });
   });

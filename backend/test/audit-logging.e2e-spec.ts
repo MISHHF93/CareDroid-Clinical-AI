@@ -169,25 +169,22 @@ describe('Audit Logging E2E', () => {
       const logs = await auditService.findByUser('user-1', 100);
 
       expect(logs.length).toBeGreaterThan(0);
-      expect(logs.every(log => log.userId === 'user-1')).toBe(true);
+      expect(logs.every((log) => log.userId === 'user-1')).toBe(true);
       expect(logs[0].timestamp >= logs[1].timestamp).toBe(true); // DESC order
     });
 
     it('should find PHI access logs', async () => {
-      const logs = await auditService.findPhiAccess(
-        new Date(0),
-        new Date()
-      );
+      const logs = await auditService.findPhiAccess(new Date(0), new Date());
 
       expect(logs.length).toBeGreaterThan(0);
-      expect(logs.every(log => log.phiAccessed === true)).toBe(true);
+      expect(logs.every((log) => log.phiAccessed === true)).toBe(true);
     });
 
     it('should find logs by action type', async () => {
       const logs = await auditService.findByAction(AuditAction.LOGIN, 100);
 
       expect(logs.length).toBeGreaterThan(0);
-      expect(logs.every(log => log.action === AuditAction.LOGIN)).toBe(true);
+      expect(logs.every((log) => log.action === AuditAction.LOGIN)).toBe(true);
     });
 
     it('should find logs within date range', async () => {
@@ -203,13 +200,9 @@ describe('Audit Logging E2E', () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
 
-      const logs = await auditService.findByUserAndDateRange(
-        'user-1',
-        new Date(0),
-        tomorrow
-      );
+      const logs = await auditService.findByUserAndDateRange('user-1', new Date(0), tomorrow);
 
-      expect(logs.every(log => log.userId === 'user-1')).toBe(true);
+      expect(logs.every((log) => log.userId === 'user-1')).toBe(true);
     });
   });
 
@@ -288,8 +281,8 @@ describe('Audit Logging E2E', () => {
       }
 
       expect(logs.length).toBe(criticalActions.length);
-      expect(logs.every(log => log.hash)).toBe(true);
-      expect(logs.every(log => log.previousHash)).toBe(true);
+      expect(logs.every((log) => log.hash)).toBe(true);
+      expect(logs.every((log) => log.previousHash)).toBe(true);
 
       // Verify hash chain
       for (let i = 1; i < logs.length; i++) {
@@ -347,22 +340,16 @@ describe('Audit Logging E2E', () => {
     });
 
     it('should count total audit logs', async () => {
-      const logs = await auditService.findByDateRange(
-        new Date(0),
-        new Date()
-      );
+      const logs = await auditService.findByDateRange(new Date(0), new Date());
 
       expect(logs.length).toBeGreaterThan(0);
     });
 
     it('should count PHI access events', async () => {
-      const logs = await auditService.findPhiAccess(
-        new Date(0),
-        new Date()
-      );
+      const logs = await auditService.findPhiAccess(new Date(0), new Date());
 
       expect(logs.length).toBeGreaterThan(0);
-      expect(logs.every(log => log.phiAccessed === true)).toBe(true);
+      expect(logs.every((log) => log.phiAccessed === true)).toBe(true);
     });
 
     it('should count logs by action type', async () => {
@@ -382,13 +369,9 @@ describe('Audit Logging E2E', () => {
       for (let i = 0; i < logsToCreate; i++) {
         await auditService.log({
           userId: `user-${i % 10}`,
-          action: [
-            AuditAction.LOGIN,
-            AuditAction.AI_QUERY,
-            AuditAction.PHI_ACCESS,
-          ][i % 3],
+          action: [AuditAction.LOGIN, AuditAction.AI_QUERY, AuditAction.PHI_ACCESS][i % 3],
           resource: `resource/${i}`,
-          ipAddress: `192.168.1.${i % 254 + 1}`,
+          ipAddress: `192.168.1.${(i % 254) + 1}`,
           userAgent: 'Mozilla',
         });
       }

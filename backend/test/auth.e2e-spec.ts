@@ -98,7 +98,7 @@ describe('Authentication E2E Tests', () => {
         password: 'Password123!',
       };
       await request(app.getHttpServer()).post('/auth/register').send(user);
-      
+
       const loginRes = await request(app.getHttpServer()).post('/auth/login').send(user);
       accessToken = loginRes.body.accessToken;
     });

@@ -30,6 +30,10 @@ import {
   toolIdAliases,
 } from '../../data/sourceCodeToolDiscovery';
 import {
+  resolveCatalogLaunch,
+  resolveNavigationPathForLaunch,
+} from '../../data/clinicalCatalogWiring';
+import {
   getMedicalCatalogSummary,
   getMedicalToolsCatalogRows,
 } from '../../data/medicalToolsCatalogIndex';
@@ -602,12 +606,15 @@ const ClinicalToolCatalog = () => {
   };
 
   const launchCatalogItem = (id) => {
+    const launch = resolveCatalogLaunch(id);
+    const resolvedNavigationPath = resolveNavigationPathForLaunch(launch);
     applyRegistryToolLaunch(id, {
       navigate,
       addMessage,
       selectTool,
       setActiveTool,
       recordToolAccess,
+      state: { source: 'developer-catalog', resolvedNavigationPath },
     });
   };
 

@@ -533,7 +533,10 @@ export const REGISTRY_ID_TO_ORCHESTRATOR_TOOL = Object.freeze({
  * Includes dispatch-ai (chat/NLU only). POST /tools/:id/execute applies only to
  * `ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS` (three registerTool executors).
  */
-export const AI_EXECUTABLE_NLU_TOOL_IDS = Object.freeze([...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS]);
+export const AI_EXECUTABLE_NLU_TOOL_IDS = Object.freeze([
+  ...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+  NLU.dispatchAi,
+]);
 
 /**
  * Product-facing canonical ID map (registry ids unless noted).
@@ -542,7 +545,10 @@ export const AI_EXECUTABLE_NLU_TOOL_IDS = Object.freeze([...ORCHESTRATOR_REGISTE
 export const CANONICAL_TOOL_GROUPS = Object.freeze({
   aiOperationsPages: CLINICAL_AI_PAGE_REGISTRY_IDS,
   clinicalCalculatorsTierA: CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
-  clinicalChatAssistedTierB: CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+  clinicalChatAssistedTierB: Object.freeze([
+    ...CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+    ...CLINICAL_DOSE_HUB_REGISTRY_IDS,
+  ]),
   clinicalNluHubChat: CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS,
   clinicalCalculatorsHub: Object.freeze([REGISTRY.calculatorsHub]),
   fleetLogisticsTierA: FLEET_TIER_A_REGISTRY_IDS,
@@ -554,7 +560,6 @@ export const CANONICAL_TOOL_GROUPS = Object.freeze({
 /** Every `toolRegistry.js` id — must match registry file exactly (drift tests). */
 export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
   ...CANONICAL_TOOL_GROUPS.aiOperationsPages,
-  ...CLINICAL_DOSE_HUB_REGISTRY_IDS,
   ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsTierA,
   ...CANONICAL_TOOL_GROUPS.clinicalChatAssistedTierB,
   ...CANONICAL_TOOL_GROUPS.clinicalNluHubChat,

@@ -1,6 +1,6 @@
 /**
  * Lab Interpreter Service Unit Tests
- * 
+ *
  * Tests for laboratory result interpretation
  * Covers lab classification, reference ranges, AI integration
  */
@@ -48,7 +48,7 @@ describe('LabInterpreterService', () => {
   describe('getSchema', () => {
     it('should include labValues parameter', () => {
       const schema = service.getSchema();
-      const labValuesParam = schema.find(p => p.name === 'labValues');
+      const labValuesParam = schema.find((p) => p.name === 'labValues');
 
       expect(labValuesParam).toBeDefined();
       expect(labValuesParam?.required).toBe(true);
@@ -57,7 +57,7 @@ describe('LabInterpreterService', () => {
 
     it('should include optional demographic parameters', () => {
       const schema = service.getSchema();
-      const paramNames = schema.map(p => p.name);
+      const paramNames = schema.map((p) => p.name);
 
       expect(paramNames).toContain('patientAge');
       expect(paramNames).toContain('patientSex');
@@ -129,7 +129,7 @@ describe('LabInterpreterService', () => {
       });
 
       expect(result.success).toBe(true);
-      const wbc = result.data.labValues.find(l => l.name === 'WBC');
+      const wbc = result.data.labValues.find((l) => l.name === 'WBC');
       expect(wbc?.status).toBe('normal');
     });
 
@@ -204,7 +204,7 @@ describe('LabInterpreterService', () => {
         labValues: [{ name: 'WBC', value: 7.0 }],
       });
 
-      const wbc = result.data.labValues.find(l => l.name === 'WBC');
+      const wbc = result.data.labValues.find((l) => l.name === 'WBC');
       expect(wbc?.referenceRange).toBeDefined();
       expect(wbc?.referenceRange).toMatch(/\d+/);
     });
@@ -215,7 +215,7 @@ describe('LabInterpreterService', () => {
       });
 
       expect(result.success).toBe(true);
-      const lab = result.data.labValues.find(l => l.name === 'UnknownLab');
+      const lab = result.data.labValues.find((l) => l.name === 'UnknownLab');
       expect(lab?.referenceRange).toBeDefined();
     });
   });
@@ -418,7 +418,7 @@ describe('LabInterpreterService', () => {
 
     it('should handle AI service errors gracefully', async () => {
       mockAiService.generateStructuredJSON.mockRejectedValueOnce(
-        new Error('AI service unavailable')
+        new Error('AI service unavailable'),
       );
 
       const result = await service.execute({
@@ -430,7 +430,7 @@ describe('LabInterpreterService', () => {
 
     it('should fall back to rule-based interpretation', async () => {
       mockAiService.generateStructuredJSON.mockRejectedValueOnce(
-        new Error('AI service unavailable')
+        new Error('AI service unavailable'),
       );
 
       const result = await service.execute({

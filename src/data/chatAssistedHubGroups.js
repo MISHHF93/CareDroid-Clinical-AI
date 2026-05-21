@@ -22,7 +22,7 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     groupId: 'trauma',
     heading: 'Trauma imaging decision support',
     lead:
-      'Canadian C-Spine, Ottawa ankle/foot, and PECARN pediatric head rules support selected imaging decisions (clinical decision support only). They do not clear the spine, prove absence of fracture, rule out brain injury, or mandate or defer CT. Unstable patients, neurovascular compromise, open fractures, declining mental status, and severe trauma need full evaluation without delay — do not defer urgent care to finish chat.',
+      'Canadian C-Spine, Ottawa ankle/foot, and PECARN pediatric head rules support selected imaging decisions (clinical decision support only). They do not clear the spine, prove absence of fracture, rule out injury with certainty, rule out brain injury, or mandate or defer CT. Unstable patients, neurovascular compromise, open fractures, declining mental status, and severe trauma need full evaluation without delay — do not defer urgent care to finish chat.',
     toolIds: ['canadian-c-spine', 'nexus-cspine', 'ottawa-ankle', 'pecarn-head'],
   },
   {

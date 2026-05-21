@@ -521,7 +521,7 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     path: dispatchAiChatConfig.hubPath,
     sidebarToolId: dispatchAiChatConfig.registryId,
     chatSeed: dispatchAiChatConfig.chatSeed,
-    backendExecutable: false,
+    backendExecutable: true,
   },
   {
     toolId: 'drug-interactions',

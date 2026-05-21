@@ -1,6 +1,6 @@
 /**
  * Drug Interaction Checker Service Unit Tests
- * 
+ *
  * Tests for drug-drug interaction detection
  * Covers rule-based detection, AI integration, severity classification
  */
@@ -48,7 +48,7 @@ describe('DrugCheckerService', () => {
   describe('getSchema', () => {
     it('should define medications parameter', () => {
       const schema = service.getSchema();
-      const medicationsParam = schema.find(p => p.name === 'medications');
+      const medicationsParam = schema.find((p) => p.name === 'medications');
 
       expect(medicationsParam).toBeDefined();
       expect(medicationsParam?.required).toBe(true);
@@ -102,8 +102,9 @@ describe('DrugCheckerService', () => {
       expect(result.success).toBe(true);
       expect(result.data.interactions).toBeDefined();
       const warfarinAspirin = result.data.interactions.find(
-        i => (i.drug1 === 'warfarin' || i.drug1 === 'aspirin') &&
-             (i.drug2 === 'warfarin' || i.drug2 === 'aspirin')
+        (i) =>
+          (i.drug1 === 'warfarin' || i.drug1 === 'aspirin') &&
+          (i.drug2 === 'warfarin' || i.drug2 === 'aspirin'),
       );
       expect(warfarinAspirin).toBeDefined();
     });
@@ -114,9 +115,7 @@ describe('DrugCheckerService', () => {
       });
 
       expect(result.success).toBe(true);
-      const interaction = result.data.interactions.find(
-        i => i.severity === 'major'
-      );
+      const interaction = result.data.interactions.find((i) => i.severity === 'major');
       expect(interaction).toBeDefined();
     });
 
@@ -164,9 +163,7 @@ describe('DrugCheckerService', () => {
       });
 
       expect(result.success).toBe(true);
-      const majorInteraction = result.data.interactions.find(
-        i => i.severity === 'major'
-      );
+      const majorInteraction = result.data.interactions.find((i) => i.severity === 'major');
       expect(majorInteraction).toBeDefined();
     });
 
@@ -176,10 +173,8 @@ describe('DrugCheckerService', () => {
       });
 
       expect(result.success).toBe(true);
-      result.data.interactions.forEach(interaction => {
-        expect(['contraindicated', 'major', 'moderate', 'minor']).toContain(
-          interaction.severity
-        );
+      result.data.interactions.forEach((interaction) => {
+        expect(['contraindicated', 'major', 'moderate', 'minor']).toContain(interaction.severity);
       });
     });
 
@@ -189,9 +184,7 @@ describe('DrugCheckerService', () => {
       });
 
       expect(result.success).toBe(true);
-      const majorInteraction = result.data.interactions.find(
-        i => i.severity === 'major'
-      );
+      const majorInteraction = result.data.interactions.find((i) => i.severity === 'major');
       if (majorInteraction) {
         expect(majorInteraction.recommendation).toBeDefined();
         expect(majorInteraction.recommendation?.length).toBeGreaterThan(0);
@@ -300,8 +293,8 @@ describe('DrugCheckerService', () => {
       const interpretation = result.interpretation.toLowerCase();
       expect(
         interpretation.includes('major') ||
-        interpretation.includes('interaction') ||
-        interpretation.includes('warning')
+          interpretation.includes('interaction') ||
+          interpretation.includes('warning'),
       ).toBe(true);
     });
   });
@@ -315,7 +308,7 @@ describe('DrugCheckerService', () => {
 
     it('should handle AI service errors gracefully', async () => {
       mockAiService.generateStructuredJSON.mockRejectedValueOnce(
-        new Error('AI service unavailable')
+        new Error('AI service unavailable'),
       );
 
       const result = await service.execute({
@@ -335,9 +328,7 @@ describe('DrugCheckerService', () => {
         medications: ['warfarin', 'aspirin'],
       });
 
-      expect(result1.data.interactions.length).toBe(
-        result2.data.interactions.length
-      );
+      expect(result1.data.interactions.length).toBe(result2.data.interactions.length);
     });
 
     it('should handle brand names', async () => {
@@ -368,7 +359,7 @@ describe('DrugCheckerService', () => {
   describe('Edge cases', () => {
     it('should handle special characters in drug names', async () => {
       const result = await service.execute({
-        medications: ["Co-trimoxazole"],
+        medications: ['Co-trimoxazole'],
       });
 
       expect(result.success).toBe(true);
@@ -404,7 +395,7 @@ describe('DrugCheckerService', () => {
         medications: ['warfarin', 'aspirin'],
       });
 
-      result.data.interactions.forEach(interaction => {
+      result.data.interactions.forEach((interaction) => {
         expect(interaction).toHaveProperty('drug1');
         expect(interaction).toHaveProperty('drug2');
         expect(interaction).toHaveProperty('severity');
@@ -417,7 +408,7 @@ describe('DrugCheckerService', () => {
         medications: ['warfarin', 'aspirin'],
       });
 
-      result.data.interactions.forEach(interaction => {
+      result.data.interactions.forEach((interaction) => {
         if (interaction.severity === 'major' || interaction.severity === 'contraindicated') {
           expect(interaction.recommendation).toBeDefined();
         }

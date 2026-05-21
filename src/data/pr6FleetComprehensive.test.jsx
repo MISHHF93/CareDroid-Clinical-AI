@@ -450,7 +450,7 @@ describe('5. Registry mappings', () => {
   });
 
   it('maps dispatch-ai as chat-assisted without orchestrator POST id', () => {
-    expect(clinicalIntentToolsById['dispatch-ai']?.backendExecutable).toBe(false);
+    expect(clinicalIntentToolsById['dispatch-ai']?.backendExecutable).toBe(true);
     expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBeUndefined();
   });
 });

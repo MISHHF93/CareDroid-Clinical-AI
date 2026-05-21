@@ -809,6 +809,7 @@ ul.calc-breakdown-list .calc-breakdown-item {
   align-items: flex-start;
   gap: 6px;
   text-align: left;
+  /* Accessibility floor: --min-height: 44px tokenized through --touch-target-min. */
   min-height: var(--touch-target-min);
   padding: 14px 16px;
   border-radius: 12px;
@@ -1429,6 +1430,7 @@ ul.calc-breakdown-list .calc-breakdown-item {
   .calc-chat-assisted-card {
     width: 100%;
     max-width: 100%;
+    min-height: 48px;
     min-height: var(--touch-target-comfortable);
     padding: 16px;
   }

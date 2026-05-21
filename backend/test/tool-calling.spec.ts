@@ -5,7 +5,10 @@ import { ConfigService } from '@nestjs/config';
 import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../src/modules/users/entities/user.entity';
-import { Subscription, SubscriptionTier } from '../src/modules/subscriptions/entities/subscription.entity';
+import {
+  Subscription,
+  SubscriptionTier,
+} from '../src/modules/subscriptions/entities/subscription.entity';
 import { AuditService } from '../src/modules/audit/audit.service';
 import { MetricsService } from '../src/modules/metrics/metrics.service';
 import { IntentClassifierService } from '../src/modules/medical-control-plane/intent-classifier/intent-classifier.service';
@@ -83,9 +86,7 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
             }),
             getToolMetadata: jest.fn().mockReturnValue({
               name: 'SOFA Calculator',
-              parameters: [
-                { name: 'respiratory', required: true },
-              ],
+              parameters: [{ name: 'respiratory', required: true }],
             }),
           },
         },
@@ -135,15 +136,15 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
   describe('Tool Definitions (Step 1)', () => {
     it('should expose tool definitions for Claude', () => {
       const tools = aiService.getToolDefinitions();
-      
+
       expect(tools).toBeDefined();
       expect(tools.length).toBeGreaterThan(0);
     });
 
     it('should include SOFA Calculator tool', () => {
       const tools = aiService.getToolDefinitions();
-      const sofaTool = tools.find(t => t.name === 'sofa_calculator');
-      
+      const sofaTool = tools.find((t) => t.name === 'sofa_calculator');
+
       expect(sofaTool).toBeDefined();
       expect(sofaTool.description).toContain('SOFA');
       expect(sofaTool.input_schema.properties).toHaveProperty('respiratory');
@@ -151,8 +152,8 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
 
     it('should include Drug Checker tool', () => {
       const tools = aiService.getToolDefinitions();
-      const drugTool = tools.find(t => t.name === 'drug_checker');
-      
+      const drugTool = tools.find((t) => t.name === 'drug_checker');
+
       expect(drugTool).toBeDefined();
       expect(drugTool.description).toContain('drug');
       expect(drugTool.input_schema.properties).toHaveProperty('medications');
@@ -160,8 +161,8 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
 
     it('should include Lab Interpreter tool', () => {
       const tools = aiService.getToolDefinitions();
-      const labTool = tools.find(t => t.name === 'lab_interpreter');
-      
+      const labTool = tools.find((t) => t.name === 'lab_interpreter');
+
       expect(labTool).toBeDefined();
       expect(labTool.description).toContain('lab');
       expect(labTool.input_schema.properties).toHaveProperty('test_name');
@@ -208,10 +209,7 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
         },
       } as any);
 
-      const result = await aiService.invokeLLMWithTools(
-        'test-user-123',
-        'Calculate SOFA score',
-      );
+      const result = await aiService.invokeLLMWithTools('test-user-123', 'Calculate SOFA score');
 
       expect(result).toHaveProperty('content');
       expect(result).toHaveProperty('toolCalls');
@@ -276,7 +274,8 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
         formattedForChat: 'SOFA Score: 8',
       };
 
-      jest.spyOn(module.get<ToolOrchestratorService>(ToolOrchestratorService), 'executeInChat')
+      jest
+        .spyOn(module.get<ToolOrchestratorService>(ToolOrchestratorService), 'executeInChat')
         .mockResolvedValueOnce(mockToolResult as any);
 
       const response = await chatService.processMessage(
@@ -326,15 +325,12 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
 
   describe('Error Handling (Step 5)', () => {
     it('should handle API errors gracefully', async () => {
-      jest.spyOn(aiService['openai'].chat.completions, 'create').mockRejectedValueOnce(
-        new Error('OpenAI API Error'),
-      );
+      jest
+        .spyOn(aiService['openai'].chat.completions, 'create')
+        .mockRejectedValueOnce(new Error('OpenAI API Error'));
 
       try {
-        await aiService.invokeLLMWithTools(
-          'test-user-123',
-          'Test message',
-        );
+        await aiService.invokeLLMWithTools('test-user-123', 'Test message');
       } catch (error) {
         expect(error).toBeDefined();
         expect((error as Error).message).toContain('AI query with tools failed');
@@ -343,9 +339,9 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
 
     it('should handle tool execution failures', async () => {
       const toolOrchestrator = module.get<ToolOrchestratorService>(ToolOrchestratorService);
-      jest.spyOn(toolOrchestrator, 'executeInChat').mockRejectedValueOnce(
-        new Error('Tool execution failed'),
-      );
+      jest
+        .spyOn(toolOrchestrator, 'executeInChat')
+        .mockRejectedValueOnce(new Error('Tool execution failed'));
 
       // Should not throw, but log the error
       const response = await chatService.processMessage(
@@ -363,7 +359,7 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
   describe('MVP Scope (SOFA, Drug Checker, Lab Interpreter)', () => {
     it('should support SOFA Calculator invocation', async () => {
       const tools = aiService.getToolDefinitions();
-      const sofaTool = tools.find(t => t.name === 'sofa_calculator');
+      const sofaTool = tools.find((t) => t.name === 'sofa_calculator');
 
       expect(sofaTool).toBeDefined();
       // Verify required parameters
@@ -374,7 +370,7 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
 
     it('should support Drug Checker invocation', async () => {
       const tools = aiService.getToolDefinitions();
-      const drugTool = tools.find(t => t.name === 'drug_checker');
+      const drugTool = tools.find((t) => t.name === 'drug_checker');
 
       expect(drugTool).toBeDefined();
       expect(drugTool.input_schema.properties.medications.type).toBe('array');
@@ -383,7 +379,7 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
 
     it('should support Lab Interpreter invocation', async () => {
       const tools = aiService.getToolDefinitions();
-      const labTool = tools.find(t => t.name === 'lab_interpreter');
+      const labTool = tools.find((t) => t.name === 'lab_interpreter');
 
       expect(labTool).toBeDefined();
       expect(labTool.input_schema.required).toContain('test_name');

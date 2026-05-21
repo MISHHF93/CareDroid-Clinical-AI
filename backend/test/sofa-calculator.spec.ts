@@ -1,6 +1,6 @@
 /**
  * SOFA Calculator Service Unit Tests
- * 
+ *
  * Tests for sequential organ failure assessment scoring algorithm
  * Covers all organ systems, edge cases, and mortality estimation
  */
@@ -48,7 +48,7 @@ describe('SofaCalculatorService', () => {
       const schema = service.getSchema();
 
       expect(schema.length).toBeGreaterThan(10);
-      const paramNames = schema.map(p => p.name);
+      const paramNames = schema.map((p) => p.name);
       expect(paramNames).toContain('pao2');
       expect(paramNames).toContain('platelets');
       expect(paramNames).toContain('bilirubin');
@@ -58,7 +58,7 @@ describe('SofaCalculatorService', () => {
 
     it('all parameters should be optional', () => {
       const schema = service.getSchema();
-      expect(schema.every(p => !p.required)).toBe(true);
+      expect(schema.every((p) => !p.required)).toBe(true);
     });
   });
 

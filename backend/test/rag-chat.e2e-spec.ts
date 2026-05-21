@@ -9,7 +9,7 @@ import { AuditService } from '../src/modules/audit/audit.service';
 
 /**
  * Batch 7: RAG-Augmented Chat E2E Tests
- * 
+ *
  * Tests the integration of RAG retrieval with the chat system, ensuring:
  * - RAG retrieval for medical queries
  * - Citation formatting in responses
@@ -81,7 +81,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
       expect(response.body).toBeDefined();
       expect(response.body.response).toBeTruthy();
       expect(response.body.intent).toBeDefined();
-      
+
       // Should include citations if RAG retrieval was successful
       if (response.body.ragContext?.chunksRetrieved > 0) {
         expect(response.body.citations).toBeDefined();
@@ -298,9 +298,7 @@ describe('RAG-Augmented Chat (e2e)', () => {
 
     it('should fall back to direct AI when RAG service fails', async () => {
       // Mock RAG service to throw error
-      jest.spyOn(ragService, 'retrieve').mockRejectedValue(
-        new Error('RAG service unavailable'),
-      );
+      jest.spyOn(ragService, 'retrieve').mockRejectedValue(new Error('RAG service unavailable'));
 
       const response = await request(app.getHttpServer())
         .post('/chat')

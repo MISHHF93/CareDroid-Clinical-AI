@@ -1,8 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { EmergencyEscalationService, EmergencyEscalationDto, EmergencySeverity } from '../src/modules/medical-control-plane/emergency-escalation/emergency-escalation.service';
+import {
+  EmergencyEscalationService,
+  EmergencyEscalationDto,
+  EmergencySeverity,
+} from '../src/modules/medical-control-plane/emergency-escalation/emergency-escalation.service';
 import { AuditService } from '../src/modules/audit/audit.service';
 import { MetricsService } from '../src/modules/metrics/metrics.service';
-import { IntentClassification, PrimaryIntent } from '../src/modules/medical-control-plane/intent-classifier/dto/intent-classification.dto';
+import {
+  IntentClassification,
+  PrimaryIntent,
+} from '../src/modules/medical-control-plane/intent-classifier/dto/intent-classification.dto';
 
 describe('Emergency Escalation (Batch 15 Phase 2)', () => {
   let service: EmergencyEscalationService;
@@ -79,7 +86,11 @@ describe('Emergency Escalation (Batch 15 Phase 2)', () => {
         extractedParameters: {},
         isEmergency: true,
         emergencyKeywords: [
-          { keyword: 'respiratory distress', category: 'respiratory', severity: EmergencySeverity.URGENT },
+          {
+            keyword: 'respiratory distress',
+            category: 'respiratory',
+            severity: EmergencySeverity.URGENT,
+          },
         ],
         emergencySeverity: EmergencySeverity.URGENT,
         matchedPatterns: ['respiratory distress'],
@@ -168,7 +179,7 @@ describe('Emergency Escalation (Batch 15 Phase 2)', () => {
       const result = await service.escalate(classification, dto);
 
       expect(result.requiresImmediate911).toBe(true);
-      expect(result.actions.some(a => a.type === 'call_911')).toBe(true);
+      expect(result.actions.some((a) => a.type === 'call_911')).toBe(true);
     });
 
     it('should notify medical director for all emergencies', async () => {
@@ -200,7 +211,7 @@ describe('Emergency Escalation (Batch 15 Phase 2)', () => {
       const result = await service.escalate(classification, dto);
 
       expect(result.medicalDirectorNotified).toBe(true);
-      expect(result.actions.some(a => a.type === 'notify_medical_director')).toBe(true);
+      expect(result.actions.some((a) => a.type === 'notify_medical_director')).toBe(true);
     });
 
     it('should activate appropriate protocols', async () => {
@@ -231,7 +242,7 @@ describe('Emergency Escalation (Batch 15 Phase 2)', () => {
 
       const result = await service.escalate(classification, dto);
 
-      expect(result.actions.some(a => a.type === 'activate_protocol')).toBe(true);
+      expect(result.actions.some((a) => a.type === 'activate_protocol')).toBe(true);
       expect(result.recommendations).toContain('Obtain blood cultures before antibiotics');
     });
   });
@@ -266,7 +277,9 @@ describe('Emergency Escalation (Batch 15 Phase 2)', () => {
       const result = await service.escalate(classification, dto);
 
       expect(result.recommendations).toContain('Obtain 12-lead ECG immediately');
-      expect(result.recommendations).toContain('Administer aspirin 325mg PO if not contraindicated');
+      expect(result.recommendations).toContain(
+        'Administer aspirin 325mg PO if not contraindicated',
+      );
     });
 
     it('should provide respiratory-specific recommendations', async () => {
@@ -297,7 +310,9 @@ describe('Emergency Escalation (Batch 15 Phase 2)', () => {
 
       const result = await service.escalate(classification, dto);
 
-      expect(result.recommendations).toContain('Administer supplemental oxygen to maintain SpO2 > 90%');
+      expect(result.recommendations).toContain(
+        'Administer supplemental oxygen to maintain SpO2 > 90%',
+      );
       expect(result.recommendations).toContain('Assess airway patency');
     });
 
@@ -404,10 +419,7 @@ describe('Emergency Escalation (Batch 15 Phase 2)', () => {
 
       await service.escalate(classification, dto);
 
-      expect(metricsService.recordEmergencyDetection).toHaveBeenCalledWith(
-        'cardiac',
-        'critical',
-      );
+      expect(metricsService.recordEmergencyDetection).toHaveBeenCalledWith('cardiac', 'critical');
     });
   });
 

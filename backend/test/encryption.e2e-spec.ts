@@ -72,9 +72,7 @@ describe('Encryption Module E2E', () => {
         'user5@example.com',
       ];
 
-      const encryptPromises = plaintexts.map(p => 
-        Promise.resolve(encryptionService.encrypt(p))
-      );
+      const encryptPromises = plaintexts.map((p) => Promise.resolve(encryptionService.encrypt(p)));
 
       const encrypted = await Promise.all(encryptPromises);
 
@@ -179,7 +177,7 @@ describe('Encryption Module E2E', () => {
       const history = await keyRotationService.getKeyHistory();
 
       expect(history.length).toBe(2);
-      expect(history.some(k => k.isActive)).toBe(true);
+      expect(history.some((k) => k.isActive)).toBe(true);
     });
 
     it('should schedule old key deletion', async () => {
@@ -216,7 +214,7 @@ describe('Encryption Module E2E', () => {
       const rotations = await Promise.all(promises);
 
       expect(rotations).toHaveLength(3);
-      const versions = rotations.map(r => r.keyVersion);
+      const versions = rotations.map((r) => r.keyVersion);
       expect(new Set(versions).size).toBe(3); // All unique versions
     });
   });
@@ -233,10 +231,7 @@ describe('Encryption Module E2E', () => {
       // For this test, we simulate the re-encryption process
       // In production, a background job would do this
       const originalKey = Buffer.from(process.env.ENCRYPTION_MASTER_KEY, 'hex');
-      const newEncrypted = encryptionService.reEncryptWithNewKey(
-        oldEncrypted,
-        originalKey,
-      );
+      const newEncrypted = encryptionService.reEncryptWithNewKey(oldEncrypted, originalKey);
 
       // Both should decrypt to original plaintext
       expect(encryptionService.decrypt(oldEncrypted)).toBe(plaintext);
@@ -252,9 +247,7 @@ describe('Encryption Module E2E', () => {
 
       // Simulate re-encryption of batch
       const masterKey = Buffer.from(process.env.ENCRYPTION_MASTER_KEY, 'hex');
-      const reencrypted = encrypted.map(e => 
-        encryptionService.reEncryptWithNewKey(e, masterKey)
-      );
+      const reencrypted = encrypted.map((e) => encryptionService.reEncryptWithNewKey(e, masterKey));
 
       // Verify all decrypt correctly
       const decrypted = encryptionService.decryptBatch(reencrypted);
@@ -344,8 +337,8 @@ describe('Encryption Module E2E', () => {
       if (deletionScheduled) {
         expect(deletionScheduled.deletionScheduledAt).toBeDefined();
         // Verify it's scheduled far in the future (HIPAA requirement)
-        const daysUntilDeletion = 
-          (deletionScheduled.deletionScheduledAt.getTime() - new Date().getTime()) / 
+        const daysUntilDeletion =
+          (deletionScheduled.deletionScheduledAt.getTime() - new Date().getTime()) /
           (1000 * 60 * 60 * 24);
         expect(daysUntilDeletion).toBeGreaterThan(365); // At least 1 year
       }
@@ -368,7 +361,7 @@ describe('Encryption Module E2E', () => {
 
     it('should handle missing key version gracefully', () => {
       const encrypted = encryptionService.encrypt('data');
-      
+
       // Modify to invalid version (this should still work with current key)
       encrypted.keyVersion = 999;
 

@@ -58,7 +58,9 @@ function buildFromNlu(nlu) {
     sidebarToolId: nlu.sidebarToolId || launch.registryId || inventoryRecord?.id,
     chatOnRequest: true,
     chatSeed: inventoryRecord?.chatSeed || nlu.chatSeed || launch.chatSeed || '',
-    backendExecutor: inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED,
+    backendExecutor: Boolean(
+      nlu.backendExecutable || inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED
+    ),
     uiCalculatorSlug: inventoryRecord?.calculatorSlug || uiCalc?.id || null,
     chatOnlyForm: hubOnly || inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED,
     accessSummary: null,

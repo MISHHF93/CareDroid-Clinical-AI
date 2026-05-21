@@ -1,6 +1,6 @@
 /**
  * Tool Orchestrator API Integration Tests
- * 
+ *
  * E2E tests for REST API endpoints
  * Tests tool execution via HTTP, parameter validation, response structure
  */
@@ -61,7 +61,7 @@ describe('Tool Orchestrator API (e2e)', () => {
       return request(app.getHttpServer())
         .get('/tools')
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.tools).toBeDefined();
           expect(res.body.count).toBe(3);
         });
@@ -71,7 +71,7 @@ describe('Tool Orchestrator API (e2e)', () => {
       return request(app.getHttpServer())
         .get('/tools')
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           const tool = res.body.tools[0];
           expect(tool).toHaveProperty('id');
           expect(tool).toHaveProperty('name');
@@ -85,8 +85,8 @@ describe('Tool Orchestrator API (e2e)', () => {
       return request(app.getHttpServer())
         .get('/tools')
         .expect(200)
-        .expect(res => {
-          const sofa = res.body.tools.find(t => t.id === 'sofa-calculator');
+        .expect((res) => {
+          const sofa = res.body.tools.find((t) => t.id === 'sofa-calculator');
           expect(sofa).toBeDefined();
         });
     });
@@ -95,8 +95,8 @@ describe('Tool Orchestrator API (e2e)', () => {
       return request(app.getHttpServer())
         .get('/tools')
         .expect(200)
-        .expect(res => {
-          const drug = res.body.tools.find(t => t.id === 'drug-interaction-checker');
+        .expect((res) => {
+          const drug = res.body.tools.find((t) => t.id === 'drug-interaction-checker');
           expect(drug).toBeDefined();
         });
     });
@@ -105,8 +105,8 @@ describe('Tool Orchestrator API (e2e)', () => {
       return request(app.getHttpServer())
         .get('/tools')
         .expect(200)
-        .expect(res => {
-          const lab = res.body.tools.find(t => t.id === 'lab-interpreter');
+        .expect((res) => {
+          const lab = res.body.tools.find((t) => t.id === 'lab-interpreter');
           expect(lab).toBeDefined();
         });
     });
@@ -117,7 +117,7 @@ describe('Tool Orchestrator API (e2e)', () => {
       return request(app.getHttpServer())
         .get('/tools/statistics')
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.totalTools).toBeDefined();
           expect(res.body.toolsByCategory).toBeDefined();
           expect(res.body.tools).toBeDefined();
@@ -128,7 +128,7 @@ describe('Tool Orchestrator API (e2e)', () => {
       return request(app.getHttpServer())
         .get('/tools/statistics')
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.totalTools).toBe(3);
         });
     });
@@ -139,7 +139,7 @@ describe('Tool Orchestrator API (e2e)', () => {
       return request(app.getHttpServer())
         .get('/tools/sofa-calculator')
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.id).toBe('sofa-calculator');
           expect(res.body.name).toBe('SOFA Score Calculator');
           expect(res.body.parameters).toBeDefined();
@@ -147,16 +147,14 @@ describe('Tool Orchestrator API (e2e)', () => {
     });
 
     it('should return 404 for non-existent tool', () => {
-      return request(app.getHttpServer())
-        .get('/tools/invalid-tool')
-        .expect(404);
+      return request(app.getHttpServer()).get('/tools/invalid-tool').expect(404);
     });
 
     it('should include parameter schema', () => {
       return request(app.getHttpServer())
         .get('/tools/sofa-calculator')
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.parameters.length).toBeGreaterThan(0);
           expect(res.body.parameters[0]).toHaveProperty('name');
           expect(res.body.parameters[0]).toHaveProperty('type');
@@ -172,7 +170,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { pao2: 200, fio2: 1.0 },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.valid).toBe(true);
         });
     });
@@ -184,7 +182,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { medications: [] },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.valid).toBe(false);
           expect(res.body.errors.length).toBeGreaterThan(0);
         });
@@ -197,7 +195,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { medications: ['warfarin', 'aspirin'] },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.valid).toBe(true);
         });
     });
@@ -219,7 +217,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.success).toBe(true);
           expect(res.body.toolId).toBe('sofa-calculator');
           expect(res.body.result.success).toBe(true);
@@ -234,7 +232,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { medications: ['warfarin', 'aspirin'] },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.success).toBe(true);
           expect(res.body.toolId).toBe('drug-interaction-checker');
         });
@@ -252,7 +250,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.success).toBe(true);
           expect(res.body.toolId).toBe('lab-interpreter');
         });
@@ -265,7 +263,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { pao2: 200, fio2: 1.0 },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.executionTimeMs).toBeDefined();
           expect(res.body.executionTimeMs).toBeGreaterThanOrEqual(0);
         });
@@ -278,7 +276,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { medications: [] },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.success).toBe(false);
           expect(res.body.result.errors).toBeDefined();
         });
@@ -291,7 +289,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { pao2: 200, fio2: 1.0 },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.toolName).toBe('SOFA Score Calculator');
         });
     });
@@ -303,7 +301,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { pao2: 200, fio2: 1.0 },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.result.interpretation).toBeDefined();
         });
     });
@@ -315,7 +313,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { pao2: 200, fio2: 1.0 },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.result.citations).toBeDefined();
         });
     });
@@ -327,7 +325,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { pao2: 200, fio2: 1.0 },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.result.timestamp).toBeDefined();
         });
     });
@@ -342,7 +340,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { pao2: 200, fio2: 1.0 },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.success).toBe(true);
           expect(res.body.toolId).toBe('sofa-calculator');
         });
@@ -357,7 +355,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           userId: 'test-user-123',
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.success).toBe(true);
         });
     });
@@ -371,7 +369,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           conversationId: 'conv-123',
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.success).toBe(true);
         });
     });
@@ -385,7 +383,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { pao2: 200, fio2: 1.0 },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body).toHaveProperty('success');
           expect(res.body).toHaveProperty('toolId');
           expect(res.body).toHaveProperty('toolName');
@@ -401,7 +399,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { pao2: 200, fio2: 1.0 },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           const result = res.body.result;
           expect(result).toHaveProperty('success');
           expect(result).toHaveProperty('data');
@@ -416,7 +414,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { pao2: 200, fio2: 1.0 },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(typeof res.body.result.data).toBe('object');
         });
     });
@@ -454,7 +452,7 @@ describe('Tool Orchestrator API (e2e)', () => {
           parameters: { medications: [] },
         })
         .expect(200)
-        .expect(res => {
+        .expect((res) => {
           expect(res.body.success).toBe(false);
           expect(res.body.result.errors).toBeDefined();
         });
@@ -463,10 +461,7 @@ describe('Tool Orchestrator API (e2e)', () => {
 
   describe('Content negotiation', () => {
     it('should return JSON response', () => {
-      return request(app.getHttpServer())
-        .get('/tools')
-        .expect('Content-Type', /json/)
-        .expect(200);
+      return request(app.getHttpServer()).get('/tools').expect('Content-Type', /json/).expect(200);
     });
 
     it('should accept JSON content type', () => {
@@ -482,21 +477,15 @@ describe('Tool Orchestrator API (e2e)', () => {
 
   describe('HTTP status codes', () => {
     it('GET /tools should return 200', () => {
-      return request(app.getHttpServer())
-        .get('/tools')
-        .expect(200);
+      return request(app.getHttpServer()).get('/tools').expect(200);
     });
 
     it('GET /tools/:id for valid tool should return 200', () => {
-      return request(app.getHttpServer())
-        .get('/tools/sofa-calculator')
-        .expect(200);
+      return request(app.getHttpServer()).get('/tools/sofa-calculator').expect(200);
     });
 
     it('GET /tools/:id for invalid tool should return 404', () => {
-      return request(app.getHttpServer())
-        .get('/tools/invalid-tool')
-        .expect(404);
+      return request(app.getHttpServer()).get('/tools/invalid-tool').expect(404);
     });
 
     it('POST /tools/:id/execute should return 200', () => {
@@ -529,7 +518,7 @@ describe('Tool Orchestrator API (e2e)', () => {
 
       const results = await Promise.all(promises);
 
-      results.forEach(res => {
+      results.forEach((res) => {
         expect(res.status).toBe(200);
         expect(res.body.success).toBe(true);
       });

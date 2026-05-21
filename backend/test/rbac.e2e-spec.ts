@@ -10,7 +10,7 @@ import { hasPermission, hasAnyPermission } from '../config/role-permissions.conf
 
 /**
  * Role-Based Access Control (RBAC) E2E Tests
- * 
+ *
  * Tests the complete RBAC system including:
  * - Permission checks
  * - Role-permission mapping
@@ -187,7 +187,7 @@ describe('RBAC System (E2E)', () => {
       it('should return true if user has at least one permission', () => {
         const result = hasAnyPermission(UserRole.NURSE, [
           Permission.EXPORT_PHI, // Nurse doesn't have this
-          Permission.READ_PHI,    // Nurse has this
+          Permission.READ_PHI, // Nurse has this
         ]);
         expect(result).toBe(true);
       });

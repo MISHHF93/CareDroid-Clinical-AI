@@ -1,6 +1,6 @@
 /**
  * Intent Classification - Integration Tests
- * 
+ *
  * End-to-end tests for the intent classification system
  * Tests the full flow: message → classification → chat response
  */
