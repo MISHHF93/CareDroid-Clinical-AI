@@ -93,6 +93,28 @@ function Dashboard() {
 
   const panelRegistryId = searchParams.get('tool');
   const calcFromUrl = searchParams.get('calc');
+  const selectedToolEntry = selectedTool ? getToolById(selectedTool) : null;
+  const activeConversationLabel = activeConversationId ? `Conversation ${activeConversationId}` : 'No conversation';
+  const starterPrompts = useMemo(
+    () => [
+      {
+        title: 'Review a patient concern',
+        prompt: 'Help me think through this patient presentation:',
+        icon: CHROME_ICONS.stethoscope,
+      },
+      {
+        title: 'Check medications',
+        prompt: 'Check for drug interactions between ',
+        icon: CHROME_ICONS.shield,
+      },
+      {
+        title: 'Interpret labs',
+        prompt: 'Interpret these lab results and flag critical values:',
+        icon: CHROME_ICONS.microscope,
+      },
+    ],
+    []
+  );
 
   useEffect(() => {
     if (!panelRegistryId) {
@@ -160,6 +182,16 @@ function Dashboard() {
     }
   };
 
+  const handleSubmitMessage = (event) => {
+    event.preventDefault();
+    handleSendMessage();
+  };
+
+  const handleStarterPrompt = (prompt) => {
+    setInput(prompt);
+    window.requestAnimationFrame(() => composerInputRef.current?.focus());
+  };
+
   const recommendationSource = useMemo(() => {
     if (input.trim()) return input.trim();
     const lastUser = [...messages].reverse().find((m) => m.role === 'user');
@@ -208,6 +240,33 @@ function Dashboard() {
   return (
     <div className="dashboard-root">
       <div className="dashboard-main">
+        <header className="dashboard-chat-header" aria-labelledby="dashboard-chat-title">
+          <div className="dashboard-chat-header__identity">
+            <div className="dashboard-chat-header__icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.bot} size={22} />
+            </div>
+            <div>
+              <p className="dashboard-chat-eyebrow">Clinical copilot</p>
+              <h1 id="dashboard-chat-title" className="dashboard-chat-title">
+                CareDroid clinical chat
+              </h1>
+            </div>
+          </div>
+          <div className="dashboard-chat-header__status" aria-label="Chat context">
+            <span className="dashboard-context-pill dashboard-context-pill--online">
+              <NavIcon icon={CHROME_ICONS.checkCircle} size={14} aria-hidden />
+              Online
+            </span>
+            <span className="dashboard-context-pill">{activeConversationLabel}</span>
+            {selectedToolEntry && (
+              <span className="dashboard-context-pill dashboard-context-pill--tool">
+                <NavIcon icon={getToolIcon(selectedToolEntry.id)} size={14} aria-hidden />
+                {selectedToolEntry.name}
+              </span>
+            )}
+          </div>
+        </header>
+
         <div
           ref={scrollRef}
           className={`dashboard-scroll app-scroll-container${messages.length === 0 && !sending ? ' dashboard-scroll--empty' : ''}`}
@@ -224,6 +283,22 @@ function Dashboard() {
                   Ask about medications, labs, scores, protocols, and procedures. Open a clinical tool from
                   the sidebar or Tools — each tool has its own page; use &quot;Discuss with AI&quot; there to
                   bring results back into this chat.
+                </div>
+                <div className="dashboard-starter-grid" aria-label="Starter prompts">
+                  {starterPrompts.map((starter) => (
+                    <button
+                      key={starter.title}
+                      type="button"
+                      className="dashboard-starter-card"
+                      onClick={() => handleStarterPrompt(starter.prompt)}
+                    >
+                      <span className="dashboard-starter-card__icon" aria-hidden>
+                        <NavIcon icon={starter.icon} size={18} />
+                      </span>
+                      <span className="dashboard-starter-card__title">{starter.title}</span>
+                      <span className="dashboard-starter-card__prompt">{starter.prompt}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -338,27 +413,35 @@ function Dashboard() {
               </div>
             </div>
           )}
-          <div className="dashboard-input-row">
-            <input
-              type="text"
+          <form className="dashboard-input-row" onSubmit={handleSubmitMessage}>
+            <textarea
               ref={composerInputRef}
               className="dashboard-input"
               value={input}
               onFocus={keepComposerVisible}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
               placeholder="Ask anything clinical…"
               disabled={sending}
+              rows={1}
+              aria-label="Clinical chat message"
             />
             <button
-              type="button"
+              type="submit"
               className="dashboard-send"
-              onClick={handleSendMessage}
               disabled={sending || !input.trim()}
             >
               Send
             </button>
-          </div>
+          </form>
+          <p className="dashboard-disclaimer">
+            Decision support only. Verify recommendations against local protocols and clinician judgment.
+          </p>
         </div>
       </div>
 
