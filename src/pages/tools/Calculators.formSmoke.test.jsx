@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import Calculators from './Calculators';
 import { BUILTIN_CALCULATOR_FORM_SMOKE_ROWS } from '../../data/calculatorHubManifest';
@@ -64,6 +64,15 @@ function renderCalculator(slug) {
   );
 }
 
+async function waitForSofaPreflight(iface, calculatorSlug) {
+  if (calculatorSlug !== 'sofa') return;
+  await waitFor(() => {
+    expect(
+      within(iface).getByText(/missing: at least 1 sofa clinical parameter/i)
+    ).toBeInTheDocument();
+  });
+}
+
 describe('Calculators — hub shell', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -107,6 +116,7 @@ describe('Calculators — Tier-A form sections', () => {
       ).toBeTruthy();
       expect(within(iface).getByRole('button', { name: /calculate/i })).toBeInTheDocument();
       expect(within(iface).getByText(/decision support only/i)).toBeInTheDocument();
+      await waitForSofaPreflight(iface, slug);
     }
   );
 
@@ -137,6 +147,7 @@ describe('Calculators — Tier-A form sections', () => {
       expect(iface.querySelector('input, select, textarea, .calc-checkbox-group')).toBeTruthy();
       expect(within(iface).getByRole('button', { name: /calculate/i })).toBeInTheDocument();
       expect(iface.querySelector('.calculator-results')).toBeTruthy();
+      await waitForSofaPreflight(iface, calculatorSlug);
     }
   );
 });

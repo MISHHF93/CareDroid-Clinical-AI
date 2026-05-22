@@ -82,6 +82,7 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'config-system', method: 'GET', path: '/api/config/system', client: 'configService.js' },
   { id: 'ai-remaining-queries', method: 'GET', path: '/api/ai/remaining-queries', client: 'configService.js' },
   { id: 'users-profile', method: 'GET', path: '/api/users/profile', client: 'UserContext.jsx / syncService.js' },
+  { id: 'users-profile-update', method: 'PATCH', path: '/api/users/profile', client: 'profileApi.js / ProfileSettings.jsx' },
   { id: 'subscriptions-current', method: 'GET', path: '/api/subscriptions/current', client: 'configService.js / subscriptionApi.js' },
   { id: 'subscriptions-plans', method: 'GET', path: '/api/subscriptions/plans', client: 'configService.js / subscriptionApi.js' },
   { id: 'subscriptions-checkout', method: 'POST', path: '/api/subscriptions/create-checkout', client: 'subscriptionApi.js' },

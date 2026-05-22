@@ -63,6 +63,7 @@ describe('Settings Privacy & Data card', () => {
     vi.clearAllMocks();
     URL.createObjectURL = vi.fn(() => 'blob:export');
     URL.revokeObjectURL = vi.fn();
+    HTMLAnchorElement.prototype.click = vi.fn();
   });
 
   it('requires acknowledgement before requesting a data export', async () => {

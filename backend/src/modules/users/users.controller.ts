@@ -17,13 +17,24 @@ export class UsersController {
   @ApiOperation({ summary: 'Get current user profile' })
   @RequirePermission(Permission.READ_PHI)
   async getProfile(@Req() req: any) {
-    return this.usersService.findById(req.user.id);
+    return this.usersService.findById(
+      req.user.id,
+      req.user.id,
+      req.ip,
+      req.headers['user-agent'],
+    );
   }
 
   @Patch('profile')
   @ApiOperation({ summary: 'Update user profile' })
   @RequirePermission(Permission.WRITE_PHI)
   async updateProfile(@Req() req: any, @Body() updates: any) {
-    return this.usersService.updateProfile(req.user.id, updates);
+    return this.usersService.updateProfile(
+      req.user.id,
+      updates,
+      req.user.id,
+      req.ip,
+      req.headers['user-agent'],
+    );
   }
 }

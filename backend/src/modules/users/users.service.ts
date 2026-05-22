@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -86,11 +86,33 @@ export class UsersService {
   ) {
     const profile = await this.profileRepository.findOne({ where: { userId } });
     if (!profile) {
-      throw new Error('Profile not found');
+      throw new NotFoundException('Profile not found');
+    }
+
+    const allowedFields: Array<keyof UserProfile> = [
+      'fullName',
+      'firstName',
+      'lastName',
+      'institution',
+      'specialty',
+      'licenseNumber',
+      'country',
+      'languagePreference',
+      'timezone',
+      'avatarUrl',
+    ];
+    const sanitizedUpdates = Object.fromEntries(
+      Object.entries(updates || {})
+        .filter(([key, value]) => allowedFields.includes(key as keyof UserProfile) && value !== undefined)
+        .map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value]),
+    ) as Partial<UserProfile>;
+
+    if (Object.keys(sanitizedUpdates).length === 0) {
+      throw new BadRequestException('No supported profile fields were provided.');
     }
 
     const oldValues = { ...profile };
-    Object.assign(profile, updates);
+    Object.assign(profile, sanitizedUpdates);
     const savedProfile = await this.profileRepository.save(profile);
 
     // Log profile modification (PHI)
@@ -103,8 +125,8 @@ export class UsersService {
         userAgent,
         phiAccessed: true,
         metadata: {
-          modifiedFields: Object.keys(updates),
-          changes: Object.entries(updates).map(([key, newValue]) => ({
+          modifiedFields: Object.keys(sanitizedUpdates),
+          changes: Object.entries(sanitizedUpdates).map(([key, newValue]) => ({
             field: key,
             oldValue: oldValues[key],
             newValue,

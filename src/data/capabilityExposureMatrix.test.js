@@ -77,9 +77,19 @@ describe('capabilityExposureMatrix', () => {
   });
 
   it('prioritizes corrected exposure fixes instead of already-shipped outreach', () => {
+    const profile = capabilityExposureMatrix.find(
+      (row) => row.capability === 'Profile read and update'
+    );
     const outreach = capabilityExposureMatrix.find(
       (row) => row.capability === 'Guided outreach and follow-up planning'
     );
+    expect(profile).toMatchObject({
+      commandOrApiRoute: 'GET/PATCH /api/users/profile',
+      exposureStatus: 'exposed',
+      frontendRouteStatus: 'protected',
+      surfaceType: 'visible-ui',
+    });
+    expect(profile.currentFrontendSurface).toMatch(/ProfileSettings\.jsx saves through profileApi\.js PATCH/i);
     expect(outreach).toMatchObject({
       commandOrApiRoute: 'POST /api/chat/message',
       exposureStatus: 'exposed',
@@ -97,9 +107,11 @@ describe('capabilityExposureMatrix', () => {
     expect(recommendedCapabilityBuildOrder.map((row) => row.capability)).not.toContain(
       'Guided outreach and follow-up planning'
     );
+    expect(recommendedCapabilityBuildOrder.map((row) => row.capability)).not.toContain(
+      'Profile read and update'
+    );
     expect(recommendedCapabilityBuildOrder.map((row) => row.capability)).toEqual([
       'Classify and contain public/unsupported visible surfaces',
-      'Profile read and update',
       'Notification preferences and inbox actions',
       'Tool metadata and validation preview',
       'Compliance export and account deletion',
