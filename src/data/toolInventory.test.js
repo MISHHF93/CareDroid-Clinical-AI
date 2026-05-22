@@ -156,10 +156,16 @@ describe('canonical tool inventory', () => {
       }
 
       if (record.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED) {
-        expect(record.orchestratorToolId, record.id).toBeTruthy();
-        expect(record.endpoint, record.id).toBe(`/api/tools/${record.orchestratorToolId}/execute`);
-        expect(record.executorStatus, record.id).toBe(TOOL_EXECUTOR_STATUS.REGISTERED);
-        expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalOrchestratorApi.js');
+        expect(record.endpoint, record.id).toBeTruthy();
+        if (record.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED) {
+          expect(record.orchestratorToolId, record.id).toBeTruthy();
+          expect(record.endpoint, record.id).toBe(`/api/tools/${record.orchestratorToolId}/execute`);
+          expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalOrchestratorApi.js');
+        } else {
+          expect(record.executorStatus, record.id).toBe(TOOL_EXECUTOR_STATUS.PLATFORM);
+          expect(record.orchestratorToolId, record.id).toBeFalsy();
+          expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalIntelligenceApi.js');
+        }
       }
 
       if (record.hasDedicatedForm) {
@@ -194,5 +200,131 @@ describe('canonical tool inventory', () => {
     expect(audit.length).toBe(records.length);
     expect(audit.some((record) => record.kind === 'platform-api')).toBe(true);
     expect(audit.some((record) => record.launchable === false)).toBe(true);
+  });
+
+  it('registers ambient-scribe as a Tier C clinical intelligence workflow', () => {
+    const record = resolveToolInventoryRecord('ambient-scribe', records);
+
+    expect(record).toMatchObject({
+      id: 'ambient-scribe',
+      tier: 'C',
+      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      endpoint: '/api/clinical-intelligence/ambient-scribe/generate',
+      component: 'src/pages/tools/AmbientScribe.jsx',
+      executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      riskLevel: 'high',
+    });
+  });
+
+  it('registers calculator-recommender-ai as a launchable clinical page with NLU coverage', () => {
+    const record = resolveToolInventoryRecord('calculator-recommender-ai', records);
+
+    expect(record).toMatchObject({
+      id: 'calculator-recommender-ai',
+      route: '/tools/calculator-recommender',
+      component: 'src/pages/tools/CalculatorRecommender.jsx',
+      nluToolId: 'calculator-recommender-ai',
+      launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
+      executorStatus: TOOL_EXECUTOR_STATUS.UNSUPPORTED,
+    });
+  });
+
+  it('registers guideline-rag as a Tier C backend clinical intelligence workflow', () => {
+    const record = resolveToolInventoryRecord('guideline-rag', records);
+
+    expect(record).toMatchObject({
+      id: 'guideline-rag',
+      tier: 'C',
+      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      endpoint: '/api/clinical-intelligence/guideline-rag/query',
+      component: 'src/pages/tools/GuidelineRag.jsx',
+      executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      riskLevel: 'high',
+    });
+  });
+
+  it('registers differential-ai as a Tier C backend clinical intelligence workflow with NLU coverage', () => {
+    const record = resolveToolInventoryRecord('differential-ai', records);
+
+    expect(record).toMatchObject({
+      id: 'differential-ai',
+      tier: 'C',
+      nluToolId: 'differential-ai',
+      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      endpoint: '/api/clinical-intelligence/differential-ai/generate',
+      component: 'src/pages/tools/DifferentialAi.jsx',
+      executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      riskLevel: 'high',
+    });
+  });
+
+  it('registers timeline-ai as a Tier C backend clinical intelligence workflow', () => {
+    const record = resolveToolInventoryRecord('timeline-ai', records);
+
+    expect(record).toMatchObject({
+      id: 'timeline-ai',
+      tier: 'C',
+      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      endpoint: '/api/clinical-intelligence/timeline-ai/generate',
+      component: 'src/pages/tools/TimelineAi.jsx',
+      executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      riskLevel: 'high',
+    });
+  });
+
+  it('registers patient-summary-ai as a Tier C backend clinical intelligence workflow', () => {
+    const record = resolveToolInventoryRecord('patient-summary-ai', records);
+
+    expect(record).toMatchObject({
+      id: 'patient-summary-ai',
+      tier: 'C',
+      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      endpoint: '/api/clinical-intelligence/patient-summary-ai/generate',
+      component: 'src/pages/tools/PatientSummaryAi.jsx',
+      executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      riskLevel: 'high',
+    });
+  });
+
+  it('registers order-set-ai as a Tier C backend clinical intelligence workflow', () => {
+    const record = resolveToolInventoryRecord('order-set-ai', records);
+
+    expect(record).toMatchObject({
+      id: 'order-set-ai',
+      tier: 'C',
+      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      endpoint: '/api/clinical-intelligence/order-set-ai/generate',
+      component: 'src/pages/tools/OrderSetAi.jsx',
+      executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      riskLevel: 'high',
+    });
+  });
+
+  it('registers ai-explainability as a Tier C backend clinical intelligence workflow', () => {
+    const record = resolveToolInventoryRecord('ai-explainability', records);
+
+    expect(record).toMatchObject({
+      id: 'ai-explainability',
+      tier: 'C',
+      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      endpoint: '/api/clinical-intelligence/ai-explainability/trace',
+      component: 'src/pages/tools/AiExplainability.jsx',
+      executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      riskLevel: 'high',
+    });
+  });
+
+  it('registers clinical-audit as a Tier C backend clinical intelligence workflow', () => {
+    const record = resolveToolInventoryRecord('clinical-audit', records);
+
+    expect(record).toMatchObject({
+      id: 'clinical-audit',
+      tier: 'C',
+      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      endpoint: '/api/clinical-intelligence/clinical-audit/execution-logs',
+      component: 'src/pages/tools/ClinicalAudit.jsx',
+      executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      riskLevel: 'high',
+    });
   });
 });

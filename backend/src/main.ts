@@ -174,7 +174,7 @@ async function bootstrap() {
 
   console.log(`\n🚀 CareDroid Backend running on: http://localhost:${port}`);
   console.log(`📚 Swagger docs available at: http://localhost:${port}/${SWAGGER_DOCS_PATH}`);
-  console.log(`📊 Prometheus metrics at: http://localhost:${port}/metrics`);
+  console.log(`📊 Prometheus metrics at: http://localhost:${port}/api/metrics`);
   console.log(`🔐 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔒 TLS 1.3: ENFORCED (only TLS 1.3+ allowed)`);
   console.log(`\n📈 Monitoring Stack (when docker-compose running):`);

@@ -77,6 +77,7 @@ import {
   FraminghamRiskCalculator,
 } from './pr8ClinicalBatchCalculators';
 import { Abcd2Calculator } from './abcd2Calculator';
+import { AnionGapCalculator, RassCalculator, ShockIndexCalculator } from './nextWaveCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -485,6 +486,12 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <FraminghamRiskCalculator onResultChange={onResultChange} />;
     case 'abcd2':
       return <Abcd2Calculator onResultChange={onResultChange} />;
+    case 'shock-index':
+      return <ShockIndexCalculator onResultChange={onResultChange} />;
+    case 'anion-gap':
+      return <AnionGapCalculator onResultChange={onResultChange} />;
+    case 'rass':
+      return <RassCalculator onResultChange={onResultChange} />;
     default:
       return (
         <ToolNotFound

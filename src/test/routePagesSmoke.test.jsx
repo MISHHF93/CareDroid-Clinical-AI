@@ -11,6 +11,15 @@ import ToolsOverview from '../pages/tools/ToolsOverview';
 import FleetDashboard from '../pages/fleet/FleetDashboard';
 import RouteOptimizer from '../pages/fleet/RouteOptimizer';
 import PredictiveMaintenance from '../pages/fleet/PredictiveMaintenance';
+import AmbientScribe from '../pages/tools/AmbientScribe';
+import CalculatorRecommender from '../pages/tools/CalculatorRecommender';
+import GuidelineRag from '../pages/tools/GuidelineRag';
+import DifferentialAi from '../pages/tools/DifferentialAi';
+import TimelineAi from '../pages/tools/TimelineAi';
+import PatientSummaryAi from '../pages/tools/PatientSummaryAi';
+import OrderSetAi from '../pages/tools/OrderSetAi';
+import AiExplainability from '../pages/tools/AiExplainability';
+import ClinicalAudit from '../pages/tools/ClinicalAudit';
 import Dashboard from '../pages/Dashboard';
 import { CORE_ROUTE_SMOKE } from './responsiveRegression.routes';
 
@@ -70,6 +79,15 @@ const PAGE_BY_ID = {
   'tools-overview': ToolsOverview,
   'tools-catalog': ClinicalToolCatalog,
   'calculators-hub': Calculators,
+  'ambient-scribe': AmbientScribe,
+  'calculator-recommender-ai': CalculatorRecommender,
+  'guideline-rag': GuidelineRag,
+  'differential-ai': DifferentialAi,
+  'timeline-ai': TimelineAi,
+  'patient-summary-ai': PatientSummaryAi,
+  'order-set-ai': OrderSetAi,
+  'ai-explainability': AiExplainability,
+  'clinical-audit': ClinicalAudit,
   'fleet-command': FleetDashboard,
   'fleet-route-optimizer': RouteOptimizer,
   'fleet-predictive-maintenance': PredictiveMaintenance,

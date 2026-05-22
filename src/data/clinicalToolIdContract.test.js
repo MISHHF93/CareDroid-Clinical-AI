@@ -89,6 +89,7 @@ describe('clinicalToolIdContract — canonical groups', () => {
   it('CANONICAL_TOOL_GROUPS registry slices partition ALL_REGISTRY_TOOL_IDS', () => {
     const parts = [
       ...CANONICAL_TOOL_GROUPS.aiOperationsPages,
+      ...CANONICAL_TOOL_GROUPS.clinicalTierCWorkflows,
       ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsTierA,
       ...CANONICAL_TOOL_GROUPS.clinicalChatAssistedTierB,
       ...CANONICAL_TOOL_GROUPS.clinicalNluHubChat,

@@ -49,6 +49,30 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     category: 'calculator',
   },
   {
+    toolId: 'calculator-recommender-ai',
+    toolName: 'Calculator Recommendation AI',
+    keywords: [
+      'calculator recommender',
+      'calculator recommendation',
+      'calculator recommendations',
+      'recommend calculator',
+      'recommend calculators',
+      'suggest calculator',
+      'suggest calculators',
+      'which calculator',
+      'which score',
+      'which risk score',
+      'what calculator',
+      'what score should i use',
+      'tool recommendation',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['symptoms', 'chief_complaint', 'clinical_keywords'],
+    description:
+      'Suggests shipped CareDroid calculators and risk scores from symptoms, chief complaint, and clinical keywords',
+    category: 'calculator',
+  },
+  {
     toolId: 'qsofa',
     toolName: 'qSOFA (quick SOFA)',
     keywords: [
@@ -558,6 +582,47 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     ],
     description:
       'Framingham ATP III point-based 10-year hard CHD risk (ages 30–74); alternative to ASCVD PCE',
+    category: 'calculator',
+  },
+  {
+    toolId: 'shock-index',
+    toolName: 'Shock Index',
+    keywords: ['shock index', 'shock-index', 'hemodynamic index', 'heart rate over systolic'],
+    requiredParameters: [],
+    optionalParameters: ['heart_rate', 'systolic_bp'],
+    description:
+      'Hemodynamic screening index calculated as heart rate divided by systolic blood pressure',
+    category: 'calculator',
+  },
+  {
+    toolId: 'anion-gap',
+    toolName: 'Anion Gap',
+    keywords: [
+      'anion gap',
+      'anion-gap',
+      'albumin corrected anion gap',
+      'metabolic acidosis gap',
+      'acid base gap',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['sodium', 'chloride', 'bicarbonate', 'albumin'],
+    description: 'Serum anion gap with optional albumin correction for acid-base review',
+    category: 'calculator',
+  },
+  {
+    toolId: 'rass',
+    toolName: 'RASS',
+    keywords: [
+      'rass',
+      'rass score',
+      'richmond agitation sedation scale',
+      'sedation agitation score',
+      'icu sedation scale',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['observed_level', 'score'],
+    description:
+      'Richmond Agitation-Sedation Scale for bedside sedation and agitation documentation',
     category: 'calculator',
   },
   {
@@ -1085,6 +1150,24 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     requiredParameters: ['symptoms'],
     optionalParameters: ['patient_history', 'exam_findings'],
     description: 'Generates differential diagnoses based on clinical presentation',
+    category: 'reference',
+  },
+  {
+    toolId: 'differential-ai',
+    toolName: 'Differential Diagnosis Assistant',
+    keywords: [
+      'differential ai',
+      'ranked differential',
+      'ranked differentials',
+      'differential diagnosis assistant',
+      'diagnostic differential assistant',
+      'generate ranked ddx',
+      'rank ddx',
+    ],
+    requiredParameters: ['symptoms'],
+    optionalParameters: ['labs', 'history', 'demographics'],
+    description:
+      'Generates ranked differential diagnosis decision support with supporting evidence, suggested calculators, and explainability',
     category: 'reference',
   },
   {

@@ -64,6 +64,15 @@ const Calculators = lazyWithRetry(() => import('./pages/tools/Calculators'));
 const Protocols = lazyWithRetry(() => import('./pages/tools/Protocols'));
 const DiagnosisAssistant = lazyWithRetry(() => import('./pages/tools/DiagnosisAssistant'));
 const ProcedureGuide = lazyWithRetry(() => import('./pages/tools/ProcedureGuide'));
+const AmbientScribe = lazyWithRetry(() => import('./pages/tools/AmbientScribe'));
+const CalculatorRecommender = lazyWithRetry(() => import('./pages/tools/CalculatorRecommender'));
+const GuidelineRag = lazyWithRetry(() => import('./pages/tools/GuidelineRag'));
+const DifferentialAi = lazyWithRetry(() => import('./pages/tools/DifferentialAi'));
+const TimelineAi = lazyWithRetry(() => import('./pages/tools/TimelineAi'));
+const PatientSummaryAi = lazyWithRetry(() => import('./pages/tools/PatientSummaryAi'));
+const OrderSetAi = lazyWithRetry(() => import('./pages/tools/OrderSetAi'));
+const AiExplainability = lazyWithRetry(() => import('./pages/tools/AiExplainability'));
+const ClinicalAudit = lazyWithRetry(() => import('./pages/tools/ClinicalAudit'));
 const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
 const ToolsAreaFallback = lazyWithRetry(() => import('./pages/tools/ToolsAreaFallback'));
 const FleetDashboard = lazyWithRetry(() => import('./pages/fleet/FleetDashboard'));
@@ -326,6 +335,15 @@ function AppRoutes() {
     { path: '/tools/protocols', element: <AppShellPage><Protocols /></AppShellPage>, requiresAuth: true },
     { path: '/tools/diagnosis', element: <AppShellPage><DiagnosisAssistant /></AppShellPage>, requiresAuth: true },
     { path: '/tools/procedures', element: <AppShellPage><ProcedureGuide /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/ambient-scribe', element: <AppShellPage><AmbientScribe /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/calculator-recommender', element: <AppShellPage><CalculatorRecommender /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/guideline-rag', element: <AppShellPage><GuidelineRag /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/differential-ai', element: <AppShellPage><DifferentialAi /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/timeline-ai', element: <AppShellPage><TimelineAi /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/patient-summary-ai', element: <AppShellPage><PatientSummaryAi /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/order-set-ai', element: <AppShellPage><OrderSetAi /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/ai-explainability', element: <AppShellPage><AiExplainability /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/clinical-audit', element: <AppShellPage><ClinicalAudit /></AppShellPage>, requiresAuth: true },
 
     { path: '/fleet/command', element: <AppShellPage><FleetDashboard /></AppShellPage>, requiresAuth: true },
     {

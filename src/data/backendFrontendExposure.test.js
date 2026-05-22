@@ -25,6 +25,10 @@ const registrySource = readFileSync(
   ),
   'utf8'
 );
+const repoRoot = join(__dirname, '../..');
+const rootEnvExample = readFileSync(join(repoRoot, '.env.example'), 'utf8');
+const backendEnvExample = readFileSync(join(repoRoot, 'backend/.env.example'), 'utf8');
+const backendMainSource = readFileSync(join(repoRoot, 'backend/src/main.ts'), 'utf8');
 
 describe('backendFrontendExposure scan', () => {
   it('passes with zero unguarded missing routes and no false executor claims', () => {
@@ -69,7 +73,7 @@ describe('backendFrontendExposure scan', () => {
   });
 
   it('audit controller uses single /api prefix (not /api/api/audit)', () => {
-    const auditRoutes = BACKEND_HTTP_ROUTES.filter((r) => r.path.includes('audit'));
+    const auditRoutes = BACKEND_HTTP_ROUTES.filter((r) => r.controller === 'AuditController');
     expect(auditRoutes.every((r) => r.path.startsWith('/api/audit'))).toBe(true);
     expect(auditRoutes.some((r) => r.path.includes('/api/api/'))).toBe(false);
   });
@@ -88,7 +92,12 @@ describe('backendFrontendExposure scan', () => {
     expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.BACKEND_ONLY_INTERNAL);
     expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.USER_FACING_MISSING_FRONTEND_ROUTE);
     expect(classifications).toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.PLANNED_UNSUPPORTED);
-    expect(classifications).not.toContain(BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.FRONTEND_VISIBLE_BACKEND_MISSING);
+    expect(
+      rows.filter(
+        (row) =>
+          row.classification === BACKEND_FRONTEND_CAPABILITY_CLASSIFICATIONS.FRONTEND_VISIBLE_BACKEND_MISSING
+      )
+    ).toEqual([]);
 
     const executorRows = rows.filter((row) => row.source === 'user-facing-tool');
     expect(executorRows.map((row) => row.orchestratorToolId).sort()).toEqual(
@@ -109,5 +118,15 @@ describe('Vite proxy and ports', () => {
     expect(vite.proxiesSocketIo).toBe(true);
     expect(vite.serverUsesProxyHelper).toBe(true);
     expect(vite.previewUsesProxyHelper).toBe(true);
+  });
+
+  it('keeps local example URLs aligned to Vite dev port and metrics route', () => {
+    expect(rootEnvExample).toContain('VITE_PRIVACY_POLICY_URL=http://localhost:8000/privacy');
+    expect(rootEnvExample).not.toMatch(/localhost:5173/);
+    expect(backendEnvExample).toContain('FRONTEND_URL=http://localhost:8000');
+    expect(backendEnvExample).toContain('STRIPE_SUCCESS_URL=http://localhost:8000/subscription/success');
+    expect(backendEnvExample).not.toMatch(/localhost:5173/);
+    expect(backendMainSource).toContain('http://localhost:${port}/api/metrics');
+    expect(backendMainSource).not.toContain('http://localhost:${port}/metrics');
   });
 });

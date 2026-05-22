@@ -29,6 +29,7 @@ import {
   mapChatResponseToAssistantMessage,
   registryIdToChatToolParam,
 } from '../services/clinicalChatService';
+import { scheduleIdleWork } from '../utils/scheduleIdleWork';
 import { NavIcon } from '../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../navigation/iconRegistry';
 import './Dashboard.css';
@@ -155,6 +156,7 @@ function Dashboard() {
   const [outreachDraft, setOutreachDraft] = useState(OUTREACH_DRAFT_INITIAL_STATE);
   const [executionActions, setExecutionActions] = useState({});
   const [pendingConfirmation, setPendingConfirmation] = useState(null);
+  const [capabilitySuggestions, setCapabilitySuggestions] = useState([]);
   const scrollRef = useRef(null);
   const scrollEndRef = useRef(null);
   const composerInputRef = useRef(null);
@@ -745,14 +747,23 @@ function Dashboard() {
     return lastUser?.content || '';
   }, [input, messages]);
 
-  const capabilitySuggestions = useMemo(
-    () =>
-      getChatCapabilitySuggestions({
-        input: recommendationSource,
-        hasPermission,
-      }),
-    [hasPermission, recommendationSource]
-  );
+  useEffect(() => {
+    let cancelled = false;
+    const cancelIdleWork = scheduleIdleWork(() => {
+      if (cancelled) return;
+      setCapabilitySuggestions(
+        getChatCapabilitySuggestions({
+          input: recommendationSource,
+          hasPermission,
+        })
+      );
+    }, { timeout: 500 });
+
+    return () => {
+      cancelled = true;
+      cancelIdleWork?.();
+    };
+  }, [hasPermission, recommendationSource]);
 
   useEffect(() => {
     if (capabilitySuggestions.length > 0) {

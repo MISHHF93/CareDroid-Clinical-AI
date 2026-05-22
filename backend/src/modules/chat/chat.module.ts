@@ -8,6 +8,7 @@ import { EmergencyEscalationModule } from '../medical-control-plane/emergency-es
 import { AuditModule } from '../audit/audit.module';
 import { RAGModule } from '../rag/rag.module';
 import { MetricsModule } from '../metrics/metrics.module';
+import { CalculatorRecommenderService } from './calculator-recommender.service';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { MetricsModule } from '../metrics/metrics.module';
     MetricsModule,
   ],
   controllers: [ChatController],
-  providers: [ChatService],
+  providers: [ChatService, CalculatorRecommenderService],
   exports: [ChatService],
 })
 export class ChatModule {}

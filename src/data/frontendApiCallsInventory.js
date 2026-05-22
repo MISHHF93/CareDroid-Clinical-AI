@@ -68,6 +68,15 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'clinical-alerts-dismiss', method: 'POST', path: '/api/clinical/alerts/:id/dismiss', client: 'clinicalAlertNotifications.js', capability: 'clinicalAlerts' },
   { id: 'clinical-alerts-stream', method: 'GET', path: '/api/clinical/alerts/stream', client: 'clinicalAlertNotifications.js', capability: 'clinicalAlerts', notes: 'WebSocket upgrade' },
 
+  { id: 'ambient-scribe-generate', method: 'POST', path: '/api/clinical-intelligence/ambient-scribe/generate', client: 'clinicalIntelligenceApi.js / AmbientScribe.jsx', capability: 'clinicalIntelligence' },
+  { id: 'guideline-rag-query', method: 'POST', path: '/api/clinical-intelligence/guideline-rag/query', client: 'clinicalIntelligenceApi.js / GuidelineRag.jsx', capability: 'clinicalIntelligence' },
+  { id: 'differential-ai-generate', method: 'POST', path: '/api/clinical-intelligence/differential-ai/generate', client: 'clinicalIntelligenceApi.js / DifferentialAi.jsx', capability: 'clinicalIntelligence' },
+  { id: 'timeline-ai-generate', method: 'POST', path: '/api/clinical-intelligence/timeline-ai/generate', client: 'clinicalIntelligenceApi.js / TimelineAi.jsx', capability: 'clinicalIntelligence' },
+  { id: 'patient-summary-ai-generate', method: 'POST', path: '/api/clinical-intelligence/patient-summary-ai/generate', client: 'clinicalIntelligenceApi.js / PatientSummaryAi.jsx', capability: 'clinicalIntelligence' },
+  { id: 'order-set-ai-generate', method: 'POST', path: '/api/clinical-intelligence/order-set-ai/generate', client: 'clinicalIntelligenceApi.js / OrderSetAi.jsx', capability: 'clinicalIntelligence' },
+  { id: 'ai-explainability-trace', method: 'GET', path: '/api/clinical-intelligence/ai-explainability/trace', client: 'clinicalIntelligenceApi.js / AiExplainability.jsx', capability: 'clinicalIntelligence' },
+  { id: 'clinical-audit-execution-logs', method: 'GET', path: '/api/clinical-intelligence/clinical-audit/execution-logs', client: 'clinicalIntelligenceApi.js / ClinicalAudit.jsx', capability: 'clinicalIntelligence' },
+
   { id: 'exports-pdf', method: 'POST', path: '/api/exports/pdf', client: 'export/ExportService.js', capability: 'exportsPdf' },
   { id: 'exports-excel', method: 'POST', path: '/api/exports/excel', client: 'export/ExportService.js', capability: 'exportsExcel' },
   { id: 'reports-generate', method: 'POST', path: '/api/reports/generate', client: 'export/ExportService.js', capability: 'reportsGenerate' },

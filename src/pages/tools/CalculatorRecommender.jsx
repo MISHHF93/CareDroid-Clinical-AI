@@ -1,0 +1,212 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import ApiStateBanner from '../../components/ApiStateBanner';
+import { sendClinicalChatMessage } from '../../services/clinicalChatService';
+import {
+  buildCalculatorRecommendationChatMessage,
+  recommendCalculators,
+} from '../../services/calculatorRecommendationService';
+import ToolPageLayout from './ToolPageLayout';
+
+const TOOL_CONFIG = {
+  id: 'calculator-recommender-ai',
+  name: 'Calculator Recommendation AI',
+  path: '/tools/calculator-recommender',
+  color: '#6B7BC4',
+  description: 'Suggests CareDroid calculators from symptoms, chief complaint, and clinical keywords',
+  shortcut: 'Ctrl+Shift+L',
+  category: 'Calculator',
+};
+
+export default function CalculatorRecommender({ embedded = false, onCloseEmbedded } = {}) {
+  const navigate = useNavigate();
+  const [chiefComplaint, setChiefComplaint] = useState('');
+  const [symptoms, setSymptoms] = useState('');
+  const [clinicalKeywords, setClinicalKeywords] = useState('');
+  const [result, setResult] = useState(null);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatResult, setChatResult] = useState(null);
+  const [error, setError] = useState(null);
+
+  const input = { chiefComplaint, symptoms, clinicalKeywords };
+
+  const handleRecommend = () => {
+    if (![chiefComplaint, symptoms, clinicalKeywords].some((value) => value.trim())) {
+      setError('Add a chief complaint, symptoms, or clinical keywords before recommending calculators.');
+      return;
+    }
+    setError(null);
+    setChatResult(null);
+    setResult(recommendCalculators(input));
+  };
+
+  const handleChatWorkflow = async () => {
+    if (![chiefComplaint, symptoms, clinicalKeywords].some((value) => value.trim())) {
+      setError('Add scenario details before starting the chat workflow.');
+      return;
+    }
+
+    setChatLoading(true);
+    setError(null);
+    const response = await sendClinicalChatMessage({
+      message: buildCalculatorRecommendationChatMessage(input),
+      tool: 'calculator-recommender-ai',
+      feature: 'calculator-recommender-ai',
+      authToken: localStorage.getItem('caredroid_access_token'),
+    });
+
+    if (response.ok) {
+      setChatResult(response.data);
+      if (response.data?.toolResult?.result?.recommendations) {
+        setResult({
+          capabilityId: 'calculator-recommender-ai',
+          status: 'matched',
+          recommendations: response.data.toolResult.result.recommendations,
+          matchedContexts: response.data.toolResult.result.matchedContexts || [],
+          safety: response.data.toolResult.result.safety || { warnings: [] },
+        });
+      }
+    } else {
+      setError(response.data?.message || 'Unable to start calculator recommendation chat workflow.');
+    }
+    setChatLoading(false);
+  };
+
+  const clear = () => {
+    setChiefComplaint('');
+    setSymptoms('');
+    setClinicalKeywords('');
+    setResult(null);
+    setChatResult(null);
+    setError(null);
+  };
+
+  return (
+    <ToolPageLayout tool={TOOL_CONFIG} embedded={embedded} onCloseEmbedded={onCloseEmbedded}>
+      <div className="simple-tool-page-inner">
+        <div className="simple-tool-result-panel" role="note">
+          <h2>Recommendation Scope</h2>
+          <p>
+            This workflow suggests existing CareDroid calculators only. It does not diagnose, rule out disease,
+            or recommend treatment, disposition, orders, or medications.
+          </p>
+        </div>
+
+        <div className="diagnosis-tool-grid">
+          <section className="diagnosis-panel" aria-labelledby="calculator-recommender-inputs">
+            <h2 id="calculator-recommender-inputs">Clinical Scenario</h2>
+
+            <label className="simple-tool-label" htmlFor="calculator-chief-complaint">
+              Chief complaint
+            </label>
+            <input
+              id="calculator-chief-complaint"
+              className="diagnosis-field"
+              value={chiefComplaint}
+              onChange={(event) => setChiefComplaint(event.target.value)}
+              placeholder="e.g., chest pain, dyspnea, fever, stroke symptoms"
+            />
+
+            <label className="simple-tool-label" htmlFor="calculator-symptoms">
+              Symptoms
+            </label>
+            <textarea
+              id="calculator-symptoms"
+              className="diagnosis-field diagnosis-field--tall"
+              value={symptoms}
+              onChange={(event) => setSymptoms(event.target.value)}
+              placeholder="e.g., substernal chest pressure, diaphoresis, elevated troponin, risk factors"
+            />
+
+            <label className="simple-tool-label" htmlFor="calculator-keywords">
+              Clinical keywords
+            </label>
+            <input
+              id="calculator-keywords"
+              className="diagnosis-field"
+              value={clinicalKeywords}
+              onChange={(event) => setClinicalKeywords(event.target.value)}
+              placeholder="e.g., ACS, PE, sepsis, cirrhosis, TIA"
+            />
+
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '16px' }}>
+              <button type="button" className="diagnosis-primary-btn" onClick={handleRecommend}>
+                Suggest tools
+              </button>
+              <button
+                type="button"
+                className="btn-diagnosis-secondary"
+                onClick={handleChatWorkflow}
+                disabled={chatLoading}
+              >
+                {chatLoading ? 'Starting chat...' : 'Start chat workflow'}
+              </button>
+              <button type="button" className="btn-diagnosis-secondary" onClick={clear}>
+                Clear
+              </button>
+            </div>
+          </section>
+
+          <section className="diagnosis-panel diagnosis-panel--scroll" aria-labelledby="calculator-recommendations">
+            <h2 id="calculator-recommendations">Suggested Tools</h2>
+            <ApiStateBanner error={error} onRetry={handleRecommend} />
+
+            {chatLoading ? (
+              <div aria-busy="true" style={{ padding: '48px 20px', textAlign: 'center' }}>
+                <div className="simple-tool-spinner diagnosis-spinner" />
+                <p style={{ color: 'var(--app-fg-muted)' }}>Building calculator recommendations...</p>
+              </div>
+            ) : result?.recommendations?.length ? (
+              <div className="diagnosis-results-body">
+                {result.matchedContexts?.length ? (
+                  <div className="simple-tool-result-panel">
+                    <strong>Matched context:</strong>{' '}
+                    {result.matchedContexts.map((context) => context.label).join(', ')}
+                  </div>
+                ) : null}
+
+                {result.recommendations.map((tool) => (
+                  <article key={tool.id} className="simple-tool-result-panel">
+                    <h3>{tool.label}</h3>
+                    <p>{tool.description}</p>
+                    <button
+                      type="button"
+                      className="diagnosis-primary-btn"
+                      onClick={() => navigate(tool.navigationPath || tool.route || '/tools/calculators')}
+                    >
+                      Open {tool.label}
+                    </button>
+                  </article>
+                ))}
+
+                <div className="simple-tool-result-panel">
+                  <h3>Safety</h3>
+                  <ul>
+                    {(result.safety?.warnings || []).map((warning) => (
+                      <li key={warning}>{warning}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ) : result ? (
+              <div className="simple-tool-result-panel">
+                No matching calculator found yet. Add more specific symptoms, chief complaint, or clinical keywords.
+              </div>
+            ) : (
+              <div style={{ padding: '60px 20px', textAlign: 'center', color: 'var(--app-fg-muted)' }}>
+                Try “chest pain with elevated troponin” to suggest HEART, TIMI, GRACE, and ASCVD tools.
+              </div>
+            )}
+
+            {chatResult?.response ? (
+              <div className="simple-tool-result-panel">
+                <h3>Chat Workflow Response</h3>
+                <p>{chatResult.response}</p>
+              </div>
+            ) : null}
+          </section>
+        </div>
+      </div>
+    </ToolPageLayout>
+  );
+}

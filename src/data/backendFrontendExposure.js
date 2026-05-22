@@ -134,7 +134,9 @@ function backendRouteCapabilityRow(route) {
 
 function userFacingExecutorCapabilityRows() {
   return getUserFacingToolInventory()
-    .filter((record) => record.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED)
+    .filter(
+      (record) => record.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED && record.orchestratorToolId
+    )
     .map((record) => {
       const route = record.endpoint ? findBackendRoute('POST', record.endpoint) : null;
       const wired =

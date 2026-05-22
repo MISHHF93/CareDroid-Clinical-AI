@@ -24,6 +24,7 @@ export const BACKEND_API_CAPABILITIES = Object.freeze({
   toolsList: true,
   toolsExecute: true,
   toolsResultsSync: true,
+  clinicalIntelligence: true,
   complianceConsent: true,
   complianceExport: true,
   auditSync: true,

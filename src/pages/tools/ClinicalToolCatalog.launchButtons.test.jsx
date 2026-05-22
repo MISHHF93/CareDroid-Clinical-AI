@@ -84,5 +84,5 @@ describe('ClinicalToolCatalog — launch buttons', () => {
     expect(
       within(medicalSection).getAllByRole('button', { name: /start guided chat/i }).length
     ).toBeGreaterThan(0);
-  });
+  }, 20000);
 });

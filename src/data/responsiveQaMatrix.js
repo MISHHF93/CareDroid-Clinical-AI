@@ -8,6 +8,8 @@
 import {
   CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+  CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS,
+  CLINICAL_AI_PAGE_REGISTRY_IDS,
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
   REGISTRY,
 } from './clinicalToolIdContract.js';
@@ -93,9 +95,36 @@ export const TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.phq9]: '/tools/calculators/phq9',
   [REGISTRY.gad7]: '/tools/calculators/gad7',
   [REGISTRY.abcd2]: '/tools/calculators/abcd2',
+  [REGISTRY.shockIndex]: '/tools/calculators/shock-index',
+  [REGISTRY.anionGap]: '/tools/calculators/anion-gap',
+  [REGISTRY.rass]: '/tools/calculators/rass',
 });
 
 const TIER_B_LAUNCH_PATH = '/tools/calculators';
+
+const CLINICAL_AI_PAGE_PATH_BY_REGISTRY_ID = Object.freeze({
+  [REGISTRY.drugCheck]: '/tools/drug-checker',
+  [REGISTRY.labInterp]: '/tools/lab-interpreter',
+  [REGISTRY.abgInterpreter]: '/tools/lab-interpreter',
+  [REGISTRY.protocols]: '/tools/protocols',
+  [REGISTRY.aclsProtocol]: '/tools/protocols',
+  [REGISTRY.atlsProtocol]: '/tools/protocols',
+  [REGISTRY.diagnosis]: '/tools/diagnosis',
+  [REGISTRY.antibioticGuide]: '/tools/diagnosis',
+  [REGISTRY.procedures]: '/tools/procedures',
+  [REGISTRY.calculatorRecommenderAi]: '/tools/calculator-recommender',
+});
+
+const TIER_C_PAGE_PATH_BY_REGISTRY_ID = Object.freeze({
+  [REGISTRY.ambientScribe]: '/tools/ambient-scribe',
+  [REGISTRY.guidelineRag]: '/tools/guideline-rag',
+  [REGISTRY.differentialAi]: '/tools/differential-ai',
+  [REGISTRY.timelineAi]: '/tools/timeline-ai',
+  [REGISTRY.patientSummaryAi]: '/tools/patient-summary-ai',
+  [REGISTRY.orderSetAi]: '/tools/order-set-ai',
+  [REGISTRY.aiExplainability]: '/tools/ai-explainability',
+  [REGISTRY.clinicalAudit]: '/tools/clinical-audit',
+});
 
 const TIER_B_LABEL_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.wellsPe]: 'Wells PE',
@@ -196,6 +225,34 @@ export function buildResponsiveQaPages() {
       label: `Tier B launch: ${TIER_B_LABEL_BY_REGISTRY_ID[registryId] || registryId}`,
       path: TIER_B_LAUNCH_PATH,
       category: 'tier-b',
+      registryId,
+    });
+  }
+
+  for (const registryId of CLINICAL_AI_PAGE_REGISTRY_IDS) {
+    const path = CLINICAL_AI_PAGE_PATH_BY_REGISTRY_ID[registryId];
+    if (!path) {
+      throw new Error(`responsiveQaMatrix: missing clinical AI page path for ${registryId}`);
+    }
+    pages.push({
+      id: `clinical-page-${registryId}`,
+      label: `Clinical page: ${registryId}`,
+      path,
+      category: 'clinical-page',
+      registryId,
+    });
+  }
+
+  for (const registryId of CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS) {
+    const path = TIER_C_PAGE_PATH_BY_REGISTRY_ID[registryId];
+    if (!path) {
+      throw new Error(`responsiveQaMatrix: missing Tier C path for ${registryId}`);
+    }
+    pages.push({
+      id: `tier-c-${registryId}`,
+      label: `Tier C: ${registryId}`,
+      path,
+      category: 'tier-c',
       registryId,
     });
   }

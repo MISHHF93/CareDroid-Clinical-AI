@@ -23,6 +23,7 @@ import {
   addConfidenceDisclaimer,
 } from '../ai/prompts/clinical-query.prompt';
 import { calculateConfidence, getConfidenceDisclaimer } from '../ai/utils/confidence-scorer';
+import { CalculatorRecommenderService } from './calculator-recommender.service';
 
 interface QueryResponse {
   text: string;
@@ -59,6 +60,7 @@ export class ChatService {
     private readonly ragService: RAGService,
     private readonly nluMetrics: NluMetricsService,
     private readonly configService: ConfigService,
+    private readonly calculatorRecommender: CalculatorRecommenderService,
   ) {
     const ragConfig = this.configService.get<any>('rag');
     this.ragEnabled = ragConfig?.enabled !== false;
@@ -182,6 +184,14 @@ export class ChatService {
       conversationId,
       intentClassification: classification,
     };
+
+    if (
+      tool === 'calculator-recommender-ai' ||
+      feature === 'calculator-recommender-ai' ||
+      classification?.toolId === 'calculator-recommender-ai'
+    ) {
+      return this.handleCalculatorRecommendation(message, classification);
+    }
 
     // Route based on intent
     if (classification?.primaryIntent === PrimaryIntent.CLINICAL_TOOL) {
@@ -444,6 +454,44 @@ export class ChatService {
       lab_interpreter: 'lab-interpreter',
     };
     return toolMap[claudeToolName] || claudeToolName;
+  }
+
+  private async handleCalculatorRecommendation(
+    message: string,
+    classification: IntentClassification | null,
+  ): Promise<QueryResponse> {
+    const result = this.calculatorRecommender.recommend(message);
+    const list = result.recommendations.length
+      ? result.recommendations
+          .map((tool, index) => `${index + 1}. **${tool.label}** (${tool.id}) — ${tool.rationale}`)
+          .join('\n')
+      : 'No specific calculator matched yet. Add symptoms, chief complaint, and clinical keywords.';
+
+    return {
+      text: `**Calculator Recommendation AI**\n\n${list}\n\n_Suggestions are limited to shipped CareDroid tools and are not diagnostic or treatment recommendations._`,
+      suggestions: result.recommendations.map((tool) => `Open ${tool.label}`),
+      visualizations: [
+        {
+          type: 'calculator-recommendations',
+          data: result,
+        },
+      ],
+      intentClassification:
+        classification ||
+        ({
+          primaryIntent: PrimaryIntent.CLINICAL_TOOL,
+          toolId: 'calculator-recommender-ai',
+          confidence: 0.8,
+          method: 'ui-tool-hint',
+        } as any),
+      toolResult: {
+        toolId: 'calculator-recommender-ai',
+        toolName: 'Calculator Recommendation AI',
+        parameters: { message },
+        result,
+        displayFormat: 'card',
+      },
+    };
   }
 
   async suggestNextAction(patientId: string, context: any): Promise<any> {

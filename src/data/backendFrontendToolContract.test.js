@@ -61,6 +61,12 @@ describe('backendFrontendToolContract', () => {
     for (const record of getUserFacingToolInventory().filter(
       (tool) => tool.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED
     )) {
+      if (record.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM) {
+        expect(record.endpoint, record.id).toMatch(/^\/api\/clinical-intelligence\//);
+        expect(record.auditRefs.apiClient, record.id).toBe('src/services/clinicalIntelligenceApi.js');
+        continue;
+      }
+
       expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS, record.id).toContain(record.orchestratorToolId);
       expect(record.endpoint, record.id).toBe(`/api/tools/${record.orchestratorToolId}/execute`);
       expect(record.executorStatus, record.id).toBe(TOOL_EXECUTOR_STATUS.REGISTERED);

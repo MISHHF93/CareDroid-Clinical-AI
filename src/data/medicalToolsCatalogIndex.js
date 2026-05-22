@@ -92,7 +92,10 @@ function buildFromRegistry(reg) {
     sidebarToolId: reg.id,
     chatOnRequest: Boolean(matchedNlu) || keywordRouted,
     chatSeed: inventoryRecord?.chatSeed || matchedNlu?.chatSeed || launch.chatSeed || '',
-    backendExecutor: inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED,
+    backendExecutor: Boolean(
+      inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED ||
+        (inventoryRecord?.endpoint && inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED)
+    ),
     uiCalculatorSlug: inventoryRecord?.calculatorSlug || uiCalc?.id || reg.initialCalc || null,
     chatOnlyForm: false,
     accessSummary: null,

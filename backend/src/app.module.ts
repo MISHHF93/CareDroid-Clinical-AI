@@ -32,6 +32,7 @@ import { ClinicalModule } from './modules/clinical/clinical.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { ComplianceModule } from './modules/compliance/compliance.module';
 import { ChatModule } from './modules/chat/chat.module';
+import { ClinicalIntelligenceModule } from './modules/clinical-intelligence/clinical-intelligence.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { MedicalControlPlaneModule } from './modules/medical-control-plane/medical-control-plane.module';
 import { EncryptionModule } from './modules/encryption/encryption.module';
@@ -115,6 +116,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     AuditModule,
     ComplianceModule,
     ChatModule,
+    ClinicalIntelligenceModule,
     AnalyticsModule,
     NotificationModule,
 

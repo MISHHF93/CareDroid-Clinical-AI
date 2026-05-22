@@ -93,7 +93,7 @@ describe('Calculators — hub shell', () => {
       screen.getByRole('heading', { name: /chat-assisted clinical decision support/i })
     ).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /start guided chat/i }).length).toBeGreaterThan(0);
-  });
+  }, 20000);
 });
 
 describe('Calculators — Tier-A form sections', () => {

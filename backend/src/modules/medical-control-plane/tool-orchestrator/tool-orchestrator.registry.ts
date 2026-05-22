@@ -41,6 +41,7 @@ export enum ToolExecutionErrorCode {
  */
 export const NLU_TOOL_IDS_WITHOUT_EXECUTOR = [
   'dispatch-ai',
+  'calculator-recommender-ai',
   'qsofa',
   'news2',
   'child-pugh',
@@ -79,6 +80,9 @@ export const NLU_TOOL_IDS_WITHOUT_EXECUTOR = [
   'pecarn-head',
   'nexus-cspine',
   'abcd2',
+  'shock-index',
+  'anion-gap',
+  'rass',
   'copd-gold',
   'rome-iv-ibs',
   'dose-calculator',
@@ -90,6 +94,7 @@ export const NLU_TOOL_IDS_WITHOUT_EXECUTOR = [
   'predictive-maintenance',
   'fleet-command',
   'differential-diagnosis',
+  'differential-ai',
   'antibiotic-guide',
   'procedures',
 ] as const;

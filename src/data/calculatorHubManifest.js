@@ -47,6 +47,9 @@ export const CALCULATOR_INTERFACE_CLASS_BY_SLUG = Object.freeze({
   fib4: 'calculator-interface--fib4',
   'framingham-risk': 'calculator-interface--framingham-risk',
   abcd2: 'calculator-interface--abcd2',
+  'shock-index': 'calculator-interface--shock-index',
+  'anion-gap': 'calculator-interface--anion-gap',
+  rass: 'calculator-interface--rass',
 });
 
 /** Registry tool ids shown in the calculators hub chat-assisted section. */

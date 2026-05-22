@@ -19,7 +19,7 @@ import { buildMatrixRowForRegistry, buildE2eToolInventory } from './e2eToolValid
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
 import { matchCalculatorRoute, isKnownToolAreaPath } from '../routes/clinicalToolRoutes';
 import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
-import { resolveToolInventoryRecord, TOOL_LAUNCH_TYPES } from './toolInventory';
+import { resolveToolInventoryRecord, TOOL_EXECUTOR_STATUS, TOOL_LAUNCH_TYPES } from './toolInventory';
 
 export const EXECUTION_MODES = Object.freeze({
   LOCAL_CALCULATOR: 'local-calculator',
@@ -143,6 +143,7 @@ export function buildRenderExecuteRow(registryId) {
   const mode = executionModeForRegistry(registryId);
   const matrixRow = buildMatrixRowForRegistry(registryId);
   const checks = buildChecklistFlags(mode, registryId);
+  const inventoryRecord = resolveToolInventoryRecord(registryId);
 
   return {
     id: registryId,
@@ -154,6 +155,9 @@ export function buildRenderExecuteRow(registryId) {
     checks,
     launch: matrixRow.launch,
     backendPostExecutor: matrixRow.backendPostExecutor,
+    backendPlatformEndpoint: matrixRow.backendPlatformEndpoint,
+    endpoint: inventoryRecord?.endpoint || null,
+    executorStatus: inventoryRecord?.executorStatus || null,
     orchestratorToolId: matrixRow.orchestratorToolId,
   };
 }
@@ -170,8 +174,13 @@ export function validateRenderExecuteRow(row) {
 
   if (!row.checks.routeRenders) issues.push('no-smoke-route');
   if (row.executionMode === EXECUTION_MODES.POST_EXECUTOR) {
-    if (!row.backendPostExecutor) issues.push('tier-c-missing-executor');
-    if (!row.orchestratorToolId || !isOrchestratorPostExecutable(row.orchestratorToolId)) {
+    const hasPlatformEndpoint =
+      row.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM && Boolean(row.endpoint);
+    if (!row.backendPostExecutor && !hasPlatformEndpoint) issues.push('tier-c-missing-executor');
+    if (
+      !hasPlatformEndpoint &&
+      (!row.orchestratorToolId || !isOrchestratorPostExecutable(row.orchestratorToolId))
+    ) {
       issues.push('tier-c-invalid-orchestrator-id');
     }
   }

@@ -79,6 +79,9 @@ export const REGISTRY = Object.freeze({
   pecarnHead: 'pecarn-head',
   nexusCspine: 'nexus-cspine',
   abcd2: 'abcd2',
+  shockIndex: 'shock-index',
+  anionGap: 'anion-gap',
+  rass: 'rass',
   calculatorsHub: 'calculators',
   apache2Calculator: 'apache2-calculator',
   curb65Calculator: 'curb65-calculator',
@@ -92,6 +95,15 @@ export const REGISTRY = Object.freeze({
   aclsProtocol: 'acls-protocol',
   atlsProtocol: 'atls-protocol',
   antibioticGuide: 'antibiotic-guide',
+  ambientScribe: 'ambient-scribe',
+  calculatorRecommenderAi: 'calculator-recommender-ai',
+  guidelineRag: 'guideline-rag',
+  differentialAi: 'differential-ai',
+  timelineAi: 'timeline-ai',
+  patientSummaryAi: 'patient-summary-ai',
+  orderSetAi: 'order-set-ai',
+  aiExplainability: 'ai-explainability',
+  clinicalAudit: 'clinical-audit',
   dispatchAi: 'dispatch-ai',
   routeOptimizer: 'route-optimizer',
   predictiveMaintenance: 'predictive-maintenance',
@@ -138,6 +150,9 @@ export const NLU = Object.freeze({
   pecarnHead: 'pecarn-head',
   nexusCspine: 'nexus-cspine',
   abcd2: 'abcd2',
+  shockIndex: 'shock-index',
+  anionGap: 'anion-gap',
+  rass: 'rass',
   copdGold: 'copd-gold',
   romeIvIbs: 'rome-iv-ibs',
   dispatchAi: 'dispatch-ai',
@@ -152,8 +167,10 @@ export const NLU = Object.freeze({
   predictiveMaintenance: 'predictive-maintenance',
   fleetCommand: 'fleet-command',
   differentialDiagnosis: 'differential-diagnosis',
+  differentialAi: 'differential-ai',
   antibioticGuide: 'antibiotic-guide',
   procedures: 'procedures',
+  calculatorRecommenderAi: 'calculator-recommender-ai',
 });
 
 /** Built-in calculator UI slugs (`Calculators.jsx`, `?calc=`). */
@@ -183,6 +200,9 @@ export const BUILTIN_CALC = Object.freeze({
   fib4: 'fib4',
   framinghamRisk: 'framingham-risk',
   abcd2: 'abcd2',
+  shockIndex: 'shock-index',
+  anionGap: 'anion-gap',
+  rass: 'rass',
   gfr: 'gfr',
   egfr: 'egfr',
   bmi: 'bmi',
@@ -246,6 +266,14 @@ export const PR10_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([REGISTRY.abcd2
 
 export const PR10_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR10_TIER_A_CALCULATOR_REGISTRY_IDS]);
 
+export const PR11_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
+  REGISTRY.shockIndex,
+  REGISTRY.anionGap,
+  REGISTRY.rass,
+]);
+
+export const PR11_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR11_TIER_A_CALCULATOR_REGISTRY_IDS]);
+
 /** All Tier-A calculator registry ids (dedicated routes + forms when shipped). */
 export const CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...LEGACY_TIER_A_CALCULATOR_REGISTRY_IDS,
@@ -255,6 +283,7 @@ export const CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...PR5_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR8_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR10_TIER_A_CALCULATOR_REGISTRY_IDS,
+  ...PR11_TIER_A_CALCULATOR_REGISTRY_IDS,
 ]);
 
 // —— Chat-assisted clinical tools (Tier B hub) ——
@@ -343,6 +372,18 @@ export const CLINICAL_AI_PAGE_REGISTRY_IDS = Object.freeze([
   REGISTRY.diagnosis,
   REGISTRY.antibioticGuide,
   REGISTRY.procedures,
+  REGISTRY.calculatorRecommenderAi,
+]);
+
+export const CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS = Object.freeze([
+  REGISTRY.ambientScribe,
+  REGISTRY.guidelineRag,
+  REGISTRY.differentialAi,
+  REGISTRY.timelineAi,
+  REGISTRY.patientSummaryAi,
+  REGISTRY.orderSetAi,
+  REGISTRY.aiExplainability,
+  REGISTRY.clinicalAudit,
 ]);
 
 /** Chat-assisted calculator hub entries with dedicated sidebar rows. */
@@ -410,6 +451,9 @@ export const NLU_PROFILE_TOOL_IDS = Object.freeze([
   NLU.pecarnHead,
   NLU.nexusCspine,
   NLU.abcd2,
+  NLU.shockIndex,
+  NLU.anionGap,
+  NLU.rass,
   NLU.copdGold,
   NLU.romeIvIbs,
   NLU.dispatchAi,
@@ -424,8 +468,10 @@ export const NLU_PROFILE_TOOL_IDS = Object.freeze([
   NLU.predictiveMaintenance,
   NLU.fleetCommand,
   NLU.differentialDiagnosis,
+  NLU.differentialAi,
   NLU.antibioticGuide,
   NLU.procedures,
+  NLU.calculatorRecommenderAi,
 ]);
 
 export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
@@ -455,6 +501,9 @@ export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
   [BUILTIN_CALC.fib4]: REGISTRY.fib4,
   [BUILTIN_CALC.framinghamRisk]: REGISTRY.framinghamRisk,
   [BUILTIN_CALC.abcd2]: REGISTRY.abcd2,
+  [BUILTIN_CALC.shockIndex]: REGISTRY.shockIndex,
+  [BUILTIN_CALC.anionGap]: REGISTRY.anionGap,
+  [BUILTIN_CALC.rass]: REGISTRY.rass,
   [BUILTIN_CALC.gfr]: REGISTRY.calcGfr,
   [BUILTIN_CALC.egfr]: REGISTRY.calcGfr,
   [BUILTIN_CALC.bmi]: REGISTRY.calcBmi,
@@ -479,6 +528,9 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
   [NLU.pecarnHead]: REGISTRY.pecarnHead,
   [NLU.nexusCspine]: REGISTRY.nexusCspine,
   [NLU.abcd2]: REGISTRY.abcd2,
+  [NLU.shockIndex]: REGISTRY.shockIndex,
+  [NLU.anionGap]: REGISTRY.anionGap,
+  [NLU.rass]: REGISTRY.rass,
   [NLU.ascvdRisk]: REGISTRY.ascvdRisk,
   [NLU.ckdStaging]: REGISTRY.ckdStaging,
   [NLU.stopBang]: REGISTRY.stopBang,
@@ -508,7 +560,9 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
   [NLU.aclsProtocol]: REGISTRY.protocols,
   [NLU.atlsProtocol]: REGISTRY.protocols,
   [NLU.differentialDiagnosis]: REGISTRY.diagnosis,
+  [NLU.differentialAi]: REGISTRY.differentialAi,
   [NLU.antibioticGuide]: REGISTRY.diagnosis,
+  [NLU.calculatorRecommenderAi]: REGISTRY.calculatorRecommenderAi,
 });
 
 /**
@@ -544,6 +598,7 @@ export const AI_EXECUTABLE_NLU_TOOL_IDS = Object.freeze([
  */
 export const CANONICAL_TOOL_GROUPS = Object.freeze({
   aiOperationsPages: CLINICAL_AI_PAGE_REGISTRY_IDS,
+  clinicalTierCWorkflows: CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS,
   clinicalCalculatorsTierA: CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
   clinicalChatAssistedTierB: Object.freeze([
     ...CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
@@ -560,6 +615,7 @@ export const CANONICAL_TOOL_GROUPS = Object.freeze({
 /** Every `toolRegistry.js` id — must match registry file exactly (drift tests). */
 export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
   ...CANONICAL_TOOL_GROUPS.aiOperationsPages,
+  ...CANONICAL_TOOL_GROUPS.clinicalTierCWorkflows,
   ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsTierA,
   ...CANONICAL_TOOL_GROUPS.clinicalChatAssistedTierB,
   ...CANONICAL_TOOL_GROUPS.clinicalNluHubChat,
@@ -589,7 +645,38 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'atls-protocol': REGISTRY.atlsProtocol,
   procedures: REGISTRY.procedures,
   'differential-diagnosis': REGISTRY.diagnosis,
+  'differential-ai': REGISTRY.differentialAi,
+  'ranked differential': REGISTRY.differentialAi,
+  'ranked differentials': REGISTRY.differentialAi,
+  'differential diagnosis assistant': REGISTRY.differentialAi,
+  'timeline-ai': REGISTRY.timelineAi,
+  'patient timeline': REGISTRY.timelineAi,
+  'timeline assistant': REGISTRY.timelineAi,
+  'clinical timeline': REGISTRY.timelineAi,
+  'patient-summary-ai': REGISTRY.patientSummaryAi,
+  'patient summary': REGISTRY.patientSummaryAi,
+  'summary assistant': REGISTRY.patientSummaryAi,
+  'clinical summary': REGISTRY.patientSummaryAi,
+  'order-set-ai': REGISTRY.orderSetAi,
+  'order set ai': REGISTRY.orderSetAi,
+  'order set assistant': REGISTRY.orderSetAi,
+  'order bundles': REGISTRY.orderSetAi,
+  'protocol pathways': REGISTRY.orderSetAi,
+  'ai-explainability': REGISTRY.aiExplainability,
+  'ai explainability': REGISTRY.aiExplainability,
+  explainability: REGISTRY.aiExplainability,
+  'reasoning trace': REGISTRY.aiExplainability,
+  'clinical-audit': REGISTRY.clinicalAudit,
+  'clinical audit': REGISTRY.clinicalAudit,
+  'execution logs': REGISTRY.clinicalAudit,
+  'tool chain audit': REGISTRY.clinicalAudit,
   'antibiotic-guide': REGISTRY.antibioticGuide,
+  'calculator-recommender-ai': REGISTRY.calculatorRecommenderAi,
+  'calculator recommender': REGISTRY.calculatorRecommenderAi,
+  'calculator-recommender': REGISTRY.calculatorRecommenderAi,
+  'calculator recommendation': REGISTRY.calculatorRecommenderAi,
+  'calculator recommendations': REGISTRY.calculatorRecommenderAi,
+  'recommend calculators': REGISTRY.calculatorRecommenderAi,
   calculator: REGISTRY.calculatorsHub,
   'diagnosis-assistant': REGISTRY.diagnosis,
   'procedure-guide': REGISTRY.procedures,
@@ -756,6 +843,18 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'tia-risk': REGISTRY.abcd2,
   'tia stroke risk': REGISTRY.abcd2,
   'tia-stroke-risk': REGISTRY.abcd2,
+  'shock-index': REGISTRY.shockIndex,
+  'shock index': REGISTRY.shockIndex,
+  'shock index calculator': REGISTRY.shockIndex,
+  'hemodynamic index': REGISTRY.shockIndex,
+  'anion-gap': REGISTRY.anionGap,
+  'anion gap': REGISTRY.anionGap,
+  'anion gap calculator': REGISTRY.anionGap,
+  'albumin corrected anion gap': REGISTRY.anionGap,
+  'rass': REGISTRY.rass,
+  'rass score': REGISTRY.rass,
+  'richmond agitation sedation scale': REGISTRY.rass,
+  'sedation agitation score': REGISTRY.rass,
   ascvd: REGISTRY.ascvdRisk,
   'ascvd-score': REGISTRY.ascvdRisk,
   'cardiovascular risk': REGISTRY.ascvdRisk,

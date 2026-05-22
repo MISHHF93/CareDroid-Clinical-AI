@@ -56,6 +56,15 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/chat/suggest-action', controller: 'ChatController' },
   { method: 'POST', path: '/api/chat/analyze-vitals', controller: 'ChatController' },
 
+  { method: 'POST', path: '/api/clinical-intelligence/ambient-scribe/generate', controller: 'ClinicalIntelligenceController' },
+  { method: 'POST', path: '/api/clinical-intelligence/guideline-rag/query', controller: 'ClinicalIntelligenceController' },
+  { method: 'POST', path: '/api/clinical-intelligence/differential-ai/generate', controller: 'ClinicalIntelligenceController' },
+  { method: 'POST', path: '/api/clinical-intelligence/timeline-ai/generate', controller: 'ClinicalIntelligenceController' },
+  { method: 'POST', path: '/api/clinical-intelligence/patient-summary-ai/generate', controller: 'ClinicalIntelligenceController' },
+  { method: 'POST', path: '/api/clinical-intelligence/order-set-ai/generate', controller: 'ClinicalIntelligenceController' },
+  { method: 'GET', path: '/api/clinical-intelligence/ai-explainability/trace', controller: 'ClinicalIntelligenceController' },
+  { method: 'GET', path: '/api/clinical-intelligence/clinical-audit/execution-logs', controller: 'ClinicalIntelligenceController' },
+
   { method: 'GET', path: '/api/tools', controller: 'ToolOrchestratorController' },
   { method: 'GET', path: '/api/tools/available', controller: 'ToolOrchestratorController' },
   { method: 'GET', path: '/api/tools/statistics', controller: 'ToolOrchestratorController' },

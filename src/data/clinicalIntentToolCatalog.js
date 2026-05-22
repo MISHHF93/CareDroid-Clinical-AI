@@ -361,6 +361,36 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     backendExecutable: false,
   },
   {
+    toolId: 'shock-index',
+    toolName: 'Shock Index',
+    category: 'calculator',
+    description: 'Hemodynamic screening index from heart rate divided by systolic blood pressure.',
+    path: '/tools/calculators/shock-index',
+    sidebarToolId: 'shock-index',
+    chatSeed: 'Help me calculate shock index from heart rate and systolic blood pressure.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'anion-gap',
+    toolName: 'Anion Gap',
+    category: 'calculator',
+    description: 'Serum anion gap with optional albumin correction for acid-base review.',
+    path: '/tools/calculators/anion-gap',
+    sidebarToolId: 'anion-gap',
+    chatSeed: 'Help me calculate an anion gap from sodium, chloride, bicarbonate, and optional albumin.',
+    backendExecutable: false,
+  },
+  {
+    toolId: 'rass',
+    toolName: 'RASS',
+    category: 'calculator',
+    description: 'Richmond Agitation-Sedation Scale for bedside sedation/agitation documentation.',
+    path: '/tools/calculators/rass',
+    sidebarToolId: 'rass',
+    chatSeed: 'Help me document a Richmond Agitation-Sedation Scale score.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
     category: 'calculator',
@@ -524,6 +554,18 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     backendExecutable: true,
   },
   {
+    toolId: NLU.calculatorRecommenderAi,
+    toolName: 'Calculator Recommendation AI',
+    category: 'calculator',
+    description:
+      'Suggests shipped CareDroid calculators and risk scores from symptoms, chief complaint, and clinical keywords. Tool-selection support only.',
+    path: '/tools/calculator-recommender',
+    sidebarToolId: REGISTRY.calculatorRecommenderAi,
+    chatSeed:
+      'Recommend CareDroid calculators or risk scores for this clinical scenario based on symptoms, chief complaint, and keywords. Suggest only tools that exist in CareDroid. Do not diagnose, rule out disease, recommend treatment, or recommend disposition.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'drug-interactions',
     toolName: 'Drug Interaction Checker',
     category: 'checker',
@@ -652,6 +694,18 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     sidebarToolId: 'diagnosis',
     chatSeed:
       'Generate a ranked differential diagnosis list for discussion as clinical decision support — not a confirmed diagnosis. Require clinician review before testing or treatment decisions:',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.differentialAi,
+    toolName: 'Differential Diagnosis Assistant',
+    category: 'reference',
+    description:
+      'Structured differential diagnosis decision support from symptoms, labs, history, and demographics. Not a diagnosis.',
+    path: '/tools/differential-ai',
+    sidebarToolId: REGISTRY.differentialAi,
+    chatSeed:
+      'Generate a ranked differential diagnosis decision-support list from symptoms, labs, history, and demographics. Include supporting evidence, missing evidence, suggested calculators, and clearly state this is not a diagnosis.',
     backendExecutable: false,
   },
   {
@@ -959,6 +1013,33 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/abcd2',
     calcQuery: '/tools/calculators?calc=abcd2',
     implementation: 'Client-side in abcd2Calculator.jsx (abcd2Calculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'shock-index',
+    name: 'Shock Index',
+    description: 'Hemodynamic screening index from heart rate / systolic blood pressure.',
+    path: '/tools/calculators/shock-index',
+    calcQuery: '/tools/calculators?calc=shock-index',
+    implementation: 'Client-side in nextWaveCalculators.jsx (nextWaveCalculatorUtils.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'anion-gap',
+    name: 'Anion Gap',
+    description: 'Serum anion gap with optional albumin correction.',
+    path: '/tools/calculators/anion-gap',
+    calcQuery: '/tools/calculators?calc=anion-gap',
+    implementation: 'Client-side in nextWaveCalculators.jsx (nextWaveCalculatorUtils.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'rass',
+    name: 'RASS',
+    description: 'Richmond Agitation-Sedation Scale from +4 combative to -5 unarousable.',
+    path: '/tools/calculators/rass',
+    calcQuery: '/tools/calculators?calc=rass',
+    implementation: 'Client-side in nextWaveCalculators.jsx (nextWaveCalculatorUtils.js)',
     orchestratorId: null,
   },
   {

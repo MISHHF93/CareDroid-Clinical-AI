@@ -266,6 +266,8 @@ export function buildMatrixRowForRegistry(registryId) {
   const postExecutor =
     inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED ||
     (orchestratorNluId ? isOrchestratorPostExecutable(orchestratorNluId) : false);
+  const platformEndpoint =
+    inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM && Boolean(inventoryRecord?.endpoint);
 
   return {
     id: registryId,
@@ -279,6 +281,7 @@ export function buildMatrixRowForRegistry(registryId) {
     nluPresence: nluToolIds.length > 0,
     nluToolIds,
     backendPostExecutor: postExecutor,
+    backendPlatformEndpoint: platformEndpoint,
     backendNluExecutable: nluToolIds.some((id) =>
       clinicalIntentTools.find((t) => t.toolId === id)?.backendExecutable
     ),
@@ -406,7 +409,7 @@ export function validateMatrixRow(row) {
     issues.push('missing-catalog');
   }
 
-  if (row.tier === 'C' && !row.backendPostExecutor) {
+  if (row.tier === 'C' && !row.backendPostExecutor && !row.backendPlatformEndpoint) {
     issues.push('tier-c-without-executor');
   }
 
