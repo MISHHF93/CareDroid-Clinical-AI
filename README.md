@@ -1,333 +1,338 @@
 # CareDroid Clinical AI
 
-Medical AI clinical co-pilot: React + Vite SPA, NestJS API, optional Capacitor Android shell. **This README is the only Markdown file in the repository root**; extended matrices and checklists live under `docs/`.
+CareDroid Clinical AI is a clinical co-pilot application for healthcare workflows. It combines a React/Vite frontend, a NestJS backend, clinical tool routing, AI-assisted clinical workflows, audit logging, compliance surfaces, RAG retrieval, and Android packaging through Capacitor.
 
----
+This README was regenerated from source and configuration files only.
 
-## Contents
+## Application Overview
 
-1. [Repository layout](#repository-layout)
-2. [Ports and HTTP proxy](#ports-and-http-proxy)
-3. [Environment variables](#environment-variables)
-4. [Scripts: root `package.json`](#scripts-root-packagejson)
-5. [Scripts: `backend/package.json`](#scripts-backendpackagejson)
-6. [Scripts: `mcp/package.json`](#scripts-mcppackagejson)
-7. [Repo `scripts/`](#repo-scripts)
-8. [Frontend (Vite + React)](#frontend-vite--react)
-9. [Backend (NestJS)](#backend-nestjs)
-10. [Platform inventory](#platform-inventory)
-11. [Clinical tools and catalog](#clinical-tools-and-catalog)
-12. [Android (Capacitor)](#android-capacitor)
-13. [MCP bridge](#mcp-bridge)
-14. [Testing and quality](#testing-and-quality)
-15. [Operational notes](#operational-notes)
+The app is organized around authenticated clinical workspaces:
 
----
+- A dashboard and chat workspace for clinical conversations and guided actions.
+- A tool catalog with direct routes for clinical calculators, drug checks, lab interpretation, protocols, diagnosis support, procedure guidance, and clinical intelligence workflows.
+- A Clinical Intelligence API surface for backend-backed AI workflows that require audit, safety warnings, and clinician review.
+- Compliance, audit, analytics, notification, profile, team, and subscription areas.
+- Fleet workflow pages for dispatch intelligence, route optimization, predictive maintenance, and command views.
+- Responsive web and Android-oriented rendering through Vite, mobile CSS, service worker registration, and Capacitor.
 
-## Repository layout
+## Tech Stack
 
-| Path | Role |
-|------|------|
-| `src/` | React 18 SPA: routing, pages, contexts, services |
-| `backend/` | NestJS API (`/api` prefix), TypeORM, clinical + chat modules |
-| `android/` | Capacitor Android project (Gradle) |
-| `mcp/` | Model Context Protocol stdio server bridging tools API |
-| `scripts/` | Node maintenance utilities (`clean`, smoke checklist, PWA icons) |
-| `public/` | Static assets, PWA icons (see `scripts/generate-icons.js`) |
+Frontend:
 
----
+- React 18
+- React Router
+- Vite
+- Vitest and Testing Library
+- Playwright for device and production smoke tests
+- Capacitor for Android builds
+- Dexie, Firebase, Recharts, Lucide React, Axios
 
-## Ports and HTTP proxy
+Backend:
 
-| Service | Default port | Source |
-|---------|----------------|--------|
-| Vite dev server | **8000** | `package.json` → `vite --port 8000` |
-| Vite preview | **4173** | `vite.config.js` → `preview.port` |
-| Nest API | **3000** | `backend/src/main.ts` — `process.env.PORT` or default `3000` |
+- NestJS 10
+- TypeORM
+- PostgreSQL or SQLite
+- JWT, Passport, OAuth, two-factor auth, biometric endpoints
+- OpenAI integration
+- RAG services with embeddings and Pinecone
+- Stripe, Redis, Firebase Admin, email, Sentry, Datadog, Prometheus metrics
+- Jest and Supertest
 
-**Local dev:** [vite.config.js](vite.config.js) proxies `/api` and `/socket.io` to `http://localhost:3000`. Use **empty** `VITE_API_URL` in dev so the browser calls same-origin `/api` and Vite forwards to Nest.
+## Source Layout
 
-**Split deploy:** set `VITE_API_URL` to the API origin; configure Nest CORS via `FRONTEND_URL` (comma-separated origins allowed in [backend/src/main.ts](backend/src/main.ts)).
+Key frontend areas:
 
----
+- `src/main.jsx` bootstraps React, global styles, service worker registration, and mobile viewport metrics.
+- `src/App.jsx` defines app providers, auth gating, lazy-loaded pages, and route wiring.
+- `src/pages/tools/` contains clinical tool pages and AI workflow pages.
+- `src/data/` contains tool registry, inventory, route, exposure, contract, safety, and validation matrices.
+- `src/services/` contains API clients and clinical workflow service calls.
+- `src/routes/` contains route metadata for calculator and clinical tool pages.
+- `src/styles/` contains design tokens, responsive layout, and mobile performance styles.
 
-## Environment variables
+Key backend areas:
 
-Copy examples and tune for your environment:
+- `backend/src/main.ts` configures Nest bootstrap, security headers, CORS, validation, API prefixing, Swagger, and production static frontend serving.
+- `backend/src/app.module.ts` wires auth, users, subscriptions, two-factor, AI, clinical data, audit, compliance, chat, clinical intelligence, analytics, notifications, medical control plane, encryption, RAG, metrics, email, and cache modules.
+- `backend/src/modules/clinical-intelligence/` contains backend workflows for advanced clinical AI tools.
+- `backend/src/modules/medical-control-plane/` contains intent classification, emergency escalation, and tool orchestration.
+- `backend/src/modules/rag/` handles document ingestion, embedding, vector retrieval, source extraction, and retrieval confidence.
+- `backend/src/modules/audit/` writes hash-chained audit logs and exposes integrity checks.
 
-- **Frontend / shared:** [.env.example](.env.example) — `VITE_*` feature flags, `VITE_API_URL`, optional Sentry, Firebase, demo auth flags.
-- **Proxy / API client audit:** [docs/proxy-config-audit.md](docs/proxy-config-audit.md) — dev vs split deploy, Vite proxy paths, centralized `apiClient`, `backendApiCapabilities.js` gating, layout scroll visibility (`layout-visibility.css`).
-- **Backend exposure:** [docs/backend-exposure-report.md](docs/backend-exposure-report.md) — routes vs frontend clients; [docs/orphaned-backend-functions.md](docs/orphaned-backend-functions.md) — exposure policy per backend-only route.
-- **Orchestrator executors:** [docs/unsupported-orchestrator-tools.md](docs/unsupported-orchestrator-tools.md) — three POST executors vs NLU-only tools (`npm run orchestrator:write-docs` to regenerate).
-- **Executor readiness (candidates):** [docs/executor-readiness-report.md](docs/executor-readiness-report.md) — MELD, GRACE, ASCVD, CKD, fleet route/maintenance; planning only, no new executors on mapping branches.
-- **Render / execute matrix:** [docs/tool-render-execute-matrix.md](docs/tool-render-execute-matrix.md) — per-tool route, Tier A/B/C mode, smoke paths (`npm run tool-matrix:write-docs` to regenerate; `npm run test:tool-render-smoke` for automated checks).
-- **Backend:** [backend/.env.example](backend/.env.example) — `PORT`, `FRONTEND_URL`, `DATABASE_*` / `SQLITE_PATH`, Redis, JWT, OAuth, OpenAI, Stripe, etc.
+## Frontend Routing
 
-Root `.env.example` documents `PORT=8000` for documentation symmetry; the **API** listens on **`PORT` in `backend/.env`** (default **3000**). Align `FRONTEND_URL` with where users load the SPA (e.g. `http://localhost:8000` when using Vite on 8000).
+The React app lazy-loads pages and routes authenticated users through an `AppShell`. Important route groups include:
 
----
+- `/dashboard` and `/chat`
+- `/tools`, `/tools/catalog`, and individual tool pages
+- `/tools/calculators` and calculator-specific routes
+- `/tools/ambient-scribe`
+- `/tools/calculator-recommender`
+- `/tools/guideline-rag`
+- `/tools/differential-ai`
+- `/tools/timeline-ai`
+- `/tools/patient-summary-ai`
+- `/tools/order-set-ai`
+- `/tools/ai-explainability`
+- `/tools/clinical-audit`
+- `/fleet/command`, `/fleet/predictive-maintenance`, and `/fleet/route-optimizer`
+- `/clinical/alerts`
+- `/profile`, `/profile-settings`, `/settings`, `/notifications`, `/team`, `/audit-logs`, `/analytics`, and `/costs`
+- Public legal/help routes and shared tool sessions
 
-## Scripts: root `package.json`
+The Vite dev server runs on port `8000` and proxies `/api`, `/health`, and `/socket.io` to the backend target from `VITE_API_PROXY_TARGET`, defaulting to `http://localhost:3000`.
 
-| Script | Command / purpose |
-|--------|-------------------|
-| `dev` | Vite dev server on port 8000 |
-| `dev:lan` | Vite with `--host` for LAN devices |
-| `build` / `build:frontend` | Production SPA to `dist/` |
-| `clean` | `node scripts/clean.mjs` — removes `dist/` and `node_modules/.vite` |
-| `rebuild` | `clean` then `build` |
-| `preview` / `preview:lan` | Vite preview (port 4173) with same `/api` proxy |
-| `test` | Vitest (watch) |
-| `test:run` | Vitest single run |
-| `test:run:frontend` | Vitest on `src/` only |
-| `test:coverage` | Coverage run |
-| `lint` | ESLint on `src` |
-| `format` | Prettier on `src` JS/JSX/JSON/CSS |
-| `start:all` | Concurrently: `backend:dev` + `dev` |
-| `backend:dev` | `cd backend && npm run start:dev` |
-| `backend:build` / `backend:start` | Nest build / prod start |
-| `start:single` | Build SPA + API; Nest serves `dist/` + `/api` on port 3000 |
-| `validate:ci` | Lint, format, typecheck, frontend matrix tests, backend tests, production builds |
-| `validate:responsive` | Playwright overflow QA at phone viewports |
-| `lint:all` | ESLint on `src` and `backend/src` |
-| `format:check` | Prettier check (no write) |
-| `build:analyze` | Production build + bundle budget report |
-| `android-debug` | Build SPA → `cap sync android` → `gradlew.bat assembleDebug` (Windows path) |
-| `android-release` | Same with `assembleRelease` |
-| `mcp:server` | `cd mcp && npm run start` |
-| `smoke` | `node scripts/print-smoke-checklist.mjs` |
-| `inventory:report` | `node scripts/print-platform-inventory.mjs` — registry, NLU, calculator, and feature counts |
+## Backend API Surfaces
 
----
+The backend uses the global `/api` prefix, excluding root and health routes. Swagger is configured from `backend/src/main.ts`.
 
-## Scripts: `backend/package.json`
+Major controller surfaces include:
 
-| Script | Purpose |
-|--------|---------|
-| `start:dev` | Nest watch mode |
-| `start:prod` | `node dist/main` |
-| `build` | `nest build` |
-| `test` / `test:e2e` | Jest unit / e2e |
-| `migration:*` | TypeORM CLI via `src/data-source.ts` |
-| `seed` | Database seeds |
-| `ingest` | `scripts/ingest-documents.ts` |
+- `/api/auth`
+- `/api/auth/biometric`
+- `/api/users`
+- `/api/subscriptions`
+- `/api/chat`
+- `/api/tools`
+- `/api/clinical-intelligence`
+- `/api/audit`
+- `/api/compliance`
+- `/api/notifications`
+- `/api/metrics`
+- Clinical data controllers for drugs and protocols
 
----
+## Clinical Intelligence Workflows
 
-## Scripts: `mcp/package.json`
+The clinical intelligence module is mounted at `/api/clinical-intelligence` and is guarded by JWT auth plus authorization permissions. The source defines these workflows:
 
-| Script | Purpose |
-|--------|---------|
-| `start` | `node src/server.mjs` (stdio MCP server) |
-| `test` | `node --check src/server.mjs` |
+- `POST /api/clinical-intelligence/ambient-scribe/generate`
+  - Produces ambient clinical documentation drafts.
+  - Requires clinician review.
+  - Blocks auto-signing, EHR write-back, and autonomous chart modification.
 
----
+- `POST /api/clinical-intelligence/guideline-rag/query`
+  - Retrieves guideline evidence through RAG.
+  - Returns citation-bound recommendations and source attribution.
+  - Withholds unsupported summary claims when retrieved evidence is insufficient.
 
-## Repo `scripts/`
+- `POST /api/clinical-intelligence/differential-ai/generate`
+  - Produces ranked differential decision support from symptoms, labs, history, and demographics.
+  - Returns supporting evidence and suggested calculators that map to shipped tools.
+  - Explicitly marks output as decision support only, not a diagnosis.
 
-| File | Behavior |
-|------|----------|
-| [scripts/clean.mjs](scripts/clean.mjs) | Deletes `dist/` and `node_modules/.vite` for a clean build |
-| [scripts/print-smoke-checklist.mjs](scripts/print-smoke-checklist.mjs) | Prints manual smoke steps (auth, chat, intent classify, tool execute, LAN) |
-| [scripts/generate-icons.js](scripts/generate-icons.js) | Optional **sharp**-based PNG generation from `public/logo.svg` into PWA icon sizes under `public/`; if `sharp` is missing, prints manual steps |
+- `POST /api/clinical-intelligence/timeline-ai/generate`
+  - Builds encounter timelines, trend summaries, and abnormal progression flags.
+  - Requires source record review.
 
----
+- `POST /api/clinical-intelligence/patient-summary-ai/generate`
+  - Structures active problems, medications, recent labs, alerts, and risk factors from submitted chart text.
+  - Marks output as decision support requiring verification.
 
-## Frontend (Vite + React)
+- `POST /api/clinical-intelligence/order-set-ai/generate`
+  - Suggests evidence-linked order bundles and protocol pathways.
+  - Does not place, sign, route, or activate orders.
+  - Requires clinician review and local policy reconciliation.
 
-- **Entry:** [src/main.jsx](src/main.jsx) → [src/App.jsx](src/App.jsx)
-- **Router:** `react-router-dom` v6; public vs authenticated shells (`PublicShell`, `AuthShell`, `AppShell`).
-- **Providers (order matters):** `ThemeProvider` → `UserProvider` → `NotificationProvider` → `WorkspaceProvider` → `CostTrackingProvider` → `ToolPreferencesProvider` → `ConversationProvider` → `SystemConfigProvider` → `OfflineProvider` → `ErrorBoundary` ([src/App.jsx](src/App.jsx)).
-- **Lazy routes:** Heavy pages use `lazyWithRetry` from [src/utils/lazyWithRetry.js](src/utils/lazyWithRetry.js).
+- `GET /api/clinical-intelligence/ai-explainability/trace`
+  - Summarizes confidence, source, reasoning, tool chain, and sanitized execution logs.
+  - Uses audit metadata rather than exposing raw PHI prompts or transcripts.
 
-**Representative authenticated routes** (see [src/App.jsx](src/App.jsx) for the full list):
+- `GET /api/clinical-intelligence/clinical-audit/execution-logs`
+  - Displays clinical AI execution logs, PHI flags, tool chains, and integrity metadata.
 
-- `/dashboard` — main chat workspace  
-- `/tools`, `/tools/catalog`, `/tools/drug-checker`, `/tools/lab-interpreter`, calculator routes, `/tools/protocols`, `/tools/diagnosis`, `/tools/procedures`  
-- `/clinical/alerts`  
-- `/profile`, `/settings`, consent, 2FA/biometric, onboarding  
-- `/team`, `/audit-logs`, `/analytics`, `/costs` (permission-gated)
+## Medical Control Plane
 
-**Public routes:** `/`, `/auth`, `/auth-callback`, legal/help pages, `/shared/tools/:shareId`.
+The medical control plane provides:
 
----
+- Intent classification through `/api/chat/intent-classify`.
+- Tool orchestration through `/api/tools`.
+- Emergency escalation services.
+- Registered executor routes for backend clinical tools.
+- NLU and calculator recommendation support for chat-assisted workflows.
 
-## Backend (NestJS)
+The calculator recommender uses source-defined rules for presentations such as chest pain, dyspnea or PE concern, infection or sepsis, stroke or TIA, and abdominal organ severity. It returns only known calculator/tool routes and includes decision-support safety warnings.
 
-- **Bootstrap:** [backend/src/main.ts](backend/src/main.ts) — helmet, CORS, global prefix `api` (with `health` and root excluded), Swagger at `/api`, listens on `PORT` (default 3000).
-- **Root module:** [backend/src/app.module.ts](backend/src/app.module.ts) — `ConfigModule`, TypeORM (SQLite or Postgres from env), throttling, scheduled tasks, static SPA optional, imports below.
+## Safety And Audit Model
 
-**Feature modules** (under `backend/src/modules/`):
+The source code applies safety controls across AI workflows:
 
-`auth`, `users`, `subscriptions`, `two-factor`, `ai`, `clinical`, `audit`, `compliance`, `chat`, `analytics`, `medical-control-plane` (intent classifier, tool orchestrator, emergency escalation), `encryption`, `rag`, `notifications`, `email`, `cache`, `logger`, `metrics`.
+- Human review is required for generated notes, summaries, differentials, timelines, and order-set suggestions.
+- AI workflows do not autonomously diagnose, sign notes, modify charts, place orders, or activate protocols.
+- RAG guideline summaries are citation-bound and intentionally limited when source support is insufficient.
+- Audit logging records run IDs, capability IDs, contract versions, PHI access flags, status, and sanitized workflow metadata.
+- Audit logs are hash-chained for integrity verification.
+- Permission gates protect PHI, audit, analytics, team, and AI workflow routes.
 
-Intent patterns for clinical tools live under `backend/src/modules/medical-control-plane/intent-classifier/`.
+## Local Development
 
----
-
-## Platform inventory
-
-*Reverse-engineered from shipped source. Regenerate counts: `npm run inventory:report`. Programmatic source: [`src/data/platformInventory.js`](src/data/platformInventory.js).*
-
-### Summary
-
-| Layer | Count | Primary source |
-|-------|------:|----------------|
-| Sidebar registry tools | **35** | [`src/data/toolRegistry.js`](src/data/toolRegistry.js) |
-| NLU / AI clinical profiles | **40** | [`src/data/clinicalIntentToolCatalog.js`](src/data/clinicalIntentToolCatalog.js) |
-| Dedicated calculator UI forms | **17** | `builtinUiCalculators` in catalog |
-| Calculator SPA routes | **17** | [`src/routes/clinicalToolRoutes.js`](src/routes/clinicalToolRoutes.js) |
-| Unified catalog rows (search) | **43** | `/tools/catalog` index |
-| Known tool-area paths | **28** | `KNOWN_TOOL_AREA_PATHS` |
-| Backend POST executors | **3** | SOFA, drug interactions, lab interpreter |
-| E2E validation matrix rows | **35** | [`src/data/e2eToolValidationMatrix.js`](src/data/e2eToolValidationMatrix.js) |
-
-### Medical tools by delivery tier
-
-| Tier | Count | Shipped tools |
-|------|------:|---------------|
-| **A** | 16 | ASCVD 10-year risk, AUDIT-C, BMI, CHA₂DS₂-VASc, Child-Pugh, CKD staging (KDIGO), eGFR (CKD-EPI), GAD-7, HAS-BLED, MELD, MELD-Na, NEWS2, PHQ-9, qSOFA (quick SOFA), STOP-Bang, TIMI (UA/NSTEMI) |
-| **B** | 8 | Canadian C-Spine Rule, COPD GOLD, GRACE ACS Risk, NIH Stroke Scale (NIHSS), Ottawa Ankle Rule, PERC, Rome IV IBS, Wells PE |
-| **C** | 3 | Drug Checker, Lab Interpreter, SOFA Score |
-| **clinical-page** | 3 | Clinical Protocols, Diagnosis Assistant, Procedure Guide |
-| **fleet-A** | 3 | Fleet Command, Predictive Maintenance, Route Optimization |
-| **fleet-B** | 1 | Dispatch Intelligence |
-| **hub** | 1 | All calculators |
-
-**Tier semantics**
-
-- **A** — Dedicated calculator form in `Calculators.jsx` (client-side scoring).
-- **B** — Chat-assisted from calculators hub (structured chat seed, no standalone form).
-- **C** — Full page + registered POST `/api/tools/:id/execute`.
-- **clinical-page** — Protocols, diagnosis assistant, procedure guide (chat via `POST /api/chat/message`).
-- **fleet-A** — Fleet operations pages under `/fleet/*`.
-- **fleet-B** — Dispatch intelligence (chat-assisted via hub).
-- **hub** — Calculators overview (`/tools/calculators`).
-
-### Built-in calculator forms (17)
-
-| Calculator | Slug | Route |
-|------------|------|-------|
-| SOFA Score | `sofa` | `/tools/calculator/sofa` |
-| qSOFA (quick SOFA) | `qsofa` | `/tools/calculators/qsofa` |
-| NEWS2 | `news2` | `/tools/calculators/news2` |
-| Child-Pugh | `child-pugh` | `/tools/calculators/child-pugh` |
-| HAS-BLED | `has-bled` | `/tools/calculators/has-bled` |
-| MELD | `meld` | `/tools/calculators/meld` |
-| MELD-Na | `meld-na` | `/tools/calculators/meld-na` |
-| TIMI (UA/NSTEMI) | `timi-ua-nstemi` | `/tools/calculators/timi-ua-nstemi` |
-| ASCVD 10-year risk | `ascvd-risk` | `/tools/calculators/ascvd-risk` |
-| CKD staging (KDIGO) | `ckd-staging` | `/tools/calculators/ckd-staging` |
-| STOP-Bang | `stop-bang` | `/tools/calculators/stop-bang` |
-| AUDIT-C | `audit-c` | `/tools/calculators/audit-c` |
-| PHQ-9 | `phq9` | `/tools/calculators/phq9` |
-| GAD-7 | `gad7` | `/tools/calculators/gad7` |
-| eGFR (CKD-EPI) | `gfr` | `/tools/calculator/gfr` |
-| BMI | `bmi` | `/tools/calculator/bmi` |
-| CHA₂DS₂-VASc | `chads2vasc` | `/tools/calculator/chads2vasc` |
-
-### NLU hub-only profiles (4)
-
-Routed through the calculators hub without a dedicated form yet: `apache2-calculator`, `curb65-calculator`, `gcs-calculator`, `wells-dvt-calculator`.
-
-Additional NLU-only chat profiles (protocol lookup, ACLS/ATLS, dose calculator, ABG interpreter, differential diagnosis, antibiotic guide, fleet NLU, etc.) are included in the **40** NLU profiles and the unified catalog.
-
-### Sidebar registry categories
-
-| Category | Count |
-|----------|------:|
-| Calculator | 26 |
-| Diagnostic | 3 |
-| Fleet | 4 |
-| Reference | 2 |
-
-### Product & platform capabilities (SPA)
-
-| Area | Routes |
-|------|--------|
-| AI workspace | `/dashboard` |
-| Clinical tools hub | `/tools`, `/tools/catalog`, `/tools/calculators` |
-| Clinical intelligence | `/clinical/alerts` |
-| Account & security | `/profile`, `/profile-settings`, `/settings`, `/notifications`, `/two-factor-setup`, `/biometric-setup`, `/onboarding`, `/consent`, `/consent-history` |
-| Administration (RBAC) | `/team`, `/audit-logs`, `/analytics`, `/costs` |
-| Public & legal | `/`, `/auth`, `/privacy`, `/terms`, `/gdpr`, `/hipaa`, `/help`, `/shared/tools/:shareId` |
-
-### Marketing / discovery inventory (16)
-
-Six clinical tool prompts plus ten platform capability entries in [`src/data/featureInventory.js`](src/data/featureInventory.js) (AI workflow, audit logging, drug database, offline access, FHIR/HL7/DICOM, custom branding, dedicated support, SSO/SAML, team management, AI query limits).
-
-### Regenerate detailed matrices
+Install frontend dependencies:
 
 ```bash
-npm run inventory:report           # print this summary to stdout
-npm run e2e-matrix:write-docs      # docs/e2e-tool-validation-matrix.md
-npm run contract:write-docs        # docs/backend-frontend-tool-contract.md
-npm run tool-matrix:write-docs     # docs/tool-render-execute-matrix.md
+npm install
 ```
 
----
+Install backend dependencies:
 
-## Clinical tools and catalog
+```bash
+cd backend
+npm install
+```
 
-Canonical **frontend** definitions and wiring (keep in sync with backend patterns when changing NLU):
+Create local environment files from the examples:
 
-| Concern | File |
-|---------|------|
-| Sidebar registry | [src/data/toolRegistry.js](src/data/toolRegistry.js) |
-| NLU-facing catalog (40 profiles + calculator metadata) | [src/data/clinicalIntentToolCatalog.js](src/data/clinicalIntentToolCatalog.js) |
-| **Android device QA** | [qa/ANDROID_QA_MATRIX.md](qa/ANDROID_QA_MATRIX.md) — `npm run qa:android` |
-| **Mobile performance audit** | [docs/mobile-performance-audit.md](docs/mobile-performance-audit.md) |
-| **Tool contract matrix** (regenerate) | [docs/tool-contract-matrix.md](docs/tool-contract-matrix.md) |
-| **Backend ↔ frontend contract matrix** (extended columns) | [docs/backend-frontend-tool-contract.md](docs/backend-frontend-tool-contract.md) |
-| Launch map: registry id, routes, chat seeds, orchestrator `tool` param | [src/data/clinicalCatalogWiring.js](src/data/clinicalCatalogWiring.js) |
-| Source-code discovery merge (IDs, phantoms, APIs) | [src/data/sourceCodeToolDiscovery.js](src/data/sourceCodeToolDiscovery.js) |
-| Unified medical index for the catalog UI | [src/data/medicalToolsCatalogIndex.js](src/data/medicalToolsCatalogIndex.js) |
-| Full in-app inventory | `/tools/catalog` → [src/pages/tools/ClinicalToolCatalog.jsx](src/pages/tools/ClinicalToolCatalog.jsx) |
+```bash
+copy .env.example .env
+copy backend\.env.example backend\.env
+```
 
-Backend POST executors are limited to SOFA, drug interactions, and lab interpreter. See [docs/backend-frontend-tool-contract.md](docs/backend-frontend-tool-contract.md) (full 17-column matrix), [docs/clinical-tool-executors.md](docs/clinical-tool-executors.md), `REGISTRY_ID_TO_ORCHESTRATOR_TOOL` in [src/data/clinicalToolIdContract.js](src/data/clinicalToolIdContract.js), and [src/data/unsupportedOrchestratorTools.js](src/data/unsupportedOrchestratorTools.js) for the full mapping and frontend-only tools.
+Start frontend and backend together:
 
-Regenerate the contract doc after wiring changes: `npm run contract:write-docs` (runs `npm run test:contract-matrix` drift gates).
+```bash
+npm run start:all
+```
 
-Backend route inventory and frontend call audit: [docs/backend-api-inventory.md](docs/backend-api-inventory.md).
+Or run them separately:
 
----
+```bash
+npm run dev
+npm run backend:dev
+```
 
-## Android (Capacitor)
+Default local ports:
 
-- Capacitor dependencies: `@capacitor/core`, `@capacitor/android` (root [package.json](package.json)).
-- **Build:** from repo root, `npm run android-debug` or `npm run android-release` (runs Vite build, `cap sync`, then Gradle). On macOS/Linux, replace `.\gradlew.bat` with `./gradlew` inside `android/` as appropriate.
-- **Play Store:** listing copy and graphics previously lived under `android/*.md` and `android/play-store-assets/`; those Markdown files were removed in favor of this README. Maintain store text and screenshots in your release process or versioned assets outside this repo if needed.
+- Frontend Vite dev server: `http://localhost:8000`
+- Backend Nest API: `http://localhost:3000`
+- Vite proxy target: `http://localhost:3000`
 
----
+SQLite is available as a development fallback through `DATABASE_CLIENT=sqlite`. PostgreSQL, Redis, OpenAI, Pinecone, Firebase, Stripe, Sentry, Datadog, and SMTP settings are configured through environment variables when those integrations are enabled.
 
-## MCP bridge
+## Production And Mobile Builds
 
-- **Package:** [mcp/](mcp/) — stdio MCP server for clinical tools API integration.
-- **Run:** `npm run mcp:server` from repo root (or `cd mcp && npm start`).
+Build the frontend:
 
----
+```bash
+npm run build
+```
 
-## Testing and quality
+Build the backend:
 
-| Layer | Command |
-|-------|---------|
-| Full CI gate (lint, matrix tests, builds) | `npm run validate:ci` |
-| Frontend unit / component tests | `npm run test:run` or `npm run test:run:frontend` |
-| Backend unit + E2E | `cd backend && npm test && npm run test:e2e` |
-| Responsive Playwright (360–430px) | `npm run validate:responsive` |
-| Bundle size report | `npm run build:analyze` |
-| Manual wiring checklist | `npm run smoke` |
+```bash
+npm run backend:build
+```
 
-**Local dev:** `npm run start:all` (Vite **:8000** + API **:3000**). **Single-port prod preview:** `npm run start:single` (builds SPA to `dist/`, Nest serves API + static assets on **:3000**).
+Build both and run the backend production server:
 
----
+```bash
+npm run start:single
+```
 
-## Operational notes
+Build Android debug:
 
-- **Swagger:** With API on port 3000, OpenAPI UI is at `http://localhost:3000/api` (see [backend/src/main.ts](backend/src/main.ts)).
-- **Metrics:** `/metrics` on the API host (see bootstrap logs in `main.ts`).
-- **Legal / compliance copy** for the product remains in the SPA under `src/pages/legal/` and related public pages — not in this README.
+```bash
+npm run android-debug
+```
 
----
+Build Android release:
 
-*Root documentation policy: keep **only this `README.md`** at the repository root. Put matrices, PR bodies, and QA reports under `docs/`, `qa/`, or `release/`. Update counts via `npm run inventory:report` when tools ship or retire.*
+```bash
+npm run android-release
+```
+
+Capacitor uses `com.caredroid.clinical` as the Android app id and `dist` as the web output directory.
+
+## Useful Scripts
+
+Frontend:
+
+- `npm run dev`
+- `npm run dev:lan`
+- `npm run build`
+- `npm run preview`
+- `npm run test`
+- `npm run test:run`
+- `npm run lint`
+- `npm run typecheck:frontend`
+
+Backend:
+
+- `npm run backend:dev`
+- `npm run backend:build`
+- `npm run backend:start`
+- `cd backend && npm test`
+- `cd backend && npm run test:e2e`
+- `cd backend && npm run migration:run`
+- `cd backend && npm run seed`
+- `cd backend && npm run ingest`
+
+Validation suites:
+
+- `npm run validate:ci`
+- `npm run test:backend-exposure`
+- `npm run test:contract-matrix`
+- `npm run test:e2e-matrix`
+- `npm run test:executor-mapping`
+- `npm run test:registry-launch`
+- `npm run test:tool-render-smoke`
+- `npm run test:safety-compliance`
+- `npm run test:visibility-matrix`
+- `npm run test:responsive-regression`
+- `npm run test:mobile-performance`
+- `npm run test:e2e:android`
+- `npm run test:e2e:production`
+
+## Environment Configuration
+
+Important frontend variables include:
+
+- `VITE_API_URL`
+- `VITE_ALLOW_SAME_ORIGIN_API`
+- `VITE_WS_URL`
+- `VITE_API_PROXY_TARGET`
+- `VITE_API_TIMEOUT_MS`
+- `VITE_APP_NAME`
+- `VITE_APP_VERSION`
+- `VITE_ENABLE_CRASH_REPORTING`
+- `VITE_ENABLE_ANALYTICS`
+- `VITE_ENABLE_PUSH_NOTIFICATIONS`
+- `VITE_ENABLE_OFFLINE_MODE`
+- `VITE_ENABLE_BIOMETRIC_AUTH`
+
+Important backend variables include:
+
+- `PORT`
+- `FRONTEND_URL`
+- `DATABASE_CLIENT`
+- `SQLITE_PATH`
+- PostgreSQL connection settings
+- Redis settings
+- JWT and session settings
+- OAuth settings
+- SMTP settings
+- Stripe settings
+- OpenAI settings
+- Encryption keys
+- Firebase settings
+- Pinecone and RAG settings
+- NLU and anomaly detection service settings
+- Sentry, Datadog, and logging settings
+
+Do not commit real `.env` files or production secrets.
+
+## Testing Strategy
+
+The source tree contains focused tests for:
+
+- Frontend route rendering and launch behavior.
+- Tool registry, inventory, alias, exposure, and contract drift.
+- Clinical safety guardrails.
+- Backend clinical intelligence services.
+- Audit integrity and audit route behavior.
+- Calculator forms and tool render smoke coverage.
+- Responsive regression and mobile performance.
+- Android and production smoke flows through Playwright.
+
+Use focused scripts while developing and `npm run validate:ci` before release-level validation.
+
+## Clinical Use Notice
+
+CareDroid Clinical AI is built as clinical decision support. AI-generated content, summaries, recommendations, timelines, and order-set suggestions require clinician review and source verification. The application does not replace clinical judgment, local protocols, emergency escalation procedures, or institutional governance.
