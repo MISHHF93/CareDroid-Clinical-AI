@@ -2,18 +2,17 @@ import { BACKEND_API_CAPABILITIES } from '../config/backendApiCapabilities';
 import { BACKEND_HTTP_ROUTES } from '../data/backendHttpRouteInventory';
 import {
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
-  REGISTRY,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
 } from '../data/clinicalToolIdContract';
-import { getToolById } from '../data/toolRegistry';
+import { getBackendBackedToolInventory } from '../data/toolInventory';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import { Permission } from '../contexts/UserContext';
 
-const EXECUTOR_REGISTRY_IDS = Object.freeze([
-  REGISTRY.drugCheck,
-  REGISTRY.labInterp,
-  REGISTRY.sofaScore,
-]);
+function getExecutorInventoryRecords() {
+  return getBackendBackedToolInventory().filter((record) =>
+    ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(record.orchestratorToolId)
+  );
+}
 
 function routeExists(routes, method, path) {
   return routes.some((route) => route.method === method && route.path === path);
@@ -35,20 +34,29 @@ function scoreSuggestion(input, suggestion) {
 }
 
 function makeExecutorSuggestion(registryId, index) {
-  const tool = getToolById(registryId);
-  const executorId = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId];
-  if (!tool || !ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(executorId)) return null;
+  const record = typeof registryId === 'string' ? null : registryId;
+  const canonicalId = record?.id || registryId;
+  const executorId = record?.orchestratorToolId || REGISTRY_ID_TO_ORCHESTRATOR_TOOL[canonicalId];
+  if (!ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(executorId)) return null;
   return {
     id: `executor-${executorId}`,
-    label: tool.name,
-    description: tool.description,
+    label: record?.label || canonicalId,
+    description: record?.safetyCopy || record?.notes || 'Registered clinical tool executor.',
     kind: 'executor',
-    toolId: registryId,
+    toolId: canonicalId,
     executorId,
-    icon: getToolIcon(registryId),
+    icon: getToolIcon(canonicalId),
     source: 'POST /api/tools/:id/execute',
     defaultRank: 20 + index,
-    keywords: [tool.name, tool.description, registryId, executorId],
+    keywords: [
+      record?.label,
+      record?.description,
+      record?.safetyCopy,
+      canonicalId,
+      record?.nluToolId,
+      executorId,
+      ...(record?.aliases || []),
+    ],
   };
 }
 
@@ -127,7 +135,7 @@ export function getChatCapabilitySuggestions({
     capabilityEnabled(capabilities, 'toolsExecute') &&
     capabilityEnabled(capabilities, 'toolsList')
   ) {
-    EXECUTOR_REGISTRY_IDS.map(makeExecutorSuggestion).filter(Boolean).forEach((suggestion) => {
+    getExecutorInventoryRecords().map(makeExecutorSuggestion).filter(Boolean).forEach((suggestion) => {
       suggestions.push(suggestion);
     });
   }

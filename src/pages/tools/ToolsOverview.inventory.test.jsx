@@ -65,7 +65,7 @@ describe('ToolsOverview unified inventory', () => {
 
     expect(
       [...container.querySelectorAll('.btn-open-tool')].filter((button) =>
-        /start with chat/i.test(button.textContent || '')
+        /start with assistant/i.test(button.textContent || '')
       )
     ).toHaveLength(chatAssistedCount);
   });

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BACKEND_API_CAPABILITIES } from '../config/backendApiCapabilities';
 import { BACKEND_HTTP_ROUTES } from '../data/backendHttpRouteInventory';
+import { getBackendBackedToolInventory } from '../data/toolInventory';
 import {
   CHAT_SENSITIVE_CONFIRMATIONS,
   getChatCapabilitySuggestions,
@@ -18,12 +19,16 @@ describe('chat capability suggestions', () => {
   it('shows only registered POST tool executors as executable suggestions', () => {
     const suggestions = getChatCapabilitySuggestions({ hasPermission: allowAll });
     const executorSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'executor');
+    const inventoryExecutors = getBackendBackedToolInventory();
 
     expect(executorSuggestions.map((suggestion) => suggestion.executorId).sort()).toEqual([
       'drug-interactions',
       'lab-interpreter',
       'sofa-calculator',
     ]);
+    expect(executorSuggestions.map((suggestion) => suggestion.toolId).sort()).toEqual(
+      inventoryExecutors.map((record) => record.id).sort()
+    );
     expect(executorSuggestions.every((suggestion) => suggestion.source.includes('/api/tools'))).toBe(true);
   });
 

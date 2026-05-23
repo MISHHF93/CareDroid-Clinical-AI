@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
 import { getUserFacingToolRegistryProjection } from '../../data/toolInventory';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import { NavIcon } from '../../navigation/NavIcon';
@@ -103,6 +104,19 @@ const ToolsOverview = () => {
       setActiveTool,
       recordToolAccess,
     });
+  };
+
+  const handleAssistantLaunch = (tool) => {
+    const launch = resolveCatalogLaunch(tool.id);
+    recordToolAccess(tool.id);
+    selectTool(tool.id);
+    setActiveTool(tool.id);
+    addMessage(
+      launch.chatSeed ||
+        `Help me use ${tool.name} as clinical decision support only. Ask for any context needed before recommending next steps.`,
+      'user'
+    );
+    navigate('/assistant');
   };
 
   const orderedTools = [
@@ -364,9 +378,7 @@ const ToolsOverview = () => {
                 className="btn-chat-tool"
                 onClick={(e) => {
                   e.stopPropagation();
-                  recordToolAccess(tool.id);
-                  selectTool(tool.id);
-                  navigate('/assistant');
+                  handleAssistantLaunch(tool);
                 }}
               >
                 Open in Assistant

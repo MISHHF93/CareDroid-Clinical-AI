@@ -175,4 +175,23 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
       expect.objectContaining({ replace: true })
     );
   }, 10000);
+
+  it('opens Assistant from a tool card with the canonical launch seed', () => {
+    const { container } = renderOverview();
+    const card = toolCard(container, 'guideline-rag');
+    expect(card).toBeTruthy();
+    const assistantButton = card.querySelector('.btn-chat-tool');
+    expect(assistantButton).toBeTruthy();
+
+    fireEvent.click(assistantButton);
+
+    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('guideline-rag');
+    expect(mockConversationValue.selectTool).toHaveBeenCalledWith('guideline-rag');
+    expect(mockConversationValue.setActiveTool).toHaveBeenCalledWith('guideline-rag');
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringMatching(/clinical decision support/i),
+      'user'
+    );
+    expect(navigateMock).toHaveBeenLastCalledWith('/assistant');
+  }, 10000);
 });

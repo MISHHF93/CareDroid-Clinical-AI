@@ -12,6 +12,7 @@ import {
   resolveToolInventoryRecord,
   TOOL_EXECUTOR_STATUS,
   TOOL_LAUNCH_TYPES,
+  TOOL_PERMISSION_LOGIC,
   TOOL_SURFACES,
 } from './toolInventory';
 import {
@@ -34,6 +35,7 @@ const requiredFields = [
   'catalogVisible',
   'sidebarVisible',
   'executorStatus',
+  'permissionPolicy',
   'testCoverage',
   'riskLevel',
 ];
@@ -212,6 +214,11 @@ describe('canonical tool inventory', () => {
       endpoint: '/api/clinical-intelligence/ambient-scribe/generate',
       component: 'src/pages/tools/AmbientScribe.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      permissionPolicy: {
+        permissions: ['READ_PHI', 'USE_AI_CHAT'],
+        logic: TOOL_PERMISSION_LOGIC.ALL,
+        backendController: 'ClinicalIntelligenceController',
+      },
       riskLevel: 'high',
     });
   });
@@ -239,6 +246,11 @@ describe('canonical tool inventory', () => {
       endpoint: '/api/clinical-intelligence/guideline-rag/query',
       component: 'src/pages/tools/GuidelineRag.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      permissionPolicy: {
+        permissions: ['USE_AI_CHAT'],
+        logic: TOOL_PERMISSION_LOGIC.ALL,
+        backendController: 'ClinicalIntelligenceController',
+      },
       riskLevel: 'high',
     });
   });
@@ -324,7 +336,36 @@ describe('canonical tool inventory', () => {
       endpoint: '/api/clinical-intelligence/clinical-audit/execution-logs',
       component: 'src/pages/tools/ClinicalAudit.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+      permissionPolicy: {
+        permissions: ['VIEW_AUDIT_LOGS'],
+        logic: TOOL_PERMISSION_LOGIC.ALL,
+        backendController: 'ClinicalIntelligenceController',
+      },
       riskLevel: 'high',
     });
+  });
+
+  it('captures frontend preflight permissions for every clinical-intelligence backend workflow', () => {
+    const expected = {
+      'ambient-scribe': ['READ_PHI', 'USE_AI_CHAT'],
+      'guideline-rag': ['USE_AI_CHAT'],
+      'differential-ai': ['READ_PHI', 'USE_AI_CHAT'],
+      'timeline-ai': ['READ_PHI', 'USE_AI_CHAT'],
+      'patient-summary-ai': ['READ_PHI', 'USE_AI_CHAT'],
+      'order-set-ai': ['READ_PHI', 'USE_AI_CHAT'],
+      'ai-explainability': ['READ_PHI', 'USE_AI_CHAT'],
+      'clinical-audit': ['VIEW_AUDIT_LOGS'],
+    };
+
+    for (const [id, permissions] of Object.entries(expected)) {
+      const record = resolveToolInventoryRecord(id, records);
+
+      expect(record?.executorStatus, id).toBe(TOOL_EXECUTOR_STATUS.PLATFORM);
+      expect(record?.permissionPolicy, id).toMatchObject({
+        permissions,
+        logic: TOOL_PERMISSION_LOGIC.ALL,
+        backendController: 'ClinicalIntelligenceController',
+      });
+    }
   });
 });

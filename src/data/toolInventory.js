@@ -120,6 +120,54 @@ const CLINICAL_AUDIT_DTO = Object.freeze({
   responseDto: 'ClinicalAuditResponseDto (`runId`, `summary`, `toolChain`, `executionLogs`, `safety`)',
 });
 
+export const TOOL_PERMISSION_LOGIC = Object.freeze({
+  ALL: 'all',
+  ANY: 'any',
+});
+
+const CLINICAL_INTELLIGENCE_PERMISSION_POLICIES = Object.freeze({
+  [REGISTRY.ambientScribe]: Object.freeze({
+    permissions: Object.freeze(['READ_PHI', 'USE_AI_CHAT']),
+    logic: TOOL_PERMISSION_LOGIC.ALL,
+    backendController: 'ClinicalIntelligenceController',
+  }),
+  [REGISTRY.guidelineRag]: Object.freeze({
+    permissions: Object.freeze(['USE_AI_CHAT']),
+    logic: TOOL_PERMISSION_LOGIC.ALL,
+    backendController: 'ClinicalIntelligenceController',
+  }),
+  [REGISTRY.differentialAi]: Object.freeze({
+    permissions: Object.freeze(['READ_PHI', 'USE_AI_CHAT']),
+    logic: TOOL_PERMISSION_LOGIC.ALL,
+    backendController: 'ClinicalIntelligenceController',
+  }),
+  [REGISTRY.timelineAi]: Object.freeze({
+    permissions: Object.freeze(['READ_PHI', 'USE_AI_CHAT']),
+    logic: TOOL_PERMISSION_LOGIC.ALL,
+    backendController: 'ClinicalIntelligenceController',
+  }),
+  [REGISTRY.patientSummaryAi]: Object.freeze({
+    permissions: Object.freeze(['READ_PHI', 'USE_AI_CHAT']),
+    logic: TOOL_PERMISSION_LOGIC.ALL,
+    backendController: 'ClinicalIntelligenceController',
+  }),
+  [REGISTRY.orderSetAi]: Object.freeze({
+    permissions: Object.freeze(['READ_PHI', 'USE_AI_CHAT']),
+    logic: TOOL_PERMISSION_LOGIC.ALL,
+    backendController: 'ClinicalIntelligenceController',
+  }),
+  [REGISTRY.aiExplainability]: Object.freeze({
+    permissions: Object.freeze(['READ_PHI', 'USE_AI_CHAT']),
+    logic: TOOL_PERMISSION_LOGIC.ALL,
+    backendController: 'ClinicalIntelligenceController',
+  }),
+  [REGISTRY.clinicalAudit]: Object.freeze({
+    permissions: Object.freeze(['VIEW_AUDIT_LOGS']),
+    logic: TOOL_PERMISSION_LOGIC.ALL,
+    backendController: 'ClinicalIntelligenceController',
+  }),
+});
+
 const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.drugCheck]: 'src/pages/tools/DrugChecker.jsx',
   [REGISTRY.labInterp]: 'src/pages/tools/LabInterpreter.jsx',
@@ -309,6 +357,10 @@ function clinicalIntelligenceEndpointFor(registryId) {
   return null;
 }
 
+function permissionPolicyFor(registryId) {
+  return CLINICAL_INTELLIGENCE_PERMISSION_POLICIES[registryId] || null;
+}
+
 function apiClientFor(orchestratorToolId, launchType, registryId) {
   if (orchestratorToolId) return 'src/services/clinicalOrchestratorApi.js';
   if (clinicalIntelligenceEndpointFor(registryId)) return 'src/services/clinicalIntelligenceApi.js';
@@ -391,6 +443,7 @@ function userFacingRecordFromCanonical(record) {
     orchestratorToolId: record.orchestratorToolId,
     endpoint: record.endpoint,
     executorStatus: record.executorStatus,
+    permissionPolicy: record.permissionPolicy,
     favoriteable: true,
     workspaceFilterable: true,
     sidebarVisible: record.sidebarVisible,
@@ -401,6 +454,7 @@ function userFacingRecordFromCanonical(record) {
       backendPatternId: record.backendPatternId,
       apiClient: record.apiClient,
       testCoverage: record.testCoverage,
+      permissionPolicy: record.permissionPolicy,
     },
     legacy: toolRegistryById[record.id] || null,
   };
@@ -457,6 +511,7 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
   const clinicalIntelligenceEndpoint = clinicalIntelligenceEndpointFor(registryId);
   const endpoint = clinicalIntelligenceEndpoint || endpointFor(orchestratorToolId, launchType);
   const apiClient = apiClientFor(orchestratorToolId, launchType, registryId);
+  const permissionPolicy = permissionPolicyFor(registryId);
   const dto =
     registryId === REGISTRY.ambientScribe
       ? AMBIENT_SCRIBE_DTO
@@ -516,6 +571,7 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
           ? TOOL_EXECUTOR_STATUS.UNSUPPORTED
           : TOOL_EXECUTOR_STATUS.NONE,
     apiClient,
+    permissionPolicy,
     safetyCopy: primaryNlu?.description || registryEntry?.description || null,
     chatSeed,
     testCoverage: unique([
@@ -565,6 +621,7 @@ function buildPlatformRecord({ id, label, endpoint, apiClient, requestDto = null
     responseDto,
     executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
     apiClient,
+    permissionPolicy: null,
     safetyCopy: null,
     chatSeed: null,
     testCoverage: ['backendFrontendExposure.test.js', 'clinicalToolsApi.test.js'],

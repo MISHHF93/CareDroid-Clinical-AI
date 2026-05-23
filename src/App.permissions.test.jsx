@@ -2,6 +2,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import {
+  getFrontendVisibleToolInventory,
+  TOOL_EXECUTOR_STATUS,
+  TOOL_PERMISSION_LOGIC,
+} from './data/toolInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, 'App.jsx'), 'utf8');
@@ -39,5 +44,33 @@ describe('App clinical-intelligence route permissions', () => {
     const block = routeBlock('/tools/clinical-audit');
 
     expect(block).toContain('permission: Permission.VIEW_AUDIT_LOGS');
+  });
+
+  it('keeps App route preflight aligned with canonical inventory permission policies', () => {
+    const clinicalIntelligenceRecords = getFrontendVisibleToolInventory().filter(
+      (record) =>
+        record.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM &&
+        record.endpoint?.startsWith('/api/clinical-intelligence/')
+    );
+
+    expect(clinicalIntelligenceRecords.length).toBeGreaterThan(0);
+
+    for (const record of clinicalIntelligenceRecords) {
+      const block = routeBlock(record.route);
+
+      expect(block, `${record.id} route block`).toContain(`path: '${record.route}'`);
+      expect(record.permissionPolicy, `${record.id} permission policy`).toBeTruthy();
+      for (const permission of record.permissionPolicy.permissions) {
+        expect(block, `${record.id} missing ${permission}`).toContain(`Permission.${permission}`);
+      }
+      if (
+        record.permissionPolicy.logic === TOOL_PERMISSION_LOGIC.ALL &&
+        record.permissionPolicy.permissions.length > 1
+      ) {
+        expect(block, `${record.id} should require all permissions`).toContain(
+          'requireAllPermissions: true'
+        );
+      }
+    }
   });
 });

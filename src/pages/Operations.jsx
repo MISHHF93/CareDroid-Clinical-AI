@@ -1,4 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import { useConversation } from '../contexts/ConversationContext';
+import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import './OperatingWorkspace.css';
@@ -15,6 +18,7 @@ const OPERATION_AREAS = Object.freeze([
     title: 'Fleet command',
     body: 'Monitor vehicle state, dispatch readiness, and live operational bottlenecks.',
     path: '/fleet/command',
+    toolId: 'fleet-command',
     icon: CHROME_ICONS.tools,
     label: 'Open command',
   },
@@ -22,6 +26,7 @@ const OPERATION_AREAS = Object.freeze([
     title: 'Route optimizer',
     body: 'Plan route sequencing while preserving human approval for dispatch decisions.',
     path: '/fleet/route-optimizer',
+    toolId: 'route-optimizer',
     icon: CHROME_ICONS.shareLink,
     label: 'Optimize routes',
   },
@@ -29,6 +34,7 @@ const OPERATION_AREAS = Object.freeze([
     title: 'Predictive maintenance',
     body: 'Inspect maintenance risk and fleet health signals in one operational area.',
     path: '/fleet/predictive-maintenance',
+    toolId: 'predictive-maintenance',
     icon: CHROME_ICONS.alert,
     label: 'View maintenance',
   },
@@ -50,6 +56,23 @@ const OPERATION_AREAS = Object.freeze([
 
 export default function Operations() {
   const navigate = useNavigate();
+  const { addMessage, selectTool, setActiveTool } = useConversation();
+  const { recordToolAccess } = useToolPreferences();
+
+  const launchArea = (area) => {
+    if (!area.toolId) {
+      navigate(area.path);
+      return;
+    }
+
+    applyRegistryToolLaunch(area.toolId, {
+      navigate,
+      addMessage,
+      selectTool,
+      setActiveTool,
+      recordToolAccess,
+    });
+  };
 
   return (
     <main className="operating-workspace" aria-labelledby="operations-title">
@@ -80,7 +103,7 @@ export default function Operations() {
               key={area.title}
               type="button"
               className="operating-card"
-              onClick={() => navigate(area.path)}
+              onClick={() => launchArea(area)}
             >
               <span className="operating-card__icon" aria-hidden>
                 <NavIcon icon={area.icon} size={22} />

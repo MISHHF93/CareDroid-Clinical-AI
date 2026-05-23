@@ -1,4 +1,7 @@
 import { useNavigate } from 'react-router-dom';
+import { useConversation } from '../contexts/ConversationContext';
+import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import './OperatingWorkspace.css';
@@ -8,6 +11,7 @@ const PATIENT_ACTIONS = Object.freeze([
     title: 'Summarize active case',
     body: 'Build a clinician-reviewed problem, medication, lab, alert, and risk summary.',
     path: '/tools/patient-summary-ai',
+    toolId: 'patient-summary-ai',
     icon: CHROME_ICONS.clipboardList,
     label: 'Open summary AI',
   },
@@ -15,6 +19,7 @@ const PATIENT_ACTIONS = Object.freeze([
     title: 'Review clinical timeline',
     body: 'Organize encounters, trends, and abnormal progression into a timeline workspace.',
     path: '/tools/timeline-ai',
+    toolId: 'timeline-ai',
     icon: CHROME_ICONS.clock,
     label: 'Open timeline AI',
   },
@@ -22,6 +27,7 @@ const PATIENT_ACTIONS = Object.freeze([
     title: 'Draft documentation',
     body: 'Use ambient scribe and documentation workflows while keeping clinician review explicit.',
     path: '/tools/ambient-scribe',
+    toolId: 'ambient-scribe',
     icon: CHROME_ICONS.fileEdit,
     label: 'Open documentation AI',
   },
@@ -29,6 +35,7 @@ const PATIENT_ACTIONS = Object.freeze([
     title: 'Prepare orders',
     body: 'Generate order-set suggestions with safety limits, protocol pathways, and explainability.',
     path: '/tools/order-set-ai',
+    toolId: 'order-set-ai',
     icon: CHROME_ICONS.clipboardList,
     label: 'Open order set AI',
   },
@@ -36,6 +43,23 @@ const PATIENT_ACTIONS = Object.freeze([
 
 export default function Patients() {
   const navigate = useNavigate();
+  const { addMessage, selectTool, setActiveTool } = useConversation();
+  const { recordToolAccess } = useToolPreferences();
+
+  const launchAction = (action) => {
+    if (!action.toolId) {
+      navigate(action.path);
+      return;
+    }
+
+    applyRegistryToolLaunch(action.toolId, {
+      navigate,
+      addMessage,
+      selectTool,
+      setActiveTool,
+      recordToolAccess,
+    });
+  };
 
   return (
     <main className="operating-workspace" aria-labelledby="patients-title">
@@ -66,7 +90,7 @@ export default function Patients() {
               key={action.title}
               type="button"
               className="operating-card"
-              onClick={() => navigate(action.path)}
+              onClick={() => launchAction(action)}
             >
               <span className="operating-card__icon" aria-hidden>
                 <NavIcon icon={action.icon} size={22} />
