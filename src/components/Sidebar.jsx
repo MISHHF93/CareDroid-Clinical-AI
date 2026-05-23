@@ -10,6 +10,7 @@ import { partitionSidebarTools, SIDEBAR_CATEGORY_ORDER } from '../data/sidebarTo
 import { getSidebarToolRegistryProjection } from '../data/toolInventory';
 import { useConversation } from '../contexts/ConversationContext';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
+import { PRIMARY_NAV_ITEMS, primaryNavPathMatches } from '../navigation/primaryNavigation';
 import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon, getToolIcon } from '../navigation/iconRegistry';
@@ -64,7 +65,7 @@ const Sidebar = forwardRef(function Sidebar(
   const [expandedCategories, setExpandedCategories] = useState(() =>
     Object.fromEntries(SIDEBAR_CATEGORY_ORDER.map((category) => [category, true]))
   );
-  
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   // Medical Tools - Enhanced with navigation
@@ -84,19 +85,15 @@ const Sidebar = forwardRef(function Sidebar(
     .map((toolId) => sidebarToolById[toolId])
     .filter((tool) => tool && workspaceToolIds.includes(tool.id));
 
-  // Product modes stay simple while existing routes remain available.
-  const navItems = [
-    { id: 'pulse', label: 'Pulse', path: '/dashboard' },
-    { id: 'chat', label: 'Chat', path: '/chat' },
-    { id: 'control', label: 'Control', path: '/settings' },
-  ];
+  // Visible IA follows the clinical operating system map while legacy routes remain available.
+  const navItems = PRIMARY_NAV_ITEMS;
 
   const recentConversations = conversations.slice(-5).reverse();
 
   const effectiveCollapsed = layoutCompact ? false : sidebarCollapsed;
 
   const handleNavClick = (path) => {
-    if (path === '/dashboard' || path === '/chat') {
+    if (['/home', '/dashboard', '/assistant', '/chat'].includes(path)) {
       navigate({ pathname: path, search: '' }, { replace: true });
     } else {
       onToolSelect?.(null);
@@ -141,12 +138,7 @@ const Sidebar = forwardRef(function Sidebar(
   const isOnToolsOverview = location.pathname === '/tools';
   const isOnToolsCatalog = location.pathname === '/tools/catalog';
 
-  const isNavPathActive = (path) => {
-    if (path === '/dashboard') {
-      return location.pathname === '/dashboard';
-    }
-    return location.pathname === path || location.pathname.startsWith(`${path}/`);
-  };
+  const isNavItemActive = (item) => primaryNavPathMatches(item, location.pathname);
 
   const isToolRouteActive = (tool) => {
     const path = location.pathname;
@@ -390,22 +382,23 @@ const Sidebar = forwardRef(function Sidebar(
           <span className="btn-icon" aria-hidden>
             <NavIcon icon={CHROME_ICONS.sparkles} size={18} />
           </span>
-          {!effectiveCollapsed && <span>Start Chat</span>}
+          {!effectiveCollapsed && <span>Start Assistant</span>}
         </button>
 
         {/* Navigation */}
         <nav className="sidebar-nav">
           <div className="nav-section-title">
-            {!effectiveCollapsed && 'Modes'}
+            {!effectiveCollapsed && 'Care OS'}
           </div>
           {navItems.map(item => {
+            const isActive = isNavItemActive(item);
             const NavButton = (
               <button
                 key={item.id}
-                className={`nav-item ${isNavPathActive(item.path) ? 'active' : ''}`}
+                className={`nav-item ${isActive ? 'active' : ''}`}
                 onClick={() => handleNavClick(item.path)}
                 title={effectiveCollapsed ? item.label : ''}
-                aria-current={isNavPathActive(item.path) ? 'page' : undefined}
+                aria-current={isActive ? 'page' : undefined}
               >
                 <span className="nav-icon" aria-hidden>
                   <NavIcon icon={getNavIcon(item.id)} />
@@ -604,14 +597,14 @@ const Sidebar = forwardRef(function Sidebar(
                 <button
                   type="button"
                   onClick={handleViewAllTools}
-                  aria-label="Open action library"
+                  aria-label="Open tools workspace"
                   aria-current={isOnToolsOverview ? 'page' : undefined}
                   className={`sidebar-tools-quick-action${isOnToolsOverview ? ' sidebar-tools-quick-action--active' : ''}`}
                 >
                   <span className="section-icon--svg" aria-hidden>
                     <NavIcon icon={CHROME_ICONS.bolt} size={14} />
                   </span>
-                  <span>Action Library</span>
+                  <span>Tools</span>
                 </button>
               </div>
             )}

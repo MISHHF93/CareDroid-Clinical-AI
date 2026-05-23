@@ -144,6 +144,76 @@
   border-color: var(--accent-green);
 }
 
+.app-shell-bottom-nav {
+  position: fixed;
+  right: env(safe-area-inset-right, 0px);
+  bottom: env(safe-area-inset-bottom, 0px);
+  left: env(safe-area-inset-left, 0px);
+  z-index: 930;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 2px;
+  min-height: var(--app-bottom-nav-height, 64px);
+  padding: 6px max(6px, env(safe-area-inset-right, 0px)) 6px max(6px, env(safe-area-inset-left, 0px));
+  border-top: 1px solid var(--panel-border);
+  background: var(--app-surface-glass);
+  -webkit-backdrop-filter: blur(var(--app-blur-glass, 18px));
+  backdrop-filter: blur(var(--app-blur-glass, 18px));
+  box-sizing: border-box;
+}
+
+.app-shell-bottom-nav__item {
+  min-width: 0;
+  min-height: 52px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--muted-text);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 4px 2px;
+  font: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.app-shell-bottom-nav__item--active {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 36%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive) 16%, transparent);
+  color: var(--app-accent-interactive);
+}
+
+.app-shell-bottom-nav__item:focus-visible {
+  outline: 2px solid var(--app-focus);
+  outline-offset: 2px;
+}
+
+.app-shell-bottom-nav__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.app-shell-bottom-nav__label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.1;
+}
+
+@media (min-width: 901px) {
+  .app-shell-bottom-nav {
+    display: none;
+  }
+}
+
 /* Authed page column: primary vertical scrollport for tool/fleet/settings pages */
 .app-shell-page-body {
   flex: 1 1 auto;
@@ -169,6 +239,10 @@
 /* Reserve space under absolute menu/theme controls when compact (scroll + initial layout) */
 .app-shell--compact.app-shell--authed .app-shell-page-body {
   padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
+  padding-bottom: calc(
+    var(--app-bottom-nav-height, 64px) + var(--app-shell-page-gutter-block, 12px) +
+      env(safe-area-inset-bottom, 0px)
+  );
   scroll-padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
 }
 
@@ -183,6 +257,7 @@
 
 .app-shell--compact.app-shell--authed .app-shell-page-body--conversation {
   padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
+  padding-bottom: var(--app-bottom-nav-height, 64px);
   scroll-padding-top: 0;
 }
 

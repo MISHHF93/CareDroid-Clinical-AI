@@ -214,7 +214,7 @@ function Dashboard() {
 
   const panelRegistryId = searchParams.get('tool');
   const calcFromUrl = searchParams.get('calc');
-  const isChatMode = location.pathname === '/chat';
+  const isChatMode = location.pathname === '/chat' || location.pathname === '/assistant';
   const selectedToolEntry = selectedTool ? getToolById(selectedTool) : null;
   const activeConversationLabel = activeConversationId ? `Conversation ${activeConversationId}` : 'No conversation';
   const availableChatTools = useMemo(
@@ -232,46 +232,46 @@ function Dashboard() {
   const pulseActions = useMemo(
     () => [
       {
-        title: 'Review what needs attention',
-        body: 'Open active clinical alerts and verify the highest-risk items first.',
-        label: 'Review alerts',
-        icon: CHROME_ICONS.siren,
-        path: '/clinical/alerts',
+        title: 'Start clinical assessment',
+        body: 'Open Assistant with a structured case prompt and choose calculators, evidence, or documentation from there.',
+        label: 'Start assessment',
+        icon: CHROME_ICONS.stethoscope,
+        prompt: 'Start a clinical assessment for this patient presentation:',
       },
       {
-        title: 'Act with guidance',
-        body: 'Start from chat with context instead of memorizing a tool or command phrase.',
-        label: 'Open Chat',
-        icon: CHROME_ICONS.message,
-        path: '/chat',
+        title: 'Open calculators',
+        body: 'Launch calculator workflows with safety copy, inputs, results, interpretation, and next-tool suggestions.',
+        label: 'Open calculators',
+        icon: CHROME_ICONS.calculator,
+        path: '/tools/calculators',
       },
       {
-        title: 'Outreach and follow-up',
-        body: 'Draft a follow-up plan, preview the message, then confirm the next step.',
-        label: 'Plan outreach',
-        icon: CHROME_ICONS.messageCircle,
-        workflow: 'outreach',
+        title: 'Differential assistant',
+        body: 'Build and explain differential diagnoses from symptoms, history, labs, and context.',
+        label: 'Build differential',
+        icon: CHROME_ICONS.bot,
+        path: '/tools/differential-ai',
       },
       {
-        title: 'Medication safety',
+        title: 'Drug checker',
         body: 'Guide a drug interaction check with structured context and reviewable output.',
         label: 'Check medications',
         icon: CHROME_ICONS.shield,
         path: '/tools/drug-checker',
       },
       {
-        title: 'Lab review',
-        body: 'Interpret labs with loading, success, and error states handled by the tool page.',
-        label: 'Interpret labs',
-        icon: CHROME_ICONS.microscope,
-        path: '/tools/lab-interpreter',
+        title: 'Documentation AI',
+        body: 'Draft notes through protected AI documentation workflows while keeping clinician review explicit.',
+        label: 'Draft documentation',
+        icon: CHROME_ICONS.fileEdit,
+        path: '/tools/ambient-scribe',
       },
       {
-        title: 'Control access and trust',
-        body: 'Manage account, integrations, audit visibility, and platform settings.',
-        label: 'Open Control',
-        icon: CHROME_ICONS.settings,
-        path: '/settings',
+        title: 'Operations overview',
+        body: 'Review clinical alerts, fleet command, analytics, and audit surfaces from one operations workspace.',
+        label: 'Open operations',
+        icon: CHROME_ICONS.tools,
+        path: '/operations',
       },
     ],
     []
@@ -328,7 +328,7 @@ function Dashboard() {
     });
 
     if (plan.mode === 'chat-assisted') {
-      navigate({ pathname: '/chat', search: '' }, { replace: true });
+      navigate({ pathname: '/assistant', search: '' }, { replace: true });
     }
   }, [panelRegistryId, calcFromUrl, navigate, setActiveTool, recordToolAccess, clearTool, addMessage, selectTool]);
 
@@ -395,7 +395,7 @@ function Dashboard() {
     });
     selectTool(action.registryId);
     setActiveTool(action.registryId);
-    navigate('/chat');
+    navigate('/assistant');
     return action;
   };
 
@@ -584,7 +584,7 @@ function Dashboard() {
     }
     if (action.chatSeed) {
       setInput(action.chatSeed);
-      navigate('/chat');
+      navigate('/assistant');
       window.requestAnimationFrame(() => composerInputRef.current?.focus());
     }
   };
@@ -616,7 +616,7 @@ function Dashboard() {
 
   const openChatWithPrompt = (prompt) => {
     setInput(prompt);
-    navigate('/chat');
+    navigate('/assistant');
     window.requestAnimationFrame(() => composerInputRef.current?.focus());
   };
 
@@ -720,7 +720,7 @@ function Dashboard() {
     setOutreachDrawerOpen(false);
     setOutreachForm(OUTREACH_INITIAL_FORM);
     setOutreachDraft(OUTREACH_DRAFT_INITIAL_STATE);
-    navigate('/chat');
+    navigate('/assistant');
   };
 
   const openSensitiveActionConfirmation = (suggestion, onConfirm) => {
@@ -830,10 +830,10 @@ function Dashboard() {
             </div>
             <div>
               <p className="dashboard-chat-eyebrow">
-                {isChatMode ? 'Chat = act with guidance' : 'Pulse = see what matters'}
+                {isChatMode ? 'Assistant = act with guidance' : 'Home = see what matters'}
               </p>
               <h1 id="dashboard-chat-title" className="dashboard-chat-title">
-                {isChatMode ? 'CareDroid clinical chat' : 'Pulse'}
+                {isChatMode ? 'CareDroid Assistant' : 'Home'}
               </h1>
             </div>
           </div>
@@ -894,7 +894,7 @@ function Dashboard() {
               <button
                 type="button"
                 className="dashboard-today-card__action"
-                onClick={() => navigate('/chat')}
+                onClick={() => navigate('/assistant')}
               >
                 Verify in Chat
               </button>
@@ -908,7 +908,7 @@ function Dashboard() {
               </div>
               <div className="dashboard-empty-inner">
                 <div className="dashboard-empty-title">
-                  {isChatMode ? 'CareDroid clinical chat' : 'Start with what matters'}
+                  {isChatMode ? 'CareDroid Assistant' : 'Start with what matters'}
                 </div>
                 <div className="dashboard-empty-copy">
                   {isChatMode

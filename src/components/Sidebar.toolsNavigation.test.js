@@ -31,8 +31,8 @@ describe('View All Tools navigation wiring', () => {
     expect(sidebarSource).toContain('handleViewAllTools');
   });
 
-  it('exposes accessible action library control with active state on /tools', () => {
-    expect(sidebarSource).toContain('Open action library');
+  it('exposes accessible tools workspace control with active state on /tools', () => {
+    expect(sidebarSource).toContain('Open tools workspace');
     expect(sidebarSource).toContain('isOnToolsOverview');
     expect(sidebarSource).toContain("location.pathname === '/tools'");
     expect(sidebarSource).toContain('sidebar-tools-quick-action--active');

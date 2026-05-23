@@ -33,6 +33,8 @@ import HelpCenter from './pages/HelpCenter';
 
 // Authenticated shell pages — lazy for smaller initial JS (mobile LCP)
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
+const Patients = lazyWithRetry(() => import('./pages/Patients'));
+const Operations = lazyWithRetry(() => import('./pages/Operations'));
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
@@ -110,7 +112,7 @@ function AuthPage() {
   const handleAuthSuccess = (token, user) => {
     setAuthToken(token);
     if (user) setUser(user);
-    navigate('/dashboard', { replace: true });
+    navigate('/home', { replace: true });
   };
 
   return <Auth onAuthSuccess={handleAuthSuccess} />;
@@ -190,12 +192,12 @@ function AppShellPage({ children }) {
 
   const handleNewConversation = () => {
     addConversation();
-    navigate({ pathname: '/chat', search: '' }, { replace: true });
+    navigate({ pathname: '/assistant', search: '' }, { replace: true });
   };
 
   const handleSelectConversation = (conversationId) => {
     selectConversation(conversationId);
-    navigate({ pathname: '/chat', search: '' }, { replace: true });
+    navigate({ pathname: '/assistant', search: '' }, { replace: true });
   };
 
   const handleToolSelect = (toolId) => {
@@ -210,7 +212,7 @@ function AppShellPage({ children }) {
       });
     } else {
       setActiveTool(null);
-      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+      navigate({ pathname: '/home', search: '' }, { replace: true });
     }
   };
 
@@ -224,7 +226,7 @@ function AppShellPage({ children }) {
     navigate('/tools/catalog');
   };
 
-  const isConversationViewport = location.pathname === '/dashboard' || location.pathname === '/chat';
+  const isConversationViewport = ['/dashboard', '/home', '/chat', '/assistant'].includes(location.pathname);
 
   return (
     <AppShell
@@ -289,7 +291,7 @@ function AppRoutes() {
     }
 
     if (publicOnly && isAuthenticated) {
-      return <Navigate to="/dashboard" replace />;
+      return <Navigate to="/home" replace />;
     }
 
     if (permission) {
@@ -297,7 +299,7 @@ function AppRoutes() {
         <PermissionGate
           permission={permission}
           requireAll={requireAllPermissions}
-          fallback={<Navigate to="/dashboard" replace />}
+          fallback={<Navigate to="/home" replace />}
         >
           {element}
         </PermissionGate>
@@ -318,8 +320,12 @@ function AppRoutes() {
       publicOnly: true,
     })),
 
+    { path: '/home', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
     { path: '/dashboard', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
+    { path: '/assistant', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
     { path: '/chat', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
+    { path: '/patients', element: <AppShellPage><Patients /></AppShellPage>, requiresAuth: true },
+    { path: '/operations', element: <AppShellPage><Operations /></AppShellPage>, requiresAuth: true },
 
     // Clinical tools: full-page routes; chat-assisted actions use /chat while /dashboard remains Pulse.
     { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
@@ -456,7 +462,7 @@ function AppRoutes() {
       permission: Permission.VIEW_ANALYTICS
     },
 
-    { path: '*', element: isAuthenticated ? <Navigate to="/dashboard" replace /> : <Navigate to="/" replace /> }
+    { path: '*', element: isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/" replace /> }
   ];
 
   return (

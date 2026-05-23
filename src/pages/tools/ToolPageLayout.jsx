@@ -134,17 +134,17 @@ const ToolPageLayout = ({
     <div className={`tool-page${embedded ? ' tool-page--embedded' : ''}`}>
       {!embedded && (
         <div className="tool-breadcrumb">
-          <button type="button" onClick={() => navigate('/dashboard')} className="breadcrumb-link">
+          <button type="button" onClick={() => navigate('/home')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.message} size={16} decorative />
-              <span>Pulse</span>
+              <span>Home</span>
             </span>
           </button>
           <span className="breadcrumb-separator">›</span>
           <button type="button" onClick={() => navigate('/tools')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.tools} size={16} decorative />
-              <span>Actions</span>
+              <span>Tools</span>
             </span>
           </button>
           <span className="breadcrumb-separator">›</span>
@@ -198,7 +198,7 @@ const ToolPageLayout = ({
           ) : (
             <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => navigate('/tools')}>
               <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
-              <span>Action Library</span>
+              <span>Tools</span>
             </button>
           )}
         </div>
@@ -308,9 +308,9 @@ const ToolPageLayout = ({
           <div className="ai-panel-header">
             <h3 className="ai-panel-title-with-icon">
               <NavIcon icon={CHROME_ICONS.bot} size={22} aria-hidden />
-              <span>Open in Chat</span>
+              <span>Open in Assistant</span>
             </h3>
-            <p>Bring this action into Chat to preview, confirm, or ask for guidance.</p>
+            <p>Bring this action into Assistant to preview, confirm, or ask for guidance.</p>
           </div>
           <div className="ai-panel-actions">
             <button
@@ -318,7 +318,7 @@ const ToolPageLayout = ({
               className="btn-ai-action"
               onClick={() => {
                 selectTool(tool.id);
-                navigate('/chat');
+                navigate('/assistant');
               }}
             >
               <span className="btn-icon" aria-hidden>
@@ -331,13 +331,13 @@ const ToolPageLayout = ({
               className="btn-ai-action"
               onClick={() => {
                 selectTool(tool.id);
-                navigate('/chat');
+                navigate('/assistant');
               }}
             >
               <span className="btn-icon" aria-hidden>
                 <NavIcon icon={CHROME_ICONS.bolt} size={18} />
               </span>
-              <span>Use in Chat</span>
+              <span>Use in Assistant</span>
             </button>
           </div>
           <div className="ai-panel-tip">

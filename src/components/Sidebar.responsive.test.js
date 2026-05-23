@@ -75,9 +75,9 @@ describe('Sidebar responsive — desktop collapse unchanged', () => {
 
 describe('Sidebar responsive — active routes and keyboard', () => {
   it('uses nested path matching and aria-current for nav items', () => {
-    expect(sidebarJsx).toContain('isNavPathActive');
-    expect(sidebarJsx).toMatch(/isNavPathActive\(item\.path\)/);
-    expect(sidebarJsx).toMatch(/aria-current=\{isNavPathActive\(item\.path\)/);
+    expect(sidebarJsx).toContain('isNavItemActive');
+    expect(sidebarJsx).toContain('primaryNavPathMatches');
+    expect(sidebarJsx).toMatch(/aria-current=\{isActive \? 'page'/);
   });
 
   it('scrolls active item into view when mobile drawer opens', () => {

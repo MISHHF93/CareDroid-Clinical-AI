@@ -122,7 +122,7 @@ const ToolsOverview = () => {
             <span className="tools-overview-title-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.tools} size={28} />
             </span>{' '}
-            Action Library
+            Tools
           </h1>
           <p className="header-subtitle">
             Pick what you want to do. CareDroid keeps the routes, validation, and execution details underneath.
@@ -358,7 +358,7 @@ const ToolsOverview = () => {
                   handleToolClick(tool);
                 }}
               >
-                {tool.surface === 'chat-assisted' ? 'Start with Chat →' : 'Open →'}
+                {tool.surface === 'chat-assisted' ? 'Start with Assistant →' : 'Open →'}
               </button>
               <button
                 className="btn-chat-tool"
@@ -366,10 +366,10 @@ const ToolsOverview = () => {
                   e.stopPropagation();
                   recordToolAccess(tool.id);
                   selectTool(tool.id);
-                  navigate('/chat');
+                  navigate('/assistant');
                 }}
               >
-                Open in Chat
+                Open in Assistant
               </button>
             </div>
           </div>
@@ -394,8 +394,8 @@ const ToolsOverview = () => {
             <span className="tip-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.messageCircle} size={32} />
             </span>
-            <h3>Open in Chat</h3>
-            <p>Send context to Chat when you want guidance, preview, or confirmation before acting.</p>
+            <h3>Open in Assistant</h3>
+            <p>Send context to Assistant when you want guidance, preview, or confirmation before acting.</p>
           </div>
           <div className="tip-card">
             <span className="tip-icon" aria-hidden>

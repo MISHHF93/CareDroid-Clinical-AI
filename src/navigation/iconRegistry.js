@@ -86,6 +86,12 @@ const FALLBACK = Layers;
 
 /** Primary app routes (Sidebar / Navigation) */
 const NAV_ICONS = {
+  home: LayoutDashboard,
+  assistant: Bot,
+  tools: Wrench,
+  patients: Users,
+  operations: Truck,
+  settings: Settings,
   pulse: LayoutDashboard,
   chat: MessageSquare,
   control: Settings,
@@ -94,7 +100,6 @@ const NAV_ICONS = {
   team: Users,
   audit: ScrollText,
   analytics: LineChart,
-  settings: Settings,
 };
 
 /** Tool registry ids */
