@@ -184,13 +184,13 @@ export function buildResponsiveQaPages() {
     },
     {
       id: 'tools-overview',
-      label: 'Action Library',
+      label: 'Tools',
       path: '/tools',
       category: 'core',
     },
     {
       id: 'tools-catalog',
-      label: 'Clinical tool catalog',
+      label: 'Developer Catalog / Source Audit',
       path: '/tools/catalog',
       category: 'core',
     },

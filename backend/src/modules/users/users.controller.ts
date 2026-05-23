@@ -5,6 +5,7 @@ import { UsersService } from './users.service';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -27,7 +28,7 @@ export class UsersController {
   @Patch('profile')
   @ApiOperation({ summary: 'Update user profile' })
   @RequirePermission(Permission.WRITE_PHI)
-  async updateProfile(@Req() req: any, @Body() updates: any) {
+  async updateProfile(@Req() req: any, @Body() updates: UpdateProfileDto) {
     return this.usersService.updateProfile(
       req.user.id,
       updates,

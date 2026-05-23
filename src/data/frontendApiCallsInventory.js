@@ -18,6 +18,8 @@
 export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'chat-message', method: 'POST', path: '/api/chat/message', client: 'clinicalChatService.js', capability: 'chatMessage' },
   { id: 'chat-intent-classify', method: 'POST', path: '/api/chat/intent-classify', client: 'advancedRecommendationService.js', capability: 'chatIntentClassify' },
+  { id: 'chat-suggest-action', method: 'POST', path: '/api/chat/suggest-action', client: 'clinicalChatService.js', capability: 'chatMessage' },
+  { id: 'chat-analyze-vitals', method: 'POST', path: '/api/chat/analyze-vitals', client: 'clinicalChatService.js', capability: 'chatMessage' },
   { id: 'chat-messages-sync', method: 'POST', path: '/api/chat/messages', client: 'syncService.js', capability: 'chatPersistence', notes: 'No route — gated off' },
   { id: 'chat-conversations-sync', method: 'POST', path: '/api/chat/conversations', client: 'syncService.js', capability: 'chatPersistence' },
 

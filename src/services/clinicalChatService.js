@@ -54,6 +54,38 @@ export async function sendClinicalChatMessage({
   return { ok: response.ok, status: response.status, data };
 }
 
+export async function suggestClinicalAction({ patientId, context = {}, authToken }) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`;
+  }
+
+  const response = await apiFetch('/api/chat/suggest-action', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ patientId, context }),
+  });
+
+  const data = await parseApiResponse(response, { fallback: {} });
+  return { ok: response.ok, status: response.status, data };
+}
+
+export async function analyzeClinicalVitals({ vitals, authToken }) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`;
+  }
+
+  const response = await apiFetch('/api/chat/analyze-vitals', {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ vitals }),
+  });
+
+  const data = await parseApiResponse(response, { fallback: {} });
+  return { ok: response.ok, status: response.status, data };
+}
+
 /**
  * Normalize API toolResult so ToolCard receives { toolId, toolName, result: { data, ... } }.
  * @param {object|undefined} tr

@@ -1,4 +1,4 @@
-import './ClinicalAlertBanner.jsx';
+import './ClinicalAlertBanner.css';
 
 const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
   if (!alert) return null;

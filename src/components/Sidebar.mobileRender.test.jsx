@@ -93,6 +93,8 @@ describe('Sidebar mobile render state', () => {
     const { container } = renderSidebar({ layoutCompact: false, sidebarCollapsed: false });
 
     expect(screen.getByText('Actions')).toBeInTheDocument();
+    expect(screen.getByText('Developer Catalog / Source Audit')).toBeInTheDocument();
+    expect(screen.getByText('Browse All Tools')).toBeInTheDocument();
     const toolCards = container.querySelectorAll('.sidebar-tool-card');
     expect(toolCards.length).toBeGreaterThan(0);
     expect(toolCards[0].querySelector('.sidebar-tool-card-name')?.textContent?.trim().length).toBeGreaterThan(

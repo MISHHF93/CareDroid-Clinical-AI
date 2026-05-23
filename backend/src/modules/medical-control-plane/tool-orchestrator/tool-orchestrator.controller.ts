@@ -19,6 +19,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ToolOrchestratorService } from './tool-orchestrator.service';
 import {
   ExecuteToolDto,
+  RecordToolResultDto,
   ToolExecutionBodyDto,
   ToolExecutionResponseDto,
   ToolListDto,
@@ -142,7 +143,7 @@ export class ToolOrchestratorController {
   @Post('results')
   @HttpCode(HttpStatus.OK)
   async recordToolResult(
-    @Body() body: { toolType: string; input?: any; output?: any; timestamp?: string },
+    @Body() body: RecordToolResultDto,
     @Request() req: any,
   ) {
     const userId = req.user?.id || 'anonymous';

@@ -3,6 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { AIService } from '../ai/ai.service';
 import { IntentClassifierService } from '../medical-control-plane/intent-classifier/intent-classifier.service';
 import { ToolOrchestratorService } from '../medical-control-plane/tool-orchestrator/tool-orchestrator.service';
+import {
+  ToolExecutionErrorCode,
+  UNSUPPORTED_ORCHESTRATOR_TOOL_DOCS,
+} from '../medical-control-plane/tool-orchestrator/tool-orchestrator.registry';
 import { EmergencyEscalationService } from '../medical-control-plane/emergency-escalation/emergency-escalation.service';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
@@ -686,15 +690,34 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
 
       if (error instanceof NotFoundException) {
         this.logger.warn(
-          `No orchestrator registered for toolId=${toolId}; falling back to general clinical response`,
+          `No orchestrator registered for toolId=${toolId}; returning structured unsupported-tool response`,
         );
-        const fallback = await this.generateAIResponse(
-          `${message}\n\n(Note: Clinical tool "${toolId}" is not available as an automated executor in this deployment. Provide general educational guidance and state limitations clearly.)`,
-          { intentClassification: classification },
+        const unsupportedDoc = UNSUPPORTED_ORCHESTRATOR_TOOL_DOCS.find(
+          (doc) => doc.nluToolId === toolId,
         );
         return {
-          ...fallback,
+          text:
+            `**${this.getToolInfo(toolId).name} is not available as an automated backend executor.**\n\n` +
+            'This CareDroid deployment can still route you to the supported frontend workflow when one exists, but it will not run a backend `/tools/:id/execute` action for this tool.',
+          suggestions: ['Open supported workflow', 'Ask general clinical question'],
+          visualizations: [
+            {
+              type: 'unsupported-tool',
+              data: {
+                code: ToolExecutionErrorCode.UNSUPPORTED_TOOL,
+                toolId,
+                frontendSurface: unsupportedDoc?.frontendSurface || 'chat-assisted',
+                registryId: unsupportedDoc?.registryId,
+              },
+            },
+          ],
           intentClassification: classification,
+          toolResult: {
+            toolId,
+            errorCode: ToolExecutionErrorCode.UNSUPPORTED_TOOL,
+            frontendSurface: unsupportedDoc?.frontendSurface || 'chat-assisted',
+            registryId: unsupportedDoc?.registryId,
+          },
         };
       }
 

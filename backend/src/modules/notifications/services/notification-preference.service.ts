@@ -1,22 +1,61 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 import { NotificationPreference } from '../entities/notification-preference.entity';
 import { User } from '../../users/entities/user.entity';
 
-export interface UpdatePreferencesDto {
+export class UpdatePreferencesDto {
+  @IsOptional()
+  @IsBoolean()
   emergencyAlerts?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   medicationReminders?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   appointmentReminders?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   labResults?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   marketingCommunications?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   securityAlerts?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   systemUpdates?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   pushEnabled?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   emailEnabled?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   smsEnabled?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
   quietHoursEnabled?: boolean;
+
+  @IsOptional()
+  @IsString()
   quietHoursStart?: string;
+
+  @IsOptional()
+  @IsString()
   quietHoursEnd?: string;
 }
 

@@ -170,7 +170,7 @@ function WelcomePage() {
 }
 
 function AppShellPage({ children }) {
-  const { signOut } = useUser();
+  const { signOut, user, isDevAuthBypass } = useUser();
   const {
     conversations,
     activeConversationId,
@@ -241,6 +241,8 @@ function AppShellPage({ children }) {
       onToolSelect={handleToolSelect}
       onOpenToolsOverview={handleOpenToolsOverview}
       onOpenToolsCatalog={handleOpenToolsCatalog}
+      isDevAuthBypass={isDevAuthBypass}
+      devAuthBannerLabel={user?.devAuthLabel || 'Demo / Local Dev Mode'}
     >
       <div
         className={`app-shell-page-body${isConversationViewport ? ' app-shell-page-body--conversation' : ''}`}

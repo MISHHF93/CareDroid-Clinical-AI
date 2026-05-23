@@ -1,14 +1,27 @@
 import { Injectable, Logger, NotFoundException, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { DeviceToken, DevicePlatform } from '../entities/device-token.entity';
 import { User } from '../../users/entities/user.entity';
 
-export interface RegisterDeviceDto {
+export class RegisterDeviceDto {
+  @IsString()
   token: string;
+
+  @IsEnum(DevicePlatform)
   platform: DevicePlatform;
+
+  @IsOptional()
+  @IsString()
   deviceModel?: string;
+
+  @IsOptional()
+  @IsString()
   osVersion?: string;
+
+  @IsOptional()
+  @IsString()
   appVersion?: string;
 }
 

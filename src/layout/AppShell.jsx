@@ -29,6 +29,8 @@ const AppShell = ({
   onOpenToolsOverview = null,
   onOpenToolsCatalog = null,
   onFeatureSelect = null,
+  isDevAuthBypass = false,
+  devAuthBannerLabel = 'Demo / Local Dev Mode',
   children,
 }) => {
   const { preference, resolvedTheme, setPreference } = useTheme();
@@ -192,6 +194,12 @@ const AppShell = ({
               );
             })}
           </nav>
+        )}
+        {isAuthed && isDevAuthBypass && (
+          <div className="app-shell-dev-mode-banner" role="status">
+            <strong>{devAuthBannerLabel}</strong> is active. This session uses a mock local clinician profile and
+            does not weaken production authentication.
+          </div>
         )}
         {children}
       </div>

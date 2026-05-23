@@ -591,20 +591,20 @@ const Sidebar = forwardRef(function Sidebar(
                   <span className="section-icon--svg" aria-hidden>
                     <NavIcon icon={CHROME_ICONS.tools} size={14} />
                   </span>
-                <span>Trust Details</span>
+                  <span>Developer Catalog / Source Audit</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleViewAllTools}
-                  aria-label="Open tools workspace"
+                  aria-label="Open canonical tools browser"
                   aria-current={isOnToolsOverview ? 'page' : undefined}
                   className={`sidebar-tools-quick-action${isOnToolsOverview ? ' sidebar-tools-quick-action--active' : ''}`}
                 >
                   <span className="section-icon--svg" aria-hidden>
                     <NavIcon icon={CHROME_ICONS.bolt} size={14} />
                   </span>
-                  <span>Tools</span>
+                  <span>Browse All Tools</span>
                 </button>
               </div>
             )}

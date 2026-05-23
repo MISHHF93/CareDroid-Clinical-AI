@@ -32,15 +32,16 @@ describe('View All Tools navigation wiring', () => {
   });
 
   it('exposes accessible tools workspace control with active state on /tools', () => {
-    expect(sidebarSource).toContain('Open tools workspace');
+    expect(sidebarSource).toContain('Open canonical tools browser');
+    expect(sidebarSource).toContain('Browse All Tools');
     expect(sidebarSource).toContain('isOnToolsOverview');
     expect(sidebarSource).toContain("location.pathname === '/tools'");
     expect(sidebarSource).toContain('sidebar-tools-quick-action--active');
   });
 
-  it('keeps the catalog route available behind trust details', () => {
+  it('keeps the source audit route available as a developer catalog', () => {
     expect(sidebarSource).toContain('Open developer catalog and source audit');
-    expect(sidebarSource).toContain('Trust Details');
+    expect(sidebarSource).toContain('Developer Catalog / Source Audit');
     expect(sidebarSource).toContain("navigate('/tools/catalog')");
   });
 

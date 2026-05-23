@@ -3,8 +3,11 @@
 .auth-shell {
   box-sizing: border-box;
   width: 100%;
+  min-width: 0;
   min-height: 100%;
   min-height: 100dvh;
+  height: var(--app-viewport-height, 100dvh);
+  max-height: var(--app-viewport-height, 100dvh);
   margin: 0;
   padding: max(12px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
     max(max(20px, env(safe-area-inset-bottom)), 12px) max(16px, env(safe-area-inset-left));
@@ -14,12 +17,18 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
 }
 
 .auth-shell-card {
   box-sizing: border-box;
   width: 100%;
   max-width: min(100%, 440px);
+  min-width: 0;
   margin: 0 auto;
   padding: clamp(20px, 4vw, 28px);
   padding-bottom: max(clamp(22px, 5vw, 32px), env(safe-area-inset-bottom));
@@ -31,6 +40,7 @@
   flex-direction: column;
   gap: 0;
   flex-shrink: 0;
+  overflow: visible;
 }
 
 .auth-shell-brandbar {
@@ -58,6 +68,7 @@
 .auth-shell-body {
   width: 100%;
   min-width: 0;
+  min-height: 0;
 }
 
 @media (min-width: 520px) {

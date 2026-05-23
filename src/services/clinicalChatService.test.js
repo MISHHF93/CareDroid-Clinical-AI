@@ -1,8 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
+  analyzeClinicalVitals,
   mapChatResponseToAssistantMessage,
   normalizeToolResultForUi,
   sendClinicalChatMessage,
+  suggestClinicalAction,
 } from './clinicalChatService';
 
 vi.mock('./apiClient', () => ({
@@ -63,5 +65,55 @@ describe('clinicalChatService', () => {
     expect(body.message).toBe('hi');
     expect(body.tool).toBe('drug-interactions');
     expect(body.conversationId).toBe(12);
+  });
+
+  it('suggestClinicalAction posts patient context', async () => {
+    apiFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ suggestion: 'review vitals' }),
+    });
+
+    const res = await suggestClinicalAction({
+      patientId: 'patient-1',
+      context: { setting: 'icu' },
+      authToken: 'tok',
+    });
+
+    expect(res.ok).toBe(true);
+    expect(apiFetch).toHaveBeenCalledWith(
+      '/api/chat/suggest-action',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer tok' }),
+      }),
+    );
+    expect(JSON.parse(apiFetch.mock.calls[0][1].body)).toEqual({
+      patientId: 'patient-1',
+      context: { setting: 'icu' },
+    });
+  });
+
+  it('analyzeClinicalVitals posts vitals payload', async () => {
+    apiFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ risk: 'low' }),
+    });
+
+    const res = await analyzeClinicalVitals({
+      vitals: { hr: 88 },
+      authToken: 'tok',
+    });
+
+    expect(res.ok).toBe(true);
+    expect(apiFetch).toHaveBeenCalledWith(
+      '/api/chat/analyze-vitals',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer tok' }),
+      }),
+    );
+    expect(JSON.parse(apiFetch.mock.calls[0][1].body)).toEqual({
+      vitals: { hr: 88 },
+    });
   });
 });

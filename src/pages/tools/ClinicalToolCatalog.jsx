@@ -23,11 +23,14 @@ import {
   collaborationCapabilities,
   getAllDiscoveredTools,
   getSourceCodeDiscoverySummary,
+  aliasOnlyToolReferences,
+  apiOnlyToolReferences,
   orchestratorApiCapabilities,
   phantomToolReferences,
   routingCapabilities,
   SOURCE_SCAN_LOCATIONS,
   toolIdAliases,
+  truePhantomToolReferences,
 } from '../../data/sourceCodeToolDiscovery';
 import {
   resolveCatalogLaunch,
@@ -965,10 +968,11 @@ const ClinicalToolCatalog = () => {
           </table>
         </div>
         <details className="catalog-details">
-          <summary>Phantom / roadmap IDs ({phantomToolReferences.length})</summary>
+          <summary>Source-audit-only IDs ({phantomToolReferences.length})</summary>
           <p className="catalog-section-desc">
-            Referenced in recommendation or cost code but not implemented as pages or orchestrator
-            tools: {phantomToolReferences.map((p) => p.id).join(', ')}.
+            True phantoms: {truePhantomToolReferences.map((p) => p.id).join(', ') || 'none'}.
+            API-only: {apiOnlyToolReferences.map((p) => p.id).join(', ') || 'none'}.
+            Aliases: {aliasOnlyToolReferences.map((p) => p.id).join(', ') || 'none'}.
           </p>
         </details>
         <details className="catalog-details">

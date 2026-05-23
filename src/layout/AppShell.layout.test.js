@@ -14,6 +14,7 @@ import {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appShellCss = readFileSync(join(__dirname, 'AppShell.css'), 'utf8');
+const authShellCss = readFileSync(join(__dirname, 'AuthShell.css'), 'utf8');
 const layoutTokensCss = readFileSync(join(__dirname, '../styles/layout-breakpoints.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const appShellJsx = readFileSync(join(__dirname, 'AppShell.jsx'), 'utf8');
@@ -30,6 +31,13 @@ describe('App shell layout — root and scroll', () => {
     expect(layoutTokensCss).toContain('--app-compact-content-offset-top');
     expect(COMPACT_CHROME_HEIGHT_PX).toBe(52);
     expect(COMPACT_CHROME_HEIGHT_LANDSCAPE_PX).toBe(44);
+  });
+
+  it('auth shell owns vertical scrolling under the locked root', () => {
+    expect(authShellCss).toMatch(/\.auth-shell[\s\S]*height:\s*var\(--app-viewport-height/);
+    expect(authShellCss).toMatch(/\.auth-shell[\s\S]*overflow-y:\s*auto/);
+    expect(authShellCss).toMatch(/\.auth-shell[\s\S]*overflow-x:\s*clip/);
+    expect(authShellCss).toMatch(/\.auth-shell-card[\s\S]*min-width:\s*0/);
   });
 });
 
@@ -60,6 +68,7 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-y:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-x:\s*clip/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*min-width:\s*0/);
+    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*height:\s*auto/);
   });
 
   it('reserves compact chrome offset on scrollport (not hidden behind menu/theme)', () => {
@@ -81,6 +90,12 @@ describe('App shell layout — page scrollport', () => {
   it('page roots fill width without exceeding scrollport', () => {
     expect(appShellCss).toMatch(/\.app-shell-page-body > \*[\s\S]*min-width:\s*0/);
     expect(appShellCss).toMatch(/\.app-shell-page-body > \*[\s\S]*max-width:\s*100%/);
+  });
+
+  it('renders an explicit dev/demo mode banner without changing the scrollport', () => {
+    expect(appShellJsx).toContain('app-shell-dev-mode-banner');
+    expect(appShellJsx).toContain('isDevAuthBypass');
+    expect(appShellCss).toMatch(/\.app-shell-dev-mode-banner[\s\S]*flex:\s*0 0 auto/);
   });
 
   it('scroll routes grow with content instead of clipping inside page-body', () => {

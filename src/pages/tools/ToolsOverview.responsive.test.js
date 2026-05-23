@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const toolsOverviewCss = readFileSync(join(__dirname, 'ToolsOverview.css'), 'utf8');
+const toolsOverviewJsx = readFileSync(join(__dirname, 'ToolsOverview.jsx'), 'utf8');
 
 describe('ToolsOverview responsive layout', () => {
   it('wraps cards and prevents tool metadata overflow', () => {
@@ -34,5 +35,9 @@ describe('ToolsOverview responsive layout', () => {
     expect(toolsOverviewCss).toMatch(
       /@media \(max-width: 768px\)[\s\S]*\.tools-discovery-controls[\s\S]*grid-template-columns:\s*1fr/
     );
+  });
+
+  it('labels the source audit as a developer catalog, not another user-facing tools catalog', () => {
+    expect(toolsOverviewJsx).toContain('Developer Catalog / Source Audit');
   });
 });

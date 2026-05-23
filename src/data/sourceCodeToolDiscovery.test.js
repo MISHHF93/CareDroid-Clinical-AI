@@ -7,9 +7,12 @@ import { builtinUiCalculators, clinicalIntentTools } from './clinicalIntentToolC
 import {
   getAllDiscoveredTools,
   getSourceCodeDiscoverySummary,
+  aliasOnlyToolReferences,
+  apiOnlyToolReferences,
   phantomToolReferences,
   SOURCE_SCAN_LOCATIONS,
   toolIdAliases,
+  truePhantomToolReferences,
 } from './sourceCodeToolDiscovery';
 import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
 import { emergencyPatternGroups } from './emergencyPatternCatalog';
@@ -56,6 +59,19 @@ describe('sourceCodeToolDiscovery', () => {
     for (const key of COST_TRACKING_EXTRA_TOOL_KEYS) {
       expect(phantomIds.has(key)).toBe(true);
     }
+  });
+
+  it('separates true phantoms from API-only and alias-only source-audit references', () => {
+    expect(truePhantomToolReferences.map((p) => p.id)).toEqual(
+      expect.arrayContaining(['abc-assessment', 'trauma-score', 'cancer-calculator'])
+    );
+    expect(apiOnlyToolReferences.map((p) => p.id)).toContain('vitals-monitor');
+    expect(aliasOnlyToolReferences.map((p) => p.id)).toEqual(
+      expect.arrayContaining(['bleeding-risk', 'medication-checker'])
+    );
+    expect(new Set(phantomToolReferences.map((p) => p.sourceScanKind))).toEqual(
+      new Set(['true-phantom', 'api-only', 'alias'])
+    );
   });
 
   it('documents drug-interaction-checker, sofa_calculator, and bleeding-risk aliases', () => {

@@ -21,7 +21,7 @@ import OrderSetAi from '../pages/tools/OrderSetAi';
 import AiExplainability from '../pages/tools/AiExplainability';
 import ClinicalAudit from '../pages/tools/ClinicalAudit';
 import Dashboard from '../pages/Dashboard';
-import { CORE_ROUTE_SMOKE } from './responsiveRegression.routes';
+import { CORE_ROUTE_SMOKE, TIER_A_FORM_SMOKE_SLUGS } from './responsiveRegression.routes';
 
 vi.mock('../pages/tools/Calculators.css', () => ({}));
 vi.mock('../pages/tools/ToolPageLayout.css', () => ({}));
@@ -166,6 +166,37 @@ describe('Route pages smoke — compact viewport (no crash)', () => {
         expect(await screen.findByRole('heading', { level: 1, name: heading })).toBeInTheDocument();
       }
 
+      expectNonEmptyPage(container);
+    },
+    15_000
+  );
+});
+
+describe('Route pages smoke — calculator forms', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    Element.prototype.scrollTo = vi.fn();
+    Element.prototype.scrollIntoView = vi.fn();
+    mockCompactViewport(true);
+  });
+
+  it.each(TIER_A_FORM_SMOKE_SLUGS)(
+    '$slug renders scrollable calculator content',
+    async ({ slug, interfaceClass }) => {
+      const path = `/tools/calculators/${slug}`;
+      const { container } = render(
+        <MemoryRouter initialEntries={[path]}>
+          <Routes>
+            <Route
+              path="/tools/calculators/:slug"
+              element={<Calculators initialCalculatorId={slug} />}
+            />
+          </Routes>
+        </MemoryRouter>
+      );
+
+      expect(await screen.findByRole('heading', { level: 1, name: /medical calculators/i })).toBeInTheDocument();
+      expect(container.querySelector(`.${interfaceClass}`), slug).toBeTruthy();
       expectNonEmptyPage(container);
     },
     15_000

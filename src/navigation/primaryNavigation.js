@@ -73,7 +73,6 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
       '/two-factor-setup',
       '/biometric-setup',
       '/onboarding',
-      '/tools/catalog',
     ],
   },
 ]);

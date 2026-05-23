@@ -11,7 +11,7 @@ import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes.js';
 export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'dashboard', path: '/dashboard', match: 'heading', heading: /pulse/i },
   { id: 'chat', path: '/chat', match: 'composer' },
-  { id: 'tools-overview', path: '/tools', match: 'heading', heading: /action library/i },
+  { id: 'tools-overview', path: '/tools', match: 'heading', heading: /^tools$/i },
   { id: 'tools-catalog', path: '/tools/catalog', match: 'heading', heading: /developer catalog \/ source audit/i },
   { id: 'calculators-hub', path: '/tools/calculators', match: 'heading', heading: /medical calculators/i },
   {

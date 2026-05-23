@@ -144,7 +144,7 @@ button.auth-oauth-btn {
   background: var(--app-divider-on-surface);
 }
 
-/* One-click developer sign-in (dev / localhost / VITE_SHOW_DEMO_AUTH) */
+/* Explicit one-click demo/local sign-in (VITE_ENABLE_DEV_AUTH_BYPASS=true only) */
 .auth-dev-oneclick {
   margin-bottom: 20px;
   padding: 14px;

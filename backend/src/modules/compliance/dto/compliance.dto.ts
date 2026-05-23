@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsBoolean } from 'class-validator';
+import { IsBoolean, IsEmail, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class DeleteAccountDto {
@@ -7,10 +7,16 @@ export class DeleteAccountDto {
   confirmEmail: string;
 }
 
+export enum ConsentType {
+  MARKETING = 'marketing',
+  DATA_PROCESSING = 'data_processing',
+  THIRD_PARTY_SHARING = 'third_party_sharing',
+}
+
 export class UpdateConsentDto {
-  @ApiProperty({ example: 'marketing', enum: ['marketing', 'analytics', 'thirdParty'] })
-  @IsString()
-  consentType: string;
+  @ApiProperty({ example: ConsentType.MARKETING, enum: ConsentType })
+  @IsEnum(ConsentType)
+  consentType: ConsentType;
 
   @ApiProperty({ example: true })
   @IsBoolean()

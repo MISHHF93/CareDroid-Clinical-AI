@@ -16,6 +16,7 @@ jest.mock('bcrypt');
 describe('AuthService', () => {
   let service: AuthService;
   let jwtService: JwtService;
+  const originalNodeEnv = process.env.NODE_ENV;
 
   const mockUser = {
     id: '1',
@@ -113,6 +114,9 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    delete process.env.ENABLE_DEV_AUTH_BYPASS;
+    delete process.env.VITE_ENABLE_DEV_AUTH_BYPASS;
+    process.env.NODE_ENV = originalNodeEnv;
     mockConfigService.get.mockImplementation((key: string) => {
       switch (key) {
         case 'jwt':
@@ -132,6 +136,12 @@ describe('AuthService', () => {
           return undefined;
       }
     });
+  });
+
+  afterAll(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+    delete process.env.ENABLE_DEV_AUTH_BYPASS;
+    delete process.env.VITE_ENABLE_DEV_AUTH_BYPASS;
   });
 
   it('should be defined', () => {
@@ -180,6 +190,23 @@ describe('AuthService', () => {
 
       await expect(service.login(loginDto, '192.168.1.1', 'test-agent')).rejects.toThrow(
         'Invalid credentials',
+      );
+    });
+  });
+
+  describe('createDevSession', () => {
+    it('requires an explicit development bypass flag', async () => {
+      await expect(service.createDevSession('127.0.0.1', 'test-agent')).rejects.toThrow(
+        'ENABLE_DEV_AUTH_BYPASS',
+      );
+    });
+
+    it('refuses production even when the bypass flag is set', async () => {
+      process.env.ENABLE_DEV_AUTH_BYPASS = 'true';
+      process.env.NODE_ENV = 'production';
+
+      await expect(service.createDevSession('127.0.0.1', 'test-agent')).rejects.toThrow(
+        'Dev session is not available in production',
       );
     });
   });

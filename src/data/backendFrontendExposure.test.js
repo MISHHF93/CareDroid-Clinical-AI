@@ -85,6 +85,17 @@ describe('backendFrontendExposure scan', () => {
     expect(scan.unguarded).toHaveLength(0);
   });
 
+  it('surfaces chat next-action and vitals endpoints through the canonical frontend inventory', () => {
+    expect(FRONTEND_API_CALLS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ method: 'POST', path: '/api/chat/suggest-action' }),
+        expect.objectContaining({ method: 'POST', path: '/api/chat/analyze-vitals' }),
+      ])
+    );
+    expect(findBackendRoute('POST', '/api/chat/suggest-action')).toBeTruthy();
+    expect(findBackendRoute('POST', '/api/chat/analyze-vitals')).toBeTruthy();
+  });
+
   it('classifies frontend, backend-only, missing-route, and executor capabilities', () => {
     const rows = buildBackendFrontendCapabilityRows();
     const classifications = new Set(rows.map((row) => row.classification));

@@ -24,15 +24,16 @@ import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
 import { nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
 
 /**
- * Phantom / roadmap IDs referenced in cost tracking, NLU recommendations, or tests
- * but with NO page, NO orchestrator, and NO tool.patterns entry.
+ * Source-audit-only references. Keep these split so Developer Catalog can
+ * distinguish true missing tools from aliases and API-only capabilities.
  */
-export const phantomToolReferences = [
+export const truePhantomToolReferences = [
   {
     id: 'abc-assessment',
     name: 'ABC Emergency Assessment',
     source: 'src/services/advancedRecommendationService.js, src/contexts/CostTrackingContext.jsx',
     status: 'phantom',
+    sourceScanKind: 'true-phantom',
     category: 'emergency',
     notes: 'Recommended for emergency_assessment intent; no UI or backend executor.',
   },
@@ -41,32 +42,16 @@ export const phantomToolReferences = [
     name: 'Trauma Severity Score',
     source: 'advancedRecommendationService.js, CostTrackingContext.jsx, WorkspaceContext.test.jsx',
     status: 'phantom',
+    sourceScanKind: 'true-phantom',
     category: 'calculator',
     notes: 'Maps to calculators hub in recommendations only; no trauma calculator form.',
-  },
-  {
-    id: 'vitals-monitor',
-    name: 'Vitals Monitor',
-    source: 'advancedRecommendationService.js, CostTrackingContext.jsx',
-    status: 'phantom',
-    category: 'monitoring',
-    notes: 'POST /api/chat/analyze-vitals exists; no dedicated vitals tool page.',
-    relatedApi: 'POST /api/chat/analyze-vitals',
-  },
-  {
-    id: 'bleeding-risk',
-    name: 'Bleeding Risk Calculator',
-    source: 'CostTrackingContext.jsx',
-    status: 'phantom',
-    category: 'calculator',
-    notes:
-      'Cost category id; launch resolves to HAS-BLED registry (/tools/calculators/has-bled) via NLU_TO_REGISTRY_ID + toolIdAliases.',
   },
   {
     id: 'cancer-calculator',
     name: 'Oncology Risk Calculator',
     source: 'advancedRecommendationService.js',
     status: 'phantom',
+    sourceScanKind: 'true-phantom',
     category: 'oncology',
     notes: 'NLU recommendations only; not in tool.patterns or Calculators.jsx.',
   },
@@ -75,6 +60,7 @@ export const phantomToolReferences = [
     name: 'Tumor Staging Guide',
     source: 'advancedRecommendationService.js, CostTrackingContext.jsx',
     status: 'phantom',
+    sourceScanKind: 'true-phantom',
     category: 'oncology',
     notes: 'Recommendation + cost tracking only.',
   },
@@ -83,14 +69,42 @@ export const phantomToolReferences = [
     name: 'Chemotherapy Dosing Calculator',
     source: 'advancedRecommendationService.js, CostTrackingContext.jsx',
     status: 'phantom',
+    sourceScanKind: 'true-phantom',
     category: 'oncology',
     notes: 'Recommendation + cost tracking only.',
+  },
+];
+
+export const apiOnlyToolReferences = [
+  {
+    id: 'vitals-monitor',
+    name: 'Vitals Monitor',
+    source: 'advancedRecommendationService.js, CostTrackingContext.jsx',
+    status: 'phantom',
+    sourceScanKind: 'api-only',
+    category: 'monitoring',
+    notes: 'POST /api/chat/analyze-vitals exists; no dedicated vitals tool page.',
+    relatedApi: 'POST /api/chat/analyze-vitals',
+  },
+];
+
+export const aliasOnlyToolReferences = [
+  {
+    id: 'bleeding-risk',
+    name: 'Bleeding Risk Calculator',
+    source: 'CostTrackingContext.jsx',
+    status: 'phantom',
+    sourceScanKind: 'alias',
+    category: 'calculator',
+    notes:
+      'Cost category id; launch resolves to HAS-BLED registry (/tools/calculators/has-bled) via NLU_TO_REGISTRY_ID + toolIdAliases.',
   },
   {
     id: 'antibiotic-scripts',
     name: 'Antibiotic Scripts',
     source: 'advancedRecommendationService.js, CostTrackingContext.jsx',
     status: 'phantom',
+    sourceScanKind: 'alias',
     category: 'medication',
     notes: 'Overlaps NLU antibiotic-guide → diagnosis page; separate id unused in UI.',
   },
@@ -99,9 +113,16 @@ export const phantomToolReferences = [
     name: 'Medication Checker (offline label)',
     source: 'src/contexts/OfflineProvider.jsx, OfflineSupport.jsx',
     status: 'phantom',
+    sourceScanKind: 'alias',
     category: 'medication',
     notes: 'Offline cache category label; alias of drug-check conceptually.',
   },
+];
+
+export const phantomToolReferences = [
+  ...truePhantomToolReferences,
+  ...apiOnlyToolReferences,
+  ...aliasOnlyToolReferences,
 ];
 
 /** Marketing / legal copy not backed by code */
@@ -789,6 +810,9 @@ export function getSourceCodeDiscoverySummary() {
     nluProfiles: clinicalIntentTools.length,
     chatApis: count('chat-api'),
     phantomOrPlanned: phantomToolReferences.length,
+    truePhantoms: truePhantomToolReferences.length,
+    apiOnlyReferences: apiOnlyToolReferences.length,
+    aliasOnlyReferences: aliasOnlyToolReferences.length,
     marketingOnly: marketingOnlyMentions.length,
     aliases: toolIdAliases.length,
     clientCapabilities: clientClinicalCapabilities.length,
@@ -817,7 +841,9 @@ export const SOURCE_SCAN_LOCATIONS = [
   },
   { label: 'Sidebar registry', path: 'src/data/toolRegistry.js', count: toolRegistry.length },
   { label: 'Emergency NLU patterns', path: 'src/data/emergencyPatternCatalog.js', count: emergencyPatternGroups.length },
-  { label: 'Phantom / roadmap IDs', path: 'CostTrackingContext, advancedRecommendationService', count: phantomToolReferences.length },
+  { label: 'Phantom / roadmap IDs', path: 'CostTrackingContext, advancedRecommendationService', count: truePhantomToolReferences.length },
+  { label: 'API-only source-audit IDs', path: 'backend route exposure policy', count: apiOnlyToolReferences.length },
+  { label: 'Alias-only source-audit IDs', path: 'CostTrackingContext, OfflineProvider', count: aliasOnlyToolReferences.length },
   { label: 'Client clinical helpers', path: 'riskScoring.js, clinicalInsights.js, ToolVisualization.jsx', count: clientClinicalCapabilities.length },
   { label: 'Orchestrator API endpoints', path: 'tool-orchestrator.controller.ts', count: orchestratorApiCapabilities.length },
   { label: 'Platform features', path: 'src/data/featureInventory.js', count: platformFeatures.length },

@@ -15,6 +15,7 @@ import {
   dismissOverlays,
   installQaNetworkStubs,
   measurePageOverflow,
+  measureVerticalScrollAccess,
   seedQaAuth,
   waitForAppReady,
 } from './responsive-qa.helpers.mjs';
@@ -66,9 +67,14 @@ for (const pageDef of PAGES) {
       expect(url).toContain(pageDef.path.split('?')[0]);
 
       const overflow = await measurePageOverflow(page);
+      const verticalScroll = await measureVerticalScrollAccess(page);
 
       test.info().attach('overflow-report', {
         body: JSON.stringify(overflow, null, 2),
+        contentType: 'application/json',
+      });
+      test.info().attach('vertical-scroll-report', {
+        body: JSON.stringify(verticalScroll, null, 2),
         contentType: 'application/json',
       });
 
@@ -81,6 +87,11 @@ for (const pageDef of PAGES) {
           `[${projectName}] ${pageDef.id} ${viewport.id}: horizontal overflow — ${detail}`
         ).toBe(true);
       }
+
+      expect(
+        verticalScroll.pass,
+        `[${projectName}] ${pageDef.id} ${viewport.id}: content scrollport is not usable — ${JSON.stringify(verticalScroll)}`
+      ).toBe(true);
     });
   }
 }

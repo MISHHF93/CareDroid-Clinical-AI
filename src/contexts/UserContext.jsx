@@ -92,6 +92,7 @@ const UserContext = createContext({
   user: null,
   authToken: '',
   isAuthenticated: false,
+  isDevAuthBypass: false,
   isLoading: true,
   hasPermission: () => false,
   hasAnyPermission: () => false,
@@ -263,6 +264,11 @@ export const UserProvider = ({ children }) => {
   };
 
   const isAuthenticated = Boolean(authToken && user);
+  const isDevAuthBypass = Boolean(
+    user?.isDevAuthBypass ||
+      user?.authMode === 'local-dev-demo' ||
+      user?.authMode === 'dev-demo'
+  );
 
   // Debug logging for authentication state changes
   useEffect(() => {
@@ -270,16 +276,18 @@ export const UserProvider = ({ children }) => {
       hasAuthToken: Boolean(authToken),
       hasUser: Boolean(user),
       isAuthenticated,
+      isDevAuthBypass,
     });
     if (user) {
       logger.debug('User details', { id: user.id, email: user.email, role: user.role });
     }
-  }, [isAuthenticated, authToken, user]);
+  }, [isAuthenticated, isDevAuthBypass, authToken, user]);
 
   const value = {
     user,
     authToken,
     isAuthenticated,
+    isDevAuthBypass,
     isLoading,
     hasPermission,
     hasAnyPermission,

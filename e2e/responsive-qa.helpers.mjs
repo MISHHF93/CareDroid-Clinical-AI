@@ -84,6 +84,38 @@ export async function measurePageOverflow(page) {
   }, { tolerance: TOLERANCE_PX, allowedAncestors: ALLOWED_OVERFLOW_ANCESTORS });
 }
 
+/**
+ * Verify the app exposes a usable vertical scrollport when content exceeds the viewport.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function measureVerticalScrollAccess(page) {
+  return page.evaluate(({ tolerance }) => {
+    const scrollport =
+      document.querySelector('.app-shell-page-body:not(.app-shell-page-body--conversation)') ||
+      document.querySelector('.auth-shell') ||
+      document.scrollingElement ||
+      document.documentElement;
+    const style = getComputedStyle(scrollport);
+    const overflowAmount = scrollport.scrollHeight - scrollport.clientHeight;
+    const needsScroll = overflowAmount > tolerance;
+    const canScroll = /(auto|scroll)/.test(style.overflowY);
+    const rect = scrollport.getBoundingClientRect();
+
+    return {
+      pass: rect.width > 0 && rect.height > 0 && (!needsScroll || canScroll),
+      selector:
+        scrollport.className && typeof scrollport.className === 'string'
+          ? `.${scrollport.className.trim().split(/\s+/).join('.')}`
+          : scrollport.tagName.toLowerCase(),
+      clientHeight: Math.round(scrollport.clientHeight),
+      scrollHeight: Math.round(scrollport.scrollHeight),
+      overflowY: style.overflowY,
+      needsScroll,
+      canScroll,
+    };
+  }, { tolerance: TOLERANCE_PX });
+}
+
 export const QA_AUTH_STORAGE = {
   caredroid_access_token: 'responsive-qa-token',
   caredroid_user_profile: JSON.stringify({

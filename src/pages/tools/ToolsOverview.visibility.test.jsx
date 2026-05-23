@@ -78,6 +78,10 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(new Set(renderedIds).size).toBe(renderedIds.length);
     for (const record of userFacing) {
       expect(renderedIds, record.id).toContain(record.id);
+      const card = toolCard(container, record.id);
+      expect(card?.querySelector('h3')?.textContent?.trim().length, record.id).toBeGreaterThan(0);
+      expect(card?.querySelector('.tool-description')?.textContent?.trim().length, record.id).toBeGreaterThan(0);
+      expect(card?.querySelector('.btn-open-tool')?.textContent?.trim().length, record.id).toBeGreaterThan(0);
     }
     for (const phantom of phantomToolReferences) {
       expect(renderedIds, phantom.id).not.toContain(phantom.id);

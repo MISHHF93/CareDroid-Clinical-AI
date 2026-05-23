@@ -14,9 +14,23 @@ import { Response, Request } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
+import { IsEmail, IsString } from 'class-validator';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+
+class VerifyTwoFactorLoginDto {
+  @IsString()
+  userId: string;
+
+  @IsString()
+  token: string;
+}
+
+class MagicLinkRequestDto {
+  @IsEmail()
+  email: string;
+}
 
 @ApiTags('auth')
 @Controller('auth')
@@ -64,7 +78,7 @@ export class AuthController {
 
   @Post('dev-session')
   @HttpCode(HttpStatus.OK)
-  @ApiOperation({ summary: 'Development only: issue JWT for local UI bypass' })
+  @ApiOperation({ summary: 'Development only: explicit local/demo UI access' })
   async devSession(@Req() req: Request) {
     const ipAddress = req.ip || '0.0.0.0';
     const userAgent = req.headers['user-agent'] || 'unknown';
@@ -76,7 +90,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Verify 2FA token during login' })
   @ApiResponse({ status: 200, description: 'Successfully authenticated with 2FA' })
   @ApiResponse({ status: 401, description: 'Invalid 2FA token' })
-  async verifyTwoFactor(@Body() body: { userId: string; token: string }, @Req() req: Request) {
+  async verifyTwoFactor(@Body() body: VerifyTwoFactorLoginDto, @Req() req: Request) {
     const ipAddress = req.ip || '0.0.0.0';
     const userAgent = req.headers['user-agent'] || 'unknown';
 
@@ -139,7 +153,7 @@ export class AuthController {
 
   @Post('magic-link')
   @ApiOperation({ summary: 'Request magic login link' })
-  async requestMagicLink(@Body() body: { email: string }) {
+  async requestMagicLink(@Body() body: MagicLinkRequestDto) {
     return this.authService.requestMagicLink(body.email);
   }
 

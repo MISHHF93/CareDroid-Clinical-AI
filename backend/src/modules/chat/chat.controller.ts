@@ -49,6 +49,19 @@ class IntentClassifyDto {
   conversationId?: number;
 }
 
+class SuggestActionDto {
+  @IsString()
+  patientId: string;
+
+  @IsObject()
+  context: Record<string, any>;
+}
+
+class AnalyzeVitalsDto {
+  @IsObject()
+  vitals: Record<string, any>;
+}
+
 interface ChatResponse3DDto {
   id: string;
   response: string;
@@ -151,13 +164,13 @@ export class ChatController {
 
   @Post('suggest-action')
   @RequirePermission(Permission.READ_PHI)
-  async suggestAction(@Body() body: { patientId: string; context: any }): Promise<any> {
+  async suggestAction(@Body() body: SuggestActionDto): Promise<any> {
     return this.chatService.suggestNextAction(body.patientId, body.context);
   }
 
   @Post('analyze-vitals')
   @RequirePermission(Permission.USE_CALCULATORS)
-  async analyzeVitals(@Body() body: { vitals: Record<string, any> }): Promise<any> {
+  async analyzeVitals(@Body() body: AnalyzeVitalsDto): Promise<any> {
     return this.chatService.analyzeVitals(body.vitals);
   }
 }

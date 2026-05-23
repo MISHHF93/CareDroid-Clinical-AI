@@ -23,9 +23,9 @@ const Auth = ({ onAuthSuccess }) => {
   const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
   const [userId, setUserId] = useState(null);
   const [twoFactorToken, setTwoFactorToken] = useState('');
-  /** Token stored for Division mode bypass (defaults in appConfig when env unset). */
+  /** Token stored for explicit local/demo auth bypass when backend dev-session is unavailable. */
   const divisionToken = (appConfig.dev.bearerToken || '').trim() || 'dev-bypass-token';
-  const showDivisionMode = !appConfig.features.hideDivisionMode;
+  const enableDevAuthBypass = Boolean(appConfig.features.enableDevAuthBypass);
   const { success, error, info } = useNotificationActions();
   const googleAuthUrl = buildApiUrl('/api/auth/google');
   const linkedinAuthUrl = buildApiUrl('/api/auth/linkedin');
@@ -149,95 +149,91 @@ const Auth = ({ onAuthSuccess }) => {
     }
   };
 
-  const applyDevSession = async (mockUser, label) => {
+  const withDevSessionMarker = (user) => ({
+    ...user,
+    authMode: 'local-dev-demo',
+    isDevAuthBypass: true,
+    devAuthLabel: 'Demo / Local Dev Mode',
+  });
+
+  const buildDevDemoUser = () =>
+    withDevSessionMarker({
+      id: 'dev-demo-user',
+      email: 'demo@caredroid.local',
+      name: 'Demo Clinician',
+      role: 'physician',
+      fullName: 'Demo Clinician',
+      isEmailVerified: true,
+      twoFactorEnabled: false,
+      createdAt: new Date().toISOString(),
+    });
+
+  const applyDevSession = async () => {
+    if (!enableDevAuthBypass) {
+      error('Local demo access disabled', 'Set VITE_ENABLE_DEV_AUTH_BYPASS=true to enable local/demo sign-in.');
+      return;
+    }
+
+    const label = 'Demo / Local Dev Mode';
     try {
       const { response, data } = await apiFetchJson('/api/auth/dev-session', { method: 'POST' });
       if (response.ok && data?.accessToken && data?.user) {
-        localStorage.setItem('caredroid_user_profile', JSON.stringify(data.user));
+        const devUser = withDevSessionMarker(data.user);
+        localStorage.setItem('caredroid_user_profile', JSON.stringify(devUser));
         localStorage.setItem('caredroid_access_token', data.accessToken);
         if (onAuthSuccess) {
-          onAuthSuccess(data.accessToken, data.user);
+          onAuthSuccess(data.accessToken, devUser);
         }
-        info('Signing in', `${label} — development session with API access.`);
+        info('Signing in', `${label} with API access.`);
         return;
       }
     } catch (err) {
-      logger.warn('Dev session API unavailable, using local bypass only', { err });
+      logger.warn('Dev session API unavailable, using local demo session only', { err });
     }
 
     try {
+      const mockUser = buildDevDemoUser();
       localStorage.setItem('caredroid_user_profile', JSON.stringify(mockUser));
       localStorage.setItem('caredroid_access_token', divisionToken);
-      logger.info('Division mode bypass: stored token and profile (no API)', { label });
+      logger.info('Local demo auth bypass: stored token and mock profile (no API)', { label });
 
       if (onAuthSuccess) {
         onAuthSuccess(divisionToken, mockUser);
       }
       info('Signing in', `${label} — UI only (start backend for tool APIs).`);
     } catch (err) {
-      logger.error('Dev bypass failed', { err });
+      logger.error('Local demo auth bypass failed', { err });
     }
   };
 
-  const handleDemoSession = () => {
-    applyDevSession(
-      {
-        id: 'demo-user',
-        email: 'demo@caredroid.local',
-        name: 'Demo Clinician',
-        role: 'physician',
-        fullName: 'Demo Clinician',
-        isEmailVerified: true,
-        twoFactorEnabled: false,
-        createdAt: new Date().toISOString(),
-      },
-      'Free demo session',
-    );
+  const handleDevDemoSession = () => {
+    applyDevSession();
   };
 
-  const handleDeveloperSession = () => {
-    applyDevSession(
-      {
-        id: 'dev-user',
-        email: 'dev@caredroid.local',
-        name: 'Development User',
-        role: 'admin',
-        fullName: 'Development User',
-        isEmailVerified: true,
-        twoFactorEnabled: false,
-        createdAt: new Date().toISOString(),
-      },
-      'Division mode (admin)',
-    );
-  };
-
-  const divisionModeSection = (opts = {}) => {
+  const devAuthBypassSection = (opts = {}) => {
     const { compact } = opts;
-    if (!showDivisionMode) return null;
+    if (!enableDevAuthBypass) return null;
     return (
       <section
         className={`auth-dev-oneclick${compact ? ' auth-dev-oneclick--compact' : ''}`}
-        aria-label="Division mode — bypass verification"
+        aria-label="Local demo access"
       >
-        <p className="auth-division-tag">Division mode</p>
+        <p className="auth-division-tag">Local/demo access</p>
         <Button
           type="button"
           variant="success"
           size="lg"
-          onClick={handleDeveloperSession}
+          onClick={handleDevDemoSession}
           leftIcon={<NavIcon icon={CHROME_ICONS.zap} size={20} aria-hidden />}
         >
-          Enter app — no verification
+          Continue in Demo / Local Dev Mode
         </Button>
         <p className="auth-dev-oneclick__hint">
-          Skips password, OAuth, and 2FA for UI work. Uses token from{' '}
-          <code className="auth-dev-code">VITE_DEV_BEARER_TOKEN</code> (default <code className="auth-dev-code">dev-bypass-token</code>).
-          Your API must accept that JWT or calls return 401. Hide on real PHI deploys:{' '}
-          <code className="auth-dev-code">VITE_HIDE_DIVISION_MODE=true</code>.
+          Explicit local-only access is enabled by{' '}
+          <code className="auth-dev-code">VITE_ENABLE_DEV_AUTH_BYPASS=true</code>. It uses a mock clinician
+          profile and the token from <code className="auth-dev-code">VITE_DEV_BEARER_TOKEN</code> only for
+          development/demo workflows.
         </p>
-        <button type="button" className="auth-text-btn auth-dev-oneclick__alt" onClick={handleDemoSession}>
-          Demo clinician profile instead
-        </button>
       </section>
     );
   };
@@ -246,7 +242,7 @@ const Auth = ({ onAuthSuccess }) => {
     <div className="auth-root">
       {requiresTwoFactor ? (
         <section className="auth-twofa" aria-labelledby="auth-twofa-title">
-          {divisionModeSection({ compact: true })}
+          {devAuthBypassSection({ compact: true })}
 
           <div className="auth-twofa__icon" aria-hidden>
             <NavIcon icon={CHROME_ICONS.lock} size={40} />
@@ -287,7 +283,7 @@ const Auth = ({ onAuthSuccess }) => {
         </section>
       ) : (
         <>
-          {divisionModeSection()}
+          {devAuthBypassSection()}
 
           <header className="auth-panel__header">
             <h1 className="auth-panel__title">{mode === 'login' ? 'Sign in' : 'Create account'}</h1>

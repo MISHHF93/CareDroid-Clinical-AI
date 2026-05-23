@@ -31,6 +31,23 @@ export class ToolExecutionBodyDto {
   conversationId?: string;
 }
 
+export class RecordToolResultDto {
+  @IsString()
+  toolType: string;
+
+  @IsOptional()
+  @IsObject()
+  input?: Record<string, any>;
+
+  @IsOptional()
+  @IsObject()
+  output?: Record<string, any>;
+
+  @IsOptional()
+  @IsString()
+  timestamp?: string;
+}
+
 export class ToolExecutionResponseDto {
   success: boolean;
   toolId: string;

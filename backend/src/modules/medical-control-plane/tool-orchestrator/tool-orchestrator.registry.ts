@@ -114,8 +114,15 @@ export const EXECUTOR_PARAMETER_ALIASES: Readonly<
     mechanical_ventilation: 'mechanicalVentilation',
     urine_output: 'urineOutput',
   },
-  'drug-interactions': {},
-  'lab-interpreter': {},
+  'drug-interactions': {
+    severity_filter: 'severityFilter',
+  },
+  'lab-interpreter': {
+    lab_values: 'labValues',
+    patient_age: 'patientAge',
+    patient_sex: 'patientSex',
+    clinical_context: 'clinicalContext',
+  },
 };
 
 /** Request/response contracts for registered executors (documentation + validation hints). */

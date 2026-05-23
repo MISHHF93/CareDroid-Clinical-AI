@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { User } from '../../users/entities/user.entity';
 import { AuditService } from '../../audit/audit.service';
 import { AuditAction } from '../../audit/entities/audit-log.entity';
@@ -45,7 +46,13 @@ export class EmergencyAccessService {
     }
 
     const backupCodes = user.twoFactor.backupCodes || [];
-    const codeIndex = backupCodes.findIndex((c) => c === code);
+    let codeIndex = -1;
+    for (let index = 0; index < backupCodes.length; index += 1) {
+      if (await bcrypt.compare(code, backupCodes[index])) {
+        codeIndex = index;
+        break;
+      }
+    }
 
     if (codeIndex === -1) {
       // Log failed attempt

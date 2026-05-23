@@ -21,8 +21,6 @@ export default defineConfig({
       '**/backend/**',
       /** Playwright suites — run via `npm run test:e2e:responsive`. */
       '**/e2e/**',
-      /** Legacy Jest-style suite; wrong paths and missing chatAPI — rewrite or delete. */
-      '**/ChatInterface.test.jsx',
     ],
     /**
      * Default `maxWorkers: 1` avoids Vitest 4 worker startup timeouts on some Windows setups.

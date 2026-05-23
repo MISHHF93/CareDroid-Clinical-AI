@@ -161,7 +161,7 @@ const ToolsOverview = () => {
               className="tools-catalog-link"
               onClick={() => navigate('/tools/catalog')}
             >
-              Trust and source details →
+              Developer Catalog / Source Audit →
             </button>
           </p>
           <div className="tools-discovery-controls" role="search" aria-label="Search and filter all tools">

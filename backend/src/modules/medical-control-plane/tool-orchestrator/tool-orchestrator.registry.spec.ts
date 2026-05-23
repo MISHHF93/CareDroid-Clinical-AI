@@ -130,6 +130,11 @@ describe('tool-orchestrator.registry', () => {
     expect(sofaPattern?.[1]).toContain("'urine_output'");
     expect(EXECUTOR_REQUEST_CONTRACTS['sofa-calculator'].optionalParameters).toContain('urineOutput');
     expect(EXECUTOR_PARAMETER_ALIASES['sofa-calculator'].urine_output).toBe('urineOutput');
+
+    expect(EXECUTOR_PARAMETER_ALIASES['lab-interpreter'].lab_values).toBe('labValues');
+    expect(EXECUTOR_PARAMETER_ALIASES['lab-interpreter'].patient_age).toBe('patientAge');
+    expect(EXECUTOR_PARAMETER_ALIASES['lab-interpreter'].clinical_context).toBe('clinicalContext');
+    expect(EXECUTOR_PARAMETER_ALIASES['drug-interactions'].severity_filter).toBe('severityFilter');
   });
 
   it('isKnownUnsupportedNluTool identifies dispatch-ai', () => {

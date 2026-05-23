@@ -52,9 +52,11 @@ const appConfig = {
     enablePushNotifications: toBoolean(getEnvValue('VITE_ENABLE_PUSH_NOTIFICATIONS', 'false')),
     enableOfflineMode: toBoolean(getEnvValue('VITE_ENABLE_OFFLINE_MODE', 'false')),
     enableBiometricAuth: toBoolean(getEnvValue('VITE_ENABLE_BIOMETRIC_AUTH', 'false')),
-    /** When true, show demo / developer quick-sign-in on /auth even in production builds (staging only). */
+    /** Explicit opt-in for mock local/demo auth on `/auth`. Hidden and inert unless true. */
+    enableDevAuthBypass: toBoolean(getEnvValue('VITE_ENABLE_DEV_AUTH_BYPASS', 'false')),
+    /** Legacy demo-auth flag retained for older deployments; new bypass uses enableDevAuthBypass. */
     showDemoAuth: toBoolean(getEnvValue('VITE_SHOW_DEMO_AUTH', 'false')),
-    /** When true, hide Division mode (instant bypass) on /auth. Production bundles hide it by default. */
+    /** Legacy hide flag retained for older deployments. */
     hideDivisionMode: toBoolean(
       getEnvValue('VITE_HIDE_DIVISION_MODE', isProductionBuild() ? 'true' : 'false')
     ),

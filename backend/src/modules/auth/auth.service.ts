@@ -235,9 +235,19 @@ export class AuthService {
   }
 
   /**
-   * Development-only: issue a real JWT for local UI bypass (Division mode).
+   * Development-only: issue a real JWT for explicit local/demo UI access.
    */
   async createDevSession(ipAddress: string, userAgent: string) {
+    const explicitDevBypassEnabled = [
+      this.configService.get<string | boolean>('ENABLE_DEV_AUTH_BYPASS'),
+      process.env.ENABLE_DEV_AUTH_BYPASS,
+      process.env.VITE_ENABLE_DEV_AUTH_BYPASS,
+    ].some((value) => String(value).toLowerCase() === 'true');
+
+    if (!explicitDevBypassEnabled) {
+      throw new ForbiddenException('Dev session requires ENABLE_DEV_AUTH_BYPASS=true');
+    }
+
     if (process.env.NODE_ENV === 'production') {
       throw new ForbiddenException('Dev session is not available in production');
     }

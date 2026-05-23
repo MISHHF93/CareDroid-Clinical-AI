@@ -3,18 +3,30 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
+import { IsEnum, IsOptional, IsString } from 'class-validator';
 import { BiometricConfig, BiometricType } from '../entities/biometric-config.entity';
 import { User } from '../../users/entities/user.entity';
 
-export interface EnrollBiometricDto {
+export class EnrollBiometricDto {
+  @IsEnum(BiometricType)
   biometricType: BiometricType;
+
+  @IsString()
   deviceId: string;
+
+  @IsOptional()
+  @IsString()
   deviceName?: string;
 }
 
-export interface VerifyBiometricDto {
+export class VerifyBiometricDto {
+  @IsString()
   userId: string;
+
+  @IsString()
   deviceId: string;
+
+  @IsString()
   challengeResponse: string;
 }
 

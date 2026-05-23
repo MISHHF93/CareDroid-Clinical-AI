@@ -106,8 +106,8 @@ export const PublicShell = ({ children }) => {
               </li>
               <li><Link to="/gdpr">GDPR Notice</Link></li>
               <li><Link to="/hipaa">HIPAA Notice</Link></li>
-              <li><a href="#security">Security Practices</a></li>
-              <li><a href="#audit">Audit Logs</a></li>
+              <li><Link to="/hipaa">Security Practices</Link></li>
+              <li><Link to="/privacy">Audit & Privacy Practices</Link></li>
             </ul>
           </div>
         </div>
