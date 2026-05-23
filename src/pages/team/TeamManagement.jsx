@@ -8,7 +8,7 @@ import {
 
 /**
  * TeamManagement Page Component
- * 
+ *
  * Full page for managing team members, roles, and permissions
  * Located at /team
  */
@@ -29,6 +29,12 @@ export const TeamManagement = () => {
   }, []);
 
   const teamApiEnabled = isBackendCapabilityEnabled('teamManagement');
+
+  const requireTeamApi = () => {
+    if (teamApiEnabled) return true;
+    setError(UNSUPPORTED_CAPABILITY_MESSAGE);
+    return false;
+  };
 
   const fetchUsers = async () => {
     if (!teamApiEnabled) {
@@ -84,11 +90,14 @@ export const TeamManagement = () => {
   };
 
   const handleEditUser = (user) => {
+    if (!requireTeamApi()) return;
     setSelectedUser(user);
     setShowEditModal(true);
   };
 
   const handleSaveUser = async (updatedUser) => {
+    if (!requireTeamApi()) return;
+
     try {
       const response = await apiFetch(`/api/team/users/${selectedUser.id}`, {
         method: 'PUT',
@@ -114,6 +123,8 @@ export const TeamManagement = () => {
   };
 
   const handleDeleteUser = async (userId) => {
+    if (!requireTeamApi()) return;
+
     if (!confirm('Are you sure you want to remove this user from the team?')) {
       return;
     }
@@ -137,6 +148,7 @@ export const TeamManagement = () => {
   };
 
   const handleInviteUser = async () => {
+    if (!requireTeamApi()) return;
     if (!inviteEmail) return;
 
     try {
@@ -171,7 +183,11 @@ export const TeamManagement = () => {
         </div>
         <button
           className="btn-invite"
-          onClick={() => setShowInviteModal(true)}
+          onClick={() => {
+            if (requireTeamApi()) setShowInviteModal(true);
+          }}
+          disabled={!teamApiEnabled}
+          title={teamApiEnabled ? undefined : 'Team API is not available on this server'}
         >
           + Invite Member
         </button>
@@ -207,6 +223,7 @@ export const TeamManagement = () => {
           onSort={handleSort}
           onEdit={handleEditUser}
           onDelete={handleDeleteUser}
+          actionsDisabled={!teamApiEnabled}
         />
       ) : (
         <div className="team-empty">
@@ -223,6 +240,7 @@ export const TeamManagement = () => {
           user={selectedUser}
           onSave={handleSaveUser}
           onCancel={() => setShowEditModal(false)}
+          disabled={!teamApiEnabled}
         />
       )}
 
@@ -232,6 +250,7 @@ export const TeamManagement = () => {
           onEmailChange={setInviteEmail}
           onInvite={handleInviteUser}
           onCancel={() => setShowInviteModal(false)}
+          disabled={!teamApiEnabled}
         />
       )}
     </div>
@@ -240,10 +259,10 @@ export const TeamManagement = () => {
 
 /**
  * UserTable Component
- * 
+ *
  * Sortable table displaying team members with their roles and status
  */
-const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete }) => {
+const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisabled = false }) => {
   const getRoleColor = (role) => {
     const colors = {
       'Admin': { bg: '#ff6b6b', text: 'Admin' },
@@ -326,6 +345,7 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete }) => {
                   onClick={() => onEdit(user)}
                   title="Edit user"
                   aria-label={`Edit ${user.name}`}
+                  disabled={actionsDisabled}
                 >
                   ✎
                 </button>
@@ -334,6 +354,7 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete }) => {
                   onClick={() => onDelete(user.id)}
                   title="Remove user"
                   aria-label={`Remove ${user.name}`}
+                  disabled={actionsDisabled}
                 >
                   ✕
                 </button>
@@ -348,10 +369,10 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete }) => {
 
 /**
  * EditUserModal Component
- * 
+ *
  * Modal for editing user role and permissions
  */
-const EditUserModal = ({ user, onSave, onCancel }) => {
+const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
   const [role, setRole] = useState(user.role);
   const [permissions, setPermissions] = useState(user.permissions || []);
   const [saving, setSaving] = useState(false);
@@ -421,7 +442,7 @@ const EditUserModal = ({ user, onSave, onCancel }) => {
           <button
             className="btn-save"
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || disabled}
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
@@ -433,7 +454,7 @@ const EditUserModal = ({ user, onSave, onCancel }) => {
 
 /**
  * RoleSelector Component
- * 
+ *
  * Dropdown for selecting user roles with descriptions
  */
 const RoleSelector = ({ value, onChange }) => {
@@ -462,10 +483,10 @@ const RoleSelector = ({ value, onChange }) => {
 
 /**
  * InviteUserModal Component
- * 
+ *
  * Modal for inviting new team members
  */
-const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel }) => {
+const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel, disabled = false }) => {
   const [loading, setLoading] = useState(false);
 
   const handleInvite = async () => {
@@ -519,7 +540,7 @@ const InviteUserModal = ({ email, onEmailChange, onInvite, onCancel }) => {
           <button
             className="btn-invite"
             onClick={handleInvite}
-            disabled={!isValidEmail || loading}
+            disabled={!isValidEmail || loading || disabled}
           >
             {loading ? 'Sending...' : 'Send Invitation'}
           </button>

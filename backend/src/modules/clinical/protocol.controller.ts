@@ -3,6 +3,9 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagg
 import { AuthGuard } from '@nestjs/passport';
 import { ProtocolService } from './protocol.service';
 import { CreateProtocolDto, UpdateProtocolDto, SearchProtocolDto } from './dto/protocol.dto';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { RequirePermission } from '../auth/decorators/permissions.decorator';
+import { Permission } from '../auth/enums/permission.enum';
 
 @ApiTags('protocols')
 @Controller('protocols')
@@ -31,7 +34,8 @@ export class ProtocolController {
   }
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
+  @RequirePermission(Permission.WRITE_PHI)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new protocol (admin only)' })
   @ApiResponse({ status: 201, description: 'Protocol created' })
@@ -40,7 +44,8 @@ export class ProtocolController {
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
+  @RequirePermission(Permission.WRITE_PHI)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update protocol (admin only)' })
   @ApiResponse({ status: 200, description: 'Protocol updated' })
@@ -49,7 +54,8 @@ export class ProtocolController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
+  @RequirePermission(Permission.DELETE_PHI)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete protocol (admin only)' })
   @ApiResponse({ status: 200, description: 'Protocol deleted' })

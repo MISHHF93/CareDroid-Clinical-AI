@@ -225,7 +225,7 @@ describe('Wiring audit — resolveCatalogLaunch', () => {
 
   it('returns empty launch for unknown ids', () => {
     const empty = resolveCatalogLaunch('not-in-wiring-audit-xyz');
-    expect(empty.path).toBe('/dashboard');
+    expect(empty.path).toBe('/chat');
     expect(empty.registryId).toBeNull();
     expect(empty.chatSeed).toBeTruthy();
   });

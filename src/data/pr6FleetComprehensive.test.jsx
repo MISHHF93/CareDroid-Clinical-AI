@@ -401,9 +401,9 @@ describe('4. Dispatch launch behavior', () => {
     }
   );
 
-  it('navigates dispatch-ai chat launch to dashboard (not calculators slug)', () => {
+  it('navigates dispatch-ai chat launch to chat (not calculators slug)', () => {
     const launch = resolveCatalogLaunch('dispatch-ai');
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
     expect(launch.path).toBe(PR_FLEET_HUB_PATH);
   });
 
@@ -450,7 +450,8 @@ describe('5. Registry mappings', () => {
   });
 
   it('maps dispatch-ai as chat-assisted without orchestrator POST id', () => {
-    expect(clinicalIntentToolsById['dispatch-ai']?.backendExecutable).toBe(true);
+    expect(clinicalIntentToolsById['dispatch-ai']?.backendRouted).toBe(true);
+    expect(clinicalIntentToolsById['dispatch-ai']?.postExecutable).toBe(false);
     expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBeUndefined();
   });
 });
@@ -566,7 +567,7 @@ describe('8. Route validation', () => {
 
   it('returns empty launch for unknown fleet-like ids', () => {
     const empty = resolveCatalogLaunch('not-a-fleet-tool-xyz-123');
-    expect(empty.path).toBe('/dashboard');
+    expect(empty.path).toBe('/chat');
     expect(empty.registryId).toBeNull();
   });
 

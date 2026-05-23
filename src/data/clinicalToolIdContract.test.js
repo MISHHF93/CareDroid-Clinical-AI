@@ -227,16 +227,20 @@ describe('clinicalToolIdContract — NLU profile drift', () => {
     expect(backendIds).toEqual(contractIds);
   });
 
-  it('AI_EXECUTABLE_NLU_TOOL_IDS are flagged backendExecutable in clinicalIntentTools', () => {
+  it('AI_EXECUTABLE_NLU_TOOL_IDS are flagged as backend-routed in clinicalIntentTools', () => {
     for (const toolId of AI_EXECUTABLE_NLU_TOOL_IDS) {
       const row = clinicalIntentTools.find((t) => t.toolId === toolId);
-      expect(row?.backendExecutable, `${toolId} should be backendExecutable`).toBe(true);
+      expect(row?.backendRouted, `${toolId} should be backendRouted`).toBe(true);
     }
   });
 
-  it('dispatch-ai is AI_EXECUTABLE but not POST-orchestrator registered', () => {
+  it('dispatch-ai is NLU/backend routed but not POST-orchestrator registered', () => {
+    const row = clinicalIntentTools.find((t) => t.toolId === 'dispatch-ai');
+
     expect(AI_EXECUTABLE_NLU_TOOL_IDS).toContain('dispatch-ai');
     expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS).not.toContain('dispatch-ai');
+    expect(row?.backendRouted).toBe(true);
+    expect(row?.postExecutable).toBe(false);
   });
 
   it('canonical NLU ids self-map via ORCHESTRATOR_TO_REGISTRY_ID when registry id differs', () => {

@@ -137,7 +137,7 @@ export function auditTierACalculatorExecutorLeaks() {
   return { ok: issues.length === 0, issues };
 }
 
-/** Tier-B chat tools must not claim backendExecutable unless dispatch (chat-only). */
+/** Tier-B chat tools must not claim POST executability unless registered. */
 export function auditTierBBackendExecutableClaims() {
   const issues = [];
   const tierBIds = new Set([
@@ -148,10 +148,10 @@ export function auditTierBBackendExecutableClaims() {
     const registryId = row.sidebarToolId || row.toolId;
     if (!tierBIds.has(registryId) && row.toolId !== NLU.dispatchAi) continue;
     if (row.toolId === NLU.dispatchAi) {
-      if (!row.backendExecutable) {
+      if (!row.backendRouted) {
         issues.push({
           code: 'dispatch-missing-chat-flag',
-          detail: 'dispatch-ai should remain backendExecutable for NLU routing only',
+          detail: 'dispatch-ai should remain backend-routed for NLU/chat only',
         });
       }
       if (isOrchestratorPostExecutable(row.toolId)) {
@@ -162,10 +162,10 @@ export function auditTierBBackendExecutableClaims() {
       }
       continue;
     }
-    if (row.backendExecutable) {
+    if (row.postExecutable) {
       issues.push({
         code: 'tier-b-false-backend-executable',
-        detail: `Tier-B tool ${row.toolId} must not set backendExecutable: true without POST executor`,
+        detail: `Tier-B tool ${row.toolId} must not set postExecutable: true without POST executor`,
       });
     }
     if (isOrchestratorPostExecutable(row.toolId)) {
@@ -178,22 +178,20 @@ export function auditTierBBackendExecutableClaims() {
   return { ok: issues.length === 0, issues };
 }
 
-/** backendExecutable: true in catalog must match AI_EXECUTABLE list; POST only for three executors. */
+/** backend routing in catalog is separate from POST executors. */
 export function auditBackendExecutableCatalogFlags() {
   const issues = [];
   for (const row of clinicalIntentTools) {
-    if (row.backendExecutable && !isOrchestratorPostExecutable(row.toolId) && row.toolId !== NLU.dispatchAi) {
-      if (![NLU.drugInteractions, NLU.labInterpreter, NLU.sofaCalculator].includes(row.toolId)) {
-        issues.push({
-          code: 'unexpected-backend-executable',
-          detail: `${row.toolId} has backendExecutable:true but is not a registered POST executor or dispatch-ai`,
-        });
-      }
+    if (row.postExecutable && !isOrchestratorPostExecutable(row.toolId)) {
+      issues.push({
+        code: 'unexpected-post-executable',
+        detail: `${row.toolId} has postExecutable:true but is not a registered POST executor`,
+      });
     }
-    if (isOrchestratorPostExecutable(row.toolId) && !row.backendExecutable) {
+    if (isOrchestratorPostExecutable(row.toolId) && !row.postExecutable) {
       issues.push({
         code: 'executor-missing-backend-flag',
-        detail: `${row.toolId} is POST-registered but backendExecutable is false in catalog`,
+        detail: `${row.toolId} is POST-registered but postExecutable is false in catalog`,
       });
     }
   }

@@ -160,7 +160,7 @@ function launchPathWorks(row) {
   const navPath = resolveNavigationPathForLaunch(launch);
   if (!navPath && !launch.path) return false;
   const effective = navPath || launch.path;
-  if (effective === '/dashboard') return Boolean(launch.chatSeed?.length > 20);
+  if (effective === '/dashboard' || effective === '/chat') return Boolean(launch.chatSeed?.length > 20);
   return isKnownToolAreaPath(effective);
 }
 
@@ -498,7 +498,7 @@ export function formatToolVisibilityMatrixMarkdown(doc = getToolVisibilityMatrix
     '',
     '1. **NLU hub-only sidebar rows** — Add `toolRegistry.js` entries (or a collapsible “More calculators” group) for `apache2-calculator`, `curb65-calculator`, `gcs-calculator`, `wells-dvt-calculator` mapped to hub + chat launch (`applyRegistryToolLaunch`).',
     '2. **Secondary NLU profiles** — Optional dedicated sidebar rows for ACLS/ATLS, ABG, dose calculator, antibiotic guide (currently catalog + parent page only).',
-    '3. **`dispatch-ai` catalog flag** — Set `backendExecutable: false` in `clinicalIntentToolCatalog.js` for `dispatch-ai`, or rename catalog column to “NLU/chat route” so it is not confused with POST `/api/tools/:id/execute`.',
+    '3. **`dispatch-ai` catalog flag** — use `backendRouted` for NLU/chat support and `postExecutable` for POST `/api/tools/:id/execute` badges.',
     '4. **Duplicate shortcut labels** — Deduplicate `shortcut` strings in `toolRegistry.js` (PERC/PHQ-9, GRACE/GAD-7, etc.) even if global hotkeys are not wired yet.',
     '5. **Account route discoverability** — Link `Profile` → `/profile-settings`, `Settings` → `/notifications`; add footer links for `/gdpr` and `/hipaa` in `PublicShell.jsx`.',
     '6. **Cost analytics nav** — Add sidebar or Analytics sub-link to `/costs` for `VIEW_ANALYTICS` users.',

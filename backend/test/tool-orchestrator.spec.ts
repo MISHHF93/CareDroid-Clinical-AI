@@ -168,6 +168,13 @@ describe('ToolOrchestratorService', () => {
     });
   });
 
+  describe('chat registry hints', () => {
+    it('should map sofa-score UI hint to sofa-calculator executor', () => {
+      expect(() => service.getToolMetadata('sofa-score')).not.toThrow();
+      expect(service.getToolMetadata('sofa-score').id).toBe('sofa-calculator');
+    });
+  });
+
   describe('validateToolExecution', () => {
     it('should validate tool parameters', async () => {
       const result = await service.validateToolExecution({
@@ -217,6 +224,19 @@ describe('ToolOrchestratorService', () => {
       expect(result.success).toBe(true);
       expect(result.toolId).toBe('sofa-calculator');
       expect(result.result.success).toBe(true);
+    });
+
+    it('should normalize snake_case SOFA parameters from NLU before execution', async () => {
+      const result = await service.executeTool({
+        toolId: 'sofa-score',
+        parameters: { pao2: 90, fio2: 0.3, urine_output: 450 },
+        userId: 'test-user',
+        conversationId: 'test-conv',
+      });
+
+      expect(result.success).toBe(true);
+      expect(result.toolId).toBe('sofa-calculator');
+      expect(result.result.data.renalScore).toBeGreaterThan(0);
     });
 
     it('should execute drug checker successfully (canonical id)', async () => {

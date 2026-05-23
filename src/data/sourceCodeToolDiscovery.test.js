@@ -3,13 +3,15 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
-import { clinicalIntentTools } from './clinicalIntentToolCatalog';
+import { builtinUiCalculators, clinicalIntentTools } from './clinicalIntentToolCatalog';
 import {
   getAllDiscoveredTools,
   getSourceCodeDiscoverySummary,
   phantomToolReferences,
+  SOURCE_SCAN_LOCATIONS,
   toolIdAliases,
 } from './sourceCodeToolDiscovery';
+import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
 import { emergencyPatternGroups } from './emergencyPatternCatalog';
 import { resolveCatalogLaunch, NLU_TO_REGISTRY_ID } from './clinicalCatalogWiring';
 import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
@@ -32,6 +34,14 @@ describe('sourceCodeToolDiscovery', () => {
   it('indexes NLU clinical tool profiles (PR3 adds GRACE ACS, NIHSS, C-Spine, Ottawa Ankle)', () => {
     expect(clinicalIntentTools.length).toBeGreaterThanOrEqual(28);
     expect(clinicalIntentTools).toHaveLength(getSourceCodeDiscoverySummary().nluPatternCount);
+  });
+
+  it('keeps source scan counts derived from current contracts', () => {
+    const byLabel = Object.fromEntries(SOURCE_SCAN_LOCATIONS.map((loc) => [loc.label, loc.count]));
+
+    expect(byLabel['NLU clinical tools']).toBe(clinicalIntentTools.length);
+    expect(byLabel['Backend executors']).toBe(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.length);
+    expect(byLabel['Calculator UI slugs']).toBe(builtinUiCalculators.length);
   });
 
   it('includes every sidebar registry id in the discovered list', () => {

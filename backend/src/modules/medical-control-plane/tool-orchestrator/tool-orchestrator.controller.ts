@@ -17,7 +17,12 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ToolOrchestratorService } from './tool-orchestrator.service';
-import { ExecuteToolDto, ToolExecutionResponseDto, ToolListDto } from './dto/tool-execution.dto';
+import {
+  ExecuteToolDto,
+  ToolExecutionBodyDto,
+  ToolExecutionResponseDto,
+  ToolListDto,
+} from './dto/tool-execution.dto';
 
 @Controller('tools')
 @UseGuards(AuthGuard('jwt'))
@@ -84,7 +89,7 @@ export class ToolOrchestratorController {
   @HttpCode(HttpStatus.OK)
   async validateTool(
     @Param('id') toolId: string,
-    @Body() body: { parameters?: Record<string, any> },
+    @Body() body: ToolExecutionBodyDto,
   ) {
     return this.toolOrchestratorService.validateToolExecution({
       toolId,
@@ -102,7 +107,7 @@ export class ToolOrchestratorController {
   @HttpCode(HttpStatus.OK)
   async executeTool(
     @Param('id') toolId: string,
-    @Body() body: { parameters?: Record<string, any>; conversationId?: string },
+    @Body() body: ToolExecutionBodyDto,
     @Request() req: any,
   ): Promise<ToolExecutionResponseDto> {
     const dto: ExecuteToolDto = {

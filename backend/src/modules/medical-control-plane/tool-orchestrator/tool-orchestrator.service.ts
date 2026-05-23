@@ -25,6 +25,7 @@ import { ToolResult } from './entities/tool-result.entity';
 import {
   classifyToolExecutionError,
   getExecutorCatalogSnapshot,
+  normalizeExecutorParameters,
   resolveExecutorToolId,
   ToolExecutionErrorCode,
   validateExecutorContractParameters,
@@ -180,10 +181,12 @@ export class ToolOrchestratorService {
       };
     }
 
-    const contractCheck = validateExecutorContractParameters(
+    const normalizedParameters = normalizeExecutorParameters(
       resolved.resolvedId,
       dto.parameters as Record<string, unknown>,
     );
+
+    const contractCheck = validateExecutorContractParameters(resolved.resolvedId, normalizedParameters);
     if (!contractCheck.valid) {
       return {
         valid: false,
@@ -195,7 +198,7 @@ export class ToolOrchestratorService {
     }
 
     const tool = this.getTool(resolved.resolvedId);
-    const validation = tool.validate(dto.parameters);
+    const validation = tool.validate(normalizedParameters);
     return {
       ...validation,
       resolvedToolId: resolved.resolvedId,
@@ -258,10 +261,12 @@ export class ToolOrchestratorService {
 
     const canonicalToolId = resolved.resolvedId;
 
-    const contractCheck = validateExecutorContractParameters(
+    const normalizedParameters = normalizeExecutorParameters(
       canonicalToolId,
       dto.parameters as Record<string, unknown>,
     );
+
+    const contractCheck = validateExecutorContractParameters(canonicalToolId, normalizedParameters);
     if (!contractCheck.valid) {
       await this.auditService.log({
         userId: dto.userId,
@@ -300,7 +305,7 @@ export class ToolOrchestratorService {
       const tool = this.getTool(canonicalToolId);
       const metadata = tool.getMetadata();
 
-      const complexity = this.toolMetrics.calculateParameterComplexity(dto.parameters);
+      const complexity = this.toolMetrics.calculateParameterComplexity(normalizedParameters);
       const complexityLabel = complexity.category;
       this.toolMetrics.setToolParameterComplexity(
         canonicalToolId,
@@ -308,7 +313,7 @@ export class ToolOrchestratorService {
         complexity.score,
       );
 
-      const validation = tool.validate(dto.parameters);
+      const validation = tool.validate(normalizedParameters);
       if (!validation.valid) {
         this.toolMetrics.recordToolError(canonicalToolId, 'validation');
 
@@ -325,7 +330,7 @@ export class ToolOrchestratorService {
             resolvedToolId: canonicalToolId,
             aliased: resolved.aliased,
             errors: validation.errors,
-            parametersCount: Object.keys(dto.parameters).length,
+            parametersCount: Object.keys(normalizedParameters).length,
           },
         });
 
@@ -347,7 +352,7 @@ export class ToolOrchestratorService {
         };
       }
 
-      const result = await tool.execute(dto.parameters);
+      const result = await tool.execute(normalizedParameters);
       const executionTime = Date.now() - startTime;
 
       this.toolMetrics.recordToolExecutionTier(canonicalToolId, executionTime);
@@ -365,7 +370,7 @@ export class ToolOrchestratorService {
           requestedToolId,
           resolvedToolId: canonicalToolId,
           aliased: resolved.aliased,
-          parametersCount: Object.keys(dto.parameters).length,
+          parametersCount: Object.keys(normalizedParameters).length,
           hasWarnings: (result.warnings?.length || 0) > 0,
           hasErrors: (result.errors?.length || 0) > 0,
         },

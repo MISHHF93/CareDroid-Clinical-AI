@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { getExportService } from '../../services/export/ExportService';
+import { buildSharedSessionUrl, createSharedSession } from '../../utils/sharedSessions';
 import {
   isBackendCapabilityEnabled,
   UNSUPPORTED_CAPABILITY_MESSAGE,
@@ -21,26 +22,25 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
     pdf: CHROME_ICONS.formatPdf,
   };
 
-  const generateShareLink = () => {
-    const shareData = {
-      tool: toolName,
-      results: results,
-      timestamp: new Date().toISOString(),
-    };
-
-    const encoded = btoa(JSON.stringify(shareData));
-    const url = `${window.location.origin}/shared-result/${encoded}`;
-    return url;
+  const createResultShareLink = () => {
+    const shareId = createSharedSession({
+      toolId,
+      toolName,
+      toolDescription: `${toolName} result snapshot`,
+      results,
+      shareKind: 'tool-results',
+    });
+    return buildSharedSessionUrl(shareId);
   };
 
   const handleCopyLink = async () => {
     try {
-      const url = generateShareLink();
+      const url = createResultShareLink();
       await navigator.clipboard.writeText(url);
-      setFeedback({ text: 'Share link copied to clipboard.', variant: 'success' });
+      setFeedback({ text: 'Local share link copied to clipboard.', variant: 'success' });
       setTimeout(() => setFeedback({ text: '', variant: 'info' }), 3000);
     } catch (err) {
-      const url = generateShareLink();
+      const url = createResultShareLink();
       window.prompt('Copy this link to share:', url);
     }
   };
@@ -170,9 +170,9 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
           {/* Link Share */}
           {shareMode === 'link' && (
             <div className="share-mode-content">
-              <p>Generate a shareable link for these results:</p>
+              <p>Generate a local browser link for these results:</p>
               <div className="share-link-display">
-                <code className="link-preview">{generateShareLink().substring(0, 50)}...</code>
+                <code className="link-preview">{`${window.location.origin}/shared/tools/...`}</code>
               </div>
               <button
                 type="button"
@@ -184,7 +184,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
                 Copy Share Link
               </button>
               <p className="share-note">
-                Share this link with colleagues. Link expires after 30 days for security.
+                This link opens on this browser profile for 30 days. Use Export for cross-device sharing.
               </p>
             </div>
           )}
@@ -288,7 +288,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
         <div className="share-modal-footer">
           <p className="share-privacy-note share-privacy-note--with-icon">
             <NavIcon icon={CHROME_ICONS.lock} size={18} aria-hidden />
-            <span>Your shared results are encrypted and accessible only to intended recipients.</span>
+            <span>Local links stay in this browser profile. Use Export when recipients need a portable copy.</span>
           </p>
           <button type="button" className="btn-secondary" onClick={onClose}>
             Close

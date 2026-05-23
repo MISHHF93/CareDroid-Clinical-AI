@@ -185,10 +185,10 @@ describe('PR3 ten-area — 5. resolveCatalogLaunch behavior', () => {
     assertPr3AliasResolves(alias, canonical, ALIAS_CTX);
   });
 
-  it.each(PR3_TOOL_IDS)('navigation after launch opens dashboard for visible chat', (id) => {
+  it.each(PR3_TOOL_IDS)('navigation after launch opens chat for visible chat', (id) => {
     const launch = resolveCatalogLaunch(id);
     expect(launch.path).toBe('/tools/calculators');
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
   });
 
   it('returns empty launch for unknown ids', () => {

@@ -36,17 +36,17 @@ export function isCalculatorsHubPath(path) {
 
 /**
  * Where to navigate after a catalog launch so chat seeds are visible.
- * Tier-B hub tools (PR3, Wells/PERC, etc.) open /dashboard; Tier-A keeps dedicated routes.
+ * Tier-B hub tools (PR3, Wells/PERC, etc.) open /chat; Tier-A keeps dedicated routes.
  * @param {{ path: string|null, chatSeed: string|null }} launch
  * @returns {string|null}
  */
 export function resolveNavigationPathForLaunch(launch) {
   if (!launch) return null;
   if (launch.chatSeed && isCalculatorsHubPath(launch.path)) {
-    return '/dashboard';
+    return '/chat';
   }
   if (launch.path) return launch.path;
-  if (launch.chatSeed) return '/dashboard';
+  if (launch.chatSeed) return '/chat';
   return null;
 }
 
@@ -60,7 +60,7 @@ const EMPTY_LAUNCH = Object.freeze({
 
 /** Safe generic chat when an id cannot be mapped to a shipped tool (no fake routes). */
 export const CATALOG_UNKNOWN_TOOL_LAUNCH = Object.freeze({
-  path: '/dashboard',
+  path: '/chat',
   registryId: null,
   chatSeed: ensureChatSeedGuardrails({
     toolId: 'unknown-clinical-tool',

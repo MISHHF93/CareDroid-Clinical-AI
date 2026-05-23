@@ -74,7 +74,8 @@ describe('Dispatch Intelligence (dispatch-ai) wiring', () => {
     const nlu = clinicalIntentTools.find((t) => t.toolId === id);
     expect(nlu?.path).toBe(HUB_PATH);
     expect(nlu?.sidebarToolId).toBe(id);
-    expect(nlu?.backendExecutable).toBe(true);
+    expect(nlu?.backendRouted).toBe(true);
+    expect(nlu?.postExecutable).toBe(false);
     expect(nluCalculatorHubOnly.some((h) => h.toolId === id)).toBe(true);
     expect(appSource).not.toContain("path: '/tools/calculators/dispatch-ai'");
   });
@@ -90,9 +91,9 @@ describe('Dispatch Intelligence (dispatch-ai) wiring', () => {
     expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL[id]).toBeUndefined();
   });
 
-  it('maps hub launch to dashboard for conversational workflow', () => {
+  it('maps hub launch to chat for conversational workflow', () => {
     const launch = resolveCatalogLaunch(id);
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
   });
 
   it.each(ALIAS_PAIRS)('alias "%s" resolves same launch as dispatch-ai', (alias, expected) => {

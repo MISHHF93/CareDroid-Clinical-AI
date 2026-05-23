@@ -59,13 +59,13 @@ describe('resolveCatalogLaunch — empty / unknown', () => {
     expect(resolveCatalogLaunch('   ')).toEqual(CATALOG_EMPTY_LAUNCH);
   });
 
-  it('returns guarded dashboard fallback for unknown tool-shaped ids', () => {
+  it('returns guarded chat fallback for unknown tool-shaped ids', () => {
     const launch = resolveCatalogLaunch('not-a-shipped-tool-xyz-999');
-    expect(launch.path).toBe('/dashboard');
+    expect(launch.path).toBe('/chat');
     expect(launch.registryId).toBeNull();
     expect(launch.chatSeed).toMatch(/decision support|does not establish a diagnosis/i);
     expect(launch.orchestratorTool).toBeNull();
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
   });
 
   it('resolveCatalogLaunchFallback matches unknown launch shape', () => {
@@ -133,19 +133,19 @@ describe('resolveCatalogLaunch — Tier A dedicated calculator routes', () => {
 
 describe('resolveNavigationPathForLaunch — chat visibility', () => {
   it.each(PR3_CALCULATOR_REGISTRY_IDS)(
-    'PR3 %s navigates to dashboard after hub chat launch',
+    'PR3 %s navigates to chat after hub chat launch',
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
       expect(launch.path).toBe(HUB);
-      expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+      expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
     }
   );
 
   it.each(PR2_TIER_B_CHAT_CALCULATOR_IDS)(
-    'PR2 Tier-B %s navigates to dashboard for guided chat',
+    'PR2 Tier-B %s navigates to chat for guided chat',
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
-      expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+      expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
     }
   );
 
@@ -254,11 +254,11 @@ describe('resolveCatalogLaunch — fleet Tier A pages', () => {
 });
 
 describe('resolveCatalogLaunch — fleet Tier B dispatch hub', () => {
-  it('dispatch-ai launches calculators hub and navigates to dashboard', () => {
+  it('dispatch-ai launches calculators hub and navigates to chat', () => {
     const launch = resolveCatalogLaunch('dispatch-ai');
     expect(launch.path).toBe('/tools/calculators');
     expect(launch.openLabel).toBe('Start guided chat');
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
     expect(launch.orchestratorTool).toBeNull();
   });
 
@@ -272,7 +272,7 @@ describe('resolveCatalogLaunch — fleet Tier B dispatch hub', () => {
     const fromCanonical = resolveCatalogLaunch('dispatch-ai');
     expect(fromAlias.registryId).toBe('dispatch-ai');
     expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-    expect(resolveNavigationPathForLaunch(fromAlias)).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(fromAlias)).toBe('/chat');
   });
 });
 

@@ -20,6 +20,7 @@ import {
   offlineClinicalFeatures,
   workspaceTemplateCatalog,
 } from './clinicalCatalogWiring';
+import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
 import { nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
 
 /**
@@ -797,15 +798,23 @@ export function getSourceCodeDiscoverySummary() {
     platformFeatures: platformFeatures.length,
     collaboration: collaborationCapabilities.length,
     nluPatternCount: clinicalIntentTools.length,
-    orchestratorExecutorCount: 3,
+    orchestratorExecutorCount: ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.length,
     externalCatalogInRepo: 0,
   };
 }
 
 export const SOURCE_SCAN_LOCATIONS = [
-  { label: 'NLU clinical tools', path: 'backend/.../tool.patterns.ts', count: 24 },
-  { label: 'Backend executors', path: 'backend/.../tool-orchestrator/', count: 3 },
-  { label: 'Calculator UI slugs', path: 'src/pages/tools/Calculators.jsx', count: 8 },
+  { label: 'NLU clinical tools', path: 'backend/.../tool.patterns.ts', count: clinicalIntentTools.length },
+  {
+    label: 'Backend executors',
+    path: 'backend/.../tool-orchestrator/',
+    count: ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.length,
+  },
+  {
+    label: 'Calculator UI slugs',
+    path: 'src/pages/tools/Calculators.jsx',
+    count: builtinUiCalculators.length,
+  },
   { label: 'Sidebar registry', path: 'src/data/toolRegistry.js', count: toolRegistry.length },
   { label: 'Emergency NLU patterns', path: 'src/data/emergencyPatternCatalog.js', count: emergencyPatternGroups.length },
   { label: 'Phantom / roadmap IDs', path: 'CostTrackingContext, advancedRecommendationService', count: phantomToolReferences.length },

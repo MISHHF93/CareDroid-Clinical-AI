@@ -107,6 +107,17 @@ export interface ExecutorRequestContract {
   deterministic: boolean;
 }
 
+export const EXECUTOR_PARAMETER_ALIASES: Readonly<
+  Record<RegisteredExecutorToolId, Readonly<Record<string, string>>>
+> = {
+  'sofa-calculator': {
+    mechanical_ventilation: 'mechanicalVentilation',
+    urine_output: 'urineOutput',
+  },
+  'drug-interactions': {},
+  'lab-interpreter': {},
+};
+
 /** Request/response contracts for registered executors (documentation + validation hints). */
 export const EXECUTOR_REQUEST_CONTRACTS: Readonly<
   Record<RegisteredExecutorToolId, ExecutorRequestContract>
@@ -266,6 +277,23 @@ function hasRequiredParameterValue(value: unknown): boolean {
   return true;
 }
 
+export function normalizeExecutorParameters(
+  resolvedId: RegisteredExecutorToolId,
+  parameters: Record<string, unknown>,
+): Record<string, unknown> {
+  const aliases = EXECUTOR_PARAMETER_ALIASES[resolvedId] || {};
+  const normalized = { ...parameters };
+
+  for (const [alias, canonical] of Object.entries(aliases)) {
+    if (alias in normalized && !(canonical in normalized)) {
+      normalized[canonical] = normalized[alias];
+    }
+    delete normalized[alias];
+  }
+
+  return normalized;
+}
+
 /**
  * Contract-level validation before tool-specific validate() (deterministic SOFA + required fields).
  */
@@ -274,23 +302,24 @@ export function validateExecutorContractParameters(
   parameters: Record<string, unknown>,
 ): { valid: boolean; errors: string[] } {
   const contract = EXECUTOR_REQUEST_CONTRACTS[resolvedId];
+  const normalizedParameters = normalizeExecutorParameters(resolvedId, parameters);
   const errors: string[] = [];
 
   for (const key of contract.requiredParameters) {
-    if (!hasRequiredParameterValue(parameters[key])) {
+    if (!hasRequiredParameterValue(normalizedParameters[key])) {
       errors.push(`Missing required parameter: ${key}`);
     }
   }
 
-  if (resolvedId === 'drug-interactions' && Array.isArray(parameters.medications)) {
-    const meds = parameters.medications as unknown[];
+  if (resolvedId === 'drug-interactions' && Array.isArray(normalizedParameters.medications)) {
+    const meds = normalizedParameters.medications as unknown[];
     if (meds.some((m) => typeof m !== 'string' || !String(m).trim())) {
       errors.push('medications must be an array of non-empty drug name strings');
     }
   }
 
-  if (resolvedId === 'lab-interpreter' && Array.isArray(parameters.labValues)) {
-    const labs = parameters.labValues as unknown[];
+  if (resolvedId === 'lab-interpreter' && Array.isArray(normalizedParameters.labValues)) {
+    const labs = normalizedParameters.labValues as unknown[];
     if (labs.length === 0) {
       errors.push('labValues must be a non-empty array');
     }
@@ -307,6 +336,7 @@ export function getExecutorCatalogSnapshot() {
   return {
     audit: EXECUTOR_MAPPING_AUDIT,
     contracts: EXECUTOR_REQUEST_CONTRACTS,
+    parameterAliases: EXECUTOR_PARAMETER_ALIASES,
     registeredExecutorToolIds: [...REGISTERED_EXECUTOR_TOOL_IDS],
     registryIdToExecutor: { ...REGISTRY_ID_TO_EXECUTOR_TOOL_ID },
     executorAliases: { ...EXECUTOR_ID_ALIASES },

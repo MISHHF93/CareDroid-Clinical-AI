@@ -135,7 +135,8 @@ describe('PR-FLEET consistency — NLU and orchestrator maps', () => {
   });
 
   it('dispatch-ai is AI_EXECUTABLE (NLU/chat) but not POST-orchestrator registered', () => {
-    expect(clinicalIntentToolsById['dispatch-ai']?.backendExecutable).toBe(true);
+    expect(clinicalIntentToolsById['dispatch-ai']?.backendRouted).toBe(true);
+    expect(clinicalIntentToolsById['dispatch-ai']?.postExecutable).toBe(false);
     expect(AI_EXECUTABLE_NLU_TOOL_IDS).toContain('dispatch-ai');
     expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS).not.toContain('dispatch-ai');
     expect(REGISTRY_ID_TO_ORCHESTRATOR_TOOL['dispatch-ai']).toBeUndefined();
@@ -240,10 +241,10 @@ describe('PR-FLEET consistency — launch behavior', () => {
     expect(expectedLaunchPath(id)).toBe(spec.routePath);
   });
 
-  it.each(PR_FLEET_TIER_B_IDS)('%s uses calculators hub path and dashboard navigation', (id) => {
+  it.each(PR_FLEET_TIER_B_IDS)('%s uses calculators hub path and chat navigation', (id) => {
     const launch = resolveCatalogLaunch(id);
     expect(launch.path).toBe(PR_FLEET_HUB_PATH);
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
     expect(launch.openLabel).toBe('Start guided chat');
     expect(isKnownToolAreaPath(PR_FLEET_HUB_PATH)).toBe(true);
   });

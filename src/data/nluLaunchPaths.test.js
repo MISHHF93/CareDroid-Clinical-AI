@@ -36,14 +36,14 @@ describe('nluLaunchPaths — every NLU profile resolves visibly', () => {
     }
 
     if (expectation.expectsDashboardChat) {
-      expect(navPath).toBe('/dashboard');
+      expect(navPath).toBe('/chat');
       expect(plan.shouldSeedChat).toBe(true);
       expect(launch.chatSeed?.length).toBeGreaterThan(10);
     }
 
     if (expectation.kind === 'clinical-page') {
       expect(plan.mode).toBe('tool-page');
-      expect(navPath).not.toBe('/dashboard');
+      expect(navPath).not.toBe('/chat');
     }
 
     if (expectation.kind === 'fleet-page') {

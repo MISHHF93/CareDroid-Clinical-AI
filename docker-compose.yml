@@ -62,7 +62,7 @@ services:
       ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:- }
       OPENAI_API_KEY: ${OPENAI_API_KEY:- }
       PINECONE_API_KEY: ${PINECONE_API_KEY:- }
-      NLU_SERVICE_URL: http://nlu:8001
+      NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://nlu:8001}
       # Email Configuration
       SMTP_HOST: ${SMTP_HOST:-smtp.sendgrid.net}
       SMTP_PORT: ${SMTP_PORT:-587}
@@ -88,7 +88,7 @@ services:
       SENTRY_DSN: ${SENTRY_DSN:- }
       DATADOG_API_KEY: ${DATADOG_API_KEY:- }
     ports:
-      - "8000:3000"
+      - "3000:3000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -185,9 +185,10 @@ services:
       dockerfile: Dockerfile
     container_name: caredroid-frontend
     environment:
-      VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+      VITE_API_URL: ${VITE_API_URL:-}
+      VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://backend:3000}
     ports:
-      - "5173:5173"
+      - "8000:8000"
     depends_on:
       - backend
     volumes:

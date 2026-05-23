@@ -358,6 +358,7 @@ export class ChatService {
     const registryToOrchestrator: Record<string, string> = {
       'drug-check': 'drug-interactions',
       'lab-interp': 'lab-interpreter',
+      'sofa-score': 'sofa-calculator',
     };
     const targetId = registryToOrchestrator[toolHint];
     if (!targetId) {

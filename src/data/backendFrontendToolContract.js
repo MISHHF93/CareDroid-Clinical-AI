@@ -444,16 +444,6 @@ export function buildBackendFrontendContractRows() {
 export function getContractGaps(rows = buildBackendFrontendContractRows()) {
   const gaps = [];
 
-  const dispatchCatalog = clinicalIntentTools.find((t) => t.toolId === 'dispatch-ai');
-  if (dispatchCatalog?.backendExecutable && !isOrchestratorPostExecutable('dispatch-ai')) {
-    gaps.push({
-      id: 'dispatch-ai',
-      severity: 'low',
-      issue: 'clinicalIntentToolCatalog backendExecutable: true but no POST executor',
-      fix: gapFixFor({ canonicalId: 'dispatch-ai' }),
-    });
-  }
-
   for (const row of rows) {
     if (row.status === 'broken') {
       gaps.push({
@@ -489,7 +479,7 @@ function gapFixFor(row) {
     return 'Implement POST /api/tools/share-results in ToolOrchestratorController or remove/guard ToolResultShare.jsx call';
   }
   if (row.canonicalId === 'dispatch-ai') {
-    return 'Set backendExecutable: false in clinicalIntentToolCatalog.js or relabel catalog badge as NLU-only (no POST executor)';
+    return 'Keep `postExecutable: false` and label dispatch-ai as NLU/chat routed, not POST-executable';
   }
   if (row.catalogGap === 'no-nlu-profile' || row.canonicalId === 'procedures') {
     return 'Add `procedures` NLU row to clinicalIntentToolCatalog.js + matching entry in tool.patterns.ts, or document registry-only in catalog UI';
@@ -624,7 +614,7 @@ export function formatBackendFrontendContractMarkdown(
     '- **Keyboard shortcuts:** duplicate `Ctrl+Shift+*` bindings in `toolRegistry.js` (PERC/PHQ-9, GRACE/GAD-7, etc.).',
     '- **Route duality:** legacy `/tools/calculator/*` vs `/tools/calculators/*` — both valid; keep redirects in `clinicalToolRoutes.js`.',
     '- **Env:** align `backend/.env.example` `FRONTEND_URL` with Vite port **8000** when using default dev proxy.',
-    '- **dispatch-ai:** fleet Tier-B chat; `backendExecutable: true` in catalog is NLU/chat routing only — not POST execute (documented in row notes).',
+    '- **dispatch-ai:** fleet Tier-B chat; `backendRouted: true` marks NLU/chat routing, while `postExecutable: false` keeps it out of POST execute.',
     '',
     '## Regeneration',
     '',

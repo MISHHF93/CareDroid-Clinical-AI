@@ -123,12 +123,12 @@ describe('Production routes — catalog launch targets', () => {
   );
 
   it.each(CLINICAL_TIER_B_CHAT_REGISTRY_IDS)(
-    'Tier B chat %s launches to calculators hub with dashboard navigation',
+    'Tier B chat %s launches to calculators hub with chat navigation',
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
       expect(launch.path).toBe(TOOL_LAUNCH_PATHS.calculatorsHub);
       expect(launch.chatSeed?.length).toBeGreaterThan(20);
-      expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+      expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
     }
   );
 
@@ -156,9 +156,9 @@ describe('Production routes — tools area fallback redirects', () => {
     expect(redirect?.pathname).toBe('/tools/calculator/sofa');
   });
 
-  it('redirects chat-assisted mistyped subpath to dashboard with legacy tool param', () => {
+  it('redirects chat-assisted mistyped subpath to chat with legacy tool param', () => {
     const redirect = resolveToolsAreaRedirect('/tools/calculators/wells-pe');
-    expect(redirect?.pathname).toBe('/dashboard');
+    expect(redirect?.pathname).toBe('/chat');
     expect(redirect?.search).toBe('?tool=wells-pe');
   });
 

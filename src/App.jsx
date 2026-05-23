@@ -283,7 +283,7 @@ function AppRoutes() {
     );
   }
 
-  const resolveElement = ({ element, requiresAuth, publicOnly, permission }) => {
+  const resolveElement = ({ element, requiresAuth, publicOnly, permission, requireAllPermissions = false }) => {
     if (requiresAuth && !isAuthenticated) {
       return <Navigate to="/auth" replace />;
     }
@@ -294,7 +294,11 @@ function AppRoutes() {
 
     if (permission) {
       return (
-        <PermissionGate permission={permission} fallback={<Navigate to="/dashboard" replace />}>
+        <PermissionGate
+          permission={permission}
+          requireAll={requireAllPermissions}
+          fallback={<Navigate to="/dashboard" replace />}
+        >
           {element}
         </PermissionGate>
       );
@@ -335,15 +339,61 @@ function AppRoutes() {
     { path: '/tools/protocols', element: <AppShellPage><Protocols /></AppShellPage>, requiresAuth: true },
     { path: '/tools/diagnosis', element: <AppShellPage><DiagnosisAssistant /></AppShellPage>, requiresAuth: true },
     { path: '/tools/procedures', element: <AppShellPage><ProcedureGuide /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/ambient-scribe', element: <AppShellPage><AmbientScribe /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/tools/ambient-scribe',
+      element: <AppShellPage><AmbientScribe /></AppShellPage>,
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
     { path: '/tools/calculator-recommender', element: <AppShellPage><CalculatorRecommender /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/guideline-rag', element: <AppShellPage><GuidelineRag /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/differential-ai', element: <AppShellPage><DifferentialAi /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/timeline-ai', element: <AppShellPage><TimelineAi /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/patient-summary-ai', element: <AppShellPage><PatientSummaryAi /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/order-set-ai', element: <AppShellPage><OrderSetAi /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/ai-explainability', element: <AppShellPage><AiExplainability /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/clinical-audit', element: <AppShellPage><ClinicalAudit /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/tools/guideline-rag',
+      element: <AppShellPage><GuidelineRag /></AppShellPage>,
+      requiresAuth: true,
+      permission: Permission.USE_AI_CHAT,
+    },
+    {
+      path: '/tools/differential-ai',
+      element: <AppShellPage><DifferentialAi /></AppShellPage>,
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/timeline-ai',
+      element: <AppShellPage><TimelineAi /></AppShellPage>,
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/patient-summary-ai',
+      element: <AppShellPage><PatientSummaryAi /></AppShellPage>,
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/order-set-ai',
+      element: <AppShellPage><OrderSetAi /></AppShellPage>,
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/ai-explainability',
+      element: <AppShellPage><AiExplainability /></AppShellPage>,
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/clinical-audit',
+      element: <AppShellPage><ClinicalAudit /></AppShellPage>,
+      requiresAuth: true,
+      permission: Permission.VIEW_AUDIT_LOGS,
+    },
 
     { path: '/fleet/command', element: <AppShellPage><FleetDashboard /></AppShellPage>, requiresAuth: true },
     {

@@ -3,6 +3,9 @@ import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagg
 import { AuthGuard } from '@nestjs/passport';
 import { DrugService } from './drug.service';
 import { CreateDrugDto, UpdateDrugDto, SearchDrugDto } from './dto/drug.dto';
+import { AuthorizationGuard } from '../auth/guards/authorization.guard';
+import { RequirePermission } from '../auth/decorators/permissions.decorator';
+import { Permission } from '../auth/enums/permission.enum';
 
 @ApiTags('drugs')
 @Controller('drugs')
@@ -31,7 +34,8 @@ export class DrugController {
   }
 
   @Post()
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
+  @RequirePermission(Permission.WRITE_PHI)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new drug (admin only)' })
   @ApiResponse({ status: 201, description: 'Drug created' })
@@ -40,7 +44,8 @@ export class DrugController {
   }
 
   @Put(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
+  @RequirePermission(Permission.WRITE_PHI)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update drug (admin only)' })
   @ApiResponse({ status: 200, description: 'Drug updated' })
@@ -49,7 +54,8 @@ export class DrugController {
   }
 
   @Delete(':id')
-  @UseGuards(AuthGuard('jwt'))
+  @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
+  @RequirePermission(Permission.DELETE_PHI)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete drug (admin only)' })
   @ApiResponse({ status: 200, description: 'Drug deleted' })

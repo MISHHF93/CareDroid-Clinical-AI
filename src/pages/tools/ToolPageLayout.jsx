@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
-import { createSharedSession } from '../../utils/sharedSessions';
+import { buildSharedSessionUrl, createSharedSession } from '../../utils/sharedSessions';
 import { buildClinicalInsights } from '../../utils/clinicalInsights';
 import { computeRiskScore, generateClinicalAlerts } from '../../utils/riskScoring';
 import ToolResultShare from '../../components/tools/ToolResultShare';
@@ -120,11 +120,11 @@ const ToolPageLayout = ({
       parameters: { toolId: tool.id, shareId },
     });
 
-    const url = `${window.location.origin}/shared/tools/${shareId}`;
+    const url = buildSharedSessionUrl(shareId);
 
     try {
       await navigator.clipboard.writeText(url);
-      alert('Share link copied to clipboard.');
+      alert('Local session link copied. It opens on this browser profile for 30 days.');
     } catch (error) {
       window.prompt('Copy this link to share:', url);
     }
@@ -188,7 +188,7 @@ const ToolPageLayout = ({
             className="btn-share-tool"
             onClick={handleShareSession}
           >
-            Share Session
+            Share Local Session
           </button>
           {embedded ? (
             <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => onCloseEmbedded?.()}>

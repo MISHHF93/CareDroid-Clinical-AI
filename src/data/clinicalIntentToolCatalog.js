@@ -18,7 +18,12 @@ import { pecarnHeadChatConfig } from './chatAssistedCalculators/pecarnHead';
 import { nexusCSpineChatConfig } from './chatAssistedCalculators/nexusCSpine';
 import { dispatchAiChatConfig } from './chatAssistedFleet/dispatchAi';
 import { ensureChatSeedGuardrails } from './clinicalSafetyGuardrails';
-import { NLU, REGISTRY, TOOL_LAUNCH_PATHS } from './clinicalToolIdContract';
+import {
+  NLU,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+  REGISTRY,
+  TOOL_LAUNCH_PATHS,
+} from './clinicalToolIdContract';
 
 const clinicalIntentToolsRaw = [
   {
@@ -723,6 +728,8 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
 
 export const clinicalIntentTools = clinicalIntentToolsRaw.map((row) => ({
   ...row,
+  postExecutable: ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(row.toolId),
+  backendRouted: Boolean(row.backendExecutable),
   chatSeed: row.chatSeed ? ensureChatSeedGuardrails(row) : row.chatSeed,
 }));
 
@@ -1085,7 +1092,7 @@ export function getCatalogSummary({ sidebarCount = 0, backendToolCount = 0 } = {
     calculatorForms: builtinUiCalculators.length,
     aiClinicalProfiles: clinicalIntentTools.length,
     chatOnlyProfiles,
-    backendExecutors: backendToolCount || clinicalIntentTools.filter((t) => t.backendExecutable).length,
+    backendExecutors: backendToolCount || clinicalIntentTools.filter((t) => t.postExecutable).length,
   };
 }
 

@@ -27,7 +27,7 @@ const SharedToolSession = () => {
   return (
     <div className="shared-session">
       <div className="shared-session-card">
-        <span className="shared-tag">Shared Session</span>
+        <span className="shared-tag">Local Shared Session</span>
         <h1 className="shared-session-title">
           <span className="shared-session-title-icon" aria-hidden>
             <NavIcon icon={getToolIcon(session.toolId)} size={28} />
@@ -35,10 +35,20 @@ const SharedToolSession = () => {
           <span>{session.toolName || 'Clinical Tool'}</span>
         </h1>
         <p>{session.toolDescription || 'Shared tool session from CareDroid.'}</p>
+        <p>
+          This link is stored locally in the browser that created it. Export results for
+          portable sharing outside this device.
+        </p>
         <div className="shared-meta">
           <span>Created: {new Date(session.createdAt).toLocaleString()}</span>
+          {session.expiresAt && <span>Expires: {new Date(session.expiresAt).toLocaleDateString()}</span>}
           <span>Tool: {session.toolId}</span>
         </div>
+        {session.results && (
+          <pre className="shared-session-results">
+            {JSON.stringify(session.results, null, 2)}
+          </pre>
+        )}
         <div className="shared-actions">
           <button onClick={() => navigate('/dashboard')}>Open Dashboard</button>
           {tool && (

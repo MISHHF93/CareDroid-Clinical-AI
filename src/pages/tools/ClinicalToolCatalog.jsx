@@ -630,15 +630,11 @@ const ClinicalToolCatalog = () => {
   const handleTryInChat = (sidebarToolId, chatSeed) => {
     if (sidebarToolId) {
       launchCatalogItem(sidebarToolId);
-      if (chatSeed) {
-        addMessage(chatSeed, 'user');
-        navigate('/dashboard');
-      }
       return;
     }
     if (chatSeed) {
       addMessage(chatSeed, 'user');
-      navigate('/dashboard');
+      navigate('/chat');
     }
   };
 
@@ -654,8 +650,11 @@ const ClinicalToolCatalog = () => {
     launchFromRow(row);
   };
 
-  const isBackendExecutable = (toolId) =>
-    backendIds.has(toolId) || clinicalIntentTools.find((t) => t.toolId === toolId)?.backendExecutable;
+  const isPostExecutable = (toolId) =>
+    backendIds.has(toolId) || isOrchestratorRegisteredNlu(toolId);
+
+  const isBackendRouted = (toolId) =>
+    clinicalIntentTools.find((t) => t.toolId === toolId)?.backendRouted;
 
   return (
     <div className="clinical-tool-catalog">
@@ -1272,7 +1271,7 @@ const ClinicalToolCatalog = () => {
             <tbody>
               {(filteredBackend.length > 0
                 ? filteredBackend
-                : clinicalIntentTools.filter((t) => t.backendExecutable)
+                : clinicalIntentTools.filter((t) => t.postExecutable)
               ).map((tool) => {
                 const id = tool.id || tool.toolId;
                 const intentRow = clinicalIntentTools.find((t) => t.toolId === id);
@@ -1284,7 +1283,7 @@ const ClinicalToolCatalog = () => {
                     </td>
                     <td data-label="Name" className="catalog-tool-name-cell">
                       {tool.name || intentRow?.toolName}
-                      {intentRow?.backendExecutable && !isOrchestratorRegisteredNlu(id) && (
+                      {intentRow?.backendRouted && !isOrchestratorRegisteredNlu(id) && (
                         <span
                           className="catalog-inline-badge catalog-inline-badge--muted"
                           title="NLU profile only — not registered for POST /api/tools/:id/execute"
@@ -1367,8 +1366,10 @@ const ClinicalToolCatalog = () => {
                     </td>
                     <td data-label="Page">{tool.path ? 'Yes' : 'Chat only'}</td>
                     <td data-label="Backend">
-                      {isBackendExecutable(tool.toolId) ? (
-                        <span className="catalog-badge catalog-badge--backend">API</span>
+                      {isPostExecutable(tool.toolId) ? (
+                        <span className="catalog-badge catalog-badge--backend">POST API</span>
+                      ) : isBackendRouted(tool.toolId) ? (
+                        <span className="catalog-badge catalog-badge--backend">NLU backend</span>
                       ) : (
                         <span className="catalog-badge catalog-badge--client">Chat / UI</span>
                       )}

@@ -346,9 +346,9 @@ describe('PR1 comprehensive — NLU aliases, routes, resolveCatalogLaunch', () =
     expect(rows.some((r) => r.primaryId === registryId || r.sidebarToolId === registryId)).toBe(true);
   });
 
-  it('resolveCatalogLaunch returns guarded dashboard fallback for unknown id', () => {
+  it('resolveCatalogLaunch returns guarded chat fallback for unknown id', () => {
     const launch = resolveCatalogLaunch('not-a-pr1-tool-xyz');
-    expect(launch.path).toBe('/dashboard');
+    expect(launch.path).toBe('/chat');
     expect(launch.registryId).toBeNull();
     expect(launch.chatSeed).toMatch(/decision support|does not establish a diagnosis/i);
   });

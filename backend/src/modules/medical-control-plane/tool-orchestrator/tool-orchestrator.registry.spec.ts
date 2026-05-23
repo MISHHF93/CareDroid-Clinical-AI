@@ -4,12 +4,14 @@ import {
   REGISTERED_EXECUTOR_TOOL_IDS,
   REGISTRY_ID_TO_EXECUTOR_TOOL_ID,
   EXECUTOR_ID_ALIASES,
+  EXECUTOR_PARAMETER_ALIASES,
   EXECUTOR_REQUEST_CONTRACTS,
   NLU_TOOL_IDS_WITHOUT_EXECUTOR,
   resolveExecutorToolId,
   classifyToolExecutionError,
   validateExecutorRequestPayload,
   validateExecutorContractParameters,
+  normalizeExecutorParameters,
   isKnownUnsupportedNluTool,
   getExecutorCatalogSnapshot,
   ToolExecutionErrorCode,
@@ -105,6 +107,29 @@ describe('tool-orchestrator.registry', () => {
   it('validateExecutorContractParameters allows empty optional SOFA inputs', () => {
     expect(validateExecutorContractParameters('sofa-calculator', {}).valid).toBe(true);
     expect(EXECUTOR_REQUEST_CONTRACTS['sofa-calculator'].deterministic).toBe(true);
+  });
+
+  it('normalizes SOFA snake_case NLU parameters to executor camelCase parameters', () => {
+    expect(EXECUTOR_PARAMETER_ALIASES['sofa-calculator']).toEqual({
+      mechanical_ventilation: 'mechanicalVentilation',
+      urine_output: 'urineOutput',
+    });
+    expect(
+      normalizeExecutorParameters('sofa-calculator', {
+        urine_output: 450,
+        mechanical_ventilation: true,
+      }),
+    ).toEqual({
+      urineOutput: 450,
+      mechanicalVentilation: true,
+    });
+  });
+
+  it('documents executor parameter aliases for pattern parameters that differ by casing', () => {
+    const sofaPattern = patternsSource.match(/toolId:\s*'sofa-calculator'[\s\S]*?optionalParameters:\s*\[([\s\S]*?)\]/);
+    expect(sofaPattern?.[1]).toContain("'urine_output'");
+    expect(EXECUTOR_REQUEST_CONTRACTS['sofa-calculator'].optionalParameters).toContain('urineOutput');
+    expect(EXECUTOR_PARAMETER_ALIASES['sofa-calculator'].urine_output).toBe('urineOutput');
   });
 
   it('isKnownUnsupportedNluTool identifies dispatch-ai', () => {

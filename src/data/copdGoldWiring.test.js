@@ -64,7 +64,7 @@ describe('COPD GOLD (Tier B chat-assisted) wiring', () => {
     expect(launch.chatSeed).toMatch(/hospitalization history/i);
     expect(launch.openLabel).toBe('Start guided chat');
     expect(launch.orchestratorTool).toBeNull();
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
   });
 
   it.each(PR6_REQUIRED_NLU_ALIAS_PAIRS)(

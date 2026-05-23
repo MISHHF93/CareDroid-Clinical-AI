@@ -279,10 +279,10 @@ export const capabilityExposureMatrix = Object.freeze([
   {
     capability: 'Shared tool session and result surfaces',
     backendSourceFile: 'No backend route found for shared sessions/results; frontend shared session store and gated export/share helpers.',
-    commandOrApiRoute: 'Public SPA route /shared/tools/:shareId; gated frontend-only POST /api/tools/share-results capability is false; ToolResultShare.jsx also generates unrouted /shared-result/:encoded links.',
-    currentFrontendSurface: 'ToolPageLayout.jsx Share Session button, SharedToolSession.jsx public route, ToolResultShare.jsx local link/export modal.',
+    commandOrApiRoute: 'Public SPA route /shared/tools/:shareId; gated frontend-only POST /api/tools/share-results capability is false; result links now use the mounted /shared/tools/:shareId local-session route.',
+    currentFrontendSurface: 'ToolPageLayout.jsx Share Local Session button, SharedToolSession.jsx public route, ToolResultShare.jsx local link/export modal.',
     exposureStatus: 'unsafe/unclear',
-    userFacingProblem: 'Protected tool workflows can create public share URLs, and result-share link generation does not match the mounted SPA route.',
+    userFacingProblem: 'Protected tool workflows can create public-looking share URLs that are backed by same-browser local storage only.',
     recommendedFrontendMechanism: 'Classify public share as explicit public surface; align generated routes, expiry/privacy copy, and backend capability gate before expanding sharing.',
     riskLevel: 'high',
   },

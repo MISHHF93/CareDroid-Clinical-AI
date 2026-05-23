@@ -15,6 +15,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
+import { CustomerPortalDto } from './dto/customer-portal.dto';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 
@@ -67,8 +68,8 @@ export class SubscriptionsController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create customer portal session' })
   @ApiResponse({ status: 200, description: 'Portal session created' })
-  async createPortalSession(@Req() req: any, @Body() body: { returnUrl?: string }) {
-    return this.subscriptionsService.createCustomerPortalSession(req.user.id, body.returnUrl);
+  async createPortalSession(@Req() req: any, @Body() dto: CustomerPortalDto) {
+    return this.subscriptionsService.createCustomerPortalSession(req.user.id, dto.returnUrl);
   }
 
   @Get('current')

@@ -297,7 +297,7 @@ describe('PR4A consistency — resolveCatalogLaunch, routes, sidebar, deep links
 
   it('does not expose empty launch for unknown ids', () => {
     const empty = resolveCatalogLaunch('not-a-pr4a-calculator');
-    expect(empty.path).toBe('/dashboard');
+    expect(empty.path).toBe('/chat');
     expect(empty.registryId).toBeNull();
     expect(empty.chatSeed).toBeTruthy();
   });

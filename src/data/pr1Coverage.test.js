@@ -75,7 +75,7 @@ describe('PR1 coverage — NLU aliases & resolveCatalogLaunch', () => {
     expect(resolveCatalogLaunch('')).toEqual(empty);
     expect(resolveCatalogLaunch(null)).toEqual(empty);
     const unknown = resolveCatalogLaunch('not-a-real-tool-id-xyz');
-    expect(unknown.path).toBe('/dashboard');
+    expect(unknown.path).toBe('/chat');
     expect(unknown.registryId).toBeNull();
     expect(unknown.chatSeed).toBeTruthy();
   });

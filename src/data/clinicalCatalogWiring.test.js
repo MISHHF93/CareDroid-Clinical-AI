@@ -20,19 +20,19 @@ describe('clinicalCatalogWiring helpers', () => {
     expect(isCalculatorsHubPath('/dashboard')).toBe(false);
   });
 
-  it('resolveNavigationPathForLaunch sends hub chat seeds to dashboard', () => {
+  it('resolveNavigationPathForLaunch sends hub chat seeds to chat', () => {
     const nav = resolveNavigationPathForLaunch({
       path: '/tools/calculators',
       chatSeed: 'Calculate Wells PE',
     });
-    expect(nav).toBe('/dashboard');
+    expect(nav).toBe('/chat');
   });
 
   it('resolveRegistryId maps unknown ids to null', () => {
     expect(resolveRegistryId('not-a-real-tool-id-xyz')).toBeNull();
   });
 
-  it('unknown catalog id returns safe dashboard launch', () => {
+  it('unknown catalog id returns safe chat launch', () => {
     const launch = resolveCatalogLaunch('totally-unknown-tool');
     expect(launch.path).toBe(CATALOG_UNKNOWN_TOOL_LAUNCH.path);
     expect(launch.chatSeed?.length).toBeGreaterThan(20);

@@ -267,9 +267,9 @@ describe('4. COPD GOLD launch behavior', () => {
     expect(appSource).not.toContain(`path: '/tools/calculators/${canonical}'`);
   });
 
-  it('resolveNavigationPathForLaunch routes to dashboard for chat visibility', () => {
+  it('resolveNavigationPathForLaunch routes to chat for chat visibility', () => {
     const launch = resolveCatalogLaunch(canonical);
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
     expect(launch.chatSeed).toMatch(WIRING_AUDIT_TOOL_SPECS[canonical].chatSeedPattern);
   });
 });
@@ -305,9 +305,9 @@ describe('5. Rome IV IBS launch behavior', () => {
     expect(appSource).not.toContain(`path: '/tools/calculators/${canonical}'`);
   });
 
-  it('resolveNavigationPathForLaunch routes to dashboard for chat visibility', () => {
+  it('resolveNavigationPathForLaunch routes to chat for chat visibility', () => {
     const launch = resolveCatalogLaunch(canonical);
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/dashboard');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
     expect(launch.chatSeed).toMatch(WIRING_AUDIT_TOOL_SPECS[canonical].chatSeedPattern);
   });
 });
@@ -439,7 +439,7 @@ describe('9. Route resolution', () => {
 
   it('returns empty launch for unknown tool ids', () => {
     const empty = resolveCatalogLaunch('not-a-clinical-tool-xyz-123');
-    expect(empty.path).toBe('/dashboard');
+    expect(empty.path).toBe('/chat');
     expect(empty.registryId).toBeNull();
     expect(empty.chatSeed).toBeTruthy();
   });

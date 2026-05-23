@@ -323,8 +323,8 @@ function apiClientFor(orchestratorToolId, launchType, registryId) {
 }
 
 function navigationPathFor(route, launchType, chatSeed) {
-  if (chatSeed && route === TOOL_LAUNCH_PATHS.calculatorsHub) return '/dashboard';
-  if (launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED && chatSeed) return '/dashboard';
+  if (chatSeed && route === TOOL_LAUNCH_PATHS.calculatorsHub) return '/chat';
+  if (launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED && chatSeed) return '/chat';
   return route || TOOL_LAUNCH_PATHS.toolsCatalog;
 }
 

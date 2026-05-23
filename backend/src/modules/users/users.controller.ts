@@ -15,7 +15,6 @@ export class UsersController {
 
   @Get('profile')
   @ApiOperation({ summary: 'Get current user profile' })
-  @RequirePermission(Permission.READ_PHI)
   async getProfile(@Req() req: any) {
     return this.usersService.findById(
       req.user.id,

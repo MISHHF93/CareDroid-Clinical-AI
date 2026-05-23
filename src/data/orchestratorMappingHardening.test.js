@@ -68,9 +68,10 @@ describe('orchestratorMappingHardening — Tier B chat-assisted', () => {
     }
   });
 
-  it('dispatch-ai remains backendExecutable in catalog but not POST-executable', () => {
+  it('dispatch-ai remains backend-routed in catalog but not POST-executable', () => {
     const row = clinicalIntentTools.find((t) => t.toolId === NLU.dispatchAi);
-    expect(row?.backendExecutable).toBe(true);
+    expect(row?.backendRouted).toBe(true);
+    expect(row?.postExecutable).toBe(false);
     expect(isOrchestratorPostExecutable(NLU.dispatchAi)).toBe(false);
   });
 });

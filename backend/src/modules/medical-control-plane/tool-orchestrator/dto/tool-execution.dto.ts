@@ -2,12 +2,32 @@
  * Tool Execution DTOs
  */
 
+import { IsObject, IsOptional, IsString } from 'class-validator';
 import { ToolExecutionErrorCode } from '../tool-orchestrator.registry';
 
 export class ExecuteToolDto {
+  @IsString()
   toolId: string;
+
+  @IsObject()
   parameters: Record<string, any>;
+
+  @IsOptional()
+  @IsString()
   userId?: string;
+
+  @IsOptional()
+  @IsString()
+  conversationId?: string;
+}
+
+export class ToolExecutionBodyDto {
+  @IsOptional()
+  @IsObject()
+  parameters?: Record<string, any>;
+
+  @IsOptional()
+  @IsString()
   conversationId?: string;
 }
 

@@ -135,7 +135,7 @@ export function resolveToolsAreaRedirect(pathname) {
   }
   if (plan.mode === 'chat-assisted') {
     return {
-      pathname: '/dashboard',
+      pathname: '/chat',
       search: `?tool=${encodeURIComponent(plan.registryId || subpathSlug)}`,
     };
   }
@@ -150,9 +150,9 @@ export function resolveToolsAreaRedirect(pathname) {
     }
     const navPath = resolveNavigationPathForLaunch(launch);
     if (navPath && normalizeToolPathname(navPath) !== normalized) {
-      if (navPath === '/dashboard' && launch.chatSeed) {
+      if ((navPath === '/dashboard' || navPath === '/chat') && launch.chatSeed) {
         return {
-          pathname: '/dashboard',
+          pathname: '/chat',
           search: `?tool=${encodeURIComponent(registryId || subpathSlug)}`,
         };
       }

@@ -5,10 +5,17 @@ import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { MedicalSource } from '../rag/dto/medical-source.dto';
+import { IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 
-interface ChatMessage3DDto {
+class ChatMessage3DDto {
+  @IsString()
   patientId: string;
+
+  @IsString()
   message: string;
+
+  @IsOptional()
+  @IsObject()
   context?: {
     vitals?: Record<string, any>;
     medications?: string[];
@@ -16,15 +23,29 @@ interface ChatMessage3DDto {
   };
 }
 
-interface ChatMessageDto {
+class ChatMessageDto {
+  @IsString()
   message: string;
+
+  @IsOptional()
+  @IsString()
   tool?: string;
+
+  @IsOptional()
+  @IsString()
   feature?: string;
+
+  @IsOptional()
+  @IsNumber()
   conversationId?: number;
 }
 
-interface IntentClassifyDto {
+class IntentClassifyDto {
+  @IsString()
   message: string;
+
+  @IsOptional()
+  @IsNumber()
   conversationId?: number;
 }
 
