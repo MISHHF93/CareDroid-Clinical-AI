@@ -90,6 +90,9 @@ export const REGISTRY = Object.freeze({
   apache2Calculator: 'apache2-calculator',
   curb65Calculator: 'curb65-calculator',
   gcsCalculator: 'gcs-calculator',
+  mews: 'mews',
+  revisedTraumaScore: 'revised-trauma-score',
+  pews: 'pews',
   wellsDvtCalculator: 'wells-dvt-calculator',
   protocols: 'protocols',
   diagnosis: 'diagnosis',
@@ -152,6 +155,9 @@ export const NLU = Object.freeze({
   cha2ds2vascCalculator: 'cha2ds2vasc-calculator',
   curb65Calculator: 'curb65-calculator',
   gcsCalculator: 'gcs-calculator',
+  mews: 'mews',
+  revisedTraumaScore: 'revised-trauma-score',
+  pews: 'pews',
   wellsDvtCalculator: 'wells-dvt-calculator',
   wellsPe: 'wells-pe',
   perc: 'perc',
@@ -211,6 +217,12 @@ export const BUILTIN_CALC = Object.freeze({
   bisapScore: 'bisap-score',
   fib4: 'fib4',
   framinghamRisk: 'framingham-risk',
+  apacheIi: 'apache-ii',
+  curb65: 'curb-65',
+  gcs: 'gcs',
+  mews: 'mews',
+  revisedTraumaScore: 'revised-trauma-score',
+  pews: 'pews',
   abcd2: 'abcd2',
   shockIndex: 'shock-index',
   anionGap: 'anion-gap',
@@ -286,6 +298,15 @@ export const PR11_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
 
 export const PR11_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR11_TIER_A_CALCULATOR_REGISTRY_IDS]);
 
+export const EMERGENCY_CRITICAL_CARE_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
+  REGISTRY.apache2Calculator,
+  REGISTRY.curb65Calculator,
+  REGISTRY.gcsCalculator,
+  REGISTRY.mews,
+  REGISTRY.revisedTraumaScore,
+  REGISTRY.pews,
+]);
+
 /** All Tier-A calculator registry ids (dedicated routes + forms when shipped). */
 export const CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...LEGACY_TIER_A_CALCULATOR_REGISTRY_IDS,
@@ -296,6 +317,7 @@ export const CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...PR8_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR10_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR11_TIER_A_CALCULATOR_REGISTRY_IDS,
+  ...EMERGENCY_CRITICAL_CARE_TIER_A_CALCULATOR_REGISTRY_IDS,
 ]);
 
 // —— Chat-assisted clinical tools (Tier B hub) ——
@@ -328,9 +350,6 @@ export const CLINICAL_TIER_B_CHAT_REGISTRY_IDS = Object.freeze([
 
 /** NLU hub chat tools with dedicated sidebar registry rows (guided chat from calculators hub). */
 export const CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS = Object.freeze([
-  NLU.apache2Calculator,
-  NLU.curb65Calculator,
-  NLU.gcsCalculator,
   NLU.wellsDvtCalculator,
 ]);
 
@@ -435,9 +454,6 @@ export const KEYWORD_ROUTED_REGISTRY_IDS = Object.freeze([
  * NLU profiles that route to the calculators hub (chat-assisted; dedicated sidebar registry rows).
  */
 export const NLU_HUB_ONLY_PROFILE_TOOL_IDS = Object.freeze([
-  NLU.apache2Calculator,
-  NLU.curb65Calculator,
-  NLU.gcsCalculator,
   NLU.wellsDvtCalculator,
 ]);
 
@@ -474,6 +490,9 @@ export const NLU_PROFILE_TOOL_IDS = Object.freeze([
   NLU.cha2ds2vascCalculator,
   NLU.curb65Calculator,
   NLU.gcsCalculator,
+  NLU.mews,
+  NLU.revisedTraumaScore,
+  NLU.pews,
   NLU.wellsDvtCalculator,
   NLU.wellsPe,
   NLU.perc,
@@ -533,6 +552,12 @@ export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
   [BUILTIN_CALC.bisapScore]: REGISTRY.bisapScore,
   [BUILTIN_CALC.fib4]: REGISTRY.fib4,
   [BUILTIN_CALC.framinghamRisk]: REGISTRY.framinghamRisk,
+  [BUILTIN_CALC.apacheIi]: REGISTRY.apache2Calculator,
+  [BUILTIN_CALC.curb65]: REGISTRY.curb65Calculator,
+  [BUILTIN_CALC.gcs]: REGISTRY.gcsCalculator,
+  [BUILTIN_CALC.mews]: REGISTRY.mews,
+  [BUILTIN_CALC.revisedTraumaScore]: REGISTRY.revisedTraumaScore,
+  [BUILTIN_CALC.pews]: REGISTRY.pews,
   [BUILTIN_CALC.abcd2]: REGISTRY.abcd2,
   [BUILTIN_CALC.shockIndex]: REGISTRY.shockIndex,
   [BUILTIN_CALC.anionGap]: REGISTRY.anionGap,
@@ -551,6 +576,9 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
   [NLU.cha2ds2vascCalculator]: REGISTRY.calcChads2vasc,
   [NLU.curb65Calculator]: REGISTRY.curb65Calculator,
   [NLU.gcsCalculator]: REGISTRY.gcsCalculator,
+  [NLU.mews]: REGISTRY.mews,
+  [NLU.revisedTraumaScore]: REGISTRY.revisedTraumaScore,
+  [NLU.pews]: REGISTRY.pews,
   [NLU.wellsDvtCalculator]: REGISTRY.wellsDvtCalculator,
   [NLU.wellsPe]: REGISTRY.wellsPe,
   [NLU.perc]: REGISTRY.perc,
@@ -673,9 +701,29 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'sofa-calculator': REGISTRY.sofaScore,
   sofa_calculator: REGISTRY.sofaScore,
   'apache2-calculator': REGISTRY.apache2Calculator,
+  'apache-ii': REGISTRY.apache2Calculator,
+  'apache ii': REGISTRY.apache2Calculator,
+  'apache 2': REGISTRY.apache2Calculator,
+  apache: REGISTRY.apache2Calculator,
   'cha2ds2vasc-calculator': REGISTRY.calcChads2vasc,
   'curb65-calculator': REGISTRY.curb65Calculator,
+  'curb-65': REGISTRY.curb65Calculator,
+  curb65: REGISTRY.curb65Calculator,
+  'curb 65': REGISTRY.curb65Calculator,
   'gcs-calculator': REGISTRY.gcsCalculator,
+  gcs: REGISTRY.gcsCalculator,
+  'glasgow coma scale': REGISTRY.gcsCalculator,
+  mews: REGISTRY.mews,
+  'modified early warning score': REGISTRY.mews,
+  'early warning score mews': REGISTRY.mews,
+  'revised-trauma-score': REGISTRY.revisedTraumaScore,
+  'revised trauma score': REGISTRY.revisedTraumaScore,
+  rts: REGISTRY.revisedTraumaScore,
+  'trauma score': REGISTRY.revisedTraumaScore,
+  'trauma-score': REGISTRY.revisedTraumaScore,
+  pews: REGISTRY.pews,
+  'pediatric early warning score': REGISTRY.pews,
+  'paediatric early warning score': REGISTRY.pews,
   'wells-dvt-calculator': REGISTRY.wellsDvtCalculator,
   'dose-calculator': REGISTRY.doseCalculator,
   'abg-interpreter': REGISTRY.abgInterpreter,

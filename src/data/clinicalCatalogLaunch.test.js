@@ -196,9 +196,9 @@ describe('resolveCatalogLaunch — NLU hub-only scores', () => {
     expect(launch.orchestratorTool).toBeNull();
   });
 
-  it('resolves apache2 alias via NLU profile not generic calculators registry row', () => {
+  it('resolves apache2 alias via the dedicated calculator route', () => {
     const launch = resolveCatalogLaunch('apache2-calculator');
-    expect(launch.path).toBe(HUB);
+    expect(launch.path).toBe('/tools/calculators/apache-ii');
     expect(launch.chatSeed).toMatch(/APACHE/i);
     expect(launch.registryId).toBe(REGISTRY.apache2Calculator);
   });

@@ -98,9 +98,6 @@ describe('clinicalToolAliasSync — chat-assisted tools', () => {
       'copd-gold',
       'rome-iv-ibs',
       'dispatch-ai',
-      'apache2-calculator',
-      'curb65-calculator',
-      'gcs-calculator',
       'wells-dvt-calculator',
     ]) {
       expect(CHAT_ASSISTED_NLU_TOOL_IDS).toContain(toolId);

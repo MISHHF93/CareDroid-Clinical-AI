@@ -17,6 +17,7 @@ import { ToolOrchestratorService } from '../src/modules/medical-control-plane/to
 import { RAGService } from '../src/modules/rag/rag.service';
 import { NluMetricsService } from '../src/modules/metrics/nlu-metrics.service';
 import { EmergencyEscalationService } from '../src/modules/medical-control-plane/emergency-escalation/emergency-escalation.service';
+import { CalculatorRecommenderService } from '../src/modules/chat/calculator-recommender.service';
 
 describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
   let aiService: AIService;
@@ -129,6 +130,12 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
               message: '',
             }),
             shouldEscalate: jest.fn().mockReturnValue(false),
+          },
+        },
+        {
+          provide: CalculatorRecommenderService,
+          useValue: {
+            recommend: jest.fn().mockReturnValue({ recommendations: [] }),
           },
         },
       ],

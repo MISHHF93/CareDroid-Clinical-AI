@@ -25,6 +25,7 @@ import {
   PR9_TIER_B_CHAT_CALCULATOR_IDS,
   PR10_TIER_A_CALCULATOR_REGISTRY_IDS,
   PR11_TIER_A_CALCULATOR_REGISTRY_IDS,
+  EMERGENCY_CRITICAL_CARE_TIER_A_CALCULATOR_REGISTRY_IDS,
   PR_FLEET_ALL_REGISTRY_IDS,
   REGISTRY,
 } from './clinicalToolIdContract';
@@ -64,7 +65,6 @@ export const TOOL_PATTERNS_PATH = join(
 /** Phantom / cost-tracking ids that must never map to a launchable registry via NLU_TO_REGISTRY_ID. */
 export const PHANTOM_BLOCKED_CATALOG_ALIASES = Object.freeze([
   'abc-assessment',
-  'trauma-score',
   'chemo-calculator',
   'cancer-calculator',
   'tumor-staging',
@@ -123,6 +123,7 @@ export const AUDITED_CLINICAL_REGISTRY_IDS = Object.freeze([
   ...PR9_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR10_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR11_TIER_A_CALCULATOR_REGISTRY_IDS,
+  ...EMERGENCY_CRITICAL_CARE_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR_FLEET_ALL_REGISTRY_IDS,
   REGISTRY.drugCheck,
   REGISTRY.labInterp,

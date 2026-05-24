@@ -78,6 +78,14 @@ import {
 } from './pr8ClinicalBatchCalculators';
 import { Abcd2Calculator } from './abcd2Calculator';
 import { AnionGapCalculator, RassCalculator, ShockIndexCalculator } from './nextWaveCalculators';
+import {
+  ApacheIICalculator,
+  Curb65Calculator,
+  GcsCalculator,
+  MewsCalculator,
+  PewsCalculator,
+  RevisedTraumaScoreCalculator,
+} from './emergencyCriticalCareCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -436,6 +444,18 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <QSOFACalculator onResultChange={onResultChange} />;
     case 'news2':
       return <NEWS2Calculator onResultChange={onResultChange} />;
+    case 'apache-ii':
+      return <ApacheIICalculator onResultChange={onResultChange} />;
+    case 'curb-65':
+      return <Curb65Calculator onResultChange={onResultChange} />;
+    case 'gcs':
+      return <GcsCalculator onResultChange={onResultChange} />;
+    case 'mews':
+      return <MewsCalculator onResultChange={onResultChange} />;
+    case 'revised-trauma-score':
+      return <RevisedTraumaScoreCalculator onResultChange={onResultChange} />;
+    case 'pews':
+      return <PewsCalculator onResultChange={onResultChange} />;
     case 'child-pugh':
       return <ChildPughCalculator onResultChange={onResultChange} />;
     case 'has-bled':

@@ -399,11 +399,12 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
     category: 'calculator',
-    description: 'ICU mortality prediction (chat-assisted; no dedicated form yet).',
-    path: '/tools/calculators',
+    description:
+      'APACHE II ICU severity scoring from validated point bands, GCS, age, and chronic health. Mortality estimates are diagnosis-specific and not generated.',
+    path: '/tools/calculators/apache-ii',
     sidebarToolId: 'apache2-calculator',
     chatSeed:
-      'Help me estimate an APACHE-II score. I will provide age, vitals, labs, and GCS as available.',
+      'Open APACHE II and help me score acute physiology, GCS, age, and chronic health using validated APACHE II point bands. Clinical decision support only. Do not estimate mortality without diagnosis-specific validated context.',
     backendExecutable: false,
   },
   {
@@ -420,22 +421,58 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     toolId: 'curb65-calculator',
     toolName: 'CURB-65 Score',
     category: 'calculator',
-    description: 'CAP severity (chat-assisted; no dedicated form yet).',
-    path: '/tools/calculators',
+    description: 'Community-acquired pneumonia severity score using confusion, urea/BUN, respiratory rate, blood pressure, and age.',
+    path: '/tools/calculators/curb-65',
     sidebarToolId: 'curb65-calculator',
     chatSeed:
-      'Help me apply CURB-65 for pneumonia severity using confusion, urea, RR, BP, and age.',
+      'Open CURB-65 and help me apply pneumonia severity criteria: confusion, urea or BUN, respiratory rate, blood pressure, and age. Clinical decision support only; not a diagnosis or disposition order.',
     backendExecutable: false,
   },
   {
     toolId: 'gcs-calculator',
     toolName: 'Glasgow Coma Scale',
     category: 'calculator',
-    description: 'Level of consciousness scoring (chat-assisted).',
-    path: '/tools/calculators',
+    description: 'Level of consciousness scoring from eye, verbal, and motor responses with severe/moderate/mild interpretation ranges.',
+    path: '/tools/calculators/gcs',
     sidebarToolId: 'gcs-calculator',
     chatSeed:
-      'Help me score and interpret the Glasgow Coma Scale from eye, verbal, and motor responses.',
+      'Open the Glasgow Coma Scale calculator and help me score eye, verbal, and motor responses. Clinical decision support only; not a diagnosis.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.mews,
+    toolName: 'Modified Early Warning Score (MEWS)',
+    category: 'calculator',
+    description:
+      'Adult early-warning score from respiratory rate, heart rate, systolic blood pressure, temperature, and AVPU.',
+    path: '/tools/calculators/mews',
+    sidebarToolId: REGISTRY.mews,
+    chatSeed:
+      'Open MEWS and help me calculate an adult early-warning score from respiratory rate, heart rate, systolic blood pressure, temperature, and AVPU. Clinical decision support only; not a diagnosis.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.revisedTraumaScore,
+    toolName: 'Revised Trauma Score',
+    category: 'calculator',
+    description:
+      'Physiologic trauma severity score using coded GCS, systolic blood pressure, and respiratory rate.',
+    path: '/tools/calculators/revised-trauma-score',
+    sidebarToolId: REGISTRY.revisedTraumaScore,
+    chatSeed:
+      'Open Revised Trauma Score and help me calculate weighted RTS from GCS, systolic blood pressure, and respiratory rate. Clinical decision support only; trauma pathways take priority.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pews,
+    toolName: 'Pediatric Early Warning Score (PEWS)',
+    category: 'calculator',
+    description:
+      'Pediatric early-warning score using Brighton-style behavior, cardiovascular, respiratory, nebulizer, and vomiting criteria.',
+    path: '/tools/calculators/pews',
+    sidebarToolId: REGISTRY.pews,
+    chatSeed:
+      'Open PEWS and help me calculate a pediatric early-warning score from behavior, cardiovascular status, respiratory status, frequent nebulizers, and persistent vomiting. Pediatric caution: use age-appropriate norms and local escalation pathways. Clinical decision support only.',
     backendExecutable: false,
   },
   {
@@ -445,7 +482,21 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     description: 'Pre-test probability for DVT (chat-assisted).',
     path: '/tools/calculators',
     sidebarToolId: 'wells-dvt-calculator',
-    chatSeed: 'Help me complete a Wells score for suspected DVT using my clinical findings.',
+    chatSeed: `Help me complete a Wells score for suspected DVT using my clinical findings.
+
+Ask for missing inputs one at a time:
+1. Active cancer
+2. Paralysis, paresis, or recent plaster immobilization of lower extremity
+3. Recently bedridden for more than 3 days or major surgery within 12 weeks
+4. Localized tenderness along deep venous system
+5. Entire leg swollen
+6. Calf swelling at least 3 cm larger than asymptomatic side
+7. Pitting edema confined to symptomatic leg
+8. Collateral superficial veins
+9. Previous documented DVT
+10. Alternative diagnosis at least as likely as DVT
+
+Then summarize entered findings, calculate the Wells DVT score, explain likely/unlikely or probability-band interpretation, show limitations, cite the original Wells validation work, and warn: "Clinical decision support only. Not a diagnosis." Do not invent missing clinical values.`,
     backendExecutable: false,
   },
   {
@@ -733,19 +784,8 @@ export const clinicalIntentTools = clinicalIntentToolsRaw.map((row) => ({
   chatSeed: row.chatSeed ? ensureChatSeedGuardrails(row) : row.chatSeed,
 }));
 
-/** Built-in calculator slugs not yet in Calculators.jsx UI — NLU + catalog only */
+/** Calculator profiles that intentionally launch guided chat from the hub instead of a dedicated form. */
 export const nluCalculatorHubOnly = [
-  {
-    toolId: NLU.apache2Calculator,
-    name: 'APACHE-II',
-    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
-  },
-  {
-    toolId: NLU.curb65Calculator,
-    name: 'CURB-65',
-    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
-  },
-  { toolId: NLU.gcsCalculator, name: 'GCS', hubPath: TOOL_LAUNCH_PATHS.calculatorsHub },
   {
     toolId: NLU.wellsDvtCalculator,
     name: 'Wells DVT',
@@ -822,6 +862,60 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/news2',
     calcQuery: '/tools/calculators?calc=news2',
     implementation: 'Client-side in Calculators.jsx (news2Calculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'apache-ii',
+    name: 'APACHE II',
+    description: 'ICU severity score using APACHE II acute physiology, GCS, age, and chronic health points.',
+    path: '/tools/calculators/apache-ii',
+    calcQuery: '/tools/calculators?calc=apache-ii',
+    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'curb-65',
+    name: 'CURB-65',
+    description: 'Community-acquired pneumonia severity (confusion, urea/BUN, RR, BP, age).',
+    path: '/tools/calculators/curb-65',
+    calcQuery: '/tools/calculators?calc=curb-65',
+    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'gcs',
+    name: 'Glasgow Coma Scale',
+    description: 'Consciousness scoring from eye, verbal, and motor responses.',
+    path: '/tools/calculators/gcs',
+    calcQuery: '/tools/calculators?calc=gcs',
+    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'mews',
+    name: 'MEWS',
+    description: 'Modified Early Warning Score from adult vitals and AVPU.',
+    path: '/tools/calculators/mews',
+    calcQuery: '/tools/calculators?calc=mews',
+    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'revised-trauma-score',
+    name: 'Revised Trauma Score',
+    description: 'Weighted trauma physiology score from coded GCS, systolic BP, and respiratory rate.',
+    path: '/tools/calculators/revised-trauma-score',
+    calcQuery: '/tools/calculators?calc=revised-trauma-score',
+    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pews',
+    name: 'PEWS',
+    description: 'Pediatric Early Warning Score with pediatric caution labels.',
+    path: '/tools/calculators/pews',
+    calcQuery: '/tools/calculators?calc=pews',
+    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
     orchestratorId: null,
   },
   {

@@ -64,8 +64,8 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     groupId: 'nlu-hub-screening',
     heading: 'Screening & severity (chat)',
     lead:
-      'APACHE-II, CURB-65, GCS, and Wells DVT support structured scoring in guided chat (clinical decision support only). They do not diagnose, establish prognosis with certainty, or replace ICU admission, sepsis, or VTE pathways — unstable patients need urgent evaluation first.',
-    toolIds: ['apache2-calculator', 'curb65-calculator', 'gcs-calculator', 'wells-dvt-calculator'],
+      'Wells DVT supports structured scoring in guided chat (clinical decision support only). It does not diagnose DVT, establish prognosis with certainty, or replace VTE pathways — unstable patients need urgent evaluation first.',
+    toolIds: ['wells-dvt-calculator'],
   },
 ]);
 
