@@ -1,11 +1,15 @@
 /* PublicShell Layout Styles */
 
 .public-shell {
+  flex: 1 1 auto;
   height: var(--app-viewport-height, 100dvh);
   min-height: 100svh;
+  max-height: var(--app-viewport-height, 100dvh);
+  min-width: 0;
   display: flex;
   flex-direction: column;
   background: var(--navy-bg);
+  overflow-x: clip;
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
@@ -95,6 +99,7 @@
 /* Main Content */
 .public-main {
   flex: 1;
+  min-width: 0;
   max-width: min(1760px, 100%);
   width: 100%;
   margin: 0 auto;

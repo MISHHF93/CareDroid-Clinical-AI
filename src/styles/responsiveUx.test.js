@@ -12,6 +12,14 @@ const responsiveUxCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8
 const layoutVisibilityCss = readFileSync(join(__dirname, 'layout-visibility.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const mainJsx = readFileSync(join(__dirname, '../main.jsx'), 'utf8');
+const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
+const authShellCss = readFileSync(join(__dirname, '../layout/AuthShell.css'), 'utf8');
+const publicShellCss = readFileSync(join(__dirname, '../layout/PublicShell.css'), 'utf8');
+const quickCommandCss = readFileSync(
+  join(__dirname, '../components/QuickCommandLauncher.css'),
+  'utf8'
+);
+const drawerCss = readFileSync(join(__dirname, '../components/ui/Drawer.css'), 'utf8');
 const buttonCss = readFileSync(join(__dirname, '../components/ui/button.css'), 'utf8');
 const dashboardVisualizationsCss = readFileSync(
   join(__dirname, '../components/dashboard/DashboardVisualizations.css'),
@@ -45,9 +53,37 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('prevents body-level horizontal overflow without a fixed root minimum width', () => {
-    expect(indexCss).toMatch(/html,\s*body,\s*#root\s*\{[\s\S]*min-width:\s*0/);
+    expect(indexCss).toMatch(/html\s*\{[\s\S]*min-width:\s*0/);
+    expect(indexCss).toMatch(/body\s*\{[\s\S]*min-width:\s*0/);
+    expect(indexCss).toMatch(/#root\s*\{[\s\S]*min-width:\s*0/);
     expect(layoutVisibilityCss).toMatch(/body\s*\{[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*min-inline-size:\s*0/);
+  });
+
+  it('defines one canonical authenticated page scrollport plus local scroll helpers', () => {
+    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*overflow-y:\s*auto/);
+    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*height:\s*100%/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*flex:\s*0 0 auto/
+    );
+    expect(indexCss).toMatch(/\.app-local-scroll-y\s*\{[\s\S]*overflow-y:\s*auto/);
+    expect(indexCss).toMatch(/\.app-local-scroll-x\s*\{[\s\S]*overflow-x:\s*auto/);
+  });
+
+  it('keeps auth and public shells as route-level scrollports under the locked root', () => {
+    expect(authShellCss).toMatch(/\.auth-shell\s*\{[\s\S]*overflow-y:\s*auto/);
+    expect(authShellCss).toMatch(/\.auth-shell\s*\{[\s\S]*scroll-padding-block/);
+    expect(publicShellCss).toMatch(/\.public-shell\s*\{[\s\S]*overflow-y:\s*auto/);
+    expect(publicShellCss).toMatch(/\.public-shell\s*\{[\s\S]*overflow-x:\s*clip/);
+  });
+
+  it('keeps overlay bodies locally scrollable without becoming page scroll owners', () => {
+    expect(quickCommandCss).toMatch(/\.quick-command-results\s*\{[\s\S]*overflow-y:\s*auto/);
+    expect(quickCommandCss).toMatch(
+      /\.quick-command-results\s*\{[\s\S]*overscroll-behavior:\s*contain/
+    );
+    expect(drawerCss).toMatch(/\.drawer-body\s*\{[\s\S]*overflow-y:\s*auto/);
+    expect(drawerCss).toMatch(/\.drawer-body\s*\{[\s\S]*overflow-x:\s*clip/);
   });
 
   it('wraps long clinical tool names and catalog cells', () => {
@@ -60,7 +96,9 @@ describe('responsive-ux.css — global normalization', () => {
     expect(responsiveUxCss).toMatch(
       /@media \(max-width: 640px\)[\s\S]*min-height:\s*var\(--app-min-touch-target/
     );
-    expect(responsiveUxCss).toMatch(/\.calc-input-field[\s\S]*min-height:\s*var\(--app-min-touch-target/);
+    expect(responsiveUxCss).toMatch(
+      /\.calc-input-field[\s\S]*min-height:\s*var\(--app-min-touch-target/
+    );
   });
 
   it('wraps badges and chips', () => {
@@ -81,9 +119,7 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('reduces card padding on small screens', () => {
-    expect(responsiveUxCss).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*--app-card-padding-compact/
-    );
+    expect(responsiveUxCss).toMatch(/@media \(max-width: 640px\)[\s\S]*--app-card-padding-compact/);
   });
 });
 
@@ -99,7 +135,9 @@ describe('responsive UX — component baselines', () => {
 
   it('dashboard visualization grids collapse before phone widths and hide chart overflow locally', () => {
     expect(dashboardVisualizationsCss).toMatch(/\.dashboard-visual-grid[\s\S]*minmax\(0,\s*1fr\)/);
-    expect(dashboardVisualizationsCss).toMatch(/@media \(max-width:\s*860px\)[\s\S]*grid-template-columns:\s*1fr/);
+    expect(dashboardVisualizationsCss).toMatch(
+      /@media \(max-width:\s*860px\)[\s\S]*grid-template-columns:\s*1fr/
+    );
     expect(dashboardVisualizationsCss).toMatch(/\.dashboard-chart[\s\S]*overflow:\s*hidden/);
   });
 });

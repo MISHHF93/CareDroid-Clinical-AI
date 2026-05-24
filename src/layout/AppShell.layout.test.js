@@ -68,7 +68,8 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-y:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-x:\s*clip/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*min-width:\s*0/);
-    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*height:\s*auto/);
+    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*height:\s*100%/);
+    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*scroll-padding-bottom/);
   });
 
   it('reserves compact chrome offset on scrollport (not hidden behind menu/command controls)', () => {
@@ -107,10 +108,16 @@ describe('App shell layout — page scrollport', () => {
 
   it('scroll routes grow with content instead of clipping inside page-body', () => {
     expect(appShellCss).toMatch(
-      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*min-height:\s*min-content/
+      /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*min-height:\s*auto/
     );
     expect(appShellCss).toMatch(
       /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*overflow:\s*visible/
+    );
+  });
+
+  it('keeps command dashboard out of the conversation-only scroll container', () => {
+    expect(readFileSync(join(__dirname, '../App.jsx'), 'utf8')).toContain(
+      "const isConversationViewport = ['/chat', '/assistant'].includes(location.pathname)"
     );
   });
 });

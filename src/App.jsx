@@ -24,7 +24,10 @@ import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
 import { applyRegistryToolLaunch } from './navigation/registryToolLaunch';
 import { AUTH_PATH_ALIASES, AUTH_SIGNUP_PATH_ALIASES } from './routing/authPathAliases';
-import { CALCULATOR_ROUTE_DEFS, LEGACY_CALCULATOR_ROUTE_ALIASES } from './routes/clinicalToolRoutes';
+import {
+  CALCULATOR_ROUTE_DEFS,
+  LEGACY_CALCULATOR_ROUTE_ALIASES,
+} from './routes/clinicalToolRoutes';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 
 // Page imports - Public
@@ -41,10 +44,10 @@ const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
 const Operations = lazyWithRetry(() => import('./pages/Operations'));
 const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
+const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
-const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
 
 // Lazy-loaded pages for better performance (loaded on demand)
 const NotificationPreferences = lazyWithRetry(() => import('./pages/NotificationPreferences'));
@@ -104,12 +107,7 @@ logger.info('App.jsx loaded - Medical AI Chat Application');
 
 function NotificationToasts() {
   const { notifications, removeNotification } = useNotifications();
-  return (
-    <NotificationToastContainer
-      toasts={notifications}
-      onDismiss={removeNotification}
-    />
-  );
+  return <NotificationToastContainer toasts={notifications} onDismiss={removeNotification} />;
 }
 
 // ==================== AUTH PAGE ====================
@@ -170,7 +168,8 @@ export function WelcomePage() {
         <h1 className="welcome-page-title">CareDroid-Clinical-AI</h1>
 
         <p className="welcome-page-lead">
-          Your universal medical AI doctor. Get instant clinical guidance, drug interaction checks, lab interpretations, and evidence-based recommendations.
+          Your universal medical AI doctor. Get instant clinical guidance, drug interaction checks,
+          lab interpretations, and evidence-based recommendations.
         </p>
 
         <div className="welcome-page-grid">
@@ -179,21 +178,27 @@ export function WelcomePage() {
               <NavIcon icon={CHROME_ICONS.checkCircle} size={20} aria-hidden />
               <span>Clinical Tools</span>
             </div>
-            <div className="welcome-page-card-desc">Drug checker, calculators, lab interpreter, protocols</div>
+            <div className="welcome-page-card-desc">
+              Drug checker, calculators, lab interpreter, protocols
+            </div>
           </div>
           <div className="welcome-page-card">
             <div className="welcome-page-card-title welcome-page-card-title--icon">
               <NavIcon icon={CHROME_ICONS.shield} size={20} aria-hidden />
               <span>Secure & Compliant</span>
             </div>
-            <div className="welcome-page-card-desc">HIPAA-ready, encrypted conversations, audit logging</div>
+            <div className="welcome-page-card-desc">
+              HIPAA-ready, encrypted conversations, audit logging
+            </div>
           </div>
           <div className="welcome-page-card">
             <div className="welcome-page-card-title welcome-page-card-title--icon">
               <NavIcon icon={CHROME_ICONS.rocket} size={20} aria-hidden />
               <span>Always On</span>
             </div>
-            <div className="welcome-page-card-desc">Works offline, stores conversations, available everywhere</div>
+            <div className="welcome-page-card-desc">
+              Works offline, stores conversations, available everywhere
+            </div>
           </div>
         </div>
 
@@ -210,11 +215,14 @@ export function WelcomePage() {
 
         {enableDevAuthBypass && (
           <p className="welcome-page-dev-note">
-            Direct sign-in is enabled for local development and uses the same app shell routes as signed-in users.
+            Direct sign-in is enabled for local development and uses the same app shell routes as
+            signed-in users.
           </p>
         )}
 
-        <p className="welcome-page-footnote">Healthcare professionals only. Secure login required.</p>
+        <p className="welcome-page-footnote">
+          Healthcare professionals only. Secure login required.
+        </p>
       </div>
     </div>
   );
@@ -277,7 +285,7 @@ function AppShellPage({ children }) {
     navigate('/tools/catalog');
   };
 
-  const isConversationViewport = ['/dashboard', '/home', '/chat', '/assistant'].includes(location.pathname);
+  const isConversationViewport = ['/chat', '/assistant'].includes(location.pathname);
 
   return (
     <AppShell
@@ -361,7 +369,13 @@ function AppRoutes() {
     );
   }
 
-  const resolveElement = ({ element, requiresAuth, publicOnly, permission, requireAllPermissions = false }) => {
+  const resolveElement = ({
+    element,
+    requiresAuth,
+    publicOnly,
+    permission,
+    requireAllPermissions = false,
+  }) => {
     if (requiresAuth && !isAuthenticated) {
       return <Navigate to="/auth" replace />;
     }
@@ -386,32 +400,128 @@ function AppRoutes() {
   };
 
   const routes = [
-    { path: '/', element: <PublicShell><WelcomePage /></PublicShell>, publicOnly: true },
-    { path: '/auth', element: <AuthShell><AuthPage /></AuthShell>, publicOnly: true },
-    { path: '/auth-callback', element: <AuthShell><AuthCallback /></AuthShell>, publicOnly: true },
-    { path: '/auth/callback', element: <AuthShell><LegacyOAuthCallbackRedirect /></AuthShell>, publicOnly: true },
+    {
+      path: '/',
+      element: (
+        <PublicShell>
+          <WelcomePage />
+        </PublicShell>
+      ),
+      publicOnly: true,
+    },
+    {
+      path: '/auth',
+      element: (
+        <AuthShell>
+          <AuthPage />
+        </AuthShell>
+      ),
+      publicOnly: true,
+    },
+    {
+      path: '/auth-callback',
+      element: (
+        <AuthShell>
+          <AuthCallback />
+        </AuthShell>
+      ),
+      publicOnly: true,
+    },
+    {
+      path: '/auth/callback',
+      element: (
+        <AuthShell>
+          <LegacyOAuthCallbackRedirect />
+        </AuthShell>
+      ),
+      publicOnly: true,
+    },
     ...AUTH_PATH_ALIASES.map((path) => ({
       path,
       element: <AuthPathRedirect />,
       publicOnly: true,
     })),
 
-    { path: '/dashboard', element: <AppShellPage><CommandDashboard /></AppShellPage>, requiresAuth: true },
-    { path: '/hospital-map', element: <AppShellPage><HospitalMapDashboard /></AppShellPage>, requiresAuth: true },
-    { path: '/home', element: <LegacyProtectedRouteRedirect to="/dashboard" />, requiresAuth: true },
-    { path: '/assistant', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
-    { path: '/chat', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
+    {
+      path: '/dashboard',
+      element: (
+        <AppShellPage>
+          <CommandDashboard />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/home',
+      element: <LegacyProtectedRouteRedirect to="/dashboard" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/assistant',
+      element: (
+        <AppShellPage>
+          <Dashboard />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/chat',
+      element: <LegacyProtectedRouteRedirect to="/assistant" />,
+      requiresAuth: true,
+    },
     ...ASSISTANT_ROUTE_ALIASES.map((path) => ({
       path,
       element: <LegacyProtectedRouteRedirect to="/assistant" />,
       requiresAuth: true,
     })),
-    { path: '/patients', element: <AppShellPage><Patients /></AppShellPage>, requiresAuth: true },
-    { path: '/operations', element: <AppShellPage><Operations /></AppShellPage>, requiresAuth: true },
-    { path: '/medical-iot', element: <AppShellPage><MedicalIotDashboard /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/patients',
+      element: (
+        <AppShellPage>
+          <Patients />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/operations',
+      element: (
+        <AppShellPage>
+          <Operations />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/medical-iot',
+      element: (
+        <AppShellPage>
+          <MedicalIotDashboard />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/hospital-map',
+      element: (
+        <AppShellPage>
+          <HospitalMapDashboard />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
 
     // Clinical tools: canonical routes render their product pages directly.
-    { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/tools',
+      element: (
+        <AppShellPage>
+          <ToolsOverview />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
     ...TOOLS_ROUTE_ALIASES.map((path) => ({
       path,
       element: <LegacyProtectedRouteRedirect to="/tools" />,
@@ -419,15 +529,39 @@ function AppRoutes() {
     })),
     {
       path: '/tools/catalog',
-      element: <AppShellPage><ClinicalToolCatalog /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <ClinicalToolCatalog />
+        </AppShellPage>
+      ),
       requiresAuth: true,
       permission: Permission.CONFIGURE_SYSTEM,
     },
-    { path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/lab-interpreter', element: <AppShellPage><LabInterpreter /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/tools/drug-checker',
+      element: (
+        <AppShellPage>
+          <DrugChecker />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/lab-interpreter',
+      element: (
+        <AppShellPage>
+          <LabInterpreter />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
     ...CALCULATOR_ROUTE_DEFS.map(({ path, calculatorSlug }) => ({
       path,
-      element: <AppShellPage><Calculators initialCalculatorId={calculatorSlug} /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <Calculators initialCalculatorId={calculatorSlug} />
+        </AppShellPage>
+      ),
       requiresAuth: true,
     })),
     ...LEGACY_CALCULATOR_ROUTE_ALIASES.map(({ path, to }) => ({
@@ -435,147 +569,420 @@ function AppRoutes() {
       element: <LegacyProtectedRouteRedirect to={to} />,
       requiresAuth: true,
     })),
-    { path: '/tools/calculators', element: <AppShellPage><Calculators /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/calculators/:slug', element: <AppShellPage><Calculators /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/tools/calculators',
+      element: (
+        <AppShellPage>
+          <Calculators />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/calculators/:slug',
+      element: (
+        <AppShellPage>
+          <Calculators />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
     ...CALCULATORS_ROUTE_ALIASES.map((path) => ({
       path,
       element: <LegacyProtectedRouteRedirect to="/tools/calculators" />,
       requiresAuth: true,
     })),
-    { path: '/tools/protocols', element: <AppShellPage><Protocols /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/diagnosis', element: <AppShellPage><DiagnosisAssistant /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/procedures', element: <AppShellPage><ProcedureGuide /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/tools/protocols',
+      element: (
+        <AppShellPage>
+          <Protocols />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/diagnosis',
+      element: (
+        <AppShellPage>
+          <DiagnosisAssistant />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/procedures',
+      element: (
+        <AppShellPage>
+          <ProcedureGuide />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
     {
       path: '/tools/ambient-scribe',
-      element: <AppShellPage><AmbientScribe /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <AmbientScribe />
+        </AppShellPage>
+      ),
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
-    { path: '/tools/calculator-recommender', element: <AppShellPage><CalculatorRecommender /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/tools/calculator-recommender',
+      element: (
+        <AppShellPage>
+          <CalculatorRecommender />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
     {
       path: '/tools/guideline-rag',
-      element: <AppShellPage><GuidelineRag /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <GuidelineRag />
+        </AppShellPage>
+      ),
       requiresAuth: true,
       permission: Permission.USE_AI_CHAT,
     },
     {
       path: '/tools/differential-ai',
-      element: <AppShellPage><DifferentialAi /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <DifferentialAi />
+        </AppShellPage>
+      ),
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/timeline-ai',
-      element: <AppShellPage><TimelineAi /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <TimelineAi />
+        </AppShellPage>
+      ),
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/patient-summary-ai',
-      element: <AppShellPage><PatientSummaryAi /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <PatientSummaryAi />
+        </AppShellPage>
+      ),
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/order-set-ai',
-      element: <AppShellPage><OrderSetAi /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <OrderSetAi />
+        </AppShellPage>
+      ),
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/ai-explainability',
-      element: <AppShellPage><AiExplainability /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <AiExplainability />
+        </AppShellPage>
+      ),
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/clinical-audit',
-      element: <AppShellPage><ClinicalAudit /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <ClinicalAudit />
+        </AppShellPage>
+      ),
       requiresAuth: true,
       permission: Permission.VIEW_AUDIT_LOGS,
     },
 
-    { path: '/fleet', element: <LegacyProtectedRouteRedirect to="/operations" />, requiresAuth: true },
-    { path: '/catalog', element: <LegacyProtectedRouteRedirect to="/tools/catalog" />, requiresAuth: true },
-    { path: '/fleet/command', element: <AppShellPage><FleetDashboard /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/fleet',
+      element: <LegacyProtectedRouteRedirect to="/operations" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/catalog',
+      element: <LegacyProtectedRouteRedirect to="/tools/catalog" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/fleet/command',
+      element: (
+        <AppShellPage>
+          <FleetDashboard />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
     {
       path: '/fleet/predictive-maintenance',
-      element: <AppShellPage><PredictiveMaintenance /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <PredictiveMaintenance />
+        </AppShellPage>
+      ),
       requiresAuth: true,
     },
     {
       path: '/fleet/route-optimizer',
-      element: <AppShellPage><RouteOptimizer /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <RouteOptimizer />
+        </AppShellPage>
+      ),
       requiresAuth: true,
     },
-    { path: '/tools/*', element: <AppShellPage><ToolNotFound /></AppShellPage>, requiresAuth: true },
-    { path: '/fleet/*', element: <AppShellPage><ToolsAreaFallback /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/tools/*',
+      element: (
+        <AppShellPage>
+          <ToolNotFound />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/fleet/*',
+      element: (
+        <AppShellPage>
+          <ToolsAreaFallback />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
 
     // Clinical Intelligence routes
-    { path: '/clinical/alerts', element: <AppShellPage><ClinicalAlertsPage /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/clinical/alerts',
+      element: (
+        <AppShellPage>
+          <ClinicalAlertsPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
 
-    { path: '/profile', element: <AppShellPage><Profile /></AppShellPage>, requiresAuth: true },
-    { path: '/profile-settings', element: <AppShellPage><ProfileSettings /></AppShellPage>, requiresAuth: true },
-    { path: '/settings', element: <AppShellPage><Settings /></AppShellPage>, requiresAuth: true },
-    { path: '/notifications', element: <AppShellPage><NotificationPreferences /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/profile',
+      element: (
+        <AppShellPage>
+          <Profile />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/profile-settings',
+      element: (
+        <AppShellPage>
+          <ProfileSettings />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/settings',
+      element: (
+        <AppShellPage>
+          <Settings />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/notifications',
+      element: (
+        <AppShellPage>
+          <NotificationPreferences />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
 
-    { path: '/two-factor-setup', element: <AppShellPage><TwoFactorSetup /></AppShellPage>, requiresAuth: true },
-    { path: '/biometric-setup', element: <AppShellPage><BiometricSetup /></AppShellPage>, requiresAuth: true },
-    { path: '/onboarding', element: <AppShellPage><Onboarding /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/two-factor-setup',
+      element: (
+        <AppShellPage>
+          <TwoFactorSetup />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/biometric-setup',
+      element: (
+        <AppShellPage>
+          <BiometricSetup />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/onboarding',
+      element: (
+        <AppShellPage>
+          <Onboarding />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
 
-    { path: '/consent', element: <AppShellPage><ConsentFlow /></AppShellPage>, requiresAuth: true },
-    { path: '/consent-history', element: <AppShellPage><ConsentHistory /></AppShellPage>, requiresAuth: true },
+    {
+      path: '/consent',
+      element: (
+        <AppShellPage>
+          <ConsentFlow />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/consent-history',
+      element: (
+        <AppShellPage>
+          <ConsentHistory />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
 
-    { path: '/privacy', element: <PublicShell><PrivacyPolicy /></PublicShell> },
-    { path: '/terms', element: <PublicShell><TermsOfService /></PublicShell> },
-    { path: '/gdpr', element: <PublicShell><GDPRNotice /></PublicShell> },
-    { path: '/hipaa', element: <PublicShell><HIPAANotice /></PublicShell> },
-    { path: '/help', element: <PublicShell><HelpCenter /></PublicShell> },
-    { path: '/version', element: <PublicShell><Version /></PublicShell> },
-    { path: '/shared/tools/:shareId', element: <PublicShell><SharedToolSession /></PublicShell> },
+    {
+      path: '/privacy',
+      element: (
+        <PublicShell>
+          <PrivacyPolicy />
+        </PublicShell>
+      ),
+    },
+    {
+      path: '/terms',
+      element: (
+        <PublicShell>
+          <TermsOfService />
+        </PublicShell>
+      ),
+    },
+    {
+      path: '/gdpr',
+      element: (
+        <PublicShell>
+          <GDPRNotice />
+        </PublicShell>
+      ),
+    },
+    {
+      path: '/hipaa',
+      element: (
+        <PublicShell>
+          <HIPAANotice />
+        </PublicShell>
+      ),
+    },
+    {
+      path: '/help',
+      element: (
+        <PublicShell>
+          <HelpCenter />
+        </PublicShell>
+      ),
+    },
+    {
+      path: '/version',
+      element: (
+        <PublicShell>
+          <Version />
+        </PublicShell>
+      ),
+    },
+    {
+      path: '/shared/tools/:shareId',
+      element: (
+        <PublicShell>
+          <SharedToolSession />
+        </PublicShell>
+      ),
+    },
 
     {
       path: '/team',
-      element: <AppShellPage><TeamManagement /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <TeamManagement />
+        </AppShellPage>
+      ),
       requiresAuth: true,
-      permission: Permission.MANAGE_USERS
+      permission: Permission.MANAGE_USERS,
     },
     {
       path: '/audit-logs',
-      element: <AppShellPage><AuditLogs /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <AuditLogs />
+        </AppShellPage>
+      ),
       requiresAuth: true,
-      permission: Permission.VIEW_AUDIT_LOGS
+      permission: Permission.VIEW_AUDIT_LOGS,
     },
     {
       path: '/analytics',
-      element: <AppShellPage><AnalyticsDashboard /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <AnalyticsDashboard />
+        </AppShellPage>
+      ),
       requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS
+      permission: Permission.VIEW_ANALYTICS,
     },
     {
       path: '/costs',
-      element: <AppShellPage><CostAnalyticsDashboard /></AppShellPage>,
+      element: (
+        <AppShellPage>
+          <CostAnalyticsDashboard />
+        </AppShellPage>
+      ),
       requiresAuth: true,
-      permission: Permission.VIEW_ANALYTICS
+      permission: Permission.VIEW_ANALYTICS,
     },
 
-    { path: '*', element: isAuthenticated ? <AppShellPage><ToolNotFound title="Page not found" description="The requested route does not exist in this workspace." /></AppShellPage> : <Navigate to="/auth" replace /> }
+    {
+      path: '*',
+      element: isAuthenticated ? (
+        <AppShellPage>
+          <ToolNotFound
+            title="Page not found"
+            description="The requested route does not exist in this workspace."
+          />
+        </AppShellPage>
+      ) : (
+        <Navigate to="/auth" replace />
+      ),
+    },
   ];
 
   return (
     <Routes>
       {routes.map((route) => (
-        <Route
-          key={route.path}
-          path={route.path}
-          element={resolveElement(route)}
-        />
+        <Route key={route.path} path={route.path} element={resolveElement(route)} />
       ))}
     </Routes>
   );
@@ -586,28 +993,28 @@ function App() {
   return (
     <BrowserRouter>
       <ThemeProvider>
-      <UserProvider>
-        <NotificationProvider>
-          <WorkspaceProvider>
-            <CostTrackingProvider>
-              <ToolPreferencesProvider>
-                <ConversationProvider>
-                <SystemConfigProvider>
-                  <OfflineProvider>
-                    <ErrorBoundary>
-                      <Suspense fallback={<PageLoader />}>
-                        <AppRoutes />
-                      </Suspense>
-                      <NotificationToasts />
-                    </ErrorBoundary>
-                  </OfflineProvider>
-                </SystemConfigProvider>
-                </ConversationProvider>
-              </ToolPreferencesProvider>
-            </CostTrackingProvider>
-          </WorkspaceProvider>
-        </NotificationProvider>
-      </UserProvider>
+        <UserProvider>
+          <NotificationProvider>
+            <WorkspaceProvider>
+              <CostTrackingProvider>
+                <ToolPreferencesProvider>
+                  <ConversationProvider>
+                    <SystemConfigProvider>
+                      <OfflineProvider>
+                        <ErrorBoundary>
+                          <Suspense fallback={<PageLoader />}>
+                            <AppRoutes />
+                          </Suspense>
+                          <NotificationToasts />
+                        </ErrorBoundary>
+                      </OfflineProvider>
+                    </SystemConfigProvider>
+                  </ConversationProvider>
+                </ToolPreferencesProvider>
+              </CostTrackingProvider>
+            </WorkspaceProvider>
+          </NotificationProvider>
+        </UserProvider>
       </ThemeProvider>
     </BrowserRouter>
   );

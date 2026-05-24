@@ -25,8 +25,8 @@ body {
 
 /* —— Scroll routes: content grows; vertical scroll stays on .app-shell-page-body —— */
 .app-shell-page-body:not(.app-shell-page-body--conversation) > * {
-  flex: 1 0 auto;
-  min-height: min-content;
+  flex: 0 0 auto;
+  min-height: auto;
   height: auto;
   max-height: none;
   overflow: visible;
@@ -43,10 +43,13 @@ body {
 .app-shell-page-body:not(.app-shell-page-body--conversation) pre {
   max-width: 100%;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   -webkit-overflow-scrolling: touch;
 }
 
 /* —— Standard tool / catalog / analytics page roots —— */
+.command-dashboard,
+.medical-iot-page,
 .tools-overview,
 .calculators-content,
 .clinical-tool-catalog,
@@ -66,6 +69,8 @@ body {
   box-sizing: border-box;
 }
 
+.command-dashboard,
+.medical-iot-page,
 .tools-overview,
 .clinical-tool-catalog,
 .calculators-content {
@@ -87,13 +92,13 @@ body {
 .tools-recent-list,
 .tips-grid,
 .analytics-header,
-  .analytics-panel-grid,
-  .drug-checker,
-  .lab-input-panel,
-  .lab-results-panel,
-  .clinical-executor-feedback,
-  .fleet-page-main,
-  .fleet-toolbar {
+.analytics-panel-grid,
+.drug-checker,
+.lab-input-panel,
+.lab-results-panel,
+.clinical-executor-feedback,
+.fleet-page-main,
+.fleet-toolbar {
   min-width: 0;
   max-width: 100%;
 }
@@ -106,15 +111,18 @@ body {
 /* Wide tables scroll inside their wrapper only */
 .catalog-table-wrap,
 .app-table-scroll-x,
+.app-local-scroll-x,
 .lab-category-section,
 .fleet-data-table-wrap {
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   max-width: 100%;
   min-width: 0;
 }
 
 .catalog-table-wrap,
+.app-local-scroll-x,
 .lab-category-section,
 .fleet-data-table-wrap {
   overscroll-behavior-x: contain;

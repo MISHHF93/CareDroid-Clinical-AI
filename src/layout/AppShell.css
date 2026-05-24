@@ -169,7 +169,8 @@
   grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
   gap: 2px;
   min-height: var(--app-bottom-nav-height, 64px);
-  padding: 6px max(6px, env(safe-area-inset-right, 0px)) 6px max(6px, env(safe-area-inset-left, 0px));
+  padding: 6px max(6px, env(safe-area-inset-right, 0px)) 6px
+    max(6px, env(safe-area-inset-left, 0px));
   border-top: 1px solid var(--panel-border);
   background: var(--app-surface-glass);
   -webkit-backdrop-filter: blur(var(--app-blur-glass, 18px));
@@ -231,7 +232,7 @@
 
 /* Authed page column: primary vertical scrollport for tool/fleet/settings pages */
 .app-shell-page-body {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -239,15 +240,22 @@
   max-width: 100%;
   min-width: 0;
   min-height: 0;
-  height: auto;
-  max-height: none;
+  height: 100%;
+  max-height: 100%;
   overflow-x: clip;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   overscroll-behavior-x: none;
   -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable;
-  padding-bottom: max(var(--app-shell-page-gutter-block, 12px), var(--app-keyboard-inset-bottom, 0px));
+  padding-bottom: max(
+    var(--app-shell-page-gutter-block, 12px),
+    var(--app-keyboard-inset-bottom, 0px)
+  );
+  scroll-padding-bottom: max(
+    var(--app-shell-page-gutter-block, 12px),
+    var(--app-keyboard-inset-bottom, env(safe-area-inset-bottom, 0px))
+  );
   box-sizing: border-box;
 }
 
@@ -287,8 +295,8 @@
 
 /* Tools, catalog, settings, etc.: grow with content; scroll on .app-shell-page-body (see layout-visibility.css) */
 .app-shell-page-body:not(.app-shell-page-body--conversation) > * {
-  flex: 1 0 auto;
-  min-height: min-content;
+  flex: 0 0 auto;
+  min-height: auto;
   height: auto;
   max-height: none;
   overflow: visible;
@@ -336,7 +344,9 @@
 
 @media (max-width: 900px) {
   .app-shell-dev-mode-banner {
-    margin: calc(var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px)) + 8px)
+    margin: calc(
+        var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px)) + 8px
+      )
       12px 0;
     max-width: calc(100% - 24px);
   }
