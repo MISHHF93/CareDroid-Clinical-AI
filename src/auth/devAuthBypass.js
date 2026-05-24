@@ -7,7 +7,12 @@ export const AUTH_TOKEN_KEY = 'caredroid_access_token';
 export const USER_PROFILE_KEY = 'caredroid_user_profile';
 
 export const isDevAuthBypassEnabled = () =>
-  Boolean(import.meta.env.DEV || appConfig.features.enableDevAuthBypass || appConfig.features.enableDemoMode);
+  Boolean(
+    import.meta.env.DEV ||
+      appConfig.features.enableDevAuthBypass ||
+      appConfig.features.enableDemoMode ||
+      appConfig.features.showDemoAuth
+  );
 
 export const withDevSessionMarker = (user) => ({
   ...user,

@@ -54,6 +54,7 @@ describe('Auth local/demo dev bypass', () => {
     localStorage.clear();
     mocks.appConfig.features.enableDevAuthBypass = false;
     mocks.appConfig.features.enableDemoMode = false;
+    mocks.appConfig.features.showDemoAuth = false;
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
@@ -85,7 +86,7 @@ describe('Auth local/demo dev bypass', () => {
     });
   });
 
-  it('appears only when the explicit flag is enabled and creates a marked mock session', async () => {
+  it('appears when the local dev flag is enabled and creates a marked mock session', async () => {
     mocks.appConfig.features.enableDevAuthBypass = true;
     const onAuthSuccess = renderAuth();
 
@@ -110,6 +111,16 @@ describe('Auth local/demo dev bypass', () => {
       })
     );
     expect(localStorage.getItem('caredroid_access_token')).toBe('test-dev-token');
+  });
+
+  it('appears when the deployed demo auth flag is enabled', () => {
+    mocks.appConfig.features.showDemoAuth = true;
+
+    renderAuth();
+
+    expect(
+      screen.getByRole('button', { name: /continue in demo mode/i })
+    ).toBeInTheDocument();
   });
 
   it('marks backend dev-session users before routing into the app', async () => {
