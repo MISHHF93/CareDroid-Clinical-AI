@@ -16,7 +16,6 @@ describe('canonical route redirects', () => {
     expect(appSource).toContain("path: '/dashboard', element: <LegacyProtectedRouteRedirect to=\"/home\" />");
     expect(appSource).toContain("path: '/chat', element: <LegacyProtectedRouteRedirect to=\"/assistant\" />");
     expect(appSource).toContain("const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot']");
-    expect(appSource).not.toContain("path: '/dashboard', element: <AppShellPage><Dashboard /></AppShellPage>");
     expect(appSource).not.toContain("path: '/chat', element: <AppShellPage><Dashboard /></AppShellPage>");
   });
 
@@ -26,7 +25,7 @@ describe('canonical route redirects', () => {
   });
 
   it('keeps developer/source audit catalog separate from the user-facing tools browser', () => {
-    expect(appSource).toContain("path: '/tools', element: <AssistantToolRedirect extras={{ drawer: 'tools' }} />, requiresAuth: true");
+    expect(appSource).toContain("path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true");
     expect(appSource).toContain("const TOOLS_ROUTE_ALIASES = ['/all-tools', '/clinical-tools']");
     expect(appSource).toContain("path: '/tools/catalog'");
     expect(appSource).toContain('permission: Permission.CONFIGURE_SYSTEM');

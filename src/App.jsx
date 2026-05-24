@@ -395,7 +395,7 @@ function AppRoutes() {
   };
 
   const routes = [
-    { path: '/', element: <Navigate to={isAuthenticated ? '/tools' : '/auth'} replace /> },
+    { path: '/', element: <PublicShell><WelcomePage /></PublicShell>, publicOnly: true },
     { path: '/auth', element: <AuthShell><AuthPage /></AuthShell>, publicOnly: true },
     { path: '/auth-callback', element: <AuthShell><AuthCallback /></AuthShell>, publicOnly: true },
     { path: '/auth/callback', element: <AuthShell><LegacyOAuthCallbackRedirect /></AuthShell>, publicOnly: true },
@@ -405,8 +405,8 @@ function AppRoutes() {
       publicOnly: true,
     })),
 
-    { path: '/home', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
-    { path: '/dashboard', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
+    { path: '/home', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
+    { path: '/dashboard', element: <LegacyProtectedRouteRedirect to="/home" />, requiresAuth: true },
     { path: '/assistant', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
     { path: '/chat', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
     ...ASSISTANT_ROUTE_ALIASES.map((path) => ({
@@ -434,7 +434,7 @@ function AppRoutes() {
     { path: '/tools/lab-interpreter', element: <AssistantToolRedirect toolId="lab-interp" />, requiresAuth: true },
     ...CALCULATOR_ROUTE_DEFS.map(({ path, calculatorSlug }) => ({
       path,
-      element: <AssistantToolRedirect toolId="calculators" extras={{ calc: calculatorSlug }} />,
+      element: <AppShellPage><Calculators initialCalculatorId={calculatorSlug} /></AppShellPage>,
       requiresAuth: true,
     })),
     ...LEGACY_CALCULATOR_ROUTE_ALIASES.map(({ path, to }) => ({
