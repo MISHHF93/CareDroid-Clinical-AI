@@ -19,6 +19,7 @@ const defaultWorkspaces = () => {
     { id: 'calculator', name: 'Calculator', toolIds: byCategory.Calculator || [] },
     { id: 'reference', name: 'Reference', toolIds: byCategory.Reference || [] },
     { id: 'fleet', name: 'Fleet', toolIds: byCategory.Fleet || [] },
+    { id: 'hospital-operations', name: 'Hospital Operations', toolIds: byCategory['Hospital Operations'] || [] },
   ];
 };
 

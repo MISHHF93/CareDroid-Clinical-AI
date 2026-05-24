@@ -19,6 +19,7 @@ import {
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
   FLEET_TIER_A_REGISTRY_IDS,
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
+  HOSPITAL_OPERATIONS_REGISTRY_IDS,
   MEDICAL_IOT_REGISTRY_IDS,
   NLU_PROFILE_TOOL_IDS,
   NLU_TO_REGISTRY_ID,
@@ -44,6 +45,7 @@ const CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET = new Set(CLINICAL_TIER_C_WORKFLO
 const FLEET_TIER_A_REGISTRY_ID_SET = new Set(FLEET_TIER_A_REGISTRY_IDS);
 const FLEET_TIER_B_CHAT_REGISTRY_ID_SET = new Set(FLEET_TIER_B_CHAT_REGISTRY_IDS);
 const MEDICAL_IOT_REGISTRY_ID_SET = new Set(MEDICAL_IOT_REGISTRY_IDS);
+const HOSPITAL_OPERATIONS_REGISTRY_ID_SET = new Set(HOSPITAL_OPERATIONS_REGISTRY_IDS);
 const CLINICAL_TIER_A_CALCULATOR_REGISTRY_ID_SET = new Set(CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS);
 const CLINICAL_TIER_B_CHAT_REGISTRY_ID_SET = new Set(CLINICAL_TIER_B_CHAT_REGISTRY_IDS);
 const CLINICAL_NLU_HUB_CHAT_REGISTRY_ID_SET = new Set(CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS);
@@ -90,6 +92,7 @@ export const TOOL_LAUNCH_TYPES = Object.freeze({
   CLINICAL_PAGE: 'clinical-page',
   FLEET_LOCAL: 'fleet-local',
   IOT_LOCAL: 'iot-local',
+  HOSPITAL_LOCAL: 'hospital-local',
   HUB: 'hub',
   PLATFORM: 'platform',
   UNSUPPORTED_PLANNED: 'unsupported-planned',
@@ -108,6 +111,7 @@ export const TOOL_SURFACES = Object.freeze({
   CHAT_ASSISTED: 'chat-assisted',
   FLEET_PAGE: 'fleet-page',
   IOT_DASHBOARD: 'iot-dashboard',
+  HOSPITAL_OPERATIONS: 'hospital-operations',
   HUB: 'hub',
   INTERNAL: 'internal',
 });
@@ -242,6 +246,11 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.predictiveMaintenance]: 'src/pages/fleet/PredictiveMaintenance.jsx',
   [REGISTRY.routeOptimizer]: 'src/pages/fleet/RouteOptimizer.jsx',
   [REGISTRY.medicalIotDashboard]: 'src/pages/MedicalIotDashboard.jsx',
+  [REGISTRY.hospitalMap]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.deviceFleetManagement]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.telemetryMonitoring]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.deviceMaintenance]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.hospitalOperationsCommand]: 'src/pages/HospitalMapDashboard.jsx',
 });
 
 const BASE_TEST_COVERAGE = Object.freeze([
@@ -263,6 +272,7 @@ const DEFAULT_COLOR_BY_CATEGORY = Object.freeze({
   Reference: '#A8E6CF',
   Fleet: '#6C8CFF',
   Other: '#94A3B8',
+  'Hospital Operations': '#0EA5A6',
 });
 
 function unique(values) {
@@ -279,6 +289,7 @@ function normalizeCategory(value) {
   if (category === 'reference') return 'reference';
   if (category === 'fleet') return 'fleet';
   if (category === 'iot') return 'iot';
+  if (category === 'hospital operations' || category === 'operations') return 'hospital-operations';
   return category;
 }
 
@@ -289,6 +300,7 @@ function presentationCategory(value) {
   if (category === 'reference' || category === 'protocol') return 'Reference';
   if (category === 'fleet') return 'Fleet';
   if (category === 'iot') return 'IoT';
+  if (category === 'hospital-operations') return 'Hospital Operations';
   return 'Other';
 }
 
@@ -315,6 +327,7 @@ function registryTier(registryId) {
   if (FLEET_TIER_A_REGISTRY_ID_SET.has(registryId)) return 'fleet-A';
   if (FLEET_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId)) return 'fleet-B';
   if (MEDICAL_IOT_REGISTRY_ID_SET.has(registryId)) return 'medical-iot';
+  if (HOSPITAL_OPERATIONS_REGISTRY_ID_SET.has(registryId)) return 'hospital-ops';
   if (CLINICAL_TIER_A_CALCULATOR_REGISTRY_ID_SET.has(registryId)) return 'A';
   if (
     CLINICAL_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId) ||
@@ -336,6 +349,7 @@ function launchTypeForTier(tier, hasExecutor) {
   if (tier === 'clinical-page') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'fleet-A') return TOOL_LAUNCH_TYPES.FLEET_LOCAL;
   if (tier === 'medical-iot') return TOOL_LAUNCH_TYPES.IOT_LOCAL;
+  if (tier === 'hospital-ops') return TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL;
   if (tier === 'hub') return TOOL_LAUNCH_TYPES.HUB;
   return TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED;
 }
@@ -423,6 +437,7 @@ function apiClientFor(orchestratorToolId, launchType, registryId) {
   }
   if (launchType === TOOL_LAUNCH_TYPES.FLEET_LOCAL) return 'src/services/fleetTelemetryService.js';
   if (launchType === TOOL_LAUNCH_TYPES.IOT_LOCAL) return 'src/services/medicalIotService.js';
+  if (launchType === TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL) return 'src/services/hospitalMapService.js';
   return null;
 }
 
@@ -442,6 +457,7 @@ function surfaceForRecord(record) {
   if (record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) return TOOL_SURFACES.CHAT_ASSISTED;
   if (record.launchType === TOOL_LAUNCH_TYPES.FLEET_LOCAL) return TOOL_SURFACES.FLEET_PAGE;
   if (record.launchType === TOOL_LAUNCH_TYPES.IOT_LOCAL) return TOOL_SURFACES.IOT_DASHBOARD;
+  if (record.launchType === TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL) return TOOL_SURFACES.HOSPITAL_OPERATIONS;
   if (record.calculatorSlug || isCalculatorCategory(record.category)) return TOOL_SURFACES.CALCULATOR_FORM;
   return TOOL_SURFACES.TOOL_PAGE;
 }

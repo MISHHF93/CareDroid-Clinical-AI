@@ -25,13 +25,14 @@
  */
 
 /** Bump when registry/NLU lists or maps change incompatibly. */
-export const TOOL_ID_CONTRACT_VERSION = '1.6.0';
+export const TOOL_ID_CONTRACT_VERSION = '1.7.0';
 
 /** Shared SPA paths for tool launch (browser-safe). */
 export const TOOL_LAUNCH_PATHS = Object.freeze({
   toolsOverview: '/tools',
   toolsCatalog: '/tools/catalog',
   calculatorsHub: '/tools/calculators',
+  hospitalMap: '/hospital-map',
   fleetCommand: '/fleet/command',
   predictiveMaintenance: '/fleet/predictive-maintenance',
   routeOptimizer: '/fleet/route-optimizer',
@@ -109,6 +110,11 @@ export const REGISTRY = Object.freeze({
   predictiveMaintenance: 'predictive-maintenance',
   fleetCommand: 'fleet-command',
   medicalIotDashboard: 'medical-iot-dashboard',
+  hospitalMap: 'hospital-map',
+  deviceFleetManagement: 'device-fleet-management',
+  telemetryMonitoring: 'telemetry-monitoring',
+  deviceMaintenance: 'device-maintenance',
+  hospitalOperationsCommand: 'hospital-operations-command',
 });
 
 /** NLU / backend pattern primary tool ids (`clinicalIntentTools`, tool.patterns.ts). */
@@ -365,6 +371,16 @@ export const PR_FLEET_ALL_REGISTRY_IDS = Object.freeze([
 
 export const MEDICAL_IOT_REGISTRY_IDS = Object.freeze([REGISTRY.medicalIotDashboard]);
 
+// —— Hospital map / device operations ——
+
+export const HOSPITAL_OPERATIONS_REGISTRY_IDS = Object.freeze([
+  REGISTRY.hospitalMap,
+  REGISTRY.deviceFleetManagement,
+  REGISTRY.telemetryMonitoring,
+  REGISTRY.deviceMaintenance,
+  REGISTRY.hospitalOperationsCommand,
+]);
+
 // —— Clinical AI operations pages (non-calculator tools) ——
 
 export const CLINICAL_AI_PAGE_REGISTRY_IDS = Object.freeze([
@@ -614,6 +630,7 @@ export const CANONICAL_TOOL_GROUPS = Object.freeze({
   fleetLogisticsTierA: FLEET_TIER_A_REGISTRY_IDS,
   fleetLogisticsTierBChat: FLEET_TIER_B_CHAT_REGISTRY_IDS,
   medicalIotDashboards: MEDICAL_IOT_REGISTRY_IDS,
+  hospitalOperations: HOSPITAL_OPERATIONS_REGISTRY_IDS,
   nluHubOnlyProfiles: NLU_HUB_ONLY_PROFILE_TOOL_IDS,
   backendExecutors: ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
 });
@@ -629,6 +646,7 @@ export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
   ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierA,
   ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierBChat,
   ...CANONICAL_TOOL_GROUPS.medicalIotDashboards,
+  ...CANONICAL_TOOL_GROUPS.hospitalOperations,
 ]);
 
 /** NLU / legacy / phrase aliases → registry id (recommendations, catalog, cost tracking). */
@@ -1026,6 +1044,38 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'patient-telemetry': REGISTRY.medicalIotDashboard,
   'vitals monitor': REGISTRY.medicalIotDashboard,
   'vitals-monitor': REGISTRY.medicalIotDashboard,
+  'hospital map': REGISTRY.hospitalMap,
+  'hospital-map': REGISTRY.hospitalMap,
+  'floor plan': REGISTRY.hospitalMap,
+  'floor-plan': REGISTRY.hospitalMap,
+  'bed map': REGISTRY.hospitalMap,
+  'bed-map': REGISTRY.hospitalMap,
+  'beds with alerts': REGISTRY.hospitalMap,
+  'beds-with-alerts': REGISTRY.hospitalMap,
+  'device fleet': REGISTRY.deviceFleetManagement,
+  'device-fleet': REGISTRY.deviceFleetManagement,
+  'device fleet management': REGISTRY.deviceFleetManagement,
+  'device-fleet-management': REGISTRY.deviceFleetManagement,
+  'medical device inventory': REGISTRY.deviceFleetManagement,
+  'medical-device-inventory': REGISTRY.deviceFleetManagement,
+  'telemetry monitoring': REGISTRY.telemetryMonitoring,
+  'telemetry-monitoring': REGISTRY.telemetryMonitoring,
+  'telemetry gaps': REGISTRY.telemetryMonitoring,
+  'telemetry-gaps': REGISTRY.telemetryMonitoring,
+  'offline devices': REGISTRY.telemetryMonitoring,
+  'offline-devices': REGISTRY.telemetryMonitoring,
+  'low battery devices': REGISTRY.telemetryMonitoring,
+  'low-battery-devices': REGISTRY.telemetryMonitoring,
+  'device maintenance': REGISTRY.deviceMaintenance,
+  'device-maintenance': REGISTRY.deviceMaintenance,
+  'maintenance overdue': REGISTRY.deviceMaintenance,
+  'maintenance-overdue': REGISTRY.deviceMaintenance,
+  'calibration overdue': REGISTRY.deviceMaintenance,
+  'calibration-overdue': REGISTRY.deviceMaintenance,
+  'hospital operations command': REGISTRY.hospitalOperationsCommand,
+  'hospital-operations-command': REGISTRY.hospitalOperationsCommand,
+  'hospital operations': REGISTRY.hospitalOperationsCommand,
+  'hospital-operations': REGISTRY.hospitalOperationsCommand,
 });
 
 /** Values every NLU_TO_REGISTRY_ID target must resolve to (registry id or hub). */

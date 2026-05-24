@@ -129,4 +129,15 @@ describe('CommandDashboard', () => {
     expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('medical-iot-dashboard');
     expect(screen.getByTestId('location')).toHaveTextContent('/medical-iot');
   });
+
+  it('surfaces Hospital Map as a first-class operations launch', () => {
+    renderDashboard();
+    const operationsPanel = screen.getByRole('heading', { name: /fleet & operations/i }).closest('section');
+    const hospitalMapButton = within(operationsPanel).getByRole('button', { name: /open hospital map/i });
+
+    fireEvent.click(hospitalMapButton);
+
+    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('hospital-map');
+    expect(screen.getByTestId('location')).toHaveTextContent('/hospital-map');
+  });
 });

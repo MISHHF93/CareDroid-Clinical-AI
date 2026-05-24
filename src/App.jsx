@@ -44,6 +44,7 @@ const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashbo
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
+const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
 
 // Lazy-loaded pages for better performance (loaded on demand)
 const NotificationPreferences = lazyWithRetry(() => import('./pages/NotificationPreferences'));
@@ -396,6 +397,7 @@ function AppRoutes() {
     })),
 
     { path: '/dashboard', element: <AppShellPage><CommandDashboard /></AppShellPage>, requiresAuth: true },
+    { path: '/hospital-map', element: <AppShellPage><HospitalMapDashboard /></AppShellPage>, requiresAuth: true },
     { path: '/home', element: <LegacyProtectedRouteRedirect to="/dashboard" />, requiresAuth: true },
     { path: '/assistant', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
     { path: '/chat', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },

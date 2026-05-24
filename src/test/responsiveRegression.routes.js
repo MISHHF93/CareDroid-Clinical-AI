@@ -12,6 +12,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'dashboard', path: '/dashboard', match: 'heading', heading: /caredroid command dashboard/i },
   { id: 'assistant', path: '/assistant', match: 'composer' },
   { id: 'tools-overview', path: '/tools', match: 'heading', heading: /^tool library$/i },
+  { id: 'hospital-map', path: '/hospital-map', match: 'heading', heading: /^hospital map$/i },
   { id: 'medical-iot', path: '/medical-iot', match: 'heading', heading: /medical iot dashboard/i },
   { id: 'tools-catalog', path: '/tools/catalog', match: 'heading', heading: /developer catalog \/ source audit/i },
   { id: 'calculators-hub', path: '/tools/calculators', match: 'heading', heading: /medical calculators/i },

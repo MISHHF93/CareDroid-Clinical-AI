@@ -57,12 +57,19 @@ export const COMMAND_DASHBOARD_GROUPS = Object.freeze({
     REGISTRY.procedures,
   ]),
   fleet: Object.freeze([
+    REGISTRY.hospitalMap,
+    REGISTRY.hospitalOperationsCommand,
+    REGISTRY.deviceFleetManagement,
     REGISTRY.fleetCommand,
     REGISTRY.routeOptimizer,
     REGISTRY.predictiveMaintenance,
     REGISTRY.dispatchAi,
   ]),
-  medicalIot: Object.freeze([REGISTRY.medicalIotDashboard]),
+  medicalIot: Object.freeze([
+    REGISTRY.medicalIotDashboard,
+    REGISTRY.telemetryMonitoring,
+    REGISTRY.deviceMaintenance,
+  ]),
 });
 
 function uniqueById(items) {
@@ -101,7 +108,13 @@ function fallbackReferenceTools(tools) {
 }
 
 function fallbackFleetTools(tools) {
-  return tools.filter((tool) => tool.category === 'Fleet' || tool.surface === TOOL_SURFACES.FLEET_PAGE);
+  return tools.filter(
+    (tool) =>
+      tool.category === 'Fleet' ||
+      tool.category === 'Hospital Operations' ||
+      tool.surface === TOOL_SURFACES.FLEET_PAGE ||
+      tool.surface === TOOL_SURFACES.HOSPITAL_OPERATIONS
+  );
 }
 
 function fallbackMedicalIotTools(tools) {
@@ -142,6 +155,7 @@ function readinessDistribution(tools) {
           tool.launchType === TOOL_LAUNCH_TYPES.LOCAL_ONLY ||
           tool.launchType === TOOL_LAUNCH_TYPES.FLEET_LOCAL ||
           tool.launchType === TOOL_LAUNCH_TYPES.IOT_LOCAL ||
+          tool.launchType === TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL ||
           tool.launchType === TOOL_LAUNCH_TYPES.CLINICAL_PAGE ||
           tool.launchType === TOOL_LAUNCH_TYPES.HUB
       ),

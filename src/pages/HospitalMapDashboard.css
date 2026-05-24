@@ -1,0 +1,595 @@
+.hospital-map-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  min-width: 0;
+  padding: clamp(16px, 3vw, 32px);
+  overflow-x: clip;
+  background: var(--app-bg);
+  color: var(--app-fg);
+}
+
+.hospital-map-hero,
+.hospital-map-source,
+.hospital-map-summary,
+.hospital-map-filters,
+.hospital-map-panel,
+.hospital-map-detail,
+.hospital-map-section,
+.hospital-map-state {
+  border: 1px solid var(--app-panel-border);
+  border-radius: 24px;
+  background: var(--app-surface-1);
+  box-shadow: var(--app-shadow-1);
+}
+
+.hospital-map-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+  padding: clamp(22px, 4vw, 38px);
+}
+
+.hospital-map-eyebrow {
+  margin: 0 0 8px;
+  color: var(--app-accent-interactive);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hospital-map-hero h1,
+.hospital-map-detail h2 {
+  margin: 0;
+  letter-spacing: -0.05em;
+}
+
+.hospital-map-hero h1 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 0.98;
+}
+
+.hospital-map-hero p,
+.hospital-map-panel-header p,
+.hospital-map-section-note,
+.hospital-map-source span,
+.hospital-map-empty,
+.hospital-map-detail p,
+.hospital-map-detail-meta,
+.hospital-map-table td span,
+.hospital-map-detail-alerts span,
+.hospital-map-detail-alerts time,
+.hospital-map-telemetry-card time {
+  color: var(--app-fg-muted);
+}
+
+.hospital-map-hero p {
+  max-width: 880px;
+  margin: 16px 0 0;
+  line-height: 1.6;
+}
+
+.hospital-map-hero-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.hospital-map-action,
+.hospital-map-table-action,
+.hospital-map-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 18px;
+  color: var(--app-on-solid);
+  background: var(--accent-gradient);
+  font: inherit;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.hospital-map-action--secondary,
+.hospital-map-table-action {
+  color: var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
+}
+
+.hospital-map-icon-button {
+  flex: 0 0 auto;
+  width: 44px;
+  padding: 0;
+  color: var(--app-fg);
+  background: var(--app-surface-2);
+}
+
+.hospital-map-state {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 22px;
+}
+
+.hospital-map-state h2,
+.hospital-map-state p {
+  margin: 0;
+}
+
+.hospital-map-state--error {
+  border-color: color-mix(in srgb, var(--app-danger) 35%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--app-danger) 10%, var(--app-surface-1));
+}
+
+.hospital-map-source {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  padding: 14px 18px;
+}
+
+.hospital-map-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 18px;
+}
+
+.hospital-map-summary-card {
+  min-width: 0;
+  border-radius: 18px;
+  padding: 16px;
+  background: var(--app-surface-2);
+}
+
+.hospital-map-summary-card strong {
+  display: block;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.hospital-map-summary-card span,
+.hospital-map-summary-card small {
+  display: block;
+  margin-top: 6px;
+  font-weight: 800;
+}
+
+.hospital-map-summary-card small {
+  color: var(--app-fg-muted);
+  font-size: 0.78rem;
+}
+
+.hospital-map-summary-card--good {
+  border: 1px solid color-mix(in srgb, var(--app-success) 24%, var(--app-panel-border));
+}
+
+.hospital-map-summary-card--warning {
+  border: 1px solid color-mix(in srgb, var(--app-warning) 35%, var(--app-panel-border));
+}
+
+.hospital-map-summary-card--critical {
+  border: 1px solid color-mix(in srgb, var(--app-danger) 35%, var(--app-panel-border));
+}
+
+.hospital-map-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 16px;
+}
+
+.hospital-map-filters label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 800;
+}
+
+.hospital-map-filters span {
+  color: var(--app-fg-muted);
+  font-size: 0.82rem;
+}
+
+.hospital-map-filters select,
+.hospital-map-filters input[type='search'] {
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 14px;
+  padding: 0 12px;
+  background: var(--app-surface-2);
+  color: var(--app-fg);
+  font: inherit;
+}
+
+.hospital-map-search {
+  grid-column: span 2;
+}
+
+.hospital-map-check {
+  justify-content: end;
+}
+
+.hospital-map-check input {
+  width: 18px;
+  height: 18px;
+}
+
+.hospital-map-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.55fr);
+  gap: 20px;
+  align-items: start;
+  min-width: 0;
+}
+
+.hospital-map-panel,
+.hospital-map-detail,
+.hospital-map-section {
+  min-width: 0;
+  padding: clamp(18px, 3vw, 26px);
+}
+
+.hospital-map-panel-header,
+.hospital-map-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  margin-bottom: 16px;
+}
+
+.hospital-map-panel h2,
+.hospital-map-section h2,
+.hospital-map-detail-section h3 {
+  margin: 0 0 10px;
+}
+
+.hospital-map-canvas {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  overflow: hidden;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top left, color-mix(in srgb, var(--app-accent-interactive) 12%, transparent), transparent 32%),
+    var(--app-surface-2);
+}
+
+.hospital-map-canvas svg {
+  display: block;
+  width: 100%;
+  min-width: 680px;
+  height: auto;
+}
+
+.hospital-map-floor-shell {
+  fill: color-mix(in srgb, var(--app-surface-1) 72%, transparent);
+  stroke: var(--app-panel-border);
+  stroke-width: 2;
+}
+
+.hospital-map-corridor {
+  fill: color-mix(in srgb, var(--app-accent-interactive) 9%, transparent);
+  stroke: color-mix(in srgb, var(--app-accent-interactive) 22%, var(--app-panel-border));
+}
+
+.hospital-map-room {
+  fill: var(--app-surface-1);
+  stroke: var(--app-panel-border);
+  stroke-width: 2;
+}
+
+.hospital-map-room--alert {
+  stroke: color-mix(in srgb, var(--app-warning) 62%, var(--app-panel-border));
+  stroke-width: 3;
+}
+
+.hospital-map-room-label {
+  fill: var(--app-fg);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.hospital-map-room-meta {
+  fill: var(--app-fg-muted);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.hospital-map-marker {
+  stroke: var(--app-surface-1);
+  stroke-width: 4;
+}
+
+.hospital-map-marker--good {
+  fill: var(--app-success);
+}
+
+.hospital-map-marker--warning {
+  fill: var(--app-warning);
+}
+
+.hospital-map-marker--critical {
+  fill: var(--app-danger);
+}
+
+.hospital-map-marker--neutral {
+  fill: var(--app-fg-muted);
+}
+
+.hospital-map-alert-dot {
+  fill: var(--app-danger);
+  stroke: var(--app-surface-1);
+  stroke-width: 3;
+}
+
+.hospital-map-marker-buttons {
+  position: absolute;
+  inset: 0;
+  min-width: 680px;
+}
+
+.hospital-map-marker-button {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--app-surface-1);
+  border-radius: 999px;
+  color: var(--app-on-solid);
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: var(--app-shadow-1);
+}
+
+.hospital-map-marker-button--good {
+  background: var(--app-success);
+}
+
+.hospital-map-marker-button--warning {
+  background: var(--app-warning);
+}
+
+.hospital-map-marker-button--critical {
+  background: var(--app-danger);
+}
+
+.hospital-map-marker-button--neutral {
+  background: var(--app-fg-muted);
+}
+
+.hospital-map-detail {
+  position: sticky;
+  top: 16px;
+}
+
+.hospital-map-detail--empty {
+  position: static;
+}
+
+.hospital-map-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 0.88rem;
+}
+
+.hospital-map-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 5px 9px;
+  background: var(--app-surface-muted);
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: capitalize;
+}
+
+.hospital-map-badge--good {
+  color: var(--app-success);
+  background: color-mix(in srgb, var(--app-success) 14%, transparent);
+}
+
+.hospital-map-badge--warning {
+  color: var(--app-warning);
+  background: color-mix(in srgb, var(--app-warning) 16%, transparent);
+}
+
+.hospital-map-badge--critical {
+  color: var(--app-danger);
+  background: color-mix(in srgb, var(--app-danger) 14%, transparent);
+}
+
+.hospital-map-badge--neutral {
+  color: var(--app-fg-muted);
+  background: var(--app-surface-2);
+}
+
+.hospital-map-detail-section {
+  margin-top: 18px;
+}
+
+.hospital-map-telemetry-grid,
+.hospital-map-health-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.hospital-map-telemetry-card,
+.hospital-map-health-grid div,
+.hospital-map-detail-alerts li,
+.hospital-map-alert-card {
+  min-width: 0;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 16px;
+  padding: 12px;
+  background: var(--app-surface-2);
+}
+
+.hospital-map-telemetry-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hospital-map-health-grid {
+  margin: 0;
+}
+
+.hospital-map-health-grid dt {
+  color: var(--app-fg-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.hospital-map-health-grid dd {
+  margin: 4px 0 0;
+  font-weight: 800;
+}
+
+.hospital-map-detail-alerts {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.hospital-map-detail-alerts li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hospital-map-lower-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1.2fr);
+  gap: 20px;
+  min-width: 0;
+}
+
+.hospital-map-alert-list {
+  display: grid;
+  gap: 10px;
+}
+
+.hospital-map-alert-card {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.hospital-map-alert-card--high {
+  border-color: color-mix(in srgb, var(--app-danger) 42%, var(--app-panel-border));
+}
+
+.hospital-map-alert-card--medium {
+  border-color: color-mix(in srgb, var(--app-warning) 42%, var(--app-panel-border));
+}
+
+.hospital-map-alert-severity {
+  color: var(--app-danger);
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.hospital-map-table-wrap {
+  min-width: 0;
+  overflow-x: auto;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 18px;
+}
+
+.hospital-map-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+}
+
+.hospital-map-table th,
+.hospital-map-table td {
+  border-bottom: 1px solid var(--app-panel-border);
+  padding: 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.hospital-map-table th {
+  color: var(--app-fg-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.hospital-map-table td strong,
+.hospital-map-table td span {
+  display: block;
+}
+
+@media (max-width: 1080px) {
+  .hospital-map-hero,
+  .hospital-map-workspace,
+  .hospital-map-lower-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hospital-map-detail {
+    position: static;
+  }
+
+  .hospital-map-filters,
+  .hospital-map-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .hospital-map-page {
+    padding: 14px;
+  }
+
+  .hospital-map-hero-actions,
+  .hospital-map-action {
+    width: 100%;
+  }
+
+  .hospital-map-filters,
+  .hospital-map-summary,
+  .hospital-map-search,
+  .hospital-map-telemetry-grid,
+  .hospital-map-health-grid {
+    grid-template-columns: 1fr;
+    grid-column: auto;
+  }
+
+  .hospital-map-canvas {
+    min-height: 320px;
+    overflow-x: auto;
+  }
+
+  .hospital-map-detail {
+    border-radius: 24px 24px 12px 12px;
+  }
+}

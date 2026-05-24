@@ -43,6 +43,13 @@ export const BACKEND_API_CAPABILITIES = Object.freeze({
   reportsGenerate: false,
   /** No Nest route — do not POST/DELETE scheduled reports */
   reportsSchedule: false,
+  /** Planned hospital operations APIs — frontend uses clearly labeled demo data until Nest modules exist. */
+  hospitalMap: false,
+  medicalDeviceRegistry: false,
+  telemetryLive: false,
+  deviceAlerting: false,
+  deviceFleet: false,
+  deviceMaintenance: false,
 });
 
 /**

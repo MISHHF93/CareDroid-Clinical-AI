@@ -22,6 +22,7 @@ import AiExplainability from '../pages/tools/AiExplainability';
 import ClinicalAudit from '../pages/tools/ClinicalAudit';
 import CommandDashboard from '../pages/CommandDashboard';
 import Dashboard from '../pages/Dashboard';
+import HospitalMapDashboard from '../pages/HospitalMapDashboard';
 import MedicalIotDashboard from '../pages/MedicalIotDashboard';
 import { CORE_ROUTE_SMOKE, TIER_A_FORM_SMOKE_SLUGS } from './responsiveRegression.routes';
 
@@ -89,6 +90,7 @@ vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
 const PAGE_BY_ID = {
   dashboard: CommandDashboard,
   assistant: Dashboard,
+  'hospital-map': HospitalMapDashboard,
   'medical-iot': MedicalIotDashboard,
   'tools-overview': ToolsOverview,
   'tools-catalog': ClinicalToolCatalog,

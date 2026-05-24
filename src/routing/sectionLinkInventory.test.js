@@ -7,6 +7,12 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
 const read = (relativePath) => readFileSync(join(srcRoot, relativePath), 'utf8');
 
+function expectRedirectRoute(app, path, to) {
+  expect(app).toMatch(
+    new RegExp(`path:\\s*'${path.replace(/\//g, '\\/')}'[\\s\\S]*?<LegacyProtectedRouteRedirect\\s+to="${to.replace(/\//g, '\\/')}"\\s*\\/>`)
+  );
+}
+
 const visibleLinkInventory = [
   ['Home welcome CTA', 'App.jsx', '/auth'],
   ['Home dev bypass', 'App.jsx', '/dashboard'],
@@ -14,6 +20,7 @@ const visibleLinkInventory = [
   ['Primary Dashboard nav', 'navigation/primaryNavigation.js', '/dashboard'],
   ['Primary Assistant nav', 'navigation/primaryNavigation.js', '/assistant'],
   ['Primary Tools nav', 'navigation/primaryNavigation.js', '/tools'],
+  ['Primary Hospital Map nav', 'navigation/primaryNavigation.js', '/hospital-map'],
   ['Primary Medical IoT nav', 'navigation/primaryNavigation.js', '/medical-iot'],
   ['Sidebar developer catalog', 'components/Sidebar.jsx', '/tools/catalog'],
   ['Tools developer catalog', 'pages/tools/ToolsOverview.jsx', '/tools/catalog'],
@@ -28,6 +35,7 @@ const canonicalRoutes = new Set([
   '/dashboard',
   '/assistant',
   '/tools',
+  '/hospital-map',
   '/medical-iot',
   '/tools/catalog',
   '/tools/calculators',
@@ -71,9 +79,9 @@ describe('section link inventory and route flattening', () => {
 
   it('preserves legacy route aliases as redirects, not duplicate user-facing pages', () => {
     const app = read('App.jsx');
-    expect(app).toContain("path: '/home', element: <LegacyProtectedRouteRedirect to=\"/dashboard\" />");
-    expect(app).toContain("path: '/chat', element: <LegacyProtectedRouteRedirect to=\"/assistant\" />");
-    expect(app).toContain("path: '/fleet', element: <LegacyProtectedRouteRedirect to=\"/operations\" />");
+    expectRedirectRoute(app, '/home', '/dashboard');
+    expectRedirectRoute(app, '/chat', '/assistant');
+    expectRedirectRoute(app, '/fleet', '/operations');
     expect(app).toContain('ASSISTANT_ROUTE_ALIASES.map');
     expect(app).toContain('TOOLS_ROUTE_ALIASES.map');
     expect(app).toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');

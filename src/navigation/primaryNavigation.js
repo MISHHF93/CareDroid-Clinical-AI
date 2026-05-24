@@ -60,6 +60,14 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     matchPrefixes: ['/fleet/'],
   },
   {
+    id: 'hospital-map',
+    label: 'Hospital Map',
+    mobileLabel: 'Map',
+    path: '/hospital-map',
+    matchPaths: ['/hospital-map'],
+    matchPrefixes: ['/hospital-map/'],
+  },
+  {
     id: 'medical-iot',
     label: 'Medical IoT',
     mobileLabel: 'IoT',

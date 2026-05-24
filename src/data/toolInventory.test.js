@@ -76,7 +76,7 @@ describe('canonical tool inventory', () => {
     for (const tool of sidebarTools) {
       expect(tool.name, tool.id).toBeTruthy();
       expect(tool.path, tool.id).toBeTruthy();
-      expect(tool.category, tool.id).toMatch(/Diagnostic|Calculator|Reference|Fleet|IoT|Other/);
+      expect(tool.category, tool.id).toMatch(/Diagnostic|Calculator|Reference|Fleet|IoT|Hospital Operations|Other/);
       expect(tool.color, tool.id).toMatch(/^#/);
       expect(Array.isArray(tool.features), tool.id).toBe(true);
       expect(tool.canonicalInventoryId, tool.id).toBe(tool.id);

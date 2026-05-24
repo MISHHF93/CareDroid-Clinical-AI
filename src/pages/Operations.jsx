@@ -15,6 +15,14 @@ const OPERATION_AREAS = Object.freeze([
     label: 'Review alerts',
   },
   {
+    title: 'Hospital map',
+    body: 'View floors, rooms, beds, medical devices, telemetry freshness, alerts, and maintenance context.',
+    path: '/hospital-map',
+    toolId: 'hospital-map',
+    icon: CHROME_ICONS.hospital,
+    label: 'Open map',
+  },
+  {
     title: 'Fleet command',
     body: 'Monitor vehicle state, dispatch readiness, and live operational bottlenecks.',
     path: '/fleet/command',

@@ -19,6 +19,7 @@ const TOOL_FILTER_OPTIONS = Object.freeze([
   { value: 'clinical-page', label: 'Forms and pages' },
   { value: 'fleet', label: 'Operations' },
   { value: 'iot', label: 'Medical IoT' },
+  { value: 'hospital-ops', label: 'Hospital Ops' },
   { value: 'reference', label: 'Reference' },
 ]);
 
@@ -56,6 +57,9 @@ function matchesToolFilter(tool, filter) {
   if (filter === 'clinical-page') return tool.surface === 'tool-page' || tool.launchType === 'clinical-page';
   if (filter === 'fleet') return tool.category === 'Fleet' || tool.surface === 'fleet-page';
   if (filter === 'iot') return tool.category === 'IoT' || tool.surface === 'iot-dashboard';
+  if (filter === 'hospital-ops') {
+    return tool.category === 'Hospital Operations' || tool.surface === 'hospital-operations';
+  }
   if (filter === 'reference') return tool.category === 'Reference';
   return true;
 }
