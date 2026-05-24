@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
   "installCommand": "npm ci --audit=false --fund=false",
-  "buildCommand": "npm run validate:vercel-env && npm run build",
+  "buildCommand": "VITE_ALLOW_SAME_ORIGIN_API=${VITE_ALLOW_SAME_ORIGIN_API:-true} npm run validate:vercel-env && npm run build",
   "outputDirectory": "dist",
   "rewrites": [
     {
