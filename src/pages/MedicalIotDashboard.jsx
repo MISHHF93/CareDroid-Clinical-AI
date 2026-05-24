@@ -12,6 +12,9 @@ import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import './MedicalIotDashboard.css';
 
+const DEVICE_STATUS_OPTIONS = ['all', 'online', 'warning', 'offline'];
+const MEDICAL_IOT_REFRESH_MS = 60_000;
+
 function statusTone(status) {
   if (['online', 'normal', 'good'].includes(status)) return 'good';
   if (['warning', 'stale', 'medium'].includes(status)) return 'warning';
@@ -19,9 +22,13 @@ function statusTone(status) {
   return 'neutral';
 }
 
-function DeviceCard({ device }) {
+function DeviceCard({ device, isSelected, onSelect }) {
   return (
-    <article className="medical-iot-device-card">
+    <button
+      type="button"
+      className={`medical-iot-device-card${isSelected ? ' medical-iot-device-card--selected' : ''}`}
+      onClick={() => onSelect(device)}
+    >
       <div className="medical-iot-card-row">
         <div>
           <h3>{device.name}</h3>
@@ -44,8 +51,12 @@ function DeviceCard({ device }) {
           <dt>Last seen</dt>
           <dd>{formatTelemetryTime(device.lastSeenAt)}</dd>
         </div>
+        <div>
+          <dt>Location</dt>
+          <dd>{device.location?.label || 'Unknown'}</dd>
+        </div>
       </dl>
-    </article>
+    </button>
   );
 }
 
@@ -75,6 +86,91 @@ function trendToChartData(trend) {
   }));
 }
 
+function DeviceLocationMap({ devices, selectedDeviceId, onSelectDevice }) {
+  return (
+    <section className="medical-iot-section medical-iot-location-section" aria-labelledby="medical-iot-location-title">
+      <div className="medical-iot-section-header">
+        <div>
+          <h2 id="medical-iot-location-title">Device Location Map</h2>
+          <p>Demo marker panel for connected-device location, status, freshness, and offline visibility.</p>
+        </div>
+        <span className="medical-iot-badge medical-iot-badge--neutral">Demo data</span>
+      </div>
+      {devices.length === 0 ? (
+        <p className="medical-iot-empty">No device location markers match the current filters.</p>
+      ) : (
+        <div className="medical-iot-map-canvas" role="img" aria-label="Demo Medical IoT device location map">
+          <svg viewBox="0 0 1000 620" aria-hidden="true" focusable="false">
+            <rect x="36" y="42" width="888" height="520" rx="28" className="medical-iot-map-shell" />
+            <rect x="96" y="280" width="748" height="58" rx="18" className="medical-iot-map-corridor" />
+            <rect x="96" y="96" width="240" height="140" rx="18" className="medical-iot-map-room" />
+            <rect x="390" y="96" width="240" height="140" rx="18" className="medical-iot-map-room" />
+            <rect x="684" y="96" width="180" height="140" rx="18" className="medical-iot-map-room" />
+            <rect x="96" y="382" width="240" height="120" rx="18" className="medical-iot-map-room" />
+            <rect x="390" y="382" width="240" height="120" rx="18" className="medical-iot-map-room" />
+            <rect x="684" y="382" width="180" height="120" rx="18" className="medical-iot-map-room" />
+          </svg>
+          <div className="medical-iot-marker-layer" aria-label="Medical IoT device markers">
+            {devices.map((device) => (
+              <button
+                key={device.id}
+                type="button"
+                className={`medical-iot-map-marker medical-iot-map-marker--${statusTone(device.status)}${selectedDeviceId === device.id ? ' medical-iot-map-marker--selected' : ''}`}
+                style={{ left: `${device.location?.x ?? 50}%`, top: `${device.location?.y ?? 50}%` }}
+                onClick={() => onSelectDevice(device)}
+                aria-label={`Open ${device.name} details`}
+              >
+                {device.type[0]}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className="medical-iot-map-legend" aria-label="Medical IoT status legend">
+        <span><i className="medical-iot-dot medical-iot-dot--good" /> Online</span>
+        <span><i className="medical-iot-dot medical-iot-dot--warning" /> Warning/stale</span>
+        <span><i className="medical-iot-dot medical-iot-dot--critical" /> Offline/abnormal</span>
+      </div>
+    </section>
+  );
+}
+
+function DeviceDetailDrawer({ device, onClose }) {
+  if (!device) {
+    return (
+      <aside className="medical-iot-detail medical-iot-detail--empty" aria-label="Medical IoT device details">
+        <h2>Device Detail Drawer</h2>
+        <p>Select a device card or marker to review status, location, battery, connectivity, and timestamp.</p>
+      </aside>
+    );
+  }
+
+  return (
+    <aside className="medical-iot-detail" aria-label={`${device.name} details`}>
+      <div className="medical-iot-detail-header">
+        <div>
+          <p className="medical-iot-eyebrow">Device Detail Drawer</p>
+          <h2>{device.name}</h2>
+          <p>{device.type} · {device.patientLabel}</p>
+        </div>
+        <button type="button" className="medical-iot-icon-button" onClick={onClose} aria-label="Close Medical IoT device details">
+          <NavIcon icon={CHROME_ICONS.close} size={18} aria-hidden />
+        </button>
+      </div>
+      <dl className="medical-iot-detail-grid">
+        <div><dt>Status</dt><dd><span className={`medical-iot-badge medical-iot-badge--${statusTone(device.status)}`}>{device.status}</span></dd></div>
+        <div><dt>Freshness</dt><dd>{device.freshness || device.status}</dd></div>
+        <div><dt>Location</dt><dd>{device.location?.label || 'Unknown location'}</dd></div>
+        <div><dt>Location source</dt><dd>{device.location?.source || 'No source'}</dd></div>
+        <div><dt>Battery</dt><dd>{device.battery}%</dd></div>
+        <div><dt>Connectivity</dt><dd>{device.connectivity}</dd></div>
+        <div><dt>Last seen</dt><dd>{formatTelemetryTime(device.lastSeenAt)}</dd></div>
+        <div><dt>Tracking support</dt><dd>Demo marker only</dd></div>
+      </dl>
+    </aside>
+  );
+}
+
 export default function MedicalIotDashboard() {
   const [state, setState] = useState({
     loading: true,
@@ -82,6 +178,9 @@ export default function MedicalIotDashboard() {
     snapshot: null,
     message: '',
   });
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [search, setSearch] = useState('');
+  const [selectedDeviceId, setSelectedDeviceId] = useState(null);
 
   const loadSnapshot = useCallback(async () => {
     setState((current) => ({ ...current, loading: true, error: '' }));
@@ -93,6 +192,9 @@ export default function MedicalIotDashboard() {
         snapshot: result.snapshot,
         message: result.message || '',
       });
+      if (result.snapshot?.devices?.[0]) {
+        setSelectedDeviceId((current) => current || result.snapshot.devices[0].id);
+      }
     } catch (error) {
       setState({
         loading: false,
@@ -105,9 +207,17 @@ export default function MedicalIotDashboard() {
 
   useEffect(() => {
     loadSnapshot();
+    const refreshTimer = window.setInterval(loadSnapshot, MEDICAL_IOT_REFRESH_MS);
+    return () => {
+      window.clearInterval(refreshTimer);
+    };
   }, [loadSnapshot]);
 
   const snapshot = state.snapshot;
+  const selectedDevice = useMemo(
+    () => (snapshot?.devices || []).find((device) => device.id === selectedDeviceId) || null,
+    [selectedDeviceId, snapshot]
+  );
   const counts = useMemo(() => {
     const devices = snapshot?.devices || [];
     const alerts = snapshot?.alerts || [];
@@ -131,6 +241,18 @@ export default function MedicalIotDashboard() {
     }, {});
     return Object.entries(statuses).map(([name, value]) => ({ name, value }));
   }, [snapshot]);
+  const filteredDevices = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return (snapshot?.devices || []).filter((device) => {
+      if (statusFilter !== 'all' && device.status !== statusFilter) return false;
+      if (!query) return true;
+      return [device.id, device.name, device.type, device.patientLabel, device.location?.label, device.status]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+        .includes(query);
+    });
+  }, [search, snapshot, statusFilter]);
 
   return (
     <main className="medical-iot-page">
@@ -193,6 +315,28 @@ export default function MedicalIotDashboard() {
             />
           </section>
 
+          <section className="medical-iot-filters" aria-label="Medical IoT map filters">
+            <label>
+              <span>Status</span>
+              <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+                {DEVICE_STATUS_OPTIONS.map((status) => (
+                  <option key={status} value={status}>
+                    {status === 'all' ? 'All statuses' : status}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="medical-iot-search">
+              <span>Search device, patient placeholder, location</span>
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Try pulse, Home-7, Patient A..."
+              />
+            </label>
+          </section>
+
           {snapshot.devices.length === 0 ? (
             <section className="medical-iot-state">
               <h2>No connected medical devices</h2>
@@ -202,14 +346,29 @@ export default function MedicalIotDashboard() {
               </p>
             </section>
           ) : (
-            <section className="medical-iot-section" aria-labelledby="medical-iot-devices-title">
-              <h2 id="medical-iot-devices-title">Connected Devices</h2>
-              <div className="medical-iot-device-grid">
-                {snapshot.devices.map((device) => (
-                  <DeviceCard key={device.id} device={device} />
-                ))}
+            <div className="medical-iot-location-workspace">
+              <div>
+                <DeviceLocationMap
+                  devices={filteredDevices}
+                  selectedDeviceId={selectedDeviceId}
+                  onSelectDevice={(device) => setSelectedDeviceId(device.id)}
+                />
+                <section className="medical-iot-section" aria-labelledby="medical-iot-devices-title">
+                  <h2 id="medical-iot-devices-title">Connected Devices</h2>
+                  <div className="medical-iot-device-grid">
+                    {filteredDevices.map((device) => (
+                      <DeviceCard
+                        key={device.id}
+                        device={device}
+                        isSelected={selectedDeviceId === device.id}
+                        onSelect={(nextDevice) => setSelectedDeviceId(nextDevice.id)}
+                      />
+                    ))}
+                  </div>
+                </section>
               </div>
-            </section>
+              <DeviceDetailDrawer device={selectedDevice} onClose={() => setSelectedDeviceId(null)} />
+            </div>
           )}
 
           <section className="medical-iot-section" aria-labelledby="medical-iot-vitals-title">

@@ -1,13 +1,20 @@
-/* Enhanced Card Styles with Animations */
+/* CareDroid card primitive */
 .card {
-  background: var(--panel-bg);
-  border: 1px solid var(--panel-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0;
+  max-width: 100%;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg, var(--radius-lg));
+  box-shadow: var(--app-elevation-card, var(--app-shadow-1));
+  color: var(--app-text-primary);
   position: relative;
   overflow: hidden;
-  animation: cardFadeIn 0.4s ease-out;
+  overflow-wrap: break-word;
+  transition:
+    background-color 0.2s var(--ease-smooth),
+    border-color 0.2s var(--ease-smooth),
+    box-shadow 0.2s var(--ease-smooth),
+    transform 0.2s var(--ease-smooth);
 }
 
 @keyframes cardFadeIn {
@@ -22,22 +29,18 @@
 }
 
 .card-subtle {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius-lg);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  animation: cardFadeIn 0.4s ease-out;
+  background: var(--app-surface-muted);
+  border-color: var(--app-border);
+  box-shadow: var(--app-elevation-none, none);
 }
 
 /* Glassmorphism Effect */
 .card-glass {
-  background: rgba(15, 23, 42, 0.6);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  background: var(--app-surface-glass);
+  backdrop-filter: blur(var(--app-blur-glass, 18px));
+  -webkit-backdrop-filter: blur(var(--app-blur-glass, 18px));
+  border-color: var(--app-border);
+  box-shadow: var(--app-elevation-overlay, var(--app-shadow-2));
 }
 
 /* Hover Effect */
@@ -49,21 +52,15 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    135deg,
-    rgba(0, 255, 136, 0.03),
-    rgba(0, 255, 255, 0.03)
-  );
+  background: var(--app-hover);
   opacity: 0;
   transition: opacity 0.3s ease;
   pointer-events: none;
 }
 
 .card-hover:hover {
-  border-color: rgba(0, 255, 136, 0.3);
-  box-shadow: 
-    var(--shadow-2),
-    0 0 20px rgba(0, 255, 136, 0.15);
+  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 34%, var(--app-border));
+  box-shadow: var(--app-elevation-card, var(--app-shadow-1));
   transform: translateY(-2px);
 }
 
@@ -82,7 +79,7 @@
 }
 
 .card-clickable:focus {
-  outline: 2px solid var(--accent-green);
+  outline: 2px solid var(--app-accent-action, var(--app-accent-interactive));
   outline-offset: 2px;
 }
 
@@ -103,7 +100,7 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(255, 255, 255, 0.05),
+    var(--app-overlay-on-surface),
     transparent
   );
   animation: shimmer 2s infinite;
@@ -124,30 +121,27 @@
   content: '';
   position: absolute;
   inset: -2px;
-  background: var(--accent-gradient);
-  border-radius: var(--radius-lg);
+  background: var(--app-accent-action, var(--app-accent-interactive));
+  border-radius: var(--app-radius-lg, var(--radius-lg));
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: -1;
-  filter: blur(10px);
+  filter: blur(4px);
 }
 
 .card-glow:hover::before {
-  opacity: 0.3;
+  opacity: 0.12;
 }
 
 /* Elevated Card */
 .card-elevated {
-  box-shadow: 
-    0 10px 40px rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
+  background: var(--app-surface-raised);
+  box-shadow: var(--app-elevation-overlay, var(--app-shadow-2));
 }
 
 .card-elevated:hover {
-  box-shadow: 
-    0 20px 60px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.15),
-    0 0 30px rgba(0, 255, 136, 0.1);
+  border-color: var(--app-border-strong);
+  box-shadow: var(--app-elevation-overlay, var(--app-shadow-2));
 }
 
 /* Card Header */
@@ -157,7 +151,7 @@
   justify-content: space-between;
   margin-bottom: var(--space-4);
   padding-bottom: var(--space-4);
-  border-bottom: 1px solid var(--panel-border);
+  border-bottom: 1px solid var(--app-border);
 }
 
 /* Card Footer */
@@ -168,12 +162,12 @@
   gap: var(--space-3);
   margin-top: var(--space-4);
   padding-top: var(--space-4);
-  border-top: 1px solid var(--panel-border);
+  border-top: 1px solid var(--app-border);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .card {
-    border-radius: var(--radius-md);
+    border-radius: var(--app-radius-md, var(--radius-md));
   }
 }

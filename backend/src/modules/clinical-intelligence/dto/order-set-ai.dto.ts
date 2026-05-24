@@ -20,7 +20,10 @@ export class OrderSetAiRequestDto {
   @MaxLength(5000)
   patientContext?: string;
 
-  @ApiProperty({ required: false, example: 'Renal dosing, allergy review, local antimicrobial stewardship.' })
+  @ApiProperty({
+    required: false,
+    example: 'Renal dosing, allergy review, local antimicrobial stewardship.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(3000)
@@ -37,7 +40,14 @@ export interface OrderSetAiResponseDto {
     title: string;
     intent: string;
     suggestedOrders: Array<{
-      category: 'labs' | 'imaging' | 'medications' | 'monitoring' | 'consults' | 'nursing' | 'other';
+      category:
+        | 'labs'
+        | 'imaging'
+        | 'medications'
+        | 'monitoring'
+        | 'consults'
+        | 'nursing'
+        | 'other';
       label: string;
       rationale: string;
       reviewRequired: true;

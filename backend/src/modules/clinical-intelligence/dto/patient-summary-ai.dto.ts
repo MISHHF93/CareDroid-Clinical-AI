@@ -26,7 +26,10 @@ export class PatientSummaryAiRequestDto {
   @MaxLength(5000)
   labs?: string;
 
-  @ApiProperty({ required: false, example: 'Hyperkalemia alert, fall risk, renal dose adjustment.' })
+  @ApiProperty({
+    required: false,
+    example: 'Hyperkalemia alert, fall risk, renal dose adjustment.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(5000)

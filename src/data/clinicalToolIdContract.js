@@ -25,15 +25,18 @@
  */
 
 /** Bump when registry/NLU lists or maps change incompatibly. */
-export const TOOL_ID_CONTRACT_VERSION = '1.7.0';
+export const TOOL_ID_CONTRACT_VERSION = '1.8.0';
 
 /** Shared SPA paths for tool launch (browser-safe). */
 export const TOOL_LAUNCH_PATHS = Object.freeze({
   toolsOverview: '/tools',
   toolsCatalog: '/tools/catalog',
   calculatorsHub: '/tools/calculators',
+  liveTrackingMap: '/live-map',
   hospitalMap: '/hospital-map',
+  medicalIot: '/medical-iot',
   fleetCommand: '/fleet/command',
+  fleetMap: '/fleet/map',
   predictiveMaintenance: '/fleet/predictive-maintenance',
   routeOptimizer: '/fleet/route-optimizer',
 });
@@ -109,6 +112,8 @@ export const REGISTRY = Object.freeze({
   routeOptimizer: 'route-optimizer',
   predictiveMaintenance: 'predictive-maintenance',
   fleetCommand: 'fleet-command',
+  liveTrackingMap: 'live-tracking-map',
+  fleetLiveMap: 'fleet-live-map',
   medicalIotDashboard: 'medical-iot-dashboard',
   hospitalMap: 'hospital-map',
   deviceFleetManagement: 'device-fleet-management',
@@ -371,6 +376,13 @@ export const PR_FLEET_ALL_REGISTRY_IDS = Object.freeze([
 
 export const MEDICAL_IOT_REGISTRY_IDS = Object.freeze([REGISTRY.medicalIotDashboard]);
 
+// —— Live tracking maps ——
+
+export const LIVE_TRACKING_MAP_REGISTRY_IDS = Object.freeze([
+  REGISTRY.liveTrackingMap,
+  REGISTRY.fleetLiveMap,
+]);
+
 // —— Hospital map / device operations ——
 
 export const HOSPITAL_OPERATIONS_REGISTRY_IDS = Object.freeze([
@@ -629,6 +641,7 @@ export const CANONICAL_TOOL_GROUPS = Object.freeze({
   clinicalCalculatorsHub: Object.freeze([REGISTRY.calculatorsHub]),
   fleetLogisticsTierA: FLEET_TIER_A_REGISTRY_IDS,
   fleetLogisticsTierBChat: FLEET_TIER_B_CHAT_REGISTRY_IDS,
+  liveTrackingMaps: LIVE_TRACKING_MAP_REGISTRY_IDS,
   medicalIotDashboards: MEDICAL_IOT_REGISTRY_IDS,
   hospitalOperations: HOSPITAL_OPERATIONS_REGISTRY_IDS,
   nluHubOnlyProfiles: NLU_HUB_ONLY_PROFILE_TOOL_IDS,
@@ -645,6 +658,7 @@ export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
   ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsHub,
   ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierA,
   ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierBChat,
+  ...CANONICAL_TOOL_GROUPS.liveTrackingMaps,
   ...CANONICAL_TOOL_GROUPS.medicalIotDashboards,
   ...CANONICAL_TOOL_GROUPS.hospitalOperations,
 ]);
@@ -1024,6 +1038,18 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'route-optimization': REGISTRY.routeOptimizer,
   'fleet route planner': REGISTRY.routeOptimizer,
   'fleet-route-planner': REGISTRY.routeOptimizer,
+  'live tracking': REGISTRY.liveTrackingMap,
+  'live-tracking': REGISTRY.liveTrackingMap,
+  'live tracking map': REGISTRY.liveTrackingMap,
+  'live-tracking-map': REGISTRY.liveTrackingMap,
+  'tracking map': REGISTRY.liveTrackingMap,
+  'tracking-map': REGISTRY.liveTrackingMap,
+  'fleet map': REGISTRY.fleetLiveMap,
+  'fleet-map': REGISTRY.fleetLiveMap,
+  'fleet live map': REGISTRY.fleetLiveMap,
+  'fleet-live-map': REGISTRY.fleetLiveMap,
+  'vehicle tracking': REGISTRY.fleetLiveMap,
+  'vehicle-tracking': REGISTRY.fleetLiveMap,
   dispatch: REGISTRY.dispatchAi,
   'dispatch assistant': REGISTRY.dispatchAi,
   'dispatch-assistant': REGISTRY.dispatchAi,

@@ -1,6 +1,15 @@
+import { fetchLiveTrackingCapability } from './liveTrackingApi';
+
 export const MEDICAL_IOT_BACKEND_STATUS = Object.freeze({
-  implemented: false,
+  implemented: true,
+  demoContractOnly: true,
   plannedEndpoint: '/api/medical-iot/snapshot',
+  plannedEndpoints: Object.freeze([
+    '/api/devices/live',
+    '/api/telemetry/live',
+    '/api/alerts/devices',
+    '/api/medical-iot/snapshot',
+  ]),
   plannedModules: Object.freeze([
     'device-service',
     'telemetry-service',
@@ -37,6 +46,15 @@ export function buildDemoMedicalIotSnapshot(referenceDate = new Date()) {
         battery: 82,
         connectivity: 'Wi-Fi',
         lastSeenAt: generatedAt,
+        freshness: 'fresh',
+        location: {
+          label: 'ICU / Bed 12A',
+          floorId: 'floor-2',
+          room: 'ICU-12',
+          x: 24,
+          y: 34,
+          source: 'Demo bedside gateway coordinate',
+        },
       },
       {
         id: 'cgm-room-4',
@@ -47,6 +65,15 @@ export function buildDemoMedicalIotSnapshot(referenceDate = new Date()) {
         battery: 28,
         connectivity: 'Bluetooth',
         lastSeenAt: new Date(referenceDate.getTime() - 7 * 60 * 1000).toISOString(),
+        freshness: 'fresh',
+        location: {
+          label: 'Medical-Surgical Unit / Room 4',
+          floorId: 'floor-3',
+          room: 'MS-4',
+          x: 58,
+          y: 46,
+          source: 'Demo Bluetooth gateway coordinate',
+        },
       },
       {
         id: 'bp-home-7',
@@ -57,6 +84,15 @@ export function buildDemoMedicalIotSnapshot(referenceDate = new Date()) {
         battery: 11,
         connectivity: 'Cellular',
         lastSeenAt: new Date(referenceDate.getTime() - 54 * 60 * 1000).toISOString(),
+        freshness: 'offline',
+        location: {
+          label: 'Remote monitoring / Home zone 7',
+          floorId: 'remote',
+          room: 'Home-7',
+          x: 78,
+          y: 70,
+          source: 'Demo remote patient coordinate',
+        },
       },
     ],
     vitals: [
@@ -130,7 +166,48 @@ export function buildDemoMedicalIotSnapshot(referenceDate = new Date()) {
   };
 }
 
-export async function fetchMedicalIotSnapshot() {
+async function fetchMedicalIotSnapshotFromApi(options = {}) {
+  const { signal } = options;
+  const [devicesResult, telemetryResult, alertsResult] = await Promise.all([
+    fetchLiveTrackingCapability('medicalDeviceRegistry', '/api/devices/live', { signal }),
+    fetchLiveTrackingCapability('telemetryLive', '/api/telemetry/live', { signal }),
+    fetchLiveTrackingCapability('deviceAlerting', '/api/alerts/devices', { signal }),
+  ]);
+
+  if (!devicesResult.ok || !telemetryResult.ok || !alertsResult.ok) return null;
+
+  const generatedAt =
+    telemetryResult.payload?.generatedAt ||
+    devicesResult.payload?.generatedAt ||
+    telemetryResult.generatedAt ||
+    new Date().toISOString();
+
+  return {
+    ok: true,
+    unsupported: false,
+    snapshot: {
+      source: 'backend-demo-telemetry',
+      sourceLabel:
+        telemetryResult.sourceLabel ||
+        'Backend demo Medical IoT contract - replace with real device feeds before clinical use',
+      generatedAt,
+      devices: devicesResult.payload?.devices || [],
+      vitals: telemetryResult.payload?.vitals || [],
+      alerts: alertsResult.payload?.alerts || [],
+      trends: telemetryResult.payload?.trends || [],
+      connectivityTimeline: telemetryResult.payload?.connectivityTimeline || [],
+    },
+    backendStatus: MEDICAL_IOT_BACKEND_STATUS,
+    message:
+      telemetryResult.message ||
+      'Medical IoT uses backend demo telemetry only; do not treat it as live patient monitoring.',
+  };
+}
+
+export async function fetchMedicalIotSnapshot(options = {}) {
+  const apiSnapshot = await fetchMedicalIotSnapshotFromApi(options);
+  if (apiSnapshot) return apiSnapshot;
+
   return {
     ok: true,
     unsupported: true,

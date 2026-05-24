@@ -57,6 +57,8 @@ export const COMMAND_DASHBOARD_GROUPS = Object.freeze({
     REGISTRY.procedures,
   ]),
   fleet: Object.freeze([
+    REGISTRY.liveTrackingMap,
+    REGISTRY.fleetLiveMap,
     REGISTRY.hospitalMap,
     REGISTRY.hospitalOperationsCommand,
     REGISTRY.deviceFleetManagement,
@@ -198,7 +200,7 @@ export function buildCommandDashboardModel(tools = getUserFacingToolRegistryProj
         !clinicalFeatured.some((featured) => featured.id === tool.id) &&
         !referenceFeatured.some((featured) => featured.id === tool.id)
     )
-    .slice(0, 4);
+    .slice(0, 6);
   const medicalIotFeatured = uniqueById([
     ...selectToolsByIds(COMMAND_DASHBOARD_GROUPS.medicalIot, byId),
     ...fallbackMedicalIotTools(allTools),

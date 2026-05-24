@@ -62,6 +62,9 @@ const knownPathSet = new Set(KNOWN_TOOL_AREA_PATHS);
 export const REQUIRED_PRODUCTION_TOOL_PATHS = Object.freeze([
   TOOL_LAUNCH_PATHS.toolsCatalog,
   TOOL_LAUNCH_PATHS.calculatorsHub,
+  TOOL_LAUNCH_PATHS.liveTrackingMap,
+  TOOL_LAUNCH_PATHS.hospitalMap,
+  TOOL_LAUNCH_PATHS.medicalIot,
   '/tools/calculators/qsofa',
   '/tools/calculators/news2',
   '/tools/calculators/child-pugh',
@@ -69,6 +72,7 @@ export const REQUIRED_PRODUCTION_TOOL_PATHS = Object.freeze([
   '/tools/calculators/meld',
   '/tools/calculators/meld-na',
   '/tools/calculators/timi-ua-nstemi',
+  TOOL_LAUNCH_PATHS.fleetMap,
   TOOL_LAUNCH_PATHS.fleetCommand,
   TOOL_LAUNCH_PATHS.predictiveMaintenance,
   TOOL_LAUNCH_PATHS.routeOptimizer,

@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Profile from './Profile';
 import { fetchMyAuditLogs, fetchPhiAccessLogs } from '../services/auditApi';
+import { createMockUserValue } from '../test/testRenderUtils';
 
 const mocks = vi.hoisted(() => ({
   user: {
@@ -14,16 +15,15 @@ const mocks = vi.hoisted(() => ({
   hasPermission: vi.fn(() => false),
 }));
 
-vi.mock('../contexts/UserContext', async () => {
-  const Permission = {
-    VIEW_AUDIT_LOGS: 'VIEW_AUDIT_LOGS',
-  };
+vi.mock('../contexts/UserContext', async (importOriginal) => {
+  const actual = await importOriginal();
   return {
-    Permission,
-    useUser: () => ({
-      user: mocks.user,
-      hasPermission: mocks.hasPermission,
-    }),
+    ...actual,
+    useUser: () =>
+      createMockUserValue({
+        user: mocks.user,
+        hasPermission: mocks.hasPermission,
+      }),
   };
 });
 

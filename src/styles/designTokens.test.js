@@ -9,8 +9,12 @@ import { describe, it, expect } from 'vitest';
 import {
   DESIGN_BREAKPOINTS,
   DESIGN_BREAKPOINTS_PX,
+  DESIGN_SPACING,
+  DESIGN_TYPOGRAPHY,
   DESIGN_TOUCH_TARGETS,
   DESIGN_MEDIA_QUERIES,
+  DESIGN_RADII,
+  DESIGN_ELEVATION,
 } from '../layout/designTokens.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -35,13 +39,22 @@ describe('design-tokens.css — semantic token layer', () => {
     expect(designTokensCss).toContain('--space-md: var(--space-4)');
     expect(designTokensCss).toContain('--space-lg: var(--space-6)');
     expect(designTokensCss).toContain('--space-xl: var(--space-8)');
+    expect(designTokensCss).toContain('--space-2xl:');
+    expect(designTokensCss).toContain('--app-space-xs: var(--space-1)');
+    expect(designTokensCss).toContain('--app-space-2xl: var(--space-2xl)');
   });
 
-  it('defines typography heading, body, caption', () => {
+  it('defines typography display through mono', () => {
+    expect(designTokensCss).toContain('--app-type-display: var(--text-display-fluid)');
     expect(designTokensCss).toContain('--text-heading: var(--text-heading-fluid)');
+    expect(designTokensCss).toContain('--text-subheading:');
     expect(designTokensCss).toContain('--text-body: var(--text-body-fluid)');
+    expect(designTokensCss).toContain('--text-small:');
     expect(designTokensCss).toContain('--text-caption: var(--text-caption-fluid)');
+    expect(designTokensCss).toContain('--text-mono: var(--font-13)');
     expect(indexCss).toContain('--text-caption-fluid:');
+    expect(indexCss).toContain('--font-11: 11px');
+    expect(indexCss).toContain('--font-24: 24px');
   });
 
   it('defines breakpoint tiers mobile, tablet, desktop, wide', () => {
@@ -56,6 +69,12 @@ describe('design-tokens.css — semantic token layer', () => {
     expect(designTokensCss).toContain('--touch-target-comfortable: 48px');
     expect(designTokensCss).toContain('--app-min-touch-target: var(--touch-target-min)');
     expect(designTokensCss).toMatch(/\.touch-target[\s\S]*min-height:\s*var\(--touch-target-min\)/);
+  });
+
+  it('defines semantic radii and elevation aliases', () => {
+    expect(designTokensCss).toContain('--app-radius-2xl: var(--radius-2xl)');
+    expect(DESIGN_RADII['2xl']).toBe('var(--app-radius-2xl)');
+    expect(DESIGN_ELEVATION.card).toBe('var(--app-elevation-card)');
   });
 
   it('does not duplicate type tokens in responsive-ux :root', () => {
@@ -75,6 +94,14 @@ describe('designTokens.js — JS mirror', () => {
   it('exposes touch target px for accessibility checks', () => {
     expect(DESIGN_TOUCH_TARGETS.minPx).toBe(44);
     expect(DESIGN_TOUCH_TARGETS.comfortablePx).toBe(48);
+  });
+
+  it('exposes complete typography and spacing mirrors', () => {
+    expect(DESIGN_SPACING['2xl']).toBe('var(--space-2xl)');
+    expect(DESIGN_SPACING.appXs).toBe('var(--app-space-xs)');
+    expect(DESIGN_TYPOGRAPHY.display).toBe('var(--app-type-display)');
+    expect(DESIGN_TYPOGRAPHY.subheading).toBe('var(--text-subheading)');
+    expect(DESIGN_TYPOGRAPHY.mono).toBe('var(--text-mono)');
   });
 
   it('exports media query strings for programmatic use', () => {

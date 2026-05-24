@@ -133,6 +133,13 @@ const ToolsOverview = () => {
     });
   };
 
+  const handleToolCardKeyDown = (event, tool) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    handleToolClick(tool);
+  };
+
   const handleAssistantLaunch = (tool) => {
     const launch = resolveCatalogLaunch(tool.id);
     recordToolAccess(tool.id);
@@ -326,21 +333,23 @@ const ToolsOverview = () => {
             data-tool-id={tool.id}
             className="tool-card-large"
             onClick={() => handleToolClick(tool)}
-            style={{ borderColor: tool.color }}
+            onKeyDown={(event) => handleToolCardKeyDown(event, tool)}
+            role="button"
+            tabIndex={0}
           >
             <div className="tool-card-header">
-              <div className="tool-icon" style={{ backgroundColor: `${tool.color}20` }}>
+              <div className="tool-icon">
                 <span aria-hidden>
                   <NavIcon icon={getToolIcon(tool.id)} size={28} />
                 </span>
               </div>
               <div className="tool-meta">
                 <h3>{tool.name}</h3>
-                <span className="tool-category" style={{ backgroundColor: `${tool.color}20`, color: tool.color }}>
+                <span className="tool-category">
                   {tool.category}
                 </span>
                 {tool.surface === 'chat-assisted' ? (
-                  <span className="tool-category" style={{ backgroundColor: `${tool.color}15`, color: tool.color }}>
+                  <span className="tool-category tool-category--guided">
                     Guided
                   </span>
                 ) : null}
@@ -409,7 +418,6 @@ const ToolsOverview = () => {
             <div className="tool-actions">
               <button
                 className="btn-open-tool"
-                style={{ backgroundColor: tool.color }}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleToolClick(tool);

@@ -10,6 +10,8 @@ export const SIDEBAR_CATEGORY_ORDER = Object.freeze([
   'Calculator',
   'Reference',
   'Fleet',
+  'Hospital Operations',
+  'IoT',
 ]);
 
 /**

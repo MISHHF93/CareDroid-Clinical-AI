@@ -1,6 +1,27 @@
+import { fetchLiveTrackingCapability } from './liveTrackingApi';
+
 /**
- * Mock fleet telemetry for Fleet Command Dashboard (replace with REST when backend ships).
+ * Mock fleet telemetry for Fleet Command Dashboard and Live Map.
+ * Replace with REST endpoints when backend live tracking ships.
  */
+
+export const FLEET_LIVE_TRACKING_BACKEND_STATUS = Object.freeze({
+  implemented: true,
+  demoContractOnly: true,
+  plannedEndpoints: Object.freeze([
+    '/api/fleet/vehicles/live',
+    '/api/fleet/routes/active',
+    '/api/fleet/dispatch/events',
+    '/api/fleet/alerts',
+  ]),
+  plannedModules: Object.freeze([
+    'fleet-live-tracking',
+    'vehicle-location-service',
+    'route-status-service',
+    'dispatch-events',
+    'fleet-alerting',
+  ]),
+});
 
 const MOCK_VEHICLES = [
   {
@@ -13,6 +34,14 @@ const MOCK_VEHICLES = [
     energyPercent: 72,
     utilizationPercent: 88,
     driver: 'A. Rivera',
+    coordinates: { latitude: 40.7558, longitude: -73.9864 },
+    mapPosition: { x: 38, y: 28 },
+    heading: 74,
+    speedMph: 22,
+    routeId: 'route-north',
+    destination: 'CareDroid North Clinic',
+    lastSeenAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
+    locationSource: 'Demo GPS coordinate',
   },
   {
     id: 'VH-204',
@@ -24,6 +53,14 @@ const MOCK_VEHICLES = [
     energyPercent: 91,
     utilizationPercent: 42,
     driver: null,
+    coordinates: { latitude: 40.7411, longitude: -73.9903 },
+    mapPosition: { x: 52, y: 58 },
+    heading: 0,
+    speedMph: 0,
+    routeId: null,
+    destination: 'Depot',
+    lastSeenAt: new Date(Date.now() - 4 * 60 * 1000).toISOString(),
+    locationSource: 'Demo depot coordinate',
   },
   {
     id: 'VH-118',
@@ -35,6 +72,14 @@ const MOCK_VEHICLES = [
     energyPercent: 54,
     utilizationPercent: 76,
     driver: 'J. Kim',
+    coordinates: { latitude: 40.7306, longitude: -73.9972 },
+    mapPosition: { x: 35, y: 72 },
+    heading: 142,
+    speedMph: 18,
+    routeId: 'route-south',
+    destination: 'Home health stop S-4',
+    lastSeenAt: new Date(Date.now() - 7 * 60 * 1000).toISOString(),
+    locationSource: 'Demo GPS coordinate',
   },
   {
     id: 'VH-077',
@@ -46,6 +91,14 @@ const MOCK_VEHICLES = [
     energyPercent: 38,
     utilizationPercent: 0,
     driver: null,
+    coordinates: { latitude: 40.7444, longitude: -74.0059 },
+    mapPosition: { x: 18, y: 54 },
+    heading: 0,
+    speedMph: 0,
+    routeId: null,
+    destination: 'Workshop',
+    lastSeenAt: new Date(Date.now() - 92 * 60 * 1000).toISOString(),
+    locationSource: 'Demo maintenance yard coordinate',
   },
   {
     id: 'VH-312',
@@ -57,6 +110,14 @@ const MOCK_VEHICLES = [
     energyPercent: 31,
     utilizationPercent: 92,
     driver: 'M. Okafor',
+    coordinates: { latitude: 40.7484, longitude: -73.9857 },
+    mapPosition: { x: 68, y: 42 },
+    heading: 251,
+    speedMph: 13,
+    routeId: 'route-center',
+    destination: 'Hospital courier bay',
+    lastSeenAt: new Date(Date.now() - 16 * 60 * 1000).toISOString(),
+    locationSource: 'Demo GPS coordinate',
   },
   {
     id: 'VH-189',
@@ -68,8 +129,114 @@ const MOCK_VEHICLES = [
     energyPercent: 67,
     utilizationPercent: 35,
     driver: null,
+    coordinates: { latitude: 40.7369, longitude: -73.9824 },
+    mapPosition: { x: 78, y: 74 },
+    heading: 0,
+    speedMph: 0,
+    routeId: null,
+    destination: 'Yard',
+    lastSeenAt: new Date(Date.now() - 38 * 60 * 1000).toISOString(),
+    locationSource: 'Demo yard coordinate',
   },
 ];
+
+const MOCK_ACTIVE_ROUTES = [
+  {
+    id: 'route-north',
+    name: 'North clinic route',
+    vehicleId: 'VH-101',
+    status: 'active',
+    etaMinutes: 18,
+    stopsRemaining: 2,
+    path: [
+      { x: 24, y: 40 },
+      { x: 38, y: 28 },
+      { x: 58, y: 22 },
+      { x: 74, y: 18 },
+    ],
+  },
+  {
+    id: 'route-south',
+    name: 'South home-health loop',
+    vehicleId: 'VH-118',
+    status: 'active',
+    etaMinutes: 34,
+    stopsRemaining: 4,
+    path: [
+      { x: 20, y: 62 },
+      { x: 35, y: 72 },
+      { x: 52, y: 80 },
+      { x: 70, y: 78 },
+    ],
+  },
+  {
+    id: 'route-center',
+    name: 'City center courier',
+    vehicleId: 'VH-312',
+    status: 'delayed',
+    etaMinutes: 9,
+    stopsRemaining: 1,
+    path: [
+      { x: 52, y: 58 },
+      { x: 62, y: 48 },
+      { x: 68, y: 42 },
+      { x: 82, y: 36 },
+    ],
+  },
+];
+
+function minutesSince(value) {
+  const timestamp = new Date(value).getTime();
+  if (Number.isNaN(timestamp)) return null;
+  return Math.max(0, Math.round((Date.now() - timestamp) / 60000));
+}
+
+function vehicleFreshness(vehicle) {
+  const minutes = minutesSince(vehicle.lastSeenAt);
+  if (vehicle.status === 'maintenance') return 'offline';
+  if (minutes == null) return 'unknown';
+  if (minutes > 45) return 'offline';
+  if (minutes > 15) return 'stale';
+  return 'fresh';
+}
+
+function buildFleetLiveAlerts(vehicles) {
+  return vehicles.flatMap((vehicle) => {
+    const alerts = [];
+    const freshness = vehicleFreshness(vehicle);
+    if (freshness === 'offline' || freshness === 'stale') {
+      alerts.push({
+        id: `${vehicle.id}-location-${freshness}`,
+        vehicleId: vehicle.id,
+        severity: freshness === 'offline' ? 'high' : 'medium',
+        title: freshness === 'offline' ? 'Offline or stale GPS' : 'Stale GPS coordinate',
+        detail: `${vehicle.label} last reported ${minutesSince(vehicle.lastSeenAt) ?? 'unknown'} minutes ago.`,
+        triggeredAt: vehicle.lastSeenAt,
+      });
+    }
+    if (vehicle.energyPercent < 35) {
+      alerts.push({
+        id: `${vehicle.id}-low-energy`,
+        vehicleId: vehicle.id,
+        severity: 'medium',
+        title: 'Low energy',
+        detail: `${vehicle.label} is below the configured 35% energy review threshold.`,
+        triggeredAt: vehicle.lastSeenAt,
+      });
+    }
+    if (vehicle.maintenanceStatus !== 'ok') {
+      alerts.push({
+        id: `${vehicle.id}-maintenance`,
+        vehicleId: vehicle.id,
+        severity: vehicle.status === 'maintenance' ? 'high' : 'medium',
+        title: 'Maintenance review',
+        detail: `${vehicle.label} requires maintenance review before dispatch assignment.`,
+        triggeredAt: vehicle.lastSeenAt,
+      });
+    }
+    return alerts;
+  });
+}
 
 function computeSummary(vehicles) {
   const active = vehicles.filter((v) => v.status === 'active').length;
@@ -172,6 +339,114 @@ export async function fetchFleetCommandSnapshot(options = {}) {
     summary: computeSummary(vehicles),
     vehicles,
     visualizations: buildFleetVisualizationData(vehicles),
+  };
+}
+
+function buildFleetLiveSummary(vehicles, routes, alerts) {
+  return {
+    totalVehicles: vehicles.length,
+    activeVehicles: vehicles.filter((vehicle) => ['active', 'occupied'].includes(vehicle.status)).length,
+    availableVehicles: vehicles.filter((vehicle) => vehicle.status === 'available').length,
+    staleVehicles: vehicles.filter((vehicle) => vehicle.freshness === 'stale').length,
+    offlineVehicles: vehicles.filter((vehicle) => vehicle.freshness === 'offline').length,
+    activeRoutes: routes.filter((route) => route.status === 'active').length,
+    delayedRoutes: routes.filter((route) => route.status === 'delayed').length,
+    activeAlerts: alerts.length,
+    updatedAt: new Date().toISOString(),
+    source: 'demo-fleet-live-tracking',
+  };
+}
+
+async function fetchFleetLiveTrackingFromApi(signal) {
+  const [vehiclesResult, routesResult] = await Promise.all([
+    fetchLiveTrackingCapability('fleetLiveTracking', '/api/fleet/vehicles/live', { signal }),
+    fetchLiveTrackingCapability('fleetActiveRoutes', '/api/fleet/routes/active', { signal }),
+  ]);
+
+  if (!vehiclesResult.ok || !routesResult.ok) {
+    return null;
+  }
+
+  const vehicles = (vehiclesResult.payload?.vehicles || []).map((vehicle) => ({
+    ...vehicle,
+    freshness: vehicle.freshness || vehicleFreshness(vehicle),
+  }));
+  const routes = routesResult.payload?.routes || [];
+  const alerts = buildFleetLiveAlerts(vehicles);
+  const summary = {
+    ...buildFleetLiveSummary(vehicles, routes, alerts),
+    ...(vehiclesResult.payload?.summary || {}),
+    activeRoutes: routes.filter((route) => route.status === 'active').length,
+    delayedRoutes: routes.filter((route) => route.status === 'delayed').length,
+    activeAlerts: alerts.length,
+    source: 'backend-demo-fleet-live-tracking',
+  };
+
+  return {
+    summary,
+    vehicles,
+    routes,
+    alerts,
+    backendStatus: FLEET_LIVE_TRACKING_BACKEND_STATUS,
+    sourceLabel:
+      vehiclesResult.sourceLabel ||
+      'Backend demo fleet live tracking - replace with real vehicle GPS feeds before operational use',
+    message:
+      vehiclesResult.message ||
+      'Fleet map uses backend demo coordinates only. Verify vehicle location, dispatch status, and route ETAs in the system of record.',
+  };
+}
+
+/**
+ * @param {{ signal?: AbortSignal, delayMs?: number, emptyFleet?: boolean }} [options]
+ * @returns {Promise<{ summary: object, vehicles: object[], routes: object[], alerts: object[], backendStatus: object, sourceLabel: string }>}
+ */
+export async function fetchFleetLiveTrackingSnapshot(options = {}) {
+  const { signal, delayMs = 320, emptyFleet = false } = options;
+
+  await new Promise((resolve, reject) => {
+    const timer = setTimeout(resolve, delayMs);
+    if (signal) {
+      if (signal.aborted) {
+        clearTimeout(timer);
+        reject(new DOMException('Aborted', 'AbortError'));
+        return;
+      }
+      signal.addEventListener(
+        'abort',
+        () => {
+          clearTimeout(timer);
+          reject(new DOMException('Aborted', 'AbortError'));
+        },
+        { once: true }
+      );
+    }
+  });
+
+  if (!emptyFleet) {
+    const apiSnapshot = await fetchFleetLiveTrackingFromApi(signal);
+    if (apiSnapshot) return apiSnapshot;
+  }
+
+  const vehicles = emptyFleet
+    ? []
+    : MOCK_VEHICLES.map((vehicle) => ({
+        ...vehicle,
+        freshness: vehicleFreshness(vehicle),
+      }));
+  const routes = emptyFleet ? [] : MOCK_ACTIVE_ROUTES.map((route) => ({ ...route }));
+  const alerts = buildFleetLiveAlerts(vehicles);
+
+  return {
+    summary: buildFleetLiveSummary(vehicles, routes, alerts),
+    vehicles,
+    routes,
+    alerts,
+    backendStatus: FLEET_LIVE_TRACKING_BACKEND_STATUS,
+    sourceLabel:
+      'Demo fleet live tracking - backend vehicle GPS and active-route endpoints are not connected',
+    message:
+      'Fleet map uses demo coordinates only. Verify vehicle location, dispatch status, and route ETAs in the system of record.',
   };
 }
 

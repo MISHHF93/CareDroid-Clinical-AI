@@ -130,7 +130,9 @@ export class OpenAIEmbeddingsService {
 
       for (let i = 0; i < batches.length; i++) {
         const batch = batches[i];
-        this.logger.debug(`Processing embedding batch ${i + 1}/${batches.length} (${batch.length} texts)`);
+        this.logger.debug(
+          `Processing embedding batch ${i + 1}/${batches.length} (${batch.length} texts)`,
+        );
 
         const response = await this.openai.embeddings.create({
           model: this.model,
@@ -196,7 +198,10 @@ export class OpenAIEmbeddingsService {
   }
 
   private cacheKey(text: string): string {
-    return `${this.model}:${String(text || '').trim().replace(/\s+/g, ' ').toLowerCase()}`;
+    return `${this.model}:${String(text || '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .toLowerCase()}`;
   }
 
   /**

@@ -244,7 +244,7 @@
   outline: none;
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--accent-1);
-  box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 0 2px var(--app-focus);
 }
 
 .share-email-input::placeholder {
@@ -265,7 +265,7 @@
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 255, 136, 0.3);
+  box-shadow: var(--app-shadow-1);
 }
 
 .btn-primary:disabled {

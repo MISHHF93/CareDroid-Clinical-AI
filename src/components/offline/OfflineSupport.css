@@ -24,7 +24,7 @@
 .offline-indicator-online {
   background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
   color: var(--navy-bg);
-  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.3);
+  box-shadow: var(--app-shadow-1);
 }
 
 .offline-indicator-content {

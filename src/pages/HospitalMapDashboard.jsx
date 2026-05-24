@@ -15,6 +15,7 @@ import './HospitalMapDashboard.css';
 
 const DEVICE_TYPE_OPTIONS = ['all', 'Ventilator', 'Pulse oximeter', 'Infusion pump', 'ECG patch', 'Blood pressure monitor', 'Glucose monitor'];
 const STATUS_OPTIONS = ['all', 'online', 'warning', 'stale', 'offline', 'maintenance'];
+const HOSPITAL_MAP_REFRESH_MS = 60_000;
 
 function statusLabel(value) {
   return String(value || 'unknown').replace(/-/g, ' ');
@@ -336,6 +337,10 @@ export default function HospitalMapDashboard() {
   useEffect(() => {
     recordToolAccess('hospital-map');
     loadSnapshot();
+    const refreshTimer = window.setInterval(loadSnapshot, HOSPITAL_MAP_REFRESH_MS);
+    return () => {
+      window.clearInterval(refreshTimer);
+    };
   }, [loadSnapshot, recordToolAccess]);
 
   const snapshot = state.snapshot;

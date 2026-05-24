@@ -32,6 +32,15 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('toolsResultsSync')).toBe(true);
   });
 
+  it('enables read-only live tracking contracts', () => {
+    expect(isBackendCapabilityEnabled('fleetLiveTracking')).toBe(true);
+    expect(isBackendCapabilityEnabled('fleetActiveRoutes')).toBe(true);
+    expect(isBackendCapabilityEnabled('hospitalMap')).toBe(true);
+    expect(isBackendCapabilityEnabled('medicalDeviceRegistry')).toBe(true);
+    expect(isBackendCapabilityEnabled('telemetryLive')).toBe(true);
+    expect(isBackendCapabilityEnabled('deviceAlerting')).toBe(true);
+  });
+
   it('exports frozen capability map', () => {
     expect(Object.isFrozen(BACKEND_API_CAPABILITIES)).toBe(true);
   });

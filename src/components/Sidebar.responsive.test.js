@@ -10,6 +10,7 @@ import { describe, it, expect } from 'vitest';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const sidebarCss = readFileSync(join(__dirname, 'Sidebar.css'), 'utf8');
 const sidebarJsx = readFileSync(join(__dirname, 'Sidebar.jsx'), 'utf8');
+const themeTokensCss = readFileSync(join(__dirname, '../styles/theme-tokens.css'), 'utf8');
 const drawerFocusJs = readFileSync(join(__dirname, '../hooks/useDrawerFocus.js'), 'utf8');
 const appShellJsx = readFileSync(join(__dirname, '../layout/AppShell.jsx'), 'utf8');
 
@@ -62,6 +63,15 @@ describe('Sidebar responsive — scroll and labels', () => {
     expect(sidebarCss).toContain('.sidebar-tool-card-title-row');
     expect(sidebarCss).toMatch(/\.nav-label[\s\S]*overflow-wrap:\s*break-word/);
     expect(sidebarCss).toMatch(/\.sidebar-tool-card-name[\s\S]*overflow-wrap:\s*break-word/);
+  });
+});
+
+describe('Sidebar user avatar', () => {
+  it('keeps avatar fill and circle border in the same accent family', () => {
+    expect(sidebarCss).toMatch(/\.user-avatar\s*\{[\s\S]*border:\s*2px solid var\(--sidebar-avatar-ring\)/);
+    expect(sidebarCss).toMatch(/\.user-avatar\s*\{[\s\S]*box-shadow:\s*0 0 0 1px color-mix\(in srgb, var\(--app-accent\) 12%, transparent\)/);
+    expect(themeTokensCss).toMatch(/--sidebar-avatar-gradient:\s*linear-gradient\(135deg,\s*color-mix\(in srgb, var\(--app-accent\) 92%, var\(--app-on-solid\)\), var\(--app-accent\)\)/);
+    expect(themeTokensCss).toMatch(/--sidebar-avatar-ring:\s*color-mix\(in srgb, var\(--app-accent\) 8[48]%, var\(--app-on-solid\)\)/);
   });
 });
 

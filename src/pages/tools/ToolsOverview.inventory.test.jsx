@@ -62,10 +62,36 @@ describe('ToolsOverview unified inventory', () => {
     for (const record of userFacing) {
       expect(renderedCards, record.id).toContain(record.label);
     }
+    expect(renderedCards).toContain('Live Tracking Map');
+    expect(renderedCards).toContain('Fleet Live Map');
+    expect(renderedCards).toContain('Hospital Map');
     expect(renderedCards).toContain('Medical IoT Dashboard');
+    expect(renderedCards).toContain('Device Fleet Management');
     expect(container.textContent).toMatch(/developer catalog \/ source audit/i);
     expect(screen.queryByText(/hidden APIs/i)).not.toBeInTheDocument();
   }, 10000);
+
+  it('shows map tools in /tools search results', () => {
+    const { container } = renderOverview();
+    fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
+      target: { value: 'map' },
+    });
+
+    const renderedCards = [...container.querySelectorAll('.tool-card-large h3')].map(
+      (heading) => heading.textContent
+    );
+    expect(renderedCards).toContain('Live Tracking Map');
+    expect(renderedCards).toContain('Fleet Live Map');
+    expect(renderedCards).toContain('Hospital Map');
+
+    fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
+      target: { value: 'medical iot' },
+    });
+    const iotCards = [...container.querySelectorAll('.tool-card-large h3')].map(
+      (heading) => heading.textContent
+    );
+    expect(iotCards).toContain('Medical IoT Dashboard');
+  });
 
   it('renders each chat-assisted tool only as a single catalog card', () => {
     const { container } = renderOverview();

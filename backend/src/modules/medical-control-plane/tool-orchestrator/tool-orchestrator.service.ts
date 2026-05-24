@@ -186,7 +186,10 @@ export class ToolOrchestratorService {
       dto.parameters as Record<string, unknown>,
     );
 
-    const contractCheck = validateExecutorContractParameters(resolved.resolvedId, normalizedParameters);
+    const contractCheck = validateExecutorContractParameters(
+      resolved.resolvedId,
+      normalizedParameters,
+    );
     if (!contractCheck.valid) {
       return {
         valid: false,

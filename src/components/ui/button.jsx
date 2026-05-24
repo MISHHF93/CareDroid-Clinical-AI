@@ -10,6 +10,7 @@ const Button = ({
   loading,
   leftIcon,
   rightIcon,
+  className = '',
   ...props 
 }) => {
   const getClassName = () => {
@@ -25,7 +26,9 @@ const Button = ({
       md: 'btn-md',
       lg: 'btn-lg'
     };
-    return `btn ${variants[variant] || variants.primary} ${sizes[size]}`;
+    return ['btn', variants[variant] || variants.primary, sizes[size], className]
+      .filter(Boolean)
+      .join(' ');
   };
 
   return (

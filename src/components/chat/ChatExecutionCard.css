@@ -168,7 +168,7 @@
 .chat-exec-field select:focus,
 .chat-exec-field textarea:focus {
   border-color: rgba(0, 255, 136, 0.55);
-  box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.12);
+  box-shadow: 0 0 0 2px var(--app-focus);
 }
 
 .chat-exec-notice,

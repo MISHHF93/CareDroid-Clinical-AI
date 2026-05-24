@@ -1,0 +1,59 @@
+.cd-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  min-height: 24px;
+  padding: 4px 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 999px;
+  background: var(--app-surface-muted);
+  color: var(--app-text-secondary);
+  font-size: var(--font-12);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+}
+
+.cd-badge--sm {
+  min-height: 20px;
+  padding: 2px 8px;
+  font-size: var(--font-11);
+}
+
+.cd-badge--lg {
+  min-height: 30px;
+  padding: 6px 12px;
+  font-size: var(--font-13);
+}
+
+.cd-badge--accent {
+  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 10%, var(--app-surface));
+  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 28%, var(--app-border));
+  color: var(--app-accent-action, var(--app-accent-interactive));
+}
+
+.cd-badge--success {
+  background: color-mix(in srgb, var(--app-success) 10%, var(--app-surface));
+  border-color: color-mix(in srgb, var(--app-success) 30%, var(--app-border));
+  color: var(--app-success);
+}
+
+.cd-badge--warning {
+  background: color-mix(in srgb, var(--app-warning) 12%, var(--app-surface));
+  border-color: color-mix(in srgb, var(--app-warning) 32%, var(--app-border));
+  color: var(--app-warning);
+}
+
+.cd-badge--danger {
+  background: color-mix(in srgb, var(--app-danger) 10%, var(--app-surface));
+  border-color: color-mix(in srgb, var(--app-danger) 32%, var(--app-border));
+  color: var(--app-danger);
+}
+
+.cd-badge--info {
+  background: color-mix(in srgb, var(--app-info) 10%, var(--app-surface));
+  border-color: color-mix(in srgb, var(--app-info) 30%, var(--app-border));
+  color: var(--app-info);
+}

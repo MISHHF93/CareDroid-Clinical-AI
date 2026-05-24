@@ -8,7 +8,9 @@ const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 
 describe('auth canonical flow wiring', () => {
   it('defines a single canonical auth route and redirects aliases', () => {
-    expect(appSource).toContain("{ path: '/auth', element: <AuthShell><AuthPage /></AuthShell>, publicOnly: true }");
+    expect(appSource).toMatch(
+      /path:\s*'\/auth'[\s\S]*<AuthShell>[\s\S]*<AuthPage \/>[\s\S]*<\/AuthShell>[\s\S]*publicOnly:\s*true/
+    );
     expect(appSource).toContain("pathname: '/auth'");
     expect(appSource).toContain('...AUTH_PATH_ALIASES.map');
   });

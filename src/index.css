@@ -9,6 +9,7 @@
   --radius-md: 12px;
   --radius-lg: 18px;
   --radius-xl: 24px;
+  --radius-2xl: 32px;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -24,11 +25,17 @@
   --space-fluid-4: clamp(16px, 2.5vw, 20px);
   --space-fluid-5: clamp(20px, 3vw, 24px);
   --space-fluid-6: clamp(24px, 3.5vw, 32px);
+  --font-10: 10px;
+  --font-11: 11px;
   --font-12: 12px;
+  --font-13: 13px;
   --font-14: 14px;
+  --font-15: 15px;
   --font-16: 16px;
   --font-18: 18px;
+  --font-20: 20px;
   --font-22: 22px;
+  --font-24: 24px;
   --font-28: 28px;
   --font-36: 36px;
   --text-display-fluid: clamp(1.35rem, 5vw + 0.5rem, 2.625rem);
@@ -66,8 +73,8 @@ body {
   height: 100%;
   overflow: hidden;
   overflow-x: clip;
-  background: var(--navy-bg);
-  color: var(--text-color);
+  background: var(--app-bg);
+  color: var(--app-fg);
   overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
 }
@@ -253,10 +260,10 @@ code {
 @keyframes glow {
   0%,
   100% {
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.2);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--app-accent) 18%, transparent);
   }
   50% {
-    box-shadow: 0 0 30px rgba(0, 255, 136, 0.4);
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-accent) 22%, transparent);
   }
 }
 
@@ -330,16 +337,16 @@ code {
 
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-2);
+  box-shadow: var(--shadow-1);
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--app-accent) 24%, transparent);
 }
 
 /* Focus States */
 *:focus-visible {
-  outline: 2px solid var(--accent-green);
+  outline: 2px solid var(--app-accent-interactive);
   outline-offset: 2px;
   border-radius: var(--radius-sm);
 }

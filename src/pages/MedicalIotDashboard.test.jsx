@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import MedicalIotDashboard from './MedicalIotDashboard';
+import { mockCompactViewport } from '../test/testRenderUtils';
 import {
   buildDemoMedicalIotSnapshot,
   MEDICAL_IOT_EMPTY_SNAPSHOT,
@@ -32,6 +34,7 @@ function renderMedicalIot() {
 describe('MedicalIotDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCompactViewport(false);
     mocks.fetchMedicalIotSnapshot.mockResolvedValue({
       ok: true,
       unsupported: true,
@@ -51,6 +54,23 @@ describe('MedicalIotDashboard', () => {
     expect(screen.getAllByText(/SpO2/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/device status distribution/i)).toBeInTheDocument();
     expect(screen.getByText(/heart rate trend/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /device location map/i })).toBeInTheDocument();
+  });
+
+  it('renders location markers, filters devices, and opens detail drawer', async () => {
+    const user = userEvent.setup();
+    renderMedicalIot();
+
+    const marker = await screen.findByRole('button', { name: /open bed 12 pulse oximeter details/i });
+    await user.click(marker);
+
+    const drawer = screen.getByRole('complementary', { name: /bed 12 pulse oximeter details/i });
+    expect(within(drawer).getByText(/icu \/ bed 12a/i)).toBeInTheDocument();
+    expect(within(drawer).getByText(/demo bedside gateway coordinate/i)).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: /status/i }), 'offline');
+    expect(screen.getByRole('button', { name: /open home bp cuff details/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open bed 12 pulse oximeter details/i })).not.toBeInTheDocument();
   });
 
   it('renders offline device warnings with timestamps and source', async () => {
@@ -82,5 +102,15 @@ describe('MedicalIotDashboard', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/medical iot backend unavailable/i);
     expect(screen.getByRole('button', { name: /retry loading medical iot telemetry/i })).toBeInTheDocument();
+  });
+
+  it('keeps Medical IoT map layout present in compact viewport', async () => {
+    mockCompactViewport(true);
+    const { container } = renderMedicalIot();
+
+    expect(await screen.findByRole('heading', { name: /device location map/i })).toBeInTheDocument();
+    expect(container.querySelector('.medical-iot-location-workspace')).toBeTruthy();
+    expect(container.querySelector('.medical-iot-map-canvas')).toBeTruthy();
+    expect(container.querySelector('.medical-iot-detail')).toBeTruthy();
   });
 });

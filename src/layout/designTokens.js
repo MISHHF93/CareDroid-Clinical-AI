@@ -36,12 +36,38 @@ export const DESIGN_SPACING = Object.freeze({
   md: 'var(--space-md)',
   lg: 'var(--space-lg)',
   xl: 'var(--space-xl)',
+  '2xl': 'var(--space-2xl)',
+  appXs: 'var(--app-space-xs)',
+  appSm: 'var(--app-space-sm)',
+  appMd: 'var(--app-space-md)',
+  appLg: 'var(--app-space-lg)',
+  appXl: 'var(--app-space-xl)',
+  app2xl: 'var(--app-space-2xl)',
 });
 
 export const DESIGN_TYPOGRAPHY = Object.freeze({
+  display: 'var(--app-type-display)',
   heading: 'var(--text-heading)',
+  subheading: 'var(--text-subheading)',
   body: 'var(--text-body)',
+  small: 'var(--text-small)',
   caption: 'var(--text-caption)',
+  mono: 'var(--text-mono)',
+});
+
+export const DESIGN_RADII = Object.freeze({
+  sm: 'var(--app-radius-sm)',
+  md: 'var(--app-radius-md)',
+  lg: 'var(--app-radius-lg)',
+  xl: 'var(--app-radius-xl)',
+  '2xl': 'var(--app-radius-2xl)',
+});
+
+export const DESIGN_ELEVATION = Object.freeze({
+  none: 'var(--app-elevation-none)',
+  subtle: 'var(--app-elevation-subtle)',
+  card: 'var(--app-elevation-card)',
+  overlay: 'var(--app-elevation-overlay)',
 });
 
 export const DESIGN_TOUCH_TARGETS = Object.freeze({

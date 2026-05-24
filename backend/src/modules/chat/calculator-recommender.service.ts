@@ -24,7 +24,8 @@ const RULES: RecommendationRule[] = [
         id: 'heart-score',
         label: 'HEART score',
         route: '/tools/calculators/heart-score',
-        rationale: 'Chest pain risk stratification from history, ECG, age, risk factors, and troponin.',
+        rationale:
+          'Chest pain risk stratification from history, ECG, age, risk factors, and troponin.',
       },
       {
         id: 'timi-ua-nstemi',
@@ -42,7 +43,8 @@ const RULES: RecommendationRule[] = [
         id: 'ascvd-risk',
         label: 'ASCVD 10-year risk',
         route: '/tools/calculators/ascvd-risk',
-        rationale: 'Primary-prevention cardiovascular risk context after acute evaluation is addressed.',
+        rationale:
+          'Primary-prevention cardiovascular risk context after acute evaluation is addressed.',
       },
     ],
   },

@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
@@ -9,7 +19,10 @@ import { AmbientScribeGenerateDto, AmbientScribeResponseDto } from './dto/ambien
 import { GuidelineRagQueryDto, GuidelineRagResponseDto } from './dto/guideline-rag.dto';
 import { DifferentialAiRequestDto, DifferentialAiResponseDto } from './dto/differential-ai.dto';
 import { TimelineAiRequestDto, TimelineAiResponseDto } from './dto/timeline-ai.dto';
-import { PatientSummaryAiRequestDto, PatientSummaryAiResponseDto } from './dto/patient-summary-ai.dto';
+import {
+  PatientSummaryAiRequestDto,
+  PatientSummaryAiResponseDto,
+} from './dto/patient-summary-ai.dto';
 import { OrderSetAiRequestDto, OrderSetAiResponseDto } from './dto/order-set-ai.dto';
 import {
   AiExplainabilityQueryDto,
@@ -35,10 +48,14 @@ export class ClinicalIntelligenceController {
     @Body() dto: AmbientScribeGenerateDto,
     @Req() req: any,
   ): Promise<AmbientScribeResponseDto> {
-    return this.clinicalIntelligenceService.generateAmbientScribeDraft(req.user?.id || 'anonymous', dto, {
-      ipAddress: req.ip || req.connection?.remoteAddress,
-      userAgent: req.headers?.['user-agent'],
-    });
+    return this.clinicalIntelligenceService.generateAmbientScribeDraft(
+      req.user?.id || 'anonymous',
+      dto,
+      {
+        ipAddress: req.ip || req.connection?.remoteAddress,
+        userAgent: req.headers?.['user-agent'],
+      },
+    );
   }
 
   @Post('guideline-rag/query')
@@ -51,10 +68,14 @@ export class ClinicalIntelligenceController {
     @Body() dto: GuidelineRagQueryDto,
     @Req() req: any,
   ): Promise<GuidelineRagResponseDto> {
-    return this.clinicalIntelligenceService.queryGuidelineEvidence(req.user?.id || 'anonymous', dto, {
-      ipAddress: req.ip || req.connection?.remoteAddress,
-      userAgent: req.headers?.['user-agent'],
-    });
+    return this.clinicalIntelligenceService.queryGuidelineEvidence(
+      req.user?.id || 'anonymous',
+      dto,
+      {
+        ipAddress: req.ip || req.connection?.remoteAddress,
+        userAgent: req.headers?.['user-agent'],
+      },
+    );
   }
 
   @Post('differential-ai/generate')
@@ -67,17 +88,22 @@ export class ClinicalIntelligenceController {
     @Body() dto: DifferentialAiRequestDto,
     @Req() req: any,
   ): Promise<DifferentialAiResponseDto> {
-    return this.clinicalIntelligenceService.generateDifferentialAi(req.user?.id || 'anonymous', dto, {
-      ipAddress: req.ip || req.connection?.remoteAddress,
-      userAgent: req.headers?.['user-agent'],
-    });
+    return this.clinicalIntelligenceService.generateDifferentialAi(
+      req.user?.id || 'anonymous',
+      dto,
+      {
+        ipAddress: req.ip || req.connection?.remoteAddress,
+        userAgent: req.headers?.['user-agent'],
+      },
+    );
   }
 
   @Post('timeline-ai/generate')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
   @ApiOperation({
-    summary: 'Generate a clinical timeline with encounter summaries, trends, and abnormal progression flags',
+    summary:
+      'Generate a clinical timeline with encounter summaries, trends, and abnormal progression flags',
   })
   async generateTimelineAi(
     @Body() dto: TimelineAiRequestDto,
@@ -93,16 +119,21 @@ export class ClinicalIntelligenceController {
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.READ_PHI, Permission.USE_AI_CHAT)
   @ApiOperation({
-    summary: 'Generate a structured patient summary with problems, medications, labs, alerts, and risk factors',
+    summary:
+      'Generate a structured patient summary with problems, medications, labs, alerts, and risk factors',
   })
   async generatePatientSummaryAi(
     @Body() dto: PatientSummaryAiRequestDto,
     @Req() req: any,
   ): Promise<PatientSummaryAiResponseDto> {
-    return this.clinicalIntelligenceService.generatePatientSummaryAi(req.user?.id || 'anonymous', dto, {
-      ipAddress: req.ip || req.connection?.remoteAddress,
-      userAgent: req.headers?.['user-agent'],
-    });
+    return this.clinicalIntelligenceService.generatePatientSummaryAi(
+      req.user?.id || 'anonymous',
+      dto,
+      {
+        ipAddress: req.ip || req.connection?.remoteAddress,
+        userAgent: req.headers?.['user-agent'],
+      },
+    );
   }
 
   @Post('order-set-ai/generate')

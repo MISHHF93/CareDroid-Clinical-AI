@@ -281,9 +281,9 @@
 }
 
 .tool-card-large {
-  background: var(--panel-background);
-  border: 2px solid var(--panel-border);
-  border-radius: 12px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg, 18px);
   padding: 24px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -295,8 +295,14 @@
 }
 
 .tool-card-large:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 34%, var(--app-border));
+  transform: translateY(-2px);
+  box-shadow: var(--app-elevation-card, var(--app-shadow-1));
+}
+
+.tool-card-large:focus-visible {
+  outline: 2px solid var(--app-accent-action, var(--app-accent-interactive));
+  outline-offset: 3px;
 }
 
 .tool-card-header {
@@ -337,8 +343,8 @@
 
 .tool-card-action.active {
   color: var(--app-warning);
-  border-color: rgba(245, 158, 11, 0.5);
-  background: rgba(245, 158, 11, 0.15);
+  border-color: color-mix(in srgb, var(--app-warning) 44%, var(--app-border));
+  background: color-mix(in srgb, var(--app-warning) 14%, var(--app-surface));
 }
 
 .tool-card-action:hover {
@@ -349,12 +355,14 @@
 .tool-icon {
   width: 60px;
   height: 60px;
-  border-radius: 12px;
+  border-radius: var(--app-radius-md, 12px);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: var(--text-primary);
+  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 10%, var(--app-surface-muted));
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 22%, var(--app-border));
+  color: var(--app-accent-action, var(--app-accent-interactive));
 }
 
 .tool-meta {
@@ -374,11 +382,20 @@
 .tool-category {
   display: inline-block;
   padding: 4px 10px;
-  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 28%, var(--app-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 9%, var(--app-surface));
+  color: var(--app-accent-action, var(--app-accent-interactive));
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.tool-category--guided {
+  border-color: color-mix(in srgb, var(--app-success) 30%, var(--app-border));
+  background: color-mix(in srgb, var(--app-success) 10%, var(--app-surface));
+  color: var(--app-success);
 }
 
 .tool-shortcut {
@@ -476,8 +493,9 @@
   min-width: min(100%, 10rem);
   min-height: var(--touch-target-min);
   padding: 12px 24px;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid var(--app-accent-action, var(--app-accent-interactive));
+  border-radius: var(--app-radius-md, 12px);
+  background: var(--app-accent-action, var(--app-accent-interactive));
   font-weight: 600;
   font-size: 14px;
   color: var(--app-on-solid);
@@ -486,8 +504,9 @@
 }
 
 .btn-open-tool:hover {
-  filter: brightness(1.1);
-  transform: translateX(4px);
+  background: var(--app-accent-hover);
+  border-color: var(--app-accent-hover);
+  transform: translateY(-1px);
 }
 
 .btn-chat-tool {

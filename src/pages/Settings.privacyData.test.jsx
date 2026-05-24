@@ -7,6 +7,7 @@ import {
   requestComplianceAccountDeletion,
   requestComplianceDataExport,
 } from '../services/complianceApi';
+import { createMockUserValue } from '../test/testRenderUtils';
 
 vi.mock('../contexts/ThemeContext', () => ({
   useTheme: () => ({
@@ -16,14 +17,19 @@ vi.mock('../contexts/ThemeContext', () => ({
   }),
 }));
 
-vi.mock('../contexts/UserContext', () => ({
-  useUser: () => ({
-    user: { email: 'clinician@example.com' },
-    authToken: 'test-token',
-    isAuthenticated: true,
-    isLoading: false,
-  }),
-}));
+vi.mock('../contexts/UserContext', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useUser: () =>
+      createMockUserValue({
+        user: { email: 'clinician@example.com' },
+        authToken: 'test-token',
+        isAuthenticated: true,
+        isLoading: false,
+      }),
+  };
+});
 
 vi.mock('../hooks/useNotificationActions', () => ({
   useNotificationActions: () => ({

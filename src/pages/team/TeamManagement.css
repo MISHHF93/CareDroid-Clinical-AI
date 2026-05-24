@@ -44,7 +44,7 @@
 
 .btn-invite:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+  box-shadow: var(--app-shadow-1);
 }
 
 .btn-invite:focus {
@@ -561,7 +561,7 @@
 .btn-save:hover:not(:disabled),
 .btn-invite:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+  box-shadow: var(--app-shadow-1);
 }
 
 .btn-cancel:disabled,

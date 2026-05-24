@@ -841,6 +841,50 @@ const toolRegistry = [
     ],
   },
   {
+    id: 'fleet-live-map',
+    name: 'Fleet Live Map',
+    path: '/fleet/map',
+    color: '#2563EB',
+    description:
+      'Visible fleet vehicle tracking map with demo GPS coordinates, route overlays, stale/offline markers, alerts, and vehicle detail drawer',
+    category: 'Fleet',
+    features: [
+      'Outdoor coordinate map panel',
+      'Vehicle GPS markers and route overlays',
+      'Status, freshness, and route filters',
+      'Vehicle detail drawer with timestamps',
+      'Demo-data label and no-autonomous-dispatch safety scope',
+    ],
+    useCases: [
+      'Dispatch center live map review',
+      'Vehicle location and ETA awareness',
+      'Stale or offline GPS triage',
+      'Route delay handoff',
+    ],
+  },
+  {
+    id: 'live-tracking-map',
+    name: 'Live Tracking Map',
+    path: '/live-map',
+    color: '#0EA5A6',
+    description:
+      'Main operational tracking map for fleet vehicles, hospital indoor devices, and Medical IoT status markers with demo-data safety labels',
+    category: 'Hospital Operations',
+    features: [
+      'Unified fleet, hospital, and IoT marker canvas',
+      'Layer and status filters',
+      'Tracking detail drawer with source timestamps',
+      'Cross-links to fleet, hospital, and Medical IoT maps',
+      'Explicit demo-data and safety limitations',
+    ],
+    useCases: [
+      'Operations huddle tracking overview',
+      'Fleet and device location awareness',
+      'Stale/offline asset review',
+      'Launch point for detailed map surfaces',
+    ],
+  },
+  {
     id: 'hospital-map',
     name: 'Hospital Map',
     path: '/hospital-map',

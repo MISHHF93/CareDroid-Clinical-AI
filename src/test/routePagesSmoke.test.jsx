@@ -22,8 +22,10 @@ import AiExplainability from '../pages/tools/AiExplainability';
 import ClinicalAudit from '../pages/tools/ClinicalAudit';
 import CommandDashboard from '../pages/CommandDashboard';
 import Dashboard from '../pages/Dashboard';
+import LiveTrackingMap from '../pages/LiveTrackingMap';
 import HospitalMapDashboard from '../pages/HospitalMapDashboard';
 import MedicalIotDashboard from '../pages/MedicalIotDashboard';
+import FleetLiveMap from '../pages/fleet/FleetLiveMap';
 import { CORE_ROUTE_SMOKE, TIER_A_FORM_SMOKE_SLUGS } from './responsiveRegression.routes';
 
 vi.mock('../pages/tools/Calculators.css', () => ({}));
@@ -90,6 +92,7 @@ vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
 const PAGE_BY_ID = {
   dashboard: CommandDashboard,
   assistant: Dashboard,
+  'live-map': LiveTrackingMap,
   'hospital-map': HospitalMapDashboard,
   'medical-iot': MedicalIotDashboard,
   'tools-overview': ToolsOverview,
@@ -104,10 +107,24 @@ const PAGE_BY_ID = {
   'order-set-ai': OrderSetAi,
   'ai-explainability': AiExplainability,
   'clinical-audit': ClinicalAudit,
+  'fleet-live-map': FleetLiveMap,
   'fleet-command': FleetDashboard,
   'fleet-route-optimizer': RouteOptimizer,
   'fleet-predictive-maintenance': PredictiveMaintenance,
 };
+
+const THEME_ROUTE_SMOKE_IDS = new Set([
+  'dashboard',
+  'assistant',
+  'tools-overview',
+  'calculators-hub',
+  'tools-catalog',
+  'medical-iot',
+  'fleet-command',
+  'hospital-map',
+]);
+
+const THEME_ROUTE_SMOKE = CORE_ROUTE_SMOKE.filter((route) => THEME_ROUTE_SMOKE_IDS.has(route.id));
 
 function renderRoute(path, Page) {
   return render(
@@ -152,6 +169,42 @@ describe('Route pages smoke — non-empty render', () => {
     },
     15_000
   );
+});
+
+describe('Route pages smoke — light and dark theme render', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    Element.prototype.scrollTo = vi.fn();
+    mockCompactViewport(false);
+    const { buildFleetDashboardSnapshot } = await import(
+      '../data/testHelpers/fleetToolsTestFixtures'
+    );
+    mockFetchFleetCommandSnapshot.mockResolvedValue(buildFleetDashboardSnapshot());
+  });
+
+  it.each(['light', 'dark'])('major pages render non-empty content in %s mode', async (theme) => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+
+    for (const route of THEME_ROUTE_SMOKE) {
+      const Page = PAGE_BY_ID[route.id];
+      const { container, unmount } = renderRoute(route.path, Page);
+
+      if (route.match === 'composer') {
+        expect(await screen.findByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
+      } else if (route.match === 'fleet-summary') {
+        await waitFor(() => {
+          expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
+        });
+      } else {
+        expect(await screen.findByRole('heading', { level: 1, name: route.heading })).toBeInTheDocument();
+      }
+
+      expect(document.documentElement.dataset.theme).toBe(theme);
+      expectNonEmptyPage(container);
+      unmount();
+    }
+  }, 20_000);
 });
 
 describe('Route pages smoke — compact viewport (no crash)', () => {

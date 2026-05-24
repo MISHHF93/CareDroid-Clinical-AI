@@ -25,8 +25,8 @@ html {
   --app-divider-on-surface: color-mix(in srgb, var(--app-fg) 12%, transparent);
   --app-overlay-on-surface: color-mix(in srgb, var(--app-fg) 7%, transparent);
   --app-overlay-on-surface-strong: color-mix(in srgb, var(--app-fg) 14%, transparent);
-  --app-shadow-1: 0 8px 24px rgba(0, 0, 0, 0.32);
-  --app-shadow-2: 0 18px 48px rgba(0, 0, 0, 0.45);
+  --app-shadow-1: 0 2px 8px rgba(0, 0, 0, 0.22);
+  --app-shadow-2: 0 8px 22px rgba(0, 0, 0, 0.32);
   --app-accent: #22c55e;
   --app-accent-2: #22d3ee;
   --app-accent-interactive: #38bdf8;
@@ -35,7 +35,7 @@ html {
   --app-warning: #fbbf24;
   --app-success: #22c55e;
   --app-info: #38bdf8;
-  --app-focus: rgba(56, 189, 248, 0.34);
+  --app-focus: rgba(56, 189, 248, 0.22);
   --app-hover: rgba(56, 189, 248, 0.1);
   --app-disabled: rgba(148, 163, 184, 0.38);
   --app-input-bg: rgba(255, 255, 255, 0.055);
@@ -71,7 +71,7 @@ html {
   --sidebar-fg-subtle: rgba(248, 250, 252, 0.42);
   --sidebar-border: color-mix(in srgb, var(--app-accent-interactive) 18%, var(--app-panel-border));
   --sidebar-divider: var(--app-border-subtle);
-  --sidebar-shadow: 4px 0 24px rgba(2, 6, 23, 0.28);
+  --sidebar-shadow: 2px 0 12px rgba(2, 6, 23, 0.22);
   --sidebar-item-hover-bg: color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
   --sidebar-item-hover-fg: var(--app-fg);
   --sidebar-item-hover-border: color-mix(in srgb, var(--app-accent-interactive) 28%, transparent);
@@ -88,16 +88,16 @@ html {
   --sidebar-cta-from: var(--app-accent-interactive);
   --sidebar-cta-to: color-mix(in srgb, var(--app-accent-interactive) 72%, #020617);
   --sidebar-cta-fg: #f8fafc;
-  --sidebar-cta-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 35%, transparent);
+  --sidebar-cta-shadow: 0 2px 8px color-mix(in srgb, var(--app-accent-interactive) 18%, transparent);
   --sidebar-logo-surface: linear-gradient(
     135deg,
     color-mix(in srgb, var(--app-accent-interactive) 92%, var(--app-on-solid)),
     color-mix(in srgb, var(--app-accent-interactive) 55%, #020617)
   );
-  --sidebar-logo-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 32%, transparent);
-  --sidebar-avatar-gradient: linear-gradient(135deg, var(--app-accent), color-mix(in srgb, var(--app-accent) 55%, #020617));
+  --sidebar-logo-shadow: 0 2px 8px color-mix(in srgb, var(--app-accent-interactive) 18%, transparent);
+  --sidebar-avatar-gradient: linear-gradient(135deg, color-mix(in srgb, var(--app-accent) 92%, var(--app-on-solid)), var(--app-accent));
   --sidebar-avatar-fg: #020617;
-  --sidebar-avatar-ring: color-mix(in srgb, var(--app-accent) 35%, transparent);
+  --sidebar-avatar-ring: color-mix(in srgb, var(--app-accent) 88%, var(--app-on-solid));
   --sidebar-tool-surface: var(--app-panel-bg);
   --sidebar-tool-surface-hover: color-mix(in srgb, var(--app-fg) 8%, transparent);
   --sidebar-tool-border: var(--app-panel-border);
@@ -123,7 +123,7 @@ html {
   --sidebar-tool-action-bg: color-mix(in srgb, var(--app-surface-0) 88%, transparent);
   --sidebar-tool-action-border: color-mix(in srgb, var(--app-fg) 14%, transparent);
   --sidebar-tool-action-fg: var(--app-fg-muted);
-  --sidebar-mobile-drawer-shadow: 12px 0 40px rgba(2, 6, 23, 0.38);
+  --sidebar-mobile-drawer-shadow: 8px 0 24px rgba(2, 6, 23, 0.28);
 }
 
 html[data-theme='dark'] {
@@ -145,8 +145,8 @@ html[data-theme='dark'] {
   --app-divider-on-surface: color-mix(in srgb, var(--app-fg) 12%, transparent);
   --app-overlay-on-surface: color-mix(in srgb, var(--app-fg) 7%, transparent);
   --app-overlay-on-surface-strong: color-mix(in srgb, var(--app-fg) 14%, transparent);
-  --app-shadow-1: 0 8px 24px rgba(0, 0, 0, 0.32);
-  --app-shadow-2: 0 18px 48px rgba(0, 0, 0, 0.45);
+  --app-shadow-1: 0 2px 8px rgba(0, 0, 0, 0.22);
+  --app-shadow-2: 0 8px 22px rgba(0, 0, 0, 0.32);
   --app-accent: #22c55e;
   --app-accent-2: #22d3ee;
   --app-accent-interactive: #38bdf8;
@@ -155,7 +155,7 @@ html[data-theme='dark'] {
   --app-warning: #fbbf24;
   --app-success: #22c55e;
   --app-info: #38bdf8;
-  --app-focus: rgba(56, 189, 248, 0.34);
+  --app-focus: rgba(56, 189, 248, 0.22);
   --app-hover: rgba(56, 189, 248, 0.1);
   --app-disabled: rgba(148, 163, 184, 0.38);
   --app-input-bg: rgba(255, 255, 255, 0.055);
@@ -190,7 +190,7 @@ html[data-theme='dark'] {
   --sidebar-fg-subtle: rgba(248, 250, 252, 0.42);
   --sidebar-border: var(--app-panel-border);
   --sidebar-divider: var(--app-border-subtle);
-  --sidebar-shadow: 4px 0 24px rgba(0, 0, 0, 0.32);
+  --sidebar-shadow: 2px 0 12px rgba(0, 0, 0, 0.24);
   --sidebar-item-hover-bg: color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
   --sidebar-item-hover-fg: var(--app-fg);
   --sidebar-item-hover-border: color-mix(in srgb, var(--app-accent-interactive) 28%, transparent);
@@ -207,16 +207,16 @@ html[data-theme='dark'] {
   --sidebar-cta-from: var(--app-accent-interactive);
   --sidebar-cta-to: color-mix(in srgb, var(--app-accent-interactive) 72%, #020617);
   --sidebar-cta-fg: #f8fafc;
-  --sidebar-cta-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 35%, transparent);
+  --sidebar-cta-shadow: 0 2px 8px color-mix(in srgb, var(--app-accent-interactive) 18%, transparent);
   --sidebar-logo-surface: linear-gradient(
     135deg,
     color-mix(in srgb, var(--app-accent-interactive) 92%, var(--app-on-solid)),
     color-mix(in srgb, var(--app-accent-interactive) 55%, #020617)
   );
-  --sidebar-logo-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 32%, transparent);
-  --sidebar-avatar-gradient: linear-gradient(135deg, var(--app-accent), color-mix(in srgb, var(--app-accent) 55%, #020617));
+  --sidebar-logo-shadow: 0 2px 8px color-mix(in srgb, var(--app-accent-interactive) 18%, transparent);
+  --sidebar-avatar-gradient: linear-gradient(135deg, color-mix(in srgb, var(--app-accent) 92%, var(--app-on-solid)), var(--app-accent));
   --sidebar-avatar-fg: #020617;
-  --sidebar-avatar-ring: color-mix(in srgb, var(--app-accent) 35%, transparent);
+  --sidebar-avatar-ring: color-mix(in srgb, var(--app-accent) 88%, var(--app-on-solid));
   --sidebar-tool-surface: var(--app-panel-bg);
   --sidebar-tool-surface-hover: color-mix(in srgb, var(--app-fg) 8%, transparent);
   --sidebar-tool-border: var(--app-panel-border);
@@ -242,7 +242,7 @@ html[data-theme='dark'] {
   --sidebar-tool-action-bg: color-mix(in srgb, var(--app-surface-0) 88%, transparent);
   --sidebar-tool-action-border: color-mix(in srgb, var(--app-fg) 14%, transparent);
   --sidebar-tool-action-fg: var(--app-fg-muted);
-  --sidebar-mobile-drawer-shadow: 12px 0 40px rgba(2, 6, 23, 0.38);
+  --sidebar-mobile-drawer-shadow: 8px 0 24px rgba(2, 6, 23, 0.28);
 }
 
 html[data-theme='light'] {
@@ -264,8 +264,8 @@ html[data-theme='light'] {
   --app-divider-on-surface: color-mix(in srgb, var(--app-fg) 12%, transparent);
   --app-overlay-on-surface: color-mix(in srgb, var(--app-fg) 7%, transparent);
   --app-overlay-on-surface-strong: color-mix(in srgb, var(--app-fg) 14%, transparent);
-  --app-shadow-1: 0 8px 24px rgba(15, 23, 42, 0.07);
-  --app-shadow-2: 0 16px 44px rgba(15, 23, 42, 0.11);
+  --app-shadow-1: 0 1px 4px rgba(15, 23, 42, 0.08);
+  --app-shadow-2: 0 8px 20px rgba(15, 23, 42, 0.1);
   --app-accent: #047857;
   --app-accent-2: #0891b2;
   --app-accent-interactive: #2563eb;
@@ -274,7 +274,7 @@ html[data-theme='light'] {
   --app-warning: #d97706;
   --app-success: #047857;
   --app-info: #0284c7;
-  --app-focus: rgba(37, 99, 235, 0.24);
+  --app-focus: rgba(37, 99, 235, 0.18);
   --app-hover: rgba(37, 99, 235, 0.08);
   --app-disabled: rgba(100, 116, 139, 0.34);
   --app-input-bg: rgba(255, 255, 255, 0.9);
@@ -309,7 +309,7 @@ html[data-theme='light'] {
   --sidebar-fg-subtle: rgba(15, 23, 42, 0.42);
   --sidebar-border: var(--app-panel-border);
   --sidebar-divider: var(--app-border-subtle);
-  --sidebar-shadow: 4px 0 20px rgba(15, 23, 42, 0.08);
+  --sidebar-shadow: 2px 0 10px rgba(15, 23, 42, 0.07);
   --sidebar-item-hover-bg: color-mix(in srgb, var(--app-accent-interactive) 12%, var(--app-surface-1));
   --sidebar-item-hover-fg: var(--app-fg);
   --sidebar-item-hover-border: color-mix(in srgb, var(--app-accent-interactive) 26%, transparent);
@@ -326,16 +326,16 @@ html[data-theme='light'] {
   --sidebar-cta-from: var(--app-accent-interactive);
   --sidebar-cta-to: color-mix(in srgb, var(--app-accent-interactive) 65%, #0f172a);
   --sidebar-cta-fg: var(--app-on-solid);
-  --sidebar-cta-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 28%, transparent);
+  --sidebar-cta-shadow: 0 2px 8px color-mix(in srgb, var(--app-accent-interactive) 16%, transparent);
   --sidebar-logo-surface: linear-gradient(
     135deg,
     color-mix(in srgb, var(--app-accent-interactive) 88%, var(--app-on-solid)),
     color-mix(in srgb, var(--app-accent-interactive) 48%, #0f172a)
   );
-  --sidebar-logo-shadow: 0 4px 12px color-mix(in srgb, var(--app-accent-interactive) 22%, transparent);
-  --sidebar-avatar-gradient: linear-gradient(135deg, var(--app-accent), color-mix(in srgb, var(--app-accent) 45%, #0f172a));
+  --sidebar-logo-shadow: 0 2px 8px color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
+  --sidebar-avatar-gradient: linear-gradient(135deg, color-mix(in srgb, var(--app-accent) 92%, var(--app-on-solid)), var(--app-accent));
   --sidebar-avatar-fg: var(--app-navy-ink);
-  --sidebar-avatar-ring: color-mix(in srgb, var(--app-accent) 30%, transparent);
+  --sidebar-avatar-ring: color-mix(in srgb, var(--app-accent) 84%, var(--app-on-solid));
   --sidebar-tool-surface: var(--app-panel-bg);
   --sidebar-tool-surface-hover: color-mix(in srgb, var(--app-navy-ink) 6%, transparent);
   --sidebar-tool-border: var(--app-panel-border);
@@ -361,5 +361,31 @@ html[data-theme='light'] {
   --sidebar-tool-action-bg: color-mix(in srgb, var(--app-surface-elevated) 75%, var(--app-on-solid));
   --sidebar-tool-action-border: color-mix(in srgb, var(--app-navy-ink) 10%, transparent);
   --sidebar-tool-action-fg: var(--app-fg-muted);
-  --sidebar-mobile-drawer-shadow: 12px 0 36px rgba(15, 23, 42, 0.14);
+  --sidebar-mobile-drawer-shadow: 8px 0 22px rgba(15, 23, 42, 0.12);
+}
+
+/**
+ * CareDroid semantic authoring aliases.
+ * New component CSS should use these --app-* tokens instead of raw colors.
+ */
+html {
+  --app-background: var(--app-bg);
+  --app-surface: var(--app-surface-1);
+  --app-surface-raised: var(--app-surface-elevated);
+  --app-border: var(--app-panel-border);
+  --app-border-strong: color-mix(in srgb, var(--app-fg) 22%, transparent);
+  --app-text-primary: var(--app-fg);
+  --app-text-secondary: color-mix(in srgb, var(--app-fg) 76%, transparent);
+  --app-text-muted: var(--app-fg-muted);
+  --app-accent-action: var(--app-accent-interactive);
+  --app-elevation-none: none;
+  --app-elevation-subtle: var(--app-shadow-1);
+  --app-elevation-card: var(--app-shadow-1);
+  --app-elevation-overlay: var(--app-shadow-2);
+  --app-status-online: var(--app-success);
+  --app-status-offline: var(--app-fg-muted);
+  --app-status-degraded: var(--app-warning);
+  --app-status-demo: var(--app-info);
+  --app-status-unsupported: color-mix(in srgb, var(--app-fg) 48%, transparent);
+  --app-status-critical: var(--app-danger);
 }

@@ -121,6 +121,10 @@ export function getPlatformInventory() {
         routes: ['/clinical/alerts'],
       },
       {
+        area: 'Live tracking maps',
+        routes: ['/live-map', '/fleet/map', '/hospital-map', '/medical-iot'],
+      },
+      {
         area: 'Account & security',
         routes: [
           '/profile',

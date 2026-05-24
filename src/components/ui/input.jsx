@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useId, useState } from 'react';
 import './input.css';
 
 const Input = ({ 
@@ -9,6 +9,7 @@ const Input = ({
   leftIcon,
   rightIcon,
   placeholder,
+  id,
   value,
   onChange,
   onFocus,
@@ -18,6 +19,9 @@ const Input = ({
   style,
   ...props 
 }) => {
+  const generatedId = useId();
+  const inputId = id || generatedId;
+  const messageId = error || success ? `${inputId}-message` : undefined;
   const [isFocused, setIsFocused] = useState(false);
 
   const handleFocus = (e) => {
@@ -45,13 +49,14 @@ const Input = ({
   return (
     <div className="input-wrapper">
       {label && (
-        <label className={`input-label ${isFocused ? 'input-label-focused' : ''}`}>
+        <label className={`input-label ${isFocused ? 'input-label-focused' : ''}`} htmlFor={inputId}>
           {label}
         </label>
       )}
       <div className="input-container">
         {leftIcon && <span className="input-icon input-icon-left">{leftIcon}</span>}
         <input
+          id={inputId}
           type={type}
           className={getInputClassName()}
           placeholder={placeholder}
@@ -61,12 +66,22 @@ const Input = ({
           onBlur={handleBlur}
           disabled={disabled}
           style={style}
+          aria-invalid={error ? 'true' : undefined}
+          aria-describedby={messageId}
           {...props}
         />
         {rightIcon && <span className="input-icon input-icon-right">{rightIcon}</span>}
       </div>
-      {error && <span className="input-message input-error-message">{error}</span>}
-      {success && <span className="input-message input-success-message">{success}</span>}
+      {error && (
+        <span id={messageId} className="input-message input-error-message">
+          {error}
+        </span>
+      )}
+      {success && (
+        <span id={messageId} className="input-message input-success-message">
+          {success}
+        </span>
+      )}
     </div>
   );
 };

@@ -28,9 +28,11 @@ describe('backend contract hardening', () => {
 
   it('uses DTO classes for chat and tool execution request bodies', () => {
     expect(read('src/modules/chat/chat.controller.ts')).toContain('class ChatMessageDto');
-    expect(read('src/modules/medical-control-plane/tool-orchestrator/dto/tool-execution.dto.ts')).toContain(
-      'class ToolExecutionBodyDto',
+    expect(
+      read('src/modules/medical-control-plane/tool-orchestrator/dto/tool-execution.dto.ts'),
+    ).toContain('class ToolExecutionBodyDto');
+    expect(read('src/modules/subscriptions/subscriptions.controller.ts')).toContain(
+      'CustomerPortalDto',
     );
-    expect(read('src/modules/subscriptions/subscriptions.controller.ts')).toContain('CustomerPortalDto');
   });
 });

@@ -1,7 +1,9 @@
 import { buildDemoHospitalMapSnapshot } from '../data/demoHospitalMapData';
+import { fetchLiveTrackingCapability } from './liveTrackingApi';
 
 export const HOSPITAL_MAP_BACKEND_STATUS = Object.freeze({
-  implemented: false,
+  implemented: true,
+  demoContractOnly: true,
   plannedEndpoints: Object.freeze([
     '/api/hospital-map/floors',
     '/api/hospital-map/units',
@@ -58,7 +60,42 @@ export function summarizeHospitalMapSnapshot(snapshot) {
   };
 }
 
-export async function fetchHospitalMapSnapshot() {
+async function fetchHospitalMapSnapshotFromApi(options = {}) {
+  const { signal } = options;
+  const [floorResult, deviceResult] = await Promise.all([
+    fetchLiveTrackingCapability('hospitalMap', '/api/hospital-map/floors', { signal }),
+    fetchLiveTrackingCapability('deviceFleet', '/api/hospital-map/devices', { signal }),
+  ]);
+
+  if (!floorResult.ok || !deviceResult.ok) return null;
+
+  return {
+    ok: true,
+    unsupported: false,
+    snapshot: {
+      source: 'backend-demo-hospital-map',
+      sourceLabel:
+        floorResult.sourceLabel ||
+        'Backend demo hospital map contract - replace with real floor/device feeds before clinical use',
+      generatedAt: floorResult.generatedAt || deviceResult.generatedAt || new Date().toISOString(),
+      floors: floorResult.payload?.floors || [],
+      units: floorResult.payload?.units || [],
+      rooms: floorResult.payload?.rooms || [],
+      beds: floorResult.payload?.beds || [],
+      devices: deviceResult.payload?.devices || [],
+      alerts: deviceResult.payload?.alerts || [],
+    },
+    backendStatus: HOSPITAL_MAP_BACKEND_STATUS,
+    message:
+      deviceResult.message ||
+      'Hospital map uses backend demo floor and device coordinates only; verify status in the system of record.',
+  };
+}
+
+export async function fetchHospitalMapSnapshot(options = {}) {
+  const apiSnapshot = await fetchHospitalMapSnapshotFromApi(options);
+  if (apiSnapshot) return apiSnapshot;
+
   return {
     ok: true,
     unsupported: true,

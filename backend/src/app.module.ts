@@ -40,6 +40,7 @@ import { RAGModule } from './modules/rag/rag.module';
 import { NotificationModule } from './modules/notifications/notification.module';
 import { EmailModule } from './modules/email/email.module';
 import { CacheModule } from './modules/cache/cache.module';
+import { LiveTrackingModule } from './modules/live-tracking/live-tracking.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -119,6 +120,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     ClinicalIntelligenceModule,
     AnalyticsModule,
     NotificationModule,
+    LiveTrackingModule,
 
     // Medical Control Plane (Intent Classification, Tool Orchestration)
     MedicalControlPlaneModule,

@@ -59,14 +59,15 @@
 
 .tool-header {
   background: var(--app-surface-1);
-  border-left: 4px solid var(--primary-color);
-  border-radius: 12px;
+  border: 1px solid var(--app-border);
+  border-left: 4px solid var(--app-accent-action, var(--app-accent-interactive));
+  border-radius: var(--app-radius-lg, 18px);
   padding: 32px;
   margin-bottom: 32px;
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-elevation-card, var(--app-shadow-1));
 }
 
 .tool-header-left {
@@ -85,12 +86,14 @@
 .tool-header-icon {
   width: clamp(3.25rem, 14vw, 5rem);
   height: clamp(3.25rem, 14vw, 5rem);
-  border-radius: 16px;
+  border-radius: var(--app-radius-md, 12px);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: var(--text-primary);
+  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 10%, var(--app-surface-muted));
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 22%, var(--app-border));
+  color: var(--app-accent-action, var(--app-accent-interactive));
 }
 
 .tool-header-icon-inner {
@@ -126,7 +129,10 @@
 
 .tool-category-badge {
   padding: 6px 12px;
-  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 28%, var(--app-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 9%, var(--app-surface));
+  color: var(--app-accent-action, var(--app-accent-interactive));
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -158,14 +164,14 @@
 .btn-share-tool {
   min-height: var(--touch-target-min);
   padding: 10px 16px;
-  border: 2px solid rgba(79, 70, 229, 0.4);
-  background: rgba(79, 70, 229, 0.1);
-  border-radius: 8px;
+  border: 1px solid color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 34%, var(--app-border));
+  background: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 9%, var(--app-surface));
+  border-radius: var(--app-radius-md, 12px);
   font-weight: 600;
   font-size: clamp(0.875rem, 2vw + 0.5rem, 0.9375rem);
   cursor: pointer;
   transition: all 0.2s;
-  color: var(--primary-color);
+  color: var(--app-accent-action, var(--app-accent-interactive));
   box-sizing: border-box;
 }
 
@@ -176,8 +182,8 @@
 }
 
 .btn-share-tool:hover {
-  border-color: var(--primary-color);
-  background: rgba(79, 70, 229, 0.2);
+  border-color: var(--app-accent-action, var(--app-accent-interactive));
+  background: var(--app-hover);
 }
 
 .btn-back-to-tools {
@@ -208,10 +214,11 @@
 
 .tool-content {
   background: var(--app-surface-1);
-  border-radius: 12px;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-radius-lg, 18px);
   padding: 32px;
   margin-bottom: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--app-elevation-card, var(--app-shadow-1));
 }
 
 .clinical-insights-panel {
@@ -220,7 +227,7 @@
   padding: 24px;
   margin-bottom: 24px;
   border: 1px solid var(--app-panel-border);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--app-shadow-1);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -228,22 +235,22 @@
 
 .clinical-insights-panel.severity-critical {
   border-color: rgba(255, 107, 107, 0.4);
-  box-shadow: 0 10px 22px rgba(255, 107, 107, 0.18);
+  box-shadow: var(--app-shadow-1);
 }
 
 .clinical-insights-panel.severity-warning {
   border-color: rgba(255, 193, 7, 0.4);
-  box-shadow: 0 10px 22px rgba(255, 193, 7, 0.18);
+  box-shadow: var(--app-shadow-1);
 }
 
 .clinical-insights-panel.severity-normal {
   border-color: rgba(0, 200, 140, 0.35);
-  box-shadow: 0 10px 22px rgba(0, 200, 140, 0.16);
+  box-shadow: var(--app-shadow-1);
 }
 
 .clinical-insights-panel.severity-info {
-  border-color: rgba(100, 149, 237, 0.35);
-  box-shadow: 0 10px 22px rgba(100, 149, 237, 0.16);
+  border-color: color-mix(in srgb, var(--app-info) 35%, var(--app-border));
+  box-shadow: var(--app-shadow-1);
 }
 
 .clinical-insights-header {
@@ -266,22 +273,22 @@
   letter-spacing: 0.08em;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgba(79, 70, 229, 0.08);
-  color: var(--text-secondary);
+  background: color-mix(in srgb, var(--app-info) 9%, var(--app-surface));
+  color: var(--app-info);
 }
 
 .clinical-insights-badge.critical {
-  background: rgba(255, 107, 107, 0.18);
-  color: var(--danger);
+  background: color-mix(in srgb, var(--app-danger) 12%, var(--app-surface));
+  color: var(--app-danger);
 }
 
 .clinical-insights-badge.warning {
-  background: rgba(255, 193, 7, 0.18);
-  color: var(--warning);
+  background: color-mix(in srgb, var(--app-warning) 14%, var(--app-surface));
+  color: var(--app-warning);
 }
 
 .clinical-insights-badge.normal {
-  background: rgba(0, 200, 140, 0.18);
+  background: color-mix(in srgb, var(--app-success) 12%, var(--app-surface));
   color: var(--app-success);
 }
 
@@ -353,7 +360,7 @@
   color: var(--app-on-solid);
   border-radius: 12px;
   padding: 32px;
-  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
+  box-shadow: var(--app-shadow-1);
 }
 
 .ai-panel-header {

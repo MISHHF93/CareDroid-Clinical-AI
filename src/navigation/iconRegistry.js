@@ -138,6 +138,8 @@ const TOOL_ICONS = {
   'framingham-risk': LineChart,
   'copd-gold': Flame,
   'rome-iv-ibs': BookOpen,
+  'live-tracking-map': Route,
+  'fleet-live-map': Truck,
   'fleet-command': Truck,
   'hospital-map': Hospital,
   'device-fleet-management': Wrench,

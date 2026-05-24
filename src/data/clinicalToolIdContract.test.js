@@ -96,6 +96,7 @@ describe('clinicalToolIdContract — canonical groups', () => {
       ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsHub,
       ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierA,
       ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierBChat,
+      ...CANONICAL_TOOL_GROUPS.liveTrackingMaps,
       ...CANONICAL_TOOL_GROUPS.medicalIotDashboards,
       ...CANONICAL_TOOL_GROUPS.hospitalOperations,
     ];

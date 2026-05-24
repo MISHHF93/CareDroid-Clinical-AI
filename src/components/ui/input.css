@@ -2,19 +2,19 @@
 .input-wrapper {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--app-space-sm, var(--space-2));
   width: 100%;
 }
 
 .input-label {
   font-size: var(--font-14);
-  font-weight: 500;
-  color: var(--text-muted);
+  font-weight: 650;
+  color: var(--app-text-secondary);
   transition: color 0.2s var(--ease-smooth);
 }
 
 .input-label-focused {
-  color: var(--accent-green);
+  color: var(--app-accent-action, var(--app-accent-interactive));
 }
 
 .input-container {
@@ -26,32 +26,34 @@
 .input-field {
   width: 100%;
   padding: 12px 14px;
-  font-size: var(--font-16);
+  min-height: var(--app-min-touch-target, 44px);
+  font-size: var(--text-input-min, var(--font-16));
   font-family: inherit;
-  color: var(--text-color);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--panel-border);
-  border-radius: var(--radius-md);
+  color: var(--app-text-primary);
+  background: var(--app-input-bg);
+  border: 1px solid var(--app-input-border);
+  border-radius: var(--app-radius-md, var(--radius-md));
   outline: none;
-  transition: all 0.3s var(--ease-smooth);
+  transition:
+    background-color 0.2s var(--ease-smooth),
+    border-color 0.2s var(--ease-smooth),
+    box-shadow 0.2s var(--ease-smooth);
 }
 
 .input-field::placeholder {
-  color: var(--muted-text);
+  color: var(--app-text-muted);
 }
 
 .input-field:hover {
-  border-color: rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 26%, var(--app-input-border));
+  background: var(--app-input-bg-hover);
 }
 
 .input-field:focus,
 .input-focused {
-  border-color: var(--accent-green);
-  background: rgba(0, 255, 136, 0.05);
-  box-shadow: 
-    0 0 0 3px rgba(0, 255, 136, 0.1),
-    0 4px 12px rgba(0, 255, 136, 0.15);
+  border-color: var(--app-accent-action, var(--app-accent-interactive));
+  background: var(--app-input-bg-hover);
+  box-shadow: 0 0 0 2px var(--app-focus);
 }
 
 .input-with-left-icon {
@@ -67,7 +69,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--muted-text);
+  color: var(--app-text-muted);
   transition: color 0.2s var(--ease-smooth);
   pointer-events: none;
 }
@@ -82,32 +84,28 @@
 
 .input-focused + .input-icon,
 .input-field:focus ~ .input-icon {
-  color: var(--accent-green);
+  color: var(--app-accent-action, var(--app-accent-interactive));
 }
 
 /* Input States */
 .input-error {
-  border-color: var(--danger);
-  background: rgba(255, 107, 107, 0.05);
+  border-color: var(--app-danger);
+  background: color-mix(in srgb, var(--app-danger) 8%, var(--app-input-bg));
 }
 
 .input-error:focus {
-  border-color: var(--danger);
-  box-shadow: 
-    0 0 0 3px rgba(255, 107, 107, 0.1),
-    0 4px 12px rgba(255, 107, 107, 0.15);
+  border-color: var(--app-danger);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-danger) 18%, transparent);
 }
 
 .input-success {
-  border-color: var(--accent-green);
-  background: rgba(0, 255, 136, 0.03);
+  border-color: var(--app-success);
+  background: color-mix(in srgb, var(--app-success) 7%, var(--app-input-bg));
 }
 
 .input-success:focus {
-  border-color: var(--accent-green);
-  box-shadow: 
-    0 0 0 3px rgba(0, 255, 136, 0.1),
-    0 4px 12px rgba(0, 255, 136, 0.15);
+  border-color: var(--app-success);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-success) 18%, transparent);
 }
 
 .input-disabled {
@@ -126,11 +124,11 @@
 }
 
 .input-error-message {
-  color: var(--danger);
+  color: var(--app-danger);
 }
 
 .input-success-message {
-  color: var(--accent-green);
+  color: var(--app-success);
 }
 
 /* Textarea */
@@ -140,23 +138,9 @@ textarea.input-field {
   font-family: inherit;
 }
 
-/* Focus Animation */
-@keyframes input-focus-pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 0 8px rgba(0, 255, 136, 0);
-  }
-}
-
-.input-field:focus {
-  animation: input-focus-pulse 0.6s ease-out;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .input-field {
-    font-size: var(--font-14);
+    font-size: var(--text-input-min, var(--font-16));
   }
 }

@@ -55,11 +55,6 @@ html {
   --chart-4: var(--app-chart-4);
   --chart-5: var(--app-chart-5);
   --chart-6: var(--app-chart-6);
-  --space-xs: var(--space-1);
-  --space-sm: var(--space-2);
-  --space-md: var(--space-3);
-  --space-lg: var(--space-4);
-  --space-xl: var(--space-5);
   --space-2xs: var(--space-1);
   --nav-glyph-muted: var(--sidebar-fg-muted);
 }

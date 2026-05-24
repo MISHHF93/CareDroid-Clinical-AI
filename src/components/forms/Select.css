@@ -62,7 +62,7 @@
 
 .select-trigger-open {
   border-color: var(--accent-1);
-  box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 0 2px var(--app-focus);
 }
 
 .select-trigger-disabled {

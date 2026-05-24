@@ -88,10 +88,7 @@ export class ToolOrchestratorController {
    */
   @Post(':id/validate')
   @HttpCode(HttpStatus.OK)
-  async validateTool(
-    @Param('id') toolId: string,
-    @Body() body: ToolExecutionBodyDto,
-  ) {
+  async validateTool(@Param('id') toolId: string, @Body() body: ToolExecutionBodyDto) {
     return this.toolOrchestratorService.validateToolExecution({
       toolId,
       parameters: body?.parameters ?? {},
@@ -142,10 +139,7 @@ export class ToolOrchestratorController {
    */
   @Post('results')
   @HttpCode(HttpStatus.OK)
-  async recordToolResult(
-    @Body() body: RecordToolResultDto,
-    @Request() req: any,
-  ) {
+  async recordToolResult(@Body() body: RecordToolResultDto, @Request() req: any) {
     const userId = req.user?.id || 'anonymous';
 
     const result = await this.toolOrchestratorService.saveToolResult({

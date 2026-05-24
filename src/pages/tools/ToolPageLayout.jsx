@@ -153,9 +153,9 @@ const ToolPageLayout = ({
       )}
 
       {/* Tool Header */}
-      <div className="tool-header" style={{ borderColor: tool.color }}>
+      <div className="tool-header">
         <div className="tool-header-left">
-          <div className="tool-header-icon" style={{ backgroundColor: `${tool.color}20` }}>
+          <div className="tool-header-icon">
             <span className="tool-header-icon-inner" aria-hidden>
               <NavIcon icon={getToolIcon(tool.id)} size={28} />
             </span>
@@ -164,7 +164,7 @@ const ToolPageLayout = ({
             <h1>{tool.name}</h1>
             <p>{tool.description}</p>
             <div className="tool-header-meta">
-              <span className="tool-category-badge" style={{ backgroundColor: `${tool.color}20`, color: tool.color }}>
+              <span className="tool-category-badge">
                 {tool.category}
               </span>
               {tool.shortcut ? <span className="tool-shortcut-badge">Quick access</span> : null}

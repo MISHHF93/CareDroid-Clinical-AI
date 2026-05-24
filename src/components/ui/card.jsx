@@ -7,8 +7,10 @@ const Card = ({
   subtle = false,
   hover = false,
   glassmorphism = false,
-  padding = '24px',
-  onClick
+  padding = 'var(--app-card-padding-compact, 24px)',
+  onClick,
+  className = '',
+  ...props
 }) => {
   const getClassName = () => {
     let classes = ['card'];
@@ -16,7 +18,16 @@ const Card = ({
     if (hover) classes.push('card-hover');
     if (glassmorphism) classes.push('card-glass');
     if (onClick) classes.push('card-clickable');
+    if (className) classes.push(className);
     return classes.join(' ');
+  };
+
+  const handleKeyDown = (event) => {
+    if (!onClick) return;
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClick(event);
+    }
   };
 
   return (
@@ -24,8 +35,10 @@ const Card = ({
       className={getClassName()} 
       style={{ padding, ...style }}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
       role={onClick ? 'button' : undefined}
       tabIndex={onClick ? 0 : undefined}
+      {...props}
     >
       {children}
     </div>

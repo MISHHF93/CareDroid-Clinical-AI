@@ -16,7 +16,12 @@ import {
   buildRenderExecuteMatrix,
   EXECUTION_MODES,
 } from '../data/toolRenderExecuteMatrix';
-import { expectNonEmptyPage, mockConversationValue, mockToolPreferencesValue } from './testRenderUtils';
+import {
+  expectNonEmptyPage,
+  mockConversationValue,
+  mockToolPreferencesValue,
+  mockUserValue,
+} from './testRenderUtils';
 
 vi.mock('../pages/tools/Calculators.css', () => ({}));
 vi.mock('../pages/tools/ToolPageLayout.css', () => ({}));
@@ -53,12 +58,13 @@ vi.mock('../contexts/ConversationContext', () => ({
   useConversation: () => mockConversationValue,
 }));
 
-vi.mock('../contexts/UserContext', () => ({
-  useUser: () => ({
-    user: { id: 'u1', email: 't@test.com' },
-    authToken: 'test-token',
-  }),
-}));
+vi.mock('../contexts/UserContext', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useUser: () => mockUserValue,
+  };
+});
 
 vi.mock('../services/analyticsService', () => ({
   default: { trackEvent: vi.fn() },
@@ -124,7 +130,7 @@ describe('toolRenderExecuteSmoke — clinical pages non-empty', () => {
     ['/tools/protocols', Protocols, /search for a protocol/i],
     ['/tools/diagnosis', DiagnosisAssistant, /patient presentation/i],
     ['/tools/procedures', ProcedureGuide, /search for a procedure/i],
-    ['/tools', ToolsOverview, /^Tools$/i],
+    ['/tools', ToolsOverview, /^Tool Library$/i],
   ])('%s renders primary UI', async (path, Page, matcher) => {
     const { container } = renderAt(path, <Page />);
     expect(await screen.findByText(matcher)).toBeInTheDocument();

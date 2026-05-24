@@ -330,7 +330,10 @@ export class RAGService {
   ): string {
     return JSON.stringify({
       corpusVersion: this.corpusVersion,
-      query: String(query || '').trim().replace(/\s+/g, ' ').toLowerCase(),
+      query: String(query || '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase(),
       topK: options.topK,
       minScore: options.minScore,
       includeEmbeddings: options.includeEmbeddings,

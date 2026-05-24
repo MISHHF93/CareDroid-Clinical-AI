@@ -33,24 +33,37 @@ export const mockConversationValue = {
   setIsLoading: vi.fn(),
 };
 
-export const mockUserValue = {
-  user: {
+export function createMockUserValue(overrides = {}) {
+  const baseUser = {
     id: 'test-user',
     email: 'test@caredroid.local',
     name: 'Test Clinician',
     role: 'physician',
     fullName: 'Test Clinician',
-  },
-  authToken: 'test-token',
-  isAuthenticated: true,
-  isLoading: false,
-  hasPermission: () => true,
-  hasAnyPermission: () => true,
-  hasAllPermissions: () => true,
-  setUser: vi.fn(),
-  setAuthToken: vi.fn(),
-  signOut: vi.fn(),
-};
+  };
+
+  const mergedUser =
+    overrides.user === null ? null : { ...baseUser, ...(overrides.user || {}) };
+  const contextOverrides = { ...overrides };
+  delete contextOverrides.user;
+
+  return {
+    authToken: 'test-token',
+    isAuthenticated: Boolean(mergedUser),
+    isDevAuthBypass: false,
+    isLoading: false,
+    hasPermission: () => true,
+    hasAnyPermission: () => true,
+    hasAllPermissions: () => true,
+    setUser: vi.fn(),
+    setAuthToken: vi.fn(),
+    signOut: vi.fn(),
+    ...contextOverrides,
+    user: mergedUser,
+  };
+}
+
+export const mockUserValue = createMockUserValue();
 
 export const mockWorkspaceValue = {
   workspaces: [{ id: 'default', name: 'Default', toolIds: [] }],

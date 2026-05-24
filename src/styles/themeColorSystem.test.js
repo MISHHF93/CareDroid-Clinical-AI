@@ -14,6 +14,13 @@ const medicalIotCss = readFileSync(join(srcRoot, 'pages/MedicalIotDashboard.css'
 const dashboardCss = readFileSync(join(srcRoot, 'pages/Dashboard.css'), 'utf8');
 const chartCss = readFileSync(join(srcRoot, 'components/dashboard/DashboardVisualizations.css'), 'utf8');
 const toolsOverviewCss = readFileSync(join(srcRoot, 'pages/tools/ToolsOverview.css'), 'utf8');
+const toolPageLayoutCss = readFileSync(join(srcRoot, 'pages/tools/ToolPageLayout.css'), 'utf8');
+const calculatorsCss = readFileSync(join(srcRoot, 'pages/tools/Calculators.css'), 'utf8');
+const buttonCss = readFileSync(join(srcRoot, 'components/ui/button.css'), 'utf8');
+const cardCss = readFileSync(join(srcRoot, 'components/ui/card.css'), 'utf8');
+const inputCss = readFileSync(join(srcRoot, 'components/ui/input.css'), 'utf8');
+const badgeCss = readFileSync(join(srcRoot, 'components/ui/Badge.css'), 'utf8');
+const alertCss = readFileSync(join(srcRoot, 'components/ui/Alert.css'), 'utf8');
 
 describe('theme color system revamp', () => {
   it('defines clean neutral light and OLED-conscious dark root palettes', () => {
@@ -35,6 +42,17 @@ describe('theme color system revamp', () => {
       '--chart-6',
     ]) {
       expect(themeBridgeCss).toContain(token);
+    }
+    for (const token of [
+      '--app-background',
+      '--app-surface-raised',
+      '--app-border-strong',
+      '--app-text-primary',
+      '--app-elevation-card',
+      '--app-status-online',
+      '--app-status-critical',
+    ]) {
+      expect(themeTokensCss).toContain(token);
     }
   });
 
@@ -58,5 +76,23 @@ describe('theme color system revamp', () => {
     expect(chartCss).toContain('var(--app-fg-muted)');
     expect(chartCss).toContain('var(--app-panel-border)');
     expect(chartCss).toContain('var(--app-surface-1)');
+  });
+
+  it('keeps shared primitives and tools token-native instead of neon one-offs', () => {
+    const sharedCss = [
+      buttonCss,
+      cardCss,
+      inputCss,
+      badgeCss,
+      alertCss,
+      toolsOverviewCss,
+      toolPageLayoutCss,
+      calculatorsCss,
+    ].join('\n');
+
+    expect(sharedCss).toContain('var(--app-accent-action');
+    expect(sharedCss).toContain('var(--app-border');
+    expect(sharedCss).not.toMatch(/rgba\(0,\s*255,\s*136|#ff6b6b|#ff5252|rgba\(79,\s*70,\s*229/);
+    expect(sharedCss).not.toMatch(/text-shadow:\s*0 0/);
   });
 });

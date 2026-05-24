@@ -123,7 +123,9 @@ describe('ClinicalIntelligenceService', () => {
       organization: 'Example Society',
     });
     expect(result.sources[0]).toMatchObject({ chunkId: 'chunk-1', citationId: 1 });
-    expect(result.explainability.limitations.join(' ')).toMatch(/Does not generate recommendations beyond retrieved source text/i);
+    expect(result.explainability.limitations.join(' ')).toMatch(
+      /Does not generate recommendations beyond retrieved source text/i,
+    );
   });
 
   it('withholds recommendations when retrieval has insufficient evidence', async () => {
@@ -144,7 +146,9 @@ describe('ClinicalIntelligenceService', () => {
 
     expect(result.status).toBe('insufficient_evidence');
     expect(result.summary.recommendations).toEqual([]);
-    expect(result.summary.unsupportedClaimNotice).toMatch(/Insufficient retrieved guideline evidence/i);
+    expect(result.summary.unsupportedClaimNotice).toMatch(
+      /Insufficient retrieved guideline evidence/i,
+    );
   });
 
   it('generates ranked differential decision support with calculator suggestions and safety flags', async () => {
@@ -306,9 +310,7 @@ describe('ClinicalIntelligenceService', () => {
       ]),
     );
     expect(result.recentLabs).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ label: 'K', interpretation: 'abnormal' }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ label: 'K', interpretation: 'abnormal' })]),
     );
     expect(result.alerts).toEqual(
       expect.arrayContaining([
@@ -316,9 +318,7 @@ describe('ClinicalIntelligenceService', () => {
       ]),
     );
     expect(result.riskFactors).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ label: 'CKD' }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ label: 'CKD' })]),
     );
     expect(result.safety.decisionSupportOnly).toBe(true);
   });
@@ -361,7 +361,8 @@ describe('ClinicalIntelligenceService', () => {
     const service = createService();
 
     const result = await service.generateOrderSetAi('user-11', {
-      clinicalScenario: 'Suspected sepsis with hypotension, fever, elevated lactate, and pneumonia source concern.',
+      clinicalScenario:
+        'Suspected sepsis with hypotension, fever, elevated lactate, and pneumonia source concern.',
       diagnosis: 'Sepsis / pneumonia',
       patientContext: 'CKD stage 3 and penicillin allergy.',
       constraints: 'Renal dosing and local antimicrobial stewardship review.',
@@ -381,18 +382,21 @@ describe('ClinicalIntelligenceService', () => {
       reviewRequired: true,
     });
     expect(result.protocolPathways).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: 'sepsis-pathway' }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ id: 'sepsis-pathway' })]),
     );
     expect(result.explainability.matchedSignals).toEqual(
-      expect.arrayContaining(['Sepsis / infection pathway signal', 'Renal/allergy constraint signal']),
+      expect.arrayContaining([
+        'Sepsis / infection pathway signal',
+        'Renal/allergy constraint signal',
+      ]),
     );
     expect(result.safety).toMatchObject({
       reviewRequired: true,
       autonomousOrderPlacement: false,
     });
-    expect(result.safety.blockedActions).toEqual(expect.arrayContaining(['place_orders', 'sign_orders']));
+    expect(result.safety.blockedActions).toEqual(
+      expect.arrayContaining(['place_orders', 'sign_orders']),
+    );
   });
 
   it('audits order-set-ai PHI access without storing raw scenario text', async () => {
@@ -459,7 +463,9 @@ describe('ClinicalIntelligenceService', () => {
       expect.arrayContaining([expect.objectContaining({ label: 'guideline-rag' })]),
     );
     expect(result.reasoning.join(' ')).toMatch(/sanitized execution log/i);
-    expect(result.toolChain).toEqual(expect.arrayContaining(['guideline-rag -> evidence_found -> ai_query']));
+    expect(result.toolChain).toEqual(
+      expect.arrayContaining(['guideline-rag -> evidence_found -> ai_query']),
+    );
     expect(result.executionLogs[0].metadataSummary).toMatchObject({
       capabilityId: 'guideline-rag',
       sourceCount: 2,

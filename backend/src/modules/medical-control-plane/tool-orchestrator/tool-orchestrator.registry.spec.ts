@@ -126,9 +126,13 @@ describe('tool-orchestrator.registry', () => {
   });
 
   it('documents executor parameter aliases for pattern parameters that differ by casing', () => {
-    const sofaPattern = patternsSource.match(/toolId:\s*'sofa-calculator'[\s\S]*?optionalParameters:\s*\[([\s\S]*?)\]/);
+    const sofaPattern = patternsSource.match(
+      /toolId:\s*'sofa-calculator'[\s\S]*?optionalParameters:\s*\[([\s\S]*?)\]/,
+    );
     expect(sofaPattern?.[1]).toContain("'urine_output'");
-    expect(EXECUTOR_REQUEST_CONTRACTS['sofa-calculator'].optionalParameters).toContain('urineOutput');
+    expect(EXECUTOR_REQUEST_CONTRACTS['sofa-calculator'].optionalParameters).toContain(
+      'urineOutput',
+    );
     expect(EXECUTOR_PARAMETER_ALIASES['sofa-calculator'].urine_output).toBe('urineOutput');
 
     expect(EXECUTOR_PARAMETER_ALIASES['lab-interpreter'].lab_values).toBe('labValues');

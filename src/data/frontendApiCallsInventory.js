@@ -66,6 +66,14 @@ export const FRONTEND_API_CALLS = Object.freeze([
 
   { id: 'bulk-sync', method: 'POST', path: '/api/sync', client: 'offline.js / OfflineSupport.jsx', capability: 'bulkSync' },
 
+  { id: 'fleet-live-vehicles', method: 'GET', path: '/api/fleet/vehicles/live', client: 'fleetTelemetryService.js', capability: 'fleetLiveTracking' },
+  { id: 'fleet-active-routes', method: 'GET', path: '/api/fleet/routes/active', client: 'fleetTelemetryService.js', capability: 'fleetActiveRoutes' },
+  { id: 'hospital-map-floors', method: 'GET', path: '/api/hospital-map/floors', client: 'hospitalMapService.js', capability: 'hospitalMap' },
+  { id: 'hospital-map-devices', method: 'GET', path: '/api/hospital-map/devices', client: 'hospitalMapService.js', capability: 'deviceFleet' },
+  { id: 'medical-devices-live', method: 'GET', path: '/api/devices/live', client: 'medicalIotService.js', capability: 'medicalDeviceRegistry' },
+  { id: 'medical-telemetry-live', method: 'GET', path: '/api/telemetry/live', client: 'medicalIotService.js', capability: 'telemetryLive' },
+  { id: 'medical-device-alerts', method: 'GET', path: '/api/alerts/devices', client: 'medicalIotService.js', capability: 'deviceAlerting' },
+
   { id: 'clinical-alerts-ack', method: 'POST', path: '/api/clinical/alerts/:id/acknowledge', client: 'clinicalAlertNotifications.js', capability: 'clinicalAlerts' },
   { id: 'clinical-alerts-dismiss', method: 'POST', path: '/api/clinical/alerts/:id/dismiss', client: 'clinicalAlertNotifications.js', capability: 'clinicalAlerts' },
   { id: 'clinical-alerts-stream', method: 'GET', path: '/api/clinical/alerts/stream', client: 'clinicalAlertNotifications.js', capability: 'clinicalAlerts', notes: 'WebSocket upgrade' },

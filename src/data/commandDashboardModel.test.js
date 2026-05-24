@@ -19,7 +19,10 @@ describe('command dashboard model', () => {
     expect(model.stats.aiTools).toBeGreaterThan(0);
     expect(model.panels.clinicalTools.map((tool) => tool.id)).toContain(REGISTRY.qsofa);
     expect(model.panels.referenceGuidelines.map((tool) => tool.id)).toContain(REGISTRY.guidelineRag);
+    expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.liveTrackingMap);
+    expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.fleetLiveMap);
     expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.fleetCommand);
+    expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.deviceFleetManagement);
     expect(model.panels.medicalIot.map((tool) => tool.id)).toContain(REGISTRY.medicalIotDashboard);
     for (const tool of featured) {
       expect(inventoryIds.has(tool.id), tool.id).toBe(true);

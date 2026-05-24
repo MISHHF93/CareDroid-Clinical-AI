@@ -197,7 +197,7 @@
 
 .btn-consent-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+  box-shadow: var(--app-shadow-1);
 }
 
 .btn-consent-primary:disabled {

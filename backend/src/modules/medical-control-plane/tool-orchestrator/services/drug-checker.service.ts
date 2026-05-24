@@ -106,8 +106,7 @@ const KNOWN_INTERACTION_PAIRS: Record<string, DrugInteraction> = {
     description: 'Risk of life-threatening hyperkalemia',
     mechanism: 'Additive effects on potassium retention',
     clinicalSignificance: 'Risk of life-threatening hyperkalemia',
-    management:
-      'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
+    management: 'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
     recommendation:
       'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
   },

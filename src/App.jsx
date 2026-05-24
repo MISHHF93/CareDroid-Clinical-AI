@@ -43,6 +43,7 @@ const CommandDashboard = lazyWithRetry(() => import('./pages/CommandDashboard'))
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
 const Operations = lazyWithRetry(() => import('./pages/Operations'));
+const LiveTrackingMap = lazyWithRetry(() => import('./pages/LiveTrackingMap'));
 const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
 const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
@@ -89,6 +90,7 @@ const AiExplainability = lazyWithRetry(() => import('./pages/tools/AiExplainabil
 const ToolNotFound = lazyWithRetry(() => import('./pages/tools/ToolNotFound'));
 const ToolsAreaFallback = lazyWithRetry(() => import('./pages/tools/ToolsAreaFallback'));
 const FleetDashboard = lazyWithRetry(() => import('./pages/fleet/FleetDashboard'));
+const FleetLiveMap = lazyWithRetry(() => import('./pages/fleet/FleetLiveMap'));
 const PredictiveMaintenance = lazyWithRetry(() => import('./pages/fleet/PredictiveMaintenance'));
 const RouteOptimizer = lazyWithRetry(() => import('./pages/fleet/RouteOptimizer'));
 
@@ -346,6 +348,8 @@ function LegacyProtectedRouteRedirect({ to }) {
 const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot'];
 const TOOLS_ROUTE_ALIASES = ['/all-tools', '/clinical-tools'];
 const CALCULATORS_ROUTE_ALIASES = ['/calculators'];
+const LIVE_MAP_ROUTE_ALIASES = ['/maps', '/tracking', '/live-tracking'];
+const FLEET_MAP_ROUTE_ALIASES = ['/fleet/live-map', '/fleet/tracking'];
 
 // ==================== ROUTING ====================
 function AppRoutes() {
@@ -494,6 +498,21 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/live-map',
+      element: (
+        <AppShellPage>
+          <LiveTrackingMap />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
+    },
+    ...LIVE_MAP_ROUTE_ALIASES.map((path) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to="/live-map" />,
+      requiresAuth: true,
+    })),
+    {
       path: '/medical-iot',
       element: (
         <AppShellPage>
@@ -501,6 +520,7 @@ function AppRoutes() {
         </AppShellPage>
       ),
       requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
     {
       path: '/hospital-map',
@@ -510,6 +530,7 @@ function AppRoutes() {
         </AppShellPage>
       ),
       requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
 
     // Clinical tools: canonical routes render their product pages directly.
@@ -734,6 +755,21 @@ function AppRoutes() {
       ),
       requiresAuth: true,
     },
+    {
+      path: '/fleet/map',
+      element: (
+        <AppShellPage>
+          <FleetLiveMap />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
+    },
+    ...FLEET_MAP_ROUTE_ALIASES.map((path) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to="/fleet/map" />,
+      requiresAuth: true,
+    })),
     {
       path: '/fleet/predictive-maintenance',
       element: (

@@ -34,18 +34,18 @@
 
 /* Color variants */
 .spinner-accent {
-  border-color: rgba(0, 255, 136, 0.2);
-  border-top-color: var(--accent-1);
+  border-color: color-mix(in srgb, var(--app-accent-action, var(--app-accent-interactive)) 22%, transparent);
+  border-top-color: var(--app-accent-action, var(--app-accent-interactive));
 }
 
 .spinner-white {
-  border-color: rgba(255, 255, 255, 0.2);
-  border-top-color: var(--text-color);
+  border-color: var(--app-border);
+  border-top-color: var(--app-text-primary);
 }
 
 .spinner-muted {
-  border-color: rgba(248, 250, 252, 0.1);
-  border-top-color: var(--muted-text);
+  border-color: var(--app-border);
+  border-top-color: var(--app-text-muted);
 }
 
 /* Animation */
@@ -65,7 +65,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: var(--navy-bg);
+  background: var(--app-bg);
   display: flex;
   align-items: center;
   justify-content: center;

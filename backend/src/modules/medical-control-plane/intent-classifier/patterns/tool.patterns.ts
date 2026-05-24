@@ -1311,7 +1311,9 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   },
 ];
 
-const TOOL_PATTERN_BY_ID = new Map(CLINICAL_TOOL_PATTERNS.map((pattern) => [pattern.toolId, pattern]));
+const TOOL_PATTERN_BY_ID = new Map(
+  CLINICAL_TOOL_PATTERNS.map((pattern) => [pattern.toolId, pattern]),
+);
 const NORMALIZED_TOOL_PATTERNS = CLINICAL_TOOL_PATTERNS.map((pattern) => ({
   pattern,
   keywords: pattern.keywords.map((keyword) => ({

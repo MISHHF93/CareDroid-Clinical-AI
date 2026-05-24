@@ -103,7 +103,9 @@ export class UsersService {
     ];
     const sanitizedUpdates = Object.fromEntries(
       Object.entries(updates || {})
-        .filter(([key, value]) => allowedFields.includes(key as keyof UserProfile) && value !== undefined)
+        .filter(
+          ([key, value]) => allowedFields.includes(key as keyof UserProfile) && value !== undefined,
+        )
         .map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value]),
     ) as Partial<UserProfile>;
 

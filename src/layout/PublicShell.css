@@ -93,7 +93,7 @@
 
 .btn-public-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+  box-shadow: var(--app-shadow-1);
 }
 
 /* Main Content */

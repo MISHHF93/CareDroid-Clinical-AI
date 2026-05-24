@@ -12,9 +12,11 @@
 
 .medical-iot-hero,
 .medical-iot-section,
+.medical-iot-detail,
 .medical-iot-state,
 .medical-iot-source,
-.medical-iot-summary {
+.medical-iot-summary,
+.medical-iot-filters {
   border: 1px solid var(--app-panel-border);
   border-radius: 24px;
   background: var(--app-surface-1);
@@ -146,9 +148,54 @@
   font-weight: 700;
 }
 
+.medical-iot-filters {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.35fr) minmax(0, 0.65fr);
+  gap: 12px;
+  padding: 16px;
+}
+
+.medical-iot-filters label {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--app-fg-muted);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.medical-iot-filters select,
+.medical-iot-filters input[type='search'] {
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 14px;
+  padding: 0 12px;
+  background: var(--app-surface-2);
+  color: var(--app-fg);
+  font: inherit;
+}
+
 .medical-iot-section {
   min-width: 0;
   padding: clamp(18px, 3vw, 26px);
+}
+
+.medical-iot-section-header,
+.medical-iot-detail-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.medical-iot-section-header h2,
+.medical-iot-section-header p,
+.medical-iot-detail-header h2,
+.medical-iot-detail-header p {
+  margin: 0;
 }
 
 .medical-iot-section h2 {
@@ -175,6 +222,14 @@
   min-width: 0;
 }
 
+.medical-iot-location-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 20px;
+  align-items: start;
+  min-width: 0;
+}
+
 .medical-iot-grid-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -191,6 +246,19 @@
   border-radius: 18px;
   padding: 14px;
   background: var(--app-surface-2);
+}
+
+.medical-iot-device-card {
+  width: 100%;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.medical-iot-device-card--selected {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 52%, var(--app-panel-border));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
 }
 
 .medical-iot-card-row,
@@ -242,9 +310,14 @@
   background: color-mix(in srgb, var(--app-danger) 14%, transparent);
 }
 
+.medical-iot-badge--neutral {
+  color: var(--app-fg-muted);
+  background: var(--app-surface-2);
+}
+
 .medical-iot-device-meta {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin: 14px 0 0;
 }
@@ -258,6 +331,165 @@
 .medical-iot-device-meta dd {
   margin: 4px 0 0;
   font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.medical-iot-map-canvas {
+  position: relative;
+  min-height: 360px;
+  overflow: hidden;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--app-accent-interactive) 12%, transparent), transparent 32%),
+    var(--app-surface-2);
+}
+
+.medical-iot-map-canvas svg {
+  display: block;
+  width: 100%;
+  min-width: 620px;
+  height: auto;
+}
+
+.medical-iot-map-shell {
+  fill: color-mix(in srgb, var(--app-surface-1) 74%, transparent);
+  stroke: var(--app-panel-border);
+  stroke-width: 2;
+}
+
+.medical-iot-map-corridor {
+  fill: color-mix(in srgb, var(--app-accent-interactive) 9%, transparent);
+  stroke: color-mix(in srgb, var(--app-accent-interactive) 22%, var(--app-panel-border));
+}
+
+.medical-iot-map-room {
+  fill: var(--app-surface-1);
+  stroke: var(--app-panel-border);
+  stroke-width: 2;
+}
+
+.medical-iot-marker-layer {
+  position: absolute;
+  inset: 0;
+  min-width: 620px;
+}
+
+.medical-iot-map-marker {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  border: 3px solid var(--app-surface-1);
+  border-radius: 999px;
+  color: var(--app-on-solid);
+  font-weight: 900;
+  box-shadow: var(--app-shadow-1);
+  cursor: pointer;
+}
+
+.medical-iot-map-marker--good {
+  background: var(--app-success);
+}
+
+.medical-iot-map-marker--warning {
+  background: var(--app-warning);
+}
+
+.medical-iot-map-marker--critical {
+  background: var(--app-danger);
+}
+
+.medical-iot-map-marker--neutral {
+  background: var(--app-fg-muted);
+}
+
+.medical-iot-map-marker--selected {
+  outline: 4px solid color-mix(in srgb, var(--app-accent-interactive) 24%, transparent);
+  outline-offset: 4px;
+}
+
+.medical-iot-map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+  color: var(--app-fg-muted);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.medical-iot-dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border-radius: 999px;
+  vertical-align: -1px;
+}
+
+.medical-iot-dot--good {
+  background: var(--app-success);
+}
+
+.medical-iot-dot--warning {
+  background: var(--app-warning);
+}
+
+.medical-iot-dot--critical {
+  background: var(--app-danger);
+}
+
+.medical-iot-detail {
+  position: sticky;
+  top: 16px;
+  min-width: 0;
+  padding: clamp(18px, 3vw, 26px);
+}
+
+.medical-iot-detail--empty {
+  position: static;
+}
+
+.medical-iot-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--app-surface-2);
+  color: var(--app-fg);
+  cursor: pointer;
+}
+
+.medical-iot-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.medical-iot-detail-grid div {
+  min-width: 0;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 14px;
+  padding: 12px;
+  background: var(--app-surface-2);
+}
+
+.medical-iot-detail-grid dt {
+  color: var(--app-fg-muted);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.medical-iot-detail-grid dd {
+  margin: 4px 0 0;
+  font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .medical-iot-vital-card {
@@ -303,8 +535,13 @@
 
 @media (max-width: 980px) {
   .medical-iot-hero,
+  .medical-iot-location-workspace,
   .medical-iot-grid-row {
     grid-template-columns: 1fr;
+  }
+
+  .medical-iot-detail {
+    position: static;
   }
 
   .medical-iot-device-grid,
@@ -319,11 +556,18 @@
     padding: 14px;
   }
 
+  .medical-iot-filters,
   .medical-iot-device-grid,
   .medical-iot-vitals-grid,
   .medical-iot-summary,
-  .medical-iot-device-meta {
+  .medical-iot-device-meta,
+  .medical-iot-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .medical-iot-map-canvas {
+    min-height: 300px;
+    overflow-x: auto;
   }
 
   .medical-iot-action {

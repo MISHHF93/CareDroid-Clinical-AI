@@ -9,6 +9,7 @@ import {
   fetchCurrentSubscription,
   fetchSubscriptionPlans,
 } from '../services/subscriptionApi';
+import { createMockUserValue } from '../test/testRenderUtils';
 
 let mockUserState;
 
@@ -20,9 +21,13 @@ vi.mock('../contexts/ThemeContext', () => ({
   }),
 }));
 
-vi.mock('../contexts/UserContext', () => ({
-  useUser: () => mockUserState,
-}));
+vi.mock('../contexts/UserContext', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useUser: () => mockUserState,
+  };
+});
 
 vi.mock('../hooks/useNotificationActions', () => ({
   useNotificationActions: () => ({
@@ -54,12 +59,12 @@ function renderSettings() {
 describe('Settings Billing card', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUserState = {
+    mockUserState = createMockUserValue({
       user: { email: 'clinician@example.com' },
       authToken: 'test-token',
       isAuthenticated: true,
       isLoading: false,
-    };
+    });
     fetchCurrentSubscription.mockResolvedValue({
       ok: true,
       data: {
@@ -122,12 +127,12 @@ describe('Settings Billing card', () => {
   });
 
   it('shows auth-required empty state without calling protected billing routes', async () => {
-    mockUserState = {
+    mockUserState = createMockUserValue({
       user: null,
       authToken: '',
       isAuthenticated: false,
       isLoading: false,
-    };
+    });
 
     renderSettings();
 

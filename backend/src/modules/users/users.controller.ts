@@ -17,12 +17,7 @@ export class UsersController {
   @Get('profile')
   @ApiOperation({ summary: 'Get current user profile' })
   async getProfile(@Req() req: any) {
-    return this.usersService.findById(
-      req.user.id,
-      req.user.id,
-      req.ip,
-      req.headers['user-agent'],
-    );
+    return this.usersService.findById(req.user.id, req.user.id, req.ip, req.headers['user-agent']);
   }
 
   @Patch('profile')

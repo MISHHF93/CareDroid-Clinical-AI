@@ -209,7 +209,7 @@
 
 .lab-add-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.3);
+  box-shadow: var(--app-shadow-1);
 }
 
 .lab-add-button:disabled {
@@ -335,7 +335,7 @@
 
 .lab-interpret-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 255, 136, 0.4);
+  box-shadow: var(--app-shadow-1);
 }
 
 .lab-interpret-button:disabled {

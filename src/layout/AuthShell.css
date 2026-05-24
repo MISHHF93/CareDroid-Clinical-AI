@@ -39,7 +39,7 @@
   border-radius: 16px;
   border: 1px solid var(--app-panel-border);
   background: var(--app-surface-1);
-  box-shadow: var(--app-shadow-2);
+  box-shadow: var(--app-shadow-1);
   display: flex;
   flex-direction: column;
   gap: 0;

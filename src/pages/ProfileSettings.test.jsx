@@ -5,6 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import ProfileSettings from './ProfileSettings';
 import { updateUserProfile } from '../services/profileApi';
+import { createMockUserValue } from '../test/testRenderUtils';
 
 const mockSetUser = vi.fn();
 const mockSuccess = vi.fn();
@@ -12,13 +13,18 @@ const mockError = vi.fn();
 let mockUser;
 let mockAuthToken;
 
-vi.mock('../contexts/UserContext', () => ({
-  useUser: () => ({
-    user: mockUser,
-    authToken: mockAuthToken,
-    setUser: mockSetUser,
-  }),
-}));
+vi.mock('../contexts/UserContext', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useUser: () =>
+      createMockUserValue({
+        user: mockUser,
+        authToken: mockAuthToken,
+        setUser: mockSetUser,
+      }),
+  };
+});
 
 vi.mock('../hooks/useNotificationActions', () => ({
   useNotificationActions: () => ({

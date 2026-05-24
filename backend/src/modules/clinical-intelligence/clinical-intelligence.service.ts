@@ -17,8 +17,15 @@ import {
   GuidelineRagSourceAttribution,
 } from './dto/guideline-rag.dto';
 import { DifferentialAiRequestDto, DifferentialAiResponseDto } from './dto/differential-ai.dto';
-import { TimelineAiEncounterDto, TimelineAiRequestDto, TimelineAiResponseDto } from './dto/timeline-ai.dto';
-import { PatientSummaryAiRequestDto, PatientSummaryAiResponseDto } from './dto/patient-summary-ai.dto';
+import {
+  TimelineAiEncounterDto,
+  TimelineAiRequestDto,
+  TimelineAiResponseDto,
+} from './dto/timeline-ai.dto';
+import {
+  PatientSummaryAiRequestDto,
+  PatientSummaryAiResponseDto,
+} from './dto/patient-summary-ai.dto';
 import { OrderSetAiRequestDto, OrderSetAiResponseDto } from './dto/order-set-ai.dto';
 import {
   AiExplainabilityQueryDto,
@@ -183,7 +190,9 @@ export class ClinicalIntelligenceService {
     ]);
     const rankedDifferentials = buildRankedDifferentials(inputText);
     const suggestedCalculators = buildDifferentialCalculatorSuggestions(inputText);
-    const status = rankedDifferentials.length ? 'ranked_differential_generated' : 'needs_more_context';
+    const status = rankedDifferentials.length
+      ? 'ranked_differential_generated'
+      : 'needs_more_context';
 
     await this.auditService.log({
       userId,
@@ -329,7 +338,11 @@ export class ClinicalIntelligenceService {
     const alerts = buildSummaryAlerts(dto, inputText);
     const riskFactors = buildRiskFactors(dto, inputText);
     const status =
-      activeProblems.length || medications.length || recentLabs.length || alerts.length || riskFactors.length
+      activeProblems.length ||
+      medications.length ||
+      recentLabs.length ||
+      alerts.length ||
+      riskFactors.length
         ? 'summary_generated'
         : 'needs_more_context';
 
@@ -418,8 +431,16 @@ export class ClinicalIntelligenceService {
     const matchedSignals = matchOrderSetSignals(inputText);
     const orderBundles = buildOrderSetBundles(inputText);
     const protocolPathways = buildProtocolPathways(inputText);
-    const status = orderBundles.length || protocolPathways.length ? 'suggestions_generated' : 'needs_more_context';
-    const blockedActions = ['place_orders', 'sign_orders', 'modify_ehr', 'activate_protocol_without_review'];
+    const status =
+      orderBundles.length || protocolPathways.length
+        ? 'suggestions_generated'
+        : 'needs_more_context';
+    const blockedActions = [
+      'place_orders',
+      'sign_orders',
+      'modify_ehr',
+      'activate_protocol_without_review',
+    ];
 
     await this.auditService.log({
       userId,
@@ -530,7 +551,8 @@ export class ClinicalIntelligenceService {
   ): Promise<ClinicalAuditResponseDto> {
     const runId = randomUUID();
     const limit = clampLogLimit(dto.limit, 50);
-    const action = dto.action === AuditAction.PHI_ACCESS ? AuditAction.PHI_ACCESS : AuditAction.AI_QUERY;
+    const action =
+      dto.action === AuditAction.PHI_ACCESS ? AuditAction.PHI_ACCESS : AuditAction.AI_QUERY;
     const auditLogs = await this.auditService.findByAction(action, limit);
     const executionLogs = auditLogs
       .filter((log) => !log.resource || log.resource.startsWith('clinical-intelligence/'))
@@ -606,7 +628,8 @@ export class ClinicalIntelligenceService {
           'Referral Context': contextLine,
           'Clinical Summary': transcript,
           'Reason for Referral': instructionLine,
-          'Requested Review': 'Review required. Confirm specialty, urgency, and attached records before sending.',
+          'Requested Review':
+            'Review required. Confirm specialty, urgency, and attached records before sending.',
         },
         limitations: SAFETY_WARNINGS,
       };
@@ -616,8 +639,10 @@ export class ClinicalIntelligenceService {
       title: 'SOAP Note Draft',
       sections: {
         Subjective: transcript,
-        Objective: 'Review required. Add verified exam, vitals, labs, and imaging from source records.',
-        Assessment: 'Draft assessment requires clinician review and should not be treated as a diagnosis.',
+        Objective:
+          'Review required. Add verified exam, vitals, labs, and imaging from source records.',
+        Assessment:
+          'Draft assessment requires clinician review and should not be treated as a diagnosis.',
         Plan: instructionLine,
       },
       limitations: SAFETY_WARNINGS,
@@ -626,12 +651,7 @@ export class ClinicalIntelligenceService {
 }
 
 function normalizeClinicalText(values: Array<string | undefined>): string {
-  return values
-    .filter(Boolean)
-    .join(' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLowerCase();
+  return values.filter(Boolean).join(' ').replace(/\s+/g, ' ').trim().toLowerCase();
 }
 
 function demographicsToText(demographics?: Record<string, unknown>): string {
@@ -645,31 +665,78 @@ function buildRankedDifferentials(text: string): DifferentialAiResponseDto['rank
   const rules = [
     {
       condition: 'Acute coronary syndrome',
-      triggers: ['chest pain', 'chest pressure', 'diaphoresis', 'troponin', 'st depression', 'nstemi', 'acs'],
-      supportingEvidence: ['Chest pain or pressure pattern', 'Cardiac biomarker or ECG concern when present'],
+      triggers: [
+        'chest pain',
+        'chest pressure',
+        'diaphoresis',
+        'troponin',
+        'st depression',
+        'nstemi',
+        'acs',
+      ],
+      supportingEvidence: [
+        'Chest pain or pressure pattern',
+        'Cardiac biomarker or ECG concern when present',
+      ],
       missingEvidence: ['Serial troponins', 'ECG interpretation', 'Hemodynamic stability'],
       urgencyFlags: ['Treat ongoing ischemic symptoms or instability as time-sensitive.'],
       calculators: ['heart-score', 'timi-ua-nstemi', 'grace-acs'],
     },
     {
       condition: 'Pulmonary embolism',
-      triggers: ['dyspnea', 'shortness of breath', 'pleuritic', 'hemoptysis', 'dvt', 'tachycardia', 'pe'],
+      triggers: [
+        'dyspnea',
+        'shortness of breath',
+        'pleuritic',
+        'hemoptysis',
+        'dvt',
+        'tachycardia',
+        'pe',
+      ],
       supportingEvidence: ['Dyspnea/pleuritic symptoms or DVT features when present'],
-      missingEvidence: ['Oxygen saturation', 'DVT signs', 'Recent surgery/immobility', 'Hemoptysis'],
+      missingEvidence: [
+        'Oxygen saturation',
+        'DVT signs',
+        'Recent surgery/immobility',
+        'Hemoptysis',
+      ],
       urgencyFlags: ['Escalate immediately for hypoxia, syncope, shock, or high-risk PE concern.'],
       calculators: ['wells-pe', 'perc'],
     },
     {
       condition: 'Sepsis or serious infection',
-      triggers: ['fever', 'infection', 'sepsis', 'hypotension', 'tachypnea', 'lactate', 'altered mental status'],
+      triggers: [
+        'fever',
+        'infection',
+        'sepsis',
+        'hypotension',
+        'tachypnea',
+        'lactate',
+        'altered mental status',
+      ],
       supportingEvidence: ['Infectious symptoms or physiologic derangement when present'],
-      missingEvidence: ['Vital signs', 'lactate', 'source evaluation', 'cultures and organ dysfunction markers'],
-      urgencyFlags: ['Hypotension, altered mentation, or high lactate require urgent clinical escalation.'],
+      missingEvidence: [
+        'Vital signs',
+        'lactate',
+        'source evaluation',
+        'cultures and organ dysfunction markers',
+      ],
+      urgencyFlags: [
+        'Hypotension, altered mentation, or high lactate require urgent clinical escalation.',
+      ],
       calculators: ['qsofa', 'news2', 'sofa-score'],
     },
     {
       condition: 'Stroke or transient ischemic attack',
-      triggers: ['weakness', 'facial droop', 'aphasia', 'slurred speech', 'stroke', 'tia', 'neurologic deficit'],
+      triggers: [
+        'weakness',
+        'facial droop',
+        'aphasia',
+        'slurred speech',
+        'stroke',
+        'tia',
+        'neurologic deficit',
+      ],
       supportingEvidence: ['Focal neurologic symptoms when present'],
       missingEvidence: ['Last known well', 'NIHSS elements', 'glucose', 'neuroimaging status'],
       urgencyFlags: ['Acute focal deficits require emergency stroke pathway activation.'],
@@ -689,7 +756,9 @@ function buildRankedDifferentials(text: string): DifferentialAiResponseDto['rank
       rank: index + 1,
       condition: rule.condition,
       likelihood: index === 0 && matches.length >= 2 ? 'higher' : index <= 2 ? 'moderate' : 'lower',
-      supportingEvidence: rule.supportingEvidence.concat(matches.map((match) => `Matched input keyword: ${match}`)),
+      supportingEvidence: rule.supportingEvidence.concat(
+        matches.map((match) => `Matched input keyword: ${match}`),
+      ),
       missingEvidence: rule.missingEvidence,
       urgencyFlags: rule.urgencyFlags,
     }));
@@ -781,11 +850,26 @@ function buildEncounterFindings(encounter: TimelineAiEncounterDto): string[] {
 
 function detectAbnormalSignals(text: string): string[] {
   const rules = [
-    { label: 'Possible hypoxia or respiratory decline', keywords: ['hypoxia', 'spo2', 'oxygen', 'dyspnea'] },
-    { label: 'Possible hemodynamic instability', keywords: ['hypotension', 'shock', 'syncope', 'tachycardia'] },
-    { label: 'Possible renal function worsening', keywords: ['creatinine', 'aki', 'renal', 'egfr'] },
-    { label: 'Possible infectious progression', keywords: ['fever', 'sepsis', 'lactate', 'leukocytosis'] },
-    { label: 'Possible worsening symptoms', keywords: ['worsening', 'progressive', 'increasing', 'recurrent'] },
+    {
+      label: 'Possible hypoxia or respiratory decline',
+      keywords: ['hypoxia', 'spo2', 'oxygen', 'dyspnea'],
+    },
+    {
+      label: 'Possible hemodynamic instability',
+      keywords: ['hypotension', 'shock', 'syncope', 'tachycardia'],
+    },
+    {
+      label: 'Possible renal function worsening',
+      keywords: ['creatinine', 'aki', 'renal', 'egfr'],
+    },
+    {
+      label: 'Possible infectious progression',
+      keywords: ['fever', 'sepsis', 'lactate', 'leukocytosis'],
+    },
+    {
+      label: 'Possible worsening symptoms',
+      keywords: ['worsening', 'progressive', 'increasing', 'recurrent'],
+    },
   ];
 
   return rules
@@ -843,7 +927,9 @@ function buildTimelineTrends(
     .filter(Boolean) as TimelineAiResponseDto['trends'];
 }
 
-function inferTrendDirection(texts: string[]): TimelineAiResponseDto['trends'][number]['direction'] {
+function inferTrendDirection(
+  texts: string[],
+): TimelineAiResponseDto['trends'][number]['direction'] {
   const combined = texts.join(' ');
   if (/\b(improved|improving|resolved|decreased|downtrending)\b/.test(combined)) return 'improving';
   if (/\b(worsening|progressive|increasing|elevated|rising|recurrent|decline)\b/.test(combined)) {
@@ -862,7 +948,7 @@ function buildAbnormalProgression(
     .map((event, index) => ({
       id: `progression-${index + 1}`,
       severity: event.abnormalSignals.some((signal) =>
-        /hemodynamic|hypoxia|infectious/i.test(signal)
+        /hemodynamic|hypoxia|infectious/i.test(signal),
       )
         ? ('urgent_review' as const)
         : ('watch' as const),
@@ -887,7 +973,8 @@ function buildAbnormalProgression(
 function summarizeText(value: string, maxLength: number): string {
   const normalized = value.replace(/\s+/g, ' ').trim();
   if (!normalized) return 'No details provided.';
-  const sentence = normalized.split(/(?<=[.!?])\s+/).find((part) => part.length >= 12) || normalized;
+  const sentence =
+    normalized.split(/(?<=[.!?])\s+/).find((part) => part.length >= 12) || normalized;
   return sentence.length > maxLength ? `${sentence.slice(0, maxLength - 3)}...` : sentence;
 }
 
@@ -907,7 +994,10 @@ function buildActiveProblems(
   const explicitProblems = splitClinicalList(dto.problems);
   const inferred = [
     { label: 'Congestive heart failure', keywords: ['chf', 'heart failure', 'volume overload'] },
-    { label: 'Chronic kidney disease / renal impairment', keywords: ['ckd', 'creatinine', 'renal', 'egfr'] },
+    {
+      label: 'Chronic kidney disease / renal impairment',
+      keywords: ['ckd', 'creatinine', 'renal', 'egfr'],
+    },
     { label: 'Diabetes mellitus', keywords: ['diabetes', 'dm2', 'a1c', 'insulin', 'metformin'] },
     { label: 'Hypertension', keywords: ['hypertension', 'htn', 'lisinopril', 'amlodipine'] },
     { label: 'Possible acute infection', keywords: ['fever', 'sepsis', 'leukocytosis', 'lactate'] },
@@ -939,7 +1029,8 @@ function inferProblemPriority(
   inputText: string,
 ): PatientSummaryAiResponseDto['activeProblems'][number]['priority'] {
   if (/\b(sepsis|hypotension|critical|acute|worsening|urgent)\b/.test(inputText)) return 'high';
-  if (/\b(chf|heart failure|ckd|renal|diabetes|insulin)\b/.test(label.toLowerCase())) return 'medium';
+  if (/\b(chf|heart failure|ckd|renal|diabetes|insulin)\b/.test(label.toLowerCase()))
+    return 'medium';
   return 'routine';
 }
 
@@ -956,9 +1047,12 @@ function buildMedicationSummary(value?: string): PatientSummaryAiResponseDto['me
 
 function inferMedicationContext(value: string): string {
   if (/\b(insulin|metformin|glipizide)\b/.test(value)) return 'Diabetes therapy context.';
-  if (/\b(furosemide|bumetanide|torsemide)\b/.test(value)) return 'Volume status / diuretic therapy context.';
-  if (/\b(lisinopril|losartan|spironolactone)\b/.test(value)) return 'Renal function and potassium monitoring context.';
-  if (/\b(warfarin|apixaban|rivaroxaban|heparin)\b/.test(value)) return 'Anticoagulation review context.';
+  if (/\b(furosemide|bumetanide|torsemide)\b/.test(value))
+    return 'Volume status / diuretic therapy context.';
+  if (/\b(lisinopril|losartan|spironolactone)\b/.test(value))
+    return 'Renal function and potassium monitoring context.';
+  if (/\b(warfarin|apixaban|rivaroxaban|heparin)\b/.test(value))
+    return 'Anticoagulation review context.';
   return 'Medication listed for clinician reconciliation.';
 }
 
@@ -968,7 +1062,9 @@ function inferMedicationReviewFlags(value: string): string[] {
       ? 'Review potassium and renal function.'
       : null,
     /\b(metformin)\b/.test(value) ? 'Review renal function and contrast exposure context.' : null,
-    /\b(warfarin|apixaban|rivaroxaban|heparin)\b/.test(value) ? 'Review bleeding risk and indication.' : null,
+    /\b(warfarin|apixaban|rivaroxaban|heparin)\b/.test(value)
+      ? 'Review bleeding risk and indication.'
+      : null,
   ].filter(Boolean) as string[];
 }
 
@@ -1033,7 +1129,9 @@ function buildSummaryAlerts(
   return explicitAlerts.concat(inferredAlerts).slice(0, 12);
 }
 
-function inferAlertSeverity(value: string): PatientSummaryAiResponseDto['alerts'][number]['severity'] {
+function inferAlertSeverity(
+  value: string,
+): PatientSummaryAiResponseDto['alerts'][number]['severity'] {
   if (/\b(critical|urgent|hyperkalemia|anaphylaxis|sepsis)\b/.test(value)) return 'urgent_review';
   if (/\b(risk|watch|monitor|fall)\b/.test(value)) return 'watch';
   return 'info';
@@ -1048,10 +1146,26 @@ function buildRiskFactors(
     rationale: 'Submitted risk factor.',
   }));
   const inferred = [
-    { label: 'Chronic kidney disease', keywords: ['ckd', 'renal', 'creatinine'], rationale: 'Renal risk signal.' },
-    { label: 'Diabetes', keywords: ['diabetes', 'a1c', 'insulin'], rationale: 'Metabolic risk signal.' },
-    { label: 'Cardiovascular disease risk', keywords: ['mi', 'cad', 'chf', 'hypertension'], rationale: 'Cardiovascular risk signal.' },
-    { label: 'Tobacco exposure', keywords: ['smoking', 'smoker', 'tobacco'], rationale: 'Tobacco exposure signal.' },
+    {
+      label: 'Chronic kidney disease',
+      keywords: ['ckd', 'renal', 'creatinine'],
+      rationale: 'Renal risk signal.',
+    },
+    {
+      label: 'Diabetes',
+      keywords: ['diabetes', 'a1c', 'insulin'],
+      rationale: 'Metabolic risk signal.',
+    },
+    {
+      label: 'Cardiovascular disease risk',
+      keywords: ['mi', 'cad', 'chf', 'hypertension'],
+      rationale: 'Cardiovascular risk signal.',
+    },
+    {
+      label: 'Tobacco exposure',
+      keywords: ['smoking', 'smoker', 'tobacco'],
+      rationale: 'Tobacco exposure signal.',
+    },
   ]
     .filter((rule) => rule.keywords.some((keyword) => inputText.includes(keyword)))
     .map(({ label, rationale }) => ({ label, rationale }));
@@ -1127,9 +1241,7 @@ function summarizeAuditMetadata(metadata: Record<string, unknown>): Record<strin
   ];
 
   return Object.fromEntries(
-    allowedKeys
-      .filter((key) => metadata[key] !== undefined)
-      .map((key) => [key, metadata[key]]),
+    allowedKeys.filter((key) => metadata[key] !== undefined).map((key) => [key, metadata[key]]),
   );
 }
 
@@ -1138,7 +1250,7 @@ function inferExplainabilityConfidence(
   clinicalQuestion?: string,
 ): AiExplainabilityResponseDto['confidence'] {
   const hasSources = logs.some((log) =>
-    ['sourceCount', 'chunksRetrieved'].some((key) => Number(log.metadataSummary[key] || 0) > 0)
+    ['sourceCount', 'chunksRetrieved'].some((key) => Number(log.metadataSummary[key] || 0) > 0),
   );
   const hasRecentLogs = logs.length > 0;
   const score = hasSources ? 0.86 : hasRecentLogs ? 0.68 : 0.34;
@@ -1154,9 +1266,16 @@ function inferExplainabilityConfidence(
   };
 }
 
-function buildExplainabilitySources(logs: SanitizedExecutionLogDto[]): AiExplainabilityResponseDto['source'] {
+function buildExplainabilitySources(
+  logs: SanitizedExecutionLogDto[],
+): AiExplainabilityResponseDto['source'] {
   if (!logs.length) {
-    return [{ label: 'No matching execution source', detail: 'Run a clinical AI workflow to populate source traces.' }];
+    return [
+      {
+        label: 'No matching execution source',
+        detail: 'Run a clinical AI workflow to populate source traces.',
+      },
+    ];
   }
 
   return logs.slice(0, 5).map((log) => ({
@@ -1181,18 +1300,31 @@ function buildExplainabilityReasoning(
 }
 
 function buildToolChain(logs: SanitizedExecutionLogDto[]): string[] {
-  return uniqueStrings(
-    logs.map((log) => `${log.capabilityId} -> ${log.status} -> ${log.action}`)
-  );
+  return uniqueStrings(logs.map((log) => `${log.capabilityId} -> ${log.status} -> ${log.action}`));
 }
 
 function matchOrderSetSignals(text: string): string[] {
   const signals = [
-    { label: 'Sepsis / infection pathway signal', keywords: ['sepsis', 'lactate', 'hypotension', 'fever', 'infection'] },
-    { label: 'Acute coronary syndrome pathway signal', keywords: ['chest pain', 'acs', 'troponin', 'stemi', 'nstemi'] },
-    { label: 'Stroke pathway signal', keywords: ['stroke', 'aphasia', 'weakness', 'facial droop', 'last known well'] },
-    { label: 'COPD / respiratory pathway signal', keywords: ['copd', 'wheezing', 'hypoxia', 'oxygen', 'dyspnea'] },
-    { label: 'Renal/allergy constraint signal', keywords: ['ckd', 'renal', 'creatinine', 'allergy', 'dose'] },
+    {
+      label: 'Sepsis / infection pathway signal',
+      keywords: ['sepsis', 'lactate', 'hypotension', 'fever', 'infection'],
+    },
+    {
+      label: 'Acute coronary syndrome pathway signal',
+      keywords: ['chest pain', 'acs', 'troponin', 'stemi', 'nstemi'],
+    },
+    {
+      label: 'Stroke pathway signal',
+      keywords: ['stroke', 'aphasia', 'weakness', 'facial droop', 'last known well'],
+    },
+    {
+      label: 'COPD / respiratory pathway signal',
+      keywords: ['copd', 'wheezing', 'hypoxia', 'oxygen', 'dyspnea'],
+    },
+    {
+      label: 'Renal/allergy constraint signal',
+      keywords: ['ckd', 'renal', 'creatinine', 'allergy', 'dose'],
+    },
   ];
 
   return signals
@@ -1213,19 +1345,22 @@ function buildOrderSetBundles(text: string): OrderSetAiResponseDto['orderBundles
     {
       id: 'sepsis-initial-review',
       title: 'Sepsis Initial Evaluation Bundle',
-      intent: 'Support early recognition, source evaluation, perfusion assessment, and antimicrobial review.',
+      intent:
+        'Support early recognition, source evaluation, perfusion assessment, and antimicrobial review.',
       keywords: ['sepsis', 'infection', 'lactate', 'hypotension', 'fever'],
       suggestedOrders: [
         {
           category: 'labs',
           label: 'CBC, CMP, lactate, blood cultures before antimicrobials when feasible',
-          rationale: 'Common sepsis pathways assess organ dysfunction, perfusion, and microbiology source data.',
+          rationale:
+            'Common sepsis pathways assess organ dysfunction, perfusion, and microbiology source data.',
           reviewRequired: true,
         },
         {
           category: 'medications',
           label: 'Empiric antimicrobial selection per local source-specific pathway',
-          rationale: 'Antimicrobial choice must account for source, allergy, renal function, resistance, and stewardship policy.',
+          rationale:
+            'Antimicrobial choice must account for source, allergy, renal function, resistance, and stewardship policy.',
           reviewRequired: true,
         },
         {
@@ -1238,7 +1373,8 @@ function buildOrderSetBundles(text: string): OrderSetAiResponseDto['orderBundles
       evidenceLinks: [
         {
           label: 'Sepsis bundle principles',
-          basis: 'Common institutional sepsis pathways emphasize lactate, cultures, early antimicrobials, and reassessment.',
+          basis:
+            'Common institutional sepsis pathways emphasize lactate, cultures, early antimicrobials, and reassessment.',
         },
       ],
       reviewChecklist: [
@@ -1256,13 +1392,15 @@ function buildOrderSetBundles(text: string): OrderSetAiResponseDto['orderBundles
         {
           category: 'labs',
           label: 'Serial troponins and basic labs per local chest pain pathway',
-          rationale: 'Serial biomarkers are commonly used with ECG and clinical assessment for ACS evaluation.',
+          rationale:
+            'Serial biomarkers are commonly used with ECG and clinical assessment for ACS evaluation.',
           reviewRequired: true,
         },
         {
           category: 'monitoring',
           label: 'Telemetry and repeat ECG timing per protocol',
-          rationale: 'Dynamic ECG changes and rhythm monitoring may affect urgency and pathway selection.',
+          rationale:
+            'Dynamic ECG changes and rhythm monitoring may affect urgency and pathway selection.',
           reviewRequired: true,
         },
         {
@@ -1275,7 +1413,8 @@ function buildOrderSetBundles(text: string): OrderSetAiResponseDto['orderBundles
       evidenceLinks: [
         {
           label: 'ACS pathway principles',
-          basis: 'Chest pain pathways commonly combine ECG, serial biomarkers, monitoring, and escalation criteria.',
+          basis:
+            'Chest pain pathways commonly combine ECG, serial biomarkers, monitoring, and escalation criteria.',
         },
       ],
       reviewChecklist: [
@@ -1292,13 +1431,15 @@ function buildOrderSetBundles(text: string): OrderSetAiResponseDto['orderBundles
         {
           category: 'imaging',
           label: 'Neuroimaging pathway per institutional stroke protocol',
-          rationale: 'Acute focal neurologic deficits require urgent imaging and eligibility assessment.',
+          rationale:
+            'Acute focal neurologic deficits require urgent imaging and eligibility assessment.',
           reviewRequired: true,
         },
         {
           category: 'labs',
           label: 'Point-of-care glucose and stroke protocol labs',
-          rationale: 'Glucose and protocol labs support immediate evaluation and treatment eligibility review.',
+          rationale:
+            'Glucose and protocol labs support immediate evaluation and treatment eligibility review.',
           reviewRequired: true,
         },
         {
@@ -1311,7 +1452,8 @@ function buildOrderSetBundles(text: string): OrderSetAiResponseDto['orderBundles
       evidenceLinks: [
         {
           label: 'Stroke pathway principles',
-          basis: 'Institutional stroke protocols prioritize last-known-well, glucose, imaging, and specialist activation.',
+          basis:
+            'Institutional stroke protocols prioritize last-known-well, glucose, imaging, and specialist activation.',
         },
       ],
       reviewChecklist: [
@@ -1335,27 +1477,35 @@ function buildOrderSetBundles(text: string): OrderSetAiResponseDto['orderBundles
               {
                 category: 'labs' as const,
                 label: 'Basic admission labs as clinically indicated',
-                rationale: 'General admission workflows commonly verify baseline organ function and safety labs.',
+                rationale:
+                  'General admission workflows commonly verify baseline organ function and safety labs.',
                 reviewRequired: true as const,
               },
               {
                 category: 'nursing' as const,
                 label: 'Vitals, intake/output, mobility/fall precautions as appropriate',
-                rationale: 'Nursing safety orders depend on acuity, mobility, and monitoring needs.',
+                rationale:
+                  'Nursing safety orders depend on acuity, mobility, and monitoring needs.',
                 reviewRequired: true as const,
               },
             ],
             evidenceLinks: [
               {
                 label: 'General admission workflow',
-                basis: 'Common inpatient pathways organize labs, monitoring, nursing safety, and consult review.',
+                basis:
+                  'Common inpatient pathways organize labs, monitoring, nursing safety, and consult review.',
               },
             ],
-            reviewChecklist: ['Select orders only after clinician review of diagnosis, acuity, allergies, and goals of care.'],
+            reviewChecklist: [
+              'Select orders only after clinician review of diagnosis, acuity, allergies, and goals of care.',
+            ],
           },
         ];
 
-  return matched.concat(fallback).slice(0, 3).map(({ keywords, ...bundle }) => bundle);
+  return matched
+    .concat(fallback)
+    .slice(0, 3)
+    .map(({ keywords, ...bundle }) => bundle);
 }
 
 function buildProtocolPathways(text: string): OrderSetAiResponseDto['protocolPathways'] {
@@ -1363,14 +1513,20 @@ function buildProtocolPathways(text: string): OrderSetAiResponseDto['protocolPat
     {
       id: 'sepsis-pathway',
       name: 'Sepsis Recognition and Reassessment Pathway',
-      trigger: 'Suspected infection with hypotension, elevated lactate, organ dysfunction, or concerning vitals.',
+      trigger:
+        'Suspected infection with hypotension, elevated lactate, organ dysfunction, or concerning vitals.',
       keywords: ['sepsis', 'infection', 'lactate', 'hypotension', 'fever'],
       steps: [
         'Confirm suspected source and severity using source chart data.',
         'Review lactate, cultures, antimicrobial timing, fluids, and reassessment needs.',
         'Escalate to local sepsis/shock pathway if instability persists.',
       ],
-      escalationCriteria: ['Persistent hypotension', 'Rising lactate', 'Altered mental status', 'Hypoxia or shock'],
+      escalationCriteria: [
+        'Persistent hypotension',
+        'Rising lactate',
+        'Altered mental status',
+        'Hypoxia or shock',
+      ],
     },
     {
       id: 'acs-pathway',
@@ -1382,7 +1538,12 @@ function buildProtocolPathways(text: string): OrderSetAiResponseDto['protocolPat
         'Review serial biomarkers, monitoring, and cardiology escalation criteria.',
         'Verify contraindications before any antithrombotic or procedural order.',
       ],
-      escalationCriteria: ['STEMI criteria', 'Hemodynamic instability', 'Refractory ischemic symptoms', 'Malignant arrhythmia'],
+      escalationCriteria: [
+        'STEMI criteria',
+        'Hemodynamic instability',
+        'Refractory ischemic symptoms',
+        'Malignant arrhythmia',
+      ],
     },
     {
       id: 'stroke-pathway',
@@ -1394,7 +1555,11 @@ function buildProtocolPathways(text: string): OrderSetAiResponseDto['protocolPat
         'Review glucose, neuroimaging pathway, and stroke team activation.',
         'Document contraindication review through local protocol.',
       ],
-      escalationCriteria: ['Acute focal deficit', 'Airway compromise', 'Thrombolysis/thrombectomy eligibility question'],
+      escalationCriteria: [
+        'Acute focal deficit',
+        'Airway compromise',
+        'Thrombolysis/thrombectomy eligibility question',
+      ],
     },
   ];
 
@@ -1458,7 +1623,8 @@ function buildCitationBoundRecommendations(
 function extractSupportedSentence(text: string): string {
   const normalized = text.replace(/\s+/g, ' ').trim();
   if (!normalized) return 'Retrieved source passage is empty.';
-  const sentence = normalized.split(/(?<=[.!?])\s+/).find((part) => part.length >= 20) || normalized;
+  const sentence =
+    normalized.split(/(?<=[.!?])\s+/).find((part) => part.length >= 20) || normalized;
   return sentence.length > 280 ? `${sentence.slice(0, 277)}...` : sentence;
 }
 

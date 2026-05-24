@@ -1,4 +1,12 @@
-import { IsBoolean, IsEnum, IsObject, IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
+import {
+  IsBoolean,
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum AmbientScribeNoteType {

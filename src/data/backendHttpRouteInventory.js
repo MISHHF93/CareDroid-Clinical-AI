@@ -89,6 +89,14 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'PUT', path: '/api/protocols/:id', controller: 'ProtocolController' },
   { method: 'DELETE', path: '/api/protocols/:id', controller: 'ProtocolController' },
 
+  { method: 'GET', path: '/api/fleet/vehicles/live', controller: 'FleetLiveTrackingController' },
+  { method: 'GET', path: '/api/fleet/routes/active', controller: 'FleetLiveTrackingController' },
+  { method: 'GET', path: '/api/hospital-map/floors', controller: 'HospitalLiveTrackingController' },
+  { method: 'GET', path: '/api/hospital-map/devices', controller: 'HospitalLiveTrackingController' },
+  { method: 'GET', path: '/api/devices/live', controller: 'DeviceLiveTrackingController' },
+  { method: 'GET', path: '/api/telemetry/live', controller: 'DeviceLiveTrackingController' },
+  { method: 'GET', path: '/api/alerts/devices', controller: 'DeviceLiveTrackingController' },
+
   { method: 'GET', path: '/api/audit/logs', controller: 'AuditController' },
   { method: 'GET', path: '/api/audit/my-logs', controller: 'AuditController' },
   { method: 'GET', path: '/api/audit/phi-access', controller: 'AuditController' },

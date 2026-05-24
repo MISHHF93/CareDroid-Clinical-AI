@@ -20,6 +20,7 @@ import {
   FLEET_TIER_A_REGISTRY_IDS,
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
   HOSPITAL_OPERATIONS_REGISTRY_IDS,
+  LIVE_TRACKING_MAP_REGISTRY_IDS,
   MEDICAL_IOT_REGISTRY_IDS,
   NLU_PROFILE_TOOL_IDS,
   NLU_TO_REGISTRY_ID,
@@ -44,6 +45,7 @@ let cachedUserFacingToolRegistryProjection = null;
 const CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET = new Set(CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS);
 const FLEET_TIER_A_REGISTRY_ID_SET = new Set(FLEET_TIER_A_REGISTRY_IDS);
 const FLEET_TIER_B_CHAT_REGISTRY_ID_SET = new Set(FLEET_TIER_B_CHAT_REGISTRY_IDS);
+const LIVE_TRACKING_MAP_REGISTRY_ID_SET = new Set(LIVE_TRACKING_MAP_REGISTRY_IDS);
 const MEDICAL_IOT_REGISTRY_ID_SET = new Set(MEDICAL_IOT_REGISTRY_IDS);
 const HOSPITAL_OPERATIONS_REGISTRY_ID_SET = new Set(HOSPITAL_OPERATIONS_REGISTRY_IDS);
 const CLINICAL_TIER_A_CALCULATOR_REGISTRY_ID_SET = new Set(CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS);
@@ -243,8 +245,10 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.calculatorsHub]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.doseCalculator]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.fleetCommand]: 'src/pages/fleet/FleetDashboard.jsx',
+  [REGISTRY.fleetLiveMap]: 'src/pages/fleet/FleetLiveMap.jsx',
   [REGISTRY.predictiveMaintenance]: 'src/pages/fleet/PredictiveMaintenance.jsx',
   [REGISTRY.routeOptimizer]: 'src/pages/fleet/RouteOptimizer.jsx',
+  [REGISTRY.liveTrackingMap]: 'src/pages/LiveTrackingMap.jsx',
   [REGISTRY.medicalIotDashboard]: 'src/pages/MedicalIotDashboard.jsx',
   [REGISTRY.hospitalMap]: 'src/pages/HospitalMapDashboard.jsx',
   [REGISTRY.deviceFleetManagement]: 'src/pages/HospitalMapDashboard.jsx',
@@ -326,6 +330,7 @@ function registryTier(registryId) {
   if (CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET.has(registryId)) return 'C';
   if (FLEET_TIER_A_REGISTRY_ID_SET.has(registryId)) return 'fleet-A';
   if (FLEET_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId)) return 'fleet-B';
+  if (LIVE_TRACKING_MAP_REGISTRY_ID_SET.has(registryId)) return 'live-map';
   if (MEDICAL_IOT_REGISTRY_ID_SET.has(registryId)) return 'medical-iot';
   if (HOSPITAL_OPERATIONS_REGISTRY_ID_SET.has(registryId)) return 'hospital-ops';
   if (CLINICAL_TIER_A_CALCULATOR_REGISTRY_ID_SET.has(registryId)) return 'A';
@@ -348,6 +353,7 @@ function launchTypeForTier(tier, hasExecutor) {
   if (tier === 'B' || tier === 'fleet-B') return TOOL_LAUNCH_TYPES.CHAT_ASSISTED;
   if (tier === 'clinical-page') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'fleet-A') return TOOL_LAUNCH_TYPES.FLEET_LOCAL;
+  if (tier === 'live-map') return TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL;
   if (tier === 'medical-iot') return TOOL_LAUNCH_TYPES.IOT_LOCAL;
   if (tier === 'hospital-ops') return TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL;
   if (tier === 'hub') return TOOL_LAUNCH_TYPES.HUB;
