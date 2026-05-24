@@ -300,7 +300,7 @@ const Auth = ({ onAuthSuccess }) => {
                 <GoogleLogo size={22} />
               </span>
               <span className="auth-oauth-btn__label">
-                {mode === 'signup' ? 'Sign up with Google' : 'Continue with Google'}
+                {mode === 'signup' ? 'Sign up with Google' : 'Sign in with Google'}
               </span>
             </a>
             <a className="auth-oauth-btn" href={linkedinAuthUrl}>
@@ -308,7 +308,7 @@ const Auth = ({ onAuthSuccess }) => {
                 <LinkedInLogo size={22} />
               </span>
               <span className="auth-oauth-btn__label">
-                {mode === 'signup' ? 'Sign up with LinkedIn' : 'Continue with LinkedIn'}
+                {mode === 'signup' ? 'Sign up with LinkedIn' : 'Sign in with LinkedIn'}
               </span>
             </a>
 
@@ -369,7 +369,7 @@ const Auth = ({ onAuthSuccess }) => {
               required
             />
             <Button type="submit" className="auth-form__submit">
-              {mode === 'login' ? 'Continue' : 'Create account'}
+              {mode === 'login' ? 'Sign in' : 'Create account'}
             </Button>
           </form>
 
