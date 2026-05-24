@@ -64,8 +64,22 @@ describe('Welcome page local/demo dev bypass', () => {
     renderWelcome();
 
     expect(
+      screen.queryByRole('button', { name: /direct sign in/i })
+    ).toBeInTheDocument();
+
+    expect(
       screen.queryByRole('button', { name: /continue in demo mode/i })
     ).toBeInTheDocument();
+  });
+
+  it('allows direct sign in when flags are disabled and routes to tools', async () => {
+    renderWelcome();
+
+    fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('location')).toHaveTextContent('/tools');
+    });
   });
 
   it('shows the direct dev login action when explicitly enabled and routes to tools', async () => {

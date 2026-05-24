@@ -115,9 +115,7 @@ export function WelcomePage() {
   const { info, error } = useNotificationActions();
   const enableDevAuthBypass = isDevAuthBypassEnabled();
 
-  const handleDevDemoSession = async () => {
-    if (!enableDevAuthBypass) return;
-
+  const startDevSession = async () => {
     try {
       const session = await createDevAuthSession();
       setAuthToken(session.token);
@@ -133,6 +131,15 @@ export function WelcomePage() {
       logger.error('Local demo auth bypass failed from welcome page', { err });
       error('Local demo access failed', 'Unable to start the local/demo session.');
     }
+  };
+
+  const handleDevDemoSession = async () => {
+    if (!enableDevAuthBypass) return;
+    await startDevSession();
+  };
+
+  const handleDirectSignIn = async () => {
+    await startDevSession();
   };
 
   return (
@@ -175,6 +182,9 @@ export function WelcomePage() {
         <div className="welcome-page-actions">
           <button type="button" className="welcome-page-cta" onClick={() => navigate('/auth')}>
             Sign In or Create Account
+          </button>
+          <button type="button" className="welcome-page-dev-cta" onClick={handleDirectSignIn}>
+            Direct Sign In
           </button>
 
           {enableDevAuthBypass && (
