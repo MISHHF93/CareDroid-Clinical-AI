@@ -179,7 +179,7 @@ export function WelcomePage() {
 
           {enableDevAuthBypass && (
             <button type="button" className="welcome-page-dev-cta" onClick={handleDevDemoSession}>
-              Continue in Demo / Local Dev Mode
+              Continue in Demo Mode
             </button>
           )}
         </div>
