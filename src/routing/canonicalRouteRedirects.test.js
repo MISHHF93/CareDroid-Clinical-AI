@@ -32,6 +32,16 @@ describe('canonical route redirects', () => {
     expect(appSource).toContain("path: '/catalog', element: <LegacyProtectedRouteRedirect to=\"/tools/catalog\" />");
   });
 
+  it('renders product tool pages directly instead of redirecting them through assistant', () => {
+    expect(appSource).toContain("path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>");
+    expect(appSource).toContain("path: '/tools/lab-interpreter', element: <AppShellPage><LabInterpreter /></AppShellPage>");
+    expect(appSource).toContain("path: '/tools/ambient-scribe'");
+    expect(appSource).toContain("element: <AppShellPage><AmbientScribe /></AppShellPage>");
+    expect(appSource).toContain("path: '/tools/patient-summary-ai'");
+    expect(appSource).toContain("element: <AppShellPage><PatientSummaryAi /></AppShellPage>");
+    expect(appSource).not.toContain('function AssistantToolRedirect');
+  });
+
   it('normalizes auth aliases to a single /auth route and preserves signup intent', () => {
     expect(appSource).toContain("{ path: '/auth', element: <AuthShell><AuthPage /></AuthShell>, publicOnly: true }");
     expect(appSource).toContain('AUTH_PATH_ALIASES.map((path) => ({');

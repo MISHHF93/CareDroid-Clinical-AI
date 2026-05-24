@@ -168,46 +168,40 @@ const Auth = ({ onAuthSuccess }) => {
       info(
         'Signing in',
         session.backendBacked
-          ? 'Demo / Local Dev Mode with API access.'
-          : 'Demo / Local Dev Mode — UI only (start backend for tool APIs).'
+          ? 'Direct sign-in with API access.'
+          : 'Direct sign-in using local UI data only. Start the backend for tool APIs.'
       );
     } catch (err) {
-      logger.error('Local demo auth bypass failed', { err });
-      error('Local demo access failed', 'Unable to start the local/demo session.');
+      logger.error('Direct sign-in auth bypass failed', { err });
+      error('Direct sign-in failed', 'Unable to start the local direct sign-in session.');
     }
   };
 
-  const handleDevDemoSession = () => {
+  const handleDirectSignIn = () => {
     applyDevSession();
   };
 
-  const handleDirectSignIn = () => {
-    applyDevSession({ forceDirect: true });
-  };
-
-  const devAuthBypassSection = (opts = {}) => {
+  const directSignInSection = (opts = {}) => {
     const { compact } = opts;
     if (!enableDevAuthBypass) return null;
     return (
       <section
         className={`auth-dev-oneclick${compact ? ' auth-dev-oneclick--compact' : ''}`}
-        aria-label="Local demo access"
+        aria-label="Direct sign in"
       >
-        <p className="auth-division-tag">Local/demo access</p>
+        <p className="auth-division-tag">Direct sign in</p>
         <Button
           type="button"
           variant="success"
           size="lg"
-          onClick={handleDevDemoSession}
+          onClick={handleDirectSignIn}
           leftIcon={<NavIcon icon={CHROME_ICONS.zap} size={20} aria-hidden />}
         >
-          Continue in Demo Mode
+          Direct Sign In
         </Button>
         <p className="auth-dev-oneclick__hint">
-          Explicit local-only access is enabled by{' '}
-          <code className="auth-dev-code">VITE_ENABLE_DEV_AUTH_BYPASS=true</code>. It uses a mock clinician
-          profile and the token from <code className="auth-dev-code">VITE_DEV_BEARER_TOKEN</code> only for
-          development/demo workflows.
+          Uses the local development clinician session and routes into the same app shell as every other sign-in
+          method.
         </p>
       </section>
     );
@@ -217,7 +211,7 @@ const Auth = ({ onAuthSuccess }) => {
     <div className="auth-root">
       {requiresTwoFactor ? (
         <section className="auth-twofa" aria-labelledby="auth-twofa-title">
-          {devAuthBypassSection({ compact: true })}
+          {directSignInSection({ compact: true })}
 
           <div className="auth-twofa__icon" aria-hidden>
             <NavIcon icon={CHROME_ICONS.lock} size={40} />
@@ -258,22 +252,7 @@ const Auth = ({ onAuthSuccess }) => {
         </section>
       ) : (
         <>
-          {devAuthBypassSection()}
-          <section className="auth-dev-oneclick" aria-label="Direct sign in">
-            <p className="auth-division-tag">Direct sign in</p>
-            <Button
-              type="button"
-              variant="success"
-              size="lg"
-              onClick={handleDirectSignIn}
-              leftIcon={<NavIcon icon={CHROME_ICONS.zap} size={20} aria-hidden />}
-            >
-              Direct Sign In
-            </Button>
-            <p className="auth-dev-oneclick__hint">
-              Immediate access flow for local testing that skips additional verification prompts.
-            </p>
-          </section>
+          {directSignInSection()}
 
           <header className="auth-panel__header">
             <h1 className="auth-panel__title">{mode === 'login' ? 'Sign in' : 'Create account'}</h1>

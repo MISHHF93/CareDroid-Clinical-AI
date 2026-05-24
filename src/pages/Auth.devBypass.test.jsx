@@ -48,7 +48,7 @@ function renderAuth(onAuthSuccess = vi.fn()) {
   return onAuthSuccess;
 }
 
-describe('Auth local/demo dev bypass', () => {
+describe('Auth direct sign-in dev bypass', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -58,7 +58,7 @@ describe('Auth local/demo dev bypass', () => {
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
-  it('is visible in development even when explicit flags are false', () => {
+  it('shows one direct sign-in entry in development even when explicit flags are false', () => {
     renderAuth();
 
     expect(
@@ -67,7 +67,7 @@ describe('Auth local/demo dev bypass', () => {
 
     expect(
       screen.queryByRole('button', { name: /continue in demo mode/i })
-    ).toBeInTheDocument();
+    ).not.toBeInTheDocument();
   });
 
   it('allows direct sign-in even when dev bypass flags are disabled', async () => {
@@ -86,18 +86,18 @@ describe('Auth local/demo dev bypass', () => {
     });
   });
 
-  it('appears when the local dev flag is enabled and creates a marked mock session', async () => {
+  it('uses direct sign-in when the local dev flag is enabled and creates a marked mock session', async () => {
     mocks.appConfig.features.enableDevAuthBypass = true;
     const onAuthSuccess = renderAuth();
 
-    fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
+    fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
 
     await waitFor(() => {
       expect(onAuthSuccess).toHaveBeenCalledWith(
         'test-dev-token',
         expect.objectContaining({
           authMode: 'local-dev-demo',
-          devAuthLabel: 'Demo / Local Dev Mode',
+          devAuthLabel: 'Direct Sign In',
           isDevAuthBypass: true,
           role: 'physician',
         })
@@ -119,7 +119,7 @@ describe('Auth local/demo dev bypass', () => {
     renderAuth();
 
     expect(
-      screen.getByRole('button', { name: /continue in demo mode/i })
+      screen.getByRole('button', { name: /direct sign in/i })
     ).toBeInTheDocument();
   });
 
@@ -139,7 +139,7 @@ describe('Auth local/demo dev bypass', () => {
     });
     const onAuthSuccess = renderAuth();
 
-    fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
+    fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
 
     await waitFor(() => {
       expect(onAuthSuccess).toHaveBeenCalledWith(
@@ -155,12 +155,12 @@ describe('Auth local/demo dev bypass', () => {
 });
 
 
-it('renders and allows demo entry when VITE_DEMO_MODE=true even if dev bypass is false', async () => {
+it('renders and allows direct sign-in when VITE_DEMO_MODE=true even if dev bypass is false', async () => {
   mocks.appConfig.features.enableDevAuthBypass = false;
   mocks.appConfig.features.enableDemoMode = true;
   const onAuthSuccess = renderAuth();
 
-  fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
+  fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
 
   await waitFor(() => {
     expect(onAuthSuccess).toHaveBeenCalledWith(

@@ -65,6 +65,19 @@ const ClinicalAudit = lazyWithRetry(() => import('./pages/tools/ClinicalAudit'))
 const ToolsOverview = lazyWithRetry(() => import('./pages/tools/ToolsOverview'));
 const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
 const Calculators = lazyWithRetry(() => import('./pages/tools/Calculators'));
+const DrugChecker = lazyWithRetry(() => import('./pages/tools/DrugChecker'));
+const LabInterpreter = lazyWithRetry(() => import('./pages/tools/LabInterpreter'));
+const Protocols = lazyWithRetry(() => import('./pages/tools/Protocols'));
+const DiagnosisAssistant = lazyWithRetry(() => import('./pages/tools/DiagnosisAssistant'));
+const ProcedureGuide = lazyWithRetry(() => import('./pages/tools/ProcedureGuide'));
+const AmbientScribe = lazyWithRetry(() => import('./pages/tools/AmbientScribe'));
+const CalculatorRecommender = lazyWithRetry(() => import('./pages/tools/CalculatorRecommender'));
+const GuidelineRag = lazyWithRetry(() => import('./pages/tools/GuidelineRag'));
+const DifferentialAi = lazyWithRetry(() => import('./pages/tools/DifferentialAi'));
+const TimelineAi = lazyWithRetry(() => import('./pages/tools/TimelineAi'));
+const PatientSummaryAi = lazyWithRetry(() => import('./pages/tools/PatientSummaryAi'));
+const OrderSetAi = lazyWithRetry(() => import('./pages/tools/OrderSetAi'));
+const AiExplainability = lazyWithRetry(() => import('./pages/tools/AiExplainability'));
 const ToolNotFound = lazyWithRetry(() => import('./pages/tools/ToolNotFound'));
 const ToolsAreaFallback = lazyWithRetry(() => import('./pages/tools/ToolsAreaFallback'));
 const FleetDashboard = lazyWithRetry(() => import('./pages/fleet/FleetDashboard'));
@@ -123,22 +136,18 @@ export function WelcomePage() {
       info(
         'Signing in',
         session.backendBacked
-          ? 'Demo / Local Dev Mode with API access.'
-          : 'Demo / Local Dev Mode — UI only (start backend for tool APIs).'
+          ? 'Direct sign-in with API access.'
+          : 'Direct sign-in using local UI data only. Start the backend for tool APIs.'
       );
       navigate('/tools', { replace: true });
     } catch (err) {
-      logger.error('Local demo auth bypass failed from welcome page', { err });
-      error('Local demo access failed', 'Unable to start the local/demo session.');
+      logger.error('Direct sign-in auth bypass failed from welcome page', { err });
+      error('Direct sign-in failed', 'Unable to start the local direct sign-in session.');
     }
   };
 
-  const handleDevDemoSession = async () => {
-    if (!enableDevAuthBypass) return;
-    await startDevSession();
-  };
-
   const handleDirectSignIn = async () => {
+    if (!enableDevAuthBypass) return;
     await startDevSession();
   };
 
@@ -183,20 +192,16 @@ export function WelcomePage() {
           <button type="button" className="welcome-page-cta" onClick={() => navigate('/auth')}>
             Sign In or Create Account
           </button>
-          <button type="button" className="welcome-page-dev-cta" onClick={handleDirectSignIn}>
-            Direct Sign In
-          </button>
-
           {enableDevAuthBypass && (
-            <button type="button" className="welcome-page-dev-cta" onClick={handleDevDemoSession}>
-              Continue in Demo Mode
+            <button type="button" className="welcome-page-dev-cta" onClick={handleDirectSignIn}>
+              Direct Sign In
             </button>
           )}
         </div>
 
         {enableDevAuthBypass && (
           <p className="welcome-page-dev-note">
-            Local/demo access is explicitly enabled by <code>VITE_ENABLE_DEV_AUTH_BYPASS=true</code>.
+            Direct sign-in is enabled for local development and uses the same app shell routes as signed-in users.
           </p>
         )}
 
@@ -279,7 +284,7 @@ function AppShellPage({ children }) {
       onOpenToolsOverview={handleOpenToolsOverview}
       onOpenToolsCatalog={handleOpenToolsCatalog}
       isDevAuthBypass={isDevAuthBypass}
-      devAuthBannerLabel={user?.devAuthLabel || 'Demo / Local Dev Mode'}
+      devAuthBannerLabel={user?.devAuthLabel || 'Direct Sign In'}
     >
       <div
         className={`app-shell-page-body${isConversationViewport ? ' app-shell-page-body--conversation' : ''}`}
@@ -319,29 +324,6 @@ function AuthPathRedirect() {
 function LegacyProtectedRouteRedirect({ to }) {
   const location = useLocation();
   return <Navigate to={{ pathname: to, search: location.search, hash: location.hash }} replace />;
-}
-
-function AssistantToolRedirect({ toolId, extras = {} }) {
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  if (toolId && !params.has('tool')) {
-    params.set('tool', toolId);
-  }
-  Object.entries(extras).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && !params.has(key)) {
-      params.set(key, String(value));
-    }
-  });
-  return (
-    <Navigate
-      to={{
-        pathname: '/assistant',
-        search: params.toString() ? `?${params.toString()}` : '',
-        hash: location.hash,
-      }}
-      replace
-    />
-  );
 }
 
 const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot'];
@@ -417,7 +399,7 @@ function AppRoutes() {
     { path: '/patients', element: <AppShellPage><Patients /></AppShellPage>, requiresAuth: true },
     { path: '/operations', element: <AppShellPage><Operations /></AppShellPage>, requiresAuth: true },
 
-    // Clinical tools: canonical UX is assistant-centered; preserve deep links via redirects.
+    // Clinical tools: canonical routes render their product pages directly.
     { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
     ...TOOLS_ROUTE_ALIASES.map((path) => ({
       path,
@@ -430,8 +412,8 @@ function AppRoutes() {
       requiresAuth: true,
       permission: Permission.CONFIGURE_SYSTEM,
     },
-    { path: '/tools/drug-checker', element: <AssistantToolRedirect toolId="drug-check" />, requiresAuth: true },
-    { path: '/tools/lab-interpreter', element: <AssistantToolRedirect toolId="lab-interp" />, requiresAuth: true },
+    { path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/lab-interpreter', element: <AppShellPage><LabInterpreter /></AppShellPage>, requiresAuth: true },
     ...CALCULATOR_ROUTE_DEFS.map(({ path, calculatorSlug }) => ({
       path,
       element: <AppShellPage><Calculators initialCalculatorId={calculatorSlug} /></AppShellPage>,
@@ -449,54 +431,54 @@ function AppRoutes() {
       element: <LegacyProtectedRouteRedirect to="/tools/calculators" />,
       requiresAuth: true,
     })),
-    { path: '/tools/protocols', element: <AssistantToolRedirect toolId="protocols" />, requiresAuth: true },
-    { path: '/tools/diagnosis', element: <AssistantToolRedirect toolId="diagnosis-assistant" />, requiresAuth: true },
-    { path: '/tools/procedures', element: <AssistantToolRedirect toolId="procedure-guide" />, requiresAuth: true },
+    { path: '/tools/protocols', element: <AppShellPage><Protocols /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/diagnosis', element: <AppShellPage><DiagnosisAssistant /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/procedures', element: <AppShellPage><ProcedureGuide /></AppShellPage>, requiresAuth: true },
     {
       path: '/tools/ambient-scribe',
-      element: <AssistantToolRedirect toolId="ambient-scribe" />,
+      element: <AppShellPage><AmbientScribe /></AppShellPage>,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
-    { path: '/tools/calculator-recommender', element: <AssistantToolRedirect toolId="calculator-recommender" />, requiresAuth: true },
+    { path: '/tools/calculator-recommender', element: <AppShellPage><CalculatorRecommender /></AppShellPage>, requiresAuth: true },
     {
       path: '/tools/guideline-rag',
-      element: <AssistantToolRedirect toolId="guideline-rag" />,
+      element: <AppShellPage><GuidelineRag /></AppShellPage>,
       requiresAuth: true,
       permission: Permission.USE_AI_CHAT,
     },
     {
       path: '/tools/differential-ai',
-      element: <AssistantToolRedirect toolId="differential-ai" />,
+      element: <AppShellPage><DifferentialAi /></AppShellPage>,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/timeline-ai',
-      element: <AssistantToolRedirect toolId="timeline-ai" />,
+      element: <AppShellPage><TimelineAi /></AppShellPage>,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/patient-summary-ai',
-      element: <AssistantToolRedirect toolId="patient-summary-ai" />,
+      element: <AppShellPage><PatientSummaryAi /></AppShellPage>,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/order-set-ai',
-      element: <AssistantToolRedirect toolId="order-set-ai" />,
+      element: <AppShellPage><OrderSetAi /></AppShellPage>,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/ai-explainability',
-      element: <AssistantToolRedirect toolId="ai-explainability" />,
+      element: <AppShellPage><AiExplainability /></AppShellPage>,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,

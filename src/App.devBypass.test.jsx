@@ -51,7 +51,7 @@ function renderWelcome() {
   );
 }
 
-describe('Welcome page local/demo dev bypass', () => {
+describe('Welcome page direct sign-in dev bypass', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -60,7 +60,7 @@ describe('Welcome page local/demo dev bypass', () => {
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
-  it('shows the direct demo action in development even with flags disabled', () => {
+  it('shows one direct sign-in action in development even with flags disabled', () => {
     renderWelcome();
 
     expect(
@@ -69,7 +69,7 @@ describe('Welcome page local/demo dev bypass', () => {
 
     expect(
       screen.queryByRole('button', { name: /continue in demo mode/i })
-    ).toBeInTheDocument();
+    ).not.toBeInTheDocument();
   });
 
   it('allows direct sign in when flags are disabled and routes to tools', async () => {
@@ -82,11 +82,11 @@ describe('Welcome page local/demo dev bypass', () => {
     });
   });
 
-  it('shows the direct dev login action when explicitly enabled and routes to tools', async () => {
+  it('uses the direct sign-in action when explicitly enabled and routes to tools', async () => {
     mocks.appConfig.features.enableDevAuthBypass = true;
     renderWelcome();
 
-    fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
+    fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
 
     await waitFor(() => {
       expect(screen.getByTestId('location')).toHaveTextContent('/tools');
@@ -103,12 +103,12 @@ describe('Welcome page local/demo dev bypass', () => {
 });
 
 
-it('shows direct demo login when VITE_DEMO_MODE=true and still routes to tools', async () => {
+it('shows direct sign-in when VITE_DEMO_MODE=true and still routes to tools', async () => {
   mocks.appConfig.features.enableDevAuthBypass = false;
   mocks.appConfig.features.enableDemoMode = true;
   renderWelcome();
 
-  fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
+  fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
 
   await waitFor(() => {
     expect(screen.getByTestId('location')).toHaveTextContent('/tools');

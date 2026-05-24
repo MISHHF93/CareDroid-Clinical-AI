@@ -2,7 +2,7 @@ import appConfig from '../config/appConfig';
 import { apiFetchJson } from '../services/apiClient';
 import logger from '../utils/logger';
 
-export const DEV_AUTH_LABEL = 'Demo / Local Dev Mode';
+export const DEV_AUTH_LABEL = 'Direct Sign In';
 export const AUTH_TOKEN_KEY = 'caredroid_access_token';
 export const USER_PROFILE_KEY = 'caredroid_user_profile';
 
@@ -35,7 +35,7 @@ export const buildDevDemoUser = () =>
 
 export async function createDevAuthSession() {
   if (!isDevAuthBypassEnabled()) {
-    throw new Error('Local demo access is disabled.');
+    throw new Error('Direct sign-in is disabled.');
   }
 
   try {
@@ -58,7 +58,9 @@ export async function createDevAuthSession() {
   const fallbackToken = (appConfig.dev.bearerToken || '').trim() || 'dev-bypass-token';
   localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(mockUser));
   localStorage.setItem(AUTH_TOKEN_KEY, fallbackToken);
-  logger.info('Local demo auth bypass: stored token and mock profile (no API)', { label: DEV_AUTH_LABEL });
+  logger.info('Direct sign-in auth bypass: stored token and mock profile (no API)', {
+    label: DEV_AUTH_LABEL,
+  });
 
   return {
     token: fallbackToken,

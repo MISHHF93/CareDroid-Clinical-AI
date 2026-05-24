@@ -9,7 +9,9 @@ const appConfigSource = readFileSync(join(__dirname, 'appConfig.js'), 'utf8');
 describe('dev auth bypass production guard', () => {
   it('defaults on for local dev and keeps production exposure explicit', () => {
     expect(appConfigSource).toContain('VITE_ENABLE_DEV_AUTH_BYPASS');
-    expect(appConfigSource).toContain('enableDevAuthBypass: !isProductionBuild()');
+    expect(appConfigSource).toMatch(
+      /enableDevAuthBypass:\s*!isProductionBuild\(\) && toBoolean/
+    );
     expect(appConfigSource).toContain("getEnvValue('VITE_ENABLE_DEV_AUTH_BYPASS', 'true')");
     expect(appConfigSource).toContain('VITE_DEMO_MODE');
     expect(appConfigSource).toContain('VITE_SHOW_DEMO_AUTH');
