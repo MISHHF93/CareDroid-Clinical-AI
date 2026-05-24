@@ -32,6 +32,7 @@ import { TermsOfService } from './pages/legal/TermsOfService';
 import GDPRNotice from './pages/GDPRNotice';
 import HIPAANotice from './pages/HIPAANotice';
 import HelpCenter from './pages/HelpCenter';
+import Version from './pages/Version';
 
 // Authenticated shell pages — lazy for smaller initial JS (mobile LCP)
 const CommandDashboard = lazyWithRetry(() => import('./pages/CommandDashboard'));
@@ -529,6 +530,7 @@ function AppRoutes() {
     { path: '/gdpr', element: <PublicShell><GDPRNotice /></PublicShell> },
     { path: '/hipaa', element: <PublicShell><HIPAANotice /></PublicShell> },
     { path: '/help', element: <PublicShell><HelpCenter /></PublicShell> },
+    { path: '/version', element: <PublicShell><Version /></PublicShell> },
     { path: '/shared/tools/:shareId', element: <PublicShell><SharedToolSession /></PublicShell> },
 
     {

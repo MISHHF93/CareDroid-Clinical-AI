@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Button from '../components/ui/button';
 import Input from '../components/ui/input';
+import BuildInfoBadge from '../components/BuildInfoBadge';
 import { apiFetch, apiFetchJson, buildApiUrl } from '../services/apiClient';
 import { createDevAuthSession, isDevAuthBypassEnabled } from '../auth/devAuthBypass';
 import {
@@ -36,7 +37,7 @@ const Auth = ({ onAuthSuccess }) => {
     oauthBannerShown.current = true;
     error(
       'Sign-in failed',
-      'OAuth did not return a token. Confirm provider credentials and FRONTEND_URL on the API server.',
+      'OAuth did not return a token. Confirm provider credentials and FRONTEND_URL on the API server.'
     );
     const next = new URLSearchParams(searchParams);
     next.delete('error');
@@ -156,7 +157,10 @@ const Auth = ({ onAuthSuccess }) => {
 
   const applyDevSession = async ({ forceDirect = false } = {}) => {
     if (!forceDirect && !enableDevAuthBypass) {
-      error('Local demo access disabled', 'Set VITE_ENABLE_DEV_AUTH_BYPASS=true to enable local/demo sign-in.');
+      error(
+        'Local demo access disabled',
+        'Set VITE_ENABLE_DEV_AUTH_BYPASS=true to enable local/demo sign-in.'
+      );
       return;
     }
 
@@ -200,8 +204,8 @@ const Auth = ({ onAuthSuccess }) => {
           Direct Sign In
         </Button>
         <p className="auth-dev-oneclick__hint">
-          Uses the local development clinician session and routes into the same app shell as every other sign-in
-          method.
+          Uses the local development clinician session and routes into the same app shell as every
+          other sign-in method.
         </p>
       </section>
     );
@@ -264,7 +268,8 @@ const Auth = ({ onAuthSuccess }) => {
           </header>
 
           <p className="auth-segment-caption" id="auth-mode-caption">
-            Choose <strong>Sign in</strong> or <strong>Create account</strong> (same page as <code className="auth-dev-code">/auth</code>).
+            Choose <strong>Sign in</strong> or <strong>Create account</strong> (same page as{' '}
+            <code className="auth-dev-code">/auth</code>).
           </p>
           <div
             className="auth-segment"
@@ -389,6 +394,7 @@ const Auth = ({ onAuthSuccess }) => {
             <Link className="auth-back-link" to="/">
               ← Back to home
             </Link>
+            <BuildInfoBadge className="auth-build-info" />
           </footer>
         </>
       )}

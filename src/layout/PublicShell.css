@@ -158,6 +158,16 @@
   border: 1px solid var(--app-panel-border);
 }
 
+.badge-version-link {
+  text-decoration: none;
+}
+
+.badge-version-link:hover,
+.badge-version-link:focus-visible {
+  color: var(--app-fg);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--app-panel-border));
+}
+
 .footer-links {
   list-style: none;
   padding: 0;

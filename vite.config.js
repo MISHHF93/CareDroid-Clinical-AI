@@ -1,5 +1,39 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { execSync } from 'node:child_process';
+
+const readGitValue = (command, fallback = 'unknown') => {
+  try {
+    return (
+      execSync(command, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() ||
+      fallback
+    );
+  } catch {
+    return fallback;
+  }
+};
+
+const buildInfoFor = (mode, env) => ({
+  appVersion: env.VITE_APP_VERSION || '1.0.0',
+  buildTime: env.VITE_BUILD_TIME || process.env.VITE_BUILD_TIME || new Date().toISOString(),
+  commit:
+    process.env.VERCEL_GIT_COMMIT_SHA ||
+    env.VITE_GIT_COMMIT_SHA ||
+    process.env.VITE_GIT_COMMIT_SHA ||
+    readGitValue('git rev-parse HEAD'),
+  branch:
+    process.env.VERCEL_GIT_COMMIT_REF ||
+    env.VITE_GIT_BRANCH ||
+    process.env.VITE_GIT_BRANCH ||
+    readGitValue('git rev-parse --abbrev-ref HEAD'),
+  environment: process.env.VERCEL_ENV || env.VITE_APP_ENVIRONMENT || mode,
+  deploymentUrl: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
+  deploymentId: process.env.VERCEL_DEPLOYMENT_ID || '',
+  repository:
+    process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG
+      ? `${process.env.VERCEL_GIT_REPO_OWNER}/${process.env.VERCEL_GIT_REPO_SLUG}`
+      : env.VITE_GIT_REPOSITORY || '',
+});
 
 const proxyPaths = (target) => ({
   '/api': {
@@ -19,9 +53,13 @@ const proxyPaths = (target) => ({
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   const proxyTarget = env.VITE_API_PROXY_TARGET || 'http://localhost:3000';
+  const buildInfo = buildInfoFor(mode, env);
 
   return {
     plugins: [react()],
+    define: {
+      __CARE_BUILD_INFO__: JSON.stringify(buildInfo),
+    },
     esbuild: {
       drop: ['console', 'debugger'],
     },

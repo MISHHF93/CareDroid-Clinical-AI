@@ -1,10 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
 import './PublicShell.css';
 import appConfig from '../config/appConfig';
+import { buildInfo, shortCommit } from '../config/buildInfo';
 
 /**
  * PublicShell Layout
- * 
+ *
  * Minimal layout for public pages (privacy policy, terms, help)
  * - Simple header with logo and navigation
  * - Full-width content area
@@ -30,13 +31,16 @@ export const PublicShell = ({ children }) => {
           </Link>
 
           <nav className="public-nav">
-            <Link to="/help" className="public-nav-link">Help</Link>
-            <Link to="/privacy" className="public-nav-link">Privacy</Link>
-            <Link to="/terms" className="public-nav-link">Terms</Link>
-            <button 
-              onClick={() => navigate('/auth')} 
-              className="btn-public-primary"
-            >
+            <Link to="/help" className="public-nav-link">
+              Help
+            </Link>
+            <Link to="/privacy" className="public-nav-link">
+              Privacy
+            </Link>
+            <Link to="/terms" className="public-nav-link">
+              Terms
+            </Link>
+            <button onClick={() => navigate('/auth')} className="btn-public-primary">
               Sign In
             </button>
           </nav>
@@ -55,6 +59,9 @@ export const PublicShell = ({ children }) => {
             <div className="footer-badges">
               <span className="badge-hipaa">🔒 HIPAA Compliant</span>
               <span className="badge-version">v{appVersion}</span>
+              <Link className="badge-version badge-version-link" to="/version">
+                Commit {shortCommit(buildInfo.commit)}
+              </Link>
               {buildDate ? <span className="badge-version">Build {buildDate}</span> : null}
             </div>
           </div>
@@ -64,14 +71,18 @@ export const PublicShell = ({ children }) => {
             <ul className="footer-links">
               <li>
                 {privacyUrl ? (
-                  <a href={privacyUrl} target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                  <a href={privacyUrl} target="_blank" rel="noopener noreferrer">
+                    Privacy Policy
+                  </a>
                 ) : (
                   <Link to="/privacy">Privacy Policy</Link>
                 )}
               </li>
               <li>
                 {termsUrl ? (
-                  <a href={termsUrl} target="_blank" rel="noopener noreferrer">Terms of Service</a>
+                  <a href={termsUrl} target="_blank" rel="noopener noreferrer">
+                    Terms of Service
+                  </a>
                 ) : (
                   <Link to="/terms">Terms of Service</Link>
                 )}
@@ -82,11 +93,22 @@ export const PublicShell = ({ children }) => {
           <div className="footer-section">
             <h4>Resources</h4>
             <ul className="footer-links">
-              <li><Link to="/help">Help Center</Link></li>
-              <li><a href="https://github.com/caredroid" target="_blank" rel="noopener noreferrer">Documentation</a></li>
+              <li>
+                <Link to="/help">Help Center</Link>
+              </li>
+              <li>
+                <Link to="/version">Build Version</Link>
+              </li>
+              <li>
+                <a href="https://github.com/caredroid" target="_blank" rel="noopener noreferrer">
+                  Documentation
+                </a>
+              </li>
               <li>
                 {supportUrl ? (
-                  <a href={supportUrl} target="_blank" rel="noopener noreferrer">Contact Support</a>
+                  <a href={supportUrl} target="_blank" rel="noopener noreferrer">
+                    Contact Support
+                  </a>
                 ) : (
                   <a href="mailto:support@caredroid.ai">Contact Support</a>
                 )}
@@ -99,15 +121,25 @@ export const PublicShell = ({ children }) => {
             <ul className="footer-links">
               <li>
                 {hipaaUrl ? (
-                  <a href={hipaaUrl} target="_blank" rel="noopener noreferrer">HIPAA Compliance</a>
+                  <a href={hipaaUrl} target="_blank" rel="noopener noreferrer">
+                    HIPAA Compliance
+                  </a>
                 ) : (
                   <Link to="/hipaa">HIPAA Compliance</Link>
                 )}
               </li>
-              <li><Link to="/gdpr">GDPR Notice</Link></li>
-              <li><Link to="/hipaa">HIPAA Notice</Link></li>
-              <li><Link to="/hipaa">Security Practices</Link></li>
-              <li><Link to="/privacy">Audit & Privacy Practices</Link></li>
+              <li>
+                <Link to="/gdpr">GDPR Notice</Link>
+              </li>
+              <li>
+                <Link to="/hipaa">HIPAA Notice</Link>
+              </li>
+              <li>
+                <Link to="/hipaa">Security Practices</Link>
+              </li>
+              <li>
+                <Link to="/privacy">Audit & Privacy Practices</Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -115,7 +147,8 @@ export const PublicShell = ({ children }) => {
         <div className="footer-bottom">
           <p>&copy; {new Date().getFullYear()} CareDroid-Clinical-AI. All rights reserved.</p>
           <p className="footer-disclaimer">
-            CareDroid-Clinical-AI is a clinical decision support tool. Always use clinical judgment and follow your facility's protocols.
+            CareDroid-Clinical-AI is a clinical decision support tool. Always use clinical judgment
+            and follow your facility's protocols.
           </p>
         </div>
       </footer>

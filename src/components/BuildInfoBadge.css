@@ -1,0 +1,38 @@
+.build-info-badge {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 6px 9px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-surface-1) 86%, transparent);
+  color: var(--app-fg-muted);
+  font-size: 0.72rem;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.build-info-badge:hover,
+.build-info-badge:focus-visible {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--app-panel-border));
+  color: var(--app-fg);
+}
+
+.build-info-badge__label {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.build-info-badge__value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: var(--app-fg);
+}
+
+.build-info-badge__env {
+  border-left: 1px solid var(--app-panel-border);
+  padding-left: 6px;
+}

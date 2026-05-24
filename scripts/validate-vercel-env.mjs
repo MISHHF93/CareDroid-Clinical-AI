@@ -8,6 +8,8 @@ const isVercelDeploy = isVercel && Boolean(vercelEnv);
 const apiUrl = trim(process.env.VITE_API_URL);
 const allowSameOriginApi = isTruthy(process.env.VITE_ALLOW_SAME_ORIGIN_API);
 const hideDivisionMode = trim(process.env.VITE_HIDE_DIVISION_MODE);
+const demoMode = trim(process.env.VITE_DEMO_MODE);
+const enableDevAuthBypass = trim(process.env.VITE_ENABLE_DEV_AUTH_BYPASS);
 
 const failures = [];
 
@@ -25,6 +27,16 @@ if (apiUrl && /\/api\/?$/i.test(apiUrl)) {
 
 if (isVercelDeploy && hideDivisionMode.toLowerCase() === 'false') {
   failures.push('VITE_HIDE_DIVISION_MODE must not be false for Vercel production deploys.');
+}
+
+if (isVercelDeploy && demoMode.toLowerCase() !== 'true') {
+  failures.push('VITE_DEMO_MODE=true is required so hosted demo deployments show Direct Sign In.');
+}
+
+if (isVercelDeploy && enableDevAuthBypass.toLowerCase() !== 'true') {
+  failures.push(
+    'VITE_ENABLE_DEV_AUTH_BYPASS=true is required to keep Vercel and local demo auth settings aligned.'
+  );
 }
 
 if (failures.length) {
