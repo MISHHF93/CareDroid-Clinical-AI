@@ -60,24 +60,8 @@ const TeamManagement = lazyWithRetry(() =>
 );
 const AuthCallback = lazyWithRetry(() => import('./pages/AuthCallback'));
 
-const ToolsOverview = lazyWithRetry(() => import('./pages/tools/ToolsOverview'));
 const SharedToolSession = lazyWithRetry(() => import('./pages/tools/SharedToolSession'));
-const DrugChecker = lazyWithRetry(() => import('./pages/tools/DrugChecker'));
-const LabInterpreter = lazyWithRetry(() => import('./pages/tools/LabInterpreter'));
-const Calculators = lazyWithRetry(() => import('./pages/tools/Calculators'));
-const Protocols = lazyWithRetry(() => import('./pages/tools/Protocols'));
-const DiagnosisAssistant = lazyWithRetry(() => import('./pages/tools/DiagnosisAssistant'));
-const ProcedureGuide = lazyWithRetry(() => import('./pages/tools/ProcedureGuide'));
-const AmbientScribe = lazyWithRetry(() => import('./pages/tools/AmbientScribe'));
-const CalculatorRecommender = lazyWithRetry(() => import('./pages/tools/CalculatorRecommender'));
-const GuidelineRag = lazyWithRetry(() => import('./pages/tools/GuidelineRag'));
-const DifferentialAi = lazyWithRetry(() => import('./pages/tools/DifferentialAi'));
-const TimelineAi = lazyWithRetry(() => import('./pages/tools/TimelineAi'));
-const PatientSummaryAi = lazyWithRetry(() => import('./pages/tools/PatientSummaryAi'));
-const OrderSetAi = lazyWithRetry(() => import('./pages/tools/OrderSetAi'));
-const AiExplainability = lazyWithRetry(() => import('./pages/tools/AiExplainability'));
 const ClinicalAudit = lazyWithRetry(() => import('./pages/tools/ClinicalAudit'));
-const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
 const ToolsAreaFallback = lazyWithRetry(() => import('./pages/tools/ToolsAreaFallback'));
 const FleetDashboard = lazyWithRetry(() => import('./pages/fleet/FleetDashboard'));
 const PredictiveMaintenance = lazyWithRetry(() => import('./pages/fleet/PredictiveMaintenance'));
@@ -323,6 +307,29 @@ function LegacyProtectedRouteRedirect({ to }) {
   return <Navigate to={{ pathname: to, search: location.search, hash: location.hash }} replace />;
 }
 
+function AssistantToolRedirect({ toolId, extras = {} }) {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  if (toolId && !params.has('tool')) {
+    params.set('tool', toolId);
+  }
+  Object.entries(extras).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && !params.has(key)) {
+      params.set(key, String(value));
+    }
+  });
+  return (
+    <Navigate
+      to={{
+        pathname: '/assistant',
+        search: params.toString() ? `?${params.toString()}` : '',
+        hash: location.hash,
+      }}
+      replace
+    />
+  );
+}
+
 const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot'];
 const TOOLS_ROUTE_ALIASES = ['/all-tools', '/clinical-tools'];
 
@@ -383,7 +390,7 @@ function AppRoutes() {
       publicOnly: true,
     })),
 
-    { path: '/home', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
+    { path: '/home', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
     { path: '/dashboard', element: <LegacyProtectedRouteRedirect to="/home" />, requiresAuth: true },
     { path: '/assistant', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
     { path: '/chat', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
@@ -395,8 +402,8 @@ function AppRoutes() {
     { path: '/patients', element: <AppShellPage><Patients /></AppShellPage>, requiresAuth: true },
     { path: '/operations', element: <AppShellPage><Operations /></AppShellPage>, requiresAuth: true },
 
-    // Clinical tools: full-page routes; chat-assisted actions use Assistant.
-    { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
+    // Clinical tools: canonical UX is assistant-centered; preserve deep links via redirects.
+    { path: '/tools', element: <AssistantToolRedirect extras={{ drawer: 'tools' }} />, requiresAuth: true },
     ...TOOLS_ROUTE_ALIASES.map((path) => ({
       path,
       element: <LegacyProtectedRouteRedirect to="/tools" />,
@@ -404,19 +411,15 @@ function AppRoutes() {
     })),
     {
       path: '/tools/catalog',
-      element: <AppShellPage><ClinicalToolCatalog /></AppShellPage>,
+      element: <AssistantToolRedirect extras={{ drawer: 'tools', view: 'catalog' }} />,
       requiresAuth: true,
       permission: Permission.CONFIGURE_SYSTEM,
     },
-    { path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/lab-interpreter', element: <AppShellPage><LabInterpreter /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/drug-checker', element: <AssistantToolRedirect toolId="drug-check" />, requiresAuth: true },
+    { path: '/tools/lab-interpreter', element: <AssistantToolRedirect toolId="lab-interp" />, requiresAuth: true },
     ...CALCULATOR_ROUTE_DEFS.map(({ path, calculatorSlug }) => ({
       path,
-      element: (
-        <AppShellPage>
-          <Calculators initialCalculatorId={calculatorSlug} />
-        </AppShellPage>
-      ),
+      element: <AssistantToolRedirect toolId="calculators" extras={{ calc: calculatorSlug }} />,
       requiresAuth: true,
     })),
     ...LEGACY_CALCULATOR_ROUTE_ALIASES.map(({ path, to }) => ({
@@ -424,55 +427,55 @@ function AppRoutes() {
       element: <LegacyProtectedRouteRedirect to={to} />,
       requiresAuth: true,
     })),
-    { path: '/tools/calculators', element: <AppShellPage><Calculators /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/protocols', element: <AppShellPage><Protocols /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/diagnosis', element: <AppShellPage><DiagnosisAssistant /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/procedures', element: <AppShellPage><ProcedureGuide /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/calculators', element: <AssistantToolRedirect toolId="calculators" />, requiresAuth: true },
+    { path: '/tools/protocols', element: <AssistantToolRedirect toolId="protocols" />, requiresAuth: true },
+    { path: '/tools/diagnosis', element: <AssistantToolRedirect toolId="diagnosis-assistant" />, requiresAuth: true },
+    { path: '/tools/procedures', element: <AssistantToolRedirect toolId="procedure-guide" />, requiresAuth: true },
     {
       path: '/tools/ambient-scribe',
-      element: <AppShellPage><AmbientScribe /></AppShellPage>,
+      element: <AssistantToolRedirect toolId="ambient-scribe" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
-    { path: '/tools/calculator-recommender', element: <AppShellPage><CalculatorRecommender /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/calculator-recommender', element: <AssistantToolRedirect toolId="calculator-recommender" />, requiresAuth: true },
     {
       path: '/tools/guideline-rag',
-      element: <AppShellPage><GuidelineRag /></AppShellPage>,
+      element: <AssistantToolRedirect toolId="guideline-rag" />,
       requiresAuth: true,
       permission: Permission.USE_AI_CHAT,
     },
     {
       path: '/tools/differential-ai',
-      element: <AppShellPage><DifferentialAi /></AppShellPage>,
+      element: <AssistantToolRedirect toolId="differential-ai" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/timeline-ai',
-      element: <AppShellPage><TimelineAi /></AppShellPage>,
+      element: <AssistantToolRedirect toolId="timeline-ai" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/patient-summary-ai',
-      element: <AppShellPage><PatientSummaryAi /></AppShellPage>,
+      element: <AssistantToolRedirect toolId="patient-summary-ai" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/order-set-ai',
-      element: <AppShellPage><OrderSetAi /></AppShellPage>,
+      element: <AssistantToolRedirect toolId="order-set-ai" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/tools/ai-explainability',
-      element: <AppShellPage><AiExplainability /></AppShellPage>,
+      element: <AssistantToolRedirect toolId="ai-explainability" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
