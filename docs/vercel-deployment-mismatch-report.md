@@ -19,6 +19,7 @@ Fixes applied in this pass:
 - Added build commit metadata to the public shell footer.
 - Updated the service worker cache from `caredroid-v4-static-shell` to `caredroid-v5-static-shell` and made navigation fetches use `cache: 'no-store'`.
 - Updated Vercel env validation so Vercel demo builds fail if `VITE_DEMO_MODE=true` or `VITE_ENABLE_DEV_AUTH_BYPASS=true` is missing.
+- Updated `vercel.json` so Vercel exports hosted-demo defaults before validation and build when the dashboard env vars are absent.
 - Documented optional build metadata env values in `.env.example`.
 
 ## 2. Local Commit Hash
@@ -62,7 +63,7 @@ The repository defines the intended settings in `vercel.json`. Confirm the Verce
 - Root directory: repository root, not `backend`, `src`, or another subfolder
 - Framework preset: `Vite`
 - Install command: `npm ci --audit=false --fund=false`
-- Build command: `VITE_ALLOW_SAME_ORIGIN_API=${VITE_ALLOW_SAME_ORIGIN_API:-true} npm run validate:vercel-env && npm run build`
+- Build command: `export VITE_ALLOW_SAME_ORIGIN_API="${VITE_ALLOW_SAME_ORIGIN_API:-true}" VITE_DEMO_MODE="${VITE_DEMO_MODE:-true}" VITE_ENABLE_DEV_AUTH_BYPASS="${VITE_ENABLE_DEV_AUTH_BYPASS:-true}" && npm run validate:vercel-env && npm run build`
 - Output directory: `dist`
 - Node version: use the Vercel project default compatible with Vite 7, or pin Node 22 if the dashboard allows it
 
@@ -79,10 +80,10 @@ npm run build
 Vercel build command from `vercel.json`:
 
 ```bash
-VITE_ALLOW_SAME_ORIGIN_API=${VITE_ALLOW_SAME_ORIGIN_API:-true} npm run validate:vercel-env && npm run build
+export VITE_ALLOW_SAME_ORIGIN_API="${VITE_ALLOW_SAME_ORIGIN_API:-true}" VITE_DEMO_MODE="${VITE_DEMO_MODE:-true}" VITE_ENABLE_DEV_AUTH_BYPASS="${VITE_ENABLE_DEV_AUTH_BYPASS:-true}" && npm run validate:vercel-env && npm run build
 ```
 
-The Vercel command intentionally runs env validation first, then the same production Vite build used locally.
+The Vercel command intentionally exports default hosted-demo flags first, runs env validation, then runs the same production Vite build used locally.
 
 ## 7. Output Directory
 
@@ -100,6 +101,8 @@ Required for the current hosted demo behavior:
 VITE_DEMO_MODE=true
 VITE_ENABLE_DEV_AUTH_BYPASS=true
 ```
+
+These are defaulted in `vercel.json` for the hosted demo build, but they should still be set explicitly in the Vercel dashboard for clarity.
 
 API routing must use one of these approaches:
 
@@ -171,6 +174,7 @@ Changed files:
 - `src/layout/PublicShell.jsx`
 - `src/layout/PublicShell.css`
 - `src/App.jsx`
+- `vercel.json`
 - `docs/vercel-deployment-mismatch-report.md`
 
 ## 11. Verification Steps
