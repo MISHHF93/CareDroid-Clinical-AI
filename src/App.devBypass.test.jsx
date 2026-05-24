@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   appConfig: {
     features: {
       enableDevAuthBypass: false,
+      enableDemoMode: false,
     },
     dev: {
       bearerToken: 'welcome-dev-token',
@@ -55,6 +56,7 @@ describe('Welcome page local/demo dev bypass', () => {
     vi.clearAllMocks();
     localStorage.clear();
     mocks.appConfig.features.enableDevAuthBypass = false;
+    mocks.appConfig.features.enableDemoMode = false;
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
@@ -83,5 +85,18 @@ describe('Welcome page local/demo dev bypass', () => {
         role: 'physician',
       })
     );
+  });
+});
+
+
+it('shows direct demo login when VITE_DEMO_MODE=true and still routes to tools', async () => {
+  mocks.appConfig.features.enableDevAuthBypass = false;
+  mocks.appConfig.features.enableDemoMode = true;
+  renderWelcome();
+
+  fireEvent.click(screen.getByRole('button', { name: /continue in demo \/ local dev mode/i }));
+
+  await waitFor(() => {
+    expect(screen.getByTestId('location')).toHaveTextContent('/tools');
   });
 });

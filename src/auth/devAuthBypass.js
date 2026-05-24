@@ -6,7 +6,8 @@ export const DEV_AUTH_LABEL = 'Demo / Local Dev Mode';
 export const AUTH_TOKEN_KEY = 'caredroid_access_token';
 export const USER_PROFILE_KEY = 'caredroid_user_profile';
 
-export const isDevAuthBypassEnabled = () => Boolean(appConfig.features.enableDevAuthBypass);
+export const isDevAuthBypassEnabled = () =>
+  Boolean(appConfig.features.enableDevAuthBypass || appConfig.features.enableDemoMode);
 
 export const withDevSessionMarker = (user) => ({
   ...user,

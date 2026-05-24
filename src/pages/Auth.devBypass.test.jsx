@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({
       enableDevAuthBypass: false,
       hideDivisionMode: true,
       showDemoAuth: false,
+      enableDemoMode: false,
     },
     dev: {
       bearerToken: 'test-dev-token',
@@ -52,6 +53,7 @@ describe('Auth local/demo dev bypass', () => {
     vi.clearAllMocks();
     localStorage.clear();
     mocks.appConfig.features.enableDevAuthBypass = false;
+    mocks.appConfig.features.enableDemoMode = false;
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
@@ -118,5 +120,24 @@ describe('Auth local/demo dev bypass', () => {
         })
       );
     });
+  });
+});
+
+
+it('renders and allows demo entry when VITE_DEMO_MODE=true even if dev bypass is false', async () => {
+  mocks.appConfig.features.enableDevAuthBypass = false;
+  mocks.appConfig.features.enableDemoMode = true;
+  const onAuthSuccess = renderAuth();
+
+  fireEvent.click(screen.getByRole('button', { name: /continue in demo \/ local dev mode/i }));
+
+  await waitFor(() => {
+    expect(onAuthSuccess).toHaveBeenCalledWith(
+      'test-dev-token',
+      expect.objectContaining({
+        authMode: 'local-dev-demo',
+        isDevAuthBypass: true,
+      })
+    );
   });
 });
