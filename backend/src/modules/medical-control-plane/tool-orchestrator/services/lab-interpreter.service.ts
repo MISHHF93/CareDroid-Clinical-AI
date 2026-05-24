@@ -30,9 +30,22 @@ interface LabInterpretation {
   suggestedActions: string[];
 }
 
+const LAB_CATEGORY_BY_NAME: Array<[string, Set<string>]> = [
+  ['CBC', new Set(['wbc', 'hemoglobin', 'platelets', 'hematocrit'])],
+  ['Electrolytes', new Set(['sodium', 'potassium', 'chloride', 'co2', 'calcium'])],
+  ['Renal Function', new Set(['creatinine', 'bun', 'gfr'])],
+  ['Liver Function', new Set(['alt', 'ast', 'alkaline phosphatase', 'bilirubin', 'albumin'])],
+  ['Coagulation', new Set(['pt', 'inr', 'ptt'])],
+];
+
 @Injectable()
 export class LabInterpreterService implements ClinicalToolService {
   private readonly logger = new Logger(LabInterpreterService.name);
+  private readonly interpretationCacheTtlMs = 10 * 60 * 1000;
+  private readonly interpretationCache = new Map<
+    string,
+    { value: LabInterpretation; expiresAt: number }
+  >();
 
   constructor(private readonly aiService: AIService) {}
 
@@ -158,16 +171,30 @@ export class LabInterpreterService implements ClinicalToolService {
       }
     }
 
-    // Identify critical values
-    const criticalValues = labValues.filter(
-      (l) => l.status === 'critical-high' || l.status === 'critical-low',
-    );
+    const criticalValues: LabValue[] = [];
+    const summary = {
+      total: labValues.length,
+      normal: 0,
+      abnormal: 0,
+      critical: 0,
+    };
+    for (const lab of labValues) {
+      if (lab.status === 'normal') {
+        summary.normal += 1;
+      } else if (lab.status === 'critical-high' || lab.status === 'critical-low') {
+        summary.critical += 1;
+        criticalValues.push(lab);
+      } else {
+        summary.abnormal += 1;
+      }
+    }
 
     // Overall interpretation
     const overallInterpretation = this.generateOverallInterpretation(
       labValues,
       criticalValues,
       interpretations,
+      summary.abnormal + summary.critical,
     );
 
     return {
@@ -177,14 +204,7 @@ export class LabInterpreterService implements ClinicalToolService {
         groupedByCategory: grouped,
         interpretations,
         criticalValues: criticalValues.length > 0 ? criticalValues : undefined,
-        summary: {
-          total: labValues.length,
-          normal: labValues.filter((l) => l.status === 'normal').length,
-          abnormal: labValues.filter(
-            (l) => l.status !== 'normal' && !l.status.startsWith('critical'),
-          ).length,
-          critical: criticalValues.length,
-        },
+        summary,
       },
       interpretation: overallInterpretation,
       citations: [
@@ -356,17 +376,15 @@ export class LabInterpreterService implements ClinicalToolService {
     for (const lab of labValues) {
       const name = lab.name.toLowerCase();
 
-      if (['wbc', 'hemoglobin', 'platelets', 'hematocrit'].includes(name)) {
-        groups.CBC.push(lab);
-      } else if (['sodium', 'potassium', 'chloride', 'co2', 'calcium'].includes(name)) {
-        groups.Electrolytes.push(lab);
-      } else if (['creatinine', 'bun', 'gfr'].includes(name)) {
-        groups['Renal Function'].push(lab);
-      } else if (['alt', 'ast', 'alkaline phosphatase', 'bilirubin', 'albumin'].includes(name)) {
-        groups['Liver Function'].push(lab);
-      } else if (['pt', 'inr', 'ptt'].includes(name)) {
-        groups.Coagulation.push(lab);
-      } else {
+      let matched = false;
+      for (const [category, names] of LAB_CATEGORY_BY_NAME) {
+        if (names.has(name)) {
+          groups[category].push(lab);
+          matched = true;
+          break;
+        }
+      }
+      if (!matched) {
         groups.Other.push(lab);
       }
     }
@@ -405,6 +423,12 @@ Provide:
 
 Be concise and clinically relevant.`;
 
+    const cacheKey = prompt.trim().replace(/\s+/g, ' ');
+    const cached = this.interpretationCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return this.cloneInterpretation(cached.value);
+    }
+
     try {
       const result = await this.aiService.generateStructuredJSON('system', prompt, {
         findings: ['string'],
@@ -412,10 +436,15 @@ Be concise and clinically relevant.`;
         suggestedActions: ['string'],
       });
 
-      return {
+      const interpretation = {
         category,
         ...result,
       };
+      this.interpretationCache.set(cacheKey, {
+        value: interpretation,
+        expiresAt: Date.now() + this.interpretationCacheTtlMs,
+      });
+      return this.cloneInterpretation(interpretation);
     } catch (error) {
       // Fallback to rule-based interpretation
       return {
@@ -431,13 +460,13 @@ Be concise and clinically relevant.`;
     labs: LabValue[],
     criticalValues: LabValue[],
     interpretations: LabInterpretation[],
+    abnormalCount: number,
   ): string {
     if (criticalValues.length > 0) {
       const criticalList = criticalValues.map((l) => `${l.name} (${l.value})`).join(', ');
       return `🚨 **CRITICAL VALUES DETECTED**: ${criticalList}. Immediate clinical review and intervention required.`;
     }
 
-    const abnormalCount = labs.filter((l) => l.status !== 'normal').length;
     if (abnormalCount === 0) {
       return `All ${labs.length} lab values are within normal limits. No acute abnormalities detected.`;
     }
@@ -447,6 +476,14 @@ Be concise and clinically relevant.`;
     }
 
     return `${abnormalCount} of ${labs.length} lab values are abnormal. Review detailed interpretations for clinical significance and recommended actions.`;
+  }
+
+  private cloneInterpretation(interpretation: LabInterpretation): LabInterpretation {
+    return {
+      ...interpretation,
+      findings: [...(interpretation.findings || [])],
+      suggestedActions: [...(interpretation.suggestedActions || [])],
+    };
   }
 
   getExample(): Record<string, any> {

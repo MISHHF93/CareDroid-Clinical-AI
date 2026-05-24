@@ -28,9 +28,99 @@ interface DrugInteraction {
   recommendation?: string;
 }
 
+const MEDICATION_ALIASES: Record<string, string[]> = {
+  coumadin: ['warfarin'],
+  bayer: ['aspirin'],
+  ibuprofen: ['nsaid'],
+  naproxen: ['nsaid'],
+  advil: ['nsaid'],
+  motrin: ['nsaid'],
+  aleve: ['nsaid'],
+  'contrast dye': ['contrast'],
+  'iv contrast': ['contrast'],
+  sertraline: ['ssri'],
+  fluoxetine: ['ssri'],
+  paroxetine: ['ssri'],
+  citalopram: ['ssri'],
+  escitalopram: ['ssri'],
+  lisinopril: ['acei'],
+  enalapril: ['acei'],
+  ramipril: ['acei'],
+  benazepril: ['acei'],
+};
+
+const KNOWN_INTERACTION_PAIRS: Record<string, DrugInteraction> = {
+  'warfarin-aspirin': {
+    drug1: 'Warfarin',
+    drug2: 'Aspirin',
+    severity: 'major',
+    description: 'Significantly increased risk of bleeding, especially GI bleeding',
+    mechanism: 'Additive antiplatelet effects and gastric mucosal injury',
+    clinicalSignificance: 'Significantly increased risk of bleeding, especially GI bleeding',
+    management:
+      'Monitor INR closely. Consider PPI for GI protection. Use lowest effective aspirin dose.',
+    recommendation:
+      'Monitor INR closely. Consider PPI for GI protection. Use lowest effective aspirin dose.',
+  },
+  'warfarin-nsaid': {
+    drug1: 'Warfarin',
+    drug2: 'NSAID',
+    severity: 'major',
+    description: 'Increased bleeding risk by 2-3 fold',
+    mechanism: 'Increased anticoagulant effect via protein displacement and platelet inhibition',
+    clinicalSignificance: 'Increased bleeding risk by 2-3 fold',
+    management:
+      'Avoid concurrent use if possible. If necessary, monitor INR closely and consider PPI.',
+    recommendation:
+      'Avoid concurrent use if possible. If necessary, monitor INR closely and consider PPI.',
+  },
+  'metformin-contrast': {
+    drug1: 'Metformin',
+    drug2: 'IV Contrast',
+    severity: 'major',
+    description: 'Risk of lactic acidosis in setting of renal dysfunction',
+    mechanism: 'Contrast-induced nephropathy can lead to metformin accumulation',
+    clinicalSignificance: 'Risk of lactic acidosis in setting of renal dysfunction',
+    management:
+      'Hold metformin 48 hours before and after IV contrast. Check renal function before resuming.',
+    recommendation:
+      'Hold metformin 48 hours before and after IV contrast. Check renal function before resuming.',
+  },
+  'ssri-tramadol': {
+    drug1: 'SSRI',
+    drug2: 'Tramadol',
+    severity: 'major',
+    description: 'Risk of serotonin syndrome',
+    mechanism: 'Both increase serotonin levels',
+    clinicalSignificance:
+      'Risk of serotonin syndrome (confusion, agitation, tachycardia, hyperthermia)',
+    management:
+      'Avoid combination. Use alternative analgesic. Monitor for serotonin syndrome if unavoidable.',
+    recommendation:
+      'Avoid combination. Use alternative analgesic. Monitor for serotonin syndrome if unavoidable.',
+  },
+  'acei-spironolactone': {
+    drug1: 'ACE Inhibitor',
+    drug2: 'Spironolactone',
+    severity: 'major',
+    description: 'Risk of life-threatening hyperkalemia',
+    mechanism: 'Additive effects on potassium retention',
+    clinicalSignificance: 'Risk of life-threatening hyperkalemia',
+    management:
+      'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
+    recommendation:
+      'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
+  },
+};
+
 @Injectable()
 export class DrugCheckerService implements ClinicalToolService {
   private readonly logger = new Logger(DrugCheckerService.name);
+  private readonly aiCacheTtlMs = 10 * 60 * 1000;
+  private readonly aiInteractionCache = new Map<
+    string,
+    { value: DrugInteraction[]; expiresAt: number }
+  >();
 
   constructor(private readonly aiService: AIService) {}
 
@@ -146,12 +236,15 @@ export class DrugCheckerService implements ClinicalToolService {
         : allInteractions.filter((i) => i.severity === severityFilter);
 
     // Group by severity
-    const groupedBySeverity = {
-      contraindicated: filteredInteractions.filter((i) => i.severity === 'contraindicated'),
-      major: filteredInteractions.filter((i) => i.severity === 'major'),
-      moderate: filteredInteractions.filter((i) => i.severity === 'moderate'),
-      minor: filteredInteractions.filter((i) => i.severity === 'minor'),
+    const groupedBySeverity: Record<DrugInteraction['severity'], DrugInteraction[]> = {
+      contraindicated: [],
+      major: [],
+      moderate: [],
+      minor: [],
     };
+    for (const interaction of filteredInteractions) {
+      groupedBySeverity[interaction.severity]?.push(interaction);
+    }
 
     const interpretation = this.generateInterpretation(groupedBySeverity, medications.length);
 
@@ -190,77 +283,10 @@ export class DrugCheckerService implements ClinicalToolService {
       medications.flatMap((medication) => this.normalizeMedicationAliases(medication)),
     );
 
-    // High-risk interactions database (sample)
-    const knownPairs: Record<string, DrugInteraction> = {
-      'warfarin-aspirin': {
-        drug1: 'Warfarin',
-        drug2: 'Aspirin',
-        severity: 'major',
-        description: 'Significantly increased risk of bleeding, especially GI bleeding',
-        mechanism: 'Additive antiplatelet effects and gastric mucosal injury',
-        clinicalSignificance: 'Significantly increased risk of bleeding, especially GI bleeding',
-        management:
-          'Monitor INR closely. Consider PPI for GI protection. Use lowest effective aspirin dose.',
-        recommendation:
-          'Monitor INR closely. Consider PPI for GI protection. Use lowest effective aspirin dose.',
-      },
-      'warfarin-nsaid': {
-        drug1: 'Warfarin',
-        drug2: 'NSAID',
-        severity: 'major',
-        description: 'Increased bleeding risk by 2-3 fold',
-        mechanism:
-          'Increased anticoagulant effect via protein displacement and platelet inhibition',
-        clinicalSignificance: 'Increased bleeding risk by 2-3 fold',
-        management:
-          'Avoid concurrent use if possible. If necessary, monitor INR closely and consider PPI.',
-        recommendation:
-          'Avoid concurrent use if possible. If necessary, monitor INR closely and consider PPI.',
-      },
-      'metformin-contrast': {
-        drug1: 'Metformin',
-        drug2: 'IV Contrast',
-        severity: 'major',
-        description: 'Risk of lactic acidosis in setting of renal dysfunction',
-        mechanism: 'Contrast-induced nephropathy can lead to metformin accumulation',
-        clinicalSignificance: 'Risk of lactic acidosis in setting of renal dysfunction',
-        management:
-          'Hold metformin 48 hours before and after IV contrast. Check renal function before resuming.',
-        recommendation:
-          'Hold metformin 48 hours before and after IV contrast. Check renal function before resuming.',
-      },
-      'ssri-tramadol': {
-        drug1: 'SSRI',
-        drug2: 'Tramadol',
-        severity: 'major',
-        description: 'Risk of serotonin syndrome',
-        mechanism: 'Both increase serotonin levels',
-        clinicalSignificance:
-          'Risk of serotonin syndrome (confusion, agitation, tachycardia, hyperthermia)',
-        management:
-          'Avoid combination. Use alternative analgesic. Monitor for serotonin syndrome if unavoidable.',
-        recommendation:
-          'Avoid combination. Use alternative analgesic. Monitor for serotonin syndrome if unavoidable.',
-      },
-      'acei-spironolactone': {
-        drug1: 'ACE Inhibitor',
-        drug2: 'Spironolactone',
-        severity: 'major',
-        description: 'Risk of life-threatening hyperkalemia',
-        mechanism: 'Additive effects on potassium retention',
-        clinicalSignificance: 'Risk of life-threatening hyperkalemia',
-        management:
-          'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
-        recommendation:
-          'Monitor potassium levels closely. Consider lower doses. Watch for EKG changes.',
-      },
-    };
-
-    // Check for known pairs
-    for (const [key, interaction] of Object.entries(knownPairs)) {
+    for (const [key, interaction] of Object.entries(KNOWN_INTERACTION_PAIRS)) {
       const [drug1, drug2] = key.split('-');
       if (medSet.has(drug1) && medSet.has(drug2)) {
-        interactions.push(interaction);
+        interactions.push({ ...interaction });
       }
     }
 
@@ -269,31 +295,16 @@ export class DrugCheckerService implements ClinicalToolService {
 
   private normalizeMedicationAliases(medication: string): string[] {
     const normalized = medication.trim().toLowerCase();
-    const aliases: Record<string, string[]> = {
-      coumadin: ['warfarin'],
-      bayer: ['aspirin'],
-      ibuprofen: ['nsaid'],
-      naproxen: ['nsaid'],
-      advil: ['nsaid'],
-      motrin: ['nsaid'],
-      aleve: ['nsaid'],
-      'contrast dye': ['contrast'],
-      'iv contrast': ['contrast'],
-      sertraline: ['ssri'],
-      fluoxetine: ['ssri'],
-      paroxetine: ['ssri'],
-      citalopram: ['ssri'],
-      escitalopram: ['ssri'],
-      lisinopril: ['acei'],
-      enalapril: ['acei'],
-      ramipril: ['acei'],
-      benazepril: ['acei'],
-    };
-
-    return [normalized, ...(aliases[normalized] ?? [])];
+    return [normalized, ...(MEDICATION_ALIASES[normalized] ?? [])];
   }
 
   private async checkWithAI(medications: string[]): Promise<DrugInteraction[]> {
+    const cacheKey = this.canonicalMedicationCacheKey(medications);
+    const cached = this.aiInteractionCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return this.cloneInteractions(cached.value);
+    }
+
     const prompt = `As a clinical pharmacologist, identify significant drug-drug interactions for the following medications:
 
 ${medications.map((m, i) => `${i + 1}. ${m}`).join('\n')}
@@ -323,13 +334,30 @@ Respond in JSON format as an array of interactions.`;
         ],
       });
 
-      return result.interactions || [];
+      const interactions = result.interactions || [];
+      this.aiInteractionCache.set(cacheKey, {
+        value: interactions,
+        expiresAt: Date.now() + this.aiCacheTtlMs,
+      });
+      return this.cloneInteractions(interactions);
     } catch (error) {
       this.logger.error(
         `AI interaction analysis failed: ${error instanceof Error ? error.message : String(error)}`,
       );
       return [];
     }
+  }
+
+  private canonicalMedicationCacheKey(medications: string[]): string {
+    return [
+      ...new Set(medications.flatMap((medication) => this.normalizeMedicationAliases(medication))),
+    ]
+      .sort()
+      .join('|');
+  }
+
+  private cloneInteractions(interactions: DrugInteraction[]): DrugInteraction[] {
+    return interactions.map((interaction) => ({ ...interaction }));
   }
 
   private generateInterpretation(

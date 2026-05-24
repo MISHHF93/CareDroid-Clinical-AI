@@ -38,6 +38,11 @@ export class AIService {
   private readonly openaiPricing: Map<string, OpenaiPricing>;
   private readonly toolDefinitions: ToolDefinition[];
   private readonly temperature: number;
+  private readonly subscriptionTierCacheTtlMs = 30 * 1000;
+  private readonly subscriptionTierCache = new Map<
+    string,
+    { tier: SubscriptionTier; expiresAt: number }
+  >();
 
   constructor(
     private readonly configService: ConfigService,
@@ -210,14 +215,8 @@ export class AIService {
     if (!this.openai) {
       throw new Error('OpenAI API key not configured');
     }
-    // Get user's subscription tier
-    const subscription = await this.subscriptionRepository.findOne({
-      where: { userId },
-      order: { createdAt: 'DESC' },
-    });
-
-    const tier = subscription?.tier || SubscriptionTier.FREE;
-    const config = this.rateLimits.get(tier);
+    const tier = await this.getSubscriptionTier(userId);
+    const config = this.getRateLimitConfig(tier);
 
     // Check rate limit
     const usageToday = await this.getUsageToday(userId);
@@ -330,14 +329,8 @@ export class AIService {
     if (!this.openai) {
       throw new Error('OpenAI API key not configured');
     }
-    // Get user's subscription tier
-    const subscription = await this.subscriptionRepository.findOne({
-      where: { userId },
-      order: { createdAt: 'DESC' },
-    });
-
-    const tier = subscription?.tier || SubscriptionTier.FREE;
-    const config = this.rateLimits.get(tier);
+    const tier = await this.getSubscriptionTier(userId);
+    const config = this.getRateLimitConfig(tier);
 
     // Check rate limit
     const usageToday = await this.getUsageToday(userId);
@@ -402,25 +395,20 @@ export class AIService {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    const subscription = await this.subscriptionRepository.findOne({
-      where: { userId },
-      order: { createdAt: 'DESC' },
-    });
+    const tier = await this.getSubscriptionTier(userId);
+    const config = this.getRateLimitConfig(tier);
 
-    const tier = subscription?.tier || SubscriptionTier.FREE;
-    const config = this.rateLimits.get(tier);
+    const usage = await this.aiQueryRepository
+      .createQueryBuilder('aiQuery')
+      .select('COUNT(aiQuery.id)', 'count')
+      .addSelect('COALESCE(SUM(aiQuery.cost), 0)', 'totalCost')
+      .where('aiQuery.userId = :userId', { userId })
+      .andWhere('aiQuery.status = :status', { status: QueryStatus.SUCCESS })
+      .andWhere('aiQuery.createdAt >= :startDate', { startDate })
+      .getRawOne<{ count?: string; totalCost?: string }>();
 
-    // Calculate usage for the period
-    const queries = await this.aiQueryRepository.find({
-      where: {
-        userId,
-        status: QueryStatus.SUCCESS,
-        createdAt: MoreThanOrEqual(startDate),
-      },
-    });
-
-    const usedThisMonth = queries.length;
-    const totalCost = queries.reduce((sum, query) => sum + Number(query.cost), 0);
+    const usedThisMonth = Number(usage?.count || 0);
+    const totalCost = Number(usage?.totalCost || 0);
 
     return {
       userId,
@@ -433,13 +421,8 @@ export class AIService {
   }
 
   async getRemainingQueries(userId: string) {
-    const subscription = await this.subscriptionRepository.findOne({
-      where: { userId },
-      order: { createdAt: 'DESC' },
-    });
-
-    const tier = subscription?.tier || SubscriptionTier.FREE;
-    const config = this.rateLimits.get(tier);
+    const tier = await this.getSubscriptionTier(userId);
+    const config = this.getRateLimitConfig(tier);
     const usedToday = await this.getUsageToday(userId);
     const remaining = Math.max(0, config.dailyLimit - usedToday);
 
@@ -519,6 +502,28 @@ export class AIService {
     return count;
   }
 
+  private async getSubscriptionTier(userId: string): Promise<SubscriptionTier> {
+    const cached = this.subscriptionTierCache.get(userId);
+    if (cached && cached.expiresAt > Date.now()) {
+      return cached.tier;
+    }
+
+    const subscription = await this.subscriptionRepository.findOne({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
+    const tier = subscription?.tier || SubscriptionTier.FREE;
+    this.subscriptionTierCache.set(userId, {
+      tier,
+      expiresAt: Date.now() + this.subscriptionTierCacheTtlMs,
+    });
+    return tier;
+  }
+
+  private getRateLimitConfig(tier: SubscriptionTier): RateLimitConfig {
+    return this.rateLimits.get(tier) || this.rateLimits.get(SubscriptionTier.FREE)!;
+  }
+
   /**
    * Get tool definitions for Claude's tool_use block handling
    */
@@ -540,14 +545,8 @@ export class AIService {
       throw new Error('OpenAI API key not configured');
     }
 
-    // Get user's subscription tier
-    const subscription = await this.subscriptionRepository.findOne({
-      where: { userId },
-      order: { createdAt: 'DESC' },
-    });
-
-    const tier = subscription?.tier || SubscriptionTier.FREE;
-    const config = this.rateLimits.get(tier);
+    const tier = await this.getSubscriptionTier(userId);
+    const config = this.getRateLimitConfig(tier);
 
     // Check rate limit
     const usageToday = await this.getUsageToday(userId);

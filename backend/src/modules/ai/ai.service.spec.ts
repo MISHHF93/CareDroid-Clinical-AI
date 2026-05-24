@@ -36,6 +36,13 @@ describe('AIService', () => {
   const mockAiQueryRepository = {
     find: jest.fn().mockResolvedValue([]),
     count: jest.fn().mockResolvedValue(0),
+    createQueryBuilder: jest.fn(() => ({
+      select: jest.fn().mockReturnThis(),
+      addSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      getRawOne: jest.fn().mockResolvedValue({ count: '0', totalCost: '0' }),
+    })),
     create: jest.fn((query) => query),
     save: jest.fn((query) => Promise.resolve(query)),
   };
@@ -113,6 +120,7 @@ describe('AIService', () => {
       expect(result).toHaveProperty('tier', SubscriptionTier.FREE);
       expect(result).toHaveProperty('dailyLimit');
       expect(result).toHaveProperty('usedToday');
+      expect(mockAiQueryRepository.createQueryBuilder).toHaveBeenCalledWith('aiQuery');
     });
 
     it('should return default FREE tier if no subscription found', async () => {

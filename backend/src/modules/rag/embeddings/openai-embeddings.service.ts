@@ -16,6 +16,11 @@ export class OpenAIEmbeddingsService {
   private readonly model: string;
   private readonly dimension: number;
   private readonly maxBatchSize: number;
+  private readonly cacheTtlMs = 10 * 60 * 1000;
+  private readonly healthCheckTtlMs = 60 * 1000;
+  private readonly embeddingCache = new Map<string, { value: number[]; expiresAt: number }>();
+  private readonly inflightEmbeddings = new Map<string, Promise<number[]>>();
+  private healthCheckCache: { value: boolean; expiresAt: number } | null = null;
 
   constructor(private readonly configService: ConfigService) {
     const ragConfig = this.configService.get<any>('rag');
@@ -46,17 +51,40 @@ export class OpenAIEmbeddingsService {
       throw new Error('OpenAI API key not configured. Cannot generate embeddings.');
     }
 
+    const cacheKey = this.cacheKey(text);
+    const cached = this.embeddingCache.get(cacheKey);
+    if (cached && cached.expiresAt > Date.now()) {
+      return [...cached.value];
+    }
+    const inflight = this.inflightEmbeddings.get(cacheKey);
+    if (inflight) {
+      return inflight.then((embedding) => [...embedding]);
+    }
+
+    const promise = this.fetchEmbedding(text, cacheKey);
+    this.inflightEmbeddings.set(cacheKey, promise);
+    return promise.then((embedding) => [...embedding]);
+  }
+
+  private async fetchEmbedding(text: string, cacheKey: string): Promise<number[]> {
     try {
       const response = await this.openai.embeddings.create({
         model: this.model,
         input: text,
       });
 
-      return response.data[0].embedding;
+      const embedding = response.data[0].embedding;
+      this.embeddingCache.set(cacheKey, {
+        value: embedding,
+        expiresAt: Date.now() + this.cacheTtlMs,
+      });
+      return embedding;
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(`Failed to generate embedding: ${err.message}`, err.stack);
       throw new Error(`Embedding generation failed: ${err.message}`);
+    } finally {
+      this.inflightEmbeddings.delete(cacheKey);
     }
   }
 
@@ -70,38 +98,62 @@ export class OpenAIEmbeddingsService {
     }
 
     try {
-      // Split into batches if needed
-      const batches: string[][] = [];
-      for (let i = 0; i < texts.length; i += this.maxBatchSize) {
-        batches.push(texts.slice(i, i + this.maxBatchSize));
+      const results: number[][] = new Array(texts.length);
+      const missingByKey = new Map<string, { text: string; indexes: number[] }>();
+
+      texts.forEach((text, index) => {
+        const cacheKey = this.cacheKey(text);
+        const cached = this.embeddingCache.get(cacheKey);
+        if (cached && cached.expiresAt > Date.now()) {
+          results[index] = [...cached.value];
+          return;
+        }
+        if (!missingByKey.has(cacheKey)) {
+          missingByKey.set(cacheKey, { text, indexes: [] });
+        }
+        missingByKey.get(cacheKey)!.indexes.push(index);
+      });
+
+      const missing = [...missingByKey.entries()];
+      if (missing.length === 0) {
+        return results;
+      }
+
+      const batches: Array<Array<[string, { text: string; indexes: number[] }]>> = [];
+      for (let i = 0; i < missing.length; i += this.maxBatchSize) {
+        batches.push(missing.slice(i, i + this.maxBatchSize));
       }
 
       this.logger.log(
-        `Generating embeddings for ${texts.length} texts in ${batches.length} batch(es)`,
+        `Generating embeddings for ${missing.length} uncached texts in ${batches.length} batch(es)`,
       );
-
-      // Process batches sequentially to avoid rate limits
-      const allEmbeddings: number[][] = [];
 
       for (let i = 0; i < batches.length; i++) {
         const batch = batches[i];
-        this.logger.debug(`Processing batch ${i + 1}/${batches.length} (${batch.length} texts)`);
+        this.logger.debug(`Processing embedding batch ${i + 1}/${batches.length} (${batch.length} texts)`);
 
         const response = await this.openai.embeddings.create({
           model: this.model,
-          input: batch,
+          input: batch.map(([, entry]) => entry.text),
         });
 
-        const embeddings = response.data.map((item) => item.embedding);
-        allEmbeddings.push(...embeddings);
+        response.data.forEach((item, batchIndex) => {
+          const [cacheKey, entry] = batch[batchIndex];
+          this.embeddingCache.set(cacheKey, {
+            value: item.embedding,
+            expiresAt: Date.now() + this.cacheTtlMs,
+          });
+          for (const originalIndex of entry.indexes) {
+            results[originalIndex] = [...item.embedding];
+          }
+        });
 
-        // Add small delay between batches to avoid rate limiting
         if (i < batches.length - 1) {
           await this.sleep(100);
         }
       }
 
-      return allEmbeddings;
+      return results;
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(`Failed to generate batch embeddings: ${err.message}`, err.stack);
@@ -127,15 +179,24 @@ export class OpenAIEmbeddingsService {
    * Verify that the OpenAI API is accessible
    */
   async healthCheck(): Promise<boolean> {
+    if (this.healthCheckCache && this.healthCheckCache.expiresAt > Date.now()) {
+      return this.healthCheckCache.value;
+    }
+
     try {
-      // Generate a test embedding
       await this.embed('test');
+      this.healthCheckCache = { value: true, expiresAt: Date.now() + this.healthCheckTtlMs };
       return true;
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(`OpenAI embeddings health check failed: ${err.message}`);
+      this.healthCheckCache = { value: false, expiresAt: Date.now() + this.healthCheckTtlMs };
       return false;
     }
+  }
+
+  private cacheKey(text: string): string {
+    return `${this.model}:${String(text || '').trim().replace(/\s+/g, ' ').toLowerCase()}`;
   }
 
   /**

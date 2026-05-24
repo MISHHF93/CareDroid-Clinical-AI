@@ -246,8 +246,9 @@ export class ClinicalIntelligenceService {
     requestMeta: { ipAddress?: string; userAgent?: string } = {},
   ): Promise<TimelineAiResponseDto> {
     const runId = randomUUID();
-    const timeline = buildTimelineEvents(dto.encounters);
-    const trends = buildTimelineTrends(dto.encounters);
+    const normalizedEncounters = buildNormalizedTimelineEncounters(dto.encounters);
+    const timeline = buildTimelineEvents(normalizedEncounters);
+    const trends = buildTimelineTrends(normalizedEncounters);
     const abnormalProgression = buildAbnormalProgression(timeline, trends);
     const status = timeline.length ? 'timeline_generated' : 'needs_more_context';
 
@@ -740,9 +741,24 @@ function buildDifferentialCalculatorSuggestions(
     .map(({ keywords, ...item }) => item);
 }
 
-function buildTimelineEvents(encounters: TimelineAiEncounterDto[]): TimelineAiResponseDto['timeline'] {
-  return encounters.map((encounter, index) => {
-    const combinedText = normalizeClinicalText([encounter.details, encounter.labs, encounter.vitals]);
+interface NormalizedTimelineEncounter {
+  encounter: TimelineAiEncounterDto;
+  combinedText: string;
+}
+
+function buildNormalizedTimelineEncounters(
+  encounters: TimelineAiEncounterDto[],
+): NormalizedTimelineEncounter[] {
+  return encounters.map((encounter) => ({
+    encounter,
+    combinedText: normalizeClinicalText([encounter.details, encounter.labs, encounter.vitals]),
+  }));
+}
+
+function buildTimelineEvents(
+  normalizedEncounters: NormalizedTimelineEncounter[],
+): TimelineAiResponseDto['timeline'] {
+  return normalizedEncounters.map(({ encounter, combinedText }, index) => {
     return {
       id: `encounter-${index + 1}`,
       dateLabel: encounter.date?.trim() || `Encounter ${index + 1}`,
@@ -777,7 +793,9 @@ function detectAbnormalSignals(text: string): string[] {
     .map((rule) => rule.label);
 }
 
-function buildTimelineTrends(encounters: TimelineAiEncounterDto[]): TimelineAiResponseDto['trends'] {
+function buildTimelineTrends(
+  normalizedEncounters: NormalizedTimelineEncounter[],
+): TimelineAiResponseDto['trends'] {
   const trendRules = [
     {
       id: 'respiratory',
@@ -801,9 +819,8 @@ function buildTimelineTrends(encounters: TimelineAiEncounterDto[]): TimelineAiRe
     },
   ];
 
-  const normalizedEncounterTexts = encounters.map((encounter) =>
-    normalizeClinicalText([encounter.details, encounter.labs, encounter.vitals])
-  );
+  const normalizedEncounterTexts = normalizedEncounters.map((entry) => entry.combinedText);
+  const trendDirection = inferTrendDirection(normalizedEncounterTexts);
 
   return trendRules
     .map((rule) => {
@@ -819,7 +836,7 @@ function buildTimelineTrends(encounters: TimelineAiEncounterDto[]): TimelineAiRe
       return {
         id: rule.id,
         label: rule.label,
-        direction: inferTrendDirection(normalizedEncounterTexts),
+        direction: trendDirection,
         evidence: matchedEvidence,
       };
     })
@@ -855,13 +872,14 @@ function buildAbnormalProgression(
     }));
 
   const worseningTrends = trends.filter((trend) => trend.direction === 'worsening');
+  const timelineEventIds = timeline.map((event) => event.id);
   return flags.concat(
     worseningTrends.map((trend, index) => ({
       id: `trend-progression-${index + 1}`,
       severity: 'watch' as const,
       signal: `${trend.label} worsening trend`,
       rationale: trend.evidence.join('; '),
-      relatedEncounterIds: timeline.map((event) => event.id),
+      relatedEncounterIds: timelineEventIds,
     })),
   );
 }

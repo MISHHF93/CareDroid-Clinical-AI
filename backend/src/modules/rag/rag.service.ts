@@ -24,6 +24,10 @@ export class RAGService {
   private readonly enabled: boolean;
   private readonly defaultTopK: number;
   private readonly defaultMinScore: number;
+  private readonly retrievalCacheTtlMs = 5 * 60 * 1000;
+  private readonly retrievalCache = new Map<string, { value: RAGContext; expiresAt: number }>();
+  private readonly retrievalInflight = new Map<string, Promise<RAGContext>>();
+  private corpusVersion = 1;
 
   constructor(
     private readonly embeddingsService: OpenAIEmbeddingsService,
@@ -76,27 +80,67 @@ export class RAGService {
       const topK = options.topK || this.defaultTopK;
       const minScore = options.minScore || this.defaultMinScore;
       const includeEmbeddings = options.includeEmbeddings || false;
+      const filter = this.buildRetrievalFilter(options);
+      const cacheKey = this.retrievalCacheKey(query, {
+        topK,
+        minScore,
+        includeEmbeddings,
+        filter,
+        rerankerEnabled: Boolean(this.rankerService?.isEnabled()),
+      });
+      const cached = this.retrievalCache.get(cacheKey);
+      if (cached && cached.expiresAt > Date.now()) {
+        return this.cloneCachedContext(cached.value, Date.now() - startTime);
+      }
+      const inflight = this.retrievalInflight.get(cacheKey);
+      if (inflight) {
+        const result = await inflight;
+        return this.cloneCachedContext(result, Date.now() - startTime);
+      }
 
       this.logger.debug(`Retrieving context for query: "${query.substring(0, 100)}..."`);
 
+      const retrievalPromise = this.retrieveUncached(query, {
+        topK,
+        minScore,
+        includeEmbeddings,
+        filter,
+        startTime,
+      });
+      this.retrievalInflight.set(cacheKey, retrievalPromise);
+      const context = await retrievalPromise;
+      this.retrievalCache.set(cacheKey, {
+        value: context,
+        expiresAt: Date.now() + this.retrievalCacheTtlMs,
+      });
+      return context;
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error(String(error));
+      this.logger.error(`Retrieval failed: ${err.message}`, err.stack);
+      throw new Error(`Failed to retrieve context: ${err.message}`);
+    }
+  }
+
+  private async retrieveUncached(
+    query: string,
+    options: {
+      topK: number;
+      minScore: number;
+      includeEmbeddings: boolean;
+      filter: Record<string, any>;
+      startTime: number;
+    },
+  ): Promise<RAGContext> {
+    try {
       // 1. Generate query embedding
       const queryEmbedding = await this.embeddingsService.embed(query);
 
-      // 2. Build metadata filter
-      const filter: Record<string, any> = {};
-      if (options.documentType) {
-        filter.type = options.documentType;
-      }
-      if (options.specialty) {
-        filter.specialty = options.specialty;
-      }
-
       // 3. Query vector database
       const queryResult = await this.vectorDb.query(queryEmbedding, {
-        topK,
-        minScore,
-        filter,
-        includeVectors: includeEmbeddings,
+        topK: options.topK,
+        minScore: options.minScore,
+        filter: options.filter,
+        includeVectors: options.includeEmbeddings,
         includeMetadata: true,
       });
 
@@ -111,7 +155,7 @@ export class RAGService {
 
       // 4a. Rerank results if enabled
       if (this.rankerService?.isEnabled() && chunks.length > 0) {
-        chunks = await this.rankerService.rerank(query, chunks, topK);
+        chunks = await this.rankerService.rerank(query, chunks, options.topK);
       }
 
       // Record RAG metrics
@@ -133,7 +177,7 @@ export class RAGService {
       // 6. Calculate overall confidence
       const confidence = this.calculateConfidence(chunks);
 
-      const latencyMs = Date.now() - startTime;
+      const latencyMs = Date.now() - options.startTime;
 
       this.logger.log(
         `Retrieved ${chunks.length} chunks from ${sources.length} sources (confidence: ${confidence.toFixed(2)}, latency: ${latencyMs}ms)`,
@@ -148,10 +192,16 @@ export class RAGService {
         totalRetrieved: queryResult.matches.length,
         latencyMs,
       };
-    } catch (error) {
-      const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(`Retrieval failed: ${err.message}`, err.stack);
-      throw new Error(`Failed to retrieve context: ${err.message}`);
+    } finally {
+      this.retrievalInflight.delete(
+        this.retrievalCacheKey(query, {
+          topK: options.topK,
+          minScore: options.minScore,
+          includeEmbeddings: options.includeEmbeddings,
+          filter: options.filter,
+          rerankerEnabled: Boolean(this.rankerService?.isEnabled()),
+        }),
+      );
     }
   }
 
@@ -193,6 +243,7 @@ export class RAGService {
 
       // 4. Upsert to vector database
       await this.vectorDb.upsertBatch(vectorRecords);
+      this.invalidateRetrievalCache();
       this.logger.log(`Successfully ingested ${chunks.length} chunks for: ${dto.source.title}`);
 
       return {
@@ -247,12 +298,69 @@ export class RAGService {
   async deleteDocument(sourceId: string): Promise<void> {
     try {
       await this.vectorDb.deleteByFilter({ sourceId });
+      this.invalidateRetrievalCache();
       this.logger.log(`Deleted all chunks for source: ${sourceId}`);
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
       this.logger.error(`Failed to delete document ${sourceId}: ${err.message}`, err.stack);
       throw new Error(`Failed to delete document: ${err.message}`);
     }
+  }
+
+  private buildRetrievalFilter(options: RAGRetrievalOptions): Record<string, any> {
+    const filter: Record<string, any> = {};
+    if (options.documentType) {
+      filter.type = options.documentType;
+    }
+    if (options.specialty) {
+      filter.specialty = options.specialty;
+    }
+    return filter;
+  }
+
+  private retrievalCacheKey(
+    query: string,
+    options: {
+      topK: number;
+      minScore: number;
+      includeEmbeddings: boolean;
+      filter: Record<string, any>;
+      rerankerEnabled: boolean;
+    },
+  ): string {
+    return JSON.stringify({
+      corpusVersion: this.corpusVersion,
+      query: String(query || '').trim().replace(/\s+/g, ' ').toLowerCase(),
+      topK: options.topK,
+      minScore: options.minScore,
+      includeEmbeddings: options.includeEmbeddings,
+      filter: this.stableObject(options.filter),
+      rerankerEnabled: options.rerankerEnabled,
+    });
+  }
+
+  private stableObject(value: Record<string, any>): Record<string, any> {
+    return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)));
+  }
+
+  private cloneCachedContext(context: RAGContext, latencyMs: number): RAGContext {
+    return {
+      ...context,
+      chunks: context.chunks.map((chunk) => ({
+        ...chunk,
+        metadata: { ...chunk.metadata },
+        embedding: chunk.embedding ? [...chunk.embedding] : undefined,
+      })),
+      sources: context.sources.map((source) => ({ ...source })),
+      timestamp: new Date(),
+      latencyMs,
+    };
+  }
+
+  private invalidateRetrievalCache(): void {
+    this.corpusVersion += 1;
+    this.retrievalCache.clear();
+    this.retrievalInflight.clear();
   }
 
   /**
