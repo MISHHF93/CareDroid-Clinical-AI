@@ -73,8 +73,9 @@ export function getRegistryToolNavigation(toolId) {
     }
   }
 
+  const pointsToAssistantSurface = ['/home', '/assistant', '/dashboard', '/chat'].includes(navPath);
   if (
-    ((navPath === '/dashboard' || navPath === '/chat') && launch.chatSeed) ||
+    (pointsToAssistantSurface && launch.chatSeed) ||
     (inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED && inventoryRecord.chatSeed)
   ) {
     return {

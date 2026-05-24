@@ -744,7 +744,7 @@ const ClinicalToolCatalog = () => {
           placeholder="Search by name, id, alias, or description…"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          aria-label="Search clinical catalog"
+          aria-label="Search developer catalog"
         />
         <select
           className="catalog-filter"

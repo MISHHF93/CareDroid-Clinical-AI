@@ -398,9 +398,9 @@ describe('PR4A comprehensive — 9. NLU aliases', () => {
     expect(resolveCatalogLaunch('')).toEqual(PR4A_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(PR4A_EMPTY_LAUNCH);
     const unknown = resolveCatalogLaunch('not-a-pr4a-tool-xyz');
-    expect(unknown.path).toBe('/chat');
+    expect(unknown.path).toBe('/assistant');
     expect(unknown.registryId).toBeNull();
-    expect(resolveNavigationPathForLaunch(unknown)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(unknown)).toBe('/assistant');
   });
 });
 

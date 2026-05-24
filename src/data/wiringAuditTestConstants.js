@@ -94,7 +94,7 @@ export const WIRING_AUDIT_TOOL_SPECS = Object.freeze({
     chatSeedPattern: /COPD GOLD/i,
     calcSwitchCase: null,
     openLabel: 'Start guided chat',
-    navigationPath: '/chat',
+    navigationPath: '/assistant',
   },
   'rome-iv-ibs': {
     tier: 'B',
@@ -109,7 +109,7 @@ export const WIRING_AUDIT_TOOL_SPECS = Object.freeze({
     chatSeedPattern: /Rome IV/i,
     calcSwitchCase: null,
     openLabel: 'Start guided chat',
-    navigationPath: '/chat',
+    navigationPath: '/assistant',
   },
 });
 

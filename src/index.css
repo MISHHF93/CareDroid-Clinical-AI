@@ -483,20 +483,51 @@ a, button, input, select, textarea {
   color: var(--muted-text);
 }
 
-.welcome-page-cta {
+.welcome-page-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.welcome-page-cta,
+.welcome-page-dev-cta {
   padding: 14px 32px;
   font-size: var(--font-16);
   font-weight: 600;
-  background: var(--accent-gradient);
-  color: var(--app-accent-contrast);
-  border: none;
   border-radius: var(--radius-md);
   cursor: pointer;
   box-shadow: var(--shadow-1);
+  min-height: var(--app-min-touch-target, 44px);
 }
 
-.welcome-page-cta:hover {
+.welcome-page-cta {
+  background: var(--accent-gradient);
+  color: var(--app-accent-contrast);
+  border: none;
+}
+
+.welcome-page-dev-cta {
+  background: color-mix(in srgb, var(--accent-green) 16%, transparent);
+  color: var(--text-color);
+  border: 1px solid color-mix(in srgb, var(--accent-green) 48%, transparent);
+}
+
+.welcome-page-cta:hover,
+.welcome-page-dev-cta:hover {
   box-shadow: var(--shadow-2);
+}
+
+.welcome-page-dev-note {
+  margin: var(--space-3) auto 0;
+  max-width: 620px;
+  font-size: var(--font-14);
+  color: var(--muted-text);
+}
+
+.welcome-page-dev-note code {
+  font-size: 0.85em;
+  color: var(--accent-2);
 }
 
 .welcome-page-footnote {
@@ -533,8 +564,15 @@ a, button, input, select, textarea {
     border-radius: var(--radius-lg);
   }
 
-  .welcome-page-cta {
+  .welcome-page-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .welcome-page-cta,
+  .welcome-page-dev-cta {
     width: min(100%, 320px);
+    margin-inline: auto;
   }
 }
 

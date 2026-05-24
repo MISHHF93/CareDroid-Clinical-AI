@@ -161,7 +161,7 @@ function launchPathWorks(row) {
   const navPath = resolveNavigationPathForLaunch(launch);
   if (!navPath && !launch.path) return false;
   const effective = navPath || launch.path;
-  if (effective === '/dashboard' || effective === '/chat') return Boolean(launch.chatSeed?.length > 20);
+  if (effective === '/assistant') return Boolean(launch.chatSeed?.length > 20);
   return isKnownToolAreaPath(effective);
 }
 

@@ -141,6 +141,6 @@ describe('PR7 consistency — sidebar and canonical launch', () => {
     expect(launch.path).toBe(PR7_HUB_PATH);
     expect(launch.chatSeed).toBe(nlu?.chatSeed);
     expect(launch.openLabel).toBe('Start guided chat');
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
   });
 });

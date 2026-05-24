@@ -22,7 +22,7 @@ if (firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.messagin
     const notificationTitle = notification.title || 'CareDroid-Clinical-AI notification';
     const notificationOptions = {
       body: notification.body,
-      icon: notification.icon || '/logo.png',
+      icon: notification.icon || '/logo.svg',
     };
 
     self.registration.showNotification(notificationTitle, notificationOptions);

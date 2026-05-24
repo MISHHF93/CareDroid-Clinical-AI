@@ -14,7 +14,7 @@ import { isKnownToolAreaPath, matchCalculatorRoute } from '../routes/clinicalToo
 describe('registryToolLaunch', () => {
   it.each([
     ['qsofa', 'calculator-route', '/tools/calculators/qsofa'],
-    ['sofa-score', 'calculator-route', '/tools/calculator/sofa'],
+    ['sofa-score', 'calculator-route', '/tools/calculators/sofa'],
     ['drug-check', 'tool-page', '/tools/drug-checker'],
     ['fleet-command', 'tool-page', '/fleet/command'],
   ])('getRegistryToolNavigation(%s) → %s %s', (id, mode, pathname) => {

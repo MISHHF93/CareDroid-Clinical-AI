@@ -32,7 +32,7 @@ export default function ToolsAreaFallback() {
       <ToolNotFound
         toolId={mistypedSlug}
         title="Calculator not found"
-        description={`“${mistypedSlug}” is not a built-in calculator at this URL. Pick a calculator from the hub, browse the catalog, or use a supported deep link.`}
+        description={`“${mistypedSlug}” is not a built-in calculator at this URL. Pick a calculator from the hub, browse All Tools, or use a supported deep link.`}
       />
     );
   }
@@ -41,7 +41,7 @@ export default function ToolsAreaFallback() {
     return (
       <ToolNotFound
         title="Tool route mismatch"
-        description="This tool path is registered but did not match a page route. Try the clinical catalog or tools overview."
+        description="This tool path is registered but did not match a page route. Try All Tools or, if you have access, the Developer Catalog / Source Audit."
       />
     );
   }
@@ -51,7 +51,7 @@ export default function ToolsAreaFallback() {
   return (
     <ToolNotFound
       title={`${areaLabel} page not found`}
-      description="This link does not match a tool in CareDroid. Check the URL or open the catalog to find an available tool."
+      description="This link does not match a tool in CareDroid. Check the URL or open All Tools to find an available tool."
     />
   );
 }

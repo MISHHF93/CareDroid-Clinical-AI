@@ -67,10 +67,10 @@ export const RESPONSIVE_QA_BROWSER_PROJECTS = Object.freeze([
 
 /** Dedicated routes for Tier A calculators (must match App.jsx). */
 export const TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID = Object.freeze({
-  [REGISTRY.sofaScore]: '/tools/calculator/sofa',
-  [REGISTRY.calcGfr]: '/tools/calculator/gfr',
-  [REGISTRY.calcBmi]: '/tools/calculator/bmi',
-  [REGISTRY.calcChads2vasc]: '/tools/calculator/chads2vasc',
+  [REGISTRY.sofaScore]: '/tools/calculators/sofa',
+  [REGISTRY.calcGfr]: '/tools/calculators/gfr',
+  [REGISTRY.calcBmi]: '/tools/calculators/bmi',
+  [REGISTRY.calcChads2vasc]: '/tools/calculators/chads2vasc',
   [REGISTRY.qsofa]: '/tools/calculators/qsofa',
   [REGISTRY.news2]: '/tools/calculators/news2',
   [REGISTRY.childPugh]: '/tools/calculators/child-pugh',
@@ -171,15 +171,15 @@ export function buildResponsiveQaPages() {
   /** @type {ResponsiveQaPage[]} */
   const pages = [
     {
-      id: 'dashboard',
+      id: 'home',
       label: 'Pulse',
-      path: '/dashboard',
+      path: '/home',
       category: 'core',
     },
     {
-      id: 'chat',
-      label: 'Chat',
-      path: '/chat',
+      id: 'assistant',
+      label: 'Assistant',
+      path: '/assistant',
       category: 'core',
     },
     {

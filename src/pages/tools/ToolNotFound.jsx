@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import { Permission, useUser } from '../../contexts/UserContext';
 import { resolveCatalogLaunch, resolveRegistryId } from '../../data/clinicalCatalogWiring';
 import { applyRegistryToolLaunch, getRegistryToolNavigation } from '../../navigation/registryToolLaunch';
 import { NavIcon } from '../../navigation/NavIcon';
@@ -18,6 +19,7 @@ export default function ToolNotFound({
 }) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { hasPermission } = useUser();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
   const resolvedId = toolId || location.state?.toolId || null;
@@ -31,6 +33,7 @@ export default function ToolNotFound({
       : launch?.path;
 
   const canStartGuidedChat = navPlan?.mode === 'chat-assisted' && Boolean(launch?.chatSeed);
+  const canViewDeveloperCatalog = hasPermission(Permission.CONFIGURE_SYSTEM);
   const message =
     description ||
     (resolvedId
@@ -77,7 +80,7 @@ export default function ToolNotFound({
             Open suggested tool
           </button>
         ) : null}
-        {showCatalogLink ? (
+        {showCatalogLink && canViewDeveloperCatalog ? (
           <Link to="/tools/catalog" className="tool-not-found-btn tool-not-found-btn--secondary">
             Open Developer Catalog / Source Audit
           </Link>

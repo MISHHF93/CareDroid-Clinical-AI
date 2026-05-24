@@ -23,7 +23,7 @@ const AuthCallback = () => {
     if (!fromUrl || autoHandled.current) return;
     autoHandled.current = true;
     setAuthToken(fromUrl);
-    navigate('/dashboard', { replace: true });
+    navigate('/home', { replace: true });
   }, [params, setAuthToken, navigate]);
 
   const handleSave = () => {
@@ -33,7 +33,7 @@ const AuthCallback = () => {
       return;
     }
     setAuthToken(trimmed);
-    navigate('/dashboard', { replace: true });
+    navigate('/home', { replace: true });
   };
 
   if (initialToken) {
@@ -41,7 +41,7 @@ const AuthCallback = () => {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
         <Card style={{ width: '100%', maxWidth: '480px' }}>
           <h2 style={{ marginTop: 0 }}>Completing sign-in…</h2>
-          <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>You will be redirected to the dashboard.</p>
+          <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>You will be redirected to Home.</p>
         </Card>
       </div>
     );
@@ -74,8 +74,8 @@ const AuthCallback = () => {
           Save token
         </Button>
         <div style={{ marginTop: '18px', fontSize: '12px', color: 'var(--muted-text)' }}>
-          <Link to="/" style={{ color: '#00FF88', textDecoration: 'none' }}>
-            ← Back to chat
+          <Link to="/assistant" style={{ color: '#00FF88', textDecoration: 'none' }}>
+            ← Back to Assistant
           </Link>
         </div>
       </Card>

@@ -23,3 +23,14 @@ export const AUTH_PATH_ALIASES = [
   '/accounts/login',
   '/accounts/signup',
 ];
+
+export const AUTH_SIGNUP_PATH_ALIASES = [
+  '/signup',
+  '/sign-up',
+  '/register',
+  '/join',
+  '/create-account',
+  '/account/signup',
+  '/account/register',
+  '/accounts/signup',
+];

@@ -145,7 +145,7 @@ describe('PR2 coverage — NLU aliases & resolveCatalogLaunch', () => {
   it('returns empty launch for falsy or unknown ids without throwing', () => {
     expect(resolveCatalogLaunch('')).toEqual(EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(EMPTY_LAUNCH);
-    expect(resolveCatalogLaunch('not-a-pr2-tool-xyz').path).toBe('/dashboard');
+    expect(resolveCatalogLaunch('not-a-pr2-tool-xyz').path).toBe('/assistant');
   });
 
   it('separates Wells PE score aliases from PERC rule-out aliases', () => {

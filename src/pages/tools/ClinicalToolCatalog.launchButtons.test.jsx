@@ -48,7 +48,7 @@ describe('ClinicalToolCatalog — launch buttons', () => {
       screen.getByRole('heading', { name: /developer catalog \/ source audit/i })
     ).toBeInTheDocument();
     expect(container.textContent).toMatch(/user-facing tools now live at \/tools/i);
-    expect(screen.getByRole('searchbox', { name: /search clinical catalog/i })).toBeInTheDocument();
+    expect(screen.getByRole('searchbox', { name: /search developer catalog/i })).toBeInTheDocument();
     expect(await screen.findByRole('group', { name: /quick category filters/i })).toBeInTheDocument();
   }, 20000);
 
@@ -73,7 +73,7 @@ describe('ClinicalToolCatalog — launch buttons', () => {
 
   it('includes Wells PE launch control discoverable by tool name', async () => {
     renderCatalog();
-    const input = screen.getByRole('searchbox', { name: /search clinical catalog/i });
+    const input = screen.getByRole('searchbox', { name: /search developer catalog/i });
     fireEvent.change(input, { target: { value: 'pe-score' } });
     expect((await screen.findAllByText('Wells PE Score')).length).toBeGreaterThan(0);
     const medicalHeading = screen.getByRole('heading', {

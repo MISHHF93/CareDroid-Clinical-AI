@@ -247,8 +247,8 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
       if (launch.chatSeed) {
         addMessage(launch.chatSeed, 'user');
       }
-      const navPath = launch.chatSeed ? '/chat' : resolveNavigationPathForLaunch(launch);
-      navigate(navPath || '/dashboard');
+      const navPath = launch.chatSeed ? '/assistant' : resolveNavigationPathForLaunch(launch);
+      navigate(navPath || '/assistant');
     },
     [addMessage, navigate, recordToolAccess, selectTool, setActiveTool]
   );

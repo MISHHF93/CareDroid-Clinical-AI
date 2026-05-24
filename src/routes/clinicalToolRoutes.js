@@ -34,6 +34,13 @@ export const CALCULATOR_ROUTE_DEFS = Object.freeze(
     .sort((a, b) => b.path.length - a.path.length)
 );
 
+export const LEGACY_CALCULATOR_ROUTE_ALIASES = Object.freeze([
+  { path: '/tools/calculator/sofa', to: '/tools/calculators/sofa' },
+  { path: '/tools/calculator/gfr', to: '/tools/calculators/gfr' },
+  { path: '/tools/calculator/bmi', to: '/tools/calculators/bmi' },
+  { path: '/tools/calculator/chads2vasc', to: '/tools/calculators/chads2vasc' },
+]);
+
 /** Registry tool paths under /tools and /fleet (includes hub + fleet pages). */
 export const REGISTRY_TOOL_PATHS = Object.freeze(
   [...new Set(getFrontendVisibleToolInventory().map((t) => t.route).filter(Boolean))].sort()
@@ -160,7 +167,7 @@ export function resolveToolsAreaRedirect(pathname) {
     }
     const navPath = resolveNavigationPathForLaunch(launch);
     if (navPath && normalizeToolPathname(navPath) !== normalized) {
-      if ((navPath === '/dashboard' || navPath === '/chat') && launch.chatSeed) {
+      if (['/home', '/assistant', '/dashboard', '/chat'].includes(navPath) && launch.chatSeed) {
         return {
           pathname: '/assistant',
           search: `?tool=${encodeURIComponent(registryId || subpathSlug)}`,

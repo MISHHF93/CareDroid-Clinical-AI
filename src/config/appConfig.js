@@ -52,8 +52,8 @@ const appConfig = {
     enablePushNotifications: toBoolean(getEnvValue('VITE_ENABLE_PUSH_NOTIFICATIONS', 'false')),
     enableOfflineMode: toBoolean(getEnvValue('VITE_ENABLE_OFFLINE_MODE', 'false')),
     enableBiometricAuth: toBoolean(getEnvValue('VITE_ENABLE_BIOMETRIC_AUTH', 'false')),
-    /** Explicit opt-in for mock local/demo auth on `/auth`. Hidden and inert unless true. */
-    enableDevAuthBypass: toBoolean(getEnvValue('VITE_ENABLE_DEV_AUTH_BYPASS', 'false')),
+    /** Explicit opt-in for mock local/demo auth. Always disabled in production bundles. */
+    enableDevAuthBypass: !isProductionBuild() && toBoolean(getEnvValue('VITE_ENABLE_DEV_AUTH_BYPASS', 'false')),
     /** Legacy demo-auth flag retained for older deployments; new bypass uses enableDevAuthBypass. */
     showDemoAuth: toBoolean(getEnvValue('VITE_SHOW_DEMO_AUTH', 'false')),
     /** Legacy hide flag retained for older deployments. */

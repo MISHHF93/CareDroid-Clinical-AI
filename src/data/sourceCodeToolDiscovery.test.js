@@ -104,7 +104,7 @@ describe('sourceCodeToolDiscovery', () => {
     expect(apache.chatSeed).toMatch(/APACHE/i);
 
     expect(NLU_TO_REGISTRY_ID['drug-interaction-checker']).toBe('drug-check');
-    expect(resolveCatalogLaunch('sofa').path).toBe('/tools/calculator/sofa');
+    expect(resolveCatalogLaunch('sofa').path).toBe('/tools/calculators/sofa');
 
     expect(NLU_TO_REGISTRY_ID.qsofa).toBe('qsofa');
     expect(resolveCatalogLaunch('qsofa').path).toBe('/tools/calculators/qsofa');

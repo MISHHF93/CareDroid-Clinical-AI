@@ -161,7 +161,7 @@ describe('canonical tool inventory', () => {
 
       if (record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) {
         expect(record.chatSeed, record.id).toBeTruthy();
-        expect(record.navigationPath, record.id).toBe('/dashboard');
+        expect(record.navigationPath, record.id).toBe('/assistant');
       }
 
       if (record.launchType === TOOL_LAUNCH_TYPES.BACKEND_BACKED) {

@@ -108,8 +108,8 @@ const Onboarding = () => {
           </Button>
         </div>
         <div style={{ marginTop: '18px', fontSize: '12px', color: 'var(--muted-text)' }}>
-          <Link to="/" style={{ color: '#00FF88', textDecoration: 'none' }}>
-            ← Back to chat
+          <Link to="/assistant" style={{ color: '#00FF88', textDecoration: 'none' }}>
+            ← Back to Assistant
           </Link>
         </div>
       </Card>

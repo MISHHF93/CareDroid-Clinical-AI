@@ -66,7 +66,7 @@ describe('Rome IV IBS (Tier B chat-assisted) wiring', () => {
     expect(launch.chatSeed).toMatch(/criteria support assessment/i);
     expect(launch.openLabel).toBe('Start guided chat');
     expect(launch.orchestratorTool).toBeNull();
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
   });
 
   it.each(PR7_REQUIRED_NLU_ALIAS_PAIRS)(

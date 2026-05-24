@@ -188,7 +188,7 @@ describe('PR3 ten-area — 5. resolveCatalogLaunch behavior', () => {
   it.each(PR3_TOOL_IDS)('navigation after launch opens chat for visible chat', (id) => {
     const launch = resolveCatalogLaunch(id);
     expect(launch.path).toBe('/tools/calculators');
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
   });
 
   it('returns empty launch for unknown ids', () => {

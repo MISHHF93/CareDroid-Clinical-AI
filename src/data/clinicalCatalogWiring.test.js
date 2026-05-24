@@ -20,12 +20,12 @@ describe('clinicalCatalogWiring helpers', () => {
     expect(isCalculatorsHubPath('/dashboard')).toBe(false);
   });
 
-  it('resolveNavigationPathForLaunch sends hub chat seeds to chat', () => {
+  it('resolveNavigationPathForLaunch sends hub chat seeds to canonical Assistant', () => {
     const nav = resolveNavigationPathForLaunch({
       path: '/tools/calculators',
       chatSeed: 'Calculate Wells PE',
     });
-    expect(nav).toBe('/chat');
+    expect(nav).toBe('/assistant');
   });
 
   it('resolveRegistryId maps unknown ids to null', () => {

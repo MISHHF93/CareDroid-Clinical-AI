@@ -128,7 +128,7 @@ describe('Production routes — catalog launch targets', () => {
       const launch = resolveCatalogLaunch(registryId);
       expect(launch.path).toBe(TOOL_LAUNCH_PATHS.calculatorsHub);
       expect(launch.chatSeed?.length).toBeGreaterThan(20);
-      expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+      expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
     }
   );
 
@@ -151,9 +151,9 @@ describe('Production routes — catalog launch targets', () => {
 });
 
 describe('Production routes — tools area fallback redirects', () => {
-  it('redirects legacy /tools/calculator/sofa mistyped under calculators subpath', () => {
+  it('does not redirect canonical plural calculator subpaths', () => {
     const redirect = resolveToolsAreaRedirect('/tools/calculators/sofa');
-    expect(redirect?.pathname).toBe('/tools/calculator/sofa');
+    expect(redirect).toBeNull();
   });
 
   it('redirects chat-assisted mistyped subpath to Assistant with legacy tool param', () => {

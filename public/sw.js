@@ -7,12 +7,15 @@
  * - Periodic API sync when connection restored
  */
 
-const CACHE_NAME = 'caredroid-v3-with-sidebar';
-const urlsToCache = [
+const CACHE_NAME = 'caredroid-v4-static-shell';
+const APP_SHELL_URLS = [
   '/',
   '/index.html',
-  '/style.css',
-  '/main.js',
+  '/favicon.svg',
+  '/logo.svg',
+  '/icon.svg',
+  '/badge.svg',
+  '/site.webmanifest',
 ];
 
 // Install event - cache essential files
@@ -20,7 +23,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => {
       console.log('Service Worker: Caching app shell');
-      return cache.addAll(urlsToCache);
+      return Promise.allSettled(APP_SHELL_URLS.map((url) => cache.add(url)));
     })
   );
   self.skipWaiting();
@@ -48,8 +51,14 @@ self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
 
+  if (request.method !== 'GET' || url.origin !== self.location.origin) {
+    return;
+  }
+
   // Skip caching for API calls and external resources
   if (url.pathname.startsWith('/api')) {
+    event.respondWith(networkFirstStrategy(request));
+  } else if (request.mode === 'navigate') {
     event.respondWith(networkFirstStrategy(request));
   } else {
     event.respondWith(cacheFirstStrategy(request));
@@ -183,8 +192,8 @@ if ('PushManager' in self) {
   self.addEventListener('push', event => {
     const options = {
       body: event.data?.text() || 'New notification',
-      icon: '/icon.png',
-      badge: '/badge.png',
+      icon: '/icon.svg',
+      badge: '/badge.svg',
       vibrate: [100, 50, 100],
       tag: 'notification',
       requireInteraction: false,

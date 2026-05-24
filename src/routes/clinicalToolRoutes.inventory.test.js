@@ -17,7 +17,7 @@ describe('clinical tool routes — unified inventory', () => {
       if (!record.route) continue;
       const normalized = normalizeToolPathname(record.route);
       expect(
-        normalized === '/dashboard' || isKnownToolAreaPath(normalized) || Boolean(matchCalculatorRoute(normalized)),
+        normalized === '/assistant' || isKnownToolAreaPath(normalized) || Boolean(matchCalculatorRoute(normalized)),
         record.id
       ).toBe(true);
     }

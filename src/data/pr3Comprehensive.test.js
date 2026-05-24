@@ -231,17 +231,17 @@ describe('PR3 comprehensive — 5. resolveCatalogLaunch behavior', () => {
 
   it.each(PR3_TOOL_IDS)('resolveNavigationPathForLaunch(%s) opens chat for chat visibility', (id) => {
     const launch = resolveCatalogLaunch(id);
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
   });
 
   it('returns empty launch shape for unknown ids', () => {
     expect(resolveCatalogLaunch('')).toEqual(PR3_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(PR3_EMPTY_LAUNCH);
     const unknown = resolveCatalogLaunch('not-a-pr3-tool-xyz');
-    expect(unknown.path).toBe('/chat');
+    expect(unknown.path).toBe('/assistant');
     expect(unknown.registryId).toBeNull();
     expect(unknown.chatSeed).toBeTruthy();
-    expect(resolveNavigationPathForLaunch(unknown)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(unknown)).toBe('/assistant');
   });
 });
 

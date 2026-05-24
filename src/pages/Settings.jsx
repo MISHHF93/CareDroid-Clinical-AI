@@ -464,8 +464,8 @@ const Settings = () => {
 
         <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
           <Button onClick={handleSave}>Save changes</Button>
-          <Link to="/" style={{ color: 'var(--accent-green)', textDecoration: 'none', alignSelf: 'center' }}>
-            Back to chat
+          <Link to="/assistant" style={{ color: 'var(--accent-green)', textDecoration: 'none', alignSelf: 'center' }}>
+            Back to Assistant
           </Link>
         </div>
       </Card>

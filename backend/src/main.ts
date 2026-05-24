@@ -25,14 +25,7 @@ function registerProductionFrontendAssets(app: Awaited<ReturnType<typeof NestFac
   const frontendIndexPath = resolveFrontendIndexPath(__dirname);
 
   app.use('/assets', express.static(join(frontendDistPath, 'assets'), { index: false }));
-  app.use('/vite.svg', (req, res, next) => {
-    if (!['GET', 'HEAD'].includes(req.method)) {
-      next();
-      return;
-    }
-
-    res.sendFile(join(frontendDistPath, 'vite.svg'));
-  });
+  app.use(express.static(frontendDistPath, { index: false }));
   app.use((req, res, next) => {
     const requestPaths = [
       req.originalUrl,

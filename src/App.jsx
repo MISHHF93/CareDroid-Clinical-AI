@@ -16,12 +16,14 @@ import AppShell from './layout/AppShell';
 import AuthShell from './layout/AuthShell';
 import { PublicShell } from './layout/PublicShell';
 import Auth from './pages/Auth';
+import { createDevAuthSession, isDevAuthBypassEnabled } from './auth/devAuthBypass';
+import { useNotificationActions } from './hooks/useNotificationActions';
 import logger from './utils/logger';
 import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
 import { applyRegistryToolLaunch } from './navigation/registryToolLaunch';
-import { AUTH_PATH_ALIASES } from './routing/authPathAliases';
-import { CALCULATOR_ROUTE_DEFS } from './routes/clinicalToolRoutes';
+import { AUTH_PATH_ALIASES, AUTH_SIGNUP_PATH_ALIASES } from './routing/authPathAliases';
+import { CALCULATOR_ROUTE_DEFS, LEGACY_CALCULATOR_ROUTE_ALIASES } from './routes/clinicalToolRoutes';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 
 // Page imports - Public
@@ -119,8 +121,31 @@ function AuthPage() {
 }
 
 // ==================== WELCOME PAGE ====================
-function WelcomePage() {
+export function WelcomePage() {
   const navigate = useNavigate();
+  const { setAuthToken, setUser } = useUser();
+  const { info, error } = useNotificationActions();
+  const enableDevAuthBypass = isDevAuthBypassEnabled();
+
+  const handleDevDemoSession = async () => {
+    if (!enableDevAuthBypass) return;
+
+    try {
+      const session = await createDevAuthSession();
+      setAuthToken(session.token);
+      setUser(session.user);
+      info(
+        'Signing in',
+        session.backendBacked
+          ? 'Demo / Local Dev Mode with API access.'
+          : 'Demo / Local Dev Mode — UI only (start backend for tool APIs).'
+      );
+      navigate('/tools', { replace: true });
+    } catch (err) {
+      logger.error('Local demo auth bypass failed from welcome page', { err });
+      error('Local demo access failed', 'Unable to start the local/demo session.');
+    }
+  };
 
   return (
     <div className="welcome-page-root">
@@ -159,9 +184,23 @@ function WelcomePage() {
           </div>
         </div>
 
-        <button type="button" className="welcome-page-cta" onClick={() => navigate('/auth')}>
-          Sign In or Create Account
-        </button>
+        <div className="welcome-page-actions">
+          <button type="button" className="welcome-page-cta" onClick={() => navigate('/auth')}>
+            Sign In or Create Account
+          </button>
+
+          {enableDevAuthBypass && (
+            <button type="button" className="welcome-page-dev-cta" onClick={handleDevDemoSession}>
+              Continue in Demo / Local Dev Mode
+            </button>
+          )}
+        </div>
+
+        {enableDevAuthBypass && (
+          <p className="welcome-page-dev-note">
+            Local/demo access is explicitly enabled by <code>VITE_ENABLE_DEV_AUTH_BYPASS=true</code>.
+          </p>
+        )}
 
         <p className="welcome-page-footnote">Healthcare professionals only. Secure login required.</p>
       </div>
@@ -262,7 +301,20 @@ function LegacyOAuthCallbackRedirect() {
 /** This SPA only implements sign-in at `/auth`; common paths redirect here. */
 function AuthPathRedirect() {
   const location = useLocation();
-  return <Navigate to={{ pathname: '/auth', search: location.search, hash: location.hash }} replace />;
+  const search = new URLSearchParams(location.search);
+  if (AUTH_SIGNUP_PATH_ALIASES.includes(location.pathname) && !search.has('mode')) {
+    search.set('mode', 'signup');
+  }
+  return (
+    <Navigate
+      to={{
+        pathname: '/auth',
+        search: search.toString() ? `?${search.toString()}` : '',
+        hash: location.hash,
+      }}
+      replace
+    />
+  );
 }
 
 /** Legacy protected paths stay deep-linkable while canonical routes own the UI. */
@@ -270,6 +322,9 @@ function LegacyProtectedRouteRedirect({ to }) {
   const location = useLocation();
   return <Navigate to={{ pathname: to, search: location.search, hash: location.hash }} replace />;
 }
+
+const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot'];
+const TOOLS_ROUTE_ALIASES = ['/all-tools', '/clinical-tools'];
 
 // ==================== ROUTING ====================
 function AppRoutes() {
@@ -332,12 +387,27 @@ function AppRoutes() {
     { path: '/dashboard', element: <LegacyProtectedRouteRedirect to="/home" />, requiresAuth: true },
     { path: '/assistant', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
     { path: '/chat', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
+    ...ASSISTANT_ROUTE_ALIASES.map((path) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to="/assistant" />,
+      requiresAuth: true,
+    })),
     { path: '/patients', element: <AppShellPage><Patients /></AppShellPage>, requiresAuth: true },
     { path: '/operations', element: <AppShellPage><Operations /></AppShellPage>, requiresAuth: true },
 
     // Clinical tools: full-page routes; chat-assisted actions use Assistant.
     { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
-    { path: '/tools/catalog', element: <AppShellPage><ClinicalToolCatalog /></AppShellPage>, requiresAuth: true },
+    ...TOOLS_ROUTE_ALIASES.map((path) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to="/tools" />,
+      requiresAuth: true,
+    })),
+    {
+      path: '/tools/catalog',
+      element: <AppShellPage><ClinicalToolCatalog /></AppShellPage>,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
     { path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>, requiresAuth: true },
     { path: '/tools/lab-interpreter', element: <AppShellPage><LabInterpreter /></AppShellPage>, requiresAuth: true },
     ...CALCULATOR_ROUTE_DEFS.map(({ path, calculatorSlug }) => ({
@@ -347,6 +417,11 @@ function AppRoutes() {
           <Calculators initialCalculatorId={calculatorSlug} />
         </AppShellPage>
       ),
+      requiresAuth: true,
+    })),
+    ...LEGACY_CALCULATOR_ROUTE_ALIASES.map(({ path, to }) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to={to} />,
       requiresAuth: true,
     })),
     { path: '/tools/calculators', element: <AppShellPage><Calculators /></AppShellPage>, requiresAuth: true },
@@ -409,7 +484,8 @@ function AppRoutes() {
       permission: Permission.VIEW_AUDIT_LOGS,
     },
 
-    { path: '/fleet', element: <LegacyProtectedRouteRedirect to="/fleet/command" />, requiresAuth: true },
+    { path: '/fleet', element: <LegacyProtectedRouteRedirect to="/operations" />, requiresAuth: true },
+    { path: '/catalog', element: <LegacyProtectedRouteRedirect to="/tools/catalog" />, requiresAuth: true },
     { path: '/fleet/command', element: <AppShellPage><FleetDashboard /></AppShellPage>, requiresAuth: true },
     {
       path: '/fleet/predictive-maintenance',

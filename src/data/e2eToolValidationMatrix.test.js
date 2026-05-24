@@ -104,7 +104,7 @@ describe('e2e matrix — per-registry row facts', () => {
     expect(row.tier).toBe('C');
     expect(row.accessModes).toContain('tier-a-form');
     expect(row.accessModes).toContain('tier-c-executor');
-    expect(row.route).toBe('/tools/calculator/sofa');
+    expect(row.route).toBe('/tools/calculators/sofa');
   });
 });
 

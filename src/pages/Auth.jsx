@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Button from '../components/ui/button';
 import Input from '../components/ui/input';
-import appConfig from '../config/appConfig';
 import { apiFetch, apiFetchJson, buildApiUrl } from '../services/apiClient';
+import { createDevAuthSession, isDevAuthBypassEnabled } from '../auth/devAuthBypass';
 import {
   GoogleLogo,
   LinkedInLogo,
@@ -23,9 +23,7 @@ const Auth = ({ onAuthSuccess }) => {
   const [requiresTwoFactor, setRequiresTwoFactor] = useState(false);
   const [userId, setUserId] = useState(null);
   const [twoFactorToken, setTwoFactorToken] = useState('');
-  /** Token stored for explicit local/demo auth bypass when backend dev-session is unavailable. */
-  const divisionToken = (appConfig.dev.bearerToken || '').trim() || 'dev-bypass-token';
-  const enableDevAuthBypass = Boolean(appConfig.features.enableDevAuthBypass);
+  const enableDevAuthBypass = isDevAuthBypassEnabled();
   const { success, error, info } = useNotificationActions();
   const googleAuthUrl = buildApiUrl('/api/auth/google');
   const linkedinAuthUrl = buildApiUrl('/api/auth/linkedin');
@@ -44,6 +42,13 @@ const Auth = ({ onAuthSuccess }) => {
     next.delete('error');
     setSearchParams(next, { replace: true });
   }, [searchParams, setSearchParams, error]);
+
+  useEffect(() => {
+    const requestedMode = searchParams.get('mode');
+    if (requestedMode === 'signup' || requestedMode === 'login') {
+      setMode(requestedMode);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -149,60 +154,26 @@ const Auth = ({ onAuthSuccess }) => {
     }
   };
 
-  const withDevSessionMarker = (user) => ({
-    ...user,
-    authMode: 'local-dev-demo',
-    isDevAuthBypass: true,
-    devAuthLabel: 'Demo / Local Dev Mode',
-  });
-
-  const buildDevDemoUser = () =>
-    withDevSessionMarker({
-      id: 'dev-demo-user',
-      email: 'demo@caredroid.local',
-      name: 'Demo Clinician',
-      role: 'physician',
-      fullName: 'Demo Clinician',
-      isEmailVerified: true,
-      twoFactorEnabled: false,
-      createdAt: new Date().toISOString(),
-    });
-
   const applyDevSession = async () => {
     if (!enableDevAuthBypass) {
       error('Local demo access disabled', 'Set VITE_ENABLE_DEV_AUTH_BYPASS=true to enable local/demo sign-in.');
       return;
     }
 
-    const label = 'Demo / Local Dev Mode';
     try {
-      const { response, data } = await apiFetchJson('/api/auth/dev-session', { method: 'POST' });
-      if (response.ok && data?.accessToken && data?.user) {
-        const devUser = withDevSessionMarker(data.user);
-        localStorage.setItem('caredroid_user_profile', JSON.stringify(devUser));
-        localStorage.setItem('caredroid_access_token', data.accessToken);
-        if (onAuthSuccess) {
-          onAuthSuccess(data.accessToken, devUser);
-        }
-        info('Signing in', `${label} with API access.`);
-        return;
-      }
-    } catch (err) {
-      logger.warn('Dev session API unavailable, using local demo session only', { err });
-    }
-
-    try {
-      const mockUser = buildDevDemoUser();
-      localStorage.setItem('caredroid_user_profile', JSON.stringify(mockUser));
-      localStorage.setItem('caredroid_access_token', divisionToken);
-      logger.info('Local demo auth bypass: stored token and mock profile (no API)', { label });
-
+      const session = await createDevAuthSession();
       if (onAuthSuccess) {
-        onAuthSuccess(divisionToken, mockUser);
+        onAuthSuccess(session.token, session.user);
       }
-      info('Signing in', `${label} — UI only (start backend for tool APIs).`);
+      info(
+        'Signing in',
+        session.backendBacked
+          ? 'Demo / Local Dev Mode with API access.'
+          : 'Demo / Local Dev Mode — UI only (start backend for tool APIs).'
+      );
     } catch (err) {
       logger.error('Local demo auth bypass failed', { err });
+      error('Local demo access failed', 'Unable to start the local/demo session.');
     }
   };
 

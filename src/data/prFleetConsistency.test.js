@@ -244,7 +244,7 @@ describe('PR-FLEET consistency — launch behavior', () => {
   it.each(PR_FLEET_TIER_B_IDS)('%s uses calculators hub path and chat navigation', (id) => {
     const launch = resolveCatalogLaunch(id);
     expect(launch.path).toBe(PR_FLEET_HUB_PATH);
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
     expect(launch.openLabel).toBe('Start guided chat');
     expect(isKnownToolAreaPath(PR_FLEET_HUB_PATH)).toBe(true);
   });

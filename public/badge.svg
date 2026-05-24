@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" role="img" aria-labelledby="title">
+  <title id="title">CareDroid notification badge</title>
+  <rect width="96" height="96" rx="24" fill="#0a0e27"/>
+  <path d="M42 20h12v22h22v12H54v22H42V54H20V42h22z" fill="#5eead4"/>
+</svg>

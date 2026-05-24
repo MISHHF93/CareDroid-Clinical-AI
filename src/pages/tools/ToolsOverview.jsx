@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { Permission, useUser } from '../../contexts/UserContext';
 import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
 import { getUserFacingToolRegistryProjection } from '../../data/toolInventory';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
@@ -61,6 +62,8 @@ const ToolsOverview = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [toolFilter, setToolFilter] = useState('all');
+  const { hasPermission } = useUser();
+  const canViewDeveloperCatalog = hasPermission(Permission.CONFIGURE_SYSTEM);
   const { selectTool, setActiveTool, addMessage } = useConversation();
   const {
     favorites,
@@ -187,15 +190,17 @@ const ToolsOverview = () => {
               ))}
             </select>
           </div>
-          <p className="tools-catalog-link-wrap">
-            <button
-              type="button"
-              className="tools-catalog-link"
-              onClick={() => navigate('/tools/catalog')}
-            >
-              Developer Catalog / Source Audit →
-            </button>
-          </p>
+          {canViewDeveloperCatalog && (
+            <p className="tools-catalog-link-wrap">
+              <button
+                type="button"
+                className="tools-catalog-link"
+                onClick={() => navigate('/tools/catalog')}
+              >
+                Developer Catalog / Source Audit →
+              </button>
+            </p>
+          )}
           <div className="tools-discovery-controls" role="search" aria-label="Search and filter all tools">
             <label className="tools-search-field">
               <span>Search tools</span>

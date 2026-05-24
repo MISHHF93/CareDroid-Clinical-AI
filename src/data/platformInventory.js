@@ -110,7 +110,7 @@ export function getPlatformInventory() {
     spaFeatureAreas: [
       {
         area: 'AI workspace',
-        routes: ['/dashboard'],
+        routes: ['/home', '/assistant'],
       },
       {
         area: 'Clinical tools hub',

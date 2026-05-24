@@ -57,7 +57,7 @@ const chatExecutionCardCss = readFileSync(
 );
 const toolCardCss = readFileSync(join(__dirname, '../components/ToolCard.css'), 'utf8');
 
-function renderDashboard(route = '/chat') {
+function renderDashboard(route = '/assistant') {
   return render(
     <MemoryRouter initialEntries={[route]}>
       <Dashboard />
@@ -75,7 +75,7 @@ describe('Dashboard Chat mobile layout contracts', () => {
   });
 
   it('keeps composer controls and send button reachable on compact viewports', () => {
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     expect(screen.getByLabelText(/clinical chat message/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /send/i })).toBeInTheDocument();
@@ -83,7 +83,7 @@ describe('Dashboard Chat mobile layout contracts', () => {
   });
 
   it('renders suggestion chips in the Chat action rail on mobile', () => {
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     const rail = screen.getByLabelText(/suggested actions/i);
     expect(within(rail).getByRole('button', { name: /plan follow-up/i })).toBeInTheDocument();
@@ -112,7 +112,7 @@ describe('Dashboard Chat mobile layout contracts', () => {
       },
     ];
 
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     expect(screen.getByText(/sofa score completed successfully/i)).toBeInTheDocument();
     expect(screen.getByText(/operational result/i)).toBeInTheDocument();

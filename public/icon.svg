@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-labelledby="title">
+  <title id="title">CareDroid notification icon</title>
+  <rect width="192" height="192" rx="42" fill="#0a0e27"/>
+  <circle cx="96" cy="96" r="64" fill="#122052"/>
+  <path d="M84 44h24v40h40v24h-40v40H84v-40H44V84h40z" fill="#5eead4"/>
+</svg>

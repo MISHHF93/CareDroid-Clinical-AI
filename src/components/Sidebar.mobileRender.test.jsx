@@ -85,8 +85,8 @@ describe('Sidebar mobile render state', () => {
     const nav = container.querySelector('nav.sidebar-nav');
     expect(nav).toBeInTheDocument();
     expect(within(nav).getByRole('button', { name: /^pulse$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^chat$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^control$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^assistant$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^operations$/i })).toBeInTheDocument();
   });
 
   it('renders tool cards with accessible names in tools section', () => {

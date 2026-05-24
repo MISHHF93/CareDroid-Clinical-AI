@@ -10,6 +10,9 @@ import appConfig from '../config/appConfig';
 import { getFirebaseMessagingToken } from './firebaseClient';
 import logger from '../utils/logger';
 
+const NOTIFICATION_ICON = '/logo.svg';
+const NOTIFICATION_BADGE = '/badge.svg';
+
 export const NotificationService = {
   /**
    * Request browser notification permission
@@ -81,8 +84,8 @@ export const NotificationService = {
   sendBrowserNotification(title, options = {}) {
     if (Notification.permission === 'granted') {
       return new Notification(title, {
-        icon: '/logo.png',
-        badge: '/badge.png',
+        icon: NOTIFICATION_ICON,
+        badge: NOTIFICATION_BADGE,
         ...options,
       });
     }

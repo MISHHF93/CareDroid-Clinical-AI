@@ -41,7 +41,7 @@ const toolRegistry = [
   {
     id: 'sofa-score',
     name: 'SOFA Score',
-    path: '/tools/calculator/sofa',
+    path: '/tools/calculators/sofa',
     panelTool: 'calculators',
     initialCalc: 'sofa',
     color: '#95E1D3',
@@ -54,7 +54,7 @@ const toolRegistry = [
   {
     id: 'calc-gfr',
     name: 'eGFR (CKD-EPI)',
-    path: '/tools/calculator/gfr',
+    path: '/tools/calculators/gfr',
     panelTool: 'calculators',
     initialCalc: 'gfr',
     color: '#7FD1AE',
@@ -67,7 +67,7 @@ const toolRegistry = [
   {
     id: 'calc-bmi',
     name: 'BMI',
-    path: '/tools/calculator/bmi',
+    path: '/tools/calculators/bmi',
     panelTool: 'calculators',
     initialCalc: 'bmi',
     color: '#88D4C4',
@@ -80,7 +80,7 @@ const toolRegistry = [
   {
     id: 'calc-chads2vasc',
     name: 'CHA₂DS₂-VASc',
-    path: '/tools/calculator/chads2vasc',
+    path: '/tools/calculators/chads2vasc',
     panelTool: 'calculators',
     initialCalc: 'chads2vasc',
     color: '#6BCFC0',

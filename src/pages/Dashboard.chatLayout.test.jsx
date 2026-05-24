@@ -80,7 +80,7 @@ vi.mock('../utils/toolRecommendations', () => ({
   recordRecommendationFeedback: vi.fn(),
 }));
 
-function renderDashboard(route = '/dashboard') {
+function renderDashboard(route = '/home') {
   return render(
     <MemoryRouter initialEntries={[route]}>
       <Dashboard />
@@ -140,7 +140,7 @@ describe('Dashboard chat layout', () => {
   });
 
   it('renders a complete clinical chat shell', async () => {
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     expect(screen.getByRole('heading', { level: 1, name: /caredroid clinical chat/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/chat context/i)).toHaveTextContent(/online/i);
@@ -149,7 +149,7 @@ describe('Dashboard chat layout', () => {
   });
 
   it('shows capability-backed suggested actions when Chat opens', async () => {
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     const actionRail = screen.getByLabelText(/suggested actions/i);
     expect(within(actionRail).getByRole('button', { name: /plan follow-up/i })).toBeInTheDocument();
@@ -160,7 +160,7 @@ describe('Dashboard chat layout', () => {
 
   it('requires confirmation before sensitive Chat actions continue', async () => {
     const user = userEvent.setup();
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     const actionRail = screen.getByLabelText(/suggested actions/i);
     await user.click(within(actionRail).getByRole('button', { name: /request data export/i }));
@@ -176,7 +176,7 @@ describe('Dashboard chat layout', () => {
 
   it('confirms PHI-sensitive outreach from the Chat composer before opening the planner', async () => {
     const user = userEvent.setup();
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     const composerActions = screen.getByLabelText(/composer actions/i);
     await user.click(within(composerActions).getByRole('button', { name: /plan outreach/i }));
@@ -193,7 +193,7 @@ describe('Dashboard chat layout', () => {
 
   it('requires confirmation before the Chat outreach starter opens the planner', async () => {
     const user = userEvent.setup();
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     const starterPrompts = screen.getByLabelText(/starter prompts/i);
     await user.click(within(starterPrompts).getByRole('button', { name: /^plan outreach$/i }));
@@ -206,7 +206,7 @@ describe('Dashboard chat layout', () => {
 
   it('lets a user complete a real tool workflow without command syntax', async () => {
     const user = userEvent.setup();
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     expect(screen.getByRole('heading', { level: 1, name: /caredroid clinical chat/i })).toBeInTheDocument();
     const actionRail = screen.getByLabelText(/suggested actions/i);
@@ -304,7 +304,7 @@ describe('Dashboard chat layout', () => {
       },
     ];
 
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     expect(screen.getByText(/drug checker completed successfully/i)).toBeInTheDocument();
     expect(screen.getAllByText(/operational result/i)).toHaveLength(1);
@@ -318,7 +318,7 @@ describe('Dashboard chat layout', () => {
 
   it('prefills the composer from starter prompts', async () => {
     const user = userEvent.setup();
-    renderDashboard('/chat');
+    renderDashboard('/assistant');
 
     await user.click(screen.getByRole('button', { name: /check medication safety/i }));
 

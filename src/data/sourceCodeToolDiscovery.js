@@ -374,7 +374,7 @@ export const clientClinicalCapabilities = [
     source: 'src/components/ToolVisualization.jsx',
     status: 'client',
     category: 'clinical',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'Chat/tool viz type drug-interaction',
   },
   {
@@ -383,7 +383,7 @@ export const clientClinicalCapabilities = [
     source: 'src/components/ToolVisualization.jsx',
     status: 'client',
     category: 'clinical',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'Chat/tool viz type calculator',
   },
   {
@@ -392,7 +392,7 @@ export const clientClinicalCapabilities = [
     source: 'src/components/ToolVisualization.jsx',
     status: 'client',
     category: 'clinical',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'Chat/tool viz type protocol',
   },
   {
@@ -401,7 +401,7 @@ export const clientClinicalCapabilities = [
     source: 'src/components/ToolVisualization.jsx',
     status: 'client',
     category: 'clinical',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'Chat/tool viz type lab-order',
   },
   {
@@ -410,7 +410,7 @@ export const clientClinicalCapabilities = [
     source: 'src/components/ToolVisualization.jsx',
     status: 'client',
     category: 'clinical',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'Chat/tool viz type vitals',
   },
   {
@@ -419,7 +419,7 @@ export const clientClinicalCapabilities = [
     source: 'src/components/ToolVisualization.jsx',
     status: 'client',
     category: 'clinical',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'Ties to chat.service anomalyDetection config and AnomalyBanner.jsx',
   },
   {
@@ -508,7 +508,7 @@ export const routingCapabilities = [
     source: 'intent-classification.dto.ts',
     status: 'routing',
     category: 'nlu',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'Phase 0 emergency keyword scan; may block or escalate before clinical tools.',
   },
   {
@@ -517,7 +517,7 @@ export const routingCapabilities = [
     source: 'intent-classification.dto.ts',
     status: 'routing',
     category: 'nlu',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'Routes to one of 15 tool.patterns profiles.',
   },
   {
@@ -526,7 +526,7 @@ export const routingCapabilities = [
     source: 'intent-classification.dto.ts',
     status: 'routing',
     category: 'nlu',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'RAG + general medical Q&A.',
   },
   {
@@ -535,7 +535,7 @@ export const routingCapabilities = [
     source: 'intent-classification.dto.ts',
     status: 'routing',
     category: 'nlu',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'Non-clinical app questions.',
   },
   {
@@ -544,7 +544,7 @@ export const routingCapabilities = [
     source: 'intent-classification.dto.ts',
     status: 'routing',
     category: 'nlu',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'Fallback conversational intent.',
   },
   {
@@ -553,7 +553,7 @@ export const routingCapabilities = [
     source: 'chat.controller.ts ChatMessageDto',
     status: 'routing',
     category: 'nlu',
-    path: '/dashboard',
+    path: '/assistant',
     notes: 'POST /api/chat/message accepts feature?: string (featureInventory ids).',
   },
   {
@@ -562,7 +562,7 @@ export const routingCapabilities = [
     source: 'chat.service.ts, rag module',
     status: 'routing',
     category: 'ai',
-    path: '/dashboard',
+    path: '/assistant',
     apiPath: 'Embedded in POST /api/chat/message response.ragContext',
     notes: 'Medical source citations and chunk counts on chat responses.',
   },

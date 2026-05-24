@@ -93,7 +93,7 @@ describe('Dispatch Intelligence (dispatch-ai) wiring', () => {
 
   it('maps hub launch to chat for conversational workflow', () => {
     const launch = resolveCatalogLaunch(id);
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
   });
 
   it.each(ALIAS_PAIRS)('alias "%s" resolves same launch as dispatch-ai', (alias, expected) => {

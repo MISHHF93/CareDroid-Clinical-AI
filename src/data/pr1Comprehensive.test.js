@@ -348,7 +348,7 @@ describe('PR1 comprehensive — NLU aliases, routes, resolveCatalogLaunch', () =
 
   it('resolveCatalogLaunch returns guarded chat fallback for unknown id', () => {
     const launch = resolveCatalogLaunch('not-a-pr1-tool-xyz');
-    expect(launch.path).toBe('/chat');
+    expect(launch.path).toBe('/assistant');
     expect(launch.registryId).toBeNull();
     expect(launch.chatSeed).toMatch(/decision support|does not establish a diagnosis/i);
   });

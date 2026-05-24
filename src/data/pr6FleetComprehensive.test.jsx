@@ -403,7 +403,7 @@ describe('4. Dispatch launch behavior', () => {
 
   it('navigates dispatch-ai chat launch to chat (not calculators slug)', () => {
     const launch = resolveCatalogLaunch('dispatch-ai');
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
     expect(launch.path).toBe(PR_FLEET_HUB_PATH);
   });
 
@@ -567,7 +567,7 @@ describe('8. Route validation', () => {
 
   it('returns empty launch for unknown fleet-like ids', () => {
     const empty = resolveCatalogLaunch('not-a-fleet-tool-xyz-123');
-    expect(empty.path).toBe('/chat');
+    expect(empty.path).toBe('/assistant');
     expect(empty.registryId).toBeNull();
   });
 

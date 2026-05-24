@@ -87,7 +87,7 @@ export const ANDROID_QA_ROUTE_PAGES = Object.freeze(
 export const ANDROID_QA_CALCULATOR_PATHS = Object.freeze([
   '/tools/calculators/has-bled',
   '/tools/calculators/qsofa',
-  '/tools/calculator/sofa',
+  '/tools/calculators/sofa',
 ]);
 
 export const ANDROID_QA_INTERACTION_DEVICE_IDS = Object.freeze([

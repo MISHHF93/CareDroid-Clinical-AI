@@ -41,7 +41,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       emptyOutDir: true,
-      sourcemap: true,
+      sourcemap: mode !== 'production',
       // Performance optimizations
       target: 'esnext',
       // esbuild minify (default); avoids optional terser peer on CI (e.g. Vercel)

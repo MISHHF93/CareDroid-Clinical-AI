@@ -61,11 +61,11 @@ describe('resolveCatalogLaunch — empty / unknown', () => {
 
   it('returns guarded chat fallback for unknown tool-shaped ids', () => {
     const launch = resolveCatalogLaunch('not-a-shipped-tool-xyz-999');
-    expect(launch.path).toBe('/chat');
+    expect(launch.path).toBe('/assistant');
     expect(launch.registryId).toBeNull();
     expect(launch.chatSeed).toMatch(/decision support|does not establish a diagnosis/i);
     expect(launch.orchestratorTool).toBeNull();
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
   });
 
   it('resolveCatalogLaunchFallback matches unknown launch shape', () => {
@@ -99,7 +99,7 @@ describe('resolveCatalogLaunch — every NLU profile', () => {
   it('launches calc-gfr via registry alias gfr', () => {
     const launch = resolveCatalogLaunch('gfr');
     expect(launch.registryId).toBe(REGISTRY.calcGfr);
-    expect(launch.path).toBe('/tools/calculator/gfr');
+    expect(launch.path).toBe('/tools/calculators/gfr');
     expect(launch.orchestratorTool).toBeNull();
   });
 });
@@ -137,7 +137,7 @@ describe('resolveNavigationPathForLaunch — chat visibility', () => {
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
       expect(launch.path).toBe(HUB);
-      expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+      expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
     }
   );
 
@@ -145,7 +145,7 @@ describe('resolveNavigationPathForLaunch — chat visibility', () => {
     'PR2 Tier-B %s navigates to chat for guided chat',
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
-      expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+      expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
     }
   );
 
@@ -258,7 +258,7 @@ describe('resolveCatalogLaunch — fleet Tier B dispatch hub', () => {
     const launch = resolveCatalogLaunch('dispatch-ai');
     expect(launch.path).toBe('/tools/calculators');
     expect(launch.openLabel).toBe('Start guided chat');
-    expect(resolveNavigationPathForLaunch(launch)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
     expect(launch.orchestratorTool).toBeNull();
   });
 
@@ -272,7 +272,7 @@ describe('resolveCatalogLaunch — fleet Tier B dispatch hub', () => {
     const fromCanonical = resolveCatalogLaunch('dispatch-ai');
     expect(fromAlias.registryId).toBe('dispatch-ai');
     expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-    expect(resolveNavigationPathForLaunch(fromAlias)).toBe('/chat');
+    expect(resolveNavigationPathForLaunch(fromAlias)).toBe('/assistant');
   });
 });
 

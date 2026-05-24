@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-labelledby="title desc">
+  <title id="title">CareDroid Clinical AI</title>
+  <desc id="desc">CareDroid clinical cross logo</desc>
+  <rect width="256" height="256" rx="56" fill="#0a0e27"/>
+  <circle cx="128" cy="128" r="84" fill="#122052"/>
+  <path d="M112 64h32v48h48v32h-48v48h-32v-48H64v-32h48z" fill="#5eead4"/>
+  <path d="M80 202c24 17 72 17 96 0" fill="none" stroke="#e0f2fe" stroke-width="12" stroke-linecap="round"/>
+</svg>

@@ -114,7 +114,7 @@ export function buildChecklistFlags(mode, registryId) {
   const path = smokePathForRegistry(registryId);
 
   return {
-    routeRenders: Boolean(path && (isKnownToolAreaPath(path) || path === '/dashboard')),
+    routeRenders: Boolean(path && (isKnownToolAreaPath(path) || path === '/assistant')),
     nonEmpty: true,
     tierAForm: mode === EXECUTION_MODES.LOCAL_CALCULATOR,
     tierAResult: mode === EXECUTION_MODES.LOCAL_CALCULATOR,
@@ -236,7 +236,7 @@ export function getToolPageSmokeRoutes() {
     '/tools',
     '/tools/catalog',
     '/tools/calculators',
-    '/dashboard',
+    '/assistant',
   ]);
   for (const row of rows) {
     if (row.smokePath && row.checks.routeRenders) paths.add(row.smokePath);

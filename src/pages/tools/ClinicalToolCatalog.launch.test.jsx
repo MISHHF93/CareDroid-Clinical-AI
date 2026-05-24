@@ -51,7 +51,7 @@ describe('ClinicalToolCatalog launch and search', () => {
 
   it('finds wells-pe via alias search in the medical table', async () => {
     renderCatalog();
-    const input = screen.getByRole('searchbox', { name: /search clinical catalog/i });
+    const input = screen.getByRole('searchbox', { name: /search developer catalog/i });
     fireEvent.change(input, { target: { value: 'pe-score' } });
     const matches = await screen.findAllByText('Wells PE Score');
     expect(matches.length).toBeGreaterThan(0);
@@ -59,14 +59,14 @@ describe('ClinicalToolCatalog launch and search', () => {
 
   it('shows global empty state when search has no matches', async () => {
     renderCatalog();
-    const input = screen.getByRole('searchbox', { name: /search clinical catalog/i });
+    const input = screen.getByRole('searchbox', { name: /search developer catalog/i });
     fireEvent.change(input, { target: { value: 'zzz-no-such-tool-xyz' } });
     expect(await screen.findByRole('status')).toHaveTextContent(/No tools match/i);
   });
 
   it('clears search from global empty state', async () => {
     renderCatalog();
-    const input = screen.getByRole('searchbox', { name: /search clinical catalog/i });
+    const input = screen.getByRole('searchbox', { name: /search developer catalog/i });
     fireEvent.change(input, { target: { value: 'zzz-no-such-tool-xyz' } });
     fireEvent.click(await screen.findByRole('button', { name: /clear search/i }));
     expect(input.value).toBe('');

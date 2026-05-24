@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useUser } from '../contexts/UserContext';
+import { Permission, useUser } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
@@ -42,7 +42,7 @@ const Sidebar = forwardRef(function Sidebar(
 ) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useUser();
+  const { user, hasPermission } = useUser();
   const { notifications } = useNotifications();
   const {
     favorites,
@@ -110,7 +110,7 @@ const Sidebar = forwardRef(function Sidebar(
   const effectiveCollapsed = layoutCompact ? false : sidebarCollapsed;
 
   const handleNavClick = (path) => {
-    if (['/home', '/dashboard', '/assistant', '/chat'].includes(path)) {
+    if (['/home', '/dashboard', '/assistant', '/chat', '/ai', '/copilot'].includes(path)) {
       navigate({ pathname: path, search: '' }, { replace: true });
     } else {
       onToolSelect?.(null);
@@ -154,6 +154,7 @@ const Sidebar = forwardRef(function Sidebar(
 
   const isOnToolsOverview = location.pathname === '/tools';
   const isOnToolsCatalog = location.pathname === '/tools/catalog';
+  const canViewDeveloperCatalog = hasPermission(Permission.CONFIGURE_SYSTEM);
   const activeCalculatorMatch = useMemo(
     () => matchCalculatorRoute(location.pathname),
     [location.pathname]
@@ -215,7 +216,7 @@ const Sidebar = forwardRef(function Sidebar(
     const isSelected =
       currentTool === tool.id &&
       (
-        ['/home', '/dashboard', '/assistant', '/chat'].includes(location.pathname) ||
+        ['/home', '/dashboard', '/assistant', '/chat', '/ai', '/copilot'].includes(location.pathname) ||
         isToolRouteActive(tool)
       );
     const isFavorite = favoriteToolIdSet.has(tool.id);
@@ -607,18 +608,20 @@ const Sidebar = forwardRef(function Sidebar(
                   );
                 })}
 
-                <button
-                  type="button"
-                  onClick={handleOpenCatalog}
-                  aria-label="Open developer catalog and source audit"
-                  aria-current={isOnToolsCatalog ? 'page' : undefined}
-                  className={`sidebar-tools-quick-action${isOnToolsCatalog ? ' sidebar-tools-quick-action--active' : ''}`}
-                >
-                  <span className="section-icon--svg" aria-hidden>
-                    <NavIcon icon={CHROME_ICONS.tools} size={14} />
-                  </span>
-                  <span>Developer Catalog / Source Audit</span>
-                </button>
+                {canViewDeveloperCatalog && (
+                  <button
+                    type="button"
+                    onClick={handleOpenCatalog}
+                    aria-label="Open developer catalog and source audit"
+                    aria-current={isOnToolsCatalog ? 'page' : undefined}
+                    className={`sidebar-tools-quick-action${isOnToolsCatalog ? ' sidebar-tools-quick-action--active' : ''}`}
+                  >
+                    <span className="section-icon--svg" aria-hidden>
+                      <NavIcon icon={CHROME_ICONS.tools} size={14} />
+                    </span>
+                    <span>Developer Catalog / Source Audit</span>
+                  </button>
+                )}
 
                 <button
                   type="button"

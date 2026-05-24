@@ -213,7 +213,7 @@ describe('PR4A coverage — NLU aliases & resolveCatalogLaunch', () => {
   it('returns empty launch for falsy or unknown ids without throwing', () => {
     expect(resolveCatalogLaunch('')).toEqual(PR4A_EMPTY_LAUNCH);
     expect(resolveCatalogLaunch(null)).toEqual(PR4A_EMPTY_LAUNCH);
-    expect(resolveCatalogLaunch('not-a-pr4a-tool-xyz').path).toBe('/dashboard');
+    expect(resolveCatalogLaunch('not-a-pr4a-tool-xyz').path).toBe('/assistant');
   });
 });
 

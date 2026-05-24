@@ -13,7 +13,7 @@ function renderFallback(path) {
       <Routes>
         <Route path="/tools/*" element={<ToolsAreaFallback />} />
         <Route path="/fleet/*" element={<ToolsAreaFallback />} />
-        <Route path="/dashboard" element={<div data-testid="dashboard-page">Dashboard</div>} />
+        <Route path="/assistant" element={<div data-testid="assistant-page">Assistant</div>} />
         <Route path="/tools/calculator/sofa" element={<div data-testid="sofa-page">SOFA</div>} />
       </Routes>
     </MemoryRouter>
@@ -37,9 +37,9 @@ describe('ToolsAreaFallback', () => {
     expect(await screen.findByTestId('sofa-page')).toBeTruthy();
   });
 
-  it('redirects chat-assisted mistyped subpath to dashboard', async () => {
+  it('redirects chat-assisted mistyped subpath to Assistant', async () => {
     renderFallback('/tools/calculators/wells-pe');
-    expect(await screen.findByTestId('dashboard-page')).toBeTruthy();
+    expect(await screen.findByTestId('assistant-page')).toBeTruthy();
   });
 
   it('shows fleet not found for unknown fleet path', () => {
