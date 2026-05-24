@@ -263,7 +263,7 @@ export const UserProvider = ({ children }) => {
     return permissions.every((permission) => rolePermissions.includes(permission));
   };
 
-  const isAuthenticated = Boolean(authToken && user);
+  const isAuthenticated = Boolean(authToken);
   const isDevAuthBypass = Boolean(
     user?.isDevAuthBypass ||
       user?.authMode === 'local-dev-demo' ||

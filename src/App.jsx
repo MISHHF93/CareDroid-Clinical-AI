@@ -98,7 +98,7 @@ function AuthPage() {
   const handleAuthSuccess = (token, user) => {
     setAuthToken(token);
     if (user) setUser(user);
-    navigate('/home', { replace: true });
+    navigate('/tools', { replace: true });
   };
 
   return <Auth onAuthSuccess={handleAuthSuccess} />;
