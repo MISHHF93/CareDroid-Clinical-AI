@@ -147,6 +147,7 @@ Passed:
 - `npm run test:registry-launch`
 - `npm run test:catalog-launch`
 - `npm run test:alias-sync`
+- `npm run test:responsive-regression`
 - `npm run lint` (passes with existing warnings)
 - `npm run build`
 - `cd backend; npm run build`
