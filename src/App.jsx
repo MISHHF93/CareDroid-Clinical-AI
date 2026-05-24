@@ -390,7 +390,7 @@ function AppRoutes() {
       publicOnly: true,
     })),
 
-    { path: '/home', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
+    { path: '/home', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
     { path: '/dashboard', element: <LegacyProtectedRouteRedirect to="/home" />, requiresAuth: true },
     { path: '/assistant', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
     { path: '/chat', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
