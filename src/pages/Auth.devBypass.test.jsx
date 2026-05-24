@@ -61,8 +61,28 @@ describe('Auth local/demo dev bypass', () => {
     renderAuth();
 
     expect(
+      screen.getByRole('button', { name: /direct sign in/i })
+    ).toBeInTheDocument();
+
+    expect(
       screen.queryByRole('button', { name: /continue in demo mode/i })
     ).toBeInTheDocument();
+  });
+
+  it('allows direct sign-in even when dev bypass flags are disabled', async () => {
+    const onAuthSuccess = renderAuth();
+
+    fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
+
+    await waitFor(() => {
+      expect(onAuthSuccess).toHaveBeenCalledWith(
+        'test-dev-token',
+        expect.objectContaining({
+          authMode: 'local-dev-demo',
+          isDevAuthBypass: true,
+        })
+      );
+    });
   });
 
   it('appears only when the explicit flag is enabled and creates a marked mock session', async () => {
