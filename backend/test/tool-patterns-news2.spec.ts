@@ -1,4 +1,7 @@
-import { matchToolPatterns } from '../src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns';
+import {
+  getToolPattern,
+  matchToolPatterns,
+} from '../src/modules/medical-control-plane/intent-classifier/patterns/tool.patterns';
 
 describe('matchToolPatterns — NEWS2', () => {
   it('matches news2 and national early warning score aliases', () => {
@@ -10,5 +13,10 @@ describe('matchToolPatterns — NEWS2', () => {
 
     const c = matchToolPatterns('early warning score deterioration');
     expect(c.some((m) => m.toolId === 'news2')).toBe(true);
+  });
+
+  it('resolves NEWS2 metadata through the indexed pattern lookup', () => {
+    expect(getToolPattern('news2')?.toolName).toContain('NEWS2');
+    expect(getToolPattern('not-a-real-tool')).toBeUndefined();
   });
 });

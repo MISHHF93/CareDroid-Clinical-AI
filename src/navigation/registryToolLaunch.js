@@ -12,7 +12,7 @@ import {
 } from '../data/clinicalCatalogWiring';
 import { resolveToolInventoryRecord, TOOL_LAUNCH_TYPES } from '../data/toolInventory';
 import {
-  CALCULATOR_ROUTE_DEFS,
+  getCalculatorRouteBySlug,
   isKnownToolAreaPath,
   isRegisteredCalculatorSlug,
   matchCalculatorRoute,
@@ -60,7 +60,7 @@ export function getRegistryToolNavigation(toolId) {
 
   const calculatorSlug = inventoryRecord?.calculatorSlug || reg?.initialCalc;
   if (calculatorSlug && isRegisteredCalculatorSlug(calculatorSlug)) {
-    const def = CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === calculatorSlug);
+    const def = getCalculatorRouteBySlug(calculatorSlug);
     if (def) {
       return {
         mode: 'calculator-route',
@@ -79,7 +79,7 @@ export function getRegistryToolNavigation(toolId) {
   ) {
     return {
       mode: 'chat-assisted',
-      pathname: '/chat',
+      pathname: '/assistant',
       search: '',
       registryId: launch.registryId || registryId,
       launch,

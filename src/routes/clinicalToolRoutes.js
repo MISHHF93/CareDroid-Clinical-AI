@@ -47,6 +47,8 @@ export const KNOWN_TOOL_AREA_PATHS = Object.freeze([
 
 const calculatorPathSet = new Set(CALCULATOR_ROUTE_DEFS.map((d) => d.path));
 const calculatorSlugSet = new Set(CALCULATOR_ROUTE_DEFS.map((d) => d.calculatorSlug));
+const calculatorRouteByPath = new Map(CALCULATOR_ROUTE_DEFS.map((d) => [d.path, d]));
+const calculatorRouteBySlug = new Map(CALCULATOR_ROUTE_DEFS.map((d) => [d.calculatorSlug, d]));
 const knownPathSet = new Set(KNOWN_TOOL_AREA_PATHS);
 
 /** Production paths required for release validation (audits, smoke checks). */
@@ -79,7 +81,7 @@ export function normalizeToolPathname(pathname) {
  */
 export function matchCalculatorRoute(pathname) {
   const normalized = normalizeToolPathname(pathname);
-  return CALCULATOR_ROUTE_DEFS.find((def) => def.path === normalized) ?? null;
+  return calculatorRouteByPath.get(normalized) ?? null;
 }
 
 /**
@@ -102,6 +104,14 @@ export function parseCalculatorSubpath(pathname) {
  */
 export function isRegisteredCalculatorSlug(slug) {
   return calculatorSlugSet.has(slug);
+}
+
+/**
+ * @param {string} slug
+ * @returns {{ path: string, calculatorSlug: string } | null}
+ */
+export function getCalculatorRouteBySlug(slug) {
+  return calculatorRouteBySlug.get(slug) ?? null;
 }
 
 /**
@@ -135,7 +145,7 @@ export function resolveToolsAreaRedirect(pathname) {
   }
   if (plan.mode === 'chat-assisted') {
     return {
-      pathname: '/chat',
+      pathname: '/assistant',
       search: `?tool=${encodeURIComponent(plan.registryId || subpathSlug)}`,
     };
   }
@@ -152,7 +162,7 @@ export function resolveToolsAreaRedirect(pathname) {
     if (navPath && normalizeToolPathname(navPath) !== normalized) {
       if ((navPath === '/dashboard' || navPath === '/chat') && launch.chatSeed) {
         return {
-          pathname: '/chat',
+          pathname: '/assistant',
           search: `?tool=${encodeURIComponent(registryId || subpathSlug)}`,
         };
       }

@@ -13,6 +13,7 @@ vi.mock('../config/backendApiCapabilities', () => ({
 import { apiFetch } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import {
+  clearClinicalToolsApiCache,
   fetchBackendClinicalTools,
   fetchClinicalToolMetadata,
   fetchToolExecutorCatalog,
@@ -23,6 +24,7 @@ import {
 describe('clinicalToolsApi', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    clearClinicalToolsApiCache();
     vi.mocked(isBackendCapabilityEnabled).mockReturnValue(true);
   });
 
@@ -37,6 +39,31 @@ describe('clinicalToolsApi', () => {
     expect(result.tools).toHaveLength(1);
     expect(result.error).toBeUndefined();
     expect(apiFetch).toHaveBeenCalledWith('/api/tools', expect.any(Object));
+  });
+
+  it('coalesces in-flight tool list requests and reuses the short-lived cache', async () => {
+    let resolveFetch;
+    const pendingResponse = new Promise((resolve) => {
+      resolveFetch = resolve;
+    });
+    apiFetch.mockReturnValueOnce(pendingResponse);
+
+    const first = fetchBackendClinicalTools();
+    const second = fetchBackendClinicalTools();
+
+    expect(apiFetch).toHaveBeenCalledTimes(1);
+    resolveFetch({
+      ok: true,
+      _json: { tools: [{ id: 'sofa-calculator' }], count: 1, tier: 'pro' },
+    });
+
+    const [firstResult, secondResult] = await Promise.all([first, second]);
+    expect(firstResult.ok).toBe(true);
+    expect(secondResult).toBe(firstResult);
+
+    const cached = await fetchBackendClinicalTools();
+    expect(cached).toBe(firstResult);
+    expect(apiFetch).toHaveBeenCalledTimes(1);
   });
 
   it('returns empty tools and error message on HTTP failure', async () => {

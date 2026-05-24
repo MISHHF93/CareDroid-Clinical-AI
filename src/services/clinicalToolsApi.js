@@ -1,10 +1,20 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 
+const STABLE_GET_CACHE_TTL_MS = 30_000;
+const stableGetCache = new Map();
+const stableGetInflight = new Map();
+
+function resolveAuthToken(authToken = null) {
+  if (authToken !== null && authToken !== undefined) return authToken;
+  if (typeof localStorage === 'undefined') return null;
+  return localStorage.getItem('caredroid_access_token');
+}
+
 function authHeaders(authToken = null, contentType = false) {
   const headers = {};
   if (contentType) headers['Content-Type'] = 'application/json';
-  const token = authToken ?? localStorage.getItem('caredroid_access_token');
+  const token = resolveAuthToken(authToken);
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
@@ -13,6 +23,44 @@ function authHeaders(authToken = null, contentType = false) {
 
 function disabledResponse(message) {
   return { ok: false, data: null, error: message };
+}
+
+function stableGetCacheKey(path, authToken) {
+  return `${path}::${authToken || 'anonymous'}`;
+}
+
+async function cachedStableGet(cacheKey, producer) {
+  const now = Date.now();
+  const cached = stableGetCache.get(cacheKey);
+  if (cached && cached.expiresAt > now) {
+    return cached.value;
+  }
+
+  if (stableGetInflight.has(cacheKey)) {
+    return stableGetInflight.get(cacheKey);
+  }
+
+  const promise = producer()
+    .then((result) => {
+      if (result?.ok) {
+        stableGetCache.set(cacheKey, {
+          value: result,
+          expiresAt: Date.now() + STABLE_GET_CACHE_TTL_MS,
+        });
+      }
+      return result;
+    })
+    .finally(() => {
+      stableGetInflight.delete(cacheKey);
+    });
+
+  stableGetInflight.set(cacheKey, promise);
+  return promise;
+}
+
+export function clearClinicalToolsApiCache() {
+  stableGetCache.clear();
+  stableGetInflight.clear();
 }
 
 /**
@@ -25,38 +73,41 @@ export async function fetchBackendClinicalTools({ availableOnly = false, authTok
   }
 
   const path = availableOnly ? '/api/tools/available' : '/api/tools';
-  const headers = authHeaders(authToken);
+  const resolvedToken = resolveAuthToken(authToken);
+  const cacheKey = stableGetCacheKey(path, resolvedToken);
 
-  try {
-    const response = await apiFetch(path, { headers });
-    const data = await parseApiResponse(response, { fallback: {} });
+  return cachedStableGet(cacheKey, async () => {
+    try {
+      const response = await apiFetch(path, { headers: authHeaders(resolvedToken) });
+      const data = await parseApiResponse(response, { fallback: {} });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        return {
+          ok: false,
+          tools: [],
+          count: 0,
+          tier: null,
+          error: data?.message || getApiErrorMessage(null, response),
+        };
+      }
+
+      const tools = data.tools || data.data?.tools || [];
+      return {
+        ok: true,
+        tools,
+        count: data.count ?? tools.length,
+        tier: data.tier ?? null,
+      };
+    } catch (error) {
       return {
         ok: false,
         tools: [],
         count: 0,
         tier: null,
-        error: data?.message || getApiErrorMessage(null, response),
+        error: getApiErrorMessage(error),
       };
     }
-
-    const tools = data.tools || data.data?.tools || [];
-    return {
-      ok: true,
-      tools,
-      count: data.count ?? tools.length,
-      tier: data.tier ?? null,
-    };
-  } catch (error) {
-    return {
-      ok: false,
-      tools: [],
-      count: 0,
-      tier: null,
-      error: getApiErrorMessage(error),
-    };
-  }
+  });
 }
 
 /**
@@ -70,18 +121,24 @@ export async function fetchClinicalToolMetadata(toolId, { authToken = null } = {
   }
   if (!toolId) return disabledResponse('Tool id is required.');
 
-  try {
-    const response = await apiFetch(`/api/tools/${encodeURIComponent(toolId)}`, {
-      headers: authHeaders(authToken),
-    });
-    const data = await parseApiResponse(response, { fallback: {} });
-    if (!response.ok) {
-      return { ok: false, data: null, error: data?.message || getApiErrorMessage(null, response) };
+  const path = `/api/tools/${encodeURIComponent(toolId)}`;
+  const resolvedToken = resolveAuthToken(authToken);
+  const cacheKey = stableGetCacheKey(path, resolvedToken);
+
+  return cachedStableGet(cacheKey, async () => {
+    try {
+      const response = await apiFetch(path, {
+        headers: authHeaders(resolvedToken),
+      });
+      const data = await parseApiResponse(response, { fallback: {} });
+      if (!response.ok) {
+        return { ok: false, data: null, error: data?.message || getApiErrorMessage(null, response) };
+      }
+      return { ok: true, data, error: null };
+    } catch (error) {
+      return { ok: false, data: null, error: getApiErrorMessage(error) };
     }
-    return { ok: true, data, error: null };
-  } catch (error) {
-    return { ok: false, data: null, error: getApiErrorMessage(error) };
-  }
+  });
 }
 
 /**
@@ -121,18 +178,24 @@ export async function fetchToolExecutorCatalog({ authToken = null } = {}) {
     return disabledResponse('Tool executor catalog API is not available.');
   }
 
-  try {
-    const response = await apiFetch('/api/tools/catalog/executors', {
-      headers: authHeaders(authToken),
-    });
-    const data = await parseApiResponse(response, { fallback: {} });
-    if (!response.ok) {
-      return { ok: false, data: null, error: data?.message || getApiErrorMessage(null, response) };
+  const path = '/api/tools/catalog/executors';
+  const resolvedToken = resolveAuthToken(authToken);
+  const cacheKey = stableGetCacheKey(path, resolvedToken);
+
+  return cachedStableGet(cacheKey, async () => {
+    try {
+      const response = await apiFetch(path, {
+        headers: authHeaders(resolvedToken),
+      });
+      const data = await parseApiResponse(response, { fallback: {} });
+      if (!response.ok) {
+        return { ok: false, data: null, error: data?.message || getApiErrorMessage(null, response) };
+      }
+      return { ok: true, data, error: null };
+    } catch (error) {
+      return { ok: false, data: null, error: getApiErrorMessage(error) };
     }
-    return { ok: true, data, error: null };
-  } catch (error) {
-    return { ok: false, data: null, error: getApiErrorMessage(error) };
-  }
+  });
 }
 
 /**
@@ -144,16 +207,22 @@ export async function fetchToolStatistics({ authToken = null } = {}) {
     return disabledResponse('Tool statistics API is not available.');
   }
 
-  try {
-    const response = await apiFetch('/api/tools/statistics', {
-      headers: authHeaders(authToken),
-    });
-    const data = await parseApiResponse(response, { fallback: {} });
-    if (!response.ok) {
-      return { ok: false, data: null, error: data?.message || getApiErrorMessage(null, response) };
+  const path = '/api/tools/statistics';
+  const resolvedToken = resolveAuthToken(authToken);
+  const cacheKey = stableGetCacheKey(path, resolvedToken);
+
+  return cachedStableGet(cacheKey, async () => {
+    try {
+      const response = await apiFetch(path, {
+        headers: authHeaders(resolvedToken),
+      });
+      const data = await parseApiResponse(response, { fallback: {} });
+      if (!response.ok) {
+        return { ok: false, data: null, error: data?.message || getApiErrorMessage(null, response) };
+      }
+      return { ok: true, data, error: null };
+    } catch (error) {
+      return { ok: false, data: null, error: getApiErrorMessage(error) };
     }
-    return { ok: true, data, error: null };
-  } catch (error) {
-    return { ok: false, data: null, error: getApiErrorMessage(error) };
-  }
+  });
 }

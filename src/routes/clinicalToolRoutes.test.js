@@ -17,6 +17,7 @@ import {
   REGISTRY_TOOL_PATHS,
   TOOLS_OVERVIEW_PATHS,
   expectedLaunchPath,
+  getCalculatorRouteBySlug,
   isKnownToolAreaPath,
   matchCalculatorRoute,
   resolveToolsAreaRedirect,
@@ -95,6 +96,14 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
     }
   });
 
+  it('resolves calculator routes by slug through the indexed route map', () => {
+    for (const path of REQUIRED_CALCULATOR_PATHS) {
+      const slug = path.split('/').pop();
+      expect(getCalculatorRouteBySlug(slug)).toEqual(matchCalculatorRoute(path));
+    }
+    expect(getCalculatorRouteBySlug('not-a-real-calc-xyz')).toBeNull();
+  });
+
   it('catalog launch paths resolve for required calculators', () => {
     for (const path of REQUIRED_CALCULATOR_PATHS) {
       const slug = path.split('/').pop();
@@ -127,10 +136,10 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
     expect(resolveToolsAreaRedirect('/tools/calculators/not-a-real-calc-xyz')).toBeNull();
   });
 
-  it('redirects Tier B hub subpaths to chat with ?tool= for chat launch', () => {
+  it('redirects Tier B hub subpaths to Assistant with ?tool= for chat launch', () => {
     const redirect = resolveToolsAreaRedirect('/tools/calculators/wells-pe');
     expect(redirect).toEqual({
-      pathname: '/chat',
+      pathname: '/assistant',
       search: '?tool=wells-pe',
     });
   });

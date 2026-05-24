@@ -48,28 +48,32 @@ export default function CalculatorRecommender({ embedded = false, onCloseEmbedde
 
     setChatLoading(true);
     setError(null);
-    const response = await sendClinicalChatMessage({
-      message: buildCalculatorRecommendationChatMessage(input),
-      tool: 'calculator-recommender-ai',
-      feature: 'calculator-recommender-ai',
-      authToken: localStorage.getItem('caredroid_access_token'),
-    });
+    try {
+      const response = await sendClinicalChatMessage({
+        message: buildCalculatorRecommendationChatMessage(input),
+        tool: 'calculator-recommender-ai',
+        feature: 'calculator-recommender-ai',
+      });
 
-    if (response.ok) {
-      setChatResult(response.data);
-      if (response.data?.toolResult?.result?.recommendations) {
-        setResult({
-          capabilityId: 'calculator-recommender-ai',
-          status: 'matched',
-          recommendations: response.data.toolResult.result.recommendations,
-          matchedContexts: response.data.toolResult.result.matchedContexts || [],
-          safety: response.data.toolResult.result.safety || { warnings: [] },
-        });
+      if (response.ok) {
+        setChatResult(response.data);
+        if (response.data?.toolResult?.result?.recommendations) {
+          setResult({
+            capabilityId: 'calculator-recommender-ai',
+            status: 'matched',
+            recommendations: response.data.toolResult.result.recommendations,
+            matchedContexts: response.data.toolResult.result.matchedContexts || [],
+            safety: response.data.toolResult.result.safety || { warnings: [] },
+          });
+        }
+      } else {
+        setError(response.data?.message || 'Unable to start calculator recommendation chat workflow.');
       }
-    } else {
-      setError(response.data?.message || 'Unable to start calculator recommendation chat workflow.');
+    } catch (err) {
+      setError(err.message || 'Unable to start calculator recommendation chat workflow.');
+    } finally {
+      setChatLoading(false);
     }
-    setChatLoading(false);
   };
 
   const clear = () => {

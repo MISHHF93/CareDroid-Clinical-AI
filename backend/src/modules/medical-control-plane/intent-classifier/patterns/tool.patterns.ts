@@ -1311,6 +1311,15 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   },
 ];
 
+const TOOL_PATTERN_BY_ID = new Map(CLINICAL_TOOL_PATTERNS.map((pattern) => [pattern.toolId, pattern]));
+const NORMALIZED_TOOL_PATTERNS = CLINICAL_TOOL_PATTERNS.map((pattern) => ({
+  pattern,
+  keywords: pattern.keywords.map((keyword) => ({
+    original: keyword,
+    normalized: keyword.toLowerCase(),
+  })),
+}));
+
 /**
  * Match clinical tool patterns in a message
  * Returns array of potential tools with confidence scores
@@ -1329,12 +1338,12 @@ export function matchToolPatterns(message: string): Array<{
     matchedKeywords: string[];
   }> = [];
 
-  for (const pattern of CLINICAL_TOOL_PATTERNS) {
+  for (const { pattern, keywords } of NORMALIZED_TOOL_PATTERNS) {
     const matchedKeywords: string[] = [];
 
-    for (const keyword of pattern.keywords) {
-      if (lowerMessage.includes(keyword.toLowerCase())) {
-        matchedKeywords.push(keyword);
+    for (const keyword of keywords) {
+      if (lowerMessage.includes(keyword.normalized)) {
+        matchedKeywords.push(keyword.original);
       }
     }
 
@@ -1674,7 +1683,7 @@ export function matchToolPatterns(message: string): Array<{
  * Get tool pattern by ID
  */
 export function getToolPattern(toolId: string): ToolPattern | undefined {
-  return CLINICAL_TOOL_PATTERNS.find((p) => p.toolId === toolId);
+  return TOOL_PATTERN_BY_ID.get(toolId);
 }
 
 /**

@@ -156,9 +156,9 @@ describe('Production routes — tools area fallback redirects', () => {
     expect(redirect?.pathname).toBe('/tools/calculator/sofa');
   });
 
-  it('redirects chat-assisted mistyped subpath to chat with legacy tool param', () => {
+  it('redirects chat-assisted mistyped subpath to Assistant with legacy tool param', () => {
     const redirect = resolveToolsAreaRedirect('/tools/calculators/wells-pe');
-    expect(redirect?.pathname).toBe('/chat');
+    expect(redirect?.pathname).toBe('/assistant');
     expect(redirect?.search).toBe('?tool=wells-pe');
   });
 

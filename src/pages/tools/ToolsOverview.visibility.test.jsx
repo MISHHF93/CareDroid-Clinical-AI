@@ -175,7 +175,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(mockConversationValue.selectTool).toHaveBeenCalledWith('wells-pe');
     expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('wells-pe');
     expect(navigateMock).toHaveBeenLastCalledWith(
-      { pathname: '/chat', search: '' },
+      { pathname: '/assistant', search: '' },
       expect.objectContaining({ replace: true })
     );
   }, 10000);

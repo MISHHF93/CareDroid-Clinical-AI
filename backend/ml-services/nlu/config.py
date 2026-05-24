@@ -40,7 +40,12 @@ INFERENCE_CONFIG = {
     "batch_size": int(os.getenv("NLU_INFERENCE_BATCH_SIZE", "32")),
     "use_gpu": os.getenv("NLU_USE_GPU", "true").lower() == "true",
     "num_workers": int(os.getenv("NLU_INFERENCE_WORKERS", "4")),
-    "confidence_threshold": float(os.getenv("NLU_CONFIDENCE_THRESHOLD", "0.5")),
+    "confidence_threshold": float(
+        os.getenv(
+            "NLU_INFERENCE_CONFIDENCE_THRESHOLD",
+            os.getenv("NLU_CONFIDENCE_THRESHOLD", "0.5"),
+        )
+    ),
 }
 
 # Service Configuration

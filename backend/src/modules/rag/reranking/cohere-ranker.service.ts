@@ -61,8 +61,8 @@ export class CohereRankerService {
       );
 
       // Prepare documents for Cohere
-      const documents = chunks.map((chunk) => ({
-        index: chunks.indexOf(chunk),
+      const documents = chunks.map((chunk, index) => ({
+        index,
         text: chunk.text.substring(0, 1000), // Cohere has 1000 char limit per doc
       }));
 

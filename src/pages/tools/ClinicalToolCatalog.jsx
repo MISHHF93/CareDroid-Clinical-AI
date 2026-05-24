@@ -637,7 +637,7 @@ const ClinicalToolCatalog = () => {
     }
     if (chatSeed) {
       addMessage(chatSeed, 'user');
-      navigate('/chat');
+      navigate('/assistant');
     }
   };
 

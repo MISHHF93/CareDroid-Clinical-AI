@@ -29,6 +29,7 @@ import { readToolPatternsSource } from './clinicalToolAliasSync';
 import { parseClinicalToolPatternRecords } from './parseToolPatterns';
 import {
   CALCULATOR_ROUTE_DEFS,
+  getCalculatorRouteBySlug,
   isKnownToolAreaPath,
   matchCalculatorRoute,
 } from '../routes/clinicalToolRoutes';
@@ -91,7 +92,7 @@ function appRouteRegistered(path, registryId, builtinSlug) {
     return appSource.includes(`path: '${spec.routePath}'`);
   }
   if (builtinSlug) {
-    const def = CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === builtinSlug);
+    const def = getCalculatorRouteBySlug(builtinSlug);
     if (def && appSource.includes('CALCULATOR_ROUTE_DEFS.map')) return true;
   }
   return appSource.includes(`path: '${path}'`);

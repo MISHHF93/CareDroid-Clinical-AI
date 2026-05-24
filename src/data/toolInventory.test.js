@@ -8,6 +8,7 @@ import {
   getFrontendVisibleToolInventory,
   getSidebarToolRegistryProjection,
   getSidebarToolInventory,
+  getUserFacingToolRegistryProjection,
   getUserFacingToolInventory,
   resolveToolInventoryRecord,
   TOOL_EXECUTOR_STATUS,
@@ -80,6 +81,12 @@ describe('canonical tool inventory', () => {
       expect(Array.isArray(tool.features), tool.id).toBe(true);
       expect(tool.canonicalInventoryId, tool.id).toBe(tool.id);
     }
+  });
+
+  it('memoizes stable canonical inventory projections for repeated UI lookups', () => {
+    expect(getUserFacingToolInventory()).toBe(getUserFacingToolInventory());
+    expect(getSidebarToolRegistryProjection()).toBe(getSidebarToolRegistryProjection());
+    expect(getUserFacingToolRegistryProjection()).toBe(getUserFacingToolRegistryProjection());
   });
 
   it('covers every NLU profile through a canonical record', () => {

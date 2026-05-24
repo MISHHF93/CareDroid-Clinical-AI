@@ -50,7 +50,7 @@ const SharedToolSession = () => {
           </pre>
         )}
         <div className="shared-actions">
-          <button onClick={() => navigate('/dashboard')}>Open Dashboard</button>
+          <button onClick={() => navigate('/home')}>Open Home</button>
           {tool && (
             <button onClick={() => navigate(tool.path)}>Open Tool</button>
           )}

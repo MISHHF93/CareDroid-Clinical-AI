@@ -32,7 +32,10 @@ import {
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import { PR_FLEET_TOOL_SPECS } from './prFleetTestConstants';
 import { tierForRegistryId } from './e2eToolValidationMatrix';
-import { CALCULATOR_ROUTE_DEFS, isKnownToolAreaPath } from '../routes/clinicalToolRoutes';
+import {
+  getCalculatorRouteBySlug,
+  isKnownToolAreaPath,
+} from '../routes/clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -125,7 +128,7 @@ function appRouteRegistered(registryId, builtinSlug, regPath) {
     );
   }
   if (builtinSlug) {
-    const def = CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === builtinSlug);
+    const def = getCalculatorRouteBySlug(builtinSlug);
     if (def && appUsesDynamicCalculatorRoutes()) return true;
     if (appSource.includes(`initialCalculatorId="${builtinSlug}"`)) return true;
     if (def && appSource.includes(`path: '${def.path}'`)) return true;

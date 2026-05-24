@@ -26,7 +26,7 @@ describe('registryToolLaunch', () => {
   it.each(TIER_B_CHAT_CALCULATOR_REGISTRY_IDS)('Tier B %s launches chat-assisted flow', (id) => {
     const plan = getRegistryToolNavigation(id);
     expect(plan.mode).toBe('chat-assisted');
-    expect(plan.pathname).toBe('/chat');
+    expect(plan.pathname).toBe('/assistant');
     expect(plan.shouldSeedChat).toBe(true);
     expect(plan.launch.chatSeed?.length).toBeGreaterThan(20);
   });
@@ -34,7 +34,7 @@ describe('registryToolLaunch', () => {
   it('dispatch-ai uses chat-assisted flow', () => {
     const plan = getRegistryToolNavigation('dispatch-ai');
     expect(plan.mode).toBe('chat-assisted');
-    expect(plan.pathname).toBe('/chat');
+    expect(plan.pathname).toBe('/assistant');
   });
 
   it.each(NLU_PROFILE_TOOL_IDS)('NLU profile %s resolves via getRegistryToolNavigation', (nluId) => {
@@ -80,7 +80,7 @@ describe('registryToolLaunch', () => {
 
       if (record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) {
         expect(plan.mode, record.id).toBe('chat-assisted');
-        expect(plan.pathname, record.id).toBe('/chat');
+        expect(plan.pathname, record.id).toBe('/assistant');
         expect(plan.shouldSeedChat, record.id).toBe(true);
         expect(plan.launch.chatSeed, record.id).toBeTruthy();
       }

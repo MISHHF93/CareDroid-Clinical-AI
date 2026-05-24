@@ -72,16 +72,30 @@ const ToolsOverview = () => {
   } = useToolPreferences();
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
 
-  const tools = getUserFacingToolRegistryProjection();
-  const toolById = Object.fromEntries(tools.map((tool) => [tool.id, tool]));
-  const activeWorkspace = workspaces.find((workspace) => workspace.id === activeWorkspaceId);
+  const tools = useMemo(() => getUserFacingToolRegistryProjection(), []);
+  const toolById = useMemo(() => Object.fromEntries(tools.map((tool) => [tool.id, tool])), [tools]);
+  const activeWorkspace = useMemo(
+    () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
+    [activeWorkspaceId, workspaces]
+  );
   const isAllToolsWorkspace = activeWorkspaceId === 'all';
-  const workspaceToolIds = isAllToolsWorkspace
-    ? tools.map((tool) => tool.id)
-    : activeWorkspace
-    ? activeWorkspace.toolIds || []
-    : tools.map((tool) => tool.id);
-  const workspaceTools = tools.filter((tool) => workspaceToolIds.includes(tool.id));
+  const allToolIds = useMemo(() => tools.map((tool) => tool.id), [tools]);
+  const workspaceToolIds = useMemo(
+    () =>
+      isAllToolsWorkspace
+        ? allToolIds
+        : activeWorkspace
+          ? activeWorkspace.toolIds || []
+          : allToolIds,
+    [activeWorkspace, allToolIds, isAllToolsWorkspace]
+  );
+  const workspaceToolIdSet = useMemo(() => new Set(workspaceToolIds), [workspaceToolIds]);
+  const pinnedToolIdSet = useMemo(() => new Set(pinned), [pinned]);
+  const favoriteToolIdSet = useMemo(() => new Set(favorites), [favorites]);
+  const workspaceTools = useMemo(
+    () => tools.filter((tool) => workspaceToolIdSet.has(tool.id)),
+    [tools, workspaceToolIdSet]
+  );
   const searchQuery = normalizeSearch(search);
   const filteredTools = useMemo(
     () =>
@@ -92,9 +106,13 @@ const ToolsOverview = () => {
       }),
     [workspaceTools, searchQuery, toolFilter]
   );
-  const recentToolItems = recentTools
-    .map((toolId) => toolById[toolId])
-    .filter((tool) => tool && (isAllToolsWorkspace || workspaceToolIds.includes(tool.id)));
+  const recentToolItems = useMemo(
+    () =>
+      recentTools
+        .map((toolId) => toolById[toolId])
+        .filter((tool) => tool && (isAllToolsWorkspace || workspaceToolIdSet.has(tool.id))),
+    [isAllToolsWorkspace, recentTools, toolById, workspaceToolIdSet]
+  );
 
   const handleToolClick = (tool) => {
     applyRegistryToolLaunch(tool.id, {
@@ -119,12 +137,26 @@ const ToolsOverview = () => {
     navigate('/assistant');
   };
 
-  const orderedTools = [
-    ...filteredTools.filter((tool) => pinned.includes(tool.id)),
-    ...filteredTools.filter((tool) => !pinned.includes(tool.id))
-  ];
-  const calculatorCount = tools.filter((tool) => tool.category === 'Calculator').length;
-  const chatAssistedCount = tools.filter((tool) => tool.surface === 'chat-assisted').length;
+  const orderedTools = useMemo(() => {
+    const pinnedTools = [];
+    const unpinnedTools = [];
+    for (const tool of filteredTools) {
+      if (pinnedToolIdSet.has(tool.id)) {
+        pinnedTools.push(tool);
+      } else {
+        unpinnedTools.push(tool);
+      }
+    }
+    return [...pinnedTools, ...unpinnedTools];
+  }, [filteredTools, pinnedToolIdSet]);
+  const calculatorCount = useMemo(
+    () => tools.filter((tool) => tool.category === 'Calculator').length,
+    [tools]
+  );
+  const chatAssistedCount = useMemo(
+    () => tools.filter((tool) => tool.surface === 'chat-assisted').length,
+    [tools]
+  );
   const showWorkspaceEmpty = workspaceTools.length === 0;
   const showSearchEmpty = !showWorkspaceEmpty && filteredTools.length === 0;
 
@@ -304,8 +336,8 @@ const ToolsOverview = () => {
               </div>
               <div className="tool-card-actions">
                 <button
-                  className={`tool-card-action ${favorites.includes(tool.id) ? 'active' : ''}`}
-                  title={favorites.includes(tool.id) ? 'Remove from favorites' : 'Add to favorites'}
+                  className={`tool-card-action ${favoriteToolIdSet.has(tool.id) ? 'active' : ''}`}
+                  title={favoriteToolIdSet.has(tool.id) ? 'Remove from favorites' : 'Add to favorites'}
                   onClick={(e) => {
                     e.stopPropagation();
                     toggleFavorite(tool.id);
@@ -315,13 +347,13 @@ const ToolsOverview = () => {
                   <NavIcon
                     icon={CHROME_ICONS.star}
                     size={16}
-                    fill={favorites.includes(tool.id) ? 'currentColor' : 'none'}
+                    fill={favoriteToolIdSet.has(tool.id) ? 'currentColor' : 'none'}
                     aria-hidden
                   />
                 </button>
                 <button
-                  className={`tool-card-action ${pinned.includes(tool.id) ? 'active' : ''}`}
-                  title={pinned.includes(tool.id) ? 'Unpin tool' : 'Pin tool'}
+                  className={`tool-card-action ${pinnedToolIdSet.has(tool.id) ? 'active' : ''}`}
+                  title={pinnedToolIdSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
                   onClick={(e) => {
                     e.stopPropagation();
                     togglePinned(tool.id);

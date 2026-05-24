@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import ApiStateBanner from '../../components/ApiStateBanner';
-import { apiFetch, parseApiResponse, getApiErrorMessage } from '../../services/apiClient';
+import { sendClinicalChatMessage } from '../../services/clinicalChatService';
 import { fetchProtocols } from '../../services/clinicalContentApi';
 
 const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
@@ -61,22 +61,14 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
     setError(null);
     setResults(null);
     try {
-      const response = await apiFetch('/api/chat/message', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('caredroid_access_token')}`,
-        },
-        body: JSON.stringify({
-          message: `Provide the clinical protocol for: ${protocolName}`,
-          tool: 'protocols',
-        }),
+      const { ok, data } = await sendClinicalChatMessage({
+        message: `Provide the clinical protocol for: ${protocolName}`,
+        tool: 'protocols',
       });
 
-      if (!response.ok) {
-        throw new Error(getApiErrorMessage(null, response));
+      if (!ok) {
+        throw new Error(data?.message || 'Unable to load protocol.');
       }
-      const data = await parseApiResponse(response, { fallback: {} });
       setResults(data.response || data.message || 'No protocol content returned.');
     } catch (err) {
       setError(

@@ -139,7 +139,7 @@ function buildOutreachChatPrompt({ intent: intentId, target, reason, timing, con
 
 /**
  * Dashboard — clinical chat (full width). Tools open on dedicated /tools/* routes.
- * Legacy URLs `/dashboard?tool=…` redirect to the matching tool page.
+ * Legacy URLs `/dashboard?tool=…` and `/chat?tool=…` redirect through canonical routes.
  */
 function Dashboard() {
   const { authToken, hasPermission } = useUser();
@@ -307,7 +307,7 @@ function Dashboard() {
     const entry = toolRegistryById[panelRegistryId];
     if (!entry) {
       clearTool();
-      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
+      navigate({ pathname: '/home', search: '' }, { replace: true });
       return;
     }
 

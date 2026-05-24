@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
@@ -69,21 +69,38 @@ const Sidebar = forwardRef(function Sidebar(
   const unreadCount = notifications.filter(n => !n.read).length;
 
   // Medical Tools - Enhanced with navigation
-  const medicalTools = getSidebarToolRegistryProjection();
-  const sidebarToolById = Object.fromEntries(medicalTools.map((tool) => [tool.id, tool]));
-  const activeWorkspace = workspaces.find((workspace) => workspace.id === activeWorkspaceId);
-  const workspaceToolIds = activeWorkspace?.toolIds?.length
-    ? activeWorkspace.toolIds
-    : medicalTools.map((tool) => tool.id);
-  const workspaceTools = medicalTools.filter((tool) => workspaceToolIds.includes(tool.id));
-  const { pinnedTools, favoriteTools, categoryGroups } = partitionSidebarTools(
-    workspaceTools,
-    pinned,
-    favorites
+  const medicalTools = useMemo(() => getSidebarToolRegistryProjection(), []);
+  const sidebarToolById = useMemo(
+    () => Object.fromEntries(medicalTools.map((tool) => [tool.id, tool])),
+    [medicalTools]
   );
-  const recentToolItems = recentTools
-    .map((toolId) => sidebarToolById[toolId])
-    .filter((tool) => tool && workspaceToolIds.includes(tool.id));
+  const activeWorkspace = useMemo(
+    () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
+    [activeWorkspaceId, workspaces]
+  );
+  const allMedicalToolIds = useMemo(() => medicalTools.map((tool) => tool.id), [medicalTools]);
+  const workspaceToolIds = useMemo(
+    () => (activeWorkspace?.toolIds?.length ? activeWorkspace.toolIds : allMedicalToolIds),
+    [activeWorkspace, allMedicalToolIds]
+  );
+  const workspaceToolIdSet = useMemo(() => new Set(workspaceToolIds), [workspaceToolIds]);
+  const pinnedToolIdSet = useMemo(() => new Set(pinned), [pinned]);
+  const favoriteToolIdSet = useMemo(() => new Set(favorites), [favorites]);
+  const workspaceTools = useMemo(
+    () => medicalTools.filter((tool) => workspaceToolIdSet.has(tool.id)),
+    [medicalTools, workspaceToolIdSet]
+  );
+  const { pinnedTools, favoriteTools, categoryGroups } = useMemo(
+    () => partitionSidebarTools(workspaceTools, pinned, favorites),
+    [favorites, pinned, workspaceTools]
+  );
+  const recentToolItems = useMemo(
+    () =>
+      recentTools
+        .map((toolId) => sidebarToolById[toolId])
+        .filter((tool) => tool && workspaceToolIdSet.has(tool.id)),
+    [recentTools, sidebarToolById, workspaceToolIdSet]
+  );
 
   // Visible IA follows the clinical operating system map while legacy routes remain available.
   const navItems = PRIMARY_NAV_ITEMS;
@@ -137,22 +154,28 @@ const Sidebar = forwardRef(function Sidebar(
 
   const isOnToolsOverview = location.pathname === '/tools';
   const isOnToolsCatalog = location.pathname === '/tools/catalog';
+  const activeCalculatorMatch = useMemo(
+    () => matchCalculatorRoute(location.pathname),
+    [location.pathname]
+  );
+  const activeCalcParam = useMemo(
+    () => new URLSearchParams(location.search).get('calc'),
+    [location.search]
+  );
 
   const isNavItemActive = (item) => primaryNavPathMatches(item, location.pathname);
 
   const isToolRouteActive = (tool) => {
     const path = location.pathname;
-    const calcParam = new URLSearchParams(location.search).get('calc');
 
     if (tool.initialCalc) {
-      const calcMatch = matchCalculatorRoute(path);
-      if (calcMatch?.calculatorSlug === tool.initialCalc) return true;
-      if (path === '/tools/calculators' && calcParam === tool.initialCalc) return true;
+      if (activeCalculatorMatch?.calculatorSlug === tool.initialCalc) return true;
+      if (path === '/tools/calculators' && activeCalcParam === tool.initialCalc) return true;
     }
 
     if (tool.path && path === tool.path) {
       if (tool.path === '/tools/calculators' && tool.id !== 'calculators') {
-        return !matchCalculatorRoute(path);
+        return !activeCalculatorMatch;
       }
       return true;
     }
@@ -191,9 +214,12 @@ const Sidebar = forwardRef(function Sidebar(
   const renderToolCard = (tool) => {
     const isSelected =
       currentTool === tool.id &&
-      (location.pathname === '/dashboard' || location.pathname === '/chat' || isToolRouteActive(tool));
-    const isFavorite = favorites.includes(tool.id);
-    const isPinned = pinned.includes(tool.id);
+      (
+        ['/home', '/dashboard', '/assistant', '/chat'].includes(location.pathname) ||
+        isToolRouteActive(tool)
+      );
+    const isFavorite = favoriteToolIdSet.has(tool.id);
+    const isPinned = pinnedToolIdSet.has(tool.id);
 
     return (
       <div

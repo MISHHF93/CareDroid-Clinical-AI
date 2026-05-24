@@ -6,13 +6,14 @@
 import { builtinUiCalculators, clinicalIntentTools, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
 import { NLU_HUB_ONLY_PROFILE_TOOL_IDS } from './clinicalToolIdContract';
 import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
-import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes';
+import { getCalculatorRouteBySlug } from '../routes/clinicalToolRoutes';
 import { getCalculatorToolInventory, TOOL_SURFACES } from './toolInventory';
 
 /** Every built-in form slug implemented in CalculatorInterface. */
 export const BUILTIN_CALCULATOR_SWITCH_SLUGS = Object.freeze(
   builtinUiCalculators.map((c) => c.id)
 );
+const BUILTIN_CALCULATOR_SWITCH_SLUG_SET = new Set(BUILTIN_CALCULATOR_SWITCH_SLUGS);
 
 /**
  * CSS hook for form smoke / hub tests. Slugs without a BEM modifier use `.calculator-interface`.
@@ -133,7 +134,7 @@ export const BUILTIN_CALCULATOR_FORM_SMOKE_ROWS = Object.freeze(
  * @returns {boolean}
  */
 export function isBuiltinCalculatorSlug(slug) {
-  return BUILTIN_CALCULATOR_SWITCH_SLUGS.includes(slug);
+  return BUILTIN_CALCULATOR_SWITCH_SLUG_SET.has(slug);
 }
 
 /**
@@ -141,7 +142,7 @@ export function isBuiltinCalculatorSlug(slug) {
  * @returns {{ path: string, calculatorSlug: string } | undefined}
  */
 export function getBuiltinCalculatorRouteDef(slug) {
-  return CALCULATOR_ROUTE_DEFS.find((d) => d.calculatorSlug === slug);
+  return getCalculatorRouteBySlug(slug);
 }
 
 /**

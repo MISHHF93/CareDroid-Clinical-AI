@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
-import { apiFetch, parseApiResponse } from '../../services/apiClient';
+import { sendClinicalChatMessage } from '../../services/clinicalChatService';
 
 const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
@@ -35,19 +35,14 @@ const DiagnosisAssistant = ({ embedded = false, onCloseEmbedded } = {}) => {
         patientInfo.history ?`\nRelevant history: ${patientInfo.history}` : ''
       }`;
 
-      const response = await apiFetch('/api/chat/message', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('caredroid_access_token')}`,
-        },
-        body: JSON.stringify({ message, tool: 'diagnosis-assistant' }),
+      const { ok, data } = await sendClinicalChatMessage({
+        message,
+        tool: 'diagnosis',
       });
 
-      if (!response.ok) throw new Error('Failed to generate differential diagnosis');
+      if (!ok) throw new Error(data?.message || 'Failed to generate differential diagnosis');
 
-      const data = await parseApiResponse(response, { fallback: {} });
-      setResults(data.response);
+      setResults(data.response || data.message || 'No differential diagnosis content returned.');
     } catch (err) {
       setError(err.message);
     } finally {

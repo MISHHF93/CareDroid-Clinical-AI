@@ -90,7 +90,7 @@ const ToolPageLayout = ({
       ],
       timestamp: new Date(),
     });
-    const dest = embedded ? undefined : '/chat';
+    const dest = embedded ? undefined : '/assistant';
     if (dest) navigate(dest);
     onCloseEmbedded?.();
   };

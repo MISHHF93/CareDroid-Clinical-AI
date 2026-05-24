@@ -25,6 +25,13 @@ describe('build and service config consistency', () => {
     expect(read('docker-compose.yml')).toContain('NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://nlu:8001}');
   });
 
+  it('separates backend NLU client threshold from sidecar inference threshold', () => {
+    expect(read('backend/.env.example')).toContain('NLU_CONFIDENCE_THRESHOLD=0.7');
+    expect(read('backend/src/config/nlu.config.ts')).toContain('NLU_CONFIDENCE_THRESHOLD');
+    expect(read('backend/ml-services/nlu/.env.example')).toContain('NLU_INFERENCE_CONFIDENCE_THRESHOLD=0.5');
+    expect(read('backend/ml-services/nlu/config.py')).toContain('NLU_INFERENCE_CONFIDENCE_THRESHOLD');
+  });
+
   it('provides the root frontend Dockerfile used by docker-compose', () => {
     const dockerfile = read('Dockerfile');
 

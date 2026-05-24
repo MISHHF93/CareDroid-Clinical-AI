@@ -265,6 +265,12 @@ function AuthPathRedirect() {
   return <Navigate to={{ pathname: '/auth', search: location.search, hash: location.hash }} replace />;
 }
 
+/** Legacy protected paths stay deep-linkable while canonical routes own the UI. */
+function LegacyProtectedRouteRedirect({ to }) {
+  const location = useLocation();
+  return <Navigate to={{ pathname: to, search: location.search, hash: location.hash }} replace />;
+}
+
 // ==================== ROUTING ====================
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useUser();
@@ -323,13 +329,13 @@ function AppRoutes() {
     })),
 
     { path: '/home', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
-    { path: '/dashboard', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
+    { path: '/dashboard', element: <LegacyProtectedRouteRedirect to="/home" />, requiresAuth: true },
     { path: '/assistant', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
-    { path: '/chat', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
+    { path: '/chat', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
     { path: '/patients', element: <AppShellPage><Patients /></AppShellPage>, requiresAuth: true },
     { path: '/operations', element: <AppShellPage><Operations /></AppShellPage>, requiresAuth: true },
 
-    // Clinical tools: full-page routes; chat-assisted actions use /chat while /dashboard remains Pulse.
+    // Clinical tools: full-page routes; chat-assisted actions use Assistant.
     { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
     { path: '/tools/catalog', element: <AppShellPage><ClinicalToolCatalog /></AppShellPage>, requiresAuth: true },
     { path: '/tools/drug-checker', element: <AppShellPage><DrugChecker /></AppShellPage>, requiresAuth: true },
@@ -403,6 +409,7 @@ function AppRoutes() {
       permission: Permission.VIEW_AUDIT_LOGS,
     },
 
+    { path: '/fleet', element: <LegacyProtectedRouteRedirect to="/fleet/command" />, requiresAuth: true },
     { path: '/fleet/command', element: <AppShellPage><FleetDashboard /></AppShellPage>, requiresAuth: true },
     {
       path: '/fleet/predictive-maintenance',

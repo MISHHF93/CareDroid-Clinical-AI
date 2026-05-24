@@ -35,6 +35,51 @@ export const TOOL_INVENTORY_VERSION = 1;
 
 let cachedInventory = null;
 let cachedInventoryById = null;
+let cachedUserFacingInventory = null;
+let cachedSidebarToolRegistryProjection = null;
+let cachedUserFacingToolRegistryProjection = null;
+
+const CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET = new Set(CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS);
+const FLEET_TIER_A_REGISTRY_ID_SET = new Set(FLEET_TIER_A_REGISTRY_IDS);
+const FLEET_TIER_B_CHAT_REGISTRY_ID_SET = new Set(FLEET_TIER_B_CHAT_REGISTRY_IDS);
+const CLINICAL_TIER_A_CALCULATOR_REGISTRY_ID_SET = new Set(CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS);
+const CLINICAL_TIER_B_CHAT_REGISTRY_ID_SET = new Set(CLINICAL_TIER_B_CHAT_REGISTRY_IDS);
+const CLINICAL_NLU_HUB_CHAT_REGISTRY_ID_SET = new Set(CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS);
+const CLINICAL_DOSE_HUB_REGISTRY_ID_SET = new Set(CLINICAL_DOSE_HUB_REGISTRY_IDS);
+const CLINICAL_AI_PAGE_REGISTRY_ID_SET = new Set(CLINICAL_AI_PAGE_REGISTRY_IDS);
+const ORCHESTRATOR_REGISTERED_NLU_TOOL_ID_SET = new Set(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS);
+const NLU_PROFILE_TOOL_ID_SET = new Set(NLU_PROFILE_TOOL_IDS);
+const ALL_REGISTRY_TOOL_ID_ORDER = new Map(ALL_REGISTRY_TOOL_IDS.map((id, index) => [id, index]));
+
+const clinicalIntentToolById = new Map(clinicalIntentTools.map((row) => [row.toolId, row]));
+const builtinUiCalculatorById = new Map(builtinUiCalculators.map((calc) => [calc.id, calc]));
+const builtinUiCalculatorByRegistryId = new Map();
+for (const calc of builtinUiCalculators) {
+  const registryId = BUILTIN_CALC_ID_TO_REGISTRY_ID[calc.id];
+  if (registryId && !builtinUiCalculatorByRegistryId.has(registryId)) {
+    builtinUiCalculatorByRegistryId.set(registryId, calc);
+  }
+}
+
+const nluProfilesByRegistryId = new Map();
+for (const row of clinicalIntentTools) {
+  const registryIds = unique([row.sidebarToolId, row.toolId]);
+  for (const registryId of registryIds) {
+    if (!nluProfilesByRegistryId.has(registryId)) {
+      nluProfilesByRegistryId.set(registryId, []);
+    }
+    nluProfilesByRegistryId.get(registryId).push(row);
+  }
+}
+
+const aliasesByRegistryId = new Map();
+for (const [alias, target] of Object.entries(NLU_TO_REGISTRY_ID)) {
+  if (!aliasesByRegistryId.has(target)) aliasesByRegistryId.set(target, []);
+  aliasesByRegistryId.get(target).push(alias);
+}
+for (const aliases of aliasesByRegistryId.values()) {
+  aliases.sort();
+}
 
 export const TOOL_LAUNCH_TYPES = Object.freeze({
   LOCAL_ONLY: 'local-only',
@@ -259,18 +304,18 @@ function getPatternMaps() {
 
 function registryTier(registryId) {
   if (REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]) return 'C';
-  if (CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS.includes(registryId)) return 'C';
-  if (FLEET_TIER_A_REGISTRY_IDS.includes(registryId)) return 'fleet-A';
-  if (FLEET_TIER_B_CHAT_REGISTRY_IDS.includes(registryId)) return 'fleet-B';
-  if (CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS.includes(registryId)) return 'A';
+  if (CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET.has(registryId)) return 'C';
+  if (FLEET_TIER_A_REGISTRY_ID_SET.has(registryId)) return 'fleet-A';
+  if (FLEET_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId)) return 'fleet-B';
+  if (CLINICAL_TIER_A_CALCULATOR_REGISTRY_ID_SET.has(registryId)) return 'A';
   if (
-    CLINICAL_TIER_B_CHAT_REGISTRY_IDS.includes(registryId) ||
-    CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS.includes(registryId) ||
-    CLINICAL_DOSE_HUB_REGISTRY_IDS.includes(registryId)
+    CLINICAL_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId) ||
+    CLINICAL_NLU_HUB_CHAT_REGISTRY_ID_SET.has(registryId) ||
+    CLINICAL_DOSE_HUB_REGISTRY_ID_SET.has(registryId)
   ) {
     return 'B';
   }
-  if (CLINICAL_AI_PAGE_REGISTRY_IDS.includes(registryId)) return 'clinical-page';
+  if (CLINICAL_AI_PAGE_REGISTRY_ID_SET.has(registryId)) return 'clinical-page';
   if (registryId === REGISTRY.calculatorsHub) return 'hub';
   return 'other';
 }
@@ -293,27 +338,24 @@ function componentFor(registryId, calculatorSlug, tier) {
 }
 
 function aliasesForRegistry(registryId) {
-  return Object.entries(NLU_TO_REGISTRY_ID)
-    .filter(([, target]) => target === registryId)
-    .map(([alias]) => alias)
-    .sort();
+  return aliasesByRegistryId.get(registryId) || [];
 }
 
 function primaryNluForRegistry(registryId) {
   const mapped = registryToPrimaryNluToolId(registryId);
   if (mapped && mapped !== registryId) return mapped;
-  const nlu = clinicalIntentTools.find((row) => row.sidebarToolId === registryId || row.toolId === registryId);
+  const nlu = nluProfilesByRegistryId.get(registryId)?.[0];
   return nlu?.toolId || mapped || null;
 }
 
 function nluProfilesForRegistry(registryId) {
-  return clinicalIntentTools.filter((row) => row.sidebarToolId === registryId || row.toolId === registryId);
+  return nluProfilesByRegistryId.get(registryId) || [];
 }
 
 function calculatorForRegistry(registryId, registryEntry) {
   return (
-    builtinUiCalculators.find((calc) => BUILTIN_CALC_ID_TO_REGISTRY_ID[calc.id] === registryId) ||
-    builtinUiCalculators.find((calc) => calc.id === registryEntry?.initialCalc) ||
+    builtinUiCalculatorByRegistryId.get(registryId) ||
+    builtinUiCalculatorById.get(registryEntry?.initialCalc) ||
     null
   );
 }
@@ -497,12 +539,12 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
   const tier = registryTier(registryId);
   const nluProfiles = nluProfilesForRegistry(registryId);
   const nluToolId = primaryNluForRegistry(registryId);
-  const primaryNlu = nluToolId ? clinicalIntentTools.find((row) => row.toolId === nluToolId) : null;
+  const primaryNlu = nluToolId ? clinicalIntentToolById.get(nluToolId) : null;
   const pattern = nluToolId ? patternByToolId[nluToolId] : null;
   const calculator = calculatorForRegistry(registryId, registryEntry);
   const orchestratorToolId = REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId] || null;
   const hasExecutor = Boolean(
-    orchestratorToolId && ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(orchestratorToolId)
+    orchestratorToolId && ORCHESTRATOR_REGISTERED_NLU_TOOL_ID_SET.has(orchestratorToolId)
   );
   const launchType = launchTypeForTier(tier, hasExecutor);
   const route = registryEntry?.path || primaryNlu?.path || calculator?.path || null;
@@ -567,7 +609,7 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
       ? TOOL_EXECUTOR_STATUS.REGISTERED
       : clinicalIntelligenceEndpoint
         ? TOOL_EXECUTOR_STATUS.PLATFORM
-        : nluToolId && NLU_PROFILE_TOOL_IDS.includes(nluToolId)
+        : nluToolId && NLU_PROFILE_TOOL_ID_SET.has(nluToolId)
           ? TOOL_EXECUTOR_STATUS.UNSUPPORTED
           : TOOL_EXECUTOR_STATUS.NONE,
     apiClient,
@@ -711,7 +753,10 @@ export function getSidebarToolInventory(records = getCanonicalToolInventory()) {
 }
 
 export function getUserFacingToolInventory(records = getCanonicalToolInventory()) {
-  return records
+  if (records === cachedInventory && cachedUserFacingInventory) {
+    return cachedUserFacingInventory;
+  }
+  const userFacing = records
     .filter(isUserFacingInventoryRecord)
     .map(userFacingRecordFromCanonical)
     .sort((a, b) => {
@@ -719,6 +764,10 @@ export function getUserFacingToolInventory(records = getCanonicalToolInventory()
       if (categoryCompare !== 0) return categoryCompare;
       return a.label.localeCompare(b.label);
     });
+  if (records === cachedInventory) {
+    cachedUserFacingInventory = userFacing;
+  }
+  return userFacing;
 }
 
 export function getCalculatorToolInventory(records = getCanonicalToolInventory()) {
@@ -740,8 +789,10 @@ export function getAuditToolInventory(records = getCanonicalToolInventory()) {
 }
 
 export function getSidebarToolRegistryProjection(records = getCanonicalToolInventory()) {
-  const order = new Map(ALL_REGISTRY_TOOL_IDS.map((id, index) => [id, index]));
-  return getSidebarToolInventory(records)
+  if (records === cachedInventory && cachedSidebarToolRegistryProjection) {
+    return cachedSidebarToolRegistryProjection;
+  }
+  const projection = getSidebarToolInventory(records)
     .map((record) => {
       const legacy = toolRegistryById[record.id] || {};
       const category = legacy.category || presentationCategory(record.category);
@@ -767,11 +818,22 @@ export function getSidebarToolRegistryProjection(records = getCanonicalToolInven
         executorStatus: record.executorStatus,
       };
     })
-    .sort((a, b) => (order.get(a.id) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.id) ?? Number.MAX_SAFE_INTEGER));
+    .sort(
+      (a, b) =>
+        (ALL_REGISTRY_TOOL_ID_ORDER.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
+        (ALL_REGISTRY_TOOL_ID_ORDER.get(b.id) ?? Number.MAX_SAFE_INTEGER)
+    );
+  if (records === cachedInventory) {
+    cachedSidebarToolRegistryProjection = projection;
+  }
+  return projection;
 }
 
 export function getUserFacingToolRegistryProjection(records = getCanonicalToolInventory()) {
-  return getUserFacingToolInventory(records).map((record) => {
+  if (records === cachedInventory && cachedUserFacingToolRegistryProjection) {
+    return cachedUserFacingToolRegistryProjection;
+  }
+  const projection = getUserFacingToolInventory(records).map((record) => {
     const legacy = record.legacy || {};
     const category = legacy.category || record.presentationCategory;
     return {
@@ -801,6 +863,10 @@ export function getUserFacingToolRegistryProjection(records = getCanonicalToolIn
       searchText: record.searchText,
     };
   });
+  if (records === cachedInventory) {
+    cachedUserFacingToolRegistryProjection = projection;
+  }
+  return projection;
 }
 
 export function getBackendBackedToolInventory(records = getCanonicalToolInventory()) {

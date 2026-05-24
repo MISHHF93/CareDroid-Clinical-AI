@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import ToolPageLayout from './ToolPageLayout';
 import ToolApiErrorBanner from '../../components/ToolApiErrorBanner';
-import { apiFetch, parseApiResponse, getApiErrorMessage } from '../../services/apiClient';
+import { sendClinicalChatMessage } from '../../services/clinicalChatService';
 
 const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
@@ -39,22 +39,14 @@ const ProcedureGuide = ({ embedded = false, onCloseEmbedded } = {}) => {
     setError(null);
     setResults(null);
     try {
-      const response = await apiFetch('/api/chat/message', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('caredroid_access_token')}`,
-        },
-        body: JSON.stringify({
-          message: `Provide a step-by-step guide for the following procedure: ${procedureName}`,
-          tool: 'procedures'
-        }),
+      const { ok, data } = await sendClinicalChatMessage({
+        message: `Provide a step-by-step guide for the following procedure: ${procedureName}`,
+        tool: 'procedures',
       });
 
-      if (!response.ok) {
-        throw new Error(getApiErrorMessage(null, response));
+      if (!ok) {
+        throw new Error(data?.message || 'Unable to load procedure guide.');
       }
-      const data = await parseApiResponse(response, { fallback: {} });
       setResults(data.response || data.message || 'No procedure content returned.');
     } catch (err) {
       setError(err.message || 'Unable to load procedure guide. Check your connection or try chat from the dashboard.');
