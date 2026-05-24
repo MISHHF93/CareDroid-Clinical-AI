@@ -1,4 +1,5 @@
 import React, { useState, useEffect, Suspense } from 'react';
+import { flushSync } from 'react-dom';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider, useUser, Permission } from './contexts/UserContext';
@@ -116,8 +117,10 @@ function AuthPage() {
   const navigate = useNavigate();
 
   const handleAuthSuccess = (token, user) => {
-    setAuthToken(token);
-    if (user) setUser(user);
+    flushSync(() => {
+      setAuthToken(token);
+      if (user) setUser(user);
+    });
     navigate('/dashboard', { replace: true });
   };
 
@@ -134,8 +137,10 @@ export function WelcomePage() {
   const startDevSession = async () => {
     try {
       const session = await createDevAuthSession();
-      setAuthToken(session.token);
-      setUser(session.user);
+      flushSync(() => {
+        setAuthToken(session.token);
+        setUser(session.user);
+      });
       info(
         'Signing in',
         session.backendBacked

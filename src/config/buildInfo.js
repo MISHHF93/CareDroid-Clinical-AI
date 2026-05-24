@@ -15,11 +15,11 @@ export const shortCommit = (commit) => {
 };
 
 export const buildInfo = Object.freeze({
-  appVersion: normalizeValue(injectedBuildInfo.appVersion, appConfig.app.version),
+  appVersion: normalizeValue(injectedBuildInfo.appVersion, appConfig.app?.version || '1.0.0'),
   buildTime: normalizeValue(injectedBuildInfo.buildTime),
   commit: normalizeValue(injectedBuildInfo.commit),
   branch: normalizeValue(injectedBuildInfo.branch),
-  environment: normalizeValue(injectedBuildInfo.environment, appConfig.app.environment),
+  environment: normalizeValue(injectedBuildInfo.environment, appConfig.app?.environment || 'unknown'),
   deploymentUrl: normalizeValue(injectedBuildInfo.deploymentUrl, ''),
   deploymentId: normalizeValue(injectedBuildInfo.deploymentId, ''),
   repository: normalizeValue(injectedBuildInfo.repository, ''),
