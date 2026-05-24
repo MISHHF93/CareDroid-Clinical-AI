@@ -332,6 +332,7 @@ function AssistantToolRedirect({ toolId, extras = {} }) {
 
 const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot'];
 const TOOLS_ROUTE_ALIASES = ['/all-tools', '/clinical-tools'];
+const CALCULATORS_ROUTE_ALIASES = ['/calculators'];
 
 // ==================== ROUTING ====================
 function AppRoutes() {
@@ -428,6 +429,11 @@ function AppRoutes() {
       requiresAuth: true,
     })),
     { path: '/tools/calculators', element: <AssistantToolRedirect toolId="calculators" />, requiresAuth: true },
+    ...CALCULATORS_ROUTE_ALIASES.map((path) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to="/tools/calculators" />,
+      requiresAuth: true,
+    })),
     { path: '/tools/protocols', element: <AssistantToolRedirect toolId="protocols" />, requiresAuth: true },
     { path: '/tools/diagnosis', element: <AssistantToolRedirect toolId="diagnosis-assistant" />, requiresAuth: true },
     { path: '/tools/procedures', element: <AssistantToolRedirect toolId="procedure-guide" />, requiresAuth: true },
@@ -550,7 +556,7 @@ function AppRoutes() {
       permission: Permission.VIEW_ANALYTICS
     },
 
-    { path: '*', element: isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/" replace /> }
+    { path: '*', element: isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/auth" replace /> }
   ];
 
   return (
