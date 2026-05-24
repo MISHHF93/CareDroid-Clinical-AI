@@ -154,8 +154,8 @@ const Auth = ({ onAuthSuccess }) => {
     }
   };
 
-  const applyDevSession = async () => {
-    if (!enableDevAuthBypass) {
+  const applyDevSession = async ({ forceDirect = false } = {}) => {
+    if (!forceDirect && !enableDevAuthBypass) {
       error('Local demo access disabled', 'Set VITE_ENABLE_DEV_AUTH_BYPASS=true to enable local/demo sign-in.');
       return;
     }
@@ -179,6 +179,10 @@ const Auth = ({ onAuthSuccess }) => {
 
   const handleDevDemoSession = () => {
     applyDevSession();
+  };
+
+  const handleDirectSignIn = () => {
+    applyDevSession({ forceDirect: true });
   };
 
   const devAuthBypassSection = (opts = {}) => {
@@ -255,6 +259,21 @@ const Auth = ({ onAuthSuccess }) => {
       ) : (
         <>
           {devAuthBypassSection()}
+          <section className="auth-dev-oneclick" aria-label="Direct sign in">
+            <p className="auth-division-tag">Direct sign in</p>
+            <Button
+              type="button"
+              variant="success"
+              size="lg"
+              onClick={handleDirectSignIn}
+              leftIcon={<NavIcon icon={CHROME_ICONS.zap} size={20} aria-hidden />}
+            >
+              Direct Sign In
+            </Button>
+            <p className="auth-dev-oneclick__hint">
+              Immediate access flow for local testing that skips additional verification prompts.
+            </p>
+          </section>
 
           <header className="auth-panel__header">
             <h1 className="auth-panel__title">{mode === 'login' ? 'Sign in' : 'Create account'}</h1>
