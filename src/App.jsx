@@ -81,6 +81,7 @@ const DiagnosisAssistant = lazyWithRetry(() => import('./pages/tools/DiagnosisAs
 const ProcedureGuide = lazyWithRetry(() => import('./pages/tools/ProcedureGuide'));
 const AmbientScribe = lazyWithRetry(() => import('./pages/tools/AmbientScribe'));
 const CalculatorRecommender = lazyWithRetry(() => import('./pages/tools/CalculatorRecommender'));
+const PulmonologyAssistantPage = lazyWithRetry(() => import('./pages/tools/PulmonologyAssistantPage'));
 const GuidelineRag = lazyWithRetry(() => import('./pages/tools/GuidelineRag'));
 const DifferentialAi = lazyWithRetry(() => import('./pages/tools/DifferentialAi'));
 const TimelineAi = lazyWithRetry(() => import('./pages/tools/TimelineAi'));
@@ -656,6 +657,15 @@ function AppRoutes() {
       element: (
         <AppShellPage>
           <CalculatorRecommender />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/pulmonology/:toolId',
+      element: (
+        <AppShellPage>
+          <PulmonologyAssistantPage />
         </AppShellPage>
       ),
       requiresAuth: true,

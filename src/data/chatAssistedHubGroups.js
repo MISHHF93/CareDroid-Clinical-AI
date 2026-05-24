@@ -40,6 +40,18 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     toolIds: ['copd-gold'],
   },
   {
+    groupId: 'pulmonology-assistants',
+    heading: 'Pulmonology workflow assistants',
+    lead:
+      'Asthma, ventilator, oxygen escalation, and COPD assistants organize respiratory review and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend treatment or disposition, and must not delay emergency respiratory, oxygen, ventilator, asthma, or COPD pathways.',
+    toolIds: [
+      'asthma-exacerbation-assistant',
+      'ventilator-support-assistant',
+      'oxygen-escalation-helper',
+      'copd-workflow-assistant',
+    ],
+  },
+  {
     groupId: 'gastrointestinal',
     heading: 'Rome IV IBS criteria',
     lead:
@@ -88,6 +100,10 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'wells-pe': 'PE cannot be ruled out with certainty; unstable patients need urgent evaluation first.',
   perc: 'PERC does not rule out pulmonary embolism with certainty.',
   'copd-gold': 'Acute COPD exacerbation or severe respiratory distress takes priority over grouping chat.',
+  'asthma-exacerbation-assistant': 'Life-threatening asthma features require urgent pathways before chat.',
+  'ventilator-support-assistant': 'Bedside clinician and respiratory therapy review take priority over chat.',
+  'oxygen-escalation-helper': 'Severe hypoxemia or respiratory distress takes priority over chat.',
+  'copd-workflow-assistant': 'Acute COPD exacerbation or respiratory failure takes priority over chat.',
   'rome-iv-ibs': 'Alarm features and urgent gastrointestinal evaluation take priority over criteria chat.',
   phq9: 'Question 9 self-harm or suicidal ideation requires immediate safety assessment before routine scoring.',
   gad7: 'Suicidal ideation or acute psychiatric emergency takes priority over anxiety screening chat.',

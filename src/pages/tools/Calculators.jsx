@@ -86,6 +86,15 @@ import {
   PewsCalculator,
   RevisedTraumaScoreCalculator,
 } from './emergencyCriticalCareCalculators';
+import {
+  AaGradientCalculator,
+  AsthmaSeverityScoreCalculator,
+  BodeIndexCalculator,
+  CopdGoldAssessmentCalculator,
+  Pao2Fio2RatioCalculator,
+  PneumoniaSeverityIndexCalculator,
+  RoxIndexCalculator,
+} from './pulmonologyCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -482,6 +491,20 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <CkdStagingCalculator onResultChange={onResultChange} />;
     case 'stop-bang':
       return <StopBangCalculator onResultChange={onResultChange} />;
+    case 'bode-index':
+      return <BodeIndexCalculator onResultChange={onResultChange} />;
+    case 'copd-gold-assessment':
+      return <CopdGoldAssessmentCalculator onResultChange={onResultChange} />;
+    case 'aa-gradient':
+      return <AaGradientCalculator onResultChange={onResultChange} />;
+    case 'pao2-fio2-ratio':
+      return <Pao2Fio2RatioCalculator onResultChange={onResultChange} />;
+    case 'rox-index':
+      return <RoxIndexCalculator onResultChange={onResultChange} />;
+    case 'pneumonia-severity-index':
+      return <PneumoniaSeverityIndexCalculator onResultChange={onResultChange} />;
+    case 'asthma-severity-score':
+      return <AsthmaSeverityScoreCalculator onResultChange={onResultChange} />;
     case 'audit-c':
       return <AuditCCalculator onResultChange={onResultChange} />;
     case 'heart-score':

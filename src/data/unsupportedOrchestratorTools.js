@@ -36,6 +36,15 @@ const CLINICAL_PAGE_NLU = new Set([
   NLU.differentialDiagnosis,
   NLU.antibioticGuide,
   NLU.abgInterpreter,
+  NLU.asthmaExacerbationAssistant,
+  NLU.ventilatorSupportAssistant,
+  NLU.oxygenEscalationHelper,
+  NLU.copdWorkflowAssistant,
+  NLU.ventilatorMonitoringDashboard,
+  NLU.respiratoryTelemetryDashboard,
+  NLU.sleepApneaAnalytics,
+  NLU.pulmonaryTrendEngine,
+  NLU.respiratoryCommandCenter,
 ]);
 
 /** @returns {UnsupportedOrchestratorToolRow[]} */

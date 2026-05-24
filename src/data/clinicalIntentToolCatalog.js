@@ -157,6 +157,90 @@ const clinicalIntentToolsRaw = [
     backendExecutable: false,
   },
   {
+    toolId: NLU.bodeIndex,
+    toolName: 'BODE Index',
+    category: 'calculator',
+    description:
+      'COPD prognosis context using BMI, FEV1 percent predicted, 6-minute walk distance, and mMRC dyspnea. Does not diagnose COPD or recommend therapy.',
+    path: '/tools/calculators/bode-index',
+    sidebarToolId: REGISTRY.bodeIndex,
+    chatSeed:
+      'Help me calculate the BODE Index from BMI, FEV1 percent predicted, 6-minute walk distance, and mMRC dyspnea. Clinical decision support only; do not diagnose COPD or recommend inhalers, oxygen, pulmonary rehab, transplant referral, admission, or discharge.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.copdGoldAssessment,
+    toolName: 'COPD GOLD Assessment',
+    category: 'calculator',
+    description:
+      'COPD GOLD A/B/E grouping and optional spirometric grade context. Does not diagnose COPD or recommend inhalers, steroids, antibiotics, oxygen, or disposition.',
+    path: '/tools/calculators/copd-gold-assessment',
+    sidebarToolId: REGISTRY.copdGoldAssessment,
+    chatSeed:
+      'Help me apply COPD GOLD assessment using mMRC or CAT symptom burden, exacerbation history, hospitalization history, and optional FEV1 percent predicted. Clinical decision support only; do not diagnose COPD, do not replace post-bronchodilator spirometry, and do not recommend inhalers, steroids, antibiotics, oxygen, admission, or discharge.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.aaGradient,
+    toolName: 'A-a Gradient',
+    category: 'calculator',
+    description:
+      'Alveolar-arterial oxygen gradient from ABG values and FiO2 assumptions. Does not diagnose PE, shunt, V/Q mismatch, or respiratory failure.',
+    path: '/tools/calculators/aa-gradient',
+    sidebarToolId: REGISTRY.aaGradient,
+    chatSeed:
+      'Help me calculate the A-a gradient from age, FiO2, PaO2, PaCO2, atmospheric pressure, and respiratory quotient. Clinical decision support only; verify ABG quality and do not diagnose PE, shunt, V/Q mismatch, or respiratory failure.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pao2Fio2Ratio,
+    toolName: 'PaO2/FiO2 Ratio',
+    category: 'calculator',
+    description:
+      'Oxygenation ratio support for ABG and FiO2 context. Does not diagnose ARDS or recommend ventilator or oxygen changes.',
+    path: '/tools/calculators/pao2-fio2-ratio',
+    sidebarToolId: REGISTRY.pao2Fio2Ratio,
+    chatSeed:
+      'Help me calculate the PaO2/FiO2 ratio from PaO2 and FiO2. Clinical decision support only; do not diagnose ARDS and do not recommend oxygen device, ventilator settings, intubation, ICU admission, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.roxIndex,
+    toolName: 'ROX Index',
+    category: 'calculator',
+    description:
+      'ROX index from SpO2, FiO2, and respiratory rate for high-flow oxygen monitoring context. Does not determine escalation or intubation.',
+    path: '/tools/calculators/rox-index',
+    sidebarToolId: REGISTRY.roxIndex,
+    chatSeed:
+      'Help me calculate the ROX Index from SpO2, FiO2, and respiratory rate for monitoring context. Clinical decision support only; use serial reassessment and local escalation policy, and do not recommend intubation, NIV, ICU admission, or oxygen device changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pneumoniaSeverityIndex,
+    toolName: 'Pneumonia Severity Index',
+    category: 'calculator',
+    description:
+      'Community-acquired pneumonia risk class context using PSI variables. Does not diagnose pneumonia or recommend antibiotics or disposition.',
+    path: '/tools/calculators/pneumonia-severity-index',
+    sidebarToolId: REGISTRY.pneumoniaSeverityIndex,
+    chatSeed:
+      'Help me calculate Pneumonia Severity Index risk class from demographics, comorbidities, vital signs, labs, oxygenation, and pleural effusion. Clinical decision support only; do not diagnose pneumonia or recommend antibiotics, admission, ICU care, or discharge.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.asthmaSeverityScore,
+    toolName: 'Asthma Severity Score',
+    category: 'calculator',
+    description:
+      'Acute asthma severity helper using PEF, SpO2, respiratory rate, speech, work of breathing, and life-threatening features.',
+    path: '/tools/calculators/asthma-severity-score',
+    sidebarToolId: REGISTRY.asthmaSeverityScore,
+    chatSeed:
+      'Help me assess acute asthma severity using PEF percent personal best, SpO2, respiratory rate, speech, accessory muscle use, exhaustion, altered mental status, and silent chest. Clinical decision support only; life-threatening features require urgent local pathways and this tool does not recommend medications, NIV, intubation, admission, or discharge.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'audit-c',
     toolName: 'AUDIT-C (alcohol screen)',
     category: 'calculator',
@@ -590,6 +674,114 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     backendExecutable: false,
   },
   {
+    toolId: NLU.asthmaExacerbationAssistant,
+    toolName: 'Asthma Exacerbation Assistant',
+    category: 'calculator',
+    description:
+      'Guided asthma exacerbation review for severity features, reassessment prompts, and safety handoff. Does not diagnose or recommend medications/disposition.',
+    path: '/tools/pulmonology/asthma-exacerbation-assistant',
+    sidebarToolId: REGISTRY.asthmaExacerbationAssistant,
+    chatSeed:
+      'Help me structure an asthma exacerbation review: severity features, PEF/SpO2 context, work of breathing, response trend, and handoff prompts. Clinical decision support only; do not diagnose asthma, do not recommend bronchodilators, steroids, magnesium, NIV, intubation, admission, or discharge, and do not delay emergency pathways for life-threatening features.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.ventilatorSupportAssistant,
+    toolName: 'Ventilator Support Assistant',
+    category: 'reference',
+    description:
+      'Ventilator support review for mode context, oxygenation/ventilation checks, alarms, and escalation prompts. Does not change settings.',
+    path: '/tools/pulmonology/ventilator-support-assistant',
+    sidebarToolId: REGISTRY.ventilatorSupportAssistant,
+    chatSeed:
+      'Help me organize ventilator support review: current mode, oxygenation, ventilation, alarms, synchrony concerns, recent ABG, and escalation questions for clinician/RT review. Clinical decision support only; do not recommend or change ventilator settings, sedation, paralytics, extubation, intubation, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.oxygenEscalationHelper,
+    toolName: 'Oxygen Escalation Helper',
+    category: 'calculator',
+    description:
+      'Oxygen escalation checklist support using device context, work of breathing, ROX/PF ratio context, and local policy reminders.',
+    path: '/tools/pulmonology/oxygen-escalation-helper',
+    sidebarToolId: REGISTRY.oxygenEscalationHelper,
+    chatSeed:
+      'Help me structure oxygen escalation review: current oxygen device and FiO2, SpO2 trend, work of breathing, PaO2/FiO2 or ROX context if available, and local escalation triggers. Clinical decision support only; do not recommend oxygen device changes, NIV, intubation, ICU admission, or discharge, and do not delay urgent care.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.copdWorkflowAssistant,
+    toolName: 'COPD Workflow Assistant',
+    category: 'calculator',
+    description:
+      'COPD workflow support for GOLD context, exacerbation concerns, oxygen safety, and handoff prompts. Does not recommend treatment.',
+    path: '/tools/pulmonology/copd-workflow-assistant',
+    sidebarToolId: REGISTRY.copdWorkflowAssistant,
+    chatSeed:
+      'Help me structure a COPD workflow review: GOLD context, exacerbation history, oxygenation, CO2 retention concerns, infection triggers, comorbidities, and handoff prompts. Clinical decision support only; do not diagnose COPD or recommend inhalers, steroids, antibiotics, oxygen targets, NIV, admission, or discharge.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.ventilatorMonitoringDashboard,
+    toolName: 'Ventilator Monitoring Dashboard',
+    category: 'reference',
+    description:
+      'Ventilator monitoring dashboard for oxygenation, ventilation, alarms, trends, and human review queues. Does not change settings.',
+    path: '/tools/pulmonology/ventilator-monitoring-dashboard',
+    sidebarToolId: REGISTRY.ventilatorMonitoringDashboard,
+    chatSeed:
+      'Help me review a ventilator monitoring dashboard summary: oxygenation, ventilation, alarms, settings context, recent ABGs, and unresolved review items. Clinical decision support only; do not change ventilator settings or recommend sedation, extubation, intubation, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.respiratoryTelemetryDashboard,
+    toolName: 'Respiratory Telemetry Dashboard',
+    category: 'reference',
+    description:
+      'Respiratory telemetry review for SpO2, respiratory rate, oxygen device context, deterioration signals, gaps, and artifact.',
+    path: '/tools/pulmonology/respiratory-telemetry-dashboard',
+    sidebarToolId: REGISTRY.respiratoryTelemetryDashboard,
+    chatSeed:
+      'Help me review respiratory telemetry: SpO2, respiratory rate, oxygen device context, sustained desaturation, artifacts, missing data, and local escalation flags. Clinical decision support only; do not diagnose respiratory failure or recommend oxygen, NIV, intubation, ICU admission, or discharge.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.sleepApneaAnalytics,
+    toolName: 'Sleep Apnea Analytics',
+    category: 'reference',
+    description:
+      'Sleep apnea analytics support for STOP-BANG context, symptoms, adherence trends, and review queues. Screening only.',
+    path: '/tools/pulmonology/sleep-apnea-analytics',
+    sidebarToolId: REGISTRY.sleepApneaAnalytics,
+    chatSeed:
+      'Help me review sleep apnea analytics: STOP-BANG context, symptoms, sleep study status if known, device adherence trend if provided, and follow-up queue prompts. Clinical decision support only; do not diagnose OSA or recommend CPAP, oral appliances, surgery, or sleep study ordering.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pulmonaryTrendEngine,
+    toolName: 'Pulmonary Trend Engine',
+    category: 'reference',
+    description:
+      'Pulmonary trend support for oxygenation indices, symptoms, spirometry context, and serial respiratory observations.',
+    path: '/tools/pulmonology/pulmonary-trend-engine',
+    sidebarToolId: REGISTRY.pulmonaryTrendEngine,
+    chatSeed:
+      'Help me summarize pulmonary trends: SpO2, respiratory rate, oxygen requirement, PaO2/FiO2, ROX, spirometry context, symptoms, and unresolved deterioration signals. Clinical decision support only; do not diagnose or recommend treatment, oxygen escalation, ventilator settings, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.respiratoryCommandCenter,
+    toolName: 'Respiratory Command Center',
+    category: 'reference',
+    description:
+      'Respiratory command-center workflow for oxygen, ventilator, COPD/asthma, and sleep-review operational queues.',
+    path: '/tools/pulmonology/respiratory-command-center',
+    sidebarToolId: REGISTRY.respiratoryCommandCenter,
+    chatSeed:
+      'Help me review respiratory command-center queues: oxygen escalation, ventilator monitoring, asthma/COPD reviews, sleep apnea analytics, bottlenecks, and unresolved alerts. Clinical decision support only; no automated orders, dispatch, bed moves, ventilator changes, or disposition recommendations.',
+    backendExecutable: false,
+  },
+  {
     toolId: romeIvIbsChatConfig.toolId,
     toolName: 'Rome IV IBS Criteria',
     category: romeIvIbsChatConfig.category,
@@ -988,6 +1180,69 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/stop-bang',
     calcQuery: '/tools/calculators?calc=stop-bang',
     implementation: 'Client-side in Calculators.jsx (stopBangCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'bode-index',
+    name: 'BODE Index',
+    description: 'COPD prognosis context from BMI, FEV1, 6-minute walk distance, and mMRC dyspnea.',
+    path: '/tools/calculators/bode-index',
+    calcQuery: '/tools/calculators?calc=bode-index',
+    implementation: 'Client-side in pulmonologyCalculators.jsx (pulmonologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'copd-gold-assessment',
+    name: 'COPD GOLD Assessment',
+    description: 'GOLD A/B/E grouping and optional spirometric grade context.',
+    path: '/tools/calculators/copd-gold-assessment',
+    calcQuery: '/tools/calculators?calc=copd-gold-assessment',
+    implementation: 'Client-side in pulmonologyCalculators.jsx (pulmonologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'aa-gradient',
+    name: 'A-a Gradient',
+    description: 'Alveolar-arterial oxygen gradient from ABG values and FiO2 assumptions.',
+    path: '/tools/calculators/aa-gradient',
+    calcQuery: '/tools/calculators?calc=aa-gradient',
+    implementation: 'Client-side in pulmonologyCalculators.jsx (pulmonologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pao2-fio2-ratio',
+    name: 'PaO2/FiO2 Ratio',
+    description: 'Oxygenation ratio support from PaO2 and FiO2.',
+    path: '/tools/calculators/pao2-fio2-ratio',
+    calcQuery: '/tools/calculators?calc=pao2-fio2-ratio',
+    implementation: 'Client-side in pulmonologyCalculators.jsx (pulmonologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'rox-index',
+    name: 'ROX Index',
+    description: 'SpO2/FiO2 divided by respiratory rate for oxygenation monitoring context.',
+    path: '/tools/calculators/rox-index',
+    calcQuery: '/tools/calculators?calc=rox-index',
+    implementation: 'Client-side in pulmonologyCalculators.jsx (pulmonologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pneumonia-severity-index',
+    name: 'Pneumonia Severity Index',
+    description: 'Community-acquired pneumonia risk class context.',
+    path: '/tools/calculators/pneumonia-severity-index',
+    calcQuery: '/tools/calculators?calc=pneumonia-severity-index',
+    implementation: 'Client-side in pulmonologyCalculators.jsx (pulmonologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'asthma-severity-score',
+    name: 'Asthma Severity Score',
+    description: 'Acute asthma exacerbation severity feature helper.',
+    path: '/tools/calculators/asthma-severity-score',
+    calcQuery: '/tools/calculators?calc=asthma-severity-score',
+    implementation: 'Client-side in pulmonologyCalculators.jsx (pulmonologyCalculators.js)',
     orchestratorId: null,
   },
   {
