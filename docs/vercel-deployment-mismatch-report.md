@@ -67,6 +67,8 @@ The repository defines the intended settings in `vercel.json`. Confirm the Verce
 - Output directory: `dist`
 - Node version: use the Vercel project default compatible with Vite 7, or pin Node 22 if the dashboard allows it
 
+Deployment rule: Vercel production should be connected to GitHub `main`. Every pushed commit to `origin/main` should automatically trigger a new Vercel production deployment for that commit. If a push to `main` does not create a deployment, check the Vercel Git integration, production branch, ignored build step, and project connection.
+
 If any dashboard value differs from `vercel.json`, the dashboard override can cause Vercel to build a different app than local.
 
 ## 6. Build Command
