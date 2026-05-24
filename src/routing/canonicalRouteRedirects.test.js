@@ -26,11 +26,17 @@ describe('canonical route redirects', () => {
   });
 
   it('keeps developer/source audit catalog separate from the user-facing tools browser', () => {
-    expect(appSource).toContain("path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>");
+    expect(appSource).toContain("path: '/tools', element: <AssistantToolRedirect extras={{ drawer: 'tools' }} />, requiresAuth: true");
     expect(appSource).toContain("const TOOLS_ROUTE_ALIASES = ['/all-tools', '/clinical-tools']");
     expect(appSource).toContain("path: '/tools/catalog'");
     expect(appSource).toContain('permission: Permission.CONFIGURE_SYSTEM');
     expect(appSource).toContain("path: '/catalog', element: <LegacyProtectedRouteRedirect to=\"/tools/catalog\" />");
+  });
+
+  it('normalizes auth aliases to a single /auth route and preserves signup intent', () => {
+    expect(appSource).toContain("{ path: '/auth', element: <AuthShell><AuthPage /></AuthShell>, publicOnly: true }");
+    expect(appSource).toContain('AUTH_PATH_ALIASES.map((path) => ({');
+    expect(appSource).toContain('pathname: \'/auth\'');
   });
 
   it('redirects legacy singular calculator paths to plural canonical calculator routes', () => {
