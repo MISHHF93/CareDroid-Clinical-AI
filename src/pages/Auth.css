@@ -69,6 +69,20 @@
   color: var(--text-color);
 }
 
+.auth-direct-signin {
+  margin: 0 0 12px;
+}
+
+.auth-direct-signin__btn {
+  width: 100%;
+}
+
+.auth-direct-signin__hint {
+  margin: 8px 2px 0;
+  font-size: 0.75rem;
+  color: var(--muted-text);
+}
+
 /* OAuth primary row (Google / LinkedIn) */
 .auth-oauth-stack {
   display: flex;

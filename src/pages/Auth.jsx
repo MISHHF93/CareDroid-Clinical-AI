@@ -30,6 +30,13 @@ const Auth = ({ onAuthSuccess }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const oauthBannerShown = useRef(false);
 
+  const handleDirectSignIn = () => {
+    setMode('login');
+    setTimeout(() => {
+      document.querySelector('input[name="email"]')?.focus();
+    }, 0);
+  };
+
   useEffect(() => {
     if (oauthBannerShown.current) return;
     if (searchParams.get('error') !== 'oauth') return;
@@ -311,6 +318,21 @@ const Auth = ({ onAuthSuccess }) => {
             >
               Create account
             </button>
+          </div>
+
+
+          <div className="auth-direct-signin">
+            <Button
+              type="button"
+              variant="primary"
+              className="auth-direct-signin__btn"
+              onClick={handleDirectSignIn}
+            >
+              Direct Sign in
+            </Button>
+            <p className="auth-direct-signin__hint">
+              Use this to jump straight to sign-in with your existing account.
+            </p>
           </div>
 
           <div className="auth-oauth-stack" aria-label="Sign-in options">
