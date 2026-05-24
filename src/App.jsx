@@ -62,6 +62,10 @@ const AuthCallback = lazyWithRetry(() => import('./pages/AuthCallback'));
 
 const SharedToolSession = lazyWithRetry(() => import('./pages/tools/SharedToolSession'));
 const ClinicalAudit = lazyWithRetry(() => import('./pages/tools/ClinicalAudit'));
+const ToolsOverview = lazyWithRetry(() => import('./pages/tools/ToolsOverview'));
+const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
+const Calculators = lazyWithRetry(() => import('./pages/tools/Calculators'));
+const ToolNotFound = lazyWithRetry(() => import('./pages/tools/ToolNotFound'));
 const ToolsAreaFallback = lazyWithRetry(() => import('./pages/tools/ToolsAreaFallback'));
 const FleetDashboard = lazyWithRetry(() => import('./pages/fleet/FleetDashboard'));
 const PredictiveMaintenance = lazyWithRetry(() => import('./pages/fleet/PredictiveMaintenance'));
@@ -362,7 +366,7 @@ function AppRoutes() {
     }
 
     if (publicOnly && isAuthenticated) {
-      return <Navigate to="/home" replace />;
+      return <Navigate to="/tools" replace />;
     }
 
     if (permission) {
@@ -370,7 +374,7 @@ function AppRoutes() {
         <PermissionGate
           permission={permission}
           requireAll={requireAllPermissions}
-          fallback={<Navigate to="/home" replace />}
+          fallback={<Navigate to="/tools" replace />}
         >
           {element}
         </PermissionGate>
@@ -381,7 +385,7 @@ function AppRoutes() {
   };
 
   const routes = [
-    { path: '/', element: <PublicShell><WelcomePage /></PublicShell>, publicOnly: true },
+    { path: '/', element: <Navigate to={isAuthenticated ? '/tools' : '/auth'} replace /> },
     { path: '/auth', element: <AuthShell><AuthPage /></AuthShell>, publicOnly: true },
     { path: '/auth-callback', element: <AuthShell><AuthCallback /></AuthShell>, publicOnly: true },
     { path: '/auth/callback', element: <AuthShell><LegacyOAuthCallbackRedirect /></AuthShell>, publicOnly: true },
@@ -391,8 +395,8 @@ function AppRoutes() {
       publicOnly: true,
     })),
 
-    { path: '/home', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
-    { path: '/dashboard', element: <LegacyProtectedRouteRedirect to="/home" />, requiresAuth: true },
+    { path: '/home', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
+    { path: '/dashboard', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
     { path: '/assistant', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
     { path: '/chat', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
     ...ASSISTANT_ROUTE_ALIASES.map((path) => ({
@@ -404,7 +408,7 @@ function AppRoutes() {
     { path: '/operations', element: <AppShellPage><Operations /></AppShellPage>, requiresAuth: true },
 
     // Clinical tools: canonical UX is assistant-centered; preserve deep links via redirects.
-    { path: '/tools', element: <AssistantToolRedirect extras={{ drawer: 'tools' }} />, requiresAuth: true },
+    { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },
     ...TOOLS_ROUTE_ALIASES.map((path) => ({
       path,
       element: <LegacyProtectedRouteRedirect to="/tools" />,
@@ -412,7 +416,7 @@ function AppRoutes() {
     })),
     {
       path: '/tools/catalog',
-      element: <AssistantToolRedirect extras={{ drawer: 'tools', view: 'catalog' }} />,
+      element: <AppShellPage><ClinicalToolCatalog /></AppShellPage>,
       requiresAuth: true,
       permission: Permission.CONFIGURE_SYSTEM,
     },
@@ -428,7 +432,8 @@ function AppRoutes() {
       element: <LegacyProtectedRouteRedirect to={to} />,
       requiresAuth: true,
     })),
-    { path: '/tools/calculators', element: <AssistantToolRedirect toolId="calculators" />, requiresAuth: true },
+    { path: '/tools/calculators', element: <AppShellPage><Calculators /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/calculators/:slug', element: <AppShellPage><Calculators /></AppShellPage>, requiresAuth: true },
     ...CALCULATORS_ROUTE_ALIASES.map((path) => ({
       path,
       element: <LegacyProtectedRouteRedirect to="/tools/calculators" />,
@@ -506,7 +511,7 @@ function AppRoutes() {
       element: <AppShellPage><RouteOptimizer /></AppShellPage>,
       requiresAuth: true,
     },
-    { path: '/tools/*', element: <AppShellPage><ToolsAreaFallback /></AppShellPage>, requiresAuth: true },
+    { path: '/tools/*', element: <AppShellPage><ToolNotFound /></AppShellPage>, requiresAuth: true },
     { path: '/fleet/*', element: <AppShellPage><ToolsAreaFallback /></AppShellPage>, requiresAuth: true },
 
     // Clinical Intelligence routes
@@ -556,7 +561,7 @@ function AppRoutes() {
       permission: Permission.VIEW_ANALYTICS
     },
 
-    { path: '*', element: isAuthenticated ? <Navigate to="/home" replace /> : <Navigate to="/auth" replace /> }
+    { path: '*', element: isAuthenticated ? <AppShellPage><ToolNotFound title="Page not found" description="The requested route does not exist in this workspace." /></AppShellPage> : <Navigate to="/auth" replace /> }
   ];
 
   return (
