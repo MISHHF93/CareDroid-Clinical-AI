@@ -477,12 +477,12 @@
 }
 
 .tool-action-buttons {
-  position: absolute;
-  top: 6px;
-  right: 6px;
   display: flex;
+  flex: 0 0 auto;
+  align-self: flex-start;
   gap: 4px;
-  z-index: 2;
+  padding-left: 2px;
+  z-index: 1;
 }
 
 .tool-action-btn {
@@ -837,6 +837,22 @@
   max-width: 100%;
   box-sizing: border-box;
   overflow: hidden;
+}
+
+.sidebar-tool-card-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.sidebar-tool-card-main {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .medical-tools-list .sidebar-tool-card > div:last-child {

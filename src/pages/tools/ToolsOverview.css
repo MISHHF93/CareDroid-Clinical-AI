@@ -300,9 +300,9 @@
 }
 
 .tool-card-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
   align-items: flex-start;
-  flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 16px;
   min-width: 0;
@@ -315,7 +315,9 @@
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: 8px;
-  margin-left: auto;
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-left: 0;
 }
 
 .tool-card-action {
@@ -692,7 +694,7 @@
   }
 
   .tool-card-header {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .tool-card-actions {

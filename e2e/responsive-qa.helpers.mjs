@@ -4,6 +4,7 @@
  */
 
 const TOLERANCE_PX = 2;
+const OVERLAP_TOLERANCE_PX = 3;
 
 /** Selectors where horizontal scroll is permitted (must match page CSS). */
 const ALLOWED_OVERFLOW_ANCESTORS = [
@@ -12,6 +13,7 @@ const ALLOWED_OVERFLOW_ANCESTORS = [
   '.logs-table-container',
   '.tool-card-table-wrap',
   '.cost-chart',
+  '.dashboard-recs-row',
 ];
 
 /**
@@ -116,13 +118,149 @@ export async function measureVerticalScrollAccess(page) {
   }, { tolerance: TOLERANCE_PX });
 }
 
+/**
+ * Detect suspicious visible overlaps where an interactive control covers sibling text
+ * or another control. Parent-child intersections are expected and ignored.
+ * @param {import('@playwright/test').Page} page
+ */
+export async function measureVisibleElementOverlaps(page) {
+  return page.evaluate(({ tolerance }) => {
+    const CONTROL_SELECTOR = [
+      'button',
+      'a[href]',
+      'input',
+      'select',
+      'textarea',
+      'summary',
+      '[role="button"]',
+      '[role="link"]',
+      '[tabindex]:not([tabindex="-1"])',
+    ].join(',');
+    const TEXT_SELECTOR = [
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'p',
+      'label',
+      'li',
+      '.sidebar-tool-card-name',
+      '.sidebar-tool-card-shortcut',
+      '.sidebar-tool-card-desc',
+      '.tool-meta h3',
+      '.tool-shortcut',
+    ].join(',');
+    const IGNORE_SELECTOR = [
+      '[data-qa-ignore-overlap]',
+      '.notification-badge',
+      '.app-shell-theme-fab',
+      '.app-shell-menu-btn',
+      '.app-shell-dev-mode-banner',
+      '.app-shell-bottom-nav',
+    ].join(',');
+
+    const visibleRect = (el) => {
+      if (!(el instanceof HTMLElement)) return null;
+      if (el.closest(IGNORE_SELECTOR)) return null;
+      const style = getComputedStyle(el);
+      if (
+        style.display === 'none' ||
+        style.visibility === 'hidden' ||
+        Number(style.opacity || '1') === 0 ||
+        style.pointerEvents === 'none'
+      ) {
+        return null;
+      }
+      const rect = el.getBoundingClientRect();
+      if (rect.width <= 1 || rect.height <= 1) return null;
+      if (rect.bottom <= 0 || rect.right <= 0) return null;
+      if (rect.top >= window.innerHeight || rect.left >= window.innerWidth) return null;
+      return rect;
+    };
+
+    const selectorFor = (el) => {
+      const id = el.id ? `#${el.id}` : '';
+      const cls =
+        typeof el.className === 'string' && el.className
+          ? `.${el.className.trim().split(/\s+/).slice(0, 3).join('.')}`
+          : '';
+      const label =
+        el.getAttribute('aria-label') ||
+        el.getAttribute('title') ||
+        (el.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 48);
+      return `${el.tagName.toLowerCase()}${id}${cls}${label ? ` "${label}"` : ''}`;
+    };
+
+    const overlap = (a, b) => {
+      const left = Math.max(a.left, b.left);
+      const right = Math.min(a.right, b.right);
+      const top = Math.max(a.top, b.top);
+      const bottom = Math.min(a.bottom, b.bottom);
+      const width = right - left;
+      const height = bottom - top;
+      if (width <= tolerance || height <= tolerance) return null;
+      return { left, top, width, height, area: width * height };
+    };
+
+    const controls = [...document.querySelectorAll(CONTROL_SELECTOR)]
+      .map((el) => ({ el, rect: visibleRect(el) }))
+      .filter((entry) => entry.rect);
+    const textNodes = [...document.querySelectorAll(TEXT_SELECTOR)]
+      .filter((el) => !el.closest(CONTROL_SELECTOR))
+      .map((el) => ({ el, rect: visibleRect(el) }))
+      .filter((entry) => entry.rect && (entry.el.textContent || '').trim().length > 0);
+    const candidates = [...controls, ...textNodes];
+    const offenders = [];
+
+    for (let i = 0; i < controls.length; i += 1) {
+      const a = controls[i];
+      for (let j = 0; j < candidates.length; j += 1) {
+        const b = candidates[j];
+        if (a.el === b.el) continue;
+        if (a.el.contains(b.el) || b.el.contains(a.el)) continue;
+        if (a.el.closest('[data-qa-overlap-group]') === b.el.closest('[data-qa-overlap-group]')) {
+          continue;
+        }
+        const hit = overlap(a.rect, b.rect);
+        if (!hit) continue;
+
+        const controlArea = a.rect.width * a.rect.height;
+        const otherArea = b.rect.width * b.rect.height;
+        const areaRatio = hit.area / Math.min(controlArea, otherArea);
+        if (areaRatio < 0.12) continue;
+
+        offenders.push({
+          control: selectorFor(a.el),
+          overlapped: selectorFor(b.el),
+          overlapPx: {
+            width: Math.round(hit.width),
+            height: Math.round(hit.height),
+          },
+          areaRatio: Number(areaRatio.toFixed(2)),
+        });
+      }
+    }
+
+    return {
+      pass: offenders.length === 0,
+      offenders: offenders.slice(0, 12),
+      checked: {
+        controls: controls.length,
+        textNodes: textNodes.length,
+      },
+    };
+  }, { tolerance: OVERLAP_TOLERANCE_PX });
+}
+
 export const QA_AUTH_STORAGE = {
   caredroid_access_token: 'responsive-qa-token',
   caredroid_user_profile: JSON.stringify({
     id: 'responsive-qa-user',
     email: 'qa@caredroid.local',
     name: 'Responsive QA',
-    role: 'physician',
+    role: 'admin',
     fullName: 'Responsive QA',
     isEmailVerified: true,
     twoFactorEnabled: false,

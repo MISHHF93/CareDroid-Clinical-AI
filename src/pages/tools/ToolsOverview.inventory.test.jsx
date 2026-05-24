@@ -6,6 +6,7 @@ import { getUserFacingToolInventory } from '../../data/toolInventory';
 import {
   mockConversationValue,
   mockToolPreferencesValue,
+  mockUserValue,
   mockWorkspaceValue,
 } from '../../test/testRenderUtils';
 
@@ -22,6 +23,14 @@ vi.mock('../../contexts/ToolPreferencesContext', () => ({
 vi.mock('../../contexts/WorkspaceContext', () => ({
   useWorkspace: () => mockWorkspaceValue,
 }));
+
+vi.mock('../../contexts/UserContext', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    useUser: () => mockUserValue,
+  };
+});
 
 function renderOverview() {
   return render(

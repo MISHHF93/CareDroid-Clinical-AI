@@ -15,6 +15,7 @@ import {
   dismissOverlays,
   installQaNetworkStubs,
   measurePageOverflow,
+  measureVisibleElementOverlaps,
   measureVerticalScrollAccess,
   seedQaAuth,
   waitForAppReady,
@@ -67,6 +68,7 @@ for (const pageDef of PAGES) {
       expect(url).toContain(pageDef.path.split('?')[0]);
 
       const overflow = await measurePageOverflow(page);
+      const overlaps = await measureVisibleElementOverlaps(page);
       const verticalScroll = await measureVerticalScrollAccess(page);
 
       test.info().attach('overflow-report', {
@@ -75,6 +77,10 @@ for (const pageDef of PAGES) {
       });
       test.info().attach('vertical-scroll-report', {
         body: JSON.stringify(verticalScroll, null, 2),
+        contentType: 'application/json',
+      });
+      test.info().attach('overlap-report', {
+        body: JSON.stringify(overlaps, null, 2),
         contentType: 'application/json',
       });
 
@@ -91,6 +97,11 @@ for (const pageDef of PAGES) {
       expect(
         verticalScroll.pass,
         `[${projectName}] ${pageDef.id} ${viewport.id}: content scrollport is not usable — ${JSON.stringify(verticalScroll)}`
+      ).toBe(true);
+
+      expect(
+        overlaps.pass,
+        `[${projectName}] ${pageDef.id} ${viewport.id}: visible element overlap — ${JSON.stringify(overlaps.offenders)}`
       ).toBe(true);
     });
   }

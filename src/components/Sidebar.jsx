@@ -256,65 +256,71 @@ const Sidebar = forwardRef(function Sidebar(
         }}
         title={`${tool.name} - ${tool.description}${tool.shortcut ? `\n\nShortcut: ${tool.shortcut}` : ''}\nOpen directly or send to Chat for guidance.`}
       >
-        <div className="tool-action-buttons">
-          <button
-            className={`tool-action-btn ${isFavorite ? 'active' : ''}`}
-            title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleFavorite(tool.id);
-            }}
-          >
-            <NavIcon
-              icon={CHROME_ICONS.star}
-              size={14}
-              fill={isFavorite ? 'currentColor' : 'none'}
-              aria-hidden
-            />
-          </button>
-          <button
-            className={`tool-action-btn ${isPinned ? 'active' : ''}`}
-            title={isPinned ? 'Unpin tool' : 'Pin tool to top'}
-            onClick={(e) => {
-              e.stopPropagation();
-              togglePinned(tool.id);
-            }}
-          >
-            <NavIcon icon={CHROME_ICONS.pin} size={14} aria-hidden />
-          </button>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-          <span
-            className="tool-card-icon-wrap"
-            style={{
-              filter: isSelected ? 'none' : 'grayscale(0.2)',
-              lineHeight: 1,
-              display: 'inline-flex',
-              color: tool.color,
-            }}
-            aria-hidden
-          >
-            <NavIcon icon={getToolIcon(tool.id)} size={22} />
-          </span>
-          <div className="sidebar-tool-card-body">
-            <div className="sidebar-tool-card-title-row">
-              <span className="sidebar-tool-card-name">{tool.name}</span>
-              {tool.shortcut ? (
-                <span className="sidebar-tool-card-shortcut">
-                  {tool.shortcut.replace('Ctrl+', '⌘')}
-                </span>
-              ) : null}
-            </div>
-            <div className="sidebar-tool-card-desc">{tool.description}</div>
-            <div
-              className="sidebar-tool-card-category"
+        <div className="sidebar-tool-card-layout">
+          <div className="sidebar-tool-card-main">
+            <span
+              className="tool-card-icon-wrap"
               style={{
-                backgroundColor: `${tool.color}20`,
+                filter: isSelected ? 'none' : 'grayscale(0.2)',
+                lineHeight: 1,
+                display: 'inline-flex',
                 color: tool.color,
               }}
+              aria-hidden
             >
-              {tool.category}
+              <NavIcon icon={getToolIcon(tool.id)} size={22} />
+            </span>
+            <div className="sidebar-tool-card-body">
+              <div className="sidebar-tool-card-title-row">
+                <span className="sidebar-tool-card-name">{tool.name}</span>
+                {tool.shortcut ? (
+                  <span className="sidebar-tool-card-shortcut">
+                    {tool.shortcut.replace('Ctrl+', '⌘')}
+                  </span>
+                ) : null}
+              </div>
+              <div className="sidebar-tool-card-desc">{tool.description}</div>
+              <div
+                className="sidebar-tool-card-category"
+                style={{
+                  backgroundColor: `${tool.color}20`,
+                  color: tool.color,
+                }}
+              >
+                {tool.category}
+              </div>
             </div>
+          </div>
+          <div className="tool-action-buttons" aria-label={`${tool.name} preferences`}>
+            <button
+              type="button"
+              className={`tool-action-btn ${isFavorite ? 'active' : ''}`}
+              title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+              aria-label={isFavorite ? `Remove ${tool.name} from favorites` : `Add ${tool.name} to favorites`}
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleFavorite(tool.id);
+              }}
+            >
+              <NavIcon
+                icon={CHROME_ICONS.star}
+                size={14}
+                fill={isFavorite ? 'currentColor' : 'none'}
+                aria-hidden
+              />
+            </button>
+            <button
+              type="button"
+              className={`tool-action-btn ${isPinned ? 'active' : ''}`}
+              title={isPinned ? 'Unpin tool' : 'Pin tool to top'}
+              aria-label={isPinned ? `Unpin ${tool.name}` : `Pin ${tool.name} to top`}
+              onClick={(e) => {
+                e.stopPropagation();
+                togglePinned(tool.id);
+              }}
+            >
+              <NavIcon icon={CHROME_ICONS.pin} size={14} aria-hidden />
+            </button>
           </div>
         </div>
       </div>
