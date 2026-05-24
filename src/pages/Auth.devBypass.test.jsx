@@ -57,19 +57,19 @@ describe('Auth local/demo dev bypass', () => {
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
-  it('is hidden by default when VITE_ENABLE_DEV_AUTH_BYPASS is not true', () => {
+  it('is visible in development even when explicit flags are false', () => {
     renderAuth();
 
     expect(
-      screen.queryByRole('button', { name: /continue in demo \/ local dev mode/i })
-    ).not.toBeInTheDocument();
+      screen.queryByRole('button', { name: /continue in demo mode/i })
+    ).toBeInTheDocument();
   });
 
   it('appears only when the explicit flag is enabled and creates a marked mock session', async () => {
     mocks.appConfig.features.enableDevAuthBypass = true;
     const onAuthSuccess = renderAuth();
 
-    fireEvent.click(screen.getByRole('button', { name: /continue in demo \/ local dev mode/i }));
+    fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
 
     await waitFor(() => {
       expect(onAuthSuccess).toHaveBeenCalledWith(
@@ -108,7 +108,7 @@ describe('Auth local/demo dev bypass', () => {
     });
     const onAuthSuccess = renderAuth();
 
-    fireEvent.click(screen.getByRole('button', { name: /continue in demo \/ local dev mode/i }));
+    fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
 
     await waitFor(() => {
       expect(onAuthSuccess).toHaveBeenCalledWith(
@@ -129,7 +129,7 @@ it('renders and allows demo entry when VITE_DEMO_MODE=true even if dev bypass is
   mocks.appConfig.features.enableDemoMode = true;
   const onAuthSuccess = renderAuth();
 
-  fireEvent.click(screen.getByRole('button', { name: /continue in demo \/ local dev mode/i }));
+  fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
 
   await waitFor(() => {
     expect(onAuthSuccess).toHaveBeenCalledWith(

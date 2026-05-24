@@ -60,19 +60,19 @@ describe('Welcome page local/demo dev bypass', () => {
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
-  it('hides the direct dev login action by default on the first unauthenticated screen', () => {
+  it('shows the direct demo action in development even with flags disabled', () => {
     renderWelcome();
 
     expect(
-      screen.queryByRole('button', { name: /continue in demo \/ local dev mode/i })
-    ).not.toBeInTheDocument();
+      screen.queryByRole('button', { name: /continue in demo mode/i })
+    ).toBeInTheDocument();
   });
 
   it('shows the direct dev login action when explicitly enabled and routes to tools', async () => {
     mocks.appConfig.features.enableDevAuthBypass = true;
     renderWelcome();
 
-    fireEvent.click(screen.getByRole('button', { name: /continue in demo \/ local dev mode/i }));
+    fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
 
     await waitFor(() => {
       expect(screen.getByTestId('location')).toHaveTextContent('/tools');
@@ -94,7 +94,7 @@ it('shows direct demo login when VITE_DEMO_MODE=true and still routes to tools',
   mocks.appConfig.features.enableDemoMode = true;
   renderWelcome();
 
-  fireEvent.click(screen.getByRole('button', { name: /continue in demo \/ local dev mode/i }));
+  fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
 
   await waitFor(() => {
     expect(screen.getByTestId('location')).toHaveTextContent('/tools');

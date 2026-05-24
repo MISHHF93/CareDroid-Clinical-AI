@@ -197,7 +197,7 @@ const Auth = ({ onAuthSuccess }) => {
           onClick={handleDevDemoSession}
           leftIcon={<NavIcon icon={CHROME_ICONS.zap} size={20} aria-hidden />}
         >
-          Continue in Demo / Local Dev Mode
+          Continue in Demo Mode
         </Button>
         <p className="auth-dev-oneclick__hint">
           Explicit local-only access is enabled by{' '}
