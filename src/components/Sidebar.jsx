@@ -37,6 +37,7 @@ const Sidebar = forwardRef(function Sidebar(
   onCloseMobileNav = () => {},
   sidebarCollapsed = false,
   onSidebarCollapsedChange = () => {},
+  onOpenQuickCommand = () => {},
 },
   ref
 ) {
@@ -417,6 +418,29 @@ const Sidebar = forwardRef(function Sidebar(
           </span>
           {!effectiveCollapsed && <span>Start Assistant</span>}
         </button>
+
+        {!layoutCompact && (
+          <button
+            type="button"
+            className="sidebar-command-launcher"
+            onClick={onOpenQuickCommand}
+            aria-label="Open Quick Command"
+            title={effectiveCollapsed ? 'Open Quick Command' : 'Quick Command (Ctrl/Cmd K)'}
+          >
+            <span className="sidebar-command-launcher__icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.search} size={18} />
+            </span>
+            {!effectiveCollapsed && (
+              <>
+                <span className="sidebar-command-launcher__body">
+                  <strong>Quick Command</strong>
+                  <span>Search apps, tools, and routes</span>
+                </span>
+                <kbd>Ctrl K</kbd>
+              </>
+            )}
+          </button>
+        )}
 
         {/* Navigation */}
         <nav className="sidebar-nav">

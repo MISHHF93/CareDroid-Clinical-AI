@@ -841,6 +841,29 @@ const toolRegistry = [
     ],
   },
   {
+    id: 'medical-iot-dashboard',
+    name: 'Medical IoT Dashboard',
+    path: '/medical-iot',
+    color: '#0EA5A6',
+    description:
+      'Connected medical device monitoring for telemetry, vitals, device health, alerts, and stale/offline signal review',
+    shortcut: 'Ctrl+Shift+I',
+    category: 'IoT',
+    features: [
+      'Connected device status',
+      'Vitals and wearable telemetry streams',
+      'Pulse oximeter, glucose, blood pressure, and ECG/heart-rate readings',
+      'Battery and connectivity badges',
+      'Abnormal reading and offline-device alerts',
+    ],
+    useCases: [
+      'Remote patient monitoring review',
+      'Bedside connected-device status checks',
+      'Telemetry trend handoff',
+      'Stale or offline sensor triage',
+    ],
+  },
+  {
     id: 'dose-calculator',
     name: 'Medication Dose Calculator',
     path: '/tools/calculators',

@@ -20,7 +20,9 @@ import PatientSummaryAi from '../pages/tools/PatientSummaryAi';
 import OrderSetAi from '../pages/tools/OrderSetAi';
 import AiExplainability from '../pages/tools/AiExplainability';
 import ClinicalAudit from '../pages/tools/ClinicalAudit';
+import CommandDashboard from '../pages/CommandDashboard';
 import Dashboard from '../pages/Dashboard';
+import MedicalIotDashboard from '../pages/MedicalIotDashboard';
 import { CORE_ROUTE_SMOKE, TIER_A_FORM_SMOKE_SLUGS } from './responsiveRegression.routes';
 
 vi.mock('../pages/tools/Calculators.css', () => ({}));
@@ -65,6 +67,17 @@ vi.mock('../services/clinicalChatService', () => ({
   registryIdToChatToolParam: vi.fn(() => null),
 }));
 
+vi.mock('../contexts/SystemConfigContext', () => ({
+  useSystemConfig: () => ({
+    loading: false,
+    error: null,
+    configDegraded: false,
+    isRagEnabled: false,
+    availableTools: [],
+    refresh: vi.fn(),
+  }),
+}));
+
 vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
   const actual = await importOriginal();
   return {
@@ -74,8 +87,9 @@ vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
 });
 
 const PAGE_BY_ID = {
-  home: Dashboard,
+  dashboard: CommandDashboard,
   assistant: Dashboard,
+  'medical-iot': MedicalIotDashboard,
   'tools-overview': ToolsOverview,
   'tools-catalog': ClinicalToolCatalog,
   'calculators-hub': Calculators,

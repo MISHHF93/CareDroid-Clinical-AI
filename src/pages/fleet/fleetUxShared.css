@@ -18,8 +18,8 @@
   z-index: 100;
   padding: 10px 16px;
   border-radius: 8px;
-  background: var(--app-accent, #4a7c9e);
-  color: #fff;
+  background: var(--app-accent-interactive);
+  color: var(--app-on-solid);
   font-weight: 600;
   text-decoration: none;
 }
@@ -78,7 +78,7 @@
 }
 
 .fleet-back-btn:focus-visible {
-  outline: 2px solid var(--app-accent, #4a7c9e);
+  outline: 2px solid var(--app-accent-interactive);
   outline-offset: 2px;
 }
 
@@ -139,14 +139,14 @@
 }
 
 .fleet-btn:focus-visible {
-  outline: 2px solid var(--app-accent, #4a7c9e);
+  outline: 2px solid var(--app-accent-interactive);
   outline-offset: 2px;
 }
 
 .fleet-btn--primary {
   border: none;
-  background: var(--app-accent, #4a7c9e);
-  color: #fff;
+  background: var(--app-accent-interactive);
+  color: var(--app-on-solid);
 }
 
 .fleet-btn--secondary {

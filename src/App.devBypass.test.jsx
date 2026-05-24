@@ -72,24 +72,24 @@ describe('Welcome page direct sign-in dev bypass', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('allows direct sign in when flags are disabled and routes to tools', async () => {
+  it('allows direct sign in when flags are disabled and routes to dashboard', async () => {
     renderWelcome();
 
     fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
 
     await waitFor(() => {
-      expect(screen.getByTestId('location')).toHaveTextContent('/tools');
+      expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
     });
   });
 
-  it('uses the direct sign-in action when explicitly enabled and routes to tools', async () => {
+  it('uses the direct sign-in action when explicitly enabled and routes to dashboard', async () => {
     mocks.appConfig.features.enableDevAuthBypass = true;
     renderWelcome();
 
     fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
 
     await waitFor(() => {
-      expect(screen.getByTestId('location')).toHaveTextContent('/tools');
+      expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
     });
     expect(localStorage.getItem('caredroid_access_token')).toBe('welcome-dev-token');
     expect(JSON.parse(localStorage.getItem('caredroid_user_profile'))).toEqual(
@@ -103,7 +103,7 @@ describe('Welcome page direct sign-in dev bypass', () => {
 });
 
 
-it('shows direct sign-in when VITE_DEMO_MODE=true and still routes to tools', async () => {
+it('shows direct sign-in when VITE_DEMO_MODE=true and still routes to dashboard', async () => {
   mocks.appConfig.features.enableDevAuthBypass = false;
   mocks.appConfig.features.enableDemoMode = true;
   renderWelcome();
@@ -111,6 +111,6 @@ it('shows direct sign-in when VITE_DEMO_MODE=true and still routes to tools', as
   fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
 
   await waitFor(() => {
-    expect(screen.getByTestId('location')).toHaveTextContent('/tools');
+    expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
   });
 });

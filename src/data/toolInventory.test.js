@@ -76,7 +76,7 @@ describe('canonical tool inventory', () => {
     for (const tool of sidebarTools) {
       expect(tool.name, tool.id).toBeTruthy();
       expect(tool.path, tool.id).toBeTruthy();
-      expect(tool.category, tool.id).toMatch(/Diagnostic|Calculator|Reference|Fleet|Other/);
+      expect(tool.category, tool.id).toMatch(/Diagnostic|Calculator|Reference|Fleet|IoT|Other/);
       expect(tool.color, tool.id).toMatch(/^#/);
       expect(Array.isArray(tool.features), tool.id).toBe(true);
       expect(tool.canonicalInventoryId, tool.id).toBe(tool.id);
@@ -183,7 +183,14 @@ describe('canonical tool inventory', () => {
         expect(record.component, record.id).toBe('src/pages/tools/Calculators.jsx');
       }
 
-      if ([TOOL_SURFACES.TOOL_PAGE, TOOL_SURFACES.FLEET_PAGE, TOOL_SURFACES.HUB].includes(record.surface)) {
+      if (
+        [
+          TOOL_SURFACES.TOOL_PAGE,
+          TOOL_SURFACES.FLEET_PAGE,
+          TOOL_SURFACES.IOT_DASHBOARD,
+          TOOL_SURFACES.HUB,
+        ].includes(record.surface)
+      ) {
         expect(record.route, record.id).toBeTruthy();
         expect(record.component, record.id).toBeTruthy();
       }

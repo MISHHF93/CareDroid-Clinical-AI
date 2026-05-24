@@ -34,9 +34,11 @@ import HIPAANotice from './pages/HIPAANotice';
 import HelpCenter from './pages/HelpCenter';
 
 // Authenticated shell pages — lazy for smaller initial JS (mobile LCP)
+const CommandDashboard = lazyWithRetry(() => import('./pages/CommandDashboard'));
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
 const Operations = lazyWithRetry(() => import('./pages/Operations'));
+const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
@@ -115,7 +117,7 @@ function AuthPage() {
   const handleAuthSuccess = (token, user) => {
     setAuthToken(token);
     if (user) setUser(user);
-    navigate('/tools', { replace: true });
+    navigate('/dashboard', { replace: true });
   };
 
   return <Auth onAuthSuccess={handleAuthSuccess} />;
@@ -139,7 +141,7 @@ export function WelcomePage() {
           ? 'Direct sign-in with API access.'
           : 'Direct sign-in using local UI data only. Start the backend for tool APIs.'
       );
-      navigate('/tools', { replace: true });
+      navigate('/dashboard', { replace: true });
     } catch (err) {
       logger.error('Direct sign-in auth bypass failed from welcome page', { err });
       error('Direct sign-in failed', 'Unable to start the local direct sign-in session.');
@@ -254,7 +256,7 @@ function AppShellPage({ children }) {
       });
     } else {
       setActiveTool(null);
-      navigate({ pathname: '/home', search: '' }, { replace: true });
+      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
     }
   };
 
@@ -358,7 +360,7 @@ function AppRoutes() {
     }
 
     if (publicOnly && isAuthenticated) {
-      return <Navigate to="/tools" replace />;
+      return <Navigate to="/dashboard" replace />;
     }
 
     if (permission) {
@@ -387,8 +389,8 @@ function AppRoutes() {
       publicOnly: true,
     })),
 
-    { path: '/home', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
-    { path: '/dashboard', element: <LegacyProtectedRouteRedirect to="/home" />, requiresAuth: true },
+    { path: '/dashboard', element: <AppShellPage><CommandDashboard /></AppShellPage>, requiresAuth: true },
+    { path: '/home', element: <LegacyProtectedRouteRedirect to="/dashboard" />, requiresAuth: true },
     { path: '/assistant', element: <AppShellPage><Dashboard /></AppShellPage>, requiresAuth: true },
     { path: '/chat', element: <LegacyProtectedRouteRedirect to="/assistant" />, requiresAuth: true },
     ...ASSISTANT_ROUTE_ALIASES.map((path) => ({
@@ -398,6 +400,7 @@ function AppRoutes() {
     })),
     { path: '/patients', element: <AppShellPage><Patients /></AppShellPage>, requiresAuth: true },
     { path: '/operations', element: <AppShellPage><Operations /></AppShellPage>, requiresAuth: true },
+    { path: '/medical-iot', element: <AppShellPage><MedicalIotDashboard /></AppShellPage>, requiresAuth: true },
 
     // Clinical tools: canonical routes render their product pages directly.
     { path: '/tools', element: <AppShellPage><ToolsOverview /></AppShellPage>, requiresAuth: true },

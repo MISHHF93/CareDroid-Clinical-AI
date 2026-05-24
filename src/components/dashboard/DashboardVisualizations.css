@@ -1,0 +1,196 @@
+.dashboard-metric-grid,
+.dashboard-status-grid-visual {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.dashboard-metric-card,
+.dashboard-status-card,
+.dashboard-visual-panel {
+  min-width: 0;
+  border: 1px solid var(--app-panel-border);
+  background: var(--app-surface-1);
+  box-shadow: var(--app-shadow-1);
+  box-sizing: border-box;
+}
+
+.dashboard-metric-card,
+.dashboard-status-card {
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.dashboard-metric-card > span,
+.dashboard-status-card__label {
+  display: block;
+  color: var(--app-fg-muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dashboard-metric-card strong,
+.dashboard-status-card strong {
+  display: block;
+  margin-top: 8px;
+  color: var(--app-fg);
+  font-size: clamp(1.45rem, 5vw, 2.15rem);
+  line-height: 1;
+}
+
+.dashboard-metric-card p,
+.dashboard-status-card p {
+  margin: 8px 0 0;
+  color: var(--app-fg-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.dashboard-metric-card--good,
+.dashboard-status-card--good {
+  border-color: color-mix(in srgb, var(--app-success) 34%, transparent);
+  background: color-mix(in srgb, var(--app-success) 9%, var(--app-surface-1));
+}
+
+.dashboard-metric-card--warning,
+.dashboard-status-card--warning {
+  border-color: color-mix(in srgb, var(--app-warning) 38%, transparent);
+  background: color-mix(in srgb, var(--app-warning) 10%, var(--app-surface-1));
+}
+
+.dashboard-metric-card--critical,
+.dashboard-status-card--critical {
+  border-color: color-mix(in srgb, var(--app-danger) 38%, transparent);
+  background: color-mix(in srgb, var(--app-danger) 10%, var(--app-surface-1));
+}
+
+.dashboard-visual-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  min-width: 0;
+}
+
+.dashboard-visual-panel {
+  border-radius: 20px;
+  padding: 16px;
+  overflow: hidden;
+}
+
+.dashboard-visual-panel__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.dashboard-visual-panel__header h3 {
+  margin: 0;
+  color: var(--app-fg);
+  font-size: 1rem;
+}
+
+.dashboard-visual-panel__header p {
+  margin: 4px 0 0;
+  color: var(--app-fg-muted);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.dashboard-visual-panel__badge {
+  border-radius: 999px;
+  padding: 5px 10px;
+  background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
+  color: var(--app-accent-interactive);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.dashboard-chart {
+  width: 100%;
+  min-width: 0;
+  height: 240px;
+  overflow: hidden;
+}
+
+.dashboard-chart--donut {
+  height: 230px;
+}
+
+.dashboard-chart-state {
+  display: grid;
+  place-items: center;
+  min-height: 180px;
+  border: 1px dashed var(--app-panel-border);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--app-surface-2) 82%, transparent);
+  color: var(--app-fg-muted);
+  text-align: center;
+  padding: 18px;
+}
+
+.dashboard-chart-state--error {
+  border-color: color-mix(in srgb, var(--app-danger) 35%, transparent);
+  background: color-mix(in srgb, var(--app-danger) 10%, transparent);
+  color: var(--app-fg);
+}
+
+.dashboard-chart-state--loading {
+  color: var(--app-fg);
+}
+
+.dashboard-donut-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+  min-width: 0;
+}
+
+.dashboard-chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  color: var(--app-fg-muted);
+  font-size: 0.82rem;
+}
+
+.dashboard-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.dashboard-chart-legend i {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  flex: 0 0 auto;
+}
+
+.dashboard-mini-sparkline {
+  width: 110px;
+  height: 44px;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 860px) {
+  .dashboard-visual-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .dashboard-chart {
+    height: 210px;
+  }
+
+  .dashboard-visual-panel {
+    padding: 14px;
+  }
+}

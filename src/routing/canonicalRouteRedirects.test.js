@@ -12,16 +12,24 @@ describe('canonical route redirects', () => {
     expect(appSource).toContain("search.set('mode', 'signup')");
   });
 
-  it('keeps legacy dashboard and chat paths as redirects, not duplicate page routes', () => {
-    expect(appSource).toContain("path: '/dashboard', element: <LegacyProtectedRouteRedirect to=\"/home\" />");
+  it('keeps command dashboard canonical and legacy chat paths as redirects', () => {
+    expect(appSource).toContain("path: '/dashboard', element: <AppShellPage><CommandDashboard /></AppShellPage>");
+    expect(appSource).toContain("path: '/home', element: <LegacyProtectedRouteRedirect to=\"/dashboard\" />");
     expect(appSource).toContain("path: '/chat', element: <LegacyProtectedRouteRedirect to=\"/assistant\" />");
     expect(appSource).toContain("const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot']");
+    expect(appSource).not.toContain("path: '/dashboard', element: <LegacyProtectedRouteRedirect to=\"/home\" />");
     expect(appSource).not.toContain("path: '/chat', element: <AppShellPage><Dashboard /></AppShellPage>");
   });
 
   it('gives the fleet area an explicit canonical operations landing redirect', () => {
     expect(appSource).toContain("path: '/fleet', element: <LegacyProtectedRouteRedirect to=\"/operations\" />");
     expect(appSource).toContain("path: '/fleet/command', element: <AppShellPage><FleetDashboard /></AppShellPage>");
+  });
+
+  it('keeps Medical IoT as a first-class authenticated dashboard route', () => {
+    expect(appSource).toContain("path: '/medical-iot', element: <AppShellPage><MedicalIotDashboard /></AppShellPage>");
+    expect(appSource).not.toContain("to=\"/fleet/medical-iot\"");
+    expect(appSource).not.toContain("to=\"/tools/catalog?tool=medical-iot-dashboard\"");
   });
 
   it('keeps developer/source audit catalog separate from the user-facing tools browser', () => {

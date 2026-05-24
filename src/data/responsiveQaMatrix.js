@@ -171,9 +171,9 @@ export function buildResponsiveQaPages() {
   /** @type {ResponsiveQaPage[]} */
   const pages = [
     {
-      id: 'home',
-      label: 'Pulse',
-      path: '/home',
+      id: 'dashboard',
+      label: 'Command Dashboard',
+      path: '/dashboard',
       category: 'core',
     },
     {
@@ -184,9 +184,16 @@ export function buildResponsiveQaPages() {
     },
     {
       id: 'tools-overview',
-      label: 'Tools',
+      label: 'Tool Library',
       path: '/tools',
       category: 'core',
+    },
+    {
+      id: 'medical-iot',
+      label: 'Medical IoT Dashboard',
+      path: '/medical-iot',
+      category: 'core',
+      registryId: REGISTRY.medicalIotDashboard,
     },
     {
       id: 'tools-catalog',

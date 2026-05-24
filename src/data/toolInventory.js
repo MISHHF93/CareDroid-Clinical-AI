@@ -19,6 +19,7 @@ import {
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
   FLEET_TIER_A_REGISTRY_IDS,
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
+  MEDICAL_IOT_REGISTRY_IDS,
   NLU_PROFILE_TOOL_IDS,
   NLU_TO_REGISTRY_ID,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
@@ -42,6 +43,7 @@ let cachedUserFacingToolRegistryProjection = null;
 const CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET = new Set(CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS);
 const FLEET_TIER_A_REGISTRY_ID_SET = new Set(FLEET_TIER_A_REGISTRY_IDS);
 const FLEET_TIER_B_CHAT_REGISTRY_ID_SET = new Set(FLEET_TIER_B_CHAT_REGISTRY_IDS);
+const MEDICAL_IOT_REGISTRY_ID_SET = new Set(MEDICAL_IOT_REGISTRY_IDS);
 const CLINICAL_TIER_A_CALCULATOR_REGISTRY_ID_SET = new Set(CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS);
 const CLINICAL_TIER_B_CHAT_REGISTRY_ID_SET = new Set(CLINICAL_TIER_B_CHAT_REGISTRY_IDS);
 const CLINICAL_NLU_HUB_CHAT_REGISTRY_ID_SET = new Set(CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS);
@@ -87,6 +89,7 @@ export const TOOL_LAUNCH_TYPES = Object.freeze({
   BACKEND_BACKED: 'backend-backed',
   CLINICAL_PAGE: 'clinical-page',
   FLEET_LOCAL: 'fleet-local',
+  IOT_LOCAL: 'iot-local',
   HUB: 'hub',
   PLATFORM: 'platform',
   UNSUPPORTED_PLANNED: 'unsupported-planned',
@@ -104,6 +107,7 @@ export const TOOL_SURFACES = Object.freeze({
   CALCULATOR_FORM: 'calculator-form',
   CHAT_ASSISTED: 'chat-assisted',
   FLEET_PAGE: 'fleet-page',
+  IOT_DASHBOARD: 'iot-dashboard',
   HUB: 'hub',
   INTERNAL: 'internal',
 });
@@ -237,6 +241,7 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.fleetCommand]: 'src/pages/fleet/FleetDashboard.jsx',
   [REGISTRY.predictiveMaintenance]: 'src/pages/fleet/PredictiveMaintenance.jsx',
   [REGISTRY.routeOptimizer]: 'src/pages/fleet/RouteOptimizer.jsx',
+  [REGISTRY.medicalIotDashboard]: 'src/pages/MedicalIotDashboard.jsx',
 });
 
 const BASE_TEST_COVERAGE = Object.freeze([
@@ -273,6 +278,7 @@ function normalizeCategory(value) {
   if (category === 'protocol') return 'protocol';
   if (category === 'reference') return 'reference';
   if (category === 'fleet') return 'fleet';
+  if (category === 'iot') return 'iot';
   return category;
 }
 
@@ -282,6 +288,7 @@ function presentationCategory(value) {
   if (category === 'calculator') return 'Calculator';
   if (category === 'reference' || category === 'protocol') return 'Reference';
   if (category === 'fleet') return 'Fleet';
+  if (category === 'iot') return 'IoT';
   return 'Other';
 }
 
@@ -307,6 +314,7 @@ function registryTier(registryId) {
   if (CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET.has(registryId)) return 'C';
   if (FLEET_TIER_A_REGISTRY_ID_SET.has(registryId)) return 'fleet-A';
   if (FLEET_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId)) return 'fleet-B';
+  if (MEDICAL_IOT_REGISTRY_ID_SET.has(registryId)) return 'medical-iot';
   if (CLINICAL_TIER_A_CALCULATOR_REGISTRY_ID_SET.has(registryId)) return 'A';
   if (
     CLINICAL_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId) ||
@@ -327,6 +335,7 @@ function launchTypeForTier(tier, hasExecutor) {
   if (tier === 'B' || tier === 'fleet-B') return TOOL_LAUNCH_TYPES.CHAT_ASSISTED;
   if (tier === 'clinical-page') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'fleet-A') return TOOL_LAUNCH_TYPES.FLEET_LOCAL;
+  if (tier === 'medical-iot') return TOOL_LAUNCH_TYPES.IOT_LOCAL;
   if (tier === 'hub') return TOOL_LAUNCH_TYPES.HUB;
   return TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED;
 }
@@ -413,6 +422,7 @@ function apiClientFor(orchestratorToolId, launchType, registryId) {
     return 'src/services/clinicalChatService.js';
   }
   if (launchType === TOOL_LAUNCH_TYPES.FLEET_LOCAL) return 'src/services/fleetTelemetryService.js';
+  if (launchType === TOOL_LAUNCH_TYPES.IOT_LOCAL) return 'src/services/medicalIotService.js';
   return null;
 }
 
@@ -431,6 +441,7 @@ function surfaceForRecord(record) {
   if (record.launchType === TOOL_LAUNCH_TYPES.HUB) return TOOL_SURFACES.HUB;
   if (record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) return TOOL_SURFACES.CHAT_ASSISTED;
   if (record.launchType === TOOL_LAUNCH_TYPES.FLEET_LOCAL) return TOOL_SURFACES.FLEET_PAGE;
+  if (record.launchType === TOOL_LAUNCH_TYPES.IOT_LOCAL) return TOOL_SURFACES.IOT_DASHBOARD;
   if (record.calculatorSlug || isCalculatorCategory(record.category)) return TOOL_SURFACES.CALCULATOR_FORM;
   return TOOL_SURFACES.TOOL_PAGE;
 }

@@ -105,6 +105,42 @@ function computeSummary(vehicles) {
   };
 }
 
+function buildFleetVisualizationData(vehicles) {
+  const statusDistribution = vehicles.reduce((acc, vehicle) => {
+    acc[vehicle.status] = (acc[vehicle.status] || 0) + 1;
+    return acc;
+  }, {});
+  const maintenanceRisk = vehicles.map((vehicle) => ({
+    name: vehicle.id,
+    value:
+      vehicle.status === 'maintenance'
+        ? 100
+        : vehicle.maintenanceStatus === 'warning'
+          ? 72
+          : Math.max(10, 100 - vehicle.energyPercent),
+  }));
+  const etaTrend = vehicles
+    .filter((vehicle) => Number.isFinite(vehicle.etaMinutes))
+    .map((vehicle) => ({ label: vehicle.id, value: vehicle.etaMinutes }));
+  const dispatchLoadTrend = vehicles.map((vehicle) => ({
+    label: vehicle.id,
+    value: vehicle.utilizationPercent,
+  }));
+
+  return {
+    statusDistribution: Object.entries(statusDistribution).map(([name, value]) => ({ name, value })),
+    maintenanceRisk,
+    etaTrend,
+    dispatchLoadTrend,
+    routeEfficiency: vehicles.length
+      ? Math.round(
+          vehicles.reduce((sum, vehicle) => sum + Math.max(0, 100 - (vehicle.etaMinutes || 0)), 0) /
+            vehicles.length
+        )
+      : 0,
+  };
+}
+
 /**
  * @param {{ signal?: AbortSignal, delayMs?: number, emptyFleet?: boolean }} [options]
  * @returns {Promise<{ summary: object, vehicles: object[] }>}
@@ -135,6 +171,7 @@ export async function fetchFleetCommandSnapshot(options = {}) {
   return {
     summary: computeSummary(vehicles),
     vehicles,
+    visualizations: buildFleetVisualizationData(vehicles),
   };
 }
 

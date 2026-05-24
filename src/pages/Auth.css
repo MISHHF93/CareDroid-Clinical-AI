@@ -163,8 +163,8 @@ button.auth-oauth-btn {
   margin-bottom: 20px;
   padding: 14px;
   border-radius: 12px;
-  border: 1px solid rgba(0, 255, 136, 0.45);
-  background: rgba(0, 255, 136, 0.09);
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 34%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--app-surface-1));
 }
 
 .auth-dev-oneclick--compact {
@@ -178,7 +178,7 @@ button.auth-oauth-btn {
   font-weight: 800;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(0, 255, 136, 0.95);
+  color: var(--app-accent-interactive);
 }
 
 .auth-dev-oneclick .btn {
@@ -360,7 +360,7 @@ button.auth-oauth-btn {
   border: none;
   padding: 0;
   font-size: 0.8125rem;
-  color: var(--accent-secondary, #22d3ee);
+  color: var(--app-accent-interactive);
   cursor: pointer;
   text-decoration: underline;
 }

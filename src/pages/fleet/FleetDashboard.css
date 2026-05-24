@@ -152,6 +152,23 @@
   color: var(--text-primary);
 }
 
+.fleet-visual-analytics {
+  margin: 24px 0;
+  min-width: 0;
+}
+
+.fleet-dashboard-demo-note {
+  margin: -4px 0 14px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.fleet-visual-metrics,
+.fleet-visual-grid {
+  margin-bottom: 16px;
+}
+
 .fleet-vehicle-list {
   list-style: none;
   margin: 0;

@@ -7,10 +7,10 @@
 export const PRIMARY_NAV_ITEMS = Object.freeze([
   {
     id: 'home',
-    label: 'Home',
-    mobileLabel: 'Home',
-    path: '/home',
-    legacyPaths: ['/dashboard'],
+    label: 'Dashboard',
+    mobileLabel: 'Dash',
+    path: '/dashboard',
+    legacyPaths: ['/home'],
     matchPaths: ['/home', '/dashboard'],
   },
   {
@@ -58,6 +58,13 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     legacyPaths: ['/fleet'],
     matchPaths: ['/operations', '/fleet', '/clinical/alerts', '/analytics', '/costs', '/audit-logs'],
     matchPrefixes: ['/fleet/'],
+  },
+  {
+    id: 'medical-iot',
+    label: 'Medical IoT',
+    mobileLabel: 'IoT',
+    path: '/medical-iot',
+    matchPaths: ['/medical-iot'],
   },
   {
     id: 'settings',

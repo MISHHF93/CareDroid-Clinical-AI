@@ -21,9 +21,7 @@
   max-width: 100%;
   height: 100%;
   overflow: hidden;
-  background:
-    radial-gradient(circle at top left, rgba(0, 255, 136, 0.09), transparent 34%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0));
+  background: var(--app-bg);
 }
 
 .dashboard-chat-header {
@@ -34,10 +32,10 @@
   gap: var(--space-4);
   padding: var(--space-4) var(--space-6);
   border-bottom: 1px solid var(--panel-border);
-  background: rgba(2, 6, 23, 0.72);
+  background: var(--app-surface-glass);
   -webkit-backdrop-filter: blur(var(--app-blur-glass, 18px));
   backdrop-filter: blur(var(--app-blur-glass, 18px));
-  box-shadow: 0 10px 32px rgba(2, 6, 23, 0.18);
+  box-shadow: var(--app-shadow-1);
   position: relative;
   z-index: 3;
 }
@@ -58,7 +56,7 @@
   justify-content: center;
   flex: 0 0 auto;
   background: var(--accent-gradient);
-  color: var(--navy-ink);
+  color: var(--app-on-solid);
   box-shadow: var(--shadow-1);
 }
 
@@ -94,7 +92,7 @@
   padding: var(--space-2);
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--app-surface-2);
 }
 
 .dashboard-header-group__label {
@@ -128,7 +126,7 @@
 
 .dashboard-header-tool:hover,
 .dashboard-header-tool:focus-visible {
-  border-color: rgba(0, 255, 136, 0.45);
+  border-color: var(--app-accent-interactive);
   outline: none;
 }
 
@@ -151,9 +149,9 @@
 }
 
 .dashboard-context-pill--online {
-  border-color: rgba(0, 255, 136, 0.35);
-  color: var(--accent-green);
-  background: rgba(0, 255, 136, 0.08);
+  border-color: color-mix(in srgb, var(--app-success) 34%, var(--app-panel-border));
+  color: var(--app-success);
+  background: color-mix(in srgb, var(--app-success) 8%, transparent);
 }
 
 .dashboard-context-pill--tool {
@@ -281,7 +279,7 @@
 .dashboard-pulse-card:hover,
 .dashboard-pulse-card:focus-visible {
   transform: translateY(-2px);
-  border-color: rgba(0, 255, 136, 0.45);
+  border-color: var(--app-accent-interactive);
   background: var(--surface-2);
   outline: none;
 }
@@ -294,8 +292,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 255, 136, 0.12);
-  color: var(--accent-green);
+  background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
+  color: var(--app-accent-interactive);
 }
 
 .dashboard-starter-card__title,
@@ -314,13 +312,13 @@
 
 .dashboard-starter-card__prompt {
   margin-top: auto;
-  color: var(--accent-green);
+  color: var(--app-accent-interactive);
   font-weight: 750;
 }
 
 .dashboard-pulse-card__action {
   margin-top: auto;
-  color: var(--accent-green);
+  color: var(--app-accent-interactive);
   font-size: var(--font-12);
   font-weight: 800;
 }
@@ -361,7 +359,7 @@
 
 .dashboard-msg-bubble--user {
   background: var(--accent-gradient);
-  color: var(--navy-ink);
+  color: var(--app-on-solid);
   border: none;
 }
 
@@ -381,17 +379,15 @@
   justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-4);
-  border: 1px solid rgba(0, 255, 136, 0.32);
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 28%, var(--app-panel-border));
   border-radius: var(--radius-md);
-  background:
-    linear-gradient(135deg, rgba(0, 255, 136, 0.12), rgba(0, 153, 255, 0.08)),
-    var(--surface-1);
+  background: var(--app-surface-1);
   box-shadow: var(--shadow-1);
 }
 
 .dashboard-today-card__eyebrow {
   margin: 0 0 4px;
-  color: var(--accent-green);
+  color: var(--app-accent-interactive);
   font-size: var(--font-12);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -415,9 +411,9 @@
   flex: 0 0 auto;
   min-height: var(--app-min-touch-target, 44px);
   padding: 0 var(--space-4);
-  border: 1px solid rgba(0, 255, 136, 0.38);
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 34%, var(--app-panel-border));
   border-radius: var(--radius-md);
-  background: rgba(0, 255, 136, 0.14);
+  background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
   color: var(--text-color);
   font-weight: 800;
   cursor: pointer;
@@ -449,8 +445,8 @@
   min-height: 34px;
   padding: 0 var(--space-3);
   border-radius: 999px;
-  border: 1px solid rgba(0, 255, 136, 0.34);
-  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 30%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, transparent);
   color: var(--text-color);
   font-size: var(--font-12);
   font-weight: 800;
@@ -459,8 +455,8 @@
 
 .dashboard-msg-suggestions button:hover,
 .dashboard-msg-suggestions button:focus-visible {
-  border-color: rgba(0, 255, 136, 0.55);
-  background: rgba(0, 255, 136, 0.16);
+  border-color: var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
   outline: none;
 }
 
@@ -490,7 +486,7 @@
   position: relative;
   z-index: 4;
   flex-direction: column;
-  box-shadow: 0 -8px 32px rgba(2, 6, 23, 0.18);
+  box-shadow: var(--app-shadow-1);
 }
 
 .dashboard-action-rail {
@@ -558,13 +554,13 @@
 }
 
 .dashboard-action-chip--recommended {
-  border-color: rgba(0, 255, 136, 0.34);
-  background: rgba(0, 255, 136, 0.1);
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 30%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, transparent);
 }
 
 .dashboard-action-chip:hover,
 .dashboard-action-chip:focus-visible {
-  border-color: rgba(0, 255, 136, 0.55);
+  border-color: var(--app-accent-interactive);
   outline: none;
 }
 
@@ -587,9 +583,9 @@
   gap: 8px;
   min-height: var(--app-min-touch-target, 44px);
   padding: 0 var(--space-3);
-  border: 1px solid rgba(0, 255, 136, 0.35);
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 30%, var(--app-panel-border));
   border-radius: 999px;
-  background: rgba(0, 255, 136, 0.1);
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, transparent);
   color: var(--text-color);
   font-size: var(--font-12);
   font-weight: 800;
@@ -633,9 +629,9 @@
 }
 
 .dashboard-input:focus {
-  border-color: rgba(0, 255, 136, 0.55);
+  border-color: var(--app-accent-interactive);
   box-shadow:
-    0 0 0 3px rgba(0, 255, 136, 0.12),
+    0 0 0 3px var(--app-focus),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
@@ -647,7 +643,7 @@
   padding: 0 var(--space-5);
   box-sizing: border-box;
   background: var(--accent-gradient);
-  color: var(--navy-ink);
+  color: var(--app-on-solid);
   border: none;
   border-radius: var(--radius-md);
   font-weight: 600;
@@ -741,8 +737,8 @@
 }
 
 .dashboard-outreach-intent-card--selected {
-  border-color: rgba(0, 255, 136, 0.55);
-  background: rgba(0, 255, 136, 0.08);
+  border-color: var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, transparent);
 }
 
 .dashboard-outreach-intent-card input {
@@ -795,8 +791,8 @@
 .dashboard-outreach-field input:focus,
 .dashboard-outreach-field select:focus,
 .dashboard-outreach-field textarea:focus {
-  border-color: rgba(0, 255, 136, 0.55);
-  box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.12);
+  border-color: var(--app-accent-interactive);
+  box-shadow: 0 0 0 3px var(--app-focus);
 }
 
 .dashboard-outreach-visible-context {
@@ -864,7 +860,7 @@
 }
 
 .dashboard-outreach-error {
-  color: #ffb4b4 !important;
+  color: var(--app-danger) !important;
 }
 
 .dashboard-outreach-prompt-details {
@@ -895,7 +891,7 @@
 .dashboard-outreach-primary {
   border: none;
   background: var(--accent-gradient);
-  color: var(--navy-ink);
+  color: var(--app-on-solid);
 }
 
 .dashboard-outreach-secondary {
@@ -920,9 +916,9 @@
   grid-template-columns: auto minmax(0, 1fr);
   gap: var(--space-3);
   padding: var(--space-3);
-  border: 1px solid rgba(0, 255, 136, 0.25);
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 24%, var(--app-panel-border));
   border-radius: var(--radius-md);
-  background: rgba(0, 255, 136, 0.08);
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, transparent);
   color: var(--text-color);
 }
 

@@ -13,6 +13,10 @@ const layoutVisibilityCss = readFileSync(join(__dirname, 'layout-visibility.css'
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const mainJsx = readFileSync(join(__dirname, '../main.jsx'), 'utf8');
 const buttonCss = readFileSync(join(__dirname, '../components/ui/button.css'), 'utf8');
+const dashboardVisualizationsCss = readFileSync(
+  join(__dirname, '../components/dashboard/DashboardVisualizations.css'),
+  'utf8'
+);
 const disclaimerCss = readFileSync(
   join(__dirname, '../components/clinical/ClinicalDecisionSupportDisclaimer.css'),
   'utf8'
@@ -91,5 +95,11 @@ describe('responsive UX — component baselines', () => {
 
   it('shared btn component supports touch-friendly sizing', () => {
     expect(buttonCss).toContain('.btn-md');
+  });
+
+  it('dashboard visualization grids collapse before phone widths and hide chart overflow locally', () => {
+    expect(dashboardVisualizationsCss).toMatch(/\.dashboard-visual-grid[\s\S]*minmax\(0,\s*1fr\)/);
+    expect(dashboardVisualizationsCss).toMatch(/@media \(max-width:\s*860px\)[\s\S]*grid-template-columns:\s*1fr/);
+    expect(dashboardVisualizationsCss).toMatch(/\.dashboard-chart[\s\S]*overflow:\s*hidden/);
   });
 });

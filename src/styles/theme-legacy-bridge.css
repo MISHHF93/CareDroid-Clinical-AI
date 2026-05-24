@@ -23,6 +23,7 @@ html {
   --surface-0: var(--app-surface-0);
   --surface-1: var(--app-surface-1);
   --surface-2: var(--app-surface-2);
+  --surface-muted: var(--app-surface-muted);
   --surface-glass: var(--app-surface-glass);
   --border-subtle: var(--app-border-subtle);
   --divider-on-surface: var(--app-divider-on-surface);
@@ -33,8 +34,9 @@ html {
   --accent-2: var(--app-accent-2);
   --accent-cyan: var(--app-accent-2);
   --accent-green: var(--app-accent);
-  --accent-gradient: linear-gradient(135deg, var(--app-accent), var(--app-accent-2));
-  --gradient-accent: linear-gradient(135deg, var(--app-accent), var(--app-accent-2));
+  --accent-hover: var(--app-accent-hover);
+  --accent-gradient: linear-gradient(135deg, var(--app-accent-interactive), var(--app-accent-2));
+  --gradient-accent: linear-gradient(135deg, var(--app-accent-interactive), var(--app-accent-2));
   --danger: var(--app-danger);
   --error-color: var(--app-danger);
   --warning: var(--app-warning);
@@ -46,6 +48,13 @@ html {
   --focus-ring: var(--app-focus);
   --disabled: var(--app-disabled);
   --primary-color: var(--app-accent-interactive);
+  --primary-hover: var(--app-accent-hover);
+  --chart-1: var(--app-chart-1);
+  --chart-2: var(--app-chart-2);
+  --chart-3: var(--app-chart-3);
+  --chart-4: var(--app-chart-4);
+  --chart-5: var(--app-chart-5);
+  --chart-6: var(--app-chart-6);
   --space-xs: var(--space-1);
   --space-sm: var(--space-2);
   --space-md: var(--space-3);

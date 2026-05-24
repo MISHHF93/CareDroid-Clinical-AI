@@ -13,7 +13,7 @@ function readStoredPreference() {
   } catch {
     /* ignore */
   }
-  return 'dark';
+  return 'system';
 }
 
 function resolveFromPreference(pref, prefersDark) {

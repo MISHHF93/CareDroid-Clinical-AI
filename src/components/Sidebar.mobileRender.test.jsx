@@ -84,7 +84,7 @@ describe('Sidebar mobile render state', () => {
     expect(closeButton).toHaveAccessibleName(/close menu/i);
     const nav = container.querySelector('nav.sidebar-nav');
     expect(nav).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^home$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^dashboard$/i })).toBeInTheDocument();
     expect(within(nav).getByRole('button', { name: /^assistant$/i })).toBeInTheDocument();
     expect(within(nav).getByRole('button', { name: /^operations$/i })).toBeInTheDocument();
   });

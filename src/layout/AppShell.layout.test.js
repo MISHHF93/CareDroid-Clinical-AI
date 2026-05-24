@@ -71,7 +71,7 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*height:\s*auto/);
   });
 
-  it('reserves compact chrome offset on scrollport (not hidden behind menu/theme)', () => {
+  it('reserves compact chrome offset on scrollport (not hidden behind menu/command controls)', () => {
     expect(appShellCss).toMatch(
       /\.app-shell--compact\.app-shell--authed \.app-shell-page-body[\s\S]*padding-top:\s*var\(--app-compact-content-offset-top/
     );
@@ -96,6 +96,13 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellJsx).toContain('app-shell-dev-mode-banner');
     expect(appShellJsx).toContain('isDevAuthBypass');
     expect(appShellCss).toMatch(/\.app-shell-dev-mode-banner[\s\S]*flex:\s*0 0 auto/);
+  });
+
+  it('gates Quick Command behind authenticated app shell state', () => {
+    expect(appShellJsx).toContain('QuickCommandLauncher');
+    expect(appShellJsx).toContain('isAuthed && (');
+    expect(appShellJsx).toContain('aria-label="Open Quick Command"');
+    expect(appShellJsx).not.toContain('app-shell-theme-fab');
   });
 
   it('scroll routes grow with content instead of clipping inside page-body', () => {

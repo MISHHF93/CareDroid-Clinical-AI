@@ -512,8 +512,9 @@
 }
 
 .tools-tips {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #764ba2 100%);
-  color: var(--app-on-solid);
+  border: 1px solid var(--app-panel-border);
+  background: var(--app-surface-1);
+  color: var(--app-fg);
   padding: 48px;
   border-radius: 16px;
   margin-top: 48px;
@@ -542,16 +543,16 @@
 }
 
 .tip-card {
-  background: color-mix(in srgb, var(--app-on-solid) 14%, transparent);
+  background: var(--app-surface-2);
   backdrop-filter: blur(10px);
   padding: 24px;
   border-radius: 12px;
-  border: 1px solid color-mix(in srgb, var(--app-on-solid) 22%, transparent);
+  border: 1px solid var(--app-panel-border);
   transition: all 0.3s;
 }
 
 .tip-card:hover {
-  background: color-mix(in srgb, var(--app-on-solid) 20%, transparent);
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--app-surface-2));
   transform: translateY(-4px);
 }
 

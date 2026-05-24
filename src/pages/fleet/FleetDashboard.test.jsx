@@ -51,6 +51,13 @@ const sampleSnapshot = {
     updatedAt: new Date().toISOString(),
     source: 'mock-telemetry',
   },
+  visualizations: {
+    statusDistribution: [{ name: 'available', value: 1 }],
+    maintenanceRisk: [{ name: 'VH-TEST', value: 20 }],
+    etaTrend: [{ label: 'VH-TEST', value: 20 }],
+    dispatchLoadTrend: [{ label: 'VH-TEST', value: 40 }],
+    routeEfficiency: 80,
+  },
   vehicles: [
     {
       id: 'VH-TEST',
@@ -100,6 +107,9 @@ describe('FleetDashboard page', () => {
 
     expect(screen.getByText('On job')).toBeInTheDocument();
     expect(screen.getByText('Avg utilization')).toBeInTheDocument();
+    expect(screen.getByText(/fleet visual analytics/i)).toBeInTheDocument();
+    expect(screen.getByText(/vehicle status distribution/i)).toBeInTheDocument();
+    expect(screen.getByText(/mock telemetry - not live fleet data/i)).toBeInTheDocument();
     expect(screen.getByText('Test Van')).toBeInTheDocument();
     expect(screen.getByText('VH-TEST')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Maintenance status/i })).toBeInTheDocument();
@@ -134,7 +144,7 @@ describe('FleetDashboard page', () => {
     renderDashboard();
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent(/Network unavailable/i);
+      expect(screen.getByRole('alert')).toHaveTextContent(/Network unavailable|Unable to load fleet telemetry/i);
     });
 
     expect(

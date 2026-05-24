@@ -18,6 +18,7 @@ const TOOL_FILTER_OPTIONS = Object.freeze([
   { value: 'backend-backed', label: 'Verified actions' },
   { value: 'clinical-page', label: 'Forms and pages' },
   { value: 'fleet', label: 'Operations' },
+  { value: 'iot', label: 'Medical IoT' },
   { value: 'reference', label: 'Reference' },
 ]);
 
@@ -54,6 +55,7 @@ function matchesToolFilter(tool, filter) {
   if (filter === 'backend-backed') return tool.launchType === 'backend-backed' || tool.executorStatus === 'registered';
   if (filter === 'clinical-page') return tool.surface === 'tool-page' || tool.launchType === 'clinical-page';
   if (filter === 'fleet') return tool.category === 'Fleet' || tool.surface === 'fleet-page';
+  if (filter === 'iot') return tool.category === 'IoT' || tool.surface === 'iot-dashboard';
   if (filter === 'reference') return tool.category === 'Reference';
   return true;
 }
@@ -171,10 +173,10 @@ const ToolsOverview = () => {
             <span className="tools-overview-title-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.tools} size={28} />
             </span>{' '}
-            Tools
+            Tool Library
           </h1>
           <p className="header-subtitle">
-            Pick what you want to do. CareDroid keeps the routes, validation, and execution details underneath.
+            Browse the complete canonical tool library. The Command Dashboard stays the main clinical cockpit.
           </p>
           <div className="tools-workspace">
             <label htmlFor="workspaceSelect">Workspace</label>
@@ -230,7 +232,7 @@ const ToolsOverview = () => {
           <div className="header-stats">
             <div className="stat">
               <span className="stat-number">{tools.length}</span>
-              <span className="stat-label">Actions</span>
+              <span className="stat-label">Library tools</span>
             </div>
             <div className="stat">
               <span className="stat-number">{filteredTools.length}</span>

@@ -88,8 +88,8 @@ export default function ToolNotFound({
         <Link to="/tools" className="tool-not-found-btn tool-not-found-btn--ghost">
           All Tools
         </Link>
-        <Link to="/home" className="tool-not-found-btn tool-not-found-btn--ghost">
-          Back to Home
+        <Link to="/dashboard" className="tool-not-found-btn tool-not-found-btn--ghost">
+          Back to Dashboard
         </Link>
       </div>
     </div>

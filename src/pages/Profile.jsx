@@ -253,8 +253,8 @@ const Profile = () => {
           {canViewPhiAccess && <Link to="/audit-logs">Audit logs</Link>}
         </div>
         <div style={{ marginTop: '18px', fontSize: '12px', color: 'var(--muted-text)' }}>
-          <Link to="/home" style={{ color: '#00FF88', textDecoration: 'none' }}>
-            ← Back to Home
+          <Link to="/dashboard" style={{ color: '#00FF88', textDecoration: 'none' }}>
+            ← Back to Dashboard
           </Link>
         </div>
       </Card>

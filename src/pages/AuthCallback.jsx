@@ -23,7 +23,7 @@ const AuthCallback = () => {
     if (!fromUrl || autoHandled.current) return;
     autoHandled.current = true;
     setAuthToken(fromUrl);
-    navigate('/home', { replace: true });
+    navigate('/dashboard', { replace: true });
   }, [params, setAuthToken, navigate]);
 
   const handleSave = () => {
@@ -33,7 +33,7 @@ const AuthCallback = () => {
       return;
     }
     setAuthToken(trimmed);
-    navigate('/home', { replace: true });
+    navigate('/dashboard', { replace: true });
   };
 
   if (initialToken) {
@@ -41,7 +41,9 @@ const AuthCallback = () => {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px' }}>
         <Card style={{ width: '100%', maxWidth: '480px' }}>
           <h2 style={{ marginTop: 0 }}>Completing sign-in…</h2>
-          <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>You will be redirected to Home.</p>
+          <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
+            You will be redirected to the Command Dashboard.
+          </p>
         </Card>
       </div>
     );

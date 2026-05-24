@@ -25,7 +25,7 @@
  */
 
 /** Bump when registry/NLU lists or maps change incompatibly. */
-export const TOOL_ID_CONTRACT_VERSION = '1.5.0';
+export const TOOL_ID_CONTRACT_VERSION = '1.6.0';
 
 /** Shared SPA paths for tool launch (browser-safe). */
 export const TOOL_LAUNCH_PATHS = Object.freeze({
@@ -108,6 +108,7 @@ export const REGISTRY = Object.freeze({
   routeOptimizer: 'route-optimizer',
   predictiveMaintenance: 'predictive-maintenance',
   fleetCommand: 'fleet-command',
+  medicalIotDashboard: 'medical-iot-dashboard',
 });
 
 /** NLU / backend pattern primary tool ids (`clinicalIntentTools`, tool.patterns.ts). */
@@ -360,6 +361,10 @@ export const PR_FLEET_ALL_REGISTRY_IDS = Object.freeze([
   ...FLEET_TIER_B_CHAT_REGISTRY_IDS,
 ]);
 
+// —— Medical IoT / device monitoring ——
+
+export const MEDICAL_IOT_REGISTRY_IDS = Object.freeze([REGISTRY.medicalIotDashboard]);
+
 // —— Clinical AI operations pages (non-calculator tools) ——
 
 export const CLINICAL_AI_PAGE_REGISTRY_IDS = Object.freeze([
@@ -608,6 +613,7 @@ export const CANONICAL_TOOL_GROUPS = Object.freeze({
   clinicalCalculatorsHub: Object.freeze([REGISTRY.calculatorsHub]),
   fleetLogisticsTierA: FLEET_TIER_A_REGISTRY_IDS,
   fleetLogisticsTierBChat: FLEET_TIER_B_CHAT_REGISTRY_IDS,
+  medicalIotDashboards: MEDICAL_IOT_REGISTRY_IDS,
   nluHubOnlyProfiles: NLU_HUB_ONLY_PROFILE_TOOL_IDS,
   backendExecutors: ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
 });
@@ -622,6 +628,7 @@ export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
   ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsHub,
   ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierA,
   ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierBChat,
+  ...CANONICAL_TOOL_GROUPS.medicalIotDashboards,
 ]);
 
 /** NLU / legacy / phrase aliases → registry id (recommendations, catalog, cost tracking). */
@@ -1009,6 +1016,16 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'fleet-dispatch': REGISTRY.dispatchAi,
   'dispatch intelligence': REGISTRY.dispatchAi,
   'dispatch-intelligence': REGISTRY.dispatchAi,
+  'medical-iot': REGISTRY.medicalIotDashboard,
+  'medical-iot-dashboard': REGISTRY.medicalIotDashboard,
+  'device monitoring': REGISTRY.medicalIotDashboard,
+  'device-monitoring': REGISTRY.medicalIotDashboard,
+  'connected devices': REGISTRY.medicalIotDashboard,
+  'connected-devices': REGISTRY.medicalIotDashboard,
+  'patient telemetry': REGISTRY.medicalIotDashboard,
+  'patient-telemetry': REGISTRY.medicalIotDashboard,
+  'vitals monitor': REGISTRY.medicalIotDashboard,
+  'vitals-monitor': REGISTRY.medicalIotDashboard,
 });
 
 /** Values every NLU_TO_REGISTRY_ID target must resolve to (registry id or hub). */

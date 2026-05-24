@@ -6,6 +6,7 @@ import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon } from '../navigation/iconRegistry';
 import { PRIMARY_NAV_ITEMS, primaryNavPathMatches } from '../navigation/primaryNavigation';
 import { useDrawerFocus } from '../hooks/useDrawerFocus';
+import QuickCommandLauncher from '../components/QuickCommandLauncher';
 import {
   COMPACT_MEDIA_QUERY,
   getIsCompactViewport,
@@ -39,6 +40,7 @@ const AppShell = ({
 
   const [isCompact, setIsCompact] = useState(getIsCompactViewport);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [quickCommandOpen, setQuickCommandOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const menuButtonRef = useRef(null);
   const sidebarRef = useRef(null);
@@ -65,6 +67,11 @@ const AppShell = ({
   };
 
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
+  const openQuickCommand = useCallback(() => {
+    setQuickCommandOpen(true);
+    setMobileNavOpen(false);
+  }, []);
+  const closeQuickCommand = useCallback(() => setQuickCommandOpen(false), []);
 
   const handlePrimaryNav = useCallback(
     (path) => {
@@ -76,7 +83,20 @@ const AppShell = ({
 
   useEffect(() => {
     closeMobileNav();
-  }, [location.pathname, location.search, closeMobileNav]);
+    closeQuickCommand();
+  }, [location.pathname, location.search, closeMobileNav, closeQuickCommand]);
+
+  useEffect(() => {
+    if (!isAuthed) return undefined;
+    const onKeyDown = (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        openQuickCommand();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isAuthed, openQuickCommand]);
 
   useDrawerFocus({
     isOpen: isAuthed && isCompact && mobileNavOpen,
@@ -133,6 +153,7 @@ const AppShell = ({
         onCloseMobileNav={closeMobileNav}
         sidebarCollapsed={sidebarCollapsed}
         onSidebarCollapsedChange={setSidebarCollapsed}
+        onOpenQuickCommand={openQuickCommand}
       />
 
       <div className="app-shell-main-wrap">
@@ -151,28 +172,29 @@ const AppShell = ({
             </span>
           </button>
         )}
-        {isAuthed && (
+        {isAuthed && isCompact && (
           <button
             type="button"
-            className="app-shell-theme-fab"
-            onClick={cycleTheme}
-            title="Cycle theme (system / light / dark)"
-            aria-label={`Theme: ${preference}, active ${resolvedTheme}. Click to cycle.`}
+            className="app-shell-command-btn"
+            onClick={openQuickCommand}
+            aria-expanded={quickCommandOpen}
+            aria-haspopup="dialog"
+            aria-label="Open Quick Command"
           >
             <span aria-hidden>
-              <NavIcon
-                icon={
-                  preference === 'system'
-                    ? CHROME_ICONS.contrast
-                    : resolvedTheme === 'dark'
-                      ? CHROME_ICONS.moon
-                      : CHROME_ICONS.sun
-                }
-                size={22}
-              />
+              <NavIcon icon={CHROME_ICONS.search} size={22} />
             </span>
-            <span className="app-shell-theme-fab-label">{preference}</span>
           </button>
+        )}
+        {isAuthed && (
+          <QuickCommandLauncher
+            isOpen={quickCommandOpen}
+            isCompact={isCompact}
+            onClose={closeQuickCommand}
+            themePreference={preference}
+            resolvedTheme={resolvedTheme}
+            onCycleTheme={cycleTheme}
+          />
         )}
         {isAuthed && isCompact && (
           <nav className="app-shell-bottom-nav" aria-label="Primary navigation">

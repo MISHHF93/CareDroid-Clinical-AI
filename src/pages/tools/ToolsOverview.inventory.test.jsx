@@ -54,7 +54,7 @@ describe('ToolsOverview unified inventory', () => {
       (heading) => heading.textContent
     );
 
-    expect(screen.getByRole('heading', { level: 1, name: /^tools$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /^tool library$/i })).toBeInTheDocument();
     expect([...container.querySelectorAll('.stat-number')].map((node) => node.textContent)).toContain(
       String(userFacing.length)
     );
@@ -62,6 +62,7 @@ describe('ToolsOverview unified inventory', () => {
     for (const record of userFacing) {
       expect(renderedCards, record.id).toContain(record.label);
     }
+    expect(renderedCards).toContain('Medical IoT Dashboard');
     expect(container.textContent).toMatch(/developer catalog \/ source audit/i);
     expect(screen.queryByText(/hidden APIs/i)).not.toBeInTheDocument();
   }, 10000);

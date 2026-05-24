@@ -96,6 +96,7 @@ describe('clinicalToolIdContract — canonical groups', () => {
       ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsHub,
       ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierA,
       ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierBChat,
+      ...CANONICAL_TOOL_GROUPS.medicalIotDashboards,
     ];
     expect(sortedUnique(parts)).toEqual(sortedUnique([...ALL_REGISTRY_TOOL_IDS]));
     expect(parts).toHaveLength(ALL_REGISTRY_TOOL_IDS.length);

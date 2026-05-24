@@ -3,6 +3,13 @@ import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { fetchFleetCommandSnapshot } from '../../services/fleetTelemetryService';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
+import {
+  CategoryBarChart,
+  DistributionDonutChart,
+  MetricCard,
+  TrendChart,
+  VisualizationPanel,
+} from '../../components/dashboard/DashboardVisualizations';
 import FleetPageChrome, { FleetOperationalBanner } from './FleetPageChrome';
 import {
   FleetMaintenanceWidget,
@@ -114,7 +121,7 @@ export default function FleetDashboard() {
         {phase === 'error' ? (
           <div className="fleet-dashboard-error" role="alert">
             <NavIcon icon={CHROME_ICONS.alert} size={28} aria-hidden />
-            <p>{errorMessage}</p>
+            <p>{errorMessage || 'Unable to load fleet telemetry.'}</p>
             <button
               type="button"
               className="fleet-btn fleet-btn--secondary"
@@ -184,6 +191,44 @@ export default function FleetDashboard() {
             ) : null}
 
             <FleetSummaryWidget summary={summary} />
+
+            <section className="fleet-visual-analytics" aria-labelledby="fleet-visual-analytics-heading">
+              <h2 id="fleet-visual-analytics-heading" className="fleet-section-title">
+                Fleet visual analytics
+              </h2>
+              <p className="fleet-dashboard-demo-note">
+                Mock telemetry - not live fleet data. Verify against dispatch and telematics systems.
+              </p>
+              <div className="dashboard-metric-grid fleet-visual-metrics">
+                <MetricCard label="Active vehicles" value={summary.activeVehicles + summary.occupiedVehicles} hint="On route or on job" />
+                <MetricCard label="Offline vehicles" value={summary.maintenanceCount} hint="Maintenance/unavailable proxy" tone={summary.maintenanceCount ? 'warning' : 'good'} />
+                <MetricCard
+                  label="Average ETA"
+                  value={summary.averageEtaMinutes != null ? `${summary.averageEtaMinutes}m` : 'None'}
+                  hint="Vehicles with ETA"
+                />
+                <MetricCard
+                  label="Route efficiency"
+                  value={`${snapshot.visualizations?.routeEfficiency ?? 0}%`}
+                  hint="Demo route-time proxy"
+                />
+              </div>
+              <div className="dashboard-visual-grid fleet-visual-grid">
+                <VisualizationPanel title="Vehicle Status Distribution" description="Active, available, occupied, and maintenance states." badge="Mock telemetry">
+                  <DistributionDonutChart data={snapshot.visualizations?.statusDistribution || []} title="Vehicle status distribution" />
+                </VisualizationPanel>
+                <VisualizationPanel title="Route Time Trend" description="ETA trend by reporting vehicle." badge="Mock telemetry">
+                  <TrendChart data={snapshot.visualizations?.etaTrend || []} title="Route time trend" color="var(--app-chart-1)" />
+                </VisualizationPanel>
+                <VisualizationPanel title="Maintenance Risk" description="Risk proxy from maintenance state and energy level.">
+                  <CategoryBarChart data={snapshot.visualizations?.maintenanceRisk || []} title="Maintenance risk bar chart" color="var(--app-chart-4)" />
+                </VisualizationPanel>
+                <VisualizationPanel title="Dispatch Load Trend" description="Vehicle utilization across current snapshot.">
+                  <TrendChart data={snapshot.visualizations?.dispatchLoadTrend || []} title="Dispatch load trend" color="var(--app-chart-2)" />
+                </VisualizationPanel>
+              </div>
+            </section>
+
             <FleetMaintenanceWidget vehicles={snapshot.vehicles} />
             <FleetVehicleListWidget vehicles={snapshot.vehicles} />
 

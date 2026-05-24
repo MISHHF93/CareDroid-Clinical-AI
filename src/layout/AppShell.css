@@ -116,7 +116,7 @@
 }
 
 .app-shell-menu-btn:hover {
-  border-color: var(--accent-green);
+  border-color: var(--app-accent-interactive);
 }
 
 .app-shell-menu-icon {
@@ -126,15 +126,19 @@
   color: inherit;
 }
 
-.app-shell-theme-fab {
+.app-shell-command-btn {
   position: absolute;
   top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
   right: calc(var(--space-3) + env(safe-area-inset-right, 0px));
-  z-index: 5;
+  z-index: 960;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
+  justify-content: center;
+  width: var(--touch-target-min, 44px);
+  height: var(--touch-target-min, 44px);
+  min-width: var(--touch-target-min, 44px);
+  min-height: var(--touch-target-min, 44px);
+  padding: 0;
   border-radius: var(--radius-md);
   border: 1px solid var(--panel-border);
   background: var(--app-surface-glass);
@@ -146,23 +150,13 @@
   box-shadow: var(--shadow-1);
 }
 
-.app-shell--compact .app-shell-theme-fab {
+.app-shell--compact .app-shell-command-btn {
   top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
   right: calc(var(--space-3) + env(safe-area-inset-right, 0px));
 }
 
-.app-shell-theme-fab-label {
-  text-transform: capitalize;
-}
-
-@media (max-width: 520px) {
-  .app-shell-theme-fab-label {
-    display: none;
-  }
-}
-
-.app-shell-theme-fab:hover {
-  border-color: var(--accent-green);
+.app-shell-command-btn:hover {
+  border-color: var(--app-accent-interactive);
 }
 
 .app-shell-bottom-nav {
@@ -172,7 +166,7 @@
   left: env(safe-area-inset-left, 0px);
   z-index: 930;
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
   gap: 2px;
   min-height: var(--app-bottom-nav-height, 64px);
   padding: 6px max(6px, env(safe-area-inset-right, 0px)) 6px max(6px, env(safe-area-inset-left, 0px));
@@ -257,7 +251,7 @@
   box-sizing: border-box;
 }
 
-/* Reserve space under absolute menu/theme controls when compact (scroll + initial layout) */
+/* Reserve space under absolute menu/command controls when compact (scroll + initial layout) */
 .app-shell--compact.app-shell--authed .app-shell-page-body {
   padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
   padding-bottom: calc(
@@ -318,11 +312,9 @@
     left: calc(var(--space-2) + env(safe-area-inset-left, 0px));
   }
 
-  .app-shell-theme-fab {
+  .app-shell-command-btn {
     top: calc(var(--space-2) + env(safe-area-inset-top, 0px));
     right: calc(var(--space-2) + env(safe-area-inset-right, 0px));
-    padding: var(--space-2);
-    gap: var(--space-1);
   }
 }
 
