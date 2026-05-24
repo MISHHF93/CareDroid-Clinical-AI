@@ -67,7 +67,7 @@ describe('ToolsOverview unified inventory', () => {
     expect(renderedCards).toContain('Hospital Map');
     expect(renderedCards).toContain('Medical IoT Dashboard');
     expect(renderedCards).toContain('Device Fleet Management');
-    expect(container.textContent).toMatch(/developer catalog \/ source audit/i);
+    expect(container.textContent).not.toMatch(/developer catalog \/ source audit/i);
     expect(screen.queryByText(/hidden APIs/i)).not.toBeInTheDocument();
   }, 10000);
 
@@ -104,6 +104,13 @@ describe('ToolsOverview unified inventory', () => {
         /start with assistant/i.test(button.textContent || '')
       )
     ).toHaveLength(chatAssistedCount);
+  });
+
+  it('keeps /tools compact and free of duplicate developer catalog links', () => {
+    const { container } = renderOverview();
+    expect(container.querySelector('.tools-discovery-controls')).toBeTruthy();
+    expect(container.querySelectorAll('.tool-card-large').length).toBeGreaterThan(0);
+    expect(screen.queryByRole('button', { name: /developer catalog/i })).not.toBeInTheDocument();
   });
 
   it('shows a non-blank empty state for empty custom workspaces', () => {

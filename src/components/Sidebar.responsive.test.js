@@ -76,8 +76,8 @@ describe('Sidebar user avatar', () => {
 });
 
 describe('Sidebar responsive — desktop collapse unchanged', () => {
-  it('keeps collapsed width token at 70px', () => {
-    expect(sidebarCss).toMatch(/\.sidebar-collapsed[\s\S]*--sidebar-width-collapsed,\s*70px/);
+  it('keeps collapsed width fallback aligned with the compact token', () => {
+    expect(sidebarCss).toMatch(/\.sidebar-collapsed[\s\S]*--sidebar-width-collapsed,\s*58px/);
     expect(sidebarJsx).toContain('sidebar-collapsed');
     expect(sidebarJsx).toMatch(/effectiveCollapsed = layoutCompact \? false : sidebarCollapsed/);
   });

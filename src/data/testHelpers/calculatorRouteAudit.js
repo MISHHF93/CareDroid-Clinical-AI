@@ -14,7 +14,7 @@ export function assertAppCalculatorRouteWiring(appSource, registryIds) {
   expect(appSource).toContain('initialCalculatorId={calculatorSlug}');
 
   const spreadIdx = appSource.indexOf('...CALCULATOR_ROUTE_DEFS.map');
-  const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
+  const hubIdx = appSource.indexOf("path: '/tools/calculators'");
   expect(spreadIdx).toBeGreaterThan(-1);
   expect(hubIdx).toBeGreaterThan(spreadIdx);
 

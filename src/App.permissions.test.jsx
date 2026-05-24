@@ -13,7 +13,7 @@ const appSource = readFileSync(join(__dirname, 'App.jsx'), 'utf8');
 
 function routeBlock(path) {
   const pathIndex = appSource.indexOf(`path: '${path}'`);
-  const nextPathIndex = appSource.indexOf('\n    { path:', pathIndex + 1);
+  const nextPathIndex = appSource.indexOf('\n    {\n      path:', pathIndex + 1);
   return appSource.slice(pathIndex, nextPathIndex === -1 ? undefined : nextPathIndex);
 }
 

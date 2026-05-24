@@ -11,8 +11,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const sidebarSource = readFileSync(join(__dirname, 'Sidebar.jsx'), 'utf8');
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 const appShellSource = readFileSync(join(__dirname, '../layout/AppShell.jsx'), 'utf8');
+const primaryNavSource = readFileSync(join(__dirname, '../navigation/primaryNavigation.js'), 'utf8');
 
-describe('View All Tools navigation wiring', () => {
+describe('Flattened tools navigation wiring', () => {
   it('registers /tools route to ToolsOverview', () => {
     expect(appSource).toContain("path: '/tools'");
     expect(appSource).toContain('<ToolsOverview />');
@@ -25,24 +26,25 @@ describe('View All Tools navigation wiring', () => {
     expect(appSource).toContain('onOpenToolsOverview={handleOpenToolsOverview}');
   });
 
-  it('passes onOpenToolsOverview through AppShell to Sidebar', () => {
+  it('renders canonical primary navigation in Sidebar instead of duplicate tool shortcuts', () => {
     expect(appShellSource).toContain('onOpenToolsOverview');
-    expect(sidebarSource).toContain('onOpenToolsOverview');
-    expect(sidebarSource).toContain('handleViewAllTools');
+    expect(sidebarSource).toContain('PRIMARY_NAV_ITEMS');
+    expect(sidebarSource).not.toContain('onOpenToolsOverview');
+    expect(sidebarSource).not.toContain('handleViewAllTools');
   });
 
-  it('exposes accessible tools workspace control with active state on /tools', () => {
-    expect(sidebarSource).toContain('Open canonical tools browser');
-    expect(sidebarSource).toContain('Browse All Tools');
-    expect(sidebarSource).toContain('isOnToolsOverview');
-    expect(sidebarSource).toContain("location.pathname === '/tools'");
-    expect(sidebarSource).toContain('sidebar-tools-quick-action--active');
+  it('exposes canonical tools through primary navigation active state', () => {
+    expect(sidebarSource).toContain('navItems.map');
+    expect(sidebarSource).toContain('primaryNavPathMatches');
+    expect(sidebarSource).toContain('isNavItemActive(item)');
+    expect(primaryNavSource).toContain("path: '/tools'");
+    expect(sidebarSource).not.toContain('Browse All Tools');
   });
 
   it('keeps the source audit route available as a developer catalog', () => {
-    expect(sidebarSource).toContain('Open developer catalog and source audit');
-    expect(sidebarSource).toContain('Developer Catalog / Source Audit');
-    expect(sidebarSource).toContain("navigate('/tools/catalog')");
+    expect(readFileSync(join(__dirname, '../navigation/primaryNavigation.js'), 'utf8')).toContain("id: 'developer-audit'");
+    expect(readFileSync(join(__dirname, '../navigation/primaryNavigation.js'), 'utf8')).toContain("path: '/tools/catalog'");
+    expect(sidebarSource).not.toContain("navigate('/tools/catalog')");
   });
 
   it('navigates sidebar tool cards via centralized registry launch', () => {
@@ -53,7 +55,7 @@ describe('View All Tools navigation wiring', () => {
 
   it('derives sidebar cards from canonical tool inventory projection', () => {
     expect(sidebarSource).toContain('getSidebarToolRegistryProjection');
-    expect(sidebarSource).toContain('const medicalTools = getSidebarToolRegistryProjection()');
+    expect(sidebarSource).toContain('const medicalTools = useMemo(() => getSidebarToolRegistryProjection(), [])');
     expect(appShellSource).toContain('<Sidebar');
   });
 

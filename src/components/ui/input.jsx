@@ -15,6 +15,7 @@ const Input = ({
   onFocus,
   onBlur,
   disabled,
+  compact = false,
   className,
   style,
   ...props 
@@ -40,6 +41,7 @@ const Input = ({
     if (success) classes.push('input-success');
     if (disabled) classes.push('input-disabled');
     if (isFocused) classes.push('input-focused');
+    if (compact) classes.push('input-compact');
     if (leftIcon) classes.push('input-with-left-icon');
     if (rightIcon) classes.push('input-with-right-icon');
     if (className) classes.push(className);

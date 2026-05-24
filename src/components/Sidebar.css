@@ -6,7 +6,7 @@
   top: 0;
   min-height: var(--app-viewport-height, 100dvh);
   height: var(--app-viewport-height, 100dvh);
-  width: var(--sidebar-width-expanded, 280px);
+  width: var(--sidebar-width-expanded, 248px);
   max-width: 100%;
   min-width: 0;
   max-height: var(--app-viewport-height, 100dvh);
@@ -28,30 +28,30 @@
 }
 
 .sidebar-collapsed {
-  width: var(--sidebar-width-collapsed, 70px);
+  width: var(--sidebar-width-collapsed, 58px);
 }
 
 /* Header */
 .sidebar-header {
-  padding: 20px 16px;
+  padding: 12px 10px;
   border-bottom: 1px solid var(--sidebar-divider);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 72px;
+  min-height: 56px;
   flex-shrink: 0;
 }
 
 .sidebar-logo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   flex: 1;
 }
 
 .logo-icon {
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   background: var(--sidebar-logo-surface);
   border-radius: 10px;
   display: flex;
@@ -68,7 +68,7 @@
 
 .logo-text h1 {
   margin: 0;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--sidebar-fg);
   letter-spacing: -0.5px;
@@ -117,11 +117,11 @@
   align-items: center;
   gap: 10px;
   width: 100%;
-  min-height: 56px;
-  margin: 10px 0 6px;
-  padding: 10px;
+  min-height: 42px;
+  margin: 6px 0 2px;
+  padding: 8px;
   border: 1px solid var(--sidebar-control-border);
-  border-radius: 14px;
+  border-radius: var(--compact-card-radius, 12px);
   background: color-mix(in srgb, var(--sidebar-control-bg) 72%, transparent);
   color: var(--sidebar-fg);
   text-align: left;
@@ -146,9 +146,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
   background: color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
   color: var(--app-accent-interactive);
 }
@@ -194,24 +194,24 @@
 
 /* User Profile */
 .sidebar-user {
-  padding: 16px;
+  padding: 10px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   background: var(--sidebar-surface-muted);
   border-bottom: 1px solid var(--sidebar-divider);
   position: relative;
 }
 
 .user-avatar {
-  width: 42px;
-  height: 42px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: var(--sidebar-avatar-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--sidebar-avatar-fg);
   border: 2px solid var(--sidebar-avatar-ring);
@@ -278,10 +278,10 @@
   overflow-x: hidden;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  padding: 16px;
+  padding: 10px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
 }
 
 .sidebar-content::-webkit-scrollbar {
@@ -304,7 +304,8 @@
 /* New Conversation Button */
 .btn-new-conversation {
   width: 100%;
-  padding: 12px 16px;
+  min-height: var(--compact-control-height, 38px);
+  padding: 8px 10px;
   background: linear-gradient(135deg, var(--sidebar-cta-from), var(--sidebar-cta-to));
   border: none;
   border-radius: 10px;
@@ -353,12 +354,13 @@
   color: var(--sidebar-fg-subtle);
   text-transform: uppercase;
   letter-spacing: 1px;
-  padding: 0 12px 8px;
+  padding: 0 8px 4px;
 }
 
 .nav-item {
   width: 100%;
-  padding: 10px 12px;
+  min-height: var(--compact-control-height, 38px);
+  padding: 7px 9px;
   background: transparent;
   border: 1px solid transparent;
   border-radius: 8px;
@@ -414,7 +416,7 @@
 .nav-label {
   flex: 1;
   min-width: 0;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   word-break: normal;
 }
 
@@ -427,13 +429,13 @@
 .sidebar-section {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 .section-header {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   padding: 0 4px;
   color: var(--sidebar-fg-muted);
 }
@@ -487,7 +489,7 @@
 .tool-card:hover {
   background: var(--sidebar-tool-surface-hover);
   border-color: var(--sidebar-tool-border-hover);
-  transform: translateY(-2px);
+  transform: none;
 }
 
 .tool-card:hover::before {
@@ -506,7 +508,7 @@
 .tools-subsection {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .tools-subsection-header {
@@ -592,7 +594,7 @@
 .recent-tools-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   margin-bottom: 4px;
 }
 
@@ -600,7 +602,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: 8px;
   border: 1px solid var(--sidebar-tool-border);
   background: var(--sidebar-tool-surface);
@@ -715,7 +717,7 @@
 }
 
 .conversation-item {
-  padding: 10px 12px;
+  padding: 7px 8px;
   background: var(--sidebar-tool-surface);
   border: 1px solid transparent;
   border-radius: 8px;
@@ -761,17 +763,18 @@
 
 /* Footer */
 .sidebar-footer {
-  padding: 16px;
+  padding: 10px;
   border-top: 1px solid var(--sidebar-divider);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
 .footer-action {
   width: 100%;
-  padding: 10px;
+  min-height: var(--compact-control-height, 38px);
+  padding: 7px;
   background: var(--sidebar-action-surface);
   border: 1px solid var(--sidebar-tool-border);
   border-radius: 8px;
@@ -816,7 +819,7 @@
 }
 
 .hipaa-badge {
-  padding: 8px 12px;
+  padding: 6px 8px;
   background: var(--sidebar-hipaa-bg);
   border: 1px solid var(--sidebar-hipaa-border);
   border-radius: 6px;
@@ -840,7 +843,8 @@
 
 .btn-signout {
   width: 100%;
-  padding: 10px 12px;
+  min-height: var(--compact-control-height, 38px);
+  padding: 7px 8px;
   background: var(--sidebar-signout-bg);
   border: 1px solid var(--sidebar-signout-border);
   border-radius: 8px;
@@ -1028,7 +1032,7 @@
   border-radius: 8px;
   padding: 8px 10px;
   font-size: 12px;
-  min-height: var(--app-min-touch-target, 44px);
+  min-height: var(--compact-control-height, 38px);
 }
 
 .sidebar-workspace-new-btn {
@@ -1044,7 +1048,7 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: var(--app-min-touch-target, 44px);
+  min-height: var(--compact-control-height, 38px);
 }
 
 .sidebar-section-header-toggle {

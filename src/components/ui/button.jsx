@@ -4,6 +4,7 @@ import './button.css';
 const Button = ({ 
   variant = 'primary', 
   size = 'md',
+  compact = false,
   children, 
   style, 
   disabled,
@@ -26,7 +27,7 @@ const Button = ({
       md: 'btn-md',
       lg: 'btn-lg'
     };
-    return ['btn', variants[variant] || variants.primary, sizes[size], className]
+    return ['btn', variants[variant] || variants.primary, sizes[size], compact ? 'btn-compact' : '', className]
       .filter(Boolean)
       .join(' ');
   };

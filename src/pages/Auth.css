@@ -6,12 +6,12 @@
 }
 
 .auth-panel__header {
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .auth-panel__title {
   margin: 0;
-  font-size: clamp(1.25rem, 4vw, 1.5rem);
+  font-size: clamp(1.15rem, 3vw, 1.35rem);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--text-color);
@@ -28,16 +28,16 @@
 .auth-segment {
   display: flex;
   gap: 0;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
   padding: 4px;
-  border-radius: 12px;
+  border-radius: var(--compact-card-radius, 12px);
   background: var(--app-overlay-on-surface);
   border: 1px solid var(--app-panel-border);
 }
 
 .auth-segment__btn {
   flex: 1;
-  min-height: 44px;
+  min-height: var(--compact-control-height, 38px);
   border: none;
   border-radius: 10px;
   font-size: 0.9rem;
@@ -89,7 +89,7 @@
 .auth-oauth-stack {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   margin-bottom: 8px;
 }
 
@@ -103,8 +103,8 @@
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: 46px;
-  padding: 10px 14px;
+  min-height: var(--compact-control-height, 38px);
+  padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid var(--app-input-border);
   background: var(--app-input-bg);
@@ -143,7 +143,7 @@ button.auth-oauth-btn {
 }
 
 .auth-or-divider {
-  margin: 0 0 16px;
+  margin: 0 0 10px;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -164,9 +164,9 @@ button.auth-oauth-btn {
 
 /* Explicit one-click demo/local sign-in (VITE_ENABLE_DEV_AUTH_BYPASS=true only) */
 .auth-dev-oneclick {
-  margin-bottom: 20px;
-  padding: 14px;
-  border-radius: 12px;
+  margin-bottom: 12px;
+  padding: 10px;
+  border-radius: var(--compact-card-radius, 12px);
   border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 34%, var(--app-panel-border));
   background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--app-surface-1));
 }
@@ -187,7 +187,7 @@ button.auth-oauth-btn {
 
 .auth-dev-oneclick .btn {
   width: 100%;
-  min-height: 48px;
+  min-height: var(--compact-control-height, 38px);
   font-size: 0.95rem;
   font-weight: 700;
 }
@@ -222,7 +222,7 @@ button.auth-oauth-btn {
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .auth-form__submit {
@@ -230,8 +230,8 @@ button.auth-oauth-btn {
 }
 
 .auth-magic {
-  margin-top: 18px;
-  padding-top: 16px;
+  margin-top: 12px;
+  padding-top: 10px;
   border-top: 1px solid var(--app-divider-on-surface);
   display: flex;
   flex-direction: column;
@@ -255,8 +255,8 @@ button.auth-oauth-btn {
   align-items: center;
   gap: 10px;
   width: 100%;
-  min-height: 44px;
-  padding: 10px 14px;
+  min-height: var(--compact-control-height, 38px);
+  padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid var(--app-input-border);
   background: var(--app-input-bg);
@@ -300,8 +300,8 @@ button.auth-oauth-btn {
 }
 
 .auth-panel__footer {
-  margin-top: 22px;
-  padding-top: 16px;
+  margin-top: 12px;
+  padding-top: 10px;
   padding-bottom: 4px;
   border-top: 1px solid var(--app-divider-on-surface);
 }

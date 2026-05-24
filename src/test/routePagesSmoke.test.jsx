@@ -22,6 +22,7 @@ import AiExplainability from '../pages/tools/AiExplainability';
 import ClinicalAudit from '../pages/tools/ClinicalAudit';
 import CommandDashboard from '../pages/CommandDashboard';
 import Dashboard from '../pages/Dashboard';
+import Operations from '../pages/Operations';
 import LiveTrackingMap from '../pages/LiveTrackingMap';
 import HospitalMapDashboard from '../pages/HospitalMapDashboard';
 import MedicalIotDashboard from '../pages/MedicalIotDashboard';
@@ -92,6 +93,7 @@ vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
 const PAGE_BY_ID = {
   dashboard: CommandDashboard,
   assistant: Dashboard,
+  operations: Operations,
   'live-map': LiveTrackingMap,
   'hospital-map': HospitalMapDashboard,
   'medical-iot': MedicalIotDashboard,
@@ -117,6 +119,7 @@ const THEME_ROUTE_SMOKE_IDS = new Set([
   'dashboard',
   'assistant',
   'tools-overview',
+  'operations',
   'calculators-hub',
   'tools-catalog',
   'medical-iot',

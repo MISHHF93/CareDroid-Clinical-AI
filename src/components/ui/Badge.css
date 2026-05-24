@@ -4,7 +4,7 @@
   justify-content: center;
   max-width: 100%;
   min-height: 24px;
-  padding: 4px 10px;
+  padding: 3px 8px;
   border: 1px solid var(--app-border);
   border-radius: 999px;
   background: var(--app-surface-muted);
@@ -26,6 +26,12 @@
   min-height: 30px;
   padding: 6px 12px;
   font-size: var(--font-13);
+}
+
+.cd-badge--compact {
+  min-height: 20px;
+  padding: 2px 7px;
+  font-size: var(--font-11);
 }
 
 .cd-badge--accent {

@@ -348,7 +348,7 @@ function registryTier(registryId) {
 
 function launchTypeForTier(tier, hasExecutor) {
   if (hasExecutor) return TOOL_LAUNCH_TYPES.BACKEND_BACKED;
-  if (tier === 'C') return TOOL_LAUNCH_TYPES.BACKEND_BACKED;
+  if (tier === 'C') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'A') return TOOL_LAUNCH_TYPES.LOCAL_ONLY;
   if (tier === 'B' || tier === 'fleet-B') return TOOL_LAUNCH_TYPES.CHAT_ASSISTED;
   if (tier === 'clinical-page') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;

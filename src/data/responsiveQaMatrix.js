@@ -142,6 +142,13 @@ const TIER_B_LABEL_BY_REGISTRY_ID = Object.freeze({
 
 const FLEET_PAGES = Object.freeze([
   {
+    id: 'fleet-live-map',
+    label: 'Fleet live map',
+    path: '/fleet/map',
+    category: 'fleet',
+    registryId: REGISTRY.fleetLiveMap,
+  },
+  {
     id: 'fleet-command',
     label: 'Fleet dashboard',
     path: '/fleet/command',
@@ -183,6 +190,12 @@ export function buildResponsiveQaPages() {
       category: 'core',
     },
     {
+      id: 'operations',
+      label: 'Operations',
+      path: '/operations',
+      category: 'core',
+    },
+    {
       id: 'tools-overview',
       label: 'Tool Library',
       path: '/tools',
@@ -194,6 +207,20 @@ export function buildResponsiveQaPages() {
       path: '/medical-iot',
       category: 'core',
       registryId: REGISTRY.medicalIotDashboard,
+    },
+    {
+      id: 'live-map',
+      label: 'Live Tracking Map',
+      path: '/live-map',
+      category: 'core',
+      registryId: REGISTRY.liveTrackingMap,
+    },
+    {
+      id: 'hospital-map',
+      label: 'Hospital Map',
+      path: '/hospital-map',
+      category: 'core',
+      registryId: REGISTRY.hospitalMap,
     },
     {
       id: 'tools-catalog',

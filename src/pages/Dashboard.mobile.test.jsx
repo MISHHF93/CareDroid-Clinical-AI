@@ -139,7 +139,7 @@ describe('Dashboard Chat mobile CSS contracts', () => {
     expect(dashboardCss).toMatch(
       /\.app-keyboard-visible \.dashboard-scroll[\s\S]*scroll-padding-bottom:\s*max\(160px/
     );
-    expect(dashboardCss).toMatch(/\.dashboard-send\s*\{[\s\S]*min-width:\s*88px/);
+    expect(dashboardCss).toMatch(/\.dashboard-send\s*\{[\s\S]*min-width:\s*76px/);
   });
 
   it('turns Chat drawers into bottom sheets on mobile', () => {

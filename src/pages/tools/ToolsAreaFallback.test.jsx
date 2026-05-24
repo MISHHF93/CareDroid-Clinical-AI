@@ -11,10 +11,10 @@ function renderFallback(path) {
   return render(
     <MemoryRouter initialEntries={[path]}>
       <Routes>
+        <Route path="/tools/calculators/sofa" element={<div data-testid="sofa-page">SOFA</div>} />
         <Route path="/tools/*" element={<ToolsAreaFallback />} />
         <Route path="/fleet/*" element={<ToolsAreaFallback />} />
         <Route path="/assistant" element={<div data-testid="assistant-page">Assistant</div>} />
-        <Route path="/tools/calculator/sofa" element={<div data-testid="sofa-page">SOFA</div>} />
       </Routes>
     </MemoryRouter>
   );
@@ -26,13 +26,10 @@ describe('ToolsAreaFallback', () => {
     expect(screen.getByRole('alert')).toBeTruthy();
     expect(screen.getByText(/Calculator not found/i)).toBeTruthy();
     expect(screen.getByText(/unknown-calc-xyz/, { selector: '.tool-not-found-message' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: /Developer Catalog \/ Source Audit/i })).toHaveAttribute(
-      'href',
-      '/tools/catalog'
-    );
+    expect(screen.queryByRole('link', { name: /Developer Catalog \/ Source Audit/i })).not.toBeInTheDocument();
   });
 
-  it('redirects mistyped /tools/calculators/sofa to canonical legacy route', async () => {
+  it('keeps registered calculator subpaths on their canonical route', async () => {
     renderFallback('/tools/calculators/sofa');
     expect(await screen.findByTestId('sofa-page')).toBeTruthy();
   });

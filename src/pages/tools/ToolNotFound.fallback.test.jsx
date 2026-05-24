@@ -24,9 +24,6 @@ describe('ToolNotFound fallback', () => {
 
     expect(screen.getByRole('alert')).toHaveTextContent(/not-a-real-calc/i);
     expect(screen.getByRole('link', { name: /all tools/i })).toHaveAttribute('href', '/tools');
-    expect(screen.getByRole('link', { name: /developer catalog \/ source audit/i })).toHaveAttribute(
-      'href',
-      '/tools/catalog'
-    );
+    expect(screen.queryByRole('link', { name: /developer catalog \/ source audit/i })).not.toBeInTheDocument();
   });
 });

@@ -13,7 +13,8 @@ describe('ClinicalToolCatalog chat launch wiring', () => {
     )?.[1];
 
     expect(handler).toContain('launchCatalogItem(sidebarToolId)');
-    expect(handler).toContain("navigate('/assistant')");
-    expect(handler).not.toMatch(/launchCatalogItem\(sidebarToolId\);[\s\S]*?addMessage\(chatSeed, 'user'\);/);
+    const sidebarBranch = handler.match(/if \(sidebarToolId\) \{([\s\S]*?)\n {4}\}/)?.[1];
+    expect(sidebarBranch).toContain('return;');
+    expect(sidebarBranch).not.toContain('addMessage');
   });
 });

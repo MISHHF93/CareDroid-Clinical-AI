@@ -65,7 +65,6 @@ export const TOOL_PATTERNS_PATH = join(
 export const PHANTOM_BLOCKED_CATALOG_ALIASES = Object.freeze([
   'abc-assessment',
   'trauma-score',
-  'vitals-monitor',
   'chemo-calculator',
   'cancer-calculator',
   'tumor-staging',

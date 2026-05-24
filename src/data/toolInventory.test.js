@@ -224,7 +224,7 @@ describe('canonical tool inventory', () => {
     expect(record).toMatchObject({
       id: 'ambient-scribe',
       tier: 'C',
-      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/ambient-scribe/generate',
       component: 'src/pages/tools/AmbientScribe.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
@@ -256,7 +256,7 @@ describe('canonical tool inventory', () => {
     expect(record).toMatchObject({
       id: 'guideline-rag',
       tier: 'C',
-      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/guideline-rag/query',
       component: 'src/pages/tools/GuidelineRag.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
@@ -276,7 +276,7 @@ describe('canonical tool inventory', () => {
       id: 'differential-ai',
       tier: 'C',
       nluToolId: 'differential-ai',
-      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/differential-ai/generate',
       component: 'src/pages/tools/DifferentialAi.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
@@ -290,7 +290,7 @@ describe('canonical tool inventory', () => {
     expect(record).toMatchObject({
       id: 'timeline-ai',
       tier: 'C',
-      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/timeline-ai/generate',
       component: 'src/pages/tools/TimelineAi.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
@@ -304,7 +304,7 @@ describe('canonical tool inventory', () => {
     expect(record).toMatchObject({
       id: 'patient-summary-ai',
       tier: 'C',
-      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/patient-summary-ai/generate',
       component: 'src/pages/tools/PatientSummaryAi.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
@@ -318,7 +318,7 @@ describe('canonical tool inventory', () => {
     expect(record).toMatchObject({
       id: 'order-set-ai',
       tier: 'C',
-      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/order-set-ai/generate',
       component: 'src/pages/tools/OrderSetAi.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
@@ -332,7 +332,7 @@ describe('canonical tool inventory', () => {
     expect(record).toMatchObject({
       id: 'ai-explainability',
       tier: 'C',
-      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/ai-explainability/trace',
       component: 'src/pages/tools/AiExplainability.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
@@ -346,7 +346,7 @@ describe('canonical tool inventory', () => {
     expect(record).toMatchObject({
       id: 'clinical-audit',
       tier: 'C',
-      launchType: TOOL_LAUNCH_TYPES.BACKEND_BACKED,
+      launchType: TOOL_LAUNCH_TYPES.CLINICAL_PAGE,
       endpoint: '/api/clinical-intelligence/clinical-audit/execution-logs',
       component: 'src/pages/tools/ClinicalAudit.jsx',
       executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,

@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
-import { Permission, useUser } from '../../contexts/UserContext';
 import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
 import { getUserFacingToolRegistryProjection } from '../../data/toolInventory';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
@@ -68,8 +67,6 @@ const ToolsOverview = () => {
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [toolFilter, setToolFilter] = useState('all');
-  const { hasPermission } = useUser();
-  const canViewDeveloperCatalog = hasPermission(Permission.CONFIGURE_SYSTEM);
   const { selectTool, setActiveTool, addMessage } = useConversation();
   const {
     favorites,
@@ -203,17 +200,6 @@ const ToolsOverview = () => {
               ))}
             </select>
           </div>
-          {canViewDeveloperCatalog && (
-            <p className="tools-catalog-link-wrap">
-              <button
-                type="button"
-                className="tools-catalog-link"
-                onClick={() => navigate('/tools/catalog')}
-              >
-                Developer Catalog / Source Audit →
-              </button>
-            </p>
-          )}
           <div className="tools-discovery-controls" role="search" aria-label="Search and filter all tools">
             <label className="tools-search-field">
               <span>Search tools</span>
@@ -393,7 +379,7 @@ const ToolsOverview = () => {
             <div className="tool-features">
               <h4>Key Features:</h4>
               <ul>
-                {(tool.features || []).map((feature, idx) => (
+                {(tool.features || []).slice(0, 3).map((feature, idx) => (
                   <li key={idx}>
                     <span className="feature-icon" aria-hidden>
                       <NavIcon icon={CHROME_ICONS.check} size={14} />
@@ -407,7 +393,7 @@ const ToolsOverview = () => {
             <div className="tool-use-cases">
               <h4>Use Cases:</h4>
               <div className="use-cases-tags">
-                {tool.useCases.map((useCase, idx) => (
+                {tool.useCases.slice(0, 3).map((useCase, idx) => (
                   <span key={idx} className="use-case-tag">
                     {useCase}
                   </span>

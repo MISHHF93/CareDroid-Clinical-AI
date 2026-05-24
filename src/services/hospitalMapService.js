@@ -60,6 +60,106 @@ export function summarizeHospitalMapSnapshot(snapshot) {
   };
 }
 
+function titleFromKey(value) {
+  return String(value || '')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function normalizeTelemetry(device) {
+  const telemetry = device?.telemetry;
+  if (Array.isArray(telemetry)) return telemetry;
+  if (!telemetry || typeof telemetry !== 'object') return [];
+
+  return Object.entries(telemetry).map(([key, value]) => ({
+    id: `${device.id || 'device'}-${key}`,
+    deviceId: device.id,
+    parameter: key.replace(/[A-Z]/g, (char) => `-${char.toLowerCase()}`),
+    label: titleFromKey(key),
+    value,
+    unit: '',
+    status: device.freshness || device.status || 'unknown',
+    timestamp: device.lastSeenAt,
+  }));
+}
+
+function normalizeAlert(alert, deviceById) {
+  const device = deviceById[alert.deviceId] || {};
+  const triggeredAt = alert.triggeredAt || alert.timestamp || alert.lastObservedAt || device.lastSeenAt || null;
+  return {
+    ...alert,
+    deviceName: alert.deviceName || device.name || alert.source || 'Unknown device',
+    triggeredAt,
+    lastObservedAt: alert.lastObservedAt || triggeredAt,
+    floorId: alert.floorId || device.floorId || null,
+    unitId: alert.unitId || device.unitId || null,
+    roomId: alert.roomId || device.roomId || null,
+    bedId: alert.bedId || device.bedId || null,
+  };
+}
+
+function normalizeDevice(device, alerts) {
+  const location = device.location || {};
+  const activeAlerts = alerts.filter(
+    (alert) => alert.deviceId === device.id && (alert.status || 'active') === 'active'
+  );
+  return {
+    ...device,
+    x: device.x ?? location.x ?? 0,
+    y: device.y ?? location.y ?? 0,
+    locationSource: device.locationSource || location.source || 'Backend demo floor coordinate',
+    patientLabel: device.patientLabel || 'Patient placeholder unavailable',
+    serialNumber: device.serialNumber || 'Backend demo',
+    firmwareVersion: device.firmwareVersion || 'Unknown',
+    chargingState: device.chargingState || 'unknown',
+    connectivity: device.connectivity || 'Unknown',
+    signalStrength: device.signalStrength ?? 0,
+    utilization: device.utilization ?? 0,
+    activeAlerts,
+    telemetry: normalizeTelemetry(device),
+  };
+}
+
+function normalizeRoom(room, devices, alerts) {
+  const roomDevices = devices.filter((device) => device.roomId === room.id);
+  const activeAlertCount = alerts.filter(
+    (alert) => alert.roomId === room.id && (alert.status || 'active') === 'active'
+  ).length;
+  return {
+    ...room,
+    roomNumber: room.roomNumber || room.name || room.label || room.id,
+    deviceCount: room.deviceCount ?? roomDevices.length,
+    activeAlertCount: room.activeAlertCount ?? activeAlertCount,
+  };
+}
+
+export function normalizeHospitalMapBackendSnapshot({
+  floorPayload = {},
+  devicePayload = {},
+  sourceLabel,
+  generatedAt,
+} = {}) {
+  const rawDevices = devicePayload.devices || [];
+  const deviceById = Object.fromEntries(rawDevices.map((device) => [device.id, device]));
+  const alerts = (devicePayload.alerts || []).map((alert) => normalizeAlert(alert, deviceById));
+  const devices = rawDevices.map((device) => normalizeDevice(device, alerts));
+
+  return {
+    source: 'backend-demo-hospital-map',
+    sourceLabel:
+      sourceLabel ||
+      'Backend demo hospital map contract - replace with real floor/device feeds before clinical use',
+    generatedAt: generatedAt || new Date().toISOString(),
+    floors: floorPayload.floors || [],
+    units: floorPayload.units || [],
+    rooms: (floorPayload.rooms || []).map((room) => normalizeRoom(room, devices, alerts)),
+    beds: floorPayload.beds || [],
+    devices,
+    alerts,
+  };
+}
+
 async function fetchHospitalMapSnapshotFromApi(options = {}) {
   const { signal } = options;
   const [floorResult, deviceResult] = await Promise.all([
@@ -72,19 +172,12 @@ async function fetchHospitalMapSnapshotFromApi(options = {}) {
   return {
     ok: true,
     unsupported: false,
-    snapshot: {
-      source: 'backend-demo-hospital-map',
-      sourceLabel:
-        floorResult.sourceLabel ||
-        'Backend demo hospital map contract - replace with real floor/device feeds before clinical use',
-      generatedAt: floorResult.generatedAt || deviceResult.generatedAt || new Date().toISOString(),
-      floors: floorResult.payload?.floors || [],
-      units: floorResult.payload?.units || [],
-      rooms: floorResult.payload?.rooms || [],
-      beds: floorResult.payload?.beds || [],
-      devices: deviceResult.payload?.devices || [],
-      alerts: deviceResult.payload?.alerts || [],
-    },
+    snapshot: normalizeHospitalMapBackendSnapshot({
+      floorPayload: floorResult.payload,
+      devicePayload: deviceResult.payload,
+      sourceLabel: floorResult.sourceLabel || deviceResult.sourceLabel,
+      generatedAt: floorResult.generatedAt || deviceResult.generatedAt,
+    }),
     backendStatus: HOSPITAL_MAP_BACKEND_STATUS,
     message:
       deviceResult.message ||

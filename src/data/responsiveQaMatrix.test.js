@@ -17,6 +17,7 @@ import {
   CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
+  REGISTRY,
 } from './clinicalToolIdContract.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -70,6 +71,21 @@ describe('responsiveQaMatrix', () => {
   it('has a positive cell count', () => {
     expect(countResponsiveQaCells()).toBeGreaterThan(0);
     expect(RESPONSIVE_QA_PAGES.length).toBeGreaterThanOrEqual(20);
+  });
+
+  it('only references defined registry ids', () => {
+    const registryValues = new Set(Object.values(REGISTRY));
+    const pages = buildResponsiveQaPages();
+
+    expect(pages.find((page) => page.id === 'fleet-live-map')?.registryId).toBe(
+      REGISTRY.fleetLiveMap
+    );
+
+    for (const page of pages) {
+      if (page.registryId) {
+        expect(registryValues.has(page.registryId), page.id).toBe(true);
+      }
+    }
   });
 
   it('maps every Tier A registry id to a dedicated route', () => {

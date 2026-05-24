@@ -7,7 +7,10 @@ const Card = ({
   subtle = false,
   hover = false,
   glassmorphism = false,
-  padding = 'var(--app-card-padding-compact, 24px)',
+  compact = false,
+  padding = compact
+    ? 'var(--compact-card-padding, var(--app-card-padding-compact, 14px))'
+    : 'var(--app-card-padding-compact, 14px)',
   onClick,
   className = '',
   ...props
@@ -17,6 +20,7 @@ const Card = ({
     if (subtle) classes.push('card-subtle');
     if (hover) classes.push('card-hover');
     if (glassmorphism) classes.push('card-glass');
+    if (compact) classes.push('card-compact');
     if (onClick) classes.push('card-clickable');
     if (className) classes.push(className);
     return classes.join(' ');

@@ -33,7 +33,7 @@
 .public-header-content {
   max-width: min(1760px, 100%);
   margin: 0 auto;
-  padding: clamp(12px, 2vw, 18px) var(--app-fluid-page-gutter, var(--space-6));
+  padding: clamp(8px, 1.4vw, 12px) var(--app-fluid-page-gutter, var(--space-6));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -103,7 +103,7 @@
   max-width: min(1760px, 100%);
   width: 100%;
   margin: 0 auto;
-  padding: clamp(20px, 5svh, 56px) var(--app-fluid-page-gutter, var(--space-6));
+  padding: clamp(12px, 3svh, 32px) var(--app-fluid-page-gutter, var(--space-6));
   box-sizing: border-box;
 }
 
@@ -111,7 +111,7 @@
 .public-footer {
   background: var(--app-surface-elevated);
   border-top: 1px solid var(--app-panel-border);
-  padding: var(--space-8) var(--space-6) var(--space-6);
+  padding: var(--space-5) var(--space-4) var(--space-4);
 }
 
 .public-footer-content {
@@ -119,8 +119,8 @@
   margin: 0 auto;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-6);
-  margin-bottom: var(--space-6);
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 .footer-section h4 {

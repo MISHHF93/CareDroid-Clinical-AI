@@ -1,10 +1,10 @@
 .command-dashboard {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--compact-page-gap, 14px);
   width: 100%;
   min-width: 0;
-  padding: clamp(16px, 3vw, 32px);
+  padding: var(--app-page-padding-roomy);
   background: var(--app-bg);
   color: var(--app-fg);
   overflow-x: clip;
@@ -13,17 +13,17 @@
 .command-hero,
 .command-panel {
   border: 1px solid var(--app-panel-border);
-  border-radius: 24px;
+  border-radius: var(--compact-panel-radius, 14px);
   background: var(--app-surface-1);
-  box-shadow: var(--app-shadow-1);
+  box-shadow: var(--compact-shadow, none);
 }
 
 .command-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: stretch;
-  gap: 20px;
-  padding: clamp(22px, 4vw, 38px);
+  gap: var(--compact-page-gap, 14px);
+  padding: var(--compact-panel-padding, 16px);
 }
 
 .command-hero__content {
@@ -41,38 +41,38 @@
 
 .command-hero h1 {
   margin: 0;
-  font-size: clamp(2rem, 5vw, 4.25rem);
-  line-height: 0.95;
-  letter-spacing: -0.06em;
+  font-size: clamp(1.45rem, 2.4vw, 2.2rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
 }
 
 .command-hero p {
   max-width: 780px;
-  margin: 16px 0 0;
+  margin: 8px 0 0;
   color: var(--app-fg-muted);
-  font-size: clamp(1rem, 2vw, 1.18rem);
-  line-height: 1.6;
+  font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .command-hero__stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(96px, 1fr));
   align-self: end;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
 .command-hero__stats div {
   min-width: 0;
-  padding: 16px;
-  border-radius: 18px;
+  padding: 10px;
+  border-radius: var(--compact-card-radius, 12px);
   background: var(--app-surface-2);
   border: 1px solid var(--app-panel-border);
 }
 
 .command-hero__stats strong {
   display: block;
-  font-size: 1.8rem;
+  font-size: 1.25rem;
   line-height: 1;
 }
 
@@ -85,15 +85,15 @@
 
 .command-panel {
   min-width: 0;
-  padding: clamp(18px, 3vw, 26px);
+  padding: var(--compact-panel-padding, 16px);
 }
 
 .command-panel__header {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 10px;
   min-width: 0;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .command-panel__icon {
@@ -101,16 +101,16 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   color: var(--app-accent-interactive);
   background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
 }
 
 .command-panel h2 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1rem;
   letter-spacing: -0.02em;
 }
 
@@ -121,15 +121,14 @@
 }
 
 .command-panel--assistant {
-  position: sticky;
-  top: 12px;
+  position: relative;
   z-index: 2;
 }
 
 .command-assistant-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .command-assistant-form label {
@@ -139,7 +138,7 @@
 .command-assistant-input-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
+  gap: 8px;
   align-items: stretch;
   min-width: 0;
 }
@@ -149,8 +148,8 @@
   min-width: 0;
   resize: vertical;
   border: 1px solid var(--app-input-border);
-  border-radius: 18px;
-  padding: 14px 16px;
+  border-radius: var(--compact-card-radius, 12px);
+  padding: 10px 12px;
   color: var(--app-fg);
   background: var(--app-input-bg);
   font: inherit;
@@ -171,9 +170,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  border-radius: 999px;
-  padding: 0 18px;
+  min-height: var(--compact-control-height, 38px);
+  border-radius: var(--compact-card-radius, 12px);
+  padding: 0 14px;
   border: 0;
   text-decoration: none;
   font-weight: 800;
@@ -195,8 +194,8 @@
 .command-prompt-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 18px;
+  gap: 8px;
+  margin-top: 12px;
   min-width: 0;
 }
 
@@ -206,7 +205,7 @@
   width: 100%;
   min-width: 0;
   border: 1px solid var(--app-panel-border);
-  border-radius: 18px;
+  border-radius: var(--compact-card-radius, 12px);
   color: inherit;
   background: var(--app-surface-2);
   text-align: left;
@@ -214,7 +213,7 @@
 }
 
 .command-prompt-chip {
-  padding: 14px;
+  padding: 10px;
 }
 
 .command-prompt-chip strong,
@@ -239,21 +238,21 @@
 .command-dashboard__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
+  gap: var(--compact-page-gap, 14px);
   min-width: 0;
 }
 
 .command-tool-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
 }
 
 .command-analytics-metrics,
 .command-analytics-grid,
 .command-system-status-cards {
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .command-system-status-cards {
@@ -263,8 +262,8 @@
 .command-tool-card {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
-  padding: 14px;
+  gap: 10px;
+  padding: 10px;
 }
 
 .command-tool-card__icon {
@@ -272,9 +271,9 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
   background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
 }
 
@@ -298,11 +297,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin-top: 10px;
+  margin-top: 8px;
 }
 
 .command-tool-card__meta span {
-  padding: 4px 8px;
+  padding: 3px 7px;
   border-radius: 999px;
   color: var(--app-fg-muted);
   background: var(--app-surface-muted);
@@ -311,19 +310,19 @@
 }
 
 .command-panel-link {
-  margin-top: 14px;
+  margin-top: 10px;
 }
 
 .command-recent-list,
 .command-status-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
 }
 
 .command-recent-item {
-  padding: 12px 14px;
+  padding: 10px;
 }
 
 .command-status-grid {
@@ -335,8 +334,8 @@
 
 .command-status-item {
   min-width: 0;
-  border-radius: 16px;
-  padding: 12px;
+  border-radius: var(--compact-card-radius, 12px);
+  padding: 10px;
   border: 1px solid var(--app-panel-border);
   background: var(--app-surface-2);
 }
@@ -382,7 +381,7 @@
 
 @media (max-width: 760px) {
   .command-dashboard {
-    padding: 14px;
+    padding: 10px;
   }
 
   .command-panel--assistant {

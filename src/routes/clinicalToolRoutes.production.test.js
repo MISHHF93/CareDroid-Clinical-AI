@@ -56,7 +56,7 @@ describe('Production routes — App.jsx derives calculator routes from contract'
   });
 
   it('declares calculators hub after slug-specific routes', () => {
-    const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
+    const hubIdx = appSource.indexOf("path: '/tools/calculators'");
     expect(hubIdx).toBeGreaterThan(-1);
     const lastSlugRoute = appSource.lastIndexOf('initialCalculatorId={calculatorSlug}');
     expect(lastSlugRoute).toBeLessThan(hubIdx);

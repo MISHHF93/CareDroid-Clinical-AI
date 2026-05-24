@@ -32,18 +32,18 @@
   --bp-desktop-xl: 1920px;
 
   /* —— Spacing (semantic → numeric scale in index.css) —— */
-  --space-xs: var(--space-2);
-  --space-sm: var(--space-3);
-  --space-md: var(--space-4);
-  --space-lg: var(--space-6);
-  --space-xl: var(--space-8);
-  --space-2xl: clamp(56px, 7vw, 80px);
+  --space-xs: var(--space-1);
+  --space-sm: var(--space-2);
+  --space-md: var(--space-3);
+  --space-lg: var(--space-4);
+  --space-xl: var(--space-6);
+  --space-2xl: clamp(32px, 5vw, 48px);
 
   --app-space-xs: var(--space-1);
   --app-space-sm: var(--space-2);
-  --app-space-md: var(--space-4);
-  --app-space-lg: var(--space-6);
-  --app-space-xl: var(--space-7);
+  --app-space-md: var(--space-3);
+  --app-space-lg: var(--space-4);
+  --app-space-xl: var(--space-6);
   --app-space-2xl: var(--space-2xl);
 
   --space-xs-fluid: var(--space-fluid-2);
@@ -54,7 +54,7 @@
 
   /* —— Typography (semantic; responsive via clamp) —— */
   --text-heading: var(--text-heading-fluid);
-  --text-subheading: clamp(1rem, 2vw + 0.45rem, 1.25rem);
+  --text-subheading: clamp(0.95rem, 1.5vw + 0.45rem, 1.12rem);
   --text-body: var(--text-body-fluid);
   --text-small: clamp(0.8125rem, 1vw + 0.45rem, 0.875rem);
   --text-caption: var(--text-caption-fluid);
@@ -97,25 +97,35 @@
   --app-radius-2xl: var(--radius-2xl);
 
   /* —— Fluid page shell —— */
-  --app-fluid-page-gutter: clamp(var(--space-md), 3.2vw, var(--space-lg));
-  --app-fluid-page-gutter-tight: clamp(10px, 2.8vw, var(--space-lg));
-  --app-fluid-section-gap: clamp(var(--space-md), 4vw, var(--space-lg));
-  --app-fluid-split-gap: clamp(var(--space-md), 3vw, var(--space-lg));
+  --app-fluid-page-gutter: clamp(10px, 2vw, var(--space-lg));
+  --app-fluid-page-gutter-tight: clamp(8px, 1.8vw, var(--space-md));
+  --app-fluid-section-gap: clamp(10px, 2vw, var(--space-md));
+  --app-fluid-split-gap: clamp(10px, 2vw, var(--space-md));
   --app-fluid-container-max: min(100%, 72rem);
   --app-fluid-container-max-wide: min(100%, 87.5rem);
 
-  --app-page-padding-compact: clamp(var(--space-md), 3vw, var(--space-lg));
-  --app-page-padding-roomy: clamp(var(--space-md), 3vw, var(--space-xl));
+  --app-page-padding-compact: clamp(10px, 2vw, var(--space-md));
+  --app-page-padding-roomy: clamp(12px, 2.2vw, var(--space-lg));
 
-  --app-space-field: var(--space-sm-fluid);
-  --app-space-field-lg: var(--space-md-fluid);
-  --app-card-padding-compact: clamp(var(--space-md), 3vw, 18px);
-  --app-callout-padding-compact: clamp(10px, 2.5vw, var(--space-md));
+  --app-space-field: var(--space-2);
+  --app-space-field-lg: var(--space-3);
+  --app-card-padding-compact: clamp(10px, 1.8vw, 14px);
+  --app-callout-padding-compact: clamp(8px, 1.6vw, var(--space-3));
+
+  /* Compact clinical command layout primitives */
+  --compact-page-gap: clamp(10px, 1.8vw, 16px);
+  --compact-panel-gap: clamp(8px, 1.4vw, 12px);
+  --compact-card-padding: clamp(10px, 1.6vw, 14px);
+  --compact-panel-padding: clamp(12px, 2vw, 16px);
+  --compact-control-height: 38px;
+  --compact-card-radius: 12px;
+  --compact-panel-radius: 14px;
+  --compact-shadow: none;
 
   /* App shell / sidebar layout */
-  --sidebar-width-expanded: 280px;
-  --sidebar-width-collapsed: 70px;
-  --sidebar-drawer-max-width: min(280px, 88vw);
+  --sidebar-width-expanded: 248px;
+  --sidebar-width-collapsed: 58px;
+  --sidebar-drawer-max-width: min(264px, 88vw);
 
   --app-content-max-width: 1760px;
   --app-keyboard-inset-bottom: 0px;

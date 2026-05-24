@@ -20,10 +20,11 @@ const visibleLinkInventory = [
   ['Primary Dashboard nav', 'navigation/primaryNavigation.js', '/dashboard'],
   ['Primary Assistant nav', 'navigation/primaryNavigation.js', '/assistant'],
   ['Primary Tools nav', 'navigation/primaryNavigation.js', '/tools'],
-  ['Primary Hospital Map nav', 'navigation/primaryNavigation.js', '/hospital-map'],
+  ['Primary Calculators nav', 'navigation/primaryNavigation.js', '/tools/calculators'],
+  ['Primary Operations nav', 'navigation/primaryNavigation.js', '/operations'],
+  ['Primary Maps nav', 'navigation/primaryNavigation.js', '/live-map'],
   ['Primary Medical IoT nav', 'navigation/primaryNavigation.js', '/medical-iot'],
-  ['Sidebar developer catalog', 'components/Sidebar.jsx', '/tools/catalog'],
-  ['Tools developer catalog', 'pages/tools/ToolsOverview.jsx', '/tools/catalog'],
+  ['Primary Developer Audit nav', 'navigation/primaryNavigation.js', '/tools/catalog'],
   ['Profile settings assistant link', 'pages/ProfileSettings.jsx', '/assistant'],
   ['Settings back link', 'pages/Settings.jsx', '/assistant'],
   ['OAuth callback success', 'pages/AuthCallback.jsx', '/dashboard'],
@@ -35,6 +36,7 @@ const canonicalRoutes = new Set([
   '/dashboard',
   '/assistant',
   '/tools',
+  '/live-map',
   '/hospital-map',
   '/medical-iot',
   '/tools/catalog',
@@ -63,9 +65,11 @@ describe('section link inventory and route flattening', () => {
   });
 
   it('keeps Developer Catalog / Source Audit gated away from normal clinician links', () => {
-    expect(read('pages/tools/ToolsOverview.jsx')).toContain('Permission.CONFIGURE_SYSTEM');
-    expect(read('components/Sidebar.jsx')).toContain('Permission.CONFIGURE_SYSTEM');
+    expect(read('navigation/primaryNavigation.js')).toContain("permission: 'CONFIGURE_SYSTEM'");
+    expect(read('navigation/primaryNavigation.js')).toContain("showInMobile: false");
     expect(read('App.jsx')).toContain('permission: Permission.CONFIGURE_SYSTEM');
+    expect(read('pages/tools/ToolsOverview.jsx')).not.toContain("navigate('/tools/catalog')");
+    expect(read('components/Sidebar.jsx')).not.toContain("navigate('/tools/catalog')");
   });
 
   it('keeps user-facing calculator registry paths on plural canonical routes', () => {

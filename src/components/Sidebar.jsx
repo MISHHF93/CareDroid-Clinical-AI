@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Permission, useUser } from '../contexts/UserContext';
+import { useUser } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
@@ -30,8 +30,6 @@ const Sidebar = forwardRef(function Sidebar(
   healthStatus = 'online',
   currentTool = null,
   onToolSelect,
-  onOpenToolsOverview,
-  onOpenToolsCatalog,
   layoutCompact = false,
   mobileNavOpen = false,
   onCloseMobileNav = () => {},
@@ -43,7 +41,7 @@ const Sidebar = forwardRef(function Sidebar(
 ) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, hasPermission } = useUser();
+  const { user } = useUser();
   const { notifications } = useNotifications();
   const {
     favorites,
@@ -135,27 +133,6 @@ const Sidebar = forwardRef(function Sidebar(
     onCloseMobileNav();
   };
 
-  const handleViewAllTools = () => {
-    if (onOpenToolsOverview) {
-      onOpenToolsOverview();
-    } else {
-      navigate('/tools');
-    }
-    onCloseMobileNav();
-  };
-
-  const handleOpenCatalog = () => {
-    if (onOpenToolsCatalog) {
-      onOpenToolsCatalog();
-    } else {
-      navigate('/tools/catalog');
-    }
-    onCloseMobileNav();
-  };
-
-  const isOnToolsOverview = location.pathname === '/tools';
-  const isOnToolsCatalog = location.pathname === '/tools/catalog';
-  const canViewDeveloperCatalog = hasPermission(Permission.CONFIGURE_SYSTEM);
   const activeCalculatorMatch = useMemo(
     () => matchCalculatorRoute(location.pathname),
     [location.pathname]
@@ -232,10 +209,10 @@ const Sidebar = forwardRef(function Sidebar(
           handleToolClick(tool);
         }}
         style={{
-          padding: '10px',
-          margin: '6px 0',
-          borderRadius: '8px',
-          border: `2px solid ${isSelected ? tool.color : 'transparent'}`,
+          padding: '8px',
+          margin: '3px 0',
+          borderRadius: 'var(--compact-card-radius, 10px)',
+          border: `1px solid ${isSelected ? tool.color : 'transparent'}`,
           backgroundColor: isSelected
             ? `${tool.color}15`
             : 'var(--panel-background)',
@@ -638,33 +615,6 @@ const Sidebar = forwardRef(function Sidebar(
                   );
                 })}
 
-                {canViewDeveloperCatalog && (
-                  <button
-                    type="button"
-                    onClick={handleOpenCatalog}
-                    aria-label="Open developer catalog and source audit"
-                    aria-current={isOnToolsCatalog ? 'page' : undefined}
-                    className={`sidebar-tools-quick-action${isOnToolsCatalog ? ' sidebar-tools-quick-action--active' : ''}`}
-                  >
-                    <span className="section-icon--svg" aria-hidden>
-                      <NavIcon icon={CHROME_ICONS.tools} size={14} />
-                    </span>
-                    <span>Developer Catalog / Source Audit</span>
-                  </button>
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleViewAllTools}
-                  aria-label="Open canonical tools browser"
-                  aria-current={isOnToolsOverview ? 'page' : undefined}
-                  className={`sidebar-tools-quick-action${isOnToolsOverview ? ' sidebar-tools-quick-action--active' : ''}`}
-                >
-                  <span className="section-icon--svg" aria-hidden>
-                    <NavIcon icon={CHROME_ICONS.bolt} size={14} />
-                  </span>
-                  <span>Browse All Tools</span>
-                </button>
               </div>
             )}
           </div>

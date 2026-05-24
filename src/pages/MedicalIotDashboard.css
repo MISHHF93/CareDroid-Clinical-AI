@@ -1,10 +1,10 @@
 .medical-iot-page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--compact-page-gap, 14px);
   width: 100%;
   min-width: 0;
-  padding: clamp(16px, 3vw, 32px);
+  padding: var(--app-page-padding-roomy);
   background: var(--app-bg);
   color: var(--app-fg);
   overflow-x: clip;
@@ -18,17 +18,17 @@
 .medical-iot-summary,
 .medical-iot-filters {
   border: 1px solid var(--app-panel-border);
-  border-radius: 24px;
+  border-radius: var(--compact-panel-radius, 14px);
   background: var(--app-surface-1);
-  box-shadow: var(--app-shadow-1);
+  box-shadow: var(--compact-shadow, none);
 }
 
 .medical-iot-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
+  gap: var(--compact-page-gap, 14px);
   align-items: end;
-  padding: clamp(22px, 4vw, 38px);
+  padding: var(--compact-panel-padding, 16px);
   background: var(--app-surface-1);
 }
 
@@ -43,16 +43,16 @@
 
 .medical-iot-hero h1 {
   margin: 0;
-  font-size: clamp(2rem, 5vw, 4rem);
-  line-height: 0.98;
-  letter-spacing: -0.055em;
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
 }
 
 .medical-iot-hero p {
   max-width: 820px;
-  margin: 16px 0 0;
+  margin: 8px 0 0;
   color: var(--app-fg-muted);
-  line-height: 1.6;
+  line-height: 1.45;
 }
 
 .medical-iot-hero-actions,
@@ -67,9 +67,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: var(--compact-control-height, 38px);
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--compact-card-radius, 12px);
   padding: 0 18px;
   color: var(--app-on-solid);
   background: var(--accent-gradient);
@@ -88,7 +88,7 @@
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  padding: 22px;
+  padding: var(--compact-panel-padding, 14px);
   color: var(--app-fg-muted);
 }
 
@@ -107,7 +107,7 @@
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-  padding: 14px 18px;
+  padding: 10px 12px;
 }
 
 .medical-iot-source span,
@@ -123,21 +123,21 @@
 .medical-iot-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  padding: 18px;
+  gap: var(--compact-panel-gap, 10px);
+  padding: var(--compact-panel-padding, 14px);
 }
 
 .medical-iot-summary > div,
 .medical-iot-summary > article {
   min-width: 0;
-  border-radius: 18px;
-  padding: 16px;
+  border-radius: var(--compact-card-radius, 12px);
+  padding: 10px;
   background: var(--app-surface-2);
 }
 
 .medical-iot-summary strong {
   display: block;
-  font-size: 1.8rem;
+  font-size: 1.35rem;
   line-height: 1;
 }
 
@@ -151,8 +151,8 @@
 .medical-iot-filters {
   display: grid;
   grid-template-columns: minmax(180px, 0.35fr) minmax(0, 0.65fr);
-  gap: 12px;
-  padding: 16px;
+  gap: var(--compact-panel-gap, 10px);
+  padding: var(--compact-panel-padding, 14px);
 }
 
 .medical-iot-filters label {
@@ -168,9 +168,9 @@
 .medical-iot-filters select,
 .medical-iot-filters input[type='search'] {
   min-width: 0;
-  min-height: 44px;
+  min-height: var(--compact-control-height, 38px);
   border: 1px solid var(--app-panel-border);
-  border-radius: 14px;
+  border-radius: var(--compact-card-radius, 12px);
   padding: 0 12px;
   background: var(--app-surface-2);
   color: var(--app-fg);
@@ -179,7 +179,7 @@
 
 .medical-iot-section {
   min-width: 0;
-  padding: clamp(18px, 3vw, 26px);
+  padding: var(--compact-panel-padding, 14px);
 }
 
 .medical-iot-section-header,
@@ -188,7 +188,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .medical-iot-section-header h2,
@@ -218,14 +218,14 @@
 .medical-iot-vitals-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: var(--compact-panel-gap, 10px);
   min-width: 0;
 }
 
 .medical-iot-location-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
-  gap: 20px;
+  gap: var(--compact-page-gap, 14px);
   align-items: start;
   min-width: 0;
 }
@@ -233,7 +233,7 @@
 .medical-iot-grid-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 20px;
+  gap: var(--compact-page-gap, 14px);
   min-width: 0;
 }
 
@@ -243,8 +243,8 @@
 .medical-iot-trend-card {
   min-width: 0;
   border: 1px solid var(--app-panel-border);
-  border-radius: 18px;
-  padding: 14px;
+  border-radius: var(--compact-card-radius, 12px);
+  padding: 10px;
   background: var(--app-surface-2);
 }
 
@@ -336,10 +336,10 @@
 
 .medical-iot-map-canvas {
   position: relative;
-  min-height: 360px;
+  min-height: 320px;
   overflow: hidden;
   border: 1px solid var(--app-panel-border);
-  border-radius: 22px;
+  border-radius: var(--compact-panel-radius, 14px);
   background:
     radial-gradient(circle at top right, color-mix(in srgb, var(--app-accent-interactive) 12%, transparent), transparent 32%),
     var(--app-surface-2);
@@ -377,8 +377,8 @@
 
 .medical-iot-map-marker {
   position: absolute;
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   transform: translate(-50%, -50%);
   border: 3px solid var(--app-surface-1);
   border-radius: 999px;
@@ -413,7 +413,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 14px;
+  margin-top: 10px;
   color: var(--app-fg-muted);
   font-size: 0.88rem;
   font-weight: 700;
@@ -444,7 +444,7 @@
   position: sticky;
   top: 16px;
   min-width: 0;
-  padding: clamp(18px, 3vw, 26px);
+  padding: var(--compact-panel-padding, 14px);
 }
 
 .medical-iot-detail--empty {
@@ -456,8 +456,8 @@
   align-items: center;
   justify-content: center;
   flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
+  width: var(--compact-control-height, 38px);
+  height: var(--compact-control-height, 38px);
   border: 0;
   border-radius: 999px;
   background: var(--app-surface-2);
@@ -468,15 +468,15 @@
 .medical-iot-detail-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: var(--compact-panel-gap, 10px);
   margin: 0;
 }
 
 .medical-iot-detail-grid div {
   min-width: 0;
   border: 1px solid var(--app-panel-border);
-  border-radius: 14px;
-  padding: 12px;
+  border-radius: var(--compact-card-radius, 12px);
+  padding: 10px;
   background: var(--app-surface-2);
 }
 
@@ -509,11 +509,11 @@
   flex-wrap: wrap;
   align-items: baseline;
   gap: 8px;
-  margin: 14px 0 8px;
+  margin: 10px 0 6px;
 }
 
 .medical-iot-vital-value strong {
-  font-size: 2rem;
+  font-size: 1.45rem;
   line-height: 1;
 }
 

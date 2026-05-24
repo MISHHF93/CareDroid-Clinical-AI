@@ -7,6 +7,7 @@ import {
   CLINICAL_AI_PAGE_REGISTRY_IDS,
   CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
+  CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS,
   FLEET_TIER_A_REGISTRY_IDS,
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
   NLU_HUB_ONLY_PROFILE_TOOL_IDS,
@@ -85,7 +86,10 @@ export function getNluLaunchExpectation(nluToolId) {
     };
   }
 
-  if (CLINICAL_AI_PAGE_REGISTRY_IDS.includes(registryId)) {
+  if (
+    CLINICAL_AI_PAGE_REGISTRY_IDS.includes(registryId) ||
+    CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS.includes(registryId)
+  ) {
     return {
       nluToolId,
       kind: 'clinical-page',

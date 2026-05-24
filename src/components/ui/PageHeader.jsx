@@ -6,11 +6,17 @@ export default function PageHeader({
   description,
   actions,
   children,
+  compact = false,
   className = '',
   ...props
 }) {
   return (
-    <header className={['cd-page-header', className].filter(Boolean).join(' ')} {...props}>
+    <header
+      className={['cd-page-header', compact ? 'cd-page-header--compact' : '', className]
+        .filter(Boolean)
+        .join(' ')}
+      {...props}
+    >
       <div className="cd-page-header__content">
         {eyebrow ? <p className="cd-page-header__eyebrow">{eyebrow}</p> : null}
         <h1 className="cd-page-header__title">{title}</h1>

@@ -16,6 +16,10 @@ import {
   DESIGN_RADII,
   DESIGN_ELEVATION,
 } from '../layout/designTokens.js';
+import {
+  SIDEBAR_WIDTH_COLLAPSED_PX,
+  SIDEBAR_WIDTH_EXPANDED_PX,
+} from '../layout/breakpoints.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
@@ -34,14 +38,16 @@ describe('design-tokens.css — semantic token layer', () => {
   });
 
   it('defines spacing scale xs through xl', () => {
-    expect(designTokensCss).toContain('--space-xs: var(--space-2)');
-    expect(designTokensCss).toContain('--space-sm: var(--space-3)');
-    expect(designTokensCss).toContain('--space-md: var(--space-4)');
-    expect(designTokensCss).toContain('--space-lg: var(--space-6)');
-    expect(designTokensCss).toContain('--space-xl: var(--space-8)');
+    expect(designTokensCss).toContain('--space-xs: var(--space-1)');
+    expect(designTokensCss).toContain('--space-sm: var(--space-2)');
+    expect(designTokensCss).toContain('--space-md: var(--space-3)');
+    expect(designTokensCss).toContain('--space-lg: var(--space-4)');
+    expect(designTokensCss).toContain('--space-xl: var(--space-6)');
     expect(designTokensCss).toContain('--space-2xl:');
     expect(designTokensCss).toContain('--app-space-xs: var(--space-1)');
     expect(designTokensCss).toContain('--app-space-2xl: var(--space-2xl)');
+    expect(designTokensCss).toContain('--compact-page-gap:');
+    expect(designTokensCss).toContain('--compact-card-padding:');
   });
 
   it('defines typography display through mono', () => {
@@ -69,6 +75,11 @@ describe('design-tokens.css — semantic token layer', () => {
     expect(designTokensCss).toContain('--touch-target-comfortable: 48px');
     expect(designTokensCss).toContain('--app-min-touch-target: var(--touch-target-min)');
     expect(designTokensCss).toMatch(/\.touch-target[\s\S]*min-height:\s*var\(--touch-target-min\)/);
+  });
+
+  it('keeps sidebar width CSS tokens aligned with JS layout mirrors', () => {
+    expect(designTokensCss).toContain(`--sidebar-width-expanded: ${SIDEBAR_WIDTH_EXPANDED_PX}px`);
+    expect(designTokensCss).toContain(`--sidebar-width-collapsed: ${SIDEBAR_WIDTH_COLLAPSED_PX}px`);
   });
 
   it('defines semantic radii and elevation aliases', () => {

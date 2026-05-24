@@ -25,14 +25,14 @@
 
 .input-field {
   width: 100%;
-  padding: 12px 14px;
-  min-height: var(--app-min-touch-target, 44px);
+  padding: 9px 12px;
+  min-height: var(--compact-control-height, 38px);
   font-size: var(--text-input-min, var(--font-16));
   font-family: inherit;
   color: var(--app-text-primary);
   background: var(--app-input-bg);
   border: 1px solid var(--app-input-border);
-  border-radius: var(--app-radius-md, var(--radius-md));
+  border-radius: var(--compact-card-radius, var(--app-radius-md, var(--radius-md)));
   outline: none;
   transition:
     background-color 0.2s var(--ease-smooth),
@@ -133,9 +133,15 @@
 
 /* Textarea */
 textarea.input-field {
-  min-height: 100px;
+  min-height: 82px;
   resize: vertical;
   font-family: inherit;
+}
+
+.input-compact {
+  min-height: var(--compact-control-height, 38px);
+  padding: 8px 10px;
+  font-size: var(--text-input-min, var(--font-16));
 }
 
 /* Responsive */

@@ -198,7 +198,7 @@ const AppShell = ({
         )}
         {isAuthed && isCompact && (
           <nav className="app-shell-bottom-nav" aria-label="Primary navigation">
-            {PRIMARY_NAV_ITEMS.map((item) => {
+            {PRIMARY_NAV_ITEMS.filter((item) => item.showInMobile !== false).map((item) => {
               const isActive = primaryNavPathMatches(item, location.pathname);
               return (
                 <button

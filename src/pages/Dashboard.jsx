@@ -156,7 +156,9 @@ function Dashboard() {
   const [outreachDraft, setOutreachDraft] = useState(OUTREACH_DRAFT_INITIAL_STATE);
   const [executionActions, setExecutionActions] = useState({});
   const [pendingConfirmation, setPendingConfirmation] = useState(null);
-  const [capabilitySuggestions, setCapabilitySuggestions] = useState([]);
+  const [capabilitySuggestions, setCapabilitySuggestions] = useState(() =>
+    getChatCapabilitySuggestions({ hasPermission })
+  );
   const scrollRef = useRef(null);
   const scrollEndRef = useRef(null);
   const composerInputRef = useRef(null);

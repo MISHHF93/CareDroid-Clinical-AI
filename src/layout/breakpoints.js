@@ -15,8 +15,8 @@ export const MOBILE_FIRST_VIEWPORT_WIDTHS = Object.freeze([
 export const COMPACT_MEDIA_QUERY = '(max-width: 900px)';
 
 /** Match design-tokens.css --sidebar-width-* */
-export const SIDEBAR_WIDTH_EXPANDED_PX = 280;
-export const SIDEBAR_WIDTH_COLLAPSED_PX = 70;
+export const SIDEBAR_WIDTH_EXPANDED_PX = 248;
+export const SIDEBAR_WIDTH_COLLAPSED_PX = 58;
 
 /** Split calculator / lab / diagnosis forms — two columns from this width up */
 export const SPLIT_FORM_MEDIA_QUERY = '(min-width: 1024px)';

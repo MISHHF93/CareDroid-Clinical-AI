@@ -121,7 +121,7 @@ export default function FleetDashboard() {
         {phase === 'error' ? (
           <div className="fleet-dashboard-error" role="alert">
             <NavIcon icon={CHROME_ICONS.alert} size={28} aria-hidden />
-            <p>{errorMessage || 'Unable to load fleet telemetry.'}</p>
+            <p>Telemetry offline. {errorMessage || 'Unable to load fleet telemetry.'}</p>
             <button
               type="button"
               className="fleet-btn fleet-btn--secondary"

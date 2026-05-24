@@ -45,7 +45,7 @@
   overflow: hidden;
   overflow-x: clip;
   box-sizing: border-box;
-  margin-left: var(--app-main-inset, var(--sidebar-width-expanded, 280px));
+  margin-left: var(--app-main-inset, var(--sidebar-width-expanded, 248px));
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   z-index: 2;
 }
@@ -54,10 +54,10 @@
   flex: 0 0 auto;
   min-width: 0;
   max-width: calc(100% - 32px);
-  margin: 12px 16px 0;
-  padding: 10px 14px;
+  margin: 8px 12px 0;
+  padding: 8px 10px;
   border: 1px solid color-mix(in srgb, var(--app-warning) 48%, var(--panel-border));
-  border-radius: var(--radius-md);
+  border-radius: var(--compact-card-radius, var(--radius-md));
   background: color-mix(in srgb, var(--app-warning) 14%, var(--app-surface-1));
   color: var(--text-primary);
   font-size: var(--font-12);
@@ -168,8 +168,8 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(44px, 1fr));
   gap: 2px;
-  min-height: var(--app-bottom-nav-height, 64px);
-  padding: 6px max(6px, env(safe-area-inset-right, 0px)) 6px
+  min-height: var(--app-bottom-nav-height, 56px);
+  padding: 4px max(4px, env(safe-area-inset-right, 0px)) 4px
     max(6px, env(safe-area-inset-left, 0px));
   border-top: 1px solid var(--panel-border);
   background: var(--app-surface-glass);
@@ -180,7 +180,7 @@
 
 .app-shell-bottom-nav__item {
   min-width: 0;
-  min-height: 52px;
+  min-height: 46px;
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   background: transparent;
@@ -189,7 +189,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 3px;
+  gap: 2px;
   padding: 4px 2px;
   font: inherit;
   cursor: pointer;
@@ -263,7 +263,7 @@
 .app-shell--compact.app-shell--authed .app-shell-page-body {
   padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
   padding-bottom: calc(
-    var(--app-bottom-nav-height, 64px) + var(--app-shell-page-gutter-block, 12px) +
+    var(--app-bottom-nav-height, 56px) + var(--app-shell-page-gutter-block, 10px) +
       env(safe-area-inset-bottom, 0px)
   );
   scroll-padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
@@ -280,7 +280,7 @@
 
 .app-shell--compact.app-shell--authed .app-shell-page-body--conversation {
   padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
-  padding-bottom: var(--app-bottom-nav-height, 64px);
+  padding-bottom: var(--app-bottom-nav-height, 56px);
   scroll-padding-top: 0;
 }
 

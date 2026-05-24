@@ -33,20 +33,20 @@
   z-index: 1;
   display: flex;
   flex-direction: column;
-  width: min(440px, calc(100vw - var(--sidebar-width-expanded, 280px) - 32px));
-  max-height: min(680px, calc(100dvh - 48px));
+  width: min(400px, calc(100vw - var(--sidebar-width-expanded, 248px) - 24px));
+  max-height: min(620px, calc(100dvh - 32px));
   border: 1px solid var(--panel-border);
-  border-radius: 24px;
+  border-radius: var(--compact-panel-radius, 14px);
   background: color-mix(in srgb, var(--app-surface-1) 94%, transparent);
-  box-shadow: var(--app-shadow-2);
+  box-shadow: var(--app-shadow-1);
   color: var(--text-primary);
   overflow: hidden;
   pointer-events: auto;
 }
 
 .quick-command--desktop .quick-command-panel {
-  top: 18px;
-  left: calc(var(--app-main-inset, var(--sidebar-width-expanded, 280px)) + 14px);
+  top: 10px;
+  left: calc(var(--app-main-inset, var(--sidebar-width-expanded, 248px)) + 10px);
 }
 
 .quick-command--mobile {
@@ -59,19 +59,19 @@
 
 .quick-command--mobile .quick-command-panel {
   right: max(10px, env(safe-area-inset-right, 0px));
-  bottom: calc(var(--app-bottom-nav-height, 64px) + max(10px, env(safe-area-inset-bottom, 0px)));
+  bottom: calc(var(--app-bottom-nav-height, 56px) + max(8px, env(safe-area-inset-bottom, 0px)));
   left: max(10px, env(safe-area-inset-left, 0px));
   width: auto;
   max-height: min(72dvh, 680px);
-  border-radius: 24px 24px 18px 18px;
+  border-radius: var(--compact-panel-radius, 14px);
 }
 
 .quick-command-header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  padding: 18px 18px 12px;
+  gap: 8px;
+  padding: 12px 12px 8px;
   border-bottom: 1px solid var(--panel-border);
 }
 
@@ -87,7 +87,7 @@
 .quick-command-header h2 {
   margin: 0;
   color: var(--text-primary);
-  font-size: 1.25rem;
+  font-size: 1rem;
   line-height: 1.1;
 }
 
@@ -95,10 +95,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: 1px solid var(--panel-border);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--app-surface-2);
   color: var(--text-primary);
   cursor: pointer;
@@ -108,12 +108,12 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
-  gap: 10px;
-  margin: 14px 16px 10px;
-  padding: 0 12px;
-  min-height: 46px;
+  gap: 8px;
+  margin: 10px 12px 8px;
+  padding: 0 10px;
+  min-height: var(--compact-control-height, 38px);
   border: 1px solid var(--panel-border);
-  border-radius: 16px;
+  border-radius: var(--compact-card-radius, 12px);
   background: var(--input-bg, var(--app-surface-2));
   color: var(--text-primary);
 }
@@ -141,10 +141,10 @@
 .quick-command-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   justify-content: space-between;
-  margin: 0 16px 10px;
+  margin: 0 12px 8px;
 }
 
 .quick-command-utility,
@@ -152,7 +152,7 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  min-height: 34px;
+  min-height: 30px;
   border-radius: 999px;
   padding: 0 10px;
   font-size: var(--font-12, 12px);
@@ -179,11 +179,11 @@
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   scrollbar-gutter: stable;
-  padding: 0 14px 16px;
+  padding: 0 10px 12px;
 }
 
 .quick-command-section {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .quick-command-section h3 {
@@ -198,19 +198,19 @@
 
 .quick-command-list {
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .quick-command-item {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   width: 100%;
-  min-height: 54px;
+  min-height: 44px;
   border: 1px solid transparent;
-  border-radius: 16px;
-  padding: 9px 10px;
+  border-radius: var(--compact-card-radius, 12px);
+  padding: 7px 8px;
   background: transparent;
   color: var(--text-primary);
   text-align: left;
@@ -228,9 +228,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
   background: color-mix(in srgb, currentColor 12%, transparent);
   color: var(--app-accent-interactive);
 }
@@ -268,10 +268,10 @@
 }
 
 .quick-command-empty {
-  margin: 12px 4px 0;
-  padding: 14px;
+  margin: 10px 4px 0;
+  padding: 10px;
   border: 1px dashed var(--panel-border);
-  border-radius: 16px;
+  border-radius: var(--compact-card-radius, 12px);
   background: var(--app-surface-2);
 }
 

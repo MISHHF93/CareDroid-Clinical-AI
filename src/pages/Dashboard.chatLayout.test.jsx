@@ -133,16 +133,16 @@ describe('Dashboard chat layout', () => {
   it('renders Pulse as the simple home surface', async () => {
     renderDashboard();
 
-    expect(screen.getByRole('heading', { level: 1, name: /pulse/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /home/i })).toBeInTheDocument();
     expect(screen.getByText(/see what matters/i)).toBeInTheDocument();
-    expect(screen.getByText(/outreach and follow-up/i).closest('button')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /plan outreach/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
   });
 
   it('renders a complete clinical chat shell', async () => {
     renderDashboard('/assistant');
 
-    expect(screen.getByRole('heading', { level: 1, name: /caredroid clinical chat/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /caredroid assistant/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/chat context/i)).toHaveTextContent(/online/i);
     expect(screen.getByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
     expect(screen.getByText(/decision support only/i)).toBeInTheDocument();
@@ -208,7 +208,7 @@ describe('Dashboard chat layout', () => {
     const user = userEvent.setup();
     renderDashboard('/assistant');
 
-    expect(screen.getByRole('heading', { level: 1, name: /caredroid clinical chat/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /caredroid assistant/i })).toBeInTheDocument();
     const actionRail = screen.getByLabelText(/suggested actions/i);
     expect(within(actionRail).getByRole('button', { name: /drug checker/i })).toBeInTheDocument();
 
@@ -329,7 +329,7 @@ describe('Dashboard chat layout', () => {
     const user = userEvent.setup();
     renderDashboard();
 
-    await user.click(screen.getByText(/outreach and follow-up/i).closest('button'));
+    await user.click(screen.getByRole('button', { name: /plan outreach/i }));
 
     expect(screen.getByRole('dialog', { name: /plan follow-up outreach/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/outreach workflow steps/i)).toHaveTextContent(/choose intent/i);
@@ -341,7 +341,7 @@ describe('Dashboard chat layout', () => {
   it('drafts and confirms guided outreach through the existing Chat path', async () => {
     renderDashboard();
 
-    fireEvent.click(screen.getByText(/outreach and follow-up/i).closest('button'));
+    fireEvent.click(screen.getByRole('button', { name: /plan outreach/i }));
     fireEvent.click(screen.getByLabelText(/patient outreach/i));
     fireEvent.change(screen.getByLabelText(/target\/context/i), {
       target: { value: 'Mrs. A after discharge' },
