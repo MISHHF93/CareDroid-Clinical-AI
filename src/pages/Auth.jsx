@@ -30,6 +30,13 @@ const Auth = ({ onAuthSuccess }) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const oauthBannerShown = useRef(false);
 
+  const handleDirectSignIn = () => {
+    setMode('login');
+    setTimeout(() => {
+      document.querySelector('input[name="email"]')?.focus();
+    }, 0);
+  };
+
   useEffect(() => {
     if (oauthBannerShown.current) return;
     if (searchParams.get('error') !== 'oauth') return;
@@ -294,13 +301,28 @@ const Auth = ({ onAuthSuccess }) => {
             </button>
           </div>
 
+
+          <div className="auth-direct-signin">
+            <Button
+              type="button"
+              variant="primary"
+              className="auth-direct-signin__btn"
+              onClick={handleDirectSignIn}
+            >
+              Direct Sign in
+            </Button>
+            <p className="auth-direct-signin__hint">
+              Use this to jump straight to sign-in with your existing account.
+            </p>
+          </div>
+
           <div className="auth-oauth-stack" aria-label="Sign-in options">
             <a className="auth-oauth-btn" href={googleAuthUrl}>
               <span className="auth-oauth-btn__brand" aria-hidden>
                 <GoogleLogo size={22} />
               </span>
               <span className="auth-oauth-btn__label">
-                {mode === 'signup' ? 'Sign up with Google' : 'Continue with Google'}
+                {mode === 'signup' ? 'Sign up with Google' : 'Sign in with Google'}
               </span>
             </a>
             <a className="auth-oauth-btn" href={linkedinAuthUrl}>
@@ -308,7 +330,7 @@ const Auth = ({ onAuthSuccess }) => {
                 <LinkedInLogo size={22} />
               </span>
               <span className="auth-oauth-btn__label">
-                {mode === 'signup' ? 'Sign up with LinkedIn' : 'Continue with LinkedIn'}
+                {mode === 'signup' ? 'Sign up with LinkedIn' : 'Sign in with LinkedIn'}
               </span>
             </a>
 
@@ -369,7 +391,7 @@ const Auth = ({ onAuthSuccess }) => {
               required
             />
             <Button type="submit" className="auth-form__submit">
-              {mode === 'login' ? 'Continue' : 'Create account'}
+              {mode === 'login' ? 'Sign in' : 'Create account'}
             </Button>
           </form>
 
