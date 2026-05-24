@@ -86,6 +86,13 @@ import {
   PewsCalculator,
   RevisedTraumaScoreCalculator,
 } from './emergencyCriticalCareCalculators';
+import {
+  Chads2Calculator,
+  DukeTreadmillScoreCalculator,
+  HcmSuddenDeathRiskCalculator,
+  HeartFailureStagingCalculator,
+  ReynoldsRiskScoreCalculator,
+} from './cardiologyCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -466,6 +473,16 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <MeldCalculator mode="meld-na" onResultChange={onResultChange} />;
     case 'timi-ua-nstemi':
       return <TimiUaNstemiCalculator onResultChange={onResultChange} />;
+    case 'duke-treadmill-score':
+      return <DukeTreadmillScoreCalculator onResultChange={onResultChange} />;
+    case 'reynolds-risk-score':
+      return <ReynoldsRiskScoreCalculator onResultChange={onResultChange} />;
+    case 'hcm-sudden-death-risk':
+      return <HcmSuddenDeathRiskCalculator onResultChange={onResultChange} />;
+    case 'chads2':
+      return <Chads2Calculator onResultChange={onResultChange} />;
+    case 'heart-failure-staging':
+      return <HeartFailureStagingCalculator onResultChange={onResultChange} />;
     case 'gfr':
       return <GFRCalculator onResultChange={onResultChange} />;
     case 'bmi':

@@ -31,6 +31,7 @@ import {
   PR3_CALCULATOR_REGISTRY_IDS,
   PR6_CALCULATOR_REGISTRY_IDS,
   PR7_CALCULATOR_REGISTRY_IDS,
+  CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS,
 } from './clinicalToolIdContract';
 import { runClinicalSafetyComplianceAudit } from './clinicalSafetyGuardrails';
 import { PR5_ALL_ALIAS_PAIRS } from './pr5TestConstants';
@@ -41,6 +42,10 @@ const TIER_B_ALL = [
   ...TIER_B_CHAT_CALCULATOR_REGISTRY_IDS,
   ...PR_FLEET_TIER_B_CHAT_REGISTRY_IDS,
 ];
+
+const TIER_B_HUB_TOOLS = TIER_B_ALL.filter(
+  (registryId) => !CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS.includes(registryId)
+);
 
 /** Substrings chat seeds for clinical tools should include (safety / scope). */
 const CLINICAL_CHAT_SEED_GUARDRAILS = [
@@ -160,7 +165,7 @@ describe('resolveNavigationPathForLaunch — chat visibility', () => {
 });
 
 describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () => {
-  it.each(TIER_B_ALL)('%s launches via calculators hub with guided chat seed', (registryId) => {
+  it.each(TIER_B_HUB_TOOLS)('%s launches via calculators hub with guided chat seed', (registryId) => {
     const launch = resolveCatalogLaunch(registryId);
     const nlu = clinicalIntentTools.find(
       (t) => t.toolId === registryId || t.sidebarToolId === registryId
@@ -172,6 +177,21 @@ describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () =
     expect(launch.openLabel).toMatch(/guided chat|Try in chat/i);
     expect(launch.orchestratorTool).toBeNull();
   });
+
+  it.each(CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS)(
+    '%s uses a cardiology route with guided chat seed',
+    (registryId) => {
+      const launch = resolveCatalogLaunch(registryId);
+      const nlu = clinicalIntentTools.find(
+        (t) => t.toolId === registryId || t.sidebarToolId === registryId
+      );
+      expect(launch.path).toMatch(/^\/tools\/cardiology\//);
+      expect(launch.registryId).toBe(registryId);
+      expect(launch.chatSeed).toBe(nlu?.chatSeed);
+      expect(launch.openLabel).toMatch(/guided chat/i);
+      expect(launch.orchestratorTool).toBeNull();
+    }
+  );
 
   it.each(PR2_TIER_B_CHAT_CALCULATOR_IDS)('alias launch for %s matches hub path', (registryId) => {
     const aliasLaunch = resolveCatalogLaunch('pe-score');

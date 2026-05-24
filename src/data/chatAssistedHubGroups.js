@@ -12,6 +12,19 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     toolIds: ['grace-acs'],
   },
   {
+    groupId: 'cardiology-assistants',
+    heading: 'Cardiology workflow assistants',
+    lead:
+      'ECG, STEMI, ACS, atrial fibrillation, and heart failure assistants organize cardiology review and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend treatment or disposition, and must not delay emergency ACS/STEMI, unstable arrhythmia, or decompensated heart failure pathways.',
+    toolIds: [
+      'ecg-interpretation-assistant',
+      'stemi-pathway-assistant',
+      'acs-workflow-assistant',
+      'atrial-fibrillation-assistant',
+      'heart-failure-assistant',
+    ],
+  },
+  {
     groupId: 'neurology',
     heading: 'Acute stroke severity (NIHSS)',
     lead:
@@ -95,6 +108,11 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'curb65-calculator': 'Severe pneumonia, sepsis, or respiratory failure take priority over CURB-65 chat.',
   'gcs-calculator': 'Declining consciousness or trauma requires immediate evaluation before GCS chat alone.',
   'wells-dvt-calculator': 'Wells DVT does not rule in or rule out DVT with certainty; suspected PE or limb-threatening ischemia need urgent pathways.',
+  'ecg-interpretation-assistant': 'Unstable ECG findings and STEMI pathways take priority over chat.',
+  'stemi-pathway-assistant': 'STEMI activation and emergency care take priority over chat.',
+  'acs-workflow-assistant': 'Unstable ACS pathways take priority over chat.',
+  'atrial-fibrillation-assistant': 'Unstable atrial fibrillation requires urgent evaluation before chat.',
+  'heart-failure-assistant': 'Respiratory failure, shock, or severe decompensation takes priority over chat.',
 });
 
 /**

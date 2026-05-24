@@ -133,6 +133,66 @@ const clinicalIntentToolsRaw = [
     backendExecutable: false,
   },
   {
+    toolId: NLU.dukeTreadmillScore,
+    toolName: 'Duke Treadmill Score',
+    category: 'calculator',
+    description:
+      'Exercise treadmill prognostic score from exercise time, ST deviation, and angina index. Decision support only; does not clear patients for discharge or exercise.',
+    path: '/tools/calculators/duke-treadmill-score',
+    sidebarToolId: REGISTRY.dukeTreadmillScore,
+    chatSeed:
+      'Help me calculate the Duke Treadmill Score from exercise duration, ST-segment deviation, and exercise angina index. Decision support only; do not use for unstable ACS, uninterpretable ECG, or treatment/disposition decisions.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.reynoldsRiskScore,
+    toolName: 'Reynolds Risk Score Helper',
+    category: 'calculator',
+    description:
+      'Cardiovascular prevention risk context using Reynolds inputs including hs-CRP and parental MI. Helper only; exact risk requires validated Reynolds implementation.',
+    path: '/tools/calculators/reynolds-risk-score',
+    sidebarToolId: REGISTRY.reynoldsRiskScore,
+    chatSeed:
+      'Help me review Reynolds Risk Score inputs (age, sex, blood pressure, cholesterol, hs-CRP, smoking, parental MI, diabetes/HbA1c where applicable). Clinical decision support only; do not recommend statins, aspirin, or blood pressure therapy.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.hcmSuddenDeathRisk,
+    toolName: 'HCM Sudden Death Risk',
+    category: 'calculator',
+    description:
+      'HCM Risk-SCD 5-year sudden cardiac death risk context for specialist review. Does not recommend ICD placement or non-placement.',
+    path: '/tools/calculators/hcm-sudden-death-risk',
+    sidebarToolId: REGISTRY.hcmSuddenDeathRisk,
+    chatSeed:
+      'Help me calculate HCM Risk-SCD context from age, max wall thickness, left atrial diameter, LVOT gradient, family history of SCD, NSVT, and unexplained syncope. Clinical decision support only; do not recommend ICD placement or non-placement.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.chads2,
+    toolName: 'CHADS2 Score',
+    category: 'calculator',
+    description:
+      'Older atrial fibrillation stroke-risk score using CHF, hypertension, age, diabetes, and stroke/TIA history. Does not recommend anticoagulation.',
+    path: '/tools/calculators/chads2',
+    sidebarToolId: REGISTRY.chads2,
+    chatSeed:
+      'Help me calculate CHADS2 for atrial fibrillation stroke-risk context using CHF, hypertension, age 75 or older, diabetes, and prior stroke/TIA. Clinical decision support only; do not recommend anticoagulation or medication changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.heartFailureStaging,
+    toolName: 'Heart Failure Staging Helper',
+    category: 'calculator',
+    description:
+      'ACC/AHA heart failure stage documentation helper (A-D). Does not diagnose heart failure, assign NYHA class, or recommend therapy.',
+    path: '/tools/calculators/heart-failure-staging',
+    sidebarToolId: REGISTRY.heartFailureStaging,
+    chatSeed:
+      'Help me apply ACC/AHA heart failure staging (A-D) from risk factors, structural heart disease, symptoms, and advanced/refractory features. Clinical decision support only; do not diagnose heart failure or recommend diuretics, devices, admission, or advanced therapy.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'ckd-staging',
     toolName: 'CKD staging (KDIGO)',
     category: 'calculator',
@@ -622,6 +682,126 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     backendExecutable: false,
   },
   {
+    toolId: NLU.ecgInterpretationAssistant,
+    toolName: 'ECG Interpretation Assistant',
+    category: 'calculator',
+    description:
+      'Structured ECG interpretation support for rhythm, rate, intervals, ischemia flags, and urgent escalation reminders.',
+    path: '/tools/cardiology/ecg-interpretation-assistant',
+    sidebarToolId: REGISTRY.ecgInterpretationAssistant,
+    chatSeed:
+      'Help me structure an ECG interpretation: rhythm, rate, axis, PR/QRS/QT intervals, hypertrophy, ischemia/infarction flags, and comparison with prior ECGs. Clinical decision support only; do not diagnose, do not rule out MI, and do not delay STEMI/unstable arrhythmia pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.stemiPathwayAssistant,
+    toolName: 'STEMI Pathway Assistant',
+    category: 'calculator',
+    description:
+      'STEMI pathway checklist support for ECG timing, activation, contraindication review, and handoff preparation.',
+    path: '/tools/cardiology/stemi-pathway-assistant',
+    sidebarToolId: REGISTRY.stemiPathwayAssistant,
+    chatSeed:
+      'Help me prepare a STEMI pathway checklist: symptom onset, ECG timing, STEMI-equivalent concerns, cath lab or reperfusion pathway activation, contraindication review prompts, and handoff items. Clinical decision support only; do not delay emergency activation and do not recommend treatment orders.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.acsWorkflowAssistant,
+    toolName: 'ACS Workflow Assistant',
+    category: 'calculator',
+    description:
+      'ACS workflow support across ECG review, serial biomarkers, risk score selection, and reassessment checkpoints.',
+    path: '/tools/cardiology/acs-workflow-assistant',
+    sidebarToolId: REGISTRY.acsWorkflowAssistant,
+    chatSeed:
+      'Help me organize an ACS workflow: initial ECG, serial ECG/bio-marker checkpoints, HEART/TIMI/GRACE calculator selection, red flags, and handoff documentation. Clinical decision support only; do not diagnose ACS, rule out ACS, recommend antithrombotics, disposition, or invasive strategy.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.atrialFibrillationAssistant,
+    toolName: 'Atrial Fibrillation Assistant',
+    category: 'calculator',
+    description:
+      'AF decision-support workspace for stability review, stroke/bleeding score selection, and clinician handoff prompts.',
+    path: '/tools/cardiology/atrial-fibrillation-assistant',
+    sidebarToolId: REGISTRY.atrialFibrillationAssistant,
+    chatSeed:
+      'Help me structure an atrial fibrillation review: stability first, symptom context, triggers, CHA2DS2-VASc/CHADS2/HAS-BLED selection, medication safety questions, and handoff prompts. Clinical decision support only; do not recommend anticoagulation, rate/rhythm control, cardioversion, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.heartFailureAssistant,
+    toolName: 'Heart Failure Assistant',
+    category: 'calculator',
+    description:
+      'Heart failure support for staging, congestion context, telemetry concerns, and escalation prompts.',
+    path: '/tools/cardiology/heart-failure-assistant',
+    sidebarToolId: REGISTRY.heartFailureAssistant,
+    chatSeed:
+      'Help me structure a heart failure review: stability, congestion symptoms, vitals, renal/electrolyte context, ACC/AHA stage helper, red flags, and follow-up questions. Clinical decision support only; do not diagnose heart failure or recommend diuretics, devices, admission, or medication changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.cardiacTelemetryAnalyzer,
+    toolName: 'Cardiac Telemetry Analyzer',
+    category: 'reference',
+    description:
+      'Telemetry review workflow for rhythm events, sustained alerts, artifact concerns, and human-reviewed escalation summaries.',
+    path: '/tools/cardiology/cardiac-telemetry-analyzer',
+    sidebarToolId: REGISTRY.cardiacTelemetryAnalyzer,
+    chatSeed:
+      'Help me review cardiac telemetry events: rhythm label, duration, rate, symptoms, artifact/lead quality, recurrence, and escalation summary. Clinical decision support only; do not diagnose arrhythmia, silence alarms, auto-page, or replace clinician review.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.ecgTrendEngine,
+    toolName: 'ECG Trend Engine',
+    category: 'reference',
+    description:
+      'Serial ECG trend support for intervals, morphology changes, ischemia flags, and comparison documentation.',
+    path: '/tools/cardiology/ecg-trend-engine',
+    sidebarToolId: REGISTRY.ecgTrendEngine,
+    chatSeed:
+      'Help me compare serial ECGs: rhythm/rate changes, PR/QRS/QT interval trends, ST-T morphology, new conduction changes, and urgent-change flags. Clinical decision support only; do not diagnose MI or delay emergency pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.arrhythmiaRiskClassifier,
+    toolName: 'Arrhythmia Risk Classifier',
+    category: 'reference',
+    description:
+      'Arrhythmia concern-level classifier using symptoms, telemetry findings, comorbidity context, and escalation signals.',
+    path: '/tools/cardiology/arrhythmia-risk-classifier',
+    sidebarToolId: REGISTRY.arrhythmiaRiskClassifier,
+    chatSeed:
+      'Help me classify arrhythmia concern level from rhythm description, rate, duration, symptoms, hemodynamics, structural heart disease, electrolyte context, and telemetry recurrence. Clinical decision support only; unstable arrhythmia pathways take priority and this does not diagnose or recommend therapy.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.remoteCardiologyMonitoringDashboard,
+    toolName: 'Remote Cardiology Monitoring Dashboard',
+    category: 'reference',
+    description:
+      'Remote cardiology monitoring review queue for symptoms, vitals, missed transmissions, alerts, and human triage documentation.',
+    path: '/tools/cardiology/remote-cardiology-monitoring-dashboard',
+    sidebarToolId: REGISTRY.remoteCardiologyMonitoringDashboard,
+    chatSeed:
+      'Help me review remote cardiology monitoring: patient symptoms, vitals, rhythm alerts, missed transmissions, device flags, and priority queue summary. Clinical decision support only; do not auto-triage, message patients autonomously, or replace local escalation policy.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.cardiologyCommandCenter,
+    toolName: 'Cardiology Command Center',
+    category: 'reference',
+    description:
+      'Cardiology operations command center for ACS queues, telemetry risk, remote monitoring alerts, and unresolved human-review items.',
+    path: '/tools/cardiology/cardiology-command-center',
+    sidebarToolId: REGISTRY.cardiologyCommandCenter,
+    chatSeed:
+      'Help me summarize the cardiology command center: ACS/STEMI queue, telemetry alerts, remote monitoring flags, high-risk calculator follow-ups, bottlenecks, and unresolved review tasks. Clinical decision support only; no automated orders, no dispatch, and human review required.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'drug-interactions',
     toolName: 'Drug Interaction Checker',
     category: 'checker',
@@ -1105,6 +1285,51 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/framingham-risk',
     calcQuery: '/tools/calculators?calc=framingham-risk',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (framinghamRiskCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'duke-treadmill-score',
+    name: 'Duke Treadmill Score',
+    description: 'Exercise treadmill prognostic score from time, ST deviation, and exercise angina.',
+    path: '/tools/calculators/duke-treadmill-score',
+    calcQuery: '/tools/calculators?calc=duke-treadmill-score',
+    implementation: 'Client-side in cardiologyCalculators.jsx (cardiologyRiskCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'reynolds-risk-score',
+    name: 'Reynolds Risk Score Helper',
+    description: 'Cardiovascular prevention risk context including hs-CRP and parental MI.',
+    path: '/tools/calculators/reynolds-risk-score',
+    calcQuery: '/tools/calculators?calc=reynolds-risk-score',
+    implementation: 'Client-side in cardiologyCalculators.jsx (cardiologyRiskCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'hcm-sudden-death-risk',
+    name: 'HCM Sudden Death Risk',
+    description: 'HCM Risk-SCD 5-year sudden cardiac death risk context for specialist review.',
+    path: '/tools/calculators/hcm-sudden-death-risk',
+    calcQuery: '/tools/calculators?calc=hcm-sudden-death-risk',
+    implementation: 'Client-side in cardiologyCalculators.jsx (cardiologyRiskCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'chads2',
+    name: 'CHADS2',
+    description: 'Older AF stroke-risk score using CHF, hypertension, age, diabetes, and stroke/TIA.',
+    path: '/tools/calculators/chads2',
+    calcQuery: '/tools/calculators?calc=chads2',
+    implementation: 'Client-side in cardiologyCalculators.jsx (cardiologyRiskCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'heart-failure-staging',
+    name: 'Heart Failure Staging Helper',
+    description: 'ACC/AHA heart failure stage documentation helper (A-D).',
+    path: '/tools/calculators/heart-failure-staging',
+    calcQuery: '/tools/calculators?calc=heart-failure-staging',
+    implementation: 'Client-side in cardiologyCalculators.jsx (cardiologyRiskCalculators.js)',
     orchestratorId: null,
   },
   {

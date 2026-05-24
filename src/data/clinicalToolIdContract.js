@@ -25,7 +25,7 @@
  */
 
 /** Bump when registry/NLU lists or maps change incompatibly. */
-export const TOOL_ID_CONTRACT_VERSION = '1.8.0';
+export const TOOL_ID_CONTRACT_VERSION = '1.9.0';
 
 /** Shared SPA paths for tool launch (browser-safe). */
 export const TOOL_LAUNCH_PATHS = Object.freeze({
@@ -57,6 +57,11 @@ export const REGISTRY = Object.freeze({
   meldNa: 'meld-na',
   timiUaNstemi: 'timi-ua-nstemi',
   ascvdRisk: 'ascvd-risk',
+  dukeTreadmillScore: 'duke-treadmill-score',
+  reynoldsRiskScore: 'reynolds-risk-score',
+  hcmSuddenDeathRisk: 'hcm-sudden-death-risk',
+  chads2: 'chads2',
+  heartFailureStaging: 'heart-failure-staging',
   ckdStaging: 'ckd-staging',
   stopBang: 'stop-bang',
   auditC: 'audit-c',
@@ -104,6 +109,16 @@ export const REGISTRY = Object.freeze({
   antibioticGuide: 'antibiotic-guide',
   ambientScribe: 'ambient-scribe',
   calculatorRecommenderAi: 'calculator-recommender-ai',
+  ecgInterpretationAssistant: 'ecg-interpretation-assistant',
+  stemiPathwayAssistant: 'stemi-pathway-assistant',
+  acsWorkflowAssistant: 'acs-workflow-assistant',
+  atrialFibrillationAssistant: 'atrial-fibrillation-assistant',
+  heartFailureAssistant: 'heart-failure-assistant',
+  cardiacTelemetryAnalyzer: 'cardiac-telemetry-analyzer',
+  ecgTrendEngine: 'ecg-trend-engine',
+  arrhythmiaRiskClassifier: 'arrhythmia-risk-classifier',
+  remoteCardiologyMonitoringDashboard: 'remote-cardiology-monitoring-dashboard',
+  cardiologyCommandCenter: 'cardiology-command-center',
   guidelineRag: 'guideline-rag',
   differentialAi: 'differential-ai',
   timelineAi: 'timeline-ai',
@@ -136,6 +151,11 @@ export const NLU = Object.freeze({
   meldNa: 'meld-na',
   timiUaNstemi: 'timi-ua-nstemi',
   ascvdRisk: 'ascvd-risk',
+  dukeTreadmillScore: 'duke-treadmill-score',
+  reynoldsRiskScore: 'reynolds-risk-score',
+  hcmSuddenDeathRisk: 'hcm-sudden-death-risk',
+  chads2: 'chads2',
+  heartFailureStaging: 'heart-failure-staging',
   ckdStaging: 'ckd-staging',
   stopBang: 'stop-bang',
   auditC: 'audit-c',
@@ -189,6 +209,16 @@ export const NLU = Object.freeze({
   antibioticGuide: 'antibiotic-guide',
   procedures: 'procedures',
   calculatorRecommenderAi: 'calculator-recommender-ai',
+  ecgInterpretationAssistant: 'ecg-interpretation-assistant',
+  stemiPathwayAssistant: 'stemi-pathway-assistant',
+  acsWorkflowAssistant: 'acs-workflow-assistant',
+  atrialFibrillationAssistant: 'atrial-fibrillation-assistant',
+  heartFailureAssistant: 'heart-failure-assistant',
+  cardiacTelemetryAnalyzer: 'cardiac-telemetry-analyzer',
+  ecgTrendEngine: 'ecg-trend-engine',
+  arrhythmiaRiskClassifier: 'arrhythmia-risk-classifier',
+  remoteCardiologyMonitoringDashboard: 'remote-cardiology-monitoring-dashboard',
+  cardiologyCommandCenter: 'cardiology-command-center',
 });
 
 /** Built-in calculator UI slugs (`Calculators.jsx`, `?calc=`). */
@@ -202,6 +232,11 @@ export const BUILTIN_CALC = Object.freeze({
   meldNa: 'meld-na',
   timiUaNstemi: 'timi-ua-nstemi',
   ascvdRisk: 'ascvd-risk',
+  dukeTreadmillScore: 'duke-treadmill-score',
+  reynoldsRiskScore: 'reynolds-risk-score',
+  hcmSuddenDeathRisk: 'hcm-sudden-death-risk',
+  chads2: 'chads2',
+  heartFailureStaging: 'heart-failure-staging',
   ckdStaging: 'ckd-staging',
   stopBang: 'stop-bang',
   auditC: 'audit-c',
@@ -286,6 +321,14 @@ export const PR8_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
 
 export const PR8_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR8_TIER_A_CALCULATOR_REGISTRY_IDS]);
 
+export const CARDIOLOGY_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
+  REGISTRY.dukeTreadmillScore,
+  REGISTRY.reynoldsRiskScore,
+  REGISTRY.hcmSuddenDeathRisk,
+  REGISTRY.chads2,
+  REGISTRY.heartFailureStaging,
+]);
+
 export const PR10_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([REGISTRY.abcd2]);
 
 export const PR10_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR10_TIER_A_CALCULATOR_REGISTRY_IDS]);
@@ -315,6 +358,7 @@ export const CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...PR4A_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR5_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR8_TIER_A_CALCULATOR_REGISTRY_IDS,
+  ...CARDIOLOGY_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR10_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...PR11_TIER_A_CALCULATOR_REGISTRY_IDS,
   ...EMERGENCY_CRITICAL_CARE_TIER_A_CALCULATOR_REGISTRY_IDS,
@@ -340,12 +384,21 @@ export const PR9_TIER_B_CHAT_CALCULATOR_IDS = Object.freeze([
   REGISTRY.nexusCspine,
 ]);
 
+export const CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS = Object.freeze([
+  REGISTRY.ecgInterpretationAssistant,
+  REGISTRY.stemiPathwayAssistant,
+  REGISTRY.acsWorkflowAssistant,
+  REGISTRY.atrialFibrillationAssistant,
+  REGISTRY.heartFailureAssistant,
+]);
+
 export const CLINICAL_TIER_B_CHAT_REGISTRY_IDS = Object.freeze([
   ...PR2_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR3_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR6_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR7_TIER_B_CHAT_CALCULATOR_IDS,
   ...PR9_TIER_B_CHAT_CALCULATOR_IDS,
+  ...CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS,
 ]);
 
 /** NLU hub chat tools with dedicated sidebar registry rows (guided chat from calculators hub). */
@@ -436,6 +489,11 @@ export const CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS = Object.freeze([
   REGISTRY.orderSetAi,
   REGISTRY.aiExplainability,
   REGISTRY.clinicalAudit,
+  REGISTRY.cardiacTelemetryAnalyzer,
+  REGISTRY.ecgTrendEngine,
+  REGISTRY.arrhythmiaRiskClassifier,
+  REGISTRY.remoteCardiologyMonitoringDashboard,
+  REGISTRY.cardiologyCommandCenter,
 ]);
 
 /** Chat-assisted calculator hub entries with dedicated sidebar rows. */
@@ -471,6 +529,11 @@ export const NLU_PROFILE_TOOL_IDS = Object.freeze([
   NLU.meldNa,
   NLU.timiUaNstemi,
   NLU.ascvdRisk,
+  NLU.dukeTreadmillScore,
+  NLU.reynoldsRiskScore,
+  NLU.hcmSuddenDeathRisk,
+  NLU.chads2,
+  NLU.heartFailureStaging,
   NLU.ckdStaging,
   NLU.stopBang,
   NLU.auditC,
@@ -524,6 +587,16 @@ export const NLU_PROFILE_TOOL_IDS = Object.freeze([
   NLU.antibioticGuide,
   NLU.procedures,
   NLU.calculatorRecommenderAi,
+  NLU.ecgInterpretationAssistant,
+  NLU.stemiPathwayAssistant,
+  NLU.acsWorkflowAssistant,
+  NLU.atrialFibrillationAssistant,
+  NLU.heartFailureAssistant,
+  NLU.cardiacTelemetryAnalyzer,
+  NLU.ecgTrendEngine,
+  NLU.arrhythmiaRiskClassifier,
+  NLU.remoteCardiologyMonitoringDashboard,
+  NLU.cardiologyCommandCenter,
 ]);
 
 export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
@@ -537,6 +610,11 @@ export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
   [BUILTIN_CALC.meldNa]: REGISTRY.meldNa,
   [BUILTIN_CALC.timiUaNstemi]: REGISTRY.timiUaNstemi,
   [BUILTIN_CALC.ascvdRisk]: REGISTRY.ascvdRisk,
+  [BUILTIN_CALC.dukeTreadmillScore]: REGISTRY.dukeTreadmillScore,
+  [BUILTIN_CALC.reynoldsRiskScore]: REGISTRY.reynoldsRiskScore,
+  [BUILTIN_CALC.hcmSuddenDeathRisk]: REGISTRY.hcmSuddenDeathRisk,
+  [BUILTIN_CALC.chads2]: REGISTRY.chads2,
+  [BUILTIN_CALC.heartFailureStaging]: REGISTRY.heartFailureStaging,
   [BUILTIN_CALC.ckdStaging]: REGISTRY.ckdStaging,
   [BUILTIN_CALC.stopBang]: REGISTRY.stopBang,
   [BUILTIN_CALC.auditC]: REGISTRY.auditC,
@@ -593,6 +671,11 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
   [NLU.anionGap]: REGISTRY.anionGap,
   [NLU.rass]: REGISTRY.rass,
   [NLU.ascvdRisk]: REGISTRY.ascvdRisk,
+  [NLU.dukeTreadmillScore]: REGISTRY.dukeTreadmillScore,
+  [NLU.reynoldsRiskScore]: REGISTRY.reynoldsRiskScore,
+  [NLU.hcmSuddenDeathRisk]: REGISTRY.hcmSuddenDeathRisk,
+  [NLU.chads2]: REGISTRY.chads2,
+  [NLU.heartFailureStaging]: REGISTRY.heartFailureStaging,
   [NLU.ckdStaging]: REGISTRY.ckdStaging,
   [NLU.stopBang]: REGISTRY.stopBang,
   [NLU.auditC]: REGISTRY.auditC,
@@ -624,6 +707,16 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
   [NLU.differentialAi]: REGISTRY.differentialAi,
   [NLU.antibioticGuide]: REGISTRY.diagnosis,
   [NLU.calculatorRecommenderAi]: REGISTRY.calculatorRecommenderAi,
+  [NLU.ecgInterpretationAssistant]: REGISTRY.ecgInterpretationAssistant,
+  [NLU.stemiPathwayAssistant]: REGISTRY.stemiPathwayAssistant,
+  [NLU.acsWorkflowAssistant]: REGISTRY.acsWorkflowAssistant,
+  [NLU.atrialFibrillationAssistant]: REGISTRY.atrialFibrillationAssistant,
+  [NLU.heartFailureAssistant]: REGISTRY.heartFailureAssistant,
+  [NLU.cardiacTelemetryAnalyzer]: REGISTRY.cardiacTelemetryAnalyzer,
+  [NLU.ecgTrendEngine]: REGISTRY.ecgTrendEngine,
+  [NLU.arrhythmiaRiskClassifier]: REGISTRY.arrhythmiaRiskClassifier,
+  [NLU.remoteCardiologyMonitoringDashboard]: REGISTRY.remoteCardiologyMonitoringDashboard,
+  [NLU.cardiologyCommandCenter]: REGISTRY.cardiologyCommandCenter,
 });
 
 /**
@@ -956,6 +1049,28 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'pooled cohort equations': REGISTRY.ascvdRisk,
   '10 year ascvd': REGISTRY.ascvdRisk,
   '10-year ascvd': REGISTRY.ascvdRisk,
+  'duke treadmill': REGISTRY.dukeTreadmillScore,
+  'duke-treadmill': REGISTRY.dukeTreadmillScore,
+  'duke treadmill score': REGISTRY.dukeTreadmillScore,
+  'duke-treadmill-score': REGISTRY.dukeTreadmillScore,
+  'exercise treadmill score': REGISTRY.dukeTreadmillScore,
+  reynolds: REGISTRY.reynoldsRiskScore,
+  'reynolds risk': REGISTRY.reynoldsRiskScore,
+  'reynolds-risk': REGISTRY.reynoldsRiskScore,
+  'reynolds score': REGISTRY.reynoldsRiskScore,
+  'reynolds-risk-score': REGISTRY.reynoldsRiskScore,
+  'hcm risk': REGISTRY.hcmSuddenDeathRisk,
+  'hcm sudden death risk': REGISTRY.hcmSuddenDeathRisk,
+  'hcm-sudden-death-risk': REGISTRY.hcmSuddenDeathRisk,
+  'hcm scd risk': REGISTRY.hcmSuddenDeathRisk,
+  'hypertrophic cardiomyopathy risk': REGISTRY.hcmSuddenDeathRisk,
+  chads2: REGISTRY.chads2,
+  'chads2 score': REGISTRY.chads2,
+  'chads-2': REGISTRY.chads2,
+  'heart failure staging': REGISTRY.heartFailureStaging,
+  'heart-failure-staging': REGISTRY.heartFailureStaging,
+  'hf staging': REGISTRY.heartFailureStaging,
+  'acc aha heart failure stage': REGISTRY.heartFailureStaging,
   'ckd stage': REGISTRY.ckdStaging,
   'ckd-stage': REGISTRY.ckdStaging,
   'kidney stage': REGISTRY.ckdStaging,
@@ -1052,6 +1167,34 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'framingham-score': REGISTRY.framinghamRisk,
   'hard chd risk': REGISTRY.framinghamRisk,
   'hard-chd-risk': REGISTRY.framinghamRisk,
+  'ecg interpretation assistant': REGISTRY.ecgInterpretationAssistant,
+  'ecg-interpretation-assistant': REGISTRY.ecgInterpretationAssistant,
+  'ekg interpretation': REGISTRY.ecgInterpretationAssistant,
+  'stemi pathway': REGISTRY.stemiPathwayAssistant,
+  'stemi-pathway-assistant': REGISTRY.stemiPathwayAssistant,
+  'stemi activation': REGISTRY.stemiPathwayAssistant,
+  'acs workflow': REGISTRY.acsWorkflowAssistant,
+  'acs-workflow-assistant': REGISTRY.acsWorkflowAssistant,
+  'acute coronary syndrome workflow': REGISTRY.acsWorkflowAssistant,
+  'atrial fibrillation assistant': REGISTRY.atrialFibrillationAssistant,
+  'atrial-fibrillation-assistant': REGISTRY.atrialFibrillationAssistant,
+  'afib assistant': REGISTRY.atrialFibrillationAssistant,
+  'heart failure assistant': REGISTRY.heartFailureAssistant,
+  'heart-failure-assistant': REGISTRY.heartFailureAssistant,
+  'hf assistant': REGISTRY.heartFailureAssistant,
+  'cardiac telemetry analyzer': REGISTRY.cardiacTelemetryAnalyzer,
+  'cardiac-telemetry-analyzer': REGISTRY.cardiacTelemetryAnalyzer,
+  'telemetry analyzer': REGISTRY.cardiacTelemetryAnalyzer,
+  'ecg trend engine': REGISTRY.ecgTrendEngine,
+  'ecg-trend-engine': REGISTRY.ecgTrendEngine,
+  'ekg trend': REGISTRY.ecgTrendEngine,
+  'arrhythmia risk classifier': REGISTRY.arrhythmiaRiskClassifier,
+  'arrhythmia-risk-classifier': REGISTRY.arrhythmiaRiskClassifier,
+  'remote cardiology monitoring': REGISTRY.remoteCardiologyMonitoringDashboard,
+  'remote-cardiology-monitoring-dashboard': REGISTRY.remoteCardiologyMonitoringDashboard,
+  'cardiology monitoring dashboard': REGISTRY.remoteCardiologyMonitoringDashboard,
+  'cardiology command center': REGISTRY.cardiologyCommandCenter,
+  'cardiology-command-center': REGISTRY.cardiologyCommandCenter,
   'copd-gold': REGISTRY.copdGold,
   'gold copd': REGISTRY.copdGold,
   'gold-copd': REGISTRY.copdGold,

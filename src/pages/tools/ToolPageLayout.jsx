@@ -29,6 +29,16 @@ const AI_DOCUMENTATION_TOOL_IDS = new Set([
   'timeline-ai',
   'procedures',
   'protocols',
+  'ecg-interpretation-assistant',
+  'stemi-pathway-assistant',
+  'acs-workflow-assistant',
+  'atrial-fibrillation-assistant',
+  'heart-failure-assistant',
+  'cardiac-telemetry-analyzer',
+  'ecg-trend-engine',
+  'arrhythmia-risk-classifier',
+  'remote-cardiology-monitoring-dashboard',
+  'cardiology-command-center',
 ]);
 const FLEET_TOOL_IDS = new Set(['route-optimizer', 'predictive-maintenance', 'fleet-command', 'dispatch-ai']);
 

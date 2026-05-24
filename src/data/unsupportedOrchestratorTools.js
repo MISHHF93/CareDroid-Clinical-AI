@@ -29,6 +29,14 @@ export const UNSUPPORTED_ORCHESTRATOR_NLU_TOOL_IDS = Object.freeze(
  */
 
 const FLEET_NLU = new Set([NLU.fleetCommand, NLU.predictiveMaintenance, NLU.routeOptimizer]);
+const CHAT_ASSISTED_NLU = new Set([
+  NLU.dispatchAi,
+  NLU.ecgInterpretationAssistant,
+  NLU.stemiPathwayAssistant,
+  NLU.acsWorkflowAssistant,
+  NLU.atrialFibrillationAssistant,
+  NLU.heartFailureAssistant,
+]);
 const CLINICAL_PAGE_NLU = new Set([
   NLU.protocolLookup,
   NLU.aclsProtocol,
@@ -36,13 +44,18 @@ const CLINICAL_PAGE_NLU = new Set([
   NLU.differentialDiagnosis,
   NLU.antibioticGuide,
   NLU.abgInterpreter,
+  NLU.cardiacTelemetryAnalyzer,
+  NLU.ecgTrendEngine,
+  NLU.arrhythmiaRiskClassifier,
+  NLU.remoteCardiologyMonitoringDashboard,
+  NLU.cardiologyCommandCenter,
 ]);
 
 /** @returns {UnsupportedOrchestratorToolRow[]} */
 export function buildUnsupportedOrchestratorToolDocs() {
   return UNSUPPORTED_ORCHESTRATOR_NLU_TOOL_IDS.map((nluToolId) => {
     let surface = 'calculator-form';
-    if (nluToolId === NLU.dispatchAi) surface = 'chat-assisted';
+    if (CHAT_ASSISTED_NLU.has(nluToolId)) surface = 'chat-assisted';
     else if (FLEET_NLU.has(nluToolId)) surface = 'fleet';
     else if (CLINICAL_PAGE_NLU.has(nluToolId)) surface = 'clinical-page';
 
