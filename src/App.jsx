@@ -83,6 +83,7 @@ const AmbientScribe = lazyWithRetry(() => import('./pages/tools/AmbientScribe'))
 const CalculatorRecommender = lazyWithRetry(() => import('./pages/tools/CalculatorRecommender'));
 const PulmonologyAssistantPage = lazyWithRetry(() => import('./pages/tools/PulmonologyAssistantPage'));
 const NephrologyAssistantPage = lazyWithRetry(() => import('./pages/tools/NephrologyAssistantPage'));
+const GastroenterologyAssistantPage = lazyWithRetry(() => import('./pages/tools/GastroenterologyAssistantPage'));
 const GuidelineRag = lazyWithRetry(() => import('./pages/tools/GuidelineRag'));
 const DifferentialAi = lazyWithRetry(() => import('./pages/tools/DifferentialAi'));
 const TimelineAi = lazyWithRetry(() => import('./pages/tools/TimelineAi'));
@@ -676,6 +677,15 @@ function AppRoutes() {
       element: (
         <AppShellPage>
           <NephrologyAssistantPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/gastroenterology/:toolId',
+      element: (
+        <AppShellPage>
+          <GastroenterologyAssistantPage />
         </AppShellPage>
       ),
       requiresAuth: true,

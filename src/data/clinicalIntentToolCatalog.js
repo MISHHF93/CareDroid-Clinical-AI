@@ -546,6 +546,54 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     backendExecutable: false,
   },
   {
+    toolId: NLU.maddreyDiscriminantFunction,
+    toolName: 'Maddrey Discriminant Function',
+    category: 'calculator',
+    description:
+      'Maddrey DF for alcoholic hepatitis severe-range risk context using PT prolongation and bilirubin. Does not diagnose alcoholic hepatitis or recommend treatment.',
+    path: '/tools/calculators/maddrey-discriminant-function',
+    sidebarToolId: REGISTRY.maddreyDiscriminantFunction,
+    chatSeed:
+      'Help me calculate Maddrey Discriminant Function from patient PT, control PT, and bilirubin. Clinical decision support only; do not diagnose alcoholic hepatitis and do not recommend corticosteroids, transplant referral, admission, discharge, or any treatment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.apri,
+    toolName: 'APRI',
+    category: 'calculator',
+    description:
+      'AST to Platelet Ratio Index fibrosis screening context. Does not diagnose cirrhosis or replace elastography, imaging, biopsy, or hepatology review.',
+    path: '/tools/calculators/apri',
+    sidebarToolId: REGISTRY.apri,
+    chatSeed:
+      'Help me calculate APRI from AST, AST upper limit of normal, and platelet count. Clinical decision support only; do not diagnose fibrosis or cirrhosis, and do not recommend treatment, biopsy, elastography, referral urgency, or medication changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.glasgowBlatchfordScore,
+    toolName: 'Glasgow-Blatchford Score',
+    category: 'calculator',
+    description:
+      'Pre-endoscopy upper GI bleeding risk stratification support using BUN/urea, hemoglobin, blood pressure, pulse, melena, syncope, hepatic disease, and cardiac failure.',
+    path: '/tools/calculators/glasgow-blatchford-score',
+    sidebarToolId: REGISTRY.glasgowBlatchfordScore,
+    chatSeed:
+      'Help me calculate Glasgow-Blatchford Score for suspected upper GI bleeding from BUN/urea, hemoglobin, sex, systolic BP, pulse, melena, syncope, hepatic disease, and cardiac failure. Clinical decision support only; do not rule in or rule out GI bleeding and do not recommend transfusion, endoscopy timing, medication, admission, discharge, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.rockallScore,
+    toolName: 'Rockall Score',
+    category: 'calculator',
+    description:
+      'Upper GI bleeding risk score using age, shock, comorbidity, endoscopic diagnosis, and bleeding stigmata. Does not recommend treatment or disposition.',
+    path: '/tools/calculators/rockall-score',
+    sidebarToolId: REGISTRY.rockallScore,
+    chatSeed:
+      'Help me calculate the Rockall Score for upper GI bleeding using age, shock, comorbidity, diagnosis, and endoscopic stigmata. Clinical decision support only; do not recommend transfusion, endoscopy timing, medication, level of care, admission, discharge, or disposition.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'framingham-risk',
     toolName: 'Framingham 10-year CHD risk',
     category: 'calculator',
@@ -993,6 +1041,102 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     path: romeIvIbsChatConfig.hubPath,
     sidebarToolId: romeIvIbsChatConfig.registryId,
     chatSeed: romeIvIbsChatConfig.chatSeed,
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.giBleedWorkflowAssistant,
+    toolName: 'GI Bleed Workflow Assistant',
+    category: 'calculator',
+    description:
+      'Guided GI bleed review using GBS/Rockall context, hemodynamics, medications, comorbidities, and handoff prompts.',
+    path: '/tools/calculators',
+    sidebarToolId: REGISTRY.giBleedWorkflowAssistant,
+    chatSeed:
+      'Help me structure a GI bleed workflow review: hemodynamics, ongoing bleeding, melena/hematemesis, hemoglobin trend, BUN/urea, anticoagulants, liver disease, Glasgow-Blatchford or Rockall context, and handoff prompts. Clinical decision support only; do not recommend transfusion, endoscopy timing, medications, admission, discharge, or disposition, and do not delay urgent local GI bleed pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.liverDiseaseAssistant,
+    toolName: 'Liver Disease Assistant',
+    category: 'calculator',
+    description:
+      'Guided liver disease review for Child-Pugh, MELD/MELD-Na, Maddrey DF, FIB-4/APRI, trends, and missing data.',
+    path: '/tools/calculators',
+    sidebarToolId: REGISTRY.liverDiseaseAssistant,
+    chatSeed:
+      'Help me structure a liver disease review: bilirubin, INR/PT, albumin, creatinine, sodium, ascites, encephalopathy, platelets, AST/ALT, Child-Pugh, MELD/MELD-Na, Maddrey DF, FIB-4/APRI context, and missing data. Clinical decision support only; do not diagnose cirrhosis or alcoholic hepatitis and do not recommend treatment, transplant listing, referral urgency, admission, discharge, or medication changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pancreatitisWorkflowAssistant,
+    toolName: 'Pancreatitis Workflow Assistant',
+    category: 'calculator',
+    description:
+      'Guided pancreatitis severity review using Ranson, BISAP, organ-failure context, trends, and missing-data prompts.',
+    path: '/tools/calculators',
+    sidebarToolId: REGISTRY.pancreatitisWorkflowAssistant,
+    chatSeed:
+      'Help me structure an acute pancreatitis workflow review: timing, etiology context, Ranson criteria, BISAP, organ failure markers, BUN trend, calcium, oxygenation, imaging status if known, and missing data. Clinical decision support only; do not diagnose severity definitively and do not recommend fluids, antibiotics, nutrition, ICU admission, procedures, discharge, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.giSurveillanceDashboard,
+    toolName: 'GI Surveillance Dashboard',
+    category: 'reference',
+    description:
+      'GI surveillance dashboard for endoscopy follow-up, pathology gaps, recall queues, and human review tracking.',
+    path: '/tools/gastroenterology/gi-surveillance-dashboard',
+    sidebarToolId: REGISTRY.giSurveillanceDashboard,
+    chatSeed:
+      'Help me review a GI surveillance dashboard summary: endoscopy follow-up queue, pathology status, recall gaps, overdue reviews, and unresolved clinician-review items. Clinical decision support only; do not recommend surveillance intervals, procedures, treatment, admission, discharge, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.hepaticTrendAnalytics,
+    toolName: 'Hepatic Trend Analytics',
+    category: 'reference',
+    description:
+      'Hepatic trend analytics for synthetic function, cholestasis, platelets, MELD/Child-Pugh inputs, and missing labs.',
+    path: '/tools/gastroenterology/hepatic-trend-analytics',
+    sidebarToolId: REGISTRY.hepaticTrendAnalytics,
+    chatSeed:
+      'Help me summarize hepatic trends: bilirubin, INR/PT, albumin, sodium, creatinine, AST/ALT, platelets, MELD/Child-Pugh inputs, FIB-4/APRI context, and missing labs. Clinical decision support only; do not diagnose liver failure and do not recommend treatment, transplant listing, referral urgency, admission, discharge, or medication changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.endoscopyWorkflowAssistant,
+    toolName: 'Endoscopy Workflow Assistant',
+    category: 'reference',
+    description:
+      'Endoscopy workflow support for indication, preparation status, risk context, documentation, and follow-up queues.',
+    path: '/tools/gastroenterology/endoscopy-workflow-assistant',
+    sidebarToolId: REGISTRY.endoscopyWorkflowAssistant,
+    chatSeed:
+      'Help me organize an endoscopy workflow review: indication, preparation status, anticoagulant context if provided, GI bleed risk-score context if relevant, pathology follow-up, and unresolved documentation items. Clinical decision support only; do not recommend procedure timing, sedation, anticoagulant changes, treatment, admission, discharge, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.cirrhosisMonitoringEngine,
+    toolName: 'Cirrhosis Monitoring Engine',
+    category: 'reference',
+    description:
+      'Cirrhosis monitoring workspace for decompensation features, liver scores, surveillance gaps, and review queues.',
+    path: '/tools/gastroenterology/cirrhosis-monitoring-engine',
+    sidebarToolId: REGISTRY.cirrhosisMonitoringEngine,
+    chatSeed:
+      'Help me review cirrhosis monitoring context: ascites, encephalopathy, variceal/history context if provided, bilirubin, INR, albumin, creatinine, sodium, MELD/MELD-Na, Child-Pugh, platelet trend, and surveillance gaps. Clinical decision support only; do not recommend treatment, transplant listing, procedures, referral urgency, admission, discharge, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.giCommandCenter,
+    toolName: 'GI Command Center',
+    category: 'reference',
+    description:
+      'GI command-center workflow for GI bleed, liver disease, pancreatitis, endoscopy, and surveillance queues.',
+    path: '/tools/gastroenterology/gi-command-center',
+    sidebarToolId: REGISTRY.giCommandCenter,
+    chatSeed:
+      'Help me review GI command-center queues: GI bleed workflow, liver disease reviews, pancreatitis reviews, endoscopy workflow, surveillance dashboard gaps, unresolved alerts, and handoff priorities. Clinical decision support and operations visibility only; do not recommend treatment, procedures, admission, discharge, or disposition.',
     backendExecutable: false,
   },
   {
@@ -1636,6 +1780,42 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/fib4',
     calcQuery: '/tools/calculators?calc=fib4',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (fib4Calculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'maddrey-discriminant-function',
+    name: 'Maddrey Discriminant Function',
+    description: 'Alcoholic hepatitis severe-range risk context from PT prolongation and bilirubin.',
+    path: '/tools/calculators/maddrey-discriminant-function',
+    calcQuery: '/tools/calculators?calc=maddrey-discriminant-function',
+    implementation: 'Client-side in hepatologyGiCalculators.jsx (hepatologyGiCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'apri',
+    name: 'APRI',
+    description: 'AST to Platelet Ratio Index fibrosis screening context.',
+    path: '/tools/calculators/apri',
+    calcQuery: '/tools/calculators?calc=apri',
+    implementation: 'Client-side in hepatologyGiCalculators.jsx (hepatologyGiCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'glasgow-blatchford-score',
+    name: 'Glasgow-Blatchford Score',
+    description: 'Pre-endoscopy upper GI bleeding risk stratification support.',
+    path: '/tools/calculators/glasgow-blatchford-score',
+    calcQuery: '/tools/calculators?calc=glasgow-blatchford-score',
+    implementation: 'Client-side in hepatologyGiCalculators.jsx (hepatologyGiCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'rockall-score',
+    name: 'Rockall Score',
+    description: 'Upper GI bleeding risk score using clinical and endoscopic findings.',
+    path: '/tools/calculators/rockall-score',
+    calcQuery: '/tools/calculators?calc=rockall-score',
+    implementation: 'Client-side in hepatologyGiCalculators.jsx (hepatologyGiCalculators.js)',
     orchestratorId: null,
   },
   {

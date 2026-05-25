@@ -66,6 +66,17 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     toolIds: ['rome-iv-ibs'],
   },
   {
+    groupId: 'hepatology-gi-workflows',
+    heading: 'Hepatology and GI workflows',
+    lead:
+      'GI bleed, liver disease, and pancreatitis assistants organize risk-score context, trends, missing data, and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend treatment, procedures, or disposition, and must not delay urgent GI bleed, liver failure, pancreatitis, endoscopy, or emergency pathways.',
+    toolIds: [
+      'gi-bleed-workflow-assistant',
+      'liver-disease-assistant',
+      'pancreatitis-workflow-assistant',
+    ],
+  },
+  {
     groupId: 'medication-dosing-education',
     heading: 'Medication dosing education',
     lead:
@@ -115,6 +126,9 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'dialysis-readiness-helper': 'Life-threatening electrolyte, toxin, overload, or uremic concerns need urgent local pathways before chat.',
   'electrolyte-disorder-assistant': 'Severe or symptomatic electrolyte abnormalities need urgent review before chat.',
   'rome-iv-ibs': 'Alarm features and urgent gastrointestinal evaluation take priority over criteria chat.',
+  'gi-bleed-workflow-assistant': 'Hemodynamic instability or active GI bleeding needs urgent local pathways before chat.',
+  'liver-disease-assistant': 'Acute liver failure, severe encephalopathy, shock, or bleeding needs urgent local pathways before chat.',
+  'pancreatitis-workflow-assistant': 'Shock, organ failure, sepsis, or severe pancreatitis concern needs urgent local pathways before chat.',
   phq9: 'Question 9 self-harm or suicidal ideation requires immediate safety assessment before routine scoring.',
   gad7: 'Suicidal ideation or acute psychiatric emergency takes priority over anxiety screening chat.',
   'apache2-calculator': 'ICU-level illness and organ support decisions take priority over completing APACHE-II in chat.',

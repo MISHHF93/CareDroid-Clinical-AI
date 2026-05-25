@@ -77,6 +77,12 @@ import {
   Fib4Calculator,
   FraminghamRiskCalculator,
 } from './pr8ClinicalBatchCalculators';
+import {
+  ApriCalculator,
+  GlasgowBlatchfordScoreCalculator,
+  MaddreyDiscriminantFunctionCalculator,
+  RockallScoreCalculator,
+} from './hepatologyGiCalculators';
 import { Abcd2Calculator } from './abcd2Calculator';
 import { AnionGapCalculator, RassCalculator, ShockIndexCalculator } from './nextWaveCalculators';
 import {
@@ -555,6 +561,14 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <BisapScoreCalculator onResultChange={onResultChange} />;
     case 'fib4':
       return <Fib4Calculator onResultChange={onResultChange} />;
+    case 'maddrey-discriminant-function':
+      return <MaddreyDiscriminantFunctionCalculator onResultChange={onResultChange} />;
+    case 'apri':
+      return <ApriCalculator onResultChange={onResultChange} />;
+    case 'glasgow-blatchford-score':
+      return <GlasgowBlatchfordScoreCalculator onResultChange={onResultChange} />;
+    case 'rockall-score':
+      return <RockallScoreCalculator onResultChange={onResultChange} />;
     case 'framingham-risk':
       return <FraminghamRiskCalculator onResultChange={onResultChange} />;
     case 'abcd2':
