@@ -46,6 +46,7 @@ const Operations = lazyWithRetry(() => import('./pages/Operations'));
 const LiveTrackingMap = lazyWithRetry(() => import('./pages/LiveTrackingMap'));
 const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
 const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
+const PlatformSystemPage = lazyWithRetry(() => import('./pages/platform/PlatformSystemPage'));
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
@@ -496,6 +497,186 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/patients/import',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.WRITE_PHI],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/patients/:patientId/labs/import',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.WRITE_PHI],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/patients/:patientId/medications/import',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.WRITE_PHI],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/patients/:patientId/observations/import',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.WRITE_PHI],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/patients/:patientId/workspace',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.READ_PHI,
+    },
+    {
+      path: '/patients/:patientId/summary',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/patients/:patientId/timeline',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.READ_PHI,
+    },
+    {
+      path: '/patients/:patientId/events',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/patients/:patientId/risk-history',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.READ_PHI,
+    },
+    {
+      path: '/patients/:patientId/care-plan',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.READ_PHI,
+    },
+    {
+      path: '/patients/:patientId/workflows',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/patients/:patientId/workflows/:workflowId',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/patients/:patientId/documentation',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/patients/:patientId/documentation/:documentId',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/integrations',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/integrations/fhir',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/integrations/hl7',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
       path: '/operations',
       element: (
         <AppShellPage>
@@ -666,6 +847,105 @@ function AppRoutes() {
         </AppShellPage>
       ),
       requiresAuth: true,
+    },
+    {
+      path: '/tools/workflow-builder-ai',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/clinical-reasoning-engine',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/why-engine',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/audit-trail-ai',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.VIEW_AUDIT_LOGS, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/soap-builder',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/clinical-dictation',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/discharge-summary-ai',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/referral-ai',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/tools/prior-auth-ai',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
+      requireAllPermissions: true,
     },
     {
       path: '/tools/pulmonology/:toolId',
@@ -1068,6 +1348,79 @@ function AppRoutes() {
       ),
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/governance',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/governance/ai',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/governance/model-usage',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/governance/costs',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.MANAGE_SUBSCRIPTIONS, Permission.VIEW_ANALYTICS],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/governance/clinical-safety',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_AUDIT_LOGS,
+    },
+    {
+      path: '/governance/consent',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_CONSENT,
+    },
+    {
+      path: '/governance/privacy',
+      element: (
+        <AppShellPage>
+          <PlatformSystemPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_PRIVACY,
     },
 
     {

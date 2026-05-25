@@ -40,12 +40,6 @@ const FAKE_WORKFLOW_GUARDS = [
     allowedFrontendIds: ['reports-schedule-create', 'reports-schedule-cancel'],
   },
   {
-    workflow: 'Connector management',
-    capability: 'Integrations and connectors',
-    blockedApiPattern: /\/api\/(?:connectors?|integrations?)(?:\/|$)/i,
-    allowedFrontendIds: [],
-  },
-  {
     workflow: 'Reminder creation',
     capability: 'Reminders and scheduler',
     blockedApiPattern: /\/api\/(?:reminders?|notifications\/reminders?)(?:\/|$)/i,
@@ -184,7 +178,7 @@ describe('capabilityExposureMatrix', () => {
     );
 
     for (const item of unsupportedWorkflowDecisions) {
-      expect(item.reason).toMatch(/No backend|not API-backed|no general connector|no .*route|no .*controller|mock or client-only|no durable Nest cost API/i);
+      expect(item.reason).toMatch(/No backend|not API-backed|no general connector|no .*route|no .*controller|mock or client-only|no durable Nest cost API|requires configured credentials/i);
     }
   });
 
@@ -235,7 +229,7 @@ describe('capabilityExposureMatrix', () => {
     expect(decisionsByWorkflow.get('Publishing/content scheduling')).toMatchObject({
       decision: 'Do not expose',
     });
-    expect(decisionsByWorkflow.get('Connector management')?.decision).toMatch(/supported auth integrations/i);
+    expect(decisionsByWorkflow.get('Connector management')?.decision).toMatch(/FHIR\/HL7 integration/i);
     expect(decisionsByWorkflow.get('Reminder creation')?.decision).toMatch(/preferences only/i);
 
     const matrixCopy = capabilityExposureMatrix

@@ -1,6 +1,6 @@
 # Tool contract matrix
 
-**Generated:** 2026-05-25T04:05:46.284Z
+**Generated:** 2026-05-25T04:54:16.515Z
 
 > **Source:** `src/data/toolContractMatrix.js` (derived from `backendFrontendToolContract.js`)
 > **Regenerate:** `npm run contract:write-docs`
@@ -28,7 +28,7 @@
 
 | Classification | Count |
 |----------------|------:|
-| user-facing and wired | 76 |
+| user-facing and wired | 122 |
 | backend-only/internal | 26 |
 | user-facing but missing frontend route | 8 |
 | frontend-visible but backend missing | 0 |

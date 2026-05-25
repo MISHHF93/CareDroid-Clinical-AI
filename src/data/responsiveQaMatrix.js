@@ -332,6 +332,36 @@ export function buildResponsiveQaPages() {
       path: TIER_B_LAUNCH_PATH,
       category: 'core',
     },
+    {
+      id: 'integrations-platform',
+      label: 'Interoperability platform hub',
+      path: '/integrations',
+      category: 'platform',
+    },
+    {
+      id: 'workflow-builder-ai',
+      label: 'Workflow Builder AI platform shell',
+      path: '/tools/workflow-builder-ai',
+      category: 'platform',
+    },
+    {
+      id: 'patient-workspace-platform',
+      label: 'Patient Workspace platform shell',
+      path: '/patients/demo-patient/workspace',
+      category: 'platform',
+    },
+    {
+      id: 'soap-builder',
+      label: 'SOAP Builder documentation shell',
+      path: '/tools/soap-builder',
+      category: 'platform',
+    },
+    {
+      id: 'governance-platform',
+      label: 'Governance platform hub',
+      path: '/governance',
+      category: 'platform',
+    },
   ];
 
   for (const registryId of CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS) {

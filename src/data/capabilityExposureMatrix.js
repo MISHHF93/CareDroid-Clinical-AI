@@ -129,7 +129,7 @@ const capabilityExposureMetadata = Object.freeze({
     surfaceType: 'not-routed',
   },
   'Integrations and connectors': {
-    frontendRouteStatus: 'public-only',
+    frontendRouteStatus: 'protected + permission',
     surfaceType: 'visible-ui',
   },
   'Reminders and scheduler': {
@@ -388,12 +388,12 @@ export const capabilityExposureMatrix = Object.freeze([
   },
   {
     capability: 'Integrations and connectors',
-    backendSourceFile: 'backend/src/modules/auth/auth.controller.ts; featureInventory.js',
-    commandOrApiRoute: 'OAuth/SSO placeholders; no connector management API',
-    currentFrontendSurface: 'OAuth login and docs/feature prompts only.',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'Users may see integration language without connector setup or verification flows.',
-    recommendedFrontendMechanism: 'Document general connector management as coming later; list supported auth integrations only and avoid unsupported EHR connector setup.',
+    backendSourceFile: 'backend/src/modules/platform-systems/platform-systems.controller.ts',
+    commandOrApiRoute: 'GET/POST /api/integrations/fhir/*; GET/POST /api/integrations/hl7/*',
+    currentFrontendSurface: 'PlatformSystemPage.jsx renders FHIR/HL7 connection status and demo contract execution.',
+    exposureStatus: 'exposed',
+    userFacingProblem: 'Real EHR connectivity still requires credentials and environment-specific validation.',
+    recommendedFrontendMechanism: 'Keep the protected integrations shell with demo/unsupported labels until live FHIR/HL7 credentials are configured.',
     riskLevel: 'medium',
   },
   {
@@ -522,8 +522,8 @@ export const unsupportedWorkflowDecisions = Object.freeze([
   },
   {
     workflow: 'Connector management',
-    decision: 'Expose only supported auth integrations',
-    reason: 'OAuth/SSO routes exist, but no general connector setup/verification backend exists.',
+    decision: 'Expose only demo-safe FHIR/HL7 integration contracts',
+    reason: 'Platform systems now provide protected demo connector contracts; real EHR/FHIR/HL7 writeback still requires configured credentials and validation.',
   },
   {
     workflow: 'Reminder creation',

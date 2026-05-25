@@ -72,6 +72,36 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     match: 'heading',
     heading: /clinical audit/i,
   },
+  {
+    id: 'integrations-platform',
+    path: '/integrations',
+    match: 'heading',
+    heading: /interoperability hub/i,
+  },
+  {
+    id: 'workflow-builder-ai',
+    path: '/tools/workflow-builder-ai',
+    match: 'heading',
+    heading: /workflow builder ai/i,
+  },
+  {
+    id: 'patient-workspace-platform',
+    path: '/patients/demo-patient/workspace',
+    match: 'heading',
+    heading: /patient workspace/i,
+  },
+  {
+    id: 'soap-builder',
+    path: '/tools/soap-builder',
+    match: 'heading',
+    heading: /soap builder/i,
+  },
+  {
+    id: 'governance-platform',
+    path: '/governance',
+    match: 'heading',
+    heading: /governance hub/i,
+  },
   { id: 'fleet-live-map', path: '/fleet/map', match: 'heading', heading: /fleet live map/i },
   { id: 'fleet-command', path: '/fleet/command', match: 'fleet-summary' },
   {

@@ -26,4 +26,3 @@ describe('matchToolPatterns — Neurology Clinical Tools Pack', () => {
     expect(matches.some((match) => match.toolId === toolId)).toBe(true);
   });
 });
-

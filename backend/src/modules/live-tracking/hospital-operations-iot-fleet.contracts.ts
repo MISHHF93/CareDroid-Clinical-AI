@@ -54,40 +54,46 @@ export interface HospitalOperationsMapContract {
     | 'hospital-operations-cockpit'
     | 'device-battery-intelligence'
     | 'capacity-prediction-engine';
-  launchPath: '/hospital-map' | '/medical-iot' | '/fleet/map' | '/fleet/predictive-maintenance' | '/fleet/route-optimizer';
+  launchPath:
+    | '/hospital-map'
+    | '/medical-iot'
+    | '/fleet/map'
+    | '/fleet/predictive-maintenance'
+    | '/fleet/route-optimizer';
   telemetrySourceMustBeLabeled: true;
   fallbackStateRequired: true;
   responsiveMapRequired: true;
   autonomousActionAllowed: false;
 }
 
-export const HOSPITAL_OPERATIONS_ASSISTANT_CONTRACTS: readonly HospitalOperationsAssistantContract[] = [
-  {
-    toolId: 'dispatch-ai',
-    route: '/api/chat/message',
-    postExecuteSupported: false,
-    autonomousActionAllowed: false,
-    requiredHumanApproval: true,
-  },
-  {
-    toolId: 'hospital-command-assistant',
-    route: '/api/chat/message',
-    postExecuteSupported: false,
-    autonomousActionAllowed: false,
-    requiredHumanApproval: true,
-  },
-  {
-    toolId: 'resource-allocation-assistant',
-    route: '/api/chat/message',
-    postExecuteSupported: false,
-    autonomousActionAllowed: false,
-    requiredHumanApproval: true,
-  },
-  {
-    toolId: 'device-recommendation-assistant',
-    route: '/api/chat/message',
-    postExecuteSupported: false,
-    autonomousActionAllowed: false,
-    requiredHumanApproval: true,
-  },
-] as const;
+export const HOSPITAL_OPERATIONS_ASSISTANT_CONTRACTS: readonly HospitalOperationsAssistantContract[] =
+  [
+    {
+      toolId: 'dispatch-ai',
+      route: '/api/chat/message',
+      postExecuteSupported: false,
+      autonomousActionAllowed: false,
+      requiredHumanApproval: true,
+    },
+    {
+      toolId: 'hospital-command-assistant',
+      route: '/api/chat/message',
+      postExecuteSupported: false,
+      autonomousActionAllowed: false,
+      requiredHumanApproval: true,
+    },
+    {
+      toolId: 'resource-allocation-assistant',
+      route: '/api/chat/message',
+      postExecuteSupported: false,
+      autonomousActionAllowed: false,
+      requiredHumanApproval: true,
+    },
+    {
+      toolId: 'device-recommendation-assistant',
+      route: '/api/chat/message',
+      postExecuteSupported: false,
+      autonomousActionAllowed: false,
+      requiredHumanApproval: true,
+    },
+  ] as const;

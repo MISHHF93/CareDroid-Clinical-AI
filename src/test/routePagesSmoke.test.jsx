@@ -20,6 +20,7 @@ import PatientSummaryAi from '../pages/tools/PatientSummaryAi';
 import OrderSetAi from '../pages/tools/OrderSetAi';
 import AiExplainability from '../pages/tools/AiExplainability';
 import ClinicalAudit from '../pages/tools/ClinicalAudit';
+import PlatformSystemPage from '../pages/platform/PlatformSystemPage';
 import CommandDashboard from '../pages/CommandDashboard';
 import Dashboard from '../pages/Dashboard';
 import Operations from '../pages/Operations';
@@ -63,6 +64,21 @@ vi.mock('../hooks/useNotificationActions', () => ({
 
 vi.mock('../services/clinicalToolsApi', () => ({
   fetchBackendClinicalTools: vi.fn().mockResolvedValue({ ok: true, tools: [] }),
+}));
+
+vi.mock('../services/platformSystemsApi', () => ({
+  fetchPlatformSystemCapability: vi.fn().mockResolvedValue({
+    ok: true,
+    data: { status: 'demo_available', safety: { reviewRequired: true } },
+  }),
+  fetchPlatformSystemHub: vi.fn().mockResolvedValue({
+    ok: true,
+    data: { status: 'demo_available', capabilities: [] },
+  }),
+  postPlatformSystemContract: vi.fn().mockResolvedValue({
+    ok: true,
+    data: { status: 'demo_review_required' },
+  }),
 }));
 
 vi.mock('../services/clinicalChatService', () => ({
@@ -109,6 +125,11 @@ const PAGE_BY_ID = {
   'order-set-ai': OrderSetAi,
   'ai-explainability': AiExplainability,
   'clinical-audit': ClinicalAudit,
+  'integrations-platform': PlatformSystemPage,
+  'workflow-builder-ai': PlatformSystemPage,
+  'patient-workspace-platform': PlatformSystemPage,
+  'soap-builder': PlatformSystemPage,
+  'governance-platform': PlatformSystemPage,
   'fleet-live-map': FleetLiveMap,
   'fleet-command': FleetDashboard,
   'fleet-route-optimizer': RouteOptimizer,

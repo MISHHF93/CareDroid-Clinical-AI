@@ -37,6 +37,8 @@ export enum Permission {
   MANAGE_ENCRYPTION = 'MANAGE_ENCRYPTION', // Encryption key rotation
   MANAGE_SUBSCRIPTIONS = 'MANAGE_SUBSCRIPTIONS', // Billing and subscription management
   VIEW_ANALYTICS = 'VIEW_ANALYTICS', // System usage analytics
+  MANAGE_CONSENT = 'MANAGE_CONSENT', // Patient consent management
+  MANAGE_PRIVACY = 'MANAGE_PRIVACY', // Privacy requests and PHI access logs
 
   // Emergency & Safety
   TRIGGER_EMERGENCY_PROTOCOL = 'TRIGGER_EMERGENCY_PROTOCOL', // Initiate emergency response
@@ -158,6 +160,16 @@ export const PermissionMetadata: Record<
     description: 'View system usage analytics',
     category: 'System Administration',
     riskLevel: 'medium',
+  },
+  [Permission.MANAGE_CONSENT]: {
+    description: 'Manage patient consent status, revocation, and audit visibility',
+    category: 'System Administration',
+    riskLevel: 'critical',
+  },
+  [Permission.MANAGE_PRIVACY]: {
+    description: 'Manage privacy center workflows and PHI access-log requests',
+    category: 'System Administration',
+    riskLevel: 'critical',
   },
 
   // Emergency & Safety

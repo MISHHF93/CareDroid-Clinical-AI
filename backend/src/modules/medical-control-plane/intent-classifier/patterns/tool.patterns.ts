@@ -390,7 +390,8 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     keywords: ['homa-ir', 'homa ir', 'homa', 'insulin resistance calculator'],
     requiredParameters: [],
     optionalParameters: ['fasting_glucose', 'fasting_insulin'],
-    description: 'HOMA-IR insulin resistance estimate from fasting glucose and insulin without dosing automation',
+    description:
+      'HOMA-IR insulin resistance estimate from fasting glucose and insulin without dosing automation',
     category: 'calculator',
   },
   {
@@ -405,7 +406,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'serum-osmolality',
     toolName: 'Serum Osmolality',
-    keywords: ['serum osmolality', 'serum-osmolality', 'calculated osmolality', 'calculated serum osmolality'],
+    keywords: [
+      'serum osmolality',
+      'serum-osmolality',
+      'calculated osmolality',
+      'calculated serum osmolality',
+    ],
     requiredParameters: [],
     optionalParameters: ['sodium', 'glucose', 'bun', 'ethanol'],
     description: 'Calculated serum osmolality from sodium, glucose, BUN, and optional ethanol',
@@ -441,7 +447,13 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'waist-hip-ratio',
     toolName: 'Waist-to-Hip Ratio',
-    keywords: ['waist hip ratio', 'waist to hip ratio', 'waist-to-hip ratio', 'waist-hip-ratio', 'whr'],
+    keywords: [
+      'waist hip ratio',
+      'waist to hip ratio',
+      'waist-to-hip ratio',
+      'waist-hip-ratio',
+      'whr',
+    ],
     requiredParameters: [],
     optionalParameters: ['sex', 'waist', 'hip'],
     description: 'Waist-to-hip ratio central adiposity context',
@@ -647,17 +659,35 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     toolName: 'MMSE score entry',
     keywords: ['mmse', 'mini mental state', 'mini-mental-state', 'mini mental state exam'],
     requiredParameters: [],
-    optionalParameters: ['orientation', 'registration', 'attention', 'recall', 'language', 'visuospatial'],
+    optionalParameters: [
+      'orientation',
+      'registration',
+      'attention',
+      'recall',
+      'language',
+      'visuospatial',
+    ],
     description: 'MMSE cognitive screening score entry from governed administration (0-30)',
     category: 'calculator',
   },
   {
     toolId: 'moca-placeholder-workflow',
     toolName: 'MoCA placeholder workflow',
-    keywords: ['moca', 'moca workflow', 'moca placeholder workflow', 'montreal cognitive assessment'],
+    keywords: [
+      'moca',
+      'moca workflow',
+      'moca placeholder workflow',
+      'montreal cognitive assessment',
+    ],
     requiredParameters: [],
-    optionalParameters: ['official_form', 'trained_administrator', 'accommodations', 'human_review'],
-    description: 'MoCA governance workflow placeholder; no item display, administration, or scoring',
+    optionalParameters: [
+      'official_form',
+      'trained_administrator',
+      'accommodations',
+      'human_review',
+    ],
+    description:
+      'MoCA governance workflow placeholder; no item display, administration, or scoring',
     category: 'calculator',
   },
   {
@@ -681,7 +711,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'epworth-sleepiness-scale',
     toolName: 'Epworth Sleepiness Scale',
-    keywords: ['epworth', 'epworth sleepiness scale', 'sleepiness scale', 'daytime sleepiness screen'],
+    keywords: [
+      'epworth',
+      'epworth sleepiness scale',
+      'sleepiness scale',
+      'daytime sleepiness screen',
+    ],
     requiredParameters: [],
     optionalParameters: ['item_scores', 'safety_sensitive_activity'],
     description: 'Daytime sleepiness screen (0-24) with safety-sensitive activity flag',
@@ -698,14 +733,25 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'suicide severity workflow',
     ],
     requiredParameters: [],
-    optionalParameters: ['ideation', 'intent_or_plan', 'behavior', 'current_safety', 'direct_review'],
-    description: 'Suicide-risk workflow entry with immediate safety review messaging; not official C-SSRS scoring',
+    optionalParameters: [
+      'ideation',
+      'intent_or_plan',
+      'behavior',
+      'current_safety',
+      'direct_review',
+    ],
+    description:
+      'Suicide-risk workflow entry with immediate safety review messaging; not official C-SSRS scoring',
     category: 'calculator',
   },
   {
     toolId: 'mental-health-screening-assistant',
     toolName: 'Mental Health Screening Assistant',
-    keywords: ['mental health screening assistant', 'mental health screening', 'behavioral health screening'],
+    keywords: [
+      'mental health screening assistant',
+      'mental health screening',
+      'behavioral health screening',
+    ],
     requiredParameters: [],
     optionalParameters: ['screen_type', 'symptoms', 'safety_concerns'],
     description: 'Guided mental-health screening workflow with crisis-sensitive guardrails',
@@ -714,19 +760,29 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'suicide-risk-workflow-assistant',
     toolName: 'Suicide Risk Workflow Assistant',
-    keywords: ['suicide risk workflow assistant', 'suicide risk workflow', 'suicide safety workflow'],
+    keywords: [
+      'suicide risk workflow assistant',
+      'suicide risk workflow',
+      'suicide safety workflow',
+    ],
     requiredParameters: [],
     optionalParameters: ['ideation', 'intent', 'plan', 'behavior', 'direct_review'],
-    description: 'Guided suicide-risk workflow support requiring immediate safety review when indicated',
+    description:
+      'Guided suicide-risk workflow support requiring immediate safety review when indicated',
     category: 'calculator',
   },
   {
     toolId: 'substance-use-screening-assistant',
     toolName: 'Substance Use Screening Assistant',
-    keywords: ['substance use screening assistant', 'substance use screening', 'addiction screening workflow'],
+    keywords: [
+      'substance use screening assistant',
+      'substance use screening',
+      'addiction screening workflow',
+    ],
     requiredParameters: [],
     optionalParameters: ['audit_c', 'cage', 'withdrawal', 'intoxication', 'co_ingestion'],
-    description: 'Guided substance-use screening workflow without diagnosis, detox, or medication advice',
+    description:
+      'Guided substance-use screening workflow without diagnosis, detox, or medication advice',
     category: 'calculator',
   },
   {
@@ -735,16 +791,22 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     keywords: ['cognitive screening assistant', 'cognitive screening', 'memory screening workflow'],
     requiredParameters: [],
     optionalParameters: ['mmse', 'moca', 'delirium_flags', 'accommodations'],
-    description: 'Guided cognitive screening workflow without dementia diagnosis or capacity determination',
+    description:
+      'Guided cognitive screening workflow without dementia diagnosis or capacity determination',
     category: 'calculator',
   },
   {
     toolId: 'behavioral-analytics-dashboard',
     toolName: 'Behavioral Analytics Dashboard',
-    keywords: ['behavioral analytics dashboard', 'behavioral health analytics', 'mental health analytics dashboard'],
+    keywords: [
+      'behavioral analytics dashboard',
+      'behavioral health analytics',
+      'mental health analytics dashboard',
+    ],
     requiredParameters: [],
     optionalParameters: ['screening_volume', 'positive_screens', 'review_queue'],
-    description: 'Behavioral-health screening analytics dashboard concept with human review tracking',
+    description:
+      'Behavioral-health screening analytics dashboard concept with human review tracking',
     category: 'reference',
   },
   {
@@ -759,7 +821,11 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'psychiatry-monitoring-dashboard',
     toolName: 'Psychiatry Monitoring Dashboard',
-    keywords: ['psychiatry monitoring dashboard', 'psychiatric monitoring dashboard', 'behavioral monitoring dashboard'],
+    keywords: [
+      'psychiatry monitoring dashboard',
+      'psychiatric monitoring dashboard',
+      'behavioral monitoring dashboard',
+    ],
     requiredParameters: [],
     optionalParameters: ['review_queue', 'safety_flags', 'handoff_status'],
     description: 'Psychiatry monitoring dashboard concept with unresolved safety flag visibility',
@@ -777,10 +843,15 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'population-screening-dashboard',
     toolName: 'Population Screening Dashboard',
-    keywords: ['population screening dashboard', 'behavioral population screening', 'mental health population dashboard'],
+    keywords: [
+      'population screening dashboard',
+      'behavioral population screening',
+      'mental health population dashboard',
+    ],
     requiredParameters: [],
     optionalParameters: ['panel_completion', 'positive_screen_queue', 'follow_up_gaps'],
-    description: 'Population behavioral-health screening dashboard concept; no individual diagnosis',
+    description:
+      'Population behavioral-health screening dashboard concept; no individual diagnosis',
     category: 'reference',
   },
   {
@@ -825,7 +896,13 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'hunt-hess-scale',
     toolName: 'Hunt-Hess Scale',
-    keywords: ['hunt hess', 'hunt-hess', 'hunt hess scale', 'sah grade', 'subarachnoid hemorrhage grade'],
+    keywords: [
+      'hunt hess',
+      'hunt-hess',
+      'hunt hess scale',
+      'sah grade',
+      'subarachnoid hemorrhage grade',
+    ],
     requiredParameters: [],
     optionalParameters: ['grade', 'mental_status', 'focal_deficit'],
     description: 'Hunt-Hess aneurysmal subarachnoid hemorrhage clinical severity grading',
@@ -834,7 +911,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'ich-score',
     toolName: 'ICH Score',
-    keywords: ['ich score', 'intracerebral hemorrhage score', 'intracranial hemorrhage score', 'hemorrhage score'],
+    keywords: [
+      'ich score',
+      'intracerebral hemorrhage score',
+      'intracranial hemorrhage score',
+      'hemorrhage score',
+    ],
     requiredParameters: [],
     optionalParameters: ['gcs', 'volume', 'ivh', 'infratentorial_origin', 'age'],
     description: 'ICH Score severity context for spontaneous intracerebral hemorrhage',
@@ -843,7 +925,13 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'four-score',
     toolName: 'FOUR Score',
-    keywords: ['four score', 'four-score', 'full outline unresponsiveness', 'coma four score', 'four coma score'],
+    keywords: [
+      'four score',
+      'four-score',
+      'full outline unresponsiveness',
+      'coma four score',
+      'four coma score',
+    ],
     requiredParameters: [],
     optionalParameters: ['eye', 'motor', 'brainstem', 'respiration'],
     description: 'FOUR Score coma scale using eye, motor, brainstem, and respiration components',
@@ -852,7 +940,13 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'modified-rankin-scale',
     toolName: 'Modified Rankin Scale',
-    keywords: ['modified rankin scale', 'modified-rankin-scale', 'rankin scale', 'mrs score', 'stroke disability score'],
+    keywords: [
+      'modified rankin scale',
+      'modified-rankin-scale',
+      'rankin scale',
+      'mrs score',
+      'stroke disability score',
+    ],
     requiredParameters: [],
     optionalParameters: ['functional_status', 'dependence', 'walking'],
     description: 'Modified Rankin Scale global disability outcome documentation',
@@ -861,10 +955,16 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'nihss-summary-view',
     toolName: 'NIHSS Summary View',
-    keywords: ['nihss summary', 'nihss summary view', 'nih stroke scale summary', 'stroke scale summary'],
+    keywords: [
+      'nihss summary',
+      'nihss summary view',
+      'nih stroke scale summary',
+      'stroke scale summary',
+    ],
     requiredParameters: [],
     optionalParameters: ['nihss_items', 'total_score', 'serial_exam'],
-    description: 'NIHSS item summary view for stroke exam documentation without delaying stroke care',
+    description:
+      'NIHSS item summary view for stroke exam documentation without delaying stroke care',
     category: 'calculator',
   },
   {
@@ -879,7 +979,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'gestational-age-calculator',
     toolName: 'Gestational Age Calculator',
-    keywords: ['gestational age calculator', 'gestational age', 'pregnancy dating', 'calculate gestational age'],
+    keywords: [
+      'gestational age calculator',
+      'gestational age',
+      'pregnancy dating',
+      'calculate gestational age',
+    ],
     requiredParameters: [],
     optionalParameters: ['lmp_date', 'conception_date', 'ultrasound_date', 'assessment_date'],
     description: 'Gestational age calculation from LMP, conception, or ultrasound dating',
@@ -888,7 +993,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'pediatric-bp-percentile',
     toolName: 'Pediatric BP Percentile',
-    keywords: ['pediatric bp percentile', 'paediatric bp percentile', 'child blood pressure percentile', 'pediatric blood pressure'],
+    keywords: [
+      'pediatric bp percentile',
+      'paediatric bp percentile',
+      'child blood pressure percentile',
+      'pediatric blood pressure',
+    ],
     requiredParameters: [],
     optionalParameters: ['age', 'sex', 'height_percentile', 'systolic_bp', 'diastolic_bp'],
     description: 'Pediatric blood pressure screening-band helper using AAP source-table context',
@@ -897,7 +1007,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'pregnancy-due-date-calculator',
     toolName: 'Pregnancy Due Date Calculator',
-    keywords: ['pregnancy due date calculator', 'pregnancy due date', 'estimated due date', 'edd calculator'],
+    keywords: [
+      'pregnancy due date calculator',
+      'pregnancy due date',
+      'estimated due date',
+      'edd calculator',
+    ],
     requiredParameters: [],
     optionalParameters: ['lmp_date', 'conception_date', 'ultrasound_date', 'gestational_age'],
     description: 'Estimated due date helper from LMP, conception, or ultrasound dating',
@@ -906,16 +1021,31 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'fenton-growth-chart-helper',
     toolName: 'Fenton Growth Chart Helper',
-    keywords: ['fenton growth chart helper', 'fenton growth chart', 'preterm growth percentile', 'neonatal growth percentile'],
+    keywords: [
+      'fenton growth chart helper',
+      'fenton growth chart',
+      'preterm growth percentile',
+      'neonatal growth percentile',
+    ],
     requiredParameters: [],
-    optionalParameters: ['gestational_age', 'weight_percentile', 'length_percentile', 'head_circumference_percentile'],
+    optionalParameters: [
+      'gestational_age',
+      'weight_percentile',
+      'length_percentile',
+      'head_circumference_percentile',
+    ],
     description: 'Neonatal growth percentile classification helper for Fenton chart review',
     category: 'calculator',
   },
   {
     toolId: 'neonatal-bilirubin-risk-helper',
     toolName: 'Neonatal Bilirubin Risk Helper',
-    keywords: ['neonatal bilirubin risk helper', 'newborn bilirubin', 'bilirubin nomogram', 'neonatal jaundice helper'],
+    keywords: [
+      'neonatal bilirubin risk helper',
+      'newborn bilirubin',
+      'bilirubin nomogram',
+      'neonatal jaundice helper',
+    ],
     requiredParameters: [],
     optionalParameters: ['age_hours', 'bilirubin', 'gestational_age', 'neurotoxicity_risk_factors'],
     description: 'Neonatal bilirubin nomogram review helper without phototherapy recommendations',
@@ -924,7 +1054,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'pediatric-dose-safety-checker',
     toolName: 'Pediatric Dose Safety Checker',
-    keywords: ['pediatric dose safety checker', 'paediatric dose safety checker', 'pediatric dose checker', 'pediatric medication safety'],
+    keywords: [
+      'pediatric dose safety checker',
+      'paediatric dose safety checker',
+      'pediatric dose checker',
+      'pediatric medication safety',
+    ],
     requiredParameters: [],
     optionalParameters: ['medication', 'weight', 'governed_protocol'],
     description: 'Placeholder-only pediatric medication safety checklist without dose calculation',
@@ -933,37 +1068,73 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'pediatric-sepsis-assistant',
     toolName: 'Pediatric Sepsis Assistant',
-    keywords: ['pediatric sepsis assistant', 'paediatric sepsis assistant', 'pediatric sepsis workflow', 'child sepsis review'],
+    keywords: [
+      'pediatric sepsis assistant',
+      'paediatric sepsis assistant',
+      'pediatric sepsis workflow',
+      'child sepsis review',
+    ],
     requiredParameters: [],
     optionalParameters: ['infection_concern', 'age', 'vitals', 'perfusion', 'labs'],
-    description: 'Pediatric sepsis workflow support without diagnosis, treatment, or medication dosing recommendations',
+    description:
+      'Pediatric sepsis workflow support without diagnosis, treatment, or medication dosing recommendations',
     category: 'calculator',
   },
   {
     toolId: 'pregnancy-workflow-assistant',
     toolName: 'Pregnancy Workflow Assistant',
-    keywords: ['pregnancy workflow assistant', 'pregnancy workflow', 'prenatal workflow', 'pregnancy review'],
+    keywords: [
+      'pregnancy workflow assistant',
+      'pregnancy workflow',
+      'prenatal workflow',
+      'pregnancy review',
+    ],
     requiredParameters: [],
-    optionalParameters: ['gestational_age', 'symptoms', 'fetal_movement', 'bleeding', 'blood_pressure'],
-    description: 'Pregnancy workflow support for dating, symptoms, fetal concerns, and handoff prompts',
+    optionalParameters: [
+      'gestational_age',
+      'symptoms',
+      'fetal_movement',
+      'bleeding',
+      'blood_pressure',
+    ],
+    description:
+      'Pregnancy workflow support for dating, symptoms, fetal concerns, and handoff prompts',
     category: 'calculator',
   },
   {
     toolId: 'neonatal-assessment-assistant',
     toolName: 'Neonatal Assessment Assistant',
-    keywords: ['neonatal assessment assistant', 'newborn assessment assistant', 'neonatal workflow', 'newborn review'],
+    keywords: [
+      'neonatal assessment assistant',
+      'newborn assessment assistant',
+      'neonatal workflow',
+      'newborn review',
+    ],
     requiredParameters: [],
     optionalParameters: ['apgar', 'temperature', 'feeding', 'bilirubin', 'growth'],
-    description: 'Neonatal assessment workflow support without replacing resuscitation or neonatal clinician assessment',
+    description:
+      'Neonatal assessment workflow support without replacing resuscitation or neonatal clinician assessment',
     category: 'calculator',
   },
   {
     toolId: 'ob-triage-assistant',
     toolName: 'OB Triage Assistant',
-    keywords: ['ob triage assistant', 'obgyn triage assistant', 'obstetric triage assistant', 'labor triage assistant'],
+    keywords: [
+      'ob triage assistant',
+      'obgyn triage assistant',
+      'obstetric triage assistant',
+      'labor triage assistant',
+    ],
     requiredParameters: [],
-    optionalParameters: ['gestational_age', 'bleeding', 'fluid_leakage', 'contractions', 'fetal_movement'],
-    description: 'OB triage workflow support without diagnosis, delivery timing, or disposition recommendations',
+    optionalParameters: [
+      'gestational_age',
+      'bleeding',
+      'fluid_leakage',
+      'contractions',
+      'fetal_movement',
+    ],
+    description:
+      'OB triage workflow support without diagnosis, delivery timing, or disposition recommendations',
     category: 'calculator',
   },
   {
@@ -978,7 +1149,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'maternal-monitoring-dashboard',
     toolName: 'Maternal Monitoring Dashboard',
-    keywords: ['maternal monitoring dashboard', 'ob monitoring dashboard', 'pregnancy monitoring dashboard', 'postpartum monitoring'],
+    keywords: [
+      'maternal monitoring dashboard',
+      'ob monitoring dashboard',
+      'pregnancy monitoring dashboard',
+      'postpartum monitoring',
+    ],
     requiredParameters: [],
     optionalParameters: ['blood_pressure', 'symptoms', 'labs', 'fetal_context', 'review_queue'],
     description: 'Maternal monitoring dashboard for trend visibility and human review queues',
@@ -987,16 +1163,27 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'pediatric-command-center',
     toolName: 'Pediatric Command Center',
-    keywords: ['pediatric command center', 'paediatric command center', 'pediatric dashboard', 'pediatric operations'],
+    keywords: [
+      'pediatric command center',
+      'paediatric command center',
+      'pediatric dashboard',
+      'pediatric operations',
+    ],
     requiredParameters: [],
     optionalParameters: ['pews', 'sepsis_reviews', 'vitals', 'growth', 'bp'],
-    description: 'Pediatric command-center visibility for deterioration, sepsis, vitals, and growth review queues',
+    description:
+      'Pediatric command-center visibility for deterioration, sepsis, vitals, and growth review queues',
     category: 'reference',
   },
   {
     toolId: 'growth-trend-analytics',
     toolName: 'Growth Trend Analytics',
-    keywords: ['growth trend analytics', 'growth trends', 'pediatric growth analytics', 'neonatal growth trends'],
+    keywords: [
+      'growth trend analytics',
+      'growth trends',
+      'pediatric growth analytics',
+      'neonatal growth trends',
+    ],
     requiredParameters: [],
     optionalParameters: ['weight', 'height', 'length', 'head_circumference', 'percentiles'],
     description: 'Growth trend analytics for serial anthropometrics and percentile review',
@@ -1005,10 +1192,21 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'perinatal-risk-dashboard',
     toolName: 'Perinatal Risk Dashboard',
-    keywords: ['perinatal risk dashboard', 'perinatal dashboard', 'maternal fetal dashboard', 'ob newborn handoff'],
+    keywords: [
+      'perinatal risk dashboard',
+      'perinatal dashboard',
+      'maternal fetal dashboard',
+      'ob newborn handoff',
+    ],
     requiredParameters: [],
-    optionalParameters: ['maternal_risk', 'fetal_concerns', 'delivery_context', 'neonatal_follow_up'],
-    description: 'Perinatal risk dashboard for maternal, fetal, delivery, and neonatal review queues',
+    optionalParameters: [
+      'maternal_risk',
+      'fetal_concerns',
+      'delivery_context',
+      'neonatal_follow_up',
+    ],
+    description:
+      'Perinatal risk dashboard for maternal, fetal, delivery, and neonatal review queues',
     category: 'reference',
   },
   {
@@ -1023,19 +1221,31 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'stroke-workflow-assistant',
     toolName: 'Stroke Workflow Assistant',
-    keywords: ['stroke workflow assistant', 'stroke workflow', 'stroke activation workflow', 'acute stroke handoff'],
+    keywords: [
+      'stroke workflow assistant',
+      'stroke workflow',
+      'stroke activation workflow',
+      'acute stroke handoff',
+    ],
     requiredParameters: [],
     optionalParameters: ['last_known_well', 'deficits', 'nihss', 'imaging_status', 'glucose'],
-    description: 'Acute stroke workflow support that must not delay activation, imaging, or treatment pathways',
+    description:
+      'Acute stroke workflow support that must not delay activation, imaging, or treatment pathways',
     category: 'calculator',
   },
   {
     toolId: 'headache-red-flag-assistant',
     toolName: 'Headache Red Flag Assistant',
-    keywords: ['headache red flag assistant', 'headache red flags', 'thunderclap headache review', 'headache warning signs'],
+    keywords: [
+      'headache red flag assistant',
+      'headache red flags',
+      'thunderclap headache review',
+      'headache warning signs',
+    ],
     requiredParameters: [],
     optionalParameters: ['onset', 'neurologic_deficit', 'fever', 'pregnancy', 'cancer', 'trauma'],
-    description: 'Headache red-flag review without diagnosis or imaging/disposition recommendations',
+    description:
+      'Headache red-flag review without diagnosis or imaging/disposition recommendations',
     category: 'calculator',
   },
   {
@@ -1043,23 +1253,48 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     toolName: 'Vertigo HINTS Assistant',
     keywords: ['vertigo hints assistant', 'hints exam', 'hints plus', 'acute vestibular syndrome'],
     requiredParameters: [],
-    optionalParameters: ['nystagmus', 'head_impulse', 'skew', 'hearing', 'gait', 'neurologic_findings'],
-    description: 'Vertigo/HINTS documentation support for trained exam workflows with stroke warnings',
+    optionalParameters: [
+      'nystagmus',
+      'head_impulse',
+      'skew',
+      'hearing',
+      'gait',
+      'neurologic_findings',
+    ],
+    description:
+      'Vertigo/HINTS documentation support for trained exam workflows with stroke warnings',
     category: 'calculator',
   },
   {
     toolId: 'neuro-exam-assistant',
     toolName: 'Neuro Exam Assistant',
-    keywords: ['neuro exam assistant', 'neurologic exam assistant', 'neurological exam assistant', 'neuro exam checklist'],
+    keywords: [
+      'neuro exam assistant',
+      'neurologic exam assistant',
+      'neurological exam assistant',
+      'neuro exam checklist',
+    ],
     requiredParameters: [],
-    optionalParameters: ['mental_status', 'cranial_nerves', 'motor', 'sensory', 'coordination', 'gait'],
+    optionalParameters: [
+      'mental_status',
+      'cranial_nerves',
+      'motor',
+      'sensory',
+      'coordination',
+      'gait',
+    ],
     description: 'Guided neurologic exam checklist and handoff prompts',
     category: 'calculator',
   },
   {
     toolId: 'neuro-telemetry-dashboard',
     toolName: 'Neuro Telemetry Dashboard',
-    keywords: ['neuro telemetry dashboard', 'neurology telemetry dashboard', 'neurologic telemetry', 'neuro check dashboard'],
+    keywords: [
+      'neuro telemetry dashboard',
+      'neurology telemetry dashboard',
+      'neurologic telemetry',
+      'neuro check dashboard',
+    ],
     requiredParameters: [],
     optionalParameters: ['neuro_checks', 'gcs', 'nihss', 'seizure_events', 'icp', 'data_freshness'],
     description: 'Neuro telemetry dashboard for trend visibility and human review queues',
@@ -1068,16 +1303,32 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'stroke-command-center',
     toolName: 'Stroke Command Center',
-    keywords: ['stroke command center', 'stroke dashboard', 'stroke activation dashboard', 'stroke operations'],
+    keywords: [
+      'stroke command center',
+      'stroke dashboard',
+      'stroke activation dashboard',
+      'stroke operations',
+    ],
     requiredParameters: [],
-    optionalParameters: ['activation_queue', 'last_known_well', 'imaging_milestones', 'handoff_status'],
-    description: 'Stroke command-center operations visibility without treatment eligibility decisions',
+    optionalParameters: [
+      'activation_queue',
+      'last_known_well',
+      'imaging_milestones',
+      'handoff_status',
+    ],
+    description:
+      'Stroke command-center operations visibility without treatment eligibility decisions',
     category: 'reference',
   },
   {
     toolId: 'neuro-monitoring-engine',
     toolName: 'Neuro Monitoring Engine',
-    keywords: ['neuro monitoring engine', 'neurology monitoring engine', 'neurologic monitoring', 'neuro trends'],
+    keywords: [
+      'neuro monitoring engine',
+      'neurology monitoring engine',
+      'neurologic monitoring',
+      'neuro trends',
+    ],
     requiredParameters: [],
     optionalParameters: ['serial_exams', 'pupils', 'icp', 'sedation_context', 'review_queue'],
     description: 'Neuro monitoring trend visibility without autonomous escalation orders',
@@ -1089,16 +1340,23 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     keywords: ['eeg trend dashboard', 'eeg trends', 'eeg dashboard', 'seizure burden dashboard'],
     requiredParameters: [],
     optionalParameters: ['eeg_status', 'seizure_burden', 'artifact', 'report_freshness'],
-    description: 'EEG trend dashboard for report freshness and review queues without diagnosis or dosing',
+    description:
+      'EEG trend dashboard for report freshness and review queues without diagnosis or dosing',
     category: 'reference',
   },
   {
     toolId: 'neurology-timeline-ai',
     toolName: 'Neurology Timeline AI',
-    keywords: ['neurology timeline ai', 'neuro timeline', 'neurologic timeline', 'stroke seizure timeline'],
+    keywords: [
+      'neurology timeline ai',
+      'neuro timeline',
+      'neurologic timeline',
+      'stroke seizure timeline',
+    ],
     requiredParameters: [],
     optionalParameters: ['symptom_onset', 'exams', 'imaging', 'eeg', 'interventions'],
-    description: 'Clinician-reviewed neurology timeline support for exams, imaging, EEG, and handoff chronology',
+    description:
+      'Clinician-reviewed neurology timeline support for exams, imaging, EEG, and handoff chronology',
     category: 'reference',
   },
   {
@@ -1400,7 +1658,14 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'gi bleed assistant',
     ],
     requiredParameters: [],
-    optionalParameters: ['hemodynamics', 'hemoglobin', 'bun', 'melena', 'syncope', 'anticoagulants'],
+    optionalParameters: [
+      'hemodynamics',
+      'hemoglobin',
+      'bun',
+      'melena',
+      'syncope',
+      'anticoagulants',
+    ],
     description:
       'Guided GI bleed review using GBS/Rockall context, hemodynamics, medications, comorbidities, and handoff prompts',
     category: 'calculator',
@@ -1416,7 +1681,15 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'hepatology assistant',
     ],
     requiredParameters: [],
-    optionalParameters: ['bilirubin', 'inr', 'albumin', 'creatinine', 'sodium', 'ascites', 'encephalopathy'],
+    optionalParameters: [
+      'bilirubin',
+      'inr',
+      'albumin',
+      'creatinine',
+      'sodium',
+      'ascites',
+      'encephalopathy',
+    ],
     description:
       'Guided liver disease review for Child-Pugh, MELD/MELD-Na, Maddrey DF, FIB-4/APRI, trends, and missing data',
     category: 'calculator',
@@ -1446,7 +1719,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'colonoscopy follow up queue',
     ],
     requiredParameters: [],
-    optionalParameters: ['endoscopy_follow_up', 'pathology_status', 'recall_queue', 'overdue_reviews'],
+    optionalParameters: [
+      'endoscopy_follow_up',
+      'pathology_status',
+      'recall_queue',
+      'overdue_reviews',
+    ],
     description:
       'GI surveillance dashboard for endoscopy follow-up, pathology gaps, recall queues, and human review tracking',
     category: 'reference',
@@ -1493,7 +1771,14 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'decompensation monitoring',
     ],
     requiredParameters: [],
-    optionalParameters: ['ascites', 'encephalopathy', 'meld', 'child_pugh', 'platelets', 'surveillance_gaps'],
+    optionalParameters: [
+      'ascites',
+      'encephalopathy',
+      'meld',
+      'child_pugh',
+      'platelets',
+      'surveillance_gaps',
+    ],
     description:
       'Cirrhosis monitoring workspace for decompensation features, liver scores, surveillance gaps, and review queues',
     category: 'reference',
@@ -1509,7 +1794,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'gi service huddle',
     ],
     requiredParameters: [],
-    optionalParameters: ['gi_bleed_queue', 'liver_reviews', 'pancreatitis_reviews', 'endoscopy_queue'],
+    optionalParameters: [
+      'gi_bleed_queue',
+      'liver_reviews',
+      'pancreatitis_reviews',
+      'endoscopy_queue',
+    ],
     description:
       'GI command-center workflow for GI bleed, liver disease, pancreatitis, endoscopy, and surveillance queues',
     category: 'reference',
@@ -2042,7 +2332,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'diabetes-care-assistant',
     toolName: 'Diabetes Care Assistant',
-    keywords: ['diabetes care assistant', 'diabetes-care-assistant', 'diabetes assistant', 'diabetes workflow'],
+    keywords: [
+      'diabetes care assistant',
+      'diabetes-care-assistant',
+      'diabetes assistant',
+      'diabetes workflow',
+    ],
     requiredParameters: [],
     optionalParameters: ['glucose', 'a1c', 'hypoglycemia', 'hyperglycemia', 'complications'],
     description:
@@ -2052,9 +2347,23 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'dka-pathway-assistant',
     toolName: 'DKA Pathway Assistant',
-    keywords: ['dka pathway assistant', 'dka-pathway-assistant', 'dka assistant', 'dka pathway', 'hhs pathway'],
+    keywords: [
+      'dka pathway assistant',
+      'dka-pathway-assistant',
+      'dka assistant',
+      'dka pathway',
+      'hhs pathway',
+    ],
     requiredParameters: [],
-    optionalParameters: ['glucose', 'ketones', 'anion_gap', 'bicarbonate', 'ph', 'potassium', 'osmolality'],
+    optionalParameters: [
+      'glucose',
+      'ketones',
+      'anion_gap',
+      'bicarbonate',
+      'ph',
+      'potassium',
+      'osmolality',
+    ],
     description:
       'DKA/HHS pathway checklist support with no insulin, electrolyte, bicarbonate, or fluid dosing automation',
     category: 'calculator',
@@ -2062,7 +2371,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'thyroid-disorder-assistant',
     toolName: 'Thyroid Disorder Assistant',
-    keywords: ['thyroid disorder assistant', 'thyroid-disorder-assistant', 'thyroid assistant', 'thyroid workflow'],
+    keywords: [
+      'thyroid disorder assistant',
+      'thyroid-disorder-assistant',
+      'thyroid assistant',
+      'thyroid workflow',
+    ],
     requiredParameters: [],
     optionalParameters: ['tsh', 'free_t4', 't3', 'symptoms', 'pregnancy', 'medications'],
     description:
@@ -2087,7 +2401,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'glucose-telemetry-dashboard',
     toolName: 'Glucose Telemetry Dashboard',
-    keywords: ['glucose telemetry dashboard', 'glucose-telemetry-dashboard', 'glucose telemetry', 'cgm dashboard'],
+    keywords: [
+      'glucose telemetry dashboard',
+      'glucose-telemetry-dashboard',
+      'glucose telemetry',
+      'cgm dashboard',
+    ],
     requiredParameters: [],
     optionalParameters: ['glucose_trends', 'hypoglycemia', 'hyperglycemia', 'data_freshness'],
     description:
@@ -2097,7 +2416,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'insulin-trend-engine',
     toolName: 'Insulin Trend Engine',
-    keywords: ['insulin trend engine', 'insulin-trend-engine', 'insulin trends', 'insulin analytics'],
+    keywords: [
+      'insulin trend engine',
+      'insulin-trend-engine',
+      'insulin trends',
+      'insulin analytics',
+    ],
     requiredParameters: [],
     optionalParameters: ['documented_insulin', 'glucose_response', 'timing', 'data_gaps'],
     description:
@@ -2107,7 +2431,11 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   {
     toolId: 'endocrine-monitoring-system',
     toolName: 'Endocrine Monitoring System',
-    keywords: ['endocrine monitoring system', 'endocrine-monitoring-system', 'endocrine monitoring'],
+    keywords: [
+      'endocrine monitoring system',
+      'endocrine-monitoring-system',
+      'endocrine monitoring',
+    ],
     requiredParameters: [],
     optionalParameters: ['glucose', 'thyroid', 'calcium', 'osmolality', 'anthropometrics'],
     description:
@@ -2539,7 +2867,13 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'turnaround target',
     ],
     requiredParameters: [],
-    optionalParameters: ['request_to_assign_minutes', 'travel_minutes', 'service_minutes', 'cleanup_minutes', 'target_minutes'],
+    optionalParameters: [
+      'request_to_assign_minutes',
+      'travel_minutes',
+      'service_minutes',
+      'cleanup_minutes',
+      'target_minutes',
+    ],
     description:
       'Operations calculator for turnaround segment total and target variance (no dispatch automation)',
     category: 'calculator',
@@ -2556,7 +2890,12 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'operations utilization',
     ],
     requiredParameters: [],
-    optionalParameters: ['bed_utilization_percent', 'staff_utilization_percent', 'device_utilization_percent', 'fleet_utilization_percent'],
+    optionalParameters: [
+      'bed_utilization_percent',
+      'staff_utilization_percent',
+      'device_utilization_percent',
+      'fleet_utilization_percent',
+    ],
     description:
       'Composite utilization index across bed, staff, device, and fleet signals (planning support only)',
     category: 'calculator',
@@ -2603,7 +2942,13 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'command center summary',
     ],
     requiredParameters: [],
-    optionalParameters: ['bed_status', 'staffing', 'device_alerts', 'fleet_status', 'incident_context'],
+    optionalParameters: [
+      'bed_status',
+      'staffing',
+      'device_alerts',
+      'fleet_status',
+      'incident_context',
+    ],
     description:
       'Chat-assisted hospital command huddle support; no autonomous dispatch, escalation, admission, transfer, discharge, staffing, or clinical decisions',
     category: 'hospital-operations',
@@ -2637,7 +2982,13 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'device battery maintenance compatibility',
     ],
     requiredParameters: [],
-    optionalParameters: ['device_requirements', 'availability', 'battery', 'maintenance_status', 'compatibility'],
+    optionalParameters: [
+      'device_requirements',
+      'availability',
+      'battery',
+      'maintenance_status',
+      'compatibility',
+    ],
     description:
       'Chat-assisted device requirement and availability review; does not assign clinical devices automatically',
     category: 'hospital-operations',

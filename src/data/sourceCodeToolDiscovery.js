@@ -25,6 +25,7 @@ import {
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
 } from './clinicalToolIdContract';
 import { nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
+import { PLATFORM_SYSTEM_CAPABILITIES } from './platformSystems';
 
 /**
  * Source-audit-only references. Keep these split so Developer Catalog can
@@ -668,16 +669,30 @@ function aliasRows() {
 }
 
 function platformRows() {
-  return platformFeatures.map((item) => ({
-    id: item.id,
-    name: item.name,
-    source: 'src/data/featureInventory.js',
-    status: 'platform',
-    category: item.category?.toLowerCase() || 'platform',
-    type: item.type,
-    path: item.path,
-    notes: item.description,
-  }));
+  return [
+    ...platformFeatures.map((item) => ({
+      id: item.id,
+      name: item.name,
+      source: 'src/data/featureInventory.js',
+      status: 'platform',
+      category: item.category?.toLowerCase() || 'platform',
+      type: item.type,
+      path: item.path,
+      notes: item.description,
+    })),
+    ...PLATFORM_SYSTEM_CAPABILITIES.map((item) => ({
+      id: item.id,
+      name: item.name,
+      source: 'src/data/platformSystems.js',
+      status: 'platform-system',
+      category: item.category?.toLowerCase() || 'platform',
+      pack: item.pack,
+      tier: item.tier,
+      path: item.route,
+      apiPath: item.endpoint,
+      notes: item.summary,
+    })),
+  ];
 }
 
 function categoryPackRows() {
@@ -843,6 +858,7 @@ export function getSourceCodeDiscoverySummary() {
     routingIntents: routingCapabilities.length,
     emergencyPatterns: emergencyPatternGroups.length,
     platformFeatures: platformFeatures.length,
+    platformSystems: PLATFORM_SYSTEM_CAPABILITIES.length,
     categoryPacks: MEDICAL_EXPANSION_CATEGORY_PACKS.length,
     collaboration: collaborationCapabilities.length,
     nluPatternCount: clinicalIntentTools.length,

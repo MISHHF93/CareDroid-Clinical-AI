@@ -123,6 +123,8 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.MANAGE_ENCRYPTION,
     Permission.MANAGE_SUBSCRIPTIONS,
     Permission.VIEW_ANALYTICS,
+    Permission.MANAGE_CONSENT,
+    Permission.MANAGE_PRIVACY,
 
     // Emergency & Safety
     Permission.TRIGGER_EMERGENCY_PROTOCOL,

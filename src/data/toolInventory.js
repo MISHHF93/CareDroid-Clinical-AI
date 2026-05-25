@@ -34,6 +34,7 @@ import {
 } from './clinicalToolIdContract';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';
+import { PLATFORM_SYSTEM_CAPABILITIES } from './platformSystems';
 
 export const TOOL_INVENTORY_VERSION = 1;
 
@@ -118,6 +119,7 @@ export const TOOL_SURFACES = Object.freeze({
   FLEET_PAGE: 'fleet-page',
   IOT_DASHBOARD: 'iot-dashboard',
   HOSPITAL_OPERATIONS: 'hospital-operations',
+  PLATFORM_PAGE: 'platform-page',
   HUB: 'hub',
   INTERNAL: 'internal',
 });
@@ -380,6 +382,12 @@ function presentationCategory(value) {
   if (category === 'fleet') return 'Fleet';
   if (category === 'iot') return 'IoT';
   if (category === 'hospital-operations') return 'Hospital Operations';
+  if (category === 'clinical ai') return 'Clinical AI';
+  if (category === 'documentation') return 'Documentation';
+  if (category === 'governance') return 'Governance';
+  if (category === 'interoperability') return 'Interoperability';
+  if (category === 'patient data') return 'Patient Data';
+  if (category === 'patient workspace') return 'Patient Workspace';
   return 'Other';
 }
 
@@ -534,6 +542,8 @@ function isCalculatorCategory(category) {
 }
 
 function surfaceForRecord(record) {
+  if (record.sourceKind === 'platform-system' && record.route) return TOOL_SURFACES.PLATFORM_PAGE;
+  if (record.sourceKind === 'platform' && record.route) return TOOL_SURFACES.PLATFORM_PAGE;
   if (record.sourceKind === 'platform') return TOOL_SURFACES.INTERNAL;
   if (record.launchType === TOOL_LAUNCH_TYPES.HUB) return TOOL_SURFACES.HUB;
   if (record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) return TOOL_SURFACES.CHAT_ASSISTED;
@@ -545,7 +555,8 @@ function surfaceForRecord(record) {
 }
 
 function isUserFacingInventoryRecord(record) {
-  if (!record || record.sourceKind === 'platform') return false;
+  if (!record) return false;
+  if (record.sourceKind === 'platform' && !record.catalogVisible) return false;
   if (record.launchType === TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED) return false;
   if (!record.route && !record.navigationPath && !record.chatSeed) return false;
   return true;
@@ -743,22 +754,41 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
   };
 }
 
-function buildPlatformRecord({ id, label, endpoint, apiClient, requestDto = null, responseDto = null, notes }) {
+function buildPlatformRecord({
+  id,
+  label,
+  category = 'platform',
+  tier = 'platform',
+  route = null,
+  component = null,
+  endpoint,
+  apiClient,
+  requestDto = null,
+  responseDto = null,
+  permissionPolicy = null,
+  safetyCopy = null,
+  chatSeed = null,
+  testCoverage = ['backendFrontendExposure.test.js', 'clinicalToolsApi.test.js'],
+  riskLevel = 'low',
+  notes,
+  catalogVisible = false,
+  sourceKind = 'platform',
+}) {
   return {
     id,
     label,
-    category: 'platform',
-    tier: 'platform',
+    category,
+    tier,
     status: 'active',
-    sourceKind: 'platform',
-    route: null,
-    component: null,
+    sourceKind,
+    route,
+    component,
     launchType: TOOL_LAUNCH_TYPES.PLATFORM,
-    catalogVisible: false,
+    catalogVisible,
     sidebarVisible: false,
     calculatorSlug: null,
-    fallbackRoute: null,
-    navigationPath: null,
+    fallbackRoute: route,
+    navigationPath: route,
     nluToolId: null,
     nluProfileIds: [],
     aliases: [],
@@ -772,11 +802,11 @@ function buildPlatformRecord({ id, label, endpoint, apiClient, requestDto = null
     responseDto,
     executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
     apiClient,
-    permissionPolicy: null,
-    safetyCopy: null,
-    chatSeed: null,
-    testCoverage: ['backendFrontendExposure.test.js', 'clinicalToolsApi.test.js'],
-    riskLevel: 'low',
+    permissionPolicy,
+    safetyCopy,
+    chatSeed,
+    testCoverage,
+    riskLevel,
     notes,
   };
 }
@@ -809,6 +839,30 @@ function buildPlatformRecords() {
       requestDto: 'Undocumented share payload',
       notes: 'Capability-gated frontend call; no Nest route today.',
     }),
+    ...PLATFORM_SYSTEM_CAPABILITIES.filter(
+      (capability) => !ALL_REGISTRY_TOOL_ID_ORDER.has(capability.id)
+    ).map((capability) =>
+      buildPlatformRecord({
+        id: capability.id,
+        label: capability.name,
+        category: capability.category,
+        tier: capability.tier,
+        route: capability.route,
+        component: 'src/pages/platform/PlatformSystemPage.jsx',
+        endpoint: capability.endpoint,
+        apiClient: capability.apiClient,
+        requestDto: capability.requestDto,
+        responseDto: capability.responseDto,
+        permissionPolicy: capability.permissionPolicy,
+        safetyCopy: capability.summary,
+        chatSeed: capability.chatSeed || null,
+        testCoverage: capability.testCoverage,
+        riskLevel: capability.permissionPolicy?.permissions?.includes('READ_PHI') ? 'high' : 'medium',
+        notes: capability.safetyCopy,
+        catalogVisible: true,
+        sourceKind: 'platform-system',
+      })
+    ),
   ];
 }
 

@@ -41,6 +41,7 @@ import { NotificationModule } from './modules/notifications/notification.module'
 import { EmailModule } from './modules/email/email.module';
 import { CacheModule } from './modules/cache/cache.module';
 import { LiveTrackingModule } from './modules/live-tracking/live-tracking.module';
+import { PlatformSystemsModule } from './modules/platform-systems/platform-systems.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -121,6 +122,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     AnalyticsModule,
     NotificationModule,
     LiveTrackingModule,
+    PlatformSystemsModule,
 
     // Medical Control Plane (Intent Classification, Tool Orchestration)
     MedicalControlPlaneModule,

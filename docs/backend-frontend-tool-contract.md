@@ -1,6 +1,6 @@
 # Backend ↔ frontend tool contract matrix
 
-Generated: 2026-05-25T04:05:45.644Z
+Generated: 2026-05-25T04:54:40.348Z
 
 > **Source:** `src/data/backendFrontendToolContract.js` — regenerate with `npm run contract:write-docs`.
 > **Related:** [clinical-tool-executors.md](./clinical-tool-executors.md), [e2e-tool-validation-matrix.md](./e2e-tool-validation-matrix.md).
