@@ -39,6 +39,7 @@ describe('DeviceFleetManagement', () => {
     expect(await screen.findByRole('heading', { level: 1, name: /device fleet management/i })).toBeInTheDocument();
     expect(screen.getByText(/demo\/local actions only/i)).toBeInTheDocument();
     expect(screen.getByText(/demo hospital map telemetry/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /ask assistant/i })).toHaveAttribute('href', '/assistant');
     expect(screen.getByRole('heading', { name: /device inventory/i })).toBeInTheDocument();
     expect(screen.getAllByText(/firmware/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/maintenance/i).length).toBeGreaterThan(0);

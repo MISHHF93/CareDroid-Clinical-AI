@@ -281,7 +281,10 @@ export default function MedicalIotDashboard() {
           </p>
         </div>
         <div className="medical-iot-hero-actions">
-          <Link to="/dashboard" className="medical-iot-action">
+          <Link to="/assistant" className="medical-iot-action">
+            Ask Assistant
+          </Link>
+          <Link to="/dashboard" className="medical-iot-action medical-iot-action--secondary">
             Back to Command Dashboard
           </Link>
           <Link to="/tools" className="medical-iot-action medical-iot-action--secondary">

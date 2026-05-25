@@ -50,6 +50,7 @@ describe('MedicalIotDashboard', () => {
     expect((await screen.findAllByText(/demo telemetry/i)).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/monitoring support only/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/mock telemetry, not live patient data/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /ask assistant/i })).toHaveAttribute('href', '/assistant');
     expect(screen.getAllByText(/Bed 12 Pulse Oximeter/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/SpO2/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/Respiratory rate/i)).toBeInTheDocument();

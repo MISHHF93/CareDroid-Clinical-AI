@@ -29,6 +29,10 @@ const disclaimerCss = readFileSync(
   join(__dirname, '../components/clinical/ClinicalDecisionSupportDisclaimer.css'),
   'utf8'
 );
+const liveMapCss = readFileSync(join(__dirname, '../pages/LiveTrackingMap.css'), 'utf8');
+const hospitalMapCss = readFileSync(join(__dirname, '../pages/HospitalMapDashboard.css'), 'utf8');
+const medicalIotCss = readFileSync(join(__dirname, '../pages/MedicalIotDashboard.css'), 'utf8');
+const fleetLiveMapCss = readFileSync(join(__dirname, '../pages/fleet/FleetLiveMap.css'), 'utf8');
 
 describe('responsive-ux.css — global normalization', () => {
   it('is imported from main.jsx after design-tokens.css', () => {
@@ -120,6 +124,16 @@ describe('responsive-ux.css — global normalization', () => {
 
   it('reduces card padding on small screens', () => {
     expect(responsiveUxCss).toMatch(/@media \(max-width: 640px\)[\s\S]*--app-card-padding-compact/);
+  });
+
+  it('keeps map canvases locally scrollable instead of clipping fixed-width floor plans', () => {
+    for (const css of [liveMapCss, hospitalMapCss, medicalIotCss, fleetLiveMapCss]) {
+      expect(css).toMatch(/-map-canvas[\s\S]*overflow-x:\s*auto/);
+      expect(css).toMatch(/-map-canvas[\s\S]*overflow-y:\s*hidden/);
+      expect(css).toMatch(/-webkit-overflow-scrolling:\s*touch/);
+    }
+    expect(layoutVisibilityCss).toContain('.hospital-map-canvas');
+    expect(layoutVisibilityCss).toMatch(/\.medical-iot-page :is\([\s\S]*overflow-wrap:\s*anywhere/);
   });
 });
 

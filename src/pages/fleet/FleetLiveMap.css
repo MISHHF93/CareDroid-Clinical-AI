@@ -178,7 +178,12 @@
 .fleet-map-canvas {
   position: relative;
   min-height: 400px;
-  overflow: hidden;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--app-panel-border);
   border-radius: var(--compact-panel-radius, 14px);
   background:
@@ -239,6 +244,7 @@
   position: absolute;
   inset: 0;
   min-width: 720px;
+  min-height: 100%;
 }
 
 .fleet-map-marker {

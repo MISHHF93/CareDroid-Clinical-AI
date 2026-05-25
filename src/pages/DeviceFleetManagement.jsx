@@ -216,7 +216,8 @@ export default function DeviceFleetManagement() {
           </p>
         </div>
         <div className="device-fleet-hero-actions">
-          <Link to="/hospital-map" className="device-fleet-action">Open Hospital Map</Link>
+          <Link to="/assistant" className="device-fleet-action">Ask Assistant</Link>
+          <Link to="/hospital-map" className="device-fleet-action device-fleet-action--secondary">Open Hospital Map</Link>
           <Link to="/medical-iot" className="device-fleet-action device-fleet-action--secondary">Open Medical IoT</Link>
         </div>
       </section>
