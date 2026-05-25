@@ -130,6 +130,14 @@ import {
   NihssSummaryViewCalculator,
   PediatricGcsCalculator,
 } from './neurologyCalculators';
+import {
+  FentonGrowthChartHelper,
+  GestationalAgeCalculator,
+  NeonatalBilirubinRiskHelper,
+  PediatricBpPercentileCalculator,
+  PediatricDoseSafetyChecker,
+  PregnancyDueDateCalculator,
+} from './pediatricsObgynCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -616,6 +624,18 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <NihssSummaryViewCalculator onResultChange={onResultChange} />;
     case 'pediatric-gcs':
       return <PediatricGcsCalculator onResultChange={onResultChange} />;
+    case 'gestational-age-calculator':
+      return <GestationalAgeCalculator onResultChange={onResultChange} />;
+    case 'pediatric-bp-percentile':
+      return <PediatricBpPercentileCalculator onResultChange={onResultChange} />;
+    case 'pregnancy-due-date-calculator':
+      return <PregnancyDueDateCalculator onResultChange={onResultChange} />;
+    case 'fenton-growth-chart-helper':
+      return <FentonGrowthChartHelper onResultChange={onResultChange} />;
+    case 'neonatal-bilirubin-risk-helper':
+      return <NeonatalBilirubinRiskHelper onResultChange={onResultChange} />;
+    case 'pediatric-dose-safety-checker':
+      return <PediatricDoseSafetyChecker onResultChange={onResultChange} />;
     case 'shock-index':
       return <ShockIndexCalculator onResultChange={onResultChange} />;
     case 'anion-gap':

@@ -32,6 +32,18 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     ],
   },
   {
+    groupId: 'pediatrics-obgyn-assistants',
+    heading: 'Pediatrics and OB-GYN workflows',
+    lead:
+      'Pediatric sepsis, pregnancy workflow, neonatal assessment, and OB triage assistants organize review and handoff prompts. They are pediatric/OB decision support only, do not diagnose, do not recommend treatment, medication dosing, delivery timing, procedures, or disposition, and must not delay urgent maternal, fetal, neonatal, pediatric sepsis, airway, trauma, or emergency pathways.',
+    toolIds: [
+      'pediatric-sepsis-assistant',
+      'pregnancy-workflow-assistant',
+      'neonatal-assessment-assistant',
+      'ob-triage-assistant',
+    ],
+  },
+  {
     groupId: 'trauma',
     heading: 'Trauma imaging decision support',
     lead:
@@ -136,6 +148,10 @@ export function chatAssistedLaunchAriaLabel(toolName) {
 const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'grace-acs': 'Unstable ACS or STEMI pathways take priority over chat.',
   nihss: 'Emergency stroke pathways take priority over completing scoring in chat.',
+  'pediatric-sepsis-assistant': 'Local pediatric sepsis and emergency pathways take priority over chat.',
+  'pregnancy-workflow-assistant': 'Urgent maternal or fetal concerns need obstetric evaluation before chat.',
+  'neonatal-assessment-assistant': 'Neonatal resuscitation, hypoglycemia, temperature instability, or jaundice pathways take priority over chat.',
+  'ob-triage-assistant': 'Urgent bleeding, severe symptoms, labor, fetal concern, or hypertensive emergency pathways take priority over chat.',
   'seizure-assistant': 'Status epilepticus, airway compromise, trauma, or unstable patients need urgent pathways before chat.',
   'stroke-workflow-assistant': 'Emergency stroke activation, imaging, transfer, and treatment workflows take priority over chat.',
   'headache-red-flag-assistant': 'Thunderclap headache, neurologic deficit, meningismus, or unstable patients need urgent evaluation before chat.',

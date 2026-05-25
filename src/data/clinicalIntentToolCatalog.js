@@ -630,6 +630,186 @@ Score appearance, pulse, grimace, activity, and respiration (0–2 each) at 1 an
     backendExecutable: false,
   },
   {
+    toolId: NLU.gestationalAgeCalculator,
+    toolName: 'Gestational Age Calculator',
+    category: 'calculator',
+    description:
+      'Gestational age calculation from LMP, conception, or ultrasound dating with ACOG dating caveats.',
+    path: '/tools/calculators/gestational-age-calculator',
+    sidebarToolId: REGISTRY.gestationalAgeCalculator,
+    chatSeed:
+      'Help me calculate gestational age from LMP, conception/ovulation date, or ultrasound dating, and document the estimated due date and dating method. Pediatric/OB decision support only; reconcile with ACOG dating policy and local obstetric workflow, do not diagnose pregnancy complications, do not recommend delivery timing, and do not delay urgent maternal or fetal evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pediatricBpPercentile,
+    toolName: 'Pediatric BP Percentile',
+    category: 'calculator',
+    description:
+      'Pediatric blood pressure screening-band helper using age/sex context and AAP source-table reminders.',
+    path: '/tools/calculators/pediatric-bp-percentile',
+    sidebarToolId: REGISTRY.pediatricBpPercentile,
+    chatSeed:
+      'Help me review pediatric blood pressure using age, sex, systolic BP, and diastolic BP. Pediatric decision support only; confirm cuff size, repeat manual readings, height percentile/source tables, and local pediatric guidance. Do not diagnose hypertension, recommend medications, or delay urgent evaluation for severe symptoms.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pregnancyDueDateCalculator,
+    toolName: 'Pregnancy Due Date Calculator',
+    category: 'calculator',
+    description:
+      'Estimated due date helper from LMP, conception/ovulation date, or ultrasound dating.',
+    path: '/tools/calculators/pregnancy-due-date-calculator',
+    sidebarToolId: REGISTRY.pregnancyDueDateCalculator,
+    chatSeed:
+      'Help me estimate pregnancy due date using LMP, conception/ovulation date, or ultrasound dating details. OB decision support only; confirm dating hierarchy with ACOG/local policy, do not recommend delivery timing or interventions, and do not delay urgent maternal or fetal evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.fentonGrowthChartHelper,
+    toolName: 'Fenton Growth Chart Helper',
+    category: 'calculator',
+    description:
+      'Neonatal growth percentile classification helper for official Fenton chart review.',
+    path: '/tools/calculators/fenton-growth-chart-helper',
+    sidebarToolId: REGISTRY.fentonGrowthChartHelper,
+    chatSeed:
+      'Help me classify neonatal growth percentiles from the official Fenton chart: gestational/postmenstrual age, weight percentile, length percentile, and head circumference percentile. Pediatric/neonatal decision support only; use validated source charts and neonatal review, do not diagnose growth failure or recommend feeding, fluids, fortification, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neonatalBilirubinRiskHelper,
+    toolName: 'Neonatal Bilirubin Risk Helper',
+    category: 'calculator',
+    description:
+      'Neonatal bilirubin review helper for AAP 2022 nomogram workflow without phototherapy recommendations.',
+    path: '/tools/calculators/neonatal-bilirubin-risk-helper',
+    sidebarToolId: REGISTRY.neonatalBilirubinRiskHelper,
+    chatSeed:
+      'Help me organize neonatal bilirubin review: age in hours, total bilirubin, gestational age, neurotoxicity risk factors, and whether values have been plotted on the AAP 2022/local nomogram. Neonatal decision support only; do not recommend phototherapy, exchange transfusion, labs, admission, discharge, or timing, and do not delay urgent jaundice or neonatal evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pediatricDoseSafetyChecker,
+    toolName: 'Pediatric Dose Safety Checker',
+    category: 'calculator',
+    description:
+      'Placeholder-only pediatric medication safety checklist that blocks patient-specific dose calculation.',
+    path: '/tools/calculators/pediatric-dose-safety-checker',
+    sidebarToolId: REGISTRY.pediatricDoseSafetyChecker,
+    chatSeed:
+      'Help me document pediatric medication safety checks without calculating a dose: medication context, weight in kg, governed institutional protocol availability, concentration, route, frequency, maximum dose source, allergies, renal/hepatic context, and independent verification. Placeholder only; do not provide mg/kg doses, dose ranges, titration, infusion rates, medication recommendations, or prescriptions unless governed by an approved protocol outside this build.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pediatricSepsisAssistant,
+    toolName: 'Pediatric Sepsis Assistant',
+    category: 'calculator',
+    description:
+      'Guided pediatric sepsis review for infection concern, age-adjusted vitals, perfusion, labs, and escalation prompts.',
+    path: '/tools/pediatrics-obgyn/pediatric-sepsis-assistant',
+    sidebarToolId: REGISTRY.pediatricSepsisAssistant,
+    chatSeed:
+      'Help me structure a pediatric sepsis review: age, infection concern, age-adjusted vitals, perfusion, mental status, lactate/labs if available, fluids or antibiotics already documented, source concerns, and missing data. Pediatric decision support only; do not diagnose sepsis, do not recommend fluids, antibiotics, vasopressors, medication doses, disposition, or transfer, and do not delay local pediatric sepsis or emergency pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pregnancyWorkflowAssistant,
+    toolName: 'Pregnancy Workflow Assistant',
+    category: 'calculator',
+    description:
+      'Pregnancy workflow review for dating, maternal symptoms, fetal movement, labs, risk context, and handoff prompts.',
+    path: '/tools/pediatrics-obgyn/pregnancy-workflow-assistant',
+    sidebarToolId: REGISTRY.pregnancyWorkflowAssistant,
+    chatSeed:
+      'Help me structure a pregnancy workflow review: gestational age, dating method, maternal symptoms, fetal movement, bleeding/fluid/leakage context, blood pressure, labs if available, risk factors, and missing data. OB decision support only; do not diagnose pregnancy complications, do not recommend medications, delivery timing, disposition, or procedures, and do not delay urgent obstetric evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neonatalAssessmentAssistant,
+    toolName: 'Neonatal Assessment Assistant',
+    category: 'calculator',
+    description:
+      'Neonatal assessment assistant for Apgar, feeding, temperature, bilirubin, growth, screening, and red flags.',
+    path: '/tools/pediatrics-obgyn/neonatal-assessment-assistant',
+    sidebarToolId: REGISTRY.neonatalAssessmentAssistant,
+    chatSeed:
+      'Help me structure a neonatal assessment: gestational age, birth weight, Apgar documentation, temperature, feeding, glucose if available, bilirubin context, growth percentiles, screenings, and red flags. Neonatal decision support only; do not replace NRP or neonatal clinician assessment, do not recommend treatment or disposition, and do not delay urgent newborn evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.obTriageAssistant,
+    toolName: 'OB Triage Assistant',
+    category: 'calculator',
+    description:
+      'OB triage assistant for maternal symptoms, gestational age, fetal concerns, bleeding, fluid leakage, and urgent pathway prompts.',
+    path: '/tools/pediatrics-obgyn/ob-triage-assistant',
+    sidebarToolId: REGISTRY.obTriageAssistant,
+    chatSeed:
+      'Help me structure an OB triage review: gestational age, chief concern, maternal vitals, bleeding, fluid leakage, contractions, fetal movement, pain, headache/vision symptoms, labs if available, and missing data. OB decision support only; do not diagnose, do not recommend medications, delivery, discharge, admission, transfer, or procedures, and do not delay urgent maternal or fetal pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neonatalDashboard,
+    toolName: 'Neonatal Dashboard',
+    category: 'reference',
+    description:
+      'Neonatal dashboard concept for vitals, feeding, bilirubin, growth, screening, and review queues.',
+    path: '/tools/pediatrics-obgyn/neonatal-dashboard',
+    sidebarToolId: REGISTRY.neonatalDashboard,
+    chatSeed:
+      'Help me review neonatal dashboard context: vitals, temperature, feeding, weight change, bilirubin review status, growth percentile trends, screening completion, data freshness, and unresolved review items. Monitoring visibility and neonatal decision support only; no autonomous escalation, treatment, feeding, phototherapy, discharge, or admission recommendations.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.maternalMonitoringDashboard,
+    toolName: 'Maternal Monitoring Dashboard',
+    category: 'reference',
+    description:
+      'Maternal monitoring dashboard concept for vitals, symptoms, labs, fetal context, and review queues.',
+    path: '/tools/pediatrics-obgyn/maternal-monitoring-dashboard',
+    sidebarToolId: REGISTRY.maternalMonitoringDashboard,
+    chatSeed:
+      'Help me review maternal monitoring dashboard context: blood pressure trends, symptoms, labs if available, fetal movement/status documentation, postpartum or antepartum risk context, data freshness, and review queues. OB decision support and monitoring visibility only; no autonomous escalation, medication, delivery, disposition, or procedure recommendations.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pediatricCommandCenter,
+    toolName: 'Pediatric Command Center',
+    category: 'reference',
+    description:
+      'Pediatric command-center concept for deterioration, sepsis, vitals, growth, BP, and unresolved review items.',
+    path: '/tools/pediatrics-obgyn/pediatric-command-center',
+    sidebarToolId: REGISTRY.pediatricCommandCenter,
+    chatSeed:
+      'Help me review pediatric command-center queues: PEWS/deterioration context, sepsis concern, vitals trends, BP screening bands, growth trend flags, data gaps, and human review status. Pediatric decision support and operations visibility only; no diagnosis, medication dosing, treatment, transfer, or disposition recommendations.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.growthTrendAnalytics,
+    toolName: 'Growth Trend Analytics',
+    category: 'reference',
+    description:
+      'Growth trend analytics concept for serial anthropometrics, percentile changes, data quality, and review queues.',
+    path: '/tools/pediatrics-obgyn/growth-trend-analytics',
+    sidebarToolId: REGISTRY.growthTrendAnalytics,
+    chatSeed:
+      'Help me review growth trend analytics: serial weight, length/height, head circumference, percentiles, gestational/corrected age where applicable, percentile crossing, measurement quality, and missing data. Pediatric/neonatal decision support only; no growth diagnosis and no nutrition, medication, lab, imaging, or disposition recommendation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.perinatalRiskDashboard,
+    toolName: 'Perinatal Risk Dashboard',
+    category: 'reference',
+    description:
+      'Perinatal risk dashboard concept for maternal, fetal, delivery, neonatal, and follow-up review queues.',
+    path: '/tools/pediatrics-obgyn/perinatal-risk-dashboard',
+    sidebarToolId: REGISTRY.perinatalRiskDashboard,
+    chatSeed:
+      'Help me review perinatal risk dashboard context: maternal risk factors, fetal concerns, delivery details, neonatal assessment, bilirubin/growth follow-up, data freshness, and unresolved review queues. Perinatal decision support and visibility only; no diagnosis, medication dosing, delivery, treatment, admission, discharge, or transfer recommendations.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'braden-scale',
     toolName: 'Braden scale',
     category: 'calculator',
@@ -2182,6 +2362,60 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/apgar-score',
     calcQuery: '/tools/calculators?calc=apgar-score',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (apgarScoreCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'gestational-age-calculator',
+    name: 'Gestational Age Calculator',
+    description: 'Gestational age from LMP, conception, or ultrasound dating.',
+    path: '/tools/calculators/gestational-age-calculator',
+    calcQuery: '/tools/calculators?calc=gestational-age-calculator',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pediatric-bp-percentile',
+    name: 'Pediatric BP Percentile',
+    description: 'Pediatric BP screening-band helper with AAP source-table reminders.',
+    path: '/tools/calculators/pediatric-bp-percentile',
+    calcQuery: '/tools/calculators?calc=pediatric-bp-percentile',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pregnancy-due-date-calculator',
+    name: 'Pregnancy Due Date Calculator',
+    description: 'Estimated due date from LMP, conception, or ultrasound dating.',
+    path: '/tools/calculators/pregnancy-due-date-calculator',
+    calcQuery: '/tools/calculators?calc=pregnancy-due-date-calculator',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'fenton-growth-chart-helper',
+    name: 'Fenton Growth Chart Helper',
+    description: 'Neonatal growth percentile classification helper for Fenton chart review.',
+    path: '/tools/calculators/fenton-growth-chart-helper',
+    calcQuery: '/tools/calculators?calc=fenton-growth-chart-helper',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'neonatal-bilirubin-risk-helper',
+    name: 'Neonatal Bilirubin Risk Helper',
+    description: 'AAP 2022 bilirubin nomogram review prompt without treatment recommendations.',
+    path: '/tools/calculators/neonatal-bilirubin-risk-helper',
+    calcQuery: '/tools/calculators?calc=neonatal-bilirubin-risk-helper',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pediatric-dose-safety-checker',
+    name: 'Pediatric Dose Safety Checker',
+    description: 'Placeholder-only pediatric medication safety checker; no patient-specific dose calculation.',
+    path: '/tools/calculators/pediatric-dose-safety-checker',
+    calcQuery: '/tools/calculators?calc=pediatric-dose-safety-checker',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
     orchestratorId: null,
   },
   {

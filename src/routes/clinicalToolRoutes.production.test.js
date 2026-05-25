@@ -91,6 +91,8 @@ describe('Production routes — registry tool paths', () => {
         expect(appSource).toContain(`path: '/tools/endocrine/:toolId'`);
       } else if (tool.path.startsWith('/tools/neurology/')) {
         expect(appSource).toContain(`path: '/tools/neurology/:toolId'`);
+      } else if (tool.path.startsWith('/tools/pediatrics-obgyn/')) {
+        expect(appSource).toContain(`path: '/tools/pediatrics-obgyn/:toolId'`);
       } else {
         expect(appSource).toContain(`path: '${tool.path}'`);
       }
