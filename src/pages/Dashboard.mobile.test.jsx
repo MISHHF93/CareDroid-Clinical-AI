@@ -166,7 +166,7 @@ describe('Dashboard Chat mobile CSS contracts', () => {
       /@media \(max-width: 700px\)[\s\S]*\.chat-exec-summary-row[\s\S]*grid-template-columns:\s*1fr/
     );
     expect(toolCardCss).toMatch(
-      /@media \(max-width: 520px\)[\s\S]*\.tool-card-table[\s\S]*min-width:\s*520px/
+      /@media \(max-width: 520px\)[\s\S]*\.tool-card-table[\s\S]*min-width:\s*460px/
     );
   });
 
