@@ -231,7 +231,7 @@
 .live-map-canvas {
   position: relative;
   min-height: 400px;
-  overflow: hidden;
+  overflow: auto;
   border: 1px solid var(--app-panel-border);
   border-radius: var(--compact-panel-radius, 14px);
   background:
@@ -275,7 +275,7 @@
 .live-map-marker-layer {
   position: absolute;
   inset: 0;
-  min-width: 720px;
+  width: max(100%, 720px);
 }
 
 .live-map-marker {
@@ -449,6 +449,12 @@
 }
 
 @media (max-width: 720px) {
+  .live-map-canvas svg,
+  .live-map-marker-layer {
+    min-width: 640px;
+    width: max(100%, 640px);
+  }
+
   .live-map-page {
     padding: 14px;
   }
