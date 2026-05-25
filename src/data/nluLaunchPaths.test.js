@@ -84,7 +84,7 @@ describe('nluLaunchPaths — contract coverage', () => {
 
   it('getNluLaunchExpectation is stable for hub tools', () => {
     const exp = getNluLaunchExpectation('apache2-calculator');
-    expect(exp.kind).toBe('tier-b-chat');
+    expect(exp.kind).toBe('tier-a-calculator');
     expect(exp.registryId).toBe('apache2-calculator');
   });
 });

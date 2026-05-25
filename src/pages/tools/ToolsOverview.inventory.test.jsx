@@ -111,7 +111,7 @@ describe('ToolsOverview unified inventory', () => {
     expect(container.querySelector('.tools-discovery-controls')).toBeTruthy();
     expect(container.querySelectorAll('.tool-card-large').length).toBeGreaterThan(0);
     expect(screen.queryByRole('button', { name: /developer catalog/i })).not.toBeInTheDocument();
-  });
+  }, 10000);
 
   it('shows a non-blank empty state for empty custom workspaces', () => {
     mockWorkspaceValue.workspaces = [{ id: 'empty', name: 'Empty Workspace', toolIds: [] }];

@@ -979,6 +979,116 @@ export const CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS = Object.freeze([
 export const CLINICAL_DOSE_HUB_REGISTRY_IDS = Object.freeze([REGISTRY.doseCalculator]);
 
 /**
+ * Cross-pack validation scope for category packs 2-10.
+ *
+ * Tier labels here reflect product-pack acceptance criteria, not every legacy PR
+ * grouping name. Shared calculator ids may appear in more than one specialty pack.
+ */
+export const MEDICAL_EXPANSION_CATEGORY_PACKS = Object.freeze([
+  {
+    id: 'emergency-critical-care',
+    label: 'Emergency Critical Care',
+    tierA: EMERGENCY_CRITICAL_CARE_TIER_A_CALCULATOR_REGISTRY_IDS,
+    tierB: Object.freeze([]),
+    tierC: Object.freeze([]),
+  },
+  {
+    id: 'pulmonology',
+    label: 'Pulmonology',
+    tierA: PULMONOLOGY_TIER_A_CALCULATOR_REGISTRY_IDS,
+    tierB: PULMONOLOGY_TIER_B_CHAT_REGISTRY_IDS,
+    tierC: Object.freeze([
+      REGISTRY.ventilatorMonitoringDashboard,
+      REGISTRY.respiratoryTelemetryDashboard,
+      REGISTRY.sleepApneaAnalytics,
+      REGISTRY.pulmonaryTrendEngine,
+      REGISTRY.respiratoryCommandCenter,
+    ]),
+  },
+  {
+    id: 'nephrology',
+    label: 'Nephrology',
+    tierA: NEPHROLOGY_TIER_A_CALCULATOR_REGISTRY_IDS,
+    tierB: NEPHROLOGY_TIER_B_CHAT_REGISTRY_IDS,
+    tierC: Object.freeze([
+      REGISTRY.renalMonitoringDashboard,
+      REGISTRY.ckdProgressionPredictor,
+      REGISTRY.dialysisUtilizationTracker,
+      REGISTRY.electrolyteTrendEngine,
+      REGISTRY.fluidBalanceMonitor,
+    ]),
+  },
+  {
+    id: 'hepatology-gi',
+    label: 'Hepatology and Gastroenterology',
+    tierA: HEPATOLOGY_GI_TIER_A_CALCULATOR_REGISTRY_IDS,
+    tierB: HEPATOLOGY_GI_TIER_B_CHAT_REGISTRY_IDS,
+    tierC: Object.freeze([
+      REGISTRY.giSurveillanceDashboard,
+      REGISTRY.hepaticTrendAnalytics,
+      REGISTRY.endoscopyWorkflowAssistant,
+      REGISTRY.cirrhosisMonitoringEngine,
+      REGISTRY.giCommandCenter,
+    ]),
+  },
+  {
+    id: 'endocrine-metabolic',
+    label: 'Endocrine and Metabolic',
+    tierA: ENDOCRINE_METABOLIC_TIER_A_CALCULATOR_REGISTRY_IDS,
+    tierB: ENDOCRINE_METABOLIC_TIER_B_CHAT_REGISTRY_IDS,
+    tierC: Object.freeze([
+      REGISTRY.glucoseTelemetryDashboard,
+      REGISTRY.insulinTrendEngine,
+      REGISTRY.endocrineMonitoringSystem,
+      REGISTRY.metabolicAnalytics,
+      REGISTRY.continuousGlucoseCommandCenter,
+    ]),
+  },
+  {
+    id: 'neurology',
+    label: 'Neurology',
+    tierA: NEUROLOGY_TIER_A_CALCULATOR_REGISTRY_IDS,
+    tierB: NEUROLOGY_TIER_B_CHAT_REGISTRY_IDS,
+    tierC: Object.freeze([
+      REGISTRY.neuroTelemetryDashboard,
+      REGISTRY.strokeCommandCenter,
+      REGISTRY.neuroMonitoringEngine,
+      REGISTRY.eegTrendDashboard,
+      REGISTRY.neurologyTimelineAi,
+    ]),
+  },
+  {
+    id: 'pediatrics-obgyn',
+    label: 'Pediatrics and OB-GYN',
+    tierA: PEDIATRICS_OBGYN_TIER_A_CALCULATOR_REGISTRY_IDS,
+    tierB: PEDIATRICS_OBGYN_TIER_B_CHAT_REGISTRY_IDS,
+    tierC: PEDIATRICS_OBGYN_TIER_C_WORKFLOW_REGISTRY_IDS,
+  },
+  {
+    id: 'psychiatry-screening',
+    label: 'Psychiatry and Screening',
+    tierA: PSYCHIATRY_SCREENING_TIER_A_CALCULATOR_REGISTRY_IDS,
+    tierB: PSYCHIATRY_SCREENING_TIER_B_CHAT_REGISTRY_IDS,
+    tierC: PSYCHIATRY_SCREENING_TIER_C_WORKFLOW_REGISTRY_IDS,
+  },
+  {
+    id: 'hospital-operations-iot-fleet',
+    label: 'Hospital Operations, Medical IoT, and Fleet',
+    tierA: HOSPITAL_OPERATIONS_TIER_A_CALCULATOR_REGISTRY_IDS,
+    tierB: Object.freeze([
+      ...FLEET_TIER_B_CHAT_REGISTRY_IDS,
+      ...HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_IDS,
+    ]),
+    tierC: Object.freeze([
+      ...FLEET_TIER_A_REGISTRY_IDS,
+      ...LIVE_TRACKING_MAP_REGISTRY_IDS,
+      ...MEDICAL_IOT_REGISTRY_IDS,
+      ...HOSPITAL_OPERATIONS_REGISTRY_IDS,
+    ]),
+  },
+]);
+
+/**
  * Registry tools with NLU/chat coverage via backend keywords but no `clinicalIntentTools` row
  * (e.g. legacy eGFR/BMI/SOFA keyword routing).
  */

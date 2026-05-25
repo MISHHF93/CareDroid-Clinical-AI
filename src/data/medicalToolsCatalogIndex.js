@@ -14,6 +14,7 @@ import { isCalculatorsHubPath, resolveCatalogLaunch } from './clinicalCatalogWir
 import {
   BUILTIN_CALC,
   KEYWORD_ROUTED_REGISTRY_IDS,
+  MEDICAL_EXPANSION_CATEGORY_PACKS,
   REGISTRY,
 } from './clinicalToolIdContract';
 import {
@@ -174,4 +175,15 @@ export function getMedicalCatalogSummary() {
     chatOnlyForms: rows.filter((r) => r.chatOnlyForm).length,
     hubOnlyCalculators: nluCalculatorHubOnly.length,
   };
+}
+
+export function getMedicalExpansionCategoryPackRows() {
+  return MEDICAL_EXPANSION_CATEGORY_PACKS.map((pack) => ({
+    id: pack.id,
+    name: pack.label,
+    tierAToolIds: [...pack.tierA],
+    tierBToolIds: [...pack.tierB],
+    tierCToolIds: [...pack.tierC],
+    totalTools: new Set([...pack.tierA, ...pack.tierB, ...pack.tierC]).size,
+  }));
 }

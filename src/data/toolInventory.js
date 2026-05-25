@@ -336,6 +336,7 @@ const BASE_TEST_COVERAGE = Object.freeze([
   'clinicalToolIdContract.test.js',
   'clinicalToolAliasSync.test.js',
   'medicalToolsCatalogIndex.test.js',
+  'medicalExpansionCrossPackValidation.test.js',
 ]);
 
 const EXECUTOR_TEST_COVERAGE = Object.freeze({

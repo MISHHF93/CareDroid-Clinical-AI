@@ -126,21 +126,35 @@ export function getHubChatAssistedTools() {
     (record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED
   );
   const hubRowsById = new Map(nluCalculatorHubOnly.map((tool) => [tool.toolId, tool]));
-  return calculatorRecords
-    .map((record) => {
-      const toolId = record.nluToolId || record.id;
-      const tool = hubRowsById.get(toolId);
-      return {
-        ...tool,
-        toolId,
-        name: record?.label || tool?.name || toolId,
-        description: record?.description,
-        registryId: record?.id,
-        hubPath: tool?.hubPath || record?.route,
-        path: record?.route || tool?.hubPath,
-      };
-    })
-    .filter((tool) => idSet.has(tool.toolId));
+  const rowsByToolId = new Map();
+
+  for (const record of calculatorRecords) {
+    const toolId = record.nluToolId || record.id;
+    const tool = hubRowsById.get(toolId);
+    rowsByToolId.set(toolId, {
+      ...tool,
+      toolId,
+      name: record?.label || tool?.name || toolId,
+      description: record?.description,
+      registryId: record?.id,
+      hubPath: tool?.hubPath || record?.route,
+      path: record?.route || tool?.hubPath,
+    });
+  }
+
+  for (const tool of nluCalculatorHubOnly) {
+    if (tool.toolId === 'dispatch-ai' || rowsByToolId.has(tool.toolId)) continue;
+    rowsByToolId.set(tool.toolId, {
+      ...tool,
+      description:
+        clinicalIntentTools.find((intent) => intent.toolId === tool.toolId)?.description ||
+        'Chat-assisted decision support',
+      registryId: tool.toolId,
+      path: tool.hubPath,
+    });
+  }
+
+  return [...rowsByToolId.values()].filter((tool) => idSet.has(tool.toolId));
 }
 
 /**

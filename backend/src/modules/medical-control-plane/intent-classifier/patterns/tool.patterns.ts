@@ -13,7 +13,14 @@ export interface ToolPattern {
   optionalParameters?: string[];
   parameterExtractors?: Record<string, RegExp>;
   description: string;
-  category: 'calculator' | 'checker' | 'interpreter' | 'protocol' | 'reference' | 'fleet';
+  category:
+    | 'calculator'
+    | 'checker'
+    | 'interpreter'
+    | 'protocol'
+    | 'reference'
+    | 'fleet'
+    | 'hospital-operations';
 }
 
 export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
@@ -2599,7 +2606,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     optionalParameters: ['bed_status', 'staffing', 'device_alerts', 'fleet_status', 'incident_context'],
     description:
       'Chat-assisted hospital command huddle support; no autonomous dispatch, escalation, admission, transfer, discharge, staffing, or clinical decisions',
-    category: 'fleet',
+    category: 'hospital-operations',
   },
   {
     toolId: 'resource-allocation-assistant',
@@ -2616,7 +2623,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     optionalParameters: ['available_resources', 'constraints', 'priorities', 'approval_owner'],
     description:
       'Chat-assisted resource allocation option review with human approval required; does not move resources or issue assignments',
-    category: 'fleet',
+    category: 'hospital-operations',
   },
   {
     toolId: 'device-recommendation-assistant',
@@ -2633,7 +2640,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     optionalParameters: ['device_requirements', 'availability', 'battery', 'maintenance_status', 'compatibility'],
     description:
       'Chat-assisted device requirement and availability review; does not assign clinical devices automatically',
-    category: 'fleet',
+    category: 'hospital-operations',
   },
   {
     toolId: 'route-optimizer',

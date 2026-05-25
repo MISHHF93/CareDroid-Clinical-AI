@@ -121,14 +121,18 @@ export function getNluLaunchExpectation(nluToolId) {
     NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(nluToolId) ||
     isCalculatorsHubPath(nlu.path)
   ) {
+    const registryPath = toolRegistryById[registryId]?.path;
+    const launchPath = registryPath || nlu.path;
+    const launchesFromHub =
+      NLU_HUB_ONLY_PROFILE_TOOL_IDS.includes(nluToolId) || isCalculatorsHubPath(launchPath);
     return {
       nluToolId,
       kind: 'tier-b-chat',
       registryId,
       expectsDedicatedCalculatorPath: false,
-      expectsDashboardChat: true,
+      expectsDashboardChat: launchesFromHub,
       expectsChatSeed: true,
-      allowsHubPath: true,
+      allowsHubPath: launchesFromHub,
     };
   }
 
