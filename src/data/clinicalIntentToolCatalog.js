@@ -253,6 +253,90 @@ const clinicalIntentToolsRaw = [
     backendExecutable: false,
   },
   {
+    toolId: NLU.homaIr,
+    toolName: 'HOMA-IR',
+    category: 'calculator',
+    description:
+      'HOMA-IR insulin resistance estimate from fasting glucose and fasting insulin. Does not diagnose diabetes or recommend insulin/medication changes.',
+    path: '/tools/calculators/homa-ir',
+    sidebarToolId: REGISTRY.homaIr,
+    chatSeed:
+      'Help me calculate HOMA-IR from fasting glucose and fasting insulin. Clinical decision support only; do not diagnose diabetes, insulin resistance, or metabolic syndrome, and do not recommend insulin, diabetes medication, diet, or weight-loss treatment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.correctedCalcium,
+    toolName: 'Corrected Calcium',
+    category: 'calculator',
+    description:
+      'Albumin-corrected total calcium estimate. Does not diagnose calcium disorders or recommend treatment.',
+    path: '/tools/calculators/corrected-calcium',
+    sidebarToolId: REGISTRY.correctedCalcium,
+    chatSeed:
+      'Help me calculate corrected calcium from measured total calcium and albumin. Clinical decision support only; discuss ionized calcium limitations and do not diagnose hypocalcemia or hypercalcemia, and do not recommend calcium, vitamin D, bisphosphonate, calcitonin, dialysis, or medication changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.serumOsmolality,
+    toolName: 'Serum Osmolality',
+    category: 'calculator',
+    description:
+      'Calculated serum osmolality from sodium, glucose, BUN, and optional ethanol. Does not diagnose hyperosmolar states or DKA.',
+    path: '/tools/calculators/serum-osmolality',
+    sidebarToolId: REGISTRY.serumOsmolality,
+    chatSeed:
+      'Help me calculate serum osmolality from sodium, glucose, BUN, and ethanol if available. Clinical decision support only; do not diagnose DKA, HHS, toxic ingestion, or hyperosmolar state, and do not recommend insulin, fluids, dialysis, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.bsa,
+    toolName: 'Body Surface Area',
+    category: 'calculator',
+    description:
+      'Mosteller body surface area estimate from height and weight. Does not recommend medication, chemotherapy, or fluid dosing.',
+    path: '/tools/calculators/bsa',
+    sidebarToolId: REGISTRY.bsa,
+    chatSeed:
+      'Help me calculate Mosteller body surface area from height and weight. Clinical decision support only; confirm the required formula for the protocol and do not recommend medication doses, chemotherapy doses, fluids, nutrition, or treatment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.idealBodyWeight,
+    toolName: 'Ideal Body Weight',
+    category: 'calculator',
+    description:
+      'Devine ideal body weight estimate from sex and height. Not a health target and not medication dosing automation.',
+    path: '/tools/calculators/ideal-body-weight',
+    sidebarToolId: REGISTRY.idealBodyWeight,
+    chatSeed:
+      'Help me calculate Devine ideal body weight from sex and height. Clinical decision support only; this is not a target weight and does not recommend medication dosing, nutrition targets, ventilator settings, or weight-loss treatment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.adjustedBodyWeight,
+    toolName: 'Adjusted Body Weight',
+    category: 'calculator',
+    description:
+      'Adjusted body weight estimate from actual weight, ideal body weight, and correction factor. Not dosing automation.',
+    path: '/tools/calculators/adjusted-body-weight',
+    sidebarToolId: REGISTRY.adjustedBodyWeight,
+    chatSeed:
+      'Help me calculate adjusted body weight from actual weight, height, sex, and correction factor. Clinical decision support only; do not recommend drug doses, insulin doses, nutrition prescriptions, fluid rates, or treatment plans, and defer dosing decisions to governed protocols and pharmacy/clinician review.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.waistHipRatio,
+    toolName: 'Waist-to-Hip Ratio',
+    category: 'calculator',
+    description:
+      'Waist-to-hip ratio central adiposity estimate. Does not diagnose cardiometabolic disease or recommend treatment.',
+    path: '/tools/calculators/waist-hip-ratio',
+    sidebarToolId: REGISTRY.waistHipRatio,
+    chatSeed:
+      'Help me calculate waist-to-hip ratio from waist and hip circumference. Clinical decision support only; do not diagnose metabolic syndrome, obesity-related disease, or cardiometabolic disease, and do not recommend treatment, medication, surgery, or nutrition plans.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'stop-bang',
     toolName: 'STOP-Bang (OSA screening)',
     category: 'calculator',
@@ -1034,6 +1118,114 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     backendExecutable: false,
   },
   {
+    toolId: NLU.diabetesCareAssistant,
+    toolName: 'Diabetes Care Assistant',
+    category: 'calculator',
+    description:
+      'Guided diabetes review for glucose trends, A1c context, complications, safety flags, and handoff prompts.',
+    path: '/tools/endocrine/diabetes-care-assistant',
+    sidebarToolId: REGISTRY.diabetesCareAssistant,
+    chatSeed:
+      'Help me structure a diabetes care review: glucose trend, A1c context, hypoglycemia or hyperglycemia episodes, complications, kidney function context, current regimen as documented, and missing data. Clinical decision support only; do not diagnose diabetes, do not recommend insulin or medication starts/stops/changes, do not calculate doses, and do not delay urgent hypoglycemia, DKA, or HHS pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.dkaPathwayAssistant,
+    toolName: 'DKA Pathway Assistant',
+    category: 'calculator',
+    description:
+      'DKA pathway checklist support for glucose, ketones, anion gap, bicarbonate, osmolality, severity context, and urgent handoff.',
+    path: '/tools/endocrine/dka-pathway-assistant',
+    sidebarToolId: REGISTRY.dkaPathwayAssistant,
+    chatSeed:
+      'Help me organize a DKA pathway review: glucose, ketones, anion gap, bicarbonate, pH, potassium, sodium/corrected sodium, osmolality, mental status, fluids already documented, insulin already documented, and missing data. Clinical decision support only; do not diagnose DKA/HHS, do not recommend insulin, potassium, bicarbonate, or fluid dosing/rates, and do not delay emergency endocrine/critical-care protocols.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.thyroidDisorderAssistant,
+    toolName: 'Thyroid Disorder Assistant',
+    category: 'calculator',
+    description:
+      'Guided thyroid disorder review for TSH/free T4 context, symptoms, medication/pregnancy caveats, red flags, and follow-up prompts.',
+    path: '/tools/endocrine/thyroid-disorder-assistant',
+    sidebarToolId: REGISTRY.thyroidDisorderAssistant,
+    chatSeed:
+      'Help me structure a thyroid disorder review: TSH, free T4/T3 if available, symptoms, pregnancy/postpartum status, amiodarone/lithium/biotin context, vital-sign red flags, and follow-up gaps. Clinical decision support only; do not diagnose thyroid storm, myxedema coma, hypo/hyperthyroidism, or recommend levothyroxine, antithyroid drugs, beta blockers, iodine, steroids, or medication dose changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.metabolicSyndromeAssistant,
+    toolName: 'Metabolic Syndrome Assistant',
+    category: 'calculator',
+    description:
+      'Metabolic syndrome review using waist circumference, glucose, blood pressure, triglycerides, HDL, and missing data.',
+    path: '/tools/endocrine/metabolic-syndrome-assistant',
+    sidebarToolId: REGISTRY.metabolicSyndromeAssistant,
+    chatSeed:
+      'Help me review metabolic syndrome criteria: waist circumference, fasting glucose/A1c context, blood pressure, triglycerides, HDL, medications as documented, and missing data. Clinical decision support only; do not diagnose metabolic syndrome or recommend antihypertensives, lipid therapy, diabetes medications, weight-loss medication, surgery, diet, or exercise prescriptions.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.glucoseTelemetryDashboard,
+    toolName: 'Glucose Telemetry Dashboard',
+    category: 'reference',
+    description:
+      'Backend-backed glucose telemetry dashboard for CGM/point-of-care trends, freshness, hypoglycemia flags, and human review queues.',
+    path: '/tools/endocrine/glucose-telemetry-dashboard',
+    sidebarToolId: REGISTRY.glucoseTelemetryDashboard,
+    chatSeed:
+      'Help me review glucose telemetry dashboard context: CGM or point-of-care glucose trends, hypoglycemia flags, hyperglycemia patterns, data freshness, missing readings, and unresolved review items. Clinical decision support only; backend telemetry visibility only, no autonomous insulin changes, no dose recommendations, no alerts replacing bedside assessment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.insulinTrendEngine,
+    toolName: 'Insulin Trend Engine',
+    category: 'reference',
+    description:
+      'Insulin trend review for documented insulin administration and glucose response context without dose recommendations.',
+    path: '/tools/endocrine/insulin-trend-engine',
+    sidebarToolId: REGISTRY.insulinTrendEngine,
+    chatSeed:
+      'Help me review insulin trends from documented administrations and glucose response context: timing, data gaps, hypoglycemia clusters, and protocol-governance questions. Clinical decision support only; backend trend visibility only, no insulin dosing automation, no dose calculation, no titration recommendation, and no medication change without explicitly governed protocols and clinician approval.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.endocrineMonitoringSystem,
+    toolName: 'Endocrine Monitoring System',
+    category: 'reference',
+    description:
+      'Endocrine monitoring workspace for glucose, thyroid, calcium, weight, metabolic labs, and missing-data queues.',
+    path: '/tools/endocrine/endocrine-monitoring-system',
+    sidebarToolId: REGISTRY.endocrineMonitoringSystem,
+    chatSeed:
+      'Help me review endocrine monitoring: glucose, thyroid labs, calcium, sodium/osmolality, anthropometrics, critical-value flags, missing data, and unresolved review queues. Clinical decision support only; backend monitoring visibility only, no autonomous orders, no insulin/dosing automation, and no medication or treatment recommendations.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.metabolicAnalytics,
+    toolName: 'Metabolic Analytics',
+    category: 'reference',
+    description:
+      'Metabolic analytics for anthropometrics, glucose/lipid context, metabolic syndrome factors, and review queues.',
+    path: '/tools/endocrine/metabolic-analytics',
+    sidebarToolId: REGISTRY.metabolicAnalytics,
+    chatSeed:
+      'Help me summarize metabolic analytics: BMI, BSA, waist-to-hip ratio, fasting glucose/A1c context, lipids if provided, blood pressure context, and missing data. Clinical decision support only; backend analytics visibility only, no diagnosis, no treatment plan, no medication dosing, and no diet or weight-loss prescription.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.continuousGlucoseCommandCenter,
+    toolName: 'Continuous Glucose Command Center',
+    category: 'reference',
+    description:
+      'CGM command-center view for glucose telemetry, freshness, hypoglycemia/hyperglycemia patterns, and unresolved review queues.',
+    path: '/tools/endocrine/continuous-glucose-command-center',
+    sidebarToolId: REGISTRY.continuousGlucoseCommandCenter,
+    chatSeed:
+      'Help me review continuous glucose command-center queues: CGM freshness, hypoglycemia events, sustained hyperglycemia patterns, sensor gaps, unresolved alerts, and handoff priorities. Clinical decision support and backend telemetry visibility only; no autonomous insulin changes, no dosing recommendations, no pump control, and no replacement for urgent bedside assessment.',
+    backendExecutable: false,
+  },
+  {
     toolId: romeIvIbsChatConfig.toolId,
     toolName: 'Rome IV IBS Criteria',
     category: romeIvIbsChatConfig.category,
@@ -1600,6 +1792,69 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/osmolal-gap',
     calcQuery: '/tools/calculators?calc=osmolal-gap',
     implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'homa-ir',
+    name: 'HOMA-IR',
+    description: 'Insulin resistance estimate from fasting glucose and fasting insulin.',
+    path: '/tools/calculators/homa-ir',
+    calcQuery: '/tools/calculators?calc=homa-ir',
+    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'corrected-calcium',
+    name: 'Corrected Calcium',
+    description: 'Albumin-corrected total calcium estimate.',
+    path: '/tools/calculators/corrected-calcium',
+    calcQuery: '/tools/calculators?calc=corrected-calcium',
+    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'serum-osmolality',
+    name: 'Serum Osmolality',
+    description: 'Calculated serum osmolality from sodium, glucose, BUN, and optional ethanol.',
+    path: '/tools/calculators/serum-osmolality',
+    calcQuery: '/tools/calculators?calc=serum-osmolality',
+    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'bsa',
+    name: 'Body Surface Area',
+    description: 'Mosteller body surface area estimate from height and weight.',
+    path: '/tools/calculators/bsa',
+    calcQuery: '/tools/calculators?calc=bsa',
+    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'ideal-body-weight',
+    name: 'Ideal Body Weight',
+    description: 'Devine ideal body weight estimate from sex and height.',
+    path: '/tools/calculators/ideal-body-weight',
+    calcQuery: '/tools/calculators?calc=ideal-body-weight',
+    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'adjusted-body-weight',
+    name: 'Adjusted Body Weight',
+    description: 'Adjusted body weight estimate using IBW, actual weight, and a correction factor.',
+    path: '/tools/calculators/adjusted-body-weight',
+    calcQuery: '/tools/calculators?calc=adjusted-body-weight',
+    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'waist-hip-ratio',
+    name: 'Waist-to-Hip Ratio',
+    description: 'Central adiposity estimate from waist and hip circumference.',
+    path: '/tools/calculators/waist-hip-ratio',
+    calcQuery: '/tools/calculators?calc=waist-hip-ratio',
+    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
     orchestratorId: null,
   },
   {

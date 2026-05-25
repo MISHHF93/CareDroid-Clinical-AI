@@ -84,6 +84,7 @@ const CalculatorRecommender = lazyWithRetry(() => import('./pages/tools/Calculat
 const PulmonologyAssistantPage = lazyWithRetry(() => import('./pages/tools/PulmonologyAssistantPage'));
 const NephrologyAssistantPage = lazyWithRetry(() => import('./pages/tools/NephrologyAssistantPage'));
 const GastroenterologyAssistantPage = lazyWithRetry(() => import('./pages/tools/GastroenterologyAssistantPage'));
+const EndocrineMetabolicAssistantPage = lazyWithRetry(() => import('./pages/tools/EndocrineMetabolicAssistantPage'));
 const GuidelineRag = lazyWithRetry(() => import('./pages/tools/GuidelineRag'));
 const DifferentialAi = lazyWithRetry(() => import('./pages/tools/DifferentialAi'));
 const TimelineAi = lazyWithRetry(() => import('./pages/tools/TimelineAi'));
@@ -686,6 +687,15 @@ function AppRoutes() {
       element: (
         <AppShellPage>
           <GastroenterologyAssistantPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/endocrine/:toolId',
+      element: (
+        <AppShellPage>
+          <EndocrineMetabolicAssistantPage />
         </AppShellPage>
       ),
       requiresAuth: true,

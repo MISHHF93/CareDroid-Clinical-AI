@@ -59,6 +59,18 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     toolIds: ['aki-staging-assistant', 'dialysis-readiness-helper', 'electrolyte-disorder-assistant'],
   },
   {
+    groupId: 'endocrine-metabolic-assistants',
+    heading: 'Endocrine and metabolic workflow assistants',
+    lead:
+      'Diabetes, DKA, thyroid, and metabolic syndrome assistants organize review, missing data, and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend insulin or other medication dosing, and must not delay urgent hypoglycemia, DKA, HHS, thyroid storm, myxedema, or electrolyte pathways.',
+    toolIds: [
+      'diabetes-care-assistant',
+      'dka-pathway-assistant',
+      'thyroid-disorder-assistant',
+      'metabolic-syndrome-assistant',
+    ],
+  },
+  {
     groupId: 'gastrointestinal',
     heading: 'Rome IV IBS criteria',
     lead:
@@ -125,6 +137,10 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'aki-staging-assistant': 'Rapidly worsening kidney function, oliguria, or unstable patients need urgent review before chat.',
   'dialysis-readiness-helper': 'Life-threatening electrolyte, toxin, overload, or uremic concerns need urgent local pathways before chat.',
   'electrolyte-disorder-assistant': 'Severe or symptomatic electrolyte abnormalities need urgent review before chat.',
+  'diabetes-care-assistant': 'Hypoglycemia, DKA, HHS, or unstable patients need urgent local pathways before chat.',
+  'dka-pathway-assistant': 'Suspected DKA or HHS requires urgent local emergency/endocrine pathways before chat.',
+  'thyroid-disorder-assistant': 'Thyroid storm, myxedema coma, pregnancy concerns, or unstable patients need urgent review before chat.',
+  'metabolic-syndrome-assistant': 'This is risk-factor review only and does not diagnose metabolic syndrome.',
   'rome-iv-ibs': 'Alarm features and urgent gastrointestinal evaluation take priority over criteria chat.',
   'gi-bleed-workflow-assistant': 'Hemodynamic instability or active GI bleeding needs urgent local pathways before chat.',
   'liver-disease-assistant': 'Acute liver failure, severe encephalopathy, shock, or bleeding needs urgent local pathways before chat.',

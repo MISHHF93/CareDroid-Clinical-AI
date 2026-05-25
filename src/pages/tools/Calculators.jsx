@@ -113,6 +113,15 @@ import {
   KfreCalculator,
   OsmolalGapCalculator,
 } from './nephrologyCalculators';
+import {
+  AdjustedBodyWeightCalculator,
+  BsaCalculator,
+  CorrectedCalciumCalculator,
+  HomaIrCalculator,
+  IdealBodyWeightCalculator,
+  SerumOsmolalityCalculator,
+  WaistHipRatioCalculator,
+} from './endocrineMetabolicCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -511,6 +520,20 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <FreeWaterDeficitCalculator onResultChange={onResultChange} />;
     case 'osmolal-gap':
       return <OsmolalGapCalculator onResultChange={onResultChange} />;
+    case 'homa-ir':
+      return <HomaIrCalculator onResultChange={onResultChange} />;
+    case 'corrected-calcium':
+      return <CorrectedCalciumCalculator onResultChange={onResultChange} />;
+    case 'serum-osmolality':
+      return <SerumOsmolalityCalculator onResultChange={onResultChange} />;
+    case 'bsa':
+      return <BsaCalculator onResultChange={onResultChange} />;
+    case 'ideal-body-weight':
+      return <IdealBodyWeightCalculator onResultChange={onResultChange} />;
+    case 'adjusted-body-weight':
+      return <AdjustedBodyWeightCalculator onResultChange={onResultChange} />;
+    case 'waist-hip-ratio':
+      return <WaistHipRatioCalculator onResultChange={onResultChange} />;
     case 'gfr':
       return <GFRCalculator onResultChange={onResultChange} />;
     case 'bmi':

@@ -230,7 +230,11 @@ function launchFromInventoryRecord(record) {
           : 'Try in chat';
 
   return {
-    path: record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED ? CALCULATORS_HUB_PATH : record.route,
+    path:
+      record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED &&
+      (!record.route || isCalculatorsHubPath(record.route))
+        ? CALCULATORS_HUB_PATH
+        : record.route,
     registryId: record.sidebarVisible ? record.id : record.id || null,
     chatSeed,
     orchestratorTool: record.orchestratorToolId || null,
