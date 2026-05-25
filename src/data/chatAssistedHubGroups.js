@@ -52,6 +52,13 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     ],
   },
   {
+    groupId: 'nephrology-assistants',
+    heading: 'Nephrology workflow assistants',
+    lead:
+      'AKI staging, dialysis readiness, and electrolyte assistants organize renal review and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend fluids, dialysis, electrolyte replacement, correction rates, or medication dosing, and must not delay urgent AKI, electrolyte, toxicology, or critical-care pathways.',
+    toolIds: ['aki-staging-assistant', 'dialysis-readiness-helper', 'electrolyte-disorder-assistant'],
+  },
+  {
     groupId: 'gastrointestinal',
     heading: 'Rome IV IBS criteria',
     lead:
@@ -104,6 +111,9 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'ventilator-support-assistant': 'Bedside clinician and respiratory therapy review take priority over chat.',
   'oxygen-escalation-helper': 'Severe hypoxemia or respiratory distress takes priority over chat.',
   'copd-workflow-assistant': 'Acute COPD exacerbation or respiratory failure takes priority over chat.',
+  'aki-staging-assistant': 'Rapidly worsening kidney function, oliguria, or unstable patients need urgent review before chat.',
+  'dialysis-readiness-helper': 'Life-threatening electrolyte, toxin, overload, or uremic concerns need urgent local pathways before chat.',
+  'electrolyte-disorder-assistant': 'Severe or symptomatic electrolyte abnormalities need urgent review before chat.',
   'rome-iv-ibs': 'Alarm features and urgent gastrointestinal evaluation take priority over criteria chat.',
   phq9: 'Question 9 self-harm or suicidal ideation requires immediate safety assessment before routine scoring.',
   gad7: 'Suicidal ideation or acute psychiatric emergency takes priority over anxiety screening chat.',

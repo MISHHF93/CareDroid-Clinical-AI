@@ -62,6 +62,8 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
         expect(CALCULATOR_ROUTE_DEFS.some((d) => d.path === path)).toBe(true);
       } else if (path.startsWith('/tools/pulmonology/')) {
         expect(appSource).toContain(`path: '/tools/pulmonology/:toolId'`);
+      } else if (path.startsWith('/tools/nephrology/')) {
+        expect(appSource).toContain(`path: '/tools/nephrology/:toolId'`);
       } else {
         expect(appSource).toContain(`path: '${path}'`);
       }

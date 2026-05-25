@@ -145,6 +145,114 @@ const clinicalIntentToolsRaw = [
     backendExecutable: false,
   },
   {
+    toolId: NLU.egfrCkdEpi,
+    toolName: 'eGFR CKD-EPI 2021',
+    category: 'calculator',
+    description:
+      'Race-free CKD-EPI 2021 creatinine eGFR estimate. Does not diagnose AKI/CKD or automate renal medication dosing.',
+    path: '/tools/calculators/egfr-ckd-epi',
+    sidebarToolId: REGISTRY.egfrCkdEpi,
+    chatSeed:
+      'Help me estimate eGFR using CKD-EPI 2021 from age, sex, and serum creatinine. Clinical decision support only; do not diagnose AKI or CKD, do not determine chronicity, and do not recommend medication dosing adjustments.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.creatinineClearanceCg,
+    toolName: 'Creatinine Clearance Cockcroft-Gault',
+    category: 'calculator',
+    description:
+      'Cockcroft-Gault creatinine clearance estimate using age, sex, weight, and creatinine. Not medication dosing automation.',
+    path: '/tools/calculators/creatinine-clearance-cg',
+    sidebarToolId: REGISTRY.creatinineClearanceCg,
+    chatSeed:
+      'Help me estimate Cockcroft-Gault creatinine clearance from age, sex, selected weight, and serum creatinine. Clinical decision support only; explain weight selection caveats and do not recommend drug doses, dose intervals, renal adjustments, or medication changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.fena,
+    toolName: 'FeNa',
+    category: 'calculator',
+    description:
+      'Fractional excretion of sodium urine electrolyte pattern support for selected AKI contexts. Does not diagnose AKI etiology.',
+    path: '/tools/calculators/fena',
+    sidebarToolId: REGISTRY.fena,
+    chatSeed:
+      'Help me calculate FeNa from serum sodium, urine sodium, serum creatinine, and urine creatinine. Clinical decision support only; discuss limitations with diuretics, CKD, sepsis, contrast, and non-oliguric states, and do not recommend fluids, diuretics, or dialysis.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.feurea,
+    toolName: 'FeUrea',
+    category: 'calculator',
+    description:
+      'Fractional excretion of urea urine electrolyte pattern support, often considered when diuretics limit FeNa.',
+    path: '/tools/calculators/feurea',
+    sidebarToolId: REGISTRY.feurea,
+    chatSeed:
+      'Help me calculate FeUrea from BUN, urine urea nitrogen, serum creatinine, and urine creatinine. Clinical decision support only; discuss limitations and do not diagnose AKI etiology or recommend fluids, diuretics, or dialysis.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.kfre,
+    toolName: 'Kidney Failure Risk Equation',
+    category: 'calculator',
+    description:
+      'Four-variable KFRE 2-year and 5-year kidney failure risk context from age, sex, eGFR, and ACR.',
+    path: '/tools/calculators/kfre',
+    sidebarToolId: REGISTRY.kfre,
+    chatSeed:
+      'Help me estimate kidney failure risk with the four-variable KFRE from age, sex, eGFR, and urine ACR. Clinical decision support only; do not diagnose CKD, determine transplant referral, or recommend dialysis initiation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.bunCreatinineRatio,
+    toolName: 'BUN/Creatinine Ratio',
+    category: 'calculator',
+    description:
+      'BUN/creatinine ratio pattern support for renal and volume-status review. Nonspecific and non-diagnostic.',
+    path: '/tools/calculators/bun-creatinine-ratio',
+    sidebarToolId: REGISTRY.bunCreatinineRatio,
+    chatSeed:
+      'Help me calculate and interpret the BUN/creatinine ratio as nonspecific pattern support. Clinical decision support only; do not diagnose prerenal azotemia or recommend fluids, diuretics, or dialysis.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.correctedSodium,
+    toolName: 'Corrected Sodium',
+    category: 'calculator',
+    description:
+      'Corrected sodium estimate for hyperglycemia context. Does not recommend sodium correction strategy.',
+    path: '/tools/calculators/corrected-sodium',
+    sidebarToolId: REGISTRY.correctedSodium,
+    chatSeed:
+      'Help me calculate corrected sodium from measured sodium and glucose. Clinical decision support only; do not recommend hypertonic saline, insulin, free water, sodium correction rate, or monitoring frequency.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.freeWaterDeficit,
+    toolName: 'Free Water Deficit',
+    category: 'calculator',
+    description:
+      'Free water deficit estimate from sodium, weight, and total body water factor. Does not prescribe fluids.',
+    path: '/tools/calculators/free-water-deficit',
+    sidebarToolId: REGISTRY.freeWaterDeficit,
+    chatSeed:
+      'Help me estimate free water deficit from sodium, weight, TBW factor, and target sodium. Clinical decision support only; do not prescribe IV fluids, enteral water, correction rates, or monitoring intervals.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.osmolalGap,
+    toolName: 'Osmolal Gap',
+    category: 'calculator',
+    description:
+      'Osmolal gap calculation from measured osmolality, sodium, glucose, BUN, and optional ethanol. Toxicology context only.',
+    path: '/tools/calculators/osmolal-gap',
+    sidebarToolId: REGISTRY.osmolalGap,
+    chatSeed:
+      'Help me calculate the osmolal gap from measured osmolality, sodium, glucose, BUN, and ethanol if available. Clinical decision support only; do not diagnose toxic alcohol ingestion or recommend antidotes, dialysis, or disposition.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'stop-bang',
     toolName: 'STOP-Bang (OSA screening)',
     category: 'calculator',
@@ -782,6 +890,102 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     backendExecutable: false,
   },
   {
+    toolId: NLU.akiStagingAssistant,
+    toolName: 'AKI Staging Assistant',
+    category: 'calculator',
+    description:
+      'Guided AKI staging support using KDIGO creatinine and urine output context. Does not diagnose etiology or recommend therapy.',
+    path: '/tools/nephrology/aki-staging-assistant',
+    sidebarToolId: REGISTRY.akiStagingAssistant,
+    chatSeed:
+      'Help me structure AKI staging using baseline creatinine, current creatinine, timing, urine output context, and missing data. Clinical decision support only; do not diagnose AKI etiology and do not recommend fluids, diuretics, nephrotoxins to stop, dialysis, disposition, or medication dosing changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.dialysisReadinessHelper,
+    toolName: 'Dialysis Readiness Helper',
+    category: 'reference',
+    description:
+      'Dialysis readiness checklist support for access status, symptoms, labs, volume context, and nephrology handoff.',
+    path: '/tools/nephrology/dialysis-readiness-helper',
+    sidebarToolId: REGISTRY.dialysisReadinessHelper,
+    chatSeed:
+      'Help me organize dialysis readiness information: symptoms, volume context, potassium, acid-base status, uremic features, access status, current modality if any, and nephrology handoff questions. Clinical decision support only; do not initiate dialysis, set a dialysis prescription, recommend ultrafiltration, or determine disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.electrolyteDisorderAssistant,
+    toolName: 'Electrolyte Disorder Assistant',
+    category: 'calculator',
+    description:
+      'Guided electrolyte disorder review for sodium, potassium, bicarbonate, osmolality, kidney function, and safety flags.',
+    path: '/tools/nephrology/electrolyte-disorder-assistant',
+    sidebarToolId: REGISTRY.electrolyteDisorderAssistant,
+    chatSeed:
+      'Help me review an electrolyte disorder: sodium, potassium, bicarbonate, chloride, glucose, osmolality, kidney function, symptoms, ECG concern if relevant, and missing labs. Clinical decision support only; do not recommend electrolyte replacement doses, hypertonic saline, insulin, bicarbonate, binders, correction rates, or medication dosing changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.renalMonitoringDashboard,
+    toolName: 'Renal Monitoring Dashboard',
+    category: 'reference',
+    description:
+      'Renal monitoring dashboard for creatinine, eGFR, urine output, electrolyte, acid-base, and missing-data review queues.',
+    path: '/tools/nephrology/renal-monitoring-dashboard',
+    sidebarToolId: REGISTRY.renalMonitoringDashboard,
+    chatSeed:
+      'Help me review a renal monitoring dashboard summary: creatinine/eGFR trends, urine output, electrolytes, acid-base markers, nephrotoxin exposure context if provided, missing data, and unresolved review items. Clinical decision support only; no automated orders, medication dosing, dialysis decisions, or disposition recommendations.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.ckdProgressionPredictor,
+    toolName: 'CKD Progression Predictor',
+    category: 'reference',
+    description:
+      'CKD progression workspace for eGFR slope, albuminuria, KFRE context, and longitudinal review prompts.',
+    path: '/tools/nephrology/ckd-progression-predictor',
+    sidebarToolId: REGISTRY.ckdProgressionPredictor,
+    chatSeed:
+      'Help me summarize CKD progression context: eGFR slope, albuminuria, KFRE inputs if available, blood pressure context, comorbidities, and missing follow-up data. Clinical decision support only; do not diagnose CKD chronicity, recommend medications, determine referral urgency, transplant referral, or dialysis initiation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.dialysisUtilizationTracker,
+    toolName: 'Dialysis Utilization Tracker',
+    category: 'reference',
+    description:
+      'Dialysis utilization tracker for schedule adherence, access context, missed treatments, capacity, and review queues.',
+    path: '/tools/nephrology/dialysis-utilization-tracker',
+    sidebarToolId: REGISTRY.dialysisUtilizationTracker,
+    chatSeed:
+      'Help me review dialysis utilization: scheduled vs completed treatments, missed treatments, access issues, capacity bottlenecks, symptoms reported, and unresolved review queues. Clinical decision support and operations visibility only; do not change dialysis prescriptions, ultrafiltration goals, modality, or scheduling without dialysis team approval.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.electrolyteTrendEngine,
+    toolName: 'Electrolyte Trend Engine',
+    category: 'reference',
+    description:
+      'Electrolyte trend engine for sodium, potassium, bicarbonate, chloride, osmolality, and serial lab context.',
+    path: '/tools/nephrology/electrolyte-trend-engine',
+    sidebarToolId: REGISTRY.electrolyteTrendEngine,
+    chatSeed:
+      'Help me summarize electrolyte trends: sodium, potassium, chloride, bicarbonate, osmolality, glucose, kidney function, timing, symptoms, and missing data. Clinical decision support only; do not recommend replacement doses, correction rates, binders, insulin, bicarbonate, dialysis, or medication changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.fluidBalanceMonitor,
+    toolName: 'Fluid Balance Monitor',
+    category: 'reference',
+    description:
+      'Fluid balance monitor for intake/output, weight change, urine output, volume context, and handoff prompts.',
+    path: '/tools/nephrology/fluid-balance-monitor',
+    sidebarToolId: REGISTRY.fluidBalanceMonitor,
+    chatSeed:
+      'Help me review fluid balance: intake, output, urine output, weight change, edema or overload context, hemodynamics, kidney function, and missing data. Clinical decision support only; do not prescribe fluids, diuretics, ultrafiltration, dialysis, or monitoring frequency.',
+    backendExecutable: false,
+  },
+  {
     toolId: romeIvIbsChatConfig.toolId,
     toolName: 'Rome IV IBS Criteria',
     category: romeIvIbsChatConfig.category,
@@ -1171,6 +1375,87 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/ckd-staging',
     calcQuery: '/tools/calculators?calc=ckd-staging',
     implementation: 'Client-side in Calculators.jsx (ckdStagingCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'egfr-ckd-epi',
+    name: 'eGFR CKD-EPI 2021',
+    description: 'Race-free CKD-EPI creatinine eGFR estimate.',
+    path: '/tools/calculators/egfr-ckd-epi',
+    calcQuery: '/tools/calculators?calc=egfr-ckd-epi',
+    implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'creatinine-clearance-cg',
+    name: 'Creatinine Clearance Cockcroft-Gault',
+    description: 'Creatinine clearance estimate from age, sex, weight, and serum creatinine.',
+    path: '/tools/calculators/creatinine-clearance-cg',
+    calcQuery: '/tools/calculators?calc=creatinine-clearance-cg',
+    implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'fena',
+    name: 'FeNa',
+    description: 'Fractional excretion of sodium from serum and urine sodium/creatinine.',
+    path: '/tools/calculators/fena',
+    calcQuery: '/tools/calculators?calc=fena',
+    implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'feurea',
+    name: 'FeUrea',
+    description: 'Fractional excretion of urea from BUN, urine urea nitrogen, and creatinine values.',
+    path: '/tools/calculators/feurea',
+    calcQuery: '/tools/calculators?calc=feurea',
+    implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'kfre',
+    name: 'Kidney Failure Risk Equation',
+    description: 'Four-variable KFRE 2-year and 5-year kidney failure risk context.',
+    path: '/tools/calculators/kfre',
+    calcQuery: '/tools/calculators?calc=kfre',
+    implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'bun-creatinine-ratio',
+    name: 'BUN/Creatinine Ratio',
+    description: 'BUN/creatinine ratio pattern support.',
+    path: '/tools/calculators/bun-creatinine-ratio',
+    calcQuery: '/tools/calculators?calc=bun-creatinine-ratio',
+    implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'corrected-sodium',
+    name: 'Corrected Sodium',
+    description: 'Sodium correction for hyperglycemia context.',
+    path: '/tools/calculators/corrected-sodium',
+    calcQuery: '/tools/calculators?calc=corrected-sodium',
+    implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'free-water-deficit',
+    name: 'Free Water Deficit',
+    description: 'Estimated free water deficit from sodium, weight, TBW factor, and target sodium.',
+    path: '/tools/calculators/free-water-deficit',
+    calcQuery: '/tools/calculators?calc=free-water-deficit',
+    implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'osmolal-gap',
+    name: 'Osmolal Gap',
+    description: 'Measured vs calculated serum osmolality gap with optional ethanol.',
+    path: '/tools/calculators/osmolal-gap',
+    calcQuery: '/tools/calculators?calc=osmolal-gap',
+    implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
     orchestratorId: null,
   },
   {

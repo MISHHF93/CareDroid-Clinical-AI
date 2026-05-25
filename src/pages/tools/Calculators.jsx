@@ -12,6 +12,7 @@ import {
   qsofaCriteriaFromInputs,
   validateQsofaInputs,
 } from '../../utils/qsofaCalculator';
+import { computeEgfrCkdEpi2021 } from '../../utils/nephrologyCalculators';
 import {
   computeNews2Breakdown,
   interpretNews2Risk,
@@ -95,6 +96,17 @@ import {
   PneumoniaSeverityIndexCalculator,
   RoxIndexCalculator,
 } from './pulmonologyCalculators';
+import {
+  BunCreatinineRatioCalculator,
+  CorrectedSodiumCalculator,
+  CreatinineClearanceCgCalculator,
+  EgfrCkdEpiCalculator,
+  FeNaCalculator,
+  FeUreaCalculator,
+  FreeWaterDeficitCalculator,
+  KfreCalculator,
+  OsmolalGapCalculator,
+} from './nephrologyCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -475,6 +487,24 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <MeldCalculator mode="meld-na" onResultChange={onResultChange} />;
     case 'timi-ua-nstemi':
       return <TimiUaNstemiCalculator onResultChange={onResultChange} />;
+    case 'egfr-ckd-epi':
+      return <EgfrCkdEpiCalculator onResultChange={onResultChange} />;
+    case 'creatinine-clearance-cg':
+      return <CreatinineClearanceCgCalculator onResultChange={onResultChange} />;
+    case 'fena':
+      return <FeNaCalculator onResultChange={onResultChange} />;
+    case 'feurea':
+      return <FeUreaCalculator onResultChange={onResultChange} />;
+    case 'kfre':
+      return <KfreCalculator onResultChange={onResultChange} />;
+    case 'bun-creatinine-ratio':
+      return <BunCreatinineRatioCalculator onResultChange={onResultChange} />;
+    case 'corrected-sodium':
+      return <CorrectedSodiumCalculator onResultChange={onResultChange} />;
+    case 'free-water-deficit':
+      return <FreeWaterDeficitCalculator onResultChange={onResultChange} />;
+    case 'osmolal-gap':
+      return <OsmolalGapCalculator onResultChange={onResultChange} />;
     case 'gfr':
       return <GFRCalculator onResultChange={onResultChange} />;
     case 'bmi':
@@ -2776,14 +2806,13 @@ const SOFACalculator = ({ onResultChange }) => {
 };
 
 /**
- * GFR Calculator (simplified version - can be expanded)
+ * Legacy eGFR route kept for deep links; uses race-free CKD-EPI 2021.
  */
 const GFRCalculator = ({ onResultChange }) => {
   const [inputs, setInputs] = useState({
     age: '',
     sex: '',
     creatinine: '',
-    race: '',
   });
   const [result, setResult] = useState(null);
 
@@ -2794,57 +2823,32 @@ const GFRCalculator = ({ onResultChange }) => {
   }, [onResultChange, result]);
 
   const calculateGFR = () => {
-    const { age, sex, creatinine, race } = inputs;
-    
+    const { age, sex, creatinine } = inputs;
+
     if (!age || !sex || !creatinine) {
       alert('Please fill in all required fields');
       return;
     }
 
-    // CKD-EPI formula (simplified)
-    const kappa = sex === 'female' ? 0.7 : 0.9;
-    const alpha = sex === 'female' ? -0.329 : -0.411;
-    const minCrKappa = Math.min(parseFloat(creatinine) / kappa, 1);
-    const maxCrKappa = Math.max(parseFloat(creatinine) / kappa, 1);
-    
-    let gfr = 141 * Math.pow(minCrKappa, alpha) * Math.pow(maxCrKappa, -1.209) * Math.pow(0.993, parseFloat(age));
-    
-    if (sex === 'female') gfr *= 1.018;
-    if (race === 'black') gfr *= 1.159;
-
-    gfr = Math.round(gfr);
-
-    let stage = '';
-    let interpretation = '';
-    let severity = 'normal';
-
-    if (gfr >= 90) {
-      stage = 'G1';
-      interpretation = 'Normal or high kidney function';
-      severity = 'normal';
-    } else if (gfr >= 60) {
-      stage = 'G2';
-      interpretation = 'Mildly decreased kidney function';
-      severity = 'normal';
-    } else if (gfr >= 45) {
-      stage = 'G3a';
-      interpretation = 'Mild to moderate decrease in kidney function';
-      severity = 'warning';
-    } else if (gfr >= 30) {
-      stage = 'G3b';
-      interpretation = 'Moderate to severe decrease in kidney function';
-      severity = 'warning';
-    } else if (gfr >= 15) {
-      stage = 'G4';
-      interpretation = 'Severe decrease in kidney function';
-      severity = 'critical';
-    } else {
-      stage = 'G5';
-      interpretation = 'Kidney failure - dialysis or transplant may be needed';
-      severity = 'critical';
+    const computed = computeEgfrCkdEpi2021({
+      ageYears: age,
+      sex,
+      serumCreatinine: creatinine,
+      creatinineUnit: 'mg_dl',
+    });
+    if (!computed.ok) {
+      alert(computed.errors.join('\n'));
+      return;
     }
 
-    setResult({ gfr, stage, interpretation, severity });
+    setResult({
+      gfr: computed.egfrMlMin173,
+      stage: computed.gfrCategory,
+      interpretation: computed.interpretation,
+      severity: computed.severity,
+      referenceLine: computed.referenceLine,
+      disclaimer: computed.disclaimer,
+    });
   };
 
   return (
@@ -2890,19 +2894,6 @@ const GFRCalculator = ({ onResultChange }) => {
           />
         </div>
 
-        <div className="calc-input-group">
-          <label className="calc-input-label">Race (optional)</label>
-          <select
-            className="calc-select-field"
-            value={inputs.race}
-            onChange={(e) => setInputs({ ...inputs, race: e.target.value })}
-          >
-            <option value="">Select...</option>
-            <option value="black">Black/African American</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-
         <div className="calc-actions">
           <button
             type="button"
@@ -2914,7 +2905,7 @@ const GFRCalculator = ({ onResultChange }) => {
           </button>
           <button
             className="calc-reset-btn"
-            onClick={() => { setInputs({ age: '', sex: '', creatinine: '', race: '' }); setResult(null); }}
+            onClick={() => { setInputs({ age: '', sex: '', creatinine: '' }); setResult(null); }}
           >
             Reset
           </button>
@@ -2940,12 +2931,13 @@ const GFRCalculator = ({ onResultChange }) => {
             <div className={`calc-interpretation-box ${result.severity}`}>
               <div className="calc-interpretation-title">Interpretation</div>
               <div className="calc-interpretation-text">{result.interpretation}</div>
+              <div className="calc-interpretation-text">{result.disclaimer}</div>
             </div>
 
             <div className="calc-references">
               <div className="calc-references-title">Reference</div>
               <ul className="calc-references-list">
-                <li>Levey AS, et al. A new equation to estimate glomerular filtration rate. Ann Intern Med. 2009;150(9):604-612.</li>
+                <li>{result.referenceLine}</li>
               </ul>
             </div>
             <CalcResultSafetyFooter />
