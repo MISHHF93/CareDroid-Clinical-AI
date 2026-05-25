@@ -16,6 +16,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'live-map', path: '/live-map', match: 'heading', heading: /^live tracking map$/i },
   { id: 'hospital-map', path: '/hospital-map', match: 'heading', heading: /^hospital map$/i },
   { id: 'medical-iot', path: '/medical-iot', match: 'heading', heading: /medical iot dashboard/i },
+  { id: 'devices', path: '/devices', match: 'heading', heading: /device fleet management/i },
   { id: 'tools-catalog', path: '/tools/catalog', match: 'heading', heading: /developer catalog \/ source audit/i },
   { id: 'calculators-hub', path: '/tools/calculators', match: 'heading', heading: /medical calculators/i },
   {

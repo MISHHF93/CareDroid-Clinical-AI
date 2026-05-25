@@ -53,7 +53,7 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Ops',
     path: '/operations',
     legacyPaths: ['/fleet'],
-    matchPaths: ['/operations', '/fleet', '/live-map', '/clinical/alerts', '/analytics', '/costs', '/audit-logs'],
+    matchPaths: ['/operations', '/fleet', '/devices', '/live-map', '/clinical/alerts', '/analytics', '/costs', '/audit-logs'],
     matchPrefixes: ['/fleet/'],
   },
   {

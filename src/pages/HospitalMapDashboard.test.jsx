@@ -47,6 +47,7 @@ describe('HospitalMapDashboard', () => {
     expect(await screen.findByRole('heading', { level: 1, name: /^hospital map$/i })).toBeInTheDocument();
     expect(screen.getByText(/demo hospital map telemetry/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /hospital floor plan/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Bed 12A/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /device fleet management/i })).toBeInTheDocument();
   });
 

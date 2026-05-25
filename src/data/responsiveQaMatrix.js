@@ -321,6 +321,13 @@ export function buildResponsiveQaPages() {
       registryId: REGISTRY.hospitalMap,
     },
     {
+      id: 'devices',
+      label: 'Device Fleet Management',
+      path: '/devices',
+      category: 'core',
+      registryId: REGISTRY.deviceFleetManagement,
+    },
+    {
       id: 'tools-catalog',
       label: 'Developer Catalog / Source Audit',
       path: '/tools/catalog',

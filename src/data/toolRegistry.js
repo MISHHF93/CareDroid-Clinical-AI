@@ -2223,7 +2223,7 @@ const toolRegistry = [
   {
     id: 'device-fleet-management',
     name: 'Device Fleet Management',
-    path: '/hospital-map',
+    path: '/devices',
     color: '#0891B2',
     description:
       'Medical device fleet inventory, assignment, maintenance, calibration, firmware, battery, location, and utilization review',
@@ -2269,7 +2269,7 @@ const toolRegistry = [
   {
     id: 'device-maintenance',
     name: 'Device Maintenance',
-    path: '/hospital-map',
+    path: '/devices',
     color: '#B45309',
     description:
       'Device maintenance and calibration queue for overdue service, due-soon maintenance, and blocked clinical-use review',

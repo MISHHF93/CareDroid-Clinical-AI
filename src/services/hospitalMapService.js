@@ -35,9 +35,9 @@ export function formatHospitalMapTime(value) {
 }
 
 export function getDeviceStatusTone(status) {
-  if (['online', 'fresh', 'ok', 'available'].includes(status)) return 'good';
+  if (['online', 'fresh', 'ok', 'available', 'normal'].includes(status)) return 'good';
   if (['warning', 'stale', 'due-soon', 'maintenance'].includes(status)) return 'warning';
-  if (['offline', 'overdue', 'critical'].includes(status)) return 'critical';
+  if (['offline', 'overdue', 'critical', 'abnormal'].includes(status)) return 'critical';
   return 'neutral';
 }
 

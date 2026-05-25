@@ -27,6 +27,7 @@ import Operations from '../pages/Operations';
 import LiveTrackingMap from '../pages/LiveTrackingMap';
 import HospitalMapDashboard from '../pages/HospitalMapDashboard';
 import MedicalIotDashboard from '../pages/MedicalIotDashboard';
+import DeviceFleetManagement from '../pages/DeviceFleetManagement';
 import FleetLiveMap from '../pages/fleet/FleetLiveMap';
 import { CORE_ROUTE_SMOKE, TIER_A_FORM_SMOKE_SLUGS } from './responsiveRegression.routes';
 
@@ -113,6 +114,7 @@ const PAGE_BY_ID = {
   'live-map': LiveTrackingMap,
   'hospital-map': HospitalMapDashboard,
   'medical-iot': MedicalIotDashboard,
+  devices: DeviceFleetManagement,
   'tools-overview': ToolsOverview,
   'tools-catalog': ClinicalToolCatalog,
   'calculators-hub': Calculators,
@@ -144,6 +146,7 @@ const THEME_ROUTE_SMOKE_IDS = new Set([
   'calculators-hub',
   'tools-catalog',
   'medical-iot',
+  'devices',
   'fleet-command',
   'hospital-map',
 ]);

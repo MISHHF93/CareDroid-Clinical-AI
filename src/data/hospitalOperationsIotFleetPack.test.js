@@ -91,7 +91,7 @@ describe('Hospital Operations, Medical IoT, and Fleet Tools Pack', () => {
       const nav = getRegistryToolNavigation(id);
 
       expect(visibleIds, id).toContain(id);
-      expect(registry?.path, id).toMatch(/^\/(hospital-map|medical-iot|fleet\/)/);
+      expect(registry?.path, id).toMatch(/^\/(hospital-map|medical-iot|devices|fleet\/)/);
       expect(launch.path, id).toBe(registry?.path);
       expect(nav.mode, id).toBe('tool-page');
       expect(nav.pathname, id).toBe(registry?.path);

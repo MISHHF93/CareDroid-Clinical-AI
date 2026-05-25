@@ -57,6 +57,7 @@ export interface HospitalOperationsMapContract {
   launchPath:
     | '/hospital-map'
     | '/medical-iot'
+    | '/devices'
     | '/fleet/map'
     | '/fleet/predictive-maintenance'
     | '/fleet/route-optimizer';

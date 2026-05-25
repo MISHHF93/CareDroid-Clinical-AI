@@ -47,6 +47,7 @@ const Operations = lazyWithRetry(() => import('./pages/Operations'));
 const LiveTrackingMap = lazyWithRetry(() => import('./pages/LiveTrackingMap'));
 const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
 const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
+const DeviceFleetManagement = lazyWithRetry(() => import('./pages/DeviceFleetManagement'));
 const PlatformSystemPage = lazyWithRetry(() => import('./pages/platform/PlatformSystemPage'));
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
@@ -720,6 +721,16 @@ function AppRoutes() {
       element: (
         <AppShellPage>
           <HospitalMapDashboard />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
+    },
+    {
+      path: '/devices',
+      element: (
+        <AppShellPage>
+          <DeviceFleetManagement />
         </AppShellPage>
       ),
       requiresAuth: true,
