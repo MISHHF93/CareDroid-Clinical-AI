@@ -44,6 +44,18 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     ],
   },
   {
+    groupId: 'psychiatry-screening-assistants',
+    heading: 'Psychiatry and screening workflows',
+    lead:
+      'Mental health screening, suicide-risk workflow, substance-use screening, and cognitive screening assistants organize review prompts. They are screening decision support only, do not diagnose, do not recommend medications or therapy, require human review, and must not delay psychiatric emergency, intoxication, withdrawal, delirium, or medical emergency pathways.',
+    toolIds: [
+      'mental-health-screening-assistant',
+      'suicide-risk-workflow-assistant',
+      'substance-use-screening-assistant',
+      'cognitive-screening-assistant',
+    ],
+  },
+  {
     groupId: 'trauma',
     heading: 'Trauma imaging decision support',
     lead:
@@ -181,6 +193,14 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'pancreatitis-workflow-assistant': 'Shock, organ failure, sepsis, or severe pancreatitis concern needs urgent local pathways before chat.',
   phq9: 'Question 9 self-harm or suicidal ideation requires immediate safety assessment before routine scoring.',
   gad7: 'Suicidal ideation or acute psychiatric emergency takes priority over anxiety screening chat.',
+  cage: 'Intoxication, withdrawal, co-ingestion, or immediate safety concerns take priority over alcohol screening.',
+  pcl5: 'Self-harm, suicidal ideation, acute danger, or severe dissociation takes priority over trauma symptom scoring.',
+  mdq: 'Psychosis, unsafe behavior, suicidal ideation, or acute mania concerns need urgent human review before chat.',
+  'columbia-suicide-severity-workflow': 'Any suicide-risk disclosure requires immediate safety assessment and direct human review.',
+  'mental-health-screening-assistant': 'Suicidal ideation, self-harm, psychosis, violence risk, intoxication, withdrawal, or delirium concerns take priority over chat.',
+  'suicide-risk-workflow-assistant': 'Immediate safety assessment and crisis pathways take priority over chat.',
+  'substance-use-screening-assistant': 'Withdrawal, intoxication, overdose, co-ingestion, pregnancy, trauma, or immediate danger take priority over chat.',
+  'cognitive-screening-assistant': 'Acute confusion, delirium, neurologic deficit, intoxication, hypoxia, or trauma take priority over chat.',
   'apache2-calculator': 'ICU-level illness and organ support decisions take priority over completing APACHE-II in chat.',
   'curb65-calculator': 'Severe pneumonia, sepsis, or respiratory failure take priority over CURB-65 chat.',
   'gcs-calculator': 'Declining consciousness or trauma requires immediate evaluation before GCS chat alone.',

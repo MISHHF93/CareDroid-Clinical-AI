@@ -8,7 +8,7 @@
  */
 
 export const PEDIATRICS_OBGYN_SAFETY_DISCLAIMER =
-  'Pediatric and OB-GYN decision support only. Use validated source charts, local protocols, and clinician judgment; do not delay urgent maternal, fetal, neonatal, pediatric, sepsis, trauma, airway, or emergency pathways to complete this tool.';
+  'Pediatric and OB-GYN safety support. Use validated source charts, local protocols, and clinician judgment; do not delay urgent maternal, fetal, neonatal, pediatric, sepsis, trauma, airway, or emergency pathways to complete this tool.';
 
 export const PEDIATRIC_DOSING_PLACEHOLDER_DISCLAIMER =
   'Pediatric dose safety checker placeholder only. This build does not calculate mg/kg doses, dose ranges, infusion rates, maximum doses, or medication recommendations. Use governed institutional dosing references, pharmacy review, and local policy.';

@@ -87,6 +87,7 @@ const GastroenterologyAssistantPage = lazyWithRetry(() => import('./pages/tools/
 const EndocrineMetabolicAssistantPage = lazyWithRetry(() => import('./pages/tools/EndocrineMetabolicAssistantPage'));
 const NeurologyAssistantPage = lazyWithRetry(() => import('./pages/tools/NeurologyAssistantPage'));
 const PediatricsObgynAssistantPage = lazyWithRetry(() => import('./pages/tools/PediatricsObgynAssistantPage'));
+const PsychiatryAssistantPage = lazyWithRetry(() => import('./pages/tools/PsychiatryAssistantPage'));
 const GuidelineRag = lazyWithRetry(() => import('./pages/tools/GuidelineRag'));
 const DifferentialAi = lazyWithRetry(() => import('./pages/tools/DifferentialAi'));
 const TimelineAi = lazyWithRetry(() => import('./pages/tools/TimelineAi'));
@@ -716,6 +717,15 @@ function AppRoutes() {
       element: (
         <AppShellPage>
           <PediatricsObgynAssistantPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/psychiatry/:toolId',
+      element: (
+        <AppShellPage>
+          <PsychiatryAssistantPage />
         </AppShellPage>
       ),
       requiresAuth: true,

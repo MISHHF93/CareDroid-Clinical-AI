@@ -138,6 +138,15 @@ import {
   PediatricDoseSafetyChecker,
   PregnancyDueDateCalculator,
 } from './pediatricsObgynCalculators';
+import {
+  CageCalculator,
+  ColumbiaSuicideSeverityWorkflow,
+  EpworthSleepinessScaleCalculator,
+  MdqCalculator,
+  MmseCalculator,
+  MocaPlaceholderWorkflow,
+  Pcl5Calculator,
+} from './psychiatryScreeningCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -560,6 +569,20 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <Phq9Calculator onResultChange={onResultChange} />;
     case 'gad7':
       return <Gad7Calculator onResultChange={onResultChange} />;
+    case 'cage':
+      return <CageCalculator onResultChange={onResultChange} />;
+    case 'mmse':
+      return <MmseCalculator onResultChange={onResultChange} />;
+    case 'moca-placeholder-workflow':
+      return <MocaPlaceholderWorkflow onResultChange={onResultChange} />;
+    case 'pcl5':
+      return <Pcl5Calculator onResultChange={onResultChange} />;
+    case 'mdq':
+      return <MdqCalculator onResultChange={onResultChange} />;
+    case 'epworth-sleepiness-scale':
+      return <EpworthSleepinessScaleCalculator onResultChange={onResultChange} />;
+    case 'columbia-suicide-severity-workflow':
+      return <ColumbiaSuicideSeverityWorkflow onResultChange={onResultChange} />;
     case 'ascvd-risk':
       return <AscvdRiskCalculator onResultChange={onResultChange} />;
     case 'ckd-staging':

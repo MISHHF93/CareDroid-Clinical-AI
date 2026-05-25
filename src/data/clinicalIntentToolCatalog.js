@@ -469,6 +469,198 @@ const clinicalIntentToolsRaw = [
     backendExecutable: false,
   },
   {
+    toolId: NLU.cage,
+    toolName: 'CAGE (alcohol screen)',
+    category: 'calculator',
+    description:
+      'Screening only: CAGE alcohol questionnaire (0-4). Does not diagnose alcohol use disorder or provide withdrawal-management advice.',
+    path: '/tools/calculators/cage',
+    sidebarToolId: REGISTRY.cage,
+    chatSeed:
+      'Help me complete the CAGE alcohol screen and interpret the score as screening only. Do not diagnose alcohol use disorder, do not recommend detox or medications, and route intoxication, withdrawal, co-ingestion, trauma, pregnancy, or immediate safety concerns to local urgent pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.mmse,
+    toolName: 'MMSE score entry',
+    category: 'calculator',
+    description:
+      'Screening only: MMSE domain score entry from governed administration. Does not diagnose dementia, delirium, or capacity.',
+    path: '/tools/calculators/mmse',
+    sidebarToolId: REGISTRY.mmse,
+    chatSeed:
+      'Help me enter MMSE domain scores from a governed administration and summarize the total as cognitive screening support only. Do not diagnose dementia, delirium, cognitive impairment, or capacity; do not recommend medications. Acute confusion, neurologic deficits, intoxication, trauma, infection, hypoxia, or rapidly changing mental status requires urgent medical evaluation first.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.mocaPlaceholderWorkflow,
+    toolName: 'MoCA placeholder workflow',
+    category: 'calculator',
+    description:
+      'Governance workflow only: MoCA placeholder that does not show items, administer MoCA, calculate a score, or diagnose cognitive impairment.',
+    path: '/tools/calculators/moca-placeholder-workflow',
+    sidebarToolId: REGISTRY.mocaPlaceholderWorkflow,
+    chatSeed:
+      'Help me check MoCA workflow readiness: official form/version, required training, language and sensory accommodations, and clinician review plan. This placeholder does not administer or score MoCA, does not show MoCA items, does not diagnose cognitive impairment, and does not recommend medications or treatment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pcl5,
+    toolName: 'PCL-5 (PTSD symptom screen)',
+    category: 'calculator',
+    description:
+      'Screening only: PCL-5 PTSD symptom score entry (0-80) with current safety concern flag. Does not diagnose PTSD.',
+    path: '/tools/calculators/pcl5',
+    sidebarToolId: REGISTRY.pcl5,
+    chatSeed:
+      'Help me enter PCL-5 item scores and summarize the total as PTSD symptom screening support only. Do not diagnose PTSD, establish causality, or recommend medications or therapy. If self-harm, suicidal ideation, acute danger, severe dissociation, or inability to maintain safety is present, stop routine scoring and arrange immediate safety assessment and crisis resources.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.mdq,
+    toolName: 'Mood Disorder Questionnaire (MDQ)',
+    category: 'calculator',
+    description:
+      'Screening only: MDQ bipolar-spectrum screening summary. Does not diagnose bipolar disorder, mania, hypomania, or medication need.',
+    path: '/tools/calculators/mdq',
+    sidebarToolId: REGISTRY.mdq,
+    chatSeed:
+      'Help me summarize the MDQ using symptom count, same-period symptoms, impairment, and urgent safety flags. Screening only; do not diagnose bipolar disorder, mania, hypomania, psychosis, or recommend medications. Psychosis, unsafe behavior, suicidal ideation, violence risk, or inability to maintain safety requires urgent human review before routine screening.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.epworthSleepinessScale,
+    toolName: 'Epworth Sleepiness Scale',
+    category: 'calculator',
+    description:
+      'Screening only: Epworth Sleepiness Scale (0-24). Does not diagnose sleep apnea, narcolepsy, or medication effects.',
+    path: '/tools/calculators/epworth-sleepiness-scale',
+    sidebarToolId: REGISTRY.epworthSleepinessScale,
+    chatSeed:
+      'Help me complete the Epworth Sleepiness Scale and summarize daytime sleepiness as screening support only. Do not diagnose sleep apnea, narcolepsy, or medication effects, do not determine driving or work clearance, and flag safety-sensitive sleepiness for prompt human review.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.columbiaSuicideSeverityWorkflow,
+    toolName: 'Columbia suicide severity workflow entry',
+    category: 'calculator',
+    description:
+      'Workflow entry only: suicide-risk routing support with immediate safety review messaging. Does not administer or score official C-SSRS.',
+    path: '/tools/calculators/columbia-suicide-severity-workflow',
+    sidebarToolId: REGISTRY.columbiaSuicideSeverityWorkflow,
+    chatSeed:
+      'Help me document a Columbia suicide severity workflow entry: ideation disclosure, intent or plan, recent suicidal or preparatory behavior, immediate safety status, and direct human review. This is not official C-SSRS scoring and does not clear risk. Any suicidal ideation, intent, plan, behavior, or inability to maintain safety requires immediate safety assessment, local psychiatric emergency pathways, emergency services when needed, and crisis resources such as 988 in the U.S. when applicable.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.mentalHealthScreeningAssistant,
+    toolName: 'Mental Health Screening Assistant',
+    category: 'calculator',
+    description:
+      'Guided mental-health screening workflow across mood, anxiety, trauma, sleep, substance-use, and cognitive screens.',
+    path: '/tools/psychiatry/mental-health-screening-assistant',
+    sidebarToolId: REGISTRY.mentalHealthScreeningAssistant,
+    chatSeed:
+      'Help me choose and document mental-health screening tools across PHQ-9, GAD-7, PCL-5, MDQ, Epworth, AUDIT-C/CAGE, MMSE, and MoCA workflow readiness. Screening decision support only; do not diagnose, do not recommend medications or therapy, require human review, and prioritize crisis, psychosis, intoxication, withdrawal, delirium, or medical emergency pathways before chat.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.suicideRiskWorkflowAssistant,
+    toolName: 'Suicide Risk Workflow Assistant',
+    category: 'calculator',
+    description:
+      'Guided suicide-risk workflow support for PHQ-9 item 9, Columbia workflow flags, direct review, and crisis handoff.',
+    path: '/tools/psychiatry/suicide-risk-workflow-assistant',
+    sidebarToolId: REGISTRY.suicideRiskWorkflowAssistant,
+    chatSeed:
+      'Help me organize suicide-risk workflow documentation from PHQ-9 item 9 and Columbia workflow flags: ideation, intent, plan, behavior, immediate safety, protective context, and direct clinician/crisis review. Decision support only; do not diagnose, do not clear risk, do not recommend medications or therapy, and immediately prioritize safety assessment, emergency services, local psychiatric emergency pathways, and crisis resources such as 988 in the U.S. when applicable.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.substanceUseScreeningAssistant,
+    toolName: 'Substance Use Screening Assistant',
+    category: 'calculator',
+    description:
+      'Guided substance-use screening workflow for AUDIT-C, CAGE, intoxication/withdrawal context, and local referral prompts.',
+    path: '/tools/psychiatry/substance-use-screening-assistant',
+    sidebarToolId: REGISTRY.substanceUseScreeningAssistant,
+    chatSeed:
+      'Help me organize substance-use screening with AUDIT-C, CAGE, substance pattern, intoxication/withdrawal concerns, co-ingestions, pregnancy, trauma, safety concerns, and follow-up prompts. Screening decision support only; do not diagnose substance use disorder, do not recommend detox, medications, or treatment programs, and prioritize overdose, withdrawal, intoxication, co-ingestion, trauma, or immediate danger pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.cognitiveScreeningAssistant,
+    toolName: 'Cognitive Screening Assistant',
+    category: 'calculator',
+    description:
+      'Guided cognitive screening workflow for MMSE score entry, MoCA governance, delirium flags, accommodations, and clinician review.',
+    path: '/tools/psychiatry/cognitive-screening-assistant',
+    sidebarToolId: REGISTRY.cognitiveScreeningAssistant,
+    chatSeed:
+      'Help me organize cognitive screening with MMSE score entry, MoCA workflow readiness, baseline function, collateral history, language/sensory/motor accommodations, medication/substance context, and delirium flags. Screening decision support only; do not diagnose dementia, delirium, cognitive impairment, or capacity, do not recommend medications, and prioritize acute confusion, neurologic deficit, trauma, hypoxia, infection, or intoxication pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.behavioralAnalyticsDashboard,
+    toolName: 'Behavioral Analytics Dashboard',
+    category: 'reference',
+    description:
+      'Dashboard concept for behavioral-health screening volumes, positive-screen queues, follow-up status, and safety-review gaps.',
+    path: '/tools/psychiatry/behavioral-analytics-dashboard',
+    sidebarToolId: REGISTRY.behavioralAnalyticsDashboard,
+    chatSeed:
+      'Help me review behavioral analytics dashboard context: screening volumes, positive-screen queues, follow-up status, unresolved PHQ-9 item 9 or Columbia workflow flags, data freshness, and human review status. Monitoring visibility and decision support only; no diagnosis, no medication or therapy advice, no autonomous escalation, and crisis pathways take priority.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.screeningTrendEngine,
+    toolName: 'Screening Trend Engine',
+    category: 'reference',
+    description:
+      'Trend engine concept for serial psychiatry screening scores and review queues.',
+    path: '/tools/psychiatry/screening-trend-engine',
+    sidebarToolId: REGISTRY.screeningTrendEngine,
+    chatSeed:
+      'Help me review screening trend engine context: serial PHQ-9, GAD-7, PCL-5, MDQ, AUDIT-C/CAGE, Epworth, MMSE, and MoCA workflow status, score changes, missing data, and review queues. Trend visibility and decision support only; no diagnosis, no treatment or medication recommendations, and human interpretation is required.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.psychiatryMonitoringDashboard,
+    toolName: 'Psychiatry Monitoring Dashboard',
+    category: 'reference',
+    description:
+      'Monitoring dashboard concept for psychiatry review queues, repeated screens, unresolved safety flags, and handoff status.',
+    path: '/tools/psychiatry/psychiatry-monitoring-dashboard',
+    sidebarToolId: REGISTRY.psychiatryMonitoringDashboard,
+    chatSeed:
+      'Help me review psychiatry monitoring dashboard context: repeated screens, unresolved safety flags, follow-up gaps, review queues, and care-team handoff status. Monitoring decision support only; no diagnosis, no medication or therapy recommendations, no autonomous escalation, and crisis pathways take priority.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.crisisEscalationAuditLog,
+    toolName: 'Crisis Escalation Audit Log',
+    category: 'reference',
+    description:
+      'Audit-log concept for crisis escalation events, PHQ-9 item 9, Columbia workflow flags, and direct review status.',
+    path: '/tools/psychiatry/crisis-escalation-audit-log',
+    sidebarToolId: REGISTRY.crisisEscalationAuditLog,
+    chatSeed:
+      'Help me review crisis escalation audit-log context: PHQ-9 item 9 alerts, Columbia workflow flags, crisis-resource display, direct-review status, timestamps, and unresolved escalation gaps. Audit visibility and decision support only; no risk clearance, no diagnosis, no medication or therapy advice, and immediate safety workflows take priority.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.populationScreeningDashboard,
+    toolName: 'Population Screening Dashboard',
+    category: 'reference',
+    description:
+      'Population screening dashboard concept for panel-level completion, positive screens, follow-up gaps, and data quality.',
+    path: '/tools/psychiatry/population-screening-dashboard',
+    sidebarToolId: REGISTRY.populationScreeningDashboard,
+    chatSeed:
+      'Help me review population screening dashboard context: panel completion rates, positive-screen queues, follow-up gaps, equity/data-quality checks, and human review status. Population health visibility and decision support only; no individual diagnosis, no treatment or medication recommendations, and crisis pathways take priority.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'heart-score',
     toolName: 'HEART score',
     category: 'calculator',
@@ -2326,6 +2518,69 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/gad7',
     calcQuery: '/tools/calculators?calc=gad7',
     implementation: 'Client-side in Calculators.jsx (gad7Calculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'cage',
+    name: 'CAGE',
+    description: 'CAGE alcohol screening questionnaire (0-4).',
+    path: '/tools/calculators/cage',
+    calcQuery: '/tools/calculators?calc=cage',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'mmse',
+    name: 'MMSE',
+    description: 'MMSE cognitive screening score entry from governed administration (0-30).',
+    path: '/tools/calculators/mmse',
+    calcQuery: '/tools/calculators?calc=mmse',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'moca-placeholder-workflow',
+    name: 'MoCA Placeholder Workflow',
+    description: 'MoCA governance workflow placeholder without item display or scoring.',
+    path: '/tools/calculators/moca-placeholder-workflow',
+    calcQuery: '/tools/calculators?calc=moca-placeholder-workflow',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pcl5',
+    name: 'PCL-5',
+    description: 'PCL-5 PTSD symptom screening score entry (0-80) with current safety flag.',
+    path: '/tools/calculators/pcl5',
+    calcQuery: '/tools/calculators?calc=pcl5',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'mdq',
+    name: 'MDQ',
+    description: 'Mood Disorder Questionnaire screening summary with urgent safety flag.',
+    path: '/tools/calculators/mdq',
+    calcQuery: '/tools/calculators?calc=mdq',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'epworth-sleepiness-scale',
+    name: 'Epworth Sleepiness Scale',
+    description: 'Daytime sleepiness screen (0-24) with safety-sensitive activity flag.',
+    path: '/tools/calculators/epworth-sleepiness-scale',
+    calcQuery: '/tools/calculators?calc=epworth-sleepiness-scale',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'columbia-suicide-severity-workflow',
+    name: 'Columbia Suicide Severity Workflow',
+    description: 'Suicide-severity workflow entry with immediate safety review messaging.',
+    path: '/tools/calculators/columbia-suicide-severity-workflow',
+    calcQuery: '/tools/calculators?calc=columbia-suicide-severity-workflow',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
     orchestratorId: null,
   },
   {
