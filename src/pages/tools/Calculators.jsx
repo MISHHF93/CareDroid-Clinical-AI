@@ -147,6 +147,12 @@ import {
   MocaPlaceholderWorkflow,
   Pcl5Calculator,
 } from './psychiatryScreeningCalculators';
+import {
+  BedOccupancyCalculator,
+  ResourceUtilizationIndexCalculator,
+  StaffingRatioCalculator,
+  TurnaroundTimeCalculator,
+} from './hospitalOperationsCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -665,6 +671,14 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <AnionGapCalculator onResultChange={onResultChange} />;
     case 'rass':
       return <RassCalculator onResultChange={onResultChange} />;
+    case 'bed-occupancy-calculator':
+      return <BedOccupancyCalculator onResultChange={onResultChange} />;
+    case 'staffing-ratio-calculator':
+      return <StaffingRatioCalculator onResultChange={onResultChange} />;
+    case 'turnaround-time-calculator':
+      return <TurnaroundTimeCalculator onResultChange={onResultChange} />;
+    case 'resource-utilization-index':
+      return <ResourceUtilizationIndexCalculator onResultChange={onResultChange} />;
     default:
       return (
         <ToolNotFound

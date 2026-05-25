@@ -103,6 +103,10 @@ export const CALCULATOR_INTERFACE_CLASS_BY_SLUG = Object.freeze({
   'shock-index': 'calculator-interface--shock-index',
   'anion-gap': 'calculator-interface--anion-gap',
   rass: 'calculator-interface--rass',
+  'bed-occupancy-calculator': 'calculator-interface--bed-occupancy-calculator',
+  'staffing-ratio-calculator': 'calculator-interface--staffing-ratio-calculator',
+  'turnaround-time-calculator': 'calculator-interface--turnaround-time-calculator',
+  'resource-utilization-index': 'calculator-interface--resource-utilization-index',
 });
 
 /** Registry tool ids shown in the calculators hub chat-assisted section. */

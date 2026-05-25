@@ -2485,6 +2485,76 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
   // FLEET / LOGISTICS (operations decision support)
   // ========================================
   {
+    toolId: 'bed-occupancy-calculator',
+    toolName: 'Bed Occupancy Calculator',
+    keywords: [
+      'bed occupancy',
+      'bed occupancy calculator',
+      'occupied beds',
+      'available beds',
+      'blocked beds',
+      'bed capacity',
+      'hospital capacity',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['occupied_beds', 'total_beds', 'blocked_beds'],
+    description:
+      'Operations calculator for bed occupancy and usable bed capacity (planning support only)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'staffing-ratio-calculator',
+    toolName: 'Staffing Ratio Calculator',
+    keywords: [
+      'staffing ratio',
+      'staffing ratio calculator',
+      'patients per staff',
+      'nurse patient ratio',
+      'staff coverage',
+      'target staffing',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['patient_count', 'staff_count', 'target_patients_per_staff'],
+    description:
+      'Operations calculator for patients per staff and target coverage gap (human staffing review required)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'turnaround-time-calculator',
+    toolName: 'Turnaround Time Calculator',
+    keywords: [
+      'turnaround time',
+      'turnaround time calculator',
+      'transport turnaround',
+      'room turnaround',
+      'service time',
+      'ready time',
+      'turnaround target',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['request_to_assign_minutes', 'travel_minutes', 'service_minutes', 'cleanup_minutes', 'target_minutes'],
+    description:
+      'Operations calculator for turnaround segment total and target variance (no dispatch automation)',
+    category: 'calculator',
+  },
+  {
+    toolId: 'resource-utilization-index',
+    toolName: 'Resource Utilization Index',
+    keywords: [
+      'resource utilization index',
+      'utilization index',
+      'resource utilization',
+      'bed staff device fleet utilization',
+      'capacity utilization',
+      'operations utilization',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['bed_utilization_percent', 'staff_utilization_percent', 'device_utilization_percent', 'fleet_utilization_percent'],
+    description:
+      'Composite utilization index across bed, staff, device, and fleet signals (planning support only)',
+    category: 'calculator',
+  },
+  {
     toolId: 'dispatch-ai',
     toolName: 'Dispatch Intelligence Assistant',
     keywords: [
@@ -2511,6 +2581,58 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     ],
     description:
       'Conversational dispatch decision support: assignment options, prioritization, bottlenecks, and suggested actions (human approval required)',
+    category: 'fleet',
+  },
+  {
+    toolId: 'hospital-command-assistant',
+    toolName: 'Hospital Command Assistant',
+    keywords: [
+      'hospital command assistant',
+      'hospital command',
+      'command huddle',
+      'operations huddle',
+      'incident readiness',
+      'hospital operations command',
+      'command center summary',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['bed_status', 'staffing', 'device_alerts', 'fleet_status', 'incident_context'],
+    description:
+      'Chat-assisted hospital command huddle support; no autonomous dispatch, escalation, admission, transfer, discharge, staffing, or clinical decisions',
+    category: 'fleet',
+  },
+  {
+    toolId: 'resource-allocation-assistant',
+    toolName: 'Resource Allocation Assistant',
+    keywords: [
+      'resource allocation assistant',
+      'resource allocation',
+      'allocate resources',
+      'bed staff device allocation',
+      'resource balancing',
+      'capacity allocation',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['available_resources', 'constraints', 'priorities', 'approval_owner'],
+    description:
+      'Chat-assisted resource allocation option review with human approval required; does not move resources or issue assignments',
+    category: 'fleet',
+  },
+  {
+    toolId: 'device-recommendation-assistant',
+    toolName: 'Device Recommendation Assistant',
+    keywords: [
+      'device recommendation assistant',
+      'device recommendation',
+      'recommend device',
+      'equipment request',
+      'device availability',
+      'device battery maintenance compatibility',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['device_requirements', 'availability', 'battery', 'maintenance_status', 'compatibility'],
+    description:
+      'Chat-assisted device requirement and availability review; does not assign clinical devices automatically',
     category: 'fleet',
   },
   {

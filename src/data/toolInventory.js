@@ -20,6 +20,7 @@ import {
   FLEET_TIER_A_REGISTRY_IDS,
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
   HOSPITAL_OPERATIONS_REGISTRY_IDS,
+  HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_IDS,
   LIVE_TRACKING_MAP_REGISTRY_IDS,
   MEDICAL_IOT_REGISTRY_IDS,
   NLU_PROFILE_TOOL_IDS,
@@ -45,6 +46,9 @@ let cachedUserFacingToolRegistryProjection = null;
 const CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET = new Set(CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS);
 const FLEET_TIER_A_REGISTRY_ID_SET = new Set(FLEET_TIER_A_REGISTRY_IDS);
 const FLEET_TIER_B_CHAT_REGISTRY_ID_SET = new Set(FLEET_TIER_B_CHAT_REGISTRY_IDS);
+const HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_ID_SET = new Set(
+  HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_IDS
+);
 const LIVE_TRACKING_MAP_REGISTRY_ID_SET = new Set(LIVE_TRACKING_MAP_REGISTRY_IDS);
 const MEDICAL_IOT_REGISTRY_ID_SET = new Set(MEDICAL_IOT_REGISTRY_IDS);
 const HOSPITAL_OPERATIONS_REGISTRY_ID_SET = new Set(HOSPITAL_OPERATIONS_REGISTRY_IDS);
@@ -306,6 +310,9 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.calculatorRecommenderAi]: 'src/pages/tools/CalculatorRecommender.jsx',
   [REGISTRY.calculatorsHub]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.doseCalculator]: 'src/pages/tools/Calculators.jsx',
+  [REGISTRY.hospitalCommandAssistant]: 'src/pages/tools/Calculators.jsx',
+  [REGISTRY.resourceAllocationAssistant]: 'src/pages/tools/Calculators.jsx',
+  [REGISTRY.deviceRecommendationAssistant]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.fleetCommand]: 'src/pages/fleet/FleetDashboard.jsx',
   [REGISTRY.fleetLiveMap]: 'src/pages/fleet/FleetLiveMap.jsx',
   [REGISTRY.predictiveMaintenance]: 'src/pages/fleet/PredictiveMaintenance.jsx',
@@ -317,6 +324,11 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.telemetryMonitoring]: 'src/pages/HospitalMapDashboard.jsx',
   [REGISTRY.deviceMaintenance]: 'src/pages/HospitalMapDashboard.jsx',
   [REGISTRY.hospitalOperationsCommand]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.assetTrackingDashboard]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.incidentCommandCenter]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.hospitalOperationsCockpit]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.deviceBatteryIntelligence]: 'src/pages/MedicalIotDashboard.jsx',
+  [REGISTRY.capacityPredictionEngine]: 'src/pages/HospitalMapDashboard.jsx',
 });
 
 const BASE_TEST_COVERAGE = Object.freeze([
@@ -392,6 +404,7 @@ function registryTier(registryId) {
   if (CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET.has(registryId)) return 'C';
   if (FLEET_TIER_A_REGISTRY_ID_SET.has(registryId)) return 'fleet-A';
   if (FLEET_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId)) return 'fleet-B';
+  if (HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId)) return 'hospital-ops-B';
   if (LIVE_TRACKING_MAP_REGISTRY_ID_SET.has(registryId)) return 'live-map';
   if (MEDICAL_IOT_REGISTRY_ID_SET.has(registryId)) return 'medical-iot';
   if (HOSPITAL_OPERATIONS_REGISTRY_ID_SET.has(registryId)) return 'hospital-ops';
@@ -412,7 +425,7 @@ function launchTypeForTier(tier, hasExecutor) {
   if (hasExecutor) return TOOL_LAUNCH_TYPES.BACKEND_BACKED;
   if (tier === 'C') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'A') return TOOL_LAUNCH_TYPES.LOCAL_ONLY;
-  if (tier === 'B' || tier === 'fleet-B') return TOOL_LAUNCH_TYPES.CHAT_ASSISTED;
+  if (tier === 'B' || tier === 'fleet-B' || tier === 'hospital-ops-B') return TOOL_LAUNCH_TYPES.CHAT_ASSISTED;
   if (tier === 'clinical-page') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'fleet-A') return TOOL_LAUNCH_TYPES.FLEET_LOCAL;
   if (tier === 'live-map') return TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL;

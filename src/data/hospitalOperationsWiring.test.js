@@ -26,6 +26,11 @@ describe('Hospital operations wiring', () => {
       REGISTRY.telemetryMonitoring,
       REGISTRY.deviceMaintenance,
       REGISTRY.hospitalOperationsCommand,
+      REGISTRY.assetTrackingDashboard,
+      REGISTRY.incidentCommandCenter,
+      REGISTRY.hospitalOperationsCockpit,
+      REGISTRY.deviceBatteryIntelligence,
+      REGISTRY.capacityPredictionEngine,
     ]);
     expect(CANONICAL_TOOL_GROUPS.hospitalOperations).toEqual(HOSPITAL_OPERATIONS_REGISTRY_IDS);
   });
@@ -39,11 +44,11 @@ describe('Hospital operations wiring', () => {
   it('keeps registry rows and catalog launches aligned', () => {
     for (const id of HOSPITAL_OPERATIONS_REGISTRY_IDS) {
       const reg = toolRegistryById[id];
-      expect(reg?.path, id).toBe('/hospital-map');
-      expect(reg?.category, id).toBe('Hospital Operations');
+      expect(['/hospital-map', '/medical-iot']).toContain(reg?.path);
+      expect(['Hospital Operations', 'IoT']).toContain(reg?.category);
 
       const launch = resolveCatalogLaunch(id);
-      expect(launch.path, id).toBe('/hospital-map');
+      expect(['/hospital-map', '/medical-iot']).toContain(launch.path);
       expect(launch.registryId, id).toBe(id);
     }
   });
@@ -54,6 +59,8 @@ describe('Hospital operations wiring', () => {
     expect(resolveRegistryId('device-fleet-management')).toBe(REGISTRY.deviceFleetManagement);
     expect(resolveRegistryId('telemetry-gaps')).toBe(REGISTRY.telemetryMonitoring);
     expect(resolveRegistryId('maintenance-overdue')).toBe(REGISTRY.deviceMaintenance);
+    expect(resolveRegistryId('asset-tracking-dashboard')).toBe(REGISTRY.assetTrackingDashboard);
+    expect(resolveRegistryId('capacity-prediction-engine')).toBe(REGISTRY.capacityPredictionEngine);
   });
 
   it('surfaces Hospital Map in user-facing tools and the command dashboard', () => {

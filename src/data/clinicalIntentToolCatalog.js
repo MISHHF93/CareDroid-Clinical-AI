@@ -1164,6 +1164,54 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     backendExecutable: false,
   },
   {
+    toolId: NLU.bedOccupancyCalculator,
+    toolName: 'Bed Occupancy Calculator',
+    category: 'calculator',
+    description:
+      'Hospital operations calculator for occupied beds, blocked beds, usable beds, and occupancy percentage. Operations support only; no admission, discharge, transfer, or clinical triage decisions.',
+    path: '/tools/calculators/bed-occupancy-calculator',
+    sidebarToolId: REGISTRY.bedOccupancyCalculator,
+    chatSeed:
+      'Open the Bed Occupancy Calculator and help me review occupied beds, total beds, blocked beds, usable capacity, and available beds. Operations planning support only; do not recommend admission, discharge, transfer, triage, or staffing actions.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.staffingRatioCalculator,
+    toolName: 'Staffing Ratio Calculator',
+    category: 'calculator',
+    description:
+      'Operations calculator for patients per staff member and target staffing coverage gap. Does not schedule staff or override acuity, credentials, labor rules, or supervisor review.',
+    path: '/tools/calculators/staffing-ratio-calculator',
+    sidebarToolId: REGISTRY.staffingRatioCalculator,
+    chatSeed:
+      'Open the Staffing Ratio Calculator and help me review patient count, available staff, target patients per staff, and staffing coverage gap. Operations planning support only; do not recommend autonomous staffing changes or clinical assignments.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.turnaroundTimeCalculator,
+    toolName: 'Turnaround Time Calculator',
+    category: 'calculator',
+    description:
+      'Operations calculator for request-to-assign, travel, service, cleanup, and target turnaround variance. Does not auto-dispatch or reprioritize work.',
+    path: '/tools/calculators/turnaround-time-calculator',
+    sidebarToolId: REGISTRY.turnaroundTimeCalculator,
+    chatSeed:
+      'Open the Turnaround Time Calculator and help me total request-to-assign, travel, service, cleanup, and target variance. Operations planning support only; do not auto-dispatch, reprioritize care, or override command workflows.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.resourceUtilizationIndex,
+    toolName: 'Resource Utilization Index',
+    category: 'calculator',
+    description:
+      'Composite operations utilization index across beds, staff, devices, and fleet signals. Requires source-system validation and human approval for resource moves.',
+    path: '/tools/calculators/resource-utilization-index',
+    sidebarToolId: REGISTRY.resourceUtilizationIndex,
+    chatSeed:
+      'Open the Resource Utilization Index and help me review bed, staff, device, and fleet utilization signals. Operations planning support only; require human approval for any resource movement, staffing, dispatch, admission, or transfer decision.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'apache2-calculator',
     toolName: 'APACHE-II Score',
     category: 'calculator',
@@ -1906,6 +1954,42 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     backendExecutable: true,
   },
   {
+    toolId: NLU.hospitalCommandAssistant,
+    toolName: 'Hospital Command Assistant',
+    category: 'hospital-operations',
+    description:
+      'Chat-assisted command-center support for hospital map, bed capacity, device fleet, telemetry, alerts, and huddle prompts. Human command approval required; no autonomous dispatch, escalation, admission, transfer, discharge, or clinical decisions.',
+    path: TOOL_LAUNCH_PATHS.calculatorsHub,
+    sidebarToolId: REGISTRY.hospitalCommandAssistant,
+    chatSeed:
+      'Help me prepare a hospital command huddle using map status, bed occupancy, staffing ratio, turnaround time, resource utilization, device alerts, fleet status, and stale telemetry. Operations support only; do not make autonomous dispatch, escalation, admission, transfer, discharge, staffing, or clinical decisions. Ask what source-system values should be verified.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.resourceAllocationAssistant,
+    toolName: 'Resource Allocation Assistant',
+    category: 'hospital-operations',
+    description:
+      'Chat-assisted resource allocation planning for beds, staff, devices, and fleet options with constraints and human approval. Does not move resources or issue assignments.',
+    path: TOOL_LAUNCH_PATHS.calculatorsHub,
+    sidebarToolId: REGISTRY.resourceAllocationAssistant,
+    chatSeed:
+      'Help me compare resource allocation options across beds, staff, devices, and fleet capacity. Ask for constraints, source-system values, and approval owner. Operations support only; do not move resources, assign staff, dispatch vehicles, or make clinical decisions.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.deviceRecommendationAssistant,
+    toolName: 'Device Recommendation Assistant',
+    category: 'hospital-operations',
+    description:
+      'Chat-assisted device requirement and availability review using inventory, battery, maintenance, calibration, compatibility, and location context. Does not assign clinical devices automatically.',
+    path: TOOL_LAUNCH_PATHS.calculatorsHub,
+    sidebarToolId: REGISTRY.deviceRecommendationAssistant,
+    chatSeed:
+      'Help me review device options for an equipment request using requirements, inventory, battery, maintenance, calibration, firmware, compatibility, location, and source-system verification. Operations support only; do not assign devices automatically or make clinical decisions.',
+    backendExecutable: false,
+  },
+  {
     toolId: NLU.calculatorRecommenderAi,
     toolName: 'Calculator Recommendation AI',
     category: 'calculator',
@@ -2129,6 +2213,21 @@ export const nluCalculatorHubOnly = [
     toolId: dispatchAiChatConfig.toolId,
     name: dispatchAiChatConfig.name,
     hubPath: dispatchAiChatConfig.hubPath,
+  },
+  {
+    toolId: NLU.hospitalCommandAssistant,
+    name: 'Hospital Command Assistant',
+    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  },
+  {
+    toolId: NLU.resourceAllocationAssistant,
+    name: 'Resource Allocation Assistant',
+    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  },
+  {
+    toolId: NLU.deviceRecommendationAssistant,
+    name: 'Device Recommendation Assistant',
+    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
   },
 ];
 
@@ -2851,6 +2950,42 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/rass',
     calcQuery: '/tools/calculators?calc=rass',
     implementation: 'Client-side in nextWaveCalculators.jsx (nextWaveCalculatorUtils.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'bed-occupancy-calculator',
+    name: 'Bed Occupancy Calculator',
+    description: 'Hospital bed occupancy percentage with blocked-bed and usable-capacity context.',
+    path: '/tools/calculators/bed-occupancy-calculator',
+    calcQuery: '/tools/calculators?calc=bed-occupancy-calculator',
+    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'staffing-ratio-calculator',
+    name: 'Staffing Ratio Calculator',
+    description: 'Patients-per-staff ratio and target coverage gap for operations planning.',
+    path: '/tools/calculators/staffing-ratio-calculator',
+    calcQuery: '/tools/calculators?calc=staffing-ratio-calculator',
+    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'turnaround-time-calculator',
+    name: 'Turnaround Time Calculator',
+    description: 'Turnaround segment total and target variance for operational workflows.',
+    path: '/tools/calculators/turnaround-time-calculator',
+    calcQuery: '/tools/calculators?calc=turnaround-time-calculator',
+    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'resource-utilization-index',
+    name: 'Resource Utilization Index',
+    description: 'Composite utilization index across beds, staff, devices, and fleet signals.',
+    path: '/tools/calculators/resource-utilization-index',
+    calcQuery: '/tools/calculators?calc=resource-utilization-index',
+    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
     orchestratorId: null,
   },
   {

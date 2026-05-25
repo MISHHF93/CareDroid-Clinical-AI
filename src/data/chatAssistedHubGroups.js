@@ -140,6 +140,17 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     toolIds: ['dispatch-ai'],
   },
   {
+    groupId: 'hospital-operations-command',
+    heading: 'Hospital operations command',
+    lead:
+      'Hospital Command, Resource Allocation, and Device Recommendation assistants organize operations huddles, constraints, and source-system checks. They do not auto-dispatch, allocate resources, assign devices, change staffing, or make clinical decisions; command staff must approve every action.',
+    toolIds: [
+      'hospital-command-assistant',
+      'resource-allocation-assistant',
+      'device-recommendation-assistant',
+    ],
+  },
+  {
     groupId: 'nlu-hub-screening',
     heading: 'Screening & severity (chat)',
     lead:
@@ -205,6 +216,9 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'curb65-calculator': 'Severe pneumonia, sepsis, or respiratory failure take priority over CURB-65 chat.',
   'gcs-calculator': 'Declining consciousness or trauma requires immediate evaluation before GCS chat alone.',
   'wells-dvt-calculator': 'Wells DVT does not rule in or rule out DVT with certainty; suspected PE or limb-threatening ischemia need urgent pathways.',
+  'hospital-command-assistant': 'Hospital incident command and source systems take priority over chat.',
+  'resource-allocation-assistant': 'Human command approval is required before any resource movement.',
+  'device-recommendation-assistant': 'Biomedical and bedside clinical review are required before device assignment.',
 });
 
 /**
