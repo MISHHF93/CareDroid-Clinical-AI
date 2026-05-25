@@ -4,6 +4,8 @@ import { Permission, useUser } from '../contexts/UserContext';
 import { useConversation } from '../contexts/ConversationContext';
 import { useSystemConfig } from '../contexts/SystemConfigContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
+import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
 import { getCommandDashboardModel } from '../data/commandDashboardModel';
 import {
   CategoryBarChart,
@@ -94,6 +96,7 @@ export default function CommandDashboard() {
   const navigate = useNavigate();
   const [assistantPrompt, setAssistantPrompt] = useState('');
   const { user, isDevAuthBypass, hasPermission } = useUser();
+  const { activeWorkspace, activity, aiPersonalization } = useUserIdentity();
   const { conversations, messages, addMessage, selectTool, setActiveTool } = useConversation();
   const { recentTools, recordToolAccess } = useToolPreferences();
   const systemConfig = useSystemConfig();
@@ -171,6 +174,32 @@ export default function CommandDashboard() {
             <span>Backend-backed</span>
           </div>
         </div>
+      </section>
+
+      <section className="command-dashboard__grid" aria-label="Personalized workspace summary">
+        <ProfileSummaryCard compact />
+        <DashboardPanel
+          title="Workspace Recommendations"
+          description={`Context-aware suggestions for ${activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'your workspace'}.`}
+          icon={CHROME_ICONS.sparkles}
+        >
+          <div className="command-prompt-grid">
+            {(aiPersonalization?.recommendedWorkflows || []).slice(0, 3).map((workflow) => (
+              <button
+                key={workflow.id || workflow.title}
+                type="button"
+                className="command-prompt-chip"
+                onClick={() => workflow.toolId && model.toolById[workflow.toolId] ? launchTool(model.toolById[workflow.toolId]) : null}
+              >
+                <strong>{workflow.title}</strong>
+                <span>{workflow.reason}</span>
+              </button>
+            ))}
+          </div>
+          <p className="command-assistant-help">
+            Recent safe activity: {(activity?.recentTools || []).length} tools, {(activity?.recentAiChats || []).length} AI chats.
+          </p>
+        </DashboardPanel>
       </section>
 
       <DashboardPanel

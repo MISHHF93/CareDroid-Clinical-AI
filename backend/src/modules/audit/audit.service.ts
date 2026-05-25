@@ -38,6 +38,11 @@ export class AuditService {
    */
   async log(data: {
     userId?: string;
+    workspaceId?: string;
+    organizationId?: string;
+    actorUserId?: string;
+    targetUserId?: string;
+    membershipId?: string;
     action: AuditAction;
     resource: string;
     ipAddress: string;

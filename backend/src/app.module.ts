@@ -42,6 +42,11 @@ import { EmailModule } from './modules/email/email.module';
 import { CacheModule } from './modules/cache/cache.module';
 import { LiveTrackingModule } from './modules/live-tracking/live-tracking.module';
 import { PlatformSystemsModule } from './modules/platform-systems/platform-systems.module';
+import { UserProfileModule } from './modules/user-profile/user-profile.module';
+import { WorkspacesModule } from './modules/workspaces/workspaces.module';
+import { PermissionsModule } from './modules/permissions/permissions.module';
+import { UserActivityModule } from './modules/user-activity/user-activity.module';
+import { PersonalizationModule } from './modules/personalization/personalization.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -121,6 +126,11 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     ClinicalIntelligenceModule,
     AnalyticsModule,
     NotificationModule,
+    PermissionsModule,
+    WorkspacesModule,
+    UserActivityModule,
+    PersonalizationModule,
+    UserProfileModule,
     LiveTrackingModule,
     PlatformSystemsModule,
 

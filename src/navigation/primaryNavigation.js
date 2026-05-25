@@ -115,6 +115,11 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     matchPaths: [
       '/settings',
       '/profile',
+      '/profile/settings',
+      '/profile/activity',
+      '/profile/preferences',
+      '/profile/workspaces',
+      '/profile/security',
       '/profile-settings',
       '/notifications',
       '/team',

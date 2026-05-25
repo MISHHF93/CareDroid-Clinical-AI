@@ -7,6 +7,7 @@ import { NotificationProvider, useNotifications } from './contexts/NotificationC
 import { ConversationProvider, useConversation } from './contexts/ConversationContext';
 import { ToolPreferencesProvider, useToolPreferences } from './contexts/ToolPreferencesContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
+import { UserIdentityProvider } from './contexts/UserIdentityContext';
 import { CostTrackingProvider } from './contexts/CostTrackingContext';
 import { SystemConfigProvider } from './contexts/SystemConfigContext';
 import OfflineProvider from './contexts/OfflineProvider';
@@ -49,6 +50,10 @@ const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDash
 const PlatformSystemPage = lazyWithRetry(() => import('./pages/platform/PlatformSystemPage'));
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
+const ProfileActivity = lazyWithRetry(() => import('./pages/profile/ProfileActivity'));
+const ProfilePreferences = lazyWithRetry(() => import('./pages/profile/ProfilePreferences'));
+const ProfileWorkspaces = lazyWithRetry(() => import('./pages/profile/ProfileWorkspaces'));
+const ProfileSecurity = lazyWithRetry(() => import('./pages/profile/ProfileSecurity'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
 
 // Lazy-loaded pages for better performance (loaded on demand)
@@ -1178,12 +1183,53 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
-      path: '/profile-settings',
+      path: '/profile/settings',
       element: (
         <AppShellPage>
           <ProfileSettings />
         </AppShellPage>
       ),
+      requiresAuth: true,
+    },
+    {
+      path: '/profile/activity',
+      element: (
+        <AppShellPage>
+          <ProfileActivity />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/profile/preferences',
+      element: (
+        <AppShellPage>
+          <ProfilePreferences />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/profile/workspaces',
+      element: (
+        <AppShellPage>
+          <ProfileWorkspaces />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/profile/security',
+      element: (
+        <AppShellPage>
+          <ProfileSecurity />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/profile-settings',
+      element: <Navigate to="/profile/settings" replace />,
       requiresAuth: true,
     },
     {
@@ -1457,18 +1503,20 @@ function App() {
             <WorkspaceProvider>
               <CostTrackingProvider>
                 <ToolPreferencesProvider>
-                  <ConversationProvider>
-                    <SystemConfigProvider>
-                      <OfflineProvider>
-                        <ErrorBoundary>
-                          <Suspense fallback={<PageLoader />}>
-                            <AppRoutes />
-                          </Suspense>
-                          <NotificationToasts />
-                        </ErrorBoundary>
-                      </OfflineProvider>
-                    </SystemConfigProvider>
-                  </ConversationProvider>
+                  <UserIdentityProvider>
+                    <ConversationProvider>
+                      <SystemConfigProvider>
+                        <OfflineProvider>
+                          <ErrorBoundary>
+                            <Suspense fallback={<PageLoader />}>
+                              <AppRoutes />
+                            </Suspense>
+                            <NotificationToasts />
+                          </ErrorBoundary>
+                        </OfflineProvider>
+                      </SystemConfigProvider>
+                    </ConversationProvider>
+                  </UserIdentityProvider>
                 </ToolPreferencesProvider>
               </CostTrackingProvider>
             </WorkspaceProvider>

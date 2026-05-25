@@ -4,6 +4,7 @@ import { useUser } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
 import PermissionGate from './PermissionGate';
 import WorkspaceCreationModal from './WorkspaceCreationModal';
 import { partitionSidebarTools, SIDEBAR_CATEGORY_ORDER } from '../data/sidebarToolPresentation';
@@ -42,6 +43,13 @@ const Sidebar = forwardRef(function Sidebar(
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useUser();
+  const {
+    account,
+    activeWorkspace: activeOperationalWorkspace,
+    workspaces: operationalWorkspaces,
+    workspaceState,
+    switchWorkspace,
+  } = useUserIdentity();
   const { notifications } = useNotifications();
   const {
     favorites,
@@ -66,6 +74,8 @@ const Sidebar = forwardRef(function Sidebar(
   );
 
   const unreadCount = notifications.filter(n => !n.read).length;
+  const displayName = account?.displayName || user?.fullName || user?.name || 'User';
+  const displayRole = account?.specialty || account?.role || user?.role || 'Clinician';
 
   // Medical Tools - Enhanced with navigation
   const medicalTools = useMemo(() => getSidebarToolRegistryProjection(), []);
@@ -366,12 +376,36 @@ const Sidebar = forwardRef(function Sidebar(
       {/* User Profile */}
       {!effectiveCollapsed && (
         <div className="sidebar-user">
-          <div className="user-avatar">
-            {user?.name?.charAt(0).toUpperCase() || 'U'}
-          </div>
-          <div className="user-info">
-            <div className="user-name">{user?.name || 'User'}</div>
-            <div className="user-role">{user?.role || 'Clinician'}</div>
+          <button
+            type="button"
+            className="sidebar-user-main"
+            onClick={() => {
+              navigate('/profile');
+              onCloseMobileNav();
+            }}
+            aria-label="Open profile"
+          >
+            <div className="user-avatar">
+              {account?.avatarUrl ? <img src={account.avatarUrl} alt="" /> : displayName.charAt(0).toUpperCase()}
+            </div>
+            <div className="user-info">
+              <div className="user-name">{displayName}</div>
+              <div className="user-role">{displayRole}</div>
+            </div>
+          </button>
+          <div className="sidebar-operational-workspace">
+            <label htmlFor="sidebar-operational-workspace">Workspace</label>
+            <select
+              id="sidebar-operational-workspace"
+              value={workspaceState?.activeWorkspaceId || activeOperationalWorkspace?.id || ''}
+              onChange={(event) => switchWorkspace(event.target.value)}
+            >
+              {operationalWorkspaces.map((workspace) => (
+                <option key={workspace.id} value={workspace.id}>
+                  {workspace.branding?.displayName || workspace.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div className={`health-indicator ${healthStatus}`}>
             <div className="health-dot"></div>
