@@ -64,6 +64,12 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
         expect(appSource).toContain(`path: '/tools/pulmonology/:toolId'`);
       } else if (path.startsWith('/tools/nephrology/')) {
         expect(appSource).toContain(`path: '/tools/nephrology/:toolId'`);
+      } else if (path.startsWith('/tools/gastroenterology/')) {
+        expect(appSource).toContain(`path: '/tools/gastroenterology/:toolId'`);
+      } else if (path.startsWith('/tools/endocrine/')) {
+        expect(appSource).toContain(`path: '/tools/endocrine/:toolId'`);
+      } else if (path.startsWith('/tools/neurology/')) {
+        expect(appSource).toContain(`path: '/tools/neurology/:toolId'`);
       } else {
         expect(appSource).toContain(`path: '${path}'`);
       }

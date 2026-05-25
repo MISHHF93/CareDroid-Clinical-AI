@@ -19,6 +19,19 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     toolIds: ['nihss'],
   },
   {
+    groupId: 'neurology-assistants',
+    heading: 'Neurology workflow assistants',
+    lead:
+      'Seizure, stroke workflow, headache red-flag, vertigo/HINTS, and neuro exam assistants organize exam-heavy review and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend treatment or disposition, and must not delay emergency stroke, seizure, airway, trauma, infection, or neurosurgical pathways.',
+    toolIds: [
+      'seizure-assistant',
+      'stroke-workflow-assistant',
+      'headache-red-flag-assistant',
+      'vertigo-hints-assistant',
+      'neuro-exam-assistant',
+    ],
+  },
+  {
     groupId: 'trauma',
     heading: 'Trauma imaging decision support',
     lead:
@@ -123,6 +136,11 @@ export function chatAssistedLaunchAriaLabel(toolName) {
 const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'grace-acs': 'Unstable ACS or STEMI pathways take priority over chat.',
   nihss: 'Emergency stroke pathways take priority over completing scoring in chat.',
+  'seizure-assistant': 'Status epilepticus, airway compromise, trauma, or unstable patients need urgent pathways before chat.',
+  'stroke-workflow-assistant': 'Emergency stroke activation, imaging, transfer, and treatment workflows take priority over chat.',
+  'headache-red-flag-assistant': 'Thunderclap headache, neurologic deficit, meningismus, or unstable patients need urgent evaluation before chat.',
+  'vertigo-hints-assistant': 'Posterior circulation stroke concerns and severe gait/neurologic findings need urgent evaluation before chat.',
+  'neuro-exam-assistant': 'New focal deficits, declining consciousness, seizure, trauma, infection, or cord symptoms need urgent pathways before chat.',
   'canadian-c-spine': 'Unstable trauma and primary survey take priority over chat.',
   'nexus-cspine': 'Unstable trauma and primary survey take priority over chat.',
   'ottawa-ankle': 'Hard-stop injuries and urgent evaluation take priority over chat.',

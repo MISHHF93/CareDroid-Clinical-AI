@@ -516,6 +516,78 @@ Report total score (0–7), risk category (low 0–3, moderate 4–5, high 6–7
     backendExecutable: false,
   },
   {
+    toolId: NLU.huntHessScale,
+    toolName: 'Hunt-Hess Scale',
+    category: 'calculator',
+    description:
+      'Aneurysmal subarachnoid hemorrhage clinical severity grade. Does not replace emergency SAH evaluation or neurosurgical pathways.',
+    path: '/tools/calculators/hunt-hess-scale',
+    sidebarToolId: REGISTRY.huntHessScale,
+    chatSeed:
+      'Help me document Hunt-Hess clinical grade for suspected aneurysmal subarachnoid hemorrhage. Clinical decision support only; do not diagnose SAH, do not recommend aneurysm treatment, and do not delay emergency neuroimaging, airway/hemodynamic support, or neurosurgical consultation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.ichScore,
+    toolName: 'ICH Score',
+    category: 'calculator',
+    description:
+      'Intracerebral hemorrhage severity score from GCS, hematoma volume, intraventricular hemorrhage, infratentorial origin, and age.',
+    path: '/tools/calculators/ich-score',
+    sidebarToolId: REGISTRY.ichScore,
+    chatSeed:
+      'Help me calculate ICH Score from GCS, hematoma volume, intraventricular hemorrhage, infratentorial origin, and age. Clinical decision support only; do not diagnose hemorrhage type, do not recommend BP targets, reversal, surgery, transfer, or disposition, and do not delay emergency imaging or stroke/neurosurgery pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.fourScore,
+    toolName: 'FOUR Score',
+    category: 'calculator',
+    description:
+      'Coma scale using eye, motor, brainstem reflex, and respiration components. Airway and neurocritical-care pathways take priority.',
+    path: '/tools/calculators/four-score',
+    sidebarToolId: REGISTRY.fourScore,
+    chatSeed:
+      'Help me document FOUR Score components: eye response, motor response, brainstem reflexes, and respiration. Clinical decision support only; do not diagnose coma cause, brain death, or prognosis, and do not delay airway, ventilation, seizure, trauma, stroke, or neurocritical-care evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.modifiedRankinScale,
+    toolName: 'Modified Rankin Scale',
+    category: 'calculator',
+    description:
+      'Global disability outcome scale after stroke or neurologic illness. Does not recommend acute treatment or disposition.',
+    path: '/tools/calculators/modified-rankin-scale',
+    sidebarToolId: REGISTRY.modifiedRankinScale,
+    chatSeed:
+      'Help me document modified Rankin Scale level from functional status and dependence. Clinical decision support only; outcome documentation only, not a diagnosis and not an acute treatment, discharge, rehab, or placement recommendation. Do not delay urgent evaluation for new or worsening neurologic deficits to complete this outcome score.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.nihssSummaryView,
+    toolName: 'NIHSS Summary View',
+    category: 'calculator',
+    description:
+      'NIH Stroke Scale item summary for stroke exam documentation. Does not replace urgent stroke activation or imaging.',
+    path: '/tools/calculators/nihss-summary-view',
+    sidebarToolId: REGISTRY.nihssSummaryView,
+    chatSeed:
+      'Help me summarize NIHSS item scores for a stroke exam: LOC, questions, commands, gaze, visual fields, facial palsy, motor arms/legs, ataxia, sensory, language, dysarthria, and extinction. Clinical decision support only; do not diagnose stroke, do not determine thrombolysis or thrombectomy eligibility, and do not delay emergency stroke activation, imaging, transfer, or treatment workflows.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pediatricGcs,
+    toolName: 'Pediatric GCS',
+    category: 'calculator',
+    description:
+      'Pediatric Glasgow Coma Scale with age-adjusted verbal response context. Does not replace urgent pediatric evaluation.',
+    path: '/tools/calculators/pediatric-gcs',
+    sidebarToolId: REGISTRY.pediatricGcs,
+    chatSeed:
+      'Help me document Pediatric GCS from eye, verbal, and motor responses using age-appropriate descriptions. Clinical decision support only; do not diagnose neurologic injury, do not recommend imaging, airway, transfer, or disposition, and do not delay pediatric trauma, seizure, hypoglycemia, airway, or emergency pathways.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'centor-mcisaac',
     toolName: 'Centor / McIsaac score',
     category: 'calculator',
@@ -1223,6 +1295,126 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     sidebarToolId: REGISTRY.continuousGlucoseCommandCenter,
     chatSeed:
       'Help me review continuous glucose command-center queues: CGM freshness, hypoglycemia events, sustained hyperglycemia patterns, sensor gaps, unresolved alerts, and handoff priorities. Clinical decision support and backend telemetry visibility only; no autonomous insulin changes, no dosing recommendations, no pump control, and no replacement for urgent bedside assessment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.seizureAssistant,
+    toolName: 'Seizure Assistant',
+    category: 'calculator',
+    description:
+      'Guided seizure review with event features, recovery, triggers, medications as documented, and urgent-care prompts.',
+    path: '/tools/neurology/seizure-assistant',
+    sidebarToolId: REGISTRY.seizureAssistant,
+    chatSeed:
+      'Help me structure a seizure review: witnessed event description, onset and duration, recovery, provoking factors, glucose/electrolyte context if known, antiseizure medications as documented, pregnancy/trauma/infection context, and missing data. Clinical decision support only; do not diagnose seizure type, do not recommend antiseizure medication dosing or changes, and do not delay status epilepticus, airway, trauma, or emergency pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.strokeWorkflowAssistant,
+    toolName: 'Stroke Workflow Assistant',
+    category: 'calculator',
+    description:
+      'Stroke workflow review for last-known-well, deficits, NIHSS context, imaging status, contraindication prompts, and handoff.',
+    path: '/tools/neurology/stroke-workflow-assistant',
+    sidebarToolId: REGISTRY.strokeWorkflowAssistant,
+    chatSeed:
+      'Help me organize an acute stroke workflow handoff: last-known-well, baseline function, focal deficits, NIHSS context, glucose, anticoagulant context, imaging status, thrombectomy screen prompts, and missing data. Clinical decision support only; do not diagnose stroke, do not determine thrombolysis or thrombectomy eligibility, and do not delay emergency stroke activation, imaging, transfer, or treatment workflows.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.headacheRedFlagAssistant,
+    toolName: 'Headache Red Flag Assistant',
+    category: 'calculator',
+    description:
+      'Headache red-flag review for thunderclap onset, neurologic deficit, infection, pregnancy/postpartum, cancer, trauma, and age context.',
+    path: '/tools/neurology/headache-red-flag-assistant',
+    sidebarToolId: REGISTRY.headacheRedFlagAssistant,
+    chatSeed:
+      'Help me review headache red flags: thunderclap or worst headache, new neurologic deficits, altered mental status, fever/meningismus, pregnancy/postpartum, cancer/immunosuppression, trauma, anticoagulation, age over 50, and pattern change. Clinical decision support only; do not diagnose headache cause, do not recommend imaging, LP, medications, admission, discharge, or disposition, and do not delay urgent evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.vertigoHintsAssistant,
+    toolName: 'Vertigo HINTS Assistant',
+    category: 'calculator',
+    description:
+      'Vertigo/HINTS documentation support for continuous vertigo, trained bedside exam findings, gait/hearing context, and stroke warnings.',
+    path: '/tools/neurology/vertigo-hints-assistant',
+    sidebarToolId: REGISTRY.vertigoHintsAssistant,
+    chatSeed:
+      'Help me document a vertigo/HINTS review for continuous acute vestibular syndrome: timing, nystagmus, head impulse, test of skew, hearing symptoms, gait, focal neurologic findings, and vascular risk context. Clinical decision support only; HINTS requires trained bedside exam, does not rule out posterior circulation stroke, and must not delay urgent stroke evaluation or imaging when concerning features are present.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neuroExamAssistant,
+    toolName: 'Neuro Exam Assistant',
+    category: 'calculator',
+    description:
+      'Guided neurologic exam checklist for mental status, cranial nerves, motor, sensory, coordination, gait, reflexes, and localization prompts.',
+    path: '/tools/neurology/neuro-exam-assistant',
+    sidebarToolId: REGISTRY.neuroExamAssistant,
+    chatSeed:
+      'Help me structure a neurologic exam: mental status, cranial nerves, motor strength/tone, reflexes, sensory findings, coordination, gait, cortical signs, localization clues, and missing data. Clinical decision support only; do not diagnose, do not recommend treatment or disposition, and do not delay emergency stroke, seizure, trauma, infection, or spinal cord pathways for new deficits.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neuroTelemetryDashboard,
+    toolName: 'Neuro Telemetry Dashboard',
+    category: 'reference',
+    description:
+      'Neuro telemetry dashboard for neuro checks, GCS/NIHSS trends, seizure events, ICP/EVD context, freshness, and review queues.',
+    path: '/tools/neurology/neuro-telemetry-dashboard',
+    sidebarToolId: REGISTRY.neuroTelemetryDashboard,
+    chatSeed:
+      'Help me review neuro telemetry dashboard context: neuro check trends, GCS or NIHSS changes, seizure events, pupillary findings, ICP/EVD context if available, data freshness, missing checks, and unresolved review items. Clinical decision support and monitoring visibility only; no autonomous escalation or alerts replacing bedside assessment, and urgent neurologic change needs immediate local pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.strokeCommandCenter,
+    toolName: 'Stroke Command Center',
+    category: 'reference',
+    description:
+      'Stroke command-center view for activation queues, last-known-well, imaging milestones, handoff status, and unresolved review items.',
+    path: '/tools/neurology/stroke-command-center',
+    sidebarToolId: REGISTRY.strokeCommandCenter,
+    chatSeed:
+      'Help me review stroke command-center queues: active stroke alerts, last-known-well documentation, imaging milestones, transfer/handoff status, unresolved data gaps, and review priorities. Clinical decision support and operations visibility only; do not determine thrombolysis or thrombectomy eligibility and do not delay emergency stroke workflow steps.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neuroMonitoringEngine,
+    toolName: 'Neuro Monitoring Engine',
+    category: 'reference',
+    description:
+      'Neuro monitoring trend engine for serial exams, consciousness scores, pupillary data, ICP context, and review queues.',
+    path: '/tools/neurology/neuro-monitoring-engine',
+    sidebarToolId: REGISTRY.neuroMonitoringEngine,
+    chatSeed:
+      'Help me summarize neuro monitoring trends: serial neuro exams, consciousness scores, pupillary findings, ICP/EVD context if available, sedation/procedure context, data gaps, and review queues. Clinical decision support and trend visibility only; no autonomous escalation orders and no replacement for bedside assessment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.eegTrendDashboard,
+    toolName: 'EEG Trend Dashboard',
+    category: 'reference',
+    description:
+      'EEG trend dashboard for EEG status, seizure burden context, artifact, report freshness, and review queues.',
+    path: '/tools/neurology/eeg-trend-dashboard',
+    sidebarToolId: REGISTRY.eegTrendDashboard,
+    chatSeed:
+      'Help me review EEG trend dashboard context: EEG connection/status, seizure burden context if reported, artifact, report freshness, medication context as documented, and pending review queues. Clinical decision support and visibility only; do not diagnose seizures or recommend antiseizure medication, sedation, stimulation, admission, discharge, or disposition, and do not delay urgent seizure or neurologic deterioration pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neurologyTimelineAi,
+    toolName: 'Neurology Timeline AI',
+    category: 'reference',
+    description:
+      'Neurology timeline workflow for symptom onset, exams, imaging, EEG, interventions, and handoff chronology.',
+    path: '/tools/neurology/neurology-timeline-ai',
+    sidebarToolId: REGISTRY.neurologyTimelineAi,
+    chatSeed:
+      'Help me build a clinician-reviewed neurology timeline: symptom onset and last-known-well, exam changes, imaging and EEG milestones, treatments already documented, consults, and handoff gaps. Clinical decision support only; do not diagnose, do not recommend treatment, and do not delay emergency stroke, seizure, airway, infection, trauma, or neurosurgical care.',
     backendExecutable: false,
   },
   {
@@ -2089,6 +2281,60 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/abcd2',
     calcQuery: '/tools/calculators?calc=abcd2',
     implementation: 'Client-side in abcd2Calculator.jsx (abcd2Calculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'hunt-hess-scale',
+    name: 'Hunt-Hess Scale',
+    description: 'Aneurysmal SAH clinical severity grade with emergency pathway warnings.',
+    path: '/tools/calculators/hunt-hess-scale',
+    calcQuery: '/tools/calculators?calc=hunt-hess-scale',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'ich-score',
+    name: 'ICH Score',
+    description: 'Intracerebral hemorrhage severity from GCS, volume, IVH, origin, and age.',
+    path: '/tools/calculators/ich-score',
+    calcQuery: '/tools/calculators?calc=ich-score',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'four-score',
+    name: 'FOUR Score',
+    description: 'Coma exam score from eye, motor, brainstem reflex, and respiration.',
+    path: '/tools/calculators/four-score',
+    calcQuery: '/tools/calculators?calc=four-score',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'modified-rankin-scale',
+    name: 'Modified Rankin Scale',
+    description: 'Global disability outcome scale for stroke and neurologic illness.',
+    path: '/tools/calculators/modified-rankin-scale',
+    calcQuery: '/tools/calculators?calc=modified-rankin-scale',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'nihss-summary-view',
+    name: 'NIHSS Summary View',
+    description: 'NIHSS item summary view for stroke exam documentation and serial comparison.',
+    path: '/tools/calculators/nihss-summary-view',
+    calcQuery: '/tools/calculators?calc=nihss-summary-view',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pediatric-gcs',
+    name: 'Pediatric GCS',
+    description: 'Pediatric Glasgow Coma Scale with age-adjusted verbal response descriptions.',
+    path: '/tools/calculators/pediatric-gcs',
+    calcQuery: '/tools/calculators?calc=pediatric-gcs',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
     orchestratorId: null,
   },
   {

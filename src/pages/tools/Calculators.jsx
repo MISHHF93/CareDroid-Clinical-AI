@@ -122,6 +122,14 @@ import {
   SerumOsmolalityCalculator,
   WaistHipRatioCalculator,
 } from './endocrineMetabolicCalculators';
+import {
+  FourScoreCalculator,
+  HuntHessScaleCalculator,
+  IchScoreCalculator,
+  ModifiedRankinScaleCalculator,
+  NihssSummaryViewCalculator,
+  PediatricGcsCalculator,
+} from './neurologyCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -596,6 +604,18 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <FraminghamRiskCalculator onResultChange={onResultChange} />;
     case 'abcd2':
       return <Abcd2Calculator onResultChange={onResultChange} />;
+    case 'hunt-hess-scale':
+      return <HuntHessScaleCalculator onResultChange={onResultChange} />;
+    case 'ich-score':
+      return <IchScoreCalculator onResultChange={onResultChange} />;
+    case 'four-score':
+      return <FourScoreCalculator onResultChange={onResultChange} />;
+    case 'modified-rankin-scale':
+      return <ModifiedRankinScaleCalculator onResultChange={onResultChange} />;
+    case 'nihss-summary-view':
+      return <NihssSummaryViewCalculator onResultChange={onResultChange} />;
+    case 'pediatric-gcs':
+      return <PediatricGcsCalculator onResultChange={onResultChange} />;
     case 'shock-index':
       return <ShockIndexCalculator onResultChange={onResultChange} />;
     case 'anion-gap':
