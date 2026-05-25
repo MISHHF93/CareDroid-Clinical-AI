@@ -85,6 +85,7 @@ export class UserProfileService {
     if (dto.organization !== undefined) profileUpdates.institution = dto.organization.trim();
     if (dto.country !== undefined) profileUpdates.country = dto.country.trim();
     if (dto.timezone !== undefined) profileUpdates.timezone = dto.timezone.trim();
+    if (dto.licenseNumber !== undefined) profileUpdates.licenseNumber = dto.licenseNumber.trim();
     Object.assign(profile, profileUpdates);
     await this.profileRepository.save(profile);
 
@@ -98,6 +99,7 @@ export class UserProfileService {
       specialties: dto.specialties,
       experienceLevel: dto.experienceLevel,
       clinicalInterests: dto.clinicalInterests,
+      licenseRegion: dto.licenseRegion,
     };
     for (const [key, value] of Object.entries(professionalUpdates)) {
       if (value !== undefined) {
@@ -234,6 +236,8 @@ export class UserProfileService {
           : [],
       experienceLevel: professional.experienceLevel || 'mid',
       clinicalInterests: professional.clinicalInterests || [],
+      licenseNumber: profile.licenseNumber,
+      licenseRegion: professional.licenseRegion,
     };
   }
 

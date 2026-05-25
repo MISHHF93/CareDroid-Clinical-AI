@@ -39,6 +39,16 @@ export class UpdateOperationalProfileDto {
   timezone?: string;
 
   @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  licenseNumber?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(120)
+  licenseRegion?: string;
+
+  @IsOptional()
   @IsArray()
   credentials?: string[];
 
