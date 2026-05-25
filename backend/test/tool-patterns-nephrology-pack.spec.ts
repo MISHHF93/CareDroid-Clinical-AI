@@ -10,6 +10,7 @@ const NEPHROLOGY_PATTERN_PHRASES = [
   ['corrected-sodium', 'corrected sodium'],
   ['free-water-deficit', 'free water deficit'],
   ['osmolal-gap', 'osmolal gap'],
+  ['anion-gap', 'anion gap'],
   ['aki-staging-assistant', 'aki staging assistant'],
   ['dialysis-readiness-helper', 'dialysis readiness helper'],
   ['electrolyte-disorder-assistant', 'electrolyte disorder assistant'],
