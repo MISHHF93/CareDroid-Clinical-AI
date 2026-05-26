@@ -81,6 +81,7 @@ const DiagnosisAssistant = lazyWithRetry(() => import('./pages/tools/DiagnosisAs
 const ProcedureGuide = lazyWithRetry(() => import('./pages/tools/ProcedureGuide'));
 const AmbientScribe = lazyWithRetry(() => import('./pages/tools/AmbientScribe'));
 const CalculatorRecommender = lazyWithRetry(() => import('./pages/tools/CalculatorRecommender'));
+const CardiologyAssistantPage = lazyWithRetry(() => import('./pages/tools/CardiologyAssistantPage'));
 const GuidelineRag = lazyWithRetry(() => import('./pages/tools/GuidelineRag'));
 const DifferentialAi = lazyWithRetry(() => import('./pages/tools/DifferentialAi'));
 const TimelineAi = lazyWithRetry(() => import('./pages/tools/TimelineAi'));
@@ -659,6 +660,16 @@ function AppRoutes() {
         </AppShellPage>
       ),
       requiresAuth: true,
+    },
+    {
+      path: '/tools/cardiology/:toolId',
+      element: (
+        <AppShellPage>
+          <CardiologyAssistantPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.USE_AI_CHAT,
     },
     {
       path: '/tools/guideline-rag',

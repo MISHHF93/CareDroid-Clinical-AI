@@ -267,7 +267,8 @@ export function buildMatrixRowForRegistry(registryId) {
     inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED ||
     (orchestratorNluId ? isOrchestratorPostExecutable(orchestratorNluId) : false);
   const platformEndpoint =
-    inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM && Boolean(inventoryRecord?.endpoint);
+    (inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.PLATFORM && Boolean(inventoryRecord?.endpoint)) ||
+    (inventoryRecord?.tier === 'C' && inventoryRecord?.endpoint === '/api/chat/message');
 
   return {
     id: registryId,
