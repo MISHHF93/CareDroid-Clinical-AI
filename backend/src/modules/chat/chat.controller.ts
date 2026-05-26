@@ -152,6 +152,7 @@ export class ChatController {
       confidence: response.confidence,
       ragContext: response.ragContext,
       metadata: {
+        ...response.metadata,
         toolUsed: dto.tool,
         featureUsed: dto.feature,
         conversationId: dto.conversationId,

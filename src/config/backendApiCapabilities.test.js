@@ -1,7 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import {
   BACKEND_API_CAPABILITIES,
+  BACKEND_API_CAPABILITY_STATUS,
+  BACKEND_CAPABILITY_STATUS,
   BACKEND_EXECUTOR_NLU_TOOL_IDS,
+  getBackendCapabilityStatus,
   isBackendCapabilityEnabled,
   isBackendExecutorToolId,
 } from './backendApiCapabilities';
@@ -23,6 +26,7 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('bulkSync')).toBe(false);
     expect(isBackendCapabilityEnabled('chatPersistence')).toBe(false);
     expect(isBackendCapabilityEnabled('reportsSchedule')).toBe(false);
+    expect(isBackendCapabilityEnabled('clinicalAlertsStream')).toBe(false);
   });
 
   it('enables wired clinical routes', () => {
@@ -30,18 +34,29 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('chatMessage')).toBe(true);
     expect(isBackendCapabilityEnabled('complianceConsent')).toBe(true);
     expect(isBackendCapabilityEnabled('toolsResultsSync')).toBe(true);
+    expect(isBackendCapabilityEnabled('userProfile')).toBe(true);
+    expect(isBackendCapabilityEnabled('operationalProfile')).toBe(true);
+    expect(isBackendCapabilityEnabled('workspaces')).toBe(true);
+    expect(isBackendCapabilityEnabled('userActivity')).toBe(true);
+    expect(isBackendCapabilityEnabled('personalization')).toBe(true);
+    expect(isBackendCapabilityEnabled('clinicalAlerts')).toBe(true);
   });
 
-  it('enables read-only live tracking contracts', () => {
+  it('enables read-only live tracking contracts as demo-backed capabilities', () => {
     expect(isBackendCapabilityEnabled('fleetLiveTracking')).toBe(true);
     expect(isBackendCapabilityEnabled('fleetActiveRoutes')).toBe(true);
     expect(isBackendCapabilityEnabled('hospitalMap')).toBe(true);
     expect(isBackendCapabilityEnabled('medicalDeviceRegistry')).toBe(true);
     expect(isBackendCapabilityEnabled('telemetryLive')).toBe(true);
     expect(isBackendCapabilityEnabled('deviceAlerting')).toBe(true);
+    expect(getBackendCapabilityStatus('fleetLiveTracking')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    expect(getBackendCapabilityStatus('hospitalMap')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    expect(getBackendCapabilityStatus('telemetryLive')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
+    expect(getBackendCapabilityStatus('clinicalAlerts')).toBe(BACKEND_CAPABILITY_STATUS.DEMO);
   });
 
   it('exports frozen capability map', () => {
     expect(Object.isFrozen(BACKEND_API_CAPABILITIES)).toBe(true);
+    expect(Object.isFrozen(BACKEND_API_CAPABILITY_STATUS)).toBe(true);
   });
 });

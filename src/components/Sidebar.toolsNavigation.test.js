@@ -28,7 +28,7 @@ describe('Flattened tools navigation wiring', () => {
 
   it('renders canonical primary navigation in Sidebar instead of duplicate tool shortcuts', () => {
     expect(appShellSource).toContain('onOpenToolsOverview');
-    expect(sidebarSource).toContain('PRIMARY_NAV_ITEMS');
+    expect(sidebarSource).toContain('PRIMARY_SIDEBAR_NAV_ITEMS');
     expect(sidebarSource).not.toContain('onOpenToolsOverview');
     expect(sidebarSource).not.toContain('handleViewAllTools');
   });
@@ -45,6 +45,20 @@ describe('Flattened tools navigation wiring', () => {
     expect(readFileSync(join(__dirname, '../navigation/primaryNavigation.js'), 'utf8')).toContain("id: 'developer-audit'");
     expect(readFileSync(join(__dirname, '../navigation/primaryNavigation.js'), 'utf8')).toContain("path: '/tools/catalog'");
     expect(sidebarSource).not.toContain("navigate('/tools/catalog')");
+  });
+
+  it('flattens maps and IoT under Operations in visible shell navigation', () => {
+    expect(primaryNavSource).toContain('PRIMARY_SIDEBAR_NAV_ITEMS');
+    expect(primaryNavSource).toMatch(/id:\s*'operations'[\s\S]*'\/hospital-map'[\s\S]*'\/medical-iot'/);
+    expect(primaryNavSource).toMatch(/id:\s*'maps'[\s\S]*showInSidebar:\s*false[\s\S]*showInMobile:\s*false/);
+    expect(primaryNavSource).toMatch(/id:\s*'medical-iot'[\s\S]*showInSidebar:\s*false[\s\S]*showInMobile:\s*false/);
+    expect(appShellSource).toContain('PRIMARY_MOBILE_NAV_ITEMS');
+  });
+
+  it('keeps the duplicate sidebar Actions inventory collapsed until requested', () => {
+    expect(sidebarSource).toContain('useState(false)');
+    expect(sidebarSource).toContain('showToolsSection &&');
+    expect(sidebarSource).toContain('sidebar-workspace-controls');
   });
 
   it('navigates sidebar tool cards via centralized registry launch', () => {

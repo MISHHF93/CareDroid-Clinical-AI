@@ -53,7 +53,18 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Ops',
     path: '/operations',
     legacyPaths: ['/fleet'],
-    matchPaths: ['/operations', '/fleet', '/devices', '/live-map', '/clinical/alerts', '/analytics', '/costs', '/audit-logs'],
+    matchPaths: [
+      '/operations',
+      '/fleet',
+      '/devices',
+      '/live-map',
+      '/hospital-map',
+      '/medical-iot',
+      '/clinical/alerts',
+      '/analytics',
+      '/costs',
+      '/audit-logs',
+    ],
     matchPrefixes: ['/fleet/'],
   },
   {
@@ -90,6 +101,8 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     legacyPaths: ['/maps', '/tracking', '/live-tracking'],
     matchPaths: ['/live-map', '/hospital-map', '/maps', '/tracking', '/live-tracking'],
     matchPrefixes: ['/hospital-map/', '/fleet/map', '/fleet/live-map', '/fleet/tracking'],
+    showInSidebar: false,
+    showInMobile: false,
   },
   {
     id: 'medical-iot',
@@ -97,6 +110,8 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     mobileLabel: 'IoT',
     path: '/medical-iot',
     matchPaths: ['/medical-iot'],
+    showInSidebar: false,
+    showInMobile: false,
   },
   {
     id: 'developer-audit',
@@ -135,6 +150,16 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
 export const PRIMARY_NAV_BY_ID = Object.freeze(
   Object.fromEntries(PRIMARY_NAV_ITEMS.map((item) => [item.id, item]))
 );
+
+export const PRIMARY_SIDEBAR_NAV_ITEMS = Object.freeze(
+  PRIMARY_NAV_ITEMS.filter((item) => item.showInSidebar !== false)
+);
+
+export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
+  PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => item.showInMobile !== false)
+);
+
+export const QUICK_COMMAND_NAV_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 
 export function primaryNavPathMatches(item, pathname) {
   const normalized = pathname || '/';

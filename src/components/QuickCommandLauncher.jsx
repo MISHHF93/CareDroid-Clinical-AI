@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
-import { PRIMARY_NAV_ITEMS } from '../navigation/primaryNavigation';
+import { QUICK_COMMAND_NAV_ITEMS } from '../navigation/primaryNavigation';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon, getToolIcon } from '../navigation/iconRegistry';
@@ -60,7 +60,7 @@ function makeToolEntry(tool) {
 
 export function buildQuickCommandEntries({
   tools = getUserFacingToolRegistryProjection(),
-  navItems = PRIMARY_NAV_ITEMS,
+  navItems = QUICK_COMMAND_NAV_ITEMS,
   recentToolIds = [],
 } = {}) {
   const navEntries = navItems.map(makeNavEntry);

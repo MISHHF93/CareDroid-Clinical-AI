@@ -32,7 +32,10 @@ const disclaimerCss = readFileSync(
 const liveMapCss = readFileSync(join(__dirname, '../pages/LiveTrackingMap.css'), 'utf8');
 const hospitalMapCss = readFileSync(join(__dirname, '../pages/HospitalMapDashboard.css'), 'utf8');
 const medicalIotCss = readFileSync(join(__dirname, '../pages/MedicalIotDashboard.css'), 'utf8');
+const deviceFleetCss = readFileSync(join(__dirname, '../pages/DeviceFleetManagement.css'), 'utf8');
 const fleetLiveMapCss = readFileSync(join(__dirname, '../pages/fleet/FleetLiveMap.css'), 'utf8');
+
+const REQUIRED_RESPONSIVE_VIEWPORT_WIDTHS = Object.freeze([320, 360, 390, 412, 430, 768, 1024, 1280, 1440]);
 
 describe('responsive-ux.css — global normalization', () => {
   it('is imported from main.jsx after design-tokens.css', () => {
@@ -134,6 +137,23 @@ describe('responsive-ux.css — global normalization', () => {
     }
     expect(layoutVisibilityCss).toContain('.hospital-map-canvas');
     expect(layoutVisibilityCss).toMatch(/\.medical-iot-page :is\([\s\S]*overflow-wrap:\s*anywhere/);
+  });
+
+  it('codifies the requested mobile, tablet, and desktop viewport matrix', () => {
+    expect(REQUIRED_RESPONSIVE_VIEWPORT_WIDTHS).toEqual([320, 360, 390, 412, 430, 768, 1024, 1280, 1440]);
+  });
+
+  it('keeps operational tables and fixed-width panels locally scrollable', () => {
+    expect(deviceFleetCss).toMatch(/\.device-fleet-page\s*\{[\s\S]*overflow-x:\s*clip/);
+    expect(deviceFleetCss).toMatch(/\.device-fleet-table-wrap\s*\{[\s\S]*overflow-x:\s*auto/);
+    expect(deviceFleetCss).toMatch(/\.device-fleet-table\s*\{[\s\S]*min-width:\s*980px/);
+    expect(layoutVisibilityCss).toMatch(/\.fleet-data-table-wrap\s*\{[\s\S]*overflow-x:\s*auto/);
+  });
+
+  it('collapses operational grids before phone widths', () => {
+    for (const css of [liveMapCss, hospitalMapCss, medicalIotCss, deviceFleetCss, fleetLiveMapCss]) {
+      expect(css).toMatch(/@media \(max-width:\s*\d+px\)[\s\S]*grid-template-columns:\s*1fr/);
+    }
   });
 });
 

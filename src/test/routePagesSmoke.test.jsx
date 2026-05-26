@@ -28,6 +28,7 @@ import LiveTrackingMap from '../pages/LiveTrackingMap';
 import HospitalMapDashboard from '../pages/HospitalMapDashboard';
 import MedicalIotDashboard from '../pages/MedicalIotDashboard';
 import DeviceFleetManagement from '../pages/DeviceFleetManagement';
+import ClinicalAlertsPage from '../pages/ClinicalAlertsPage';
 import FleetLiveMap from '../pages/fleet/FleetLiveMap';
 import { CORE_ROUTE_SMOKE, TIER_A_FORM_SMOKE_SLUGS } from './responsiveRegression.routes';
 
@@ -88,6 +89,28 @@ vi.mock('../services/clinicalChatService', () => ({
   registryIdToChatToolParam: vi.fn(() => null),
 }));
 
+vi.mock('../services/clinicalAlertsApi', () => ({
+  fetchClinicalAlerts: vi.fn().mockResolvedValue({
+    ok: true,
+    data: {
+      safety: 'Demo clinical alerts for route smoke.',
+      alerts: [
+        {
+          id: 'alert-smoke',
+          timestamp: new Date().toISOString(),
+          severity: 'critical',
+          title: 'Critical SOFA Score',
+          description: 'Route smoke alert',
+          source: 'SOFA Calculator',
+          status: 'unacknowledged',
+          findings: ['SOFA Score: 15/24'],
+        },
+      ],
+    },
+  }),
+  acknowledgeClinicalAlertApi: vi.fn().mockResolvedValue({ ok: true, data: {} }),
+}));
+
 vi.mock('../contexts/SystemConfigContext', () => ({
   useSystemConfig: () => ({
     loading: false,
@@ -115,6 +138,7 @@ const PAGE_BY_ID = {
   'hospital-map': HospitalMapDashboard,
   'medical-iot': MedicalIotDashboard,
   devices: DeviceFleetManagement,
+  'clinical-alerts': ClinicalAlertsPage,
   'tools-overview': ToolsOverview,
   'tools-catalog': ClinicalToolCatalog,
   'calculators-hub': Calculators,
@@ -147,11 +171,39 @@ const THEME_ROUTE_SMOKE_IDS = new Set([
   'tools-catalog',
   'medical-iot',
   'devices',
+  'clinical-alerts',
   'fleet-command',
   'hospital-map',
 ]);
 
 const THEME_ROUTE_SMOKE = CORE_ROUTE_SMOKE.filter((route) => THEME_ROUTE_SMOKE_IDS.has(route.id));
+const RESPONSIVE_UX_VIEWPORT_WIDTHS = Object.freeze([320, 360, 390, 412, 430, 768, 1024, 1280, 1440]);
+const RESPONSIVE_MATRIX_ROUTE_IDS = new Set([
+  'dashboard',
+  'assistant',
+  'tools-overview',
+  'operations',
+  'calculators-hub',
+  'medical-iot',
+  'hospital-map',
+  'devices',
+  'fleet-command',
+]);
+const RESPONSIVE_MATRIX_ROUTES = CORE_ROUTE_SMOKE.filter((route) => RESPONSIVE_MATRIX_ROUTE_IDS.has(route.id));
+
+function setViewportWidth(width) {
+  Object.defineProperty(window, 'innerWidth', {
+    configurable: true,
+    writable: true,
+    value: width,
+  });
+  Object.defineProperty(window, 'innerHeight', {
+    configurable: true,
+    writable: true,
+    value: width >= 768 ? 900 : 740,
+  });
+  mockCompactViewport(width <= 900);
+}
 
 function renderRoute(path, Page) {
   return render(
@@ -265,6 +317,44 @@ describe('Route pages smoke — compact viewport (no crash)', () => {
       expectNonEmptyPage(container);
     },
     15_000
+  );
+});
+
+describe('Route pages smoke — requested responsive matrix', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    Element.prototype.scrollTo = vi.fn();
+    Element.prototype.scrollIntoView = vi.fn();
+    const { buildFleetDashboardSnapshot } = await import(
+      '../data/testHelpers/fleetToolsTestFixtures'
+    );
+    mockFetchFleetCommandSnapshot.mockResolvedValue(buildFleetDashboardSnapshot());
+  });
+
+  it.each(RESPONSIVE_UX_VIEWPORT_WIDTHS)(
+    'renders core UX surfaces without empty content at %ipx',
+    async (width) => {
+      setViewportWidth(width);
+
+      for (const route of RESPONSIVE_MATRIX_ROUTES) {
+        const Page = PAGE_BY_ID[route.id];
+        const { container, unmount } = renderRoute(route.path, Page);
+
+        if (route.match === 'composer') {
+          expect(await screen.findByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
+        } else if (route.match === 'fleet-summary') {
+          await waitFor(() => {
+            expect(screen.getByRole('heading', { name: /fleet summary/i })).toBeInTheDocument();
+          });
+        } else {
+          expect(await screen.findByRole('heading', { level: 1, name: route.heading })).toBeInTheDocument();
+        }
+
+        expectNonEmptyPage(container);
+        unmount();
+      }
+    },
+    25_000
   );
 });
 

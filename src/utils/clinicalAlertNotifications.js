@@ -5,7 +5,10 @@
 
 import NotificationService from '../services/NotificationService';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
-import { apiFetch } from '../services/apiClient';
+import {
+  acknowledgeClinicalAlertApi,
+  dismissClinicalAlertApi,
+} from '../services/clinicalAlertsApi';
 
 export const sendClinicalAlert = async (alertData, options = {}) => {
   const {
@@ -27,7 +30,8 @@ export const sendClinicalAlert = async (alertData, options = {}) => {
         findings: alertData.findings || [],
         recommendations: alertData.recommendations || [],
         source: alertData.source,
-        timestamp: alertData.timestamp || new Date()
+        timestamp: alertData.timestamp || new Date(),
+        requiresAcknowledgement,
       },
       icon: getSeverityIcon(alertData.severity),
       color: getSeverityColor(alertData.severity),
@@ -113,20 +117,16 @@ export const acknowledgeClinicalAlert = async (alertId, userId = null) => {
   }
 
   try {
-    const response = await apiFetch(`/api/clinical/alerts/${alertId}/acknowledge`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        userId,
-        acknowledgedAt: new Date().toISOString(),
-      }),
+    const result = await acknowledgeClinicalAlertApi(alertId, {
+      userId,
+      acknowledgedAt: new Date().toISOString(),
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to acknowledge alert: ${response.status}`);
+    if (!result.ok) {
+      throw new Error(result.message || 'Failed to acknowledge alert');
     }
 
-    return { success: true, alertId };
+    return { success: true, alertId, data: result.data };
   } catch (error) {
     console.error('Error acknowledging alert:', error);
     return { success: false, error: error.message };
@@ -144,20 +144,16 @@ export const dismissClinicalAlert = async (alertId, reason = '') => {
   }
 
   try {
-    const response = await apiFetch(`/api/clinical/alerts/${alertId}/dismiss`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        reason,
-        dismissedAt: new Date().toISOString(),
-      }),
+    const result = await dismissClinicalAlertApi(alertId, {
+      reason,
+      dismissedAt: new Date().toISOString(),
     });
 
-    if (!response.ok) {
-      throw new Error(`Failed to dismiss alert: ${response.status}`);
+    if (!result.ok) {
+      throw new Error(result.message || 'Failed to dismiss alert');
     }
 
-    return { success: true, alertId };
+    return { success: true, alertId, data: result.data };
   } catch (error) {
     console.error('Error dismissing alert:', error);
     return { success: false, error: error.message };
@@ -230,7 +226,7 @@ export const subscribeToClinicalAlerts = (callbacks = {}) => {
     onError = () => {}
   } = callbacks;
 
-  if (!isBackendCapabilityEnabled('clinicalAlerts')) {
+  if (!isBackendCapabilityEnabled('clinicalAlertsStream')) {
     onError(
       new Error(
         'Clinical alerts stream is not available on this server. Use in-app notifications or refresh the alerts page.'

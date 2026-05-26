@@ -37,6 +37,33 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/users/profile', controller: 'UsersController' },
   { method: 'PATCH', path: '/api/users/profile', controller: 'UsersController' },
 
+  { method: 'GET', path: '/api/profile/me', controller: 'UserProfileController' },
+  { method: 'PATCH', path: '/api/profile/me', controller: 'UserProfileController' },
+  { method: 'GET', path: '/api/profile/me/preferences', controller: 'UserProfileController' },
+  { method: 'PATCH', path: '/api/profile/me/preferences', controller: 'UserProfileController' },
+  { method: 'GET', path: '/api/profile/me/activity', controller: 'UserProfileController' },
+  { method: 'GET', path: '/api/profile/me/security', controller: 'UserProfileController' },
+
+  { method: 'GET', path: '/api/workspaces', controller: 'WorkspacesController' },
+  { method: 'POST', path: '/api/workspaces', controller: 'WorkspacesController' },
+  { method: 'POST', path: '/api/workspaces/active', controller: 'WorkspacesController' },
+  { method: 'GET', path: '/api/workspaces/:workspaceId', controller: 'WorkspacesController' },
+  { method: 'GET', path: '/api/workspaces/:workspaceId/members', controller: 'WorkspacesController' },
+  { method: 'POST', path: '/api/workspaces/:workspaceId/invitations', controller: 'WorkspacesController' },
+  { method: 'GET', path: '/api/workspaces/:workspaceId/tools', controller: 'WorkspacesController' },
+  { method: 'PATCH', path: '/api/workspaces/:workspaceId/tools', controller: 'WorkspacesController' },
+
+  { method: 'POST', path: '/api/activity', controller: 'UserActivityController' },
+  { method: 'GET', path: '/api/activity/me', controller: 'UserActivityController' },
+  { method: 'GET', path: '/api/activity/me/summary', controller: 'UserActivityController' },
+  { method: 'GET', path: '/api/activity/workspaces/:workspaceId', controller: 'UserActivityController' },
+
+  { method: 'GET', path: '/api/personalization/me', controller: 'PersonalizationController' },
+  { method: 'PATCH', path: '/api/personalization/me', controller: 'PersonalizationController' },
+  { method: 'GET', path: '/api/personalization/me/recommendations', controller: 'PersonalizationController' },
+  { method: 'POST', path: '/api/personalization/me/saved-prompts', controller: 'PersonalizationController' },
+  { method: 'DELETE', path: '/api/personalization/me/saved-prompts/:promptId', controller: 'PersonalizationController' },
+
   { method: 'GET', path: '/api/two-factor/generate', controller: 'TwoFactorController' },
   { method: 'POST', path: '/api/two-factor/enable', controller: 'TwoFactorController' },
   { method: 'DELETE', path: '/api/two-factor/disable', controller: 'TwoFactorController' },
@@ -142,6 +169,10 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/devices/live', controller: 'DeviceLiveTrackingController' },
   { method: 'GET', path: '/api/telemetry/live', controller: 'DeviceLiveTrackingController' },
   { method: 'GET', path: '/api/alerts/devices', controller: 'DeviceLiveTrackingController' },
+
+  { method: 'GET', path: '/api/clinical/alerts', controller: 'ClinicalAlertsController' },
+  { method: 'POST', path: '/api/clinical/alerts/:alertId/acknowledge', controller: 'ClinicalAlertsController' },
+  { method: 'POST', path: '/api/clinical/alerts/:alertId/dismiss', controller: 'ClinicalAlertsController' },
 
   { method: 'GET', path: '/api/audit/logs', controller: 'AuditController' },
   { method: 'GET', path: '/api/audit/my-logs', controller: 'AuditController' },
