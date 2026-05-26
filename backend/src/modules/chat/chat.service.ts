@@ -29,11 +29,11 @@ import {
 import { calculateConfidence, getConfidenceDisclaimer } from '../ai/utils/confidence-scorer';
 import { CalculatorRecommenderService } from './calculator-recommender.service';
 import {
-  AiContextManagerService,
-  AiGatewayService,
-  AiResponseComposerService,
-  AiRoutingEngineService,
-} from '../ai/foundation';
+  AIGatewayService,
+  ContextBuilderService,
+  ResponseComposerService,
+} from '../ai-gateway';
+import { MoERouterService } from '../moe-router';
 
 interface QueryResponse {
   text: string;
@@ -72,10 +72,10 @@ export class ChatService {
     private readonly nluMetrics: NluMetricsService,
     private readonly configService: ConfigService,
     private readonly calculatorRecommender: CalculatorRecommenderService,
-    private readonly aiGateway: AiGatewayService,
-    private readonly aiRoutingEngine: AiRoutingEngineService,
-    private readonly aiContextManager: AiContextManagerService,
-    private readonly aiResponseComposer: AiResponseComposerService,
+    private readonly aiGateway: AIGatewayService,
+    private readonly aiRoutingEngine: MoERouterService,
+    private readonly aiContextManager: ContextBuilderService,
+    private readonly aiResponseComposer: ResponseComposerService,
   ) {
     const ragConfig = this.configService.get<any>('rag');
     this.ragEnabled = ragConfig?.enabled !== false;
@@ -165,6 +165,12 @@ export class ChatService {
     const routePlan = this.aiRoutingEngine.createRoutePlan(aiRunEnvelope, classification);
     const contextPacket = this.aiContextManager.buildContextPacket(aiRunEnvelope, routePlan);
     const modelFoundationContext = this.aiContextManager.toModelContext(contextPacket);
+    await this.aiGateway.logRoutingAudit({
+      envelope: aiRunEnvelope,
+      classification,
+      routePlan,
+      userId,
+    });
 
     // ========================================
     // STEP 2: EMERGENCY DETECTION & ESCALATION

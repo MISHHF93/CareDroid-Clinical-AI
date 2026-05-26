@@ -9,6 +9,8 @@ import { AuditModule } from '../audit/audit.module';
 import { RAGModule } from '../rag/rag.module';
 import { MetricsModule } from '../metrics/metrics.module';
 import { CalculatorRecommenderService } from './calculator-recommender.service';
+import { AIGatewayModule } from '../ai-gateway';
+import { MoERouterModule } from '../moe-router';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { CalculatorRecommenderService } from './calculator-recommender.service';
     AuditModule,
     RAGModule,
     MetricsModule,
+    AIGatewayModule,
+    MoERouterModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, CalculatorRecommenderService],

@@ -134,6 +134,8 @@ export function normalizeAiFoundationMetadata(metadata = {}) {
     ...foundation,
     selectedExperts,
     routeScore: foundation.routeScore ?? selectedExperts[0]?.score,
+    routingMode: foundation.routingMode ?? metadata.routePlan?.routingMode,
+    fallbackApplied: foundation.fallbackApplied ?? metadata.routePlan?.fallbackApplied ?? false,
     estimatedCost:
       foundation.estimatedCost ??
       metadata.cost?.estimated ??
@@ -183,6 +185,7 @@ export function mapChatResponseToAssistantMessage(data) {
     visualizations: viz.length > 0 ? viz : undefined,
     metadata: data.metadata,
     aiFoundation,
+    aiGateway: data.metadata?.aiGateway,
     timestamp: new Date(),
   };
 }

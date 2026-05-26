@@ -28,7 +28,15 @@ describe('AiRouteMetadata', () => {
           confidence: 0.82,
           routeScore: 6.42,
           estimatedCost: 0.14,
+          routingMode: 'multi_expert',
           requiresHumanReview: true,
+        }}
+        aiGateway={{
+          pipeline: [
+            { stage: 'ai_gateway', status: 'complete' },
+            { stage: 'intent_classifier', status: 'complete' },
+            { stage: 'tool_orchestrator', status: 'planned' },
+          ],
         }}
       />
     );
@@ -38,6 +46,9 @@ describe('AiRouteMetadata', () => {
     expect(within(panel).getByText(/support: pulmonology/i)).toBeInTheDocument();
     expect(within(panel).getByText(/intent: medical reference/i)).toBeInTheDocument();
     expect(within(panel).getByText(/retrieval: guideline/i)).toBeInTheDocument();
+    expect(within(panel).getByText(/mode: multi expert/i)).toBeInTheDocument();
+    expect(within(panel).getByText(/ai gateway: complete/i)).toBeInTheDocument();
+    expect(within(panel).getByText(/tool orchestrator: planned/i)).toBeInTheDocument();
     expect(within(panel).getByText('82%')).toBeInTheDocument();
     expect(within(panel).getByText('6.42')).toBeInTheDocument();
     expect(within(panel).getByText('$0.1400')).toBeInTheDocument();

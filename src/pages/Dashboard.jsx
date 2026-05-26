@@ -1004,6 +1004,7 @@ function Dashboard() {
                       <AiRouteMetadata
                         aiFoundation={aiFoundation}
                         routePlan={msg.metadata?.routePlan}
+                        aiGateway={msg.aiGateway || msg.metadata?.aiGateway}
                       />
                     )}
                     <div className="dashboard-msg-body">{msg.content}</div>

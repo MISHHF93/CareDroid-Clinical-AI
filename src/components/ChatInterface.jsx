@@ -171,6 +171,7 @@ const ChatInterface = ({
                 <AiRouteMetadata
                   aiFoundation={message.aiFoundation || message.metadata?.aiFoundation}
                   routePlan={message.metadata?.routePlan}
+                  aiGateway={message.aiGateway || message.metadata?.aiGateway}
                 />
               )}
               {message.toolResult && (

@@ -6,10 +6,11 @@ const EXPERT_LABELS = {
   cardiology: 'Cardiology',
   pulmonology: 'Pulmonology',
   nephrology: 'Nephrology',
-  radiology: 'Radiology',
+  gastroenterology: 'Gastroenterology',
+  neurology: 'Neurology',
   psychiatry: 'Psychiatry',
   fleet: 'Fleet',
-  iot: 'IoT',
+  'medical-iot': 'Medical IoT',
   operations: 'Operations',
   'hospital-map': 'Hospital map',
   documentation: 'Documentation',
@@ -40,7 +41,7 @@ function formatCost(value) {
   return `$${Number(value).toFixed(4)}`;
 }
 
-export default function AiRouteMetadata({ aiFoundation, routePlan }) {
+export default function AiRouteMetadata({ aiFoundation, routePlan, aiGateway }) {
   if (!aiFoundation) return null;
 
   const selectedExperts =
@@ -62,6 +63,7 @@ export default function AiRouteMetadata({ aiFoundation, routePlan }) {
   );
   const reviewRequired =
     aiFoundation.requiresHumanReview ?? routePlan?.safetyPlan?.requiresHumanReview;
+  const pipeline = Array.isArray(aiGateway?.pipeline) ? aiGateway.pipeline : [];
 
   return (
     <section className="ai-route-metadata" aria-label="AI routing metadata">
@@ -82,6 +84,14 @@ export default function AiRouteMetadata({ aiFoundation, routePlan }) {
           <span className="ai-route-metadata__chip">
             Retrieval: {formatLabel(aiFoundation.retrievalPolicy)}
           </span>
+        )}
+        {(aiFoundation.routingMode || routePlan?.routingMode) && (
+          <span className="ai-route-metadata__chip">
+            Mode: {formatLabel(aiFoundation.routingMode || routePlan.routingMode)}
+          </span>
+        )}
+        {(aiFoundation.fallbackApplied || routePlan?.fallbackApplied) && (
+          <span className="ai-route-metadata__chip">Fallback route</span>
         )}
       </div>
       <dl className="ai-route-metadata__metrics">
@@ -104,6 +114,18 @@ export default function AiRouteMetadata({ aiFoundation, routePlan }) {
           </div>
         )}
       </dl>
+      {pipeline.length > 0 && (
+        <div className="ai-route-metadata__pipeline" aria-label="AI gateway pipeline">
+          {pipeline.map((item) => (
+            <span
+              className="ai-route-metadata__pipeline-step"
+              key={`${item.stage}-${item.status}`}
+            >
+              {formatLabel(item.stage)}: {formatLabel(item.status)}
+            </span>
+          ))}
+        </div>
+      )}
     </section>
   );
 }

@@ -50,8 +50,10 @@ describe('clinicalChatService', () => {
         selectedExpert: 'cardiology',
         confidence: 0.82,
         routeScore: 6.12,
+        routingMode: 'multi_expert',
         requiresHumanReview: true,
       },
+      routePlan: { fallbackApplied: true },
       cost: { estimated: 0.14, savedBy: ['lightweight_router'] },
     });
 
@@ -64,6 +66,8 @@ describe('clinicalChatService', () => {
         }),
       ],
       routeScore: 6.12,
+      routingMode: 'multi_expert',
+      fallbackApplied: true,
       estimatedCost: 0.14,
       costReductionApplied: ['lightweight_router'],
       requiresHumanReview: true,
@@ -81,6 +85,9 @@ describe('clinicalChatService', () => {
           routeScore: 10.2,
           estimatedCost: 0.08,
         },
+        aiGateway: {
+          pipeline: [{ stage: 'ai_gateway', status: 'complete' }],
+        },
       },
     });
 
@@ -89,6 +96,7 @@ describe('clinicalChatService', () => {
       routeScore: 10.2,
       estimatedCost: 0.08,
     });
+    expect(msg.aiGateway.pipeline[0]).toEqual({ stage: 'ai_gateway', status: 'complete' });
     expect(msg.metadata.aiFoundation.selectedExpert).toBe('operations');
   });
 
