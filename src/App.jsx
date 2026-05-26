@@ -45,6 +45,7 @@ const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
 const Operations = lazyWithRetry(() => import('./pages/Operations'));
 const Artifacts = lazyWithRetry(() => import('./pages/Artifacts'));
+const MemoryDashboard = lazyWithRetry(() => import('./pages/MemoryDashboard'));
 const LiveTrackingMap = lazyWithRetry(() => import('./pages/LiveTrackingMap'));
 const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
 const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
@@ -698,6 +699,15 @@ function AppRoutes() {
       element: (
         <AppShellPage>
           <Artifacts />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/memory',
+      element: (
+        <AppShellPage>
+          <MemoryDashboard />
         </AppShellPage>
       ),
       requiresAuth: true,

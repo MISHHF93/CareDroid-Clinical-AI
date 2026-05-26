@@ -49,6 +49,7 @@ import { PermissionsModule } from './modules/permissions/permissions.module';
 import { UserActivityModule } from './modules/user-activity/user-activity.module';
 import { PersonalizationModule } from './modules/personalization/personalization.module';
 import { ArtifactsModule } from './modules/artifacts/artifacts.module';
+import { MemoryModule } from './modules/memory/memory.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -133,6 +134,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     UserActivityModule,
     PersonalizationModule,
     ArtifactsModule,
+    MemoryModule,
     UserProfileModule,
     LiveTrackingModule,
     ClinicalAlertsModule,

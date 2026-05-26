@@ -56,6 +56,14 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     showInMobile: false,
   },
   {
+    id: 'memory',
+    label: 'Memory',
+    mobileLabel: 'Memory',
+    path: '/memory',
+    matchPaths: ['/memory'],
+    showInMobile: false,
+  },
+  {
     id: 'operations',
     label: 'Operations',
     mobileLabel: 'Ops',
