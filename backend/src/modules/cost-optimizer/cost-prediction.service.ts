@@ -102,7 +102,9 @@ export class CostPredictionService {
     maxOutputTokens?: number,
   ): number {
     const requestedTokens = expectedOutputTokens ?? profile.defaultOutputTokens;
-    const ceiling = maxOutputTokens ? Math.min(maxOutputTokens, profile.maxTokens) : profile.maxTokens;
+    const ceiling = maxOutputTokens
+      ? Math.min(maxOutputTokens, profile.maxTokens)
+      : profile.maxTokens;
     return Math.max(64, Math.min(requestedTokens, ceiling));
   }
 

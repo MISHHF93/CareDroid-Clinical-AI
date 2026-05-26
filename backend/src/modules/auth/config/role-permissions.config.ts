@@ -83,6 +83,14 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
 
     // Audit (Limited - own patients only)
     Permission.VIEW_AUDIT_LOGS,
+
+    // Governed clinical review
+    Permission.VIEW_REVIEW_QUEUE,
+    Permission.REVIEW_CLINICAL_AI,
+    Permission.REVIEW_DOCUMENTATION,
+    Permission.VIEW_GOVERNANCE,
+    Permission.VIEW_REGULATORY,
+    Permission.VIEW_VALIDATION,
   ],
 
   /**
@@ -125,6 +133,44 @@ export const RolePermissions: Record<UserRole, Permission[]> = {
     Permission.VIEW_ANALYTICS,
     Permission.MANAGE_CONSENT,
     Permission.MANAGE_PRIVACY,
+
+    // Platform Governance (Full)
+    Permission.VIEW_GOVERNANCE,
+    Permission.MANAGE_CLINICAL_POLICY,
+    Permission.APPROVE_CLINICAL_POLICY,
+    Permission.REVIEW_SAFETY_FINDINGS,
+    Permission.VIEW_AI_SECURITY,
+    Permission.MANAGE_AI_SECURITY,
+    Permission.REVIEW_AI_SECURITY_INCIDENTS,
+    Permission.VIEW_INTEGRATIONS,
+    Permission.MANAGE_INTEGRATIONS,
+    Permission.IMPORT_PATIENT_DATA,
+    Permission.RESOLVE_DATA_CONFLICTS,
+    Permission.BREAK_GLASS_ACCESS,
+    Permission.VIEW_REGULATORY,
+    Permission.MANAGE_REGULATORY,
+    Permission.APPROVE_REGULATORY,
+    Permission.VIEW_EQUITY_METRICS,
+    Permission.MANAGE_EQUITY_COHORTS,
+    Permission.REVIEW_BIAS_FINDINGS,
+    Permission.EXPORT_EQUITY_REPORTS,
+    Permission.VIEW_VALIDATION,
+    Permission.MANAGE_VALIDATION,
+    Permission.RUN_VALIDATION,
+    Permission.APPROVE_VALIDATION,
+    Permission.VIEW_REVIEW_QUEUE,
+    Permission.REVIEW_CLINICAL_AI,
+    Permission.REVIEW_DOCUMENTATION,
+    Permission.REVIEW_PRIVACY_REQUESTS,
+    Permission.REVIEW_GOVERNANCE,
+    Permission.VIEW_PRIVACY_CENTER,
+    Permission.VIEW_PHI_ACCESS_LOGS,
+    Permission.REQUEST_DATA_EXPORT,
+    Permission.APPROVE_DATA_RIGHTS_REQUESTS,
+    Permission.VIEW_PHI_AUDIT,
+    Permission.VIEW_OPERATIONS,
+    Permission.VIEW_OBSERVABILITY,
+    Permission.MANAGE_INCIDENTS,
 
     // Emergency & Safety
     Permission.TRIGGER_EMERGENCY_PROTOCOL,
@@ -206,6 +252,32 @@ export const PermissionHierarchy: Partial<Record<Permission, Permission[]>> = {
 
   // Export audit logs implies view audit logs
   [Permission.EXPORT_AUDIT_LOGS]: [Permission.VIEW_AUDIT_LOGS],
+  [Permission.VIEW_PHI_AUDIT]: [Permission.VIEW_AUDIT_LOGS, Permission.READ_PHI],
+
+  // Planned platform governance permissions imply their read scopes
+  [Permission.MANAGE_CLINICAL_POLICY]: [Permission.VIEW_GOVERNANCE],
+  [Permission.APPROVE_CLINICAL_POLICY]: [Permission.VIEW_GOVERNANCE],
+  [Permission.MANAGE_AI_SECURITY]: [Permission.VIEW_AI_SECURITY],
+  [Permission.REVIEW_AI_SECURITY_INCIDENTS]: [Permission.VIEW_AI_SECURITY],
+  [Permission.MANAGE_INTEGRATIONS]: [Permission.VIEW_INTEGRATIONS],
+  [Permission.IMPORT_PATIENT_DATA]: [Permission.READ_PHI, Permission.WRITE_PHI],
+  [Permission.MANAGE_REGULATORY]: [Permission.VIEW_REGULATORY],
+  [Permission.APPROVE_REGULATORY]: [Permission.VIEW_REGULATORY],
+  [Permission.MANAGE_EQUITY_COHORTS]: [Permission.VIEW_EQUITY_METRICS],
+  [Permission.REVIEW_BIAS_FINDINGS]: [Permission.VIEW_EQUITY_METRICS],
+  [Permission.RUN_VALIDATION]: [Permission.VIEW_VALIDATION],
+  [Permission.MANAGE_VALIDATION]: [Permission.VIEW_VALIDATION],
+  [Permission.APPROVE_VALIDATION]: [Permission.VIEW_VALIDATION],
+  [Permission.REVIEW_CLINICAL_AI]: [Permission.VIEW_REVIEW_QUEUE],
+  [Permission.REVIEW_DOCUMENTATION]: [Permission.VIEW_REVIEW_QUEUE],
+  [Permission.REVIEW_PRIVACY_REQUESTS]: [
+    Permission.VIEW_REVIEW_QUEUE,
+    Permission.VIEW_PRIVACY_CENTER,
+  ],
+  [Permission.REVIEW_GOVERNANCE]: [Permission.VIEW_REVIEW_QUEUE, Permission.VIEW_GOVERNANCE],
+  [Permission.VIEW_PHI_ACCESS_LOGS]: [Permission.VIEW_PRIVACY_CENTER, Permission.READ_PHI],
+  [Permission.APPROVE_DATA_RIGHTS_REQUESTS]: [Permission.VIEW_PRIVACY_CENTER],
+  [Permission.MANAGE_INCIDENTS]: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
 
   // Manage MFA implies view users
   [Permission.MANAGE_MFA]: [Permission.VIEW_USERS],

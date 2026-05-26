@@ -9,7 +9,12 @@ import { RoutingOptimizerService } from './routing-optimizer.service';
 @Module({
   imports: [MetricsModule],
   controllers: [CostOptimizerController],
-  providers: [CostPredictionService, ComplexityScorerService, CacheService, RoutingOptimizerService],
+  providers: [
+    CostPredictionService,
+    ComplexityScorerService,
+    CacheService,
+    RoutingOptimizerService,
+  ],
   exports: [CostPredictionService, ComplexityScorerService, CacheService, RoutingOptimizerService],
 })
 export class CostOptimizerModule {}

@@ -54,6 +54,16 @@ import { ToolCallingModule } from './modules/tool-calling/tool-calling.module';
 import { TrainingModule } from './modules/training/training.module';
 import { CostOptimizerModule } from './modules/cost-optimizer/cost-optimizer.module';
 import { EvaluationModule } from './modules/evaluation/evaluation.module';
+import { PlatformGovernanceModule } from './modules/platform-governance';
+import { GovernanceModule } from './modules/governance/governance.module';
+import { LlmSecurityModule } from './modules/llm-security/llm-security.module';
+import { InteroperabilityModule } from './modules/interoperability/interoperability.module';
+import { RegulatoryModule } from './modules/regulatory/regulatory.module';
+import { EquityModule } from './modules/equity/equity.module';
+import { HumanReviewModule } from './modules/human-review/human-review.module';
+import { PrivacyCenterModule } from './modules/privacy-center/privacy-center.module';
+import { EhrAuditModule } from './modules/ehr-audit/ehr-audit.module';
+import { ObservabilityModule } from './modules/observability/observability.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -143,6 +153,16 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     TrainingModule,
     CostOptimizerModule,
     EvaluationModule,
+    PlatformGovernanceModule,
+    GovernanceModule,
+    LlmSecurityModule,
+    InteroperabilityModule,
+    RegulatoryModule,
+    EquityModule,
+    HumanReviewModule,
+    PrivacyCenterModule,
+    EhrAuditModule,
+    ObservabilityModule,
     UserProfileModule,
     LiveTrackingModule,
     ClinicalAlertsModule,

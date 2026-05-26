@@ -45,7 +45,9 @@ export class CitationService {
     }
 
     return sources
-      .map((source, index) => this.buildReference(source, chunksBySource.get(source.id) || [], index))
+      .map((source, index) =>
+        this.buildReference(source, chunksBySource.get(source.id) || [], index),
+      )
       .filter((reference): reference is RAGReference => Boolean(reference));
   }
 
@@ -92,7 +94,9 @@ export class CitationService {
   }
 
   private trimExcerpt(text: string): string {
-    const normalized = String(text || '').trim().replace(/\s+/g, ' ');
+    const normalized = String(text || '')
+      .trim()
+      .replace(/\s+/g, ' ');
     return normalized.length > 280 ? `${normalized.slice(0, 277)}...` : normalized;
   }
 

@@ -218,7 +218,11 @@ export class EvaluationService {
       'hallucinationRate',
       this.safeRate(rawScores.unsupportedClaims, rawScores.factualClaims),
     );
-    this.assignIfDefined(metrics, 'accuracy', this.safeRate(rawScores.correctAnswers, rawScores.totalAnswers));
+    this.assignIfDefined(
+      metrics,
+      'accuracy',
+      this.safeRate(rawScores.correctAnswers, rawScores.totalAnswers),
+    );
     this.assignIfDefined(
       metrics,
       'retrievalPrecision',
@@ -291,79 +295,80 @@ export class EvaluationService {
   private createSeedRuns(): EvaluationRun[] {
     const now = Date.now();
     const day = 24 * 60 * 60 * 1000;
-    const seeds: Array<Pick<EvaluationRun, 'modelName' | 'datasetName' | 'sampleCount' | 'metrics'>> =
-      [
-        {
-          modelName: 'caredroid-clinical-assistant',
-          datasetName: 'clinical-ai-eval-suite-v1',
-          sampleCount: 120,
-          metrics: {
-            hallucinationRate: 0.052,
-            accuracy: 0.884,
-            latencyMs: 1040,
-            retrievalPrecision: 0.823,
-            toolExecutionSuccess: 0.972,
-            userSatisfaction: 4.21,
-            costUsd: 16.4,
-          },
+    const seeds: Array<
+      Pick<EvaluationRun, 'modelName' | 'datasetName' | 'sampleCount' | 'metrics'>
+    > = [
+      {
+        modelName: 'caredroid-clinical-assistant',
+        datasetName: 'clinical-ai-eval-suite-v1',
+        sampleCount: 120,
+        metrics: {
+          hallucinationRate: 0.052,
+          accuracy: 0.884,
+          latencyMs: 1040,
+          retrievalPrecision: 0.823,
+          toolExecutionSuccess: 0.972,
+          userSatisfaction: 4.21,
+          costUsd: 16.4,
         },
-        {
-          modelName: 'caredroid-clinical-assistant',
-          datasetName: 'clinical-ai-eval-suite-v1',
-          sampleCount: 140,
-          metrics: {
-            hallucinationRate: 0.047,
-            accuracy: 0.901,
-            latencyMs: 990,
-            retrievalPrecision: 0.846,
-            toolExecutionSuccess: 0.981,
-            userSatisfaction: 4.32,
-            costUsd: 15.1,
-          },
+      },
+      {
+        modelName: 'caredroid-clinical-assistant',
+        datasetName: 'clinical-ai-eval-suite-v1',
+        sampleCount: 140,
+        metrics: {
+          hallucinationRate: 0.047,
+          accuracy: 0.901,
+          latencyMs: 990,
+          retrievalPrecision: 0.846,
+          toolExecutionSuccess: 0.981,
+          userSatisfaction: 4.32,
+          costUsd: 15.1,
         },
-        {
-          modelName: 'caredroid-rag-router',
-          datasetName: 'rag-retrieval-benchmark-v2',
-          sampleCount: 160,
-          metrics: {
-            hallucinationRate: 0.041,
-            accuracy: 0.918,
-            latencyMs: 910,
-            retrievalPrecision: 0.872,
-            toolExecutionSuccess: 0.988,
-            userSatisfaction: 4.47,
-            costUsd: 13.7,
-          },
+      },
+      {
+        modelName: 'caredroid-rag-router',
+        datasetName: 'rag-retrieval-benchmark-v2',
+        sampleCount: 160,
+        metrics: {
+          hallucinationRate: 0.041,
+          accuracy: 0.918,
+          latencyMs: 910,
+          retrievalPrecision: 0.872,
+          toolExecutionSuccess: 0.988,
+          userSatisfaction: 4.47,
+          costUsd: 13.7,
         },
-        {
-          modelName: 'caredroid-rag-router',
-          datasetName: 'rag-retrieval-benchmark-v2',
-          sampleCount: 180,
-          metrics: {
-            hallucinationRate: 0.037,
-            accuracy: 0.929,
-            latencyMs: 860,
-            retrievalPrecision: 0.891,
-            toolExecutionSuccess: 0.993,
-            userSatisfaction: 4.58,
-            costUsd: 12.5,
-          },
+      },
+      {
+        modelName: 'caredroid-rag-router',
+        datasetName: 'rag-retrieval-benchmark-v2',
+        sampleCount: 180,
+        metrics: {
+          hallucinationRate: 0.037,
+          accuracy: 0.929,
+          latencyMs: 860,
+          retrievalPrecision: 0.891,
+          toolExecutionSuccess: 0.993,
+          userSatisfaction: 4.58,
+          costUsd: 12.5,
         },
-        {
-          modelName: 'caredroid-moe-clinical-router',
-          datasetName: 'tool-calling-eval-v2',
-          sampleCount: 200,
-          metrics: {
-            hallucinationRate: 0.033,
-            accuracy: 0.936,
-            latencyMs: 820,
-            retrievalPrecision: 0.902,
-            toolExecutionSuccess: 0.996,
-            userSatisfaction: 4.66,
-            costUsd: 11.8,
-          },
+      },
+      {
+        modelName: 'caredroid-moe-clinical-router',
+        datasetName: 'tool-calling-eval-v2',
+        sampleCount: 200,
+        metrics: {
+          hallucinationRate: 0.033,
+          accuracy: 0.936,
+          latencyMs: 820,
+          retrievalPrecision: 0.902,
+          toolExecutionSuccess: 0.996,
+          userSatisfaction: 4.66,
+          costUsd: 11.8,
         },
-      ];
+      },
+    ];
 
     return seeds.reverse().map((seed, index) => ({
       id: `evaluation-run-${seeds.length - index}`,

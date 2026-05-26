@@ -6,7 +6,13 @@ export class CreateMemoryTables1770000000000 implements MigrationInterface {
       new Table({
         name: 'short_memory_entries',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, generationStrategy: 'uuid', default: 'uuid_generate_v4()' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            generationStrategy: 'uuid',
+            default: 'uuid_generate_v4()',
+          },
           { name: 'userId', type: 'uuid' },
           { name: 'workspaceId', type: 'uuid', isNullable: true },
           { name: 'type', type: 'varchar', length: '40' },
@@ -23,7 +29,13 @@ export class CreateMemoryTables1770000000000 implements MigrationInterface {
       new Table({
         name: 'long_memory_entries',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, generationStrategy: 'uuid', default: 'uuid_generate_v4()' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            generationStrategy: 'uuid',
+            default: 'uuid_generate_v4()',
+          },
           { name: 'userId', type: 'uuid' },
           { name: 'workspaceId', type: 'uuid', isNullable: true },
           { name: 'type', type: 'varchar', length: '40' },
@@ -41,7 +53,13 @@ export class CreateMemoryTables1770000000000 implements MigrationInterface {
       new Table({
         name: 'clinical_memory_entries',
         columns: [
-          { name: 'id', type: 'uuid', isPrimary: true, generationStrategy: 'uuid', default: 'uuid_generate_v4()' },
+          {
+            name: 'id',
+            type: 'uuid',
+            isPrimary: true,
+            generationStrategy: 'uuid',
+            default: 'uuid_generate_v4()',
+          },
           { name: 'userId', type: 'uuid' },
           { name: 'workspaceId', type: 'uuid', isNullable: true },
           { name: 'patientId', type: 'varchar', length: '96', isNullable: true },

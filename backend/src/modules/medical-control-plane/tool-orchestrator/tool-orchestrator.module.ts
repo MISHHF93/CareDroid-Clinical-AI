@@ -9,9 +9,16 @@ import { AiModule } from '../../ai/ai.module';
 import { AuditModule } from '../../audit/audit.module';
 import { MetricsModule } from '../../metrics/metrics.module';
 import { ToolResult } from './entities/tool-result.entity';
+import { PlatformGovernanceModule } from '../../platform-governance';
 
 @Module({
-  imports: [AiModule, AuditModule, MetricsModule, TypeOrmModule.forFeature([ToolResult])],
+  imports: [
+    AiModule,
+    AuditModule,
+    MetricsModule,
+    PlatformGovernanceModule,
+    TypeOrmModule.forFeature([ToolResult]),
+  ],
   controllers: [ToolOrchestratorController],
   providers: [
     ToolOrchestratorService,

@@ -19,7 +19,11 @@ export interface AiExpertDescriptor {
 
 export const COST_FLOOR = 0.01;
 
-export const BACKEND_EXECUTOR_TOOL_IDS = ['sofa-calculator', 'drug-interactions', 'lab-interpreter'];
+export const BACKEND_EXECUTOR_TOOL_IDS = [
+  'sofa-calculator',
+  'drug-interactions',
+  'lab-interpreter',
+];
 
 export const AI_EXPERT_DESCRIPTORS: AiExpertDescriptor[] = [
   {
@@ -102,7 +106,12 @@ export const AI_EXPERT_DESCRIPTORS: AiExpertDescriptor[] = [
       'shortness of breath',
       'ventilation',
     ],
-    toolHints: ['abg-interpreter', 'copd-gold', 'copd-gold-assessment', 'asthma-exacerbation-assistant'],
+    toolHints: [
+      'abg-interpreter',
+      'copd-gold',
+      'copd-gold-assessment',
+      'asthma-exacerbation-assistant',
+    ],
     featureHints: ['pulmonology', 'respiratory'],
     sourceSurfaces: ['pulmonology', 'assistant-chat'],
     retrievalPolicy: 'guideline',
@@ -178,7 +187,11 @@ export const AI_EXPERT_DESCRIPTORS: AiExpertDescriptor[] = [
   {
     id: 'psychiatry',
     label: 'Psychiatry expert',
-    intents: [PrimaryIntent.CLINICAL_TOOL, PrimaryIntent.MEDICAL_REFERENCE, PrimaryIntent.EMERGENCY],
+    intents: [
+      PrimaryIntent.CLINICAL_TOOL,
+      PrimaryIntent.MEDICAL_REFERENCE,
+      PrimaryIntent.EMERGENCY,
+    ],
     keywords: [
       'agitation',
       'anxiety',
@@ -193,7 +206,13 @@ export const AI_EXPERT_DESCRIPTORS: AiExpertDescriptor[] = [
       'suicide',
       'withdrawal',
     ],
-    toolHints: ['gad7', 'phq9', 'cage', 'columbia-suicide-severity-workflow', 'mental-health-screening-assistant'],
+    toolHints: [
+      'gad7',
+      'phq9',
+      'cage',
+      'columbia-suicide-severity-workflow',
+      'mental-health-screening-assistant',
+    ],
     featureHints: ['psychiatry', 'behavioral-health'],
     sourceSurfaces: ['psychiatry', 'assistant-chat'],
     retrievalPolicy: 'guideline',
@@ -207,7 +226,15 @@ export const AI_EXPERT_DESCRIPTORS: AiExpertDescriptor[] = [
     id: 'fleet',
     label: 'Fleet expert',
     intents: [PrimaryIntent.ADMINISTRATIVE, PrimaryIntent.GENERAL_QUERY],
-    keywords: ['ambulance', 'asset', 'dispatch', 'fleet', 'route optimizer', 'transport', 'vehicle'],
+    keywords: [
+      'ambulance',
+      'asset',
+      'dispatch',
+      'fleet',
+      'route optimizer',
+      'transport',
+      'vehicle',
+    ],
     toolHints: ['fleet-command', 'dispatch-ai', 'route-optimizer'],
     featureHints: ['fleet', 'dispatch'],
     sourceSurfaces: ['fleet', 'assistant-chat'],
@@ -223,7 +250,11 @@ export const AI_EXPERT_DESCRIPTORS: AiExpertDescriptor[] = [
     label: 'IoT expert',
     intents: [PrimaryIntent.ADMINISTRATIVE, PrimaryIntent.GENERAL_QUERY],
     keywords: ['device', 'iot', 'offline', 'sensor', 'signal', 'telemetry', 'wearable'],
-    toolHints: ['device-recommendation-assistant', 'glucose-telemetry-dashboard', 'neuro-telemetry-dashboard'],
+    toolHints: [
+      'device-recommendation-assistant',
+      'glucose-telemetry-dashboard',
+      'neuro-telemetry-dashboard',
+    ],
     featureHints: ['iot', 'device-fleet', 'telemetry'],
     sourceSurfaces: ['iot', 'medical-iot', 'assistant-chat'],
     retrievalPolicy: 'operational',
@@ -237,7 +268,15 @@ export const AI_EXPERT_DESCRIPTORS: AiExpertDescriptor[] = [
     id: 'operations',
     label: 'Operations expert',
     intents: [PrimaryIntent.ADMINISTRATIVE, PrimaryIntent.GENERAL_QUERY],
-    keywords: ['bed', 'capacity', 'command center', 'hospital command', 'operations', 'staffing', 'throughput'],
+    keywords: [
+      'bed',
+      'capacity',
+      'command center',
+      'hospital command',
+      'operations',
+      'staffing',
+      'throughput',
+    ],
     toolHints: ['hospital-command-assistant', 'bed-occupancy-calculator'],
     featureHints: ['operations', 'hospital-operations'],
     sourceSurfaces: ['operations', 'assistant-chat'],
@@ -252,7 +291,17 @@ export const AI_EXPERT_DESCRIPTORS: AiExpertDescriptor[] = [
     id: 'hospital-map',
     label: 'Hospital-map expert',
     intents: [PrimaryIntent.ADMINISTRATIVE, PrimaryIntent.GENERAL_QUERY],
-    keywords: ['floor', 'hospital map', 'indoor', 'location', 'map', 'nearest', 'unit', 'wayfinding', 'zone'],
+    keywords: [
+      'floor',
+      'hospital map',
+      'indoor',
+      'location',
+      'map',
+      'nearest',
+      'unit',
+      'wayfinding',
+      'zone',
+    ],
     toolHints: ['hospital-map', 'live-tracking-map'],
     featureHints: ['hospital-map', 'map', 'live-tracking'],
     sourceSurfaces: ['hospital-map', 'live-tracking', 'assistant-chat'],
@@ -267,7 +316,16 @@ export const AI_EXPERT_DESCRIPTORS: AiExpertDescriptor[] = [
     id: 'documentation',
     label: 'Documentation expert',
     intents: [PrimaryIntent.GENERAL_QUERY, PrimaryIntent.ADMINISTRATIVE],
-    keywords: ['ambient', 'discharge', 'documentation', 'handoff', 'note', 'soap', 'scribe', 'summary'],
+    keywords: [
+      'ambient',
+      'discharge',
+      'documentation',
+      'handoff',
+      'note',
+      'soap',
+      'scribe',
+      'summary',
+    ],
     toolHints: ['ambient-scribe', 'patient-summary-ai', 'timeline-ai'],
     featureHints: ['ambient-scribe', 'documentation', 'patient-summary-ai', 'timeline-ai'],
     sourceSurfaces: ['documentation', 'assistant-chat'],
@@ -282,7 +340,10 @@ export const AI_EXPERT_DESCRIPTORS: AiExpertDescriptor[] = [
 
 export const AI_EXPERT_DESCRIPTOR_BY_ID = AI_EXPERT_DESCRIPTORS.reduce<
   Record<AiExpertId, AiExpertDescriptor>
->((acc, descriptor) => {
-  acc[descriptor.id] = descriptor;
-  return acc;
-}, {} as Record<AiExpertId, AiExpertDescriptor>);
+>(
+  (acc, descriptor) => {
+    acc[descriptor.id] = descriptor;
+    return acc;
+  },
+  {} as Record<AiExpertId, AiExpertDescriptor>,
+);

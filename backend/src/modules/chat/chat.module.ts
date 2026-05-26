@@ -16,6 +16,7 @@ import { CostOptimizerModule } from '../cost-optimizer/cost-optimizer.module';
 import { MemoryModule } from '../memory/memory.module';
 import { ArtifactsModule } from '../artifacts/artifacts.module';
 import { EvaluationModule } from '../evaluation/evaluation.module';
+import { PlatformGovernanceModule } from '../platform-governance';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { EvaluationModule } from '../evaluation/evaluation.module';
     MemoryModule,
     ArtifactsModule,
     EvaluationModule,
+    PlatformGovernanceModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, CalculatorRecommenderService],

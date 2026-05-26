@@ -44,20 +44,41 @@ const MULTI_STEP_TERMS = [
   'recommend',
 ];
 
-const TOOL_ACTION_TERMS = ['calculate', 'order', 'prescribe', 'schedule', 'triage', 'route', 'generate'];
+const TOOL_ACTION_TERMS = [
+  'calculate',
+  'order',
+  'prescribe',
+  'schedule',
+  'triage',
+  'route',
+  'generate',
+];
 
 @Injectable()
 export class ComplexityScorerService {
   score(request: CostOptimizationRequest = {}): ComplexityScore {
     const text = this.extractText(request);
     const normalizedText = text.toLowerCase();
-    const estimatedInputTokens = request.inputTokens ?? this.estimateTokens(text, request.structuredPayload);
+    const estimatedInputTokens =
+      request.inputTokens ?? this.estimateTokens(text, request.structuredPayload);
     const signals: string[] = [];
     let score = this.lengthScore(estimatedInputTokens, signals);
 
     score += this.keywordScore(normalizedText, CLINICAL_DEPTH_TERMS, 14, 'clinical_depth', signals);
-    score += this.keywordScore(normalizedText, MULTI_STEP_TERMS, 12, 'multi_step_reasoning', signals);
-    score += this.keywordScore(normalizedText, TOOL_ACTION_TERMS, 10, 'tool_or_action_request', signals);
+    score += this.keywordScore(
+      normalizedText,
+      MULTI_STEP_TERMS,
+      12,
+      'multi_step_reasoning',
+      signals,
+    );
+    score += this.keywordScore(
+      normalizedText,
+      TOOL_ACTION_TERMS,
+      10,
+      'tool_or_action_request',
+      signals,
+    );
 
     const emergencyScore = this.keywordScore(
       normalizedText,
@@ -89,7 +110,10 @@ export class ComplexityScorerService {
       score = Math.min(score, 32);
     }
 
-    const level = this.levelForScore(score, emergencyScore > 0 || Boolean(request.requiresHumanReview));
+    const level = this.levelForScore(
+      score,
+      emergencyScore > 0 || Boolean(request.requiresHumanReview),
+    );
     return {
       level,
       score,
@@ -108,7 +132,9 @@ export class ComplexityScorerService {
 
   private estimateTokens(text: string, structuredPayload?: unknown): number {
     const textTokens = Math.max(1, Math.ceil(text.length / 4));
-    const structuredTokens = structuredPayload ? Math.ceil(JSON.stringify(structuredPayload).length / 4) : 0;
+    const structuredTokens = structuredPayload
+      ? Math.ceil(JSON.stringify(structuredPayload).length / 4)
+      : 0;
     return textTokens + structuredTokens;
   }
 
@@ -151,7 +177,9 @@ export class ComplexityScorerService {
   }
 
   private rationale(level: ComplexityLevel, score: number, signals: string[]): string {
-    const signalSummary = signals.length ? Array.from(new Set(signals)).join(', ') : 'minimal signals';
+    const signalSummary = signals.length
+      ? Array.from(new Set(signals)).join(', ')
+      : 'minimal signals';
     return `Classified as ${level} with score ${score} from ${signalSummary}.`;
   }
 }

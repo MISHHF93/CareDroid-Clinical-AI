@@ -167,7 +167,11 @@ export class RoutingOptimizerService {
     };
   }
 
-  private recordMetrics(result: RouteOptimizationResult, userId = 'anonymous', cacheHit: boolean): void {
+  private recordMetrics(
+    result: RouteOptimizationResult,
+    userId = 'anonymous',
+    cacheHit: boolean,
+  ): void {
     const actualRequestCost = result.costPrediction.totalCostUsd;
     const actualTokenCost = cacheHit ? 0 : result.costPrediction.tokenCostUsd;
 

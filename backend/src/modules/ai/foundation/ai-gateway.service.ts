@@ -20,8 +20,7 @@ export class AiGatewayService {
       runId: randomUUID(),
       capabilityId,
       userId: input.userId || 'anonymous',
-      conversationId:
-        input.conversationId === undefined ? undefined : String(input.conversationId),
+      conversationId: input.conversationId === undefined ? undefined : String(input.conversationId),
       input: {
         message: input.message,
         toolHint: input.tool,
@@ -69,6 +68,8 @@ export class AiGatewayService {
       'patient-summary-ai',
       'order-set-ai',
     ]);
-    return Boolean((feature && phiCapabilities.has(feature)) || (tool && phiCapabilities.has(tool)));
+    return Boolean(
+      (feature && phiCapabilities.has(feature)) || (tool && phiCapabilities.has(tool)),
+    );
   }
 }

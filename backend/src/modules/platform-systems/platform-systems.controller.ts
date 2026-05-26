@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Optional,
   Param,
   Post,
   Put,
@@ -15,13 +16,17 @@ import { Permissions } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformSystemsService } from './platform-systems.service';
+import { PlatformGovernanceService } from '../platform-governance';
 
 @ApiTags('platform-systems')
 @ApiBearerAuth()
 @Controller()
 @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
 export class PlatformSystemsController {
-  constructor(private readonly platformSystemsService: PlatformSystemsService) {}
+  constructor(
+    private readonly platformSystemsService: PlatformSystemsService,
+    @Optional() private readonly platformGovernanceService?: PlatformGovernanceService,
+  ) {}
 
   @Get('platform-systems/capabilities/:capabilityId')
   @Permissions(Permission.USE_AI_CHAT)
@@ -38,21 +43,21 @@ export class PlatformSystemsController {
   }
 
   @Get('integrations/fhir/connections')
-  @Permissions(Permission.CONFIGURE_SYSTEM)
+  @Permissions(Permission.VIEW_INTEGRATIONS)
   getFhirConnections() {
     return this.platformSystemsService.getFhirConnections();
   }
 
   @Post('integrations/fhir/connections')
   @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.CONFIGURE_SYSTEM)
+  @Permissions(Permission.MANAGE_INTEGRATIONS)
   createFhirConnection(@Body() body: Record<string, unknown>) {
     return this.platformSystemsService.demo('fhir-connector', 'demo-patient', body);
   }
 
   @Post('integrations/fhir/:connectionId/test')
   @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.CONFIGURE_SYSTEM)
+  @Permissions(Permission.MANAGE_INTEGRATIONS)
   testFhirConnection(
     @Param('connectionId') connectionId: string,
     @Body() body: Record<string, unknown>,
@@ -62,7 +67,7 @@ export class PlatformSystemsController {
 
   @Post('integrations/fhir/:connectionId/sync')
   @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.CONFIGURE_SYSTEM)
+  @Permissions(Permission.MANAGE_INTEGRATIONS)
   syncFhirConnection(
     @Param('connectionId') connectionId: string,
     @Body() body: Record<string, unknown>,
@@ -71,21 +76,50 @@ export class PlatformSystemsController {
   }
 
   @Get('integrations/hl7/interfaces')
-  @Permissions(Permission.CONFIGURE_SYSTEM)
+  @Permissions(Permission.VIEW_INTEGRATIONS)
   getHl7Interfaces() {
     return this.platformSystemsService.getHl7Interfaces();
   }
 
   @Post('integrations/hl7/interfaces/:interfaceId/test-message')
   @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.CONFIGURE_SYSTEM)
+  @Permissions(Permission.MANAGE_INTEGRATIONS)
   testHl7Message(@Param('interfaceId') interfaceId: string, @Body() body: Record<string, unknown>) {
     return this.platformSystemsService.demo('hl7-bridge', interfaceId, body);
   }
 
+  @Get('integrations/hl7/messages/quarantine')
+  @Permissions(Permission.VIEW_INTEGRATIONS)
+  getHl7MessageQuarantine() {
+    return this.platformSystemsService.demo('hl7-bridge', 'quarantine');
+  }
+
+  @Post('integrations/hl7/messages/:messageId/replay-preview')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.MANAGE_INTEGRATIONS)
+  previewHl7MessageReplay(
+    @Param('messageId') messageId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.platformSystemsService.demo('hl7-bridge', messageId, {
+      ...body,
+      replayMode: 'preview_only',
+      writebackAllowed: false,
+    });
+  }
+
+  @Get('source-provenance/:sourceId')
+  @Permissions(Permission.VIEW_INTEGRATIONS)
+  async getSourceProvenance(@Param('sourceId') sourceId: string) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.getSourceProvenance(sourceId);
+    }
+    return this.platformSystemsService.getSourceProvenance(sourceId);
+  }
+
   @Post('patients/import/ehr')
   @HttpCode(HttpStatus.OK)
-  @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
+  @Permissions(Permission.IMPORT_PATIENT_DATA)
   importEhrPatient(@Body() body: Record<string, unknown>) {
     return this.platformSystemsService.demo('ehr-patient-import', 'demo-patient', body);
   }
@@ -115,6 +149,15 @@ export class PlatformSystemsController {
   @Permissions(Permission.READ_PHI)
   getPatientWorkspace(@Param('patientId') patientId: string) {
     return this.platformSystemsService.getPatientWorkspace(patientId);
+  }
+
+  @Get('patients/:patientId/source-data')
+  @Permissions(Permission.READ_PHI)
+  async getPatientSourceData(@Param('patientId') patientId: string) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.getPatientSourceData(patientId);
+    }
+    return this.platformSystemsService.getSourceProvenance(patientId);
   }
 
   @Get('patients/:patientId/summary')
@@ -246,6 +289,76 @@ export class PlatformSystemsController {
     return this.platformSystemsService.demo('soap-builder', documentId, body);
   }
 
+  @Get('governance/clinical/readiness')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  async getClinicalReadiness() {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.getSummary();
+    }
+    return this.platformSystemsService.getProductionReadiness();
+  }
+
+  @Get('governance/clinical/policies')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  getClinicalPolicies() {
+    return this.platformSystemsService.demo('clinical-governance');
+  }
+
+  @Post('governance/clinical/policies')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  createClinicalPolicy(@Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('clinical-governance', 'policy-draft', body);
+  }
+
+  @Put('governance/clinical/policies/:policyId')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  updateClinicalPolicy(@Param('policyId') policyId: string, @Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('clinical-governance', policyId, body);
+  }
+
+  @Post('governance/clinical/policies/:policyId/approve')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  approveClinicalPolicy(
+    @Param('policyId') policyId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.platformSystemsService.demo('clinical-governance', policyId, body);
+  }
+
+  @Get('governance/clinical/release-gates')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  getClinicalReleaseGates() {
+    return this.platformSystemsService.demo('clinical-release-gates');
+  }
+
+  @Post('governance/clinical/release-gates/:gateId/decision')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  decideClinicalReleaseGate(
+    @Param('gateId') gateId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.platformSystemsService.demo('clinical-release-gates', gateId, body);
+  }
+
+  @Get('governance/clinical/safety-findings')
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  getGovernanceSafetyFindings() {
+    return this.platformSystemsService.demo('clinical-safety-findings');
+  }
+
+  @Post('governance/clinical/safety-findings/:findingId/review')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  reviewGovernanceSafetyFinding(
+    @Param('findingId') findingId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.platformSystemsService.demo('clinical-safety-findings', findingId, body);
+  }
+
   @Get('governance/ai/policies')
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
   getAiPolicies() {
@@ -256,6 +369,72 @@ export class PlatformSystemsController {
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
   updateAiPolicy(@Param('policyId') policyId: string, @Body() body: Record<string, unknown>) {
     return this.platformSystemsService.demo('ai-governance', policyId, body);
+  }
+
+  @Get('governance/ai-security/summary')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
+  getAiSecuritySummary() {
+    return this.platformSystemsService.demo('ai-security');
+  }
+
+  @Get('governance/ai-security/rules')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
+  getPromptFirewallRules() {
+    return this.platformSystemsService.demo('prompt-firewall');
+  }
+
+  @Put('governance/ai-security/rules/:ruleId')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
+  updatePromptFirewallRule(@Param('ruleId') ruleId: string, @Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('prompt-firewall', ruleId, body);
+  }
+
+  @Post('governance/ai-security/evaluate')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
+  async evaluatePromptSecurity(@Body() body: Record<string, unknown>) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.evaluateGate({
+        runId: String(body.runId || 'security-evaluation'),
+        capabilityId: String(body.capabilityId || 'ai-security'),
+        patientId: body.patientId ? String(body.patientId) : undefined,
+        phiAccessed: Boolean(body.phiAccessed),
+        prompt: String(body.prompt || body.input || ''),
+        action: 'ai-security/evaluate',
+      });
+    }
+    return this.platformSystemsService.demo('prompt-firewall', 'evaluation', body);
+  }
+
+  @Get('governance/ai-security/model-access')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
+  getModelAccessPolicies() {
+    return this.platformSystemsService.demo('model-access-policy');
+  }
+
+  @Put('governance/ai-security/model-access/:policyId')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
+  updateModelAccessPolicy(
+    @Param('policyId') policyId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.platformSystemsService.demo('model-access-policy', policyId, body);
+  }
+
+  @Get('governance/ai-security/incidents')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
+  getAiSecurityIncidents() {
+    return this.platformSystemsService.demo('ai-security');
+  }
+
+  @Post('governance/ai-security/incidents/:incidentId/review')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.MANAGE_ENCRYPTION)
+  reviewAiSecurityIncident(
+    @Param('incidentId') incidentId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.platformSystemsService.demo('ai-security', incidentId, body);
   }
 
   @Get('governance/model-usage/summary')
@@ -300,41 +479,454 @@ export class PlatformSystemsController {
 
   @Get('consent/:patientId')
   @Permissions(Permission.MANAGE_CONSENT)
-  getConsent(@Param('patientId') patientId: string) {
+  async getConsent(@Param('patientId') patientId: string) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.getConsent(patientId);
+    }
     return this.platformSystemsService.demo('consent-manager', patientId);
   }
 
   @Post('consent/:patientId')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_CONSENT)
-  updateConsent(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
+  async updateConsent(
+    @Param('patientId') patientId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.upsertConsent(
+        patientId,
+        String(body.scope || 'clinical_ai'),
+        body,
+      );
+    }
     return this.platformSystemsService.demo('consent-manager', patientId, body);
   }
 
   @Post('consent/:patientId/revoke')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_CONSENT)
-  revokeConsent(@Param('patientId') patientId: string, @Body() body: Record<string, unknown>) {
+  async revokeConsent(
+    @Param('patientId') patientId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.upsertConsent(
+        patientId,
+        String(body.scope || 'clinical_ai'),
+        {
+          ...body,
+          status: 'revoked',
+        },
+      );
+    }
     return this.platformSystemsService.demo('consent-manager', patientId, body);
   }
 
   @Get('privacy/access-log')
   @Permissions(Permission.MANAGE_PRIVACY)
-  getPrivacyAccessLog() {
+  async getPrivacyAccessLog() {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.getPrivacyAccessLog();
+    }
     return this.platformSystemsService.demo('privacy-center');
+  }
+
+  @Get('privacy/patient/:patientId/access-log')
+  @Permissions(Permission.MANAGE_PRIVACY, Permission.READ_PHI)
+  async getPatientPrivacyAccessLog(@Param('patientId') patientId: string) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.getPrivacyAccessLog(patientId);
+    }
+    return this.platformSystemsService.demo('privacy-center', patientId);
   }
 
   @Post('privacy/export')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_PRIVACY)
-  requestPrivacyExport(@Body() body: Record<string, unknown>) {
+  async requestPrivacyExport(@Body() body: Record<string, unknown>) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.createPrivacyRequest(
+        String(body.patientId || 'demo-patient'),
+        'export',
+        body,
+      );
+    }
     return this.platformSystemsService.demo('privacy-center', 'privacy-export', body);
   }
 
   @Post('privacy/delete-request')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.MANAGE_PRIVACY)
-  requestPrivacyDelete(@Body() body: Record<string, unknown>) {
+  async requestPrivacyDelete(@Body() body: Record<string, unknown>) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.createPrivacyRequest(
+        String(body.patientId || 'demo-patient'),
+        'delete',
+        body,
+      );
+    }
     return this.platformSystemsService.demo('privacy-center', 'privacy-delete-request', body);
+  }
+
+  @Get('privacy/requests')
+  @Permissions(Permission.MANAGE_PRIVACY)
+  async getPrivacyRequests() {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.listPrivacyRequests();
+    }
+    return this.platformSystemsService.demo('privacy-center', 'privacy-requests');
+  }
+
+  @Post('privacy/requests/:requestId/review')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.MANAGE_PRIVACY, Permission.VIEW_AUDIT_LOGS)
+  async reviewPrivacyRequest(
+    @Param('requestId') requestId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    if (this.platformGovernanceService) {
+      const result = await this.platformGovernanceService.reviewPrivacyRequest(requestId, body);
+      if (result) return result;
+    }
+    return this.platformSystemsService.demo('privacy-center', requestId, body);
+  }
+
+  @Get('governance/regulatory/capabilities')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  getRegulatoryCapabilities() {
+    return this.platformSystemsService.demo('regulatory-classification');
+  }
+
+  @Get('governance/regulatory/capabilities/:capabilityId')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  getRegulatoryCapability(@Param('capabilityId') capabilityId: string) {
+    return this.platformSystemsService.demo('regulatory-classification', capabilityId);
+  }
+
+  @Put('governance/regulatory/capabilities/:capabilityId/classification')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  updateRegulatoryClassification(
+    @Param('capabilityId') capabilityId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.platformSystemsService.demo('regulatory-classification', capabilityId, body);
+  }
+
+  @Post('governance/regulatory/capabilities/:capabilityId/approve')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  approveRegulatoryClassification(
+    @Param('capabilityId') capabilityId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.platformSystemsService.demo('regulatory-classification', capabilityId, body);
+  }
+
+  @Get('governance/regulatory/evidence/:capabilityId')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  getRegulatoryEvidence(@Param('capabilityId') capabilityId: string) {
+    return this.platformSystemsService.demo('intended-use-registry', capabilityId);
+  }
+
+  @Post('governance/regulatory/evidence/:capabilityId/artifacts')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  createRegulatoryEvidenceArtifact(
+    @Param('capabilityId') capabilityId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.platformSystemsService.demo('intended-use-registry', capabilityId, body);
+  }
+
+  @Get('governance/equity/summary')
+  @Permissions(Permission.VIEW_ANALYTICS, Permission.VIEW_AUDIT_LOGS)
+  getEquitySummary() {
+    return this.platformSystemsService.demo('equity-monitoring');
+  }
+
+  @Get('governance/equity/metrics')
+  @Permissions(Permission.VIEW_ANALYTICS, Permission.VIEW_AUDIT_LOGS)
+  getEquityMetrics() {
+    return this.platformSystemsService.demo('equity-monitoring');
+  }
+
+  @Post('governance/equity/cohorts')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.VIEW_ANALYTICS, Permission.VIEW_AUDIT_LOGS)
+  createEquityCohort(@Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('equity-monitoring', 'cohort', body);
+  }
+
+  @Get('governance/equity/cohorts')
+  @Permissions(Permission.VIEW_ANALYTICS, Permission.VIEW_AUDIT_LOGS)
+  getEquityCohorts() {
+    return this.platformSystemsService.demo('equity-monitoring');
+  }
+
+  @Get('governance/equity/findings')
+  @Permissions(Permission.VIEW_ANALYTICS, Permission.VIEW_AUDIT_LOGS)
+  getBiasFindings() {
+    return this.platformSystemsService.demo('bias-finding-review');
+  }
+
+  @Post('governance/equity/findings/:findingId/review')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.VIEW_ANALYTICS, Permission.VIEW_AUDIT_LOGS)
+  reviewBiasFinding(@Param('findingId') findingId: string, @Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('bias-finding-review', findingId, body);
+  }
+
+  @Post('governance/equity/reports')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.VIEW_ANALYTICS, Permission.VIEW_AUDIT_LOGS)
+  createEquityReport(@Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('equity-monitoring', 'report', body);
+  }
+
+  @Get('governance/validation/scenarios')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  async getValidationScenarios() {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.listValidationScenarios();
+    }
+    return this.platformSystemsService.demo('validation-sandbox');
+  }
+
+  @Post('governance/validation/scenarios')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  async createValidationScenario(@Body() body: Record<string, unknown>) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.createValidationScenario(body);
+    }
+    return this.platformSystemsService.demo('validation-sandbox', 'scenario', body);
+  }
+
+  @Get('governance/validation/synthetic-patients')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  getSyntheticPatients() {
+    return {
+      patients: [
+        this.platformGovernanceService?.syntheticFhirBundle() ??
+          this.platformSystemsService.demo('synthetic-patient-lab'),
+      ],
+      synthetic: true,
+    };
+  }
+
+  @Post('governance/validation/runs')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  createValidationRun(@Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('validation-sandbox', 'run', body);
+  }
+
+  @Get('governance/validation/runs/:runId')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  getValidationRun(@Param('runId') runId: string) {
+    return this.platformSystemsService.demo('validation-sandbox', runId);
+  }
+
+  @Post('governance/validation/runs/:runId/approve')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  approveValidationRun(@Param('runId') runId: string, @Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('validation-sandbox', runId, body);
+  }
+
+  @Get('governance/validation/release-gates/:capabilityId')
+  @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
+  getValidationReleaseGate(@Param('capabilityId') capabilityId: string) {
+    return this.platformSystemsService.demo('clinical-release-gates', capabilityId);
+  }
+
+  @Get('review/items')
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  async getReviewItems() {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.listReviewItems();
+    }
+    return this.platformSystemsService.getReviewItems();
+  }
+
+  @Post('review/items')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  async createReviewItem(@Body() body: Record<string, unknown>) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.createReviewItem(body);
+    }
+    return this.platformSystemsService.demo('human-review-queue', 'review-item', body);
+  }
+
+  @Get('review/items/:itemId')
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  async getReviewItem(@Param('itemId') itemId: string) {
+    if (this.platformGovernanceService) {
+      const item = await this.platformGovernanceService.getReviewItem(itemId);
+      if (item) return item;
+    }
+    return this.platformSystemsService.demo('human-review-queue', itemId);
+  }
+
+  @Post('review/items/:itemId/assign')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  assignReviewItem(@Param('itemId') itemId: string, @Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('human-review-queue', itemId, body);
+  }
+
+  @Post('review/items/:itemId/decision')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  async decideReviewItem(@Param('itemId') itemId: string, @Body() body: Record<string, unknown>) {
+    if (this.platformGovernanceService) {
+      const result = await this.platformGovernanceService.decideReviewItem(itemId, body);
+      if (result) return result;
+    }
+    return this.platformSystemsService.demo('human-review-queue', itemId, body);
+  }
+
+  @Post('review/items/:itemId/comments')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  commentOnReviewItem(@Param('itemId') itemId: string, @Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('human-review-queue', itemId, body);
+  }
+
+  @Get('patients/:patientId/review-items')
+  @Permissions(Permission.READ_PHI, Permission.VIEW_AUDIT_LOGS)
+  async getPatientReviewItems(@Param('patientId') patientId: string) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.listPatientReviewItems(patientId);
+    }
+    return this.platformSystemsService.demo('human-review-queue', patientId);
+  }
+
+  @Get('audit/events')
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  getAuditEvents() {
+    return this.platformSystemsService.demo('audit-trail-spine');
+  }
+
+  @Get('audit/events/:eventId')
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  getAuditEvent(@Param('eventId') eventId: string) {
+    return this.platformSystemsService.demo('audit-trail-spine', eventId);
+  }
+
+  @Get('audit/runs/:runId')
+  @Permissions(Permission.VIEW_AUDIT_LOGS)
+  async getAuditRunTimeline(@Param('runId') runId: string) {
+    if (this.platformGovernanceService) {
+      await this.platformGovernanceService.recordObservabilityEvent({
+        correlationId: runId,
+        capabilityId: 'ai-run-audit-timeline',
+        eventType: 'audit.ai_run.timeline_viewed',
+        status: 'viewed',
+      });
+    }
+    return this.platformSystemsService.getAuditRunTimeline(runId);
+  }
+
+  @Get('audit/patients/:patientId/access')
+  @Permissions(Permission.VIEW_AUDIT_LOGS, Permission.READ_PHI)
+  async getPatientAuditAccess(@Param('patientId') patientId: string) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.getPrivacyAccessLog(patientId);
+    }
+    return this.platformSystemsService.demo('audit-trail-spine', patientId);
+  }
+
+  @Get('audit/integrity/status')
+  @Permissions(Permission.VERIFY_AUDIT_INTEGRITY)
+  async getAuditIntegrityStatus() {
+    if (this.platformGovernanceService) {
+      await this.platformGovernanceService.recordObservabilityEvent({
+        capabilityId: 'audit-trail-spine',
+        eventType: 'audit.integrity.checked',
+        status: 'checked',
+      });
+    }
+    return this.platformSystemsService.getAuditIntegrityStatus();
+  }
+
+  @Post('audit/integrity/verify')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.VERIFY_AUDIT_INTEGRITY)
+  verifyAuditIntegrityPlaceholder(@Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('audit-trail-spine', 'integrity-verify', body);
+  }
+
+  @Post('audit/export')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.EXPORT_AUDIT_LOGS)
+  exportAuditPlaceholder(@Body() body: Record<string, unknown>) {
+    return this.platformSystemsService.demo('audit-trail-spine', 'audit-export', body);
+  }
+
+  @Get('operations/health')
+  @Permissions(Permission.VIEW_ANALYTICS)
+  async getOperationsHealth() {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.recentObservability();
+    }
+    return this.platformSystemsService.getOperationsHealth();
+  }
+
+  @Get('operations/service-health')
+  @Permissions(Permission.VIEW_ANALYTICS)
+  async getServiceHealth() {
+    return this.getOperationsHealth();
+  }
+
+  @Get('operations/observability/summary')
+  @Permissions(Permission.VIEW_ANALYTICS)
+  async getObservabilitySummary() {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.recentObservability();
+    }
+    return this.platformSystemsService.getObservabilitySummary();
+  }
+
+  @Get('operations/observability/ai-runs')
+  @Permissions(Permission.VIEW_ANALYTICS)
+  getAiRunMetrics() {
+    return this.platformSystemsService.demo('deployment-observability');
+  }
+
+  @Get('operations/observability/orchestrator')
+  @Permissions(Permission.VIEW_ANALYTICS)
+  getOrchestratorMetrics() {
+    return this.platformSystemsService.demo('deployment-observability');
+  }
+
+  @Get('operations/observability/integrations')
+  @Permissions(Permission.VIEW_ANALYTICS)
+  getIntegrationHealth() {
+    return this.platformSystemsService.demo('deployment-observability');
+  }
+
+  @Get('operations/deployments/current')
+  @Permissions(Permission.VIEW_ANALYTICS)
+  getCurrentDeployment() {
+    return this.platformSystemsService.demo('deployment-observability');
+  }
+
+  @Get('operations/incidents')
+  @Permissions(Permission.VIEW_ANALYTICS)
+  getOperationsIncidents() {
+    return this.platformSystemsService.demo('operations-incident-center');
+  }
+
+  @Post('operations/incidents/:incidentId/review')
+  @HttpCode(HttpStatus.OK)
+  @Permissions(Permission.VIEW_ANALYTICS)
+  reviewOperationsIncident(
+    @Param('incidentId') incidentId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.platformSystemsService.demo('operations-incident-center', incidentId, body);
   }
 }

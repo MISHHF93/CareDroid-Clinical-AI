@@ -8,6 +8,41 @@ import { getBackendBackedToolInventory } from '../data/toolInventory';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import { Permission } from '../contexts/UserContext';
 
+const ENTERPRISE_PLATFORM_SUGGESTIONS = Object.freeze([
+  {
+    id: 'ai-governance-center',
+    label: 'AI Governance Center',
+    path: '/ai-governance',
+    permissions: [Permission.VIEW_GOVERNANCE],
+    sourceRoute: '/api/ai-governance/summary',
+    keywords: ['governance', 'model inventory', 'approval', 'release history'],
+  },
+  {
+    id: 'llm-security-dashboard',
+    label: 'LLM Security Dashboard',
+    path: '/security',
+    permissions: [Permission.VIEW_AI_SECURITY],
+    sourceRoute: '/api/security/summary',
+    keywords: ['security', 'prompt injection', 'blocked prompts', 'phi leakage'],
+  },
+  {
+    id: 'human-review-queue',
+    label: 'Human Review Queue',
+    path: '/human-review',
+    permissions: [Permission.VIEW_REVIEW_QUEUE],
+    sourceRoute: '/api/human-review/items',
+    keywords: ['review', 'pending ai output', 'approve', 'reject'],
+  },
+  {
+    id: 'system-health',
+    label: 'System Health',
+    path: '/system-health',
+    permissions: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
+    sourceRoute: '/api/system-health',
+    keywords: ['health', 'deployment', 'version', 'observability'],
+  },
+]);
+
 function getExecutorInventoryRecords() {
   return getBackendBackedToolInventory().filter((record) =>
     ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.includes(record.orchestratorToolId)
@@ -222,6 +257,22 @@ export function getChatCapabilitySuggestions({
       keywords: ['profile', 'account', 'user'],
     });
   }
+
+  ENTERPRISE_PLATFORM_SUGGESTIONS.forEach((item, index) => {
+    if (!item.permissions.every((permission) => hasPermission(permission))) return;
+    if (!routeExists(routes, 'GET', item.sourceRoute)) return;
+    suggestions.push({
+      id: item.id,
+      label: item.label,
+      description: 'Open a governed enterprise platform module. No backend executor is invoked.',
+      kind: 'route',
+      path: item.path,
+      icon: CHROME_ICONS.shield || CHROME_ICONS.clipboardList,
+      source: item.sourceRoute,
+      defaultRank: 120 + index,
+      keywords: item.keywords,
+    });
+  });
 
   return suggestions
     .map((suggestion) => ({

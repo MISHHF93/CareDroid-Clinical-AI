@@ -26,6 +26,8 @@ export class EmbeddingService {
   }
 
   private normalizeText(text: string): string {
-    return String(text || '').trim().replace(/\s+/g, ' ');
+    return String(text || '')
+      .trim()
+      .replace(/\s+/g, ' ');
   }
 }

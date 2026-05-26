@@ -5,7 +5,7 @@
  * Manages tool registry, execution, validation, and result formatting.
  */
 
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditService } from '../../audit/audit.service';
@@ -31,6 +31,7 @@ import {
   validateExecutorContractParameters,
   validateExecutorRequestPayload,
 } from './tool-orchestrator.registry';
+import { PlatformGovernanceService } from '../../platform-governance';
 
 interface ToolRegistry {
   [toolId: string]: ClinicalToolService;
@@ -57,6 +58,7 @@ export class ToolOrchestratorService {
     private readonly toolMetrics: ToolMetricsService,
     @InjectRepository(ToolResult)
     private readonly toolResultRepository: Repository<ToolResult>,
+    @Optional() private readonly platformGovernance?: PlatformGovernanceService,
   ) {
     this.initializeRegistry();
   }
@@ -161,6 +163,15 @@ export class ToolOrchestratorService {
     errorCode?: ToolExecutionErrorCode;
     resolvedToolId?: string;
   }> {
+    await this.platformGovernance?.recordObservabilityEvent({
+      correlationId: dto.conversationId,
+      capabilityId: dto.toolId,
+      eventType: 'tool.validation.requested',
+      severity: 'info',
+      status: 'requested',
+      metadata: { userId: dto.userId },
+    });
+
     const requestCheck = validateExecutorRequestPayload(dto.parameters);
     if (!requestCheck.valid) {
       return {
@@ -216,6 +227,12 @@ export class ToolOrchestratorService {
     const startTime = Date.now();
     const requestedToolId = dto.toolId;
     this.logger.log(`Executing tool: ${requestedToolId}`);
+    await this.platformGovernance?.evaluateGate({
+      runId: dto.conversationId,
+      capabilityId: requestedToolId,
+      phiAccessed: false,
+      action: 'tool-orchestrator/execute',
+    });
 
     const requestCheck = validateExecutorRequestPayload(dto.parameters);
     if (!requestCheck.valid) {

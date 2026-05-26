@@ -12,9 +12,9 @@ import {
 @Injectable()
 export class ExpertSelectorService {
   scoreCandidates(input: ExpertSelectionInput): ExpertCandidate[] {
-    return MOE_EXPERT_DESCRIPTORS.map((descriptor) =>
-      this.scoreCandidate(descriptor, input),
-    ).sort((a, b) => b.score - a.score);
+    return MOE_EXPERT_DESCRIPTORS.map((descriptor) => this.scoreCandidate(descriptor, input)).sort(
+      (a, b) => b.score - a.score,
+    );
   }
 
   private scoreCandidate(

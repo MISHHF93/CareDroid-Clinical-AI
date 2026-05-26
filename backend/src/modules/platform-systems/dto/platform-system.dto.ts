@@ -19,8 +19,20 @@ export interface PlatformCapabilityContractDto {
   tier: string;
   route: string;
   endpoint: string;
+  sourceKind: 'platform';
+  executorStatus: 'platform' | 'registered_executor' | 'unsupported';
+  riskLevel: 'low' | 'moderate' | 'high' | 'critical';
+  permissionPolicy: string[];
+  apiClient: string;
+  auditEvents: string[];
+  dashboardPlacement: string[];
   status: 'demo_available' | 'unsupported_until_configured';
   contractVersion: string;
+  criticality?: 'P0' | 'P1' | 'P2' | 'P3';
+  implementationPhase?: string;
+  requiresHumanReview?: boolean;
+  requiresConsent?: boolean;
+  regulatoryClassificationRequired?: boolean;
   provenance: SourceProvenanceDto;
   safety: PlatformSafetyDto;
 }

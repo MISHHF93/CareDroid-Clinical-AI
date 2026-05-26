@@ -34,7 +34,12 @@ export class MoERouterService {
       primaryIntent,
     });
     const simpleRequest = this.isSimpleRequest(envelope, classification, candidates);
-    const selectedExperts = this.selectExperts(candidates, classification, primaryIntent, simpleRequest);
+    const selectedExperts = this.selectExperts(
+      candidates,
+      classification,
+      primaryIntent,
+      simpleRequest,
+    );
     const primaryExpert = selectedExperts[0];
     const selectedExpert = primaryExpert.expertId;
     const descriptor = MOE_EXPERT_DESCRIPTOR_BY_ID[selectedExpert];
@@ -146,7 +151,8 @@ export class MoERouterService {
   }
 
   private selectEmergencyExperts(candidates: ExpertCandidate[]): SelectedExpertRoute[] {
-    const emergency = candidates.find((candidate) => candidate.expertId === 'emergency') || candidates[0];
+    const emergency =
+      candidates.find((candidate) => candidate.expertId === 'emergency') || candidates[0];
     const selected: SelectedExpertRoute[] = [this.withRole(emergency, 'primary')];
     const safetySupport = candidates
       .filter((candidate) => candidate.expertId !== emergency.expertId)
@@ -175,7 +181,10 @@ export class MoERouterService {
     };
   }
 
-  private withRole(candidate: ExpertCandidate, role: SelectedExpertRoute['role']): SelectedExpertRoute {
+  private withRole(
+    candidate: ExpertCandidate,
+    role: SelectedExpertRoute['role'],
+  ): SelectedExpertRoute {
     return {
       expertId: candidate.expertId,
       role,
@@ -205,7 +214,10 @@ export class MoERouterService {
     if (classification?.isEmergency || classification?.toolId || envelope.input.toolHint) {
       return false;
     }
-    if (classification?.primaryIntent && classification.primaryIntent !== PrimaryIntent.GENERAL_QUERY) {
+    if (
+      classification?.primaryIntent &&
+      classification.primaryIntent !== PrimaryIntent.GENERAL_QUERY
+    ) {
       return false;
     }
     const message = envelope.input.message || '';

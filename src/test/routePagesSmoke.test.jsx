@@ -27,6 +27,7 @@ import CostAnalyticsDashboard from '../pages/CostAnalyticsDashboard';
 import AiEvaluationDashboard from '../pages/AiEvaluationDashboard';
 import AiCommandCenterDashboard from '../pages/AiCommandCenterDashboard';
 import PlatformSystemPage from '../pages/platform/PlatformSystemPage';
+import PlatformGovernanceWorkspace from '../pages/platform/PlatformGovernanceWorkspace';
 import CommandDashboard from '../pages/CommandDashboard';
 import Dashboard from '../pages/Dashboard';
 import Operations from '../pages/Operations';
@@ -123,6 +124,19 @@ vi.mock('../services/platformSystemsApi', () => ({
     data: { status: 'demo_review_required' },
   }),
 }));
+
+vi.mock('../services/platformGovernanceApi', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    fetchPlatformGovernanceSurface: vi.fn().mockResolvedValue({
+      ok: true,
+      sourceStatus: 'demo',
+      data: actual.LOCAL_PLATFORM_GOVERNANCE_STATE,
+      message: '',
+    }),
+  };
+});
 
 vi.mock('../services/clinicalChatService', () => ({
   sendClinicalChatMessage: vi.fn().mockResolvedValue({ ok: true, message: { content: 'ok' } }),
@@ -297,11 +311,25 @@ const PAGE_BY_ID = {
   costs: CostAnalyticsDashboard,
   'ai-evaluation': AiEvaluationDashboard,
   'ai-command-center': AiCommandCenterDashboard,
-  'integrations-platform': PlatformSystemPage,
+  'integrations-platform': PlatformGovernanceWorkspace,
   'workflow-builder-ai': PlatformSystemPage,
   'patient-workspace-platform': PlatformSystemPage,
   'soap-builder': PlatformSystemPage,
-  'governance-platform': PlatformSystemPage,
+  'governance-platform': PlatformGovernanceWorkspace,
+  'ai-governance-center': PlatformGovernanceWorkspace,
+  'llm-security-dashboard': PlatformGovernanceWorkspace,
+  'regulatory-enterprise': PlatformGovernanceWorkspace,
+  'equity-monitoring-enterprise': PlatformGovernanceWorkspace,
+  'human-review-enterprise': PlatformGovernanceWorkspace,
+  'privacy-enterprise': PlatformGovernanceWorkspace,
+  'system-health-enterprise': PlatformGovernanceWorkspace,
+  'governance-clinical': PlatformGovernanceWorkspace,
+  'ai-security-platform': PlatformGovernanceWorkspace,
+  'regulatory-classification': PlatformGovernanceWorkspace,
+  'validation-sandbox': PlatformGovernanceWorkspace,
+  'human-review-queue': PlatformGovernanceWorkspace,
+  'audit-trail-spine': PlatformGovernanceWorkspace,
+  'deployment-observability': PlatformGovernanceWorkspace,
   'fleet-live-map': FleetLiveMap,
   'fleet-command': FleetDashboard,
   'fleet-route-optimizer': RouteOptimizer,

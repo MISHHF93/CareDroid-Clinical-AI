@@ -6,7 +6,9 @@ import { PineconeService } from './vector-db/pinecone.service';
 describe('RetrievalService', () => {
   const queryEmbedding = [0.1, 0.2, 0.3];
 
-  function createService(overrides: Partial<{ cacheGetOrSet: jest.Mock; vectorQuery: jest.Mock }> = {}) {
+  function createService(
+    overrides: Partial<{ cacheGetOrSet: jest.Mock; vectorQuery: jest.Mock }> = {},
+  ) {
     const vectorQuery =
       overrides.vectorQuery ||
       jest.fn().mockResolvedValue({
@@ -31,7 +33,9 @@ describe('RetrievalService', () => {
     const service = new RetrievalService(
       { query: vectorQuery } as unknown as PineconeService,
       { getOrSet: cacheGetOrSet } as unknown as CacheService,
-      { get: jest.fn().mockReturnValue({ retrieval: { cacheTtlSeconds: 60 } }) } as unknown as ConfigService,
+      {
+        get: jest.fn().mockReturnValue({ retrieval: { cacheTtlSeconds: 60 } }),
+      } as unknown as ConfigService,
     );
 
     return { service, vectorQuery, cacheGetOrSet };

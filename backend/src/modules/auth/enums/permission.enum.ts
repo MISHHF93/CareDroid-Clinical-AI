@@ -31,6 +31,7 @@ export enum Permission {
   VIEW_AUDIT_LOGS = 'VIEW_AUDIT_LOGS', // Access to audit trail
   EXPORT_AUDIT_LOGS = 'EXPORT_AUDIT_LOGS', // Export audit logs for compliance
   VERIFY_AUDIT_INTEGRITY = 'VERIFY_AUDIT_INTEGRITY', // Check audit log chain integrity
+  VIEW_PHI_AUDIT = 'VIEW_PHI_AUDIT', // View PHI-specific audit timelines
 
   // System Administration
   CONFIGURE_SYSTEM = 'CONFIGURE_SYSTEM', // System settings and configuration
@@ -39,6 +40,43 @@ export enum Permission {
   VIEW_ANALYTICS = 'VIEW_ANALYTICS', // System usage analytics
   MANAGE_CONSENT = 'MANAGE_CONSENT', // Patient consent management
   MANAGE_PRIVACY = 'MANAGE_PRIVACY', // Privacy requests and PHI access logs
+
+  // Platform Governance
+  VIEW_GOVERNANCE = 'VIEW_GOVERNANCE',
+  MANAGE_CLINICAL_POLICY = 'MANAGE_CLINICAL_POLICY',
+  APPROVE_CLINICAL_POLICY = 'APPROVE_CLINICAL_POLICY',
+  REVIEW_SAFETY_FINDINGS = 'REVIEW_SAFETY_FINDINGS',
+  VIEW_AI_SECURITY = 'VIEW_AI_SECURITY',
+  MANAGE_AI_SECURITY = 'MANAGE_AI_SECURITY',
+  REVIEW_AI_SECURITY_INCIDENTS = 'REVIEW_AI_SECURITY_INCIDENTS',
+  VIEW_INTEGRATIONS = 'VIEW_INTEGRATIONS',
+  MANAGE_INTEGRATIONS = 'MANAGE_INTEGRATIONS',
+  IMPORT_PATIENT_DATA = 'IMPORT_PATIENT_DATA',
+  RESOLVE_DATA_CONFLICTS = 'RESOLVE_DATA_CONFLICTS',
+  BREAK_GLASS_ACCESS = 'BREAK_GLASS_ACCESS',
+  VIEW_REGULATORY = 'VIEW_REGULATORY',
+  MANAGE_REGULATORY = 'MANAGE_REGULATORY',
+  APPROVE_REGULATORY = 'APPROVE_REGULATORY',
+  VIEW_EQUITY_METRICS = 'VIEW_EQUITY_METRICS',
+  MANAGE_EQUITY_COHORTS = 'MANAGE_EQUITY_COHORTS',
+  REVIEW_BIAS_FINDINGS = 'REVIEW_BIAS_FINDINGS',
+  EXPORT_EQUITY_REPORTS = 'EXPORT_EQUITY_REPORTS',
+  VIEW_VALIDATION = 'VIEW_VALIDATION',
+  MANAGE_VALIDATION = 'MANAGE_VALIDATION',
+  RUN_VALIDATION = 'RUN_VALIDATION',
+  APPROVE_VALIDATION = 'APPROVE_VALIDATION',
+  VIEW_REVIEW_QUEUE = 'VIEW_REVIEW_QUEUE',
+  REVIEW_CLINICAL_AI = 'REVIEW_CLINICAL_AI',
+  REVIEW_DOCUMENTATION = 'REVIEW_DOCUMENTATION',
+  REVIEW_PRIVACY_REQUESTS = 'REVIEW_PRIVACY_REQUESTS',
+  REVIEW_GOVERNANCE = 'REVIEW_GOVERNANCE',
+  VIEW_PRIVACY_CENTER = 'VIEW_PRIVACY_CENTER',
+  VIEW_PHI_ACCESS_LOGS = 'VIEW_PHI_ACCESS_LOGS',
+  REQUEST_DATA_EXPORT = 'REQUEST_DATA_EXPORT',
+  APPROVE_DATA_RIGHTS_REQUESTS = 'APPROVE_DATA_RIGHTS_REQUESTS',
+  VIEW_OPERATIONS = 'VIEW_OPERATIONS',
+  VIEW_OBSERVABILITY = 'VIEW_OBSERVABILITY',
+  MANAGE_INCIDENTS = 'MANAGE_INCIDENTS',
 
   // Emergency & Safety
   TRIGGER_EMERGENCY_PROTOCOL = 'TRIGGER_EMERGENCY_PROTOCOL', // Initiate emergency response
@@ -139,6 +177,11 @@ export const PermissionMetadata: Record<
     category: 'Audit & Compliance',
     riskLevel: 'medium',
   },
+  [Permission.VIEW_PHI_AUDIT]: {
+    description: 'View PHI-specific audit timelines and access trails',
+    category: 'Audit & Compliance',
+    riskLevel: 'critical',
+  },
 
   // System Administration
   [Permission.CONFIGURE_SYSTEM]: {
@@ -169,6 +212,183 @@ export const PermissionMetadata: Record<
   [Permission.MANAGE_PRIVACY]: {
     description: 'Manage privacy center workflows and PHI access-log requests',
     category: 'System Administration',
+    riskLevel: 'critical',
+  },
+
+  // Platform Governance
+  [Permission.VIEW_GOVERNANCE]: {
+    description: 'View clinical governance readiness, policy summaries, and blocker state',
+    category: 'Platform Governance',
+    riskLevel: 'high',
+  },
+  [Permission.MANAGE_CLINICAL_POLICY]: {
+    description: 'Create and update clinical governance policy drafts',
+    category: 'Platform Governance',
+    riskLevel: 'critical',
+  },
+  [Permission.APPROVE_CLINICAL_POLICY]: {
+    description: 'Approve clinical policies and release gates',
+    category: 'Platform Governance',
+    riskLevel: 'critical',
+  },
+  [Permission.REVIEW_SAFETY_FINDINGS]: {
+    description: 'Triage and resolve clinical safety findings',
+    category: 'Platform Governance',
+    riskLevel: 'critical',
+  },
+  [Permission.VIEW_AI_SECURITY]: {
+    description: 'View AI security dashboards, prompt blocks, and incidents',
+    category: 'AI Security',
+    riskLevel: 'high',
+  },
+  [Permission.MANAGE_AI_SECURITY]: {
+    description: 'Manage prompt firewall and model access policies',
+    category: 'AI Security',
+    riskLevel: 'critical',
+  },
+  [Permission.REVIEW_AI_SECURITY_INCIDENTS]: {
+    description: 'Review and disposition AI security incidents',
+    category: 'AI Security',
+    riskLevel: 'critical',
+  },
+  [Permission.VIEW_INTEGRATIONS]: {
+    description: 'View FHIR, HL7, source provenance, and import status',
+    category: 'Interoperability',
+    riskLevel: 'medium',
+  },
+  [Permission.MANAGE_INTEGRATIONS]: {
+    description: 'Configure and test FHIR/HL7 interfaces',
+    category: 'Interoperability',
+    riskLevel: 'critical',
+  },
+  [Permission.IMPORT_PATIENT_DATA]: {
+    description: 'Run patient import previews and commits',
+    category: 'Interoperability',
+    riskLevel: 'critical',
+  },
+  [Permission.RESOLVE_DATA_CONFLICTS]: {
+    description: 'Resolve patient matching and terminology conflicts',
+    category: 'Interoperability',
+    riskLevel: 'critical',
+  },
+  [Permission.BREAK_GLASS_ACCESS]: {
+    description: 'Use emergency break-glass access with elevated audit requirements',
+    category: 'Emergency & Safety',
+    riskLevel: 'critical',
+  },
+  [Permission.VIEW_REGULATORY]: {
+    description: 'View regulatory classification and intended-use records',
+    category: 'Regulatory',
+    riskLevel: 'high',
+  },
+  [Permission.MANAGE_REGULATORY]: {
+    description: 'Draft and edit regulatory classifications',
+    category: 'Regulatory',
+    riskLevel: 'critical',
+  },
+  [Permission.APPROVE_REGULATORY]: {
+    description: 'Approve regulatory classifications and evidence packages',
+    category: 'Regulatory',
+    riskLevel: 'critical',
+  },
+  [Permission.VIEW_EQUITY_METRICS]: {
+    description: 'View aggregate equity and missingness metrics',
+    category: 'Equity Monitoring',
+    riskLevel: 'high',
+  },
+  [Permission.MANAGE_EQUITY_COHORTS]: {
+    description: 'Define equity cohorts and aggregation thresholds',
+    category: 'Equity Monitoring',
+    riskLevel: 'critical',
+  },
+  [Permission.REVIEW_BIAS_FINDINGS]: {
+    description: 'Review and resolve bias findings',
+    category: 'Equity Monitoring',
+    riskLevel: 'critical',
+  },
+  [Permission.EXPORT_EQUITY_REPORTS]: {
+    description: 'Export governance committee equity reports',
+    category: 'Equity Monitoring',
+    riskLevel: 'critical',
+  },
+  [Permission.VIEW_VALIDATION]: {
+    description: 'View validation scenarios and run results',
+    category: 'Validation',
+    riskLevel: 'high',
+  },
+  [Permission.MANAGE_VALIDATION]: {
+    description: 'Create validation scenarios and synthetic patients',
+    category: 'Validation',
+    riskLevel: 'critical',
+  },
+  [Permission.RUN_VALIDATION]: {
+    description: 'Execute sandbox validation runs',
+    category: 'Validation',
+    riskLevel: 'critical',
+  },
+  [Permission.APPROVE_VALIDATION]: {
+    description: 'Approve validation evidence for release gates',
+    category: 'Validation',
+    riskLevel: 'critical',
+  },
+  [Permission.VIEW_REVIEW_QUEUE]: {
+    description: 'View human review queue items permitted by role',
+    category: 'Human Review',
+    riskLevel: 'high',
+  },
+  [Permission.REVIEW_CLINICAL_AI]: {
+    description: 'Approve or reject clinical AI output',
+    category: 'Human Review',
+    riskLevel: 'critical',
+  },
+  [Permission.REVIEW_DOCUMENTATION]: {
+    description: 'Approve documentation drafts for export or filing',
+    category: 'Human Review',
+    riskLevel: 'critical',
+  },
+  [Permission.REVIEW_PRIVACY_REQUESTS]: {
+    description: 'Review privacy export, delete, and access requests',
+    category: 'Human Review',
+    riskLevel: 'critical',
+  },
+  [Permission.REVIEW_GOVERNANCE]: {
+    description: 'Review governance release gates and policy exceptions',
+    category: 'Human Review',
+    riskLevel: 'critical',
+  },
+  [Permission.VIEW_PRIVACY_CENTER]: {
+    description: 'View privacy center workflows and request state',
+    category: 'Privacy',
+    riskLevel: 'high',
+  },
+  [Permission.VIEW_PHI_ACCESS_LOGS]: {
+    description: 'View patient-level PHI access logs',
+    category: 'Privacy',
+    riskLevel: 'critical',
+  },
+  [Permission.REQUEST_DATA_EXPORT]: {
+    description: 'Initiate data export workflows',
+    category: 'Privacy',
+    riskLevel: 'critical',
+  },
+  [Permission.APPROVE_DATA_RIGHTS_REQUESTS]: {
+    description: 'Approve data rights export and delete workflows',
+    category: 'Privacy',
+    riskLevel: 'critical',
+  },
+  [Permission.VIEW_OPERATIONS]: {
+    description: 'View service health and deployment operations state',
+    category: 'Operations',
+    riskLevel: 'medium',
+  },
+  [Permission.VIEW_OBSERVABILITY]: {
+    description: 'View platform observability and AI operations metrics',
+    category: 'Operations',
+    riskLevel: 'medium',
+  },
+  [Permission.MANAGE_INCIDENTS]: {
+    description: 'Create, update, and resolve operations incidents',
+    category: 'Operations',
     riskLevel: 'critical',
   },
 

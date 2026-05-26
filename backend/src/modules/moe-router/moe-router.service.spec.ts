@@ -28,9 +28,7 @@ function createEnvelope(overrides: Partial<GatewayRunEnvelope> = {}): GatewayRun
   };
 }
 
-function createClassification(
-  overrides: Partial<IntentClassification> = {},
-): IntentClassification {
+function createClassification(overrides: Partial<IntentClassification> = {}): IntentClassification {
   return {
     primaryIntent: PrimaryIntent.MEDICAL_REFERENCE,
     confidence: 0.82,
@@ -97,8 +95,7 @@ describe('MoERouterService', () => {
     const plan = service.createRoutePlan(
       createEnvelope({
         input: {
-          message:
-            'Patient has chest pain, dyspnea, rising creatinine, and seizure-like activity.',
+          message: 'Patient has chest pain, dyspnea, rising creatinine, and seizure-like activity.',
         },
       }),
       createClassification({

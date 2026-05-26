@@ -27,9 +27,7 @@ function createEnvelope(overrides: Partial<AiRunEnvelope> = {}): AiRunEnvelope {
   };
 }
 
-function createClassification(
-  overrides: Partial<IntentClassification> = {},
-): IntentClassification {
+function createClassification(overrides: Partial<IntentClassification> = {}): IntentClassification {
   return {
     primaryIntent: PrimaryIntent.MEDICAL_REFERENCE,
     confidence: 0.82,

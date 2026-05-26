@@ -73,7 +73,10 @@ export class CacheService {
 
     return `{${Object.keys(value as Record<string, unknown>)
       .sort()
-      .map((key) => `${JSON.stringify(key)}:${this.stableStringify((value as Record<string, unknown>)[key])}`)
+      .map(
+        (key) =>
+          `${JSON.stringify(key)}:${this.stableStringify((value as Record<string, unknown>)[key])}`,
+      )
       .join(',')}}`;
   }
 

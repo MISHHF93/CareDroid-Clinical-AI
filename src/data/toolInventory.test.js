@@ -76,7 +76,9 @@ describe('canonical tool inventory', () => {
     for (const tool of sidebarTools) {
       expect(tool.name, tool.id).toBeTruthy();
       expect(tool.path, tool.id).toBeTruthy();
-      expect(tool.category, tool.id).toMatch(/Diagnostic|Calculator|Reference|Fleet|IoT|Hospital Operations|Other/);
+      expect(tool.category, tool.id).toMatch(
+        /Diagnostic|Calculator|Reference|Fleet|IoT|Hospital Operations|AI System|Other/
+      );
       expect(tool.color, tool.id).toMatch(/^#/);
       expect(Array.isArray(tool.features), tool.id).toBe(true);
       expect(tool.canonicalInventoryId, tool.id).toBe(tool.id);
@@ -157,7 +159,12 @@ describe('canonical tool inventory', () => {
       expect(record.surface, record.id).toBeTruthy();
       expect(record.route || record.navigationPath || record.chatSeed, record.id).toBeTruthy();
       expect(record.launchType, record.id).not.toBe(TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED);
-      expect(record.auditRefs.sourceKind, record.id).not.toBe('platform');
+      if (record.auditRefs.sourceKind === 'platform') {
+        expect(record.executorStatus, record.id).toBe(TOOL_EXECUTOR_STATUS.PLATFORM);
+        expect(record.auditRefs.sourceKind, record.id).toBe('platform');
+      } else {
+        expect(record.auditRefs.sourceKind, record.id).not.toBe('platform');
+      }
 
       if (record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) {
         expect(record.chatSeed, record.id).toBeTruthy();

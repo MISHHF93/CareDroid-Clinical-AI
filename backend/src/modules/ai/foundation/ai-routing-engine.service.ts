@@ -41,7 +41,9 @@ export class AiRoutingEngineService {
     const selectedExperts = this.selectExperts(candidates, classification);
     const primaryExpert = selectedExperts[0];
     const selectedExpert = primaryExpert.expertId;
-    const descriptor = candidates.find((candidate) => candidate.expertId === selectedExpert)?.descriptor;
+    const descriptor = candidates.find(
+      (candidate) => candidate.expertId === selectedExpert,
+    )?.descriptor;
     const estimatedCost = this.roundCost(
       selectedExperts.reduce((total, expert) => total + expert.estimatedCost, 0) + 0.02,
     );
@@ -275,7 +277,10 @@ export class AiRoutingEngineService {
     return selected;
   }
 
-  private withRole(candidate: ExpertCandidate, role: SelectedExpertRoute['role']): SelectedExpertRoute {
+  private withRole(
+    candidate: ExpertCandidate,
+    role: SelectedExpertRoute['role'],
+  ): SelectedExpertRoute {
     return {
       expertId: candidate.expertId,
       role,

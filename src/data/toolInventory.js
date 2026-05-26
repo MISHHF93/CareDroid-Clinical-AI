@@ -858,7 +858,10 @@ function buildPlatformRecords() {
         category: capability.category,
         tier: capability.tier,
         route: capability.route,
-        component: 'src/pages/platform/PlatformSystemPage.jsx',
+        component:
+          capability.criticality === 'P0'
+            ? 'src/pages/platform/PlatformGovernanceWorkspace.jsx'
+            : 'src/pages/platform/PlatformSystemPage.jsx',
         endpoint: capability.endpoint,
         apiClient: capability.apiClient,
         requestDto: capability.requestDto,
@@ -870,7 +873,7 @@ function buildPlatformRecords() {
         riskLevel: capability.permissionPolicy?.permissions?.includes('READ_PHI') ? 'high' : 'medium',
         notes: capability.safetyCopy,
         catalogVisible: true,
-        sourceKind: 'platform-system',
+        sourceKind: 'platform',
       })
     ),
   ];

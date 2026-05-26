@@ -45,9 +45,13 @@ export class LongMemoryService {
     });
     const serialized = entries.map((entry) => this.serialize(entry));
     return {
-      preferences: serialized.filter((entry) => entry.type === LongMemoryType.PREFERENCES).slice(0, 5),
+      preferences: serialized
+        .filter((entry) => entry.type === LongMemoryType.PREFERENCES)
+        .slice(0, 5),
       history: serialized.filter((entry) => entry.type === LongMemoryType.HISTORY).slice(0, 10),
-      savedTools: serialized.filter((entry) => entry.type === LongMemoryType.SAVED_TOOLS).slice(0, 10),
+      savedTools: serialized
+        .filter((entry) => entry.type === LongMemoryType.SAVED_TOOLS)
+        .slice(0, 10),
     };
   }
 

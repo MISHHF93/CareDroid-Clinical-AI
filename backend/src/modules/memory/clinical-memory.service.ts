@@ -43,7 +43,9 @@ export class ClinicalMemoryService {
     const entries = await this.listForUser(userId, { limit: '100' });
     return {
       findings: entries.filter((entry) => entry.type === ClinicalMemoryType.FINDINGS).slice(0, 10),
-      summaries: entries.filter((entry) => entry.type === ClinicalMemoryType.SUMMARIES).slice(0, 10),
+      summaries: entries
+        .filter((entry) => entry.type === ClinicalMemoryType.SUMMARIES)
+        .slice(0, 10),
       scores: entries.filter((entry) => entry.type === ClinicalMemoryType.SCORES).slice(0, 10),
     };
   }

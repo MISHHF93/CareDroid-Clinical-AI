@@ -94,7 +94,10 @@ export class RetrievalService {
   private cacheKey(request: RetrievalRequest): string {
     return `rag:retrieval:${JSON.stringify({
       corpusVersion: request.corpusVersion,
-      query: String(request.query || '').trim().replace(/\s+/g, ' ').toLowerCase(),
+      query: String(request.query || '')
+        .trim()
+        .replace(/\s+/g, ' ')
+        .toLowerCase(),
       topK: request.topK,
       minScore: request.minScore,
       includeEmbeddings: request.includeEmbeddings,

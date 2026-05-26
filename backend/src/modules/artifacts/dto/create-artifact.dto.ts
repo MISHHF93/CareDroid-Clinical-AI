@@ -1,12 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsEnum,
-  IsOptional,
-  IsString,
-  MaxLength,
-  ValidateNested,
-} from 'class-validator';
+import { IsArray, IsEnum, IsOptional, IsString, MaxLength, ValidateNested } from 'class-validator';
 import { ArtifactType } from '../entities/artifact.entity';
 import { ArtifactRelationshipDto } from './artifact-relationship.dto';
 

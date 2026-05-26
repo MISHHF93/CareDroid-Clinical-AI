@@ -46,6 +46,48 @@ describe('App clinical-intelligence route permissions', () => {
     expect(block).toContain('permission: Permission.VIEW_AUDIT_LOGS');
   });
 
+  it.each([
+    ['/ai-governance', ['VIEW_GOVERNANCE']],
+    ['/security', ['VIEW_AI_SECURITY']],
+    ['/regulatory', ['VIEW_REGULATORY']],
+    ['/equity', ['VIEW_EQUITY_METRICS']],
+    ['/human-review', ['VIEW_REVIEW_QUEUE']],
+    ['/privacy', ['VIEW_PRIVACY_CENTER']],
+    ['/integrations', ['VIEW_INTEGRATIONS']],
+    ['/system-health', ['VIEW_OPERATIONS', 'VIEW_OBSERVABILITY']],
+    ['/governance/clinical', ['VIEW_GOVERNANCE']],
+    ['/governance/clinical/policies', ['MANAGE_CLINICAL_POLICY']],
+    ['/governance/ai-security', ['VIEW_AI_SECURITY']],
+    ['/governance/ai-security/incidents', ['REVIEW_AI_SECURITY_INCIDENTS']],
+    ['/governance/regulatory', ['VIEW_REGULATORY']],
+    ['/governance/regulatory/capabilities', ['VIEW_REGULATORY']],
+    ['/governance/regulatory/evidence', ['APPROVE_REGULATORY']],
+    ['/governance/equity', ['VIEW_EQUITY_METRICS']],
+    ['/governance/equity/metrics', ['VIEW_EQUITY_METRICS']],
+    ['/governance/equity/cohorts', ['MANAGE_EQUITY_COHORTS']],
+    ['/governance/equity/reports', ['EXPORT_EQUITY_REPORTS']],
+    ['/governance/validation', ['VIEW_VALIDATION']],
+    ['/governance/validation/scenarios', ['MANAGE_VALIDATION']],
+    ['/governance/validation/runs', ['RUN_VALIDATION']],
+    ['/governance/validation/release-gates', ['APPROVE_VALIDATION']],
+    ['/review', ['VIEW_REVIEW_QUEUE']],
+    ['/patients/:patientId/review', ['READ_PHI', 'VIEW_REVIEW_QUEUE']],
+    ['/audit', ['VIEW_AUDIT_LOGS']],
+    ['/audit/phi', ['VIEW_PHI_AUDIT']],
+    ['/audit/integrations', ['VIEW_AUDIT_LOGS']],
+    ['/audit/policy', ['VIEW_AUDIT_LOGS']],
+    ['/operations/observability', ['VIEW_OPERATIONS', 'VIEW_OBSERVABILITY']],
+    ['/operations/deployments', ['VIEW_OPERATIONS']],
+    ['/operations/service-health', ['VIEW_OPERATIONS']],
+  ])('%s has the expected P0 platform permissions', (path, permissions) => {
+    const block = routeBlock(path);
+
+    expect(block).toContain(`path: '${path}'`);
+    for (const permission of permissions) {
+      expect(block).toContain(`Permission.${permission}`);
+    }
+  });
+
   it('keeps App route preflight aligned with canonical inventory permission policies', () => {
     const clinicalIntelligenceRecords = getFrontendVisibleToolInventory().filter(
       (record) =>

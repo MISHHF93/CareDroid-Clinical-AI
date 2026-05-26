@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
@@ -34,6 +34,7 @@ import {
   ClinicalAuditResponseDto,
   SanitizedExecutionLogDto,
 } from './dto/explainability-audit.dto';
+import { PlatformGovernanceService } from '../platform-governance';
 
 const CONTRACT_VERSION = 'ambient-scribe.v1';
 const GUIDELINE_RAG_CONTRACT_VERSION = 'guideline-rag.v1';
@@ -57,6 +58,7 @@ export class ClinicalIntelligenceService {
   constructor(
     private readonly auditService: AuditService,
     private readonly ragService: RAGService,
+    @Optional() private readonly platformGovernance?: PlatformGovernanceService,
   ) {}
 
   async generateAmbientScribeDraft(
@@ -65,6 +67,31 @@ export class ClinicalIntelligenceService {
     requestMeta: { ipAddress?: string; userAgent?: string } = {},
   ): Promise<AmbientScribeResponseDto> {
     const runId = randomUUID();
+    const governanceDecision = await this.platformGovernance?.evaluateGate({
+      runId,
+      capabilityId: 'ambient-scribe',
+      patientId: (dto.patientContext as any)?.patientId,
+      phiAccessed: true,
+      prompt: dto.transcriptText,
+      action: 'clinical-intelligence/ambient-scribe',
+    });
+    if (
+      governanceDecision &&
+      (!governanceDecision.allowed || governanceDecision.requiresHumanReview)
+    ) {
+      await this.platformGovernance?.createReviewItem({
+        runId,
+        patientId: (dto.patientContext as any)?.patientId,
+        capabilityId: 'ambient-scribe',
+        reviewType: 'documentation',
+        severity: governanceDecision.allowed ? 'medium' : 'high',
+        payload: {
+          reasons: governanceDecision.reasons,
+          noteType: dto.noteType,
+          contractVersion: CONTRACT_VERSION,
+        },
+      });
+    }
     const draft = this.buildDraft(dto);
 
     await this.auditService.log({
@@ -82,6 +109,7 @@ export class ClinicalIntelligenceService {
         transcriptCharacters: dto.transcriptText.length,
         status: 'review_required',
         blockedActions: BLOCKED_ACTIONS,
+        platformGovernance: governanceDecision,
       },
     });
 

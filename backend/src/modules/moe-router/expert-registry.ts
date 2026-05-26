@@ -5,7 +5,11 @@ export { experts };
 
 export const COST_FLOOR = 0.01;
 
-export const BACKEND_EXECUTOR_TOOL_IDS = ['sofa-calculator', 'drug-interactions', 'lab-interpreter'];
+export const BACKEND_EXECUTOR_TOOL_IDS = [
+  'sofa-calculator',
+  'drug-interactions',
+  'lab-interpreter',
+];
 
 export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
   {
@@ -90,7 +94,12 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
       'shortness of breath',
       'ventilation',
     ],
-    toolHints: ['abg-interpreter', 'copd-gold', 'copd-gold-assessment', 'asthma-exacerbation-assistant'],
+    toolHints: [
+      'abg-interpreter',
+      'copd-gold',
+      'copd-gold-assessment',
+      'asthma-exacerbation-assistant',
+    ],
     featureHints: ['pulmonology', 'respiratory'],
     sourceSurfaces: ['pulmonology', 'assistant-chat'],
     retrievalPolicy: 'guideline',
@@ -120,7 +129,14 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
       'renal',
       'sodium',
     ],
-    toolHints: ['aki-staging-assistant', 'ckd-progression-predictor', 'ckd-staging', 'egfr-ckd-epi', 'fena', 'lab-interpreter'],
+    toolHints: [
+      'aki-staging-assistant',
+      'ckd-progression-predictor',
+      'ckd-staging',
+      'egfr-ckd-epi',
+      'fena',
+      'lab-interpreter',
+    ],
     featureHints: ['nephrology', 'renal'],
     sourceSurfaces: ['nephrology', 'assistant-chat'],
     retrievalPolicy: 'guideline',
@@ -165,7 +181,11 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
     id: 'neurology',
     label: 'Neurology expert',
     clinical: true,
-    intents: [PrimaryIntent.CLINICAL_TOOL, PrimaryIntent.MEDICAL_REFERENCE, PrimaryIntent.EMERGENCY],
+    intents: [
+      PrimaryIntent.CLINICAL_TOOL,
+      PrimaryIntent.MEDICAL_REFERENCE,
+      PrimaryIntent.EMERGENCY,
+    ],
     keywords: [
       'aphasia',
       'eeg',
@@ -195,7 +215,11 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
     id: 'psychiatry',
     label: 'Psychiatry expert',
     clinical: true,
-    intents: [PrimaryIntent.CLINICAL_TOOL, PrimaryIntent.MEDICAL_REFERENCE, PrimaryIntent.EMERGENCY],
+    intents: [
+      PrimaryIntent.CLINICAL_TOOL,
+      PrimaryIntent.MEDICAL_REFERENCE,
+      PrimaryIntent.EMERGENCY,
+    ],
     keywords: [
       'agitation',
       'anxiety',
@@ -210,7 +234,13 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
       'suicide',
       'withdrawal',
     ],
-    toolHints: ['gad7', 'phq9', 'cage', 'columbia-suicide-severity-workflow', 'mental-health-screening-assistant'],
+    toolHints: [
+      'gad7',
+      'phq9',
+      'cage',
+      'columbia-suicide-severity-workflow',
+      'mental-health-screening-assistant',
+    ],
     featureHints: ['psychiatry', 'behavioral-health'],
     sourceSurfaces: ['psychiatry', 'assistant-chat'],
     retrievalPolicy: 'guideline',
@@ -225,7 +255,15 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
     label: 'Fleet expert',
     clinical: false,
     intents: [PrimaryIntent.ADMINISTRATIVE, PrimaryIntent.GENERAL_QUERY],
-    keywords: ['ambulance', 'asset', 'dispatch', 'fleet', 'route optimizer', 'transport', 'vehicle'],
+    keywords: [
+      'ambulance',
+      'asset',
+      'dispatch',
+      'fleet',
+      'route optimizer',
+      'transport',
+      'vehicle',
+    ],
     toolHints: ['fleet-command', 'dispatch-ai', 'route-optimizer'],
     featureHints: ['fleet', 'dispatch'],
     sourceSurfaces: ['fleet', 'assistant-chat'],
@@ -241,7 +279,17 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
     label: 'Hospital-map expert',
     clinical: false,
     intents: [PrimaryIntent.ADMINISTRATIVE, PrimaryIntent.GENERAL_QUERY],
-    keywords: ['floor', 'hospital map', 'indoor', 'location', 'map', 'nearest', 'unit', 'wayfinding', 'zone'],
+    keywords: [
+      'floor',
+      'hospital map',
+      'indoor',
+      'location',
+      'map',
+      'nearest',
+      'unit',
+      'wayfinding',
+      'zone',
+    ],
     toolHints: ['hospital-map', 'live-tracking-map'],
     featureHints: ['hospital-map', 'map', 'live-tracking'],
     sourceSurfaces: ['hospital-map', 'live-tracking', 'assistant-chat'],
@@ -258,7 +306,11 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
     clinical: false,
     intents: [PrimaryIntent.ADMINISTRATIVE, PrimaryIntent.GENERAL_QUERY],
     keywords: ['device', 'iot', 'offline', 'sensor', 'signal', 'telemetry', 'wearable'],
-    toolHints: ['device-recommendation-assistant', 'glucose-telemetry-dashboard', 'neuro-telemetry-dashboard'],
+    toolHints: [
+      'device-recommendation-assistant',
+      'glucose-telemetry-dashboard',
+      'neuro-telemetry-dashboard',
+    ],
     featureHints: ['iot', 'medical-iot', 'device-fleet', 'telemetry'],
     sourceSurfaces: ['iot', 'medical-iot', 'assistant-chat'],
     retrievalPolicy: 'operational',
@@ -273,7 +325,15 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
     label: 'Operations expert',
     clinical: false,
     intents: [PrimaryIntent.ADMINISTRATIVE, PrimaryIntent.GENERAL_QUERY],
-    keywords: ['bed', 'capacity', 'command center', 'hospital command', 'operations', 'staffing', 'throughput'],
+    keywords: [
+      'bed',
+      'capacity',
+      'command center',
+      'hospital command',
+      'operations',
+      'staffing',
+      'throughput',
+    ],
     toolHints: ['hospital-command-assistant', 'bed-occupancy-calculator'],
     featureHints: ['operations', 'hospital-operations'],
     sourceSurfaces: ['operations', 'assistant-chat'],
@@ -288,8 +348,21 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
     id: 'documentation',
     label: 'Documentation expert',
     clinical: true,
-    intents: [PrimaryIntent.GENERAL_QUERY, PrimaryIntent.ADMINISTRATIVE, PrimaryIntent.MEDICAL_REFERENCE],
-    keywords: ['ambient', 'discharge', 'documentation', 'handoff', 'note', 'soap', 'scribe', 'summary'],
+    intents: [
+      PrimaryIntent.GENERAL_QUERY,
+      PrimaryIntent.ADMINISTRATIVE,
+      PrimaryIntent.MEDICAL_REFERENCE,
+    ],
+    keywords: [
+      'ambient',
+      'discharge',
+      'documentation',
+      'handoff',
+      'note',
+      'soap',
+      'scribe',
+      'summary',
+    ],
     toolHints: ['ambient-scribe', 'patient-summary-ai', 'timeline-ai'],
     featureHints: ['ambient-scribe', 'documentation', 'patient-summary-ai', 'timeline-ai'],
     sourceSurfaces: ['documentation', 'assistant-chat'],
@@ -304,7 +377,10 @@ export const MOE_EXPERT_DESCRIPTORS: MoEExpertDescriptor[] = [
 
 export const MOE_EXPERT_DESCRIPTOR_BY_ID = MOE_EXPERT_DESCRIPTORS.reduce<
   Record<MoEExpertId, MoEExpertDescriptor>
->((acc, descriptor) => {
-  acc[descriptor.id] = descriptor;
-  return acc;
-}, {} as Record<MoEExpertId, MoEExpertDescriptor>);
+>(
+  (acc, descriptor) => {
+    acc[descriptor.id] = descriptor;
+    return acc;
+  },
+  {} as Record<MoEExpertId, MoEExpertDescriptor>,
+);

@@ -36,8 +36,7 @@ export class AIGatewayService {
       userId: input.userId || 'anonymous',
       workspaceId: input.workspaceId,
       organizationId: input.organizationId,
-      conversationId:
-        input.conversationId === undefined ? undefined : String(input.conversationId),
+      conversationId: input.conversationId === undefined ? undefined : String(input.conversationId),
       input: {
         message: input.message,
         toolHint: input.tool,
@@ -127,6 +126,8 @@ export class AIGatewayService {
       'order-set-ai',
       'lab-interpreter',
     ]);
-    return Boolean((feature && phiCapabilities.has(feature)) || (tool && phiCapabilities.has(tool)));
+    return Boolean(
+      (feature && phiCapabilities.has(feature)) || (tool && phiCapabilities.has(tool)),
+    );
   }
 }

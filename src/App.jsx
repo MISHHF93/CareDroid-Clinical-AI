@@ -54,6 +54,9 @@ const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashbo
 const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
 const DeviceFleetManagement = lazyWithRetry(() => import('./pages/DeviceFleetManagement'));
 const PlatformSystemPage = lazyWithRetry(() => import('./pages/platform/PlatformSystemPage'));
+const PlatformGovernanceWorkspace = lazyWithRetry(() =>
+  import('./pages/platform/PlatformGovernanceWorkspace')
+);
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
 const ProfileActivity = lazyWithRetry(() => import('./pages/profile/ProfileActivity'));
@@ -629,6 +632,48 @@ function AppRoutes() {
       permission: Permission.READ_PHI,
     },
     {
+      path: '/patients/:patientId/consent',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_CONSENT,
+    },
+    {
+      path: '/patients/:patientId/source-data',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.READ_PHI,
+    },
+    {
+      path: '/patients/:patientId/review',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.VIEW_REVIEW_QUEUE],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/patients/:patientId/privacy',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.READ_PHI, Permission.VIEW_PRIVACY_CENTER],
+      requireAllPermissions: true,
+    },
+    {
       path: '/patients/:patientId/workflows',
       element: (
         <AppShellPage>
@@ -676,11 +721,11 @@ function AppRoutes() {
       path: '/integrations',
       element: (
         <AppShellPage>
-          <PlatformSystemPage />
+          <PlatformGovernanceWorkspace />
         </AppShellPage>
       ),
       requiresAuth: true,
-      permission: Permission.CONFIGURE_SYSTEM,
+      permission: Permission.VIEW_INTEGRATIONS,
     },
     {
       path: '/integrations/fhir',
@@ -690,7 +735,7 @@ function AppRoutes() {
         </AppShellPage>
       ),
       requiresAuth: true,
-      permission: Permission.CONFIGURE_SYSTEM,
+      permission: Permission.VIEW_INTEGRATIONS,
     },
     {
       path: '/integrations/hl7',
@@ -700,7 +745,17 @@ function AppRoutes() {
         </AppShellPage>
       ),
       requiresAuth: true,
-      permission: Permission.CONFIGURE_SYSTEM,
+      permission: Permission.VIEW_INTEGRATIONS,
+    },
+    {
+      path: '/integrations/source-provenance',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_INTEGRATIONS,
     },
     {
       path: '/operations',
@@ -710,6 +765,47 @@ function AppRoutes() {
         </AppShellPage>
       ),
       requiresAuth: true,
+    },
+    {
+      path: '/operations/observability',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/operations/deployments',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_OPERATIONS,
+    },
+    {
+      path: '/operations/service-health',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_OPERATIONS,
+    },
+    {
+      path: '/operations/incidents',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_INCIDENTS,
     },
     {
       path: '/artifacts',
@@ -1390,10 +1486,50 @@ function AppRoutes() {
     {
       path: '/privacy',
       element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_PRIVACY_CENTER,
+    },
+    {
+      path: '/legal/privacy',
+      element: (
         <PublicShell>
           <PrivacyPolicy />
         </PublicShell>
       ),
+    },
+    {
+      path: '/privacy/access-log',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_PHI_ACCESS_LOGS,
+    },
+    {
+      path: '/privacy/requests',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_PRIVACY_CENTER,
+    },
+    {
+      path: '/consent/:patientId',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_CONSENT,
     },
     {
       path: '/terms',
@@ -1455,6 +1591,167 @@ function AppRoutes() {
       permission: Permission.MANAGE_USERS,
     },
     {
+      path: '/ai-governance',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_GOVERNANCE,
+    },
+    {
+      path: '/security',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_AI_SECURITY,
+    },
+    {
+      path: '/regulatory',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_REGULATORY,
+    },
+    {
+      path: '/equity',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_EQUITY_METRICS,
+    },
+    {
+      path: '/human-review',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_REVIEW_QUEUE,
+    },
+    {
+      path: '/system-health',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/review',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_REVIEW_QUEUE,
+    },
+    {
+      path: '/review/clinical',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.REVIEW_CLINICAL_AI,
+    },
+    {
+      path: '/review/documentation',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.REVIEW_DOCUMENTATION,
+    },
+    {
+      path: '/review/privacy',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.REVIEW_PRIVACY_REQUESTS,
+    },
+    {
+      path: '/review/governance',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.REVIEW_GOVERNANCE,
+    },
+    {
+      path: '/audit',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_AUDIT_LOGS,
+    },
+    {
+      path: '/audit/ai',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_AUDIT_LOGS,
+    },
+    {
+      path: '/audit/phi',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_PHI_AUDIT,
+    },
+    {
+      path: '/audit/integrations',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_AUDIT_LOGS,
+    },
+    {
+      path: '/audit/policy',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_AUDIT_LOGS,
+    },
+    {
       path: '/audit-logs',
       element: (
         <AppShellPage>
@@ -1488,29 +1785,247 @@ function AppRoutes() {
       path: '/governance',
       element: (
         <AppShellPage>
-          <PlatformSystemPage />
+          <PlatformGovernanceWorkspace />
         </AppShellPage>
       ),
       requiresAuth: true,
-      permission: [Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS],
-      requireAllPermissions: true,
+      permission: Permission.VIEW_GOVERNANCE,
+    },
+    {
+      path: '/governance/clinical',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_GOVERNANCE,
+    },
+    {
+      path: '/governance/clinical/policies',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_CLINICAL_POLICY,
+    },
+    {
+      path: '/governance/clinical/release-gates',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.APPROVE_CLINICAL_POLICY,
+    },
+    {
+      path: '/governance/clinical/safety-findings',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.REVIEW_SAFETY_FINDINGS,
+    },
+    {
+      path: '/governance/ai-security',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_AI_SECURITY,
+    },
+    {
+      path: '/governance/ai-security/prompt-firewall',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_AI_SECURITY,
+    },
+    {
+      path: '/governance/ai-security/model-access',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_AI_SECURITY,
+    },
+    {
+      path: '/governance/ai-security/incidents',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.REVIEW_AI_SECURITY_INCIDENTS,
+    },
+    {
+      path: '/governance/regulatory',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_REGULATORY,
+    },
+    {
+      path: '/governance/regulatory/capabilities',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_REGULATORY,
+    },
+    {
+      path: '/governance/regulatory/intended-use',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_REGULATORY,
+    },
+    {
+      path: '/governance/regulatory/evidence',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.APPROVE_REGULATORY,
+    },
+    {
+      path: '/governance/equity',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_EQUITY_METRICS,
+    },
+    {
+      path: '/governance/equity/metrics',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_EQUITY_METRICS,
+    },
+    {
+      path: '/governance/equity/cohorts',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_EQUITY_COHORTS,
+    },
+    {
+      path: '/governance/equity/findings',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.REVIEW_BIAS_FINDINGS,
+    },
+    {
+      path: '/governance/equity/reports',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.EXPORT_EQUITY_REPORTS,
+    },
+    {
+      path: '/governance/validation',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_VALIDATION,
+    },
+    {
+      path: '/governance/validation/scenarios',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_VALIDATION,
+    },
+    {
+      path: '/governance/validation/synthetic-patients',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.MANAGE_VALIDATION,
+    },
+    {
+      path: '/governance/validation/runs',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.RUN_VALIDATION,
+    },
+    {
+      path: '/governance/validation/release-gates',
+      element: (
+        <AppShellPage>
+          <PlatformGovernanceWorkspace />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.APPROVE_VALIDATION,
     },
     {
       path: '/governance/ai',
       element: (
         <AppShellPage>
-          <PlatformSystemPage />
+          <PlatformGovernanceWorkspace />
         </AppShellPage>
       ),
       requiresAuth: true,
-      permission: [Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS],
-      requireAllPermissions: true,
+      permission: Permission.VIEW_GOVERNANCE,
     },
     {
       path: '/governance/model-usage',
       element: (
         <AppShellPage>
-          <PlatformSystemPage />
+          <PlatformGovernanceWorkspace />
         </AppShellPage>
       ),
       requiresAuth: true,
@@ -1520,7 +2035,7 @@ function AppRoutes() {
       path: '/governance/costs',
       element: (
         <AppShellPage>
-          <PlatformSystemPage />
+          <PlatformGovernanceWorkspace />
         </AppShellPage>
       ),
       requiresAuth: true,
@@ -1531,17 +2046,17 @@ function AppRoutes() {
       path: '/governance/clinical-safety',
       element: (
         <AppShellPage>
-          <PlatformSystemPage />
+          <PlatformGovernanceWorkspace />
         </AppShellPage>
       ),
       requiresAuth: true,
-      permission: Permission.VIEW_AUDIT_LOGS,
+      permission: Permission.REVIEW_SAFETY_FINDINGS,
     },
     {
       path: '/governance/consent',
       element: (
         <AppShellPage>
-          <PlatformSystemPage />
+          <PlatformGovernanceWorkspace />
         </AppShellPage>
       ),
       requiresAuth: true,
@@ -1551,11 +2066,11 @@ function AppRoutes() {
       path: '/governance/privacy',
       element: (
         <AppShellPage>
-          <PlatformSystemPage />
+          <PlatformGovernanceWorkspace />
         </AppShellPage>
       ),
       requiresAuth: true,
-      permission: Permission.MANAGE_PRIVACY,
+      permission: Permission.VIEW_PRIVACY_CENTER,
     },
 
     {

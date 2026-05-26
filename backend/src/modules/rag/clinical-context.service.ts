@@ -25,7 +25,10 @@ export class ClinicalContextService {
   buildContext(input: BuildClinicalContextInput): RAGContext {
     const confidence = this.calculateConfidence(input.chunks);
     const timestamp = new Date();
-    const contextText = this.buildContextText(input.chunks, input.maxTokens || this.defaultMaxTokens);
+    const contextText = this.buildContextText(
+      input.chunks,
+      input.maxTokens || this.defaultMaxTokens,
+    );
 
     return {
       chunks: input.chunks,

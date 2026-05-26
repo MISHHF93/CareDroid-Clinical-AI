@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AIService } from '../ai/ai.service';
 import { IntentClassifierService } from '../medical-control-plane/intent-classifier/intent-classifier.service';
@@ -41,6 +41,7 @@ import { ClinicalMemoryType } from '../memory/entities/clinical-memory-entry.ent
 import { ArtifactsService } from '../artifacts/artifacts.service';
 import { ArtifactType } from '../artifacts/entities/artifact.entity';
 import { EvaluationService } from '../evaluation/evaluation.service';
+import { PlatformGovernanceService } from '../platform-governance';
 
 interface QueryResponse {
   text: string;
@@ -93,6 +94,7 @@ export class ChatService {
     private readonly clinicalMemoryService: ClinicalMemoryService,
     private readonly artifactsService: ArtifactsService,
     private readonly evaluationService: EvaluationService,
+    @Optional() private readonly platformGovernance?: PlatformGovernanceService,
   ) {
     const ragConfig = this.configService.get<any>('rag');
     this.ragEnabled = ragConfig?.enabled !== false;
@@ -131,6 +133,39 @@ export class ChatService {
       userId: userId || 'anonymous',
       sourceSurface: 'assistant-chat',
     });
+    const governanceDecision = await this.platformGovernance?.evaluateGate({
+      runId: aiRunEnvelope.runId,
+      capabilityId: aiRunEnvelope.capabilityId,
+      phiAccessed: aiRunEnvelope.policy.phiAccessed,
+      prompt: message,
+      action: 'assistant-chat',
+    });
+
+    if (governanceDecision?.reasons.includes('prompt_security_review_required')) {
+      await this.platformGovernance?.createReviewItem({
+        runId: aiRunEnvelope.runId,
+        capabilityId: aiRunEnvelope.capabilityId,
+        reviewType: 'ai_security',
+        severity: 'high',
+        payload: {
+          reasons: governanceDecision.reasons,
+          sourceSurface: 'assistant-chat',
+          promptPreview: message.substring(0, 120),
+        },
+      });
+      return {
+        text: 'This request triggered CareDroid AI security review because it appears to ask the assistant to bypass safety instructions. Please rephrase the clinical question without instruction-override language.',
+        suggestions: ['Ask a clinical question', 'Open governance review queue'],
+        confidence: 0,
+        metadata: {
+          aiFoundation: {
+            runId: aiRunEnvelope.runId,
+            capabilityId: aiRunEnvelope.capabilityId,
+          },
+          platformGovernance: governanceDecision,
+        },
+      };
+    }
 
     // ========================================
     // STEP 1: INTENT CLASSIFICATION
@@ -204,6 +239,7 @@ export class ChatService {
     const integrationMetadata = {
       costOptimization,
       memoryContext,
+      platformGovernance: governanceDecision,
     };
     await this.aiGateway.logRoutingAudit({
       envelope: aiRunEnvelope,

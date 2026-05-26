@@ -1,4 +1,12 @@
-import { IsArray, IsEnum, IsObject, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator';
 import { LongMemoryType } from '../entities/long-memory-entry.entity';
 
 export class CreateLongMemoryDto {
