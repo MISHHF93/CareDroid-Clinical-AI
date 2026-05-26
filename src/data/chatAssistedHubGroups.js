@@ -53,11 +53,53 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     toolIds: ['copd-gold'],
   },
   {
+    groupId: 'pulmonology-assistants',
+    heading: 'Pulmonology workflow assistants',
+    lead:
+      'Asthma, ventilator, oxygen escalation, and COPD assistants organize respiratory review and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend treatment or disposition, and must not delay emergency respiratory, oxygen, ventilator, asthma, or COPD pathways.',
+    toolIds: [
+      'asthma-exacerbation-assistant',
+      'ventilator-support-assistant',
+      'oxygen-escalation-helper',
+      'copd-workflow-assistant',
+    ],
+  },
+  {
+    groupId: 'nephrology-assistants',
+    heading: 'Nephrology workflow assistants',
+    lead:
+      'AKI staging, dialysis readiness, and electrolyte assistants organize renal review and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend fluids, dialysis, electrolyte replacement, correction rates, or medication dosing, and must not delay urgent AKI, electrolyte, toxicology, or critical-care pathways.',
+    toolIds: ['aki-staging-assistant', 'dialysis-readiness-helper', 'electrolyte-disorder-assistant'],
+  },
+  {
+    groupId: 'endocrine-metabolic-assistants',
+    heading: 'Endocrine and metabolic workflow assistants',
+    lead:
+      'Diabetes, DKA, thyroid, and metabolic syndrome assistants organize review, missing data, and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend insulin or other medication dosing, and must not delay urgent hypoglycemia, DKA, HHS, thyroid storm, myxedema, or electrolyte pathways.',
+    toolIds: [
+      'diabetes-care-assistant',
+      'dka-pathway-assistant',
+      'thyroid-disorder-assistant',
+      'metabolic-syndrome-assistant',
+    ],
+  },
+  {
     groupId: 'gastrointestinal',
     heading: 'Rome IV IBS criteria',
     lead:
       'Rome IV criteria support reviews abdominal pain frequency, duration, and stool-related features for discussion. It is informational only, does not diagnose irritable bowel syndrome, and does not replace alarm-feature workup — red-flag symptoms require clinician evaluation without delay.',
     toolIds: ['rome-iv-ibs'],
+  },
+  {
+    groupId: 'hepatology-gi-workflows',
+    heading: 'Hepatology and GI workflows',
+    lead:
+      'GI bleed, liver disease, and pancreatitis assistants organize risk-score context, trends, missing data, and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend treatment, procedures, or disposition, and must not delay urgent GI bleed, liver failure, pancreatitis, endoscopy, or emergency pathways.',
+    toolIds: [
+      'gi-bleed-workflow-assistant',
+      'liver-disease-assistant',
+      'pancreatitis-workflow-assistant',
+    ],
   },
   {
     groupId: 'medication-dosing-education',
@@ -101,7 +143,21 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'wells-pe': 'PE cannot be ruled out with certainty; unstable patients need urgent evaluation first.',
   perc: 'PERC does not rule out pulmonary embolism with certainty.',
   'copd-gold': 'Acute COPD exacerbation or severe respiratory distress takes priority over grouping chat.',
+  'asthma-exacerbation-assistant': 'Life-threatening asthma features require urgent pathways before chat.',
+  'ventilator-support-assistant': 'Bedside clinician and respiratory therapy review take priority over chat.',
+  'oxygen-escalation-helper': 'Severe hypoxemia or respiratory distress takes priority over chat.',
+  'copd-workflow-assistant': 'Acute COPD exacerbation or respiratory failure takes priority over chat.',
+  'aki-staging-assistant': 'Rapidly worsening kidney function, oliguria, or unstable patients need urgent review before chat.',
+  'dialysis-readiness-helper': 'Life-threatening electrolyte, toxin, overload, or uremic concerns need urgent local pathways before chat.',
+  'electrolyte-disorder-assistant': 'Severe or symptomatic electrolyte abnormalities need urgent review before chat.',
+  'diabetes-care-assistant': 'Hypoglycemia, DKA, HHS, or unstable patients need urgent local pathways before chat.',
+  'dka-pathway-assistant': 'Suspected DKA or HHS requires urgent local emergency/endocrine pathways before chat.',
+  'thyroid-disorder-assistant': 'Thyroid storm, myxedema coma, pregnancy concerns, or unstable patients need urgent review before chat.',
+  'metabolic-syndrome-assistant': 'This is risk-factor review only and does not diagnose metabolic syndrome.',
   'rome-iv-ibs': 'Alarm features and urgent gastrointestinal evaluation take priority over criteria chat.',
+  'gi-bleed-workflow-assistant': 'Hemodynamic instability or active GI bleeding needs urgent local pathways before chat.',
+  'liver-disease-assistant': 'Acute liver failure, severe encephalopathy, shock, or bleeding needs urgent local pathways before chat.',
+  'pancreatitis-workflow-assistant': 'Shock, organ failure, sepsis, or severe pancreatitis concern needs urgent local pathways before chat.',
   phq9: 'Question 9 self-harm or suicidal ideation requires immediate safety assessment before routine scoring.',
   gad7: 'Suicidal ideation or acute psychiatric emergency takes priority over anxiety screening chat.',
   'apache2-calculator': 'ICU-level illness and organ support decisions take priority over completing APACHE-II in chat.',
