@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/card';
+import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
 import { Permission, useUser } from '../contexts/UserContext';
 import { fetchMyAuditLogs, fetchPhiAccessLogs } from '../services/auditApi';
 import './Profile.css';
@@ -120,6 +121,9 @@ const Profile = () => {
         <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
           Review your account profile, recent activity, and access visibility.
         </p>
+        <div style={{ marginTop: '18px' }}>
+          <ProfileSummaryCard />
+        </div>
         <div style={{
           marginTop: '18px',
           display: 'grid',
@@ -245,7 +249,11 @@ const Profile = () => {
             fontSize: '14px',
           }}
         >
-          <Link to="/profile-settings">Profile settings</Link>
+          <Link to="/profile/settings">Profile settings</Link>
+          <Link to="/profile/activity">Activity</Link>
+          <Link to="/profile/preferences">Preferences</Link>
+          <Link to="/profile/workspaces">Workspaces</Link>
+          <Link to="/profile/security">Security</Link>
           <Link to="/settings">App settings</Link>
           <Link to="/notifications">Notifications</Link>
           <Link to="/onboarding">Onboarding</Link>

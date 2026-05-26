@@ -4,14 +4,16 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import ProfileSettings from './ProfileSettings';
-import { updateUserProfile } from '../services/profileApi';
 import { createMockUserValue } from '../test/testRenderUtils';
 
 const mockSetUser = vi.fn();
 const mockSuccess = vi.fn();
 const mockError = vi.fn();
+const mockUpdateProfile = vi.fn();
 let mockUser;
 let mockAuthToken;
+let mockAccount;
+let mockProfessional;
 
 vi.mock('../contexts/UserContext', async (importOriginal) => {
   const actual = await importOriginal();
@@ -33,8 +35,13 @@ vi.mock('../hooks/useNotificationActions', () => ({
   }),
 }));
 
-vi.mock('../services/profileApi', () => ({
-  updateUserProfile: vi.fn(),
+vi.mock('../contexts/UserIdentityContext', () => ({
+  useUserIdentity: () => ({
+    account: mockAccount,
+    professional: mockProfessional,
+    updateProfile: mockUpdateProfile,
+    isLoading: false,
+  }),
 }));
 
 vi.mock('../components/TwoFactorSettings', () => ({
@@ -49,7 +56,7 @@ function renderProfileSettings() {
   );
 }
 
-describe('ProfileSettings backend profile save', () => {
+describe('ProfileSettings operational profile save', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockAuthToken = 'test-token';
@@ -66,20 +73,35 @@ describe('ProfileSettings backend profile save', () => {
         timezone: 'America/New_York',
       },
     };
-    updateUserProfile.mockResolvedValue({
+    mockAccount = {
+      userId: 'user-1',
+      displayName: 'Dr. Avery Stone',
+      email: 'clinician@example.com',
+      organization: 'County General',
+      specialty: 'Emergency Medicine',
+      role: 'physician',
+      country: 'US',
+      timezone: 'America/New_York',
+    };
+    mockProfessional = {
+      licenseNumber: 'MD-123',
+      specialties: ['Emergency Medicine'],
+    };
+    mockUpdateProfile.mockResolvedValue({
       ok: true,
       data: {
-        fullName: 'Dr. Avery Stone',
-        institution: 'Metro Hospital',
-        specialty: 'Emergency Medicine',
-        licenseNumber: 'MD-123',
-        country: 'US',
-        timezone: 'America/New_York',
+        account: {
+          ...mockAccount,
+          organization: 'Metro Hospital',
+        },
+        professional: {
+          ...mockProfessional,
+        },
       },
     });
   });
 
-  it('prefills backend profile fields and saves changes through PATCH profile API', async () => {
+  it('prefills operational profile fields and saves changes through the operational identity API', async () => {
     const user = userEvent.setup();
     renderProfileSettings();
 
@@ -89,10 +111,10 @@ describe('ProfileSettings backend profile save', () => {
     await user.click(screen.getByRole('button', { name: /save profile/i }));
 
     await waitFor(() => {
-      expect(updateUserProfile).toHaveBeenCalledWith(
+      expect(mockUpdateProfile).toHaveBeenCalledWith(
         expect.objectContaining({
-          fullName: 'Dr. Avery Stone',
-          institution: 'Metro Hospital',
+          displayName: 'Dr. Avery Stone',
+          organization: 'Metro Hospital',
           specialty: 'Emergency Medicine',
           licenseNumber: 'MD-123',
           country: 'US',
@@ -107,12 +129,12 @@ describe('ProfileSettings backend profile save', () => {
         profile: expect.objectContaining({ institution: 'Metro Hospital' }),
       })
     );
-    expect(screen.getByText(/profile saved to the backend/i)).toBeInTheDocument();
+    expect(screen.getByText(/operational profile saved/i)).toBeInTheDocument();
   });
 
   it('shows permission or API errors without updating local profile state', async () => {
     const user = userEvent.setup();
-    updateUserProfile.mockResolvedValue({
+    mockUpdateProfile.mockResolvedValue({
       ok: false,
       message: 'You do not have permission to access this resource.',
     });

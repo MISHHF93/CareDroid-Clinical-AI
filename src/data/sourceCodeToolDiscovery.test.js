@@ -25,7 +25,6 @@ const appSrc = readFileSync(join(dirname(fileURLToPath(import.meta.url)), '../Ap
 const COST_TRACKING_EXTRA_TOOL_KEYS = [
   'vitals-monitor',
   'antibiotic-scripts',
-  'trauma-score',
   'abc-assessment',
   'bleeding-risk',
   'cancer-calculator',
@@ -63,7 +62,7 @@ describe('sourceCodeToolDiscovery', () => {
 
   it('separates true phantoms from API-only and alias-only source-audit references', () => {
     expect(truePhantomToolReferences.map((p) => p.id)).toEqual(
-      expect.arrayContaining(['abc-assessment', 'trauma-score', 'cancer-calculator'])
+      expect.arrayContaining(['abc-assessment', 'cancer-calculator'])
     );
     expect(apiOnlyToolReferences.map((p) => p.id)).toContain('vitals-monitor');
     expect(aliasOnlyToolReferences.map((p) => p.id)).toEqual(
@@ -99,7 +98,7 @@ describe('sourceCodeToolDiscovery', () => {
 
   it('wires NLU calculator ids to routes and chat seeds', () => {
     const apache = resolveCatalogLaunch('apache2-calculator');
-    expect(apache.path).toBe('/tools/calculators');
+    expect(apache.path).toBe('/tools/calculators/apache-ii');
     expect(apache.registryId).toBe('apache2-calculator');
     expect(apache.chatSeed).toMatch(/APACHE/i);
 

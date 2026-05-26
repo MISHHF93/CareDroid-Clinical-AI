@@ -169,7 +169,28 @@ function DeviceDetailDrawer({ device, room, unit, bed, onClose }) {
   );
 }
 
-function FloorPlanViewer({ floor, rooms, devices, selectedDeviceId, onSelectDevice }) {
+function FloorPlanViewer({ floor, rooms, beds, devices, selectedDeviceId, onSelectDevice }) {
+  const roomById = Object.fromEntries(rooms.map((room) => [room.id, room]));
+  const bedsByRoomId = beds.reduce((groups, bed) => {
+    groups[bed.roomId] = groups[bed.roomId] || [];
+    groups[bed.roomId].push(bed);
+    return groups;
+  }, {});
+  const positionedBeds = beds.flatMap((bed) => {
+    const room = roomById[bed.roomId];
+    if (!room) return [];
+    const roomBeds = bedsByRoomId[bed.roomId] || [];
+    const bedIndex = Math.max(0, roomBeds.findIndex((candidate) => candidate.id === bed.id));
+    const bedWidth = Math.max(58, Math.min(92, (room.width - 46) / Math.max(roomBeds.length, 1)));
+    return [{
+      ...bed,
+      x: room.x + 18 + bedIndex * (bedWidth + 8),
+      y: room.y + room.height - 46,
+      width: bedWidth,
+      height: 24,
+    }];
+  });
+
   return (
     <section className="hospital-map-panel" aria-labelledby="floor-plan-title">
       <div className="hospital-map-panel-header">
@@ -196,6 +217,21 @@ function FloorPlanViewer({ floor, rooms, devices, selectedDeviceId, onSelectDevi
               <text x={room.x + 18} y={room.y + 34} className="hospital-map-room-label">{room.roomNumber}</text>
               <text x={room.x + 18} y={room.y + 58} className="hospital-map-room-meta">
                 {room.deviceCount} device(s) / {room.activeAlertCount} alert(s)
+              </text>
+            </g>
+          ))}
+          {positionedBeds.map((bed) => (
+            <g key={bed.id}>
+              <rect
+                x={bed.x}
+                y={bed.y}
+                width={bed.width}
+                height={bed.height}
+                rx="8"
+                className={`hospital-map-bed hospital-map-bed--${bed.status || 'unknown'}`}
+              />
+              <text x={bed.x + 8} y={bed.y + 16} className="hospital-map-bed-label">
+                {bed.label}
               </text>
             </g>
           ))}
@@ -516,6 +552,7 @@ export default function HospitalMapDashboard() {
             <FloorPlanViewer
               floor={selectedFloor}
               rooms={filteredRooms}
+              beds={(snapshot?.beds || []).filter((bed) => filteredRooms.some((room) => room.id === bed.roomId))}
               devices={filteredDevices}
               selectedDeviceId={selectedDeviceId}
               onSelectDevice={selectDevice}

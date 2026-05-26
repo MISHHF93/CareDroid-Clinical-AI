@@ -32,6 +32,43 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     toolIds: ['nihss'],
   },
   {
+    groupId: 'neurology-assistants',
+    heading: 'Neurology workflow assistants',
+    lead:
+      'Seizure, stroke workflow, headache red-flag, vertigo/HINTS, and neuro exam assistants organize exam-heavy review and handoff prompts. They are clinical decision support only, do not diagnose, do not recommend treatment or disposition, and must not delay emergency stroke, seizure, airway, trauma, infection, or neurosurgical pathways.',
+    toolIds: [
+      'seizure-assistant',
+      'stroke-workflow-assistant',
+      'headache-red-flag-assistant',
+      'vertigo-hints-assistant',
+      'neuro-exam-assistant',
+    ],
+  },
+  {
+    groupId: 'pediatrics-obgyn-assistants',
+    heading: 'Pediatrics and OB-GYN workflows',
+    lead:
+      'Pediatric sepsis, pregnancy workflow, neonatal assessment, and OB triage assistants organize review and handoff prompts. They are pediatric/OB decision support only, do not diagnose, do not recommend treatment, medication dosing, delivery timing, procedures, or disposition, and must not delay urgent maternal, fetal, neonatal, pediatric sepsis, airway, trauma, or emergency pathways.',
+    toolIds: [
+      'pediatric-sepsis-assistant',
+      'pregnancy-workflow-assistant',
+      'neonatal-assessment-assistant',
+      'ob-triage-assistant',
+    ],
+  },
+  {
+    groupId: 'psychiatry-screening-assistants',
+    heading: 'Psychiatry and screening workflows',
+    lead:
+      'Mental health screening, suicide-risk workflow, substance-use screening, and cognitive screening assistants organize review prompts. They are screening decision support only, do not diagnose, do not recommend medications or therapy, require human review, and must not delay psychiatric emergency, intoxication, withdrawal, delirium, or medical emergency pathways.',
+    toolIds: [
+      'mental-health-screening-assistant',
+      'suicide-risk-workflow-assistant',
+      'substance-use-screening-assistant',
+      'cognitive-screening-assistant',
+    ],
+  },
+  {
     groupId: 'trauma',
     heading: 'Trauma imaging decision support',
     lead:
@@ -116,6 +153,17 @@ export const CHAT_ASSISTED_HUB_GROUPS = Object.freeze([
     toolIds: ['dispatch-ai'],
   },
   {
+    groupId: 'hospital-operations-command',
+    heading: 'Hospital operations command',
+    lead:
+      'Hospital Command, Resource Allocation, and Device Recommendation assistants organize operations huddles, constraints, and source-system checks. They do not auto-dispatch, allocate resources, assign devices, change staffing, or make clinical decisions; command staff must approve every action.',
+    toolIds: [
+      'hospital-command-assistant',
+      'resource-allocation-assistant',
+      'device-recommendation-assistant',
+    ],
+  },
+  {
     groupId: 'nlu-hub-screening',
     heading: 'Screening & severity (chat)',
     lead:
@@ -136,6 +184,15 @@ export function chatAssistedLaunchAriaLabel(toolName) {
 const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'grace-acs': 'Unstable ACS or STEMI pathways take priority over chat.',
   nihss: 'Emergency stroke pathways take priority over completing scoring in chat.',
+  'pediatric-sepsis-assistant': 'Local pediatric sepsis and emergency pathways take priority over chat.',
+  'pregnancy-workflow-assistant': 'Urgent maternal or fetal concerns need obstetric evaluation before chat.',
+  'neonatal-assessment-assistant': 'Neonatal resuscitation, hypoglycemia, temperature instability, or jaundice pathways take priority over chat.',
+  'ob-triage-assistant': 'Urgent bleeding, severe symptoms, labor, fetal concern, or hypertensive emergency pathways take priority over chat.',
+  'seizure-assistant': 'Status epilepticus, airway compromise, trauma, or unstable patients need urgent pathways before chat.',
+  'stroke-workflow-assistant': 'Emergency stroke activation, imaging, transfer, and treatment workflows take priority over chat.',
+  'headache-red-flag-assistant': 'Thunderclap headache, neurologic deficit, meningismus, or unstable patients need urgent evaluation before chat.',
+  'vertigo-hints-assistant': 'Posterior circulation stroke concerns and severe gait/neurologic findings need urgent evaluation before chat.',
+  'neuro-exam-assistant': 'New focal deficits, declining consciousness, seizure, trauma, infection, or cord symptoms need urgent pathways before chat.',
   'canadian-c-spine': 'Unstable trauma and primary survey take priority over chat.',
   'nexus-cspine': 'Unstable trauma and primary survey take priority over chat.',
   'ottawa-ankle': 'Hard-stop injuries and urgent evaluation take priority over chat.',
@@ -160,6 +217,14 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'pancreatitis-workflow-assistant': 'Shock, organ failure, sepsis, or severe pancreatitis concern needs urgent local pathways before chat.',
   phq9: 'Question 9 self-harm or suicidal ideation requires immediate safety assessment before routine scoring.',
   gad7: 'Suicidal ideation or acute psychiatric emergency takes priority over anxiety screening chat.',
+  cage: 'Intoxication, withdrawal, co-ingestion, or immediate safety concerns take priority over alcohol screening.',
+  pcl5: 'Self-harm, suicidal ideation, acute danger, or severe dissociation takes priority over trauma symptom scoring.',
+  mdq: 'Psychosis, unsafe behavior, suicidal ideation, or acute mania concerns need urgent human review before chat.',
+  'columbia-suicide-severity-workflow': 'Any suicide-risk disclosure requires immediate safety assessment and direct human review.',
+  'mental-health-screening-assistant': 'Suicidal ideation, self-harm, psychosis, violence risk, intoxication, withdrawal, or delirium concerns take priority over chat.',
+  'suicide-risk-workflow-assistant': 'Immediate safety assessment and crisis pathways take priority over chat.',
+  'substance-use-screening-assistant': 'Withdrawal, intoxication, overdose, co-ingestion, pregnancy, trauma, or immediate danger take priority over chat.',
+  'cognitive-screening-assistant': 'Acute confusion, delirium, neurologic deficit, intoxication, hypoxia, or trauma take priority over chat.',
   'apache2-calculator': 'ICU-level illness and organ support decisions take priority over completing APACHE-II in chat.',
   'curb65-calculator': 'Severe pneumonia, sepsis, or respiratory failure take priority over CURB-65 chat.',
   'gcs-calculator': 'Declining consciousness or trauma requires immediate evaluation before GCS chat alone.',
@@ -169,6 +234,9 @@ const CLINICAL_CHAT_LAUNCH_ARIA_CONTEXT = Object.freeze({
   'acs-workflow-assistant': 'Unstable ACS pathways take priority over chat.',
   'atrial-fibrillation-assistant': 'Unstable atrial fibrillation requires urgent evaluation before chat.',
   'heart-failure-assistant': 'Respiratory failure, shock, or severe decompensation takes priority over chat.',
+  'hospital-command-assistant': 'Hospital incident command and source systems take priority over chat.',
+  'resource-allocation-assistant': 'Human command approval is required before any resource movement.',
+  'device-recommendation-assistant': 'Biomedical and bedside clinical review are required before device assignment.',
 });
 
 /**

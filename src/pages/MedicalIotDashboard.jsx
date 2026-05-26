@@ -44,6 +44,10 @@ function DeviceCard({ device, isSelected, onSelect }) {
           <dd>{device.battery}%</dd>
         </div>
         <div>
+          <dt>Signal</dt>
+          <dd>{device.signalStrength ?? 'Unknown'}%</dd>
+        </div>
+        <div>
           <dt>Connectivity</dt>
           <dd>{device.connectivity}</dd>
         </div>
@@ -54,6 +58,14 @@ function DeviceCard({ device, isSelected, onSelect }) {
         <div>
           <dt>Location</dt>
           <dd>{device.location?.label || 'Unknown'}</dd>
+        </div>
+        <div>
+          <dt>Room / bed</dt>
+          <dd>{device.assignedRoom || device.location?.room || 'No room'} / {device.assignedBed || 'No bed'}</dd>
+        </div>
+        <div>
+          <dt>Active alerts</dt>
+          <dd>{device.activeAlerts?.length || 0}</dd>
         </div>
       </dl>
     </button>
@@ -161,10 +173,13 @@ function DeviceDetailDrawer({ device, onClose }) {
         <div><dt>Status</dt><dd><span className={`medical-iot-badge medical-iot-badge--${statusTone(device.status)}`}>{device.status}</span></dd></div>
         <div><dt>Freshness</dt><dd>{device.freshness || device.status}</dd></div>
         <div><dt>Location</dt><dd>{device.location?.label || 'Unknown location'}</dd></div>
+        <div><dt>Assigned room/bed</dt><dd>{device.assignedRoom || device.location?.room || 'No room'} / {device.assignedBed || 'No bed'}</dd></div>
         <div><dt>Location source</dt><dd>{device.location?.source || 'No source'}</dd></div>
         <div><dt>Battery</dt><dd>{device.battery}%</dd></div>
+        <div><dt>Signal strength</dt><dd>{device.signalStrength ?? 'Unknown'}%</dd></div>
         <div><dt>Connectivity</dt><dd>{device.connectivity}</dd></div>
         <div><dt>Last seen</dt><dd>{formatTelemetryTime(device.lastSeenAt)}</dd></div>
+        <div><dt>Active alerts</dt><dd>{device.activeAlerts?.join(', ') || 'None'}</dd></div>
         <div><dt>Tracking support</dt><dd>Demo marker only</dd></div>
       </dl>
     </aside>
@@ -266,7 +281,10 @@ export default function MedicalIotDashboard() {
           </p>
         </div>
         <div className="medical-iot-hero-actions">
-          <Link to="/dashboard" className="medical-iot-action">
+          <Link to="/assistant" className="medical-iot-action">
+            Ask Assistant
+          </Link>
+          <Link to="/dashboard" className="medical-iot-action medical-iot-action--secondary">
             Back to Command Dashboard
           </Link>
           <Link to="/tools" className="medical-iot-action medical-iot-action--secondary">

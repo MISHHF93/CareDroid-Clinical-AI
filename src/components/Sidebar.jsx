@@ -4,13 +4,14 @@ import { useUser } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
 import PermissionGate from './PermissionGate';
 import WorkspaceCreationModal from './WorkspaceCreationModal';
 import { partitionSidebarTools, SIDEBAR_CATEGORY_ORDER } from '../data/sidebarToolPresentation';
 import { getSidebarToolRegistryProjection } from '../data/toolInventory';
 import { useConversation } from '../contexts/ConversationContext';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
-import { PRIMARY_NAV_ITEMS, primaryNavPathMatches } from '../navigation/primaryNavigation';
+import { PRIMARY_SIDEBAR_NAV_ITEMS, primaryNavPathMatches } from '../navigation/primaryNavigation';
 import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon, getToolIcon } from '../navigation/iconRegistry';
@@ -42,6 +43,13 @@ const Sidebar = forwardRef(function Sidebar(
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useUser();
+  const {
+    account,
+    activeWorkspace: activeOperationalWorkspace,
+    workspaces: operationalWorkspaces,
+    workspaceState,
+    switchWorkspace,
+  } = useUserIdentity();
   const { notifications } = useNotifications();
   const {
     favorites,
@@ -59,13 +67,15 @@ const Sidebar = forwardRef(function Sidebar(
     addWorkspace
   } = useWorkspace();
   const { addMessage, selectTool, setActiveTool } = useConversation();
-  const [showToolsSection, setShowToolsSection] = useState(true);
+  const [showToolsSection, setShowToolsSection] = useState(false);
   const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState(() =>
     Object.fromEntries(SIDEBAR_CATEGORY_ORDER.map((category) => [category, true]))
   );
 
   const unreadCount = notifications.filter(n => !n.read).length;
+  const displayName = account?.displayName || user?.fullName || user?.name || 'User';
+  const displayRole = account?.specialty || account?.role || user?.role || 'Clinician';
 
   // Medical Tools - Enhanced with navigation
   const medicalTools = useMemo(() => getSidebarToolRegistryProjection(), []);
@@ -102,7 +112,7 @@ const Sidebar = forwardRef(function Sidebar(
   );
 
   // Visible IA follows the clinical operating system map while legacy routes remain available.
-  const navItems = PRIMARY_NAV_ITEMS;
+  const navItems = PRIMARY_SIDEBAR_NAV_ITEMS;
 
   const recentConversations = conversations.slice(-5).reverse();
 
@@ -143,6 +153,13 @@ const Sidebar = forwardRef(function Sidebar(
   );
 
   const isNavItemActive = (item) => primaryNavPathMatches(item, location.pathname);
+
+  const handleToolCardKeyDown = (event, tool) => {
+    if (event.target !== event.currentTarget) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    handleToolClick(tool);
+  };
 
   const isToolRouteActive = (tool) => {
     const path = location.pathname;
@@ -208,6 +225,10 @@ const Sidebar = forwardRef(function Sidebar(
           e.stopPropagation();
           handleToolClick(tool);
         }}
+        onKeyDown={(event) => handleToolCardKeyDown(event, tool)}
+        role="button"
+        tabIndex={0}
+        aria-label={`Open ${tool.name}`}
         style={{
           padding: '8px',
           margin: '3px 0',
@@ -366,12 +387,36 @@ const Sidebar = forwardRef(function Sidebar(
       {/* User Profile */}
       {!effectiveCollapsed && (
         <div className="sidebar-user">
-          <div className="user-avatar">
-            {user?.name?.charAt(0).toUpperCase() || 'U'}
-          </div>
-          <div className="user-info">
-            <div className="user-name">{user?.name || 'User'}</div>
-            <div className="user-role">{user?.role || 'Clinician'}</div>
+          <button
+            type="button"
+            className="sidebar-user-main"
+            onClick={() => {
+              navigate('/profile');
+              onCloseMobileNav();
+            }}
+            aria-label="Open profile"
+          >
+            <div className="user-avatar">
+              {account?.avatarUrl ? <img src={account.avatarUrl} alt="" /> : displayName.charAt(0).toUpperCase()}
+            </div>
+            <div className="user-info">
+              <div className="user-name">{displayName}</div>
+              <div className="user-role">{displayRole}</div>
+            </div>
+          </button>
+          <div className="sidebar-operational-workspace">
+            <label htmlFor="sidebar-operational-workspace">Workspace</label>
+            <select
+              id="sidebar-operational-workspace"
+              value={workspaceState?.activeWorkspaceId || activeOperationalWorkspace?.id || ''}
+              onChange={(event) => switchWorkspace(event.target.value)}
+            >
+              {operationalWorkspaces.map((workspace) => (
+                <option key={workspace.id} value={workspace.id}>
+                  {workspace.branding?.displayName || workspace.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div className={`health-indicator ${healthStatus}`}>
             <div className="health-dot"></div>
@@ -484,29 +529,30 @@ const Sidebar = forwardRef(function Sidebar(
               </span>
             </div>
 
-            <div className="sidebar-workspace-controls">
-              <select
-                className="sidebar-workspace-select"
-                value={activeWorkspaceId}
-                onChange={(e) => setActiveWorkspaceId(e.target.value)}
-              >
-                {workspaces.map((workspace) => (
-                  <option key={workspace.id} value={workspace.id}>
-                    {workspace.name}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                className="sidebar-workspace-new-btn"
-                onClick={() => setShowWorkspaceModal(true)}
-              >
-                <span>+</span>
-                <span>New Workspace</span>
-              </button>
-            </div>
-
             {showToolsSection && (
+              <>
+              <div className="sidebar-workspace-controls">
+                <select
+                  className="sidebar-workspace-select"
+                  value={activeWorkspaceId}
+                  onChange={(e) => setActiveWorkspaceId(e.target.value)}
+                >
+                  {workspaces.map((workspace) => (
+                    <option key={workspace.id} value={workspace.id}>
+                      {workspace.name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="sidebar-workspace-new-btn"
+                  onClick={() => setShowWorkspaceModal(true)}
+                >
+                  <span>+</span>
+                  <span>New Workspace</span>
+                </button>
+              </div>
+
               <div className="medical-tools-list" style={{ marginTop: '8px' }}>
                 {favoriteTools.length > 0 && (
                   <div className="tools-subsection">
@@ -616,6 +662,7 @@ const Sidebar = forwardRef(function Sidebar(
                 })}
 
               </div>
+              </>
             )}
           </div>
         )}

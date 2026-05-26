@@ -167,7 +167,8 @@ describe('canonical segment inventory', () => {
 
   it('resolves records by canonical id for follow-up implementation work', () => {
     expect(resolveSegmentRecord('assistant', records)?.canonicalRoute).toBe('/assistant');
-    expect(resolveSegmentRecord('clinical-alerts', records)?.frontendOnlyType).toBe(FRONTEND_ONLY_TYPES.BROKEN);
+    expect(resolveSegmentRecord('clinical-alerts', records)?.status).toBe(SEGMENT_STATUSES.PARTIALLY_BUILT);
+    expect(resolveSegmentRecord('clinical-alerts', records)?.frontendOnlyType).toBeNull();
     expect(resolveSegmentRecord('backend-ai-rag-metrics', records)?.backendOnlyType).toBe(BACKEND_ONLY_TYPES.INTERNAL);
     expect(resolveSegmentRecord('not-a-real-segment', records)).toBeNull();
   });

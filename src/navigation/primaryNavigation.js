@@ -53,8 +53,45 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Ops',
     path: '/operations',
     legacyPaths: ['/fleet'],
-    matchPaths: ['/operations', '/fleet', '/live-map', '/clinical/alerts', '/analytics', '/costs', '/audit-logs'],
+    matchPaths: [
+      '/operations',
+      '/fleet',
+      '/devices',
+      '/live-map',
+      '/hospital-map',
+      '/medical-iot',
+      '/clinical/alerts',
+      '/analytics',
+      '/costs',
+      '/audit-logs',
+    ],
     matchPrefixes: ['/fleet/'],
+  },
+  {
+    id: 'integrations',
+    label: 'Integrations',
+    mobileLabel: 'FHIR',
+    path: '/integrations',
+    matchPaths: ['/integrations', '/integrations/fhir', '/integrations/hl7'],
+    permission: 'CONFIGURE_SYSTEM',
+    showInMobile: false,
+  },
+  {
+    id: 'governance',
+    label: 'Governance',
+    mobileLabel: 'Gov',
+    path: '/governance',
+    matchPaths: [
+      '/governance',
+      '/governance/ai',
+      '/governance/model-usage',
+      '/governance/costs',
+      '/governance/clinical-safety',
+      '/governance/consent',
+      '/governance/privacy',
+    ],
+    permission: 'VIEW_AUDIT_LOGS',
+    showInMobile: false,
   },
   {
     id: 'maps',
@@ -64,6 +101,8 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     legacyPaths: ['/maps', '/tracking', '/live-tracking'],
     matchPaths: ['/live-map', '/hospital-map', '/maps', '/tracking', '/live-tracking'],
     matchPrefixes: ['/hospital-map/', '/fleet/map', '/fleet/live-map', '/fleet/tracking'],
+    showInSidebar: false,
+    showInMobile: false,
   },
   {
     id: 'medical-iot',
@@ -71,6 +110,8 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     mobileLabel: 'IoT',
     path: '/medical-iot',
     matchPaths: ['/medical-iot'],
+    showInSidebar: false,
+    showInMobile: false,
   },
   {
     id: 'developer-audit',
@@ -89,6 +130,11 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     matchPaths: [
       '/settings',
       '/profile',
+      '/profile/settings',
+      '/profile/activity',
+      '/profile/preferences',
+      '/profile/workspaces',
+      '/profile/security',
       '/profile-settings',
       '/notifications',
       '/team',
@@ -104,6 +150,16 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
 export const PRIMARY_NAV_BY_ID = Object.freeze(
   Object.fromEntries(PRIMARY_NAV_ITEMS.map((item) => [item.id, item]))
 );
+
+export const PRIMARY_SIDEBAR_NAV_ITEMS = Object.freeze(
+  PRIMARY_NAV_ITEMS.filter((item) => item.showInSidebar !== false)
+);
+
+export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
+  PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => item.showInMobile !== false)
+);
+
+export const QUICK_COMMAND_NAV_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 
 export function primaryNavPathMatches(item, pathname) {
   const normalized = pathname || '/';

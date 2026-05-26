@@ -5,8 +5,8 @@ import Button from '../components/ui/button';
 import Input from '../components/ui/input';
 import TwoFactorSettings from '../components/TwoFactorSettings';
 import { useUser } from '../contexts/UserContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
-import { updateUserProfile } from '../services/profileApi';
 
 const ProfileSettings = ({ authToken }) => {
   const [displayName, setDisplayName] = useState('');
@@ -18,34 +18,67 @@ const ProfileSettings = ({ authToken }) => {
   const [status, setStatus] = useState({ type: 'idle', message: '' });
   const [saving, setSaving] = useState(false);
   const { user, authToken: contextAuthToken, setUser } = useUser();
+  const { account, professional, updateProfile, isLoading: identityLoading } = useUserIdentity();
   const { success, error } = useNotificationActions();
   const effectiveAuthToken = authToken || contextAuthToken;
   const profile = user?.profile || {};
-  const accountRole = user?.role || 'Not assigned';
+  const currentProfile = useMemo(
+    () => ({
+      displayName: account?.displayName || profile.fullName || user?.fullName || user?.name || '',
+      institution: account?.organization || profile.institution || user?.institution || '',
+      specialty:
+        account?.specialty ||
+        profile.specialty ||
+        professional?.specialties?.[0] ||
+        '',
+      licenseNumber: professional?.licenseNumber || profile.licenseNumber || '',
+      country: account?.country || profile.country || '',
+      timezone: account?.timezone || profile.timezone || '',
+      role: account?.role || user?.role || 'Not assigned',
+    }),
+    [
+      account?.country,
+      account?.displayName,
+      account?.organization,
+      account?.role,
+      account?.specialty,
+      account?.timezone,
+      professional?.licenseNumber,
+      professional?.specialties,
+      profile.country,
+      profile.fullName,
+      profile.institution,
+      profile.licenseNumber,
+      profile.specialty,
+      profile.timezone,
+      user?.fullName,
+      user?.institution,
+      user?.name,
+      user?.role,
+    ],
+  );
+  const accountRole = currentProfile.role;
 
   useEffect(() => {
-    setDisplayName(profile.fullName || user?.fullName || user?.name || '');
-    setInstitution(profile.institution || user?.institution || '');
-    setSpecialty(profile.specialty || '');
-    setLicenseNumber(profile.licenseNumber || '');
-    setCountry(profile.country || '');
-    setTimezone(profile.timezone || '');
+    setDisplayName(currentProfile.displayName);
+    setInstitution(currentProfile.institution);
+    setSpecialty(currentProfile.specialty);
+    setLicenseNumber(currentProfile.licenseNumber);
+    setCountry(currentProfile.country);
+    setTimezone(currentProfile.timezone);
   }, [
-    profile.country,
-    profile.fullName,
-    profile.institution,
-    profile.licenseNumber,
-    profile.specialty,
-    profile.timezone,
-    user?.fullName,
-    user?.institution,
-    user?.name,
+    currentProfile.country,
+    currentProfile.displayName,
+    currentProfile.institution,
+    currentProfile.licenseNumber,
+    currentProfile.specialty,
+    currentProfile.timezone,
   ]);
 
   const payload = useMemo(
     () => ({
-      fullName: displayName.trim(),
-      institution: institution.trim(),
+      displayName: displayName.trim(),
+      organization: institution.trim(),
       specialty: specialty.trim(),
       licenseNumber: licenseNumber.trim(),
       country: country.trim(),
@@ -56,15 +89,15 @@ const ProfileSettings = ({ authToken }) => {
 
   const hasChanges = useMemo(() => {
     const current = {
-      fullName: profile.fullName || user?.fullName || user?.name || '',
-      institution: profile.institution || user?.institution || '',
-      specialty: profile.specialty || '',
-      licenseNumber: profile.licenseNumber || '',
-      country: profile.country || '',
-      timezone: profile.timezone || '',
+      displayName: currentProfile.displayName,
+      organization: currentProfile.institution,
+      specialty: currentProfile.specialty,
+      licenseNumber: currentProfile.licenseNumber,
+      country: currentProfile.country,
+      timezone: currentProfile.timezone,
     };
     return Object.entries(payload).some(([key, value]) => value !== current[key]);
-  }, [payload, profile, user?.fullName, user?.institution, user?.name]);
+  }, [currentProfile, payload]);
 
   const handleSave = async (event) => {
     event.preventDefault();
@@ -72,14 +105,14 @@ const ProfileSettings = ({ authToken }) => {
       setStatus({ type: 'error', message: 'Sign in to update your profile.' });
       return;
     }
-    if (!payload.fullName) {
+    if (!payload.displayName) {
       setStatus({ type: 'error', message: 'Display name is required.' });
       return;
     }
 
     setSaving(true);
     setStatus({ type: 'loading', message: 'Saving profile to CareDroid...' });
-    const result = await updateUserProfile(payload);
+    const result = await updateProfile(payload);
     setSaving(false);
 
     if (!result.ok) {
@@ -88,16 +121,25 @@ const ProfileSettings = ({ authToken }) => {
       return;
     }
 
-    const updatedProfile = result.data || payload;
+    const updatedAccount = result.data?.account || {};
+    const updatedProfessional = result.data?.professional || {};
     setUser?.({
       ...user,
-      profile: { ...profile, ...updatedProfile },
-      fullName: updatedProfile.fullName || payload.fullName,
-      institution: updatedProfile.institution || payload.institution,
+      profile: {
+        ...profile,
+        fullName: updatedAccount.displayName || payload.displayName,
+        institution: updatedAccount.organization || payload.organization,
+        specialty: updatedAccount.specialty || payload.specialty,
+        licenseNumber: updatedProfessional.licenseNumber || payload.licenseNumber,
+        country: updatedAccount.country || payload.country,
+        timezone: updatedAccount.timezone || payload.timezone,
+      },
+      fullName: updatedAccount.displayName || payload.displayName,
+      institution: updatedAccount.organization || payload.organization,
     });
     setStatus({
       type: 'success',
-      message: 'Profile saved to the backend. Profile and audit surfaces now use the latest details.',
+      message: 'Operational profile saved. Profile, workspace, and audit surfaces now use the latest details.',
     });
     success('Profile saved', 'Clinical profile updated.');
   };
@@ -184,7 +226,7 @@ const ProfileSettings = ({ authToken }) => {
               type="submit"
               form="profile-settings-form"
               loading={saving}
-              disabled={saving || !hasChanges}
+              disabled={saving || identityLoading || !hasChanges}
             >
               Save profile
             </Button>

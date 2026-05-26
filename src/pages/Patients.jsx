@@ -8,36 +8,46 @@ import './OperatingWorkspace.css';
 
 const PATIENT_ACTIONS = Object.freeze([
   {
+    title: 'Open patient workspace',
+    body: 'Review imported context, timeline, risk score history, documentation, and care-plan status.',
+    path: '/patients/demo-patient/workspace',
+    icon: CHROME_ICONS.users,
+    label: 'Open workspace',
+  },
+  {
+    title: 'Import EHR patient context',
+    body: 'Preview patient, lab, medication, observation, and vitals imports before any writeback.',
+    path: '/patients/import',
+    icon: CHROME_ICONS.upload,
+    label: 'Open import preview',
+  },
+  {
     title: 'Summarize active case',
     body: 'Build a clinician-reviewed problem, medication, lab, alert, and risk summary.',
-    path: '/tools/patient-summary-ai',
-    toolId: 'patient-summary-ai',
+    path: '/patients/demo-patient/summary',
     icon: CHROME_ICONS.clipboardList,
     label: 'Open summary AI',
   },
   {
     title: 'Review clinical timeline',
     body: 'Organize encounters, trends, and abnormal progression into a timeline workspace.',
-    path: '/tools/timeline-ai',
-    toolId: 'timeline-ai',
+    path: '/patients/demo-patient/timeline',
     icon: CHROME_ICONS.clock,
     label: 'Open timeline AI',
   },
   {
     title: 'Draft documentation',
     body: 'Use ambient scribe and documentation workflows while keeping clinician review explicit.',
-    path: '/tools/ambient-scribe',
-    toolId: 'ambient-scribe',
+    path: '/patients/demo-patient/documentation',
     icon: CHROME_ICONS.fileEdit,
-    label: 'Open documentation AI',
+    label: 'Open documentation',
   },
   {
-    title: 'Prepare orders',
-    body: 'Generate order-set suggestions with safety limits, protocol pathways, and explainability.',
-    path: '/tools/order-set-ai',
-    toolId: 'order-set-ai',
+    title: 'Build AI workflows',
+    body: 'Route existing tools into patient-aware, cited, auditable workflows.',
+    path: '/patients/demo-patient/workflows',
     icon: CHROME_ICONS.clipboardList,
-    label: 'Open order set AI',
+    label: 'Open workflows',
   },
 ]);
 

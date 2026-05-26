@@ -20,6 +20,7 @@ import {
   FLEET_TIER_A_REGISTRY_IDS,
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
   HOSPITAL_OPERATIONS_REGISTRY_IDS,
+  HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_IDS,
   LIVE_TRACKING_MAP_REGISTRY_IDS,
   MEDICAL_IOT_REGISTRY_IDS,
   NLU_PROFILE_TOOL_IDS,
@@ -33,6 +34,7 @@ import {
 } from './clinicalToolIdContract';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';
+import { PLATFORM_SYSTEM_CAPABILITIES } from './platformSystems';
 
 export const TOOL_INVENTORY_VERSION = 1;
 
@@ -45,6 +47,9 @@ let cachedUserFacingToolRegistryProjection = null;
 const CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET = new Set(CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS);
 const FLEET_TIER_A_REGISTRY_ID_SET = new Set(FLEET_TIER_A_REGISTRY_IDS);
 const FLEET_TIER_B_CHAT_REGISTRY_ID_SET = new Set(FLEET_TIER_B_CHAT_REGISTRY_IDS);
+const HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_ID_SET = new Set(
+  HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_IDS
+);
 const LIVE_TRACKING_MAP_REGISTRY_ID_SET = new Set(LIVE_TRACKING_MAP_REGISTRY_IDS);
 const MEDICAL_IOT_REGISTRY_ID_SET = new Set(MEDICAL_IOT_REGISTRY_IDS);
 const HOSPITAL_OPERATIONS_REGISTRY_ID_SET = new Set(HOSPITAL_OPERATIONS_REGISTRY_IDS);
@@ -114,6 +119,7 @@ export const TOOL_SURFACES = Object.freeze({
   FLEET_PAGE: 'fleet-page',
   IOT_DASHBOARD: 'iot-dashboard',
   HOSPITAL_OPERATIONS: 'hospital-operations',
+  PLATFORM_PAGE: 'platform-page',
   HUB: 'hub',
   INTERNAL: 'internal',
 });
@@ -269,6 +275,34 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.endocrineMonitoringSystem]: 'src/pages/tools/EndocrineMetabolicAssistantPage.jsx',
   [REGISTRY.metabolicAnalytics]: 'src/pages/tools/EndocrineMetabolicAssistantPage.jsx',
   [REGISTRY.continuousGlucoseCommandCenter]: 'src/pages/tools/EndocrineMetabolicAssistantPage.jsx',
+  [REGISTRY.seizureAssistant]: 'src/pages/tools/NeurologyAssistantPage.jsx',
+  [REGISTRY.strokeWorkflowAssistant]: 'src/pages/tools/NeurologyAssistantPage.jsx',
+  [REGISTRY.headacheRedFlagAssistant]: 'src/pages/tools/NeurologyAssistantPage.jsx',
+  [REGISTRY.vertigoHintsAssistant]: 'src/pages/tools/NeurologyAssistantPage.jsx',
+  [REGISTRY.neuroExamAssistant]: 'src/pages/tools/NeurologyAssistantPage.jsx',
+  [REGISTRY.neuroTelemetryDashboard]: 'src/pages/tools/NeurologyAssistantPage.jsx',
+  [REGISTRY.strokeCommandCenter]: 'src/pages/tools/NeurologyAssistantPage.jsx',
+  [REGISTRY.neuroMonitoringEngine]: 'src/pages/tools/NeurologyAssistantPage.jsx',
+  [REGISTRY.eegTrendDashboard]: 'src/pages/tools/NeurologyAssistantPage.jsx',
+  [REGISTRY.neurologyTimelineAi]: 'src/pages/tools/NeurologyAssistantPage.jsx',
+  [REGISTRY.pediatricSepsisAssistant]: 'src/pages/tools/PediatricsObgynAssistantPage.jsx',
+  [REGISTRY.pregnancyWorkflowAssistant]: 'src/pages/tools/PediatricsObgynAssistantPage.jsx',
+  [REGISTRY.neonatalAssessmentAssistant]: 'src/pages/tools/PediatricsObgynAssistantPage.jsx',
+  [REGISTRY.obTriageAssistant]: 'src/pages/tools/PediatricsObgynAssistantPage.jsx',
+  [REGISTRY.neonatalDashboard]: 'src/pages/tools/PediatricsObgynAssistantPage.jsx',
+  [REGISTRY.maternalMonitoringDashboard]: 'src/pages/tools/PediatricsObgynAssistantPage.jsx',
+  [REGISTRY.pediatricCommandCenter]: 'src/pages/tools/PediatricsObgynAssistantPage.jsx',
+  [REGISTRY.growthTrendAnalytics]: 'src/pages/tools/PediatricsObgynAssistantPage.jsx',
+  [REGISTRY.perinatalRiskDashboard]: 'src/pages/tools/PediatricsObgynAssistantPage.jsx',
+  [REGISTRY.mentalHealthScreeningAssistant]: 'src/pages/tools/PsychiatryAssistantPage.jsx',
+  [REGISTRY.suicideRiskWorkflowAssistant]: 'src/pages/tools/PsychiatryAssistantPage.jsx',
+  [REGISTRY.substanceUseScreeningAssistant]: 'src/pages/tools/PsychiatryAssistantPage.jsx',
+  [REGISTRY.cognitiveScreeningAssistant]: 'src/pages/tools/PsychiatryAssistantPage.jsx',
+  [REGISTRY.behavioralAnalyticsDashboard]: 'src/pages/tools/PsychiatryAssistantPage.jsx',
+  [REGISTRY.screeningTrendEngine]: 'src/pages/tools/PsychiatryAssistantPage.jsx',
+  [REGISTRY.psychiatryMonitoringDashboard]: 'src/pages/tools/PsychiatryAssistantPage.jsx',
+  [REGISTRY.crisisEscalationAuditLog]: 'src/pages/tools/PsychiatryAssistantPage.jsx',
+  [REGISTRY.populationScreeningDashboard]: 'src/pages/tools/PsychiatryAssistantPage.jsx',
   [REGISTRY.giBleedWorkflowAssistant]: 'src/pages/tools/GastroenterologyAssistantPage.jsx',
   [REGISTRY.liverDiseaseAssistant]: 'src/pages/tools/GastroenterologyAssistantPage.jsx',
   [REGISTRY.pancreatitisWorkflowAssistant]: 'src/pages/tools/GastroenterologyAssistantPage.jsx',
@@ -288,6 +322,9 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.calculatorRecommenderAi]: 'src/pages/tools/CalculatorRecommender.jsx',
   [REGISTRY.calculatorsHub]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.doseCalculator]: 'src/pages/tools/Calculators.jsx',
+  [REGISTRY.hospitalCommandAssistant]: 'src/pages/tools/Calculators.jsx',
+  [REGISTRY.resourceAllocationAssistant]: 'src/pages/tools/Calculators.jsx',
+  [REGISTRY.deviceRecommendationAssistant]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.fleetCommand]: 'src/pages/fleet/FleetDashboard.jsx',
   [REGISTRY.fleetLiveMap]: 'src/pages/fleet/FleetLiveMap.jsx',
   [REGISTRY.predictiveMaintenance]: 'src/pages/fleet/PredictiveMaintenance.jsx',
@@ -295,10 +332,15 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.liveTrackingMap]: 'src/pages/LiveTrackingMap.jsx',
   [REGISTRY.medicalIotDashboard]: 'src/pages/MedicalIotDashboard.jsx',
   [REGISTRY.hospitalMap]: 'src/pages/HospitalMapDashboard.jsx',
-  [REGISTRY.deviceFleetManagement]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.deviceFleetManagement]: 'src/pages/DeviceFleetManagement.jsx',
   [REGISTRY.telemetryMonitoring]: 'src/pages/HospitalMapDashboard.jsx',
-  [REGISTRY.deviceMaintenance]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.deviceMaintenance]: 'src/pages/DeviceFleetManagement.jsx',
   [REGISTRY.hospitalOperationsCommand]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.assetTrackingDashboard]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.incidentCommandCenter]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.hospitalOperationsCockpit]: 'src/pages/HospitalMapDashboard.jsx',
+  [REGISTRY.deviceBatteryIntelligence]: 'src/pages/MedicalIotDashboard.jsx',
+  [REGISTRY.capacityPredictionEngine]: 'src/pages/HospitalMapDashboard.jsx',
 });
 
 const BASE_TEST_COVERAGE = Object.freeze([
@@ -306,6 +348,7 @@ const BASE_TEST_COVERAGE = Object.freeze([
   'clinicalToolIdContract.test.js',
   'clinicalToolAliasSync.test.js',
   'medicalToolsCatalogIndex.test.js',
+  'medicalExpansionCrossPackValidation.test.js',
 ]);
 
 const EXECUTOR_TEST_COVERAGE = Object.freeze({
@@ -349,6 +392,12 @@ function presentationCategory(value) {
   if (category === 'fleet') return 'Fleet';
   if (category === 'iot') return 'IoT';
   if (category === 'hospital-operations') return 'Hospital Operations';
+  if (category === 'clinical ai') return 'Clinical AI';
+  if (category === 'documentation') return 'Documentation';
+  if (category === 'governance') return 'Governance';
+  if (category === 'interoperability') return 'Interoperability';
+  if (category === 'patient data') return 'Patient Data';
+  if (category === 'patient workspace') return 'Patient Workspace';
   return 'Other';
 }
 
@@ -374,6 +423,7 @@ function registryTier(registryId) {
   if (CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET.has(registryId)) return 'C';
   if (FLEET_TIER_A_REGISTRY_ID_SET.has(registryId)) return 'fleet-A';
   if (FLEET_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId)) return 'fleet-B';
+  if (HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_ID_SET.has(registryId)) return 'hospital-ops-B';
   if (LIVE_TRACKING_MAP_REGISTRY_ID_SET.has(registryId)) return 'live-map';
   if (MEDICAL_IOT_REGISTRY_ID_SET.has(registryId)) return 'medical-iot';
   if (HOSPITAL_OPERATIONS_REGISTRY_ID_SET.has(registryId)) return 'hospital-ops';
@@ -394,7 +444,7 @@ function launchTypeForTier(tier, hasExecutor) {
   if (hasExecutor) return TOOL_LAUNCH_TYPES.BACKEND_BACKED;
   if (tier === 'C') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'A') return TOOL_LAUNCH_TYPES.LOCAL_ONLY;
-  if (tier === 'B' || tier === 'fleet-B') return TOOL_LAUNCH_TYPES.CHAT_ASSISTED;
+  if (tier === 'B' || tier === 'fleet-B' || tier === 'hospital-ops-B') return TOOL_LAUNCH_TYPES.CHAT_ASSISTED;
   if (tier === 'clinical-page') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'fleet-A') return TOOL_LAUNCH_TYPES.FLEET_LOCAL;
   if (tier === 'live-map') return TOOL_LAUNCH_TYPES.HOSPITAL_LOCAL;
@@ -502,6 +552,8 @@ function isCalculatorCategory(category) {
 }
 
 function surfaceForRecord(record) {
+  if (record.sourceKind === 'platform-system' && record.route) return TOOL_SURFACES.PLATFORM_PAGE;
+  if (record.sourceKind === 'platform' && record.route) return TOOL_SURFACES.PLATFORM_PAGE;
   if (record.sourceKind === 'platform') return TOOL_SURFACES.INTERNAL;
   if (record.launchType === TOOL_LAUNCH_TYPES.HUB) return TOOL_SURFACES.HUB;
   if (record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED) return TOOL_SURFACES.CHAT_ASSISTED;
@@ -513,7 +565,8 @@ function surfaceForRecord(record) {
 }
 
 function isUserFacingInventoryRecord(record) {
-  if (!record || record.sourceKind === 'platform') return false;
+  if (!record) return false;
+  if (record.sourceKind === 'platform' && !record.catalogVisible) return false;
   if (record.launchType === TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED) return false;
   if (!record.route && !record.navigationPath && !record.chatSeed) return false;
   return true;
@@ -711,22 +764,41 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
   };
 }
 
-function buildPlatformRecord({ id, label, endpoint, apiClient, requestDto = null, responseDto = null, notes }) {
+function buildPlatformRecord({
+  id,
+  label,
+  category = 'platform',
+  tier = 'platform',
+  route = null,
+  component = null,
+  endpoint,
+  apiClient,
+  requestDto = null,
+  responseDto = null,
+  permissionPolicy = null,
+  safetyCopy = null,
+  chatSeed = null,
+  testCoverage = ['backendFrontendExposure.test.js', 'clinicalToolsApi.test.js'],
+  riskLevel = 'low',
+  notes,
+  catalogVisible = false,
+  sourceKind = 'platform',
+}) {
   return {
     id,
     label,
-    category: 'platform',
-    tier: 'platform',
+    category,
+    tier,
     status: 'active',
-    sourceKind: 'platform',
-    route: null,
-    component: null,
+    sourceKind,
+    route,
+    component,
     launchType: TOOL_LAUNCH_TYPES.PLATFORM,
-    catalogVisible: false,
+    catalogVisible,
     sidebarVisible: false,
     calculatorSlug: null,
-    fallbackRoute: null,
-    navigationPath: null,
+    fallbackRoute: route,
+    navigationPath: route,
     nluToolId: null,
     nluProfileIds: [],
     aliases: [],
@@ -740,11 +812,11 @@ function buildPlatformRecord({ id, label, endpoint, apiClient, requestDto = null
     responseDto,
     executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
     apiClient,
-    permissionPolicy: null,
-    safetyCopy: null,
-    chatSeed: null,
-    testCoverage: ['backendFrontendExposure.test.js', 'clinicalToolsApi.test.js'],
-    riskLevel: 'low',
+    permissionPolicy,
+    safetyCopy,
+    chatSeed,
+    testCoverage,
+    riskLevel,
     notes,
   };
 }
@@ -777,6 +849,30 @@ function buildPlatformRecords() {
       requestDto: 'Undocumented share payload',
       notes: 'Capability-gated frontend call; no Nest route today.',
     }),
+    ...PLATFORM_SYSTEM_CAPABILITIES.filter(
+      (capability) => !ALL_REGISTRY_TOOL_ID_ORDER.has(capability.id)
+    ).map((capability) =>
+      buildPlatformRecord({
+        id: capability.id,
+        label: capability.name,
+        category: capability.category,
+        tier: capability.tier,
+        route: capability.route,
+        component: 'src/pages/platform/PlatformSystemPage.jsx',
+        endpoint: capability.endpoint,
+        apiClient: capability.apiClient,
+        requestDto: capability.requestDto,
+        responseDto: capability.responseDto,
+        permissionPolicy: capability.permissionPolicy,
+        safetyCopy: capability.summary,
+        chatSeed: capability.chatSeed || null,
+        testCoverage: capability.testCoverage,
+        riskLevel: capability.permissionPolicy?.permissions?.includes('READ_PHI') ? 'high' : 'medium',
+        notes: capability.safetyCopy,
+        catalogVisible: true,
+        sourceKind: 'platform-system',
+      })
+    ),
   ];
 }
 

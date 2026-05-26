@@ -529,6 +529,198 @@ const clinicalIntentToolsRaw = [
     backendExecutable: false,
   },
   {
+    toolId: NLU.cage,
+    toolName: 'CAGE (alcohol screen)',
+    category: 'calculator',
+    description:
+      'Screening only: CAGE alcohol questionnaire (0-4). Does not diagnose alcohol use disorder or provide withdrawal-management advice.',
+    path: '/tools/calculators/cage',
+    sidebarToolId: REGISTRY.cage,
+    chatSeed:
+      'Help me complete the CAGE alcohol screen and interpret the score as screening only. Do not diagnose alcohol use disorder, do not recommend detox or medications, and route intoxication, withdrawal, co-ingestion, trauma, pregnancy, or immediate safety concerns to local urgent pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.mmse,
+    toolName: 'MMSE score entry',
+    category: 'calculator',
+    description:
+      'Screening only: MMSE domain score entry from governed administration. Does not diagnose dementia, delirium, or capacity.',
+    path: '/tools/calculators/mmse',
+    sidebarToolId: REGISTRY.mmse,
+    chatSeed:
+      'Help me enter MMSE domain scores from a governed administration and summarize the total as cognitive screening support only. Do not diagnose dementia, delirium, cognitive impairment, or capacity; do not recommend medications. Acute confusion, neurologic deficits, intoxication, trauma, infection, hypoxia, or rapidly changing mental status requires urgent medical evaluation first.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.mocaPlaceholderWorkflow,
+    toolName: 'MoCA placeholder workflow',
+    category: 'calculator',
+    description:
+      'Governance workflow only: MoCA placeholder that does not show items, administer MoCA, calculate a score, or diagnose cognitive impairment.',
+    path: '/tools/calculators/moca-placeholder-workflow',
+    sidebarToolId: REGISTRY.mocaPlaceholderWorkflow,
+    chatSeed:
+      'Help me check MoCA workflow readiness: official form/version, required training, language and sensory accommodations, and clinician review plan. This placeholder does not administer or score MoCA, does not show MoCA items, does not diagnose cognitive impairment, and does not recommend medications or treatment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pcl5,
+    toolName: 'PCL-5 (PTSD symptom screen)',
+    category: 'calculator',
+    description:
+      'Screening only: PCL-5 PTSD symptom score entry (0-80) with current safety concern flag. Does not diagnose PTSD.',
+    path: '/tools/calculators/pcl5',
+    sidebarToolId: REGISTRY.pcl5,
+    chatSeed:
+      'Help me enter PCL-5 item scores and summarize the total as PTSD symptom screening support only. Do not diagnose PTSD, establish causality, or recommend medications or therapy. If self-harm, suicidal ideation, acute danger, severe dissociation, or inability to maintain safety is present, stop routine scoring and arrange immediate safety assessment and crisis resources.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.mdq,
+    toolName: 'Mood Disorder Questionnaire (MDQ)',
+    category: 'calculator',
+    description:
+      'Screening only: MDQ bipolar-spectrum screening summary. Does not diagnose bipolar disorder, mania, hypomania, or medication need.',
+    path: '/tools/calculators/mdq',
+    sidebarToolId: REGISTRY.mdq,
+    chatSeed:
+      'Help me summarize the MDQ using symptom count, same-period symptoms, impairment, and urgent safety flags. Screening only; do not diagnose bipolar disorder, mania, hypomania, psychosis, or recommend medications. Psychosis, unsafe behavior, suicidal ideation, violence risk, or inability to maintain safety requires urgent human review before routine screening.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.epworthSleepinessScale,
+    toolName: 'Epworth Sleepiness Scale',
+    category: 'calculator',
+    description:
+      'Screening only: Epworth Sleepiness Scale (0-24). Does not diagnose sleep apnea, narcolepsy, or medication effects.',
+    path: '/tools/calculators/epworth-sleepiness-scale',
+    sidebarToolId: REGISTRY.epworthSleepinessScale,
+    chatSeed:
+      'Help me complete the Epworth Sleepiness Scale and summarize daytime sleepiness as screening support only. Do not diagnose sleep apnea, narcolepsy, or medication effects, do not determine driving or work clearance, and flag safety-sensitive sleepiness for prompt human review.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.columbiaSuicideSeverityWorkflow,
+    toolName: 'Columbia suicide severity workflow entry',
+    category: 'calculator',
+    description:
+      'Workflow entry only: suicide-risk routing support with immediate safety review messaging. Does not administer or score official C-SSRS.',
+    path: '/tools/calculators/columbia-suicide-severity-workflow',
+    sidebarToolId: REGISTRY.columbiaSuicideSeverityWorkflow,
+    chatSeed:
+      'Help me document a Columbia suicide severity workflow entry: ideation disclosure, intent or plan, recent suicidal or preparatory behavior, immediate safety status, and direct human review. This is not official C-SSRS scoring and does not clear risk. Any suicidal ideation, intent, plan, behavior, or inability to maintain safety requires immediate safety assessment, local psychiatric emergency pathways, emergency services when needed, and crisis resources such as 988 in the U.S. when applicable.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.mentalHealthScreeningAssistant,
+    toolName: 'Mental Health Screening Assistant',
+    category: 'calculator',
+    description:
+      'Guided mental-health screening workflow across mood, anxiety, trauma, sleep, substance-use, and cognitive screens.',
+    path: '/tools/psychiatry/mental-health-screening-assistant',
+    sidebarToolId: REGISTRY.mentalHealthScreeningAssistant,
+    chatSeed:
+      'Help me choose and document mental-health screening tools across PHQ-9, GAD-7, PCL-5, MDQ, Epworth, AUDIT-C/CAGE, MMSE, and MoCA workflow readiness. Screening decision support only; do not diagnose, do not recommend medications or therapy, require human review, and prioritize crisis, psychosis, intoxication, withdrawal, delirium, or medical emergency pathways before chat.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.suicideRiskWorkflowAssistant,
+    toolName: 'Suicide Risk Workflow Assistant',
+    category: 'calculator',
+    description:
+      'Guided suicide-risk workflow support for PHQ-9 item 9, Columbia workflow flags, direct review, and crisis handoff.',
+    path: '/tools/psychiatry/suicide-risk-workflow-assistant',
+    sidebarToolId: REGISTRY.suicideRiskWorkflowAssistant,
+    chatSeed:
+      'Help me organize suicide-risk workflow documentation from PHQ-9 item 9 and Columbia workflow flags: ideation, intent, plan, behavior, immediate safety, protective context, and direct clinician/crisis review. Decision support only; do not diagnose, do not clear risk, do not recommend medications or therapy, and immediately prioritize safety assessment, emergency services, local psychiatric emergency pathways, and crisis resources such as 988 in the U.S. when applicable.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.substanceUseScreeningAssistant,
+    toolName: 'Substance Use Screening Assistant',
+    category: 'calculator',
+    description:
+      'Guided substance-use screening workflow for AUDIT-C, CAGE, intoxication/withdrawal context, and local referral prompts.',
+    path: '/tools/psychiatry/substance-use-screening-assistant',
+    sidebarToolId: REGISTRY.substanceUseScreeningAssistant,
+    chatSeed:
+      'Help me organize substance-use screening with AUDIT-C, CAGE, substance pattern, intoxication/withdrawal concerns, co-ingestions, pregnancy, trauma, safety concerns, and follow-up prompts. Screening decision support only; do not diagnose substance use disorder, do not recommend detox, medications, or treatment programs, and prioritize overdose, withdrawal, intoxication, co-ingestion, trauma, or immediate danger pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.cognitiveScreeningAssistant,
+    toolName: 'Cognitive Screening Assistant',
+    category: 'calculator',
+    description:
+      'Guided cognitive screening workflow for MMSE score entry, MoCA governance, delirium flags, accommodations, and clinician review.',
+    path: '/tools/psychiatry/cognitive-screening-assistant',
+    sidebarToolId: REGISTRY.cognitiveScreeningAssistant,
+    chatSeed:
+      'Help me organize cognitive screening with MMSE score entry, MoCA workflow readiness, baseline function, collateral history, language/sensory/motor accommodations, medication/substance context, and delirium flags. Screening decision support only; do not diagnose dementia, delirium, cognitive impairment, or capacity, do not recommend medications, and prioritize acute confusion, neurologic deficit, trauma, hypoxia, infection, or intoxication pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.behavioralAnalyticsDashboard,
+    toolName: 'Behavioral Analytics Dashboard',
+    category: 'reference',
+    description:
+      'Dashboard concept for behavioral-health screening volumes, positive-screen queues, follow-up status, and safety-review gaps.',
+    path: '/tools/psychiatry/behavioral-analytics-dashboard',
+    sidebarToolId: REGISTRY.behavioralAnalyticsDashboard,
+    chatSeed:
+      'Help me review behavioral analytics dashboard context: screening volumes, positive-screen queues, follow-up status, unresolved PHQ-9 item 9 or Columbia workflow flags, data freshness, and human review status. Monitoring visibility and decision support only; no diagnosis, no medication or therapy advice, no autonomous escalation, and crisis pathways take priority.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.screeningTrendEngine,
+    toolName: 'Screening Trend Engine',
+    category: 'reference',
+    description:
+      'Trend engine concept for serial psychiatry screening scores and review queues.',
+    path: '/tools/psychiatry/screening-trend-engine',
+    sidebarToolId: REGISTRY.screeningTrendEngine,
+    chatSeed:
+      'Help me review screening trend engine context: serial PHQ-9, GAD-7, PCL-5, MDQ, AUDIT-C/CAGE, Epworth, MMSE, and MoCA workflow status, score changes, missing data, and review queues. Trend visibility and decision support only; no diagnosis, no treatment or medication recommendations, and human interpretation is required.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.psychiatryMonitoringDashboard,
+    toolName: 'Psychiatry Monitoring Dashboard',
+    category: 'reference',
+    description:
+      'Monitoring dashboard concept for psychiatry review queues, repeated screens, unresolved safety flags, and handoff status.',
+    path: '/tools/psychiatry/psychiatry-monitoring-dashboard',
+    sidebarToolId: REGISTRY.psychiatryMonitoringDashboard,
+    chatSeed:
+      'Help me review psychiatry monitoring dashboard context: repeated screens, unresolved safety flags, follow-up gaps, review queues, and care-team handoff status. Monitoring decision support only; no diagnosis, no medication or therapy recommendations, no autonomous escalation, and crisis pathways take priority.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.crisisEscalationAuditLog,
+    toolName: 'Crisis Escalation Audit Log',
+    category: 'reference',
+    description:
+      'Audit-log concept for crisis escalation events, PHQ-9 item 9, Columbia workflow flags, and direct review status.',
+    path: '/tools/psychiatry/crisis-escalation-audit-log',
+    sidebarToolId: REGISTRY.crisisEscalationAuditLog,
+    chatSeed:
+      'Help me review crisis escalation audit-log context: PHQ-9 item 9 alerts, Columbia workflow flags, crisis-resource display, direct-review status, timestamps, and unresolved escalation gaps. Audit visibility and decision support only; no risk clearance, no diagnosis, no medication or therapy advice, and immediate safety workflows take priority.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.populationScreeningDashboard,
+    toolName: 'Population Screening Dashboard',
+    category: 'reference',
+    description:
+      'Population screening dashboard concept for panel-level completion, positive screens, follow-up gaps, and data quality.',
+    path: '/tools/psychiatry/population-screening-dashboard',
+    sidebarToolId: REGISTRY.populationScreeningDashboard,
+    chatSeed:
+      'Help me review population screening dashboard context: panel completion rates, positive-screen queues, follow-up gaps, equity/data-quality checks, and human review status. Population health visibility and decision support only; no individual diagnosis, no treatment or medication recommendations, and crisis pathways take priority.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'heart-score',
     toolName: 'HEART score',
     category: 'calculator',
@@ -576,6 +768,78 @@ Report total score (0–7), risk category (low 0–3, moderate 4–5, high 6–7
     backendExecutable: false,
   },
   {
+    toolId: NLU.huntHessScale,
+    toolName: 'Hunt-Hess Scale',
+    category: 'calculator',
+    description:
+      'Aneurysmal subarachnoid hemorrhage clinical severity grade. Does not replace emergency SAH evaluation or neurosurgical pathways.',
+    path: '/tools/calculators/hunt-hess-scale',
+    sidebarToolId: REGISTRY.huntHessScale,
+    chatSeed:
+      'Help me document Hunt-Hess clinical grade for suspected aneurysmal subarachnoid hemorrhage. Clinical decision support only; do not diagnose SAH, do not recommend aneurysm treatment, and do not delay emergency neuroimaging, airway/hemodynamic support, or neurosurgical consultation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.ichScore,
+    toolName: 'ICH Score',
+    category: 'calculator',
+    description:
+      'Intracerebral hemorrhage severity score from GCS, hematoma volume, intraventricular hemorrhage, infratentorial origin, and age.',
+    path: '/tools/calculators/ich-score',
+    sidebarToolId: REGISTRY.ichScore,
+    chatSeed:
+      'Help me calculate ICH Score from GCS, hematoma volume, intraventricular hemorrhage, infratentorial origin, and age. Clinical decision support only; do not diagnose hemorrhage type, do not recommend BP targets, reversal, surgery, transfer, or disposition, and do not delay emergency imaging or stroke/neurosurgery pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.fourScore,
+    toolName: 'FOUR Score',
+    category: 'calculator',
+    description:
+      'Coma scale using eye, motor, brainstem reflex, and respiration components. Airway and neurocritical-care pathways take priority.',
+    path: '/tools/calculators/four-score',
+    sidebarToolId: REGISTRY.fourScore,
+    chatSeed:
+      'Help me document FOUR Score components: eye response, motor response, brainstem reflexes, and respiration. Clinical decision support only; do not diagnose coma cause, brain death, or prognosis, and do not delay airway, ventilation, seizure, trauma, stroke, or neurocritical-care evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.modifiedRankinScale,
+    toolName: 'Modified Rankin Scale',
+    category: 'calculator',
+    description:
+      'Global disability outcome scale after stroke or neurologic illness. Does not recommend acute treatment or disposition.',
+    path: '/tools/calculators/modified-rankin-scale',
+    sidebarToolId: REGISTRY.modifiedRankinScale,
+    chatSeed:
+      'Help me document modified Rankin Scale level from functional status and dependence. Clinical decision support only; outcome documentation only, not a diagnosis and not an acute treatment, discharge, rehab, or placement recommendation. Do not delay urgent evaluation for new or worsening neurologic deficits to complete this outcome score.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.nihssSummaryView,
+    toolName: 'NIHSS Summary View',
+    category: 'calculator',
+    description:
+      'NIH Stroke Scale item summary for stroke exam documentation. Does not replace urgent stroke activation or imaging.',
+    path: '/tools/calculators/nihss-summary-view',
+    sidebarToolId: REGISTRY.nihssSummaryView,
+    chatSeed:
+      'Help me summarize NIHSS item scores for a stroke exam: LOC, questions, commands, gaze, visual fields, facial palsy, motor arms/legs, ataxia, sensory, language, dysarthria, and extinction. Clinical decision support only; do not diagnose stroke, do not determine thrombolysis or thrombectomy eligibility, and do not delay emergency stroke activation, imaging, transfer, or treatment workflows.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pediatricGcs,
+    toolName: 'Pediatric GCS',
+    category: 'calculator',
+    description:
+      'Pediatric Glasgow Coma Scale with age-adjusted verbal response context. Does not replace urgent pediatric evaluation.',
+    path: '/tools/calculators/pediatric-gcs',
+    sidebarToolId: REGISTRY.pediatricGcs,
+    chatSeed:
+      'Help me document Pediatric GCS from eye, verbal, and motor responses using age-appropriate descriptions. Clinical decision support only; do not diagnose neurologic injury, do not recommend imaging, airway, transfer, or disposition, and do not delay pediatric trauma, seizure, hypoglycemia, airway, or emergency pathways.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'centor-mcisaac',
     toolName: 'Centor / McIsaac score',
     category: 'calculator',
@@ -615,6 +879,186 @@ Collect: dilation (cm), effacement (%), fetal station, consistency, and position
 STEP 0 — Newborn assessment documentation only. Does not replace neonatal resuscitation algorithms (e.g. NRP) or ongoing monitoring — follow delivery-unit and pediatric protocols.
 
 Score appearance, pulse, grimace, activity, and respiration (0–2 each) at 1 and 5 minutes. Interpretation bands: 0–3 severely depressed, 4–6 moderately depressed, 7–10 reassuring.`,
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.gestationalAgeCalculator,
+    toolName: 'Gestational Age Calculator',
+    category: 'calculator',
+    description:
+      'Gestational age calculation from LMP, conception, or ultrasound dating with ACOG dating caveats.',
+    path: '/tools/calculators/gestational-age-calculator',
+    sidebarToolId: REGISTRY.gestationalAgeCalculator,
+    chatSeed:
+      'Help me calculate gestational age from LMP, conception/ovulation date, or ultrasound dating, and document the estimated due date and dating method. Pediatric/OB decision support only; reconcile with ACOG dating policy and local obstetric workflow, do not diagnose pregnancy complications, do not recommend delivery timing, and do not delay urgent maternal or fetal evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pediatricBpPercentile,
+    toolName: 'Pediatric BP Percentile',
+    category: 'calculator',
+    description:
+      'Pediatric blood pressure screening-band helper using age/sex context and AAP source-table reminders.',
+    path: '/tools/calculators/pediatric-bp-percentile',
+    sidebarToolId: REGISTRY.pediatricBpPercentile,
+    chatSeed:
+      'Help me review pediatric blood pressure using age, sex, systolic BP, and diastolic BP. Pediatric decision support only; confirm cuff size, repeat manual readings, height percentile/source tables, and local pediatric guidance. Do not diagnose hypertension, recommend medications, or delay urgent evaluation for severe symptoms.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pregnancyDueDateCalculator,
+    toolName: 'Pregnancy Due Date Calculator',
+    category: 'calculator',
+    description:
+      'Estimated due date helper from LMP, conception/ovulation date, or ultrasound dating.',
+    path: '/tools/calculators/pregnancy-due-date-calculator',
+    sidebarToolId: REGISTRY.pregnancyDueDateCalculator,
+    chatSeed:
+      'Help me estimate pregnancy due date using LMP, conception/ovulation date, or ultrasound dating details. OB decision support only; confirm dating hierarchy with ACOG/local policy, do not recommend delivery timing or interventions, and do not delay urgent maternal or fetal evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.fentonGrowthChartHelper,
+    toolName: 'Fenton Growth Chart Helper',
+    category: 'calculator',
+    description:
+      'Neonatal growth percentile classification helper for official Fenton chart review.',
+    path: '/tools/calculators/fenton-growth-chart-helper',
+    sidebarToolId: REGISTRY.fentonGrowthChartHelper,
+    chatSeed:
+      'Help me classify neonatal growth percentiles from the official Fenton chart: gestational/postmenstrual age, weight percentile, length percentile, and head circumference percentile. Pediatric/neonatal decision support only; use validated source charts and neonatal review, do not diagnose growth failure or recommend feeding, fluids, fortification, or disposition.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neonatalBilirubinRiskHelper,
+    toolName: 'Neonatal Bilirubin Risk Helper',
+    category: 'calculator',
+    description:
+      'Neonatal bilirubin review helper for AAP 2022 nomogram workflow without phototherapy recommendations.',
+    path: '/tools/calculators/neonatal-bilirubin-risk-helper',
+    sidebarToolId: REGISTRY.neonatalBilirubinRiskHelper,
+    chatSeed:
+      'Help me organize neonatal bilirubin review: age in hours, total bilirubin, gestational age, neurotoxicity risk factors, and whether values have been plotted on the AAP 2022/local nomogram. Neonatal decision support only; do not recommend phototherapy, exchange transfusion, labs, admission, discharge, or timing, and do not delay urgent jaundice or neonatal evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pediatricDoseSafetyChecker,
+    toolName: 'Pediatric Dose Safety Checker',
+    category: 'calculator',
+    description:
+      'Placeholder-only pediatric medication safety checklist that blocks patient-specific dose calculation.',
+    path: '/tools/calculators/pediatric-dose-safety-checker',
+    sidebarToolId: REGISTRY.pediatricDoseSafetyChecker,
+    chatSeed:
+      'Help me document pediatric medication safety checks without calculating a dose: medication context, weight in kg, governed institutional protocol availability, concentration, route, frequency, maximum dose source, allergies, renal/hepatic context, and independent verification. Placeholder only; do not provide mg/kg doses, dose ranges, titration, infusion rates, medication recommendations, or prescriptions unless governed by an approved protocol outside this build.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pediatricSepsisAssistant,
+    toolName: 'Pediatric Sepsis Assistant',
+    category: 'calculator',
+    description:
+      'Guided pediatric sepsis review for infection concern, age-adjusted vitals, perfusion, labs, and escalation prompts.',
+    path: '/tools/pediatrics-obgyn/pediatric-sepsis-assistant',
+    sidebarToolId: REGISTRY.pediatricSepsisAssistant,
+    chatSeed:
+      'Help me structure a pediatric sepsis review: age, infection concern, age-adjusted vitals, perfusion, mental status, lactate/labs if available, fluids or antibiotics already documented, source concerns, and missing data. Pediatric decision support only; do not diagnose sepsis, do not recommend fluids, antibiotics, vasopressors, medication doses, disposition, or transfer, and do not delay local pediatric sepsis or emergency pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pregnancyWorkflowAssistant,
+    toolName: 'Pregnancy Workflow Assistant',
+    category: 'calculator',
+    description:
+      'Pregnancy workflow review for dating, maternal symptoms, fetal movement, labs, risk context, and handoff prompts.',
+    path: '/tools/pediatrics-obgyn/pregnancy-workflow-assistant',
+    sidebarToolId: REGISTRY.pregnancyWorkflowAssistant,
+    chatSeed:
+      'Help me structure a pregnancy workflow review: gestational age, dating method, maternal symptoms, fetal movement, bleeding/fluid/leakage context, blood pressure, labs if available, risk factors, and missing data. OB decision support only; do not diagnose pregnancy complications, do not recommend medications, delivery timing, disposition, or procedures, and do not delay urgent obstetric evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neonatalAssessmentAssistant,
+    toolName: 'Neonatal Assessment Assistant',
+    category: 'calculator',
+    description:
+      'Neonatal assessment assistant for Apgar, feeding, temperature, bilirubin, growth, screening, and red flags.',
+    path: '/tools/pediatrics-obgyn/neonatal-assessment-assistant',
+    sidebarToolId: REGISTRY.neonatalAssessmentAssistant,
+    chatSeed:
+      'Help me structure a neonatal assessment: gestational age, birth weight, Apgar documentation, temperature, feeding, glucose if available, bilirubin context, growth percentiles, screenings, and red flags. Neonatal decision support only; do not replace NRP or neonatal clinician assessment, do not recommend treatment or disposition, and do not delay urgent newborn evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.obTriageAssistant,
+    toolName: 'OB Triage Assistant',
+    category: 'calculator',
+    description:
+      'OB triage assistant for maternal symptoms, gestational age, fetal concerns, bleeding, fluid leakage, and urgent pathway prompts.',
+    path: '/tools/pediatrics-obgyn/ob-triage-assistant',
+    sidebarToolId: REGISTRY.obTriageAssistant,
+    chatSeed:
+      'Help me structure an OB triage review: gestational age, chief concern, maternal vitals, bleeding, fluid leakage, contractions, fetal movement, pain, headache/vision symptoms, labs if available, and missing data. OB decision support only; do not diagnose, do not recommend medications, delivery, discharge, admission, transfer, or procedures, and do not delay urgent maternal or fetal pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neonatalDashboard,
+    toolName: 'Neonatal Dashboard',
+    category: 'reference',
+    description:
+      'Neonatal dashboard concept for vitals, feeding, bilirubin, growth, screening, and review queues.',
+    path: '/tools/pediatrics-obgyn/neonatal-dashboard',
+    sidebarToolId: REGISTRY.neonatalDashboard,
+    chatSeed:
+      'Help me review neonatal dashboard context: vitals, temperature, feeding, weight change, bilirubin review status, growth percentile trends, screening completion, data freshness, and unresolved review items. Monitoring visibility and neonatal decision support only; no autonomous escalation, treatment, feeding, phototherapy, discharge, or admission recommendations.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.maternalMonitoringDashboard,
+    toolName: 'Maternal Monitoring Dashboard',
+    category: 'reference',
+    description:
+      'Maternal monitoring dashboard concept for vitals, symptoms, labs, fetal context, and review queues.',
+    path: '/tools/pediatrics-obgyn/maternal-monitoring-dashboard',
+    sidebarToolId: REGISTRY.maternalMonitoringDashboard,
+    chatSeed:
+      'Help me review maternal monitoring dashboard context: blood pressure trends, symptoms, labs if available, fetal movement/status documentation, postpartum or antepartum risk context, data freshness, and review queues. OB decision support and monitoring visibility only; no autonomous escalation, medication, delivery, disposition, or procedure recommendations.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.pediatricCommandCenter,
+    toolName: 'Pediatric Command Center',
+    category: 'reference',
+    description:
+      'Pediatric command-center concept for deterioration, sepsis, vitals, growth, BP, and unresolved review items.',
+    path: '/tools/pediatrics-obgyn/pediatric-command-center',
+    sidebarToolId: REGISTRY.pediatricCommandCenter,
+    chatSeed:
+      'Help me review pediatric command-center queues: PEWS/deterioration context, sepsis concern, vitals trends, BP screening bands, growth trend flags, data gaps, and human review status. Pediatric decision support and operations visibility only; no diagnosis, medication dosing, treatment, transfer, or disposition recommendations.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.growthTrendAnalytics,
+    toolName: 'Growth Trend Analytics',
+    category: 'reference',
+    description:
+      'Growth trend analytics concept for serial anthropometrics, percentile changes, data quality, and review queues.',
+    path: '/tools/pediatrics-obgyn/growth-trend-analytics',
+    sidebarToolId: REGISTRY.growthTrendAnalytics,
+    chatSeed:
+      'Help me review growth trend analytics: serial weight, length/height, head circumference, percentiles, gestational/corrected age where applicable, percentile crossing, measurement quality, and missing data. Pediatric/neonatal decision support only; no growth diagnosis and no nutrition, medication, lab, imaging, or disposition recommendation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.perinatalRiskDashboard,
+    toolName: 'Perinatal Risk Dashboard',
+    category: 'reference',
+    description:
+      'Perinatal risk dashboard concept for maternal, fetal, delivery, neonatal, and follow-up review queues.',
+    path: '/tools/pediatrics-obgyn/perinatal-risk-dashboard',
+    sidebarToolId: REGISTRY.perinatalRiskDashboard,
+    chatSeed:
+      'Help me review perinatal risk dashboard context: maternal risk factors, fetal concerns, delivery details, neonatal assessment, bilirubin/growth follow-up, data freshness, and unresolved review queues. Perinatal decision support and visibility only; no diagnosis, medication dosing, delivery, treatment, admission, discharge, or transfer recommendations.',
     backendExecutable: false,
   },
   {
@@ -777,6 +1221,54 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     path: '/tools/calculators/rass',
     sidebarToolId: 'rass',
     chatSeed: 'Help me document a Richmond Agitation-Sedation Scale score.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.bedOccupancyCalculator,
+    toolName: 'Bed Occupancy Calculator',
+    category: 'calculator',
+    description:
+      'Hospital operations calculator for occupied beds, blocked beds, usable beds, and occupancy percentage. Operations support only; no admission, discharge, transfer, or clinical triage decisions.',
+    path: '/tools/calculators/bed-occupancy-calculator',
+    sidebarToolId: REGISTRY.bedOccupancyCalculator,
+    chatSeed:
+      'Open the Bed Occupancy Calculator and help me review occupied beds, total beds, blocked beds, usable capacity, and available beds. Operations planning support only; do not recommend admission, discharge, transfer, triage, or staffing actions.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.staffingRatioCalculator,
+    toolName: 'Staffing Ratio Calculator',
+    category: 'calculator',
+    description:
+      'Operations calculator for patients per staff member and target staffing coverage gap. Does not schedule staff or override acuity, credentials, labor rules, or supervisor review.',
+    path: '/tools/calculators/staffing-ratio-calculator',
+    sidebarToolId: REGISTRY.staffingRatioCalculator,
+    chatSeed:
+      'Open the Staffing Ratio Calculator and help me review patient count, available staff, target patients per staff, and staffing coverage gap. Operations planning support only; do not recommend autonomous staffing changes or clinical assignments.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.turnaroundTimeCalculator,
+    toolName: 'Turnaround Time Calculator',
+    category: 'calculator',
+    description:
+      'Operations calculator for request-to-assign, travel, service, cleanup, and target turnaround variance. Does not auto-dispatch or reprioritize work.',
+    path: '/tools/calculators/turnaround-time-calculator',
+    sidebarToolId: REGISTRY.turnaroundTimeCalculator,
+    chatSeed:
+      'Open the Turnaround Time Calculator and help me total request-to-assign, travel, service, cleanup, and target variance. Operations planning support only; do not auto-dispatch, reprioritize care, or override command workflows.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.resourceUtilizationIndex,
+    toolName: 'Resource Utilization Index',
+    category: 'calculator',
+    description:
+      'Composite operations utilization index across beds, staff, devices, and fleet signals. Requires source-system validation and human approval for resource moves.',
+    path: '/tools/calculators/resource-utilization-index',
+    sidebarToolId: REGISTRY.resourceUtilizationIndex,
+    chatSeed:
+      'Open the Resource Utilization Index and help me review bed, staff, device, and fleet utilization signals. Operations planning support only; require human approval for any resource movement, staffing, dispatch, admission, or transfer decision.',
     backendExecutable: false,
   },
   {
@@ -1286,6 +1778,126 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     backendExecutable: false,
   },
   {
+    toolId: NLU.seizureAssistant,
+    toolName: 'Seizure Assistant',
+    category: 'calculator',
+    description:
+      'Guided seizure review with event features, recovery, triggers, medications as documented, and urgent-care prompts.',
+    path: '/tools/neurology/seizure-assistant',
+    sidebarToolId: REGISTRY.seizureAssistant,
+    chatSeed:
+      'Help me structure a seizure review: witnessed event description, onset and duration, recovery, provoking factors, glucose/electrolyte context if known, antiseizure medications as documented, pregnancy/trauma/infection context, and missing data. Clinical decision support only; do not diagnose seizure type, do not recommend antiseizure medication dosing or changes, and do not delay status epilepticus, airway, trauma, or emergency pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.strokeWorkflowAssistant,
+    toolName: 'Stroke Workflow Assistant',
+    category: 'calculator',
+    description:
+      'Stroke workflow review for last-known-well, deficits, NIHSS context, imaging status, contraindication prompts, and handoff.',
+    path: '/tools/neurology/stroke-workflow-assistant',
+    sidebarToolId: REGISTRY.strokeWorkflowAssistant,
+    chatSeed:
+      'Help me organize an acute stroke workflow handoff: last-known-well, baseline function, focal deficits, NIHSS context, glucose, anticoagulant context, imaging status, thrombectomy screen prompts, and missing data. Clinical decision support only; do not diagnose stroke, do not determine thrombolysis or thrombectomy eligibility, and do not delay emergency stroke activation, imaging, transfer, or treatment workflows.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.headacheRedFlagAssistant,
+    toolName: 'Headache Red Flag Assistant',
+    category: 'calculator',
+    description:
+      'Headache red-flag review for thunderclap onset, neurologic deficit, infection, pregnancy/postpartum, cancer, trauma, and age context.',
+    path: '/tools/neurology/headache-red-flag-assistant',
+    sidebarToolId: REGISTRY.headacheRedFlagAssistant,
+    chatSeed:
+      'Help me review headache red flags: thunderclap or worst headache, new neurologic deficits, altered mental status, fever/meningismus, pregnancy/postpartum, cancer/immunosuppression, trauma, anticoagulation, age over 50, and pattern change. Clinical decision support only; do not diagnose headache cause, do not recommend imaging, LP, medications, admission, discharge, or disposition, and do not delay urgent evaluation.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.vertigoHintsAssistant,
+    toolName: 'Vertigo HINTS Assistant',
+    category: 'calculator',
+    description:
+      'Vertigo/HINTS documentation support for continuous vertigo, trained bedside exam findings, gait/hearing context, and stroke warnings.',
+    path: '/tools/neurology/vertigo-hints-assistant',
+    sidebarToolId: REGISTRY.vertigoHintsAssistant,
+    chatSeed:
+      'Help me document a vertigo/HINTS review for continuous acute vestibular syndrome: timing, nystagmus, head impulse, test of skew, hearing symptoms, gait, focal neurologic findings, and vascular risk context. Clinical decision support only; HINTS requires trained bedside exam, does not rule out posterior circulation stroke, and must not delay urgent stroke evaluation or imaging when concerning features are present.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neuroExamAssistant,
+    toolName: 'Neuro Exam Assistant',
+    category: 'calculator',
+    description:
+      'Guided neurologic exam checklist for mental status, cranial nerves, motor, sensory, coordination, gait, reflexes, and localization prompts.',
+    path: '/tools/neurology/neuro-exam-assistant',
+    sidebarToolId: REGISTRY.neuroExamAssistant,
+    chatSeed:
+      'Help me structure a neurologic exam: mental status, cranial nerves, motor strength/tone, reflexes, sensory findings, coordination, gait, cortical signs, localization clues, and missing data. Clinical decision support only; do not diagnose, do not recommend treatment or disposition, and do not delay emergency stroke, seizure, trauma, infection, or spinal cord pathways for new deficits.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neuroTelemetryDashboard,
+    toolName: 'Neuro Telemetry Dashboard',
+    category: 'reference',
+    description:
+      'Neuro telemetry dashboard for neuro checks, GCS/NIHSS trends, seizure events, ICP/EVD context, freshness, and review queues.',
+    path: '/tools/neurology/neuro-telemetry-dashboard',
+    sidebarToolId: REGISTRY.neuroTelemetryDashboard,
+    chatSeed:
+      'Help me review neuro telemetry dashboard context: neuro check trends, GCS or NIHSS changes, seizure events, pupillary findings, ICP/EVD context if available, data freshness, missing checks, and unresolved review items. Clinical decision support and monitoring visibility only; no autonomous escalation or alerts replacing bedside assessment, and urgent neurologic change needs immediate local pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.strokeCommandCenter,
+    toolName: 'Stroke Command Center',
+    category: 'reference',
+    description:
+      'Stroke command-center view for activation queues, last-known-well, imaging milestones, handoff status, and unresolved review items.',
+    path: '/tools/neurology/stroke-command-center',
+    sidebarToolId: REGISTRY.strokeCommandCenter,
+    chatSeed:
+      'Help me review stroke command-center queues: active stroke alerts, last-known-well documentation, imaging milestones, transfer/handoff status, unresolved data gaps, and review priorities. Clinical decision support and operations visibility only; do not determine thrombolysis or thrombectomy eligibility and do not delay emergency stroke workflow steps.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neuroMonitoringEngine,
+    toolName: 'Neuro Monitoring Engine',
+    category: 'reference',
+    description:
+      'Neuro monitoring trend engine for serial exams, consciousness scores, pupillary data, ICP context, and review queues.',
+    path: '/tools/neurology/neuro-monitoring-engine',
+    sidebarToolId: REGISTRY.neuroMonitoringEngine,
+    chatSeed:
+      'Help me summarize neuro monitoring trends: serial neuro exams, consciousness scores, pupillary findings, ICP/EVD context if available, sedation/procedure context, data gaps, and review queues. Clinical decision support and trend visibility only; no autonomous escalation orders and no replacement for bedside assessment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.eegTrendDashboard,
+    toolName: 'EEG Trend Dashboard',
+    category: 'reference',
+    description:
+      'EEG trend dashboard for EEG status, seizure burden context, artifact, report freshness, and review queues.',
+    path: '/tools/neurology/eeg-trend-dashboard',
+    sidebarToolId: REGISTRY.eegTrendDashboard,
+    chatSeed:
+      'Help me review EEG trend dashboard context: EEG connection/status, seizure burden context if reported, artifact, report freshness, medication context as documented, and pending review queues. Clinical decision support and visibility only; do not diagnose seizures or recommend antiseizure medication, sedation, stimulation, admission, discharge, or disposition, and do not delay urgent seizure or neurologic deterioration pathways.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.neurologyTimelineAi,
+    toolName: 'Neurology Timeline AI',
+    category: 'reference',
+    description:
+      'Neurology timeline workflow for symptom onset, exams, imaging, EEG, interventions, and handoff chronology.',
+    path: '/tools/neurology/neurology-timeline-ai',
+    sidebarToolId: REGISTRY.neurologyTimelineAi,
+    chatSeed:
+      'Help me build a clinician-reviewed neurology timeline: symptom onset and last-known-well, exam changes, imaging and EEG milestones, treatments already documented, consults, and handoff gaps. Clinical decision support only; do not diagnose, do not recommend treatment, and do not delay emergency stroke, seizure, airway, infection, trauma, or neurosurgical care.',
+    backendExecutable: false,
+  },
+  {
     toolId: romeIvIbsChatConfig.toolId,
     toolName: 'Rome IV IBS Criteria',
     category: romeIvIbsChatConfig.category,
@@ -1400,6 +2012,42 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     sidebarToolId: dispatchAiChatConfig.registryId,
     chatSeed: dispatchAiChatConfig.chatSeed,
     backendExecutable: true,
+  },
+  {
+    toolId: NLU.hospitalCommandAssistant,
+    toolName: 'Hospital Command Assistant',
+    category: 'hospital-operations',
+    description:
+      'Chat-assisted command-center support for hospital map, bed capacity, device fleet, telemetry, alerts, and huddle prompts. Human command approval required; no autonomous dispatch, escalation, admission, transfer, discharge, or clinical decisions.',
+    path: TOOL_LAUNCH_PATHS.calculatorsHub,
+    sidebarToolId: REGISTRY.hospitalCommandAssistant,
+    chatSeed:
+      'Help me prepare a hospital command huddle using map status, bed occupancy, staffing ratio, turnaround time, resource utilization, device alerts, fleet status, and stale telemetry. Operations support only; do not make autonomous dispatch, escalation, admission, transfer, discharge, staffing, or clinical decisions. Ask what source-system values should be verified.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.resourceAllocationAssistant,
+    toolName: 'Resource Allocation Assistant',
+    category: 'hospital-operations',
+    description:
+      'Chat-assisted resource allocation planning for beds, staff, devices, and fleet options with constraints and human approval. Does not move resources or issue assignments.',
+    path: TOOL_LAUNCH_PATHS.calculatorsHub,
+    sidebarToolId: REGISTRY.resourceAllocationAssistant,
+    chatSeed:
+      'Help me compare resource allocation options across beds, staff, devices, and fleet capacity. Ask for constraints, source-system values, and approval owner. Operations support only; do not move resources, assign staff, dispatch vehicles, or make clinical decisions.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.deviceRecommendationAssistant,
+    toolName: 'Device Recommendation Assistant',
+    category: 'hospital-operations',
+    description:
+      'Chat-assisted device requirement and availability review using inventory, battery, maintenance, calibration, compatibility, and location context. Does not assign clinical devices automatically.',
+    path: TOOL_LAUNCH_PATHS.calculatorsHub,
+    sidebarToolId: REGISTRY.deviceRecommendationAssistant,
+    chatSeed:
+      'Help me review device options for an equipment request using requirements, inventory, battery, maintenance, calibration, firmware, compatibility, location, and source-system verification. Operations support only; do not assign devices automatically or make clinical decisions.',
+    backendExecutable: false,
   },
   {
     toolId: NLU.calculatorRecommenderAi,
@@ -1745,6 +2393,21 @@ export const nluCalculatorHubOnly = [
     toolId: dispatchAiChatConfig.toolId,
     name: dispatchAiChatConfig.name,
     hubPath: dispatchAiChatConfig.hubPath,
+  },
+  {
+    toolId: NLU.hospitalCommandAssistant,
+    name: 'Hospital Command Assistant',
+    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  },
+  {
+    toolId: NLU.resourceAllocationAssistant,
+    name: 'Resource Allocation Assistant',
+    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
+  },
+  {
+    toolId: NLU.deviceRecommendationAssistant,
+    name: 'Device Recommendation Assistant',
+    hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
   },
 ];
 
@@ -2137,6 +2800,69 @@ export const builtinUiCalculators = [
     orchestratorId: null,
   },
   {
+    id: 'cage',
+    name: 'CAGE',
+    description: 'CAGE alcohol screening questionnaire (0-4).',
+    path: '/tools/calculators/cage',
+    calcQuery: '/tools/calculators?calc=cage',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'mmse',
+    name: 'MMSE',
+    description: 'MMSE cognitive screening score entry from governed administration (0-30).',
+    path: '/tools/calculators/mmse',
+    calcQuery: '/tools/calculators?calc=mmse',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'moca-placeholder-workflow',
+    name: 'MoCA Placeholder Workflow',
+    description: 'MoCA governance workflow placeholder without item display or scoring.',
+    path: '/tools/calculators/moca-placeholder-workflow',
+    calcQuery: '/tools/calculators?calc=moca-placeholder-workflow',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pcl5',
+    name: 'PCL-5',
+    description: 'PCL-5 PTSD symptom screening score entry (0-80) with current safety flag.',
+    path: '/tools/calculators/pcl5',
+    calcQuery: '/tools/calculators?calc=pcl5',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'mdq',
+    name: 'MDQ',
+    description: 'Mood Disorder Questionnaire screening summary with urgent safety flag.',
+    path: '/tools/calculators/mdq',
+    calcQuery: '/tools/calculators?calc=mdq',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'epworth-sleepiness-scale',
+    name: 'Epworth Sleepiness Scale',
+    description: 'Daytime sleepiness screen (0-24) with safety-sensitive activity flag.',
+    path: '/tools/calculators/epworth-sleepiness-scale',
+    calcQuery: '/tools/calculators?calc=epworth-sleepiness-scale',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'columbia-suicide-severity-workflow',
+    name: 'Columbia Suicide Severity Workflow',
+    description: 'Suicide-severity workflow entry with immediate safety review messaging.',
+    path: '/tools/calculators/columbia-suicide-severity-workflow',
+    calcQuery: '/tools/calculators?calc=columbia-suicide-severity-workflow',
+    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    orchestratorId: null,
+  },
+  {
     id: 'heart-score',
     name: 'HEART score',
     description: 'Chest pain risk stratification (history, ECG, age, risk factors, troponin; 0–10).',
@@ -2170,6 +2896,60 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/apgar-score',
     calcQuery: '/tools/calculators?calc=apgar-score',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (apgarScoreCalculator.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'gestational-age-calculator',
+    name: 'Gestational Age Calculator',
+    description: 'Gestational age from LMP, conception, or ultrasound dating.',
+    path: '/tools/calculators/gestational-age-calculator',
+    calcQuery: '/tools/calculators?calc=gestational-age-calculator',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pediatric-bp-percentile',
+    name: 'Pediatric BP Percentile',
+    description: 'Pediatric BP screening-band helper with AAP source-table reminders.',
+    path: '/tools/calculators/pediatric-bp-percentile',
+    calcQuery: '/tools/calculators?calc=pediatric-bp-percentile',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pregnancy-due-date-calculator',
+    name: 'Pregnancy Due Date Calculator',
+    description: 'Estimated due date from LMP, conception, or ultrasound dating.',
+    path: '/tools/calculators/pregnancy-due-date-calculator',
+    calcQuery: '/tools/calculators?calc=pregnancy-due-date-calculator',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'fenton-growth-chart-helper',
+    name: 'Fenton Growth Chart Helper',
+    description: 'Neonatal growth percentile classification helper for Fenton chart review.',
+    path: '/tools/calculators/fenton-growth-chart-helper',
+    calcQuery: '/tools/calculators?calc=fenton-growth-chart-helper',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'neonatal-bilirubin-risk-helper',
+    name: 'Neonatal Bilirubin Risk Helper',
+    description: 'AAP 2022 bilirubin nomogram review prompt without treatment recommendations.',
+    path: '/tools/calculators/neonatal-bilirubin-risk-helper',
+    calcQuery: '/tools/calculators?calc=neonatal-bilirubin-risk-helper',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pediatric-dose-safety-checker',
+    name: 'Pediatric Dose Safety Checker',
+    description: 'Placeholder-only pediatric medication safety checker; no patient-specific dose calculation.',
+    path: '/tools/calculators/pediatric-dose-safety-checker',
+    calcQuery: '/tools/calculators?calc=pediatric-dose-safety-checker',
+    implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2317,6 +3097,60 @@ export const builtinUiCalculators = [
     orchestratorId: null,
   },
   {
+    id: 'hunt-hess-scale',
+    name: 'Hunt-Hess Scale',
+    description: 'Aneurysmal SAH clinical severity grade with emergency pathway warnings.',
+    path: '/tools/calculators/hunt-hess-scale',
+    calcQuery: '/tools/calculators?calc=hunt-hess-scale',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'ich-score',
+    name: 'ICH Score',
+    description: 'Intracerebral hemorrhage severity from GCS, volume, IVH, origin, and age.',
+    path: '/tools/calculators/ich-score',
+    calcQuery: '/tools/calculators?calc=ich-score',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'four-score',
+    name: 'FOUR Score',
+    description: 'Coma exam score from eye, motor, brainstem reflex, and respiration.',
+    path: '/tools/calculators/four-score',
+    calcQuery: '/tools/calculators?calc=four-score',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'modified-rankin-scale',
+    name: 'Modified Rankin Scale',
+    description: 'Global disability outcome scale for stroke and neurologic illness.',
+    path: '/tools/calculators/modified-rankin-scale',
+    calcQuery: '/tools/calculators?calc=modified-rankin-scale',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'nihss-summary-view',
+    name: 'NIHSS Summary View',
+    description: 'NIHSS item summary view for stroke exam documentation and serial comparison.',
+    path: '/tools/calculators/nihss-summary-view',
+    calcQuery: '/tools/calculators?calc=nihss-summary-view',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'pediatric-gcs',
+    name: 'Pediatric GCS',
+    description: 'Pediatric Glasgow Coma Scale with age-adjusted verbal response descriptions.',
+    path: '/tools/calculators/pediatric-gcs',
+    calcQuery: '/tools/calculators?calc=pediatric-gcs',
+    implementation: 'Client-side in neurologyCalculators.jsx (neurologyCalculators.js)',
+    orchestratorId: null,
+  },
+  {
     id: 'shock-index',
     name: 'Shock Index',
     description: 'Hemodynamic screening index from heart rate / systolic blood pressure.',
@@ -2341,6 +3175,42 @@ export const builtinUiCalculators = [
     path: '/tools/calculators/rass',
     calcQuery: '/tools/calculators?calc=rass',
     implementation: 'Client-side in nextWaveCalculators.jsx (nextWaveCalculatorUtils.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'bed-occupancy-calculator',
+    name: 'Bed Occupancy Calculator',
+    description: 'Hospital bed occupancy percentage with blocked-bed and usable-capacity context.',
+    path: '/tools/calculators/bed-occupancy-calculator',
+    calcQuery: '/tools/calculators?calc=bed-occupancy-calculator',
+    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'staffing-ratio-calculator',
+    name: 'Staffing Ratio Calculator',
+    description: 'Patients-per-staff ratio and target coverage gap for operations planning.',
+    path: '/tools/calculators/staffing-ratio-calculator',
+    calcQuery: '/tools/calculators?calc=staffing-ratio-calculator',
+    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'turnaround-time-calculator',
+    name: 'Turnaround Time Calculator',
+    description: 'Turnaround segment total and target variance for operational workflows.',
+    path: '/tools/calculators/turnaround-time-calculator',
+    calcQuery: '/tools/calculators?calc=turnaround-time-calculator',
+    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
+    orchestratorId: null,
+  },
+  {
+    id: 'resource-utilization-index',
+    name: 'Resource Utilization Index',
+    description: 'Composite utilization index across beds, staff, devices, and fleet signals.',
+    path: '/tools/calculators/resource-utilization-index',
+    calcQuery: '/tools/calculators?calc=resource-utilization-index',
+    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
     orchestratorId: null,
   },
   {

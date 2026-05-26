@@ -28,8 +28,9 @@ describe('medicalToolsCatalogIndex', () => {
     const rows = getMedicalToolsCatalogRows();
     const apache = rows.find((r) => r.primaryId === 'apache2-calculator');
     expect(apache?.chatOnRequest).toBe(true);
-    expect(apache?.chatOnlyForm).toBe(true);
-    expect(apache?.category).toBe('chat-assisted');
+    expect(apache?.chatOnlyForm).toBe(false);
+    expect(apache?.pagePath).toBe('/tools/calculators/apache-ii');
+    expect(apache?.uiCalculatorSlug).toBe('apache-ii');
 
     const gfr = rows.find((r) => r.id === 'calc-gfr');
     expect(gfr?.chatOnRequest).toBe(true);

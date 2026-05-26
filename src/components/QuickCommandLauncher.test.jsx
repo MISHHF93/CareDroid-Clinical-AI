@@ -124,4 +124,18 @@ describe('QuickCommandLauncher', () => {
       expect(inventoryIds.has(entry.sourceId), entry.sourceId).toBe(true);
     }
   });
+
+  it('keeps operational sub-surfaces searchable as tools after nav flattening', () => {
+    const entries = buildQuickCommandEntries({
+      tools: getUserFacingToolRegistryProjection(),
+      recentToolIds: [],
+    });
+    const navIds = entries.navEntries.map((entry) => entry.sourceId);
+    const toolIds = entries.toolEntries.map((entry) => entry.sourceId);
+
+    expect(navIds).toContain('operations');
+    expect(navIds).not.toContain('maps');
+    expect(navIds).not.toContain('medical-iot');
+    expect(toolIds).toEqual(expect.arrayContaining(['live-tracking-map', 'hospital-map', 'medical-iot-dashboard']));
+  });
 });

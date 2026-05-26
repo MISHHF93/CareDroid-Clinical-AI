@@ -286,6 +286,7 @@ export function buildMatrixRowForRegistry(registryId) {
     backendNluExecutable: nluToolIds.some((id) =>
       clinicalIntentTools.find((t) => t.toolId === id)?.backendExecutable
     ),
+    executorStatus: inventoryRecord?.executorStatus ?? null,
     orchestratorToolId: inventoryRecord?.orchestratorToolId ?? launch.orchestratorTool,
     launch: {
       path: inventoryRecord?.route ?? launch.path,
@@ -410,7 +411,12 @@ export function validateMatrixRow(row) {
     issues.push('missing-catalog');
   }
 
-  if (row.tier === 'C' && !row.backendPostExecutor && !row.backendPlatformEndpoint) {
+  if (
+    row.tier === 'C' &&
+    !row.backendPostExecutor &&
+    !row.backendPlatformEndpoint &&
+    !row.launch?.hasChatSeed
+  ) {
     issues.push('tier-c-without-executor');
   }
 

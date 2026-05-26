@@ -28,6 +28,12 @@ import {
 } from '../ai/prompts/clinical-query.prompt';
 import { calculateConfidence, getConfidenceDisclaimer } from '../ai/utils/confidence-scorer';
 import { CalculatorRecommenderService } from './calculator-recommender.service';
+import {
+  AiContextManagerService,
+  AiGatewayService,
+  AiResponseComposerService,
+  AiRoutingEngineService,
+} from '../ai/foundation';
 
 interface QueryResponse {
   text: string;
@@ -46,6 +52,7 @@ interface QueryResponse {
   citations?: MedicalSource[];
   confidence?: number;
   ragContext?: any;
+  metadata?: Record<string, any>;
 }
 
 @Injectable()
@@ -65,6 +72,10 @@ export class ChatService {
     private readonly nluMetrics: NluMetricsService,
     private readonly configService: ConfigService,
     private readonly calculatorRecommender: CalculatorRecommenderService,
+    private readonly aiGateway: AiGatewayService,
+    private readonly aiRoutingEngine: AiRoutingEngineService,
+    private readonly aiContextManager: AiContextManagerService,
+    private readonly aiResponseComposer: AiResponseComposerService,
   ) {
     const ragConfig = this.configService.get<any>('rag');
     this.ragEnabled = ragConfig?.enabled !== false;
@@ -94,6 +105,14 @@ export class ChatService {
     userRole?: string,
   ): Promise<QueryResponse> {
     this.logger.log(`💬 Processing chat message: "${message}"`);
+    const aiRunEnvelope = this.aiGateway.createRunEnvelope({
+      message,
+      tool,
+      feature,
+      conversationId,
+      userId: userId || 'anonymous',
+      sourceSurface: 'assistant-chat',
+    });
 
     // ========================================
     // STEP 1: INTENT CLASSIFICATION
@@ -121,7 +140,9 @@ export class ChatService {
           userId,
           action: AuditAction.AI_QUERY,
           resource: 'chat/intent-classification',
-          details: {
+          metadata: {
+            runId: aiRunEnvelope.runId,
+            capabilityId: aiRunEnvelope.capabilityId,
             message: message.substring(0, 100),
             intent: classification.primaryIntent,
             toolId: classification.toolId,
@@ -141,6 +162,9 @@ export class ChatService {
     }
 
     classification = this.mergeUiToolRegistryHint(tool, classification);
+    const routePlan = this.aiRoutingEngine.createRoutePlan(aiRunEnvelope, classification);
+    const contextPacket = this.aiContextManager.buildContextPacket(aiRunEnvelope, routePlan);
+    const modelFoundationContext = this.aiContextManager.toModelContext(contextPacket);
 
     // ========================================
     // STEP 2: EMERGENCY DETECTION & ESCALATION
@@ -164,7 +188,8 @@ export class ChatService {
       });
 
       // Return emergency response with escalation details
-      return {
+      return this.aiResponseComposer.compose(
+        {
         text: escalationResult.message,
         suggestions: escalationResult.recommendations.slice(0, 3), // Top 3 recommendations
         emergencyAlert: {
@@ -176,7 +201,12 @@ export class ChatService {
           medicalDirectorNotified: escalationResult.medicalDirectorNotified,
         },
         intentClassification: classification,
-      };
+        },
+        aiRunEnvelope,
+        routePlan,
+        contextPacket,
+        { emergencySeverity: classification.emergencySeverity },
+      );
     }
 
     // ========================================
@@ -187,6 +217,7 @@ export class ChatService {
       feature,
       conversationId,
       intentClassification: classification,
+      aiFoundation: modelFoundationContext,
     };
 
     if (
@@ -194,16 +225,29 @@ export class ChatService {
       feature === 'calculator-recommender-ai' ||
       classification?.toolId === 'calculator-recommender-ai'
     ) {
-      return this.handleCalculatorRecommendation(message, classification);
+      const response = await this.handleCalculatorRecommendation(message, classification);
+      return this.aiResponseComposer.compose(response, aiRunEnvelope, routePlan, contextPacket);
     }
 
     // Route based on intent
     if (classification?.primaryIntent === PrimaryIntent.CLINICAL_TOOL) {
-      return this.handleClinicalTool(message, classification, userId);
+      const response = await this.handleClinicalTool(
+        message,
+        classification,
+        userId,
+        modelFoundationContext,
+      );
+      return this.aiResponseComposer.compose(response, aiRunEnvelope, routePlan, contextPacket);
     }
 
     if (classification?.primaryIntent === PrimaryIntent.MEDICAL_REFERENCE) {
-      return this.handleMedicalReference(message, classification, userId);
+      const response = await this.handleMedicalReference(
+        message,
+        classification,
+        userId,
+        modelFoundationContext,
+      );
+      return this.aiResponseComposer.compose(response, aiRunEnvelope, routePlan, contextPacket);
     }
 
     // Default: General AI response with optional RAG
@@ -328,7 +372,8 @@ export class ChatService {
         }
       }
 
-      return {
+      return this.aiResponseComposer.compose(
+        {
         text: responseText,
         suggestions: citations.length > 0 ? ['View sources', 'Related topics'] : [],
         visualizations: [],
@@ -336,15 +381,25 @@ export class ChatService {
         citations,
         confidence,
         toolResult: toolResults,
-      };
+        },
+        aiRunEnvelope,
+        routePlan,
+        contextPacket,
+      );
     } catch (error) {
       this.logger.warn('AI service unavailable, falling back to simulated response.');
       const fallback = await this.generateAIResponse(message, context);
 
-      return {
-        ...fallback,
-        intentClassification: classification,
-      };
+      return this.aiResponseComposer.compose(
+        {
+          ...fallback,
+          intentClassification: classification,
+        },
+        aiRunEnvelope,
+        routePlan,
+        contextPacket,
+        { fallbackReason: error instanceof Error ? error.message : String(error) },
+      );
     }
   }
 
@@ -556,6 +611,7 @@ export class ChatService {
     message: string,
     classification: any,
     userId?: string,
+    aiFoundation?: Record<string, any>,
   ): Promise<QueryResponse> {
     const toolId = classification.toolId;
     const parameters = classification.extractedParameters || {};
@@ -595,6 +651,12 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
                 p.type === 'number' ? 0 : p.type === 'boolean' ? false : '',
               ]),
             ),
+            {
+              feature: 'tool-parameter-extraction',
+              intentClassification: classification,
+              tool: toolId,
+              aiFoundation,
+            },
           );
 
           // Filter out null values
@@ -737,6 +799,7 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
     message: string,
     classification: any,
     userId?: string,
+    aiFoundation?: Record<string, any>,
   ): Promise<QueryResponse> {
     this.logger.log(`📚 Handling medical reference query with RAG`);
 
@@ -773,7 +836,8 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
           userId,
           action: AuditAction.AI_QUERY,
           resource: 'chat/rag-retrieval',
-          details: {
+          metadata: {
+            aiFoundation,
             query: message.substring(0, 100),
             chunksRetrieved: ragContext.chunks.length,
             sources: ragContext.sources.map((s) => s.id),
@@ -855,8 +919,12 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
       // ========================================
       const aiResponse = await this.aiService.invokeLLM(userId || 'anonymous', prompt, {
         intentType: 'medical_reference',
+        feature: 'medical_reference',
         ragEnabled: true,
         confidence: confidenceScore.score,
+        conversationId: aiFoundation?.conversationId,
+        intentClassification: classification,
+        aiFoundation,
       });
 
       let responseText = aiResponse.content || 'Unable to generate response.';

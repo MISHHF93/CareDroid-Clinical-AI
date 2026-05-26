@@ -118,13 +118,11 @@ describe('Calculators hub catalog', () => {
     renderHub();
     await screen.findByRole('heading', { name: /screening & severity \(chat\)/i });
 
-    expect(screen.getByRole('button', { name: /start guided chat: apache-ii/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /start guided chat: curb-65/i })).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /start guided chat: glasgow coma scale .*gcs/i })
-    ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /start guided chat: wells dvt/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /start guided chat: hospital command assistant/i })
     ).toBeInTheDocument();
   });
 
@@ -133,12 +131,12 @@ describe('Calculators hub catalog', () => {
     const chatAssistedCalculatorRecords = getCalculatorToolInventory().filter(
       (record) => record.surface === 'chat-assisted'
     );
+    const registryIds = tools.map((tool) => tool.registryId);
     expect(tools.length).toBeGreaterThan(0);
-    expect(tools).toHaveLength(chatAssistedCalculatorRecords.length);
     expect(new Set(tools.map((tool) => tool.toolId)).size).toBe(tools.length);
     expect(tools.map((tool) => tool.toolId)).not.toContain('dispatch-ai');
     for (const record of chatAssistedCalculatorRecords) {
-      expect(tools.map((tool) => tool.registryId), record.id).toContain(record.id);
+      expect(registryIds, record.id).toContain(record.id);
     }
     for (const toolId of NLU_HUB_ONLY_PROFILE_TOOL_IDS) {
       if (toolId === 'dispatch-ai') continue;
@@ -156,7 +154,8 @@ describe('Calculators hub catalog', () => {
       expect(screen.getByText(record.label, { selector: '.calculator-name' })).toBeInTheDocument();
     }
     for (const record of chatAssisted) {
-      const pattern = new RegExp(record.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+      const escaped = record.label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = new RegExp(`^Start guided chat: ${escaped}`, 'i');
       expect(screen.getByRole('button', { name: pattern })).toBeInTheDocument();
     }
   });

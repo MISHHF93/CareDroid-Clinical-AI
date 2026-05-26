@@ -20,8 +20,12 @@ import {
   offlineClinicalFeatures,
   workspaceTemplateCatalog,
 } from './clinicalCatalogWiring';
-import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
+import {
+  MEDICAL_EXPANSION_CATEGORY_PACKS,
+  ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+} from './clinicalToolIdContract';
 import { nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
+import { PLATFORM_SYSTEM_CAPABILITIES } from './platformSystems';
 
 /**
  * Source-audit-only references. Keep these split so Developer Catalog can
@@ -665,15 +669,42 @@ function aliasRows() {
 }
 
 function platformRows() {
-  return platformFeatures.map((item) => ({
-    id: item.id,
-    name: item.name,
-    source: 'src/data/featureInventory.js',
-    status: 'platform',
-    category: item.category?.toLowerCase() || 'platform',
-    type: item.type,
-    path: item.path,
-    notes: item.description,
+  return [
+    ...platformFeatures.map((item) => ({
+      id: item.id,
+      name: item.name,
+      source: 'src/data/featureInventory.js',
+      status: 'platform',
+      category: item.category?.toLowerCase() || 'platform',
+      type: item.type,
+      path: item.path,
+      notes: item.description,
+    })),
+    ...PLATFORM_SYSTEM_CAPABILITIES.map((item) => ({
+      id: item.id,
+      name: item.name,
+      source: 'src/data/platformSystems.js',
+      status: 'platform-system',
+      category: item.category?.toLowerCase() || 'platform',
+      pack: item.pack,
+      tier: item.tier,
+      path: item.route,
+      apiPath: item.endpoint,
+      notes: item.summary,
+    })),
+  ];
+}
+
+function categoryPackRows() {
+  return MEDICAL_EXPANSION_CATEGORY_PACKS.map((pack) => ({
+    id: `category-pack-${pack.id}`,
+    name: `${pack.label} category pack`,
+    source: 'clinicalToolIdContract.MEDICAL_EXPANSION_CATEGORY_PACKS',
+    status: 'category-pack',
+    category: 'pack',
+    path: '/tools',
+    notes: `Tier A: ${pack.tierA.length}; Tier B: ${pack.tierB.length}; Tier C: ${pack.tierC.length}`,
+    toolIds: [...pack.tierA, ...pack.tierB, ...pack.tierC],
   }));
 }
 
@@ -797,6 +828,7 @@ export function getAllDiscoveredTools() {
     ...routingCapabilities,
     ...collaborationCapabilities,
     ...emergencyPatternRows(),
+    ...categoryPackRows(),
     ...platformRows(),
     ...aliasRows(),
     ...workspaceRows(),
@@ -826,6 +858,8 @@ export function getSourceCodeDiscoverySummary() {
     routingIntents: routingCapabilities.length,
     emergencyPatterns: emergencyPatternGroups.length,
     platformFeatures: platformFeatures.length,
+    platformSystems: PLATFORM_SYSTEM_CAPABILITIES.length,
+    categoryPacks: MEDICAL_EXPANSION_CATEGORY_PACKS.length,
     collaboration: collaborationCapabilities.length,
     nluPatternCount: clinicalIntentTools.length,
     orchestratorExecutorCount: ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS.length,
@@ -853,5 +887,10 @@ export const SOURCE_SCAN_LOCATIONS = [
   { label: 'Client clinical helpers', path: 'riskScoring.js, clinicalInsights.js, ToolVisualization.jsx', count: clientClinicalCapabilities.length },
   { label: 'Orchestrator API endpoints', path: 'tool-orchestrator.controller.ts', count: orchestratorApiCapabilities.length },
   { label: 'Platform features', path: 'src/data/featureInventory.js', count: platformFeatures.length },
+  {
+    label: 'Category packs 2-10',
+    path: 'src/data/clinicalToolIdContract.js',
+    count: MEDICAL_EXPANSION_CATEGORY_PACKS.length,
+  },
   { label: 'ID aliases', path: 'sourceCodeToolDiscovery.toolIdAliases', count: toolIdAliases.length },
 ];

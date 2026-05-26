@@ -50,8 +50,14 @@ describe('MedicalIotDashboard', () => {
     expect((await screen.findAllByText(/demo telemetry/i)).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/monitoring support only/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/mock telemetry, not live patient data/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /ask assistant/i })).toHaveAttribute('href', '/assistant');
     expect(screen.getAllByText(/Bed 12 Pulse Oximeter/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/SpO2/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Respiratory rate/i)).toBeInTheDocument();
+    expect(screen.getByText(/Temperature/i)).toBeInTheDocument();
+    expect(screen.getByText(/Oxygen flow/i)).toBeInTheDocument();
+    expect(screen.getByText(/Infusion state/i)).toBeInTheDocument();
+    expect(screen.getByText(/Ventilator mode/i)).toBeInTheDocument();
     expect(screen.getByText(/device status distribution/i)).toBeInTheDocument();
     expect(screen.getByText(/heart rate trend/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /device location map/i })).toBeInTheDocument();
@@ -67,6 +73,8 @@ describe('MedicalIotDashboard', () => {
     const drawer = screen.getByRole('complementary', { name: /bed 12 pulse oximeter details/i });
     expect(within(drawer).getByText(/icu \/ bed 12a/i)).toBeInTheDocument();
     expect(within(drawer).getByText(/demo bedside gateway coordinate/i)).toBeInTheDocument();
+    expect(within(drawer).getByText(/signal strength/i)).toBeInTheDocument();
+    expect(within(drawer).getByText(/low oxygen saturation/i)).toBeInTheDocument();
 
     await user.selectOptions(screen.getByRole('combobox', { name: /status/i }), 'offline');
     expect(screen.getByRole('button', { name: /open home bp cuff details/i })).toBeInTheDocument();

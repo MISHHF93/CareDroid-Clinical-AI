@@ -26,34 +26,48 @@ describe('Hospital operations wiring', () => {
       REGISTRY.telemetryMonitoring,
       REGISTRY.deviceMaintenance,
       REGISTRY.hospitalOperationsCommand,
+      REGISTRY.assetTrackingDashboard,
+      REGISTRY.incidentCommandCenter,
+      REGISTRY.hospitalOperationsCockpit,
+      REGISTRY.deviceBatteryIntelligence,
+      REGISTRY.capacityPredictionEngine,
     ]);
     expect(CANONICAL_TOOL_GROUPS.hospitalOperations).toEqual(HOSPITAL_OPERATIONS_REGISTRY_IDS);
   });
 
   it('registers Hospital Map as a protected App route and launch path', () => {
     expect(TOOL_LAUNCH_PATHS.hospitalMap).toBe('/hospital-map');
+    expect(TOOL_LAUNCH_PATHS.deviceFleet).toBe('/devices');
     expect(appSource).toContain("path: '/hospital-map'");
+    expect(appSource).toContain("path: '/devices'");
     expect(appSource).toContain('HospitalMapDashboard');
+    expect(appSource).toContain('DeviceFleetManagement');
   });
 
   it('keeps registry rows and catalog launches aligned', () => {
     for (const id of HOSPITAL_OPERATIONS_REGISTRY_IDS) {
       const reg = toolRegistryById[id];
-      expect(reg?.path, id).toBe('/hospital-map');
-      expect(reg?.category, id).toBe('Hospital Operations');
+      expect(['/hospital-map', '/medical-iot', '/devices']).toContain(reg?.path);
+      expect(['Hospital Operations', 'IoT']).toContain(reg?.category);
 
       const launch = resolveCatalogLaunch(id);
-      expect(launch.path, id).toBe('/hospital-map');
+      expect(['/hospital-map', '/medical-iot', '/devices']).toContain(launch.path);
       expect(launch.registryId, id).toBe(id);
     }
   });
 
   it('resolves hospital operations aliases', () => {
     expect(NLU_TO_REGISTRY_ID['hospital map']).toBe(REGISTRY.hospitalMap);
+    expect(resolveRegistryId('show-hospital-map')).toBe(REGISTRY.hospitalMap);
+    expect(resolveRegistryId('show hospital map')).toBe(REGISTRY.hospitalMap);
+    expect(resolveRegistryId('open medical iot dashboard')).toBe(REGISTRY.medicalIotDashboard);
     expect(resolveRegistryId('hospital-map')).toBe(REGISTRY.hospitalMap);
     expect(resolveRegistryId('device-fleet-management')).toBe(REGISTRY.deviceFleetManagement);
+    expect(resolveCatalogLaunch('open device fleet').path).toBe('/devices');
     expect(resolveRegistryId('telemetry-gaps')).toBe(REGISTRY.telemetryMonitoring);
     expect(resolveRegistryId('maintenance-overdue')).toBe(REGISTRY.deviceMaintenance);
+    expect(resolveRegistryId('asset-tracking-dashboard')).toBe(REGISTRY.assetTrackingDashboard);
+    expect(resolveRegistryId('capacity-prediction-engine')).toBe(REGISTRY.capacityPredictionEngine);
   });
 
   it('surfaces Hospital Map in user-facing tools and the command dashboard', () => {

@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools, builtinUiCalculators, nluCalculatorHubOnly } from './clinicalIntentToolCatalog';
+import { CHAT_ASSISTED_HUB_GROUPS } from './chatAssistedHubGroups';
 import {
   REGISTRY,
   NLU,
@@ -96,6 +97,7 @@ describe('clinicalToolIdContract — canonical groups', () => {
       ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsHub,
       ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierA,
       ...CANONICAL_TOOL_GROUPS.fleetLogisticsTierBChat,
+      ...CANONICAL_TOOL_GROUPS.hospitalOperationsTierBChat,
       ...CANONICAL_TOOL_GROUPS.liveTrackingMaps,
       ...CANONICAL_TOOL_GROUPS.medicalIotDashboards,
       ...CANONICAL_TOOL_GROUPS.hospitalOperations,
@@ -228,6 +230,17 @@ describe('clinicalToolIdContract — NLU profile drift', () => {
     const backendIds = patternToolIds();
     const contractIds = sortedUnique([...NLU_PROFILE_TOOL_IDS]);
     expect(backendIds).toEqual(contractIds);
+  });
+
+  it('backend tool.patterns.ts toolIds are covered by catalog rows or chat-assisted hub groups', () => {
+    const catalogIds = clinicalIntentTools.map((t) => t.toolId);
+    const hubOnlyIds = nluCalculatorHubOnly.map((t) => t.toolId);
+    const groupedChatIds = CHAT_ASSISTED_HUB_GROUPS.flatMap((group) => group.toolIds);
+    const coveredIds = new Set([...catalogIds, ...hubOnlyIds, ...groupedChatIds]);
+
+    for (const toolId of patternToolIds()) {
+      expect(coveredIds.has(toolId), `${toolId} must be launchable through catalog or chat hub`).toBe(true);
+    }
   });
 
   it('AI_EXECUTABLE_NLU_TOOL_IDS are flagged as backend-routed in clinicalIntentTools', () => {

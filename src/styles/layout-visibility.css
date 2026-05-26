@@ -150,6 +150,30 @@ body {
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
 }
 
+/* Map and telemetry canvases own horizontal overflow; the route scrollport stays vertical-only. */
+.live-map-canvas,
+.hospital-map-canvas,
+.medical-iot-map-canvas,
+.fleet-map-canvas {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.live-map-page :is(h1, h2, h3, p, span, small, dt, dd, button, a),
+.hospital-map-page :is(h1, h2, h3, p, span, small, dt, dd, button, a),
+.medical-iot-page :is(h1, h2, h3, p, span, small, dt, dd, button, a),
+.device-fleet-page :is(h1, h2, h3, p, span, small, dt, dd, button, a),
+.fleet-live-map-page :is(h1, h2, h3, p, span, small, dt, dd, button, a) {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
 @media (max-width: 768px) {
   .tools-overview .header-stats {
     flex-wrap: wrap;

@@ -4,7 +4,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import Sidebar from '../components/Sidebar';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon } from '../navigation/iconRegistry';
-import { PRIMARY_NAV_ITEMS, primaryNavPathMatches } from '../navigation/primaryNavigation';
+import { PRIMARY_MOBILE_NAV_ITEMS, primaryNavPathMatches } from '../navigation/primaryNavigation';
 import { useDrawerFocus } from '../hooks/useDrawerFocus';
 import QuickCommandLauncher from '../components/QuickCommandLauncher';
 import {
@@ -198,7 +198,7 @@ const AppShell = ({
         )}
         {isAuthed && isCompact && (
           <nav className="app-shell-bottom-nav" aria-label="Primary navigation">
-            {PRIMARY_NAV_ITEMS.filter((item) => item.showInMobile !== false).map((item) => {
+            {PRIMARY_MOBILE_NAV_ITEMS.map((item) => {
               const isActive = primaryNavPathMatches(item, location.pathname);
               return (
                 <button

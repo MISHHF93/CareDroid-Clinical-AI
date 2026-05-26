@@ -29,6 +29,12 @@ export const UNSUPPORTED_ORCHESTRATOR_NLU_TOOL_IDS = Object.freeze(
  */
 
 const FLEET_NLU = new Set([NLU.fleetCommand, NLU.predictiveMaintenance, NLU.routeOptimizer]);
+const OPERATIONS_CHAT_NLU = new Set([
+  NLU.dispatchAi,
+  NLU.hospitalCommandAssistant,
+  NLU.resourceAllocationAssistant,
+  NLU.deviceRecommendationAssistant,
+]);
 const CLINICAL_PAGE_NLU = new Set([
   NLU.protocolLookup,
   NLU.aclsProtocol,
@@ -56,13 +62,13 @@ const CLINICAL_PAGE_NLU = new Set([
 export function buildUnsupportedOrchestratorToolDocs() {
   return UNSUPPORTED_ORCHESTRATOR_NLU_TOOL_IDS.map((nluToolId) => {
     let surface = 'calculator-form';
-    if (nluToolId === NLU.dispatchAi) surface = 'chat-assisted';
+    if (OPERATIONS_CHAT_NLU.has(nluToolId)) surface = 'chat-assisted';
     else if (FLEET_NLU.has(nluToolId)) surface = 'fleet';
     else if (CLINICAL_PAGE_NLU.has(nluToolId)) surface = 'clinical-page';
 
     const reason =
-      nluToolId === NLU.dispatchAi
-        ? 'Chat/NLU routing only; no POST /tools/:id/execute handler.'
+      OPERATIONS_CHAT_NLU.has(nluToolId)
+        ? 'Chat/NLU routing only; no POST /tools/:id/execute handler and no autonomous operations action.'
         : surface === 'calculator-form'
           ? 'Deterministic client-side calculator or chat-assisted scoring; no server executor.'
           : 'Clinical page or chat workflow; no tool-orchestrator registerTool().';

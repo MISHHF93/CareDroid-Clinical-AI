@@ -10,6 +10,8 @@ import {
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
   CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS,
   CLINICAL_AI_PAGE_REGISTRY_IDS,
+  HOSPITAL_OPERATIONS_REGISTRY_IDS,
+  HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_IDS,
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
   REGISTRY,
 } from './clinicalToolIdContract.js';
@@ -120,10 +122,41 @@ export const TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.auditC]: '/tools/calculators/audit-c',
   [REGISTRY.phq9]: '/tools/calculators/phq9',
   [REGISTRY.gad7]: '/tools/calculators/gad7',
+  [REGISTRY.cage]: '/tools/calculators/cage',
+  [REGISTRY.mmse]: '/tools/calculators/mmse',
+  [REGISTRY.mocaPlaceholderWorkflow]: '/tools/calculators/moca-placeholder-workflow',
+  [REGISTRY.pcl5]: '/tools/calculators/pcl5',
+  [REGISTRY.mdq]: '/tools/calculators/mdq',
+  [REGISTRY.epworthSleepinessScale]: '/tools/calculators/epworth-sleepiness-scale',
+  [REGISTRY.columbiaSuicideSeverityWorkflow]:
+    '/tools/calculators/columbia-suicide-severity-workflow',
   [REGISTRY.abcd2]: '/tools/calculators/abcd2',
+  [REGISTRY.huntHessScale]: '/tools/calculators/hunt-hess-scale',
+  [REGISTRY.ichScore]: '/tools/calculators/ich-score',
+  [REGISTRY.fourScore]: '/tools/calculators/four-score',
+  [REGISTRY.modifiedRankinScale]: '/tools/calculators/modified-rankin-scale',
+  [REGISTRY.nihssSummaryView]: '/tools/calculators/nihss-summary-view',
+  [REGISTRY.pediatricGcs]: '/tools/calculators/pediatric-gcs',
+  [REGISTRY.gestationalAgeCalculator]: '/tools/calculators/gestational-age-calculator',
+  [REGISTRY.pediatricBpPercentile]: '/tools/calculators/pediatric-bp-percentile',
+  [REGISTRY.pregnancyDueDateCalculator]: '/tools/calculators/pregnancy-due-date-calculator',
+  [REGISTRY.fentonGrowthChartHelper]: '/tools/calculators/fenton-growth-chart-helper',
+  [REGISTRY.neonatalBilirubinRiskHelper]: '/tools/calculators/neonatal-bilirubin-risk-helper',
+  [REGISTRY.pediatricDoseSafetyChecker]: '/tools/calculators/pediatric-dose-safety-checker',
   [REGISTRY.shockIndex]: '/tools/calculators/shock-index',
   [REGISTRY.anionGap]: '/tools/calculators/anion-gap',
   [REGISTRY.rass]: '/tools/calculators/rass',
+  [REGISTRY.bedOccupancyCalculator]: '/tools/calculators/bed-occupancy-calculator',
+  [REGISTRY.staffingRatioCalculator]: '/tools/calculators/staffing-ratio-calculator',
+  [REGISTRY.turnaroundTimeCalculator]: '/tools/calculators/turnaround-time-calculator',
+  [REGISTRY.resourceUtilizationIndex]: '/tools/calculators/resource-utilization-index',
+  [REGISTRY.homaIr]: '/tools/calculators/homa-ir',
+  [REGISTRY.correctedCalcium]: '/tools/calculators/corrected-calcium',
+  [REGISTRY.serumOsmolality]: '/tools/calculators/serum-osmolality',
+  [REGISTRY.bsa]: '/tools/calculators/bsa',
+  [REGISTRY.idealBodyWeight]: '/tools/calculators/ideal-body-weight',
+  [REGISTRY.adjustedBodyWeight]: '/tools/calculators/adjusted-body-weight',
+  [REGISTRY.waistHipRatio]: '/tools/calculators/waist-hip-ratio',
 });
 
 const TIER_B_LAUNCH_PATH = '/tools/calculators';
@@ -165,6 +198,27 @@ const TIER_C_PAGE_PATH_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.endoscopyWorkflowAssistant]: '/tools/gastroenterology/endoscopy-workflow-assistant',
   [REGISTRY.cirrhosisMonitoringEngine]: '/tools/gastroenterology/cirrhosis-monitoring-engine',
   [REGISTRY.giCommandCenter]: '/tools/gastroenterology/gi-command-center',
+  [REGISTRY.glucoseTelemetryDashboard]: '/tools/endocrine/glucose-telemetry-dashboard',
+  [REGISTRY.insulinTrendEngine]: '/tools/endocrine/insulin-trend-engine',
+  [REGISTRY.endocrineMonitoringSystem]: '/tools/endocrine/endocrine-monitoring-system',
+  [REGISTRY.metabolicAnalytics]: '/tools/endocrine/metabolic-analytics',
+  [REGISTRY.continuousGlucoseCommandCenter]:
+    '/tools/endocrine/continuous-glucose-command-center',
+  [REGISTRY.neuroTelemetryDashboard]: '/tools/neurology/neuro-telemetry-dashboard',
+  [REGISTRY.strokeCommandCenter]: '/tools/neurology/stroke-command-center',
+  [REGISTRY.neuroMonitoringEngine]: '/tools/neurology/neuro-monitoring-engine',
+  [REGISTRY.eegTrendDashboard]: '/tools/neurology/eeg-trend-dashboard',
+  [REGISTRY.neurologyTimelineAi]: '/tools/neurology/neurology-timeline-ai',
+  [REGISTRY.neonatalDashboard]: '/tools/pediatrics-obgyn/neonatal-dashboard',
+  [REGISTRY.maternalMonitoringDashboard]: '/tools/pediatrics-obgyn/maternal-monitoring-dashboard',
+  [REGISTRY.pediatricCommandCenter]: '/tools/pediatrics-obgyn/pediatric-command-center',
+  [REGISTRY.growthTrendAnalytics]: '/tools/pediatrics-obgyn/growth-trend-analytics',
+  [REGISTRY.perinatalRiskDashboard]: '/tools/pediatrics-obgyn/perinatal-risk-dashboard',
+  [REGISTRY.behavioralAnalyticsDashboard]: '/tools/psychiatry/behavioral-analytics-dashboard',
+  [REGISTRY.screeningTrendEngine]: '/tools/psychiatry/screening-trend-engine',
+  [REGISTRY.psychiatryMonitoringDashboard]: '/tools/psychiatry/psychiatry-monitoring-dashboard',
+  [REGISTRY.crisisEscalationAuditLog]: '/tools/psychiatry/crisis-escalation-audit-log',
+  [REGISTRY.populationScreeningDashboard]: '/tools/psychiatry/population-screening-dashboard',
 });
 
 const TIER_B_LABEL_BY_REGISTRY_ID = Object.freeze({
@@ -267,6 +321,13 @@ export function buildResponsiveQaPages() {
       registryId: REGISTRY.hospitalMap,
     },
     {
+      id: 'devices',
+      label: 'Device Fleet Management',
+      path: '/devices',
+      category: 'core',
+      registryId: REGISTRY.deviceFleetManagement,
+    },
+    {
       id: 'tools-catalog',
       label: 'Developer Catalog / Source Audit',
       path: '/tools/catalog',
@@ -277,6 +338,36 @@ export function buildResponsiveQaPages() {
       label: 'Calculators hub (Tier B launch surface)',
       path: TIER_B_LAUNCH_PATH,
       category: 'core',
+    },
+    {
+      id: 'integrations-platform',
+      label: 'Interoperability platform hub',
+      path: '/integrations',
+      category: 'platform',
+    },
+    {
+      id: 'workflow-builder-ai',
+      label: 'Workflow Builder AI platform shell',
+      path: '/tools/workflow-builder-ai',
+      category: 'platform',
+    },
+    {
+      id: 'patient-workspace-platform',
+      label: 'Patient Workspace platform shell',
+      path: '/patients/demo-patient/workspace',
+      category: 'platform',
+    },
+    {
+      id: 'soap-builder',
+      label: 'SOAP Builder documentation shell',
+      path: '/tools/soap-builder',
+      category: 'platform',
+    },
+    {
+      id: 'governance-platform',
+      label: 'Governance platform hub',
+      path: '/governance',
+      category: 'platform',
     },
   ];
 
@@ -297,6 +388,7 @@ export function buildResponsiveQaPages() {
   for (const registryId of [
     ...CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
     ...FLEET_TIER_B_CHAT_REGISTRY_IDS,
+    ...HOSPITAL_OPERATIONS_TIER_B_CHAT_REGISTRY_IDS,
   ]) {
     pages.push({
       id: `tier-b-${registryId}`,
@@ -336,6 +428,20 @@ export function buildResponsiveQaPages() {
   }
 
   pages.push(...FLEET_PAGES);
+
+  for (const registryId of HOSPITAL_OPERATIONS_REGISTRY_IDS) {
+    const path =
+      registryId === REGISTRY.deviceBatteryIntelligence
+        ? '/medical-iot'
+        : '/hospital-map';
+    pages.push({
+      id: `hospital-ops-${registryId}`,
+      label: `Hospital operations: ${registryId}`,
+      path,
+      category: 'hospital-ops',
+      registryId,
+    });
+  }
 
   return Object.freeze(pages);
 }

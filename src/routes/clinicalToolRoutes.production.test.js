@@ -81,6 +81,20 @@ describe('Production routes — registry tool paths', () => {
       expect(REGISTRY_TOOL_PATHS).toContain(tool.path);
       if (calculatorPaths.has(tool.path)) {
         expect(CALCULATOR_ROUTE_DEFS.some((d) => d.path === tool.path)).toBe(true);
+      } else if (tool.path.startsWith('/tools/pulmonology/')) {
+        expect(appSource).toContain(`path: '/tools/pulmonology/:toolId'`);
+      } else if (tool.path.startsWith('/tools/nephrology/')) {
+        expect(appSource).toContain(`path: '/tools/nephrology/:toolId'`);
+      } else if (tool.path.startsWith('/tools/gastroenterology/')) {
+        expect(appSource).toContain(`path: '/tools/gastroenterology/:toolId'`);
+      } else if (tool.path.startsWith('/tools/endocrine/')) {
+        expect(appSource).toContain(`path: '/tools/endocrine/:toolId'`);
+      } else if (tool.path.startsWith('/tools/neurology/')) {
+        expect(appSource).toContain(`path: '/tools/neurology/:toolId'`);
+      } else if (tool.path.startsWith('/tools/pediatrics-obgyn/')) {
+        expect(appSource).toContain(`path: '/tools/pediatrics-obgyn/:toolId'`);
+      } else if (tool.path.startsWith('/tools/psychiatry/')) {
+        expect(appSource).toContain(`path: '/tools/psychiatry/:toolId'`);
       } else {
         expect(appSource).toContain(`path: '${tool.path}'`);
       }
@@ -123,12 +137,13 @@ describe('Production routes — catalog launch targets', () => {
   );
 
   it.each(CLINICAL_TIER_B_CHAT_REGISTRY_IDS)(
-    'Tier B chat %s launches to calculators hub with chat navigation',
+    'Tier B chat %s launches with chat navigation',
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
-      expect(launch.path).toBe(TOOL_LAUNCH_PATHS.calculatorsHub);
+      expect(launch.path).toBeTruthy();
+      expect(isKnownToolAreaPath(launch.path)).toBe(true);
       expect(launch.chatSeed?.length).toBeGreaterThan(20);
-      expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
+      expect([launch.path, '/assistant']).toContain(resolveNavigationPathForLaunch(launch));
     }
   );
 

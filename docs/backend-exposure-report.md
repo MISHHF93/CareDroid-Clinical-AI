@@ -1,45 +1,66 @@
-# Backend Exposure Report
+# Backend exposure report
 
-Status: source-aligned harness summary
+**Generated:** 2026-05-25T04:54:39.023Z
 
-This report should be regenerated from backend route and frontend API exposure inventories when package tooling is available:
+> Regenerate: `npm run exposure:write-docs`
 
-```bash
-npm run exposure:write-docs
-```
+## Executive summary
 
-## Source Inventories
+| Metric | Count |
+|--------|------:|
+| Backend HTTP routes (inventory) | 153 |
+| Frontend API calls (inventory) | 137 |
+| Wired (route exists) | 119 |
+| Gated stubs (no route, capability off) | 18 |
+| Unguarded missing routes | 0 |
+| POST executors (backend) | 3 |
+| Contract gaps (matrix) | 0 |
 
-- Backend routes: `src/data/backendHttpRouteInventory.js`
-- Frontend API calls: `src/data/frontendApiCallsInventory.js`
-- Capability flags: `src/config/backendApiCapabilities.js`
-- Exposure policy: `src/data/backendRouteExposurePolicy.js`
-- Capability exposure matrix: `src/data/capabilityExposureMatrix.js`
+## Vite dev proxy
 
-## Exposure Rules
+| Setting | Value |
+|---------|-------|
+| Frontend dev port | 8000 |
+| Preview port | 4173 |
+| Proxy target | http://localhost:3000 |
+| Proxies `/api` | yes |
+| Proxies `/health` | yes |
+| Proxies `/socket.io` | yes |
+| Server uses shared proxy helper | yes |
+| Preview uses shared proxy helper | yes |
 
-- User-facing frontend calls must match a backend route or a disabled capability gate.
-- Backend routes intended for users must be listed in the frontend API inventory before UI entry points are added.
-- Backend routes not ready for users should be documented as internal, deferred, unsupported, or capability-gated.
-- Clinical intelligence routes must carry permission preflight in `App.jsx` and `toolInventory.js`.
-- Missing routes must produce disabled UI, local fallback, or clear unsupported messaging, never blank screens.
+## Registered POST executors
 
-## Known Exposure Classes
+- `sofa-calculator` → `POST /api/tools/sofa-calculator/execute`
+- `drug-interactions` → `POST /api/tools/drug-interactions/execute`
+- `lab-interpreter` → `POST /api/tools/lab-interpreter/execute`
 
-| Class | Examples | Harness rule |
-|---|---|---|
-| Fully exposed user routes | Auth, profile, subscriptions, chat, clinical intelligence, audit, notifications, tools list/execute/results | Keep frontend calls, backend routes, permissions, and tests aligned. |
-| Frontend-only/gated | Team management actions, exports, report scheduling, chat persistence, notification stream/send-channel, clinical alerts API calls | Do not expose as available server features while capability flags are false. |
-| Internal/deferred backend routes | OAuth/SAML/OIDC callbacks, metrics, webhook, AI internals, admin CRUD surfaces | Keep out of normal user launch paths unless productized. |
-| Platform trust/audit rows | Source scan, executor catalog, backend exposure and render/execute matrices | May appear in trust/source catalog, not normal workflow discovery. |
+## Frontend calls without backend routes (gated)
 
-## Current Priority
+| ID | Method | Path | Capability | Client |
+|----|--------|------|------------|--------|
+| chat-messages-sync | POST | `/api/chat/messages` | chatPersistence | syncService.js |
+| chat-conversations-sync | POST | `/api/chat/conversations` | chatPersistence | syncService.js |
+| tools-share-results | POST | `/api/tools/share-results` | toolsShareResults | ToolResultShare.jsx |
+| notifications-stream | GET | `/api/notifications/stream` | notificationStream | NotificationService.js |
+| notifications-send-channel | POST | `/api/notifications/send/:channel` | notificationSendChannel | notifications/NotificationService.js |
+| team-users | GET | `/api/team/users` | teamManagement | TeamManagement.jsx |
+| team-user-update | PUT | `/api/team/users/:id` | teamManagement | TeamManagement.jsx |
+| team-user-delete | DELETE | `/api/team/users/:id` | teamManagement | TeamManagement.jsx |
+| team-invite | POST | `/api/team/invite` | teamManagement | TeamManagement.jsx |
+| bulk-sync | POST | `/api/sync` | bulkSync | offline.js / OfflineSupport.jsx |
+| clinical-alerts-ack | POST | `/api/clinical/alerts/:id/acknowledge` | clinicalAlerts | clinicalAlertNotifications.js |
+| clinical-alerts-dismiss | POST | `/api/clinical/alerts/:id/dismiss` | clinicalAlerts | clinicalAlertNotifications.js |
+| clinical-alerts-stream | GET | `/api/clinical/alerts/stream` | clinicalAlerts | clinicalAlertNotifications.js |
+| exports-pdf | POST | `/api/exports/pdf` | exportsPdf | export/ExportService.js |
+| exports-excel | POST | `/api/exports/excel` | exportsExcel | export/ExportService.js |
+| reports-generate | POST | `/api/reports/generate` | reportsGenerate | export/ExportService.js |
+| reports-schedule-create | POST | `/api/reports/schedule` | reportsSchedule | export/ExportService.js |
+| reports-schedule-cancel | DELETE | `/api/reports/schedule/:reportId` | reportsSchedule | export/ExportService.js |
 
-The next exposure hardening step is to keep user-facing routes, Assistant recommendations, `/tools` cards, and workspace cards tied to the canonical inventory and launch resolver. Hidden backend capability promotion must follow this order:
+## Related docs
 
-1. Add backend route inventory.
-2. Add frontend API inventory.
-3. Add capability flag and exposure policy.
-4. Add inventory route/launch/safety metadata.
-5. Add UI fallback states.
-6. Add route, launch, backend exposure, and responsive tests.
+- [backend-frontend-tool-contract.md](./backend-frontend-tool-contract.md)
+- [endpoint-to-frontend-matrix.md](./endpoint-to-frontend-matrix.md)
+- [backend-api-inventory.md](./backend-api-inventory.md)
+

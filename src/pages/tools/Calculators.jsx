@@ -129,6 +129,37 @@ import {
   SerumOsmolalityCalculator,
   WaistHipRatioCalculator,
 } from './endocrineMetabolicCalculators';
+import {
+  FourScoreCalculator,
+  HuntHessScaleCalculator,
+  IchScoreCalculator,
+  ModifiedRankinScaleCalculator,
+  NihssSummaryViewCalculator,
+  PediatricGcsCalculator,
+} from './neurologyCalculators';
+import {
+  FentonGrowthChartHelper,
+  GestationalAgeCalculator,
+  NeonatalBilirubinRiskHelper,
+  PediatricBpPercentileCalculator,
+  PediatricDoseSafetyChecker,
+  PregnancyDueDateCalculator,
+} from './pediatricsObgynCalculators';
+import {
+  CageCalculator,
+  ColumbiaSuicideSeverityWorkflow,
+  EpworthSleepinessScaleCalculator,
+  MdqCalculator,
+  MmseCalculator,
+  MocaPlaceholderWorkflow,
+  Pcl5Calculator,
+} from './psychiatryScreeningCalculators';
+import {
+  BedOccupancyCalculator,
+  ResourceUtilizationIndexCalculator,
+  StaffingRatioCalculator,
+  TurnaroundTimeCalculator,
+} from './hospitalOperationsCalculators';
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
@@ -561,6 +592,20 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <Phq9Calculator onResultChange={onResultChange} />;
     case 'gad7':
       return <Gad7Calculator onResultChange={onResultChange} />;
+    case 'cage':
+      return <CageCalculator onResultChange={onResultChange} />;
+    case 'mmse':
+      return <MmseCalculator onResultChange={onResultChange} />;
+    case 'moca-placeholder-workflow':
+      return <MocaPlaceholderWorkflow onResultChange={onResultChange} />;
+    case 'pcl5':
+      return <Pcl5Calculator onResultChange={onResultChange} />;
+    case 'mdq':
+      return <MdqCalculator onResultChange={onResultChange} />;
+    case 'epworth-sleepiness-scale':
+      return <EpworthSleepinessScaleCalculator onResultChange={onResultChange} />;
+    case 'columbia-suicide-severity-workflow':
+      return <ColumbiaSuicideSeverityWorkflow onResultChange={onResultChange} />;
     case 'ascvd-risk':
       return <AscvdRiskCalculator onResultChange={onResultChange} />;
     case 'ckd-staging':
@@ -613,12 +658,44 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <FraminghamRiskCalculator onResultChange={onResultChange} />;
     case 'abcd2':
       return <Abcd2Calculator onResultChange={onResultChange} />;
+    case 'hunt-hess-scale':
+      return <HuntHessScaleCalculator onResultChange={onResultChange} />;
+    case 'ich-score':
+      return <IchScoreCalculator onResultChange={onResultChange} />;
+    case 'four-score':
+      return <FourScoreCalculator onResultChange={onResultChange} />;
+    case 'modified-rankin-scale':
+      return <ModifiedRankinScaleCalculator onResultChange={onResultChange} />;
+    case 'nihss-summary-view':
+      return <NihssSummaryViewCalculator onResultChange={onResultChange} />;
+    case 'pediatric-gcs':
+      return <PediatricGcsCalculator onResultChange={onResultChange} />;
+    case 'gestational-age-calculator':
+      return <GestationalAgeCalculator onResultChange={onResultChange} />;
+    case 'pediatric-bp-percentile':
+      return <PediatricBpPercentileCalculator onResultChange={onResultChange} />;
+    case 'pregnancy-due-date-calculator':
+      return <PregnancyDueDateCalculator onResultChange={onResultChange} />;
+    case 'fenton-growth-chart-helper':
+      return <FentonGrowthChartHelper onResultChange={onResultChange} />;
+    case 'neonatal-bilirubin-risk-helper':
+      return <NeonatalBilirubinRiskHelper onResultChange={onResultChange} />;
+    case 'pediatric-dose-safety-checker':
+      return <PediatricDoseSafetyChecker onResultChange={onResultChange} />;
     case 'shock-index':
       return <ShockIndexCalculator onResultChange={onResultChange} />;
     case 'anion-gap':
       return <AnionGapCalculator onResultChange={onResultChange} />;
     case 'rass':
       return <RassCalculator onResultChange={onResultChange} />;
+    case 'bed-occupancy-calculator':
+      return <BedOccupancyCalculator onResultChange={onResultChange} />;
+    case 'staffing-ratio-calculator':
+      return <StaffingRatioCalculator onResultChange={onResultChange} />;
+    case 'turnaround-time-calculator':
+      return <TurnaroundTimeCalculator onResultChange={onResultChange} />;
+    case 'resource-utilization-index':
+      return <ResourceUtilizationIndexCalculator onResultChange={onResultChange} />;
     default:
       return (
         <ToolNotFound

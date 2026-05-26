@@ -259,7 +259,12 @@
   position: relative;
   width: 100%;
   min-height: 360px;
-  overflow: hidden;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
   border: 1px solid var(--app-panel-border);
   border-radius: var(--compact-panel-radius, 14px);
   background:
@@ -308,6 +313,30 @@
   font-weight: 700;
 }
 
+.hospital-map-bed {
+  fill: color-mix(in srgb, var(--app-accent-interactive) 10%, var(--app-surface-2));
+  stroke: color-mix(in srgb, var(--app-accent-interactive) 32%, var(--app-panel-border));
+  stroke-width: 2;
+}
+
+.hospital-map-bed--occupied {
+  fill: color-mix(in srgb, var(--app-accent-interactive) 16%, var(--app-surface-2));
+}
+
+.hospital-map-bed--available {
+  fill: color-mix(in srgb, var(--app-success) 13%, var(--app-surface-2));
+}
+
+.hospital-map-bed--cleaning {
+  fill: color-mix(in srgb, var(--app-warning) 13%, var(--app-surface-2));
+}
+
+.hospital-map-bed-label {
+  fill: var(--app-fg);
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .hospital-map-marker {
   stroke: var(--app-surface-1);
   stroke-width: 4;
@@ -339,6 +368,7 @@
   position: absolute;
   inset: 0;
   min-width: 680px;
+  min-height: 100%;
 }
 
 .hospital-map-marker-button {

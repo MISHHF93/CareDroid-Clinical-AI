@@ -4,7 +4,44 @@ import {
   isBackendCapabilityEnabled,
   UNSUPPORTED_CAPABILITY_MESSAGE,
 } from '../config/backendApiCapabilities';
+import {
+  acknowledgeClinicalAlertApi,
+  fetchClinicalAlerts,
+} from '../services/clinicalAlertsApi';
 import './ClinicalAlertsPage.css';
+
+const buildSampleAlerts = () => [
+  {
+    id: 'alert-1',
+    timestamp: new Date(Date.now() - 3600000),
+    severity: 'critical',
+    title: 'Critical SOFA Score',
+    description: 'Patient shows signs of multiple organ dysfunction',
+    source: 'SOFA Calculator',
+    status: 'unacknowledged',
+    findings: ['SOFA Score: 15/24', 'Mortality risk: High'],
+  },
+  {
+    id: 'alert-2',
+    timestamp: new Date(Date.now() - 7200000),
+    severity: 'high',
+    title: 'Abnormal Lab Values',
+    description: '3 critical laboratory values detected',
+    source: 'Lab Interpreter',
+    status: 'acknowledged',
+    findings: ['K+: 6.8 mEq/L', 'pH: 7.25', 'HCO3-: 18 mEq/L'],
+  },
+  {
+    id: 'alert-3',
+    timestamp: new Date(Date.now() - 86400000),
+    severity: 'moderate',
+    title: 'Kidney Dysfunction Alert',
+    description: 'GFR indicates moderate to severe kidney disease',
+    source: 'GFR Calculator',
+    status: 'acknowledged',
+    findings: ['GFR: 28 mL/min/1.73m2', 'CKD Stage: 3b'],
+  },
+];
 
 const ClinicalAlertsPage = () => {
   const alertsApiEnabled = isBackendCapabilityEnabled('clinicalAlerts');
@@ -12,45 +49,45 @@ const ClinicalAlertsPage = () => {
   const [filteredAlerts, setFilteredAlerts] = useState([]);
   const [selectedSeverity, setSelectedSeverity] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isLoadingAlerts, setIsLoadingAlerts] = useState(alertsApiEnabled);
+  const [apiNotice, setApiNotice] = useState('');
 
-  // Mock data for demonstration
   useEffect(() => {
-    const mockAlerts = [
-      {
-        id: 'alert-1',
-        timestamp: new Date(Date.now() - 3600000),
-        severity: 'critical',
-        title: 'Critical SOFA Score',
-        description: 'Patient shows signs of multiple organ dysfunction',
-        source: 'SOFA Calculator',
-        status: 'unacknowledged',
-        findings: ['SOFA Score: 15/24', 'Mortality risk: High']
-      },
-      {
-        id: 'alert-2',
-        timestamp: new Date(Date.now() - 7200000),
-        severity: 'high',
-        title: 'Abnormal Lab Values',
-        description: '3 critical laboratory values detected',
-        source: 'Lab Interpreter',
-        status: 'acknowledged',
-        findings: ['K+: 6.8 mEq/L', 'pH: 7.25', 'HCO3-: 18 mEq/L']
-      },
-      {
-        id: 'alert-3',
-        timestamp: new Date(Date.now() - 86400000),
-        severity: 'moderate',
-        title: 'Kidney Dysfunction Alert',
-        description: 'GFR indicates moderate to severe kidney disease',
-        source: 'GFR Calculator',
-        status: 'acknowledged',
-        findings: ['GFR: 28 mL/min/1.73m²', 'CKD Stage: 3b']
-      }
-    ];
+    let cancelled = false;
 
-    setAlerts(mockAlerts);
-    setFilteredAlerts(mockAlerts);
-  }, []);
+    async function loadAlerts() {
+      if (!alertsApiEnabled) {
+        const sampleAlerts = buildSampleAlerts();
+        setAlerts(sampleAlerts);
+        setFilteredAlerts(sampleAlerts);
+        setIsLoadingAlerts(false);
+        return;
+      }
+
+      setIsLoadingAlerts(true);
+      const result = await fetchClinicalAlerts();
+      if (cancelled) return;
+
+      if (result.ok) {
+        const apiAlerts = Array.isArray(result.data?.alerts) ? result.data.alerts : [];
+        setAlerts(apiAlerts);
+        setFilteredAlerts(apiAlerts);
+        setApiNotice(result.data?.safety || '');
+      } else {
+        const sampleAlerts = buildSampleAlerts();
+        setAlerts(sampleAlerts);
+        setFilteredAlerts(sampleAlerts);
+        setApiNotice(`${result.message || 'Unable to load clinical alerts.'} Showing sample alerts on this device only.`);
+      }
+      setIsLoadingAlerts(false);
+    }
+
+    loadAlerts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [alertsApiEnabled]);
 
   // Filter alerts
   useEffect(() => {
@@ -72,7 +109,16 @@ const ClinicalAlertsPage = () => {
     setFilteredAlerts(filtered);
   }, [selectedSeverity, searchTerm, alerts]);
 
-  const handleAcknowledge = (alertId) => {
+  const handleAcknowledge = async (alertId) => {
+    if (alertsApiEnabled) {
+      const result = await acknowledgeClinicalAlertApi(alertId, {
+        acknowledgedAt: new Date().toISOString(),
+      });
+      if (!result.ok) {
+        setApiNotice(`${result.message || 'Unable to acknowledge alert on the server.'} Updated locally only.`);
+      }
+    }
+
     setAlerts(alerts =>
       alerts.map(a =>
         a.id === alertId ? { ...a, status: 'acknowledged' } : a
@@ -117,6 +163,10 @@ const ClinicalAlertsPage = () => {
           unsupportedMessage={`${UNSUPPORTED_CAPABILITY_MESSAGE} Showing sample alerts on this device only.`}
         />
       ) : null}
+      {alertsApiEnabled && isLoadingAlerts ? (
+        <ApiStateBanner loading loadingMessage="Loading clinical alerts..." />
+      ) : null}
+      {apiNotice ? <ApiStateBanner unsupportedMessage={apiNotice} /> : null}
 
       <div className="alerts-controls">
         <div className="control-group">
@@ -210,7 +260,7 @@ const ClinicalAlertsPage = () => {
                   {alert.status === 'acknowledged' && (
                     <span className="status-text">Acknowledged</span>
                   )}
-                  <button className="btn-export" title="Export alert details">
+                  <button type="button" className="btn-export" title="Export alert details">
                     📥 Export
                   </button>
                 </div>

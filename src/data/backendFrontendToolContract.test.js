@@ -33,6 +33,14 @@ const backendRegistrySource = readFileSync(
   ),
   'utf8'
 );
+let cachedContractRows = null;
+
+function getContractRows() {
+  if (!cachedContractRows) {
+    cachedContractRows = buildBackendFrontendContractRows();
+  }
+  return cachedContractRows;
+}
 
 function parseBackendRegisteredExecutorIds() {
   const block = backendRegistrySource.match(/REGISTERED_EXECUTOR_TOOL_IDS\s*=\s*\[([\s\S]*?)\]\s*as const/);
@@ -41,7 +49,7 @@ function parseBackendRegisteredExecutorIds() {
 
 describe('backendFrontendToolContract', () => {
   it('assigns POST executor only to registered orchestrator ids', () => {
-    const rows = buildBackendFrontendContractRows().filter((r) => r.kind === 'nlu');
+    const rows = getContractRows().filter((r) => r.kind === 'nlu');
     const withExecutor = rows.filter((r) => r.backendExecutor === 'yes');
     expect(withExecutor.map((r) => r.canonicalId).sort()).toEqual(
       [...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS].sort()
@@ -75,7 +83,7 @@ describe('backendFrontendToolContract', () => {
   });
 
   it('frontend-only and unsupported rows do not claim POST executor support', () => {
-    const rows = buildBackendFrontendContractRows();
+    const rows = getContractRows();
     for (const row of rows.filter((r) => r.status === 'frontend-only' || r.status === 'planned')) {
       expect(row.backendExecutor, row.canonicalId).not.toBe('yes');
       expect(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS, row.canonicalId).not.toContain(row.canonicalId);
@@ -83,19 +91,19 @@ describe('backendFrontendToolContract', () => {
   });
 
   it('does not mark dispatch-ai as fully wired with POST executor', () => {
-    const dispatch = buildBackendFrontendContractRows().find((r) => r.canonicalId === 'dispatch-ai');
+    const dispatch = getContractRows().find((r) => r.canonicalId === 'dispatch-ai');
     expect(dispatch?.backendExecutor).toBe('no');
     expect(dispatch?.status).not.toBe('fully wired');
   });
 
   it('marks share-results platform row as frontend-only (capability gated)', () => {
-    const share = buildBackendFrontendContractRows().find((r) => r.canonicalId === 'tools-share-results');
+    const share = getContractRows().find((r) => r.canonicalId === 'tools-share-results');
     expect(share?.status).toBe('frontend-only');
     expect(share?.brokenReasons).toEqual([]);
   });
 
   it('NLU row count matches clinicalIntentTools', () => {
-    const nluRows = buildBackendFrontendContractRows().filter((r) => r.kind === 'nlu');
+    const nluRows = getContractRows().filter((r) => r.kind === 'nlu');
     expect(nluRows.length).toBe(clinicalIntentTools.length);
     expect(nluRows.length).toBe(NLU_PROFILE_TOOL_IDS.length);
   });
@@ -103,7 +111,7 @@ describe('backendFrontendToolContract', () => {
   it('every NLU profile has backend pattern and catalog yes', () => {
     const patterns = parseClinicalToolPatterns(readToolPatternsSource());
     const patternIds = new Set(patterns.map((p) => p.toolId));
-    const rows = buildBackendFrontendContractRows().filter((r) => r.kind === 'nlu');
+    const rows = getContractRows().filter((r) => r.kind === 'nlu');
 
     for (const id of NLU_PROFILE_TOOL_IDS) {
       expect(patternIds.has(id)).toBe(true);
@@ -120,7 +128,7 @@ describe('backendFrontendToolContract', () => {
 
   it('documents procedures NLU profile with frontend-only status', () => {
     const gaps = getContractGaps();
-    const procedures = buildBackendFrontendContractRows().find((r) => r.canonicalId === 'procedures');
+    const procedures = getContractRows().find((r) => r.canonicalId === 'procedures');
     expect(gaps.some((g) => g.id === 'procedures')).toBe(false);
     expect(procedures?.status).toBe('frontend-only');
     expect(procedures?.nluProfile).toBe('procedures');

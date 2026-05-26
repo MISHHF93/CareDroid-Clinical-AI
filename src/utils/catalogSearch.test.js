@@ -41,8 +41,8 @@ describe('catalogSearch', () => {
 
   it('normalizes hub-only rows to chat-assisted category', () => {
     const rows = getMedicalToolsCatalogRows();
-    const apache = rows.find((r) => r.primaryId === 'apache2-calculator');
-    expect(apache?.category).toBe('chat-assisted');
+    const wells = rows.find((r) => r.primaryId === 'wells-pe');
+    expect(wells?.category).toBe('chat-assisted');
     expect(normalizeCatalogCategory('calculator', { chatOnlyForm: true })).toBe('chat-assisted');
   });
 

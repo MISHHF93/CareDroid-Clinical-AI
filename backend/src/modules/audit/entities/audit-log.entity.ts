@@ -43,6 +43,21 @@ export class AuditLog {
   @Column({ type: 'uuid', nullable: true })
   userId: string;
 
+  @Column({ type: 'uuid', nullable: true })
+  workspaceId: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  organizationId: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  actorUserId: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  targetUserId: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  membershipId: string;
+
   @Column({ type: 'varchar', enum: AuditAction })
   action: AuditAction;
 

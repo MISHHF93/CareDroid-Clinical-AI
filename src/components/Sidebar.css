@@ -195,12 +195,26 @@
 /* User Profile */
 .sidebar-user {
   padding: 10px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 8px;
   background: var(--sidebar-surface-muted);
   border-bottom: 1px solid var(--sidebar-divider);
   position: relative;
+}
+
+.sidebar-user-main {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  text-align: left;
 }
 
 .user-avatar {
@@ -217,6 +231,13 @@
   border: 2px solid var(--sidebar-avatar-ring);
   box-shadow: 0 0 0 1px color-mix(in srgb, var(--app-accent) 12%, transparent);
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .user-info {
@@ -238,6 +259,29 @@
   color: var(--sidebar-fg-muted);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+}
+
+.sidebar-operational-workspace {
+  grid-column: 1 / -1;
+  display: grid;
+  gap: 4px;
+}
+
+.sidebar-operational-workspace label {
+  color: var(--sidebar-fg-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sidebar-operational-workspace select {
+  width: 100%;
+  border: 1px solid var(--sidebar-divider);
+  border-radius: 8px;
+  background: var(--sidebar-surface);
+  color: var(--sidebar-fg);
+  padding: 7px 8px;
+  font-size: 12px;
 }
 
 .health-indicator {

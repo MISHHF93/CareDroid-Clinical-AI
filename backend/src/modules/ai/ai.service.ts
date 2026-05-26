@@ -283,12 +283,13 @@ export class AIService {
         latencyMs,
         feature: context?.feature || 'chat',
         conversationId: context?.conversationId,
-        intentClassified: context?.intent,
-        toolUsed: context?.toolId,
+        intentClassified: context?.intent || context?.intentClassification?.primaryIntent,
+        toolUsed: context?.toolId || context?.tool || context?.intentClassification?.toolId,
         metadata: {
           temperature: this.temperature,
           maxTokens: config.maxTokens,
           finishReason: result.finishReason,
+          aiFoundation: this.extractAiFoundationMetadata(context),
         },
       });
 
@@ -297,7 +298,8 @@ export class AIService {
         userId,
         action: AuditAction.AI_QUERY,
         resource: 'ai/query',
-        details: {
+        metadata: {
+          aiFoundation: this.extractAiFoundationMetadata(context),
           prompt: prompt.substring(0, 100),
           model: config.model,
           tokensUsed: result.tokensUsed,
@@ -319,13 +321,14 @@ export class AIService {
         conversationId: context?.conversationId,
         metadata: {
           error: error instanceof Error ? error.message : String(error),
+          aiFoundation: this.extractAiFoundationMetadata(context),
         },
       });
       throw new Error(`AI query failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
-  async generateStructuredJSON(userId: string, prompt: string, schema: any) {
+  async generateStructuredJSON(userId: string, prompt: string, schema: any, context?: any) {
     if (!this.openai) {
       throw new Error('OpenAI API key not configured');
     }
@@ -359,6 +362,7 @@ export class AIService {
       });
 
       const result = JSON.parse(response.choices[0].message.content);
+      const totalTokens = response.usage?.total_tokens || 0;
 
       // Calculate and record cost
       const costUsd = this.calculateCost(
@@ -367,17 +371,37 @@ export class AIService {
         response.usage?.completion_tokens || 0,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
+      await this.logQuery({
+        userId,
+        prompt,
+        response: response.choices[0].message.content,
+        status: QueryStatus.SUCCESS,
+        model: config.model,
+        promptTokens: response.usage?.prompt_tokens || 0,
+        completionTokens: response.usage?.completion_tokens || 0,
+        totalTokens,
+        cost: costUsd,
+        feature: context?.feature || 'structured_json',
+        conversationId: context?.conversationId,
+        intentClassified: context?.intentClassification?.primaryIntent,
+        toolUsed: context?.tool || context?.intentClassification?.toolId,
+        metadata: {
+          schemaKeys: Object.keys(schema),
+          aiFoundation: this.extractAiFoundationMetadata(context),
+        },
+      });
 
       // Audit log
       await this.auditService.log({
         userId,
         action: AuditAction.AI_QUERY,
         resource: 'ai/structured',
-        details: {
+        metadata: {
+          aiFoundation: this.extractAiFoundationMetadata(context),
           prompt: prompt.substring(0, 100),
           schema: Object.keys(schema),
           model: config.model,
-          tokensUsed: response.usage?.total_tokens || 0,
+          tokensUsed: totalTokens,
         },
         ipAddress: '0.0.0.0',
         userAgent: 'system',
@@ -385,6 +409,19 @@ export class AIService {
 
       return result;
     } catch (error) {
+      await this.logQuery({
+        userId,
+        prompt,
+        response: null,
+        status: QueryStatus.ERROR,
+        model: config.model,
+        feature: context?.feature || 'structured_json',
+        conversationId: context?.conversationId,
+        metadata: {
+          error: error instanceof Error ? error.message : String(error),
+          aiFoundation: this.extractAiFoundationMetadata(context),
+        },
+      });
       throw new Error(
         `Structured JSON generation failed: ${error instanceof Error ? error.message : String(error)}`,
       );
@@ -631,13 +668,34 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
         response.usage?.completion_tokens || 0,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
+      await this.logQuery({
+        userId,
+        prompt,
+        response: result.content,
+        status: QueryStatus.SUCCESS,
+        model: config.model,
+        promptTokens: response.usage?.prompt_tokens || 0,
+        completionTokens: response.usage?.completion_tokens || 0,
+        totalTokens: response.usage?.total_tokens || 0,
+        cost: costUsd,
+        feature: context?.feature || 'chat_with_tools',
+        conversationId: context?.conversationId,
+        intentClassified: context?.intentClassification?.primaryIntent,
+        toolUsed: context?.tool || context?.intentClassification?.toolId,
+        metadata: {
+          finishReason: result.finishReason,
+          toolCallCount: toolCalls.length,
+          aiFoundation: this.extractAiFoundationMetadata(context),
+        },
+      });
 
       // Audit log
       await this.auditService.log({
         userId,
         action: AuditAction.AI_QUERY,
         resource: 'ai/query-with-tools',
-        details: {
+        metadata: {
+          aiFoundation: this.extractAiFoundationMetadata(context),
           prompt: prompt.substring(0, 100),
           model: config.model,
           tokensUsed: result.tokensUsed,
@@ -649,9 +707,39 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
 
       return result;
     } catch (error) {
+      await this.logQuery({
+        userId,
+        prompt,
+        response: null,
+        status: QueryStatus.ERROR,
+        model: config.model,
+        feature: context?.feature || 'chat_with_tools',
+        conversationId: context?.conversationId,
+        metadata: {
+          error: error instanceof Error ? error.message : String(error),
+          aiFoundation: this.extractAiFoundationMetadata(context),
+        },
+      });
       throw new Error(
         `AI query with tools failed: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
+  }
+
+  private extractAiFoundationMetadata(context?: any): Record<string, any> | undefined {
+    const foundation = context?.aiFoundation;
+    if (!foundation) {
+      return undefined;
+    }
+
+    return {
+      runId: foundation.runId,
+      capabilityId: foundation.capabilityId,
+      route: foundation.route,
+      selectedExpert: foundation.selectedExpert,
+      retrievalPolicy: foundation.retrievalPolicy,
+      requiresHumanReview: foundation.requiresHumanReview,
+      phiAccessed: foundation.phiAccessed,
+    };
   }
 }

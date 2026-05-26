@@ -14,6 +14,7 @@ import { isCalculatorsHubPath, resolveCatalogLaunch } from './clinicalCatalogWir
 import {
   BUILTIN_CALC,
   KEYWORD_ROUTED_REGISTRY_IDS,
+  MEDICAL_EXPANSION_CATEGORY_PACKS,
   REGISTRY,
 } from './clinicalToolIdContract';
 import {
@@ -21,6 +22,7 @@ import {
   TOOL_EXECUTOR_STATUS,
   TOOL_LAUNCH_TYPES,
 } from './toolInventory';
+import { PLATFORM_SYSTEM_CAPABILITIES } from './platformSystems';
 import { enrichMedicalCatalogRow, normalizeCatalogCategory } from '../utils/catalogSearch';
 
 /** Keyword-routed in chat but not separate NLU tool profiles */
@@ -104,6 +106,27 @@ function buildFromRegistry(reg) {
   };
 }
 
+function buildFromPlatformCapability(capability) {
+  const inventoryRecord = resolveToolInventoryRecord(capability.id);
+  return {
+    primaryId: capability.id,
+    id: capability.id,
+    name: capability.name,
+    category: normalizeCatalogCategory(capability.category),
+    description: capability.summary,
+    pagePath: capability.route,
+    sidebarToolId: capability.id,
+    chatOnRequest: Boolean(capability.chatSeed),
+    chatSeed: capability.chatSeed || '',
+    backendExecutor: false,
+    uiCalculatorSlug: null,
+    chatOnlyForm: false,
+    accessSummary: inventoryRecord?.endpoint ? 'Platform API' : 'Page',
+    source: 'platformSystems.js',
+    platformSystem: true,
+  };
+}
+
 /**
  * Complete medical tools + calculators list (one row per NLU tool, plus registry-only & keyword extras).
  */
@@ -158,6 +181,13 @@ export function getMedicalToolsCatalogRows() {
     }
   }
 
+  for (const capability of PLATFORM_SYSTEM_CAPABILITIES) {
+    const row = buildFromPlatformCapability(capability);
+    if (!byId.has(row.primaryId)) {
+      byId.set(row.primaryId, row);
+    }
+  }
+
   return [...byId.values()].map(enrichMedicalCatalogRow);
 }
 
@@ -174,4 +204,19 @@ export function getMedicalCatalogSummary() {
     chatOnlyForms: rows.filter((r) => r.chatOnlyForm).length,
     hubOnlyCalculators: nluCalculatorHubOnly.length,
   };
+}
+
+export function getMedicalExpansionCategoryPackRows() {
+  return MEDICAL_EXPANSION_CATEGORY_PACKS.map((pack) => ({
+    id: pack.id,
+    name: pack.label,
+    tierAToolIds: [...pack.tierA],
+    tierBToolIds: [...pack.tierB],
+    tierCToolIds: [...pack.tierC],
+    totalTools: new Set([...pack.tierA, ...pack.tierB, ...pack.tierC]).size,
+  }));
+}
+
+export function getPlatformSystemsCatalogRows() {
+  return PLATFORM_SYSTEM_CAPABILITIES.map(buildFromPlatformCapability);
 }

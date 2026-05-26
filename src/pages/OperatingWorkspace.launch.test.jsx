@@ -37,21 +37,13 @@ describe('operating workspace launch harness', () => {
     vi.clearAllMocks();
   });
 
-  it('routes patient workflow cards through the registry launch resolver', () => {
+  it('routes patient workflow cards to patient workspace platform routes', () => {
     render(<Patients />);
 
     fireEvent.click(screen.getByRole('button', { name: /summarize active case/i }));
 
-    expect(applyRegistryToolLaunch).toHaveBeenCalledWith(
-      'patient-summary-ai',
-      expect.objectContaining({
-        navigate: navigateMock,
-        addMessage: mockConversationValue.addMessage,
-        selectTool: mockConversationValue.selectTool,
-        setActiveTool: mockConversationValue.setActiveTool,
-        recordToolAccess: mockToolPreferencesValue.recordToolAccess,
-      })
-    );
+    expect(applyRegistryToolLaunch).not.toHaveBeenCalled();
+    expect(navigateMock).toHaveBeenCalledWith('/patients/demo-patient/summary');
   });
 
   it('routes fleet operation cards through the registry launch resolver', () => {

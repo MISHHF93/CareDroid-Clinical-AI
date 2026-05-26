@@ -54,7 +54,7 @@ describe('backendFrontendExposure scan', () => {
       'bulk-sync',
       'chat-messages-sync',
       'notifications-stream',
-      'clinical-alerts-ack',
+      'clinical-alerts-stream',
       'exports-pdf',
       'reports-schedule-create',
     ];
@@ -94,6 +94,49 @@ describe('backendFrontendExposure scan', () => {
     );
     expect(findBackendRoute('POST', '/api/chat/suggest-action')).toBeTruthy();
     expect(findBackendRoute('POST', '/api/chat/analyze-vitals')).toBeTruthy();
+  });
+
+  it('covers profile, workspace, activity, and personalization client calls', () => {
+    const expectedUserIdentityCalls = [
+      ['GET', '/api/profile/me'],
+      ['PATCH', '/api/profile/me'],
+      ['GET', '/api/profile/me/preferences'],
+      ['PATCH', '/api/profile/me/preferences'],
+      ['GET', '/api/profile/me/activity'],
+      ['GET', '/api/profile/me/security'],
+      ['GET', '/api/workspaces'],
+      ['POST', '/api/workspaces'],
+      ['POST', '/api/workspaces/active'],
+      ['POST', '/api/activity'],
+      ['GET', '/api/personalization/me'],
+      ['PATCH', '/api/personalization/me'],
+      ['POST', '/api/personalization/me/saved-prompts'],
+    ];
+
+    for (const [method, path] of expectedUserIdentityCalls) {
+      expect(FRONTEND_API_CALLS, `${method} ${path}`).toEqual(
+        expect.arrayContaining([expect.objectContaining({ method, path })])
+      );
+      expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
+    }
+  });
+
+  it('covers demo-backed clinical alerts API routes while keeping stream gated', () => {
+    const alertCalls = [
+      ['GET', '/api/clinical/alerts'],
+      ['POST', '/api/clinical/alerts/:id/acknowledge'],
+      ['POST', '/api/clinical/alerts/:id/dismiss'],
+    ];
+
+    for (const [method, path] of alertCalls) {
+      expect(FRONTEND_API_CALLS, `${method} ${path}`).toEqual(
+        expect.arrayContaining([expect.objectContaining({ method, path, capability: 'clinicalAlerts' })])
+      );
+      expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
+    }
+
+    const stream = runBackendFrontendExposureScan().analyzed.find((row) => row.id === 'clinical-alerts-stream');
+    expect(stream?.exposure).toBe('gated-stub');
   });
 
   it('classifies frontend, backend-only, missing-route, and executor capabilities', () => {

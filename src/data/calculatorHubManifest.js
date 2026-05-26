@@ -39,6 +39,13 @@ export const CALCULATOR_INTERFACE_CLASS_BY_SLUG = Object.freeze({
   chads2vasc: 'calculator-interface--chads2vasc',
   phq9: 'calculator-interface--phq9',
   gad7: 'calculator-interface--gad7',
+  cage: 'calculator-interface--cage',
+  mmse: 'calculator-interface--mmse',
+  'moca-placeholder-workflow': 'calculator-interface--moca-placeholder-workflow',
+  pcl5: 'calculator-interface--pcl5',
+  mdq: 'calculator-interface--mdq',
+  'epworth-sleepiness-scale': 'calculator-interface--epworth-sleepiness-scale',
+  'columbia-suicide-severity-workflow': 'calculator-interface--columbia-suicide-severity-workflow',
   'ascvd-risk': 'calculator-interface--ascvd-risk',
   'ckd-staging': 'calculator-interface--ckd-staging',
   'egfr-ckd-epi': 'calculator-interface--egfr-ckd-epi',
@@ -86,9 +93,25 @@ export const CALCULATOR_INTERFACE_CLASS_BY_SLUG = Object.freeze({
   chads2: 'calculator-interface--chads2',
   'heart-failure-staging': 'calculator-interface--heart-failure-staging',
   abcd2: 'calculator-interface--abcd2',
+  'hunt-hess-scale': 'calculator-interface--hunt-hess-scale',
+  'ich-score': 'calculator-interface--ich-score',
+  'four-score': 'calculator-interface--four-score',
+  'modified-rankin-scale': 'calculator-interface--modified-rankin-scale',
+  'nihss-summary-view': 'calculator-interface--nihss-summary-view',
+  'pediatric-gcs': 'calculator-interface--pediatric-gcs',
+  'gestational-age-calculator': 'calculator-interface--gestational-age-calculator',
+  'pediatric-bp-percentile': 'calculator-interface--pediatric-bp-percentile',
+  'pregnancy-due-date-calculator': 'calculator-interface--pregnancy-due-date-calculator',
+  'fenton-growth-chart-helper': 'calculator-interface--fenton-growth-chart-helper',
+  'neonatal-bilirubin-risk-helper': 'calculator-interface--neonatal-bilirubin-risk-helper',
+  'pediatric-dose-safety-checker': 'calculator-interface--pediatric-dose-safety-checker',
   'shock-index': 'calculator-interface--shock-index',
   'anion-gap': 'calculator-interface--anion-gap',
   rass: 'calculator-interface--rass',
+  'bed-occupancy-calculator': 'calculator-interface--bed-occupancy-calculator',
+  'staffing-ratio-calculator': 'calculator-interface--staffing-ratio-calculator',
+  'turnaround-time-calculator': 'calculator-interface--turnaround-time-calculator',
+  'resource-utilization-index': 'calculator-interface--resource-utilization-index',
 });
 
 /** Registry tool ids shown in the calculators hub chat-assisted section. */
@@ -108,21 +131,35 @@ export function getHubChatAssistedTools() {
     (record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED
   );
   const hubRowsById = new Map(nluCalculatorHubOnly.map((tool) => [tool.toolId, tool]));
-  return calculatorRecords
-    .map((record) => {
-      const toolId = record.nluToolId || record.id;
-      const tool = hubRowsById.get(toolId);
-      return {
-        ...tool,
-        toolId,
-        name: record?.label || tool?.name || toolId,
-        description: record?.description,
-        registryId: record?.id,
-        hubPath: tool?.hubPath || record?.route,
-        path: record?.route || tool?.hubPath,
-      };
-    })
-    .filter((tool) => idSet.has(tool.toolId));
+  const rowsByToolId = new Map();
+
+  for (const record of calculatorRecords) {
+    const toolId = record.nluToolId || record.id;
+    const tool = hubRowsById.get(toolId);
+    rowsByToolId.set(toolId, {
+      ...tool,
+      toolId,
+      name: record?.label || tool?.name || toolId,
+      description: record?.description,
+      registryId: record?.id,
+      hubPath: tool?.hubPath || record?.route,
+      path: record?.route || tool?.hubPath,
+    });
+  }
+
+  for (const tool of nluCalculatorHubOnly) {
+    if (tool.toolId === 'dispatch-ai' || rowsByToolId.has(tool.toolId)) continue;
+    rowsByToolId.set(tool.toolId, {
+      ...tool,
+      description:
+        clinicalIntentTools.find((intent) => intent.toolId === tool.toolId)?.description ||
+        'Chat-assisted decision support',
+      registryId: tool.toolId,
+      path: tool.hubPath,
+    });
+  }
+
+  return [...rowsByToolId.values()].filter((tool) => idSet.has(tool.toolId));
 }
 
 /**

@@ -129,7 +129,7 @@ const capabilityExposureMetadata = Object.freeze({
     surfaceType: 'not-routed',
   },
   'Integrations and connectors': {
-    frontendRouteStatus: 'public-only',
+    frontendRouteStatus: 'protected + permission',
     surfaceType: 'visible-ui',
   },
   'Reminders and scheduler': {
@@ -388,12 +388,12 @@ export const capabilityExposureMatrix = Object.freeze([
   },
   {
     capability: 'Integrations and connectors',
-    backendSourceFile: 'backend/src/modules/auth/auth.controller.ts; featureInventory.js',
-    commandOrApiRoute: 'OAuth/SSO placeholders; no connector management API',
-    currentFrontendSurface: 'OAuth login and docs/feature prompts only.',
-    exposureStatus: 'partially exposed',
-    userFacingProblem: 'Users may see integration language without connector setup or verification flows.',
-    recommendedFrontendMechanism: 'Document general connector management as coming later; list supported auth integrations only and avoid unsupported EHR connector setup.',
+    backendSourceFile: 'backend/src/modules/platform-systems/platform-systems.controller.ts',
+    commandOrApiRoute: 'GET/POST /api/integrations/fhir/*; GET/POST /api/integrations/hl7/*',
+    currentFrontendSurface: 'PlatformSystemPage.jsx renders FHIR/HL7 connection status and demo contract execution.',
+    exposureStatus: 'exposed',
+    userFacingProblem: 'Real EHR connectivity still requires credentials and environment-specific validation.',
+    recommendedFrontendMechanism: 'Keep the protected integrations shell with demo/unsupported labels until live FHIR/HL7 credentials are configured.',
     riskLevel: 'medium',
   },
   {
@@ -428,12 +428,12 @@ export const capabilityExposureMatrix = Object.freeze([
   },
   {
     capability: 'Clinical alerts management',
-    backendSourceFile: 'No backend clinical alerts route found; backendApiCapabilities.clinicalAlerts is false.',
-    commandOrApiRoute: 'Protected SPA route /clinical/alerts; gated frontend calls POST /api/clinical/alerts/:id/acknowledge|dismiss and GET /api/clinical/alerts/stream are disabled.',
-    currentFrontendSurface: 'ClinicalAlertsPage.jsx visible with mock alerts and unsupported API banner.',
-    exposureStatus: 'mock-only',
-    userFacingProblem: 'Alerts management is visible without a real backend alert source or mutation API.',
-    recommendedFrontendMechanism: 'Keep unsupported banner and local-only behavior; implement backend alert API before presenting operational alert management.',
+    backendSourceFile: 'backend/src/modules/clinical-alerts/*; backendApiCapabilities.clinicalAlerts is demo.',
+    commandOrApiRoute: 'Protected SPA route /clinical/alerts; GET /api/clinical/alerts; POST /api/clinical/alerts/:id/acknowledge|dismiss. Stream remains disabled.',
+    currentFrontendSurface: 'ClinicalAlertsPage.jsx loads demo-backed alerts and keeps local fallback.',
+    exposureStatus: 'partially exposed',
+    userFacingProblem: 'Alerts management has a backend workflow contract, but the current alert source is demo-backed rather than connected to a live clinical alarm source.',
+    recommendedFrontendMechanism: 'Keep demo/source labeling and do not present as a bedside alarm source until a real alert feed and streaming contract exist.',
     riskLevel: 'high',
   },
   {
@@ -522,8 +522,8 @@ export const unsupportedWorkflowDecisions = Object.freeze([
   },
   {
     workflow: 'Connector management',
-    decision: 'Expose only supported auth integrations',
-    reason: 'OAuth/SSO routes exist, but no general connector setup/verification backend exists.',
+    decision: 'Expose only demo-safe FHIR/HL7 integration contracts',
+    reason: 'Platform systems now provide protected demo connector contracts; real EHR/FHIR/HL7 writeback still requires configured credentials and validation.',
   },
   {
     workflow: 'Reminder creation',
@@ -532,8 +532,8 @@ export const unsupportedWorkflowDecisions = Object.freeze([
   },
   {
     workflow: 'Clinical alerts backend actions',
-    decision: 'Keep mock/local until backend ships',
-    reason: 'ClinicalAlertsPage is visible, but no clinical-alerts Nest route exists and the frontend API capability is disabled.',
+    decision: 'Expose demo-backed list/ack/dismiss only',
+    reason: 'ClinicalAlertsPage now has Nest routes for workflow validation; streaming and live alarm source integration remain disabled.',
   },
   {
     workflow: 'Team invite/edit/delete',

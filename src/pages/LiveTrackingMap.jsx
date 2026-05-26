@@ -215,7 +215,8 @@ export default function LiveTrackingMap() {
           </p>
         </div>
         <div className="live-map-actions">
-          <Link to="/fleet/map" className="live-map-action">Fleet Map</Link>
+          <Link to="/assistant" className="live-map-action">Ask Assistant</Link>
+          <Link to="/fleet/map" className="live-map-action live-map-action--secondary">Fleet Map</Link>
           <Link to="/hospital-map" className="live-map-action live-map-action--secondary">Hospital Map</Link>
           <Link to="/medical-iot" className="live-map-action live-map-action--secondary">Medical IoT</Link>
         </div>
