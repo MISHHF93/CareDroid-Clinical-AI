@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AIService } from '../ai/ai.service';
 import { IntentClassifierService } from '../medical-control-plane/intent-classifier/intent-classifier.service';
@@ -29,12 +29,9 @@ import {
 } from '../ai/prompts/clinical-query.prompt';
 import { calculateConfidence, getConfidenceDisclaimer } from '../ai/utils/confidence-scorer';
 import { CalculatorRecommenderService } from './calculator-recommender.service';
-import {
-  AIGatewayService,
-  ContextBuilderService,
-  ResponseComposerService,
-} from '../ai-gateway';
+import { AIGatewayService, ContextBuilderService, ResponseComposerService } from '../ai-gateway';
 import { MoERouterService } from '../moe-router';
+import { ToolExecutionService } from '../tool-calling/tool-execution.service';
 
 interface QueryResponse {
   text: string;
@@ -78,6 +75,7 @@ export class ChatService {
     private readonly aiRoutingEngine: MoERouterService,
     private readonly aiContextManager: ContextBuilderService,
     private readonly aiResponseComposer: ResponseComposerService,
+    private readonly toolExecutionService: ToolExecutionService,
   ) {
     const ragConfig = this.configService.get<any>('rag');
     this.ragEnabled = ragConfig?.enabled !== false;
@@ -198,17 +196,17 @@ export class ChatService {
       // Return emergency response with escalation details
       return this.aiResponseComposer.compose(
         {
-        text: escalationResult.message,
-        suggestions: escalationResult.recommendations.slice(0, 3), // Top 3 recommendations
-        emergencyAlert: {
-          severity: classification.emergencySeverity!,
-          message: escalationResult.message,
-          requiresEscalation: true,
-          escalationActions: escalationResult.actions.map((a) => a.type),
-          requires911: escalationResult.requiresImmediate911,
-          medicalDirectorNotified: escalationResult.medicalDirectorNotified,
-        },
-        intentClassification: classification,
+          text: escalationResult.message,
+          suggestions: escalationResult.recommendations.slice(0, 3), // Top 3 recommendations
+          emergencyAlert: {
+            severity: classification.emergencySeverity!,
+            message: escalationResult.message,
+            requiresEscalation: true,
+            escalationActions: escalationResult.actions.map((a) => a.type),
+            requires911: escalationResult.requiresImmediate911,
+            medicalDirectorNotified: escalationResult.medicalDirectorNotified,
+          },
+          intentClassification: classification,
         },
         aiRunEnvelope,
         routePlan,
@@ -382,15 +380,15 @@ export class ChatService {
 
       return this.aiResponseComposer.compose(
         {
-        text: responseText,
-        suggestions: citations.length > 0 ? ['View sources', 'Related topics'] : [],
-        visualizations: [],
-        intentClassification: classification,
-        citations,
-        confidence,
-        ragContext: ragContext ? this.buildRagResponseContext(ragContext) : undefined,
-        sourcePanel: ragContext?.sourcePanel,
-        toolResult: toolResults,
+          text: responseText,
+          suggestions: citations.length > 0 ? ['View sources', 'Related topics'] : [],
+          visualizations: [],
+          intentClassification: classification,
+          citations,
+          confidence,
+          ragContext: ragContext ? this.buildRagResponseContext(ragContext) : undefined,
+          sourcePanel: ragContext?.sourcePanel,
+          toolResult: toolResults,
         },
         aiRunEnvelope,
         routePlan,
@@ -496,7 +494,10 @@ export class ChatService {
     };
   }
 
-  private buildRagResponseContext(ragContext: RAGContext, confidenceLevel?: string): Record<string, any> {
+  private buildRagResponseContext(
+    ragContext: RAGContext,
+    confidenceLevel?: string,
+  ): Record<string, any> {
     return {
       chunksRetrieved: ragContext.chunks.length,
       sourcesFound: ragContext.sources.length,
@@ -638,182 +639,79 @@ export class ChatService {
     aiFoundation?: Record<string, any>,
   ): Promise<QueryResponse> {
     const toolId = classification.toolId;
-    const parameters = classification.extractedParameters || {};
 
-    this.logger.log(`🔧 Invoking clinical tool: ${toolId}`);
+    this.logger.log(`🔧 Invoking clinical tool through tool-calling pipeline: ${toolId}`);
 
-    try {
-      // Check if we have enough parameters to execute the tool
-      const toolMetadata = this.toolOrchestrator.getToolMetadata(toolId);
-      const requiredParams = toolMetadata.parameters.filter((p) => p.required);
-      const providedParams = Object.keys(parameters);
+    const result = await this.toolExecutionService.executePrompt({
+      prompt: message,
+      toolId,
+      parameters: classification.extractedParameters || {},
+      userId: userId || 'anonymous',
+      conversationId: 'chat-' + Date.now(),
+      classification,
+      context: {
+        aiFoundation,
+      },
+    });
 
-      // If missing required parameters, ask AI to extract them
-      if (requiredParams.length > 0 && providedParams.length === 0) {
-        this.logger.log(`📝 Attempting to extract parameters from message with AI`);
-
-        const extractionPrompt = `Extract the following parameters from this medical query: "${message}"
-
-Required parameters for ${toolMetadata.name}:
-${requiredParams.map((p) => `- ${p.name} (${p.type}): ${p.description}`).join('\n')}
-
-Optional parameters:
-${toolMetadata.parameters
-  .filter((p) => !p.required)
-  .map((p) => `- ${p.name} (${p.type}): ${p.description}`)
-  .join('\n')}
-
-Return ONLY a JSON object with the extracted values. Return null for any parameter that cannot be extracted.`;
-
-        try {
-          const extractedParams = await this.aiService.generateStructuredJSON(
-            userId || 'anonymous',
-            extractionPrompt,
-            Object.fromEntries(
-              toolMetadata.parameters.map((p) => [
-                p.name,
-                p.type === 'number' ? 0 : p.type === 'boolean' ? false : '',
-              ]),
-            ),
-            {
-              feature: 'tool-parameter-extraction',
-              intentClassification: classification,
-              tool: toolId,
-              aiFoundation,
-            },
-          );
-
-          // Filter out null values
-          Object.keys(extractedParams).forEach((key) => {
-            if (extractedParams[key] !== null && extractedParams[key] !== '') {
-              parameters[key] = extractedParams[key];
-            }
-          });
-
-          this.logger.log(`✅ Extracted ${Object.keys(parameters).length} parameters`);
-        } catch (error) {
-          this.logger.warn(
-            `Parameter extraction failed: ${error instanceof Error ? error.message : String(error)}`,
-          );
-        }
-      }
-
-      // Validate parameters
-      const validation = await this.toolOrchestrator.validateToolExecution({
-        toolId,
-        parameters,
-        userId: userId || 'anonymous',
-        conversationId: 'chat-' + Date.now(),
-      });
-
-      // If validation fails but tool might still be useful, show what's needed
-      if (!validation.valid && Object.keys(parameters).length === 0) {
-        const toolInfo = this.getToolInfo(toolId);
-
-        return {
-          text: `**${toolMetadata.name}**\n\n${toolMetadata.description}\n\n**To use this tool, please provide the following information:**\n${requiredParams.map((p) => `- **${p.name}**: ${p.description}`).join('\n')}\n\n${
-            toolMetadata.parameters.filter((p) => !p.required).length > 0
-              ? `**Optional parameters:**\n${toolMetadata.parameters
-                  .filter((p) => !p.required)
-                  .map((p) => `- ${p.name}: ${p.description}`)
-                  .join('\n')}`
-              : ''
-          }`,
-          suggestions: ['Show example', 'View documentation'],
-          visualizations: [
-            {
-              type: 'tool-preview',
-              data: { toolId, toolName: toolMetadata.name },
-            },
-          ],
-          intentClassification: classification,
-        };
-      }
-
-      // Execute the tool
-      const toolResult = await this.toolOrchestrator.executeInChat(
-        toolId,
-        parameters,
-        userId || 'anonymous',
-        'chat-' + Date.now(),
+    if (result.status === 'unsupported') {
+      const unsupportedDoc = UNSUPPORTED_ORCHESTRATOR_TOOL_DOCS.find(
+        (doc) => doc.nluToolId === toolId,
       );
-
-      // Format response
-      if (!toolResult.result.success) {
-        const errors = toolResult.result.errors?.join(', ') || 'Unknown error';
-        return {
-          text: `❌ **${toolMetadata.name} Error**\n\n${errors}\n\n_Please provide the required parameters and try again._`,
-          suggestions: ['Try again with parameters', 'View documentation'],
-          intentClassification: classification,
-        };
-      }
-
       return {
-        text: toolResult.formattedForChat,
-        suggestions: ['Calculate again', 'Export results', 'View more details'],
-        visualizations: [
+        text: result.text,
+        suggestions: result.suggestions || [
+          'Open supported workflow',
+          'Ask general clinical question',
+        ],
+        visualizations: result.visualizations || [
           {
-            type: 'tool-result',
+            type: 'unsupported-tool',
             data: {
+              code: ToolExecutionErrorCode.UNSUPPORTED_TOOL,
               toolId,
-              toolName: toolResult.toolName,
-              result: toolResult.result.data,
-              timestamp: toolResult.result.timestamp,
+              frontendSurface: unsupportedDoc?.frontendSurface || 'chat-assisted',
+              registryId: unsupportedDoc?.registryId,
             },
           },
         ],
         intentClassification: classification,
         toolResult: {
           toolId,
-          toolName: toolResult.toolName,
-          result: toolResult.result,
+          errorCode: result.errorCode || ToolExecutionErrorCode.UNSUPPORTED_TOOL,
+          frontendSurface: unsupportedDoc?.frontendSurface || 'chat-assisted',
+          registryId: unsupportedDoc?.registryId,
+          launch: result.launch,
+          executionLogs: result.executionLogs,
+        },
+        metadata: {
+          toolCallingStatus: result.status,
+          executionLogs: result.executionLogs,
         },
       };
-    } catch (error) {
-      this.logger.error(
-        `Tool execution failed: ${error instanceof Error ? error.message : String(error)}`,
-      );
-
-      if (error instanceof NotFoundException) {
-        this.logger.warn(
-          `No orchestrator registered for toolId=${toolId}; returning structured unsupported-tool response`,
-        );
-        const unsupportedDoc = UNSUPPORTED_ORCHESTRATOR_TOOL_DOCS.find(
-          (doc) => doc.nluToolId === toolId,
-        );
-        return {
-          text:
-            `**${this.getToolInfo(toolId).name} is not available as an automated backend executor.**\n\n` +
-            'This CareDroid deployment can still route you to the supported frontend workflow when one exists, but it will not run a backend `/tools/:id/execute` action for this tool.',
-          suggestions: ['Open supported workflow', 'Ask general clinical question'],
-          visualizations: [
-            {
-              type: 'unsupported-tool',
-              data: {
-                code: ToolExecutionErrorCode.UNSUPPORTED_TOOL,
-                toolId,
-                frontendSurface: unsupportedDoc?.frontendSurface || 'chat-assisted',
-                registryId: unsupportedDoc?.registryId,
-              },
-            },
-          ],
-          intentClassification: classification,
-          toolResult: {
-            toolId,
-            errorCode: ToolExecutionErrorCode.UNSUPPORTED_TOOL,
-            frontendSurface: unsupportedDoc?.frontendSurface || 'chat-assisted',
-            registryId: unsupportedDoc?.registryId,
-          },
-        };
-      }
-
-      const toolInfo = this.getToolInfo(toolId);
-      return {
-        text: `❌ **Error executing ${toolInfo.name}**\n\n${error instanceof Error ? error.message : 'An unexpected error occurred'}\n\nPlease try again or contact support if the issue persists.`,
-        suggestions: ['Try again', 'View documentation'],
-        intentClassification: classification,
-      };
     }
+
+    return {
+      text: result.text,
+      suggestions: result.suggestions,
+      visualizations: result.visualizations,
+      intentClassification: result.intentClassification || classification,
+      toolResult: {
+        toolId,
+        toolName: result.toolName,
+        status: result.status,
+        result: result.result,
+        parameters: result.parameters,
+        missingParameters: result.missingParameters,
+        validation: result.validation,
+        launch: result.launch,
+        executionLogs: result.executionLogs,
+      },
+      metadata: {
+        toolCallingStatus: result.status,
+        executionLogs: result.executionLogs,
+      },
+    };
   }
 
   /**

@@ -50,6 +50,7 @@ import { UserActivityModule } from './modules/user-activity/user-activity.module
 import { PersonalizationModule } from './modules/personalization/personalization.module';
 import { ArtifactsModule } from './modules/artifacts/artifacts.module';
 import { MemoryModule } from './modules/memory/memory.module';
+import { ToolCallingModule } from './modules/tool-calling/tool-calling.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -135,6 +136,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     PersonalizationModule,
     ArtifactsModule,
     MemoryModule,
+    ToolCallingModule,
     UserProfileModule,
     LiveTrackingModule,
     ClinicalAlertsModule,

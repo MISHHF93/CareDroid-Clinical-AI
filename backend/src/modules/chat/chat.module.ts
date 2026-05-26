@@ -11,6 +11,7 @@ import { MetricsModule } from '../metrics/metrics.module';
 import { CalculatorRecommenderService } from './calculator-recommender.service';
 import { AIGatewayModule } from '../ai-gateway';
 import { MoERouterModule } from '../moe-router';
+import { ToolCallingModule } from '../tool-calling/tool-calling.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { MoERouterModule } from '../moe-router';
     MetricsModule,
     AIGatewayModule,
     MoERouterModule,
+    ToolCallingModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, CalculatorRecommenderService],
