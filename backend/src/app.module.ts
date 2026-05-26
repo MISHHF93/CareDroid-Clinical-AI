@@ -53,6 +53,7 @@ import { MemoryModule } from './modules/memory/memory.module';
 import { ToolCallingModule } from './modules/tool-calling/tool-calling.module';
 import { TrainingModule } from './modules/training/training.module';
 import { CostOptimizerModule } from './modules/cost-optimizer/cost-optimizer.module';
+import { EvaluationModule } from './modules/evaluation/evaluation.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -141,6 +142,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     ToolCallingModule,
     TrainingModule,
     CostOptimizerModule,
+    EvaluationModule,
     UserProfileModule,
     LiveTrackingModule,
     ClinicalAlertsModule,

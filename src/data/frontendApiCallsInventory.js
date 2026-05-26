@@ -175,6 +175,8 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'training-runs-create', method: 'POST', path: '/api/training/runs', client: 'trainingApi.js / TrainingDashboard.jsx', capability: 'trainingPipeline' },
   { id: 'training-run-evaluate', method: 'POST', path: '/api/training/runs/:runId/evaluate', client: 'trainingApi.js', capability: 'trainingPipeline' },
   { id: 'training-moe-plan', method: 'GET', path: '/api/training/moe-plan', client: 'trainingApi.js', capability: 'trainingPipeline' },
+  { id: 'evaluation-dashboard', method: 'GET', path: '/api/evaluation/dashboard', client: 'evaluationApi.js / AiEvaluationDashboard.jsx', capability: 'evaluationFramework' },
+  { id: 'evaluation-runs-create', method: 'POST', path: '/api/evaluation/runs', client: 'evaluationApi.js', capability: 'evaluationFramework' },
   { id: 'subscriptions-current', method: 'GET', path: '/api/subscriptions/current', client: 'configService.js / subscriptionApi.js' },
   { id: 'subscriptions-plans', method: 'GET', path: '/api/subscriptions/plans', client: 'configService.js / subscriptionApi.js' },
   { id: 'subscriptions-checkout', method: 'POST', path: '/api/subscriptions/create-checkout', client: 'subscriptionApi.js' },

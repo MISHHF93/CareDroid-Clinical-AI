@@ -45,6 +45,7 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   personalization: BACKEND_CAPABILITY_STATUS.REAL,
   memory: BACKEND_CAPABILITY_STATUS.REAL,
   trainingPipeline: BACKEND_CAPABILITY_STATUS.REAL,
+  evaluationFramework: BACKEND_CAPABILITY_STATUS.REAL,
   /** No Nest route — do not POST */
   toolsShareResults: BACKEND_CAPABILITY_STATUS.DISABLED,
   teamManagement: BACKEND_CAPABILITY_STATUS.DISABLED,
