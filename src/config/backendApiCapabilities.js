@@ -8,7 +8,9 @@
 import { ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from '../data/clinicalToolIdContract';
 
 /** POST /api/tools/:nluToolId/execute — registered orchestrator executors only. */
-export const BACKEND_EXECUTOR_NLU_TOOL_IDS = Object.freeze([...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS]);
+export const BACKEND_EXECUTOR_NLU_TOOL_IDS = Object.freeze([
+  ...ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+]);
 
 export function isBackendExecutorToolId(toolId) {
   return BACKEND_EXECUTOR_NLU_TOOL_IDS.includes(toolId);
@@ -42,6 +44,7 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   userActivity: BACKEND_CAPABILITY_STATUS.REAL,
   personalization: BACKEND_CAPABILITY_STATUS.REAL,
   memory: BACKEND_CAPABILITY_STATUS.REAL,
+  trainingPipeline: BACKEND_CAPABILITY_STATUS.REAL,
   /** No Nest route — do not POST */
   toolsShareResults: BACKEND_CAPABILITY_STATUS.DISABLED,
   teamManagement: BACKEND_CAPABILITY_STATUS.DISABLED,

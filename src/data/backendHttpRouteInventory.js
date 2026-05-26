@@ -64,6 +64,21 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/personalization/me/saved-prompts', controller: 'PersonalizationController' },
   { method: 'DELETE', path: '/api/personalization/me/saved-prompts/:promptId', controller: 'PersonalizationController' },
 
+  { method: 'GET', path: '/api/artifacts', controller: 'ArtifactsController' },
+  { method: 'GET', path: '/api/artifacts/graph', controller: 'ArtifactsController' },
+  { method: 'POST', path: '/api/artifacts', controller: 'ArtifactsController' },
+  { method: 'GET', path: '/api/artifacts/:id', controller: 'ArtifactsController' },
+  { method: 'GET', path: '/api/artifacts/:id/versions', controller: 'ArtifactsController' },
+  { method: 'PATCH', path: '/api/artifacts/:id', controller: 'ArtifactsController' },
+
+  { method: 'GET', path: '/api/memory/dashboard', controller: 'MemoryController' },
+  { method: 'POST', path: '/api/memory/short', controller: 'MemoryController' },
+  { method: 'GET', path: '/api/memory/short', controller: 'MemoryController' },
+  { method: 'POST', path: '/api/memory/long', controller: 'MemoryController' },
+  { method: 'GET', path: '/api/memory/long', controller: 'MemoryController' },
+  { method: 'POST', path: '/api/memory/clinical', controller: 'MemoryController' },
+  { method: 'GET', path: '/api/memory/clinical', controller: 'MemoryController' },
+
   { method: 'GET', path: '/api/two-factor/generate', controller: 'TwoFactorController' },
   { method: 'POST', path: '/api/two-factor/enable', controller: 'TwoFactorController' },
   { method: 'DELETE', path: '/api/two-factor/disable', controller: 'TwoFactorController' },
@@ -147,6 +162,18 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/tools/:id/execute', controller: 'ToolOrchestratorController' },
   { method: 'POST', path: '/api/tools/execute', controller: 'ToolOrchestratorController' },
   { method: 'POST', path: '/api/tools/results', controller: 'ToolOrchestratorController' },
+
+  { method: 'POST', path: '/api/tool-calling/execute', controller: 'ToolCallingController' },
+  { method: 'GET', path: '/api/tool-calling/catalog', controller: 'ToolCallingController' },
+  { method: 'GET', path: '/api/tool-calling/resolve', controller: 'ToolCallingController' },
+  { method: 'GET', path: '/api/tool-calling/logs', controller: 'ToolCallingController' },
+
+  { method: 'GET', path: '/api/training/pipeline', controller: 'TrainingController' },
+  { method: 'GET', path: '/api/training/dashboard', controller: 'TrainingController' },
+  { method: 'GET', path: '/api/training/runs', controller: 'TrainingController' },
+  { method: 'POST', path: '/api/training/runs', controller: 'TrainingController' },
+  { method: 'POST', path: '/api/training/runs/:runId/evaluate', controller: 'TrainingController' },
+  { method: 'GET', path: '/api/training/moe-plan', controller: 'TrainingController' },
 
   { method: 'GET', path: '/api/drugs', controller: 'DrugController' },
   { method: 'GET', path: '/api/drugs/categories', controller: 'DrugController' },

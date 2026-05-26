@@ -46,6 +46,7 @@ const Patients = lazyWithRetry(() => import('./pages/Patients'));
 const Operations = lazyWithRetry(() => import('./pages/Operations'));
 const Artifacts = lazyWithRetry(() => import('./pages/Artifacts'));
 const MemoryDashboard = lazyWithRetry(() => import('./pages/MemoryDashboard'));
+const TrainingDashboard = lazyWithRetry(() => import('./pages/TrainingDashboard'));
 const LiveTrackingMap = lazyWithRetry(() => import('./pages/LiveTrackingMap'));
 const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
 const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
@@ -90,14 +91,28 @@ const DiagnosisAssistant = lazyWithRetry(() => import('./pages/tools/DiagnosisAs
 const ProcedureGuide = lazyWithRetry(() => import('./pages/tools/ProcedureGuide'));
 const AmbientScribe = lazyWithRetry(() => import('./pages/tools/AmbientScribe'));
 const CalculatorRecommender = lazyWithRetry(() => import('./pages/tools/CalculatorRecommender'));
-const CardiologyAssistantPage = lazyWithRetry(() => import('./pages/tools/CardiologyAssistantPage'));
-const PulmonologyAssistantPage = lazyWithRetry(() => import('./pages/tools/PulmonologyAssistantPage'));
-const NephrologyAssistantPage = lazyWithRetry(() => import('./pages/tools/NephrologyAssistantPage'));
-const GastroenterologyAssistantPage = lazyWithRetry(() => import('./pages/tools/GastroenterologyAssistantPage'));
-const EndocrineMetabolicAssistantPage = lazyWithRetry(() => import('./pages/tools/EndocrineMetabolicAssistantPage'));
+const CardiologyAssistantPage = lazyWithRetry(
+  () => import('./pages/tools/CardiologyAssistantPage')
+);
+const PulmonologyAssistantPage = lazyWithRetry(
+  () => import('./pages/tools/PulmonologyAssistantPage')
+);
+const NephrologyAssistantPage = lazyWithRetry(
+  () => import('./pages/tools/NephrologyAssistantPage')
+);
+const GastroenterologyAssistantPage = lazyWithRetry(
+  () => import('./pages/tools/GastroenterologyAssistantPage')
+);
+const EndocrineMetabolicAssistantPage = lazyWithRetry(
+  () => import('./pages/tools/EndocrineMetabolicAssistantPage')
+);
 const NeurologyAssistantPage = lazyWithRetry(() => import('./pages/tools/NeurologyAssistantPage'));
-const PediatricsObgynAssistantPage = lazyWithRetry(() => import('./pages/tools/PediatricsObgynAssistantPage'));
-const PsychiatryAssistantPage = lazyWithRetry(() => import('./pages/tools/PsychiatryAssistantPage'));
+const PediatricsObgynAssistantPage = lazyWithRetry(
+  () => import('./pages/tools/PediatricsObgynAssistantPage')
+);
+const PsychiatryAssistantPage = lazyWithRetry(
+  () => import('./pages/tools/PsychiatryAssistantPage')
+);
 const GuidelineRag = lazyWithRetry(() => import('./pages/tools/GuidelineRag'));
 const DifferentialAi = lazyWithRetry(() => import('./pages/tools/DifferentialAi'));
 const TimelineAi = lazyWithRetry(() => import('./pages/tools/TimelineAi'));
@@ -711,6 +726,16 @@ function AppRoutes() {
         </AppShellPage>
       ),
       requiresAuth: true,
+    },
+    {
+      path: '/training',
+      element: (
+        <AppShellPage>
+          <TrainingDashboard />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: [Permission.CONFIGURE_SYSTEM, Permission.VIEW_ANALYTICS],
     },
     {
       path: '/live-map',

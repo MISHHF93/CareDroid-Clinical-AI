@@ -39,6 +39,7 @@ describe('backendApiCapabilities', () => {
     expect(isBackendCapabilityEnabled('workspaces')).toBe(true);
     expect(isBackendCapabilityEnabled('userActivity')).toBe(true);
     expect(isBackendCapabilityEnabled('personalization')).toBe(true);
+    expect(isBackendCapabilityEnabled('trainingPipeline')).toBe(true);
     expect(isBackendCapabilityEnabled('clinicalAlerts')).toBe(true);
   });
 

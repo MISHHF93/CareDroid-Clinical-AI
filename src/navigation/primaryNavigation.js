@@ -64,6 +64,15 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     showInMobile: false,
   },
   {
+    id: 'training',
+    label: 'Training',
+    mobileLabel: 'Train',
+    path: '/training',
+    matchPaths: ['/training'],
+    permission: 'VIEW_ANALYTICS',
+    showInMobile: false,
+  },
+  {
     id: 'operations',
     label: 'Operations',
     mobileLabel: 'Ops',

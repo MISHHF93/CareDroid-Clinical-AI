@@ -92,6 +92,7 @@ const NAV_ICONS = {
   calculators: Calculator,
   artifacts: Layers,
   memory: Brain,
+  training: LineChart,
   operations: Truck,
   maps: Route,
   'medical-iot': Activity,

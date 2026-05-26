@@ -48,6 +48,19 @@ export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'POST /api/tools/:id/validate': { strategy: 'expose-recommended', reason: 'Pre-execute validation', clientHint: 'clinicalOrchestratorApi.js' },
   'POST /api/tools/execute': { strategy: 'deferred', reason: 'Batch execute; UI uses per-id execute' },
 
+  'GET /api/memory/short': { strategy: 'deferred', reason: 'Memory dashboard uses aggregate route' },
+  'GET /api/memory/long': { strategy: 'deferred', reason: 'Memory dashboard uses aggregate route' },
+  'GET /api/memory/clinical': { strategy: 'deferred', reason: 'Memory dashboard uses aggregate route' },
+
+  'POST /api/artifacts': { strategy: 'deferred', reason: 'Artifact authoring is not exposed in dashboard yet' },
+  'GET /api/artifacts/:id': { strategy: 'deferred', reason: 'Artifact detail route is not linked yet' },
+  'PATCH /api/artifacts/:id': { strategy: 'deferred', reason: 'Artifact editing is not exposed in dashboard yet' },
+
+  'POST /api/tool-calling/execute': { strategy: 'deferred', reason: 'Chat delegates server-side; direct UI not exposed yet' },
+  'GET /api/tool-calling/catalog': { strategy: 'deferred', reason: 'Internal tool-calling contract catalog' },
+  'GET /api/tool-calling/resolve': { strategy: 'deferred', reason: 'Server-side catalog launch helper' },
+  'GET /api/tool-calling/logs': { strategy: 'deferred', reason: 'Operational debugging endpoint' },
+
   'GET /api/drugs/categories': { strategy: 'expose-recommended', reason: 'Drug reference', clientHint: 'clinicalContentApi.js' },
   'GET /api/drugs/:id': { strategy: 'expose-recommended', reason: 'Drug detail', clientHint: 'clinicalContentApi.js' },
   'POST /api/drugs': { strategy: 'deferred', reason: 'Admin content API' },
