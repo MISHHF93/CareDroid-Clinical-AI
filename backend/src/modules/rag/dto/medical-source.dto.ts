@@ -5,6 +5,22 @@
  * Used for providing citations and maintaining clinical accuracy.
  */
 
+export type MedicalSourceType =
+  | 'clinical_guideline'
+  | 'guideline'
+  | 'protocol'
+  | 'calculator_metadata'
+  | 'medical_tool'
+  | 'documentation'
+  | 'workflow_artifact'
+  | 'drug_info'
+  | 'drug_information'
+  | 'clinical_pathway'
+  | 'reference'
+  | 'textbook'
+  | 'journal'
+  | 'other';
+
 export interface MedicalSource {
   /**
    * Unique identifier for the source
@@ -19,14 +35,7 @@ export interface MedicalSource {
   /**
    * Type of medical source
    */
-  type:
-    | 'protocol'
-    | 'guideline'
-    | 'drug_info'
-    | 'clinical_pathway'
-    | 'reference'
-    | 'textbook'
-    | 'journal';
+  type: MedicalSourceType;
 
   /**
    * Organization that published the source
@@ -42,6 +51,16 @@ export interface MedicalSource {
    * Publication date or last updated
    */
   date?: string;
+
+  /**
+   * Last time this source was materially updated
+   */
+  lastUpdated?: string;
+
+  /**
+   * Timestamp associated with the source event/artifact
+   */
+  timestamp?: string;
 
   /**
    * URL to the full source
@@ -77,6 +96,11 @@ export interface MedicalSource {
    * Tags for categorization
    */
   tags?: string[];
+
+  /**
+   * Provider-specific or source-specific metadata for display and filtering
+   */
+  metadata?: Record<string, any>;
 }
 
 export interface IngestDocumentDto {
@@ -146,10 +170,13 @@ export interface DocumentChunk {
     type: MedicalSource['type'];
     organization?: string;
     date?: string;
+    lastUpdated?: string;
+    timestamp?: string;
     url?: string;
     chunkIndex: number;
     totalChunks: number;
     specialty?: string;
     tags?: string[];
+    metadata?: Record<string, any>;
   };
 }

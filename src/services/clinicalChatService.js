@@ -150,6 +150,31 @@ export function normalizeAiFoundationMetadata(metadata = {}) {
   };
 }
 
+export function normalizeRagSourcePanel(data = {}) {
+  const panel = data.sourcePanel || data.ragContext?.sourcePanel;
+  if (panel?.references?.length) {
+    return panel;
+  }
+
+  const references = data.ragContext?.references;
+  if (Array.isArray(references) && references.length > 0) {
+    return {
+      references,
+      confidence: data.confidence ?? data.ragContext?.confidence,
+      generatedAt: data.ragContext?.generatedAt,
+      retrieval: {
+        query: data.ragContext?.query,
+        chunksRetrieved: data.ragContext?.chunksRetrieved,
+        sourcesFound: data.ragContext?.sourcesFound,
+        totalRetrieved: data.ragContext?.totalRetrieved,
+        latencyMs: data.ragContext?.latencyMs,
+      },
+    };
+  }
+
+  return undefined;
+}
+
 /**
  * Map API JSON body to a single assistant message object for conversation state.
  * @param {object} data - parsed response from sendClinicalChatMessage
@@ -157,6 +182,7 @@ export function normalizeAiFoundationMetadata(metadata = {}) {
 export function mapChatResponseToAssistantMessage(data) {
   const toolResult = normalizeToolResultForUi(data.toolResult);
   const aiFoundation = normalizeAiFoundationMetadata(data.metadata);
+  const sourcePanel = normalizeRagSourcePanel(data);
   const backendVisualizations = Array.isArray(data.visualizations) ? data.visualizations : [];
   const viz = [...backendVisualizations];
   if (toolResult?.result?.data != null && (toolResult.toolId || toolResult.toolName)) {
@@ -181,6 +207,7 @@ export function mapChatResponseToAssistantMessage(data) {
     confidence: data.confidence,
     suggestions: Array.isArray(data.suggestions) ? data.suggestions : [],
     ragContext: data.ragContext,
+    sourcePanel,
     toolResult,
     visualizations: viz.length > 0 ? viz : undefined,
     metadata: data.metadata,

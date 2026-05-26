@@ -89,7 +89,15 @@ interface ChatResponseDto {
   ragContext?: {
     chunksRetrieved: number;
     sourcesFound: number;
+    totalRetrieved?: number;
+    latencyMs?: number;
+    confidence?: number;
+    confidenceLevel?: string;
+    generatedAt?: string;
+    references?: any[];
+    sourcePanel?: any;
   };
+  sourcePanel?: any;
   metadata: {
     toolUsed?: string;
     featureUsed?: string;
@@ -151,6 +159,7 @@ export class ChatController {
       citations: response.citations,
       confidence: response.confidence,
       ragContext: response.ragContext,
+      sourcePanel: response.sourcePanel || response.ragContext?.sourcePanel,
       metadata: {
         ...response.metadata,
         toolUsed: dto.tool,

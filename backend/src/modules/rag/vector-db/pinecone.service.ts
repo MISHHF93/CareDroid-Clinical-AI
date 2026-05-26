@@ -312,11 +312,14 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
 
     if (metadata.organization) flattened.organization = metadata.organization;
     if (metadata.date) flattened.date = metadata.date;
+    if (metadata.lastUpdated) flattened.lastUpdated = metadata.lastUpdated;
+    if (metadata.timestamp) flattened.timestamp = metadata.timestamp;
     if (metadata.url) flattened.url = metadata.url;
     if (metadata.chunkIndex !== undefined) flattened.chunkIndex = metadata.chunkIndex;
     if (metadata.totalChunks !== undefined) flattened.totalChunks = metadata.totalChunks;
     if (metadata.specialty) flattened.specialty = metadata.specialty;
     if (metadata.tags) flattened.tags = metadata.tags;
+    if (metadata.metadata) flattened.metadata = JSON.stringify(metadata.metadata);
 
     return flattened;
   }
@@ -331,12 +334,28 @@ export class PineconeService implements IVectorDatabase, OnModuleInit {
     // Remove text from metadata (it's stored separately)
     const { text: _, ...metadataWithoutText } = metadata;
 
+    const metadataRecord = {
+      ...metadataWithoutText,
+      metadata:
+        typeof metadataWithoutText.metadata === 'string'
+          ? this.safeJsonParse(metadataWithoutText.metadata)
+          : metadataWithoutText.metadata,
+    };
+
     return {
       id: match.id,
       score: match.score,
       text,
-      metadata: metadataWithoutText as ChunkMetadata,
+      metadata: metadataRecord as ChunkMetadata,
       vector: includeVector ? match.values : undefined,
     };
+  }
+
+  private safeJsonParse(value: string): Record<string, any> | undefined {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return undefined;
+    }
   }
 }

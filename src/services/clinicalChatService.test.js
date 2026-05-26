@@ -3,6 +3,7 @@ import {
   analyzeClinicalVitals,
   mapChatResponseToAssistantMessage,
   normalizeAiFoundationMetadata,
+  normalizeRagSourcePanel,
   normalizeToolResultForUi,
   sendClinicalChatMessage,
   suggestClinicalAction,
@@ -41,6 +42,54 @@ describe('clinicalChatService', () => {
     });
     expect(msg.content).toBe('Hello');
     expect(msg.toolResult.toolId).toBe('drug-interactions');
+  });
+
+  it('normalizes RAG source panel references from chat responses', () => {
+    const sourcePanel = normalizeRagSourcePanel({
+      confidence: 0.84,
+      ragContext: {
+        chunksRetrieved: 2,
+        sourcesFound: 1,
+        references: [
+          {
+            id: 'ref-sepsis',
+            sourceId: 'sepsis-guideline',
+            title: 'Sepsis Guideline',
+            type: 'clinical_guideline',
+            relevance: 0.92,
+          },
+        ],
+      },
+    });
+
+    expect(sourcePanel).toMatchObject({
+      confidence: 0.84,
+      references: [expect.objectContaining({ sourceId: 'sepsis-guideline' })],
+      retrieval: expect.objectContaining({ chunksRetrieved: 2, sourcesFound: 1 }),
+    });
+  });
+
+  it('mapChatResponseToAssistantMessage exposes RAG source panel data', () => {
+    const msg = mapChatResponseToAssistantMessage({
+      response: 'Evidence-based response',
+      sourcePanel: {
+        confidence: 0.9,
+        references: [
+          {
+            id: 'ref-protocol',
+            sourceId: 'protocol-1',
+            title: 'Protocol',
+            type: 'protocol',
+            relevance: 0.9,
+          },
+        ],
+      },
+    });
+
+    expect(msg.sourcePanel.references[0]).toMatchObject({
+      sourceId: 'protocol-1',
+      relevance: 0.9,
+    });
   });
 
   it('normalizes AI foundation metadata for assistant rendering', () => {

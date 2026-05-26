@@ -5,6 +5,12 @@ import { OpenAIEmbeddingsService } from './embeddings/openai-embeddings.service'
 import { PineconeService } from './vector-db/pinecone.service';
 import { CohereRankerService } from './reranking/cohere-ranker.service';
 import { MetricsModule } from '../metrics/metrics.module';
+import { CacheModule } from '../cache/cache.module';
+import { EmbeddingService } from './embedding.service';
+import { RetrievalService } from './retrieval.service';
+import { RerankingService } from './reranking.service';
+import { ClinicalContextService } from './clinical-context.service';
+import { CitationService } from './citation.service';
 
 /**
  * RAG Module
@@ -16,8 +22,18 @@ import { MetricsModule } from '../metrics/metrics.module';
  */
 
 @Module({
-  imports: [ConfigModule, MetricsModule],
-  providers: [RAGService, OpenAIEmbeddingsService, PineconeService, CohereRankerService],
-  exports: [RAGService, CohereRankerService],
+  imports: [ConfigModule, MetricsModule, CacheModule],
+  providers: [
+    RAGService,
+    EmbeddingService,
+    RetrievalService,
+    RerankingService,
+    ClinicalContextService,
+    CitationService,
+    OpenAIEmbeddingsService,
+    PineconeService,
+    CohereRankerService,
+  ],
+  exports: [RAGService, RerankingService, CohereRankerService],
 })
 export class RAGModule {}

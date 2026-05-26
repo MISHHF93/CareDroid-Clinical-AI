@@ -18,6 +18,7 @@ import {
 } from '../medical-control-plane/intent-classifier/dto/intent-classification.dto';
 import { RAGService } from '../rag/rag.service';
 import { MedicalSource } from '../rag/dto/medical-source.dto';
+import { RAGContext } from '../rag/dto/rag-context.dto';
 import {
   buildClinicalQueryPrompt,
   buildMedicalReferencePrompt,
@@ -52,6 +53,7 @@ interface QueryResponse {
   citations?: MedicalSource[];
   confidence?: number;
   ragContext?: any;
+  sourcePanel?: any;
   metadata?: Record<string, any>;
 }
 
@@ -280,9 +282,9 @@ export class ChatService {
           this.logger.log(`📖 RAG: Retrieved ${ragContext.chunks.length} chunks for general query`);
 
           // Use RAG-augmented prompt
-          const retrievedContext = ragContext.chunks
-            .map((chunk, i) => `[${i + 1}] ${chunk.text}`)
-            .join('\n\n');
+          const retrievedContext =
+            ragContext.contextText ||
+            ragContext.chunks.map((chunk, i) => `[${i + 1}] ${chunk.text}`).join('\n\n');
 
           const prompt = buildClinicalQueryPrompt({
             retrievedContext,
@@ -386,6 +388,8 @@ export class ChatService {
         intentClassification: classification,
         citations,
         confidence,
+        ragContext: ragContext ? this.buildRagResponseContext(ragContext) : undefined,
+        sourcePanel: ragContext?.sourcePanel,
         toolResult: toolResults,
         },
         aiRunEnvelope,
@@ -489,6 +493,20 @@ export class ChatService {
         isEmergency: classification.isEmergency,
         method: classification.method,
       },
+    };
+  }
+
+  private buildRagResponseContext(ragContext: RAGContext, confidenceLevel?: string): Record<string, any> {
+    return {
+      chunksRetrieved: ragContext.chunks.length,
+      sourcesFound: ragContext.sources.length,
+      totalRetrieved: ragContext.totalRetrieved,
+      latencyMs: ragContext.latencyMs,
+      confidence: ragContext.confidence,
+      confidenceLevel,
+      generatedAt: ragContext.timestamp?.toISOString?.() || new Date().toISOString(),
+      references: ragContext.references || [],
+      sourcePanel: ragContext.sourcePanel,
     };
   }
 
@@ -872,18 +890,16 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
           text: `I wasn't able to find specific evidence-based resources in my knowledge base for this query.\n\n**Suggestions:**\n${confidenceScore.suggestedActions.map((a) => `- ${a}`).join('\n')}\n\n${getConfidenceDisclaimer(confidenceScore) || ''}\n\n_Would you like me to provide general clinical information, or would you prefer to rephrase your query?_`,
           suggestions: ['Rephrase query', 'General information', 'Search protocols'],
           confidence: confidenceScore.score,
-          ragContext: {
-            chunksRetrieved: 0,
-            sourcesFound: 0,
-          },
+          ragContext: this.buildRagResponseContext(ragContext, confidenceScore.level),
+          sourcePanel: ragContext.sourcePanel,
           intentClassification: classification,
         };
       }
 
       // Combine retrieved chunks into context
-      const retrievedContext = ragContext.chunks
-        .map((chunk, i) => `[Chunk ${i + 1}] ${chunk.text}`)
-        .join('\n\n');
+      const retrievedContext =
+        ragContext.contextText ||
+        ragContext.chunks.map((chunk, i) => `[Chunk ${i + 1}] ${chunk.text}`).join('\n\n');
 
       // Build prompt based on query type
       let prompt: string;
@@ -963,12 +979,8 @@ Return ONLY a JSON object with the extracted values. Return null for any paramet
         suggestions,
         citations: ragContext.sources,
         confidence: confidenceScore.score,
-        ragContext: {
-          chunksRetrieved: ragContext.chunks.length,
-          sourcesFound: ragContext.sources.length,
-          latencyMs: ragContext.latencyMs,
-          confidenceLevel: confidenceScore.level,
-        },
+        ragContext: this.buildRagResponseContext(ragContext, confidenceScore.level),
+        sourcePanel: ragContext.sourcePanel,
         intentClassification: classification,
       };
     } catch (error) {

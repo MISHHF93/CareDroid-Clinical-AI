@@ -240,11 +240,14 @@ export class DocumentChunker {
         type: source.type,
         organization: source.organization,
         date: source.date,
+        lastUpdated: source.lastUpdated,
+        timestamp: source.timestamp,
         url: source.url,
         chunkIndex,
         totalChunks,
         specialty: source.specialty,
         tags: source.tags,
+        metadata: source.metadata,
       },
     };
   }

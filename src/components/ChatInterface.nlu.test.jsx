@@ -116,4 +116,48 @@ describe('ChatInterface NLU integration', () => {
     expect(routePanel).toHaveTextContent(/retrieval: operational/i);
     expect(routePanel).toHaveTextContent(/estimated cost/i);
   });
+
+  it('renders the AI source panel for RAG references', () => {
+    render(
+      <ChatInterface
+        messages={[
+          {
+            id: '2',
+            role: 'assistant',
+            content: 'Use early antibiotics for sepsis.',
+            sourcePanel: {
+              confidence: 0.88,
+              generatedAt: '2026-01-01T12:00:00.000Z',
+              retrieval: {
+                chunksRetrieved: 2,
+                sourcesFound: 1,
+                latencyMs: 42,
+              },
+              references: [
+                {
+                  id: 'ref-sepsis',
+                  sourceId: 'sepsis-guideline',
+                  citationLabel: '[1]',
+                  title: 'Surviving Sepsis Guideline',
+                  type: 'clinical_guideline',
+                  organization: 'SCCM',
+                  relevance: 0.91,
+                  timestamp: '2026-01-01T11:00:00.000Z',
+                  chunkCount: 2,
+                  excerpts: ['Use early broad-spectrum antibiotics in sepsis.'],
+                },
+              ],
+            },
+          },
+        ]}
+        onAppendMessage={onAppendMessage}
+      />,
+    );
+
+    const sourcePanel = screen.getByLabelText(/ai source panel/i);
+    expect(sourcePanel).toHaveTextContent(/clinical rag sources/i);
+    expect(sourcePanel).toHaveTextContent(/surviving sepsis guideline/i);
+    expect(sourcePanel).toHaveTextContent(/relevance/i);
+    expect(sourcePanel).toHaveTextContent(/91%/);
+  });
 });

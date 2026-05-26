@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ToolPanel from './ToolPanel';
+import AISourcePanel from './chat/AISourcePanel';
 import AiRouteMetadata from './chat/AiRouteMetadata';
 import ToolCard from './ToolCard';
 import ToolVisualization from './ToolVisualization';
@@ -186,7 +187,31 @@ const ChatInterface = ({
                   ))}
                 </div>
               )}
-              {message.citations && message.citations.length > 0 && message.role === 'assistant' && (
+              {message.role === 'assistant' && (
+                <AISourcePanel
+                  sourcePanel={
+                    message.sourcePanel ||
+                    message.ragContext?.sourcePanel ||
+                    (Array.isArray(message.ragContext?.references) &&
+                    message.ragContext.references.length > 0
+                      ? {
+                          references: message.ragContext.references,
+                          confidence: message.confidence ?? message.ragContext.confidence,
+                          generatedAt: message.ragContext.generatedAt,
+                          retrieval: message.ragContext,
+                        }
+                      : undefined)
+                  }
+                />
+              )}
+              {message.citations &&
+                message.citations.length > 0 &&
+                message.role === 'assistant' &&
+                !(
+                  message.sourcePanel?.references?.length ||
+                  message.ragContext?.sourcePanel?.references?.length ||
+                  message.ragContext?.references?.length
+                ) && (
                 <Citations
                   citations={message.citations}
                   onViewDetails={(citation) => setSelectedCitation(citation)}
