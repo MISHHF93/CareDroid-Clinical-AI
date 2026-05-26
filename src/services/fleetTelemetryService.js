@@ -352,15 +352,30 @@ function buildFleetLiveSummary(vehicles, routes, alerts) {
     activeRoutes: routes.filter((route) => route.status === 'active').length,
     delayedRoutes: routes.filter((route) => route.status === 'delayed').length,
     activeAlerts: alerts.length,
+    averageUtilizationPercent: vehicles.length
+      ? Math.round(
+          vehicles.reduce((sum, vehicle) => sum + (vehicle.utilizationPercent || 0), 0) /
+            vehicles.length
+        )
+      : 0,
+    averageEtaMinutes: vehicles.some((vehicle) => Number.isFinite(vehicle.etaMinutes))
+      ? Math.round(
+          vehicles
+            .filter((vehicle) => Number.isFinite(vehicle.etaMinutes))
+            .reduce((sum, vehicle) => sum + vehicle.etaMinutes, 0) /
+            vehicles.filter((vehicle) => Number.isFinite(vehicle.etaMinutes)).length
+        )
+      : null,
     updatedAt: new Date().toISOString(),
     source: 'demo-fleet-live-tracking',
   };
 }
 
 async function fetchFleetLiveTrackingFromApi(signal) {
-  const [vehiclesResult, routesResult] = await Promise.all([
+  const [vehiclesResult, routesResult, alertsResult] = await Promise.all([
     fetchLiveTrackingCapability('fleetLiveTracking', '/api/fleet/vehicles/live', { signal }),
     fetchLiveTrackingCapability('fleetActiveRoutes', '/api/fleet/routes/active', { signal }),
+    fetchLiveTrackingCapability('fleetAlerts', '/api/fleet/alerts', { signal }),
   ]);
 
   if (!vehiclesResult.ok || !routesResult.ok) {
@@ -372,7 +387,7 @@ async function fetchFleetLiveTrackingFromApi(signal) {
     freshness: vehicle.freshness || vehicleFreshness(vehicle),
   }));
   const routes = routesResult.payload?.routes || [];
-  const alerts = buildFleetLiveAlerts(vehicles);
+  const alerts = alertsResult.ok ? alertsResult.payload?.alerts || [] : buildFleetLiveAlerts(vehicles);
   const summary = {
     ...buildFleetLiveSummary(vehicles, routes, alerts),
     ...(vehiclesResult.payload?.summary || {}),

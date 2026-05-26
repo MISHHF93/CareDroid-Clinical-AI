@@ -65,6 +65,7 @@ export const BACKEND_API_CAPABILITY_STATUS = Object.freeze({
   /** Read-only live tracking contracts exist and return clearly labeled demo data until real feeds are connected. */
   fleetLiveTracking: BACKEND_CAPABILITY_STATUS.DEMO,
   fleetActiveRoutes: BACKEND_CAPABILITY_STATUS.DEMO,
+  fleetAlerts: BACKEND_CAPABILITY_STATUS.DEMO,
   hospitalMap: BACKEND_CAPABILITY_STATUS.DEMO,
   medicalDeviceRegistry: BACKEND_CAPABILITY_STATUS.DEMO,
   telemetryLive: BACKEND_CAPABILITY_STATUS.DEMO,

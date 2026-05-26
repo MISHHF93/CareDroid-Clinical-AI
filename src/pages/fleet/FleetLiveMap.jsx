@@ -143,6 +143,7 @@ function VehicleDetailDrawer({ vehicle, route, alerts, onClose }) {
         <div><dt>Driver</dt><dd>{vehicle.driver || 'Unassigned'}</dd></div>
         <div><dt>Heading / speed</dt><dd>{vehicle.heading} deg / {vehicle.speedMph} mph</dd></div>
         <div><dt>Energy</dt><dd>{vehicle.energyPercent}% {vehicle.energyType}</dd></div>
+        <div><dt>Utilization</dt><dd>{vehicle.utilizationPercent}% active capacity</dd></div>
         <div><dt>ETA</dt><dd>{route?.etaMinutes != null ? `${route.etaMinutes} min` : vehicle.etaMinutes != null ? `${vehicle.etaMinutes} min` : 'No active ETA'}</dd></div>
         <div><dt>Route</dt><dd>{route?.name || 'No active route'}</dd></div>
       </dl>
@@ -304,6 +305,8 @@ export default function FleetLiveMap() {
               <SummaryCard label="Active/on job" value={snapshot.summary.activeVehicles} />
               <SummaryCard label="Available" value={snapshot.summary.availableVehicles} tone="good" />
               <SummaryCard label="Active routes" value={snapshot.summary.activeRoutes} />
+              <SummaryCard label="Avg utilization" value={`${snapshot.summary.averageUtilizationPercent ?? 0}%`} />
+              <SummaryCard label="Avg ETA" value={snapshot.summary.averageEtaMinutes == null ? 'N/A' : `${snapshot.summary.averageEtaMinutes}m`} />
               <SummaryCard label="Delayed routes" value={snapshot.summary.delayedRoutes} tone={snapshot.summary.delayedRoutes ? 'warning' : 'good'} />
               <SummaryCard label="Stale GPS" value={snapshot.summary.staleVehicles} tone={snapshot.summary.staleVehicles ? 'warning' : 'good'} />
               <SummaryCard label="Offline" value={snapshot.summary.offlineVehicles} tone={snapshot.summary.offlineVehicles ? 'critical' : 'good'} hint="Last updated required" />
@@ -356,6 +359,26 @@ export default function FleetLiveMap() {
                 onClose={() => setSelectedVehicleId(null)}
               />
             </div>
+
+            <section className="fleet-map-roster" aria-labelledby="fleet-map-roster-title">
+              <h2 id="fleet-map-roster-title">Vehicle Utilization</h2>
+              <div className="fleet-map-roster-grid">
+                {filteredVehicles.map((vehicle) => (
+                  <button
+                    key={vehicle.id}
+                    type="button"
+                    className="fleet-map-roster-card"
+                    onClick={() => setSelectedVehicleId(vehicle.id)}
+                  >
+                    <strong>{vehicle.id}</strong>
+                    <span>{FLEET_VEHICLE_STATUS_LABELS[vehicle.status] || vehicle.status}</span>
+                    <span>ETA: {vehicle.etaMinutes == null ? 'N/A' : `${vehicle.etaMinutes}m`}</span>
+                    <span>Utilization: {vehicle.utilizationPercent}%</span>
+                    <span>Alerts: {(alertsByVehicleId[vehicle.id] || []).length}</span>
+                  </button>
+                ))}
+              </div>
+            </section>
 
             {filteredVehicles.length === 0 ? (
               <section className="fleet-map-state" role="status">

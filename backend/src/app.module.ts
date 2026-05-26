@@ -66,6 +66,7 @@ import { EhrAuditModule } from './modules/ehr-audit/ehr-audit.module';
 import { ObservabilityModule } from './modules/observability/observability.module';
 import { HospitalMapModule } from './modules/hospital-map';
 import { TelemetryModule } from './modules/telemetry';
+import { FleetModule } from './modules/fleet';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -169,6 +170,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     LiveTrackingModule,
     HospitalMapModule,
     TelemetryModule,
+    FleetModule,
     ClinicalAlertsModule,
     PlatformSystemsModule,
 

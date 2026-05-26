@@ -155,7 +155,8 @@
 }
 
 .fleet-map-panel,
-.fleet-map-detail {
+.fleet-map-detail,
+.fleet-map-roster {
   min-width: 0;
   padding: var(--compact-panel-padding, 14px);
 }
@@ -414,6 +415,42 @@
   color: var(--text-secondary);
 }
 
+.fleet-map-roster {
+  margin-top: var(--compact-page-gap, 14px);
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--compact-panel-radius, 14px);
+  background: var(--app-surface-1);
+}
+
+.fleet-map-roster h2 {
+  margin: 0 0 12px;
+}
+
+.fleet-map-roster-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--compact-panel-gap, 10px);
+}
+
+.fleet-map-roster-card {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--compact-card-radius, 12px);
+  padding: 10px;
+  background: var(--app-surface-2);
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.fleet-map-roster-card span {
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+}
+
 .fleet-map-legend {
   margin-top: var(--compact-page-gap, 14px);
   padding: 10px 12px;
@@ -455,6 +492,7 @@
 @media (max-width: 1080px) {
   .fleet-map-workspace,
   .fleet-map-summary,
+  .fleet-map-roster-grid,
   .fleet-map-filters {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -476,6 +514,7 @@
   .fleet-map-summary,
   .fleet-map-filters,
   .fleet-map-search,
+  .fleet-map-roster-grid,
   .fleet-map-detail-grid {
     grid-template-columns: 1fr;
     grid-column: auto;
