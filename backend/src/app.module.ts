@@ -48,6 +48,7 @@ import { WorkspacesModule } from './modules/workspaces/workspaces.module';
 import { PermissionsModule } from './modules/permissions/permissions.module';
 import { UserActivityModule } from './modules/user-activity/user-activity.module';
 import { PersonalizationModule } from './modules/personalization/personalization.module';
+import { ArtifactsModule } from './modules/artifacts/artifacts.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -131,6 +132,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     WorkspacesModule,
     UserActivityModule,
     PersonalizationModule,
+    ArtifactsModule,
     UserProfileModule,
     LiveTrackingModule,
     ClinicalAlertsModule,

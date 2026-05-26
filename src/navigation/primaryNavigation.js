@@ -48,6 +48,14 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     matchPrefixes: ['/tools/calculators/'],
   },
   {
+    id: 'artifacts',
+    label: 'Artifacts',
+    mobileLabel: 'Artifacts',
+    path: '/artifacts',
+    matchPaths: ['/artifacts'],
+    showInMobile: false,
+  },
+  {
     id: 'operations',
     label: 'Operations',
     mobileLabel: 'Ops',

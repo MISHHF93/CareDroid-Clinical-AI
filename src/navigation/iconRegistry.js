@@ -90,6 +90,7 @@ const NAV_ICONS = {
   assistant: Bot,
   tools: Wrench,
   calculators: Calculator,
+  artifacts: Layers,
   operations: Truck,
   maps: Route,
   'medical-iot': Activity,
