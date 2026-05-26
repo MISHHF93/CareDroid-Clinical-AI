@@ -99,6 +99,10 @@ function trendToChartData(trend) {
   }));
 }
 
+function trendColor(index) {
+  return `var(--app-chart-${(index % 6) + 1})`;
+}
+
 function DeviceLocationMap({ devices, selectedDeviceId, onSelectDevice }) {
   return (
     <section className="medical-iot-section medical-iot-location-section" aria-labelledby="medical-iot-location-title">
@@ -423,23 +427,20 @@ export default function MedicalIotDashboard() {
               <VisualizationPanel title="Device Status Distribution" description="Online, warning, and offline connected-device states." badge="Demo data">
                 <CategoryBarChart data={deviceStatusDistribution} title="Medical IoT device status distribution" />
               </VisualizationPanel>
-              <VisualizationPanel title="SpO2 Trend" description="Recent pulse oximeter readings from demo telemetry." badge="Mock telemetry">
-                <TrendChart data={trendToChartData(snapshot.trends.find((trend) => trend.label === 'SpO2'))} title="SpO2 telemetry trend" />
-              </VisualizationPanel>
-              <VisualizationPanel title="Glucose Trend" description="Recent glucose monitor readings from demo telemetry." badge="Mock telemetry">
-                <TrendChart
-                  data={trendToChartData(snapshot.trends.find((trend) => trend.label === 'Glucose'))}
-                  title="Glucose telemetry trend"
-                  color="var(--app-chart-4)"
-                />
-              </VisualizationPanel>
-              <VisualizationPanel title="Heart Rate Trend" description="Recent ECG/heart-rate telemetry from demo data." badge="Mock telemetry">
-                <TrendChart
-                  data={trendToChartData(snapshot.trends.find((trend) => trend.label === 'Heart rate'))}
-                  title="Heart rate telemetry trend"
-                  color="var(--app-chart-5)"
-                />
-              </VisualizationPanel>
+              {(snapshot.trends || []).map((trend, index) => (
+                <VisualizationPanel
+                  key={trend.parameter || trend.label}
+                  title={`${trend.label} Trend`}
+                  description={`Recent ${trend.label} readings from demo Medical IoT telemetry.`}
+                  badge={trend.unit || 'Mock telemetry'}
+                >
+                  <TrendChart
+                    data={trendToChartData(trend)}
+                    title={`${trend.label} telemetry trend`}
+                    color={trendColor(index + 1)}
+                  />
+                </VisualizationPanel>
+              ))}
               <VisualizationPanel title="Device Connectivity Timeline" description="Snapshot trend of online devices over time." badge="Demo timeline">
                 <TrendChart
                   data={(snapshot.connectivityTimeline || []).map((item) => ({ label: item.label, value: item.online }))}

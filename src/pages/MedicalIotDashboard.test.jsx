@@ -39,7 +39,7 @@ describe('MedicalIotDashboard', () => {
       ok: true,
       unsupported: true,
       snapshot: buildDemoMedicalIotSnapshot(new Date('2026-05-24T05:00:00.000Z')),
-      message: 'Dedicated Medical IoT backend endpoints are not implemented yet.',
+      message: 'Medical IoT backend endpoints are unavailable in test.',
     });
   });
 
@@ -52,14 +52,17 @@ describe('MedicalIotDashboard', () => {
     expect(screen.getByText(/mock telemetry, not live patient data/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /ask assistant/i })).toHaveAttribute('href', '/assistant');
     expect(screen.getAllByText(/Bed 12 Pulse Oximeter/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('heading', { name: /^HR$/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/SpO2/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Respiratory rate/i)).toBeInTheDocument();
-    expect(screen.getByText(/Temperature/i)).toBeInTheDocument();
-    expect(screen.getByText(/Oxygen flow/i)).toBeInTheDocument();
-    expect(screen.getByText(/Infusion state/i)).toBeInTheDocument();
-    expect(screen.getByText(/Ventilator mode/i)).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: /^BP$/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('heading', { name: /^RR$/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Temperature/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Glucose/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('heading', { name: /^ECG$/i }).length).toBeGreaterThan(0);
     expect(screen.getByText(/device status distribution/i)).toBeInTheDocument();
-    expect(screen.getByText(/heart rate trend/i)).toBeInTheDocument();
+    expect(screen.getByText(/HR trend/i)).toBeInTheDocument();
+    expect(screen.getByText(/BP systolic trend/i)).toBeInTheDocument();
+    expect(screen.getByText(/ECG rate trend/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /device location map/i })).toBeInTheDocument();
   });
 
