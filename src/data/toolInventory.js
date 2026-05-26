@@ -10,6 +10,7 @@ import { toolRegistryById } from './toolRegistry';
 import { builtinUiCalculators, clinicalIntentTools } from './clinicalIntentToolCatalog';
 import {
   ALL_REGISTRY_TOOL_IDS,
+  AI_SYSTEM_REGISTRY_IDS,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
   CLINICAL_AI_PAGE_REGISTRY_IDS,
   CLINICAL_DOSE_HUB_REGISTRY_IDS,
@@ -34,7 +35,7 @@ import {
 } from './clinicalToolIdContract';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';
-import { PLATFORM_SYSTEM_CAPABILITIES } from './platformSystems';
+import { PLATFORM_SYSTEM_CAPABILITIES, PLATFORM_SYSTEM_CAPABILITY_BY_ID } from './platformSystems';
 
 export const TOOL_INVENTORY_VERSION = 1;
 
@@ -61,6 +62,7 @@ const CLINICAL_AI_PAGE_REGISTRY_ID_SET = new Set(CLINICAL_AI_PAGE_REGISTRY_IDS);
 const ORCHESTRATOR_REGISTERED_NLU_TOOL_ID_SET = new Set(ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS);
 const NLU_PROFILE_TOOL_ID_SET = new Set(NLU_PROFILE_TOOL_IDS);
 const ALL_REGISTRY_TOOL_ID_ORDER = new Map(ALL_REGISTRY_TOOL_IDS.map((id, index) => [id, index]));
+const AI_SYSTEM_REGISTRY_ID_SET = new Set(AI_SYSTEM_REGISTRY_IDS);
 
 const clinicalIntentToolById = new Map(clinicalIntentTools.map((row) => [row.toolId, row]));
 const builtinUiCalculatorById = new Map(builtinUiCalculators.map((calc) => [calc.id, calc]));
@@ -322,6 +324,18 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.calculatorRecommenderAi]: 'src/pages/tools/CalculatorRecommender.jsx',
   [REGISTRY.calculatorsHub]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.doseCalculator]: 'src/pages/tools/Calculators.jsx',
+  [REGISTRY.aiGateway]: 'src/pages/Assistant.jsx',
+  [REGISTRY.moeRouter]: 'src/pages/Assistant.jsx',
+  [REGISTRY.aiRag]: 'src/pages/tools/GuidelineRag.jsx',
+  [REGISTRY.aiArtifacts]: 'src/pages/Artifacts.jsx',
+  [REGISTRY.aiMemory]: 'src/pages/MemoryDashboard.jsx',
+  [REGISTRY.aiToolCalling]: 'src/pages/Assistant.jsx',
+  [REGISTRY.aiTraining]: 'src/pages/TrainingDashboard.jsx',
+  [REGISTRY.aiCostOptimization]: 'src/pages/CostAnalyticsDashboard.jsx',
+  [REGISTRY.aiEvaluation]: 'src/pages/AiEvaluationDashboard.jsx',
+  [REGISTRY.aiCommandCenter]: 'src/pages/AiCommandCenterDashboard.jsx',
+  [REGISTRY.aiGovernance]: 'src/pages/platform/PlatformGovernanceWorkspace.jsx',
+  [REGISTRY.aiSecurity]: 'src/pages/platform/PlatformGovernanceWorkspace.jsx',
   [REGISTRY.hospitalCommandAssistant]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.resourceAllocationAssistant]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.deviceRecommendationAssistant]: 'src/pages/tools/Calculators.jsx',
@@ -419,6 +433,7 @@ function getPatternMaps() {
 }
 
 function registryTier(registryId) {
+  if (AI_SYSTEM_REGISTRY_ID_SET.has(registryId)) return 'ai-system';
   if (REGISTRY_ID_TO_ORCHESTRATOR_TOOL[registryId]) return 'C';
   if (CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET.has(registryId)) return 'C';
   if (FLEET_TIER_A_REGISTRY_ID_SET.has(registryId)) return 'fleet-A';
@@ -443,6 +458,7 @@ function registryTier(registryId) {
 function launchTypeForTier(tier, hasExecutor) {
   if (hasExecutor) return TOOL_LAUNCH_TYPES.BACKEND_BACKED;
   if (tier === 'C') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
+  if (tier === 'ai-system') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
   if (tier === 'A') return TOOL_LAUNCH_TYPES.LOCAL_ONLY;
   if (tier === 'B' || tier === 'fleet-B' || tier === 'hospital-ops-B') return TOOL_LAUNCH_TYPES.CHAT_ASSISTED;
   if (tier === 'clinical-page') return TOOL_LAUNCH_TYPES.CLINICAL_PAGE;
@@ -666,6 +682,9 @@ function sourceStatusFor({ catalogVisible, sidebarVisible, component, route }) {
 
 function buildRecordFromRegistry(registryId, patternByToolId) {
   const registryEntry = toolRegistryById[registryId] || null;
+  const platformCapability = PLATFORM_SYSTEM_CAPABILITY_BY_ID[registryId] || null;
+  const usePlatformCapability =
+    platformCapability && [REGISTRY.aiGovernance, REGISTRY.aiSecurity].includes(registryId);
   const tier = registryTier(registryId);
   const nluProfiles = nluProfilesForRegistry(registryId);
   const nluToolId = primaryNluForRegistry(registryId);
@@ -677,13 +696,31 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
     orchestratorToolId && ORCHESTRATOR_REGISTERED_NLU_TOOL_ID_SET.has(orchestratorToolId)
   );
   const launchType = launchTypeForTier(tier, hasExecutor);
-  const route = registryEntry?.path || primaryNlu?.path || calculator?.path || null;
-  const component = componentFor(registryId, calculator?.id || registryEntry?.initialCalc, tier);
+  const route =
+    registryEntry?.path ||
+    primaryNlu?.path ||
+    calculator?.path ||
+    (usePlatformCapability ? platformCapability?.route : null) ||
+    null;
+  const component =
+    componentFor(registryId, calculator?.id || registryEntry?.initialCalc, tier) ||
+    (usePlatformCapability
+      ? platformCapability.criticality === 'P0'
+        ? 'src/pages/platform/PlatformGovernanceWorkspace.jsx'
+        : 'src/pages/platform/PlatformSystemPage.jsx'
+      : null);
   const chatSeed = primaryNlu?.chatSeed || null;
   const clinicalIntelligenceEndpoint = clinicalIntelligenceEndpointFor(registryId);
-  const endpoint = clinicalIntelligenceEndpoint || endpointFor(orchestratorToolId, launchType);
-  const apiClient = apiClientFor(orchestratorToolId, launchType, registryId);
-  const permissionPolicy = permissionPolicyFor(registryId);
+  const endpoint =
+    (usePlatformCapability ? platformCapability?.endpoint : null) ||
+    clinicalIntelligenceEndpoint ||
+    endpointFor(orchestratorToolId, launchType);
+  const apiClient =
+    (usePlatformCapability ? platformCapability?.apiClient : null) ||
+    apiClientFor(orchestratorToolId, launchType, registryId);
+  const permissionPolicy =
+    (usePlatformCapability ? platformCapability?.permissionPolicy : null) ||
+    permissionPolicyFor(registryId);
   const dto =
     registryId === REGISTRY.ambientScribe
       ? AMBIENT_SCRIBE_DTO
@@ -737,7 +774,7 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
     responseDto: dto.responseDto || null,
     executorStatus: hasExecutor
       ? TOOL_EXECUTOR_STATUS.REGISTERED
-      : clinicalIntelligenceEndpoint
+      : clinicalIntelligenceEndpoint || usePlatformCapability
         ? TOOL_EXECUTOR_STATUS.PLATFORM
         : nluToolId && NLU_PROFILE_TOOL_ID_SET.has(nluToolId)
           ? TOOL_EXECUTOR_STATUS.UNSUPPORTED
@@ -759,6 +796,9 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
           : 'low',
     notes: unique([
       primaryNlu?.backendExecutable && !hasExecutor ? 'backendExecutable indicates NLU/chat routing only' : null,
+      usePlatformCapability
+        ? `Platform endpoint ${platformCapability.method || 'GET'} ${platformCapability.endpoint}`
+        : null,
       nluProfiles.length > 1 ? `Shares route with ${nluProfiles.length} NLU profiles` : null,
     ]).join('; '),
   };

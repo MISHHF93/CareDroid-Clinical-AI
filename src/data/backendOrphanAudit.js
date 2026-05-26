@@ -12,7 +12,7 @@ import {
 import { compareControllerScanToInventory } from './backendControllerRouteScan';
 import { runBackendFrontendExposureScan } from './backendFrontendExposure';
 import { BACKEND_EXECUTOR_NLU_TOOL_IDS } from '../config/backendApiCapabilities';
-import { NLU_PROFILE_TOOL_IDS, ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS } from './clinicalToolIdContract';
+import { NLU_PROFILE_TOOL_IDS } from './clinicalToolIdContract';
 import { isOrchestratorPostExecutable } from './unsupportedOrchestratorTools';
 
 /** Internal Nest services (no direct HTTP from SPA). */

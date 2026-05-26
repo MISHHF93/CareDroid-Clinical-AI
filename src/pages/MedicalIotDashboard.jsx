@@ -235,6 +235,7 @@ export default function MedicalIotDashboard() {
   }, [loadSnapshot]);
 
   useEffect(() => {
+    if (typeof recordActivity !== 'function') return;
     recordActivity({
       category: 'iot',
       label: 'Medical IoT Dashboard',

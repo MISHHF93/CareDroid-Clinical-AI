@@ -58,13 +58,26 @@ function makeExecutionService() {
     new ValidationService(toolOrchestrator as any),
     toolOrchestrator as any,
     {
-      getHospitalFloors: jest.fn().mockResolvedValue({ payload: { floors: [] } }),
-      getHospitalDevices: jest.fn().mockResolvedValue({ payload: { devices: [] } }),
-      getFleetVehicles: jest.fn().mockResolvedValue({ payload: { vehicles: [] } }),
-      getFleetRoutes: jest.fn().mockResolvedValue({ payload: { routes: [] } }),
-      getDevicesLive: jest.fn().mockResolvedValue({ payload: { devices: [] } }),
-      getTelemetryLive: jest.fn().mockResolvedValue({ payload: { vitals: [] } }),
-      getDeviceAlerts: jest.fn().mockResolvedValue({ payload: { alerts: [] } }),
+      getFloorPlan: jest.fn().mockReturnValue({ floors: [] }),
+    } as any,
+    {
+      getDeviceLocations: jest.fn().mockResolvedValue({ devices: [] }),
+    } as any,
+    {
+      getActiveRoutes: jest.fn().mockResolvedValue({ routes: [] }),
+      getFleetAlerts: jest.fn().mockResolvedValue({ alerts: [] }),
+    } as any,
+    {
+      getLiveVehicles: jest.fn().mockResolvedValue({ vehicles: [] }),
+    } as any,
+    {
+      getLiveTelemetry: jest.fn().mockResolvedValue({ vitals: [] }),
+    } as any,
+    {
+      getLiveDevices: jest.fn().mockResolvedValue({ devices: [] }),
+    } as any,
+    {
+      getDeviceAlerts: jest.fn().mockResolvedValue({ alerts: [] }),
     } as any,
     {
       demo: jest.fn().mockReturnValue({

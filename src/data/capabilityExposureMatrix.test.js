@@ -148,8 +148,8 @@ describe('capabilityExposureMatrix', () => {
     });
     expect(rowsByCapability.get('Clinical alerts management')).toMatchObject({
       frontendRouteStatus: 'protected',
-      surfaceType: 'mock-only',
-      exposureStatus: 'mock-only',
+      surfaceType: 'visible-ui',
+      exposureStatus: 'partially exposed',
     });
     expect(rowsByCapability.get('Team management')).toMatchObject({
       frontendRouteStatus: 'protected + permission',

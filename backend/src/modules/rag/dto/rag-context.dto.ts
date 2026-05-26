@@ -200,9 +200,18 @@ export interface RAGReference {
 }
 
 export interface RAGSourcePanel {
+  citations: MedicalSource[];
   references: RAGReference[];
   confidence: number;
   generatedAt: string;
+  timestamps: {
+    generatedAt: string;
+    retrievedAt: string;
+    latestSourceTimestamp?: string;
+  };
+  cache: {
+    retrievalCacheHit: boolean;
+  };
   retrieval: {
     query: string;
     chunksRetrieved: number;

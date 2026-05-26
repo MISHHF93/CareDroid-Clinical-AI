@@ -72,12 +72,14 @@ export default function FleetDashboard() {
   useEffect(() => {
     const controller = new AbortController();
     recordToolAccess(TOOL_ID);
-    recordActivity({
-      category: 'fleet',
-      label: 'Fleet Command Dashboard',
-      route: '/fleet/command',
-      metadata: { toolId: TOOL_ID, source: 'fleet-dashboard' },
-    });
+    if (typeof recordActivity === 'function') {
+      recordActivity({
+        category: 'fleet',
+        label: 'Fleet Command Dashboard',
+        route: '/fleet/command',
+        metadata: { toolId: TOOL_ID, source: 'fleet-dashboard' },
+      });
+    }
     loadSnapshot(controller.signal);
     return () => {
       controller.abort();

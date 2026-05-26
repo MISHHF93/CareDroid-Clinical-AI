@@ -15,7 +15,7 @@ import { findBackendRoute } from './backendHttpRouteInventory';
  * @type {Readonly<Record<string, { strategy: ExposureStrategy, reason: string, clientHint?: string }>>}
  * Keys: `METHOD /path` (inventory path patterns)
  */
-export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
+const BASE_BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'GET /health': { strategy: 'backend-only', reason: 'Ops / load balancer probe' },
   'GET /api/auth/verify-email': { strategy: 'backend-only', reason: 'Email link callback' },
   'GET /api/auth/google': { strategy: 'backend-only', reason: 'OAuth redirect' },
@@ -267,6 +267,19 @@ export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'GET /api/ai/usage': { strategy: 'deferred', reason: 'Usage meter UI' },
 
   'GET /api/metrics': { strategy: 'backend-only', reason: 'Prometheus scrape' },
+});
+
+export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
+  ...Object.fromEntries(
+    BACKEND_HTTP_ROUTES.map((route) => [
+      `${route.method} ${route.path}`,
+      {
+        strategy: 'deferred',
+        reason: 'Cataloged backend route; frontend exposure is tracked by platform wiring inventory.',
+      },
+    ])
+  ),
+  ...BASE_BACKEND_ROUTE_EXPOSURE_POLICY,
 });
 
 export function routePolicyKey(method, path) {

@@ -54,6 +54,7 @@ const EMPTY_SNAPSHOT = Object.freeze({
     successRate: 0,
     successLabel: '0%',
   },
+  toolCalls: [],
   costMetrics: {
     totalUsd: 0,
     averageUsd: 0,
@@ -110,6 +111,13 @@ function memoryBars(memoryUsage) {
   ];
 }
 
+function expertLoadBars(experts = []) {
+  return experts.map((expert) => ({
+    name: expert.label,
+    value: Number(expert.load || 0),
+  }));
+}
+
 function Panel({ title, icon, description, children, className = '' }) {
   return (
     <section
@@ -154,6 +162,21 @@ function AuditLogRow({ log }) {
       <strong>{label}</strong>
       <span>{log.resource || log.entity || log.status || 'AI system activity'}</span>
       <small>{timestamp ? formatTime(timestamp) : 'Recent'}</small>
+    </article>
+  );
+}
+
+function ToolCallRow({ call }) {
+  return (
+    <article className="ai-command-tool-call">
+      <div>
+        <strong>{call.label || call.route}</strong>
+        <span>{call.complexity || 'mixed'} complexity</span>
+      </div>
+      <div>
+        <strong>{call.count}</strong>
+        <span>{call.status || 'active'}</span>
+      </div>
     </article>
   );
 }
@@ -271,7 +294,7 @@ export default function AiCommandCenterDashboard() {
           hint={`${snapshot.memoryUsage.clinical} clinical entries`}
         />
         <MetricCard
-          label="Tool usage"
+          label="Tool calls"
           value={snapshot.toolUsage.totalRequests}
           hint={`${snapshot.toolUsage.successLabel} success`}
           tone={snapshot.toolUsage.successRate >= 0.98 ? 'good' : 'warning'}
@@ -288,7 +311,7 @@ export default function AiCommandCenterDashboard() {
           tone={snapshot.hallucinationMetrics.rate <= 0.05 ? 'good' : 'critical'}
         />
         <MetricCard
-          label="Retrieval quality"
+          label="Retrieval metrics"
           value={snapshot.retrievalQuality.label}
           hint={`${percent(snapshot.ragMetrics.cacheHitRate)} cache hit rate`}
           tone={snapshot.retrievalQuality.precision >= 0.85 ? 'good' : 'warning'}
@@ -333,10 +356,15 @@ export default function AiCommandCenterDashboard() {
               <ExpertChip key={expert.id} expert={expert} />
             ))}
           </div>
+          <CategoryBarChart
+            data={expertLoadBars(snapshot.experts)}
+            title="Expert load chart"
+            color="var(--app-chart-6)"
+          />
         </Panel>
 
         <Panel
-          title="RAG Metrics"
+          title="Retrieval Metrics"
           icon={CHROME_ICONS.sparkles}
           description="Grounding, cache, and retrieval flow."
         >
@@ -373,10 +401,17 @@ export default function AiCommandCenterDashboard() {
         </Panel>
 
         <Panel
-          title="Tool Usage"
+          title="Tool Calls"
           icon={CHROME_ICONS.tools}
-          description="Routing and complexity distribution."
+          description="Recent tool-call routes, success, and complexity distribution."
         >
+          <div className="ai-command-tool-call-list">
+            {snapshot.toolCalls?.length ? (
+              snapshot.toolCalls.map((call) => <ToolCallRow key={call.id || call.route} call={call} />)
+            ) : (
+              <p className="ai-command-empty">No tool calls returned in the current snapshot.</p>
+            )}
+          </div>
           <DistributionDonutChart data={routeBars} title="Tool route distribution" />
           <CategoryBarChart
             data={complexityBars}
@@ -413,7 +448,7 @@ export default function AiCommandCenterDashboard() {
         </Panel>
 
         <Panel
-          title="Hallucination Metrics"
+          title="Hallucination Monitoring"
           icon={CHROME_ICONS.alert}
           description="Unsupported claims and benchmark guardrail."
         >

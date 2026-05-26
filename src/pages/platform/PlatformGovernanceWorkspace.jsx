@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { getPlatformSystemCapabilityByPath } from '../../data/platformSystems';
 import { fetchPlatformGovernanceSurface } from '../../services/platformGovernanceApi';
 import {
+  PlatformDashboardPanels,
   PlatformDecisionPanel,
   PlatformEvidencePanel,
   PlatformMetricGrid,
@@ -174,6 +175,7 @@ export default function PlatformGovernanceWorkspace() {
     >
       <PlatformMetricGrid metrics={metrics} />
       <PlatformDecisionPanel />
+      <PlatformDashboardPanels panels={state.data?.panels} />
       {state.data?.panels ? (
         <PlatformEvidencePanel
           title={`${copy.title} Panels`}

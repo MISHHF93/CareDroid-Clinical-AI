@@ -25,7 +25,7 @@
  */
 
 /** Bump when registry/NLU lists or maps change incompatibly. */
-export const TOOL_ID_CONTRACT_VERSION = '1.17.0';
+export const TOOL_ID_CONTRACT_VERSION = '1.18.0';
 
 /** Shared SPA paths for tool launch (browser-safe). */
 export const TOOL_LAUNCH_PATHS = Object.freeze({
@@ -34,11 +34,13 @@ export const TOOL_LAUNCH_PATHS = Object.freeze({
   calculatorsHub: '/tools/calculators',
   assistant: '/assistant',
   artifacts: '/artifacts',
-  memory: '/memory',
+  memory: '/ai-memory',
   training: '/training',
   costs: '/costs',
   aiEvaluation: '/ai/evaluation',
   aiCommandCenter: '/ai-command-center',
+  aiGovernance: '/ai-governance',
+  aiSecurity: '/security',
   liveTrackingMap: '/live-map',
   hospitalMap: '/hospital-map',
   medicalIot: '/medical-iot',
@@ -249,6 +251,8 @@ export const REGISTRY = Object.freeze({
   aiCostOptimization: 'ai-cost-optimization',
   aiEvaluation: 'ai-evaluation',
   aiCommandCenter: 'ai-command-center',
+  aiGovernance: 'ai-governance',
+  aiSecurity: 'ai-security',
   guidelineRag: 'guideline-rag',
   differentialAi: 'differential-ai',
   timelineAi: 'timeline-ai',
@@ -482,6 +486,8 @@ export const NLU = Object.freeze({
   aiCostOptimization: 'ai-cost-optimization',
   aiEvaluation: 'ai-evaluation',
   aiCommandCenter: 'ai-command-center',
+  aiGovernance: 'ai-governance',
+  aiSecurity: 'ai-security',
 });
 
 /** Built-in calculator UI slugs (`Calculators.jsx`, `?calc=`). */
@@ -1011,6 +1017,8 @@ export const AI_SYSTEM_REGISTRY_IDS = Object.freeze([
   REGISTRY.aiCostOptimization,
   REGISTRY.aiEvaluation,
   REGISTRY.aiCommandCenter,
+  REGISTRY.aiGovernance,
+  REGISTRY.aiSecurity,
 ]);
 
 export const PEDIATRICS_OBGYN_TIER_C_WORKFLOW_REGISTRY_IDS = Object.freeze([
@@ -1403,6 +1411,8 @@ export const NLU_PROFILE_TOOL_IDS = Object.freeze([
   NLU.aiCostOptimization,
   NLU.aiEvaluation,
   NLU.aiCommandCenter,
+  NLU.aiGovernance,
+  NLU.aiSecurity,
 ]);
 
 export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
@@ -1698,6 +1708,8 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
   [NLU.aiCostOptimization]: REGISTRY.aiCostOptimization,
   [NLU.aiEvaluation]: REGISTRY.aiEvaluation,
   [NLU.aiCommandCenter]: REGISTRY.aiCommandCenter,
+  [NLU.aiGovernance]: REGISTRY.aiGovernance,
+  [NLU.aiSecurity]: REGISTRY.aiSecurity,
 });
 
 /**
@@ -2527,6 +2539,14 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'command center': REGISTRY.aiCommandCenter,
   'ai command center': REGISTRY.aiCommandCenter,
   'ai-command-center': REGISTRY.aiCommandCenter,
+  governance: REGISTRY.aiGovernance,
+  'ai governance': REGISTRY.aiGovernance,
+  'ai-governance': REGISTRY.aiGovernance,
+  'governance dashboard': REGISTRY.aiGovernance,
+  security: REGISTRY.aiSecurity,
+  'ai security': REGISTRY.aiSecurity,
+  'llm security': REGISTRY.aiSecurity,
+  'security dashboard': REGISTRY.aiSecurity,
   'copd-gold': REGISTRY.copdGold,
   'gold copd': REGISTRY.copdGold,
   'gold-copd': REGISTRY.copdGold,

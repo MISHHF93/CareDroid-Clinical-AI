@@ -826,6 +826,15 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/ai-memory',
+      element: (
+        <AppShellPage>
+          <MemoryDashboard />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
       path: '/training',
       element: (
         <AppShellPage>

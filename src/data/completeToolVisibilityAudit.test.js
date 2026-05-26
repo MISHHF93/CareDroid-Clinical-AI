@@ -94,7 +94,7 @@ describe('complete calculator and medical-tool visibility audit', () => {
     const userIds = new Set(getUserFacingToolInventory().map((record) => record.id));
     const auditOnlyIds = new Set(
       getAuditToolInventory()
-        .filter((record) => record.sourceModule === 'platform')
+        .filter((record) => record.sourceModule === 'platform' && !record.launchable)
         .map((record) => record.id)
     );
 

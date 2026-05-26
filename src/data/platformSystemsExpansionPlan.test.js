@@ -103,8 +103,10 @@ describe('platform systems expansion plan metadata', () => {
       'lab-result-import'
     );
     expect(getPlatformSystemCapabilityByPath('/review/clinical')?.id).toBe('human-review-queue');
-    expect(getPlatformSystemCapabilityByPath('/ai-governance')?.id).toBe('clinical-governance');
+    expect(getPlatformSystemCapabilityByPath('/ai-governance')?.id).toBe('ai-governance');
+    expect(getPlatformSystemCapabilityByPath('/governance/ai')?.id).toBe('ai-governance');
     expect(getPlatformSystemCapabilityByPath('/security')?.id).toBe('ai-security');
+    expect(getPlatformSystemCapabilityByPath('/governance/ai-security')?.id).toBe('ai-security');
     expect(getPlatformSystemCapabilityByPath('/human-review')?.id).toBe('human-review-queue');
     expect(getPlatformSystemCapabilityByPath('/system-health')?.id).toBe('deployment-observability');
     expect(getPlatformSystemCapabilityByPath('/operations/observability')?.id).toBe(

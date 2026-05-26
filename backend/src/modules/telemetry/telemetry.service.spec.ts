@@ -20,7 +20,15 @@ describe('TelemetryService', () => {
       expect.arrayContaining(['HR', 'SpO2', 'BP', 'RR', 'Temperature', 'Glucose', 'ECG']),
     );
     expect(trendParameters).toEqual(
-      expect.arrayContaining(['hr', 'spo2', 'bp', 'respiratory-rate', 'temperature', 'glucose', 'ecg']),
+      expect.arrayContaining([
+        'hr',
+        'spo2',
+        'bp',
+        'respiratory-rate',
+        'temperature',
+        'glucose',
+        'ecg',
+      ]),
     );
     expect(result.connectivityTimeline).toHaveLength(5);
     expect(telemetryAudit.recordRead).toHaveBeenCalledWith(

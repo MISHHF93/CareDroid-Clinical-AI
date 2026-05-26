@@ -337,11 +337,18 @@ export class ChatService {
       return composed;
     }
 
-    // Route based on intent
-    if (classification?.primaryIntent === PrimaryIntent.CLINICAL_TOOL) {
+    // Route explicit assistant tool calls and classified tool intents through the tool-calling engine:
+    // detect intent -> collect missing fields -> execute -> summarize result.
+    const toolCallingClassification = this.buildToolCallingClassification(
+      message,
+      tool,
+      feature,
+      classification,
+    );
+    if (toolCallingClassification) {
       const response = await this.handleClinicalTool(
         message,
-        classification,
+        toolCallingClassification,
         userId,
         modelFoundationContext,
       );
@@ -610,6 +617,35 @@ export class ChatService {
     };
   }
 
+  private buildToolCallingClassification(
+    message: string,
+    toolHint: string | undefined,
+    featureHint: string | undefined,
+    classification: IntentClassification | null,
+  ): IntentClassification | null {
+    if (classification?.primaryIntent === PrimaryIntent.CLINICAL_TOOL && classification.toolId) {
+      return classification;
+    }
+
+    const hintedToolId = toolHint || featureHint;
+    if (!hintedToolId) {
+      return null;
+    }
+
+    return {
+      ...(classification || {}),
+      primaryIntent: PrimaryIntent.CLINICAL_TOOL,
+      toolId: hintedToolId,
+      confidence: Math.max(classification?.confidence || 0, 0.72),
+      method: classification?.method || 'keyword',
+      extractedParameters: classification?.extractedParameters || {},
+      isEmergency: classification?.isEmergency || false,
+      emergencyKeywords: classification?.emergencyKeywords || [],
+      matchedPatterns: classification?.matchedPatterns || [`ui-tool-hint:${hintedToolId}`],
+      classifiedAt: classification?.classifiedAt || new Date(),
+    } as IntentClassification;
+  }
+
   /**
    * Intent classification for client-side tool recommendations (matches frontend contract).
    */
@@ -843,9 +879,17 @@ export class ChatService {
       latencyMs: 0,
       references: [],
       sourcePanel: {
+        citations: [],
         references: [],
         confidence: 0,
         generatedAt: generatedAt.toISOString(),
+        timestamps: {
+          generatedAt: generatedAt.toISOString(),
+          retrievedAt: generatedAt.toISOString(),
+        },
+        cache: {
+          retrievalCacheHit: false,
+        },
         retrieval: {
           query,
           chunksRetrieved: 0,

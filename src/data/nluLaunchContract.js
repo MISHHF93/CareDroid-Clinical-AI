@@ -4,6 +4,7 @@
 
 import { clinicalIntentToolsById } from './clinicalIntentToolCatalog';
 import {
+  AI_SYSTEM_REGISTRY_IDS,
   CLINICAL_AI_PAGE_REGISTRY_IDS,
   CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
   CLINICAL_TIER_B_CHAT_REGISTRY_IDS,
@@ -87,6 +88,22 @@ export function getNluLaunchExpectation(nluToolId) {
   }
 
   if (
+    AI_SYSTEM_REGISTRY_IDS.includes(registryId) &&
+    nlu.path === TOOL_LAUNCH_PATHS.assistant
+  ) {
+    return {
+      nluToolId,
+      kind: 'tier-b-chat',
+      registryId,
+      expectsDedicatedCalculatorPath: false,
+      expectsDashboardChat: true,
+      expectsChatSeed: true,
+      allowsHubPath: false,
+    };
+  }
+
+  if (
+    AI_SYSTEM_REGISTRY_IDS.includes(registryId) ||
     CLINICAL_AI_PAGE_REGISTRY_IDS.includes(registryId) ||
     CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS.includes(registryId)
   ) {

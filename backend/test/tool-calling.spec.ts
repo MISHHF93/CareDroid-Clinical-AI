@@ -226,6 +226,18 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
               text: 'Unsupported test tool',
               executionLogs: [],
             }),
+            executePrompt: jest.fn().mockResolvedValue({
+              status: 'completed',
+              text: 'SOFA Score: 8',
+              toolName: 'SOFA Calculator',
+              result: { score: 8, interpretation: 'High risk' },
+              parameters: { respiratory: 8.5 },
+              missingParameters: [],
+              suggestions: ['Review organ dysfunction trend'],
+              visualizations: [],
+              executionLogs: [],
+              context: {},
+            }),
           },
         },
         {

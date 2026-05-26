@@ -3,7 +3,8 @@ import { FleetAlert, FleetRoute, FleetSummary, FleetVehicle } from './fleet.type
 export const FLEET_SOURCE = Object.freeze({
   demo: true,
   source: 'demo-fleet-live-tracking',
-  sourceLabel: 'Backend demo fleet live tracking - replace with real vehicle GPS feeds before operational use',
+  sourceLabel:
+    'Backend demo fleet live tracking - replace with real vehicle GPS feeds before operational use',
   generatedBy: 'backend-fleet-demo-service',
 });
 
@@ -212,7 +213,8 @@ export function buildFleetSummary(
 
   return {
     totalVehicles: vehicles.length,
-    activeVehicles: vehicles.filter((vehicle) => ['active', 'occupied'].includes(vehicle.status)).length,
+    activeVehicles: vehicles.filter((vehicle) => ['active', 'occupied'].includes(vehicle.status))
+      .length,
     availableVehicles: vehicles.filter((vehicle) => vehicle.status === 'available').length,
     staleVehicles: vehicles.filter((vehicle) => vehicle.freshness === 'stale').length,
     offlineVehicles: vehicles.filter((vehicle) => vehicle.freshness === 'offline').length,
@@ -220,7 +222,9 @@ export function buildFleetSummary(
     delayedRoutes: routes.filter((route) => route.status === 'delayed').length,
     activeAlerts: alerts.length,
     averageUtilizationPercent: utilizationValues.length
-      ? Math.round(utilizationValues.reduce((sum, value) => sum + value, 0) / utilizationValues.length)
+      ? Math.round(
+          utilizationValues.reduce((sum, value) => sum + value, 0) / utilizationValues.length,
+        )
       : 0,
     averageEtaMinutes: etaValues.length
       ? Math.round(etaValues.reduce((sum, value) => sum + value, 0) / etaValues.length)

@@ -14,6 +14,17 @@ describe('ChatService assistant lifecycle integration', () => {
     expect(source).toContain('context: {');
   });
 
+  it('routes assistant tool calls through the tool-calling engine lifecycle', () => {
+    expect(source).toContain('buildToolCallingClassification');
+    expect(source).toContain(
+      'detect intent -> collect missing fields -> execute -> summarize result',
+    );
+    expect(source).toContain('this.toolExecutionService.executePrompt');
+    expect(source).toContain(
+      'matchedPatterns: classification?.matchedPatterns || [`ui-tool-hint:${hintedToolId}`]',
+    );
+  });
+
   it('guards memory writes to UUID-backed users only', () => {
     expect(source).toContain('uuidPattern');
     expect(source).toContain("reason: 'non_uuid_user'");

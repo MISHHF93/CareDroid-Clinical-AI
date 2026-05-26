@@ -2,6 +2,8 @@ import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 
 export const LOCAL_MEMORY_DASHBOARD = Object.freeze({
   recentActivity: [],
+  recentConversations: [],
+  recentTools: [],
   savedWorkflows: [],
   aiContext: {
     shortTerm: {
@@ -53,6 +55,8 @@ export async function fetchMemoryDashboard() {
   return {
     ok: true,
     recentActivity: result.data?.recentActivity || [],
+    recentConversations: result.data?.recentConversations || [],
+    recentTools: result.data?.recentTools || [],
     savedWorkflows: result.data?.savedWorkflows || [],
     aiContext: result.data?.aiContext || LOCAL_MEMORY_DASHBOARD.aiContext,
     message: '',

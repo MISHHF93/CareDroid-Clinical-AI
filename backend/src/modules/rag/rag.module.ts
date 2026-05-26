@@ -34,6 +34,13 @@ import { CitationService } from './citation.service';
     PineconeService,
     CohereRankerService,
   ],
-  exports: [RAGService, RerankingService, CohereRankerService],
+  exports: [
+    RAGService,
+    EmbeddingService,
+    RetrievalService,
+    CitationService,
+    RerankingService,
+    CohereRankerService,
+  ],
 })
 export class RAGModule {}

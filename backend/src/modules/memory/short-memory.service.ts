@@ -55,6 +55,20 @@ export class ShortMemoryService {
     };
   }
 
+  async recentConversationsForUser(userId: string, limit = 10) {
+    return this.listForUser(userId, {
+      type: ShortMemoryType.ACTIVE_CONVERSATION,
+      limit: String(limit),
+    });
+  }
+
+  async recentToolsForUser(userId: string, limit = 10) {
+    return this.listForUser(userId, {
+      type: ShortMemoryType.ACTIVE_CALCULATOR,
+      limit: String(limit),
+    });
+  }
+
   serialize(entry: ShortMemoryEntry) {
     return {
       id: entry.id,

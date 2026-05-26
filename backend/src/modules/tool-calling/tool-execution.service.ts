@@ -2,7 +2,13 @@ import { Injectable, Logger } from '@nestjs/common';
 import { IntentClassifierService } from '../medical-control-plane/intent-classifier/intent-classifier.service';
 import { ToolOrchestratorService } from '../medical-control-plane/tool-orchestrator/tool-orchestrator.service';
 import { ToolExecutionErrorCode } from '../medical-control-plane/tool-orchestrator/tool-orchestrator.registry';
-import { LiveTrackingService } from '../live-tracking/live-tracking.service';
+import { FloorService } from '../hospital-map/floor.service';
+import { DeviceLocationService } from '../hospital-map/device-location.service';
+import { FleetService } from '../fleet/fleet.service';
+import { VehicleTrackingService } from '../fleet/vehicle-tracking.service';
+import { AlertService } from '../telemetry/alert.service';
+import { DeviceRegistryService } from '../telemetry/device-registry.service';
+import { TelemetryService } from '../telemetry/telemetry.service';
 import { PlatformSystemsService } from '../platform-systems/platform-systems.service';
 import { ParameterCollectorService } from './parameter-collector.service';
 import { ToolResolverService } from './tool-resolver.service';
@@ -26,7 +32,13 @@ export class ToolExecutionService {
     private readonly parameterCollector: ParameterCollectorService,
     private readonly validationService: ValidationService,
     private readonly toolOrchestrator: ToolOrchestratorService,
-    private readonly liveTrackingService: LiveTrackingService,
+    private readonly floorService: FloorService,
+    private readonly deviceLocationService: DeviceLocationService,
+    private readonly fleetService: FleetService,
+    private readonly vehicleTrackingService: VehicleTrackingService,
+    private readonly telemetryService: TelemetryService,
+    private readonly deviceRegistryService: DeviceRegistryService,
+    private readonly alertService: AlertService,
     private readonly platformSystemsService: PlatformSystemsService,
   ) {}
 
@@ -160,7 +172,7 @@ export class ToolExecutionService {
         parameterState.parameters,
         userId,
         conversationId,
-        request.context,
+        { ...(request.context || {}), ...parameterState.parameters },
       );
       this.recordLog(logs, 'execution', 'success', `Executed ${resolution.definition.name}.`, {
         executionKind: resolution.definition.executionKind,
@@ -325,25 +337,29 @@ export class ToolExecutionService {
 
     if (definition.id === 'hospital-map') {
       const [floors, devices] = await Promise.all([
-        this.liveTrackingService.getHospitalFloors(req),
-        this.liveTrackingService.getHospitalDevices(req),
+        this.floorService.getFloorPlan(context?.floorId),
+        this.deviceLocationService.getDeviceLocations(req, {
+          floorId: context?.floorId,
+          unitId: context?.unitId,
+        }),
       ]);
       return { floors, devices };
     }
 
     if (definition.id === 'fleet-live-map') {
-      const [vehicles, routes] = await Promise.all([
-        this.liveTrackingService.getFleetVehicles(req),
-        this.liveTrackingService.getFleetRoutes(req),
+      const [vehicles, routes, alerts] = await Promise.all([
+        this.vehicleTrackingService.getLiveVehicles(req),
+        this.fleetService.getActiveRoutes(req),
+        this.fleetService.getFleetAlerts(req),
       ]);
-      return { vehicles, routes };
+      return { vehicles, routes, alerts };
     }
 
     if (definition.id === 'medical-iot-dashboard') {
       const [devices, telemetry, alerts] = await Promise.all([
-        this.liveTrackingService.getDevicesLive(req),
-        this.liveTrackingService.getTelemetryLive(req),
-        this.liveTrackingService.getDeviceAlerts(req),
+        this.deviceRegistryService.getLiveDevices(req),
+        this.telemetryService.getLiveTelemetry(req),
+        this.alertService.getDeviceAlerts(req),
       ]);
       return { devices, telemetry, alerts };
     }

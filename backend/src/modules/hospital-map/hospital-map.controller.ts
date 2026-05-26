@@ -105,7 +105,12 @@ export class HospitalMapController {
     });
 
     return envelope(
-      { generatedAt: devices.generatedAt, rooms: rooms.rooms, beds: rooms.beds, devices: devices.devices },
+      {
+        generatedAt: devices.generatedAt,
+        rooms: rooms.rooms,
+        beds: rooms.beds,
+        devices: devices.devices,
+      },
       'Backend demo hospital map search returned.',
     );
   }

@@ -42,6 +42,39 @@ export function PlatformEvidencePanel({ title = 'Evidence', data }) {
   );
 }
 
+function panelSummary(value) {
+  if (Array.isArray(value)) return `${value.length} records`;
+  if (!value || typeof value !== 'object') return String(value ?? 'Ready');
+  if (value.status) return value.status;
+  if (value.level) return value.level;
+  if (value.action) return value.action;
+  if (value.blocked !== undefined) return value.blocked ? 'Blocked' : 'Allowed';
+  return `${Object.keys(value).length} signals`;
+}
+
+export function PlatformDashboardPanels({ panels = {} }) {
+  const entries = Object.entries(panels);
+  if (!entries.length) return null;
+
+  return (
+    <section className="platform-system-section" aria-labelledby="platform-dashboard-panels-title">
+      <div className="platform-system-section__header">
+        <h2 id="platform-dashboard-panels-title">Dashboard Panels</h2>
+        <p>Governance and security controls are split into reviewable operational panels.</p>
+      </div>
+      <div className="platform-capability-list">
+        {entries.map(([key, value]) => (
+          <article className="platform-capability-card" key={key}>
+            <span className="platform-capability-card__meta">{key.replace(/([A-Z])/g, ' $1')}</span>
+            <strong>{panelSummary(value)}</strong>
+            <span>{JSON.stringify(value).slice(0, 220)}</span>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function PlatformDecisionPanel() {
   return (
     <section className="platform-system-section" aria-labelledby="platform-decision-title">

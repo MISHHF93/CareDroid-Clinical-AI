@@ -3459,7 +3459,7 @@ const toolRegistry = [
   {
     id: 'ai-memory',
     name: 'AI Memory',
-    path: '/memory',
+    path: '/ai-memory',
     color: '#DB2777',
     description: 'Short, long, and clinical memory context used to personalize assistant workflows',
     shortcut: 'Ctrl+Alt+M',
@@ -3553,6 +3553,50 @@ const toolRegistry = [
       'Cost and audit snapshots',
     ],
     useCases: ['Open AI command center', 'Monitor AI systems', 'Review operational metrics'],
+  },
+  {
+    id: 'ai-governance',
+    name: 'AI Governance',
+    path: '/ai-governance',
+    color: '#7C2D12',
+    description:
+      'Governance center for model inventory, release gates, risk classification, clinical review, and approval workflows',
+    shortcut: 'Ctrl+Alt+G',
+    category: 'AI System',
+    features: [
+      'Model inventory',
+      'Risk classification',
+      'Clinical review queue',
+      'Approval workflow status',
+      'Release history',
+    ],
+    useCases: [
+      'Open AI governance dashboard',
+      'Review high-risk AI actions',
+      'Validate approval and audit posture',
+    ],
+  },
+  {
+    id: 'ai-security',
+    name: 'LLM Security',
+    path: '/security',
+    color: '#991B1B',
+    description:
+      'Security dashboard for prompt-injection detection, PHI protection, output validation, tool permissions, and rate limits',
+    shortcut: 'Ctrl+Alt+S',
+    category: 'AI System',
+    features: [
+      'Prompt injection monitoring',
+      'PHI minimization',
+      'Output validation',
+      'Tool permission checks',
+      'Rate limit status',
+    ],
+    useCases: [
+      'Open LLM security dashboard',
+      'Review prompt and PHI guardrails',
+      'Check model access controls',
+    ],
   },
   {
     id: 'guideline-rag',

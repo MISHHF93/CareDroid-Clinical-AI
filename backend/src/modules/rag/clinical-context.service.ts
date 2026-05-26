@@ -10,6 +10,7 @@ export interface BuildClinicalContextInput {
   references: RAGReference[];
   totalRetrieved: number;
   latencyMs: number;
+  retrievalCacheHit?: boolean;
   maxTokens?: number;
 }
 
@@ -25,6 +26,8 @@ export class ClinicalContextService {
   buildContext(input: BuildClinicalContextInput): RAGContext {
     const confidence = this.calculateConfidence(input.chunks);
     const timestamp = new Date();
+    const generatedAt = timestamp.toISOString();
+    const latestSourceTimestamp = this.latestTimestamp(input.references);
     const contextText = this.buildContextText(
       input.chunks,
       input.maxTokens || this.defaultMaxTokens,
@@ -41,9 +44,18 @@ export class ClinicalContextService {
       contextText,
       references: input.references,
       sourcePanel: {
+        citations: input.sources,
         references: input.references,
         confidence,
-        generatedAt: timestamp.toISOString(),
+        generatedAt,
+        timestamps: {
+          generatedAt,
+          retrievedAt: generatedAt,
+          latestSourceTimestamp,
+        },
+        cache: {
+          retrievalCacheHit: Boolean(input.retrievalCacheHit),
+        },
         retrieval: {
           query: input.query,
           chunksRetrieved: input.chunks.length,
@@ -68,9 +80,17 @@ export class ClinicalContextService {
       contextText: '',
       references: [],
       sourcePanel: {
+        citations: [],
         references: [],
         confidence: 0,
         generatedAt: timestamp.toISOString(),
+        timestamps: {
+          generatedAt: timestamp.toISOString(),
+          retrievedAt: timestamp.toISOString(),
+        },
+        cache: {
+          retrievalCacheHit: false,
+        },
         retrieval: {
           query,
           chunksRetrieved: 0,
@@ -121,5 +141,19 @@ export class ClinicalContextService {
     });
 
     return Math.min(Math.max(totalWeight > 0 ? weightedSum / totalWeight : 0, 0), 1);
+  }
+
+  private latestTimestamp(references: RAGReference[]): string | undefined {
+    const timestamps = references
+      .map((reference) => reference.timestamp || reference.lastUpdated || reference.date)
+      .filter((value): value is string => Boolean(value))
+      .map((value) => new Date(value).getTime())
+      .filter((value) => Number.isFinite(value));
+
+    if (timestamps.length === 0) {
+      return undefined;
+    }
+
+    return new Date(Math.max(...timestamps)).toISOString();
   }
 }

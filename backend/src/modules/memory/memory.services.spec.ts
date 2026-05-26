@@ -110,6 +110,50 @@ describe('Memory services', () => {
     expect(context.activeCalculator).toMatchObject({ title: 'qSOFA' });
   });
 
+  it('lists recent conversations and tools from short-term memory', async () => {
+    shortRepository.find.mockResolvedValueOnce([
+      {
+        id: 'conversation-memory',
+        type: ShortMemoryType.ACTIVE_CONVERSATION,
+        title: 'ICU rounds',
+        content: { messageCount: 6 },
+        createdAt: NOW,
+        updatedAt: NOW,
+      },
+    ]);
+
+    const conversations = await shortMemoryService.recentConversationsForUser('user-1', 5);
+
+    expect(shortRepository.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { userId: 'user-1', type: ShortMemoryType.ACTIVE_CONVERSATION },
+        take: 5,
+      }),
+    );
+    expect(conversations[0]).toMatchObject({ title: 'ICU rounds' });
+
+    shortRepository.find.mockResolvedValueOnce([
+      {
+        id: 'tool-memory',
+        type: ShortMemoryType.ACTIVE_CALCULATOR,
+        title: 'qSOFA',
+        content: { toolId: 'qsofa' },
+        createdAt: NOW,
+        updatedAt: NOW,
+      },
+    ]);
+
+    const tools = await shortMemoryService.recentToolsForUser('user-1', 5);
+
+    expect(shortRepository.find).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        where: { userId: 'user-1', type: ShortMemoryType.ACTIVE_CALCULATOR },
+        take: 5,
+      }),
+    );
+    expect(tools[0]).toMatchObject({ title: 'qSOFA' });
+  });
+
   it('normalizes long-term saved workflow metadata', async () => {
     const result = await longMemoryService.remember('user-1', {
       type: LongMemoryType.SAVED_TOOLS,
@@ -152,6 +196,34 @@ describe('Memory services', () => {
 
     expect(workflows).toHaveLength(1);
     expect(workflows[0]).toMatchObject({ id: 'workflow-memory' });
+  });
+
+  it('returns recent saved tools without workflow memories', async () => {
+    longRepository.find.mockResolvedValue([
+      {
+        id: 'tool-memory',
+        type: LongMemoryType.SAVED_TOOLS,
+        title: 'Drug checker',
+        content: { toolId: 'drug-check' },
+        tags: ['tool'],
+        createdAt: NOW,
+        updatedAt: NOW,
+      },
+      {
+        id: 'workflow-memory',
+        type: LongMemoryType.SAVED_TOOLS,
+        title: 'Sepsis escalation workflow',
+        content: { kind: 'workflow' },
+        tags: ['workflow'],
+        createdAt: NOW,
+        updatedAt: NOW,
+      },
+    ]);
+
+    const tools = await longMemoryService.recentToolsForUser('user-1', 5);
+
+    expect(tools).toHaveLength(1);
+    expect(tools[0]).toMatchObject({ id: 'tool-memory', title: 'Drug checker' });
   });
 
   it('groups clinical findings, summaries, and scores for AI context', async () => {

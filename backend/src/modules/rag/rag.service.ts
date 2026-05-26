@@ -103,6 +103,7 @@ export class RAGService {
         references,
         totalRetrieved: retrievalResult.totalRetrieved,
         latencyMs,
+        retrievalCacheHit: retrievalResult.cacheHit,
         maxTokens: options.maxTokens,
       });
 

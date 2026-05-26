@@ -18,6 +18,7 @@ export interface RetrievalResult {
   chunks: RetrievedChunk[];
   totalRetrieved: number;
   latencyMs: number;
+  cacheHit: boolean;
 }
 
 @Injectable()
@@ -42,11 +43,7 @@ export class RetrievalService {
       return this.cloneResult(await inflight);
     }
 
-    const promise = this.cacheService.getOrSet(
-      cacheKey,
-      () => this.retrieveUncached(request),
-      this.cacheTtlSeconds,
-    );
+    const promise = this.retrieveWithCache(cacheKey, request);
 
     this.inflightRetrievals.set(cacheKey, promise);
 
@@ -88,7 +85,25 @@ export class RetrievalService {
       chunks,
       totalRetrieved: queryResult.total ?? queryResult.matches.length,
       latencyMs,
+      cacheHit: false,
     };
+  }
+
+  private async retrieveWithCache(
+    cacheKey: string,
+    request: RetrievalRequest,
+  ): Promise<RetrievalResult> {
+    const cached = await this.cacheService.get<RetrievalResult>(cacheKey);
+    if (cached) {
+      return {
+        ...cached,
+        cacheHit: true,
+      };
+    }
+
+    const result = await this.retrieveUncached(request);
+    await this.cacheService.set(cacheKey, result, this.cacheTtlSeconds);
+    return result;
   }
 
   private cacheKey(request: RetrievalRequest): string {
@@ -112,6 +127,7 @@ export class RetrievalService {
   private cloneResult(result: RetrievalResult): RetrievalResult {
     return {
       ...result,
+      cacheHit: result.cacheHit,
       chunks: result.chunks.map((chunk) => ({
         ...chunk,
         metadata: { ...chunk.metadata },

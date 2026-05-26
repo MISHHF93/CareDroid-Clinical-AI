@@ -28,16 +28,29 @@ export class MemoryController {
   @ApiOperation({ summary: 'Get current-user memory dashboard aggregate' })
   async dashboard(@Req() req: any) {
     const userId = req.user.id;
-    const [shortTerm, longTerm, clinical, recentShort, recentLong, recentClinical, savedWorkflows] =
-      await Promise.all([
-        this.shortMemoryService.getActiveContext(userId),
-        this.longMemoryService.getContext(userId),
-        this.clinicalMemoryService.getClinicalContext(userId),
-        this.shortMemoryService.listForUser(userId, { limit: '10' }),
-        this.longMemoryService.listForUser(userId, { limit: '10' }),
-        this.clinicalMemoryService.listForUser(userId, { limit: '10' }),
-        this.longMemoryService.savedWorkflowsForUser(userId),
-      ]);
+    const [
+      shortTerm,
+      longTerm,
+      clinical,
+      recentShort,
+      recentLong,
+      recentClinical,
+      savedWorkflows,
+      recentConversations,
+      recentShortTools,
+      recentSavedTools,
+    ] = await Promise.all([
+      this.shortMemoryService.getActiveContext(userId),
+      this.longMemoryService.getContext(userId),
+      this.clinicalMemoryService.getClinicalContext(userId),
+      this.shortMemoryService.listForUser(userId, { limit: '10' }),
+      this.longMemoryService.listForUser(userId, { limit: '10' }),
+      this.clinicalMemoryService.listForUser(userId, { limit: '10' }),
+      this.longMemoryService.savedWorkflowsForUser(userId),
+      this.shortMemoryService.recentConversationsForUser(userId),
+      this.shortMemoryService.recentToolsForUser(userId),
+      this.longMemoryService.recentToolsForUser(userId),
+    ]);
 
     const recentActivity = [
       ...recentShort.map((entry) => this.toActivity('short-term', entry)),
@@ -49,6 +62,8 @@ export class MemoryController {
 
     return {
       recentActivity,
+      recentConversations,
+      recentTools: this.mergeRecentTools(recentShortTools, recentSavedTools),
       savedWorkflows,
       aiContext: {
         shortTerm,
@@ -104,5 +119,17 @@ export class MemoryController {
       occurredAt: entry.updatedAt || entry.createdAt,
       metadata: entry.content || {},
     };
+  }
+
+  private mergeRecentTools(shortTermTools: any[], savedTools: any[]) {
+    const seen = new Set<string>();
+    return [...shortTermTools, ...savedTools]
+      .filter((entry) => {
+        const key = entry.content?.toolId || entry.title || entry.id;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .slice(0, 12);
   }
 }

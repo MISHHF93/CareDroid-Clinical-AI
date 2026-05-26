@@ -246,5 +246,4 @@ export class UserProfileService {
     });
     return this.profileRepository.save(profile);
   }
-
 }

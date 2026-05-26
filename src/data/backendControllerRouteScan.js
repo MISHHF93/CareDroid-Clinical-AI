@@ -10,9 +10,6 @@ import { BACKEND_HTTP_ROUTES, normalizeRoutePattern } from './backendHttpRouteIn
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const backendSrc = join(__dirname, '../../backend/src');
 
-/** Routes excluded from global `api` prefix (`main.ts`). */
-const PREFIX_EXCLUDED_HANDLERS = new Set(['health']);
-
 /** SPA catch-all — not REST API inventory. */
 const SKIP_HANDLER_PATHS = new Set(['*']);
 
@@ -45,8 +42,11 @@ export function buildEffectiveHttpPath(controllerPrefix, handlerPath, httpMethod
  * @returns {{ controller: string, method: string, path: string, file: string }[]}
  */
 export function parseControllerRoutesFromSource(source, filePath) {
-  const controllerName = source.match(/export class (\w+)/)?.[1] ?? 'UnknownController';
   const controllerMatch = source.match(/@Controller\(([^)]*)\)/);
+  const controllerName =
+    (controllerMatch
+      ? source.slice(controllerMatch.index).match(/export class (\w+)/)?.[1]
+      : source.match(/export class (\w+)/)?.[1]) ?? 'UnknownController';
   let controllerPrefix = '';
   if (controllerMatch) {
     const arg = controllerMatch[1].trim();
@@ -81,6 +81,10 @@ function walkControllerFiles(dir, acc = []) {
       continue;
     }
     if (entry.endsWith('.controller.ts')) {
+      acc.push(full);
+      continue;
+    }
+    if (entry.endsWith('.module.ts') && readFileSync(full, 'utf8').includes('@Controller(')) {
       acc.push(full);
     }
   }

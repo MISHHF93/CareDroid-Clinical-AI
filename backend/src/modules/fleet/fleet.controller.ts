@@ -37,7 +37,9 @@ export class FleetController {
   ) {}
 
   @Get('vehicles/live')
-  @ApiOperation({ summary: 'Get demo-backed fleet vehicle markers, ETAs, statuses, and utilization' })
+  @ApiOperation({
+    summary: 'Get demo-backed fleet vehicle markers, ETAs, statuses, and utilization',
+  })
   async getFleetVehicles(@Req() req: FleetRequestLike) {
     return envelope(
       await this.vehicleTrackingService.getLiveVehicles(req),

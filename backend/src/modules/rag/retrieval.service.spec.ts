@@ -7,7 +7,7 @@ describe('RetrievalService', () => {
   const queryEmbedding = [0.1, 0.2, 0.3];
 
   function createService(
-    overrides: Partial<{ cacheGetOrSet: jest.Mock; vectorQuery: jest.Mock }> = {},
+    overrides: Partial<{ cacheGet: jest.Mock; cacheSet: jest.Mock; vectorQuery: jest.Mock }> = {},
   ) {
     const vectorQuery =
       overrides.vectorQuery ||
@@ -27,18 +27,18 @@ describe('RetrievalService', () => {
         total: 1,
         latencyMs: 12,
       });
-    const cacheGetOrSet =
-      overrides.cacheGetOrSet || jest.fn((_key, factory) => Promise.resolve(factory()));
+    const cacheGet = overrides.cacheGet || jest.fn().mockResolvedValue(null);
+    const cacheSet = overrides.cacheSet || jest.fn().mockResolvedValue(true);
 
     const service = new RetrievalService(
       { query: vectorQuery } as unknown as PineconeService,
-      { getOrSet: cacheGetOrSet } as unknown as CacheService,
+      { get: cacheGet, set: cacheSet } as unknown as CacheService,
       {
         get: jest.fn().mockReturnValue({ retrieval: { cacheTtlSeconds: 60 } }),
       } as unknown as ConfigService,
     );
 
-    return { service, vectorQuery, cacheGetOrSet };
+    return { service, vectorQuery, cacheGet, cacheSet };
   }
 
   it('queries vectors and maps matches to retrieved chunks', async () => {
@@ -70,10 +70,11 @@ describe('RetrievalService', () => {
     ]);
     expect(result.totalRetrieved).toBe(1);
     expect(result.latencyMs).toBeGreaterThanOrEqual(0);
+    expect(result.cacheHit).toBe(false);
   });
 
   it('uses cached retrieval payloads when available', async () => {
-    const cacheGetOrSet = jest.fn().mockResolvedValue({
+    const cacheGet = jest.fn().mockResolvedValue({
       chunks: [
         {
           id: 'cached-chunk',
@@ -84,8 +85,9 @@ describe('RetrievalService', () => {
       ],
       totalRetrieved: 1,
       latencyMs: 1,
+      cacheHit: false,
     });
-    const { service, vectorQuery } = createService({ cacheGetOrSet });
+    const { service, vectorQuery } = createService({ cacheGet });
 
     const result = await service.retrieve({
       query: 'cached query',
@@ -97,8 +99,9 @@ describe('RetrievalService', () => {
       corpusVersion: 2,
     });
 
-    expect(cacheGetOrSet).toHaveBeenCalled();
+    expect(cacheGet).toHaveBeenCalled();
     expect(vectorQuery).not.toHaveBeenCalled();
     expect(result.chunks[0].id).toBe('cached-chunk');
+    expect(result.cacheHit).toBe(true);
   });
 });

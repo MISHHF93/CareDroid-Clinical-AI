@@ -146,7 +146,8 @@ const capabilityExposureMetadata = Object.freeze({
   },
   'Clinical alerts management': {
     frontendRouteStatus: 'protected',
-    surfaceType: 'mock-only',
+    surfaceType: 'visible-ui',
+    exposureStatus: 'partially exposed',
   },
   'Team management': {
     frontendRouteStatus: 'protected + permission',
@@ -533,7 +534,7 @@ export const unsupportedWorkflowDecisions = Object.freeze([
   {
     workflow: 'Clinical alerts backend actions',
     decision: 'Expose demo-backed list/ack/dismiss only',
-    reason: 'ClinicalAlertsPage now has Nest routes for workflow validation; streaming and live alarm source integration remain disabled.',
+    reason: 'ClinicalAlertsPage now has Nest routes for workflow validation, but live alarm streaming is not API-backed and source integration remains disabled.',
   },
   {
     workflow: 'Team invite/edit/delete',

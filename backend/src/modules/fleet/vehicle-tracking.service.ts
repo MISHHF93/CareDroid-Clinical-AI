@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { buildFleetAlerts, buildFleetRoutes, buildFleetSummary, buildFleetVehicles } from './fleet.data';
+import {
+  buildFleetAlerts,
+  buildFleetRoutes,
+  buildFleetSummary,
+  buildFleetVehicles,
+} from './fleet.data';
 import { FleetAuditService } from './fleet-audit.service';
 import { FleetRequestLike } from './fleet.types';
 

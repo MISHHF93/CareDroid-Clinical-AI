@@ -61,6 +61,8 @@ const AI_SYSTEM_ROUTE_ALLOWLIST = {
   [REGISTRY.aiCostOptimization]: TOOL_LAUNCH_PATHS.costs,
   [REGISTRY.aiEvaluation]: TOOL_LAUNCH_PATHS.aiEvaluation,
   [REGISTRY.aiCommandCenter]: TOOL_LAUNCH_PATHS.aiCommandCenter,
+  [REGISTRY.aiGovernance]: TOOL_LAUNCH_PATHS.aiGovernance,
+  [REGISTRY.aiSecurity]: TOOL_LAUNCH_PATHS.aiSecurity,
 };
 const PULMONOLOGY_TIER_B_SET = new Set(PULMONOLOGY_TIER_B_CHAT_REGISTRY_IDS);
 const NEPHROLOGY_TIER_B_SET = new Set(NEPHROLOGY_TIER_B_CHAT_REGISTRY_IDS);

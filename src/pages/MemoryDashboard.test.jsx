@@ -17,6 +17,8 @@ const memoryApiMock = vi.hoisted(() => ({
 vi.mock('../services/memoryApi', () => ({
   LOCAL_MEMORY_DASHBOARD: {
     recentActivity: [],
+    recentConversations: [],
+    recentTools: [],
     savedWorkflows: [],
     aiContext: {
       shortTerm: { activeConversation: null, activeCalculator: null, activeDashboard: null },
@@ -63,6 +65,22 @@ function arrangeDashboard() {
         title: 'Latest sepsis summary',
         occurredAt: '2026-05-25T12:00:00.000Z',
         metadata: { status: 'ready' },
+      },
+    ],
+    recentConversations: [
+      {
+        id: 'conversation-memory-1',
+        title: 'Persisted cardiology follow-up',
+        content: { messageCount: 5 },
+        updatedAt: '2026-05-25T11:50:00.000Z',
+      },
+    ],
+    recentTools: [
+      {
+        id: 'tool-memory-1',
+        title: 'drug-check',
+        content: { toolId: 'drug-check' },
+        updatedAt: '2026-05-25T11:45:00.000Z',
       },
     ],
     savedWorkflows: [
@@ -125,8 +143,12 @@ describe('MemoryDashboard', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: /memory dashboard/i })).toBeInTheDocument();
     expect(await screen.findByText('Sepsis escalation workflow')).toBeVisible();
+    expect(screen.getByRole('heading', { name: /recent conversations/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /recent tools/i })).toBeInTheDocument();
     expect(screen.getByText('Latest sepsis summary')).toBeVisible();
     expect(screen.getByText('Persisted active conversation')).toBeVisible();
+    expect(screen.getByText('Persisted cardiology follow-up')).toBeVisible();
+    expect(screen.getAllByText('drug-check').length).toBeGreaterThan(0);
     expect(screen.getByText('qSOFA score')).toBeVisible();
     expect(screen.getByText('Recommended rounding workflow')).toBeVisible();
 
@@ -146,6 +168,7 @@ describe('MemoryDashboard', () => {
         expect.objectContaining({
           type: 'active_dashboard',
           title: 'Memory dashboard',
+          content: expect.objectContaining({ route: '/ai-memory' }),
         })
       )
     );

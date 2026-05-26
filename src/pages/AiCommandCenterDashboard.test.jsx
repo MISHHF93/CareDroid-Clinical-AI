@@ -59,6 +59,16 @@ const snapshot = vi.hoisted(() => ({
     successRate: 0.99,
     successLabel: '99%',
   },
+  toolCalls: [
+    {
+      id: 'tool-call-rag',
+      route: 'rag',
+      label: 'rag',
+      count: 6,
+      complexity: 'medium',
+      status: 'active',
+    },
+  ],
   costMetrics: {
     totalUsd: 4.25,
     averageUsd: 0.08,
@@ -124,14 +134,16 @@ describe('AiCommandCenterDashboard', () => {
     expect((await screen.findAllByText('Healthy')).length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /ai health/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /active experts/i })).toBeVisible();
-    expect(screen.getByRole('heading', { name: /rag metrics/i })).toBeVisible();
+    expect(screen.getByRole('heading', { name: /retrieval metrics/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /memory usage/i })).toBeVisible();
-    expect(screen.getByRole('heading', { name: /tool usage/i })).toBeVisible();
+    expect(screen.getByRole('heading', { name: /tool calls/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /cost metrics/i })).toBeVisible();
-    expect(screen.getByRole('heading', { name: /hallucination metrics/i })).toBeVisible();
+    expect(screen.getByRole('heading', { name: /hallucination monitoring/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /retrieval quality/i })).toBeVisible();
     expect(screen.getByRole('heading', { name: /audit logs/i })).toBeVisible();
     expect(screen.getByRole('img', { name: /ai accuracy trend/i })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /expert load chart/i })).toBeInTheDocument();
+    expect(screen.getByText('medium complexity')).toBeVisible();
     expect(screen.getByText('AI_EVALUATION_VIEWED')).toBeVisible();
     expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 15000);
     setIntervalSpy.mockRestore();

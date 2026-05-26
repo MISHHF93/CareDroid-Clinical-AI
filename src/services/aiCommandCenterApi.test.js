@@ -140,6 +140,12 @@ describe('aiCommandCenterApi', () => {
     expect(snapshot.ragMetrics.retrievalLabel).toBe('89%');
     expect(snapshot.memoryUsage.total).toBe(7);
     expect(snapshot.toolUsage.totalRequests).toBe(12);
+    expect(snapshot.toolCalls[0]).toMatchObject({
+      route: 'rag',
+      label: 'rag',
+      count: 6,
+      status: 'active',
+    });
     expect(snapshot.sourceStatus).toMatchObject({
       evaluation: 'live',
       memory: 'live',

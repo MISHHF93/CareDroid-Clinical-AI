@@ -158,6 +158,8 @@ export default function MemoryDashboard() {
       if (cancelled) return;
       setDashboard({
         recentActivity: result.recentActivity,
+        recentConversations: result.recentConversations,
+        recentTools: result.recentTools,
         savedWorkflows: result.savedWorkflows,
         aiContext: result.aiContext,
       });
@@ -176,8 +178,9 @@ export default function MemoryDashboard() {
       title: 'Memory dashboard',
       workspaceId,
       content: {
-        route: '/memory',
-        sections: ['recent activity', 'saved workflows', 'ai context'],
+        route: '/ai-memory',
+        routeAliases: ['/memory'],
+        sections: ['recent conversations', 'saved workflows', 'recent tools', 'ai context'],
       },
     });
   }, [workspaceId]);
@@ -221,6 +224,31 @@ export default function MemoryDashboard() {
       updatedAt: new Date().toISOString(),
     }))
   );
+  const recentConversations = mergeById(
+    activeConversation
+      ? [
+          {
+            id: `current-conversation-${activeConversation.id}`,
+            title: activeConversation.title || 'Active conversation',
+            content: {
+              messageCount: messages.length,
+              latestMessage: messages[messages.length - 1]?.content,
+            },
+            updatedAt: activeConversation.date || new Date().toISOString(),
+          },
+        ]
+      : [],
+    dashboard.recentConversations || []
+  ).slice(0, 8);
+  const recentToolEntries = mergeById(
+    (recentTools || []).slice(0, 6).map((toolId) => ({
+      id: `session-tool-card-${toolId}`,
+      title: toolId,
+      content: { toolId, source: 'current session' },
+      updatedAt: new Date().toISOString(),
+    })),
+    dashboard.recentTools || []
+  ).slice(0, 8);
   const shortEntries = Object.values(aiContext.shortTerm || {}).filter(Boolean);
   const clinicalEntries = [
     ...(aiContext.clinical?.findings || []),
@@ -262,6 +290,12 @@ export default function MemoryDashboard() {
       </section>
 
       <section className="memory-layout">
+        <MemoryCard
+          title="Recent Conversations"
+          entries={recentConversations}
+          empty="Recent assistant conversations will appear here as short-term memory."
+        />
+
         <section className="memory-panel memory-panel--activity" aria-labelledby="memory-activity-title">
           <div className="memory-panel__heading">
             <h2 id="memory-activity-title">Recent Activity</h2>
@@ -277,11 +311,19 @@ export default function MemoryDashboard() {
             <p className="memory-empty">No memory activity has been captured yet.</p>
           )}
         </section>
+      </section>
 
+      <section className="memory-layout">
         <MemoryCard
           title="Saved Workflows"
           entries={savedWorkflows}
           empty="Save tools or recommended workflows to make them available here."
+        />
+
+        <MemoryCard
+          title="Recent Tools"
+          entries={recentToolEntries}
+          empty="Recently used assistant tools and calculators will appear here."
         />
       </section>
 

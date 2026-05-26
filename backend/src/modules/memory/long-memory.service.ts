@@ -73,6 +73,24 @@ export class LongMemoryService {
       .slice(0, 12);
   }
 
+  async recentToolsForUser(userId: string, limit = 10) {
+    const savedTools = await this.listForUser(userId, {
+      type: LongMemoryType.SAVED_TOOLS,
+      limit: '50',
+    });
+    return savedTools
+      .filter((entry) => {
+        const content = entry.content || {};
+        return (
+          content.kind !== 'workflow' &&
+          !content.workflowId &&
+          !entry.tags.includes('workflow') &&
+          !entry.tags.includes('saved-workflow')
+        );
+      })
+      .slice(0, limit);
+  }
+
   serialize(entry: LongMemoryEntry) {
     return {
       id: entry.id,

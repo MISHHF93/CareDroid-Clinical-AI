@@ -174,6 +174,31 @@ function buildToolUsage(costDashboard, evaluationDashboard) {
   };
 }
 
+function buildToolCalls(costDashboard) {
+  const routeCounts = costDashboard.routeCounts || {};
+  const complexityCounts = costDashboard.complexityCounts || {};
+  const generatedAt = costDashboard.generatedAt || new Date().toISOString();
+
+  return Object.entries(routeCounts)
+    .sort(([, a], [, b]) => Number(b || 0) - Number(a || 0))
+    .map(([route, count], index) => {
+      const complexity =
+        Object.entries(complexityCounts).sort(([, a], [, b]) => Number(b || 0) - Number(a || 0))[
+          index
+        ]?.[0] || 'mixed';
+      return {
+        id: `tool-call-${route}`,
+        route,
+        label: route.replace(/_/g, ' '),
+        count: Number(count || 0),
+        complexity,
+        status: Number(count || 0) > 0 ? 'active' : 'idle',
+        updatedAt: generatedAt,
+      };
+    })
+    .slice(0, 8);
+}
+
 function buildTrendRows(evaluationDashboard) {
   return (evaluationDashboard.trends || []).map((point) => ({
     label: point.label,
@@ -242,6 +267,7 @@ export async function fetchAiCommandCenterSnapshot() {
     },
     memoryUsage: buildMemoryUsage(memoryDashboard),
     toolUsage: buildToolUsage(costDashboard, evaluationDashboard),
+    toolCalls: buildToolCalls(costDashboard),
     costMetrics: {
       totalUsd: Number(costDashboard.requestCost?.totalUsd || 0),
       averageUsd: Number(costDashboard.requestCost?.averageUsd || 0),

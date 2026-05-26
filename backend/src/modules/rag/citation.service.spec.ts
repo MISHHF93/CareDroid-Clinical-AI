@@ -88,4 +88,31 @@ describe('CitationService', () => {
       metadata: { toolId: 'sofa-calculator' },
     });
   });
+
+  it('keeps citations ready for assistant source panels', () => {
+    const sources = service.extractSources(chunks);
+    const references = service.buildReferences(chunks, sources);
+
+    const panel = {
+      citations: sources,
+      references,
+      confidence: 0.86,
+      generatedAt: '2026-05-26T18:00:00.000Z',
+      timestamps: {
+        generatedAt: '2026-05-26T18:00:00.000Z',
+        retrievedAt: '2026-05-26T18:00:00.000Z',
+        latestSourceTimestamp: references[1].timestamp,
+      },
+    };
+
+    expect(panel.citations[0]).toMatchObject({
+      id: 'sepsis-guideline',
+      title: 'Surviving Sepsis Guideline',
+    });
+    expect(panel.references[0]).toMatchObject({
+      citationLabel: '[1]',
+      timestamp: '2024-02-01T12:00:00.000Z',
+    });
+    expect(panel.timestamps.latestSourceTimestamp).toBe('2026-01-01T09:00:00.000Z');
+  });
 });

@@ -2302,6 +2302,30 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     backendExecutable: false,
   },
   {
+    toolId: NLU.aiGovernance,
+    toolName: 'AI Governance',
+    category: 'reference',
+    description:
+      'Governance center for model inventory, clinical review, risk classification, approval workflows, and release history.',
+    path: TOOL_LAUNCH_PATHS.aiGovernance,
+    sidebarToolId: REGISTRY.aiGovernance,
+    chatSeed:
+      'Open the AI Governance dashboard and help me review model inventory, clinical review queue, risk classification, release gates, and approval workflow signals. Governance review required before policy or release decisions.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.aiSecurity,
+    toolName: 'LLM Security',
+    category: 'reference',
+    description:
+      'Security dashboard for prompt-injection detection, PHI protection, output validation, tool permissions, and rate limits.',
+    path: TOOL_LAUNCH_PATHS.aiSecurity,
+    sidebarToolId: REGISTRY.aiSecurity,
+    chatSeed:
+      'Open the LLM Security dashboard and help me review prompt-injection findings, PHI protection, output validation, tool permissions, and rate limits. Do not expose secrets or PHI.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'drug-interactions',
     toolName: 'Drug Interaction Checker',
     category: 'checker',

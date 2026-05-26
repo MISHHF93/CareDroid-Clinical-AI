@@ -84,16 +84,16 @@ describe('PlatformSystemsController', () => {
     const { controller, platformGovernanceService } = buildController();
 
     await expect(controller.getClinicalPolicies()).resolves.toEqual([{ id: 'policy-1' }]);
-    await expect(controller.createClinicalPolicy({ capabilityId: 'clinical-governance' })).resolves.toEqual(
-      expect.objectContaining({ id: 'policy-2' }),
-    );
-    await expect(controller.approveClinicalPolicy('policy-1', { decision: 'approve' })).resolves.toEqual(
-      expect.objectContaining({ status: 'active' }),
-    );
+    await expect(
+      controller.createClinicalPolicy({ capabilityId: 'clinical-governance' }),
+    ).resolves.toEqual(expect.objectContaining({ id: 'policy-2' }));
+    await expect(
+      controller.approveClinicalPolicy('policy-1', { decision: 'approve' }),
+    ).resolves.toEqual(expect.objectContaining({ status: 'active' }));
     await expect(controller.getClinicalReleaseGates()).resolves.toEqual([{ id: 'gate-1' }]);
-    await expect(controller.decideClinicalReleaseGate('gate-1', { decision: 'reject' })).resolves.toEqual(
-      expect.objectContaining({ status: 'blocked' }),
-    );
+    await expect(
+      controller.decideClinicalReleaseGate('gate-1', { decision: 'reject' }),
+    ).resolves.toEqual(expect.objectContaining({ status: 'blocked' }));
     await expect(controller.getGovernanceSafetyFindings()).resolves.toEqual([{ id: 'finding-1' }]);
     await expect(
       controller.reviewGovernanceSafetyFinding('finding-1', { decision: 'resolve' }),

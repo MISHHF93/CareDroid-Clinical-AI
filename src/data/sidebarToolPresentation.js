@@ -9,6 +9,7 @@ export const SIDEBAR_CATEGORY_ORDER = Object.freeze([
   'Diagnostic',
   'Calculator',
   'Reference',
+  'AI System',
   'Fleet',
   'Hospital Operations',
   'IoT',

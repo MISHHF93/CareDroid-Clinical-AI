@@ -230,6 +230,45 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     category: 'reference',
   },
   {
+    toolId: 'ai-governance',
+    toolName: 'AI Governance',
+    keywords: [
+      'ai governance',
+      'ai-governance',
+      'governance dashboard',
+      'risk classification',
+      'approval workflow',
+      'clinical review queue',
+      'model inventory',
+      'release gates',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['panel', 'risk_level', 'capability_id'],
+    description:
+      'Opens AI governance context for model inventory, clinical review, risk classification, approval workflows, and release gates',
+    category: 'reference',
+  },
+  {
+    toolId: 'ai-security',
+    toolName: 'LLM Security',
+    keywords: [
+      'llm security',
+      'ai security',
+      'security dashboard',
+      'prompt injection',
+      'prompt injection detection',
+      'phi protection',
+      'phi redaction',
+      'tool permissions',
+      'rate limits',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['prompt', 'text', 'panel'],
+    description:
+      'Opens LLM security context for prompt-injection detection, PHI protection, output validation, tool permissions, and rate limits',
+    category: 'reference',
+  },
+  {
     toolId: 'ecg-interpretation-assistant',
     toolName: 'ECG Interpretation Assistant',
     keywords: [

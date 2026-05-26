@@ -52,7 +52,7 @@ const allPackIds = [
   ),
 ];
 
-const sharedRouteAllowlist = new Set(['/tools/calculators', '/hospital-map', '/medical-iot']);
+const sharedRouteAllowlist = new Set(['/tools/calculators', '/hospital-map', '/medical-iot', '/devices']);
 const documentedPlaceholderIds = new Set([
   'moca-placeholder-workflow',
   'pediatric-dose-safety-checker',
