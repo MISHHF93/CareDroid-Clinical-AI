@@ -676,8 +676,7 @@ const clinicalIntentToolsRaw = [
     toolId: NLU.screeningTrendEngine,
     toolName: 'Screening Trend Engine',
     category: 'reference',
-    description:
-      'Trend engine concept for serial psychiatry screening scores and review queues.',
+    description: 'Trend engine concept for serial psychiatry screening scores and review queues.',
     path: '/tools/psychiatry/screening-trend-engine',
     sidebarToolId: REGISTRY.screeningTrendEngine,
     chatSeed:
@@ -843,8 +842,7 @@ Report total score (0–7), risk category (low 0–3, moderate 4–5, high 6–7
     toolId: 'centor-mcisaac',
     toolName: 'Centor / McIsaac score',
     category: 'calculator',
-    description:
-      'Modified Centor (McIsaac) score for streptococcal pharyngitis probability (0–5).',
+    description: 'Modified Centor (McIsaac) score for streptococcal pharyngitis probability (0–5).',
     path: '/tools/calculators/centor-mcisaac',
     sidebarToolId: 'centor-mcisaac',
     chatSeed:
@@ -1122,8 +1120,7 @@ Check: BUN >25 mg/dL, impaired mental status, SIRS, age >60, pleural effusion on
     toolId: 'fib4',
     toolName: 'FIB-4 index',
     category: 'calculator',
-    description:
-      'FIB-4 index for liver fibrosis risk using age, AST, ALT, and platelets.',
+    description: 'FIB-4 index for liver fibrosis risk using age, AST, ALT, and platelets.',
     path: '/tools/calculators/fib4',
     sidebarToolId: 'fib4',
     chatSeed: `Help me calculate the FIB-4 index from age, AST, ALT, and platelet count.
@@ -1210,7 +1207,8 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     description: 'Serum anion gap with optional albumin correction for acid-base review.',
     path: '/tools/calculators/anion-gap',
     sidebarToolId: 'anion-gap',
-    chatSeed: 'Help me calculate an anion gap from sodium, chloride, bicarbonate, and optional albumin.',
+    chatSeed:
+      'Help me calculate an anion gap from sodium, chloride, bicarbonate, and optional albumin.',
     backendExecutable: false,
   },
   {
@@ -1297,7 +1295,8 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     toolId: 'curb65-calculator',
     toolName: 'CURB-65 Score',
     category: 'calculator',
-    description: 'Community-acquired pneumonia severity score using confusion, urea/BUN, respiratory rate, blood pressure, and age.',
+    description:
+      'Community-acquired pneumonia severity score using confusion, urea/BUN, respiratory rate, blood pressure, and age.',
     path: '/tools/calculators/curb-65',
     sidebarToolId: 'curb65-calculator',
     chatSeed:
@@ -1308,7 +1307,8 @@ Use conventional units: age (years), AST and ALT (U/L), platelets (×10⁹/L). I
     toolId: 'gcs-calculator',
     toolName: 'Glasgow Coma Scale',
     category: 'calculator',
-    description: 'Level of consciousness scoring from eye, verbal, and motor responses with severe/moderate/mild interpretation ranges.',
+    description:
+      'Level of consciousness scoring from eye, verbal, and motor responses with severe/moderate/mild interpretation ranges.',
     path: '/tools/calculators/gcs',
     sidebarToolId: 'gcs-calculator',
     chatSeed:
@@ -2182,6 +2182,126 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     backendExecutable: false,
   },
   {
+    toolId: NLU.aiGateway,
+    toolName: 'AI Gateway',
+    category: 'reference',
+    description:
+      'Assistant gateway surface for routing, trace metadata, safety policy context, and guarded clinical AI responses.',
+    path: TOOL_LAUNCH_PATHS.assistant,
+    sidebarToolId: REGISTRY.aiGateway,
+    chatSeed:
+      'Open the AI Gateway assistant flow and help me route this clinical AI request with safety, memory, retrieval, tool, cost, and evaluation context. Clinical decision support only; do not automate orders or replace clinician judgment.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.moeRouter,
+    toolName: 'MoE Router',
+    category: 'reference',
+    description:
+      'Mixture-of-experts router context for expert selection, retrieval policy, fallback behavior, and human-review flags.',
+    path: TOOL_LAUNCH_PATHS.assistant,
+    sidebarToolId: REGISTRY.moeRouter,
+    chatSeed:
+      'Help me inspect which CareDroid AI expert route should handle this request, including retrieval policy, safety flags, and fallback rationale. Clinical decision support only; require clinician review.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.aiRag,
+    toolName: 'RAG Evidence Engine',
+    category: 'reference',
+    description:
+      'Retrieval-augmented evidence engine for guideline lookup, citations, source panels, and grounded assistant responses.',
+    path: '/tools/guideline-rag',
+    sidebarToolId: REGISTRY.aiRag,
+    chatSeed:
+      'Help me retrieve and summarize guideline evidence with citations and source attribution. Clinical decision support only; do not make treatment decisions without clinician review.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.aiArtifacts,
+    toolName: 'AI Artifacts',
+    category: 'reference',
+    description:
+      'Artifact workspace for saved AI outputs, workflow assets, telemetry schemas, protocols, and templates.',
+    path: TOOL_LAUNCH_PATHS.artifacts,
+    sidebarToolId: REGISTRY.aiArtifacts,
+    chatSeed:
+      'Help me review relevant AI artifacts, saved outputs, templates, or protocols and explain how they should be used with clinician review.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.aiMemory,
+    toolName: 'AI Memory',
+    category: 'reference',
+    description:
+      'Memory dashboard for short, long, and clinical context used to personalize assistant workflows.',
+    path: TOOL_LAUNCH_PATHS.memory,
+    sidebarToolId: REGISTRY.aiMemory,
+    chatSeed:
+      'Help me review the assistant memory context for this workflow, including active conversation, saved preferences, clinical summaries, and saved tools. Do not infer missing patient facts.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.aiToolCalling,
+    toolName: 'AI Tool Calling',
+    category: 'reference',
+    description:
+      'Guarded tool-calling workflow for tool resolution, parameter validation, structured tool context, and unsupported-tool boundaries.',
+    path: TOOL_LAUNCH_PATHS.assistant,
+    sidebarToolId: REGISTRY.aiToolCalling,
+    chatSeed:
+      'Help me launch the right CareDroid tool for this request. Collect required parameters, return structured context, and avoid unsupported backend executors. Clinical decision support only.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.aiTraining,
+    toolName: 'AI Training Pipeline',
+    category: 'reference',
+    description:
+      'Training and MoE planning dashboard for governed AI iteration, datasets, and model improvement loops.',
+    path: TOOL_LAUNCH_PATHS.training,
+    sidebarToolId: REGISTRY.aiTraining,
+    chatSeed:
+      'Help me review AI training readiness, MoE plan status, dataset gaps, and improvement opportunities. Governance review required before model changes.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.aiCostOptimization,
+    toolName: 'AI Cost Optimization',
+    category: 'reference',
+    description:
+      'Cost optimizer dashboard for route prediction, cache metrics, token spend, and savings snapshots.',
+    path: TOOL_LAUNCH_PATHS.costs,
+    sidebarToolId: REGISTRY.aiCostOptimization,
+    chatSeed:
+      'Help me review AI cost optimization metrics, route predictions, cache behavior, and token spend without changing production routing automatically.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.aiEvaluation,
+    toolName: 'AI Evaluation',
+    category: 'reference',
+    description:
+      'Evaluation framework for hallucination, accuracy, latency, retrieval precision, tool success, satisfaction, and cost metrics.',
+    path: TOOL_LAUNCH_PATHS.aiEvaluation,
+    sidebarToolId: REGISTRY.aiEvaluation,
+    chatSeed:
+      'Help me review AI evaluation metrics, benchmarks, trends, and assistant quality signals. Highlight risks and missing evidence for human review.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.aiCommandCenter,
+    toolName: 'AI Command Center',
+    category: 'reference',
+    description:
+      'Unified AI operations dashboard spanning health, active experts, RAG, memory, tools, costs, hallucination, retrieval, and audit logs.',
+    path: TOOL_LAUNCH_PATHS.aiCommandCenter,
+    sidebarToolId: REGISTRY.aiCommandCenter,
+    chatSeed:
+      'Open the AI Command Center and help me summarize AI health, experts, RAG, memory, tool usage, costs, evaluation quality, and audit signals.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'drug-interactions',
     toolName: 'Drug Interaction Checker',
     category: 'checker',
@@ -2351,7 +2471,11 @@ export const nluCalculatorHubOnly = [
     name: 'Wells DVT',
     hubPath: TOOL_LAUNCH_PATHS.calculatorsHub,
   },
-  { toolId: wellsPeChatConfig.toolId, name: wellsPeChatConfig.name, hubPath: wellsPeChatConfig.hubPath },
+  {
+    toolId: wellsPeChatConfig.toolId,
+    name: wellsPeChatConfig.name,
+    hubPath: wellsPeChatConfig.hubPath,
+  },
   { toolId: percChatConfig.toolId, name: percChatConfig.name, hubPath: percChatConfig.hubPath },
   {
     toolId: graceAcsChatConfig.toolId,
@@ -2442,10 +2566,12 @@ export const builtinUiCalculators = [
   {
     id: 'apache-ii',
     name: 'APACHE II',
-    description: 'ICU severity score using APACHE II acute physiology, GCS, age, and chronic health points.',
+    description:
+      'ICU severity score using APACHE II acute physiology, GCS, age, and chronic health points.',
     path: '/tools/calculators/apache-ii',
     calcQuery: '/tools/calculators?calc=apache-ii',
-    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    implementation:
+      'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2454,7 +2580,8 @@ export const builtinUiCalculators = [
     description: 'Community-acquired pneumonia severity (confusion, urea/BUN, RR, BP, age).',
     path: '/tools/calculators/curb-65',
     calcQuery: '/tools/calculators?calc=curb-65',
-    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    implementation:
+      'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2463,7 +2590,8 @@ export const builtinUiCalculators = [
     description: 'Consciousness scoring from eye, verbal, and motor responses.',
     path: '/tools/calculators/gcs',
     calcQuery: '/tools/calculators?calc=gcs',
-    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    implementation:
+      'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2472,16 +2600,19 @@ export const builtinUiCalculators = [
     description: 'Modified Early Warning Score from adult vitals and AVPU.',
     path: '/tools/calculators/mews',
     calcQuery: '/tools/calculators?calc=mews',
-    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    implementation:
+      'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
     orchestratorId: null,
   },
   {
     id: 'revised-trauma-score',
     name: 'Revised Trauma Score',
-    description: 'Weighted trauma physiology score from coded GCS, systolic BP, and respiratory rate.',
+    description:
+      'Weighted trauma physiology score from coded GCS, systolic BP, and respiratory rate.',
     path: '/tools/calculators/revised-trauma-score',
     calcQuery: '/tools/calculators?calc=revised-trauma-score',
-    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    implementation:
+      'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2490,13 +2621,15 @@ export const builtinUiCalculators = [
     description: 'Pediatric Early Warning Score with pediatric caution labels.',
     path: '/tools/calculators/pews',
     calcQuery: '/tools/calculators?calc=pews',
-    implementation: 'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
+    implementation:
+      'Client-side in emergencyCriticalCareCalculators.jsx (emergencyCriticalCareCalculators.js)',
     orchestratorId: null,
   },
   {
     id: 'child-pugh',
     name: 'Child-Pugh',
-    description: 'Cirrhosis severity class (bilirubin, albumin, coagulation, ascites, encephalopathy).',
+    description:
+      'Cirrhosis severity class (bilirubin, albumin, coagulation, ascites, encephalopathy).',
     path: '/tools/calculators/child-pugh',
     calcQuery: '/tools/calculators?calc=child-pugh',
     implementation: 'Client-side in Calculators.jsx (childPughCalculator.js)',
@@ -2586,7 +2719,8 @@ export const builtinUiCalculators = [
   {
     id: 'feurea',
     name: 'FeUrea',
-    description: 'Fractional excretion of urea from BUN, urine urea nitrogen, and creatinine values.',
+    description:
+      'Fractional excretion of urea from BUN, urine urea nitrogen, and creatinine values.',
     path: '/tools/calculators/feurea',
     calcQuery: '/tools/calculators?calc=feurea',
     implementation: 'Client-side in nephrologyCalculators.jsx (nephrologyCalculators.js)',
@@ -2643,7 +2777,8 @@ export const builtinUiCalculators = [
     description: 'Insulin resistance estimate from fasting glucose and fasting insulin.',
     path: '/tools/calculators/homa-ir',
     calcQuery: '/tools/calculators?calc=homa-ir',
-    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    implementation:
+      'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2652,7 +2787,8 @@ export const builtinUiCalculators = [
     description: 'Albumin-corrected total calcium estimate.',
     path: '/tools/calculators/corrected-calcium',
     calcQuery: '/tools/calculators?calc=corrected-calcium',
-    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    implementation:
+      'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2661,7 +2797,8 @@ export const builtinUiCalculators = [
     description: 'Calculated serum osmolality from sodium, glucose, BUN, and optional ethanol.',
     path: '/tools/calculators/serum-osmolality',
     calcQuery: '/tools/calculators?calc=serum-osmolality',
-    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    implementation:
+      'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2670,7 +2807,8 @@ export const builtinUiCalculators = [
     description: 'Mosteller body surface area estimate from height and weight.',
     path: '/tools/calculators/bsa',
     calcQuery: '/tools/calculators?calc=bsa',
-    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    implementation:
+      'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2679,7 +2817,8 @@ export const builtinUiCalculators = [
     description: 'Devine ideal body weight estimate from sex and height.',
     path: '/tools/calculators/ideal-body-weight',
     calcQuery: '/tools/calculators?calc=ideal-body-weight',
-    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    implementation:
+      'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2688,7 +2827,8 @@ export const builtinUiCalculators = [
     description: 'Adjusted body weight estimate using IBW, actual weight, and a correction factor.',
     path: '/tools/calculators/adjusted-body-weight',
     calcQuery: '/tools/calculators?calc=adjusted-body-weight',
-    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    implementation:
+      'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2697,7 +2837,8 @@ export const builtinUiCalculators = [
     description: 'Central adiposity estimate from waist and hip circumference.',
     path: '/tools/calculators/waist-hip-ratio',
     calcQuery: '/tools/calculators?calc=waist-hip-ratio',
-    implementation: 'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
+    implementation:
+      'Client-side in endocrineMetabolicCalculators.jsx (endocrineMetabolicCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2805,7 +2946,8 @@ export const builtinUiCalculators = [
     description: 'CAGE alcohol screening questionnaire (0-4).',
     path: '/tools/calculators/cage',
     calcQuery: '/tools/calculators?calc=cage',
-    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    implementation:
+      'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2814,7 +2956,8 @@ export const builtinUiCalculators = [
     description: 'MMSE cognitive screening score entry from governed administration (0-30).',
     path: '/tools/calculators/mmse',
     calcQuery: '/tools/calculators?calc=mmse',
-    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    implementation:
+      'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2823,7 +2966,8 @@ export const builtinUiCalculators = [
     description: 'MoCA governance workflow placeholder without item display or scoring.',
     path: '/tools/calculators/moca-placeholder-workflow',
     calcQuery: '/tools/calculators?calc=moca-placeholder-workflow',
-    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    implementation:
+      'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2832,7 +2976,8 @@ export const builtinUiCalculators = [
     description: 'PCL-5 PTSD symptom screening score entry (0-80) with current safety flag.',
     path: '/tools/calculators/pcl5',
     calcQuery: '/tools/calculators?calc=pcl5',
-    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    implementation:
+      'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2841,7 +2986,8 @@ export const builtinUiCalculators = [
     description: 'Mood Disorder Questionnaire screening summary with urgent safety flag.',
     path: '/tools/calculators/mdq',
     calcQuery: '/tools/calculators?calc=mdq',
-    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    implementation:
+      'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2850,7 +2996,8 @@ export const builtinUiCalculators = [
     description: 'Daytime sleepiness screen (0-24) with safety-sensitive activity flag.',
     path: '/tools/calculators/epworth-sleepiness-scale',
     calcQuery: '/tools/calculators?calc=epworth-sleepiness-scale',
-    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    implementation:
+      'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -2859,13 +3006,15 @@ export const builtinUiCalculators = [
     description: 'Suicide-severity workflow entry with immediate safety review messaging.',
     path: '/tools/calculators/columbia-suicide-severity-workflow',
     calcQuery: '/tools/calculators?calc=columbia-suicide-severity-workflow',
-    implementation: 'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
+    implementation:
+      'Client-side in psychiatryScreeningCalculators.jsx (psychiatryScreeningCalculators.js)',
     orchestratorId: null,
   },
   {
     id: 'heart-score',
     name: 'HEART score',
-    description: 'Chest pain risk stratification (history, ECG, age, risk factors, troponin; 0–10).',
+    description:
+      'Chest pain risk stratification (history, ECG, age, risk factors, troponin; 0–10).',
     path: '/tools/calculators/heart-score',
     calcQuery: '/tools/calculators?calc=heart-score',
     implementation: 'Client-side in pr8ClinicalBatchCalculators.jsx (heartScoreCalculator.js)',
@@ -2946,7 +3095,8 @@ export const builtinUiCalculators = [
   {
     id: 'pediatric-dose-safety-checker',
     name: 'Pediatric Dose Safety Checker',
-    description: 'Placeholder-only pediatric medication safety checker; no patient-specific dose calculation.',
+    description:
+      'Placeholder-only pediatric medication safety checker; no patient-specific dose calculation.',
     path: '/tools/calculators/pediatric-dose-safety-checker',
     calcQuery: '/tools/calculators?calc=pediatric-dose-safety-checker',
     implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',
@@ -3000,7 +3150,8 @@ export const builtinUiCalculators = [
   {
     id: 'maddrey-discriminant-function',
     name: 'Maddrey Discriminant Function',
-    description: 'Alcoholic hepatitis severe-range risk context from PT prolongation and bilirubin.',
+    description:
+      'Alcoholic hepatitis severe-range risk context from PT prolongation and bilirubin.',
     path: '/tools/calculators/maddrey-discriminant-function',
     calcQuery: '/tools/calculators?calc=maddrey-discriminant-function',
     implementation: 'Client-side in hepatologyGiCalculators.jsx (hepatologyGiCalculators.js)',
@@ -3045,7 +3196,8 @@ export const builtinUiCalculators = [
   {
     id: 'duke-treadmill-score',
     name: 'Duke Treadmill Score',
-    description: 'Exercise treadmill prognostic score from time, ST deviation, and exercise angina.',
+    description:
+      'Exercise treadmill prognostic score from time, ST deviation, and exercise angina.',
     path: '/tools/calculators/duke-treadmill-score',
     calcQuery: '/tools/calculators?calc=duke-treadmill-score',
     implementation: 'Client-side in cardiologyCalculators.jsx (cardiologyRiskCalculators.js)',
@@ -3072,7 +3224,8 @@ export const builtinUiCalculators = [
   {
     id: 'chads2',
     name: 'CHADS2',
-    description: 'Older AF stroke-risk score using CHF, hypertension, age, diabetes, and stroke/TIA.',
+    description:
+      'Older AF stroke-risk score using CHF, hypertension, age, diabetes, and stroke/TIA.',
     path: '/tools/calculators/chads2',
     calcQuery: '/tools/calculators?calc=chads2',
     implementation: 'Client-side in cardiologyCalculators.jsx (cardiologyRiskCalculators.js)',
@@ -3090,7 +3243,8 @@ export const builtinUiCalculators = [
   {
     id: 'abcd2',
     name: 'ABCD² score',
-    description: 'TIA short-term stroke risk (age, BP, clinical features, duration, diabetes; 0–7).',
+    description:
+      'TIA short-term stroke risk (age, BP, clinical features, duration, diabetes; 0–7).',
     path: '/tools/calculators/abcd2',
     calcQuery: '/tools/calculators?calc=abcd2',
     implementation: 'Client-side in abcd2Calculator.jsx (abcd2Calculator.js)',
@@ -3183,7 +3337,8 @@ export const builtinUiCalculators = [
     description: 'Hospital bed occupancy percentage with blocked-bed and usable-capacity context.',
     path: '/tools/calculators/bed-occupancy-calculator',
     calcQuery: '/tools/calculators?calc=bed-occupancy-calculator',
-    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
+    implementation:
+      'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -3192,7 +3347,8 @@ export const builtinUiCalculators = [
     description: 'Patients-per-staff ratio and target coverage gap for operations planning.',
     path: '/tools/calculators/staffing-ratio-calculator',
     calcQuery: '/tools/calculators?calc=staffing-ratio-calculator',
-    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
+    implementation:
+      'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -3201,7 +3357,8 @@ export const builtinUiCalculators = [
     description: 'Turnaround segment total and target variance for operational workflows.',
     path: '/tools/calculators/turnaround-time-calculator',
     calcQuery: '/tools/calculators?calc=turnaround-time-calculator',
-    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
+    implementation:
+      'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -3210,7 +3367,8 @@ export const builtinUiCalculators = [
     description: 'Composite utilization index across beds, staff, devices, and fleet signals.',
     path: '/tools/calculators/resource-utilization-index',
     calcQuery: '/tools/calculators?calc=resource-utilization-index',
-    implementation: 'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
+    implementation:
+      'Client-side in hospitalOperationsCalculators.jsx (hospitalOperationsCalculators.js)',
     orchestratorId: null,
   },
   {
@@ -3256,7 +3414,8 @@ export function getCatalogSummary({ sidebarCount = 0, backendToolCount = 0 } = {
     calculatorForms: builtinUiCalculators.length,
     aiClinicalProfiles: clinicalIntentTools.length,
     chatOnlyProfiles,
-    backendExecutors: backendToolCount || clinicalIntentTools.filter((t) => t.postExecutable).length,
+    backendExecutors:
+      backendToolCount || clinicalIntentTools.filter((t) => t.postExecutable).length,
   };
 }
 

@@ -19,7 +19,11 @@ const toolRegistry = [
       'Adverse effects database',
       'Renal/hepatic adjustments',
     ],
-    useCases: ['Polypharmacy management', 'New prescription safety check', 'Patient medication review'],
+    useCases: [
+      'Polypharmacy management',
+      'New prescription safety check',
+      'Patient medication review',
+    ],
   },
   {
     id: 'lab-interp',
@@ -36,7 +40,11 @@ const toolRegistry = [
       'Critical value alerts',
       'Test correlation insights',
     ],
-    useCases: ['Lab result interpretation', 'Abnormal value investigation', 'Serial lab monitoring'],
+    useCases: [
+      'Lab result interpretation',
+      'Abnormal value investigation',
+      'Serial lab monitoring',
+    ],
   },
   {
     id: 'sofa-score',
@@ -48,7 +56,12 @@ const toolRegistry = [
     description: 'Sequential Organ Failure Assessment (ICU sepsis / organ dysfunction)',
     shortcut: 'Ctrl+3',
     category: 'Calculator',
-    features: ['PaO2/FiO2 & ventilation', 'Coagulation & liver', 'Cardiovascular & CNS', 'Renal / urine output'],
+    features: [
+      'PaO2/FiO2 & ventilation',
+      'Coagulation & liver',
+      'Cardiovascular & CNS',
+      'Renal / urine output',
+    ],
     useCases: ['Sepsis bundle documentation', 'ICU severity trending', 'Mortality risk context'],
   },
   {
@@ -126,8 +139,17 @@ const toolRegistry = [
     description: 'Cirrhosis severity classification (Child–Turcotte–Pugh)',
     shortcut: 'Ctrl+Shift+9',
     category: 'Calculator',
-    features: ['Bilirubin & albumin', 'INR or PT prolongation', 'Ascites & encephalopathy', 'Class A/B/C'],
-    useCases: ['Hepatology staging', 'Peri-procedure risk context', 'Transplant referral discussion'],
+    features: [
+      'Bilirubin & albumin',
+      'INR or PT prolongation',
+      'Ascites & encephalopathy',
+      'Class A/B/C',
+    ],
+    useCases: [
+      'Hepatology staging',
+      'Peri-procedure risk context',
+      'Transplant referral discussion',
+    ],
   },
   {
     id: 'has-bled',
@@ -139,7 +161,13 @@ const toolRegistry = [
     description: 'Bleeding-risk score when considering anticoagulation (e.g. AF)',
     shortcut: 'Ctrl+Shift+0',
     category: 'Calculator',
-    features: ['Hypertension', 'Renal / liver', 'Stroke & bleeding', 'Labile INR', 'Age, drugs, alcohol'],
+    features: [
+      'Hypertension',
+      'Renal / liver',
+      'Stroke & bleeding',
+      'Labile INR',
+      'Age, drugs, alcohol',
+    ],
     useCases: ['AF anticoagulation counselling', 'Risk documentation', 'MDT preparation'],
   },
   {
@@ -153,7 +181,11 @@ const toolRegistry = [
     shortcut: 'Ctrl+Shift+M',
     category: 'Calculator',
     features: ['UNOS laboratory MELD', 'Dialysis creatinine rule', 'Mortality context bands'],
-    useCases: ['Cirrhosis severity', 'Acute-on-chronic liver failure', 'Hepatology MDT documentation'],
+    useCases: [
+      'Cirrhosis severity',
+      'Acute-on-chronic liver failure',
+      'Hepatology MDT documentation',
+    ],
   },
   {
     id: 'meld-na',
@@ -166,7 +198,11 @@ const toolRegistry = [
     shortcut: 'Ctrl+Shift+N',
     category: 'Calculator',
     features: ['Laboratory MELD + sodium', 'Na clamp 125–140 mEq/L', 'Not below laboratory MELD'],
-    useCases: ['Hyponatremia in cirrhosis', 'Severity documentation', 'Alongside Child-Pugh / clinical exam'],
+    useCases: [
+      'Hyponatremia in cirrhosis',
+      'Severity documentation',
+      'Alongside Child-Pugh / clinical exam',
+    ],
   },
   {
     id: 'timi-ua-nstemi',
@@ -215,7 +251,12 @@ const toolRegistry = [
     description: 'Exercise treadmill prognostic score from time, ST deviation, and exercise angina',
     shortcut: 'Ctrl+Shift+U',
     category: 'Calculator',
-    features: ['Exercise time', 'ST-segment deviation', 'Exercise angina index', 'Low/intermediate/high bands'],
+    features: [
+      'Exercise time',
+      'ST-segment deviation',
+      'Exercise angina index',
+      'Low/intermediate/high bands',
+    ],
     useCases: ['Stress test documentation', 'Cardiology review context', 'Exercise ECG handoff'],
   },
   {
@@ -229,7 +270,11 @@ const toolRegistry = [
     shortcut: 'Ctrl+Shift+Y',
     category: 'Calculator',
     features: ['Lipids and BP', 'hs-CRP', 'Parental MI history', 'Smoking and diabetes context'],
-    useCases: ['Prevention clinic discussion', 'Inflammation-informed risk review', 'Shared decision-making context'],
+    useCases: [
+      'Prevention clinic discussion',
+      'Inflammation-informed risk review',
+      'Shared decision-making context',
+    ],
   },
   {
     id: 'hcm-sudden-death-risk',
@@ -241,8 +286,17 @@ const toolRegistry = [
     description: 'HCM Risk-SCD 5-year sudden cardiac death risk context for specialist review',
     shortcut: 'Ctrl+Shift+Q',
     category: 'Calculator',
-    features: ['Wall thickness', 'Left atrial diameter', 'LVOT gradient', 'Syncope, NSVT, family history'],
-    useCases: ['HCM specialty review', 'ICD risk discussion preparation', 'Serial risk documentation'],
+    features: [
+      'Wall thickness',
+      'Left atrial diameter',
+      'LVOT gradient',
+      'Syncope, NSVT, family history',
+    ],
+    useCases: [
+      'HCM specialty review',
+      'ICD risk discussion preparation',
+      'Serial risk documentation',
+    ],
   },
   {
     id: 'chads2',
@@ -251,10 +305,15 @@ const toolRegistry = [
     panelTool: 'calculators',
     initialCalc: 'chads2',
     color: '#DB2777',
-    description: 'Older atrial fibrillation stroke-risk score (CHF, hypertension, age, diabetes, stroke/TIA)',
+    description:
+      'Older atrial fibrillation stroke-risk score (CHF, hypertension, age, diabetes, stroke/TIA)',
     shortcut: 'Ctrl+Shift+2',
     category: 'Calculator',
-    features: ['CHF, HTN, age, diabetes', 'Stroke/TIA double weighting', 'Historical AF risk context'],
+    features: [
+      'CHF, HTN, age, diabetes',
+      'Stroke/TIA double weighting',
+      'Historical AF risk context',
+    ],
     useCases: ['AF documentation', 'Legacy risk-score comparison', 'Cardiology handoff context'],
   },
   {
@@ -267,8 +326,17 @@ const toolRegistry = [
     description: 'ACC/AHA heart failure stage documentation helper (A-D)',
     shortcut: 'Ctrl+Shift+F',
     category: 'Calculator',
-    features: ['Stage A-D helper', 'Risk factors', 'Structural disease', 'Symptoms and advanced features'],
-    useCases: ['Heart failure clinic documentation', 'Handoff staging context', 'Cardiology review preparation'],
+    features: [
+      'Stage A-D helper',
+      'Risk factors',
+      'Structural disease',
+      'Symptoms and advanced features',
+    ],
+    useCases: [
+      'Heart failure clinic documentation',
+      'Handoff staging context',
+      'Cardiology review preparation',
+    ],
   },
   {
     id: 'ckd-staging',
@@ -328,7 +396,11 @@ const toolRegistry = [
     description: 'Fractional excretion of sodium urine electrolyte pattern support',
     category: 'Calculator',
     features: ['Serum sodium', 'Urine sodium', 'Serum creatinine', 'Urine creatinine'],
-    useCases: ['AKI pattern review', 'Urine electrolyte documentation', 'Renal consult preparation'],
+    useCases: [
+      'AKI pattern review',
+      'Urine electrolyte documentation',
+      'Renal consult preparation',
+    ],
   },
   {
     id: 'feurea',
@@ -352,7 +424,11 @@ const toolRegistry = [
     description: 'Four-variable KFRE 2-year and 5-year kidney failure risk context',
     category: 'Calculator',
     features: ['Age', 'Sex', 'eGFR', 'Urine ACR'],
-    useCases: ['CKD risk discussion', 'Longitudinal kidney review', 'Nephrology clinic documentation'],
+    useCases: [
+      'CKD risk discussion',
+      'Longitudinal kidney review',
+      'Nephrology clinic documentation',
+    ],
   },
   {
     id: 'bun-creatinine-ratio',
@@ -411,8 +487,17 @@ const toolRegistry = [
     color: '#7C3AED',
     description: 'Insulin resistance estimate from fasting glucose and fasting insulin',
     category: 'Calculator',
-    features: ['Fasting glucose', 'Fasting insulin', 'HOMA-IR estimate', 'Assay and population caveats'],
-    useCases: ['Metabolic clinic documentation', 'Insulin resistance context', 'Research or screening discussion'],
+    features: [
+      'Fasting glucose',
+      'Fasting insulin',
+      'HOMA-IR estimate',
+      'Assay and population caveats',
+    ],
+    useCases: [
+      'Metabolic clinic documentation',
+      'Insulin resistance context',
+      'Research or screening discussion',
+    ],
   },
   {
     id: 'corrected-calcium',
@@ -448,7 +533,11 @@ const toolRegistry = [
     description: 'Mosteller body surface area estimate from height and weight',
     category: 'Calculator',
     features: ['Metric / imperial inputs', 'Mosteller formula', 'Protocol method reminder'],
-    useCases: ['Anthropometric documentation', 'Research forms', 'Protocol context without dosing automation'],
+    useCases: [
+      'Anthropometric documentation',
+      'Research forms',
+      'Protocol context without dosing automation',
+    ],
   },
   {
     id: 'ideal-body-weight',
@@ -460,7 +549,11 @@ const toolRegistry = [
     description: 'Devine ideal body weight estimate from sex and height',
     category: 'Calculator',
     features: ['Sex', 'Height', 'kg and lb output', 'Not a target weight'],
-    useCases: ['Anthropometric documentation', 'Respiratory or nutrition context', 'Protocol review without dosing automation'],
+    useCases: [
+      'Anthropometric documentation',
+      'Respiratory or nutrition context',
+      'Protocol review without dosing automation',
+    ],
   },
   {
     id: 'adjusted-body-weight',
@@ -469,9 +562,15 @@ const toolRegistry = [
     panelTool: 'calculators',
     initialCalc: 'adjusted-body-weight',
     color: '#475569',
-    description: 'Adjusted body weight estimate using IBW, actual weight, and selected correction factor',
+    description:
+      'Adjusted body weight estimate using IBW, actual weight, and selected correction factor',
     category: 'Calculator',
-    features: ['IBW calculation', 'Actual weight', '0.25 / 0.3 / 0.4 correction factors', 'No dosing output'],
+    features: [
+      'IBW calculation',
+      'Actual weight',
+      '0.25 / 0.3 / 0.4 correction factors',
+      'No dosing output',
+    ],
     useCases: ['Protocol documentation', 'Pharmacy consult prep', 'Nutrition discussion context'],
   },
   {
@@ -484,7 +583,11 @@ const toolRegistry = [
     description: 'Central adiposity pattern estimate from waist and hip circumference',
     category: 'Calculator',
     features: ['Waist circumference', 'Hip circumference', 'Sex-specific risk bands'],
-    useCases: ['Metabolic syndrome context', 'Cardiometabolic risk documentation', 'Lifestyle counseling discussion'],
+    useCases: [
+      'Metabolic syndrome context',
+      'Cardiometabolic risk documentation',
+      'Lifestyle counseling discussion',
+    ],
   },
   {
     id: 'stop-bang',
@@ -518,7 +621,11 @@ const toolRegistry = [
     description: 'COPD prognosis context from BMI, FEV1, 6-minute walk distance, and mMRC dyspnea',
     category: 'Calculator',
     features: ['BMI', 'FEV1 percent predicted', '6-minute walk distance', 'mMRC dyspnea'],
-    useCases: ['COPD prognosis documentation', 'Pulmonary clinic review', 'Longitudinal risk discussion'],
+    useCases: [
+      'COPD prognosis documentation',
+      'Pulmonary clinic review',
+      'Longitudinal risk discussion',
+    ],
   },
   {
     id: 'copd-gold-assessment',
@@ -529,7 +636,12 @@ const toolRegistry = [
     color: '#8B7355',
     description: 'GOLD A/B/E grouping and optional spirometric grade context',
     category: 'Calculator',
-    features: ['mMRC or CAT', 'Exacerbation history', 'Hospitalization history', 'Optional FEV1 grade'],
+    features: [
+      'mMRC or CAT',
+      'Exacerbation history',
+      'Hospitalization history',
+      'Optional FEV1 grade',
+    ],
     useCases: ['COPD follow-up', 'Pulmonary handoff', 'Exacerbation risk documentation'],
   },
   {
@@ -566,7 +678,11 @@ const toolRegistry = [
     description: 'SpO2/FiO2 divided by respiratory rate for oxygenation monitoring context',
     category: 'Calculator',
     features: ['SpO2', 'FiO2', 'Respiratory rate', 'HFNC monitoring context'],
-    useCases: ['High-flow oxygen monitoring', 'Respiratory trend review', 'Escalation handoff context'],
+    useCases: [
+      'High-flow oxygen monitoring',
+      'Respiratory trend review',
+      'Escalation handoff context',
+    ],
   },
   {
     id: 'pneumonia-severity-index',
@@ -590,7 +706,11 @@ const toolRegistry = [
     description: 'Acute asthma exacerbation severity feature helper',
     category: 'Calculator',
     features: ['PEF', 'SpO2', 'Speech', 'Work of breathing', 'Life-threatening features'],
-    useCases: ['Asthma exacerbation handoff', 'ED reassessment context', 'Respiratory pathway documentation'],
+    useCases: [
+      'Asthma exacerbation handoff',
+      'ED reassessment context',
+      'Respiratory pathway documentation',
+    ],
   },
   {
     id: 'audit-c',
@@ -599,7 +719,8 @@ const toolRegistry = [
     panelTool: 'calculators',
     initialCalc: 'audit-c',
     color: '#9B7BC4',
-    description: 'AUDIT-C brief alcohol consumption screen (0–12) with sex-specific positive thresholds',
+    description:
+      'AUDIT-C brief alcohol consumption screen (0–12) with sex-specific positive thresholds',
     shortcut: 'Ctrl+Shift+U',
     category: 'Calculator',
     features: [
@@ -667,7 +788,11 @@ const toolRegistry = [
     color: '#9B7BC4',
     description: 'CAGE alcohol screening questionnaire (0-4) with substance-use safety caveats',
     category: 'Calculator',
-    features: ['Four yes/no questions', 'Positive screen threshold', 'No diagnosis or detox advice'],
+    features: [
+      'Four yes/no questions',
+      'Positive screen threshold',
+      'No diagnosis or detox advice',
+    ],
     useCases: ['Alcohol screening', 'Behavioral health intake', 'Substance-use assessment handoff'],
   },
   {
@@ -680,7 +805,11 @@ const toolRegistry = [
     description: 'MMSE score-entry support for governed cognitive screening administration',
     category: 'Calculator',
     features: ['Domain score entry', '30-point total', 'Acute confusion caution'],
-    useCases: ['Cognitive screening documentation', 'Geriatrics handoff', 'Memory clinic intake context'],
+    useCases: [
+      'Cognitive screening documentation',
+      'Geriatrics handoff',
+      'Memory clinic intake context',
+    ],
   },
   {
     id: 'moca-placeholder-workflow',
@@ -704,7 +833,11 @@ const toolRegistry = [
     description: 'PCL-5 PTSD symptom score entry (0-80) with crisis-sensitive safety check',
     category: 'Calculator',
     features: ['20 item scores', 'Elevated symptom range', 'Current safety concern alert'],
-    useCases: ['Trauma symptom screening', 'Behavioral health intake', 'Longitudinal symptom monitoring'],
+    useCases: [
+      'Trauma symptom screening',
+      'Behavioral health intake',
+      'Longitudinal symptom monitoring',
+    ],
   },
   {
     id: 'mdq',
@@ -715,7 +848,12 @@ const toolRegistry = [
     color: '#BE185D',
     description: 'Mood Disorder Questionnaire screening summary with urgent-safety flags',
     category: 'Calculator',
-    features: ['Symptom count', 'Same-period criterion', 'Functional impairment', 'No bipolar diagnosis'],
+    features: [
+      'Symptom count',
+      'Same-period criterion',
+      'Functional impairment',
+      'No bipolar diagnosis',
+    ],
     useCases: ['Mood screening', 'Psychiatry intake context', 'Safety-aware handoff'],
   },
   {
@@ -747,10 +885,20 @@ const toolRegistry = [
     name: 'Mental Health Screening Assistant',
     path: '/tools/psychiatry/mental-health-screening-assistant',
     color: '#6B8CAE',
-    description: 'Guided mental-health screening assistant across mood, anxiety, trauma, sleep, substance, and cognition tools',
+    description:
+      'Guided mental-health screening assistant across mood, anxiety, trauma, sleep, substance, and cognition tools',
     category: 'Calculator',
-    features: ['Screen selection', 'Missing-data prompts', 'Crisis-sensitive safety checks', 'No diagnosis'],
-    useCases: ['Behavioral health intake', 'Primary care screening bundle', 'Follow-up queue preparation'],
+    features: [
+      'Screen selection',
+      'Missing-data prompts',
+      'Crisis-sensitive safety checks',
+      'No diagnosis',
+    ],
+    useCases: [
+      'Behavioral health intake',
+      'Primary care screening bundle',
+      'Follow-up queue preparation',
+    ],
   },
   {
     id: 'suicide-risk-workflow-assistant',
@@ -760,26 +908,44 @@ const toolRegistry = [
     description: 'Suicide-risk workflow assistant for PHQ-9 item 9 and Columbia workflow handoff',
     category: 'Calculator',
     features: ['PHQ-9 item 9 context', 'Columbia workflow flags', 'Direct review prompts'],
-    useCases: ['Crisis workflow entry', 'Safety handoff', 'Behavioral health escalation documentation'],
+    useCases: [
+      'Crisis workflow entry',
+      'Safety handoff',
+      'Behavioral health escalation documentation',
+    ],
   },
   {
     id: 'substance-use-screening-assistant',
     name: 'Substance Use Screening Assistant',
     path: '/tools/psychiatry/substance-use-screening-assistant',
     color: '#9B7BC4',
-    description: 'Substance-use screening assistant for AUDIT-C, CAGE, withdrawal/intoxication context, and review prompts',
+    description:
+      'Substance-use screening assistant for AUDIT-C, CAGE, withdrawal/intoxication context, and review prompts',
     category: 'Calculator',
-    features: ['AUDIT-C/CAGE context', 'Withdrawal and intoxication cautions', 'No detox or medication advice'],
-    useCases: ['Substance-use intake', 'Primary care alcohol screening', 'Behavioral health handoff'],
+    features: [
+      'AUDIT-C/CAGE context',
+      'Withdrawal and intoxication cautions',
+      'No detox or medication advice',
+    ],
+    useCases: [
+      'Substance-use intake',
+      'Primary care alcohol screening',
+      'Behavioral health handoff',
+    ],
   },
   {
     id: 'cognitive-screening-assistant',
     name: 'Cognitive Screening Assistant',
     path: '/tools/psychiatry/cognitive-screening-assistant',
     color: '#7A9E7E',
-    description: 'Cognitive screening assistant for MMSE score entry, MoCA governance, delirium flags, and review planning',
+    description:
+      'Cognitive screening assistant for MMSE score entry, MoCA governance, delirium flags, and review planning',
     category: 'Calculator',
-    features: ['MMSE/MoCA workflow context', 'Delirium and sensory caveats', 'No capacity determination'],
+    features: [
+      'MMSE/MoCA workflow context',
+      'Delirium and sensory caveats',
+      'No capacity determination',
+    ],
     useCases: ['Memory clinic intake', 'Geriatrics handoff', 'Cognitive screening readiness'],
   },
   {
@@ -787,9 +953,15 @@ const toolRegistry = [
     name: 'Behavioral Analytics Dashboard',
     path: '/tools/psychiatry/behavioral-analytics-dashboard',
     color: '#2563EB',
-    description: 'Behavioral analytics dashboard concept for screening volumes, queues, and safety-review gaps',
+    description:
+      'Behavioral analytics dashboard concept for screening volumes, queues, and safety-review gaps',
     category: 'Reference',
-    features: ['Screening volumes', 'Positive-screen queues', 'Follow-up status', 'Human review tracking'],
+    features: [
+      'Screening volumes',
+      'Positive-screen queues',
+      'Follow-up status',
+      'Human review tracking',
+    ],
     useCases: ['Behavioral health huddle', 'Quality monitoring', 'Safety review queue'],
   },
   {
@@ -799,7 +971,12 @@ const toolRegistry = [
     color: '#4F46E5',
     description: 'Screening trend engine for serial behavioral-health screening score visibility',
     category: 'Reference',
-    features: ['Serial PHQ/GAD/PCL trends', 'Substance and sleep trends', 'Data freshness', 'No treatment advice'],
+    features: [
+      'Serial PHQ/GAD/PCL trends',
+      'Substance and sleep trends',
+      'Data freshness',
+      'No treatment advice',
+    ],
     useCases: ['Longitudinal screening review', 'Panel follow-up', 'Clinic quality monitoring'],
   },
   {
@@ -807,19 +984,35 @@ const toolRegistry = [
     name: 'Psychiatry Monitoring Dashboard',
     path: '/tools/psychiatry/psychiatry-monitoring-dashboard',
     color: '#0EA5A6',
-    description: 'Psychiatry monitoring dashboard concept for review queues, repeated screens, and unresolved safety flags',
+    description:
+      'Psychiatry monitoring dashboard concept for review queues, repeated screens, and unresolved safety flags',
     category: 'Reference',
-    features: ['Review queues', 'Repeated screen context', 'Safety flags', 'Clinician review status'],
-    useCases: ['Psychiatry service huddle', 'Behavioral health monitoring', 'Unresolved alert review'],
+    features: [
+      'Review queues',
+      'Repeated screen context',
+      'Safety flags',
+      'Clinician review status',
+    ],
+    useCases: [
+      'Psychiatry service huddle',
+      'Behavioral health monitoring',
+      'Unresolved alert review',
+    ],
   },
   {
     id: 'crisis-escalation-audit-log',
     name: 'Crisis Escalation Audit Log',
     path: '/tools/psychiatry/crisis-escalation-audit-log',
     color: '#B45309',
-    description: 'Crisis escalation audit log for suicide-safety workflow visibility and review status',
+    description:
+      'Crisis escalation audit log for suicide-safety workflow visibility and review status',
     category: 'Reference',
-    features: ['PHQ-9 item 9 events', 'Columbia workflow flags', 'Direct review status', 'Audit timestamps'],
+    features: [
+      'PHQ-9 item 9 events',
+      'Columbia workflow flags',
+      'Direct review status',
+      'Audit timestamps',
+    ],
     useCases: ['Crisis workflow audit', 'Safety review', 'Compliance documentation'],
   },
   {
@@ -827,9 +1020,15 @@ const toolRegistry = [
     name: 'Population Screening Dashboard',
     path: '/tools/psychiatry/population-screening-dashboard',
     color: '#1D4ED8',
-    description: 'Population screening dashboard concept for panel completion, positive screens, and follow-up gaps',
+    description:
+      'Population screening dashboard concept for panel completion, positive screens, and follow-up gaps',
     category: 'Reference',
-    features: ['Panel completion', 'Positive-screen queues', 'Follow-up gaps', 'Equity and data-quality checks'],
+    features: [
+      'Panel completion',
+      'Positive-screen queues',
+      'Follow-up gaps',
+      'Equity and data-quality checks',
+    ],
     useCases: ['Population health review', 'Behavioral screening outreach', 'Quality improvement'],
   },
   {
@@ -949,8 +1148,17 @@ const toolRegistry = [
     color: '#B45309',
     description: 'Maddrey DF for alcoholic hepatitis severe-range risk context',
     category: 'Calculator',
-    features: ['Patient PT', 'Control PT', 'Bilirubin unit conversion', '32-point severe-range threshold'],
-    useCases: ['Alcoholic hepatitis documentation', 'Hepatology consult preparation', 'Liver severity context'],
+    features: [
+      'Patient PT',
+      'Control PT',
+      'Bilirubin unit conversion',
+      '32-point severe-range threshold',
+    ],
+    useCases: [
+      'Alcoholic hepatitis documentation',
+      'Hepatology consult preparation',
+      'Liver severity context',
+    ],
   },
   {
     id: 'apri',
@@ -973,7 +1181,12 @@ const toolRegistry = [
     color: '#9B5E3C',
     description: 'Pre-endoscopy upper GI bleeding risk stratification support',
     category: 'Calculator',
-    features: ['BUN/urea units', 'Hemoglobin units', 'Vitals', 'Melena/syncope/comorbidity markers'],
+    features: [
+      'BUN/urea units',
+      'Hemoglobin units',
+      'Vitals',
+      'Melena/syncope/comorbidity markers',
+    ],
     useCases: ['Upper GI bleed handoff', 'ED documentation', 'Endoscopy referral context'],
   },
   {
@@ -998,7 +1211,11 @@ const toolRegistry = [
     description: 'Framingham 10-year hard CHD risk (ATP III points; ages 30–74)',
     category: 'Calculator',
     features: ['Sex-specific points', 'Lipids', 'Blood pressure', 'Smoking'],
-    useCases: ['Cardiovascular prevention discussion', 'Alternative to ASCVD PCE', 'Risk documentation'],
+    useCases: [
+      'Cardiovascular prevention discussion',
+      'Alternative to ASCVD PCE',
+      'Risk documentation',
+    ],
   },
   {
     id: 'wells-pe',
@@ -1009,7 +1226,14 @@ const toolRegistry = [
     description: 'Wells pulmonary embolism rule (chat-assisted; calculator hub)',
     shortcut: 'Ctrl+Shift+W',
     category: 'Calculator',
-    features: ['DVT signs', 'PE likelihood', 'HR & immobilization', 'Prior VTE', 'Hemoptysis', 'Malignancy'],
+    features: [
+      'DVT signs',
+      'PE likelihood',
+      'HR & immobilization',
+      'Prior VTE',
+      'Hemoptysis',
+      'Malignancy',
+    ],
     useCases: ['Suspected PE', 'ED dyspnoea', 'Pre-test probability documentation'],
   },
   {
@@ -1088,7 +1312,11 @@ const toolRegistry = [
     shortcut: 'Ctrl+Shift+Y',
     category: 'Calculator',
     features: ['Behavior', 'Cardiovascular status', 'Respiratory status', 'Nebulizers', 'Vomiting'],
-    useCases: ['Pediatric ward deterioration', 'Pediatric ED reassessment', 'Escalation documentation'],
+    useCases: [
+      'Pediatric ward deterioration',
+      'Pediatric ED reassessment',
+      'Escalation documentation',
+    ],
   },
   {
     id: 'wells-dvt-calculator',
@@ -1108,10 +1336,17 @@ const toolRegistry = [
     path: '/tools/calculators',
     panelTool: 'calculators',
     color: '#5BA4CF',
-    description: 'Pulmonary Embolism Rule-out Criteria (chat-assisted; low pre-test probability only)',
+    description:
+      'Pulmonary Embolism Rule-out Criteria (chat-assisted; low pre-test probability only)',
     shortcut: 'Ctrl+Shift+P',
     category: 'Calculator',
-    features: ['Age & vitals', 'No DVT signs', 'No hemoptysis', 'No estrogen', 'Safety-first wording'],
+    features: [
+      'Age & vitals',
+      'No DVT signs',
+      'No hemoptysis',
+      'No estrogen',
+      'Safety-first wording',
+    ],
     useCases: ['Low-risk chest pain', 'PE pathway documentation', 'Shared decision support'],
   },
   {
@@ -1148,11 +1383,7 @@ const toolRegistry = [
       'Hospitalization history',
       'GOLD group support',
     ],
-    useCases: [
-      'COPD clinic follow-up',
-      'Exacerbation risk documentation',
-      'Pulmonary MDT context',
-    ],
+    useCases: ['COPD clinic follow-up', 'Exacerbation risk documentation', 'Pulmonary MDT context'],
   },
   {
     id: 'asthma-exacerbation-assistant',
@@ -1161,7 +1392,12 @@ const toolRegistry = [
     color: '#B85C5C',
     description: 'Guided asthma exacerbation review with severity and reassessment prompts',
     category: 'Calculator',
-    features: ['Severity features', 'PEF and SpO2 context', 'Reassessment prompts', 'Safety handoff'],
+    features: [
+      'Severity features',
+      'PEF and SpO2 context',
+      'Reassessment prompts',
+      'Safety handoff',
+    ],
     useCases: ['ED asthma review', 'Respiratory handoff', 'Pathway documentation'],
   },
   {
@@ -1189,7 +1425,8 @@ const toolRegistry = [
     name: 'COPD Workflow Assistant',
     path: '/tools/pulmonology/copd-workflow-assistant',
     color: '#8B7355',
-    description: 'COPD workflow support for GOLD context, exacerbation concerns, and handoff prompts',
+    description:
+      'COPD workflow support for GOLD context, exacerbation concerns, and handoff prompts',
     category: 'Calculator',
     features: ['GOLD context', 'Exacerbation history', 'Oxygen safety', 'Handoff prompts'],
     useCases: ['COPD clinic', 'Exacerbation review', 'Pulmonary consult preparation'],
@@ -1209,7 +1446,8 @@ const toolRegistry = [
     name: 'Respiratory Telemetry Dashboard',
     path: '/tools/pulmonology/respiratory-telemetry-dashboard',
     color: '#2F7D7E',
-    description: 'Respiratory telemetry dashboard for SpO2, respiratory rate, device context, and gaps',
+    description:
+      'Respiratory telemetry dashboard for SpO2, respiratory rate, device context, and gaps',
     category: 'Reference',
     features: ['SpO2 trends', 'Respiratory rate', 'Oxygen device context', 'Artifact and gaps'],
     useCases: ['Ward respiratory monitoring', 'Remote observation', 'Deterioration review'],
@@ -1219,7 +1457,8 @@ const toolRegistry = [
     name: 'Sleep Apnea Analytics',
     path: '/tools/pulmonology/sleep-apnea-analytics',
     color: '#6B7BC4',
-    description: 'Sleep apnea analytics for screening context, symptoms, adherence trends, and queues',
+    description:
+      'Sleep apnea analytics for screening context, symptoms, adherence trends, and queues',
     category: 'Reference',
     features: ['STOP-BANG context', 'Symptoms', 'Adherence trends', 'Review queues'],
     useCases: ['Sleep clinic review', 'OSA screening follow-up', 'Remote monitoring summary'],
@@ -1229,17 +1468,23 @@ const toolRegistry = [
     name: 'Pulmonary Trend Engine',
     path: '/tools/pulmonology/pulmonary-trend-engine',
     color: '#5B8E7D',
-    description: 'Pulmonary trend engine for oxygenation indices, symptoms, and serial observations',
+    description:
+      'Pulmonary trend engine for oxygenation indices, symptoms, and serial observations',
     category: 'Reference',
     features: ['PF ratio trends', 'ROX trends', 'Symptoms', 'Spirometry context'],
-    useCases: ['Pulmonary trend review', 'ICU respiratory rounds', 'Longitudinal respiratory summary'],
+    useCases: [
+      'Pulmonary trend review',
+      'ICU respiratory rounds',
+      'Longitudinal respiratory summary',
+    ],
   },
   {
     id: 'respiratory-command-center',
     name: 'Respiratory Command Center',
     path: '/tools/pulmonology/respiratory-command-center',
     color: '#1D4ED8',
-    description: 'Respiratory command-center view for oxygen, ventilator, asthma/COPD, and sleep queues',
+    description:
+      'Respiratory command-center view for oxygen, ventilator, asthma/COPD, and sleep queues',
     category: 'Reference',
     features: ['Oxygen queue', 'Ventilator queue', 'Asthma/COPD reviews', 'Sleep analytics'],
     useCases: ['Respiratory operations huddle', 'Queue review', 'Unresolved alert summary'],
@@ -1249,9 +1494,15 @@ const toolRegistry = [
     name: 'AKI Staging Assistant',
     path: '/tools/nephrology/aki-staging-assistant',
     color: '#2F7D7E',
-    description: 'Guided AKI staging review with creatinine, urine output, timing, and missing-data prompts',
+    description:
+      'Guided AKI staging review with creatinine, urine output, timing, and missing-data prompts',
     category: 'Calculator',
-    features: ['KDIGO creatinine context', 'Urine output context', 'Baseline verification', 'Safety handoff'],
+    features: [
+      'KDIGO creatinine context',
+      'Urine output context',
+      'Baseline verification',
+      'Safety handoff',
+    ],
     useCases: ['AKI documentation', 'Renal consult preparation', 'Ward deterioration review'],
   },
   {
@@ -1259,7 +1510,8 @@ const toolRegistry = [
     name: 'Dialysis Readiness Helper',
     path: '/tools/nephrology/dialysis-readiness-helper',
     color: '#315C7C',
-    description: 'Dialysis readiness checklist support for access, symptoms, labs, volume, and handoff',
+    description:
+      'Dialysis readiness checklist support for access, symptoms, labs, volume, and handoff',
     category: 'Reference',
     features: ['Access status', 'Uremic features', 'Volume context', 'Nephrology handoff'],
     useCases: ['Dialysis planning review', 'Nephrology huddle', 'Renal replacement handoff'],
@@ -1279,7 +1531,8 @@ const toolRegistry = [
     name: 'Renal Monitoring Dashboard',
     path: '/tools/nephrology/renal-monitoring-dashboard',
     color: '#1D4ED8',
-    description: 'Renal monitoring dashboard for creatinine, eGFR, urine output, electrolytes, and acid-base trends',
+    description:
+      'Renal monitoring dashboard for creatinine, eGFR, urine output, electrolytes, and acid-base trends',
     category: 'Reference',
     features: ['Creatinine/eGFR trends', 'Urine output', 'Electrolytes', 'Missing data'],
     useCases: ['Renal safety huddle', 'Ward monitoring', 'Nephrology service review'],
@@ -1289,17 +1542,23 @@ const toolRegistry = [
     name: 'CKD Progression Predictor',
     path: '/tools/nephrology/ckd-progression-predictor',
     color: '#4F7CAC',
-    description: 'CKD progression workspace for eGFR slope, albuminuria, KFRE inputs, and longitudinal review',
+    description:
+      'CKD progression workspace for eGFR slope, albuminuria, KFRE inputs, and longitudinal review',
     category: 'Reference',
     features: ['eGFR slope', 'Albuminuria context', 'KFRE inputs', 'Follow-up gaps'],
-    useCases: ['CKD clinic review', 'Longitudinal risk discussion', 'Nephrology follow-up planning'],
+    useCases: [
+      'CKD clinic review',
+      'Longitudinal risk discussion',
+      'Nephrology follow-up planning',
+    ],
   },
   {
     id: 'dialysis-utilization-tracker',
     name: 'Dialysis Utilization Tracker',
     path: '/tools/nephrology/dialysis-utilization-tracker',
     color: '#6B7BC4',
-    description: 'Dialysis utilization tracker for completed treatments, missed sessions, access issues, and capacity',
+    description:
+      'Dialysis utilization tracker for completed treatments, missed sessions, access issues, and capacity',
     category: 'Reference',
     features: ['Schedule adherence', 'Access context', 'Missed treatments', 'Capacity review'],
     useCases: ['Dialysis operations huddle', 'Treatment adherence review', 'Access issue tracking'],
@@ -1309,7 +1568,8 @@ const toolRegistry = [
     name: 'Electrolyte Trend Engine',
     path: '/tools/nephrology/electrolyte-trend-engine',
     color: '#5B8E7D',
-    description: 'Electrolyte trend engine for sodium, potassium, bicarbonate, osmolality, and kidney context',
+    description:
+      'Electrolyte trend engine for sodium, potassium, bicarbonate, osmolality, and kidney context',
     category: 'Reference',
     features: ['Sodium trends', 'Potassium trends', 'Bicarbonate trends', 'Osmolality context'],
     useCases: ['Critical lab trending', 'Renal rounds', 'Electrolyte safety review'],
@@ -1319,7 +1579,8 @@ const toolRegistry = [
     name: 'Fluid Balance Monitor',
     path: '/tools/nephrology/fluid-balance-monitor',
     color: '#348AA7',
-    description: 'Fluid balance monitor for intake/output, weight change, urine output, and volume context',
+    description:
+      'Fluid balance monitor for intake/output, weight change, urine output, and volume context',
     category: 'Reference',
     features: ['Intake/output', 'Daily weights', 'Urine output', 'Volume-status prompts'],
     useCases: ['Fluid balance handoff', 'AKI monitoring', 'Dialysis and ward review'],
@@ -1329,19 +1590,35 @@ const toolRegistry = [
     name: 'Diabetes Care Assistant',
     path: '/tools/endocrine/diabetes-care-assistant',
     color: '#7C3AED',
-    description: 'Guided diabetes review with glucose trends, A1c context, complications, and handoff prompts',
+    description:
+      'Guided diabetes review with glucose trends, A1c context, complications, and handoff prompts',
     category: 'Calculator',
-    features: ['Glucose and A1c context', 'Hypo/hyperglycemia flags', 'Complication prompts', 'No dosing automation'],
-    useCases: ['Diabetes clinic review', 'Inpatient glucose handoff', 'Metabolic consult preparation'],
+    features: [
+      'Glucose and A1c context',
+      'Hypo/hyperglycemia flags',
+      'Complication prompts',
+      'No dosing automation',
+    ],
+    useCases: [
+      'Diabetes clinic review',
+      'Inpatient glucose handoff',
+      'Metabolic consult preparation',
+    ],
   },
   {
     id: 'dka-pathway-assistant',
     name: 'DKA Pathway Assistant',
     path: '/tools/endocrine/dka-pathway-assistant',
     color: '#B45309',
-    description: 'DKA pathway checklist support for labs, severity context, missing data, and urgent handoff',
+    description:
+      'DKA pathway checklist support for labs, severity context, missing data, and urgent handoff',
     category: 'Calculator',
-    features: ['Glucose/ketone context', 'Anion gap and bicarbonate', 'Osmolality context', 'Emergency pathway reminders'],
+    features: [
+      'Glucose/ketone context',
+      'Anion gap and bicarbonate',
+      'Osmolality context',
+      'Emergency pathway reminders',
+    ],
     useCases: ['DKA handoff', 'ED metabolic emergency review', 'Critical lab checklist'],
   },
   {
@@ -1349,9 +1626,15 @@ const toolRegistry = [
     name: 'Thyroid Disorder Assistant',
     path: '/tools/endocrine/thyroid-disorder-assistant',
     color: '#0F766E',
-    description: 'Guided thyroid disorder review for TSH/T4 context, symptoms, red flags, and follow-up prompts',
+    description:
+      'Guided thyroid disorder review for TSH/T4 context, symptoms, red flags, and follow-up prompts',
     category: 'Calculator',
-    features: ['TSH and free T4 context', 'Symptom prompts', 'Pregnancy and medication caveats', 'Emergency red flags'],
+    features: [
+      'TSH and free T4 context',
+      'Symptom prompts',
+      'Pregnancy and medication caveats',
+      'Emergency red flags',
+    ],
     useCases: ['Thyroid lab review', 'Endocrine consult prep', 'Longitudinal monitoring'],
   },
   {
@@ -1359,19 +1642,35 @@ const toolRegistry = [
     name: 'Metabolic Syndrome Assistant',
     path: '/tools/endocrine/metabolic-syndrome-assistant',
     color: '#BE185D',
-    description: 'Metabolic syndrome review using waist, glucose, blood pressure, triglycerides, HDL, and missing data',
+    description:
+      'Metabolic syndrome review using waist, glucose, blood pressure, triglycerides, HDL, and missing data',
     category: 'Calculator',
-    features: ['Waist context', 'Glucose and lipid criteria', 'Blood pressure context', 'Risk-factor documentation'],
-    useCases: ['Primary care metabolic review', 'Cardiometabolic clinic', 'Prevention discussion support'],
+    features: [
+      'Waist context',
+      'Glucose and lipid criteria',
+      'Blood pressure context',
+      'Risk-factor documentation',
+    ],
+    useCases: [
+      'Primary care metabolic review',
+      'Cardiometabolic clinic',
+      'Prevention discussion support',
+    ],
   },
   {
     id: 'glucose-telemetry-dashboard',
     name: 'Glucose Telemetry Dashboard',
     path: '/tools/endocrine/glucose-telemetry-dashboard',
     color: '#2563EB',
-    description: 'Backend-backed glucose telemetry dashboard concept for CGM/point-of-care trends and review queues',
+    description:
+      'Backend-backed glucose telemetry dashboard concept for CGM/point-of-care trends and review queues',
     category: 'Reference',
-    features: ['Glucose trend review', 'Hypoglycemia flags', 'Data freshness', 'Human review queue'],
+    features: [
+      'Glucose trend review',
+      'Hypoglycemia flags',
+      'Data freshness',
+      'Human review queue',
+    ],
     useCases: ['Inpatient glucose huddle', 'Remote monitoring review', 'CGM signal triage'],
   },
   {
@@ -1379,9 +1678,15 @@ const toolRegistry = [
     name: 'Insulin Trend Engine',
     path: '/tools/endocrine/insulin-trend-engine',
     color: '#4F46E5',
-    description: 'Insulin trend review surface for administered insulin context and glucose response without dose recommendations',
+    description:
+      'Insulin trend review surface for administered insulin context and glucose response without dose recommendations',
     category: 'Reference',
-    features: ['Insulin administration trends', 'Glucose response context', 'Protocol governance reminders', 'No automated dosing'],
+    features: [
+      'Insulin administration trends',
+      'Glucose response context',
+      'Protocol governance reminders',
+      'No automated dosing',
+    ],
     useCases: ['Endocrine service review', 'Quality monitoring', 'Insulin safety huddle'],
   },
   {
@@ -1389,9 +1694,15 @@ const toolRegistry = [
     name: 'Endocrine Monitoring System',
     path: '/tools/endocrine/endocrine-monitoring-system',
     color: '#0EA5A6',
-    description: 'Endocrine monitoring workspace for glucose, thyroid, calcium, weight, and missing-data queues',
+    description:
+      'Endocrine monitoring workspace for glucose, thyroid, calcium, weight, and missing-data queues',
     category: 'Reference',
-    features: ['Multi-domain endocrine trends', 'Critical value context', 'Missing data', 'Clinician review status'],
+    features: [
+      'Multi-domain endocrine trends',
+      'Critical value context',
+      'Missing data',
+      'Clinician review status',
+    ],
     useCases: ['Endocrine rounds', 'Clinic panel review', 'Longitudinal monitoring'],
   },
   {
@@ -1399,9 +1710,15 @@ const toolRegistry = [
     name: 'Metabolic Analytics',
     path: '/tools/endocrine/metabolic-analytics',
     color: '#9333EA',
-    description: 'Metabolic analytics for anthropometrics, lipids, glucose context, and cardiometabolic risk factors',
+    description:
+      'Metabolic analytics for anthropometrics, lipids, glucose context, and cardiometabolic risk factors',
     category: 'Reference',
-    features: ['Anthropometric trends', 'Glucose/lipid context', 'Metabolic syndrome flags', 'Review queues'],
+    features: [
+      'Anthropometric trends',
+      'Glucose/lipid context',
+      'Metabolic syndrome flags',
+      'Review queues',
+    ],
     useCases: ['Population health review', 'Metabolic clinic analytics', 'Quality improvement'],
   },
   {
@@ -1409,9 +1726,15 @@ const toolRegistry = [
     name: 'Continuous Glucose Command Center',
     path: '/tools/endocrine/continuous-glucose-command-center',
     color: '#1D4ED8',
-    description: 'CGM command-center view for glucose telemetry, data freshness, hypoglycemia, and unresolved review queues',
+    description:
+      'CGM command-center view for glucose telemetry, data freshness, hypoglycemia, and unresolved review queues',
     category: 'Reference',
-    features: ['CGM freshness', 'Hypoglycemia queue', 'Hyperglycemia trend context', 'No autonomous insulin changes'],
+    features: [
+      'CGM freshness',
+      'Hypoglycemia queue',
+      'Hyperglycemia trend context',
+      'No autonomous insulin changes',
+    ],
     useCases: ['Diabetes technology huddle', 'Remote CGM monitoring', 'Safety queue review'],
   },
   {
@@ -1441,9 +1764,15 @@ const toolRegistry = [
     name: 'GI Bleed Workflow Assistant',
     path: '/tools/gastroenterology/gi-bleed-workflow-assistant',
     color: '#9B5E3C',
-    description: 'Guided GI bleed review using risk scores, hemodynamic context, and handoff prompts',
+    description:
+      'Guided GI bleed review using risk scores, hemodynamic context, and handoff prompts',
     category: 'Calculator',
-    features: ['GBS and Rockall context', 'Hemodynamic review', 'Medication and comorbidity prompts', 'Safety handoff'],
+    features: [
+      'GBS and Rockall context',
+      'Hemodynamic review',
+      'Medication and comorbidity prompts',
+      'Safety handoff',
+    ],
     useCases: ['Upper GI bleed handoff', 'ED-to-GI consult prep', 'Endoscopy queue documentation'],
   },
   {
@@ -1451,9 +1780,15 @@ const toolRegistry = [
     name: 'Liver Disease Assistant',
     path: '/tools/gastroenterology/liver-disease-assistant',
     color: '#7A8B6E',
-    description: 'Guided liver disease review for Child-Pugh, MELD, FIB-4/APRI, trends, and missing data',
+    description:
+      'Guided liver disease review for Child-Pugh, MELD, FIB-4/APRI, trends, and missing data',
     category: 'Calculator',
-    features: ['Severity scores', 'Fibrosis indices', 'Decompensation prompts', 'Hepatology handoff'],
+    features: [
+      'Severity scores',
+      'Fibrosis indices',
+      'Decompensation prompts',
+      'Hepatology handoff',
+    ],
     useCases: ['Cirrhosis review', 'Liver clinic documentation', 'Hepatology consult preparation'],
   },
   {
@@ -1461,29 +1796,50 @@ const toolRegistry = [
     name: 'Pancreatitis Workflow Assistant',
     path: '/tools/gastroenterology/pancreatitis-workflow-assistant',
     color: '#D46B5C',
-    description: 'Guided pancreatitis severity review using Ranson, BISAP, organ failure, and missing-data prompts',
+    description:
+      'Guided pancreatitis severity review using Ranson, BISAP, organ failure, and missing-data prompts',
     category: 'Calculator',
-    features: ['Ranson and BISAP context', 'Organ-failure prompts', 'Trend review', 'Safety handoff'],
-    useCases: ['Acute pancreatitis admission', '48-hour reassessment', 'GI or surgery consult prep'],
+    features: [
+      'Ranson and BISAP context',
+      'Organ-failure prompts',
+      'Trend review',
+      'Safety handoff',
+    ],
+    useCases: [
+      'Acute pancreatitis admission',
+      '48-hour reassessment',
+      'GI or surgery consult prep',
+    ],
   },
   {
     id: 'gi-surveillance-dashboard',
     name: 'GI Surveillance Dashboard',
     path: '/tools/gastroenterology/gi-surveillance-dashboard',
     color: '#0F766E',
-    description: 'GI surveillance dashboard for endoscopy follow-up, pathology gaps, and review queues',
+    description:
+      'GI surveillance dashboard for endoscopy follow-up, pathology gaps, and review queues',
     category: 'Reference',
     features: ['Surveillance queue', 'Pathology status', 'Follow-up gaps', 'Human review tracking'],
-    useCases: ['GI clinic huddle', 'Surveillance registry review', 'Colonoscopy follow-up tracking'],
+    useCases: [
+      'GI clinic huddle',
+      'Surveillance registry review',
+      'Colonoscopy follow-up tracking',
+    ],
   },
   {
     id: 'hepatic-trend-analytics',
     name: 'Hepatic Trend Analytics',
     path: '/tools/gastroenterology/hepatic-trend-analytics',
     color: '#5B8E7D',
-    description: 'Hepatic trend workspace for bilirubin, INR, albumin, sodium, creatinine, and platelets',
+    description:
+      'Hepatic trend workspace for bilirubin, INR, albumin, sodium, creatinine, and platelets',
     category: 'Reference',
-    features: ['MELD/Child-Pugh inputs', 'Synthetic function trends', 'Fibrosis index trends', 'Missing labs'],
+    features: [
+      'MELD/Child-Pugh inputs',
+      'Synthetic function trends',
+      'Fibrosis index trends',
+      'Missing labs',
+    ],
     useCases: ['Cirrhosis monitoring', 'Hepatology rounds', 'Longitudinal liver review'],
   },
   {
@@ -1491,19 +1847,35 @@ const toolRegistry = [
     name: 'Endoscopy Workflow Assistant',
     path: '/tools/gastroenterology/endoscopy-workflow-assistant',
     color: '#8B5C7E',
-    description: 'Endoscopy workflow support for indication, preparation status, risk context, and documentation queues',
+    description:
+      'Endoscopy workflow support for indication, preparation status, risk context, and documentation queues',
     category: 'Reference',
-    features: ['Indication review', 'Preparation status', 'Anticoagulant context', 'Result follow-up prompts'],
-    useCases: ['Endoscopy unit huddle', 'Pre-procedure checklist context', 'Post-procedure follow-up tracking'],
+    features: [
+      'Indication review',
+      'Preparation status',
+      'Anticoagulant context',
+      'Result follow-up prompts',
+    ],
+    useCases: [
+      'Endoscopy unit huddle',
+      'Pre-procedure checklist context',
+      'Post-procedure follow-up tracking',
+    ],
   },
   {
     id: 'cirrhosis-monitoring-engine',
     name: 'Cirrhosis Monitoring Engine',
     path: '/tools/gastroenterology/cirrhosis-monitoring-engine',
     color: '#315C7C',
-    description: 'Cirrhosis monitoring workspace for decompensation features, labs, scores, and surveillance gaps',
+    description:
+      'Cirrhosis monitoring workspace for decompensation features, labs, scores, and surveillance gaps',
     category: 'Reference',
-    features: ['Decompensation tracking', 'MELD/Child-Pugh context', 'Surveillance gaps', 'Review queues'],
+    features: [
+      'Decompensation tracking',
+      'MELD/Child-Pugh context',
+      'Surveillance gaps',
+      'Review queues',
+    ],
     useCases: ['Cirrhosis clinic review', 'Hepatology huddle', 'Longitudinal safety monitoring'],
   },
   {
@@ -1511,9 +1883,15 @@ const toolRegistry = [
     name: 'GI Command Center',
     path: '/tools/gastroenterology/gi-command-center',
     color: '#1D4ED8',
-    description: 'GI command-center view for bleed, liver, pancreatitis, endoscopy, and surveillance queues',
+    description:
+      'GI command-center view for bleed, liver, pancreatitis, endoscopy, and surveillance queues',
     category: 'Reference',
-    features: ['GI bleed queue', 'Hepatic trend queue', 'Pancreatitis review', 'Endoscopy and surveillance status'],
+    features: [
+      'GI bleed queue',
+      'Hepatic trend queue',
+      'Pancreatitis review',
+      'Endoscopy and surveillance status',
+    ],
     useCases: ['GI service huddle', 'Unresolved alert summary', 'Cross-workflow queue review'],
   },
   {
@@ -1595,7 +1973,11 @@ const toolRegistry = [
       'Distracting injury',
       'Alertness',
     ],
-    useCases: ['ED blunt neck trauma', 'C-spine imaging documentation', 'Trauma shared decision-making'],
+    useCases: [
+      'ED blunt neck trauma',
+      'C-spine imaging documentation',
+      'Trauma shared decision-making',
+    ],
   },
   {
     id: 'abcd2',
@@ -1618,7 +2000,8 @@ const toolRegistry = [
     panelTool: 'calculators',
     initialCalc: 'hunt-hess-scale',
     color: '#6B7FD4',
-    description: 'Aneurysmal SAH clinical severity grading with urgent neurosurgical pathway reminders',
+    description:
+      'Aneurysmal SAH clinical severity grading with urgent neurosurgical pathway reminders',
     category: 'Calculator',
     features: ['SAH grade I-V', 'Clinical severity context', 'Urgent-care disclaimer'],
     useCases: ['SAH documentation', 'Neurosurgery handoff', 'Neurocritical care review'],
@@ -1666,7 +2049,8 @@ const toolRegistry = [
     panelTool: 'calculators',
     initialCalc: 'nihss-summary-view',
     color: '#4F7CAC',
-    description: 'NIHSS item summary view for stroke exam documentation without delaying stroke care',
+    description:
+      'NIHSS item summary view for stroke exam documentation without delaying stroke care',
     category: 'Calculator',
     features: ['NIHSS item scores', 'Total 0-42', 'Serial exam handoff'],
     useCases: ['Stroke activation documentation', 'Serial NIHSS summary', 'Neurology handoff'],
@@ -1680,7 +2064,12 @@ const toolRegistry = [
     color: '#9A8EB8',
     description: 'Pediatric Glasgow Coma Scale with age-adjusted verbal response descriptions',
     category: 'Calculator',
-    features: ['Eye response', 'Pediatric verbal response', 'Motor response', 'Urgent pediatric caution'],
+    features: [
+      'Eye response',
+      'Pediatric verbal response',
+      'Motor response',
+      'Urgent pediatric caution',
+    ],
     useCases: ['Pediatric ED exam', 'Pediatric trauma handoff', 'Serial consciousness scoring'],
   },
   {
@@ -1690,9 +2079,14 @@ const toolRegistry = [
     panelTool: 'calculators',
     initialCalc: 'gestational-age-calculator',
     color: '#C77BA5',
-    description: 'OB dating support from LMP, conception, or ultrasound anchor with ACOG dating caveats',
+    description:
+      'OB dating support from LMP, conception, or ultrasound anchor with ACOG dating caveats',
     category: 'Calculator',
-    features: ['LMP / conception / ultrasound dating', 'Weeks + days output', 'EDD reconciliation prompt'],
+    features: [
+      'LMP / conception / ultrasound dating',
+      'Weeks + days output',
+      'EDD reconciliation prompt',
+    ],
     useCases: ['Prenatal intake', 'OB triage documentation', 'Pregnancy dating review'],
   },
   {
@@ -1704,8 +2098,16 @@ const toolRegistry = [
     color: '#5B9EA6',
     description: 'Pediatric blood pressure screening-band helper using AAP source-table context',
     category: 'Calculator',
-    features: ['Age and sex context', 'Systolic / diastolic screening band', 'Repeat-measurement reminders'],
-    useCases: ['Pediatric clinic vitals review', 'School-age BP screening', 'Pediatric handoff documentation'],
+    features: [
+      'Age and sex context',
+      'Systolic / diastolic screening band',
+      'Repeat-measurement reminders',
+    ],
+    useCases: [
+      'Pediatric clinic vitals review',
+      'School-age BP screening',
+      'Pediatric handoff documentation',
+    ],
   },
   {
     id: 'pregnancy-due-date-calculator',
@@ -1728,7 +2130,11 @@ const toolRegistry = [
     color: '#0F766E',
     description: 'Neonatal growth percentile classification helper for Fenton chart review',
     category: 'Calculator',
-    features: ['Weight / length / head percentile bands', 'Preterm growth chart caveats', 'Neonatal review prompts'],
+    features: [
+      'Weight / length / head percentile bands',
+      'Preterm growth chart caveats',
+      'Neonatal review prompts',
+    ],
     useCases: ['NICU rounds', 'Newborn growth review', 'Preterm follow-up documentation'],
   },
   {
@@ -1738,7 +2144,8 @@ const toolRegistry = [
     panelTool: 'calculators',
     initialCalc: 'neonatal-bilirubin-risk-helper',
     color: '#D4A55B',
-    description: 'AAP 2022 bilirubin nomogram review prompt without phototherapy or exchange recommendations',
+    description:
+      'AAP 2022 bilirubin nomogram review prompt without phototherapy or exchange recommendations',
     category: 'Calculator',
     features: ['Age in hours', 'Gestational age context', 'Neurotoxicity risk-factor prompt'],
     useCases: ['Newborn jaundice review', 'Nursery handoff', 'Neonatal escalation documentation'],
@@ -1750,19 +2157,30 @@ const toolRegistry = [
     panelTool: 'calculators',
     initialCalc: 'pediatric-dose-safety-checker',
     color: '#B45309',
-    description: 'Placeholder-only pediatric medication safety checklist; no patient-specific dose calculation',
+    description:
+      'Placeholder-only pediatric medication safety checklist; no patient-specific dose calculation',
     category: 'Calculator',
     features: ['Weight/unit verification', 'Governed-protocol gate', 'No mg/kg dosing output'],
-    useCases: ['Pediatric medication safety review', 'Pharmacy consult prep', 'Protocol-governance checks'],
+    useCases: [
+      'Pediatric medication safety review',
+      'Pharmacy consult prep',
+      'Protocol-governance checks',
+    ],
   },
   {
     id: 'pediatric-sepsis-assistant',
     name: 'Pediatric Sepsis Assistant',
     path: '/tools/pediatrics-obgyn/pediatric-sepsis-assistant',
     color: '#E85D75',
-    description: 'Pediatric sepsis review assistant for infection concern, perfusion, vitals, labs, and escalation prompts',
+    description:
+      'Pediatric sepsis review assistant for infection concern, perfusion, vitals, labs, and escalation prompts',
     category: 'Calculator',
-    features: ['Age-adjusted vitals context', 'Perfusion prompts', 'Sepsis pathway reminders', 'No treatment dosing'],
+    features: [
+      'Age-adjusted vitals context',
+      'Perfusion prompts',
+      'Sepsis pathway reminders',
+      'No treatment dosing',
+    ],
     useCases: ['Pediatric ED sepsis concern', 'Ward deterioration review', 'Pediatric handoff'],
   },
   {
@@ -1770,9 +2188,15 @@ const toolRegistry = [
     name: 'Pregnancy Workflow Assistant',
     path: '/tools/pediatrics-obgyn/pregnancy-workflow-assistant',
     color: '#C77BA5',
-    description: 'Pregnancy workflow assistant for dating, symptoms, fetal movement, labs, and triage context',
+    description:
+      'Pregnancy workflow assistant for dating, symptoms, fetal movement, labs, and triage context',
     category: 'Calculator',
-    features: ['Dating context', 'Maternal symptoms', 'Fetal movement prompts', 'Urgent OB pathway reminders'],
+    features: [
+      'Dating context',
+      'Maternal symptoms',
+      'Fetal movement prompts',
+      'Urgent OB pathway reminders',
+    ],
     useCases: ['Prenatal workflow review', 'OB handoff', 'Pregnancy symptom triage prep'],
   },
   {
@@ -1780,9 +2204,15 @@ const toolRegistry = [
     name: 'Neonatal Assessment Assistant',
     path: '/tools/pediatrics-obgyn/neonatal-assessment-assistant',
     color: '#0EA5A6',
-    description: 'Neonatal assessment workflow for Apgar, feeding, temperature, bilirubin, growth, and red flags',
+    description:
+      'Neonatal assessment workflow for Apgar, feeding, temperature, bilirubin, growth, and red flags',
     category: 'Calculator',
-    features: ['Apgar and vitals context', 'Feeding/temperature prompts', 'Bilirubin review', 'No resuscitation replacement'],
+    features: [
+      'Apgar and vitals context',
+      'Feeding/temperature prompts',
+      'Bilirubin review',
+      'No resuscitation replacement',
+    ],
     useCases: ['Newborn nursery review', 'NICU handoff', 'Neonatal red-flag documentation'],
   },
   {
@@ -1790,9 +2220,15 @@ const toolRegistry = [
     name: 'OB Triage Assistant',
     path: '/tools/pediatrics-obgyn/ob-triage-assistant',
     color: '#BE185D',
-    description: 'OB triage assistant for maternal symptoms, gestational age, fetal concerns, bleeding, and urgent pathway prompts',
+    description:
+      'OB triage assistant for maternal symptoms, gestational age, fetal concerns, bleeding, and urgent pathway prompts',
     category: 'Calculator',
-    features: ['Maternal symptom checklist', 'Gestational age context', 'Fetal concern prompts', 'Emergency warning scope'],
+    features: [
+      'Maternal symptom checklist',
+      'Gestational age context',
+      'Fetal concern prompts',
+      'Emergency warning scope',
+    ],
     useCases: ['Labor and delivery triage', 'Pregnancy bleeding review', 'Maternal safety handoff'],
   },
   {
@@ -1800,9 +2236,15 @@ const toolRegistry = [
     name: 'Neonatal Dashboard',
     path: '/tools/pediatrics-obgyn/neonatal-dashboard',
     color: '#2563EB',
-    description: 'Neonatal dashboard concept for vitals, feeding, bilirubin, growth, screening, and review queues',
+    description:
+      'Neonatal dashboard concept for vitals, feeding, bilirubin, growth, screening, and review queues',
     category: 'Reference',
-    features: ['Newborn vitals trends', 'Feeding and weight context', 'Bilirubin review queue', 'Human review status'],
+    features: [
+      'Newborn vitals trends',
+      'Feeding and weight context',
+      'Bilirubin review queue',
+      'Human review status',
+    ],
     useCases: ['Nursery huddle', 'NICU panel review', 'Newborn follow-up queue'],
   },
   {
@@ -1810,9 +2252,15 @@ const toolRegistry = [
     name: 'Maternal Monitoring Dashboard',
     path: '/tools/pediatrics-obgyn/maternal-monitoring-dashboard',
     color: '#9333EA',
-    description: 'Maternal monitoring dashboard concept for vitals, symptoms, labs, fetal context, and review queues',
+    description:
+      'Maternal monitoring dashboard concept for vitals, symptoms, labs, fetal context, and review queues',
     category: 'Reference',
-    features: ['Maternal vitals trends', 'Symptom queues', 'Lab context', 'No autonomous escalation'],
+    features: [
+      'Maternal vitals trends',
+      'Symptom queues',
+      'Lab context',
+      'No autonomous escalation',
+    ],
     useCases: ['OB unit huddle', 'Antepartum monitoring review', 'Postpartum safety queue'],
   },
   {
@@ -1820,9 +2268,15 @@ const toolRegistry = [
     name: 'Pediatric Command Center',
     path: '/tools/pediatrics-obgyn/pediatric-command-center',
     color: '#1D4ED8',
-    description: 'Pediatric command-center view for deterioration, sepsis, vitals, growth, and unresolved review items',
+    description:
+      'Pediatric command-center view for deterioration, sepsis, vitals, growth, and unresolved review items',
     category: 'Reference',
-    features: ['PEWS queue', 'Sepsis review context', 'Growth and BP trends', 'Clinician review status'],
+    features: [
+      'PEWS queue',
+      'Sepsis review context',
+      'Growth and BP trends',
+      'Clinician review status',
+    ],
     useCases: ['Pediatric service huddle', 'Ward safety review', 'Deterioration queue monitoring'],
   },
   {
@@ -1830,9 +2284,15 @@ const toolRegistry = [
     name: 'Growth Trend Analytics',
     path: '/tools/pediatrics-obgyn/growth-trend-analytics',
     color: '#0F766E',
-    description: 'Growth trend analytics concept for serial weight, length/height, head circumference, and percentile changes',
+    description:
+      'Growth trend analytics concept for serial weight, length/height, head circumference, and percentile changes',
     category: 'Reference',
-    features: ['Serial growth trends', 'Percentile crossing context', 'Data quality prompts', 'No diagnosis automation'],
+    features: [
+      'Serial growth trends',
+      'Percentile crossing context',
+      'Data quality prompts',
+      'No diagnosis automation',
+    ],
     useCases: ['Pediatric growth review', 'NICU follow-up', 'Population panel review'],
   },
   {
@@ -1840,9 +2300,15 @@ const toolRegistry = [
     name: 'Perinatal Risk Dashboard',
     path: '/tools/pediatrics-obgyn/perinatal-risk-dashboard',
     color: '#B45309',
-    description: 'Perinatal risk dashboard concept for maternal, fetal, delivery, and neonatal review queues',
+    description:
+      'Perinatal risk dashboard concept for maternal, fetal, delivery, and neonatal review queues',
     category: 'Reference',
-    features: ['Maternal-fetal context', 'Delivery queue visibility', 'Neonatal follow-up prompts', 'No autonomous orders'],
+    features: [
+      'Maternal-fetal context',
+      'Delivery queue visibility',
+      'Neonatal follow-up prompts',
+      'No autonomous orders',
+    ],
     useCases: ['Perinatal safety huddle', 'OB-newborn handoff', 'Risk review queue'],
   },
   {
@@ -1850,9 +2316,15 @@ const toolRegistry = [
     name: 'Seizure Assistant',
     path: '/tools/neurology/seizure-assistant',
     color: '#7C3AED',
-    description: 'Guided seizure review with event features, recovery, triggers, and urgent-care prompts',
+    description:
+      'Guided seizure review with event features, recovery, triggers, and urgent-care prompts',
     category: 'Calculator',
-    features: ['Event semiology', 'Postictal recovery', 'Triggers and meds context', 'Status epilepticus warnings'],
+    features: [
+      'Event semiology',
+      'Postictal recovery',
+      'Triggers and meds context',
+      'Status epilepticus warnings',
+    ],
     useCases: ['Seizure handoff', 'ED neurology consult prep', 'Spell characterization'],
   },
   {
@@ -1860,7 +2332,8 @@ const toolRegistry = [
     name: 'Stroke Workflow Assistant',
     path: '/tools/neurology/stroke-workflow-assistant',
     color: '#1D4ED8',
-    description: 'Stroke workflow checklist support for last-known-well, deficits, imaging, and handoff prompts',
+    description:
+      'Stroke workflow checklist support for last-known-well, deficits, imaging, and handoff prompts',
     category: 'Calculator',
     features: ['Last-known-well', 'NIHSS context', 'Imaging status', 'Do-not-delay warnings'],
     useCases: ['Stroke activation handoff', 'ED stroke workflow', 'Neurology consult preparation'],
@@ -1870,9 +2343,15 @@ const toolRegistry = [
     name: 'Headache Red Flag Assistant',
     path: '/tools/neurology/headache-red-flag-assistant',
     color: '#B45309',
-    description: 'Headache red-flag review with thunderclap, neurologic deficit, infection, and risk-context prompts',
+    description:
+      'Headache red-flag review with thunderclap, neurologic deficit, infection, and risk-context prompts',
     category: 'Calculator',
-    features: ['Thunderclap onset', 'Neurologic deficits', 'Pregnancy/postpartum', 'Cancer/immunosuppression'],
+    features: [
+      'Thunderclap onset',
+      'Neurologic deficits',
+      'Pregnancy/postpartum',
+      'Cancer/immunosuppression',
+    ],
     useCases: ['Headache triage documentation', 'Neurology referral prep', 'ED red-flag review'],
   },
   {
@@ -1880,17 +2359,28 @@ const toolRegistry = [
     name: 'Vertigo HINTS Assistant',
     path: '/tools/neurology/vertigo-hints-assistant',
     color: '#0F766E',
-    description: 'Vertigo/HINTS documentation support for trained clinicians and posterior circulation red flags',
+    description:
+      'Vertigo/HINTS documentation support for trained clinicians and posterior circulation red flags',
     category: 'Calculator',
-    features: ['Continuous vertigo context', 'HINTS exam fields', 'Gait/hearing prompts', 'Stroke warning scope'],
-    useCases: ['Acute vestibular syndrome handoff', 'Neuro exam documentation', 'Posterior stroke concern review'],
+    features: [
+      'Continuous vertigo context',
+      'HINTS exam fields',
+      'Gait/hearing prompts',
+      'Stroke warning scope',
+    ],
+    useCases: [
+      'Acute vestibular syndrome handoff',
+      'Neuro exam documentation',
+      'Posterior stroke concern review',
+    ],
   },
   {
     id: 'neuro-exam-assistant',
     name: 'Neuro Exam Assistant',
     path: '/tools/neurology/neuro-exam-assistant',
     color: '#315C7C',
-    description: 'Guided neurologic exam checklist for exam-heavy workflows and localization prompts',
+    description:
+      'Guided neurologic exam checklist for exam-heavy workflows and localization prompts',
     category: 'Calculator',
     features: ['Mental status', 'Cranial nerves', 'Motor/sensory', 'Coordination and gait'],
     useCases: ['Neurology consult prep', 'Serial neuro checks', 'Exam documentation'],
@@ -1900,7 +2390,8 @@ const toolRegistry = [
     name: 'Neuro Telemetry Dashboard',
     path: '/tools/neurology/neuro-telemetry-dashboard',
     color: '#2563EB',
-    description: 'Neuro telemetry dashboard concept for neuro checks, consciousness scores, seizures, and gaps',
+    description:
+      'Neuro telemetry dashboard concept for neuro checks, consciousness scores, seizures, and gaps',
     category: 'Reference',
     features: ['Neuro check trends', 'GCS/NIHSS context', 'Seizure events', 'Missing data'],
     useCases: ['Neuro unit huddle', 'ICU monitoring review', 'Remote observation summary'],
@@ -1920,7 +2411,8 @@ const toolRegistry = [
     name: 'Neuro Monitoring Engine',
     path: '/tools/neurology/neuro-monitoring-engine',
     color: '#4F46E5',
-    description: 'Neuro monitoring trend engine for serial exams, pupils, ICP context, and review queues',
+    description:
+      'Neuro monitoring trend engine for serial exams, pupils, ICP context, and review queues',
     category: 'Reference',
     features: ['Serial exams', 'Pupillary context', 'ICP/EVD context', 'Review queues'],
     useCases: ['Neuro ICU rounds', 'Deterioration review', 'Monitoring handoff'],
@@ -1930,7 +2422,8 @@ const toolRegistry = [
     name: 'EEG Trend Dashboard',
     path: '/tools/neurology/eeg-trend-dashboard',
     color: '#9333EA',
-    description: 'EEG trend dashboard concept for seizure burden context, artifact, and report freshness',
+    description:
+      'EEG trend dashboard concept for seizure burden context, artifact, and report freshness',
     category: 'Reference',
     features: ['EEG status', 'Seizure burden context', 'Artifact review', 'Report freshness'],
     useCases: ['Epilepsy monitoring huddle', 'ICU EEG review', 'Neurology handoff'],
@@ -1940,9 +2433,15 @@ const toolRegistry = [
     name: 'Neurology Timeline AI',
     path: '/tools/neurology/neurology-timeline-ai',
     color: '#0EA5A6',
-    description: 'Neurology timeline workflow for symptom onset, exams, imaging, EEG, interventions, and handoff chronology',
+    description:
+      'Neurology timeline workflow for symptom onset, exams, imaging, EEG, interventions, and handoff chronology',
     category: 'Reference',
-    features: ['Symptom onset timeline', 'Exam trends', 'Imaging and EEG milestones', 'Clinician review'],
+    features: [
+      'Symptom onset timeline',
+      'Exam trends',
+      'Imaging and EEG milestones',
+      'Clinician review',
+    ],
     useCases: ['Stroke/seizure timeline', 'Neurology handoff', 'Chart review preparation'],
   },
   {
@@ -1954,7 +2453,11 @@ const toolRegistry = [
     color: '#E85D75',
     description: 'Hemodynamic screening index from heart rate and systolic blood pressure',
     category: 'Calculator',
-    features: ['Heart rate / systolic BP', 'Elevated threshold context', 'Perfusion escalation prompt'],
+    features: [
+      'Heart rate / systolic BP',
+      'Elevated threshold context',
+      'Perfusion escalation prompt',
+    ],
     useCases: ['ED triage', 'Sepsis or bleeding concern', 'Vitals trend review'],
   },
   {
@@ -1967,7 +2470,11 @@ const toolRegistry = [
     description: 'Serum anion gap with optional albumin correction',
     category: 'Calculator',
     features: ['Na - (Cl + HCO3)', 'Albumin correction', 'High/low/common range context'],
-    useCases: ['Metabolic acidosis review', 'DKA/lactate/renal context', 'Lab interpretation handoff'],
+    useCases: [
+      'Metabolic acidosis review',
+      'DKA/lactate/renal context',
+      'Lab interpretation handoff',
+    ],
   },
   {
     id: 'rass',
@@ -1979,7 +2486,11 @@ const toolRegistry = [
     description: 'Richmond Agitation-Sedation Scale documentation from +4 to -5',
     category: 'Calculator',
     features: ['Agitation scale', 'Sedation depth scale', 'ICU handoff wording'],
-    useCases: ['ICU sedation documentation', 'Ventilated patient handoff', 'Delirium workflow context'],
+    useCases: [
+      'ICU sedation documentation',
+      'Ventilated patient handoff',
+      'Delirium workflow context',
+    ],
   },
   {
     id: 'bed-occupancy-calculator',
@@ -1990,7 +2501,12 @@ const toolRegistry = [
     color: '#0F766E',
     description: 'Operational bed occupancy, blocked-bed, and usable-capacity calculator',
     category: 'Calculator',
-    features: ['Occupied / usable bed percentage', 'Blocked bed adjustment', 'Available bed count', 'Human bed-management review'],
+    features: [
+      'Occupied / usable bed percentage',
+      'Blocked bed adjustment',
+      'Available bed count',
+      'Human bed-management review',
+    ],
     useCases: ['Capacity huddles', 'Bed board planning', 'Surge readiness review'],
   },
   {
@@ -2002,7 +2518,12 @@ const toolRegistry = [
     color: '#0EA5A6',
     description: 'Patients-per-staff ratio and target coverage gap for operations planning',
     category: 'Calculator',
-    features: ['Patients per staff member', 'Target staffing estimate', 'Coverage gap/surplus', 'No autonomous scheduling'],
+    features: [
+      'Patients per staff member',
+      'Target staffing estimate',
+      'Coverage gap/surplus',
+      'No autonomous scheduling',
+    ],
     useCases: ['Charge nurse huddles', 'Operations staffing review', 'Shift planning context'],
   },
   {
@@ -2012,10 +2533,20 @@ const toolRegistry = [
     panelTool: 'calculators',
     initialCalc: 'turnaround-time-calculator',
     color: '#2563EB',
-    description: 'Operational turnaround-time calculator for assignment, travel, service, and ready-time segments',
+    description:
+      'Operational turnaround-time calculator for assignment, travel, service, and ready-time segments',
     category: 'Calculator',
-    features: ['Workflow segment total', 'Target variance', 'Bottleneck discussion context', 'No dispatch automation'],
-    useCases: ['Transport turnaround review', 'Room/device ready-time tracking', 'Service-level huddles'],
+    features: [
+      'Workflow segment total',
+      'Target variance',
+      'Bottleneck discussion context',
+      'No dispatch automation',
+    ],
+    useCases: [
+      'Transport turnaround review',
+      'Room/device ready-time tracking',
+      'Service-level huddles',
+    ],
   },
   {
     id: 'resource-utilization-index',
@@ -2026,8 +2557,17 @@ const toolRegistry = [
     color: '#7C3AED',
     description: 'Composite utilization index across beds, staff, devices, and fleet signals',
     category: 'Calculator',
-    features: ['Average utilization index', 'Highest utilization driver', 'Capacity planning context', 'Human approval required'],
-    useCases: ['Hospital command center review', 'Resource balancing discussion', 'Surge planning context'],
+    features: [
+      'Average utilization index',
+      'Highest utilization driver',
+      'Capacity planning context',
+      'Human approval required',
+    ],
+    useCases: [
+      'Hospital command center review',
+      'Resource balancing discussion',
+      'Surge planning context',
+    ],
   },
   {
     id: 'calculators',
@@ -2037,7 +2577,31 @@ const toolRegistry = [
     description: 'Browse every built-in calculator in one place',
     shortcut: 'Ctrl+7',
     category: 'Calculator',
-    features: ['SOFA', 'qSOFA', 'NEWS2', 'APACHE II', 'CURB-65', 'GCS', 'MEWS', 'RTS', 'PEWS', 'Child-Pugh', 'HAS-BLED', 'MELD', 'MELD-Na', 'TIMI UA/NSTEMI', 'GRACE ACS', 'NIHSS', 'Canadian C-Spine', 'Ottawa Ankle', 'Wells PE', 'PERC', 'eGFR', 'BMI', 'CHA₂DS₂-VASc'],
+    features: [
+      'SOFA',
+      'qSOFA',
+      'NEWS2',
+      'APACHE II',
+      'CURB-65',
+      'GCS',
+      'MEWS',
+      'RTS',
+      'PEWS',
+      'Child-Pugh',
+      'HAS-BLED',
+      'MELD',
+      'MELD-Na',
+      'TIMI UA/NSTEMI',
+      'GRACE ACS',
+      'NIHSS',
+      'Canadian C-Spine',
+      'Ottawa Ankle',
+      'Wells PE',
+      'PERC',
+      'eGFR',
+      'BMI',
+      'CHA₂DS₂-VASc',
+    ],
     useCases: ['Teaching', 'Quick switching between scores'],
   },
   {
@@ -2072,7 +2636,11 @@ const toolRegistry = [
       'Clinical decision trees',
       'Rare disease identification',
     ],
-    useCases: ['Differential diagnosis generation', 'Diagnostic workup planning', 'Complex case analysis'],
+    useCases: [
+      'Differential diagnosis generation',
+      'Diagnostic workup planning',
+      'Complex case analysis',
+    ],
   },
   {
     id: 'dispatch-ai',
@@ -2113,7 +2681,11 @@ const toolRegistry = [
       'Incident readiness checklist',
       'No autonomous operational decisions',
     ],
-    useCases: ['Hospital command huddle', 'Surge readiness review', 'Operations handoff preparation'],
+    useCases: [
+      'Hospital command huddle',
+      'Surge readiness review',
+      'Operations handoff preparation',
+    ],
   },
   {
     id: 'resource-allocation-assistant',
@@ -2130,7 +2702,11 @@ const toolRegistry = [
       'Constraint collection',
       'No autonomous resource movement',
     ],
-    useCases: ['Surge planning', 'Device redistribution review', 'Staffing and bed-capacity huddles'],
+    useCases: [
+      'Surge planning',
+      'Device redistribution review',
+      'Staffing and bed-capacity huddles',
+    ],
   },
   {
     id: 'device-recommendation-assistant',
@@ -2147,7 +2723,11 @@ const toolRegistry = [
       'Availability review prompts',
       'No clinical device assignment automation',
     ],
-    useCases: ['Biomedical engineering huddles', 'Unit equipment requests', 'Device readiness review'],
+    useCases: [
+      'Biomedical engineering huddles',
+      'Unit equipment requests',
+      'Device readiness review',
+    ],
   },
   {
     id: 'route-optimizer',
@@ -2391,7 +2971,11 @@ const toolRegistry = [
       'Device and room filters',
       'Demo telemetry clearly labeled',
     ],
-    useCases: ['Locate monitored assets', 'Find stale/offline equipment', 'Operations asset huddles'],
+    useCases: [
+      'Locate monitored assets',
+      'Find stale/offline equipment',
+      'Operations asset huddles',
+    ],
   },
   {
     id: 'incident-command-center',
@@ -2423,7 +3007,11 @@ const toolRegistry = [
       'Capacity and maintenance context',
       'Responsive command layout',
     ],
-    useCases: ['Daily operations cockpit', 'Cross-functional command review', 'Capacity readiness handoff'],
+    useCases: [
+      'Daily operations cockpit',
+      'Cross-functional command review',
+      'Capacity readiness handoff',
+    ],
   },
   {
     id: 'device-battery-intelligence',
@@ -2439,7 +3027,11 @@ const toolRegistry = [
       'Medical IoT dashboard launch',
       'Demo telemetry labels',
     ],
-    useCases: ['Biomedical battery rounds', 'Unit readiness review', 'Offline or low-power device triage'],
+    useCases: [
+      'Biomedical battery rounds',
+      'Unit readiness review',
+      'Offline or low-power device triage',
+    ],
   },
   {
     id: 'capacity-prediction-engine',
@@ -2490,7 +3082,11 @@ const toolRegistry = [
       'Educational dosing concepts (chat-assisted) — does not calculate patient-specific doses',
     shortcut: 'Ctrl+Shift+Y',
     category: 'Calculator',
-    features: ['Weight-based concepts', 'Renal adjustment overview', 'Institutional protocol pointers'],
+    features: [
+      'Weight-based concepts',
+      'Renal adjustment overview',
+      'Institutional protocol pointers',
+    ],
     useCases: ['Teaching rounds', 'Pharmacy consult prep', 'Protocol orientation'],
   },
   {
@@ -2534,8 +3130,16 @@ const toolRegistry = [
     description: 'Empiric antibiotic selection context (Diagnosis Assistant chat)',
     shortcut: 'Ctrl+Shift+N',
     category: 'Diagnostic',
-    features: ['Infection syndrome framing', 'Allergy / renal factors', 'Local resistance reminders'],
-    useCases: ['Empiric therapy discussion', 'ID consult prep', 'Antimicrobial stewardship context'],
+    features: [
+      'Infection syndrome framing',
+      'Allergy / renal factors',
+      'Local resistance reminders',
+    ],
+    useCases: [
+      'Empiric therapy discussion',
+      'ID consult prep',
+      'Antimicrobial stewardship context',
+    ],
   },
   {
     id: 'procedures',
@@ -2608,8 +3212,17 @@ const toolRegistry = [
     description: 'Structured ECG interpretation support with urgent-pathway guardrails',
     shortcut: 'Ctrl+Alt+E',
     category: 'Calculator',
-    features: ['Rhythm/rate/axis/intervals', 'Ischemia flags', 'Prior ECG comparison', 'STEMI escalation reminders'],
-    useCases: ['ECG documentation', 'Cardiology consult preparation', 'Urgent ECG review checklist'],
+    features: [
+      'Rhythm/rate/axis/intervals',
+      'Ischemia flags',
+      'Prior ECG comparison',
+      'STEMI escalation reminders',
+    ],
+    useCases: [
+      'ECG documentation',
+      'Cardiology consult preparation',
+      'Urgent ECG review checklist',
+    ],
   },
   {
     id: 'stemi-pathway-assistant',
@@ -2630,18 +3243,33 @@ const toolRegistry = [
     description: 'ACS workflow support across ECG, biomarkers, risk scores, and reassessment',
     shortcut: 'Ctrl+Alt+A',
     category: 'Calculator',
-    features: ['Serial ECG/lab prompts', 'HEART/TIMI/GRACE selection', 'Red flags', 'Handoff checklist'],
-    useCases: ['ACS evaluation organization', 'Chest pain unit documentation', 'Cardiology handoff'],
+    features: [
+      'Serial ECG/lab prompts',
+      'HEART/TIMI/GRACE selection',
+      'Red flags',
+      'Handoff checklist',
+    ],
+    useCases: [
+      'ACS evaluation organization',
+      'Chest pain unit documentation',
+      'Cardiology handoff',
+    ],
   },
   {
     id: 'atrial-fibrillation-assistant',
     name: 'Atrial Fibrillation Assistant',
     path: '/tools/cardiology/atrial-fibrillation-assistant',
     color: '#BE185D',
-    description: 'AF review support for stability, stroke/bleeding score selection, and handoff prompts',
+    description:
+      'AF review support for stability, stroke/bleeding score selection, and handoff prompts',
     shortcut: 'Ctrl+Alt+F',
     category: 'Calculator',
-    features: ['Stability review', 'CHA2DS2-VASc / CHADS2 / HAS-BLED', 'Trigger prompts', 'Medication safety questions'],
+    features: [
+      'Stability review',
+      'CHA2DS2-VASc / CHADS2 / HAS-BLED',
+      'Trigger prompts',
+      'Medication safety questions',
+    ],
     useCases: ['AF clinic review', 'ED AF documentation', 'Anticoagulation discussion preparation'],
   },
   {
@@ -2649,10 +3277,16 @@ const toolRegistry = [
     name: 'Heart Failure Assistant',
     path: '/tools/cardiology/heart-failure-assistant',
     color: '#C2410C',
-    description: 'Heart failure review support for staging, congestion context, and escalation prompts',
+    description:
+      'Heart failure review support for staging, congestion context, and escalation prompts',
     shortcut: 'Ctrl+Alt+H',
     category: 'Calculator',
-    features: ['Stability and congestion review', 'ACC/AHA staging helper', 'Renal/electrolyte context', 'Red flags'],
+    features: [
+      'Stability and congestion review',
+      'ACC/AHA staging helper',
+      'Renal/electrolyte context',
+      'Red flags',
+    ],
     useCases: ['HF clinic preparation', 'Decompensation handoff', 'Cardiology consult framing'],
   },
   {
@@ -2660,10 +3294,16 @@ const toolRegistry = [
     name: 'Cardiac Telemetry Analyzer',
     path: '/tools/cardiology/cardiac-telemetry-analyzer',
     color: '#7F1D1D',
-    description: 'Telemetry event review workflow with artifact checks and human escalation summaries',
+    description:
+      'Telemetry event review workflow with artifact checks and human escalation summaries',
     shortcut: 'Ctrl+Alt+T',
     category: 'Diagnostic',
-    features: ['Rhythm event review', 'Duration/rate/symptom capture', 'Artifact and lead quality', 'Escalation summary'],
+    features: [
+      'Rhythm event review',
+      'Duration/rate/symptom capture',
+      'Artifact and lead quality',
+      'Escalation summary',
+    ],
     useCases: ['Telemetry review queue', 'Arrhythmia handoff', 'Cardiology monitor rounds'],
   },
   {
@@ -2671,10 +3311,16 @@ const toolRegistry = [
     name: 'ECG Trend Engine',
     path: '/tools/cardiology/ecg-trend-engine',
     color: '#991B1B',
-    description: 'Serial ECG trend support for intervals, morphology, ischemia flags, and comparison notes',
+    description:
+      'Serial ECG trend support for intervals, morphology, ischemia flags, and comparison notes',
     shortcut: 'Ctrl+Alt+G',
     category: 'Diagnostic',
-    features: ['Serial interval trends', 'ST-T morphology changes', 'Conduction changes', 'Comparison documentation'],
+    features: [
+      'Serial interval trends',
+      'ST-T morphology changes',
+      'Conduction changes',
+      'Comparison documentation',
+    ],
     useCases: ['Serial ECG review', 'QT monitoring context', 'Ischemia trend documentation'],
   },
   {
@@ -2682,21 +3328,37 @@ const toolRegistry = [
     name: 'Arrhythmia Risk Classifier',
     path: '/tools/cardiology/arrhythmia-risk-classifier',
     color: '#9F1239',
-    description: 'Arrhythmia concern-level classifier with symptoms, telemetry, and escalation signals',
+    description:
+      'Arrhythmia concern-level classifier with symptoms, telemetry, and escalation signals',
     shortcut: 'Ctrl+Alt+R',
     category: 'Diagnostic',
-    features: ['Symptom/hemodynamic context', 'Telemetry recurrence', 'Structural disease prompts', 'Concern-level summary'],
-    useCases: ['Arrhythmia triage documentation', 'Telemetry escalation review', 'Electrophysiology handoff'],
+    features: [
+      'Symptom/hemodynamic context',
+      'Telemetry recurrence',
+      'Structural disease prompts',
+      'Concern-level summary',
+    ],
+    useCases: [
+      'Arrhythmia triage documentation',
+      'Telemetry escalation review',
+      'Electrophysiology handoff',
+    ],
   },
   {
     id: 'remote-cardiology-monitoring-dashboard',
     name: 'Remote Cardiology Monitoring Dashboard',
     path: '/tools/cardiology/remote-cardiology-monitoring-dashboard',
     color: '#0F766E',
-    description: 'Remote cardiology monitoring queue for symptoms, vitals, alerts, and missed transmissions',
+    description:
+      'Remote cardiology monitoring queue for symptoms, vitals, alerts, and missed transmissions',
     shortcut: 'Ctrl+Alt+M',
     category: 'Diagnostic',
-    features: ['Remote symptom/vital review', 'Rhythm and device alerts', 'Missed transmissions', 'Human triage queue'],
+    features: [
+      'Remote symptom/vital review',
+      'Rhythm and device alerts',
+      'Missed transmissions',
+      'Human triage queue',
+    ],
     useCases: ['Remote monitoring rounds', 'Device clinic review', 'Alert queue prioritization'],
   },
   {
@@ -2704,11 +3366,193 @@ const toolRegistry = [
     name: 'Cardiology Command Center',
     path: '/tools/cardiology/cardiology-command-center',
     color: '#1D4ED8',
-    description: 'Cardiology operations command view for ACS queues, telemetry risk, and unresolved review items',
+    description:
+      'Cardiology operations command view for ACS queues, telemetry risk, and unresolved review items',
     shortcut: 'Ctrl+Alt+C',
     category: 'Diagnostic',
-    features: ['ACS/STEMI queues', 'Telemetry risk summary', 'Remote monitoring flags', 'Unresolved review tasks'],
-    useCases: ['Cardiology service huddle', 'Operational bottleneck review', 'High-risk follow-up tracking'],
+    features: [
+      'ACS/STEMI queues',
+      'Telemetry risk summary',
+      'Remote monitoring flags',
+      'Unresolved review tasks',
+    ],
+    useCases: [
+      'Cardiology service huddle',
+      'Operational bottleneck review',
+      'High-risk follow-up tracking',
+    ],
+  },
+  {
+    id: 'ai-gateway',
+    name: 'AI Gateway',
+    path: '/assistant',
+    color: '#2563EB',
+    description:
+      'Assistant gateway envelope for clinical AI routing, trace metadata, and guarded responses',
+    shortcut: 'Ctrl+Alt+G',
+    category: 'AI System',
+    features: [
+      'Gateway run envelope',
+      'Route metadata',
+      'Safety policy context',
+      'Assistant launch',
+    ],
+    useCases: [
+      'Start an AI-assisted clinical workflow',
+      'Inspect gateway routing context',
+      'Launch assistant with guardrails',
+    ],
+  },
+  {
+    id: 'moe-router',
+    name: 'MoE Router',
+    path: '/assistant',
+    color: '#7C3AED',
+    description:
+      'Mixture-of-experts router that chooses clinical experts, retrieval policy, and safety plans',
+    shortcut: 'Ctrl+Alt+R',
+    category: 'AI System',
+    features: ['Expert selection', 'Routing evidence', 'Fallback tracking', 'Human-review flags'],
+    useCases: [
+      'Review model routing behavior',
+      'Launch expert-assisted chat',
+      'Explain selected AI pathway',
+    ],
+  },
+  {
+    id: 'ai-rag',
+    name: 'RAG Evidence Engine',
+    path: '/tools/guideline-rag',
+    color: '#0E7490',
+    description:
+      'Retrieval-augmented generation surface with citations, source panels, and evidence grounding',
+    shortcut: 'Ctrl+Alt+E',
+    category: 'AI System',
+    features: [
+      'Cited retrieval',
+      'Source panel',
+      'Reference metadata',
+      'Unsupported-claim guardrails',
+    ],
+    useCases: [
+      'Open guideline retrieval',
+      'Ground assistant answers in citations',
+      'Review evidence sources',
+    ],
+  },
+  {
+    id: 'ai-artifacts',
+    name: 'AI Artifacts',
+    path: '/artifacts',
+    color: '#059669',
+    description:
+      'Persistent AI outputs, workflow artifacts, telemetry schemas, protocols, and reusable templates',
+    shortcut: 'Ctrl+Alt+A',
+    category: 'AI System',
+    features: ['AI output records', 'Artifact versions', 'Workflow assets', 'Template library'],
+    useCases: [
+      'Review saved assistant outputs',
+      'Open generated artifacts',
+      'Audit reusable AI assets',
+    ],
+  },
+  {
+    id: 'ai-memory',
+    name: 'AI Memory',
+    path: '/memory',
+    color: '#DB2777',
+    description: 'Short, long, and clinical memory context used to personalize assistant workflows',
+    shortcut: 'Ctrl+Alt+M',
+    category: 'AI System',
+    features: ['Active context', 'Long-term preferences', 'Clinical summaries', 'Saved tools'],
+    useCases: [
+      'Review assistant memory',
+      'Inspect active conversation context',
+      'Launch memory dashboard',
+    ],
+  },
+  {
+    id: 'ai-tool-calling',
+    name: 'AI Tool Calling',
+    path: '/assistant',
+    color: '#EA580C',
+    description:
+      'Guarded assistant tool launcher that returns structured tool context without fake executors',
+    shortcut: 'Ctrl+Alt+T',
+    category: 'AI System',
+    features: [
+      'Tool resolution',
+      'Parameter validation',
+      'Structured tool context',
+      'Unsupported-tool boundaries',
+    ],
+    useCases: [
+      'Launch a clinical tool in chat',
+      'Review tool execution context',
+      'Route unsupported tools safely',
+    ],
+  },
+  {
+    id: 'ai-training',
+    name: 'AI Training Pipeline',
+    path: '/training',
+    color: '#9333EA',
+    description:
+      'Training, MoE planning, and model improvement dashboard for governed AI iteration',
+    shortcut: 'Ctrl+Alt+N',
+    category: 'AI System',
+    features: ['Training jobs', 'MoE plan', 'Dataset status', 'Improvement loops'],
+    useCases: [
+      'Review AI training readiness',
+      'Inspect MoE training plan',
+      'Open training dashboard',
+    ],
+  },
+  {
+    id: 'ai-cost-optimization',
+    name: 'AI Cost Optimization',
+    path: '/costs',
+    color: '#16A34A',
+    description:
+      'Cost optimizer dashboard for model routing, cache usage, and token spend snapshots',
+    shortcut: 'Ctrl+Alt+K',
+    category: 'AI System',
+    features: ['Route cost prediction', 'Cache metrics', 'Token spend', 'Cost savings'],
+    useCases: ['Open cost dashboard', 'Review route economics', 'Audit cache and spend'],
+  },
+  {
+    id: 'ai-evaluation',
+    name: 'AI Evaluation',
+    path: '/ai/evaluation',
+    color: '#DC2626',
+    description:
+      'Evaluation framework for hallucination, accuracy, latency, retrieval, tool, satisfaction, and cost metrics',
+    shortcut: 'Ctrl+Alt+V',
+    category: 'AI System',
+    features: ['Evaluation runs', 'Benchmarks', 'Metric trends', 'Live assistant captures'],
+    useCases: [
+      'Open AI evaluation dashboard',
+      'Review benchmark health',
+      'Track assistant quality',
+    ],
+  },
+  {
+    id: 'ai-command-center',
+    name: 'AI Command Center',
+    path: '/ai-command-center',
+    color: '#111827',
+    description:
+      'Unified AI operations dashboard spanning health, experts, RAG, memory, tools, costs, evaluation, and audit logs',
+    shortcut: 'Ctrl+Alt+X',
+    category: 'AI System',
+    features: [
+      'AI health',
+      'Active experts',
+      'RAG metrics',
+      'Memory and tool usage',
+      'Cost and audit snapshots',
+    ],
+    useCases: ['Open AI command center', 'Monitor AI systems', 'Review operational metrics'],
   },
   {
     id: 'guideline-rag',

@@ -30,8 +30,16 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/auth/biometric/verify', controller: 'BiometricController' },
   { method: 'GET', path: '/api/auth/biometric/config', controller: 'BiometricController' },
   { method: 'GET', path: '/api/auth/biometric/stats', controller: 'BiometricController' },
-  { method: 'DELETE', path: '/api/auth/biometric/disable/:deviceId', controller: 'BiometricController' },
-  { method: 'DELETE', path: '/api/auth/biometric/delete/:deviceId', controller: 'BiometricController' },
+  {
+    method: 'DELETE',
+    path: '/api/auth/biometric/disable/:deviceId',
+    controller: 'BiometricController',
+  },
+  {
+    method: 'DELETE',
+    path: '/api/auth/biometric/delete/:deviceId',
+    controller: 'BiometricController',
+  },
   { method: 'GET', path: '/api/auth/biometric/available', controller: 'BiometricController' },
 
   { method: 'GET', path: '/api/users/profile', controller: 'UsersController' },
@@ -48,21 +56,49 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/workspaces', controller: 'WorkspacesController' },
   { method: 'POST', path: '/api/workspaces/active', controller: 'WorkspacesController' },
   { method: 'GET', path: '/api/workspaces/:workspaceId', controller: 'WorkspacesController' },
-  { method: 'GET', path: '/api/workspaces/:workspaceId/members', controller: 'WorkspacesController' },
-  { method: 'POST', path: '/api/workspaces/:workspaceId/invitations', controller: 'WorkspacesController' },
+  {
+    method: 'GET',
+    path: '/api/workspaces/:workspaceId/members',
+    controller: 'WorkspacesController',
+  },
+  {
+    method: 'POST',
+    path: '/api/workspaces/:workspaceId/invitations',
+    controller: 'WorkspacesController',
+  },
   { method: 'GET', path: '/api/workspaces/:workspaceId/tools', controller: 'WorkspacesController' },
-  { method: 'PATCH', path: '/api/workspaces/:workspaceId/tools', controller: 'WorkspacesController' },
+  {
+    method: 'PATCH',
+    path: '/api/workspaces/:workspaceId/tools',
+    controller: 'WorkspacesController',
+  },
 
   { method: 'POST', path: '/api/activity', controller: 'UserActivityController' },
   { method: 'GET', path: '/api/activity/me', controller: 'UserActivityController' },
   { method: 'GET', path: '/api/activity/me/summary', controller: 'UserActivityController' },
-  { method: 'GET', path: '/api/activity/workspaces/:workspaceId', controller: 'UserActivityController' },
+  {
+    method: 'GET',
+    path: '/api/activity/workspaces/:workspaceId',
+    controller: 'UserActivityController',
+  },
 
   { method: 'GET', path: '/api/personalization/me', controller: 'PersonalizationController' },
   { method: 'PATCH', path: '/api/personalization/me', controller: 'PersonalizationController' },
-  { method: 'GET', path: '/api/personalization/me/recommendations', controller: 'PersonalizationController' },
-  { method: 'POST', path: '/api/personalization/me/saved-prompts', controller: 'PersonalizationController' },
-  { method: 'DELETE', path: '/api/personalization/me/saved-prompts/:promptId', controller: 'PersonalizationController' },
+  {
+    method: 'GET',
+    path: '/api/personalization/me/recommendations',
+    controller: 'PersonalizationController',
+  },
+  {
+    method: 'POST',
+    path: '/api/personalization/me/saved-prompts',
+    controller: 'PersonalizationController',
+  },
+  {
+    method: 'DELETE',
+    path: '/api/personalization/me/saved-prompts/:promptId',
+    controller: 'PersonalizationController',
+  },
 
   { method: 'GET', path: '/api/artifacts', controller: 'ArtifactsController' },
   { method: 'GET', path: '/api/artifacts/graph', controller: 'ArtifactsController' },
@@ -87,7 +123,11 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
 
   { method: 'GET', path: '/api/subscriptions/plans', controller: 'SubscriptionsController' },
   { method: 'GET', path: '/api/subscriptions/config', controller: 'SubscriptionsController' },
-  { method: 'POST', path: '/api/subscriptions/create-checkout', controller: 'SubscriptionsController' },
+  {
+    method: 'POST',
+    path: '/api/subscriptions/create-checkout',
+    controller: 'SubscriptionsController',
+  },
   { method: 'POST', path: '/api/subscriptions/portal', controller: 'SubscriptionsController' },
   { method: 'GET', path: '/api/subscriptions/current', controller: 'SubscriptionsController' },
   { method: 'POST', path: '/api/subscriptions/webhook', controller: 'SubscriptionsController' },
@@ -98,57 +138,241 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/chat/suggest-action', controller: 'ChatController' },
   { method: 'POST', path: '/api/chat/analyze-vitals', controller: 'ChatController' },
 
-  { method: 'POST', path: '/api/clinical-intelligence/ambient-scribe/generate', controller: 'ClinicalIntelligenceController' },
-  { method: 'POST', path: '/api/clinical-intelligence/guideline-rag/query', controller: 'ClinicalIntelligenceController' },
-  { method: 'POST', path: '/api/clinical-intelligence/differential-ai/generate', controller: 'ClinicalIntelligenceController' },
-  { method: 'POST', path: '/api/clinical-intelligence/timeline-ai/generate', controller: 'ClinicalIntelligenceController' },
-  { method: 'POST', path: '/api/clinical-intelligence/patient-summary-ai/generate', controller: 'ClinicalIntelligenceController' },
-  { method: 'POST', path: '/api/clinical-intelligence/order-set-ai/generate', controller: 'ClinicalIntelligenceController' },
-  { method: 'GET', path: '/api/clinical-intelligence/ai-explainability/trace', controller: 'ClinicalIntelligenceController' },
-  { method: 'GET', path: '/api/clinical-intelligence/clinical-audit/execution-logs', controller: 'ClinicalIntelligenceController' },
-  { method: 'GET', path: '/api/platform-systems/capabilities/:capabilityId', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/platform-systems/packs/:pack', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/integrations/fhir/connections', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/integrations/fhir/connections', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/integrations/fhir/:connectionId/test', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/integrations/fhir/:connectionId/sync', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/integrations/hl7/interfaces', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/integrations/hl7/interfaces/:interfaceId/test-message', controller: 'PlatformSystemsController' },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/ambient-scribe/generate',
+    controller: 'ClinicalIntelligenceController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/guideline-rag/query',
+    controller: 'ClinicalIntelligenceController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/differential-ai/generate',
+    controller: 'ClinicalIntelligenceController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/timeline-ai/generate',
+    controller: 'ClinicalIntelligenceController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/patient-summary-ai/generate',
+    controller: 'ClinicalIntelligenceController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/order-set-ai/generate',
+    controller: 'ClinicalIntelligenceController',
+  },
+  {
+    method: 'GET',
+    path: '/api/clinical-intelligence/ai-explainability/trace',
+    controller: 'ClinicalIntelligenceController',
+  },
+  {
+    method: 'GET',
+    path: '/api/clinical-intelligence/clinical-audit/execution-logs',
+    controller: 'ClinicalIntelligenceController',
+  },
+  {
+    method: 'GET',
+    path: '/api/platform-systems/capabilities/:capabilityId',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/platform-systems/packs/:pack',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/integrations/fhir/connections',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/integrations/fhir/connections',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/integrations/fhir/:connectionId/test',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/integrations/fhir/:connectionId/sync',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/integrations/hl7/interfaces',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/integrations/hl7/interfaces/:interfaceId/test-message',
+    controller: 'PlatformSystemsController',
+  },
   { method: 'POST', path: '/api/patients/import/ehr', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/patients/:patientId/import/labs', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/patients/:patientId/import/medications', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/patients/:patientId/import/observations', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/patients/:patientId/workspace', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/patients/:patientId/summary', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/patients/:patientId/timeline', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/patients/:patientId/events', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/patients/:patientId/risk-scores', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/patients/:patientId/risk-scores', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/patients/:patientId/care-plan', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/clinical-intelligence/calculator-recommender/suggest', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/clinical-intelligence/workflow-builder/generate', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/clinical-intelligence/reasoning/analyze', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/clinical-intelligence/why-engine/explain', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/clinical-intelligence/audit-trail/summarize', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/clinical-intelligence/clinical-event-ai/draft', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/documentation/soap/draft', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/documentation/dictation/transcribe', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/documentation/discharge-summary/draft', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/documentation/referral/draft', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/documentation/prior-auth/draft', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/documentation/:documentId/approve', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/documentation/:documentId/export', controller: 'PlatformSystemsController' },
+  {
+    method: 'POST',
+    path: '/api/patients/:patientId/import/labs',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/patients/:patientId/import/medications',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/patients/:patientId/import/observations',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/patients/:patientId/workspace',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/patients/:patientId/summary',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/patients/:patientId/timeline',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/patients/:patientId/events',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/patients/:patientId/risk-scores',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/patients/:patientId/risk-scores',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/patients/:patientId/care-plan',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/calculator-recommender/suggest',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/workflow-builder/generate',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/reasoning/analyze',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/why-engine/explain',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/audit-trail/summarize',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical-intelligence/clinical-event-ai/draft',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/documentation/soap/draft',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/documentation/dictation/transcribe',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/documentation/discharge-summary/draft',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/documentation/referral/draft',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/documentation/prior-auth/draft',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/documentation/:documentId/approve',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/documentation/:documentId/export',
+    controller: 'PlatformSystemsController',
+  },
   { method: 'GET', path: '/api/governance/ai/policies', controller: 'PlatformSystemsController' },
-  { method: 'PUT', path: '/api/governance/ai/policies/:policyId', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/governance/model-usage/summary', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/governance/model-usage/events', controller: 'PlatformSystemsController' },
+  {
+    method: 'PUT',
+    path: '/api/governance/ai/policies/:policyId',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/governance/model-usage/summary',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/governance/model-usage/events',
+    controller: 'PlatformSystemsController',
+  },
   { method: 'GET', path: '/api/governance/costs/summary', controller: 'PlatformSystemsController' },
-  { method: 'PUT', path: '/api/governance/costs/budgets/:budgetId', controller: 'PlatformSystemsController' },
-  { method: 'GET', path: '/api/governance/clinical-safety/findings', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/governance/clinical-safety/findings/:findingId/review', controller: 'PlatformSystemsController' },
+  {
+    method: 'PUT',
+    path: '/api/governance/costs/budgets/:budgetId',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/governance/clinical-safety/findings',
+    controller: 'PlatformSystemsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/governance/clinical-safety/findings/:findingId/review',
+    controller: 'PlatformSystemsController',
+  },
   { method: 'GET', path: '/api/consent/:patientId', controller: 'PlatformSystemsController' },
   { method: 'POST', path: '/api/consent/:patientId', controller: 'PlatformSystemsController' },
-  { method: 'POST', path: '/api/consent/:patientId/revoke', controller: 'PlatformSystemsController' },
+  {
+    method: 'POST',
+    path: '/api/consent/:patientId/revoke',
+    controller: 'PlatformSystemsController',
+  },
   { method: 'GET', path: '/api/privacy/access-log', controller: 'PlatformSystemsController' },
   { method: 'POST', path: '/api/privacy/export', controller: 'PlatformSystemsController' },
   { method: 'POST', path: '/api/privacy/delete-request', controller: 'PlatformSystemsController' },
@@ -168,12 +392,20 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/tool-calling/resolve', controller: 'ToolCallingController' },
   { method: 'GET', path: '/api/tool-calling/logs', controller: 'ToolCallingController' },
 
+  { method: 'GET', path: '/api/cost-optimizer/dashboard', controller: 'CostOptimizerController' },
+  { method: 'POST', path: '/api/cost-optimizer/route', controller: 'CostOptimizerController' },
+
   { method: 'GET', path: '/api/training/pipeline', controller: 'TrainingController' },
   { method: 'GET', path: '/api/training/dashboard', controller: 'TrainingController' },
   { method: 'GET', path: '/api/training/runs', controller: 'TrainingController' },
   { method: 'POST', path: '/api/training/runs', controller: 'TrainingController' },
   { method: 'POST', path: '/api/training/runs/:runId/evaluate', controller: 'TrainingController' },
   { method: 'GET', path: '/api/training/moe-plan', controller: 'TrainingController' },
+
+  { method: 'GET', path: '/api/evaluation/dashboard', controller: 'EvaluationController' },
+  { method: 'GET', path: '/api/evaluation/metrics', controller: 'EvaluationController' },
+  { method: 'GET', path: '/api/evaluation/runs', controller: 'EvaluationController' },
+  { method: 'POST', path: '/api/evaluation/runs', controller: 'EvaluationController' },
 
   { method: 'GET', path: '/api/drugs', controller: 'DrugController' },
   { method: 'GET', path: '/api/drugs/categories', controller: 'DrugController' },
@@ -192,14 +424,26 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/fleet/vehicles/live', controller: 'FleetLiveTrackingController' },
   { method: 'GET', path: '/api/fleet/routes/active', controller: 'FleetLiveTrackingController' },
   { method: 'GET', path: '/api/hospital-map/floors', controller: 'HospitalLiveTrackingController' },
-  { method: 'GET', path: '/api/hospital-map/devices', controller: 'HospitalLiveTrackingController' },
+  {
+    method: 'GET',
+    path: '/api/hospital-map/devices',
+    controller: 'HospitalLiveTrackingController',
+  },
   { method: 'GET', path: '/api/devices/live', controller: 'DeviceLiveTrackingController' },
   { method: 'GET', path: '/api/telemetry/live', controller: 'DeviceLiveTrackingController' },
   { method: 'GET', path: '/api/alerts/devices', controller: 'DeviceLiveTrackingController' },
 
   { method: 'GET', path: '/api/clinical/alerts', controller: 'ClinicalAlertsController' },
-  { method: 'POST', path: '/api/clinical/alerts/:alertId/acknowledge', controller: 'ClinicalAlertsController' },
-  { method: 'POST', path: '/api/clinical/alerts/:alertId/dismiss', controller: 'ClinicalAlertsController' },
+  {
+    method: 'POST',
+    path: '/api/clinical/alerts/:alertId/acknowledge',
+    controller: 'ClinicalAlertsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/clinical/alerts/:alertId/dismiss',
+    controller: 'ClinicalAlertsController',
+  },
 
   { method: 'GET', path: '/api/audit/logs', controller: 'AuditController' },
   { method: 'GET', path: '/api/audit/my-logs', controller: 'AuditController' },
@@ -213,12 +457,24 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/compliance/consent', controller: 'ComplianceController' },
   { method: 'POST', path: '/api/compliance/consent', controller: 'ComplianceController' },
 
-  { method: 'POST', path: '/api/notifications/devices/register', controller: 'NotificationController' },
+  {
+    method: 'POST',
+    path: '/api/notifications/devices/register',
+    controller: 'NotificationController',
+  },
   { method: 'GET', path: '/api/notifications/devices', controller: 'NotificationController' },
-  { method: 'DELETE', path: '/api/notifications/devices/:token', controller: 'NotificationController' },
+  {
+    method: 'DELETE',
+    path: '/api/notifications/devices/:token',
+    controller: 'NotificationController',
+  },
   { method: 'GET', path: '/api/notifications/preferences', controller: 'NotificationController' },
   { method: 'PATCH', path: '/api/notifications/preferences', controller: 'NotificationController' },
-  { method: 'POST', path: '/api/notifications/preferences/toggle-all', controller: 'NotificationController' },
+  {
+    method: 'POST',
+    path: '/api/notifications/preferences/toggle-all',
+    controller: 'NotificationController',
+  },
   { method: 'GET', path: '/api/notifications', controller: 'NotificationController' },
   { method: 'GET', path: '/api/notifications/unread/count', controller: 'NotificationController' },
   { method: 'PATCH', path: '/api/notifications/:id/read', controller: 'NotificationController' },
@@ -229,7 +485,12 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/analytics/events', controller: 'AnalyticsController' },
   { method: 'GET', path: '/api/analytics/metrics', controller: 'AnalyticsController' },
   { method: 'POST', path: '/api/crashes', controller: 'AnalyticsController' },
-  { method: 'POST', path: '/api/health', controller: 'AnalyticsController', notes: 'client health ping under /api' },
+  {
+    method: 'POST',
+    path: '/api/health',
+    controller: 'AnalyticsController',
+    notes: 'client health ping under /api',
+  },
 
   { method: 'POST', path: '/api/ai/query', controller: 'AiController' },
   { method: 'POST', path: '/api/ai/structured', controller: 'AiController' },
@@ -243,9 +504,7 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
  * @param {string} path
  */
 export function normalizeRoutePattern(path) {
-  return path
-    .replace(/\$\{[^}]+\}/g, ':param')
-    .replace(/:[a-zA-Z0-9_]+/g, ':param');
+  return path.replace(/\$\{[^}]+\}/g, ':param').replace(/:[a-zA-Z0-9_]+/g, ':param');
 }
 
 /**
@@ -265,9 +524,7 @@ export function routePatternMatches(callPath, routePath) {
  */
 export function findBackendRoute(method, path) {
   const m = method.toUpperCase();
-  return BACKEND_HTTP_ROUTES.find(
-    (r) => r.method === m && routePatternMatches(path, r.path)
-  );
+  return BACKEND_HTTP_ROUTES.find((r) => r.method === m && routePatternMatches(path, r.path));
 }
 
 export function listBackendRoutePaths() {

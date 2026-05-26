@@ -96,6 +96,7 @@ export class ToolExecutionService {
         missingParameters: parameterState.missingRequired,
         intentClassification: classification,
         executionLogs: logs,
+        context: this.buildToolContext(resolution.definition, parameterState.parameters),
         suggestions: parameterState.missingRequired.map((param) => `Provide ${param.name}`),
         visualizations: [
           {
@@ -140,6 +141,7 @@ export class ToolExecutionService {
         validation,
         intentClassification: classification,
         executionLogs: logs,
+        context: this.buildToolContext(resolution.definition, parameterState.parameters),
         suggestions: ['Provide corrected parameters', 'Open supported workflow'],
         visualizations: [
           {
@@ -185,6 +187,11 @@ export class ToolExecutionService {
         validation,
         intentClassification: classification,
         executionLogs: logs,
+        context: this.buildToolContext(
+          resolution.definition,
+          parameterState.parameters,
+          executed.result,
+        ),
         suggestions: executed.suggestions,
         visualizations: executed.visualizations,
         executionTimeMs: Date.now() - startedAt,
@@ -207,6 +214,7 @@ export class ToolExecutionService {
         validation,
         intentClassification: classification,
         executionLogs: logs,
+        context: this.buildToolContext(resolution.definition, parameterState.parameters),
         suggestions: ['Try again', 'Open supported workflow'],
         errorCode: ToolExecutionErrorCode.EXECUTION_FAILED,
         executionTimeMs: Date.now() - startedAt,
@@ -398,6 +406,10 @@ export class ToolExecutionService {
       launch: resolution.launch,
       intentClassification: classification,
       executionLogs: logs,
+      context: {
+        toolId,
+        launch: resolution.launch,
+      },
       suggestions: ['Open supported workflow', 'Ask follow-up question'],
       visualizations: [
         {
@@ -411,6 +423,30 @@ export class ToolExecutionService {
       ],
       errorCode: ToolExecutionErrorCode.UNSUPPORTED_TOOL,
       executionTimeMs: Date.now() - startedAt,
+    };
+  }
+
+  private buildToolContext(
+    definition: ToolDefinition,
+    parameters: Record<string, any> = {},
+    result?: any,
+  ): ToolCallingResult['context'] {
+    const resultData = result?.data || result;
+    return {
+      toolId: definition.id,
+      toolName: definition.name,
+      category: definition.category,
+      executionKind: definition.executionKind,
+      launch: definition.launch,
+      parameters,
+      resultSummary:
+        resultData && typeof resultData === 'object'
+          ? {
+              keys: Object.keys(resultData).slice(0, 12),
+              status: result?.success ?? result?.status,
+              timestamp: result?.timestamp,
+            }
+          : undefined,
     };
   }
 

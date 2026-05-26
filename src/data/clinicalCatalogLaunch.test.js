@@ -4,7 +4,11 @@
 
 import { describe, it, expect } from 'vitest';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
-import { clinicalIntentTools, clinicalIntentToolsById, builtinUiCalculators } from './clinicalIntentToolCatalog';
+import {
+  clinicalIntentTools,
+  clinicalIntentToolsById,
+  builtinUiCalculators,
+} from './clinicalIntentToolCatalog';
 import {
   resolveCatalogLaunch,
   resolveCatalogLaunchFallback,
@@ -39,11 +43,25 @@ import {
   PR6_CALCULATOR_REGISTRY_IDS,
   PR7_CALCULATOR_REGISTRY_IDS,
   CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS,
+  AI_SYSTEM_REGISTRY_IDS,
+  TOOL_LAUNCH_PATHS,
 } from './clinicalToolIdContract';
 import { runClinicalSafetyComplianceAudit } from './clinicalSafetyGuardrails';
 import { PR5_ALL_ALIAS_PAIRS } from './pr5TestConstants';
 
 const HUB = '/tools/calculators';
+const AI_SYSTEM_ROUTE_ALLOWLIST = {
+  [REGISTRY.aiGateway]: TOOL_LAUNCH_PATHS.assistant,
+  [REGISTRY.moeRouter]: TOOL_LAUNCH_PATHS.assistant,
+  [REGISTRY.aiRag]: '/tools/guideline-rag',
+  [REGISTRY.aiArtifacts]: TOOL_LAUNCH_PATHS.artifacts,
+  [REGISTRY.aiMemory]: TOOL_LAUNCH_PATHS.memory,
+  [REGISTRY.aiToolCalling]: TOOL_LAUNCH_PATHS.assistant,
+  [REGISTRY.aiTraining]: TOOL_LAUNCH_PATHS.training,
+  [REGISTRY.aiCostOptimization]: TOOL_LAUNCH_PATHS.costs,
+  [REGISTRY.aiEvaluation]: TOOL_LAUNCH_PATHS.aiEvaluation,
+  [REGISTRY.aiCommandCenter]: TOOL_LAUNCH_PATHS.aiCommandCenter,
+};
 const PULMONOLOGY_TIER_B_SET = new Set(PULMONOLOGY_TIER_B_CHAT_REGISTRY_IDS);
 const NEPHROLOGY_TIER_B_SET = new Set(NEPHROLOGY_TIER_B_CHAT_REGISTRY_IDS);
 const HEPATOLOGY_GI_TIER_B_SET = new Set(HEPATOLOGY_GI_TIER_B_CHAT_REGISTRY_IDS);
@@ -132,6 +150,38 @@ describe('resolveCatalogLaunch — every NLU profile', () => {
   });
 });
 
+describe('resolveCatalogLaunch — AI system contracts', () => {
+  it.each(AI_SYSTEM_REGISTRY_IDS)(
+    '%s launches to a real AI surface without fake executors',
+    (registryId) => {
+      const launch = resolveCatalogLaunch(registryId);
+
+      expect(launch.registryId).toBe(registryId);
+      expect(launch.path).toBe(AI_SYSTEM_ROUTE_ALLOWLIST[registryId]);
+      expect(launch.path).not.toBeNull();
+      expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
+      expect(launch.chatSeed?.length).toBeGreaterThan(40);
+      expect(launch.orchestratorTool).toBeNull();
+    }
+  );
+
+  it('documents intentional shared AI system routes', () => {
+    const sharedRouteGroups = AI_SYSTEM_REGISTRY_IDS.reduce((groups, registryId) => {
+      const launch = resolveCatalogLaunch(registryId);
+      groups[launch.path] = [...(groups[launch.path] || []), registryId];
+      return groups;
+    }, {});
+
+    expect(sharedRouteGroups[TOOL_LAUNCH_PATHS.assistant].sort()).toEqual(
+      [REGISTRY.aiGateway, REGISTRY.moeRouter, REGISTRY.aiToolCalling].sort()
+    );
+    expect(sharedRouteGroups['/tools/guideline-rag']).toEqual([REGISTRY.aiRag]);
+    expect(sharedRouteGroups[TOOL_LAUNCH_PATHS.aiCommandCenter]).toEqual([
+      REGISTRY.aiCommandCenter,
+    ]);
+  });
+});
+
 describe('resolveCatalogLaunch — Tier A dedicated calculator routes', () => {
   it.each(CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS)(
     '%s deep-links to dedicated calculator page',
@@ -152,11 +202,14 @@ describe('resolveCatalogLaunch — Tier A dedicated calculator routes', () => {
     }
   );
 
-  it.each(['sofa', 'gfr', 'bmi', 'chads2vasc'])('builtin slug %s resolves to registry path', (slug) => {
-    const launch = resolveCatalogLaunch(slug);
-    expect(launch.path).toBeTruthy();
-    expect(launch.registryId).toBeTruthy();
-  });
+  it.each(['sofa', 'gfr', 'bmi', 'chads2vasc'])(
+    'builtin slug %s resolves to registry path',
+    (slug) => {
+      const launch = resolveCatalogLaunch(slug);
+      expect(launch.path).toBeTruthy();
+      expect(launch.registryId).toBeTruthy();
+    }
+  );
 });
 
 describe('resolveNavigationPathForLaunch — chat visibility', () => {
@@ -188,18 +241,21 @@ describe('resolveNavigationPathForLaunch — chat visibility', () => {
 });
 
 describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () => {
-  it.each(TIER_B_HUB_TOOLS)('%s launches via calculators hub with guided chat seed', (registryId) => {
-    const launch = resolveCatalogLaunch(registryId);
-    const nlu = clinicalIntentTools.find(
-      (t) => t.toolId === registryId || t.sidebarToolId === registryId
-    );
-    expect(launch.path).toBe(HUB);
-    expect(launch.registryId).toBe(registryId);
-    expect(launch.chatSeed).toBe(nlu?.chatSeed);
-    expect(launch.chatSeed?.length).toBeGreaterThan(40);
-    expect(launch.openLabel).toMatch(/guided chat|Try in chat/i);
-    expect(launch.orchestratorTool).toBeNull();
-  });
+  it.each(TIER_B_HUB_TOOLS)(
+    '%s launches via calculators hub with guided chat seed',
+    (registryId) => {
+      const launch = resolveCatalogLaunch(registryId);
+      const nlu = clinicalIntentTools.find(
+        (t) => t.toolId === registryId || t.sidebarToolId === registryId
+      );
+      expect(launch.path).toBe(HUB);
+      expect(launch.registryId).toBe(registryId);
+      expect(launch.chatSeed).toBe(nlu?.chatSeed);
+      expect(launch.chatSeed?.length).toBeGreaterThan(40);
+      expect(launch.openLabel).toMatch(/guided chat|Try in chat/i);
+      expect(launch.orchestratorTool).toBeNull();
+    }
+  );
 
   it.each(CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS)(
     '%s uses a cardiology route with guided chat seed',
@@ -281,7 +337,11 @@ describe('resolveCatalogLaunch — Tier C orchestrator (registered executors onl
   });
 
   it('does not assign orchestrator for Tier B clinical calculators', () => {
-    for (const id of [...PR3_CALCULATOR_REGISTRY_IDS, ...PR6_CALCULATOR_REGISTRY_IDS, ...PR7_CALCULATOR_REGISTRY_IDS]) {
+    for (const id of [
+      ...PR3_CALCULATOR_REGISTRY_IDS,
+      ...PR6_CALCULATOR_REGISTRY_IDS,
+      ...PR7_CALCULATOR_REGISTRY_IDS,
+    ]) {
       expect(resolveCatalogLaunch(id).orchestratorTool).toBeNull();
     }
   });
@@ -305,18 +365,16 @@ describe('resolveCatalogLaunch — fleet Tier B dispatch hub', () => {
     expect(launch.orchestratorTool).toBeNull();
   });
 
-  it.each([
-    'dispatch',
-    'dispatch assistant',
-    'vehicle dispatch',
-    'fleet dispatch',
-  ])('alias "%s" resolves same dispatch-ai launch', (alias) => {
-    const fromAlias = resolveCatalogLaunch(alias);
-    const fromCanonical = resolveCatalogLaunch('dispatch-ai');
-    expect(fromAlias.registryId).toBe('dispatch-ai');
-    expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
-    expect(resolveNavigationPathForLaunch(fromAlias)).toBe('/assistant');
-  });
+  it.each(['dispatch', 'dispatch assistant', 'vehicle dispatch', 'fleet dispatch'])(
+    'alias "%s" resolves same dispatch-ai launch',
+    (alias) => {
+      const fromAlias = resolveCatalogLaunch(alias);
+      const fromCanonical = resolveCatalogLaunch('dispatch-ai');
+      expect(fromAlias.registryId).toBe('dispatch-ai');
+      expect(fromAlias.chatSeed).toBe(fromCanonical.chatSeed);
+      expect(resolveNavigationPathForLaunch(fromAlias)).toBe('/assistant');
+    }
+  );
 });
 
 describe('resolveCatalogLaunch — NLU alias resolution', () => {

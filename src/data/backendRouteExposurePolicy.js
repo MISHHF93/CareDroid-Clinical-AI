@@ -26,65 +26,241 @@ export const BACKEND_ROUTE_EXPOSURE_POLICY = Object.freeze({
   'GET /api/auth/saml': { strategy: 'deferred', reason: 'SSO placeholder' },
   'GET /api/auth/me': { strategy: 'deferred', reason: 'JWT introspection; SPA uses profile' },
 
-  'DELETE /api/auth/biometric/disable/:deviceId': { strategy: 'expose-recommended', reason: 'Device management', clientHint: 'BiometricSetup.jsx' },
-  'DELETE /api/auth/biometric/delete/:deviceId': { strategy: 'expose-recommended', reason: 'Device management', clientHint: 'BiometricSetup.jsx' },
-  'GET /api/auth/biometric/available': { strategy: 'expose-recommended', reason: 'Capability probe', clientHint: 'BiometricSetup.jsx' },
+  'DELETE /api/auth/biometric/disable/:deviceId': {
+    strategy: 'expose-recommended',
+    reason: 'Device management',
+    clientHint: 'BiometricSetup.jsx',
+  },
+  'DELETE /api/auth/biometric/delete/:deviceId': {
+    strategy: 'expose-recommended',
+    reason: 'Device management',
+    clientHint: 'BiometricSetup.jsx',
+  },
+  'GET /api/auth/biometric/available': {
+    strategy: 'expose-recommended',
+    reason: 'Capability probe',
+    clientHint: 'BiometricSetup.jsx',
+  },
 
-  'PATCH /api/users/profile': { strategy: 'expose-recommended', reason: 'Profile edit', clientHint: 'UserContext.jsx' },
-  'POST /api/two-factor/verify': { strategy: 'backend-only', reason: 'Used during login challenge' },
+  'PATCH /api/users/profile': {
+    strategy: 'expose-recommended',
+    reason: 'Profile edit',
+    clientHint: 'UserContext.jsx',
+  },
+  'POST /api/two-factor/verify': {
+    strategy: 'backend-only',
+    reason: 'Used during login challenge',
+  },
 
-  'GET /api/subscriptions/config': { strategy: 'deferred', reason: 'Stripe config for checkout UI' },
-  'POST /api/subscriptions/create-checkout': { strategy: 'expose-recommended', reason: 'Billing', clientHint: 'configService / settings' },
-  'POST /api/subscriptions/portal': { strategy: 'expose-recommended', reason: 'Billing portal', clientHint: 'configService / settings' },
+  'GET /api/workspaces/:workspaceId': {
+    strategy: 'deferred',
+    reason: 'Workspace detail route for future workspace settings',
+  },
+  'GET /api/workspaces/:workspaceId/members': {
+    strategy: 'deferred',
+    reason: 'Workspace member management surface pending',
+  },
+  'POST /api/workspaces/:workspaceId/invitations': {
+    strategy: 'deferred',
+    reason: 'Workspace invitation UX pending',
+  },
+  'GET /api/workspaces/:workspaceId/tools': {
+    strategy: 'deferred',
+    reason: 'Workspace tool preferences currently use aggregate settings',
+  },
+  'PATCH /api/workspaces/:workspaceId/tools': {
+    strategy: 'deferred',
+    reason: 'Workspace tool preference editor pending',
+  },
+
+  'GET /api/activity/me': { strategy: 'deferred', reason: 'Profile activity dashboard pending' },
+  'GET /api/activity/me/summary': {
+    strategy: 'deferred',
+    reason: 'Profile activity summary pending',
+  },
+  'GET /api/activity/workspaces/:workspaceId': {
+    strategy: 'deferred',
+    reason: 'Workspace activity surface pending',
+  },
+
+  'GET /api/personalization/me/recommendations': {
+    strategy: 'deferred',
+    reason: 'Personalization recommendations UI pending',
+  },
+  'DELETE /api/personalization/me/saved-prompts/:promptId': {
+    strategy: 'deferred',
+    reason: 'Saved prompt deletion UI pending',
+  },
+
+  'GET /api/subscriptions/config': {
+    strategy: 'deferred',
+    reason: 'Stripe config for checkout UI',
+  },
+  'POST /api/subscriptions/create-checkout': {
+    strategy: 'expose-recommended',
+    reason: 'Billing',
+    clientHint: 'configService / settings',
+  },
+  'POST /api/subscriptions/portal': {
+    strategy: 'expose-recommended',
+    reason: 'Billing portal',
+    clientHint: 'configService / settings',
+  },
   'POST /api/subscriptions/webhook': { strategy: 'backend-only', reason: 'Stripe webhook' },
 
   'POST /api/chat/message-3d': { strategy: 'deferred', reason: '3D avatar experiment' },
-  'POST /api/chat/suggest-action': { strategy: 'expose-recommended', reason: 'Dashboard next-step', clientHint: 'clinicalChatService.js' },
-  'POST /api/chat/analyze-vitals': { strategy: 'expose-recommended', reason: 'Vitals widgets', clientHint: 'clinicalChatService.js' },
+  'POST /api/chat/suggest-action': {
+    strategy: 'expose-recommended',
+    reason: 'Dashboard next-step',
+    clientHint: 'clinicalChatService.js',
+  },
+  'POST /api/chat/analyze-vitals': {
+    strategy: 'expose-recommended',
+    reason: 'Vitals widgets',
+    clientHint: 'clinicalChatService.js',
+  },
 
-  'GET /api/tools/statistics': { strategy: 'expose-recommended', reason: 'Usage analytics', clientHint: 'clinicalToolsApi.js' },
-  'GET /api/tools/catalog/executors': { strategy: 'expose-recommended', reason: 'Catalog executor panel', clientHint: 'clinicalToolsApi.js' },
-  'GET /api/tools/:id': { strategy: 'expose-recommended', reason: 'Tool metadata / schema', clientHint: 'clinicalToolsApi.js' },
-  'POST /api/tools/:id/validate': { strategy: 'expose-recommended', reason: 'Pre-execute validation', clientHint: 'clinicalOrchestratorApi.js' },
-  'POST /api/tools/execute': { strategy: 'deferred', reason: 'Batch execute; UI uses per-id execute' },
+  'GET /api/tools/statistics': {
+    strategy: 'expose-recommended',
+    reason: 'Usage analytics',
+    clientHint: 'clinicalToolsApi.js',
+  },
+  'GET /api/tools/catalog/executors': {
+    strategy: 'expose-recommended',
+    reason: 'Catalog executor panel',
+    clientHint: 'clinicalToolsApi.js',
+  },
+  'GET /api/tools/:id': {
+    strategy: 'expose-recommended',
+    reason: 'Tool metadata / schema',
+    clientHint: 'clinicalToolsApi.js',
+  },
+  'POST /api/tools/:id/validate': {
+    strategy: 'expose-recommended',
+    reason: 'Pre-execute validation',
+    clientHint: 'clinicalOrchestratorApi.js',
+  },
+  'POST /api/tools/execute': {
+    strategy: 'deferred',
+    reason: 'Batch execute; UI uses per-id execute',
+  },
 
-  'GET /api/memory/short': { strategy: 'deferred', reason: 'Memory dashboard uses aggregate route' },
+  'GET /api/memory/short': {
+    strategy: 'deferred',
+    reason: 'Memory dashboard uses aggregate route',
+  },
   'GET /api/memory/long': { strategy: 'deferred', reason: 'Memory dashboard uses aggregate route' },
-  'GET /api/memory/clinical': { strategy: 'deferred', reason: 'Memory dashboard uses aggregate route' },
+  'GET /api/memory/clinical': {
+    strategy: 'deferred',
+    reason: 'Memory dashboard uses aggregate route',
+  },
 
-  'POST /api/artifacts': { strategy: 'deferred', reason: 'Artifact authoring is not exposed in dashboard yet' },
-  'GET /api/artifacts/:id': { strategy: 'deferred', reason: 'Artifact detail route is not linked yet' },
-  'PATCH /api/artifacts/:id': { strategy: 'deferred', reason: 'Artifact editing is not exposed in dashboard yet' },
+  'POST /api/artifacts': {
+    strategy: 'deferred',
+    reason: 'Artifact authoring is not exposed in dashboard yet',
+  },
+  'GET /api/artifacts/:id': {
+    strategy: 'deferred',
+    reason: 'Artifact detail route is not linked yet',
+  },
+  'PATCH /api/artifacts/:id': {
+    strategy: 'deferred',
+    reason: 'Artifact editing is not exposed in dashboard yet',
+  },
 
-  'POST /api/tool-calling/execute': { strategy: 'deferred', reason: 'Chat delegates server-side; direct UI not exposed yet' },
-  'GET /api/tool-calling/catalog': { strategy: 'deferred', reason: 'Internal tool-calling contract catalog' },
-  'GET /api/tool-calling/resolve': { strategy: 'deferred', reason: 'Server-side catalog launch helper' },
+  'POST /api/tool-calling/execute': {
+    strategy: 'deferred',
+    reason: 'Chat delegates server-side; direct UI not exposed yet',
+  },
+  'GET /api/tool-calling/catalog': {
+    strategy: 'deferred',
+    reason: 'Internal tool-calling contract catalog',
+  },
+  'GET /api/tool-calling/resolve': {
+    strategy: 'deferred',
+    reason: 'Server-side catalog launch helper',
+  },
   'GET /api/tool-calling/logs': { strategy: 'deferred', reason: 'Operational debugging endpoint' },
 
-  'GET /api/drugs/categories': { strategy: 'expose-recommended', reason: 'Drug reference', clientHint: 'clinicalContentApi.js' },
-  'GET /api/drugs/:id': { strategy: 'expose-recommended', reason: 'Drug detail', clientHint: 'clinicalContentApi.js' },
+  'POST /api/cost-optimizer/route': {
+    strategy: 'backend-only',
+    reason:
+      'Assistant lifecycle invokes route optimization server-side before model/tool execution',
+  },
+
+  'GET /api/evaluation/metrics': {
+    strategy: 'deferred',
+    reason:
+      'Evaluation dashboard currently receives metric definitions from aggregate dashboard payload',
+  },
+  'GET /api/evaluation/runs': {
+    strategy: 'deferred',
+    reason: 'Evaluation dashboard currently reads recent runs from aggregate dashboard payload',
+  },
+
+  'GET /api/drugs/categories': {
+    strategy: 'expose-recommended',
+    reason: 'Drug reference',
+    clientHint: 'clinicalContentApi.js',
+  },
+  'GET /api/drugs/:id': {
+    strategy: 'expose-recommended',
+    reason: 'Drug detail',
+    clientHint: 'clinicalContentApi.js',
+  },
   'POST /api/drugs': { strategy: 'deferred', reason: 'Admin content API' },
   'PUT /api/drugs/:id': { strategy: 'deferred', reason: 'Admin content API' },
   'DELETE /api/drugs/:id': { strategy: 'deferred', reason: 'Admin content API' },
 
-  'GET /api/protocols/:id': { strategy: 'expose-recommended', reason: 'Protocol detail', clientHint: 'Protocols.jsx' },
+  'GET /api/protocols/:id': {
+    strategy: 'expose-recommended',
+    reason: 'Protocol detail',
+    clientHint: 'Protocols.jsx',
+  },
   'POST /api/protocols': { strategy: 'deferred', reason: 'Admin content API' },
   'PUT /api/protocols/:id': { strategy: 'deferred', reason: 'Admin content API' },
   'DELETE /api/protocols/:id': { strategy: 'deferred', reason: 'Admin content API' },
 
-  'GET /api/audit/my-logs': { strategy: 'expose-recommended', reason: 'User activity', clientHint: 'profile / AuditLogs.jsx' },
+  'GET /api/audit/my-logs': {
+    strategy: 'expose-recommended',
+    reason: 'User activity',
+    clientHint: 'profile / AuditLogs.jsx',
+  },
   'GET /api/audit/phi-access': { strategy: 'deferred', reason: 'Compliance officer view' },
 
-  'POST /api/compliance/export': { strategy: 'expose-recommended', reason: 'GDPR export', clientHint: 'complianceApi.js' },
-  'DELETE /api/compliance/delete-account': { strategy: 'expose-recommended', reason: 'Account deletion', clientHint: 'complianceApi.js' },
+  'POST /api/compliance/export': {
+    strategy: 'expose-recommended',
+    reason: 'GDPR export',
+    clientHint: 'complianceApi.js',
+  },
+  'DELETE /api/compliance/delete-account': {
+    strategy: 'expose-recommended',
+    reason: 'Account deletion',
+    clientHint: 'complianceApi.js',
+  },
 
   'GET /api/notifications/devices': { strategy: 'deferred', reason: 'Device list admin' },
   'DELETE /api/notifications/devices/:token': { strategy: 'deferred', reason: 'Unregister device' },
-  'POST /api/notifications/preferences/toggle-all': { strategy: 'expose-recommended', reason: 'Settings UX', clientHint: 'NotificationService.js' },
-  'GET /api/notifications/unread/count': { strategy: 'expose-recommended', reason: 'Badge count', clientHint: 'NotificationService.js' },
-  'POST /api/notifications/read-all': { strategy: 'expose-recommended', reason: 'Inbox UX', clientHint: 'NotificationService.js' },
+  'POST /api/notifications/preferences/toggle-all': {
+    strategy: 'expose-recommended',
+    reason: 'Settings UX',
+    clientHint: 'NotificationService.js',
+  },
+  'GET /api/notifications/unread/count': {
+    strategy: 'expose-recommended',
+    reason: 'Badge count',
+    clientHint: 'NotificationService.js',
+  },
+  'POST /api/notifications/read-all': {
+    strategy: 'expose-recommended',
+    reason: 'Inbox UX',
+    clientHint: 'NotificationService.js',
+  },
 
-  'POST /api/health': { strategy: 'backend-only', reason: 'Client health ping (distinct from GET /health)' },
+  'POST /api/health': {
+    strategy: 'backend-only',
+    reason: 'Client health ping (distinct from GET /health)',
+  },
 
   'POST /api/ai/query': { strategy: 'backend-only', reason: 'Invoked via chat pipeline' },
   'POST /api/ai/structured': { strategy: 'backend-only', reason: 'Invoked via chat pipeline' },
@@ -102,8 +278,8 @@ export function routePolicyKey(method, path) {
  */
 export function getBackendOnlyRoutes() {
   const wiredPaths = new Set(
-    FRONTEND_API_CALLS.filter((c) => findBackendRoute(c.method, c.path)).map(
-      (c) => routePolicyKey(c.method, findBackendRoute(c.method, c.path).path)
+    FRONTEND_API_CALLS.filter((c) => findBackendRoute(c.method, c.path)).map((c) =>
+      routePolicyKey(c.method, findBackendRoute(c.method, c.path).path)
     )
   );
 
@@ -125,9 +301,7 @@ export function getBackendRouteExposureGaps() {
   for (const key of Object.keys(BACKEND_ROUTE_EXPOSURE_POLICY)) {
     const [method, ...pathParts] = key.split(' ');
     const path = pathParts.join(' ');
-    const inInventory = BACKEND_HTTP_ROUTES.some(
-      (r) => r.method === method && r.path === path
-    );
+    const inInventory = BACKEND_HTTP_ROUTES.some((r) => r.method === method && r.path === path);
     if (!inInventory) {
       gaps.push({ key, issue: 'stale-policy' });
     }

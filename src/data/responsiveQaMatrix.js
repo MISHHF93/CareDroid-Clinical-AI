@@ -15,6 +15,7 @@ import {
   FLEET_TIER_B_CHAT_REGISTRY_IDS,
   REGISTRY,
 } from './clinicalToolIdContract.js';
+import { toolRegistryById } from './toolRegistry.js';
 import { MOBILE_FIRST_BREAKPOINTS } from '../layout/breakpoints.js';
 
 /** @typedef {{ id: string, width: number, height: number, label: string, tier?: string }} ResponsiveQaViewport */
@@ -202,8 +203,7 @@ const TIER_C_PAGE_PATH_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.insulinTrendEngine]: '/tools/endocrine/insulin-trend-engine',
   [REGISTRY.endocrineMonitoringSystem]: '/tools/endocrine/endocrine-monitoring-system',
   [REGISTRY.metabolicAnalytics]: '/tools/endocrine/metabolic-analytics',
-  [REGISTRY.continuousGlucoseCommandCenter]:
-    '/tools/endocrine/continuous-glucose-command-center',
+  [REGISTRY.continuousGlucoseCommandCenter]: '/tools/endocrine/continuous-glucose-command-center',
   [REGISTRY.neuroTelemetryDashboard]: '/tools/neurology/neuro-telemetry-dashboard',
   [REGISTRY.strokeCommandCenter]: '/tools/neurology/stroke-command-center',
   [REGISTRY.neuroMonitoringEngine]: '/tools/neurology/neuro-monitoring-engine',
@@ -328,6 +328,12 @@ export function buildResponsiveQaPages() {
       registryId: REGISTRY.deviceFleetManagement,
     },
     {
+      id: 'clinical-alerts',
+      label: 'Clinical Alerts',
+      path: '/clinical/alerts',
+      category: 'core',
+    },
+    {
       id: 'tools-catalog',
       label: 'Developer Catalog / Source Audit',
       path: '/tools/catalog',
@@ -338,6 +344,48 @@ export function buildResponsiveQaPages() {
       label: 'Calculators hub (Tier B launch surface)',
       path: TIER_B_LAUNCH_PATH,
       category: 'core',
+    },
+    {
+      id: 'artifacts',
+      label: 'CareDroid Artifacts',
+      path: '/artifacts',
+      category: 'ai-system',
+      registryId: REGISTRY.aiArtifacts,
+    },
+    {
+      id: 'memory',
+      label: 'AI Memory Dashboard',
+      path: '/memory',
+      category: 'ai-system',
+      registryId: REGISTRY.aiMemory,
+    },
+    {
+      id: 'training',
+      label: 'AI Training Dashboard',
+      path: '/training',
+      category: 'ai-system',
+      registryId: REGISTRY.aiTraining,
+    },
+    {
+      id: 'costs',
+      label: 'AI Cost Optimization',
+      path: '/costs',
+      category: 'ai-system',
+      registryId: REGISTRY.aiCostOptimization,
+    },
+    {
+      id: 'ai-evaluation',
+      label: 'AI Evaluation',
+      path: '/ai/evaluation',
+      category: 'ai-system',
+      registryId: REGISTRY.aiEvaluation,
+    },
+    {
+      id: 'ai-command-center',
+      label: 'AI Command Center',
+      path: '/ai-command-center',
+      category: 'ai-system',
+      registryId: REGISTRY.aiCommandCenter,
     },
     {
       id: 'integrations-platform',
@@ -372,10 +420,10 @@ export function buildResponsiveQaPages() {
   ];
 
   for (const registryId of CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS) {
-    const path = TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID[registryId];
-    if (!path) {
-      throw new Error(`responsiveQaMatrix: missing Tier A path for ${registryId}`);
-    }
+    const path =
+      TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID[registryId] ||
+      toolRegistryById[registryId]?.path ||
+      `/tools/calculators/${registryId}`;
     pages.push({
       id: `tier-a-${registryId}`,
       label: `Tier A: ${registryId}`,
@@ -400,7 +448,8 @@ export function buildResponsiveQaPages() {
   }
 
   for (const registryId of CLINICAL_AI_PAGE_REGISTRY_IDS) {
-    const path = CLINICAL_AI_PAGE_PATH_BY_REGISTRY_ID[registryId];
+    const path =
+      CLINICAL_AI_PAGE_PATH_BY_REGISTRY_ID[registryId] || toolRegistryById[registryId]?.path;
     if (!path) {
       throw new Error(`responsiveQaMatrix: missing clinical AI page path for ${registryId}`);
     }
@@ -414,7 +463,7 @@ export function buildResponsiveQaPages() {
   }
 
   for (const registryId of CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS) {
-    const path = TIER_C_PAGE_PATH_BY_REGISTRY_ID[registryId];
+    const path = TIER_C_PAGE_PATH_BY_REGISTRY_ID[registryId] || toolRegistryById[registryId]?.path;
     if (!path) {
       throw new Error(`responsiveQaMatrix: missing Tier C path for ${registryId}`);
     }
@@ -431,9 +480,7 @@ export function buildResponsiveQaPages() {
 
   for (const registryId of HOSPITAL_OPERATIONS_REGISTRY_IDS) {
     const path =
-      registryId === REGISTRY.deviceBatteryIntelligence
-        ? '/medical-iot'
-        : '/hospital-map';
+      registryId === REGISTRY.deviceBatteryIntelligence ? '/medical-iot' : '/hospital-map';
     pages.push({
       id: `hospital-ops-${registryId}`,
       label: `Hospital operations: ${registryId}`,
@@ -499,9 +546,7 @@ export function formatResponsiveQaMatrixMarkdown() {
     '',
     '| ID | Category | Path | Label |',
     '| --- | --- | --- | --- |',
-    ...RESPONSIVE_QA_PAGES.map(
-      (p) => `| ${p.id} | ${p.category} | \`${p.path}\` | ${p.label} |`
-    ),
+    ...RESPONSIVE_QA_PAGES.map((p) => `| ${p.id} | ${p.category} | \`${p.path}\` | ${p.label} |`),
     '',
     '## Rules',
     '',

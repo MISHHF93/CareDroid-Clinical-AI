@@ -48,6 +48,7 @@ const Artifacts = lazyWithRetry(() => import('./pages/Artifacts'));
 const MemoryDashboard = lazyWithRetry(() => import('./pages/MemoryDashboard'));
 const TrainingDashboard = lazyWithRetry(() => import('./pages/TrainingDashboard'));
 const AiEvaluationDashboard = lazyWithRetry(() => import('./pages/AiEvaluationDashboard'));
+const AiCommandCenterDashboard = lazyWithRetry(() => import('./pages/AiCommandCenterDashboard'));
 const LiveTrackingMap = lazyWithRetry(() => import('./pages/LiveTrackingMap'));
 const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
 const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
@@ -743,6 +744,16 @@ function AppRoutes() {
       element: (
         <AppShellPage>
           <AiEvaluationDashboard />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/ai-command-center',
+      element: (
+        <AppShellPage>
+          <AiCommandCenterDashboard />
         </AppShellPage>
       ),
       requiresAuth: true,

@@ -25,13 +25,20 @@
  */
 
 /** Bump when registry/NLU lists or maps change incompatibly. */
-export const TOOL_ID_CONTRACT_VERSION = '1.16.0';
+export const TOOL_ID_CONTRACT_VERSION = '1.17.0';
 
 /** Shared SPA paths for tool launch (browser-safe). */
 export const TOOL_LAUNCH_PATHS = Object.freeze({
   toolsOverview: '/tools',
   toolsCatalog: '/tools/catalog',
   calculatorsHub: '/tools/calculators',
+  assistant: '/assistant',
+  artifacts: '/artifacts',
+  memory: '/memory',
+  training: '/training',
+  costs: '/costs',
+  aiEvaluation: '/ai/evaluation',
+  aiCommandCenter: '/ai-command-center',
   liveTrackingMap: '/live-map',
   hospitalMap: '/hospital-map',
   medicalIot: '/medical-iot',
@@ -232,6 +239,16 @@ export const REGISTRY = Object.freeze({
   arrhythmiaRiskClassifier: 'arrhythmia-risk-classifier',
   remoteCardiologyMonitoringDashboard: 'remote-cardiology-monitoring-dashboard',
   cardiologyCommandCenter: 'cardiology-command-center',
+  aiGateway: 'ai-gateway',
+  moeRouter: 'moe-router',
+  aiRag: 'ai-rag',
+  aiArtifacts: 'ai-artifacts',
+  aiMemory: 'ai-memory',
+  aiToolCalling: 'ai-tool-calling',
+  aiTraining: 'ai-training',
+  aiCostOptimization: 'ai-cost-optimization',
+  aiEvaluation: 'ai-evaluation',
+  aiCommandCenter: 'ai-command-center',
   guidelineRag: 'guideline-rag',
   differentialAi: 'differential-ai',
   timelineAi: 'timeline-ai',
@@ -455,6 +472,16 @@ export const NLU = Object.freeze({
   arrhythmiaRiskClassifier: 'arrhythmia-risk-classifier',
   remoteCardiologyMonitoringDashboard: 'remote-cardiology-monitoring-dashboard',
   cardiologyCommandCenter: 'cardiology-command-center',
+  aiGateway: 'ai-gateway',
+  moeRouter: 'moe-router',
+  aiRag: 'ai-rag',
+  aiArtifacts: 'ai-artifacts',
+  aiMemory: 'ai-memory',
+  aiToolCalling: 'ai-tool-calling',
+  aiTraining: 'ai-training',
+  aiCostOptimization: 'ai-cost-optimization',
+  aiEvaluation: 'ai-evaluation',
+  aiCommandCenter: 'ai-command-center',
 });
 
 /** Built-in calculator UI slugs (`Calculators.jsx`, `?calc=`). */
@@ -886,9 +913,7 @@ export const CLINICAL_TIER_B_CHAT_REGISTRY_IDS = Object.freeze([
 ]);
 
 /** NLU hub chat tools with dedicated sidebar registry rows (guided chat from calculators hub). */
-export const CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS = Object.freeze([
-  NLU.wellsDvtCalculator,
-]);
+export const CLINICAL_NLU_HUB_CHAT_REGISTRY_IDS = Object.freeze([NLU.wellsDvtCalculator]);
 
 export const PR2_CALCULATOR_REGISTRY_IDS = Object.freeze([
   ...PR2_TIER_A_CALCULATOR_REGISTRY_IDS,
@@ -973,6 +998,19 @@ export const CLINICAL_AI_PAGE_REGISTRY_IDS = Object.freeze([
   REGISTRY.antibioticGuide,
   REGISTRY.procedures,
   REGISTRY.calculatorRecommenderAi,
+]);
+
+export const AI_SYSTEM_REGISTRY_IDS = Object.freeze([
+  REGISTRY.aiGateway,
+  REGISTRY.moeRouter,
+  REGISTRY.aiRag,
+  REGISTRY.aiArtifacts,
+  REGISTRY.aiMemory,
+  REGISTRY.aiToolCalling,
+  REGISTRY.aiTraining,
+  REGISTRY.aiCostOptimization,
+  REGISTRY.aiEvaluation,
+  REGISTRY.aiCommandCenter,
 ]);
 
 export const PEDIATRICS_OBGYN_TIER_C_WORKFLOW_REGISTRY_IDS = Object.freeze([
@@ -1151,17 +1189,12 @@ export const MEDICAL_EXPANSION_CATEGORY_PACKS = Object.freeze([
  * Registry tools with NLU/chat coverage via backend keywords but no `clinicalIntentTools` row
  * (e.g. legacy eGFR/BMI/SOFA keyword routing).
  */
-export const KEYWORD_ROUTED_REGISTRY_IDS = Object.freeze([
-  REGISTRY.calcGfr,
-  REGISTRY.calcBmi,
-]);
+export const KEYWORD_ROUTED_REGISTRY_IDS = Object.freeze([REGISTRY.calcGfr, REGISTRY.calcBmi]);
 
 /**
  * NLU profiles that route to the calculators hub (chat-assisted; dedicated sidebar registry rows).
  */
-export const NLU_HUB_ONLY_PROFILE_TOOL_IDS = Object.freeze([
-  NLU.wellsDvtCalculator,
-]);
+export const NLU_HUB_ONLY_PROFILE_TOOL_IDS = Object.freeze([NLU.wellsDvtCalculator]);
 
 /**
  * Primary NLU tool ids shipped in `clinicalIntentTools` + backend `tool.patterns.ts`.
@@ -1360,6 +1393,16 @@ export const NLU_PROFILE_TOOL_IDS = Object.freeze([
   NLU.arrhythmiaRiskClassifier,
   NLU.remoteCardiologyMonitoringDashboard,
   NLU.cardiologyCommandCenter,
+  NLU.aiGateway,
+  NLU.moeRouter,
+  NLU.aiRag,
+  NLU.aiArtifacts,
+  NLU.aiMemory,
+  NLU.aiToolCalling,
+  NLU.aiTraining,
+  NLU.aiCostOptimization,
+  NLU.aiEvaluation,
+  NLU.aiCommandCenter,
 ]);
 
 export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
@@ -1645,6 +1688,16 @@ export const ORCHESTRATOR_TO_REGISTRY_ID = Object.freeze({
   [NLU.arrhythmiaRiskClassifier]: REGISTRY.arrhythmiaRiskClassifier,
   [NLU.remoteCardiologyMonitoringDashboard]: REGISTRY.remoteCardiologyMonitoringDashboard,
   [NLU.cardiologyCommandCenter]: REGISTRY.cardiologyCommandCenter,
+  [NLU.aiGateway]: REGISTRY.aiGateway,
+  [NLU.moeRouter]: REGISTRY.moeRouter,
+  [NLU.aiRag]: REGISTRY.aiRag,
+  [NLU.aiArtifacts]: REGISTRY.aiArtifacts,
+  [NLU.aiMemory]: REGISTRY.aiMemory,
+  [NLU.aiToolCalling]: REGISTRY.aiToolCalling,
+  [NLU.aiTraining]: REGISTRY.aiTraining,
+  [NLU.aiCostOptimization]: REGISTRY.aiCostOptimization,
+  [NLU.aiEvaluation]: REGISTRY.aiEvaluation,
+  [NLU.aiCommandCenter]: REGISTRY.aiCommandCenter,
 });
 
 /**
@@ -1679,6 +1732,7 @@ export const AI_EXECUTABLE_NLU_TOOL_IDS = Object.freeze([
  * Disjoint registry groups union to `ALL_REGISTRY_TOOL_IDS`; NLU-only ids are separate.
  */
 export const CANONICAL_TOOL_GROUPS = Object.freeze({
+  aiSystems: AI_SYSTEM_REGISTRY_IDS,
   aiOperationsPages: CLINICAL_AI_PAGE_REGISTRY_IDS,
   clinicalTierCWorkflows: CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS,
   clinicalCalculatorsTierA: CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS,
@@ -1700,6 +1754,7 @@ export const CANONICAL_TOOL_GROUPS = Object.freeze({
 
 /** Every `toolRegistry.js` id — must match registry file exactly (drift tests). */
 export const ALL_REGISTRY_TOOL_IDS = Object.freeze([
+  ...CANONICAL_TOOL_GROUPS.aiSystems,
   ...CANONICAL_TOOL_GROUPS.aiOperationsPages,
   ...CANONICAL_TOOL_GROUPS.clinicalTierCWorkflows,
   ...CANONICAL_TOOL_GROUPS.clinicalCalculatorsTierA,
@@ -2064,7 +2119,7 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'anion gap': REGISTRY.anionGap,
   'anion gap calculator': REGISTRY.anionGap,
   'albumin corrected anion gap': REGISTRY.anionGap,
-  'rass': REGISTRY.rass,
+  rass: REGISTRY.rass,
   'rass score': REGISTRY.rass,
   'richmond agitation sedation scale': REGISTRY.rass,
   'sedation agitation score': REGISTRY.rass,
@@ -2139,7 +2194,7 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'creatinine clearance cg': REGISTRY.creatinineClearanceCg,
   'cockcroft gault': REGISTRY.creatinineClearanceCg,
   'cockcroft-gault': REGISTRY.creatinineClearanceCg,
-  'crcl': REGISTRY.creatinineClearanceCg,
+  crcl: REGISTRY.creatinineClearanceCg,
   fena: REGISTRY.fena,
   'fractional excretion sodium': REGISTRY.fena,
   'fractional-excretion-sodium': REGISTRY.fena,
@@ -2442,6 +2497,36 @@ export const NLU_TO_REGISTRY_ID = Object.freeze({
   'cardiology monitoring dashboard': REGISTRY.remoteCardiologyMonitoringDashboard,
   'cardiology command center': REGISTRY.cardiologyCommandCenter,
   'cardiology-command-center': REGISTRY.cardiologyCommandCenter,
+  'ai gateway': REGISTRY.aiGateway,
+  'ai-gateway': REGISTRY.aiGateway,
+  gateway: REGISTRY.aiGateway,
+  'moe router': REGISTRY.moeRouter,
+  'moe-router': REGISTRY.moeRouter,
+  router: REGISTRY.moeRouter,
+  'rag system': REGISTRY.aiRag,
+  'rag-system': REGISTRY.aiRag,
+  rag: REGISTRY.aiRag,
+  'ai artifacts': REGISTRY.aiArtifacts,
+  'ai-artifacts': REGISTRY.aiArtifacts,
+  artifacts: REGISTRY.aiArtifacts,
+  'ai memory': REGISTRY.aiMemory,
+  'ai-memory': REGISTRY.aiMemory,
+  memory: REGISTRY.aiMemory,
+  'tool calling': REGISTRY.aiToolCalling,
+  'tool-calling': REGISTRY.aiToolCalling,
+  'ai tool calling': REGISTRY.aiToolCalling,
+  training: REGISTRY.aiTraining,
+  'ai training': REGISTRY.aiTraining,
+  'training pipeline': REGISTRY.aiTraining,
+  costs: REGISTRY.aiCostOptimization,
+  'cost optimization': REGISTRY.aiCostOptimization,
+  'cost optimizer': REGISTRY.aiCostOptimization,
+  evaluation: REGISTRY.aiEvaluation,
+  'ai evaluation': REGISTRY.aiEvaluation,
+  'evaluation framework': REGISTRY.aiEvaluation,
+  'command center': REGISTRY.aiCommandCenter,
+  'ai command center': REGISTRY.aiCommandCenter,
+  'ai-command-center': REGISTRY.aiCommandCenter,
   'copd-gold': REGISTRY.copdGold,
   'gold copd': REGISTRY.copdGold,
   'gold-copd': REGISTRY.copdGold,

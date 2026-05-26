@@ -9,7 +9,12 @@ import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes.js';
 
 /** Core and fleet paths rendered in route smoke tests. */
 export const CORE_ROUTE_SMOKE = Object.freeze([
-  { id: 'dashboard', path: '/dashboard', match: 'heading', heading: /caredroid command dashboard/i },
+  {
+    id: 'dashboard',
+    path: '/dashboard',
+    match: 'heading',
+    heading: /caredroid command dashboard/i,
+  },
   { id: 'assistant', path: '/assistant', match: 'composer' },
   { id: 'operations', path: '/operations', match: 'heading', heading: /^operations$/i },
   { id: 'tools-overview', path: '/tools', match: 'heading', heading: /^tool library$/i },
@@ -17,9 +22,24 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'hospital-map', path: '/hospital-map', match: 'heading', heading: /^hospital map$/i },
   { id: 'medical-iot', path: '/medical-iot', match: 'heading', heading: /medical iot dashboard/i },
   { id: 'devices', path: '/devices', match: 'heading', heading: /device fleet management/i },
-  { id: 'clinical-alerts', path: '/clinical/alerts', match: 'heading', heading: /clinical alerts management/i },
-  { id: 'tools-catalog', path: '/tools/catalog', match: 'heading', heading: /developer catalog \/ source audit/i },
-  { id: 'calculators-hub', path: '/tools/calculators', match: 'heading', heading: /medical calculators/i },
+  {
+    id: 'clinical-alerts',
+    path: '/clinical/alerts',
+    match: 'heading',
+    heading: /clinical alerts management/i,
+  },
+  {
+    id: 'tools-catalog',
+    path: '/tools/catalog',
+    match: 'heading',
+    heading: /developer catalog \/ source audit/i,
+  },
+  {
+    id: 'calculators-hub',
+    path: '/tools/calculators',
+    match: 'heading',
+    heading: /medical calculators/i,
+  },
   {
     id: 'ambient-scribe',
     path: '/tools/ambient-scribe',
@@ -74,6 +94,17 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     match: 'heading',
     heading: /clinical audit/i,
   },
+  { id: 'artifacts', path: '/artifacts', match: 'heading', heading: /caredroid artifacts/i },
+  { id: 'memory', path: '/memory', match: 'heading', heading: /memory dashboard/i },
+  { id: 'training', path: '/training', match: 'heading', heading: /training dashboard/i },
+  { id: 'costs', path: '/costs', match: 'heading', heading: /cost analytics/i },
+  { id: 'ai-evaluation', path: '/ai/evaluation', match: 'heading', heading: /^ai evaluation$/i },
+  {
+    id: 'ai-command-center',
+    path: '/ai-command-center',
+    match: 'heading',
+    heading: /^ai command center$/i,
+  },
   {
     id: 'integrations-platform',
     path: '/integrations',
@@ -126,7 +157,11 @@ export const TIER_A_FORM_SMOKE_SLUGS = Object.freeze([
   { slug: 'news2', registryId: 'news2', interfaceClass: 'calculator-interface--news2' },
   { slug: 'has-bled', registryId: 'has-bled', interfaceClass: 'calculator-interface--has-bled' },
   { slug: 'phq9', registryId: 'phq9', interfaceClass: 'calculator-interface--phq9' },
-  { slug: 'ascvd-risk', registryId: 'ascvd-risk', interfaceClass: 'calculator-interface--ascvd-risk' },
+  {
+    slug: 'ascvd-risk',
+    registryId: 'ascvd-risk',
+    interfaceClass: 'calculator-interface--ascvd-risk',
+  },
 ]);
 
 /** Every Tier-A path is registered in App routing. */

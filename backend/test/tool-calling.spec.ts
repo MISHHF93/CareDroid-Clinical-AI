@@ -18,6 +18,19 @@ import { RAGService } from '../src/modules/rag/rag.service';
 import { NluMetricsService } from '../src/modules/metrics/nlu-metrics.service';
 import { EmergencyEscalationService } from '../src/modules/medical-control-plane/emergency-escalation/emergency-escalation.service';
 import { CalculatorRecommenderService } from '../src/modules/chat/calculator-recommender.service';
+import {
+  AIGatewayService,
+  ContextBuilderService,
+  ResponseComposerService,
+} from '../src/modules/ai-gateway';
+import { MoERouterService } from '../src/modules/moe-router';
+import { ToolExecutionService } from '../src/modules/tool-calling/tool-execution.service';
+import { RoutingOptimizerService } from '../src/modules/cost-optimizer/routing-optimizer.service';
+import { ShortMemoryService } from '../src/modules/memory/short-memory.service';
+import { LongMemoryService } from '../src/modules/memory/long-memory.service';
+import { ClinicalMemoryService } from '../src/modules/memory/clinical-memory.service';
+import { ArtifactsService } from '../src/modules/artifacts/artifacts.service';
+import { EvaluationService } from '../src/modules/evaluation/evaluation.service';
 
 describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
   let aiService: AIService;
@@ -136,6 +149,129 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
           provide: CalculatorRecommenderService,
           useValue: {
             recommend: jest.fn().mockReturnValue({ recommendations: [] }),
+          },
+        },
+        {
+          provide: AIGatewayService,
+          useValue: {
+            createRunEnvelope: jest.fn().mockReturnValue({
+              runId: 'test-run-id',
+              capabilityId: 'assistant-chat',
+              policy: { phiAccessed: false },
+              trace: { startedAt: new Date().toISOString() },
+            }),
+            logRoutingAudit: jest.fn().mockResolvedValue(undefined),
+          },
+        },
+        {
+          provide: MoERouterService,
+          useValue: {
+            createRoutePlan: jest.fn().mockReturnValue({
+              primaryIntent: 'general',
+              selectedExpert: 'clinical',
+              selectedExperts: [{ expertId: 'clinical' }],
+              retrievalPolicy: 'optional',
+              confidence: 0.9,
+              routeScore: 0.9,
+              routeReason: 'test route',
+              routingMode: 'test',
+              fallbackApplied: false,
+              routingEvidence: [],
+              modelPlan: {},
+              toolPlan: {},
+              costPlan: { estimatedCost: 0.01, costReductionApplied: 0 },
+              safetyPlan: {
+                requiresHumanReview: false,
+                blockedActions: [],
+                emergencyEscalation: false,
+                crisisEscalation: false,
+              },
+            }),
+          },
+        },
+        {
+          provide: ContextBuilderService,
+          useValue: {
+            buildContextPacket: jest.fn().mockReturnValue({
+              pipeline: [],
+              sourceSurface: 'test',
+              memory: { persistence: 'test' },
+              inputSummary: { messageCharacters: 12 },
+              route: {
+                selectedExperts: [{ expertId: 'clinical' }],
+                routeScore: 0.9,
+                routingMode: 'test',
+              },
+            }),
+            toModelContext: jest.fn().mockReturnValue({}),
+          },
+        },
+        {
+          provide: ResponseComposerService,
+          useValue: {
+            compose: jest.fn(
+              (response, _envelope, _routePlan, _contextPacket, extraMetadata = {}) => ({
+                ...response,
+                metadata: { ...(response.metadata || {}), ...extraMetadata },
+              }),
+            ),
+          },
+        },
+        {
+          provide: ToolExecutionService,
+          useValue: {
+            execute: jest.fn().mockResolvedValue({
+              success: false,
+              status: 'unsupported',
+              text: 'Unsupported test tool',
+              executionLogs: [],
+            }),
+          },
+        },
+        {
+          provide: RoutingOptimizerService,
+          useValue: {
+            optimizeRequest: jest.fn().mockReturnValue({
+              routing: { model: 'test-model' },
+              costPrediction: { totalCostUsd: 0.01 },
+              cache: { hit: false },
+            }),
+          },
+        },
+        {
+          provide: ShortMemoryService,
+          useValue: {
+            getActiveContext: jest.fn().mockResolvedValue({}),
+            remember: jest.fn().mockResolvedValue({}),
+          },
+        },
+        {
+          provide: LongMemoryService,
+          useValue: {
+            getContext: jest
+              .fn()
+              .mockResolvedValue({ preferences: [], history: [], savedTools: [] }),
+          },
+        },
+        {
+          provide: ClinicalMemoryService,
+          useValue: {
+            getClinicalContext: jest
+              .fn()
+              .mockResolvedValue({ findings: [], summaries: [], scores: [] }),
+            record: jest.fn().mockResolvedValue({}),
+          },
+        },
+        {
+          provide: ArtifactsService,
+          useValue: {
+            create: jest.fn().mockResolvedValue({}),
+          },
+        },
+        {
+          provide: EvaluationService,
+          useValue: {
+            createRun: jest.fn().mockReturnValue({}),
           },
         },
       ],

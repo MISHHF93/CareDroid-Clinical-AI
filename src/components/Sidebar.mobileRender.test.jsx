@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import {
@@ -96,10 +96,14 @@ describe('Sidebar mobile render state', () => {
     expect(screen.getByRole('button', { name: /^tools$/i })).toBeInTheDocument();
     expect(screen.queryByText('Developer Catalog / Source Audit')).not.toBeInTheDocument();
     expect(screen.queryByText('Browse All Tools')).not.toBeInTheDocument();
+    const actionsToggle = screen.getByRole('button', { name: /actions/i });
+    if (actionsToggle.getAttribute('aria-expanded') === 'false') {
+      fireEvent.click(actionsToggle);
+    }
     const toolCards = container.querySelectorAll('.sidebar-tool-card');
     expect(toolCards.length).toBeGreaterThan(0);
-    expect(toolCards[0].querySelector('.sidebar-tool-card-name')?.textContent?.trim().length).toBeGreaterThan(
-      0
-    );
+    expect(
+      toolCards[0].querySelector('.sidebar-tool-card-name')?.textContent?.trim().length
+    ).toBeGreaterThan(0);
   });
 });

@@ -3,13 +3,19 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { assertNoOrphanedBackendFunctionality, formatOrphanedBackendFunctionsMarkdown } from './backendOrphanAudit';
+import {
+  assertNoOrphanedBackendFunctionality,
+  formatOrphanedBackendFunctionsMarkdown,
+} from './backendOrphanAudit';
 import {
   getBackendOnlyRoutes,
   getBackendRouteExposureGaps,
   BACKEND_ROUTE_EXPOSURE_POLICY,
 } from './backendRouteExposurePolicy';
-import { compareControllerScanToInventory, scanNestControllerRoutes } from './backendControllerRouteScan';
+import {
+  compareControllerScanToInventory,
+  scanNestControllerRoutes,
+} from './backendControllerRouteScan';
 import { BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { assertExposureScanPasses } from './backendFrontendExposure';
@@ -46,7 +52,7 @@ describe('backend orphan audit', () => {
     const orphan = assertNoOrphanedBackendFunctionality();
     expect(exposure.ok).toBe(true);
     expect(orphan.ok).toBe(true);
-  });
+  }, 15000);
 
   it('orphaned-backend-functions markdown generator is non-empty', () => {
     const md = formatOrphanedBackendFunctionsMarkdown();

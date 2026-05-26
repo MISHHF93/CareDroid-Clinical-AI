@@ -80,6 +80,156 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     category: 'calculator',
   },
   {
+    toolId: 'ai-gateway',
+    toolName: 'AI Gateway',
+    keywords: ['ai gateway', 'gateway envelope', 'assistant gateway', 'ai routing envelope'],
+    requiredParameters: [],
+    optionalParameters: ['message', 'feature', 'tool'],
+    description:
+      'Routes assistant requests through the AI gateway envelope with safety, trace, and response metadata',
+    category: 'reference',
+  },
+  {
+    toolId: 'moe-router',
+    toolName: 'MoE Router',
+    keywords: [
+      'moe router',
+      'mixture of experts',
+      'expert router',
+      'selected expert',
+      'ai route plan',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['message', 'intent', 'selected_expert'],
+    description:
+      'Explains expert routing, retrieval policy, fallback behavior, and human-review flags',
+    category: 'reference',
+  },
+  {
+    toolId: 'ai-rag',
+    toolName: 'RAG Evidence Engine',
+    keywords: [
+      'rag system',
+      'rag evidence',
+      'guideline rag',
+      'citations',
+      'source panel',
+      'retrieval quality',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['query', 'citations', 'sources'],
+    description:
+      'Routes evidence lookup through retrieval-augmented generation with citations and source metadata',
+    category: 'reference',
+  },
+  {
+    toolId: 'ai-artifacts',
+    toolName: 'AI Artifacts',
+    keywords: ['ai artifacts', 'assistant artifacts', 'saved ai outputs', 'artifact library'],
+    requiredParameters: [],
+    optionalParameters: ['artifact_id', 'type'],
+    description:
+      'Opens saved assistant outputs, workflow artifacts, templates, protocols, and reusable AI assets',
+    category: 'reference',
+  },
+  {
+    toolId: 'ai-memory',
+    toolName: 'AI Memory',
+    keywords: [
+      'ai memory',
+      'assistant memory',
+      'memory context',
+      'clinical memory',
+      'long memory',
+      'short memory',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['conversation_id', 'patient_id'],
+    description: 'Surfaces short, long, and clinical memory context used by assistant workflows',
+    category: 'reference',
+  },
+  {
+    toolId: 'ai-tool-calling',
+    toolName: 'AI Tool Calling',
+    keywords: [
+      'tool calling',
+      'ai tool calling',
+      'launch tool',
+      'tool execution context',
+      'tool resolver',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['tool_id', 'parameters'],
+    description:
+      'Launches guarded assistant tool workflows and returns structured context without fake executors',
+    category: 'reference',
+  },
+  {
+    toolId: 'ai-training',
+    toolName: 'AI Training Pipeline',
+    keywords: [
+      'ai training',
+      'training pipeline',
+      'moe plan',
+      'model training',
+      'training dashboard',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['dataset', 'model'],
+    description:
+      'Opens governed AI training and MoE planning dashboards for model improvement review',
+    category: 'reference',
+  },
+  {
+    toolId: 'ai-cost-optimization',
+    toolName: 'AI Cost Optimization',
+    keywords: [
+      'cost optimization',
+      'cost optimizer',
+      'ai costs',
+      'token spend',
+      'route cost',
+      'cache savings',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['route', 'model', 'cache'],
+    description:
+      'Opens cost optimizer context for route prediction, cache metrics, token spend, and savings',
+    category: 'reference',
+  },
+  {
+    toolId: 'ai-evaluation',
+    toolName: 'AI Evaluation',
+    keywords: [
+      'ai evaluation',
+      'evaluation framework',
+      'hallucination metrics',
+      'retrieval precision',
+      'tool success metrics',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['metric', 'benchmark'],
+    description:
+      'Opens AI evaluation metrics for hallucination, accuracy, latency, retrieval, tool success, satisfaction, and cost',
+    category: 'reference',
+  },
+  {
+    toolId: 'ai-command-center',
+    toolName: 'AI Command Center',
+    keywords: [
+      'ai command center',
+      'command center',
+      'ai health',
+      'active experts',
+      'ai operations dashboard',
+    ],
+    requiredParameters: [],
+    optionalParameters: ['panel', 'metric'],
+    description:
+      'Opens the unified AI operations dashboard for health, experts, RAG, memory, tools, costs, evaluation, and audits',
+    category: 'reference',
+  },
+  {
     toolId: 'ecg-interpretation-assistant',
     toolName: 'ECG Interpretation Assistant',
     keywords: [
@@ -93,8 +243,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     ],
     requiredParameters: [],
     optionalParameters: ['rhythm', 'rate', 'axis', 'intervals', 'st_t_changes', 'prior_ecg'],
-    description:
-      'Structured ECG interpretation support with urgent-pathway guardrails',
+    description: 'Structured ECG interpretation support with urgent-pathway guardrails',
     category: 'calculator',
   },
   {
@@ -110,8 +259,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     ],
     requiredParameters: [],
     optionalParameters: ['symptom_onset', 'ecg_time', 'stemi_equivalent', 'contraindications'],
-    description:
-      'STEMI pathway checklist support for emergency activation and handoff preparation',
+    description: 'STEMI pathway checklist support for emergency activation and handoff preparation',
     category: 'calculator',
   },
   {
@@ -212,7 +360,14 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'telemetry risk classifier',
     ],
     requiredParameters: [],
-    optionalParameters: ['rhythm', 'rate', 'duration', 'symptoms', 'hemodynamics', 'structural_heart_disease'],
+    optionalParameters: [
+      'rhythm',
+      'rate',
+      'duration',
+      'symptoms',
+      'hemodynamics',
+      'structural_heart_disease',
+    ],
     description:
       'Arrhythmia concern-level classifier using symptoms, telemetry, comorbidity context, and escalation signals',
     category: 'reference',
@@ -229,7 +384,13 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'cardiology alert queue',
     ],
     requiredParameters: [],
-    optionalParameters: ['symptoms', 'vitals', 'rhythm_alerts', 'missed_transmissions', 'device_flags'],
+    optionalParameters: [
+      'symptoms',
+      'vitals',
+      'rhythm_alerts',
+      'missed_transmissions',
+      'device_flags',
+    ],
     description:
       'Remote cardiology monitoring queue for symptoms, vitals, missed transmissions, alerts, and human triage documentation',
     category: 'reference',
@@ -246,7 +407,13 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'cardiac command center',
     ],
     requiredParameters: [],
-    optionalParameters: ['acs_queue', 'telemetry_alerts', 'remote_monitoring', 'bottlenecks', 'review_tasks'],
+    optionalParameters: [
+      'acs_queue',
+      'telemetry_alerts',
+      'remote_monitoring',
+      'bottlenecks',
+      'review_tasks',
+    ],
     description:
       'Cardiology operations command view for ACS queues, telemetry risk, remote monitoring alerts, and unresolved review items',
     category: 'reference',
@@ -495,8 +662,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
       'nsvt',
       'syncope',
     ],
-    description:
-      'HCM Risk-SCD 5-year sudden cardiac death risk context for specialist review',
+    description: 'HCM Risk-SCD 5-year sudden cardiac death risk context for specialist review',
     category: 'calculator',
   },
   {

@@ -12,6 +12,10 @@ import { CalculatorRecommenderService } from './calculator-recommender.service';
 import { AIGatewayModule } from '../ai-gateway';
 import { MoERouterModule } from '../moe-router';
 import { ToolCallingModule } from '../tool-calling/tool-calling.module';
+import { CostOptimizerModule } from '../cost-optimizer/cost-optimizer.module';
+import { MemoryModule } from '../memory/memory.module';
+import { ArtifactsModule } from '../artifacts/artifacts.module';
+import { EvaluationModule } from '../evaluation/evaluation.module';
 
 @Module({
   imports: [
@@ -25,6 +29,10 @@ import { ToolCallingModule } from '../tool-calling/tool-calling.module';
     AIGatewayModule,
     MoERouterModule,
     ToolCallingModule,
+    CostOptimizerModule,
+    MemoryModule,
+    ArtifactsModule,
+    EvaluationModule,
   ],
   controllers: [ChatController],
   providers: [ChatService, CalculatorRecommenderService],

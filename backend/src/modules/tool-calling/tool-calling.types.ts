@@ -103,6 +103,15 @@ export interface ToolCallingResult {
   executionLogs: ToolExecutionLogEntry[];
   suggestions?: string[];
   visualizations?: any[];
+  context?: {
+    toolId?: string;
+    toolName?: string;
+    category?: ToolCallingCategory;
+    executionKind?: ToolExecutionKind;
+    launch?: CatalogLaunch;
+    parameters?: Record<string, any>;
+    resultSummary?: Record<string, any>;
+  };
   errorCode?: string;
   executionTimeMs?: number;
 }
