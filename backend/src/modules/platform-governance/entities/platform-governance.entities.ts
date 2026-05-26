@@ -61,6 +61,86 @@ export class PlatformGovernancePolicy {
   updatedAt: Date;
 }
 
+@Entity('clinical_release_gates')
+@Index(['capabilityId', 'status'])
+@Index(['changeType', 'riskLevel'])
+export class PlatformClinicalReleaseGate {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'varchar', length: 96 })
+  capabilityId: string;
+
+  @Column({ type: 'varchar', length: 80 })
+  changeType: string;
+
+  @Column({ type: 'varchar', length: 96, nullable: true })
+  artifactVersion: string;
+
+  @Column({ type: 'varchar', length: 40, default: 'high' })
+  riskLevel: string;
+
+  @Column({ type: 'varchar', length: 96, nullable: true })
+  validationRunId: string;
+
+  @Column({ type: 'varchar', length: 40, default: PlatformGovernanceStatus.NEEDS_REVIEW })
+  status: PlatformGovernanceStatus;
+
+  @Column({ type: 'simple-json', nullable: true })
+  requiredApprovals: Record<string, any>[];
+
+  @Column({ type: 'simple-json', nullable: true })
+  decision: Record<string, any>;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
+@Entity('clinical_safety_findings')
+@Index(['capabilityId', 'status'])
+@Index(['runId'])
+@Index(['severity', 'findingType'])
+export class PlatformClinicalSafetyFinding {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ type: 'varchar', length: 96, nullable: true })
+  runId: string;
+
+  @Column({ type: 'varchar', length: 96 })
+  capabilityId: string;
+
+  @Column({ type: 'varchar', length: 40, default: 'high' })
+  severity: string;
+
+  @Column({ type: 'varchar', length: 80, default: 'clinical_safety' })
+  findingType: string;
+
+  @Column({ type: 'varchar', length: 80, default: 'governance' })
+  source: string;
+
+  @Column({ type: 'text' })
+  description: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  ownerUserId: string;
+
+  @Column({ type: 'varchar', length: 40, default: PlatformGovernanceStatus.NEEDS_REVIEW })
+  status: PlatformGovernanceStatus;
+
+  @Column({ type: 'simple-json', nullable: true })
+  resolution: Record<string, any>;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+}
+
 @Entity('platform_security_events')
 @Index(['runId'])
 @Index(['capabilityId', 'createdAt'])

@@ -14,6 +14,8 @@ export default function ProfileSummaryCard({ compact = false }) {
   const { account, activeWorkspace, isLoading } = useUserIdentity();
   const displayName = account?.displayName || 'CareDroid User';
   const specialty = account?.specialty || account?.profession || 'Clinical user';
+  const organization = account?.organization || account?.department || 'No organization set';
+  const role = account?.role || 'No role set';
   const workspaceName = activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'Personal workspace';
 
   return (
@@ -25,6 +27,10 @@ export default function ProfileSummaryCard({ compact = false }) {
         <p className="profile-summary-card__eyebrow">Operational profile</p>
         <h2>{displayName}</h2>
         <p>{specialty}</p>
+        <div className="profile-summary-card__meta" aria-label="Profile organization and role">
+          <span>{organization}</span>
+          <span>{role}</span>
+        </div>
         <div className="profile-summary-card__workspace">
           <span>{workspaceName}</span>
           {activeWorkspace?.type ? <strong>{activeWorkspace.type}</strong> : null}

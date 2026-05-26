@@ -5,6 +5,8 @@ import { MetricsModule } from '../metrics/metrics.module';
 import { PlatformGovernanceController } from './platform-governance.controller';
 import { PlatformGovernanceService } from './platform-governance.service';
 import {
+  PlatformClinicalReleaseGate,
+  PlatformClinicalSafetyFinding,
   PlatformConsentRecord,
   PlatformEquityMetric,
   PlatformGovernancePolicy,
@@ -21,6 +23,8 @@ import {
   imports: [
     TypeOrmModule.forFeature([
       PlatformGovernancePolicy,
+      PlatformClinicalReleaseGate,
+      PlatformClinicalSafetyFinding,
       PlatformSecurityEvent,
       PlatformRegulatoryClassification,
       PlatformEquityMetric,

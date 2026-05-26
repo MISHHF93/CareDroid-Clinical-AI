@@ -27,6 +27,8 @@ function repoMock(seed: any[] = []) {
 function buildService(overrides: Record<string, any> = {}) {
   const repositories = {
     policies: repoMock(overrides.policies),
+    releaseGates: repoMock(overrides.releaseGates),
+    safetyFindings: repoMock(overrides.safetyFindings),
     securityEvents: repoMock(overrides.securityEvents),
     classifications: repoMock(overrides.classifications),
     equityMetrics: repoMock(overrides.equityMetrics),
@@ -43,6 +45,8 @@ function buildService(overrides: Record<string, any> = {}) {
     auditService: overrides.auditService,
     service: new PlatformGovernanceService(
       repositories.policies as any,
+      repositories.releaseGates as any,
+      repositories.safetyFindings as any,
       repositories.securityEvents as any,
       repositories.classifications as any,
       repositories.equityMetrics as any,
@@ -208,6 +212,17 @@ describe('PlatformGovernanceService', () => {
       eventType: 'prompt_injection',
       status: PlatformGovernanceStatus.BLOCKED,
     });
+    await service.createPolicy({
+      capabilityId: 'ambient-scribe',
+      policyType: 'clinical_safety',
+      createdBy: '11111111-1111-1111-1111-111111111111',
+    });
+    await service.createReleaseGate({ capabilityId: 'ambient-scribe', validationRunId: 'run-1' });
+    await service.createSafetyFinding({
+      runId: 'run-1',
+      capabilityId: 'ambient-scribe',
+      description: 'Unsafe output needs review.',
+    });
 
     expect(auditService.log).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -239,6 +254,44 @@ describe('PlatformGovernanceService', () => {
         resource: 'platform-governance/clinical-chat',
         metadata: expect.objectContaining({ eventName: 'ai.security.event' }),
       }),
+    );
+    expect(auditService.log).toHaveBeenCalledWith(
+      expect.objectContaining({
+        resource: 'platform-governance/ambient-scribe',
+        metadata: expect.objectContaining({ eventName: 'clinical.policy.created' }),
+      }),
+    );
+    expect(auditService.log).toHaveBeenCalledWith(
+      expect.objectContaining({
+        resource: 'platform-governance/ambient-scribe',
+        metadata: expect.objectContaining({ eventName: 'release.gate.created' }),
+      }),
+    );
+    expect(auditService.log).toHaveBeenCalledWith(
+      expect.objectContaining({
+        resource: 'platform-governance/ambient-scribe',
+        metadata: expect.objectContaining({ eventName: 'safety.finding.created' }),
+      }),
+    );
+  });
+
+  it('persists policy approval, release gate decisions, and safety finding reviews', async () => {
+    const { service } = buildService();
+    const policy = await service.createPolicy({ capabilityId: 'clinical-governance' });
+    const gate = await service.createReleaseGate({ capabilityId: 'clinical-governance' });
+    const finding = await service.createSafetyFinding({
+      capabilityId: 'clinical-governance',
+      description: 'Gate blocker needs triage.',
+    });
+
+    await expect(service.approvePolicy(policy.id, { decision: 'approve' })).resolves.toEqual(
+      expect.objectContaining({ status: PlatformGovernanceStatus.ACTIVE }),
+    );
+    await expect(service.decideReleaseGate(gate.id, { decision: 'reject' })).resolves.toEqual(
+      expect.objectContaining({ status: PlatformGovernanceStatus.BLOCKED }),
+    );
+    await expect(service.reviewSafetyFinding(finding.id, { decision: 'resolve' })).resolves.toEqual(
+      expect.objectContaining({ status: PlatformGovernanceStatus.RESOLVED }),
     );
   });
 

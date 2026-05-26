@@ -20,6 +20,18 @@ describe('PlatformSystemsController', () => {
       evaluateGate: jest.fn((body: Record<string, unknown>) => ({ allowed: true, ...body })),
       listPrivacyRequests: jest.fn(() => [{ id: 'privacy-1' }]),
       reviewPrivacyRequest: jest.fn(() => ({ id: 'privacy-1', status: 'resolved' })),
+      listPolicies: jest.fn(() => [{ id: 'policy-1' }]),
+      createPolicy: jest.fn((body: Record<string, unknown>) => ({ id: 'policy-2', ...body })),
+      updatePolicy: jest.fn((policyId: string, body: Record<string, unknown>) => ({
+        id: policyId,
+        ...body,
+      })),
+      approvePolicy: jest.fn((policyId: string) => ({ id: policyId, status: 'active' })),
+      listReleaseGates: jest.fn(() => [{ id: 'gate-1' }]),
+      createReleaseGate: jest.fn((body: Record<string, unknown>) => ({ id: 'gate-2', ...body })),
+      decideReleaseGate: jest.fn((gateId: string) => ({ id: gateId, status: 'blocked' })),
+      listSafetyFindings: jest.fn(() => [{ id: 'finding-1' }]),
+      reviewSafetyFinding: jest.fn((findingId: string) => ({ id: findingId, status: 'resolved' })),
       recordObservabilityEvent: jest.fn().mockResolvedValue({ id: 'event-1' }),
       getPrivacyAccessLog: jest.fn((patientId?: string) => ({ patientId, accessLog: [] })),
       recentObservability: jest.fn(() => ({ status: 'synthetic_ready' })),
@@ -64,6 +76,60 @@ describe('PlatformSystemsController', () => {
         capabilityId: 'clinical-chat',
         prompt: 'hello',
         action: 'ai-security/evaluate',
+      }),
+    );
+  });
+
+  it('routes clinical governance policies, release gates, and safety findings through durable services', async () => {
+    const { controller, platformGovernanceService } = buildController();
+
+    await expect(controller.getClinicalPolicies()).resolves.toEqual([{ id: 'policy-1' }]);
+    await expect(controller.createClinicalPolicy({ capabilityId: 'clinical-governance' })).resolves.toEqual(
+      expect.objectContaining({ id: 'policy-2' }),
+    );
+    await expect(controller.approveClinicalPolicy('policy-1', { decision: 'approve' })).resolves.toEqual(
+      expect.objectContaining({ status: 'active' }),
+    );
+    await expect(controller.getClinicalReleaseGates()).resolves.toEqual([{ id: 'gate-1' }]);
+    await expect(controller.decideClinicalReleaseGate('gate-1', { decision: 'reject' })).resolves.toEqual(
+      expect.objectContaining({ status: 'blocked' }),
+    );
+    await expect(controller.getGovernanceSafetyFindings()).resolves.toEqual([{ id: 'finding-1' }]);
+    await expect(
+      controller.reviewGovernanceSafetyFinding('finding-1', { decision: 'resolve' }),
+    ).resolves.toEqual(expect.objectContaining({ status: 'resolved' }));
+
+    expect(platformGovernanceService.listPolicies).toHaveBeenCalled();
+    expect(platformGovernanceService.createPolicy).toHaveBeenCalled();
+    expect(platformGovernanceService.approvePolicy).toHaveBeenCalledWith('policy-1', {
+      decision: 'approve',
+    });
+    expect(platformGovernanceService.listReleaseGates).toHaveBeenCalled();
+    expect(platformGovernanceService.decideReleaseGate).toHaveBeenCalledWith('gate-1', {
+      decision: 'reject',
+    });
+    expect(platformGovernanceService.listSafetyFindings).toHaveBeenCalled();
+    expect(platformGovernanceService.reviewSafetyFinding).toHaveBeenCalledWith('finding-1', {
+      decision: 'resolve',
+    });
+  });
+
+  it('opens a release gate when a validation run is created', async () => {
+    const { controller, platformGovernanceService } = buildController();
+
+    await expect(
+      controller.createValidationRun({
+        runId: 'run-1',
+        capabilityId: 'clinical-governance',
+        changeType: 'prompt',
+      }),
+    ).resolves.toEqual(expect.objectContaining({ status: 'release_gate_opened' }));
+
+    expect(platformGovernanceService.createReleaseGate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        capabilityId: 'clinical-governance',
+        changeType: 'prompt',
+        validationRunId: 'run-1',
       }),
     );
   });

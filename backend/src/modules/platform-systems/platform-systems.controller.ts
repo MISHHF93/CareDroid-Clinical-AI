@@ -300,62 +300,93 @@ export class PlatformSystemsController {
 
   @Get('governance/clinical/policies')
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  getClinicalPolicies() {
+  async getClinicalPolicies() {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.listPolicies();
+    }
     return this.platformSystemsService.demo('clinical-governance');
   }
 
   @Post('governance/clinical/policies')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  createClinicalPolicy(@Body() body: Record<string, unknown>) {
+  async createClinicalPolicy(@Body() body: Record<string, unknown>) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.createPolicy(body);
+    }
     return this.platformSystemsService.demo('clinical-governance', 'policy-draft', body);
   }
 
   @Put('governance/clinical/policies/:policyId')
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  updateClinicalPolicy(@Param('policyId') policyId: string, @Body() body: Record<string, unknown>) {
+  async updateClinicalPolicy(
+    @Param('policyId') policyId: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    if (this.platformGovernanceService) {
+      const result = await this.platformGovernanceService.updatePolicy(policyId, body);
+      if (result) return result;
+    }
     return this.platformSystemsService.demo('clinical-governance', policyId, body);
   }
 
   @Post('governance/clinical/policies/:policyId/approve')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  approveClinicalPolicy(
+  async approveClinicalPolicy(
     @Param('policyId') policyId: string,
     @Body() body: Record<string, unknown>,
   ) {
+    if (this.platformGovernanceService) {
+      const result = await this.platformGovernanceService.approvePolicy(policyId, body);
+      if (result) return result;
+    }
     return this.platformSystemsService.demo('clinical-governance', policyId, body);
   }
 
   @Get('governance/clinical/release-gates')
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  getClinicalReleaseGates() {
+  async getClinicalReleaseGates() {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.listReleaseGates();
+    }
     return this.platformSystemsService.demo('clinical-release-gates');
   }
 
   @Post('governance/clinical/release-gates/:gateId/decision')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  decideClinicalReleaseGate(
+  async decideClinicalReleaseGate(
     @Param('gateId') gateId: string,
     @Body() body: Record<string, unknown>,
   ) {
+    if (this.platformGovernanceService) {
+      const result = await this.platformGovernanceService.decideReleaseGate(gateId, body);
+      if (result) return result;
+    }
     return this.platformSystemsService.demo('clinical-release-gates', gateId, body);
   }
 
   @Get('governance/clinical/safety-findings')
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  getGovernanceSafetyFindings() {
+  async getGovernanceSafetyFindings() {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.listSafetyFindings();
+    }
     return this.platformSystemsService.demo('clinical-safety-findings');
   }
 
   @Post('governance/clinical/safety-findings/:findingId/review')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.VIEW_AUDIT_LOGS)
-  reviewGovernanceSafetyFinding(
+  async reviewGovernanceSafetyFinding(
     @Param('findingId') findingId: string,
     @Body() body: Record<string, unknown>,
   ) {
+    if (this.platformGovernanceService) {
+      const result = await this.platformGovernanceService.reviewSafetyFinding(findingId, body);
+      if (result) return result;
+    }
     return this.platformSystemsService.demo('clinical-safety-findings', findingId, body);
   }
 
@@ -718,7 +749,23 @@ export class PlatformSystemsController {
   @Post('governance/validation/runs')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  createValidationRun(@Body() body: Record<string, unknown>) {
+  async createValidationRun(@Body() body: Record<string, unknown>) {
+    if (this.platformGovernanceService) {
+      const runId = String(body.runId || `validation-${Date.now()}`);
+      const gate = await this.platformGovernanceService.createReleaseGate({
+        capabilityId: String(body.capabilityId || 'clinical-governance'),
+        changeType: String(body.changeType || 'validation'),
+        artifactVersion: body.artifactVersion || body.version,
+        riskLevel: String(body.riskLevel || 'high'),
+        validationRunId: runId,
+      });
+      return {
+        runId,
+        status: 'release_gate_opened',
+        gate,
+        synthetic: true,
+      };
+    }
     return this.platformSystemsService.demo('validation-sandbox', 'run', body);
   }
 
@@ -737,7 +784,10 @@ export class PlatformSystemsController {
 
   @Get('governance/validation/release-gates/:capabilityId')
   @Permissions(Permission.CONFIGURE_SYSTEM, Permission.VIEW_AUDIT_LOGS)
-  getValidationReleaseGate(@Param('capabilityId') capabilityId: string) {
+  async getValidationReleaseGate(@Param('capabilityId') capabilityId: string) {
+    if (this.platformGovernanceService) {
+      return this.platformGovernanceService.listReleaseGates(capabilityId);
+    }
     return this.platformSystemsService.demo('clinical-release-gates', capabilityId);
   }
 

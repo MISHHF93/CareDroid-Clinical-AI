@@ -195,6 +195,6 @@ export async function fetchHospitalMapSnapshot(options = {}) {
     snapshot: buildDemoHospitalMapSnapshot(),
     backendStatus: HOSPITAL_MAP_BACKEND_STATUS,
     message:
-      'Dedicated hospital map and device fleet backend endpoints are not implemented yet; showing clearly labeled demo telemetry.',
+      'Hospital map backend endpoints are unavailable; showing clearly labeled local demo telemetry.',
   };
 }

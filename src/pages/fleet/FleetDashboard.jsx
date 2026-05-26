@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { fetchFleetCommandSnapshot } from '../../services/fleetTelemetryService';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
@@ -23,6 +24,7 @@ const TOOL_ID = 'fleet-command';
 
 export default function FleetDashboard() {
   const { recordToolAccess } = useToolPreferences();
+  const { activeWorkspace, account, recordActivity } = useUserIdentity();
   const [phase, setPhase] = useState('loading');
   const [snapshot, setSnapshot] = useState(null);
   const [errorMessage, setErrorMessage] = useState(null);
@@ -70,12 +72,18 @@ export default function FleetDashboard() {
   useEffect(() => {
     const controller = new AbortController();
     recordToolAccess(TOOL_ID);
+    recordActivity({
+      category: 'fleet',
+      label: 'Fleet Command Dashboard',
+      route: '/fleet/command',
+      metadata: { toolId: TOOL_ID, source: 'fleet-dashboard' },
+    });
     loadSnapshot(controller.signal);
     return () => {
       controller.abort();
       requestSeqRef.current += 1;
     };
-  }, [loadSnapshot, recordToolAccess]);
+  }, [loadSnapshot, recordActivity, recordToolAccess]);
 
   const summary = snapshot?.summary;
   const lowEnergyVehicles =
@@ -86,7 +94,9 @@ export default function FleetDashboard() {
       <FleetPageChrome
         toolId={TOOL_ID}
         title="Fleet Command Dashboard"
-        lead="Operational snapshot of active fleet units — vehicle availability, maintenance, ETAs, energy levels, and utilization."
+        lead={`Operational snapshot for ${
+          activeWorkspace?.branding?.displayName || activeWorkspace?.name || account?.organization || 'your workspace'
+        } - vehicle availability, maintenance, ETAs, energy levels, and utilization.`}
         safetyNote={
           <>
             <strong>Decision support only.</strong> Verify all metrics against your dispatch system of

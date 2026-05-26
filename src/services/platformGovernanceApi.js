@@ -73,6 +73,8 @@ export const LOCAL_PLATFORM_GOVERNANCE_STATE = Object.freeze({
   },
   counts: {
     policies: 0,
+    releaseGates: 0,
+    safetyFindings: 0,
     securityEvents: 0,
     classifications: 0,
     equityMetrics: 0,

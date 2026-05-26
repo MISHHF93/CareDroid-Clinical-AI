@@ -47,6 +47,7 @@ describe('HospitalMapDashboard', () => {
     expect(await screen.findByRole('heading', { level: 1, name: /^hospital map$/i })).toBeInTheDocument();
     expect(screen.getByText(/demo hospital map telemetry/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /hospital floor plan/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /room grid & bed grid/i })).toBeInTheDocument();
     expect(screen.getAllByText(/Bed 12A/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /device fleet management/i })).toBeInTheDocument();
   });
@@ -165,6 +166,18 @@ describe('HospitalMapDashboard', () => {
     await waitFor(() => {
       expect(screen.getByRole('complementary', { name: /bed 12 pulse oximeter details/i })).toBeInTheDocument();
     });
+  });
+
+  it('supports separate room and device searches', async () => {
+    const user = userEvent.setup();
+    renderHospitalMap();
+
+    await screen.findByRole('heading', { level: 1, name: /^hospital map$/i });
+    await user.type(screen.getByRole('searchbox', { name: /room search/i }), 'ICU-14');
+    await user.type(screen.getByRole('searchbox', { name: /device search/i }), 'pump');
+
+    expect(screen.getByRole('button', { name: /open icu-14 infusion pump details/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open bed 12 pulse oximeter details/i })).not.toBeInTheDocument();
   });
 
   it('survives compact viewport without horizontal document overflow contract markers', async () => {

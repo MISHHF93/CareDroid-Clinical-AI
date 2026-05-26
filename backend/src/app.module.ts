@@ -64,6 +64,7 @@ import { HumanReviewModule } from './modules/human-review/human-review.module';
 import { PrivacyCenterModule } from './modules/privacy-center/privacy-center.module';
 import { EhrAuditModule } from './modules/ehr-audit/ehr-audit.module';
 import { ObservabilityModule } from './modules/observability/observability.module';
+import { HospitalMapModule } from './modules/hospital-map';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -165,6 +166,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     ObservabilityModule,
     UserProfileModule,
     LiveTrackingModule,
+    HospitalMapModule,
     ClinicalAlertsModule,
     PlatformSystemsModule,
 

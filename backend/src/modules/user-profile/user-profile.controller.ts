@@ -52,6 +52,23 @@ export class UserProfileController {
     return this.userProfileService.getActivity(req.user.id);
   }
 
+  @Get('me/workspaces')
+  @ApiOperation({ summary: 'Get current-user workspace context' })
+  async workspaces(@Req() req: any) {
+    return this.userProfileService.getWorkspaces(req.user.id);
+  }
+
+  @Patch('me/workspaces/active')
+  @ApiOperation({ summary: 'Switch current-user active workspace from profile' })
+  async switchWorkspace(@Req() req: any, @Body('workspaceId') workspaceId: string) {
+    return this.userProfileService.setActiveWorkspace(
+      req.user.id,
+      workspaceId,
+      req.ip,
+      req.headers['user-agent'],
+    );
+  }
+
   @Get('me/security')
   @ApiOperation({ summary: 'Get current-user profile security summary' })
   async security(@Req() req: any) {

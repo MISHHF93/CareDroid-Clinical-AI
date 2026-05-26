@@ -6,10 +6,13 @@ import { UserActivityModule } from '../user-activity/user-activity.module';
 import { User } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
+import { ActivityService } from './activity.service';
 import { ProfessionalProfile } from './entities/professional-profile.entity';
 import { UserPreference } from './entities/user-preference.entity';
+import { UserPreferencesService } from './user-preferences.service';
 import { UserProfileController } from './user-profile.controller';
 import { UserProfileService } from './user-profile.service';
+import { WorkspaceService } from './workspace.service';
 
 @Module({
   imports: [
@@ -20,7 +23,7 @@ import { UserProfileService } from './user-profile.service';
     PersonalizationModule,
   ],
   controllers: [UserProfileController],
-  providers: [UserProfileService],
-  exports: [UserProfileService],
+  providers: [UserProfileService, UserPreferencesService, WorkspaceService, ActivityService],
+  exports: [UserProfileService, UserPreferencesService, WorkspaceService, ActivityService],
 })
 export class UserProfileModule {}

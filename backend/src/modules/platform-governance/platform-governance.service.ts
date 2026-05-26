@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { createHash, randomUUID } from 'crypto';
 import {
+  PlatformClinicalReleaseGate,
+  PlatformClinicalSafetyFinding,
   PlatformConsentRecord,
   PlatformEquityMetric,
   PlatformGovernancePolicy,
@@ -44,6 +46,10 @@ export class PlatformGovernanceService {
   constructor(
     @InjectRepository(PlatformGovernancePolicy)
     private readonly policies: Repository<PlatformGovernancePolicy>,
+    @InjectRepository(PlatformClinicalReleaseGate)
+    private readonly releaseGates: Repository<PlatformClinicalReleaseGate>,
+    @InjectRepository(PlatformClinicalSafetyFinding)
+    private readonly safetyFindings: Repository<PlatformClinicalSafetyFinding>,
     @InjectRepository(PlatformSecurityEvent)
     private readonly securityEvents: Repository<PlatformSecurityEvent>,
     @InjectRepository(PlatformRegulatoryClassification)
@@ -68,6 +74,8 @@ export class PlatformGovernanceService {
   async getSummary(): Promise<PlatformGovernanceSummaryDto> {
     const [
       policyCount,
+      releaseGateCount,
+      safetyFindingCount,
       securityEventCount,
       classificationCount,
       equityMetricCount,
@@ -79,6 +87,8 @@ export class PlatformGovernanceService {
       sourceProvenanceCount,
     ] = await Promise.all([
       this.policies.count(),
+      this.releaseGates.count(),
+      this.safetyFindings.count(),
       this.securityEvents.count(),
       this.classifications.count(),
       this.equityMetrics.count(),
@@ -107,6 +117,8 @@ export class PlatformGovernanceService {
       },
       counts: {
         policies: policyCount,
+        releaseGates: releaseGateCount,
+        safetyFindings: safetyFindingCount,
         securityEvents: securityEventCount,
         classifications: classificationCount,
         equityMetrics: equityMetricCount,
@@ -123,6 +135,205 @@ export class PlatformGovernanceService {
         demoExternalConnectors: true,
       },
     };
+  }
+
+  async listPolicies(capabilityId?: string) {
+    return this.policies.find({
+      where: capabilityId ? { capabilityId } : {},
+      order: { updatedAt: 'DESC' },
+      take: 50,
+    });
+  }
+
+  async createPolicy(input: Record<string, any> = {}) {
+    const policy = await this.policies.save(
+      this.policies.create({
+        organizationId: input.organizationId,
+        capabilityId: input.capabilityId || 'clinical-governance',
+        policyType: input.policyType || 'clinical_safety',
+        version: input.version || 'v1',
+        status: input.status || PlatformGovernanceStatus.DRAFT,
+        content: input.content || {
+          intendedUse: input.intendedUse,
+          excludedUses: input.excludedUses,
+          humanReviewPolicy: input.humanReviewPolicy,
+          blockedActions: input.blockedActions,
+          modelPolicy: input.modelPolicy,
+          privacyPolicy: input.privacyPolicy,
+          evidenceRequirements: input.evidenceRequirements,
+        },
+        createdBy: input.createdBy,
+      }),
+    );
+    await this.logGovernanceAudit('clinical.policy.created', policy.capabilityId, {
+      policyId: policy.id,
+      policyType: policy.policyType,
+      version: policy.version,
+      status: policy.status,
+      actorUserId: policy.createdBy,
+    });
+    return policy;
+  }
+
+  async updatePolicy(policyId: string, input: Record<string, any> = {}) {
+    const policy = await this.policies.findOne({ where: { id: policyId } });
+    if (!policy) return null;
+
+    policy.policyType = input.policyType || policy.policyType;
+    policy.version = input.version || policy.version;
+    policy.status = input.status || policy.status;
+    policy.content = input.content || policy.content;
+    policy.retiredAt = input.retiredAt ? new Date(input.retiredAt) : policy.retiredAt;
+    const saved = await this.policies.save(policy);
+    await this.logGovernanceAudit('clinical.policy.updated', saved.capabilityId, {
+      policyId: saved.id,
+      policyType: saved.policyType,
+      version: saved.version,
+      status: saved.status,
+      actorUserId: input.updatedBy,
+    });
+    return saved;
+  }
+
+  async approvePolicy(policyId: string, decision: Record<string, any> = {}) {
+    const policy = await this.policies.findOne({ where: { id: policyId } });
+    if (!policy) return null;
+
+    policy.status = PlatformGovernanceStatus.ACTIVE;
+    policy.approvedBy = decision.approvedBy;
+    policy.effectiveAt = decision.effectiveAt ? new Date(decision.effectiveAt) : new Date();
+    policy.content = {
+      ...(policy.content || {}),
+      approval: {
+        decision: decision.decision || 'approve',
+        notes: decision.notes,
+        approvedAt: policy.effectiveAt.toISOString(),
+      },
+    };
+    const saved = await this.policies.save(policy);
+    await this.logGovernanceAudit('clinical.policy.approved', saved.capabilityId, {
+      policyId: saved.id,
+      policyType: saved.policyType,
+      version: saved.version,
+      approvedBy: saved.approvedBy,
+      effectiveAt: saved.effectiveAt,
+    });
+    return saved;
+  }
+
+  async listReleaseGates(capabilityId?: string) {
+    return this.releaseGates.find({
+      where: capabilityId ? { capabilityId } : {},
+      order: { updatedAt: 'DESC' },
+      take: 50,
+    });
+  }
+
+  async createReleaseGate(input: Record<string, any> = {}) {
+    const gate = await this.releaseGates.save(
+      this.releaseGates.create({
+        capabilityId: input.capabilityId || 'clinical-governance',
+        changeType: input.changeType || 'policy',
+        artifactVersion: input.artifactVersion || input.version,
+        riskLevel: input.riskLevel || 'high',
+        validationRunId: input.validationRunId,
+        status: input.status || PlatformGovernanceStatus.NEEDS_REVIEW,
+        requiredApprovals: input.requiredApprovals || [
+          { role: 'clinical_safety_reviewer', required: true },
+          { role: 'governance_owner', required: true },
+        ],
+        decision: input.decision,
+      }),
+    );
+    await this.logGovernanceAudit('release.gate.created', gate.capabilityId, {
+      releaseGateId: gate.id,
+      changeType: gate.changeType,
+      riskLevel: gate.riskLevel,
+      validationRunId: gate.validationRunId,
+      status: gate.status,
+    });
+    return gate;
+  }
+
+  async decideReleaseGate(gateId: string, decision: Record<string, any> = {}) {
+    const gate = await this.releaseGates.findOne({ where: { id: gateId } });
+    if (!gate) return null;
+
+    gate.status =
+      decision.decision === 'approve'
+        ? PlatformGovernanceStatus.ACTIVE
+        : decision.decision === 'rollback'
+          ? PlatformGovernanceStatus.REVOKED
+          : PlatformGovernanceStatus.BLOCKED;
+    gate.decision = {
+      ...decision,
+      decidedAt: new Date().toISOString(),
+    };
+    const saved = await this.releaseGates.save(gate);
+    await this.logGovernanceAudit('release.gate.decided', saved.capabilityId, {
+      releaseGateId: saved.id,
+      changeType: saved.changeType,
+      decision: saved.decision,
+      status: saved.status,
+    });
+    return saved;
+  }
+
+  async listSafetyFindings(capabilityId?: string) {
+    return this.safetyFindings.find({
+      where: capabilityId ? { capabilityId } : {},
+      order: { updatedAt: 'DESC' },
+      take: 50,
+    });
+  }
+
+  async createSafetyFinding(input: Record<string, any> = {}) {
+    const finding = await this.safetyFindings.save(
+      this.safetyFindings.create({
+        runId: input.runId,
+        capabilityId: input.capabilityId || 'clinical-governance',
+        severity: input.severity || 'high',
+        findingType: input.findingType || 'clinical_safety',
+        source: input.source || 'governance',
+        description: input.description || 'Governance safety finding requires triage.',
+        ownerUserId: input.ownerUserId,
+        status: input.status || PlatformGovernanceStatus.NEEDS_REVIEW,
+        resolution: input.resolution,
+      }),
+    );
+    await this.logGovernanceAudit('safety.finding.created', finding.capabilityId, {
+      safetyFindingId: finding.id,
+      runId: finding.runId,
+      severity: finding.severity,
+      findingType: finding.findingType,
+      status: finding.status,
+    });
+    return finding;
+  }
+
+  async reviewSafetyFinding(findingId: string, review: Record<string, any> = {}) {
+    const finding = await this.safetyFindings.findOne({ where: { id: findingId } });
+    if (!finding) return null;
+
+    finding.status =
+      review.decision === 'resolve'
+        ? PlatformGovernanceStatus.RESOLVED
+        : review.decision === 'accept_risk'
+          ? PlatformGovernanceStatus.ACTIVE
+          : PlatformGovernanceStatus.BLOCKED;
+    finding.resolution = {
+      ...review,
+      reviewedAt: new Date().toISOString(),
+    };
+    const saved = await this.safetyFindings.save(finding);
+    await this.logGovernanceAudit('safety.finding.reviewed', saved.capabilityId, {
+      safetyFindingId: saved.id,
+      runId: saved.runId,
+      severity: saved.severity,
+      decision: saved.resolution,
+      status: saved.status,
+    });
+    return saved;
   }
 
   async evaluateGate(input: {

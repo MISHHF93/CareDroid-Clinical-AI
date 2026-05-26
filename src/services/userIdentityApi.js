@@ -51,12 +51,12 @@ export const UserIdentityApi = {
   },
 
   fetchWorkspaces() {
-    return requestJson('/api/workspaces');
+    return requestJson('/api/profile/me/workspaces');
   },
 
   switchWorkspace(workspaceId) {
-    return requestJson('/api/workspaces/active', {
-      method: 'POST',
+    return requestJson('/api/profile/me/workspaces/active', {
+      method: 'PATCH',
       body: JSON.stringify({ workspaceId }),
     });
   },

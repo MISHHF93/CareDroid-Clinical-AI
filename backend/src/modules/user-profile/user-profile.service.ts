@@ -4,14 +4,14 @@ import { Repository } from 'typeorm';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { AuditService } from '../audit/audit.service';
 import { PersonalizationService } from '../personalization/personalization.service';
-import { UserActivityService } from '../user-activity/user-activity.service';
 import { User } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
-import { WorkspacesService } from '../workspaces/workspaces.service';
+import { ActivityService } from './activity.service';
 import { UpdateOperationalProfileDto } from './dto/update-operational-profile.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { ProfessionalProfile } from './entities/professional-profile.entity';
-import { UserPreference } from './entities/user-preference.entity';
+import { UserPreferencesService } from './user-preferences.service';
+import { WorkspaceService } from './workspace.service';
 
 @Injectable()
 export class UserProfileService {
@@ -20,12 +20,11 @@ export class UserProfileService {
     private readonly userRepository: Repository<User>,
     @InjectRepository(UserProfile)
     private readonly profileRepository: Repository<UserProfile>,
-    @InjectRepository(UserPreference)
-    private readonly preferenceRepository: Repository<UserPreference>,
     @InjectRepository(ProfessionalProfile)
     private readonly professionalRepository: Repository<ProfessionalProfile>,
-    private readonly workspacesService: WorkspacesService,
-    private readonly activityService: UserActivityService,
+    private readonly preferencesService: UserPreferencesService,
+    private readonly workspaceService: WorkspaceService,
+    private readonly activityService: ActivityService,
     private readonly personalizationService: PersonalizationService,
     private readonly auditService: AuditService,
   ) {}
@@ -34,8 +33,8 @@ export class UserProfileService {
     const user = await this.loadUser(userId);
     const preferences = await this.getPreferences(userId);
     const professional = await this.getProfessionalProfile(user);
-    const workspace = await this.workspacesService.getActiveWorkspaceState(user);
-    const activity = await this.activityService.summaryForUser(userId);
+    const workspace = await this.workspaceService.getWorkspaceState(user);
+    const activity = await this.activityService.getSummary(userId);
     const aiPersonalization = await this.personalizationService.getForUser(userId);
     const auditLogs = await this.auditService.findByUser(userId, 5);
 
@@ -128,8 +127,7 @@ export class UserProfileService {
   }
 
   async getPreferences(userId: string) {
-    const preference = await this.getOrCreatePreferences(userId);
-    return this.serializePreferences(preference);
+    return this.preferencesService.getPreferences(userId);
   }
 
   async updatePreferences(
@@ -138,47 +136,26 @@ export class UserProfileService {
     ipAddress = '0.0.0.0',
     userAgent = 'system',
   ) {
-    const preference = await this.getOrCreatePreferences(userId);
-    const supportedFields = [
-      'theme',
-      'language',
-      'defaultDashboard',
-      'compactMode',
-      'accessibility',
-      'calculatorPreferences',
-      'toolPreferences',
-      'aiAssistantPreferences',
-      'notificationSettings',
-    ];
-    const modifiedFields: string[] = [];
-    for (const field of supportedFields) {
-      if ((dto as any)[field] !== undefined) {
-        (preference as any)[field] = (dto as any)[field];
-        modifiedFields.push(field);
-      }
-    }
-    await this.preferenceRepository.save(preference);
-
-    await this.auditService.log({
-      userId,
-      action: AuditAction.SECURITY_EVENT,
-      resource: `profile/${userId}/preferences`,
-      ipAddress,
-      userAgent,
-      metadata: {
-        eventType: 'preference_update',
-        modifiedFields,
-      },
-    });
-
-    return this.serializePreferences(preference);
+    return this.preferencesService.updatePreferences(userId, dto, ipAddress, userAgent);
   }
 
   async getActivity(userId: string) {
-    return {
-      summary: await this.activityService.summaryForUser(userId),
-      activities: await this.activityService.listForUser(userId, 30),
-    };
+    return this.activityService.getActivity(userId);
+  }
+
+  async getWorkspaces(userId: string) {
+    const user = await this.loadUser(userId);
+    return this.workspaceService.listWorkspaces(user);
+  }
+
+  async setActiveWorkspace(
+    userId: string,
+    workspaceId: string,
+    ipAddress = '0.0.0.0',
+    userAgent = 'system',
+  ) {
+    const user = await this.loadUser(userId);
+    return this.workspaceService.switchWorkspace(user, workspaceId, ipAddress, userAgent);
   }
 
   async getSecurity(userId: string) {
@@ -270,65 +247,4 @@ export class UserProfileService {
     return this.profileRepository.save(profile);
   }
 
-  private async getOrCreatePreferences(userId: string) {
-    let preference = await this.preferenceRepository.findOne({ where: { userId } });
-    if (!preference) {
-      preference = this.preferenceRepository.create({
-        userId,
-        theme: 'system',
-        language: 'en',
-        defaultDashboard: 'command',
-        compactMode: false,
-        accessibility: {
-          reduceMotion: false,
-          highContrast: false,
-          fontScale: 'default',
-        },
-        calculatorPreferences: {
-          pinnedCalculatorIds: [],
-          defaultUnits: 'metric',
-          rememberInputs: false,
-        },
-        toolPreferences: {
-          favoriteToolIds: [],
-          pinnedToolIds: [],
-          recentToolIds: [],
-        },
-        aiAssistantPreferences: {
-          responseStyle: 'concise',
-          citationLevel: 'standard',
-          safetyTone: 'standard',
-        },
-        notificationSettings: {
-          emergencyAlerts: true,
-          medicationReminders: true,
-          appointmentReminders: true,
-          labResults: true,
-          securityAlerts: true,
-          systemUpdates: true,
-          marketingCommunications: false,
-          pushEnabled: true,
-          emailEnabled: true,
-          smsEnabled: false,
-          quietHoursEnabled: false,
-        },
-      });
-      preference = await this.preferenceRepository.save(preference);
-    }
-    return preference;
-  }
-
-  private serializePreferences(preference: UserPreference) {
-    return {
-      theme: preference.theme,
-      language: preference.language,
-      defaultDashboard: preference.defaultDashboard,
-      compactMode: preference.compactMode,
-      accessibility: preference.accessibility || {},
-      calculatorPreferences: preference.calculatorPreferences || {},
-      toolPreferences: preference.toolPreferences || {},
-      aiAssistantPreferences: preference.aiAssistantPreferences || {},
-      notificationSettings: preference.notificationSettings || {},
-    };
-  }
 }

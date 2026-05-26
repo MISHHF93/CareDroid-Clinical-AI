@@ -56,6 +56,13 @@ function filterSearchBlob(device, room, unit, bed) {
     .toLowerCase();
 }
 
+function roomSearchBlob(room, unit) {
+  return [room?.id, room?.roomNumber, room?.name, unit?.name, unit?.shortCode]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
 function TelemetryParametersPanel({ device }) {
   const telemetry = device?.telemetry || [];
   const parameterCards = [
@@ -291,6 +298,74 @@ function AlertsList({ alerts, devicesById, onSelectDevice }) {
   );
 }
 
+function RoomBedGrid({ rooms, beds, devices, unitsById, onSelectDevice }) {
+  const devicesByRoomId = devices.reduce((groups, device) => {
+    groups[device.roomId] = groups[device.roomId] || [];
+    groups[device.roomId].push(device);
+    return groups;
+  }, {});
+  const roomById = Object.fromEntries(rooms.map((room) => [room.id, room]));
+
+  return (
+    <section className="hospital-map-section" aria-labelledby="room-bed-grid-title">
+      <div className="hospital-map-panel-header">
+        <div>
+          <h2 id="room-bed-grid-title">Room Grid & Bed Grid</h2>
+          <p className="hospital-map-section-note">
+            Room and bed cards mirror the SVG coordinate map for keyboard and compact viewport workflows.
+          </p>
+        </div>
+      </div>
+      <div className="hospital-map-room-grid" aria-label="Room grid">
+        {rooms.map((room) => {
+          const roomDevices = devicesByRoomId[room.id] || [];
+          return (
+            <article key={room.id} className="hospital-map-room-card">
+              <div>
+                <strong>{room.roomNumber}</strong>
+                <span>{unitsById[room.unitId]?.name || 'Unknown unit'}</span>
+              </div>
+              <div className="hospital-map-room-card-meta">
+                <StatusBadge value={room.activeAlertCount ? 'warning' : 'ok'} />
+                <span>{room.deviceCount} device(s)</span>
+                <span>{room.activeAlertCount} alert(s)</span>
+              </div>
+              {roomDevices[0] ? (
+                <button
+                  type="button"
+                  className="hospital-map-table-action"
+                  onClick={() => onSelectDevice(roomDevices[0])}
+                >
+                  Open room device
+                </button>
+              ) : null}
+            </article>
+          );
+        })}
+      </div>
+      <div className="hospital-map-bed-grid" aria-label="Bed grid">
+        {beds.map((bed) => {
+          const bedDevice = devices.find((device) => device.bedId === bed.id);
+          return (
+            <button
+              key={bed.id}
+              type="button"
+              className="hospital-map-bed-card"
+              onClick={() => (bedDevice ? onSelectDevice(bedDevice) : undefined)}
+              disabled={!bedDevice}
+            >
+              <strong>{bed.label}</strong>
+              <span>{roomById[bed.roomId]?.roomNumber || 'Unknown room'}</span>
+              <StatusBadge value={bed.status} />
+              <small>{bedDevice ? bedDevice.name : 'No assigned device'}</small>
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function DeviceFleetTable({ devices, onSelectDevice }) {
   return (
     <section className="hospital-map-section" aria-labelledby="fleet-table-title">
@@ -349,7 +424,8 @@ export default function HospitalMapDashboard() {
   const [selectedStatus, setSelectedStatus] = useState('all');
   const [selectedType, setSelectedType] = useState('all');
   const [alertOnly, setAlertOnly] = useState(false);
-  const [search, setSearch] = useState('');
+  const [roomSearch, setRoomSearch] = useState('');
+  const [deviceSearch, setDeviceSearch] = useState('');
   const [selectedDeviceId, setSelectedDeviceId] = useState(null);
 
   const loadSnapshot = useCallback(async () => {
@@ -389,10 +465,26 @@ export default function HospitalMapDashboard() {
   const selectedFloor = floorsById[selectedFloorId] || snapshot?.floors?.[0] || null;
   const selectedDevice = selectedDeviceId ? devicesById[selectedDeviceId] : null;
 
+  const filteredRooms = useMemo(
+    () => {
+      const searchQuery = roomSearch.trim().toLowerCase();
+      return (snapshot?.rooms || []).filter((room) => {
+        if (room.floorId !== selectedFloor?.id) return false;
+        if (selectedUnitId !== 'all' && room.unitId !== selectedUnitId) return false;
+        if (!searchQuery) return true;
+        return roomSearchBlob(room, unitsById[room.unitId]).includes(searchQuery);
+      });
+    },
+    [roomSearch, selectedFloor, selectedUnitId, snapshot, unitsById]
+  );
+
   const filteredDevices = useMemo(() => {
-    const searchQuery = search.trim().toLowerCase();
+    const searchQuery = deviceSearch.trim().toLowerCase();
+    const roomSearchActive = roomSearch.trim().length > 0;
+    const visibleRoomIds = new Set(filteredRooms.map((room) => room.id));
     return (snapshot?.devices || []).filter((device) => {
       if (selectedFloor?.id && device.floorId !== selectedFloor.id) return false;
+      if ((roomSearchActive || visibleRoomIds.size) && !visibleRoomIds.has(device.roomId)) return false;
       if (selectedUnitId !== 'all' && device.unitId !== selectedUnitId) return false;
       if (selectedStatus !== 'all' && device.status !== selectedStatus && device.freshness !== selectedStatus) return false;
       if (selectedType !== 'all' && device.type !== selectedType) return false;
@@ -400,12 +492,7 @@ export default function HospitalMapDashboard() {
       if (!searchQuery) return true;
       return filterSearchBlob(device, roomsById[device.roomId], unitsById[device.unitId], bedsById[device.bedId]).includes(searchQuery);
     });
-  }, [alertOnly, bedsById, roomsById, search, selectedFloor, selectedStatus, selectedType, selectedUnitId, snapshot, unitsById]);
-
-  const filteredRooms = useMemo(
-    () => (snapshot?.rooms || []).filter((room) => room.floorId === selectedFloor?.id),
-    [selectedFloor, snapshot]
-  );
+  }, [alertOnly, bedsById, deviceSearch, filteredRooms, roomSearch, roomsById, selectedFloor, selectedStatus, selectedType, selectedUnitId, snapshot, unitsById]);
   const filteredAlerts = useMemo(
     () => (snapshot?.alerts || []).filter((alert) => filteredDevices.some((device) => device.id === alert.deviceId)),
     [filteredDevices, snapshot]
@@ -534,12 +621,21 @@ export default function HospitalMapDashboard() {
               </select>
             </label>
             <label className="hospital-map-search">
-              <span>Search room, device, patient ID placeholder</span>
+              <span>Room search</span>
               <input
                 type="search"
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Try ICU-12, pump, Patient A..."
+                value={roomSearch}
+                onChange={(event) => setRoomSearch(event.target.value)}
+                placeholder="Try ICU-12, ED-4, Medical-Surgical..."
+              />
+            </label>
+            <label className="hospital-map-search">
+              <span>Device search</span>
+              <input
+                type="search"
+                value={deviceSearch}
+                onChange={(event) => setDeviceSearch(event.target.value)}
+                placeholder="Try pump, ECG, Patient A..."
               />
             </label>
             <label className="hospital-map-check">
@@ -565,6 +661,14 @@ export default function HospitalMapDashboard() {
               onClose={() => setSelectedDeviceId(null)}
             />
           </div>
+
+          <RoomBedGrid
+            rooms={filteredRooms}
+            beds={(snapshot?.beds || []).filter((bed) => filteredRooms.some((room) => room.id === bed.roomId))}
+            devices={filteredDevices}
+            unitsById={unitsById}
+            onSelectDevice={selectDevice}
+          />
 
           <div className="hospital-map-lower-grid">
             <AlertsList alerts={filteredAlerts} devicesById={devicesById} onSelectDevice={selectDevice} />

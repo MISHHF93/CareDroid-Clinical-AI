@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import ToolPageLayout from './ToolPageLayout';
 import './Calculators.css';
 import '../../styles/calculators-mobile-pr.css';
@@ -315,14 +316,25 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
   const navigate = useNavigate();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
+  const { recordActivity } = useUserIdentity();
   const [searchParams] = useSearchParams();
   const calcFromUrl = searchParams.get('calc');
+  const lastRecordedResultRef = useRef('');
 
   const handleChatAssistedLaunch = useCallback(
     (toolId) => {
       const launch = resolveCatalogLaunch(toolId);
       if (launch.registryId) {
         recordToolAccess(launch.registryId);
+        recordActivity({
+          category: 'calculator',
+          label: toolRegistryById[launch.registryId]?.name || launch.registryId,
+          route: launch.path || '/tools/calculators',
+          metadata: {
+            calculatorId: launch.registryId,
+            source: 'chat-assisted-calculator',
+          },
+        });
         selectTool(launch.registryId);
         setActiveTool(launch.registryId);
       }
@@ -332,7 +344,7 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
       const navPath = launch.chatSeed ? '/assistant' : resolveNavigationPathForLaunch(launch);
       navigate(navPath || '/assistant');
     },
-    [addMessage, navigate, recordToolAccess, selectTool, setActiveTool]
+    [addMessage, navigate, recordActivity, recordToolAccess, selectTool, setActiveTool]
   );
 
   const toolConfig = {
@@ -348,6 +360,22 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
   const [selectedCalculator, setSelectedCalculator] = useState(null);
   const [sharedResult, setSharedResult] = useState(null);
   const [unknownSlug, setUnknownSlug] = useState(null);
+
+  useEffect(() => {
+    if (!selectedCalculator || !sharedResult) return;
+    const resultKey = `${selectedCalculator.id}:${JSON.stringify(sharedResult).slice(0, 120)}`;
+    if (lastRecordedResultRef.current === resultKey) return;
+    lastRecordedResultRef.current = resultKey;
+    recordActivity({
+      category: 'calculator',
+      label: selectedCalculator.name || selectedCalculator.id,
+      route: selectedCalculator.route || `/tools/calculators/${selectedCalculator.id}`,
+      metadata: {
+        calculatorId: selectedCalculator.id,
+        source: 'calculator-result',
+      },
+    });
+  }, [recordActivity, selectedCalculator, sharedResult]);
 
   useEffect(() => {
     const slug = initialCalculatorId || calcFromUrl;
@@ -476,6 +504,15 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
                 setSelectedCalculator(calc);
                 setSharedResult(null);
                 setUnknownSlug(null);
+                recordActivity({
+                  category: 'calculator',
+                  label: calc.name || calc.id,
+                  route: calc.route || `/tools/calculators/${calc.id}`,
+                  metadata: {
+                    calculatorId: calc.id,
+                    source: 'calculator-open',
+                  },
+                });
                 if (calc.route) {
                   navigate(calc.route);
                 }

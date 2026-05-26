@@ -16,9 +16,26 @@ const ProfileSettings = ({ authToken }) => {
   const [country, setCountry] = useState('');
   const [timezone, setTimezone] = useState('');
   const [status, setStatus] = useState({ type: 'idle', message: '' });
+  const [preferenceStatus, setPreferenceStatus] = useState('');
   const [saving, setSaving] = useState(false);
+  const [prefForm, setPrefForm] = useState({
+    theme: 'system',
+    responseStyle: 'concise',
+    citationLevel: 'standard',
+    safetyTone: 'standard',
+    pushEnabled: true,
+    emailEnabled: true,
+    securityAlerts: true,
+  });
   const { user, authToken: contextAuthToken, setUser } = useUser();
-  const { account, professional, updateProfile, isLoading: identityLoading } = useUserIdentity();
+  const {
+    account,
+    professional,
+    preferences,
+    updateProfile,
+    savePreferences,
+    isLoading: identityLoading,
+  } = useUserIdentity();
   const { success, error } = useNotificationActions();
   const effectiveAuthToken = authToken || contextAuthToken;
   const profile = user?.profile || {};
@@ -74,6 +91,18 @@ const ProfileSettings = ({ authToken }) => {
     currentProfile.specialty,
     currentProfile.timezone,
   ]);
+
+  useEffect(() => {
+    setPrefForm({
+      theme: preferences?.theme || 'system',
+      responseStyle: preferences?.aiAssistantPreferences?.responseStyle || 'concise',
+      citationLevel: preferences?.aiAssistantPreferences?.citationLevel || 'standard',
+      safetyTone: preferences?.aiAssistantPreferences?.safetyTone || 'standard',
+      pushEnabled: preferences?.notificationSettings?.pushEnabled !== false,
+      emailEnabled: preferences?.notificationSettings?.emailEnabled !== false,
+      securityAlerts: preferences?.notificationSettings?.securityAlerts !== false,
+    });
+  }, [preferences]);
 
   const payload = useMemo(
     () => ({
@@ -142,6 +171,30 @@ const ProfileSettings = ({ authToken }) => {
       message: 'Operational profile saved. Profile, workspace, and audit surfaces now use the latest details.',
     });
     success('Profile saved', 'Clinical profile updated.');
+  };
+
+  const updatePreferenceField = (field, value) => {
+    setPrefForm((current) => ({ ...current, [field]: value }));
+    setPreferenceStatus('');
+  };
+
+  const handleSavePreferences = async (event) => {
+    event.preventDefault();
+    const result = await savePreferences({
+      theme: prefForm.theme,
+      aiAssistantPreferences: {
+        responseStyle: prefForm.responseStyle,
+        citationLevel: prefForm.citationLevel,
+        safetyTone: prefForm.safetyTone,
+      },
+      notificationSettings: {
+        ...(preferences?.notificationSettings || {}),
+        pushEnabled: prefForm.pushEnabled,
+        emailEnabled: prefForm.emailEnabled,
+        securityAlerts: prefForm.securityAlerts,
+      },
+    });
+    setPreferenceStatus(result.ok ? 'Preferences saved.' : result.message || 'Unable to save preferences.');
   };
 
   return (
@@ -233,6 +286,101 @@ const ProfileSettings = ({ authToken }) => {
             <Link to="/assistant" style={{ color: '#00FF88', textDecoration: 'none', alignSelf: 'center' }}>
               Back to Assistant
             </Link>
+          </div>
+        </Card>
+
+        <Card>
+          <h2 style={{ marginTop: 0 }}>AI, Notification, and Theme Preferences</h2>
+          <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
+            Tune the assistant response style, notification channels, security alerts, and app theme.
+          </p>
+          <form
+            id="profile-preferences-form"
+            onSubmit={handleSavePreferences}
+            style={{ display: 'grid', gap: '12px', marginTop: '18px' }}
+          >
+            <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
+              Theme
+              <select
+                value={prefForm.theme}
+                onChange={(event) => updatePreferenceField('theme', event.target.value)}
+              >
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
+              AI response style
+              <select
+                value={prefForm.responseStyle}
+                onChange={(event) => updatePreferenceField('responseStyle', event.target.value)}
+              >
+                <option value="concise">Concise</option>
+                <option value="stepwise">Stepwise</option>
+                <option value="evidence_first">Evidence first</option>
+                <option value="teaching">Teaching</option>
+              </select>
+            </label>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
+                Citation level
+                <select
+                  value={prefForm.citationLevel}
+                  onChange={(event) => updatePreferenceField('citationLevel', event.target.value)}
+                >
+                  <option value="minimal">Minimal</option>
+                  <option value="standard">Standard</option>
+                  <option value="full">Full</option>
+                </select>
+              </label>
+              <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
+                Safety tone
+                <select
+                  value={prefForm.safetyTone}
+                  onChange={(event) => updatePreferenceField('safetyTone', event.target.value)}
+                >
+                  <option value="standard">Standard</option>
+                  <option value="strict">Strict</option>
+                </select>
+              </label>
+            </div>
+            <div className="card-subtle" style={{ display: 'grid', gap: '10px', padding: '12px 16px' }}>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={prefForm.pushEnabled}
+                  onChange={(event) => updatePreferenceField('pushEnabled', event.target.checked)}
+                />{' '}
+                Push notifications
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={prefForm.emailEnabled}
+                  onChange={(event) => updatePreferenceField('emailEnabled', event.target.checked)}
+                />{' '}
+                Email notifications
+              </label>
+              <label>
+                <input
+                  type="checkbox"
+                  checked={prefForm.securityAlerts}
+                  onChange={(event) => updatePreferenceField('securityAlerts', event.target.checked)}
+                />{' '}
+                Security alerts
+              </label>
+            </div>
+          </form>
+          <div style={{ display: 'flex', gap: '12px', marginTop: '18px', flexWrap: 'wrap' }}>
+            <Button type="submit" form="profile-preferences-form" disabled={identityLoading}>
+              Save preferences
+            </Button>
+            {preferenceStatus ? (
+              <span style={{ color: 'var(--muted-text)', alignSelf: 'center', fontSize: '14px' }}>
+                {preferenceStatus}
+              </span>
+            ) : null}
           </div>
         </Card>
 

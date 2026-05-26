@@ -46,6 +46,24 @@
   color: var(--muted-text);
 }
 
+.profile-summary-card__meta {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.profile-summary-card__meta span {
+  padding: 3px 8px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-background);
+  color: var(--muted-text);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
 .profile-summary-card__workspace {
   margin-top: 8px;
   display: flex;

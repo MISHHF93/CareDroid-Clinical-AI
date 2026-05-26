@@ -158,6 +158,11 @@
   color: var(--text-color);
 }
 
+.dashboard-context-pill--profile {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 24%, var(--app-panel-border));
+  color: var(--text-color);
+}
+
 .dashboard-scroll {
   grid-row: 2;
   flex: 1 1 0;

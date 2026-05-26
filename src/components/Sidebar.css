@@ -261,6 +261,40 @@
   letter-spacing: 0.5px;
 }
 
+.user-organization {
+  font-size: 11px;
+  color: var(--sidebar-fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-profile-links {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sidebar-profile-links button {
+  min-height: 28px;
+  padding: 0 8px;
+  border: 1px solid var(--sidebar-divider);
+  border-radius: 999px;
+  background: var(--sidebar-surface);
+  color: var(--sidebar-fg-muted);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.sidebar-profile-links button:hover,
+.sidebar-profile-links button:focus-visible {
+  border-color: var(--sidebar-item-hover-border);
+  color: var(--sidebar-fg);
+  outline: none;
+}
+
 .sidebar-operational-workspace {
   grid-column: 1 / -1;
   display: grid;

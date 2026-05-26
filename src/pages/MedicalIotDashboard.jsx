@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { fetchMedicalIotSnapshot, formatTelemetryTime } from '../services/medicalIotService';
 import {
   CategoryBarChart,
@@ -187,6 +188,7 @@ function DeviceDetailDrawer({ device, onClose }) {
 }
 
 export default function MedicalIotDashboard() {
+  const { activeWorkspace, account, recordActivity } = useUserIdentity();
   const [state, setState] = useState({
     loading: true,
     error: '',
@@ -227,6 +229,15 @@ export default function MedicalIotDashboard() {
       window.clearInterval(refreshTimer);
     };
   }, [loadSnapshot]);
+
+  useEffect(() => {
+    recordActivity({
+      category: 'iot',
+      label: 'Medical IoT Dashboard',
+      route: '/medical-iot',
+      metadata: { toolId: 'medical-iot', source: 'medical-iot-dashboard' },
+    });
+  }, [recordActivity]);
 
   const snapshot = state.snapshot;
   const selectedDevice = useMemo(
@@ -276,8 +287,9 @@ export default function MedicalIotDashboard() {
           <p className="medical-iot-eyebrow">Connected care monitoring</p>
           <h1 id="medical-iot-title">Medical IoT Dashboard</h1>
           <p>
-            Monitor connected devices, patient telemetry, vitals streams, wearable data, and abnormal
-            signal alerts. Device data is monitoring support only and does not replace clinician assessment.
+            Monitor connected devices, patient telemetry, vitals streams, wearable data, and abnormal signal alerts
+            for {activeWorkspace?.branding?.displayName || activeWorkspace?.name || account?.organization || 'your workspace'}.
+            Device data is monitoring support only and does not replace clinician assessment.
           </p>
         </div>
         <div className="medical-iot-hero-actions">

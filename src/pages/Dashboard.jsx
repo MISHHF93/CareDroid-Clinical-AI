@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import { toolRegistryById, getToolById } from '../data/toolRegistry';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
@@ -146,6 +147,7 @@ function Dashboard() {
   const { authToken, hasPermission } = useUser();
   const { error, success } = useNotificationActions();
   const { recordToolAccess } = useToolPreferences();
+  const { account, activeWorkspace, preferences, recordActivity } = useUserIdentity();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -220,6 +222,11 @@ function Dashboard() {
   const isChatMode = location.pathname === '/chat' || location.pathname === '/assistant';
   const selectedToolEntry = selectedTool ? getToolById(selectedTool) : null;
   const activeConversationLabel = activeConversationId ? `Conversation ${activeConversationId}` : 'No conversation';
+  const workspaceLabel =
+    activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'Personal workspace';
+  const aiPreferenceLabel =
+    preferences?.aiAssistantPreferences?.responseStyle || 'concise';
+  const clinicianContextLabel = account?.specialty || account?.profession || account?.role || 'Clinical profile';
   const availableChatTools = useMemo(
     () =>
       getChatCapabilitySuggestions({ hasPermission })
@@ -344,6 +351,15 @@ function Dashboard() {
     setSending(true);
 
     try {
+      recordActivity({
+        category: 'ai_chat',
+        label: selectedToolEntry ? `Assistant: ${selectedToolEntry.name}` : 'Assistant chat',
+        route: '/assistant',
+        metadata: {
+          toolId: selectedToolEntry?.id,
+          source: 'assistant',
+        },
+      });
       const apiTool = registryIdToChatToolParam(selectedTool);
       const { ok, data } = await sendClinicalChatMessage({
         message: text,
@@ -387,6 +403,12 @@ function Dashboard() {
     const action = createChatExecutionAction(toolOrId, { source });
     shouldStickToBottomRef.current = true;
     setExecutionActions((current) => ({ ...current, [action.id]: action }));
+    recordActivity({
+      category: 'tool',
+      label: action.toolName,
+      route: action.path || '/assistant',
+      metadata: { toolId: action.registryId, source },
+    });
     addMessage({
       role: 'assistant',
       content:
@@ -844,6 +866,9 @@ function Dashboard() {
             <div className="dashboard-header-group" aria-label="Current context">
               <span className="dashboard-header-group__label">Context</span>
               <span className="dashboard-context-pill">{activeConversationLabel}</span>
+              <span className="dashboard-context-pill dashboard-context-pill--profile">
+                {clinicianContextLabel}
+              </span>
               {selectedToolEntry && (
                 <span className="dashboard-context-pill dashboard-context-pill--tool">
                   <NavIcon icon={getToolIcon(selectedToolEntry.id)} size={14} aria-hidden />
@@ -853,11 +878,12 @@ function Dashboard() {
             </div>
             <div className="dashboard-header-group" aria-label="Workspace status">
               <span className="dashboard-header-group__label">Workspace</span>
+              <span className="dashboard-context-pill">{workspaceLabel}</span>
               <span className="dashboard-context-pill dashboard-context-pill--online">
                 <NavIcon icon={CHROME_ICONS.checkCircle} size={14} aria-hidden />
                 Online
               </span>
-              <span className="dashboard-context-pill">Protected</span>
+              <span className="dashboard-context-pill">AI: {aiPreferenceLabel}</span>
             </div>
             <div className="dashboard-header-group" aria-label="Available tools">
               <span className="dashboard-header-group__label">Available tools</span>

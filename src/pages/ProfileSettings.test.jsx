@@ -10,10 +10,12 @@ const mockSetUser = vi.fn();
 const mockSuccess = vi.fn();
 const mockError = vi.fn();
 const mockUpdateProfile = vi.fn();
+const mockSavePreferences = vi.fn();
 let mockUser;
 let mockAuthToken;
 let mockAccount;
 let mockProfessional;
+let mockPreferences;
 
 vi.mock('../contexts/UserContext', async (importOriginal) => {
   const actual = await importOriginal();
@@ -39,7 +41,9 @@ vi.mock('../contexts/UserIdentityContext', () => ({
   useUserIdentity: () => ({
     account: mockAccount,
     professional: mockProfessional,
+    preferences: mockPreferences,
     updateProfile: mockUpdateProfile,
+    savePreferences: mockSavePreferences,
     isLoading: false,
   }),
 }));
@@ -87,6 +91,19 @@ describe('ProfileSettings operational profile save', () => {
       licenseNumber: 'MD-123',
       specialties: ['Emergency Medicine'],
     };
+    mockPreferences = {
+      theme: 'system',
+      aiAssistantPreferences: {
+        responseStyle: 'concise',
+        citationLevel: 'standard',
+        safetyTone: 'standard',
+      },
+      notificationSettings: {
+        pushEnabled: true,
+        emailEnabled: true,
+        securityAlerts: true,
+      },
+    };
     mockUpdateProfile.mockResolvedValue({
       ok: true,
       data: {
@@ -99,6 +116,7 @@ describe('ProfileSettings operational profile save', () => {
         },
       },
     });
+    mockSavePreferences.mockResolvedValue({ ok: true, data: mockPreferences, message: '' });
   });
 
   it('prefills operational profile fields and saves changes through the operational identity API', async () => {
@@ -150,5 +168,26 @@ describe('ProfileSettings operational profile save', () => {
       'Profile save failed',
       'You do not have permission to access this resource.'
     );
+  });
+
+  it('saves AI, notification, and theme preferences from profile settings', async () => {
+    const user = userEvent.setup();
+    renderProfileSettings();
+
+    await user.selectOptions(screen.getByLabelText(/theme/i), 'dark');
+    await user.selectOptions(screen.getByLabelText(/ai response style/i), 'teaching');
+    await user.click(screen.getByLabelText(/email notifications/i));
+    await user.click(screen.getByRole('button', { name: /save preferences/i }));
+
+    await waitFor(() => {
+      expect(mockSavePreferences).toHaveBeenCalledWith(
+        expect.objectContaining({
+          theme: 'dark',
+          aiAssistantPreferences: expect.objectContaining({ responseStyle: 'teaching' }),
+          notificationSettings: expect.objectContaining({ emailEnabled: false }),
+        })
+      );
+    });
+    expect(screen.getByText(/preferences saved/i)).toBeInTheDocument();
   });
 });

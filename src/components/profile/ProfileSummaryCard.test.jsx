@@ -9,6 +9,8 @@ vi.mock('../../contexts/UserIdentityContext', () => ({
     account: {
       displayName: 'Avery Clinician',
       specialty: 'Emergency Medicine',
+      organization: 'CareDroid General',
+      role: 'physician',
     },
     activeWorkspace: {
       type: 'hospital',
@@ -29,6 +31,8 @@ describe('ProfileSummaryCard', () => {
 
     expect(screen.getByText('Avery Clinician')).toBeInTheDocument();
     expect(screen.getByText('Emergency Medicine')).toBeInTheDocument();
+    expect(screen.getByText('CareDroid General')).toBeInTheDocument();
+    expect(screen.getByText('physician')).toBeInTheDocument();
     expect(screen.getByText('Hospital Operations')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /switch workspace/i })).toHaveAttribute(
       'href',

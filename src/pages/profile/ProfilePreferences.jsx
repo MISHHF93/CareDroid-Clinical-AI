@@ -13,6 +13,9 @@ export default function ProfilePreferences() {
     responseStyle: 'concise',
     citationLevel: 'standard',
     safetyTone: 'standard',
+    pushEnabled: true,
+    emailEnabled: true,
+    securityAlerts: true,
   });
   const [status, setStatus] = useState('');
 
@@ -25,6 +28,9 @@ export default function ProfilePreferences() {
       responseStyle: preferences?.aiAssistantPreferences?.responseStyle || 'concise',
       citationLevel: preferences?.aiAssistantPreferences?.citationLevel || 'standard',
       safetyTone: preferences?.aiAssistantPreferences?.safetyTone || 'standard',
+      pushEnabled: preferences?.notificationSettings?.pushEnabled !== false,
+      emailEnabled: preferences?.notificationSettings?.emailEnabled !== false,
+      securityAlerts: preferences?.notificationSettings?.securityAlerts !== false,
     });
   }, [preferences]);
 
@@ -49,6 +55,12 @@ export default function ProfilePreferences() {
         responseStyle: form.responseStyle,
         citationLevel: form.citationLevel,
         safetyTone: form.safetyTone,
+      },
+      notificationSettings: {
+        ...(preferences?.notificationSettings || {}),
+        pushEnabled: form.pushEnabled,
+        emailEnabled: form.emailEnabled,
+        securityAlerts: form.securityAlerts,
       },
     });
     setStatus(result.ok ? 'Preferences saved.' : result.message || 'Unable to save preferences.');
@@ -122,6 +134,36 @@ export default function ProfilePreferences() {
                   onChange={(event) => updateField('compactMode', event.target.checked)}
                 />{' '}
                 Compact mode
+              </span>
+            </label>
+            <label>
+              <span>
+                <input
+                  type="checkbox"
+                  checked={form.pushEnabled}
+                  onChange={(event) => updateField('pushEnabled', event.target.checked)}
+                />{' '}
+                Push notifications
+              </span>
+            </label>
+            <label>
+              <span>
+                <input
+                  type="checkbox"
+                  checked={form.emailEnabled}
+                  onChange={(event) => updateField('emailEnabled', event.target.checked)}
+                />{' '}
+                Email notifications
+              </span>
+            </label>
+            <label>
+              <span>
+                <input
+                  type="checkbox"
+                  checked={form.securityAlerts}
+                  onChange={(event) => updateField('securityAlerts', event.target.checked)}
+                />{' '}
+                Security alerts
               </span>
             </label>
             <div className="profile-identity-actions">

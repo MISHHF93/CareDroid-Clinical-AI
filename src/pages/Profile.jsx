@@ -2,7 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../components/ui/card';
 import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
+import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { Permission, useUser } from '../contexts/UserContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { toolRegistryById } from '../data/toolRegistry';
 import { fetchMyAuditLogs, fetchPhiAccessLogs } from '../services/auditApi';
 import './Profile.css';
 
@@ -37,6 +40,8 @@ function formatDate(value) {
 
 const Profile = () => {
   const { user, hasPermission } = useUser();
+  const { account, preferences, activity, aiPersonalization, activeWorkspace } = useUserIdentity();
+  const { favorites, pinned, recentTools } = useToolPreferences();
   const [activityState, setActivityState] = useState({
     loading: true,
     error: '',
@@ -51,10 +56,39 @@ const Profile = () => {
   });
 
   const canViewPhiAccess = hasPermission(Permission.VIEW_AUDIT_LOGS);
-  const displayName = user?.fullName || user?.name || user?.profile?.fullName || '—';
-  const email = user?.email || '—';
-  const role = user?.role || '—';
-  const institution = user?.institution || user?.profile?.institution || '—';
+  const displayName = account?.displayName || user?.fullName || user?.name || user?.profile?.fullName || '—';
+  const email = account?.email || user?.email || '—';
+  const role = account?.role || user?.role || '—';
+  const specialty = account?.specialty || user?.profile?.specialty || '—';
+  const institution = account?.organization || user?.institution || user?.profile?.institution || '—';
+  const workspaceName =
+    activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'Personal workspace';
+  const recentToolItems = useMemo(() => {
+    const profileItems = activity?.recentTools || [];
+    if (profileItems.length > 0) return profileItems;
+    return (recentTools || []).map((toolId) => ({
+      id: toolId,
+      label: toolRegistryById[toolId]?.name || toolId,
+      route: toolRegistryById[toolId]?.path,
+    }));
+  }, [activity?.recentTools, recentTools]);
+  const savedTools = useMemo(() => {
+    const profileToolPrefs = preferences?.toolPreferences || {};
+    const ids = [
+      ...(profileToolPrefs.favoriteToolIds || []),
+      ...(profileToolPrefs.pinnedToolIds || []),
+      ...(favorites || []),
+      ...(pinned || []),
+    ];
+    return [...new Set(ids)].map((toolId) => ({
+      id: toolId,
+      label: toolRegistryById[toolId]?.name || toolId,
+      route: toolRegistryById[toolId]?.path,
+    }));
+  }, [favorites, pinned, preferences?.toolPreferences]);
+  const recentCalculators = activity?.recentCalculators || [];
+  const aiPreferences = preferences?.aiAssistantPreferences || {};
+  const notificationSettings = preferences?.notificationSettings || {};
   const recentPhiCount = useMemo(
     () => activityState.logs.filter((log) => log.phiAccessed || log.action === 'PHI_ACCESS').length,
     [activityState.logs]
@@ -132,9 +166,102 @@ const Profile = () => {
         }}>
           <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Name:</strong> {displayName}</div>
           <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Email:</strong> {email}</div>
+          <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Specialty:</strong> {specialty}</div>
           <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Role:</strong> {role}</div>
-          <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Institution:</strong> {institution}</div>
+          <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Organization:</strong> {institution}</div>
+          <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Workspace:</strong> {workspaceName}</div>
         </div>
+
+        <section className="profile-overview-grid" aria-label="Profile tools and preferences">
+          <div className="profile-overview-card">
+            <div className="profile-overview-card__header">
+              <h3>Recent tools</h3>
+              <Link to="/profile/activity">View activity</Link>
+            </div>
+            <div className="profile-overview-list">
+              {recentToolItems.length > 0 ? (
+                recentToolItems.slice(0, 5).map((tool) => (
+                  <div key={tool.id || tool.label} className="profile-overview-row">
+                    <span>{tool.label}</span>
+                    {tool.route ? <Link to={tool.route}>Open</Link> : null}
+                  </div>
+                ))
+              ) : (
+                <p>No recent tools yet.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="profile-overview-card">
+            <div className="profile-overview-card__header">
+              <h3>Recent calculators</h3>
+              <Link to="/tools/calculators">Open calculators</Link>
+            </div>
+            <div className="profile-overview-list">
+              {recentCalculators.length > 0 ? (
+                recentCalculators.slice(0, 5).map((calculator) => (
+                  <div key={calculator.id || calculator.label} className="profile-overview-row">
+                    <span>{calculator.label}</span>
+                    {calculator.route ? <Link to={calculator.route}>Open</Link> : null}
+                  </div>
+                ))
+              ) : (
+                <p>No calculator history yet.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="profile-overview-card">
+            <div className="profile-overview-card__header">
+              <h3>Saved tools</h3>
+              <Link to="/tools">Manage tools</Link>
+            </div>
+            <div className="profile-overview-list">
+              {savedTools.length > 0 ? (
+                savedTools.slice(0, 6).map((tool) => (
+                  <div key={tool.id} className="profile-overview-row">
+                    <span>{tool.label}</span>
+                    {tool.route ? <Link to={tool.route}>Open</Link> : null}
+                  </div>
+                ))
+              ) : (
+                <p>Favorite or pin tools to save them here.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="profile-overview-card">
+            <div className="profile-overview-card__header">
+              <h3>Preferences</h3>
+              <Link to="/profile/settings">Edit settings</Link>
+            </div>
+            <dl className="profile-preference-list">
+              <div>
+                <dt>Theme</dt>
+                <dd>{preferences?.theme || 'system'}</dd>
+              </div>
+              <div>
+                <dt>AI style</dt>
+                <dd>{aiPreferences.responseStyle || 'concise'}</dd>
+              </div>
+              <div>
+                <dt>Citations</dt>
+                <dd>{aiPreferences.citationLevel || 'standard'}</dd>
+              </div>
+              <div>
+                <dt>Notifications</dt>
+                <dd>
+                  {notificationSettings.pushEnabled === false ? 'Push off' : 'Push on'} ·{' '}
+                  {notificationSettings.emailEnabled === false ? 'Email off' : 'Email on'}
+                </dd>
+              </div>
+              <div>
+                <dt>Recommended AI</dt>
+                <dd>{aiPersonalization?.preferredBehavior || 'clinical_copilot'}</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
 
         <section className="profile-activity-card" aria-labelledby="profile-activity-title">
           <div className="profile-activity-card__header">
@@ -251,7 +378,6 @@ const Profile = () => {
         >
           <Link to="/profile/settings">Profile settings</Link>
           <Link to="/profile/activity">Activity</Link>
-          <Link to="/profile/preferences">Preferences</Link>
           <Link to="/profile/workspaces">Workspaces</Link>
           <Link to="/profile/security">Security</Link>
           <Link to="/settings">App settings</Link>

@@ -76,6 +76,7 @@ const Sidebar = forwardRef(function Sidebar(
   const unreadCount = notifications.filter(n => !n.read).length;
   const displayName = account?.displayName || user?.fullName || user?.name || 'User';
   const displayRole = account?.specialty || account?.role || user?.role || 'Clinician';
+  const displayOrganization = account?.organization || user?.institution || 'Personal workspace';
 
   // Medical Tools - Enhanced with navigation
   const medicalTools = useMemo(() => getSidebarToolRegistryProjection(), []);
@@ -402,8 +403,20 @@ const Sidebar = forwardRef(function Sidebar(
             <div className="user-info">
               <div className="user-name">{displayName}</div>
               <div className="user-role">{displayRole}</div>
+              <div className="user-organization">{displayOrganization}</div>
             </div>
           </button>
+          <div className="sidebar-profile-links" aria-label="Profile quick links">
+            <button type="button" onClick={() => handleNavClick('/profile/activity')}>
+              Activity
+            </button>
+            <button type="button" onClick={() => handleNavClick('/profile/settings')}>
+              Settings
+            </button>
+            <button type="button" onClick={() => handleNavClick('/profile/security')}>
+              Security
+            </button>
+          </div>
           <div className="sidebar-operational-workspace">
             <label htmlFor="sidebar-operational-workspace">Workspace</label>
             <select
