@@ -148,6 +148,43 @@ describe('Dashboard chat layout', () => {
     expect(screen.getByText(/decision support only/i)).toBeInTheDocument();
   });
 
+  it('renders AI foundation route metadata for assistant messages', () => {
+    mockConversationValue.messages = [
+      {
+        id: 'assistant-1',
+        role: 'assistant',
+        content: 'Route-aware answer',
+        timestamp: new Date(),
+        aiFoundation: {
+          route: 'medical_reference',
+          selectedExpert: 'cardiology',
+          selectedExperts: [
+            {
+              expertId: 'cardiology',
+              role: 'primary',
+              confidence: 0.82,
+              score: 6.42,
+            },
+          ],
+          retrievalPolicy: 'guideline',
+          confidence: 0.82,
+          routeScore: 6.42,
+          estimatedCost: 0.14,
+          requiresHumanReview: true,
+        },
+      },
+    ];
+
+    renderDashboard('/assistant');
+
+    const routePanel = screen.getByLabelText(/ai routing metadata/i);
+    expect(routePanel).toHaveTextContent(/expert: cardiology/i);
+    expect(routePanel).toHaveTextContent(/intent: medical reference/i);
+    expect(routePanel).toHaveTextContent(/route score/i);
+    expect(routePanel).toHaveTextContent(/\$0\.1400/);
+    expect(screen.getByText('Route-aware answer')).toBeInTheDocument();
+  });
+
   it('shows capability-backed suggested actions when Chat opens', async () => {
     renderDashboard('/assistant');
 

@@ -1,0 +1,109 @@
+import React from 'react';
+import './AiRouteMetadata.css';
+
+const EXPERT_LABELS = {
+  emergency: 'Emergency',
+  cardiology: 'Cardiology',
+  pulmonology: 'Pulmonology',
+  nephrology: 'Nephrology',
+  radiology: 'Radiology',
+  psychiatry: 'Psychiatry',
+  fleet: 'Fleet',
+  iot: 'IoT',
+  operations: 'Operations',
+  'hospital-map': 'Hospital map',
+  documentation: 'Documentation',
+};
+
+function formatLabel(value) {
+  if (!value) return 'Unknown';
+  return (
+    EXPERT_LABELS[value] ||
+    String(value)
+      .replace(/[-_]/g, ' ')
+      .replace(/\b\w/g, (char) => char.toUpperCase())
+  );
+}
+
+function formatPercent(value) {
+  if (!Number.isFinite(Number(value))) return null;
+  return `${Math.round(Number(value) * 100)}%`;
+}
+
+function formatScore(value) {
+  if (!Number.isFinite(Number(value))) return null;
+  return Number(value).toFixed(2);
+}
+
+function formatCost(value) {
+  if (!Number.isFinite(Number(value))) return null;
+  return `$${Number(value).toFixed(4)}`;
+}
+
+export default function AiRouteMetadata({ aiFoundation, routePlan }) {
+  if (!aiFoundation) return null;
+
+  const selectedExperts =
+    Array.isArray(aiFoundation.selectedExperts) && aiFoundation.selectedExperts.length > 0
+      ? aiFoundation.selectedExperts
+      : Array.isArray(routePlan?.selectedExperts) && routePlan.selectedExperts.length > 0
+        ? routePlan.selectedExperts
+        : aiFoundation.selectedExpert
+          ? [{ expertId: aiFoundation.selectedExpert, role: 'primary' }]
+          : [];
+
+  if (!selectedExperts.length && !aiFoundation.route) return null;
+
+  const primaryExpert = selectedExperts[0];
+  const routeScore = formatScore(aiFoundation.routeScore ?? primaryExpert?.score);
+  const confidence = formatPercent(aiFoundation.confidence ?? primaryExpert?.confidence);
+  const estimatedCost = formatCost(
+    aiFoundation.estimatedCost ?? routePlan?.costPlan?.estimatedCost
+  );
+  const reviewRequired =
+    aiFoundation.requiresHumanReview ?? routePlan?.safetyPlan?.requiresHumanReview;
+
+  return (
+    <section className="ai-route-metadata" aria-label="AI routing metadata">
+      <div className="ai-route-metadata__header">
+        <span className="ai-route-metadata__eyebrow">AI route</span>
+        {reviewRequired && <span className="ai-route-metadata__review">Human review</span>}
+      </div>
+      <div className="ai-route-metadata__chips">
+        {selectedExperts.slice(0, 3).map((expert) => (
+          <span className="ai-route-metadata__chip" key={`${expert.expertId}-${expert.role}`}>
+            {expert.role === 'supporting' ? 'Support' : 'Expert'}: {formatLabel(expert.expertId)}
+          </span>
+        ))}
+        {aiFoundation.route && (
+          <span className="ai-route-metadata__chip">Intent: {formatLabel(aiFoundation.route)}</span>
+        )}
+        {aiFoundation.retrievalPolicy && (
+          <span className="ai-route-metadata__chip">
+            Retrieval: {formatLabel(aiFoundation.retrievalPolicy)}
+          </span>
+        )}
+      </div>
+      <dl className="ai-route-metadata__metrics">
+        {confidence && (
+          <div>
+            <dt>Confidence</dt>
+            <dd>{confidence}</dd>
+          </div>
+        )}
+        {routeScore && (
+          <div>
+            <dt>Route score</dt>
+            <dd>{routeScore}</dd>
+          </div>
+        )}
+        {estimatedCost && (
+          <div>
+            <dt>Estimated cost</dt>
+            <dd>{estimatedCost}</dd>
+          </div>
+        )}
+      </dl>
+    </section>
+  );
+}

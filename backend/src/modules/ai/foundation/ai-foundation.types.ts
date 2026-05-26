@@ -1,4 +1,40 @@
-export type RetrievalPolicy = 'none' | 'reference' | 'guideline' | 'patient_scoped';
+export type RetrievalPolicy = 'none' | 'reference' | 'guideline' | 'patient_scoped' | 'operational';
+
+export type AiExpertId =
+  | 'emergency'
+  | 'cardiology'
+  | 'pulmonology'
+  | 'nephrology'
+  | 'radiology'
+  | 'psychiatry'
+  | 'fleet'
+  | 'iot'
+  | 'operations'
+  | 'hospital-map'
+  | 'documentation';
+
+export type ExpertRole = 'primary' | 'supporting' | 'review';
+
+export type RouterModelTier = 'deterministic' | 'embedding' | 'small' | 'standard' | 'large';
+
+export type ExpertModelTier = 'none' | 'small' | 'standard' | 'large';
+
+export interface RouteEvidence {
+  expertId: AiExpertId;
+  kind: 'keyword' | 'intent' | 'tool_id' | 'feature' | 'source_surface' | 'policy';
+  value: string;
+  weight: number;
+}
+
+export interface SelectedExpertRoute {
+  expertId: AiExpertId;
+  role: ExpertRole;
+  confidence: number;
+  relevance: number;
+  estimatedCost: number;
+  score: number;
+  reason: string;
+}
 
 export interface AiRunEnvelope {
   runId: string;
@@ -29,20 +65,40 @@ export interface AiRunEnvelope {
 export interface ExpertRoutePlan {
   runId: string;
   primaryIntent: string;
+  /**
+   * Backward-compatible primary expert field for older consumers.
+   * New consumers should prefer selectedExperts[0].expertId.
+   */
   selectedExpert: string;
+  selectedExperts: SelectedExpertRoute[];
   confidence: number;
   retrievalPolicy: RetrievalPolicy;
+  routeScore: number;
+  routeReason: string;
+  routingEvidence: RouteEvidence[];
+  modelPlan: {
+    routerModel: RouterModelTier;
+    expertModel: ExpertModelTier;
+    useLightweightFirst: boolean;
+    allowEscalation: boolean;
+    maxTokens: number;
+  };
   toolPlan: {
     allowedToolIds: string[];
+    backendExecutorIds: string[];
     requiredHumanConfirmation: boolean;
   };
   costPlan: {
     preferredModel: string;
     maxTokens: number;
     allowFallback: boolean;
+    estimatedCost: number;
+    budgetLimit?: number;
+    costReductionApplied: string[];
   };
   safetyPlan: {
     emergencyEscalation: boolean;
+    crisisEscalation: boolean;
     requiresHumanReview: boolean;
     blockedActions: string[];
   };
@@ -62,8 +118,15 @@ export interface AiContextPacket {
   route: {
     primaryIntent: string;
     selectedExpert: string;
+    selectedExperts: SelectedExpertRoute[];
     retrievalPolicy: RetrievalPolicy;
     confidence: number;
+    routeScore: number;
+    routeReason: string;
+  };
+  cost: {
+    estimatedCost: number;
+    costReductionApplied: string[];
   };
   memory: {
     conversationScope: 'request' | 'session' | 'patient' | 'workspace';
@@ -81,8 +144,13 @@ export interface AiFoundationMetadata {
   capabilityId: string;
   route: string;
   selectedExpert: string;
+  selectedExperts?: SelectedExpertRoute[];
   retrievalPolicy: RetrievalPolicy;
   confidence: number;
+  routeScore?: number;
+  routeReason?: string;
+  estimatedCost?: number;
+  costReductionApplied?: string[];
   phiAccessed: boolean;
   requiresHumanReview: boolean;
   startedAt: string;

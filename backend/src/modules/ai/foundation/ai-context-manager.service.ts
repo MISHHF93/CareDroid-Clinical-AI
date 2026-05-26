@@ -18,8 +18,15 @@ export class AiContextManagerService {
       route: {
         primaryIntent: routePlan.primaryIntent,
         selectedExpert: routePlan.selectedExpert,
+        selectedExperts: routePlan.selectedExperts,
         retrievalPolicy: routePlan.retrievalPolicy,
         confidence: routePlan.confidence,
+        routeScore: routePlan.routeScore,
+        routeReason: routePlan.routeReason,
+      },
+      cost: {
+        estimatedCost: routePlan.costPlan.estimatedCost,
+        costReductionApplied: routePlan.costPlan.costReductionApplied,
       },
       memory: {
         conversationScope: 'request',
@@ -40,7 +47,15 @@ export class AiContextManagerService {
       conversationId: packet.conversationId,
       route: packet.route.primaryIntent,
       selectedExpert: packet.route.selectedExpert,
+      selectedExperts: packet.route.selectedExperts.map((expert) => ({
+        expertId: expert.expertId,
+        role: expert.role,
+        confidence: expert.confidence,
+        score: expert.score,
+      })),
       retrievalPolicy: packet.route.retrievalPolicy,
+      routeScore: packet.route.routeScore,
+      estimatedCost: packet.cost.estimatedCost,
       requiresHumanReview: packet.safety.requiresHumanReview,
       phiAccessed: packet.safety.phiAccessed,
     };

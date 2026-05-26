@@ -86,4 +86,34 @@ describe('ChatInterface NLU integration', () => {
     expect(screen.getByText('Hello clinician')).toBeInTheDocument();
     expect(screen.getByText('How can I help?')).toBeInTheDocument();
   });
+
+  it('renders AI foundation metadata on assistant messages', () => {
+    render(
+      <ChatInterface
+        messages={[
+          {
+            id: '2',
+            role: 'assistant',
+            content: 'Routing-aware reply',
+            aiFoundation: {
+              route: 'administrative',
+              selectedExpert: 'operations',
+              selectedExperts: [{ expertId: 'operations', role: 'primary', confidence: 0.76, score: 9.4 }],
+              retrievalPolicy: 'operational',
+              confidence: 0.76,
+              routeScore: 9.4,
+              estimatedCost: 0.08,
+              requiresHumanReview: false,
+            },
+          },
+        ]}
+        onAppendMessage={onAppendMessage}
+      />,
+    );
+
+    const routePanel = screen.getByLabelText(/ai routing metadata/i);
+    expect(routePanel).toHaveTextContent(/expert: operations/i);
+    expect(routePanel).toHaveTextContent(/retrieval: operational/i);
+    expect(routePanel).toHaveTextContent(/estimated cost/i);
+  });
 });

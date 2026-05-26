@@ -7,6 +7,7 @@ import { useNotificationActions } from '../hooks/useNotificationActions';
 import { toolRegistryById, getToolById } from '../data/toolRegistry';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import ToolVisualization from '../components/ToolVisualization';
+import AiRouteMetadata from '../components/chat/AiRouteMetadata';
 import ChatExecutionCard from '../components/chat/ChatExecutionCard';
 import OperationalResultCard from '../components/chat/OperationalResultCard';
 import Citations, { CitationModal } from '../components/Citations';
@@ -972,6 +973,7 @@ function Dashboard() {
             messages.map((msg) => {
               const recoveryActionId = msg.metadata?.sourceExecutionActionId;
               const canRecoverExecution = recoveryActionId && executionActions[recoveryActionId];
+              const aiFoundation = msg.aiFoundation || msg.metadata?.aiFoundation;
               const visualizations = Array.isArray(msg.visualizations)
                 ? msg.visualizations.filter((viz) => !(msg.toolResult && viz?.type === 'tool-result'))
                 : [];
@@ -997,6 +999,12 @@ function Dashboard() {
                       <div className="dashboard-msg-meta">
                         <ConfidenceBadge confidence={msg.confidence} />
                       </div>
+                    )}
+                    {msg.role === 'assistant' && aiFoundation && (
+                      <AiRouteMetadata
+                        aiFoundation={aiFoundation}
+                        routePlan={msg.metadata?.routePlan}
+                      />
                     )}
                     <div className="dashboard-msg-body">{msg.content}</div>
                     {msg.toolResult && (

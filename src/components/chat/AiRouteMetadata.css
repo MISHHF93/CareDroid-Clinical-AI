@@ -1,0 +1,86 @@
+.ai-route-metadata {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md, 12px);
+  background: color-mix(in srgb, var(--app-accent-interactive, #37c6ff) 7%, transparent);
+  display: grid;
+  gap: 8px;
+}
+
+.ai-route-metadata__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ai-route-metadata__eyebrow,
+.ai-route-metadata__review {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ai-route-metadata__eyebrow {
+  color: var(--muted-text);
+}
+
+.ai-route-metadata__review {
+  color: var(--app-warning, #ffbf47);
+}
+
+.ai-route-metadata__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.ai-route-metadata__chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--surface-1);
+  color: var(--text-color);
+  font-size: var(--font-12, 12px);
+  font-weight: 700;
+}
+
+.ai-route-metadata__metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.ai-route-metadata__metrics div {
+  display: grid;
+  gap: 2px;
+  min-width: 96px;
+}
+
+.ai-route-metadata__metrics dt {
+  color: var(--muted-text);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ai-route-metadata__metrics dd {
+  margin: 0;
+  color: var(--text-color);
+  font-size: var(--font-12, 12px);
+  font-weight: 800;
+}
+
+@media (max-width: 520px) {
+  .ai-route-metadata__metrics {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ToolPanel from './ToolPanel';
+import AiRouteMetadata from './chat/AiRouteMetadata';
 import ToolCard from './ToolCard';
 import ToolVisualization from './ToolVisualization';
 import Citations, { CitationModal } from './Citations';
@@ -165,6 +166,12 @@ const ChatInterface = ({
                 <div style={{ marginTop: '12px' }}>
                   <ConfidenceBadge confidence={message.confidence} />
                 </div>
+              )}
+              {message.role === 'assistant' && (message.aiFoundation || message.metadata?.aiFoundation) && (
+                <AiRouteMetadata
+                  aiFoundation={message.aiFoundation || message.metadata?.aiFoundation}
+                  routePlan={message.metadata?.routePlan}
+                />
               )}
               {message.toolResult && (
                 <div style={{ marginTop: '12px' }}>

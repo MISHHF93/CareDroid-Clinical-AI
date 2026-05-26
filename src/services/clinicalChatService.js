@@ -110,12 +110,51 @@ export function normalizeToolResultForUi(tr) {
   };
 }
 
+export function normalizeAiFoundationMetadata(metadata = {}) {
+  const foundation = metadata?.aiFoundation;
+  if (!foundation) return undefined;
+
+  const selectedExperts =
+    Array.isArray(foundation.selectedExperts) && foundation.selectedExperts.length > 0
+      ? foundation.selectedExperts
+      : Array.isArray(metadata.routePlan?.selectedExperts) && metadata.routePlan.selectedExperts.length > 0
+        ? metadata.routePlan.selectedExperts
+        : foundation.selectedExpert
+          ? [
+              {
+                expertId: foundation.selectedExpert,
+                role: 'primary',
+                confidence: foundation.confidence,
+                score: foundation.routeScore,
+              },
+            ]
+          : [];
+
+  return {
+    ...foundation,
+    selectedExperts,
+    routeScore: foundation.routeScore ?? selectedExperts[0]?.score,
+    estimatedCost:
+      foundation.estimatedCost ??
+      metadata.cost?.estimated ??
+      metadata.routePlan?.costPlan?.estimatedCost,
+    costReductionApplied:
+      foundation.costReductionApplied ??
+      metadata.cost?.savedBy ??
+      metadata.routePlan?.costPlan?.costReductionApplied ??
+      [],
+    requiresHumanReview:
+      foundation.requiresHumanReview ?? metadata.safety?.requiresHumanReview ?? false,
+  };
+}
+
 /**
  * Map API JSON body to a single assistant message object for conversation state.
  * @param {object} data - parsed response from sendClinicalChatMessage
  */
 export function mapChatResponseToAssistantMessage(data) {
   const toolResult = normalizeToolResultForUi(data.toolResult);
+  const aiFoundation = normalizeAiFoundationMetadata(data.metadata);
   const backendVisualizations = Array.isArray(data.visualizations) ? data.visualizations : [];
   const viz = [...backendVisualizations];
   if (toolResult?.result?.data != null && (toolResult.toolId || toolResult.toolName)) {
@@ -143,6 +182,7 @@ export function mapChatResponseToAssistantMessage(data) {
     toolResult,
     visualizations: viz.length > 0 ? viz : undefined,
     metadata: data.metadata,
+    aiFoundation,
     timestamp: new Date(),
   };
 }

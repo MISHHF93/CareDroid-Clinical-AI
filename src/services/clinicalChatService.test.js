@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   analyzeClinicalVitals,
   mapChatResponseToAssistantMessage,
+  normalizeAiFoundationMetadata,
   normalizeToolResultForUi,
   sendClinicalChatMessage,
   suggestClinicalAction,
@@ -40,6 +41,55 @@ describe('clinicalChatService', () => {
     });
     expect(msg.content).toBe('Hello');
     expect(msg.toolResult.toolId).toBe('drug-interactions');
+  });
+
+  it('normalizes AI foundation metadata for assistant rendering', () => {
+    const aiFoundation = normalizeAiFoundationMetadata({
+      aiFoundation: {
+        route: 'medical_reference',
+        selectedExpert: 'cardiology',
+        confidence: 0.82,
+        routeScore: 6.12,
+        requiresHumanReview: true,
+      },
+      cost: { estimated: 0.14, savedBy: ['lightweight_router'] },
+    });
+
+    expect(aiFoundation).toMatchObject({
+      selectedExpert: 'cardiology',
+      selectedExperts: [
+        expect.objectContaining({
+          expertId: 'cardiology',
+          role: 'primary',
+        }),
+      ],
+      routeScore: 6.12,
+      estimatedCost: 0.14,
+      costReductionApplied: ['lightweight_router'],
+      requiresHumanReview: true,
+    });
+  });
+
+  it('mapChatResponseToAssistantMessage exposes normalized AI foundation metadata', () => {
+    const msg = mapChatResponseToAssistantMessage({
+      response: 'Hello',
+      metadata: {
+        aiFoundation: {
+          route: 'administrative',
+          selectedExpert: 'operations',
+          confidence: 0.76,
+          routeScore: 10.2,
+          estimatedCost: 0.08,
+        },
+      },
+    });
+
+    expect(msg.aiFoundation).toMatchObject({
+      selectedExpert: 'operations',
+      routeScore: 10.2,
+      estimatedCost: 0.08,
+    });
+    expect(msg.metadata.aiFoundation.selectedExpert).toBe('operations');
   });
 
   it('sendClinicalChatMessage posts JSON', async () => {

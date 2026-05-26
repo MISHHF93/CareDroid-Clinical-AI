@@ -3,6 +3,7 @@
 Status: foundation architecture  
 Scope: AI assistant, prompts, tool launch behavior, backend executors, chat flows, tool inventory, RAG, audit, and cost controls  
 Goal: define CareDroid as a Clinical AI Operating System
+Related: [CareDroid Mixture-of-Experts Routing System](./moe-routing-system.md)
 
 ## Executive Summary
 
@@ -128,6 +129,7 @@ Current behavior by area:
 - [backend/src/modules/ai/ai.service.ts](../backend/src/modules/ai/ai.service.ts) invokes OpenAI, applies subscription rate limits, calculates token costs, records metrics, and persists some `ai_queries`.
 - [backend/src/modules/rag/rag.service.ts](../backend/src/modules/rag/rag.service.ts) performs embedding, vector retrieval, optional reranking, source extraction, confidence calculation, retrieval caching, and document ingestion.
 - [backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.service.ts](../backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.service.ts) validates and executes registered clinical tools.
+- [backend/src/modules/ai/foundation](../backend/src/modules/ai/foundation) now contains first-pass gateway, routing, context, and response-composition services used by chat flows.
 - [src/navigation/registryToolLaunch.js](../src/navigation/registryToolLaunch.js) centralizes how tool IDs launch as calculator routes, dedicated tool pages, chat-assisted flows, or fallbacks.
 - [src/data/toolInventory.js](../src/data/toolInventory.js) normalizes the frontend inventory across tool pages, chat-assisted tools, backend-backed tools, clinical pages, platform tools, and unsupported planned tools.
 
@@ -164,6 +166,8 @@ Current state:
 - `POST /api/chat/message` is the primary assistant entry.
 - [backend/src/modules/chat/chat.service.ts](../backend/src/modules/chat/chat.service.ts) acts as the practical gateway today.
 - [backend/src/modules/ai/ai.controller.ts](../backend/src/modules/ai/ai.controller.ts) exposes lower-level AI functions such as structured JSON generation and usage.
+- [backend/src/modules/ai/foundation/ai-gateway.service.ts](../backend/src/modules/ai/foundation/ai-gateway.service.ts) creates a first-pass `AiRunEnvelope` for chat requests with `runId`, capability, user, tool and feature hints, PHI flags, human-review default, and trace metadata.
+- The gateway scaffold is still chat-scoped; other AI-capable surfaces should be moved through the same envelope contract.
 
 Target responsibilities:
 
@@ -212,6 +216,8 @@ Current state:
 - [backend/src/modules/medical-control-plane/intent-classifier/intent-classifier.service.ts](../backend/src/modules/medical-control-plane/intent-classifier/intent-classifier.service.ts) classifies clinical intent.
 - [backend/src/modules/chat/chat.service.ts](../backend/src/modules/chat/chat.service.ts) performs routing decisions after classification.
 - Emergency escalation is handled before normal routing.
+- [backend/src/modules/ai/foundation/ai-routing-engine.service.ts](../backend/src/modules/ai/foundation/ai-routing-engine.service.ts) creates an initial `ExpertRoutePlan` with selected expert, confidence, retrieval policy, tool plan, cost plan, and safety plan.
+- Detailed multi-expert scoring and lightweight-first selection are defined in [CareDroid Mixture-of-Experts Routing System](./moe-routing-system.md).
 
 Target responsibilities:
 
@@ -256,6 +262,8 @@ Current state:
 - Context is passed ad hoc through `ChatService`, `AIService`, clinical intelligence DTOs, and frontend state.
 - `ConversationContext` stores web chat state in memory.
 - Some clinical intelligence workflows include structured DTOs and request metadata.
+- [backend/src/modules/ai/foundation/ai-context-manager.service.ts](../backend/src/modules/ai/foundation/ai-context-manager.service.ts) builds a request-scoped `AiContextPacket` and compact model context from the run envelope and route plan.
+- The current context packet records memory persistence as planned; it does not yet implement governed session, patient, or workspace memory.
 
 Target responsibilities:
 
@@ -376,6 +384,7 @@ Current state:
 - There is no general expert-agent runtime.
 - Specialized behavior exists as services, prompts, DTOs, and clinical intelligence workflows.
 - [backend/src/modules/clinical-intelligence/clinical-intelligence.service.ts](../backend/src/modules/clinical-intelligence/clinical-intelligence.service.ts) already models capabilities with `runId`, `capabilityId`, contract versions, safety warnings, explainability, and audit events.
+- [backend/src/modules/ai/foundation/ai-routing-engine.service.ts](../backend/src/modules/ai/foundation/ai-routing-engine.service.ts) now maps classified intents to named expert identifiers, but those experts are not yet independently executable agents.
 
 Target expert families:
 
@@ -414,8 +423,9 @@ Purpose: produce one clinician-safe response from model output, retrieved eviden
 
 Current state:
 
-- Response composition is implicit.
+- Response composition is partially scaffolded.
 - [backend/src/modules/chat/chat.service.ts](../backend/src/modules/chat/chat.service.ts) appends citations, disclaimers, confidence, suggestions, and tool results.
+- [backend/src/modules/ai/foundation/ai-response-composer.service.ts](../backend/src/modules/ai/foundation/ai-response-composer.service.ts) attaches `aiFoundation`, context, and safety metadata to chat responses.
 - [src/services/clinicalChatService.js](../src/services/clinicalChatService.js) maps API responses into assistant messages.
 - [src/pages/Dashboard.jsx](../src/pages/Dashboard.jsx) renders confidence, citations, operational cards, execution cards, and visualizations.
 
@@ -521,18 +531,18 @@ Optimization rules:
 
 AI Gateway:
 
-- Exists today as `ChatService` plus chat and AI controllers.
-- Target is a dedicated gateway service that normalizes all AI-capable routes into `AiRunEnvelope`.
+- Exists today as `ChatService`, chat and AI controllers, plus a first-pass `AiGatewayService` that creates chat-scoped `AiRunEnvelope` records.
+- Target is to make the gateway the required entry point that normalizes all AI-capable routes into `AiRunEnvelope`.
 
 Routing Engine:
 
-- Exists today as `IntentClassifierService` plus routing branches in `ChatService`.
-- Target is a Mixture of Experts Router that returns explicit route plans.
+- Exists today as `IntentClassifierService`, routing branches in `ChatService`, and a first-pass `AiRoutingEngineService`.
+- Target is a full Mixture of Experts Router that scores candidates, supports multi-expert routing, and returns explicit route plans.
 
 Context Manager:
 
-- Exists today as scattered context passing in chat, AI service calls, RAG prompts, and clinical intelligence DTOs.
-- Target is a dedicated service that builds context packets and applies PHI, tenant, and token-budget policy.
+- Exists today as scattered context passing in chat, AI service calls, RAG prompts, clinical intelligence DTOs, and a first-pass `AiContextManagerService`.
+- Target is a dedicated service that builds governed context packets and applies PHI, tenant, memory, and token-budget policy.
 
 Memory Layer:
 
@@ -556,8 +566,8 @@ Specialized Experts:
 
 Response Composer:
 
-- Exists today as logic split across `ChatService`, `clinicalChatService.js`, and frontend rendering.
-- Target is a backend response composer with one structured clinical response schema.
+- Exists today as logic split across `ChatService`, `AiResponseComposerService`, `clinicalChatService.js`, and frontend rendering.
+- Target is a backend response composer with one structured clinical response schema across all AI surfaces.
 
 Audit System:
 
