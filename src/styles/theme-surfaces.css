@@ -15,7 +15,8 @@ body {
     radial-gradient(circle at 18% 22%, var(--app-mesh-green), transparent 46%),
     var(--app-bg);
   color: var(--text-color);
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: auto;
   transition: background 0.45s var(--ease-smooth, cubic-bezier(0.4, 0, 0.2, 1)),
     color 0.35s var(--ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
 }

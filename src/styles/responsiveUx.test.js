@@ -67,9 +67,10 @@ describe('responsive-ux.css — global normalization', () => {
     expect(layoutVisibilityCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*min-inline-size:\s*0/);
   });
 
-  it('defines one canonical authenticated page scrollport plus local scroll helpers', () => {
-    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*height:\s*100%/);
+  it('uses document-flow page scrolling plus local scroll helpers', () => {
+    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*overflow-y:\s*visible/);
+    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*height:\s*auto/);
+    expect(appShellCss).toMatch(/\.app-shell-page-body--conversation\s*\{[\s\S]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(
       /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*flex:\s*0 0 auto/
     );

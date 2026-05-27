@@ -59,23 +59,25 @@ html {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  height: 100%;
+  min-height: 100%;
   scroll-behavior: smooth;
-  overflow: hidden;
   overflow-x: clip;
-  overscroll-behavior: none;
+  overflow-y: auto;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
 }
 
 body {
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
   overflow-x: clip;
+  overflow-y: auto;
   background: var(--app-bg);
   color: var(--app-fg);
-  overscroll-behavior: none;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -85,15 +87,18 @@ body {
   min-width: 0;
   min-height: 100dvh;
   min-height: var(--app-viewport-height, 100dvh);
-  height: 100dvh;
-  height: var(--app-viewport-height, 100dvh);
   position: relative;
   box-sizing: border-box;
-  overflow: hidden;
   overflow-x: clip;
-  overscroll-behavior: none;
+  overflow-y: visible;
+  overscroll-behavior-x: none;
   display: flex;
   flex-direction: column;
+}
+
+html.app-scroll-locked,
+body.app-scroll-locked {
+  overflow: hidden !important;
 }
 
 #root > * {
@@ -669,7 +674,6 @@ textarea {
 
   .app-keyboard-visible #root {
     min-height: var(--app-viewport-height, 100dvh);
-    height: var(--app-viewport-height, 100dvh);
   }
 }
 

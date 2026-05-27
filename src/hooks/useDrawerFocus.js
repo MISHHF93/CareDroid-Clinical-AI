@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { lockGlobalScroll } from '../utils/scrollLock';
 
 const FOCUSABLE_SELECTOR =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -17,17 +18,12 @@ function isFocusableVisible(el) {
  */
 export function useDrawerFocus({ isOpen, containerRef, restoreFocusRef }) {
   const previousFocusRef = useRef(null);
-  const bodyOverflowRef = useRef('');
-  const htmlOverflowRef = useRef('');
 
   useEffect(() => {
     if (!isOpen) return undefined;
 
     previousFocusRef.current = document.activeElement;
-    bodyOverflowRef.current = document.body.style.overflow;
-    htmlOverflowRef.current = document.documentElement.style.overflow;
-    document.body.style.overflow = 'hidden';
-    document.documentElement.style.overflow = 'hidden';
+    const releaseScrollLock = lockGlobalScroll();
 
     const container = containerRef.current;
     const focusFirst = () => {
@@ -58,8 +54,7 @@ export function useDrawerFocus({ isOpen, containerRef, restoreFocusRef }) {
     return () => {
       window.clearTimeout(focusTimer);
       document.removeEventListener('keydown', onKeyDown);
-      document.body.style.overflow = bodyOverflowRef.current;
-      document.documentElement.style.overflow = htmlOverflowRef.current;
+      releaseScrollLock();
       const restore = restoreFocusRef?.current ?? previousFocusRef.current;
       restore?.focus?.();
     };

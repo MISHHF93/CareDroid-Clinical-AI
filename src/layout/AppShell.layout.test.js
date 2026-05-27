@@ -20,9 +20,11 @@ const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const appShellJsx = readFileSync(join(__dirname, 'AppShell.jsx'), 'utf8');
 
 describe('App shell layout — root and scroll', () => {
-  it('locks document scroll and allows app shell to manage overflow', () => {
-    expect(indexCss).toMatch(/html[\s\S]*overflow:\s*hidden/);
-    expect(indexCss).toMatch(/#root[\s\S]*overflow:\s*hidden/);
+  it('allows document scroll and uses explicit overlay scroll locks only', () => {
+    expect(indexCss).toMatch(/html[\s\S]*overflow-y:\s*auto/);
+    expect(indexCss).toMatch(/body[\s\S]*overflow-y:\s*auto/);
+    expect(indexCss).toMatch(/#root[\s\S]*overflow-y:\s*visible/);
+    expect(indexCss).toMatch(/html\.app-scroll-locked,\s*body\.app-scroll-locked[\s\S]*overflow:\s*hidden/);
     expect(indexCss).toMatch(/#root[\s\S]*min-width:\s*0/);
   });
 
@@ -33,8 +35,9 @@ describe('App shell layout — root and scroll', () => {
     expect(COMPACT_CHROME_HEIGHT_LANDSCAPE_PX).toBe(44);
   });
 
-  it('auth shell owns vertical scrolling under the locked root', () => {
-    expect(authShellCss).toMatch(/\.auth-shell[\s\S]*height:\s*var\(--app-viewport-height/);
+  it('auth shell can scroll vertically without fixed viewport clipping', () => {
+    expect(authShellCss).toMatch(/\.auth-shell[\s\S]*height:\s*auto/);
+    expect(authShellCss).toMatch(/\.auth-shell[\s\S]*max-height:\s*none/);
     expect(authShellCss).toMatch(/\.auth-shell[\s\S]*overflow-y:\s*auto/);
     expect(authShellCss).toMatch(/\.auth-shell[\s\S]*overflow-x:\s*clip/);
     expect(authShellCss).toMatch(/\.auth-shell-card[\s\S]*min-width:\s*0/);
@@ -64,11 +67,11 @@ describe('App shell layout — main column', () => {
 });
 
 describe('App shell layout — page scrollport', () => {
-  it('page body scrolls vertically with min-width 0', () => {
-    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-y:\s*auto/);
+  it('page body stays in document flow with min-width 0', () => {
+    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-y:\s*visible/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-x:\s*clip/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*min-width:\s*0/);
-    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*height:\s*100%/);
+    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*height:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*scroll-padding-bottom/);
   });
 

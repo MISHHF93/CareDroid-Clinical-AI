@@ -5,7 +5,10 @@
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, it, expect } from 'vitest';
+import React, { useRef } from 'react';
+import { render } from '@testing-library/react';
+import { describe, it, expect, afterEach } from 'vitest';
+import { useDrawerFocus } from './useDrawerFocus';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const hookSource = readFileSync(join(__dirname, 'useDrawerFocus.js'), 'utf8');
@@ -14,14 +17,54 @@ const sidebarSource = readFileSync(join(__dirname, '../components/Sidebar.jsx'),
 const sidebarCss = readFileSync(join(__dirname, '../components/Sidebar.css'), 'utf8');
 
 describe('useDrawerFocus — mobile nav accessibility', () => {
+  afterEach(() => {
+    document.body.classList.remove('app-scroll-locked');
+    document.documentElement.classList.remove('app-scroll-locked');
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+  });
+
   it('traps Tab within the drawer container', () => {
     expect(hookSource).toContain("event.key !== 'Tab'");
     expect(hookSource).toContain('FOCUSABLE_SELECTOR');
   });
 
   it('locks body scroll and restores focus on close', () => {
-    expect(hookSource).toContain("document.body.style.overflow = 'hidden'");
+    expect(hookSource).toContain('lockGlobalScroll');
     expect(hookSource).toContain('restore?.focus');
+  });
+
+  it('releases global scroll lock when compact drawer closes', () => {
+    function DrawerHarness({ isOpen }) {
+      const containerRef = useRef(null);
+      const restoreFocusRef = useRef(null);
+      useDrawerFocus({ isOpen, containerRef, restoreFocusRef });
+      return React.createElement(
+        React.Fragment,
+        null,
+        React.createElement('button', { ref: restoreFocusRef, type: 'button' }, 'Menu'),
+        React.createElement(
+          'aside',
+          { ref: containerRef },
+          React.createElement(
+            'button',
+            { type: 'button', 'data-drawer-initial-focus': true },
+            'Close menu'
+          ),
+          React.createElement('button', { type: 'button' }, 'Dashboard')
+        )
+      );
+    }
+
+    const { rerender } = render(React.createElement(DrawerHarness, { isOpen: true }));
+    expect(document.body).toHaveClass('app-scroll-locked');
+    expect(document.documentElement).toHaveClass('app-scroll-locked');
+
+    rerender(React.createElement(DrawerHarness, { isOpen: false }));
+    expect(document.body).not.toHaveClass('app-scroll-locked');
+    expect(document.documentElement).not.toHaveClass('app-scroll-locked');
+    expect(document.body.style.overflow).toBe('');
+    expect(document.documentElement.style.overflow).toBe('');
   });
 
   it('is wired from AppShell when compact nav opens', () => {

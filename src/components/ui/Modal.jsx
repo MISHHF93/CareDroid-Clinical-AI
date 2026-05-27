@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { lockGlobalScroll } from '../../utils/scrollLock';
 import './Modal.css';
 
 /** * Base Modal Component
@@ -29,7 +30,6 @@ export const Modal = ({
 }) => {
   const modalRef = useRef(null);
   const previousFocusRef = useRef(null);
-  const previousBodyOverflowRef = useRef('');
 
   // Handle escape key
   useEffect(() => {
@@ -61,20 +61,16 @@ export const Modal = ({
         }
       }, 10);
 
-      // Prevent background scroll without clobbering the app's default overflow state.
-      previousBodyOverflowRef.current = document.body.style.overflow;
-      document.body.style.overflow = 'hidden';
+      // Prevent background scroll without clobbering another active overlay.
+      const releaseScrollLock = lockGlobalScroll();
+      return () => {
+        releaseScrollLock();
+      };
     } else {
       // Restore focus to previous element
       previousFocusRef.current?.focus();
-      
-      // Restore body scroll
-      document.body.style.overflow = previousBodyOverflowRef.current;
     }
-
-    return () => {
-      document.body.style.overflow = previousBodyOverflowRef.current;
-    };
+    return undefined;
   }, [isOpen]);
 
   // Handle overlay click
