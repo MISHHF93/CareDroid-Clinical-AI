@@ -2,42 +2,39 @@ import React, { forwardRef, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
-import { useToolPreferences } from '../contexts/ToolPreferencesContext';
-import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import PermissionGate from './PermissionGate';
-import WorkspaceCreationModal from './WorkspaceCreationModal';
-import { partitionSidebarTools, SIDEBAR_CATEGORY_ORDER } from '../data/sidebarToolPresentation';
-import { getSidebarToolRegistryProjection } from '../data/toolInventory';
-import { useConversation } from '../contexts/ConversationContext';
-import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
-import { PRIMARY_SIDEBAR_NAV_ITEMS, primaryNavPathMatches } from '../navigation/primaryNavigation';
-import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
+import {
+  ADVANCED_SIDEBAR_NAV_ITEMS,
+  PRIMARY_SIDEBAR_NAV_ITEMS,
+  primaryNavPathMatches,
+} from '../navigation/primaryNavigation';
 import { NavIcon } from '../navigation/NavIcon';
-import { CHROME_ICONS, getNavIcon, getToolIcon } from '../navigation/iconRegistry';
+import { CHROME_ICONS, getNavIcon } from '../navigation/iconRegistry';
 import './Sidebar.css';
 
 /**
- * CareDroid Professional Sidebar
- * Clinical AI Platform Navigation
+ * Compact CareDroid navigation shell.
+ *
+ * Feature routes remain registered in App.jsx. The sidebar exposes one obvious
+ * path to each major user task and keeps developer/governance surfaces behind
+ * the Advanced group.
  */
 const Sidebar = forwardRef(function Sidebar(
   {
-  conversations = [],
-  activeConversation,
-  onSelectConversation,
-  onNewConversation,
-  onSignOut,
-  healthStatus = 'online',
-  currentTool = null,
-  onToolSelect,
-  layoutCompact = false,
-  mobileNavOpen = false,
-  onCloseMobileNav = () => {},
-  sidebarCollapsed = false,
-  onSidebarCollapsedChange = () => {},
-  onOpenQuickCommand = () => {},
-},
+    conversations = [],
+    activeConversation,
+    onSelectConversation,
+    onNewConversation,
+    onSignOut,
+    healthStatus = 'online',
+    layoutCompact = false,
+    mobileNavOpen = false,
+    onCloseMobileNav = () => {},
+    sidebarCollapsed = false,
+    onSidebarCollapsedChange = () => {},
+    onOpenQuickCommand = () => {},
+  },
   ref
 ) {
   const navigate = useNavigate();
@@ -51,143 +48,23 @@ const Sidebar = forwardRef(function Sidebar(
     switchWorkspace,
   } = useUserIdentity();
   const { notifications } = useNotifications();
-  const {
-    favorites,
-    pinned,
-    recentTools,
-    toggleFavorite,
-    togglePinned,
-    recordToolAccess,
-    clearRecentTools
-  } = useToolPreferences();
-  const {
-    workspaces,
-    activeWorkspaceId,
-    setActiveWorkspaceId,
-    addWorkspace
-  } = useWorkspace();
-  const { addMessage, selectTool, setActiveTool } = useConversation();
-  const [showToolsSection, setShowToolsSection] = useState(false);
-  const [showWorkspaceModal, setShowWorkspaceModal] = useState(false);
-  const [expandedCategories, setExpandedCategories] = useState(() =>
-    Object.fromEntries(SIDEBAR_CATEGORY_ORDER.map((category) => [category, true]))
-  );
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
   const displayName = account?.displayName || user?.fullName || user?.name || 'User';
   const displayRole = account?.specialty || account?.role || user?.role || 'Clinician';
   const displayOrganization = account?.organization || user?.institution || 'Personal workspace';
-
-  // Medical Tools - Enhanced with navigation
-  const medicalTools = useMemo(() => getSidebarToolRegistryProjection(), []);
-  const sidebarToolById = useMemo(
-    () => Object.fromEntries(medicalTools.map((tool) => [tool.id, tool])),
-    [medicalTools]
-  );
-  const activeWorkspace = useMemo(
-    () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
-    [activeWorkspaceId, workspaces]
-  );
-  const allMedicalToolIds = useMemo(() => medicalTools.map((tool) => tool.id), [medicalTools]);
-  const workspaceToolIds = useMemo(
-    () => (activeWorkspace?.toolIds?.length ? activeWorkspace.toolIds : allMedicalToolIds),
-    [activeWorkspace, allMedicalToolIds]
-  );
-  const workspaceToolIdSet = useMemo(() => new Set(workspaceToolIds), [workspaceToolIds]);
-  const pinnedToolIdSet = useMemo(() => new Set(pinned), [pinned]);
-  const favoriteToolIdSet = useMemo(() => new Set(favorites), [favorites]);
-  const workspaceTools = useMemo(
-    () => medicalTools.filter((tool) => workspaceToolIdSet.has(tool.id)),
-    [medicalTools, workspaceToolIdSet]
-  );
-  const { pinnedTools, favoriteTools, categoryGroups } = useMemo(
-    () => partitionSidebarTools(workspaceTools, pinned, favorites),
-    [favorites, pinned, workspaceTools]
-  );
-  const recentToolItems = useMemo(
-    () =>
-      recentTools
-        .map((toolId) => sidebarToolById[toolId])
-        .filter((tool) => tool && workspaceToolIdSet.has(tool.id)),
-    [recentTools, sidebarToolById, workspaceToolIdSet]
-  );
-
-  // Visible IA follows the clinical operating system map while legacy routes remain available.
-  const navItems = PRIMARY_SIDEBAR_NAV_ITEMS;
-
-  const recentConversations = conversations.slice(-5).reverse();
-
   const effectiveCollapsed = layoutCompact ? false : sidebarCollapsed;
+  const recentConversations = conversations.slice(-4).reverse();
 
-  const handleNavClick = (path) => {
-    if (['/home', '/dashboard', '/assistant', '/chat', '/ai', '/copilot'].includes(path)) {
-      navigate({ pathname: path, search: '' }, { replace: true });
-    } else {
-      onToolSelect?.(null);
-      navigate(path);
-    }
-    onCloseMobileNav();
-  };
-
-  const handleToolClick = (tool) => {
-    if (onToolSelect) {
-      onToolSelect(tool.id);
-    } else {
-      applyRegistryToolLaunch(tool.id, {
-        navigate,
-        addMessage,
-        selectTool,
-        setActiveTool,
-        recordToolAccess,
-      });
-    }
-    onCloseMobileNav();
-  };
-
-  const activeCalculatorMatch = useMemo(
-    () => matchCalculatorRoute(location.pathname),
+  const advancedActive = useMemo(
+    () => ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => primaryNavPathMatches(item, location.pathname)),
     [location.pathname]
   );
-  const activeCalcParam = useMemo(
-    () => new URLSearchParams(location.search).get('calc'),
-    [location.search]
-  );
 
-  const isNavItemActive = (item) => primaryNavPathMatches(item, location.pathname);
-
-  const handleToolCardKeyDown = (event, tool) => {
-    if (event.target !== event.currentTarget) return;
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    handleToolClick(tool);
-  };
-
-  const isToolRouteActive = (tool) => {
-    const path = location.pathname;
-
-    if (tool.initialCalc) {
-      if (activeCalculatorMatch?.calculatorSlug === tool.initialCalc) return true;
-      if (path === '/tools/calculators' && activeCalcParam === tool.initialCalc) return true;
-    }
-
-    if (tool.path && path === tool.path) {
-      if (tool.path === '/tools/calculators' && tool.id !== 'calculators') {
-        return !activeCalculatorMatch;
-      }
-      return true;
-    }
-
-    if (tool.path && path.startsWith(`${tool.path}/`)) return true;
-
-    return false;
-  };
-
-  const toggleCategoryGroup = (category) => {
-    setExpandedCategories((prev) => ({
-      ...prev,
-      [category]: !prev[category],
-    }));
-  };
+  useEffect(() => {
+    if (advancedActive) setShowAdvanced(true);
+  }, [advancedActive]);
 
   useEffect(() => {
     const node = ref?.current;
@@ -203,132 +80,54 @@ const Sidebar = forwardRef(function Sidebar(
   useEffect(() => {
     if (!layoutCompact || !mobileNavOpen || !ref?.current) return;
     const active = ref.current.querySelector(
-      '.nav-item.active, .sidebar-tool-card.active, .sidebar-tools-quick-action--active'
+      '.nav-item.active, .sidebar-advanced-toggle--active'
     );
     active?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-  }, [layoutCompact, mobileNavOpen, location.pathname, location.search, ref]);
+  }, [layoutCompact, mobileNavOpen, location.pathname, ref]);
 
-  const renderToolCard = (tool) => {
-    const isSelected =
-      currentTool === tool.id &&
-      (
-        ['/home', '/dashboard', '/assistant', '/chat', '/ai', '/copilot'].includes(location.pathname) ||
-        isToolRouteActive(tool)
-      );
-    const isFavorite = favoriteToolIdSet.has(tool.id);
-    const isPinned = pinnedToolIdSet.has(tool.id);
+  const handleNavClick = (path) => {
+    navigate({ pathname: path, search: '' });
+    onCloseMobileNav();
+  };
 
-    return (
-      <div
-        key={tool.id}
-        className={`tool-card sidebar-tool-card ${isSelected ? 'active' : ''}`}
-        onClick={(e) => {
-          e.stopPropagation();
-          handleToolClick(tool);
-        }}
-        onKeyDown={(event) => handleToolCardKeyDown(event, tool)}
-        role="button"
-        tabIndex={0}
-        aria-label={`Open ${tool.name}`}
-        style={{
-          padding: '8px',
-          margin: '3px 0',
-          borderRadius: 'var(--compact-card-radius, 10px)',
-          border: `1px solid ${isSelected ? tool.color : 'transparent'}`,
-          backgroundColor: isSelected
-            ? `${tool.color}15`
-            : 'var(--panel-background)',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease',
-          position: 'relative'
-        }}
-        onMouseEnter={(e) => {
-          if (!isSelected) {
-            e.currentTarget.style.backgroundColor = 'var(--panel-hover, #f5f5f5)';
-            e.currentTarget.style.borderColor = `${tool.color}40`;
-          }
-        }}
-        onMouseLeave={(e) => {
-          if (!isSelected) {
-            e.currentTarget.style.backgroundColor = 'var(--panel-background)';
-            e.currentTarget.style.borderColor = 'transparent';
-          }
-        }}
-        title={`${tool.name} - ${tool.description}${tool.shortcut ? `\n\nShortcut: ${tool.shortcut}` : ''}\nOpen directly or send to Chat for guidance.`}
+  const handleNewChat = () => {
+    onNewConversation?.();
+    navigate('/assistant');
+    onCloseMobileNav();
+  };
+
+  const renderNavButton = (item, { advanced = false } = {}) => {
+    const isActive = primaryNavPathMatches(item, location.pathname);
+    const button = (
+      <button
+        key={item.id}
+        type="button"
+        className={`nav-item${advanced ? ' nav-item--advanced' : ''}${isActive ? ' active' : ''}`}
+        onClick={() => handleNavClick(item.path)}
+        title={effectiveCollapsed ? item.label : ''}
+        aria-current={isActive ? 'page' : undefined}
       >
-        <div className="sidebar-tool-card-layout">
-          <div className="sidebar-tool-card-main">
-            <span
-              className="tool-card-icon-wrap"
-              style={{
-                filter: isSelected ? 'none' : 'grayscale(0.2)',
-                lineHeight: 1,
-                display: 'inline-flex',
-                color: tool.color,
-              }}
-              aria-hidden
-            >
-              <NavIcon icon={getToolIcon(tool.id)} size={22} />
-            </span>
-            <div className="sidebar-tool-card-body">
-              <div className="sidebar-tool-card-title-row">
-                <span className="sidebar-tool-card-name">{tool.name}</span>
-                {tool.shortcut ? (
-                  <span className="sidebar-tool-card-shortcut">
-                    {tool.shortcut.replace('Ctrl+', '⌘')}
-                  </span>
-                ) : null}
-              </div>
-              <div className="sidebar-tool-card-desc">{tool.description}</div>
-              <div
-                className="sidebar-tool-card-category"
-                style={{
-                  backgroundColor: `${tool.color}20`,
-                  color: tool.color,
-                }}
-              >
-                {tool.category}
-              </div>
-            </div>
-          </div>
-          <div className="tool-action-buttons" aria-label={`${tool.name} preferences`}>
-            <button
-              type="button"
-              className={`tool-action-btn ${isFavorite ? 'active' : ''}`}
-              title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-              aria-label={isFavorite ? `Remove ${tool.name} from favorites` : `Add ${tool.name} to favorites`}
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleFavorite(tool.id);
-              }}
-            >
-              <NavIcon
-                icon={CHROME_ICONS.star}
-                size={14}
-                fill={isFavorite ? 'currentColor' : 'none'}
-                aria-hidden
-              />
-            </button>
-            <button
-              type="button"
-              className={`tool-action-btn ${isPinned ? 'active' : ''}`}
-              title={isPinned ? 'Unpin tool' : 'Pin tool to top'}
-              aria-label={isPinned ? `Unpin ${tool.name}` : `Pin ${tool.name} to top`}
-              onClick={(e) => {
-                e.stopPropagation();
-                togglePinned(tool.id);
-              }}
-            >
-              <NavIcon icon={CHROME_ICONS.pin} size={14} aria-hidden />
-            </button>
-          </div>
-        </div>
-      </div>
+        <span className="nav-icon" aria-hidden>
+          <NavIcon icon={getNavIcon(item.id)} />
+        </span>
+        {!effectiveCollapsed && <span className="nav-label">{item.label}</span>}
+      </button>
+    );
+
+    return item.permission ? (
+      <PermissionGate
+        key={item.id}
+        permission={item.permission}
+        requireAll={item.requireAllPermissions}
+      >
+        {button}
+      </PermissionGate>
+    ) : (
+      button
     );
   };
 
   return (
-    <>
     <aside
       ref={ref}
       id="app-sidebar-nav"
@@ -345,7 +144,6 @@ const Sidebar = forwardRef(function Sidebar(
       role={layoutCompact && mobileNavOpen ? 'dialog' : undefined}
       aria-label={layoutCompact && mobileNavOpen ? 'Navigation menu' : undefined}
     >
-      {/* Header */}
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <div className="logo-icon" aria-hidden>
@@ -353,7 +151,7 @@ const Sidebar = forwardRef(function Sidebar(
           </div>
           {!effectiveCollapsed && (
             <div className="logo-text">
-              <h1>CareDroid-Clinical-AI</h1>
+              <h1>CareDroid</h1>
             </div>
           )}
         </div>
@@ -385,16 +183,12 @@ const Sidebar = forwardRef(function Sidebar(
         </button>
       </div>
 
-      {/* User Profile */}
       {!effectiveCollapsed && (
         <div className="sidebar-user">
           <button
             type="button"
             className="sidebar-user-main"
-            onClick={() => {
-              navigate('/profile');
-              onCloseMobileNav();
-            }}
+            onClick={() => handleNavClick('/profile')}
             aria-label="Open profile"
           >
             <div className="user-avatar">
@@ -406,17 +200,6 @@ const Sidebar = forwardRef(function Sidebar(
               <div className="user-organization">{displayOrganization}</div>
             </div>
           </button>
-          <div className="sidebar-profile-links" aria-label="Profile quick links">
-            <button type="button" onClick={() => handleNavClick('/profile/activity')}>
-              Activity
-            </button>
-            <button type="button" onClick={() => handleNavClick('/profile/settings')}>
-              Settings
-            </button>
-            <button type="button" onClick={() => handleNavClick('/profile/security')}>
-              Security
-            </button>
-          </div>
           <div className="sidebar-operational-workspace">
             <label htmlFor="sidebar-operational-workspace">Workspace</label>
             <select
@@ -432,26 +215,17 @@ const Sidebar = forwardRef(function Sidebar(
             </select>
           </div>
           <div className={`health-indicator ${healthStatus}`}>
-            <div className="health-dot"></div>
+            <div className="health-dot" />
           </div>
         </div>
       )}
 
-      {/* Main Content */}
       <div className="sidebar-content">
-        {/* New Conversation Button */}
-        <button
-          type="button"
-          className="btn-new-conversation"
-          onClick={() => {
-            onNewConversation();
-            onCloseMobileNav();
-          }}
-        >
+        <button type="button" className="btn-new-conversation" onClick={handleNewChat}>
           <span className="btn-icon" aria-hidden>
             <NavIcon icon={CHROME_ICONS.sparkles} size={18} />
           </span>
-          {!effectiveCollapsed && <span>Start Assistant</span>}
+          {!effectiveCollapsed && <span>New Chat</span>}
         </button>
 
         {!layoutCompact && (
@@ -469,7 +243,7 @@ const Sidebar = forwardRef(function Sidebar(
               <>
                 <span className="sidebar-command-launcher__body">
                   <strong>Quick Command</strong>
-                  <span>Search apps, tools, and routes</span>
+                  <span>Search and launch</span>
                 </span>
                 <kbd>Ctrl K</kbd>
               </>
@@ -477,230 +251,72 @@ const Sidebar = forwardRef(function Sidebar(
           </button>
         )}
 
-        {/* Navigation */}
-        <nav className="sidebar-nav">
-          <div className="nav-section-title">
-            {!effectiveCollapsed && 'Care OS'}
-          </div>
-          {navItems.map(item => {
-            const isActive = isNavItemActive(item);
-            const NavButton = (
-              <button
-                key={item.id}
-                className={`nav-item ${isActive ? 'active' : ''}`}
-                onClick={() => handleNavClick(item.path)}
-                title={effectiveCollapsed ? item.label : ''}
-                aria-current={isActive ? 'page' : undefined}
-              >
-                <span className="nav-icon" aria-hidden>
-                  <NavIcon icon={getNavIcon(item.id)} />
-                </span>
-                {!effectiveCollapsed && <span className="nav-label">{item.label}</span>}
-              </button>
-            );
-
-            return item.permission ? (
-              <PermissionGate key={item.id} permission={item.permission} hideIfDenied>
-                {NavButton}
-              </PermissionGate>
-            ) : NavButton;
-          })}
+        <nav className="sidebar-nav" aria-label="Primary navigation">
+          <div className="nav-section-title">{!effectiveCollapsed && 'Main'}</div>
+          {PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => renderNavButton(item))}
         </nav>
 
-        {/* Medical Tools Section - Enhanced */}
-        {!effectiveCollapsed && (
-          <div className="sidebar-section">
-            <div
-              className="section-header sidebar-section-header-toggle"
-              role="button"
-              tabIndex={0}
-              aria-expanded={showToolsSection}
-              onClick={() => setShowToolsSection(!showToolsSection)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  setShowToolsSection((open) => !open);
-                }
-              }}
-            >
-              <span className="section-icon section-icon--svg" aria-hidden>
-                <NavIcon icon={CHROME_ICONS.tools} size={16} />
-              </span>
-              <span className="section-title">Actions</span>
-              <span
-                style={{
-                  marginLeft: 'auto',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  transform: showToolsSection ? 'rotate(0deg)' : 'rotate(-90deg)',
-                  transition: 'transform 0.2s',
-                  color: 'var(--sidebar-fg-muted)',
-                }}
-                aria-hidden
-              >
-                <NavIcon icon={CHROME_ICONS.chevronDown} size={14} />
-              </span>
-            </div>
-
-            {showToolsSection && (
+        <div className="sidebar-advanced">
+          <button
+            type="button"
+            className={`sidebar-advanced-toggle${advancedActive ? ' sidebar-advanced-toggle--active' : ''}`}
+            onClick={() => setShowAdvanced((open) => !open)}
+            aria-expanded={showAdvanced}
+            aria-controls="sidebar-advanced-links"
+            title={effectiveCollapsed ? 'Advanced' : ''}
+          >
+            <span className="nav-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.shield} size={18} />
+            </span>
+            {!effectiveCollapsed && (
               <>
-              <div className="sidebar-workspace-controls">
-                <select
-                  className="sidebar-workspace-select"
-                  value={activeWorkspaceId}
-                  onChange={(e) => setActiveWorkspaceId(e.target.value)}
-                >
-                  {workspaces.map((workspace) => (
-                    <option key={workspace.id} value={workspace.id}>
-                      {workspace.name}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  className="sidebar-workspace-new-btn"
-                  onClick={() => setShowWorkspaceModal(true)}
-                >
-                  <span>+</span>
-                  <span>New Workspace</span>
-                </button>
-              </div>
-
-              <div className="medical-tools-list" style={{ marginTop: '8px' }}>
-                {favoriteTools.length > 0 && (
-                  <div className="tools-subsection">
-                    <div className="tools-subsection-header tools-subsection-header--with-icon">
-                      <span className="tools-subsection-header-icon" aria-hidden>
-                        <NavIcon icon={CHROME_ICONS.star} size={14} fill="currentColor" />
-                      </span>
-                      <span>Favorites</span>
-                    </div>
-                    <div className="tools-subsection-list">
-                      {favoriteTools.map(renderToolCard)}
-                    </div>
-                  </div>
-                )}
-
-                {recentToolItems.length > 0 && (
-                  <div className="tools-subsection">
-                    <div className="tools-subsection-header tools-subsection-header-row">
-                      <span className="tools-subsection-header-row-title">
-                        <span className="tools-subsection-header-icon" aria-hidden>
-                          <NavIcon icon={CHROME_ICONS.clock} size={14} />
-                        </span>
-                        <span>Recent Tools</span>
-                      </span>
-                      <button
-                        className="tools-clear-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          clearRecentTools();
-                        }}
-                        type="button"
-                      >
-                        Clear
-                      </button>
-                    </div>
-                    <div className="recent-tools-list">
-                      {recentToolItems.map((tool) => (
-                        <button
-                          key={tool.id}
-                          className="recent-tool-item"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleToolClick(tool);
-                          }}
-                          type="button"
-                        >
-                          <span className="recent-tool-icon" aria-hidden>
-                            <NavIcon icon={getToolIcon(tool.id)} size={18} />
-                          </span>
-                          <span className="recent-tool-name">{tool.name}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {pinnedTools.length > 0 && (
-                  <div className="tools-subsection">
-                    <div className="tools-subsection-header tools-subsection-header--with-icon">
-                      <span className="tools-subsection-header-icon" aria-hidden>
-                        <NavIcon icon={CHROME_ICONS.pin} size={14} />
-                      </span>
-                      <span>Pinned</span>
-                    </div>
-                    <div className="tools-subsection-list">{pinnedTools.map(renderToolCard)}</div>
-                  </div>
-                )}
-
-                {categoryGroups.map(({ category, tools }) => {
-                  const groupId = `sidebar-tools-cat-${category.replace(/\s+/g, '-').toLowerCase()}`;
-                  const isExpanded = expandedCategories[category] !== false;
-                  return (
-                    <div key={category} className="tools-subsection tools-subsection--category">
-                      <div
-                        className="tools-subsection-header tools-subsection-header-toggle"
-                        role="button"
-                        tabIndex={0}
-                        aria-expanded={isExpanded}
-                        aria-controls={groupId}
-                        onClick={() => toggleCategoryGroup(category)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            toggleCategoryGroup(category);
-                          }
-                        }}
-                      >
-                        <span>{category}</span>
-                        <span className="tools-subsection-chevron" aria-hidden>
-                          <NavIcon
-                            icon={CHROME_ICONS.chevronDown}
-                            size={14}
-                            style={{
-                              transform: isExpanded ? 'rotate(0deg)' : 'rotate(-90deg)',
-                              transition: 'transform 0.2s',
-                            }}
-                          />
-                        </span>
-                      </div>
-                      {isExpanded ? (
-                        <div id={groupId} className="tools-subsection-list">
-                          {tools.map(renderToolCard)}
-                        </div>
-                      ) : null}
-                    </div>
-                  );
-                })}
-
-              </div>
+                <span className="nav-label">Advanced</span>
+                <span className="sidebar-advanced-chevron" aria-hidden>
+                  <NavIcon
+                    icon={CHROME_ICONS.chevronDown}
+                    size={14}
+                    style={{
+                      transform: showAdvanced ? 'rotate(0deg)' : 'rotate(-90deg)',
+                    }}
+                  />
+                </span>
               </>
             )}
-          </div>
-        )}
+          </button>
 
-        {/* Recent Conversations */}
+          {showAdvanced && (
+            <nav
+              id="sidebar-advanced-links"
+              className="sidebar-advanced-links"
+              aria-label="Advanced navigation"
+            >
+              {ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => renderNavButton(item, { advanced: true }))}
+            </nav>
+          )}
+        </div>
+
         {!effectiveCollapsed && recentConversations.length > 0 && (
-          <div className="sidebar-section">
+          <div className="sidebar-section sidebar-section--recent-chats">
             <div className="section-header">
               <span className="section-icon section-icon--svg" aria-hidden>
                 <NavIcon icon={CHROME_ICONS.messageCircle} size={16} />
               </span>
-              <span className="section-title">Recent</span>
+              <span className="section-title">Recent Chats</span>
             </div>
             <div className="conversations-list">
-              {recentConversations.map(conv => (
+              {recentConversations.map((conv) => (
                 <button
                   key={conv.id}
+                  type="button"
                   className={`conversation-item ${activeConversation === conv.id ? 'active' : ''}`}
                   onClick={() => {
                     onSelectConversation(conv.id);
+                    navigate('/assistant');
                     onCloseMobileNav();
                   }}
                 >
                   <span className="conversation-title">
-                    {conv.title.length > 25 ? conv.title.substring(0, 25) + '...' : conv.title}
+                    {conv.title.length > 25 ? `${conv.title.substring(0, 25)}...` : conv.title}
                   </span>
                   <span className="conversation-time">
                     {new Date(conv.date || conv.timestamp).toLocaleDateString('en-US', {
@@ -715,16 +331,11 @@ const Sidebar = forwardRef(function Sidebar(
         )}
       </div>
 
-      {/* Footer */}
       <div className="sidebar-footer">
-        {/* Notifications */}
         <button
           type="button"
           className="footer-action"
-          onClick={() => {
-            navigate('/notifications');
-            onCloseMobileNav();
-          }}
+          onClick={() => handleNavClick('/notifications')}
           title="Notifications"
         >
           <span className="action-icon" aria-hidden>
@@ -735,17 +346,15 @@ const Sidebar = forwardRef(function Sidebar(
           )}
         </button>
 
-        {/* HIPAA Badge */}
         {!effectiveCollapsed && (
           <div className="hipaa-badge">
             <span className="hipaa-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.lock} size={14} />
             </span>
-            <span className="hipaa-text">HIPAA Compliant</span>
+            <span className="hipaa-text">HIPAA</span>
           </div>
         )}
 
-        {/* Sign Out */}
         <button
           type="button"
           className="btn-signout"
@@ -762,18 +371,6 @@ const Sidebar = forwardRef(function Sidebar(
         </button>
       </div>
     </aside>
-
-    {/* Workspace Creation Modal */}
-    <WorkspaceCreationModal
-      isOpen={showWorkspaceModal}
-      onClose={() => setShowWorkspaceModal(false)}
-      onCreateWorkspace={(workspace) => {
-        addWorkspace(workspace);
-        setActiveWorkspaceId(workspace.id);
-        setShowWorkspaceModal(false);
-      }}
-    />
-    </>
   );
 });
 

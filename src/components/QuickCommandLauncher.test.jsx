@@ -125,7 +125,7 @@ describe('QuickCommandLauncher', () => {
     }
   });
 
-  it('keeps operational sub-surfaces searchable as tools after nav flattening', () => {
+  it('uses simplified canonical destinations and keeps secondary operations searchable', () => {
     const entries = buildQuickCommandEntries({
       tools: getUserFacingToolRegistryProjection(),
       recentToolIds: [],
@@ -133,9 +133,20 @@ describe('QuickCommandLauncher', () => {
     const navIds = entries.navEntries.map((entry) => entry.sourceId);
     const toolIds = entries.toolEntries.map((entry) => entry.sourceId);
 
-    expect(navIds).toContain('operations');
-    expect(navIds).not.toContain('maps');
-    expect(navIds).not.toContain('medical-iot');
-    expect(toolIds).toEqual(expect.arrayContaining(['live-tracking-map', 'hospital-map', 'medical-iot-dashboard']));
+    expect(navIds).toEqual(expect.arrayContaining(['home', 'assistant', 'tools', 'calculators', 'hospital-map', 'medical-iot', 'fleet']));
+    expect(navIds).not.toContain('operations');
+    expect(navIds).not.toContain('developer-audit');
+    expect(toolIds).toEqual(expect.arrayContaining(['live-tracking-map', 'device-fleet-management']));
+  });
+
+  it('keeps shared calculator-hub tools searchable instead of hiding them as nav duplicates', () => {
+    const entries = buildQuickCommandEntries({
+      tools: getUserFacingToolRegistryProjection(),
+      recentToolIds: [],
+    });
+    const toolIds = entries.toolEntries.map((entry) => entry.sourceId);
+
+    expect(toolIds).toEqual(expect.arrayContaining(['wells-pe', 'perc', 'grace-acs']));
+    expect(toolIds).not.toContain('calculators');
   });
 });

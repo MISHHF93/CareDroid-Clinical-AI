@@ -1,11 +1,11 @@
 /**
- * Sidebar tools navigation contracts (source-level; avoids heavy Sidebar render).
+ * Sidebar navigation contracts (source-level; avoids heavy Sidebar render).
  */
 
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const sidebarSource = readFileSync(join(__dirname, 'Sidebar.jsx'), 'utf8');
@@ -13,81 +13,63 @@ const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 const appShellSource = readFileSync(join(__dirname, '../layout/AppShell.jsx'), 'utf8');
 const primaryNavSource = readFileSync(join(__dirname, '../navigation/primaryNavigation.js'), 'utf8');
 
-describe('Flattened tools navigation wiring', () => {
-  it('registers /tools route to ToolsOverview', () => {
+describe('Simplified sidebar navigation wiring', () => {
+  it('keeps /tools and /tools/calculators as first-class canonical routes', () => {
     expect(appSource).toContain("path: '/tools'");
     expect(appSource).toContain('<ToolsOverview />');
+    expect(appSource).toContain("path: '/tools/calculators'");
+    expect(appSource).toContain('<Calculators />');
   });
 
-  it('clears active tool and navigates via handleOpenToolsOverview', () => {
-    expect(appSource).toContain('handleOpenToolsOverview');
-    expect(appSource).toContain("navigate('/tools')");
-    expect(appSource).toContain('setActiveTool(null)');
-    expect(appSource).toContain('onOpenToolsOverview={handleOpenToolsOverview}');
-  });
-
-  it('renders canonical primary navigation in Sidebar instead of duplicate tool shortcuts', () => {
-    expect(appShellSource).toContain('onOpenToolsOverview');
+  it('renders canonical primary navigation without duplicate tool-card shortcuts', () => {
     expect(sidebarSource).toContain('PRIMARY_SIDEBAR_NAV_ITEMS');
-    expect(sidebarSource).not.toContain('onOpenToolsOverview');
-    expect(sidebarSource).not.toContain('handleViewAllTools');
+    expect(sidebarSource).toContain('ADVANCED_SIDEBAR_NAV_ITEMS');
+    expect(sidebarSource).not.toContain('getSidebarToolRegistryProjection');
+    expect(sidebarSource).not.toContain('partitionSidebarTools');
+    expect(sidebarSource).not.toContain('showToolsSection');
+    expect(sidebarSource).not.toContain('applyRegistryToolLaunch');
   });
 
-  it('exposes canonical tools through primary navigation active state', () => {
-    expect(sidebarSource).toContain('navItems.map');
-    expect(sidebarSource).toContain('primaryNavPathMatches');
-    expect(sidebarSource).toContain('isNavItemActive(item)');
-    expect(primaryNavSource).toContain("path: '/tools'");
-    expect(sidebarSource).not.toContain('Browse All Tools');
+  it('keeps removed sidebar props out of AppShell wiring', () => {
+    expect(appShellSource).not.toContain('onOpenToolsOverview');
+    expect(appShellSource).not.toContain('onOpenToolsCatalog');
+    expect(appShellSource).not.toContain('onToolSelect={');
+    expect(appShellSource).toContain('onOpenQuickCommand={openQuickCommand}');
   });
 
-  it('keeps the source audit route available as a developer catalog', () => {
-    expect(readFileSync(join(__dirname, '../navigation/primaryNavigation.js'), 'utf8')).toContain("id: 'developer-audit'");
-    expect(readFileSync(join(__dirname, '../navigation/primaryNavigation.js'), 'utf8')).toContain("path: '/tools/catalog'");
-    expect(sidebarSource).not.toContain("navigate('/tools/catalog')");
+  it('defines the requested visible primary routes and advanced routes', () => {
+    for (const path of [
+      '/dashboard',
+      '/assistant',
+      '/tools',
+      '/tools/calculators',
+      '/hospital-map',
+      '/medical-iot',
+      '/fleet/map',
+      '/profile',
+      '/settings',
+    ]) {
+      expect(primaryNavSource, path).toContain(`path: '${path}'`);
+    }
+
+    for (const path of ['/tools/catalog', '/system-health', '/ai-governance', '/audit-logs']) {
+      expect(primaryNavSource, path).toContain(`path: '${path}'`);
+    }
   });
 
-  it('flattens maps and IoT under Operations in visible shell navigation', () => {
-    expect(primaryNavSource).toContain('PRIMARY_SIDEBAR_NAV_ITEMS');
-    expect(primaryNavSource).toMatch(/id:\s*'operations'[\s\S]*'\/hospital-map'[\s\S]*'\/medical-iot'/);
-    expect(primaryNavSource).toMatch(/id:\s*'maps'[\s\S]*showInSidebar:\s*false[\s\S]*showInMobile:\s*false/);
-    expect(primaryNavSource).toMatch(/id:\s*'medical-iot'[\s\S]*showInSidebar:\s*false[\s\S]*showInMobile:\s*false/);
-    expect(appShellSource).toContain('PRIMARY_MOBILE_NAV_ITEMS');
+  it('keeps Advanced collapsed and permission-gated', () => {
+    expect(sidebarSource).toContain('showAdvanced &&');
+    expect(sidebarSource).toContain('aria-expanded={showAdvanced}');
+    expect(sidebarSource).toContain('PermissionGate');
+    expect(sidebarSource).toContain('requireAll={item.requireAllPermissions}');
+    expect(primaryNavSource).toContain("label: 'Developer Catalog / Source Audit'");
+    expect(primaryNavSource).toContain("permission: 'CONFIGURE_SYSTEM'");
   });
 
-  it('keeps the duplicate sidebar Actions inventory collapsed until requested', () => {
-    expect(sidebarSource).toContain('useState(false)');
-    expect(sidebarSource).toContain('showToolsSection &&');
-    expect(sidebarSource).toContain('sidebar-workspace-controls');
-  });
-
-  it('navigates sidebar tool cards via centralized registry launch', () => {
-    expect(sidebarSource).toContain('applyRegistryToolLaunch');
-    expect(sidebarSource).toContain('onToolSelect(tool.id)');
-    expect(sidebarSource).toContain('if (onToolSelect)');
-  });
-
-  it('derives sidebar cards from canonical tool inventory projection', () => {
-    expect(sidebarSource).toContain('getSidebarToolRegistryProjection');
-    expect(sidebarSource).toContain('const medicalTools = useMemo(() => getSidebarToolRegistryProjection(), [])');
-    expect(appShellSource).toContain('<Sidebar');
-  });
-
-  it('closes mobile drawer after navigation', () => {
-    expect(sidebarSource).toContain('onCloseMobileNav');
+  it('closes the mobile drawer after navigation and starts new chats on /assistant', () => {
     expect(sidebarSource).toContain('handleNavClick');
-    expect(sidebarSource).toContain('handleToolClick');
-  });
-
-  it('groups clinical tools by category with expand/collapse', () => {
-    expect(sidebarSource).toContain('partitionSidebarTools');
-    expect(sidebarSource).toContain('categoryGroups.map');
-    expect(sidebarSource).toContain('toggleCategoryGroup');
-    expect(sidebarSource).toContain('aria-expanded={isExpanded}');
-  });
-
-  it('highlights calculator routes via matchCalculatorRoute and initialCalc', () => {
-    expect(sidebarSource).toContain('matchCalculatorRoute');
-    expect(sidebarSource).toContain('tool.initialCalc');
+    expect(sidebarSource).toContain('onCloseMobileNav();');
+    expect(sidebarSource).toContain("navigate('/assistant')");
+    expect(sidebarSource).toContain('onNewConversation?.()');
   });
 });

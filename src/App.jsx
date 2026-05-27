@@ -5,7 +5,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider, useUser, Permission } from './contexts/UserContext';
 import { NotificationProvider, useNotifications } from './contexts/NotificationContext';
 import { ConversationProvider, useConversation } from './contexts/ConversationContext';
-import { ToolPreferencesProvider, useToolPreferences } from './contexts/ToolPreferencesContext';
+import { ToolPreferencesProvider } from './contexts/ToolPreferencesContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { UserIdentityProvider } from './contexts/UserIdentityContext';
 import { CostTrackingProvider } from './contexts/CostTrackingContext';
@@ -23,7 +23,6 @@ import { useNotificationActions } from './hooks/useNotificationActions';
 import logger from './utils/logger';
 import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
-import { applyRegistryToolLaunch } from './navigation/registryToolLaunch';
 import { AUTH_PATH_ALIASES, AUTH_SIGNUP_PATH_ALIASES } from './routing/authPathAliases';
 import {
   CALCULATOR_ROUTE_DEFS,
@@ -274,12 +273,7 @@ function AppShellPage({ children }) {
     activeConversationId,
     selectConversation,
     addConversation,
-    selectedTool,
-    setActiveTool,
-    selectTool,
-    addMessage,
   } = useConversation();
-  const { recordToolAccess } = useToolPreferences();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -298,32 +292,6 @@ function AppShellPage({ children }) {
     navigate({ pathname: '/assistant', search: '' }, { replace: true });
   };
 
-  const handleToolSelect = (toolId) => {
-    if (toolId) {
-      applyRegistryToolLaunch(toolId, {
-        navigate,
-        addMessage,
-        selectTool,
-        setActiveTool,
-        recordToolAccess,
-        replace: true,
-      });
-    } else {
-      setActiveTool(null);
-      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
-    }
-  };
-
-  const handleOpenToolsOverview = () => {
-    setActiveTool(null);
-    navigate('/tools');
-  };
-
-  const handleOpenToolsCatalog = () => {
-    setActiveTool(null);
-    navigate('/tools/catalog');
-  };
-
   const isConversationViewport = ['/chat', '/assistant'].includes(location.pathname);
 
   return (
@@ -335,10 +303,6 @@ function AppShellPage({ children }) {
       onNewConversation={handleNewConversation}
       onSignOut={handleSignOut}
       healthStatus="online"
-      currentTool={selectedTool}
-      onToolSelect={handleToolSelect}
-      onOpenToolsOverview={handleOpenToolsOverview}
-      onOpenToolsCatalog={handleOpenToolsCatalog}
       isDevAuthBypass={isDevAuthBypass}
       devAuthBannerLabel={user?.devAuthLabel || 'Direct Sign In'}
     >
@@ -1287,7 +1251,7 @@ function AppRoutes() {
 
     {
       path: '/fleet',
-      element: <LegacyProtectedRouteRedirect to="/operations" />,
+      element: <LegacyProtectedRouteRedirect to="/fleet/map" />,
       requiresAuth: true,
     },
     {

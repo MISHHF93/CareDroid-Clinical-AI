@@ -63,9 +63,10 @@ describe('CommandDashboard', () => {
     expect(screen.getByRole('heading', { level: 1, name: /caredroid command dashboard/i })).toBeInTheDocument();
     for (const name of [
       /ai assistant/i,
+      /launchpad/i,
       /clinical tools/i,
       /reference & guidelines/i,
-      /fleet & operations/i,
+      /fleet/i,
       /medical iot \/ device monitoring/i,
       /command analytics/i,
       /^recent activity$/i,
@@ -74,6 +75,25 @@ describe('CommandDashboard', () => {
       expect(screen.getByRole('heading', { name })).toBeInTheDocument();
     }
     expect(screen.getByText(/no recent tools yet/i)).toBeInTheDocument();
+  });
+
+  it('renders compact launch cards for primary dashboard entry points', () => {
+    renderDashboard();
+
+    const launchpad = screen.getByRole('heading', { name: /launchpad/i }).closest('section');
+    for (const name of [
+      /ai assistant/i,
+      /browse every user-facing/i,
+      /calculators/i,
+      /hospital map/i,
+      /medical iot/i,
+      /open live vehicle tracking/i,
+      /device management/i,
+      /recent activity/i,
+      /system status/i,
+    ]) {
+      expect(within(launchpad).getByRole('link', { name })).toBeInTheDocument();
+    }
   });
 
   it('renders inventory-backed dashboard charts and KPI cards', () => {
@@ -132,7 +152,7 @@ describe('CommandDashboard', () => {
 
   it('surfaces Hospital Map as a first-class operations launch', () => {
     renderDashboard();
-    const operationsPanel = screen.getByRole('heading', { name: /fleet & operations/i }).closest('section');
+    const operationsPanel = screen.getByRole('heading', { name: /^fleet$/i }).closest('section');
     const hospitalMapButton = within(operationsPanel).getByRole('button', { name: /open hospital map/i });
 
     fireEvent.click(hospitalMapButton);

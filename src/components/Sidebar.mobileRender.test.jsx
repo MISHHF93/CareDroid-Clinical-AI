@@ -33,15 +33,26 @@ vi.mock('../contexts/WorkspaceContext', () => ({
   useWorkspace: () => mockWorkspaceValue,
 }));
 
+vi.mock('../contexts/UserIdentityContext', () => ({
+  useUserIdentity: () => ({
+    account: {
+      displayName: 'Test Clinician',
+      specialty: 'Emergency Medicine',
+      organization: 'CareDroid Demo',
+    },
+    activeWorkspace: { id: 'default', name: 'Default' },
+    workspaces: [{ id: 'default', name: 'Default' }],
+    workspaceState: { activeWorkspaceId: 'default' },
+    switchWorkspace: vi.fn(),
+  }),
+}));
+
 const defaultProps = {
   conversations: [{ id: '1', title: 'Test chat', date: new Date().toISOString() }],
   activeConversation: '1',
   onSelectConversation: vi.fn(),
   onNewConversation: vi.fn(),
   onSignOut: vi.fn(),
-  onToolSelect: vi.fn(),
-  onOpenToolsOverview: vi.fn(),
-  onOpenToolsCatalog: vi.fn(),
 };
 
 function renderSidebar(overrides = {}) {
@@ -85,25 +96,32 @@ describe('Sidebar mobile render state', () => {
     const nav = container.querySelector('nav.sidebar-nav');
     expect(nav).toBeInTheDocument();
     expect(within(nav).getByRole('button', { name: /^dashboard$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^assistant$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^operations$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^ai assistant$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^hospital map$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^fleet$/i })).toBeInTheDocument();
   });
 
-  it('renders tool cards with accessible names in tools section', () => {
-    const { container } = renderSidebar({ layoutCompact: false, sidebarCollapsed: false });
+  it('renders simplified primary items and hides developer links in Advanced by default', () => {
+    renderSidebar({ layoutCompact: false, sidebarCollapsed: false });
 
-    expect(screen.getByText('Actions')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^tools$/i })).toBeInTheDocument();
-    expect(screen.queryByText('Developer Catalog / Source Audit')).not.toBeInTheDocument();
-    expect(screen.queryByText('Browse All Tools')).not.toBeInTheDocument();
-    const actionsToggle = screen.getByRole('button', { name: /actions/i });
-    if (actionsToggle.getAttribute('aria-expanded') === 'false') {
-      fireEvent.click(actionsToggle);
+    const nav = screen.getByRole('navigation', { name: /primary navigation/i });
+    for (const name of [
+      /^dashboard$/i,
+      /^ai assistant$/i,
+      /^tools$/i,
+      /^calculators$/i,
+      /^hospital map$/i,
+      /^medical iot$/i,
+      /^fleet$/i,
+      /^profile$/i,
+      /^settings$/i,
+    ]) {
+      expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
     }
-    const toolCards = container.querySelectorAll('.sidebar-tool-card');
-    expect(toolCards.length).toBeGreaterThan(0);
-    expect(
-      toolCards[0].querySelector('.sidebar-tool-card-name')?.textContent?.trim().length
-    ).toBeGreaterThan(0);
+
+    expect(screen.queryByRole('button', { name: /developer catalog/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /advanced/i }));
+    expect(screen.getByRole('button', { name: /developer catalog/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /system health/i })).toBeInTheDocument();
   });
 });

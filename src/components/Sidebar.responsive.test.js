@@ -85,7 +85,6 @@ describe('Sidebar responsive — desktop collapse unchanged', () => {
 
 describe('Sidebar responsive — active routes and keyboard', () => {
   it('uses nested path matching and aria-current for nav items', () => {
-    expect(sidebarJsx).toContain('isNavItemActive');
     expect(sidebarJsx).toContain('primaryNavPathMatches');
     expect(sidebarJsx).toMatch(/aria-current=\{isActive \? 'page'/);
   });
@@ -95,8 +94,9 @@ describe('Sidebar responsive — active routes and keyboard', () => {
     expect(sidebarJsx).toMatch(/\.nav-item\.active/);
   });
 
-  it('tools section header is keyboard operable', () => {
-    expect(sidebarJsx).toContain('sidebar-section-header-toggle');
-    expect(sidebarJsx).toMatch(/e\.key === 'Enter' \|\| e\.key === ' '/);
+  it('advanced section uses a native button and keeps developer links collapsed', () => {
+    expect(sidebarJsx).toContain('sidebar-advanced-toggle');
+    expect(sidebarJsx).toContain('ADVANCED_SIDEBAR_NAV_ITEMS');
+    expect(sidebarJsx).toContain('aria-expanded={showAdvanced}');
   });
 });

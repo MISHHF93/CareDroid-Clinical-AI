@@ -242,6 +242,63 @@
   min-width: 0;
 }
 
+.command-launch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  min-width: 0;
+}
+
+.command-launch-card {
+  min-width: 0;
+  min-height: 78px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--compact-card-radius, 12px);
+  color: inherit;
+  background: var(--app-surface-2);
+  text-decoration: none;
+}
+
+.command-launch-card:hover,
+.command-launch-card:focus-visible {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 36%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--app-surface-2));
+  outline: none;
+}
+
+.command-launch-card__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  color: var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--app-accent-interactive) 11%, transparent);
+}
+
+.command-launch-card__body {
+  min-width: 0;
+  display: grid;
+  gap: 5px;
+}
+
+.command-launch-card__body strong,
+.command-launch-card__body span {
+  min-width: 0;
+}
+
+.command-launch-card__body span {
+  color: var(--app-fg-muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
 .command-tool-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -374,6 +431,7 @@
 
   .command-hero__stats,
   .command-prompt-grid,
+  .command-launch-grid,
   .command-tool-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -391,6 +449,7 @@
   .command-dashboard__grid,
   .command-assistant-input-row,
   .command-prompt-grid,
+  .command-launch-grid,
   .command-tool-grid,
   .command-status-grid {
     grid-template-columns: 1fr;

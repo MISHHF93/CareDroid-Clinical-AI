@@ -22,14 +22,7 @@ const AppShell = ({
   onSelectConversation,
   onNewConversation,
   onSignOut,
-  authToken,
   healthStatus,
-  currentTool = null,
-  currentFeature = null,
-  onToolSelect = null,
-  onOpenToolsOverview = null,
-  onOpenToolsCatalog = null,
-  onFeatureSelect = null,
   isDevAuthBypass = false,
   devAuthBannerLabel = 'Direct Sign In',
   children,
@@ -144,10 +137,6 @@ const AppShell = ({
         onNewConversation={onNewConversation}
         onSignOut={onSignOut}
         healthStatus={healthStatus}
-        currentTool={currentTool}
-        onToolSelect={onToolSelect}
-        onOpenToolsOverview={onOpenToolsOverview}
-        onOpenToolsCatalog={onOpenToolsCatalog}
         layoutCompact={isCompact}
         mobileNavOpen={mobileNavOpen}
         onCloseMobileNav={closeMobileNav}

@@ -80,6 +80,72 @@ function StatusItem({ label, value, tone = 'neutral' }) {
   );
 }
 
+const DASHBOARD_LAUNCH_CARDS = Object.freeze([
+  {
+    id: 'assistant',
+    label: 'AI Assistant',
+    description: 'Ask, triage, and launch tools from the chatbot workspace.',
+    path: '/assistant',
+    icon: CHROME_ICONS.bot,
+  },
+  {
+    id: 'tools',
+    label: 'Tools',
+    description: 'Browse every user-facing clinical and operations tool.',
+    path: '/tools',
+    icon: CHROME_ICONS.tools,
+  },
+  {
+    id: 'calculators',
+    label: 'Calculators',
+    description: 'Open the focused calculator hub and severity scores.',
+    path: '/tools/calculators',
+    icon: CHROME_ICONS.calculator,
+  },
+  {
+    id: 'hospital-map',
+    label: 'Hospital Map',
+    description: 'View floors, rooms, beds, device markers, and stale states.',
+    path: '/hospital-map',
+    icon: CHROME_ICONS.hospital,
+  },
+  {
+    id: 'medical-iot',
+    label: 'Medical IoT',
+    description: 'Monitor telemetry, devices, alerts, and demo data labels.',
+    path: '/medical-iot',
+    icon: CHROME_ICONS.activity,
+  },
+  {
+    id: 'fleet',
+    label: 'Fleet',
+    description: 'Open live vehicle tracking and route status.',
+    path: '/fleet/map',
+    icon: CHROME_ICONS.truck,
+  },
+  {
+    id: 'devices',
+    label: 'Device Management',
+    description: 'Manage device fleet state, maintenance, and assignments.',
+    path: '/devices',
+    icon: CHROME_ICONS.wrench,
+  },
+  {
+    id: 'activity',
+    label: 'Recent Activity',
+    description: 'Review recent tools, AI chats, and profile activity.',
+    path: '/profile/activity',
+    icon: CHROME_ICONS.clock,
+  },
+  {
+    id: 'system-status',
+    label: 'System Status',
+    description: 'Check platform health and backend readiness.',
+    path: '/system-health',
+    icon: CHROME_ICONS.shield,
+  },
+]);
+
 function buildRecentUsageTrend(recentToolItems, messages) {
   const assistantCount = messages.filter((message) => message.role === 'assistant').length;
   const toolCount = recentToolItems.length;
@@ -203,6 +269,26 @@ export default function CommandDashboard() {
       </section>
 
       <DashboardPanel
+        title="Launchpad"
+        description="One compact entry point for the major CareDroid work areas."
+        icon={CHROME_ICONS.layoutDashboard}
+      >
+        <div className="command-launch-grid">
+          {DASHBOARD_LAUNCH_CARDS.map((card) => (
+            <Link key={card.id} className="command-launch-card" to={card.path}>
+              <span className="command-launch-card__icon" aria-hidden>
+                <NavIcon icon={card.icon} size={21} />
+              </span>
+              <span className="command-launch-card__body">
+                <strong>{card.label}</strong>
+                <span>{card.description}</span>
+              </span>
+            </Link>
+          ))}
+        </div>
+      </DashboardPanel>
+
+      <DashboardPanel
         title="AI Assistant"
         description="Start with the chatbot, then let canonical launch behavior route tools and calculators."
         icon={CHROME_ICONS.bot}
@@ -301,8 +387,8 @@ export default function CommandDashboard() {
         </DashboardPanel>
 
         <DashboardPanel
-          title="Fleet & Operations"
-          description="Operations tools stay visible without implying autonomous dispatch or control."
+          title="Fleet"
+          description="Tracking and operations tools stay visible without implying autonomous dispatch or control."
           icon={CHROME_ICONS.tools}
         >
           <div className="command-tool-grid">
@@ -310,8 +396,8 @@ export default function CommandDashboard() {
               <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
             ))}
           </div>
-          <Link className="command-panel-link" to="/operations">
-            Open operations landing
+          <Link className="command-panel-link" to="/fleet/map">
+            Open Fleet Map
           </Link>
         </DashboardPanel>
 

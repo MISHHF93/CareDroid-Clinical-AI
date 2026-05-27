@@ -58,6 +58,12 @@ function makeToolEntry(tool) {
   };
 }
 
+function isPrimaryShellDuplicate(tool, navPathSet) {
+  if (!tool?.path || !navPathSet.has(tool.path)) return false;
+  if (tool.path === '/tools/calculators' && tool.id !== 'calculators') return false;
+  return true;
+}
+
 export function buildQuickCommandEntries({
   tools = getUserFacingToolRegistryProjection(),
   navItems = QUICK_COMMAND_NAV_ITEMS,
@@ -66,7 +72,7 @@ export function buildQuickCommandEntries({
   const navEntries = navItems.map(makeNavEntry);
   const navPathSet = new Set(navEntries.map((entry) => entry.path).filter(Boolean));
   const allToolEntries = tools
-    .filter((tool) => tool?.id && !navPathSet.has(tool.path))
+    .filter((tool) => tool?.id && !isPrimaryShellDuplicate(tool, navPathSet))
     .map(makeToolEntry);
   const toolById = Object.fromEntries(allToolEntries.map((entry) => [entry.sourceId, entry]));
   const seenRecentIds = new Set();

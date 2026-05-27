@@ -31,8 +31,8 @@ describe('canonical route redirects', () => {
     expect(appSource).not.toContain("path: '/chat', element: <AppShellPage><Dashboard /></AppShellPage>");
   });
 
-  it('gives the fleet area an explicit canonical operations landing redirect', () => {
-    expectRedirect('/fleet', '/operations');
+  it('gives the fleet area an explicit canonical live-map redirect', () => {
+    expectRedirect('/fleet', '/fleet/map');
     expectRoute('/fleet/command', 'FleetDashboard');
   });
 

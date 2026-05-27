@@ -15,7 +15,7 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
   },
   {
     id: 'assistant',
-    label: 'Assistant',
+    label: 'AI Assistant',
     mobileLabel: 'AI',
     path: '/assistant',
     legacyPaths: ['/chat', '/ai', '/copilot'],
@@ -48,65 +48,87 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     matchPrefixes: ['/tools/calculators/'],
   },
   {
-    id: 'artifacts',
-    label: 'Artifacts',
-    mobileLabel: 'Artifacts',
-    path: '/artifacts',
-    matchPaths: ['/artifacts'],
+    id: 'hospital-map',
+    label: 'Hospital Map',
+    mobileLabel: 'Map',
+    path: '/hospital-map',
+    legacyPaths: ['/maps', '/tracking', '/live-tracking'],
+    matchPaths: ['/hospital-map', '/live-map', '/maps', '/tracking', '/live-tracking'],
+    matchPrefixes: ['/hospital-map/'],
+  },
+  {
+    id: 'medical-iot',
+    label: 'Medical IoT',
+    mobileLabel: 'IoT',
+    path: '/medical-iot',
+    matchPaths: ['/medical-iot'],
     showInMobile: false,
   },
   {
-    id: 'memory',
-    label: 'Memory',
-    mobileLabel: 'Memory',
-    path: '/ai-memory',
-    legacyPaths: ['/memory'],
-    matchPaths: ['/ai-memory', '/memory'],
-    showInMobile: false,
-  },
-  {
-    id: 'training',
-    label: 'Training',
-    mobileLabel: 'Train',
-    path: '/training',
-    matchPaths: ['/training'],
-    permission: 'VIEW_ANALYTICS',
-    showInMobile: false,
-  },
-  {
-    id: 'operations',
-    label: 'Operations',
-    mobileLabel: 'Ops',
-    path: '/operations',
-    legacyPaths: ['/fleet'],
-    matchPaths: [
-      '/operations',
-      '/fleet',
-      '/devices',
-      '/live-map',
-      '/hospital-map',
-      '/medical-iot',
-      '/clinical/alerts',
-      '/analytics',
-      '/costs',
-      '/audit-logs',
-    ],
+    id: 'fleet',
+    label: 'Fleet',
+    mobileLabel: 'Fleet',
+    path: '/fleet/map',
+    legacyPaths: ['/fleet', '/fleet/live-map', '/fleet/tracking'],
+    matchPaths: ['/fleet', '/fleet/map', '/fleet/command', '/fleet/live-map', '/fleet/tracking'],
     matchPrefixes: ['/fleet/'],
+    showInMobile: false,
   },
   {
-    id: 'integrations',
-    label: 'Integrations',
-    mobileLabel: 'FHIR',
-    path: '/integrations',
-    matchPaths: ['/integrations', '/integrations/fhir', '/integrations/hl7'],
+    id: 'profile',
+    label: 'Profile',
+    mobileLabel: 'Profile',
+    path: '/profile',
+    matchPaths: ['/profile', '/profile/activity', '/profile/workspaces', '/profile/security'],
+    showInMobile: false,
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    mobileLabel: 'Settings',
+    path: '/settings',
+    matchPaths: [
+      '/settings',
+      '/profile/settings',
+      '/profile/preferences',
+      '/profile-settings',
+      '/notifications',
+      '/team',
+      '/consent',
+      '/consent-history',
+      '/two-factor-setup',
+      '/biometric-setup',
+      '/onboarding',
+    ],
+    showInMobile: false,
+  },
+]);
+
+export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
+  {
+    id: 'developer-audit',
+    label: 'Developer Catalog / Source Audit',
+    mobileLabel: 'Dev',
+    path: '/tools/catalog',
+    matchPaths: ['/tools/catalog', '/catalog'],
     permission: 'CONFIGURE_SYSTEM',
+    showInMobile: false,
+  },
+  {
+    id: 'system-health',
+    label: 'System Health',
+    mobileLabel: 'Health',
+    path: '/system-health',
+    matchPaths: ['/system-health', '/operations/service-health'],
+    permission: ['VIEW_OPERATIONS', 'VIEW_OBSERVABILITY'],
+    requireAllPermissions: true,
     showInMobile: false,
   },
   {
     id: 'governance',
     label: 'Governance',
     mobileLabel: 'Gov',
-    path: '/governance',
+    path: '/ai-governance',
     matchPaths: [
       '/governance',
       '/governance/ai',
@@ -117,66 +139,26 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
       '/governance/privacy',
       '/ai-governance',
       '/security',
+      '/privacy',
+      '/regulatory',
+      '/human-review',
     ],
+    permission: 'VIEW_GOVERNANCE',
+    showInMobile: false,
+  },
+  {
+    id: 'audit',
+    label: 'Audit Logs',
+    mobileLabel: 'Audit',
+    path: '/audit-logs',
+    matchPaths: ['/audit', '/audit-logs', '/audit/ai', '/audit/phi', '/audit/integrations', '/audit/policy'],
     permission: 'VIEW_AUDIT_LOGS',
     showInMobile: false,
-  },
-  {
-    id: 'maps',
-    label: 'Maps',
-    mobileLabel: 'Maps',
-    path: '/live-map',
-    legacyPaths: ['/maps', '/tracking', '/live-tracking'],
-    matchPaths: ['/live-map', '/hospital-map', '/maps', '/tracking', '/live-tracking'],
-    matchPrefixes: ['/hospital-map/', '/fleet/map', '/fleet/live-map', '/fleet/tracking'],
-    showInSidebar: false,
-    showInMobile: false,
-  },
-  {
-    id: 'medical-iot',
-    label: 'Medical IoT',
-    mobileLabel: 'IoT',
-    path: '/medical-iot',
-    matchPaths: ['/medical-iot'],
-    showInSidebar: false,
-    showInMobile: false,
-  },
-  {
-    id: 'developer-audit',
-    label: 'Developer Audit',
-    mobileLabel: 'Audit',
-    path: '/tools/catalog',
-    matchPaths: ['/tools/catalog', '/catalog'],
-    permission: 'CONFIGURE_SYSTEM',
-    showInMobile: false,
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    mobileLabel: 'Settings',
-    path: '/settings',
-    matchPaths: [
-      '/settings',
-      '/profile',
-      '/profile/settings',
-      '/profile/activity',
-      '/profile/preferences',
-      '/profile/workspaces',
-      '/profile/security',
-      '/profile-settings',
-      '/notifications',
-      '/team',
-      '/consent',
-      '/consent-history',
-      '/two-factor-setup',
-      '/biometric-setup',
-      '/onboarding',
-    ],
   },
 ]);
 
 export const PRIMARY_NAV_BY_ID = Object.freeze(
-  Object.fromEntries(PRIMARY_NAV_ITEMS.map((item) => [item.id, item]))
+  Object.fromEntries([...PRIMARY_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map((item) => [item.id, item]))
 );
 
 export const PRIMARY_SIDEBAR_NAV_ITEMS = Object.freeze(
@@ -188,6 +170,10 @@ export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
 );
 
 export const QUICK_COMMAND_NAV_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
+export const QUICK_COMMAND_DESTINATION_ITEMS = Object.freeze([
+  ...PRIMARY_SIDEBAR_NAV_ITEMS,
+  ...ADVANCED_SIDEBAR_NAV_ITEMS,
+]);
 
 export function primaryNavPathMatches(item, pathname) {
   const normalized = pathname || '/';
@@ -199,5 +185,9 @@ export function primaryNavPathMatches(item, pathname) {
 }
 
 export function getPrimaryNavItemForPath(pathname) {
-  return PRIMARY_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) || null;
+  return (
+    PRIMARY_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
+    ADVANCED_SIDEBAR_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
+    null
+  );
 }
