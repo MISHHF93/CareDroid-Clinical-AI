@@ -129,8 +129,9 @@ export default defineConfig(({ mode }) => {
           assetFileNames: 'assets/[name]-[hash].[ext]',
         },
       },
-      // Increase chunk size warning limit (we're using code splitting)
-      chunkSizeWarningLimit: 600,
+      // The calculator hub is an intentionally lazy-loaded clinical route with many form
+      // implementations. Keep Vercel warnings focused on unexpected chunk growth.
+      chunkSizeWarningLimit: 950,
     },
     // Optimize dependencies
     optimizeDeps: {
