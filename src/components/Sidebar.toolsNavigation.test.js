@@ -52,7 +52,7 @@ describe('Simplified sidebar navigation wiring', () => {
       expect(primaryNavSource, path).toContain(`path: '${path}'`);
     }
 
-    for (const path of ['/tools/catalog', '/system-health', '/ai-governance', '/audit-logs']) {
+    for (const path of ['/tools/catalog', '/system-health', '/ai-governance', '/security', '/audit-logs']) {
       expect(primaryNavSource, path).toContain(`path: '${path}'`);
     }
   });

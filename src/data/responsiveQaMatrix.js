@@ -293,9 +293,9 @@ export function buildResponsiveQaPages() {
       category: 'core',
     },
     {
-      id: 'operations',
-      label: 'Operations',
-      path: '/operations',
+      id: 'fleet-map',
+      label: 'Fleet Map',
+      path: '/fleet/map',
       category: 'core',
     },
     {

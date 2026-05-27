@@ -172,12 +172,12 @@ const Auth = ({ onAuthSuccess }) => {
       info(
         'Signing in',
         session.backendBacked
-          ? 'Direct sign-in with API access.'
-          : 'Direct sign-in using local UI data only. Start the backend for tool APIs.'
+          ? 'Demo mode with API access.'
+          : 'Demo mode using local UI data only. Start the backend for tool APIs.'
       );
     } catch (err) {
-      logger.error('Direct sign-in auth bypass failed', { err });
-      error('Direct sign-in failed', 'Unable to start the local direct sign-in session.');
+      logger.error('Demo mode auth bypass failed', { err });
+      error('Demo mode failed', 'Unable to start the local demo session.');
     }
   };
 
@@ -191,9 +191,9 @@ const Auth = ({ onAuthSuccess }) => {
     return (
       <section
         className={`auth-dev-oneclick${compact ? ' auth-dev-oneclick--compact' : ''}`}
-        aria-label="Direct sign in"
+        aria-label="Demo mode access"
       >
-        <p className="auth-division-tag">Direct sign in</p>
+        <p className="auth-division-tag">Demo mode</p>
         <Button
           type="button"
           variant="success"
@@ -201,11 +201,11 @@ const Auth = ({ onAuthSuccess }) => {
           onClick={handleDirectSignIn}
           leftIcon={<NavIcon icon={CHROME_ICONS.zap} size={20} aria-hidden />}
         >
-          Direct Sign In
+          Continue in Demo Mode
         </Button>
         <p className="auth-dev-oneclick__hint">
-          Uses the local development clinician session and routes into the same app shell as every
-          other sign-in method.
+          Uses a persisted demo clinician session and routes into the same app shell as every other
+          sign-in method.
         </p>
       </section>
     );

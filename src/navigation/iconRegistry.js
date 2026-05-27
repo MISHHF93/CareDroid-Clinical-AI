@@ -101,6 +101,7 @@ const NAV_ICONS = {
   'developer-audit': ScrollText,
   'system-health': Activity,
   governance: Shield,
+  security: Lock,
   settings: Settings,
   pulse: LayoutDashboard,
   chat: MessageSquare,

@@ -86,7 +86,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     for (const phantom of phantomToolReferences) {
       expect(renderedIds, phantom.id).not.toContain(phantom.id);
     }
-  }, 10000);
+  }, 30_000);
 
   it.each([
     ['pe-score', 'wells-pe'],

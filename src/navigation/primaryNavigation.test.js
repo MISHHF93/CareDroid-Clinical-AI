@@ -17,7 +17,7 @@ describe('primaryNavigation', () => {
       ['Calculators', '/tools/calculators'],
       ['Hospital Map', '/hospital-map'],
       ['Medical IoT', '/medical-iot'],
-      ['Fleet', '/fleet/map'],
+      ['Fleet Map', '/fleet/map'],
       ['Profile', '/profile'],
       ['Settings', '/settings'],
     ]);
@@ -28,6 +28,7 @@ describe('primaryNavigation', () => {
       ['Developer Catalog / Source Audit', '/tools/catalog'],
       ['System Health', '/system-health'],
       ['Governance', '/ai-governance'],
+      ['Security', '/security'],
       ['Audit Logs', '/audit-logs'],
     ]);
   });

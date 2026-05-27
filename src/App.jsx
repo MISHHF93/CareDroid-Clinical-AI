@@ -42,7 +42,6 @@ import Version from './pages/Version';
 const CommandDashboard = lazyWithRetry(() => import('./pages/CommandDashboard'));
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
-const Operations = lazyWithRetry(() => import('./pages/Operations'));
 const Artifacts = lazyWithRetry(() => import('./pages/Artifacts'));
 const MemoryDashboard = lazyWithRetry(() => import('./pages/MemoryDashboard'));
 const TrainingDashboard = lazyWithRetry(() => import('./pages/TrainingDashboard'));
@@ -181,13 +180,13 @@ export function WelcomePage() {
       info(
         'Signing in',
         session.backendBacked
-          ? 'Direct sign-in with API access.'
-          : 'Direct sign-in using local UI data only. Start the backend for tool APIs.'
+          ? 'Demo mode with API access.'
+          : 'Demo mode using local UI data only. Start the backend for tool APIs.'
       );
       navigate('/dashboard', { replace: true });
     } catch (err) {
-      logger.error('Direct sign-in auth bypass failed from welcome page', { err });
-      error('Direct sign-in failed', 'Unable to start the local direct sign-in session.');
+      logger.error('Demo mode auth bypass failed from welcome page', { err });
+      error('Demo mode failed', 'Unable to start the local demo session.');
     }
   };
 
@@ -246,15 +245,15 @@ export function WelcomePage() {
           </button>
           {enableDevAuthBypass && (
             <button type="button" className="welcome-page-dev-cta" onClick={handleDirectSignIn}>
-              Direct Sign In
+              Continue in Demo Mode
             </button>
           )}
         </div>
 
         {enableDevAuthBypass && (
           <p className="welcome-page-dev-note">
-            Direct sign-in is enabled for local development and uses the same app shell routes as
-            signed-in users.
+            Demo mode is enabled for local or hosted demos and uses the same app shell routes as
+            signed-in clinicians.
           </p>
         )}
 
@@ -304,7 +303,7 @@ function AppShellPage({ children }) {
       onSignOut={handleSignOut}
       healthStatus="online"
       isDevAuthBypass={isDevAuthBypass}
-      devAuthBannerLabel={user?.devAuthLabel || 'Direct Sign In'}
+      devAuthBannerLabel={user?.devAuthLabel || 'Demo Mode'}
     >
       <div
         className={`app-shell-page-body${isConversationViewport ? ' app-shell-page-body--conversation' : ''}`}
@@ -723,11 +722,7 @@ function AppRoutes() {
     },
     {
       path: '/operations',
-      element: (
-        <AppShellPage>
-          <Operations />
-        </AppShellPage>
-      ),
+      element: <LegacyProtectedRouteRedirect to="/dashboard" />,
       requiresAuth: true,
     },
     {
@@ -1256,7 +1251,7 @@ function AppRoutes() {
     },
     {
       path: '/catalog',
-      element: <LegacyProtectedRouteRedirect to="/tools/catalog" />,
+      element: <LegacyProtectedRouteRedirect to="/tools" />,
       requiresAuth: true,
     },
     {

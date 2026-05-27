@@ -53,12 +53,16 @@ describe('ToolsOverview unified inventory', () => {
     const renderedCards = [...container.querySelectorAll('.tool-card-large h3')].map(
       (heading) => heading.textContent
     );
+    const renderedIds = [...container.querySelectorAll('.tool-card-large')].map(
+      (card) => card.getAttribute('data-tool-id')
+    );
 
     expect(screen.getByRole('heading', { level: 1, name: /^tool library$/i })).toBeInTheDocument();
     expect([...container.querySelectorAll('.stat-number')].map((node) => node.textContent)).toContain(
       String(userFacing.length)
     );
     expect(renderedCards).toHaveLength(userFacing.length);
+    expect(new Set(renderedIds).size).toBe(renderedIds.length);
     for (const record of userFacing) {
       expect(renderedCards, record.id).toContain(record.label);
     }
@@ -110,7 +114,7 @@ describe('ToolsOverview unified inventory', () => {
     const { container } = renderOverview();
     expect(container.querySelector('.tools-discovery-controls')).toBeTruthy();
     expect(container.querySelectorAll('.tool-card-large').length).toBeGreaterThan(0);
-    expect(screen.queryByRole('button', { name: /developer catalog/i })).not.toBeInTheDocument();
+    expect(container.textContent).not.toMatch(/developer catalog \/ source audit/i);
   }, 10000);
 
   it('shows a non-blank empty state for empty custom workspaces', () => {

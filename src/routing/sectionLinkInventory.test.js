@@ -21,9 +21,9 @@ const visibleLinkInventory = [
   ['Primary Assistant nav', 'navigation/primaryNavigation.js', '/assistant'],
   ['Primary Tools nav', 'navigation/primaryNavigation.js', '/tools'],
   ['Primary Calculators nav', 'navigation/primaryNavigation.js', '/tools/calculators'],
-  ['Primary Operations nav', 'navigation/primaryNavigation.js', '/operations'],
-  ['Primary Maps nav', 'navigation/primaryNavigation.js', '/live-map'],
+  ['Primary Hospital Map nav', 'navigation/primaryNavigation.js', '/hospital-map'],
   ['Primary Medical IoT nav', 'navigation/primaryNavigation.js', '/medical-iot'],
+  ['Primary Fleet Map nav', 'navigation/primaryNavigation.js', '/fleet/map'],
   ['Primary Developer Audit nav', 'navigation/primaryNavigation.js', '/tools/catalog'],
   ['Profile settings assistant link', 'pages/ProfileSettings.jsx', '/assistant'],
   ['Settings back link', 'pages/Settings.jsx', '/assistant'],
@@ -39,10 +39,12 @@ const canonicalRoutes = new Set([
   '/live-map',
   '/hospital-map',
   '/medical-iot',
+  '/fleet/map',
+  '/devices',
   '/tools/catalog',
   '/tools/calculators',
-  '/operations',
   '/settings',
+  '/system-health',
 ]);
 
 const userFacingLinkFiles = [
@@ -85,7 +87,9 @@ describe('section link inventory and route flattening', () => {
     const app = read('App.jsx');
     expectRedirectRoute(app, '/home', '/dashboard');
     expectRedirectRoute(app, '/chat', '/assistant');
-    expectRedirectRoute(app, '/fleet', '/operations');
+    expectRedirectRoute(app, '/fleet', '/fleet/map');
+    expectRedirectRoute(app, '/operations', '/dashboard');
+    expectRedirectRoute(app, '/catalog', '/tools');
     expect(app).toContain('ASSISTANT_ROUTE_ALIASES.map');
     expect(app).toContain('TOOLS_ROUTE_ALIASES.map');
     expect(app).toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');

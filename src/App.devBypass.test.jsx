@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router-dom';
-import { UserProvider } from './contexts/UserContext';
+import { UserProvider, useUser } from './contexts/UserContext';
 import { WelcomePage } from './App';
 
 const mocks = vi.hoisted(() => ({
@@ -40,6 +40,16 @@ function LocationProbe() {
   return <div data-testid="location">{location.pathname}</div>;
 }
 
+function AuthStateProbe() {
+  const { isAuthenticated, isDevAuthBypass, user } = useUser();
+  return (
+    <output data-testid="auth-state">
+      {isAuthenticated ? 'authenticated' : 'anonymous'}:{isDevAuthBypass ? 'demo' : 'standard'}:
+      {user?.role || 'none'}
+    </output>
+  );
+}
+
 function renderWelcome() {
   render(
     <MemoryRouter initialEntries={['/']}>
@@ -51,7 +61,7 @@ function renderWelcome() {
   );
 }
 
-describe('Welcome page direct sign-in dev bypass', () => {
+describe('Welcome page demo mode access', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -60,33 +70,33 @@ describe('Welcome page direct sign-in dev bypass', () => {
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
-  it('shows one direct sign-in action in development even with flags disabled', () => {
+  it('shows one demo mode action in development even with flags disabled', () => {
     renderWelcome();
-
-    expect(
-      screen.queryByRole('button', { name: /direct sign in/i })
-    ).toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', { name: /continue in demo mode/i })
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: /direct sign in/i })
     ).not.toBeInTheDocument();
   });
 
-  it('allows direct sign in when flags are disabled and routes to dashboard', async () => {
+  it('allows demo mode when flags are disabled in local dev and routes to dashboard', async () => {
     renderWelcome();
 
-    fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
+    fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
 
     await waitFor(() => {
       expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
     });
   });
 
-  it('uses the direct sign-in action when explicitly enabled and routes to dashboard', async () => {
+  it('uses the demo mode action when explicitly enabled and routes to dashboard', async () => {
     mocks.appConfig.features.enableDevAuthBypass = true;
     renderWelcome();
 
-    fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
+    fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
 
     await waitFor(() => {
       expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
@@ -103,14 +113,38 @@ describe('Welcome page direct sign-in dev bypass', () => {
 });
 
 
-it('shows direct sign-in when VITE_DEMO_MODE=true and still routes to dashboard', async () => {
+it('shows demo mode when VITE_DEMO_MODE=true and still routes to dashboard', async () => {
   mocks.appConfig.features.enableDevAuthBypass = false;
   mocks.appConfig.features.enableDemoMode = true;
   renderWelcome();
 
-  fireEvent.click(screen.getByRole('button', { name: /direct sign in/i }));
+  fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
 
   await waitFor(() => {
     expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
+  });
+});
+
+it('restores persisted demo auth after refresh-compatible remounts', async () => {
+  localStorage.setItem('caredroid_access_token', 'persisted-demo-token');
+  localStorage.setItem(
+    'caredroid_user_profile',
+    JSON.stringify({
+      id: 'dev-demo-user',
+      role: 'physician',
+      authMode: 'local-dev-demo',
+      isDevAuthBypass: true,
+      devAuthLabel: 'Demo Mode',
+    })
+  );
+
+  render(
+    <UserProvider>
+      <AuthStateProbe />
+    </UserProvider>
+  );
+
+  await waitFor(() => {
+    expect(screen.getByTestId('auth-state')).toHaveTextContent('authenticated:demo:physician');
   });
 });

@@ -25,6 +25,7 @@ describe('canonical route redirects', () => {
   it('keeps command dashboard canonical and legacy chat paths as redirects', () => {
     expectRoute('/dashboard', 'CommandDashboard');
     expectRedirect('/home', '/dashboard');
+    expectRedirect('/operations', '/dashboard');
     expectRedirect('/chat', '/assistant');
     expect(appSource).toContain("const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot']");
     expect(appSource).not.toContain("path: '/dashboard', element: <LegacyProtectedRouteRedirect to=\"/home\" />");
@@ -52,7 +53,7 @@ describe('canonical route redirects', () => {
     expect(appSource).toContain("const TOOLS_ROUTE_ALIASES = ['/all-tools', '/clinical-tools']");
     expect(appSource).toContain("path: '/tools/catalog'");
     expect(appSource).toContain('permission: Permission.CONFIGURE_SYSTEM');
-    expectRedirect('/catalog', '/tools/catalog');
+    expectRedirect('/catalog', '/tools');
   });
 
   it('renders product tool pages directly instead of redirecting them through assistant', () => {

@@ -277,11 +277,11 @@ function Dashboard() {
         path: '/tools/ambient-scribe',
       },
       {
-        title: 'Operations overview',
-        body: 'Review clinical alerts, fleet command, analytics, and audit surfaces from one operations workspace.',
-        label: 'Open operations',
+        title: 'Command dashboard',
+        body: 'Review launch cards, fleet, maps, IoT, analytics, and system status from the main dashboard.',
+        label: 'Open dashboard',
         icon: CHROME_ICONS.tools,
-        path: '/operations',
+        path: '/dashboard',
       },
     ],
     []

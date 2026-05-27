@@ -134,8 +134,14 @@ describe('canonical segment inventory', () => {
     expect(getSegmentsByNavEntry('assistant').map((record) => record.id)).toEqual(
       expect.arrayContaining(['assistant', 'chat-assisted-tools', 'dispatch-ai'])
     );
-    expect(getSegmentsByNavEntry('operations').map((record) => record.id)).toEqual(
-      expect.arrayContaining(['operations', 'fleet-operations', 'clinical-alerts', 'analytics-costs'])
+    expect(getSegmentsByNavEntry('home').map((record) => record.id)).toEqual(
+      expect.arrayContaining(['home', 'operations'])
+    );
+    expect(getSegmentsByNavEntry('fleet').map((record) => record.id)).toEqual(
+      expect.arrayContaining(['fleet-operations'])
+    );
+    expect(getSegmentsByNavEntry('audit').map((record) => record.id)).toEqual(
+      expect.arrayContaining(['audit-compliance'])
     );
   });
 

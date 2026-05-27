@@ -24,7 +24,7 @@ const AppShell = ({
   onSignOut,
   healthStatus,
   isDevAuthBypass = false,
-  devAuthBannerLabel = 'Direct Sign In',
+  devAuthBannerLabel = 'Demo Mode',
   children,
 }) => {
   const { preference, resolvedTheme, setPreference } = useTheme();

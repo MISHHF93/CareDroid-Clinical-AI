@@ -98,7 +98,7 @@ describe('Sidebar mobile render state', () => {
     expect(within(nav).getByRole('button', { name: /^dashboard$/i })).toBeInTheDocument();
     expect(within(nav).getByRole('button', { name: /^ai assistant$/i })).toBeInTheDocument();
     expect(within(nav).getByRole('button', { name: /^hospital map$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^fleet$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^fleet map$/i })).toBeInTheDocument();
   });
 
   it('renders simplified primary items and hides developer links in Advanced by default', () => {
@@ -112,7 +112,7 @@ describe('Sidebar mobile render state', () => {
       /^calculators$/i,
       /^hospital map$/i,
       /^medical iot$/i,
-      /^fleet$/i,
+      /^fleet map$/i,
       /^profile$/i,
       /^settings$/i,
     ]) {
@@ -123,5 +123,6 @@ describe('Sidebar mobile render state', () => {
     fireEvent.click(screen.getByRole('button', { name: /advanced/i }));
     expect(screen.getByRole('button', { name: /developer catalog/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /system health/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^security$/i })).toBeInTheDocument();
   });
 });

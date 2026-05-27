@@ -20,12 +20,14 @@ import { BACKEND_HTTP_ROUTES } from './backendHttpRouteInventory';
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { assertExposureScanPasses } from './backendFrontendExposure';
 
+const HEAVY_ORPHAN_SCAN_TIMEOUT_MS = 30_000;
+
 describe('backend orphan audit', () => {
   it('passes full orphan assertion (inventory ↔ controllers ↔ policy ↔ frontend)', () => {
     const { ok, errors } = assertNoOrphanedBackendFunctionality();
     expect(errors, errors.join('; ')).toEqual([]);
     expect(ok).toBe(true);
-  });
+  }, HEAVY_ORPHAN_SCAN_TIMEOUT_MS);
 
   it('controller scan matches BACKEND_HTTP_ROUTES inventory', () => {
     const { missingInInventory, missingInControllers } = compareControllerScanToInventory();

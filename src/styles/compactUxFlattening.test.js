@@ -30,16 +30,18 @@ describe('compact UX/UI flattening contracts', () => {
       "id: 'assistant'",
       "id: 'tools'",
       "id: 'calculators'",
-      "id: 'operations'",
+      "id: 'hospital-map'",
       "id: 'medical-iot'",
-      "id: 'maps'",
+      "id: 'fleet'",
       "id: 'developer-audit'",
+      "id: 'security'",
       "id: 'settings'",
     ]) {
       expect(nav).toContain(id);
     }
     expect(nav).not.toContain("id: 'patients'");
-    expect(nav).not.toContain("id: 'hospital-map'");
+    expect(nav).not.toContain("id: 'operations'");
+    expect(nav).not.toContain("id: 'maps'");
   });
 
   it('keeps /tools canonical and removes duplicate developer catalog shortcuts', () => {

@@ -118,7 +118,7 @@ describe('full platform consolidation contract', () => {
       expect(appSource).toContain(snippet);
     }
 
-    expect(authSource).toContain('Direct Sign In');
+    expect(authSource).toContain('Continue in Demo Mode');
     expect(authSource).toContain('directSignInSection');
     expect(appShellSource).toContain('app-shell-dev-mode-banner');
     expect(devAuthSource).toContain('enableDemoMode');

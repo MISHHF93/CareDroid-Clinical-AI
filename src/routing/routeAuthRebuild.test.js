@@ -30,6 +30,18 @@ describe('canonical route/auth architecture', () => {
     );
   });
 
+  it('normalizes product aliases to the compact canonical map', () => {
+    expect(appSource).toMatch(
+      /path:\s*'\/catalog'[\s\S]*element:\s*<LegacyProtectedRouteRedirect to="\/tools" \/>[\s\S]*requiresAuth:\s*true/
+    );
+    expect(appSource).toMatch(
+      /path:\s*'\/operations'[\s\S]*element:\s*<LegacyProtectedRouteRedirect to="\/dashboard" \/>[\s\S]*requiresAuth:\s*true/
+    );
+    expect(appSource).toMatch(
+      /path:\s*'\/fleet'[\s\S]*element:\s*<LegacyProtectedRouteRedirect to="\/fleet\/map" \/>[\s\S]*requiresAuth:\s*true/
+    );
+  });
+
   it('ensures unknown protected routes render not found in app shell', () => {
     expect(appSource).toMatch(
       /path:\s*'\/tools\/\*'[\s\S]*<AppShellPage>[\s\S]*<ToolNotFound \/>[\s\S]*<\/AppShellPage>[\s\S]*requiresAuth:\s*true/

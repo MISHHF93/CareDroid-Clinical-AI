@@ -539,8 +539,8 @@ export default function HospitalMapDashboard() {
           <button type="button" className="hospital-map-action hospital-map-action--secondary" onClick={launchMedicalIot}>
             Open Medical IoT
           </button>
-          <Link to="/operations" className="hospital-map-action hospital-map-action--secondary">
-            Operations
+          <Link to="/dashboard" className="hospital-map-action hospital-map-action--secondary">
+            Dashboard
           </Link>
         </div>
       </section>

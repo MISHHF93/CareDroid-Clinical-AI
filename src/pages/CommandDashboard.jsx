@@ -472,7 +472,7 @@ export default function CommandDashboard() {
           <div className="command-status-grid" role="status">
             <StatusItem
               label="Session"
-              value={isDevAuthBypass ? 'Direct sign-in' : user?.role || 'Authenticated'}
+              value={isDevAuthBypass ? 'Demo mode' : user?.role || 'Authenticated'}
               tone={isDevAuthBypass ? 'warning' : 'good'}
             />
             <StatusItem
