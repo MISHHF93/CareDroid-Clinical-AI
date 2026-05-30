@@ -51,7 +51,7 @@ const patternsSource = readFileSync(TOOL_PATTERNS_PATH, 'utf8');
 
 const PR1_PATH_SET = new Set(Object.values(PR1_ROUTE_BY_REGISTRY_ID));
 
-function extractAppCalculatorRoutes(source) {
+function _extractAppCalculatorRoutes(source) {
   const routes = [];
   const re = /path:\s*'(\/tools\/calculators\/[^']+)'/g;
   let m;

@@ -365,7 +365,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
  * Lab Results Display Component
  */
 const LabResults = ({ results }) => {
-  const { summary, criticalValues, interpretation, labValues, groupedByCategory, interpretations } = results;
+  const { summary, criticalValues, interpretation, groupedByCategory, interpretations } = results;
 
   return (
     <>

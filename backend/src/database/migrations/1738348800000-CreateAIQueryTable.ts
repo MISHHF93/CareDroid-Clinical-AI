@@ -154,19 +154,19 @@ export class CreateAIQueryTable1738348800000 implements MigrationInterface {
       // Drop indexes
       try {
         await queryRunner.dropIndex('ai_queries', 'IDX_ai_queries_userId_createdAt');
-      } catch (e) {
+      } catch (_e) {
         // Index doesn't exist, continue
       }
 
       try {
         await queryRunner.dropIndex('ai_queries', 'IDX_ai_queries_createdAt');
-      } catch (e) {
+      } catch (_e) {
         // Index doesn't exist, continue
       }
 
       try {
         await queryRunner.dropIndex('ai_queries', 'IDX_ai_queries_status');
-      } catch (e) {
+      } catch (_e) {
         // Index doesn't exist, continue
       }
 

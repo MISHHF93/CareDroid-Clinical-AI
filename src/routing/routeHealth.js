@@ -67,10 +67,9 @@ const NAVIGATION_VISIBLE_PATHS = new Set([
   ...ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => item.path),
 ]);
 const NAVIGATION_ENTRY_BY_PATH = new Map(
-  [...PRIMARY_NAV_ITEMS, ...OPERATIONS_SIDEBAR_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map((item) => [
-    normalizePath(item.path),
-    item.label,
-  ])
+  [...PRIMARY_NAV_ITEMS, ...OPERATIONS_SIDEBAR_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map(
+    (item) => [normalizePath(item.path), item.label]
+  )
 );
 
 const BACKEND_CONTRACT_BY_APP_PATH = Object.freeze({
@@ -80,11 +79,15 @@ const BACKEND_CONTRACT_BY_APP_PATH = Object.freeze({
   '/settings': ['/api/users/profile', '/api/profile/me/preferences'],
   '/tools': ['/api/chat/message'],
   '/tools/calculators': ['/api/chat/message'],
-  '/hospital-map': ['/api/hospital-map/floors', '/api/hospital-map/devices', '/api/hospital-map/rooms'],
+  '/hospital-map': [
+    '/api/hospital-map/floors',
+    '/api/hospital-map/devices',
+    '/api/hospital-map/rooms',
+  ],
   '/medical-iot': ['/api/medical-iot/snapshot'],
   '/devices': ['/api/hospital-map/devices'],
   '/fleet/map': ['/api/fleet/vehicles/live', '/api/fleet/routes/active'],
-  '/system-health': ['/health', '/api/config/system'],
+  '/system-health': ['/health', '/api/system-health'],
   '/audit': ['/api/audit/logs', '/api/audit/statistics'],
   '/ai-governance': ['/api/ai-governance/summary', '/api/platform-governance/summary'],
   '/security': ['/api/security/summary', '/api/governance/ai-security/summary'],
@@ -149,7 +152,10 @@ function extractOwner(block, fallback = 'GeneratedRoute') {
   if (navigate) return 'Navigate';
   const components = [...block.matchAll(/<([A-Z][A-Za-z0-9]+)\b/g)]
     .map((match) => match[1])
-    .filter((name) => !['AppShellPage', 'AuthShell', 'PublicShell', 'PermissionGate', 'Route'].includes(name));
+    .filter(
+      (name) =>
+        !['AppShellPage', 'AuthShell', 'PublicShell', 'PermissionGate', 'Route'].includes(name)
+    );
   return components.at(-1) || fallback;
 }
 
@@ -160,7 +166,10 @@ function inferStatus({ path, owner, block, generatedKind }) {
   if (generatedKind === 'auth-alias' || owner === 'Navigate') return ROUTE_HEALTH_STATES.ALIAS;
   if (owner === 'LegacyProtectedRouteRedirect') return ROUTE_HEALTH_STATES.ALIAS;
   if (NAVIGATION_VISIBLE_PATHS.has(normalized)) return ROUTE_HEALTH_STATES.ACTIVE;
-  if (HIDDEN_PATHS.has(normalized) || HIDDEN_PREFIXES.some((prefix) => normalized.startsWith(prefix))) {
+  if (
+    HIDDEN_PATHS.has(normalized) ||
+    HIDDEN_PREFIXES.some((prefix) => normalized.startsWith(prefix))
+  ) {
     return ROUTE_HEALTH_STATES.HIDDEN;
   }
   if (/permission:\s*/.test(block || '')) return ROUTE_HEALTH_STATES.HIDDEN;
@@ -301,7 +310,9 @@ function mergeRouteEntries(entries) {
       ROUTE_HEALTH_STATES.ORPHANED,
     ];
     const preferred =
-      statusPriority.indexOf(entry.status) < statusPriority.indexOf(existing.status) ? entry : existing;
+      statusPriority.indexOf(entry.status) < statusPriority.indexOf(existing.status)
+        ? entry
+        : existing;
     byPath.set(entry.path, {
       ...preferred,
       sources: unique([...(existing.sources || [existing.source]), entry.source]),
@@ -373,7 +384,10 @@ function orphanPageEntries() {
     .filter((file) => {
       const importPath = `./${file.replace(/^pages\//, 'pages/')}`;
       const modulePath = `./${file.replace(/\.jsx$/, '')}`;
-      const basename = file.split('/').at(-1).replace(/\.jsx$/, '');
+      const basename = file
+        .split('/')
+        .at(-1)
+        .replace(/\.jsx$/, '');
       return (
         !corpus.includes(modulePath) &&
         !corpus.includes(importPath) &&
@@ -386,7 +400,10 @@ function orphanPageEntries() {
       path: file,
       status: ROUTE_HEALTH_STATES.ORPHANED,
       owner: 'unreferenced-page-file',
-      component: file.split('/').at(-1).replace(/\.jsx$/, ''),
+      component: file
+        .split('/')
+        .at(-1)
+        .replace(/\.jsx$/, ''),
       source: 'pages-scan',
       blank: false,
       wildcard: false,
@@ -405,7 +422,11 @@ export function buildRouteHealthGraph() {
   const referenced = referencedRoutePaths();
   const duplicateOwnership = Object.values(
     rawRoutes.reduce((acc, route) => {
-      if (!route.path || route.status === ROUTE_HEALTH_STATES.ALIAS || route.status === ROUTE_HEALTH_STATES.DEPRECATED) {
+      if (
+        !route.path ||
+        route.status === ROUTE_HEALTH_STATES.ALIAS ||
+        route.status === ROUTE_HEALTH_STATES.DEPRECATED
+      ) {
         return acc;
       }
       if (route.source !== 'App.jsx') return acc;

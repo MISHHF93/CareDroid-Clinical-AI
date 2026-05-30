@@ -17,7 +17,10 @@ import {
   TrendChart,
   VisualizationPanel,
 } from '../components/dashboard/DashboardVisualizations';
-import { getRegistryToolNavigation, applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
+import {
+  getRegistryToolNavigation,
+  applyRegistryToolLaunch,
+} from '../navigation/registryToolLaunch';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
@@ -59,7 +62,10 @@ function ToolCard({ tool, onLaunch }) {
 
 function DashboardPanel({ title, description, icon, children, className = '' }) {
   return (
-    <section className={`command-panel ${className}`.trim()} aria-labelledby={`${title.replace(/\W+/g, '-').toLowerCase()}-title`}>
+    <section
+      className={`command-panel ${className}`.trim()}
+      aria-labelledby={`${title.replace(/\W+/g, '-').toLowerCase()}-title`}
+    >
       <div className="command-panel__header">
         <span className="command-panel__icon" aria-hidden>
           <NavIcon icon={icon} size={22} />
@@ -190,15 +196,27 @@ function buildRecentUsageTrend(recentToolItems, messages) {
 }
 
 function notificationTitle(notification) {
-  return notification.title || notification.message || notification.text || notification.type || 'Notification';
+  return (
+    notification.title ||
+    notification.message ||
+    notification.text ||
+    notification.type ||
+    'Notification'
+  );
 }
 
 function notificationBody(notification) {
-  return notification.message || notification.body || notification.description || notificationTitle(notification);
+  return (
+    notification.message ||
+    notification.body ||
+    notification.description ||
+    notificationTitle(notification)
+  );
 }
 
 function isAlertNotification(notification) {
-  const text = `${notification.type || ''} ${notification.severity || ''} ${notification.priority || ''}`.toLowerCase();
+  const text =
+    `${notification.type || ''} ${notification.severity || ''} ${notification.priority || ''}`.toLowerCase();
   return /alert|critical|high|urgent|warning/.test(text);
 }
 
@@ -214,11 +232,19 @@ export default function CommandDashboard() {
   const model = useMemo(() => getCommandDashboardModel(), []);
   const canViewDeveloperCatalog = hasPermission(Permission.CONFIGURE_SYSTEM);
   const recentToolItems = useMemo(
-    () => recentTools.map((toolId) => model.toolById[toolId]).filter(Boolean).slice(0, 4),
+    () =>
+      recentTools
+        .map((toolId) => model.toolById[toolId])
+        .filter(Boolean)
+        .slice(0, 4),
     [model.toolById, recentTools]
   );
   const recentAssistantOutputs = useMemo(
-    () => messages.filter((message) => message.role === 'assistant').slice(-3).reverse(),
+    () =>
+      messages
+        .filter((message) => message.role === 'assistant')
+        .slice(-3)
+        .reverse(),
     [messages]
   );
   const recentUsageTrend = useMemo(
@@ -275,8 +301,9 @@ export default function CommandDashboard() {
           <p className="command-eyebrow">One command center architecture</p>
           <h1 id="command-dashboard-title">CareDroid Command Center</h1>
           <p>
-            Spend the day from one clinical operating center: ask AI, open tools and calculators, review alerts,
-            check workspace context, and launch major modules without browsing the sidebar.
+            Spend the day from one clinical operating center: ask AI, open tools and calculators,
+            review alerts, check workspace context, and launch major modules without browsing the
+            sidebar.
           </p>
         </div>
         <div className="command-hero__stats" aria-label="Dashboard inventory summary">
@@ -308,7 +335,11 @@ export default function CommandDashboard() {
                 key={workflow.id || workflow.title}
                 type="button"
                 className="command-prompt-chip"
-                onClick={() => workflow.toolId && model.toolById[workflow.toolId] ? launchTool(model.toolById[workflow.toolId]) : null}
+                onClick={() =>
+                  workflow.toolId && model.toolById[workflow.toolId]
+                    ? launchTool(model.toolById[workflow.toolId])
+                    : null
+                }
               >
                 <strong>{workflow.title}</strong>
                 <span>{workflow.reason}</span>
@@ -316,7 +347,8 @@ export default function CommandDashboard() {
             ))}
           </div>
           <p className="command-assistant-help">
-            Recent safe activity: {(activity?.recentTools || []).length} tools, {(activity?.recentAiChats || []).length} AI chats.
+            Recent safe activity: {(activity?.recentTools || []).length} tools,{' '}
+            {(activity?.recentAiChats || []).length} AI chats.
           </p>
           <div className="command-status-actions">
             <Link className="command-secondary-action" to="/workspaces">
@@ -360,13 +392,19 @@ export default function CommandDashboard() {
           <div className="command-recent-list">
             {unreadNotifications.length > 0 ? (
               unreadNotifications.map((notification) => (
-                <Link key={notification.id || notificationTitle(notification)} className="command-recent-item" to={CANONICAL_ROUTES.notifications}>
+                <Link
+                  key={notification.id || notificationTitle(notification)}
+                  className="command-recent-item"
+                  to={CANONICAL_ROUTES.notifications}
+                >
                   <strong>{notificationTitle(notification)}</strong>
                   <span>{notificationBody(notification)}</span>
                 </Link>
               ))
             ) : (
-              <p className="command-empty-state">No unread notifications. Notification preferences and history remain one click away.</p>
+              <p className="command-empty-state">
+                No unread notifications. Notification preferences and history remain one click away.
+              </p>
             )}
           </div>
           <Link className="command-panel-link" to={CANONICAL_ROUTES.notifications}>
@@ -382,14 +420,19 @@ export default function CommandDashboard() {
           <div className="command-recent-list">
             {activeAlerts.length > 0 ? (
               activeAlerts.map((alert) => (
-                <Link key={alert.id || notificationTitle(alert)} className="command-recent-item command-recent-item--alert" to="/clinical/alerts">
+                <Link
+                  key={alert.id || notificationTitle(alert)}
+                  className="command-recent-item command-recent-item--alert"
+                  to="/clinical/alerts"
+                >
                   <strong>{notificationTitle(alert)}</strong>
                   <span>{notificationBody(alert)}</span>
                 </Link>
               ))
             ) : (
               <p className="command-empty-state">
-                No active alerts in this session. Use the alerts route or Digital Twin for deeper operational review.
+                No active alerts in this session. Use the alerts route or Digital Twin for deeper
+                operational review.
               </p>
             )}
           </div>
@@ -425,7 +468,8 @@ export default function CommandDashboard() {
             </button>
           </div>
           <p className="command-assistant-help">
-            Free-text questions seed the active conversation and continue in the focused assistant route.
+            Free-text questions seed the active conversation and continue in the focused assistant
+            route.
           </p>
         </form>
         <div className="command-prompt-grid" aria-label="Suggested CareDroid prompts">
@@ -443,7 +487,10 @@ export default function CommandDashboard() {
         </div>
       </DashboardPanel>
 
-      <section className="command-dashboard__grid" aria-label="Command Center personalized toolkits">
+      <section
+        className="command-dashboard__grid"
+        aria-label="Command Center personalized toolkits"
+      >
         <DashboardPanel
           title="My Tools"
           description="High-value clinical, reference, and workflow tools surfaced from the unified inventory."
@@ -451,7 +498,9 @@ export default function CommandDashboard() {
         >
           <div className="command-tool-grid">
             {[...model.panels.clinicalTools, ...model.panels.referenceGuidelines]
-              .filter((tool) => tool.category !== 'Calculator' && tool.surface !== 'calculator-form')
+              .filter(
+                (tool) => tool.category !== 'Calculator' && tool.surface !== 'calculator-form'
+              )
               .slice(0, 8)
               .map((tool) => (
                 <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
@@ -472,7 +521,7 @@ export default function CommandDashboard() {
               <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
             ))}
           </div>
-          <Link className="command-panel-link" to={`${CANONICAL_ROUTES.tools}?filter=calculator`}>
+          <Link className="command-panel-link" to={CANONICAL_ROUTES.calculators}>
             Open All Calculators
           </Link>
         </DashboardPanel>
@@ -484,10 +533,27 @@ export default function CommandDashboard() {
         icon={CHROME_ICONS.barChart}
       >
         <div className="dashboard-metric-grid command-analytics-metrics">
-          <MetricCard label="Total tools" value={model.stats.totalTools} hint="Unified inventory" tone="good" />
-          <MetricCard label="Calculators" value={model.stats.calculators} hint="Dedicated and assisted scores" />
-          <MetricCard label="AI tools" value={model.stats.aiTools} hint="Backend or assistant-guided" />
-          <MetricCard label="Backend-backed" value={model.stats.backendBacked} hint="Executor/platform routes" />
+          <MetricCard
+            label="Total tools"
+            value={model.stats.totalTools}
+            hint="Unified inventory"
+            tone="good"
+          />
+          <MetricCard
+            label="Calculators"
+            value={model.stats.calculators}
+            hint="Dedicated and assisted scores"
+          />
+          <MetricCard
+            label="AI tools"
+            value={model.stats.aiTools}
+            hint="Backend or assistant-guided"
+          />
+          <MetricCard
+            label="Backend-backed"
+            value={model.stats.backendBacked}
+            hint="Executor/platform routes"
+          />
           <MetricCard
             label="Planned"
             value={model.stats.unsupported}
@@ -497,16 +563,38 @@ export default function CommandDashboard() {
         </div>
 
         <div className="dashboard-visual-grid command-analytics-grid">
-          <VisualizationPanel title="Tool Category Distribution" description="One count per canonical user-facing tool.">
-            <CategoryBarChart data={model.visualizations.categoryDistribution} title="Tool category distribution" />
+          <VisualizationPanel
+            title="Tool Category Distribution"
+            description="One count per canonical user-facing tool."
+          >
+            <CategoryBarChart
+              data={model.visualizations.categoryDistribution}
+              title="Tool category distribution"
+            />
           </VisualizationPanel>
-          <VisualizationPanel title="Launch Type Distribution" description="How dashboard cards resolve at launch.">
-            <DistributionDonutChart data={model.visualizations.launchTypeDistribution} title="Launch type distribution" />
+          <VisualizationPanel
+            title="Launch Type Distribution"
+            description="How dashboard cards resolve at launch."
+          >
+            <DistributionDonutChart
+              data={model.visualizations.launchTypeDistribution}
+              title="Launch type distribution"
+            />
           </VisualizationPanel>
-          <VisualizationPanel title="Clinical Tier Distribution" description="Tier A/B/C, fleet, IoT, and hub readiness.">
-            <DistributionDonutChart data={model.visualizations.tierDistribution} title="Clinical tier distribution" />
+          <VisualizationPanel
+            title="Clinical Tier Distribution"
+            description="Tier A/B/C, fleet, IoT, and hub readiness."
+          >
+            <DistributionDonutChart
+              data={model.visualizations.tierDistribution}
+              title="Clinical tier distribution"
+            />
           </VisualizationPanel>
-          <VisualizationPanel title="Recent Activity Trend" description="Session-derived activity trend, not a persisted audit log." badge="Session data">
+          <VisualizationPanel
+            title="Recent Activity Trend"
+            description="Session-derived activity trend, not a persisted audit log."
+            badge="Session data"
+          >
             <TrendChart data={recentUsageTrend} title="Recent activity trend" />
           </VisualizationPanel>
         </div>
@@ -628,7 +716,13 @@ export default function CommandDashboard() {
             />
             <StatusItem
               label="Backend config"
-              value={systemConfig.loading ? 'Checking' : systemConfig.configDegraded ? 'Degraded' : 'Connected'}
+              value={
+                systemConfig.loading
+                  ? 'Checking'
+                  : systemConfig.configDegraded
+                    ? 'Degraded'
+                    : 'Connected'
+              }
               tone={systemConfig.configDegraded ? 'warning' : 'good'}
             />
             <StatusItem
@@ -639,15 +733,25 @@ export default function CommandDashboard() {
             <StatusItem label="Unsupported tools" value={model.stats.unsupported} tone="neutral" />
             <StatusItem
               label="API tools"
-              value={Array.isArray(systemConfig.availableTools) ? systemConfig.availableTools.length : 0}
+              value={
+                Array.isArray(systemConfig.availableTools) ? systemConfig.availableTools.length : 0
+              }
               tone="neutral"
             />
           </div>
           <div className="dashboard-status-grid-visual command-system-status-cards">
             <StatusCard
               label="API status"
-              value={systemConfig.loading ? 'Checking' : systemConfig.configDegraded ? 'Degraded' : 'Ready'}
-              detail={systemConfig.error || 'Dashboard remains usable while local tools stay available.'}
+              value={
+                systemConfig.loading
+                  ? 'Checking'
+                  : systemConfig.configDegraded
+                    ? 'Degraded'
+                    : 'Ready'
+              }
+              detail={
+                systemConfig.error || 'Dashboard remains usable while local tools stay available.'
+              }
               tone={systemConfig.configDegraded || systemConfig.error ? 'warning' : 'good'}
             />
             <StatusCard
@@ -657,12 +761,22 @@ export default function CommandDashboard() {
               tone={model.stats.unsupported > 0 ? 'warning' : 'good'}
             />
           </div>
-          <VisualizationPanel title="Tool Readiness Distribution" description="Backend, local, assistant-guided, and planned tool states.">
-            <DistributionDonutChart data={model.visualizations.readinessDistribution} title="Tool readiness distribution" />
+          <VisualizationPanel
+            title="Tool Readiness Distribution"
+            description="Backend, local, assistant-guided, and planned tool states."
+          >
+            <DistributionDonutChart
+              data={model.visualizations.readinessDistribution}
+              title="Tool readiness distribution"
+            />
           </VisualizationPanel>
           {systemConfig.error ? <p className="command-status-note">{systemConfig.error}</p> : null}
           <div className="command-status-actions">
-            <button type="button" className="command-secondary-action" onClick={systemConfig.refresh}>
+            <button
+              type="button"
+              className="command-secondary-action"
+              onClick={systemConfig.refresh}
+            >
               Retry status
             </button>
             <Link className="command-secondary-action" to={CANONICAL_ROUTES.tools}>

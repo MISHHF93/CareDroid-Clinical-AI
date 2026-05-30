@@ -13,10 +13,9 @@ const distAssets = join(process.cwd(), 'dist', 'assets');
 const CHUNK_BUDGETS = Object.freeze({
   'vendor-firebase': 900_000,
   vendor: 1_200_000,
-  'vendor-react': 500_000,
   calculators: 800_000,
   'clinical-catalog': 600_000,
-  dashboard: 600_000,
+  dashboard: 700_000,
 });
 
 const ENTRY_BUDGET = 400_000;

@@ -11,19 +11,33 @@ import {
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
 } from '../config/navigation.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const sidebarSource = readFileSync(join(__dirname, 'Sidebar.jsx'), 'utf8');
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 const appShellSource = readFileSync(join(__dirname, '../layout/AppShell.jsx'), 'utf8');
-const navigationConfigSource = readFileSync(join(__dirname, '../config/navigation.config.js'), 'utf8');
+const navigationConfigSource = readFileSync(
+  join(__dirname, '../config/navigation.config.js'),
+  'utf8'
+);
+const visibleSidebarItems = [
+  ...PRIMARY_SIDEBAR_NAV_ITEMS,
+  ...OPERATIONS_SIDEBAR_NAV_ITEMS,
+  ...ADVANCED_SIDEBAR_NAV_ITEMS,
+];
 
 describe('Simplified sidebar navigation wiring', () => {
   it('keeps /tools and /tools/calculators as first-class canonical routes', () => {
     expect(appSource).toContain("path: '/tools'");
     expect(appSource).toContain('<ToolsOverview />');
     expect(appSource).toContain("path: '/tools/calculators'");
-    expect(appSource).toContain('<Calculators />');
+    expect(appSource).toMatch(
+      /path:\s*'\/tools\/calculators'[\s\S]*<ToolsOverview \/>[\s\S]*requiresAuth:\s*true/
+    );
+    expect(appSource).toMatch(
+      /path:\s*'\/tools\/calculators\/:slug'[\s\S]*<Calculators \/>[\s\S]*requiresAuth:\s*true/
+    );
   });
 
   it('renders canonical primary navigation without duplicate tool-card shortcuts', () => {
@@ -43,11 +57,7 @@ describe('Simplified sidebar navigation wiring', () => {
   });
 
   it('defines the requested visible primary routes and advanced routes', () => {
-    const navPaths = [
-      ...PRIMARY_SIDEBAR_NAV_ITEMS,
-      ...OPERATIONS_SIDEBAR_NAV_ITEMS,
-      ...ADVANCED_SIDEBAR_NAV_ITEMS,
-    ].map((item) => item.path);
+    const navPaths = visibleSidebarItems.map((item) => item.path);
 
     for (const path of [
       '/dashboard',
@@ -66,8 +76,28 @@ describe('Simplified sidebar navigation wiring', () => {
       expect(navPaths, path).toContain(path);
     }
 
-    for (const path of ['/tools/catalog', '/system-health', '/ai-governance', '/security', '/audit', '/regulatory', '/assets']) {
+    for (const path of [
+      '/tools/catalog',
+      '/system-health',
+      '/ai-governance',
+      '/security',
+      '/audit',
+      '/regulatory',
+      '/assets',
+    ]) {
       expect(navPaths, path).toContain(path);
+    }
+  });
+
+  it('does not duplicate visible sidebar destinations, labels, or non-canonical links', () => {
+    const labels = visibleSidebarItems.map((item) => item.label);
+    const paths = visibleSidebarItems.map((item) => item.path);
+    const canonicalPaths = new Set(Object.values(CANONICAL_ROUTES));
+
+    expect(new Set(labels).size).toBe(labels.length);
+    expect(new Set(paths).size).toBe(paths.length);
+    for (const item of visibleSidebarItems) {
+      expect(canonicalPaths.has(item.path), `${item.label} -> ${item.path}`).toBe(true);
     }
   });
 

@@ -30,7 +30,7 @@ export class AuditController {
    */
   @Get('logs')
   @RequirePermission(Permission.VIEW_AUDIT_LOGS)
-  async getLogs(@Query() query: any, @Req() req: any) {
+  async getLogs(@Query() query: any, @Req() _req: any) {
     const { userId, startDate, endDate, action, limit = 100, offset = 0 } = query;
 
     try {

@@ -75,7 +75,7 @@ const patternsSource = readFileSync(
   'utf8'
 );
 const calculatorsSource = readFileSync(join(__dirname, '../pages/tools/Calculators.jsx'), 'utf8');
-const hubRouteIdx = appSource.indexOf("path: '/tools/calculators', element:");
+const _hubRouteIdx = appSource.indexOf("path: '/tools/calculators', element:");
 
 const BACKEND_KEYWORDS_BY_TOOL = Object.freeze({
   phq9: extractToolPatternKeywords(patternsSource, 'phq9'),

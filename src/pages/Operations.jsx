@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
@@ -17,7 +18,7 @@ const OPERATION_AREAS = Object.freeze([
   {
     title: 'Hospital map',
     body: 'View floors, rooms, beds, medical devices, telemetry freshness, alerts, and maintenance context.',
-    path: '/hospital-map',
+    path: CANONICAL_ROUTES.hospitalMap,
     toolId: 'hospital-map',
     icon: CHROME_ICONS.hospital,
     label: 'Open map',
@@ -25,7 +26,7 @@ const OPERATION_AREAS = Object.freeze([
   {
     title: 'Device fleet management',
     body: 'Review medical device inventory, assignment, maintenance, calibration, firmware, battery, and demo-only action states.',
-    path: '/devices',
+    path: CANONICAL_ROUTES.devices,
     toolId: 'device-fleet-management',
     icon: CHROME_ICONS.tools,
     label: 'Open devices',
@@ -33,7 +34,7 @@ const OPERATION_AREAS = Object.freeze([
   {
     title: 'Medical IoT',
     body: 'Monitor connected medical devices, telemetry parameters, stale readings, and demo/device alert status.',
-    path: '/medical-iot',
+    path: CANONICAL_ROUTES.medicalIot,
     toolId: 'medical-iot-dashboard',
     icon: CHROME_ICONS.lineChart,
     label: 'Open IoT',
@@ -41,7 +42,7 @@ const OPERATION_AREAS = Object.freeze([
   {
     title: 'Live tracking map',
     body: 'Open the unified map for fleet, hospital device, and Medical IoT markers with demo tracking labels.',
-    path: '/live-map',
+    path: CANONICAL_ROUTES.liveMap,
     toolId: 'live-tracking-map',
     icon: CHROME_ICONS.shareLink,
     label: 'Open live map',
@@ -80,7 +81,7 @@ const OPERATION_AREAS = Object.freeze([
   {
     title: 'Audit logs',
     body: 'Review access and trust events without exposing audit tooling as a clinician catalog.',
-    path: '/audit',
+    path: CANONICAL_ROUTES.audit,
     icon: CHROME_ICONS.shield,
     label: 'Open audit',
   },
@@ -116,10 +117,15 @@ export default function Operations() {
           <p className="operating-eyebrow">Operational command</p>
           <h1 id="operations-title">Operations</h1>
           <p>
-            Fleet, alerts, analytics, and audit surfaces live together here so operations feels like one system.
+            Fleet, alerts, analytics, and audit surfaces live together here so operations feels like
+            one system.
           </p>
         </div>
-        <button type="button" className="operating-primary-action" onClick={() => navigate('/assistant')}>
+        <button
+          type="button"
+          className="operating-primary-action"
+          onClick={() => navigate(CANONICAL_ROUTES.assistant)}
+        >
           Ask Assistant
         </button>
       </section>

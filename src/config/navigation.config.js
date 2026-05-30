@@ -29,7 +29,13 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Tools',
     path: CANONICAL_ROUTES.tools,
     legacyPaths: ['/all-tools', '/clinical-tools', '/catalog'],
-    matchPaths: [CANONICAL_ROUTES.tools, '/all-tools', '/clinical-tools', '/catalog', '/calculators'],
+    matchPaths: [
+      CANONICAL_ROUTES.tools,
+      '/all-tools',
+      '/clinical-tools',
+      '/catalog',
+      '/calculators',
+    ],
     matchPrefixes: [`${CANONICAL_ROUTES.tools}/`],
     excludePrefixes: [CANONICAL_ROUTES.developerCatalog],
   },
@@ -37,9 +43,8 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     id: 'operations',
     label: 'Operations',
     mobileLabel: 'Ops',
-    path: '/operations',
-    legacyPaths: ['/operations'],
-    matchPaths: ['/operations'],
+    path: CANONICAL_ROUTES.operations,
+    matchPaths: [CANONICAL_ROUTES.operations],
   },
   {
     id: 'profile',
@@ -116,7 +121,13 @@ export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Fleet',
     path: CANONICAL_ROUTES.fleetMap,
     legacyPaths: ['/fleet', '/fleet/live-map', '/fleet/tracking'],
-    matchPaths: ['/fleet', CANONICAL_ROUTES.fleetMap, '/fleet/command', '/fleet/live-map', '/fleet/tracking'],
+    matchPaths: [
+      '/fleet',
+      CANONICAL_ROUTES.fleetMap,
+      '/fleet/command',
+      '/fleet/live-map',
+      '/fleet/tracking',
+    ],
     matchPrefixes: ['/fleet/'],
     showInMobile: false,
   },
@@ -190,7 +201,14 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     label: 'Audit',
     mobileLabel: 'Audit',
     path: CANONICAL_ROUTES.audit,
-    matchPaths: [CANONICAL_ROUTES.audit, '/audit-logs', '/audit/ai', '/audit/phi', '/audit/integrations', '/audit/policy'],
+    matchPaths: [
+      CANONICAL_ROUTES.audit,
+      '/audit-logs',
+      '/audit/ai',
+      '/audit/phi',
+      '/audit/integrations',
+      '/audit/policy',
+    ],
     permission: 'VIEW_AUDIT_LOGS',
     showInMobile: false,
   },
@@ -222,10 +240,9 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
 
 export const PRIMARY_NAV_BY_ID = Object.freeze(
   Object.fromEntries(
-    [...PRIMARY_NAV_ITEMS, ...OPERATIONS_SIDEBAR_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map((item) => [
-      item.id,
-      item,
-    ])
+    [...PRIMARY_NAV_ITEMS, ...OPERATIONS_SIDEBAR_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map(
+      (item) => [item.id, item]
+    )
   )
 );
 

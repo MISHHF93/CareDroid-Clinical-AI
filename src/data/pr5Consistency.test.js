@@ -26,7 +26,7 @@ import {
   PR5_TIER_A_CALCULATOR_REGISTRY_IDS,
 } from './clinicalCatalogWiring';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
-import { getAllDiscoveredTools, toolIdAliases } from './sourceCodeToolDiscovery';
+import { getAllDiscoveredTools } from './sourceCodeToolDiscovery';
 import {
   PR5_HUB_PATH,
   PR5_REQUIRED_NLU_ALIAS_PAIRS,

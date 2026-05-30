@@ -14,7 +14,9 @@ const read = (relativePath) => readFileSync(join(srcRoot, relativePath), 'utf8')
 
 function expectRedirectRoute(app, path, to) {
   expect(app).toMatch(
-    new RegExp(`path:\\s*'${path.replace(/\//g, '\\/')}'[\\s\\S]*?<LegacyProtectedRouteRedirect\\s+to="${to.replace(/\//g, '\\/')}"\\s*\\/>`)
+    new RegExp(
+      `path:\\s*'${path.replace(/\//g, '\\/')}'[\\s\\S]*?<LegacyProtectedRouteRedirect\\s+to="${to.replace(/\//g, '\\/')}"\\s*\\/>`
+    )
   );
 }
 
@@ -87,7 +89,7 @@ describe('section link inventory and route flattening', () => {
 
   it('keeps Developer Catalog / Source Audit gated away from normal clinician links', () => {
     expect(read('config/navigation.config.js')).toContain("permission: 'CONFIGURE_SYSTEM'");
-    expect(read('config/navigation.config.js')).toContain("showInMobile: false");
+    expect(read('config/navigation.config.js')).toContain('showInMobile: false');
     expect(read('App.jsx')).toContain('permission: Permission.CONFIGURE_SYSTEM');
     expect(read('pages/tools/ToolsOverview.jsx')).not.toContain("navigate('/tools/catalog')");
     expect(read('components/Sidebar.jsx')).not.toContain("navigate('/tools/catalog')");
@@ -106,13 +108,19 @@ describe('section link inventory and route flattening', () => {
     const app = read('App.jsx');
     const routes = read('config/routes.config.js');
     expectRedirectRoute(app, '/home', '/dashboard');
-    expect(routes).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])");
-    expect(routes).toContain("export const FLEET_MAP_ROUTE_ALIASES = Object.freeze(['/fleet', '/fleet/live-map', '/fleet/tracking'])");
-    expect(routes).toContain("export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations'])");
-    expect(routes).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])");
+    expect(routes).toContain(
+      "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
+    );
+    expect(routes).toMatch(
+      /export const FLEET_MAP_ROUTE_ALIASES = Object\.freeze\(\[[\s\S]*'\/fleet'[\s\S]*'\/fleet\/live-map'[\s\S]*'\/fleet\/tracking'/
+    );
+    expect(routes).toContain('export const OPERATIONS_ROUTE_ALIASES = Object.freeze([])');
+    expect(routes).toContain(
+      "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
+    );
     expect(app).toContain('ASSISTANT_ROUTE_ALIASES.map');
     expect(app).toContain('TOOLS_ROUTE_ALIASES.map');
-    expect(app).toContain('OPERATIONS_ROUTE_ALIASES.map');
+    expect(app).toMatch(/path:\s*'\/operations'[\s\S]*<Operations \/>[\s\S]*requiresAuth:\s*true/);
     expect(app).toContain('FLEET_MAP_ROUTE_ALIASES.map');
     expect(app).toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
     expect(app).not.toContain("path: '/home', element: <AppShellPage>");
@@ -121,11 +129,11 @@ describe('section link inventory and route flattening', () => {
 
   it('keeps visible links off deprecated route aliases', () => {
     const deprecatedVisibleRoutes = [
-      "to=\"/home\"",
-      "to=\"/chat\"",
-      "to=\"/catalog\"",
-      "to=\"/all-tools\"",
-      "to=\"/clinical-tools\"",
+      'to="/home"',
+      'to="/chat"',
+      'to="/catalog"',
+      'to="/all-tools"',
+      'to="/clinical-tools"',
       "navigate('/home')",
       "navigate('/chat')",
       "navigate('/catalog')",

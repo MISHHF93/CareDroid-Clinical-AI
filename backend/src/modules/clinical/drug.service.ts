@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Drug } from './entities/drug.entity';
 import { CreateDrugDto, UpdateDrugDto, SearchDrugDto } from './dto/drug.dto';
 

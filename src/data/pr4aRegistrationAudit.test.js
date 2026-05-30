@@ -60,7 +60,7 @@ const patternsSource = readFileSync(TOOL_PATTERNS_PATH, 'utf8');
 
 const PR4A_ROUTE_PATH_SET = new Set(Object.values(PR4A_ROUTE_BY_REGISTRY_ID));
 
-function extractAppCalculatorRoutes(source) {
+function _extractAppCalculatorRoutes(source) {
   const routes = [];
   const re = /path:\s*'(\/tools\/calculators\/[^']+)'/g;
   let m;

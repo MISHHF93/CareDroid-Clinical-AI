@@ -11,6 +11,7 @@ export const CANONICAL_ROUTES = Object.freeze({
   dashboard: '/dashboard',
   assistant: '/assistant',
   tools: '/tools',
+  operations: '/operations',
   calculators: '/tools/calculators',
   calculatorDetail: '/tools/calculators/:slug',
   liveMap: '/live-map',
@@ -69,18 +70,31 @@ export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'
 export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog']);
 export const CALCULATORS_ROUTE_ALIASES = Object.freeze(['/calculators']);
 export const LIVE_MAP_ROUTE_ALIASES = Object.freeze(['/maps', '/tracking', '/live-tracking']);
-export const FLEET_MAP_ROUTE_ALIASES = Object.freeze(['/fleet', '/fleet/live-map', '/fleet/tracking']);
-export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations']);
+export const FLEET_MAP_ROUTE_ALIASES = Object.freeze([
+  '/fleet',
+  '/fleet/live-map',
+  '/fleet/tracking',
+]);
+export const OPERATIONS_ROUTE_ALIASES = Object.freeze([]);
 export const AUDIT_ROUTE_ALIASES = Object.freeze(['/audit-logs']);
 
 export const ROUTE_ALIAS_GROUPS = Object.freeze({
   auth: Object.freeze({ target: CANONICAL_ROUTES.auth, aliases: AUTH_PATH_ALIASES }),
-  assistant: Object.freeze({ target: CANONICAL_ROUTES.assistant, aliases: ASSISTANT_ROUTE_ALIASES }),
+  assistant: Object.freeze({
+    target: CANONICAL_ROUTES.assistant,
+    aliases: ASSISTANT_ROUTE_ALIASES,
+  }),
   tools: Object.freeze({ target: CANONICAL_ROUTES.tools, aliases: TOOLS_ROUTE_ALIASES }),
-  calculators: Object.freeze({ target: CANONICAL_ROUTES.calculators, aliases: CALCULATORS_ROUTE_ALIASES }),
+  calculators: Object.freeze({
+    target: CANONICAL_ROUTES.calculators,
+    aliases: CALCULATORS_ROUTE_ALIASES,
+  }),
   liveMap: Object.freeze({ target: CANONICAL_ROUTES.liveMap, aliases: LIVE_MAP_ROUTE_ALIASES }),
   fleetMap: Object.freeze({ target: CANONICAL_ROUTES.fleetMap, aliases: FLEET_MAP_ROUTE_ALIASES }),
-  operations: Object.freeze({ target: CANONICAL_ROUTES.digitalTwin, aliases: OPERATIONS_ROUTE_ALIASES }),
+  operations: Object.freeze({
+    target: CANONICAL_ROUTES.operations,
+    aliases: OPERATIONS_ROUTE_ALIASES,
+  }),
   audit: Object.freeze({ target: CANONICAL_ROUTES.audit, aliases: AUDIT_ROUTE_ALIASES }),
 });
 

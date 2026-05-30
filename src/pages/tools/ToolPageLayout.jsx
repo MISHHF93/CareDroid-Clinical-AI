@@ -58,7 +58,7 @@ const ToolPageLayout = ({
   onCloseEmbedded,
 }) => {
   const navigate = useNavigate();
-  const { addMessage, selectTool } = useConversation();
+  const { selectTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
   const [showShareModal, setShowShareModal] = useState(false);
   const [clinicalAlerts, setClinicalAlerts] = useState([]);
@@ -80,30 +80,6 @@ const ToolPageLayout = ({
       recordToolAccess(tool.id);
     }
   }, [recordToolAccess, tool]);
-
-  const handleSendToChat = (data) => {
-    const summary =
-      typeof data === 'object' && data !== null
-        ? Object.keys(data)
-            .slice(0, 8)
-            .map((k) => `${k}: ${JSON.stringify(data[k]).slice(0, 120)}`)
-            .join('\n')
-        : String(data);
-    addMessage({
-      role: 'assistant',
-      content: `**${tool.name}** — result snapshot (from clinical tool). Use chat for interpretation.\n\n\`\`\`json\n${JSON.stringify(data, null, 2)}\n\`\`\`\n\n_Key fields:_\n${summary}`,
-      visualizations: [
-        {
-          type: 'calculator',
-          data: typeof data === 'object' && data !== null && !Array.isArray(data) ? data : { value: data },
-        },
-      ],
-      timestamp: new Date(),
-    });
-    const dest = embedded ? undefined : '/assistant';
-    if (dest) navigate(dest);
-    onCloseEmbedded?.();
-  };
 
   const handleAcknowledgeAlert = (alertId) => {
     setClinicalAlerts(alerts =>
@@ -135,7 +111,7 @@ const ToolPageLayout = ({
     try {
       await navigator.clipboard.writeText(url);
       alert('Local session link copied. It opens on this browser profile for 30 days.');
-    } catch (error) {
+    } catch (_error) {
       window.prompt('Copy this link to share:', url);
     }
   };

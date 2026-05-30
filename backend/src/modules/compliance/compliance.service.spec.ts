@@ -11,7 +11,7 @@ import { AuditService } from '../audit/audit.service';
 
 describe('ComplianceService', () => {
   let service: ComplianceService;
-  let auditService: AuditService;
+  let _auditService: AuditService;
 
   const mockUser = {
     id: '1',
@@ -106,7 +106,7 @@ describe('ComplianceService', () => {
     }).compile();
 
     service = module.get<ComplianceService>(ComplianceService);
-    auditService = module.get<AuditService>(AuditService);
+    _auditService = module.get<AuditService>(AuditService);
   });
 
   beforeEach(() => {

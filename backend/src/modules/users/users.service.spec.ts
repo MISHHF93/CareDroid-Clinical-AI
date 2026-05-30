@@ -8,8 +8,8 @@ import { AuditService } from '../audit/audit.service';
 
 describe('UsersService', () => {
   let service: UsersService;
-  let userRepository: Repository<User>;
-  let profileRepository: Repository<UserProfile>;
+  let _userRepository: Repository<User>;
+  let _profileRepository: Repository<UserProfile>;
 
   const mockUserRepository = {
     findOne: jest.fn(),
@@ -47,8 +47,8 @@ describe('UsersService', () => {
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
-    profileRepository = module.get<Repository<UserProfile>>(getRepositoryToken(UserProfile));
+    _userRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    _profileRepository = module.get<Repository<UserProfile>>(getRepositoryToken(UserProfile));
   });
 
   beforeEach(() => {

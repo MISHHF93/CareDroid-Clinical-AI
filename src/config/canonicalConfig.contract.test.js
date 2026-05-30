@@ -35,7 +35,7 @@ describe('canonical configuration contract', () => {
     expect(getRouteAliasTarget('/copilot')).toBe('/assistant');
     expect(getRouteAliasTarget('/catalog')).toBe('/tools');
     expect(getRouteAliasTarget('/fleet')).toBe('/fleet/map');
-    expect(getRouteAliasTarget('/operations')).toBe('/digital-twin');
+    expect(getRouteAliasTarget('/operations')).toBeNull();
     expect(ROUTE_ALIAS_GROUPS.assistant.aliases).toBe(ASSISTANT_ROUTE_ALIASES);
     expect(new Set(AUTH_PATH_ALIASES).size).toBe(AUTH_PATH_ALIASES.length);
 
@@ -52,6 +52,7 @@ describe('canonical configuration contract', () => {
         '/dashboard',
         '/assistant',
         '/tools',
+        '/operations',
         '/tools/calculators',
         '/tools/calculators/:slug',
         '/hospital-map',
@@ -124,9 +125,9 @@ describe('canonical configuration contract', () => {
     expect(read('contexts/ThemeContext.jsx')).toContain("from '../config/theme.tokens'");
 
     expect(LAYOUT_SCROLL_CONTRACT.viewportOwner).toBe('AppShell');
-    expect(LAYOUT_SCROLL_CONTRACT.primaryScrollContainer).toBe('.app-shell-page-body');
+    expect(LAYOUT_SCROLL_CONTRACT.primaryScrollContainer).toBe('.app-shell-main-content');
     expect(LAYOUT_SCROLL_CONTRACT.normalPagesCreateViewportScrollShells).toBe(false);
     expect(read('layout/AppShell.jsx')).toContain("from '../config/layout.config'");
-    expect(read('layout/AppShell.css')).toContain('.app-shell-page-body');
+    expect(read('layout/AppShell.css')).toContain('.app-shell-main-content');
   });
 });

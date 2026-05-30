@@ -508,7 +508,7 @@ describe('AuditService', () => {
       mockAuditRepository.find.mockResolvedValue(logs);
       mockAuditRepository.update.mockResolvedValue({});
 
-      const result = await service.verifyIntegrity();
+      await service.verifyIntegrity();
 
       expect(mockAuditRepository.update).toHaveBeenCalledWith({}, { integrityVerified: false });
     });

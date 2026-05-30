@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
-import { assertAppCalculatorRouteWiring, registeredCalculatorPathsForSet } from './testHelpers/calculatorRouteAudit';
+import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
 import { toolRegistryById } from './toolRegistry';
 import { clinicalIntentTools, builtinUiCalculators } from './clinicalIntentToolCatalog';
 import {

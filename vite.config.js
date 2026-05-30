@@ -29,6 +29,9 @@ const buildInfoFor = (mode, env) => ({
   environment: process.env.VERCEL_ENV || env.VITE_APP_ENVIRONMENT || mode,
   deploymentUrl: process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : '',
   deploymentId: process.env.VERCEL_DEPLOYMENT_ID || '',
+  vercelDetected: Boolean(process.env.VERCEL || process.env.VERCEL_ENV || process.env.VERCEL_URL),
+  vercelEnv: process.env.VERCEL_ENV || '',
+  vercelGitCommitSha: process.env.VERCEL_GIT_COMMIT_SHA || '',
   repository:
     process.env.VERCEL_GIT_REPO_OWNER && process.env.VERCEL_GIT_REPO_SLUG
       ? `${process.env.VERCEL_GIT_REPO_OWNER}/${process.env.VERCEL_GIT_REPO_SLUG}`
@@ -89,9 +92,6 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: (id) => {
             if (id.includes('node_modules')) {
-              if (id.includes('react') || id.includes('react-dom') || id.includes('react-router')) {
-                return 'vendor-react';
-              }
               if (id.includes('recharts')) {
                 return 'vendor-charts';
               }

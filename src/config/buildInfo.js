@@ -9,20 +9,32 @@ const normalizeValue = (value, fallback = 'unknown') => {
   return nextValue || fallback;
 };
 
+const normalizeBoolean = (value) => value === true || value === 'true' || value === '1';
+
 export const shortCommit = (commit) => {
   const normalized = normalizeValue(commit);
   return normalized === 'unknown' ? normalized : normalized.slice(0, 12);
 };
+
+const vercelDetected = normalizeBoolean(injectedBuildInfo.vercelDetected);
+const vercelEnv = normalizeValue(injectedBuildInfo.vercelEnv, '');
 
 export const buildInfo = Object.freeze({
   appVersion: normalizeValue(injectedBuildInfo.appVersion, appConfig.app?.version || '1.0.0'),
   buildTime: normalizeValue(injectedBuildInfo.buildTime),
   commit: normalizeValue(injectedBuildInfo.commit),
   branch: normalizeValue(injectedBuildInfo.branch),
-  environment: normalizeValue(injectedBuildInfo.environment, appConfig.app?.environment || 'unknown'),
+  environment: normalizeValue(
+    injectedBuildInfo.environment,
+    appConfig.app?.environment || 'unknown'
+  ),
   deploymentUrl: normalizeValue(injectedBuildInfo.deploymentUrl, ''),
   deploymentId: normalizeValue(injectedBuildInfo.deploymentId, ''),
   repository: normalizeValue(injectedBuildInfo.repository, ''),
+  vercelDetected,
+  vercelEnv,
+  vercelEnvStatus: vercelDetected ? `detected: ${vercelEnv || 'unknown'}` : 'not detected',
+  vercelGitCommitSha: normalizeValue(injectedBuildInfo.vercelGitCommitSha, ''),
 });
 
 export const buildInfoRows = Object.freeze([
@@ -34,4 +46,5 @@ export const buildInfoRows = Object.freeze([
   { label: 'Repository', value: buildInfo.repository || 'not provided' },
   { label: 'Deployment URL', value: buildInfo.deploymentUrl || 'not provided' },
   { label: 'Deployment ID', value: buildInfo.deploymentId || 'not provided' },
+  { label: 'Vercel env status', value: buildInfo.vercelEnvStatus },
 ]);

@@ -8,7 +8,6 @@ import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
 import {
-  clinicalIntentTools,
   clinicalIntentToolsById,
   builtinUiCalculators,
   nluCalculatorHubOnly,

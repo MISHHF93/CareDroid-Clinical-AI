@@ -66,6 +66,16 @@ const AppShell = ({
     setMobileNavOpen(false);
   }, []);
   const closeQuickCommand = useCallback(() => setQuickCommandOpen(false), []);
+  const isConversationViewport = ['/chat', '/assistant'].includes(location.pathname);
+  const mainContentClassName = [
+    'app-shell-main-content',
+    'app-shell-page-body',
+    isConversationViewport
+      ? 'app-shell-main-content--conversation app-shell-page-body--conversation'
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   const handlePrimaryNav = useCallback(
     (path) => {
@@ -146,7 +156,7 @@ const AppShell = ({
         onOpenQuickCommand={openQuickCommand}
       />
 
-      <div className="app-shell-main-wrap" data-layout-role="MainContent">
+      <div className="app-shell-main-wrap">
         {isAuthed && (
           <header className="app-shell-header" aria-label="Application header">
             {isCompact && (
@@ -208,19 +218,23 @@ const AppShell = ({
                   <span className="app-shell-bottom-nav__icon" aria-hidden>
                     <NavIcon icon={getNavIcon(item.id)} size={18} />
                   </span>
-                  <span className="app-shell-bottom-nav__label">{item.mobileLabel || item.label}</span>
+                  <span className="app-shell-bottom-nav__label">
+                    {item.mobileLabel || item.label}
+                  </span>
                 </button>
               );
             })}
           </nav>
         )}
-        {isAuthed && isDevAuthBypass && (
-          <div className="app-shell-dev-mode-banner" role="status">
-            <strong>{devAuthBannerLabel}</strong> is active. This session uses a local clinician profile and does
-            not weaken production authentication.
-          </div>
-        )}
-        {children}
+        <main className={mainContentClassName} data-layout-role="MainContent" id="main-content">
+          {isAuthed && isDevAuthBypass && (
+            <div className="app-shell-dev-mode-banner" role="status">
+              <strong>{devAuthBannerLabel}</strong> is active. This session uses a local clinician
+              profile and does not weaken production authentication.
+            </div>
+          )}
+          {children}
+        </main>
       </div>
     </div>
   );

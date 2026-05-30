@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, forwardRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { apiFetch } from '../../services/apiClient';
 import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
 import './OfflineSupport.css';

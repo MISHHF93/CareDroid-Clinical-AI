@@ -2,12 +2,12 @@ import { Link } from 'react-router-dom';
 import { buildInfo, shortCommit } from '../config/buildInfo';
 import './BuildInfoBadge.css';
 
-export default function BuildInfoBadge({ className = '' }) {
+export default function BuildInfoBadge({ className = '', to = '/version' }) {
   const classes = ['build-info-badge', className].filter(Boolean).join(' ');
 
   return (
     <Link
-      to="/version"
+      to={to}
       className={classes}
       aria-label={`Build version ${buildInfo.appVersion}, commit ${shortCommit(buildInfo.commit)}`}
     >

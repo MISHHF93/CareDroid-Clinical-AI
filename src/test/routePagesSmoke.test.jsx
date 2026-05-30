@@ -28,6 +28,7 @@ import AiEvaluationDashboard from '../pages/AiEvaluationDashboard';
 import AiCommandCenterDashboard from '../pages/AiCommandCenterDashboard';
 import PlatformSystemPage from '../pages/platform/PlatformSystemPage';
 import PlatformGovernanceWorkspace from '../pages/platform/PlatformGovernanceWorkspace';
+import SystemHealth from '../pages/SystemHealth';
 import CommandDashboard from '../pages/CommandDashboard';
 import Dashboard from '../pages/Dashboard';
 import LiveTrackingMap from '../pages/LiveTrackingMap';
@@ -132,6 +133,40 @@ vi.mock('../services/platformGovernanceApi', async (importOriginal) => {
       ok: true,
       sourceStatus: 'demo',
       data: actual.LOCAL_PLATFORM_GOVERNANCE_STATE,
+      message: '',
+    }),
+  };
+});
+
+vi.mock('../services/systemHealthService', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    fetchDeploymentTruth: vi.fn().mockResolvedValue({
+      backendProbe: { ok: true, data: { status: 'ok', version: '1.0.0' }, message: '' },
+      systemHealth: {
+        ok: true,
+        data: {
+          apiHealth: 'ok',
+          backendVersion: '1.0.0',
+          gitCommit: 'unknown',
+          buildTimestamp: '2026-05-30T14:00:00.000Z',
+          vercelEnvironment: 'test',
+          deploymentStatus: 'guarded',
+        },
+        message: '',
+      },
+      backendHealth: {
+        status: 'ok',
+        service: 'CareDroid backend',
+        frontendVersion: '1.0.0',
+        backendVersion: '1.0.0',
+        gitCommit: 'unknown',
+        buildTimestamp: '2026-05-30T14:00:00.000Z',
+        vercelEnvironment: 'test',
+        deploymentStatus: 'guarded',
+      },
+      sourceStatus: 'live',
       message: '',
     }),
   };
@@ -320,7 +355,7 @@ const PAGE_BY_ID = {
   'equity-monitoring-enterprise': PlatformGovernanceWorkspace,
   'human-review-enterprise': PlatformGovernanceWorkspace,
   'privacy-enterprise': PlatformGovernanceWorkspace,
-  'system-health-enterprise': PlatformGovernanceWorkspace,
+  'system-health-enterprise': SystemHealth,
   'governance-clinical': PlatformGovernanceWorkspace,
   'ai-security-platform': PlatformGovernanceWorkspace,
   'regulatory-classification': PlatformGovernanceWorkspace,

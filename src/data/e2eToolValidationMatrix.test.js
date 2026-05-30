@@ -12,7 +12,6 @@ import {
   NLU_PROFILE_TOOL_IDS,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
-  ORCHESTRATOR_TO_REGISTRY_ID,
   NLU_TO_REGISTRY_ID,
 } from './clinicalToolIdContract';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
@@ -29,7 +28,6 @@ import {
   assertLaunchPathMatchesRoute,
   assertNluResolvesToRegistry,
   KNOWN_TOOL_AREA_PATHS,
-  expectedLaunchPath,
   matchCalculatorRoute,
 } from './e2eToolValidationMatrix';
 import {

@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useCostTracking } from '../contexts/CostTrackingContext';
-import { useUser } from '../contexts/UserContext';
 import analyticsService from '../services/analyticsService';
-import toolRegistry, { toolRegistryById } from '../data/toolRegistry';
+import { toolRegistryById } from '../data/toolRegistry';
 import { NavIcon } from '../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../navigation/iconRegistry';
 import './CostAnalyticsDashboard.css';
 
 const CostAnalyticsDashboard = () => {
-  const { user } = useUser();
   const {
     costData,
     costLimit,

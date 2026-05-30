@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Between, MoreThan } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { AnalyticsEvent } from '../entities/analytics-event.entity';
 
 export interface EventMetrics {

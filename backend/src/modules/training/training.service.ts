@@ -10,18 +10,7 @@ import {
   TrainingEvaluationMetrics,
   TrainingPipelineStage,
   TrainingRun,
-  TrainingStageId,
 } from './training.types';
-
-const PIPELINE_ORDER: TrainingStageId[] = [
-  'data',
-  'cleaning',
-  'labeling',
-  'embeddings',
-  'lora_tuning',
-  'evaluation',
-  'deployment',
-];
 
 const DEFAULT_METRICS: TrainingEvaluationMetrics = {
   accuracy: 0.91,

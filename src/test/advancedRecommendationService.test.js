@@ -155,12 +155,18 @@ describe('AdvancedRecommendationService', () => {
     });
 
     it('should handle API errors gracefully', async () => {
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
       global.fetch.mockRejectedValueOnce(new Error('Network error'));
 
       const result = await advancedRecommendationService.classifyIntent('test query');
 
       expect(result.primaryIntent).toBe('unknown');
       expect(result.confidence).toBeLessThan(0.5);
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        'Intent classification error:',
+        expect.any(Error)
+      );
+      consoleErrorSpy.mockRestore();
     });
   });
 

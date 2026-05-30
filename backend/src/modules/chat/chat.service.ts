@@ -27,7 +27,6 @@ import {
   buildDrugInformationPrompt,
   buildClinicalProtocolPrompt,
   formatCitations,
-  addConfidenceDisclaimer,
 } from '../ai/prompts/clinical-query.prompt';
 import { calculateConfidence, getConfidenceDisclaimer } from '../ai/utils/confidence-scorer';
 import { CalculatorRecommenderService } from './calculator-recommender.service';

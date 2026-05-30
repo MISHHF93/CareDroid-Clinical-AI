@@ -39,7 +39,7 @@ const ToolResultShare = ({ toolName, toolId, results, onClose }) => {
       await navigator.clipboard.writeText(url);
       setFeedback({ text: 'Local share link copied to clipboard.', variant: 'success' });
       setTimeout(() => setFeedback({ text: '', variant: 'info' }), 3000);
-    } catch (err) {
+    } catch (_err) {
       const url = createResultShareLink();
       window.prompt('Copy this link to share:', url);
     }

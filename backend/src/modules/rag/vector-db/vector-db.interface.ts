@@ -1,4 +1,4 @@
-import { RetrievedChunk, ChunkMetadata } from '../dto/rag-context.dto';
+import { ChunkMetadata } from '../dto/rag-context.dto';
 
 /**
  * Vector Database Interface

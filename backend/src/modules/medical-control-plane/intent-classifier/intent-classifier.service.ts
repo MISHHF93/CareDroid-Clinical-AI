@@ -25,7 +25,7 @@ import {
   getHighestSeverity,
   EmergencyPattern,
 } from './patterns/emergency.patterns';
-import { matchToolPatterns, extractToolParameters, getToolPattern } from './patterns/tool.patterns';
+import { matchToolPatterns, extractToolParameters } from './patterns/tool.patterns';
 import { classifyClinicalQuery } from './patterns/clinical.patterns';
 
 @Injectable()

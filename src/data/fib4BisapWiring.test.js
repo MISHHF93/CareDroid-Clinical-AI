@@ -9,7 +9,7 @@ import { NLU_TO_REGISTRY_ID, REGISTRY } from './clinicalToolIdContract';
 import { getMedicalToolsCatalogRows } from './medicalToolsCatalogIndex';
 import { getAllDiscoveredTools } from './sourceCodeToolDiscovery';
 import { assertAppCalculatorRouteWiring } from './testHelpers/calculatorRouteAudit';
-import { CALCULATOR_ROUTE_DEFS, matchCalculatorRoute } from '../routes/clinicalToolRoutes';
+import { matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

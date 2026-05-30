@@ -20,8 +20,6 @@ import {
   resolveCatalogLaunch,
   NLU_TO_REGISTRY_ID,
   PR2_CALCULATOR_REGISTRY_IDS,
-  PR2_TIER_A_CALCULATOR_REGISTRY_IDS,
-  PR2_TIER_B_CHAT_CALCULATOR_IDS,
   BUILTIN_CALC_ID_TO_REGISTRY_ID,
   resolveRegistryId,
 } from './clinicalCatalogWiring';
@@ -65,7 +63,7 @@ const patternsSource = readFileSync(TOOL_PATTERNS_PATH, 'utf8');
 
 const PR2_TIER_A_PATH_SET = new Set(Object.values(PR2_ROUTE_BY_REGISTRY_ID));
 
-function extractAppCalculatorRoutes(source) {
+function _extractAppCalculatorRoutes(source) {
   const routes = [];
   const re = /path:\s*'(\/tools\/calculators\/[^']+)'/g;
   let m;

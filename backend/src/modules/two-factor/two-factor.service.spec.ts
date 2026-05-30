@@ -14,7 +14,7 @@ jest.mock('bcrypt');
 
 describe('TwoFactorService', () => {
   let service: TwoFactorService;
-  let auditService: AuditService;
+  let _auditService: AuditService;
 
   const mockUser = {
     id: '1',
@@ -67,7 +67,7 @@ describe('TwoFactorService', () => {
     }).compile();
 
     service = module.get<TwoFactorService>(TwoFactorService);
-    auditService = module.get<AuditService>(AuditService);
+    _auditService = module.get<AuditService>(AuditService);
   });
 
   beforeEach(() => {

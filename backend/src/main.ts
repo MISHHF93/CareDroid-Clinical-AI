@@ -8,7 +8,6 @@ import { join } from 'path';
 import * as Sentry from '@sentry/node';
 import { AppModule } from './app.module';
 import { initSentry } from './config/sentry.config';
-import { LoggingMiddleware } from './middleware/logging.middleware';
 import { SWAGGER_DOCS_PATH } from './server-routes';
 import {
   resolveFrontendDistPath,

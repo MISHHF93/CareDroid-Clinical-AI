@@ -11,7 +11,7 @@ jest.mock('stripe');
 
 describe('SubscriptionsService', () => {
   let service: SubscriptionsService;
-  let auditService: AuditService;
+  let _auditService: AuditService;
 
   const mockUser = {
     id: '1',
@@ -99,7 +99,7 @@ describe('SubscriptionsService', () => {
     }).compile();
 
     service = module.get<SubscriptionsService>(SubscriptionsService);
-    auditService = module.get<AuditService>(AuditService);
+    _auditService = module.get<AuditService>(AuditService);
 
     // Mock the getPriceIdForTier method
     jest.spyOn(service as any, 'getPriceIdForTier').mockReturnValue('price_test123');

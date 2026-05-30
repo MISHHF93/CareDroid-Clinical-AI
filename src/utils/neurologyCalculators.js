@@ -14,10 +14,6 @@ function toNumber(value) {
   return Number.isFinite(n) ? n : NaN;
 }
 
-function round(value, decimals = 1) {
-  return Number(value.toFixed(decimals));
-}
-
 function selectedPoints(value, options) {
   const row = options.find((option) => String(option.value) === String(value));
   return row ? Number(row.points) : NaN;

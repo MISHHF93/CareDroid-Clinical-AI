@@ -15,8 +15,12 @@ describe('ToolsOverview responsive layout', () => {
   });
 
   it('stacks important launch actions on mobile with touch targets', () => {
-    expect(toolsOverviewCss).toMatch(/\.btn-open-tool[\s\S]*min-height:\s*var\(--compact-control-height/);
-    expect(toolsOverviewCss).toMatch(/\.btn-chat-tool[\s\S]*min-height:\s*var\(--compact-control-height/);
+    expect(toolsOverviewCss).toMatch(
+      /\.btn-open-tool[\s\S]*min-height:\s*var\(--compact-control-height/
+    );
+    expect(toolsOverviewCss).toMatch(
+      /\.btn-chat-tool[\s\S]*min-height:\s*var\(--compact-control-height/
+    );
     expect(toolsOverviewCss).toMatch(
       /@media \(max-width: 768px\)[\s\S]*\.tool-actions[\s\S]*flex-direction:\s*column/
     );
@@ -24,14 +28,22 @@ describe('ToolsOverview responsive layout', () => {
 
   it('lets workspace controls wrap at phone widths', () => {
     expect(toolsOverviewCss).toMatch(/\.tools-workspace[\s\S]*flex-wrap:\s*wrap/);
-    expect(toolsOverviewCss).toMatch(/@media \(max-width: 640px\)[\s\S]*\.tools-workspace[\s\S]*width:\s*100%/);
+    expect(toolsOverviewCss).toMatch(
+      /@media \(max-width: 640px\)[\s\S]*\.tools-workspace[\s\S]*width:\s*100%/
+    );
     expect(toolsOverviewCss).toMatch(/\.tools-workspace select[\s\S]*min-width:\s*0/);
   });
 
   it('keeps search and filter controls touch-friendly at phone widths', () => {
-    expect(toolsOverviewCss).toMatch(/\.tools-discovery-controls[\s\S]*grid-template-columns:\s*minmax/);
-    expect(toolsOverviewCss).toMatch(/\.tools-search-field input[\s\S]*min-height:\s*var\(--compact-control-height/);
-    expect(toolsOverviewCss).toMatch(/\.tools-filter-field select[\s\S]*min-height:\s*var\(--compact-control-height/);
+    expect(toolsOverviewCss).toMatch(
+      /\.tools-discovery-controls[\s\S]*grid-template-columns:\s*minmax/
+    );
+    expect(toolsOverviewCss).toMatch(
+      /\.tools-search-field input[\s\S]*min-height:\s*var\(--compact-control-height/
+    );
+    expect(toolsOverviewCss).toMatch(
+      /\.tools-filter-field select[\s\S]*min-height:\s*var\(--compact-control-height/
+    );
     expect(toolsOverviewCss).toMatch(
       /@media \(max-width: 768px\)[\s\S]*\.tools-discovery-controls[\s\S]*grid-template-columns:\s*1fr/
     );
@@ -39,10 +51,13 @@ describe('ToolsOverview responsive layout', () => {
 
   it('keeps profile filters and graph summary mobile friendly', () => {
     expect(toolsOverviewCss).toMatch(/\.tools-filter-tabs[\s\S]*flex-wrap:\s*wrap/);
-    expect(toolsOverviewCss).toMatch(/\.tools-filter-tab[\s\S]*min-height:\s*var\(--compact-control-height/);
+    expect(toolsOverviewCss).toMatch(
+      /\.tools-filter-tab[\s\S]*min-height:\s*var\(--compact-control-height/
+    );
     expect(toolsOverviewCss).toMatch(/\.tools-profile-summary[\s\S]*flex-wrap:\s*wrap/);
-    expect(toolsOverviewJsx).toContain('Recommended for Me');
-    expect(toolsOverviewJsx).toContain('Restricted/Unavailable');
+    expect(toolsOverviewJsx).toContain("label: 'Recommended'");
+    expect(toolsOverviewJsx).toContain("label: 'Calculators'");
+    expect(toolsOverviewJsx).not.toContain('Restricted/Unavailable');
   });
 
   it('does not label source audit as another user-facing tools catalog', () => {

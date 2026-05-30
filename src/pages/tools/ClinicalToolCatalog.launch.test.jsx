@@ -23,7 +23,7 @@ vi.mock('../../contexts/ConversationContext', () => ({
 }));
 
 vi.mock('../../services/clinicalToolsApi', () => ({
-  fetchBackendClinicalTools: vi.fn().mockResolvedValue({ ok: true, tools: [] }),
+  fetchBackendClinicalTools: vi.fn(() => new Promise(() => {})),
 }));
 
 function renderCatalog() {

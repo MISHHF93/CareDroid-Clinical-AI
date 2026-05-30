@@ -26,10 +26,11 @@
   border: none;
   background: rgba(2, 6, 23, 0.45);
   cursor: pointer;
+  pointer-events: auto;
   -webkit-tap-highlight-color: transparent;
 }
 
-/* MainContent: fixed-height viewport column; scroll lives in .app-shell-page-body */
+/* Shell column stays fixed-height; vertical scroll lives in MainContent. */
 .app-shell-main-wrap {
   position: relative;
   flex: none;
@@ -260,7 +261,20 @@
   }
 }
 
-/* Authed page column: primary vertical scrollport for tool/fleet/settings pages */
+/* MainContent is the primary vertical scrollport for tool/fleet/settings pages. */
+.app-shell-main-content {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .app-shell-page-body {
   flex: 1 1 0;
   display: flex;
@@ -331,7 +345,7 @@
   box-sizing: border-box;
 }
 
-/* Tools, catalog, settings, etc.: grow with content; scroll on .app-shell-page-body (see layout-visibility.css) */
+/* Tools, catalog, settings, etc.: grow with content; scroll on MainContent (see layout-visibility.css) */
 .app-shell-page-body:not(.app-shell-page-body--conversation) > * {
   flex: 0 0 auto;
   min-height: auto;
@@ -384,10 +398,7 @@
 
 @media (max-width: 900px) {
   .app-shell-dev-mode-banner {
-    margin: calc(
-        var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px)) + 8px
-      )
-      12px 0;
+    margin: 8px 12px 0;
     max-width: calc(100% - 24px);
   }
 }

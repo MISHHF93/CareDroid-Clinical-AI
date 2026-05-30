@@ -3,16 +3,6 @@ import './ClinicalAlertBanner.css';
 const ClinicalAlertBanner = ({ alert, onAcknowledge, onDismiss }) => {
   if (!alert) return null;
 
-  const getSeverityColor = (severity) => {
-    const colors = {
-      critical: '#ff4d4f',
-      high: '#ff7a45',
-      warning: '#faad14',
-      info: '#1890ff'
-    };
-    return colors[severity] || colors.info;
-  };
-
   const getSeverityIcon = (severity) => {
     const icons = {
       critical: '🔴',

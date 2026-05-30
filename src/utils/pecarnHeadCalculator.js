@@ -91,7 +91,7 @@ export function evaluatePecarnHead(raw) {
  * }} input
  */
 export function interpretPecarnHead(input) {
-  const { ageCategory, ruleCriteriaMet, riskStratum, triggeredCriteria } = input;
+  const { ageCategory, ruleCriteriaMet, triggeredCriteria } = input;
   const ageLabel = ageCategory === 'under_2' ? '<2 years' : '≥2 years';
 
   const referenceLine =

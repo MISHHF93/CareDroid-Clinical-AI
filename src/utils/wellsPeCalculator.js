@@ -64,8 +64,6 @@ export const WELLS_PE_CRITERIA_META = [
   },
 ];
 
-const POINTS_BY_KEY = Object.fromEntries(WELLS_PE_CRITERIA_META.map((r) => [r.key, r.points]));
-
 /**
  * @param {WellsPeInputs} raw
  * @returns {Record<string, number>}

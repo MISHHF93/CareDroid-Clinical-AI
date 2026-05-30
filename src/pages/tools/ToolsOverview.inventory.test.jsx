@@ -2,7 +2,10 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ToolsOverview from './ToolsOverview';
-import { getUserFacingToolRegistryProjection, TOOL_LIFECYCLE_STATES } from '../../data/toolInventory';
+import {
+  getCalculatorToolInventory,
+  getUserFacingToolRegistryProjection,
+} from '../../data/toolInventory';
 import { buildProfileToolGraph, buildUserToolProfile } from '../../data/profileToolSegmentation';
 import {
   mockConversationValue,
@@ -63,19 +66,19 @@ describe('ToolsOverview unified inventory', () => {
     const renderedCards = [...container.querySelectorAll('.tool-card-large h3')].map(
       (heading) => heading.textContent
     );
-    const renderedIds = [...container.querySelectorAll('.tool-card-large')].map(
-      (card) => card.getAttribute('data-tool-id')
+    const renderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
+      card.getAttribute('data-tool-id')
     );
 
     expect(screen.getByRole('heading', { level: 1, name: /^tool library$/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /^all$/i })).toHaveAttribute('aria-selected', 'true');
-    expect([...container.querySelectorAll('.stat-number')].map((node) => node.textContent)).toContain(
-      String(graph.counts.visible)
-    );
+    expect(
+      [...container.querySelectorAll('.stat-number')].map((node) => node.textContent)
+    ).toContain(String(graph.counts.visible));
     expect(renderedCards).toHaveLength(graph.visibleTools.length);
     expect(new Set(renderedIds).size).toBe(renderedIds.length);
 
-    fireEvent.click(screen.getByRole('tab', { name: /recommended for me/i }));
+    fireEvent.click(screen.getByRole('tab', { name: /^recommended$/i }));
     const recommendedRenderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
       card.getAttribute('data-tool-id')
     );
@@ -116,7 +119,9 @@ describe('ToolsOverview unified inventory', () => {
     });
     const graph = buildProfileToolGraph({ tools: getUserFacingToolRegistryProjection(), profile });
     fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
-    const chatAssistedCount = graph.visibleTools.filter((record) => record.surface === 'chat-assisted').length;
+    const chatAssistedCount = graph.visibleTools.filter(
+      (record) => record.surface === 'chat-assisted'
+    ).length;
 
     expect(
       [...container.querySelectorAll('.btn-open-tool')].filter((button) =>
@@ -128,37 +133,32 @@ describe('ToolsOverview unified inventory', () => {
 
   it('contains a Calculators tab/filter that shows calculator cards under /tools', () => {
     const { container } = renderOverview();
-    const profile = buildUserToolProfile({
-      user: mockUserValue.user,
-      toolPreferences: mockToolPreferencesValue,
-    });
-    const graph = buildProfileToolGraph({ tools: getUserFacingToolRegistryProjection(), profile });
-    const calculatorIds = new Set(
-      graph.visibleTools
-        .filter((tool) => tool.category === 'Calculator' || tool.surface === 'calculator-form')
-        .map((tool) => tool.id)
-    );
+    const calculatorIds = getCalculatorToolInventory().map((tool) => tool.id);
 
     fireEvent.click(screen.getByRole('tab', { name: /calculators/i }));
 
     const renderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
       card.getAttribute('data-tool-id')
     );
-    expect(screen.getByRole('tab', { name: /calculators/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /calculators/i })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
     expect(renderedIds.length).toBeGreaterThan(0);
-    expect(renderedIds.every((id) => calculatorIds.has(id))).toBe(true);
+    expect(renderedIds.every((id) => calculatorIds.includes(id))).toBe(true);
     for (const calculatorId of calculatorIds) {
       expect(renderedIds, calculatorId).toContain(calculatorId);
     }
   });
 
-  it('exposes the requested AI-first discovery buckets', () => {
+  it('exposes only the requested merged Tools discovery tabs', () => {
     renderOverview();
     const filter = screen.getByLabelText(/filter tools by type/i);
+    const tabs = screen.getAllByRole('tab').map((tab) => tab.textContent);
 
-    for (const label of [
+    const expectedLabels = [
       'All',
-      'Recommended for Me',
+      'Recommended',
       'Calculators',
       'Diagnostics',
       'AI Workflows',
@@ -166,43 +166,10 @@ describe('ToolsOverview unified inventory', () => {
       'Operations',
       'Favorites',
       'Recent',
-    ]) {
-      expect(filter).toHaveTextContent(label);
-    }
-  }, 10000);
+    ];
 
-  it('shows lifecycle badges and filters by lifecycle state', () => {
-    const { container } = renderOverview();
-    const profile = buildUserToolProfile({
-      user: mockUserValue.user,
-      toolPreferences: mockToolPreferencesValue,
-    });
-    const graph = buildProfileToolGraph({ tools: getUserFacingToolRegistryProjection(), profile });
-    const activeIds = new Set(
-      graph.visibleTools
-        .filter((tool) => tool.lifecycleState === TOOL_LIFECYCLE_STATES.ACTIVE)
-        .map((tool) => tool.id)
-    );
-
-    expect(container.querySelectorAll('.tool-category--lifecycle').length).toBe(
-      container.querySelectorAll('.tool-card-large').length
-    );
-
-    fireEvent.click(screen.getByRole('tab', { name: /^active$/i }));
-    const renderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
-      card.getAttribute('data-tool-id')
-    );
-
-    expect(screen.getByRole('tab', { name: /^active$/i })).toHaveAttribute('aria-selected', 'true');
-    expect(renderedIds.length).toBeGreaterThan(0);
-    expect(renderedIds.every((id) => activeIds.has(id))).toBe(true);
-  });
-
-  it('exposes lifecycle filters for beta, experimental, deprecated, hidden, and admin-only states', () => {
-    renderOverview();
-    const filter = screen.getByLabelText(/filter tools by type/i);
-
-    for (const label of ['Beta', 'Experimental', 'Deprecated', 'Hidden', 'Admin Only']) {
+    expect(tabs).toEqual(expectedLabels);
+    for (const label of expectedLabels) {
       expect(filter).toHaveTextContent(label);
     }
   }, 10000);
@@ -225,39 +192,44 @@ describe('ToolsOverview unified inventory', () => {
     expect(mockWorkspaceValue.setActiveWorkspaceId).toHaveBeenCalledWith('all');
   });
 
-  it('explains restricted tools instead of making them feel missing', () => {
-    renderOverview();
-    fireEvent.click(screen.getByRole('tab', { name: /restricted\/unavailable/i }));
-
-    expect(screen.getByText(/restricted tools are protected for this profile/i)).toBeInTheDocument();
-  });
-
   it('opens the all-tools view by default so source-backed tools are not hidden', () => {
     renderOverview();
 
     expect(screen.getByRole('tab', { name: /^all$/i })).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('opens directly to linked calculator and search-filtered tool views', () => {
-    const { container } = renderOverview('/tools?filter=calculator&q=meld');
+  it('opens /tools/calculators directly to the calculator filtered view', () => {
+    const { container } = renderOverview('/tools/calculators?q=meld');
 
-    expect(screen.getByRole('tab', { name: /calculators/i })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByRole('searchbox', { name: /search all tools/i })).toHaveValue('meld');
-    expect([...container.querySelectorAll('.tool-card-large')].map((card) => card.getAttribute('data-tool-id'))).toContain(
-      'meld'
+    expect(screen.getByRole('tab', { name: /calculators/i })).toHaveAttribute(
+      'aria-selected',
+      'true'
     );
+    expect(screen.getByRole('searchbox', { name: /search all tools/i })).toHaveValue('meld');
+    expect(
+      [...container.querySelectorAll('.tool-card-large')].map((card) =>
+        card.getAttribute('data-tool-id')
+      )
+    ).toContain('meld');
   });
 
-  it('filters to Recommended for Me and hides user-hidden tools', () => {
-    const hiddenTool = getUserFacingToolRegistryProjection().find((tool) => tool.category === 'Calculator');
+  it('filters to Recommended and hides user-hidden tools', () => {
+    const hiddenTool = getUserFacingToolRegistryProjection().find(
+      (tool) => tool.category === 'Calculator'
+    );
     mockToolPreferencesValue.hiddenTools = [hiddenTool.id];
     const { container } = renderOverview();
 
-    fireEvent.click(screen.getByRole('tab', { name: /recommended for me/i }));
-    expect(screen.getByRole('tab', { name: /recommended for me/i })).toHaveAttribute('aria-selected', 'true');
-    expect([...container.querySelectorAll('.tool-card-large')].map((card) => card.getAttribute('data-tool-id'))).not.toContain(
-      hiddenTool.id
+    fireEvent.click(screen.getByRole('tab', { name: /^recommended$/i }));
+    expect(screen.getByRole('tab', { name: /^recommended$/i })).toHaveAttribute(
+      'aria-selected',
+      'true'
     );
+    expect(
+      [...container.querySelectorAll('.tool-card-large')].map((card) =>
+        card.getAttribute('data-tool-id')
+      )
+    ).not.toContain(hiddenTool.id);
   });
 
   it('explains hidden tools in empty filtered views', () => {

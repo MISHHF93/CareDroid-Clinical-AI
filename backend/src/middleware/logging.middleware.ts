@@ -94,7 +94,7 @@ export class LoggingMiddleware implements NestMiddleware {
 
       const decoded = JSON.parse(Buffer.from(parts[1], 'base64').toString('utf-8'));
       return decoded.sub || decoded.userId || null;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }

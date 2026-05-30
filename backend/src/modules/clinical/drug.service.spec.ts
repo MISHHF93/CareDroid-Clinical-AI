@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 
 describe('DrugService', () => {
   let service: DrugService;
-  let repository: Repository<Drug>;
+  let _repository: Repository<Drug>;
 
   const mockRepository = {
     find: jest.fn(),
@@ -30,7 +30,7 @@ describe('DrugService', () => {
     }).compile();
 
     service = module.get<DrugService>(DrugService);
-    repository = module.get<Repository<Drug>>(getRepositoryToken(Drug));
+    _repository = module.get<Repository<Drug>>(getRepositoryToken(Drug));
   });
 
   beforeEach(() => {

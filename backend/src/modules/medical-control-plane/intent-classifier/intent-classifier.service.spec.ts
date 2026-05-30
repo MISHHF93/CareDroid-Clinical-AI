@@ -18,7 +18,7 @@ import { PrimaryIntent, EmergencySeverity } from './dto/intent-classification.dt
 
 describe('IntentClassifierService', () => {
   let service: IntentClassifierService;
-  let aiService: AIService;
+  let _aiService: AIService;
 
   // Mock AIService
   const mockAIService = {
@@ -58,7 +58,7 @@ describe('IntentClassifierService', () => {
     }).compile();
 
     service = module.get<IntentClassifierService>(IntentClassifierService);
-    aiService = module.get<AIService>(AIService);
+    _aiService = module.get<AIService>(AIService);
 
     // Reset mocks
     jest.clearAllMocks();
@@ -357,9 +357,9 @@ describe('IntentClassifierService', () => {
     it('should not require escalation for urgent but stable conditions', async () => {
       const result = await service.classify('Patient has chest pain, stable vitals');
 
-      const requiresEscalation = service.requiresEscalation(result);
       // Chest pain is URGENT, not CRITICAL, so should not auto-escalate
       expect(result.emergencySeverity).toBe(EmergencySeverity.URGENT);
+      expect(service.requiresEscalation(result)).toBe(false);
     });
 
     it('should provide escalation message for emergencies', async () => {

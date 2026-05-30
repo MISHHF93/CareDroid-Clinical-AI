@@ -4,6 +4,7 @@ import { useUser } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import PermissionGate from './PermissionGate';
+import BuildInfoBadge from './BuildInfoBadge';
 import {
   ADVANCED_SIDEBAR_NAV_ITEMS,
   OPERATIONS_SIDEBAR_NAV_ITEMS,
@@ -79,9 +80,7 @@ const Sidebar = forwardRef(function Sidebar(
 
   useEffect(() => {
     if (!layoutCompact || !mobileNavOpen || !ref?.current) return;
-    const active = ref.current.querySelector(
-      '.nav-item.active, .sidebar-advanced-toggle--active'
-    );
+    const active = ref.current.querySelector('.nav-item.active, .sidebar-advanced-toggle--active');
     active?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [layoutCompact, mobileNavOpen, location.pathname, ref]);
 
@@ -157,10 +156,7 @@ const Sidebar = forwardRef(function Sidebar(
         </div>
         <button
           type="button"
-          className={[
-            'sidebar-toggle',
-            layoutCompact ? 'sidebar-toggle--mobile-close' : '',
-          ]
+          className={['sidebar-toggle', layoutCompact ? 'sidebar-toggle--mobile-close' : '']
             .filter(Boolean)
             .join(' ')}
           {...(layoutCompact ? { 'data-drawer-initial-focus': '' } : {})}
@@ -171,7 +167,13 @@ const Sidebar = forwardRef(function Sidebar(
               onSidebarCollapsedChange(!sidebarCollapsed);
             }
           }}
-          aria-label={layoutCompact ? 'Close menu' : effectiveCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={
+            layoutCompact
+              ? 'Close menu'
+              : effectiveCollapsed
+                ? 'Expand sidebar'
+                : 'Collapse sidebar'
+          }
         >
           {layoutCompact ? (
             <NavIcon icon={CHROME_ICONS.close} size={20} aria-hidden />
@@ -192,7 +194,11 @@ const Sidebar = forwardRef(function Sidebar(
             aria-label="Open profile"
           >
             <div className="user-avatar">
-              {account?.avatarUrl ? <img src={account.avatarUrl} alt="" /> : displayName.charAt(0).toUpperCase()}
+              {account?.avatarUrl ? (
+                <img src={account.avatarUrl} alt="" />
+              ) : (
+                displayName.charAt(0).toUpperCase()
+              )}
             </div>
             <div className="user-info">
               <div className="user-name">{displayName}</div>
@@ -358,6 +364,10 @@ const Sidebar = forwardRef(function Sidebar(
             </span>
             <span className="hipaa-text">HIPAA</span>
           </div>
+        )}
+
+        {!effectiveCollapsed && (
+          <BuildInfoBadge className="sidebar-build-info" to="/system-health" />
         )}
 
         <button

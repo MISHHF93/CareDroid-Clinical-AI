@@ -290,7 +290,7 @@ describe('ToolCard Component', () => {
     });
 
     it('should have warning icon before disclaimer', () => {
-      const { container } = render(<ToolCard toolResult={mockSofaResult} />);
+      render(<ToolCard toolResult={mockSofaResult} />);
       const disclaimerText = screen.getByText(/This is for clinical reference only/);
       expect(disclaimerText.textContent).toContain('⚠️');
     });

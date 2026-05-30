@@ -26,9 +26,9 @@ describe('ToolOrchestratorService', () => {
   let service: ToolOrchestratorService;
   let mockAuditService: any;
   let mockAiService: any;
-  let sofaService: SofaCalculatorService;
-  let drugService: DrugCheckerService;
-  let labService: LabInterpreterService;
+  let _sofaService: SofaCalculatorService;
+  let _drugService: DrugCheckerService;
+  let _labService: LabInterpreterService;
 
   beforeEach(async () => {
     mockAuditService = {
@@ -77,9 +77,9 @@ describe('ToolOrchestratorService', () => {
     }).compile();
 
     service = module.get<ToolOrchestratorService>(ToolOrchestratorService);
-    sofaService = module.get<SofaCalculatorService>(SofaCalculatorService);
-    drugService = module.get<DrugCheckerService>(DrugCheckerService);
-    labService = module.get<LabInterpreterService>(LabInterpreterService);
+    _sofaService = module.get<SofaCalculatorService>(SofaCalculatorService);
+    _drugService = module.get<DrugCheckerService>(DrugCheckerService);
+    _labService = module.get<LabInterpreterService>(LabInterpreterService);
   });
 
   describe('Tool Registry', () => {

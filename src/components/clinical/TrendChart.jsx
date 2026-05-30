@@ -1,6 +1,6 @@
 import './TrendChart.css';
 
-const TrendChart = ({ data = [], title = 'Risk Trend', timeRange = '7days' }) => {
+const TrendChart = ({ data = [], title = 'Risk Trend' }) => {
   if (!data || data.length === 0) {
     return (
       <div className="trend-chart">

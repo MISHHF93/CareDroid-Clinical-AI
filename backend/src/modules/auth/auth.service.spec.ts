@@ -15,7 +15,7 @@ jest.mock('bcrypt');
 
 describe('AuthService', () => {
   let service: AuthService;
-  let jwtService: JwtService;
+  let _jwtService: JwtService;
   const originalNodeEnv = process.env.NODE_ENV;
 
   const mockUser = {
@@ -109,7 +109,7 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    jwtService = module.get<JwtService>(JwtService);
+    _jwtService = module.get<JwtService>(JwtService);
   });
 
   beforeEach(() => {

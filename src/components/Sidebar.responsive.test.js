@@ -34,7 +34,7 @@ describe('Sidebar responsive — mobile drawer', () => {
   it('provides mobile close control with touch target and initial focus hook', () => {
     expect(sidebarJsx).toContain('sidebar-toggle--mobile-close');
     expect(sidebarJsx).toContain('data-drawer-initial-focus');
-    expect(sidebarJsx).toMatch(/layoutCompact \? 'Close menu'/);
+    expect(sidebarJsx).toMatch(/layoutCompact\s*\?\s*'Close menu'/);
     expect(drawerFocusJs).toContain('[data-drawer-initial-focus]');
   });
 

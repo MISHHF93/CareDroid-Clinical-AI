@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { ArtifactQueryDto } from './dto/artifact-query.dto';
 import { CreateArtifactDto } from './dto/create-artifact.dto';
 import { UpdateArtifactDto } from './dto/update-artifact.dto';
-import { DEFAULT_ARTIFACTS, ArtifactSeedRecord } from './artifact.seed';
+import { DEFAULT_ARTIFACTS } from './artifact.seed';
 import { Artifact, ArtifactRelationship, ArtifactType } from './entities/artifact.entity';
 import { ArtifactVersion } from './entities/artifact-version.entity';
 

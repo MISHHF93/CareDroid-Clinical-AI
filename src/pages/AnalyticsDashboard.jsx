@@ -39,7 +39,7 @@ const AnalyticsDashboard = () => {
         if (isMounted) {
           setMetrics(data);
         }
-      } catch (err) {
+      } catch (_err) {
         if (isMounted) {
           setErrorMessage('Unable to load analytics metrics.');
         }
@@ -52,7 +52,7 @@ const AnalyticsDashboard = () => {
             setToolResults(results || []);
           }
         }
-      } catch (err) {
+      } catch (_err) {
         if (isMounted) {
           setToolResults([]);
         }

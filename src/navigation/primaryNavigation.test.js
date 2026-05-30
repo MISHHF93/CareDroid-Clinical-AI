@@ -8,6 +8,13 @@ import {
   PRIMARY_SIDEBAR_NAV_ITEMS,
   primaryNavPathMatches,
 } from './primaryNavigation';
+import { CANONICAL_ROUTES } from '../config/routes.config';
+
+const VISIBLE_SIDEBAR_ITEMS = [
+  ...PRIMARY_SIDEBAR_NAV_ITEMS,
+  ...OPERATIONS_SIDEBAR_NAV_ITEMS,
+  ...ADVANCED_SIDEBAR_NAV_ITEMS,
+];
 
 describe('primaryNavigation', () => {
   it('exposes the simplified primary sidebar model in canonical order', () => {
@@ -45,18 +52,25 @@ describe('primaryNavigation', () => {
   });
 
   it('does not duplicate visible sidebar destinations', () => {
-    const paths = [...PRIMARY_SIDEBAR_NAV_ITEMS, ...OPERATIONS_SIDEBAR_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map((item) => item.path);
+    const paths = VISIBLE_SIDEBAR_ITEMS.map((item) => item.path);
     expect(new Set(paths).size).toBe(paths.length);
   });
 
+  it('does not duplicate visible sidebar labels', () => {
+    const labels = VISIBLE_SIDEBAR_ITEMS.map((item) => item.label);
+    expect(new Set(labels).size).toBe(labels.length);
+  });
+
+  it('uses canonical routes for every visible sidebar destination', () => {
+    const canonicalPaths = new Set(Object.values(CANONICAL_ROUTES));
+    for (const item of VISIBLE_SIDEBAR_ITEMS) {
+      expect(canonicalPaths.has(item.path), `${item.label} -> ${item.path}`).toBe(true);
+    }
+  });
+
   it('does not activate multiple visible sidebar items for known nav paths', () => {
-    const visibleItems = [
-      ...PRIMARY_SIDEBAR_NAV_ITEMS,
-      ...OPERATIONS_SIDEBAR_NAV_ITEMS,
-      ...ADVANCED_SIDEBAR_NAV_ITEMS,
-    ];
     const paths = new Set(
-      visibleItems.flatMap((item) => [
+      VISIBLE_SIDEBAR_ITEMS.flatMap((item) => [
         item.path,
         ...(item.matchPaths || []),
         ...(item.legacyPaths || []),
@@ -64,9 +78,12 @@ describe('primaryNavigation', () => {
     );
 
     for (const path of paths) {
-      const matches = visibleItems.filter((item) => primaryNavPathMatches(item, path));
+      const matches = VISIBLE_SIDEBAR_ITEMS.filter((item) => primaryNavPathMatches(item, path));
 
-      expect(matches.map((item) => item.id), path).toHaveLength(1);
+      expect(
+        matches.map((item) => item.id),
+        path
+      ).toHaveLength(1);
     }
   });
 
@@ -83,13 +100,17 @@ describe('primaryNavigation', () => {
 
   it('assigns /tools/catalog to the permissioned Developer Audit entry only', () => {
     expect(getPrimaryNavItemForPath('/tools/catalog')?.id).toBe('developer-audit');
-    expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID['developer-audit'], '/tools/catalog')).toBe(true);
+    expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID['developer-audit'], '/tools/catalog')).toBe(
+      true
+    );
     expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID.tools, '/tools/catalog')).toBe(false);
     expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID.settings, '/tools/catalog')).toBe(false);
   });
 
   it('keeps calculator routes under the Tools nav item without a duplicate sidebar destination', () => {
-    expect(ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools/calculators')).toBe(false);
+    expect(ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools/calculators')).toBe(
+      false
+    );
     expect(getPrimaryNavItemForPath('/tools/calculators/sofa')?.id).toBe('tools');
   });
 
@@ -117,7 +138,10 @@ describe('primaryNavigation', () => {
     for (const [path, itemId] of expected) {
       const matches = PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => primaryNavPathMatches(item, path));
 
-      expect(matches.map((item) => item.id), path).toEqual([itemId]);
+      expect(
+        matches.map((item) => item.id),
+        path
+      ).toEqual([itemId]);
       expect(getPrimaryNavItemForPath(path)?.id, path).toBe(itemId);
     }
   });

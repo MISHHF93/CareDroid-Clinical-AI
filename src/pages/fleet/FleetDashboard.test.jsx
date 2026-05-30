@@ -31,9 +31,21 @@ vi.mock('../../contexts/ToolPreferencesContext', () => ({
 
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
+  const [React, actual] = await Promise.all([
+    vi.importActual('react'),
+    vi.importActual('react-router-dom'),
+  ]);
   return {
     ...actual,
+    MemoryRouter: ({ future, ...props }) =>
+      React.createElement(actual.MemoryRouter, {
+        ...props,
+        future: {
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+          ...future,
+        },
+      }),
     useNavigate: () => mockNavigate,
   };
 });
@@ -87,11 +99,14 @@ describe('FleetDashboard page', () => {
     mockFetchFleetCommandSnapshot.mockResolvedValue(sampleSnapshot);
   });
 
-  it('renders route page with accessible title', () => {
+  it('renders route page with accessible title', async () => {
     renderDashboard();
     expect(
       screen.getByRole('heading', { level: 1, name: /Fleet Command Dashboard/i })
     ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /Fleet summary/i })).toBeInTheDocument();
+    });
   });
 
   it('shows loading then fleet summary widgets', async () => {

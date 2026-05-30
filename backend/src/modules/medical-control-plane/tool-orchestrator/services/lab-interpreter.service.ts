@@ -445,7 +445,7 @@ Be concise and clinically relevant.`;
         expiresAt: Date.now() + this.interpretationCacheTtlMs,
       });
       return this.cloneInterpretation(interpretation);
-    } catch (error) {
+    } catch (_error) {
       // Fallback to rule-based interpretation
       return {
         category,

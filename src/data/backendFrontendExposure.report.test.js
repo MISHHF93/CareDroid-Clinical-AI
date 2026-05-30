@@ -48,7 +48,7 @@ describe('backendFrontendExposure report', () => {
       `${formatOrphanedBackendFunctionsMarkdown()}\n`
     );
 
-    // eslint-disable-next-line no-console
+     
     console.log(
       'Wrote docs/backend-exposure-report.md, endpoint-to-frontend-matrix.md, backend-frontend-tool-contract.md, orphaned-backend-functions.md'
     );

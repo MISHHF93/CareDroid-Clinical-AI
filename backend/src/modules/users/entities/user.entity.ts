@@ -9,7 +9,6 @@ import {
   BeforeInsert,
   BeforeUpdate,
   AfterLoad,
-  JoinColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { UserProfile } from './user-profile.entity';
@@ -117,7 +116,7 @@ export class User {
    * Called whenever a new User is inserted
    */
   @BeforeInsert()
-  async encryptPhiBeforeInsert(encryptionService?: EncryptionService) {
+  async encryptPhiBeforeInsert(_encryptionService?: EncryptionService) {
     // Encryption service will be injected via hooks decorator in UsersService
     // For now, this is a placeholder that will be implemented at the repository level
     this.phiFieldsEncrypted = false;
@@ -128,7 +127,7 @@ export class User {
    * Called whenever a User is updated
    */
   @BeforeUpdate()
-  async encryptPhiBeforeUpdate(encryptionService?: EncryptionService) {
+  async encryptPhiBeforeUpdate(_encryptionService?: EncryptionService) {
     // Encryption service will be injected via hooks decorator in UsersService
     // For now, this is a placeholder that will be implemented at the repository level
     this.phiFieldsEncrypted = false;

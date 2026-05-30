@@ -114,7 +114,7 @@ Stimulates alpha-1, beta-1, and beta-2 receptors:
     // Clean up test data
     try {
       await ragService.deleteDocument(sampleSource.id);
-    } catch (error) {
+    } catch (_error) {
       // Ignore cleanup errors
     }
 

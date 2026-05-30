@@ -353,7 +353,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: clip;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
   padding: 10px;
@@ -992,6 +992,13 @@
   letter-spacing: 0.5px;
 }
 
+.sidebar-build-info {
+  width: 100%;
+  border-color: var(--sidebar-divider);
+  background: color-mix(in srgb, var(--sidebar-surface-muted) 82%, transparent);
+  color: var(--sidebar-fg-muted);
+}
+
 .btn-signout {
   width: 100%;
   min-height: var(--compact-control-height, 38px);
@@ -1266,7 +1273,7 @@
     padding-inline: 12px;
     /* Independent scroll; long tool lists must not clip on Android */
     overflow-y: auto;
-    overflow-x: hidden;
+    overflow-x: clip;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
   }

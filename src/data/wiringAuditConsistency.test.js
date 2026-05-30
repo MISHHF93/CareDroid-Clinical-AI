@@ -59,7 +59,7 @@ const mentalHealthSource = readFileSync(
   join(__dirname, '../pages/tools/mentalHealthCalculators.jsx'),
   'utf8'
 );
-const hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
+const _hubIdx = appSource.indexOf("path: '/tools/calculators', element:");
 
 describe('Wiring audit — frozen tool id lists', () => {
   it('matches PR5/PR6/PR7 tier audit lists', () => {

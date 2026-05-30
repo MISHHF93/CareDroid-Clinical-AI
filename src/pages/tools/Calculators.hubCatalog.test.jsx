@@ -27,6 +27,10 @@ vi.mock('../../contexts/ConversationContext', () => ({
   useConversation: () => mockConversationValue,
 }));
 
+vi.mock('../../components/clinical/ToolPreflightStatus', () => ({
+  default: () => <div data-testid="tool-preflight-status">Preflight ready</div>,
+}));
+
 vi.mock('../../services/apiClient', () => ({
   apiFetch: vi.fn(),
   parseApiResponse: vi.fn(),

@@ -24,7 +24,12 @@ describe('App shell layout — root and scroll', () => {
     expect(indexCss).toMatch(/html[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/body[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/#root[\s\S]*overflow-y:\s*visible/);
-    expect(indexCss).toMatch(/html\.app-scroll-locked,\s*body\.app-scroll-locked[\s\S]*overflow:\s*hidden/);
+    expect(indexCss).toMatch(/html\s*\{[\s\S]*height:\s*auto/);
+    expect(indexCss).toMatch(/body\s*\{[\s\S]*height:\s*auto/);
+    expect(indexCss).toMatch(/#root\s*\{[\s\S]*height:\s*auto/);
+    expect(indexCss).toMatch(
+      /html\.app-scroll-locked,\s*body\.app-scroll-locked[\s\S]*overflow:\s*hidden/
+    );
     expect(indexCss).toMatch(/#root[\s\S]*min-width:\s*0/);
   });
 
@@ -47,7 +52,9 @@ describe('App shell layout — root and scroll', () => {
 describe('App shell layout — main column', () => {
   it('main wrap uses flex min-width 0 and clips horizontal overflow', () => {
     expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*min-width:\s*0/);
-    expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*width:\s*calc\(100% - var\(--app-main-inset/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-main-wrap[\s\S]*width:\s*calc\(100% - var\(--app-main-inset/
+    );
     expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*overflow-x:\s*clip/);
   });
 
@@ -67,7 +74,13 @@ describe('App shell layout — main column', () => {
 });
 
 describe('App shell layout — page scrollport', () => {
-  it('page body is the primary vertical scrollport with min-width 0', () => {
+  it('MainContent is the primary vertical scrollport with min-width 0', () => {
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-y:\s*auto/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-x:\s*clip/);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*min-width:\s*0/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-main-content\s*\{[\s\S]*-webkit-overflow-scrolling:\s*touch/
+    );
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-y:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-x:\s*clip/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*min-width:\s*0/);
@@ -112,6 +125,7 @@ describe('App shell layout — page scrollport', () => {
 
   it('defines one authenticated app shell header before route content', () => {
     expect(appShellJsx).toContain('<header className="app-shell-header"');
+    expect(appShellJsx.match(/<header className="app-shell-header"/g)).toHaveLength(1);
     expect(appShellCss).toMatch(/\.app-shell-header[\s\S]*position:\s*sticky/);
     expect(appShellCss).toMatch(/\.app-shell-header[\s\S]*pointer-events:\s*none/);
   });
@@ -127,14 +141,24 @@ describe('App shell layout — page scrollport', () => {
 
   it('main content owns viewport width beside the fixed sidebar', () => {
     expect(appShellJsx).toContain('data-layout-role="MainContent"');
+    expect(appShellJsx).toContain(
+      '<main className={mainContentClassName} data-layout-role="MainContent"'
+    );
+    expect(appShellJsx.match(/data-layout-role="MainContent"/g)).toHaveLength(1);
+    expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell\s*\{[\s\S]*height:\s*var\(--app-viewport-height/);
-    expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*width:\s*calc\(100% - var\(--app-main-inset/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-main-wrap[\s\S]*width:\s*calc\(100% - var\(--app-main-inset/
+    );
     expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*overflow:\s*hidden/);
   });
 
   it('keeps command dashboard out of the conversation-only scroll container', () => {
-    expect(readFileSync(join(__dirname, '../App.jsx'), 'utf8')).toContain(
+    expect(appShellJsx).toContain(
       "const isConversationViewport = ['/chat', '/assistant'].includes(location.pathname)"
+    );
+    expect(readFileSync(join(__dirname, '../App.jsx'), 'utf8')).not.toContain(
+      'app-shell-page-body--conversation'
     );
   });
 });

@@ -3,7 +3,6 @@ import { AuthService } from '../src/modules/auth/auth.service';
 import { UsersService } from '../src/modules/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../src/modules/users/entities/user.entity';
 import { UserProfile } from '../src/modules/users/entities/user-profile.entity';
@@ -15,8 +14,8 @@ import * as bcrypt from 'bcrypt';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let usersService: UsersService;
-  let jwtService: JwtService;
+  let _usersService: UsersService;
+  let _jwtService: JwtService;
 
   const mockUserRepository = {
     findOne: jest.fn(),
@@ -110,7 +109,7 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    jwtService = module.get<JwtService>(JwtService);
+    _jwtService = module.get<JwtService>(JwtService);
   });
 
   beforeEach(() => {

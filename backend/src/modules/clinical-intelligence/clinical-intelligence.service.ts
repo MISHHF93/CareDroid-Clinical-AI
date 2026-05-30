@@ -835,7 +835,7 @@ function buildDifferentialCalculatorSuggestions(
 
   return suggestions
     .filter((item) => item.keywords.some((keyword) => text.includes(keyword)))
-    .map(({ keywords, ...item }) => item);
+    .map(({ keywords: _keywords, ...item }) => item);
 }
 
 interface NormalizedTimelineEncounter {
@@ -1533,7 +1533,7 @@ function buildOrderSetBundles(text: string): OrderSetAiResponseDto['orderBundles
   return matched
     .concat(fallback)
     .slice(0, 3)
-    .map(({ keywords, ...bundle }) => bundle);
+    .map(({ keywords: _keywords, ...bundle }) => bundle);
 }
 
 function buildProtocolPathways(text: string): OrderSetAiResponseDto['protocolPathways'] {
@@ -1593,7 +1593,7 @@ function buildProtocolPathways(text: string): OrderSetAiResponseDto['protocolPat
 
   return pathways
     .filter((pathway) => pathway.keywords.some((keyword) => text.includes(keyword)))
-    .map(({ keywords, ...pathway }) => pathway);
+    .map(({ keywords: _keywords, ...pathway }) => pathway);
 }
 
 function buildCitations(chunks: RetrievedChunk[]): GuidelineRagCitation[] {

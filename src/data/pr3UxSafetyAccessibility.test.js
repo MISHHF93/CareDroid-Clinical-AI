@@ -7,7 +7,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, it, expect } from 'vitest';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';
-import toolRegistry, { toolRegistryById } from './toolRegistry';
+import { toolRegistryById } from './toolRegistry';
 import {
   CHAT_ASSISTED_HUB_GROUPS,
   chatAssistedLaunchAriaLabel,

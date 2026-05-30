@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ExecutionContext } from '@nestjs/common';
+import { INestApplication } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import * as request from 'supertest';
 import { AuthorizationGuard } from '../src/modules/auth/guards/authorization.guard';
 import { Permission } from '../src/modules/auth/enums/permission.enum';
 import { UserRole } from '../src/modules/users/entities/user.entity';
@@ -9,6 +8,7 @@ import { AuditService } from '../src/modules/audit/audit.service';
 import {
   hasPermission,
   hasAnyPermission,
+  getEffectivePermissions,
 } from '../src/modules/auth/config/role-permissions.config';
 
 /**
@@ -21,7 +21,7 @@ import {
  * - Audit logging of permission checks
  */
 describe('RBAC System (E2E)', () => {
-  let app: INestApplication;
+  let _app: INestApplication;
   let auditService: AuditService;
 
   beforeEach(async () => {
@@ -327,6 +327,7 @@ describe('RBAC System (E2E)', () => {
       ];
 
       // Verify students only have these permissions and nothing more
+      expect(studentPermissions).toEqual(getEffectivePermissions(UserRole.STUDENT));
       expect(hasPermission(UserRole.STUDENT, Permission.READ_PHI)).toBe(false);
       expect(hasPermission(UserRole.STUDENT, Permission.MANAGE_USERS)).toBe(false);
     });

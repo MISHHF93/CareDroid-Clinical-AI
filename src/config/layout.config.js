@@ -19,7 +19,7 @@ export {
 
 export const LAYOUT_SCROLL_CONTRACT = Object.freeze({
   viewportOwner: 'AppShell',
-  primaryScrollContainer: '.app-shell-page-body',
+  primaryScrollContainer: '.app-shell-main-content',
   mainContentRole: 'MainContent',
   sidebarScrollContainer: '.sidebar-content',
   localScrollAllowedFor: Object.freeze(['chat', 'tables', 'maps', 'drawers']),

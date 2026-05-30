@@ -23,7 +23,7 @@ jest.mock('openai', () => {
 
 describe('AIService', () => {
   let service: AIService;
-  let configService: ConfigService;
+  let _configService: ConfigService;
 
   const mockConfigService = {
     get: jest.fn(),
@@ -91,7 +91,7 @@ describe('AIService', () => {
     }).compile();
 
     service = module.get<AIService>(AIService);
-    configService = module.get<ConfigService>(ConfigService);
+    _configService = module.get<ConfigService>(ConfigService);
   });
 
   beforeEach(() => {

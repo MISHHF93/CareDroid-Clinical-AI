@@ -2,6 +2,46 @@ import { afterEach, vi } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
+const originalConsoleWarn = console.warn.bind(console);
+console.warn = (...args) => {
+  const message = String(args[0] ?? '');
+  if (
+    message.includes('React Router Future Flag Warning') &&
+    (message.includes('v7_startTransition') || message.includes('v7_relativeSplatPath'))
+  ) {
+    return;
+  }
+  originalConsoleWarn(...args);
+};
+
+vi.mock('react-router-dom', async () => {
+  const [React, actual] = await Promise.all([
+    vi.importActual('react'),
+    vi.importActual('react-router-dom'),
+  ]);
+  const futureDefaults = {
+    v7_startTransition: true,
+    v7_relativeSplatPath: true,
+  };
+  const withFutureDefaults = (Router) => {
+    const RouterWithFutureDefaults = ({ future, ...props }) =>
+      React.createElement(Router, {
+        ...props,
+        future: {
+          ...futureDefaults,
+          ...future,
+        },
+      });
+    return RouterWithFutureDefaults;
+  };
+
+  return {
+    ...actual,
+    BrowserRouter: withFutureDefaults(actual.BrowserRouter),
+    MemoryRouter: withFutureDefaults(actual.MemoryRouter),
+  };
+});
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();

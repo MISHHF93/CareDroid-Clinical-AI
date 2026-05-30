@@ -118,7 +118,7 @@ class AdvancedRecommendationService {
    * @param {Object} context - Additional context
    * @returns {Array} Tool recommendations
    */
-  async generateRecommendations(intentData, originalMessage, context) {
+  async generateRecommendations(intentData, _originalMessage, _context) {
     const { primaryIntent, confidence, entities, emergencyScore } = intentData;
 
     // Intent to tool mapping (more sophisticated than keyword matching)

@@ -3,7 +3,7 @@ const enabled =
   !!(process.env.DATADOG_API_KEY && process.env.DATADOG_API_KEY.length > 0);
 
 if (enabled) {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
   const tracer = require('dd-trace').init({
     service: 'caredroid-backend',
     env: process.env.NODE_ENV || 'development',

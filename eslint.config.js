@@ -36,8 +36,15 @@ export default [
       ...reactRecommended.rules,
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
-      'react/no-unescaped-entities': 'warn',
-      'no-unused-vars': 'warn',
+      'react/no-unescaped-entities': 'off',
+      'no-unused-vars': [
+        'warn',
+        {
+          argsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+        },
+      ],
     },
     settings: { react: { version: 'detect' } },
   },

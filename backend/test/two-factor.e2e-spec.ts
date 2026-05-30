@@ -32,10 +32,10 @@ jest.setTimeout(120_000);
 describe('Two-Factor Authentication (e2e)', () => {
   let app: INestApplication;
   let authService: AuthService;
-  let twoFactorService: TwoFactorService;
+  let _twoFactorService: TwoFactorService;
   let auditService: AuditService;
   let authToken: string;
-  let userId: string;
+  let _userId: string;
   let email: string;
   let testSecret: string;
   let testBackupCodes: string[];
@@ -78,7 +78,7 @@ describe('Two-Factor Authentication (e2e)', () => {
     await app.init();
 
     authService = moduleFixture.get<AuthService>(AuthService);
-    twoFactorService = moduleFixture.get<TwoFactorService>(TwoFactorService);
+    _twoFactorService = moduleFixture.get<TwoFactorService>(TwoFactorService);
     auditService = moduleFixture.get<AuditService>(AuditService);
 
     // Create test user
@@ -89,7 +89,7 @@ describe('Two-Factor Authentication (e2e)', () => {
       fullName: '2FA Test User',
       role: UserRole.PHYSICIAN,
     });
-    userId = user.userId;
+    _userId = user.userId;
 
     const loginResponse = await authService.login(
       { email, password: 'Test1234!' },

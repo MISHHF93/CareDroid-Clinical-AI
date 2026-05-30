@@ -26,7 +26,7 @@ describe('ExportService', () => {
 
     // Mock document for downloads
     global.document = {
-      createElement: vi.fn((tag) => ({
+      createElement: vi.fn((_tag) => ({
         href: '',
         download: '',
         click: vi.fn(),

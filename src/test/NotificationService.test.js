@@ -39,19 +39,19 @@ describe('NotificationService', () => {
     });
 
     it('should detect alert severity levels', async () => {
-      const approachingAlert = await service.sendCostAlert(
+      await service.sendCostAlert(
         'tool1',
         800,
         1000,
         'APPROACHING'
       );
-      const exceededAlert = await service.sendCostAlert(
+      await service.sendCostAlert(
         'tool2',
         1200,
         1000,
         'EXCEEDED'
       );
-      const criticalAlert = await service.sendCostAlert(
+      await service.sendCostAlert(
         'tool3',
         2500,
         1000,
@@ -69,7 +69,7 @@ describe('NotificationService', () => {
       service.preferences.smsEnabled = false;
       service.preferences.inAppEnabled = true;
 
-      const alert = await service.sendCostAlert('tool1', 800, 1000);
+      await service.sendCostAlert('tool1', 800, 1000);
 
       const notification = service.notificationQueue[0];
       expect(notification.channels).toContain('email');
@@ -306,14 +306,14 @@ describe('NotificationService', () => {
 
   describe('Queue Processing', () => {
     it('should queue notifications', async () => {
-      const notif1 = await service.sendCostAlert('tool1', 100, 1000);
-      const notif2 = await service.sendCostAlert('tool2', 200, 1000);
+      await service.sendCostAlert('tool1', 100, 1000);
+      await service.sendCostAlert('tool2', 200, 1000);
 
       expect(service.notificationQueue.length).toBeGreaterThanOrEqual(2);
     });
 
     it('should prevent duplicate processing', async () => {
-      const processSpy = vi.spyOn(service, 'processQueue');
+      vi.spyOn(service, 'processQueue');
 
       // Add multiple notifications quickly
       await service.sendCostAlert('tool1', 100, 1000);

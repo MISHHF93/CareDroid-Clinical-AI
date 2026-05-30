@@ -20,7 +20,6 @@ import {
   NotificationPreferenceService,
   UpdatePreferencesDto,
 } from './services/notification-preference.service';
-import { DevicePlatform } from './entities/device-token.entity';
 import { NotificationType } from './entities/notification.entity';
 
 @ApiTags('notifications')

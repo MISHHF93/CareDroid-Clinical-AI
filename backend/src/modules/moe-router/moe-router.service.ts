@@ -9,7 +9,6 @@ import {
   ExpertCandidate,
   ExpertRoutePlan,
   GatewayRunEnvelope,
-  MoEExpertId,
   SelectedExpertRoute,
 } from './moe-router.types';
 

@@ -11,31 +11,27 @@ const ConfidenceBadge = ({ confidence }) => {
   }
 
   // Determine confidence level
-  let level, color, bgColor, borderColor, icon, label;
+  let color, bgColor, borderColor, icon, label;
   
   if (confidence >= 0.8) {
-    level = 'high';
     color = '#00FF88';
     bgColor = 'rgba(0, 255, 136, 0.1)';
     borderColor = 'rgba(0, 255, 136, 0.3)';
     icon = '✓';
     label = 'High Confidence';
   } else if (confidence >= 0.6) {
-    level = 'moderate';
     color = '#FFB800';
     bgColor = 'rgba(255, 184, 0, 0.1)';
     borderColor = 'rgba(255, 184, 0, 0.3)';
     icon = '⚠';
     label = 'Moderate Confidence';
   } else if (confidence >= 0.3) {
-    level = 'low';
     color = '#FF8800';
     bgColor = 'rgba(255, 136, 0, 0.1)';
     borderColor = 'rgba(255, 136, 0, 0.3)';
     icon = '⚠';
     label = 'Low Confidence';
   } else {
-    level = 'very-low';
     color = '#FF4444';
     bgColor = 'rgba(255, 68, 68, 0.1)';
     borderColor = 'rgba(255, 68, 68, 0.3)';

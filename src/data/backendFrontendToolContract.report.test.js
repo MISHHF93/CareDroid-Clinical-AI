@@ -61,7 +61,7 @@ describe('backendFrontendToolContract report', () => {
       join(docsDir, 'tool-contract-matrix.md'),
       `${formatToolContractMatrixMarkdown(undefined, gaps)}\n`
     );
-    // eslint-disable-next-line no-console
+     
     console.log('Wrote docs/backend-frontend-tool-contract.md, docs/tool-contract-matrix.md');
   });
 });

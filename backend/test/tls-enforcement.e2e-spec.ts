@@ -292,7 +292,7 @@ describe('TLS 1.3 & Security Headers (E2E)', () => {
           if (response.status !== 405) {
             expect(response.headers['strict-transport-security']).toBeDefined();
           }
-        } catch (e) {
+        } catch (_e) {
           // Some methods may not be supported on root path
           // That's OK, we just want to ensure headers are present where applicable
         }

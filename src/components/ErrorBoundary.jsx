@@ -21,6 +21,7 @@ const reportCrash = (error, errorInfo) => {
       message: error?.message || 'Unknown error',
       stack: (error?.stack ? error.stack.split('\n') : []),
     },
+    componentStack: errorInfo?.componentStack || '',
     breadcrumbs: [],
     timestamp: new Date().toISOString(),
     sessionId: getSessionId(),
@@ -44,7 +45,7 @@ class ErrorBoundary extends Component {
     };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     return { hasError: true };
   }
 

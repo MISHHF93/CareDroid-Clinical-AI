@@ -3,7 +3,6 @@ import { INestApplication } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as request from 'supertest';
 import { EncryptionService } from '../src/modules/encryption/encryption.service';
 import { KeyRotationService } from '../src/modules/encryption/key-rotation.service';
 import { EncryptionKey } from '../src/modules/encryption/entities/encryption-key.entity';
@@ -167,7 +166,7 @@ describe('Encryption Module E2E', () => {
     it('should maintain key history', async () => {
       // Create multiple rotations
       const rot1 = await keyRotationService.initiateKeyRotation('ROTATION_1');
-      const rot2 = await keyRotationService.initiateKeyRotation('ROTATION_2');
+      await keyRotationService.initiateKeyRotation('ROTATION_2');
 
       // Activate first rotation
       await keyRotationService.updateRotationProgress(rot1.keyVersion, 100, 1000);
@@ -226,7 +225,7 @@ describe('Encryption Module E2E', () => {
       const oldEncrypted = encryptionService.encrypt(plaintext);
 
       // Initiate rotation
-      const rotation = await keyRotationService.initiateKeyRotation('REENCRYPT_TEST');
+      await keyRotationService.initiateKeyRotation('REENCRYPT_TEST');
 
       // For this test, we simulate the re-encryption process
       // In production, a background job would do this
@@ -288,7 +287,7 @@ describe('Encryption Module E2E', () => {
       const encrypted = encryptionService.encrypt(data);
 
       // Start rotation
-      const rotation = await keyRotationService.initiateKeyRotation('ROLLBACK_TEST');
+      await keyRotationService.initiateKeyRotation('ROLLBACK_TEST');
 
       // In case of error, old key should still work
       expect(encryptionService.decrypt(encrypted)).toBe(data);

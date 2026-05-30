@@ -2,7 +2,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AIService } from '../src/modules/ai/ai.service';
 import { ChatService } from '../src/modules/chat/chat.service';
 import { ConfigService } from '@nestjs/config';
-import { Repository } from 'typeorm';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../src/modules/users/entities/user.entity';
 import {

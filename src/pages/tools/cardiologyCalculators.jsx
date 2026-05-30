@@ -103,7 +103,7 @@ function EmptyResults({ icon, text }) {
   );
 }
 
-function ResultCard({ slug, title, result, scoreLabel = 'Score' }) {
+function ResultCard({ slug, result, scoreLabel = 'Score' }) {
   const headingId = `${slug}-interpretation-heading`;
   if (!result) return null;
   return (

@@ -94,7 +94,7 @@ export function evaluateNexusCSpine(raw) {
  * }} input
  */
 export function interpretNexusCSpine(input) {
-  const { imagingIndicatedByRule, lowRiskByRule, triggeredCriteria } = input;
+  const { imagingIndicatedByRule, triggeredCriteria } = input;
 
   const referenceLine =
     'Hoffman JR, et al. Validity of a set of clinical criteria to rule out injury to the cervical spine in patients with blunt trauma. N Engl J Med. 2000;343(2):94–99.';

@@ -11,8 +11,10 @@ global.WebSocket = vi.fn();
 describe('RealTimeCostService', () => {
   let service;
   let mockWs;
+  let consoleWarnSpy;
 
   beforeEach(() => {
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     service = new RealTimeCostService();
 
     // Mock WebSocket
@@ -30,6 +32,7 @@ describe('RealTimeCostService', () => {
     if (service) {
       service.disconnect();
     }
+    consoleWarnSpy.mockRestore();
     vi.clearAllMocks();
   });
 

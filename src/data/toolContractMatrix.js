@@ -10,7 +10,6 @@ import {
   getContractGaps,
 } from './backendFrontendToolContract';
 import {
-  NLU_PROFILE_TOOL_IDS,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
 } from './clinicalToolIdContract';
 import { clinicalIntentTools } from './clinicalIntentToolCatalog';

@@ -374,7 +374,7 @@ const UserTable = ({ users, sortConfig, onSort, onEdit, onDelete, actionsDisable
  */
 const EditUserModal = ({ user, onSave, onCancel, disabled = false }) => {
   const [role, setRole] = useState(user.role);
-  const [permissions, setPermissions] = useState(user.permissions || []);
+  const [permissions] = useState(user.permissions || []);
   const [saving, setSaving] = useState(false);
 
   const roleDefinitions = {

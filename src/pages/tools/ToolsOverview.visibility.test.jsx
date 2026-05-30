@@ -78,14 +78,42 @@ function expectedProfileVisibleTools(filter = 'all') {
   return filterToolsForProfileGraph(graph, filter);
 }
 
-function expectedFilterIds(filter, surface) {
-  return expectedProfileVisibleTools(filter)
-    .filter(
-      (record) =>
-        record.surface === surface ||
-        (filter === 'calculator' && record.category === 'Calculator') ||
-        (filter === 'fleet' && record.category === 'Fleet')
-    )
+function expectedFilterBase(filter) {
+  return filter === 'calculator'
+    ? getUserFacingToolRegistryProjection()
+    : expectedProfileVisibleTools(filter);
+}
+
+function expectedFilterIds(filter) {
+  return expectedFilterBase(filter)
+    .filter((record) => {
+      if (filter === 'calculator') {
+        return (
+          record.surface !== 'hub' &&
+          (record.category === 'Calculator' || record.surface === TOOL_SURFACES.CALCULATOR_FORM)
+        );
+      }
+      if (filter === 'ai-workflows') {
+        return (
+          ['AI Tools', 'Diagnostic'].includes(record.category) ||
+          record.launchType === 'chat-assisted' ||
+          record.launchType === 'backend-backed' ||
+          /ai|assistant|workflow|scribe|summary|order set|timeline/i.test(
+            `${record.name} ${record.description}`
+          )
+        );
+      }
+      if (filter === 'operations') {
+        return (
+          ['Fleet', 'IoT', 'Hospital Operations'].includes(record.category) ||
+          ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(record.surface) ||
+          /fleet|operations|dispatch|device|hospital map|live map|digital twin/i.test(
+            `${record.name} ${record.description}`
+          )
+        );
+      }
+      return true;
+    })
     .map((record) => record.id);
 }
 
@@ -141,10 +169,10 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
   }, 10000);
 
   it.each([
-    ['calculator', TOOL_SURFACES.CALCULATOR_FORM],
-    ['chat-assisted', TOOL_SURFACES.CHAT_ASSISTED],
-    ['fleet', TOOL_SURFACES.FLEET_PAGE],
-  ])('filters visible cards by %s without hiding all tools', (filter, surface) => {
+    ['calculator', 'Calculators'],
+    ['ai-workflows', 'AI Workflows'],
+    ['operations', 'Operations'],
+  ])('filters visible cards by %s without hiding all tools', (filter) => {
     const { container } = renderOverview();
 
     fireEvent.change(screen.getByRole('combobox', { name: /filter tools by type/i }), {
@@ -154,7 +182,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     const renderedIds = [...container.querySelectorAll('[data-tool-id]')].map((node) =>
       node.getAttribute('data-tool-id')
     );
-    const expectedIds = expectedFilterIds(filter, surface);
+    const expectedIds = expectedFilterIds(filter);
 
     expect(renderedIds.length).toBeGreaterThan(0);
     expect(renderedIds.sort()).toEqual(expectedIds.sort());

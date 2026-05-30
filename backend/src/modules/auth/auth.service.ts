@@ -441,7 +441,12 @@ export class AuthService {
   }
 
   private sanitizeUser(user: User) {
-    const { passwordHash, emailVerificationToken, passwordResetToken, ...sanitized } = user;
+    const {
+      passwordHash: _passwordHash,
+      emailVerificationToken: _emailVerificationToken,
+      passwordResetToken: _passwordResetToken,
+      ...sanitized
+    } = user;
     return sanitized;
   }
 }

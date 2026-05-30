@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useUser } from '../../contexts/UserContext';
@@ -14,7 +15,6 @@ import {
 import {
   getUserFacingToolRegistryProjection,
   TOOL_LIFECYCLE_LABELS,
-  TOOL_LIFECYCLE_STATES,
 } from '../../data/toolInventory';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import { NavIcon } from '../../navigation/NavIcon';
@@ -23,7 +23,7 @@ import './ToolsOverview.css';
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
   { value: 'all', label: 'All' },
-  { value: 'recommended', label: 'Recommended for Me' },
+  { value: 'recommended', label: 'Recommended' },
   { value: 'calculator', label: 'Calculators' },
   { value: 'diagnostics', label: 'Diagnostics' },
   { value: 'ai-workflows', label: 'AI Workflows' },
@@ -31,29 +31,14 @@ const TOOL_FILTER_OPTIONS = Object.freeze([
   { value: 'operations', label: 'Operations' },
   { value: 'favorites', label: 'Favorites' },
   { value: 'recent', label: 'Recent' },
-  { value: 'specialty', label: 'My Specialty' },
-  { value: 'workspace', label: 'My Workspace' },
-  { value: 'pinned', label: 'Pinned' },
-  { value: 'restricted', label: 'Restricted/Unavailable' },
-  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.ACTIVE}`, label: 'Active' },
-  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.BETA}`, label: 'Beta' },
-  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.EXPERIMENTAL}`, label: 'Experimental' },
-  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.DEPRECATED}`, label: 'Deprecated' },
-  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.HIDDEN}`, label: 'Hidden' },
-  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.ADMIN_ONLY}`, label: 'Admin Only' },
-  { value: 'chat-assisted', label: 'Guided chat' },
-  { value: 'backend-backed', label: 'Verified actions' },
-  { value: 'clinical-page', label: 'Forms and pages' },
-  { value: 'fleet', label: 'Operations' },
-  { value: 'iot', label: 'Medical IoT' },
-  { value: 'hospital-ops', label: 'Hospital Ops' },
-  { value: 'reference', label: 'Reference' },
 ]);
 
 const TOOL_FILTER_OPTION_VALUES = new Set(TOOL_FILTER_OPTIONS.map((option) => option.value));
 
 function normalizeSearch(value) {
-  return String(value || '').trim().toLowerCase();
+  return String(value || '')
+    .trim()
+    .toLowerCase();
 }
 
 function toolSearchBlob(tool) {
@@ -81,20 +66,29 @@ function toolSearchBlob(tool) {
 }
 
 function matchesToolFilter(tool, filter) {
-  if (!filter || ['recommended', 'specialty', 'workspace', 'pinned', 'favorites', 'recent', 'restricted', 'all'].includes(filter)) {
+  if (!filter || ['recommended', 'favorites', 'recent', 'all'].includes(filter)) {
     return true;
   }
-  if (filter.startsWith('lifecycle-')) return tool.lifecycleState === filter.replace('lifecycle-', '');
-  if (filter === 'calculator') return tool.category === 'Calculator' || tool.surface === 'calculator-form';
+  if (filter === 'calculator') {
+    return (
+      tool.surface !== 'hub' &&
+      (tool.category === 'Calculator' || tool.surface === 'calculator-form')
+    );
+  }
   if (filter === 'diagnostics') {
-    return tool.category === 'Diagnostic' || /diagnos|differential|triage|risk|score/i.test(`${tool.name} ${tool.description}`);
+    return (
+      tool.category === 'Diagnostic' ||
+      /diagnos|differential|triage|risk|score/i.test(`${tool.name} ${tool.description}`)
+    );
   }
   if (filter === 'ai-workflows') {
     return (
       ['AI Tools', 'Diagnostic'].includes(tool.category) ||
       tool.launchType === 'chat-assisted' ||
       tool.launchType === 'backend-backed' ||
-      /ai|assistant|workflow|scribe|summary|order set|timeline/i.test(`${tool.name} ${tool.description}`)
+      /ai|assistant|workflow|scribe|summary|order set|timeline/i.test(
+        `${tool.name} ${tool.description}`
+      )
     );
   }
   if (filter === 'maps-iot') {
@@ -110,24 +104,19 @@ function matchesToolFilter(tool, filter) {
     return (
       ['Fleet', 'IoT', 'Hospital Operations'].includes(tool.category) ||
       ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(tool.surface) ||
-      /fleet|operations|dispatch|device|hospital map|live map|digital twin/i.test(`${tool.name} ${tool.description}`)
+      /fleet|operations|dispatch|device|hospital map|live map|digital twin/i.test(
+        `${tool.name} ${tool.description}`
+      )
     );
   }
-  if (filter === 'chat-assisted') return tool.surface === 'chat-assisted' || tool.launchType === 'chat-assisted';
-  if (filter === 'backend-backed') return tool.launchType === 'backend-backed' || tool.executorStatus === 'registered';
-  if (filter === 'clinical-page') return tool.surface === 'tool-page' || tool.launchType === 'clinical-page';
-  if (filter === 'fleet') return tool.category === 'Fleet' || tool.surface === 'fleet-page';
-  if (filter === 'iot') return tool.category === 'IoT' || tool.surface === 'iot-dashboard';
-  if (filter === 'hospital-ops') {
-    return tool.category === 'Hospital Operations' || tool.surface === 'hospital-operations';
-  }
-  if (filter === 'reference') return tool.category === 'Reference';
   return true;
 }
 
 function primaryActionLabel(tool) {
-  if (tool.surface === 'chat-assisted' || tool.launchType === 'chat-assisted') return 'Start guided chat';
-  if (tool.category === 'Calculator' || tool.surface === 'calculator-form') return 'Open calculator';
+  if (tool.surface === 'chat-assisted' || tool.launchType === 'chat-assisted')
+    return 'Start guided chat';
+  if (tool.category === 'Calculator' || tool.surface === 'calculator-form')
+    return 'Open calculator';
   if (
     ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(tool.surface) ||
     ['Fleet', 'IoT', 'Hospital Operations'].includes(tool.category)
@@ -147,19 +136,22 @@ function lifecycleLabel(tool) {
 
 const ToolsOverview = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const requestedFilter = searchParams.get('filter');
   const requestedSearch = searchParams.get('q') || searchParams.get('search') || '';
+  const routeDefaultFilter =
+    location.pathname === CANONICAL_ROUTES.calculators ? 'calculator' : 'all';
   const [search, setSearch] = useState(requestedSearch);
   const [toolFilter, setToolFilter] = useState(
-    TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : 'all'
+    TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : routeDefaultFilter
   );
 
   useEffect(() => {
-    if (TOOL_FILTER_OPTION_VALUES.has(requestedFilter)) {
-      setToolFilter(requestedFilter);
-    }
-  }, [requestedFilter]);
+    setToolFilter(
+      TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : routeDefaultFilter
+    );
+  }, [requestedFilter, routeDefaultFilter]);
 
   useEffect(() => {
     setSearch(requestedSearch);
@@ -174,7 +166,7 @@ const ToolsOverview = () => {
     toggleFavorite,
     togglePinned,
     toggleHidden,
-    recordToolAccess
+    recordToolAccess,
   } = toolPreferences;
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
   const { user } = useUser();
@@ -226,20 +218,25 @@ const ToolsOverview = () => {
   );
   const workspaceToolIdSet = useMemo(() => new Set(workspaceToolIds), [workspaceToolIds]);
   const workspaceInventoryCount = useMemo(
-    () => (isAllToolsWorkspace ? tools.length : tools.filter((tool) => workspaceToolIdSet.has(tool.id)).length),
+    () =>
+      isAllToolsWorkspace
+        ? tools.length
+        : tools.filter((tool) => workspaceToolIdSet.has(tool.id)).length,
     [isAllToolsWorkspace, tools, workspaceToolIdSet]
   );
   const pinnedToolIdSet = useMemo(() => new Set(pinned), [pinned]);
   const favoriteToolIdSet = useMemo(() => new Set(favorites), [favorites]);
   const hiddenToolIdSet = useMemo(() => new Set(hiddenTools), [hiddenTools]);
   const profileFilteredTools = useMemo(
-    () => filterToolsForProfileGraph(profileToolGraph, toolFilter),
-    [profileToolGraph, toolFilter]
+    () =>
+      toolFilter === 'calculator'
+        ? tools
+        : filterToolsForProfileGraph(profileToolGraph, toolFilter),
+    [profileToolGraph, toolFilter, tools]
   );
   const workspaceTools = useMemo(
     () =>
       profileFilteredTools.filter((tool) => {
-        if (toolFilter === 'restricted') return true;
         return isAllToolsWorkspace || workspaceToolIdSet.has(tool.id);
       }),
     [isAllToolsWorkspace, profileFilteredTools, toolFilter, workspaceToolIdSet]
@@ -289,7 +286,7 @@ const ToolsOverview = () => {
         `Help me use ${tool.name} as clinical decision support only. Ask for any context needed before recommending next steps.`,
       'user'
     );
-    navigate('/assistant');
+    navigate(CANONICAL_ROUTES.assistant);
   };
 
   const orderedTools = useMemo(() => {
@@ -308,13 +305,9 @@ const ToolsOverview = () => {
   const showSearchEmpty = !showWorkspaceEmpty && filteredTools.length === 0;
   const filterTabs = TOOL_FILTER_OPTIONS;
   const emptyStateCopy =
-    toolFilter === 'restricted'
-      ? profile.permissionLevel === 'admin'
-        ? 'No restricted or unavailable tools match the current search. Admin-visible restricted tools will appear here when access rules block them.'
-        : 'Restricted tools are protected for this profile. Ask an administrator or switch to an authorized profile to view unavailable admin, operations, security, or high-risk AI tools.'
-      : hiddenTools.length > 0
-        ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch to All.'
-        : 'No launchable tools match the current search and filter. Try a clinical alias or reset the filters.';
+    hiddenTools.length > 0
+      ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch to All.'
+      : 'No launchable tools match the current search and filter. Try a clinical alias or reset the filters.';
 
   return (
     <div className="tools-overview">
@@ -327,7 +320,8 @@ const ToolsOverview = () => {
             Tool Library
           </h1>
           <p className="header-subtitle">
-            Browse the canonical tool library prioritized for your role, specialty, workspace, pins, and access level.
+            Browse the canonical tool library prioritized for your role, specialty, workspace, pins,
+            and access level.
           </p>
           <div className="tools-profile-summary" aria-label="Profile tool graph summary">
             <span>{profile.role}</span>
@@ -350,7 +344,11 @@ const ToolsOverview = () => {
               ))}
             </select>
           </div>
-          <div className="tools-discovery-controls" role="search" aria-label="Search and filter all tools">
+          <div
+            className="tools-discovery-controls"
+            role="search"
+            aria-label="Search and filter all tools"
+          >
             <label className="tools-search-field">
               <span>Search tools</span>
               <input
@@ -398,7 +396,11 @@ const ToolsOverview = () => {
             <div className="stat">
               <span className="stat-number">{filteredTools.length}</span>
               <span className="stat-label">
-                {searchQuery || toolFilter !== 'all' ? 'Matching' : isAllToolsWorkspace ? 'Shown' : 'Workspace tools'}
+                {searchQuery || toolFilter !== 'all'
+                  ? 'Matching'
+                  : isAllToolsWorkspace
+                    ? 'Shown'
+                    : 'Workspace tools'}
               </span>
             </div>
             <div className="stat">
@@ -452,7 +454,11 @@ const ToolsOverview = () => {
             <h2 className="tools-recent-title">No tools in this workspace</h2>
             <p>This workspace does not include any launchable tools from the current inventory.</p>
           </div>
-          <button type="button" className="btn-open-tool" onClick={() => setActiveWorkspaceId('all')}>
+          <button
+            type="button"
+            className="btn-open-tool"
+            onClick={() => setActiveWorkspaceId('all')}
+          >
             Show all tools →
           </button>
         </div>
@@ -475,140 +481,144 @@ const ToolsOverview = () => {
         </div>
       ) : (
         <div className="tools-grid">
-          {orderedTools.map(tool => (
-          <div
-            key={tool.id}
-            data-tool-id={tool.id}
-            className="tool-card-large"
-            onClick={() => handleToolClick(tool)}
-            onKeyDown={(event) => handleToolCardKeyDown(event, tool)}
-            role="button"
-            tabIndex={0}
-          >
-            <div className="tool-card-header">
-              <div className="tool-icon">
-                <span aria-hidden>
-                  <NavIcon icon={getToolIcon(tool.id)} size={28} />
-                </span>
-              </div>
-              <div className="tool-meta">
-                <h3>{tool.name}</h3>
-                <span className="tool-category">
-                  {tool.category}
-                </span>
-                <span className={`tool-category tool-category--lifecycle tool-category--lifecycle-${tool.lifecycleState}`}>
-                  {lifecycleLabel(tool)}
-                </span>
-                {tool.surface === 'chat-assisted' ? (
-                  <span className="tool-category tool-category--guided">
-                    Guided
+          {orderedTools.map((tool) => (
+            <div
+              key={tool.id}
+              data-tool-id={tool.id}
+              className="tool-card-large"
+              onClick={() => handleToolClick(tool)}
+              onKeyDown={(event) => handleToolCardKeyDown(event, tool)}
+              role="button"
+              tabIndex={0}
+            >
+              <div className="tool-card-header">
+                <div className="tool-icon">
+                  <span aria-hidden>
+                    <NavIcon icon={getToolIcon(tool.id)} size={28} />
                   </span>
-                ) : null}
-                {tool.restrictionReason ? (
-                  <span className="tool-category tool-category--restricted">
-                    {tool.restrictionReason}
+                </div>
+                <div className="tool-meta">
+                  <h3>{tool.name}</h3>
+                  <span className="tool-category">{tool.category}</span>
+                  <span
+                    className={`tool-category tool-category--lifecycle tool-category--lifecycle-${tool.lifecycleState}`}
+                  >
+                    {lifecycleLabel(tool)}
                   </span>
-                ) : null}
-              </div>
-              <div className="tool-card-actions">
-                <button
-                  className={`tool-card-action ${favoriteToolIdSet.has(tool.id) ? 'active' : ''}`}
-                  title={favoriteToolIdSet.has(tool.id) ? 'Remove from favorites' : 'Add to favorites'}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleFavorite(tool.id);
-                  }}
-                  type="button"
-                >
-                  <NavIcon
-                    icon={CHROME_ICONS.star}
-                    size={16}
-                    fill={favoriteToolIdSet.has(tool.id) ? 'currentColor' : 'none'}
-                    aria-hidden
-                  />
-                </button>
-                <button
-                  className={`tool-card-action ${pinnedToolIdSet.has(tool.id) ? 'active' : ''}`}
-                  title={pinnedToolIdSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    togglePinned(tool.id);
-                  }}
-                  type="button"
-                >
-                  <NavIcon icon={CHROME_ICONS.pin} size={16} aria-hidden />
-                </button>
-                <button
-                  className={`tool-card-action ${hiddenToolIdSet.has(tool.id) ? 'active' : ''}`}
-                  title={hiddenToolIdSet.has(tool.id) ? 'Show tool by default' : 'Hide from default views'}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleHidden(tool.id);
-                  }}
-                  type="button"
-                >
-                  <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
-                </button>
-                <div className="tool-shortcut">
-                  {tool.shortcut ? tool.shortcut.replace('Ctrl+', '⌘') : 'Open'}
+                  {tool.surface === 'chat-assisted' ? (
+                    <span className="tool-category tool-category--guided">Guided</span>
+                  ) : null}
+                  {tool.restrictionReason ? (
+                    <span className="tool-category tool-category--restricted">
+                      {tool.restrictionReason}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="tool-card-actions">
+                  <button
+                    className={`tool-card-action ${favoriteToolIdSet.has(tool.id) ? 'active' : ''}`}
+                    title={
+                      favoriteToolIdSet.has(tool.id) ? 'Remove from favorites' : 'Add to favorites'
+                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleFavorite(tool.id);
+                    }}
+                    type="button"
+                  >
+                    <NavIcon
+                      icon={CHROME_ICONS.star}
+                      size={16}
+                      fill={favoriteToolIdSet.has(tool.id) ? 'currentColor' : 'none'}
+                      aria-hidden
+                    />
+                  </button>
+                  <button
+                    className={`tool-card-action ${pinnedToolIdSet.has(tool.id) ? 'active' : ''}`}
+                    title={pinnedToolIdSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      togglePinned(tool.id);
+                    }}
+                    type="button"
+                  >
+                    <NavIcon icon={CHROME_ICONS.pin} size={16} aria-hidden />
+                  </button>
+                  <button
+                    className={`tool-card-action ${hiddenToolIdSet.has(tool.id) ? 'active' : ''}`}
+                    title={
+                      hiddenToolIdSet.has(tool.id)
+                        ? 'Show tool by default'
+                        : 'Hide from default views'
+                    }
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleHidden(tool.id);
+                    }}
+                    type="button"
+                  >
+                    <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
+                  </button>
+                  <div className="tool-shortcut">
+                    {tool.shortcut ? tool.shortcut.replace('Ctrl+', '⌘') : 'Open'}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <p className="tool-description">{tool.description}</p>
-            {tool.restrictionReason ? (
-              <p className="tool-restriction-note">Unavailable: {tool.restrictionReason}</p>
-            ) : null}
+              <p className="tool-description">{tool.description}</p>
+              {tool.restrictionReason ? (
+                <p className="tool-restriction-note">Unavailable: {tool.restrictionReason}</p>
+              ) : null}
 
-            <div className="tool-features">
-              <h4>Key Features:</h4>
-              <ul>
-                {(tool.features || []).slice(0, 3).map((feature, idx) => (
-                  <li key={idx}>
-                    <span className="feature-icon" aria-hidden>
-                      <NavIcon icon={CHROME_ICONS.check} size={14} />
-                    </span>
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="tool-use-cases">
-              <h4>Use Cases:</h4>
-              <div className="use-cases-tags">
-                {tool.useCases.slice(0, 3).map((useCase, idx) => (
-                  <span key={idx} className="use-case-tag">
-                    {useCase}
-                  </span>
-                ))}
+              <div className="tool-features">
+                <h4>Key Features:</h4>
+                <ul>
+                  {(tool.features || []).slice(0, 3).map((feature, idx) => (
+                    <li key={idx}>
+                      <span className="feature-icon" aria-hidden>
+                        <NavIcon icon={CHROME_ICONS.check} size={14} />
+                      </span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
 
-            <div className="tool-actions">
-              <button
-                className="btn-open-tool"
-                disabled={Boolean(tool.restrictionReason)}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleToolClick(tool);
-                }}
-              >
-                {primaryActionLabel(tool)} →
-              </button>
-              {hasMeaningfulAssistantAction(tool) && !tool.restrictionReason ? (
+              <div className="tool-use-cases">
+                <h4>Use Cases:</h4>
+                <div className="use-cases-tags">
+                  {tool.useCases.slice(0, 3).map((useCase, idx) => (
+                    <span key={idx} className="use-case-tag">
+                      {useCase}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="tool-actions">
                 <button
-                  className="btn-chat-tool"
+                  className="btn-open-tool"
+                  disabled={Boolean(tool.restrictionReason)}
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleAssistantLaunch(tool);
+                    handleToolClick(tool);
                   }}
                 >
-                  Ask Assistant
+                  {primaryActionLabel(tool)} →
                 </button>
-              ) : null}
+                {hasMeaningfulAssistantAction(tool) && !tool.restrictionReason ? (
+                  <button
+                    className="btn-chat-tool"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleAssistantLaunch(tool);
+                    }}
+                  >
+                    Ask Assistant
+                  </button>
+                ) : null}
+              </div>
             </div>
-          </div>
           ))}
         </div>
       )}
@@ -631,7 +641,10 @@ const ToolsOverview = () => {
               <NavIcon icon={CHROME_ICONS.messageCircle} size={32} />
             </span>
             <h3>Ask Assistant</h3>
-            <p>Send context to Assistant when you want guidance, preview, or confirmation before acting.</p>
+            <p>
+              Send context to Assistant when you want guidance, preview, or confirmation before
+              acting.
+            </p>
           </div>
           <div className="tip-card">
             <span className="tip-icon" aria-hidden>
@@ -645,7 +658,10 @@ const ToolsOverview = () => {
               <NavIcon icon={CHROME_ICONS.bot} size={32} />
             </span>
             <h3>Power stays underneath</h3>
-            <p>Existing backend commands and deterministic executors still run behind the simpler surface.</p>
+            <p>
+              Existing backend commands and deterministic executors still run behind the simpler
+              surface.
+            </p>
           </div>
         </div>
       </div>

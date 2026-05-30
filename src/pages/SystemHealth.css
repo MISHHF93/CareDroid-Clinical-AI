@@ -1,0 +1,185 @@
+.system-health-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: min(1180px, 100%);
+  max-width: 100%;
+  min-width: 0;
+  margin-inline: auto;
+  color: var(--app-fg);
+}
+
+.system-health-hero,
+.system-health-verdict,
+.system-health-section,
+.system-health-endpoint-grid article {
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--compact-panel-radius, 24px);
+  background: var(--app-surface-1);
+  box-shadow: var(--app-shadow-1);
+}
+
+.system-health-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: clamp(20px, 4vw, 30px);
+}
+
+.system-health-eyebrow {
+  margin: 0 0 8px;
+  color: var(--app-accent-interactive);
+  font-size: 0.78rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.system-health-hero h1,
+.system-health-verdict h2,
+.system-health-section h2 {
+  margin: 0;
+  color: var(--app-fg);
+}
+
+.system-health-hero h1 {
+  font-size: clamp(1.8rem, 5vw, 3.1rem);
+  line-height: 1.05;
+}
+
+.system-health-hero p,
+.system-health-verdict p,
+.system-health-section p {
+  max-width: 76ch;
+  color: var(--app-fg-muted);
+  line-height: 1.65;
+}
+
+.system-health-hero code {
+  margin-inline: 4px;
+  color: var(--app-fg);
+}
+
+.system-health-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--app-min-touch-target, 44px);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--app-accent-interactive);
+  color: var(--app-on-solid);
+  font-weight: 850;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.system-health-verdict,
+.system-health-section {
+  padding: clamp(16px, 3vw, 24px);
+}
+
+.system-health-verdict {
+  border-color: color-mix(in srgb, var(--app-warning) 46%, var(--app-panel-border));
+}
+
+.system-health-status--ok {
+  border-color: color-mix(in srgb, var(--app-success) 52%, var(--app-panel-border));
+}
+
+.system-health-status--danger {
+  border-color: color-mix(in srgb, var(--app-danger) 56%, var(--app-panel-border));
+}
+
+.system-health-status-pill {
+  display: inline-flex;
+  margin-bottom: 10px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-accent-interactive) 16%, transparent);
+  color: var(--app-accent-interactive);
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.system-health-message {
+  color: var(--app-warning);
+}
+
+.system-health-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 12px;
+  margin: 16px 0 0;
+}
+
+.system-health-card {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--compact-card-radius, 16px);
+  background: var(--app-surface-2);
+}
+
+.system-health-card dt {
+  margin: 0 0 7px;
+  color: var(--app-fg-muted);
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.system-health-card dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--app-fg);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.9rem;
+}
+
+.system-health-endpoint-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.system-health-endpoint-grid article {
+  min-width: 0;
+  padding: 16px;
+}
+
+.system-health-endpoint-grid h3 {
+  margin: 0 0 8px;
+}
+
+.system-health-endpoint-grid pre {
+  max-width: 100%;
+  max-height: 300px;
+  margin: 12px 0 0;
+  overflow: auto;
+  padding: 12px;
+  border-radius: 14px;
+  background: var(--app-code-bg, rgba(15, 23, 42, 0.08));
+  color: var(--app-fg);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 760px) {
+  .system-health-hero,
+  .system-health-endpoint-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .system-health-hero {
+    flex-direction: column;
+  }
+
+  .system-health-link {
+    width: 100%;
+  }
+}

@@ -82,7 +82,7 @@ describe('Sidebar — responsive drawer contracts', () => {
 
   it('exposes dialog semantics and close control on compact drawer', () => {
     expect(sidebarSource).toContain("aria-modal={layoutCompact && mobileNavOpen ? 'true' : undefined}");
-    expect(sidebarSource).toContain("aria-label={layoutCompact ? 'Close menu'");
+    expect(sidebarSource).toMatch(/aria-label=\{[\s\S]*layoutCompact[\s\S]*\? 'Close menu'/);
     expect(sidebarSource).toContain('CHROME_ICONS.close');
   });
 

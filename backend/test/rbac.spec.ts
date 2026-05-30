@@ -1,9 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication, ForbiddenException } from '@nestjs/common';
 import { ChatController } from '../src/modules/chat/chat.controller';
 import { ChatService } from '../src/modules/chat/chat.service';
 import { AuditService } from '../src/modules/audit/audit.service';
-import { AuthorizationGuard } from '../src/modules/auth/guards/authorization.guard';
 import { UserRole } from '../src/modules/users/entities/user.entity';
 import {
   RolePermissions,
@@ -14,7 +12,6 @@ import {
   getEffectivePermissions,
 } from '../src/modules/auth/config/role-permissions.config';
 import { Permission, PermissionMetadata } from '../src/modules/auth/enums/permission.enum';
-import { AuditAction } from '../src/modules/audit/entities/audit-log.entity';
 
 /**
  * RBAC (Role-Based Access Control) Tests - Batch 15 Phase 3
@@ -32,9 +29,9 @@ import { AuditAction } from '../src/modules/audit/entities/audit-log.entity';
  */
 
 describe('RBAC System (Batch 15 Phase 3)', () => {
-  let chatController: ChatController;
-  let chatService: ChatService;
-  let auditService: AuditService;
+  let _chatController: ChatController;
+  let _chatService: ChatService;
+  let _auditService: AuditService;
   let module: TestingModule;
 
   beforeEach(async () => {
@@ -72,9 +69,9 @@ describe('RBAC System (Batch 15 Phase 3)', () => {
       ],
     }).compile();
 
-    chatController = module.get<ChatController>(ChatController);
-    chatService = module.get<ChatService>(ChatService);
-    auditService = module.get<AuditService>(AuditService);
+    _chatController = module.get<ChatController>(ChatController);
+    _chatService = module.get<ChatService>(ChatService);
+    _auditService = module.get<AuditService>(AuditService);
   });
 
   afterEach(() => {

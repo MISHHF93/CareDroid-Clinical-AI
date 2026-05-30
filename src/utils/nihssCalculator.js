@@ -43,8 +43,6 @@ export const NIHSS_ITEM_META = [
   { key: 'extinctionInattention', label: '11 — Extinction / inattention', min: 0, max: 2, untestableCode: null },
 ];
 
-const NIHSS_KEYS = NIHSS_ITEM_META.map((r) => r.key);
-
 /**
  * Untestable (9) contributes 0 to the total per standard NIHSS summation.
  * @param {number} itemScore

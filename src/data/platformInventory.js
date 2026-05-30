@@ -21,7 +21,6 @@ import {
   FLEET_TIER_A_REGISTRY_IDS,
   NLU_HUB_ONLY_PROFILE_TOOL_IDS,
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
-  REGISTRY,
 } from './clinicalToolIdContract';
 import { CALCULATOR_ROUTE_DEFS, KNOWN_TOOL_AREA_PATHS } from '../routes/clinicalToolRoutes';
 

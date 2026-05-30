@@ -12,10 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import toolRegistry, { toolRegistryById } from './toolRegistry';
 import { resolveCatalogLaunch } from './clinicalCatalogWiring';
-import {
-  getCalculatorToolInventory,
-  getUserFacingToolInventory,
-} from './toolInventory';
+import { getCalculatorToolInventory, getUserFacingToolInventory } from './toolInventory';
 import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -145,9 +142,15 @@ describe('full platform consolidation contract', () => {
 
     expect(appSource).toContain('ASSISTANT_ROUTE_ALIASES');
     expect(appSource).toContain('TOOLS_ROUTE_ALIASES');
-    expect(routeConfigSource).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])");
-    expect(routeConfigSource).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])");
-    expect(routeConfigSource).toContain("export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations'])");
+    expect(routeConfigSource).toContain(
+      "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
+    );
+    expect(routeConfigSource).toContain(
+      "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
+    );
+    expect(routeConfigSource).toContain(
+      'export const OPERATIONS_ROUTE_ALIASES = Object.freeze([])'
+    );
     expect(appSource).toContain("path: '/home'");
     expect(appSource).toContain('to="/dashboard"');
     expect(appSource).not.toMatch(/element:\s*null|element:\s*undefined/);
@@ -187,7 +190,10 @@ describe('full platform consolidation contract', () => {
   it('keeps AI-native systems, governance, profile, maps, and telemetry visible', () => {
     for (const toolId of REQUIRED_AI_SYSTEM_TOOLS) {
       expect(toolRegistryById[toolId], toolId).toBeTruthy();
-      expect(resolveCatalogLaunch(toolId).path || resolveCatalogLaunch(toolId).chatSeed, toolId).toBeTruthy();
+      expect(
+        resolveCatalogLaunch(toolId).path || resolveCatalogLaunch(toolId).chatSeed,
+        toolId
+      ).toBeTruthy();
     }
 
     for (const toolId of [
@@ -198,7 +204,9 @@ describe('full platform consolidation contract', () => {
       'live-tracking-map',
     ]) {
       expect(toolRegistryById[toolId], toolId).toBeTruthy();
-      expect(resolveCatalogLaunch(toolId).path, toolId).toMatch(/^\/(hospital-map|medical-iot|devices|fleet|live-map)/);
+      expect(resolveCatalogLaunch(toolId).path, toolId).toMatch(
+        /^\/(hospital-map|medical-iot|devices|fleet|live-map)/
+      );
     }
   });
 
@@ -221,6 +229,8 @@ describe('full platform consolidation contract', () => {
     expect(indexCss).toMatch(/html\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(appShellCss).toMatch(/\.app-shell-page-body--conversation\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(
+      /\.app-shell-page-body--conversation\s*\{[\s\S]*overflow:\s*hidden/
+    );
   });
 });

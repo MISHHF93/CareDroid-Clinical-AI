@@ -177,7 +177,7 @@ export class NluMetricsService {
    * @param service - Service name
    * @returns Current state (0 = closed, 1 = open)
    */
-  getCircuitBreakerState(service: 'nlu_model' | 'llm'): number {
+  getCircuitBreakerState(_service: 'nlu_model' | 'llm'): number {
     // This is a gauge, so we can't directly get the value without querying Prometheus
     // This method is for internal tracking if needed
     return 0; // Default to closed

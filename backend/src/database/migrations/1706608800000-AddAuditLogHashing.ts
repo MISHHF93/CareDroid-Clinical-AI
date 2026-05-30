@@ -63,7 +63,7 @@ export class AddAuditLogHashing1706608800000 implements MigrationInterface {
       const hashIndexName = 'IDX_audit_logs_hash';
       try {
         await queryRunner.dropIndex('audit_logs', hashIndexName);
-      } catch (e) {
+      } catch (_e) {
         // Index doesn't exist, continue
       }
 

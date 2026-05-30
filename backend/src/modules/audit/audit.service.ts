@@ -171,7 +171,7 @@ export class AuditService {
     });
   }
 
-  async findPhiAccess(startDate: Date, endDate: Date) {
+  async findPhiAccess(_startDate: Date, _endDate: Date) {
     return this.auditRepository.find({
       where: {
         phiAccessed: true,
