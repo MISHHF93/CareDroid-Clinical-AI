@@ -14,6 +14,11 @@ export function parseToolExecutionResponse(json) {
       ok,
       data: inner.data ?? null,
       errors: inner.errors || (ok ? [] : ['Tool execution failed']),
+      interpretation: inner.interpretation,
+      warnings: inner.warnings || [],
+      citations: inner.citations || [],
+      disclaimer: inner.disclaimer,
+      timestamp: inner.timestamp,
       toolId: json.toolId,
       toolName: json.toolName,
     };
@@ -26,6 +31,11 @@ export function parseToolExecutionResponse(json) {
       ok,
       data: inner.data ?? null,
       errors: inner.errors || [],
+      interpretation: inner.interpretation,
+      warnings: inner.warnings || [],
+      citations: inner.citations || [],
+      disclaimer: inner.disclaimer,
+      timestamp: inner.timestamp,
       toolId: json.data.toolId,
       toolName: json.data.toolName,
     };

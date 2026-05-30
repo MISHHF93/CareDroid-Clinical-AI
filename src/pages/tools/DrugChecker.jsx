@@ -115,13 +115,13 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
         throw new Error(parsed.errors?.[0] || 'Drug interaction check failed');
       }
 
-      const data = execution.raw || {};
-
       const normalized = normalizeDrugCheckResults(parsed.data);
-      const interpretation = data?.result?.interpretation;
+      const interpretation = execution.interpretation;
       if (interpretation) {
         normalized.summary = interpretation;
       }
+      normalized.warnings = execution.warnings || normalized.warnings || [];
+      normalized.disclaimer = execution.disclaimer || normalized.disclaimer;
       setResults(normalized);
 
       offlineService.saveToolResult({
@@ -269,15 +269,26 @@ const DrugChecker = ({ embedded = false, onCloseEmbedded } = {}) => {
             {results.warnings.length > 0 && (
               <div className="result-card">
                 <h3 className="result-title">⚡ Clinical Warnings</h3>
-                {results.warnings.map((warning, idx) => (
-                  <div key={idx} className="warning-item">
-                    <div className="warning-drug">{warning.drug}</div>
-                    <div className="warning-text">{warning.warning}</div>
-                    <div className="warning-recommendation">
-                      <strong>Recommendation:</strong> {warning.recommendation}
+                {results.warnings.map((warning, idx) => {
+                  const warningText = typeof warning === 'string' ? warning : warning.warning;
+                  return (
+                    <div key={idx} className="warning-item">
+                      {warning.drug ? <div className="warning-drug">{warning.drug}</div> : null}
+                      <div className="warning-text">{warningText}</div>
+                      {warning.recommendation ? (
+                        <div className="warning-recommendation">
+                          <strong>Recommendation:</strong> {warning.recommendation}
+                        </div>
+                      ) : null}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+              </div>
+            )}
+
+            {results.disclaimer && (
+              <div className="result-card">
+                <p className="disclaimer">{results.disclaimer}</p>
               </div>
             )}
 

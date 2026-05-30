@@ -98,7 +98,14 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
         throw new Error(execution.message || 'Failed to interpret lab values');
       }
       if (execution.data != null) {
-        setResults(execution.data);
+        setResults({
+          ...execution.data,
+          interpretation: execution.interpretation || execution.data.interpretation,
+          warnings: execution.warnings || execution.data.warnings || [],
+          citations: execution.citations || execution.data.citations || [],
+          disclaimer: execution.disclaimer || execution.data.disclaimer,
+          timestamp: execution.timestamp || execution.data.timestamp,
+        });
       } else {
         throw new Error(execution.errors?.[0] || 'Unknown error occurred');
       }
@@ -365,7 +372,7 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
  * Lab Results Display Component
  */
 const LabResults = ({ results }) => {
-  const { summary, criticalValues, interpretation, groupedByCategory, interpretations } = results;
+  const { summary, criticalValues, interpretation, groupedByCategory, interpretations, disclaimer, warnings } = results;
 
   return (
     <>
@@ -417,6 +424,17 @@ const LabResults = ({ results }) => {
       {interpretation && (
         <div className={`lab-overall-interpretation ${criticalValues?.length > 0 ? 'critical' : ''}`}>
           {interpretation}
+        </div>
+      )}
+
+      {warnings?.length > 0 && (
+        <div className="lab-critical-alert">
+          <div className="lab-critical-alert-header">Clinical Warnings</div>
+          <ul className="lab-critical-values-list">
+            {warnings.map((warning) => (
+              <li key={warning}>{warning}</li>
+            ))}
+          </ul>
         </div>
       )}
 
@@ -510,7 +528,7 @@ const LabResults = ({ results }) => {
           </span>
           Clinical Disclaimer:
         </strong>{' '}
-        Clinical decision support only — does not establish a diagnosis. Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history. This tool provides educational information only and is not a substitute for professional medical judgment.
+        Clinical decision support only — does not establish a diagnosis. {disclaimer || 'Lab interpretation is context-dependent. Results should be evaluated by qualified healthcare providers in conjunction with clinical presentation and patient history.'} This tool provides educational information only and is not a substitute for professional medical judgment.
       </div>
     </>
   );

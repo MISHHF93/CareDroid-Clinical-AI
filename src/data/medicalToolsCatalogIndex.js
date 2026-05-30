@@ -46,8 +46,9 @@ function buildFromNlu(nlu) {
       c.id === nlu.toolId ||
       (nlu.toolId === 'cha2ds2vasc-calculator' && c.id === 'chads2vasc')
   );
+  const hasDedicatedForm = Boolean(inventoryRecord?.calculatorSlug || uiCalc);
   const hubOnly =
-    nluCalculatorHubOnly.some((h) => h.toolId === nlu.toolId) ||
+    (nluCalculatorHubOnly.some((h) => h.toolId === nlu.toolId) && !hasDedicatedForm) ||
     Boolean(!uiCalc && nlu.path && isCalculatorsHubPath(nlu.path) && !nlu.backendExecutable);
 
   return {
@@ -64,7 +65,9 @@ function buildFromNlu(nlu) {
       nlu.backendExecutable || inventoryRecord?.executorStatus === TOOL_EXECUTOR_STATUS.REGISTERED
     ),
     uiCalculatorSlug: inventoryRecord?.calculatorSlug || uiCalc?.id || null,
-    chatOnlyForm: hubOnly || inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED,
+    chatOnlyForm:
+      hubOnly ||
+      (inventoryRecord?.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED && !hasDedicatedForm),
     accessSummary: null,
     source: 'NLU (tool.patterns.ts)',
   };
