@@ -102,7 +102,8 @@ export class AIService {
       ['gpt-4o-mini', { inputPer1kTokens: 0.00015, outputPer1kTokens: 0.0006 }],
     ]);
 
-    // Tool definitions for Claude's tool_use block handling
+    // Legacy LLM function schema. Canonical executor IDs/aliases live in
+    // tool-orchestrator.registry.ts and ChatService normalizes these names.
     this.toolDefinitions = [
       {
         name: 'sofa_calculator',

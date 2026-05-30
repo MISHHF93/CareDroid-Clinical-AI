@@ -17,7 +17,7 @@ export class AppController {
 
   @Get('config/system')
   getSystemConfig() {
-    const authConfig = this.configService.get<any>('auth') || {};
+    const sessionConfig = this.configService.get<any>('session') || {};
     const ragConfig = this.configService.get<any>('rag') || {};
 
     return {
@@ -27,8 +27,8 @@ export class AppController {
         minScore: ragConfig.retrieval?.minScore || 0.7,
       },
       session: {
-        idleTimeoutMs: authConfig.sessionConfig?.idleTimeout || 1800000, // 30 min
-        absoluteTimeoutMs: authConfig.sessionConfig?.absoluteTimeout || 28800000, // 8 hours
+        idleTimeoutMs: sessionConfig.idleTimeout || 1800000, // 30 min
+        absoluteTimeoutMs: sessionConfig.absoluteTimeout || 28800000, // 8 hours
       },
     };
   }

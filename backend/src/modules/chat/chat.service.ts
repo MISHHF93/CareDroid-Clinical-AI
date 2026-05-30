@@ -4,6 +4,8 @@ import { AIService } from '../ai/ai.service';
 import { IntentClassifierService } from '../medical-control-plane/intent-classifier/intent-classifier.service';
 import { ToolOrchestratorService } from '../medical-control-plane/tool-orchestrator/tool-orchestrator.service';
 import {
+  REGISTRY_ID_TO_EXECUTOR_TOOL_ID,
+  resolveLegacyLlmToolName,
   ToolExecutionErrorCode,
   UNSUPPORTED_ORCHESTRATOR_TOOL_DOCS,
 } from '../medical-control-plane/tool-orchestrator/tool-orchestrator.registry';
@@ -595,12 +597,7 @@ export class ChatService {
     if (!toolHint || !classification) {
       return classification;
     }
-    const registryToOrchestrator: Record<string, string> = {
-      'drug-check': 'drug-interactions',
-      'lab-interp': 'lab-interpreter',
-      'sofa-score': 'sofa-calculator',
-    };
-    const targetId = registryToOrchestrator[toolHint];
+    const targetId = REGISTRY_ID_TO_EXECUTOR_TOOL_ID[toolHint];
     if (!targetId) {
       return classification;
     }
@@ -941,12 +938,7 @@ export class ChatService {
    * Map Claude tool names to internal tool IDs
    */
   private mapToolName(claudeToolName: string): string {
-    const toolMap = {
-      sofa_calculator: 'sofa-calculator',
-      drug_checker: 'drug-interactions',
-      lab_interpreter: 'lab-interpreter',
-    };
-    return toolMap[claudeToolName] || claudeToolName;
+    return resolveLegacyLlmToolName(claudeToolName) || claudeToolName;
   }
 
   private async handleCalculatorRecommendation(

@@ -12,6 +12,7 @@ export const ENV_CONFIG = Object.freeze({
   apiUrl: appConfig.api.baseUrl,
   wsUrl: appConfig.api.wsUrl,
   demoMode: appConfig.features.enableDemoMode,
+  allowLocalDemoAuth: appConfig.features.allowLocalDemoAuth,
   enableDevAuthBypass: appConfig.features.enableDevAuthBypass,
   showDemoAuth: appConfig.features.showDemoAuth,
   hideDivisionMode: appConfig.features.hideDivisionMode,

@@ -4,6 +4,8 @@
  */
 
 import appConfig from '../config/appConfig';
+import { API_ROUTES } from '../config/api.config';
+import { apiFetchJson } from './apiClient';
 import logger from '../utils/logger';
 
 export interface ChatMessage {
@@ -26,14 +28,10 @@ export interface OpenAIResponse {
 }
 
 class OpenAIService {
-  private apiKey: string;
   private model: string;
-  private baseUrl: string;
 
   constructor() {
-    this.apiKey = appConfig.ai.openai.apiKey;
     this.model = appConfig.ai.openai.model;
-    this.baseUrl = appConfig.ai.openai.baseUrl;
   }
 
   /**
@@ -41,45 +39,30 @@ class OpenAIService {
    * @param request Chat completion request with messages
    */
   async createChatCompletion(request: ChatCompletionRequest): Promise<OpenAIResponse> {
-    if (!this.apiKey) {
-      logger.warn('OpenAI API key not configured');
-      return { success: false, error: 'OpenAI API key not configured' };
-    }
-
     try {
-      const payload = {
-        model: this.model,
-        messages: request.messages,
-        temperature: request.temperature ?? 0.7,
-        max_tokens: request.max_tokens ?? 2000,
-        top_p: request.top_p ?? 1.0,
-      };
-
-      logger.debug('OpenAI chat completion request', { model: this.model });
-
-      const response = await fetch(`${this.baseUrl}/chat/completions`, {
+      const lastUserMessage = [...request.messages].reverse().find((message) => message.role === 'user');
+      const { response, data } = await apiFetchJson(API_ROUTES.chat.message, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify(payload),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: lastUserMessage?.content || request.messages.map((message) => message.content).join('\n'),
+        }),
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(
-          `OpenAI API error: ${response.statusText} - ${errorData.error?.message || 'Unknown error'}`,
-        );
+        throw new Error(data?.message || `AI backend request failed: ${response.statusText}`);
       }
 
-      const data = await response.json();
-      logger.debug('OpenAI response received', {
-        model: data.model,
-        tokensUsed: data.usage?.total_tokens,
-      });
+      logger.debug('Backend AI response received', { model: this.model });
 
-      return { success: true, data };
+      return {
+        success: true,
+        data: {
+          model: this.model,
+          choices: [{ message: { role: 'assistant', content: data.response || '' } }],
+          raw: data,
+        },
+      };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       logger.error('OpenAI API request failed', error);
@@ -102,7 +85,7 @@ class OpenAIService {
    * Check if OpenAI is configured
    */
   isConfigured(): boolean {
-    return !!this.apiKey && !!this.model;
+    return !!this.model;
   }
 
   /**
@@ -115,12 +98,8 @@ class OpenAIService {
   /**
    * Update configuration (for dynamic switching)
    */
-  setConfig(apiKey: string, model: string, baseUrl?: string): void {
-    this.apiKey = apiKey;
+  setConfig(_apiKey: string, model: string, _baseUrl?: string): void {
     this.model = model;
-    if (baseUrl) {
-      this.baseUrl = baseUrl;
-    }
     logger.info(`OpenAI config updated: model=${model}`);
   }
 }

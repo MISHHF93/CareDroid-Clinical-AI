@@ -11,6 +11,7 @@ Date: 2026-05-30
 - **Theme/layout:** CSS tokens and JS breakpoint constants were split across `theme-tokens.css`, `design-tokens.css`, `layout/designTokens.js`, and `layout/breakpoints.js`.
 - **API/env/auth:** API path handling existed in `apiEnv.js`, app env parsing in `appConfig.js`, token storage keys were repeated in multiple services, and backend config endpoints were string literals in `configService.js`.
 - **Backend executors:** backend executable tool IDs, aliases, unsupported NLU IDs, and request contracts were already centralized in `backend/src/modules/medical-control-plane/tool-orchestrator/tool-orchestrator.registry.ts`.
+- **Build/deploy env:** Vercel defaulted to same-origin API without a verified `/api` proxy, Docker supplied `DATABASE_URL` while backend DB config read discrete host fields, and browser OpenAI config exposed a frontend key path.
 
 ## Canonical Configs Created
 
@@ -38,6 +39,15 @@ Date: 2026-05-30
 - `src/routing/authPathAliases.js` is retained as a deprecated compatibility projection that re-exports aliases from `routes.config`.
 - `src/navigation/primaryNavigation.js`, `src/data/workspaceArchitecture.js`, `src/layout/breakpoints.js`, and `src/config/apiEnv.js` remain implementation/source modules for compatibility and tests. Active UI consumers now go through `src/config/*` projections where safe.
 - Backend executor mapping remains in `tool-orchestrator.registry.ts`; no competing backend executor registry was introduced.
+- Legacy LLM function names are now documented in `LEGACY_LLM_TOOL_NAME_TO_EXECUTOR` and normalized to canonical executor IDs at chat boundaries.
+
+## Build / Env Fixes
+
+- `vercel.json` no longer defaults `VITE_ALLOW_SAME_ORIGIN_API=true`; Vercel builds require `VITE_API_URL` unless a same-origin API proxy is explicitly verified.
+- `scripts/validate-vercel-env.mjs` fails deployed frontend builds when `/api/*` could fall through to the SPA catch-all.
+- `backend/src/config/database-url.config.ts` centralizes Postgres connection resolution and gives `DATABASE_URL` precedence for Docker and hosted environments.
+- `backend/src/config/env.validation.ts` adds a canonical Joi validation layer for critical backend env shape and production secret defaults.
+- `src/services/openaiService.ts` now routes AI requests through backend chat APIs, and `VITE_OPENAI_API_KEY` was removed from frontend env config examples.
 
 ## Layout Config Fixes
 
@@ -50,10 +60,12 @@ Date: 2026-05-30
 - `/auth` remains the single canonical auth route.
 - Login/signup aliases remain redirects and are now owned by `routes.config`.
 - Demo auth exposure is resolved through `AUTH_CONFIG.demo.exposed`, preserving `VITE_DEMO_MODE`, `VITE_ENABLE_DEV_AUTH_BYPASS`, and `VITE_SHOW_DEMO_AUTH` behavior without duplicating flag logic in the auth page.
+- Browser-only local demo fallback is disabled in production by default; hosted demos must use the backend dev-session endpoint, with production opt-in gated by `ALLOW_DEMO_AUTH_IN_PRODUCTION=true`.
 
 ## Tests Added / Updated
 
 - Added `src/config/canonicalConfig.contract.test.js` to enforce canonical route/auth/API/layout/theme/workspace/tool contracts.
+- Updated `src/config/buildConfigConsistency.test.js` to cover Vercel API validation, Docker/database URL alignment, and backend-only OpenAI keys.
 - Updated route and consolidation tests to assert `App.jsx` consumes route config instead of owning local alias arrays.
 - Ran backend executor registry tests to verify registered executors, aliases, unsupported NLU tools, and request contracts are still registered once.
 
@@ -62,3 +74,4 @@ Date: 2026-05-30
 - Some lower-level implementation modules are intentionally still imported by tests and data/reporting code. They are compatibility sources, not new active user-facing config maps.
 - Full route rendering still lives in `App.jsx`; moving every route object into a pure config file would be a larger router refactor and should be done in a separate PR-sized pass.
 - Several legacy source-level tests still inspect strings in implementation files. They were updated where touched, but future config moves should continue reducing source-string coupling.
+- Backend lint still reports pre-existing warnings in unrelated files, but no lint errors block the build.

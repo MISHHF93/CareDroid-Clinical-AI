@@ -47,6 +47,10 @@ export async function createDevAuthSession() {
       };
     }
   } catch (err) {
+    if (!AUTH_CONFIG.demo.allowLocalFallback) {
+      logger.error('Backend demo session unavailable and local fallback is disabled', { err });
+      throw err;
+    }
     logger.warn('Dev session API unavailable, using local demo session only', { err });
   }
 

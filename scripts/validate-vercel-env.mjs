@@ -7,15 +7,21 @@ const isVercelDeploy = isVercel && Boolean(vercelEnv);
 
 const apiUrl = trim(process.env.VITE_API_URL);
 const allowSameOriginApi = isTruthy(process.env.VITE_ALLOW_SAME_ORIGIN_API);
+const sameOriginProxyVerified = isTruthy(process.env.VITE_SAME_ORIGIN_API_PROXY_VERIFIED);
 const hideDivisionMode = trim(process.env.VITE_HIDE_DIVISION_MODE);
 const demoMode = trim(process.env.VITE_DEMO_MODE);
-const enableDevAuthBypass = trim(process.env.VITE_ENABLE_DEV_AUTH_BYPASS);
 
 const failures = [];
 
 if (isVercelDeploy && !apiUrl && !allowSameOriginApi) {
   failures.push(
-    'VITE_API_URL is required for Vercel frontend deploys unless VITE_ALLOW_SAME_ORIGIN_API=true is set for a verified edge proxy.'
+    'VITE_API_URL is required for Vercel frontend deploys. Same-origin /api is only valid with a verified proxy in front of the SPA.'
+  );
+}
+
+if (isVercelDeploy && allowSameOriginApi && !sameOriginProxyVerified) {
+  failures.push(
+    'VITE_ALLOW_SAME_ORIGIN_API=true requires VITE_SAME_ORIGIN_API_PROXY_VERIFIED=true so /api/* cannot fall through to index.html.'
   );
 }
 
@@ -31,12 +37,6 @@ if (isVercelDeploy && hideDivisionMode.toLowerCase() === 'false') {
 
 if (isVercelDeploy && demoMode.toLowerCase() !== 'true') {
   failures.push('VITE_DEMO_MODE=true is required so hosted demo deployments show Direct Sign In.');
-}
-
-if (isVercelDeploy && enableDevAuthBypass.toLowerCase() !== 'true') {
-  failures.push(
-    'VITE_ENABLE_DEV_AUTH_BYPASS=true is required to keep Vercel and local demo auth settings aligned.'
-  );
 }
 
 if (failures.length) {

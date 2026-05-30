@@ -12,6 +12,18 @@ describe('build and service config consistency', () => {
     expect(compose).toContain('- "3000:3000"');
     expect(compose).toContain('- "8000:8000"');
     expect(compose).toContain('VITE_API_PROXY_TARGET: ${VITE_API_PROXY_TARGET:-http://backend:3000}');
+    expect(compose).toContain('DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-secure123}@postgres:5432/${DB_NAME:-caredroid}');
+    expect(read('backend/src/config/database.config.ts')).toContain('buildPostgresOptions');
+    expect(read('backend/src/data-source.ts')).toContain('buildPostgresOptions');
+  });
+
+  it('does not allow Vercel same-origin /api unless a proxy is verified', () => {
+    const vercel = read('vercel.json');
+    const validator = read('scripts/validate-vercel-env.mjs');
+
+    expect(vercel).toContain('VITE_ALLOW_SAME_ORIGIN_API:-false');
+    expect(validator).toContain('VITE_SAME_ORIGIN_API_PROXY_VERIFIED');
+    expect(validator).toContain('VITE_API_URL is required for Vercel frontend deploys');
   });
 
   it('keeps backend production entrypoint aligned with package.json', () => {
@@ -37,5 +49,11 @@ describe('build and service config consistency', () => {
 
     expect(dockerfile).toContain('EXPOSE 8000');
     expect(dockerfile).toContain('CMD ["npm", "run", "dev:lan"]');
+  });
+
+  it('keeps OpenAI API keys backend-only', () => {
+    expect(read('.env.example')).not.toContain('VITE_OPENAI_API_KEY=');
+    expect(read('src/config/appConfig.js')).not.toContain('VITE_OPENAI_API_KEY');
+    expect(read('src/services/openaiService.ts')).toContain('API_ROUTES.chat.message');
   });
 });

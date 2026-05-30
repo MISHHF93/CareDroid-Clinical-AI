@@ -21,6 +21,9 @@ export const AUTH_CONFIG = Object.freeze({
     get showDemoAuth() {
       return ENV_CONFIG.showDemoAuth;
     },
+    get allowLocalFallback() {
+      return ENV_CONFIG.allowLocalDemoAuth;
+    },
     get exposed() {
       return shouldExposeDemoAuth();
     },

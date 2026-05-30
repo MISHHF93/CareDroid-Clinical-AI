@@ -18,6 +18,14 @@ export const EXECUTOR_ID_ALIASES: Readonly<Record<string, RegisteredExecutorTool
   'drug-interaction-checker': 'drug-interactions',
 };
 
+/** Legacy LLM function names retained only for old tool_use payload normalization. */
+export const LEGACY_LLM_TOOL_NAME_TO_EXECUTOR: Readonly<Record<string, RegisteredExecutorToolId>> =
+  {
+    sofa_calculator: 'sofa-calculator',
+    drug_checker: 'drug-interactions',
+    lab_interpreter: 'lab-interpreter',
+  };
+
 /**
  * Sidebar registry id → canonical executor id (mirrors frontend REGISTRY_ID_TO_ORCHESTRATOR_TOOL).
  */
@@ -386,6 +394,10 @@ export function resolveExecutorToolId(toolId: string): {
   }
 
   return null;
+}
+
+export function resolveLegacyLlmToolName(toolName: string): RegisteredExecutorToolId | null {
+  return LEGACY_LLM_TOOL_NAME_TO_EXECUTOR[String(toolName || '').trim()] ?? null;
 }
 
 export function classifyToolExecutionError(toolId: string): ToolExecutionErrorCode {

@@ -243,6 +243,10 @@ export class AuthService {
       process.env.ENABLE_DEV_AUTH_BYPASS,
       process.env.VITE_ENABLE_DEV_AUTH_BYPASS,
     ].some((value) => String(value).toLowerCase() === 'true');
+    const productionDemoAuthEnabled = [
+      this.configService.get<string | boolean>('ALLOW_DEMO_AUTH_IN_PRODUCTION'),
+      process.env.ALLOW_DEMO_AUTH_IN_PRODUCTION,
+    ].some((value) => String(value).toLowerCase() === 'true');
     const nodeEnv = process.env.NODE_ENV || 'development';
     const isLocalDevelopment =
       nodeEnv === 'development' && ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(ipAddress);
@@ -251,8 +255,10 @@ export class AuthService {
       throw new ForbiddenException('Dev session requires ENABLE_DEV_AUTH_BYPASS=true');
     }
 
-    if (nodeEnv === 'production') {
-      throw new ForbiddenException('Dev session is not available in production');
+    if (nodeEnv === 'production' && !(explicitDevBypassEnabled && productionDemoAuthEnabled)) {
+      throw new ForbiddenException(
+        'Dev session is not available in production unless ALLOW_DEMO_AUTH_IN_PRODUCTION=true',
+      );
     }
 
     const email = process.env.DEV_LOGIN_EMAIL || 'dev@caredroid.local';

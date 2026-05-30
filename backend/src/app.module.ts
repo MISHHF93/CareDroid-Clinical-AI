@@ -21,6 +21,7 @@ import ragConfig from './config/rag.config';
 import anomalyDetectionConfig from './config/anomaly-detection.config';
 import nluConfig from './config/nlu.config';
 import firebaseConfig from './config/firebase.config';
+import { envValidationSchema } from './config/env.validation';
 
 // Modules
 import { AuthModule } from './modules/auth/auth.module';
@@ -95,6 +96,11 @@ function resolveDatabaseClient() {
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
+      validationSchema: envValidationSchema,
+      validationOptions: {
+        allowUnknown: true,
+        abortEarly: false,
+      },
       load: [
         jwtConfig,
         oauthConfig,

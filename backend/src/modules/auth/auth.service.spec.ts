@@ -116,6 +116,7 @@ describe('AuthService', () => {
     jest.clearAllMocks();
     delete process.env.ENABLE_DEV_AUTH_BYPASS;
     delete process.env.VITE_ENABLE_DEV_AUTH_BYPASS;
+    delete process.env.ALLOW_DEMO_AUTH_IN_PRODUCTION;
     process.env.NODE_ENV = originalNodeEnv;
     mockConfigService.get.mockImplementation((key: string) => {
       switch (key) {
@@ -142,6 +143,7 @@ describe('AuthService', () => {
     process.env.NODE_ENV = originalNodeEnv;
     delete process.env.ENABLE_DEV_AUTH_BYPASS;
     delete process.env.VITE_ENABLE_DEV_AUTH_BYPASS;
+    delete process.env.ALLOW_DEMO_AUTH_IN_PRODUCTION;
   });
 
   it('should be defined', () => {
@@ -206,7 +208,7 @@ describe('AuthService', () => {
       process.env.NODE_ENV = 'production';
 
       await expect(service.createDevSession('127.0.0.1', 'test-agent')).rejects.toThrow(
-        'Dev session is not available in production',
+        'ALLOW_DEMO_AUTH_IN_PRODUCTION',
       );
     });
   });

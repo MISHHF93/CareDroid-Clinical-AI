@@ -4,10 +4,12 @@ import {
   REGISTERED_EXECUTOR_TOOL_IDS,
   REGISTRY_ID_TO_EXECUTOR_TOOL_ID,
   EXECUTOR_ID_ALIASES,
+  LEGACY_LLM_TOOL_NAME_TO_EXECUTOR,
   EXECUTOR_PARAMETER_ALIASES,
   EXECUTOR_REQUEST_CONTRACTS,
   NLU_TOOL_IDS_WITHOUT_EXECUTOR,
   resolveExecutorToolId,
+  resolveLegacyLlmToolName,
   classifyToolExecutionError,
   validateExecutorRequestPayload,
   validateExecutorContractParameters,
@@ -82,6 +84,8 @@ describe('tool-orchestrator.registry', () => {
 
   it('does not alias unknown legacy ids into executors', () => {
     expect(EXECUTOR_ID_ALIASES['sofa_calculator']).toBeUndefined();
+    expect(LEGACY_LLM_TOOL_NAME_TO_EXECUTOR.sofa_calculator).toBe('sofa-calculator');
+    expect(resolveLegacyLlmToolName('drug_checker')).toBe('drug-interactions');
   });
 
   it('NLU_TOOL_IDS_WITHOUT_EXECUTOR covers every tool.patterns id except registered executors', () => {

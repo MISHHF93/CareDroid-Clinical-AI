@@ -58,6 +58,13 @@ const appConfig = {
     ),
     /** Production-safe demo flag for hosted demos. */
     enableDemoMode: toBoolean(getEnvValue('VITE_DEMO_MODE', 'false')),
+    /**
+     * Browser-only fallback demo sessions are local-dev only by default.
+     * Hosted demos should use the backend /api/auth/dev-session endpoint.
+     */
+    allowLocalDemoAuth: toBoolean(
+      getEnvValue('VITE_ALLOW_LOCAL_DEMO_AUTH', isProductionBuild() ? 'false' : 'true')
+    ),
     /** Explicit deployed-demo override for staging/demo builds that intentionally expose the bypass. */
     showDemoAuth: toBoolean(getEnvValue('VITE_SHOW_DEMO_AUTH', 'false')),
     /** Legacy hide flag retained for older deployments. */
@@ -103,9 +110,7 @@ const appConfig = {
   },
   ai: {
     openai: {
-      apiKey: getEnvValue('VITE_OPENAI_API_KEY', ''),
       model: getEnvValue('VITE_OPENAI_MODEL', 'gpt-4'),
-      baseUrl: 'https://api.openai.com/v1',
     },
   },
 };
