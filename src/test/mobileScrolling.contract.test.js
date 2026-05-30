@@ -1,5 +1,5 @@
 /**
- * Mobile scrolling contracts — app shell pages use document-flow scrolling by default.
+ * Mobile scrolling contracts — app shell pages use the main content scrollport by default.
  */
 
 import { readFileSync } from 'node:fs';
@@ -33,10 +33,10 @@ describe('mobile scrolling contracts', () => {
     expect(appShellCss).toMatch(/\.app-shell--nav-open \.app-shell-main-wrap[\s\S]*touch-action:\s*none/);
   });
 
-  it('keeps normal pages in document flow while preserving chat as a local viewport', () => {
-    expect(appShellCss).toMatch(/\.app-shell\s*\{[\s\S]*overflow-y:\s*visible/);
-    expect(appShellCss).toMatch(/\.app-shell-main-wrap\s*\{[\s\S]*height:\s*auto/);
-    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*overflow-y:\s*visible/);
+  it('keeps normal pages in the main scrollport while preserving chat as a local viewport', () => {
+    expect(appShellCss).toMatch(/\.app-shell\s*\{[\s\S]*overflow:\s*hidden/);
+    expect(appShellCss).toMatch(/\.app-shell-main-wrap\s*\{[\s\S]*height:\s*100%/);
+    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell-page-body--conversation\s*\{[\s\S]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(/\.app-shell-page-body--conversation\s*\{[\s\S]*height:\s*calc/);
   });

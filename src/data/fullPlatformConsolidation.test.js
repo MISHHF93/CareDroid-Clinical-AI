@@ -213,7 +213,7 @@ describe('full platform consolidation contract', () => {
     expect(themeTokensCss).toContain("html[data-theme='dark']");
     expect(indexCss).toMatch(/html\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*overflow-y:\s*visible/);
+    expect(appShellCss).toMatch(/\.app-shell-page-body\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell-page-body--conversation\s*\{[\s\S]*overflow:\s*hidden/);
   });
 });

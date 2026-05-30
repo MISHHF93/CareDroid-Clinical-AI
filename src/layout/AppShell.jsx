@@ -146,7 +146,7 @@ const AppShell = ({
         onOpenQuickCommand={openQuickCommand}
       />
 
-      <div className="app-shell-main-wrap">
+      <main className="app-shell-main-wrap" data-layout-role="MainContent">
         {isAuthed && (
           <header className="app-shell-header" aria-label="Application header">
             {isCompact && (
@@ -221,7 +221,7 @@ const AppShell = ({
           </div>
         )}
         {children}
-      </div>
+      </main>
     </div>
   );
 };

@@ -1,0 +1,45 @@
+.page-container {
+  width: 100%;
+  max-width: min(100%, var(--app-content-max-width, 1280px));
+  min-width: 0;
+  margin-inline: auto;
+  padding: var(--app-page-padding-roomy);
+  box-sizing: border-box;
+}
+
+.page-container--narrow {
+  --app-content-max-width: 760px;
+}
+
+.page-container--standard {
+  --app-content-max-width: 1280px;
+}
+
+.page-container--wide {
+  --app-content-max-width: 1760px;
+}
+
+.page-container--full {
+  max-width: 100%;
+}
+
+.page-stack {
+  display: grid;
+  gap: var(--compact-page-gap, 16px);
+  min-width: 0;
+}
+
+.scroll-area {
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: clip;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: auto;
+}
+
+@media (max-width: 640px) {
+  .page-container {
+    padding: var(--app-page-padding-compact);
+  }
+}

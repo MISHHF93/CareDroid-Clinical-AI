@@ -62,7 +62,9 @@ body {
 .cost-analytics-dashboard,
 .notification-preferences-page,
 .settings-page,
-.profile-page {
+.profile-page,
+.profile-settings-page,
+.page-container {
   width: 100%;
   max-width: 100%;
   min-width: 0;

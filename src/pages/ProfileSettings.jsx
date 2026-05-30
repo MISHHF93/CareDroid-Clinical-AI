@@ -7,6 +7,8 @@ import TwoFactorSettings from '../components/TwoFactorSettings';
 import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
+import { PageContainer } from '../layout/PageContainer';
+import './ProfileSettings.css';
 
 const ProfileSettings = ({ authToken }) => {
   const [displayName, setDisplayName] = useState('');
@@ -198,10 +200,16 @@ const ProfileSettings = ({ authToken }) => {
   };
 
   return (
-    <div style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '48px' }}>
-      <div style={{ width: '100%', maxWidth: '720px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <PageContainer
+      size="narrow"
+      className="profile-settings-page"
+      aria-labelledby="profile-settings-title"
+    >
+      <div className="page-stack profile-settings-stack">
         <Card>
-          <h2 style={{ marginTop: 0 }}>Profile Settings</h2>
+          <h2 id="profile-settings-title" style={{ marginTop: 0 }}>
+            Profile Settings
+          </h2>
           <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
             Update your backend-backed clinical profile and institutional details.
           </p>
@@ -253,7 +261,7 @@ const ProfileSettings = ({ authToken }) => {
               value={licenseNumber}
               onChange={(e) => setLicenseNumber(e.target.value)}
             />
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="profile-settings-grid">
               <Input
                 type="text"
                 label="Country"
@@ -322,7 +330,7 @@ const ProfileSettings = ({ authToken }) => {
                 <option value="teaching">Teaching</option>
               </select>
             </label>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <div className="profile-settings-grid">
               <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
                 Citation level
                 <select
@@ -387,7 +395,7 @@ const ProfileSettings = ({ authToken }) => {
         {/* Two-Factor Authentication Settings */}
         <TwoFactorSettings authToken={authToken} />
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

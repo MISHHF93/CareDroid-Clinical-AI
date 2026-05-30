@@ -47,7 +47,7 @@ describe('App shell layout — root and scroll', () => {
 describe('App shell layout — main column', () => {
   it('main wrap uses flex min-width 0 and clips horizontal overflow', () => {
     expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*min-width:\s*0/);
-    expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*width:\s*100%/);
+    expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*width:\s*calc\(100% - var\(--app-main-inset/);
     expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*overflow-x:\s*clip/);
   });
 
@@ -67,11 +67,12 @@ describe('App shell layout — main column', () => {
 });
 
 describe('App shell layout — page scrollport', () => {
-  it('page body stays in document flow with min-width 0', () => {
-    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-y:\s*visible/);
+  it('page body is the primary vertical scrollport with min-width 0', () => {
+    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-y:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*overflow-x:\s*clip/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*min-width:\s*0/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*height:\s*auto/);
+    expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*scrollbar-gutter:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell-page-body[\s\S]*scroll-padding-bottom/);
   });
 
@@ -122,6 +123,13 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellCss).toMatch(
       /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*overflow:\s*visible/
     );
+  });
+
+  it('main content owns viewport width beside the fixed sidebar', () => {
+    expect(appShellJsx).toContain('data-layout-role="MainContent"');
+    expect(appShellCss).toMatch(/\.app-shell\s*\{[\s\S]*height:\s*var\(--app-viewport-height/);
+    expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*width:\s*calc\(100% - var\(--app-main-inset/);
+    expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*overflow:\s*hidden/);
   });
 
   it('keeps command dashboard out of the conversation-only scroll container', () => {
