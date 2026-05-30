@@ -7,6 +7,7 @@ import {
   buildEffectiveHttpPath,
   compareControllerScanToInventory,
   parseControllerRoutesFromSource,
+  scanNestControllerRoutes,
 } from './backendControllerRouteScan';
 
 describe('backendControllerRouteScan', () => {
@@ -45,5 +46,13 @@ describe('backendControllerRouteScan', () => {
     const { missingInInventory, missingInControllers } = compareControllerScanToInventory();
     expect(missingInInventory).toEqual([]);
     expect(missingInControllers).toEqual([]);
+  });
+
+  it('does not expose duplicate active controller method/path pairs', () => {
+    const routes = scanNestControllerRoutes();
+    const keys = routes.map((route) => `${route.method} ${route.path}`);
+    const duplicates = keys.filter((key, index) => keys.indexOf(key) !== index);
+
+    expect(duplicates).toEqual([]);
   });
 });

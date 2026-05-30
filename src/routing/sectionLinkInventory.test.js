@@ -2,6 +2,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import {
+  ADVANCED_SIDEBAR_NAV_ITEMS,
+  OPERATIONS_SIDEBAR_NAV_ITEMS,
+  PRIMARY_SIDEBAR_NAV_ITEMS,
+} from '../config/navigation.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
@@ -17,15 +22,16 @@ const visibleLinkInventory = [
   ['Home welcome CTA', 'App.jsx', '/auth'],
   ['Home dev bypass', 'App.jsx', '/dashboard'],
   ['Auth back link', 'pages/Auth.jsx', '/'],
-  ['Primary Dashboard nav', 'navigation/primaryNavigation.js', '/dashboard'],
-  ['Primary Assistant nav', 'navigation/primaryNavigation.js', '/assistant'],
-  ['Primary Tools nav', 'navigation/primaryNavigation.js', '/tools'],
+  ['Primary Dashboard nav', 'config/navigation.config.js', '/dashboard'],
+  ['Primary Assistant nav', 'config/navigation.config.js', '/assistant'],
+  ['Primary Tools nav', 'config/navigation.config.js', '/tools'],
+  ['Primary Operations nav', 'config/navigation.config.js', '/operations'],
   ['Calculators app route', 'App.jsx', '/tools/calculators'],
-  ['Operations Digital Twin nav', 'navigation/primaryNavigation.js', '/digital-twin'],
-  ['Operations Hospital Map nav', 'navigation/primaryNavigation.js', '/hospital-map'],
-  ['Operations Medical IoT nav', 'navigation/primaryNavigation.js', '/medical-iot'],
-  ['Operations Fleet nav', 'navigation/primaryNavigation.js', '/fleet/map'],
-  ['Advanced Developer Catalog nav', 'navigation/primaryNavigation.js', '/tools/catalog'],
+  ['Operations Digital Twin nav', 'config/navigation.config.js', '/digital-twin'],
+  ['Operations Hospital Map nav', 'config/navigation.config.js', '/hospital-map'],
+  ['Operations Medical IoT nav', 'config/navigation.config.js', '/medical-iot'],
+  ['Operations Fleet nav', 'config/navigation.config.js', '/fleet/map'],
+  ['Advanced Developer Catalog nav', 'config/navigation.config.js', '/tools/catalog'],
   ['Profile settings assistant link', 'pages/ProfileSettings.jsx', '/assistant'],
   ['Settings back link', 'pages/Settings.jsx', '/assistant'],
   ['OAuth callback success', 'pages/AuthCallback.jsx', '/dashboard'],
@@ -37,6 +43,7 @@ const canonicalRoutes = new Set([
   '/dashboard',
   '/assistant',
   '/tools',
+  '/operations',
   '/digital-twin',
   '/live-map',
   '/hospital-map',
@@ -62,15 +69,25 @@ const userFacingLinkFiles = [
   'pages/tools/ToolsAreaFallback.jsx',
 ];
 
+const navigationConfigPaths = [
+  ...PRIMARY_SIDEBAR_NAV_ITEMS,
+  ...OPERATIONS_SIDEBAR_NAV_ITEMS,
+  ...ADVANCED_SIDEBAR_NAV_ITEMS,
+].map((item) => item.path);
+
 describe('section link inventory and route flattening', () => {
   it.each(visibleLinkInventory)('%s uses canonical route %s', (_label, file, route) => {
     expect(canonicalRoutes.has(route), `${file} -> ${route}`).toBe(true);
-    expect(read(file), file).toContain(route);
+    if (file === 'config/navigation.config.js') {
+      expect(navigationConfigPaths, route).toContain(route);
+    } else {
+      expect(read(file), file).toContain(route);
+    }
   });
 
   it('keeps Developer Catalog / Source Audit gated away from normal clinician links', () => {
-    expect(read('navigation/primaryNavigation.js')).toContain("permission: 'CONFIGURE_SYSTEM'");
-    expect(read('navigation/primaryNavigation.js')).toContain("showInMobile: false");
+    expect(read('config/navigation.config.js')).toContain("permission: 'CONFIGURE_SYSTEM'");
+    expect(read('config/navigation.config.js')).toContain("showInMobile: false");
     expect(read('App.jsx')).toContain('permission: Permission.CONFIGURE_SYSTEM');
     expect(read('pages/tools/ToolsOverview.jsx')).not.toContain("navigate('/tools/catalog')");
     expect(read('components/Sidebar.jsx')).not.toContain("navigate('/tools/catalog')");
@@ -87,13 +104,16 @@ describe('section link inventory and route flattening', () => {
 
   it('preserves legacy route aliases as redirects, not duplicate user-facing pages', () => {
     const app = read('App.jsx');
+    const routes = read('config/routes.config.js');
     expectRedirectRoute(app, '/home', '/dashboard');
-    expectRedirectRoute(app, '/chat', '/assistant');
-    expectRedirectRoute(app, '/fleet', '/fleet/map');
-    expectRedirectRoute(app, '/operations', '/dashboard');
-    expectRedirectRoute(app, '/catalog', '/tools');
+    expect(routes).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])");
+    expect(routes).toContain("export const FLEET_MAP_ROUTE_ALIASES = Object.freeze(['/fleet', '/fleet/live-map', '/fleet/tracking'])");
+    expect(routes).toContain("export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations'])");
+    expect(routes).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])");
     expect(app).toContain('ASSISTANT_ROUTE_ALIASES.map');
     expect(app).toContain('TOOLS_ROUTE_ALIASES.map');
+    expect(app).toContain('OPERATIONS_ROUTE_ALIASES.map');
+    expect(app).toContain('FLEET_MAP_ROUTE_ALIASES.map');
     expect(app).toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
     expect(app).not.toContain("path: '/home', element: <AppShellPage>");
     expect(app).not.toContain("path: '/chat', element: <AppShellPage>");

@@ -18,6 +18,7 @@ import {
   VisualizationPanel,
 } from '../components/dashboard/DashboardVisualizations';
 import { getRegistryToolNavigation, applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import './CommandDashboard.css';
@@ -87,7 +88,7 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     id: 'assistant',
     label: 'AI Assistant',
     description: 'Ask, triage, and launch tools from the chatbot workspace.',
-    path: '/assistant',
+    path: CANONICAL_ROUTES.assistant,
     icon: CHROME_ICONS.bot,
   },
   {
@@ -101,28 +102,28 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     id: 'tools',
     label: 'My Tools',
     description: 'Browse every permitted clinical and operations tool.',
-    path: '/tools',
+    path: CANONICAL_ROUTES.tools,
     icon: CHROME_ICONS.tools,
   },
   {
     id: 'calculators',
     label: 'My Calculators',
     description: 'Open the focused calculator hub and severity scores.',
-    path: '/tools/calculators',
+    path: CANONICAL_ROUTES.calculators,
     icon: CHROME_ICONS.calculator,
   },
   {
     id: 'digital-twin',
     label: 'Digital Twin',
     description: 'View the operations aggregate across hospital, IoT, alerts, and fleet.',
-    path: '/digital-twin',
+    path: CANONICAL_ROUTES.digitalTwin,
     icon: CHROME_ICONS.activity,
   },
   {
     id: 'notifications',
     label: 'Notifications',
     description: 'Review unread updates, preferences, and notification history.',
-    path: '/notifications',
+    path: CANONICAL_ROUTES.notifications,
     icon: CHROME_ICONS.bell,
   },
   {
@@ -136,28 +137,28 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     id: 'hospital-map',
     label: 'Hospital Map',
     description: 'View floors, rooms, beds, device markers, and stale states.',
-    path: '/hospital-map',
+    path: CANONICAL_ROUTES.hospitalMap,
     icon: CHROME_ICONS.hospital,
   },
   {
     id: 'medical-iot',
     label: 'Medical IoT',
     description: 'Monitor telemetry, devices, alerts, and demo data labels.',
-    path: '/medical-iot',
+    path: CANONICAL_ROUTES.medicalIot,
     icon: CHROME_ICONS.activity,
   },
   {
     id: 'fleet',
     label: 'Fleet',
     description: 'Open live vehicle tracking and route status.',
-    path: '/fleet/map',
+    path: CANONICAL_ROUTES.fleetMap,
     icon: CHROME_ICONS.truck,
   },
   {
     id: 'devices',
     label: 'Device Management',
     description: 'Manage device fleet state, maintenance, and assignments.',
-    path: '/devices',
+    path: CANONICAL_ROUTES.devices,
     icon: CHROME_ICONS.wrench,
   },
   {
@@ -171,7 +172,7 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     id: 'system-status',
     label: 'System Status',
     description: 'Check platform health and backend readiness.',
-    path: '/system-health',
+    path: CANONICAL_ROUTES.systemHealth,
     icon: CHROME_ICONS.shield,
   },
 ]);
@@ -246,7 +247,7 @@ export default function CommandDashboard() {
 
   const launchPrompt = (prompt) => {
     addMessage(prompt, 'user');
-    navigate('/assistant');
+    navigate(CANONICAL_ROUTES.assistant);
   };
 
   const handleSubmit = (event) => {
@@ -321,7 +322,7 @@ export default function CommandDashboard() {
             <Link className="command-secondary-action" to="/workspaces">
               Open workspace
             </Link>
-            <Link className="command-secondary-action" to="/profile/tool-preferences">
+            <Link className="command-secondary-action" to={CANONICAL_ROUTES.profileToolPreferences}>
               Tune my toolkit
             </Link>
           </div>
@@ -359,7 +360,7 @@ export default function CommandDashboard() {
           <div className="command-recent-list">
             {unreadNotifications.length > 0 ? (
               unreadNotifications.map((notification) => (
-                <Link key={notification.id || notificationTitle(notification)} className="command-recent-item" to="/notifications">
+                <Link key={notification.id || notificationTitle(notification)} className="command-recent-item" to={CANONICAL_ROUTES.notifications}>
                   <strong>{notificationTitle(notification)}</strong>
                   <span>{notificationBody(notification)}</span>
                 </Link>
@@ -368,7 +369,7 @@ export default function CommandDashboard() {
               <p className="command-empty-state">No unread notifications. Notification preferences and history remain one click away.</p>
             )}
           </div>
-          <Link className="command-panel-link" to="/notifications">
+          <Link className="command-panel-link" to={CANONICAL_ROUTES.notifications}>
             Open Notifications
           </Link>
         </DashboardPanel>
@@ -396,7 +397,7 @@ export default function CommandDashboard() {
             <Link className="command-secondary-action" to="/clinical/alerts">
               Open Active Alerts
             </Link>
-            <Link className="command-secondary-action" to="/digital-twin">
+            <Link className="command-secondary-action" to={CANONICAL_ROUTES.digitalTwin}>
               Open Digital Twin
             </Link>
           </div>
@@ -456,7 +457,7 @@ export default function CommandDashboard() {
                 <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
               ))}
           </div>
-          <Link className="command-panel-link" to="/tools?filter=all">
+          <Link className="command-panel-link" to={`${CANONICAL_ROUTES.tools}?filter=all`}>
             Open All Medical Tools
           </Link>
         </DashboardPanel>
@@ -471,7 +472,7 @@ export default function CommandDashboard() {
               <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
             ))}
           </div>
-          <Link className="command-panel-link" to="/tools?filter=calculator">
+          <Link className="command-panel-link" to={`${CANONICAL_ROUTES.tools}?filter=calculator`}>
             Open All Calculators
           </Link>
         </DashboardPanel>
@@ -546,7 +547,7 @@ export default function CommandDashboard() {
               <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
             ))}
           </div>
-          <Link className="command-panel-link" to="/fleet/map">
+          <Link className="command-panel-link" to={CANONICAL_ROUTES.fleetMap}>
             Open Fleet Map
           </Link>
         </DashboardPanel>
@@ -561,7 +562,7 @@ export default function CommandDashboard() {
               <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
             ))}
           </div>
-          <Link className="command-panel-link" to="/medical-iot">
+          <Link className="command-panel-link" to={CANONICAL_ROUTES.medicalIot}>
             Open Medical IoT Dashboard
           </Link>
         </DashboardPanel>
@@ -594,7 +595,7 @@ export default function CommandDashboard() {
                 key={conversation.id}
                 type="button"
                 className="command-recent-item"
-                onClick={() => navigate('/assistant')}
+                onClick={() => navigate(CANONICAL_ROUTES.assistant)}
               >
                 <strong>{conversation.title || 'Conversation'}</strong>
                 <span>Continue in Assistant</span>
@@ -605,7 +606,7 @@ export default function CommandDashboard() {
                 key={message.id}
                 type="button"
                 className="command-recent-item"
-                onClick={() => navigate('/assistant')}
+                onClick={() => navigate(CANONICAL_ROUTES.assistant)}
               >
                 <strong>Recent AI output</strong>
                 <span>{String(message.content || '').slice(0, 90)}</span>
@@ -664,11 +665,11 @@ export default function CommandDashboard() {
             <button type="button" className="command-secondary-action" onClick={systemConfig.refresh}>
               Retry status
             </button>
-            <Link className="command-secondary-action" to="/tools">
+            <Link className="command-secondary-action" to={CANONICAL_ROUTES.tools}>
               Open Tool Library
             </Link>
             {canViewDeveloperCatalog ? (
-              <Link className="command-secondary-action" to="/tools/catalog">
+              <Link className="command-secondary-action" to={CANONICAL_ROUTES.developerCatalog}>
                 Developer audit
               </Link>
             ) : null}

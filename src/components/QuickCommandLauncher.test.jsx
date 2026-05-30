@@ -144,6 +144,7 @@ describe('QuickCommandLauncher', () => {
         'home',
         'assistant',
         'tools',
+        'operations',
         'live-map',
         'hospital-map',
         'medical-iot',
@@ -152,7 +153,6 @@ describe('QuickCommandLauncher', () => {
       ])
     );
     expect(navIds).not.toContain('calculators');
-    expect(navIds).not.toContain('operations');
     expect(toolIds).not.toContain('live-tracking-map');
     expect(toolIds).not.toContain('device-fleet-management');
   });

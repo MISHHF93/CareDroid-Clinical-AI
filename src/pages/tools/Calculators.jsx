@@ -89,10 +89,8 @@ import { AnionGapCalculator, RassCalculator, ShockIndexCalculator } from './next
 import {
   CanadianCSpineCalculator,
   GraceAcsCalculator,
-  NexusCSpineCalculator,
   NihssCalculator,
   OttawaAnkleCalculator,
-  PecarnHeadCalculator,
   PercCalculator,
   WellsPeCalculator,
 } from './sourceBackedClinicalCalculators';
@@ -717,10 +715,6 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <CanadianCSpineCalculator onResultChange={onResultChange} />;
     case 'ottawa-ankle':
       return <OttawaAnkleCalculator onResultChange={onResultChange} />;
-    case 'pecarn-head':
-      return <PecarnHeadCalculator onResultChange={onResultChange} />;
-    case 'nexus-cspine':
-      return <NexusCSpineCalculator onResultChange={onResultChange} />;
     case 'hunt-hess-scale':
       return <HuntHessScaleCalculator onResultChange={onResultChange} />;
     case 'ich-score':

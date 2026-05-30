@@ -1,4 +1,5 @@
 import appConfig from './appConfig';
+import { FEATURE_FLAGS, shouldExposeDemoAuthFlag } from './featureFlags.config';
 
 /**
  * Canonical frontend environment flag projection.
@@ -11,20 +12,16 @@ export const ENV_CONFIG = Object.freeze({
   environment: appConfig.app.environment,
   apiUrl: appConfig.api.baseUrl,
   wsUrl: appConfig.api.wsUrl,
-  demoMode: appConfig.features.enableDemoMode,
-  allowLocalDemoAuth: appConfig.features.allowLocalDemoAuth,
-  enableDevAuthBypass: appConfig.features.enableDevAuthBypass,
-  showDemoAuth: appConfig.features.showDemoAuth,
-  hideDivisionMode: appConfig.features.hideDivisionMode,
-  enablePushNotifications: appConfig.features.enablePushNotifications,
-  enableOfflineMode: appConfig.features.enableOfflineMode,
-  enableBiometricAuth: appConfig.features.enableBiometricAuth,
+  demoMode: FEATURE_FLAGS.enableDemoMode,
+  allowLocalDemoAuth: FEATURE_FLAGS.allowLocalDemoAuth,
+  enableDevAuthBypass: FEATURE_FLAGS.enableDevAuthBypass,
+  showDemoAuth: FEATURE_FLAGS.showDemoAuth,
+  hideDivisionMode: FEATURE_FLAGS.hideDivisionMode,
+  enablePushNotifications: FEATURE_FLAGS.enablePushNotifications,
+  enableOfflineMode: FEATURE_FLAGS.enableOfflineMode,
+  enableBiometricAuth: FEATURE_FLAGS.enableBiometricAuth,
 });
 
 export function shouldExposeDemoAuth() {
-  return Boolean(
-    appConfig.features.enableDemoMode ||
-      appConfig.features.enableDevAuthBypass ||
-      appConfig.features.showDemoAuth
-  );
+  return shouldExposeDemoAuthFlag();
 }

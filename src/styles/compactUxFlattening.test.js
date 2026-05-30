@@ -24,11 +24,12 @@ describe('compact UX/UI flattening contracts', () => {
   });
 
   it('normalizes primary navigation around canonical command app entries', () => {
-    const nav = read('navigation/primaryNavigation.js');
+    const nav = read('config/navigation.config.js');
     for (const id of [
       "id: 'home'",
       "id: 'assistant'",
       "id: 'tools'",
+      "id: 'operations'",
       "id: 'digital-twin'",
       "id: 'hospital-map'",
       "id: 'medical-iot'",
@@ -40,7 +41,6 @@ describe('compact UX/UI flattening contracts', () => {
       expect(nav).toContain(id);
     }
     expect(nav).not.toContain("id: 'patients'");
-    expect(nav).not.toContain("id: 'operations'");
     expect(nav).not.toContain("id: 'maps'");
   });
 

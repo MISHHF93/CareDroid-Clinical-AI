@@ -26,16 +26,17 @@ describe('canonical route redirects', () => {
   it('keeps command dashboard canonical and legacy chat paths as redirects', () => {
     expectRoute('/dashboard', 'CommandDashboard');
     expectRedirect('/home', '/dashboard');
-    expectRedirect('/operations', '/dashboard');
-    expectRedirect('/chat', '/assistant');
     expect(appSource).toContain('ASSISTANT_ROUTE_ALIASES.map');
-    expect(routeConfigSource).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/ai', '/copilot'])");
+    expect(routeConfigSource).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])");
+    expect(appSource).toContain('OPERATIONS_ROUTE_ALIASES.map');
+    expect(routeConfigSource).toContain("export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations'])");
     expect(appSource).not.toContain("path: '/dashboard', element: <LegacyProtectedRouteRedirect to=\"/home\" />");
     expect(appSource).not.toContain("path: '/chat', element: <AppShellPage><Dashboard /></AppShellPage>");
   });
 
   it('gives the fleet area an explicit canonical live-map redirect', () => {
-    expectRedirect('/fleet', '/fleet/map');
+    expect(appSource).toContain('FLEET_MAP_ROUTE_ALIASES.map');
+    expect(routeConfigSource).toContain("export const FLEET_MAP_ROUTE_ALIASES = Object.freeze(['/fleet', '/fleet/live-map', '/fleet/tracking'])");
     expectRoute('/fleet/command', 'FleetDashboard');
   });
 
@@ -53,10 +54,15 @@ describe('canonical route redirects', () => {
   it('keeps developer/source audit catalog separate from the user-facing tools browser', () => {
     expectRoute('/tools', 'ToolsOverview');
     expect(appSource).toContain('TOOLS_ROUTE_ALIASES.map');
-    expect(routeConfigSource).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools'])");
+    expect(routeConfigSource).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])");
     expect(appSource).toContain("path: '/tools/catalog'");
     expect(appSource).toContain('permission: Permission.CONFIGURE_SYSTEM');
-    expectRedirect('/catalog', '/tools');
+  });
+
+  it('redirects legacy audit-log entry points to the canonical audit route', () => {
+    expect(appSource).toContain('AUDIT_ROUTE_ALIASES.map');
+    expect(appSource).toContain('to="/audit"');
+    expect(routeConfigSource).toContain("export const AUDIT_ROUTE_ALIASES = Object.freeze(['/audit-logs'])");
   });
 
   it('registers profile tool preferences without redirecting canonical tool routes', () => {

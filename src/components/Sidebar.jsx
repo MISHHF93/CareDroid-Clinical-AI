@@ -268,14 +268,14 @@ const Sidebar = forwardRef(function Sidebar(
             onClick={() => setShowAdvanced((open) => !open)}
             aria-expanded={showAdvanced}
             aria-controls="sidebar-advanced-links"
-            title={effectiveCollapsed ? 'More' : ''}
+            title={effectiveCollapsed ? 'Advanced' : ''}
           >
             <span className="nav-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.shield} size={18} />
             </span>
             {!effectiveCollapsed && (
               <>
-                <span className="nav-label">More</span>
+                <span className="nav-label">Advanced</span>
                 <span className="sidebar-advanced-chevron" aria-hidden>
                   <NavIcon
                     icon={CHROME_ICONS.chevronDown}

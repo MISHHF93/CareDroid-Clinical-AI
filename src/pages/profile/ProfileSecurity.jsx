@@ -50,7 +50,7 @@ export default function ProfileSecurity() {
         <Card>
           <h2 style={{ marginTop: 0 }}>Protected Areas</h2>
           <div className="profile-identity-actions">
-            <Link to="/audit-logs">Audit logs</Link>
+            <Link to="/audit">Audit logs</Link>
             <Link to="/settings">Privacy and billing settings</Link>
             <Link to="/notifications">Notification security alerts</Link>
           </div>

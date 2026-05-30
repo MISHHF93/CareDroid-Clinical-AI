@@ -46,17 +46,17 @@ const EXECUTOR_DTO = {
 const EXECUTOR_API = {
   'sofa-calculator': {
     endpoint: 'POST /api/tools/sofa-calculator/execute',
-    client: 'src/pages/tools/Calculators.jsx (`apiFetch`)',
+    client: 'src/services/clinicalOrchestratorApi.js (`executeClinicalTool`)',
     dto: EXECUTOR_DTO,
   },
   'drug-interactions': {
     endpoint: 'POST /api/tools/drug-interactions/execute',
-    client: 'src/pages/tools/DrugChecker.jsx (`apiFetch`)',
+    client: 'src/services/clinicalOrchestratorApi.js (`executeClinicalTool`)',
     dto: EXECUTOR_DTO,
   },
   'lab-interpreter': {
     endpoint: 'POST /api/tools/lab-interpreter/execute',
-    client: 'src/pages/tools/LabInterpreter.jsx (`apiFetch`)',
+    client: 'src/services/clinicalOrchestratorApi.js (`executeClinicalTool`)',
     dto: EXECUTOR_DTO,
   },
 };

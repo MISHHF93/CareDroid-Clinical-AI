@@ -35,7 +35,8 @@ const viteConfigSource = readFileSync(join(dirname(srcRoot), 'vite.config.js'), 
 const REQUIRED_AUTH_SNIPPETS = Object.freeze([
   "path: '/auth'",
   'AUTH_PATH_ALIASES.map',
-  'return <Navigate to="/auth" replace />',
+  "pathname: '/auth'",
+  'buildAuthRedirectSearch(location)',
 ]);
 
 const REQUIRED_ROUTES = Object.freeze([
@@ -144,8 +145,9 @@ describe('full platform consolidation contract', () => {
 
     expect(appSource).toContain('ASSISTANT_ROUTE_ALIASES');
     expect(appSource).toContain('TOOLS_ROUTE_ALIASES');
-    expect(routeConfigSource).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/ai', '/copilot'])");
-    expect(routeConfigSource).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools'])");
+    expect(routeConfigSource).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])");
+    expect(routeConfigSource).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])");
+    expect(routeConfigSource).toContain("export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations'])");
     expect(appSource).toContain("path: '/home'");
     expect(appSource).toContain('to="/dashboard"');
     expect(appSource).not.toMatch(/element:\s*null|element:\s*undefined/);

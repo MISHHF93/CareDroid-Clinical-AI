@@ -20,7 +20,7 @@ import logger from '../utils/logger';
  * @example Single permission:
  * ```jsx
  * <PermissionGate permission="VIEW_AUDIT_LOGS">
- *   <Link to="/audit-logs">Audit Logs</Link>
+ *   <Link to="/audit">Audit Logs</Link>
  * </PermissionGate>
  * ```
  * 

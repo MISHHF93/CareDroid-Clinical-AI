@@ -80,7 +80,7 @@ const OPERATION_AREAS = Object.freeze([
   {
     title: 'Audit logs',
     body: 'Review access and trust events without exposing audit tooling as a clinician catalog.',
-    path: '/audit-logs',
+    path: '/audit',
     icon: CHROME_ICONS.shield,
     label: 'Open audit',
   },

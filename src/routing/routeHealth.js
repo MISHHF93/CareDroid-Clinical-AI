@@ -3,10 +3,12 @@ import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   ASSISTANT_ROUTE_ALIASES,
+  AUDIT_ROUTE_ALIASES,
   AUTH_PATH_ALIASES,
   CALCULATORS_ROUTE_ALIASES,
   FLEET_MAP_ROUTE_ALIASES,
   LIVE_MAP_ROUTE_ALIASES,
+  OPERATIONS_ROUTE_ALIASES,
   TOOLS_ROUTE_ALIASES,
 } from '../config/routes.config';
 import {
@@ -83,7 +85,7 @@ const BACKEND_CONTRACT_BY_APP_PATH = Object.freeze({
   '/devices': ['/api/hospital-map/devices'],
   '/fleet/map': ['/api/fleet/vehicles/live', '/api/fleet/routes/active'],
   '/system-health': ['/health', '/api/config/system'],
-  '/audit-logs': ['/api/audit/logs', '/api/audit/statistics'],
+  '/audit': ['/api/audit/logs', '/api/audit/statistics'],
   '/ai-governance': ['/api/ai-governance/summary', '/api/platform-governance/summary'],
   '/security': ['/api/security/summary', '/api/governance/ai-security/summary'],
 });
@@ -227,6 +229,16 @@ function generatedAliasEntries() {
       path,
       target: '/fleet/map',
       generatedKind: 'fleet-alias',
+    })),
+    ...OPERATIONS_ROUTE_ALIASES.map((path) => ({
+      path,
+      target: '/digital-twin',
+      generatedKind: 'operations-alias',
+    })),
+    ...AUDIT_ROUTE_ALIASES.map((path) => ({
+      path,
+      target: '/audit',
+      generatedKind: 'audit-alias',
     })),
     ...LEGACY_CALCULATOR_ROUTE_ALIASES.map((alias) => ({
       path: alias.path,

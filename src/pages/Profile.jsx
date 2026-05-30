@@ -353,7 +353,7 @@ const Profile = () => {
                 {!phiState.loading && phiState.logs.length > 0 && (
                   <>
                     <span>{phiState.total} PHI access events in the recent window.</span>
-                    <Link to="/audit-logs">Open protected audit logs</Link>
+                    <Link to="/audit">Open protected audit logs</Link>
                   </>
                 )}
               </div>
@@ -385,7 +385,7 @@ const Profile = () => {
           <Link to="/notifications">Notifications</Link>
           <Link to="/onboarding">Onboarding</Link>
           <Link to="/biometric-setup">Biometric setup</Link>
-          {canViewPhiAccess && <Link to="/audit-logs">Audit logs</Link>}
+          {canViewPhiAccess && <Link to="/audit">Audit logs</Link>}
         </div>
         <div style={{ marginTop: '18px', fontSize: '12px', color: 'var(--muted-text)' }}>
           <Link to="/dashboard" style={{ color: '#00FF88', textDecoration: 'none' }}>

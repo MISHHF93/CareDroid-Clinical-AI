@@ -18,7 +18,9 @@ describe('auth canonical flow wiring', () => {
 
   it('protects private routes and redirects unauthenticated users to /auth', () => {
     expect(appSource).toContain('if (requiresAuth && !isAuthenticated) {');
-    expect(appSource).toContain('return <Navigate to="/auth" replace />;');
+    expect(appSource).toContain("pathname: '/auth'");
+    expect(appSource).toContain('buildAuthRedirectSearch(location)');
+    expect(appSource).toContain('state={{ from:');
   });
 
   it('redirects duplicate calculators route aliases to canonical /tools/calculators', () => {

@@ -119,7 +119,7 @@ export const emergencyCapabilities = [
 
 const FEATURE_ROUTES = {
   'team-management': '/team',
-  'audit-logging': '/audit-logs',
+  'audit-logging': '/audit',
   'ai-query-limits': '/settings',
   'offline-access': '/settings',
   'custom-branding': '/settings',

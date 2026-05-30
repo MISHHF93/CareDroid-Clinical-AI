@@ -45,13 +45,14 @@ describe('profile tool segmentation', () => {
     }
   });
 
-  it('filters role-specific operations tools for fleet users', () => {
+  it('prioritizes operations tools for fleet users without making them disappear for clinicians', () => {
     const tools = getUserFacingToolRegistryProjection();
     const fleetGraph = buildProfileToolGraph({ tools, profile: profileFor('fleet operator', { workspace: 'fleet' }) });
     const nurseGraph = buildProfileToolGraph({ tools, profile: profileFor('nurse') });
 
     expect(fleetGraph.visibleTools.some((tool) => /fleet/i.test(`${tool.name} ${tool.id}`))).toBe(true);
-    expect(nurseGraph.visibleTools.some((tool) => tool.id === 'fleet-command')).toBe(false);
+    expect(nurseGraph.visibleTools.some((tool) => tool.id === 'fleet-live-map')).toBe(true);
+    expect(fleetGraph.recommendedTools.some((tool) => tool.id === 'fleet-command')).toBe(true);
   });
 
   it('default profile has a safe useful baseline without admin-only tools', () => {
@@ -189,6 +190,7 @@ describe('profile tool segmentation', () => {
     expect(filterToolsForProfileGraph(graph, 'recommended')).toHaveLength(graph.counts.recommended);
     expect(filterToolsForProfileGraph(graph, 'pinned')).toHaveLength(graph.counts.pinned);
     expect(filterToolsForProfileGraph(graph, 'recent')).toHaveLength(graph.counts.recent);
+    expect(filterToolsForProfileGraph(graph, 'favorites')).toHaveLength(graph.counts.favorites);
     expect(filterToolsForProfileGraph(graph, 'specialty')).toHaveLength(graph.counts.specialtyCoverage);
   });
 

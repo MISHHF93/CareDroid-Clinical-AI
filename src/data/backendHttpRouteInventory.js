@@ -437,17 +437,17 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'PUT', path: '/api/protocols/:id', controller: 'ProtocolController' },
   { method: 'DELETE', path: '/api/protocols/:id', controller: 'ProtocolController' },
 
-  { method: 'GET', path: '/api/fleet/vehicles/live', controller: 'FleetLiveTrackingController' },
-  { method: 'GET', path: '/api/fleet/routes/active', controller: 'FleetLiveTrackingController' },
-  { method: 'GET', path: '/api/hospital-map/floors', controller: 'HospitalLiveTrackingController' },
+  { method: 'GET', path: '/api/fleet/vehicles/live', controller: 'FleetController' },
+  { method: 'GET', path: '/api/fleet/routes/active', controller: 'FleetController' },
+  { method: 'GET', path: '/api/hospital-map/floors', controller: 'HospitalMapController' },
   {
     method: 'GET',
     path: '/api/hospital-map/devices',
-    controller: 'HospitalLiveTrackingController',
+    controller: 'HospitalMapController',
   },
-  { method: 'GET', path: '/api/devices/live', controller: 'DeviceLiveTrackingController' },
-  { method: 'GET', path: '/api/telemetry/live', controller: 'DeviceLiveTrackingController' },
-  { method: 'GET', path: '/api/alerts/devices', controller: 'DeviceLiveTrackingController' },
+  { method: 'GET', path: '/api/devices/live', controller: 'TelemetryController' },
+  { method: 'GET', path: '/api/telemetry/live', controller: 'TelemetryController' },
+  { method: 'GET', path: '/api/alerts/devices', controller: 'TelemetryController' },
 
   { method: 'GET', path: '/api/clinical/alerts', controller: 'ClinicalAlertsController' },
   {

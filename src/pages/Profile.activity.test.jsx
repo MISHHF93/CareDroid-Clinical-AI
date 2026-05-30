@@ -112,7 +112,7 @@ describe('Profile activity audit visibility', () => {
     expect(screen.getByText(/2 PHI access events/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /open protected audit logs/i })).toHaveAttribute(
       'href',
-      '/audit-logs'
+      '/audit'
     );
     expect(screen.queryByRole('link', { name: /request audit\/export/i })).not.toBeInTheDocument();
   });

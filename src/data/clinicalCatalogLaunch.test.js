@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import toolRegistry, { toolRegistryById } from './toolRegistry';
+import { toolRegistryById } from './toolRegistry';
 import {
   clinicalIntentTools,
   clinicalIntentToolsById,
@@ -221,11 +221,11 @@ describe('resolveCatalogLaunch — Tier A dedicated calculator routes', () => {
 
 describe('resolveNavigationPathForLaunch — chat visibility', () => {
   it.each(PR3_CALCULATOR_REGISTRY_IDS)(
-    'PR3 %s navigates to its source-backed calculator route',
+    'PR3 %s navigates to Assistant from the calculators hub',
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
-      expect(launch.path).toBe(`/tools/calculators/${registryId}`);
-      expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
+      expect(launch.path).toBe(HUB);
+      expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
     }
   );
 
@@ -283,12 +283,12 @@ describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () =
     const aliasLaunch = resolveCatalogLaunch('pe-score');
     if (registryId === 'wells-pe') {
       expect(aliasLaunch.registryId).toBe('wells-pe');
-      expect(aliasLaunch.path).toBe('/tools/calculators/wells-pe');
+      expect(aliasLaunch.path).toBe(HUB);
     }
     const percAlias = resolveCatalogLaunch('pe-rule-out');
     if (registryId === 'perc') {
       expect(percAlias.registryId).toBe('perc');
-      expect(percAlias.path).toBe('/tools/calculators/perc');
+      expect(percAlias.path).toBe(HUB);
     }
   });
 });

@@ -232,7 +232,7 @@ function launchFromInventoryRecord(record) {
   return {
     path:
       record.launchType === TOOL_LAUNCH_TYPES.CHAT_ASSISTED &&
-      (!record.route || isCalculatorsHubPath(record.route))
+      (!record.route || String(record.route).startsWith(`${CALCULATORS_HUB_PATH}/`) || isCalculatorsHubPath(record.route))
         ? CALCULATORS_HUB_PATH
         : record.route,
     registryId: record.sidebarVisible ? record.id : record.id || null,

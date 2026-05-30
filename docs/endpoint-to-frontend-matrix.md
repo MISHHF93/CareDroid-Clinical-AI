@@ -47,13 +47,13 @@
 | DELETE | `/api/team/users/:id` | — | TeamManagement.jsx | ⚠️ gated |
 | POST | `/api/team/invite` | — | TeamManagement.jsx | ⚠️ gated |
 | POST | `/api/sync` | — | offline.js / OfflineSupport.jsx | ⚠️ gated |
-| GET | `/api/fleet/vehicles/live` | FleetLiveTrackingController | fleetTelemetryService.js | ✅ |
-| GET | `/api/fleet/routes/active` | FleetLiveTrackingController | fleetTelemetryService.js | ✅ |
-| GET | `/api/hospital-map/floors` | HospitalLiveTrackingController | hospitalMapService.js | ✅ |
-| GET | `/api/hospital-map/devices` | HospitalLiveTrackingController | hospitalMapService.js | ✅ |
-| GET | `/api/devices/live` | DeviceLiveTrackingController | medicalIotService.js | ✅ |
-| GET | `/api/telemetry/live` | DeviceLiveTrackingController | medicalIotService.js | ✅ |
-| GET | `/api/alerts/devices` | DeviceLiveTrackingController | medicalIotService.js | ✅ |
+| GET | `/api/fleet/vehicles/live` | FleetController | fleetTelemetryService.js | ✅ demo |
+| GET | `/api/fleet/routes/active` | FleetController | fleetTelemetryService.js | ✅ demo |
+| GET | `/api/hospital-map/floors` | HospitalMapController | hospitalMapService.js | ✅ demo |
+| GET | `/api/hospital-map/devices` | HospitalMapController | hospitalMapService.js | ✅ demo |
+| GET | `/api/devices/live` | TelemetryController | medicalIotService.js | ✅ demo |
+| GET | `/api/telemetry/live` | TelemetryController | medicalIotService.js | ✅ demo |
+| GET | `/api/alerts/devices` | TelemetryController | medicalIotService.js | ✅ demo |
 | POST | `/api/clinical/alerts/:id/acknowledge` | — | clinicalAlertNotifications.js | ⚠️ gated |
 | POST | `/api/clinical/alerts/:id/dismiss` | — | clinicalAlertNotifications.js | ⚠️ gated |
 | GET | `/api/clinical/alerts/stream` | — | clinicalAlertNotifications.js | ⚠️ gated |

@@ -680,16 +680,7 @@ export const PR8_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
 
 export const PR8_CALCULATOR_REGISTRY_IDS = Object.freeze([...PR8_TIER_A_CALCULATOR_REGISTRY_IDS]);
 
-export const SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
-  REGISTRY.wellsPe,
-  REGISTRY.perc,
-  REGISTRY.graceAcs,
-  REGISTRY.nihss,
-  REGISTRY.canadianCSpine,
-  REGISTRY.ottawaAnkle,
-  REGISTRY.pecarnHead,
-  REGISTRY.nexusCspine,
-]);
+export const SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([]);
 
 export const CARDIOLOGY_TIER_A_CALCULATOR_REGISTRY_IDS = Object.freeze([
   REGISTRY.dukeTreadmillScore,
@@ -1506,9 +1497,6 @@ export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
   [BUILTIN_CALC.glasgowBlatchfordScore]: REGISTRY.glasgowBlatchfordScore,
   [BUILTIN_CALC.rockallScore]: REGISTRY.rockallScore,
   [BUILTIN_CALC.framinghamRisk]: REGISTRY.framinghamRisk,
-  [BUILTIN_CALC.wellsPe]: REGISTRY.wellsPe,
-  [BUILTIN_CALC.perc]: REGISTRY.perc,
-  [BUILTIN_CALC.graceAcs]: REGISTRY.graceAcs,
   [BUILTIN_CALC.apacheIi]: REGISTRY.apache2Calculator,
   [BUILTIN_CALC.curb65]: REGISTRY.curb65Calculator,
   [BUILTIN_CALC.gcs]: REGISTRY.gcsCalculator,
@@ -1516,11 +1504,6 @@ export const BUILTIN_CALC_ID_TO_REGISTRY_ID = Object.freeze({
   [BUILTIN_CALC.revisedTraumaScore]: REGISTRY.revisedTraumaScore,
   [BUILTIN_CALC.pews]: REGISTRY.pews,
   [BUILTIN_CALC.abcd2]: REGISTRY.abcd2,
-  [BUILTIN_CALC.nihss]: REGISTRY.nihss,
-  [BUILTIN_CALC.canadianCSpine]: REGISTRY.canadianCSpine,
-  [BUILTIN_CALC.ottawaAnkle]: REGISTRY.ottawaAnkle,
-  [BUILTIN_CALC.pecarnHead]: REGISTRY.pecarnHead,
-  [BUILTIN_CALC.nexusCspine]: REGISTRY.nexusCspine,
   [BUILTIN_CALC.huntHessScale]: REGISTRY.huntHessScale,
   [BUILTIN_CALC.ichScore]: REGISTRY.ichScore,
   [BUILTIN_CALC.fourScore]: REGISTRY.fourScore,

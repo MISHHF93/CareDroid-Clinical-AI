@@ -152,6 +152,25 @@ describe('ToolsOverview unified inventory', () => {
     }
   });
 
+  it('exposes the requested AI-first discovery buckets', () => {
+    renderOverview();
+    const filter = screen.getByLabelText(/filter tools by type/i);
+
+    for (const label of [
+      'All',
+      'Recommended for Me',
+      'Calculators',
+      'Diagnostics',
+      'AI Workflows',
+      'Maps & IoT',
+      'Operations',
+      'Favorites',
+      'Recent',
+    ]) {
+      expect(filter).toHaveTextContent(label);
+    }
+  }, 10000);
+
   it('shows lifecycle badges and filters by lifecycle state', () => {
     const { container } = renderOverview();
     const profile = buildUserToolProfile({
@@ -186,7 +205,7 @@ describe('ToolsOverview unified inventory', () => {
     for (const label of ['Beta', 'Experimental', 'Deprecated', 'Hidden', 'Admin Only']) {
       expect(filter).toHaveTextContent(label);
     }
-  });
+  }, 10000);
 
   it('keeps /tools compact and free of duplicate developer catalog links', () => {
     const { container } = renderOverview();

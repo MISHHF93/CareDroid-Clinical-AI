@@ -13,8 +13,9 @@ describe('primaryNavigation', () => {
   it('exposes the simplified primary sidebar model in canonical order', () => {
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
       ['Dashboard', '/dashboard'],
-      ['AI Assistant', '/assistant'],
+      ['Assistant', '/assistant'],
       ['Tools', '/tools'],
+      ['Operations', '/operations'],
       ['Profile', '/profile'],
       ['Settings', '/settings'],
     ]);
@@ -23,11 +24,11 @@ describe('primaryNavigation', () => {
   it('keeps operations destinations in their own sidebar section', () => {
     expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
       ['Digital Twin', '/digital-twin'],
-      ['Live Map', '/live-map'],
       ['Hospital Map', '/hospital-map'],
       ['Medical IoT', '/medical-iot'],
       ['Devices', '/devices'],
-      ['Fleet', '/fleet/map'],
+      ['Fleet Map', '/fleet/map'],
+      ['Live Map', '/live-map'],
     ]);
   });
 
@@ -37,7 +38,9 @@ describe('primaryNavigation', () => {
       ['System Health', '/system-health'],
       ['Governance', '/ai-governance'],
       ['Security', '/security'],
-      ['Audit Logs', '/audit-logs'],
+      ['Audit', '/audit'],
+      ['Regulatory', '/regulatory'],
+      ['Assets', '/assets'],
     ]);
   });
 
@@ -72,6 +75,7 @@ describe('primaryNavigation', () => {
       '/dashboard',
       '/assistant',
       '/tools',
+      '/operations',
       '/profile',
       '/settings',
     ]);
@@ -96,6 +100,8 @@ describe('primaryNavigation', () => {
     expect(getPrimaryNavItemForPath('/medical-iot')?.id).toBe('medical-iot');
     expect(getPrimaryNavItemForPath('/devices')?.id).toBe('devices');
     expect(getPrimaryNavItemForPath('/fleet/map')?.id).toBe('fleet');
+    expect(getPrimaryNavItemForPath('/digital-twin')?.id).toBe('digital-twin');
+    expect(getPrimaryNavItemForPath('/operations')?.id).toBe('operations');
   });
 
   it('activates exactly one primary nav item for profile and settings routes', () => {

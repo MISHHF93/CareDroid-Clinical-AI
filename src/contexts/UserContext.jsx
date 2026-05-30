@@ -191,11 +191,13 @@ export const UserProvider = ({ children }) => {
     }
 
     // Load profile
+    let loadedProfile = false;
     if (storedProfile) {
       try {
         const profile = JSON.parse(storedProfile);
         logger.info('Loading profile into state', { profile });
         setUserState(profile);
+        loadedProfile = true;
       } catch (error) {
         logger.error('Failed to parse stored user profile', { error });
         localStorage.removeItem(USER_PROFILE_KEY);
@@ -204,15 +206,27 @@ export const UserProvider = ({ children }) => {
       logger.warn('No profile in localStorage');
     }
 
-    setIsLoading(false);
+    if (!storedToken || loadedProfile) {
+      setIsLoading(false);
+    }
     logger.info('UserContext init complete');
   }, []);
 
   // Fetch user profile when token changes
   useEffect(() => {
-    if (!authToken || user) return;
+    if (!authToken) {
+      setIsLoading(false);
+      return undefined;
+    }
+    if (user) {
+      setIsLoading(false);
+      return undefined;
+    }
+
+    let cancelled = false;
 
     const fetchUserProfile = async () => {
+      setIsLoading(true);
       try {
         const { response, data: profile } = await apiFetchJson('/api/users/profile', {
           headers: {
@@ -222,18 +236,20 @@ export const UserProvider = ({ children }) => {
         });
 
         if (response.ok) {
-          setUserState(profile);
-          localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
+          if (!cancelled) {
+            setUserState(profile);
+            localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
+          }
         } else {
           // If profile fetch fails and we're in dev mode, use mock profile
           const storedProfile = localStorage.getItem(USER_PROFILE_KEY);
           if (storedProfile) {
             try {
               const profile = JSON.parse(storedProfile);
-              setUserState(profile);
+              if (!cancelled) setUserState(profile);
               logger.info('Using stored mock profile from localStorage');
-            } catch (e) {
-              logger.error('Failed to parse stored profile');
+            } catch (parseError) {
+              logger.error('Failed to parse stored profile', { error: parseError });
             }
           }
         }
@@ -244,22 +260,28 @@ export const UserProvider = ({ children }) => {
         if (storedProfile) {
           try {
             const profile = JSON.parse(storedProfile);
-            setUserState(profile);
+            if (!cancelled) setUserState(profile);
             logger.info('Using stored mock profile (backend unavailable)');
-          } catch (e) {
-            logger.error('Failed to parse stored profile');
+          } catch (parseError) {
+            logger.error('Failed to parse stored profile', { error: parseError });
           }
         }
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
 
     fetchUserProfile();
+    return () => {
+      cancelled = true;
+    };
   }, [authToken, user]);
 
   const setUser = (newUser) => {
     setUserState(newUser);
+    if (newUser) {
+      setIsLoading(false);
+    }
     if (newUser) {
       localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(newUser));
     } else {
@@ -270,8 +292,10 @@ export const UserProvider = ({ children }) => {
   const setAuthToken = (token) => {
     setAuthTokenState(token);
     if (token) {
+      if (!user) setIsLoading(true);
       localStorage.setItem(AUTH_TOKEN_KEY, token);
     } else {
+      setIsLoading(false);
       localStorage.removeItem(AUTH_TOKEN_KEY);
     }
   };

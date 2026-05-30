@@ -1,17 +1,18 @@
 import { existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';
-import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
-import { PLATFORM_DASHBOARDS } from './platformOperatingSystem';
-import { PLATFORM_SYSTEM_CAPABILITIES, PLATFORM_SYSTEM_CAPABILITY_BY_ID } from './platformSystems';
-import { getCanonicalToolInventory } from './toolInventory';
+import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory.js';
+import { FRONTEND_API_CALLS } from './frontendApiCallsInventory.js';
+import { PLATFORM_DASHBOARDS } from './platformOperatingSystem.js';
+import { PLATFORM_SYSTEM_CAPABILITIES, PLATFORM_SYSTEM_CAPABILITY_BY_ID } from './platformSystems.js';
+import { getCanonicalToolInventory } from './toolInventory.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..');
 
 export const PLATFORM_CAPABILITY_MATRIX_STATUSES = Object.freeze({
   ACTIVE: 'Active',
+  DEMO: 'Demo',
   CONTRACTED: 'Contracted',
   FRONTEND_ACTIVE: 'Frontend Active',
   PLANNED: 'Planned',
@@ -66,6 +67,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     backendService: 'FloorService / RoomService / DeviceLocationService',
     apiEndpoint: 'GET /api/hospital-map/floors',
     testCoverage: ['src/pages/HospitalMapDashboard.test.jsx', 'src/services/hospitalMapService.test.js'],
+    status: PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
   },
   {
     id: 'medical-iot',
@@ -73,9 +75,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     frontendRoute: '/medical-iot',
     inventoryEntry: 'medical-iot-dashboard',
     aiLaunchAlias: 'show telemetry',
-    backendService: 'TelemetryService',
+    backendService: 'TelemetryService / DeviceRegistryService / AlertService',
     apiEndpoint: 'GET /api/telemetry/live',
     testCoverage: ['src/pages/MedicalIotDashboard.test.jsx', 'src/services/medicalIotService.test.js'],
+    status: PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
   },
   {
     id: 'devices',
@@ -93,9 +96,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     frontendRoute: '/live-map',
     inventoryEntry: 'live-tracking-map',
     aiLaunchAlias: 'show live tracking',
-    backendService: 'LiveTrackingService',
+    backendService: 'FleetService / VehicleTrackingService',
     apiEndpoint: 'GET /api/fleet/vehicles/live',
     testCoverage: ['src/pages/LiveTrackingMaps.test.jsx', 'src/services/liveTrackingApi.test.js'],
+    status: PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
   },
   {
     id: 'fleet-map',
@@ -103,9 +107,10 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     frontendRoute: '/fleet/map',
     inventoryEntry: 'fleet-live-map',
     aiLaunchAlias: 'show fleet map',
-    backendService: 'LiveTrackingService',
+    backendService: 'FleetService / VehicleTrackingService',
     apiEndpoint: 'GET /api/fleet/vehicles/live',
     testCoverage: ['src/pages/fleet/FleetLiveMap.test.jsx', 'src/services/liveTrackingApi.test.js'],
+    status: PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO,
   },
   {
     id: 'fleet-command',
@@ -372,7 +377,7 @@ function foundationToMatrixRow(row) {
   return {
     ...row,
     testCoverage: normalizeTestCoverage(row.testCoverage),
-    status: statusFor(row.apiEndpoint),
+    status: row.status || statusFor(row.apiEndpoint),
     frontendApiCall: frontendCallExists(row.apiEndpoint),
     source: 'platform-foundation',
   };
@@ -440,6 +445,7 @@ function mdCell(value) {
 export function formatPlatformCapabilityMatrixDocument(rows = platformCapabilityMatrix) {
   const missing = listMissingPlatformCapabilityTraceability(rows);
   const active = rows.filter((row) => row.status === PLATFORM_CAPABILITY_MATRIX_STATUSES.ACTIVE).length;
+  const demo = rows.filter((row) => row.status === PLATFORM_CAPABILITY_MATRIX_STATUSES.DEMO).length;
   const lines = [
     '# Platform Capability Matrix',
     '',
@@ -449,6 +455,7 @@ export function formatPlatformCapabilityMatrixDocument(rows = platformCapability
     '',
     `- Total capabilities: ${rows.length}`,
     `- Active capabilities: ${active}`,
+    `- Demo-labeled operational capabilities: ${demo}`,
     `- Traceability gaps: ${missing.length}`,
     '',
     '## Matrix',

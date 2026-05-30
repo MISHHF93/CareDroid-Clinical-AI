@@ -317,7 +317,7 @@ export function getChatCapabilitySuggestions({
       label: 'Review audit logs',
       description: 'Open the protected audit log surface.',
       kind: 'route',
-      path: '/audit-logs',
+      path: '/audit',
       icon: CHROME_ICONS.clipboardList,
       source: 'GET /api/audit/logs',
       defaultRank: 60,

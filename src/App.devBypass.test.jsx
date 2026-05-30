@@ -6,9 +6,24 @@ import { WelcomePage } from './App';
 
 const mocks = vi.hoisted(() => ({
   appConfig: {
+    app: {
+      name: 'CareDroid-Clinical-AI',
+      version: 'test',
+      environment: 'test',
+    },
+    api: {
+      baseUrl: '',
+      wsUrl: '',
+    },
     features: {
       enableDevAuthBypass: false,
       enableDemoMode: false,
+      allowLocalDemoAuth: true,
+      showDemoAuth: false,
+      hideDivisionMode: true,
+      enablePushNotifications: false,
+      enableOfflineMode: false,
+      enableBiometricAuth: false,
     },
     dev: {
       bearerToken: 'welcome-dev-token',

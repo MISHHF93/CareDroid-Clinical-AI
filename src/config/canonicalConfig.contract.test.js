@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { API_ROUTES, normalizeApiPath } from './api.config';
 import { AUTH_CONFIG } from './auth.config';
+import { FEATURE_FLAGS } from './featureFlags.config';
 import {
   ASSISTANT_ROUTE_ALIASES,
   AUTH_PATH_ALIASES,
@@ -30,7 +31,11 @@ describe('canonical configuration contract', () => {
     expect(CANONICAL_ROUTES.auth).toBe('/auth');
     expect(AUTH_CONFIG.canonicalRoute).toBe(CANONICAL_ROUTES.auth);
     expect(getRouteAliasTarget('/signin')).toBe('/auth');
+    expect(getRouteAliasTarget('/chat')).toBe('/assistant');
     expect(getRouteAliasTarget('/copilot')).toBe('/assistant');
+    expect(getRouteAliasTarget('/catalog')).toBe('/tools');
+    expect(getRouteAliasTarget('/fleet')).toBe('/fleet/map');
+    expect(getRouteAliasTarget('/operations')).toBe('/digital-twin');
     expect(ROUTE_ALIAS_GROUPS.assistant.aliases).toBe(ASSISTANT_ROUTE_ALIASES);
     expect(new Set(AUTH_PATH_ALIASES).size).toBe(AUTH_PATH_ALIASES.length);
 
@@ -39,6 +44,41 @@ describe('canonical configuration contract', () => {
     expect(appSource).not.toMatch(/const\s+TOOLS_ROUTE_ALIASES\s*=\s*\[/);
     expect(routeHealthSource).toContain("from '../config/routes.config'");
     expect(routeHealthSource).not.toContain('parseStringArrayConstant');
+  });
+
+  it('declares the compact clinical OS route surface in the canonical route map', () => {
+    expect(Object.values(CANONICAL_ROUTES)).toEqual(
+      expect.arrayContaining([
+        '/dashboard',
+        '/assistant',
+        '/tools',
+        '/tools/calculators',
+        '/tools/calculators/:slug',
+        '/hospital-map',
+        '/medical-iot',
+        '/devices',
+        '/fleet/map',
+        '/live-map',
+        '/digital-twin',
+        '/profile',
+        '/profile/settings',
+        '/profile/tool-preferences',
+        '/settings',
+        '/notifications',
+        '/timeline',
+        '/workflows',
+        '/search',
+        '/tools/catalog',
+        '/system-health',
+        '/ai-governance',
+        '/security',
+        '/audit',
+        '/regulatory',
+        '/human-review',
+        '/assets',
+      ])
+    );
+    expect(getRouteAliasTarget('/audit-logs')).toBe('/audit');
   });
 
   it('keeps calculator manifest as a toolInventory projection', () => {
@@ -70,6 +110,13 @@ describe('canonical configuration contract', () => {
     expect(read('services/apiClient.js')).toContain("from '../config/auth.config'");
     expect(read('services/clinicalOrchestratorApi.js')).toContain('API_ROUTES.tools.execute');
     expect(read('services/clinicalToolsApi.js')).toContain('AUTH_CONFIG.tokenStorageKey');
+  });
+
+  it('projects feature flags through featureFlags.config before env/auth consumers', () => {
+    expect(FEATURE_FLAGS).toHaveProperty('enableDemoMode');
+    expect(FEATURE_FLAGS).toHaveProperty('enableDevAuthBypass');
+    expect(read('config/env.config.js')).toContain("from './featureFlags.config'");
+    expect(read('config/auth.config.js')).toContain("from './env.config'");
   });
 
   it('centralizes theme and layout contracts without page-owned viewport shells', () => {

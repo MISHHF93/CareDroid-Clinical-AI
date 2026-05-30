@@ -140,7 +140,7 @@ export function getPlatformInventory() {
       },
       {
         area: 'Administration (RBAC)',
-        routes: ['/team', '/audit-logs', '/analytics', '/costs'],
+        routes: ['/team', '/audit', '/analytics', '/costs'],
       },
       {
         area: 'Public & legal',

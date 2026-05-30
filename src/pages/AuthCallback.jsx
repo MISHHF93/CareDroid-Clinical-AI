@@ -15,16 +15,20 @@ const AuthCallback = () => {
   const { setAuthToken } = useUser();
   const { info } = useNotificationActions();
   const initialToken = params.get('token') || '';
+  const nextPath = params.get('next') || '/dashboard';
   const [token, setToken] = useState(initialToken);
   const autoHandled = useRef(false);
+  const safeNextPath = nextPath.startsWith('/') && !nextPath.startsWith('//') && !nextPath.startsWith('/auth')
+    ? nextPath
+    : '/dashboard';
 
   useEffect(() => {
     const fromUrl = params.get('token');
     if (!fromUrl || autoHandled.current) return;
     autoHandled.current = true;
     setAuthToken(fromUrl);
-    navigate('/dashboard', { replace: true });
-  }, [params, setAuthToken, navigate]);
+    navigate(safeNextPath, { replace: true });
+  }, [params, setAuthToken, navigate, safeNextPath]);
 
   const handleSave = () => {
     const trimmed = token.trim();
@@ -33,7 +37,7 @@ const AuthCallback = () => {
       return;
     }
     setAuthToken(trimmed);
-    navigate('/dashboard', { replace: true });
+    navigate(safeNextPath, { replace: true });
   };
 
   if (initialToken) {

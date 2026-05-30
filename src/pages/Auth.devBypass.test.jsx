@@ -5,11 +5,24 @@ import Auth from './Auth';
 
 const mocks = vi.hoisted(() => ({
   appConfig: {
+    app: {
+      name: 'CareDroid-Clinical-AI',
+      version: 'test',
+      environment: 'test',
+    },
+    api: {
+      baseUrl: '',
+      wsUrl: '',
+    },
     features: {
       enableDevAuthBypass: false,
       hideDivisionMode: true,
       showDemoAuth: false,
       enableDemoMode: false,
+      allowLocalDemoAuth: true,
+      enablePushNotifications: false,
+      enableOfflineMode: false,
+      enableBiometricAuth: false,
     },
     dev: {
       bearerToken: 'test-dev-token',

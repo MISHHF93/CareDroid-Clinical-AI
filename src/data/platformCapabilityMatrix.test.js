@@ -81,7 +81,7 @@ describe('platform capability matrix', () => {
       inventoryEntry: 'hospital-map',
       aiLaunchAlias: 'show map',
       apiEndpoint: 'GET /api/hospital-map/floors',
-      status: 'Active',
+      status: 'Demo',
     });
 
     expect(getPlatformCapabilityById('medical-iot')).toMatchObject({
@@ -89,9 +89,9 @@ describe('platform capability matrix', () => {
       frontendRoute: '/medical-iot',
       inventoryEntry: 'medical-iot-dashboard',
       aiLaunchAlias: 'show telemetry',
-      backendService: 'TelemetryService',
+      backendService: 'TelemetryService / DeviceRegistryService / AlertService',
       apiEndpoint: 'GET /api/telemetry/live',
-      status: 'Active',
+      status: 'Demo',
     });
   });
 

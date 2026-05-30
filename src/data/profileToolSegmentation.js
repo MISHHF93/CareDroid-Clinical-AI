@@ -28,6 +28,13 @@ const STUDENT_PERMISSIONS = Object.freeze([
   'USE_AI_CHAT',
 ]);
 
+const OPERATIONS_DISCOVERY_PERMISSIONS = new Set([
+  'VIEW_OPERATIONS',
+  'VIEW_OBSERVABILITY',
+  'VIEW_ANALYTICS',
+  'CONFIGURE_SYSTEM',
+]);
+
 export const PROFILE_ROLES = Object.freeze([
   'emergency physician',
   'hospitalist',
@@ -482,6 +489,12 @@ function hasRequiredPermissions(profile, metadata) {
   const required = metadata.requiredPermissions || [];
   if (!required.length) return true;
   const permissionSet = new Set(profile.permissions || []);
+  if (metadata.workspaceTags?.some((tag) => ['fleet', 'operations', 'iot', 'hospital-operations'].includes(tag))) {
+    const nonDiscoveryPermissions = required.filter(
+      (permission) => !OPERATIONS_DISCOVERY_PERMISSIONS.has(permission)
+    );
+    return nonDiscoveryPermissions.every((permission) => permissionSet.has(permission));
+  }
   return required.every((permission) => permissionSet.has(permission));
 }
 
@@ -489,7 +502,7 @@ export function getToolRestrictionReason(tool, profile) {
   const metadata = tool.segmentation || deriveToolSegmentationMetadata(tool);
   if ((profile.hiddenTools || []).includes(tool.id)) return 'Hidden by user preference';
   if (metadata.hiddenFor?.includes(profile.role)) return `Hidden for ${profile.role}`;
-  if (!profile.operationsAccess && metadata.workspaceTags?.some((tag) => ['fleet', 'operations', 'iot', 'hospital-operations', 'admin'].includes(tag))) {
+  if (!profile.operationsAccess && metadata.workspaceTags?.includes('admin')) {
     return 'Requires operations access';
   }
   if (!profile.clinicalAccess && metadata.workspaceTags?.includes('clinical')) {
@@ -501,7 +514,7 @@ export function getToolRestrictionReason(tool, profile) {
   if (
     metadata.requiresHumanReview &&
     metadata.clinicalRiskLevel === 'high' &&
-    !['admin', 'clinician'].includes(profile.permissionLevel)
+    !['admin', 'clinician', 'operations'].includes(profile.permissionLevel)
   ) {
     return 'Requires clinical human-review permission';
   }
@@ -547,6 +560,7 @@ export function buildProfileToolGraph({ tools = [], profile }) {
   const recommendedTools = visibleTools.filter((tool) => tool.profileScore >= 50).slice(0, 24);
   const pinnedTools = (profile.pinnedTools || []).map((toolId) => visibleTools.find((tool) => tool.id === toolId)).filter(Boolean);
   const recentTools = (profile.recentTools || []).map((toolId) => visibleTools.find((tool) => tool.id === toolId)).filter(Boolean);
+  const favoriteTools = (profile.preferredTools || []).map((toolId) => visibleTools.find((tool) => tool.id === toolId)).filter(Boolean);
   const specialtyTools = visibleTools.filter((tool) => tool.specialties?.includes(profile.specialty));
   const workspaceTools = visibleTools.filter((tool) => {
     if (!profile.workspace || profile.workspace === 'all') return true;
@@ -564,6 +578,7 @@ export function buildProfileToolGraph({ tools = [], profile }) {
     recommendedTools,
     restrictedTools,
     pinnedTools,
+    favoriteTools,
     recentTools,
     specialtyTools,
     workspaceTools,
@@ -572,6 +587,7 @@ export function buildProfileToolGraph({ tools = [], profile }) {
       recommended: recommendedTools.length,
       restricted: restrictedTools.length,
       pinned: pinnedTools.length,
+      favorites: favoriteTools.length,
       recent: recentTools.length,
       specialtyCoverage: specialtyTools.length,
     },
@@ -589,6 +605,7 @@ export function filterToolsForProfileGraph(graph, filter) {
   if (filter === 'specialty') return graph.specialtyTools;
   if (filter === 'workspace') return graph.workspaceTools;
   if (filter === 'pinned') return graph.pinnedTools;
+  if (filter === 'favorites') return graph.favoriteTools;
   if (filter === 'recent') return graph.recentTools;
   if (filter === 'restricted') return graph.profile.permissionLevel === 'admin' ? graph.restrictedTools : [];
   return graph.visibleTools;

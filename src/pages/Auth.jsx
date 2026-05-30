@@ -78,7 +78,7 @@ const Auth = ({ onAuthSuccess }) => {
       }
 
       if (data?.accessToken) {
-        onAuthSuccess?.(data.accessToken);
+        onAuthSuccess?.(data.accessToken, data.user);
       } else {
         success('Registration complete', 'Check your email to verify your account.');
       }
@@ -107,7 +107,7 @@ const Auth = ({ onAuthSuccess }) => {
       }
 
       if (data?.accessToken) {
-        onAuthSuccess?.(data.accessToken);
+        onAuthSuccess?.(data.accessToken, data.user);
         success('Signed in', 'You are authenticated.');
       }
     } catch {

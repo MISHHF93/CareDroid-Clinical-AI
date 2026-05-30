@@ -25,11 +25,13 @@ import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
 import {
   ASSISTANT_ROUTE_ALIASES,
+  AUDIT_ROUTE_ALIASES,
   AUTH_PATH_ALIASES,
   AUTH_SIGNUP_PATH_ALIASES,
   CALCULATORS_ROUTE_ALIASES,
   FLEET_MAP_ROUTE_ALIASES,
   LIVE_MAP_ROUTE_ALIASES,
+  OPERATIONS_ROUTE_ALIASES,
   TOOLS_ROUTE_ALIASES,
 } from './config/routes.config';
 import {
@@ -109,7 +111,6 @@ const NotificationPreferences = lazyWithRetry(() => import('./pages/Notification
 const TwoFactorSetup = lazyWithRetry(() => import('./pages/TwoFactorSetup'));
 const BiometricSetup = lazyWithRetry(() => import('./pages/BiometricSetup'));
 const Onboarding = lazyWithRetry(() => import('./pages/Onboarding'));
-const AuditLogs = lazyWithRetry(() => import('./pages/AuditLogs'));
 const AnalyticsDashboard = lazyWithRetry(() => import('./pages/AnalyticsDashboard'));
 const CostAnalyticsDashboard = lazyWithRetry(() => import('./pages/CostAnalyticsDashboard'));
 const ConsentFlow = lazyWithRetry(() =>
@@ -183,6 +184,27 @@ const PageLoader = () => (
 
 logger.info('App.jsx loaded - Medical AI Chat Application');
 
+function buildAuthRedirectSearch(location) {
+  const current = `${location.pathname}${location.search || ''}${location.hash || ''}`;
+  if (!location.pathname || location.pathname === '/auth' || location.pathname.startsWith('/auth/')) {
+    return '';
+  }
+  const search = new URLSearchParams();
+  search.set('next', current);
+  return `?${search.toString()}`;
+}
+
+function getSafePostAuthPath(location) {
+  const search = new URLSearchParams(location.search);
+  const next = search.get('next') || location.state?.from;
+  if (!next || typeof next !== 'string') return '/dashboard';
+  if (!next.startsWith('/') || next.startsWith('//')) return '/dashboard';
+  if (next === '/auth' || next.startsWith('/auth?') || next.startsWith('/auth/')) {
+    return '/dashboard';
+  }
+  return next;
+}
+
 function NotificationToasts() {
   const { notifications, removeNotification } = useNotifications();
   return <NotificationToastContainer toasts={notifications} onDismiss={removeNotification} />;
@@ -192,13 +214,14 @@ function NotificationToasts() {
 function AuthPage() {
   const { setAuthToken, setUser } = useUser();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleAuthSuccess = (token, user) => {
     flushSync(() => {
       setAuthToken(token);
       if (user) setUser(user);
     });
-    navigate('/dashboard', { replace: true });
+    navigate(getSafePostAuthPath(location), { replace: true });
   };
 
   return <Auth onAuthSuccess={handleAuthSuccess} />;
@@ -389,6 +412,7 @@ function LegacyProtectedRouteRedirect({ to }) {
 // ==================== ROUTING ====================
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useUser();
+  const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
@@ -416,7 +440,13 @@ function AppRoutes() {
     requireAllPermissions = false,
   }) => {
     if (requiresAuth && !isAuthenticated) {
-      return <Navigate to="/auth" replace />;
+      return (
+        <Navigate
+          to={{ pathname: '/auth', search: buildAuthRedirectSearch(location) }}
+          replace
+          state={{ from: `${location.pathname}${location.search || ''}${location.hash || ''}` }}
+        />
+      );
     }
 
     if (publicOnly && isAuthenticated) {
@@ -464,7 +494,6 @@ function AppRoutes() {
           <AuthCallback />
         </AuthShell>
       ),
-      publicOnly: true,
     },
     {
       path: '/auth/callback',
@@ -473,7 +502,6 @@ function AppRoutes() {
           <LegacyOAuthCallbackRedirect />
         </AuthShell>
       ),
-      publicOnly: true,
     },
     ...AUTH_PATH_ALIASES.map((path) => ({
       path,
@@ -570,11 +598,6 @@ function AppRoutes() {
           <Dashboard />
         </AppShellPage>
       ),
-      requiresAuth: true,
-    },
-    {
-      path: '/chat',
-      element: <LegacyProtectedRouteRedirect to="/assistant" />,
       requiresAuth: true,
     },
     ...ASSISTANT_ROUTE_ALIASES.map((path) => ({
@@ -823,11 +846,11 @@ function AppRoutes() {
       requiresAuth: true,
       permission: Permission.VIEW_INTEGRATIONS,
     },
-    {
-      path: '/operations',
-      element: <LegacyProtectedRouteRedirect to="/dashboard" />,
+    ...OPERATIONS_ROUTE_ALIASES.map((path) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to="/digital-twin" />,
       requiresAuth: true,
-    },
+    })),
     {
       path: '/operations/observability',
       element: (
@@ -1348,16 +1371,6 @@ function AppRoutes() {
     },
 
     {
-      path: '/fleet',
-      element: <LegacyProtectedRouteRedirect to="/fleet/map" />,
-      requiresAuth: true,
-    },
-    {
-      path: '/catalog',
-      element: <LegacyProtectedRouteRedirect to="/tools" />,
-      requiresAuth: true,
-    },
-    {
       path: '/fleet/command',
       element: (
         <AppShellPage>
@@ -1840,16 +1853,11 @@ function AppRoutes() {
       requiresAuth: true,
       permission: Permission.VIEW_AUDIT_LOGS,
     },
-    {
-      path: '/audit-logs',
-      element: (
-        <AppShellPage>
-          <AuditLogs />
-        </AppShellPage>
-      ),
+    ...AUDIT_ROUTE_ALIASES.map((path) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to="/audit" />,
       requiresAuth: true,
-      permission: Permission.VIEW_AUDIT_LOGS,
-    },
+    })),
     {
       path: '/analytics',
       element: (

@@ -1,8 +1,23 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { normalizeApiPath } from '../config/api.config';
 
 const mockAppConfig = vi.hoisted(() => ({
+  app: {
+    name: 'CareDroid-Clinical-AI',
+    version: 'test',
+    environment: 'test',
+  },
   api: { baseUrl: '', wsUrl: '' },
+  features: {
+    enableDemoMode: false,
+    allowLocalDemoAuth: false,
+    enableDevAuthBypass: false,
+    showDemoAuth: false,
+    hideDivisionMode: false,
+    enablePushNotifications: false,
+    enableOfflineMode: false,
+    enableBiometricAuth: false,
+  },
 }));
 
 vi.mock('../config/appConfig', () => ({

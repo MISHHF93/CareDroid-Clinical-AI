@@ -22,20 +22,25 @@ import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './ToolsOverview.css';
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
+  { value: 'all', label: 'All' },
   { value: 'recommended', label: 'Recommended for Me' },
+  { value: 'calculator', label: 'Calculators' },
+  { value: 'diagnostics', label: 'Diagnostics' },
+  { value: 'ai-workflows', label: 'AI Workflows' },
+  { value: 'maps-iot', label: 'Maps & IoT' },
+  { value: 'operations', label: 'Operations' },
+  { value: 'favorites', label: 'Favorites' },
+  { value: 'recent', label: 'Recent' },
   { value: 'specialty', label: 'My Specialty' },
   { value: 'workspace', label: 'My Workspace' },
   { value: 'pinned', label: 'Pinned' },
-  { value: 'recent', label: 'Recent' },
   { value: 'restricted', label: 'Restricted/Unavailable' },
-  { value: 'all', label: 'All' },
   { value: `lifecycle-${TOOL_LIFECYCLE_STATES.ACTIVE}`, label: 'Active' },
   { value: `lifecycle-${TOOL_LIFECYCLE_STATES.BETA}`, label: 'Beta' },
   { value: `lifecycle-${TOOL_LIFECYCLE_STATES.EXPERIMENTAL}`, label: 'Experimental' },
   { value: `lifecycle-${TOOL_LIFECYCLE_STATES.DEPRECATED}`, label: 'Deprecated' },
   { value: `lifecycle-${TOOL_LIFECYCLE_STATES.HIDDEN}`, label: 'Hidden' },
   { value: `lifecycle-${TOOL_LIFECYCLE_STATES.ADMIN_ONLY}`, label: 'Admin Only' },
-  { value: 'calculator', label: 'Calculators' },
   { value: 'chat-assisted', label: 'Guided chat' },
   { value: 'backend-backed', label: 'Verified actions' },
   { value: 'clinical-page', label: 'Forms and pages' },
@@ -76,11 +81,38 @@ function toolSearchBlob(tool) {
 }
 
 function matchesToolFilter(tool, filter) {
-  if (!filter || ['recommended', 'specialty', 'workspace', 'pinned', 'recent', 'restricted', 'all'].includes(filter)) {
+  if (!filter || ['recommended', 'specialty', 'workspace', 'pinned', 'favorites', 'recent', 'restricted', 'all'].includes(filter)) {
     return true;
   }
   if (filter.startsWith('lifecycle-')) return tool.lifecycleState === filter.replace('lifecycle-', '');
   if (filter === 'calculator') return tool.category === 'Calculator' || tool.surface === 'calculator-form';
+  if (filter === 'diagnostics') {
+    return tool.category === 'Diagnostic' || /diagnos|differential|triage|risk|score/i.test(`${tool.name} ${tool.description}`);
+  }
+  if (filter === 'ai-workflows') {
+    return (
+      ['AI Tools', 'Diagnostic'].includes(tool.category) ||
+      tool.launchType === 'chat-assisted' ||
+      tool.launchType === 'backend-backed' ||
+      /ai|assistant|workflow|scribe|summary|order set|timeline/i.test(`${tool.name} ${tool.description}`)
+    );
+  }
+  if (filter === 'maps-iot') {
+    return (
+      tool.category === 'IoT' ||
+      tool.surface === 'iot-dashboard' ||
+      tool.path === '/hospital-map' ||
+      tool.path === '/live-map' ||
+      /map|iot|device|telemetry|digital twin/i.test(`${tool.name} ${tool.description}`)
+    );
+  }
+  if (filter === 'operations') {
+    return (
+      ['Fleet', 'IoT', 'Hospital Operations'].includes(tool.category) ||
+      ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(tool.surface) ||
+      /fleet|operations|dispatch|device|hospital map|live map|digital twin/i.test(`${tool.name} ${tool.description}`)
+    );
+  }
   if (filter === 'chat-assisted') return tool.surface === 'chat-assisted' || tool.launchType === 'chat-assisted';
   if (filter === 'backend-backed') return tool.launchType === 'backend-backed' || tool.executorStatus === 'registered';
   if (filter === 'clinical-page') return tool.surface === 'tool-page' || tool.launchType === 'clinical-page';
@@ -274,7 +306,7 @@ const ToolsOverview = () => {
   }, [filteredTools, pinnedToolIdSet]);
   const showWorkspaceEmpty = !isAllToolsWorkspace && workspaceInventoryCount === 0;
   const showSearchEmpty = !showWorkspaceEmpty && filteredTools.length === 0;
-  const filterTabs = TOOL_FILTER_OPTIONS.slice(0, 14);
+  const filterTabs = TOOL_FILTER_OPTIONS;
   const emptyStateCopy =
     toolFilter === 'restricted'
       ? profile.permissionLevel === 'admin'
