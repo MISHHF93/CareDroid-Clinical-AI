@@ -1,6 +1,6 @@
 # Full Throttle Platform Consolidation Report
 
-Date: 2026-05-26
+Date: 2026-05-29
 
 ## Product Model
 
@@ -35,10 +35,26 @@ CareDroid is now organized as a compact AI-first clinical operating system:
 
 ## Navigation And Dashboard
 
-- Sidebar primary items are limited to Dashboard, AI Assistant, Tools, Calculators, Hospital Map, Medical IoT, Fleet Map, Profile, and Settings.
-- Advanced remains collapsed and now contains Developer Catalog / Source Audit, System Health, Governance, Security, and Audit Logs.
+- Sidebar primary items now move toward workspace-first IA: Workspace, AI Assistant, Command Center, Profile, and Settings.
+- The collapsed More group keeps secondary destinations reachable without top-level sprawl: Tool Library, Calculators, Hospital Map, Medical IoT, Fleet Map, Developer Catalog / Source Audit, System Health, Governance, Security, and Audit Logs.
+- `/workspace/:workspaceId` introduces Clinical, Emergency, Operations, Fleet, Medical IoT, Research, and Admin workspaces. Each workspace exposes relevant routes, dashboards, calculators, tools, maps, and AI context from the unified inventory.
+- `/workspaces` is the workspace directory and entry point for the workspace architecture.
+- A global workspace switcher is available in the authenticated app shell header.
+- Quick Command now searches workspace destinations in addition to routes and inventory-backed tools/calculators, with fuzzy matching, recent tools, favorites, and keyboard launch from the search field.
 - The dashboard launchpad provides compact entry cards for AI Assistant, Tools, Calculators, Hospital Map, Medical IoT, Fleet, Device Management, Recent Activity, and System Status.
+- `/dashboard` includes an adaptive workspace panel that changes recommendations from role/workspace/recent/favorite context.
 - Quick Command remains a launcher/search surface backed by the unified tool inventory while preserving shared calculator-hub tools.
+
+## Platform Upgrades
+
+- `/search` provides global search across workspaces, routes, tools, calculators, dashboards, maps, workflows, notifications, and documents.
+- `/timeline` provides a unified clinical timeline for calculator runs, AI actions, device/telemetry events, fleet activity, workflow activity, audit events, and alerts, with filters and JSON export.
+- `/notifications` is now the operational notification center; notification preferences remain available at `/notification-preferences`.
+- `/digital-twin` assembles hospital map, IoT, fleet, occupancy, staffing, assets, device markers, and alerts into a single demo-labeled digital twin view.
+- `/workflows` adds a workflow builder surface with saved workflows, draft creation, AI-generation entry point, and launchable workflow blocks.
+- `/assets` provides an asset library view for templates, documents, protocols, maps, telemetry schemas, usage counts, and orphan-risk detection.
+- AI assistant messages now expose an `Explain` action that opens the explainability trace surface with the response context.
+- Backend service foundations were added for `SearchService`, `TimelineService`, and `AssetRegistryService`.
 
 ## Tools And Clinical Operations
 
@@ -62,18 +78,18 @@ CareDroid is now organized as a compact AI-first clinical operating system:
 
 ## Verification
 
-Completed verification:
+Completed verification on 2026-05-29:
 
-- Focused consolidation tests: `15` files, `84` tests passed.
+- Platform upgrade focused tests: `7` files, `31` tests passed.
+- Backend platform service tests: `3` suites, `6` tests passed.
+- Workspace IA focused tests: `5` files, `21` tests passed.
+- Focused consolidation/auth/route/mobile tests: `6` files, `49` tests passed.
 - Backend/frontend exposure: `10` files, `62` tests passed.
-- Responsive regression: `11` files, `463` tests passed across the requested mobile/tablet/desktop viewport matrix.
+- Responsive regression: `11` files, `461` tests passed across the requested mobile/tablet/desktop viewport matrix.
 - Backend tests: `92` suites, `769` tests passed.
-- Heavy frontend contract rerun: `4` files, `37` tests passed after raising explicit timeouts for expanded inventory scans.
-- IA contract rerun: `3` files, `30` tests passed after replacing stale operations-route expectations.
 - Lint: passed with `0` errors and existing warnings.
 - Production build: passed; asset validation passed and Vite emitted the existing large calculator chunk warning.
-
-The full bounded frontend run (`npm run test:run:parallel`) reported passing output across the large route, tool, exposure, calculator, theme, registry, and wiring batches, but the shell wrapper ended without a final Vitest summary after the process disappeared. The failed default full-suite attempt was due to stale IA expectations and short timeouts; those files were fixed and rerun cleanly.
+- Backend build: passed.
 
 ## Remaining Risks
 

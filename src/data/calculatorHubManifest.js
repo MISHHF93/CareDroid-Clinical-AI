@@ -87,12 +87,20 @@ export const CALCULATOR_INTERFACE_CLASS_BY_SLUG = Object.freeze({
   'glasgow-blatchford-score': 'calculator-interface--glasgow-blatchford-score',
   'rockall-score': 'calculator-interface--rockall-score',
   'framingham-risk': 'calculator-interface--framingham-risk',
+  'wells-pe': 'calculator-interface--wells-pe',
+  perc: 'calculator-interface--perc',
+  'grace-acs': 'calculator-interface--grace-acs',
   'duke-treadmill-score': 'calculator-interface--duke-treadmill-score',
   'reynolds-risk-score': 'calculator-interface--reynolds-risk-score',
   'hcm-sudden-death-risk': 'calculator-interface--hcm-sudden-death-risk',
   chads2: 'calculator-interface--chads2',
   'heart-failure-staging': 'calculator-interface--heart-failure-staging',
   abcd2: 'calculator-interface--abcd2',
+  nihss: 'calculator-interface--nihss',
+  'canadian-c-spine': 'calculator-interface--canadian-c-spine',
+  'ottawa-ankle': 'calculator-interface--ottawa-ankle',
+  'pecarn-head': 'calculator-interface--pecarn-head',
+  'nexus-cspine': 'calculator-interface--nexus-cspine',
   'hunt-hess-scale': 'calculator-interface--hunt-hess-scale',
   'ich-score': 'calculator-interface--ich-score',
   'four-score': 'calculator-interface--four-score',
@@ -130,6 +138,11 @@ export function getHubChatAssistedTools() {
   const calculatorRecords = getCalculatorToolInventory().filter(
     (record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED
   );
+  const dedicatedToolIds = new Set(
+    getCalculatorToolInventory()
+      .filter((record) => record.hasDedicatedForm)
+      .flatMap((record) => [record.id, record.nluToolId, ...(record.nluProfileIds || [])].filter(Boolean))
+  );
   const hubRowsById = new Map(nluCalculatorHubOnly.map((tool) => [tool.toolId, tool]));
   const rowsByToolId = new Map();
 
@@ -148,7 +161,7 @@ export function getHubChatAssistedTools() {
   }
 
   for (const tool of nluCalculatorHubOnly) {
-    if (tool.toolId === 'dispatch-ai' || rowsByToolId.has(tool.toolId)) continue;
+    if (tool.toolId === 'dispatch-ai' || rowsByToolId.has(tool.toolId) || dedicatedToolIds.has(tool.toolId)) continue;
     rowsByToolId.set(tool.toolId, {
       ...tool,
       description:

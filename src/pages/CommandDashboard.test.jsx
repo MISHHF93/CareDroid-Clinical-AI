@@ -4,6 +4,7 @@ import { MemoryRouter, useLocation } from 'react-router-dom';
 import CommandDashboard from './CommandDashboard';
 import {
   mockConversationValue,
+  mockNotificationsValue,
   mockToolPreferencesValue,
   mockUserValue,
 } from '../test/testRenderUtils';
@@ -24,6 +25,10 @@ vi.mock('../contexts/ConversationContext', () => ({
 
 vi.mock('../contexts/ToolPreferencesContext', () => ({
   useToolPreferences: () => mockToolPreferencesValue,
+}));
+
+vi.mock('../contexts/NotificationContext', () => ({
+  useNotifications: () => mockNotificationsValue,
 }));
 
 vi.mock('../contexts/SystemConfigContext', () => ({
@@ -55,22 +60,22 @@ describe('CommandDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockToolPreferencesValue.recentTools = [];
+    mockNotificationsValue.notifications = [];
   });
 
-  it('renders the command dashboard panels without blank states', () => {
+  it('renders the command center sections without blank states', () => {
     renderDashboard();
 
-    expect(screen.getByRole('heading', { level: 1, name: /caredroid command dashboard/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /caredroid command center/i })).toBeInTheDocument();
     for (const name of [
       /ai assistant/i,
-      /launchpad/i,
-      /clinical tools/i,
-      /reference & guidelines/i,
-      /fleet/i,
-      /medical iot \/ device monitoring/i,
-      /command analytics/i,
+      /quick actions/i,
+      /my tools/i,
+      /my calculators/i,
+      /my workspace/i,
+      /notifications/i,
+      /active alerts/i,
       /^recent activity$/i,
-      /system status/i,
     ]) {
       expect(screen.getByRole('heading', { name })).toBeInTheDocument();
     }
@@ -80,11 +85,15 @@ describe('CommandDashboard', () => {
   it('renders compact launch cards for primary dashboard entry points', () => {
     renderDashboard();
 
-    const launchpad = screen.getByRole('heading', { name: /launchpad/i }).closest('section');
+    const launchpad = screen.getByRole('heading', { name: /quick actions/i }).closest('section');
     for (const name of [
       /ai assistant/i,
-      /browse every user-facing/i,
-      /calculators/i,
+      /my workspace/i,
+      /my tools/i,
+      /my calculators/i,
+      /digital twin/i,
+      /notifications/i,
+      /active alerts/i,
       /hospital map/i,
       /medical iot/i,
       /open live vehicle tracking/i,
@@ -108,8 +117,12 @@ describe('CommandDashboard', () => {
   });
 
   it('keeps featured dashboard tool cards unique', () => {
-    const { container } = renderDashboard();
-    const cards = [...container.querySelectorAll('.command-tool-card')];
+    renderDashboard();
+    const primarySections = [
+      screen.getByRole('heading', { name: /^my tools$/i }).closest('section'),
+      screen.getByRole('heading', { name: /^my calculators$/i }).closest('section'),
+    ];
+    const cards = primarySections.flatMap((section) => [...section.querySelectorAll('.command-tool-card')]);
     const labels = cards.map((card) => card.getAttribute('aria-label'));
 
     expect(cards.length).toBeGreaterThan(0);
@@ -130,7 +143,7 @@ describe('CommandDashboard', () => {
 
   it('launches calculator cards through canonical launch behavior', () => {
     renderDashboard();
-    const clinicalPanel = screen.getByRole('heading', { name: /clinical tools/i }).closest('section');
+    const clinicalPanel = screen.getByRole('heading', { name: /my calculators/i }).closest('section');
     const qsofaButton = within(clinicalPanel).getByRole('button', { name: /open qsofa/i });
 
     fireEvent.click(qsofaButton);
@@ -159,5 +172,21 @@ describe('CommandDashboard', () => {
 
     expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('hospital-map');
     expect(screen.getByTestId('location')).toHaveTextContent('/hospital-map');
+  });
+
+  it('summarizes notifications and active alerts inside the command center', () => {
+    mockNotificationsValue.notifications = [
+      { id: 'n1', title: 'Lab result ready', message: 'CBC is ready', read: false, type: 'info' },
+      { id: 'a1', title: 'Sepsis alert', message: 'High risk patient', read: false, type: 'critical' },
+    ];
+
+    renderDashboard();
+
+    const notifications = screen.getByRole('heading', { name: /^notifications$/i }).closest('section');
+    const activeAlerts = screen.getByRole('heading', { name: /^active alerts$/i }).closest('section');
+
+    expect(within(notifications).getByText(/lab result ready/i)).toBeInTheDocument();
+    expect(within(activeAlerts).getByText(/sepsis alert/i)).toBeInTheDocument();
+    expect(within(activeAlerts).getByRole('link', { name: /open digital twin/i })).toHaveAttribute('href', '/digital-twin');
   });
 });

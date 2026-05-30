@@ -6,6 +6,7 @@ import { useUserIdentity } from '../contexts/UserIdentityContext';
 import PermissionGate from './PermissionGate';
 import {
   ADVANCED_SIDEBAR_NAV_ITEMS,
+  OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
   primaryNavPathMatches,
 } from '../navigation/primaryNavigation';
@@ -61,7 +62,6 @@ const Sidebar = forwardRef(function Sidebar(
     () => ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => primaryNavPathMatches(item, location.pathname)),
     [location.pathname]
   );
-
   useEffect(() => {
     if (advancedActive) setShowAdvanced(true);
   }, [advancedActive]);
@@ -201,7 +201,7 @@ const Sidebar = forwardRef(function Sidebar(
             </div>
           </button>
           <div className="sidebar-operational-workspace">
-            <label htmlFor="sidebar-operational-workspace">Workspace</label>
+            <label htmlFor="sidebar-operational-workspace">Org Workspace</label>
             <select
               id="sidebar-operational-workspace"
               value={workspaceState?.activeWorkspaceId || activeOperationalWorkspace?.id || ''}
@@ -256,6 +256,11 @@ const Sidebar = forwardRef(function Sidebar(
           {PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => renderNavButton(item))}
         </nav>
 
+        <nav className="sidebar-nav sidebar-nav--operations" aria-label="Operations navigation">
+          <div className="nav-section-title">{!effectiveCollapsed && 'Operations'}</div>
+          {OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => renderNavButton(item))}
+        </nav>
+
         <div className="sidebar-advanced">
           <button
             type="button"
@@ -263,14 +268,14 @@ const Sidebar = forwardRef(function Sidebar(
             onClick={() => setShowAdvanced((open) => !open)}
             aria-expanded={showAdvanced}
             aria-controls="sidebar-advanced-links"
-            title={effectiveCollapsed ? 'Advanced' : ''}
+            title={effectiveCollapsed ? 'More' : ''}
           >
             <span className="nav-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.shield} size={18} />
             </span>
             {!effectiveCollapsed && (
               <>
-                <span className="nav-label">Advanced</span>
+                <span className="nav-label">More</span>
                 <span className="sidebar-advanced-chevron" aria-hidden>
                   <NavIcon
                     icon={CHROME_ICONS.chevronDown}

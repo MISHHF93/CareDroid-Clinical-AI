@@ -57,6 +57,9 @@ describe('Calculators.jsx route wiring', () => {
 
   it('registers calculators hub and catalog in App.jsx', () => {
     expect(appSource).toContain("path: '/tools/calculators'");
+    expect(appSource).toContain("path: '/tools/calculators/:slug'");
+    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('initialCalculatorId={calculatorSlug}');
     expect(appSource).toContain("path: '/tools/catalog'");
   });
 });

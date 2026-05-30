@@ -8,7 +8,7 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
   {
     id: 'home',
     label: 'Dashboard',
-    mobileLabel: 'Dash',
+    mobileLabel: 'Dashboard',
     path: '/dashboard',
     legacyPaths: ['/home'],
     matchPaths: ['/home', '/dashboard'],
@@ -27,25 +27,49 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Tools',
     path: '/tools',
     legacyPaths: ['/all-tools', '/clinical-tools'],
-    matchPaths: ['/tools', '/all-tools', '/clinical-tools'],
+    matchPaths: ['/tools', '/all-tools', '/clinical-tools', '/calculators'],
     matchPrefixes: ['/tools/'],
-    excludePrefixes: [
-      '/tools/calculators',
-      '/tools/patient-summary-ai',
-      '/tools/timeline-ai',
-      '/tools/ambient-scribe',
-      '/tools/order-set-ai',
-      '/tools/clinical-audit',
-      '/tools/catalog',
-    ],
+    excludePrefixes: ['/tools/catalog'],
   },
   {
-    id: 'calculators',
-    label: 'Calculators',
-    mobileLabel: 'Calcs',
-    path: '/tools/calculators',
-    matchPaths: ['/tools/calculators', '/calculators'],
-    matchPrefixes: ['/tools/calculators/'],
+    id: 'profile',
+    label: 'Profile',
+    mobileLabel: 'Profile',
+    path: '/profile',
+    matchPaths: ['/profile', '/profile/activity', '/profile/tool-preferences', '/profile/workspaces', '/profile/security'],
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    mobileLabel: 'Settings',
+    path: '/settings',
+    matchPaths: [
+      '/settings',
+      '/profile/settings',
+      '/profile/preferences',
+      '/profile/tool-preferences',
+      '/profile-settings',
+      '/notifications',
+      '/notification-preferences',
+      '/team',
+      '/consent',
+      '/consent-history',
+      '/two-factor-setup',
+      '/biometric-setup',
+      '/onboarding',
+    ],
+  },
+]);
+
+export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
+  {
+    id: 'digital-twin',
+    label: 'Digital Twin',
+    mobileLabel: 'Twin',
+    path: '/digital-twin',
+    matchPaths: ['/digital-twin'],
+    matchPrefixes: ['/digital-twin/'],
+    showInMobile: false,
   },
   {
     id: 'hospital-map',
@@ -66,7 +90,7 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
   },
   {
     id: 'fleet',
-    label: 'Fleet Map',
+    label: 'Fleet',
     mobileLabel: 'Fleet',
     path: '/fleet/map',
     legacyPaths: ['/fleet', '/fleet/live-map', '/fleet/tracking'],
@@ -74,40 +98,12 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     matchPrefixes: ['/fleet/'],
     showInMobile: false,
   },
-  {
-    id: 'profile',
-    label: 'Profile',
-    mobileLabel: 'Profile',
-    path: '/profile',
-    matchPaths: ['/profile', '/profile/activity', '/profile/workspaces', '/profile/security'],
-    showInMobile: false,
-  },
-  {
-    id: 'settings',
-    label: 'Settings',
-    mobileLabel: 'Settings',
-    path: '/settings',
-    matchPaths: [
-      '/settings',
-      '/profile/settings',
-      '/profile/preferences',
-      '/profile-settings',
-      '/notifications',
-      '/team',
-      '/consent',
-      '/consent-history',
-      '/two-factor-setup',
-      '/biometric-setup',
-      '/onboarding',
-    ],
-    showInMobile: false,
-  },
 ]);
 
 export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
   {
     id: 'developer-audit',
-    label: 'Developer Catalog / Source Audit',
+    label: 'Developer Catalog',
     mobileLabel: 'Dev',
     path: '/tools/catalog',
     matchPaths: ['/tools/catalog'],
@@ -172,7 +168,12 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
 ]);
 
 export const PRIMARY_NAV_BY_ID = Object.freeze(
-  Object.fromEntries([...PRIMARY_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map((item) => [item.id, item]))
+  Object.fromEntries(
+    [...PRIMARY_NAV_ITEMS, ...OPERATIONS_SIDEBAR_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map((item) => [
+      item.id,
+      item,
+    ])
+  )
 );
 
 export const PRIMARY_SIDEBAR_NAV_ITEMS = Object.freeze(
@@ -186,7 +187,23 @@ export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
 export const QUICK_COMMAND_NAV_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 export const QUICK_COMMAND_DESTINATION_ITEMS = Object.freeze([
   ...PRIMARY_SIDEBAR_NAV_ITEMS,
+  ...OPERATIONS_SIDEBAR_NAV_ITEMS,
   ...ADVANCED_SIDEBAR_NAV_ITEMS,
+  {
+    id: 'workspace',
+    label: 'Workspace',
+    mobileLabel: 'Work',
+    path: '/workspaces',
+    matchPaths: ['/workspaces', '/workspace', '/workspace/clinical'],
+    matchPrefixes: ['/workspace/'],
+  },
+  {
+    id: 'devices',
+    label: 'Devices',
+    mobileLabel: 'Devices',
+    path: '/devices',
+    matchPaths: ['/devices'],
+  },
 ]);
 
 export function primaryNavPathMatches(item, pathname) {
@@ -201,6 +218,7 @@ export function primaryNavPathMatches(item, pathname) {
 export function getPrimaryNavItemForPath(pathname) {
   return (
     PRIMARY_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
+    OPERATIONS_SIDEBAR_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
     ADVANCED_SIDEBAR_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
     null
   );

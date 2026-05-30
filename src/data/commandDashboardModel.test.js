@@ -10,6 +10,7 @@ describe('command dashboard model', () => {
     const model = buildCommandDashboardModel(inventory);
     const featured = [
       ...model.panels.clinicalTools,
+      ...model.panels.calculators,
       ...model.panels.referenceGuidelines,
       ...model.panels.fleetOperations,
       ...model.panels.medicalIot,
@@ -18,6 +19,7 @@ describe('command dashboard model', () => {
     expect(model.stats.totalTools).toBe(inventory.length);
     expect(model.stats.aiTools).toBeGreaterThan(0);
     expect(model.panels.clinicalTools.map((tool) => tool.id)).toContain(REGISTRY.qsofa);
+    expect(model.panels.calculators.map((tool) => tool.id)).toContain(REGISTRY.qsofa);
     expect(model.panels.referenceGuidelines.map((tool) => tool.id)).toContain(REGISTRY.guidelineRag);
     expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.liveTrackingMap);
     expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.fleetLiveMap);
@@ -43,14 +45,12 @@ describe('command dashboard model', () => {
 
   it('keeps command dashboard card groups unique', () => {
     const model = buildCommandDashboardModel();
-    const featuredIds = [
-      ...model.panels.clinicalTools,
-      ...model.panels.referenceGuidelines,
-      ...model.panels.fleetOperations,
-      ...model.panels.medicalIot,
-    ].map((tool) => tool.id);
 
-    expect(new Set(featuredIds).size).toBe(featuredIds.length);
+    for (const panel of Object.values(model.panels)) {
+      const ids = panel.map((tool) => tool.id);
+      expect(new Set(ids).size).toBe(ids.length);
+    }
+    expect(model.panels.calculators.every((tool) => tool.category === 'Calculator' || tool.surface === 'calculator-form')).toBe(true);
   });
 
   it('keeps curated group ids explicit and registry-backed', () => {

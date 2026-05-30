@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
-import { QUICK_COMMAND_NAV_ITEMS } from '../navigation/primaryNavigation';
+import { CARE_WORKSPACES } from '../data/workspaceArchitecture';
+import { QUICK_COMMAND_DESTINATION_ITEMS } from '../navigation/primaryNavigation';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
-import { CHROME_ICONS, getNavIcon, getToolIcon } from '../navigation/iconRegistry';
+import { CHROME_ICONS, getNavIcon, getToolIcon, getWorkspaceIcon } from '../navigation/iconRegistry';
 import './QuickCommandLauncher.css';
 
 const MAX_RECENT_ITEMS = 5;
+const MAX_FAVORITE_ITEMS = 5;
 const MAX_DEFAULT_TOOL_ITEMS = 18;
 
 function commandSearchText(entry) {
@@ -27,17 +29,42 @@ function commandSearchText(entry) {
     .toLowerCase();
 }
 
+function fuzzyIncludes(haystack, needle) {
+  if (!needle) return true;
+  if (haystack.includes(needle)) return true;
+  let index = 0;
+  for (const char of haystack) {
+    if (char === needle[index]) index += 1;
+    if (index === needle.length) return true;
+  }
+  return false;
+}
+
 function makeNavEntry(item) {
   return {
     id: `nav:${item.id}`,
     sourceId: item.id,
     kind: 'nav',
     label: item.label,
-    description: item.id === 'home' ? 'Open the CareDroid Command Dashboard' : `Open ${item.label}`,
+    description: item.id === 'home' ? 'Open the CareDroid dashboard' : `Open ${item.label}`,
     category: 'Destination',
     path: item.path,
     icon: getNavIcon(item.id),
     shortcut: item.id === 'assistant' ? '/ask' : null,
+  };
+}
+
+function makeWorkspaceEntry(workspace) {
+  return {
+    id: `workspace:${workspace.id}`,
+    sourceId: workspace.id,
+    kind: 'workspace',
+    label: `${workspace.label} Workspace`,
+    description: workspace.description,
+    category: 'Workspace',
+    path: workspace.path,
+    icon: getWorkspaceIcon(workspace.icon),
+    aliases: [workspace.shortLabel, workspace.aiContext],
   };
 }
 
@@ -59,6 +86,7 @@ function makeToolEntry(tool) {
 }
 
 function isPrimaryShellDuplicate(tool, navPathSet) {
+  if (tool?.path === '/tools/calculators' && tool.id === 'calculators') return true;
   if (!tool?.path || !navPathSet.has(tool.path)) return false;
   if (tool.path === '/tools/calculators' && tool.id !== 'calculators') return false;
   return true;
@@ -66,9 +94,12 @@ function isPrimaryShellDuplicate(tool, navPathSet) {
 
 export function buildQuickCommandEntries({
   tools = getUserFacingToolRegistryProjection(),
-  navItems = QUICK_COMMAND_NAV_ITEMS,
+  navItems = QUICK_COMMAND_DESTINATION_ITEMS,
+  workspaces = CARE_WORKSPACES,
   recentToolIds = [],
+  favoriteToolIds = [],
 } = {}) {
+  const workspaceEntries = workspaces.map(makeWorkspaceEntry);
   const navEntries = navItems.map(makeNavEntry);
   const navPathSet = new Set(navEntries.map((entry) => entry.path).filter(Boolean));
   const allToolEntries = tools
@@ -85,9 +116,21 @@ export function buildQuickCommandEntries({
     })
     .slice(0, MAX_RECENT_ITEMS);
   const recentSourceIds = new Set(recentEntries.map((entry) => entry.sourceId));
-  const toolEntries = allToolEntries.filter((entry) => !recentSourceIds.has(entry.sourceId));
+  const seenFavoriteIds = new Set();
+  const favoriteEntries = favoriteToolIds
+    .map((toolId) => toolById[toolId])
+    .filter((entry) => {
+      if (!entry || recentSourceIds.has(entry.sourceId) || seenFavoriteIds.has(entry.sourceId)) return false;
+      seenFavoriteIds.add(entry.sourceId);
+      return true;
+    })
+    .slice(0, MAX_FAVORITE_ITEMS);
+  const favoriteSourceIds = new Set(favoriteEntries.map((entry) => entry.sourceId));
+  const toolEntries = allToolEntries.filter(
+    (entry) => !recentSourceIds.has(entry.sourceId) && !favoriteSourceIds.has(entry.sourceId)
+  );
 
-  return { navEntries, toolEntries, recentEntries };
+  return { workspaceEntries, navEntries, toolEntries, recentEntries, favoriteEntries };
 }
 
 function Section({ title, children }) {
@@ -100,11 +143,11 @@ function Section({ title, children }) {
   );
 }
 
-function CommandItem({ entry, onLaunch }) {
+function CommandItem({ entry, onLaunch, active = false }) {
   return (
     <button
       type="button"
-      className="quick-command-item"
+      className={`quick-command-item${active ? ' quick-command-item--active' : ''}`}
       onClick={() => onLaunch(entry)}
       aria-label={`Open ${entry.label}`}
     >
@@ -130,12 +173,13 @@ export default function QuickCommandLauncher({
 }) {
   const navigate = useNavigate();
   const { addMessage, selectTool, setActiveTool } = useConversation();
-  const { recentTools, recordToolAccess } = useToolPreferences();
+  const { recentTools, favorites, recordToolAccess } = useToolPreferences();
   const [query, setQuery] = useState('');
+  const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
   const entries = useMemo(
-    () => buildQuickCommandEntries({ recentToolIds: recentTools }),
-    [recentTools]
+    () => buildQuickCommandEntries({ recentToolIds: recentTools, favoriteToolIds: favorites }),
+    [favorites, recentTools]
   );
 
   useEffect(() => {
@@ -180,15 +224,42 @@ export default function QuickCommandLauncher({
       return true;
     });
 
-  const matchesQuery = (entry) => commandSearchText(entry).includes(normalizedQuery);
+  const matchesQuery = (entry) => fuzzyIncludes(commandSearchText(entry), normalizedQuery);
   const recentEntries = pickUnique(entries.recentEntries.filter(matchesQuery));
+  const favoriteEntries = pickUnique(entries.favoriteEntries.filter(matchesQuery));
+  const workspaceEntries = pickUnique(entries.workspaceEntries.filter(matchesQuery));
   const navEntries = pickUnique(entries.navEntries.filter(matchesQuery));
   const toolEntries = pickUnique(
     entries.toolEntries
       .filter(matchesQuery)
       .slice(0, normalizedQuery ? entries.toolEntries.length : MAX_DEFAULT_TOOL_ITEMS)
   );
-  const hasResults = recentEntries.length + navEntries.length + toolEntries.length > 0;
+  const hasResults =
+    recentEntries.length +
+      favoriteEntries.length +
+      workspaceEntries.length +
+      navEntries.length +
+      toolEntries.length >
+    0;
+  const resultEntries = normalizedQuery
+    ? [...recentEntries, ...favoriteEntries, ...workspaceEntries, ...navEntries, ...toolEntries]
+    : [...recentEntries, ...favoriteEntries, ...workspaceEntries, ...navEntries, ...toolEntries];
+  const activeEntryId = resultEntries[activeIndex]?.id;
+  const handleSearchKeyDown = (event) => {
+    if (!resultEntries.length) return;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveIndex((index) => (index + 1) % resultEntries.length);
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveIndex((index) => (index - 1 + resultEntries.length) % resultEntries.length);
+    }
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      launchEntry(resultEntries[activeIndex] || resultEntries[0]);
+    }
+  };
 
   return (
     <div className={`quick-command quick-command--${isCompact ? 'mobile' : 'desktop'}`}>
@@ -219,12 +290,16 @@ export default function QuickCommandLauncher({
           <span className="quick-command-search__icon" aria-hidden>
             <NavIcon icon={CHROME_ICONS.search} size={18} />
           </span>
-          <span className="sr-only">Search commands and tools</span>
+          <span className="sr-only">Search commands and tools across workspaces and routes</span>
           <input
             ref={inputRef}
             value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search destinations, calculators, tools..."
+            onChange={(event) => {
+              setQuery(event.target.value);
+              setActiveIndex(0);
+            }}
+            onKeyDown={handleSearchKeyDown}
+            placeholder="Search workspaces, routes, calculators, tools..."
           />
         </label>
 
@@ -254,25 +329,35 @@ export default function QuickCommandLauncher({
             <p className="quick-command-empty">No matching commands. Try a tool, route, or clinical action.</p>
           ) : normalizedQuery ? (
             <Section title="Results">
-              {[...recentEntries, ...navEntries, ...toolEntries].map((entry) => (
-                <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} />
+              {resultEntries.map((entry) => (
+                <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
               ))}
             </Section>
           ) : (
             <>
               <Section title="Recent Tools">
                 {recentEntries.map((entry) => (
-                  <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} />
+                  <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
+                ))}
+              </Section>
+              <Section title="Favorites">
+                {favoriteEntries.map((entry) => (
+                  <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
+                ))}
+              </Section>
+              <Section title="Workspaces">
+                {workspaceEntries.map((entry) => (
+                  <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
                 ))}
               </Section>
               <Section title="Destinations">
                 {navEntries.map((entry) => (
-                  <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} />
+                  <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
                 ))}
               </Section>
               <Section title="Canonical Tools">
                 {toolEntries.map((entry) => (
-                  <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} />
+                  <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
                 ))}
               </Section>
             </>

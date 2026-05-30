@@ -42,7 +42,7 @@ describe('Simplified sidebar navigation wiring', () => {
       '/dashboard',
       '/assistant',
       '/tools',
-      '/tools/calculators',
+      '/digital-twin',
       '/hospital-map',
       '/medical-iot',
       '/fleet/map',
@@ -62,7 +62,7 @@ describe('Simplified sidebar navigation wiring', () => {
     expect(sidebarSource).toContain('aria-expanded={showAdvanced}');
     expect(sidebarSource).toContain('PermissionGate');
     expect(sidebarSource).toContain('requireAll={item.requireAllPermissions}');
-    expect(primaryNavSource).toContain("label: 'Developer Catalog / Source Audit'");
+    expect(primaryNavSource).toContain("label: 'Developer Catalog'");
     expect(primaryNavSource).toContain("permission: 'CONFIGURE_SYSTEM'");
   });
 

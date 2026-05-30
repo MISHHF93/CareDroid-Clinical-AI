@@ -1,17 +1,40 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import { useUser } from '../../contexts/UserContext';
+import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { resolveCatalogLaunch } from '../../data/clinicalCatalogWiring';
-import { getUserFacingToolRegistryProjection } from '../../data/toolInventory';
+import {
+  buildProfileToolGraph,
+  buildUserToolProfile,
+  filterToolsForProfileGraph,
+} from '../../data/profileToolSegmentation';
+import {
+  getUserFacingToolRegistryProjection,
+  TOOL_LIFECYCLE_LABELS,
+  TOOL_LIFECYCLE_STATES,
+} from '../../data/toolInventory';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './ToolsOverview.css';
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
-  { value: 'all', label: 'All actions' },
+  { value: 'recommended', label: 'Recommended for Me' },
+  { value: 'specialty', label: 'My Specialty' },
+  { value: 'workspace', label: 'My Workspace' },
+  { value: 'pinned', label: 'Pinned' },
+  { value: 'recent', label: 'Recent' },
+  { value: 'restricted', label: 'Restricted/Unavailable' },
+  { value: 'all', label: 'All' },
+  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.ACTIVE}`, label: 'Active' },
+  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.BETA}`, label: 'Beta' },
+  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.EXPERIMENTAL}`, label: 'Experimental' },
+  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.DEPRECATED}`, label: 'Deprecated' },
+  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.HIDDEN}`, label: 'Hidden' },
+  { value: `lifecycle-${TOOL_LIFECYCLE_STATES.ADMIN_ONLY}`, label: 'Admin Only' },
   { value: 'calculator', label: 'Calculators' },
   { value: 'chat-assisted', label: 'Guided chat' },
   { value: 'backend-backed', label: 'Verified actions' },
@@ -21,6 +44,8 @@ const TOOL_FILTER_OPTIONS = Object.freeze([
   { value: 'hospital-ops', label: 'Hospital Ops' },
   { value: 'reference', label: 'Reference' },
 ]);
+
+const TOOL_FILTER_OPTION_VALUES = new Set(TOOL_FILTER_OPTIONS.map((option) => option.value));
 
 function normalizeSearch(value) {
   return String(value || '').trim().toLowerCase();
@@ -36,6 +61,8 @@ function toolSearchBlob(tool) {
     tool.surface,
     tool.launchType,
     tool.tier,
+    tool.lifecycleState,
+    tool.lifecycleLabel,
     tool.nluToolId,
     tool.executorStatus,
     tool.shortcut,
@@ -49,7 +76,10 @@ function toolSearchBlob(tool) {
 }
 
 function matchesToolFilter(tool, filter) {
-  if (!filter || filter === 'all') return true;
+  if (!filter || ['recommended', 'specialty', 'workspace', 'pinned', 'recent', 'restricted', 'all'].includes(filter)) {
+    return true;
+  }
+  if (filter.startsWith('lifecycle-')) return tool.lifecycleState === filter.replace('lifecycle-', '');
   if (filter === 'calculator') return tool.category === 'Calculator' || tool.surface === 'calculator-form';
   if (filter === 'chat-assisted') return tool.surface === 'chat-assisted' || tool.launchType === 'chat-assisted';
   if (filter === 'backend-backed') return tool.launchType === 'backend-backed' || tool.executorStatus === 'registered';
@@ -63,26 +93,93 @@ function matchesToolFilter(tool, filter) {
   return true;
 }
 
+function primaryActionLabel(tool) {
+  if (tool.surface === 'chat-assisted' || tool.launchType === 'chat-assisted') return 'Start guided chat';
+  if (tool.category === 'Calculator' || tool.surface === 'calculator-form') return 'Open calculator';
+  if (
+    ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(tool.surface) ||
+    ['Fleet', 'IoT', 'Hospital Operations'].includes(tool.category)
+  ) {
+    return 'Open dashboard';
+  }
+  return 'Open tool';
+}
+
+function hasMeaningfulAssistantAction(tool) {
+  return tool.surface !== 'chat-assisted' && tool.launchType !== 'chat-assisted';
+}
+
+function lifecycleLabel(tool) {
+  return tool.lifecycleLabel || TOOL_LIFECYCLE_LABELS[tool.lifecycleState] || 'Active';
+}
+
 const ToolsOverview = () => {
   const navigate = useNavigate();
-  const [search, setSearch] = useState('');
-  const [toolFilter, setToolFilter] = useState('all');
+  const [searchParams] = useSearchParams();
+  const requestedFilter = searchParams.get('filter');
+  const requestedSearch = searchParams.get('q') || searchParams.get('search') || '';
+  const [search, setSearch] = useState(requestedSearch);
+  const [toolFilter, setToolFilter] = useState(
+    TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : 'all'
+  );
+
+  useEffect(() => {
+    if (TOOL_FILTER_OPTION_VALUES.has(requestedFilter)) {
+      setToolFilter(requestedFilter);
+    }
+  }, [requestedFilter]);
+
+  useEffect(() => {
+    setSearch(requestedSearch);
+  }, [requestedSearch]);
   const { selectTool, setActiveTool, addMessage } = useConversation();
+  const toolPreferences = useToolPreferences();
   const {
     favorites,
     pinned,
     recentTools,
+    hiddenTools,
     toggleFavorite,
     togglePinned,
+    toggleHidden,
     recordToolAccess
-  } = useToolPreferences();
+  } = toolPreferences;
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
+  const { user } = useUser();
+  const { account, preferences, activeWorkspace, workspaceState } = useUserIdentity();
 
   const tools = useMemo(() => getUserFacingToolRegistryProjection(), []);
   const toolById = useMemo(() => Object.fromEntries(tools.map((tool) => [tool.id, tool])), [tools]);
-  const activeWorkspace = useMemo(
+  const localActiveWorkspace = useMemo(
     () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
     [activeWorkspaceId, workspaces]
+  );
+  const profile = useMemo(
+    () =>
+      buildUserToolProfile({
+        account,
+        user,
+        preferences,
+        activeWorkspace: activeWorkspace || localActiveWorkspace,
+        activeWorkspaceId: workspaceState?.activeWorkspaceId || activeWorkspaceId,
+        toolPreferences,
+        permissions: workspaceState?.effectivePermissions || [],
+      }),
+    [
+      account,
+      activeWorkspace,
+      activeWorkspaceId,
+      localActiveWorkspace,
+      preferences,
+      toolPreferences,
+      user,
+      workspaceState?.activeWorkspaceId,
+      workspaceState?.effectivePermissions,
+    ]
+  );
+  const profileToolGraph = useMemo(
+    () => buildProfileToolGraph({ tools, profile }),
+    [profile, tools]
   );
   const isAllToolsWorkspace = activeWorkspaceId === 'all';
   const allToolIds = useMemo(() => tools.map((tool) => tool.id), [tools]);
@@ -90,17 +187,30 @@ const ToolsOverview = () => {
     () =>
       isAllToolsWorkspace
         ? allToolIds
-        : activeWorkspace
-          ? activeWorkspace.toolIds || []
+        : localActiveWorkspace
+          ? localActiveWorkspace.toolIds || []
           : allToolIds,
-    [activeWorkspace, allToolIds, isAllToolsWorkspace]
+    [localActiveWorkspace, allToolIds, isAllToolsWorkspace]
   );
   const workspaceToolIdSet = useMemo(() => new Set(workspaceToolIds), [workspaceToolIds]);
+  const workspaceInventoryCount = useMemo(
+    () => (isAllToolsWorkspace ? tools.length : tools.filter((tool) => workspaceToolIdSet.has(tool.id)).length),
+    [isAllToolsWorkspace, tools, workspaceToolIdSet]
+  );
   const pinnedToolIdSet = useMemo(() => new Set(pinned), [pinned]);
   const favoriteToolIdSet = useMemo(() => new Set(favorites), [favorites]);
+  const hiddenToolIdSet = useMemo(() => new Set(hiddenTools), [hiddenTools]);
+  const profileFilteredTools = useMemo(
+    () => filterToolsForProfileGraph(profileToolGraph, toolFilter),
+    [profileToolGraph, toolFilter]
+  );
   const workspaceTools = useMemo(
-    () => tools.filter((tool) => workspaceToolIdSet.has(tool.id)),
-    [tools, workspaceToolIdSet]
+    () =>
+      profileFilteredTools.filter((tool) => {
+        if (toolFilter === 'restricted') return true;
+        return isAllToolsWorkspace || workspaceToolIdSet.has(tool.id);
+      }),
+    [isAllToolsWorkspace, profileFilteredTools, toolFilter, workspaceToolIdSet]
   );
   const searchQuery = normalizeSearch(search);
   const filteredTools = useMemo(
@@ -162,16 +272,17 @@ const ToolsOverview = () => {
     }
     return [...pinnedTools, ...unpinnedTools];
   }, [filteredTools, pinnedToolIdSet]);
-  const calculatorCount = useMemo(
-    () => tools.filter((tool) => tool.category === 'Calculator').length,
-    [tools]
-  );
-  const chatAssistedCount = useMemo(
-    () => tools.filter((tool) => tool.surface === 'chat-assisted').length,
-    [tools]
-  );
-  const showWorkspaceEmpty = workspaceTools.length === 0;
+  const showWorkspaceEmpty = !isAllToolsWorkspace && workspaceInventoryCount === 0;
   const showSearchEmpty = !showWorkspaceEmpty && filteredTools.length === 0;
+  const filterTabs = TOOL_FILTER_OPTIONS.slice(0, 14);
+  const emptyStateCopy =
+    toolFilter === 'restricted'
+      ? profile.permissionLevel === 'admin'
+        ? 'No restricted or unavailable tools match the current search. Admin-visible restricted tools will appear here when access rules block them.'
+        : 'Restricted tools are protected for this profile. Ask an administrator or switch to an authorized profile to view unavailable admin, operations, security, or high-risk AI tools.'
+      : hiddenTools.length > 0
+        ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch to All.'
+        : 'No launchable tools match the current search and filter. Try a clinical alias or reset the filters.';
 
   return (
     <div className="tools-overview">
@@ -184,8 +295,15 @@ const ToolsOverview = () => {
             Tool Library
           </h1>
           <p className="header-subtitle">
-            Browse the complete canonical tool library. The Command Dashboard stays the main clinical cockpit.
+            Browse the canonical tool library prioritized for your role, specialty, workspace, pins, and access level.
           </p>
+          <div className="tools-profile-summary" aria-label="Profile tool graph summary">
+            <span>{profile.role}</span>
+            <span>{profile.specialty}</span>
+            <span>{profileToolGraph.counts.visible} visible</span>
+            <span>{profileToolGraph.counts.recommended} recommended</span>
+            <span>{profileToolGraph.counts.restricted} restricted</span>
+          </div>
           <div className="tools-workspace">
             <label htmlFor="workspaceSelect">Workspace</label>
             <select
@@ -226,10 +344,24 @@ const ToolsOverview = () => {
               </select>
             </label>
           </div>
+          <div className="tools-filter-tabs" role="tablist" aria-label="Tool category filters">
+            {filterTabs.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                role="tab"
+                aria-selected={toolFilter === option.value}
+                className={`tools-filter-tab${toolFilter === option.value ? ' tools-filter-tab--active' : ''}`}
+                onClick={() => setToolFilter(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
           <div className="header-stats">
             <div className="stat">
-              <span className="stat-number">{tools.length}</span>
-              <span className="stat-label">Library tools</span>
+              <span className="stat-number">{profileToolGraph.counts.visible}</span>
+              <span className="stat-label">Visible</span>
             </div>
             <div className="stat">
               <span className="stat-number">{filteredTools.length}</span>
@@ -238,12 +370,12 @@ const ToolsOverview = () => {
               </span>
             </div>
             <div className="stat">
-              <span className="stat-number">{calculatorCount}</span>
-              <span className="stat-label">Calculators</span>
+              <span className="stat-number">{profileToolGraph.counts.recommended}</span>
+              <span className="stat-label">Recommended</span>
             </div>
             <div className="stat">
-              <span className="stat-number">{chatAssistedCount}</span>
-              <span className="stat-label">Guided</span>
+              <span className="stat-number">{profileToolGraph.counts.pinned}</span>
+              <span className="stat-label">Pinned</span>
             </div>
           </div>
         </div>
@@ -275,7 +407,7 @@ const ToolsOverview = () => {
                   <span className="tools-recent-name">{tool.name}</span>
                   <span className="tools-recent-category">{tool.category}</span>
                 </div>
-                <span className="tools-recent-action">Open →</span>
+                <span className="tools-recent-action">{primaryActionLabel(tool)} →</span>
               </button>
             ))}
           </div>
@@ -296,9 +428,7 @@ const ToolsOverview = () => {
         <div className="tools-recent" role="status">
           <div className="tools-recent-header">
             <h2 className="tools-recent-title">No matching tools</h2>
-            <p>
-              No launchable tools match the current search and filter. Try a clinical alias or reset the filters.
-            </p>
+            <p>{emptyStateCopy}</p>
           </div>
           <button
             type="button"
@@ -334,9 +464,17 @@ const ToolsOverview = () => {
                 <span className="tool-category">
                   {tool.category}
                 </span>
+                <span className={`tool-category tool-category--lifecycle tool-category--lifecycle-${tool.lifecycleState}`}>
+                  {lifecycleLabel(tool)}
+                </span>
                 {tool.surface === 'chat-assisted' ? (
                   <span className="tool-category tool-category--guided">
                     Guided
+                  </span>
+                ) : null}
+                {tool.restrictionReason ? (
+                  <span className="tool-category tool-category--restricted">
+                    {tool.restrictionReason}
                   </span>
                 ) : null}
               </div>
@@ -368,6 +506,17 @@ const ToolsOverview = () => {
                 >
                   <NavIcon icon={CHROME_ICONS.pin} size={16} aria-hidden />
                 </button>
+                <button
+                  className={`tool-card-action ${hiddenToolIdSet.has(tool.id) ? 'active' : ''}`}
+                  title={hiddenToolIdSet.has(tool.id) ? 'Show tool by default' : 'Hide from default views'}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleHidden(tool.id);
+                  }}
+                  type="button"
+                >
+                  <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
+                </button>
                 <div className="tool-shortcut">
                   {tool.shortcut ? tool.shortcut.replace('Ctrl+', '⌘') : 'Open'}
                 </div>
@@ -375,6 +524,9 @@ const ToolsOverview = () => {
             </div>
 
             <p className="tool-description">{tool.description}</p>
+            {tool.restrictionReason ? (
+              <p className="tool-restriction-note">Unavailable: {tool.restrictionReason}</p>
+            ) : null}
 
             <div className="tool-features">
               <h4>Key Features:</h4>
@@ -404,22 +556,25 @@ const ToolsOverview = () => {
             <div className="tool-actions">
               <button
                 className="btn-open-tool"
+                disabled={Boolean(tool.restrictionReason)}
                 onClick={(e) => {
                   e.stopPropagation();
                   handleToolClick(tool);
                 }}
               >
-                {tool.surface === 'chat-assisted' ? 'Start with Assistant →' : 'Open →'}
+                {primaryActionLabel(tool)} →
               </button>
-              <button
-                className="btn-chat-tool"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleAssistantLaunch(tool);
-                }}
-              >
-                Open in Assistant
-              </button>
+              {hasMeaningfulAssistantAction(tool) && !tool.restrictionReason ? (
+                <button
+                  className="btn-chat-tool"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAssistantLaunch(tool);
+                  }}
+                >
+                  Ask Assistant
+                </button>
+              ) : null}
             </div>
           </div>
           ))}
@@ -443,7 +598,7 @@ const ToolsOverview = () => {
             <span className="tip-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.messageCircle} size={32} />
             </span>
-            <h3>Open in Assistant</h3>
+            <h3>Ask Assistant</h3>
             <p>Send context to Assistant when you want guidance, preview, or confirmation before acting.</p>
           </div>
           <div className="tip-card">

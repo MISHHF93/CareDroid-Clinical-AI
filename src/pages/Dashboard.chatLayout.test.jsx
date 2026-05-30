@@ -135,6 +135,8 @@ describe('Dashboard chat layout', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: /home/i })).toBeInTheDocument();
     expect(screen.getByText(/see what matters/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /your clinical toolkit/i })).toBeInTheDocument();
+    expect(screen.getByText(/profile tool graph card/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /plan outreach/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
   });

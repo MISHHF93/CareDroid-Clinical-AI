@@ -170,6 +170,16 @@ describe('Dashboard Chat mobile CSS contracts', () => {
     );
   });
 
+  it('stacks the profile tool graph card on mobile', () => {
+    expect(dashboardCss).toMatch(
+      /@media \(max-width: 760px\)[\s\S]*\.profile-tool-graph-card__columns[\s\S]*grid-template-columns:\s*1fr/
+    );
+    expect(dashboardCss).toMatch(
+      /@media \(max-width: 760px\)[\s\S]*\.profile-tool-graph-card__header[\s\S]*flex-direction:\s*column/
+    );
+    expect(dashboardCss).toMatch(/\.profile-tool-graph-card__metrics[\s\S]*flex-wrap:\s*wrap/);
+  });
+
   it('does not hide the action rail in mobile landscape', () => {
     const landscapeBlock = dashboardCss.match(
       /@media \(max-width: 900px\) and \(orientation: landscape\) \{[\s\S]*?\n\}/

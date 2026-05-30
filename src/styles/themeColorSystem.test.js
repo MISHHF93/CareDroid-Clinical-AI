@@ -30,6 +30,13 @@ describe('theme color system revamp', () => {
     expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-surface-1:\s*#101114/);
   });
 
+  it('uses blue as the product accent in both light and dark themes', () => {
+    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-accent:\s*#38bdf8/);
+    expect(themeTokensCss).toMatch(/html\[data-theme='dark'\][\s\S]*--app-accent-interactive:\s*#38bdf8/);
+    expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-accent:\s*#2563eb/);
+    expect(themeTokensCss).toMatch(/html\[data-theme='light'\][\s\S]*--app-accent-interactive:\s*#2563eb/);
+  });
+
   it('exposes semantic aliases for accents, surfaces, focus, and charts', () => {
     for (const token of [
       '--surface-muted',

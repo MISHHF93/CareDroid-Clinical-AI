@@ -1,0 +1,59 @@
+.workspace-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: min(100%, 260px);
+  padding: 6px 8px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  background: var(--app-surface-glass, var(--app-surface-1));
+  color: var(--text-color);
+  box-shadow: var(--shadow-1);
+  box-sizing: border-box;
+}
+
+.workspace-switcher__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.workspace-switcher__select {
+  min-width: 0;
+  flex: 1 1 auto;
+  border: 0;
+  background: transparent;
+  color: var(--text-color);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  outline: none;
+  cursor: pointer;
+}
+
+.workspace-switcher__select option {
+  color: #0f172a;
+}
+
+.workspace-switcher--compact {
+  width: min(100%, calc(100vw - 112px));
+  min-width: 0;
+  justify-self: center;
+}
+
+.workspace-switcher--compact .workspace-switcher__label span {
+  display: none;
+}
+
+@media (max-width: 430px) {
+  .workspace-switcher {
+    gap: 6px;
+    padding-inline: 7px;
+  }
+}

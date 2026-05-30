@@ -13,7 +13,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     id: 'dashboard',
     path: '/dashboard',
     match: 'heading',
-    heading: /caredroid command dashboard/i,
+    heading: /caredroid command center/i,
   },
   { id: 'assistant', path: '/assistant', match: 'composer' },
   { id: 'tools-overview', path: '/tools', match: 'heading', heading: /^tool library$/i },

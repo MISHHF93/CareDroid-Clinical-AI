@@ -67,6 +67,8 @@
   --app-type-small: var(--text-small);
   --app-type-caption: var(--text-caption);
   --app-type-mono: var(--text-mono);
+  --app-type-label: var(--text-small);
+  --app-type-helper: var(--text-caption);
 
   --app-font-family-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --app-font-family-mono: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
@@ -110,6 +112,11 @@
   --app-space-field: var(--space-2);
   --app-space-field-lg: var(--space-3);
   --app-card-padding-compact: clamp(10px, 1.8vw, 14px);
+  --app-card-padding-standard: clamp(14px, 2vw, 18px);
+  --app-card-padding-dashboard: clamp(14px, 2.2vw, 20px);
+  --app-card-padding-tool: clamp(12px, 2vw, 16px);
+  --app-card-padding-calculator: clamp(12px, 2vw, 18px);
+  --app-card-padding-alert: clamp(10px, 1.8vw, 14px);
   --app-callout-padding-compact: clamp(8px, 1.6vw, var(--space-3));
 
   /* Compact clinical command layout primitives */
@@ -158,10 +165,88 @@
   line-height: var(--type-caption-line-height);
 }
 
+.type-label {
+  font-size: var(--app-type-label);
+  font-weight: 650;
+  line-height: var(--type-small-line-height);
+}
+
+.type-helper {
+  color: var(--app-text-muted, var(--app-fg-muted));
+  font-size: var(--app-type-helper);
+  line-height: var(--type-caption-line-height);
+}
+
 .type-mono {
   font-family: var(--app-font-family-mono);
   font-size: var(--text-mono);
   line-height: var(--type-caption-line-height);
+}
+
+/* CareDroid design language primitives for app-wide page authorship. */
+.cd-page {
+  display: grid;
+  gap: var(--app-fluid-section-gap);
+  width: 100%;
+  min-width: 0;
+  max-width: var(--app-fluid-container-max-wide);
+  margin: 0 auto;
+  padding: var(--app-page-padding-roomy);
+}
+
+.cd-card,
+.cd-card--standard,
+.cd-card--dashboard,
+.cd-card--tool,
+.cd-card--calculator,
+.cd-card--alert {
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--app-border, var(--app-panel-border));
+  border-radius: var(--compact-panel-radius, var(--app-radius-lg));
+  background: var(--app-surface, var(--app-surface-1));
+  color: var(--app-text-primary, var(--app-fg));
+  box-shadow: var(--app-elevation-card, var(--app-shadow-1));
+  overflow-wrap: anywhere;
+}
+
+.cd-card--standard {
+  padding: var(--app-card-padding-standard);
+}
+
+.cd-card--dashboard {
+  padding: var(--app-card-padding-dashboard);
+}
+
+.cd-card--tool {
+  padding: var(--app-card-padding-tool);
+}
+
+.cd-card--calculator {
+  padding: var(--app-card-padding-calculator);
+}
+
+.cd-card--alert {
+  padding: var(--app-card-padding-alert);
+  border-color: color-mix(in srgb, var(--app-warning) 34%, var(--app-border));
+}
+
+.cd-empty,
+.cd-loading,
+.cd-error {
+  display: grid;
+  gap: var(--space-sm);
+  min-width: 0;
+  padding: var(--app-card-padding-standard);
+  border: 1px solid var(--app-border, var(--app-panel-border));
+  border-radius: var(--compact-panel-radius, var(--app-radius-lg));
+  background: var(--app-surface-muted, var(--app-surface-2));
+  color: var(--app-text-secondary, var(--app-fg-muted));
+}
+
+.cd-error {
+  border-color: color-mix(in srgb, var(--app-danger) 36%, var(--app-border));
+  background: color-mix(in srgb, var(--app-danger) 8%, var(--app-surface));
 }
 
 /* Touch-friendly control baseline (opt-in; responsive-ux also enforces globally) */

@@ -377,6 +377,7 @@ const Profile = () => {
           }}
         >
           <Link to="/profile/settings">Profile settings</Link>
+          <Link to="/profile/tool-preferences">Tool preferences</Link>
           <Link to="/profile/activity">Activity</Link>
           <Link to="/profile/workspaces">Workspaces</Link>
           <Link to="/profile/security">Security</Link>

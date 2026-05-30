@@ -36,6 +36,7 @@ import {
 import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';
 import { PLATFORM_SYSTEM_CAPABILITIES, PLATFORM_SYSTEM_CAPABILITY_BY_ID } from './platformSystems';
+import { enrichToolWithSegmentation } from './profileToolSegmentation';
 
 export const TOOL_INVENTORY_VERSION = 1;
 
@@ -124,6 +125,24 @@ export const TOOL_SURFACES = Object.freeze({
   PLATFORM_PAGE: 'platform-page',
   HUB: 'hub',
   INTERNAL: 'internal',
+});
+
+export const TOOL_LIFECYCLE_STATES = Object.freeze({
+  ACTIVE: 'active',
+  BETA: 'beta',
+  EXPERIMENTAL: 'experimental',
+  DEPRECATED: 'deprecated',
+  HIDDEN: 'hidden',
+  ADMIN_ONLY: 'admin-only',
+});
+
+export const TOOL_LIFECYCLE_LABELS = Object.freeze({
+  [TOOL_LIFECYCLE_STATES.ACTIVE]: 'Active',
+  [TOOL_LIFECYCLE_STATES.BETA]: 'Beta',
+  [TOOL_LIFECYCLE_STATES.EXPERIMENTAL]: 'Experimental',
+  [TOOL_LIFECYCLE_STATES.DEPRECATED]: 'Deprecated',
+  [TOOL_LIFECYCLE_STATES.HIDDEN]: 'Hidden',
+  [TOOL_LIFECYCLE_STATES.ADMIN_ONLY]: 'Admin Only',
 });
 
 export const AUDIT_RECORD_KINDS = Object.freeze({
@@ -588,6 +607,54 @@ function isUserFacingInventoryRecord(record) {
   return true;
 }
 
+const ADMIN_ONLY_PERMISSIONS = new Set([
+  'CONFIGURE_SYSTEM',
+  'MANAGE_USERS',
+  'VIEW_AUDIT_LOGS',
+  'VIEW_GOVERNANCE',
+  'VIEW_AI_SECURITY',
+  'VIEW_OPERATIONS',
+  'VIEW_OBSERVABILITY',
+  'VIEW_REVIEW_QUEUE',
+  'REVIEW_CLINICAL_AI',
+  'MANAGE_INCIDENTS',
+]);
+
+function isAdminOnlyPermissionPolicy(permissionPolicy) {
+  return (permissionPolicy?.permissions || []).some((permission) => ADMIN_ONLY_PERMISSIONS.has(permission));
+}
+
+function lifecycleStateForRecord({
+  status,
+  sourceKind,
+  launchType,
+  executorStatus,
+  permissionPolicy,
+  catalogVisible,
+  sidebarVisible,
+  category,
+  tier,
+}) {
+  if (!catalogVisible && !sidebarVisible) return TOOL_LIFECYCLE_STATES.HIDDEN;
+  if (isAdminOnlyPermissionPolicy(permissionPolicy)) return TOOL_LIFECYCLE_STATES.ADMIN_ONLY;
+  if (status && !['active', 'hidden'].includes(status)) return TOOL_LIFECYCLE_STATES.DEPRECATED;
+  if (
+    launchType === TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED ||
+    executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED
+  ) {
+    return TOOL_LIFECYCLE_STATES.EXPERIMENTAL;
+  }
+  if (
+    sourceKind === 'platform-system' ||
+    launchType === TOOL_LAUNCH_TYPES.PLATFORM ||
+    ['AI System', 'Hospital Operations', 'IoT'].includes(presentationCategory(category)) ||
+    ['platform', 'fleet'].includes(tier)
+  ) {
+    return TOOL_LIFECYCLE_STATES.BETA;
+  }
+  return TOOL_LIFECYCLE_STATES.ACTIVE;
+}
+
 function userFacingRecordFromCanonical(record) {
   const surface = surfaceForRecord(record);
   const navigationPath = navigationPathFor(record.route, record.launchType, record.chatSeed);
@@ -631,6 +698,8 @@ function userFacingRecordFromCanonical(record) {
     orchestratorToolId: record.orchestratorToolId,
     endpoint: record.endpoint,
     executorStatus: record.executorStatus,
+    lifecycleState: record.lifecycleState,
+    lifecycleLabel: TOOL_LIFECYCLE_LABELS[record.lifecycleState] || 'Active',
     permissionPolicy: record.permissionPolicy,
     favoriteable: true,
     workspaceFilterable: true,
@@ -638,6 +707,7 @@ function userFacingRecordFromCanonical(record) {
     userCatalogVisible: true,
     auditRefs: {
       canonicalStatus: record.status,
+      lifecycleState: record.lifecycleState,
       sourceKind: record.sourceKind,
       backendPatternId: record.backendPatternId,
       apiClient: record.apiClient,
@@ -662,6 +732,7 @@ function auditRecordFromCanonical(record) {
     label: record.label,
     kind: auditRecordKind(record),
     status: record.status,
+    lifecycleState: record.lifecycleState,
     sourceFiles: unique([record.component, record.apiClient]),
     sourceModule: record.sourceKind,
     notes: record.notes,
@@ -745,13 +816,33 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
           : {};
   const catalogVisible = true;
   const sidebarVisible = Boolean(registryEntry);
+  const status = sourceStatusFor({ catalogVisible, sidebarVisible, component, route });
+  const executorStatus = hasExecutor
+    ? TOOL_EXECUTOR_STATUS.REGISTERED
+    : clinicalIntelligenceEndpoint || usePlatformCapability
+      ? TOOL_EXECUTOR_STATUS.PLATFORM
+      : nluToolId && NLU_PROFILE_TOOL_ID_SET.has(nluToolId)
+        ? TOOL_EXECUTOR_STATUS.UNSUPPORTED
+        : TOOL_EXECUTOR_STATUS.NONE;
+  const lifecycleState = lifecycleStateForRecord({
+    status,
+    sourceKind: 'registry',
+    launchType,
+    executorStatus,
+    permissionPolicy,
+    catalogVisible,
+    sidebarVisible,
+    category: normalizeCategory(registryEntry?.category || primaryNlu?.category || pattern?.category),
+    tier,
+  });
 
   return {
     id: registryId,
     label: registryEntry?.name || primaryNlu?.toolName || pattern?.toolName || registryId,
     category: normalizeCategory(registryEntry?.category || primaryNlu?.category || pattern?.category),
     tier,
-    status: sourceStatusFor({ catalogVisible, sidebarVisible, component, route }),
+    status,
+    lifecycleState,
     sourceKind: 'registry',
     route,
     component,
@@ -772,13 +863,7 @@ function buildRecordFromRegistry(registryId, patternByToolId) {
     endpoint,
     requestDto: dto.requestDto || null,
     responseDto: dto.responseDto || null,
-    executorStatus: hasExecutor
-      ? TOOL_EXECUTOR_STATUS.REGISTERED
-      : clinicalIntelligenceEndpoint || usePlatformCapability
-        ? TOOL_EXECUTOR_STATUS.PLATFORM
-        : nluToolId && NLU_PROFILE_TOOL_ID_SET.has(nluToolId)
-          ? TOOL_EXECUTOR_STATUS.UNSUPPORTED
-          : TOOL_EXECUTOR_STATUS.NONE,
+    executorStatus,
     apiClient,
     permissionPolicy,
     safetyCopy: primaryNlu?.description || registryEntry?.description || null,
@@ -824,18 +909,33 @@ function buildPlatformRecord({
   catalogVisible = false,
   sourceKind = 'platform',
 }) {
+  const status = 'active';
+  const executorStatus = TOOL_EXECUTOR_STATUS.PLATFORM;
+  const sidebarVisible = false;
+  const lifecycleState = lifecycleStateForRecord({
+    status,
+    sourceKind,
+    launchType: TOOL_LAUNCH_TYPES.PLATFORM,
+    executorStatus,
+    permissionPolicy,
+    catalogVisible,
+    sidebarVisible,
+    category,
+    tier,
+  });
   return {
     id,
     label,
     category,
     tier,
-    status: 'active',
+    status,
+    lifecycleState,
     sourceKind,
     route,
     component,
     launchType: TOOL_LAUNCH_TYPES.PLATFORM,
     catalogVisible,
-    sidebarVisible: false,
+    sidebarVisible,
     calculatorSlug: null,
     fallbackRoute: route,
     navigationPath: route,
@@ -850,7 +950,7 @@ function buildPlatformRecord({
     endpoint,
     requestDto,
     responseDto,
-    executorStatus: TOOL_EXECUTOR_STATUS.PLATFORM,
+    executorStatus,
     apiClient,
     permissionPolicy,
     safetyCopy,
@@ -1032,6 +1132,8 @@ export function getSidebarToolRegistryProjection(records = getCanonicalToolInven
         tier: record.tier,
         nluToolId: record.nluToolId,
         executorStatus: record.executorStatus,
+        lifecycleState: record.lifecycleState,
+        lifecycleLabel: TOOL_LIFECYCLE_LABELS[record.lifecycleState] || 'Active',
       };
     })
     .sort(
@@ -1052,7 +1154,7 @@ export function getUserFacingToolRegistryProjection(records = getCanonicalToolIn
   const projection = getUserFacingToolInventory(records).map((record) => {
     const legacy = record.legacy || {};
     const category = legacy.category || record.presentationCategory;
-    return {
+    return enrichToolWithSegmentation({
       ...legacy,
       id: record.id,
       name: record.label || legacy.name || record.id,
@@ -1073,11 +1175,17 @@ export function getUserFacingToolRegistryProjection(records = getCanonicalToolIn
       tier: record.tier,
       nluToolId: record.nluToolId,
       executorStatus: record.executorStatus,
+      lifecycleState: record.lifecycleState,
+      lifecycleLabel: TOOL_LIFECYCLE_LABELS[record.lifecycleState] || 'Active',
+      permissionPolicy: record.permissionPolicy,
+      aliases: record.aliases || [],
+      endpoint: record.endpoint,
+      clinicalRiskLevel: record.riskLevel,
       userCatalogVisible: record.userCatalogVisible,
       workspaceFilterable: record.workspaceFilterable,
       favoriteable: record.favoriteable,
       searchText: record.searchText,
-    };
+    });
   });
   if (records === cachedInventory) {
     cachedUserFacingToolRegistryProjection = projection;
@@ -1112,6 +1220,10 @@ export function getCanonicalToolInventoryDocument(records = getCanonicalToolInve
     acc[record.launchType] = (acc[record.launchType] || 0) + 1;
     return acc;
   }, {});
+  const lifecycleCounts = records.reduce((acc, record) => {
+    acc[record.lifecycleState] = (acc[record.lifecycleState] || 0) + 1;
+    return acc;
+  }, {});
 
   return {
     version: TOOL_INVENTORY_VERSION,
@@ -1124,6 +1236,7 @@ export function getCanonicalToolInventoryDocument(records = getCanonicalToolInve
       backendBacked: getBackendBackedToolInventory(records).length,
       statusCounts,
       launchTypeCounts,
+      lifecycleCounts,
     },
     records,
   };

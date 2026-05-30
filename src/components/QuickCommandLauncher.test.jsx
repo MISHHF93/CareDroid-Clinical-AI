@@ -113,6 +113,7 @@ describe('QuickCommandLauncher', () => {
       recentToolIds: ['qsofa', 'qsofa', 'medical-iot-dashboard'],
     });
     const commandIds = [
+      ...entries.workspaceEntries,
       ...entries.navEntries,
       ...entries.recentEntries,
       ...entries.toolEntries,
@@ -125,18 +126,33 @@ describe('QuickCommandLauncher', () => {
     }
   });
 
-  it('uses simplified canonical destinations and keeps secondary operations searchable', () => {
+  it('uses workspace-first destinations while keeping secondary routes searchable', () => {
     const entries = buildQuickCommandEntries({
       tools: getUserFacingToolRegistryProjection(),
       recentToolIds: [],
     });
+    const workspaceIds = entries.workspaceEntries.map((entry) => entry.sourceId);
     const navIds = entries.navEntries.map((entry) => entry.sourceId);
     const toolIds = entries.toolEntries.map((entry) => entry.sourceId);
 
-    expect(navIds).toEqual(expect.arrayContaining(['home', 'assistant', 'tools', 'calculators', 'hospital-map', 'medical-iot', 'fleet']));
+    expect(workspaceIds).toEqual(
+      expect.arrayContaining(['clinical', 'emergency', 'operations', 'fleet', 'medical-iot', 'research', 'admin'])
+    );
+    expect(navIds).toEqual(expect.arrayContaining(['workspace', 'home', 'assistant', 'tools', 'hospital-map', 'medical-iot', 'fleet']));
+    expect(navIds).not.toContain('calculators');
     expect(navIds).not.toContain('operations');
-    expect(navIds).not.toContain('developer-audit');
     expect(toolIds).toEqual(expect.arrayContaining(['live-tracking-map', 'device-fleet-management']));
+  });
+
+  it('launches workspace entries as first-class command destinations', () => {
+    renderQuickCommand({ defaultOpen: true });
+
+    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
+      target: { value: 'emergency workspace' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /open emergency workspace/i }));
+
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency');
   });
 
   it('keeps shared calculator-hub tools searchable instead of hiding them as nav duplicates', () => {

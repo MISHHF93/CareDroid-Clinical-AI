@@ -27,8 +27,8 @@ html {
   --app-overlay-on-surface-strong: color-mix(in srgb, var(--app-fg) 14%, transparent);
   --app-shadow-1: 0 2px 8px rgba(0, 0, 0, 0.22);
   --app-shadow-2: 0 8px 22px rgba(0, 0, 0, 0.32);
-  --app-accent: #22c55e;
-  --app-accent-2: #22d3ee;
+  --app-accent: #38bdf8;
+  --app-accent-2: #60a5fa;
   --app-accent-interactive: #38bdf8;
   --app-accent-hover: #7dd3fc;
   --app-danger: #f87171;
@@ -49,7 +49,7 @@ html {
   --app-success-contrast: #04111f;
   --app-on-solid: #ffffff;
   --app-mesh-cyan: rgba(56, 189, 248, 0.025);
-  --app-mesh-green: rgba(34, 197, 94, 0.025);
+  --app-mesh-green: rgba(56, 189, 248, 0.018);
   --app-scrollbar-track: rgba(255, 255, 255, 0.06);
   --app-scrollbar-thumb: rgba(148, 163, 184, 0.36);
   --app-scrollbar-thumb-hover: rgba(56, 189, 248, 0.5);
@@ -147,8 +147,8 @@ html[data-theme='dark'] {
   --app-overlay-on-surface-strong: color-mix(in srgb, var(--app-fg) 14%, transparent);
   --app-shadow-1: 0 2px 8px rgba(0, 0, 0, 0.22);
   --app-shadow-2: 0 8px 22px rgba(0, 0, 0, 0.32);
-  --app-accent: #22c55e;
-  --app-accent-2: #22d3ee;
+  --app-accent: #38bdf8;
+  --app-accent-2: #60a5fa;
   --app-accent-interactive: #38bdf8;
   --app-accent-hover: #7dd3fc;
   --app-danger: #f87171;
@@ -169,7 +169,7 @@ html[data-theme='dark'] {
   --app-success-contrast: #04111f;
   --app-on-solid: #ffffff;
   --app-mesh-cyan: rgba(56, 189, 248, 0.025);
-  --app-mesh-green: rgba(34, 197, 94, 0.025);
+  --app-mesh-green: rgba(56, 189, 248, 0.018);
   --app-scrollbar-track: rgba(255, 255, 255, 0.06);
   --app-scrollbar-thumb: rgba(148, 163, 184, 0.36);
   --app-scrollbar-thumb-hover: rgba(56, 189, 248, 0.5);
@@ -266,8 +266,8 @@ html[data-theme='light'] {
   --app-overlay-on-surface-strong: color-mix(in srgb, var(--app-fg) 14%, transparent);
   --app-shadow-1: 0 1px 4px rgba(15, 23, 42, 0.08);
   --app-shadow-2: 0 8px 20px rgba(15, 23, 42, 0.1);
-  --app-accent: #047857;
-  --app-accent-2: #0891b2;
+  --app-accent: #2563eb;
+  --app-accent-2: #38bdf8;
   --app-accent-interactive: #2563eb;
   --app-accent-hover: #1d4ed8;
   --app-danger: #dc2626;
@@ -288,7 +288,7 @@ html[data-theme='light'] {
   --app-success-contrast: #f0fdf4;
   --app-on-solid: #ffffff;
   --app-mesh-cyan: rgba(37, 99, 235, 0.018);
-  --app-mesh-green: rgba(4, 120, 87, 0.014);
+  --app-mesh-green: rgba(37, 99, 235, 0.012);
   --app-scrollbar-track: rgba(15, 23, 42, 0.06);
   --app-scrollbar-thumb: rgba(37, 99, 235, 0.35);
   --app-scrollbar-thumb-hover: rgba(37, 99, 235, 0.55);

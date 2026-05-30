@@ -87,6 +87,16 @@ import {
 import { Abcd2Calculator } from './abcd2Calculator';
 import { AnionGapCalculator, RassCalculator, ShockIndexCalculator } from './nextWaveCalculators';
 import {
+  CanadianCSpineCalculator,
+  GraceAcsCalculator,
+  NexusCSpineCalculator,
+  NihssCalculator,
+  OttawaAnkleCalculator,
+  PecarnHeadCalculator,
+  PercCalculator,
+  WellsPeCalculator,
+} from './sourceBackedClinicalCalculators';
+import {
   ApacheIICalculator,
   Curb65Calculator,
   GcsCalculator,
@@ -693,8 +703,24 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
       return <RockallScoreCalculator onResultChange={onResultChange} />;
     case 'framingham-risk':
       return <FraminghamRiskCalculator onResultChange={onResultChange} />;
+    case 'wells-pe':
+      return <WellsPeCalculator onResultChange={onResultChange} />;
+    case 'perc':
+      return <PercCalculator onResultChange={onResultChange} />;
+    case 'grace-acs':
+      return <GraceAcsCalculator onResultChange={onResultChange} />;
     case 'abcd2':
       return <Abcd2Calculator onResultChange={onResultChange} />;
+    case 'nihss':
+      return <NihssCalculator onResultChange={onResultChange} />;
+    case 'canadian-c-spine':
+      return <CanadianCSpineCalculator onResultChange={onResultChange} />;
+    case 'ottawa-ankle':
+      return <OttawaAnkleCalculator onResultChange={onResultChange} />;
+    case 'pecarn-head':
+      return <PecarnHeadCalculator onResultChange={onResultChange} />;
+    case 'nexus-cspine':
+      return <NexusCSpineCalculator onResultChange={onResultChange} />;
     case 'hunt-hess-scale':
       return <HuntHessScaleCalculator onResultChange={onResultChange} />;
     case 'ich-score':

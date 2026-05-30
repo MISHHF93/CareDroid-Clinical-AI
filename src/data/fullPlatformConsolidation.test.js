@@ -38,6 +38,13 @@ const REQUIRED_AUTH_SNIPPETS = Object.freeze([
 
 const REQUIRED_ROUTES = Object.freeze([
   '/dashboard',
+  '/workspaces',
+  '/search',
+  '/timeline',
+  '/notifications',
+  '/digital-twin',
+  '/workflows',
+  '/assets',
   '/assistant',
   '/tools',
   '/tools/calculators',

@@ -86,12 +86,15 @@ const FALLBACK = Layers;
 
 /** Primary app routes (Sidebar / Navigation) */
 const NAV_ICONS = {
+  workspace: Layers,
   home: LayoutDashboard,
   assistant: Bot,
   tools: Wrench,
   calculators: Calculator,
+  'digital-twin': Activity,
   'hospital-map': Hospital,
   fleet: Truck,
+  devices: Wrench,
   artifacts: Layers,
   memory: Brain,
   training: LineChart,

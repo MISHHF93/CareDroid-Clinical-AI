@@ -119,6 +119,36 @@
   outline-offset: 2px;
 }
 
+.tools-filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.tools-filter-tab {
+  min-height: var(--compact-control-height, 38px);
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-background);
+  color: var(--text-secondary);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tools-filter-tab--active {
+  border-color: color-mix(in srgb, var(--primary-color) 48%, var(--panel-border));
+  background: color-mix(in srgb, var(--primary-color) 12%, var(--panel-background));
+  color: var(--text-primary);
+}
+
+.tools-filter-tab:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
 .tools-workspace {
   display: inline-flex;
   flex-wrap: wrap;
@@ -149,6 +179,26 @@
 
 .tools-workspace select:focus {
   outline: none;
+}
+
+.tools-profile-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.tools-profile-summary span {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 4px 10px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  background: var(--app-surface-1);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 750;
 }
 
 .header-stats {
@@ -407,6 +457,44 @@
   color: var(--app-success);
 }
 
+.tool-category--restricted {
+  border-color: color-mix(in srgb, var(--app-warning) 42%, var(--app-border));
+  background: color-mix(in srgb, var(--app-warning) 10%, var(--app-surface));
+  color: var(--app-warning);
+}
+
+.tool-category--lifecycle {
+  border-color: color-mix(in srgb, var(--text-secondary) 28%, var(--app-border));
+  background: color-mix(in srgb, var(--text-secondary) 9%, var(--app-surface));
+  color: var(--text-secondary);
+}
+
+.tool-category--lifecycle-active {
+  border-color: color-mix(in srgb, var(--app-success) 34%, var(--app-border));
+  background: color-mix(in srgb, var(--app-success) 10%, var(--app-surface));
+  color: var(--app-success);
+}
+
+.tool-category--lifecycle-beta {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 34%, var(--app-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 10%, var(--app-surface));
+  color: var(--app-accent-interactive);
+}
+
+.tool-category--lifecycle-experimental,
+.tool-category--lifecycle-admin-only {
+  border-color: color-mix(in srgb, var(--app-warning) 42%, var(--app-border));
+  background: color-mix(in srgb, var(--app-warning) 10%, var(--app-surface));
+  color: var(--app-warning);
+}
+
+.tool-category--lifecycle-deprecated,
+.tool-category--lifecycle-hidden {
+  border-color: color-mix(in srgb, var(--app-danger, #dc2626) 36%, var(--app-border));
+  background: color-mix(in srgb, var(--app-danger, #dc2626) 8%, var(--app-surface));
+  color: var(--app-danger, #dc2626);
+}
+
 .tool-shortcut {
   background: var(--panel-border);
   color: var(--text-secondary);
@@ -426,6 +514,16 @@
   overflow: hidden;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+}
+
+.tool-restriction-note {
+  margin: -4px 0 12px;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--app-warning) 40%, var(--panel-border));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--app-warning) 8%, transparent);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
 }
 
 .tool-features {

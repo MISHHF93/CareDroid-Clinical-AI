@@ -327,7 +327,7 @@ export const SEGMENT_INVENTORY = Object.freeze([
     backendFiles: ['backend/src/modules/medical-control-plane/tool-orchestrator'],
     routes: ['/tools/calculators', '/tools/calculators/:slug', '/tools/calculator/:legacySlug'],
     canonicalRoute: '/tools/calculators',
-    navEntry: 'calculators',
+    navEntry: 'tools',
     inventoryEntry: 'calculator records in src/data/toolInventory.js',
     apiClients: ['src/services/clinicalOrchestratorApi.js'],
     backendEndpoints: ['/api/tools/sofa-calculator/execute'],
@@ -337,7 +337,7 @@ export const SEGMENT_INVENTORY = Object.freeze([
     mobile: { readiness: 'covered', tests: ['src/pages/tools/Calculators.responsive.test.js', 'src/pages/tools/Calculators.formSmoke.test.jsx'] },
     testCoverage: ['src/pages/tools/Calculators.hubCatalog.test.jsx', 'src/pages/tools/Calculators.formSmoke.test.jsx', 'src/routes/clinicalToolRoutes.production.test.js'],
     bridges: bridge({
-      userReach: 'Calculators primary navigation, Tools, sidebar, catalog, and direct calculator routes.',
+      userReach: 'Tools navigation, calculator hub links, catalog, and direct calculator routes.',
       assistant: 'Chat-assisted calculators seed Assistant; local results need a stronger return path.',
       tools: 'Native child of Tools.',
       backend: 'SOFA executor only; most forms are local.',

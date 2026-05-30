@@ -1220,10 +1220,11 @@ const toolRegistry = [
   {
     id: 'wells-pe',
     name: 'Wells PE',
-    path: '/tools/calculators',
+    path: '/tools/calculators/wells-pe',
     panelTool: 'calculators',
+    initialCalc: 'wells-pe',
     color: '#D46B5C',
-    description: 'Wells pulmonary embolism rule (chat-assisted; calculator hub)',
+    description: 'Wells pulmonary embolism rule with a source-backed calculator form',
     shortcut: 'Ctrl+Shift+W',
     category: 'Calculator',
     features: [
@@ -1333,11 +1334,12 @@ const toolRegistry = [
   {
     id: 'perc',
     name: 'PERC',
-    path: '/tools/calculators',
+    path: '/tools/calculators/perc',
     panelTool: 'calculators',
+    initialCalc: 'perc',
     color: '#5BA4CF',
     description:
-      'Pulmonary Embolism Rule-out Criteria (chat-assisted; low pre-test probability only)',
+      'Pulmonary Embolism Rule-out Criteria with a source-backed calculator form',
     shortcut: 'Ctrl+Shift+P',
     category: 'Calculator',
     features: [
@@ -1352,8 +1354,9 @@ const toolRegistry = [
   {
     id: 'grace-acs',
     name: 'GRACE ACS Risk',
-    path: '/tools/calculators',
+    path: '/tools/calculators/grace-acs',
     panelTool: 'calculators',
+    initialCalc: 'grace-acs',
     color: '#C45C5C',
     description:
       'GRACE ACS mortality risk stratification (clinical decision support; not ACS diagnosis or treatment)',
@@ -1897,8 +1900,9 @@ const toolRegistry = [
   {
     id: 'nihss',
     name: 'NIH Stroke Scale (NIHSS)',
-    path: '/tools/calculators',
+    path: '/tools/calculators/nihss',
     panelTool: 'calculators',
+    initialCalc: 'nihss',
     color: '#6B7FD4',
     description:
       'NIH Stroke Scale — neurologic deficit scoring (clinical decision support; does not replace urgent stroke care)',
@@ -1915,8 +1919,9 @@ const toolRegistry = [
   {
     id: 'canadian-c-spine',
     name: 'Canadian C-Spine Rule',
-    path: '/tools/calculators',
+    path: '/tools/calculators/canadian-c-spine',
     panelTool: 'calculators',
+    initialCalc: 'canadian-c-spine',
     color: '#7A9E8E',
     description:
       'Cervical spine imaging decision support for alert, stable blunt trauma (clinical decision support; not c-spine clearance)',
@@ -1928,8 +1933,9 @@ const toolRegistry = [
   {
     id: 'ottawa-ankle',
     name: 'Ottawa Ankle Rule',
-    path: '/tools/calculators',
+    path: '/tools/calculators/ottawa-ankle',
     panelTool: 'calculators',
+    initialCalc: 'ottawa-ankle',
     color: '#8E9A7A',
     description:
       'Ottawa ankle/foot radiography rules — acute injury only (clinical decision support; not fracture clearance)',
@@ -1941,8 +1947,9 @@ const toolRegistry = [
   {
     id: 'pecarn-head',
     name: 'PECARN Head Injury Rule',
-    path: '/tools/calculators',
+    path: '/tools/calculators/pecarn-head',
     panelTool: 'calculators',
+    initialCalc: 'pecarn-head',
     color: '#9A8EB8',
     description:
       'PECARN pediatric head injury rule — CT decision support (informational only; does not recommend imaging or override clinical judgment)',
@@ -1959,8 +1966,9 @@ const toolRegistry = [
   {
     id: 'nexus-cspine',
     name: 'NEXUS C-Spine Rule',
-    path: '/tools/calculators',
+    path: '/tools/calculators/nexus-cspine',
     panelTool: 'calculators',
+    initialCalc: 'nexus-cspine',
     color: '#7A8E9E',
     description:
       'NEXUS criteria for cervical spine imaging in blunt trauma (clinical decision support; not c-spine clearance)',

@@ -3,9 +3,14 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ToolsOverview from './ToolsOverview';
 import {
-  getUserFacingToolInventory,
+  getUserFacingToolRegistryProjection,
   TOOL_SURFACES,
 } from '../../data/toolInventory';
+import {
+  buildProfileToolGraph,
+  buildUserToolProfile,
+  filterToolsForProfileGraph,
+} from '../../data/profileToolSegmentation';
 import { phantomToolReferences } from '../../data/sourceCodeToolDiscovery';
 import {
   mockConversationValue,
@@ -45,6 +50,12 @@ function renderOverview() {
   );
 }
 
+function showAllTools() {
+  fireEvent.change(screen.getByRole('combobox', { name: /filter tools by type/i }), {
+    target: { value: 'all' },
+  });
+}
+
 function toolCard(container, id) {
   return container.querySelector(`[data-tool-id="${id}"]`);
 }
@@ -57,6 +68,27 @@ function openTool(container, id) {
   fireEvent.click(launchButton);
 }
 
+function expectedProfileVisibleTools(filter = 'all') {
+  const tools = getUserFacingToolRegistryProjection();
+  const profile = buildUserToolProfile({
+    activeWorkspaceId: 'all',
+    toolPreferences: mockToolPreferencesValue,
+  });
+  const graph = buildProfileToolGraph({ tools, profile });
+  return filterToolsForProfileGraph(graph, filter);
+}
+
+function expectedFilterIds(filter, surface) {
+  return expectedProfileVisibleTools(filter)
+    .filter(
+      (record) =>
+        record.surface === surface ||
+        (filter === 'calculator' && record.category === 'Calculator') ||
+        (filter === 'fleet' && record.category === 'Fleet')
+    )
+    .map((record) => record.id);
+}
+
 describe('ToolsOverview complete visibility, search, filters, and launch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -65,11 +97,14 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     mockToolPreferencesValue.favorites = [];
     mockToolPreferencesValue.pinned = [];
     mockToolPreferencesValue.recentTools = [];
+    mockToolPreferencesValue.hiddenTools = [];
+    mockToolPreferencesValue.profileSettings = { permissionLevel: 'admin' };
   });
 
   it('renders one card per user-facing canonical tool and excludes phantom audit rows', () => {
     const { container } = renderOverview();
-    const userFacing = getUserFacingToolInventory();
+    showAllTools();
+    const userFacing = expectedProfileVisibleTools('all');
     const renderedIds = [...container.querySelectorAll('[data-tool-id]')].map((node) =>
       node.getAttribute('data-tool-id')
     );
@@ -95,6 +130,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     ['kidney disease staging', 'ckd-staging'],
   ])('finds %s by alias or clinical phrase', (query, expectedId) => {
     const { container } = renderOverview();
+    showAllTools();
 
     fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
       target: { value: query },
@@ -118,14 +154,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     const renderedIds = [...container.querySelectorAll('[data-tool-id]')].map((node) =>
       node.getAttribute('data-tool-id')
     );
-    const expectedIds = getUserFacingToolInventory()
-      .filter(
-        (record) =>
-          record.surface === surface ||
-          (filter === 'calculator' && record.category === 'calculator') ||
-          (filter === 'fleet' && record.category === 'fleet')
-      )
-      .map((record) => record.id);
+    const expectedIds = expectedFilterIds(filter, surface);
 
     expect(renderedIds.length).toBeGreaterThan(0);
     expect(renderedIds.sort()).toEqual(expectedIds.sort());
@@ -145,6 +174,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
   it('launches representative calculator, clinical-page, fleet, hub, and chat-assisted tools', () => {
     const { container } = renderOverview();
+    showAllTools();
 
     openTool(container, 'qsofa');
     expect(navigateMock).toHaveBeenLastCalledWith(
@@ -170,10 +200,10 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
       expect.objectContaining({ replace: true })
     );
 
-    openTool(container, 'wells-pe');
+    openTool(container, 'wells-dvt-calculator');
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(expect.stringMatching(/wells/i), 'user');
-    expect(mockConversationValue.selectTool).toHaveBeenCalledWith('wells-pe');
-    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('wells-pe');
+    expect(mockConversationValue.selectTool).toHaveBeenCalledWith('wells-dvt-calculator');
+    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('wells-dvt-calculator');
     expect(navigateMock).toHaveBeenLastCalledWith(
       { pathname: '/assistant', search: '' },
       expect.objectContaining({ replace: true })
@@ -182,6 +212,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
 
   it('opens Assistant from a tool card with the canonical launch seed', () => {
     const { container } = renderOverview();
+    showAllTools();
     const card = toolCard(container, 'guideline-rag');
     expect(card).toBeTruthy();
     const assistantButton = card.querySelector('.btn-chat-tool');

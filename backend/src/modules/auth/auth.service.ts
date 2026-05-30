@@ -243,12 +243,15 @@ export class AuthService {
       process.env.ENABLE_DEV_AUTH_BYPASS,
       process.env.VITE_ENABLE_DEV_AUTH_BYPASS,
     ].some((value) => String(value).toLowerCase() === 'true');
+    const nodeEnv = process.env.NODE_ENV || 'development';
+    const isLocalDevelopment =
+      nodeEnv === 'development' && ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(ipAddress);
 
-    if (!explicitDevBypassEnabled) {
+    if (!explicitDevBypassEnabled && !isLocalDevelopment) {
       throw new ForbiddenException('Dev session requires ENABLE_DEV_AUTH_BYPASS=true');
     }
 
-    if (process.env.NODE_ENV === 'production') {
+    if (nodeEnv === 'production') {
       throw new ForbiddenException('Dev session is not available in production');
     }
 

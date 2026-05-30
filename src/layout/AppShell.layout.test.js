@@ -109,6 +109,12 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellJsx).not.toContain('app-shell-theme-fab');
   });
 
+  it('defines one authenticated app shell header before route content', () => {
+    expect(appShellJsx).toContain('<header className="app-shell-header"');
+    expect(appShellCss).toMatch(/\.app-shell-header[\s\S]*position:\s*sticky/);
+    expect(appShellCss).toMatch(/\.app-shell-header[\s\S]*pointer-events:\s*none/);
+  });
+
   it('scroll routes grow with content instead of clipping inside page-body', () => {
     expect(appShellCss).toMatch(
       /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*min-height:\s*auto/

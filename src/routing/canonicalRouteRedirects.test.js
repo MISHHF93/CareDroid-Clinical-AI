@@ -56,6 +56,13 @@ describe('canonical route redirects', () => {
     expectRedirect('/catalog', '/tools');
   });
 
+  it('registers profile tool preferences without redirecting canonical tool routes', () => {
+    expectRoute('/profile/tool-preferences', 'ProfileToolPreferences');
+    expect(appSource).toContain("path: '/tools'");
+    expect(appSource).toContain("path: '/tools/calculators/:slug'");
+    expect(appSource).not.toContain("to=\"/profile/preferences?tool-preferences\"");
+  });
+
   it('renders product tool pages directly instead of redirecting them through assistant', () => {
     expectRoute('/tools/drug-checker', 'DrugChecker');
     expectRoute('/tools/lab-interpreter', 'LabInterpreter');

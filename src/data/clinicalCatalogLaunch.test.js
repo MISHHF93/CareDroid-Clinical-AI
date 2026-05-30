@@ -44,6 +44,7 @@ import {
   PR7_CALCULATOR_REGISTRY_IDS,
   CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS,
   AI_SYSTEM_REGISTRY_IDS,
+  SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS,
   TOOL_LAUNCH_PATHS,
 } from './clinicalToolIdContract';
 import { runClinicalSafetyComplianceAudit } from './clinicalSafetyGuardrails';
@@ -88,6 +89,10 @@ const TIER_B_ALL = [
 
 const TIER_B_HUB_TOOLS = TIER_B_ALL.filter(
   (registryId) => !CARDIOLOGY_TIER_B_CHAT_REGISTRY_IDS.includes(registryId)
+);
+const SOURCE_BACKED_DIRECT_CALCULATOR_SET = new Set(SOURCE_BACKED_TIER_A_CALCULATOR_REGISTRY_IDS);
+const PR2_CHAT_ONLY_CALCULATOR_IDS = PR2_TIER_B_CHAT_CALCULATOR_IDS.filter(
+  (registryId) => !SOURCE_BACKED_DIRECT_CALCULATOR_SET.has(registryId)
 );
 
 /** Substrings chat seeds for clinical tools should include (safety / scope). */
@@ -216,15 +221,15 @@ describe('resolveCatalogLaunch — Tier A dedicated calculator routes', () => {
 
 describe('resolveNavigationPathForLaunch — chat visibility', () => {
   it.each(PR3_CALCULATOR_REGISTRY_IDS)(
-    'PR3 %s navigates to chat after hub chat launch',
+    'PR3 %s navigates to its source-backed calculator route',
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
-      expect(launch.path).toBe(HUB);
-      expect(resolveNavigationPathForLaunch(launch)).toBe('/assistant');
+      expect(launch.path).toBe(`/tools/calculators/${registryId}`);
+      expect(resolveNavigationPathForLaunch(launch)).toBe(launch.path);
     }
   );
 
-  it.each(PR2_TIER_B_CHAT_CALCULATOR_IDS)(
+  it.each(PR2_CHAT_ONLY_CALCULATOR_IDS)(
     'PR2 Tier-B %s navigates to chat for guided chat',
     (registryId) => {
       const launch = resolveCatalogLaunch(registryId);
@@ -278,12 +283,12 @@ describe('resolveCatalogLaunch — Tier B chat-assisted (calculators hub)', () =
     const aliasLaunch = resolveCatalogLaunch('pe-score');
     if (registryId === 'wells-pe') {
       expect(aliasLaunch.registryId).toBe('wells-pe');
-      expect(aliasLaunch.path).toBe(HUB);
+      expect(aliasLaunch.path).toBe('/tools/calculators/wells-pe');
     }
     const percAlias = resolveCatalogLaunch('pe-rule-out');
     if (registryId === 'perc') {
       expect(percAlias.registryId).toBe('perc');
-      expect(percAlias.path).toBe(HUB);
+      expect(percAlias.path).toBe('/tools/calculators/perc');
     }
   });
 });

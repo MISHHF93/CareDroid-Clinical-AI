@@ -89,9 +89,23 @@
   touch-action: none;
 }
 
+.app-shell-header {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 920;
+  flex: 0 0 auto;
+  width: 100%;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.app-shell-header > * {
+  pointer-events: auto;
+}
+
 .app-shell-menu-btn {
   position: absolute;
-  top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
+  top: var(--space-3);
   left: calc(var(--space-3) + env(safe-area-inset-left, 0px));
   z-index: 960;
   display: inline-flex;
@@ -127,7 +141,7 @@
 
 .app-shell-command-btn {
   position: absolute;
-  top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
+  top: var(--space-3);
   right: calc(var(--space-3) + env(safe-area-inset-right, 0px));
   z-index: 960;
   display: inline-flex;
@@ -150,12 +164,28 @@
 }
 
 .app-shell--compact .app-shell-command-btn {
-  top: calc(var(--space-3) + env(safe-area-inset-top, 0px));
+  top: var(--space-3);
   right: calc(var(--space-3) + env(safe-area-inset-right, 0px));
 }
 
 .app-shell-command-btn:hover {
   border-color: var(--app-accent-interactive);
+}
+
+.app-shell-workspace-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 16px 0;
+  pointer-events: none;
+}
+
+.app-shell-workspace-bar > * {
+  pointer-events: auto;
+}
+
+.app-shell--compact .app-shell-workspace-bar {
+  justify-content: center;
+  padding: 10px 56px 0;
 }
 
 .app-shell-bottom-nav {

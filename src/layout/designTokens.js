@@ -52,7 +52,17 @@ export const DESIGN_TYPOGRAPHY = Object.freeze({
   body: 'var(--text-body)',
   small: 'var(--text-small)',
   caption: 'var(--text-caption)',
+  label: 'var(--app-type-label)',
+  helper: 'var(--app-type-helper)',
   mono: 'var(--text-mono)',
+});
+
+export const DESIGN_CARD_PADDING = Object.freeze({
+  standard: 'var(--app-card-padding-standard)',
+  dashboard: 'var(--app-card-padding-dashboard)',
+  tool: 'var(--app-card-padding-tool)',
+  calculator: 'var(--app-card-padding-calculator)',
+  alert: 'var(--app-card-padding-alert)',
 });
 
 export const DESIGN_RADII = Object.freeze({

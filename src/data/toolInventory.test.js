@@ -12,6 +12,7 @@ import {
   getUserFacingToolInventory,
   resolveToolInventoryRecord,
   TOOL_EXECUTOR_STATUS,
+  TOOL_LIFECYCLE_STATES,
   TOOL_LAUNCH_TYPES,
   TOOL_PERMISSION_LOGIC,
   TOOL_SURFACES,
@@ -31,6 +32,7 @@ const requiredFields = [
   'category',
   'tier',
   'status',
+  'lifecycleState',
   'sourceKind',
   'launchType',
   'catalogVisible',
@@ -53,6 +55,7 @@ describe('canonical tool inventory', () => {
         expect(record, `${record.id} missing ${field}`).toHaveProperty(field);
         expect(record[field], `${record.id}.${field} is undefined`).not.toBeUndefined();
       }
+      expect(Object.values(TOOL_LIFECYCLE_STATES), record.id).toContain(record.lifecycleState);
       expect(record.label).toBeTruthy();
       expect(record.category).toBeTruthy();
       expect(Array.isArray(record.testCoverage)).toBe(true);
@@ -147,6 +150,7 @@ describe('canonical tool inventory', () => {
   it('projects a user-facing inventory without platform or unsupported artifacts', () => {
     const userFacing = getUserFacingToolInventory(records);
     const calculatorRoutes = new Set(CALCULATOR_ROUTE_DEFS.map((def) => def.path));
+    const allowedLifecycleStates = new Set(Object.values(TOOL_LIFECYCLE_STATES));
     expect(userFacing.length).toBeGreaterThan(0);
     expect(new Set(userFacing.map((record) => record.id)).size).toBe(userFacing.length);
 
@@ -156,6 +160,9 @@ describe('canonical tool inventory', () => {
       expect(record.label, record.id).toBeTruthy();
       expect(record.category, record.id).toBeTruthy();
       expect(record.launchType, record.id).toBeTruthy();
+      expect(record.lifecycleState, record.id).toBeTruthy();
+      expect(allowedLifecycleStates.has(record.lifecycleState), record.id).toBe(true);
+      expect(record.lifecycleLabel, record.id).toBeTruthy();
       expect(record.surface, record.id).toBeTruthy();
       expect(record.route || record.navigationPath || record.chatSeed, record.id).toBeTruthy();
       expect(record.launchType, record.id).not.toBe(TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED);
@@ -201,6 +208,18 @@ describe('canonical tool inventory', () => {
         expect(record.route, record.id).toBeTruthy();
         expect(record.component, record.id).toBeTruthy();
       }
+    }
+  });
+
+  it('does not allow user-facing registry projection tools without lifecycle state', () => {
+    const tools = getUserFacingToolRegistryProjection(records);
+    const allowedLifecycleStates = new Set(Object.values(TOOL_LIFECYCLE_STATES));
+
+    expect(tools.length).toBeGreaterThan(100);
+    for (const tool of tools) {
+      expect(tool.lifecycleState, tool.id).toBeTruthy();
+      expect(allowedLifecycleStates.has(tool.lifecycleState), tool.id).toBe(true);
+      expect(tool.lifecycleLabel, tool.id).toBeTruthy();
     }
   });
 

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import Sidebar from '../components/Sidebar';
+import WorkspaceSwitcher from '../components/WorkspaceSwitcher';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon } from '../navigation/iconRegistry';
 import { PRIMARY_MOBILE_NAV_ITEMS, primaryNavPathMatches } from '../navigation/primaryNavigation';
@@ -146,34 +147,41 @@ const AppShell = ({
       />
 
       <div className="app-shell-main-wrap">
-        {isAuthed && isCompact && (
-          <button
-            ref={menuButtonRef}
-            type="button"
-            className="app-shell-menu-btn"
-            onClick={() => setMobileNavOpen((open) => !open)}
-            aria-expanded={mobileNavOpen}
-            aria-controls="app-sidebar-nav"
-            aria-label={mobileNavOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          >
-            <span className="app-shell-menu-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.menu} size={22} />
-            </span>
-          </button>
-        )}
-        {isAuthed && isCompact && (
-          <button
-            type="button"
-            className="app-shell-command-btn"
-            onClick={openQuickCommand}
-            aria-expanded={quickCommandOpen}
-            aria-haspopup="dialog"
-            aria-label="Open Quick Command"
-          >
-            <span aria-hidden>
-              <NavIcon icon={CHROME_ICONS.search} size={22} />
-            </span>
-          </button>
+        {isAuthed && (
+          <header className="app-shell-header" aria-label="Application header">
+            {isCompact && (
+              <button
+                ref={menuButtonRef}
+                type="button"
+                className="app-shell-menu-btn"
+                onClick={() => setMobileNavOpen((open) => !open)}
+                aria-expanded={mobileNavOpen}
+                aria-controls="app-sidebar-nav"
+                aria-label={mobileNavOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              >
+                <span className="app-shell-menu-icon" aria-hidden>
+                  <NavIcon icon={CHROME_ICONS.menu} size={22} />
+                </span>
+              </button>
+            )}
+            {isCompact && (
+              <button
+                type="button"
+                className="app-shell-command-btn"
+                onClick={openQuickCommand}
+                aria-expanded={quickCommandOpen}
+                aria-haspopup="dialog"
+                aria-label="Open Quick Command"
+              >
+                <span aria-hidden>
+                  <NavIcon icon={CHROME_ICONS.search} size={22} />
+                </span>
+              </button>
+            )}
+            <div className="app-shell-workspace-bar" aria-label="Workspace switcher">
+              <WorkspaceSwitcher compact={isCompact} />
+            </div>
+          </header>
         )}
         {isAuthed && (
           <QuickCommandLauncher

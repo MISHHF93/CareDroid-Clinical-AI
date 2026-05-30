@@ -95,32 +95,37 @@ describe('Sidebar mobile render state', () => {
     expect(closeButton).toHaveAccessibleName(/close menu/i);
     const nav = container.querySelector('nav.sidebar-nav');
     expect(nav).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^dashboard$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^workspace$/i })).toBeInTheDocument();
     expect(within(nav).getByRole('button', { name: /^ai assistant$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^hospital map$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^fleet map$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^command center$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^tools$/i })).toBeInTheDocument();
+    expect(within(nav).queryByRole('button', { name: /^hospital map$/i })).not.toBeInTheDocument();
+    expect(within(nav).queryByRole('button', { name: /^fleet map$/i })).not.toBeInTheDocument();
   });
 
-  it('renders simplified primary items and hides developer links in Advanced by default', () => {
+  it('renders workspace-first primary items and hides contextual links in More by default', () => {
     renderSidebar({ layoutCompact: false, sidebarCollapsed: false });
 
     const nav = screen.getByRole('navigation', { name: /primary navigation/i });
     for (const name of [
-      /^dashboard$/i,
+      /^workspace$/i,
       /^ai assistant$/i,
+      /^command center$/i,
       /^tools$/i,
-      /^calculators$/i,
-      /^hospital map$/i,
-      /^medical iot$/i,
-      /^fleet map$/i,
       /^profile$/i,
       /^settings$/i,
     ]) {
       expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
     }
 
+    expect(screen.getByLabelText(/org workspace/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/^workspace$/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /developer catalog/i })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /advanced/i }));
+    expect(screen.queryByRole('button', { name: /^tool library$/i })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /more/i }));
+    expect(screen.queryByRole('button', { name: /^tool library$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^calculators$/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^hospital map$/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /developer catalog/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /system health/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^security$/i })).toBeInTheDocument();

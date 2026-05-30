@@ -67,10 +67,27 @@ import { ObservabilityModule } from './modules/observability/observability.modul
 import { HospitalMapModule } from './modules/hospital-map';
 import { TelemetryModule } from './modules/telemetry';
 import { FleetModule } from './modules/fleet';
+import { WorkspaceIntelligenceModule } from './modules/workspace-intelligence/workspace-intelligence.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
+
+function resolveDatabaseClient() {
+  const configuredClient = (process.env.DATABASE_CLIENT || '').toLowerCase();
+  if (configuredClient) return configuredClient;
+
+  const hasExplicitPostgresConfig = [
+    process.env.DATABASE_URL,
+    process.env.DATABASE_HOST,
+    process.env.DATABASE_USER,
+    process.env.DATABASE_PASSWORD,
+    process.env.DATABASE_NAME,
+  ].some(Boolean);
+
+  const nodeEnv = process.env.NODE_ENV || 'development';
+  return nodeEnv === 'development' && !hasExplicitPostgresConfig ? 'sqlite' : 'postgres';
+}
 
 @Module({
   imports: [
@@ -100,7 +117,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: () => {
-        const client = (process.env.DATABASE_CLIENT || '').toLowerCase();
+        const client = resolveDatabaseClient();
         if (client === 'sqlite') {
           return {
             type: 'sqlite',
@@ -171,6 +188,7 @@ import { MetricsModule } from './modules/metrics/metrics.module';
     HospitalMapModule,
     TelemetryModule,
     FleetModule,
+    WorkspaceIntelligenceModule,
     ClinicalAlertsModule,
     PlatformSystemsModule,
 

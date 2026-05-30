@@ -11,9 +11,14 @@ export const mockToolPreferencesValue = {
   favorites: [],
   pinned: [],
   recentTools: [],
+  hiddenTools: [],
+  profileSettings: {},
   toggleFavorite: vi.fn(),
   togglePinned: vi.fn(),
+  toggleHidden: vi.fn(),
   clearRecentTools: vi.fn(),
+  updateProfileSettings: vi.fn(),
+  resetToolRecommendations: vi.fn(),
 };
 
 export const mockConversationValue = {

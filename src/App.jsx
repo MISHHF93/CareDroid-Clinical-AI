@@ -40,6 +40,38 @@ import Version from './pages/Version';
 
 // Authenticated shell pages — lazy for smaller initial JS (mobile LCP)
 const CommandDashboard = lazyWithRetry(() => import('./pages/CommandDashboard'));
+const WorkspaceHome = lazyWithRetry(() => import('./pages/WorkspaceHome'));
+const {
+  WorkspacesIndexPage,
+  SearchResultsPage,
+  ClinicalTimelinePage,
+  NotificationCenterPage,
+  DigitalTwinPage,
+  WorkflowBuilderPage,
+  AssetLibraryPage,
+} = {
+  WorkspacesIndexPage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.WorkspacesIndexPage }))
+  ),
+  SearchResultsPage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.SearchResultsPage }))
+  ),
+  ClinicalTimelinePage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.ClinicalTimelinePage }))
+  ),
+  NotificationCenterPage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.NotificationCenterPage }))
+  ),
+  DigitalTwinPage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.DigitalTwinPage }))
+  ),
+  WorkflowBuilderPage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.WorkflowBuilderPage }))
+  ),
+  AssetLibraryPage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.AssetLibraryPage }))
+  ),
+};
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
 const Artifacts = lazyWithRetry(() => import('./pages/Artifacts'));
@@ -59,6 +91,7 @@ const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
 const ProfileActivity = lazyWithRetry(() => import('./pages/profile/ProfileActivity'));
 const ProfilePreferences = lazyWithRetry(() => import('./pages/profile/ProfilePreferences'));
+const ProfileToolPreferences = lazyWithRetry(() => import('./pages/profile/ProfileToolPreferences'));
 const ProfileWorkspaces = lazyWithRetry(() => import('./pages/profile/ProfileWorkspaces'));
 const ProfileSecurity = lazyWithRetry(() => import('./pages/profile/ProfileSecurity'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
@@ -451,6 +484,74 @@ function AppRoutes() {
       element: (
         <AppShellPage>
           <CommandDashboard />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/workspace',
+      element: <LegacyProtectedRouteRedirect to="/workspace/clinical" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workspaces',
+      element: (
+        <AppShellPage>
+          <WorkspacesIndexPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/workspace/:workspaceId',
+      element: (
+        <AppShellPage>
+          <WorkspaceHome />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/search',
+      element: (
+        <AppShellPage>
+          <SearchResultsPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/timeline',
+      element: (
+        <AppShellPage>
+          <ClinicalTimelinePage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/digital-twin',
+      element: (
+        <AppShellPage>
+          <DigitalTwinPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/workflows',
+      element: (
+        <AppShellPage>
+          <WorkflowBuilderPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/assets',
+      element: (
+        <AppShellPage>
+          <AssetLibraryPage />
         </AppShellPage>
       ),
       requiresAuth: true,
@@ -1363,6 +1464,15 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/profile/tool-preferences',
+      element: (
+        <AppShellPage>
+          <ProfileToolPreferences />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
       path: '/profile/workspaces',
       element: (
         <AppShellPage>
@@ -1396,6 +1506,15 @@ function AppRoutes() {
     },
     {
       path: '/notifications',
+      element: (
+        <AppShellPage>
+          <NotificationCenterPage />
+        </AppShellPage>
+      ),
+      requiresAuth: true,
+    },
+    {
+      path: '/notification-preferences',
       element: (
         <AppShellPage>
           <NotificationPreferences />

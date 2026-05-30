@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { BACKEND_API_CAPABILITIES } from '../config/backendApiCapabilities';
 import { BACKEND_HTTP_ROUTES } from '../data/backendHttpRouteInventory';
-import { getBackendBackedToolInventory } from '../data/toolInventory';
+import { getBackendBackedToolInventory, getUserFacingToolRegistryProjection } from '../data/toolInventory';
+import { buildUserToolProfile } from '../data/profileToolSegmentation';
 import {
   CHAT_SENSITIVE_CONFIRMATIONS,
   getChatCapabilitySuggestions,
@@ -132,5 +133,70 @@ describe('chat capability suggestions', () => {
       expect(byId[id].confirmation.reversible).toBeTruthy();
       expect(byId[id].confirmation.authRequirement).toBeTruthy();
     }
+  });
+
+  it('adds profile-context recommendations for the assistant', () => {
+    const profileContext = buildUserToolProfile({
+      user: { role: 'cardiologist' },
+      toolPreferences: {
+        favorites: [],
+        pinned: [],
+        recentTools: [],
+        hiddenTools: [],
+        profileSettings: { role: 'cardiologist', specialty: 'cardiology' },
+      },
+    });
+    const suggestions = getChatCapabilitySuggestions({ hasPermission: allowAll, profileContext });
+
+    expect(suggestions.map((suggestion) => suggestion.toolId)).toEqual(
+      expect.arrayContaining(['has-bled', 'grace-acs'])
+    );
+    expect(suggestions.find((suggestion) => suggestion.toolId === 'has-bled')?.source).toBe('profile-tool-graph');
+  });
+
+  it('uses stroke context as an AI launcher for neuro tools and workspace', () => {
+    const suggestions = getChatCapabilitySuggestions({
+      input: 'stroke patient',
+      hasPermission: allowAll,
+      tools: getUserFacingToolRegistryProjection(),
+    });
+
+    expect(suggestions.slice(0, 4).map((suggestion) => suggestion.toolId || suggestion.label)).toEqual(
+      expect.arrayContaining(['nihss', 'abcd2', 'stroke-workflow-assistant', 'Neurology Workspace'])
+    );
+    expect(suggestions.find((suggestion) => suggestion.label === 'Neurology Workspace')?.path).toBe('/workspace/neurology');
+  });
+
+  it('uses chest pain context as an AI launcher for ACS tools and cardiology workspace', () => {
+    const profileContext = buildUserToolProfile({
+      user: { role: 'cardiologist' },
+      toolPreferences: { favorites: [], pinned: [], recentTools: [], hiddenTools: [], profileSettings: { role: 'cardiologist' } },
+    });
+    const suggestions = getChatCapabilitySuggestions({
+      input: 'chest pain',
+      hasPermission: allowAll,
+      profileContext,
+      workspaceContext: { activeWorkspaceId: 'cardiology' },
+      recentToolIds: ['heart-score'],
+      tools: getUserFacingToolRegistryProjection(),
+    });
+
+    expect(suggestions.slice(0, 4).map((suggestion) => suggestion.toolId || suggestion.label)).toEqual(
+      expect.arrayContaining(['heart-score', 'timi-ua-nstemi', 'acs-workflow-assistant', 'Cardiology Workspace'])
+    );
+    expect(suggestions[0].toolId).toBe('heart-score');
+  });
+
+  it('uses ventilator context as an AI launcher for respiratory tools and workspace', () => {
+    const suggestions = getChatCapabilitySuggestions({
+      input: 'ventilator settings worsening oxygenation',
+      hasPermission: allowAll,
+      workspaceContext: { activeWorkspaceId: 'respiratory' },
+      tools: getUserFacingToolRegistryProjection(),
+    });
+
+    expect(suggestions.slice(0, 3).map((suggestion) => suggestion.toolId || suggestion.label)).toEqual(
+      expect.arrayContaining(['rox-index', 'pao2-fio2-ratio', 'Respiratory Workspace'])
+    );
   });
 });

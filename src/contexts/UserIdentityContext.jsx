@@ -95,6 +95,8 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
         favoriteToolIds: toolPrefs.favorites,
         pinnedToolIds: toolPrefs.pinned,
         recentToolIds: toolPrefs.recentTools,
+        hiddenToolIds: toolPrefs.hiddenTools,
+        profileSettings: toolPrefs.profileSettings,
       },
       aiAssistantPreferences: {
         responseStyle: 'concise',

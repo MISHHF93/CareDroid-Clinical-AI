@@ -2,9 +2,11 @@ import { BACKEND_API_CAPABILITIES } from '../config/backendApiCapabilities';
 import { BACKEND_HTTP_ROUTES } from '../data/backendHttpRouteInventory';
 import {
   ORCHESTRATOR_REGISTERED_NLU_TOOL_IDS,
+  REGISTRY,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
 } from '../data/clinicalToolIdContract';
-import { getBackendBackedToolInventory } from '../data/toolInventory';
+import { getBackendBackedToolInventory, getUserFacingToolRegistryProjection } from '../data/toolInventory';
+import { buildProfileToolGraph, getProfileAssistantRecommendations } from '../data/profileToolSegmentation';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import { Permission } from '../contexts/UserContext';
 
@@ -66,6 +68,123 @@ function textMatches(input, terms) {
 function scoreSuggestion(input, suggestion) {
   if (!input?.trim()) return suggestion.defaultRank;
   return textMatches(input, suggestion.keywords) ? suggestion.defaultRank - 100 : suggestion.defaultRank;
+}
+
+const CONTEXT_AWARE_LAUNCHER_INTENTS = Object.freeze([
+  {
+    id: 'stroke',
+    terms: ['stroke', 'tia', 'nihss', 'facial droop', 'aphasia', 'weakness', 'thrombolysis'],
+    toolIds: [REGISTRY.nihss, REGISTRY.abcd2, REGISTRY.strokeWorkflowAssistant],
+    workspace: {
+      id: 'neurology-workspace',
+      label: 'Neurology Workspace',
+      path: '/workspace/neurology',
+      description: 'Open a neurology workspace for stroke, TIA, NIHSS, and neuro workflow support.',
+    },
+  },
+  {
+    id: 'chest-pain',
+    terms: ['chest pain', 'acs', 'stemi', 'nstemi', 'troponin', 'cardiac pain', 'heart attack'],
+    toolIds: [REGISTRY.heartScore, REGISTRY.timiUaNstemi, REGISTRY.acsWorkflowAssistant],
+    workspace: {
+      id: 'cardiology-workspace',
+      label: 'Cardiology Workspace',
+      path: '/workspace/cardiology',
+      description: 'Open a cardiology workspace for ACS risk, ECG, troponin, and cardiac workflows.',
+    },
+  },
+  {
+    id: 'ventilator',
+    terms: ['ventilator', 'ventilation', 'intubated', 'ards', 'hypoxemia', 'fio2', 'p/f ratio', 'pf ratio'],
+    toolIds: [REGISTRY.roxIndex, REGISTRY.pao2Fio2Ratio],
+    workspace: {
+      id: 'respiratory-workspace',
+      label: 'Respiratory Workspace',
+      path: '/workspace/respiratory',
+      description: 'Open a respiratory workspace for ventilator, oxygenation, ROX, and P/F ratio support.',
+    },
+  },
+]);
+
+function findTool(tools, toolId) {
+  return tools.find((tool) => tool.id === toolId);
+}
+
+function toolSuggestionFromIntent({ tool, intent, index, recentToolIds, workspaceContext, profileGraph }) {
+  const graphTool = profileGraph?.visibleTools?.find((candidate) => candidate.id === tool.id);
+  if (profileGraph && !graphTool) return null;
+  const sourceTool = graphTool || tool;
+  const recentBoost = recentToolIds.includes(tool.id) ? -8 : 0;
+  const workspaceBoost =
+    workspaceContext?.activeWorkspaceId &&
+    sourceTool.workspaceTags?.includes(workspaceContext.activeWorkspaceId)
+      ? -6
+      : 0;
+  const profileBoost = sourceTool.profileScore ? Math.min(18, Math.max(0, Math.round(sourceTool.profileScore / 12))) : 0;
+
+  return {
+    id: `intent-${intent.id}-${tool.id}`,
+    label: sourceTool.name || sourceTool.label || tool.id,
+    description: `Suggested for ${intent.id.replace('-', ' ')} context using your profile, workspace, recent activity, and tool graph.`,
+    kind: 'route',
+    toolId: tool.id,
+    path: sourceTool.path || sourceTool.navigationPath,
+    icon: getToolIcon(tool.id),
+    source: 'context-aware-ai-launcher',
+    defaultRank: -30 + index + recentBoost + workspaceBoost - profileBoost,
+    keywords: [intent.id, ...intent.terms, tool.id, sourceTool.name, sourceTool.category],
+  };
+}
+
+function workspaceSuggestionFromIntent({ intent, workspaceContext, profileContext }) {
+  const activeWorkspaceId = workspaceContext?.activeWorkspaceId || profileContext?.workspace;
+  const activeBoost = intent.workspace.path.endsWith(`/${activeWorkspaceId}`) ? -8 : 0;
+  return {
+    id: `intent-${intent.id}-${intent.workspace.id}`,
+    label: intent.workspace.label,
+    description: intent.workspace.description,
+    kind: 'route',
+    path: intent.workspace.path,
+    icon: CHROME_ICONS.layoutDashboard,
+    source: 'context-aware-ai-launcher',
+    defaultRank: -24 + activeBoost,
+    keywords: [intent.id, ...intent.terms, intent.workspace.label, activeWorkspaceId],
+  };
+}
+
+function getContextAwareLauncherSuggestions({
+  input,
+  tools,
+  profileContext,
+  workspaceContext,
+  recentToolIds = [],
+}) {
+  if (!input?.trim()) return [];
+  const matchedIntents = CONTEXT_AWARE_LAUNCHER_INTENTS.filter((intent) => textMatches(input, intent.terms));
+  if (!matchedIntents.length) return [];
+
+  const profileGraph = profileContext ? buildProfileToolGraph({ tools, profile: profileContext }) : null;
+  return matchedIntents.flatMap((intent) => {
+    const toolSuggestions = intent.toolIds
+      .map((toolId, index) => {
+        const tool = findTool(tools, toolId);
+        if (!tool) return null;
+        return toolSuggestionFromIntent({
+          tool,
+          intent,
+          index,
+          recentToolIds,
+          workspaceContext,
+          profileGraph,
+        });
+      })
+      .filter(Boolean);
+
+    return [
+      ...toolSuggestions,
+      workspaceSuggestionFromIntent({ intent, workspaceContext, profileContext }),
+    ];
+  });
 }
 
 function makeExecutorSuggestion(registryId, index) {
@@ -149,8 +268,22 @@ export function getChatCapabilitySuggestions({
   capabilities = BACKEND_API_CAPABILITIES,
   routes = BACKEND_HTTP_ROUTES,
   hasPermission = () => true,
+  profileContext = null,
+  tools = getUserFacingToolRegistryProjection(),
+  workspaceContext = null,
+  recentToolIds = [],
 } = {}) {
   const suggestions = [];
+
+  getContextAwareLauncherSuggestions({
+    input,
+    tools,
+    profileContext,
+    workspaceContext,
+    recentToolIds,
+  }).forEach((suggestion) => {
+    suggestions.push(suggestion);
+  });
 
   if (capabilityEnabled(capabilities, 'chatMessage')) {
     suggestions.push(withConfirmation({
@@ -274,13 +407,35 @@ export function getChatCapabilitySuggestions({
     });
   });
 
-  return suggestions
+  if (profileContext) {
+    getProfileAssistantRecommendations(profileContext, tools, 4).forEach((item, index) => {
+      suggestions.push({
+        ...item,
+        icon: getToolIcon(item.toolId),
+        defaultRank: 72 + index,
+        keywords: [item.label, item.toolId, profileContext.role, profileContext.specialty],
+      });
+    });
+  }
+
+  const deduped = Array.from(
+    suggestions
+      .reduce((acc, suggestion) => {
+        const key = suggestion.toolId || suggestion.id;
+        const current = acc.get(key);
+        if (!current || suggestion.defaultRank < current.defaultRank) acc.set(key, suggestion);
+        return acc;
+      }, new Map())
+      .values()
+  );
+
+  return deduped
     .map((suggestion) => ({
       ...suggestion,
       score: scoreSuggestion(input, suggestion),
     }))
     .sort((a, b) => a.score - b.score)
-    .slice(0, 8);
+    .slice(0, 10);
 }
 
 export function suggestionIds(suggestions) {

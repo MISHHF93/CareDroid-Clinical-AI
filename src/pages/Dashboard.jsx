@@ -13,10 +13,12 @@ import ChatExecutionCard from '../components/chat/ChatExecutionCard';
 import OperationalResultCard from '../components/chat/OperationalResultCard';
 import Citations, { CitationModal } from '../components/Citations';
 import ConfidenceBadge from '../components/ConfidenceBadge';
+import ProfileToolGraphCard from '../components/ProfileToolGraphCard';
 import { Drawer } from '../components/ui/Drawer';
 import analyticsService from '../services/analyticsService';
 import { validateClinicalTool } from '../services/clinicalToolsApi';
 import { executeClinicalTool } from '../services/clinicalOrchestratorApi';
+import { buildUserToolProfile } from '../data/profileToolSegmentation';
 import {
   CHAT_SENSITIVE_CONFIRMATIONS,
   getChatCapabilitySuggestions,
@@ -144,10 +146,11 @@ function buildOutreachChatPrompt({ intent: intentId, target, reason, timing, con
  * Legacy URLs `/dashboard?tool=…` and `/chat?tool=…` redirect through canonical routes.
  */
 function Dashboard() {
-  const { authToken, hasPermission } = useUser();
+  const { authToken, hasPermission, user } = useUser();
   const { error, success } = useNotificationActions();
-  const { recordToolAccess } = useToolPreferences();
-  const { account, activeWorkspace, preferences, recordActivity } = useUserIdentity();
+  const toolPreferences = useToolPreferences();
+  const { recordToolAccess } = toolPreferences;
+  const { account, activeWorkspace, workspaceState, preferences, recordActivity } = useUserIdentity();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -227,13 +230,34 @@ function Dashboard() {
   const aiPreferenceLabel =
     preferences?.aiAssistantPreferences?.responseStyle || 'concise';
   const clinicianContextLabel = account?.specialty || account?.profession || account?.role || 'Clinical profile';
+  const assistantProfileContext = useMemo(
+    () =>
+      buildUserToolProfile({
+        account,
+        user,
+        preferences,
+        activeWorkspace,
+        activeWorkspaceId: workspaceState?.activeWorkspaceId,
+        toolPreferences,
+        permissions: workspaceState?.effectivePermissions || [],
+      }),
+    [
+      account,
+      activeWorkspace,
+      preferences,
+      toolPreferences,
+      user,
+      workspaceState?.activeWorkspaceId,
+      workspaceState?.effectivePermissions,
+    ]
+  );
   const availableChatTools = useMemo(
     () =>
-      getChatCapabilitySuggestions({ hasPermission })
+      getChatCapabilitySuggestions({ hasPermission, profileContext: assistantProfileContext })
         .filter((suggestion) => suggestion.kind === 'executor')
         .map((suggestion) => getToolById(suggestion.toolId))
         .filter(Boolean),
-    [hasPermission]
+    [assistantProfileContext, hasPermission]
   );
   const latestExecutionAction = useMemo(() => {
     const actions = Object.values(executionActions);
@@ -780,6 +804,12 @@ function Dashboard() {
         getChatCapabilitySuggestions({
           input: recommendationSource,
           hasPermission,
+          profileContext: assistantProfileContext,
+          workspaceContext: {
+            activeWorkspaceId: workspaceState?.activeWorkspaceId || activeWorkspace?.id,
+            label: workspaceLabel,
+          },
+          recentToolIds: toolPreferences.recentTools || [],
         })
       );
     }, { timeout: 500 });
@@ -788,7 +818,15 @@ function Dashboard() {
       cancelled = true;
       cancelIdleWork?.();
     };
-  }, [hasPermission, recommendationSource]);
+  }, [
+    activeWorkspace?.id,
+    assistantProfileContext,
+    hasPermission,
+    recommendationSource,
+    toolPreferences.recentTools,
+    workspaceLabel,
+    workspaceState?.activeWorkspaceId,
+  ]);
 
   useEffect(() => {
     if (capabilitySuggestions.length > 0) {
@@ -930,6 +968,8 @@ function Dashboard() {
             </section>
           )}
 
+          {!isChatMode && <ProfileToolGraphCard />}
+
           {messages.length === 0 ? (
             <div className="dashboard-empty">
               <div className="dashboard-empty-icon" aria-hidden>
@@ -1025,6 +1065,20 @@ function Dashboard() {
                       <div className="dashboard-msg-meta">
                         <ConfidenceBadge confidence={msg.confidence} />
                       </div>
+                    )}
+                    {msg.role === 'assistant' && (
+                      <button
+                        type="button"
+                        className="dashboard-explain-btn"
+                        onClick={() =>
+                          navigate({
+                            pathname: '/tools/ai-explainability',
+                            search: `?q=${encodeURIComponent(String(msg.content || '').slice(0, 240))}`,
+                          })
+                        }
+                      >
+                        Explain
+                      </button>
                     )}
                     {msg.role === 'assistant' && aiFoundation && (
                       <AiRouteMetadata

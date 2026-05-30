@@ -35,11 +35,21 @@ export class EncryptionService {
   constructor(private readonly configService: ConfigService) {
     // Get encryption key from environment
     const encryptionConfig = this.configService.get<any>('encryption');
-    const keyString = encryptionConfig?.masterKey || process.env.ENCRYPTION_MASTER_KEY;
+    const configuredKey = encryptionConfig?.masterKey || process.env.ENCRYPTION_MASTER_KEY;
+    const isDevelopment = (process.env.NODE_ENV || 'development') === 'development';
+    const keyString =
+      configuredKey ||
+      (isDevelopment ? '0000000000000000000000000000000000000000000000000000000000000000' : '');
     if (!keyString) {
       throw new Error(
         'ENCRYPTION_MASTER_KEY environment variable not set. ' +
           "Generate with: node -e \"console.log(require('crypto').randomBytes(32).toString('hex'))\"",
+      );
+    }
+
+    if (!configuredKey && isDevelopment) {
+      this.logger.warn(
+        'ENCRYPTION_MASTER_KEY not set. Using insecure local development fallback key.',
       );
     }
 

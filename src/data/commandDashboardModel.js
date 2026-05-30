@@ -185,6 +185,24 @@ export function buildCommandDashboardModel(tools = getUserFacingToolRegistryProj
     ...selectToolsByIds(COMMAND_DASHBOARD_GROUPS.clinical, byId),
     ...fallbackClinicalTools(allTools),
   ]).slice(0, 8);
+  const calculatorFeatured = uniqueById([
+    ...selectToolsByIds(
+      [
+        REGISTRY.qsofa,
+        REGISTRY.news2,
+        REGISTRY.sofaScore,
+        REGISTRY.hasBled,
+        REGISTRY.heartScore,
+        REGISTRY.nihss,
+        REGISTRY.ascvdRisk,
+        REGISTRY.wellsPe,
+      ],
+      byId
+    ),
+    ...fallbackClinicalTools(allTools).filter(
+      (tool) => tool.category === 'Calculator' || tool.surface === TOOL_SURFACES.CALCULATOR_FORM
+    ),
+  ]).slice(0, 8);
   const referenceFeatured = uniqueById([
     ...selectToolsByIds(COMMAND_DASHBOARD_GROUPS.reference, byId),
     ...fallbackReferenceTools(allTools),
@@ -212,6 +230,7 @@ export function buildCommandDashboardModel(tools = getUserFacingToolRegistryProj
     prompts: COMMAND_DASHBOARD_PROMPTS,
     panels: {
       clinicalTools: clinicalFeatured,
+      calculators: calculatorFeatured,
       referenceGuidelines: referenceFeatured,
       fleetOperations: fleetFeatured,
       medicalIot: medicalIotFeatured,

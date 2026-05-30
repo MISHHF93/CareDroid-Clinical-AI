@@ -29,7 +29,7 @@ describe('compact UX/UI flattening contracts', () => {
       "id: 'home'",
       "id: 'assistant'",
       "id: 'tools'",
-      "id: 'calculators'",
+      "id: 'digital-twin'",
       "id: 'hospital-map'",
       "id: 'medical-iot'",
       "id: 'fleet'",

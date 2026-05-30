@@ -37,6 +37,14 @@ describe('ToolsOverview responsive layout', () => {
     );
   });
 
+  it('keeps profile filters and graph summary mobile friendly', () => {
+    expect(toolsOverviewCss).toMatch(/\.tools-filter-tabs[\s\S]*flex-wrap:\s*wrap/);
+    expect(toolsOverviewCss).toMatch(/\.tools-filter-tab[\s\S]*min-height:\s*var\(--compact-control-height/);
+    expect(toolsOverviewCss).toMatch(/\.tools-profile-summary[\s\S]*flex-wrap:\s*wrap/);
+    expect(toolsOverviewJsx).toContain('Recommended for Me');
+    expect(toolsOverviewJsx).toContain('Restricted/Unavailable');
+  });
+
   it('does not label source audit as another user-facing tools catalog', () => {
     expect(toolsOverviewJsx).not.toContain('Developer Catalog / Source Audit');
   });

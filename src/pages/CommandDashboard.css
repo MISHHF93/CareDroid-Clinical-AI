@@ -380,6 +380,13 @@
 
 .command-recent-item {
   padding: 10px;
+  display: block;
+  text-decoration: none;
+}
+
+.command-recent-item--alert {
+  border-color: color-mix(in srgb, var(--app-warning) 45%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--app-warning) 12%, var(--app-surface-2));
 }
 
 .command-status-grid {

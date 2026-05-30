@@ -349,7 +349,9 @@ export function resolveCatalogLaunch(id) {
 
 /** NLU hub-only tools (no dedicated Calculators.jsx form). */
 export const NLU_HUB_ONLY_TOOL_IDS = Object.freeze(
-  nluCalculatorHubOnly.map((row) => row.toolId)
+  nluCalculatorHubOnly
+    .map((row) => row.toolId)
+    .filter((toolId) => !BUILTIN_CALC_ID_TO_REGISTRY_ID[toolId])
 );
 
 /** Workspace presets from WorkspaceCreationModal.jsx */

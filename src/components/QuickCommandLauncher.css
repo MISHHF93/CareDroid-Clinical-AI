@@ -218,7 +218,8 @@
 }
 
 .quick-command-item:hover,
-.quick-command-item:focus-visible {
+.quick-command-item:focus-visible,
+.quick-command-item--active {
   border-color: color-mix(in srgb, var(--app-accent-interactive) 34%, transparent);
   background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
   outline: none;

@@ -8,10 +8,15 @@ const ToolPreferencesContext = createContext({
   favorites: [],
   pinned: [],
   recentTools: [],
+  hiddenTools: [],
+  profileSettings: {},
   toggleFavorite: () => {},
   togglePinned: () => {},
+  toggleHidden: () => {},
   recordToolAccess: () => {},
-  clearRecentTools: () => {}
+  clearRecentTools: () => {},
+  updateProfileSettings: () => {},
+  resetToolRecommendations: () => {},
 });
 
 export const useToolPreferences = () => {
@@ -36,6 +41,8 @@ export const ToolPreferencesProvider = ({ children }) => {
   const [favorites, setFavorites] = useState([]);
   const [pinned, setPinned] = useState([]);
   const [recentTools, setRecentTools] = useState([]);
+  const [hiddenTools, setHiddenTools] = useState([]);
+  const [profileSettings, setProfileSettings] = useState({});
 
   useEffect(() => {
     const stored = readStoredPrefs();
@@ -43,6 +50,8 @@ export const ToolPreferencesProvider = ({ children }) => {
       setFavorites(Array.isArray(stored.favorites) ? stored.favorites : []);
       setPinned(Array.isArray(stored.pinned) ? stored.pinned : []);
       setRecentTools(Array.isArray(stored.recentTools) ? stored.recentTools : []);
+      setHiddenTools(Array.isArray(stored.hiddenTools) ? stored.hiddenTools : []);
+      setProfileSettings(stored.profileSettings && typeof stored.profileSettings === 'object' ? stored.profileSettings : {});
     }
   }, []);
 
@@ -50,7 +59,9 @@ export const ToolPreferencesProvider = ({ children }) => {
     const payload = {
       favorites,
       pinned,
-      recentTools
+      recentTools,
+      hiddenTools,
+      profileSettings,
     };
 
     try {
@@ -58,7 +69,7 @@ export const ToolPreferencesProvider = ({ children }) => {
     } catch (error) {
       logger.warn('Failed to persist tool preferences', { error });
     }
-  }, [favorites, pinned, recentTools]);
+  }, [favorites, pinned, recentTools, hiddenTools, profileSettings]);
 
   const toggleFavorite = useCallback((toolId) => {
     setFavorites((prev) => {
@@ -69,6 +80,13 @@ export const ToolPreferencesProvider = ({ children }) => {
 
   const togglePinned = useCallback((toolId) => {
     setPinned((prev) => {
+      const next = prev.includes(toolId) ? prev.filter((id) => id !== toolId) : [toolId, ...prev];
+      return [...new Set(next)];
+    });
+  }, []);
+
+  const toggleHidden = useCallback((toolId) => {
+    setHiddenTools((prev) => {
       const next = prev.includes(toolId) ? prev.filter((id) => id !== toolId) : [toolId, ...prev];
       return [...new Set(next)];
     });
@@ -85,15 +103,46 @@ export const ToolPreferencesProvider = ({ children }) => {
     setRecentTools([]);
   }, []);
 
+  const updateProfileSettings = useCallback((updates) => {
+    setProfileSettings((prev) => ({
+      ...prev,
+      ...(updates || {}),
+    }));
+  }, []);
+
+  const resetToolRecommendations = useCallback(() => {
+    setFavorites([]);
+    setHiddenTools([]);
+    setRecentTools([]);
+  }, []);
+
   const value = useMemo(() => ({
     favorites,
     pinned,
     recentTools,
+    hiddenTools,
+    profileSettings,
     toggleFavorite,
     togglePinned,
+    toggleHidden,
     recordToolAccess,
-    clearRecentTools
-  }), [favorites, pinned, recentTools, toggleFavorite, togglePinned, recordToolAccess, clearRecentTools]);
+    clearRecentTools,
+    updateProfileSettings,
+    resetToolRecommendations,
+  }), [
+    favorites,
+    pinned,
+    recentTools,
+    hiddenTools,
+    profileSettings,
+    toggleFavorite,
+    togglePinned,
+    toggleHidden,
+    recordToolAccess,
+    clearRecentTools,
+    updateProfileSettings,
+    resetToolRecommendations,
+  ]);
 
   return (
     <ToolPreferencesContext.Provider value={value}>

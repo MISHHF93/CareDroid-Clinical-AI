@@ -5,7 +5,9 @@ import { useConversation } from '../contexts/ConversationContext';
 import { useSystemConfig } from '../contexts/SystemConfigContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { useNotifications } from '../contexts/NotificationContext';
 import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
+import { AdaptiveDashboardPanel } from './PlatformOSPages';
 import { getCommandDashboardModel } from '../data/commandDashboardModel';
 import {
   CategoryBarChart,
@@ -89,18 +91,46 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     icon: CHROME_ICONS.bot,
   },
   {
+    id: 'workspace',
+    label: 'My Workspace',
+    description: 'Open workspace-specific routes, recommendations, and context.',
+    path: '/workspaces',
+    icon: CHROME_ICONS.layoutDashboard,
+  },
+  {
     id: 'tools',
-    label: 'Tools',
-    description: 'Browse every user-facing clinical and operations tool.',
+    label: 'My Tools',
+    description: 'Browse every permitted clinical and operations tool.',
     path: '/tools',
     icon: CHROME_ICONS.tools,
   },
   {
     id: 'calculators',
-    label: 'Calculators',
+    label: 'My Calculators',
     description: 'Open the focused calculator hub and severity scores.',
     path: '/tools/calculators',
     icon: CHROME_ICONS.calculator,
+  },
+  {
+    id: 'digital-twin',
+    label: 'Digital Twin',
+    description: 'View the operations aggregate across hospital, IoT, alerts, and fleet.',
+    path: '/digital-twin',
+    icon: CHROME_ICONS.activity,
+  },
+  {
+    id: 'notifications',
+    label: 'Notifications',
+    description: 'Review unread updates, preferences, and notification history.',
+    path: '/notifications',
+    icon: CHROME_ICONS.bell,
+  },
+  {
+    id: 'active-alerts',
+    label: 'Active Alerts',
+    description: 'Open clinical alert workflows and escalation status.',
+    path: '/clinical/alerts',
+    icon: CHROME_ICONS.alert,
   },
   {
     id: 'hospital-map',
@@ -158,6 +188,19 @@ function buildRecentUsageTrend(recentToolItems, messages) {
   ];
 }
 
+function notificationTitle(notification) {
+  return notification.title || notification.message || notification.text || notification.type || 'Notification';
+}
+
+function notificationBody(notification) {
+  return notification.message || notification.body || notification.description || notificationTitle(notification);
+}
+
+function isAlertNotification(notification) {
+  const text = `${notification.type || ''} ${notification.severity || ''} ${notification.priority || ''}`.toLowerCase();
+  return /alert|critical|high|urgent|warning/.test(text);
+}
+
 export default function CommandDashboard() {
   const navigate = useNavigate();
   const [assistantPrompt, setAssistantPrompt] = useState('');
@@ -165,6 +208,7 @@ export default function CommandDashboard() {
   const { activeWorkspace, activity, aiPersonalization } = useUserIdentity();
   const { conversations, messages, addMessage, selectTool, setActiveTool } = useConversation();
   const { recentTools, recordToolAccess } = useToolPreferences();
+  const { notifications = [] } = useNotifications();
   const systemConfig = useSystemConfig();
   const model = useMemo(() => getCommandDashboardModel(), []);
   const canViewDeveloperCatalog = hasPermission(Permission.CONFIGURE_SYSTEM);
@@ -179,6 +223,14 @@ export default function CommandDashboard() {
   const recentUsageTrend = useMemo(
     () => buildRecentUsageTrend(recentToolItems, messages),
     [messages, recentToolItems]
+  );
+  const unreadNotifications = useMemo(
+    () => notifications.filter((notification) => !notification.read).slice(0, 4),
+    [notifications]
+  );
+  const activeAlerts = useMemo(
+    () => notifications.filter(isAlertNotification).slice(0, 4),
+    [notifications]
   );
 
   const launchTool = (tool) => {
@@ -219,11 +271,11 @@ export default function CommandDashboard() {
     <main className="command-dashboard">
       <section className="command-hero" aria-labelledby="command-dashboard-title">
         <div className="command-hero__content">
-          <p className="command-eyebrow">AI-first clinical cockpit</p>
-          <h1 id="command-dashboard-title">CareDroid Command Dashboard</h1>
+          <p className="command-eyebrow">One command center architecture</p>
+          <h1 id="command-dashboard-title">CareDroid Command Center</h1>
           <p>
-            Ask CareDroid what to do next, launch clinical tools, and keep backend status visible from one
-            authenticated workspace.
+            Spend the day from one clinical operating center: ask AI, open tools and calculators, review alerts,
+            check workspace context, and launch major modules without browsing the sidebar.
           </p>
         </div>
         <div className="command-hero__stats" aria-label="Dashboard inventory summary">
@@ -232,12 +284,12 @@ export default function CommandDashboard() {
             <span>Library tools</span>
           </div>
           <div>
-            <strong>{model.stats.calculators}</strong>
-            <span>Calculators</span>
+            <strong>{unreadNotifications.length}</strong>
+            <span>Unread updates</span>
           </div>
           <div>
-            <strong>{model.stats.backendBacked}</strong>
-            <span>Backend-backed</span>
+            <strong>{activeAlerts.length}</strong>
+            <span>Active alerts</span>
           </div>
         </div>
       </section>
@@ -245,7 +297,7 @@ export default function CommandDashboard() {
       <section className="command-dashboard__grid" aria-label="Personalized workspace summary">
         <ProfileSummaryCard compact />
         <DashboardPanel
-          title="Workspace Recommendations"
+          title="My Workspace"
           description={`Context-aware suggestions for ${activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'your workspace'}.`}
           icon={CHROME_ICONS.sparkles}
         >
@@ -265,12 +317,22 @@ export default function CommandDashboard() {
           <p className="command-assistant-help">
             Recent safe activity: {(activity?.recentTools || []).length} tools, {(activity?.recentAiChats || []).length} AI chats.
           </p>
+          <div className="command-status-actions">
+            <Link className="command-secondary-action" to="/workspaces">
+              Open workspace
+            </Link>
+            <Link className="command-secondary-action" to="/profile/tool-preferences">
+              Tune my toolkit
+            </Link>
+          </div>
         </DashboardPanel>
       </section>
 
+      <AdaptiveDashboardPanel />
+
       <DashboardPanel
-        title="Launchpad"
-        description="One compact entry point for the major CareDroid work areas."
+        title="Quick Actions"
+        description="One compact entry point for every major CareDroid work area."
         icon={CHROME_ICONS.layoutDashboard}
       >
         <div className="command-launch-grid">
@@ -287,6 +349,59 @@ export default function CommandDashboard() {
           ))}
         </div>
       </DashboardPanel>
+
+      <section className="command-dashboard__grid" aria-label="Command Center updates">
+        <DashboardPanel
+          title="Notifications"
+          description="Unread updates stay visible in the Command Center before users visit notification settings."
+          icon={CHROME_ICONS.bell}
+        >
+          <div className="command-recent-list">
+            {unreadNotifications.length > 0 ? (
+              unreadNotifications.map((notification) => (
+                <Link key={notification.id || notificationTitle(notification)} className="command-recent-item" to="/notifications">
+                  <strong>{notificationTitle(notification)}</strong>
+                  <span>{notificationBody(notification)}</span>
+                </Link>
+              ))
+            ) : (
+              <p className="command-empty-state">No unread notifications. Notification preferences and history remain one click away.</p>
+            )}
+          </div>
+          <Link className="command-panel-link" to="/notifications">
+            Open Notifications
+          </Link>
+        </DashboardPanel>
+
+        <DashboardPanel
+          title="Active Alerts"
+          description="Critical clinical and operations alerts are summarized here before deeper alert workflows."
+          icon={CHROME_ICONS.alert}
+        >
+          <div className="command-recent-list">
+            {activeAlerts.length > 0 ? (
+              activeAlerts.map((alert) => (
+                <Link key={alert.id || notificationTitle(alert)} className="command-recent-item command-recent-item--alert" to="/clinical/alerts">
+                  <strong>{notificationTitle(alert)}</strong>
+                  <span>{notificationBody(alert)}</span>
+                </Link>
+              ))
+            ) : (
+              <p className="command-empty-state">
+                No active alerts in this session. Use the alerts route or Digital Twin for deeper operational review.
+              </p>
+            )}
+          </div>
+          <div className="command-status-actions">
+            <Link className="command-secondary-action" to="/clinical/alerts">
+              Open Active Alerts
+            </Link>
+            <Link className="command-secondary-action" to="/digital-twin">
+              Open Digital Twin
+            </Link>
+          </div>
+        </DashboardPanel>
+      </section>
 
       <DashboardPanel
         title="AI Assistant"
@@ -327,6 +442,41 @@ export default function CommandDashboard() {
         </div>
       </DashboardPanel>
 
+      <section className="command-dashboard__grid" aria-label="Command Center personalized toolkits">
+        <DashboardPanel
+          title="My Tools"
+          description="High-value clinical, reference, and workflow tools surfaced from the unified inventory."
+          icon={CHROME_ICONS.tools}
+        >
+          <div className="command-tool-grid">
+            {[...model.panels.clinicalTools, ...model.panels.referenceGuidelines]
+              .filter((tool) => tool.category !== 'Calculator' && tool.surface !== 'calculator-form')
+              .slice(0, 8)
+              .map((tool) => (
+                <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
+              ))}
+          </div>
+          <Link className="command-panel-link" to="/tools?filter=all">
+            Open All Medical Tools
+          </Link>
+        </DashboardPanel>
+
+        <DashboardPanel
+          title="My Calculators"
+          description="Common scores and calculator routes stay one click away from the Command Center."
+          icon={CHROME_ICONS.calculator}
+        >
+          <div className="command-tool-grid">
+            {model.panels.calculators.map((tool) => (
+              <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
+            ))}
+          </div>
+          <Link className="command-panel-link" to="/tools?filter=calculator">
+            Open All Calculators
+          </Link>
+        </DashboardPanel>
+      </section>
+
       <DashboardPanel
         title="Command Analytics"
         description="Inventory-derived command center metrics, launch modes, readiness, and recent session activity."
@@ -363,7 +513,7 @@ export default function CommandDashboard() {
 
       <div className="command-dashboard__grid">
         <DashboardPanel
-          title="Clinical Tools"
+          title="Clinical Tools Detail"
           description="Calculators, diagnostics, emergency, and inpatient decision-support tools."
           icon={CHROME_ICONS.calculator}
         >
@@ -375,7 +525,7 @@ export default function CommandDashboard() {
         </DashboardPanel>
 
         <DashboardPanel
-          title="Reference & Guidelines"
+          title="Reference & Guidelines Detail"
           description="Evidence retrieval, medication safety, labs, protocols, and procedure support."
           icon={CHROME_ICONS.clipboardList}
         >

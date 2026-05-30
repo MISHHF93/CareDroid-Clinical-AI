@@ -15,6 +15,7 @@ import {
   DESIGN_MEDIA_QUERIES,
   DESIGN_RADII,
   DESIGN_ELEVATION,
+  DESIGN_CARD_PADDING,
 } from '../layout/designTokens.js';
 import {
   SIDEBAR_WIDTH_COLLAPSED_PX,
@@ -58,6 +59,8 @@ describe('design-tokens.css — semantic token layer', () => {
     expect(designTokensCss).toContain('--text-small:');
     expect(designTokensCss).toContain('--text-caption: var(--text-caption-fluid)');
     expect(designTokensCss).toContain('--text-mono: var(--font-13)');
+    expect(designTokensCss).toContain('--app-type-label: var(--text-small)');
+    expect(designTokensCss).toContain('--app-type-helper: var(--text-caption)');
     expect(indexCss).toContain('--text-caption-fluid:');
     expect(indexCss).toContain('--font-11: 11px');
     expect(indexCss).toContain('--font-24: 24px');
@@ -88,6 +91,22 @@ describe('design-tokens.css — semantic token layer', () => {
     expect(DESIGN_ELEVATION.card).toBe('var(--app-elevation-card)');
   });
 
+  it('defines app-wide card and state primitives for pages', () => {
+    for (const token of [
+      '--app-card-padding-standard',
+      '--app-card-padding-dashboard',
+      '--app-card-padding-tool',
+      '--app-card-padding-calculator',
+      '--app-card-padding-alert',
+    ]) {
+      expect(designTokensCss).toContain(token);
+    }
+    for (const primitive of ['.cd-page', '.cd-card--dashboard', '.cd-card--tool', '.cd-card--calculator', '.cd-empty', '.cd-loading', '.cd-error']) {
+      expect(designTokensCss).toContain(primitive);
+    }
+    expect(DESIGN_CARD_PADDING.calculator).toBe('var(--app-card-padding-calculator)');
+  });
+
   it('does not duplicate type tokens in responsive-ux :root', () => {
     expect(responsiveUxCss).not.toMatch(/^:root\s*\{[\s\S]*--app-type-title:/m);
   });
@@ -112,6 +131,8 @@ describe('designTokens.js — JS mirror', () => {
     expect(DESIGN_SPACING.appXs).toBe('var(--app-space-xs)');
     expect(DESIGN_TYPOGRAPHY.display).toBe('var(--app-type-display)');
     expect(DESIGN_TYPOGRAPHY.subheading).toBe('var(--text-subheading)');
+    expect(DESIGN_TYPOGRAPHY.label).toBe('var(--app-type-label)');
+    expect(DESIGN_TYPOGRAPHY.helper).toBe('var(--app-type-helper)');
     expect(DESIGN_TYPOGRAPHY.mono).toBe('var(--text-mono)');
   });
 
