@@ -3,7 +3,7 @@
  * Handles email, SMS, and in-app notifications for cost alerts and recommendations
  */
 
-import { resolveApiRoot } from '../../config/apiEnv';
+import { resolveApiRoot } from '../../config/api.config';
 import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
 
 const getDefaultApiBaseUrl = () => resolveApiRoot();

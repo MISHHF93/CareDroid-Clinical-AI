@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const routeConfigSource = readFileSync(join(__dirname, '../config/routes.config.js'), 'utf8');
 
 function expectRoute(path, component) {
   expect(appSource).toMatch(new RegExp(`path:\\s*'${path.replace(/\//g, '\\/')}'[\\s\\S]*?<${component}\\s*\\/>`));
@@ -27,7 +28,8 @@ describe('canonical route redirects', () => {
     expectRedirect('/home', '/dashboard');
     expectRedirect('/operations', '/dashboard');
     expectRedirect('/chat', '/assistant');
-    expect(appSource).toContain("const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot']");
+    expect(appSource).toContain('ASSISTANT_ROUTE_ALIASES.map');
+    expect(routeConfigSource).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/ai', '/copilot'])");
     expect(appSource).not.toContain("path: '/dashboard', element: <LegacyProtectedRouteRedirect to=\"/home\" />");
     expect(appSource).not.toContain("path: '/chat', element: <AppShellPage><Dashboard /></AppShellPage>");
   });
@@ -50,7 +52,8 @@ describe('canonical route redirects', () => {
 
   it('keeps developer/source audit catalog separate from the user-facing tools browser', () => {
     expectRoute('/tools', 'ToolsOverview');
-    expect(appSource).toContain("const TOOLS_ROUTE_ALIASES = ['/all-tools', '/clinical-tools']");
+    expect(appSource).toContain('TOOLS_ROUTE_ALIASES.map');
+    expect(routeConfigSource).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools'])");
     expect(appSource).toContain("path: '/tools/catalog'");
     expect(appSource).toContain('permission: Permission.CONFIGURE_SYSTEM');
     expectRedirect('/catalog', '/tools');

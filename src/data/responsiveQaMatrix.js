@@ -16,7 +16,7 @@ import {
   REGISTRY,
 } from './clinicalToolIdContract.js';
 import { toolRegistryById } from './toolRegistry.js';
-import { MOBILE_FIRST_BREAKPOINTS } from '../layout/breakpoints.js';
+import { MOBILE_FIRST_BREAKPOINTS } from '../config/layout.config.js';
 
 /** @typedef {{ id: string, width: number, height: number, label: string, tier?: string }} ResponsiveQaViewport */
 /** @typedef {{ id: string, label: string, path: string, category: string, registryId?: string }} ResponsiveQaPage */

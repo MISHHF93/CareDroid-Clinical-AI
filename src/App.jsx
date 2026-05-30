@@ -23,7 +23,15 @@ import { useNotificationActions } from './hooks/useNotificationActions';
 import logger from './utils/logger';
 import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
-import { AUTH_PATH_ALIASES, AUTH_SIGNUP_PATH_ALIASES } from './routing/authPathAliases';
+import {
+  ASSISTANT_ROUTE_ALIASES,
+  AUTH_PATH_ALIASES,
+  AUTH_SIGNUP_PATH_ALIASES,
+  CALCULATORS_ROUTE_ALIASES,
+  FLEET_MAP_ROUTE_ALIASES,
+  LIVE_MAP_ROUTE_ALIASES,
+  TOOLS_ROUTE_ALIASES,
+} from './config/routes.config';
 import {
   CALCULATOR_ROUTE_DEFS,
   LEGACY_CALCULATOR_ROUTE_ALIASES,
@@ -377,12 +385,6 @@ function LegacyProtectedRouteRedirect({ to }) {
   const location = useLocation();
   return <Navigate to={{ pathname: to, search: location.search, hash: location.hash }} replace />;
 }
-
-const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot'];
-const TOOLS_ROUTE_ALIASES = ['/all-tools', '/clinical-tools'];
-const CALCULATORS_ROUTE_ALIASES = ['/calculators'];
-const LIVE_MAP_ROUTE_ALIASES = ['/maps', '/tracking', '/live-tracking'];
-const FLEET_MAP_ROUTE_ALIASES = ['/fleet/live-map', '/fleet/tracking'];
 
 // ==================== ROUTING ====================
 function AppRoutes() {

@@ -4,6 +4,7 @@
  */
 
 import { apiFetchJson, getApiErrorMessage } from './apiClient';
+import { API_ROUTES } from '../config/api.config';
 import logger from '../utils/logger';
 
 const SYSTEM_CONFIG_DEFAULTS = {
@@ -50,22 +51,22 @@ async function fetchConfigEndpoint(path, defaults) {
 
 class ConfigService {
   async getSystemConfig() {
-    const result = await fetchConfigEndpoint('/api/config/system', SYSTEM_CONFIG_DEFAULTS);
+    const result = await fetchConfigEndpoint(API_ROUTES.config.system, SYSTEM_CONFIG_DEFAULTS);
     return { ...result.data, _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
   }
 
   async getAIRemainingQueries() {
-    const result = await fetchConfigEndpoint('/api/ai/remaining-queries', AI_USAGE_DEFAULTS);
+    const result = await fetchConfigEndpoint(API_ROUTES.ai.remainingQueries, AI_USAGE_DEFAULTS);
     return { ...result.data, _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
   }
 
   async getAvailableTools() {
-    const result = await fetchConfigEndpoint('/api/tools/available', TOOLS_DEFAULTS);
+    const result = await fetchConfigEndpoint(API_ROUTES.tools.available, TOOLS_DEFAULTS);
     return { ...result.data, _meta: { ok: result.ok, error: result.error, fromDefaults: result.fromDefaults } };
   }
 
   async getCurrentSubscription() {
-    const result = await fetchConfigEndpoint('/api/subscriptions/current', null);
+    const result = await fetchConfigEndpoint(API_ROUTES.subscriptions.current, null);
     if (!result.ok) {
       return { tier: 'free', status: 'active', _meta: { ok: false, error: result.error, fromDefaults: true } };
     }
@@ -73,7 +74,7 @@ class ConfigService {
   }
 
   async getSubscriptionPlans() {
-    const result = await fetchConfigEndpoint('/api/subscriptions/plans', []);
+    const result = await fetchConfigEndpoint(API_ROUTES.subscriptions.plans, []);
     return result.data;
   }
 }

@@ -1,8 +1,9 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { AUTH_CONFIG } from '../config/auth.config';
 
 function authHeaders(options = {}) {
   const headers = { 'Content-Type': 'application/json' };
-  const token = options.authToken ?? localStorage.getItem('caredroid_access_token');
+  const token = options.authToken ?? localStorage.getItem(AUTH_CONFIG.tokenStorageKey);
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }

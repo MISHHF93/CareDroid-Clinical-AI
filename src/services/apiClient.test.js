@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { normalizeApiPath } from '../config/apiEnv';
+import { normalizeApiPath } from '../config/api.config';
 
 const mockAppConfig = vi.hoisted(() => ({
   api: { baseUrl: '', wsUrl: '' },

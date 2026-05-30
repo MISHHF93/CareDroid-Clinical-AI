@@ -92,6 +92,7 @@ const NAV_ICONS = {
   tools: Wrench,
   calculators: Calculator,
   'digital-twin': Activity,
+  'live-map': Route,
   'hospital-map': Hospital,
   fleet: Truck,
   devices: Wrench,

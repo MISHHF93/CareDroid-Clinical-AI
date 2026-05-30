@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { getRealTimeCostService } from '../services/realtime/RealTimeCostService';
 import { getNotificationService } from '../services/notifications/NotificationService';
-import { resolveApiRoot } from '../config/apiEnv';
+import { resolveApiRoot } from '../config/api.config';
 import './LiveCostDashboard.css';
 
 /**

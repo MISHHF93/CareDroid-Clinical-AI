@@ -47,7 +47,6 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
       '/settings',
       '/profile/settings',
       '/profile/preferences',
-      '/profile/tool-preferences',
       '/profile-settings',
       '/notifications',
       '/notification-preferences',
@@ -72,12 +71,20 @@ export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     showInMobile: false,
   },
   {
+    id: 'live-map',
+    label: 'Live Map',
+    mobileLabel: 'Live',
+    path: '/live-map',
+    legacyPaths: ['/maps', '/tracking', '/live-tracking'],
+    matchPaths: ['/live-map', '/maps', '/tracking', '/live-tracking'],
+    showInMobile: false,
+  },
+  {
     id: 'hospital-map',
     label: 'Hospital Map',
     mobileLabel: 'Map',
     path: '/hospital-map',
-    legacyPaths: ['/maps', '/tracking', '/live-tracking'],
-    matchPaths: ['/hospital-map', '/live-map', '/maps', '/tracking', '/live-tracking'],
+    matchPaths: ['/hospital-map'],
     matchPrefixes: ['/hospital-map/'],
   },
   {
@@ -86,6 +93,14 @@ export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     mobileLabel: 'IoT',
     path: '/medical-iot',
     matchPaths: ['/medical-iot'],
+    showInMobile: false,
+  },
+  {
+    id: 'devices',
+    label: 'Devices',
+    mobileLabel: 'Devices',
+    path: '/devices',
+    matchPaths: ['/devices'],
     showInMobile: false,
   },
   {
@@ -196,13 +211,6 @@ export const QUICK_COMMAND_DESTINATION_ITEMS = Object.freeze([
     path: '/workspaces',
     matchPaths: ['/workspaces', '/workspace', '/workspace/clinical'],
     matchPrefixes: ['/workspace/'],
-  },
-  {
-    id: 'devices',
-    label: 'Devices',
-    mobileLabel: 'Devices',
-    path: '/devices',
-    matchPaths: ['/devices'],
   },
 ]);
 

@@ -4,7 +4,7 @@
  * Also manages custom report generation and scheduling
  */
 
-import { resolveApiRoot } from '../../config/apiEnv';
+import { resolveApiRoot } from '../../config/api.config';
 import {
   isBackendCapabilityEnabled,
   UNSUPPORTED_CAPABILITY_MESSAGE,

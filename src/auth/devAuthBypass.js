@@ -1,18 +1,14 @@
 import appConfig from '../config/appConfig';
+import { AUTH_CONFIG } from '../config/auth.config';
 import { apiFetchJson } from '../services/apiClient';
 import logger from '../utils/logger';
 
 export const DEV_AUTH_LABEL = 'Demo Mode';
-export const AUTH_TOKEN_KEY = 'caredroid_access_token';
-export const USER_PROFILE_KEY = 'caredroid_user_profile';
+export const AUTH_TOKEN_KEY = AUTH_CONFIG.tokenStorageKey;
+export const USER_PROFILE_KEY = AUTH_CONFIG.userProfileStorageKey;
 
 export const isDevAuthBypassEnabled = () =>
-  Boolean(
-    import.meta.env.DEV ||
-      appConfig.features.enableDevAuthBypass ||
-      appConfig.features.enableDemoMode ||
-      appConfig.features.showDemoAuth
-  );
+  Boolean(import.meta.env.DEV || AUTH_CONFIG.demo.exposed);
 
 export const withDevSessionMarker = (user) => ({
   ...user,
@@ -39,7 +35,7 @@ export async function createDevAuthSession() {
   }
 
   try {
-    const { response, data } = await apiFetchJson('/api/auth/dev-session', { method: 'POST' });
+    const { response, data } = await apiFetchJson(AUTH_CONFIG.devSessionEndpoint, { method: 'POST' });
     if (response.ok && data?.accessToken && data?.user) {
       const devUser = withDevSessionMarker(data.user);
       localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(devUser));

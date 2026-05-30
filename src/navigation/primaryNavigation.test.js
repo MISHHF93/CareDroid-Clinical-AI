@@ -23,8 +23,10 @@ describe('primaryNavigation', () => {
   it('keeps operations destinations in their own sidebar section', () => {
     expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
       ['Digital Twin', '/digital-twin'],
+      ['Live Map', '/live-map'],
       ['Hospital Map', '/hospital-map'],
       ['Medical IoT', '/medical-iot'],
+      ['Devices', '/devices'],
       ['Fleet', '/fleet/map'],
     ]);
   });
@@ -42,6 +44,27 @@ describe('primaryNavigation', () => {
   it('does not duplicate visible sidebar destinations', () => {
     const paths = [...PRIMARY_SIDEBAR_NAV_ITEMS, ...OPERATIONS_SIDEBAR_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map((item) => item.path);
     expect(new Set(paths).size).toBe(paths.length);
+  });
+
+  it('does not activate multiple visible sidebar items for known nav paths', () => {
+    const visibleItems = [
+      ...PRIMARY_SIDEBAR_NAV_ITEMS,
+      ...OPERATIONS_SIDEBAR_NAV_ITEMS,
+      ...ADVANCED_SIDEBAR_NAV_ITEMS,
+    ];
+    const paths = new Set(
+      visibleItems.flatMap((item) => [
+        item.path,
+        ...(item.matchPaths || []),
+        ...(item.legacyPaths || []),
+      ]).filter(Boolean)
+    );
+
+    for (const path of paths) {
+      const matches = visibleItems.filter((item) => primaryNavPathMatches(item, path));
+
+      expect(matches.map((item) => item.id), path).toHaveLength(1);
+    }
   });
 
   it('keeps mobile navigation compact and canonical', () => {
@@ -64,5 +87,32 @@ describe('primaryNavigation', () => {
   it('keeps calculator routes under the Tools nav item without a duplicate sidebar destination', () => {
     expect(ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools/calculators')).toBe(false);
     expect(getPrimaryNavItemForPath('/tools/calculators/sofa')?.id).toBe('tools');
+  });
+
+  it('keeps operations routes discoverable under their matching operations item', () => {
+    expect(getPrimaryNavItemForPath('/live-map')?.id).toBe('live-map');
+    expect(getPrimaryNavItemForPath('/maps')?.id).toBe('live-map');
+    expect(getPrimaryNavItemForPath('/hospital-map')?.id).toBe('hospital-map');
+    expect(getPrimaryNavItemForPath('/medical-iot')?.id).toBe('medical-iot');
+    expect(getPrimaryNavItemForPath('/devices')?.id).toBe('devices');
+    expect(getPrimaryNavItemForPath('/fleet/map')?.id).toBe('fleet');
+  });
+
+  it('activates exactly one primary nav item for profile and settings routes', () => {
+    const expected = [
+      ['/profile', 'profile'],
+      ['/profile/activity', 'profile'],
+      ['/profile/tool-preferences', 'profile'],
+      ['/profile/settings', 'settings'],
+      ['/profile/preferences', 'settings'],
+      ['/settings', 'settings'],
+    ];
+
+    for (const [path, itemId] of expected) {
+      const matches = PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => primaryNavPathMatches(item, path));
+
+      expect(matches.map((item) => item.id), path).toEqual([itemId]);
+      expect(getPrimaryNavItemForPath(path)?.id, path).toBe(itemId);
+    }
   });
 });

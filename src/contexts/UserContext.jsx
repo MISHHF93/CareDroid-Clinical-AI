@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { AUTH_CONFIG } from '../config/auth.config';
 import { apiFetchJson } from '../services/apiClient';
 import logger from '../utils/logger';
 
@@ -9,8 +10,8 @@ import logger from '../utils/logger';
  * throughout the application.
  */
 
-const AUTH_TOKEN_KEY = 'caredroid_access_token';
-const USER_PROFILE_KEY = 'caredroid_user_profile';
+const AUTH_TOKEN_KEY = AUTH_CONFIG.tokenStorageKey;
+const USER_PROFILE_KEY = AUTH_CONFIG.userProfileStorageKey;
 
 // Permission enum (matches backend)
 export const Permission = {

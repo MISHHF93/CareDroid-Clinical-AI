@@ -3,7 +3,7 @@
  * Handles real-time updates for cost tracking, notifications, and collaboration
  */
 
-import { resolveWebSocketOrigin } from '../../config/apiEnv';
+import { resolveWebSocketOrigin } from '../../config/api.config';
 
 const getDefaultWebSocketBaseUrl = () => resolveWebSocketOrigin();
 

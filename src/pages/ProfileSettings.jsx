@@ -201,6 +201,7 @@ const ProfileSettings = ({ authToken }) => {
 
   return (
     <PageContainer
+      as="main"
       size="narrow"
       className="profile-settings-page"
       aria-labelledby="profile-settings-title"

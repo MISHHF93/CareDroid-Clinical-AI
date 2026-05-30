@@ -1,6 +1,7 @@
 import axios from 'axios';
 import appConfig from '../config/appConfig';
-import { DEFAULT_API_TIMEOUT_MS, normalizeApiPath } from '../config/apiEnv';
+import { DEFAULT_API_TIMEOUT_MS, normalizeApiPath } from '../config/api.config';
+import { AUTH_CONFIG } from '../config/auth.config';
 
 // In development, use empty string to let Vite proxy handle routing
 // In production, use full API URL (origin only; paths include /api)
@@ -20,8 +21,8 @@ export const buildApiUrl = (path = '') => {
   return `${base}${normalizePath(apiPath)}`;
 };
 
-const AUTH_TOKEN_KEY = 'caredroid_access_token';
-const LEGACY_AUTH_TOKEN_KEY = 'authToken';
+const AUTH_TOKEN_KEY = AUTH_CONFIG.tokenStorageKey;
+const LEGACY_AUTH_TOKEN_KEY = AUTH_CONFIG.legacyTokenStorageKey;
 
 export const getStoredAccessToken = () => {
   if (typeof localStorage === 'undefined') return null;

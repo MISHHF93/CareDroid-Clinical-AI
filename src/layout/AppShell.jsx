@@ -5,7 +5,7 @@ import Sidebar from '../components/Sidebar';
 import WorkspaceSwitcher from '../components/WorkspaceSwitcher';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon } from '../navigation/iconRegistry';
-import { PRIMARY_MOBILE_NAV_ITEMS, primaryNavPathMatches } from '../navigation/primaryNavigation';
+import { PRIMARY_MOBILE_NAV_ITEMS, primaryNavPathMatches } from '../config/navigation.config';
 import { useDrawerFocus } from '../hooks/useDrawerFocus';
 import QuickCommandLauncher from '../components/QuickCommandLauncher';
 import {
@@ -13,7 +13,7 @@ import {
   getIsCompactViewport,
   SIDEBAR_WIDTH_COLLAPSED_PX,
   SIDEBAR_WIDTH_EXPANDED_PX,
-} from './breakpoints';
+} from '../config/layout.config';
 import './AppShell.css';
 
 const AppShell = ({
@@ -146,7 +146,7 @@ const AppShell = ({
         onOpenQuickCommand={openQuickCommand}
       />
 
-      <main className="app-shell-main-wrap" data-layout-role="MainContent">
+      <div className="app-shell-main-wrap" data-layout-role="MainContent">
         {isAuthed && (
           <header className="app-shell-header" aria-label="Application header">
             {isCompact && (
@@ -221,7 +221,7 @@ const AppShell = ({
           </div>
         )}
         {children}
-      </main>
+      </div>
     </div>
   );
 };

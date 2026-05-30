@@ -5,6 +5,7 @@
  */
 
 import { apiFetch, buildStreamUrl, getApiErrorMessage, getStoredAccessToken, parseApiResponse } from './apiClient';
+import { AUTH_CONFIG } from '../config/auth.config';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import appConfig from '../config/appConfig';
 import { getFirebaseMessagingToken } from './firebaseClient';
@@ -44,7 +45,7 @@ export const NotificationService = {
         return false;
       }
 
-      const authToken = localStorage.getItem('caredroid_access_token');
+      const authToken = localStorage.getItem(AUTH_CONFIG.tokenStorageKey);
       if (!authToken) {
         return false;
       }

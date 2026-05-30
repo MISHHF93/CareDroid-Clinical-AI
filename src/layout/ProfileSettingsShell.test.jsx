@@ -31,7 +31,8 @@ describe('/profile/settings source-level route contract', () => {
     expect(appShellSource.match(/<Sidebar\b/g)).toHaveLength(1);
     expect(appShellSource.match(/className="app-shell-main-wrap"/g)).toHaveLength(1);
     expect(appShellSource).toContain('data-layout-role="MainContent"');
-    expect(appShellSource).toContain('<main className="app-shell-main-wrap"');
+    expect(appShellSource).toContain('<div className="app-shell-main-wrap"');
+    expect(appShellSource).not.toContain('<main className="app-shell-main-wrap"');
     expect(appSource.match(/<AppShellPage>/g)?.length).toBeGreaterThan(20);
     expect(appSource).not.toMatch(/<AppShellPage>\s*<AppShellPage>/);
   });
@@ -54,6 +55,7 @@ describe('/profile/settings source-level route contract', () => {
     expect(pageContainerCss).toMatch(/\.page-container\s*\{[\s\S]*max-width/);
     expect(pageContainerCss).toMatch(/\.scroll-area\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(profileSettingsSource).toContain('<PageContainer');
+    expect(profileSettingsSource).toContain('as="main"');
     expect(profileSettingsSource).toContain('className="profile-settings-page"');
     expect(profileSettingsSource).not.toMatch(/app-scroll-container|app-local-scroll-y|<ScrollArea/);
     expect(profileSettingsCss).toMatch(/\.profile-settings-grid[\s\S]*minmax\(0,\s*1fr\)/);

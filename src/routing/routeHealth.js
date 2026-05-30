@@ -1,7 +1,14 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { AUTH_PATH_ALIASES } from './authPathAliases';
+import {
+  ASSISTANT_ROUTE_ALIASES,
+  AUTH_PATH_ALIASES,
+  CALCULATORS_ROUTE_ALIASES,
+  FLEET_MAP_ROUTE_ALIASES,
+  LIVE_MAP_ROUTE_ALIASES,
+  TOOLS_ROUTE_ALIASES,
+} from '../config/routes.config';
 import {
   CALCULATOR_ROUTE_DEFS,
   LEGACY_CALCULATOR_ROUTE_ALIASES,
@@ -11,9 +18,9 @@ import {
   ADVANCED_SIDEBAR_NAV_ITEMS,
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_NAV_ITEMS,
-} from '../navigation/primaryNavigation';
+} from '../config/navigation.config';
 import { PLATFORM_DASHBOARDS } from '../data/platformOperatingSystem';
-import { CARE_WORKSPACES, getCareWorkspaceRouteEntries } from '../data/workspaceArchitecture';
+import { CARE_WORKSPACES, getCareWorkspaceRouteEntries } from '../config/workspace.config';
 import { getFrontendVisibleToolInventory } from '../data/toolInventory';
 import { CORE_ROUTE_SMOKE } from '../test/responsiveRegression.routes';
 import { BACKEND_HTTP_ROUTES } from '../data/backendHttpRouteInventory';
@@ -124,13 +131,6 @@ function unique(values) {
   return [...new Set(values.filter(Boolean))];
 }
 
-function parseStringArrayConstant(name) {
-  const pattern = new RegExp(`const\\s+${name}\\s*=\\s*\\[([^\\]]*)\\]`, 'm');
-  const match = appSource.match(pattern);
-  if (!match) return [];
-  return [...match[1].matchAll(/['"`]([^'"`]+)['"`]/g)].map((item) => item[1]);
-}
-
 function routeBlockForPath(path) {
   const index = appSource.indexOf(`path: '${path}'`);
   if (index < 0) return '';
@@ -203,27 +203,27 @@ function directAppRouteEntries() {
 function generatedAliasEntries() {
   const aliasEntries = [
     ...AUTH_PATH_ALIASES.map((path) => ({ path, target: '/auth', generatedKind: 'auth-alias' })),
-    ...parseStringArrayConstant('ASSISTANT_ROUTE_ALIASES').map((path) => ({
+    ...ASSISTANT_ROUTE_ALIASES.map((path) => ({
       path,
       target: '/assistant',
       generatedKind: 'assistant-alias',
     })),
-    ...parseStringArrayConstant('TOOLS_ROUTE_ALIASES').map((path) => ({
+    ...TOOLS_ROUTE_ALIASES.map((path) => ({
       path,
       target: '/tools',
       generatedKind: 'tools-alias',
     })),
-    ...parseStringArrayConstant('CALCULATORS_ROUTE_ALIASES').map((path) => ({
+    ...CALCULATORS_ROUTE_ALIASES.map((path) => ({
       path,
       target: '/tools/calculators',
       generatedKind: 'calculator-alias',
     })),
-    ...parseStringArrayConstant('LIVE_MAP_ROUTE_ALIASES').map((path) => ({
+    ...LIVE_MAP_ROUTE_ALIASES.map((path) => ({
       path,
       target: '/live-map',
       generatedKind: 'map-alias',
     })),
-    ...parseStringArrayConstant('FLEET_MAP_ROUTE_ALIASES').map((path) => ({
+    ...FLEET_MAP_ROUTE_ALIASES.map((path) => ({
       path,
       target: '/fleet/map',
       generatedKind: 'fleet-alias',

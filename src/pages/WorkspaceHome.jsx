@@ -6,7 +6,7 @@ import {
   CARE_WORKSPACES,
   DEFAULT_CARE_WORKSPACE_ID,
   buildCareWorkspaceModel,
-} from '../data/workspaceArchitecture';
+} from '../config/workspace.config';
 import { workspaceFilterSummary } from '../data/platformOperatingSystem';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';

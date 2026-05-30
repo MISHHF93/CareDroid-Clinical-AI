@@ -25,9 +25,11 @@ const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.jsx'), 'utf8'
 const authSource = readFileSync(join(srcRoot, 'pages/Auth.jsx'), 'utf8');
 const devAuthSource = readFileSync(join(srcRoot, 'auth/devAuthBypass.js'), 'utf8');
 const appConfigSource = readFileSync(join(srcRoot, 'config/appConfig.js'), 'utf8');
+const authConfigSource = readFileSync(join(srcRoot, 'config/auth.config.js'), 'utf8');
 const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
 const indexCss = readFileSync(join(srcRoot, 'index.css'), 'utf8');
 const themeTokensCss = readFileSync(join(srcRoot, 'styles/theme-tokens.css'), 'utf8');
+const routeConfigSource = readFileSync(join(srcRoot, 'config/routes.config.js'), 'utf8');
 const viteConfigSource = readFileSync(join(dirname(srcRoot), 'vite.config.js'), 'utf8');
 
 const REQUIRED_AUTH_SNIPPETS = Object.freeze([
@@ -128,8 +130,9 @@ describe('full platform consolidation contract', () => {
     expect(authSource).toContain('Continue in Demo Mode');
     expect(authSource).toContain('directSignInSection');
     expect(appShellSource).toContain('app-shell-dev-mode-banner');
-    expect(devAuthSource).toContain('enableDemoMode');
-    expect(devAuthSource).toContain('showDemoAuth');
+    expect(devAuthSource).toContain('AUTH_CONFIG.demo.exposed');
+    expect(authConfigSource).toContain('ENV_CONFIG.demoMode');
+    expect(authConfigSource).toContain('showDemoAuth');
     expect(appConfigSource).toContain('VITE_DEMO_MODE');
     expect(appConfigSource).toContain('VITE_SHOW_DEMO_AUTH');
   });
@@ -139,8 +142,10 @@ describe('full platform consolidation contract', () => {
       expect(appSource, route).toContain(`path: '${route}'`);
     }
 
-    expect(appSource).toContain("const ASSISTANT_ROUTE_ALIASES = ['/ai', '/copilot']");
-    expect(appSource).toContain("const TOOLS_ROUTE_ALIASES = ['/all-tools', '/clinical-tools']");
+    expect(appSource).toContain('ASSISTANT_ROUTE_ALIASES');
+    expect(appSource).toContain('TOOLS_ROUTE_ALIASES');
+    expect(routeConfigSource).toContain("export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/ai', '/copilot'])");
+    expect(routeConfigSource).toContain("export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools'])");
     expect(appSource).toContain("path: '/home'");
     expect(appSource).toContain('to="/dashboard"');
     expect(appSource).not.toMatch(/element:\s*null|element:\s*undefined/);

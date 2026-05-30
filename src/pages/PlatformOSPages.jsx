@@ -6,7 +6,7 @@ import { useUser } from '../contexts/UserContext';
 import {
   CARE_WORKSPACES,
   buildCareWorkspaceModel,
-} from '../data/workspaceArchitecture';
+} from '../config/workspace.config';
 import {
   PLATFORM_NOTIFICATIONS,
   PLATFORM_TIMELINE_EVENTS,

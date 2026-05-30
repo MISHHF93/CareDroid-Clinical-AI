@@ -138,10 +138,23 @@ describe('QuickCommandLauncher', () => {
     expect(workspaceIds).toEqual(
       expect.arrayContaining(['clinical', 'emergency', 'operations', 'fleet', 'medical-iot', 'research', 'admin'])
     );
-    expect(navIds).toEqual(expect.arrayContaining(['workspace', 'home', 'assistant', 'tools', 'hospital-map', 'medical-iot', 'fleet']));
+    expect(navIds).toEqual(
+      expect.arrayContaining([
+        'workspace',
+        'home',
+        'assistant',
+        'tools',
+        'live-map',
+        'hospital-map',
+        'medical-iot',
+        'devices',
+        'fleet',
+      ])
+    );
     expect(navIds).not.toContain('calculators');
     expect(navIds).not.toContain('operations');
-    expect(toolIds).toEqual(expect.arrayContaining(['live-tracking-map', 'device-fleet-management']));
+    expect(toolIds).not.toContain('live-tracking-map');
+    expect(toolIds).not.toContain('device-fleet-management');
   });
 
   it('launches workspace entries as first-class command destinations', () => {

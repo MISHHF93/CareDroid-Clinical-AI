@@ -4,6 +4,8 @@
  */
 
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { API_ROUTES } from '../config/api.config';
+import { AUTH_CONFIG } from '../config/auth.config';
 import { classifyOrchestratorExecution } from '../data/orchestratorMappingAudit';
 import { parseToolExecutionResponse } from '../utils/toolExecutionResponse';
 
@@ -38,7 +40,7 @@ export async function executeClinicalTool(toolId, parameters, options = {}) {
   }
 
   const headers = { 'Content-Type': 'application/json' };
-  const token = options.authToken ?? localStorage.getItem('caredroid_access_token');
+  const token = options.authToken ?? localStorage.getItem(AUTH_CONFIG.tokenStorageKey);
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
@@ -52,7 +54,7 @@ export async function executeClinicalTool(toolId, parameters, options = {}) {
   }
 
   try {
-    const response = await apiFetch(`/api/tools/${classification.nluToolId}/execute`, {
+    const response = await apiFetch(API_ROUTES.tools.execute(classification.nluToolId), {
       method: 'POST',
       headers,
       body: JSON.stringify(body),

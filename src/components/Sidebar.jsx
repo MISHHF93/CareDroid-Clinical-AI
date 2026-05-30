@@ -9,7 +9,7 @@ import {
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
   primaryNavPathMatches,
-} from '../navigation/primaryNavigation';
+} from '../config/navigation.config';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon } from '../navigation/iconRegistry';
 import './Sidebar.css';

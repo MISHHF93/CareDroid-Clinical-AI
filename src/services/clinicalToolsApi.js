@@ -1,4 +1,5 @@
 import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
+import { AUTH_CONFIG } from '../config/auth.config';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 
 const STABLE_GET_CACHE_TTL_MS = 30_000;
@@ -8,7 +9,7 @@ const stableGetInflight = new Map();
 function resolveAuthToken(authToken = null) {
   if (authToken !== null && authToken !== undefined) return authToken;
   if (typeof localStorage === 'undefined') return null;
-  return localStorage.getItem('caredroid_access_token');
+  return localStorage.getItem(AUTH_CONFIG.tokenStorageKey);
 }
 
 function authHeaders(authToken = null, contentType = false) {

@@ -149,7 +149,7 @@ const Profile = () => {
   }, [canViewPhiAccess]);
 
   return (
-    <div className="profile-page">
+    <main className="profile-page">
       <Card style={{ width: '100%', maxWidth: '820px' }}>
         <h2 style={{ marginTop: 0 }}>Profile</h2>
         <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
@@ -393,7 +393,7 @@ const Profile = () => {
           </Link>
         </div>
       </Card>
-    </div>
+    </main>
   );
 };
 

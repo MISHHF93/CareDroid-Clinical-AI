@@ -4,7 +4,7 @@ import {
   CARE_WORKSPACES,
   DEFAULT_CARE_WORKSPACE_ID,
   getCareWorkspaceById,
-} from '../data/workspaceArchitecture';
+} from '../config/workspace.config';
 import { NavIcon } from '../navigation/NavIcon';
 import { getWorkspaceIcon } from '../navigation/iconRegistry';
 import './WorkspaceSwitcher.css';

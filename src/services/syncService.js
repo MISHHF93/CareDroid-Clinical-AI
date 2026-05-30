@@ -5,6 +5,7 @@
 import { db } from '../db/offline.db';
 import offlineService from './offlineService';
 import { apiFetch } from './apiClient';
+import { AUTH_CONFIG } from '../config/auth.config';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import logger from '../utils/logger';
 
@@ -91,7 +92,7 @@ class SyncService {
     this.isSyncing = true;
 
     try {
-      const token = localStorage.getItem('caredroid_access_token');
+      const token = localStorage.getItem(AUTH_CONFIG.tokenStorageKey);
       if (!token) {
         logger.info('No auth token - skipping sync');
         this.isSyncing = false;
@@ -442,7 +443,7 @@ class SyncService {
       await db.knowledgeCache.clear();
 
       // Download fresh data
-      const token = localStorage.getItem('caredroid_access_token');
+      const token = localStorage.getItem(AUTH_CONFIG.tokenStorageKey);
       if (token) {
         await this.downloadLatestData(token);
       }

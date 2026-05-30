@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { THEME_CONFIG } from '../config/theme.tokens';
 
-const STORAGE_KEY = 'caredroid_theme_preference';
+const STORAGE_KEY = THEME_CONFIG.storageKey;
 
 /** @typedef {'light' | 'dark' | 'system'} ThemePreference */
 
