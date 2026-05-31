@@ -138,6 +138,14 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellCss).toMatch(/\.app-shell-header[\s\S]*pointer-events:\s*none/);
   });
 
+  it('provides a WCAG bypass link and programmatic main focus target', () => {
+    expect(appShellJsx).toContain('href="#main-content"');
+    expect(appShellJsx).toContain('Skip to main content');
+    expect(appShellJsx).toContain('tabIndex={-1}');
+    expect(appShellCss).toMatch(/\.app-skip-link[\s\S]*transform:\s*translateY/);
+    expect(appShellCss).toMatch(/\.app-skip-link:focus[\s\S]*outline:\s*3px solid/);
+  });
+
   it('scroll routes grow with content instead of clipping inside page-body', () => {
     expect(appShellCss).toMatch(
       /\.app-shell-page-body:not\(\.app-shell-page-body--conversation\) > \*[\s\S]*min-height:\s*auto/
@@ -149,9 +157,8 @@ describe('App shell layout — page scrollport', () => {
 
   it('main content owns viewport width beside the fixed sidebar', () => {
     expect(appShellJsx).toContain('data-layout-role="MainContent"');
-    expect(appShellJsx).toContain(
-      '<main className={mainContentClassName} data-layout-role="MainContent"'
-    );
+    expect(appShellJsx).toContain('<main');
+    expect(appShellJsx).toContain('className={mainContentClassName}');
     expect(appShellJsx.match(/data-layout-role="MainContent"/g)).toHaveLength(1);
     expect(appShellCss).toMatch(/\.app-shell-main-content\s*\{[\s\S]*overflow-y:\s*auto/);
     expect(appShellCss).toMatch(/\.app-shell\s*\{[\s\S]*height:\s*var\(--app-viewport-height/);

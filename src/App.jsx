@@ -85,6 +85,9 @@ const {
   ),
 };
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
+const CapabilityDiscovery = lazyWithRetry(() => import('./pages/CapabilityDiscovery'));
+const WorkflowAutomationBuilder = lazyWithRetry(() => import('./pages/WorkflowAutomationBuilder'));
+const DependencyMap = lazyWithRetry(() => import('./pages/DependencyMap'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
 const Artifacts = lazyWithRetry(() => import('./pages/Artifacts'));
 const MemoryDashboard = lazyWithRetry(() => import('./pages/MemoryDashboard'));
@@ -113,6 +116,10 @@ const PlatformSystemPage = lazyWithRetry(() => import('./pages/platform/Platform
 const PlatformGovernanceWorkspace = lazyWithRetry(
   () => import('./pages/platform/PlatformGovernanceWorkspace')
 );
+const FeatureFlagCenter = lazyWithRetry(() => import('./pages/FeatureFlagCenter'));
+const PluginMarketplace = lazyWithRetry(() => import('./pages/PluginMarketplace'));
+const DataLineageExplorer = lazyWithRetry(() => import('./pages/DataLineageExplorer'));
+const PlatformSelfDiagnostics = lazyWithRetry(() => import('./pages/PlatformSelfDiagnostics'));
 const SystemHealth = lazyWithRetry(() => import('./pages/SystemHealth'));
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
@@ -530,6 +537,16 @@ function AppRoutes() {
     {
       path: '/dashboard',
       element: <CommandDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/discover',
+      element: <CapabilityDiscovery />,
+      requiresAuth: true,
+    },
+    {
+      path: '/automation',
+      element: <WorkflowAutomationBuilder />,
       requiresAuth: true,
     },
     {
@@ -1398,6 +1415,37 @@ function AppRoutes() {
     {
       path: '/system-health',
       element: <SystemHealth />,
+      requiresAuth: true,
+      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
+      requireAllPermissions: true,
+    },
+    {
+      path: '/feature-flags',
+      element: <FeatureFlagCenter />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/plugins',
+      element: <PluginMarketplace />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/dependency-map',
+      element: <DependencyMap />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/data-lineage',
+      element: <DataLineageExplorer />,
+      requiresAuth: true,
+      permission: Permission.VIEW_AUDIT_LOGS,
+    },
+    {
+      path: '/self-diagnostics',
+      element: <PlatformSelfDiagnostics />,
       requiresAuth: true,
       permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
       requireAllPermissions: true,

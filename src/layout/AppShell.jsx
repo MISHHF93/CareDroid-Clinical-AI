@@ -121,6 +121,12 @@ const AppShell = ({
         ['--app-main-inset']: `${mainInsetPx}px`,
       }}
     >
+      {isAuthed && (
+        <a className="app-skip-link" href="#main-content">
+          Skip to main content
+        </a>
+      )}
+
       {isAuthed && isCompact && mobileNavOpen && (
         <button
           type="button"
@@ -193,7 +199,12 @@ const AppShell = ({
             onCycleTheme={cycleTheme}
           />
         )}
-        <main className={mainContentClassName} data-layout-role="MainContent" id="main-content">
+        <main
+          className={mainContentClassName}
+          data-layout-role="MainContent"
+          id="main-content"
+          tabIndex={-1}
+        >
           {isAuthed && isDevAuthBypass && (
             <div className="app-shell-dev-mode-banner" role="status">
               <strong>{devAuthBannerLabel}</strong> is active. This session uses a local clinician

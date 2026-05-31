@@ -62,6 +62,76 @@ export const OfflineIndicator = () => {
   );
 };
 
+export const OfflineModeBanner = ({
+  isOnline = true,
+  isSyncing = false,
+  catalogSummary,
+  lastSyncAt,
+  syncError,
+  onDismiss,
+}) => {
+  const shouldShow = !isOnline || isSyncing || Boolean(syncError);
+  if (!shouldShow) return null;
+
+  const entries = catalogSummary?.entries || [];
+  const staleCount = catalogSummary?.staleCount || 0;
+  const totalItems = catalogSummary?.totalItems || 0;
+  const statusLabel = !isOnline
+    ? 'Offline mode'
+    : syncError
+      ? 'Offline sync needs attention'
+      : isSyncing
+        ? 'Syncing offline cache'
+        : 'Offline cache ready';
+
+  return (
+    <section
+      className={[
+        'offline-mode-banner',
+        !isOnline ? 'offline-mode-banner--offline' : '',
+        syncError ? 'offline-mode-banner--error' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      role={!isOnline || syncError ? 'alert' : 'status'}
+      aria-live="polite"
+      aria-label="Offline mode status"
+    >
+      <div className="offline-mode-banner__body">
+        <div className="offline-mode-banner__heading">
+          <strong>{statusLabel}</strong>
+          {staleCount > 0 && <span className="offline-mode-banner__stale">Stale data</span>}
+        </div>
+        <p>
+          {isOnline
+            ? 'Refreshing cached CareDroid data and syncing queued work.'
+            : `Network unavailable. ${totalItems} cached tools, calculators, simulations, and protocols remain available.`}
+        </p>
+        {syncError && <p className="offline-mode-banner__error">{syncError}</p>}
+        {entries.length > 0 && (
+          <ul className="offline-mode-banner__catalogs" aria-label="Cached offline catalogs">
+            {entries.map((entry) => (
+              <li key={entry.kind}>
+                <span>{entry.label}</span>
+                <strong>{entry.count}</strong>
+                {entry.stale && <em>stale</em>}
+              </li>
+            ))}
+          </ul>
+        )}
+        {lastSyncAt && (
+          <small>Last offline sync: {new Date(lastSyncAt).toLocaleString()}</small>
+        )}
+      </div>
+      {onDismiss && isOnline && !isSyncing && (
+        <button type="button" className="offline-mode-banner__close" onClick={onDismiss}>
+          Dismiss
+        </button>
+      )}
+    </section>
+  );
+};
+
 /**
  * SyncStatus Component
  * 

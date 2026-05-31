@@ -13,6 +13,7 @@ class SyncService {
   constructor() {
     this.isSyncing = false;
     this.syncInterval = null;
+    this.initialized = false;
     this.AUTO_SYNC_INTERVAL = 30000; // 30 seconds
   }
 
@@ -20,6 +21,9 @@ class SyncService {
    * Initialize sync service
    */
   initialize() {
+    if (this.initialized) return;
+    this.initialized = true;
+
     // Listen for online/offline events
     window.addEventListener('online', () => this.handleOnline());
     window.addEventListener('offline', () => this.handleOffline());
@@ -106,6 +110,7 @@ class SyncService {
       logger.info(`Found ${unsynced.total} unsynced items`);
 
       if (unsynced.total === 0) {
+        await this.downloadLatestData(token);
         this.isSyncing = false;
         return;
       }
@@ -366,6 +371,8 @@ class SyncService {
   async downloadLatestData(token) {
     try {
       logger.info('Downloading latest data from server');
+
+      await offlineService.cacheOfflineCatalogs();
 
       // Get user profile
       const profileResponse = await apiFetch('/api/users/profile', {

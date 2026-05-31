@@ -105,6 +105,7 @@ const Sidebar = forwardRef(function Sidebar(
         onClick={() => handleNavClick(item.path)}
         title={effectiveCollapsed ? item.label : ''}
         aria-current={isActive ? 'page' : undefined}
+        aria-label={item.label}
       >
         <span className="nav-icon" aria-hidden>
           <NavIcon icon={getNavIcon(item.id)} />
@@ -220,14 +221,23 @@ const Sidebar = forwardRef(function Sidebar(
               ))}
             </select>
           </div>
-          <div className={`health-indicator ${healthStatus}`}>
-            <div className="health-dot" />
+          <div
+            className={`health-indicator ${healthStatus}`}
+            role="status"
+            aria-label={`System status: ${healthStatus}`}
+          >
+            <div className="health-dot" aria-hidden />
           </div>
         </div>
       )}
 
       <div className="sidebar-content">
-        <button type="button" className="btn-new-conversation" onClick={handleNewChat}>
+        <button
+          type="button"
+          className="btn-new-conversation"
+          onClick={handleNewChat}
+          aria-label="Start a new chat"
+        >
           <span className="btn-icon" aria-hidden>
             <NavIcon icon={CHROME_ICONS.sparkles} size={18} />
           </span>
@@ -274,6 +284,7 @@ const Sidebar = forwardRef(function Sidebar(
             onClick={() => setShowAdvanced((open) => !open)}
             aria-expanded={showAdvanced}
             aria-controls="sidebar-advanced-links"
+            aria-label="Advanced navigation"
             title={effectiveCollapsed ? 'Advanced' : ''}
           >
             <span className="nav-icon" aria-hidden>
@@ -347,6 +358,7 @@ const Sidebar = forwardRef(function Sidebar(
           type="button"
           className="footer-action"
           onClick={() => handleNavClick('/notifications')}
+          aria-label="Open notifications"
           title="Notifications"
         >
           <span className="action-icon" aria-hidden>
@@ -373,6 +385,7 @@ const Sidebar = forwardRef(function Sidebar(
         <button
           type="button"
           className="btn-signout"
+          aria-label="Sign out"
           onClick={() => {
             onCloseMobileNav();
             onSignOut();

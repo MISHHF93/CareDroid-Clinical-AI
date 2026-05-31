@@ -3,6 +3,12 @@
  */
 import logger from '../utils/logger';
 import { db } from '../db/offline.db';
+import {
+  OFFLINE_CACHE_TTL_MS,
+  buildOfflineCatalogSnapshots,
+  isOfflineCatalogStale,
+  summarizeOfflineCatalogs,
+} from '../data/offlineMode';
 
 class OfflineService {
   constructor() {
@@ -323,6 +329,66 @@ class OfflineService {
   }
 
   /**
+   * Cache offline-ready platform catalogs for network-free use.
+   */
+  async cacheOfflineCatalogs({ now = Date.now() } = {}) {
+    try {
+      const snapshots = buildOfflineCatalogSnapshots(now).map((snapshot) => ({
+        ...snapshot,
+        staleAt: new Date(new Date(snapshot.cachedAt).getTime() + OFFLINE_CACHE_TTL_MS).toISOString(),
+        synced: true,
+      }));
+
+      await db.offlineCatalogs.bulkPut(snapshots);
+      logger.info('Offline catalogs cached', {
+        catalogs: snapshots.map((snapshot) => `${snapshot.kind}:${snapshot.count}`).join(', '),
+      });
+      return summarizeOfflineCatalogs(snapshots, now);
+    } catch (error) {
+      logger.error('Failed to cache offline catalogs', { error });
+      return summarizeOfflineCatalogs([], now);
+    }
+  }
+
+  /**
+   * Read one offline catalog snapshot by kind.
+   */
+  async getOfflineCatalog(kind) {
+    try {
+      const catalog = await db.offlineCatalogs.get(kind);
+      if (!catalog) return null;
+      return {
+        ...catalog,
+        stale: isOfflineCatalogStale(catalog.cachedAt),
+      };
+    } catch (error) {
+      logger.error(`Failed to read offline catalog ${kind}`, { error });
+      return null;
+    }
+  }
+
+  /**
+   * Read all cached offline catalogs with freshness metadata.
+   */
+  async getOfflineCatalogs() {
+    try {
+      const catalogs = await db.offlineCatalogs.toArray();
+      return catalogs.map((catalog) => ({
+        ...catalog,
+        stale: isOfflineCatalogStale(catalog.cachedAt),
+      }));
+    } catch (error) {
+      logger.error('Failed to read offline catalogs', { error });
+      return [];
+    }
+  }
+
+  async getOfflineCatalogSummary({ now = Date.now() } = {}) {
+    const catalogs = await this.getOfflineCatalogs();
+    return summarizeOfflineCatalogs(catalogs, now);
+  }
+
+  /**
    * Get all unsynced items
    */
   async getUnsyncedItems() {
@@ -378,6 +444,7 @@ class OfflineService {
       const cacheCount = await db.knowledgeCache.count();
       const notificationCount = await db.notifications.count();
       const auditLogCount = await db.auditLogs.count();
+      const offlineCatalogCount = await db.offlineCatalogs.count();
 
       return {
         messages: messageCount,
@@ -386,8 +453,9 @@ class OfflineService {
         cachedQueries: cacheCount,
         notifications: notificationCount,
         auditLogs: auditLogCount,
+        offlineCatalogs: offlineCatalogCount,
         total: messageCount + conversationCount + toolResultCount + 
-               cacheCount + notificationCount + auditLogCount,
+               cacheCount + notificationCount + auditLogCount + offlineCatalogCount,
       };
     } catch (error) {
       logger.error('Failed to get storage stats', { error });

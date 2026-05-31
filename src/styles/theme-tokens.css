@@ -36,6 +36,7 @@ html {
   --app-success: #22c55e;
   --app-info: #38bdf8;
   --app-focus: rgba(56, 189, 248, 0.22);
+  --app-focus-ring-aa: #7dd3fc;
   --app-hover: rgba(56, 189, 248, 0.1);
   --app-disabled: rgba(148, 163, 184, 0.38);
   --app-input-bg: rgba(255, 255, 255, 0.055);
@@ -156,6 +157,7 @@ html[data-theme='dark'] {
   --app-success: #22c55e;
   --app-info: #38bdf8;
   --app-focus: rgba(56, 189, 248, 0.22);
+  --app-focus-ring-aa: #7dd3fc;
   --app-hover: rgba(56, 189, 248, 0.1);
   --app-disabled: rgba(148, 163, 184, 0.38);
   --app-input-bg: rgba(255, 255, 255, 0.055);
@@ -275,6 +277,7 @@ html[data-theme='light'] {
   --app-success: #047857;
   --app-info: #0284c7;
   --app-focus: rgba(37, 99, 235, 0.18);
+  --app-focus-ring-aa: #1d4ed8;
   --app-hover: rgba(37, 99, 235, 0.08);
   --app-disabled: rgba(100, 116, 139, 0.34);
   --app-input-bg: rgba(255, 255, 255, 0.9);

@@ -97,9 +97,15 @@ body {
   border-color: color-mix(in srgb, var(--app-accent) 32%, var(--app-input-border));
 }
 
-:where(input, select, textarea):focus,
-:where(button, [role='button'], a):focus-visible {
-  outline: none;
+:where(input, select, textarea):focus-visible,
+:where(button, [role='button'], a[href], summary, [tabindex]:not([tabindex='-1'])):focus-visible {
+  outline: 3px solid var(--app-focus-ring-aa, var(--app-accent-interactive));
+  outline-offset: 3px;
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 6px var(--app-focus);
+}
+
+:where(input, select, textarea):focus:not(:focus-visible) {
   border-color: var(--app-accent);
   box-shadow: 0 0 0 2px var(--app-focus);
 }
@@ -125,6 +131,26 @@ html[data-theme='light'] :where(select) {
 :where(option, optgroup) {
   background: var(--app-surface-elevated);
   color: var(--app-fg);
+}
+
+:where(button, [role='button'], input:not([type='hidden']), select, textarea) {
+  touch-action: manipulation;
+}
+
+:where(button, [role='button']) {
+  min-height: var(--app-min-touch-target, 44px);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 :where(table) {

@@ -20,6 +20,8 @@ describe('primaryNavigation', () => {
   it('exposes the simplified primary sidebar model in canonical order', () => {
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
       ['Dashboard', '/dashboard'],
+      ['Discover', '/discover'],
+      ['Automation', '/automation'],
       ['Assistant', '/assistant'],
       ['Tools', '/tools'],
       ['Operations', '/operations'],
@@ -43,6 +45,11 @@ describe('primaryNavigation', () => {
     expect(ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
       ['Developer Catalog', '/tools/catalog'],
       ['System Health', '/system-health'],
+      ['Feature Flags', '/feature-flags'],
+      ['Plugins', '/plugins'],
+      ['Dependency Map', '/dependency-map'],
+      ['Data Lineage', '/data-lineage'],
+      ['Self Diagnostics', '/self-diagnostics'],
       ['Governance', '/ai-governance'],
       ['Security', '/security'],
       ['Audit', '/audit'],
@@ -90,6 +97,8 @@ describe('primaryNavigation', () => {
   it('keeps the compact drawer navigation subset canonical', () => {
     expect(PRIMARY_MOBILE_NAV_ITEMS.map((item) => item.path)).toEqual([
       '/dashboard',
+      '/discover',
+      '/automation',
       '/assistant',
       '/tools',
       '/operations',

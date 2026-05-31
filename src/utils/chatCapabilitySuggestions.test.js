@@ -154,6 +154,28 @@ describe('chat capability suggestions', () => {
     expect(suggestions.find((suggestion) => suggestion.toolId === 'has-bled')?.source).toBe('profile-tool-graph');
   });
 
+  it('adds Did you know CareDroid discovery prompts for profile-aware chat', () => {
+    const profileContext = buildUserToolProfile({
+      user: { role: 'medical student' },
+      toolPreferences: {
+        favorites: [],
+        pinned: [],
+        recentTools: [],
+        hiddenTools: [],
+        profileSettings: { role: 'medical student', specialty: 'medical education' },
+      },
+    });
+    const suggestions = getChatCapabilitySuggestions({
+      input: 'did you know discover capabilities',
+      hasPermission: allowAll,
+      profileContext,
+      tools: getUserFacingToolRegistryProjection(),
+    });
+
+    expect(suggestions.some((suggestion) => suggestion.label.startsWith('Did you know CareDroid can also'))).toBe(true);
+    expect(suggestions.some((suggestion) => suggestion.source.startsWith('capability-discovery:'))).toBe(true);
+  });
+
   it('uses stroke context as an AI launcher for neuro tools and workspace', () => {
     const suggestions = getChatCapabilitySuggestions({
       input: 'stroke patient',

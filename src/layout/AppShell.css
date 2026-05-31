@@ -17,6 +17,34 @@
   padding-left: env(safe-area-inset-left, 0px);
 }
 
+.app-skip-link {
+  position: fixed;
+  top: calc(8px + env(safe-area-inset-top, 0px));
+  left: calc(8px + env(safe-area-inset-left, 0px));
+  z-index: 2000;
+  min-height: var(--app-min-touch-target, 44px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border: 2px solid var(--app-focus-ring-aa, var(--app-accent-interactive));
+  border-radius: var(--radius-md);
+  background: var(--app-surface-elevated);
+  color: var(--app-fg);
+  font-weight: 850;
+  text-decoration: none;
+  transform: translateY(calc(-100% - 16px));
+  transition: transform 0.16s ease;
+}
+
+.app-skip-link:focus,
+.app-skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 3px solid var(--app-focus-ring-aa, var(--app-accent-interactive));
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--app-focus);
+}
+
 .app-shell-nav-backdrop {
   position: fixed;
   inset: 0;

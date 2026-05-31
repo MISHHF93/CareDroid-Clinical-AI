@@ -7,6 +7,7 @@ import {
 } from '../data/clinicalToolIdContract';
 import { getBackendBackedToolInventory, getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { buildProfileToolGraph, getProfileAssistantRecommendations } from '../data/profileToolSegmentation';
+import { getCareDroidDidYouKnowSuggestions } from '../data/capabilityDiscoveryEngine';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import { Permission } from '../contexts/UserContext';
 
@@ -414,6 +415,19 @@ export function getChatCapabilitySuggestions({
         icon: getToolIcon(item.toolId),
         defaultRank: 72 + index,
         keywords: [item.label, item.toolId, profileContext.role, profileContext.specialty],
+      });
+    });
+
+    getCareDroidDidYouKnowSuggestions({
+      profile: profileContext,
+      tools,
+      recentToolIds,
+      limit: 3,
+    }).forEach((item, index) => {
+      suggestions.push({
+        ...item,
+        icon: getToolIcon(item.toolId),
+        defaultRank: 96 + index,
       });
     });
   }

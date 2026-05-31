@@ -1,0 +1,230 @@
+.data-lineage-page {
+  min-height: 100%;
+  padding: clamp(20px, 4vw, 40px);
+  background:
+    radial-gradient(circle at top right, color-mix(in srgb, var(--app-accent) 12%, transparent), transparent 32%),
+    var(--app-bg);
+  color: var(--app-fg);
+}
+
+.data-lineage-hero,
+.data-lineage-summary,
+.data-lineage-controls,
+.data-lineage-stage-key,
+.data-lineage-card {
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--radius-xl);
+  background: var(--app-surface-1);
+  box-shadow: var(--app-shadow-1);
+}
+
+.data-lineage-hero {
+  display: grid;
+  gap: 12px;
+  padding: clamp(22px, 4vw, 36px);
+}
+
+.data-lineage-hero p:first-child,
+.data-lineage-card header span,
+.data-lineage-stage-header span {
+  margin: 0;
+  color: var(--app-accent-interactive);
+  font-size: var(--font-12);
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.data-lineage-hero h1,
+.data-lineage-card h2 {
+  margin: 0;
+  color: var(--app-fg);
+}
+
+.data-lineage-hero h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+}
+
+.data-lineage-hero span {
+  color: var(--app-fg);
+  font-family: monospace;
+  font-weight: 800;
+}
+
+.data-lineage-hero > p,
+.data-lineage-card > p {
+  max-width: 900px;
+  margin: 0;
+  color: var(--app-fg-muted);
+  line-height: 1.6;
+}
+
+.data-lineage-summary {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 18px;
+  overflow: hidden;
+}
+
+.data-lineage-summary div {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  background: var(--app-surface-2);
+}
+
+.data-lineage-summary span,
+.data-lineage-card-meta span,
+.data-lineage-timeline dt,
+.data-lineage-controls label span {
+  color: var(--app-fg-muted);
+  font-size: var(--font-12);
+  font-weight: 750;
+  text-transform: uppercase;
+}
+
+.data-lineage-summary strong {
+  font-size: var(--font-28);
+}
+
+.data-lineage-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, 260px);
+  gap: 14px;
+  margin-top: 18px;
+  padding: 16px;
+}
+
+.data-lineage-controls label {
+  display: grid;
+  gap: 6px;
+}
+
+.data-lineage-controls input,
+.data-lineage-controls select {
+  min-height: var(--app-min-touch-target, 44px);
+  border: 1px solid var(--app-input-border);
+  border-radius: var(--radius-md);
+  background: var(--app-input-bg);
+  color: var(--app-fg);
+  padding: 0 12px;
+}
+
+.data-lineage-stage-key {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 18px 0;
+  padding: 12px;
+}
+
+.data-lineage-stage-key span {
+  padding: 6px 10px;
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 32%, var(--app-panel-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
+  color: var(--app-fg);
+  font-size: var(--font-12);
+  font-weight: 800;
+}
+
+.data-lineage-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.data-lineage-card {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.data-lineage-card > header,
+.data-lineage-card-meta,
+.data-lineage-timeline,
+.data-lineage-timeline dl {
+  display: grid;
+  gap: 12px;
+}
+
+.data-lineage-card > header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.data-lineage-card time {
+  color: var(--app-fg-muted);
+  font-size: var(--font-12);
+}
+
+.data-lineage-card-meta {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.data-lineage-card-meta div,
+.data-lineage-timeline dl div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--radius-md);
+  background: var(--app-surface-2);
+}
+
+.data-lineage-card-meta strong,
+.data-lineage-timeline dd {
+  min-width: 0;
+  margin: 0;
+  color: var(--app-fg);
+  overflow-wrap: anywhere;
+}
+
+.data-lineage-timeline {
+  grid-template-columns: repeat(5, minmax(180px, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+}
+
+.data-lineage-timeline > li {
+  display: grid;
+  gap: 10px;
+  min-width: 180px;
+  padding: 14px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--radius-lg);
+  background: var(--app-surface-2);
+}
+
+.data-lineage-stage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.data-lineage-timeline ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--app-fg-muted);
+}
+
+.data-lineage-timeline li li {
+  margin: 4px 0;
+}
+
+.data-lineage-timeline dl {
+  margin: 0;
+}
+
+@media (max-width: 900px) {
+  .data-lineage-summary,
+  .data-lineage-controls,
+  .data-lineage-card > header,
+  .data-lineage-card-meta {
+    grid-template-columns: 1fr;
+  }
+}

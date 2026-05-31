@@ -37,6 +37,19 @@ class CareDroidDB extends Dexie {
       // Settings and preferences
       settings: 'key, value, lastUpdated',
     });
+
+    this.version(2).stores({
+      messages: '++id, userId, conversationId, timestamp, synced',
+      conversations: '++id, userId, lastMessageAt, synced',
+      toolResults: '++id, userId, toolType, timestamp, synced',
+      userProfile: 'userId, lastSyncedAt',
+      syncQueue: '++id, action, timestamp, retryCount, synced',
+      knowledgeCache: '++id, query, timestamp, expiresAt',
+      auditLogs: '++id, userId, action, timestamp, synced',
+      notifications: '++id, userId, timestamp, read, synced',
+      settings: 'key, value, lastUpdated',
+      offlineCatalogs: 'kind, cachedAt, staleAt',
+    });
   }
 }
 
@@ -71,6 +84,7 @@ export const clearDatabase = async () => {
     await db.auditLogs.clear();
     await db.notifications.clear();
     await db.settings.clear();
+    await db.offlineCatalogs.clear();
     
     logger.info('Database cleared successfully');
   } catch (error) {
@@ -91,6 +105,7 @@ export const exportDatabase = async () => {
       userProfile: await db.userProfile.toArray(),
       notifications: await db.notifications.toArray(),
       settings: await db.settings.toArray(),
+      offlineCatalogs: await db.offlineCatalogs.toArray(),
     };
     
     return JSON.stringify(data, null, 2);
@@ -115,6 +130,7 @@ export const importDatabase = async (jsonData) => {
     if (data.userProfile) await db.userProfile.bulkAdd(data.userProfile);
     if (data.notifications) await db.notifications.bulkAdd(data.notifications);
     if (data.settings) await db.settings.bulkAdd(data.settings);
+    if (data.offlineCatalogs) await db.offlineCatalogs.bulkPut(data.offlineCatalogs);
     
     logger.info('Database imported successfully');
   } catch (error) {

@@ -7,7 +7,7 @@
  * - Periodic API sync when connection restored
  */
 
-const CACHE_NAME = 'caredroid-v5-static-shell';
+const CACHE_NAME = 'caredroid-v6-offline-shell';
 const IS_LOCAL_DEV =
   self.location.hostname === 'localhost' ||
   self.location.hostname === '127.0.0.1' ||
@@ -154,6 +154,20 @@ function networkFirstStrategy(request) {
       return caches.match(request).then((response) => {
         if (response) {
           return response;
+        }
+
+        if (request.mode === 'navigate') {
+          return caches.match('/index.html').then((shell) => {
+            if (shell) return shell;
+            return caches.match('/').then((rootShell) => {
+              if (rootShell) return rootShell;
+              return new Response('Offline - App shell not available', {
+                status: 503,
+                statusText: 'Service Unavailable',
+                headers: new Headers({ 'Content-Type': 'text/plain' }),
+              });
+            });
+          });
         }
 
         // If no cache, notify client of offline status

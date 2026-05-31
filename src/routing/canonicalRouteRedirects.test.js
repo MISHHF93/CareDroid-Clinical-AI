@@ -31,6 +31,8 @@ describe('canonical route redirects', () => {
     expectRoute('/dashboard', 'CommandDashboard');
     expectRedirect('/home', '/dashboard');
     expect(appSource).toContain('ASSISTANT_ROUTE_ALIASES.map');
+    expectRoute('/discover', 'CapabilityDiscovery');
+    expectRoute('/automation', 'WorkflowAutomationBuilder');
     expect(routeConfigSource).toContain(
       "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
     );
@@ -88,6 +90,11 @@ describe('canonical route redirects', () => {
   it('registers profile tool preferences without redirecting canonical tool routes', () => {
     expectRoute('/profile/tool-preferences', 'ProfileToolPreferences');
     expectRoute('/analytics', 'AnalyticsDashboard');
+    expectRoute('/feature-flags', 'FeatureFlagCenter');
+    expectRoute('/plugins', 'PluginMarketplace');
+    expectRoute('/dependency-map', 'DependencyMap');
+    expectRoute('/data-lineage', 'DataLineageExplorer');
+    expectRoute('/self-diagnostics', 'PlatformSelfDiagnostics');
     expect(appSource).toContain("path: '/tools'");
     expect(appSource).toContain("path: '/tools/calculators/:slug'");
     expect(appSource).not.toContain('to="/profile/preferences?tool-preferences"');

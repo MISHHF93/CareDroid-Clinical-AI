@@ -86,8 +86,10 @@
 }
 
 .sidebar-toggle {
-  width: 28px;
-  height: 28px;
+  width: var(--app-min-touch-target, 44px);
+  height: var(--app-min-touch-target, 44px);
+  min-width: var(--app-min-touch-target, 44px);
+  min-height: var(--app-min-touch-target, 44px);
   border-radius: 6px;
   border: 1px solid var(--sidebar-control-border);
   background: var(--sidebar-control-bg);
@@ -206,10 +208,11 @@
 
 .sidebar-user-main {
   min-width: 0;
+  min-height: var(--app-min-touch-target, 44px);
   border: 0;
   background: transparent;
   color: inherit;
-  padding: 0;
+  padding: 4px;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -382,7 +385,7 @@
 /* New Conversation Button */
 .btn-new-conversation {
   width: 100%;
-  min-height: var(--compact-control-height, 38px);
+  min-height: var(--app-min-touch-target, 44px);
   padding: 8px 10px;
   background: linear-gradient(135deg, var(--sidebar-cta-from), var(--sidebar-cta-to));
   border: none;
@@ -443,7 +446,7 @@
 
 .nav-item {
   width: 100%;
-  min-height: var(--compact-control-height, 38px);
+  min-height: var(--app-min-touch-target, 44px);
   padding: 7px 9px;
   background: transparent;
   border: 1px solid transparent;
@@ -472,8 +475,8 @@
 }
 
 .nav-item:focus-visible {
-  outline: 2px solid var(--sidebar-focus-ring);
-  outline-offset: 2px;
+  outline: 3px solid var(--sidebar-focus-ring);
+  outline-offset: 3px;
 }
 
 .nav-icon {
@@ -510,7 +513,7 @@
 }
 
 .nav-item--advanced {
-  min-height: 34px;
+  min-height: var(--app-min-touch-target, 44px);
   padding-left: 14px;
   font-size: 13px;
 }
@@ -522,7 +525,7 @@
 
 .sidebar-advanced-toggle {
   width: 100%;
-  min-height: var(--compact-control-height, 38px);
+  min-height: var(--app-min-touch-target, 44px);
   padding: 7px 9px;
   background: color-mix(in srgb, var(--sidebar-control-bg) 58%, transparent);
   border: 1px solid var(--sidebar-control-border);
@@ -536,11 +539,21 @@
 }
 
 .sidebar-advanced-toggle:hover,
-.sidebar-advanced-toggle:focus-visible,
 .sidebar-advanced-toggle--active {
   background: var(--sidebar-item-hover-bg);
   color: var(--sidebar-item-hover-fg);
   border-color: var(--sidebar-item-hover-border);
+}
+
+.sidebar-advanced-toggle:focus-visible {
+  background: var(--sidebar-item-hover-bg);
+  color: var(--sidebar-item-hover-fg);
+  border-color: var(--sidebar-item-hover-border);
+  outline: 3px solid var(--sidebar-focus-ring);
+  outline-offset: 3px;
+}
+
+.sidebar-advanced-toggle--active {
   outline: none;
 }
 
@@ -868,6 +881,7 @@
 }
 
 .conversation-item {
+  min-height: var(--app-min-touch-target, 44px);
   padding: 7px 8px;
   background: var(--sidebar-tool-surface);
   border: 1px solid transparent;
@@ -924,7 +938,7 @@
 
 .footer-action {
   width: 100%;
-  min-height: var(--compact-control-height, 38px);
+  min-height: var(--app-min-touch-target, 44px);
   padding: 7px;
   background: var(--sidebar-action-surface);
   border: 1px solid var(--sidebar-tool-border);
@@ -1001,7 +1015,7 @@
 
 .btn-signout {
   width: 100%;
-  min-height: var(--compact-control-height, 38px);
+  min-height: var(--app-min-touch-target, 44px);
   padding: 7px 8px;
   background: var(--sidebar-signout-bg);
   border: 1px solid var(--sidebar-signout-border);

@@ -61,6 +61,8 @@ describe('Simplified sidebar navigation wiring', () => {
 
     for (const path of [
       '/dashboard',
+      '/discover',
+      '/automation',
       '/assistant',
       '/tools',
       '/operations',
@@ -79,6 +81,11 @@ describe('Simplified sidebar navigation wiring', () => {
     for (const path of [
       '/tools/catalog',
       '/system-health',
+      '/feature-flags',
+      '/plugins',
+      '/dependency-map',
+      '/data-lineage',
+      '/self-diagnostics',
       '/ai-governance',
       '/security',
       '/audit',

@@ -25,6 +25,11 @@ import Artifacts from '../pages/Artifacts';
 import MemoryDashboard from '../pages/MemoryDashboard';
 import TrainingDashboard from '../pages/TrainingDashboard';
 import AnalyticsDashboard from '../pages/AnalyticsDashboard';
+import FeatureFlagCenter from '../pages/FeatureFlagCenter';
+import PluginMarketplace from '../pages/PluginMarketplace';
+import DependencyMap from '../pages/DependencyMap';
+import DataLineageExplorer from '../pages/DataLineageExplorer';
+import PlatformSelfDiagnostics from '../pages/PlatformSelfDiagnostics';
 import CostAnalyticsDashboard from '../pages/CostAnalyticsDashboard';
 import AiEvaluationDashboard from '../pages/AiEvaluationDashboard';
 import AiCommandCenterDashboard from '../pages/AiCommandCenterDashboard';
@@ -32,6 +37,8 @@ import PlatformSystemPage from '../pages/platform/PlatformSystemPage';
 import PlatformGovernanceWorkspace from '../pages/platform/PlatformGovernanceWorkspace';
 import SystemHealth from '../pages/SystemHealth';
 import CommandDashboard from '../pages/CommandDashboard';
+import CapabilityDiscovery from '../pages/CapabilityDiscovery';
+import WorkflowAutomationBuilder from '../pages/WorkflowAutomationBuilder';
 import Dashboard from '../pages/Dashboard';
 import DigitalOperationsCenter from '../pages/DigitalOperationsCenter';
 import ResearchEvidenceHub from '../pages/ResearchEvidenceHub';
@@ -335,6 +342,8 @@ vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
 
 const PAGE_BY_ID = {
   dashboard: CommandDashboard,
+  discover: CapabilityDiscovery,
+  automation: WorkflowAutomationBuilder,
   assistant: Dashboard,
   'operations-center': DigitalOperationsCenter,
   research: ResearchEvidenceHub,
@@ -371,6 +380,11 @@ const PAGE_BY_ID = {
   memory: MemoryDashboard,
   training: TrainingDashboard,
   analytics: AnalyticsDashboard,
+  'feature-flags': FeatureFlagCenter,
+  plugins: PluginMarketplace,
+  'dependency-map': DependencyMap,
+  'data-lineage': DataLineageExplorer,
+  'self-diagnostics': PlatformSelfDiagnostics,
   costs: CostAnalyticsDashboard,
   'ai-evaluation': AiEvaluationDashboard,
   'ai-command-center': AiCommandCenterDashboard,

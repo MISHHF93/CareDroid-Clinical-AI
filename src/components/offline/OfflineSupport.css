@@ -64,6 +64,117 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+.offline-mode-banner {
+  position: fixed;
+  top: calc(10px + env(safe-area-inset-top, 0px));
+  left: 50%;
+  z-index: 1500;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  width: min(760px, calc(100% - 24px));
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--app-warning) 42%, var(--app-panel-border));
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--app-warning) 16%, var(--app-surface-elevated));
+  color: var(--app-fg);
+  box-shadow: var(--app-shadow-2);
+  transform: translateX(-50%);
+}
+
+.offline-mode-banner--offline {
+  border-color: color-mix(in srgb, var(--app-danger) 42%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--app-danger) 16%, var(--app-surface-elevated));
+}
+
+.offline-mode-banner--error {
+  border-color: color-mix(in srgb, var(--app-danger) 55%, var(--app-panel-border));
+}
+
+.offline-mode-banner__body {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+  flex: 1;
+}
+
+.offline-mode-banner__heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.offline-mode-banner__heading strong {
+  font-size: var(--font-14);
+  color: var(--app-fg);
+}
+
+.offline-mode-banner__stale,
+.offline-mode-banner__catalogs em {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 0 8px;
+  border: 1px solid color-mix(in srgb, var(--app-warning) 50%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-warning) 18%, transparent);
+  color: var(--app-fg);
+  font-size: var(--font-11);
+  font-style: normal;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.offline-mode-banner p,
+.offline-mode-banner small {
+  margin: 0;
+  color: var(--app-fg-muted);
+  font-size: var(--font-12);
+  line-height: 1.45;
+}
+
+.offline-mode-banner__error {
+  color: var(--app-danger-contrast);
+  font-weight: 700;
+}
+
+.offline-mode-banner__catalogs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.offline-mode-banner__catalogs li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 3px 8px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-surface-1) 84%, transparent);
+  color: var(--app-fg-muted);
+  font-size: var(--font-12);
+}
+
+.offline-mode-banner__catalogs strong {
+  color: var(--app-fg);
+}
+
+.offline-mode-banner__close {
+  min-width: var(--app-min-touch-target, 44px);
+  min-height: var(--app-min-touch-target, 44px);
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--radius-md);
+  background: var(--app-surface-1);
+  color: var(--app-fg);
+  cursor: pointer;
+}
+
 /* Sync Status */
 .sync-status {
   position: fixed;
@@ -285,6 +396,12 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 640px) {
+  .offline-mode-banner {
+    top: calc(8px + env(safe-area-inset-top, 0px));
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .offline-indicator {
     padding: var(--space-2) var(--space-4);
     flex-direction: column;
