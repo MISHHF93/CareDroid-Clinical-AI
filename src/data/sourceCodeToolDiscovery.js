@@ -133,6 +133,21 @@ export const toolIdAliases = [
   },
   { id: 'drug-interactions', mapsTo: 'drug-check', source: 'tool.patterns vs registry drug-check' },
   { id: 'lab-interpreter', mapsTo: 'lab-interp', source: 'Throughout backend + frontend' },
+  {
+    id: 'medical-simulation',
+    mapsTo: 'simulation-suite',
+    source: 'Canonical route alias /medical-simulation → /simulation',
+  },
+  {
+    id: 'lab',
+    mapsTo: 'laboratory-dashboard',
+    source: 'Canonical route alias /lab → /laboratory',
+  },
+  {
+    id: 'anatomy-viewer',
+    mapsTo: 'medical-3d-viewer',
+    source: 'Canonical route alias /anatomy-viewer → /3d-viewer',
+  },
   { id: 'sofa-calculator', mapsTo: 'sofa-score', source: 'Orchestrator id vs registry id' },
   { id: 'quick-sofa', mapsTo: 'qsofa', source: 'NLU alias — quick sofa' },
   { id: 'quick-sepsis-score', mapsTo: 'qsofa', source: 'NLU alias — quick sepsis score' },

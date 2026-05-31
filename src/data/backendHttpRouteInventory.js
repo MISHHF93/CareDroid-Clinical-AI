@@ -602,6 +602,13 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/review/items/:itemId/assign', controller: 'PlatformSystemsController' },
   { method: 'POST', path: '/api/review/items/:itemId/comments', controller: 'PlatformSystemsController' },
   { method: 'POST', path: '/api/review/items/:itemId/decision', controller: 'PlatformSystemsController' },
+  { method: 'GET', path: '/api/simulation/scenarios', controller: 'SimulationController' },
+  { method: 'GET', path: '/api/simulation/scenarios/:id', controller: 'SimulationController' },
+  { method: 'POST', path: '/api/simulation/runs', controller: 'SimulationController' },
+  { method: 'POST', path: '/api/simulation/runs/:id/steps', controller: 'SimulationController' },
+  { method: 'POST', path: '/api/simulation/runs/:id/complete', controller: 'SimulationController' },
+  { method: 'GET', path: '/api/simulation/outcomes', controller: 'SimulationController' },
+  { method: 'GET', path: '/api/simulation/recommendations', controller: 'SimulationController' },
   { method: 'GET', path: '/api/source-provenance/:sourceId', controller: 'PlatformSystemsController' },
 
   { method: 'GET', path: '/api/metrics', controller: 'MetricsController' },

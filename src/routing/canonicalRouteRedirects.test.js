@@ -35,6 +35,7 @@ describe('canonical route redirects', () => {
       "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
     );
     expectRoute('/operations', 'Operations');
+    expectRoute('/operations-center', 'DigitalOperationsCenter');
     expect(appSource).not.toContain('OPERATIONS_ROUTE_ALIASES.map');
     expect(routeConfigSource).toContain(
       'export const OPERATIONS_ROUTE_ALIASES = Object.freeze([])'
@@ -86,6 +87,7 @@ describe('canonical route redirects', () => {
 
   it('registers profile tool preferences without redirecting canonical tool routes', () => {
     expectRoute('/profile/tool-preferences', 'ProfileToolPreferences');
+    expectRoute('/analytics', 'AnalyticsDashboard');
     expect(appSource).toContain("path: '/tools'");
     expect(appSource).toContain("path: '/tools/calculators/:slug'");
     expect(appSource).not.toContain('to="/profile/preferences?tool-preferences"');
@@ -99,6 +101,28 @@ describe('canonical route redirects', () => {
     expect(appSource).toContain("path: '/tools/patient-summary-ai'");
     expectRoute('/tools/patient-summary-ai', 'PatientSummaryAi');
     expect(appSource).not.toContain('function AssistantToolRedirect');
+  });
+
+  it('wires simulation, laboratory, and 3D viewer canonical routes with aliases', () => {
+    expectRoute('/clinical-decision-support', 'ClinicalDecisionSupport');
+    expectRoute('/protocols', 'Protocols');
+    expectRoute('/research', 'ResearchEvidenceHub');
+    expectRoute('/documentation', 'ClinicalDocumentationAssistant');
+    expectRoute('/knowledge-graph', 'ClinicalKnowledgeGraph');
+    expectRoute('/predictive-analytics', 'PredictiveAnalyticsDashboard');
+    expectRoute('/competencies', 'Competencies');
+    expectRoute('/credentials', 'Credentials');
+    expectRoute('/simulation', 'MedicalSimulationSuite');
+    expectRoute('/simulation/outcomes', 'SimulationOutcomes');
+    expectRoute('/simulation/:scenarioId', 'SimulationScenarioPlayer');
+    expectRoute('/laboratory', 'LaboratoryDashboard');
+    expectRoute('/3d-viewer', 'Medical3DViewer');
+    expect(appSource).toContain('SIMULATION_ROUTE_ALIASES.map');
+    expect(appSource).toContain('LABORATORY_ROUTE_ALIASES.map');
+    expect(appSource).toContain('MEDICAL_3D_VIEWER_ROUTE_ALIASES.map');
+    expect(routeConfigSource).toContain("export const SIMULATION_ROUTE_ALIASES = Object.freeze(['/medical-simulation'])");
+    expect(routeConfigSource).toContain("export const LABORATORY_ROUTE_ALIASES = Object.freeze(['/lab'])");
+    expect(routeConfigSource).toContain("export const MEDICAL_3D_VIEWER_ROUTE_ALIASES = Object.freeze(['/anatomy-viewer'])");
   });
 
   it('normalizes auth aliases to a single /auth route and preserves signup intent', () => {

@@ -1,0 +1,150 @@
+.documentation-assistant-page {
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  color: var(--text-color);
+}
+
+.documentation-assistant-hero,
+.documentation-assistant-panel,
+.documentation-assistant-card {
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  background: var(--surface-1);
+}
+
+.documentation-assistant-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px;
+}
+
+.documentation-assistant-hero h1,
+.documentation-assistant-hero p,
+.documentation-assistant-panel h2,
+.documentation-assistant-panel p,
+.documentation-assistant-card p {
+  margin: 0;
+}
+
+.documentation-assistant-hero p,
+.documentation-assistant-eyebrow,
+.documentation-assistant-card p,
+.documentation-assistant-export-status {
+  color: var(--muted-text);
+}
+
+.documentation-assistant-eyebrow {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.documentation-assistant-hero__actions,
+.documentation-assistant-actions,
+.documentation-assistant-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.documentation-assistant-hero__actions a,
+.documentation-assistant-actions button,
+.documentation-assistant-chip-grid button {
+  border: 1px solid rgba(0, 255, 136, 0.28);
+  border-radius: 999px;
+  background: rgba(0, 255, 136, 0.08);
+  color: var(--accent-green);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 9px 12px;
+  text-decoration: none;
+}
+
+.documentation-assistant-chip-grid button.is-active {
+  background: var(--accent-green);
+  color: #04130a;
+}
+
+.documentation-assistant-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.documentation-assistant-panel {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.documentation-assistant-field {
+  display: grid;
+  gap: 6px;
+}
+
+.documentation-assistant-field label {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.documentation-assistant-field input,
+.documentation-assistant-field textarea {
+  width: 100%;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--surface-2);
+  color: var(--text-color);
+  font: inherit;
+  padding: 11px 12px;
+}
+
+.documentation-assistant-field textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.documentation-assistant-field textarea.documentation-assistant-field--tall {
+  min-height: 180px;
+}
+
+.documentation-assistant-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+}
+
+.documentation-assistant-section-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+}
+
+.documentation-assistant-output {
+  min-height: 280px;
+  white-space: pre-wrap;
+}
+
+.documentation-assistant-export-status {
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .documentation-assistant-page {
+    padding: 16px;
+  }
+
+  .documentation-assistant-hero,
+  .documentation-assistant-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .documentation-assistant-hero {
+    flex-direction: column;
+  }
+}

@@ -69,6 +69,7 @@ import { HospitalMapModule } from './modules/hospital-map';
 import { TelemetryModule } from './modules/telemetry';
 import { FleetModule } from './modules/fleet';
 import { WorkspaceIntelligenceModule } from './modules/workspace-intelligence/workspace-intelligence.module';
+import { SimulationModule } from './modules/simulation';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -195,6 +196,7 @@ function resolveDatabaseClient() {
     TelemetryModule,
     FleetModule,
     WorkspaceIntelligenceModule,
+    SimulationModule,
     ClinicalAlertsModule,
     PlatformSystemsModule,
 

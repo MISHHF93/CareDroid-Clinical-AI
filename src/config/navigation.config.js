@@ -1,8 +1,8 @@
 /**
  * Canonical clinical operating system navigation.
  *
- * Sidebar, mobile nav, and quick command destinations consume this module
- * directly. `navigation/primaryNavigation.js` is now a compatibility re-export.
+ * Sidebar/drawer and quick command destinations consume this module directly.
+ * `navigation/primaryNavigation.js` is now a compatibility re-export.
  */
 import { CANONICAL_ROUTES } from './routes.config';
 
@@ -35,8 +35,23 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
       '/clinical-tools',
       '/catalog',
       '/calculators',
+      CANONICAL_ROUTES.protocols,
+      CANONICAL_ROUTES.research,
+      CANONICAL_ROUTES.documentation,
+      CANONICAL_ROUTES.knowledgeGraph,
+      CANONICAL_ROUTES.predictiveAnalytics,
+      CANONICAL_ROUTES.clinicalDecisionSupport,
+      CANONICAL_ROUTES.competencies,
+      CANONICAL_ROUTES.credentials,
+      CANONICAL_ROUTES.simulation,
+      CANONICAL_ROUTES.simulationOutcomes,
+      CANONICAL_ROUTES.laboratory,
+      CANONICAL_ROUTES.medical3dViewer,
+      '/medical-simulation',
+      '/lab',
+      '/anatomy-viewer',
     ],
-    matchPrefixes: [`${CANONICAL_ROUTES.tools}/`],
+    matchPrefixes: [`${CANONICAL_ROUTES.tools}/`, `${CANONICAL_ROUTES.simulation}/`],
     excludePrefixes: [CANONICAL_ROUTES.developerCatalog],
   },
   {
@@ -44,7 +59,7 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     label: 'Operations',
     mobileLabel: 'Ops',
     path: CANONICAL_ROUTES.operations,
-    matchPaths: [CANONICAL_ROUTES.operations],
+    matchPaths: [CANONICAL_ROUTES.operations, CANONICAL_ROUTES.operationsCenter],
   },
   {
     id: 'profile',

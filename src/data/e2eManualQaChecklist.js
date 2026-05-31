@@ -89,7 +89,7 @@ export const E2E_MANUAL_QA_SECTIONS = Object.freeze([
       },
       {
         id: 'protocols',
-        steps: 'Open /tools/protocols; request ACLS summary.',
+        steps: 'Open /protocols; request ACLS summary.',
         expected: 'Guideline-style support; no autonomous orders.',
       },
     ],

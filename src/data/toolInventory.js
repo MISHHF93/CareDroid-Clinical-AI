@@ -37,6 +37,7 @@ import { FRONTEND_API_CALLS } from './frontendApiCallsInventory';
 import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInventory';
 import { PLATFORM_SYSTEM_CAPABILITIES, PLATFORM_SYSTEM_CAPABILITY_BY_ID } from './platformSystems';
 import { enrichToolWithSegmentation } from './profileToolSegmentation';
+import { buildPluginInventoryRecords, PLUGIN_REGISTRY } from './pluginRegistry';
 
 export const TOOL_INVENTORY_VERSION = 1;
 
@@ -218,6 +219,11 @@ const CLINICAL_INTELLIGENCE_PERMISSION_POLICIES = Object.freeze({
     logic: TOOL_PERMISSION_LOGIC.ALL,
     backendController: 'ClinicalIntelligenceController',
   }),
+  [REGISTRY.researchEvidenceHub]: Object.freeze({
+    permissions: Object.freeze(['USE_AI_CHAT']),
+    logic: TOOL_PERMISSION_LOGIC.ALL,
+    backendController: 'ClinicalIntelligenceController',
+  }),
   [REGISTRY.differentialAi]: Object.freeze({
     permissions: Object.freeze(['READ_PHI', 'USE_AI_CHAT']),
     logic: TOOL_PERMISSION_LOGIC.ALL,
@@ -334,12 +340,26 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.giCommandCenter]: 'src/pages/tools/GastroenterologyAssistantPage.jsx',
   [REGISTRY.ambientScribe]: 'src/pages/tools/AmbientScribe.jsx',
   [REGISTRY.guidelineRag]: 'src/pages/tools/GuidelineRag.jsx',
+  [REGISTRY.researchEvidenceHub]: 'src/pages/ResearchEvidenceHub.jsx',
   [REGISTRY.differentialAi]: 'src/pages/tools/DifferentialAi.jsx',
   [REGISTRY.timelineAi]: 'src/pages/tools/TimelineAi.jsx',
   [REGISTRY.patientSummaryAi]: 'src/pages/tools/PatientSummaryAi.jsx',
   [REGISTRY.orderSetAi]: 'src/pages/tools/OrderSetAi.jsx',
   [REGISTRY.aiExplainability]: 'src/pages/tools/AiExplainability.jsx',
   [REGISTRY.clinicalAudit]: 'src/pages/tools/ClinicalAudit.jsx',
+  [REGISTRY.clinicalDocumentationAssistant]: 'src/pages/ClinicalDocumentationAssistant.jsx',
+  [REGISTRY.clinicalKnowledgeGraph]: 'src/pages/ClinicalKnowledgeGraph.jsx',
+  [REGISTRY.predictiveAnalyticsDashboard]: 'src/pages/PredictiveAnalyticsDashboard.jsx',
+  [REGISTRY.clinicalDecisionSupport]: 'src/pages/ClinicalDecisionSupport.jsx',
+  [REGISTRY.competencyPlatform]: 'src/pages/Competencies.jsx',
+  [REGISTRY.credentialingPlatform]: 'src/pages/Credentials.jsx',
+  [REGISTRY.simulationSuite]: 'src/pages/MedicalSimulationSuite.jsx',
+  [REGISTRY.scenarioPlayer]: 'src/pages/SimulationScenarioPlayer.jsx',
+  [REGISTRY.simulationOutcomes]: 'src/pages/SimulationOutcomes.jsx',
+  [REGISTRY.debriefDashboard]: 'src/pages/SimulationScenarioPlayer.jsx',
+  [REGISTRY.competencyDashboard]: 'src/pages/SimulationOutcomes.jsx',
+  [REGISTRY.laboratoryDashboard]: 'src/pages/LaboratoryDashboard.jsx',
+  [REGISTRY.medical3dViewer]: 'src/pages/Medical3DViewer.jsx',
   [REGISTRY.calculatorRecommenderAi]: 'src/pages/tools/CalculatorRecommender.jsx',
   [REGISTRY.calculatorsHub]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.doseCalculator]: 'src/pages/tools/Calculators.jsx',
@@ -359,6 +379,7 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.resourceAllocationAssistant]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.deviceRecommendationAssistant]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.fleetCommand]: 'src/pages/fleet/FleetDashboard.jsx',
+  [REGISTRY.digitalOperationsCenter]: 'src/pages/DigitalOperationsCenter.jsx',
   [REGISTRY.fleetLiveMap]: 'src/pages/fleet/FleetLiveMap.jsx',
   [REGISTRY.predictiveMaintenance]: 'src/pages/fleet/PredictiveMaintenance.jsx',
   [REGISTRY.routeOptimizer]: 'src/pages/fleet/RouteOptimizer.jsx',
@@ -394,6 +415,9 @@ const DEFAULT_COLOR_BY_CATEGORY = Object.freeze({
   Diagnostic: '#FF6B9D',
   Calculator: '#95E1D3',
   Reference: '#A8E6CF',
+  'Education & Simulation': '#7C3AED',
+  Laboratory: '#0EA5A6',
+  Visualization: '#2563EB',
   Fleet: '#6C8CFF',
   Other: '#94A3B8',
   'Hospital Operations': '#0EA5A6',
@@ -411,6 +435,9 @@ function normalizeCategory(value) {
   if (category === 'interpreter') return 'interpreter';
   if (category === 'protocol') return 'protocol';
   if (category === 'reference') return 'reference';
+  if (category === 'education & simulation' || category === 'simulation') return 'simulation';
+  if (category === 'laboratory') return 'laboratory';
+  if (category === 'visualization') return 'visualization';
   if (category === 'fleet') return 'fleet';
   if (category === 'iot') return 'iot';
   if (category === 'hospital operations' || category === 'operations') return 'hospital-operations';
@@ -422,6 +449,9 @@ function presentationCategory(value) {
   if (category === 'diagnostic' || category === 'checker' || category === 'interpreter') return 'Diagnostic';
   if (category === 'calculator') return 'Calculator';
   if (category === 'reference' || category === 'protocol') return 'Reference';
+  if (category === 'simulation' || category === 'education & simulation') return 'Education & Simulation';
+  if (category === 'laboratory') return 'Laboratory';
+  if (category === 'visualization') return 'Visualization';
   if (category === 'fleet') return 'Fleet';
   if (category === 'iot') return 'IoT';
   if (category === 'hospital-operations') return 'Hospital Operations';
@@ -1026,6 +1056,7 @@ export function buildCanonicalToolInventory() {
   );
 
   records.push(...buildPlatformRecords());
+  records.push(...buildPluginInventoryRecords(PLUGIN_REGISTRY));
 
   return records.sort((a, b) => {
     const ak = `${a.sourceKind}:${a.label}:${a.id}`;
@@ -1057,7 +1088,8 @@ export function resolveToolInventoryRecord(id, records = getCanonicalToolInvento
   const byId = getToolInventoryById(records);
   if (byId[id]) return byId[id];
   const registryId = NLU_TO_REGISTRY_ID[id] || ORCHESTRATOR_TO_REGISTRY_ID[id] || null;
-  return registryId ? byId[registryId] || null : null;
+  if (registryId) return byId[registryId] || null;
+  return records.find((record) => (record.aliases || []).includes(id)) || null;
 }
 
 export function getCatalogToolInventory(records = getCanonicalToolInventory()) {

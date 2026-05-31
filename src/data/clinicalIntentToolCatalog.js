@@ -2368,6 +2368,174 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     backendExecutable: false,
   },
   {
+    toolId: NLU.laboratoryDashboard,
+    toolName: 'Laboratory Dashboard',
+    category: 'reference',
+    description:
+      'Demo laboratory dashboard for lab result review, specimen queues, abnormal alerts, reference ranges, panel trends, and lab interpreter handoff.',
+    path: TOOL_LAUNCH_PATHS.laboratory,
+    sidebarToolId: REGISTRY.laboratoryDashboard,
+    chatSeed:
+      'Open the Laboratory dashboard for demo lab results, abnormal lab alerts, specimen queue, reference ranges, and trend cards. Clearly distinguish demo data from live laboratory data and offer to use the Lab Interpreter for clinical decision support.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.simulationSuite,
+    toolName: 'Medical Simulation Suite',
+    category: 'reference',
+    description:
+      'Demo medical simulation suite for virtual patient cases, emergency scenarios, decision branching, scoring rubrics, and AI tutor debriefs.',
+    path: TOOL_LAUNCH_PATHS.simulation,
+    sidebarToolId: REGISTRY.simulationSuite,
+    chatSeed:
+      'Start the Medical Simulation Suite. Offer demo training scenarios such as sepsis deterioration, chest pain ACS, stroke alert, respiratory failure, trauma triage, DKA, pediatric fever, and medication safety. Clearly state this is training simulation only and not live patient data.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.clinicalDecisionSupport,
+    toolName: 'Clinical Decision Support Engine',
+    category: 'reference',
+    description:
+      'Patient-context-aware decision support for symptom intake, risk stratification, calculator recommendations, workflow, labs, imaging, escalation, and explainability.',
+    path: TOOL_LAUNCH_PATHS.clinicalDecisionSupport,
+    sidebarToolId: REGISTRY.clinicalDecisionSupport,
+    chatSeed:
+      'Open the Clinical Decision Support Engine. Use patient symptoms, profile context, workspace context, and calculator inventory to recommend risk stratification, calculators, workflows, labs, imaging, escalation, and explainability. Remind the user this is clinical decision support only.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.clinicalDocumentationAssistant,
+    toolName: 'Clinical Documentation Assistant',
+    category: 'reference',
+    description:
+      'AI-assisted documentation surface for SOAP notes, H&P notes, progress notes, discharge summaries, consultation notes, procedure notes, encounter summaries, patient instructions, and exportable clinician-reviewed drafts.',
+    path: TOOL_LAUNCH_PATHS.documentation,
+    sidebarToolId: REGISTRY.clinicalDocumentationAssistant,
+    chatSeed:
+      'Open the Clinical Documentation Assistant. Draft a note, summarize the encounter, or generate patient instructions with explicit clinician review and export-ready draft support.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.researchEvidenceHub,
+    toolName: 'Research and Evidence Hub',
+    category: 'reference',
+    description:
+      'Literature library, guideline library, evidence summaries, study tracker, and citation explorer with AI evidence summaries, guideline comparison, evidence briefs, and protocol/simulation links.',
+    path: TOOL_LAUNCH_PATHS.research,
+    sidebarToolId: REGISTRY.researchEvidenceHub,
+    chatSeed:
+      'Open the Research and Evidence Hub. Summarize evidence, compare guidelines, generate an evidence brief, and link findings to CareDroid protocols and simulations. Remind the user to verify source literature and local policy.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.clinicalKnowledgeGraph,
+    toolName: 'Clinical Knowledge Graph',
+    category: 'reference',
+    description:
+      'Graph explorer connecting calculators, protocols, simulations, laboratory values, devices, and AI workflows with relationship search and explainability.',
+    path: TOOL_LAUNCH_PATHS.knowledgeGraph,
+    sidebarToolId: REGISTRY.clinicalKnowledgeGraph,
+    chatSeed:
+      'Open the Clinical Knowledge Graph. Search and explain relationships across calculators, protocols, simulations, laboratory values, devices, and AI workflows. Keep explanations clinical-decision-support only.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.predictiveAnalyticsDashboard,
+    toolName: 'Predictive Analytics Dashboard',
+    category: 'reference',
+    description:
+      'Clearly labeled demo predictive analytics for deterioration risk, readmission risk, sepsis risk, ICU transfer risk, device failure risk, and fleet maintenance risk.',
+    path: TOOL_LAUNCH_PATHS.predictiveAnalytics,
+    sidebarToolId: REGISTRY.predictiveAnalyticsDashboard,
+    chatSeed:
+      'Open the Predictive Analytics Dashboard. Explain demo model predictions for deterioration, readmission, sepsis, ICU transfer, device failure, and fleet maintenance risk. State that predictions are decision support only.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.competencyPlatform,
+    toolName: 'Competency Platform',
+    category: 'reference',
+    description:
+      'Competency tracking platform for simulation completion, skill completion, training status, readiness, and competency gaps.',
+    path: TOOL_LAUNCH_PATHS.competencies,
+    sidebarToolId: REGISTRY.competencyPlatform,
+    chatSeed:
+      'Open the Competency Platform. Summarize simulation completion, skill completion, training status, competency gaps, and recommended practice from demo/local competency state.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.credentialingPlatform,
+    toolName: 'Credentialing Platform',
+    category: 'reference',
+    description:
+      'Credentialing platform for certifications, CME credits, renewal status, credential readiness, and training evidence.',
+    path: TOOL_LAUNCH_PATHS.credentials,
+    sidebarToolId: REGISTRY.credentialingPlatform,
+    chatSeed:
+      'Open the Credentialing Platform. Summarize certifications, CME credits, renewal status, training readiness, and credentialing gaps from demo/local credential state.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.scenarioPlayer,
+    toolName: 'Simulation Scenario Player',
+    category: 'reference',
+    description:
+      'Interactive demo scenario player with prebrief, vitals, labs, timeline, decisions, AI tutor hints, critical actions, and debrief.',
+    path: '/simulation/sepsis-deterioration',
+    sidebarToolId: REGISTRY.scenarioPlayer,
+    chatSeed:
+      'Launch the simulation scenario player. Recommend the best matching demo scenario, provide safe AI tutor hints, suggest calculators/tools, and remind the user this is training only and not live patient data.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.simulationOutcomes,
+    toolName: 'Simulation Outcomes',
+    category: 'reference',
+    description:
+      'Demo outcomes dashboard for scenario completion trends, learner progress, competency coverage, weak areas, and recommended practice.',
+    path: TOOL_LAUNCH_PATHS.simulationOutcomes,
+    sidebarToolId: REGISTRY.simulationOutcomes,
+    chatSeed:
+      'Open the Simulation Outcomes dashboard. Summarize completion trends, weak areas, competency coverage, and recommended practice from demo/local simulation state.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.debriefDashboard,
+    toolName: 'Simulation Debrief Dashboard',
+    category: 'reference',
+    description:
+      'Structured debrief view covering what happened, what went well, improvement areas, next actions, safety risks, evidence notes, and AI tutor feedback.',
+    path: '/simulation/sepsis-deterioration',
+    sidebarToolId: REGISTRY.debriefDashboard,
+    chatSeed:
+      'Generate a simulation debrief summary with correct actions, missed critical actions, safety risks, reflection prompts, and next recommended scenarios.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.competencyDashboard,
+    toolName: 'Simulation Competency Dashboard',
+    category: 'reference',
+    description:
+      'Competency dashboard for emergency stabilization, medication safety, communication, laboratory escalation, and operations coordination coverage.',
+    path: TOOL_LAUNCH_PATHS.simulationOutcomes,
+    sidebarToolId: REGISTRY.competencyDashboard,
+    chatSeed:
+      'Open the simulation competency dashboard and explain learner progress, weak areas, Kirkpatrick learning level, and recommended practice scenarios.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.medical3dViewer,
+    toolName: 'Medical 3D Viewer',
+    category: 'reference',
+    description:
+      'Asset-safe demo 3D viewer shell for anatomy, organ, model, and radiology-volume workflows without importing missing GLB/GLTF/DICOM assets.',
+    path: TOOL_LAUNCH_PATHS.medical3dViewer,
+    sidebarToolId: REGISTRY.medical3dViewer,
+    chatSeed:
+      'Open the 3D Viewer. Explain that the current route uses an asset-safe demo placeholder because no committed 3D model, Three.js dependency, or DICOM viewer is present. Offer anatomy/model viewer guidance without diagnostic claims.',
+    backendExecutable: false,
+  },
+  {
     toolId: 'procedures',
     toolName: 'Procedure Guide',
     category: 'reference',
@@ -2381,12 +2549,13 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
   },
   {
     toolId: 'protocol-lookup',
-    toolName: 'Clinical Protocol Lookup',
+    toolName: 'Protocol and Clinical Pathway Library',
     category: 'protocol',
-    description: 'Evidence-based protocols and pathways.',
-    path: '/tools/protocols',
+    description: 'Evidence-based protocol and clinical pathway viewer with calculators, simulations, version history, and AI explanation.',
+    path: TOOL_LAUNCH_PATHS.protocols,
     sidebarToolId: 'protocols',
-    chatSeed: 'Summarize the evidence-based protocol for this condition:',
+    chatSeed:
+      'Open the Protocol and Clinical Pathway Library. Explain the relevant pathway, version context, linked calculators, linked simulations, red flags, and decision-support limits.',
     backendExecutable: false,
   },
   {
@@ -2394,7 +2563,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     toolName: 'ACLS Protocol',
     category: 'protocol',
     description: 'Resuscitation algorithms.',
-    path: '/tools/protocols',
+    path: TOOL_LAUNCH_PATHS.protocols,
     sidebarToolId: 'acls-protocol',
     chatSeed: 'Walk me through the ACLS algorithm for this cardiac arrest scenario:',
     backendExecutable: false,
@@ -2404,7 +2573,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     toolName: 'ATLS Protocol',
     category: 'protocol',
     description: 'Trauma algorithms.',
-    path: '/tools/protocols',
+    path: TOOL_LAUNCH_PATHS.protocols,
     sidebarToolId: 'atls-protocol',
     chatSeed: 'Guide me through the ATLS primary survey for this trauma patient:',
     backendExecutable: false,
@@ -2443,6 +2612,18 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
     sidebarToolId: 'fleet-command',
     chatSeed:
       'Help me review fleet operations using the Fleet Command dashboard context: summarize active vs available vs on-job vehicles, flag maintenance and low-energy units, and discuss utilization and ETA patterns. Do not auto-dispatch or change assignments — recommend human dispatcher review.',
+    backendExecutable: false,
+  },
+  {
+    toolId: NLU.digitalOperationsCenter,
+    toolName: 'Digital Operations Center',
+    category: 'fleet',
+    description:
+      'Single operational command center combining Digital Twin, Hospital Map, Medical IoT, Fleet, Notifications, and System Health with role-based priority views.',
+    path: TOOL_LAUNCH_PATHS.operationsCenter,
+    sidebarToolId: REGISTRY.digitalOperationsCenter,
+    chatSeed:
+      'Open the Digital Operations Center. Combine Digital Twin, Hospital Map, Medical IoT, Fleet, Notifications, and System Health into a role-based operational command view. Keep recommendations as decision support and do not take operational actions automatically.',
     backendExecutable: false,
   },
   {

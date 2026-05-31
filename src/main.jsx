@@ -54,7 +54,31 @@ scheduleDeferredStartupTasks();
 
 
 
-if ('serviceWorker' in navigator) {
+const clearDevelopmentServiceWorkers = () => {
+  if (!('serviceWorker' in navigator)) return;
+
+  navigator.serviceWorker
+    .getRegistrations()
+    .then((registrations) =>
+      Promise.all(registrations.map((registration) => registration.unregister()))
+    )
+    .then(() => {
+      if (!('caches' in window)) return null;
+      return caches
+        .keys()
+        .then((cacheNames) => Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName))));
+    })
+    .then(() => {
+      logger.info('Development service workers and caches cleared');
+    })
+    .catch((error) => logger.warn('Failed to clear development service workers', { error }));
+};
+
+
+
+if (import.meta.env.DEV) {
+  runAfterFirstPaint(clearDevelopmentServiceWorkers, 500);
+} else if ('serviceWorker' in navigator) {
 
   runAfterFirstPaint(() => {
 

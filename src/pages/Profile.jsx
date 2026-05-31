@@ -5,6 +5,7 @@ import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { Permission, useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { buildCompetencyCredentialingSnapshot } from '../data/competencyCredentialingCatalog';
 import { toolRegistryById } from '../data/toolRegistry';
 import { fetchMyAuditLogs, fetchPhiAccessLogs } from '../services/auditApi';
 import './Profile.css';
@@ -92,6 +93,10 @@ const Profile = () => {
   const recentPhiCount = useMemo(
     () => activityState.logs.filter((log) => log.phiAccessed || log.action === 'PHI_ACCESS').length,
     [activityState.logs]
+  );
+  const competencySnapshot = useMemo(
+    () => buildCompetencyCredentialingSnapshot({ role, specialty }),
+    [role, specialty]
   );
 
   useEffect(() => {
@@ -209,6 +214,34 @@ const Profile = () => {
                 <p>No calculator history yet.</p>
               )}
             </div>
+          </div>
+
+          <div className="profile-overview-card profile-competency-status">
+            <div className="profile-overview-card__header">
+              <h3>Competency Status</h3>
+              <Link to="/competencies">View competencies</Link>
+            </div>
+            <div className="profile-competency-summary">
+              <div>
+                <strong>{competencySnapshot.summary.overallReadiness}%</strong>
+                <span>overall readiness</span>
+              </div>
+              <div>
+                <strong>{competencySnapshot.summary.activeCredentials}</strong>
+                <span>active credentials</span>
+              </div>
+            </div>
+            <div className="profile-competency-progress" aria-label="Profile competency readiness">
+              <span style={{ width: `${competencySnapshot.summary.overallReadiness}%` }} />
+            </div>
+            <div className="profile-overview-row">
+              <span>Training status: {competencySnapshot.summary.trainingStatus}</span>
+              <Link to="/credentials">Credentials</Link>
+            </div>
+            <p>
+              {competencySnapshot.competencyGaps.length} competency gaps tracked from simulation,
+              skill, CME, and certification state.
+            </p>
           </div>
 
           <div className="profile-overview-card">

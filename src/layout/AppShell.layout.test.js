@@ -123,6 +123,14 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellJsx).not.toContain('app-shell-theme-fab');
   });
 
+  it('uses the sidebar/drawer as the only authenticated navigation system', () => {
+    expect(appShellJsx).toContain('<Sidebar');
+    expect(appShellJsx).not.toContain('app-shell-bottom-nav');
+    expect(appShellJsx).not.toContain('PRIMARY_MOBILE_NAV_ITEMS.map');
+    expect(appShellCss).not.toContain('app-shell-bottom-nav');
+    expect(appShellCss).not.toContain('var(--app-bottom-nav-height, 56px)');
+  });
+
   it('defines one authenticated app shell header before route content', () => {
     expect(appShellJsx).toContain('<header className="app-shell-header"');
     expect(appShellJsx.match(/<header className="app-shell-header"/g)).toHaveLength(1);

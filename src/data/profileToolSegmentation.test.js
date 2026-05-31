@@ -68,6 +68,34 @@ describe('profile tool segmentation', () => {
     expect(graph.visibleTools.some((tool) => /governance|security|audit/i.test(`${tool.name} ${tool.id}`))).toBe(false);
   });
 
+  it('ignores malformed persisted preference lists instead of throwing', () => {
+    const profile = buildUserToolProfile({
+      user: { role: 'physician' },
+      toolPreferences: {
+        favorites: { bad: true },
+        pinned: null,
+        recentTools: 'lab-interp',
+        hiddenTools: 42,
+        profileSettings: { role: 'physician' },
+      },
+      preferences: {
+        toolPreferences: {
+          favoriteToolIds: { bad: true },
+          pinnedToolIds: 'qsofa',
+          recentToolIds: null,
+          hiddenToolIds: 42,
+        },
+      },
+      permissions: { invalid: true },
+    });
+
+    expect(profile.preferredTools).toEqual([]);
+    expect(profile.pinnedTools).toEqual([]);
+    expect(profile.recentTools).toEqual([]);
+    expect(profile.hiddenTools).toEqual([]);
+    expect(profile.permissions).toEqual(expect.arrayContaining(['READ_PHI', 'USE_CALCULATORS']));
+  });
+
   it('surfaces emergency physician tools', () => {
     const tools = getUserFacingToolRegistryProjection();
     const graph = buildProfileToolGraph({

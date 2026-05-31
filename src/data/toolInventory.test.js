@@ -24,6 +24,7 @@ import {
   ORCHESTRATOR_TO_REGISTRY_ID,
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
 } from './clinicalToolIdContract';
+import { PLUGIN_REGISTRY } from './pluginRegistry';
 import { CALCULATOR_ROUTE_DEFS } from '../routes/clinicalToolRoutes';
 
 const requiredFields = [
@@ -80,7 +81,7 @@ describe('canonical tool inventory', () => {
       expect(tool.name, tool.id).toBeTruthy();
       expect(tool.path, tool.id).toBeTruthy();
       expect(tool.category, tool.id).toMatch(
-        /Diagnostic|Calculator|Reference|Fleet|IoT|Hospital Operations|AI System|Other/
+        /Diagnostic|Calculator|Reference|Fleet|IoT|Hospital Operations|AI System|Education & Simulation|Laboratory|Visualization|Other/
       );
       expect(tool.color, tool.id).toMatch(/^#/);
       expect(Array.isArray(tool.features), tool.id).toBe(true);
@@ -235,6 +236,34 @@ describe('canonical tool inventory', () => {
       .filter((record) => record.surface === TOOL_SURFACES.CHAT_ASSISTED)
       .map((record) => record.nluToolId || record.id);
     expect(new Set(chatKeys).size).toBe(chatKeys.length);
+  });
+
+  it('integrates plugin registrations into canonical and user-facing inventory', () => {
+    const pluginIds = PLUGIN_REGISTRY.map((plugin) => plugin.id);
+    const canonicalById = new Map(records.map((record) => [record.id, record]));
+    const userFacingById = new Map(getUserFacingToolInventory(records).map((record) => [record.id, record]));
+
+    for (const plugin of PLUGIN_REGISTRY) {
+      const canonical = canonicalById.get(plugin.id);
+      expect(canonical, plugin.id).toBeTruthy();
+      expect(canonical).toMatchObject({
+        sourceKind: 'plugin',
+        status: plugin.lifecycle.status,
+        permissionPolicy: plugin.permissions,
+      });
+      expect(canonical.plugin).toMatchObject({
+        id: plugin.id,
+        type: plugin.type,
+        owner: plugin.owner,
+        version: plugin.version,
+      });
+      expect(userFacingById.get(plugin.id), plugin.id).toBeTruthy();
+    }
+
+    expect(resolveToolInventoryRecord('future-tool', records)?.id).toBe(
+      'plugin-fluid-resuscitation-calculator'
+    );
+    expect(pluginIds).toContain('plugin-guideline-copilot-extension');
   });
 
   it('projects audit records separately from the user-facing catalog', () => {

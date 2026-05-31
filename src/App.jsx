@@ -30,7 +30,10 @@ import {
   AUTH_SIGNUP_PATH_ALIASES,
   CALCULATORS_ROUTE_ALIASES,
   FLEET_MAP_ROUTE_ALIASES,
+  LABORATORY_ROUTE_ALIASES,
   LIVE_MAP_ROUTE_ALIASES,
+  MEDICAL_3D_VIEWER_ROUTE_ALIASES,
+  SIMULATION_ROUTE_ALIASES,
   TOOLS_ROUTE_ALIASES,
 } from './config/routes.config';
 import {
@@ -89,6 +92,19 @@ const TrainingDashboard = lazyWithRetry(() => import('./pages/TrainingDashboard'
 const AiEvaluationDashboard = lazyWithRetry(() => import('./pages/AiEvaluationDashboard'));
 const AiCommandCenterDashboard = lazyWithRetry(() => import('./pages/AiCommandCenterDashboard'));
 const Operations = lazyWithRetry(() => import('./pages/Operations'));
+const DigitalOperationsCenter = lazyWithRetry(() => import('./pages/DigitalOperationsCenter'));
+const ResearchEvidenceHub = lazyWithRetry(() => import('./pages/ResearchEvidenceHub'));
+const ClinicalDocumentationAssistant = lazyWithRetry(() => import('./pages/ClinicalDocumentationAssistant'));
+const ClinicalKnowledgeGraph = lazyWithRetry(() => import('./pages/ClinicalKnowledgeGraph'));
+const PredictiveAnalyticsDashboard = lazyWithRetry(() => import('./pages/PredictiveAnalyticsDashboard'));
+const ClinicalDecisionSupport = lazyWithRetry(() => import('./pages/ClinicalDecisionSupport'));
+const Competencies = lazyWithRetry(() => import('./pages/Competencies'));
+const Credentials = lazyWithRetry(() => import('./pages/Credentials'));
+const MedicalSimulationSuite = lazyWithRetry(() => import('./pages/MedicalSimulationSuite'));
+const SimulationScenarioPlayer = lazyWithRetry(() => import('./pages/SimulationScenarioPlayer'));
+const SimulationOutcomes = lazyWithRetry(() => import('./pages/SimulationOutcomes'));
+const LaboratoryDashboard = lazyWithRetry(() => import('./pages/LaboratoryDashboard'));
+const Medical3DViewer = lazyWithRetry(() => import('./pages/Medical3DViewer'));
 const LiveTrackingMap = lazyWithRetry(() => import('./pages/LiveTrackingMap'));
 const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
 const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
@@ -552,6 +568,11 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/operations-center',
+      element: <DigitalOperationsCenter />,
+      requiresAuth: true,
+    },
+    {
       path: '/workflows',
       element: <WorkflowBuilderPage />,
       requiresAuth: true,
@@ -865,6 +886,92 @@ function AppRoutes() {
       element: <LegacyProtectedRouteRedirect to="/tools/calculators" />,
       requiresAuth: true,
     })),
+    {
+      path: '/documentation',
+      element: <ClinicalDocumentationAssistant />,
+      requiresAuth: true,
+    },
+    {
+      path: '/knowledge-graph',
+      element: <ClinicalKnowledgeGraph />,
+      requiresAuth: true,
+    },
+    {
+      path: '/predictive-analytics',
+      element: <PredictiveAnalyticsDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/clinical-decision-support',
+      element: <ClinicalDecisionSupport />,
+      requiresAuth: true,
+    },
+    {
+      path: '/competencies',
+      element: <Competencies />,
+      requiresAuth: true,
+    },
+    {
+      path: '/credentials',
+      element: <Credentials />,
+      requiresAuth: true,
+    },
+    {
+      path: '/simulation',
+      element: <MedicalSimulationSuite />,
+      requiresAuth: true,
+    },
+    {
+      path: '/simulation/outcomes',
+      element: <SimulationOutcomes />,
+      requiresAuth: true,
+    },
+    {
+      path: '/simulation/sepsis-deterioration',
+      element: <SimulationScenarioPlayer />,
+      requiresAuth: true,
+    },
+    {
+      path: '/simulation/:scenarioId',
+      element: <SimulationScenarioPlayer />,
+      requiresAuth: true,
+    },
+    ...SIMULATION_ROUTE_ALIASES.map((path) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to="/simulation" />,
+      requiresAuth: true,
+    })),
+    {
+      path: '/laboratory',
+      element: <LaboratoryDashboard />,
+      requiresAuth: true,
+    },
+    ...LABORATORY_ROUTE_ALIASES.map((path) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to="/laboratory" />,
+      requiresAuth: true,
+    })),
+    {
+      path: '/3d-viewer',
+      element: <Medical3DViewer />,
+      requiresAuth: true,
+    },
+    ...MEDICAL_3D_VIEWER_ROUTE_ALIASES.map((path) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to="/3d-viewer" />,
+      requiresAuth: true,
+    })),
+    {
+      path: '/protocols',
+      element: <Protocols />,
+      requiresAuth: true,
+    },
+    {
+      path: '/research',
+      element: <ResearchEvidenceHub />,
+      requiresAuth: true,
+      permission: Permission.USE_AI_CHAT,
+    },
     {
       path: '/tools/protocols',
       element: <Protocols />,

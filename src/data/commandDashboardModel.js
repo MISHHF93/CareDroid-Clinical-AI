@@ -14,11 +14,109 @@ export const COMMAND_DASHBOARD_PROMPTS = Object.freeze([
     description: 'Open the focused assistant workspace with a case-first prompt.',
   },
   {
+    id: 'clinical-decision-support',
+    title: 'Clinical decision support',
+    prompt: 'Open clinical decision support for this patient presentation.',
+    toolId: REGISTRY.clinicalDecisionSupport,
+    description: 'Risk stratify symptoms and recommend calculators, workflows, labs, imaging, and escalation.',
+  },
+  {
+    id: 'open-protocol-library',
+    title: 'Open protocol library',
+    prompt: 'Open the protocol and clinical pathway library for this case.',
+    toolId: REGISTRY.protocols,
+    description: 'Review pathways, version history, linked calculators, simulations, and AI explanations.',
+  },
+  {
+    id: 'open-research-hub',
+    title: 'Open research hub',
+    prompt: 'Open the Research and Evidence Hub for this clinical topic.',
+    toolId: REGISTRY.researchEvidenceHub,
+    description: 'Review literature, guidelines, evidence summaries, study tracking, and citations.',
+  },
+  {
+    id: 'draft-documentation',
+    title: 'Draft documentation',
+    prompt: 'Open the Clinical Documentation Assistant to draft a note for this encounter.',
+    toolId: REGISTRY.clinicalDocumentationAssistant,
+    description: 'Draft SOAP, H&P, progress, discharge, consult, procedure, and patient instruction notes.',
+  },
+  {
+    id: 'open-knowledge-graph',
+    title: 'Open knowledge graph',
+    prompt: 'Open the Clinical Knowledge Graph and show relationships for this case.',
+    toolId: REGISTRY.clinicalKnowledgeGraph,
+    description: 'Explore calculators, protocols, simulations, labs, devices, and AI workflow relationships.',
+  },
+  {
+    id: 'open-predictive-analytics',
+    title: 'Open predictive analytics',
+    prompt: 'Open predictive analytics and show demo risk predictions.',
+    toolId: REGISTRY.predictiveAnalyticsDashboard,
+    description: 'Review deterioration, readmission, sepsis, ICU, device, and fleet maintenance predictions.',
+  },
+  {
+    id: 'open-operations-center',
+    title: 'Open operations center',
+    prompt: 'Open the Digital Operations Center for the current operational role.',
+    toolId: REGISTRY.digitalOperationsCenter,
+    description: 'Combine Digital Twin, Hospital Map, Medical IoT, Fleet, Notifications, and System Health.',
+  },
+  {
     id: 'interpret-labs',
     title: 'Interpret labs',
     prompt: 'Interpret these lab results and flag critical values:',
     toolId: REGISTRY.labInterp,
     description: 'Launch the lab interpreter workflow or seed assistant guidance.',
+  },
+  {
+    id: 'open-laboratory',
+    title: 'Show lab dashboard',
+    prompt: 'Open the laboratory dashboard and show abnormal labs.',
+    toolId: REGISTRY.laboratoryDashboard,
+    description: 'Review demo lab results, specimen queue, reference ranges, and trends.',
+  },
+  {
+    id: 'start-simulation',
+    title: 'Start simulation',
+    prompt: 'Start a medical simulation scenario.',
+    toolId: REGISTRY.simulationSuite,
+    description: 'Launch demo virtual patient training scenarios with AI tutor context.',
+  },
+  {
+    id: 'practice-sepsis-case',
+    title: 'Practice sepsis case',
+    prompt: 'Practice the sepsis deterioration simulation case.',
+    toolId: REGISTRY.scenarioPlayer,
+    description: 'Open the scenario player with vitals, labs, decisions, checklist, and debrief.',
+  },
+  {
+    id: 'show-simulation-outcomes',
+    title: 'Show simulation outcomes',
+    prompt: 'Show my simulation outcomes and competency weak areas.',
+    toolId: REGISTRY.simulationOutcomes,
+    description: 'Review demo completion trends, competency coverage, and recommended practice.',
+  },
+  {
+    id: 'show-competencies',
+    title: 'Show competencies',
+    prompt: 'Show my competency status and training gaps.',
+    toolId: REGISTRY.competencyPlatform,
+    description: 'Review simulation completion, skill completion, training status, and gaps.',
+  },
+  {
+    id: 'show-credentials',
+    title: 'Show credentials',
+    prompt: 'Show my credentials, certifications, and CME credits.',
+    toolId: REGISTRY.credentialingPlatform,
+    description: 'Review certifications, CME credits, renewal status, and credential readiness.',
+  },
+  {
+    id: 'open-3d-viewer',
+    title: 'Open 3D viewer',
+    prompt: 'Open the 3D anatomy viewer.',
+    toolId: REGISTRY.medical3dViewer,
+    description: 'Open the asset-safe medical model viewer fallback.',
   },
   {
     id: 'medication-safety',
@@ -38,6 +136,7 @@ export const COMMAND_DASHBOARD_PROMPTS = Object.freeze([
 
 export const COMMAND_DASHBOARD_GROUPS = Object.freeze({
   clinical: Object.freeze([
+    REGISTRY.clinicalDecisionSupport,
     REGISTRY.qsofa,
     REGISTRY.news2,
     REGISTRY.sofaScore,
@@ -49,6 +148,7 @@ export const COMMAND_DASHBOARD_GROUPS = Object.freeze({
   ]),
   reference: Object.freeze([
     REGISTRY.guidelineRag,
+    REGISTRY.researchEvidenceHub,
     REGISTRY.drugCheck,
     REGISTRY.labInterp,
     REGISTRY.abgInterpreter,
@@ -71,6 +171,17 @@ export const COMMAND_DASHBOARD_GROUPS = Object.freeze({
     REGISTRY.medicalIotDashboard,
     REGISTRY.telemetryMonitoring,
     REGISTRY.deviceMaintenance,
+  ]),
+  expandedCare: Object.freeze([
+    REGISTRY.competencyPlatform,
+    REGISTRY.credentialingPlatform,
+    REGISTRY.simulationSuite,
+    REGISTRY.scenarioPlayer,
+    REGISTRY.simulationOutcomes,
+    REGISTRY.debriefDashboard,
+    REGISTRY.competencyDashboard,
+    REGISTRY.laboratoryDashboard,
+    REGISTRY.medical3dViewer,
   ]),
 });
 
@@ -223,6 +334,9 @@ export function buildCommandDashboardModel(tools = getUserFacingToolRegistryProj
     ...selectToolsByIds(COMMAND_DASHBOARD_GROUPS.medicalIot, byId),
     ...fallbackMedicalIotTools(allTools),
   ]).slice(0, 3);
+  const expandedCareFeatured = uniqueById([
+    ...selectToolsByIds(COMMAND_DASHBOARD_GROUPS.expandedCare, byId),
+  ]);
 
   return {
     allTools,
@@ -234,6 +348,7 @@ export function buildCommandDashboardModel(tools = getUserFacingToolRegistryProj
       referenceGuidelines: referenceFeatured,
       fleetOperations: fleetFeatured,
       medicalIot: medicalIotFeatured,
+      expandedCare: expandedCareFeatured,
     },
     stats: {
       totalTools: allTools.length,

@@ -87,7 +87,7 @@ describe('primaryNavigation', () => {
     }
   });
 
-  it('keeps mobile navigation compact and canonical', () => {
+  it('keeps the compact drawer navigation subset canonical', () => {
     expect(PRIMARY_MOBILE_NAV_ITEMS.map((item) => item.path)).toEqual([
       '/dashboard',
       '/assistant',

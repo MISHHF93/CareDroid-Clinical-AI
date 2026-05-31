@@ -59,7 +59,7 @@
 
 .quick-command--mobile .quick-command-panel {
   right: max(10px, env(safe-area-inset-right, 0px));
-  bottom: calc(var(--app-bottom-nav-height, 56px) + max(8px, env(safe-area-inset-bottom, 0px)));
+  bottom: max(10px, env(safe-area-inset-bottom, 0px));
   left: max(10px, env(safe-area-inset-left, 0px));
   width: auto;
   max-height: min(72dvh, 680px);

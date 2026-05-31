@@ -301,7 +301,7 @@ export function formatToolAuditMarkdown(data = buildToolAuditData()) {
       `Shared backend endpoint groups: ${data.conflictSummary.sharedBackendEndpoints.length}`,
     ]),
     '',
-    'Shared route groups are expected for hub/chat/shared pages such as `/tools/calculators`, `/tools/lab-interpreter`, `/tools/protocols`, and specialty assistant surfaces. They are still listed in `TOOL_REGISTRY_STATUS.json` for review.',
+    'Shared route groups are expected for hub/chat/shared pages such as `/tools/calculators`, `/tools/lab-interpreter`, `/protocols`, and specialty assistant surfaces. They are still listed in `TOOL_REGISTRY_STATUS.json` for review.',
     '',
     '## Broken Connections',
     '',

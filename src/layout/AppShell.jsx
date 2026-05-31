@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import Sidebar from '../components/Sidebar';
 import WorkspaceSwitcher from '../components/WorkspaceSwitcher';
 import { NavIcon } from '../navigation/NavIcon';
-import { CHROME_ICONS, getNavIcon } from '../navigation/iconRegistry';
-import { PRIMARY_MOBILE_NAV_ITEMS, primaryNavPathMatches } from '../config/navigation.config';
+import { CHROME_ICONS } from '../navigation/iconRegistry';
 import { useDrawerFocus } from '../hooks/useDrawerFocus';
 import QuickCommandLauncher from '../components/QuickCommandLauncher';
 import {
@@ -30,7 +29,6 @@ const AppShell = ({
 }) => {
   const { preference, resolvedTheme, setPreference } = useTheme();
   const location = useLocation();
-  const navigate = useNavigate();
 
   const [isCompact, setIsCompact] = useState(getIsCompactViewport);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -76,14 +74,6 @@ const AppShell = ({
   ]
     .filter(Boolean)
     .join(' ');
-
-  const handlePrimaryNav = useCallback(
-    (path) => {
-      navigate({ pathname: path, search: '' });
-      closeMobileNav();
-    },
-    [closeMobileNav, navigate]
-  );
 
   useEffect(() => {
     closeMobileNav();
@@ -202,29 +192,6 @@ const AppShell = ({
             resolvedTheme={resolvedTheme}
             onCycleTheme={cycleTheme}
           />
-        )}
-        {isAuthed && isCompact && (
-          <nav className="app-shell-bottom-nav" aria-label="Primary navigation">
-            {PRIMARY_MOBILE_NAV_ITEMS.map((item) => {
-              const isActive = primaryNavPathMatches(item, location.pathname);
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  className={`app-shell-bottom-nav__item${isActive ? ' app-shell-bottom-nav__item--active' : ''}`}
-                  onClick={() => handlePrimaryNav(item.path)}
-                  aria-current={isActive ? 'page' : undefined}
-                >
-                  <span className="app-shell-bottom-nav__icon" aria-hidden>
-                    <NavIcon icon={getNavIcon(item.id)} size={18} />
-                  </span>
-                  <span className="app-shell-bottom-nav__label">
-                    {item.mobileLabel || item.label}
-                  </span>
-                </button>
-              );
-            })}
-          </nav>
         )}
         <main className={mainContentClassName} data-layout-role="MainContent" id="main-content">
           {isAuthed && isDevAuthBypass && (

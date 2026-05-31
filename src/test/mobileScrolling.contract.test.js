@@ -100,21 +100,14 @@ describe('mobile scrolling contracts', () => {
 
   it.each(REQUIRED_MOBILE_SCROLL_WIDTHS)('validates scroll contract at %ipx width', (width) => {
     const drawerWidth = Math.min(280, width * 0.88);
-    const bottomNavMinimum = 6 * 44 + 5 * 2 + 10;
 
     expect(drawerWidth, `${width}px drawer should fit viewport`).toBeLessThanOrEqual(width);
-    expect(
-      bottomNavMinimum,
-      `${width}px bottom nav should fit six primary items`
-    ).toBeLessThanOrEqual(width);
     expect(indexCss).toMatch(/body\s*\{[\s\S]*overflow-x:\s*clip/);
     expect(layoutVisibilityCss).toMatch(/body\s*\{[\s\S]*overflow-x:\s*clip/);
     expect(appShellCss).toMatch(
       /@media \(max-width: 900px\)[\s\S]*\.app-shell-main-wrap[\s\S]*margin-left:\s*0/
     );
-    expect(appShellCss).toMatch(
-      /\.app-shell-bottom-nav[\s\S]*grid-template-columns:\s*repeat\(auto-fit,\s*minmax\(44px,\s*1fr\)\)/
-    );
+    expect(appShellCss).not.toContain('app-shell-bottom-nav');
     expect(sidebarCss).toContain('width: var(--sidebar-drawer-max-width, min(280px, 88vw))');
   });
 });

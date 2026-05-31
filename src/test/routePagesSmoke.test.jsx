@@ -20,9 +20,11 @@ import PatientSummaryAi from '../pages/tools/PatientSummaryAi';
 import OrderSetAi from '../pages/tools/OrderSetAi';
 import AiExplainability from '../pages/tools/AiExplainability';
 import ClinicalAudit from '../pages/tools/ClinicalAudit';
+import Protocols from '../pages/tools/Protocols';
 import Artifacts from '../pages/Artifacts';
 import MemoryDashboard from '../pages/MemoryDashboard';
 import TrainingDashboard from '../pages/TrainingDashboard';
+import AnalyticsDashboard from '../pages/AnalyticsDashboard';
 import CostAnalyticsDashboard from '../pages/CostAnalyticsDashboard';
 import AiEvaluationDashboard from '../pages/AiEvaluationDashboard';
 import AiCommandCenterDashboard from '../pages/AiCommandCenterDashboard';
@@ -31,6 +33,19 @@ import PlatformGovernanceWorkspace from '../pages/platform/PlatformGovernanceWor
 import SystemHealth from '../pages/SystemHealth';
 import CommandDashboard from '../pages/CommandDashboard';
 import Dashboard from '../pages/Dashboard';
+import DigitalOperationsCenter from '../pages/DigitalOperationsCenter';
+import ResearchEvidenceHub from '../pages/ResearchEvidenceHub';
+import ClinicalDocumentationAssistant from '../pages/ClinicalDocumentationAssistant';
+import ClinicalKnowledgeGraph from '../pages/ClinicalKnowledgeGraph';
+import PredictiveAnalyticsDashboard from '../pages/PredictiveAnalyticsDashboard';
+import ClinicalDecisionSupport from '../pages/ClinicalDecisionSupport';
+import Competencies from '../pages/Competencies';
+import Credentials from '../pages/Credentials';
+import MedicalSimulationSuite from '../pages/MedicalSimulationSuite';
+import SimulationScenarioPlayer from '../pages/SimulationScenarioPlayer';
+import SimulationOutcomes from '../pages/SimulationOutcomes';
+import LaboratoryDashboard from '../pages/LaboratoryDashboard';
+import Medical3DViewer from '../pages/Medical3DViewer';
 import LiveTrackingMap from '../pages/LiveTrackingMap';
 import HospitalMapDashboard from '../pages/HospitalMapDashboard';
 import MedicalIotDashboard from '../pages/MedicalIotDashboard';
@@ -321,6 +336,20 @@ vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
 const PAGE_BY_ID = {
   dashboard: CommandDashboard,
   assistant: Dashboard,
+  'operations-center': DigitalOperationsCenter,
+  research: ResearchEvidenceHub,
+  documentation: ClinicalDocumentationAssistant,
+  'knowledge-graph': ClinicalKnowledgeGraph,
+  'predictive-analytics': PredictiveAnalyticsDashboard,
+  'clinical-decision-support': ClinicalDecisionSupport,
+  protocols: Protocols,
+  competencies: Competencies,
+  credentials: Credentials,
+  simulation: MedicalSimulationSuite,
+  'simulation-scenario': SimulationScenarioPlayer,
+  'simulation-outcomes': SimulationOutcomes,
+  laboratory: LaboratoryDashboard,
+  '3d-viewer': Medical3DViewer,
   'live-map': LiveTrackingMap,
   'hospital-map': HospitalMapDashboard,
   'medical-iot': MedicalIotDashboard,
@@ -341,6 +370,7 @@ const PAGE_BY_ID = {
   artifacts: Artifacts,
   memory: MemoryDashboard,
   training: TrainingDashboard,
+  analytics: AnalyticsDashboard,
   costs: CostAnalyticsDashboard,
   'ai-evaluation': AiEvaluationDashboard,
   'ai-command-center': AiCommandCenterDashboard,

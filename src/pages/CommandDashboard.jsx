@@ -7,6 +7,7 @@ import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
+import ProfileToolGraphCard from '../components/ProfileToolGraphCard';
 import { AdaptiveDashboardPanel } from './PlatformOSPages';
 import { getCommandDashboardModel } from '../data/commandDashboardModel';
 import {
@@ -117,6 +118,34 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     description: 'Open the focused calculator hub and severity scores.',
     path: CANONICAL_ROUTES.calculators,
     icon: CHROME_ICONS.calculator,
+  },
+  {
+    id: 'simulation',
+    label: 'Medical Simulation',
+    description: 'Practice demo scenarios with outcomes, competency, and AI tutor debrief.',
+    path: CANONICAL_ROUTES.simulation,
+    icon: CHROME_ICONS.training,
+  },
+  {
+    id: 'simulation-outcomes',
+    label: 'Simulation Outcomes',
+    description: 'Review demo learner progress, weak areas, and competency coverage.',
+    path: CANONICAL_ROUTES.simulationOutcomes,
+    icon: CHROME_ICONS.barChart,
+  },
+  {
+    id: 'laboratory',
+    label: 'Laboratory',
+    description: 'Review demo lab results, specimen queue, abnormal alerts, and trends.',
+    path: CANONICAL_ROUTES.laboratory,
+    icon: CHROME_ICONS.tools,
+  },
+  {
+    id: '3d-viewer',
+    label: '3D Viewer',
+    description: 'Open an asset-safe anatomy and medical model viewer fallback.',
+    path: CANONICAL_ROUTES.medical3dViewer,
+    icon: CHROME_ICONS.artifacts,
   },
   {
     id: 'digital-twin',
@@ -363,6 +392,8 @@ export default function CommandDashboard() {
 
       <AdaptiveDashboardPanel />
 
+      <ProfileToolGraphCard />
+
       <DashboardPanel
         title="Quick Actions"
         description="One compact entry point for every major CareDroid work area."
@@ -446,6 +477,18 @@ export default function CommandDashboard() {
           </div>
         </DashboardPanel>
       </section>
+
+      <DashboardPanel
+        title="Simulation, Lab, and 3D"
+        description="Newly wired demo-ready clinical training, laboratory, and visualization surfaces."
+        icon={CHROME_ICONS.sparkles}
+      >
+        <div className="command-launch-grid">
+          {model.panels.expandedCare.map((tool) => (
+            <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
+          ))}
+        </div>
+      </DashboardPanel>
 
       <DashboardPanel
         title="AI Assistant"

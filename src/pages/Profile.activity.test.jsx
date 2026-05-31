@@ -80,6 +80,13 @@ describe('Profile activity audit visibility', () => {
       'href',
       '/settings'
     );
+    expect(screen.getByText(/competency status/i)).toBeInTheDocument();
+    expect(screen.getByText(/overall readiness/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /view competencies/i })).toHaveAttribute(
+      'href',
+      '/competencies'
+    );
+    expect(screen.getByRole('link', { name: /credentials/i })).toHaveAttribute('href', '/credentials');
     expect(screen.queryByRole('link', { name: /audit logs/i })).not.toBeInTheDocument();
   });
 

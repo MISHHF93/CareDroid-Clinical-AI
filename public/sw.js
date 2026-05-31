@@ -8,6 +8,10 @@
  */
 
 const CACHE_NAME = 'caredroid-v5-static-shell';
+const IS_LOCAL_DEV =
+  self.location.hostname === 'localhost' ||
+  self.location.hostname === '127.0.0.1' ||
+  self.location.hostname === '[::1]';
 const APP_SHELL_URLS = [
   '/',
   '/index.html',
@@ -20,6 +24,11 @@ const APP_SHELL_URLS = [
 
 // Install event - cache essential files
 self.addEventListener('install', (event) => {
+  if (IS_LOCAL_DEV) {
+    event.waitUntil(self.skipWaiting());
+    return;
+  }
+
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('Service Worker: Caching app shell');
@@ -31,6 +40,20 @@ self.addEventListener('install', (event) => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
+  if (IS_LOCAL_DEV) {
+    event.waitUntil(
+      caches
+        .keys()
+        .then((cacheNames) => Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName))))
+        .then(() => self.registration.unregister())
+        .then(() => self.clients.matchAll({ type: 'window' }))
+        .then((clients) => {
+          clients.forEach((client) => client.navigate(client.url));
+        })
+    );
+    return;
+  }
+
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -52,6 +75,11 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   if (request.method !== 'GET' || url.origin !== self.location.origin) {
+    return;
+  }
+
+  if (IS_LOCAL_DEV) {
+    event.respondWith(fetch(request));
     return;
   }
 
@@ -172,13 +200,11 @@ async function syncDataWithServer() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        timestamp: localStorage.getItem('lastSyncTime') || 0,
+        timestamp: 0,
       }),
     });
 
     if (response.ok) {
-      localStorage.setItem('lastSyncTime', Date.now());
-
       // Notify all clients of successful sync
       const clients = await self.clients.matchAll();
       clients.forEach((client) => {

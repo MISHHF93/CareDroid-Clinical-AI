@@ -228,6 +228,10 @@ function unique(values) {
   return [...new Set(values.filter(Boolean))];
 }
 
+function list(value) {
+  return Array.isArray(value) ? value : [];
+}
+
 function normalizeKey(value) {
   return String(value || '')
     .trim()
@@ -270,6 +274,7 @@ export function buildUserToolProfile({
   permissions,
 } = {}) {
   const toolProfileSettings = toolPreferences.profileSettings || {};
+  const preferencesToolPrefs = preferences?.toolPreferences || {};
   const role = inferRole({ account, user, toolProfileSettings });
   const defaults = ROLE_DEFAULTS[role] || ROLE_DEFAULTS['medical student'];
   const specialty = normalizeSpecialty(
@@ -291,11 +296,11 @@ export function buildUserToolProfile({
     department,
     workspace,
     permissionLevel,
-    permissions: unique([...(permissions || []), ...(defaults.permissions || [])]),
-    preferredTools: unique([...(toolPreferences.favorites || []), ...(preferences?.toolPreferences?.favoriteToolIds || [])]),
-    recentTools: unique([...(toolPreferences.recentTools || []), ...(preferences?.toolPreferences?.recentToolIds || [])]),
-    pinnedTools: unique([...(toolPreferences.pinned || []), ...(preferences?.toolPreferences?.pinnedToolIds || [])]),
-    hiddenTools: unique([...(toolPreferences.hiddenTools || []), ...(preferences?.toolPreferences?.hiddenToolIds || [])]),
+    permissions: unique([...list(permissions), ...list(defaults.permissions)]),
+    preferredTools: unique([...list(toolPreferences.favorites), ...list(preferencesToolPrefs.favoriteToolIds)]),
+    recentTools: unique([...list(toolPreferences.recentTools), ...list(preferencesToolPrefs.recentToolIds)]),
+    pinnedTools: unique([...list(toolPreferences.pinned), ...list(preferencesToolPrefs.pinnedToolIds)]),
+    hiddenTools: unique([...list(toolPreferences.hiddenTools), ...list(preferencesToolPrefs.hiddenToolIds)]),
     clinicalAccess: ['clinician', 'admin', 'learner', 'research'].includes(permissionLevel),
     operationsAccess: ['operations', 'admin'].includes(permissionLevel) || defaults.permissions?.includes('VIEW_OPERATIONS'),
     trainingLevel: toolProfileSettings.trainingLevel || (permissionLevel === 'learner' ? 'student' : defaults.permissionLevel),
@@ -335,6 +340,7 @@ export function deriveToolSegmentationMetadata(tool) {
   const isFleet = category === 'fleet' || tool.surface === 'fleet-page' || matchesAny(text, ['fleet', 'dispatch', 'route optimizer', 'predictive maintenance']);
   const isIot = category === 'iot' || tool.surface === 'iot-dashboard' || matchesAny(text, ['iot', 'device', 'telemetry', 'biomedical']);
   const isOperations = category === 'hospital operations' || tool.surface === 'hospital-operations' || matchesAny(text, ['hospital command', 'operations', 'occupancy', 'resource allocation']);
+  const isSimulation = category === 'education & simulation' || matchesAny(text, ['simulation', 'scenario', 'debrief', 'competency', 'training']);
   const isAdmin = matchesAny(text, ['governance', 'security', 'audit', 'regulatory', 'privacy', 'observability', 'system health', 'validation']);
   const isCardiology = matchesAny(text, ['cardio', 'heart', 'acs', 'stemi', 'timi', 'grace', 'chads', 'cha2ds2', 'has-bled', 'ecg', 'atrial', 'arrhythmia']);
   const isEmergency = matchesAny(text, ['emergency', 'trauma', 'qsofa', 'sofa', 'news2', 'perc', 'wells', 'nihss', 'stroke', 'sepsis', 'heart score']);
@@ -381,6 +387,21 @@ export function deriveToolSegmentationMetadata(tool) {
     departments.push('operations', 'ICU');
     workspaceTags.push('hospital-operations', 'operations');
     requiredPermissions.push('VIEW_OPERATIONS');
+  }
+
+  if (isSimulation) {
+    intendedRoles.push(
+      'emergency physician',
+      'nurse',
+      'medical student',
+      'ICU clinician',
+      'biomedical engineer',
+      'fleet operator'
+    );
+    specialties.push('emergency medicine', 'critical care', 'medical education', 'operations');
+    departments.push('emergency', 'ICU', 'operations', 'biomedical engineering');
+    workspaceTags.push('simulation', 'education', 'clinical', 'training');
+    requiredPermissions.push('USE_AI_CHAT');
   }
 
   if (isCardiology) {
@@ -431,6 +452,7 @@ export function deriveToolSegmentationMetadata(tool) {
     requiredPermissions.push('USE_CALCULATORS');
   }
   if (category === 'reference') workspaceTags.push('reference');
+  if (category === 'education & simulation') workspaceTags.push('simulation', 'education');
   if (category === 'diagnostic') workspaceTags.push('diagnostic');
   if (isClinicalAi) requiredPermissions.push('USE_AI_CHAT');
   if (tool.launchType === 'backend-backed' || tool.executorStatus === 'registered') requiredPermissions.push('USE_AI_CHAT');

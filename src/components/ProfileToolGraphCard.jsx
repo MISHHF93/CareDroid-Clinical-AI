@@ -12,6 +12,41 @@ import {
 } from '../data/profileToolSegmentation';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
+import './ProfileToolGraphCard.css';
+
+const EMPTY_GRAPH = Object.freeze({
+  visibleTools: [],
+  recommendedTools: [],
+  restrictedTools: [],
+  pinnedTools: [],
+  favoriteTools: [],
+  recentTools: [],
+  specialtyTools: [],
+  workspaceTools: [],
+  counts: {
+    visible: 0,
+    recommended: 0,
+    restricted: 0,
+    pinned: 0,
+    favorites: 0,
+    recent: 0,
+    specialtyCoverage: 0,
+  },
+});
+
+const FALLBACK_PROFILE = Object.freeze({
+  role: 'medical student',
+  specialty: 'medical education',
+  workspace: 'all',
+  pinnedTools: [],
+  recentTools: [],
+  preferredTools: [],
+  hiddenTools: [],
+});
+
+function safeArray(value) {
+  return Array.isArray(value) ? value : [];
+}
 
 function ToolButton({ tool, onLaunch }) {
   return (
@@ -31,46 +66,82 @@ export default function ProfileToolGraphCard() {
   const { selectTool, setActiveTool, addMessage } = useConversation();
 
   const tools = useMemo(() => getUserFacingToolRegistryProjection(), []);
+  const safeToolPreferences = useMemo(
+    () => ({
+      ...toolPreferences,
+      favorites: safeArray(toolPreferences?.favorites),
+      pinned: safeArray(toolPreferences?.pinned),
+      recentTools: safeArray(toolPreferences?.recentTools),
+      hiddenTools: safeArray(toolPreferences?.hiddenTools),
+      profileSettings:
+        toolPreferences?.profileSettings && typeof toolPreferences.profileSettings === 'object'
+          ? toolPreferences.profileSettings
+          : {},
+      recordToolAccess:
+        typeof toolPreferences?.recordToolAccess === 'function'
+          ? toolPreferences.recordToolAccess
+          : () => {},
+    }),
+    [toolPreferences]
+  );
   const localActiveWorkspace = useMemo(
-    () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
+    () => safeArray(workspaces).find((workspace) => workspace.id === activeWorkspaceId),
     [activeWorkspaceId, workspaces]
   );
   const profile = useMemo(
-    () =>
-      buildUserToolProfile({
-        account,
-        user,
-        preferences,
-        activeWorkspace: activeWorkspace || localActiveWorkspace,
-        activeWorkspaceId: workspaceState?.activeWorkspaceId || activeWorkspaceId,
-        toolPreferences,
-        permissions: workspaceState?.effectivePermissions || [],
-      }),
+    () => {
+      try {
+        return buildUserToolProfile({
+          account,
+          user,
+          preferences,
+          activeWorkspace: activeWorkspace || localActiveWorkspace,
+          activeWorkspaceId: workspaceState?.activeWorkspaceId || activeWorkspaceId,
+          toolPreferences: safeToolPreferences,
+          permissions: safeArray(workspaceState?.effectivePermissions),
+        });
+      } catch {
+        return FALLBACK_PROFILE;
+      }
+    },
     [
       account,
       activeWorkspace,
       activeWorkspaceId,
       localActiveWorkspace,
       preferences,
-      toolPreferences,
+      safeToolPreferences,
       user,
       workspaceState?.activeWorkspaceId,
       workspaceState?.effectivePermissions,
     ]
   );
-  const graph = useMemo(() => buildProfileToolGraph({ tools, profile }), [profile, tools]);
+  const graph = useMemo(() => {
+    try {
+      return buildProfileToolGraph({ tools, profile });
+    } catch {
+      return { ...EMPTY_GRAPH, profile };
+    }
+  }, [profile, tools]);
   const assistantRecommendations = useMemo(
-    () => getProfileAssistantRecommendations(profile, tools, 4),
+    () => {
+      try {
+        return getProfileAssistantRecommendations(profile, tools, 4);
+      } catch {
+        return [];
+      }
+    },
     [profile, tools]
   );
 
   const launchTool = (tool) => {
+    if (!tool?.id) return;
     applyRegistryToolLaunch(tool.id, {
       navigate,
       addMessage,
       selectTool,
       setActiveTool,
-      recordToolAccess: toolPreferences.recordToolAccess,
+      recordToolAccess: safeToolPreferences.recordToolAccess,
     });
   };
 

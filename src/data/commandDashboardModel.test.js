@@ -14,6 +14,7 @@ describe('command dashboard model', () => {
       ...model.panels.referenceGuidelines,
       ...model.panels.fleetOperations,
       ...model.panels.medicalIot,
+      ...model.panels.expandedCare,
     ];
 
     expect(model.stats.totalTools).toBe(inventory.length);
@@ -26,6 +27,17 @@ describe('command dashboard model', () => {
     expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.fleetCommand);
     expect(model.panels.fleetOperations.map((tool) => tool.id)).toContain(REGISTRY.deviceFleetManagement);
     expect(model.panels.medicalIot.map((tool) => tool.id)).toContain(REGISTRY.medicalIotDashboard);
+    expect(model.panels.expandedCare.map((tool) => tool.id)).toEqual([
+      REGISTRY.competencyPlatform,
+      REGISTRY.credentialingPlatform,
+      REGISTRY.simulationSuite,
+      REGISTRY.scenarioPlayer,
+      REGISTRY.simulationOutcomes,
+      REGISTRY.debriefDashboard,
+      REGISTRY.competencyDashboard,
+      REGISTRY.laboratoryDashboard,
+      REGISTRY.medical3dViewer,
+    ]);
     for (const tool of featured) {
       expect(inventoryIds.has(tool.id), tool.id).toBe(true);
     }

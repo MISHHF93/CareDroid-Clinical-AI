@@ -178,4 +178,30 @@ describe('QuickCommandLauncher', () => {
     expect(toolIds).toEqual(expect.arrayContaining(['wells-pe', 'perc', 'grace-acs']));
     expect(toolIds).not.toContain('calculators');
   });
+
+  it('finds simulation, laboratory, and 3D viewer launch entries', () => {
+    const entries = buildQuickCommandEntries({
+      tools: getUserFacingToolRegistryProjection(),
+      recentToolIds: [],
+    });
+    const toolIds = entries.toolEntries.map((entry) => entry.sourceId);
+
+    expect(toolIds).toEqual(
+      expect.arrayContaining([
+        'digital-operations-center',
+        'clinical-documentation-assistant',
+        'research-evidence-hub',
+        'clinical-knowledge-graph',
+        'predictive-analytics-dashboard',
+        'clinical-decision-support',
+        'competency-platform',
+        'credentialing-platform',
+        'simulation-suite',
+        'scenario-player',
+        'simulation-outcomes',
+        'laboratory-dashboard',
+        'medical-3d-viewer',
+      ])
+    );
+  });
 });

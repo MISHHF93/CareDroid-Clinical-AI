@@ -886,7 +886,7 @@ export const SEGMENT_INVENTORY = Object.freeze([
     id: 'mobile-shell',
     label: 'Mobile Shell and Responsive UX',
     area: SEGMENT_AREAS.MOBILE,
-    purpose: 'Compact app shell, sidebar drawer, bottom nav, safe areas, and responsive regression ownership.',
+    purpose: 'Compact app shell, sidebar drawer, safe areas, and responsive regression ownership.',
     status: SEGMENT_STATUSES.PARTIALLY_BUILT,
     frontendOnlyType: null,
     backendOnlyType: null,

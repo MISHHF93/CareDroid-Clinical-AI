@@ -12,12 +12,26 @@ export const CANONICAL_ROUTES = Object.freeze({
   assistant: '/assistant',
   tools: '/tools',
   operations: '/operations',
+  operationsCenter: '/operations-center',
   calculators: '/tools/calculators',
   calculatorDetail: '/tools/calculators/:slug',
+  protocols: '/protocols',
+  research: '/research',
+  documentation: '/documentation',
+  knowledgeGraph: '/knowledge-graph',
+  predictiveAnalytics: '/predictive-analytics',
+  clinicalDecisionSupport: '/clinical-decision-support',
+  competencies: '/competencies',
+  credentials: '/credentials',
+  simulation: '/simulation',
+  simulationOutcomes: '/simulation/outcomes',
+  laboratory: '/laboratory',
+  medical3dViewer: '/3d-viewer',
   liveMap: '/live-map',
   hospitalMap: '/hospital-map',
   medicalIot: '/medical-iot',
   devices: '/devices',
+  fleetCommand: '/fleet/command',
   fleetMap: '/fleet/map',
   digitalTwin: '/digital-twin',
   profile: '/profile',
@@ -69,6 +83,9 @@ export const AUTH_SIGNUP_PATH_ALIASES = Object.freeze([
 export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot']);
 export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog']);
 export const CALCULATORS_ROUTE_ALIASES = Object.freeze(['/calculators']);
+export const SIMULATION_ROUTE_ALIASES = Object.freeze(['/medical-simulation']);
+export const LABORATORY_ROUTE_ALIASES = Object.freeze(['/lab']);
+export const MEDICAL_3D_VIEWER_ROUTE_ALIASES = Object.freeze(['/anatomy-viewer']);
 export const LIVE_MAP_ROUTE_ALIASES = Object.freeze(['/maps', '/tracking', '/live-tracking']);
 export const FLEET_MAP_ROUTE_ALIASES = Object.freeze([
   '/fleet',
@@ -88,6 +105,18 @@ export const ROUTE_ALIAS_GROUPS = Object.freeze({
   calculators: Object.freeze({
     target: CANONICAL_ROUTES.calculators,
     aliases: CALCULATORS_ROUTE_ALIASES,
+  }),
+  simulation: Object.freeze({
+    target: CANONICAL_ROUTES.simulation,
+    aliases: SIMULATION_ROUTE_ALIASES,
+  }),
+  laboratory: Object.freeze({
+    target: CANONICAL_ROUTES.laboratory,
+    aliases: LABORATORY_ROUTE_ALIASES,
+  }),
+  medical3dViewer: Object.freeze({
+    target: CANONICAL_ROUTES.medical3dViewer,
+    aliases: MEDICAL_3D_VIEWER_ROUTE_ALIASES,
   }),
   liveMap: Object.freeze({ target: CANONICAL_ROUTES.liveMap, aliases: LIVE_MAP_ROUTE_ALIASES }),
   fleetMap: Object.freeze({ target: CANONICAL_ROUTES.fleetMap, aliases: FLEET_MAP_ROUTE_ALIASES }),
