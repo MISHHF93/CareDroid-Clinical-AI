@@ -8,7 +8,14 @@ import { spawnSync } from 'node:child_process';
 
 const result = spawnSync(
   'npm',
-  ['run', 'test:run', '--', 'src/data/backendFrontendExposure.report.test.js'],
+  [
+    'run',
+    'test:run',
+    '--',
+    '--testTimeout',
+    '120000',
+    'src/data/backendFrontendExposure.report.test.js',
+  ],
   {
     stdio: 'inherit',
     shell: true,

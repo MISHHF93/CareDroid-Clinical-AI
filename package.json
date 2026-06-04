@@ -43,6 +43,7 @@
     "orphan-detection:write-docs": "node scripts/write-orphan-detection-report.mjs",
     "duplicate-system-audit:write-docs": "node scripts/write-duplicate-system-audit.mjs",
     "product-packaging-audit:write-docs": "node scripts/write-product-packaging-audit.mjs",
+    "closure-audit:write-docs": "node scripts/run-closure-audit-sequence.mjs",
     "contract:write-docs": "node scripts/write-backend-frontend-tool-contract.mjs",
     "test:contract-matrix": "vitest run src/data/backendFrontendToolContract.test.js src/data/backendFrontendToolContract.report.test.js src/data/toolContractMatrix.test.js",
     "test:backend-exposure": "vitest run src/data/backendFrontendExposure.test.js src/data/backendFrontendExposure.report.test.js src/data/backendFrontendToolContract.test.js src/data/executorMappingAudit.test.js src/data/backendOrphanAudit.test.js src/data/backendControllerRouteScan.test.js src/config/backendApiCapabilities.test.js src/services/clinicalOrchestratorApi.test.js src/services/clinicalToolsApi.test.js src/services/complianceApi.test.js",

@@ -2,7 +2,22 @@
 
 **Purpose:** Verify **actual** implementation status across platform initiatives (not roadmap intent).  
 **Audit date:** 2026-06-04  
+**Git baseline:** `829bda4` (`main`) — multi-tenant platform assets + product catalog merge  
 **Method:** Codebase inspection — backend modules, frontend routes/services, contract inventories, and cross-references. No runtime smoke test was executed for this document.
+
+**Closure sequence:** This document is **Prompt 1 of 10**. Run the full pipeline via [closure-audit-sequence.md](./closure-audit-sequence.md) (`npm run closure-audit:write-docs` for regenerable audits).
+
+| Child audit (Prompt) | Document |
+|----------------------|----------|
+| 2 Feature coverage | [feature-coverage-matrix.md](./feature-coverage-matrix.md) |
+| 3 SaaS compliance | [saas-compliance-audit.md](./saas-compliance-audit.md) · [CARE_DROID_SAAS_ARCHITECTURE_CHARTER.md](./CARE_DROID_SAAS_ARCHITECTURE_CHARTER.md) |
+| 4 Orphans | [orphan-detection-report.md](./orphan-detection-report.md) |
+| 5 Duplicates | [duplicate-system-audit.md](./duplicate-system-audit.md) |
+| 6 Packaging | [product-packaging-audit.md](./product-packaging-audit.md) |
+| 7 UX | [ux-simplification-audit.md](./ux-simplification-audit.md) |
+| 8 Deploy | [deployment-truth-audit.md](./deployment-truth-audit.md) |
+| 9 Readiness | [platform-readiness-score.md](./platform-readiness-score.md) |
+| 10 Roadmap | [final-saas-migration-execution-plan.md](./final-saas-migration-execution-plan.md) |
 
 ---
 
@@ -509,6 +524,7 @@ npm test -- --testPathPattern="backendOrphanAudit|canonicalConfig|toolInventory"
 
 ## Related documents
 
+- [Closure audit sequence](./closure-audit-sequence.md) — **run this instead of random prompts**
 - [Asset-based platform migration report](./asset-based-platform-migration-report.md)
 - [Platform transformation roadmap](./caredroid-platform-transformation-roadmap.md)
 - [Solution packs](./solution-packs.md)
@@ -522,3 +538,4 @@ npm test -- --testPathPattern="backendOrphanAudit|canonicalConfig|toolInventory"
 | Date | Change |
 |------|--------|
 | 2026-06-04 | Initial master verification audit (26 initiatives) |
+| 2026-06-04 | Linked closure sequence + child audits; baseline `829bda4` |

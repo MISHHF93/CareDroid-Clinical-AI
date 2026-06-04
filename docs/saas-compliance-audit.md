@@ -4,7 +4,7 @@ Generated: 2026-06-04 (regenerate with `npm run saas-compliance-audit:write-docs
 
 ## Charter reference
 
-**Note:** `CARE_DROID_SAAS_ARCHITECTURE_CHARTER.md` was **not found** in the repository root or `docs/`. This audit applies the charter checklist from the audit request and aligns with [asset-based-platform-migration-report.md](./asset-based-platform-migration-report.md) and [caredroid-platform-transformation-roadmap.md](./caredroid-platform-transformation-roadmap.md).
+Audited against [`CARE_DROID_SAAS_ARCHITECTURE_CHARTER.md`](../CARE_DROID_SAAS_ARCHITECTURE_CHARTER.md).
 
 ### Charter rules verified
 
@@ -23,8 +23,8 @@ Generated: 2026-06-04 (regenerate with `npm run saas-compliance-audit:write-docs
 | Surfaces audited | 316 |
 | User-facing registry tools | 291 |
 | Seeded `platform_assets` | 59 |
-| Fully charter-compliant (strict) | 39 |
-| Rows with ≥1 violation | 277 |
+| Fully charter-compliant (strict) | 43 |
+| Rows with ≥1 violation | 273 |
 | Registry tools without platform asset row | 254 |
 | Seeded assets without pack | 8 AI agents + 0 other |
 
@@ -140,16 +140,12 @@ CareDroid runs a **dual registry**: 291 user-facing tools in `toolInventory.js` 
 - **Workflow Builder** (`—`, /workflows) — No workspace alias or asset id for `enabledToolIds` scoping
 
 
-### Every asset can be assigned to a role (11 violations)
+### Every asset can be assigned to a role (7 violations)
 
 - **3D Medical Viewer** (`—`, /3d-viewer) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
 - **Platform Analytics** (`—`, /platform-analytics) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
 - **Integration Marketplace** (`—`, /integrations-marketplace) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
 - **Product Catalog** (`—`, /products) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
-- **Command Dashboard** (`dashboard`, /dashboard) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
-- **Digital Twin** (`digital-twin`, /digital-twin) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
-- **Medical IoT Dashboard** (`medical-iot`, /medical-iot) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
-- **Laboratory Dashboard** (`laboratory`, /laboratory) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
 - **Hospital Map** (`hospital-map`, /hospital-map) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
 - **User Welcome** (`—`, /welcome) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
 - **Workflow Builder** (`—`, /workflows) — Not in role profile `preferredAssetIds` and no explicit asset `roleProfiles`
@@ -250,11 +246,11 @@ Assets in `SEED_PLATFORM_ASSETS` without pack assignment:
 | Platform Analytics | /platform-analytics | platform-analytics | — | — | No | — | Missing / partial | everything-is-asset; tenant-assignable; workspace-assignable; role-assignable; governance-metadata; lifecycle-status |
 | Integration Marketplace | /integrations-marketplace | integrations-marketplace | — | — | No | — | Missing / partial | everything-is-asset; tenant-assignable; workspace-assignable; role-assignable; governance-metadata; lifecycle-status |
 | Product Catalog | /products | products-catalog | — | — | No | — | Missing / partial | everything-is-asset; tenant-assignable; workspace-assignable; role-assignable; governance-metadata; lifecycle-status |
-| Command Dashboard | /dashboard | dashboard | dashboard | core-platform | Yes | active | Complete (seed template) | role-assignable |
-| Digital Twin | /digital-twin | digital-twin | digital-twin | hospital-operations, digital-twin-pack | Yes | active | Complete (seed template) | role-assignable |
+| Command Dashboard | /dashboard | dashboard | dashboard | core-platform | Yes | active | Complete (seed template) | — |
+| Digital Twin | /digital-twin | digital-twin | digital-twin | hospital-operations, digital-twin-pack | Yes | active | Complete (seed template) | — |
 | Fleet Command | /fleet/command | fleet-dashboard | fleet-dashboard | hospital-operations | Yes | active | Complete (seed template) | — |
-| Medical IoT Dashboard | /medical-iot | medical-iot | medical-iot | medical-iot-pack | Yes | active | Complete (seed template) | role-assignable |
-| Laboratory Dashboard | /laboratory | laboratory | laboratory | laboratory-intelligence | Yes | active | Complete (seed template) | role-assignable |
+| Medical IoT Dashboard | /medical-iot | medical-iot | medical-iot | medical-iot-pack | Yes | active | Complete (seed template) | — |
+| Laboratory Dashboard | /laboratory | laboratory | laboratory | laboratory-intelligence | Yes | active | Complete (seed template) | — |
 | Hospital Map | /hospital-map | hospital-map | hospital-map | emergency-medicine, hospital-operations, emergency-department-pack, digital-twin-pack | Yes | active | Complete (seed template) | role-assignable |
 | User Welcome | /welcome | welcome | — | — | No | — | Missing / partial | everything-is-asset; tenant-assignable; workspace-assignable; role-assignable; governance-metadata; lifecycle-status |
 | Asset Pack Marketplace | /asset-packs | asset-packs-marketplace | — | — | No | — | Missing / partial | everything-is-asset; tenant-assignable; workspace-assignable; governance-metadata; lifecycle-status |

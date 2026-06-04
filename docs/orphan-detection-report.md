@@ -15,7 +15,7 @@ Generated: 2026-06-04 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 391 |
+| Total orphan findings | 346 |
 | App.jsx routes | 212 |
 | Orphan / gap routes | 181 |
 | Orphan pages | 27 |
@@ -24,11 +24,11 @@ Generated: 2026-06-04 (regenerate with `npm run orphan-detection:write-docs`)
 | Orphan services | 0 |
 | Executor contract gaps | 3 |
 | API orphans / stubs | 132 |
-| Weakly linked markdown | 45 |
+| Weakly linked markdown | 0 |
 | **wire** | 216 |
 | **merge** | 1 |
-| **quarantine** | 39 |
-| **legacy** | 135 |
+| **quarantine** | 2 |
+| **legacy** | 127 |
 
 ## Merge candidates (explicit)
 
@@ -427,53 +427,7 @@ _… and 12 more API rows._
 
 ## Orphan markdown (weak inbound links)
 
-| Doc | Class | Evidence |
-| --- | --- | --- |
-| docs/accessibility-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/auth-and-route-conflict-resolution-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/auth-route-rebuild-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/canonical-configuration-normalization-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/compact-ux-ui-flattening-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/config-layout-reconciliation-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/conflict-and-blocker-clearance-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/current-page-route-layout-investigation.md | quarantine | No inbound links from README, src, or other docs |
-| docs/dashboard-visualization-upgrade.md | quarantine | No inbound links from README, src, or other docs |
-| docs/design-language-navigation-normalization-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/duplicate-code-and-blocker-audit.md | quarantine | No inbound links from README, src, or other docs |
-| docs/emergency-critical-care-pr.md | quarantine | No inbound links from README, src, or other docs |
-| docs/full-platform-integration-execution-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/full-throttle-platform-consolidation-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/high-impact-ux-flattening-merge-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/live-tracking-maps-implementation-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/medical-expansion-cross-pack-validation.md | quarantine | No inbound links from README, src, or other docs |
-| docs/mobile-performance-audit.md | quarantine | No inbound links from README, src, or other docs |
-| docs/mobile-scrolling-fix-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/navigation-mismatch-fix-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/navigation-simplification-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/orphan-detection-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/page-inventory-ai-chatbot-flattening-plan.md | quarantine | No inbound links from README, src, or other docs |
-| docs/plan-execution-scan-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/plan-execution-status.md | quarantine | No inbound links from README, src, or other docs |
-| docs/plan-progress-dashboard.md | legacy | No inbound links from README, src, or other docs |
-| docs/platform-governance-execution-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/platform-integration-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/profile-tool-segmentation-validation-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/quick-command-layout-normalization.md | quarantine | No inbound links from README, src, or other docs |
-| docs/route-auth-rebuild-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/route-canonicalization-and-ux-flattening-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/route-health-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/saas-compliance-audit.md | legacy | No inbound links from README, src, or other docs |
-| docs/scrolling-and-layout-shell-fix-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/section-link-and-auth-flattening-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/segment-fragmentation-investigation.md | quarantine | No inbound links from README, src, or other docs |
-| docs/system-normalization-continuation-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/tech-stack-cohesion-and-isolation-audit.md | quarantine | No inbound links from README, src, or other docs |
-| docs/terminal-error-fix-and-wiring-report.md | legacy | No inbound links from README, src, or other docs |
-| docs/theme-color-system-revamp.md | quarantine | No inbound links from README, src, or other docs |
-| docs/ux-debt-report.md | quarantine | No inbound links from README, src, or other docs |
-| docs/ux-normalization-backend-wiring.md | quarantine | No inbound links from README, src, or other docs |
-| docs/ux-ui-scrolling-and-layout-evaluation.md | quarantine | No inbound links from README, src, or other docs |
-| docs/vercel-deployment-mismatch-report.md | quarantine | No inbound links from README, src, or other docs |
+_None detected._
 
 ## Appendix
 
