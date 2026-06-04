@@ -32,6 +32,12 @@ export class UserProfile {
   @Column({ type: 'varchar', length: 255, nullable: true })
   institution: string; // Will be encrypted at rest
 
+  @Column({ type: 'uuid', nullable: true })
+  organizationId: string | null;
+
+  @Column({ type: 'varchar', length: 80, nullable: true })
+  roleProfileId: string | null;
+
   @Column({ type: 'varchar', length: 100, nullable: true })
   specialty: string;
 

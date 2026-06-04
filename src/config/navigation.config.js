@@ -105,8 +105,47 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
       '/consent-history',
       '/two-factor-setup',
       '/biometric-setup',
+      '/welcome',
       '/onboarding',
     ],
+  },
+]);
+
+export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
+  {
+    id: 'products',
+    label: 'Products',
+    mobileLabel: 'Products',
+    path: CANONICAL_ROUTES.products,
+    matchPaths: [CANONICAL_ROUTES.products, CANONICAL_ROUTES.plans],
+    matchPrefixes: [`${CANONICAL_ROUTES.products}/`, `${CANONICAL_ROUTES.plans}`],
+    showInMobile: false,
+  },
+  {
+    id: 'specialties',
+    label: 'Specialties',
+    mobileLabel: 'Specialty',
+    path: CANONICAL_ROUTES.specialties,
+    matchPaths: [CANONICAL_ROUTES.specialties],
+    matchPrefixes: [`${CANONICAL_ROUTES.specialties}/`],
+    showInMobile: false,
+  },
+  {
+    id: 'care-pathways',
+    label: 'Pathways',
+    mobileLabel: 'Path',
+    path: CANONICAL_ROUTES.carePathways,
+    matchPaths: [CANONICAL_ROUTES.carePathways],
+    matchPrefixes: [`${CANONICAL_ROUTES.carePathways}/`],
+    showInMobile: false,
+  },
+  {
+    id: 'agents',
+    label: 'AI Agents',
+    mobileLabel: 'Agents',
+    path: CANONICAL_ROUTES.agents,
+    matchPaths: [CANONICAL_ROUTES.agents],
+    showInMobile: false,
   },
 ]);
 
@@ -315,9 +354,12 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
 
 export const PRIMARY_NAV_BY_ID = Object.freeze(
   Object.fromEntries(
-    [...PRIMARY_NAV_ITEMS, ...OPERATIONS_SIDEBAR_NAV_ITEMS, ...ADVANCED_SIDEBAR_NAV_ITEMS].map(
-      (item) => [item.id, item]
-    )
+    [
+      ...PRIMARY_NAV_ITEMS,
+      ...SOLUTIONS_SIDEBAR_NAV_ITEMS,
+      ...OPERATIONS_SIDEBAR_NAV_ITEMS,
+      ...ADVANCED_SIDEBAR_NAV_ITEMS,
+    ].map((item) => [item.id, item])
   )
 );
 
@@ -332,6 +374,7 @@ export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
 export const QUICK_COMMAND_NAV_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 export const QUICK_COMMAND_DESTINATION_ITEMS = Object.freeze([
   ...PRIMARY_SIDEBAR_NAV_ITEMS,
+  ...SOLUTIONS_SIDEBAR_NAV_ITEMS,
   ...OPERATIONS_SIDEBAR_NAV_ITEMS,
   ...ADVANCED_SIDEBAR_NAV_ITEMS,
   {
@@ -356,6 +399,7 @@ export function primaryNavPathMatches(item, pathname) {
 export function getPrimaryNavItemForPath(pathname) {
   return (
     PRIMARY_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
+    SOLUTIONS_SIDEBAR_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
     OPERATIONS_SIDEBAR_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
     ADVANCED_SIDEBAR_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
     null

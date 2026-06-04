@@ -131,12 +131,98 @@ const ProfileToolPreferences = lazyWithRetry(
 const ProfileWorkspaces = lazyWithRetry(() => import('./pages/profile/ProfileWorkspaces'));
 const ProfileSecurity = lazyWithRetry(() => import('./pages/profile/ProfileSecurity'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
+const {
+  OrganizationDashboard,
+  OrganizationSettings,
+  PackMarketplace,
+  AssetLifecycleAdmin,
+  AssetPacksPage,
+  PlatformAnalyticsPage,
+} = {
+  OrganizationDashboard: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.OrganizationDashboard }))
+  ),
+  OrganizationSettings: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.OrganizationSettings }))
+  ),
+  PackMarketplace: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.PackMarketplace }))
+  ),
+  AssetLifecycleAdmin: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.AssetLifecycleAdmin }))
+  ),
+  AssetPacksPage: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.AssetPacksPage }))
+  ),
+  PlatformAnalyticsPage: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.PlatformAnalyticsPage }))
+  ),
+};
 
 // Lazy-loaded pages for better performance (loaded on demand)
 const NotificationPreferences = lazyWithRetry(() => import('./pages/NotificationPreferences'));
 const TwoFactorSetup = lazyWithRetry(() => import('./pages/TwoFactorSetup'));
 const BiometricSetup = lazyWithRetry(() => import('./pages/BiometricSetup'));
-const Onboarding = lazyWithRetry(() => import('./pages/Onboarding'));
+const Welcome = lazyWithRetry(() => import('./pages/Welcome'));
+const {
+  ProductsIndexPage,
+  ProductDetailPage,
+  CommercialPlansPage,
+  SpecialtiesIndexPage,
+  SpecialtyDetailPage,
+  CarePathwaysIndexPage,
+  CarePathwayDetailPage,
+  AgentsRegistryPage,
+  MaturityAssessmentPage,
+  OutcomesDashboardPage,
+  IntegrationsMarketplacePage,
+  ConfigurationStudioPage,
+  OrganizationOnboardingPage,
+} = {
+  ProductsIndexPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ProductsIndexPage }))
+  ),
+  ProductDetailPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ProductDetailPage }))
+  ),
+  CommercialPlansPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.CommercialPlansPage }))
+  ),
+  SpecialtiesIndexPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.SpecialtiesIndexPage }))
+  ),
+  SpecialtyDetailPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.SpecialtyDetailPage }))
+  ),
+  CarePathwaysIndexPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.CarePathwaysIndexPage }))
+  ),
+  CarePathwayDetailPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.CarePathwayDetailPage }))
+  ),
+  AgentsRegistryPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.AgentsRegistryPage }))
+  ),
+  MaturityAssessmentPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.MaturityAssessmentPage }))
+  ),
+  OutcomesDashboardPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.OutcomesDashboardPage }))
+  ),
+  IntegrationsMarketplacePage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({
+      default: m.IntegrationsMarketplacePage,
+    }))
+  ),
+  ConfigurationStudioPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ConfigurationStudioPage }))
+  ),
+  OrganizationOnboardingPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({
+      default: m.OrganizationOnboardingPage,
+    }))
+  ),
+};
 const AnalyticsDashboard = lazyWithRetry(() => import('./pages/AnalyticsDashboard'));
 const CostAnalyticsDashboard = lazyWithRetry(() => import('./pages/CostAnalyticsDashboard'));
 const ConsentFlow = lazyWithRetry(() =>
@@ -1258,6 +1344,36 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/organization',
+      element: <OrganizationDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/settings/organization',
+      element: <OrganizationSettings />,
+      requiresAuth: true,
+    },
+    {
+      path: '/settings/organization/packs',
+      element: <PackMarketplace />,
+      requiresAuth: true,
+    },
+    {
+      path: '/settings/organization/assets',
+      element: <AssetLifecycleAdmin />,
+      requiresAuth: true,
+    },
+    {
+      path: '/asset-packs',
+      element: <AssetPacksPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/platform-analytics',
+      element: <PlatformAnalyticsPage />,
+      requiresAuth: true,
+    },
+    {
       path: '/notifications',
       element: <NotificationCenterPage />,
       requiresAuth: true,
@@ -1279,8 +1395,73 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/welcome',
+      element: <Welcome />,
+      requiresAuth: true,
+    },
+    {
       path: '/onboarding',
-      element: <Onboarding />,
+      element: <OrganizationOnboardingPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/products',
+      element: <ProductsIndexPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/products/:slug',
+      element: <ProductDetailPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/plans',
+      element: <CommercialPlansPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/specialties',
+      element: <SpecialtiesIndexPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/specialties/:slug',
+      element: <SpecialtyDetailPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/care-pathways',
+      element: <CarePathwaysIndexPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/care-pathways/:slug',
+      element: <CarePathwayDetailPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/agents',
+      element: <AgentsRegistryPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/maturity-assessment',
+      element: <MaturityAssessmentPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/outcomes',
+      element: <OutcomesDashboardPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/integrations-marketplace',
+      element: <IntegrationsMarketplacePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/configuration-studio',
+      element: <ConfigurationStudioPage />,
       requiresAuth: true,
     },
 

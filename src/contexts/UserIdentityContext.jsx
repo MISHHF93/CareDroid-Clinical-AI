@@ -4,6 +4,8 @@ import { useToolPreferences } from './ToolPreferencesContext';
 import { useUser } from './UserContext';
 import { useWorkspace } from './WorkspaceContext';
 import { UserIdentityApi } from '../services/userIdentityApi';
+import { PlatformAssetsApi } from '../services/platformAssetsApi';
+import { setPlatformEntitlementContext } from '../data/assetEntitlements';
 import logger from '../utils/logger';
 
 const BACKEND_TO_LOCAL_WORKSPACE = {
@@ -34,6 +36,11 @@ const UserIdentityContext = createContext({
   updateProfile: () => {},
   recordActivity: () => {},
   hasEffectivePermission: () => false,
+  platformContext: null,
+  refreshPlatformContext: () => {},
+  organization: null,
+  entitledAssetIds: [],
+  entitledPackIds: [],
 });
 
 export const useUserIdentity = () => {
@@ -149,6 +156,7 @@ export const UserIdentityProvider = ({ children }) => {
   const toolPrefs = useToolPreferences();
   const { preference: themePreference, setPreference } = useTheme();
   const [operationalProfile, setOperationalProfile] = useState(null);
+  const [platformContext, setPlatformContext] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -184,14 +192,38 @@ export const UserIdentityProvider = ({ children }) => {
     };
   }, []);
 
+  const refreshPlatformContext = useCallback(async () => {
+    if (!isAuthenticated && !authToken) {
+      setPlatformContext(null);
+      setPlatformEntitlementContext(null);
+      return null;
+    }
+    try {
+      const ctx = await PlatformAssetsApi.getContext();
+      setPlatformContext(ctx);
+      setPlatformEntitlementContext(ctx);
+      return ctx;
+    } catch (platformError) {
+      logger.warn('Platform context unavailable', { message: platformError?.message });
+      setPlatformContext(null);
+      setPlatformEntitlementContext(null);
+      return null;
+    }
+  }, [authToken, isAuthenticated]);
+
   const refreshIdentity = useCallback(async () => {
     if (!isAuthenticated && !authToken) {
       setOperationalProfile(null);
+      setPlatformContext(null);
+      setPlatformEntitlementContext(null);
       setError('');
       return null;
     }
     setIsLoading(true);
-    const result = await UserIdentityApi.fetchOperationalProfile();
+    const [result] = await Promise.all([
+      UserIdentityApi.fetchOperationalProfile(),
+      refreshPlatformContext(),
+    ]);
     setIsLoading(false);
     if (!result.ok) {
       logger.warn('Operational profile backend unavailable; using local identity fallback', {
@@ -205,7 +237,7 @@ export const UserIdentityProvider = ({ children }) => {
     setOperationalProfile(normalized);
     setError('');
     return normalized;
-  }, [authToken, fallbackProfile, isAuthenticated, normalizeProfile]);
+  }, [authToken, fallbackProfile, isAuthenticated, normalizeProfile, refreshPlatformContext]);
 
   useEffect(() => {
     refreshIdentity();
@@ -309,15 +341,22 @@ export const UserIdentityProvider = ({ children }) => {
       updateProfile,
       recordActivity,
       hasEffectivePermission,
+      platformContext,
+      refreshPlatformContext,
+      organization: platformContext?.organization || null,
+      entitledAssetIds: platformContext?.entitledAssetIds || [],
+      entitledPackIds: platformContext?.entitledPackIds || [],
     }),
     [
       activeWorkspace,
       error,
       hasEffectivePermission,
       isLoading,
+      platformContext,
       profile,
       recordActivity,
       refreshIdentity,
+      refreshPlatformContext,
       savePreferences,
       switchWorkspace,
       updateProfile,

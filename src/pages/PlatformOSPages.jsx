@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
@@ -19,6 +19,9 @@ import {
   workspaceFilterSummary,
 } from '../data/platformOperatingSystem';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
+import { PlatformAssetsApi } from '../services/platformAssetsApi';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { buildAssetInventoryProjection } from '../data/assetInventory';
 import { NavIcon } from '../navigation/NavIcon';
 import { getWorkspaceIcon } from '../navigation/iconRegistry';
 import './PlatformOSPages.css';
@@ -263,7 +266,14 @@ export function NotificationCenterPage() {
 }
 
 export function DigitalTwinPage() {
-  const twin = useMemo(() => buildDigitalTwinSnapshot(), []);
+  const { organization } = useUserIdentity();
+  const [twin, setTwin] = useState(() => buildDigitalTwinSnapshot());
+
+  useEffect(() => {
+    PlatformAssetsApi.getDigitalTwin(organization?.id)
+      .then(setTwin)
+      .catch(() => setTwin(buildDigitalTwinSnapshot()));
+  }, [organization?.id]);
   const detailRoutes = [
     { label: 'Hospital Map', path: '/hospital-map', description: 'Floors, rooms, beds, and alerts.' },
     { label: 'Medical IoT', path: '/medical-iot', description: 'Telemetry, devices, stale signals, and warnings.' },
@@ -374,25 +384,33 @@ export function AssetLibraryPage() {
   const [query, setQuery] = useState('');
   const [type, setType] = useState('all');
   const assets = useMemo(() => {
-    let items = buildAssetRegistry();
-    if (type !== 'all') items = items.filter((asset) => asset.type === type || asset.status === type);
+    let items = buildAssetInventoryProjection();
+    if (!items.length) items = buildAssetRegistry();
+    if (type !== 'all') {
+      items = items.filter(
+        (asset) => asset.assetType === type || asset.type === type || asset.status === type
+      );
+    }
     return filterText(items, query);
   }, [query, type]);
 
   return (
-    <PageShell eyebrow="Asset Registry" title="Asset Library" description="Manage icons, SVGs, images, templates, documents, protocols, usage, references, missing assets, and orphan assets.">
+    <PageShell eyebrow="Asset Registry" title="Asset Library" description="Platform assets projected from entitlements and tool inventory, with legacy artifact fallback.">
       <DataSourceNotice
-        label="Local Asset Projection"
-        detail="Assets are projected from local artifact metadata until AssetRegistryService is exposed by a backend controller."
+        label="Platform asset projection"
+        detail="Assets merge backend entitlements with canonical tool inventory. Legacy artifacts remain as fallback."
       />
       <FilterBar query={query} setQuery={setQuery} workspaceId="all" setWorkspaceId={() => {}} category={type} setCategory={setType} categories={['calculator', 'workflow', 'prompt', 'dashboard', 'template', 'protocol', 'telemetry_schema', 'map', 'ai_output', 'referenced', 'orphan-risk']} />
       <section className="platform-result-grid">
         {assets.map((asset) => (
           <article key={asset.id} className="platform-result-card platform-result-card--static">
-            <span className="platform-result-card__kind">{asset.type}</span>
+            <span className="platform-result-card__kind">{asset.assetType || asset.type}</span>
             <strong>{asset.title}</strong>
-            <span>{asset.description}</span>
-            <small>{asset.status} · {asset.usageCount} references · v{asset.version}</small>
+            <span>{asset.description || asset.category}</span>
+            <small>
+              {asset.lifecycle || asset.status}
+              {asset.entitled === false ? ' · not entitled' : ''}
+            </small>
           </article>
         ))}
       </section>

@@ -16,21 +16,34 @@ import {
   getUserFacingToolRegistryProjection,
   TOOL_LIFECYCLE_LABELS,
 } from '../../data/toolInventory';
+import {
+  ASSET_ACCESS_STATES,
+  filterVisibleTools,
+  getAssetAwareToolProjection,
+  groupToolsByAccessView,
+} from '../../data/assetAccess';
+import { getRoleBasedAssetRecommendations } from '../../data/assetRecommendation';
+import { FEATURE_FLAGS } from '../../config/featureFlags.config';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './ToolsOverview.css';
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
-  { value: 'all', label: 'All' },
-  { value: 'recommended', label: 'Recommended' },
+  { value: 'recommended', label: 'Recommended for Me' },
+  { value: 'workspace', label: 'My Workspace' },
+  { value: 'organization', label: 'My Organization' },
+  { value: 'permitted', label: 'All Permitted' },
   { value: 'calculator', label: 'Calculators' },
-  { value: 'diagnostics', label: 'Diagnostics' },
   { value: 'ai-workflows', label: 'AI Workflows' },
   { value: 'maps-iot', label: 'Maps & IoT' },
   { value: 'operations', label: 'Operations' },
+  { value: 'simulations', label: 'Simulations' },
+  { value: 'laboratory', label: 'Laboratory' },
+  { value: 'governance', label: 'Governance' },
   { value: 'favorites', label: 'Favorites' },
   { value: 'recent', label: 'Recent' },
+  { value: 'all', label: 'All (incl. locked)' },
 ]);
 
 const TOOL_FILTER_OPTION_VALUES = new Set(TOOL_FILTER_OPTIONS.map((option) => option.value));
@@ -66,8 +79,19 @@ function toolSearchBlob(tool) {
 }
 
 function matchesToolFilter(tool, filter) {
-  if (!filter || ['recommended', 'favorites', 'recent', 'all'].includes(filter)) {
+  if (!filter || ['recommended', 'favorites', 'recent', 'workspace', 'organization', 'permitted', 'all'].includes(filter)) {
     return true;
+  }
+  if (filter === 'simulations') {
+    return /simulation|scenario|competenc/i.test(`${tool.name} ${tool.description} ${tool.id}`);
+  }
+  if (filter === 'laboratory') {
+    return tool.category === 'Laboratory' || /lab|laboratory/i.test(`${tool.name} ${tool.path}`);
+  }
+  if (filter === 'governance') {
+    return /audit|governance|privacy|regulatory|compliance/i.test(
+      `${tool.name} ${tool.description} ${tool.category}`
+    );
   }
   if (filter === 'calculator') {
     return (
@@ -170,9 +194,38 @@ const ToolsOverview = () => {
   } = toolPreferences;
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
   const { user } = useUser();
-  const { account, preferences, activeWorkspace, workspaceState } = useUserIdentity();
+  const {
+    account,
+    preferences,
+    activeWorkspace,
+    workspaceState,
+    platformContext,
+    roleProfile,
+    organization,
+  } = useUserIdentity();
 
-  const tools = useMemo(() => getUserFacingToolRegistryProjection(), []);
+  const recommendations = useMemo(
+    () => getRoleBasedAssetRecommendations({ account, roleProfile }),
+    [account, roleProfile]
+  );
+  const recommendedIds = useMemo(() => recommendations.map((t) => t.id), [recommendations]);
+
+  const tools = useMemo(() => {
+    const projected = FEATURE_FLAGS.platformEntitlements
+      ? getAssetAwareToolProjection(platformContext, user?.role)
+      : getUserFacingToolRegistryProjection();
+    return filterVisibleTools(projected, { includeLocked: false });
+  }, [platformContext, user?.role]);
+
+  const accessGroups = useMemo(
+    () =>
+      groupToolsByAccessView(tools, {
+        favorites,
+        recent: recentTools,
+        recommendedIds,
+      }),
+    [tools, favorites, recentTools, recommendedIds]
+  );
   const toolById = useMemo(() => Object.fromEntries(tools.map((tool) => [tool.id, tool])), [tools]);
   const localActiveWorkspace = useMemo(
     () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
@@ -242,15 +295,6 @@ const ToolsOverview = () => {
     [isAllToolsWorkspace, profileFilteredTools, toolFilter, workspaceToolIdSet]
   );
   const searchQuery = normalizeSearch(search);
-  const filteredTools = useMemo(
-    () =>
-      workspaceTools.filter((tool) => {
-        if (!matchesToolFilter(tool, toolFilter)) return false;
-        if (!searchQuery) return true;
-        return toolSearchBlob(tool).includes(searchQuery);
-      }),
-    [workspaceTools, searchQuery, toolFilter]
-  );
   const recentToolItems = useMemo(
     () =>
       recentTools
@@ -258,6 +302,28 @@ const ToolsOverview = () => {
         .filter((tool) => tool && (isAllToolsWorkspace || workspaceToolIdSet.has(tool.id))),
     [isAllToolsWorkspace, recentTools, toolById, workspaceToolIdSet]
   );
+  const filteredTools = useMemo(() => {
+    let base = workspaceTools;
+    if (toolFilter === 'recommended') base = accessGroups.recommended;
+    else if (toolFilter === 'workspace') base = accessGroups.workspace;
+    else if (toolFilter === 'organization') base = accessGroups.organization;
+    else if (toolFilter === 'permitted') base = accessGroups.permitted;
+    else if (toolFilter === 'favorites') base = accessGroups.favorites;
+    else if (toolFilter === 'recent') base = recentToolItems;
+
+    return base.filter((tool) => {
+      if (toolFilter === 'all') return true;
+      if (!matchesToolFilter(tool, toolFilter)) return false;
+      if (!searchQuery) return true;
+      return toolSearchBlob(tool).includes(searchQuery);
+    });
+  }, [
+    workspaceTools,
+    searchQuery,
+    toolFilter,
+    accessGroups,
+    recentToolItems,
+  ]);
 
   const handleToolClick = (tool) => {
     applyRegistryToolLaunch(tool.id, {
@@ -505,6 +571,13 @@ const ToolsOverview = () => {
                   >
                     {lifecycleLabel(tool)}
                   </span>
+                  {tool.accessLabel ? (
+                    <span
+                      className={`tool-category tool-category--access tool-category--access-${tool.accessState}`}
+                    >
+                      {tool.accessLabel}
+                    </span>
+                  ) : null}
                   {tool.surface === 'chat-assisted' ? (
                     <span className="tool-category tool-category--guided">Guided</span>
                   ) : null}

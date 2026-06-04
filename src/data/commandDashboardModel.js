@@ -5,6 +5,8 @@ import {
   TOOL_LAUNCH_TYPES,
   TOOL_SURFACES,
 } from './toolInventory';
+import { getAssetAwareToolProjection } from './assetAccess';
+import { getRoleBasedAssetRecommendations } from './assetRecommendation';
 
 export const COMMAND_DASHBOARD_PROMPTS = Object.freeze([
   {
@@ -385,6 +387,17 @@ export function buildCommandDashboardModel(tools = getUserFacingToolRegistryProj
   };
 }
 
-export function getCommandDashboardModel() {
-  return buildCommandDashboardModel();
+export function getCommandDashboardModel(options = {}) {
+  const { platformContext, account, roleProfile, userRole = 'student' } = options;
+  const tools = platformContext
+    ? getAssetAwareToolProjection(platformContext, userRole)
+    : getUserFacingToolRegistryProjection();
+  const model = buildCommandDashboardModel(tools);
+  return {
+    ...model,
+    organization: platformContext?.organization || null,
+    entitledPackIds: platformContext?.entitledPackIds || [],
+    recommendedAssets: getRoleBasedAssetRecommendations({ account, roleProfile, limit: 8 }),
+    defaultAiAgentId: platformContext?.defaultAiAgentId || 'agent-clinical',
+  };
 }

@@ -416,7 +416,9 @@ const Profile = () => {
           <Link to="/profile/security">Security</Link>
           <Link to="/settings">App settings</Link>
           <Link to="/notifications">Notifications</Link>
-          <Link to="/onboarding">Onboarding</Link>
+          <Link to="/welcome">Welcome setup</Link>
+          {' · '}
+          <Link to="/onboarding">Hospital onboarding</Link>
           <Link to="/biometric-setup">Biometric setup</Link>
           {canViewPhiAccess && <Link to="/audit">Audit logs</Link>}
         </div>

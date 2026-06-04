@@ -15,6 +15,9 @@ export const FEATURE_FLAGS = Object.freeze({
   allowLocalDemoAuth: appConfig.features.allowLocalDemoAuth,
   showDemoAuth: appConfig.features.showDemoAuth,
   hideDivisionMode: appConfig.features.hideDivisionMode,
+  platformEntitlements: appConfig.features.platformEntitlements,
+  singleWorkspaceModel: appConfig.features.singleWorkspaceModel,
+  commercialSurfaces: appConfig.features.commercialSurfaces,
 });
 
 export const FEATURE_FLAG_STATES = Object.freeze({

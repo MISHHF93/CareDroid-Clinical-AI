@@ -57,6 +57,17 @@ export const CANONICAL_ROUTES = Object.freeze({
   regulatory: '/regulatory',
   humanReview: '/human-review',
   assets: '/assets',
+  products: '/products',
+  plans: '/plans',
+  specialties: '/specialties',
+  carePathways: '/care-pathways',
+  agents: '/agents',
+  maturityAssessment: '/maturity-assessment',
+  outcomes: '/outcomes',
+  integrationsMarketplace: '/integrations-marketplace',
+  configurationStudio: '/configuration-studio',
+  welcome: '/welcome',
+  onboarding: '/onboarding',
 });
 
 export const AUTH_PATH_ALIASES = Object.freeze([

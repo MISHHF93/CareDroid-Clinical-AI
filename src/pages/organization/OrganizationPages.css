@@ -1,0 +1,68 @@
+.org-page {
+  padding: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.org-page-header {
+  margin-bottom: 1.5rem;
+}
+
+.org-page-subtitle {
+  color: var(--muted-foreground, #64748b);
+  margin-top: 0.25rem;
+}
+
+.org-page-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.org-grid,
+.org-pack-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  margin-bottom: 1.5rem;
+}
+
+.org-card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.org-card label {
+  display: block;
+  margin: 0.75rem 0;
+}
+
+.org-card input,
+.org-card select {
+  display: block;
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.org-status {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.org-lifecycle-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.org-lifecycle-table th,
+.org-lifecycle-table td {
+  text-align: left;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border, #e2e8f0);
+}
+
+.org-pack-meta {
+  font-size: 0.85rem;
+  color: var(--muted-foreground, #64748b);
+}

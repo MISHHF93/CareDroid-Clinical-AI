@@ -38,6 +38,10 @@ import { BACKEND_HTTP_ROUTES, findBackendRoute } from './backendHttpRouteInvento
 import { PLATFORM_SYSTEM_CAPABILITIES, PLATFORM_SYSTEM_CAPABILITY_BY_ID } from './platformSystems';
 import { enrichToolWithSegmentation } from './profileToolSegmentation';
 import { buildPluginInventoryRecords, PLUGIN_REGISTRY } from './pluginRegistry';
+import {
+  filterToolsByEntitlements,
+  getPlatformEntitlementContext,
+} from './assetEntitlements';
 
 export const TOOL_INVENTORY_VERSION = 1;
 
@@ -46,6 +50,12 @@ let cachedInventoryById = null;
 let cachedUserFacingInventory = null;
 let cachedSidebarToolRegistryProjection = null;
 let cachedUserFacingToolRegistryProjection = null;
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('caredroid:entitlements-changed', () => {
+    cachedUserFacingToolRegistryProjection = null;
+  });
+}
 
 const CLINICAL_TIER_C_WORKFLOW_REGISTRY_ID_SET = new Set(CLINICAL_TIER_C_WORKFLOW_REGISTRY_IDS);
 const FLEET_TIER_A_REGISTRY_ID_SET = new Set(FLEET_TIER_A_REGISTRY_IDS);
@@ -1180,10 +1190,17 @@ export function getSidebarToolRegistryProjection(records = getCanonicalToolInven
 }
 
 export function getUserFacingToolRegistryProjection(records = getCanonicalToolInventory()) {
-  if (records === cachedInventory && cachedUserFacingToolRegistryProjection) {
+  const entitlementContext = getPlatformEntitlementContext();
+  const cacheKey = entitlementContext?.entitledAssetIds?.join(',') || 'all';
+  if (
+    records === cachedInventory &&
+    cachedUserFacingToolRegistryProjection &&
+    cachedUserFacingToolRegistryProjection.__entitlementKey === cacheKey
+  ) {
     return cachedUserFacingToolRegistryProjection;
   }
-  const projection = getUserFacingToolInventory(records).map((record) => {
+  const projection = filterToolsByEntitlements(
+    getUserFacingToolInventory(records).map((record) => {
     const legacy = record.legacy || {};
     const category = legacy.category || record.presentationCategory;
     return enrichToolWithSegmentation({
@@ -1218,8 +1235,11 @@ export function getUserFacingToolRegistryProjection(records = getCanonicalToolIn
       favoriteable: record.favoriteable,
       searchText: record.searchText,
     });
-  });
+    }),
+    entitlementContext,
+  );
   if (records === cachedInventory) {
+    projection.__entitlementKey = cacheKey;
     cachedUserFacingToolRegistryProjection = projection;
   }
   return projection;

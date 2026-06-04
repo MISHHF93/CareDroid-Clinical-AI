@@ -71,6 +71,9 @@ const appConfig = {
     hideDivisionMode: toBoolean(
       getEnvValue('VITE_HIDE_DIVISION_MODE', isProductionBuild() ? 'true' : 'false')
     ),
+    platformEntitlements: toBoolean(getEnvValue('VITE_PLATFORM_ENTITLEMENTS', 'true')),
+    singleWorkspaceModel: toBoolean(getEnvValue('VITE_SINGLE_WORKSPACE_MODEL', 'true')),
+    commercialSurfaces: toBoolean(getEnvValue('VITE_COMMERCIAL_SURFACES', 'true')),
   },
   legal: {
     privacyPolicyUrl: getEnvValue('VITE_PRIVACY_POLICY_URL', ''),

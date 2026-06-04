@@ -6,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { OrganizationType } from '../../platform-assets/enums/platform-asset.enums';
 import { Workspace } from './workspace.entity';
 
 @Entity('organizations')
@@ -19,11 +20,17 @@ export class Organization {
   @Column({ type: 'varchar', length: 120, unique: true })
   slug: string;
 
+  @Column({ type: 'varchar', length: 64, default: OrganizationType.HOSPITAL })
+  organizationType: OrganizationType;
+
   @Column({ type: 'varchar', length: 120, nullable: true })
   country: string;
 
   @Column({ type: 'simple-json', nullable: true })
   branding: Record<string, any>;
+
+  @Column({ type: 'simple-json', nullable: true })
+  settings: Record<string, any>;
 
   @OneToMany(() => Workspace, (workspace) => workspace.organization)
   workspaces: Workspace[];

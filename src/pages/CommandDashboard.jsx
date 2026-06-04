@@ -253,12 +253,22 @@ export default function CommandDashboard() {
   const navigate = useNavigate();
   const [assistantPrompt, setAssistantPrompt] = useState('');
   const { user, isDevAuthBypass, hasPermission } = useUser();
-  const { activeWorkspace, activity, aiPersonalization } = useUserIdentity();
+  const { activeWorkspace, activity, aiPersonalization, platformContext, account, roleProfile } =
+    useUserIdentity();
   const { conversations, messages, addMessage, selectTool, setActiveTool } = useConversation();
   const { recentTools, recordToolAccess } = useToolPreferences();
   const { notifications = [] } = useNotifications();
   const systemConfig = useSystemConfig();
-  const model = useMemo(() => getCommandDashboardModel(), []);
+  const model = useMemo(
+    () =>
+      getCommandDashboardModel({
+        platformContext,
+        account,
+        roleProfile,
+        userRole: user?.role,
+      }),
+    [platformContext, account, roleProfile, user?.role]
+  );
   const canViewDeveloperCatalog = hasPermission(Permission.CONFIGURE_SYSTEM);
   const recentToolItems = useMemo(
     () =>

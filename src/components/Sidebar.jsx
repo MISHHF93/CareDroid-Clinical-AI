@@ -1,14 +1,16 @@
-import React, { forwardRef, useEffect, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import PermissionGate from './PermissionGate';
 import BuildInfoBadge from './BuildInfoBadge';
+import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import {
   ADVANCED_SIDEBAR_NAV_ITEMS,
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
+  SOLUTIONS_SIDEBAR_NAV_ITEMS,
   primaryNavPathMatches,
 } from '../config/navigation.config';
 import { NavIcon } from '../navigation/NavIcon';
@@ -44,6 +46,7 @@ const Sidebar = forwardRef(function Sidebar(
   const { user } = useUser();
   const {
     account,
+    organization,
     activeWorkspace: activeOperationalWorkspace,
     workspaces: operationalWorkspaces,
     workspaceState,
@@ -55,9 +58,34 @@ const Sidebar = forwardRef(function Sidebar(
   const unreadCount = notifications.filter((n) => !n.read).length;
   const displayName = account?.displayName || user?.fullName || user?.name || 'User';
   const displayRole = account?.specialty || account?.role || user?.role || 'Clinician';
-  const displayOrganization = account?.organization || user?.institution || 'Personal workspace';
+  const displayOrganization =
+    organization?.name || account?.organization || user?.institution || 'Personal workspace';
   const effectiveCollapsed = layoutCompact ? false : sidebarCollapsed;
   const recentConversations = conversations.slice(-4).reverse();
+
+  const hiddenNavIds = useMemo(() => {
+    const settings = organization?.settings || {};
+    const nav = settings.navigation || settings.configuration?.navigation || {};
+    return new Set(nav.hiddenNavIds || []);
+  }, [organization?.settings]);
+
+  const filterNav = useCallback(
+    (items) => items.filter((item) => !hiddenNavIds.has(item.id)),
+    [hiddenNavIds]
+  );
+
+  const primaryNavItems = useMemo(
+    () => filterNav(PRIMARY_SIDEBAR_NAV_ITEMS),
+    [filterNav]
+  );
+  const solutionsNavItems = useMemo(
+    () => filterNav(SOLUTIONS_SIDEBAR_NAV_ITEMS),
+    [filterNav]
+  );
+  const operationsNavItems = useMemo(
+    () => filterNav(OPERATIONS_SIDEBAR_NAV_ITEMS),
+    [filterNav]
+  );
 
   const advancedActive = useMemo(
     () => ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => primaryNavPathMatches(item, location.pathname)),
@@ -269,12 +297,19 @@ const Sidebar = forwardRef(function Sidebar(
 
         <nav className="sidebar-nav" aria-label="Primary navigation">
           <div className="nav-section-title">{!effectiveCollapsed && 'Main'}</div>
-          {PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => renderNavButton(item))}
+          {primaryNavItems.map((item) => renderNavButton(item))}
         </nav>
+
+        {FEATURE_FLAGS.commercialSurfaces && (
+          <nav className="sidebar-nav sidebar-nav--solutions" aria-label="Solutions navigation">
+            <div className="nav-section-title">{!effectiveCollapsed && 'Solutions'}</div>
+            {solutionsNavItems.map((item) => renderNavButton(item))}
+          </nav>
+        )}
 
         <nav className="sidebar-nav sidebar-nav--operations" aria-label="Operations navigation">
           <div className="nav-section-title">{!effectiveCollapsed && 'Operations'}</div>
-          {OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => renderNavButton(item))}
+          {operationsNavItems.map((item) => renderNavButton(item))}
         </nav>
 
         <div className="sidebar-advanced">

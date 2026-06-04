@@ -10,6 +10,7 @@ import {
   buildUserToolProfile,
   getProfileAssistantRecommendations,
 } from '../data/profileToolSegmentation';
+import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import './ProfileToolGraphCard.css';
@@ -63,6 +64,7 @@ export default function ProfileToolGraphCard() {
   const { user } = useUser();
   const { account, preferences, activeWorkspace, workspaceState } = useUserIdentity();
   const { activeWorkspaceId, workspaces } = useWorkspace();
+  const useSingleWorkspace = FEATURE_FLAGS.singleWorkspaceModel;
   const { selectTool, setActiveTool, addMessage } = useConversation();
 
   const tools = useMemo(() => getUserFacingToolRegistryProjection(), []);
@@ -84,10 +86,10 @@ export default function ProfileToolGraphCard() {
     }),
     [toolPreferences]
   );
-  const localActiveWorkspace = useMemo(
-    () => safeArray(workspaces).find((workspace) => workspace.id === activeWorkspaceId),
-    [activeWorkspaceId, workspaces]
-  );
+  const localActiveWorkspace = useMemo(() => {
+    if (useSingleWorkspace) return null;
+    return safeArray(workspaces).find((workspace) => workspace.id === activeWorkspaceId);
+  }, [activeWorkspaceId, useSingleWorkspace, workspaces]);
   const profile = useMemo(
     () => {
       try {

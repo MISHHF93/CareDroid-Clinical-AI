@@ -18,6 +18,12 @@ import {
   matchCalculatorRoute,
 } from '../routes/clinicalToolRoutes';
 import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
+import {
+  getPlatformEntitlementContext,
+  isAssetEntitled,
+  isLaunchAllowedForWorkspace,
+  LEGACY_TOOL_ID_ALIASES,
+} from '../data/assetEntitlements';
 
 /**
  * @typedef {'calculator-route'|'chat-assisted'|'tool-page'|'calculator-hub'|'fallback'} RegistryToolLaunchMode
@@ -145,7 +151,25 @@ export function getRegistryToolNavigation(toolId) {
  * }} handlers
  * @returns {RegistryToolNavigationPlan}
  */
+export function isRegistryToolLaunchAllowed(toolId) {
+  const registryId = resolveRegistryId(toolId) || toolId;
+  const ctx = getPlatformEntitlementContext();
+  if (!isAssetEntitled(registryId, ctx)) return false;
+  const enabledToolIds = ctx?.legacyToolAliases || [];
+  if (enabledToolIds.length) {
+    return isLaunchAllowedForWorkspace(registryId, enabledToolIds, LEGACY_TOOL_ID_ALIASES);
+  }
+  return true;
+}
+
 export function applyRegistryToolLaunch(toolId, handlers) {
+  if (!isRegistryToolLaunchAllowed(toolId)) {
+    handlers.navigate?.(
+      { pathname: TOOL_LAUNCH_PATHS.toolsOverview, search: '?entitlement=denied' },
+      { replace: true },
+    );
+    return getRegistryToolNavigation(toolId);
+  }
   const plan = getRegistryToolNavigation(toolId);
   const {
     navigate,

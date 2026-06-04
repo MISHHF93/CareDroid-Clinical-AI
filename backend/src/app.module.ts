@@ -70,6 +70,9 @@ import { TelemetryModule } from './modules/telemetry';
 import { FleetModule } from './modules/fleet';
 import { WorkspaceIntelligenceModule } from './modules/workspace-intelligence/workspace-intelligence.module';
 import { SimulationModule } from './modules/simulation';
+import { PlatformAssetsModule } from './modules/platform-assets/platform-assets.module';
+import { OrganizationsModule } from './modules/organizations/organizations.module';
+import { ProductCatalogModule } from './modules/product-catalog/product-catalog.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -199,6 +202,9 @@ function resolveDatabaseClient() {
     SimulationModule,
     ClinicalAlertsModule,
     PlatformSystemsModule,
+    PlatformAssetsModule,
+    OrganizationsModule,
+    ProductCatalogModule,
 
     // Medical Control Plane (Intent Classification, Tool Orchestration)
     MedicalControlPlaneModule,

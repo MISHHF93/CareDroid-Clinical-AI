@@ -1,0 +1,129 @@
+.commercial-page {
+  padding: 24px 28px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.commercial-header {
+  margin-bottom: 24px;
+}
+
+.commercial-header h1 {
+  margin: 0 0 8px;
+  font-size: 1.75rem;
+}
+
+.commercial-subtitle {
+  color: var(--muted-text);
+  font-size: 14px;
+  margin: 0;
+}
+
+.commercial-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.commercial-card {
+  padding: 18px;
+}
+
+.commercial-card h2 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.commercial-card p {
+  margin: 0 0 12px;
+  color: var(--muted-text);
+  font-size: 13px;
+}
+
+.commercial-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.commercial-steps {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.commercial-step-pill {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid var(--panel-border);
+}
+
+.commercial-step-pill.active {
+  border-color: #00ff88;
+  background: rgba(0, 255, 136, 0.1);
+}
+
+.commercial-form-row {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.commercial-form-row label {
+  font-size: 13px;
+  color: var(--muted-text);
+}
+
+.commercial-form-row input,
+.commercial-form-row select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  background: var(--panel-bg, transparent);
+  color: var(--text-color);
+}
+
+.commercial-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.commercial-chip {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--panel-border);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.commercial-chip.selected {
+  border-color: #00ff88;
+  background: rgba(0, 255, 136, 0.12);
+}
+
+.commercial-pathway-step {
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+.commercial-metric {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.commercial-metric .commercial-card {
+  text-align: center;
+}
+
+.commercial-metric-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
