@@ -1,7 +1,7 @@
 import { REGISTRY } from './clinicalToolIdContract';
 import { getUserFacingToolRegistryProjection } from './toolInventory';
 
-export const DEFAULT_CARE_WORKSPACE_ID = 'clinical';
+export const DEFAULT_CARE_WORKSPACE_ID = 'emergency';
 
 export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
   assistant: {
@@ -58,6 +58,30 @@ export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
     path: '/live-map',
     description: 'Unified live operational tracking across fleet, map, and IoT signals.',
   },
+  laboratory: {
+    id: 'laboratory',
+    label: 'Laboratory',
+    path: '/laboratory',
+    description: 'Lab dashboard, specimen queue, abnormal alerts, and trends.',
+  },
+  simulation: {
+    id: 'simulation',
+    label: 'Simulation Suite',
+    path: '/simulation',
+    description: 'Simulation scenarios, debriefing, competency practice, and outcomes.',
+  },
+  competencies: {
+    id: 'competencies',
+    label: 'Competencies',
+    path: '/competencies',
+    description: 'Competency tracking, training gaps, and practice recommendations.',
+  },
+  governance: {
+    id: 'governance',
+    label: 'AI Governance',
+    path: '/ai-governance',
+    description: 'AI governance, auditability, policy, and review controls.',
+  },
   profile: {
     id: 'profile',
     label: 'Profile',
@@ -86,29 +110,6 @@ export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
 
 export const CARE_WORKSPACES = Object.freeze([
   {
-    id: 'clinical',
-    label: 'Clinical',
-    shortLabel: 'Clinical',
-    icon: 'Stethoscope',
-    path: '/workspace/clinical',
-    description: 'Patient-facing care, diagnostic reasoning, medication safety, and documentation.',
-    aiContext:
-      'Act as a clinical copilot. Ask for missing patient context, suggest appropriate tools, and keep recommendations scoped to decision support.',
-    routeIds: ['assistant', 'commandCenter', 'tools', 'calculators'],
-    toolIds: [
-      REGISTRY.drugCheck,
-      REGISTRY.labInterp,
-      REGISTRY.diagnosis,
-      REGISTRY.protocols,
-      REGISTRY.procedures,
-      REGISTRY.ambientScribe,
-      REGISTRY.patientSummaryAi,
-      REGISTRY.orderSetAi,
-      REGISTRY.guidelineRag,
-      REGISTRY.calculatorRecommenderAi,
-    ],
-  },
-  {
     id: 'emergency',
     label: 'Emergency',
     shortLabel: 'Emergency',
@@ -133,23 +134,24 @@ export const CARE_WORKSPACES = Object.freeze([
     ],
   },
   {
-    id: 'neurology',
-    label: 'Neurology',
-    shortLabel: 'Neuro',
-    icon: 'Brain',
-    path: '/workspace/neurology',
-    description: 'Stroke, TIA, neuro exams, neurologic deterioration, and timeline review.',
+    id: 'icu',
+    label: 'ICU',
+    shortLabel: 'ICU',
+    icon: 'Activity',
+    path: '/workspace/icu',
+    description: 'Critical care, ventilators, oxygenation, deterioration, and escalation support.',
     aiContext:
-      'Prioritize stroke/TIA timing, last-known-well, NIHSS, ABCD2, neurologic red flags, and escalation workflow suggestions.',
+      'Prioritize critical-care acuity, ventilator context, oxygenation, SOFA trends, sepsis risk, and escalation signals.',
     routeIds: ['assistant', 'calculators', 'tools', 'commandCenter'],
     toolIds: [
-      REGISTRY.nihss,
-      REGISTRY.abcd2,
-      REGISTRY.strokeWorkflowAssistant,
-      REGISTRY.strokeCommandCenter,
-      REGISTRY.neuroExamAssistant,
-      REGISTRY.neurologyTimelineAi,
-      REGISTRY.gcsCalculator,
+      REGISTRY.sofaScore,
+      REGISTRY.news2,
+      REGISTRY.roxIndex,
+      REGISTRY.pao2Fio2Ratio,
+      REGISTRY.aaGradient,
+      REGISTRY.ventilatorSupportAssistant,
+      REGISTRY.medicalIotDashboard,
+      REGISTRY.telemetryMonitoring,
     ],
   },
   {
@@ -173,22 +175,21 @@ export const CARE_WORKSPACES = Object.freeze([
     ],
   },
   {
-    id: 'respiratory',
-    label: 'Respiratory',
-    shortLabel: 'Resp',
-    icon: 'Activity',
-    path: '/workspace/respiratory',
-    description: 'Ventilator support, oxygenation calculators, respiratory telemetry, and pulmonary workflows.',
+    id: 'laboratory',
+    label: 'Laboratory',
+    shortLabel: 'Lab',
+    icon: 'FlaskConical',
+    path: '/workspace/laboratory',
+    description: 'Lab interpretation, abnormal result review, specimen flow, and critical value follow-up.',
     aiContext:
-      'Prioritize oxygenation, ventilator context, ROX, P/F ratio, respiratory support needs, and escalation signals.',
-    routeIds: ['assistant', 'calculators', 'tools', 'commandCenter'],
+      'Interpret lab context carefully, flag critical values, explain uncertainty, and recommend follow-up verification.',
+    routeIds: ['assistant', 'laboratory', 'tools', 'commandCenter'],
     toolIds: [
-      REGISTRY.roxIndex,
-      REGISTRY.pao2Fio2Ratio,
-      REGISTRY.aaGradient,
-      REGISTRY.ventilatorSupportAssistant,
-      REGISTRY.respiratoryTelemetryDashboard,
-      REGISTRY.respiratoryCommandCenter,
+      REGISTRY.labInterp,
+      REGISTRY.laboratoryDashboard,
+      REGISTRY.abgInterpreter,
+      REGISTRY.calcGfr,
+      REGISTRY.ckdStaging,
     ],
   },
   {
@@ -250,6 +251,26 @@ export const CARE_WORKSPACES = Object.freeze([
     ],
   },
   {
+    id: 'education',
+    label: 'Education',
+    shortLabel: 'Education',
+    icon: 'Trophy',
+    path: '/workspace/education',
+    description: 'Simulation, competency tracking, credentials, debriefs, and guided practice.',
+    aiContext:
+      'Teach with simulation-first framing, competency objectives, debriefing, safety reminders, and practice recommendations.',
+    routeIds: ['assistant', 'simulation', 'competencies', 'commandCenter'],
+    toolIds: [
+      REGISTRY.simulationSuite,
+      REGISTRY.scenarioPlayer,
+      REGISTRY.simulationOutcomes,
+      REGISTRY.competencyPlatform,
+      REGISTRY.credentialingPlatform,
+      REGISTRY.debriefDashboard,
+      REGISTRY.competencyDashboard,
+    ],
+  },
+  {
     id: 'research',
     label: 'Research',
     shortLabel: 'Research',
@@ -269,15 +290,15 @@ export const CARE_WORKSPACES = Object.freeze([
     ],
   },
   {
-    id: 'admin',
-    label: 'Admin',
-    shortLabel: 'Admin',
+    id: 'governance',
+    label: 'Governance',
+    shortLabel: 'Governance',
     icon: 'Shield',
-    path: '/workspace/admin',
+    path: '/workspace/governance',
     description: 'Configuration, governance, security, audit, deployment, and platform health.',
     aiContext:
       'Summarize governance, safety, configuration, audit, and deployment posture with clear unsupported/demo labels.',
-    routeIds: ['settings', 'profile', 'systemHealth', 'developerCatalog'],
+    routeIds: ['governance', 'settings', 'systemHealth', 'developerCatalog'],
     toolIds: [
       REGISTRY.aiGovernance,
       REGISTRY.aiSecurity,

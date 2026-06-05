@@ -120,9 +120,9 @@ describe('canonical route redirects', () => {
     expect(appSource).not.toContain('function AssistantToolRedirect');
   });
 
-  it('keeps products, asset packs, and configuration studio as first-class builder routes', () => {
+  it('keeps products, asset packs, and configuration studio as first-class routes', () => {
     expectRoute('/products', 'ProductsIndexPage');
-    expectRoute('/asset-packs', 'AssetPacksBuilderPage');
+    expectRoute('/asset-packs', 'PackMarketplace');
     expectRoute('/configuration-studio', 'ConfigurationStudioPage');
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ path: '/asset-packs' })])

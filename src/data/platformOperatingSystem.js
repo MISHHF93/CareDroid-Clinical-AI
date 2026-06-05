@@ -13,37 +13,37 @@ function minutesAgo(minutes) {
 }
 
 export const PLATFORM_DASHBOARDS = Object.freeze([
-  { id: 'dashboard', label: 'Command Center', path: '/dashboard', category: 'dashboard', workspaceIds: ['clinical', 'emergency', 'operations', 'admin'] },
+  { id: 'dashboard', label: 'Command Center', path: '/dashboard', category: 'dashboard', workspaceIds: ['emergency', 'icu', 'operations', 'governance'] },
   { id: 'assistant', label: 'AI Assistant', path: '/assistant', category: 'dashboard', workspaceIds: CARE_WORKSPACES.map((workspace) => workspace.id) },
   { id: 'hospital-map', label: 'Hospital Map', path: '/hospital-map', category: 'map', workspaceIds: ['emergency', 'operations', 'medical-iot'] },
   { id: 'medical-iot', label: 'Medical IoT', path: '/medical-iot', category: 'dashboard', workspaceIds: ['medical-iot', 'operations'] },
   { id: 'devices', label: 'Device Fleet', path: '/devices', category: 'dashboard', workspaceIds: ['medical-iot', 'operations'] },
   { id: 'fleet-map', label: 'Fleet Map', path: '/fleet/map', category: 'map', workspaceIds: ['fleet', 'operations'] },
   { id: 'digital-twin', label: 'Hospital Digital Twin', path: '/digital-twin', category: 'dashboard', workspaceIds: ['operations', 'medical-iot', 'fleet'] },
-  { id: 'timeline', label: 'Clinical Timeline', path: '/timeline', category: 'dashboard', workspaceIds: ['clinical', 'emergency', 'research'] },
-  { id: 'workflows', label: 'Workflow Builder', path: '/workflows', category: 'workflow', workspaceIds: ['clinical', 'emergency', 'research'] },
+  { id: 'timeline', label: 'Clinical Timeline', path: '/timeline', category: 'dashboard', workspaceIds: ['emergency', 'icu', 'research'] },
+  { id: 'workflows', label: 'Workflow Builder', path: '/workflows', category: 'workflow', workspaceIds: ['emergency', 'icu', 'research'] },
   { id: 'search', label: 'Global Search', path: '/search', category: 'search', workspaceIds: CARE_WORKSPACES.map((workspace) => workspace.id) },
-  { id: 'assets', label: 'Asset Library', path: '/assets', category: 'library', workspaceIds: ['research', 'admin'] },
-  { id: 'system-health', label: 'System Health', path: '/system-health', category: 'admin', workspaceIds: ['admin', 'operations'] },
+  { id: 'assets', label: 'Asset Library', path: '/assets', category: 'library', workspaceIds: ['research', 'governance'] },
+  { id: 'system-health', label: 'System Health', path: '/system-health', category: 'admin', workspaceIds: ['governance', 'operations'] },
 ]);
 
 export const PLATFORM_NOTIFICATIONS = Object.freeze([
-  { id: 'n-ai-1', title: 'AI recommendation needs review', body: 'Differential AI flagged sepsis and PE as competing hypotheses.', type: 'ai', priority: 'high', read: false, archived: false, createdAt: minutesAgo(8), workspaceIds: ['clinical', 'emergency'] },
+  { id: 'n-ai-1', title: 'AI recommendation needs review', body: 'Differential AI flagged sepsis and PE as competing hypotheses.', type: 'ai', priority: 'high', read: false, archived: false, createdAt: minutesAgo(8), workspaceIds: ['icu', 'emergency'] },
   { id: 'n-telemetry-1', title: 'Telemetry stale', body: 'ICU-12 monitor has not reported SpO2 for 14 minutes.', type: 'telemetry', priority: 'critical', read: false, archived: false, createdAt: minutesAgo(14), workspaceIds: ['medical-iot', 'operations', 'emergency'] },
   { id: 'n-fleet-1', title: 'Transport ETA changed', body: 'Ambulance A-12 route delayed by 6 minutes due to diversion.', type: 'fleet', priority: 'medium', read: true, archived: false, createdAt: minutesAgo(22), workspaceIds: ['fleet', 'operations'] },
-  { id: 'n-maint-1', title: 'Maintenance reminder', body: 'Telemetry gateway GW-4 is due for calibration today.', type: 'maintenance', priority: 'medium', read: false, archived: false, createdAt: minutesAgo(46), workspaceIds: ['medical-iot', 'admin'] },
-  { id: 'n-workflow-1', title: 'Chest pain workflow incomplete', body: 'HEART score completed; ECG Assistant and documentation are pending.', type: 'workflow', priority: 'high', read: false, archived: false, createdAt: minutesAgo(65), workspaceIds: ['clinical', 'emergency'] },
-  { id: 'n-gov-1', title: 'Governance review available', body: 'AI safety policy validation summary is ready for admin review.', type: 'governance', priority: 'low', read: true, archived: false, createdAt: minutesAgo(120), workspaceIds: ['admin', 'research'] },
+  { id: 'n-maint-1', title: 'Maintenance reminder', body: 'Telemetry gateway GW-4 is due for calibration today.', type: 'maintenance', priority: 'medium', read: false, archived: false, createdAt: minutesAgo(46), workspaceIds: ['medical-iot', 'governance'] },
+  { id: 'n-workflow-1', title: 'Chest pain workflow incomplete', body: 'HEART score completed; ECG Assistant and documentation are pending.', type: 'workflow', priority: 'high', read: false, archived: false, createdAt: minutesAgo(65), workspaceIds: ['cardiology', 'emergency'] },
+  { id: 'n-gov-1', title: 'Governance review available', body: 'AI safety policy validation summary is ready for admin review.', type: 'governance', priority: 'low', read: true, archived: false, createdAt: minutesAgo(120), workspaceIds: ['governance', 'research'] },
 ]);
 
 export const PLATFORM_TIMELINE_EVENTS = Object.freeze([
-  { id: 'tl-calc-1', kind: 'calculator', title: 'qSOFA calculated', detail: 'qSOFA score 2; sepsis escalation suggested.', timestamp: minutesAgo(6), workspaceIds: ['emergency', 'clinical'] },
-  { id: 'tl-ai-1', kind: 'ai', title: 'AI differential updated', detail: 'Assistant generated PE vs sepsis differential with confidence limits.', timestamp: minutesAgo(9), workspaceIds: ['clinical', 'research', 'emergency'] },
+  { id: 'tl-calc-1', kind: 'calculator', title: 'qSOFA calculated', detail: 'qSOFA score 2; sepsis escalation suggested.', timestamp: minutesAgo(6), workspaceIds: ['emergency', 'icu'] },
+  { id: 'tl-ai-1', kind: 'ai', title: 'AI differential updated', detail: 'Assistant generated PE vs sepsis differential with confidence limits.', timestamp: minutesAgo(9), workspaceIds: ['icu', 'research', 'emergency'] },
   { id: 'tl-device-1', kind: 'device', title: 'Bedside monitor signal dropped', detail: 'ICU-12 device reported weak signal and stale SpO2.', timestamp: minutesAgo(14), workspaceIds: ['medical-iot', 'operations'] },
   { id: 'tl-telemetry-1', kind: 'telemetry', title: 'Telemetry alert opened', detail: 'HR 128, SpO2 90%, RR 28; alert priority high.', timestamp: minutesAgo(18), workspaceIds: ['medical-iot', 'emergency'] },
   { id: 'tl-fleet-1', kind: 'fleet', title: 'Fleet route updated', detail: 'Ambulance A-12 reassigned to east bay handoff.', timestamp: minutesAgo(22), workspaceIds: ['fleet', 'operations'] },
-  { id: 'tl-workflow-1', kind: 'workflow', title: 'Chest Pain Workflow launched', detail: 'HEART score block completed; ECG assistant pending.', timestamp: minutesAgo(34), workspaceIds: ['clinical', 'emergency'] },
-  { id: 'tl-audit-1', kind: 'audit', title: 'Explainability trace viewed', detail: 'Reasoning summary and cited sources reviewed.', timestamp: minutesAgo(44), workspaceIds: ['research', 'admin'] },
+  { id: 'tl-workflow-1', kind: 'workflow', title: 'Chest Pain Workflow launched', detail: 'HEART score block completed; ECG assistant pending.', timestamp: minutesAgo(34), workspaceIds: ['cardiology', 'emergency'] },
+  { id: 'tl-audit-1', kind: 'audit', title: 'Explainability trace viewed', detail: 'Reasoning summary and cited sources reviewed.', timestamp: minutesAgo(44), workspaceIds: ['research', 'governance'] },
   { id: 'tl-alert-1', kind: 'alert', title: 'Rapid response alert acknowledged', detail: 'Alert marked read by Demo Clinician.', timestamp: minutesAgo(53), workspaceIds: ['emergency', 'operations'] },
 ]);
 
@@ -52,7 +52,7 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
     id: 'chest-pain',
     name: 'Chest Pain Workflow',
     description: 'HEART, ECG Assistant, ACS Assistant, and documentation in sequence.',
-    workspaceIds: ['clinical', 'emergency'],
+    workspaceIds: ['cardiology', 'emergency'],
     blocks: [
       { id: 'heart', type: 'calculator', label: 'HEART', toolId: 'heart-score' },
       { id: 'ecg', type: 'ai-prompt', label: 'ECG Assistant', toolId: 'ecg-interpretation-assistant' },
@@ -64,7 +64,7 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
     id: 'sepsis-escalation',
     name: 'Sepsis Escalation Workflow',
     description: 'qSOFA, NEWS2, SOFA, antibiotics, fluids, reassessment, and handoff.',
-    workspaceIds: ['emergency', 'clinical'],
+    workspaceIds: ['emergency', 'icu'],
     blocks: [
       { id: 'qsofa', type: 'calculator', label: 'qSOFA', toolId: 'qsofa' },
       { id: 'news2', type: 'calculator', label: 'NEWS2', toolId: 'news2' },
@@ -76,7 +76,7 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
     id: 'device-maintenance',
     name: 'Device Maintenance Workflow',
     description: 'Telemetry alert, device detail, maintenance note, and assignment review.',
-    workspaceIds: ['medical-iot', 'operations', 'admin'],
+    workspaceIds: ['medical-iot', 'operations', 'governance'],
     blocks: [
       { id: 'telemetry', type: 'dashboard', label: 'Telemetry', path: '/medical-iot' },
       { id: 'device', type: 'dashboard', label: 'Device Fleet', path: '/devices' },
@@ -166,8 +166,8 @@ export function buildGlobalSearchResults({ query = '', workspaceId = 'all', cate
     workspaceIds: asset.tags?.includes('medical-iot')
       ? ['medical-iot', 'operations']
       : asset.tags?.includes('emergency')
-        ? ['emergency', 'clinical']
-        : ['research', 'admin'],
+        ? ['emergency', 'icu']
+        : ['research', 'governance'],
   }));
 
   let results = [

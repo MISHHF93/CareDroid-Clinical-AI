@@ -46,6 +46,13 @@ export class OrganizationsController {
     return this.organizationsService.getCurrentForUser(req.user);
   }
 
+  @Get('current/engine')
+  @SkipTenantIsolation()
+  @ApiOperation({ summary: 'Get current organization and tenant engine context' })
+  async currentEngine(@Req() req: any) {
+    return this.organizationsService.getCurrentEngineForUser(req.user);
+  }
+
   @Post()
   @SkipTenantIsolation()
   @ApiOperation({ summary: 'Create organization and assign default packs' })
@@ -68,6 +75,14 @@ export class OrganizationsController {
     return this.organizationsService.getForUser(req.user, organizationId);
   }
 
+  @Get(':organizationId/engine')
+  @OrganizationScoped()
+  @ApiOperation({ summary: 'Get organization engine model: tenant, branding, subscription, integrations' })
+  async getEngine(@Req() req: any, @Param('organizationId') organizationId: string) {
+    this.assertTenantOrganization(req, organizationId);
+    return this.organizationsService.getEngineForUser(req.user, organizationId);
+  }
+
   @Patch(':organizationId')
   @OrganizationScoped({ admin: 'organization' })
   @ApiOperation({ summary: 'Update organization settings' })
@@ -78,6 +93,18 @@ export class OrganizationsController {
   ) {
     this.assertTenantOrganization(req, organizationId);
     return this.organizationsService.update(req.user, organizationId, dto);
+  }
+
+  @Patch(':organizationId/settings')
+  @OrganizationScoped({ admin: 'organization' })
+  @ApiOperation({ summary: 'Update organization engine settings' })
+  async updateSettings(
+    @Req() req: any,
+    @Param('organizationId') organizationId: string,
+    @Body() dto: Record<string, unknown>,
+  ) {
+    this.assertTenantOrganization(req, organizationId);
+    return this.organizationsService.updateOrganizationSettings(req.user, organizationId, dto);
   }
 
   private assertTenantOrganization(req: any, organizationId: string) {

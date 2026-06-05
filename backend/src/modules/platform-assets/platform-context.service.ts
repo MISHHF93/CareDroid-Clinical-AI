@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import { Product } from '../product-catalog/entities/product.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { OrganizationMembership } from '../organizations/entities/organization-membership.entity';
@@ -21,6 +22,8 @@ export class PlatformContextService {
     private readonly organizationRepository: Repository<Organization>,
     @InjectRepository(OrganizationMembership)
     private readonly membershipRepository: Repository<OrganizationMembership>,
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
   ) {}
 
   async getContextForUser(user: User) {
@@ -42,6 +45,13 @@ export class PlatformContextService {
       (w: { id: string }) => w.id === workspaceState.activeWorkspaceId,
     );
     const enabledToolIds = activeWorkspace?.settings?.enabledToolIds || [];
+    const settings = (organization?.settings || {}) as Record<string, any>;
+    const assignedProductIds = Array.isArray(settings.enabledProductIds)
+      ? settings.enabledProductIds
+      : [];
+    const assignedProducts = assignedProductIds.length
+      ? await this.productRepository.find({ where: { id: In(assignedProductIds) } })
+      : [];
 
     const entitledPackIds = organization
       ? (await this.platformAssetsService.getOrganizationEntitlements(organization.id)).map(
@@ -100,6 +110,22 @@ export class PlatformContextService {
             settings: organization.settings,
           }
         : null,
+      assignedProductIds,
+      assignedProducts: assignedProducts.map((product) => ({
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        productType: product.productType,
+        packIds: product.packIds || [],
+      })),
+      assignedProductPackIds: Array.isArray(settings.assignedProductPackIds)
+        ? settings.assignedProductPackIds
+        : [],
+      resolvedPackIds: Array.isArray(settings.resolvedPackIds) ? settings.resolvedPackIds : [],
+      navigation: settings.navigation || {},
+      branding: organization?.branding || settings.branding || {},
+      dashboardLayout: settings.dashboardLayout || {},
+      workspaceDefaults: Array.isArray(settings.workspaceDefaults) ? settings.workspaceDefaults : [],
       membership: membership
         ? {
             role: membership.role,

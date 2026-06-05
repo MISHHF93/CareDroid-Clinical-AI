@@ -10,12 +10,19 @@ import { setPlatformEntitlementContext } from '../data/assetEntitlements';
 import logger from '../utils/logger';
 
 const BACKEND_TO_LOCAL_WORKSPACE = {
-  personal: 'all',
-  hospital: 'hospital-operations',
-  emergency: 'diagnostic',
+  personal: 'emergency',
+  hospital: 'operations',
+  emergency: 'emergency',
+  icu: 'icu',
+  cardiology: 'cardiology',
+  laboratory: 'laboratory',
+  operations: 'operations',
   fleet: 'fleet',
-  research: 'reference',
-  admin: 'all',
+  'medical-iot': 'medical-iot',
+  education: 'education',
+  research: 'research',
+  governance: 'governance',
+  admin: 'governance',
 };
 
 const UserIdentityContext = createContext({
@@ -40,6 +47,7 @@ const UserIdentityContext = createContext({
   platformContext: null,
   refreshPlatformContext: () => {},
   organization: null,
+  roleProfile: null,
   entitledAssetIds: [],
   entitledPackIds: [],
 });
@@ -347,6 +355,7 @@ export const UserIdentityProvider = ({ children }) => {
       platformContext,
       refreshPlatformContext,
       organization: platformContext?.organization || null,
+      roleProfile: platformContext?.roleProfile || null,
       entitledAssetIds: platformContext?.entitledAssetIds || [],
       entitledPackIds: platformContext?.entitledPackIds || [],
     }),

@@ -3,6 +3,7 @@ export enum ProductType {
   ICU = 'icu',
   CARDIOLOGY = 'cardiology',
   LABORATORY = 'laboratory',
+  HOSPITAL_OPERATIONS = 'hospital_operations',
   MEDICAL_IOT = 'medical_iot',
   FLEET_EMS = 'fleet_ems',
   DIGITAL_TWIN = 'digital_twin',

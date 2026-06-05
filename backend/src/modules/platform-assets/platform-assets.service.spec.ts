@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PlatformAssetsService } from './platform-assets.service';
+import { AssetRegistryService } from './asset-registry.service';
 import { PlatformAsset } from './entities/platform-asset.entity';
 import { AssetPack } from './entities/asset-pack.entity';
 import { OrganizationEntitlement } from './entities/organization-entitlement.entity';
 import { RoleProfile } from './entities/role-profile.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
-import { PlatformAssetLifecycle } from './enums/platform-asset.enums';
+import { EntitlementStatus, PlatformAssetLifecycle, PricingTier } from './enums/platform-asset.enums';
 import { UserPreferencesService } from '../user-profile/user-preferences.service';
 
 describe('PlatformAssetsService', () => {
@@ -40,6 +41,11 @@ describe('PlatformAssetsService', () => {
     getPreferences: jest.fn(),
     updatePreferences: jest.fn(),
   };
+  const assetRegistryService = {
+    listAssets: jest.fn(),
+    getAssetById: jest.fn(),
+    updateAssetLifecycle: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -51,6 +57,7 @@ describe('PlatformAssetsService', () => {
         { provide: getRepositoryToken(RoleProfile), useValue: roleProfileRepo },
         { provide: getRepositoryToken(UserProfile), useValue: profileRepo },
         { provide: UserPreferencesService, useValue: userPreferencesService },
+        { provide: AssetRegistryService, useValue: assetRegistryService },
       ],
     }).compile();
 
@@ -98,10 +105,126 @@ describe('PlatformAssetsService', () => {
   });
 
   it('updates asset lifecycle', async () => {
-    assetRepo.findOne.mockResolvedValue({ id: 'qsofa', lifecycle: PlatformAssetLifecycle.ACTIVE });
-    assetRepo.save.mockImplementation(async (row) => row);
+    assetRegistryService.updateAssetLifecycle.mockResolvedValue({
+      id: 'qsofa',
+      lifecycle: PlatformAssetLifecycle.DEPRECATED,
+    });
 
     const result = await service.updateAssetLifecycle('qsofa', PlatformAssetLifecycle.DEPRECATED);
     expect(result.lifecycle).toBe(PlatformAssetLifecycle.DEPRECATED);
+    expect(assetRegistryService.updateAssetLifecycle).toHaveBeenCalledWith(
+      'qsofa',
+      PlatformAssetLifecycle.DEPRECATED,
+    );
+  });
+
+  it('projects marketplace packs with enabled state, assets, dependencies, and role mapping', async () => {
+    const corePack = {
+      id: 'core-platform',
+      name: 'Core Platform',
+      slug: 'core-platform',
+      assetIds: ['assistant'],
+      requiredDependencies: [],
+      targetRoles: ['clinician'],
+      pricingTier: PricingTier.CORE,
+      isPublished: true,
+    };
+    const emergencyPack = {
+      id: 'emergency-department-pack',
+      name: 'Emergency Department Pack',
+      slug: 'emergency-department-pack',
+      description: 'ED pack',
+      assetIds: ['qsofa', 'news2'],
+      requiredDependencies: ['core-platform'],
+      targetRoles: ['emergency physician'],
+      defaultModules: ['alerts'],
+      organizationTypes: ['hospital'],
+      pricingTier: PricingTier.ENTERPRISE,
+      isPublished: true,
+    };
+    packRepo.find
+      .mockResolvedValueOnce([corePack, emergencyPack])
+      .mockResolvedValueOnce([corePack, emergencyPack]);
+    assetRepo.find.mockResolvedValue([
+      { id: 'qsofa', title: 'qSOFA', assetType: 'calculator', route: '/tools/calculators' },
+      { id: 'news2', title: 'NEWS2', assetType: 'calculator', route: '/tools/calculators' },
+    ]);
+    roleProfileRepo.find.mockResolvedValue([
+      {
+        id: 'ed-physician',
+        label: 'ED Physician',
+        intendedRoles: ['emergency physician'],
+        preferredAssetIds: ['qsofa'],
+      },
+    ]);
+    entitlementRepo.find.mockResolvedValue([
+      { organizationId: 'org-1', packId: 'emergency-department-pack', status: EntitlementStatus.ENABLED },
+    ]);
+
+    const result = await service.listMarketplacePacks({ organizationId: 'org-1' });
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      id: 'emergency-department-pack',
+      enabled: true,
+      includedAssetCount: 2,
+      dependencySummary: { total: 1, enabled: 0, missing: 1 },
+    });
+    expect(result[0].includedAssets).toEqual(
+      expect.arrayContaining([expect.objectContaining({ id: 'qsofa', title: 'qSOFA' })]),
+    );
+    expect(result[0].roleMapping).toEqual(
+      expect.arrayContaining([expect.objectContaining({ roleProfileId: 'ed-physician' })]),
+    );
+    expect(result[0].warnings).toEqual(
+      expect.arrayContaining([expect.objectContaining({ type: 'dependency' })]),
+    );
+  });
+
+  it('rejects installing unpublished packs', async () => {
+    packRepo.findOne.mockResolvedValue({
+      id: 'emergency-department-pack',
+      isPublished: false,
+    });
+
+    await expect(
+      service.installPackForOrganization('org-1', 'emergency-department-pack'),
+    ).rejects.toThrow('Asset pack is not published');
+    expect(entitlementRepo.save).not.toHaveBeenCalled();
+  });
+
+  it('soft-disables packs and reports dependent pack warnings', async () => {
+    packRepo.findOne.mockResolvedValue({
+      id: 'core-platform',
+      isPublished: true,
+    });
+    entitlementRepo.findOne.mockResolvedValue({
+      id: 'ent-1',
+      organizationId: 'org-1',
+      packId: 'core-platform',
+      status: EntitlementStatus.ENABLED,
+    });
+    packRepo.find.mockResolvedValue([
+      { id: 'core-platform', name: 'Core Platform', requiredDependencies: [] },
+      {
+        id: 'emergency-department-pack',
+        name: 'Emergency Department Pack',
+        requiredDependencies: ['core-platform'],
+      },
+    ]);
+    entitlementRepo.find.mockResolvedValue([
+      { organizationId: 'org-1', packId: 'emergency-department-pack', status: EntitlementStatus.ENABLED },
+    ]);
+    entitlementRepo.save.mockImplementation(async (row) => row);
+
+    const result = await service.removePackFromOrganization('org-1', 'core-platform');
+
+    expect(result).toMatchObject({
+      removed: true,
+      dependentPacks: [expect.objectContaining({ id: 'emergency-department-pack', enabled: true })],
+    });
+    expect(entitlementRepo.save).toHaveBeenCalledWith(
+      expect.objectContaining({ status: EntitlementStatus.DISABLED }),
+    );
   });
 });

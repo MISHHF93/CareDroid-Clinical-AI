@@ -1,6 +1,24 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { WorkspaceProvider, useWorkspace } from '../contexts/WorkspaceContext';
+
+vi.mock('../contexts/UserContext', () => ({
+  useUser: () => ({
+    authToken: '',
+    isAuthenticated: false,
+    isLoading: false,
+  }),
+}));
+
+vi.mock('../services/apiClient', () => ({
+  apiFetch: vi.fn(),
+  getApiErrorMessage: () => 'Request failed',
+  parseApiResponse: async () => ({}),
+}));
+
+vi.mock('../utils/logger', () => ({
+  default: { warn: vi.fn() },
+}));
 
 describe('WorkspaceContext', () => {
   beforeEach(() => {
@@ -18,21 +36,20 @@ describe('WorkspaceContext', () => {
       expect(result.current.workspaces).toBeInstanceOf(Array);
       expect(result.current.workspaces.length).toBeGreaterThan(0);
       
-      // Should include "All Tools" workspace
-      const allTools = result.current.workspaces.find(w => w.id === 'all');
-      expect(allTools).toBeDefined();
-      expect(allTools.name).toBe('All Tools');
+      const emergency = result.current.workspaces.find(w => w.id === 'emergency');
+      expect(emergency).toBeDefined();
+      expect(emergency.name).toBe('Emergency');
     });
 
-    it('should set "all" as default active workspace', () => {
+    it('should set emergency as default active workspace', () => {
       const { result } = renderHook(() => useWorkspace(), { wrapper });
 
-      expect(result.current.activeWorkspaceId).toBe('all');
+      expect(result.current.activeWorkspaceId).toBe('emergency');
     });
 
     it('should load persisted workspaces from localStorage', () => {
       const customWorkspaces = [
-        { id: 'all', name: 'All Tools', toolIds: ['tool1', 'tool2'] },
+        { id: 'icu', name: 'ICU', toolIds: ['tool1', 'tool2'] },
         { id: 'emergency', name: 'Emergency', toolIds: ['tool1'], color: '#ff6b6b', icon: 'Siren' }
       ];
 
@@ -43,7 +60,7 @@ describe('WorkspaceContext', () => {
 
       const { result } = renderHook(() => useWorkspace(), { wrapper });
 
-      expect(result.current.workspaces).toHaveLength(2);
+      expect(result.current.workspaces.length).toBeGreaterThanOrEqual(2);
       expect(result.current.activeWorkspaceId).toBe('emergency');
       
       const emergencyWs = result.current.workspaces.find(w => w.id === 'emergency');
@@ -192,7 +209,7 @@ describe('WorkspaceContext', () => {
       expect(result.current.workspaces.length).toBe(beforeCount - 1);
     });
 
-    it('should reset active workspace to "all" if removed workspace was active', () => {
+    it('should reset active workspace to emergency if removed workspace was active', () => {
       const { result } = renderHook(() => useWorkspace(), { wrapper });
 
       const workspace = { id: 'active-ws', name: 'Active', toolIds: [] };
@@ -208,7 +225,7 @@ describe('WorkspaceContext', () => {
         result.current.removeWorkspace('active-ws');
       });
 
-      expect(result.current.activeWorkspaceId).toBe('all');
+      expect(result.current.activeWorkspaceId).toBe('emergency');
     });
 
     it('should not change active workspace if a different one is removed', () => {
@@ -251,42 +268,42 @@ describe('WorkspaceContext', () => {
       const { result } = renderHook(() => useWorkspace(), { wrapper });
 
       act(() => {
-        result.current.setActiveWorkspaceId('diagnostic');
+        result.current.setActiveWorkspaceId('icu');
       });
 
-      expect(result.current.activeWorkspaceId).toBe('diagnostic');
+      expect(result.current.activeWorkspaceId).toBe('icu');
     });
 
     it('should persist active workspace selection', () => {
       const { result } = renderHook(() => useWorkspace(), { wrapper });
 
       act(() => {
-        result.current.setActiveWorkspaceId('calculator');
+        result.current.setActiveWorkspaceId('laboratory');
       });
 
       const saved = localStorage.getItem('careDroid.workspaces.v1');
       const parsed = JSON.parse(saved);
 
-      expect(parsed.activeWorkspaceId).toBe('calculator');
+      expect(parsed.activeWorkspaceId).toBe('laboratory');
     });
 
     it('should allow switching between multiple workspaces', () => {
       const { result } = renderHook(() => useWorkspace(), { wrapper });
 
       act(() => {
-        result.current.setActiveWorkspaceId('diagnostic');
+        result.current.setActiveWorkspaceId('icu');
       });
-      expect(result.current.activeWorkspaceId).toBe('diagnostic');
+      expect(result.current.activeWorkspaceId).toBe('icu');
 
       act(() => {
-        result.current.setActiveWorkspaceId('calculator');
+        result.current.setActiveWorkspaceId('laboratory');
       });
-      expect(result.current.activeWorkspaceId).toBe('calculator');
+      expect(result.current.activeWorkspaceId).toBe('laboratory');
 
       act(() => {
-        result.current.setActiveWorkspaceId('all');
+        result.current.setActiveWorkspaceId('governance');
       });
-      expect(result.current.activeWorkspaceId).toBe('all');
+      expect(result.current.activeWorkspaceId).toBe('governance');
     });
   });
 
@@ -295,7 +312,7 @@ describe('WorkspaceContext', () => {
       const { result } = renderHook(() => useWorkspace(), { wrapper });
 
       const emergencyWorkspace = {
-        id: 'emergency',
+        id: 'emergency-custom',
         name: 'Emergency',
         toolIds: ['abc-assessment', 'trauma-score', 'vitals-monitor']
       };
@@ -304,7 +321,7 @@ describe('WorkspaceContext', () => {
         result.current.addWorkspace(emergencyWorkspace);
       });
 
-      const workspace = result.current.workspaces.find(w => w.id === 'emergency');
+      const workspace = result.current.workspaces.find(w => w.id === 'emergency-custom');
       expect(workspace.toolIds).toHaveLength(3);
       expect(workspace.toolIds).toContain('abc-assessment');
     });

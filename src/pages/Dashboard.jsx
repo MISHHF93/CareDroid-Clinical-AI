@@ -4,6 +4,7 @@ import { useUser } from '../contexts/UserContext';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import { toolRegistryById, getToolById } from '../data/toolRegistry';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
@@ -23,6 +24,7 @@ import {
   CHAT_SENSITIVE_CONFIRMATIONS,
   getChatCapabilitySuggestions,
 } from '../utils/chatCapabilitySuggestions';
+import { filterVisibleTools, getAssetAwareToolProjection } from '../data/assetAccess';
 import {
   buildExecutionParameters,
   createChatExecutionAction,
@@ -150,7 +152,19 @@ function Dashboard() {
   const { error, success } = useNotificationActions();
   const toolPreferences = useToolPreferences();
   const { recordToolAccess } = toolPreferences;
-  const { account, activeWorkspace, workspaceState, preferences, recordActivity } = useUserIdentity();
+  const {
+    account,
+    activeWorkspace,
+    workspaceState,
+    preferences,
+    recordActivity,
+    platformContext,
+  } = useUserIdentity();
+  const {
+    activeWorkspace: workspaceContextActive,
+    assistantContext: activeWorkspaceAssistantContext,
+    visibleAssetIds: workspaceVisibleAssetIds,
+  } = useWorkspace();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
@@ -240,6 +254,7 @@ function Dashboard() {
         activeWorkspaceId: workspaceState?.activeWorkspaceId,
         toolPreferences,
         permissions: workspaceState?.effectivePermissions || [],
+        workspaceFocus: workspaceContextActive?.id,
       }),
     [
       account,
@@ -249,15 +264,33 @@ function Dashboard() {
       user,
       workspaceState?.activeWorkspaceId,
       workspaceState?.effectivePermissions,
+      workspaceContextActive?.id,
     ]
   );
+  const organizationAwareChatTools = useMemo(() => {
+    if (!platformContext) return undefined;
+    const workspaceAwarePlatformContext = {
+      ...platformContext,
+      legacyToolAliases: workspaceVisibleAssetIds?.length
+        ? workspaceVisibleAssetIds
+        : platformContext.legacyToolAliases,
+    };
+    return filterVisibleTools(getAssetAwareToolProjection(workspaceAwarePlatformContext, user?.role), {
+      includeLocked: false,
+      includeDemo: true,
+    });
+  }, [platformContext, user?.role, workspaceVisibleAssetIds]);
   const availableChatTools = useMemo(
     () =>
-      getChatCapabilitySuggestions({ hasPermission, profileContext: assistantProfileContext })
+      getChatCapabilitySuggestions({
+        hasPermission,
+        profileContext: assistantProfileContext,
+        tools: organizationAwareChatTools,
+      })
         .filter((suggestion) => suggestion.kind === 'executor')
         .map((suggestion) => getToolById(suggestion.toolId))
         .filter(Boolean),
-    [assistantProfileContext, hasPermission]
+    [assistantProfileContext, hasPermission, organizationAwareChatTools]
   );
   const latestExecutionAction = useMemo(() => {
     const actions = Object.values(executionActions);
@@ -390,6 +423,13 @@ function Dashboard() {
         tool: apiTool,
         conversationId: activeConversationId,
         authToken,
+        workspaceContext: {
+          workspaceId: workspaceState?.activeWorkspaceId || activeWorkspace?.id,
+          workspaceKey: workspaceContextActive?.id,
+          label: workspaceContextActive?.name || workspaceLabel,
+          assistantContext: activeWorkspaceAssistantContext,
+          visibleAssetIds: workspaceVisibleAssetIds,
+        },
       });
 
       if (!ok) {
@@ -705,6 +745,12 @@ function Dashboard() {
         message: outreachPreview,
         conversationId: activeConversationId,
         authToken,
+        workspaceContext: {
+          workspaceId: workspaceState?.activeWorkspaceId || activeWorkspace?.id,
+          workspaceKey: workspaceContextActive?.id,
+          label: workspaceContextActive?.name || workspaceLabel,
+          assistantContext: activeWorkspaceAssistantContext,
+        },
       });
 
       if (!ok) {
@@ -805,9 +851,13 @@ function Dashboard() {
           input: recommendationSource,
           hasPermission,
           profileContext: assistantProfileContext,
+          tools: organizationAwareChatTools,
           workspaceContext: {
             activeWorkspaceId: workspaceState?.activeWorkspaceId || activeWorkspace?.id,
-            label: workspaceLabel,
+            workspaceKey: workspaceContextActive?.id,
+            label: workspaceContextActive?.name || workspaceLabel,
+            assistantContext: activeWorkspaceAssistantContext,
+            visibleAssetIds: workspaceVisibleAssetIds,
           },
           recentToolIds: toolPreferences.recentTools || [],
         })
@@ -822,8 +872,13 @@ function Dashboard() {
     activeWorkspace?.id,
     assistantProfileContext,
     hasPermission,
+    organizationAwareChatTools,
+    activeWorkspaceAssistantContext,
     recommendationSource,
     toolPreferences.recentTools,
+    workspaceContextActive?.id,
+    workspaceContextActive?.name,
+    workspaceVisibleAssetIds,
     workspaceLabel,
     workspaceState?.activeWorkspaceId,
   ]);

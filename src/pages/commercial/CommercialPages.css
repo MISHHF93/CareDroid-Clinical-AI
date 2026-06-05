@@ -78,12 +78,39 @@
 }
 
 .commercial-form-row input,
-.commercial-form-row select {
+.commercial-form-row select,
+.commercial-form-row textarea {
   padding: 10px 12px;
   border-radius: 8px;
   border: 1px solid var(--panel-border);
   background: var(--panel-bg, transparent);
   color: var(--text-color);
+}
+
+.commercial-form-row textarea {
+  resize: vertical;
+  min-height: 140px;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.commercial-config-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+.commercial-config-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.commercial-config-save {
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .commercial-chip-list {
@@ -124,11 +151,85 @@ button.commercial-chip {
   font-size: 12px;
 }
 
+.commercial-agent-grid {
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+}
+
+.commercial-agent-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.commercial-agent-card-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.commercial-agent-status {
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.commercial-agent-section {
+  display: grid;
+  gap: 8px;
+}
+
+.commercial-agent-section strong {
+  font-size: 13px;
+}
+
+.commercial-agent-section p {
+  margin: 0;
+}
+
 .commercial-pathway-step {
   padding: 14px;
   border: 1px solid var(--panel-border);
   border-radius: 10px;
   margin-bottom: 10px;
+}
+
+.commercial-pathway-grid {
+  margin-bottom: 16px;
+}
+
+.commercial-pathway-section {
+  display: grid;
+  gap: 12px;
+}
+
+.commercial-pathway-asset-list {
+  display: grid;
+  gap: 10px;
+}
+
+.commercial-pathway-asset-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.commercial-pathway-asset-row span {
+  display: grid;
+  gap: 4px;
+}
+
+.commercial-pathway-asset-row small {
+  color: var(--muted-text);
+}
+
+.commercial-pathway-ai {
+  margin-top: 16px;
 }
 
 .commercial-metric {

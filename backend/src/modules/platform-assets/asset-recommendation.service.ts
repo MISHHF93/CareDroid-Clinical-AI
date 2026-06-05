@@ -30,9 +30,16 @@ const ROLE_RECOMMENDATIONS: Record<string, string[]> = {
 
 const WORKSPACE_RECOMMENDATIONS: Record<string, string[]> = {
   emergency: ['qsofa', 'news2', 'nihss', 'protocols'],
+  icu: ['sofa-score', 'news2', 'rox-index', 'pao2-fio2-ratio', 'medical-iot-dashboard'],
+  cardiology: ['heart-score', 'timi-ua-nstemi', 'grace-acs', 'acs-workflow-assistant'],
+  laboratory: ['lab-interp', 'laboratory-dashboard', 'abg-interpreter', 'calc-gfr'],
+  operations: ['hospital-map', 'digital-twin', 'hospital-operations-command'],
   hospital: ['hospital-map', 'digital-twin', 'lab-interp'],
   fleet: ['fleet-dashboard', 'fleet-live-map', 'dispatch-ai'],
+  'medical-iot': ['medical-iot-dashboard', 'telemetry-monitoring', 'device-fleet-management'],
+  education: ['simulation-suite', 'scenario-player', 'simulation-outcomes', 'competency-platform'],
   research: ['guideline-rag', 'research-evidence-hub'],
+  governance: ['ai-governance', 'audit-logs', 'clinical-audit', 'ai-security'],
   admin: ['audit-logs', 'analytics'],
 };
 

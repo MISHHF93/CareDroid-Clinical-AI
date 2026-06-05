@@ -9,6 +9,7 @@ import { WorkspaceInvitation } from './entities/workspace-invitation.entity';
 import { WorkspaceMembership } from './entities/workspace-membership.entity';
 import { Workspace } from './entities/workspace.entity';
 import { WorkspacesController } from './workspaces.controller';
+import { WorkspaceContextService } from './workspace-context.service';
 import { WorkspacesService } from './workspaces.service';
 
 @Module({
@@ -25,7 +26,7 @@ import { WorkspacesService } from './workspaces.service';
     forwardRef(() => PlatformAssetsModule),
   ],
   controllers: [WorkspacesController],
-  providers: [WorkspacesService],
-  exports: [WorkspacesService],
+  providers: [WorkspacesService, WorkspaceContextService],
+  exports: [WorkspacesService, WorkspaceContextService],
 })
 export class WorkspacesModule {}

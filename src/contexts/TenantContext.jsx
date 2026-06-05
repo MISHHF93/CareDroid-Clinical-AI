@@ -43,6 +43,8 @@ const normalizeTenantContext = (input) => {
   return {
     organizationId: context.organizationId || context.organization?.id,
     organizationName: context.organizationName || context.organization?.name,
+    organizationType: context.organizationType || context.organization?.organizationType,
+    branding: context.branding || context.organization?.branding || {},
     workspaceId: context.workspaceId || context.workspace?.id || context.activeWorkspace?.id,
     workspaceName: context.workspaceName || context.workspace?.name || context.activeWorkspace?.name,
     userId: context.userId || context.user?.id,

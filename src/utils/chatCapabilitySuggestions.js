@@ -188,6 +188,26 @@ function getContextAwareLauncherSuggestions({
   });
 }
 
+function getWorkspaceContextSuggestions({ tools, workspaceContext, recentToolIds = [] }) {
+  const visibleAssetIds = new Set(workspaceContext?.visibleAssetIds || []);
+  if (!visibleAssetIds.size) return [];
+  return tools
+    .filter((tool) => visibleAssetIds.has(tool.id))
+    .slice(0, 4)
+    .map((tool, index) => ({
+      id: `workspace-${workspaceContext?.workspaceKey || 'active'}-${tool.id}`,
+      label: tool.name || tool.label || tool.id,
+      description: `Recommended for ${workspaceContext?.label || 'the active workspace'}.`,
+      kind: 'route',
+      toolId: tool.id,
+      path: tool.path || tool.navigationPath,
+      icon: getToolIcon(tool.id),
+      source: 'workspace-context',
+      defaultRank: -12 + index + (recentToolIds.includes(tool.id) ? -4 : 0),
+      keywords: [workspaceContext?.label, workspaceContext?.workspaceKey, tool.id, tool.name, tool.category],
+    }));
+}
+
 function makeExecutorSuggestion(registryId, index) {
   const record = typeof registryId === 'string' ? null : registryId;
   const canonicalId = record?.id || registryId;
@@ -283,6 +303,10 @@ export function getChatCapabilitySuggestions({
     workspaceContext,
     recentToolIds,
   }).forEach((suggestion) => {
+    suggestions.push(suggestion);
+  });
+
+  getWorkspaceContextSuggestions({ tools, workspaceContext, recentToolIds }).forEach((suggestion) => {
     suggestions.push(suggestion);
   });
 

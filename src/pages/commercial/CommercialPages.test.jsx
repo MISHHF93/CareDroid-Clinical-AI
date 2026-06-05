@@ -1,10 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import {
+  AgentsRegistryPage,
   AssetPacksBuilderPage,
+  CarePathwayDetailPage,
+  CarePathwaysIndexPage,
   ConfigurationStudioPage,
   OrganizationOnboardingPage,
+  ProductDetailPage,
   ProductsIndexPage,
 } from './CommercialPages';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
@@ -32,8 +36,13 @@ vi.mock('../../contexts/UserIdentityContext', () => ({
 vi.mock('../../services/productCatalogApi', () => ({
   ProductCatalogApi: {
     completeOnboarding: vi.fn(),
+    getCarePathway: vi.fn(),
+    getProductBuilder: vi.fn(),
+    listAgents: vi.fn(),
+    listCarePathways: vi.fn(),
     listProductBuilder: vi.fn(),
     listAssetPackBuilder: vi.fn(),
+    listSpecialties: vi.fn(),
     updateOrganizationConfiguration: vi.fn(),
   },
 }));
@@ -49,10 +58,13 @@ const productGraph = {
   product: {
     id: 'product-emergency-department',
     slug: 'emergency-department-suite',
-    name: 'Emergency Department Suite',
+    name: 'Emergency Department Solution',
     description: 'ED risk stratification and triage workflows.',
     packIds: ['emergency-department-pack'],
     targetBuyers: ['ED director'],
+    targetUsers: ['Emergency physicians'],
+    roles: ['Emergency physicians', 'emergency physician', 'triage nurse'],
+    workspaces: ['emergency', 'dashboard'],
     pricingTierPlaceholder: 'Enterprise',
   },
   packs: [
@@ -61,10 +73,30 @@ const productGraph = {
       name: 'Emergency Department Pack',
       assetIds: ['qsofa'],
       pricingTier: 'enterprise',
-      assets: [{ id: 'qsofa', title: 'qSOFA', route: '/tools/calculators/qsofa' }],
+      roles: ['emergency physician', 'triage nurse'],
+      workspaces: ['emergency'],
+      assets: [
+        {
+          id: 'qsofa',
+          title: 'qSOFA',
+          route: '/tools/calculators/qsofa',
+          roles: ['triage nurse'],
+          workspaces: ['emergency'],
+        },
+      ],
     },
   ],
-  assets: [{ id: 'qsofa', title: 'qSOFA', route: '/tools/calculators/qsofa' }],
+  assets: [
+    {
+      id: 'qsofa',
+      title: 'qSOFA',
+      route: '/tools/calculators/qsofa',
+      roles: ['triage nurse'],
+      workspaces: ['emergency'],
+    },
+  ],
+  roles: ['Emergency physicians', 'emergency physician', 'triage nurse'],
+  workspaces: ['emergency', 'dashboard'],
   routes: [{ assetId: 'qsofa', route: '/tools/calculators/qsofa' }],
   backendServices: ['ClinicalTools'],
 };
@@ -76,7 +108,7 @@ const packGraph = {
   assetIds: ['qsofa'],
   requiredDependencies: ['core-platform'],
   pricingTier: 'enterprise',
-  products: [{ id: 'product-emergency-department', name: 'Emergency Department Suite' }],
+  products: [{ id: 'product-emergency-department', name: 'Emergency Department Solution' }],
   assets: [{ id: 'qsofa', title: 'qSOFA', route: '/tools/calculators/qsofa', backendServices: ['ClinicalTools'] }],
 };
 
@@ -95,8 +127,93 @@ const roleProfiles = [
   { id: 'fleet-operator', label: 'Fleet operator' },
 ];
 
+const specialtyRows = [
+  { id: 'specialty-emergency', slug: 'emergency', name: 'Emergency' },
+  { id: 'specialty-operations', slug: 'operations', name: 'Operations' },
+  { id: 'specialty-cardiology', slug: 'cardiology', name: 'Cardiology' },
+];
+
+const agentRegistryRows = [
+  {
+    id: 'agent-emergency',
+    title: 'Emergency AI',
+    description: 'Emergency department support.',
+    capabilities: ['Triage assistance', 'Emergency risk scoring'],
+    assetAccess: [
+      {
+        id: 'qsofa',
+        title: 'qSOFA',
+        assetType: 'calculator',
+        route: '/tools/calculators/qsofa',
+      },
+    ],
+    workspaceAwareness: ['emergency'],
+    roleAwareness: ['emergency physician', 'nurse'],
+    toolCallingPermissions: ['invoke-risk-scores'],
+    canCallTools: true,
+  },
+];
+
+const carePathwayRows = [
+  {
+    id: 'pathway-sepsis',
+    slug: 'sepsis',
+    name: 'Sepsis',
+    description: 'Sepsis bundle and deterioration monitoring.',
+    calculatorAssetIds: ['qsofa'],
+    protocolAssetIds: ['protocol-sepsis'],
+    workflowAssetIds: ['workflows'],
+    simulationAssetIds: ['sepsis-deterioration'],
+    aiAgentId: 'agent-clinical',
+    outcomes: ['bundle compliance', 'early recognition'],
+  },
+];
+
+const carePathwayDetail = {
+  ...carePathwayRows[0],
+  calculators: [{ id: 'qsofa', title: 'qSOFA', assetType: 'calculator', route: '/tools/calculators/qsofa' }],
+  protocols: [{ id: 'protocol-sepsis', title: 'Sepsis Management', assetType: 'protocol', route: '/protocols' }],
+  workflows: [{ id: 'workflows', title: 'Workflow Builder', assetType: 'workflow', route: '/workflows' }],
+  simulations: [
+    {
+      id: 'sepsis-deterioration',
+      title: 'Sepsis Deterioration',
+      assetType: 'simulation',
+      route: '/simulation/sepsis-deterioration',
+    },
+  ],
+  aiAgent: { id: 'agent-clinical', title: 'Clinical AI', route: '/assistant' },
+  linkedAssetCounts: {
+    calculators: 1,
+    protocols: 1,
+    workflows: 1,
+    simulations: 1,
+    aiAgents: 1,
+  },
+};
+
 function renderPage(element) {
   return render(<MemoryRouter>{element}</MemoryRouter>);
+}
+
+function renderCarePathwayDetail(route = '/care-pathways/sepsis') {
+  return render(
+    <MemoryRouter initialEntries={[route]}>
+      <Routes>
+        <Route path="/care-pathways/:slug" element={<CarePathwayDetailPage />} />
+      </Routes>
+    </MemoryRouter>
+  );
+}
+
+function renderProductDetail(route = '/products/emergency-department-suite') {
+  return render(
+    <MemoryRouter initialEntries={[route]}>
+      <Routes>
+        <Route path="/products/:slug" element={<ProductDetailPage />} />
+      </Routes>
+    </MemoryRouter>
+  );
 }
 
 async function renderOnboardingPage() {
@@ -109,9 +226,31 @@ describe('Commercial builder pages', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     ProductCatalogApi.listProductBuilder.mockResolvedValue([productGraph]);
+    ProductCatalogApi.getProductBuilder.mockResolvedValue(productGraph);
     ProductCatalogApi.listAssetPackBuilder.mockResolvedValue([packGraph]);
+    ProductCatalogApi.listAgents.mockResolvedValue(agentRegistryRows);
+    ProductCatalogApi.listCarePathways.mockResolvedValue(carePathwayRows);
+    ProductCatalogApi.getCarePathway.mockResolvedValue(carePathwayDetail);
+    ProductCatalogApi.listSpecialties.mockResolvedValue(specialtyRows);
     ProductCatalogApi.updateOrganizationConfiguration.mockResolvedValue({});
-    ProductCatalogApi.completeOnboarding.mockResolvedValue({});
+    ProductCatalogApi.completeOnboarding.mockResolvedValue({
+      tenantProfile: {
+        organization: {
+          name: 'North EMS',
+          slug: 'north-ems',
+          organizationType: 'ems',
+        },
+        specialties: ['emergency', 'operations'],
+        workspaceDefaults: [{ name: 'EMS Command', type: 'emergency' }],
+        workspaces: [{ id: 'workspace-1', name: 'EMS Command', type: 'emergency' }],
+        roleProfileId: 'fleet-operator',
+        roleAssignments: [],
+        installedPackIds: ['core-platform', 'emergency-medicine', 'fleet-logistics'],
+        integrationsRequested: ['identity-sso', 'scheduling'],
+        branding: { displayName: 'North EMS Command', accentColor: '#00ff88' },
+        complianceMode: 'ems',
+      },
+    });
     PlatformAssetsApi.listPacks.mockResolvedValue(onboardingPacks);
     PlatformAssetsApi.listRoleProfiles.mockResolvedValue(roleProfiles);
   });
@@ -119,10 +258,22 @@ describe('Commercial builder pages', () => {
   it('renders products as product-pack-asset-route-service graph cards', async () => {
     renderPage(<ProductsIndexPage />);
 
-    expect(await screen.findByRole('heading', { name: /emergency department suite/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /emergency department solution/i })).toBeInTheDocument();
     expect(screen.getAllByText((_, element) => element?.textContent?.includes('1 packs')).length).toBeGreaterThan(0);
     expect(screen.getAllByText((_, element) => element?.textContent?.includes('1 assets')).length).toBeGreaterThan(0);
+    expect(screen.getByText(/emergency physician/i)).toBeInTheDocument();
+    expect(screen.getByText(/emergency, dashboard/i)).toBeInTheDocument();
     expect(screen.getByText(/clinicaltools/i)).toBeInTheDocument();
+  });
+
+  it('renders product detail role and workspace mappings', async () => {
+    renderProductDetail();
+
+    expect(await screen.findByRole('heading', { name: /emergency department solution/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^roles$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^workspaces$/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/triage nurse/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/emergency/i).length).toBeGreaterThan(0);
   });
 
   it('renders asset pack builder mappings', async () => {
@@ -130,41 +281,131 @@ describe('Commercial builder pages', () => {
 
     expect(await screen.findByRole('heading', { name: /emergency department pack/i })).toBeInTheDocument();
     expect(screen.getByText(/depends on:/i)).toBeInTheDocument();
-    expect(screen.getByText(/emergency department suite/i)).toBeInTheDocument();
+    expect(screen.getByText(/emergency department solution/i)).toBeInTheDocument();
     expect(screen.getByText(/tools\/calculators\/qsofa/i)).toBeInTheDocument();
   });
 
-  it('saves selected products from configuration studio', async () => {
+  it('renders AI agent registry details and launch links', async () => {
+    renderPage(<AgentsRegistryPage />);
+
+    expect(await screen.findByRole('heading', { name: /emergency ai/i })).toBeInTheDocument();
+    expect(screen.getByText(/triage assistance/i)).toBeInTheDocument();
+    expect(screen.getByText('qSOFA')).toBeInTheDocument();
+    expect(screen.getByText('emergency physician, nurse')).toBeInTheDocument();
+    expect(screen.getByText(/invoke-risk-scores/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /open agent/i })).toHaveAttribute(
+      'href',
+      '/assistant?agent=agent-emergency',
+    );
+  });
+
+  it('renders care pathway index cards with link counts and outcomes', async () => {
+    renderPage(<CarePathwaysIndexPage />);
+
+    expect(await screen.findByRole('heading', { name: /sepsis/i })).toBeInTheDocument();
+    expect(screen.getByText(/5 linked assets/i)).toBeInTheDocument();
+    expect(screen.getByText(/bundle compliance/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /start pathway/i })).toHaveAttribute(
+      'href',
+      '/care-pathways/sepsis',
+    );
+  });
+
+  it('renders care pathway detail sections and AI guidance', async () => {
+    renderCarePathwayDetail();
+
+    expect(await screen.findByRole('heading', { name: /sepsis/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /calculators/i })).toBeInTheDocument();
+    expect(screen.getByText('qSOFA')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /protocols/i })).toBeInTheDocument();
+    expect(screen.getByText('Sepsis Management')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /simulations/i })).toBeInTheDocument();
+    expect(screen.getByText('Sepsis Deterioration')).toBeInTheDocument();
+    expect(screen.getByText('Clinical AI')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /open ai guidance/i })).toHaveAttribute(
+      'href',
+      '/assistant?agent=agent-clinical',
+    );
+  });
+
+  it('saves full tenant configuration from configuration studio', async () => {
     renderPage(<ConfigurationStudioPage />);
 
-    expect(await screen.findByRole('button', { name: /emergency department suite/i })).toHaveClass(
+    expect(await screen.findByRole('button', { name: /emergency department solution/i })).toHaveClass(
       'selected',
     );
+    expect(screen.getByRole('heading', { name: /navigation/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /workspaces/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /packs/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /permissions/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /branding/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /ai agents/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /dashboards/i })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByRole('textbox', { name: /hidden nav ids/i }), {
+      target: { value: 'legacy, outcomes' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: /primary landing route/i }), {
+      target: { value: '/command' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: /^display name$/i }), {
+      target: { value: 'Demo Command' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: /accent color/i }), {
+      target: { value: '#0055ff' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: /logo url/i }), {
+      target: { value: '/logo.svg' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: /workspace defaults json/i }), {
+      target: { value: '[{"name":"Emergency Command","type":"emergency"}]' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: /permissions overrides json/i }), {
+      target: { value: '{"roles":{"admin":["configure-system"]}}' },
+    });
+    fireEvent.change(screen.getByRole('textbox', { name: /dashboard layout json/i }), {
+      target: { value: '{"home":["platform-analytics"]}' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /emergency department pack/i }));
+    fireEvent.click(screen.getByRole('button', { name: /emergency ai/i }));
     fireEvent.click(screen.getByRole('button', { name: /save configuration/i }));
 
     await waitFor(() => {
       expect(ProductCatalogApi.updateOrganizationConfiguration).toHaveBeenCalledWith(
         'org-1',
         expect.objectContaining({
+          navigation: {
+            hiddenNavIds: ['legacy', 'outcomes'],
+            primaryLanding: '/command',
+          },
+          branding: {
+            displayName: 'Demo Command',
+            accentColor: '#0055ff',
+            logoUrl: '/logo.svg',
+          },
+          workspaceDefaults: [{ name: 'Emergency Command', type: 'emergency' }],
+          permissionsOverrides: { roles: { admin: ['configure-system'] } },
+          dashboardLayout: { home: ['platform-analytics'] },
+          enabledAgentIds: ['agent-emergency'],
           enabledProductIds: ['product-emergency-department'],
+          enabledPackIds: ['emergency-department-pack'],
         }),
       );
     });
+    expect(mockIdentity.refreshPlatformContext).toHaveBeenCalled();
   });
 
-  it('renders all nine onboarding steps in the required order', async () => {
+  it('renders all seven onboarding steps in the required order', async () => {
     await renderOnboardingPage();
 
     [
       '1. Organization type',
-      '2. Departments',
-      '3. Workspaces',
-      '4. User roles',
-      '5. Asset packs',
-      '6. Integrations',
-      '7. Branding',
-      '8. Compliance mode',
-      '9. Review and activate',
+      '2. Specialty selection',
+      '3. Workspace selection',
+      '4. Asset pack selection',
+      '5. User roles',
+      '6. Branding',
+      '7. Integrations',
     ].forEach((label) => {
       expect(screen.getByText(label)).toBeInTheDocument();
     });
@@ -172,18 +413,18 @@ describe('Commercial builder pages', () => {
 
   it.each([
     ['hospital', /emergency/i, /clinical operations/i],
-    ['clinic', /pharmacy/i, /clinic workspace/i],
+    ['clinic', /cardiology/i, /clinic workspace/i],
     ['ems', /operations/i, /ems command/i],
-  ])('applies editable %s tenant presets', async (type, department, workspaceName) => {
+  ])('applies editable %s tenant presets', async (type, specialty, workspaceName) => {
     await renderOnboardingPage();
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: type } });
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
 
-    const departmentButton = screen.getByRole('button', { name: department });
-    expect(departmentButton).toHaveClass('selected');
-    fireEvent.click(departmentButton);
-    expect(departmentButton).not.toHaveClass('selected');
+    const specialtyButton = screen.getByRole('button', { name: specialty });
+    expect(specialtyButton).toHaveClass('selected');
+    fireEvent.click(specialtyButton);
+    expect(specialtyButton).not.toHaveClass('selected');
 
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
     expect(screen.getByDisplayValue(workspaceName)).toBeInTheDocument();
@@ -198,14 +439,15 @@ describe('Commercial builder pages', () => {
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'ems' } });
 
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    expect(screen.getByRole('button', { name: /operations/i })).toHaveClass('selected');
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    expect(screen.getByDisplayValue(/ems command/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
-    fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    await screen.findByRole('button', { name: /emergency department solution/i });
+    fireEvent.click(screen.getByRole('button', { name: /emergency department solution/i }));
 
-    await screen.findByRole('button', { name: /emergency department suite/i });
-    fireEvent.click(screen.getByRole('button', { name: /emergency department suite/i }));
-
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
+    expect(screen.getByDisplayValue(/fleet operator/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
 
     const brandingInputs = screen.getAllByRole('textbox');
@@ -213,13 +455,7 @@ describe('Commercial builder pages', () => {
     fireEvent.change(brandingInputs[1], { target: { value: '#00ff88' } });
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
 
-    expect(screen.getByRole('button', { name: /ems operations/i })).toHaveClass('selected');
-    fireEvent.click(screen.getByRole('button', { name: /next/i }));
-
-    expect(screen.getByRole('heading', { name: /review and activate/i })).toBeInTheDocument();
-    expect(screen.getByText(/North EMS \(ems\)/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/EMS Command/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/North EMS Command/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /identity-sso/i })).toHaveClass('selected');
 
     fireEvent.click(screen.getByRole('button', { name: /complete setup/i }));
 
@@ -229,6 +465,7 @@ describe('Commercial builder pages', () => {
           name: 'North EMS',
           slug: 'north-ems',
           organizationType: 'ems',
+          specialties: expect.arrayContaining(['emergency', 'operations']),
           complianceMode: 'ems',
           enabledProductIds: ['product-emergency-department'],
           productIds: ['product-emergency-department'],
@@ -247,5 +484,9 @@ describe('Commercial builder pages', () => {
         }),
       );
     });
+    expect(await screen.findByRole('heading', { name: /configured tenant profile/i })).toBeInTheDocument();
+    expect(screen.getByText(/North EMS \(ems\)/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/EMS Command/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/North EMS Command/i)).toBeInTheDocument();
   });
 });

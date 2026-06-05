@@ -33,6 +33,9 @@ import './ToolsOverview.css';
 const TOOL_FILTER_OPTIONS = Object.freeze([
   { value: 'all', label: 'All' },
   { value: 'recommended', label: 'Recommended' },
+  { value: 'workspace', label: 'Workspace' },
+  { value: 'organization', label: 'Organization' },
+  { value: 'permitted', label: 'Permitted' },
   { value: 'calculator', label: 'Calculators' },
   { value: 'diagnostics', label: 'Diagnostics' },
   { value: 'ai-workflows', label: 'AI Workflows' },
@@ -235,7 +238,16 @@ const ToolsOverview = () => {
     toggleHidden,
     recordToolAccess,
   } = toolPreferences;
-  const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
+  const {
+    workspaces = [],
+    activeWorkspaceId = 'emergency',
+    setActiveWorkspaceId,
+    activeWorkspace: workspaceContextActive,
+    recommendations: workspaceRecommendations = [],
+    switchWorkspace = setActiveWorkspaceId,
+    visibleAssetIds = [],
+    workspaceContext = null,
+  } = useWorkspace();
   const { user } = useUser();
   const {
     account,
@@ -247,10 +259,15 @@ const ToolsOverview = () => {
     organization,
   } = useUserIdentity();
 
-  const recommendations = useMemo(
-    () => getRoleBasedAssetRecommendations({ account, roleProfile }),
-    [account, roleProfile]
-  );
+  const recommendations = useMemo(() => {
+    if (workspaceRecommendations.length) {
+      return workspaceRecommendations.map((recommendation) => ({
+        id: recommendation.assetId,
+        reason: recommendation.reason,
+      }));
+    }
+    return getRoleBasedAssetRecommendations({ account, roleProfile });
+  }, [account, roleProfile, workspaceRecommendations]);
   const recommendedIds = useMemo(() => recommendations.map((t) => t.id), [recommendations]);
 
   const accessContext = useMemo(
@@ -258,19 +275,22 @@ const ToolsOverview = () => {
       ...(platformContext || {}),
       account,
       activeWorkspace,
+        workspaceContextActive,
       preferences,
       workspaceState,
+        visibleAssetIds,
     }),
-    [account, activeWorkspace, platformContext, preferences, workspaceState]
+    [account, activeWorkspace, platformContext, preferences, visibleAssetIds, workspaceContextActive, workspaceState]
   );
   const accessRole = platformContext?.membership?.role || account?.role || user?.role;
 
   const allToolsWithAccess = useMemo(() => {
     const projected = FEATURE_FLAGS.platformEntitlements
+      && platformContext
       ? getAssetAwareToolProjection(accessContext, accessRole)
       : getUserFacingToolRegistryProjection();
     return filterVisibleTools(projected, { includeLocked: true });
-  }, [accessContext, accessRole]);
+  }, [accessContext, accessRole, platformContext]);
 
   const tools = useMemo(
     () => filterVisibleTools(allToolsWithAccess, { includeLocked: toolFilter === 'all' }),
@@ -291,14 +311,17 @@ const ToolsOverview = () => {
     () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
     [activeWorkspaceId, workspaces]
   );
+  const isBackendWorkspaceContext = Boolean(workspaceContext?.workspace);
+  const isAllToolsWorkspace =
+    activeWorkspaceId === 'all' || (!isBackendWorkspaceContext && !localActiveWorkspace?.toolIds?.length);
   const profile = useMemo(
     () =>
       buildUserToolProfile({
         account,
         user,
         preferences,
-        activeWorkspace: activeWorkspace || localActiveWorkspace,
-        activeWorkspaceId: workspaceState?.activeWorkspaceId || activeWorkspaceId,
+        activeWorkspace: workspaceContextActive || activeWorkspace || localActiveWorkspace,
+        activeWorkspaceId: isAllToolsWorkspace ? 'all' : workspaceState?.activeWorkspaceId || activeWorkspaceId,
         toolPreferences,
         permissions: workspaceState?.effectivePermissions || [],
       }),
@@ -306,10 +329,12 @@ const ToolsOverview = () => {
       account,
       activeWorkspace,
       activeWorkspaceId,
+      isAllToolsWorkspace,
       localActiveWorkspace,
       preferences,
       toolPreferences,
       user,
+      workspaceContextActive,
       workspaceState?.activeWorkspaceId,
       workspaceState?.effectivePermissions,
     ]
@@ -318,16 +343,17 @@ const ToolsOverview = () => {
     () => buildProfileToolGraph({ tools, profile }),
     [profile, tools]
   );
-  const isAllToolsWorkspace = activeWorkspaceId === 'all';
   const allToolIds = useMemo(() => tools.map((tool) => tool.id), [tools]);
   const workspaceToolIds = useMemo(
     () =>
-      isAllToolsWorkspace
+      visibleAssetIds?.length
+        ? visibleAssetIds
+        : isAllToolsWorkspace
         ? allToolIds
         : localActiveWorkspace
           ? localActiveWorkspace.toolIds || []
           : allToolIds,
-    [localActiveWorkspace, allToolIds, isAllToolsWorkspace]
+    [localActiveWorkspace, allToolIds, isAllToolsWorkspace, visibleAssetIds]
   );
   const workspaceToolIdSet = useMemo(() => new Set(workspaceToolIds), [workspaceToolIds]);
   const workspaceInventoryCount = useMemo(
@@ -467,7 +493,7 @@ const ToolsOverview = () => {
             <select
               id="workspaceSelect"
               value={activeWorkspaceId}
-              onChange={(e) => setActiveWorkspaceId(e.target.value)}
+              onChange={(e) => switchWorkspace(e.target.value)}
             >
               {workspaces.map((workspace) => (
                 <option key={workspace.id} value={workspace.id}>

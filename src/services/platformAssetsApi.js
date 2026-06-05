@@ -37,6 +37,28 @@ export const PlatformAssetsApi = {
     return response.json();
   },
 
+  async listMarketplacePacks(params = {}) {
+    const search = new URLSearchParams();
+    if (params.organizationId) search.set('organizationId', params.organizationId);
+    if (params.organizationType) search.set('organizationType', params.organizationType);
+    if (params.publishedOnly === false) search.set('publishedOnly', 'false');
+    const qs = search.toString();
+    const response = await apiFetch(`/api/platform/marketplace/packs${qs ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error(`Marketplace packs failed (${response.status})`);
+    return response.json();
+  },
+
+  async getMarketplacePack(packId, params = {}) {
+    const search = new URLSearchParams();
+    if (params.organizationId) search.set('organizationId', params.organizationId);
+    const qs = search.toString();
+    const response = await apiFetch(
+      `/api/platform/marketplace/packs/${encodeURIComponent(packId)}${qs ? `?${qs}` : ''}`
+    );
+    if (!response.ok) throw new Error(`Marketplace pack failed (${response.status})`);
+    return response.json();
+  },
+
   async installPack(organizationId, packId) {
     const response = await apiFetch(
       `/api/platform/organizations/${organizationId}/packs/${packId}/install`,
@@ -119,6 +141,28 @@ export const PlatformAssetsApi = {
   async getCurrentOrganization() {
     const response = await apiFetch('/api/organizations/current');
     if (!response.ok) throw new Error(`Current organization failed (${response.status})`);
+    return response.json();
+  },
+
+  async getCurrentOrganizationEngine() {
+    const response = await apiFetch('/api/organizations/current/engine');
+    if (!response.ok) throw new Error(`Organization engine failed (${response.status})`);
+    return response.json();
+  },
+
+  async getOrganizationEngine(organizationId) {
+    const response = await apiFetch(`/api/organizations/${organizationId}/engine`);
+    if (!response.ok) throw new Error(`Organization engine failed (${response.status})`);
+    return response.json();
+  },
+
+  async updateOrganizationSettings(organizationId, payload) {
+    const response = await apiFetch(`/api/organizations/${organizationId}/settings`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error(`Update organization settings failed (${response.status})`);
     return response.json();
   },
 

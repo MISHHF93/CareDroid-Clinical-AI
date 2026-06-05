@@ -27,6 +27,11 @@ export class UpdateOrganizationConfigurationDto {
   enabledProductIds?: string[];
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  enabledPackIds?: string[];
+
+  @IsOptional()
   @IsObject()
   dashboardLayout?: Record<string, unknown>;
 

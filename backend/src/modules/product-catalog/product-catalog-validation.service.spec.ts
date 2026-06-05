@@ -81,4 +81,22 @@ describe('ProductCatalogValidationService', () => {
     expect(result.valid).toBe(true);
     expect(result.errors).toEqual([]);
   });
+
+  it('validates care pathway AI agent references', async () => {
+    pathwayRepo.find.mockResolvedValue([
+      {
+        slug: 'sepsis',
+        calculatorAssetIds: [],
+        protocolAssetIds: [],
+        workflowAssetIds: [],
+        simulationAssetIds: [],
+        aiAgentId: 'agent-clinical',
+      },
+    ]);
+
+    const result = await service.validateCatalogReferences();
+
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('Pathway sepsis: missing asset agent-clinical');
+  });
 });

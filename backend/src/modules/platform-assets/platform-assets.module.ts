@@ -3,12 +3,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditLog } from '../audit/entities/audit-log.entity';
 import { FleetModule } from '../fleet/fleet.module';
 import { OrganizationMembership } from '../organizations/entities/organization-membership.entity';
+import { Product } from '../product-catalog/entities/product.entity';
+import { UsageEvent } from '../subscriptions/entities/usage-event.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
 import { UserProfileModule } from '../user-profile/user-profile.module';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { AssetAccessService } from './asset-access.service';
 import { AssetRecommendationService } from './asset-recommendation.service';
+import { AssetRegistryService } from './asset-registry.service';
 import { AssetPack } from './entities/asset-pack.entity';
 import { OrganizationEntitlement } from './entities/organization-entitlement.entity';
 import { PlatformAsset } from './entities/platform-asset.entity';
@@ -33,6 +36,8 @@ import { PlatformContextService } from './platform-context.service';
       OrganizationMembership,
       UserProfile,
       AuditLog,
+      UsageEvent,
+      Product,
     ]),
     forwardRef(() => WorkspacesModule),
     UserProfileModule,
@@ -41,6 +46,7 @@ import { PlatformContextService } from './platform-context.service';
   controllers: [PlatformAssetsController],
   providers: [
     PlatformAssetsService,
+    AssetRegistryService,
     FeatureFlagService,
     EntitlementService,
     PlatformAssetsSeedService,
@@ -52,6 +58,7 @@ import { PlatformContextService } from './platform-context.service';
   ],
   exports: [
     PlatformAssetsService,
+    AssetRegistryService,
     FeatureFlagService,
     EntitlementService,
     PlatformContextService,

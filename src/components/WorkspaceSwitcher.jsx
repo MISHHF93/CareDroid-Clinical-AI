@@ -5,6 +5,9 @@ import {
   DEFAULT_CARE_WORKSPACE_ID,
   getCareWorkspaceById,
 } from '../config/workspace.config';
+import { useTenantContext } from '../contexts/TenantContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { NavIcon } from '../navigation/NavIcon';
 import { getWorkspaceIcon } from '../navigation/iconRegistry';
 import './WorkspaceSwitcher.css';
@@ -17,7 +20,13 @@ function workspaceIdFromPath(pathname) {
 export default function WorkspaceSwitcher({ compact = false }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const activeWorkspaceId = workspaceIdFromPath(location.pathname);
+  const {
+    activeWorkspaceId: contextWorkspaceId,
+    switchWorkspace,
+  } = useWorkspace();
+  const { refreshTenantContext } = useTenantContext();
+  const { refreshIdentity } = useUserIdentity();
+  const activeWorkspaceId = contextWorkspaceId || workspaceIdFromPath(location.pathname);
   const activeWorkspace = getCareWorkspaceById(activeWorkspaceId);
   const ActiveIcon = useMemo(
     () => getWorkspaceIcon(activeWorkspace.icon),
@@ -34,7 +43,13 @@ export default function WorkspaceSwitcher({ compact = false }) {
         id="care-workspace-switcher"
         className="workspace-switcher__select"
         value={activeWorkspace.id}
-        onChange={(event) => navigate(`/workspace/${event.target.value}`)}
+        onChange={async (event) => {
+          const nextWorkspaceId = event.target.value;
+          await switchWorkspace(nextWorkspaceId);
+          await refreshTenantContext();
+          await refreshIdentity();
+          navigate(`/workspace/${nextWorkspaceId}`);
+        }}
         aria-label="Switch CareDroid workspace"
       >
         {CARE_WORKSPACES.map((workspace) => (

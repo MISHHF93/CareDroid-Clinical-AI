@@ -2,6 +2,9 @@ import { useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import { useTenantContext } from '../contexts/TenantContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import {
   CARE_WORKSPACES,
   DEFAULT_CARE_WORKSPACE_ID,
@@ -57,12 +60,27 @@ export default function WorkspaceHome() {
   const { workspaceId = DEFAULT_CARE_WORKSPACE_ID } = useParams();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
+  const { refreshTenantContext } = useTenantContext();
+  const { refreshIdentity } = useUserIdentity();
+  const {
+    assistantContext,
+    recommendations,
+    shortcuts,
+    switchWorkspace,
+  } = useWorkspace();
   const model = useMemo(() => buildCareWorkspaceModel(workspaceId), [workspaceId]);
   const workspaceSummary = useMemo(() => workspaceFilterSummary(model.workspace.id), [model.workspace.id]);
   const WorkspaceIcon = getWorkspaceIcon(model.workspace.icon);
 
   const launchRoute = (path) => {
     navigate({ pathname: path, search: '' });
+  };
+
+  const activateWorkspace = async (nextWorkspaceId) => {
+    await switchWorkspace(nextWorkspaceId);
+    await refreshTenantContext();
+    await refreshIdentity();
+    navigate(`/workspace/${nextWorkspaceId}`);
   };
 
   const launchTool = (tool) => {
@@ -78,7 +96,7 @@ export default function WorkspaceHome() {
   };
 
   const launchAssistantContext = () => {
-    addMessage(model.workspace.aiContext, 'user');
+    addMessage(assistantContext || model.workspace.aiContext, 'user');
     navigate('/assistant');
   };
 
@@ -113,7 +131,7 @@ export default function WorkspaceHome() {
               key={workspace.id}
               type="button"
               className={`workspace-chip${active ? ' workspace-chip--active' : ''}`}
-              onClick={() => navigate(workspace.path)}
+              onClick={() => activateWorkspace(workspace.id)}
               aria-current={active ? 'page' : undefined}
             >
               <NavIcon icon={Icon} size={17} aria-hidden />
@@ -127,7 +145,7 @@ export default function WorkspaceHome() {
         <div>
           <p className="workspace-eyebrow">AI Context</p>
           <h2 id="workspace-context-title">Tools appear when the work requires them</h2>
-          <p>{model.workspace.aiContext}</p>
+          <p>{assistantContext || model.workspace.aiContext}</p>
         </div>
         <dl className="workspace-stats">
           <div>
@@ -156,7 +174,7 @@ export default function WorkspaceHome() {
             <p>Dashboards, maps, and settings that belong to this workspace.</p>
           </div>
           <div className="workspace-card-grid">
-            {model.routeEntries.map((route) => (
+            {(shortcuts.length ? shortcuts : model.routeEntries).map((route) => (
               <WorkspaceRouteCard key={route.id} route={route} onLaunch={launchRoute} />
             ))}
           </div>
@@ -168,7 +186,14 @@ export default function WorkspaceHome() {
             <p>Inventory-backed actions surfaced by context instead of sidebar sprawl.</p>
           </div>
           <div className="workspace-card-grid">
-            {model.toolEntries.map((tool) => (
+            {(recommendations.length
+              ? recommendations
+                  .map((recommendation) =>
+                    model.toolEntries.find((tool) => tool.id === recommendation.assetId)
+                  )
+                  .filter(Boolean)
+              : model.toolEntries
+            ).map((tool) => (
               <WorkspaceToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
             ))}
           </div>

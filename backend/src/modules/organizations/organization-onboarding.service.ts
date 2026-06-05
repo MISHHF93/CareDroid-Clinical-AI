@@ -126,6 +126,7 @@ export class OrganizationOnboardingService {
         organizationType: org.organizationType,
         country: org.country,
       },
+      specialties: dto.specialties || [],
       departments: dto.departments || [],
       workspaceDefaults: dto.workspaceSetups || [],
       workspaces,

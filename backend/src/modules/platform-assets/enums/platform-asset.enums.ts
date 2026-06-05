@@ -65,6 +65,7 @@ export enum OrganizationType {
   CLINIC = 'clinic',
   EMS = 'ems',
   RESEARCH_INSTITUTE = 'research_institute',
+  RESEARCH_CENTER = 'research_center',
   HEALTH_SYSTEM = 'health_system',
   LONG_TERM_CARE = 'long_term_care',
   HOME_CARE = 'home_care',

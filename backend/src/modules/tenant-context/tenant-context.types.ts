@@ -4,6 +4,8 @@ import { UserRole } from '../users/entities/user.entity';
 export interface TenantContext {
   organizationId: string;
   organizationName?: string;
+  organizationType?: string;
+  branding?: Record<string, any>;
   workspaceId: string;
   workspaceName?: string;
   userId: string;

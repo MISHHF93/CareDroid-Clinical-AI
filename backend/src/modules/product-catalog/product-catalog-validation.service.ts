@@ -90,6 +90,7 @@ export class ProductCatalogValidationService {
         ...(row.protocolAssetIds || []),
         ...(row.workflowAssetIds || []),
         ...(row.simulationAssetIds || []),
+        ...(row.aiAgentId ? [row.aiAgentId] : []),
       ];
       for (const id of ids) {
         if (!assetIds.has(id)) errors.push(`Pathway ${row.slug}: missing asset ${id}`);

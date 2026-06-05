@@ -93,6 +93,7 @@ describe('OrganizationOnboardingService', () => {
       slug: 'north-ems',
       organizationType: OrganizationType.EMS,
       country: 'US',
+      specialties: ['emergency', 'operations'],
       departments: ['Emergency', 'Operations'],
       packIds: ['emergency-medicine'],
       productIds: ['product-ems'],
@@ -136,6 +137,7 @@ describe('OrganizationOnboardingService', () => {
       expect.objectContaining({
         tenantProfile: expect.objectContaining({
           organization: expect.objectContaining({ slug: 'north-ems' }),
+          specialties: ['emergency', 'operations'],
           departments: ['Emergency', 'Operations'],
           productIds: ['product-ems'],
           complianceMode: 'ems',

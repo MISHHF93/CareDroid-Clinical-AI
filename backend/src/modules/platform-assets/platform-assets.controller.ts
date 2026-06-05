@@ -118,6 +118,43 @@ export class PlatformAssetsController {
     });
   }
 
+  @Get('marketplace/packs')
+  @OrganizationScoped()
+  @ApiOperation({ summary: 'List asset packs with organization marketplace state' })
+  async marketplacePacks(
+    @Req() req: any,
+    @Query('organizationId') organizationId?: string,
+    @Query('organizationType') organizationType?: string,
+    @Query('publishedOnly') publishedOnly?: string,
+  ) {
+    const orgId = organizationId || req.tenantContext?.organizationId;
+    if (orgId) {
+      this.assertTenantOrganization(req, orgId);
+      await this.assertOrgMember(req.user.id, orgId);
+    }
+    return this.platformAssetsService.listMarketplacePacks({
+      organizationId: orgId,
+      organizationType,
+      publishedOnly: publishedOnly !== 'false',
+    });
+  }
+
+  @Get('marketplace/packs/:packId')
+  @OrganizationScoped()
+  @ApiOperation({ summary: 'Get asset pack marketplace details' })
+  async marketplacePack(
+    @Req() req: any,
+    @Param('packId') packId: string,
+    @Query('organizationId') organizationId?: string,
+  ) {
+    const orgId = organizationId || req.tenantContext?.organizationId;
+    if (orgId) {
+      this.assertTenantOrganization(req, orgId);
+      await this.assertOrgMember(req.user.id, orgId);
+    }
+    return this.platformAssetsService.getMarketplacePack(packId, { organizationId: orgId });
+  }
+
   @Get('packs/:packId')
   @ApiOperation({ summary: 'Get asset pack by id' })
   async getPack(@Param('packId') packId: string) {

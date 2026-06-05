@@ -4,6 +4,7 @@ import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import { getAssetAwareToolProjection } from '../data/assetAccess';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
@@ -63,12 +64,26 @@ function makeWorkspaceEntry(workspace) {
     id: `workspace:${workspace.id}`,
     sourceId: workspace.id,
     kind: 'workspace',
-    label: `${workspace.label} Workspace`,
+    label: `${workspace.label || workspace.name} Workspace`,
     description: workspace.description,
     category: 'Workspace',
     path: workspace.path,
     icon: getWorkspaceIcon(workspace.icon),
     aliases: [workspace.shortLabel, workspace.aiContext],
+  };
+}
+
+function makeShortcutEntry(shortcut) {
+  return {
+    id: `workspace-shortcut:${shortcut.id}`,
+    sourceId: shortcut.id,
+    kind: 'nav',
+    label: shortcut.label,
+    description: shortcut.description,
+    category: 'Workspace Shortcut',
+    path: shortcut.path,
+    icon: CHROME_ICONS.layoutDashboard,
+    aliases: [shortcut.assetId],
   };
 }
 
@@ -180,6 +195,13 @@ export default function QuickCommandLauncher({
   const { recentTools, favorites, recordToolAccess } = useToolPreferences();
   const { user } = useUser();
   const { account, activeWorkspace, preferences, platformContext, workspaceState } = useUserIdentity();
+  const {
+    activeWorkspace: workspaceContextActive,
+    shortcuts: workspaceShortcuts,
+    switchWorkspace,
+    visibleAssetIds,
+    workspaces: contextWorkspaces,
+  } = useWorkspace();
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
@@ -190,25 +212,31 @@ export default function QuickCommandLauncher({
       activeWorkspace,
       preferences,
       workspaceState,
+      visibleAssetIds,
     }),
-    [account, activeWorkspace, platformContext, preferences, workspaceState]
+    [account, activeWorkspace, platformContext, preferences, visibleAssetIds, workspaceState]
   );
   const accessRole = platformContext?.membership?.role || account?.role || user?.role;
   const commandTools = useMemo(
     () =>
-      FEATURE_FLAGS.platformEntitlements
+      FEATURE_FLAGS.platformEntitlements && platformContext
         ? getAssetAwareToolProjection(accessContext, accessRole)
         : getUserFacingToolRegistryProjection(),
-    [accessContext, accessRole]
+    [accessContext, accessRole, platformContext]
   );
   const entries = useMemo(
     () =>
       buildQuickCommandEntries({
         tools: commandTools,
+        workspaces: contextWorkspaces?.length ? contextWorkspaces : CARE_WORKSPACES,
         recentToolIds: recentTools,
         favoriteToolIds: favorites,
       }),
-    [commandTools, favorites, recentTools]
+    [commandTools, contextWorkspaces, favorites, recentTools]
+  );
+  const workspaceShortcutEntries = useMemo(
+    () => (workspaceShortcuts || []).map(makeShortcutEntry),
+    [workspaceShortcuts]
   );
 
   useEffect(() => {
@@ -237,6 +265,9 @@ export default function QuickCommandLauncher({
         recordToolAccess,
       });
     } else {
+      if (entry.kind === 'workspace') {
+        switchWorkspace(entry.sourceId);
+      }
       navigate({ pathname: entry.path, search: '' });
     }
     onClose?.();
@@ -256,6 +287,7 @@ export default function QuickCommandLauncher({
   const matchesQuery = (entry) => fuzzyIncludes(commandSearchText(entry), normalizedQuery);
   const recentEntries = pickUnique(entries.recentEntries.filter(matchesQuery));
   const favoriteEntries = pickUnique(entries.favoriteEntries.filter(matchesQuery));
+  const shortcutEntries = pickUnique(workspaceShortcutEntries.filter(matchesQuery));
   const workspaceEntries = pickUnique(entries.workspaceEntries.filter(matchesQuery));
   const navEntries = pickUnique(entries.navEntries.filter(matchesQuery));
   const toolEntries = pickUnique(
@@ -266,13 +298,14 @@ export default function QuickCommandLauncher({
   const hasResults =
     recentEntries.length +
       favoriteEntries.length +
+      shortcutEntries.length +
       workspaceEntries.length +
       navEntries.length +
       toolEntries.length >
     0;
   const resultEntries = normalizedQuery
-    ? [...recentEntries, ...favoriteEntries, ...workspaceEntries, ...navEntries, ...toolEntries]
-    : [...recentEntries, ...favoriteEntries, ...workspaceEntries, ...navEntries, ...toolEntries];
+    ? [...recentEntries, ...favoriteEntries, ...shortcutEntries, ...workspaceEntries, ...navEntries, ...toolEntries]
+    : [...recentEntries, ...favoriteEntries, ...shortcutEntries, ...workspaceEntries, ...navEntries, ...toolEntries];
   const activeEntryId = resultEntries[activeIndex]?.id;
   const handleSearchKeyDown = (event) => {
     if (!resultEntries.length) return;
@@ -371,6 +404,11 @@ export default function QuickCommandLauncher({
               </Section>
               <Section title="Favorites">
                 {favoriteEntries.map((entry) => (
+                  <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
+                ))}
+              </Section>
+              <Section title={workspaceContextActive?.name ? `${workspaceContextActive.name} Shortcuts` : 'Workspace Shortcuts'}>
+                {shortcutEntries.map((entry) => (
                   <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
                 ))}
               </Section>

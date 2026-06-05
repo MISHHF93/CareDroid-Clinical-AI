@@ -106,6 +106,26 @@ function compactList(items = [], limit = 4) {
   return remaining ? `${visible.join(', ')} +${remaining} more` : visible.join(', ');
 }
 
+function csvToList(value = '') {
+  return value
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function configJson(value, fallback) {
+  return JSON.stringify(value ?? fallback, null, 2);
+}
+
+function parseConfigJson(value, label, fallback) {
+  if (!value?.trim()) return fallback;
+  try {
+    return JSON.parse(value);
+  } catch {
+    throw new Error(`${label} must be valid JSON.`);
+  }
+}
+
 function BuilderMetric({ label, value }) {
   return (
     <Card className="commercial-card">
@@ -125,6 +145,44 @@ function ProductizationList({ title, items = [] }) {
           <li key={item}>{item}</li>
         ))}
       </ul>
+    </Card>
+  );
+}
+
+function pathwayLinkCount(pathway) {
+  return [
+    ...(pathway.calculatorAssetIds || []),
+    ...(pathway.protocolAssetIds || []),
+    ...(pathway.workflowAssetIds || []),
+    ...(pathway.simulationAssetIds || []),
+    ...(pathway.aiAgentId ? [pathway.aiAgentId] : []),
+  ].length;
+}
+
+function PathwayAssetSection({ title, items = [], onOpen }) {
+  return (
+    <Card className="commercial-card commercial-pathway-section">
+      <h2>{title}</h2>
+      {items.length ? (
+        <div className="commercial-pathway-asset-list">
+          {items.map((asset) => (
+            <div key={asset.id} className="commercial-pathway-asset-row">
+              <span>
+                <strong>{asset.title || asset.id}</strong>
+                <small>
+                  {asset.assetType || asset.category || 'asset'}
+                  {asset.route ? ` · ${asset.route}` : ''}
+                </small>
+              </span>
+              <Button variant="secondary" onClick={() => onOpen(asset)}>
+                Open
+              </Button>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p>No linked assets yet.</p>
+      )}
     </Card>
   );
 }
@@ -186,6 +244,16 @@ export function ProductsIndexPage() {
             <p>
               <strong>Packs:</strong> {compactList(row.packs?.map((pack) => pack.name) || [])}
             </p>
+            {!!row.roles?.length && (
+              <p>
+                <strong>Roles:</strong> {compactList(row.roles, 6)}
+              </p>
+            )}
+            {!!row.workspaces?.length && (
+              <p>
+                <strong>Workspaces:</strong> {compactList(row.workspaces, 6)}
+              </p>
+            )}
             <p>
               <strong>Backend:</strong> {compactList(row.backendServices || [])}
             </p>
@@ -277,6 +345,18 @@ export function ProductDetailPage() {
             <ChipList items={product.targetUsers} />
           </>
         )}
+        {product.roles?.length > 0 && (
+          <>
+            <h2 style={{ marginTop: 16 }}>Roles</h2>
+            <ChipList items={product.roles} />
+          </>
+        )}
+        {product.workspaces?.length > 0 && (
+          <>
+            <h2 style={{ marginTop: 16 }}>Workspaces</h2>
+            <ChipList items={product.workspaces} />
+          </>
+        )}
         {product.outcomes?.length > 0 && (
           <>
             <h2 style={{ marginTop: 16 }}>Outcomes</h2>
@@ -308,10 +388,26 @@ export function ProductDetailPage() {
           <p>
             {pack.assetIds?.length || 0} assets · {pack.pricingTier} tier
           </p>
+          {!!pack.roles?.length && (
+            <p>
+              <strong>Roles:</strong> {compactList(pack.roles, 6)}
+            </p>
+          )}
+          {!!pack.workspaces?.length && (
+            <p>
+              <strong>Workspaces:</strong> {compactList(pack.workspaces, 6)}
+            </p>
+          )}
           <ul>
             {(pack.assets || []).map((a) => (
               <li key={a.id}>
                 {a.title || a.id}
+                {!!a.roles?.length && (
+                  <span className="commercial-muted"> · roles: {compactList(a.roles, 3)}</span>
+                )}
+                {!!a.workspaces?.length && (
+                  <span className="commercial-muted"> · workspaces: {compactList(a.workspaces, 3)}</span>
+                )}
                 {assetAccessCopy(a) && (
                   <span className="commercial-muted"> · {assetAccessCopy(a)}</span>
                 )}
@@ -523,6 +619,10 @@ export function CarePathwaysIndexPage() {
           <Card key={p.id} className="commercial-card">
             <h2>{p.name}</h2>
             <p>{p.description}</p>
+            <p>
+              {pathwayLinkCount(p)} linked assets · {(p.outcomes || []).length} outcomes
+            </p>
+            <ChipList items={(p.outcomes || []).slice(0, 3)} />
             <Link to={`/care-pathways/${p.slug}`}>
               <Button variant="primary">Start pathway</Button>
             </Link>
@@ -545,33 +645,46 @@ export function CarePathwayDetailPage() {
 
   if (!pathway) return <PageShell title="Loading…" />;
 
+  const openAsset = (asset) => {
+    if (asset?.route) {
+      navigate(asset.route);
+      return;
+    }
+    const plan = getRegistryToolNavigation(asset?.id);
+    if (plan?.pathname) navigate(`${plan.pathname}${plan.search || ''}`);
+  };
+
   return (
     <PageShell title={pathway.name} subtitle={pathway.description}>
-      {(pathway.steps || []).map((step, idx) => (
-        <div key={`${step.type}-${step.assetId}-${idx}`} className="commercial-pathway-step">
-          <strong>
-            Step {idx + 1}: {step.type}
-          </strong>
-          <p>{step.asset?.title || step.assetId}</p>
-          <Button
-            variant="primary"
-            onClick={() => {
-              const route = step.asset?.route;
-              if (route) navigate(route);
-              else {
-                const plan = getRegistryToolNavigation(step.assetId);
-                if (plan?.pathname) navigate(`${plan.pathname}${plan.search || ''}`);
-              }
-            }}
-          >
-            Open step
-          </Button>
-        </div>
-      ))}
-      {pathway.aiAgentId && (
-        <Link to={`/assistant?agent=${pathway.aiAgentId}`}>
-          <Button variant="secondary">AI guidance</Button>
-        </Link>
+      <div className="commercial-metric">
+        <BuilderMetric label="Calculators" value={pathway.linkedAssetCounts?.calculators || pathway.calculators?.length || 0} />
+        <BuilderMetric label="Protocols" value={pathway.linkedAssetCounts?.protocols || pathway.protocols?.length || 0} />
+        <BuilderMetric label="Workflows" value={pathway.linkedAssetCounts?.workflows || pathway.workflows?.length || 0} />
+        <BuilderMetric label="Simulations" value={pathway.linkedAssetCounts?.simulations || pathway.simulations?.length || 0} />
+      </div>
+
+      {!!pathway.outcomes?.length && (
+        <Card className="commercial-card" style={{ marginBottom: 16 }}>
+          <h2>Target outcomes</h2>
+          <ChipList items={pathway.outcomes} />
+        </Card>
+      )}
+
+      <div className="commercial-grid commercial-pathway-grid">
+        <PathwayAssetSection title="Calculators" items={pathway.calculators || []} onOpen={openAsset} />
+        <PathwayAssetSection title="Protocols" items={pathway.protocols || []} onOpen={openAsset} />
+        <PathwayAssetSection title="Workflows" items={pathway.workflows || []} onOpen={openAsset} />
+        <PathwayAssetSection title="Simulations" items={pathway.simulations || []} onOpen={openAsset} />
+      </div>
+
+      {pathway.aiAgent && (
+        <Card className="commercial-card commercial-pathway-ai">
+          <h2>AI guidance</h2>
+          <p>{pathway.aiAgent.title || pathway.aiAgent.id}</p>
+          <Link to={`/assistant?agent=${pathway.aiAgent.id || pathway.aiAgentId}`}>
+            <Button variant="secondary">Open AI guidance</Button>
+          </Link>
+        </Card>
       )}
       <div style={{ marginTop: 16 }}>
         <Link to="/care-pathways">← Pathways</Link>
@@ -589,19 +702,61 @@ export function AgentsRegistryPage() {
 
   return (
     <PageShell
-      title="AI agent registry"
-      subtitle="Domain experts via the common assistant gateway."
+      title="AI Agent Registry"
+      subtitle="Domain-aware agents mapped to capabilities, assets, workspaces, roles, and tool-calling permissions."
     >
-      <div className="commercial-grid">
+      <div className="commercial-grid commercial-agent-grid">
         {agents.map((agent) => (
-          <Card key={agent.id} className="commercial-card">
-            <h2>{agent.title}</h2>
-            <p>{agent.gatewayNote}</p>
+          <Card key={agent.id} className="commercial-card commercial-agent-card">
+            <div className="commercial-agent-card-header">
+              <div>
+                <h2>{agent.title}</h2>
+                <p>{agent.description || agent.gatewayNote}</p>
+              </div>
+              <span className="commercial-agent-status">{agent.canCallTools ? 'tool-calling' : 'read-only'}</span>
+            </div>
+            <section className="commercial-agent-section">
+              <strong>Capabilities</strong>
+              <ChipList items={agent.capabilities || []} />
+            </section>
+            <section className="commercial-agent-section">
+              <strong>Asset access</strong>
+              <ul className="commercial-compact-list">
+                {(agent.assetAccess || []).slice(0, 5).map((asset) => (
+                  <li key={asset.id}>
+                    {asset.title || asset.id}
+                    <span className="commercial-muted">
+                      {asset.assetType ? ` · ${asset.assetType}` : ''}
+                      {asset.route ? ` · ${asset.route}` : ''}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              {!agent.assetAccess?.length && <p className="commercial-muted">No mapped assets.</p>}
+            </section>
+            <section className="commercial-agent-section">
+              <strong>Workspace awareness</strong>
+              <ChipList items={agent.workspaceAwareness || []} />
+            </section>
+            <section className="commercial-agent-section">
+              <strong>Role awareness</strong>
+              <p>{compactList(agent.roleAwareness || [], 5) || 'General clinical users'}</p>
+            </section>
+            <section className="commercial-agent-section">
+              <strong>Tool calling permissions</strong>
+              <ChipList items={agent.toolCallingPermissions || []} />
+            </section>
             <Link to={`/assistant?agent=${agent.id}`}>
               <Button variant="primary">Open agent</Button>
             </Link>
           </Card>
         ))}
+        {!agents.length && (
+          <Card className="commercial-card">
+            <h2>No agents registered</h2>
+            <p>The AI Agent Registry will populate when platform AI-agent assets are seeded.</p>
+          </Card>
+        )}
       </div>
     </PageShell>
   );
@@ -805,28 +960,38 @@ export function ConfigurationStudioPage() {
   const { organization, refreshPlatformContext } = useUserIdentity();
   const [hiddenNavIds, setHiddenNavIds] = useState('');
   const [primaryLanding, setPrimaryLanding] = useState('/dashboard');
+  const [displayName, setDisplayName] = useState('');
   const [accentColor, setAccentColor] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
   const [enabledAgents, setEnabledAgents] = useState('');
   const [enabledProductIds, setEnabledProductIds] = useState([]);
+  const [enabledPackIds, setEnabledPackIds] = useState([]);
+  const [workspaceDefaultsJson, setWorkspaceDefaultsJson] = useState('[]');
+  const [permissionsJson, setPermissionsJson] = useState('{}');
+  const [dashboardLayoutJson, setDashboardLayoutJson] = useState('{}');
+  const [agentRows, setAgentRows] = useState([]);
   const [productGraphs, setProductGraphs] = useState([]);
   const [packGraphs, setPackGraphs] = useState([]);
   const [status, setStatus] = useState('');
 
   useEffect(() => {
     const settings = organization?.settings || {};
-    const nav = settings.navigation || settings.configuration?.navigation || {};
-    if (nav.hiddenNavIds?.length) {
-      setHiddenNavIds(nav.hiddenNavIds.join(', '));
-    }
-    if (nav.primaryLanding) setPrimaryLanding(nav.primaryLanding);
-    if (settings.enabledAgentIds?.length) {
-      setEnabledAgents(settings.enabledAgentIds.join(', '));
-    }
+    const configuration = settings.configuration || {};
+    const nav = settings.navigation || configuration.navigation || {};
+    const branding = { ...(configuration.branding || {}), ...(organization?.branding || {}) };
+
+    setHiddenNavIds((nav.hiddenNavIds || []).join(', '));
+    setPrimaryLanding(nav.primaryLanding || '/dashboard');
+    setDisplayName(branding.displayName || organization?.name || '');
+    setAccentColor(branding.accentColor || '');
+    setLogoUrl(branding.logoUrl || '');
+    setEnabledAgents((settings.enabledAgentIds || configuration.enabledAgentIds || []).join(', '));
     const productIds = settings.enabledProductIds || settings.configuration?.enabledProductIds || [];
     setEnabledProductIds(productIds);
-    if (organization?.branding?.accentColor) {
-      setAccentColor(organization.branding.accentColor);
-    }
+    setEnabledPackIds(settings.enabledPackIds || configuration.enabledPackIds || []);
+    setWorkspaceDefaultsJson(configJson(settings.workspaceDefaults ?? configuration.workspaceDefaults, []));
+    setPermissionsJson(configJson(settings.permissionsOverrides ?? configuration.permissionsOverrides, {}));
+    setDashboardLayoutJson(configJson(settings.dashboardLayout ?? configuration.dashboardLayout, {}));
   }, [organization?.id, organization?.settings, organization?.branding]);
 
   useEffect(() => {
@@ -836,11 +1001,15 @@ export function ConfigurationStudioPage() {
     ProductCatalogApi.listAssetPackBuilder(organization?.id)
       .then(setPackGraphs)
       .catch(() => setPackGraphs([]));
+    ProductCatalogApi.listAgents()
+      .then(setAgentRows)
+      .catch(() => setAgentRows([]));
   }, [organization?.id]);
 
   const selectedProducts = productGraphs.filter((row) => enabledProductIds.includes(row.product.id));
   const selectedPackIds = new Set(selectedProducts.flatMap((row) => row.product.packIds || []));
-  const selectedPacks = packGraphs.filter((pack) => selectedPackIds.has(pack.id));
+  const configuredPackIds = new Set([...selectedPackIds, ...enabledPackIds]);
+  const selectedPacks = packGraphs.filter((pack) => configuredPackIds.has(pack.id));
   const selectedAssets = new Set(selectedPacks.flatMap((pack) => pack.assetIds || []));
 
   const toggleProduct = (productId) => {
@@ -849,23 +1018,54 @@ export function ConfigurationStudioPage() {
     );
   };
 
+  const togglePack = (packId) => {
+    setEnabledPackIds((prev) =>
+      prev.includes(packId) ? prev.filter((id) => id !== packId) : [...prev, packId]
+    );
+  };
+
+  const toggleAgent = (agentId) => {
+    const ids = new Set(csvToList(enabledAgents));
+    if (ids.has(agentId)) ids.delete(agentId);
+    else ids.add(agentId);
+    setEnabledAgents([...ids].join(', '));
+  };
+
   const save = async () => {
     if (!organization?.id) return;
     try {
+      const workspaceDefaults = parseConfigJson(workspaceDefaultsJson, 'Workspace defaults', []);
+      if (!Array.isArray(workspaceDefaults)) {
+        throw new Error('Workspace defaults must be a JSON array.');
+      }
+      const permissionsOverrides = parseConfigJson(permissionsJson, 'Permissions overrides', {});
+      if (
+        permissionsOverrides &&
+        (Array.isArray(permissionsOverrides) || typeof permissionsOverrides !== 'object')
+      ) {
+        throw new Error('Permissions overrides must be a JSON object.');
+      }
+      const dashboardLayout = parseConfigJson(dashboardLayoutJson, 'Dashboard layout', {});
+      if (dashboardLayout && (Array.isArray(dashboardLayout) || typeof dashboardLayout !== 'object')) {
+        throw new Error('Dashboard layout must be a JSON object.');
+      }
+
       await ProductCatalogApi.updateOrganizationConfiguration(organization.id, {
         navigation: {
-          hiddenNavIds: hiddenNavIds
-            .split(',')
-            .map((s) => s.trim())
-            .filter(Boolean),
+          hiddenNavIds: csvToList(hiddenNavIds),
           primaryLanding,
         },
-        branding: accentColor ? { accentColor } : undefined,
-        enabledAgentIds: enabledAgents
-          .split(',')
-          .map((s) => s.trim())
-          .filter(Boolean),
+        branding: {
+          displayName,
+          accentColor,
+          logoUrl,
+        },
+        workspaceDefaults,
+        enabledAgentIds: csvToList(enabledAgents),
         enabledProductIds,
+        enabledPackIds,
+        permissionsOverrides,
+        dashboardLayout,
       });
       setStatus('Configuration saved.');
       refreshPlatformContext?.();
@@ -887,40 +1087,164 @@ export function ConfigurationStudioPage() {
   return (
     <PageShell title="Platform configuration studio" subtitle={organization.name}>
       {status && <p className="commercial-subtitle">{status}</p>}
-      <Card className="commercial-card">
-        <div className="commercial-form-row">
-          <label>Hidden nav IDs (comma-separated)</label>
-          <input value={hiddenNavIds} onChange={(e) => setHiddenNavIds(e.target.value)} />
-        </div>
-        <div className="commercial-form-row">
-          <label>Primary landing route</label>
-          <input value={primaryLanding} onChange={(e) => setPrimaryLanding(e.target.value)} />
-        </div>
-        <div className="commercial-form-row">
-          <label>Accent color</label>
-          <input value={accentColor} onChange={(e) => setAccentColor(e.target.value)} />
-        </div>
-        <div className="commercial-form-row">
-          <label>Enabled agent IDs</label>
-          <input value={enabledAgents} onChange={(e) => setEnabledAgents(e.target.value)} />
-        </div>
-        <div className="commercial-form-row">
-          <label>Enabled products</label>
+      <div className="commercial-config-grid">
+        <Card className="commercial-card commercial-config-card">
+          <h2>Navigation</h2>
+          <p>Control tenant-level menu visibility and the default post-login landing route.</p>
+          <div className="commercial-form-row">
+            <label>Hidden nav IDs (comma-separated)</label>
+            <input
+              aria-label="Hidden nav IDs"
+              value={hiddenNavIds}
+              onChange={(e) => setHiddenNavIds(e.target.value)}
+            />
+          </div>
+          <div className="commercial-form-row">
+            <label>Primary landing route</label>
+            <input
+              aria-label="Primary landing route"
+              value={primaryLanding}
+              onChange={(e) => setPrimaryLanding(e.target.value)}
+            />
+          </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>Branding</h2>
+          <p>Set the organization display identity used by tenant-aware surfaces.</p>
+          <div className="commercial-form-row">
+            <label>Display name</label>
+            <input
+              aria-label="Display name"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+            />
+          </div>
+          <div className="commercial-form-row">
+            <label>Accent color</label>
+            <input
+              aria-label="Accent color"
+              value={accentColor}
+              onChange={(e) => setAccentColor(e.target.value)}
+            />
+          </div>
+          <div className="commercial-form-row">
+            <label>Logo URL</label>
+            <input aria-label="Logo URL" value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} />
+          </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>Workspaces</h2>
+          <p>Configure default workspace setup as JSON so onboarding and context services share one shape.</p>
+          <div className="commercial-form-row">
+            <label>Workspace defaults JSON</label>
+            <textarea
+              aria-label="Workspace defaults JSON"
+              rows={8}
+              value={workspaceDefaultsJson}
+              onChange={(e) => setWorkspaceDefaultsJson(e.target.value)}
+            />
+          </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>Packs</h2>
+          <p>Select product bundles and direct asset packs for this tenant.</p>
+          <div className="commercial-form-row">
+            <label>Enabled products</label>
+            <div className="commercial-chip-list">
+              {productGraphs.map((row) => (
+                <button
+                  key={row.product.id}
+                  type="button"
+                  className={`commercial-chip ${
+                    enabledProductIds.includes(row.product.id) ? 'selected' : ''
+                  }`}
+                  onClick={() => toggleProduct(row.product.id)}
+                >
+                  {row.product.name}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="commercial-form-row">
+            <label>Enabled packs</label>
+            <div className="commercial-chip-list">
+              {packGraphs.map((pack) => {
+                const selected = configuredPackIds.has(pack.id);
+                const productManaged = selectedPackIds.has(pack.id);
+                return (
+                  <button
+                    key={pack.id}
+                    type="button"
+                    className={`commercial-chip ${selected ? 'selected' : ''}`}
+                    onClick={() => togglePack(pack.id)}
+                  >
+                    {pack.name}
+                    {productManaged ? ' (via product)' : ''}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>Permissions</h2>
+          <p>Capture organization-specific permission overrides for role-aware experiences.</p>
+          <div className="commercial-form-row">
+            <label>Permissions overrides JSON</label>
+            <textarea
+              aria-label="Permissions overrides JSON"
+              rows={8}
+              value={permissionsJson}
+              onChange={(e) => setPermissionsJson(e.target.value)}
+            />
+          </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>AI agents</h2>
+          <p>Enable AI agent IDs for the tenant and optionally select from registered agents.</p>
+          <div className="commercial-form-row">
+            <label>Enabled agent IDs</label>
+            <input
+              aria-label="Enabled agent IDs"
+              value={enabledAgents}
+              onChange={(e) => setEnabledAgents(e.target.value)}
+            />
+          </div>
           <div className="commercial-chip-list">
-            {productGraphs.map((row) => (
+            {agentRows.map((agent) => (
               <button
-                key={row.product.id}
+                key={agent.id}
                 type="button"
-                className={`commercial-chip ${
-                  enabledProductIds.includes(row.product.id) ? 'selected' : ''
-                }`}
-                onClick={() => toggleProduct(row.product.id)}
+                className={`commercial-chip ${csvToList(enabledAgents).includes(agent.id) ? 'selected' : ''}`}
+                onClick={() => toggleAgent(agent.id)}
               >
-                {row.product.name}
+                {agent.title || agent.id}
               </button>
             ))}
           </div>
-        </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>Dashboards</h2>
+          <p>Store dashboard layout preferences for command, workspace, and analytics surfaces.</p>
+          <div className="commercial-form-row">
+            <label>Dashboard layout JSON</label>
+            <textarea
+              aria-label="Dashboard layout JSON"
+              rows={8}
+              value={dashboardLayoutJson}
+              onChange={(e) => setDashboardLayoutJson(e.target.value)}
+            />
+          </div>
+        </Card>
+      </div>
+
+      <Card className="commercial-card commercial-config-save">
         <Button variant="primary" onClick={save}>
           Save configuration
         </Button>
@@ -965,26 +1289,17 @@ export function ConfigurationStudioPage() {
 
 const ONBOARDING_STEPS = [
   'Organization type',
-  'Departments',
-  'Workspaces',
+  'Specialty selection',
+  'Workspace selection',
+  'Asset pack selection',
   'User roles',
-  'Asset packs',
-  'Integrations',
   'Branding',
-  'Compliance mode',
-  'Review and activate',
-];
-
-const COMPLIANCE_MODES = [
-  { id: 'standard', label: 'Standard healthcare' },
-  { id: 'hipaa', label: 'HIPAA-ready' },
-  { id: 'research', label: 'Research governance' },
-  { id: 'ems', label: 'EMS operations' },
-  { id: 'enterprise', label: 'Enterprise governance' },
+  'Integrations',
 ];
 
 const TENANT_PRESETS = {
   hospital: {
+    specialties: ['emergency', 'icu', 'laboratory', 'operations'],
     departments: ['Emergency', 'ICU', 'Laboratory', 'Operations', 'Administration'],
     packIds: ['core-platform', 'emergency-medicine', 'laboratory-intelligence', 'hospital-operations'],
     integrationSlugs: ['fhir-patient', 'hl7-adt', 'laboratory-interface', 'identity-sso'],
@@ -1007,6 +1322,7 @@ const TENANT_PRESETS = {
     ],
   },
   clinic: {
+    specialties: ['cardiology', 'laboratory', 'operations'],
     departments: ['Operations', 'Pharmacy', 'Administration'],
     packIds: ['core-platform', 'laboratory-intelligence', 'cardiology-pack'],
     integrationSlugs: ['fhir-patient', 'identity-sso', 'scheduling'],
@@ -1022,6 +1338,7 @@ const TENANT_PRESETS = {
     ],
   },
   ems: {
+    specialties: ['emergency', 'operations'],
     departments: ['Emergency', 'Operations', 'Administration'],
     packIds: ['core-platform', 'emergency-medicine', 'fleet-logistics'],
     integrationSlugs: ['identity-sso', 'scheduling'],
@@ -1051,13 +1368,16 @@ export function OrganizationOnboardingPage() {
   const [step, setStep] = useState(0);
   const [packs, setPacks] = useState([]);
   const [productGraphs, setProductGraphs] = useState([]);
+  const [specialties, setSpecialties] = useState([]);
   const [roleProfiles, setRoleProfiles] = useState([]);
   const [error, setError] = useState('');
+  const [configuredTenantProfile, setConfiguredTenantProfile] = useState(null);
   const [form, setForm] = useState({
     name: '',
     slug: '',
     organizationType: 'hospital',
     country: '',
+    specialties: TENANT_PRESETS.hospital.specialties,
     departments: TENANT_PRESETS.hospital.departments,
     packIds: TENANT_PRESETS.hospital.packIds,
     productIds: [],
@@ -1078,6 +1398,7 @@ export function OrganizationOnboardingPage() {
     PlatformAssetsApi.listPacks().then(setPacks).catch(() => setPacks([]));
     PlatformAssetsApi.listRoleProfiles().then(setRoleProfiles).catch(() => setRoleProfiles([]));
     ProductCatalogApi.listProductBuilder().then(setProductGraphs).catch(() => setProductGraphs([]));
+    ProductCatalogApi.listSpecialties().then(setSpecialties).catch(() => setSpecialties([]));
   }, []);
 
   const toggle = (key, value) => {
@@ -1094,6 +1415,7 @@ export function OrganizationOnboardingPage() {
     setForm((prev) => ({
       ...prev,
       organizationType,
+      specialties: preset.specialties,
       departments: preset.departments,
       packIds: preset.packIds,
       integrationSlugs: preset.integrationSlugs,
@@ -1147,6 +1469,12 @@ export function OrganizationOnboardingPage() {
     ...selectedProductGraphs.flatMap((row) => row.product.packIds || []),
   ]);
   const selectedPacks = packs.filter((pack) => selectedPackIds.has(pack.id));
+  const specialtyOptions = specialties.length
+    ? specialties.map((specialty) => ({
+        id: specialty.slug || specialty.id,
+        label: specialty.name || specialty.slug || specialty.id,
+      }))
+    : SPECIALTY_OPTIONS.map((specialty) => ({ id: specialty, label: specialty }));
 
   const finish = async () => {
     setError('');
@@ -1156,11 +1484,12 @@ export function OrganizationOnboardingPage() {
         ...form.branding,
         displayName: form.branding.displayName || form.name,
       };
-      await ProductCatalogApi.completeOnboarding({
+      const result = await ProductCatalogApi.completeOnboarding({
         name: form.name,
         slug,
         organizationType: form.organizationType,
         country: form.country,
+        specialties: form.specialties,
         departments: form.departments,
         packIds: form.packIds,
         productIds: form.productIds,
@@ -1174,7 +1503,7 @@ export function OrganizationOnboardingPage() {
         complianceMode: form.complianceMode,
       });
       await refreshPlatformContext?.();
-      navigate('/organization');
+      setConfiguredTenantProfile(result.tenantProfile || result);
     } catch (e) {
       setError(e.message);
     }
@@ -1221,18 +1550,24 @@ export function OrganizationOnboardingPage() {
         );
       case 1:
         return (
-          <div className="commercial-chip-list">
-            {DEPARTMENT_OPTIONS.map((d) => (
-              <button
-                key={d}
-                type="button"
-                className={`commercial-chip ${form.departments.includes(d) ? 'selected' : ''}`}
-                onClick={() => toggle('departments', d)}
-              >
-                {d}
-              </button>
-            ))}
-          </div>
+          <>
+            <div className="commercial-chip-list">
+              {specialtyOptions.map((specialty) => (
+                <button
+                  key={specialty.id}
+                  type="button"
+                  className={`commercial-chip ${form.specialties.includes(specialty.id) ? 'selected' : ''}`}
+                  onClick={() => toggle('specialties', specialty.id)}
+                >
+                  {specialty.label}
+                </button>
+              ))}
+            </div>
+            <p className="commercial-subtitle">
+              Specialties shape the configured tenant profile and help seed the right workspaces,
+              packs, recommendations, and AI contexts.
+            </p>
+          </>
         );
       case 2:
         return (
@@ -1312,34 +1647,6 @@ export function OrganizationOnboardingPage() {
       case 3:
         return (
           <>
-            <div className="commercial-form-row">
-              <label>Default role profile</label>
-              <select
-                value={form.defaultRoleProfileId}
-                onChange={(e) => setForm({ ...form, defaultRoleProfileId: e.target.value })}
-              >
-                {roleProfiles.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.label}
-                  </option>
-                ))}
-                {roleProfiles.length === 0 &&
-                  PROFILE_ROLES.map((r) => (
-                    <option key={r} value={r}>
-                      {r}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            <p className="commercial-subtitle">
-              Additional user invitations can be added after activation. The selected profile becomes
-              the initial owner profile for this tenant.
-            </p>
-          </>
-        );
-      case 4:
-        return (
-          <>
             {productGraphs.length > 0 && (
               <div className="commercial-form-row">
                 <label>Products</label>
@@ -1376,24 +1683,41 @@ export function OrganizationOnboardingPage() {
               Selected products add their packs automatically. Explicit pack selections can refine
               the tenant launch package.
             </p>
+            <ProductizationList
+              title="Configured pack preview"
+              items={selectedPacks.map((pack) => pack.name)}
+            />
+          </>
+        );
+      case 4:
+        return (
+          <>
+            <div className="commercial-form-row">
+              <label>Default role profile</label>
+              <select
+                value={form.defaultRoleProfileId}
+                onChange={(e) => setForm({ ...form, defaultRoleProfileId: e.target.value })}
+              >
+                {roleProfiles.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.label}
+                  </option>
+                ))}
+                {roleProfiles.length === 0 &&
+                  PROFILE_ROLES.map((r) => (
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            <p className="commercial-subtitle">
+              Additional user invitations can be added after activation. The selected profile becomes
+              the initial owner profile for this tenant.
+            </p>
           </>
         );
       case 5:
-        return (
-          <div className="commercial-chip-list">
-            {INTEGRATION_OPTIONS.map((i) => (
-              <button
-                key={i}
-                type="button"
-                className={`commercial-chip ${form.integrationSlugs.includes(i) ? 'selected' : ''}`}
-                onClick={() => toggle('integrationSlugs', i)}
-              >
-                {i}
-              </button>
-            ))}
-          </div>
-        );
-      case 6:
         return (
           <>
             <div className="commercial-form-row">
@@ -1422,61 +1746,96 @@ export function OrganizationOnboardingPage() {
             </div>
           </>
         );
-      case 7:
+      case 6:
         return (
-          <div className="commercial-chip-list">
-            {COMPLIANCE_MODES.map((mode) => (
-              <button
-                key={mode.id}
-                type="button"
-                className={`commercial-chip ${form.complianceMode === mode.id ? 'selected' : ''}`}
-                onClick={() => setForm({ ...form, complianceMode: mode.id })}
-              >
-                {mode.label}
-              </button>
-            ))}
-          </div>
-        );
-      case 8:
-        return (
-          <div className="commercial-grid">
-            <ProductizationList
-              title="Tenant"
-              items={[
-                `${form.name || 'Unnamed tenant'} (${form.organizationType})`,
-                `Slug: ${form.slug || form.name.toLowerCase().replace(/\s+/g, '-') || 'pending'}`,
-                `Compliance: ${form.complianceMode}`,
-              ]}
-            />
-            <ProductizationList title="Departments" items={form.departments} />
-            <ProductizationList
-              title="Workspaces"
-              items={form.workspaceSetups.map(
-                (workspace) =>
-                  `${workspace.name} (${workspace.type}) - ${(workspace.enabledModules || []).join(', ')}`
-              )}
-            />
-            <ProductizationList
-              title="Products and packs"
-              items={[
-                ...selectedProductGraphs.map((row) => row.product.name),
-                ...selectedPacks.map((pack) => pack.name),
-              ]}
-            />
-            <ProductizationList title="Integrations" items={form.integrationSlugs} />
-            <ProductizationList
-              title="Branding"
-              items={[
-                `Display: ${form.branding.displayName || form.name || 'Default'}`,
-                `Accent: ${form.branding.accentColor || 'Default'}`,
-              ]}
-            />
+          <div className="commercial-form-row">
+            <label>Integration requests</label>
+            <div className="commercial-chip-list">
+              {INTEGRATION_OPTIONS.map((i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className={`commercial-chip ${form.integrationSlugs.includes(i) ? 'selected' : ''}`}
+                  onClick={() => toggle('integrationSlugs', i)}
+                >
+                  {i}
+                </button>
+              ))}
+            </div>
+            <p className="commercial-subtitle">
+              Completing setup will create the organization, install packs, create workspaces,
+              request integrations, and output the configured tenant profile.
+            </p>
           </div>
         );
       default:
         return null;
     }
   };
+
+  if (configuredTenantProfile) {
+    return (
+      <PageShell
+        title="Configured tenant profile"
+        subtitle="Your CareDroid tenant profile is configured and ready to use."
+        actions={
+          <Button variant="primary" onClick={() => navigate('/organization')}>
+            Open organization
+          </Button>
+        }
+      >
+        <div className="commercial-grid">
+          <ProductizationList
+            title="Organization"
+            items={[
+              `${configuredTenantProfile.organization?.name || form.name} (${
+                configuredTenantProfile.organization?.organizationType || form.organizationType
+              })`,
+              `Slug: ${configuredTenantProfile.organization?.slug || form.slug}`,
+              `Compliance: ${configuredTenantProfile.complianceMode || form.complianceMode}`,
+            ]}
+          />
+          <ProductizationList
+            title="Specialties"
+            items={configuredTenantProfile.specialties || form.specialties}
+          />
+          <ProductizationList
+            title="Workspaces"
+            items={(configuredTenantProfile.workspaces || configuredTenantProfile.workspaceDefaults || []).map(
+              (workspace) =>
+                `${workspace.name || workspace.displayName} (${workspace.type})`
+            )}
+          />
+          <ProductizationList
+            title="Asset packs"
+            items={configuredTenantProfile.installedPackIds || form.packIds}
+          />
+          <ProductizationList
+            title="User roles"
+            items={[
+              configuredTenantProfile.roleProfileId
+                ? `Default role: ${configuredTenantProfile.roleProfileId}`
+                : 'Default role pending',
+              ...((configuredTenantProfile.roleAssignments || []).map(
+                (assignment) => `${assignment.email || 'invited user'}: ${assignment.roleProfileId}`
+              )),
+            ]}
+          />
+          <ProductizationList
+            title="Branding"
+            items={[
+              `Display: ${configuredTenantProfile.branding?.displayName || form.name}`,
+              `Accent: ${configuredTenantProfile.branding?.accentColor || 'Default'}`,
+            ]}
+          />
+          <ProductizationList
+            title="Integrations"
+            items={configuredTenantProfile.integrationsRequested || form.integrationSlugs}
+          />
+        </div>
+      </PageShell>
+    );
+  }
 
   return (
     <div className="commercial-page">

@@ -20,53 +20,11 @@ import {
 } from './entities/workspace-membership.entity';
 import { Workspace, WorkspaceType } from './entities/workspace.entity';
 import { UserWorkspaceState } from './entities/user-workspace-state.entity';
-
-const WORKSPACE_TOOL_PRESETS: Record<WorkspaceType, string[]> = {
-  [WorkspaceType.PERSONAL]: [
-    'calculators',
-    'drug-check',
-    'lab-interp',
-    'protocols',
-    'diagnosis-assistant',
-  ],
-  [WorkspaceType.HOSPITAL]: [
-    'calculators',
-    'drug-check',
-    'lab-interp',
-    'protocols',
-    'hospital-map',
-    'medical-iot',
-  ],
-  [WorkspaceType.EMERGENCY]: [
-    'emergency-protocols',
-    'trauma-score',
-    'sofa-score',
-    'hospital-map',
-    'fleet-live-map',
-  ],
-  [WorkspaceType.FLEET]: [
-    'fleet-dashboard',
-    'fleet-live-map',
-    'route-optimizer',
-    'predictive-maintenance',
-  ],
-  [WorkspaceType.RESEARCH]: [
-    'guideline-rag',
-    'ai-explainability',
-    'clinical-audit',
-    'differential-ai',
-  ],
-  [WorkspaceType.ADMIN]: ['audit-logs', 'analytics', 'team-management', 'system-config'],
-};
-
-const WORKSPACE_MODULE_PRESETS: Record<WorkspaceType, string[]> = {
-  [WorkspaceType.PERSONAL]: ['dashboard', 'assistant', 'tools', 'calculators'],
-  [WorkspaceType.HOSPITAL]: ['dashboard', 'patients', 'maps', 'medical-iot', 'notifications'],
-  [WorkspaceType.EMERGENCY]: ['dashboard', 'alerts', 'fleet', 'maps', 'audit'],
-  [WorkspaceType.FLEET]: ['fleet', 'live-tracking', 'operations'],
-  [WorkspaceType.RESEARCH]: ['rag', 'research', 'assistant'],
-  [WorkspaceType.ADMIN]: ['admin', 'audit', 'analytics', 'settings'],
-};
+import {
+  REQUESTED_WORKSPACE_TYPES,
+  getWorkspaceDefinition,
+  workspaceSettingsForType,
+} from './workspace-taxonomy';
 
 @Injectable()
 export class WorkspacesService {
@@ -179,8 +137,9 @@ export class WorkspacesService {
     const slug = await this.uniqueSlug(`${dto.type}-${dto.name}-${user.id}`);
     const enabledToolIds = await this.validateEnabledToolIdsForOrganization(
       options.organizationId || null,
-      dto.enabledToolIds || WORKSPACE_TOOL_PRESETS[dto.type] || [],
+      dto.enabledToolIds || workspaceSettingsForType(dto.type).enabledToolIds,
     );
+    const defaults = workspaceSettingsForType(dto.type);
     const workspace = this.workspaceRepository.create({
       type: dto.type,
       name: dto.name.trim(),
@@ -191,9 +150,9 @@ export class WorkspacesService {
         displayName: dto.displayName?.trim() || dto.name.trim(),
       },
       settings: {
-        defaultDashboard: this.defaultDashboardForType(dto.type),
+        ...defaults,
         enabledToolIds,
-        enabledModules: dto.enabledModules || WORKSPACE_MODULE_PRESETS[dto.type] || [],
+        enabledModules: dto.enabledModules || defaults.enabledModules,
         emergencyModeEnabled: Boolean(dto.emergencyModeEnabled),
       },
     });
@@ -268,13 +227,17 @@ export class WorkspacesService {
   }
 
   private async ensureDefaultWorkspaces(user: User) {
-    const existing = await this.membershipRepository.count({
+    const memberships = await this.membershipRepository.find({
       where: { userId: user.id, status: WorkspaceMembershipStatus.ACTIVE },
+      relations: ['workspace'],
     });
-    if (existing > 0) return;
 
     const defaults = this.defaultWorkspaceDefinitions(user);
+    const existingTypes = new Set(
+      memberships.map((membership) => membership.workspace?.type).filter(Boolean),
+    );
     for (const definition of defaults) {
+      if (definition.type && existingTypes.has(definition.type)) continue;
       const workspace = this.workspaceRepository.create({
         ...definition,
         slug: await this.uniqueSlug(`${definition.type}-${user.id}`),
@@ -287,58 +250,23 @@ export class WorkspacesService {
 
   private defaultWorkspaceDefinitions(user: User) {
     const roleWorkspaceRole = this.defaultMembershipRole(user.role);
-    const definitions: Array<Partial<Workspace> & { membershipRole: WorkspaceMembershipRole }> = [
-      {
-        type: WorkspaceType.PERSONAL,
-        name: 'Personal Clinical Workspace',
-        branding: { displayName: 'Personal Clinical Workspace' },
-        settings: this.settingsForType(WorkspaceType.PERSONAL),
-        membershipRole: WorkspaceMembershipRole.OWNER,
-      },
-      {
-        type: WorkspaceType.HOSPITAL,
-        name: 'Hospital Operations Workspace',
-        branding: { displayName: 'Hospital Operations' },
-        settings: this.settingsForType(WorkspaceType.HOSPITAL),
-        membershipRole: roleWorkspaceRole,
-      },
-      {
-        type: WorkspaceType.EMERGENCY,
-        name: 'Emergency Response Workspace',
-        branding: { displayName: 'Emergency Response' },
-        settings: this.settingsForType(WorkspaceType.EMERGENCY),
-        membershipRole: roleWorkspaceRole,
-      },
-      {
-        type: WorkspaceType.FLEET,
-        name: 'Fleet Command Workspace',
-        branding: { displayName: 'Fleet Command' },
-        settings: this.settingsForType(WorkspaceType.FLEET),
+    return REQUESTED_WORKSPACE_TYPES.map((type) => {
+      const definition = getWorkspaceDefinition(type);
+      return {
+        type,
+        name: definition.name,
+        branding: {
+          displayName: definition.displayName,
+          description: definition.description,
+        },
+        settings: this.settingsForType(type),
         membershipRole:
-          user.role === UserRole.ADMIN
-            ? WorkspaceMembershipRole.ADMIN
-            : WorkspaceMembershipRole.DISPATCHER,
-      },
-      {
-        type: WorkspaceType.RESEARCH,
-        name: 'Research Workspace',
-        branding: { displayName: 'Research Workspace' },
-        settings: this.settingsForType(WorkspaceType.RESEARCH),
-        membershipRole: WorkspaceMembershipRole.RESEARCHER,
-      },
-    ];
-
-    if (user.role === UserRole.ADMIN) {
-      definitions.push({
-        type: WorkspaceType.ADMIN,
-        name: 'Admin Workspace',
-        branding: { displayName: 'Admin Workspace' },
-        settings: this.settingsForType(WorkspaceType.ADMIN),
-        membershipRole: WorkspaceMembershipRole.ADMIN,
-      });
-    }
-
-    return definitions;
+          definition.preferredMembershipRole ||
+          (type === WorkspaceType.FLEET && user.role !== UserRole.ADMIN
+            ? WorkspaceMembershipRole.DISPATCHER
+            : roleWorkspaceRole),
+      };
+    });
   }
 
   private async createMembership(user: User, workspace: Workspace, role: WorkspaceMembershipRole) {
@@ -418,24 +346,11 @@ export class WorkspacesService {
   }
 
   private settingsForType(type: WorkspaceType) {
-    return {
-      defaultDashboard: this.defaultDashboardForType(type),
-      enabledToolIds: WORKSPACE_TOOL_PRESETS[type] || [],
-      enabledModules: WORKSPACE_MODULE_PRESETS[type] || [],
-      emergencyModeEnabled: type === WorkspaceType.EMERGENCY,
-    };
+    return workspaceSettingsForType(type);
   }
 
   private defaultDashboardForType(type: WorkspaceType) {
-    const dashboards: Record<WorkspaceType, string> = {
-      [WorkspaceType.PERSONAL]: 'command',
-      [WorkspaceType.HOSPITAL]: 'operations',
-      [WorkspaceType.EMERGENCY]: 'operations',
-      [WorkspaceType.FLEET]: 'fleet',
-      [WorkspaceType.RESEARCH]: 'research',
-      [WorkspaceType.ADMIN]: 'admin',
-    };
-    return dashboards[type] || 'command';
+    return workspaceSettingsForType(type).defaultDashboard || 'command';
   }
 
   private defaultMembershipRole(userRole?: UserRole) {

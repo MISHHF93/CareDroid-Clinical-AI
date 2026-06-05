@@ -21,6 +21,7 @@ import {
 import { InviteWorkspaceMemberDto } from './dto/invite-workspace-member.dto';
 import { SetActiveWorkspaceDto } from './dto/set-active-workspace.dto';
 import { UpdateWorkspaceToolsDto } from './dto/update-workspace-tools.dto';
+import { WorkspaceContextService } from './workspace-context.service';
 import { WorkspacesService } from './workspaces.service';
 
 @ApiTags('workspaces')
@@ -29,7 +30,10 @@ import { WorkspacesService } from './workspaces.service';
 @TenantScoped()
 @ApiBearerAuth()
 export class WorkspacesController {
-  constructor(private readonly workspacesService: WorkspacesService) {}
+  constructor(
+    private readonly workspacesService: WorkspacesService,
+    private readonly workspaceContextService: WorkspaceContextService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: 'List current-user workspaces and active workspace state' })
@@ -53,6 +57,20 @@ export class WorkspacesController {
       req.ip,
       req.headers['user-agent'],
     );
+  }
+
+  @Get('context')
+  @ApiOperation({ summary: 'Get active workspace context for dashboard, assets, recommendations, assistant, and shortcuts' })
+  async context(@Req() req: any) {
+    return this.workspaceContextService.getCurrentContext(req.user);
+  }
+
+  @Get(':workspaceId/context')
+  @WorkspaceScoped()
+  @ApiOperation({ summary: 'Get workspace-specific context for the current user' })
+  async workspaceContext(@Req() req: any, @Param('workspaceId') workspaceId: string) {
+    this.assertTenantWorkspace(req, workspaceId);
+    return this.workspaceContextService.getContextForWorkspace(req.user, workspaceId);
   }
 
   @Get(':workspaceId')

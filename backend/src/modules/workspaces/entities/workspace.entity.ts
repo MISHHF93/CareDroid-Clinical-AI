@@ -16,8 +16,15 @@ export enum WorkspaceType {
   PERSONAL = 'personal',
   HOSPITAL = 'hospital',
   EMERGENCY = 'emergency',
+  ICU = 'icu',
+  CARDIOLOGY = 'cardiology',
+  LABORATORY = 'laboratory',
+  OPERATIONS = 'operations',
   FLEET = 'fleet',
+  MEDICAL_IOT = 'medical-iot',
+  EDUCATION = 'education',
   RESEARCH = 'research',
+  GOVERNANCE = 'governance',
   ADMIN = 'admin',
 }
 

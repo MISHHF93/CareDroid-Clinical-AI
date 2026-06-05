@@ -40,7 +40,7 @@ describe('canonical configuration contract', () => {
     expect(getRouteAliasTarget('/catalog')).toBe('/tools');
     expect(getRouteAliasTarget('/fleet')).toBe('/fleet/map');
     expect(getRouteAliasTarget('/home')).toBe('/dashboard');
-    expect(getRouteAliasTarget('/asset-packs')).toBe('/settings/organization/packs');
+    expect(getRouteAliasTarget('/asset-packs')).toBeNull();
     expect(getRouteAliasTarget('/operations')).toBeNull();
     expect(ROUTE_ALIAS_GROUPS.assistant.aliases).toBe(ASSISTANT_ROUTE_ALIASES);
     expect(ROUTE_ALIAS_GROUPS.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
@@ -65,18 +65,18 @@ describe('canonical configuration contract', () => {
     expect(new Set(routeIds).size).toBe(routeIds.length);
     expect(ROUTE_RECORDS_BY_ID.dashboard.path).toBe('/dashboard');
     expect(ROUTE_RECORDS_BY_ID.dashboard.aliases).toContain('/home');
+    expect(ROUTE_RECORDS_BY_ID.assetPacks.path).toBe('/asset-packs');
+    expect(ROUTE_RECORDS_BY_ID.assetPacks.componentKey).toBe('PackMarketplace');
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.path).toBe('/settings/organization/packs');
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/home', to: '/dashboard', routeId: 'dashboard' }),
         expect.objectContaining({ path: '/chat', to: '/assistant', routeId: 'assistant' }),
-        expect.objectContaining({
-          path: '/asset-packs',
-          to: '/settings/organization/packs',
-          routeId: 'organizationPacks',
-        }),
       ])
+    );
+    expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ path: '/asset-packs' })])
     );
   });
 

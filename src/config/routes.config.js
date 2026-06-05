@@ -252,13 +252,13 @@ export const ROUTE_RECORDS = Object.freeze([
   Object.freeze({
     id: 'assetPacks',
     path: CANONICAL_ROUTES.assetPacks,
-    componentKey: 'AssetPacksBuilderPage',
+    componentKey: 'PackMarketplace',
     layout: 'app',
     auth: 'required',
     status: 'active',
     aliases: [],
     navGroup: 'products',
-    notes: 'Sellable asset pack builder and product mapping view.',
+    notes: 'Canonical organization-aware asset pack marketplace.',
   }),
   Object.freeze({
     id: 'billing',

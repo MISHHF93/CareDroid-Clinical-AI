@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
 import Button from '../../components/ui/button';
+import { useOrganizationContext } from '../../contexts/OrganizationContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
@@ -10,6 +11,7 @@ import './OrganizationPages.css';
 
 export function OrganizationDashboard() {
   const { organization, platformContext, entitledPackIds, refreshPlatformContext } = useUserIdentity();
+  const { branding, integrations, subscription, tenant } = useOrganizationContext();
   const [analytics, setAnalytics] = useState(null);
 
   useEffect(() => {
@@ -32,7 +34,10 @@ export function OrganizationDashboard() {
           <Link to="/settings/organization">
             <Button variant="secondary">Organization settings</Button>
           </Link>
-          <Link to="/settings/organization/packs">
+          <Link to="/organization/settings">
+            <Button variant="secondary">Tenant engine</Button>
+          </Link>
+          <Link to="/asset-packs">
             <Button variant="primary">Solution packs</Button>
           </Link>
           <Link to="/products">
@@ -53,6 +58,28 @@ export function OrganizationDashboard() {
               <li key={pack.id}>{pack.name}</li>
             ))}
           </ul>
+        </Card>
+
+        <Card className="org-card">
+          <h2>Tenant</h2>
+          <p>{tenant?.tenantId || organization?.slug || 'No tenant selected'}</p>
+          <p className="org-pack-meta">
+            {branding?.displayName || organization?.name || 'CareDroid'} · {tenant?.complianceMode || 'hipaa'}
+          </p>
+        </Card>
+
+        <Card className="org-card">
+          <h2>Subscription</h2>
+          <p>{subscription?.tier || 'free'}</p>
+          <p className="org-pack-meta">{subscription?.status || 'active'}</p>
+        </Card>
+
+        <Card className="org-card">
+          <h2>Integrations</h2>
+          <p>{integrations.filter((item) => item.status === 'enabled').length} enabled</p>
+          <p className="org-pack-meta">
+            {integrations.filter((item) => item.status === 'requested').length} requested
+          </p>
         </Card>
 
         <Card className="org-card">
@@ -90,12 +117,24 @@ export function OrganizationDashboard() {
 
 export function OrganizationSettings() {
   const { organization, refreshPlatformContext } = useUserIdentity();
+  const {
+    branding,
+    integrations,
+    subscription,
+    supportedOrganizationTypes,
+    refreshOrganizationEngine,
+    saveOrganizationSettings,
+  } = useOrganizationContext();
   const [roleProfiles, setRoleProfiles] = useState([]);
   const [selectedRoleProfile, setSelectedRoleProfile] = useState('');
   const [form, setForm] = useState({
     name: '',
     organizationType: 'hospital',
     country: '',
+    displayName: '',
+    primaryColor: '',
+    accentColor: '',
+    subscriptionTier: 'free',
   });
   const [status, setStatus] = useState('');
 
@@ -119,9 +158,13 @@ export function OrganizationSettings() {
         name: organization.name || '',
         organizationType: organization.organizationType || 'hospital',
         country: organization.country || '',
+        displayName: branding?.displayName || organization.name || '',
+        primaryColor: branding?.primaryColor || '',
+        accentColor: branding?.accentColor || '',
+        subscriptionTier: subscription?.tier || 'free',
       });
     }
-  }, [organization]);
+  }, [branding, organization, subscription]);
 
   const createOrganization = async () => {
     setStatus('Creating…');
@@ -132,8 +175,17 @@ export function OrganizationSettings() {
         slug: slug || `org-${Date.now()}`,
         organizationType: form.organizationType,
         country: form.country,
+        branding: {
+          displayName: form.displayName || form.name,
+          primaryColor: form.primaryColor || undefined,
+          accentColor: form.accentColor || undefined,
+        },
+        settings: {
+          subscription: { tier: form.subscriptionTier, status: 'active' },
+        },
       });
       await refreshPlatformContext();
+      await refreshOrganizationEngine();
       setStatus('Organization created.');
     } catch (error) {
       setStatus(error.message);
@@ -144,7 +196,18 @@ export function OrganizationSettings() {
     if (!organization?.id) return;
     setStatus('Saving…');
     try {
-      await PlatformAssetsApi.updateOrganization(organization.id, form);
+      const result = await saveOrganizationSettings({
+        name: form.name,
+        organizationType: form.organizationType,
+        country: form.country,
+        branding: {
+          displayName: form.displayName || form.name,
+          primaryColor: form.primaryColor || undefined,
+          accentColor: form.accentColor || undefined,
+        },
+        subscription: { tier: form.subscriptionTier, status: 'active' },
+      });
+      if (!result.ok) throw new Error(result.message);
       await refreshPlatformContext();
       setStatus('Saved.');
     } catch (error) {
@@ -186,11 +249,14 @@ export function OrganizationSettings() {
               value={form.organizationType}
               onChange={(e) => setForm((f) => ({ ...f, organizationType: e.target.value }))}
             >
-              <option value="hospital">Hospital</option>
-              <option value="clinic">Clinic</option>
-              <option value="ems">EMS</option>
-              <option value="university">University</option>
-              <option value="research_institute">Research institute</option>
+              {(supportedOrganizationTypes.length
+                ? supportedOrganizationTypes
+                : ['hospital', 'clinic', 'ems', 'university', 'research_center']
+              ).map((type) => (
+                <option key={type} value={type}>
+                  {type.replace(/_/g, ' ')}
+                </option>
+              ))}
             </select>
           </label>
           <Button onClick={createOrganization}>Create organization</Button>
@@ -208,16 +274,76 @@ export function OrganizationSettings() {
               value={form.organizationType}
               onChange={(e) => setForm((f) => ({ ...f, organizationType: e.target.value }))}
             >
-              <option value="hospital">Hospital</option>
-              <option value="clinic">Clinic</option>
-              <option value="ems">EMS</option>
-              <option value="university">University</option>
-              <option value="research_institute">Research institute</option>
+              {(supportedOrganizationTypes.length
+                ? supportedOrganizationTypes
+                : ['hospital', 'clinic', 'ems', 'university', 'research_center']
+              ).map((type) => (
+                <option key={type} value={type}>
+                  {type.replace(/_/g, ' ')}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Branded display name
+            <input
+              value={form.displayName}
+              onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))}
+            />
+          </label>
+          <label>
+            Primary color
+            <input
+              value={form.primaryColor}
+              placeholder="#0f766e"
+              onChange={(e) => setForm((f) => ({ ...f, primaryColor: e.target.value }))}
+            />
+          </label>
+          <label>
+            Accent color
+            <input
+              value={form.accentColor}
+              placeholder="#2563eb"
+              onChange={(e) => setForm((f) => ({ ...f, accentColor: e.target.value }))}
+            />
+          </label>
+          <label>
+            Subscription tier
+            <select
+              value={form.subscriptionTier}
+              onChange={(e) => setForm((f) => ({ ...f, subscriptionTier: e.target.value }))}
+            >
+              <option value="free">Free</option>
+              <option value="starter">Starter</option>
+              <option value="professional">Professional</option>
+              <option value="institutional">Institutional</option>
+              <option value="enterprise">Enterprise</option>
+              <option value="academic">Academic</option>
+              <option value="government">Government</option>
             </select>
           </label>
           <Button onClick={saveOrganization}>Save organization</Button>
         </Card>
       )}
+
+      <Card className="org-card">
+        <h2>Integrations</h2>
+        <p className="org-pack-meta">Organization-aware integration state from the tenant engine.</p>
+        <div className="org-integration-list">
+          {integrations.slice(0, 8).map((integration) => (
+            <div key={integration.slug} className="org-integration-row">
+              <span>
+                <strong>{integration.name}</strong>
+                <small>{integration.category}</small>
+              </span>
+              <span className={`org-status-pill org-status-pill--${integration.status}`}>
+                {integration.status}
+              </span>
+            </div>
+          ))}
+          {!integrations.length && <p>No integration offerings loaded yet.</p>}
+        </div>
+      </Card>
 
       <Card className="org-card">
         <h2>Role profile</h2>
@@ -244,13 +370,14 @@ export function OrganizationSettings() {
 
 export function PackMarketplace() {
   const { organization, platformContext, refreshPlatformContext } = useUserIdentity();
-  const entitled = useMemo(() => new Set(platformContext?.entitledPackIds || []), [platformContext]);
   const [packs, setPacks] = useState([]);
   const [packProductMap, setPackProductMap] = useState({});
   const [status, setStatus] = useState('');
+  const [expandedPackId, setExpandedPackId] = useState('');
 
   const load = useCallback(async () => {
-    const rows = await PlatformAssetsApi.listPacks({
+    const rows = await PlatformAssetsApi.listMarketplacePacks({
+      organizationId: organization?.id,
       organizationType: organization?.organizationType,
     });
     setPacks(rows);
@@ -271,7 +398,7 @@ export function PackMarketplace() {
       setStatus('Create an organization first.');
       return;
     }
-    setStatus(enabled ? 'Installing…' : 'Removing…');
+    setStatus(enabled ? 'Disabling…' : 'Enabling…');
     try {
       if (enabled) {
         await PlatformAssetsApi.removePack(organization.id, packId);
@@ -289,19 +416,105 @@ export function PackMarketplace() {
   return (
     <div className="org-page">
       <header className="org-page-header">
-        <h1>Solution pack marketplace</h1>
-        <Link to="/settings/organization">← Settings</Link>
+        <h1>Asset Pack Marketplace</h1>
+        <p className="org-page-subtitle">
+          Enable clinical, operations, training, governance, and research packs for the active
+          organization. Each pack maps assets, dependencies, modules, and target roles.
+        </p>
+        <div className="org-page-actions">
+          <Link to="/settings/organization">← Organization settings</Link>
+          <Link to="/products">Product catalog</Link>
+        </div>
       </header>
+      {!organization?.id && (
+        <Card className="org-card">
+          <h2>Create an organization first</h2>
+          <p>Pack enablement is organization-scoped so entitlement state can be audited.</p>
+        </Card>
+      )}
       <div className="org-pack-grid">
         {packs.map((pack) => {
-          const installed = entitled.has(pack.id);
+          const installed =
+            Boolean(pack.enabled) || Boolean(platformContext?.entitledPackIds?.includes(pack.id));
+          const expanded = expandedPackId === pack.id;
           return (
             <Card key={pack.id} className="org-card org-pack-card">
-              <h2>{pack.name}</h2>
+              <div className="org-pack-card-header">
+                <div>
+                  <h2>{pack.name}</h2>
+                  <p className="org-pack-meta">
+                    {pack.includedAssetCount || pack.assetIds?.length || 0} assets · {pack.pricingTier} tier
+                  </p>
+                </div>
+                <span className={`org-status-pill org-status-pill--${installed ? 'enabled' : 'available'}`}>
+                  {installed ? 'enabled' : 'disabled'}
+                </span>
+              </div>
               <p>{pack.description}</p>
-              <p className="org-pack-meta">
-                {pack.assetIds?.length || 0} assets · {pack.pricingTier}
-              </p>
+              <div className="org-pack-section">
+                <strong>Dependencies</strong>
+                {pack.dependencies?.length ? (
+                  <div className="org-chip-list">
+                    {pack.dependencies.map((dependency) => (
+                      <span
+                        key={dependency.id}
+                        className={`org-chip ${dependency.enabled ? 'org-chip--enabled' : 'org-chip--missing'}`}
+                      >
+                        {dependency.name} {dependency.enabled ? 'enabled' : 'missing'}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="org-pack-meta">No pack dependencies.</p>
+                )}
+              </div>
+              <div className="org-pack-section">
+                <strong>Role mapping</strong>
+                <div className="org-chip-list">
+                  {(pack.roleMapping?.length
+                    ? pack.roleMapping.map((role) => role.label)
+                    : pack.targetRoles || []
+                  )
+                    .slice(0, 6)
+                    .map((role) => (
+                      <span key={role} className="org-chip">
+                        {role}
+                      </span>
+                    ))}
+                  {!pack.roleMapping?.length && !pack.targetRoles?.length && (
+                    <span className="org-pack-meta">General availability</span>
+                  )}
+                </div>
+              </div>
+              <div className="org-pack-section">
+                <strong>Included assets</strong>
+                <ul className="org-asset-list">
+                  {(pack.includedAssets || []).slice(0, expanded ? 99 : 5).map((asset) => (
+                    <li key={asset.id}>
+                      <span>{asset.title || asset.id}</span>
+                      <small>{asset.type || asset.category || 'asset'} {asset.route ? `· ${asset.route}` : ''}</small>
+                    </li>
+                  ))}
+                </ul>
+                {(pack.includedAssets || []).length > 5 && (
+                  <Button
+                    variant="ghost"
+                    onClick={() => setExpandedPackId(expanded ? '' : pack.id)}
+                  >
+                    {expanded ? 'Show fewer assets' : `Show all ${pack.includedAssets.length} assets`}
+                  </Button>
+                )}
+              </div>
+              {!!pack.defaultModules?.length && (
+                <p className="org-pack-meta">
+                  <strong>Modules:</strong> {pack.defaultModules.join(', ')}
+                </p>
+              )}
+              {!!pack.organizationTypes?.length && (
+                <p className="org-pack-meta">
+                  <strong>Organization types:</strong> {pack.organizationTypes.join(', ')}
+                </p>
+              )}
               {(packProductMap[pack.id] || []).length > 0 && (
                 <p className="org-pack-meta">
                   Part of{' '}
@@ -313,7 +526,16 @@ export function PackMarketplace() {
                   ))}
                 </p>
               )}
-              <Button onClick={() => togglePack(pack.id, installed)}>
+              {!!pack.warnings?.length && (
+                <div className="org-warning-list">
+                  {pack.warnings.map((warning) => (
+                    <p key={`${pack.id}-${warning.type}`} className="org-pack-warning">
+                      {warning.message}
+                    </p>
+                  ))}
+                </div>
+              )}
+              <Button disabled={!organization?.id} onClick={() => togglePack(pack.id, installed)}>
                 {installed ? 'Disable pack' : 'Enable pack'}
               </Button>
             </Card>
@@ -337,28 +559,95 @@ export function PlatformAnalyticsPage() {
   }, [organization?.id]);
 
   const packs = platformContext?.availablePacks || [];
+  const dashboards = analytics?.dashboards || {};
+  const dimensions = analytics?.dimensions || {};
+
+  const metricCards = [
+    ['Enabled packs', dashboards.adoption?.enabledPackCount ?? analytics?.enabledPackCount ?? 0],
+    ['Enabled assets', dashboards.adoption?.enabledAssetCount ?? 0],
+    ['Adoption score', `${dashboards.adoption?.adoptionScore ?? 0}%`],
+    ['Usage events', dashboards.engagement?.totalUsageEvents ?? 0],
+    ['AI usage', dashboards.engagement?.aiUsageCount ?? analytics?.aiSessionCount ?? 0],
+    ['Search queries', dashboards.engagement?.searchQueryCount ?? 0],
+    ['Simulation completions', dashboards.engagement?.simulationCompletionCount ?? 0],
+    ['Dashboard engagement', dashboards.engagement?.dashboardEngagementCount ?? 0],
+  ];
+
+  const renderMetricList = (title, rows = [], emptyText = 'No usage recorded yet.') => (
+    <Card className="org-card org-analytics-panel">
+      <h2>{title}</h2>
+      {rows.length ? (
+        <ol className="org-analytics-list">
+          {rows.slice(0, 8).map((row) => (
+            <li key={row.id || row.packId || row.resource || row.label}>
+              <span>
+                <strong>{row.label || row.packName || row.resource || row.id || row.packId}</strong>
+                {row.metadata?.assetType && <small>{row.metadata.assetType}</small>}
+                {row.metadata?.status && <small>{row.metadata.status}</small>}
+              </span>
+              <b>{row.count ?? row.events ?? row.status ?? 'enabled'}</b>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="org-pack-meta">{emptyText}</p>
+      )}
+    </Card>
+  );
 
   return (
     <div className="org-page">
       <header className="org-page-header">
         <h1>Platform analytics</h1>
-        <p className="org-page-subtitle">Adoption by pack, role, and organization (demo-scoped).</p>
+        <p className="org-page-subtitle">
+          Adoption, engagement, underused assets, and top assets across the active organization.
+        </p>
       </header>
       {analytics ? (
-        <div className="org-grid">
-          <Card className="org-card">
-            <h2>Audit events</h2>
-            <p>{analytics.auditEventCount}</p>
-          </Card>
-          <Card className="org-card">
-            <h2>AI sessions</h2>
-            <p>{analytics.aiSessionCount}</p>
-          </Card>
-          <Card className="org-card">
-            <h2>Enabled packs</h2>
-            <p>{analytics.enabledPackCount}</p>
-          </Card>
-        </div>
+        <>
+          <div className="org-grid org-analytics-metrics">
+            {metricCards.map(([label, value]) => (
+              <Card key={label} className="org-card org-analytics-metric">
+                <h2>{label}</h2>
+                <p>{value}</p>
+              </Card>
+            ))}
+          </div>
+
+          <div className="org-analytics-section">
+            <h2>Adoption</h2>
+            <div className="org-grid">
+              {renderMetricList('Pack usage', dimensions.packUsage || analytics.packAdoption || [])}
+              {renderMetricList('Role usage', dimensions.roleUsage || [])}
+              {renderMetricList('Workspace usage', dimensions.workspaceUsage || [])}
+            </div>
+          </div>
+
+          <div className="org-analytics-section">
+            <h2>Engagement</h2>
+            <div className="org-grid">
+              {renderMetricList('Asset usage', dimensions.assetUsage || [])}
+              {renderMetricList('AI usage', dimensions.aiUsage || [])}
+              {renderMetricList('Search queries', dimensions.searchQueries || [])}
+              {renderMetricList('Simulation completion', dimensions.simulationCompletion || [])}
+              {renderMetricList('Dashboard engagement', dimensions.dashboardEngagement || [])}
+            </div>
+          </div>
+
+          <div className="org-analytics-section">
+            <h2>Underused assets</h2>
+            <div className="org-grid">
+              {renderMetricList('Lowest engagement', dashboards.underusedAssets || [])}
+            </div>
+          </div>
+
+          <div className="org-analytics-section">
+            <h2>Top assets</h2>
+            <div className="org-grid">
+              {renderMetricList('Most used assets', dashboards.topAssets || analytics.topTools || [])}
+            </div>
+          </div>
+        </>
       ) : (
         <Card className="org-card">
           <p>Link an organization to view analytics.</p>

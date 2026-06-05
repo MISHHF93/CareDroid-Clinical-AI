@@ -13,6 +13,17 @@ import { IntegrationOffering } from './entities/integration-offering.entity';
 import { Product } from './entities/product.entity';
 import { SpecialtyCatalog } from './entities/specialty-catalog.entity';
 
+const AGENT_REGISTRY_ORDER = [
+  'agent-clinical',
+  'agent-emergency',
+  'agent-lab',
+  'agent-operations',
+  'agent-fleet',
+  'agent-governance',
+  'agent-research',
+  'agent-education',
+];
+
 @Injectable()
 export class ProductCatalogService {
   constructor(
@@ -86,15 +97,26 @@ export class ProductCatalogService {
       const productAssets = [...productAssetIds]
         .map((assetId) => assetMap.get(assetId))
         .filter(Boolean) as PlatformAsset[];
+      const productPacks = productPackIds
+        .map((packId) => packMap.get(packId))
+        .filter(Boolean) as AssetPack[];
+      const roles = this.resolveProductRoles(product, productPacks, productAssets);
+      const workspaces = this.resolveProductWorkspaces(productPacks, productAssets);
 
       return {
-        product: this.serializeProduct(product),
+        product: {
+          ...this.serializeProduct(product),
+          roles,
+          workspaces,
+        },
         packs: productPackIds.map((packId) =>
           this.serializeBuilderPack(packMap.get(packId), product.id, assetMap, context, options),
         ),
         assets: productAssets.map((asset) =>
           this.serializeBuilderAsset(asset, context, options, productPackIds),
         ),
+        roles,
+        workspaces,
         routes: productAssets
           .filter((asset) => asset.route)
           .map((asset) => ({
@@ -267,13 +289,38 @@ export class ProductCatalogService {
       ...(pathway.protocolAssetIds || []),
       ...(pathway.workflowAssetIds || []),
       ...(pathway.simulationAssetIds || []),
+      ...(pathway.aiAgentId ? [pathway.aiAgentId] : []),
     ];
     const assets = allIds.length
       ? await this.assetRepository.find({ where: { id: In(allIds) } })
       : [];
     const assetMap = new Map(assets.map((a) => [a.id, this.serializeAsset(a)]));
+    const calculators = this.serializePathwayAssets(pathway.calculatorAssetIds, assetMap);
+    const protocols = this.serializePathwayAssets(pathway.protocolAssetIds, assetMap);
+    const workflows = this.serializePathwayAssets(pathway.workflowAssetIds, assetMap);
+    const simulations = this.serializePathwayAssets(pathway.simulationAssetIds, assetMap);
+    const aiAgent = pathway.aiAgentId ? assetMap.get(pathway.aiAgentId) || { id: pathway.aiAgentId } : null;
+
     return {
       ...pathway,
+      calculators,
+      protocols,
+      workflows,
+      simulations,
+      aiAgent,
+      sections: {
+        calculators,
+        protocols,
+        workflows,
+        simulations,
+      },
+      linkedAssetCounts: {
+        calculators: calculators.length,
+        protocols: protocols.length,
+        workflows: workflows.length,
+        simulations: simulations.length,
+        aiAgents: aiAgent ? 1 : 0,
+      },
       steps: this.buildPathwaySteps(pathway, assetMap),
     };
   }
@@ -283,15 +330,53 @@ export class ProductCatalogService {
       where: { assetType: PlatformAssetType.AI_AGENT },
       order: { title: 'ASC' },
     });
-    return rows.map((a) => ({
-      id: a.id,
-      title: a.title,
-      description: a.description,
-      route: a.route || '/assistant',
-      launchType: a.launchType,
-      category: a.category,
-      gatewayNote: 'Common assistant gateway',
-    }));
+    const registryRows = rows
+      .filter((agent) => AGENT_REGISTRY_ORDER.includes(agent.id))
+      .sort((a, b) => AGENT_REGISTRY_ORDER.indexOf(a.id) - AGENT_REGISTRY_ORDER.indexOf(b.id));
+    const accessAssetIds = [
+      ...new Set(registryRows.flatMap((agent) => this.agentAssetAccessIds(agent))),
+    ];
+    const accessAssets = accessAssetIds.length
+      ? await this.assetRepository.find({ where: { id: In(accessAssetIds) }, order: { title: 'ASC' } })
+      : [];
+    const assetById = new Map(accessAssets.map((asset) => [asset.id, asset]));
+
+    return registryRows.map((agent) => {
+      const policy = this.agentPolicy(agent);
+      const assetAccessIds = this.agentAssetAccessIds(agent);
+      return {
+        id: agent.id,
+        title: agent.title,
+        description: agent.description,
+        route: agent.route || '/assistant',
+        launchType: agent.launchType,
+        category: agent.category,
+        gatewayNote: 'Common assistant gateway',
+        capabilities: this.stringArray(policy.capabilities),
+        assetAccessIds,
+        assetAccess: assetAccessIds.map((assetId) => {
+          const asset = assetById.get(assetId);
+          return {
+            id: assetId,
+            title: asset?.title || assetId,
+            assetType: asset?.assetType,
+            category: asset?.category,
+            route: asset?.route,
+            launchType: asset?.launchType,
+            riskLevel: asset?.riskLevel,
+          };
+        }),
+        workspaceAwareness: this.stringArray(policy.workspaceAwareness || agent.workspaceTags),
+        roleAwareness: this.stringArray(policy.roleAwareness || agent.intendedRoles),
+        toolCallingPermissions: this.stringArray(policy.toolCallingPermissions),
+        canCallTools: policy.canCallTools !== false,
+        permissionPolicy: agent.permissionPolicy || {},
+        governance: agent.governance || {},
+        lifecycle: agent.lifecycle,
+        pricingTier: agent.pricingTier,
+        packIds: agent.packIds || [],
+      };
+    });
   }
 
   async listIntegrations(category?: string) {
@@ -390,6 +475,13 @@ export class ProductCatalogService {
     return steps;
   }
 
+  private serializePathwayAssets(
+    ids: string[] = [],
+    assetMap: Map<string, ReturnType<typeof this.serializeAsset>>,
+  ) {
+    return ids.map((id) => assetMap.get(id) || { id });
+  }
+
   private groupAssetsByType(assets: PlatformAsset[]) {
     const groups: Record<string, typeof assets> = {};
     for (const asset of assets) {
@@ -466,6 +558,8 @@ export class ProductCatalogService {
       assetIds: pack.assetIds,
       requiredDependencies: pack.requiredDependencies,
       defaultModules: pack.defaultModules,
+      roles: this.resolvePackRoles(pack, assets),
+      workspaces: this.resolvePackWorkspaces(pack, assets),
       pricingTier: pack.pricingTier,
       salesMetadata: pack.salesMetadata,
       isPublished: pack.isPublished,
@@ -508,6 +602,8 @@ export class ProductCatalogService {
       pricingTier: asset.pricingTier,
       governance: asset.governance,
       route: asset.route,
+      roles: this.resolveAssetRoles(asset),
+      workspaces: this.resolveAssetWorkspaces(asset),
       backendServices: this.resolveBackendServices(asset),
       access,
       isLaunchable: access.isLaunchable,
@@ -574,6 +670,67 @@ export class ProductCatalogService {
       route: asset.route,
       launchType: asset.launchType,
       packIds: asset.packIds,
+      roles: this.resolveAssetRoles(asset),
+      workspaces: this.resolveAssetWorkspaces(asset),
     };
+  }
+
+  private resolveProductRoles(
+    product: Product,
+    packs: AssetPack[],
+    assets: PlatformAsset[],
+  ): string[] {
+    return this.uniqueStrings([
+      ...(product.targetUsers || []),
+      ...packs.flatMap((pack) => this.resolvePackRoles(pack, [])),
+      ...assets.flatMap((asset) => this.resolveAssetRoles(asset)),
+    ]);
+  }
+
+  private resolveProductWorkspaces(packs: AssetPack[], assets: PlatformAsset[]): string[] {
+    return this.uniqueStrings([
+      ...packs.flatMap((pack) => this.resolvePackWorkspaces(pack, [])),
+      ...assets.flatMap((asset) => this.resolveAssetWorkspaces(asset)),
+    ]);
+  }
+
+  private resolvePackRoles(pack: AssetPack, assets: PlatformAsset[]): string[] {
+    return this.uniqueStrings([
+      ...(pack.targetRoles || []),
+      ...assets.flatMap((asset) => this.resolveAssetRoles(asset)),
+    ]);
+  }
+
+  private resolvePackWorkspaces(pack: AssetPack, assets: PlatformAsset[]): string[] {
+    return this.uniqueStrings([
+      ...(pack.defaultModules || []),
+      ...assets.flatMap((asset) => this.resolveAssetWorkspaces(asset)),
+    ]);
+  }
+
+  private resolveAssetRoles(asset: PlatformAsset): string[] {
+    return this.uniqueStrings([...(asset.intendedRoles || []), ...(asset.roleProfiles || [])]);
+  }
+
+  private resolveAssetWorkspaces(asset: PlatformAsset): string[] {
+    return this.uniqueStrings(asset.workspaceTags || []);
+  }
+
+  private uniqueStrings(values: unknown[]): string[] {
+    return [...new Set(values.filter((value): value is string => typeof value === 'string' && Boolean(value.trim())))];
+  }
+
+  private agentPolicy(agent: PlatformAsset): Record<string, any> {
+    return agent.permissionPolicy && typeof agent.permissionPolicy === 'object'
+      ? agent.permissionPolicy
+      : {};
+  }
+
+  private agentAssetAccessIds(agent: PlatformAsset): string[] {
+    return this.stringArray(this.agentPolicy(agent).assetAccess);
+  }
+
+  private stringArray(value: unknown): string[] {
+    return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
   }
 }

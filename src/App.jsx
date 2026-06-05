@@ -7,6 +7,7 @@ import { NotificationProvider, useNotifications } from './contexts/NotificationC
 import { ConversationProvider, useConversation } from './contexts/ConversationContext';
 import { ToolPreferencesProvider } from './contexts/ToolPreferencesContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
+import { OrganizationContextProvider } from './contexts/OrganizationContext';
 import { UserIdentityProvider } from './contexts/UserIdentityContext';
 import { CostTrackingProvider } from './contexts/CostTrackingContext';
 import { SystemConfigProvider } from './contexts/SystemConfigContext';
@@ -158,7 +159,6 @@ const Welcome = lazyWithRetry(() => import('./pages/Welcome'));
 const {
   ProductsIndexPage,
   ProductDetailPage,
-  AssetPacksBuilderPage,
   CommercialPlansPage,
   SpecialtiesIndexPage,
   SpecialtyDetailPage,
@@ -176,11 +176,6 @@ const {
   ),
   ProductDetailPage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ProductDetailPage }))
-  ),
-  AssetPacksBuilderPage: lazyWithRetry(() =>
-    import('./pages/commercial/CommercialPages').then((m) => ({
-      default: m.AssetPacksBuilderPage,
-    }))
   ),
   CommercialPlansPage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({ default: m.CommercialPlansPage }))
@@ -1320,6 +1315,11 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/organization/settings',
+      element: <OrganizationSettings />,
+      requiresAuth: true,
+    },
+    {
       path: '/settings/organization',
       element: <OrganizationSettings />,
       requiresAuth: true,
@@ -1382,7 +1382,7 @@ function AppRoutes() {
     },
     {
       path: '/asset-packs',
-      element: <AssetPacksBuilderPage />,
+      element: <PackMarketplace />,
       requiresAuth: true,
     },
     {
@@ -1885,18 +1885,20 @@ function App() {
                 <ToolPreferencesProvider>
                   <TenantContextProvider>
                     <UserIdentityProvider>
-                      <ConversationProvider>
-                        <SystemConfigProvider>
-                          <OfflineProvider>
-                            <ErrorBoundary>
-                              <Suspense fallback={<PageLoader />}>
-                                <AppRoutes />
-                              </Suspense>
-                              <NotificationToasts />
-                            </ErrorBoundary>
-                          </OfflineProvider>
-                        </SystemConfigProvider>
-                      </ConversationProvider>
+                      <OrganizationContextProvider>
+                        <ConversationProvider>
+                          <SystemConfigProvider>
+                            <OfflineProvider>
+                              <ErrorBoundary>
+                                <Suspense fallback={<PageLoader />}>
+                                  <AppRoutes />
+                                </Suspense>
+                                <NotificationToasts />
+                              </ErrorBoundary>
+                            </OfflineProvider>
+                          </SystemConfigProvider>
+                        </ConversationProvider>
+                      </OrganizationContextProvider>
                     </UserIdentityProvider>
                   </TenantContextProvider>
                 </ToolPreferencesProvider>

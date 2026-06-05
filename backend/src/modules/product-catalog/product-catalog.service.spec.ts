@@ -11,6 +11,7 @@ import { CarePathway } from './entities/care-pathway.entity';
 import { IntegrationOffering } from './entities/integration-offering.entity';
 import { ProductCatalogService } from './product-catalog.service';
 import { Organization } from '../workspaces/entities/organization.entity';
+import { REQUIRED_SELLABLE_PRODUCT_NAMES, SEED_PRODUCTS } from './data/product-catalog-seed.data';
 
 describe('ProductCatalogService', () => {
   let service: ProductCatalogService;
@@ -67,6 +68,22 @@ describe('ProductCatalogService', () => {
     service = module.get(ProductCatalogService);
     platformAssetsService = module.get(PlatformAssetsService) as any;
     entitlementService = module.get(EntitlementService) as any;
+  });
+
+  it('defines the six canonical SaaS packaging products', () => {
+    const productNames = new Set(SEED_PRODUCTS.map((product) => product.name));
+
+    expect(REQUIRED_SELLABLE_PRODUCT_NAMES).toEqual([
+      'Emergency Department Solution',
+      'Hospital Operations Solution',
+      'Medical IoT Solution',
+      'Simulation & Training Solution',
+      'Governance & Compliance Solution',
+      'Research & Education Solution',
+    ]);
+    REQUIRED_SELLABLE_PRODUCT_NAMES.forEach((name) => {
+      expect(productNames.has(name)).toBe(true);
+    });
   });
 
   it('resolves pack ids for product ids', async () => {
@@ -216,10 +233,11 @@ describe('ProductCatalogService', () => {
       {
         id: 'product-emergency-department',
         slug: 'emergency-department-suite',
-        name: 'Emergency Department Suite',
+        name: 'Emergency Department Solution',
         productType: 'emergency_department',
         packIds: ['emergency-department-pack'],
         highlightAssetIds: ['qsofa'],
+        targetUsers: ['Emergency physicians'],
       },
     ]);
     packRepo.find.mockResolvedValue([
@@ -229,6 +247,8 @@ describe('ProductCatalogService', () => {
         slug: 'emergency-department-pack',
         assetIds: ['qsofa', 'agent-emergency'],
         requiredDependencies: ['core-platform'],
+        targetRoles: ['emergency physician', 'nurse'],
+        defaultModules: ['emergency', 'dashboard'],
         pricingTier: 'enterprise',
       },
     ]);
@@ -242,6 +262,8 @@ describe('ProductCatalogService', () => {
         launchType: 'route',
         backendStatus: 'wired',
         packIds: ['emergency-department-pack'],
+        intendedRoles: ['triage nurse'],
+        workspaceTags: ['emergency'],
       },
       {
         id: 'agent-emergency',
@@ -250,18 +272,28 @@ describe('ProductCatalogService', () => {
         route: '/assistant',
         backendStatus: 'wired',
         packIds: ['emergency-department-pack'],
+        intendedRoles: ['emergency physician'],
+        workspaceTags: ['emergency'],
       },
     ]);
 
     const [graph] = (await service.getProductBuilderGraph()) as any[];
 
-    expect(graph.product.name).toBe('Emergency Department Suite');
+    expect(graph.product.name).toBe('Emergency Department Solution');
+    expect(graph.roles).toEqual(
+      expect.arrayContaining(['Emergency physicians', 'emergency physician', 'nurse', 'triage nurse']),
+    );
+    expect(graph.workspaces).toEqual(expect.arrayContaining(['emergency', 'dashboard']));
     expect(graph.packs[0]).toMatchObject({
       id: 'emergency-department-pack',
+      roles: expect.arrayContaining(['emergency physician', 'nurse', 'triage nurse']),
+      workspaces: expect.arrayContaining(['emergency', 'dashboard']),
       assets: expect.arrayContaining([
         expect.objectContaining({
           id: 'qsofa',
           route: '/tools/calculators/qsofa',
+          roles: expect.arrayContaining(['triage nurse']),
+          workspaces: expect.arrayContaining(['emergency']),
           backendServices: expect.arrayContaining(['ClinicalTools']),
         }),
       ]),
@@ -320,6 +352,178 @@ describe('ProductCatalogService', () => {
         }),
       ],
     });
+  });
+
+  it('lists enriched AI agent registry rows', async () => {
+    const assetRepo = (service as any).assetRepository;
+    assetRepo.find
+      .mockResolvedValueOnce([
+        {
+          id: 'agent-emergency',
+          title: 'Emergency AI',
+          description: 'Emergency support.',
+          assetType: 'ai_agent',
+          category: 'AI Agent',
+          route: '/assistant',
+          launchType: 'registry',
+          permissionPolicy: {
+            capabilities: ['Triage assistance'],
+            assetAccess: ['qsofa'],
+            workspaceAwareness: ['emergency'],
+            roleAwareness: ['emergency physician'],
+            toolCallingPermissions: ['invoke-risk-scores'],
+            canCallTools: true,
+          },
+          workspaceTags: ['emergency'],
+          intendedRoles: ['emergency physician'],
+          governance: { requiresHumanReview: true },
+          lifecycle: 'active',
+          pricingTier: 'enterprise',
+          packIds: ['emergency-department-pack'],
+        },
+        {
+          id: 'agent-clinical',
+          title: 'Clinical AI',
+          description: 'Clinical support.',
+          assetType: 'ai_agent',
+          category: 'AI Agent',
+          route: '/assistant',
+          launchType: 'registry',
+          permissionPolicy: {
+            capabilities: ['Clinical reasoning'],
+            assetAccess: ['patient-summary-ai'],
+            workspaceAwareness: ['icu'],
+            roleAwareness: ['hospitalist'],
+            toolCallingPermissions: ['read-clinical-context'],
+          },
+          workspaceTags: ['icu'],
+          intendedRoles: ['hospitalist'],
+          governance: {},
+          lifecycle: 'active',
+          pricingTier: 'core',
+          packIds: ['core-platform'],
+        },
+      ])
+      .mockResolvedValueOnce([
+        {
+          id: 'qsofa',
+          title: 'qSOFA',
+          assetType: 'calculator',
+          category: 'Calculator',
+          route: '/tools/calculators/qsofa',
+          launchType: 'route',
+          riskLevel: 'clinical-decision-support',
+        },
+        {
+          id: 'patient-summary-ai',
+          title: 'Patient Summary AI',
+          assetType: 'ai_agent',
+          category: 'Clinical AI',
+          route: '/patients/:patientId/summary',
+          launchType: 'route',
+          riskLevel: 'clinical-decision-support',
+        },
+      ]);
+
+    const result = await service.listAgents();
+
+    expect(result.map((agent) => agent.id)).toEqual(['agent-clinical', 'agent-emergency']);
+    expect(result[0]).toMatchObject({
+      id: 'agent-clinical',
+      capabilities: ['Clinical reasoning'],
+      workspaceAwareness: ['icu'],
+      roleAwareness: ['hospitalist'],
+      toolCallingPermissions: ['read-clinical-context'],
+      canCallTools: true,
+    });
+    expect(result[1].assetAccess).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'qsofa',
+          title: 'qSOFA',
+          route: '/tools/calculators/qsofa',
+        }),
+      ]),
+    );
+  });
+
+  it('resolves care pathway sections with linked assets and AI agent detail', async () => {
+    const pathwayRepo = (service as any).pathwayRepository;
+    const assetRepo = (service as any).assetRepository;
+
+    pathwayRepo.findOne.mockResolvedValue({
+      id: 'pathway-sepsis',
+      slug: 'sepsis',
+      name: 'Sepsis',
+      description: 'Sepsis bundle and deterioration monitoring.',
+      calculatorAssetIds: ['qsofa'],
+      protocolAssetIds: ['protocol-sepsis'],
+      workflowAssetIds: ['workflows'],
+      simulationAssetIds: ['sepsis-deterioration'],
+      aiAgentId: 'agent-clinical',
+      outcomes: ['bundle compliance'],
+    });
+    assetRepo.find.mockResolvedValue([
+      {
+        id: 'qsofa',
+        title: 'qSOFA',
+        assetType: 'calculator',
+        category: 'Calculator',
+        route: '/tools/calculators/qsofa',
+      },
+      {
+        id: 'protocol-sepsis',
+        title: 'Sepsis Management',
+        assetType: 'protocol',
+        category: 'sepsis',
+        route: '/protocols',
+      },
+      {
+        id: 'workflows',
+        title: 'Workflow Builder',
+        assetType: 'workflow',
+        route: '/workflows',
+      },
+      {
+        id: 'sepsis-deterioration',
+        title: 'Sepsis Deterioration',
+        assetType: 'simulation',
+        route: '/simulation/sepsis-deterioration',
+      },
+      {
+        id: 'agent-clinical',
+        title: 'Clinical AI',
+        assetType: 'ai_agent',
+        route: '/assistant',
+      },
+    ]);
+
+    const result = await service.getCarePathwayBySlug('sepsis');
+
+    expect(result.calculators).toEqual([
+      expect.objectContaining({ id: 'qsofa', title: 'qSOFA' }),
+    ]);
+    expect(result.protocols).toEqual([
+      expect.objectContaining({ id: 'protocol-sepsis', title: 'Sepsis Management' }),
+    ]);
+    expect(result.workflows).toEqual([expect.objectContaining({ id: 'workflows' })]);
+    expect(result.simulations).toEqual([
+      expect.objectContaining({ id: 'sepsis-deterioration' }),
+    ]);
+    expect(result.aiAgent).toMatchObject({ id: 'agent-clinical', title: 'Clinical AI' });
+    expect(result.linkedAssetCounts).toEqual({
+      calculators: 1,
+      protocols: 1,
+      workflows: 1,
+      simulations: 1,
+      aiAgents: 1,
+    });
+    expect(result.steps.map((step) => step.type)).toEqual([
+      'calculator',
+      'protocol',
+      'workflow',
+      'simulation',
+    ]);
   });
 
   it('reconciles organization entitlements from a commercial plan without disabling manual packs by default', async () => {

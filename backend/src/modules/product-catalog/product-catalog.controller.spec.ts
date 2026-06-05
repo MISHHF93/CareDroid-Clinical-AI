@@ -9,6 +9,8 @@ describe('ProductCatalogController tenant scope', () => {
       getProductAssets: jest.fn().mockResolvedValue({ assets: [] }),
       getProductBuilderGraph: jest.fn().mockResolvedValue([]),
       getAssetPackBuilderGraph: jest.fn().mockResolvedValue([]),
+      listCarePathways: jest.fn().mockResolvedValue([]),
+      getCarePathwayBySlug: jest.fn().mockResolvedValue({ slug: 'sepsis' }),
       reconcileOrganizationCommercialPlan: jest.fn().mockResolvedValue({
         organizationId: 'org-1',
         commercialPlanId: 'enterprise',
@@ -91,6 +93,22 @@ describe('ProductCatalogController tenant scope', () => {
       userRole: undefined,
       subscriptionPlan: undefined,
     });
+  });
+
+  it('lists care pathways through the product catalog service', async () => {
+    const { controller, productCatalogService } = buildController();
+
+    await controller.listPathways();
+
+    expect(productCatalogService.listCarePathways).toHaveBeenCalled();
+  });
+
+  it('gets care pathway details by slug through the product catalog service', async () => {
+    const { controller, productCatalogService } = buildController();
+
+    await controller.getPathway('sepsis');
+
+    expect(productCatalogService.getCarePathwayBySlug).toHaveBeenCalledWith('sepsis');
   });
 
   it('does not resolve product assets when organization membership is denied', async () => {

@@ -114,6 +114,8 @@ export class TenantContextService {
     return {
       organizationId,
       organizationName: organization.name,
+      organizationType: organization.organizationType,
+      branding: organization.branding || {},
       workspaceId: finalWorkspaceMembership.workspaceId,
       workspaceName: finalWorkspace?.name,
       userId: user.id,

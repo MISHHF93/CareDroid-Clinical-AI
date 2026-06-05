@@ -5,6 +5,8 @@ import { useConversation } from '../contexts/ConversationContext';
 import { useSystemConfig } from '../contexts/SystemConfigContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { useOrganizationContext } from '../contexts/OrganizationContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
 import ProfileToolGraphCard from '../components/ProfileToolGraphCard';
@@ -249,12 +251,47 @@ function isAlertNotification(notification) {
   return /alert|critical|high|urgent|warning/.test(text);
 }
 
+function isLaunchCardAllowed(card, platformContext) {
+  const decisions = platformContext?.assetAccessDecisions || {};
+  const aliases = {
+    fleet: ['fleet-map', 'fleet-live-map', 'live-tracking-map', 'fleet-command'],
+    tools: ['calculators', 'drug-check', 'lab-interp'],
+    workspace: [],
+    notifications: [],
+    activity: [],
+    'system-status': ['system-health', 'deployment-observability'],
+  };
+  const assetIds = aliases[card.id] || [card.id];
+  const matchedDecisions = assetIds.map((id) => decisions[id]).filter(Boolean);
+  if (!matchedDecisions.length) return true;
+  return matchedDecisions.some((decision) => decision.isLaunchable !== false);
+}
+
 export default function CommandDashboard() {
   const navigate = useNavigate();
   const [assistantPrompt, setAssistantPrompt] = useState('');
   const { user, isDevAuthBypass, hasPermission } = useUser();
   const { activeWorkspace, activity, aiPersonalization, platformContext, account, roleProfile } =
     useUserIdentity();
+  const { branding, tenant, subscription } = useOrganizationContext();
+  const {
+    activeWorkspace: workspaceContextActive,
+    recommendations: workspaceRecommendations,
+    shortcuts: workspaceShortcuts,
+    visibleAssetIds: workspaceVisibleAssetIds,
+  } = useWorkspace();
+  const workspaceAwarePlatformContext = useMemo(
+    () =>
+      platformContext
+        ? {
+            ...platformContext,
+            legacyToolAliases: workspaceVisibleAssetIds?.length
+              ? workspaceVisibleAssetIds
+              : platformContext.legacyToolAliases,
+          }
+        : platformContext,
+    [platformContext, workspaceVisibleAssetIds]
+  );
   const { conversations, messages, addMessage, selectTool, setActiveTool } = useConversation();
   const { recentTools, recordToolAccess } = useToolPreferences();
   const { notifications = [] } = useNotifications();
@@ -262,12 +299,12 @@ export default function CommandDashboard() {
   const model = useMemo(
     () =>
       getCommandDashboardModel({
-        platformContext,
+        platformContext: workspaceAwarePlatformContext,
         account,
         roleProfile,
         userRole: user?.role,
       }),
-    [platformContext, account, roleProfile, user?.role]
+    [workspaceAwarePlatformContext, account, roleProfile, user?.role]
   );
   const canViewDeveloperCatalog = hasPermission(Permission.CONFIGURE_SYSTEM);
   const recentToolItems = useMemo(
@@ -297,6 +334,10 @@ export default function CommandDashboard() {
   const activeAlerts = useMemo(
     () => notifications.filter(isAlertNotification).slice(0, 4),
     [notifications]
+  );
+  const launchCards = useMemo(
+    () => DASHBOARD_LAUNCH_CARDS.filter((card) => isLaunchCardAllowed(card, workspaceAwarePlatformContext)),
+    [workspaceAwarePlatformContext]
   );
 
   const launchTool = (tool) => {
@@ -337,18 +378,29 @@ export default function CommandDashboard() {
     <main className="command-dashboard">
       <section className="command-hero" aria-labelledby="command-dashboard-title">
         <div className="command-hero__content">
-          <p className="command-eyebrow">One command center architecture</p>
+          <p className="command-eyebrow">
+            {branding?.displayName || model.organization?.name || 'CareDroid'} tenant command center
+          </p>
           <h1 id="command-dashboard-title">CareDroid Command Center</h1>
           <p>
             Spend the day from one clinical operating center: ask AI, open tools and calculators,
             review alerts, check workspace context, and launch major modules without browsing the
-            sidebar.
+            sidebar. Active tenant: {tenant?.tenantId || model.organization?.slug || 'personal'} ·
+            workspace: {workspaceContextActive?.name || activeWorkspace?.name || 'Emergency'}.
           </p>
         </div>
         <div className="command-hero__stats" aria-label="Dashboard inventory summary">
           <div>
             <strong>{model.stats.totalTools}</strong>
-            <span>Library tools</span>
+            <span>Org-aware tools</span>
+          </div>
+          <div>
+            <strong>{subscription?.tier || 'free'}</strong>
+            <span>Subscription</span>
+          </div>
+          <div>
+            <strong>{workspaceRecommendations.length || model.recommendedAssets.length}</strong>
+            <span>Workspace recs</span>
           </div>
           <div>
             <strong>{unreadNotifications.length}</strong>
@@ -406,11 +458,22 @@ export default function CommandDashboard() {
 
       <DashboardPanel
         title="Quick Actions"
-        description="One compact entry point for every major CareDroid work area."
+        description={`Workspace shortcuts for ${workspaceContextActive?.name || 'the active workspace'}.`}
         icon={CHROME_ICONS.layoutDashboard}
       >
         <div className="command-launch-grid">
-          {DASHBOARD_LAUNCH_CARDS.map((card) => (
+          {workspaceShortcuts.map((shortcut) => (
+            <Link key={`workspace-${shortcut.id}`} className="command-launch-card" to={shortcut.path}>
+              <span className="command-launch-card__icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.layoutDashboard} size={21} />
+              </span>
+              <span className="command-launch-card__body">
+                <strong>{shortcut.label}</strong>
+                <span>{shortcut.description}</span>
+              </span>
+            </Link>
+          ))}
+          {launchCards.map((card) => (
             <Link key={card.id} className="command-launch-card" to={card.path}>
               <span className="command-launch-card__icon" aria-hidden>
                 <NavIcon icon={card.icon} size={21} />

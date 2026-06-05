@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import WorkspaceHome from './WorkspaceHome';
 import {
@@ -15,6 +15,23 @@ vi.mock('../contexts/ConversationContext', () => ({
 
 vi.mock('../contexts/ToolPreferencesContext', () => ({
   useToolPreferences: () => mockToolPreferencesValue,
+}));
+
+vi.mock('../contexts/TenantContext', () => ({
+  useTenantContext: () => ({ refreshTenantContext: vi.fn() }),
+}));
+
+vi.mock('../contexts/UserIdentityContext', () => ({
+  useUserIdentity: () => ({ refreshIdentity: vi.fn() }),
+}));
+
+vi.mock('../contexts/WorkspaceContext', () => ({
+  useWorkspace: () => ({
+    assistantContext: '',
+    recommendations: [],
+    shortcuts: [],
+    switchWorkspace: vi.fn().mockResolvedValue({ ok: true }),
+  }),
 }));
 
 function LocationProbe() {
@@ -54,11 +71,13 @@ describe('WorkspaceHome', () => {
     expect(screen.getByRole('button', { name: /open live map/i })).toBeInTheDocument();
   });
 
-  it('switches workspaces and launches assistant with context', () => {
+  it('switches workspaces and launches assistant with context', async () => {
     renderWorkspace();
 
     fireEvent.click(screen.getByRole('button', { name: /^fleet$/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/fleet');
+    await waitFor(() => {
+      expect(screen.getByTestId('location')).toHaveTextContent('/workspace/fleet');
+    });
 
     fireEvent.click(screen.getByRole('button', { name: /ask in context/i }));
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
