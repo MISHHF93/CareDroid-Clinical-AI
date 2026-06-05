@@ -54,11 +54,11 @@
   max-width: 52rem;
 }
 
-.fleet-page-main {
+.fleet-page-content {
   outline: none;
 }
 
-.fleet-page-main:focus {
+.fleet-page-content:focus {
   outline: none;
 }
 

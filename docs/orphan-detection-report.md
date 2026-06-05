@@ -1,6 +1,6 @@
 # Orphan Detection Report
 
-Generated: 2026-06-04 (regenerate with `npm run orphan-detection:write-docs`)
+Generated: 2026-06-05 (regenerate with `npm run orphan-detection:write-docs`)
 
 ## Classification key
 
@@ -15,7 +15,7 @@ Generated: 2026-06-04 (regenerate with `npm run orphan-detection:write-docs`)
 
 | Metric | Count |
 |--------|------:|
-| Total orphan findings | 346 |
+| Total orphan findings | 349 |
 | App.jsx routes | 212 |
 | Orphan / gap routes | 181 |
 | Orphan pages | 27 |
@@ -24,11 +24,11 @@ Generated: 2026-06-04 (regenerate with `npm run orphan-detection:write-docs`)
 | Orphan services | 0 |
 | Executor contract gaps | 3 |
 | API orphans / stubs | 132 |
-| Weakly linked markdown | 0 |
+| Weakly linked markdown | 3 |
 | **wire** | 216 |
 | **merge** | 1 |
-| **quarantine** | 2 |
-| **legacy** | 127 |
+| **quarantine** | 4 |
+| **legacy** | 128 |
 
 ## Merge candidates (explicit)
 
@@ -58,11 +58,11 @@ Generated: 2026-06-04 (regenerate with `npm run orphan-detection:write-docs`)
 | /calculators | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /medical-simulation | legacy | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /anatomy-viewer | legacy | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /fleet/live-map | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
-| /fleet/tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /maps | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /live-tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /fleet/live-map | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
+| /fleet/tracking | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /audit-logs | wire | In navigation.config / CANONICAL_ROUTES but no exact App.jsx route |
 | /tools/calculators/aa-gradient | wire | toolInventory route not registered in App.jsx |
 | /tools/calculators/abcd2 | wire | toolInventory route not registered in App.jsx |
@@ -427,7 +427,11 @@ _… and 12 more API rows._
 
 ## Orphan markdown (weak inbound links)
 
-_None detected._
+| Doc | Class | Evidence |
+| --- | --- | --- |
+| docs/asset-pack-productization-plan.md | quarantine | No inbound links from README, src, or other docs |
+| docs/navigation-reduction-plan.md | quarantine | No inbound links from README, src, or other docs |
+| docs/saas-bottleneck-implementation-audit.md | legacy | No inbound links from README, src, or other docs |
 
 ## Appendix
 

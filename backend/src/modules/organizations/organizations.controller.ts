@@ -56,5 +56,4 @@ export class OrganizationsController {
   ) {
     return this.organizationsService.update(req.user, organizationId, dto);
   }
-
 }

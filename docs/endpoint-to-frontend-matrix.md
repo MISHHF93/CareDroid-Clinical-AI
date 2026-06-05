@@ -1,6 +1,6 @@
 # Endpoint-to-frontend matrix
 
-**Generated:** 2026-06-04T22:52:13.068Z
+**Generated:** 2026-06-05T05:41:18.516Z
 
 | Method | Path | Backend | Frontend client | Exposure |
 |--------|------|---------|-----------------|----------|
@@ -208,5 +208,5 @@
 - `GET /api/auth/biometric/stats`
 - `DELETE /api/auth/biometric/disable/:deviceId`
 
-_…and 337 more in src/data/backendHttpRouteInventory.js_
+_…and 339 more in src/data/backendHttpRouteInventory.js_
 

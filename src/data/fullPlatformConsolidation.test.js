@@ -140,8 +140,7 @@ describe('full platform consolidation contract', () => {
       expect(appSource, route).toContain(`path: '${route}'`);
     }
 
-    expect(appSource).toContain('ASSISTANT_ROUTE_ALIASES');
-    expect(appSource).toContain('TOOLS_ROUTE_ALIASES');
+    expect(appSource).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
     expect(routeConfigSource).toContain(
       "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
     );
@@ -151,8 +150,8 @@ describe('full platform consolidation contract', () => {
     expect(routeConfigSource).toContain(
       'export const OPERATIONS_ROUTE_ALIASES = Object.freeze([])'
     );
-    expect(appSource).toContain("path: '/home'");
-    expect(appSource).toContain('to="/dashboard"');
+    expect(routeConfigSource).toContain("export const HOME_ROUTE_ALIASES = Object.freeze(['/home'])");
+    expect(routeConfigSource).toContain('export const PROTECTED_ROUTE_ALIAS_REDIRECTS = Object.freeze(');
     expect(appSource).not.toMatch(/element:\s*null|element:\s*undefined/);
   });
 

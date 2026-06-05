@@ -97,12 +97,31 @@
   border-radius: 8px;
   border: 1px solid var(--panel-border);
   font-size: 12px;
+}
+
+button.commercial-chip {
   cursor: pointer;
 }
 
 .commercial-chip.selected {
   border-color: #00ff88;
   background: rgba(0, 255, 136, 0.12);
+}
+
+.commercial-compact-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted-text);
+  font-size: 13px;
+}
+
+.commercial-compact-list li {
+  margin-bottom: 8px;
+}
+
+.commercial-muted {
+  color: var(--muted-text);
+  font-size: 12px;
 }
 
 .commercial-pathway-step {

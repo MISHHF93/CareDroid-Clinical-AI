@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { PROTECTED_ROUTE_ALIAS_REDIRECTS } from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -13,11 +14,9 @@ function expectRoute(path, component) {
   );
 }
 
-function expectRedirect(path, to) {
-  expect(appSource).toMatch(
-    new RegExp(
-      `path:\\s*'${path.replace(/\//g, '\\/')}'[\\s\\S]*?<LegacyProtectedRouteRedirect\\s+to="${to.replace(/\//g, '\\/')}"\\s*\\/>`
-    )
+function expectGeneratedRedirect(path, to) {
+  expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
+    expect.arrayContaining([expect.objectContaining({ path, to })])
   );
 }
 
@@ -29,8 +28,9 @@ describe('canonical route redirects', () => {
 
   it('keeps command dashboard canonical and legacy chat paths as redirects', () => {
     expectRoute('/dashboard', 'CommandDashboard');
-    expectRedirect('/home', '/dashboard');
-    expect(appSource).toContain('ASSISTANT_ROUTE_ALIASES.map');
+    expectGeneratedRedirect('/home', '/dashboard');
+    expectGeneratedRedirect('/chat', '/assistant');
+    expect(appSource).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
     expectRoute('/discover', 'CapabilityDiscovery');
     expectRoute('/automation', 'WorkflowAutomationBuilder');
     expect(routeConfigSource).toContain(
@@ -51,7 +51,7 @@ describe('canonical route redirects', () => {
   });
 
   it('gives the fleet area an explicit canonical live-map redirect', () => {
-    expect(appSource).toContain('FLEET_MAP_ROUTE_ALIASES.map');
+    expectGeneratedRedirect('/fleet', '/fleet/map');
     expect(routeConfigSource).toMatch(
       /export const FLEET_MAP_ROUTE_ALIASES = Object\.freeze\(\[[\s\S]*'\/fleet'[\s\S]*'\/fleet\/live-map'[\s\S]*'\/fleet\/tracking'/
     );
@@ -71,7 +71,7 @@ describe('canonical route redirects', () => {
 
   it('keeps developer/source audit catalog separate from the user-facing tools browser', () => {
     expectRoute('/tools', 'ToolsOverview');
-    expect(appSource).toContain('TOOLS_ROUTE_ALIASES.map');
+    expectGeneratedRedirect('/catalog', '/tools');
     expect(routeConfigSource).toContain(
       "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
     );
@@ -80,8 +80,7 @@ describe('canonical route redirects', () => {
   });
 
   it('redirects legacy audit-log entry points to the canonical audit route', () => {
-    expect(appSource).toContain('AUDIT_ROUTE_ALIASES.map');
-    expect(appSource).toContain('to="/audit"');
+    expectGeneratedRedirect('/audit-logs', '/audit');
     expect(routeConfigSource).toContain(
       "export const AUDIT_ROUTE_ALIASES = Object.freeze(['/audit-logs'])"
     );
@@ -124,9 +123,9 @@ describe('canonical route redirects', () => {
     expectRoute('/simulation/:scenarioId', 'SimulationScenarioPlayer');
     expectRoute('/laboratory', 'LaboratoryDashboard');
     expectRoute('/3d-viewer', 'Medical3DViewer');
-    expect(appSource).toContain('SIMULATION_ROUTE_ALIASES.map');
-    expect(appSource).toContain('LABORATORY_ROUTE_ALIASES.map');
-    expect(appSource).toContain('MEDICAL_3D_VIEWER_ROUTE_ALIASES.map');
+    expectGeneratedRedirect('/medical-simulation', '/simulation');
+    expectGeneratedRedirect('/lab', '/laboratory');
+    expectGeneratedRedirect('/anatomy-viewer', '/3d-viewer');
     expect(routeConfigSource).toContain("export const SIMULATION_ROUTE_ALIASES = Object.freeze(['/medical-simulation'])");
     expect(routeConfigSource).toContain("export const LABORATORY_ROUTE_ALIASES = Object.freeze(['/lab'])");
     expect(routeConfigSource).toContain("export const MEDICAL_3D_VIEWER_ROUTE_ALIASES = Object.freeze(['/anatomy-viewer'])");

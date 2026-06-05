@@ -1,7 +1,11 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SEED_ASSET_PACKS, SEED_PLATFORM_ASSETS, SEED_ROLE_PROFILES } from './data/platform-asset-seed.data';
+import {
+  SEED_ASSET_PACKS,
+  SEED_PLATFORM_ASSETS,
+  SEED_ROLE_PROFILES,
+} from './data/platform-asset-seed.data';
 import { AssetPack } from './entities/asset-pack.entity';
 import { PlatformAsset } from './entities/platform-asset.entity';
 import { RoleProfile } from './entities/role-profile.entity';

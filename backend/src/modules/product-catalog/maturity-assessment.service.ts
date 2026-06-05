@@ -2,10 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Organization } from '../workspaces/entities/organization.entity';
-import {
-  MATURITY_PRODUCT_RULES,
-  MATURITY_QUESTIONNAIRE,
-} from './data/product-catalog-seed.data';
+import { MATURITY_PRODUCT_RULES, MATURITY_QUESTIONNAIRE } from './data/product-catalog-seed.data';
 import { MaturityDimension } from './enums/product-catalog.enums';
 import { Product } from './entities/product.entity';
 import { SubmitMaturityAssessmentDto } from './dto/submit-maturity-assessment.dto';
@@ -47,8 +44,9 @@ export class MaturityAssessmentService {
       dimensions.reduce((sum, d) => sum + d.score, 0) / Math.max(dimensions.length, 1),
     );
 
-    const applicableRules = MATURITY_PRODUCT_RULES.filter((r) => overallScore >= r.minScore)
-      .sort((a, b) => b.minScore - a.minScore);
+    const applicableRules = MATURITY_PRODUCT_RULES.filter((r) => overallScore >= r.minScore).sort(
+      (a, b) => b.minScore - a.minScore,
+    );
     const slugSet = new Set<string>();
     applicableRules.forEach((r) => r.productSlugs.forEach((s) => slugSet.add(s)));
 

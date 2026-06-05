@@ -26,12 +26,15 @@ const calculators = readFileSync(join(__dirname, '../tools/Calculators.jsx'), 'u
 const chatHubGroups = readFileSync(join(__dirname, '../../data/chatAssistedHubGroups.js'), 'utf8');
 
 describe('Fleet shared chrome — keyboard & landmarks', () => {
-  it('exposes skip link, back control, and main landmark', () => {
+  it('exposes skip link, back control, and AppShell-owned content region', () => {
     expect(fleetPageChrome).toContain('fleet-skip-link');
     expect(fleetPageChrome).toContain('Skip to main content');
-    expect(fleetPageChrome).toContain('main.focus');
+    expect(fleetPageChrome).toContain('content.focus');
     expect(fleetPageChrome).toContain('aria-label="Back to tools catalog"');
-    expect(fleetPageChrome).toContain('<main id={mainId}');
+    expect(fleetPageChrome).not.toContain('<main');
+    expect(fleetPageChrome).toContain('<section');
+    expect(fleetPageChrome).toContain('className="fleet-page-content"');
+    expect(fleetPageChrome).toContain('aria-labelledby={`${toolId}-page-title`}');
     expect(fleetPageChrome).toContain('tabIndex={-1}');
   });
 

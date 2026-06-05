@@ -6,7 +6,7 @@ import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
 import { PROFILE_ROLES } from '../../data/profileToolSegmentation';
-import { getRegistryToolNavigation } from '../../navigation/registryToolLaunch';
+import { applyRegistryToolLaunch, getRegistryToolNavigation } from '../../navigation/registryToolLaunch';
 import './CommercialPages.css';
 
 const ORG_TYPES = [
@@ -67,6 +67,33 @@ function PageShell({ title, subtitle, children, actions }) {
   );
 }
 
+function ChipList({ items = [] }) {
+  if (!items?.length) return null;
+  return (
+    <div className="commercial-chip-list">
+      {items.map((item) => (
+        <span key={item} className="commercial-chip">
+          {item}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function ProductizationList({ title, items = [] }) {
+  if (!items?.length) return null;
+  return (
+    <Card className="commercial-card">
+      <h2>{title}</h2>
+      <ul className="commercial-compact-list">
+        {items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </Card>
+  );
+}
+
 export function ProductsIndexPage() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState('');
@@ -93,6 +120,12 @@ export function ProductsIndexPage() {
           <Card key={product.id} className="commercial-card">
             <h2>{product.name}</h2>
             <p>{product.description}</p>
+            {product.pricingTierPlaceholder && (
+              <p>
+                <strong>{product.pricingTierPlaceholder}</strong> pricing placeholder
+              </p>
+            )}
+            <ChipList items={product.targetBuyers || []} />
             <p>
               <strong>{product.packIds?.length || 0}</strong> solution packs
             </p>
@@ -109,6 +142,7 @@ export function ProductsIndexPage() {
 export function ProductDetailPage() {
   const { slug } = useParams();
   const { organization } = useUserIdentity();
+  const navigate = useNavigate();
   const [detail, setDetail] = useState(null);
   const [error, setError] = useState('');
 
@@ -132,6 +166,13 @@ export function ProductDetailPage() {
   }
 
   const { product, packs, assetsByType } = detail;
+  const launchAsset = (asset) => {
+    applyRegistryToolLaunch(asset.id, {
+      navigate,
+      replace: false,
+      state: { source: 'product-detail', productSlug: product.slug },
+    });
+  };
 
   return (
     <PageShell
@@ -147,9 +188,35 @@ export function ProductDetailPage() {
         <h2>Solution packs</h2>
         <ul>
           {packs.map((p) => (
-            <li key={p.id}>{p.name}</li>
+            <li key={p.id}>
+              {p.name}
+              {p.requiredDependencies?.length > 0 && (
+                <span className="commercial-muted">
+                  {' '}
+                  depends on {p.requiredDependencies.join(', ')}
+                </span>
+              )}
+            </li>
           ))}
         </ul>
+        {product.pricingTierPlaceholder && (
+          <p>
+            <strong>Pricing tier placeholder:</strong> {product.pricingTierPlaceholder}
+          </p>
+        )}
+        <ChipList items={product.readinessLabels || []} />
+        {product.targetBuyers?.length > 0 && (
+          <>
+            <h2 style={{ marginTop: 16 }}>Target buyers</h2>
+            <ChipList items={product.targetBuyers} />
+          </>
+        )}
+        {product.targetUsers?.length > 0 && (
+          <>
+            <h2 style={{ marginTop: 16 }}>Target users</h2>
+            <ChipList items={product.targetUsers} />
+          </>
+        )}
         {product.outcomes?.length > 0 && (
           <>
             <h2 style={{ marginTop: 16 }}>Outcomes</h2>
@@ -161,6 +228,15 @@ export function ProductDetailPage() {
           </>
         )}
       </Card>
+      <div className="commercial-grid" style={{ marginBottom: 16 }}>
+        <ProductizationList
+          title="Required backend capabilities"
+          items={product.requiredBackendCapabilities}
+        />
+        <ProductizationList title="Required integrations" items={product.requiredIntegrations} />
+        <ProductizationList title="AI workflows" items={product.aiWorkflows} />
+        <ProductizationList title="Dashboards" items={product.dashboards} />
+      </div>
       {Object.entries(assetsByType || {}).map(([type, assets]) => (
         <Card key={type} className="commercial-card" style={{ marginBottom: 12 }}>
           <h2>{type.replace(/_/g, ' ')}</h2>
@@ -172,7 +248,7 @@ export function ProductDetailPage() {
                   <Button
                     variant="ghost"
                     style={{ marginLeft: 8 }}
-                    onClick={() => window.location.assign(a.route)}
+                    onClick={() => launchAsset(a)}
                   >
                     Open
                   </Button>

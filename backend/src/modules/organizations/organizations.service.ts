@@ -34,7 +34,10 @@ export class OrganizationsService {
   async getCurrentForUser(user: User) {
     const profile = await this.profileRepository.findOne({ where: { userId: user.id } });
     if (!profile?.organizationId) {
-      return { organization: null, message: 'No organization linked. Create one in organization settings.' };
+      return {
+        organization: null,
+        message: 'No organization linked. Create one in organization settings.',
+      };
     }
     return this.getForUser(user, profile.organizationId);
   }
@@ -57,7 +60,8 @@ export class OrganizationsService {
     await this.assertMember(user.id, organizationId);
     const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
     if (!org) throw new NotFoundException('Organization not found');
-    const entitlements = await this.platformAssetsService.getOrganizationEntitlements(organizationId);
+    const entitlements =
+      await this.platformAssetsService.getOrganizationEntitlements(organizationId);
     return {
       ...this.serializeOrganization(org),
       entitlements,
@@ -143,11 +147,7 @@ export class OrganizationsService {
     return this.assertMember(userId, organizationId);
   }
 
-  async updateConfiguration(
-    user: User,
-    organizationId: string,
-    config: Record<string, unknown>,
-  ) {
+  async updateConfiguration(user: User, organizationId: string, config: Record<string, unknown>) {
     await this.assertAdmin(user.id, organizationId);
     const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
     if (!org) throw new NotFoundException('Organization not found');
@@ -164,8 +164,7 @@ export class OrganizationsService {
       dashboardLayout: config.dashboardLayout ?? current.dashboardLayout,
       permissionsOverrides: config.permissionsOverrides ?? current.permissionsOverrides,
       workspaceDefaults: config.workspaceDefaults ?? current.workspaceDefaults,
-      integrationsRequested:
-        config.integrationsRequested ?? current.integrationsRequested,
+      integrationsRequested: config.integrationsRequested ?? current.integrationsRequested,
     };
 
     if (config.branding) {
@@ -182,9 +181,7 @@ export class OrganizationsService {
     if (!org) throw new NotFoundException('Organization not found');
 
     const settings = (org.settings || {}) as Record<string, unknown>;
-    const requested = new Set<string>(
-      (settings.integrationsRequested as string[]) || [],
-    );
+    const requested = new Set<string>((settings.integrationsRequested as string[]) || []);
     requested.add(integrationSlug);
     org.settings = { ...settings, integrationsRequested: [...requested] };
     await this.organizationRepository.save(org);

@@ -1,10 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { ProductType } from '../enums/product-catalog.enums';
 
 @Entity('products')
@@ -35,6 +29,27 @@ export class Product {
 
   @Column({ type: 'simple-json', default: '[]' })
   targetBuyers: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  targetUsers: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  requiredBackendCapabilities: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  requiredIntegrations: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  aiWorkflows: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  dashboards: string[];
+
+  @Column({ type: 'varchar', length: 64, nullable: true })
+  pricingTierPlaceholder: string;
+
+  @Column({ type: 'simple-json', default: '[]' })
+  readinessLabels: string[];
 
   @Column({ type: 'varchar', length: 32, nullable: true })
   complexity: string;

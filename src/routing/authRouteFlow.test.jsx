@@ -24,8 +24,9 @@ describe('auth canonical flow wiring', () => {
   });
 
   it('redirects duplicate calculators route aliases to canonical /tools/calculators', () => {
-    expect(appSource).toContain('CALCULATORS_ROUTE_ALIASES.map');
+    expect(appSource).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
     expect(routeConfigSource).toContain("export const CALCULATORS_ROUTE_ALIASES = Object.freeze(['/calculators'])");
-    expect(appSource).toContain('to="/tools/calculators"');
+    expect(routeConfigSource).toContain('aliases: CALCULATORS_ROUTE_ALIASES');
+    expect(routeConfigSource).toContain("to: record.path");
   });
 });

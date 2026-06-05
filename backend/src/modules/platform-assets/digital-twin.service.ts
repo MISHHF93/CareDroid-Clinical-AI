@@ -6,8 +6,13 @@ export class DigitalTwinService {
   constructor(private readonly fleetService: FleetService) {}
 
   async getSnapshot(organizationId?: string) {
-    let fleetVehicles: Array<{ id: string; label: string; status: string; eta: string; alert: string }> =
-      [];
+    let fleetVehicles: Array<{
+      id: string;
+      label: string;
+      status: string;
+      eta: string;
+      alert: string;
+    }> = [];
 
     try {
       const fleet = await this.fleetService.getFleetSnapshot();
@@ -20,8 +25,20 @@ export class DigitalTwinService {
       }));
     } catch {
       fleetVehicles = [
-        { id: 'amb-a12', label: 'Ambulance A-12', status: 'delayed', eta: '14 min', alert: 'Route diversion' },
-        { id: 'van-03', label: 'Transport Van 03', status: 'available', eta: '5 min', alert: 'None' },
+        {
+          id: 'amb-a12',
+          label: 'Ambulance A-12',
+          status: 'delayed',
+          eta: '14 min',
+          alert: 'Route diversion',
+        },
+        {
+          id: 'van-03',
+          label: 'Transport Van 03',
+          status: 'available',
+          eta: '5 min',
+          alert: 'None',
+        },
       ];
     }
 
@@ -33,8 +50,22 @@ export class DigitalTwinService {
       occupancy: { totalBeds: 96, occupiedBeds: 71, criticalBeds: 9, staffingRatio: '1:4.2' },
       floors: [
         { id: 'icu', label: 'ICU', occupancy: 0.88, alerts: 4, devices: 38, staffing: 'tight' },
-        { id: 'ed', label: 'Emergency', occupancy: 0.74, alerts: 3, devices: 29, staffing: 'stable' },
-        { id: 'med-surg', label: 'Med/Surg', occupancy: 0.62, alerts: 1, devices: 44, staffing: 'stable' },
+        {
+          id: 'ed',
+          label: 'Emergency',
+          occupancy: 0.74,
+          alerts: 3,
+          devices: 29,
+          staffing: 'stable',
+        },
+        {
+          id: 'med-surg',
+          label: 'Med/Surg',
+          occupancy: 0.62,
+          alerts: 1,
+          devices: 44,
+          staffing: 'stable',
+        },
       ],
       rooms: [
         {

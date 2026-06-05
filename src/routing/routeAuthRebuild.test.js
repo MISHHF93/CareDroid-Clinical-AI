@@ -31,7 +31,7 @@ describe('canonical route/auth architecture', () => {
     expect(routeConfigSource).toContain(
       "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
     );
-    expect(appSource).toContain('...ASSISTANT_ROUTE_ALIASES.map((path) => ({');
+    expect(appSource).toContain('...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({');
   });
 
   it('normalizes product aliases to the compact canonical map', () => {
@@ -44,11 +44,11 @@ describe('canonical route/auth architecture', () => {
     expect(routeConfigSource).toMatch(
       /export const FLEET_MAP_ROUTE_ALIASES = Object\.freeze\(\[[\s\S]*'\/fleet'[\s\S]*'\/fleet\/live-map'[\s\S]*'\/fleet\/tracking'/
     );
-    expect(appSource).toContain('...TOOLS_ROUTE_ALIASES.map((path) => ({');
+    expect(appSource).toContain('...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({');
     expect(appSource).toMatch(
       /path:\s*'\/operations'[\s\S]*<Operations \/>[\s\S]*requiresAuth:\s*true/
     );
-    expect(appSource).toContain('...FLEET_MAP_ROUTE_ALIASES.map((path) => ({');
+    expect(appSource).not.toContain('...FLEET_MAP_ROUTE_ALIASES.map((path) => ({');
   });
 
   it('ensures unknown protected routes render not found in app shell', () => {

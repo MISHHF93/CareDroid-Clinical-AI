@@ -263,7 +263,7 @@ const Settings = () => {
             <Link to="/settings/organization">
               <Button variant="secondary">Organization settings</Button>
             </Link>
-            <Link to="/asset-packs">
+            <Link to="/settings/organization/packs">
               <Button variant="secondary">Solution packs</Button>
             </Link>
             <Link to="/platform-analytics">

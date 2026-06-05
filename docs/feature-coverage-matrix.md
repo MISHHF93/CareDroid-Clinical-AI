@@ -1,6 +1,6 @@
 # Feature Coverage Matrix
 
-Generated: 2026-06-04 (source-derived; regenerate with `npm run feature-coverage-matrix:write-docs`)
+Generated: 2026-06-05 (source-derived; regenerate with `npm run feature-coverage-matrix:write-docs`)
 
 ## Summary
 

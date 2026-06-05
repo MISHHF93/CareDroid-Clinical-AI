@@ -4,7 +4,7 @@ import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './fleetUxShared.css';
 
 /**
- * Shared page chrome: skip link, back navigation, title, and operational safety banner.
+ * Shared page content chrome for Fleet pages inside AppShell's main landmark.
  */
 export function FleetOperationalBanner({ variant = 'default', children }) {
   const className =
@@ -36,10 +36,10 @@ export default function FleetPageChrome({
         href={`#${mainId}`}
         className="fleet-skip-link"
         onClick={(event) => {
-          const main = document.getElementById(mainId);
-          if (!main) return;
+          const content = document.getElementById(mainId);
+          if (!content) return;
           event.preventDefault();
-          main.focus({ preventScroll: false });
+          content.focus({ preventScroll: false });
         }}
       >
         Skip to main content
@@ -63,9 +63,14 @@ export default function FleetPageChrome({
           <FleetOperationalBanner variant={safetyVariant}>{safetyNote}</FleetOperationalBanner>
         ) : null}
       </header>
-      <main id={mainId} className="fleet-page-main" tabIndex={-1}>
+      <section
+        id={mainId}
+        className="fleet-page-content"
+        tabIndex={-1}
+        aria-labelledby={`${toolId}-page-title`}
+      >
         {children}
-      </main>
+      </section>
     </>
   );
 }

@@ -76,9 +76,7 @@ export class ProductCatalogService {
       order: { title: 'ASC' },
     });
 
-    const filtered = entitledIds
-      ? assets.filter((a) => entitledIds!.has(a.id))
-      : assets;
+    const filtered = entitledIds ? assets.filter((a) => entitledIds!.has(a.id)) : assets;
 
     return {
       product: this.serializeProduct(product),
@@ -87,6 +85,11 @@ export class ProductCatalogService {
         name: p.name,
         slug: p.slug,
         description: p.description,
+        targetRoles: p.targetRoles,
+        requiredDependencies: p.requiredDependencies,
+        defaultModules: p.defaultModules,
+        pricingTier: p.pricingTier,
+        salesMetadata: p.salesMetadata,
       })),
       assets: filtered.map((a) => this.serializeAsset(a)),
       assetsByType: this.groupAssetsByType(filtered),
@@ -211,10 +214,7 @@ export class ProductCatalogService {
       groups[key].push(asset);
     }
     return Object.fromEntries(
-      Object.entries(groups).map(([type, rows]) => [
-        type,
-        rows.map((a) => this.serializeAsset(a)),
-      ]),
+      Object.entries(groups).map(([type, rows]) => [type, rows.map((a) => this.serializeAsset(a))]),
     );
   }
 
@@ -229,6 +229,13 @@ export class ProductCatalogService {
       highlightAssetIds: product.highlightAssetIds,
       outcomes: product.outcomes,
       targetBuyers: product.targetBuyers,
+      targetUsers: product.targetUsers,
+      requiredBackendCapabilities: product.requiredBackendCapabilities,
+      requiredIntegrations: product.requiredIntegrations,
+      aiWorkflows: product.aiWorkflows,
+      dashboards: product.dashboards,
+      pricingTierPlaceholder: product.pricingTierPlaceholder,
+      readinessLabels: product.readinessLabels,
       complexity: product.complexity,
       commercialPlanIds: product.commercialPlanIds,
     };

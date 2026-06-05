@@ -1,6 +1,6 @@
 # SaaS Architecture Compliance Audit
 
-Generated: 2026-06-04 (regenerate with `npm run saas-compliance-audit:write-docs`)
+Generated: 2026-06-05 (regenerate with `npm run saas-compliance-audit:write-docs`)
 
 ## Charter reference
 

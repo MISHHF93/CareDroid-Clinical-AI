@@ -96,8 +96,7 @@ export class PlatformAssetsService {
     strictEntitlements?: boolean;
   }): Promise<string[]> {
     const entitled = new Set<string>();
-    const strictEntitlements =
-      params.strictEntitlements ?? this.isStrictSaasEntitlementsEnabled();
+    const strictEntitlements = params.strictEntitlements ?? this.isStrictSaasEntitlementsEnabled();
     const hasOrganizationScope = Boolean(params.organizationId);
 
     if (params.organizationId) {

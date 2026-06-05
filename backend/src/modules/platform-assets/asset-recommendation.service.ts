@@ -48,7 +48,11 @@ export class AssetRecommendationService {
     const access = await this.assetAccessService.getUserAssetAccess(user);
     const allowed = new Set(
       access.access
-        .filter((row) => row.accessState === AssetAccessState.ALLOWED || row.accessState === AssetAccessState.DEMO_ONLY)
+        .filter(
+          (row) =>
+            row.accessState === AssetAccessState.ALLOWED ||
+            row.accessState === AssetAccessState.DEMO_ONLY,
+        )
         .map((row) => row.assetId),
     );
 

@@ -1,6 +1,6 @@
 # Orphaned backend functions
 
-**Generated:** 2026-06-04T22:52:15.169Z
+**Generated:** 2026-06-05T05:41:20.900Z
 
 > Regenerate: `npm run exposure:write-docs`
 
@@ -77,6 +77,7 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/commercial-plans/:id` | ProductCatalogController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/specialties` | ProductCatalogController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/specialties/:slug` | ProductCatalogController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/specialties/:slug/assets` | ProductCatalogController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/care-pathways` | ProductCatalogController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/care-pathways/:slug` | ProductCatalogController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/agents` | ProductCatalogController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -90,6 +91,7 @@ Every backend HTTP route is either **wired** to a frontend client or listed belo
 | `/api/platform/users/me/hidden-assets` | PlatformAssetsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/platform/me/role-profile` | PlatformAssetsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/platform/assets` | PlatformAssetsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
+| `/api/platform/assets/:assetId` | PlatformAssetsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/platform/packs` | PlatformAssetsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/platform/packs/:packId` | PlatformAssetsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
 | `/api/platform/role-profiles` | PlatformAssetsController | Cataloged backend route; frontend exposure is tracked by platform wiring inventory. |
@@ -267,9 +269,9 @@ NLU profiles without POST executor (216): client-side / chat only.
 
 | Category | Count |
 |----------|------:|
-| Backend HTTP routes | 209 |
+| Backend HTTP routes | 211 |
 | Wired frontend → backend | see exposure report |
-| Backend-only / deferred (policy) | 193 |
+| Backend-only / deferred (policy) | 195 |
 | Gated frontend (no route) | 16 |
 | POST executors | 3 |
 

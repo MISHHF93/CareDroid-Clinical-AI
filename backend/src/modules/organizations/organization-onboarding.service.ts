@@ -141,8 +141,9 @@ export class OrganizationOnboardingService {
     }
 
     if (!packIds.size) {
-      const defaults =
-        DEFAULT_PACKS_BY_ORGANIZATION_TYPE[dto.organizationType] || ['core-platform'];
+      const defaults = DEFAULT_PACKS_BY_ORGANIZATION_TYPE[dto.organizationType] || [
+        'core-platform',
+      ];
       defaults.forEach((id) => packIds.add(id));
     }
 

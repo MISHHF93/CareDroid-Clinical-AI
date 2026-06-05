@@ -19,7 +19,10 @@ const results = [];
 
 for (const [script] of suites) {
   const cmd = `npm run ${script}`;
-  const run = spawnSync('bash', ['-lc', cmd], { encoding: 'utf8' });
+  const run = spawnSync('npm', ['run', script], {
+    encoding: 'utf8',
+    shell: true,
+  });
   results.push({
     script,
     command: cmd,

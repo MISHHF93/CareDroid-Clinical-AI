@@ -9,7 +9,11 @@ import {
   ASSISTANT_ROUTE_ALIASES,
   AUTH_PATH_ALIASES,
   CANONICAL_ROUTES,
+  ORGANIZATION_PACKS_ROUTE_ALIASES,
+  PROTECTED_ROUTE_ALIAS_REDIRECTS,
   ROUTE_ALIAS_GROUPS,
+  ROUTE_RECORDS,
+  ROUTE_RECORDS_BY_ID,
   getRouteAliasTarget,
 } from './routes.config';
 import { LAYOUT_SCROLL_CONTRACT } from './layout.config';
@@ -35,15 +39,45 @@ describe('canonical configuration contract', () => {
     expect(getRouteAliasTarget('/copilot')).toBe('/assistant');
     expect(getRouteAliasTarget('/catalog')).toBe('/tools');
     expect(getRouteAliasTarget('/fleet')).toBe('/fleet/map');
+    expect(getRouteAliasTarget('/home')).toBe('/dashboard');
+    expect(getRouteAliasTarget('/asset-packs')).toBe('/settings/organization/packs');
     expect(getRouteAliasTarget('/operations')).toBeNull();
     expect(ROUTE_ALIAS_GROUPS.assistant.aliases).toBe(ASSISTANT_ROUTE_ALIASES);
+    expect(ROUTE_ALIAS_GROUPS.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
     expect(new Set(AUTH_PATH_ALIASES).size).toBe(AUTH_PATH_ALIASES.length);
+    expect(new Set(PROTECTED_ROUTE_ALIAS_REDIRECTS.map((entry) => entry.path)).size).toBe(
+      PROTECTED_ROUTE_ALIAS_REDIRECTS.length
+    );
 
     expect(appSource).toContain("from './config/routes.config'");
+    expect(appSource).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
     expect(appSource).not.toMatch(/const\s+ASSISTANT_ROUTE_ALIASES\s*=\s*\[/);
     expect(appSource).not.toMatch(/const\s+TOOLS_ROUTE_ALIASES\s*=\s*\[/);
+    expect(appSource).not.toContain('ASSISTANT_ROUTE_ALIASES.map');
+    expect(appSource).not.toContain('AUDIT_ROUTE_ALIASES.map');
     expect(routeHealthSource).toContain("from '../config/routes.config'");
     expect(routeHealthSource).not.toContain('parseStringArrayConstant');
+  });
+
+  it('keeps canonical route records as the source for generated protected aliases', () => {
+    const routeIds = ROUTE_RECORDS.map((route) => route.id);
+
+    expect(new Set(routeIds).size).toBe(routeIds.length);
+    expect(ROUTE_RECORDS_BY_ID.dashboard.path).toBe('/dashboard');
+    expect(ROUTE_RECORDS_BY_ID.dashboard.aliases).toContain('/home');
+    expect(ROUTE_RECORDS_BY_ID.organizationPacks.path).toBe('/settings/organization/packs');
+    expect(ROUTE_RECORDS_BY_ID.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
+    expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/home', to: '/dashboard', routeId: 'dashboard' }),
+        expect.objectContaining({ path: '/chat', to: '/assistant', routeId: 'assistant' }),
+        expect.objectContaining({
+          path: '/asset-packs',
+          to: '/settings/organization/packs',
+          routeId: 'organizationPacks',
+        }),
+      ])
+    );
   });
 
   it('declares the compact clinical OS route surface in the canonical route map', () => {
@@ -77,6 +111,7 @@ describe('canonical configuration contract', () => {
         '/regulatory',
         '/human-review',
         '/assets',
+        '/settings/organization/packs',
       ])
     );
     expect(getRouteAliasTarget('/audit-logs')).toBe('/audit');

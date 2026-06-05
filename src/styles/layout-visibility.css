@@ -100,7 +100,7 @@ body {
 .lab-input-panel,
 .lab-results-panel,
 .clinical-executor-feedback,
-.fleet-page-main,
+.fleet-page-content,
 .fleet-toolbar {
   min-width: 0;
   max-width: 100%;

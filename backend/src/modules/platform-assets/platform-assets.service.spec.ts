@@ -59,10 +59,10 @@ describe('PlatformAssetsService', () => {
   });
 
   it('resolves entitled assets from organization packs', async () => {
-    entitlementRepo.find.mockResolvedValue([{ packId: 'emergency-medicine', organizationId: 'org-1' }]);
-    packRepo.find.mockResolvedValue([
-      { id: 'emergency-medicine', assetIds: ['qsofa', 'news2'] },
+    entitlementRepo.find.mockResolvedValue([
+      { packId: 'emergency-medicine', organizationId: 'org-1' },
     ]);
+    packRepo.find.mockResolvedValue([{ id: 'emergency-medicine', assetIds: ['qsofa', 'news2'] }]);
 
     const ids = await service.resolveEntitledAssetIds({ organizationId: 'org-1' });
     expect(ids).toEqual(expect.arrayContaining(['qsofa', 'news2']));
@@ -81,7 +81,9 @@ describe('PlatformAssetsService', () => {
   });
 
   it('narrows entitled assets by workspace scope in strict mode', async () => {
-    entitlementRepo.find.mockResolvedValue([{ packId: 'emergency-medicine', organizationId: 'org-1' }]);
+    entitlementRepo.find.mockResolvedValue([
+      { packId: 'emergency-medicine', organizationId: 'org-1' },
+    ]);
     packRepo.find.mockResolvedValue([
       { id: 'emergency-medicine', assetIds: ['qsofa', 'news2', 'sofa-score'] },
     ]);

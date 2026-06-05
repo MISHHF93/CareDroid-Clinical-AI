@@ -24,17 +24,9 @@ import logger from './utils/logger';
 import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
 import {
-  ASSISTANT_ROUTE_ALIASES,
-  AUDIT_ROUTE_ALIASES,
   AUTH_PATH_ALIASES,
   AUTH_SIGNUP_PATH_ALIASES,
-  CALCULATORS_ROUTE_ALIASES,
-  FLEET_MAP_ROUTE_ALIASES,
-  LABORATORY_ROUTE_ALIASES,
-  LIVE_MAP_ROUTE_ALIASES,
-  MEDICAL_3D_VIEWER_ROUTE_ALIASES,
-  SIMULATION_ROUTE_ALIASES,
-  TOOLS_ROUTE_ALIASES,
+  PROTECTED_ROUTE_ALIAS_REDIRECTS,
 } from './config/routes.config';
 import {
   CALCULATOR_ROUTE_DEFS,
@@ -136,7 +128,6 @@ const {
   OrganizationSettings,
   PackMarketplace,
   AssetLifecycleAdmin,
-  AssetPacksPage,
   PlatformAnalyticsPage,
 } = {
   OrganizationDashboard: lazyWithRetry(() =>
@@ -150,9 +141,6 @@ const {
   ),
   AssetLifecycleAdmin: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({ default: m.AssetLifecycleAdmin }))
-  ),
-  AssetPacksPage: lazyWithRetry(() =>
-    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.AssetPacksPage }))
   ),
   PlatformAnalyticsPage: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({ default: m.PlatformAnalyticsPage }))
@@ -685,21 +673,16 @@ function AppRoutes() {
       element: <AssetLibraryPage />,
       requiresAuth: true,
     },
-    {
-      path: '/home',
-      element: <LegacyProtectedRouteRedirect to="/dashboard" />,
+    ...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to={to} />,
       requiresAuth: true,
-    },
+    })),
     {
       path: '/assistant',
       element: <Dashboard />,
       requiresAuth: true,
     },
-    ...ASSISTANT_ROUTE_ALIASES.map((path) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to="/assistant" />,
-      requiresAuth: true,
-    })),
     {
       path: '/patients',
       element: <Patients />,
@@ -913,11 +896,6 @@ function AppRoutes() {
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
-    ...LIVE_MAP_ROUTE_ALIASES.map((path) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to="/live-map" />,
-      requiresAuth: true,
-    })),
     {
       path: '/medical-iot',
       element: <MedicalIotDashboard />,
@@ -943,11 +921,6 @@ function AppRoutes() {
       element: <ToolsOverview />,
       requiresAuth: true,
     },
-    ...TOOLS_ROUTE_ALIASES.map((path) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to="/tools" />,
-      requiresAuth: true,
-    })),
     {
       path: '/tools/catalog',
       element: <ClinicalToolCatalog />,
@@ -984,11 +957,6 @@ function AppRoutes() {
       element: <Calculators />,
       requiresAuth: true,
     },
-    ...CALCULATORS_ROUTE_ALIASES.map((path) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to="/tools/calculators" />,
-      requiresAuth: true,
-    })),
     {
       path: '/documentation',
       element: <ClinicalDocumentationAssistant />,
@@ -1039,31 +1007,16 @@ function AppRoutes() {
       element: <SimulationScenarioPlayer />,
       requiresAuth: true,
     },
-    ...SIMULATION_ROUTE_ALIASES.map((path) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to="/simulation" />,
-      requiresAuth: true,
-    })),
     {
       path: '/laboratory',
       element: <LaboratoryDashboard />,
       requiresAuth: true,
     },
-    ...LABORATORY_ROUTE_ALIASES.map((path) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to="/laboratory" />,
-      requiresAuth: true,
-    })),
     {
       path: '/3d-viewer',
       element: <Medical3DViewer />,
       requiresAuth: true,
     },
-    ...MEDICAL_3D_VIEWER_ROUTE_ALIASES.map((path) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to="/3d-viewer" />,
-      requiresAuth: true,
-    })),
     {
       path: '/protocols',
       element: <Protocols />,
@@ -1265,11 +1218,6 @@ function AppRoutes() {
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
-    ...FLEET_MAP_ROUTE_ALIASES.map((path) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to="/fleet/map" />,
-      requiresAuth: true,
-    })),
     {
       path: '/fleet/predictive-maintenance',
       element: <PredictiveMaintenance />,
@@ -1361,11 +1309,6 @@ function AppRoutes() {
     {
       path: '/settings/organization/assets',
       element: <AssetLifecycleAdmin />,
-      requiresAuth: true,
-    },
-    {
-      path: '/asset-packs',
-      element: <AssetPacksPage />,
       requiresAuth: true,
     },
     {
@@ -1691,11 +1634,6 @@ function AppRoutes() {
       requiresAuth: true,
       permission: Permission.VIEW_AUDIT_LOGS,
     },
-    ...AUDIT_ROUTE_ALIASES.map((path) => ({
-      path,
-      element: <LegacyProtectedRouteRedirect to="/audit" />,
-      requiresAuth: true,
-    })),
     {
       path: '/analytics',
       element: <AnalyticsDashboard />,

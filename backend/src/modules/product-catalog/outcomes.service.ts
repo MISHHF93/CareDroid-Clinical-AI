@@ -43,10 +43,16 @@ export class OutcomesService {
       if (resource.includes('chat') || resource.includes('assistant') || action.includes('ai')) {
         aiUsage += 1;
       }
-      if (resource.includes('workflow') && (action.includes('complete') || action.includes('finish'))) {
+      if (
+        resource.includes('workflow') &&
+        (action.includes('complete') || action.includes('finish'))
+      ) {
         workflowCompletions += 1;
       }
-      if (resource.includes('simulation') && (action.includes('complete') || action.includes('finish'))) {
+      if (
+        resource.includes('simulation') &&
+        (action.includes('complete') || action.includes('finish'))
+      ) {
         simulationCompletions += 1;
       }
       if (resource.includes('protocol')) {
@@ -60,9 +66,7 @@ export class OutcomesService {
       .map(([resource, count]) => ({ resource, count }));
 
     const packAdoptionRate =
-      entitlements.length > 0
-        ? Math.min(100, Math.round((entitlements.length / 14) * 100))
-        : 0;
+      entitlements.length > 0 ? Math.min(100, Math.round((entitlements.length / 14) * 100)) : 0;
 
     const protocolComplianceProxy =
       protocolViews > 0 && toolLaunches > 0

@@ -325,10 +325,6 @@ export function PackMarketplace() {
   );
 }
 
-export function AssetPacksPage() {
-  return <PackMarketplace />;
-}
-
 export function PlatformAnalyticsPage() {
   const { organization, platformContext } = useUserIdentity();
   const [analytics, setAnalytics] = useState(null);

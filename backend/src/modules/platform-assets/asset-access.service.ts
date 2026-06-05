@@ -44,9 +44,7 @@ export class AssetAccessService {
     const assetById = new Map(dbAssets.map((a) => [a.id, a]));
 
     const ids =
-      assetIds?.length > 0
-        ? assetIds
-        : [...new Set([...entitled, ...dbAssets.map((a) => a.id)])];
+      assetIds?.length > 0 ? assetIds : [...new Set([...entitled, ...dbAssets.map((a) => a.id)])];
 
     const access: AssetAccessRecord[] = ids.map((assetId) =>
       this.resolveAccess(assetId, {
@@ -126,10 +124,7 @@ export class AssetAccessService {
       };
     }
 
-    if (
-      asset?.demoStatus === 'demo' ||
-      asset?.backendStatus === BackendAssetStatus.DEMO
-    ) {
+    if (asset?.demoStatus === 'demo' || asset?.backendStatus === BackendAssetStatus.DEMO) {
       if (hasOrganization && (strictEntitlements || entitled.size > 0) && !entitled.has(assetId)) {
         return {
           assetId,

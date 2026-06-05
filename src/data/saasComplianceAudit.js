@@ -197,7 +197,7 @@ function supplementalSurfaces() {
     { id: 'integrations-marketplace', route: '/integrations-marketplace', label: 'Integration Marketplace', kind: 'Commercial' },
     { id: 'configuration-studio', route: '/configuration-studio', label: 'Configuration Studio', kind: 'Organization' },
     { id: 'organization-dashboard', route: '/organization', label: 'Organization Dashboard', kind: 'Organization' },
-    { id: 'asset-packs-marketplace', route: '/asset-packs', label: 'Asset Pack Marketplace', kind: 'Organization' },
+    { id: 'asset-packs-marketplace', route: '/settings/organization/packs', label: 'Asset Pack Marketplace', kind: 'Organization' },
     { id: 'platform-analytics', route: '/platform-analytics', label: 'Platform Analytics', kind: 'Analytics' },
     { id: 'onboarding-wizard', route: '/onboarding', label: 'Organization Onboarding', kind: 'Organization' },
     { id: 'welcome', route: '/welcome', label: 'User Welcome', kind: 'Onboarding' },

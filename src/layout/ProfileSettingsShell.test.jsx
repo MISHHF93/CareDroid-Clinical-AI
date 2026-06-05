@@ -79,7 +79,8 @@ describe('canonical protected AppShell source-level route contract', () => {
     expect(appShellSource.match(/<Sidebar\b/g)).toHaveLength(1);
     expect(appShellSource.match(/<header className="app-shell-header"/g)).toHaveLength(1);
     expect(appShellSource.match(/data-layout-role="MainContent"/g)).toHaveLength(1);
-    expect(appShellSource.match(/<main className=\{mainContentClassName\}/g)).toHaveLength(1);
+    expect(appShellSource.match(/<main\b/g)).toHaveLength(1);
+    expect(appShellSource.match(/className=\{mainContentClassName\}/g)).toHaveLength(1);
     expect(appShellSource).toContain('data-layout-role="MainContent"');
     expect(appSource).not.toContain('className="app-shell-page-body"');
   });

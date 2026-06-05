@@ -166,7 +166,8 @@ export const SEED_ASSET_PACKS = [
     id: 'emergency-medicine',
     name: 'Emergency Medicine Pack',
     slug: 'emergency-medicine',
-    description: 'qSOFA, NEWS2, SOFA, HEART, NIHSS, stroke workflows, trauma tools, emergency simulations.',
+    description:
+      'qSOFA, NEWS2, SOFA, HEART, NIHSS, stroke workflows, trauma tools, emergency simulations.',
     organizationTypes: [
       OrganizationType.HOSPITAL,
       OrganizationType.EMS,
@@ -174,14 +175,16 @@ export const SEED_ASSET_PACKS = [
       OrganizationType.HEALTH_SYSTEM,
     ],
     assetIds: EMERGENCY_MEDICINE_ASSET_IDS,
+    requiredDependencies: ['core-platform'],
     defaultModules: ['dashboard', 'alerts', 'tools', 'maps'],
     pricingTier: PricingTier.ENTERPRISE,
   },
   {
     id: 'laboratory-intelligence',
-    name: 'Laboratory Pack',
+    name: 'Laboratory Intelligence Pack',
     slug: 'laboratory-intelligence',
-    description: 'Lab dashboard, lab interpretation AI, reference workflows, and QC-oriented surfaces.',
+    description:
+      'Lab dashboard, lab interpretation AI, reference workflows, and QC-oriented surfaces.',
     organizationTypes: [
       OrganizationType.HOSPITAL,
       OrganizationType.CLINIC,
@@ -189,6 +192,7 @@ export const SEED_ASSET_PACKS = [
       OrganizationType.HEALTH_SYSTEM,
     ],
     assetIds: LABORATORY_INTELLIGENCE_ASSET_IDS,
+    requiredDependencies: ['core-platform'],
     defaultModules: ['dashboard', 'tools', 'laboratory'],
     pricingTier: PricingTier.STANDARD,
   },
@@ -203,15 +207,20 @@ export const SEED_ASSET_PACKS = [
       OrganizationType.ACADEMIC_MEDICAL_CENTER,
     ],
     assetIds: HOSPITAL_OPERATIONS_ASSET_IDS,
+    requiredDependencies: ['core-platform'],
     defaultModules: ['dashboard', 'maps', 'medical-iot', 'fleet', 'operations'],
     pricingTier: PricingTier.ENTERPRISE,
   },
   {
     id: 'fleet-logistics',
-    name: 'Fleet & Logistics Pack',
+    name: 'Fleet & EMS Pack',
     slug: 'fleet-logistics',
     description: 'Fleet command, live tracking, route optimization, and predictive maintenance.',
-    organizationTypes: [OrganizationType.EMS, OrganizationType.HOSPITAL, OrganizationType.HEALTH_SYSTEM],
+    organizationTypes: [
+      OrganizationType.EMS,
+      OrganizationType.HOSPITAL,
+      OrganizationType.HEALTH_SYSTEM,
+    ],
     assetIds: [
       'fleet-dashboard',
       'fleet-live-map',
@@ -219,6 +228,7 @@ export const SEED_ASSET_PACKS = [
       'predictive-maintenance',
       'dispatch-ai',
     ],
+    requiredDependencies: ['core-platform'],
     defaultModules: ['fleet', 'live-tracking'],
     pricingTier: PricingTier.STANDARD,
   },
@@ -239,6 +249,7 @@ export const SEED_ASSET_PACKS = [
       'simulation-suite',
       'differential-ai',
     ],
+    requiredDependencies: ['core-platform'],
     defaultModules: ['rag', 'research', 'assistant'],
     pricingTier: PricingTier.STANDARD,
     targetRoles: ['researcher', 'medical student'],
@@ -247,9 +258,15 @@ export const SEED_ASSET_PACKS = [
     id: 'emergency-department-pack',
     name: 'Emergency Department Pack',
     slug: 'emergency-department-pack',
-    description: 'ED risk stratification, triage calculators, trauma simulation, stroke and chest pain workflows.',
-    organizationTypes: [OrganizationType.HOSPITAL, OrganizationType.EMS, OrganizationType.HEALTH_SYSTEM],
+    description:
+      'ED risk stratification, triage calculators, trauma simulation, stroke and chest pain workflows.',
+    organizationTypes: [
+      OrganizationType.HOSPITAL,
+      OrganizationType.EMS,
+      OrganizationType.HEALTH_SYSTEM,
+    ],
     assetIds: EMERGENCY_MEDICINE_ASSET_IDS,
+    requiredDependencies: ['core-platform'],
     defaultModules: ['dashboard', 'alerts', 'tools'],
     pricingTier: PricingTier.ENTERPRISE,
     targetRoles: ['emergency physician', 'nurse'],
@@ -265,7 +282,8 @@ export const SEED_ASSET_PACKS = [
     description: 'Critical care scores, ventilator support, hemodynamic and sepsis tools.',
     organizationTypes: [OrganizationType.HOSPITAL, OrganizationType.ACADEMIC_MEDICAL_CENTER],
     assetIds: ['sofa-score', 'news2', 'mews', 'apache2-calculator', 'protocols', 'lab-interp'],
-    defaultModules: ['dashboard', 'ICU', 'tools'],
+    requiredDependencies: ['core-platform'],
+    defaultModules: ['dashboard', 'icu', 'tools'],
     pricingTier: PricingTier.ENTERPRISE,
     targetRoles: ['ICU clinician', 'nurse'],
   },
@@ -275,7 +293,13 @@ export const SEED_ASSET_PACKS = [
     slug: 'cardiology-pack',
     description: 'HEART, STEMI pathways, cardiology assistants, telemetry dashboards.',
     organizationTypes: [OrganizationType.HOSPITAL, OrganizationType.CLINIC],
-    assetIds: ['heart-score', 'ecg-interpretation-assistant', 'stemi-pathway-assistant', 'cardiology-command-center'],
+    assetIds: [
+      'heart-score',
+      'ecg-interpretation-assistant',
+      'stemi-pathway-assistant',
+      'cardiology-command-center',
+    ],
+    requiredDependencies: ['core-platform'],
     defaultModules: ['cardiology', 'tools'],
     pricingTier: PricingTier.STANDARD,
     targetRoles: ['cardiologist', 'hospitalist'],
@@ -286,29 +310,37 @@ export const SEED_ASSET_PACKS = [
     slug: 'medical-iot-pack',
     description: 'Device telemetry, maintenance, hospital IoT dashboards.',
     organizationTypes: [OrganizationType.HOSPITAL, OrganizationType.HEALTH_SYSTEM],
-    assetIds: ['telemetry-monitoring', 'device-fleet-management', 'device-maintenance', 'medical-iot'],
+    assetIds: [
+      'telemetry-monitoring',
+      'device-fleet-management',
+      'device-maintenance',
+      'medical-iot',
+    ],
+    requiredDependencies: ['core-platform'],
     defaultModules: ['medical-iot', 'devices'],
     pricingTier: PricingTier.ENTERPRISE,
     targetRoles: ['biomedical engineer', 'administrator'],
   },
   {
     id: 'simulation-training-pack',
-    name: 'Simulation Pack',
+    name: 'Simulation & Training Pack',
     slug: 'simulation-training-pack',
     description: 'Medical simulation suite, scenarios, outcomes, competency tracking.',
     organizationTypes: [OrganizationType.UNIVERSITY, OrganizationType.HOSPITAL],
     assetIds: ['simulation-suite', 'scenario-player', 'competencies'],
+    requiredDependencies: ['core-platform'],
     defaultModules: ['education', 'simulation'],
     pricingTier: PricingTier.STANDARD,
     targetRoles: ['medical student', 'researcher'],
   },
   {
     id: 'governance-compliance-pack',
-    name: 'Governance Pack',
+    name: 'Governance & Compliance Pack',
     slug: 'governance-compliance-pack',
     description: 'Audit, governance, privacy, regulatory, and AI security surfaces.',
     organizationTypes: Object.values(OrganizationType),
     assetIds: ['audit-logs', 'ai-explainability', 'clinical-audit', 'system-config'],
+    requiredDependencies: ['core-platform'],
     defaultModules: ['governance', 'audit'],
     pricingTier: PricingTier.ADDON,
     targetRoles: ['administrator'],
@@ -319,7 +351,13 @@ export const SEED_ASSET_PACKS = [
     slug: 'digital-twin-pack',
     description: 'Aggregate digital twin, hospital map, occupancy, fleet and alert overlays.',
     organizationTypes: [OrganizationType.HOSPITAL, OrganizationType.HEALTH_SYSTEM],
-    assetIds: ['digital-twin', 'digital-operations-center', 'hospital-map', 'asset-tracking-dashboard'],
+    assetIds: [
+      'digital-twin',
+      'digital-operations-center',
+      'hospital-map',
+      'asset-tracking-dashboard',
+    ],
+    requiredDependencies: ['core-platform'],
     defaultModules: ['operations', 'maps'],
     pricingTier: PricingTier.ENTERPRISE,
     targetRoles: ['administrator', 'biomedical engineer'],
@@ -328,7 +366,8 @@ export const SEED_ASSET_PACKS = [
     id: 'ai-workflow-pack',
     name: 'AI Workflow Pack',
     slug: 'ai-workflow-pack',
-    description: 'Ambient scribe, differential AI, timeline AI, order sets, documentation assistant.',
+    description:
+      'Ambient scribe, differential AI, timeline AI, order sets, documentation assistant.',
     organizationTypes: [OrganizationType.HOSPITAL, OrganizationType.ACADEMIC_MEDICAL_CENTER],
     assetIds: [
       ...AI_AGENT_IDS,
@@ -339,6 +378,7 @@ export const SEED_ASSET_PACKS = [
       'ambient-scribe',
       'clinical-documentation-assistant',
     ],
+    requiredDependencies: ['core-platform'],
     defaultModules: ['assistant', 'ai-workflow'],
     pricingTier: PricingTier.ENTERPRISE,
     targetRoles: ['physician', 'hospitalist'],
@@ -346,7 +386,12 @@ export const SEED_ASSET_PACKS = [
 ];
 
 export const DEFAULT_PACKS_BY_ORGANIZATION_TYPE: Record<OrganizationType, string[]> = {
-  [OrganizationType.HOSPITAL]: ['core-platform', 'emergency-medicine', 'laboratory-intelligence', 'hospital-operations'],
+  [OrganizationType.HOSPITAL]: [
+    'core-platform',
+    'emergency-medicine',
+    'laboratory-intelligence',
+    'hospital-operations',
+  ],
   [OrganizationType.ACADEMIC_MEDICAL_CENTER]: [
     'core-platform',
     'emergency-medicine',
@@ -394,7 +439,15 @@ export const SEED_ROLE_PROFILES = [
     label: 'Nurse',
     intendedRoles: ['nurse', 'ICU clinician'],
     specialties: ['critical care', 'emergency medicine'],
-    preferredAssetIds: ['news2', 'mews', 'protocols', 'sofa-score', 'lab-interp', 'drug-check', 'gcs-calculator'],
+    preferredAssetIds: [
+      'news2',
+      'mews',
+      'protocols',
+      'sofa-score',
+      'lab-interp',
+      'drug-check',
+      'gcs-calculator',
+    ],
     defaultDashboard: 'command',
     defaultAiAgentId: 'agent-clinical',
   },
@@ -467,7 +520,14 @@ export const SEED_ROLE_PROFILES = [
     label: 'Medical Student',
     intendedRoles: ['medical student'],
     specialties: ['medical education'],
-    preferredAssetIds: ['calculators', 'calculators-hub', 'simulation-suite', 'dashboard', 'assistant', 'search'],
+    preferredAssetIds: [
+      'calculators',
+      'calculators-hub',
+      'simulation-suite',
+      'dashboard',
+      'assistant',
+      'search',
+    ],
     defaultDashboard: 'command',
     defaultAiAgentId: 'agent-education',
   },
@@ -489,7 +549,9 @@ function inferAssetType(id: string): PlatformAssetType {
   if (
     id.includes('calculator') ||
     id.endsWith('-score') ||
-    ['qsofa', 'news2', 'mews', 'nihss', 'pews', 'apache2-calculator', 'curb65-calculator'].includes(id)
+    ['qsofa', 'news2', 'mews', 'nihss', 'pews', 'apache2-calculator', 'curb65-calculator'].includes(
+      id,
+    )
   ) {
     return PlatformAssetType.CALCULATOR;
   }
@@ -527,7 +589,11 @@ function buildAssetSeedRows(): Array<{
       id,
       assetType: agent ? PlatformAssetType.AI_AGENT : inferAssetType(id),
       title: agent?.title || id.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-      category: agent ? 'AI Agent' : inferAssetType(id) === PlatformAssetType.CALCULATOR ? 'Calculator' : 'Clinical',
+      category: agent
+        ? 'AI Agent'
+        : inferAssetType(id) === PlatformAssetType.CALCULATOR
+          ? 'Calculator'
+          : 'Clinical',
       route: agent?.route || (id === 'calculators' ? '/tools/calculators' : `/tools/${id}`),
       lifecycle: PlatformAssetLifecycle.ACTIVE,
       pricingTier: packByAsset.get(id)?.includes('core-platform')

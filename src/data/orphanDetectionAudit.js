@@ -245,9 +245,6 @@ function detectOrphanPages(corpus, appImports) {
         name: rel,
       }) || (ref.referenced ? null : ORPHAN_CLASSIFICATIONS.QUARANTINE);
 
-    if (rel === 'src/pages/Onboarding.jsx' && !appWired.has(rel)) {
-      classification = ORPHAN_CLASSIFICATIONS.QUARANTINE;
-    }
     if (mergeDuplicate) classification = ORPHAN_CLASSIFICATIONS.MERGE;
     if (!classification) return null;
     if (appWired.has(rel) && classification === ORPHAN_CLASSIFICATIONS.LEGACY && !mergeDuplicate) {
@@ -617,11 +614,10 @@ export function formatOrphanDetectionMarkdown(report = buildOrphanDetectionRepor
     '',
     '## Critical findings',
     '',
-    '1. **`src/pages/Onboarding.jsx`** — deprecated redirect; not mounted (org onboarding uses `CommercialPages`). Class: **quarantine**.',
-    '2. **`SimulationLaboratoryViewer.jsx`** — missing; tests and CSS reference a removed page. Class: **quarantine**.',
-    '3. **AI agents / platform APIs** — `platformAssetsApi.js` / `productCatalogApi.js` not in `frontendApiCallsInventory`. Class: **wire**.',
-    '4. **Chart/export components** (`VitalsTrendChart`, `DrugInteractionHeatmap`, `DataDisplay`, etc.) — barrel export only. Class: **quarantine** or **wire**.',
-    '5. **Dual registry** — hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.',
+    '1. **`SimulationLaboratoryViewer.jsx`** — missing; tests and CSS reference a removed page. Class: **quarantine**.',
+    '2. **AI agents / platform APIs** — `platformAssetsApi.js` / `productCatalogApi.js` not in `frontendApiCallsInventory`. Class: **wire**.',
+    '3. **Chart/export components** (`VitalsTrendChart`, `DrugInteractionHeatmap`, `DataDisplay`, etc.) — barrel export only. Class: **quarantine** or **wire**.',
+    '4. **Dual registry** — hundreds of tools in inventory without dedicated page components (route-only). Class: **legacy** (inventory-first) unless promoting to assets.',
     '',
   ];
 

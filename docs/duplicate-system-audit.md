@@ -1,6 +1,6 @@
 # Duplicate System Audit
 
-Generated: 2026-06-04 (regenerate with `npm run duplicate-system-audit:write-docs`)
+Generated: 2026-06-05 (regenerate with `npm run duplicate-system-audit:write-docs`)
 
 ## Purpose
 

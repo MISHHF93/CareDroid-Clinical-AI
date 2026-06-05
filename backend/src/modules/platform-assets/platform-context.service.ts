@@ -90,10 +90,7 @@ export class PlatformContextService {
       entitledPacks: packs.filter((pack) => entitledPackIds.includes(pack.id)),
       availablePacks: packs,
       aiAgents: entitledAgents,
-      defaultAiAgentId:
-        roleProfile?.defaultAiAgentId ||
-        entitledAgents[0]?.id ||
-        'agent-clinical',
+      defaultAiAgentId: roleProfile?.defaultAiAgentId || entitledAgents[0]?.id || 'agent-clinical',
       workspace: workspaceState,
       legacyToolAliases: enabledToolIds,
       strictSaasEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),

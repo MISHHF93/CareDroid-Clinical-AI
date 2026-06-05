@@ -12,14 +12,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
 const read = (relativePath) => readFileSync(join(srcRoot, relativePath), 'utf8');
 
-function expectRedirectRoute(app, path, to) {
-  expect(app).toMatch(
-    new RegExp(
-      `path:\\s*'${path.replace(/\//g, '\\/')}'[\\s\\S]*?<LegacyProtectedRouteRedirect\\s+to="${to.replace(/\//g, '\\/')}"\\s*\\/>`
-    )
-  );
-}
-
 const visibleLinkInventory = [
   ['Home welcome CTA', 'App.jsx', '/auth'],
   ['Home dev bypass', 'App.jsx', '/dashboard'],
@@ -62,7 +54,6 @@ const userFacingLinkFiles = [
   'components/Sidebar.jsx',
   'pages/Auth.jsx',
   'pages/AuthCallback.jsx',
-  'pages/Onboarding.jsx',
   'pages/Profile.jsx',
   'pages/ProfileSettings.jsx',
   'pages/Settings.jsx',
@@ -107,7 +98,8 @@ describe('section link inventory and route flattening', () => {
   it('preserves legacy route aliases as redirects, not duplicate user-facing pages', () => {
     const app = read('App.jsx');
     const routes = read('config/routes.config.js');
-    expectRedirectRoute(app, '/home', '/dashboard');
+    expect(app).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
+    expect(routes).toContain("export const HOME_ROUTE_ALIASES = Object.freeze(['/home'])");
     expect(routes).toContain(
       "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
     );
@@ -118,10 +110,9 @@ describe('section link inventory and route flattening', () => {
     expect(routes).toContain(
       "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
     );
-    expect(app).toContain('ASSISTANT_ROUTE_ALIASES.map');
-    expect(app).toContain('TOOLS_ROUTE_ALIASES.map');
+    expect(routes).toContain('export const PROTECTED_ROUTE_ALIAS_REDIRECTS = Object.freeze(');
     expect(app).toMatch(/path:\s*'\/operations'[\s\S]*<Operations \/>[\s\S]*requiresAuth:\s*true/);
-    expect(app).toContain('FLEET_MAP_ROUTE_ALIASES.map');
+    expect(app).not.toContain('FLEET_MAP_ROUTE_ALIASES.map');
     expect(app).toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
     expect(app).not.toContain("path: '/home', element: <AppShellPage>");
     expect(app).not.toContain("path: '/chat', element: <AppShellPage>");

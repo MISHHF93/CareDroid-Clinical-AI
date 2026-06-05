@@ -2,14 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
-  ASSISTANT_ROUTE_ALIASES,
-  AUDIT_ROUTE_ALIASES,
-  AUTH_PATH_ALIASES,
-  CALCULATORS_ROUTE_ALIASES,
-  FLEET_MAP_ROUTE_ALIASES,
-  LIVE_MAP_ROUTE_ALIASES,
-  OPERATIONS_ROUTE_ALIASES,
-  TOOLS_ROUTE_ALIASES,
+  ROUTE_ALIAS_REDIRECTS,
 } from '../config/routes.config';
 import {
   CALCULATOR_ROUTE_DEFS,
@@ -213,41 +206,10 @@ function directAppRouteEntries() {
 
 function generatedAliasEntries() {
   const aliasEntries = [
-    ...AUTH_PATH_ALIASES.map((path) => ({ path, target: '/auth', generatedKind: 'auth-alias' })),
-    ...ASSISTANT_ROUTE_ALIASES.map((path) => ({
-      path,
-      target: '/assistant',
-      generatedKind: 'assistant-alias',
-    })),
-    ...TOOLS_ROUTE_ALIASES.map((path) => ({
-      path,
-      target: '/tools',
-      generatedKind: 'tools-alias',
-    })),
-    ...CALCULATORS_ROUTE_ALIASES.map((path) => ({
-      path,
-      target: '/tools/calculators',
-      generatedKind: 'calculator-alias',
-    })),
-    ...LIVE_MAP_ROUTE_ALIASES.map((path) => ({
-      path,
-      target: '/live-map',
-      generatedKind: 'map-alias',
-    })),
-    ...FLEET_MAP_ROUTE_ALIASES.map((path) => ({
-      path,
-      target: '/fleet/map',
-      generatedKind: 'fleet-alias',
-    })),
-    ...OPERATIONS_ROUTE_ALIASES.map((path) => ({
-      path,
-      target: '/digital-twin',
-      generatedKind: 'operations-alias',
-    })),
-    ...AUDIT_ROUTE_ALIASES.map((path) => ({
-      path,
-      target: '/audit',
-      generatedKind: 'audit-alias',
+    ...ROUTE_ALIAS_REDIRECTS.map((alias) => ({
+      path: alias.path,
+      target: alias.to,
+      generatedKind: alias.routeId === 'auth' ? 'auth-alias' : `${alias.routeId}-alias`,
     })),
     ...LEGACY_CALCULATOR_ROUTE_ALIASES.map((alias) => ({
       path: alias.path,

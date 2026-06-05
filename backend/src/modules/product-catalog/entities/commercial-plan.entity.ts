@@ -1,10 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { PricingTier } from '../../platform-assets/enums/platform-asset.enums';
 import { CommercialPlanId } from '../enums/product-catalog.enums';
 
