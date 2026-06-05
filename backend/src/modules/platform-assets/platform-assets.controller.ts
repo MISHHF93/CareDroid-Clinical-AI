@@ -18,6 +18,12 @@ import {
 } from '../organizations/entities/organization-membership.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Permission } from '../auth/enums/permission.enum';
+import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
+import {
+  OrganizationScoped,
+  TenantScoped,
+} from '../tenant-context/tenant-scope.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { DigitalTwinService } from './digital-twin.service';
 import { OrganizationAnalyticsService } from './organization-analytics.service';
@@ -29,7 +35,8 @@ import { PlatformContextService } from './platform-context.service';
 
 @ApiTags('platform')
 @Controller('platform')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(AuthGuard('jwt'), TenantIsolationGuard)
+@TenantScoped()
 @ApiBearerAuth()
 export class PlatformAssetsController {
   constructor(
@@ -130,30 +137,36 @@ export class PlatformAssetsController {
   }
 
   @Get('organizations/:organizationId/entitlements')
+  @OrganizationScoped()
   @ApiOperation({ summary: 'List organization pack entitlements' })
   async orgEntitlements(@Req() req: any, @Param('organizationId') organizationId: string) {
+    this.assertTenantOrganization(req, organizationId);
     await this.assertOrgMember(req.user.id, organizationId);
     return this.platformAssetsService.getOrganizationEntitlements(organizationId);
   }
 
   @Post('organizations/:organizationId/packs/:packId/install')
+  @OrganizationScoped({ admin: 'organization' })
   @ApiOperation({ summary: 'Enable asset pack for organization' })
   async installPack(
     @Req() req: any,
     @Param('organizationId') organizationId: string,
     @Param('packId') packId: string,
   ) {
+    this.assertTenantOrganization(req, organizationId);
     await this.assertOrgAdmin(req.user.id, organizationId);
     return this.platformAssetsService.installPackForOrganization(organizationId, packId);
   }
 
   @Post('organizations/:organizationId/packs/:packId/remove')
+  @OrganizationScoped({ admin: 'organization' })
   @ApiOperation({ summary: 'Disable asset pack for organization' })
   async removePack(
     @Req() req: any,
     @Param('organizationId') organizationId: string,
     @Param('packId') packId: string,
   ) {
+    this.assertTenantOrganization(req, organizationId);
     await this.assertOrgAdmin(req.user.id, organizationId);
     return this.platformAssetsService.removePackFromOrganization(organizationId, packId);
   }
@@ -179,6 +192,7 @@ export class PlatformAssetsController {
   }
 
   @Patch('assets/:assetId/lifecycle')
+  @TenantScoped({ admin: 'any', permissions: [Permission.CONFIGURE_SYSTEM] })
   @ApiOperation({ summary: 'Update platform asset lifecycle state' })
   async updateLifecycle(
     @Req() req: any,
@@ -192,20 +206,30 @@ export class PlatformAssetsController {
   }
 
   @Get('digital-twin')
+  @OrganizationScoped()
   @ApiOperation({ summary: 'Get hospital digital twin snapshot for active organization' })
   async digitalTwin(@Req() req: any, @Query('organizationId') organizationId?: string) {
     const ctx = await this.platformContextService.getContextForUser(req.user);
     const orgId = organizationId || ctx.organization?.id;
     if (orgId) {
+      this.assertTenantOrganization(req, orgId);
       await this.assertOrgMember(req.user.id, orgId);
     }
     return this.digitalTwinService.getSnapshot(orgId);
   }
 
   @Get('organizations/:organizationId/analytics')
+  @OrganizationScoped({ admin: 'organization', permissions: [Permission.VIEW_ANALYTICS] })
   @ApiOperation({ summary: 'Organization-scoped analytics summary' })
   async organizationAnalytics(@Req() req: any, @Param('organizationId') organizationId: string) {
+    this.assertTenantOrganization(req, organizationId);
     await this.assertOrgMember(req.user.id, organizationId);
     return this.organizationAnalyticsService.getOrganizationSummary(organizationId);
+  }
+
+  private assertTenantOrganization(req: any, organizationId: string) {
+    if (req.tenantContext?.organizationId && req.tenantContext.organizationId !== organizationId) {
+      throw new ForbiddenException('Requested organization does not match tenant context.');
+    }
   }
 }

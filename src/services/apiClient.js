@@ -2,6 +2,7 @@ import axios from 'axios';
 import appConfig from '../config/appConfig';
 import { DEFAULT_API_TIMEOUT_MS, normalizeApiPath } from '../config/api.config';
 import { AUTH_CONFIG } from '../config/auth.config';
+import { getTenantHeaders } from './tenantContextStore';
 
 // In development, use empty string to let Vite proxy handle routing
 // In production, use full API URL (origin only; paths include /api)
@@ -23,6 +24,64 @@ export const buildApiUrl = (path = '') => {
 
 const AUTH_TOKEN_KEY = AUTH_CONFIG.tokenStorageKey;
 const LEGACY_AUTH_TOKEN_KEY = AUTH_CONFIG.legacyTokenStorageKey;
+
+const isAbsoluteHttpUrl = (path = '') => /^https?:\/\//i.test(path);
+
+const shouldAttachTenantHeaders = (path = '') => {
+  if (!path || !isAbsoluteHttpUrl(path)) return true;
+
+  const apiBaseUrl = getApiBaseUrl();
+  if (apiBaseUrl && path.startsWith(apiBaseUrl)) return true;
+
+  if (typeof window === 'undefined' || !window.location?.origin) return false;
+
+  try {
+    return new URL(path).origin === window.location.origin;
+  } catch {
+    return false;
+  }
+};
+
+const normalizeHeaders = (headers) => {
+  if (!headers) return {};
+  if (typeof Headers !== 'undefined' && headers instanceof Headers) {
+    return Object.fromEntries(headers.entries());
+  }
+  if (Array.isArray(headers)) return Object.fromEntries(headers);
+  return { ...headers };
+};
+
+const hasHeader = (headers, name) => {
+  if (!headers) return false;
+  if (typeof headers.get === 'function') return Boolean(headers.get(name));
+  const lowerName = name.toLowerCase();
+  return Object.keys(headers).some((key) => key.toLowerCase() === lowerName);
+};
+
+const setHeaderIfMissing = (headers, name, value) => {
+  if (!headers || hasHeader(headers, name)) return;
+  if (typeof headers.set === 'function') {
+    headers.set(name, value);
+    return;
+  }
+  headers[name] = value;
+};
+
+const buildRequestHeaders = (path, optionHeaders) => {
+  const mergedHeaders = {
+    ...(shouldAttachTenantHeaders(path) ? getTenantHeaders() : {}),
+    ...normalizeHeaders(optionHeaders),
+  };
+
+  if (!hasHeader(mergedHeaders, 'Authorization')) {
+    const token = getStoredAccessToken();
+    if (token) {
+      mergedHeaders.Authorization = `Bearer ${token}`;
+    }
+  }
+
+  return mergedHeaders;
+};
 
 export const getStoredAccessToken = () => {
   if (typeof localStorage === 'undefined') return null;
@@ -67,13 +126,7 @@ export const apiFetch = async (path, options = {}) => {
     ...fetchOptions
   } = options;
 
-  const mergedHeaders = { ...(optionHeaders || {}) };
-  if (!mergedHeaders.Authorization) {
-    const token = getStoredAccessToken();
-    if (token) {
-      mergedHeaders.Authorization = `Bearer ${token}`;
-    }
-  }
+  const mergedHeaders = buildRequestHeaders(path, optionHeaders);
 
   const { signal, cleanup } = mergeAbortSignals(timeoutMs, userSignal);
 
@@ -190,10 +243,16 @@ apiAxios.interceptors.request.use((config) => {
   if (config.url && !/^https?:\/\//i.test(config.url)) {
     config.url = normalizeApiPath(config.url);
   }
-  if (!config.headers.Authorization) {
+  config.headers = config.headers || {};
+  if (shouldAttachTenantHeaders(config.url)) {
+    for (const [name, value] of Object.entries(getTenantHeaders())) {
+      setHeaderIfMissing(config.headers, name, value);
+    }
+  }
+  if (!hasHeader(config.headers, 'Authorization')) {
     const token = getStoredAccessToken();
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      setHeaderIfMissing(config.headers, 'Authorization', `Bearer ${token}`);
     }
   }
   return config;

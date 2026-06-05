@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import OpenAI from 'openai';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +9,8 @@ import { AIQuery, QueryStatus } from './entities/ai-query.entity';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { MetricsService } from '../metrics/metrics.service';
+import { PlatformGovernanceService } from '../platform-governance';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 
 interface RateLimitConfig {
   dailyLimit: number;
@@ -54,6 +56,8 @@ export class AIService {
     private readonly userRepository: Repository<User>,
     private readonly auditService: AuditService,
     private readonly metricsService: MetricsService,
+    @Optional() private readonly platformGovernanceService?: PlatformGovernanceService,
+    @Optional() private readonly subscriptionsService?: SubscriptionsService,
   ) {
     const openaiConfig = this.configService.get<any>('openai') || {};
     const openaiRateLimits = openaiConfig.rateLimits || {};
@@ -269,6 +273,7 @@ export class AIService {
         response.usage?.completion_tokens || 0,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
+      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
 
       // Log query to database
       await this.logQuery({
@@ -290,7 +295,7 @@ export class AIService {
           temperature: this.temperature,
           maxTokens: config.maxTokens,
           finishReason: result.finishReason,
-          aiFoundation: this.extractAiFoundationMetadata(context),
+          ...aiUsageMetadata,
         },
       });
 
@@ -311,6 +316,7 @@ export class AIService {
 
       return result;
     } catch (error) {
+      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
       // Log failed query
       await this.logQuery({
         userId,
@@ -322,7 +328,7 @@ export class AIService {
         conversationId: context?.conversationId,
         metadata: {
           error: error instanceof Error ? error.message : String(error),
-          aiFoundation: this.extractAiFoundationMetadata(context),
+          ...aiUsageMetadata,
         },
       });
       throw new Error(`AI query failed: ${error instanceof Error ? error.message : String(error)}`);
@@ -372,6 +378,7 @@ export class AIService {
         response.usage?.completion_tokens || 0,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
+      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
       await this.logQuery({
         userId,
         prompt,
@@ -388,7 +395,7 @@ export class AIService {
         toolUsed: context?.tool || context?.intentClassification?.toolId,
         metadata: {
           schemaKeys: Object.keys(schema),
-          aiFoundation: this.extractAiFoundationMetadata(context),
+          ...aiUsageMetadata,
         },
       });
 
@@ -410,6 +417,7 @@ export class AIService {
 
       return result;
     } catch (error) {
+      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
       await this.logQuery({
         userId,
         prompt,
@@ -420,7 +428,7 @@ export class AIService {
         conversationId: context?.conversationId,
         metadata: {
           error: error instanceof Error ? error.message : String(error),
-          aiFoundation: this.extractAiFoundationMetadata(context),
+          ...aiUsageMetadata,
         },
       });
       throw new Error(
@@ -455,6 +463,52 @@ export class AIService {
       usedToday: await this.getUsageToday(userId),
       usedThisMonth,
       totalCost,
+    };
+  }
+
+  async getOrganizationUsageSummary(organizationId: string, days: number = 30) {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const totals = await this.aiQueryRepository
+      .createQueryBuilder('aiQuery')
+      .select('COUNT(aiQuery.id)', 'totalQueries')
+      .addSelect('COALESCE(SUM(aiQuery.totalTokens), 0)', 'totalTokens')
+      .addSelect('COALESCE(SUM(aiQuery.cost), 0)', 'actualCost')
+      .addSelect('COALESCE(SUM(aiQuery.estimatedCost), 0)', 'estimatedCost')
+      .addSelect(
+        'SUM(CASE WHEN aiQuery.requiresHumanReview = true THEN 1 ELSE 0 END)',
+        'reviewRequiredCount',
+      )
+      .where('aiQuery.organizationId = :organizationId', { organizationId })
+      .andWhere('aiQuery.createdAt >= :startDate', { startDate })
+      .getRawOne<{
+        totalQueries?: string;
+        totalTokens?: string;
+        actualCost?: string;
+        estimatedCost?: string;
+        reviewRequiredCount?: string;
+      }>();
+
+    const [byAsset, byAgent, byModelClass] = await Promise.all([
+      this.groupOrganizationUsage(organizationId, startDate, 'assetId', 'assetId'),
+      this.groupOrganizationUsage(organizationId, startDate, 'agentId', 'agentId'),
+      this.groupOrganizationUsage(organizationId, startDate, 'modelClass', 'modelClass'),
+    ]);
+
+    return {
+      organizationId,
+      days,
+      totals: {
+        totalQueries: Number(totals?.totalQueries || 0),
+        totalTokens: Number(totals?.totalTokens || 0),
+        actualCost: Number(totals?.actualCost || 0),
+        estimatedCost: Number(totals?.estimatedCost || 0),
+        reviewRequiredCount: Number(totals?.reviewRequiredCount || 0),
+      },
+      byAsset,
+      byAgent,
+      byModelClass,
     };
   }
 
@@ -502,7 +556,7 @@ export class AIService {
     metadata?: Record<string, any>;
   }): Promise<void> {
     try {
-      await this.aiQueryRepository.save({
+      const saved = await this.aiQueryRepository.save({
         userId: data.userId,
         prompt: data.prompt,
         response: data.response,
@@ -515,10 +569,32 @@ export class AIService {
         latencyMs: data.latencyMs,
         conversationId: data.conversationId,
         feature: data.feature,
+        organizationId: data.metadata?.tenant?.organizationId,
+        workspaceId: data.metadata?.tenant?.workspaceId,
+        assetId: data.metadata?.aiCommercialization?.assetId,
+        agentId: data.metadata?.aiCommercialization?.agentId,
+        modelClass: data.metadata?.aiCommercialization?.modelClass,
+        modelVersion: data.metadata?.aiCommercialization?.modelVersion,
+        routingExpert: data.metadata?.aiCommercialization?.routingExpert,
+        retrievalPolicy: data.metadata?.aiCommercialization?.retrievalPolicy,
+        requiresHumanReview: data.metadata?.aiCommercialization?.requiresHumanReview || false,
+        estimatedCost: data.metadata?.aiCommercialization?.estimatedCost,
         intentClassified: data.intentClassified,
         toolUsed: data.toolUsed,
         metadata: data.metadata,
       });
+      await this.subscriptionsService?.recordAiUsageFromQuery({
+        organizationId: saved.organizationId,
+        workspaceId: saved.workspaceId,
+        userId: saved.userId,
+        userRole: data.metadata?.tenant?.role,
+        subscriptionPlan: data.metadata?.tenant?.subscriptionPlan,
+        assetId: saved.assetId,
+        model: saved.model,
+        totalTokens: saved.totalTokens,
+        cost: Number(saved.cost || 0),
+      });
+      await this.createHumanReviewItemIfRequired(saved as AIQuery);
     } catch (error) {
       // Log error but don't fail the request
       console.error('Failed to log AI query:', error);
@@ -538,6 +614,39 @@ export class AIService {
     });
 
     return count;
+  }
+
+  private async groupOrganizationUsage(
+    organizationId: string,
+    startDate: Date,
+    field: 'assetId' | 'agentId' | 'modelClass',
+    alias: string,
+  ) {
+    const rows = await this.aiQueryRepository
+      .createQueryBuilder('aiQuery')
+      .select(`COALESCE(aiQuery.${field}, 'unknown')`, alias)
+      .addSelect('COUNT(aiQuery.id)', 'count')
+      .addSelect('COALESCE(SUM(aiQuery.totalTokens), 0)', 'totalTokens')
+      .addSelect('COALESCE(SUM(aiQuery.cost), 0)', 'actualCost')
+      .addSelect('COALESCE(SUM(aiQuery.estimatedCost), 0)', 'estimatedCost')
+      .addSelect(
+        'SUM(CASE WHEN aiQuery.requiresHumanReview = true THEN 1 ELSE 0 END)',
+        'reviewRequiredCount',
+      )
+      .where('aiQuery.organizationId = :organizationId', { organizationId })
+      .andWhere('aiQuery.createdAt >= :startDate', { startDate })
+      .groupBy(`COALESCE(aiQuery.${field}, 'unknown')`)
+      .orderBy('count', 'DESC')
+      .getRawMany<Record<string, string>>();
+
+    return rows.map((row) => ({
+      [alias]: row[alias],
+      count: Number(row.count || 0),
+      totalTokens: Number(row.totalTokens || 0),
+      actualCost: Number(row.actualCost || 0),
+      estimatedCost: Number(row.estimatedCost || 0),
+      reviewRequiredCount: Number(row.reviewRequiredCount || 0),
+    }));
   }
 
   private async getSubscriptionTier(userId: string): Promise<SubscriptionTier> {
@@ -669,6 +778,7 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
         response.usage?.completion_tokens || 0,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
+      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
       await this.logQuery({
         userId,
         prompt,
@@ -686,7 +796,7 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
         metadata: {
           finishReason: result.finishReason,
           toolCallCount: toolCalls.length,
-          aiFoundation: this.extractAiFoundationMetadata(context),
+          ...aiUsageMetadata,
         },
       });
 
@@ -708,6 +818,7 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
 
       return result;
     } catch (error) {
+      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
       await this.logQuery({
         userId,
         prompt,
@@ -718,7 +829,7 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
         conversationId: context?.conversationId,
         metadata: {
           error: error instanceof Error ? error.message : String(error),
-          aiFoundation: this.extractAiFoundationMetadata(context),
+          ...aiUsageMetadata,
         },
       });
       throw new Error(
@@ -738,9 +849,143 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
       capabilityId: foundation.capabilityId,
       route: foundation.route,
       selectedExpert: foundation.selectedExpert,
+      selectedExperts: foundation.selectedExperts,
       retrievalPolicy: foundation.retrievalPolicy,
+      confidence: foundation.confidence,
+      routeScore: foundation.routeScore,
+      routeReason: foundation.routeReason,
+      estimatedCost: foundation.estimatedCost,
+      costReductionApplied: foundation.costReductionApplied,
       requiresHumanReview: foundation.requiresHumanReview,
       phiAccessed: foundation.phiAccessed,
+      startedAt: foundation.startedAt,
     };
+  }
+
+  private buildAiUsageMetadata(
+    context: any,
+    modelVersion: string,
+    maxTokens?: number,
+  ): Record<string, any> {
+    const aiFoundation = this.extractAiFoundationMetadata(context);
+    const routePlan = context?.routePlan;
+    const tenant = {
+      organizationId:
+        context?.organizationId ||
+        context?.tenant?.organizationId ||
+        context?.envelope?.organizationId ||
+        context?.aiRunEnvelope?.organizationId,
+      workspaceId:
+        context?.workspaceId ||
+        context?.tenant?.workspaceId ||
+        context?.envelope?.workspaceId ||
+        context?.aiRunEnvelope?.workspaceId,
+      role: context?.role || context?.tenant?.role,
+      subscriptionPlan: context?.subscriptionPlan || context?.tenant?.subscriptionPlan,
+    };
+    const aiCommercialization = {
+      agentId: context?.agentId || aiFoundation?.capabilityId || routePlan?.selectedExpert,
+      assetId:
+        context?.assetId ||
+        context?.toolId ||
+        context?.tool ||
+        context?.intentClassification?.toolId ||
+        routePlan?.toolPlan?.backendExecutorIds?.[0],
+      modelClass:
+        context?.modelClass ||
+        routePlan?.modelPlan?.expertModel ||
+        this.inferModelClass(modelVersion),
+      modelVersion,
+      maxTokens,
+      routingExpert: aiFoundation?.selectedExpert || routePlan?.selectedExpert,
+      retrievalPolicy: aiFoundation?.retrievalPolicy || routePlan?.retrievalPolicy,
+      requiresHumanReview:
+        aiFoundation?.requiresHumanReview ??
+        routePlan?.safetyPlan?.requiresHumanReview ??
+        false,
+      estimatedCost: aiFoundation?.estimatedCost ?? routePlan?.costPlan?.estimatedCost,
+      costReductionApplied:
+        aiFoundation?.costReductionApplied || routePlan?.costPlan?.costReductionApplied || [],
+    };
+
+    return {
+      aiFoundation,
+      ...(routePlan
+        ? {
+            routePlan: {
+              selectedExperts: routePlan.selectedExperts,
+              routingEvidence: routePlan.routingEvidence,
+              modelPlan: routePlan.modelPlan,
+              toolPlan: routePlan.toolPlan,
+              costPlan: routePlan.costPlan,
+              safetyPlan: routePlan.safetyPlan,
+            },
+          }
+        : {}),
+      tenant,
+      aiCommercialization,
+    };
+  }
+
+  private inferModelClass(model: string): 'small' | 'standard' | 'large' {
+    const normalized = model.toLowerCase();
+    if (normalized.includes('mini') || normalized.includes('small')) return 'small';
+    if (normalized.includes('4') || normalized.includes('large')) return 'large';
+    return 'standard';
+  }
+
+  private async createHumanReviewItemIfRequired(query: AIQuery) {
+    if (
+      !this.platformGovernanceService ||
+      query.status !== QueryStatus.SUCCESS ||
+      !query.requiresHumanReview
+    ) {
+      return;
+    }
+
+    await this.platformGovernanceService.createReviewItem({
+      organizationId: query.organizationId,
+      runId: query.metadata?.aiFoundation?.runId || query.id,
+      capabilityId: query.agentId || query.metadata?.aiFoundation?.capabilityId || query.feature || 'ai',
+      reviewType: this.resolveReviewType(query),
+      severity: this.resolveReviewSeverity(query),
+      dueAt: this.resolveReviewDueAt(query),
+      payload: {
+        sourceType: 'ai_query',
+        sourceId: query.id,
+        organizationId: query.organizationId,
+        workspaceId: query.workspaceId,
+        assetId: query.assetId,
+        agentId: query.agentId,
+        modelClass: query.modelClass,
+        modelVersion: query.modelVersion,
+        routingExpert: query.routingExpert,
+        retrievalPolicy: query.retrievalPolicy,
+        estimatedCost: query.estimatedCost,
+        reason: 'AI output requires human review under governance policy.',
+        aiFoundation: query.metadata?.aiFoundation,
+        aiCommercialization: query.metadata?.aiCommercialization,
+      },
+    });
+  }
+
+  private resolveReviewType(query: AIQuery) {
+    const feature = (query.feature || '').toLowerCase();
+    if (feature.includes('document')) return 'documentation';
+    if (feature.includes('simulation')) return 'simulation';
+    if (query.routingExpert === 'operations' || query.routingExpert === 'fleet') return 'operational_ai';
+    if (query.routingExpert === 'documentation') return 'documentation';
+    return 'clinical_ai';
+  }
+
+  private resolveReviewSeverity(query: AIQuery) {
+    if (query.metadata?.aiFoundation?.phiAccessed) return 'critical';
+    if (query.modelClass === 'large' || query.routingExpert === 'emergency') return 'critical';
+    return 'high';
+  }
+
+  private resolveReviewDueAt(query: AIQuery) {
+    const hours = this.resolveReviewSeverity(query) === 'critical' ? 4 : 24;
+    return new Date(Date.now() + hours * 60 * 60 * 1000);
   }
 }

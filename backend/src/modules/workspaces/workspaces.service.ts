@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import { AuditService } from '../audit/audit.service';
+import { LEGACY_TOOL_ID_ALIASES } from '../platform-assets/data/platform-asset-seed.data';
+import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
 import { User, UserRole } from '../users/entities/user.entity';
 import { WorkspacePermissionsService } from '../permissions/workspace-permissions.service';
 import { CreateWorkspaceDto } from './dto/create-workspace.dto';
@@ -79,6 +81,7 @@ export class WorkspacesService {
     private readonly stateRepository: Repository<UserWorkspaceState>,
     private readonly permissionsService: WorkspacePermissionsService,
     private readonly auditService: AuditService,
+    private readonly platformAssetsService: PlatformAssetsService,
   ) {}
 
   async listForUser(user: User) {
@@ -174,6 +177,10 @@ export class WorkspacesService {
     options: { organizationId?: string | null } = {},
   ) {
     const slug = await this.uniqueSlug(`${dto.type}-${dto.name}-${user.id}`);
+    const enabledToolIds = await this.validateEnabledToolIdsForOrganization(
+      options.organizationId || null,
+      dto.enabledToolIds || WORKSPACE_TOOL_PRESETS[dto.type] || [],
+    );
     const workspace = this.workspaceRepository.create({
       type: dto.type,
       name: dto.name.trim(),
@@ -185,7 +192,7 @@ export class WorkspacesService {
       },
       settings: {
         defaultDashboard: this.defaultDashboardForType(dto.type),
-        enabledToolIds: dto.enabledToolIds || WORKSPACE_TOOL_PRESETS[dto.type] || [],
+        enabledToolIds,
         enabledModules: dto.enabledModules || WORKSPACE_MODULE_PRESETS[dto.type] || [],
         emergencyModeEnabled: Boolean(dto.emergencyModeEnabled),
       },
@@ -240,9 +247,13 @@ export class WorkspacesService {
     await this.requireManager(user, workspaceId);
     const workspace = await this.workspaceRepository.findOne({ where: { id: workspaceId } });
     if (!workspace) throw new NotFoundException('Workspace not found.');
+    const validatedToolIds = await this.validateEnabledToolIdsForOrganization(
+      workspace.organizationId,
+      enabledToolIds || [],
+    );
     workspace.settings = {
       ...(workspace.settings || {}),
-      enabledToolIds: [...new Set(enabledToolIds || [])],
+      enabledToolIds: validatedToolIds,
     };
     const saved = await this.workspaceRepository.save(workspace);
     return { workspace: this.serializeWorkspace(saved) };
@@ -374,6 +385,36 @@ export class WorkspacesService {
       throw new ForbiddenException('Workspace management permission is required.');
     }
     return membership;
+  }
+
+  private async validateEnabledToolIdsForOrganization(
+    organizationId: string | null | undefined,
+    enabledToolIds: string[],
+  ) {
+    const requestedToolIds = [...new Set(enabledToolIds || [])];
+    if (!organizationId || !this.platformAssetsService.isStrictSaasEntitlementsEnabled()) {
+      return requestedToolIds;
+    }
+
+    const entitledAssetIds = new Set(
+      await this.platformAssetsService.resolveEntitledAssetIds({
+        organizationId,
+        workspaceEnabledToolIds: requestedToolIds,
+        strictEntitlements: true,
+      }),
+    );
+    const deniedToolIds = requestedToolIds.filter((toolId) => {
+      if (entitledAssetIds.has(toolId)) return false;
+      const aliases = LEGACY_TOOL_ID_ALIASES[toolId] || [];
+      return !aliases.some((assetId) => entitledAssetIds.has(assetId));
+    });
+
+    if (deniedToolIds.length) {
+      throw new ForbiddenException(
+        `Workspace tools outside organization entitlements: ${deniedToolIds.join(', ')}`,
+      );
+    }
+    return requestedToolIds;
   }
 
   private settingsForType(type: WorkspaceType) {

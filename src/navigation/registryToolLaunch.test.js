@@ -1,8 +1,14 @@
-import { describe, it, expect } from 'vitest';
+import { beforeEach, describe, it, expect, vi } from 'vitest';
 import toolRegistry from '../data/toolRegistry';
-import { getRegistryToolNavigation } from './registryToolLaunch';
+import {
+  applyRegistryToolLaunch,
+  getRegistryToolNavigation,
+  isRegistryToolLaunchAllowed,
+  resolveRegistryToolLaunchAccess,
+} from './registryToolLaunch';
 import { TIER_B_CHAT_CALCULATOR_REGISTRY_IDS } from '../data/clinicalCatalogWiring';
 import { NLU_PROFILE_TOOL_IDS } from '../data/clinicalToolIdContract';
+import { setPlatformEntitlementContext } from '../data/assetEntitlements';
 import {
   getFrontendVisibleToolInventory,
   getUserFacingToolInventory,
@@ -12,6 +18,10 @@ import {
 import { isKnownToolAreaPath, matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 
 describe('registryToolLaunch', () => {
+  beforeEach(() => {
+    setPlatformEntitlementContext(null);
+  });
+
   it.each([
     ['qsofa', 'calculator-route', '/tools/calculators/qsofa'],
     ['sofa-score', 'calculator-route', '/tools/calculators/sofa'],
@@ -94,5 +104,65 @@ describe('registryToolLaunch', () => {
         expect(isKnownToolAreaPath(plan.pathname), record.id).toBe(true);
       }
     }
+  });
+
+  it('denies strict SaaS launches when org entitlements exclude the asset', () => {
+    setPlatformEntitlementContext({
+      organization: { id: 'org-1' },
+      entitledAssetIds: ['qsofa'],
+      strictSaasEntitlements: true,
+    });
+
+    expect(isRegistryToolLaunchAllowed('news2')).toBe(false);
+    expect(resolveRegistryToolLaunchAccess('news2')).toMatchObject({
+      allowed: false,
+      accessState: 'locked',
+    });
+  });
+
+  it('does not record, select, seed, or navigate to denied tools', () => {
+    setPlatformEntitlementContext({
+      organization: { id: 'org-1' },
+      entitledAssetIds: [],
+      strictSaasEntitlements: true,
+    });
+    const handlers = {
+      navigate: vi.fn(),
+      addMessage: vi.fn(),
+      selectTool: vi.fn(),
+      setActiveTool: vi.fn(),
+      recordToolAccess: vi.fn(),
+    };
+
+    applyRegistryToolLaunch('qsofa', handlers);
+
+    expect(handlers.recordToolAccess).not.toHaveBeenCalled();
+    expect(handlers.selectTool).not.toHaveBeenCalled();
+    expect(handlers.setActiveTool).not.toHaveBeenCalled();
+    expect(handlers.addMessage).not.toHaveBeenCalled();
+    expect(handlers.navigate).toHaveBeenCalledWith(
+      { pathname: '/tools', search: '?entitlement=denied&reason=locked' },
+      { replace: true }
+    );
+  });
+
+  it('blocks deep links when platform context marks a feature subscription-required', () => {
+    setPlatformEntitlementContext({
+      organization: { id: 'org-1' },
+      assetAccessDecisions: {
+        'simulation-suite': {
+          state: 'subscription-required',
+          isVisible: true,
+          isLaunchable: false,
+          reason: 'subscription-required',
+        },
+      },
+    });
+
+    expect(isRegistryToolLaunchAllowed('simulation-suite')).toBe(false);
+    expect(resolveRegistryToolLaunchAccess('simulation-suite')).toMatchObject({
+      allowed: false,
+      accessState: 'subscription-required',
+    });
   });
 });

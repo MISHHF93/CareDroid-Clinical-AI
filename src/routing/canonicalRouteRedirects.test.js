@@ -79,6 +79,15 @@ describe('canonical route redirects', () => {
     expect(appSource).toContain('permission: Permission.CONFIGURE_SYSTEM');
   });
 
+  it('keeps /privacy as the public privacy policy while governance privacy remains protected', () => {
+    expect(appSource).toMatch(
+      /path:\s*'\/privacy'[\s\S]*?<PublicShell>[\s\S]*?<PrivacyPolicy\s*\/>[\s\S]*?<\/PublicShell>/
+    );
+    expect(appSource).toMatch(
+      /path:\s*'\/governance\/privacy'[\s\S]*?<PlatformGovernanceWorkspace\s*\/>[\s\S]*?requiresAuth:\s*true[\s\S]*?permission:\s*Permission\.VIEW_PRIVACY_CENTER/
+    );
+  });
+
   it('redirects legacy audit-log entry points to the canonical audit route', () => {
     expectGeneratedRedirect('/audit-logs', '/audit');
     expect(routeConfigSource).toContain(
@@ -89,6 +98,8 @@ describe('canonical route redirects', () => {
   it('registers profile tool preferences without redirecting canonical tool routes', () => {
     expectRoute('/profile/tool-preferences', 'ProfileToolPreferences');
     expectRoute('/analytics', 'AnalyticsDashboard');
+    expectRoute('/billing', 'BillingPage');
+    expectRoute('/usage', 'UsagePage');
     expectRoute('/feature-flags', 'FeatureFlagCenter');
     expectRoute('/plugins', 'PluginMarketplace');
     expectRoute('/dependency-map', 'DependencyMap');
@@ -107,6 +118,15 @@ describe('canonical route redirects', () => {
     expect(appSource).toContain("path: '/tools/patient-summary-ai'");
     expectRoute('/tools/patient-summary-ai', 'PatientSummaryAi');
     expect(appSource).not.toContain('function AssistantToolRedirect');
+  });
+
+  it('keeps products, asset packs, and configuration studio as first-class builder routes', () => {
+    expectRoute('/products', 'ProductsIndexPage');
+    expectRoute('/asset-packs', 'AssetPacksBuilderPage');
+    expectRoute('/configuration-studio', 'ConfigurationStudioPage');
+    expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ path: '/asset-packs' })])
+    );
   });
 
   it('wires simulation, laboratory, and 3D viewer canonical routes with aliases', () => {

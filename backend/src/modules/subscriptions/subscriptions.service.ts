@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException, Logger, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -7,6 +7,12 @@ import { Subscription, SubscriptionTier, SubscriptionStatus } from './entities/s
 import { User } from '../users/entities/user.entity';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
+import {
+  getSubscriptionPlanDefinition,
+  SUBSCRIPTION_PLAN_DEFINITIONS,
+  UsageEventType,
+} from './subscription-plans.config';
+import { UsageMeteringService } from './usage-metering.service';
 
 @Injectable()
 export class SubscriptionsService {
@@ -20,6 +26,7 @@ export class SubscriptionsService {
     private readonly userRepository: Repository<User>,
     private readonly auditService: AuditService,
     private readonly configService: ConfigService,
+    @Optional() private readonly usageMeteringService?: UsageMeteringService,
   ) {
     const secretKey = this.configService.get<string>('stripe.secretKey');
     if (!secretKey) {
@@ -258,11 +265,23 @@ export class SubscriptionsService {
   private getPriceIdForTier(tier: SubscriptionTier): string | null {
     switch (tier) {
       case SubscriptionTier.FREE:
+      case SubscriptionTier.STARTER:
         return this.configService.get<string>('stripe.plans.free.priceId');
       case SubscriptionTier.PROFESSIONAL:
         return this.configService.get<string>('stripe.plans.professional.priceId');
       case SubscriptionTier.INSTITUTIONAL:
+      case SubscriptionTier.ENTERPRISE:
         return this.configService.get<string>('stripe.plans.institutional.priceId');
+      case SubscriptionTier.ACADEMIC:
+        return (
+          this.configService.get<string>('stripe.plans.academic.priceId') ||
+          this.configService.get<string>('stripe.plans.professional.priceId')
+        );
+      case SubscriptionTier.GOVERNMENT:
+        return (
+          this.configService.get<string>('stripe.plans.government.priceId') ||
+          this.configService.get<string>('stripe.plans.institutional.priceId')
+        );
       default:
         return null;
     }
@@ -288,29 +307,111 @@ export class SubscriptionsService {
   }
 
   async getSubscriptionPlans() {
-    return [
-      {
-        id: 'free',
-        name: this.configService.get<string>('stripe.plans.free.name'),
-        price: this.configService.get<number>('stripe.plans.free.price'),
-        features: this.configService.get<string[]>('stripe.plans.free.features'),
-      },
-      {
-        id: 'professional',
-        name: this.configService.get<string>('stripe.plans.professional.name'),
-        price: this.configService.get<number>('stripe.plans.professional.price'),
-        features: this.configService.get<string[]>('stripe.plans.professional.features'),
-      },
-      {
-        id: 'institutional',
-        name: this.configService.get<string>('stripe.plans.institutional.name'),
-        price: this.configService.get<number>('stripe.plans.institutional.price'),
-        features: this.configService.get<string[]>('stripe.plans.institutional.features'),
-      },
-    ];
+    return SUBSCRIPTION_PLAN_DEFINITIONS.map((plan) => ({
+      id: plan.id,
+      name: plan.name,
+      description: plan.description,
+      price: plan.priceMonthly,
+      priceMonthly: plan.priceMonthly,
+      features: plan.features,
+      limits: plan.limits,
+    }));
   }
 
   async getUserSubscription(userId: string) {
     return this.subscriptionRepository.findOne({ where: { userId } });
+  }
+
+  async getBillingOverview(userId: string, tenantContext?: any) {
+    const subscription = await this.getUserSubscription(userId);
+    const currentPlan = getSubscriptionPlanDefinition(
+      tenantContext?.subscriptionPlan || subscription?.tier,
+    );
+    const usageSummary =
+      tenantContext?.organizationId && this.usageMeteringService
+        ? await this.usageMeteringService.getUsageSummary({
+            organizationId: tenantContext.organizationId,
+            subscriptionPlan: currentPlan.id,
+          })
+        : null;
+
+    return {
+      organizationId: tenantContext?.organizationId || null,
+      workspaceId: tenantContext?.workspaceId || null,
+      currentSubscription: subscription,
+      currentPlan,
+      plans: await this.getSubscriptionPlans(),
+      usageSummary,
+      status: subscription?.status || 'active',
+      period: {
+        start: subscription?.currentPeriodStart || usageSummary?.period?.start || null,
+        end: subscription?.currentPeriodEnd || usageSummary?.period?.end || null,
+      },
+    };
+  }
+
+  async getUsageSummary(tenantContext: any, period = 'month') {
+    if (!tenantContext?.organizationId || !this.usageMeteringService) {
+      return {
+        organizationId: tenantContext?.organizationId || null,
+        period,
+        plan: getSubscriptionPlanDefinition(tenantContext?.subscriptionPlan),
+        totals: [],
+        activeUsers: 0,
+        breakdowns: {
+          byWorkspace: [],
+          byAsset: [],
+          byRole: [],
+          byEventType: [],
+        },
+        recentEvents: [],
+      };
+    }
+
+    return this.usageMeteringService.getUsageSummary({
+      organizationId: tenantContext.organizationId,
+      period,
+      subscriptionPlan: tenantContext.subscriptionPlan,
+    });
+  }
+
+  async recordUsageEvent(tenantContext: any, dto: any) {
+    if (!this.usageMeteringService) return null;
+    return this.usageMeteringService.recordFromTenantContext(tenantContext, dto.eventType, {
+      workspaceId: dto.workspaceId,
+      assetId: dto.assetId,
+      quantity: dto.quantity,
+      unit: dto.unit,
+      metadata: dto.metadata,
+    });
+  }
+
+  async recordAiUsageFromQuery(query: {
+    organizationId?: string | null;
+    workspaceId?: string | null;
+    userId?: string | null;
+    userRole?: string | null;
+    subscriptionPlan?: string | null;
+    assetId?: string | null;
+    model?: string | null;
+    totalTokens?: number;
+    cost?: number;
+  }) {
+    if (!this.usageMeteringService) return null;
+    return this.usageMeteringService.recordUsage({
+      organizationId: query.organizationId,
+      workspaceId: query.workspaceId,
+      userId: query.userId,
+      userRole: query.userRole,
+      subscriptionPlan: query.subscriptionPlan,
+      assetId: query.assetId,
+      eventType: UsageEventType.AI_CALL,
+      quantity: 1,
+      metadata: {
+        model: query.model,
+        totalTokens: query.totalTokens,
+        cost: query.cost,
+      },
+    });
   }
 }

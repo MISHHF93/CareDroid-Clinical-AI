@@ -122,7 +122,16 @@ async function bootstrap() {
     origin: allowedOrigins,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-CareDroid-Organization-Id',
+      'X-CareDroid-Workspace-Id',
+      'X-CareDroid-User-Id',
+      'X-CareDroid-Role',
+      'X-CareDroid-Subscription-Plan',
+      'X-CareDroid-Tenant-Source',
+    ],
   });
 
   // Global validation pipe

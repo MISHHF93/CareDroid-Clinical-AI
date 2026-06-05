@@ -1,0 +1,211 @@
+import { ForbiddenException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { In, Repository } from 'typeorm';
+import {
+  EntitlementAccessState,
+  getEntitlementRuleForAsset,
+  subscriptionMeetsRequirement,
+} from '../../config/entitlements.config';
+import { FeatureFlagState } from '../../config/featureFlags.config';
+import { SubscriptionTier } from '../subscriptions/entities/subscription.entity';
+import { UserRole } from '../users/entities/user.entity';
+import { Organization } from '../workspaces/entities/organization.entity';
+import { OrganizationMembershipRole } from '../organizations/entities/organization-membership.entity';
+import { AssetPack } from './entities/asset-pack.entity';
+import { OrganizationEntitlement } from './entities/organization-entitlement.entity';
+import { PlatformAsset } from './entities/platform-asset.entity';
+import { EntitlementStatus, PricingTier } from './enums/platform-asset.enums';
+import { FeatureFlagService } from './feature-flag.service';
+
+export interface EntitlementDecisionInput {
+  assetId: string;
+  asset?: Partial<PlatformAsset> | null;
+  organization?: Partial<Organization> | null;
+  organizationId?: string | null;
+  userRole?: UserRole | string;
+  subscriptionPlan?: SubscriptionTier | string;
+  entitledAssetIds?: string[];
+  entitledPackIds?: string[];
+  strictEntitlements?: boolean;
+}
+
+export interface EntitlementDecision {
+  assetId: string;
+  state: EntitlementAccessState | FeatureFlagState;
+  rolloutState: FeatureFlagState;
+  isVisible: boolean;
+  isLaunchable: boolean;
+  reason: string;
+  requiredPlan?: string;
+  requiredPacks?: string[];
+  featureFlagId?: string;
+}
+
+@Injectable()
+export class EntitlementService {
+  constructor(
+    @InjectRepository(AssetPack)
+    private readonly packRepository: Repository<AssetPack>,
+    @InjectRepository(OrganizationEntitlement)
+    private readonly entitlementRepository: Repository<OrganizationEntitlement>,
+    private readonly featureFlagService: FeatureFlagService,
+  ) {}
+
+  async getEnabledPackIdsForOrganization(organizationId?: string | null): Promise<string[]> {
+    if (!organizationId) return [];
+    const rows = await this.entitlementRepository.find({
+      where: { organizationId, status: EntitlementStatus.ENABLED },
+    });
+    return rows.map((row) => row.packId);
+  }
+
+  async resolveEntitledAssetIdsForPacks(packIds: string[]): Promise<string[]> {
+    if (!packIds.length) return [];
+    const packs = await this.packRepository.find({ where: { id: In(packIds) } });
+    const ids = new Set<string>();
+    packs.forEach((pack) => pack.assetIds?.forEach((assetId) => ids.add(assetId)));
+    return [...ids];
+  }
+
+  async resolveDecision(input: EntitlementDecisionInput): Promise<EntitlementDecision> {
+    const entitledPackIds =
+      input.entitledPackIds ||
+      (await this.getEnabledPackIdsForOrganization(input.organizationId || input.organization?.id));
+    const entitledAssetIds =
+      input.entitledAssetIds || (await this.resolveEntitledAssetIdsForPacks(entitledPackIds));
+    return this.resolveDecisionFromContext({
+      ...input,
+      entitledAssetIds,
+      entitledPackIds,
+    });
+  }
+
+  resolveDecisionFromContext(input: EntitlementDecisionInput): EntitlementDecision {
+    const assetId = input.assetId;
+    const rule = getEntitlementRuleForAsset(assetId);
+    const featureFlagId =
+      rule?.featureFlagId || this.featureFlagService.getFeatureFlagForAsset(assetId)?.id;
+    const rolloutState = this.featureFlagService.resolveState(
+      featureFlagId,
+      input.organization?.settings as Record<string, any>,
+    );
+
+    const base = {
+      assetId,
+      rolloutState,
+      featureFlagId,
+      requiredPlan: rule?.requiredPlan,
+      requiredPacks: rule?.requiredPackIds || [],
+    };
+
+    if (rolloutState === FeatureFlagState.DISABLED) {
+      return {
+        ...base,
+        state: EntitlementAccessState.DISABLED,
+        isVisible: false,
+        isLaunchable: false,
+        reason: 'feature-disabled',
+      };
+    }
+    if (rolloutState === FeatureFlagState.LOCKED) {
+      return {
+        ...base,
+        state: EntitlementAccessState.LOCKED,
+        isVisible: true,
+        isLaunchable: false,
+        reason: 'feature-locked',
+      };
+    }
+    if (rolloutState === FeatureFlagState.SUBSCRIPTION_REQUIRED) {
+      return {
+        ...base,
+        state: EntitlementAccessState.SUBSCRIPTION_REQUIRED,
+        isVisible: true,
+        isLaunchable: false,
+        reason: 'feature-subscription-required',
+      };
+    }
+
+    const adminOnly =
+      rule?.adminOnly ||
+      rolloutState === FeatureFlagState.ADMIN_ONLY ||
+      input.asset?.lifecycle === 'admin_only';
+    if (adminOnly && !this.isAdminRole(input.userRole)) {
+      return {
+        ...base,
+        state: EntitlementAccessState.ADMIN_ONLY,
+        isVisible: true,
+        isLaunchable: false,
+        reason: 'admin-only',
+      };
+    }
+
+    const currentPlan = input.subscriptionPlan || SubscriptionTier.FREE;
+    const requiredPlan = rule?.requiredPlan || this.planForPricingTier(input.asset?.pricingTier);
+    if (!subscriptionMeetsRequirement(currentPlan, requiredPlan)) {
+      return {
+        ...base,
+        requiredPlan,
+        state: EntitlementAccessState.SUBSCRIPTION_REQUIRED,
+        isVisible: true,
+        isLaunchable: false,
+        reason: 'subscription-required',
+      };
+    }
+
+    const entitled = new Set(input.entitledAssetIds || []);
+    const entitledPacks = new Set(input.entitledPackIds || []);
+    const requiredPacks = rule?.requiredPackIds || input.asset?.packIds || [];
+    const hasOrganization = Boolean(input.organizationId || input.organization?.id);
+    const missingPack = requiredPacks.find((packId) => !entitledPacks.has(packId));
+    const strict = Boolean(input.strictEntitlements);
+
+    if (hasOrganization && ((strict && !entitled.has(assetId)) || missingPack)) {
+      return {
+        ...base,
+        requiredPacks,
+        state: EntitlementAccessState.LOCKED,
+        isVisible: true,
+        isLaunchable: false,
+        reason: missingPack ? 'pack-required' : 'asset-not-entitled',
+      };
+    }
+
+    const state =
+      rolloutState === FeatureFlagState.BETA || rolloutState === FeatureFlagState.EXPERIMENTAL
+        ? rolloutState
+        : EntitlementAccessState.ALLOWED;
+
+    return {
+      ...base,
+      state,
+      isVisible: true,
+      isLaunchable: true,
+      reason: rolloutState === state ? `rollout-${state}` : 'allowed',
+    };
+  }
+
+  async assertLaunchAllowed(input: EntitlementDecisionInput): Promise<EntitlementDecision> {
+    const decision = await this.resolveDecision(input);
+    if (!decision.isLaunchable) {
+      throw new ForbiddenException(
+        `Feature access denied: ${decision.reason}${decision.requiredPlan ? ` (${decision.requiredPlan})` : ''}`,
+      );
+    }
+    return decision;
+  }
+
+  private planForPricingTier(tier?: string): SubscriptionTier {
+    if (tier === PricingTier.ENTERPRISE || tier === PricingTier.ADDON) {
+      return SubscriptionTier.INSTITUTIONAL;
+    }
+    if (tier === PricingTier.STANDARD) return SubscriptionTier.PROFESSIONAL;
+    return SubscriptionTier.FREE;
+  }
+
+  private isAdminRole(role?: string) {
+    return [UserRole.ADMIN, OrganizationMembershipRole.ADMIN, OrganizationMembershipRole.OWNER].includes(
+      role as UserRole | OrganizationMembershipRole,
+    );
+  }
+}

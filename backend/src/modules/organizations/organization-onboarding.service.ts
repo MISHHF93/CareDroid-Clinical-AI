@@ -39,6 +39,13 @@ export class OrganizationOnboardingService {
     }
 
     const packIds = await this.resolvePackIds(dto);
+    const enabledProductIds = dto.enabledProductIds ?? dto.productIds ?? [];
+    const complianceMode = dto.complianceMode ?? this.resolveDefaultComplianceMode(dto.organizationType);
+    const branding = {
+      ...(dto.branding || {}),
+      displayName: dto.branding?.displayName || dto.name,
+    };
+    const onboardingCompletedAt = new Date().toISOString();
 
     const org = await this.organizationRepository.save(
       this.organizationRepository.create({
@@ -46,14 +53,18 @@ export class OrganizationOnboardingService {
         slug: dto.slug,
         organizationType: dto.organizationType,
         country: dto.country,
-        branding: dto.branding || { displayName: dto.name },
+        branding,
         settings: {
-          onboardingCompletedAt: new Date().toISOString(),
+          onboardingCompletedAt,
           specialties: dto.specialties || [],
           departments: dto.departments || [],
+          workspaceDefaults: dto.workspaceSetups || [],
+          enabledProductIds,
           commercialPlanId: dto.commercialPlanId || null,
           integrations: dto.integrationSlugs || [],
           integrationsRequested: dto.integrationSlugs || [],
+          complianceMode,
+          branding,
         },
       }),
     );
@@ -84,9 +95,10 @@ export class OrganizationOnboardingService {
       await this.profileRepository.save(profile);
     }
 
+    const workspaces = [];
     for (const ws of dto.workspaceSetups || []) {
       try {
-        await this.workspacesService.createWorkspace(
+        const workspace = await this.workspacesService.createWorkspace(
           user,
           {
             name: ws.name,
@@ -94,15 +106,43 @@ export class OrganizationOnboardingService {
             displayName: ws.name,
             enabledToolIds: ws.enabledToolIds,
             enabledModules: ws.enabledModules,
+            emergencyModeEnabled: ws.emergencyModeEnabled,
           },
           { organizationId: org.id },
         );
+        workspaces.push(workspace);
       } catch {
         // optional
       }
     }
 
     const entitlements = await this.platformAssetsService.getOrganizationEntitlements(org.id);
+    const installedPackIds = entitlements.map((e) => e.packId);
+    const tenantProfile = {
+      organization: {
+        id: org.id,
+        name: org.name,
+        slug: org.slug,
+        organizationType: org.organizationType,
+        country: org.country,
+      },
+      departments: dto.departments || [],
+      workspaceDefaults: dto.workspaceSetups || [],
+      workspaces,
+      roleProfileId: dto.defaultRoleProfileId || null,
+      roleAssignments: dto.roleAssignments || [],
+      productIds: enabledProductIds,
+      installedPackIds,
+      integrationsRequested: dto.integrationSlugs || [],
+      branding,
+      complianceMode,
+    };
+
+    org.settings = {
+      ...(org.settings || {}),
+      tenantProfile,
+    };
+    await this.organizationRepository.save(org);
 
     return {
       organization: {
@@ -112,7 +152,13 @@ export class OrganizationOnboardingService {
         organizationType: org.organizationType,
         settings: org.settings,
       },
-      installedPackIds: entitlements.map((e) => e.packId),
+      installedPackIds,
+      workspaces,
+      integrationsRequested: dto.integrationSlugs || [],
+      complianceMode,
+      branding,
+      tenantProfile,
+      status: 'configured',
       message: 'CareDroid deployment configured successfully.',
     };
   }
@@ -131,8 +177,9 @@ export class OrganizationOnboardingService {
       }
     }
 
-    if (dto.productIds?.length) {
-      const products = await this.productRepository.find({ where: { id: In(dto.productIds) } });
+    const productIds = [...new Set([...(dto.productIds || []), ...(dto.enabledProductIds || [])])];
+    if (productIds.length) {
+      const products = await this.productRepository.find({ where: { id: In(productIds) } });
       products.forEach((p) => p.packIds?.forEach((id) => packIds.add(id)));
     }
 
@@ -149,5 +196,9 @@ export class OrganizationOnboardingService {
 
     packIds.add('core-platform');
     return [...packIds];
+  }
+
+  private resolveDefaultComplianceMode(type: OrganizationOnboardingDto['organizationType']): string {
+    return type === 'ems' ? 'ems' : 'hipaa';
   }
 }

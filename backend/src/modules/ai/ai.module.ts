@@ -7,6 +7,10 @@ import { Subscription } from '../subscriptions/entities/subscription.entity';
 import { User } from '../users/entities/user.entity';
 import { AuditModule } from '../audit/audit.module';
 import { MetricsModule } from '../metrics/metrics.module';
+import { OrganizationsModule } from '../organizations/organizations.module';
+import { PlatformGovernanceModule } from '../platform-governance';
+import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import {
   AiContextManagerService,
   AiGatewayService,
@@ -15,7 +19,15 @@ import {
 } from './foundation';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AIQuery, Subscription, User]), AuditModule, MetricsModule],
+  imports: [
+    TypeOrmModule.forFeature([AIQuery, Subscription, User]),
+    AuditModule,
+    MetricsModule,
+    OrganizationsModule,
+    PlatformGovernanceModule,
+    PlatformAssetsModule,
+    SubscriptionsModule,
+  ],
   controllers: [AIController],
   providers: [
     AIService,

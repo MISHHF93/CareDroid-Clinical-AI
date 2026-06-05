@@ -19,6 +19,20 @@ vi.mock('../contexts/ToolPreferencesContext', () => ({
   useToolPreferences: () => mockToolPreferencesValue,
 }));
 
+vi.mock('../contexts/UserContext', () => ({
+  useUser: () => ({ user: { role: 'physician' } }),
+}));
+
+vi.mock('../contexts/UserIdentityContext', () => ({
+  useUserIdentity: () => ({
+    account: { role: 'physician' },
+    activeWorkspace: null,
+    preferences: null,
+    platformContext: null,
+    workspaceState: { effectivePermissions: [] },
+  }),
+}));
+
 function LocationProbe() {
   const location = useLocation();
   return <output data-testid="location">{location.pathname}</output>;

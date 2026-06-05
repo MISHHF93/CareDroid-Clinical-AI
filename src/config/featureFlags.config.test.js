@@ -16,14 +16,18 @@ describe('featureFlags.config rollout registry', () => {
       'disabled',
       'beta',
       'experimental',
-      'hidden',
+      'locked',
+      'subscription-required',
+      'admin-only',
     ]);
     expect(Object.values(FEATURE_FLAG_CATEGORIES)).toEqual([
       'AI',
+      'Tools',
+      'Calculators',
       'Simulation',
+      'Maps',
       'Fleet',
       'IoT',
-      'Laboratory',
       'Governance',
     ]);
     for (const category of Object.values(FEATURE_FLAG_CATEGORIES)) {
@@ -46,6 +50,7 @@ describe('featureFlags.config rollout registry', () => {
 
   it('normalizes invalid states and summarizes rollout posture', () => {
     expect(normalizeFeatureFlagState('not-real')).toBe(FEATURE_FLAG_STATES.DISABLED);
+    expect(normalizeFeatureFlagState('hidden')).toBe(FEATURE_FLAG_STATES.DISABLED);
 
     const summary = summarizeFeatureFlags(
       buildFeatureFlagStateMap({
@@ -62,7 +67,7 @@ describe('featureFlags.config rollout registry', () => {
   it('groups flags by category with resolved state attached', () => {
     const grouped = getFeatureFlagsByCategory(
       buildFeatureFlagStateMap({
-        'simulation-outcomes': FEATURE_FLAG_STATES.HIDDEN,
+        'simulation-outcomes': FEATURE_FLAG_STATES.LOCKED,
       })
     );
 
@@ -71,7 +76,7 @@ describe('featureFlags.config rollout registry', () => {
       expect.arrayContaining([
         expect.objectContaining({
           id: 'simulation-outcomes',
-          state: FEATURE_FLAG_STATES.HIDDEN,
+          state: FEATURE_FLAG_STATES.LOCKED,
         }),
       ])
     );

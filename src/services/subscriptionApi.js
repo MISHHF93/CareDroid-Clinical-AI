@@ -38,6 +38,51 @@ export async function fetchCurrentSubscription() {
   }
 }
 
+export async function fetchBillingOverview() {
+  try {
+    const response = await apiFetch('/api/subscriptions/billing');
+    const data = await parseJson(response, null);
+    if (!response.ok) {
+      return disabled(data?.message || getApiErrorMessage(null, response));
+    }
+    return { ok: true, data, message: '' };
+  } catch (error) {
+    return disabled(getApiErrorMessage(error));
+  }
+}
+
+export async function fetchUsageSummary({ period = 'month' } = {}) {
+  try {
+    const response = await apiFetch(`/api/subscriptions/usage?period=${encodeURIComponent(period)}`);
+    const data = await parseJson(response, null);
+    if (!response.ok) {
+      return disabled(data?.message || getApiErrorMessage(null, response));
+    }
+    return { ok: true, data, message: '' };
+  } catch (error) {
+    return disabled(getApiErrorMessage(error));
+  }
+}
+
+export async function recordUsageEvent(payload = {}) {
+  if (!payload.eventType) return disabled('Usage event type is required.');
+
+  try {
+    const response = await apiFetch('/api/subscriptions/usage/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await parseJson(response, {});
+    if (!response.ok) {
+      return disabled(data?.message || getApiErrorMessage(null, response));
+    }
+    return { ok: true, data, message: '' };
+  } catch (error) {
+    return disabled(getApiErrorMessage(error));
+  }
+}
+
 export async function createCheckoutSession({ tier, successUrl, cancelUrl } = {}) {
   if (!tier) return disabled('Select a backend-returned plan before checkout.');
 

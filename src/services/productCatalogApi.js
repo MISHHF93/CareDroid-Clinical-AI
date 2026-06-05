@@ -7,6 +7,27 @@ export const ProductCatalogApi = {
     return response.json();
   },
 
+  async listProductBuilder(organizationId) {
+    const qs = organizationId ? `?organizationId=${encodeURIComponent(organizationId)}` : '';
+    const response = await apiFetch(`/api/products/builder${qs}`);
+    if (!response.ok) throw new Error(`Product builder failed (${response.status})`);
+    return response.json();
+  },
+
+  async getProductBuilder(slug, organizationId) {
+    const qs = organizationId ? `?organizationId=${encodeURIComponent(organizationId)}` : '';
+    const response = await apiFetch(`/api/products/${encodeURIComponent(slug)}/builder${qs}`);
+    if (!response.ok) throw new Error(`Product builder detail failed (${response.status})`);
+    return response.json();
+  },
+
+  async listAssetPackBuilder(organizationId) {
+    const qs = organizationId ? `?organizationId=${encodeURIComponent(organizationId)}` : '';
+    const response = await apiFetch(`/api/asset-packs${qs}`);
+    if (!response.ok) throw new Error(`Asset pack builder failed (${response.status})`);
+    return response.json();
+  },
+
   async listProducts() {
     const response = await apiFetch('/api/products');
     if (!response.ok) throw new Error(`List products failed (${response.status})`);

@@ -1190,17 +1190,10 @@ export function getSidebarToolRegistryProjection(records = getCanonicalToolInven
 }
 
 export function getUserFacingToolRegistryProjection(records = getCanonicalToolInventory()) {
-  const entitlementContext = getPlatformEntitlementContext();
-  const cacheKey = entitlementContext?.entitledAssetIds?.join(',') || 'all';
-  if (
-    records === cachedInventory &&
-    cachedUserFacingToolRegistryProjection &&
-    cachedUserFacingToolRegistryProjection.__entitlementKey === cacheKey
-  ) {
+  if (records === cachedInventory && cachedUserFacingToolRegistryProjection) {
     return cachedUserFacingToolRegistryProjection;
   }
-  const projection = filterToolsByEntitlements(
-    getUserFacingToolInventory(records).map((record) => {
+  const projection = getUserFacingToolInventory(records).map((record) => {
     const legacy = record.legacy || {};
     const category = legacy.category || record.presentationCategory;
     return enrichToolWithSegmentation({
@@ -1235,14 +1228,23 @@ export function getUserFacingToolRegistryProjection(records = getCanonicalToolIn
       favoriteable: record.favoriteable,
       searchText: record.searchText,
     });
-    }),
-    entitlementContext,
-  );
+  })
+    .sort(
+      (a, b) =>
+        (ALL_REGISTRY_TOOL_ID_ORDER.get(a.id) ?? Number.MAX_SAFE_INTEGER) -
+        (ALL_REGISTRY_TOOL_ID_ORDER.get(b.id) ?? Number.MAX_SAFE_INTEGER)
+    );
   if (records === cachedInventory) {
-    projection.__entitlementKey = cacheKey;
     cachedUserFacingToolRegistryProjection = projection;
   }
   return projection;
+}
+
+export function getEntitlementFilteredUserFacingToolRegistryProjection(
+  records = getCanonicalToolInventory(),
+  context = getPlatformEntitlementContext()
+) {
+  return filterToolsByEntitlements(getUserFacingToolRegistryProjection(records), context);
 }
 
 export function getBackendBackedToolInventory(records = getCanonicalToolInventory()) {

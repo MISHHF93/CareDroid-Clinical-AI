@@ -7,6 +7,7 @@ import { User } from '../users/entities/user.entity';
 import { AIQuery } from './entities/ai-query.entity';
 import { AuditService } from '../audit/audit.service';
 import { MetricsService } from '../metrics/metrics.service';
+import { PlatformGovernanceService } from '../platform-governance';
 
 // Mock OpenAI module
 jest.mock('openai', () => {
@@ -25,6 +26,21 @@ describe('AIService', () => {
   let service: AIService;
   let _configService: ConfigService;
 
+  const defaultConfigLookup = (key: string) => {
+    if (key === 'OPENAI_API_KEY') return 'sk-test-key';
+    if (key === 'openai') {
+      return {
+        model: 'gpt-4o-mini',
+        maxTokens: 1200,
+        temperature: 0.2,
+        rateLimits: {
+          free: { dailyLimit: 10, model: 'gpt-4o-mini', maxTokens: 1200 },
+        },
+      };
+    }
+    return undefined;
+  };
+
   const mockConfigService = {
     get: jest.fn(),
   };
@@ -41,10 +57,13 @@ describe('AIService', () => {
       addSelect: jest.fn().mockReturnThis(),
       where: jest.fn().mockReturnThis(),
       andWhere: jest.fn().mockReturnThis(),
+      groupBy: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
       getRawOne: jest.fn().mockResolvedValue({ count: '0', totalCost: '0' }),
+      getRawMany: jest.fn().mockResolvedValue([]),
     })),
     create: jest.fn((query) => query),
-    save: jest.fn((query) => Promise.resolve(query)),
+    save: jest.fn((query) => Promise.resolve({ id: 'query-1', ...query })),
   };
 
   const mockUserRepository = {
@@ -59,7 +78,13 @@ describe('AIService', () => {
     recordOpenaiCost: jest.fn(),
   };
 
+  const mockPlatformGovernanceService = {
+    createReviewItem: jest.fn().mockResolvedValue({ id: 'review-1' }),
+  };
+
   beforeEach(async () => {
+    mockConfigService.get.mockImplementation(defaultConfigLookup);
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AIService,
@@ -87,6 +112,10 @@ describe('AIService', () => {
           provide: MetricsService,
           useValue: mockMetricsService,
         },
+        {
+          provide: PlatformGovernanceService,
+          useValue: mockPlatformGovernanceService,
+        },
       ],
     }).compile();
 
@@ -96,7 +125,7 @@ describe('AIService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockConfigService.get.mockReturnValue('sk-test-key');
+    mockConfigService.get.mockImplementation(defaultConfigLookup);
   });
 
   it('should be defined', () => {
@@ -135,6 +164,74 @@ describe('AIService', () => {
     });
   });
 
+  describe('getOrganizationUsageSummary', () => {
+    const queryBuilder = (result: Record<string, any>, many = false) => ({
+      select: jest.fn().mockReturnThis(),
+      addSelect: jest.fn().mockReturnThis(),
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      groupBy: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      getRawOne: jest.fn().mockResolvedValue(result),
+      getRawMany: jest.fn().mockResolvedValue(many ? result : []),
+    });
+
+    it('returns organization AI usage grouped by commercial dimensions', async () => {
+      mockAiQueryRepository.createQueryBuilder
+        .mockReturnValueOnce(
+          queryBuilder({
+            totalQueries: '4',
+            totalTokens: '1200',
+            actualCost: '0.25',
+            estimatedCost: '0.4',
+            reviewRequiredCount: '2',
+          }),
+        )
+        .mockReturnValueOnce(
+          queryBuilder(
+            [{ assetId: 'differential-ai', count: '3', totalTokens: '900', actualCost: '0.18' }],
+            true,
+          ),
+        )
+        .mockReturnValueOnce(
+          queryBuilder(
+            [{ agentId: 'cardiology-agent', count: '2', totalTokens: '600', estimatedCost: '0.2' }],
+            true,
+          ),
+        )
+        .mockReturnValueOnce(
+          queryBuilder(
+            [
+              {
+                modelClass: 'standard',
+                count: '4',
+                totalTokens: '1200',
+                reviewRequiredCount: '2',
+              },
+            ],
+            true,
+          ),
+        );
+
+      const result = await service.getOrganizationUsageSummary('org-1', 14);
+
+      expect(result).toMatchObject({
+        organizationId: 'org-1',
+        days: 14,
+        totals: {
+          totalQueries: 4,
+          totalTokens: 1200,
+          actualCost: 0.25,
+          estimatedCost: 0.4,
+          reviewRequiredCount: 2,
+        },
+        byAsset: [expect.objectContaining({ assetId: 'differential-ai', count: 3 })],
+        byAgent: [expect.objectContaining({ agentId: 'cardiology-agent', count: 2 })],
+        byModelClass: [expect.objectContaining({ modelClass: 'standard', count: 4 })],
+      });
+    });
+  });
+
   describe('invokeLLM', () => {
     it('should throw error when daily limit exceeded', async () => {
       const userId = '1';
@@ -170,6 +267,104 @@ describe('AIService', () => {
 
       // Verify it got past the rate limit check
       expect(mockSubscriptionRepository.findOne).toHaveBeenCalled();
+    });
+
+    it('persists commercial AI usage dimensions with query records', async () => {
+      const userId = '1';
+      const prompt = 'Summarize cardiology risk for this encounter';
+      const openaiCreate = jest.fn().mockResolvedValue({
+        choices: [
+          {
+            message: { content: 'Structured clinical summary' },
+            finish_reason: 'stop',
+          },
+        ],
+        usage: {
+          prompt_tokens: 80,
+          completion_tokens: 40,
+          total_tokens: 120,
+        },
+      });
+
+      (service as any).openai = { chat: { completions: { create: openaiCreate } } };
+      mockSubscriptionRepository.findOne.mockResolvedValue({ tier: SubscriptionTier.FREE });
+      jest.spyOn(service as any, 'getUsageToday').mockResolvedValue(0);
+
+      await service.invokeLLM(userId, prompt, {
+        organizationId: '11111111-1111-1111-1111-111111111111',
+        workspaceId: '22222222-2222-2222-2222-222222222222',
+        agentId: 'cardiology-agent',
+        assetId: 'differential-ai',
+        feature: 'assistant',
+        conversationId: 'conv-1',
+        aiFoundation: {
+          runId: 'run-1',
+          capabilityId: 'clinical-assistant',
+          route: 'clinical_tool',
+          selectedExpert: 'cardiology',
+          selectedExperts: [{ expertId: 'cardiology', role: 'primary' }],
+          retrievalPolicy: 'guideline',
+          confidence: 0.92,
+          routeScore: 0.88,
+          routeReason: 'matched cardiology risk terms',
+          estimatedCost: 0.042,
+          costReductionApplied: ['lightweight_router'],
+          phiAccessed: false,
+          requiresHumanReview: true,
+          startedAt: '2026-06-05T08:00:00.000Z',
+        },
+        routePlan: {
+          selectedExpert: 'cardiology',
+          selectedExperts: [{ expertId: 'cardiology', role: 'primary' }],
+          routingEvidence: [],
+          modelPlan: { expertModel: 'standard' },
+          toolPlan: { backendExecutorIds: ['differential-ai'] },
+          costPlan: { estimatedCost: 0.042, costReductionApplied: ['lightweight_router'] },
+          safetyPlan: { requiresHumanReview: true },
+        },
+      });
+
+      expect(mockAiQueryRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organizationId: '11111111-1111-1111-1111-111111111111',
+          workspaceId: '22222222-2222-2222-2222-222222222222',
+          assetId: 'differential-ai',
+          agentId: 'cardiology-agent',
+          modelClass: 'standard',
+          modelVersion: 'gpt-4o-mini',
+          routingExpert: 'cardiology',
+          retrievalPolicy: 'guideline',
+          requiresHumanReview: true,
+          estimatedCost: 0.042,
+          metadata: expect.objectContaining({
+            tenant: expect.objectContaining({
+              organizationId: '11111111-1111-1111-1111-111111111111',
+              workspaceId: '22222222-2222-2222-2222-222222222222',
+            }),
+            aiCommercialization: expect.objectContaining({
+              costReductionApplied: ['lightweight_router'],
+              maxTokens: 1200,
+            }),
+          }),
+        }),
+      );
+      expect(mockPlatformGovernanceService.createReviewItem).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organizationId: '11111111-1111-1111-1111-111111111111',
+          runId: 'run-1',
+          capabilityId: 'cardiology-agent',
+          reviewType: 'clinical_ai',
+          severity: 'high',
+          payload: expect.objectContaining({
+            sourceType: 'ai_query',
+            sourceId: 'query-1',
+            workspaceId: '22222222-2222-2222-2222-222222222222',
+            assetId: 'differential-ai',
+            agentId: 'cardiology-agent',
+            modelVersion: 'gpt-4o-mini',
+          }),
+        }),
+      );
     });
   });
 });

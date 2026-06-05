@@ -28,6 +28,19 @@ flowchart TD
   Advanced["Advanced"] --> AdminDev["Governance, Security, Audit, Developer"]
 ```
 
+## Documentation Wave Alignment
+
+Navigation reduction is the user-facing expression of the SaaS bottleneck architecture. The persistent app chrome should not decide what an organization bought, what a workspace enables, or what a role should see. It should render a small set of stable destinations and let the effective catalog decide promotion, locking, and search ranking.
+
+Shared assumptions for the current redesign wave:
+
+- Primary navigation stays limited to Command Center, Assistant, Tools, and Operations.
+- Product and asset-pack pages explain what can be purchased or installed; they do not become day-to-day operational navigation.
+- Digital Twin, Medical IoT, devices, fleet, hospital map, live map, and alerts are Operations surfaces unless a workspace promotes them.
+- Governance, audit, security, regulatory, system health, feature flags, plugins, data lineage, self diagnostics, and asset administration are Advanced surfaces.
+- Individual calculators, specialty tools, simulation details, patient details, profile subpages, and debug surfaces are searchable/direct-linkable rather than persistent nav peers.
+- All visible, locked, recommended, and hidden states should eventually come from the same asset-aware access decision described in [SaaS Bottleneck Architecture Plan](./saas-bottleneck-architecture-plan.md).
+
 ## Current State Inventory
 
 ### Sidebar And Drawer

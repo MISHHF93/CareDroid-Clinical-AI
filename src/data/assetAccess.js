@@ -11,11 +11,18 @@ import {
   LEGACY_TOOL_ID_ALIASES,
 } from './assetEntitlements';
 import { getUserFacingToolRegistryProjection, TOOL_EXECUTOR_STATUS } from './toolInventory';
+import { resolveEntitlementDecision } from '../services/entitlementService';
+import { ENTITLEMENT_ACCESS_STATES } from '../config/entitlements.config';
 
 export const ASSET_ACCESS_STATES = Object.freeze({
   ALLOWED: 'allowed',
+  DISABLED: 'disabled',
+  BETA: 'beta',
+  EXPERIMENTAL: 'experimental',
   HIDDEN: 'hidden',
   LOCKED: 'locked',
+  SUBSCRIPTION_REQUIRED: 'subscription-required',
+  ADMIN_ONLY: 'admin-only',
   RESTRICTED: 'restricted',
   REQUIRES_ADMIN: 'requires-admin',
   REQUIRES_REVIEW: 'requires-review',
@@ -25,8 +32,13 @@ export const ASSET_ACCESS_STATES = Object.freeze({
 
 export const ASSET_ACCESS_LABELS = Object.freeze({
   [ASSET_ACCESS_STATES.ALLOWED]: 'Available',
+  [ASSET_ACCESS_STATES.DISABLED]: 'Disabled',
+  [ASSET_ACCESS_STATES.BETA]: 'Beta',
+  [ASSET_ACCESS_STATES.EXPERIMENTAL]: 'Experimental',
   [ASSET_ACCESS_STATES.HIDDEN]: 'Hidden',
   [ASSET_ACCESS_STATES.LOCKED]: 'Locked',
+  [ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED]: 'Subscription required',
+  [ASSET_ACCESS_STATES.ADMIN_ONLY]: 'Admin only',
   [ASSET_ACCESS_STATES.RESTRICTED]: 'Restricted',
   [ASSET_ACCESS_STATES.REQUIRES_ADMIN]: 'Admin only',
   [ASSET_ACCESS_STATES.REQUIRES_REVIEW]: 'Review required',
@@ -35,6 +47,44 @@ export const ASSET_ACCESS_LABELS = Object.freeze({
 });
 
 const ADMIN_ONLY_TOOLS = new Set(['audit-logs', 'system-config', 'team-management']);
+const ADMIN_ROLES = new Set(['admin', 'owner']);
+
+function normalizePermission(permission) {
+  return String(permission || '').trim();
+}
+
+function getEffectivePermissions(context = {}) {
+  return new Set(
+    [
+      ...(context?.workspaceState?.effectivePermissions || []),
+      ...(context?.effectivePermissions || []),
+      ...(context?.permissions || []),
+    ].map(normalizePermission).filter(Boolean)
+  );
+}
+
+function getRequiredPermissionPolicy(tool = {}) {
+  const policy = tool.permissionPolicy || tool.requiredPermissions;
+  if (!policy) return { permissions: [], logic: 'all' };
+  if (Array.isArray(policy)) {
+    return { permissions: policy.map(normalizePermission).filter(Boolean), logic: 'all' };
+  }
+  return {
+    permissions: (policy.permissions || policy.requiredPermissions || [])
+      .map(normalizePermission)
+      .filter(Boolean),
+    logic: String(policy.logic || 'all').toLowerCase(),
+  };
+}
+
+function hasPermissionPolicyAccess(tool, context) {
+  const { permissions, logic } = getRequiredPermissionPolicy(tool);
+  if (!permissions.length) return true;
+  const effectivePermissions = getEffectivePermissions(context);
+  if (!effectivePermissions.size) return false;
+  if (logic === 'any') return permissions.some((permission) => effectivePermissions.has(permission));
+  return permissions.every((permission) => effectivePermissions.has(permission));
+}
 
 export function resolveAssetAccessState(tool, context = getPlatformEntitlementContext(), userRole = 'student') {
   const assetId = tool.id || tool.canonicalInventoryId;
@@ -50,9 +100,18 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
     return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: ['user-hidden'] };
   }
 
+  const entitlementDecision = resolveEntitlementDecision(tool, context, userRole);
+  if (!entitlementDecision.isLaunchable) {
+    return {
+      accessState: mapEntitlementState(entitlementDecision.accessState || entitlementDecision.state),
+      reasons: entitlementDecision.reasons || [entitlementDecision.reason].filter(Boolean),
+      decision: entitlementDecision,
+    };
+  }
+
   if (tool.lifecycleState === 'admin-only' || ADMIN_ONLY_TOOLS.has(assetId)) {
-    if (userRole !== 'admin') {
-      return { accessState: ASSET_ACCESS_STATES.REQUIRES_ADMIN, reasons: ['admin-only'] };
+    if (!ADMIN_ROLES.has(userRole)) {
+      return { accessState: ASSET_ACCESS_STATES.ADMIN_ONLY, reasons: ['admin-only'] };
     }
   }
 
@@ -81,11 +140,19 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
     return { accessState: ASSET_ACCESS_STATES.RESTRICTED, reasons: ['workspace'] };
   }
 
+  if (hasOrganization && !hasPermissionPolicyAccess(tool, context)) {
+    return { accessState: ASSET_ACCESS_STATES.RESTRICTED, reasons: ['permission'] };
+  }
+
   if (tool.lifecycleState === 'deprecated') {
     return { accessState: ASSET_ACCESS_STATES.RESTRICTED, reasons: ['deprecated'] };
   }
 
-  return { accessState: ASSET_ACCESS_STATES.ALLOWED, reasons: [] };
+  return {
+    accessState: mapEntitlementState(entitlementDecision.accessState || entitlementDecision.state),
+    reasons: entitlementDecision.reasons || [],
+    decision: entitlementDecision,
+  };
 }
 
 export function projectToolsWithAccess(tools, context, userRole) {
@@ -96,9 +163,8 @@ export function projectToolsWithAccess(tools, context, userRole) {
       accessState: access.accessState,
       accessLabel: ASSET_ACCESS_LABELS[access.accessState] || access.accessState,
       accessReasons: access.reasons,
-      isLaunchable: [ASSET_ACCESS_STATES.ALLOWED, ASSET_ACCESS_STATES.DEMO_ONLY].includes(
-        access.accessState
-      ),
+      accessDecision: access.decision,
+      isLaunchable: isLaunchableAccessState(access.accessState),
     };
   });
 }
@@ -106,8 +172,11 @@ export function projectToolsWithAccess(tools, context, userRole) {
 export function filterVisibleTools(tools, { includeLocked = false, includeDemo = true } = {}) {
   return tools.filter((tool) => {
     if (tool.accessState === ASSET_ACCESS_STATES.HIDDEN) return false;
+    if (tool.accessState === ASSET_ACCESS_STATES.DISABLED) return false;
     if (tool.accessState === ASSET_ACCESS_STATES.REQUIRES_ADMIN) return false;
+    if (tool.accessState === ASSET_ACCESS_STATES.ADMIN_ONLY) return false;
     if (!includeLocked && tool.accessState === ASSET_ACCESS_STATES.LOCKED) return false;
+    if (!includeLocked && tool.accessState === ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED) return false;
     if (!includeDemo && tool.accessState === ASSET_ACCESS_STATES.DEMO_ONLY) return false;
     return true;
   });
@@ -126,7 +195,14 @@ export function groupToolsByAccessView(tools, { favorites = [], recent = [], rec
   return {
     recommended: tools.filter((t) => recSet.has(t.id) && t.accessState !== ASSET_ACCESS_STATES.HIDDEN),
     workspace: tools.filter((t) => t.workspaceFilterable !== false),
-    organization: tools.filter((t) => t.accessState !== ASSET_ACCESS_STATES.LOCKED),
+    organization: tools.filter(
+      (t) =>
+        ![
+          ASSET_ACCESS_STATES.LOCKED,
+          ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED,
+          ASSET_ACCESS_STATES.DISABLED,
+        ].includes(t.accessState)
+    ),
     packs: tools,
     permitted: tools.filter((t) =>
       [ASSET_ACCESS_STATES.ALLOWED, ASSET_ACCESS_STATES.DEMO_ONLY, ASSET_ACCESS_STATES.RESTRICTED].includes(
@@ -136,4 +212,20 @@ export function groupToolsByAccessView(tools, { favorites = [], recent = [], rec
     favorites: tools.filter((t) => favSet.has(t.id)),
     recent: tools.filter((t) => recentSet.has(t.id)),
   };
+}
+
+function mapEntitlementState(state) {
+  if (state === ENTITLEMENT_ACCESS_STATES.ADMIN_ONLY || state === ASSET_ACCESS_STATES.REQUIRES_ADMIN) {
+    return ASSET_ACCESS_STATES.ADMIN_ONLY;
+  }
+  return Object.values(ASSET_ACCESS_STATES).includes(state) ? state : ASSET_ACCESS_STATES.ALLOWED;
+}
+
+function isLaunchableAccessState(state) {
+  return [
+    ASSET_ACCESS_STATES.ALLOWED,
+    ASSET_ACCESS_STATES.BETA,
+    ASSET_ACCESS_STATES.EXPERIMENTAL,
+    ASSET_ACCESS_STATES.DEMO_ONLY,
+  ].includes(state);
 }

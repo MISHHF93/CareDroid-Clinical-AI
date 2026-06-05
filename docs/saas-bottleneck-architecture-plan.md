@@ -28,6 +28,17 @@ flowchart TD
   EffectiveCatalog --> UserExperience["Visible Tools, Workspaces, Assets"]
 ```
 
+## Documentation Wave Alignment
+
+This plan is the control-plane foundation for the current SaaS redesign documentation wave. The companion deliverables should use the same authority model:
+
+- Navigation reduction and route simplification should treat the effective asset catalog as the filter for visible, locked, hidden, and workspace-promoted surfaces.
+- Asset-pack productization should map sellable suites to `Product -> AssetPack -> PlatformAsset`, not to independent route lists.
+- AI commercialization should meter and govern AI through asset IDs, agent IDs, model usage records, and audit events tied back to organizations and workspaces.
+- Digital Twin, Simulation, Governance, Analytics, and One Product plans should all describe product surfaces as assets that can be packaged, entitled, measured, and governed.
+
+The shared migration constraint remains the `toolInventory.js` to `platform_assets` gap. Until every user-facing route or tool has a canonical `PlatformAsset.id`, all downstream plans should label broad visibility as migration behavior rather than final SaaS behavior.
+
 ## Baseline Evidence
 
 This plan intentionally builds on existing repository sources rather than introducing a new product taxonomy.

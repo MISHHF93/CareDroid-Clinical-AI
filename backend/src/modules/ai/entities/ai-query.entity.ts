@@ -60,6 +60,36 @@ export class AIQuery {
   @Column({ type: 'varchar', length: 50, nullable: true })
   feature: string; // e.g., 'chat', 'rag', 'intent-classification'
 
+  @Column({ type: 'uuid', nullable: true })
+  organizationId: string;
+
+  @Column({ type: 'uuid', nullable: true })
+  workspaceId: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  assetId: string;
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  agentId: string;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  modelClass: string; // e.g., 'small', 'standard', 'large'
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  modelVersion: string; // Canonical vendor model name/version used for this run
+
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  routingExpert: string;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  retrievalPolicy: string;
+
+  @Column({ type: 'boolean', default: false })
+  requiresHumanReview: boolean;
+
+  @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+  estimatedCost: number;
+
   @Column({ type: 'varchar', length: 50, nullable: true })
   intentClassified: string; // Primary intent if classified
 

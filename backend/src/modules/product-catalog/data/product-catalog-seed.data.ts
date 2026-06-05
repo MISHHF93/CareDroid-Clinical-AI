@@ -407,6 +407,18 @@ const PRODUCTIZATION_METADATA = {
   },
 };
 
+export const REQUIRED_SELLABLE_PRODUCT_NAMES = [
+  'Emergency Department Suite',
+  'ICU Suite',
+  'Cardiology Suite',
+  'Laboratory Intelligence Suite',
+  'Medical IoT Suite',
+  'Digital Twin Suite',
+  'Simulation & Training Suite',
+  'Governance & Compliance Suite',
+  'Research Suite',
+];
+
 export const SEED_PRODUCTS = [
   {
     id: 'product-emergency-department',

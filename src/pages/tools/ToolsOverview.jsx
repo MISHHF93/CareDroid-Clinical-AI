@@ -27,23 +27,19 @@ import { FEATURE_FLAGS } from '../../config/featureFlags.config';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
+import { recordAssetLaunchUsage, USAGE_EVENT_TYPES } from '../../services/usageMeteringService';
 import './ToolsOverview.css';
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
-  { value: 'recommended', label: 'Recommended for Me' },
-  { value: 'workspace', label: 'My Workspace' },
-  { value: 'organization', label: 'My Organization' },
-  { value: 'permitted', label: 'All Permitted' },
+  { value: 'all', label: 'All' },
+  { value: 'recommended', label: 'Recommended' },
   { value: 'calculator', label: 'Calculators' },
+  { value: 'diagnostics', label: 'Diagnostics' },
   { value: 'ai-workflows', label: 'AI Workflows' },
   { value: 'maps-iot', label: 'Maps & IoT' },
   { value: 'operations', label: 'Operations' },
-  { value: 'simulations', label: 'Simulations' },
-  { value: 'laboratory', label: 'Laboratory' },
-  { value: 'governance', label: 'Governance' },
   { value: 'favorites', label: 'Favorites' },
   { value: 'recent', label: 'Recent' },
-  { value: 'all', label: 'All (incl. locked)' },
 ]);
 
 const TOOL_FILTER_OPTION_VALUES = new Set(TOOL_FILTER_OPTIONS.map((option) => option.value));
@@ -137,6 +133,15 @@ function matchesToolFilter(tool, filter) {
 }
 
 function primaryActionLabel(tool) {
+  if (tool.accessState === ASSET_ACCESS_STATES.DISABLED) return 'Unavailable';
+  if (tool.accessState === ASSET_ACCESS_STATES.LOCKED) return 'Request access';
+  if (tool.accessState === ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED) return 'Upgrade plan';
+  if (tool.accessState === ASSET_ACCESS_STATES.RESTRICTED) return 'Restricted';
+  if (
+    tool.accessState === ASSET_ACCESS_STATES.ADMIN_ONLY ||
+    tool.accessState === ASSET_ACCESS_STATES.REQUIRES_ADMIN
+  )
+    return 'Admin only';
   if (tool.surface === 'chat-assisted' || tool.launchType === 'chat-assisted')
     return 'Start guided chat';
   if (tool.category === 'Calculator' || tool.surface === 'calculator-form')
@@ -156,6 +161,44 @@ function hasMeaningfulAssistantAction(tool) {
 
 function lifecycleLabel(tool) {
   return tool.lifecycleLabel || TOOL_LIFECYCLE_LABELS[tool.lifecycleState] || 'Active';
+}
+
+function accessRestrictionCopy(tool) {
+  if (
+    !tool.accessState ||
+    [ASSET_ACCESS_STATES.ALLOWED, ASSET_ACCESS_STATES.BETA, ASSET_ACCESS_STATES.EXPERIMENTAL].includes(
+      tool.accessState
+    )
+  )
+    return '';
+  if (tool.accessState === ASSET_ACCESS_STATES.DISABLED) {
+    return 'This feature is disabled for the current rollout.';
+  }
+  if (tool.accessState === ASSET_ACCESS_STATES.LOCKED) {
+    return 'This asset is not included in the current organization packs.';
+  }
+  if (tool.accessState === ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED) {
+    return 'This asset requires a higher subscription plan.';
+  }
+  if (tool.accessState === ASSET_ACCESS_STATES.RESTRICTED) {
+    if (tool.accessReasons?.includes('workspace')) {
+      return 'This asset is outside the active workspace.';
+    }
+    if (tool.accessReasons?.includes('permission')) {
+      return 'Your current role or workspace is missing the required permission.';
+    }
+    return 'This asset is restricted in the current context.';
+  }
+  if (
+    tool.accessState === ASSET_ACCESS_STATES.ADMIN_ONLY ||
+    tool.accessState === ASSET_ACCESS_STATES.REQUIRES_ADMIN
+  ) {
+    return 'This asset is available to administrators only.';
+  }
+  if (tool.accessState === ASSET_ACCESS_STATES.HIDDEN) {
+    return 'This asset is hidden by your role or preferences.';
+  }
+  return tool.accessLabel || '';
 }
 
 const ToolsOverview = () => {
@@ -210,12 +253,29 @@ const ToolsOverview = () => {
   );
   const recommendedIds = useMemo(() => recommendations.map((t) => t.id), [recommendations]);
 
-  const tools = useMemo(() => {
+  const accessContext = useMemo(
+    () => ({
+      ...(platformContext || {}),
+      account,
+      activeWorkspace,
+      preferences,
+      workspaceState,
+    }),
+    [account, activeWorkspace, platformContext, preferences, workspaceState]
+  );
+  const accessRole = platformContext?.membership?.role || account?.role || user?.role;
+
+  const allToolsWithAccess = useMemo(() => {
     const projected = FEATURE_FLAGS.platformEntitlements
-      ? getAssetAwareToolProjection(platformContext, user?.role)
+      ? getAssetAwareToolProjection(accessContext, accessRole)
       : getUserFacingToolRegistryProjection();
-    return filterVisibleTools(projected, { includeLocked: false });
-  }, [platformContext, user?.role]);
+    return filterVisibleTools(projected, { includeLocked: true });
+  }, [accessContext, accessRole]);
+
+  const tools = useMemo(
+    () => filterVisibleTools(allToolsWithAccess, { includeLocked: toolFilter === 'all' }),
+    [allToolsWithAccess, toolFilter]
+  );
 
   const accessGroups = useMemo(
     () =>
@@ -304,7 +364,7 @@ const ToolsOverview = () => {
   );
   const filteredTools = useMemo(() => {
     let base = workspaceTools;
-    if (toolFilter === 'recommended') base = accessGroups.recommended;
+    if (toolFilter === 'recommended') base = profileToolGraph.recommendedTools;
     else if (toolFilter === 'workspace') base = accessGroups.workspace;
     else if (toolFilter === 'organization') base = accessGroups.organization;
     else if (toolFilter === 'permitted') base = accessGroups.permitted;
@@ -312,8 +372,7 @@ const ToolsOverview = () => {
     else if (toolFilter === 'recent') base = recentToolItems;
 
     return base.filter((tool) => {
-      if (toolFilter === 'all') return true;
-      if (!matchesToolFilter(tool, toolFilter)) return false;
+      if (toolFilter !== 'all' && !matchesToolFilter(tool, toolFilter)) return false;
       if (!searchQuery) return true;
       return toolSearchBlob(tool).includes(searchQuery);
     });
@@ -322,10 +381,12 @@ const ToolsOverview = () => {
     searchQuery,
     toolFilter,
     accessGroups,
+    profileToolGraph.recommendedTools,
     recentToolItems,
   ]);
 
   const handleToolClick = (tool) => {
+    if (tool.isLaunchable === false) return;
     applyRegistryToolLaunch(tool.id, {
       navigate,
       addMessage,
@@ -343,8 +404,13 @@ const ToolsOverview = () => {
   };
 
   const handleAssistantLaunch = (tool) => {
+    if (tool.isLaunchable === false) return;
     const launch = resolveCatalogLaunch(tool.id);
     recordToolAccess(tool.id);
+    recordAssetLaunchUsage(
+      { registryId: tool.id, mode: 'chat-assisted', pathname: CANONICAL_ROUTES.assistant },
+      { source: 'tools-overview-assistant', eventType: USAGE_EVENT_TYPES.TOOL_LAUNCH }
+    );
     selectTool(tool.id);
     setActiveTool(tool.id);
     addMessage(
@@ -447,6 +513,7 @@ const ToolsOverview = () => {
                 type="button"
                 role="tab"
                 aria-selected={toolFilter === option.value}
+                aria-label={option.value === 'all' ? 'All' : option.label}
                 className={`tools-filter-tab${toolFilter === option.value ? ' tools-filter-tab--active' : ''}`}
                 onClick={() => setToolFilter(option.value)}
               >
@@ -555,7 +622,8 @@ const ToolsOverview = () => {
               onClick={() => handleToolClick(tool)}
               onKeyDown={(event) => handleToolCardKeyDown(event, tool)}
               role="button"
-              tabIndex={0}
+              tabIndex={tool.isLaunchable === false ? -1 : 0}
+              aria-disabled={tool.isLaunchable === false}
             >
               <div className="tool-card-header">
                 <div className="tool-icon">
@@ -639,8 +707,10 @@ const ToolsOverview = () => {
               </div>
 
               <p className="tool-description">{tool.description}</p>
-              {tool.restrictionReason ? (
-                <p className="tool-restriction-note">Unavailable: {tool.restrictionReason}</p>
+              {tool.restrictionReason || tool.isLaunchable === false ? (
+                <p className="tool-restriction-note">
+                  Unavailable: {tool.restrictionReason || accessRestrictionCopy(tool)}
+                </p>
               ) : null}
 
               <div className="tool-features">
@@ -671,7 +741,7 @@ const ToolsOverview = () => {
               <div className="tool-actions">
                 <button
                   className="btn-open-tool"
-                  disabled={Boolean(tool.restrictionReason)}
+                  disabled={Boolean(tool.restrictionReason) || tool.isLaunchable === false}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleToolClick(tool);
@@ -679,7 +749,9 @@ const ToolsOverview = () => {
                 >
                   {primaryActionLabel(tool)} →
                 </button>
-                {hasMeaningfulAssistantAction(tool) && !tool.restrictionReason ? (
+                {hasMeaningfulAssistantAction(tool) &&
+                !tool.restrictionReason &&
+                tool.isLaunchable !== false ? (
                   <button
                     className="btn-chat-tool"
                     onClick={(e) => {

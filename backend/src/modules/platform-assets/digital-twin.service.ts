@@ -1,11 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { FleetService } from '../fleet/fleet.service';
+import { PlatformAssetsService } from './platform-assets.service';
+
+const DIGITAL_TWIN_CAPABILITY_PACKS = {
+  hospitalMap: ['hospital-operations', 'digital-twin-pack'],
+  occupancy: ['hospital-operations', 'digital-twin-pack'],
+  iot: ['hospital-operations', 'medical-iot-pack'],
+  fleet: ['hospital-operations', 'fleet-logistics'],
+  alerts: ['hospital-operations', 'digital-twin-pack', 'medical-iot-pack'],
+};
 
 @Injectable()
 export class DigitalTwinService {
-  constructor(private readonly fleetService: FleetService) {}
+  constructor(
+    private readonly fleetService: FleetService,
+    private readonly platformAssetsService: PlatformAssetsService,
+  ) {}
 
   async getSnapshot(organizationId?: string) {
+    const entitlementPackIds = await this.resolveEntitlementPackIds(organizationId);
+    const capabilities = this.resolveCapabilities(organizationId, entitlementPackIds);
+    const source = this.buildSourceMetadata(organizationId, entitlementPackIds, capabilities);
     let fleetVehicles: Array<{
       id: string;
       label: string;
@@ -44,6 +59,9 @@ export class DigitalTwinService {
 
     return {
       organizationId: organizationId || null,
+      source,
+      capabilities,
+      dataContracts: this.buildDataContracts(source.mode, capabilities),
       sourceLabel: organizationId
         ? `Digital twin for organization ${organizationId}`
         : 'Demo digital twin assembled from hospital map, IoT, fleet, and alert contracts',
@@ -90,5 +108,67 @@ export class DigitalTwinService {
       fleet: fleetVehicles,
       updatedAt: new Date().toISOString(),
     };
+  }
+
+  private async resolveEntitlementPackIds(organizationId?: string) {
+    if (!organizationId) return [];
+    try {
+      const entitlements = await this.platformAssetsService.getOrganizationEntitlements(organizationId);
+      return entitlements.map((row) => row.packId);
+    } catch {
+      return [];
+    }
+  }
+
+  private resolveCapabilities(organizationId: string | undefined, entitlementPackIds: string[]) {
+    if (!organizationId) {
+      return {
+        hospitalMap: true,
+        occupancy: true,
+        iot: true,
+        fleet: true,
+        alerts: true,
+      };
+    }
+    return Object.fromEntries(
+      Object.entries(DIGITAL_TWIN_CAPABILITY_PACKS).map(([capability, packIds]) => [
+        capability,
+        packIds.some((packId) => entitlementPackIds.includes(packId)),
+      ]),
+    );
+  }
+
+  private buildSourceMetadata(
+    organizationId: string | undefined,
+    entitlementPackIds: string[],
+    capabilities: Record<string, boolean>,
+  ) {
+    const mode = organizationId ? 'organization' : 'demo';
+    const liveEligible = Boolean(organizationId && Object.values(capabilities).some(Boolean));
+    return {
+      mode,
+      status: liveEligible ? 'live_contract_ready' : 'demo_contract',
+      liveDataAvailable: false,
+      organizationScoped: Boolean(organizationId),
+      entitlementPackIds,
+      generatedAt: new Date().toISOString(),
+      note: liveEligible
+        ? 'Organization has digital twin capabilities enabled; live integrations can replace demo contracts when connected.'
+        : 'Snapshot uses demo contracts until organization entitlements and integrations are configured.',
+    };
+  }
+
+  private buildDataContracts(mode: string, capabilities: Record<string, boolean>) {
+    return [
+      { domain: 'occupancy', capability: 'occupancy' },
+      { domain: 'hospital-map', capability: 'hospitalMap' },
+      { domain: 'medical-iot', capability: 'iot' },
+      { domain: 'fleet', capability: 'fleet' },
+      { domain: 'alerts', capability: 'alerts' },
+    ].map((contract) => ({
+      ...contract,
+      sourceMode: mode,
+      status: capabilities[contract.capability] ? 'contract-ready' : 'not-entitled',
+    }));
   }
 }

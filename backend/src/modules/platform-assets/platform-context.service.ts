@@ -7,11 +7,13 @@ import { OrganizationMembership } from '../organizations/entities/organization-m
 import { PlatformAssetsService } from './platform-assets.service';
 import { WorkspacesService } from '../workspaces/workspaces.service';
 import { User } from '../users/entities/user.entity';
+import { EntitlementService } from './entitlement.service';
 
 @Injectable()
 export class PlatformContextService {
   constructor(
     private readonly platformAssetsService: PlatformAssetsService,
+    private readonly entitlementService: EntitlementService,
     private readonly workspacesService: WorkspacesService,
     @InjectRepository(UserProfile)
     private readonly profileRepository: Repository<UserProfile>,
@@ -64,8 +66,28 @@ export class PlatformContextService {
         })
       : await this.platformAssetsService.listPacks({ publishedOnly: true });
 
-    const aiAgents = await this.platformAssetsService.listAssets({ assetType: 'ai_agent' });
-    const entitledAgents = aiAgents.filter((agent) => entitledAssetIds.includes(agent.id));
+    const allAssets = await this.platformAssetsService.listAssets({});
+    const accessDecisions = Object.fromEntries(
+      allAssets.map((asset) => [
+        asset.id,
+        this.entitlementService.resolveDecisionFromContext({
+          assetId: asset.id,
+          asset,
+          organization,
+          organizationId: organization?.id,
+          userRole: membership?.role,
+          subscriptionPlan: user.subscription?.tier,
+          entitledAssetIds,
+          entitledPackIds,
+          strictEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
+        }),
+      ]),
+    );
+
+    const aiAgents = allAssets.filter((asset) => asset.assetType === 'ai_agent');
+    const entitledAgents = aiAgents.filter(
+      (agent) => accessDecisions[agent.id]?.isLaunchable && entitledAssetIds.includes(agent.id),
+    );
 
     return {
       organization: organization
@@ -87,6 +109,7 @@ export class PlatformContextService {
       roleProfile,
       entitledPackIds,
       entitledAssetIds,
+      assetAccessDecisions: accessDecisions,
       entitledPacks: packs.filter((pack) => entitledPackIds.includes(pack.id)),
       availablePacks: packs,
       aiAgents: entitledAgents,

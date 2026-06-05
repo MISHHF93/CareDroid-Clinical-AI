@@ -4,10 +4,26 @@
  */
 
 import { apiFetch } from './apiClient';
+import { getTenantContext } from './tenantContextStore';
 import logger from '../utils/logger';
 
-class AnalyticsService {
-  private userId: string | null = null;
+const PRIVACY_BLOCKLIST = new Set([
+  'userId',
+  'email',
+  'name',
+  'patientId',
+  'patientName',
+  'mrn',
+  'note',
+  'notes',
+  'message',
+  'queryText',
+  'freeText',
+  'rawInput',
+]);
+
+export class AnalyticsService {
+  private userIdHash: string | null = null;
   private sessionId: string;
   private enabled: boolean = true;
   private queue: any[] = [];
@@ -51,15 +67,22 @@ class AnalyticsService {
     if (!this.enabled) return;
 
     const eventName = event.eventName || event.event;
-    const parameters = event.parameters || event.properties || {};
+    const tenantProperties = this.getTenantAnalyticsProperties();
+    const parameters = {
+      ...this.sanitizeProperties(event.parameters || event.properties || {}),
+      ...tenantProperties,
+    };
     const timestamp = event.timestamp || new Date().toISOString();
+    const userIdHash =
+      event.userIdHash || this.hashIdentifier(event.userId) || this.userIdHash || undefined;
 
     const enrichedEvent = {
-      ...event,
+      ...this.sanitizeProperties(event),
+      ...tenantProperties,
       eventName,
       parameters,
       timestamp,
-      userId: event.userId || this.userId,
+      ...(userIdHash ? { userIdHash } : {}),
       sessionId: event.sessionId || this.sessionId,
     };
 
@@ -99,18 +122,21 @@ class AnalyticsService {
   setUser(properties: any) {
     if (!this.enabled) return;
 
-    this.userId = properties.userId;
+    this.userIdHash = this.hashIdentifier(properties.userId);
 
-    if ((window as any).analytics) {
-      (window as any).analytics.identify(properties.userId, {
-        email: properties.email,
+    if ((window as any).analytics && this.userIdHash) {
+      (window as any).analytics.identify(this.userIdHash, {
         role: properties.role,
       });
     }
   }
 
   getUserId(): string | null {
-    return this.userId;
+    return this.userIdHash;
+  }
+
+  getUserIdHash(): string | null {
+    return this.userIdHash;
   }
 
   getSessionId(): string {
@@ -160,8 +186,44 @@ class AnalyticsService {
 
   resetSession() {
     this.sessionId = this.generateSessionId();
-    this.userId = null;
+    this.userIdHash = null;
     this.flush();
+  }
+
+  private hashIdentifier(value: unknown): string | null {
+    const input = String(value || '').trim();
+    if (!input) return null;
+    let hash = 2166136261;
+    for (let i = 0; i < input.length; i += 1) {
+      hash ^= input.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return `anon-${(hash >>> 0).toString(16).padStart(8, '0')}`;
+  }
+
+  private sanitizeProperties(input: any): Record<string, any> {
+    if (!input || typeof input !== 'object') return {};
+    return Object.fromEntries(
+      Object.entries(input).filter(([key, value]) => {
+        if (PRIVACY_BLOCKLIST.has(key)) return false;
+        if (['parameters', 'properties'].includes(key)) return false;
+        return ['string', 'number', 'boolean'].includes(typeof value) || value == null;
+      })
+    );
+  }
+
+  private getTenantAnalyticsProperties(): Record<string, any> {
+    const tenant = getTenantContext();
+    if (!tenant) return {};
+
+    return this.sanitizeProperties({
+      organizationId: tenant.organizationId,
+      workspaceId: tenant.workspaceId,
+      role: tenant.role,
+      subscriptionPlan: tenant.subscriptionPlan,
+      tenantSource: tenant.source,
+      isDemoTenant: tenant.isDemoTenant,
+    });
   }
 }
 

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditLog } from '../audit/entities/audit-log.entity';
 import { FleetModule } from '../fleet/fleet.module';
@@ -14,6 +14,8 @@ import { OrganizationEntitlement } from './entities/organization-entitlement.ent
 import { PlatformAsset } from './entities/platform-asset.entity';
 import { RoleProfile } from './entities/role-profile.entity';
 import { DigitalTwinService } from './digital-twin.service';
+import { EntitlementService } from './entitlement.service';
+import { FeatureFlagService } from './feature-flag.service';
 import { OrganizationAnalyticsService } from './organization-analytics.service';
 import { PlatformAssetsController } from './platform-assets.controller';
 import { PlatformAssetsSeedService } from './platform-assets.seed.service';
@@ -32,13 +34,15 @@ import { PlatformContextService } from './platform-context.service';
       UserProfile,
       AuditLog,
     ]),
-    WorkspacesModule,
+    forwardRef(() => WorkspacesModule),
     UserProfileModule,
     FleetModule,
   ],
   controllers: [PlatformAssetsController],
   providers: [
     PlatformAssetsService,
+    FeatureFlagService,
+    EntitlementService,
     PlatformAssetsSeedService,
     PlatformContextService,
     AssetAccessService,
@@ -48,6 +52,8 @@ import { PlatformContextService } from './platform-context.service';
   ],
   exports: [
     PlatformAssetsService,
+    FeatureFlagService,
+    EntitlementService,
     PlatformContextService,
     AssetAccessService,
     AssetRecommendationService,

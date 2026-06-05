@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   RawBodyRequest,
+  Query,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -16,8 +17,11 @@ import { Request } from 'express';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { CustomerPortalDto } from './dto/customer-portal.dto';
+import { RecordUsageEventDto } from './dto/record-usage-event.dto';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
+import { Permission } from '../auth/enums/permission.enum';
+import { OrganizationScoped, TenantScoped } from '../tenant-context/tenant-scope.decorator';
 
 @ApiTags('subscriptions')
 @Controller('subscriptions')
@@ -79,6 +83,34 @@ export class SubscriptionsController {
   @ApiResponse({ status: 200, description: 'Current subscription' })
   async getCurrentSubscription(@Req() req: any) {
     return this.subscriptionsService.getUserSubscription(req.user.id);
+  }
+
+  @Get('billing')
+  @UseGuards(AuthGuard('jwt'))
+  @OrganizationScoped({ admin: 'organization', permissions: [Permission.MANAGE_SUBSCRIPTIONS] })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get organization billing overview and current usage against plan limits' })
+  async getBillingOverview(@Req() req: any) {
+    return this.subscriptionsService.getBillingOverview(req.user.id, req.tenantContext);
+  }
+
+  @Get('usage')
+  @UseGuards(AuthGuard('jwt'))
+  @OrganizationScoped({ admin: 'organization', permissions: [Permission.VIEW_ANALYTICS] })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get organization usage summary by workspace, asset, role, and period' })
+  async getUsageSummary(@Req() req: any, @Query('period') period?: string) {
+    return this.subscriptionsService.getUsageSummary(req.tenantContext, period || 'month');
+  }
+
+  @Post('usage/events')
+  @UseGuards(AuthGuard('jwt'))
+  @TenantScoped()
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Record a frontend-visible usage event such as a tool launch' })
+  async recordUsageEvent(@Req() req: any, @Body() dto: RecordUsageEventDto) {
+    const usageEvent = await this.subscriptionsService.recordUsageEvent(req.tenantContext, dto);
+    return { ok: true, id: usageEvent?.id || null };
   }
 
   @Post('webhook')

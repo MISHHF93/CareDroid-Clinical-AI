@@ -49,8 +49,9 @@ export default function FeatureFlagCenter() {
           <p className="feature-flag-eyebrow">Governance rollout control</p>
           <h1>Feature Flag Center</h1>
           <p>
-            Enable, disable, beta, experiment with, or hide platform features without modifying
-            application code. Runtime overrides are stored separately from the bundled defaults.
+            Feature flags control rollout posture. Entitlements and payment still decide whether a
+            visible feature can be launched, so locked or subscription-required features are never
+            treated as fully usable by these local demo overrides.
           </p>
         </div>
         <button type="button" className="feature-flag-reset" onClick={resetFlags}>
@@ -68,8 +69,8 @@ export default function FeatureFlagCenter() {
           <strong>{summary.liveRolloutCount}</strong>
         </div>
         <div>
-          <span>Hidden or disabled</span>
-          <strong>{summary.hiddenOrDisabledCount}</strong>
+          <span>Unavailable</span>
+          <strong>{summary.unavailableCount}</strong>
         </div>
         {Object.entries(FEATURE_FLAG_STATE_LABELS).map(([state, label]) => (
           <div key={state}>

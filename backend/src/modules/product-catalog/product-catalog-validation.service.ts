@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AssetPack } from '../platform-assets/entities/asset-pack.entity';
 import { PlatformAsset } from '../platform-assets/entities/platform-asset.entity';
+import { PlatformAssetLifecycle } from '../platform-assets/enums/platform-asset.enums';
+import { REQUIRED_SELLABLE_PRODUCT_NAMES } from './data/product-catalog-seed.data';
 import { Product } from './entities/product.entity';
 import { SpecialtyCatalog } from './entities/specialty-catalog.entity';
 import { CarePathway } from './entities/care-pathway.entity';
@@ -30,8 +32,25 @@ export class ProductCatalogValidationService {
     const assetIds = new Set(assets.map((a) => a.id));
     const packs = await this.packRepository.find();
     const packMap = new Map(packs.map((p) => [p.id, p]));
+    const packagedAssetIds = new Set<string>();
+
+    for (const pack of packs) {
+      for (const assetId of pack.assetIds || []) {
+        if (!assetIds.has(assetId)) {
+          errors.push(`Pack ${pack.slug}: unknown asset ${assetId}`);
+        }
+        packagedAssetIds.add(assetId);
+      }
+    }
 
     const products = await this.productRepository.find();
+    const productNames = new Set(products.map((product) => product.name));
+    for (const requiredName of REQUIRED_SELLABLE_PRODUCT_NAMES) {
+      if (!productNames.has(requiredName)) {
+        errors.push(`Missing required sellable product ${requiredName}`);
+      }
+    }
+
     for (const product of products) {
       for (const packId of product.packIds || []) {
         if (!packMap.has(packId)) {
@@ -48,6 +67,12 @@ export class ProductCatalogValidationService {
         } else if (packAssetUnion.size && !packAssetUnion.has(assetId)) {
           errors.push(`Product ${product.slug}: highlight ${assetId} not in pack union`);
         }
+      }
+    }
+
+    for (const asset of assets) {
+      if (!packagedAssetIds.has(asset.id) && !this.isExplicitlyInternalAsset(asset)) {
+        errors.push(`Asset ${asset.id}: not assigned to any pack or marked internal/developer-only`);
       }
     }
 
@@ -77,5 +102,18 @@ export class ProductCatalogValidationService {
     }
 
     return { valid: errors.length === 0, errors };
+  }
+
+  private isExplicitlyInternalAsset(asset: PlatformAsset): boolean {
+    const governance = asset.governance || {};
+    return (
+      asset.lifecycle === PlatformAssetLifecycle.ADMIN_ONLY ||
+      governance.internal === true ||
+      governance.developerOnly === true ||
+      governance.visibility === 'internal' ||
+      governance.visibility === 'developer-only' ||
+      governance.audience === 'internal' ||
+      governance.audience === 'developer-only'
+    );
   }
 }

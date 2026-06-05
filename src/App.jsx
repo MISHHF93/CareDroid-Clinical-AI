@@ -10,6 +10,7 @@ import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { UserIdentityProvider } from './contexts/UserIdentityContext';
 import { CostTrackingProvider } from './contexts/CostTrackingContext';
 import { SystemConfigProvider } from './contexts/SystemConfigContext';
+import { TenantContextProvider, TenantRequired } from './contexts/TenantContext';
 import OfflineProvider from './contexts/OfflineProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import PermissionGate from './components/PermissionGate';
@@ -123,6 +124,8 @@ const ProfileToolPreferences = lazyWithRetry(
 const ProfileWorkspaces = lazyWithRetry(() => import('./pages/profile/ProfileWorkspaces'));
 const ProfileSecurity = lazyWithRetry(() => import('./pages/profile/ProfileSecurity'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
+const BillingPage = lazyWithRetry(() => import('./pages/BillingPage'));
+const UsagePage = lazyWithRetry(() => import('./pages/UsagePage'));
 const {
   OrganizationDashboard,
   OrganizationSettings,
@@ -155,6 +158,7 @@ const Welcome = lazyWithRetry(() => import('./pages/Welcome'));
 const {
   ProductsIndexPage,
   ProductDetailPage,
+  AssetPacksBuilderPage,
   CommercialPlansPage,
   SpecialtiesIndexPage,
   SpecialtyDetailPage,
@@ -172,6 +176,11 @@ const {
   ),
   ProductDetailPage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ProductDetailPage }))
+  ),
+  AssetPacksBuilderPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({
+      default: m.AssetPacksBuilderPage,
+    }))
   ),
   CommercialPlansPage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({ default: m.CommercialPlansPage }))
@@ -561,7 +570,11 @@ function AppRoutes() {
     }
 
     if (requiresAuth) {
-      return <AppShellPage>{resolvedElement}</AppShellPage>;
+      return (
+        <TenantRequired>
+          <AppShellPage>{resolvedElement}</AppShellPage>
+        </TenantRequired>
+      );
     }
 
     return resolvedElement;
@@ -1292,6 +1305,16 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/billing',
+      element: <BillingPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/usage',
+      element: <UsagePage />,
+      requiresAuth: true,
+    },
+    {
       path: '/organization',
       element: <OrganizationDashboard />,
       requiresAuth: true,
@@ -1358,6 +1381,11 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/asset-packs',
+      element: <AssetPacksBuilderPage />,
+      requiresAuth: true,
+    },
+    {
       path: '/plans',
       element: <CommercialPlansPage />,
       requiresAuth: true,
@@ -1421,9 +1449,11 @@ function AppRoutes() {
 
     {
       path: '/privacy',
-      element: <PlatformGovernanceWorkspace />,
-      requiresAuth: true,
-      permission: Permission.VIEW_PRIVACY_CENTER,
+      element: (
+        <PublicShell>
+          <PrivacyPolicy />
+        </PublicShell>
+      ),
     },
     {
       path: '/legal/privacy',
@@ -1853,20 +1883,22 @@ function App() {
             <WorkspaceProvider>
               <CostTrackingProvider>
                 <ToolPreferencesProvider>
-                  <UserIdentityProvider>
-                    <ConversationProvider>
-                      <SystemConfigProvider>
-                        <OfflineProvider>
-                          <ErrorBoundary>
-                            <Suspense fallback={<PageLoader />}>
-                              <AppRoutes />
-                            </Suspense>
-                            <NotificationToasts />
-                          </ErrorBoundary>
-                        </OfflineProvider>
-                      </SystemConfigProvider>
-                    </ConversationProvider>
-                  </UserIdentityProvider>
+                  <TenantContextProvider>
+                    <UserIdentityProvider>
+                      <ConversationProvider>
+                        <SystemConfigProvider>
+                          <OfflineProvider>
+                            <ErrorBoundary>
+                              <Suspense fallback={<PageLoader />}>
+                                <AppRoutes />
+                              </Suspense>
+                              <NotificationToasts />
+                            </ErrorBoundary>
+                          </OfflineProvider>
+                        </SystemConfigProvider>
+                      </ConversationProvider>
+                    </UserIdentityProvider>
+                  </TenantContextProvider>
                 </ToolPreferencesProvider>
               </CostTrackingProvider>
             </WorkspaceProvider>

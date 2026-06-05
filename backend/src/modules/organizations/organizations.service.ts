@@ -147,6 +147,10 @@ export class OrganizationsService {
     return this.assertMember(userId, organizationId);
   }
 
+  async assertAdminForUser(userId: string, organizationId: string) {
+    return this.assertAdmin(userId, organizationId);
+  }
+
   async updateConfiguration(user: User, organizationId: string, config: Record<string, unknown>) {
     await this.assertAdmin(user.id, organizationId);
     const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
@@ -161,6 +165,7 @@ export class OrganizationsService {
       },
       navigation: config.navigation ?? current.navigation,
       enabledAgentIds: config.enabledAgentIds ?? current.enabledAgentIds,
+      enabledProductIds: config.enabledProductIds ?? current.enabledProductIds,
       dashboardLayout: config.dashboardLayout ?? current.dashboardLayout,
       permissionsOverrides: config.permissionsOverrides ?? current.permissionsOverrides,
       workspaceDefaults: config.workspaceDefaults ?? current.workspaceDefaults,

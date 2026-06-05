@@ -31,6 +31,18 @@ This plan defines ten sellable packs aligned with the existing product catalog a
 - Governance & Compliance Suite
 - Research Suite
 
+## Documentation Wave Alignment
+
+Asset-pack productization is the commercial layer for the broader SaaS redesign wave. The pack definitions below should be read together with:
+
+- [SaaS Bottleneck Architecture Plan](./saas-bottleneck-architecture-plan.md) for organization, workspace, role, entitlement, and effective catalog authority.
+- [AI Commercialization Layer Plan](./ai-commercialization-layer-plan.md) for packaging AI workflows, model routing, usage limits, safety gates, and audit events inside each suite.
+- [Hospital Digital Twin Roadmap](./hospital-digital-twin-roadmap.md) for the Digital Twin, Medical IoT, Fleet & EMS, and operations-facing suite boundaries.
+- [Simulation Business Line Plan](./simulation-business-line-plan.md) for standalone training and competency packaging.
+- [Compliance Governance Roadmap](./compliance-governance-roadmap.md) for enterprise controls required before hospital procurement conversations.
+
+Each suite should keep three layers distinct: the buyer-facing product promise, the entitlement-backed asset pack, and the underlying backend/frontend capability. A suite is sellable only when those layers can be traced without a hidden route or inventory-only launch path bypassing the asset registry.
+
 ## Productization Principles
 
 - `core-platform` is a prerequisite for all suites. It provides authentication, dashboard shell, assistant, search, calculators, protocols, drug checking, AI agents, and shared navigation.

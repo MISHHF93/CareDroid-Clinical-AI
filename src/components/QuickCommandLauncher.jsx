@@ -2,6 +2,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import { useUser } from '../contexts/UserContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { FEATURE_FLAGS } from '../config/featureFlags.config';
+import { getAssetAwareToolProjection } from '../data/assetAccess';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { CARE_WORKSPACES } from '../config/workspace.config';
 import { QUICK_COMMAND_DESTINATION_ITEMS } from '../config/navigation.config';
@@ -103,7 +107,7 @@ export function buildQuickCommandEntries({
   const navEntries = navItems.map(makeNavEntry);
   const navPathSet = new Set(navEntries.map((entry) => entry.path).filter(Boolean));
   const allToolEntries = tools
-    .filter((tool) => tool?.id && !isPrimaryShellDuplicate(tool, navPathSet))
+    .filter((tool) => tool?.id && tool.isLaunchable !== false && !isPrimaryShellDuplicate(tool, navPathSet))
     .map(makeToolEntry);
   const toolById = Object.fromEntries(allToolEntries.map((entry) => [entry.sourceId, entry]));
   const seenRecentIds = new Set();
@@ -174,12 +178,37 @@ export default function QuickCommandLauncher({
   const navigate = useNavigate();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recentTools, favorites, recordToolAccess } = useToolPreferences();
+  const { user } = useUser();
+  const { account, activeWorkspace, preferences, platformContext, workspaceState } = useUserIdentity();
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
+  const accessContext = useMemo(
+    () => ({
+      ...(platformContext || {}),
+      account,
+      activeWorkspace,
+      preferences,
+      workspaceState,
+    }),
+    [account, activeWorkspace, platformContext, preferences, workspaceState]
+  );
+  const accessRole = platformContext?.membership?.role || account?.role || user?.role;
+  const commandTools = useMemo(
+    () =>
+      FEATURE_FLAGS.platformEntitlements
+        ? getAssetAwareToolProjection(accessContext, accessRole)
+        : getUserFacingToolRegistryProjection(),
+    [accessContext, accessRole]
+  );
   const entries = useMemo(
-    () => buildQuickCommandEntries({ recentToolIds: recentTools, favoriteToolIds: favorites }),
-    [favorites, recentTools]
+    () =>
+      buildQuickCommandEntries({
+        tools: commandTools,
+        recentToolIds: recentTools,
+        favoriteToolIds: favorites,
+      }),
+    [commandTools, favorites, recentTools]
   );
 
   useEffect(() => {

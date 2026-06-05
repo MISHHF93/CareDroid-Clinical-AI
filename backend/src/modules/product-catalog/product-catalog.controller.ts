@@ -33,16 +33,81 @@ export class ProductCatalogController {
     return this.productCatalogService.getPackToProductMap();
   }
 
+  @Get('products/builder')
+  @ApiOperation({ summary: 'List product builder graphs with packs, assets, routes, and services' })
+  async productBuilder(@Req() req: any, @Query('organizationId') organizationId?: string) {
+    if (organizationId) {
+      await this.organizationsService.assertMemberForUser(req.user.id, organizationId);
+    }
+    return this.productCatalogService.getProductBuilderGraph(
+      undefined,
+      organizationId || req.tenantContext?.organizationId,
+      {
+        userRole: req.tenantContext?.role || req.user?.role,
+        subscriptionPlan: req.tenantContext?.subscriptionPlan || req.user?.subscription?.tier,
+      },
+    );
+  }
+
   @Get('products/:slug')
   @ApiOperation({ summary: 'Get product by slug' })
   getProduct(@Param('slug') slug: string) {
     return this.productCatalogService.getProductBySlug(slug);
   }
 
+  @Get('products/:slug/builder')
+  @ApiOperation({ summary: 'Get product builder graph with packs, assets, routes, and services' })
+  async productBuilderDetail(
+    @Req() req: any,
+    @Param('slug') slug: string,
+    @Query('organizationId') organizationId?: string,
+  ) {
+    if (organizationId) {
+      await this.organizationsService.assertMemberForUser(req.user.id, organizationId);
+    }
+    return this.productCatalogService.getProductBuilderGraph(
+      slug,
+      organizationId || req.tenantContext?.organizationId,
+      {
+        userRole: req.tenantContext?.role || req.user?.role,
+        subscriptionPlan: req.tenantContext?.subscriptionPlan || req.user?.subscription?.tier,
+      },
+    );
+  }
+
+  @Get('asset-packs')
+  @ApiOperation({ summary: 'List asset pack builder graphs with products and assets' })
+  async assetPackBuilder(@Req() req: any, @Query('organizationId') organizationId?: string) {
+    if (organizationId) {
+      await this.organizationsService.assertMemberForUser(req.user.id, organizationId);
+    }
+    return this.productCatalogService.getAssetPackBuilderGraph(
+      organizationId || req.tenantContext?.organizationId,
+      {
+        userRole: req.tenantContext?.role || req.user?.role,
+        subscriptionPlan: req.tenantContext?.subscriptionPlan || req.user?.subscription?.tier,
+      },
+    );
+  }
+
   @Get('products/:slug/assets')
   @ApiOperation({ summary: 'Resolve product assets via packs' })
-  getProductAssets(@Param('slug') slug: string, @Query('organizationId') organizationId?: string) {
-    return this.productCatalogService.getProductAssets(slug, organizationId);
+  async getProductAssets(
+    @Req() req: any,
+    @Param('slug') slug: string,
+    @Query('organizationId') organizationId?: string,
+  ) {
+    if (organizationId) {
+      await this.organizationsService.assertMemberForUser(req.user.id, organizationId);
+    }
+    return this.productCatalogService.getProductAssets(
+      slug,
+      organizationId || req.tenantContext?.organizationId,
+      {
+        userRole: req.tenantContext?.role || req.user?.role,
+        subscriptionPlan: req.tenantContext?.subscriptionPlan || req.user?.subscription?.tier,
+      },
+    );
   }
 
   @Get('commercial-plans')
@@ -107,7 +172,10 @@ export class ProductCatalogController {
 
   @Post('maturity-assessments')
   @ApiOperation({ summary: 'Submit maturity assessment and get product recommendations' })
-  submitMaturity(@Body() dto: SubmitMaturityAssessmentDto) {
+  async submitMaturity(@Req() req: any, @Body() dto: SubmitMaturityAssessmentDto) {
+    if (dto.organizationId) {
+      await this.organizationsService.assertMemberForUser(req.user.id, dto.organizationId);
+    }
     return this.maturityAssessmentService.submitAssessment(dto);
   }
 
@@ -129,6 +197,22 @@ export class ProductCatalogController {
       req.user,
       organizationId,
       dto as Record<string, unknown>,
+    );
+  }
+
+  @Patch('organizations/:organizationId/commercial-plan')
+  @ApiOperation({ summary: 'Reconcile organization entitlements from a commercial plan' })
+  async reconcileCommercialPlan(
+    @Req() req: any,
+    @Param('organizationId') organizationId: string,
+    @Body('commercialPlanId') commercialPlanId: string,
+    @Body('disableRemovedPacks') disableRemovedPacks?: boolean,
+  ) {
+    await this.organizationsService.assertAdminForUser(req.user.id, organizationId);
+    return this.productCatalogService.reconcileOrganizationCommercialPlan(
+      organizationId,
+      commercialPlanId,
+      { disableRemovedPacks },
     );
   }
 

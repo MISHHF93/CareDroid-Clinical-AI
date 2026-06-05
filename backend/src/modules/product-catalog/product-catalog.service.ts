@@ -5,6 +5,8 @@ import { PlatformAsset } from '../platform-assets/entities/platform-asset.entity
 import { AssetPack } from '../platform-assets/entities/asset-pack.entity';
 import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
 import { PlatformAssetType } from '../platform-assets/enums/platform-asset.enums';
+import { EntitlementService } from '../platform-assets/entitlement.service';
+import { Organization } from '../workspaces/entities/organization.entity';
 import { CarePathway } from './entities/care-pathway.entity';
 import { CommercialPlan } from './entities/commercial-plan.entity';
 import { IntegrationOffering } from './entities/integration-offering.entity';
@@ -28,7 +30,10 @@ export class ProductCatalogService {
     private readonly assetRepository: Repository<PlatformAsset>,
     @InjectRepository(AssetPack)
     private readonly packRepository: Repository<AssetPack>,
+    @InjectRepository(Organization)
+    private readonly organizationRepository: Repository<Organization>,
     private readonly platformAssetsService: PlatformAssetsService,
+    private readonly entitlementService: EntitlementService,
   ) {}
 
   async getPackToProductMap(): Promise<Record<string, { slug: string; name: string }[]>> {
@@ -43,6 +48,103 @@ export class ProductCatalogService {
     return map;
   }
 
+  async getProductBuilderGraph(
+    slug?: string,
+    organizationId?: string,
+    options: { userRole?: string; subscriptionPlan?: string } = {},
+  ) {
+    const products = slug
+      ? [await this.getProductBySlug(slug)]
+      : await this.productRepository.find({ order: { sortOrder: 'ASC' } });
+
+    const packIds = [...new Set(products.flatMap((product) => product.packIds || []))];
+    const packs = packIds.length
+      ? await this.packRepository.find({ where: { id: In(packIds) }, order: { name: 'ASC' } })
+      : [];
+    const packMap = new Map(packs.map((pack) => [pack.id, pack]));
+
+    const assetIds = [
+      ...new Set([
+        ...products.flatMap((product) => product.highlightAssetIds || []),
+        ...packs.flatMap((pack) => pack.assetIds || []),
+      ]),
+    ];
+    const assets = assetIds.length
+      ? await this.assetRepository.find({ where: { id: In(assetIds) }, order: { title: 'ASC' } })
+      : [];
+    const assetMap = new Map(assets.map((asset) => [asset.id, asset]));
+
+    const context = await this.buildBuilderAccessContext(organizationId);
+
+    const productGraphs = products.map((product) => {
+      const productPackIds = product.packIds || [];
+      const productAssetIds = new Set<string>(product.highlightAssetIds || []);
+      productPackIds.forEach((packId) => {
+        packMap.get(packId)?.assetIds?.forEach((assetId) => productAssetIds.add(assetId));
+      });
+
+      const productAssets = [...productAssetIds]
+        .map((assetId) => assetMap.get(assetId))
+        .filter(Boolean) as PlatformAsset[];
+
+      return {
+        product: this.serializeProduct(product),
+        packs: productPackIds.map((packId) =>
+          this.serializeBuilderPack(packMap.get(packId), product.id, assetMap, context, options),
+        ),
+        assets: productAssets.map((asset) =>
+          this.serializeBuilderAsset(asset, context, options, productPackIds),
+        ),
+        routes: productAssets
+          .filter((asset) => asset.route)
+          .map((asset) => ({
+            assetId: asset.id,
+            title: asset.title,
+            route: asset.route,
+            launchType: asset.launchType,
+          })),
+        backendServices: [
+          ...new Set(productAssets.flatMap((asset) => this.resolveBackendServices(asset))),
+        ],
+      };
+    });
+
+    return slug ? productGraphs[0] : productGraphs;
+  }
+
+  async getAssetPackBuilderGraph(
+    organizationId?: string,
+    options: { userRole?: string; subscriptionPlan?: string } = {},
+  ) {
+    const [products, packs] = await Promise.all([
+      this.productRepository.find({ order: { sortOrder: 'ASC' } }),
+      this.packRepository.find({ order: { name: 'ASC' } }),
+    ]);
+    const assetIds = [...new Set(packs.flatMap((pack) => pack.assetIds || []))];
+    const assets = assetIds.length
+      ? await this.assetRepository.find({ where: { id: In(assetIds) }, order: { title: 'ASC' } })
+      : [];
+    const assetMap = new Map(assets.map((asset) => [asset.id, asset]));
+    const productMap = new Map<string, Product[]>();
+
+    products.forEach((product) => {
+      product.packIds?.forEach((packId) => {
+        productMap.set(packId, [...(productMap.get(packId) || []), product]);
+      });
+    });
+
+    const context = await this.buildBuilderAccessContext(organizationId);
+
+    return packs.map((pack) => ({
+      ...this.serializeBuilderPack(pack, undefined, assetMap, context, options),
+      products: (productMap.get(pack.id) || []).map((product) => ({
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+      })),
+    }));
+  }
+
   async listProducts(publishedOnly = true) {
     const rows = await this.productRepository.find({ order: { sortOrder: 'ASC' } });
     return publishedOnly ? rows.filter((r) => r.isPublished) : rows;
@@ -54,7 +156,11 @@ export class ProductCatalogService {
     return product;
   }
 
-  async getProductAssets(slug: string, organizationId?: string) {
+  async getProductAssets(
+    slug: string,
+    organizationId?: string,
+    options: { userRole?: string; subscriptionPlan?: string } = {},
+  ) {
     const product = await this.getProductBySlug(slug);
     const packs = await this.packRepository.find({
       where: { id: In(product.packIds) },
@@ -63,12 +169,17 @@ export class ProductCatalogService {
     product.highlightAssetIds?.forEach((id) => assetIdSet.add(id));
     packs.forEach((pack) => pack.assetIds?.forEach((id) => assetIdSet.add(id)));
 
-    let entitledIds: Set<string> | null = null;
+    let organization: Organization | null = null;
+    let entitledAssetIds: string[] = [];
+    let entitledPackIds: string[] = [];
     if (organizationId) {
-      const entitled = await this.platformAssetsService.resolveEntitledAssetIds({
+      organization = await this.organizationRepository.findOne({ where: { id: organizationId } });
+      entitledAssetIds = await this.platformAssetsService.resolveEntitledAssetIds({
         organizationId,
       });
-      entitledIds = new Set(entitled);
+      entitledPackIds = (await this.platformAssetsService.getOrganizationEntitlements(organizationId)).map(
+        (row) => row.packId,
+      );
     }
 
     const assets = await this.assetRepository.find({
@@ -76,7 +187,26 @@ export class ProductCatalogService {
       order: { title: 'ASC' },
     });
 
-    const filtered = entitledIds ? assets.filter((a) => entitledIds!.has(a.id)) : assets;
+    const serializedAssets = assets.map((asset) => {
+      const access = this.entitlementService.resolveDecisionFromContext({
+        assetId: asset.id,
+        asset,
+        organization,
+        organizationId,
+        userRole: options.userRole,
+        subscriptionPlan: options.subscriptionPlan,
+        entitledAssetIds,
+        entitledPackIds,
+        strictEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
+      });
+      return {
+        ...this.serializeAsset(asset),
+        access,
+        entitlementStatus: access.isLaunchable ? 'entitled' : access.state,
+        isVisible: access.isVisible,
+        isLaunchable: access.isLaunchable,
+      };
+    });
 
     return {
       product: this.serializeProduct(product),
@@ -91,8 +221,8 @@ export class ProductCatalogService {
         pricingTier: p.pricingTier,
         salesMetadata: p.salesMetadata,
       })),
-      assets: filtered.map((a) => this.serializeAsset(a)),
-      assetsByType: this.groupAssetsByType(filtered),
+      assets: serializedAssets,
+      assetsByType: this.groupSerializedAssetsByType(serializedAssets),
     };
   }
 
@@ -186,6 +316,60 @@ export class ProductCatalogService {
     return [...packIds];
   }
 
+  async reconcileOrganizationCommercialPlan(
+    organizationId: string,
+    commercialPlanId: string,
+    options: { disableRemovedPacks?: boolean } = {},
+  ) {
+    const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    if (!org) throw new NotFoundException('Organization not found');
+
+    const targetPackIds = new Set(await this.resolvePackIdsForPlan(commercialPlanId));
+    targetPackIds.add('core-platform');
+
+    const installedPackIds: string[] = [];
+    const failedPackIds: string[] = [];
+    for (const packId of targetPackIds) {
+      try {
+        await this.platformAssetsService.installPackForOrganization(organizationId, packId);
+        installedPackIds.push(packId);
+      } catch {
+        failedPackIds.push(packId);
+      }
+    }
+
+    const disabledPackIds: string[] = [];
+    if (options.disableRemovedPacks) {
+      const current = await this.platformAssetsService.getOrganizationEntitlements(organizationId);
+      for (const entitlement of current) {
+        if (!targetPackIds.has(entitlement.packId) && entitlement.packId !== 'core-platform') {
+          const result = await this.platformAssetsService.removePackFromOrganization(
+            organizationId,
+            entitlement.packId,
+          );
+          if (result.removed) disabledPackIds.push(entitlement.packId);
+        }
+      }
+    }
+
+    org.settings = {
+      ...(org.settings || {}),
+      commercialPlanId,
+      commercialPlanReconciledAt: new Date().toISOString(),
+      commercialPlanPackIds: [...targetPackIds],
+    };
+    await this.organizationRepository.save(org);
+
+    return {
+      organizationId,
+      commercialPlanId,
+      targetPackIds: [...targetPackIds],
+      installedPackIds,
+      failedPackIds,
+      disabledPackIds,
+    };
+  }
+
   private buildPathwaySteps(
     pathway: CarePathway,
     assetMap: Map<string, ReturnType<typeof this.serializeAsset>>,
@@ -216,6 +400,145 @@ export class ProductCatalogService {
     return Object.fromEntries(
       Object.entries(groups).map(([type, rows]) => [type, rows.map((a) => this.serializeAsset(a))]),
     );
+  }
+
+  private groupSerializedAssetsByType(assets: Array<Record<string, any>>) {
+    const groups: Record<string, typeof assets> = {};
+    for (const asset of assets) {
+      const key = asset.assetType || 'tool';
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(asset);
+    }
+    return groups;
+  }
+
+  private async buildBuilderAccessContext(organizationId?: string) {
+    if (!organizationId) {
+      return {
+        organization: null as Organization | null,
+        entitledAssetIds: [] as string[],
+        entitledPackIds: [] as string[],
+      };
+    }
+
+    const organization = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    const entitledAssetIds = await this.platformAssetsService.resolveEntitledAssetIds({
+      organizationId,
+    });
+    const entitledPackIds = (
+      await this.platformAssetsService.getOrganizationEntitlements(organizationId)
+    ).map((row) => row.packId);
+
+    return { organization, entitledAssetIds, entitledPackIds };
+  }
+
+  private serializeBuilderPack(
+    pack: AssetPack | undefined,
+    productId: string | undefined,
+    assetMap: Map<string, PlatformAsset>,
+    context: {
+      organization: Organization | null;
+      entitledAssetIds: string[];
+      entitledPackIds: string[];
+    },
+    options: { userRole?: string; subscriptionPlan?: string },
+  ) {
+    if (!pack) {
+      return {
+        id: null,
+        missing: true,
+        assets: [],
+      };
+    }
+
+    const assets = (pack.assetIds || [])
+      .map((assetId) => assetMap.get(assetId))
+      .filter(Boolean) as PlatformAsset[];
+
+    return {
+      id: pack.id,
+      name: pack.name,
+      slug: pack.slug,
+      description: pack.description,
+      productId,
+      organizationTypes: pack.organizationTypes,
+      targetRoles: pack.targetRoles,
+      assetIds: pack.assetIds,
+      requiredDependencies: pack.requiredDependencies,
+      defaultModules: pack.defaultModules,
+      pricingTier: pack.pricingTier,
+      salesMetadata: pack.salesMetadata,
+      isPublished: pack.isPublished,
+      assets: assets.map((asset) =>
+        this.serializeBuilderAsset(asset, context, options, [pack.id]),
+      ),
+    };
+  }
+
+  private serializeBuilderAsset(
+    asset: PlatformAsset,
+    context: {
+      organization: Organization | null;
+      entitledAssetIds: string[];
+      entitledPackIds: string[];
+    },
+    options: { userRole?: string; subscriptionPlan?: string },
+    fallbackPackIds: string[] = [],
+  ) {
+    const packIds = asset.packIds?.length ? asset.packIds : fallbackPackIds;
+    const access = this.entitlementService.resolveDecisionFromContext({
+      assetId: asset.id,
+      asset,
+      organization: context.organization,
+      organizationId: context.organization?.id,
+      userRole: options.userRole,
+      subscriptionPlan: options.subscriptionPlan,
+      entitledAssetIds: context.entitledAssetIds,
+      entitledPackIds: context.entitledPackIds,
+      strictEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
+    });
+
+    return {
+      ...this.serializeAsset(asset),
+      packIds,
+      dependencies: asset.dependencies,
+      backendStatus: asset.backendStatus,
+      demoStatus: asset.demoStatus,
+      lifecycle: asset.lifecycle,
+      pricingTier: asset.pricingTier,
+      governance: asset.governance,
+      route: asset.route,
+      backendServices: this.resolveBackendServices(asset),
+      access,
+      isLaunchable: access.isLaunchable,
+    };
+  }
+
+  private resolveBackendServices(asset: PlatformAsset): string[] {
+    const services = new Set<string>();
+
+    if (asset.backendStatus) services.add(`backend:${asset.backendStatus}`);
+    if (asset.assetType === PlatformAssetType.AI_AGENT || asset.route === '/assistant') {
+      services.add('AiModule');
+    }
+    if (asset.route?.startsWith('/tools') || asset.assetType === PlatformAssetType.CALCULATOR) {
+      services.add('ClinicalTools');
+    }
+    if (asset.assetType === PlatformAssetType.MAP || asset.id.includes('twin')) {
+      services.add('DigitalTwinService');
+    }
+    if (asset.assetType === PlatformAssetType.IOT || asset.id.includes('device')) {
+      services.add('PlatformAssetsService');
+    }
+    if (asset.assetType === PlatformAssetType.FLEET || asset.id.includes('fleet')) {
+      services.add('FleetOperations');
+    }
+    if (asset.assetType === PlatformAssetType.GOVERNANCE || asset.id.includes('audit')) {
+      services.add('PlatformGovernanceService');
+    }
+
+    if (!services.size) services.add('PlatformAssetsService');
+    return [...services];
   }
 
   private serializeProduct(product: Product) {

@@ -18,6 +18,22 @@ function routeBlock(path) {
 }
 
 describe('App clinical-intelligence route permissions', () => {
+  it('wraps authenticated routes in TenantRequired before rendering the app shell', () => {
+    expect(appSource).toContain("import { TenantContextProvider, TenantRequired }");
+    expect(appSource).toContain('<TenantRequired>');
+    expect(appSource).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
+  });
+
+  it.each(['/dashboard', '/tools', '/assistant', '/profile', '/organization'])(
+    '%s is an authenticated tenant-gated route',
+    (path) => {
+      const block = routeBlock(path);
+
+      expect(block).toContain(`path: '${path}'`);
+      expect(block).toContain('requiresAuth: true');
+    },
+  );
+
   it.each([
     '/tools/ambient-scribe',
     '/tools/differential-ai',
@@ -52,7 +68,7 @@ describe('App clinical-intelligence route permissions', () => {
     ['/regulatory', ['VIEW_REGULATORY']],
     ['/equity', ['VIEW_EQUITY_METRICS']],
     ['/human-review', ['VIEW_REVIEW_QUEUE']],
-    ['/privacy', ['VIEW_PRIVACY_CENTER']],
+    ['/governance/privacy', ['VIEW_PRIVACY_CENTER']],
     ['/integrations', ['VIEW_INTEGRATIONS']],
     ['/system-health', ['VIEW_OPERATIONS', 'VIEW_OBSERVABILITY']],
     ['/governance/clinical', ['VIEW_GOVERNANCE']],

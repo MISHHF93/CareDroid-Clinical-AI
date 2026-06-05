@@ -35,6 +35,7 @@ import {
   buildStreamUrl,
   getStoredAccessToken,
 } from './apiClient';
+import { clearTenantContext, setTenantContext } from './tenantContextStore';
 
 describe('getStoredAccessToken', () => {
   beforeEach(() => {
@@ -66,6 +67,7 @@ describe('apiFetch auth header', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     localStorage.clear();
+    clearTenantContext();
   });
 
   it('injects Authorization when token is stored', async () => {
@@ -75,6 +77,53 @@ describe('apiFetch auth header', () => {
       expect.objectContaining({
         headers: expect.objectContaining({
           Authorization: 'Bearer test-jwt',
+        }),
+      }),
+    );
+  });
+
+  it('injects tenant headers for CareDroid API requests', async () => {
+    setTenantContext({
+      organizationId: 'org-1',
+      workspaceId: 'workspace-1',
+      userId: 'user-1',
+      role: 'physician',
+      subscriptionPlan: 'institutional',
+      source: 'resolved',
+    });
+
+    await apiFetch('/api/config/system');
+
+    expect(fetch).toHaveBeenCalledWith(
+      '/api/config/system',
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          'X-CareDroid-Organization-Id': 'org-1',
+          'X-CareDroid-Workspace-Id': 'workspace-1',
+          'X-CareDroid-User-Id': 'user-1',
+          'X-CareDroid-Role': 'physician',
+          'X-CareDroid-Subscription-Plan': 'institutional',
+        }),
+      }),
+    );
+  });
+
+  it('does not inject tenant headers into third-party absolute URLs', async () => {
+    setTenantContext({
+      organizationId: 'org-1',
+      workspaceId: 'workspace-1',
+      userId: 'user-1',
+      role: 'physician',
+      subscriptionPlan: 'institutional',
+    });
+
+    await apiFetch('https://example.invalid/collect');
+
+    expect(fetch).toHaveBeenCalledWith(
+      'https://example.invalid/collect',
+      expect.objectContaining({
+        headers: expect.not.objectContaining({
+          'X-CareDroid-Organization-Id': 'org-1',
         }),
       }),
     );
@@ -121,5 +170,25 @@ describe('apiFetchJson', () => {
 describe('apiAxios', () => {
   it('registers request interceptors for path and auth', () => {
     expect(apiAxios.interceptors.request.handlers.length).toBeGreaterThan(0);
+  });
+
+  it('injects tenant headers in axios requests', () => {
+    setTenantContext({
+      organizationId: 'org-1',
+      workspaceId: 'workspace-1',
+      userId: 'user-1',
+      role: 'physician',
+      subscriptionPlan: 'professional',
+    });
+
+    const interceptor = apiAxios.interceptors.request.handlers[0].fulfilled;
+    const config = interceptor({ url: '/config/system', headers: {} });
+
+    expect(config.headers).toMatchObject({
+      'X-CareDroid-Organization-Id': 'org-1',
+      'X-CareDroid-Workspace-Id': 'workspace-1',
+      'X-CareDroid-Subscription-Plan': 'professional',
+    });
+    clearTenantContext();
   });
 });

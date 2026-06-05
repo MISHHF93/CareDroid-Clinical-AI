@@ -1,7 +1,8 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditModule } from '../audit/audit.module';
 import { PermissionsModule } from '../permissions/permissions.module';
+import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 import { Organization } from './entities/organization.entity';
 import { UserWorkspaceState } from './entities/user-workspace-state.entity';
 import { WorkspaceInvitation } from './entities/workspace-invitation.entity';
@@ -21,6 +22,7 @@ import { WorkspacesService } from './workspaces.service';
     ]),
     AuditModule,
     PermissionsModule,
+    forwardRef(() => PlatformAssetsModule),
   ],
   controllers: [WorkspacesController],
   providers: [WorkspacesService],

@@ -12,6 +12,10 @@ import {
 } from '../data/clinicalCatalogWiring';
 import { resolveToolInventoryRecord, TOOL_LAUNCH_TYPES } from '../data/toolInventory';
 import {
+  ASSET_ACCESS_STATES,
+  resolveAssetAccessState,
+} from '../data/assetAccess';
+import {
   getCalculatorRouteBySlug,
   isKnownToolAreaPath,
   isRegisteredCalculatorSlug,
@@ -20,10 +24,8 @@ import {
 import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
 import {
   getPlatformEntitlementContext,
-  isAssetEntitled,
-  isLaunchAllowedForWorkspace,
-  LEGACY_TOOL_ID_ALIASES,
 } from '../data/assetEntitlements';
+import { recordAssetLaunchUsage } from '../services/usageMeteringService';
 
 /**
  * @typedef {'calculator-route'|'chat-assisted'|'tool-page'|'calculator-hub'|'fallback'} RegistryToolLaunchMode
@@ -152,20 +154,40 @@ export function getRegistryToolNavigation(toolId) {
  * @returns {RegistryToolNavigationPlan}
  */
 export function isRegistryToolLaunchAllowed(toolId) {
+  return resolveRegistryToolLaunchAccess(toolId).allowed;
+}
+
+export function resolveRegistryToolLaunchAccess(toolId, context = getPlatformEntitlementContext()) {
   const registryId = resolveRegistryId(toolId) || toolId;
-  const ctx = getPlatformEntitlementContext();
-  if (!isAssetEntitled(registryId, ctx)) return false;
-  const enabledToolIds = ctx?.legacyToolAliases || [];
-  if (enabledToolIds.length) {
-    return isLaunchAllowedForWorkspace(registryId, enabledToolIds, LEGACY_TOOL_ID_ALIASES);
-  }
-  return true;
+  const inventoryRecord = resolveToolInventoryRecord(registryId) || resolveToolInventoryRecord(toolId);
+  const tool = inventoryRecord || { id: registryId, canonicalInventoryId: registryId };
+  const userRole =
+    context?.user?.role || context?.account?.role || context?.membership?.role || context?.role || 'student';
+  const access = resolveAssetAccessState(
+    { ...tool, id: registryId, canonicalInventoryId: tool.canonicalInventoryId || registryId },
+    context,
+    userRole
+  );
+  return {
+    ...access,
+    registryId,
+    allowed: [
+      ASSET_ACCESS_STATES.ALLOWED,
+      ASSET_ACCESS_STATES.BETA,
+      ASSET_ACCESS_STATES.EXPERIMENTAL,
+      ASSET_ACCESS_STATES.DEMO_ONLY,
+    ].includes(access.accessState),
+  };
 }
 
 export function applyRegistryToolLaunch(toolId, handlers) {
-  if (!isRegistryToolLaunchAllowed(toolId)) {
+  const launchAccess = resolveRegistryToolLaunchAccess(toolId);
+  if (!launchAccess.allowed) {
     handlers.navigate?.(
-      { pathname: TOOL_LAUNCH_PATHS.toolsOverview, search: '?entitlement=denied' },
+      {
+        pathname: TOOL_LAUNCH_PATHS.toolsOverview,
+        search: `?entitlement=denied&reason=${encodeURIComponent(launchAccess.accessState)}`,
+      },
       { replace: true },
     );
     return getRegistryToolNavigation(toolId);
@@ -185,6 +207,7 @@ export function applyRegistryToolLaunch(toolId, handlers) {
     recordToolAccess?.(plan.registryId);
     selectTool?.(plan.registryId);
     setActiveTool?.(plan.registryId);
+    recordAssetLaunchUsage(plan, { source: 'registry-tool-launch' });
   }
 
   if (plan.shouldSeedChat && plan.launch?.chatSeed) {

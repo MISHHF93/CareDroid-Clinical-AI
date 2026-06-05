@@ -28,6 +28,18 @@ flowchart TD
   Pages --> LocalScroll["Allowed Local Scroll Areas"]
 ```
 
+## Documentation Wave Alignment
+
+Route and layout simplification is the structural foundation for the current redesign wave. The target route tree should support the same product model described in the SaaS, navigation, asset-pack, AI, digital twin, simulation, governance, analytics, and one-product plans.
+
+Shared assumptions:
+
+- `src/config/routes.config.js` should remain the canonical home for stable routes, aliases, route records, and generated redirects.
+- `src/config/navigation.config.js` should remain the presentation-level navigation projection while route knowledge is migrated toward generated data.
+- `src/layout/AppShell.jsx` should own authenticated chrome, global header utilities, sidebar/drawer state, Quick Command, workspace switcher placement, and the single main scrollport.
+- Product plans should not introduce new top-level route families unless they map to Command Center, Assistant, Tools, Operations, Account, or Advanced.
+- Direct links for sellable assets remain valid, but route access should resolve through the asset-aware launch and entitlement policy rather than through route existence alone.
+
 ## Current Ownership
 
 | Concern | Current source | Target role |

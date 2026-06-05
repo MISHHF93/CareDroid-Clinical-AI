@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { useTheme } from './ThemeContext';
 import { useToolPreferences } from './ToolPreferencesContext';
 import { useUser } from './UserContext';
+import { useTenantContext } from './TenantContext';
 import { useWorkspace } from './WorkspaceContext';
 import { UserIdentityApi } from '../services/userIdentityApi';
 import { PlatformAssetsApi } from '../services/platformAssetsApi';
@@ -152,6 +153,7 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
 
 export const UserIdentityProvider = ({ children }) => {
   const { user, isAuthenticated, authToken } = useUser();
+  const { refreshTenantContext } = useTenantContext();
   const { workspaces: localWorkspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
   const toolPrefs = useToolPreferences();
   const { preference: themePreference, setPreference } = useTheme();
@@ -267,10 +269,11 @@ export const UserIdentityProvider = ({ children }) => {
         ...(current || fallbackProfile),
         workspace: normalized.workspace,
       }));
+      await refreshTenantContext();
       setError('');
       return { ok: true, data: normalized.workspace, message: '' };
     },
-    [fallbackProfile, normalizeProfile],
+    [fallbackProfile, normalizeProfile, refreshTenantContext],
   );
 
   const savePreferences = useCallback(

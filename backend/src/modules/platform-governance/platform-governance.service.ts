@@ -466,6 +466,7 @@ export class PlatformGovernanceService {
   async createReviewItem(input: Partial<PlatformReviewItem>) {
     const item = await this.reviewItems.save(
       this.reviewItems.create({
+        organizationId: input.organizationId,
         patientId: input.patientId,
         runId: input.runId,
         capabilityId: input.capabilityId || 'clinical-governance',

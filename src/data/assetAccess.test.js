@@ -43,6 +43,7 @@ describe('assetAccess', () => {
     setPlatformEntitlementContext({
       organization: { id: 'org-1' },
       entitledAssetIds: ['qsofa', 'news2'],
+      entitledPackIds: ['core-platform'],
       legacyToolAliases: ['qsofa'],
     });
     const tool = { id: 'news2', lifecycleState: 'active', executorStatus: 'registered' };
@@ -55,11 +56,70 @@ describe('assetAccess', () => {
 
   it('admin-only tools require admin role', () => {
     setPlatformEntitlementContext(null);
-    const tool = { id: 'audit-logs', lifecycleState: 'admin-only' };
+    const tool = { id: 'system-config', lifecycleState: 'admin-only' };
     expect(resolveAssetAccessState(tool, null, 'student').accessState).toBe(
-      ASSET_ACCESS_STATES.REQUIRES_ADMIN
+      ASSET_ACCESS_STATES.ADMIN_ONLY
     );
     expect(resolveAssetAccessState(tool, null, 'admin').accessState).toBe(ASSET_ACCESS_STATES.ALLOWED);
+  });
+
+  it('blocks disabled rollout before entitlement checks', () => {
+    const tool = { id: 'dispatch-ai', lifecycleState: 'active', executorStatus: 'registered' };
+    expect(
+      resolveAssetAccessState(
+        tool,
+        {
+          organization: {
+            id: 'org-1',
+            settings: { featureFlagOverrides: { 'fleet-command': 'disabled' } },
+          },
+          entitledAssetIds: ['dispatch-ai'],
+          entitledPackIds: ['fleet-logistics'],
+          subscriptionPlan: 'professional',
+        },
+        'physician'
+      ).accessState
+    ).toBe(ASSET_ACCESS_STATES.DISABLED);
+  });
+
+  it('marks paid features as subscription-required when plan is too low', () => {
+    const tool = { id: 'simulation-suite', lifecycleState: 'active', executorStatus: 'registered' };
+    expect(
+      resolveAssetAccessState(
+        tool,
+        {
+          organization: { id: 'org-1' },
+          entitledAssetIds: ['simulation-suite'],
+          entitledPackIds: ['research-education'],
+          subscriptionPlan: 'free',
+        },
+        'physician'
+      ).accessState
+    ).toBe(ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED);
+  });
+
+  it('honors server access decisions from platform context', () => {
+    const tool = { id: 'qsofa', lifecycleState: 'active', executorStatus: 'registered' };
+    expect(
+      resolveAssetAccessState(
+        tool,
+        {
+          organization: { id: 'org-1' },
+          assetAccessDecisions: {
+            qsofa: {
+              state: 'locked',
+              isVisible: true,
+              isLaunchable: false,
+              reason: 'asset-not-entitled',
+            },
+          },
+        },
+        'physician'
+      )
+    ).toMatchObject({
+      accessState: ASSET_ACCESS_STATES.LOCKED,
+      reasons: ['asset-not-entitled'],
+    });
   });
 
   it('filterVisibleTools hides hidden state', () => {
@@ -80,5 +140,41 @@ describe('assetAccess', () => {
     );
     expect(row.accessLabel).toBeTruthy();
     expect(row.accessState).toBe(ASSET_ACCESS_STATES.ALLOWED);
+  });
+
+  it('restricts assets when required permission policy is not satisfied', () => {
+    const tool = {
+      id: 'patient-summary-ai',
+      lifecycleState: 'active',
+      executorStatus: 'registered',
+      permissionPolicy: { permissions: ['READ_PHI', 'USE_AI_CHAT'], logic: 'all' },
+    };
+
+    expect(
+      resolveAssetAccessState(
+        tool,
+        {
+          organization: { id: 'org-1' },
+          entitledAssetIds: ['patient-summary-ai'],
+          workspaceState: { effectivePermissions: ['USE_AI_CHAT'] },
+        },
+        'physician'
+      )
+    ).toEqual({
+      accessState: ASSET_ACCESS_STATES.RESTRICTED,
+      reasons: ['permission'],
+    });
+
+    expect(
+      resolveAssetAccessState(
+        tool,
+        {
+          organization: { id: 'org-1' },
+          entitledAssetIds: ['patient-summary-ai'],
+          workspaceState: { effectivePermissions: ['READ_PHI', 'USE_AI_CHAT'] },
+        },
+        'physician'
+      ).accessState
+    ).toBe(ASSET_ACCESS_STATES.ALLOWED);
   });
 });

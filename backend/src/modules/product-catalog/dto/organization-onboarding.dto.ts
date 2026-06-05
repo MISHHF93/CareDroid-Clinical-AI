@@ -49,6 +49,11 @@ export class OrganizationOnboardingDto {
   productIds?: string[];
 
   @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  enabledProductIds?: string[];
+
+  @IsOptional()
   @IsEnum(CommercialPlanId)
   commercialPlanId?: CommercialPlanId;
 
@@ -66,12 +71,17 @@ export class OrganizationOnboardingDto {
   defaultRoleProfileId?: string;
 
   @IsOptional()
+  @IsString()
+  complianceMode?: string;
+
+  @IsOptional()
   @IsArray()
   workspaceSetups?: Array<{
     name: string;
     type: string;
     enabledToolIds?: string[];
     enabledModules?: string[];
+    emergencyModeEnabled?: boolean;
   }>;
 
   @IsOptional()

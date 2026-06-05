@@ -11,8 +11,12 @@ import { User } from '../../users/entities/user.entity';
 
 export enum SubscriptionTier {
   FREE = 'free',
+  STARTER = 'starter',
   PROFESSIONAL = 'professional',
   INSTITUTIONAL = 'institutional',
+  ENTERPRISE = 'enterprise',
+  ACADEMIC = 'academic',
+  GOVERNMENT = 'government',
 }
 
 export enum SubscriptionStatus {

@@ -40,6 +40,8 @@ export const CANONICAL_ROUTES = Object.freeze({
   profileSettings: '/profile/settings',
   profileToolPreferences: '/profile/tool-preferences',
   settings: '/settings',
+  billing: '/billing',
+  usage: '/usage',
   notifications: '/notifications',
   timeline: '/timeline',
   workflows: '/workflows',
@@ -63,6 +65,7 @@ export const CANONICAL_ROUTES = Object.freeze({
   organizationAssets: '/settings/organization/assets',
   platformAnalytics: '/platform-analytics',
   products: '/products',
+  assetPacks: '/asset-packs',
   plans: '/plans',
   specialties: '/specialties',
   carePathways: '/care-pathways',
@@ -118,7 +121,7 @@ export const FLEET_MAP_ROUTE_ALIASES = Object.freeze([
 export const OPERATIONS_ROUTE_ALIASES = Object.freeze([]);
 export const AUDIT_ROUTE_ALIASES = Object.freeze(['/audit-logs']);
 export const HOME_ROUTE_ALIASES = Object.freeze(['/home']);
-export const ORGANIZATION_PACKS_ROUTE_ALIASES = Object.freeze(['/asset-packs']);
+export const ORGANIZATION_PACKS_ROUTE_ALIASES = Object.freeze([]);
 
 export const ROUTE_RECORDS = Object.freeze([
   Object.freeze({
@@ -247,6 +250,39 @@ export const ROUTE_RECORDS = Object.freeze([
     navGroup: 'advanced',
   }),
   Object.freeze({
+    id: 'assetPacks',
+    path: CANONICAL_ROUTES.assetPacks,
+    componentKey: 'AssetPacksBuilderPage',
+    layout: 'app',
+    auth: 'required',
+    status: 'active',
+    aliases: [],
+    navGroup: 'products',
+    notes: 'Sellable asset pack builder and product mapping view.',
+  }),
+  Object.freeze({
+    id: 'billing',
+    path: CANONICAL_ROUTES.billing,
+    componentKey: 'BillingPage',
+    layout: 'app',
+    auth: 'required',
+    status: 'active',
+    aliases: [],
+    navGroup: 'account',
+    notes: 'Organization subscription billing and plan limit overview.',
+  }),
+  Object.freeze({
+    id: 'usage',
+    path: CANONICAL_ROUTES.usage,
+    componentKey: 'UsagePage',
+    layout: 'app',
+    auth: 'required',
+    status: 'active',
+    aliases: [],
+    navGroup: 'operations',
+    notes: 'Organization usage metering by workspace, asset, role, and period.',
+  }),
+  Object.freeze({
     id: 'organizationPacks',
     path: CANONICAL_ROUTES.organizationPacks,
     componentKey: 'PackMarketplace',
@@ -255,7 +291,7 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: ORGANIZATION_PACKS_ROUTE_ALIASES,
     navGroup: 'organization',
-    notes: 'Canonical organization pack marketplace; /asset-packs is a legacy redirect.',
+    notes: 'Organization-specific pack marketplace and entitlement management.',
   }),
   Object.freeze({
     id: 'workflows',
@@ -329,6 +365,10 @@ export const ROUTE_ALIAS_GROUPS = Object.freeze({
     aliases: aliasesForRoute('operations'),
   }),
   audit: Object.freeze({ target: CANONICAL_ROUTES.audit, aliases: aliasesForRoute('audit') }),
+  assetPacks: Object.freeze({
+    target: CANONICAL_ROUTES.assetPacks,
+    aliases: aliasesForRoute('assetPacks'),
+  }),
   organizationPacks: Object.freeze({
     target: CANONICAL_ROUTES.organizationPacks,
     aliases: aliasesForRoute('organizationPacks'),
