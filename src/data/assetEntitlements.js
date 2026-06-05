@@ -50,6 +50,13 @@ export function isPlatformEntitlementsEnabled() {
   return FEATURE_FLAGS.platformEntitlements !== false;
 }
 
+export function isStrictSaasEntitlementsEnabled(context = cachedEntitlementContext) {
+  if (context?.strictSaasEntitlements !== undefined) {
+    return Boolean(context.strictSaasEntitlements);
+  }
+  return FEATURE_FLAGS.strictSaasEntitlements === true;
+}
+
 export function shouldFilterByEntitlements() {
   if (!isPlatformEntitlementsEnabled()) return false;
   const ctx = cachedEntitlementContext;
@@ -60,7 +67,7 @@ export function shouldFilterByEntitlements() {
 export function isAssetEntitled(assetId, context = cachedEntitlementContext) {
   if (!shouldFilterByEntitlements()) return true;
   const entitled = new Set(context?.entitledAssetIds || []);
-  if (!entitled.size) return true;
+  if (!entitled.size) return !isStrictSaasEntitlementsEnabled(context);
   return entitled.has(assetId);
 }
 
@@ -71,6 +78,7 @@ export function filterToolsByEntitlements(tools, context = cachedEntitlementCont
   return tools.filter((tool) => {
     const id = tool.id || tool.canonicalInventoryId;
     if (hidden.has(id)) return false;
+    if (!entitled.size) return !isStrictSaasEntitlementsEnabled(context);
     return entitled.has(id);
   });
 }

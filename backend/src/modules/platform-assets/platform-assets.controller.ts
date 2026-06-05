@@ -12,9 +12,13 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { OrganizationMembership, OrganizationMembershipRole } from '../organizations/entities/organization-membership.entity';
+import {
+  OrganizationMembership,
+  OrganizationMembershipRole,
+} from '../organizations/entities/organization-membership.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { UserRole } from '../users/entities/user.entity';
 import { DigitalTwinService } from './digital-twin.service';
 import { OrganizationAnalyticsService } from './organization-analytics.service';
 import { PlatformAssetLifecycle } from './enums/platform-asset.enums';
@@ -127,7 +131,8 @@ export class PlatformAssetsController {
 
   @Get('organizations/:organizationId/entitlements')
   @ApiOperation({ summary: 'List organization pack entitlements' })
-  async orgEntitlements(@Param('organizationId') organizationId: string) {
+  async orgEntitlements(@Req() req: any, @Param('organizationId') organizationId: string) {
+    await this.assertOrgMember(req.user.id, organizationId);
     return this.platformAssetsService.getOrganizationEntitlements(organizationId);
   }
 
@@ -154,24 +159,35 @@ export class PlatformAssetsController {
   }
 
   private async assertOrgAdmin(userId: string, organizationId: string) {
-    const membership = await this.membershipRepository.findOne({
-      where: { userId, organizationId },
-    });
+    const membership = await this.assertOrgMember(userId, organizationId);
     if (
-      !membership ||
-      (membership.role !== OrganizationMembershipRole.ADMIN &&
-        membership.role !== OrganizationMembershipRole.OWNER)
+      membership.role !== OrganizationMembershipRole.ADMIN &&
+      membership.role !== OrganizationMembershipRole.OWNER
     ) {
       throw new ForbiddenException('Organization admin access required');
     }
   }
 
+  private async assertOrgMember(userId: string, organizationId: string) {
+    const membership = await this.membershipRepository.findOne({
+      where: { userId, organizationId },
+    });
+    if (!membership) {
+      throw new ForbiddenException('Organization membership required');
+    }
+    return membership;
+  }
+
   @Patch('assets/:assetId/lifecycle')
   @ApiOperation({ summary: 'Update platform asset lifecycle state' })
   async updateLifecycle(
+    @Req() req: any,
     @Param('assetId') assetId: string,
     @Body('lifecycle') lifecycle: PlatformAssetLifecycle,
   ) {
+    if (req.user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Platform admin access required');
+    }
     return this.platformAssetsService.updateAssetLifecycle(assetId, lifecycle);
   }
 
@@ -180,12 +196,16 @@ export class PlatformAssetsController {
   async digitalTwin(@Req() req: any, @Query('organizationId') organizationId?: string) {
     const ctx = await this.platformContextService.getContextForUser(req.user);
     const orgId = organizationId || ctx.organization?.id;
+    if (orgId) {
+      await this.assertOrgMember(req.user.id, orgId);
+    }
     return this.digitalTwinService.getSnapshot(orgId);
   }
 
   @Get('organizations/:organizationId/analytics')
   @ApiOperation({ summary: 'Organization-scoped analytics summary' })
-  async organizationAnalytics(@Param('organizationId') organizationId: string) {
+  async organizationAnalytics(@Req() req: any, @Param('organizationId') organizationId: string) {
+    await this.assertOrgMember(req.user.id, organizationId);
     return this.organizationAnalyticsService.getOrganizationSummary(organizationId);
   }
 }

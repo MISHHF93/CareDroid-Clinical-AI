@@ -9,6 +9,7 @@ import { PlatformAsset } from './entities/platform-asset.entity';
 import { PlatformAssetsService } from './platform-assets.service';
 import { UserPreferencesService } from '../user-profile/user-preferences.service';
 import { PlatformContextService } from './platform-context.service';
+import { LEGACY_TOOL_ID_ALIASES } from './data/platform-asset-seed.data';
 
 export interface AssetAccessRecord {
   assetId: string;
@@ -27,6 +28,7 @@ export class AssetAccessService {
   async getUserAssetAccess(user: User, assetIds?: string[]) {
     const ctx = await this.platformContextService.getContextForUser(user);
     const entitled = new Set(ctx.entitledAssetIds || []);
+    const workspaceEnabled = new Set(this.resolveWorkspaceAssetIds(ctx.legacyToolAliases || []));
     const prefs = await this.userPreferencesService.getPreferences(user.id);
     const pinned = new Set([
       ...(prefs.toolPreferences?.pinnedAssetIds || []),
@@ -53,6 +55,8 @@ export class AssetAccessService {
         hidden: userHidden,
         asset: assetById.get(assetId),
         hasOrganization: Boolean(ctx.organization?.id),
+        strictEntitlements: Boolean(ctx.strictSaasEntitlements),
+        workspaceEnabled,
       }),
     );
 
@@ -77,10 +81,13 @@ export class AssetAccessService {
       hidden: Set<string>;
       asset?: PlatformAsset;
       hasOrganization: boolean;
+      strictEntitlements: boolean;
+      workspaceEnabled: Set<string>;
     },
   ): AssetAccessRecord {
     const reasons: string[] = [];
-    const { user, entitled, hidden, asset, hasOrganization } = params;
+    const { user, entitled, hidden, asset, hasOrganization, strictEntitlements, workspaceEnabled } =
+      params;
 
     if (hidden.has(assetId)) {
       return { assetId, accessState: AssetAccessState.HIDDEN, reasons: ['user-hidden'] };
@@ -123,7 +130,7 @@ export class AssetAccessService {
       asset?.demoStatus === 'demo' ||
       asset?.backendStatus === BackendAssetStatus.DEMO
     ) {
-      if (hasOrganization && !entitled.has(assetId)) {
+      if (hasOrganization && (strictEntitlements || entitled.size > 0) && !entitled.has(assetId)) {
         return {
           assetId,
           accessState: AssetAccessState.LOCKED,
@@ -137,11 +144,19 @@ export class AssetAccessService {
       };
     }
 
-    if (hasOrganization && entitled.size > 0 && !entitled.has(assetId)) {
+    if (hasOrganization && (strictEntitlements || entitled.size > 0) && !entitled.has(assetId)) {
       return {
         assetId,
         accessState: AssetAccessState.LOCKED,
         reasons: ['not-in-entitled-packs'],
+      };
+    }
+
+    if (workspaceEnabled.size > 0 && !workspaceEnabled.has(assetId)) {
+      return {
+        assetId,
+        accessState: AssetAccessState.RESTRICTED,
+        reasons: ['workspace-not-enabled'],
       };
     }
 
@@ -154,5 +169,14 @@ export class AssetAccessService {
     }
 
     return { assetId, accessState: AssetAccessState.ALLOWED, reasons };
+  }
+
+  private resolveWorkspaceAssetIds(enabledToolIds: string[]) {
+    const resolved = new Set<string>();
+    for (const legacyId of enabledToolIds || []) {
+      const aliases = LEGACY_TOOL_ID_ALIASES[legacyId] || [legacyId];
+      aliases.forEach((id) => resolved.add(id));
+    }
+    return [...resolved];
   }
 }

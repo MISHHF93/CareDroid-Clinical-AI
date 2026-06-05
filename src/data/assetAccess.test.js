@@ -26,6 +26,33 @@ describe('assetAccess', () => {
     setPlatformEntitlementContext(null);
   });
 
+  it('locks organization assets with empty entitlements in strict SaaS mode', () => {
+    setPlatformEntitlementContext({
+      organization: { id: 'org-1' },
+      entitledAssetIds: [],
+      strictSaasEntitlements: true,
+    });
+    const tool = { id: 'qsofa', lifecycleState: 'active', executorStatus: 'registered' };
+    expect(resolveAssetAccessState(tool, getPlatformEntitlementContext(), 'physician').accessState).toBe(
+      ASSET_ACCESS_STATES.LOCKED
+    );
+    setPlatformEntitlementContext(null);
+  });
+
+  it('marks assets outside the active workspace as restricted', () => {
+    setPlatformEntitlementContext({
+      organization: { id: 'org-1' },
+      entitledAssetIds: ['qsofa', 'news2'],
+      legacyToolAliases: ['qsofa'],
+    });
+    const tool = { id: 'news2', lifecycleState: 'active', executorStatus: 'registered' };
+    expect(resolveAssetAccessState(tool, getPlatformEntitlementContext(), 'physician')).toEqual({
+      accessState: ASSET_ACCESS_STATES.RESTRICTED,
+      reasons: ['workspace'],
+    });
+    setPlatformEntitlementContext(null);
+  });
+
   it('admin-only tools require admin role', () => {
     setPlatformEntitlementContext(null);
     const tool = { id: 'audit-logs', lifecycleState: 'admin-only' };

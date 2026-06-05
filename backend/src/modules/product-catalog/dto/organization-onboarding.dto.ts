@@ -70,6 +70,7 @@ export class OrganizationOnboardingDto {
   workspaceSetups?: Array<{
     name: string;
     type: string;
+    enabledToolIds?: string[];
     enabledModules?: string[];
   }>;
 

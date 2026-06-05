@@ -86,12 +86,17 @@ export class OrganizationOnboardingService {
 
     for (const ws of dto.workspaceSetups || []) {
       try {
-        await this.workspacesService.createWorkspace(user, {
-          name: ws.name,
-          type: ws.type as any,
-          displayName: ws.name,
-          enabledModules: ws.enabledModules,
-        });
+        await this.workspacesService.createWorkspace(
+          user,
+          {
+            name: ws.name,
+            type: ws.type as any,
+            displayName: ws.name,
+            enabledToolIds: ws.enabledToolIds,
+            enabledModules: ws.enabledModules,
+          },
+          { organizationId: org.id },
+        );
       } catch {
         // optional
       }

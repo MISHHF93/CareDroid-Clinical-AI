@@ -168,12 +168,17 @@ export class WorkspacesService {
     return this.getActiveWorkspaceState(user);
   }
 
-  async createWorkspace(user: User, dto: CreateWorkspaceDto) {
+  async createWorkspace(
+    user: User,
+    dto: CreateWorkspaceDto,
+    options: { organizationId?: string | null } = {},
+  ) {
     const slug = await this.uniqueSlug(`${dto.type}-${dto.name}-${user.id}`);
     const workspace = this.workspaceRepository.create({
       type: dto.type,
       name: dto.name.trim(),
       slug,
+      organizationId: options.organizationId || null,
       ownerUserId: user.id,
       branding: {
         displayName: dto.displayName?.trim() || dto.name.trim(),

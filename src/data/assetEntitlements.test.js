@@ -25,4 +25,15 @@ describe('assetEntitlements', () => {
     setPlatformEntitlementContext(null);
     expect(isAssetEntitled('any-tool')).toBe(true);
   });
+
+  it('denies empty organization entitlements in strict SaaS mode', () => {
+    setPlatformEntitlementContext({
+      organization: { id: 'org-1' },
+      entitledAssetIds: [],
+      strictSaasEntitlements: true,
+    });
+    expect(isAssetEntitled('qsofa')).toBe(false);
+    expect(filterToolsByEntitlements([{ id: 'qsofa' }])).toEqual([]);
+    setPlatformEntitlementContext(null);
+  });
 });

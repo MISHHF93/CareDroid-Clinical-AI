@@ -204,6 +204,8 @@
 
 .app-shell-workspace-bar {
   display: flex;
+  align-items: center;
+  gap: 10px;
   justify-content: flex-end;
   padding: 10px 16px 0;
   pointer-events: none;
@@ -216,6 +218,67 @@
 .app-shell--compact .app-shell-workspace-bar {
   justify-content: center;
   padding: 10px 56px 0;
+}
+
+.app-shell-header-utilities {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 4px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg, 14px);
+  background: var(--app-surface-glass);
+  -webkit-backdrop-filter: blur(var(--app-blur-glass, 18px));
+  backdrop-filter: blur(var(--app-blur-glass, 18px));
+  box-shadow: var(--shadow-1);
+}
+
+.app-shell-header-command,
+.app-shell-header-action {
+  min-height: 36px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+}
+
+.app-shell-header-command:hover,
+.app-shell-header-command:focus-visible,
+.app-shell-header-action:hover,
+.app-shell-header-action:focus-visible {
+  border-color: var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
+  outline: none;
+}
+
+.app-shell-header-command {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 0 10px;
+  font-size: var(--font-12);
+  font-weight: 750;
+}
+
+.app-shell-header-command kbd {
+  border: 1px solid var(--panel-border);
+  border-radius: 7px;
+  padding: 2px 5px;
+  background: var(--app-surface-1);
+  color: var(--muted-text);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.app-shell-header-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  padding: 0;
 }
 
 /* MainContent is the primary vertical scrollport for tool/fleet/settings pages. */

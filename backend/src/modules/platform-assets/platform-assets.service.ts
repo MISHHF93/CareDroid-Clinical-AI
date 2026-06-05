@@ -85,12 +85,20 @@ export class PlatformAssetsService {
     });
   }
 
+  isStrictSaasEntitlementsEnabled() {
+    return process.env.CAREDROID_STRICT_SAAS_ENTITLEMENTS === 'true';
+  }
+
   async resolveEntitledAssetIds(params: {
     organizationId?: string | null;
     roleProfileId?: string | null;
     workspaceEnabledToolIds?: string[];
+    strictEntitlements?: boolean;
   }): Promise<string[]> {
     const entitled = new Set<string>();
+    const strictEntitlements =
+      params.strictEntitlements ?? this.isStrictSaasEntitlementsEnabled();
+    const hasOrganizationScope = Boolean(params.organizationId);
 
     if (params.organizationId) {
       const entitlements = await this.getOrganizationEntitlements(params.organizationId);
@@ -102,9 +110,19 @@ export class PlatformAssetsService {
     }
 
     if (params.workspaceEnabledToolIds?.length) {
+      const workspaceAssetIds = new Set<string>();
       for (const legacyId of params.workspaceEnabledToolIds) {
         const aliases = LEGACY_TOOL_ID_ALIASES[legacyId] || [legacyId];
-        aliases.forEach((id) => entitled.add(id));
+        aliases.forEach((id) => workspaceAssetIds.add(id));
+      }
+      if (strictEntitlements && hasOrganizationScope) {
+        if (entitled.size) {
+          for (const id of [...entitled]) {
+            if (!workspaceAssetIds.has(id)) entitled.delete(id);
+          }
+        }
+      } else {
+        workspaceAssetIds.forEach((id) => entitled.add(id));
       }
     }
 
@@ -115,7 +133,7 @@ export class PlatformAssetsService {
       profile?.hiddenAssetIds?.forEach((id) => entitled.delete(id));
     }
 
-    if (!entitled.size) {
+    if (!entitled.size && !(strictEntitlements && hasOrganizationScope)) {
       const active = await this.assetRepository.find({
         where: { lifecycle: PlatformAssetLifecycle.ACTIVE },
       });

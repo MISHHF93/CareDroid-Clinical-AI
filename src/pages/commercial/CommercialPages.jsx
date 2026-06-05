@@ -705,7 +705,14 @@ export function OrganizationOnboardingPage() {
     commercialPlanId: '',
     integrationSlugs: [],
     defaultRoleProfileId: 'emergency-physician',
-    workspaceSetups: [{ name: 'Clinical', type: 'clinical', enabledModules: ['dashboard', 'tools'] }],
+    workspaceSetups: [
+      {
+        name: 'Clinical Operations',
+        type: 'hospital',
+        enabledToolIds: ['calculators', 'drug-check', 'lab-interp', 'protocols'],
+        enabledModules: ['dashboard', 'tools'],
+      },
+    ],
   });
 
   useEffect(() => {

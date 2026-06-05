@@ -8,7 +8,6 @@ import BuildInfoBadge from './BuildInfoBadge';
 import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import {
   ADVANCED_SIDEBAR_NAV_ITEMS,
-  OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
   SOLUTIONS_SIDEBAR_NAV_ITEMS,
   primaryNavPathMatches,
@@ -37,7 +36,6 @@ const Sidebar = forwardRef(function Sidebar(
     onCloseMobileNav = () => {},
     sidebarCollapsed = false,
     onSidebarCollapsedChange = () => {},
-    onOpenQuickCommand = () => {},
   },
   ref
 ) {
@@ -80,10 +78,6 @@ const Sidebar = forwardRef(function Sidebar(
   );
   const solutionsNavItems = useMemo(
     () => filterNav(SOLUTIONS_SIDEBAR_NAV_ITEMS),
-    [filterNav]
-  );
-  const operationsNavItems = useMemo(
-    () => filterNav(OPERATIONS_SIDEBAR_NAV_ITEMS),
     [filterNav]
   );
 
@@ -235,6 +229,17 @@ const Sidebar = forwardRef(function Sidebar(
               <div className="user-organization">{displayOrganization}</div>
             </div>
           </button>
+          <div className="sidebar-profile-links" aria-label="Account utilities">
+            <button type="button" onClick={() => handleNavClick('/profile')}>
+              Profile
+            </button>
+            <button type="button" onClick={() => handleNavClick('/settings')}>
+              Settings
+            </button>
+            <button type="button" onClick={() => handleNavClick('/profile/security')}>
+              Security
+            </button>
+          </div>
           <div className="sidebar-operational-workspace">
             <label htmlFor="sidebar-operational-workspace">Org Workspace</label>
             <select
@@ -272,29 +277,6 @@ const Sidebar = forwardRef(function Sidebar(
           {!effectiveCollapsed && <span>New Chat</span>}
         </button>
 
-        {!layoutCompact && (
-          <button
-            type="button"
-            className="sidebar-command-launcher"
-            onClick={onOpenQuickCommand}
-            aria-label="Open Quick Command"
-            title={effectiveCollapsed ? 'Open Quick Command' : 'Quick Command (Ctrl/Cmd K)'}
-          >
-            <span className="sidebar-command-launcher__icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.search} size={18} />
-            </span>
-            {!effectiveCollapsed && (
-              <>
-                <span className="sidebar-command-launcher__body">
-                  <strong>Quick Command</strong>
-                  <span>Search and launch</span>
-                </span>
-                <kbd>Ctrl K</kbd>
-              </>
-            )}
-          </button>
-        )}
-
         <nav className="sidebar-nav" aria-label="Primary navigation">
           <div className="nav-section-title">{!effectiveCollapsed && 'Main'}</div>
           {primaryNavItems.map((item) => renderNavButton(item))}
@@ -306,11 +288,6 @@ const Sidebar = forwardRef(function Sidebar(
             {solutionsNavItems.map((item) => renderNavButton(item))}
           </nav>
         )}
-
-        <nav className="sidebar-nav sidebar-nav--operations" aria-label="Operations navigation">
-          <div className="nav-section-title">{!effectiveCollapsed && 'Operations'}</div>
-          {operationsNavItems.map((item) => renderNavButton(item))}
-        </nav>
 
         <div className="sidebar-advanced">
           <button

@@ -40,6 +40,7 @@
     "visibility-matrix:write-docs": "node scripts/write-tool-visibility-matrix.mjs",
     "feature-coverage-matrix:write-docs": "node scripts/write-feature-coverage-matrix.mjs",
     "saas-compliance-audit:write-docs": "node scripts/write-saas-compliance-audit.mjs",
+    "saas-bottleneck-audit:write-docs": "node scripts/write-saas-bottleneck-implementation-audit.mjs",
     "orphan-detection:write-docs": "node scripts/write-orphan-detection-report.mjs",
     "duplicate-system-audit:write-docs": "node scripts/write-duplicate-system-audit.mjs",
     "product-packaging-audit:write-docs": "node scripts/write-product-packaging-audit.mjs",

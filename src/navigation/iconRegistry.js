@@ -452,6 +452,7 @@ export const CHROME_ICONS = {
   contrast: Contrast,
   sparkles: Sparkles,
   search: Search,
+  settings: Settings,
   message: MessageSquare,
   tools: Wrench,
   wrench: Wrench,

@@ -4,7 +4,12 @@
  */
 
 import { FEATURE_FLAGS } from '../config/featureFlags.config';
-import { getPlatformEntitlementContext } from './assetEntitlements';
+import {
+  getPlatformEntitlementContext,
+  isLaunchAllowedForWorkspace,
+  isStrictSaasEntitlementsEnabled,
+  LEGACY_TOOL_ID_ALIASES,
+} from './assetEntitlements';
 import { getUserFacingToolRegistryProjection, TOOL_EXECUTOR_STATUS } from './toolInventory';
 
 export const ASSET_ACCESS_STATES = Object.freeze({
@@ -33,6 +38,8 @@ const ADMIN_ONLY_TOOLS = new Set(['audit-logs', 'system-config', 'team-managemen
 
 export function resolveAssetAccessState(tool, context = getPlatformEntitlementContext(), userRole = 'student') {
   const assetId = tool.id || tool.canonicalInventoryId;
+  const hasOrganization = Boolean(context?.organization?.id);
+  const strictEntitlements = isStrictSaasEntitlementsEnabled(context);
   const hidden = new Set([
     ...(context?.roleProfile?.hiddenAssetIds || []),
     ...(context?.preferences?.toolPreferences?.hiddenAssetIds || []),
@@ -50,20 +57,28 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
   }
 
   if (tool.executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED && tool.launchType !== 'calculator') {
-    if (context?.organization?.id) {
+    if (hasOrganization) {
       const entitled = new Set(context?.entitledAssetIds || []);
-      if (entitled.size && !entitled.has(assetId)) {
+      if ((strictEntitlements || entitled.size) && !entitled.has(assetId)) {
         return { accessState: ASSET_ACCESS_STATES.LOCKED, reasons: ['pack'] };
       }
     }
     return { accessState: ASSET_ACCESS_STATES.DEMO_ONLY, reasons: ['demo'] };
   }
 
-  if (FEATURE_FLAGS.platformEntitlements && context?.organization?.id) {
+  if (FEATURE_FLAGS.platformEntitlements && hasOrganization) {
     const entitled = new Set(context?.entitledAssetIds || []);
-    if (entitled.size && !entitled.has(assetId)) {
+    if ((strictEntitlements || entitled.size) && !entitled.has(assetId)) {
       return { accessState: ASSET_ACCESS_STATES.LOCKED, reasons: ['pack'] };
     }
+  }
+
+  const workspaceEnabledToolIds = context?.legacyToolAliases || [];
+  if (
+    workspaceEnabledToolIds.length &&
+    !isLaunchAllowedForWorkspace(assetId, workspaceEnabledToolIds, LEGACY_TOOL_ID_ALIASES)
+  ) {
+    return { accessState: ASSET_ACCESS_STATES.RESTRICTED, reasons: ['workspace'] };
   }
 
   if (tool.lifecycleState === 'deprecated') {

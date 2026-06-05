@@ -96,6 +96,7 @@ export class PlatformContextService {
         'agent-clinical',
       workspace: workspaceState,
       legacyToolAliases: enabledToolIds,
+      strictSaasEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
     };
   }
 }

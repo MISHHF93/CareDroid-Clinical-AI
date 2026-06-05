@@ -7,6 +7,7 @@ import { OrganizationEntitlement } from './entities/organization-entitlement.ent
 import { RoleProfile } from './entities/role-profile.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { PlatformAssetLifecycle } from './enums/platform-asset.enums';
+import { UserPreferencesService } from '../user-profile/user-preferences.service';
 
 describe('PlatformAssetsService', () => {
   let service: PlatformAssetsService;
@@ -35,6 +36,10 @@ describe('PlatformAssetsService', () => {
     findOne: jest.fn(),
     save: jest.fn(),
   };
+  const userPreferencesService = {
+    getPreferences: jest.fn(),
+    updatePreferences: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -45,6 +50,7 @@ describe('PlatformAssetsService', () => {
         { provide: getRepositoryToken(OrganizationEntitlement), useValue: entitlementRepo },
         { provide: getRepositoryToken(RoleProfile), useValue: roleProfileRepo },
         { provide: getRepositoryToken(UserProfile), useValue: profileRepo },
+        { provide: UserPreferencesService, useValue: userPreferencesService },
       ],
     }).compile();
 
@@ -60,6 +66,33 @@ describe('PlatformAssetsService', () => {
 
     const ids = await service.resolveEntitledAssetIds({ organizationId: 'org-1' });
     expect(ids).toEqual(expect.arrayContaining(['qsofa', 'news2']));
+  });
+
+  it('does not fall back to all active assets for strict organization entitlements', async () => {
+    entitlementRepo.find.mockResolvedValue([]);
+
+    const ids = await service.resolveEntitledAssetIds({
+      organizationId: 'org-1',
+      strictEntitlements: true,
+    });
+
+    expect(ids).toEqual([]);
+    expect(assetRepo.find).not.toHaveBeenCalled();
+  });
+
+  it('narrows entitled assets by workspace scope in strict mode', async () => {
+    entitlementRepo.find.mockResolvedValue([{ packId: 'emergency-medicine', organizationId: 'org-1' }]);
+    packRepo.find.mockResolvedValue([
+      { id: 'emergency-medicine', assetIds: ['qsofa', 'news2', 'sofa-score'] },
+    ]);
+
+    const ids = await service.resolveEntitledAssetIds({
+      organizationId: 'org-1',
+      workspaceEnabledToolIds: ['sofa-score'],
+      strictEntitlements: true,
+    });
+
+    expect(ids).toEqual(['sofa-score']);
   });
 
   it('updates asset lifecycle', async () => {

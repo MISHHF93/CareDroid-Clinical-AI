@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import Sidebar from '../components/Sidebar';
 import WorkspaceSwitcher from '../components/WorkspaceSwitcher';
@@ -29,6 +29,7 @@ const AppShell = ({
 }) => {
   const { preference, resolvedTheme, setPreference } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const [isCompact, setIsCompact] = useState(getIsCompactViewport);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -59,6 +60,10 @@ const AppShell = ({
   };
 
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
+  const navigateToUtility = useCallback(
+    (path) => navigate({ pathname: path, search: '' }),
+    [navigate]
+  );
   const openQuickCommand = useCallback(() => {
     setQuickCommandOpen(true);
     setMobileNavOpen(false);
@@ -149,7 +154,6 @@ const AppShell = ({
         onCloseMobileNav={closeMobileNav}
         sidebarCollapsed={sidebarCollapsed}
         onSidebarCollapsedChange={setSidebarCollapsed}
-        onOpenQuickCommand={openQuickCommand}
       />
 
       <div className="app-shell-main-wrap">
@@ -186,6 +190,60 @@ const AppShell = ({
             )}
             <div className="app-shell-workspace-bar" aria-label="Workspace switcher">
               <WorkspaceSwitcher compact={isCompact} />
+              {!isCompact && (
+                <div className="app-shell-header-utilities" aria-label="Header utilities">
+                  <button
+                    type="button"
+                    className="app-shell-header-command"
+                    onClick={openQuickCommand}
+                    aria-expanded={quickCommandOpen}
+                    aria-haspopup="dialog"
+                    aria-label="Open Quick Command"
+                  >
+                    <span aria-hidden>
+                      <NavIcon icon={CHROME_ICONS.search} size={17} />
+                    </span>
+                    <span>Search</span>
+                    <kbd>Ctrl K</kbd>
+                  </button>
+                  <button
+                    type="button"
+                    className="app-shell-header-action"
+                    onClick={() => navigateToUtility('/notifications')}
+                    aria-label="Open notifications"
+                    title="Notifications"
+                  >
+                    <NavIcon icon={CHROME_ICONS.bell} size={18} aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    className="app-shell-header-action"
+                    onClick={() => navigateToUtility('/profile')}
+                    aria-label="Open profile"
+                    title="Profile"
+                  >
+                    <NavIcon icon={CHROME_ICONS.user} size={18} aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    className="app-shell-header-action"
+                    onClick={() => navigateToUtility('/settings')}
+                    aria-label="Open settings"
+                    title="Settings"
+                  >
+                    <NavIcon icon={CHROME_ICONS.settings} size={18} aria-hidden />
+                  </button>
+                  <button
+                    type="button"
+                    className="app-shell-header-action"
+                    onClick={() => onSignOut?.()}
+                    aria-label="Sign out"
+                    title="Sign out"
+                  >
+                    <NavIcon icon={CHROME_ICONS.logOut} size={18} aria-hidden />
+                  </button>
+                </div>
+              )}
             </div>
           </header>
         )}

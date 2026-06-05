@@ -74,6 +74,9 @@ const appConfig = {
     platformEntitlements: toBoolean(getEnvValue('VITE_PLATFORM_ENTITLEMENTS', 'true')),
     singleWorkspaceModel: toBoolean(getEnvValue('VITE_SINGLE_WORKSPACE_MODEL', 'true')),
     commercialSurfaces: toBoolean(getEnvValue('VITE_COMMERCIAL_SURFACES', 'true')),
+    strictSaasEntitlements: toBoolean(getEnvValue('VITE_STRICT_SAAS_ENTITLEMENTS', 'false')),
+    assetAwareNavigation: toBoolean(getEnvValue('VITE_ASSET_AWARE_NAVIGATION', 'true')),
+    orgScopedPlatformReads: toBoolean(getEnvValue('VITE_ORG_SCOPED_PLATFORM_READS', 'true')),
   },
   legal: {
     privacyPolicyUrl: getEnvValue('VITE_PRIVACY_POLICY_URL', ''),

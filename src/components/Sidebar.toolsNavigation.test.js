@@ -7,9 +7,11 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import {
+  ACCOUNT_UTILITY_NAV_ITEMS,
   ADVANCED_SIDEBAR_NAV_ITEMS,
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
+  SECONDARY_NAV_ITEMS,
 } from '../config/navigation.config';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 
@@ -23,7 +25,6 @@ const navigationConfigSource = readFileSync(
 );
 const visibleSidebarItems = [
   ...PRIMARY_SIDEBAR_NAV_ITEMS,
-  ...OPERATIONS_SIDEBAR_NAV_ITEMS,
   ...ADVANCED_SIDEBAR_NAV_ITEMS,
 ];
 
@@ -53,28 +54,14 @@ describe('Simplified sidebar navigation wiring', () => {
     expect(appShellSource).not.toContain('onOpenToolsOverview');
     expect(appShellSource).not.toContain('onOpenToolsCatalog');
     expect(appShellSource).not.toContain('onToolSelect={');
-    expect(appShellSource).toContain('onOpenQuickCommand={openQuickCommand}');
+    expect(appShellSource).toContain('app-shell-header-utilities');
+    expect(appShellSource).toContain('onClick={openQuickCommand}');
   });
 
-  it('defines the requested visible primary routes and advanced routes', () => {
+  it('defines the reduced visible primary routes and advanced routes', () => {
     const navPaths = visibleSidebarItems.map((item) => item.path);
 
-    for (const path of [
-      '/dashboard',
-      '/discover',
-      '/automation',
-      '/assistant',
-      '/tools',
-      '/operations',
-      '/digital-twin',
-      '/hospital-map',
-      '/medical-iot',
-      '/devices',
-      '/fleet/map',
-      '/live-map',
-      '/profile',
-      '/settings',
-    ]) {
+    for (const path of ['/dashboard', '/assistant', '/tools', '/operations']) {
       expect(navPaths, path).toContain(path);
     }
 
@@ -94,6 +81,38 @@ describe('Simplified sidebar navigation wiring', () => {
     ]) {
       expect(navPaths, path).toContain(path);
     }
+
+    for (const path of [
+      '/discover',
+      '/automation',
+      '/digital-twin',
+      '/hospital-map',
+      '/medical-iot',
+      '/devices',
+      '/fleet/map',
+      '/live-map',
+      '/profile',
+      '/settings',
+    ]) {
+      expect(navPaths, path).not.toContain(path);
+    }
+  });
+
+  it('keeps secondary, operations, and account destinations available outside primary nav', () => {
+    expect(SECONDARY_NAV_ITEMS.map((item) => item.path)).toEqual(['/discover', '/automation']);
+    expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual([
+      '/digital-twin',
+      '/hospital-map',
+      '/medical-iot',
+      '/devices',
+      '/fleet/map',
+      '/live-map',
+    ]);
+    expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.path)).toEqual([
+      '/profile',
+      '/settings',
+      '/notifications',
+    ]);
   });
 
   it('does not duplicate visible sidebar destinations, labels, or non-canonical links', () => {

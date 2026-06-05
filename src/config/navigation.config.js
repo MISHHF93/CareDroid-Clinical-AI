@@ -9,25 +9,11 @@ import { CANONICAL_ROUTES } from './routes.config';
 export const PRIMARY_NAV_ITEMS = Object.freeze([
   {
     id: 'home',
-    label: 'Dashboard',
-    mobileLabel: 'Dashboard',
+    label: 'Command Center',
+    mobileLabel: 'Command',
     path: CANONICAL_ROUTES.dashboard,
     legacyPaths: ['/home'],
     matchPaths: ['/home', CANONICAL_ROUTES.dashboard],
-  },
-  {
-    id: 'discover',
-    label: 'Discover',
-    mobileLabel: 'Discover',
-    path: CANONICAL_ROUTES.discover,
-    matchPaths: [CANONICAL_ROUTES.discover],
-  },
-  {
-    id: 'automation',
-    label: 'Automation',
-    mobileLabel: 'Automate',
-    path: CANONICAL_ROUTES.automation,
-    matchPaths: [CANONICAL_ROUTES.automation],
   },
   {
     id: 'assistant',
@@ -73,8 +59,52 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     label: 'Operations',
     mobileLabel: 'Ops',
     path: CANONICAL_ROUTES.operations,
-    matchPaths: [CANONICAL_ROUTES.operations, CANONICAL_ROUTES.operationsCenter],
+    matchPaths: [
+      CANONICAL_ROUTES.operations,
+      CANONICAL_ROUTES.operationsCenter,
+      CANONICAL_ROUTES.digitalTwin,
+      CANONICAL_ROUTES.hospitalMap,
+      CANONICAL_ROUTES.medicalIot,
+      CANONICAL_ROUTES.devices,
+      CANONICAL_ROUTES.liveMap,
+      CANONICAL_ROUTES.fleetMap,
+      CANONICAL_ROUTES.fleetCommand,
+      '/clinical/alerts',
+      '/analytics',
+      '/costs',
+      '/maps',
+      '/tracking',
+      '/live-tracking',
+      '/fleet',
+      '/fleet/live-map',
+      '/fleet/tracking',
+    ],
+    matchPrefixes: ['/operations/', '/fleet/'],
   },
+]);
+
+export const SECONDARY_NAV_ITEMS = Object.freeze([
+  {
+    id: 'discover',
+    label: 'Discover',
+    mobileLabel: 'Discover',
+    path: CANONICAL_ROUTES.discover,
+    matchPaths: [CANONICAL_ROUTES.discover],
+    showInMobile: false,
+    showInSidebar: false,
+  },
+  {
+    id: 'automation',
+    label: 'Automation',
+    mobileLabel: 'Automate',
+    path: CANONICAL_ROUTES.automation,
+    matchPaths: [CANONICAL_ROUTES.automation, CANONICAL_ROUTES.workflows],
+    showInMobile: false,
+    showInSidebar: false,
+  },
+]);
+
+export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
   {
     id: 'profile',
     label: 'Profile',
@@ -87,6 +117,8 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
       '/profile/workspaces',
       '/profile/security',
     ],
+    showInMobile: false,
+    showInSidebar: false,
   },
   {
     id: 'settings',
@@ -108,6 +140,17 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
       '/welcome',
       '/onboarding',
     ],
+    showInMobile: false,
+    showInSidebar: false,
+  },
+  {
+    id: 'notifications',
+    label: 'Notifications',
+    mobileLabel: 'Alerts',
+    path: CANONICAL_ROUTES.notifications,
+    matchPaths: [CANONICAL_ROUTES.notifications, '/notification-preferences'],
+    showInMobile: false,
+    showInSidebar: false,
   },
 ]);
 
@@ -225,7 +268,7 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     label: 'System Health',
     mobileLabel: 'Health',
     path: CANONICAL_ROUTES.systemHealth,
-    matchPaths: [CANONICAL_ROUTES.systemHealth, '/operations/service-health'],
+    matchPaths: [CANONICAL_ROUTES.systemHealth],
     permission: ['VIEW_OPERATIONS', 'VIEW_OBSERVABILITY'],
     requireAllPermissions: true,
     showInMobile: false,
@@ -356,9 +399,11 @@ export const PRIMARY_NAV_BY_ID = Object.freeze(
   Object.fromEntries(
     [
       ...PRIMARY_NAV_ITEMS,
+      ...SECONDARY_NAV_ITEMS,
       ...SOLUTIONS_SIDEBAR_NAV_ITEMS,
       ...OPERATIONS_SIDEBAR_NAV_ITEMS,
       ...ADVANCED_SIDEBAR_NAV_ITEMS,
+      ...ACCOUNT_UTILITY_NAV_ITEMS,
     ].map((item) => [item.id, item])
   )
 );
@@ -374,9 +419,11 @@ export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
 export const QUICK_COMMAND_NAV_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 export const QUICK_COMMAND_DESTINATION_ITEMS = Object.freeze([
   ...PRIMARY_SIDEBAR_NAV_ITEMS,
+  ...SECONDARY_NAV_ITEMS,
   ...SOLUTIONS_SIDEBAR_NAV_ITEMS,
   ...OPERATIONS_SIDEBAR_NAV_ITEMS,
   ...ADVANCED_SIDEBAR_NAV_ITEMS,
+  ...ACCOUNT_UTILITY_NAV_ITEMS,
   {
     id: 'workspace',
     label: 'Workspace',
@@ -399,9 +446,11 @@ export function primaryNavPathMatches(item, pathname) {
 export function getPrimaryNavItemForPath(pathname) {
   return (
     PRIMARY_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
+    SECONDARY_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
     SOLUTIONS_SIDEBAR_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
     OPERATIONS_SIDEBAR_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
     ADVANCED_SIDEBAR_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
+    ACCOUNT_UTILITY_NAV_ITEMS.find((item) => primaryNavPathMatches(item, pathname)) ||
     null
   );
 }

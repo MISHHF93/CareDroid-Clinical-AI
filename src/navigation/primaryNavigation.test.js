@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ACCOUNT_UTILITY_NAV_ITEMS,
   ADVANCED_SIDEBAR_NAV_ITEMS,
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   getPrimaryNavItemForPath,
@@ -7,30 +8,26 @@ import {
   PRIMARY_NAV_BY_ID,
   PRIMARY_SIDEBAR_NAV_ITEMS,
   primaryNavPathMatches,
+  SECONDARY_NAV_ITEMS,
 } from './primaryNavigation';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 
 const VISIBLE_SIDEBAR_ITEMS = [
   ...PRIMARY_SIDEBAR_NAV_ITEMS,
-  ...OPERATIONS_SIDEBAR_NAV_ITEMS,
   ...ADVANCED_SIDEBAR_NAV_ITEMS,
 ];
 
 describe('primaryNavigation', () => {
   it('exposes the simplified primary sidebar model in canonical order', () => {
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
-      ['Dashboard', '/dashboard'],
-      ['Discover', '/discover'],
-      ['Automation', '/automation'],
+      ['Command Center', '/dashboard'],
       ['Assistant', '/assistant'],
       ['Tools', '/tools'],
       ['Operations', '/operations'],
-      ['Profile', '/profile'],
-      ['Settings', '/settings'],
     ]);
   });
 
-  it('keeps operations destinations in their own sidebar section', () => {
+  it('keeps operations destinations grouped for command/search instead of persistent sidebar nav', () => {
     expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
       ['Digital Twin', '/digital-twin'],
       ['Hospital Map', '/hospital-map'],
@@ -39,6 +36,9 @@ describe('primaryNavigation', () => {
       ['Fleet Map', '/fleet/map'],
       ['Live Map', '/live-map'],
     ]);
+    for (const item of OPERATIONS_SIDEBAR_NAV_ITEMS) {
+      expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((nav) => nav.path)).not.toContain(item.path);
+    }
   });
 
   it('keeps developer and governance routes in the collapsed advanced group', () => {
@@ -97,13 +97,9 @@ describe('primaryNavigation', () => {
   it('keeps the compact drawer navigation subset canonical', () => {
     expect(PRIMARY_MOBILE_NAV_ITEMS.map((item) => item.path)).toEqual([
       '/dashboard',
-      '/discover',
-      '/automation',
       '/assistant',
       '/tools',
       '/operations',
-      '/profile',
-      '/settings',
     ]);
   });
 
@@ -123,18 +119,20 @@ describe('primaryNavigation', () => {
     expect(getPrimaryNavItemForPath('/tools/calculators/sofa')?.id).toBe('tools');
   });
 
-  it('keeps operations routes discoverable under their matching operations item', () => {
-    expect(getPrimaryNavItemForPath('/live-map')?.id).toBe('live-map');
-    expect(getPrimaryNavItemForPath('/maps')?.id).toBe('live-map');
-    expect(getPrimaryNavItemForPath('/hospital-map')?.id).toBe('hospital-map');
-    expect(getPrimaryNavItemForPath('/medical-iot')?.id).toBe('medical-iot');
-    expect(getPrimaryNavItemForPath('/devices')?.id).toBe('devices');
-    expect(getPrimaryNavItemForPath('/fleet/map')?.id).toBe('fleet');
-    expect(getPrimaryNavItemForPath('/digital-twin')?.id).toBe('digital-twin');
+  it('keeps operations leaf routes under the primary Operations concept', () => {
+    expect(getPrimaryNavItemForPath('/live-map')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/maps')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/hospital-map')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/medical-iot')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/devices')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/fleet/map')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/fleet/route-optimizer')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/operations/incidents')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/digital-twin')?.id).toBe('operations');
     expect(getPrimaryNavItemForPath('/operations')?.id).toBe('operations');
   });
 
-  it('activates exactly one primary nav item for profile and settings routes', () => {
+  it('keeps account utilities outside persistent primary navigation', () => {
     const expected = [
       ['/profile', 'profile'],
       ['/profile/activity', 'profile'],
@@ -150,8 +148,24 @@ describe('primaryNavigation', () => {
       expect(
         matches.map((item) => item.id),
         path
-      ).toEqual([itemId]);
+      ).toEqual([]);
       expect(getPrimaryNavItemForPath(path)?.id, path).toBe(itemId);
     }
+
+    expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.id)).toEqual([
+      'profile',
+      'settings',
+      'notifications',
+    ]);
+  });
+
+  it('keeps Discover and Automation searchable without making them primary', () => {
+    expect(SECONDARY_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
+      ['Discover', '/discover'],
+      ['Automation', '/automation'],
+    ]);
+    expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => item.id)).not.toEqual(
+      expect.arrayContaining(['discover', 'automation'])
+    );
   });
 });

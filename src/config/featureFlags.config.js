@@ -18,6 +18,9 @@ export const FEATURE_FLAGS = Object.freeze({
   platformEntitlements: appConfig.features.platformEntitlements,
   singleWorkspaceModel: appConfig.features.singleWorkspaceModel,
   commercialSurfaces: appConfig.features.commercialSurfaces,
+  strictSaasEntitlements: appConfig.features.strictSaasEntitlements,
+  assetAwareNavigation: appConfig.features.assetAwareNavigation,
+  orgScopedPlatformReads: appConfig.features.orgScopedPlatformReads,
 });
 
 export const FEATURE_FLAG_STATES = Object.freeze({
