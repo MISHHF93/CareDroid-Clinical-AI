@@ -3,6 +3,7 @@ import { SubscriptionTier } from '../modules/subscriptions/entities/subscription
 export enum EntitlementCategory {
   TOOLS = 'tools',
   CALCULATORS = 'calculators',
+  AUTOMATIONS = 'automations',
   SIMULATIONS = 'simulations',
   MAPS = 'maps',
   IOT = 'iot',
@@ -53,6 +54,33 @@ export const ENTITLEMENT_REGISTRY: EntitlementRule[] = [
     featureFlagId: 'simulation-suite',
     requiredPlan: SubscriptionTier.PROFESSIONAL,
     requiredPackIds: ['research-education'],
+  },
+  {
+    assetIds: [
+      'automation-news2-clinician-notification',
+      'automation-potassium-lab-workflow',
+    ],
+    category: EntitlementCategory.AUTOMATIONS,
+    featureFlagId: 'clinical-tools-core',
+    requiredPlan: SubscriptionTier.PROFESSIONAL,
+    requiredPackIds: ['emergency-department-pack'],
+  },
+  {
+    assetIds: ['automation-device-offline-maintenance'],
+    category: EntitlementCategory.AUTOMATIONS,
+    featureFlagId: 'medical-iot-dashboard',
+    requiredPlan: SubscriptionTier.ENTERPRISE,
+    requiredPackIds: ['medical-iot-pack'],
+  },
+  {
+    assetIds: [
+      'automation-audit-event-review',
+      'automation-integration-unsupported-labeling',
+    ],
+    category: EntitlementCategory.AUTOMATIONS,
+    featureFlagId: 'ai-governance-center',
+    requiredPlan: SubscriptionTier.ENTERPRISE,
+    requiredPackIds: ['governance-compliance-pack'],
   },
   {
     assetIds: ['hospital-map', 'digital-twin', 'live-map'],

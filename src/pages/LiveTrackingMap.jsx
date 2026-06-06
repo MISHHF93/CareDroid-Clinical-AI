@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { fetchFleetLiveTrackingSnapshot } from '../services/fleetTelemetryService';
 import { fetchHospitalMapSnapshot, formatHospitalMapTime } from '../services/hospitalMapService';
 import { fetchMedicalIotSnapshot } from '../services/medicalIotService';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './LiveTrackingMap.css';
 
 const TOOL_ID = 'live-tracking-map';
@@ -253,6 +255,17 @@ export default function LiveTrackingMap() {
             <span>Last updated: {formatHospitalMapTime(state.fleet?.summary?.updatedAt || state.hospital?.generatedAt || state.iot?.generatedAt)}</span>
             <span>Future data sources: fleet GPS, active routes, hospital floor devices, device telemetry, device alerts.</span>
           </section>
+
+          <StateSourceNotice
+            title="Combined live map source states"
+            states={[
+              DEMO_LIVE_STATES.DEMO,
+              DEMO_LIVE_STATES.MOCK,
+              DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+              DEMO_LIVE_STATES.UNSUPPORTED,
+            ]}
+            details="The map combines demo fleet, hospital, and Medical IoT snapshots with mock coordinates. If any backend source is unavailable, its local/demo fallback is used; dispatch, routing, and clinical action writes are unsupported."
+          />
 
           <section className="live-map-summary" aria-label="Live tracking summary">
             <SummaryCard label="Markers" value={summary.total} />

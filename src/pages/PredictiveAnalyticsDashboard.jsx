@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ApiStateBanner from '../components/ApiStateBanner';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
 import {
   buildPredictiveAnalyticsAiPrompt,
@@ -8,6 +9,7 @@ import {
   DEMO_PREDICTIVE_ANALYTICS_MODELS,
   searchPredictiveModels,
 } from '../data/predictiveAnalyticsDashboard';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './PredictiveAnalyticsDashboard.css';
 
 function getAssistantText(response) {
@@ -69,6 +71,17 @@ export default function PredictiveAnalyticsDashboard() {
           <Link to="/fleet/predictive-maintenance">Fleet maintenance</Link>
         </div>
       </section>
+
+      <StateSourceNotice
+        title="Predictive analytics source states"
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+          DEMO_LIVE_STATES.UNSUPPORTED,
+        ]}
+        details="Risk scores and model cards are demo predictive examples. AI explanations require the chat backend; if that backend is unavailable, no local text is presented as a live model explanation. Automated prediction actions are unsupported."
+      />
 
       <section className="predictive-analytics-panel" aria-label="Predictive analytics search">
         <div className="predictive-analytics-search">

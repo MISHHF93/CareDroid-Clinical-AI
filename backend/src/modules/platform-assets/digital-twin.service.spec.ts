@@ -25,6 +25,7 @@ describe('DigitalTwinService', () => {
     expect(snapshot.source).toMatchObject({
       mode: 'demo',
       status: 'demo_contract',
+      demoData: true,
       liveDataAvailable: false,
       organizationScoped: false,
     });
@@ -38,7 +39,7 @@ describe('DigitalTwinService', () => {
     expect(platformAssetsService.getOrganizationEntitlements).not.toHaveBeenCalled();
   });
 
-  it('marks organization snapshots live-contract-ready when digital twin packs are entitled', async () => {
+  it('marks organization snapshots as contract-ready demo data when digital twin packs are entitled', async () => {
     platformAssetsService.getOrganizationEntitlements.mockResolvedValue([
       { packId: 'digital-twin-pack' },
       { packId: 'medical-iot-pack' },
@@ -49,10 +50,13 @@ describe('DigitalTwinService', () => {
     expect(platformAssetsService.getOrganizationEntitlements).toHaveBeenCalledWith('org-1');
     expect(snapshot.source).toMatchObject({
       mode: 'organization',
-      status: 'live_contract_ready',
+      status: 'organization_contract_ready',
+      demoData: true,
+      liveDataAvailable: false,
       organizationScoped: true,
       entitlementPackIds: ['digital-twin-pack', 'medical-iot-pack'],
     });
+    expect(snapshot.sourceLabel).toMatch(/live data not connected/i);
     expect(snapshot.capabilities).toMatchObject({
       hospitalMap: true,
       occupancy: true,

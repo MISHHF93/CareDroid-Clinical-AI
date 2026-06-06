@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import StateSourceNotice from '../../components/StateSourceNotice';
 import { getPlatformSystemCapabilityByPath } from '../../data/platformSystems';
 import { fetchPlatformGovernanceSurface } from '../../services/platformGovernanceApi';
 import {
@@ -9,6 +10,7 @@ import {
   PlatformMetricGrid,
   PlatformPageShell,
 } from './components/PlatformWorkflowPrimitives';
+import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import './PlatformSystemPage.css';
 
 const SURFACE_BY_PATH = Object.freeze([
@@ -174,6 +176,17 @@ export default function PlatformGovernanceWorkspace() {
       error={state.error}
     >
       <PlatformMetricGrid metrics={metrics} />
+      <StateSourceNotice
+        title="Governance and security source states"
+        states={[
+          DEMO_LIVE_STATES.LIVE,
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.SIMULATED,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+          DEMO_LIVE_STATES.UNSUPPORTED,
+        ]}
+        details="Governance, security, regulatory, review, privacy, audit, and observability routes show the current source status. Demo or synthetic panels are review artifacts only; unavailable or unsupported controls should not be treated as active production enforcement."
+      />
       <PlatformDecisionPanel />
       <PlatformDashboardPanels panels={state.data?.panels} />
       {state.data?.panels ? (

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import StateSourceNotice from '../components/StateSourceNotice';
 import {
   DEMO_SIMULATION_OUTCOMES,
   SIMULATION_OUTCOME_METRICS,
@@ -6,6 +7,7 @@ import {
 } from '../data/medicalSimulationCatalog';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './SimulationLaboratoryViewer.css';
 
 export default function SimulationOutcomes() {
@@ -30,6 +32,17 @@ export default function SimulationOutcomes() {
           Open scenario library
         </Link>
       </section>
+
+      <StateSourceNotice
+        title="Simulation outcomes source states"
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.SIMULATED,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.UNSUPPORTED,
+        ]}
+        details="Completion, competency, weak-area, and recommendation metrics are demo outcomes from local simulation state. Live learner analytics and institutional LMS writes are unsupported."
+      />
 
       <section className="ops-demo-grid ops-demo-grid--four" aria-label="Simulation outcome metrics">
         <article className="ops-demo-metric">

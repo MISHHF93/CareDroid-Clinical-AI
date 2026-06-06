@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
+import StateSourceNotice from '../../components/StateSourceNotice';
 import {
   FLEET_MAINTENANCE_LABELS,
   FLEET_VEHICLE_STATUS_LABELS,
@@ -8,6 +9,7 @@ import {
 } from '../../services/fleetTelemetryService';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import FleetPageChrome from './FleetPageChrome';
 import './FleetLiveMap.css';
 import './fleetUxShared.css';
@@ -299,6 +301,17 @@ export default function FleetLiveMap() {
               <span>Last updated: {formatFleetTime(snapshot.summary.updatedAt)}</span>
               <span>{snapshot.message}</span>
             </section>
+
+            <StateSourceNotice
+              title="Fleet map source states"
+              states={[
+                DEMO_LIVE_STATES.DEMO,
+                DEMO_LIVE_STATES.MOCK,
+                DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+                DEMO_LIVE_STATES.UNSUPPORTED,
+              ]}
+              details="Vehicle GPS, routes, alerts, and utilization are demo/mock tracking records. If the fleet telemetry backend is unavailable, the page uses demo fallback data; dispatch, autonomous routing, and emergency-response writes are unsupported."
+            />
 
             <section className="fleet-map-summary" aria-label="Fleet map status summary">
               <SummaryCard label="Vehicles" value={snapshot.summary.totalVehicles} />

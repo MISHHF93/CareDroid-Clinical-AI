@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import StateSourceNotice from '../components/StateSourceNotice';
 import {
   buildDemoSimulationRun,
   buildScenarioDebrief,
@@ -8,6 +9,7 @@ import {
 } from '../data/medicalSimulationCatalog';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './SimulationLaboratoryViewer.css';
 
 export default function SimulationScenarioPlayer() {
@@ -60,6 +62,17 @@ export default function SimulationScenarioPlayer() {
           Back to library
         </Link>
       </section>
+
+      <StateSourceNotice
+        title="Scenario player source states"
+        states={[
+          DEMO_LIVE_STATES.SIMULATED,
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.UNSUPPORTED,
+        ]}
+        details="Patient vitals, labs, timeline events, checklist state, AI tutor hints, and debriefs are simulated training content. Submitted decisions remain local and do not trigger real clinical workflows or external escalation."
+      />
 
       <section className="ops-demo-grid ops-demo-grid--four" aria-label="Scenario progress">
         <article className="ops-demo-metric">

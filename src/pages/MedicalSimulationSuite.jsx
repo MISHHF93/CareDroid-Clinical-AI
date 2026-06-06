@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { buildUserToolProfile } from '../data/profileToolSegmentation';
 import {
   SIMULATION_CATEGORIES,
@@ -10,6 +11,7 @@ import {
 } from '../data/medicalSimulationCatalog';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './SimulationLaboratoryViewer.css';
 
 export default function MedicalSimulationSuite() {
@@ -48,6 +50,17 @@ export default function MedicalSimulationSuite() {
           </Link>
         </div>
       </section>
+
+      <StateSourceNotice
+        title="Simulation suite source states"
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.SIMULATED,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.UNSUPPORTED,
+        ]}
+        details="Scenario cases, AI tutor prompts, recommendations, and progress are demo/simulated training data. Launching or completing a scenario updates local browser state only; live learner records and external clinical actions are unsupported."
+      />
 
       <section className="ops-demo-grid ops-demo-grid--four" aria-label="Simulation status">
         <article className="ops-demo-metric">

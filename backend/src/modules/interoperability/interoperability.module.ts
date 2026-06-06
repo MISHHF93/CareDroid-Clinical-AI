@@ -6,6 +6,8 @@ import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { PlatformGovernanceModule, PlatformGovernanceService } from '../platform-governance';
 import { PlatformSystemsModule } from '../platform-systems/platform-systems.module';
 import { PlatformSystemsService } from '../platform-systems/platform-systems.service';
+import { IntegrationAutomationRouter } from './integration-automation-router.service';
+import { IntegrationEventRegistry } from './integration-event-registry.service';
 
 @Injectable()
 export class FHIRService {
@@ -54,6 +56,7 @@ export class InteroperabilityController {
     private readonly observationImport: ObservationImportService,
     private readonly medicationImport: MedicationImportService,
     private readonly platformGovernance: PlatformGovernanceService,
+    private readonly integrationEventRegistry: IntegrationEventRegistry,
   ) {}
 
   @Get('summary')
@@ -72,6 +75,11 @@ export class InteroperabilityController {
         fhir: this.fhir.getConnections(),
         hl7: this.hl7.getInterfaces(),
       },
+      automation: {
+        model: 'Integration Event -> Normalized Event -> Automation Trigger -> Safe Action',
+        safeActionPolicy: 'review_required_no_clinical_writeback',
+        registeredEvents: this.integrationEventRegistry.listDefinitions(),
+      },
       provenance: await this.platformGovernance.getSourceProvenance('synthetic-source'),
       uiStates: { loading: false, error: null, connectionState: 'demo_unconfigured' },
     };
@@ -87,6 +95,8 @@ export class InteroperabilityController {
     PatientImportService,
     ObservationImportService,
     MedicationImportService,
+    IntegrationEventRegistry,
+    IntegrationAutomationRouter,
   ],
   exports: [
     FHIRService,
@@ -94,6 +104,8 @@ export class InteroperabilityController {
     PatientImportService,
     ObservationImportService,
     MedicationImportService,
+    IntegrationEventRegistry,
+    IntegrationAutomationRouter,
   ],
 })
 export class InteroperabilityModule {}

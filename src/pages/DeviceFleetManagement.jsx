@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import StateSourceNotice from '../components/StateSourceNotice';
 import {
   fetchHospitalMapSnapshot,
   formatHospitalMapTime,
@@ -9,6 +10,7 @@ import {
 } from '../services/hospitalMapService';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './DeviceFleetManagement.css';
 
 const TOOL_ID = 'device-fleet-management';
@@ -253,6 +255,18 @@ export default function DeviceFleetManagement() {
             <span>Last updated: {formatHospitalMapTime(snapshot.generatedAt)}</span>
             {state.message ? <span>{state.message}</span> : null}
           </section>
+
+          <StateSourceNotice
+            title="Device fleet source states"
+            states={[
+              DEMO_LIVE_STATES.DEMO,
+              DEMO_LIVE_STATES.MOCK,
+              DEMO_LIVE_STATES.LOCAL_ONLY,
+              DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+              DEMO_LIVE_STATES.UNSUPPORTED,
+            ]}
+            details="Inventory, location history, maintenance, calibration, and firmware data come from the demo hospital map contract or local fallback. Row actions are browser-only placeholders; assignment, maintenance, firmware, and calibration write APIs are unsupported."
+          />
 
           <section className="device-fleet-summary" aria-label="Device fleet summary">
             <SummaryCard label="Devices" value={summary.devices} />

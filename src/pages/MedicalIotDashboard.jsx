@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { fetchMedicalIotSnapshot, formatTelemetryTime } from '../services/medicalIotService';
 import {
   CategoryBarChart,
@@ -11,6 +12,7 @@ import {
 } from '../components/dashboard/DashboardVisualizations';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './MedicalIotDashboard.css';
 
 const DEVICE_STATUS_OPTIONS = ['all', 'online', 'warning', 'offline'];
@@ -337,6 +339,17 @@ export default function MedicalIotDashboard() {
             <span>Last updated: {formatTelemetryTime(snapshot.generatedAt)}</span>
             {state.message ? <span>{state.message}</span> : null}
           </section>
+
+          <StateSourceNotice
+            title="Medical IoT source states"
+            states={[
+              DEMO_LIVE_STATES.DEMO,
+              DEMO_LIVE_STATES.MOCK,
+              DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+              DEMO_LIVE_STATES.UNSUPPORTED,
+            ]}
+            details="Connected-device cards, vitals streams, and map markers are demo/mock telemetry for monitoring UX only. If the backend telemetry contract is unavailable, local demo fixtures are shown; live patient-device control actions are unsupported."
+          />
 
           <section className="medical-iot-summary" aria-label="Medical IoT status summary">
             <MetricCard label="Connected devices" value={snapshot.devices.length} hint="Demo registry count" />

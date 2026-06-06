@@ -16,7 +16,10 @@ import {
   SEED_COMMERCIAL_PLANS,
   SEED_PRODUCTS,
 } from './data/product-catalog-seed.data';
-import { SEED_ASSET_PACKS } from '../platform-assets/data/platform-asset-seed.data';
+import {
+  SEED_ASSET_PACKS,
+  SEED_PLATFORM_ASSETS,
+} from '../platform-assets/data/platform-asset-seed.data';
 import { IntegrationCategory, IntegrationReadinessStatus, IntegrationStatus } from './enums/product-catalog.enums';
 
 describe('ProductCatalogService', () => {
@@ -472,6 +475,118 @@ describe('ProductCatalogService', () => {
             expect.objectContaining({ id: 'qsofa', title: 'qSOFA' }),
           ]),
         }),
+      ]),
+    );
+  });
+
+  it('surfaces automation assets in the correct product and pack view', async () => {
+    const productRepo = (service as any).productRepository;
+    const packRepo = (service as any).packRepository;
+    const assetRepo = (service as any).assetRepository;
+    const product = {
+      id: 'product-medical-iot',
+      slug: 'medical-iot-suite',
+      name: 'Medical IoT Solution',
+      packIds: ['medical-iot-pack'],
+      highlightAssetIds: ['automation-device-offline-maintenance'],
+      outcomes: ['device uptime'],
+      expectedOutcomes: ['device uptime'],
+      targetUsers: ['Biomedical engineers'],
+    };
+    const pack = SEED_ASSET_PACKS.find((row) => row.id === 'medical-iot-pack');
+    const automationAsset = SEED_PLATFORM_ASSETS.find(
+      (asset) => asset.id === 'automation-device-offline-maintenance',
+    );
+
+    productRepo.findOne.mockResolvedValue(product);
+    packRepo.find.mockResolvedValue([pack]);
+    assetRepo.find.mockResolvedValue([automationAsset]);
+
+    const graph = (await service.getProductBuilderGraph('medical-iot-suite')) as any;
+
+    expect(graph.product.name).toBe('Medical IoT Solution');
+    expect(graph.assets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'automation-device-offline-maintenance',
+          packIds: ['medical-iot-pack'],
+          pricingTier: 'enterprise',
+          roles: expect.arrayContaining(['biomedical engineer']),
+          governance: expect.objectContaining({
+            dashboardCard: 'device-automation-queue',
+          }),
+        }),
+      ]),
+    );
+    expect(graph.packs[0]).toMatchObject({
+      id: 'medical-iot-pack',
+      assets: expect.arrayContaining([
+        expect.objectContaining({ id: 'automation-device-offline-maintenance' }),
+      ]),
+    });
+  });
+
+  it('hides restricted automation from unauthorized roles in organization product views', async () => {
+    const productRepo = (service as any).productRepository;
+    const packRepo = (service as any).packRepository;
+    const assetRepo = (service as any).assetRepository;
+    const orgRepo = (service as any).organizationRepository;
+    const product = {
+      id: 'product-governance',
+      slug: 'governance-compliance-suite',
+      name: 'Governance & Compliance Solution',
+      packIds: ['governance-compliance-pack'],
+      highlightAssetIds: ['automation-audit-event-review'],
+      outcomes: ['audit readiness'],
+      expectedOutcomes: ['audit readiness'],
+      targetUsers: ['Compliance officers'],
+    };
+    const pack = SEED_ASSET_PACKS.find((row) => row.id === 'governance-compliance-pack');
+    const automationAsset = SEED_PLATFORM_ASSETS.find(
+      (asset) => asset.id === 'automation-audit-event-review',
+    );
+
+    productRepo.findOne.mockResolvedValue(product);
+    packRepo.find.mockResolvedValue([pack]);
+    assetRepo.find.mockResolvedValue([automationAsset]);
+    orgRepo.findOne.mockResolvedValue({ id: 'org-1' });
+    platformAssetsService.resolveEntitledAssetIds.mockResolvedValue(['automation-audit-event-review']);
+    platformAssetsService.getOrganizationEntitlements.mockResolvedValue([
+      { organizationId: 'org-1', packId: 'governance-compliance-pack', status: 'enabled' },
+    ]);
+    entitlementService.resolveDecisionFromContext.mockImplementation(({ asset, userRole }) => {
+      const allowedRoles = asset?.permissionPolicy?.allowedRoles || [];
+      const isAllowed = allowedRoles.map((role) => role.toLowerCase()).includes(userRole);
+      return {
+        assetId: asset.id,
+        state: isAllowed ? 'allowed' : 'disabled',
+        isVisible: isAllowed,
+        isLaunchable: isAllowed,
+        reason: isAllowed ? 'allowed' : 'role-hidden',
+      };
+    });
+
+    const unauthorized = (await service.getProductBuilderGraph(
+      'governance-compliance-suite',
+      'org-1',
+      { userRole: 'student', subscriptionPlan: 'enterprise' },
+    )) as any;
+    const authorized = (await service.getProductBuilderGraph(
+      'governance-compliance-suite',
+      'org-1',
+      { userRole: 'compliance officer', subscriptionPlan: 'enterprise' },
+    )) as any;
+
+    expect(unauthorized.assets).toEqual([]);
+    expect(unauthorized.packs).toEqual([]);
+    expect(authorized.assets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'automation-audit-event-review' }),
+      ]),
+    );
+    expect(authorized.packs[0].assets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'automation-audit-event-review' }),
       ]),
     );
   });

@@ -5,6 +5,7 @@ import {
   MetricCard,
   TrendChart,
 } from '../components/dashboard/DashboardVisualizations';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { useSystemConfig } from '../contexts/SystemConfigContext';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
@@ -13,6 +14,7 @@ import {
   fetchAiCommandCenterSnapshot,
   formatCommandMetric,
 } from '../services/aiCommandCenterApi';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './AiCommandCenterDashboard.css';
 
 const EMPTY_SNAPSHOT = Object.freeze({
@@ -233,7 +235,7 @@ export default function AiCommandCenterDashboard() {
     <main className="ai-command-center">
       <section className="ai-command-hero" aria-labelledby="ai-command-center-title">
         <div>
-          <p className="ai-command-eyebrow">Live AI operations</p>
+          <p className="ai-command-eyebrow">AI operations source mix</p>
           <h1 id="ai-command-center-title">AI Command Center</h1>
           <p>
             Compact operational view of AI health, experts, RAG, memory, tools, spend, safety,
@@ -246,7 +248,7 @@ export default function AiCommandCenterDashboard() {
           />
           <div>
             <strong>{loading ? 'Syncing' : snapshot.health.label}</strong>
-            <span>Live refresh every {AI_COMMAND_CENTER_REFRESH_MS / 1000}s</span>
+            <span>Refresh every {AI_COMMAND_CENTER_REFRESH_MS / 1000}s</span>
             <small>
               {lastUpdated ? `Updated ${formatTime(lastUpdated)}` : 'Preparing snapshot'}
             </small>
@@ -268,6 +270,17 @@ export default function AiCommandCenterDashboard() {
           ))}
         </section>
       ) : null}
+
+      <StateSourceNotice
+        title="AI command center source states"
+        states={[
+          DEMO_LIVE_STATES.LIVE,
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+        ]}
+        details="AI health, memory, cost, retrieval, and audit panels may combine backend snapshots with fallback/local metrics. Source status is shown above; backend-unavailable panels must not be interpreted as live production AI telemetry."
+      />
 
       <section className="ai-command-metrics" aria-label="AI command center summary">
         <MetricCard
@@ -322,7 +335,7 @@ export default function AiCommandCenterDashboard() {
         <Panel
           title="AI Health"
           icon={CHROME_ICONS.shield}
-          description="Live readiness signals and benchmark status."
+          description="Readiness signals and benchmark status."
           className="ai-command-panel--wide"
         >
           <div className="ai-command-health-grid">

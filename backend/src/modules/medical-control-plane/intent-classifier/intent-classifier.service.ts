@@ -224,7 +224,24 @@ export class IntentClassifierService {
       };
     }
 
-    // Priority 2: Clinical tool detection
+    const clinicalQuery = classifyClinicalQuery(message);
+    const lowerMessage = message.toLowerCase();
+    const explicitDocumentationToolRequest =
+      /\b(open|launch|use|run|start)\b/.test(lowerMessage) &&
+      (lowerMessage.includes('clinical documentation assistant') ||
+        lowerMessage.includes('documentation assistant'));
+
+    // Priority 2: Administrative documentation/billing requests before broad tool aliases.
+    if (clinicalQuery.category === 'administrative' && !explicitDocumentationToolRequest) {
+      return {
+        primaryIntent: PrimaryIntent.ADMINISTRATIVE,
+        confidence: clinicalQuery.confidence,
+        extractedParameters: {},
+        matchedPatterns: [clinicalQuery.category],
+      };
+    }
+
+    // Priority 3: Clinical tool detection
     const toolMatches = matchToolPatterns(message);
     if (toolMatches.length > 0) {
       const bestMatch = toolMatches[0];
@@ -245,9 +262,6 @@ export class IntentClassifierService {
         })),
       };
     }
-
-    // Priority 3: Clinical query classification
-    const clinicalQuery = classifyClinicalQuery(message);
 
     if (clinicalQuery.category === 'medical_reference') {
       return {

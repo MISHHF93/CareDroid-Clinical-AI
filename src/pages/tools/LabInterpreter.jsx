@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import StateSourceNotice from '../../components/StateSourceNotice';
 import ToolPageLayout from './ToolPageLayout';
 import './LabInterpreter.css';
 import { executeClinicalTool } from '../../services/clinicalOrchestratorApi';
@@ -6,6 +7,7 @@ import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExec
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getLabCategoryIcon, getToolIcon } from '../../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 
 const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
   const toolConfig = {
@@ -148,6 +150,17 @@ const LabInterpreter = ({ embedded = false, onCloseEmbedded } = {}) => {
       results={results}
     >
       <div className="lab-interpreter-content">
+        <StateSourceNotice
+          className="lab-source-notice"
+          title="Lab interpreter source states"
+          states={[
+            DEMO_LIVE_STATES.LOCAL_ONLY,
+            DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+            DEMO_LIVE_STATES.UNSUPPORTED,
+          ]}
+          details="Entered lab values and examples are local-only until submitted. Interpretation depends on the clinical tool backend; when that route is backend unavailable or unsupported, the page shows the returned unsupported/error state instead of fake live AI output."
+        />
+
         {/* Input Panel */}
         <div className="lab-input-panel">
           <div className="lab-panel-header">

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { useCostTracking } from '../contexts/CostTrackingContext';
 import analyticsService from '../services/analyticsService';
 import { toolRegistryById } from '../data/toolRegistry';
 import { NavIcon } from '../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './CostAnalyticsDashboard.css';
 
 const CostAnalyticsDashboard = () => {
@@ -81,6 +83,16 @@ const CostAnalyticsDashboard = () => {
           </button>
         </div>
       </header>
+
+      <StateSourceNotice
+        title="Cost analytics source states"
+        states={[
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+          DEMO_LIVE_STATES.UNSUPPORTED,
+        ]}
+        details="Cost totals, ROI, limits, and resets come from the local cost tracking context. A live billing backend is unavailable here; resetting data only changes local app state and external billing reconciliation is unsupported."
+      />
 
       {/* Cost Limit Warning */}
       {isCostLimitExceeded && (

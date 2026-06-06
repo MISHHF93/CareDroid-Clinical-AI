@@ -7,6 +7,11 @@
   overflow-x: clip;
 }
 
+.lab-source-notice {
+  grid-column: 1 / -1;
+  margin-bottom: 16px;
+}
+
 @media (max-width: 768px) {
   .lab-interpreter-content {
     padding: var(--app-shell-page-gutter-block, 16px) var(--app-fluid-page-gutter, 16px);

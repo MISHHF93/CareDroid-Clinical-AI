@@ -125,6 +125,9 @@ describe('FleetDashboard page', () => {
     expect(screen.getByText(/fleet visual analytics/i)).toBeInTheDocument();
     expect(screen.getByText(/vehicle status distribution/i)).toBeInTheDocument();
     expect(screen.getByText(/mock telemetry - not live fleet data/i)).toBeInTheDocument();
+    expect(screen.getByText(/fleet command source states/i)).toBeInTheDocument();
+    expect(screen.getByText(/^backend unavailable$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^unsupported$/i)).toBeInTheDocument();
     expect(screen.getByText('Test Van')).toBeInTheDocument();
     expect(screen.getByText('VH-TEST')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Maintenance status/i })).toBeInTheDocument();

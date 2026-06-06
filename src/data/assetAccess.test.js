@@ -196,4 +196,30 @@ describe('assetAccess', () => {
       ).accessState
     ).toBe(ASSET_ACCESS_STATES.ALLOWED);
   });
+
+  it('hides automation assets from roles outside the declared role visibility', () => {
+    const automation = {
+      id: 'automation-device-offline-maintenance',
+      lifecycleState: 'active',
+      executorStatus: 'registered',
+      permissionPolicy: {
+        allowedRoles: ['biomedical engineer', 'administrator'],
+      },
+    };
+
+    expect(resolveAssetAccessState(automation, null, 'student')).toEqual({
+      accessState: ASSET_ACCESS_STATES.HIDDEN,
+      reasons: ['role-hidden'],
+    });
+    expect([
+      ASSET_ACCESS_STATES.ALLOWED,
+      ASSET_ACCESS_STATES.BETA,
+    ]).toContain(
+      resolveAssetAccessState(
+        automation,
+        { subscriptionPlan: 'institutional' },
+        'biomedical engineer'
+      ).accessState
+    );
+  });
 });

@@ -151,6 +151,16 @@ export class EntitlementService {
       };
     }
 
+    if (!this.isAllowedRole(input.asset, input.userRole)) {
+      return {
+        ...base,
+        state: EntitlementAccessState.DISABLED,
+        isVisible: false,
+        isLaunchable: false,
+        reason: 'role-hidden',
+      };
+    }
+
     const adminOnly =
       rule?.adminOnly ||
       rolloutState === FeatureFlagState.ADMIN_ONLY ||
@@ -294,6 +304,16 @@ export class EntitlementService {
     return [UserRole.ADMIN, OrganizationMembershipRole.ADMIN, OrganizationMembershipRole.OWNER].includes(
       role as UserRole | OrganizationMembershipRole,
     );
+  }
+
+  private isAllowedRole(asset?: Partial<PlatformAsset> | null, role?: string) {
+    const permissionPolicy = asset?.permissionPolicy || {};
+    const allowedRoles = Array.isArray((permissionPolicy as any).allowedRoles)
+      ? ((permissionPolicy as any).allowedRoles as string[])
+      : [];
+    if (!allowedRoles.length || !role) return true;
+    const normalizedRole = role.toLowerCase();
+    return allowedRoles.map((item) => item.toLowerCase()).includes(normalizedRole);
   }
 
   private isAdminOnlyAsset(asset?: Partial<PlatformAsset> | null) {

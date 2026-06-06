@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './SimulationLaboratoryViewer.css';
 
 const LAB_RESULTS = Object.freeze([
@@ -67,6 +69,17 @@ export default function LaboratoryDashboard() {
           Open Lab Interpreter
         </Link>
       </section>
+
+      <StateSourceNotice
+        title="Laboratory source states"
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+          DEMO_LIVE_STATES.UNSUPPORTED,
+        ]}
+        details="Lab results, specimen queues, and trend cards are demo records. A live LIS/FHIR feed is not connected in this dashboard; operational specimen updates and clinical result posting are unsupported."
+      />
 
       <section className="ops-demo-grid ops-demo-grid--four" aria-label="Laboratory summary">
         <article className="ops-demo-metric">

@@ -63,7 +63,7 @@ export class DigitalTwinService {
       capabilities,
       dataContracts: this.buildDataContracts(source.mode, capabilities),
       sourceLabel: organizationId
-        ? `Digital twin for organization ${organizationId}`
+        ? `Organization-scoped digital twin demo for ${organizationId} - live data not connected`
         : 'Demo digital twin assembled from hospital map, IoT, fleet, and alert contracts',
       occupancy: { totalBeds: 96, occupiedBeds: 71, criticalBeds: 9, staffingRatio: '1:4.2' },
       floors: [
@@ -147,13 +147,14 @@ export class DigitalTwinService {
     const liveEligible = Boolean(organizationId && Object.values(capabilities).some(Boolean));
     return {
       mode,
-      status: liveEligible ? 'live_contract_ready' : 'demo_contract',
+      status: liveEligible ? 'organization_contract_ready' : 'demo_contract',
+      demoData: true,
       liveDataAvailable: false,
       organizationScoped: Boolean(organizationId),
       entitlementPackIds,
       generatedAt: new Date().toISOString(),
       note: liveEligible
-        ? 'Organization has digital twin capabilities enabled; live integrations can replace demo contracts when connected.'
+        ? 'Organization has digital twin capabilities enabled, but this snapshot still uses demo/static contracts until live integrations are connected.'
         : 'Snapshot uses demo contracts until organization entitlements and integrations are configured.',
     };
   }

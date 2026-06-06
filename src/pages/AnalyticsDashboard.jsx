@@ -1,12 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { apiFetchJson } from '../services/apiClient';
 import analyticsService from '../services/analyticsService';
 import offlineService from '../services/offlineService';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import { buildPlatformAnalytics, PLATFORM_ANALYTICS_DECISIONS } from '../data/platformAnalytics';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './AnalyticsDashboard.css';
 
 const AnalyticsDashboard = () => {
@@ -117,6 +119,17 @@ const AnalyticsDashboard = () => {
           {errorMessage} Showing privacy-safe demo and local aggregate telemetry.
         </div>
       )}
+
+      <StateSourceNotice
+        title="Platform analytics source states"
+        states={[
+          DEMO_LIVE_STATES.LIVE,
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+        ]}
+        details="Analytics uses backend aggregate metrics when available, plus local/offline tool activity and demo aggregate fallbacks. When the metrics backend is unavailable, the page clearly falls back instead of claiming live production analytics."
+      />
 
       <section className="analytics-summary">
         <div className="summary-card">

@@ -7,6 +7,7 @@ export const SUBSCRIPTION_TIERS = Object.freeze({
 export const ENTITLEMENT_CATEGORIES = Object.freeze({
   TOOLS: 'tools',
   CALCULATORS: 'calculators',
+  AUTOMATIONS: 'automations',
   SIMULATIONS: 'simulations',
   MAPS: 'maps',
   IOT: 'iot',
@@ -48,6 +49,33 @@ export const ENTITLEMENT_REGISTRY = Object.freeze([
     featureFlagId: 'simulation-suite',
     requiredPlan: SUBSCRIPTION_TIERS.PROFESSIONAL,
     requiredPackIds: ['research-education'],
+  },
+  {
+    assetIds: [
+      'automation-news2-clinician-notification',
+      'automation-potassium-lab-workflow',
+    ],
+    category: ENTITLEMENT_CATEGORIES.AUTOMATIONS,
+    featureFlagId: 'clinical-tools-core',
+    requiredPlan: SUBSCRIPTION_TIERS.PROFESSIONAL,
+    requiredPackIds: ['emergency-department-pack'],
+  },
+  {
+    assetIds: ['automation-device-offline-maintenance'],
+    category: ENTITLEMENT_CATEGORIES.AUTOMATIONS,
+    featureFlagId: 'medical-iot-dashboard',
+    requiredPlan: SUBSCRIPTION_TIERS.INSTITUTIONAL,
+    requiredPackIds: ['medical-iot-pack'],
+  },
+  {
+    assetIds: [
+      'automation-audit-event-review',
+      'automation-integration-unsupported-labeling',
+    ],
+    category: ENTITLEMENT_CATEGORIES.AUTOMATIONS,
+    featureFlagId: 'ai-governance-center',
+    requiredPlan: SUBSCRIPTION_TIERS.INSTITUTIONAL,
+    requiredPackIds: ['governance-compliance-pack'],
   },
   {
     assetIds: ['hospital-map', 'digital-twin', 'live-map'],

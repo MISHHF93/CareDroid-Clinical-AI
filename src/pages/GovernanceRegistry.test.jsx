@@ -81,6 +81,8 @@ describe('GovernanceRegistry', () => {
       query: '',
       riskLevel: 'all',
     });
+    expect(screen.getByText(/governance registry source states/i)).toBeInTheDocument();
+    expect(screen.getByText(/^backend unavailable$/i)).toBeInTheDocument();
 
     for (const label of [
       'Owner',

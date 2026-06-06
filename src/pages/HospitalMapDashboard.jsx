@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import StateSourceNotice from '../components/StateSourceNotice';
 import {
   fetchHospitalMapSnapshot,
   formatHospitalMapTime,
@@ -11,6 +12,7 @@ import {
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './HospitalMapDashboard.css';
 
 const DEVICE_TYPE_OPTIONS = ['all', 'Ventilator', 'Pulse oximeter', 'Infusion pump', 'ECG patch', 'Blood pressure monitor', 'Glucose monitor'];
@@ -572,6 +574,17 @@ export default function HospitalMapDashboard() {
             <span>Last updated: {formatHospitalMapTime(snapshot.generatedAt)}</span>
             {state.message ? <span>{state.message}</span> : null}
           </section>
+
+          <StateSourceNotice
+            title="Hospital map source states"
+            states={[
+              DEMO_LIVE_STATES.DEMO,
+              DEMO_LIVE_STATES.MOCK,
+              DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+              DEMO_LIVE_STATES.UNSUPPORTED,
+            ]}
+            details="Floor plans, device positions, patient placeholders, and telemetry are demo/mock data. If the backend demo contract is unavailable, the page falls back to a local demo snapshot; live device writes or dispatch actions are unsupported."
+          />
 
           <section className="hospital-map-summary" aria-label="Hospital map status summary">
             <SummaryCard label="Floors" value={summary.floors} />

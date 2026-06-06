@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { PlatformAssetsApi } from '../services/platformAssetsApi';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './GovernanceRegistry.css';
 
 const REQUIRED_COLUMNS = [
@@ -63,6 +65,16 @@ export default function GovernanceRegistry() {
         </p>
         {status && <p className="governance-registry-status">{status}</p>}
       </header>
+
+      <StateSourceNotice
+        title="Governance registry source states"
+        states={[
+          DEMO_LIVE_STATES.LIVE,
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+        ]}
+        details="Registry rows come from the platform assets backend when available. If the registry backend is unavailable, this page shows the unavailable state instead of presenting fallback rows as live governance evidence."
+      />
 
       <section className="governance-registry-summary" aria-label="Governance registry summary">
         <article>

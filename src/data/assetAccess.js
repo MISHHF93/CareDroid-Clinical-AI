@@ -86,6 +86,13 @@ function hasPermissionPolicyAccess(tool, context) {
   return permissions.every((permission) => effectivePermissions.has(permission));
 }
 
+function hasAllowedRoleAccess(tool = {}, userRole = 'student') {
+  const allowedRoles = tool.permissionPolicy?.allowedRoles || tool.allowedRoles || [];
+  if (!Array.isArray(allowedRoles) || !allowedRoles.length || !userRole) return true;
+  const normalizedRole = String(userRole).toLowerCase();
+  return allowedRoles.map((role) => String(role).toLowerCase()).includes(normalizedRole);
+}
+
 export function resolveAssetAccessState(tool, context = getPlatformEntitlementContext(), userRole = 'student') {
   const assetId = tool.id || tool.canonicalInventoryId;
   const hasOrganization = Boolean(context?.organization?.id);
@@ -102,6 +109,10 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
 
   if (['draft', 'archived'].includes(tool.lifecycleState)) {
     return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: [tool.lifecycleState] };
+  }
+
+  if (!hasAllowedRoleAccess(tool, userRole)) {
+    return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: ['role-hidden'] };
   }
 
   const entitlementDecision = resolveEntitlementDecision(tool, context, userRole);

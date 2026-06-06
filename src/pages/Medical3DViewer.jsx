@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './SimulationLaboratoryViewer.css';
 
 const MODELS = Object.freeze([
@@ -52,6 +54,17 @@ export default function Medical3DViewer() {
         </div>
         <span className="ops-demo-badge ops-demo-badge--warning">Asset-safe fallback</span>
       </section>
+
+      <StateSourceNotice
+        title="3D viewer source states"
+        states={[
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.MOCK,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+          DEMO_LIVE_STATES.UNSUPPORTED,
+        ]}
+        details="The canvas uses mock placeholder geometry only. No live imaging, DICOM renderer, GLB/GLTF asset manifest, or remote model service is connected; diagnostic image viewing and patient-specific model loading are unsupported."
+      />
 
       <section className="ops-demo-layout ops-demo-layout--viewer">
         <div className="ops-demo-panel">

@@ -5,6 +5,7 @@ import {
   TrendChart,
   VisualizationPanel,
 } from '../components/dashboard/DashboardVisualizations';
+import StateSourceNotice from '../components/StateSourceNotice';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import {
@@ -12,6 +13,7 @@ import {
   LOCAL_EVALUATION_DASHBOARD,
   fetchEvaluationDashboard,
 } from '../services/evaluationApi';
+import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './AiEvaluationDashboard.css';
 
 const LOWER_IS_BETTER = new Set(['hallucinationRate', 'latencyMs', 'costUsd']);
@@ -130,6 +132,17 @@ export default function AiEvaluationDashboard() {
       </section>
 
       {notice ? <p className="ai-evaluation-notice">{notice}</p> : null}
+
+      <StateSourceNotice
+        title="AI evaluation source states"
+        states={[
+          DEMO_LIVE_STATES.LIVE,
+          DEMO_LIVE_STATES.DEMO,
+          DEMO_LIVE_STATES.LOCAL_ONLY,
+          DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+        ]}
+        details="Evaluation metrics use backend benchmark results when available and local baseline data when the backend is unavailable. Local baselines are release-readiness examples, not live production model quality."
+      />
 
       <section className="dashboard-metric-grid" aria-label="AI evaluation metrics">
         {EVALUATION_METRICS.map((metric) => (

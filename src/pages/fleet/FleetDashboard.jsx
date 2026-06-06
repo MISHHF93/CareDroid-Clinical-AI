@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import StateSourceNotice from '../../components/StateSourceNotice';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { fetchFleetCommandSnapshot } from '../../services/fleetTelemetryService';
@@ -17,6 +18,7 @@ import {
   FleetSummaryWidget,
   FleetVehicleListWidget,
 } from './FleetDashboardWidgets';
+import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import './FleetDashboard.css';
 import './fleetUxShared.css';
 
@@ -111,6 +113,17 @@ export default function FleetDashboard() {
         <p className="fleet-live-region" role="status" aria-live="polite" aria-atomic="true">
           {statusMessage}
         </p>
+
+        <StateSourceNotice
+          title="Fleet command source states"
+          states={[
+            DEMO_LIVE_STATES.DEMO,
+            DEMO_LIVE_STATES.MOCK,
+            DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
+            DEMO_LIVE_STATES.UNSUPPORTED,
+          ]}
+          details="Fleet command telemetry is mock/demo operational data unless a live telematics backend is connected. Dispatch writes, route assignment, and external fleet control remain unsupported from this dashboard."
+        />
 
         {phase === 'loading' ? (
           <div
