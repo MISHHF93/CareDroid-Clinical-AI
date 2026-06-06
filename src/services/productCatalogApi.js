@@ -96,6 +96,18 @@ export const ProductCatalogApi = {
     return response.json();
   },
 
+  async getIntegrationReadiness() {
+    const response = await apiFetch('/api/integration-readiness');
+    if (!response.ok) throw new Error(`Integration readiness failed (${response.status})`);
+    return response.json();
+  },
+
+  async getAssetDependencyGraph() {
+    const response = await apiFetch('/api/dependency-graph');
+    if (!response.ok) throw new Error(`Asset dependency graph failed (${response.status})`);
+    return response.json();
+  },
+
   async getMaturityQuestionnaire() {
     const response = await apiFetch('/api/maturity-assessments/questionnaire');
     if (!response.ok) throw new Error(`Maturity questionnaire failed (${response.status})`);

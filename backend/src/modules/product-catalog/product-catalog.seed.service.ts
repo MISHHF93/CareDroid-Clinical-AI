@@ -37,7 +37,11 @@ export class ProductCatalogSeedService implements OnModuleInit {
 
   async seedIfEmpty() {
     const count = await this.productRepository.count();
-    if (count > 0) return;
+    if (count > 0) {
+      await this.backfillProductBuyerMetadata();
+      await this.backfillIntegrationOfferings();
+      return;
+    }
 
     for (const row of SEED_PRODUCTS) {
       await this.productRepository.save(this.productRepository.create(row));
@@ -64,5 +68,52 @@ export class ProductCatalogSeedService implements OnModuleInit {
     }
 
     await this.validationService.validateCatalogReferences();
+  }
+
+  private async backfillProductBuyerMetadata() {
+    for (const row of SEED_PRODUCTS) {
+      const existing = await this.productRepository.findOne({ where: { id: row.id } });
+      if (!existing) continue;
+
+      let changed = false;
+      for (const field of ['buyerPersona', 'decisionMaker', 'stakeholders'] as const) {
+        if (!(existing[field] || []).length) {
+          existing[field] = (row as any)[field] || [];
+          changed = true;
+        }
+      }
+      const expectedOutcomes = [...new Set([...(existing.expectedOutcomes || []), ...((row as any).expectedOutcomes || [])])];
+      if (expectedOutcomes.length !== (existing.expectedOutcomes || []).length) {
+        existing.expectedOutcomes = expectedOutcomes;
+        changed = true;
+      }
+
+      if (changed) {
+        await this.productRepository.save(existing);
+      }
+    }
+  }
+
+  private async backfillIntegrationOfferings() {
+    for (const row of SEED_INTEGRATION_OFFERINGS) {
+      const existing = await this.integrationRepository.findOne({ where: { id: row.id } });
+      if (!existing) {
+        await this.integrationRepository.save(this.integrationRepository.create(row));
+        continue;
+      }
+
+      let changed = false;
+      for (const field of ['slug', 'name', 'category', 'status', 'linkedAssetId', 'docsUrl', 'sortOrder'] as const) {
+        const nextValue = (row as any)[field];
+        if (nextValue !== undefined && (existing as any)[field] !== nextValue) {
+          (existing as any)[field] = nextValue;
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        await this.integrationRepository.save(existing);
+      }
+    }
   }
 }

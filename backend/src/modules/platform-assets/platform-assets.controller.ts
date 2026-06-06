@@ -31,7 +31,9 @@ import { PlatformAssetLifecycle } from './enums/platform-asset.enums';
 import { PlatformAssetsService } from './platform-assets.service';
 import { AssetAccessService } from './asset-access.service';
 import { AssetRecommendationService } from './asset-recommendation.service';
+import { DepartmentAssetMappingService } from './department-asset-mapping.service';
 import { PlatformContextService } from './platform-context.service';
+import { ServiceLineArchitectureService } from './service-line-architecture.service';
 
 @ApiTags('platform')
 @Controller('platform')
@@ -46,6 +48,8 @@ export class PlatformAssetsController {
     private readonly platformContextService: PlatformContextService,
     private readonly assetAccessService: AssetAccessService,
     private readonly assetRecommendationService: AssetRecommendationService,
+    private readonly departmentAssetMappingService: DepartmentAssetMappingService,
+    private readonly serviceLineArchitectureService: ServiceLineArchitectureService,
     private readonly digitalTwinService: DigitalTwinService,
     private readonly organizationAnalyticsService: OrganizationAnalyticsService,
   ) {}
@@ -104,6 +108,58 @@ export class PlatformAssetsController {
     @Query('lifecycle') lifecycle?: string,
   ) {
     return this.platformAssetsService.listAssets({ query, assetType, packId, lifecycle });
+  }
+
+  @Get('departments')
+  @ApiOperation({ summary: 'List department-to-asset mappings' })
+  async departments(@Req() req: any, @Query('organizationId') organizationId?: string) {
+    const orgId = organizationId || req.tenantContext?.organizationId;
+    if (orgId) {
+      this.assertTenantOrganization(req, orgId);
+      await this.assertOrgMember(req.user.id, orgId);
+    }
+    return this.departmentAssetMappingService.getDepartmentGraph({ organizationId: orgId });
+  }
+
+  @Get('departments/:departmentId')
+  @ApiOperation({ summary: 'Get a department asset mapping' })
+  async department(
+    @Req() req: any,
+    @Param('departmentId') departmentId: string,
+    @Query('organizationId') organizationId?: string,
+  ) {
+    const orgId = organizationId || req.tenantContext?.organizationId;
+    if (orgId) {
+      this.assertTenantOrganization(req, orgId);
+      await this.assertOrgMember(req.user.id, orgId);
+    }
+    return this.departmentAssetMappingService.getDepartmentById(departmentId, { organizationId: orgId });
+  }
+
+  @Get('service-lines')
+  @ApiOperation({ summary: 'List service-line architecture mappings' })
+  async serviceLines(@Req() req: any, @Query('organizationId') organizationId?: string) {
+    const orgId = organizationId || req.tenantContext?.organizationId;
+    if (orgId) {
+      this.assertTenantOrganization(req, orgId);
+      await this.assertOrgMember(req.user.id, orgId);
+    }
+    return this.serviceLineArchitectureService.getServiceLineGraph({ organizationId: orgId });
+  }
+
+  @Get('service-lines/:serviceLineId')
+  @ApiOperation({ summary: 'Get a service-line architecture mapping' })
+  async serviceLine(
+    @Req() req: any,
+    @Param('serviceLineId') serviceLineId: string,
+    @Query('organizationId') organizationId?: string,
+  ) {
+    const orgId = organizationId || req.tenantContext?.organizationId;
+    if (orgId) {
+      this.assertTenantOrganization(req, orgId);
+      await this.assertOrgMember(req.user.id, orgId);
+    }
+    return this.serviceLineArchitectureService.getServiceLineById(serviceLineId, { organizationId: orgId });
   }
 
   @Get('packs')

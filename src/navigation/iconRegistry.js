@@ -111,6 +111,7 @@ const NAV_ICONS = {
   'developer-audit': ScrollText,
   plugins: Braces,
   'dependency-map': Link2,
+  'dependency-graph': GitBranch,
   'data-lineage': GitBranch,
   'self-diagnostics': Activity,
   'system-health': Activity,

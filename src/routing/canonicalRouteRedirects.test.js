@@ -103,6 +103,7 @@ describe('canonical route redirects', () => {
     expectRoute('/feature-flags', 'FeatureFlagCenter');
     expectRoute('/plugins', 'PluginMarketplace');
     expectRoute('/dependency-map', 'DependencyMap');
+    expectRoute('/dependency-graph', 'DependencyGraph');
     expectRoute('/data-lineage', 'DataLineageExplorer');
     expectRoute('/self-diagnostics', 'PlatformSelfDiagnostics');
     expect(appSource).toContain("path: '/tools'");
@@ -123,6 +124,9 @@ describe('canonical route redirects', () => {
   it('keeps products, asset packs, and configuration studio as first-class routes', () => {
     expectRoute('/products', 'ProductsIndexPage');
     expectRoute('/asset-packs', 'PackMarketplace');
+    expectRoute('/departments', 'DepartmentsPage');
+    expectRoute('/service-lines', 'ServiceLinesPage');
+    expectRoute('/integration-readiness', 'IntegrationReadinessPage');
     expectRoute('/configuration-studio', 'ConfigurationStudioPage');
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ path: '/asset-packs' })])

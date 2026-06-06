@@ -28,6 +28,7 @@ import AnalyticsDashboard from '../pages/AnalyticsDashboard';
 import FeatureFlagCenter from '../pages/FeatureFlagCenter';
 import PluginMarketplace from '../pages/PluginMarketplace';
 import DependencyMap from '../pages/DependencyMap';
+import DependencyGraph from '../pages/DependencyGraph';
 import DataLineageExplorer from '../pages/DataLineageExplorer';
 import PlatformSelfDiagnostics from '../pages/PlatformSelfDiagnostics';
 import CostAnalyticsDashboard from '../pages/CostAnalyticsDashboard';
@@ -145,6 +146,38 @@ vi.mock('../services/platformSystemsApi', () => ({
     ok: true,
     data: { status: 'demo_review_required' },
   }),
+}));
+
+vi.mock('../services/productCatalogApi', () => ({
+  ProductCatalogApi: {
+    getAssetDependencyGraph: vi.fn().mockResolvedValue({
+      summary: {
+        products: 1,
+        assetPacks: 1,
+        assets: 1,
+        routes: 1,
+        backendServices: 1,
+        integrations: 1,
+      },
+      issueCounts: {
+        'missing-dependency': 0,
+        'duplicate-dependency': 0,
+        'orphan-asset': 0,
+      },
+      issues: [],
+      chains: [
+        {
+          id: 'product:pack:asset',
+          product: { id: 'product', name: 'Emergency Department Solution' },
+          assetPack: { id: 'pack', name: 'Emergency Department Pack' },
+          asset: { id: 'asset', title: 'qSOFA', assetType: 'calculator', dependencies: [] },
+          route: '/tools/calculators/qsofa',
+          backendServices: ['ClinicalTools'],
+          integrations: [{ id: 'int-fhir', name: 'FHIR' }],
+        },
+      ],
+    }),
+  },
 }));
 
 vi.mock('../services/platformGovernanceApi', async (importOriginal) => {
@@ -383,6 +416,7 @@ const PAGE_BY_ID = {
   'feature-flags': FeatureFlagCenter,
   plugins: PluginMarketplace,
   'dependency-map': DependencyMap,
+  'dependency-graph': DependencyGraph,
   'data-lineage': DataLineageExplorer,
   'self-diagnostics': PlatformSelfDiagnostics,
   costs: CostAnalyticsDashboard,

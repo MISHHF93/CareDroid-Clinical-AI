@@ -1,5 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { PlatformAsset } from './entities/platform-asset.entity';
+import { DEPARTMENT_IDS, normalizeDepartmentId, normalizeDepartmentIds } from './department-taxonomy';
 import {
   OrganizationType,
   PlatformAssetLifecycle,
@@ -47,6 +48,10 @@ export interface AssetRegistryMetadata {
   organizationTypes: string[];
   workspaceTags: string[];
   intendedRoles: string[];
+  primaryDepartment: string;
+  secondaryDepartments: string[];
+  recommendedRoles: string[];
+  requiredPermissions: string[];
   lifecycleStatus: PlatformAssetLifecycle;
   subscriptionTier: PricingTier;
   riskLevel: AssetRegistryRiskLevel;
@@ -67,6 +72,9 @@ export const REQUIRED_ASSET_METADATA_FIELDS: Array<keyof AssetRegistryMetadata> 
   'organizationTypes',
   'workspaceTags',
   'intendedRoles',
+  'primaryDepartment',
+  'recommendedRoles',
+  'requiredPermissions',
   'lifecycleStatus',
   'subscriptionTier',
   'riskLevel',
@@ -199,6 +207,10 @@ export function platformAssetToRegistryMetadata(asset: PlatformAsset): AssetRegi
     organizationTypes: asStringArray(asset.organizationTypes),
     workspaceTags: asStringArray(asset.workspaceTags),
     intendedRoles: asStringArray(asset.intendedRoles),
+    primaryDepartment: normalizeDepartmentId(asset.primaryDepartment) || '',
+    secondaryDepartments: normalizeDepartmentIds(asset.secondaryDepartments || []),
+    recommendedRoles: asStringArray(asset.recommendedRoles),
+    requiredPermissions: asStringArray(asset.requiredPermissions),
     lifecycleStatus: normalizeAssetLifecycle(asset.lifecycle) || PlatformAssetLifecycle.DRAFT,
     subscriptionTier: normalizeSubscriptionTier(asset.pricingTier) || PricingTier.STANDARD,
     riskLevel: normalizeRiskLevel(asset.riskLevel) || AssetRegistryRiskLevel.CLINICAL_DECISION_SUPPORT,
@@ -248,6 +260,14 @@ export function validateAssetRegistryMetadata(
   }
   if (metadata.demoStatus && !DEMO_STATUSES.has(metadata.demoStatus)) {
     issues.push({ field: 'demoStatus', message: 'is not a supported demo/live status' });
+  }
+  if (metadata.primaryDepartment && !DEPARTMENT_IDS.includes(metadata.primaryDepartment as any)) {
+    issues.push({ field: 'primaryDepartment', message: 'is not a supported department' });
+  }
+  for (const department of metadata.secondaryDepartments || []) {
+    if (!DEPARTMENT_IDS.includes(department as any)) {
+      issues.push({ field: 'secondaryDepartments', message: `contains unsupported department ${department}` });
+    }
   }
 
   for (const organizationType of metadata.organizationTypes || []) {

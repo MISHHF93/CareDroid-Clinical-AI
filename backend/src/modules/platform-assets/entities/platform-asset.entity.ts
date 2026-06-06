@@ -51,6 +51,18 @@ export class PlatformAsset {
   @Column({ type: 'simple-json', default: '[]' })
   specialties: string[];
 
+  @Column({ type: 'varchar', length: 80, nullable: true })
+  primaryDepartment: string;
+
+  @Column({ type: 'simple-json', default: '[]' })
+  secondaryDepartments: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  recommendedRoles: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  requiredPermissions: string[];
+
   @Column({ type: 'varchar', length: 32, nullable: true })
   riskLevel: string;
 

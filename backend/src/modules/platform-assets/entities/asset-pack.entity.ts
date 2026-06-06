@@ -31,6 +31,18 @@ export class AssetPack {
   salesMetadata: Record<string, unknown>;
 
   @Column({ type: 'simple-json', default: '[]' })
+  buyerPersona: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  decisionMaker: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  stakeholders: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  expectedOutcomes: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
   defaultModules: string[];
 
   @Column({ type: 'varchar', length: 32, default: PricingTier.STANDARD })

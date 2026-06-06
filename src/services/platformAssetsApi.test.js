@@ -32,4 +32,34 @@ describe('PlatformAssetsApi marketplace helpers', () => {
       '/api/platform/marketplace/packs/icu-pack?organizationId=org-1'
     );
   });
+
+  it('lists departments with organization scope', async () => {
+    await PlatformAssetsApi.listDepartments({ organizationId: 'org-1' });
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/platform/departments?organizationId=org-1');
+  });
+
+  it('loads department details with organization scope', async () => {
+    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+
+    await PlatformAssetsApi.getDepartment('emergency', { organizationId: 'org-1' });
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/platform/departments/emergency?organizationId=org-1');
+  });
+
+  it('lists service lines with organization scope', async () => {
+    await PlatformAssetsApi.listServiceLines({ organizationId: 'org-1' });
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/platform/service-lines?organizationId=org-1');
+  });
+
+  it('loads service line details with organization scope', async () => {
+    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+
+    await PlatformAssetsApi.getServiceLine('emergency-medicine', { organizationId: 'org-1' });
+
+    expect(apiFetch).toHaveBeenCalledWith(
+      '/api/platform/service-lines/emergency-medicine?organizationId=org-1'
+    );
+  });
 });

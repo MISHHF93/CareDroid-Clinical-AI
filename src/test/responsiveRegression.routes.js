@@ -131,6 +131,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'feature-flags', path: '/feature-flags', match: 'heading', heading: /feature flag center/i },
   { id: 'plugins', path: '/plugins', match: 'heading', heading: /plugin marketplace/i },
   { id: 'dependency-map', path: '/dependency-map', match: 'heading', heading: /platform wiring map/i },
+  { id: 'dependency-graph', path: '/dependency-graph', match: 'heading', heading: /asset dependency graph/i },
   { id: 'data-lineage', path: '/data-lineage', match: 'heading', heading: /data lineage explorer/i },
   { id: 'self-diagnostics', path: '/self-diagnostics', match: 'heading', heading: /platform self-diagnostics/i },
   { id: 'costs', path: '/costs', match: 'heading', heading: /cost analytics/i },

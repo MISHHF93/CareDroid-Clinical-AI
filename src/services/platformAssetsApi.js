@@ -37,6 +37,46 @@ export const PlatformAssetsApi = {
     return response.json();
   },
 
+  async listDepartments(params = {}) {
+    const search = new URLSearchParams();
+    if (params.organizationId) search.set('organizationId', params.organizationId);
+    const qs = search.toString();
+    const response = await apiFetch(`/api/platform/departments${qs ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error(`List departments failed (${response.status})`);
+    return response.json();
+  },
+
+  async getDepartment(departmentId, params = {}) {
+    const search = new URLSearchParams();
+    if (params.organizationId) search.set('organizationId', params.organizationId);
+    const qs = search.toString();
+    const response = await apiFetch(
+      `/api/platform/departments/${encodeURIComponent(departmentId)}${qs ? `?${qs}` : ''}`
+    );
+    if (!response.ok) throw new Error(`Department failed (${response.status})`);
+    return response.json();
+  },
+
+  async listServiceLines(params = {}) {
+    const search = new URLSearchParams();
+    if (params.organizationId) search.set('organizationId', params.organizationId);
+    const qs = search.toString();
+    const response = await apiFetch(`/api/platform/service-lines${qs ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error(`List service lines failed (${response.status})`);
+    return response.json();
+  },
+
+  async getServiceLine(serviceLineId, params = {}) {
+    const search = new URLSearchParams();
+    if (params.organizationId) search.set('organizationId', params.organizationId);
+    const qs = search.toString();
+    const response = await apiFetch(
+      `/api/platform/service-lines/${encodeURIComponent(serviceLineId)}${qs ? `?${qs}` : ''}`
+    );
+    if (!response.ok) throw new Error(`Service line failed (${response.status})`);
+    return response.json();
+  },
+
   async listMarketplacePacks(params = {}) {
     const search = new URLSearchParams();
     if (params.organizationId) search.set('organizationId', params.organizationId);

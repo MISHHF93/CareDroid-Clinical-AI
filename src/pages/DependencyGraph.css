@@ -1,0 +1,170 @@
+.dependency-graph {
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.dependency-graph-hero,
+.dependency-graph-panel {
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  background: var(--panel-background);
+  padding: 24px;
+}
+
+.dependency-graph-eyebrow {
+  margin: 0 0 8px;
+  color: var(--app-accent-interactive);
+  font-size: var(--font-12, 12px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dependency-graph h1,
+.dependency-graph h2,
+.dependency-graph h3 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.dependency-graph h1 {
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+}
+
+.dependency-graph p {
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.dependency-graph-hero p {
+  max-width: 860px;
+  margin: 8px 0 0;
+}
+
+.dependency-graph-status {
+  color: var(--warning-text, var(--text-secondary));
+}
+
+.dependency-graph-summary,
+.dependency-graph-issue-counts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
+  gap: 12px;
+}
+
+.dependency-graph-summary > div,
+.dependency-graph-issue-counts button {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  background: var(--panel-background);
+  padding: 16px;
+  text-align: left;
+}
+
+.dependency-graph-issue-counts button {
+  cursor: pointer;
+}
+
+.dependency-graph-summary span,
+.dependency-graph-issue-counts span,
+.dependency-graph label span,
+.dependency-graph-chain span,
+.dependency-graph-issue > span {
+  color: var(--text-secondary);
+  font-size: var(--font-12, 12px);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.dependency-graph-summary strong,
+.dependency-graph-issue-counts strong {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.dependency-graph-panel > header,
+.dependency-graph-chain-card > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.dependency-graph label {
+  min-width: min(100%, 220px);
+  display: grid;
+  gap: 8px;
+}
+
+.dependency-graph select {
+  min-height: 42px;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--input-background, var(--panel-background));
+  color: var(--text-primary);
+  padding: 0 12px;
+}
+
+.dependency-graph-issues,
+.dependency-graph-chain-list {
+  display: grid;
+  gap: 12px;
+}
+
+.dependency-graph-issue,
+.dependency-graph-chain-card {
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  background: var(--surface-background, rgba(255, 255, 255, 0.03));
+  padding: 16px;
+}
+
+.dependency-graph-issue--high {
+  border-color: var(--danger-border, #ef4444);
+}
+
+.dependency-graph-issue--medium {
+  border-color: var(--warning-border, #f59e0b);
+}
+
+.dependency-graph-chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: 10px;
+}
+
+.dependency-graph-chain li {
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  padding: 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.dependency-graph-chain strong,
+.dependency-graph-chain-card > header > span {
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 720px) {
+  .dependency-graph {
+    padding: 18px;
+  }
+
+  .dependency-graph-panel > header,
+  .dependency-graph-chain-card > header {
+    flex-direction: column;
+  }
+}

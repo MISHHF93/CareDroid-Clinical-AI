@@ -116,6 +116,8 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/care-pathways/:slug', controller: 'ProductCatalogController' },
   { method: 'GET', path: '/api/agents', controller: 'ProductCatalogController' },
   { method: 'GET', path: '/api/integrations-marketplace', controller: 'ProductCatalogController' },
+  { method: 'GET', path: '/api/integration-readiness', controller: 'ProductCatalogController' },
+  { method: 'GET', path: '/api/dependency-graph', controller: 'ProductCatalogController' },
   {
     method: 'GET',
     path: '/api/maturity-assessments/questionnaire',

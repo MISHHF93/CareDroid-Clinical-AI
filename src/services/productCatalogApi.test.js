@@ -33,6 +33,16 @@ describe('ProductCatalogApi builder helpers', () => {
     expect(apiFetch).toHaveBeenCalledWith('/api/care-pathways');
   });
 
+  it('loads integration readiness', async () => {
+    await ProductCatalogApi.getIntegrationReadiness();
+    expect(apiFetch).toHaveBeenCalledWith('/api/integration-readiness');
+  });
+
+  it('loads asset dependency graph', async () => {
+    await ProductCatalogApi.getAssetDependencyGraph();
+    expect(apiFetch).toHaveBeenCalledWith('/api/dependency-graph');
+  });
+
   it('gets care pathway detail by slug', async () => {
     apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
     await ProductCatalogApi.getCarePathway('sepsis');

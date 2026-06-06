@@ -10,6 +10,10 @@ import {
   PlatformAssetType,
   PricingTier,
 } from '../enums/platform-asset.enums';
+import {
+  defaultRequiredPermissions,
+  inferDepartmentsForAsset,
+} from '../department-taxonomy';
 
 /** Legacy workspace enabledToolIds → canonical asset ids */
 export const LEGACY_TOOL_ID_ALIASES: Record<string, string[]> = {
@@ -189,7 +193,102 @@ const CORE_PLATFORM_ASSET_IDS = [
   ...AI_AGENT_IDS,
 ];
 
-export const SEED_ASSET_PACKS = [
+const PACK_BUYER_METADATA_BY_ID: Record<
+  string,
+  {
+    buyerPersona: string[];
+    decisionMaker: string[];
+    stakeholders: string[];
+    expectedOutcomes: string[];
+  }
+> = {
+  'core-platform': {
+    buyerPersona: ['Chief Medical Officer', 'CIO', 'Clinical Operations Leader'],
+    decisionMaker: ['Chief Medical Officer', 'CIO'],
+    stakeholders: ['Clinicians', 'Nursing leadership', 'Clinical informatics', 'IT operations'],
+    expectedOutcomes: ['core platform adoption', 'standardized access to clinical tools'],
+  },
+  'emergency-medicine': {
+    buyerPersona: ['ED Director', 'Chief Medical Officer'],
+    decisionMaker: ['ED Director', 'Chief Medical Officer'],
+    stakeholders: ['Emergency physicians', 'Triage nurses', 'Stroke teams', 'Trauma teams'],
+    expectedOutcomes: ['faster risk stratification', 'standardized emergency workflows'],
+  },
+  'laboratory-intelligence': {
+    buyerPersona: ['Laboratory Director'],
+    decisionMaker: ['Laboratory Director'],
+    stakeholders: ['Pathologists', 'Lab managers', 'Lab technologists', 'Quality analysts'],
+    expectedOutcomes: ['faster lab interpretation', 'quality-control visibility'],
+  },
+  'hospital-operations': {
+    buyerPersona: ['COO', 'Operations Director'],
+    decisionMaker: ['COO', 'Chief Medical Officer'],
+    stakeholders: ['Bed managers', 'Facilities teams', 'Incident commanders', 'Nursing operations'],
+    expectedOutcomes: ['capacity visibility', 'incident response coordination'],
+  },
+  'fleet-logistics': {
+    buyerPersona: ['EMS Director'],
+    decisionMaker: ['EMS Director'],
+    stakeholders: ['Dispatchers', 'Paramedics', 'Fleet operators', 'Transport coordinators'],
+    expectedOutcomes: ['dispatch efficiency', 'fleet visibility'],
+  },
+  'research-education': {
+    buyerPersona: ['Research Director', 'Dean of Medical Education'],
+    decisionMaker: ['Research Director', 'Dean of Medical Education'],
+    stakeholders: ['Researchers', 'Principal investigators', 'Educators', 'Students'],
+    expectedOutcomes: ['evidence synthesis', 'research and education workflow adoption'],
+  },
+  'emergency-department-pack': {
+    buyerPersona: ['ED Director', 'Chief Medical Officer'],
+    decisionMaker: ['ED Director', 'Chief Medical Officer'],
+    stakeholders: ['Emergency physicians', 'Triage nurses', 'Charge nurses', 'Quality leaders'],
+    expectedOutcomes: ['faster risk stratification', 'standardized triage', 'simulation training'],
+  },
+  'icu-pack': {
+    buyerPersona: ['ICU Medical Director', 'Chief Nursing Officer'],
+    decisionMaker: ['ICU Medical Director', 'Chief Medical Officer'],
+    stakeholders: ['Intensivists', 'ICU nurses', 'Respiratory therapists', 'Pharmacists'],
+    expectedOutcomes: ['critical care standardization', 'sepsis bundle support'],
+  },
+  'cardiology-pack': {
+    buyerPersona: ['Cardiology Service Line Director'],
+    decisionMaker: ['Cardiology Service Line Director', 'Chief Medical Officer'],
+    stakeholders: ['Cardiologists', 'ED physicians', 'Telemetry teams', 'Cath lab coordinators'],
+    expectedOutcomes: ['ACS pathway adherence', 'telemetry visibility'],
+  },
+  'medical-iot-pack': {
+    buyerPersona: ['Biomedical Engineering Lead'],
+    decisionMaker: ['Biomedical Engineering Lead'],
+    stakeholders: ['Clinical engineers', 'Device managers', 'IT operations', 'Nursing operations'],
+    expectedOutcomes: ['device uptime', 'telemetry alerting'],
+  },
+  'simulation-training-pack': {
+    buyerPersona: ['Simulation Center Director', 'Nursing Education Director'],
+    decisionMaker: ['Simulation Center Director', 'Dean of Medical Education'],
+    stakeholders: ['Instructors', 'Residents', 'Medical students', 'Simulation technicians'],
+    expectedOutcomes: ['competency tracking', 'scenario completion'],
+  },
+  'governance-compliance-pack': {
+    buyerPersona: ['CIO', 'Compliance Officer'],
+    decisionMaker: ['CIO', 'Compliance Officer'],
+    stakeholders: ['Privacy teams', 'Security teams', 'Clinical safety reviewers', 'Quality analysts'],
+    expectedOutcomes: ['audit readiness', 'AI governance'],
+  },
+  'digital-twin-pack': {
+    buyerPersona: ['COO', 'Facilities Director'],
+    decisionMaker: ['COO', 'Chief Operating Officer'],
+    stakeholders: ['Bed managers', 'Facilities teams', 'Transport coordinators', 'Incident command'],
+    expectedOutcomes: ['operations command center', 'capacity visibility'],
+  },
+  'ai-workflow-pack': {
+    buyerPersona: ['Chief Medical Information Officer', 'Clinical Informatics Director'],
+    decisionMaker: ['Chief Medical Information Officer', 'Chief Medical Officer'],
+    stakeholders: ['Physicians', 'Hospitalists', 'Documentation teams', 'Clinical informatics'],
+    expectedOutcomes: ['clinical workflow automation', 'documentation efficiency'],
+  },
+};
+
+const RAW_SEED_ASSET_PACKS = [
   {
     id: 'core-platform',
     name: 'Core Platform',
@@ -431,6 +530,26 @@ export const SEED_ASSET_PACKS = [
   },
 ];
 
+export const SEED_ASSET_PACKS = RAW_SEED_ASSET_PACKS.map((pack) => {
+  const buyerMetadata = PACK_BUYER_METADATA_BY_ID[pack.id] || {
+    buyerPersona: (pack as any).targetRoles || ['Clinical Operations Leader'],
+    decisionMaker: ['Clinical Operations Leader'],
+    stakeholders: (pack as any).targetRoles || [],
+    expectedOutcomes: ((pack as any).salesMetadata?.outcomes as string[]) || ['asset adoption'],
+  };
+  return {
+    ...pack,
+    ...buyerMetadata,
+    salesMetadata: {
+      ...((pack as any).salesMetadata || {}),
+      buyerPersona: buyerMetadata.buyerPersona,
+      decisionMaker: buyerMetadata.decisionMaker,
+      stakeholders: buyerMetadata.stakeholders,
+      expectedOutcomes: buyerMetadata.expectedOutcomes,
+    },
+  };
+});
+
 export const DEFAULT_PACKS_BY_ORGANIZATION_TYPE: Record<OrganizationType, string[]> = {
   [OrganizationType.HOSPITAL]: [
     'core-platform',
@@ -586,6 +705,7 @@ type SeedPlatformAsset = {
   title: string;
   description: string;
   category: string;
+  clinicalSpecialty: string;
   route: string;
   launchType: string;
   permissionPolicy: Record<string, unknown>;
@@ -594,6 +714,10 @@ type SeedPlatformAsset = {
   intendedRoles: string[];
   workspaceTags: string[];
   specialties: string[];
+  primaryDepartment: string;
+  secondaryDepartments: string[];
+  recommendedRoles: string[];
+  requiredPermissions: string[];
   riskLevel: AssetRegistryRiskLevel;
   backendStatus: string;
   demoStatus: AssetDemoLiveStatus;
@@ -991,6 +1115,36 @@ function normalizeSeedAsset(
         canCallTools: true,
       }
     : null;
+  const permissionPolicy = overrides.permissionPolicy || agentPermissionPolicy || DEFAULT_PERMISSION_POLICY;
+  const departmentInput = {
+    id,
+    title: overrides.title || agent?.title || titleize(id),
+    category: overrides.category,
+    clinicalSpecialty: overrides.clinicalSpecialty,
+    route: overrides.route || agent?.route,
+    assetType,
+    workspaceTags: workspaceTags.length ? workspaceTags : agent?.workspaceTags || DEFAULT_WORKSPACE_TAGS,
+    specialties: overrides.specialties || [],
+    intendedRoles: intendedRoles.length ? intendedRoles : DEFAULT_INTENDED_ROLES,
+    packIds,
+    permissionPolicy,
+  };
+  const inferredDepartments = inferDepartmentsForAsset(departmentInput);
+  const primaryDepartment = overrides.primaryDepartment || inferredDepartments.primaryDepartment;
+  const secondaryDepartments = union<string>(
+    overrides.secondaryDepartments,
+    inferredDepartments.secondaryDepartments,
+  ).filter((department) => department !== primaryDepartment);
+  const recommendedRoles = union<string>(
+    overrides.recommendedRoles,
+    intendedRoles,
+    agent?.defaultForRoles,
+    defaults.intendedRoles,
+  );
+  const requiredPermissions = union<string>(
+    overrides.requiredPermissions,
+    defaultRequiredPermissions({ ...departmentInput, primaryDepartment }),
+  );
 
   return {
     id,
@@ -1009,6 +1163,7 @@ function normalizeSeedAsset(
           : assetType === PlatformAssetType.DASHBOARD
             ? 'Dashboard'
             : 'Clinical'),
+    clinicalSpecialty: overrides.clinicalSpecialty || '',
     route:
       overrides.route ||
       agent?.route ||
@@ -1018,12 +1173,16 @@ function normalizeSeedAsset(
           ? `/tools/calculators/${id}`
           : `/tools/${id}`),
     launchType: overrides.launchType || 'registry',
-    permissionPolicy: overrides.permissionPolicy || agentPermissionPolicy || DEFAULT_PERMISSION_POLICY,
+    permissionPolicy,
     organizationTypes: organizationTypes.length ? organizationTypes : DEFAULT_ORGANIZATION_TYPES,
     roleProfiles: overrides.roleProfiles || [],
     intendedRoles: intendedRoles.length ? intendedRoles : DEFAULT_INTENDED_ROLES,
     workspaceTags: workspaceTags.length ? workspaceTags : agent?.workspaceTags || DEFAULT_WORKSPACE_TAGS,
     specialties: overrides.specialties || [],
+    primaryDepartment,
+    secondaryDepartments,
+    recommendedRoles: recommendedRoles.length ? recommendedRoles : DEFAULT_INTENDED_ROLES,
+    requiredPermissions,
     riskLevel,
     backendStatus: overrides.backendStatus || 'partial',
     demoStatus,

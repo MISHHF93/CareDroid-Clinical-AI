@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Card from '../../components/ui/card';
 import Button from '../../components/ui/button';
@@ -149,6 +149,38 @@ function ProductizationList({ title, items = [] }) {
   );
 }
 
+function BuyerStakeholderSummary({ item }) {
+  const rows = [
+    ['Buyer persona', item?.buyerPersona],
+    ['Decision maker', item?.decisionMaker],
+    ['Stakeholders', item?.stakeholders],
+    ['Expected outcomes', item?.expectedOutcomes],
+  ].filter(([, values]) => values?.length);
+
+  if (!rows.length) return null;
+
+  return (
+    <div className="commercial-buyer-summary">
+      {rows.map(([label, values]) => (
+        <p key={label}>
+          <strong>{label}:</strong> {compactList(values, 6)}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+function outcomeMappingsForProduct(row) {
+  if (row?.outcomeMappings?.length) return row.outcomeMappings;
+  const outcomes = [...new Set([...(row?.product?.expectedOutcomes || []), ...(row?.product?.outcomes || [])])];
+  return outcomes.map((outcome) => ({
+    outcome,
+    product: row.product,
+    packs: row.packs || [],
+    assets: row.assets || [],
+  }));
+}
+
 function pathwayLinkCount(pathway) {
   return [
     ...(pathway.calculatorAssetIds || []),
@@ -198,10 +230,15 @@ export function ProductsIndexPage() {
       .catch((e) => setError(e.message));
   }, [organization?.id]);
 
+  const outcomeRows = useMemo(
+    () => products.flatMap((row) => outcomeMappingsForProduct(row)),
+    [products]
+  );
+
   return (
     <PageShell
-      title="CareDroid Products"
-      subtitle="Sellable hospital solutions packaged as Product → Asset Packs → Assets → Routes → Backend Services."
+      title="Outcome Product Catalog"
+      subtitle="Start with the outcome, then trace the product, asset packs, and assets that deliver it."
       actions={
         <>
           <Link to="/asset-packs">
@@ -215,6 +252,7 @@ export function ProductsIndexPage() {
     >
       {error && <p className="commercial-subtitle">{error}</p>}
       <div className="commercial-metric">
+        <BuilderMetric label="Outcomes" value={outcomeRows.length} />
         <BuilderMetric label="Products" value={products.length} />
         <BuilderMetric
           label="Asset packs"
@@ -226,39 +264,33 @@ export function ProductsIndexPage() {
         />
       </div>
       <div className="commercial-grid">
-        {products.map((row) => (
-          <Card key={row.product.id} className="commercial-card">
-            <h2>{row.product.name}</h2>
-            <p>{row.product.description}</p>
-            {row.product.pricingTierPlaceholder && (
+        {outcomeRows.map((row) => (
+          <Card key={`${row.product?.id}-${row.outcome}`} className="commercial-card">
+            <h2>{row.outcome}</h2>
+            <p>
+              <strong>Product:</strong>{' '}
+              <Link to={`/products/${row.product?.slug}`}>{row.product?.name}</Link>
+            </p>
+            {row.product?.description && <p>{row.product.description}</p>}
+            {row.product?.pricingTierPlaceholder && (
               <p>
                 <strong>{row.product.pricingTierPlaceholder}</strong> pricing placeholder
               </p>
             )}
-            <ChipList items={row.product.targetBuyers || []} />
+            <ChipList items={row.product?.targetBuyers || []} />
+            <BuyerStakeholderSummary item={row.product} />
             <p>
               <strong>{row.packs?.length || 0}</strong> packs ·{' '}
-              <strong>{row.assets?.length || 0}</strong> assets ·{' '}
-              <strong>{row.routes?.length || 0}</strong> routes
+              <strong>{row.assets?.length || 0}</strong> assets
             </p>
             <p>
               <strong>Packs:</strong> {compactList(row.packs?.map((pack) => pack.name) || [])}
             </p>
-            {!!row.roles?.length && (
-              <p>
-                <strong>Roles:</strong> {compactList(row.roles, 6)}
-              </p>
-            )}
-            {!!row.workspaces?.length && (
-              <p>
-                <strong>Workspaces:</strong> {compactList(row.workspaces, 6)}
-              </p>
-            )}
             <p>
-              <strong>Backend:</strong> {compactList(row.backendServices || [])}
+              <strong>Assets:</strong> {compactList(row.assets?.map((asset) => asset.title || asset.id) || [])}
             </p>
-            <Link to={`/products/${row.product.slug}`}>
-              <Button variant="primary">View product</Button>
+            <Link to={`/products/${row.product?.slug}`}>
+              <Button variant="primary">View product path</Button>
             </Link>
           </Card>
         ))}
@@ -333,6 +365,7 @@ export function ProductDetailPage() {
           </p>
         )}
         <ChipList items={product.readinessLabels || []} />
+        <BuyerStakeholderSummary item={product} />
         {product.targetBuyers?.length > 0 && (
           <>
             <h2 style={{ marginTop: 16 }}>Target buyers</h2>
@@ -388,6 +421,7 @@ export function ProductDetailPage() {
           <p>
             {pack.assetIds?.length || 0} assets · {pack.pricingTier} tier
           </p>
+          <BuyerStakeholderSummary item={pack} />
           {!!pack.roles?.length && (
             <p>
               <strong>Roles:</strong> {compactList(pack.roles, 6)}
@@ -477,6 +511,7 @@ export function AssetPacksBuilderPage() {
             <p>
               {pack.assetIds?.length || 0} assets · {pack.pricingTier} tier
             </p>
+            <BuyerStakeholderSummary item={pack} />
             {pack.requiredDependencies?.length > 0 && (
               <p>
                 <strong>Depends on:</strong> {pack.requiredDependencies.join(', ')}
@@ -949,6 +984,82 @@ export function IntegrationsMarketplacePage() {
             <Button variant="primary" onClick={() => request(item.slug)}>
               Request enablement
             </Button>
+          </Card>
+        ))}
+      </div>
+    </PageShell>
+  );
+}
+
+export function IntegrationReadinessPage() {
+  const { organization } = useUserIdentity();
+  const [readiness, setReadiness] = useState({ integrations: [], summary: {} });
+  const [status, setStatus] = useState('');
+
+  useEffect(() => {
+    ProductCatalogApi.getIntegrationReadiness()
+      .then(setReadiness)
+      .catch((e) => setStatus(e.message));
+  }, []);
+
+  const request = async (slug) => {
+    if (!organization?.id) {
+      setStatus('Create an organization first.');
+      return;
+    }
+    try {
+      await ProductCatalogApi.requestIntegration(organization.id, slug);
+      setStatus(`Requested: ${slug}`);
+    } catch (e) {
+      setStatus(e.message);
+    }
+  };
+
+  const summary = readiness.summary || {};
+
+  return (
+    <PageShell
+      title="Integration Readiness Center"
+      subtitle="Track interoperability readiness across clinical, identity, government, and scheduling systems."
+      actions={
+        <Link to="/integrations-marketplace">
+          <Button variant="secondary">Open marketplace</Button>
+        </Link>
+      }
+    >
+      {status && <p className="commercial-subtitle">{status}</p>}
+      <div className="commercial-metric">
+        <BuilderMetric label="Supported" value={summary.supported || 0} />
+        <BuilderMetric label="Planned" value={summary.planned || 0} />
+        <BuilderMetric label="Demo" value={summary.demo || 0} />
+        <BuilderMetric label="Unavailable" value={summary.unavailable || 0} />
+      </div>
+      <div className="commercial-grid">
+        {(readiness.integrations || []).map((item) => (
+          <Card key={item.id} className="commercial-card">
+            <h2>{item.name}</h2>
+            <p>
+              {item.category} · <strong>{item.status}</strong>
+            </p>
+            {item.sourceStatus && (
+              <p className="commercial-muted">Marketplace status: {item.sourceStatus}</p>
+            )}
+            {item.description && <p>{item.description}</p>}
+            {item.linkedAssetId && (
+              <p>
+                <strong>Linked asset:</strong> {item.linkedAssetId}
+              </p>
+            )}
+            {item.docsUrl && (
+              <p>
+                <Link to={item.docsUrl}>Read integration docs</Link>
+              </p>
+            )}
+            {item.slug && (
+              <Button variant="primary" onClick={() => request(item.slug)}>
+                Request enablement
+              </Button>
+            )}
           </Card>
         ))}
       </div>

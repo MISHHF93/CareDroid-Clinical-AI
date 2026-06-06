@@ -146,6 +146,18 @@ button.commercial-chip {
   margin-bottom: 8px;
 }
 
+.commercial-buyer-summary {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--surface-muted);
+}
+
+.commercial-buyer-summary p {
+  margin: 4px 0;
+}
+
 .commercial-muted {
   color: var(--muted-text);
   font-size: 12px;

@@ -31,6 +31,18 @@ export class Product {
   targetBuyers: string[];
 
   @Column({ type: 'simple-json', default: '[]' })
+  buyerPersona: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  decisionMaker: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  stakeholders: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
+  expectedOutcomes: string[];
+
+  @Column({ type: 'simple-json', default: '[]' })
   targetUsers: string[];
 
   @Column({ type: 'simple-json', default: '[]' })

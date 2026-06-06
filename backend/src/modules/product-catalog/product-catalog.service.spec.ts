@@ -12,6 +12,8 @@ import { IntegrationOffering } from './entities/integration-offering.entity';
 import { ProductCatalogService } from './product-catalog.service';
 import { Organization } from '../workspaces/entities/organization.entity';
 import { REQUIRED_SELLABLE_PRODUCT_NAMES, SEED_PRODUCTS } from './data/product-catalog-seed.data';
+import { SEED_ASSET_PACKS } from '../platform-assets/data/platform-asset-seed.data';
+import { IntegrationCategory, IntegrationReadinessStatus, IntegrationStatus } from './enums/product-catalog.enums';
 
 describe('ProductCatalogService', () => {
   let service: ProductCatalogService;
@@ -86,11 +88,90 @@ describe('ProductCatalogService', () => {
     });
   });
 
+  it('defines buyer and stakeholder metadata for every seeded product and asset pack', () => {
+    for (const product of SEED_PRODUCTS) {
+      expect(product.buyerPersona.length).toBeGreaterThan(0);
+      expect(product.decisionMaker.length).toBeGreaterThan(0);
+      expect(product.stakeholders.length).toBeGreaterThan(0);
+      expect(product.expectedOutcomes.length).toBeGreaterThan(0);
+    }
+
+    for (const pack of SEED_ASSET_PACKS) {
+      expect(pack.buyerPersona.length).toBeGreaterThan(0);
+      expect(pack.decisionMaker.length).toBeGreaterThan(0);
+      expect(pack.stakeholders.length).toBeGreaterThan(0);
+      expect(pack.expectedOutcomes.length).toBeGreaterThan(0);
+    }
+  });
+
   it('resolves pack ids for product ids', async () => {
     const productRepo = (service as any).productRepository;
     productRepo.find.mockResolvedValue([{ id: 'p1', packIds: ['icu-pack', 'core-platform'] }]);
     const ids = await service.resolvePackIdsForProductIds(['p1']);
     expect(ids).toEqual(expect.arrayContaining(['icu-pack', 'core-platform']));
+  });
+
+  it('projects integration readiness across the eight required categories', async () => {
+    const integrationRepo = (service as any).integrationRepository;
+    integrationRepo.find.mockResolvedValue([
+      {
+        id: 'int-fhir-patient',
+        slug: 'fhir-patient',
+        name: 'FHIR Patient & Observation',
+        category: IntegrationCategory.FHIR,
+        status: IntegrationStatus.ROADMAP,
+        docsUrl: '/integrations',
+      },
+      {
+        id: 'int-lab-interface',
+        slug: 'laboratory-interface',
+        name: 'Laboratory LIS Interface',
+        category: IntegrationCategory.LABORATORY,
+        status: IntegrationStatus.BETA,
+      },
+      {
+        id: 'int-identity',
+        slug: 'identity-sso',
+        name: 'Enterprise SSO',
+        category: IntegrationCategory.IDENTITY,
+        status: IntegrationStatus.AVAILABLE,
+      },
+    ]);
+
+    const readiness = await service.getIntegrationReadiness();
+
+    expect(readiness.integrations.map((integration) => integration.name)).toEqual([
+      'FHIR',
+      'HL7',
+      'PACS',
+      'LIS',
+      'EMR/EHR',
+      'Identity Providers',
+      'Government APIs',
+      'Scheduling Systems',
+    ]);
+    expect(new Set(readiness.integrations.map((integration) => integration.status))).toEqual(
+      new Set([
+        IntegrationReadinessStatus.PLANNED,
+        IntegrationReadinessStatus.DEMO,
+        IntegrationReadinessStatus.SUPPORTED,
+        IntegrationReadinessStatus.UNAVAILABLE,
+      ]),
+    );
+    expect(readiness.integrations).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: 'FHIR', status: 'planned', sourceStatus: 'roadmap' }),
+        expect.objectContaining({ name: 'LIS', status: 'demo', sourceStatus: 'beta' }),
+        expect.objectContaining({ name: 'Identity Providers', status: 'supported', sourceStatus: 'available' }),
+        expect.objectContaining({ name: 'EMR/EHR', status: 'unavailable', sourceStatus: null }),
+      ]),
+    );
+    expect(readiness.summary).toMatchObject({
+      supported: 1,
+      demo: 1,
+      planned: 1,
+      unavailable: 5,
+    });
   });
 
   it('serializes asset-pack productization metadata on product detail', async () => {
@@ -108,6 +189,10 @@ describe('ProductCatalogService', () => {
       highlightAssetIds: ['sofa-score'],
       outcomes: ['critical care standardization'],
       targetBuyers: ['critical care leadership'],
+      buyerPersona: ['ICU Medical Director'],
+      decisionMaker: ['Chief Medical Officer'],
+      stakeholders: ['Intensivists', 'ICU nurses'],
+      expectedOutcomes: ['critical care standardization'],
       targetUsers: ['Intensivists', 'ICU nurses'],
       requiredBackendCapabilities: ['Entitlement installation for icu-pack plus core-platform'],
       requiredIntegrations: ['FHIR observations for vitals and labs'],
@@ -129,6 +214,10 @@ describe('ProductCatalogService', () => {
         defaultModules: ['dashboard', 'icu', 'tools'],
         pricingTier: 'enterprise',
         salesMetadata: null,
+        buyerPersona: ['ICU Medical Director'],
+        decisionMaker: ['Chief Medical Officer'],
+        stakeholders: ['Intensivists', 'ICU nurses'],
+        expectedOutcomes: ['critical care standardization'],
         assetIds: ['sofa-score'],
       },
     ]);
@@ -150,6 +239,10 @@ describe('ProductCatalogService', () => {
     expect(detail.product).toMatchObject({
       slug: 'icu-suite',
       targetUsers: ['Intensivists', 'ICU nurses'],
+      buyerPersona: ['ICU Medical Director'],
+      decisionMaker: ['Chief Medical Officer'],
+      stakeholders: ['Intensivists', 'ICU nurses'],
+      expectedOutcomes: ['critical care standardization'],
       requiredBackendCapabilities: ['Entitlement installation for icu-pack plus core-platform'],
       requiredIntegrations: ['FHIR observations for vitals and labs'],
       aiWorkflows: ['Daily ICU patient summary and timeline synthesis'],
@@ -161,6 +254,10 @@ describe('ProductCatalogService', () => {
       id: 'icu-pack',
       requiredDependencies: ['core-platform'],
       defaultModules: ['dashboard', 'icu', 'tools'],
+      buyerPersona: ['ICU Medical Director'],
+      decisionMaker: ['Chief Medical Officer'],
+      stakeholders: ['Intensivists', 'ICU nurses'],
+      expectedOutcomes: ['critical care standardization'],
     });
   });
 
@@ -237,6 +334,8 @@ describe('ProductCatalogService', () => {
         productType: 'emergency_department',
         packIds: ['emergency-department-pack'],
         highlightAssetIds: ['qsofa'],
+        outcomes: ['faster risk stratification'],
+        expectedOutcomes: ['Reduce triage time'],
         targetUsers: ['Emergency physicians'],
       },
     ]);
@@ -250,6 +349,7 @@ describe('ProductCatalogService', () => {
         targetRoles: ['emergency physician', 'nurse'],
         defaultModules: ['emergency', 'dashboard'],
         pricingTier: 'enterprise',
+        expectedOutcomes: ['standardized triage'],
       },
     ]);
     assetRepo.find.mockResolvedValue([
@@ -304,6 +404,20 @@ describe('ProductCatalogService', () => {
       ]),
     );
     expect(graph.backendServices).toEqual(expect.arrayContaining(['ClinicalTools', 'AiModule']));
+    expect(graph.outcomeMappings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          outcome: 'Reduce triage time',
+          product: expect.objectContaining({ name: 'Emergency Department Solution' }),
+          packs: expect.arrayContaining([
+            expect.objectContaining({ id: 'emergency-department-pack' }),
+          ]),
+          assets: expect.arrayContaining([
+            expect.objectContaining({ id: 'qsofa', title: 'qSOFA' }),
+          ]),
+        }),
+      ]),
+    );
   });
 
   it('builds asset pack graph with product mappings', async () => {

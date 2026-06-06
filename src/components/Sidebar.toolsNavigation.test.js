@@ -71,6 +71,7 @@ describe('Simplified sidebar navigation wiring', () => {
       '/feature-flags',
       '/plugins',
       '/dependency-map',
+      '/dependency-graph',
       '/data-lineage',
       '/self-diagnostics',
       '/ai-governance',
@@ -107,10 +108,12 @@ describe('Simplified sidebar navigation wiring', () => {
       '/devices',
       '/fleet/map',
       '/live-map',
+      '/usage',
     ]);
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.path)).toEqual([
       '/profile',
       '/settings',
+      '/billing',
       '/notifications',
     ]);
   });

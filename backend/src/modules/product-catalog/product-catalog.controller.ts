@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Patch, Post, Query, Req, UseGuards } from
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrganizationsService } from '../organizations/organizations.service';
+import { AssetDependencyGraphService } from './asset-dependency-graph.service';
 import { SubmitMaturityAssessmentDto } from './dto/submit-maturity-assessment.dto';
 import { UpdateOrganizationConfigurationDto } from './dto/update-organization-configuration.dto';
 import { MaturityAssessmentService } from './maturity-assessment.service';
@@ -16,6 +17,7 @@ import { IntegrationCategory } from './enums/product-catalog.enums';
 export class ProductCatalogController {
   constructor(
     private readonly productCatalogService: ProductCatalogService,
+    private readonly assetDependencyGraphService: AssetDependencyGraphService,
     private readonly maturityAssessmentService: MaturityAssessmentService,
     private readonly outcomesService: OutcomesService,
     private readonly organizationsService: OrganizationsService,
@@ -162,6 +164,18 @@ export class ProductCatalogController {
   @ApiOperation({ summary: 'List integration marketplace offerings' })
   listIntegrations(@Query('category') category?: IntegrationCategory) {
     return this.productCatalogService.listIntegrations(category);
+  }
+
+  @Get('integration-readiness')
+  @ApiOperation({ summary: 'List integration readiness status by integration category' })
+  integrationReadiness() {
+    return this.productCatalogService.getIntegrationReadiness();
+  }
+
+  @Get('dependency-graph')
+  @ApiOperation({ summary: 'Project asset dependency graph across products, packs, assets, routes, services, and integrations' })
+  dependencyGraph() {
+    return this.assetDependencyGraphService.getGraph();
   }
 
   @Get('maturity-assessments/questionnaire')

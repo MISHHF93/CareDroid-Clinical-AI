@@ -7,6 +7,7 @@ import { PlatformAssetsModule } from '../platform-assets/platform-assets.module'
 import { AssetPack } from '../platform-assets/entities/asset-pack.entity';
 import { OrganizationEntitlement } from '../platform-assets/entities/organization-entitlement.entity';
 import { PlatformAsset } from '../platform-assets/entities/platform-asset.entity';
+import { AssetDependencyGraphService } from './asset-dependency-graph.service';
 import { CarePathway } from './entities/care-pathway.entity';
 import { CommercialPlan } from './entities/commercial-plan.entity';
 import { IntegrationOffering } from './entities/integration-offering.entity';
@@ -41,6 +42,7 @@ import { ProductCatalogValidationService } from './product-catalog-validation.se
     ProductCatalogService,
     ProductCatalogSeedService,
     ProductCatalogValidationService,
+    AssetDependencyGraphService,
     MaturityAssessmentService,
     OutcomesService,
   ],

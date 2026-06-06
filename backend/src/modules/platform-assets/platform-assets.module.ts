@@ -12,6 +12,7 @@ import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { AssetAccessService } from './asset-access.service';
 import { AssetRecommendationService } from './asset-recommendation.service';
 import { AssetRegistryService } from './asset-registry.service';
+import { DepartmentAssetMappingService } from './department-asset-mapping.service';
 import { AssetPack } from './entities/asset-pack.entity';
 import { OrganizationEntitlement } from './entities/organization-entitlement.entity';
 import { PlatformAsset } from './entities/platform-asset.entity';
@@ -24,6 +25,7 @@ import { PlatformAssetsController } from './platform-assets.controller';
 import { PlatformAssetsSeedService } from './platform-assets.seed.service';
 import { PlatformAssetsService } from './platform-assets.service';
 import { PlatformContextService } from './platform-context.service';
+import { ServiceLineArchitectureService } from './service-line-architecture.service';
 
 @Module({
   imports: [
@@ -55,6 +57,8 @@ import { PlatformContextService } from './platform-context.service';
     AssetRecommendationService,
     DigitalTwinService,
     OrganizationAnalyticsService,
+    DepartmentAssetMappingService,
+    ServiceLineArchitectureService,
   ],
   exports: [
     PlatformAssetsService,

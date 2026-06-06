@@ -19,6 +19,9 @@ describe('ProductCatalogController tenant scope', () => {
     const maturityAssessmentService = {
       submitAssessment: jest.fn().mockResolvedValue({ overallScore: 80 }),
     };
+    const assetDependencyGraphService = {
+      getGraph: jest.fn().mockResolvedValue({ chains: [] }),
+    };
     const outcomesService = {};
     const organizationsService = {
       assertMemberForUser: jest.fn().mockResolvedValue({ organizationId: 'org-1' }),
@@ -27,6 +30,7 @@ describe('ProductCatalogController tenant scope', () => {
 
     const controller = new ProductCatalogController(
       productCatalogService as any,
+      assetDependencyGraphService as any,
       maturityAssessmentService as any,
       outcomesService as any,
       organizationsService as any,

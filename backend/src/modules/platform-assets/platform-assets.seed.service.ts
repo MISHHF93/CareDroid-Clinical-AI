@@ -52,6 +52,10 @@ export class PlatformAssetsSeedService implements OnModuleInit {
           defaultModules: pack.defaultModules,
           pricingTier: pack.pricingTier,
           salesMetadata: (pack as any).salesMetadata || null,
+          buyerPersona: (pack as any).buyerPersona || [],
+          decisionMaker: (pack as any).decisionMaker || [],
+          stakeholders: (pack as any).stakeholders || [],
+          expectedOutcomes: (pack as any).expectedOutcomes || [],
           isPublished: true,
         }),
       );
@@ -112,6 +116,10 @@ export class PlatformAssetsSeedService implements OnModuleInit {
             defaultModules: pack.defaultModules,
             pricingTier: pack.pricingTier,
             salesMetadata: (pack as any).salesMetadata || null,
+            buyerPersona: (pack as any).buyerPersona || [],
+            decisionMaker: (pack as any).decisionMaker || [],
+            stakeholders: (pack as any).stakeholders || [],
+            expectedOutcomes: (pack as any).expectedOutcomes || [],
             isPublished: true,
           }),
         );
@@ -119,10 +127,30 @@ export class PlatformAssetsSeedService implements OnModuleInit {
       }
 
       const mergedAssetIds = [...new Set([...(existing.assetIds || []), ...pack.assetIds])];
+      let changed = false;
       if (mergedAssetIds.length !== (existing.assetIds || []).length) {
         existing.assetIds = mergedAssetIds;
         existing.defaultModules = [...new Set([...(existing.defaultModules || []), ...pack.defaultModules])];
         existing.targetRoles = [...new Set([...(existing.targetRoles || []), ...((pack as any).targetRoles || [])])];
+        changed = true;
+      }
+      const buyerFields: Array<keyof typeof existing> = [
+        'buyerPersona',
+        'decisionMaker',
+        'stakeholders',
+        'expectedOutcomes',
+      ];
+      for (const field of buyerFields) {
+        if (!(existing[field] as string[] | undefined)?.length) {
+          (existing as any)[field] = (pack as any)[field] || [];
+          changed = true;
+        }
+      }
+      if ((pack as any).salesMetadata && !existing.salesMetadata) {
+        existing.salesMetadata = (pack as any).salesMetadata;
+        changed = true;
+      }
+      if (changed) {
         await this.packRepository.save(existing);
       }
     }

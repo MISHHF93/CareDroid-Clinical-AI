@@ -12,6 +12,11 @@ import { CommercialPlan } from './entities/commercial-plan.entity';
 import { IntegrationOffering } from './entities/integration-offering.entity';
 import { Product } from './entities/product.entity';
 import { SpecialtyCatalog } from './entities/specialty-catalog.entity';
+import {
+  IntegrationCategory,
+  IntegrationReadinessStatus,
+  IntegrationStatus,
+} from './enums/product-catalog.enums';
 
 const AGENT_REGISTRY_ORDER = [
   'agent-clinical',
@@ -23,6 +28,44 @@ const AGENT_REGISTRY_ORDER = [
   'agent-research',
   'agent-education',
 ];
+
+const OUTCOME_NORMALIZATION_RULES = [
+  {
+    label: 'Reduce triage time',
+    matches: ['triage', 'risk stratification', 'emergency'],
+  },
+  {
+    label: 'Improve sepsis detection',
+    matches: ['sepsis', 'deterioration'],
+  },
+  {
+    label: 'Improve protocol adherence',
+    matches: ['protocol', 'pathway adherence', 'audit readiness', 'bundle compliance', 'acs pathway'],
+  },
+  {
+    label: 'Improve simulation readiness',
+    matches: ['simulation', 'competency', 'scenario', 'training'],
+  },
+  {
+    label: 'Improve asset visibility',
+    matches: ['asset visibility', 'capacity visibility', 'operations command', 'fleet visibility'],
+  },
+  {
+    label: 'Improve device uptime',
+    matches: ['device uptime', 'maintenance', 'telemetry'],
+  },
+];
+
+const INTEGRATION_READINESS_CATALOG = [
+  { id: 'fhir', name: 'FHIR', category: IntegrationCategory.FHIR },
+  { id: 'hl7', name: 'HL7', category: IntegrationCategory.HL7 },
+  { id: 'pacs', name: 'PACS', category: IntegrationCategory.PACS },
+  { id: 'lis', name: 'LIS', category: IntegrationCategory.LABORATORY },
+  { id: 'emr-ehr', name: 'EMR/EHR', category: IntegrationCategory.EMR_EHR },
+  { id: 'identity-providers', name: 'Identity Providers', category: IntegrationCategory.IDENTITY },
+  { id: 'government-apis', name: 'Government APIs', category: IntegrationCategory.GOVERNMENT_APIS },
+  { id: 'scheduling-systems', name: 'Scheduling Systems', category: IntegrationCategory.SCHEDULING },
+] as const;
 
 @Injectable()
 export class ProductCatalogService {
@@ -102,6 +145,7 @@ export class ProductCatalogService {
         .filter(Boolean) as AssetPack[];
       const roles = this.resolveProductRoles(product, productPacks, productAssets);
       const workspaces = this.resolveProductWorkspaces(productPacks, productAssets);
+      const outcomeMappings = this.resolveProductOutcomeMappings(product, productPacks, productAssets);
 
       return {
         product: {
@@ -117,6 +161,7 @@ export class ProductCatalogService {
         ),
         roles,
         workspaces,
+        outcomeMappings,
         routes: productAssets
           .filter((asset) => asset.route)
           .map((asset) => ({
@@ -242,6 +287,10 @@ export class ProductCatalogService {
         defaultModules: p.defaultModules,
         pricingTier: p.pricingTier,
         salesMetadata: p.salesMetadata,
+        buyerPersona: p.buyerPersona || [],
+        decisionMaker: p.decisionMaker || [],
+        stakeholders: p.stakeholders || [],
+        expectedOutcomes: p.expectedOutcomes || [],
       })),
       assets: serializedAssets,
       assetsByType: this.groupSerializedAssetsByType(serializedAssets),
@@ -383,6 +432,43 @@ export class ProductCatalogService {
     const rows = await this.integrationRepository.find({ order: { sortOrder: 'ASC' } });
     if (!category) return rows;
     return rows.filter((r) => r.category === category);
+  }
+
+  async getIntegrationReadiness() {
+    const rows = await this.integrationRepository.find({ order: { sortOrder: 'ASC' } });
+    const byCategory = new Map<string, IntegrationOffering>();
+    for (const row of rows) {
+      if (!byCategory.has(row.category)) byCategory.set(row.category, row);
+    }
+
+    const integrations = INTEGRATION_READINESS_CATALOG.map((item) => {
+      const offering = byCategory.get(item.category);
+      return {
+        id: item.id,
+        name: item.name,
+        category: item.category,
+        status: this.toReadinessStatus(offering?.status),
+        sourceStatus: offering?.status || null,
+        offeringId: offering?.id || null,
+        slug: offering?.slug || null,
+        description: offering?.description || null,
+        docsUrl: offering?.docsUrl || null,
+        linkedAssetId: offering?.linkedAssetId || null,
+      };
+    });
+
+    return {
+      integrations,
+      statuses: Object.values(IntegrationReadinessStatus),
+      summary: Object.values(IntegrationReadinessStatus).reduce(
+        (acc, status) => ({
+          ...acc,
+          [status]: integrations.filter((item) => item.status === status).length,
+        }),
+        {} as Record<string, number>,
+      ),
+      generatedAt: new Date().toISOString(),
+    };
   }
 
   async resolvePackIdsForProductIds(productIds: string[]): Promise<string[]> {
@@ -562,6 +648,10 @@ export class ProductCatalogService {
       workspaces: this.resolvePackWorkspaces(pack, assets),
       pricingTier: pack.pricingTier,
       salesMetadata: pack.salesMetadata,
+      buyerPersona: pack.buyerPersona || [],
+      decisionMaker: pack.decisionMaker || [],
+      stakeholders: pack.stakeholders || [],
+      expectedOutcomes: pack.expectedOutcomes || [],
       isPublished: pack.isPublished,
       assets: assets.map((asset) =>
         this.serializeBuilderAsset(asset, context, options, [pack.id]),
@@ -648,6 +738,10 @@ export class ProductCatalogService {
       highlightAssetIds: product.highlightAssetIds,
       outcomes: product.outcomes,
       targetBuyers: product.targetBuyers,
+      buyerPersona: product.buyerPersona || [],
+      decisionMaker: product.decisionMaker || [],
+      stakeholders: product.stakeholders || [],
+      expectedOutcomes: product.expectedOutcomes || [],
       targetUsers: product.targetUsers,
       requiredBackendCapabilities: product.requiredBackendCapabilities,
       requiredIntegrations: product.requiredIntegrations,
@@ -692,6 +786,64 @@ export class ProductCatalogService {
       ...packs.flatMap((pack) => this.resolvePackWorkspaces(pack, [])),
       ...assets.flatMap((asset) => this.resolveAssetWorkspaces(asset)),
     ]);
+  }
+
+  private resolveProductOutcomeMappings(
+    product: Product,
+    packs: AssetPack[],
+    assets: PlatformAsset[],
+  ) {
+    const sourceOutcomes = this.uniqueStrings([
+      ...(product.outcomes || []),
+      ...(product.expectedOutcomes || []),
+      ...packs.flatMap((pack) => pack.expectedOutcomes || []),
+      ...packs.flatMap((pack) =>
+        Array.isArray((pack.salesMetadata as any)?.outcomes)
+          ? ((pack.salesMetadata as any).outcomes as string[])
+          : [],
+      ),
+    ]);
+    const outcomes = this.normalizeOutcomeLabels(sourceOutcomes);
+    return outcomes.map((outcome) => ({
+      outcome,
+      product: {
+        id: product.id,
+        slug: product.slug,
+        name: product.name,
+        description: product.description,
+      },
+      packs: packs.map((pack) => ({
+        id: pack.id,
+        slug: pack.slug,
+        name: pack.name,
+        description: pack.description,
+        assetIds: pack.assetIds || [],
+      })),
+      assets: assets.map((asset) => this.serializeAsset(asset)),
+    }));
+  }
+
+  private toReadinessStatus(status?: IntegrationStatus | string | null): IntegrationReadinessStatus {
+    if (status === IntegrationStatus.AVAILABLE) return IntegrationReadinessStatus.SUPPORTED;
+    if (status === IntegrationStatus.BETA) return IntegrationReadinessStatus.DEMO;
+    if (status === IntegrationStatus.ROADMAP) return IntegrationReadinessStatus.PLANNED;
+    return IntegrationReadinessStatus.UNAVAILABLE;
+  }
+
+  private normalizeOutcomeLabels(outcomes: string[]): string[] {
+    const normalized = new Set<string>();
+    for (const outcome of outcomes) {
+      const lower = outcome.toLowerCase();
+      const matched = OUTCOME_NORMALIZATION_RULES.filter((rule) =>
+        rule.matches.some((match) => lower.includes(match)),
+      );
+      if (matched.length) {
+        matched.forEach((rule) => normalized.add(rule.label));
+      } else if (outcome.trim()) {
+        normalized.add(outcome);
+      }
+    }
+    return [...normalized];
   }
 
   private resolvePackRoles(pack: AssetPack, assets: PlatformAsset[]): string[] {

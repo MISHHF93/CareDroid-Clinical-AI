@@ -7,6 +7,7 @@ import {
   CarePathwayDetailPage,
   CarePathwaysIndexPage,
   ConfigurationStudioPage,
+  IntegrationReadinessPage,
   OrganizationOnboardingPage,
   ProductDetailPage,
   ProductsIndexPage,
@@ -38,11 +39,13 @@ vi.mock('../../services/productCatalogApi', () => ({
     completeOnboarding: vi.fn(),
     getCarePathway: vi.fn(),
     getProductBuilder: vi.fn(),
+    getIntegrationReadiness: vi.fn(),
     listAgents: vi.fn(),
     listCarePathways: vi.fn(),
     listProductBuilder: vi.fn(),
     listAssetPackBuilder: vi.fn(),
     listSpecialties: vi.fn(),
+    requestIntegration: vi.fn(),
     updateOrganizationConfiguration: vi.fn(),
   },
 }));
@@ -62,6 +65,11 @@ const productGraph = {
     description: 'ED risk stratification and triage workflows.',
     packIds: ['emergency-department-pack'],
     targetBuyers: ['ED director'],
+    buyerPersona: ['ED Director', 'Chief Medical Officer'],
+    decisionMaker: ['ED Director'],
+    stakeholders: ['Emergency physicians', 'Triage nurses'],
+    outcomes: ['faster risk stratification'],
+    expectedOutcomes: ['Reduce triage time', 'standardized triage'],
     targetUsers: ['Emergency physicians'],
     roles: ['Emergency physicians', 'emergency physician', 'triage nurse'],
     workspaces: ['emergency', 'dashboard'],
@@ -73,6 +81,10 @@ const productGraph = {
       name: 'Emergency Department Pack',
       assetIds: ['qsofa'],
       pricingTier: 'enterprise',
+      buyerPersona: ['ED Director', 'Chief Medical Officer'],
+      decisionMaker: ['ED Director'],
+      stakeholders: ['Emergency physicians', 'Triage nurses'],
+      expectedOutcomes: ['standardized triage'],
       roles: ['emergency physician', 'triage nurse'],
       workspaces: ['emergency'],
       assets: [
@@ -99,6 +111,25 @@ const productGraph = {
   workspaces: ['emergency', 'dashboard'],
   routes: [{ assetId: 'qsofa', route: '/tools/calculators/qsofa' }],
   backendServices: ['ClinicalTools'],
+  outcomeMappings: [
+    {
+      outcome: 'Reduce triage time',
+      product: {
+        id: 'product-emergency-department',
+        slug: 'emergency-department-suite',
+        name: 'Emergency Department Solution',
+        description: 'ED risk stratification and triage workflows.',
+        targetBuyers: ['ED director'],
+        buyerPersona: ['ED Director', 'Chief Medical Officer'],
+        decisionMaker: ['ED Director'],
+        stakeholders: ['Emergency physicians', 'Triage nurses'],
+        expectedOutcomes: ['Reduce triage time', 'standardized triage'],
+        pricingTierPlaceholder: 'Enterprise',
+      },
+      packs: [{ id: 'emergency-department-pack', name: 'Emergency Department Pack' }],
+      assets: [{ id: 'qsofa', title: 'qSOFA', route: '/tools/calculators/qsofa' }],
+    },
+  ],
 };
 
 const packGraph = {
@@ -108,6 +139,10 @@ const packGraph = {
   assetIds: ['qsofa'],
   requiredDependencies: ['core-platform'],
   pricingTier: 'enterprise',
+  buyerPersona: ['ED Director', 'Chief Medical Officer'],
+  decisionMaker: ['ED Director'],
+  stakeholders: ['Emergency physicians', 'Triage nurses'],
+  expectedOutcomes: ['standardized triage'],
   products: [{ id: 'product-emergency-department', name: 'Emergency Department Solution' }],
   assets: [{ id: 'qsofa', title: 'qSOFA', route: '/tools/calculators/qsofa', backendServices: ['ClinicalTools'] }],
 };
@@ -192,8 +227,39 @@ const carePathwayDetail = {
   },
 };
 
+const integrationReadiness = {
+  summary: {
+    supported: 1,
+    planned: 5,
+    demo: 1,
+    unavailable: 1,
+  },
+  integrations: [
+    { id: 'fhir', name: 'FHIR', category: 'fhir', status: 'planned', slug: 'fhir-patient' },
+    { id: 'hl7', name: 'HL7', category: 'hl7', status: 'planned', slug: 'hl7-adt' },
+    { id: 'pacs', name: 'PACS', category: 'pacs', status: 'planned', slug: 'pacs-dicom' },
+    {
+      id: 'lis',
+      name: 'LIS',
+      category: 'laboratory',
+      status: 'demo',
+      slug: 'laboratory-interface',
+      linkedAssetId: 'lab-interp',
+    },
+    { id: 'emr-ehr', name: 'EMR/EHR', category: 'emr_ehr', status: 'unavailable', slug: 'emr-ehr' },
+    { id: 'identity-providers', name: 'Identity Providers', category: 'identity', status: 'supported', slug: 'identity-sso' },
+    { id: 'government-apis', name: 'Government APIs', category: 'government_apis', status: 'planned', slug: 'government-reporting' },
+    { id: 'scheduling-systems', name: 'Scheduling Systems', category: 'scheduling', status: 'planned', slug: 'scheduling' },
+  ],
+};
+
 function renderPage(element) {
   return render(<MemoryRouter>{element}</MemoryRouter>);
+}
+
+function elementsContaining(text) {
+  const lower = text.toLowerCase();
+  return screen.getAllByText((_, element) => element?.textContent?.toLowerCase().includes(lower));
 }
 
 function renderCarePathwayDetail(route = '/care-pathways/sepsis') {
@@ -231,6 +297,8 @@ describe('Commercial builder pages', () => {
     ProductCatalogApi.listAgents.mockResolvedValue(agentRegistryRows);
     ProductCatalogApi.listCarePathways.mockResolvedValue(carePathwayRows);
     ProductCatalogApi.getCarePathway.mockResolvedValue(carePathwayDetail);
+    ProductCatalogApi.getIntegrationReadiness.mockResolvedValue(integrationReadiness);
+    ProductCatalogApi.requestIntegration.mockResolvedValue({});
     ProductCatalogApi.listSpecialties.mockResolvedValue(specialtyRows);
     ProductCatalogApi.updateOrganizationConfiguration.mockResolvedValue({});
     ProductCatalogApi.completeOnboarding.mockResolvedValue({
@@ -255,15 +323,20 @@ describe('Commercial builder pages', () => {
     PlatformAssetsApi.listRoleProfiles.mockResolvedValue(roleProfiles);
   });
 
-  it('renders products as product-pack-asset-route-service graph cards', async () => {
+  it('renders products as outcome-product-pack-asset graph cards', async () => {
     renderPage(<ProductsIndexPage />);
 
-    expect(await screen.findByRole('heading', { name: /emergency department solution/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /reduce triage time/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /emergency department solution/i })).toHaveAttribute(
+      'href',
+      '/products/emergency-department-suite'
+    );
     expect(screen.getAllByText((_, element) => element?.textContent?.includes('1 packs')).length).toBeGreaterThan(0);
     expect(screen.getAllByText((_, element) => element?.textContent?.includes('1 assets')).length).toBeGreaterThan(0);
-    expect(screen.getByText(/emergency physician/i)).toBeInTheDocument();
-    expect(screen.getByText(/emergency, dashboard/i)).toBeInTheDocument();
-    expect(screen.getByText(/clinicaltools/i)).toBeInTheDocument();
+    expect(elementsContaining('Buyer persona: ED Director, Chief Medical Officer').length).toBeGreaterThan(0);
+    expect(elementsContaining('Decision maker: ED Director').length).toBeGreaterThan(0);
+    expect(screen.getByText(/emergency department pack/i)).toBeInTheDocument();
+    expect(screen.getByText(/qsofa/i)).toBeInTheDocument();
   });
 
   it('renders product detail role and workspace mappings', async () => {
@@ -272,6 +345,8 @@ describe('Commercial builder pages', () => {
     expect(await screen.findByRole('heading', { name: /emergency department solution/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^roles$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^workspaces$/i })).toBeInTheDocument();
+    expect(elementsContaining('Stakeholders: Emergency physicians, Triage nurses').length).toBeGreaterThan(0);
+    expect(elementsContaining('Expected outcomes: standardized triage').length).toBeGreaterThan(0);
     expect(screen.getAllByText(/triage nurse/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/emergency/i).length).toBeGreaterThan(0);
   });
@@ -282,6 +357,8 @@ describe('Commercial builder pages', () => {
     expect(await screen.findByRole('heading', { name: /emergency department pack/i })).toBeInTheDocument();
     expect(screen.getByText(/depends on:/i)).toBeInTheDocument();
     expect(screen.getByText(/emergency department solution/i)).toBeInTheDocument();
+    expect(elementsContaining('Buyer persona: ED Director, Chief Medical Officer').length).toBeGreaterThan(0);
+    expect(elementsContaining('Expected outcomes: standardized triage').length).toBeGreaterThan(0);
     expect(screen.getByText(/tools\/calculators\/qsofa/i)).toBeInTheDocument();
   });
 
@@ -297,6 +374,28 @@ describe('Commercial builder pages', () => {
       'href',
       '/assistant?agent=agent-emergency',
     );
+  });
+
+  it('renders integration readiness status and requests enablement', async () => {
+    renderPage(<IntegrationReadinessPage />);
+
+    expect(await screen.findByRole('heading', { name: /integration readiness center/i })).toBeInTheDocument();
+    ['FHIR', 'HL7', 'PACS', 'LIS', 'EMR/EHR', 'Identity Providers', 'Government APIs', 'Scheduling Systems'].forEach(
+      (name) => {
+        expect(screen.getByRole('heading', { name })).toBeInTheDocument();
+      },
+    );
+    expect(screen.getByText('Supported')).toBeInTheDocument();
+    expect(screen.getByText('Planned')).toBeInTheDocument();
+    expect(screen.getByText('Demo')).toBeInTheDocument();
+    expect(screen.getByText('Unavailable')).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('button', { name: /request enablement/i })[0]);
+
+    await waitFor(() => {
+      expect(ProductCatalogApi.requestIntegration).toHaveBeenCalledWith('org-1', 'fhir-patient');
+    });
+    expect(screen.getByText(/requested: fhir-patient/i)).toBeInTheDocument();
   });
 
   it('renders care pathway index cards with link counts and outcomes', async () => {

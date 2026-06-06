@@ -732,3 +732,251 @@ export function AssetLifecycleAdmin() {
     </div>
   );
 }
+
+export function DepartmentsPage() {
+  const { organization } = useUserIdentity();
+  const [graph, setGraph] = useState(null);
+  const [selectedDepartmentId, setSelectedDepartmentId] = useState('emergency');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    PlatformAssetsApi.listDepartments({ organizationId: organization?.id })
+      .then((data) => {
+        setGraph(data);
+        if (!data.departments?.some((department) => department.id === selectedDepartmentId)) {
+          setSelectedDepartmentId(data.departments?.[0]?.id || 'emergency');
+        }
+      })
+      .catch((e) => setError(e.message));
+  }, [organization?.id, selectedDepartmentId]);
+
+  const departments = graph?.departments || [];
+  const selectedDepartment =
+    departments.find((department) => department.id === selectedDepartmentId) || departments[0];
+
+  return (
+    <div className="org-page">
+      <header className="org-page-header">
+        <h1>Departments</h1>
+        <p className="org-page-subtitle">
+          Department-to-asset mapping across packs, assets, roles, permissions, and users.
+        </p>
+      </header>
+
+      {error && <p className="org-status">{error}</p>}
+
+      <div className="org-department-grid">
+        {departments.map((department) => (
+          <button
+            key={department.id}
+            type="button"
+            className={`org-department-card ${department.id === selectedDepartment?.id ? 'selected' : ''}`}
+            onClick={() => setSelectedDepartmentId(department.id)}
+          >
+            <strong>{department.name}</strong>
+            <span>{department.packCount} packs</span>
+            <span>{department.assetCount} assets</span>
+            <span>{department.userCount} users</span>
+          </button>
+        ))}
+      </div>
+
+      {selectedDepartment && (
+        <div className="org-department-detail">
+          <Card className="org-card">
+            <h2>{selectedDepartment.name}</h2>
+            <p className="org-pack-meta">
+              {selectedDepartment.packCount} packs · {selectedDepartment.assetCount} assets ·{' '}
+              {selectedDepartment.userCount} users
+            </p>
+          </Card>
+
+          <Card className="org-card">
+            <h2>Asset packs</h2>
+            {selectedDepartment.packs?.length ? (
+              <ul className="org-asset-list">
+                {selectedDepartment.packs.map((pack) => (
+                  <li key={pack.id}>
+                    <span>{pack.name}</span>
+                    <small>
+                      {pack.assetIds?.length || 0} department assets
+                      {pack.enabled ? ' · enabled' : ''}
+                    </small>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="org-pack-meta">No packs mapped yet.</p>
+            )}
+          </Card>
+
+          <Card className="org-card">
+            <h2>Assets</h2>
+            {selectedDepartment.assets?.length ? (
+              <ul className="org-asset-list">
+                {selectedDepartment.assets.map((asset) => (
+                  <li key={asset.id}>
+                    <span>
+                      {asset.route ? <Link to={asset.route}>{asset.title || asset.id}</Link> : asset.title || asset.id}
+                    </span>
+                    <small>
+                      {asset.assetType} · primary: {asset.primaryDepartment}
+                      {asset.secondaryDepartments?.length
+                        ? ` · secondary: ${asset.secondaryDepartments.join(', ')}`
+                        : ''}
+                    </small>
+                    <small>Roles: {(asset.recommendedRoles || []).join(', ') || 'none'}</small>
+                    <small>Permissions: {(asset.requiredPermissions || []).join(', ') || 'none'}</small>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="org-pack-meta">No assets mapped yet.</p>
+            )}
+          </Card>
+
+          <Card className="org-card">
+            <h2>Users</h2>
+            {selectedDepartment.users?.length ? (
+              <ul className="org-asset-list">
+                {selectedDepartment.users.map((user) => (
+                  <li key={user.userId}>
+                    <span>{user.displayName}</span>
+                    <small>
+                      {user.role}
+                      {user.roleProfileId ? ` · ${user.roleProfileId}` : ''}
+                      {user.specialty ? ` · ${user.specialty}` : ''}
+                    </small>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="org-pack-meta">No users matched for this department.</p>
+            )}
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function ServiceLinesPage() {
+  const { organization } = useUserIdentity();
+  const [graph, setGraph] = useState(null);
+  const [selectedServiceLineId, setSelectedServiceLineId] = useState('emergency-medicine');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    PlatformAssetsApi.listServiceLines({ organizationId: organization?.id })
+      .then((data) => {
+        setGraph(data);
+        if (!data.serviceLines?.some((serviceLine) => serviceLine.id === selectedServiceLineId)) {
+          setSelectedServiceLineId(data.serviceLines?.[0]?.id || 'emergency-medicine');
+        }
+      })
+      .catch((e) => setError(e.message));
+  }, [organization?.id, selectedServiceLineId]);
+
+  const serviceLines = graph?.serviceLines || [];
+  const selectedServiceLine =
+    serviceLines.find((serviceLine) => serviceLine.id === selectedServiceLineId) || serviceLines[0];
+
+  return (
+    <div className="org-page">
+      <header className="org-page-header">
+        <h1>Service Lines</h1>
+        <p className="org-page-subtitle">
+          Service Line to Department to Asset Pack to Asset architecture for clinical and operational rollouts.
+        </p>
+      </header>
+
+      {error && <p className="org-status">{error}</p>}
+
+      <div className="org-department-grid">
+        {serviceLines.map((serviceLine) => (
+          <button
+            key={serviceLine.id}
+            type="button"
+            className={`org-department-card ${serviceLine.id === selectedServiceLine?.id ? 'selected' : ''}`}
+            onClick={() => setSelectedServiceLineId(serviceLine.id)}
+          >
+            <strong>{serviceLine.name}</strong>
+            <span>{serviceLine.departmentCount} departments</span>
+            <span>{serviceLine.packCount} packs</span>
+            <span>{serviceLine.assetCount} assets</span>
+          </button>
+        ))}
+      </div>
+
+      {selectedServiceLine && (
+        <div className="org-department-detail">
+          <Card className="org-card">
+            <h2>{selectedServiceLine.name}</h2>
+            <p className="org-pack-meta">
+              {selectedServiceLine.departmentCount} departments · {selectedServiceLine.packCount} packs ·{' '}
+              {selectedServiceLine.assetCount} assets
+            </p>
+          </Card>
+
+          <Card className="org-card">
+            <h2>Departments</h2>
+            {selectedServiceLine.departments?.length ? (
+              <ul className="org-asset-list">
+                {selectedServiceLine.departments.map((department) => (
+                  <li key={department.id}>
+                    <span>{department.name}</span>
+                    <small>
+                      {department.packCount} packs · {department.assetCount} assets
+                    </small>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="org-pack-meta">No departments mapped yet.</p>
+            )}
+          </Card>
+
+          <Card className="org-card">
+            <h2>Asset packs</h2>
+            {selectedServiceLine.packs?.length ? (
+              <ul className="org-asset-list">
+                {selectedServiceLine.packs.map((pack) => (
+                  <li key={pack.id}>
+                    <span>{pack.name}</span>
+                    <small>
+                      {pack.assetIds?.length || 0} service-line assets
+                      {pack.enabled ? ' · enabled' : ''}
+                    </small>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="org-pack-meta">No packs mapped yet.</p>
+            )}
+          </Card>
+
+          <Card className="org-card">
+            <h2>Assets</h2>
+            {selectedServiceLine.assets?.length ? (
+              <ul className="org-asset-list">
+                {selectedServiceLine.assets.map((asset) => (
+                  <li key={asset.id}>
+                    <span>
+                      {asset.route ? <Link to={asset.route}>{asset.title || asset.id}</Link> : asset.title || asset.id}
+                    </span>
+                    <small>
+                      {asset.assetType} · departments: {(asset.departmentIds || []).join(', ') || asset.primaryDepartment}
+                    </small>
+                    <small>Packs: {(asset.packIds || []).join(', ') || 'none'}</small>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="org-pack-meta">No assets mapped yet.</p>
+            )}
+          </Card>
+        </div>
+      )}
+    </div>
+  );
+}

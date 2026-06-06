@@ -82,6 +82,7 @@ const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
 const CapabilityDiscovery = lazyWithRetry(() => import('./pages/CapabilityDiscovery'));
 const WorkflowAutomationBuilder = lazyWithRetry(() => import('./pages/WorkflowAutomationBuilder'));
 const DependencyMap = lazyWithRetry(() => import('./pages/DependencyMap'));
+const DependencyGraph = lazyWithRetry(() => import('./pages/DependencyGraph'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
 const Artifacts = lazyWithRetry(() => import('./pages/Artifacts'));
 const MemoryDashboard = lazyWithRetry(() => import('./pages/MemoryDashboard'));
@@ -133,6 +134,8 @@ const {
   PackMarketplace,
   AssetLifecycleAdmin,
   PlatformAnalyticsPage,
+  DepartmentsPage,
+  ServiceLinesPage,
 } = {
   OrganizationDashboard: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({ default: m.OrganizationDashboard }))
@@ -148,6 +151,12 @@ const {
   ),
   PlatformAnalyticsPage: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({ default: m.PlatformAnalyticsPage }))
+  ),
+  DepartmentsPage: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.DepartmentsPage }))
+  ),
+  ServiceLinesPage: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.ServiceLinesPage }))
   ),
 };
 
@@ -168,6 +177,7 @@ const {
   MaturityAssessmentPage,
   OutcomesDashboardPage,
   IntegrationsMarketplacePage,
+  IntegrationReadinessPage,
   ConfigurationStudioPage,
   OrganizationOnboardingPage,
 } = {
@@ -204,6 +214,11 @@ const {
   IntegrationsMarketplacePage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({
       default: m.IntegrationsMarketplacePage,
+    }))
+  ),
+  IntegrationReadinessPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({
+      default: m.IntegrationReadinessPage,
     }))
   ),
   ConfigurationStudioPage: lazyWithRetry(() =>
@@ -1340,6 +1355,16 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/departments',
+      element: <DepartmentsPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/service-lines',
+      element: <ServiceLinesPage />,
+      requiresAuth: true,
+    },
+    {
       path: '/notifications',
       element: <NotificationCenterPage />,
       requiresAuth: true,
@@ -1428,6 +1453,11 @@ function AppRoutes() {
     {
       path: '/integrations-marketplace',
       element: <IntegrationsMarketplacePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/integration-readiness',
+      element: <IntegrationReadinessPage />,
       requiresAuth: true,
     },
     {
@@ -1588,6 +1618,12 @@ function AppRoutes() {
     {
       path: '/dependency-map',
       element: <DependencyMap />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/dependency-graph',
+      element: <DependencyGraph />,
       requiresAuth: true,
       permission: Permission.CONFIGURE_SYSTEM,
     },

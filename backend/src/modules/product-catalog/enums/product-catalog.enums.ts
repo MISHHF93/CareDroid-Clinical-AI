@@ -25,6 +25,7 @@ export enum IntegrationCategory {
   HL7 = 'hl7',
   LABORATORY = 'laboratory',
   PACS = 'pacs',
+  EMR_EHR = 'emr_ehr',
   IDENTITY = 'identity',
   GOVERNMENT_APIS = 'government_apis',
   SCHEDULING = 'scheduling',
@@ -35,6 +36,13 @@ export enum IntegrationStatus {
   AVAILABLE = 'available',
   ROADMAP = 'roadmap',
   BETA = 'beta',
+}
+
+export enum IntegrationReadinessStatus {
+  SUPPORTED = 'supported',
+  PLANNED = 'planned',
+  DEMO = 'demo',
+  UNAVAILABLE = 'unavailable',
 }
 
 export enum MaturityDimension {

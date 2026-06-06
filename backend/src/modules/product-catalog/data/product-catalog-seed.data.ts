@@ -416,7 +416,7 @@ export const REQUIRED_SELLABLE_PRODUCT_NAMES = [
   'Research & Education Solution',
 ];
 
-export const SEED_PRODUCTS = [
+const RAW_SEED_PRODUCTS = [
   {
     id: 'product-emergency-department',
     slug: 'emergency-department-suite',
@@ -584,6 +584,36 @@ export const SEED_PRODUCTS = [
     sortOrder: 11,
   },
 ];
+
+const OUTCOME_LABELS_BY_PRODUCT_ID: Record<string, string[]> = {
+  'product-emergency-department': [
+    'Reduce triage time',
+    'Improve protocol adherence',
+    'Improve simulation readiness',
+  ],
+  'product-hospital-operations': ['Improve asset visibility'],
+  'product-icu': ['Improve sepsis detection', 'Improve protocol adherence'],
+  'product-cardiology': ['Improve protocol adherence'],
+  'product-medical-iot': ['Improve device uptime', 'Improve asset visibility'],
+  'product-fleet-ems': ['Improve asset visibility'],
+  'product-digital-twin': ['Improve asset visibility'],
+  'product-simulation-training': ['Improve simulation readiness'],
+  'product-governance': ['Improve protocol adherence'],
+  'product-research': ['Improve simulation readiness'],
+};
+
+export const SEED_PRODUCTS = RAW_SEED_PRODUCTS.map((product) => ({
+  ...product,
+  buyerPersona: (product as any).buyerPersona || product.targetBuyers || [],
+  decisionMaker: (product as any).decisionMaker || product.targetBuyers || [],
+  stakeholders: (product as any).stakeholders || (product as any).targetUsers || [],
+  expectedOutcomes: [
+    ...new Set([
+      ...((product as any).expectedOutcomes || product.outcomes || []),
+      ...(OUTCOME_LABELS_BY_PRODUCT_ID[product.id] || []),
+    ]),
+  ],
+}));
 
 export const SEED_COMMERCIAL_PLANS = [
   {
@@ -987,12 +1017,21 @@ export const SEED_INTEGRATION_OFFERINGS = [
     sortOrder: 3,
   },
   {
+    id: 'int-emr-ehr',
+    slug: 'emr-ehr',
+    name: 'EMR/EHR Connector',
+    category: IntegrationCategory.EMR_EHR,
+    status: IntegrationStatus.ROADMAP,
+    docsUrl: '/integrations',
+    sortOrder: 4,
+  },
+  {
     id: 'int-pacs',
     slug: 'pacs-dicom',
     name: 'PACS / DICOM Viewer',
     category: IntegrationCategory.PACS,
     status: IntegrationStatus.ROADMAP,
-    sortOrder: 4,
+    sortOrder: 5,
   },
   {
     id: 'int-identity',
@@ -1000,7 +1039,7 @@ export const SEED_INTEGRATION_OFFERINGS = [
     name: 'Enterprise SSO (SAML/OIDC)',
     category: IntegrationCategory.IDENTITY,
     status: IntegrationStatus.AVAILABLE,
-    sortOrder: 5,
+    sortOrder: 6,
   },
   {
     id: 'int-government',
@@ -1008,7 +1047,7 @@ export const SEED_INTEGRATION_OFFERINGS = [
     name: 'Government Reporting APIs',
     category: IntegrationCategory.GOVERNMENT_APIS,
     status: IntegrationStatus.ROADMAP,
-    sortOrder: 6,
+    sortOrder: 7,
   },
   {
     id: 'int-scheduling',
@@ -1016,7 +1055,7 @@ export const SEED_INTEGRATION_OFFERINGS = [
     name: 'Scheduling & Appointments',
     category: IntegrationCategory.SCHEDULING,
     status: IntegrationStatus.ROADMAP,
-    sortOrder: 7,
+    sortOrder: 8,
   },
   {
     id: 'int-telehealth',
@@ -1024,7 +1063,7 @@ export const SEED_INTEGRATION_OFFERINGS = [
     name: 'Telehealth Session Bridge',
     category: IntegrationCategory.TELEHEALTH,
     status: IntegrationStatus.ROADMAP,
-    sortOrder: 8,
+    sortOrder: 9,
   },
 ];
 

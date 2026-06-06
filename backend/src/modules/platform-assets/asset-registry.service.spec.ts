@@ -9,6 +9,7 @@ import {
   validateAssetRegistryMetadata,
 } from './asset-registry.schema';
 import { SEED_PLATFORM_ASSETS } from './data/platform-asset-seed.data';
+import { DEPARTMENT_IDS } from './department-taxonomy';
 import { PlatformAsset } from './entities/platform-asset.entity';
 import { PlatformAssetLifecycle, PlatformAssetType, PricingTier } from './enums/platform-asset.enums';
 
@@ -31,6 +32,10 @@ describe('AssetRegistryService', () => {
     organizationTypes: ['hospital'],
     workspaceTags: ['clinical'],
     intendedRoles: ['emergency physician'],
+    primaryDepartment: 'emergency',
+    secondaryDepartments: ['icu'],
+    recommendedRoles: ['emergency physician'],
+    requiredPermissions: ['use-calculators'],
     riskLevel: AssetRegistryRiskLevel.CLINICAL_DECISION_SUPPORT,
     demoStatus: 'demo',
     lifecycle: PlatformAssetLifecycle.ACTIVE,
@@ -102,7 +107,15 @@ describe('AssetRegistryService', () => {
     });
 
     expect(issues.map((issue) => issue.field)).toEqual(
-      expect.arrayContaining(['assetId', 'title', 'route', 'organizationTypes']),
+      expect.arrayContaining([
+        'assetId',
+        'title',
+        'route',
+        'organizationTypes',
+        'primaryDepartment',
+        'recommendedRoles',
+        'requiredPermissions',
+      ]),
     );
   });
 
@@ -141,12 +154,19 @@ describe('AssetRegistryService', () => {
         organizationTypes: asset.organizationTypes,
         workspaceTags: asset.workspaceTags,
         intendedRoles: asset.intendedRoles,
+        primaryDepartment: asset.primaryDepartment,
+        secondaryDepartments: asset.secondaryDepartments,
+        recommendedRoles: asset.recommendedRoles,
+        requiredPermissions: asset.requiredPermissions,
         lifecycleStatus: asset.lifecycle,
         subscriptionTier: asset.pricingTier,
         riskLevel: asset.riskLevel,
         demoStatus: asset.demoStatus,
       };
       expect(validateAssetRegistryMetadata(projection)).toEqual([]);
+      expect(DEPARTMENT_IDS).toContain(asset.primaryDepartment);
+      expect(asset.recommendedRoles.length).toBeGreaterThan(0);
+      expect(asset.requiredPermissions.length).toBeGreaterThan(0);
     }
   });
 });

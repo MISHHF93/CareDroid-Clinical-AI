@@ -35,6 +35,7 @@ describe('primaryNavigation', () => {
       ['Devices', '/devices'],
       ['Fleet Map', '/fleet/map'],
       ['Live Map', '/live-map'],
+      ['Usage', '/usage'],
     ]);
     for (const item of OPERATIONS_SIDEBAR_NAV_ITEMS) {
       expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((nav) => nav.path)).not.toContain(item.path);
@@ -48,6 +49,7 @@ describe('primaryNavigation', () => {
       ['Feature Flags', '/feature-flags'],
       ['Plugins', '/plugins'],
       ['Dependency Map', '/dependency-map'],
+      ['Dependency Graph', '/dependency-graph'],
       ['Data Lineage', '/data-lineage'],
       ['Self Diagnostics', '/self-diagnostics'],
       ['Governance', '/ai-governance'],
@@ -155,6 +157,7 @@ describe('primaryNavigation', () => {
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.id)).toEqual([
       'profile',
       'settings',
+      'billing',
       'notifications',
     ]);
   });
