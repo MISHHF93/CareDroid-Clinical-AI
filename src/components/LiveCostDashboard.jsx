@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { getRealTimeCostService } from '../services/realtime/RealTimeCostService';
-import { getNotificationService } from '../services/notifications/NotificationService';
 import { resolveApiRoot } from '../config/api.config';
 import './LiveCostDashboard.css';
 
@@ -12,7 +11,7 @@ import './LiveCostDashboard.css';
 const getApiBaseUrl = () => resolveApiRoot();
 
 function LiveCostDashboard({ embedded = false }) {
-  const { authToken, user } = useUser();
+  const { authToken } = useUser();
   const [costData, setCostData] = useState({
     totalCost: 0,
     costByTool: {},
@@ -35,31 +34,31 @@ function LiveCostDashboard({ embedded = false }) {
 
   const [exportLoading, setExportLoading] = useState(false);
   const rtcService = useRef(null);
-  const notifService = useRef(null);
+  const statsInterval = useRef(null);
   const isMounted = useRef(true);
 
   useEffect(() => {
+    isMounted.current = true;
     if (authToken) {
-      initializeServices(authToken, user?.id);
+      initializeServices(authToken);
     }
 
     return () => {
       isMounted.current = false;
+      if (statsInterval.current) {
+        clearInterval(statsInterval.current);
+        statsInterval.current = null;
+      }
       if (rtcService.current) {
         rtcService.current.disconnect();
       }
     };
-  }, [authToken, user?.id]);
+  }, [authToken]);
 
-  const initializeServices = async (token, userId) => {
+  const initializeServices = async (token) => {
     try {
       rtcService.current = getRealTimeCostService();
       await rtcService.current.initialize(token);
-
-      notifService.current = getNotificationService(getApiBaseUrl());
-      if (userId) {
-        await notifService.current.initialize(userId, token);
-      }
 
       // Subscribe to cost updates
       rtcService.current.onCostUpdate((update) => {
@@ -79,7 +78,7 @@ function LiveCostDashboard({ embedded = false }) {
       rtcService.current.requestTrendingAnalysis('24h', 5);
 
       // Update stats every second
-      const interval = setInterval(() => {
+      statsInterval.current = setInterval(() => {
         if (isMounted.current && rtcService.current) {
           const serviceStats = rtcService.current.getStats();
           setStats((prev) => ({
@@ -89,8 +88,6 @@ function LiveCostDashboard({ embedded = false }) {
           }));
         }
       }, 1000);
-
-      return () => clearInterval(interval);
     } catch (error) {
       console.error('Failed to initialize dashboard:', error);
     }

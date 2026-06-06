@@ -1,10 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import { OfflineModeBanner, SyncStatus, registerServiceWorker } from '../components/offline/OfflineSupport';
 import offlineService from '../services/offlineService';
 import { summarizeOfflineCatalogs } from '../data/offlineMode';
 import logger from '../utils/logger';
 
 const OfflineModeContext = createContext(null);
+const DISABLED_OFFLINE_SUMMARY = summarizeOfflineCatalogs([]);
 
 const getInitialOnlineState = () =>
   typeof navigator === 'undefined' || typeof navigator.onLine !== 'boolean' ? true : navigator.onLine;
@@ -26,6 +28,7 @@ async function loadSyncService() {
  * </OfflineProvider>
  */
 export const OfflineProvider = ({ children }) => {
+  const offlineModeEnabled = FEATURE_FLAGS.enableOfflineMode;
   const [isOnline, setIsOnline] = useState(getInitialOnlineState);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
@@ -38,14 +41,19 @@ export const OfflineProvider = ({ children }) => {
   const syncServiceRef = useRef(null);
 
   const refreshOfflineCatalogs = useCallback(async () => {
+    if (!offlineModeEnabled) {
+      setCatalogSummary(DISABLED_OFFLINE_SUMMARY);
+      return DISABLED_OFFLINE_SUMMARY;
+    }
+
     const summary = await offlineService.cacheOfflineCatalogs();
     setCatalogSummary(summary);
     setLastSyncAt(summary.lastCachedAt || new Date().toISOString());
     return summary;
-  }, []);
+  }, [offlineModeEnabled]);
 
   const syncWhenOnline = useCallback(async () => {
-    if (syncInFlightRef.current || !getInitialOnlineState()) return;
+    if (!offlineModeEnabled || syncInFlightRef.current || !getInitialOnlineState()) return;
 
     syncInFlightRef.current = true;
     setIsSyncing(true);
@@ -72,9 +80,14 @@ export const OfflineProvider = ({ children }) => {
       syncInFlightRef.current = false;
       setIsSyncing(false);
     }
-  }, [refreshOfflineCatalogs]);
+  }, [offlineModeEnabled, refreshOfflineCatalogs]);
 
   useEffect(() => {
+    if (!offlineModeEnabled) {
+      logger.info('Offline mode is disabled; background sync automation not started');
+      return undefined;
+    }
+
     let cancelled = false;
 
     async function initializeOfflineMode() {
@@ -106,7 +119,7 @@ export const OfflineProvider = ({ children }) => {
       cancelled = true;
       syncServiceRef.current?.stopAutoSync();
     };
-  }, [refreshOfflineCatalogs]);
+  }, [offlineModeEnabled, refreshOfflineCatalogs]);
 
   useEffect(() => {
     const handleOnline = () => {
@@ -137,6 +150,7 @@ export const OfflineProvider = ({ children }) => {
       catalogSummary,
       lastSyncAt,
       syncError,
+      offlineModeEnabled,
       refreshOfflineCatalogs,
       syncWhenOnline,
     }),
@@ -145,6 +159,7 @@ export const OfflineProvider = ({ children }) => {
       isOnline,
       isSyncing,
       lastSyncAt,
+      offlineModeEnabled,
       refreshOfflineCatalogs,
       syncError,
       syncProgress,
@@ -155,10 +170,30 @@ export const OfflineProvider = ({ children }) => {
 
   const showSyncStatus = isSyncing;
   const showBanner = !isOnline || isSyncing || syncError || (!onlineNoticeDismissed && syncProgress === 100);
+  const showDisabledBanner = !offlineModeEnabled && !isOnline;
 
   return (
     <OfflineModeContext.Provider value={contextValue}>
-      {showBanner && (
+      {showDisabledBanner && (
+        <section
+          className="offline-mode-banner offline-mode-banner--disabled"
+          role="alert"
+          aria-live="polite"
+          aria-label="Offline mode disabled"
+        >
+          <div className="offline-mode-banner__body">
+            <div className="offline-mode-banner__heading">
+              <strong>Offline mode disabled</strong>
+            </div>
+            <p>
+              Background sync, service worker registration, and offline catalog caching are disabled by
+              feature flag. Reconnect to use live CareDroid data.
+            </p>
+          </div>
+        </section>
+      )}
+
+      {!showDisabledBanner && showBanner && (
         <OfflineModeBanner
           isOnline={isOnline}
           isSyncing={isSyncing}

@@ -3,6 +3,12 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import OfflineProvider from './OfflineProvider';
 
+vi.mock('../config/featureFlags.config', () => ({
+  FEATURE_FLAGS: {
+    enableOfflineMode: true,
+  },
+}));
+
 const { freshSummary, staleSummary } = vi.hoisted(() => {
   const baseSummary = {
     entries: [

@@ -17,8 +17,8 @@ export class MetricsController {
    * Returns all collected metrics in Prometheus text exposition format
    */
   @Get()
-  getMetrics(@Response() res: ExpressResponse): void {
-    const metrics = this.metricsService.getMetricsAsString();
+  async getMetrics(@Response() res: ExpressResponse): Promise<void> {
+    const metrics = await this.metricsService.getMetricsAsString();
     res.set('Content-Type', 'text/plain; charset=utf-8');
     res.send(metrics);
   }

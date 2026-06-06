@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   AUTOMATION_STEP_TYPES,
+  AUTOMATION_EXECUTION_MODES,
   buildAutomationRule,
   buildAutomationRuleLibrary,
   summarizeAutomationBuilder,
@@ -17,6 +18,8 @@ describe('workflowAutomationBuilder', () => {
       'Abnormal potassium -> Critical result confirmed -> Open laboratory workflow',
     ]);
     expect(rules.every((rule) => rule.chain.map((step) => step.type).join('|') === 'trigger|condition|action')).toBe(true);
+    expect(rules.every((rule) => rule.executionMode === AUTOMATION_EXECUTION_MODES.DEMO_PREVIEW)).toBe(true);
+    expect(rules.every((rule) => /No automation is saved, scheduled, or executed/i.test(rule.automationOutcome))).toBe(true);
   });
 
   it('allows composing a custom rule from selected steps', () => {

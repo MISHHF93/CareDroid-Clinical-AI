@@ -55,22 +55,29 @@ export default function WorkflowAutomationBuilder() {
           <p className="automation-eyebrow">Workflow Automation Builder</p>
           <h1>Automation</h1>
           <p>
-            Move from dashboards to automation by turning clinical signals, device telemetry,
-            and lab results into {'trigger -> condition -> action'} rules.
+            Demo-only legacy builder for exploring {'trigger -> condition -> action'} rules.
+            Rules here are not saved, scheduled, or executed.
           </p>
         </div>
-        <div className="automation-summary" aria-label="Automation builder summary">
-          <div>
-            <span>Triggers</span>
-            <strong>{summary.triggers}</strong>
+        <div className="automation-hero__aside">
+          <div className="automation-demo-notice" role="note">
+            <strong>Demo preview only</strong>
+            <span>No live automation worker is connected to this route.</span>
+            <a href="/workflows">Open canonical workflows</a>
           </div>
-          <div>
-            <span>Conditions</span>
-            <strong>{summary.conditions}</strong>
-          </div>
-          <div>
-            <span>Actions</span>
-            <strong>{summary.actions}</strong>
+          <div className="automation-summary" aria-label="Automation builder summary">
+            <div>
+              <span>Triggers</span>
+              <strong>{summary.triggers}</strong>
+            </div>
+            <div>
+              <span>Conditions</span>
+              <strong>{summary.conditions}</strong>
+            </div>
+            <div>
+              <span>Actions</span>
+              <strong>{summary.actions}</strong>
+            </div>
           </div>
         </div>
       </header>
@@ -100,7 +107,7 @@ export default function WorkflowAutomationBuilder() {
               <p>{rule.goal}</p>
             </div>
             <span className={validation.valid ? 'automation-status automation-status--valid' : 'automation-status'}>
-              {validation.valid ? 'Ready to save' : 'Incomplete'}
+              {validation.valid ? 'Demo preview' : 'Incomplete'}
             </span>
           </div>
 
@@ -127,6 +134,7 @@ export default function WorkflowAutomationBuilder() {
             <h3>Automation preview</h3>
             <p>{rule.automationOutcome}</p>
             <code>{rule.summary}</code>
+            <small>Execution state: demo-only, not scheduled, not queued, not saved.</small>
           </section>
         </section>
       </section>

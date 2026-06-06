@@ -4,6 +4,10 @@ export const AUTOMATION_STEP_TYPES = Object.freeze({
   ACTION: 'action',
 });
 
+export const AUTOMATION_EXECUTION_MODES = Object.freeze({
+  DEMO_PREVIEW: 'demo-preview',
+});
+
 export const AUTOMATION_TRIGGERS = Object.freeze([
   {
     id: 'high-news2',
@@ -80,7 +84,8 @@ export const AUTOMATION_TEMPLATES = Object.freeze([
     triggerId: 'high-news2',
     conditionId: 'patient-admitted',
     actionId: 'notify-clinician',
-    status: 'draft-ready',
+    status: 'demo-preview',
+    executionMode: AUTOMATION_EXECUTION_MODES.DEMO_PREVIEW,
     goal: 'Move clinical deterioration monitoring from passive dashboard review to active escalation.',
   },
   {
@@ -89,7 +94,8 @@ export const AUTOMATION_TEMPLATES = Object.freeze([
     triggerId: 'device-offline',
     conditionId: 'device-assigned',
     actionId: 'create-maintenance-ticket',
-    status: 'draft-ready',
+    status: 'demo-preview',
+    executionMode: AUTOMATION_EXECUTION_MODES.DEMO_PREVIEW,
     goal: 'Convert device telemetry gaps into operational work without manual dashboard polling.',
   },
   {
@@ -98,7 +104,8 @@ export const AUTOMATION_TEMPLATES = Object.freeze([
     triggerId: 'abnormal-potassium',
     conditionId: 'critical-result-confirmed',
     actionId: 'open-laboratory-workflow',
-    status: 'draft-ready',
+    status: 'demo-preview',
+    executionMode: AUTOMATION_EXECUTION_MODES.DEMO_PREVIEW,
     goal: 'Route abnormal potassium results into the lab workflow for repeat, trend, and escalation review.',
   },
 ]);
@@ -117,6 +124,7 @@ export function buildAutomationRule({ templateId, triggerId, conditionId, action
     id: template.id,
     name: template.name,
     status: template.status,
+    executionMode: template.executionMode,
     goal: template.goal,
     trigger,
     condition,
@@ -127,7 +135,7 @@ export function buildAutomationRule({ templateId, triggerId, conditionId, action
       { type: AUTOMATION_STEP_TYPES.ACTION, ...action },
     ],
     summary: `${trigger.label} -> ${condition.label} -> ${action.label}`,
-    automationOutcome: `When ${trigger.label.toLowerCase()} occurs and ${condition.label.toLowerCase()}, CareDroid will ${action.label.toLowerCase()}.`,
+    automationOutcome: `Demo preview: when ${trigger.label.toLowerCase()} occurs and ${condition.label.toLowerCase()}, the rule would ${action.label.toLowerCase()}. No automation is saved, scheduled, or executed from this legacy builder.`,
   };
 }
 

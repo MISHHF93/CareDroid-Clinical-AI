@@ -8,7 +8,12 @@ describe('WorkflowAutomationBuilder', () => {
     render(<WorkflowAutomationBuilder />);
 
     expect(screen.getByRole('heading', { name: /^automation$/i })).toBeInTheDocument();
-    expect(screen.getByText(/trigger -> condition -> action/i)).toBeInTheDocument();
+    expect(screen.getByText(/demo-only legacy builder/i)).toBeInTheDocument();
+    expect(screen.getByRole('note')).toHaveTextContent(/demo preview only/i);
+    expect(screen.getByRole('link', { name: /open canonical workflows/i })).toHaveAttribute(
+      'href',
+      '/workflows'
+    );
     expect(screen.getByRole('button', { name: /high news2 escalation/i })).toHaveTextContent(
       /high news2 -> patient is admitted -> notify clinician/i
     );
@@ -31,6 +36,7 @@ describe('WorkflowAutomationBuilder', () => {
     expect(screen.getByLabelText(/automation preview/i)).toHaveTextContent(
       /abnormal potassium -> always run -> open laboratory workflow/i
     );
-    expect(screen.getByText(/ready to save/i)).toBeInTheDocument();
+    expect(screen.getByText(/^demo preview$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/automation preview/i)).toHaveTextContent(/not scheduled, not queued, not saved/i);
   });
 });

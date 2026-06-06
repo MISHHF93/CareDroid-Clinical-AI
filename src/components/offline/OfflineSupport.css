@@ -91,6 +91,11 @@
   border-color: color-mix(in srgb, var(--app-danger) 55%, var(--app-panel-border));
 }
 
+.offline-mode-banner--disabled {
+  border-color: color-mix(in srgb, var(--app-warning) 45%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--app-warning) 12%, var(--app-surface-elevated));
+}
+
 .offline-mode-banner__body {
   min-width: 0;
   display: grid;
