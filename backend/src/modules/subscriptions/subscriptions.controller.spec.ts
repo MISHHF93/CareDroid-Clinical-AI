@@ -10,6 +10,7 @@ describe('SubscriptionsController', () => {
   const subscriptionsService = {
     getBillingOverview: jest.fn(),
     getUsageSummary: jest.fn(),
+    getUsageMeteringFramework: jest.fn(),
     recordUsageEvent: jest.fn(),
     getSubscriptionPlans: jest.fn(),
   };
@@ -55,6 +56,22 @@ describe('SubscriptionsController', () => {
 
     await expect(controller.getUsageSummary(req, 'week')).resolves.toEqual({ period: { key: 'week' } });
     expect(subscriptionsService.getUsageSummary).toHaveBeenCalledWith(req.tenantContext, 'week');
+  });
+
+  it('returns tenant usage metering framework for requested period', async () => {
+    subscriptionsService.getUsageMeteringFramework.mockResolvedValue({
+      period: { key: 'week' },
+      storage: { billingSeparated: true },
+    });
+
+    await expect(controller.getUsageMeteringFramework(req, 'week')).resolves.toEqual({
+      period: { key: 'week' },
+      storage: { billingSeparated: true },
+    });
+    expect(subscriptionsService.getUsageMeteringFramework).toHaveBeenCalledWith(
+      req.tenantContext,
+      'week',
+    );
   });
 
   it('records frontend-originated usage events', async () => {

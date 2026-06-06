@@ -139,21 +139,19 @@ export const TOOL_SURFACES = Object.freeze({
 });
 
 export const TOOL_LIFECYCLE_STATES = Object.freeze({
-  ACTIVE: 'active',
+  DRAFT: 'draft',
   BETA: 'beta',
-  EXPERIMENTAL: 'experimental',
+  ACTIVE: 'active',
   DEPRECATED: 'deprecated',
-  HIDDEN: 'hidden',
-  ADMIN_ONLY: 'admin-only',
+  ARCHIVED: 'archived',
 });
 
 export const TOOL_LIFECYCLE_LABELS = Object.freeze({
-  [TOOL_LIFECYCLE_STATES.ACTIVE]: 'Active',
+  [TOOL_LIFECYCLE_STATES.DRAFT]: 'Draft',
   [TOOL_LIFECYCLE_STATES.BETA]: 'Beta',
-  [TOOL_LIFECYCLE_STATES.EXPERIMENTAL]: 'Experimental',
+  [TOOL_LIFECYCLE_STATES.ACTIVE]: 'Active',
   [TOOL_LIFECYCLE_STATES.DEPRECATED]: 'Deprecated',
-  [TOOL_LIFECYCLE_STATES.HIDDEN]: 'Hidden',
-  [TOOL_LIFECYCLE_STATES.ADMIN_ONLY]: 'Admin Only',
+  [TOOL_LIFECYCLE_STATES.ARCHIVED]: 'Archived',
 });
 
 export const AUDIT_RECORD_KINDS = Object.freeze({
@@ -675,14 +673,14 @@ function lifecycleStateForRecord({
   category,
   tier,
 }) {
-  if (!catalogVisible && !sidebarVisible) return TOOL_LIFECYCLE_STATES.HIDDEN;
-  if (isAdminOnlyPermissionPolicy(permissionPolicy)) return TOOL_LIFECYCLE_STATES.ADMIN_ONLY;
+  if (!catalogVisible && !sidebarVisible) return TOOL_LIFECYCLE_STATES.ARCHIVED;
+  if (isAdminOnlyPermissionPolicy(permissionPolicy)) return TOOL_LIFECYCLE_STATES.ACTIVE;
   if (status && !['active', 'hidden'].includes(status)) return TOOL_LIFECYCLE_STATES.DEPRECATED;
   if (
     launchType === TOOL_LAUNCH_TYPES.UNSUPPORTED_PLANNED ||
     executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED
   ) {
-    return TOOL_LIFECYCLE_STATES.EXPERIMENTAL;
+    return TOOL_LIFECYCLE_STATES.DRAFT;
   }
   if (
     sourceKind === 'platform-system' ||

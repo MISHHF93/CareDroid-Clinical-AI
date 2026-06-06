@@ -13,6 +13,7 @@ import { TenantContextInterceptor } from './tenant-context.interceptor';
 import { TenantIsolationGuard } from './tenant-isolation.guard';
 import { TenantScopeInterceptor } from './tenant-scope.interceptor';
 import { TenantContextService } from './tenant-context.service';
+import { TenantDataIsolationAuditService } from './tenant-data-isolation-audit.service';
 
 @Global()
 @Module({
@@ -30,6 +31,7 @@ import { TenantContextService } from './tenant-context.service';
   controllers: [TenantContextController],
   providers: [
     TenantContextService,
+    TenantDataIsolationAuditService,
     TenantIsolationGuard,
     {
       provide: APP_GUARD,
@@ -44,6 +46,6 @@ import { TenantContextService } from './tenant-context.service';
       useClass: TenantScopeInterceptor,
     },
   ],
-  exports: [TenantContextService, TenantIsolationGuard],
+  exports: [TenantContextService, TenantIsolationGuard, TenantDataIsolationAuditService],
 })
 export class TenantContextModule {}

@@ -43,10 +43,49 @@ describe('ProductCatalogApi builder helpers', () => {
     expect(apiFetch).toHaveBeenCalledWith('/api/dependency-graph');
   });
 
+  it('loads asset dependency graph with organization scope', async () => {
+    await ProductCatalogApi.getAssetDependencyGraph('org-1');
+    expect(apiFetch).toHaveBeenCalledWith('/api/dependency-graph?organizationId=org-1');
+  });
+
+  it('posts hospital solution recommendation input', async () => {
+    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    const payload = { organizationId: 'org-1', hospitalType: 'hospital' };
+
+    await ProductCatalogApi.getHospitalSolutionRecommendation(payload);
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/solution-builder/recommendations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  });
+
+  it('posts hospital solution apply payload', async () => {
+    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    const payload = { organizationId: 'org-1', commercialPlanId: 'enterprise' };
+
+    await ProductCatalogApi.applyHospitalSolution(payload);
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/solution-builder/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  });
+
   it('gets care pathway detail by slug', async () => {
     apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
     await ProductCatalogApi.getCarePathway('sepsis');
     expect(apiFetch).toHaveBeenCalledWith('/api/care-pathways/sepsis');
+  });
+
+  it('loads organization value tracking by period', async () => {
+    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+
+    await ProductCatalogApi.getOrganizationValueTracking('org-1', 'week');
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/organizations/org-1/value-tracking?period=week');
   });
 
   it('lists specialties for onboarding selection', async () => {

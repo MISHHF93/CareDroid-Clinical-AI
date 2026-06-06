@@ -56,11 +56,30 @@ describe('assetAccess', () => {
 
   it('admin-only tools require admin role', () => {
     setPlatformEntitlementContext(null);
-    const tool = { id: 'system-config', lifecycleState: 'admin-only' };
+    const tool = { id: 'system-config', lifecycleState: 'active' };
     expect(resolveAssetAccessState(tool, null, 'student').accessState).toBe(
       ASSET_ACCESS_STATES.ADMIN_ONLY
     );
     expect(resolveAssetAccessState(tool, null, 'admin').accessState).toBe(ASSET_ACCESS_STATES.ALLOWED);
+  });
+
+  it('applies canonical asset lifecycle states locally', () => {
+    expect(resolveAssetAccessState({ id: 'draft-tool', lifecycleState: 'draft' }, null, 'admin')).toEqual({
+      accessState: ASSET_ACCESS_STATES.HIDDEN,
+      reasons: ['draft'],
+    });
+    expect(resolveAssetAccessState({ id: 'beta-tool', lifecycleState: 'beta' }, null, 'admin')).toEqual({
+      accessState: ASSET_ACCESS_STATES.BETA,
+      reasons: ['beta'],
+    });
+    expect(resolveAssetAccessState({ id: 'deprecated-tool', lifecycleState: 'deprecated' }, null, 'admin')).toEqual({
+      accessState: ASSET_ACCESS_STATES.RESTRICTED,
+      reasons: ['deprecated'],
+    });
+    expect(resolveAssetAccessState({ id: 'archived-tool', lifecycleState: 'archived' }, null, 'admin')).toEqual({
+      accessState: ASSET_ACCESS_STATES.HIDDEN,
+      reasons: ['archived'],
+    });
   });
 
   it('blocks disabled rollout before entitlement checks', () => {

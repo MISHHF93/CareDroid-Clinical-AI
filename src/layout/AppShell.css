@@ -95,6 +95,35 @@
   overflow-wrap: anywhere;
 }
 
+.app-shell-environment-banner {
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: calc(100% - 32px);
+  margin: 8px 12px 0;
+  padding: 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 45%, var(--panel-border));
+  border-radius: var(--compact-card-radius, var(--radius-md));
+  background: color-mix(in srgb, var(--app-accent-interactive) 12%, var(--app-surface-1));
+  color: var(--text-primary);
+  font-size: var(--font-12);
+  font-weight: 650;
+  line-height: 1.45;
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  text-transform: none;
+}
+
+.app-shell-environment-banner--staging {
+  border-color: color-mix(in srgb, var(--app-warning) 58%, var(--panel-border));
+  background: color-mix(in srgb, var(--app-warning) 16%, var(--app-surface-1));
+}
+
+.app-shell-environment-banner strong {
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
 .app-shell-dev-mode-banner strong {
   color: var(--text-primary);
 }

@@ -12,6 +12,7 @@ import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { AssetAccessService } from './asset-access.service';
 import { AssetRecommendationService } from './asset-recommendation.service';
 import { AssetRegistryService } from './asset-registry.service';
+import { CustomerSuccessService } from './customer-success.service';
 import { DepartmentAssetMappingService } from './department-asset-mapping.service';
 import { AssetPack } from './entities/asset-pack.entity';
 import { OrganizationEntitlement } from './entities/organization-entitlement.entity';
@@ -25,6 +26,7 @@ import { PlatformAssetsController } from './platform-assets.controller';
 import { PlatformAssetsSeedService } from './platform-assets.seed.service';
 import { PlatformAssetsService } from './platform-assets.service';
 import { PlatformContextService } from './platform-context.service';
+import { PlatformGovernanceRegistryService } from './platform-governance-registry.service';
 import { ServiceLineArchitectureService } from './service-line-architecture.service';
 
 @Module({
@@ -53,10 +55,12 @@ import { ServiceLineArchitectureService } from './service-line-architecture.serv
     EntitlementService,
     PlatformAssetsSeedService,
     PlatformContextService,
+    PlatformGovernanceRegistryService,
     AssetAccessService,
     AssetRecommendationService,
     DigitalTwinService,
     OrganizationAnalyticsService,
+    CustomerSuccessService,
     DepartmentAssetMappingService,
     ServiceLineArchitectureService,
   ],
@@ -66,6 +70,7 @@ import { ServiceLineArchitectureService } from './service-line-architecture.serv
     FeatureFlagService,
     EntitlementService,
     PlatformContextService,
+    PlatformGovernanceRegistryService,
     AssetAccessService,
     AssetRecommendationService,
     PlatformAssetsSeedService,

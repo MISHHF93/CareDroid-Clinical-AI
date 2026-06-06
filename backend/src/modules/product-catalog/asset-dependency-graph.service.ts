@@ -4,6 +4,9 @@ import { Repository } from 'typeorm';
 import { AssetPack } from '../platform-assets/entities/asset-pack.entity';
 import { PlatformAsset } from '../platform-assets/entities/platform-asset.entity';
 import { PlatformAssetType } from '../platform-assets/enums/platform-asset.enums';
+import { EntitlementService } from '../platform-assets/entitlement.service';
+import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
+import { Organization } from '../workspaces/entities/organization.entity';
 import { IntegrationOffering } from './entities/integration-offering.entity';
 import { Product } from './entities/product.entity';
 
@@ -54,9 +57,16 @@ export class AssetDependencyGraphService {
     private readonly assetRepository: Repository<PlatformAsset>,
     @InjectRepository(IntegrationOffering)
     private readonly integrationRepository: Repository<IntegrationOffering>,
+    @InjectRepository(Organization)
+    private readonly organizationRepository: Repository<Organization>,
+    private readonly platformAssetsService: PlatformAssetsService,
+    private readonly entitlementService: EntitlementService,
   ) {}
 
-  async getGraph() {
+  async getGraph(
+    organizationId?: string,
+    options: { userRole?: string; subscriptionPlan?: string } = {},
+  ) {
     const [products, packs, assets, integrations] = await Promise.all([
       this.productRepository.find({ order: { sortOrder: 'ASC' } }),
       this.packRepository.find({ order: { name: 'ASC' } }),
@@ -64,7 +74,12 @@ export class AssetDependencyGraphService {
       this.integrationRepository.find({ order: { sortOrder: 'ASC' } }),
     ]);
 
-    return this.buildGraph(products, packs, assets, integrations);
+    if (!organizationId) {
+      return this.buildGraph(products, packs, assets, integrations);
+    }
+
+    const scoped = await this.filterForEntitledAssets(products, packs, assets, organizationId, options);
+    return this.buildGraph(scoped.products, scoped.packs, scoped.assets, integrations);
   }
 
   buildGraph(
@@ -334,5 +349,58 @@ export class AssetDependencyGraphService {
 
     if (!services.size) services.add('PlatformAssetsService');
     return [...services];
+  }
+
+  private async filterForEntitledAssets(
+    products: Product[],
+    packs: AssetPack[],
+    assets: PlatformAsset[],
+    organizationId: string,
+    options: { userRole?: string; subscriptionPlan?: string },
+  ) {
+    const organization = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    const [entitledAssetIds, entitlements] = await Promise.all([
+      this.platformAssetsService.resolveEntitledAssetIds({ organizationId }),
+      this.platformAssetsService.getOrganizationEntitlements(organizationId),
+    ]);
+    const entitledPackIds = entitlements.map((row) => row.packId);
+    const visibleAssets = assets.filter((asset) => {
+      const decision = this.entitlementService.resolveDecisionFromContext({
+        assetId: asset.id,
+        asset,
+        organization,
+        organizationId,
+        userRole: options.userRole,
+        subscriptionPlan: options.subscriptionPlan,
+        entitledAssetIds,
+        entitledPackIds,
+        strictEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
+      });
+      return entitledAssetIds.includes(asset.id) && decision.isLaunchable;
+    });
+    const visibleAssetIds = new Set(visibleAssets.map((asset) => asset.id));
+    const visiblePacks = packs
+      .filter((pack) => entitledPackIds.includes(pack.id))
+      .map((pack) => ({
+        ...pack,
+        assetIds: (pack.assetIds || []).filter((assetId) => visibleAssetIds.has(assetId)),
+      }) as AssetPack)
+      .filter((pack) => pack.assetIds.length);
+    const visiblePackIds = new Set(visiblePacks.map((pack) => pack.id));
+    const visibleProducts = products
+      .map((product) => ({
+        ...product,
+        packIds: (product.packIds || []).filter((packId) => visiblePackIds.has(packId)),
+        highlightAssetIds: (product.highlightAssetIds || []).filter((assetId) =>
+          visibleAssetIds.has(assetId),
+        ),
+      }) as Product)
+      .filter((product) => product.packIds.length || product.highlightAssetIds.length);
+
+    return {
+      products: visibleProducts,
+      packs: visiblePacks,
+      assets: visibleAssets,
+    };
   }
 }

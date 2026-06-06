@@ -11,7 +11,11 @@ import { CarePathway } from './entities/care-pathway.entity';
 import { IntegrationOffering } from './entities/integration-offering.entity';
 import { ProductCatalogService } from './product-catalog.service';
 import { Organization } from '../workspaces/entities/organization.entity';
-import { REQUIRED_SELLABLE_PRODUCT_NAMES, SEED_PRODUCTS } from './data/product-catalog-seed.data';
+import {
+  REQUIRED_SELLABLE_PRODUCT_NAMES,
+  SEED_COMMERCIAL_PLANS,
+  SEED_PRODUCTS,
+} from './data/product-catalog-seed.data';
 import { SEED_ASSET_PACKS } from '../platform-assets/data/platform-asset-seed.data';
 import { IntegrationCategory, IntegrationReadinessStatus, IntegrationStatus } from './enums/product-catalog.enums';
 
@@ -85,6 +89,19 @@ describe('ProductCatalogService', () => {
     ]);
     REQUIRED_SELLABLE_PRODUCT_NAMES.forEach((name) => {
       expect(productNames.has(name)).toBe(true);
+    });
+  });
+
+  it('defines the five canonical subscription entitlement plans', () => {
+    expect(SEED_COMMERCIAL_PLANS.map((plan) => plan.id)).toEqual([
+      'starter',
+      'professional',
+      'enterprise',
+      'academic',
+      'government',
+    ]);
+    SEED_COMMERCIAL_PLANS.forEach((plan) => {
+      expect(plan.includedPackIds.length + plan.includedProductIds.length).toBeGreaterThan(0);
     });
   });
 
@@ -261,7 +278,7 @@ describe('ProductCatalogService', () => {
     });
   });
 
-  it('keeps marketplace product assets visible with entitlement status for organization context', async () => {
+  it('hides product assets that are not entitled in organization context', async () => {
     const productRepo = (service as any).productRepository;
     const packRepo = (service as any).packRepository;
     const assetRepo = (service as any).assetRepository;
@@ -299,26 +316,65 @@ describe('ProductCatalogService', () => {
 
     const detail = await service.getProductAssets('icu-suite', 'org-1');
 
-    expect(detail.assets).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          id: 'sofa-score',
-          entitlementStatus: 'entitled',
-          isLaunchable: true,
-        }),
-        expect.objectContaining({
-          id: 'locked-ai',
-          entitlementStatus: 'locked',
-          isLaunchable: false,
-        }),
-      ]),
-    );
-    expect(detail.assetsByType.ai_agent[0]).toMatchObject({
-      id: 'locked-ai',
-      entitlementStatus: 'locked',
-      isLaunchable: false,
+    expect(detail.assets).toEqual([
+      expect.objectContaining({
+        id: 'sofa-score',
+        entitlementStatus: 'entitled',
+        isLaunchable: true,
+      }),
+    ]);
+    expect(detail.assetsByType.ai_agent).toBeUndefined();
+    expect(detail.assetsByType.calculator[0]).toMatchObject({
+      id: 'sofa-score',
+      entitlementStatus: 'entitled',
+      isLaunchable: true,
     });
     expect(entitlementService.resolveDecisionFromContext).toHaveBeenCalled();
+  });
+
+  it('resolves a normalized plan entitlement graph through products, packs, and assets', async () => {
+    const planRepo = (service as any).planRepository;
+    const productRepo = (service as any).productRepository;
+    const packRepo = (service as any).packRepository;
+    const assetRepo = (service as any).assetRepository;
+
+    planRepo.findOne.mockResolvedValue({
+      id: 'professional',
+      name: 'Professional',
+      description: 'Department deployment.',
+      includedProductIds: ['product-cardiology'],
+      includedPackIds: ['core-platform'],
+      pricingTier: 'standard',
+      sortOrder: 2,
+    });
+    productRepo.find.mockResolvedValue([
+      {
+        id: 'product-cardiology',
+        slug: 'cardiology-suite',
+        name: 'Cardiology Suite',
+        packIds: ['cardiology-pack'],
+        highlightAssetIds: ['grace-acs'],
+      },
+    ]);
+    packRepo.find.mockResolvedValue([
+      { id: 'core-platform', name: 'Core Platform', slug: 'core', assetIds: ['qsofa'] },
+      { id: 'cardiology-pack', name: 'Cardiology Pack', slug: 'cardiology', assetIds: ['grace-acs'] },
+    ]);
+    assetRepo.find.mockResolvedValue([
+      { id: 'qsofa', title: 'qSOFA', assetType: 'calculator' },
+      { id: 'grace-acs', title: 'GRACE ACS', assetType: 'calculator' },
+    ]);
+
+    const graph = await service.resolvePlanEntitlementGraph('professional');
+
+    expect(graph.plan).toMatchObject({ id: 'professional', name: 'Professional' });
+    expect(graph.productIds).toEqual(['product-cardiology']);
+    expect(graph.packIds).toEqual(expect.arrayContaining(['core-platform', 'cardiology-pack']));
+    expect(graph.assetIds).toEqual(expect.arrayContaining(['qsofa', 'grace-acs']));
+    expect(graph.hierarchy).toMatchObject({
+      planId: 'professional',
+      productIds: ['product-cardiology'],
+    });
   });
 
   it('builds product graph from products to packs, assets, routes, and backend services', async () => {

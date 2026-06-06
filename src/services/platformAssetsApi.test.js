@@ -62,4 +62,67 @@ describe('PlatformAssetsApi marketplace helpers', () => {
       '/api/platform/service-lines/emergency-medicine?organizationId=org-1'
     );
   });
+
+  it('loads tenant administration by organization scope', async () => {
+    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+
+    await PlatformAssetsApi.getTenantAdministration('org-1');
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/organizations/org-1/tenant-admin');
+  });
+
+  it('loads customer success dashboard with a period', async () => {
+    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+
+    await PlatformAssetsApi.getCustomerSuccessDashboard('org-1', 'week');
+
+    expect(apiFetch).toHaveBeenCalledWith(
+      '/api/platform/organizations/org-1/customer-success?period=week'
+    );
+  });
+
+  it('lists assets by lifecycle state', async () => {
+    await PlatformAssetsApi.listAssets({ assetType: 'workflow', lifecycle: 'beta' });
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/platform/assets?assetType=workflow&lifecycle=beta');
+  });
+
+  it('updates asset lifecycle state', async () => {
+    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+
+    await PlatformAssetsApi.updateAssetLifecycle('agent-clinical', 'archived');
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/platform/assets/agent-clinical/lifecycle', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ lifecycle: 'archived' }),
+    });
+  });
+
+  it('loads governance registry with filters', async () => {
+    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+
+    await PlatformAssetsApi.getGovernanceRegistry({
+      query: 'qsofa',
+      riskLevel: 'clinical-decision-support',
+      assetType: 'calculator',
+    });
+
+    expect(apiFetch).toHaveBeenCalledWith(
+      '/api/platform/governance-registry?query=qsofa&riskLevel=clinical-decision-support&assetType=calculator'
+    );
+  });
+
+  it('updates tenant administration by organization scope', async () => {
+    apiFetch.mockResolvedValue(new Response('{}', { status: 200 }));
+    const payload = { departments: ['emergency'] };
+
+    await PlatformAssetsApi.updateTenantAdministration('org-1', payload);
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/organizations/org-1/tenant-admin', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  });
 });

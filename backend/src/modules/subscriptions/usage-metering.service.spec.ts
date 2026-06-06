@@ -123,4 +123,105 @@ describe('UsageMeteringService', () => {
       expect.arrayContaining([expect.objectContaining({ key: 'physician', quantity: 5 })]),
     );
   });
+
+  it('projects a billing-neutral usage metering framework for future billing models', async () => {
+    usageEventRepository.find.mockResolvedValue([
+      {
+        id: '1',
+        organizationId: 'org-1',
+        workspaceId: 'workspace-a',
+        userId: 'user-1',
+        userRole: 'physician',
+        assetId: 'agent-clinical',
+        eventType: UsageEventType.AI_CALL,
+        quantity: 4,
+        unit: 'call',
+        occurredAt: new Date(),
+        metadata: { model: 'gpt' },
+      },
+      {
+        id: '2',
+        organizationId: 'org-1',
+        workspaceId: 'workspace-a',
+        userId: 'user-2',
+        userRole: 'nurse',
+        assetId: 'simulation-suite',
+        eventType: UsageEventType.SIMULATION,
+        quantity: 2,
+        unit: 'run',
+        occurredAt: new Date(),
+        metadata: { status: 'completed' },
+      },
+      {
+        id: '3',
+        organizationId: 'org-1',
+        workspaceId: 'workspace-b',
+        userId: 'user-1',
+        userRole: 'physician',
+        assetId: 'workflow-builder',
+        eventType: UsageEventType.API_CALL,
+        quantity: 3,
+        unit: 'request',
+        occurredAt: new Date(),
+        metadata: { eventType: 'workflow_completed', workflowId: 'wf-1' },
+      },
+      {
+        id: '4',
+        organizationId: 'org-1',
+        workspaceId: 'workspace-c',
+        userId: 'user-3',
+        userRole: 'operator',
+        assetId: 'fhir-connector',
+        eventType: UsageEventType.INTEGRATION,
+        quantity: 5,
+        unit: 'event',
+        occurredAt: new Date(),
+        metadata: { integrationSlug: 'fhir' },
+      },
+      {
+        id: '5',
+        organizationId: 'org-1',
+        workspaceId: 'workspace-c',
+        userId: 'user-4',
+        userRole: 'operator',
+        assetId: null,
+        eventType: UsageEventType.ACTIVE_USER,
+        quantity: 10,
+        unit: 'user',
+        occurredAt: new Date(),
+        metadata: {},
+      },
+    ]);
+
+    const framework = await service.getUsageMeteringFramework({
+      organizationId: 'org-1',
+      period: 'month',
+    });
+
+    expect(framework.storage).toMatchObject({
+      source: 'usage_events',
+      billingSeparated: true,
+    });
+    expect(framework.meters).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: 'active-users', value: 10, billingSeparated: true }),
+        expect.objectContaining({ id: 'ai-requests', value: 4 }),
+        expect.objectContaining({ id: 'simulation-runs', value: 2 }),
+        expect.objectContaining({ id: 'workflow-executions', value: 3 }),
+        expect.objectContaining({ id: 'integrations', value: 5 }),
+      ]),
+    );
+    expect(framework.billingReadiness.futureBillingCandidates).toEqual(
+      expect.arrayContaining([
+        'active-users',
+        'ai-requests',
+        'simulation-runs',
+        'workflow-executions',
+        'integrations',
+      ]),
+    );
+    expect(framework.breakdowns.byIntegration).toEqual([
+      expect.objectContaining({ key: 'fhir', quantity: 5 }),
+    ]);
+  });
 });

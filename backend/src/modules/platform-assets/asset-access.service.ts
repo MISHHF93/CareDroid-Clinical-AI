@@ -91,21 +91,23 @@ export class AssetAccessService {
       return { assetId, accessState: AssetAccessState.HIDDEN, reasons: ['user-hidden'] };
     }
 
-    if (asset?.lifecycle === PlatformAssetLifecycle.ADMIN_ONLY) {
+    if (this.isAdminOnlyAsset(asset)) {
       if (user.role !== UserRole.ADMIN) {
         return {
           assetId,
           accessState: AssetAccessState.REQUIRES_ADMIN,
-          reasons: ['admin-only-lifecycle'],
+          reasons: ['admin-only-policy'],
         };
       }
       reasons.push('admin-lifecycle-override');
     }
 
     if (asset?.lifecycle === PlatformAssetLifecycle.DRAFT) {
-      if (user.role !== UserRole.ADMIN) {
-        return { assetId, accessState: AssetAccessState.HIDDEN, reasons: ['draft'] };
-      }
+      return { assetId, accessState: AssetAccessState.HIDDEN, reasons: ['draft'] };
+    }
+
+    if (asset?.lifecycle === PlatformAssetLifecycle.ARCHIVED) {
+      return { assetId, accessState: AssetAccessState.HIDDEN, reasons: ['archived'] };
     }
 
     if (asset?.governance?.requiresHumanReview && user.role === UserRole.STUDENT) {
@@ -163,7 +165,26 @@ export class AssetAccessService {
       };
     }
 
+    if (asset?.lifecycle === PlatformAssetLifecycle.BETA) {
+      return {
+        assetId,
+        accessState: AssetAccessState.ALLOWED,
+        reasons: [...reasons, 'beta'],
+      };
+    }
+
     return { assetId, accessState: AssetAccessState.ALLOWED, reasons };
+  }
+
+  private isAdminOnlyAsset(asset?: PlatformAsset) {
+    const governance = asset?.governance || {};
+    const permissionPolicy = asset?.permissionPolicy || {};
+    return (
+      governance.adminOnly === true ||
+      governance.visibility === 'admin-only' ||
+      governance.audience === 'admin-only' ||
+      permissionPolicy.adminOnly === true
+    );
   }
 
   private resolveWorkspaceAssetIds(enabledToolIds: string[]) {

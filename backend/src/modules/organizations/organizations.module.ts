@@ -12,6 +12,7 @@ import { OrganizationMembership } from './entities/organization-membership.entit
 import { OrganizationOnboardingService } from './organization-onboarding.service';
 import { OrganizationsController } from './organizations.controller';
 import { OrganizationsService } from './organizations.service';
+import { WhiteLabelController } from './white-label.controller';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { OrganizationsService } from './organizations.service';
     PlatformAssetsModule,
     WorkspacesModule,
   ],
-  controllers: [OrganizationsController],
+  controllers: [OrganizationsController, WhiteLabelController],
   providers: [OrganizationsService, OrganizationOnboardingService],
   exports: [OrganizationsService],
 })

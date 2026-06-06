@@ -1,0 +1,152 @@
+.saas-health-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: min(1180px, 100%);
+  margin-inline: auto;
+  color: var(--app-fg);
+}
+
+.saas-health-hero,
+.saas-health-card,
+.saas-health-section,
+.saas-health-summary-card {
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--compact-panel-radius, 22px);
+  background: var(--app-surface-1);
+  box-shadow: var(--app-shadow-1);
+}
+
+.saas-health-hero {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: clamp(20px, 4vw, 30px);
+}
+
+.saas-health-eyebrow,
+.saas-health-card__header span,
+.saas-health-summary-card span {
+  color: var(--app-accent-interactive);
+  font-size: 0.75rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.saas-health-hero h1,
+.saas-health-card h2,
+.saas-health-section h2 {
+  margin: 0;
+}
+
+.saas-health-hero h1 {
+  font-size: clamp(1.8rem, 5vw, 3rem);
+}
+
+.saas-health-hero p,
+.saas-health-card p,
+.saas-health-section p {
+  color: var(--app-fg-muted);
+  line-height: 1.6;
+}
+
+.saas-health-overall {
+  align-self: flex-start;
+  min-width: 150px;
+  padding: 14px 16px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 18px;
+  background: var(--app-surface-2);
+}
+
+.saas-health-overall span,
+.saas-health-overall strong {
+  display: block;
+}
+
+.saas-health-overall span {
+  font-size: 1.35rem;
+  font-weight: 850;
+}
+
+.saas-health-overall strong {
+  color: var(--app-fg-muted);
+  text-transform: uppercase;
+}
+
+.saas-health-message {
+  margin: 0;
+  color: var(--app-warning);
+}
+
+.saas-health-summary,
+.saas-health-grid,
+.saas-health-groups {
+  display: grid;
+  gap: 14px;
+}
+
+.saas-health-summary {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+}
+
+.saas-health-summary-card,
+.saas-health-card,
+.saas-health-section {
+  padding: 16px;
+}
+
+.saas-health-summary-card strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.35rem;
+}
+
+.saas-health-grid {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+}
+
+.saas-health-card {
+  border-left-width: 6px;
+}
+
+.saas-health-card ul,
+.saas-health-groups ul {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: var(--app-fg-muted);
+}
+
+.saas-health-status--healthy {
+  border-color: color-mix(in srgb, var(--app-success) 56%, var(--app-panel-border));
+}
+
+.saas-health-status--warning {
+  border-color: color-mix(in srgb, var(--app-warning) 58%, var(--app-panel-border));
+}
+
+.saas-health-status--critical {
+  border-color: color-mix(in srgb, var(--app-danger) 62%, var(--app-panel-border));
+}
+
+.saas-health-groups {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+.saas-health-groups article {
+  padding: 14px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--compact-card-radius, 16px);
+  background: var(--app-surface-2);
+}
+
+@media (max-width: 760px) {
+  .saas-health-hero {
+    flex-direction: column;
+  }
+
+  .saas-health-overall {
+    width: 100%;
+  }
+}

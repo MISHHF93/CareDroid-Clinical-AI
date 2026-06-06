@@ -289,12 +289,12 @@ const ToolsOverview = () => {
       && platformContext
       ? getAssetAwareToolProjection(accessContext, accessRole)
       : getUserFacingToolRegistryProjection();
-    return filterVisibleTools(projected, { includeLocked: true });
+    return filterVisibleTools(projected);
   }, [accessContext, accessRole, platformContext]);
 
   const tools = useMemo(
-    () => filterVisibleTools(allToolsWithAccess, { includeLocked: toolFilter === 'all' }),
-    [allToolsWithAccess, toolFilter]
+    () => filterVisibleTools(allToolsWithAccess),
+    [allToolsWithAccess]
   );
 
   const accessGroups = useMemo(

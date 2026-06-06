@@ -2,7 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import BillingPage from './BillingPage';
 import UsagePage from './UsagePage';
-import { fetchBillingOverview, fetchUsageSummary } from '../services/subscriptionApi';
+import {
+  fetchBillingOverview,
+  fetchUsageMeteringFramework,
+  fetchUsageSummary,
+} from '../services/subscriptionApi';
 
 vi.mock('./commercial/CommercialPages.css', () => ({}));
 
@@ -22,6 +26,7 @@ vi.mock('../services/subscriptionApi', () => ({
   createCheckoutSession: vi.fn(),
   createCustomerPortalSession: vi.fn(),
   fetchBillingOverview: vi.fn(),
+  fetchUsageMeteringFramework: vi.fn(),
   fetchUsageSummary: vi.fn(),
 }));
 
@@ -79,6 +84,33 @@ describe('Billing and usage pages', () => {
         },
       },
     });
+    fetchUsageMeteringFramework.mockResolvedValue({
+      ok: true,
+      data: {
+        storage: { billingSeparated: true },
+        meters: [
+          {
+            id: 'active-users',
+            label: 'Active users',
+            value: 7,
+            unit: 'user',
+            events: 7,
+            billingReadiness: 'future-billing-candidate',
+          },
+          {
+            id: 'integrations',
+            label: 'Integrations',
+            value: 3,
+            unit: 'event',
+            events: 3,
+            billingReadiness: 'future-billing-candidate',
+          },
+        ],
+        breakdowns: {
+          byIntegration: [{ key: 'fhir', quantity: 3, events: 3 }],
+        },
+      },
+    });
   });
 
   it('renders billing overview with current plan and plan limits', async () => {
@@ -95,10 +127,17 @@ describe('Billing and usage pages', () => {
     render(<UsagePage />);
 
     await waitFor(() => expect(fetchUsageSummary).toHaveBeenCalledWith({ period: 'month' }));
-    expect(screen.getByRole('heading', { name: /usage/i })).toBeInTheDocument();
+    await waitFor(() =>
+      expect(fetchUsageMeteringFramework).toHaveBeenCalledWith({ period: 'month' })
+    );
+    expect(screen.getByRole('heading', { name: /^usage$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /usage metering framework/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /active users/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /integrations/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /ai calls/i })).toBeInTheDocument();
     expect(screen.getByText(/workspace-1: 16 usage units/i)).toBeInTheDocument();
     expect(screen.getByText(/qsofa: 4 usage units/i)).toBeInTheDocument();
     expect(screen.getByText(/physician: 12 usage units/i)).toBeInTheDocument();
+    expect(screen.getByText(/fhir: 3 usage units/i)).toBeInTheDocument();
   });
 });

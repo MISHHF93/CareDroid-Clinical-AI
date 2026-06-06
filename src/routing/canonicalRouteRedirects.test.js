@@ -99,6 +99,7 @@ describe('canonical route redirects', () => {
     expectRoute('/profile/tool-preferences', 'ProfileToolPreferences');
     expectRoute('/analytics', 'AnalyticsDashboard');
     expectRoute('/billing', 'BillingPage');
+    expectRoute('/tenant-admin', 'TenantAdministrationCenter');
     expectRoute('/usage', 'UsagePage');
     expectRoute('/feature-flags', 'FeatureFlagCenter');
     expectRoute('/plugins', 'PluginMarketplace');
@@ -127,6 +128,9 @@ describe('canonical route redirects', () => {
     expectRoute('/departments', 'DepartmentsPage');
     expectRoute('/service-lines', 'ServiceLinesPage');
     expectRoute('/integration-readiness', 'IntegrationReadinessPage');
+    expectRoute('/solution-builder', 'HospitalSolutionBuilderPage');
+    expectRoute('/value-tracking', 'ValueTrackingPage');
+    expectRoute('/customer-success', 'CustomerSuccessDashboard');
     expectRoute('/configuration-studio', 'ConfigurationStudioPage');
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ path: '/asset-packs' })])

@@ -47,9 +47,10 @@ export enum BackendAssetStatus {
 
 export enum PlatformAssetLifecycle {
   DRAFT = 'draft',
+  BETA = 'beta',
   ACTIVE = 'active',
   DEPRECATED = 'deprecated',
-  ADMIN_ONLY = 'admin_only',
+  ARCHIVED = 'archived',
 }
 
 export enum PricingTier {

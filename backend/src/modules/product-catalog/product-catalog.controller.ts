@@ -3,12 +3,18 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrganizationsService } from '../organizations/organizations.service';
 import { AssetDependencyGraphService } from './asset-dependency-graph.service';
+import {
+  ApplyHospitalSolutionDto,
+  HospitalSolutionRecommendationDto,
+} from './dto/hospital-solution-builder.dto';
 import { SubmitMaturityAssessmentDto } from './dto/submit-maturity-assessment.dto';
 import { UpdateOrganizationConfigurationDto } from './dto/update-organization-configuration.dto';
+import { HospitalSolutionBuilderService } from './hospital-solution-builder.service';
 import { MaturityAssessmentService } from './maturity-assessment.service';
 import { OutcomesService } from './outcomes.service';
 import { ProductCatalogService } from './product-catalog.service';
 import { IntegrationCategory } from './enums/product-catalog.enums';
+import { ValueTrackingService } from './value-tracking.service';
 
 @ApiTags('products')
 @Controller()
@@ -18,8 +24,10 @@ export class ProductCatalogController {
   constructor(
     private readonly productCatalogService: ProductCatalogService,
     private readonly assetDependencyGraphService: AssetDependencyGraphService,
+    private readonly hospitalSolutionBuilderService: HospitalSolutionBuilderService,
     private readonly maturityAssessmentService: MaturityAssessmentService,
     private readonly outcomesService: OutcomesService,
+    private readonly valueTrackingService: ValueTrackingService,
     private readonly organizationsService: OrganizationsService,
   ) {}
 
@@ -172,10 +180,37 @@ export class ProductCatalogController {
     return this.productCatalogService.getIntegrationReadiness();
   }
 
+  @Post('solution-builder/recommendations')
+  @ApiOperation({ summary: 'Recommend a no-code hospital solution deployment' })
+  async recommendHospitalSolution(@Req() req: any, @Body() dto: HospitalSolutionRecommendationDto) {
+    const organizationId = dto.organizationId || req.tenantContext?.organizationId;
+    if (organizationId) {
+      await this.organizationsService.assertMemberForUser(req.user.id, organizationId);
+    }
+    return this.hospitalSolutionBuilderService.recommend({
+      ...dto,
+      organizationId,
+    });
+  }
+
+  @Post('solution-builder/apply')
+  @ApiOperation({ summary: 'Apply a recommended hospital solution deployment' })
+  async applyHospitalSolution(@Req() req: any, @Body() dto: ApplyHospitalSolutionDto) {
+    await this.organizationsService.assertAdminForUser(req.user.id, dto.organizationId);
+    return this.hospitalSolutionBuilderService.apply(req.user, dto);
+  }
+
   @Get('dependency-graph')
   @ApiOperation({ summary: 'Project asset dependency graph across products, packs, assets, routes, services, and integrations' })
-  dependencyGraph() {
-    return this.assetDependencyGraphService.getGraph();
+  async dependencyGraph(@Req() req: any, @Query('organizationId') organizationId?: string) {
+    const orgId = organizationId || req.tenantContext?.organizationId;
+    if (orgId) {
+      await this.organizationsService.assertMemberForUser(req.user.id, orgId);
+    }
+    return this.assetDependencyGraphService.getGraph(orgId, {
+      userRole: req.tenantContext?.role || req.user?.role,
+      subscriptionPlan: req.tenantContext?.subscriptionPlan || req.user?.subscription?.tier,
+    });
   }
 
   @Get('maturity-assessments/questionnaire')
@@ -198,6 +233,17 @@ export class ProductCatalogController {
   async outcomes(@Req() req: any, @Param('organizationId') organizationId: string) {
     await this.organizationsService.assertMemberForUser(req.user.id, organizationId);
     return this.outcomesService.getOrganizationOutcomes(organizationId);
+  }
+
+  @Get('organizations/:organizationId/value-tracking')
+  @ApiOperation({ summary: 'Organization value tracking metrics by clinical, operational, and executive category' })
+  async valueTracking(
+    @Req() req: any,
+    @Param('organizationId') organizationId: string,
+    @Query('period') period?: string,
+  ) {
+    await this.organizationsService.assertMemberForUser(req.user.id, organizationId);
+    return this.valueTrackingService.getOrganizationValueTracking(organizationId, period);
   }
 
   @Patch('organizations/:organizationId/configuration')

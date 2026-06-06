@@ -180,6 +180,23 @@ describe('AuditService', () => {
       expect(result).toEqual(mockLogs);
     });
 
+    it('should scope audit logs for a user by organization when provided', async () => {
+      const userId = '1';
+      const organizationId = 'org-a';
+      const mockLogs = [{ ...mockAuditLog, organizationId }];
+
+      mockAuditRepository.find.mockResolvedValue(mockLogs);
+
+      const result = await service.findByUser(userId, 100, organizationId);
+
+      expect(mockAuditRepository.find).toHaveBeenCalledWith({
+        where: { userId, organizationId },
+        order: { timestamp: 'DESC' },
+        take: 100,
+      });
+      expect(result).toEqual(mockLogs);
+    });
+
     it('should return empty array when no logs found', async () => {
       const userId = 'nonexistent';
 
@@ -225,6 +242,24 @@ describe('AuditService', () => {
       const result = await service.findPhiAccess(startDate, endDate);
 
       expect(result).toEqual([]);
+    });
+
+    it('should scope PHI access logs by organization when provided', async () => {
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-12-31');
+      const organizationId = 'org-a';
+
+      mockAuditRepository.find.mockResolvedValue([]);
+
+      await service.findPhiAccess(startDate, endDate, organizationId);
+
+      expect(mockAuditRepository.find).toHaveBeenCalledWith({
+        where: {
+          phiAccessed: true,
+          organizationId,
+        },
+        order: { timestamp: 'DESC' },
+      });
     });
   });
 
@@ -630,6 +665,26 @@ describe('AuditService', () => {
       const result = await service.findByDateRange(startDate, endDate);
 
       expect(result).toBeDefined();
+    });
+
+    it('should add an organization filter for date range queries when provided', async () => {
+      const startDate = new Date('2023-01-01');
+      const endDate = new Date('2023-12-31');
+      const organizationId = 'org-a';
+      const query = {
+        where: jest.fn().mockReturnThis(),
+        andWhere: jest.fn().mockReturnThis(),
+        orderBy: jest.fn().mockReturnThis(),
+        getMany: jest.fn().mockResolvedValue([mockAuditLog]),
+      };
+
+      mockAuditRepository.createQueryBuilder.mockReturnValue(query);
+
+      await service.findByDateRange(startDate, endDate, organizationId);
+
+      expect(query.andWhere).toHaveBeenCalledWith('log.organizationId = :organizationId', {
+        organizationId,
+      });
     });
   });
 

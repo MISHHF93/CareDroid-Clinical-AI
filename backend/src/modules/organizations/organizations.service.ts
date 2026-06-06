@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
+import { Permission, PermissionMetadata } from '../auth/enums/permission.enum';
 import { User } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
@@ -107,6 +108,27 @@ export class OrganizationsService {
     const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
     if (!org) throw new NotFoundException('Organization not found');
     return this.buildOrganizationEngine(user, org);
+  }
+
+  async getPublicWhiteLabel(tenantId: string) {
+    const normalizedTenantId = String(tenantId || '').trim();
+    if (!normalizedTenantId) throw new NotFoundException('Tenant not found');
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      normalizedTenantId,
+    );
+    const org = await this.organizationRepository.findOne({
+      where: isUuid ? [{ id: normalizedTenantId }, { slug: normalizedTenantId }] : { slug: normalizedTenantId },
+    });
+    if (!org) throw new NotFoundException('Tenant not found');
+    const settings = this.normalizeSettings(org.settings, org.organizationType);
+    const branding = this.normalizeBranding(org.branding || settings.branding, org.name);
+    return {
+      tenantId: org.slug,
+      organizationId: org.id,
+      organizationName: org.name,
+      organizationType: org.organizationType,
+      branding,
+    };
   }
 
   async create(user: User, dto: CreateOrganizationDto) {
@@ -271,6 +293,129 @@ export class OrganizationsService {
     return this.buildOrganizationEngine(user, org);
   }
 
+  async getTenantAdministration(user: User, organizationId: string) {
+    await this.assertMember(user.id, organizationId);
+    const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    if (!org) throw new NotFoundException('Organization not found');
+
+    const [engine, memberships, roleProfiles] = await Promise.all([
+      this.buildOrganizationEngine(user, org),
+      this.membershipRepository.find({
+        where: { organizationId },
+        order: { createdAt: 'ASC' },
+      }),
+      this.platformAssetsService.listRoleProfiles().catch(() => []),
+    ]);
+    const userIds = memberships.map((membership) => membership.userId);
+    const profiles = userIds.length
+      ? await this.profileRepository.find({ where: { userId: In(userIds) } })
+      : [];
+    const profileByUserId = new Map(profiles.map((profile) => [profile.userId, profile]));
+    const settings = engine.settings as Record<string, any>;
+
+    return {
+      organizationId,
+      profile: {
+        ...engine.organization,
+        tenantId: engine.tenant.tenantId,
+        complianceMode: engine.tenant.complianceMode,
+        isDemoTenant: engine.tenant.isDemoTenant,
+      },
+      departments: Array.isArray(settings.departments) ? settings.departments : [],
+      workspaces: Array.isArray(settings.workspaceDefaults) ? settings.workspaceDefaults : [],
+      users: memberships.map((membership) => {
+        const profile = profileByUserId.get(membership.userId);
+        return {
+          membershipId: membership.id,
+          userId: membership.userId,
+          displayName: profile?.fullName || membership.userId,
+          specialty: profile?.specialty || null,
+          verified: Boolean(profile?.verified),
+          membershipRole: membership.role,
+          roleProfileId: membership.roleProfileId || profile?.roleProfileId || null,
+          joinedAt: membership.createdAt,
+        };
+      }),
+      roles: {
+        membershipRoles: Object.values(OrganizationMembershipRole),
+        roleProfiles: roleProfiles.map((profile) => ({
+          id: profile.id,
+          label: profile.label,
+          intendedRoles: profile.intendedRoles || [],
+          specialties: profile.specialties || [],
+          requiredPermissions: profile.requiredPermissions || [],
+          defaultDashboard: profile.defaultDashboard,
+          defaultAiAgentId: profile.defaultAiAgentId,
+        })),
+      },
+      permissions: {
+        catalog: Object.values(Permission).map((permission) => ({
+          id: permission,
+          ...PermissionMetadata[permission],
+        })),
+        overrides: settings.permissionsOverrides || {},
+      },
+      branding: engine.branding,
+      integrations: engine.integrations,
+      subscriptions: {
+        current: engine.subscription,
+        settings: settings.subscription || {},
+        commercialPlanId: settings.commercialPlanId || engine.subscription?.commercialPlanId || null,
+      },
+      noCodeConfiguration: {
+        enabledProductIds: settings.enabledProductIds || [],
+        enabledPackIds: settings.enabledPackIds || [],
+        enabledAgentIds: settings.enabledAgentIds || [],
+        navigation: settings.navigation || {},
+        dashboardLayout: settings.dashboardLayout || {},
+        integrationsRequested: settings.integrationsRequested || [],
+      },
+      supportedOrganizationTypes: engine.supportedOrganizationTypes,
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  async updateTenantAdministration(
+    user: User,
+    organizationId: string,
+    updates: Record<string, unknown>,
+  ) {
+    await this.assertAdmin(user.id, organizationId);
+
+    const settingsPatch: Record<string, unknown> = {
+      ...(this.isRecord(updates.settings) ? updates.settings : {}),
+    };
+    const workspaceDefaults = updates.workspaceDefaults ?? updates.workspaces;
+    for (const [sourceKey, targetKey] of [
+      ['departments', 'departments'],
+      ['integrations', 'integrations'],
+      ['integrationsRequested', 'integrationsRequested'],
+      ['enabledProductIds', 'enabledProductIds'],
+      ['enabledPackIds', 'enabledPackIds'],
+      ['enabledAgentIds', 'enabledAgentIds'],
+    ] as const) {
+      if (Array.isArray(updates[sourceKey])) {
+        settingsPatch[targetKey] = this.uniqueStrings(updates[sourceKey] as unknown[]);
+      }
+    }
+    if (Array.isArray(workspaceDefaults)) settingsPatch.workspaceDefaults = workspaceDefaults;
+    if (this.isRecord(updates.permissionsOverrides)) {
+      settingsPatch.permissionsOverrides = updates.permissionsOverrides;
+    }
+    if (this.isRecord(updates.navigation)) settingsPatch.navigation = updates.navigation;
+    if (this.isRecord(updates.dashboardLayout)) settingsPatch.dashboardLayout = updates.dashboardLayout;
+
+    const organizationUpdates: Record<string, unknown> = {};
+    for (const key of ['name', 'organizationType', 'country', 'subscription', 'integrations'] as const) {
+      if (updates[key] !== undefined) organizationUpdates[key] = updates[key];
+    }
+    if (this.isRecord(updates.branding)) organizationUpdates.branding = updates.branding;
+    if (Object.keys(settingsPatch).length) organizationUpdates.settings = settingsPatch;
+
+    await this.updateOrganizationSettings(user, organizationId, organizationUpdates);
+    return this.getTenantAdministration(user, organizationId);
+  }
+
   async requestIntegration(user: User, organizationId: string, integrationSlug: string) {
     await this.assertAdmin(user.id, organizationId);
     const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
@@ -286,6 +431,20 @@ export class OrganizationsService {
       status: 'requested',
       engine: await this.buildOrganizationEngine(user, org),
     };
+  }
+
+  private uniqueStrings(values: unknown[]) {
+    return [
+      ...new Set(
+        values
+          .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
+          .map((value) => value.trim()),
+      ),
+    ];
+  }
+
+  private isRecord(value: unknown): value is Record<string, unknown> {
+    return Boolean(value && typeof value === 'object' && !Array.isArray(value));
   }
 
   private async assertMember(userId: string, organizationId: string) {
@@ -357,11 +516,22 @@ export class OrganizationsService {
     const branding = (input && typeof input === 'object' ? input : {}) as Record<string, unknown>;
     return {
       displayName: String(branding.displayName || fallbackName || 'CareDroid Organization'),
-      logoUrl: (branding.logoUrl as string) || null,
-      primaryColor: (branding.primaryColor as string) || null,
-      accentColor: (branding.accentColor as string) || null,
-      theme: (branding.theme as string) || 'system',
+      logoUrl: this.optionalString(branding.logoUrl),
+      faviconUrl: this.optionalString(branding.faviconUrl),
+      primaryColor: this.optionalString(branding.primaryColor),
+      accentColor: this.optionalString(branding.accentColor),
+      theme: this.optionalString(branding.theme) || 'system',
+      loginTitle: this.optionalString(branding.loginTitle),
+      loginSubtitle: this.optionalString(branding.loginSubtitle),
+      loginBackgroundImageUrl: this.optionalString(branding.loginBackgroundImageUrl),
+      dashboardTitle: this.optionalString(branding.dashboardTitle),
+      dashboardSubtitle: this.optionalString(branding.dashboardSubtitle),
+      dashboardLogoUrl: this.optionalString(branding.dashboardLogoUrl),
     };
+  }
+
+  private optionalString(value: unknown) {
+    return typeof value === 'string' && value.trim().length ? value.trim() : null;
   }
 
   private normalizeSettings(input: unknown, organizationType: OrganizationType): Record<string, any> {

@@ -858,6 +858,7 @@ const PLATFORM_SYSTEM_ASSETS: MigratedAssetRecord[] = [
   ['model-usage-dashboard', 'Model Usage Dashboard', 'Governance', '/governance/model-usage', AssetRegistryType.DASHBOARD],
   ['cost-optimization-control-plane', 'Cost Optimization Control Plane', 'Governance', '/governance/costs', AssetRegistryType.DASHBOARD],
   ['clinical-safety-audit', 'Clinical Safety Audit', 'Governance', '/governance/clinical-safety', AssetRegistryType.REPORT],
+  ['governance-registry', 'Platform Governance Registry', 'Governance', '/governance-registry', AssetRegistryType.REPORT],
   ['consent-manager', 'Consent Manager', 'Governance', '/governance/consent', AssetRegistryType.WORKFLOW],
   ['privacy-center', 'Privacy Center', 'Governance', '/governance/privacy', AssetRegistryType.REPORT],
   ['regulatory-classification', 'Regulatory Classification', 'Regulatory', '/governance/regulatory', AssetRegistryType.REPORT],
@@ -956,6 +957,12 @@ const WORKFLOW_TEMPLATE_ASSETS: MigratedAssetRecord[] = [
   route: category.includes('Template') ? '/documentation' : '/workflows',
   packIds: ['ai-workflow-pack'],
   workspaceTags: ['clinical', 'workflow', 'documentation'],
+  lifecycle:
+    id === 'referral-letter-template'
+      ? PlatformAssetLifecycle.DEPRECATED
+      : id === 'prior-auth-template'
+        ? PlatformAssetLifecycle.ARCHIVED
+        : undefined,
 }));
 
 const PLUGIN_ASSETS: MigratedAssetRecord[] = [
@@ -1068,14 +1075,37 @@ function attachMigratedAssetsToPacks() {
 }
 
 function governanceForAsset(riskLevel: AssetRegistryRiskLevel, demoStatus: AssetDemoLiveStatus) {
+  const clinicalReviewRequired =
+    riskLevel === AssetRegistryRiskLevel.CLINICAL_DECISION_SUPPORT ||
+    riskLevel === AssetRegistryRiskLevel.HIGH_RISK ||
+    riskLevel === AssetRegistryRiskLevel.GOVERNANCE_REQUIRED;
   return {
     ...CLINICAL_REVIEW_GOVERNANCE,
+    owner: 'Clinical Platform Owner',
+    steward: 'Clinical Informatics Steward',
+    approver:
+      riskLevel === AssetRegistryRiskLevel.HIGH_RISK
+        ? 'Clinical Safety Board'
+        : riskLevel === AssetRegistryRiskLevel.GOVERNANCE_REQUIRED
+          ? 'Governance Review Board'
+          : clinicalReviewRequired
+            ? 'Clinical Governance Lead'
+            : 'Asset Steward',
     clinicalRiskLevel: riskLevel,
-    validationStatus: demoStatus,
-    requiresHumanReview:
-      riskLevel === AssetRegistryRiskLevel.CLINICAL_DECISION_SUPPORT ||
+    riskLevel,
+    evidenceSource: 'platform-asset-seed.data.ts',
+    version: '1.0.0',
+    auditRequirement:
+      clinicalReviewRequired || riskLevel === AssetRegistryRiskLevel.OPERATIONAL ? 'required' : 'standard',
+    reviewSchedule:
       riskLevel === AssetRegistryRiskLevel.HIGH_RISK ||
-      riskLevel === AssetRegistryRiskLevel.GOVERNANCE_REQUIRED,
+      riskLevel === AssetRegistryRiskLevel.GOVERNANCE_REQUIRED
+        ? 'quarterly'
+        : riskLevel === AssetRegistryRiskLevel.CLINICAL_DECISION_SUPPORT
+          ? 'semiannual'
+          : 'annual',
+    validationStatus: demoStatus,
+    requiresHumanReview: clinicalReviewRequired,
   };
 }
 
@@ -1187,7 +1217,11 @@ function normalizeSeedAsset(
     backendStatus: overrides.backendStatus || 'partial',
     demoStatus,
     governance: overrides.governance || governanceForAsset(riskLevel, demoStatus),
-    lifecycle: overrides.lifecycle || PlatformAssetLifecycle.ACTIVE,
+    lifecycle:
+      overrides.lifecycle ||
+      (assetType === PlatformAssetType.INTEGRATION
+        ? PlatformAssetLifecycle.BETA
+        : PlatformAssetLifecycle.ACTIVE),
     pricingTier: overrides.pricingTier || pricingTierForPackIds(packIds),
     packIds,
     dependencies: overrides.dependencies || [],

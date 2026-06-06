@@ -103,6 +103,18 @@ export class SubscriptionsController {
     return this.subscriptionsService.getUsageSummary(req.tenantContext, period || 'month');
   }
 
+  @Get('usage/metering')
+  @UseGuards(AuthGuard('jwt'))
+  @OrganizationScoped({ admin: 'organization', permissions: [Permission.VIEW_ANALYTICS] })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get billing-neutral usage metering framework summary' })
+  async getUsageMeteringFramework(@Req() req: any, @Query('period') period?: string) {
+    return this.subscriptionsService.getUsageMeteringFramework(
+      req.tenantContext,
+      period || 'month',
+    );
+  }
+
   @Post('usage/events')
   @UseGuards(AuthGuard('jwt'))
   @TenantScoped()

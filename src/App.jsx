@@ -8,6 +8,7 @@ import { ConversationProvider, useConversation } from './contexts/ConversationCo
 import { ToolPreferencesProvider } from './contexts/ToolPreferencesContext';
 import { WorkspaceProvider } from './contexts/WorkspaceContext';
 import { OrganizationContextProvider } from './contexts/OrganizationContext';
+import { WhiteLabelProvider } from './contexts/WhiteLabelContext';
 import { UserIdentityProvider } from './contexts/UserIdentityContext';
 import { CostTrackingProvider } from './contexts/CostTrackingContext';
 import { SystemConfigProvider } from './contexts/SystemConfigContext';
@@ -114,8 +115,10 @@ const PlatformGovernanceWorkspace = lazyWithRetry(
 const FeatureFlagCenter = lazyWithRetry(() => import('./pages/FeatureFlagCenter'));
 const PluginMarketplace = lazyWithRetry(() => import('./pages/PluginMarketplace'));
 const DataLineageExplorer = lazyWithRetry(() => import('./pages/DataLineageExplorer'));
+const GovernanceRegistry = lazyWithRetry(() => import('./pages/GovernanceRegistry'));
 const PlatformSelfDiagnostics = lazyWithRetry(() => import('./pages/PlatformSelfDiagnostics'));
 const SystemHealth = lazyWithRetry(() => import('./pages/SystemHealth'));
+const SaasHealthCenter = lazyWithRetry(() => import('./pages/SaasHealthCenter'));
 const Profile = lazyWithRetry(() => import('./pages/Profile'));
 const ProfileSettings = lazyWithRetry(() => import('./pages/ProfileSettings'));
 const ProfileActivity = lazyWithRetry(() => import('./pages/profile/ProfileActivity'));
@@ -134,8 +137,10 @@ const {
   PackMarketplace,
   AssetLifecycleAdmin,
   PlatformAnalyticsPage,
+  CustomerSuccessDashboard,
   DepartmentsPage,
   ServiceLinesPage,
+  TenantAdministrationCenter,
 } = {
   OrganizationDashboard: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({ default: m.OrganizationDashboard }))
@@ -152,11 +157,21 @@ const {
   PlatformAnalyticsPage: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({ default: m.PlatformAnalyticsPage }))
   ),
+  CustomerSuccessDashboard: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({
+      default: m.CustomerSuccessDashboard,
+    }))
+  ),
   DepartmentsPage: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({ default: m.DepartmentsPage }))
   ),
   ServiceLinesPage: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({ default: m.ServiceLinesPage }))
+  ),
+  TenantAdministrationCenter: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({
+      default: m.TenantAdministrationCenter,
+    }))
   ),
 };
 
@@ -176,8 +191,10 @@ const {
   AgentsRegistryPage,
   MaturityAssessmentPage,
   OutcomesDashboardPage,
+  ValueTrackingPage,
   IntegrationsMarketplacePage,
   IntegrationReadinessPage,
+  HospitalSolutionBuilderPage,
   ConfigurationStudioPage,
   OrganizationOnboardingPage,
 } = {
@@ -211,6 +228,9 @@ const {
   OutcomesDashboardPage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({ default: m.OutcomesDashboardPage }))
   ),
+  ValueTrackingPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ValueTrackingPage }))
+  ),
   IntegrationsMarketplacePage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({
       default: m.IntegrationsMarketplacePage,
@@ -219,6 +239,11 @@ const {
   IntegrationReadinessPage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({
       default: m.IntegrationReadinessPage,
+    }))
+  ),
+  HospitalSolutionBuilderPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({
+      default: m.HospitalSolutionBuilderPage,
     }))
   ),
   ConfigurationStudioPage: lazyWithRetry(() =>
@@ -1335,6 +1360,11 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/tenant-admin',
+      element: <TenantAdministrationCenter />,
+      requiresAuth: true,
+    },
+    {
       path: '/settings/organization',
       element: <OrganizationSettings />,
       requiresAuth: true,
@@ -1352,6 +1382,11 @@ function AppRoutes() {
     {
       path: '/platform-analytics',
       element: <PlatformAnalyticsPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/customer-success',
+      element: <CustomerSuccessDashboard />,
       requiresAuth: true,
     },
     {
@@ -1451,6 +1486,11 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/value-tracking',
+      element: <ValueTrackingPage />,
+      requiresAuth: true,
+    },
+    {
       path: '/integrations-marketplace',
       element: <IntegrationsMarketplacePage />,
       requiresAuth: true,
@@ -1463,6 +1503,11 @@ function AppRoutes() {
     {
       path: '/configuration-studio',
       element: <ConfigurationStudioPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/solution-builder',
+      element: <HospitalSolutionBuilderPage />,
       requiresAuth: true,
     },
 
@@ -1604,6 +1649,13 @@ function AppRoutes() {
       requireAllPermissions: true,
     },
     {
+      path: '/saas-health',
+      element: <SaasHealthCenter />,
+      requiresAuth: true,
+      permission: [Permission.VIEW_OPERATIONS, Permission.VIEW_OBSERVABILITY],
+      requireAllPermissions: true,
+    },
+    {
       path: '/feature-flags',
       element: <FeatureFlagCenter />,
       requiresAuth: true,
@@ -1626,6 +1678,12 @@ function AppRoutes() {
       element: <DependencyGraph />,
       requiresAuth: true,
       permission: Permission.CONFIGURE_SYSTEM,
+    },
+    {
+      path: '/governance-registry',
+      element: <GovernanceRegistry />,
+      requiresAuth: true,
+      permission: Permission.VIEW_GOVERNANCE,
     },
     {
       path: '/data-lineage',
@@ -1922,18 +1980,20 @@ function App() {
                   <TenantContextProvider>
                     <UserIdentityProvider>
                       <OrganizationContextProvider>
-                        <ConversationProvider>
-                          <SystemConfigProvider>
-                            <OfflineProvider>
-                              <ErrorBoundary>
-                                <Suspense fallback={<PageLoader />}>
-                                  <AppRoutes />
-                                </Suspense>
-                                <NotificationToasts />
-                              </ErrorBoundary>
-                            </OfflineProvider>
-                          </SystemConfigProvider>
-                        </ConversationProvider>
+                        <WhiteLabelProvider>
+                          <ConversationProvider>
+                            <SystemConfigProvider>
+                              <OfflineProvider>
+                                <ErrorBoundary>
+                                  <Suspense fallback={<PageLoader />}>
+                                    <AppRoutes />
+                                  </Suspense>
+                                  <NotificationToasts />
+                                </ErrorBoundary>
+                              </OfflineProvider>
+                            </SystemConfigProvider>
+                          </ConversationProvider>
+                        </WhiteLabelProvider>
                       </OrganizationContextProvider>
                     </UserIdentityProvider>
                   </TenantContextProvider>

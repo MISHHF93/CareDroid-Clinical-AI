@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AssetPack } from '../platform-assets/entities/asset-pack.entity';
 import { PlatformAsset } from '../platform-assets/entities/platform-asset.entity';
-import { PlatformAssetLifecycle } from '../platform-assets/enums/platform-asset.enums';
 import { REQUIRED_SELLABLE_PRODUCT_NAMES } from './data/product-catalog-seed.data';
 import { Product } from './entities/product.entity';
 import { SpecialtyCatalog } from './entities/specialty-catalog.entity';
@@ -108,13 +107,15 @@ export class ProductCatalogValidationService {
   private isExplicitlyInternalAsset(asset: PlatformAsset): boolean {
     const governance = asset.governance || {};
     return (
-      asset.lifecycle === PlatformAssetLifecycle.ADMIN_ONLY ||
       governance.internal === true ||
       governance.developerOnly === true ||
+      governance.adminOnly === true ||
       governance.visibility === 'internal' ||
       governance.visibility === 'developer-only' ||
+      governance.visibility === 'admin-only' ||
       governance.audience === 'internal' ||
-      governance.audience === 'developer-only'
+      governance.audience === 'developer-only' ||
+      governance.audience === 'admin-only'
     );
   }
 }

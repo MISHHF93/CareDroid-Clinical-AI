@@ -5,6 +5,7 @@ import { AssetRegistryService } from './asset-registry.service';
 import {
   AssetRegistryRiskLevel,
   AssetRegistryType,
+  normalizeAssetLifecycle,
   normalizeRegistryType,
   validateAssetRegistryMetadata,
 } from './asset-registry.schema';
@@ -120,9 +121,15 @@ describe('AssetRegistryService', () => {
   });
 
   it('rejects invalid lifecycle updates', async () => {
-    await expect(service.updateAssetLifecycle('qsofa', 'retired')).rejects.toBeInstanceOf(
+    await expect(service.updateAssetLifecycle('qsofa', 'sunset')).rejects.toBeInstanceOf(
       BadRequestException,
     );
+  });
+
+  it('normalizes lifecycle aliases into canonical asset lifecycle states', () => {
+    expect(normalizeAssetLifecycle('preview')).toBe(PlatformAssetLifecycle.BETA);
+    expect(normalizeAssetLifecycle('retired')).toBe(PlatformAssetLifecycle.ARCHIVED);
+    expect(normalizeAssetLifecycle('admin_only')).toBeNull();
   });
 
   it('keeps migrated seed assets complete and unique', () => {
@@ -168,5 +175,29 @@ describe('AssetRegistryService', () => {
       expect(asset.recommendedRoles.length).toBeGreaterThan(0);
       expect(asset.requiredPermissions.length).toBeGreaterThan(0);
     }
+
+    const managedTypes = new Set([
+      PlatformAssetType.TOOL,
+      PlatformAssetType.CLINICAL_TOOL,
+      PlatformAssetType.CALCULATOR,
+      PlatformAssetType.SIMULATION,
+      PlatformAssetType.WORKFLOW,
+      PlatformAssetType.AI_AGENT,
+      PlatformAssetType.INTEGRATION,
+    ]);
+    for (const assetType of managedTypes) {
+      expect(SEED_PLATFORM_ASSETS.some((asset) => asset.assetType === assetType)).toBe(true);
+    }
+
+    const seededLifecycleStates = new Set(SEED_PLATFORM_ASSETS.map((asset) => asset.lifecycle));
+    expect(seededLifecycleStates).toEqual(
+      new Set([
+        PlatformAssetLifecycle.DRAFT,
+        PlatformAssetLifecycle.BETA,
+        PlatformAssetLifecycle.ACTIVE,
+        PlatformAssetLifecycle.DEPRECATED,
+        PlatformAssetLifecycle.ARCHIVED,
+      ]),
+    );
   });
 });

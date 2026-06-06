@@ -21,6 +21,7 @@ import ragConfig from './config/rag.config';
 import anomalyDetectionConfig from './config/anomaly-detection.config';
 import nluConfig from './config/nlu.config';
 import firebaseConfig from './config/firebase.config';
+import environmentConfig from './config/environment.config';
 import { envValidationSchema } from './config/env.validation';
 
 // Modules
@@ -121,6 +122,7 @@ function resolveDatabaseClient() {
         anomalyDetectionConfig,
         nluConfig,
         firebaseConfig,
+        environmentConfig,
       ],
     }),
 

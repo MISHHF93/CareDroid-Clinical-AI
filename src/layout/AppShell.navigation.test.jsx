@@ -138,4 +138,11 @@ describe('AppShell navigation surfaces', () => {
     expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
     expect(screen.getByRole('main')).toHaveAttribute('data-layout-role', 'MainContent');
   });
+
+  it('renders an environment banner in authenticated non-production shells', () => {
+    renderShell(1280, '/dashboard');
+
+    expect(screen.getByText(/development/i).closest('[role="status"]')).toBeInTheDocument();
+    expect(screen.getByText(/environment/i)).toBeInTheDocument();
+  });
 });

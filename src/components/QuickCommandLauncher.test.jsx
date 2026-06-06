@@ -140,6 +140,27 @@ describe('QuickCommandLauncher', () => {
     }
   });
 
+  it('does not include non-launchable entitled-filtered tools', () => {
+    const entries = buildQuickCommandEntries({
+      tools: [
+        { id: 'qsofa', name: 'qSOFA', description: 'Score', category: 'Calculator', path: '/tools/qsofa' },
+        {
+          id: 'locked-ai',
+          name: 'Locked AI',
+          description: 'Premium AI',
+          category: 'AI',
+          path: '/assistant',
+          isLaunchable: false,
+        },
+      ],
+      recentToolIds: ['locked-ai', 'qsofa'],
+    });
+    const toolIds = [...entries.recentEntries, ...entries.toolEntries].map((entry) => entry.sourceId);
+
+    expect(toolIds).toContain('qsofa');
+    expect(toolIds).not.toContain('locked-ai');
+  });
+
   it('uses workspace-first destinations while keeping secondary routes searchable', () => {
     const entries = buildQuickCommandEntries({
       tools: getUserFacingToolRegistryProjection(),
@@ -150,7 +171,18 @@ describe('QuickCommandLauncher', () => {
     const toolIds = entries.toolEntries.map((entry) => entry.sourceId);
 
     expect(workspaceIds).toEqual(
-      expect.arrayContaining(['clinical', 'emergency', 'operations', 'fleet', 'medical-iot', 'research', 'admin'])
+      expect.arrayContaining([
+        'emergency',
+        'icu',
+        'cardiology',
+        'laboratory',
+        'operations',
+        'fleet',
+        'medical-iot',
+        'education',
+        'research',
+        'governance',
+      ])
     );
     expect(navIds).toEqual(
       expect.arrayContaining([

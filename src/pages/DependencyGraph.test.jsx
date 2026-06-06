@@ -12,6 +12,12 @@ vi.mock('../services/productCatalogApi', () => ({
   },
 }));
 
+vi.mock('../contexts/UserIdentityContext', () => ({
+  useUserIdentity: () => ({
+    organization: { id: 'org-1' },
+  }),
+}));
+
 const graph = {
   summary: {
     products: 1,
@@ -73,6 +79,7 @@ describe('DependencyGraph', () => {
     render(<DependencyGraph />);
 
     expect(await screen.findByRole('heading', { name: /asset dependency graph/i })).toBeInTheDocument();
+    expect(ProductCatalogApi.getAssetDependencyGraph).toHaveBeenCalledWith('org-1');
     expect(screen.getByText('Products')).toBeInTheDocument();
     expect(screen.getByText('Asset Packs')).toBeInTheDocument();
     expect(screen.getByText('Backend Services')).toBeInTheDocument();

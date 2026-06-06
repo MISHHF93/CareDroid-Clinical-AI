@@ -3,6 +3,7 @@ import {
   Controller,
   ForbiddenException,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -31,8 +32,10 @@ import { PlatformAssetLifecycle } from './enums/platform-asset.enums';
 import { PlatformAssetsService } from './platform-assets.service';
 import { AssetAccessService } from './asset-access.service';
 import { AssetRecommendationService } from './asset-recommendation.service';
+import { CustomerSuccessService } from './customer-success.service';
 import { DepartmentAssetMappingService } from './department-asset-mapping.service';
 import { PlatformContextService } from './platform-context.service';
+import { PlatformGovernanceRegistryService } from './platform-governance-registry.service';
 import { ServiceLineArchitectureService } from './service-line-architecture.service';
 
 @ApiTags('platform')
@@ -48,8 +51,10 @@ export class PlatformAssetsController {
     private readonly platformContextService: PlatformContextService,
     private readonly assetAccessService: AssetAccessService,
     private readonly assetRecommendationService: AssetRecommendationService,
+    private readonly customerSuccessService: CustomerSuccessService,
     private readonly departmentAssetMappingService: DepartmentAssetMappingService,
     private readonly serviceLineArchitectureService: ServiceLineArchitectureService,
+    private readonly platformGovernanceRegistryService: PlatformGovernanceRegistryService,
     private readonly digitalTwinService: DigitalTwinService,
     private readonly organizationAnalyticsService: OrganizationAnalyticsService,
   ) {}
@@ -95,19 +100,43 @@ export class PlatformAssetsController {
 
   @Get('assets/:assetId')
   @ApiOperation({ summary: 'Get platform asset by id' })
-  async getAsset(@Param('assetId') assetId: string) {
-    return this.platformAssetsService.getAssetById(assetId);
+  async getAsset(@Req() req: any, @Param('assetId') assetId: string) {
+    const [asset, ctx] = await Promise.all([
+      this.platformAssetsService.getAssetById(assetId),
+      this.platformContextService.getContextForUser(req.user),
+    ]);
+    if (!this.isEntitledAsset(asset, ctx)) {
+      throw new NotFoundException(`Asset not found: ${assetId}`);
+    }
+    return asset;
   }
 
   @Get('assets')
   @ApiOperation({ summary: 'List platform assets' })
   async listAssets(
+    @Req() req: any,
     @Query('query') query?: string,
     @Query('assetType') assetType?: string,
     @Query('packId') packId?: string,
     @Query('lifecycle') lifecycle?: string,
   ) {
-    return this.platformAssetsService.listAssets({ query, assetType, packId, lifecycle });
+    const [assets, ctx] = await Promise.all([
+      this.platformAssetsService.listAssets({ query, assetType, packId, lifecycle }),
+      this.platformContextService.getContextForUser(req.user),
+    ]);
+    return assets.filter((asset) => this.isEntitledAsset(asset, ctx));
+  }
+
+  @Get('governance-registry')
+  @TenantScoped({ permissions: [Permission.VIEW_GOVERNANCE] })
+  @ApiOperation({ summary: 'Platform asset governance registry' })
+  async governanceRegistry(
+    @Query('query') query?: string,
+    @Query('riskLevel') riskLevel?: string,
+    @Query('owner') owner?: string,
+    @Query('assetType') assetType?: string,
+  ) {
+    return this.platformGovernanceRegistryService.getRegistry({ query, riskLevel, owner, assetType });
   }
 
   @Get('departments')
@@ -320,9 +349,28 @@ export class PlatformAssetsController {
     return this.organizationAnalyticsService.getOrganizationSummary(organizationId);
   }
 
+  @Get('organizations/:organizationId/customer-success')
+  @OrganizationScoped({ admin: 'organization', permissions: [Permission.VIEW_ANALYTICS] })
+  @ApiOperation({ summary: 'Customer success health and retention dashboard' })
+  async customerSuccess(
+    @Req() req: any,
+    @Param('organizationId') organizationId: string,
+    @Query('period') period?: string,
+  ) {
+    this.assertTenantOrganization(req, organizationId);
+    await this.assertOrgMember(req.user.id, organizationId);
+    return this.customerSuccessService.getCustomerSuccessDashboard(organizationId, period);
+  }
+
   private assertTenantOrganization(req: any, organizationId: string) {
     if (req.tenantContext?.organizationId && req.tenantContext.organizationId !== organizationId) {
       throw new ForbiddenException('Requested organization does not match tenant context.');
     }
+  }
+
+  private isEntitledAsset(asset: { id: string }, ctx: any) {
+    const entitledAssetIds = new Set(ctx?.entitledAssetIds || []);
+    const decision = ctx?.assetAccessDecisions?.[asset.id];
+    return entitledAssetIds.has(asset.id) && decision?.isLaunchable === true;
   }
 }

@@ -209,6 +209,18 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     heading: /deployment observability/i,
   },
   {
+    id: 'saas-health-enterprise',
+    path: '/saas-health',
+    match: 'heading',
+    heading: /saas health center/i,
+  },
+  {
+    id: 'governance-registry-enterprise',
+    path: '/governance-registry',
+    match: 'heading',
+    heading: /platform governance registry/i,
+  },
+  {
     id: 'governance-platform',
     path: '/governance',
     match: 'heading',

@@ -18,6 +18,7 @@ import { IsEmail, IsString } from 'class-validator';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+import { IdentityProviderRegistryService } from './identity-provider-registry.service';
 
 class VerifyTwoFactorLoginDto {
   @IsString()
@@ -38,6 +39,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly configService: ConfigService,
+    private readonly identityProviderRegistryService: IdentityProviderRegistryService,
   ) {}
 
   private getFrontendBaseUrl(): string {
@@ -110,6 +112,12 @@ export class AuthController {
   @ApiOperation({ summary: 'Initiate Google OAuth login' })
   async googleLogin() {
     // Passport handles this
+  }
+
+  @Get('identity-providers')
+  @ApiOperation({ summary: 'Enterprise identity provider registry' })
+  async identityProviders() {
+    return this.identityProviderRegistryService.getRegistry();
   }
 
   @Get('google/callback')

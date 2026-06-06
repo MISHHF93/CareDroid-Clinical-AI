@@ -102,9 +102,30 @@ export const ProductCatalogApi = {
     return response.json();
   },
 
-  async getAssetDependencyGraph() {
-    const response = await apiFetch('/api/dependency-graph');
+  async getAssetDependencyGraph(organizationId) {
+    const qs = organizationId ? `?organizationId=${encodeURIComponent(organizationId)}` : '';
+    const response = await apiFetch(`/api/dependency-graph${qs}`);
     if (!response.ok) throw new Error(`Asset dependency graph failed (${response.status})`);
+    return response.json();
+  },
+
+  async getHospitalSolutionRecommendation(payload) {
+    const response = await apiFetch('/api/solution-builder/recommendations', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error(`Hospital solution recommendation failed (${response.status})`);
+    return response.json();
+  },
+
+  async applyHospitalSolution(payload) {
+    const response = await apiFetch('/api/solution-builder/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error(`Apply hospital solution failed (${response.status})`);
     return response.json();
   },
 
@@ -137,6 +158,15 @@ export const ProductCatalogApi = {
   async getOrganizationOutcomes(organizationId) {
     const response = await apiFetch(`/api/organizations/${organizationId}/outcomes`);
     if (!response.ok) throw new Error(`Outcomes failed (${response.status})`);
+    return response.json();
+  },
+
+  async getOrganizationValueTracking(organizationId, period = 'month') {
+    const qs = period ? `?period=${encodeURIComponent(period)}` : '';
+    const response = await apiFetch(
+      `/api/organizations/${encodeURIComponent(organizationId)}/value-tracking${qs}`
+    );
+    if (!response.ok) throw new Error(`Value tracking failed (${response.status})`);
     return response.json();
   },
 

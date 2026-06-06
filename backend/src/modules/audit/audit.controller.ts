@@ -32,6 +32,7 @@ export class AuditController {
   @RequirePermission(Permission.VIEW_AUDIT_LOGS)
   async getLogs(@Query() query: any, @Req() _req: any) {
     const { userId, startDate, endDate, action, limit = 100, offset = 0 } = query;
+    const organizationId = _req.tenantContext?.organizationId;
 
     try {
       let logs: any[];
@@ -42,13 +43,18 @@ export class AuditController {
           userId,
           new Date(startDate),
           new Date(endDate),
+          organizationId,
         );
       } else if (userId) {
-        logs = await this.auditService.findByUser(userId, parseInt(limit));
+        logs = await this.auditService.findByUser(userId, parseInt(limit), organizationId);
       } else if (action) {
-        logs = await this.auditService.findByAction(action, parseInt(limit));
+        logs = await this.auditService.findByAction(action, parseInt(limit), organizationId);
       } else if (startDate && endDate) {
-        logs = await this.auditService.findByDateRange(new Date(startDate), new Date(endDate));
+        logs = await this.auditService.findByDateRange(
+          new Date(startDate),
+          new Date(endDate),
+          organizationId,
+        );
       } else {
         // Return all logs (limited)
         logs = [];
@@ -93,7 +99,11 @@ export class AuditController {
     }
 
     try {
-      const logs = await this.auditService.findByUser(userId, parseInt(limit));
+      const logs = await this.auditService.findByUser(
+        userId,
+        parseInt(limit),
+        req.tenantContext?.organizationId,
+      );
 
       return {
         success: true,
@@ -119,6 +129,7 @@ export class AuditController {
   @Get('phi-access')
   @RequirePermission(Permission.VIEW_AUDIT_LOGS)
   async getPhiAccessLogs(
+    @Req() req: any,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
   ) {
@@ -126,6 +137,7 @@ export class AuditController {
       const logs = await this.auditService.findPhiAccess(
         startDate ? new Date(startDate) : new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Default last 7 days
         endDate ? new Date(endDate) : new Date(),
+        req.tenantContext?.organizationId,
       );
 
       return {
@@ -181,14 +193,22 @@ export class AuditController {
    */
   @Get('statistics')
   @RequirePermission(Permission.VIEW_AUDIT_LOGS)
-  async getStatistics(@Query('startDate') startDate?: string, @Query('endDate') endDate?: string) {
+  async getStatistics(
+    @Req() req: any,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
+  ) {
     try {
       const start = startDate
         ? new Date(startDate)
         : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000); // Default last 30 days
       const end = endDate ? new Date(endDate) : new Date();
 
-      const logs = await this.auditService.findByDateRange(start, end);
+      const logs = await this.auditService.findByDateRange(
+        start,
+        end,
+        req.tenantContext?.organizationId,
+      );
 
       // Compute statistics
       const logsByAction: Record<string, number> = {};
@@ -262,6 +282,8 @@ export class AuditController {
 
     await this.auditService.log({
       userId,
+      organizationId: req.tenantContext?.organizationId,
+      workspaceId: req.tenantContext?.workspaceId,
       action,
       resource: `${body.resourceType || 'client'}:${body.resourceId || 'unknown'}`,
       ipAddress: req.ip || '0.0.0.0',

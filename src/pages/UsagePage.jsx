@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import Card from '../components/ui/card';
 import { useTenantContext } from '../contexts/TenantContext';
-import { fetchUsageSummary } from '../services/subscriptionApi';
+import { fetchUsageMeteringFramework, fetchUsageSummary } from '../services/subscriptionApi';
 import './commercial/CommercialPages.css';
 
 function formatNumber(value) {
@@ -31,23 +31,27 @@ export default function UsagePage() {
   const { tenantContext } = useTenantContext();
   const [period, setPeriod] = useState('month');
   const [usage, setUsage] = useState(null);
+  const [metering, setMetering] = useState(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
     setIsLoading(true);
-    fetchUsageSummary({ period }).then((result) => {
-      if (cancelled) return;
-      if (!result.ok) {
-        setError(result.message);
-        setUsage(null);
-      } else {
-        setError('');
-        setUsage(result.data);
+    Promise.all([fetchUsageSummary({ period }), fetchUsageMeteringFramework({ period })]).then(
+      ([usageResult, meteringResult]) => {
+        if (cancelled) return;
+        if (!usageResult.ok) {
+          setError(usageResult.message);
+          setUsage(null);
+        } else {
+          setError('');
+          setUsage(usageResult.data);
+        }
+        setMetering(meteringResult.ok ? meteringResult.data : null);
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    });
+    );
     return () => {
       cancelled = true;
     };
@@ -73,6 +77,26 @@ export default function UsagePage() {
         <p>Loading usage...</p>
       ) : (
         <>
+          <section className="commercial-section">
+            <h2>Usage Metering Framework</h2>
+            <p className="commercial-subtitle">
+              Billing-neutral operational meters stored separately from invoices and prepared for
+              future usage-based models.
+            </p>
+            <div className="commercial-grid">
+              {(metering?.meters || []).map((meter) => (
+                <Card key={meter.id} className="commercial-card">
+                  <span className="commercial-muted">{meter.billingReadiness}</span>
+                  <h2>{meter.label}</h2>
+                  <strong>{formatNumber(meter.value)}</strong>
+                  <p className="commercial-subtitle">
+                    {meter.unit} · {meter.events} events · billing separated
+                  </p>
+                </Card>
+              ))}
+            </div>
+          </section>
+
           <section className="commercial-grid">
             {(usage?.totals || []).map((meter) => (
               <Card key={meter.eventType} className="commercial-card">
@@ -94,6 +118,7 @@ export default function UsagePage() {
             <UsageBreakdown title="By asset" rows={usage?.breakdowns?.byAsset} />
             <UsageBreakdown title="By user role" rows={usage?.breakdowns?.byRole} />
             <UsageBreakdown title="By meter" rows={usage?.breakdowns?.byEventType} />
+            <UsageBreakdown title="By integration" rows={metering?.breakdowns?.byIntegration} />
           </section>
         </>
       )}

@@ -22,13 +22,41 @@ const normalizeUrl = (value) => {
 };
 
 const isProductionBuild = () => Boolean(import.meta.env?.PROD);
+export const SUPPORTED_APP_ENVIRONMENTS = Object.freeze([
+  'local',
+  'development',
+  'staging',
+  'production',
+]);
+
+export const normalizeAppEnvironment = (value) => {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (normalized === 'dev') return 'development';
+  if (normalized === 'prod') return 'production';
+  return SUPPORTED_APP_ENVIRONMENTS.includes(normalized) ? normalized : 'development';
+};
+
+const rawAppEnvironment = getEnvValue('VITE_APP_ENVIRONMENT', 'development');
+const appEnvironment = normalizeAppEnvironment(rawAppEnvironment);
 
 const appConfig = {
   app: {
     name: getEnvValue('VITE_APP_NAME', 'CareDroid-Clinical-AI'),
     version: getEnvValue('VITE_APP_VERSION', '1.0.0'),
-    environment: getEnvValue('VITE_APP_ENVIRONMENT', 'development'),
+    environment: appEnvironment,
+    environmentValidation: {
+      valid: appEnvironment === rawAppEnvironment || rawAppEnvironment === 'dev' || rawAppEnvironment === 'prod',
+      raw: rawAppEnvironment,
+      allowed: SUPPORTED_APP_ENVIRONMENTS,
+    },
     buildDate: getEnvValue('VITE_APP_BUILD_DATE', ''),
+    deployment: {
+      id: getEnvValue('VITE_DEPLOYMENT_ID', ''),
+      region: getEnvValue('VITE_DEPLOYMENT_REGION', ''),
+      commit: getEnvValue('VITE_GIT_COMMIT', ''),
+      branch: getEnvValue('VITE_GIT_BRANCH', ''),
+      deployedAt: getEnvValue('VITE_DEPLOYED_AT', getEnvValue('VITE_APP_BUILD_DATE', '')),
+    },
   },
   api: {
     baseUrl: normalizeUrl(getEnvValue('VITE_API_URL', '')),

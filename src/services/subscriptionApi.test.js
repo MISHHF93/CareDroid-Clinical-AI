@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { apiFetch, parseApiResponse } from './apiClient';
 import {
   fetchBillingOverview,
+  fetchUsageMeteringFramework,
   fetchUsageSummary,
   recordUsageEvent,
 } from './subscriptionApi';
@@ -29,6 +30,12 @@ describe('subscriptionApi metering helpers', () => {
     await fetchUsageSummary({ period: 'week' });
 
     expect(apiFetch).toHaveBeenCalledWith('/api/subscriptions/usage?period=week');
+  });
+
+  it('fetches billing-neutral usage metering framework by period', async () => {
+    await fetchUsageMeteringFramework({ period: 'week' });
+
+    expect(apiFetch).toHaveBeenCalledWith('/api/subscriptions/usage/metering?period=week');
   });
 
   it('records usage events with payload', async () => {

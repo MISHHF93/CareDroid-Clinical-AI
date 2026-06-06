@@ -14,7 +14,7 @@ import { OrganizationMembershipRole } from '../organizations/entities/organizati
 import { AssetPack } from './entities/asset-pack.entity';
 import { OrganizationEntitlement } from './entities/organization-entitlement.entity';
 import { PlatformAsset } from './entities/platform-asset.entity';
-import { EntitlementStatus, PricingTier } from './enums/platform-asset.enums';
+import { EntitlementStatus, PlatformAssetLifecycle, PricingTier } from './enums/platform-asset.enums';
 import { FeatureFlagService } from './feature-flag.service';
 
 export interface EntitlementDecisionInput {
@@ -126,10 +126,30 @@ export class EntitlementService {
       };
     }
 
+    if (input.asset?.lifecycle === PlatformAssetLifecycle.ARCHIVED) {
+      return {
+        ...base,
+        state: EntitlementAccessState.DISABLED,
+        isVisible: false,
+        isLaunchable: false,
+        reason: 'asset-archived',
+      };
+    }
+
+    if (input.asset?.lifecycle === PlatformAssetLifecycle.DRAFT) {
+      return {
+        ...base,
+        state: EntitlementAccessState.DISABLED,
+        isVisible: false,
+        isLaunchable: false,
+        reason: 'asset-draft',
+      };
+    }
+
     const adminOnly =
       rule?.adminOnly ||
       rolloutState === FeatureFlagState.ADMIN_ONLY ||
-      input.asset?.lifecycle === 'admin_only';
+      this.isAdminOnlyAsset(input.asset);
     if (adminOnly && !this.isAdminRole(input.userRole)) {
       return {
         ...base,
@@ -172,16 +192,23 @@ export class EntitlementService {
     }
 
     const state =
-      rolloutState === FeatureFlagState.BETA || rolloutState === FeatureFlagState.EXPERIMENTAL
-        ? rolloutState
-        : EntitlementAccessState.ALLOWED;
+      input.asset?.lifecycle === PlatformAssetLifecycle.BETA
+        ? FeatureFlagState.BETA
+        : rolloutState === FeatureFlagState.BETA || rolloutState === FeatureFlagState.EXPERIMENTAL
+          ? rolloutState
+          : EntitlementAccessState.ALLOWED;
 
     return {
       ...base,
       state,
       isVisible: true,
       isLaunchable: true,
-      reason: rolloutState === state ? `rollout-${state}` : 'allowed',
+      reason:
+        input.asset?.lifecycle === PlatformAssetLifecycle.BETA
+          ? 'asset-beta'
+          : rolloutState === state
+            ? `rollout-${state}`
+            : 'allowed',
     };
   }
 
@@ -206,6 +233,17 @@ export class EntitlementService {
   private isAdminRole(role?: string) {
     return [UserRole.ADMIN, OrganizationMembershipRole.ADMIN, OrganizationMembershipRole.OWNER].includes(
       role as UserRole | OrganizationMembershipRole,
+    );
+  }
+
+  private isAdminOnlyAsset(asset?: Partial<PlatformAsset> | null) {
+    const governance = asset?.governance || {};
+    const permissionPolicy = asset?.permissionPolicy || {};
+    return (
+      governance.adminOnly === true ||
+      governance.visibility === 'admin-only' ||
+      governance.audience === 'admin-only' ||
+      permissionPolicy.adminOnly === true
     );
   }
 }

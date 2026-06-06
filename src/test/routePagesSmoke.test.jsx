@@ -30,6 +30,7 @@ import PluginMarketplace from '../pages/PluginMarketplace';
 import DependencyMap from '../pages/DependencyMap';
 import DependencyGraph from '../pages/DependencyGraph';
 import DataLineageExplorer from '../pages/DataLineageExplorer';
+import GovernanceRegistry from '../pages/GovernanceRegistry';
 import PlatformSelfDiagnostics from '../pages/PlatformSelfDiagnostics';
 import CostAnalyticsDashboard from '../pages/CostAnalyticsDashboard';
 import AiEvaluationDashboard from '../pages/AiEvaluationDashboard';
@@ -37,6 +38,7 @@ import AiCommandCenterDashboard from '../pages/AiCommandCenterDashboard';
 import PlatformSystemPage from '../pages/platform/PlatformSystemPage';
 import PlatformGovernanceWorkspace from '../pages/platform/PlatformGovernanceWorkspace';
 import SystemHealth from '../pages/SystemHealth';
+import SaasHealthCenter from '../pages/SaasHealthCenter';
 import CommandDashboard from '../pages/CommandDashboard';
 import CapabilityDiscovery from '../pages/CapabilityDiscovery';
 import WorkflowAutomationBuilder from '../pages/WorkflowAutomationBuilder';
@@ -180,6 +182,52 @@ vi.mock('../services/productCatalogApi', () => ({
   },
 }));
 
+vi.mock('../services/platformAssetsApi', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    PlatformAssetsApi: {
+      ...actual.PlatformAssetsApi,
+      getGovernanceRegistry: vi.fn().mockResolvedValue({
+        generatedAt: '2026-06-06T13:30:00.000Z',
+        summary: {
+          totalAssets: 1,
+          complete: 1,
+          incomplete: 0,
+          auditRequired: 1,
+          humanReviewRequired: 1,
+          byRiskLevel: { 'clinical-decision-support': 1 },
+        },
+        requiredFields: [
+          'owner',
+          'steward',
+          'approver',
+          'riskLevel',
+          'evidenceSource',
+          'version',
+          'auditRequirement',
+          'reviewSchedule',
+        ],
+        rows: [
+          {
+            assetId: 'qsofa',
+            title: 'qSOFA',
+            route: '/tools/calculators/qsofa',
+            owner: 'ED Director',
+            steward: 'Emergency Medicine Steward',
+            approver: 'Clinical Governance Lead',
+            riskLevel: 'clinical-decision-support',
+            evidenceSource: 'validated protocol library',
+            version: '2.1.0',
+            auditRequirement: 'required',
+            reviewSchedule: 'quarterly',
+          },
+        ],
+      }),
+    },
+  };
+});
+
 vi.mock('../services/platformGovernanceApi', async (importOriginal) => {
   const actual = await importOriginal();
   return {
@@ -226,6 +274,83 @@ vi.mock('../services/systemHealthService', async (importOriginal) => {
     }),
   };
 });
+
+vi.mock('../services/saasHealthApi', () => ({
+  SAAS_HEALTH_FALLBACK: {
+    status: 'critical',
+    label: 'Critical',
+    summary: { healthy: 0, warning: 0, critical: 7, total: 7 },
+    checks: [],
+  },
+  fetchSaasHealthCenter: vi.fn().mockResolvedValue({
+    ok: true,
+    message: '',
+    data: {
+      status: 'warning',
+      label: 'Warning',
+      generatedAt: '2026-06-06T13:00:00.000Z',
+      summary: { healthy: 5, warning: 2, critical: 0, total: 7 },
+      checks: [
+        {
+          id: 'frontend',
+          label: 'Frontend Health',
+          status: 'healthy',
+          displayStatus: 'Healthy',
+          summary: 'Frontend build metadata is published.',
+          evidence: ['frontendVersion=1.0.0'],
+        },
+        {
+          id: 'backend',
+          label: 'Backend Health',
+          status: 'healthy',
+          displayStatus: 'Healthy',
+          summary: 'Backend health endpoint is responding.',
+          evidence: ['backendVersion=1.0.0'],
+        },
+        {
+          id: 'api',
+          label: 'API Health',
+          status: 'healthy',
+          displayStatus: 'Healthy',
+          summary: 'Authenticated API health contract is available.',
+          evidence: ['apiHealth=ok'],
+        },
+        {
+          id: 'integrations',
+          label: 'Integrations',
+          status: 'warning',
+          displayStatus: 'Warning',
+          summary: 'Integration layer is guarded by synthetic or demo connectors.',
+          evidence: ['externalConnectors=synthetic'],
+        },
+        {
+          id: 'tenant',
+          label: 'Tenant Health',
+          status: 'healthy',
+          displayStatus: 'Healthy',
+          summary: 'Tenant context guards are active.',
+          evidence: ['tenantGuards=active'],
+        },
+        {
+          id: 'ai',
+          label: 'AI Health',
+          status: 'warning',
+          displayStatus: 'Warning',
+          summary: 'AI gateway is guarded.',
+          evidence: ['aiGateway=guarded'],
+        },
+        {
+          id: 'simulation',
+          label: 'Simulation Health',
+          status: 'healthy',
+          displayStatus: 'Healthy',
+          summary: 'Simulation assets and scenario routes are included.',
+          evidence: ['simulationStatus=healthy'],
+        },
+      ],
+    },
+  }),
+}));
 
 vi.mock('../services/clinicalChatService', () => ({
   sendClinicalChatMessage: vi.fn().mockResolvedValue({ ok: true, message: { content: 'ok' } }),
@@ -417,6 +542,7 @@ const PAGE_BY_ID = {
   plugins: PluginMarketplace,
   'dependency-map': DependencyMap,
   'dependency-graph': DependencyGraph,
+  'governance-registry-enterprise': GovernanceRegistry,
   'data-lineage': DataLineageExplorer,
   'self-diagnostics': PlatformSelfDiagnostics,
   costs: CostAnalyticsDashboard,
@@ -434,6 +560,7 @@ const PAGE_BY_ID = {
   'human-review-enterprise': PlatformGovernanceWorkspace,
   'privacy-enterprise': PlatformGovernanceWorkspace,
   'system-health-enterprise': SystemHealth,
+  'saas-health-enterprise': SaasHealthCenter,
   'governance-clinical': PlatformGovernanceWorkspace,
   'ai-security-platform': PlatformGovernanceWorkspace,
   'regulatory-classification': PlatformGovernanceWorkspace,

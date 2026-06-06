@@ -148,6 +148,15 @@ const DEMO_STATUS_ALIASES: Record<string, AssetDemoLiveStatus> = {
   production: AssetDemoLiveStatus.LIVE,
 };
 
+const LIFECYCLE_ALIASES: Record<string, PlatformAssetLifecycle> = {
+  preview: PlatformAssetLifecycle.BETA,
+  experimental: PlatformAssetLifecycle.BETA,
+  live: PlatformAssetLifecycle.ACTIVE,
+  production: PlatformAssetLifecycle.ACTIVE,
+  retired: PlatformAssetLifecycle.ARCHIVED,
+  hidden: PlatformAssetLifecycle.ARCHIVED,
+};
+
 export function normalizeRegistryType(value: unknown): AssetRegistryType | null {
   if (!value) return null;
   const raw = String(value).trim();
@@ -161,10 +170,10 @@ export function registryTypeToEntityAssetType(type: AssetRegistryType): Platform
 export function normalizeAssetLifecycle(value: unknown): PlatformAssetLifecycle | null {
   if (!value) return null;
   const raw = String(value).trim();
-  if (raw === 'admin-only') return PlatformAssetLifecycle.ADMIN_ONLY;
-  return LIFECYCLE_STATUSES.has(raw as PlatformAssetLifecycle)
-    ? (raw as PlatformAssetLifecycle)
-    : null;
+  return (
+    LIFECYCLE_ALIASES[raw] ||
+    (LIFECYCLE_STATUSES.has(raw as PlatformAssetLifecycle) ? (raw as PlatformAssetLifecycle) : null)
+  );
 }
 
 export function normalizeSubscriptionTier(value: unknown): PricingTier | null {

@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, Index } from 'typeorm';
 
 @Entity('analytics_events')
+@Index(['organizationId', 'createdAt'])
 @Index(['userId', 'createdAt'])
 @Index(['event', 'createdAt'])
 @Index(['sessionId'])
@@ -13,6 +14,12 @@ export class AnalyticsEvent {
 
   @Column({ nullable: true })
   userId: string;
+
+  @Column({ nullable: true })
+  organizationId: string;
+
+  @Column({ nullable: true })
+  workspaceId: string;
 
   @Column()
   sessionId: string;

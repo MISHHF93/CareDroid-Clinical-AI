@@ -22,14 +22,14 @@ const vercelEnv = normalizeValue(injectedBuildInfo.vercelEnv, '');
 export const buildInfo = Object.freeze({
   appVersion: normalizeValue(injectedBuildInfo.appVersion, appConfig.app?.version || '1.0.0'),
   buildTime: normalizeValue(injectedBuildInfo.buildTime),
-  commit: normalizeValue(injectedBuildInfo.commit),
-  branch: normalizeValue(injectedBuildInfo.branch),
+  commit: normalizeValue(injectedBuildInfo.commit, appConfig.app?.deployment?.commit || 'unknown'),
+  branch: normalizeValue(injectedBuildInfo.branch, appConfig.app?.deployment?.branch || 'unknown'),
   environment: normalizeValue(
     injectedBuildInfo.environment,
     appConfig.app?.environment || 'unknown'
   ),
   deploymentUrl: normalizeValue(injectedBuildInfo.deploymentUrl, ''),
-  deploymentId: normalizeValue(injectedBuildInfo.deploymentId, ''),
+  deploymentId: normalizeValue(injectedBuildInfo.deploymentId, appConfig.app?.deployment?.id || ''),
   repository: normalizeValue(injectedBuildInfo.repository, ''),
   vercelDetected,
   vercelEnv,

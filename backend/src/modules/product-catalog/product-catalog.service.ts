@@ -143,9 +143,26 @@ export class ProductCatalogService {
       const productPacks = productPackIds
         .map((packId) => packMap.get(packId))
         .filter(Boolean) as AssetPack[];
-      const roles = this.resolveProductRoles(product, productPacks, productAssets);
-      const workspaces = this.resolveProductWorkspaces(productPacks, productAssets);
-      const outcomeMappings = this.resolveProductOutcomeMappings(product, productPacks, productAssets);
+      const visibleProductAssets = this.filterAssetsForContext(
+        productAssets,
+        context,
+        options,
+        productPackIds,
+      );
+      const visibleAssetIds = new Set(visibleProductAssets.map((asset) => asset.id));
+      const visibleProductPacks = this.filterPacksForVisibleAssets(
+        productPacks,
+        visibleAssetIds,
+        context,
+      );
+      const roles = this.resolveProductRoles(product, visibleProductPacks, visibleProductAssets);
+      const workspaces = this.resolveProductWorkspaces(visibleProductPacks, visibleProductAssets);
+      const outcomeMappings = this.resolveProductOutcomeMappings(
+        product,
+        visibleProductPacks,
+        visibleProductAssets,
+        visibleAssetIds,
+      );
 
       return {
         product: {
@@ -153,16 +170,16 @@ export class ProductCatalogService {
           roles,
           workspaces,
         },
-        packs: productPackIds.map((packId) =>
-          this.serializeBuilderPack(packMap.get(packId), product.id, assetMap, context, options),
+        packs: visibleProductPacks.map((pack) =>
+          this.serializeBuilderPack(pack, product.id, assetMap, context, options),
         ),
-        assets: productAssets.map((asset) =>
+        assets: visibleProductAssets.map((asset) =>
           this.serializeBuilderAsset(asset, context, options, productPackIds),
         ),
         roles,
         workspaces,
         outcomeMappings,
-        routes: productAssets
+        routes: visibleProductAssets
           .filter((asset) => asset.route)
           .map((asset) => ({
             assetId: asset.id,
@@ -171,12 +188,16 @@ export class ProductCatalogService {
             launchType: asset.launchType,
           })),
         backendServices: [
-          ...new Set(productAssets.flatMap((asset) => this.resolveBackendServices(asset))),
+          ...new Set(visibleProductAssets.flatMap((asset) => this.resolveBackendServices(asset))),
         ],
       };
     });
 
-    return slug ? productGraphs[0] : productGraphs;
+    const visibleGraphs = context.organization
+      ? productGraphs.filter((graph) => graph.assets.length || graph.packs.length)
+      : productGraphs;
+
+    return slug ? visibleGraphs[0] || productGraphs[0] : visibleGraphs;
   }
 
   async getAssetPackBuilderGraph(
@@ -202,7 +223,11 @@ export class ProductCatalogService {
 
     const context = await this.buildBuilderAccessContext(organizationId);
 
-    return packs.map((pack) => ({
+    const visiblePacks = context.organization
+      ? packs.filter((pack) => context.entitledPackIds.includes(pack.id))
+      : packs;
+
+    return visiblePacks.map((pack) => ({
       ...this.serializeBuilderPack(pack, undefined, assetMap, context, options),
       products: (productMap.get(pack.id) || []).map((product) => ({
         id: product.id,
@@ -240,7 +265,9 @@ export class ProductCatalogService {
     let entitledAssetIds: string[] = [];
     let entitledPackIds: string[] = [];
     if (organizationId) {
-      organization = await this.organizationRepository.findOne({ where: { id: organizationId } });
+      organization =
+        (await this.organizationRepository.findOne({ where: { id: organizationId } })) ||
+        ({ id: organizationId } as Organization);
       entitledAssetIds = await this.platformAssetsService.resolveEntitledAssetIds({
         organizationId,
       });
@@ -254,18 +281,9 @@ export class ProductCatalogService {
       order: { title: 'ASC' },
     });
 
+    const context = { organization, entitledAssetIds, entitledPackIds };
     const serializedAssets = assets.map((asset) => {
-      const access = this.entitlementService.resolveDecisionFromContext({
-        assetId: asset.id,
-        asset,
-        organization,
-        organizationId,
-        userRole: options.userRole,
-        subscriptionPlan: options.subscriptionPlan,
-        entitledAssetIds,
-        entitledPackIds,
-        strictEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
-      });
+      const access = this.resolveAssetAccess(asset, context, options);
       return {
         ...this.serializeAsset(asset),
         access,
@@ -274,10 +292,15 @@ export class ProductCatalogService {
         isLaunchable: access.isLaunchable,
       };
     });
+    const visibleAssets = this.filterSerializedAssetsForContext(serializedAssets, organizationId);
+    const visibleAssetIds = new Set(visibleAssets.map((asset) => asset.id));
+    const visiblePacks = organizationId
+      ? packs.filter((pack) => (pack.assetIds || []).some((assetId) => visibleAssetIds.has(assetId)))
+      : packs;
 
     return {
       product: this.serializeProduct(product),
-      packs: packs.map((p) => ({
+      packs: visiblePacks.map((p) => ({
         id: p.id,
         name: p.name,
         slug: p.slug,
@@ -292,8 +315,8 @@ export class ProductCatalogService {
         stakeholders: p.stakeholders || [],
         expectedOutcomes: p.expectedOutcomes || [],
       })),
-      assets: serializedAssets,
-      assetsByType: this.groupSerializedAssetsByType(serializedAssets),
+      assets: visibleAssets,
+      assetsByType: this.groupSerializedAssetsByType(visibleAssets),
     };
   }
 
@@ -305,9 +328,47 @@ export class ProductCatalogService {
     const plan = await this.planRepository.findOne({ where: { id: id as any } });
     if (!plan) throw new NotFoundException(`Commercial plan not found: ${id}`);
     const products = plan.includedProductIds?.length
-      ? await this.productRepository.find({ where: { id: In(plan.includedProductIds) } })
+      ? (await this.productRepository.find({ where: { id: In(plan.includedProductIds) } })) || []
       : [];
     return { ...plan, products: products.map((p) => this.serializeProduct(p)) };
+  }
+
+  async resolvePlanEntitlementGraph(planId: string) {
+    const plan = await this.planRepository.findOne({ where: { id: planId as any } });
+    if (!plan) throw new NotFoundException(`Commercial plan not found: ${planId}`);
+
+    const products = plan.includedProductIds?.length
+      ? await this.productRepository.find({ where: { id: In(plan.includedProductIds) } })
+      : [];
+    const directPackIds = new Set(plan.includedPackIds || []);
+    const productPackIds = new Set(products.flatMap((product) => product.packIds || []));
+    const packIds = [...new Set([...directPackIds, ...productPackIds])];
+    const packs = packIds.length
+      ? (await this.packRepository.find({ where: { id: In(packIds) }, order: { name: 'ASC' } })) || []
+      : [];
+    const assetIds = [...new Set(packs.flatMap((pack) => pack.assetIds || []))];
+    const assets = assetIds.length
+      ? (await this.assetRepository.find({ where: { id: In(assetIds) }, order: { title: 'ASC' } })) || []
+      : [];
+
+    return {
+      plan: this.serializePlan(plan),
+      productIds: plan.includedProductIds || [],
+      products: products.map((product) => this.serializeProduct(product)),
+      directPackIds: [...directPackIds],
+      productPackIds: [...productPackIds],
+      packIds,
+      packs: packs.map((pack) => this.serializePack(pack)),
+      assetIds,
+      assets: assets.map((asset) => this.serializeAsset(asset)),
+      hierarchy: {
+        planId: plan.id,
+        productIds: plan.includedProductIds || [],
+        directPackIds: [...directPackIds],
+        packIds,
+        assetIds,
+      },
+    };
   }
 
   async listSpecialties() {
@@ -480,11 +541,8 @@ export class ProductCatalogService {
   }
 
   async resolvePackIdsForPlan(planId: string): Promise<string[]> {
-    const plan = await this.getCommercialPlan(planId);
-    const packIds = new Set<string>(plan.includedPackIds || []);
-    const fromProducts = await this.resolvePackIdsForProductIds(plan.includedProductIds || []);
-    fromProducts.forEach((id) => packIds.add(id));
-    return [...packIds];
+    const graph = await this.resolvePlanEntitlementGraph(planId);
+    return graph.packIds;
   }
 
   async reconcileOrganizationCommercialPlan(
@@ -599,7 +657,9 @@ export class ProductCatalogService {
       };
     }
 
-    const organization = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    const organization =
+      (await this.organizationRepository.findOne({ where: { id: organizationId } })) ||
+      ({ id: organizationId } as Organization);
     const entitledAssetIds = await this.platformAssetsService.resolveEntitledAssetIds({
       organizationId,
     });
@@ -608,6 +668,69 @@ export class ProductCatalogService {
     ).map((row) => row.packId);
 
     return { organization, entitledAssetIds, entitledPackIds };
+  }
+
+  private hasOrganizationContext(context: { organization: Organization | null }) {
+    return Boolean(context.organization?.id);
+  }
+
+  private resolveAssetAccess(
+    asset: PlatformAsset,
+    context: {
+      organization: Organization | null;
+      entitledAssetIds: string[];
+      entitledPackIds: string[];
+    },
+    options: { userRole?: string; subscriptionPlan?: string },
+  ) {
+    return this.entitlementService.resolveDecisionFromContext({
+      assetId: asset.id,
+      asset,
+      organization: context.organization,
+      organizationId: context.organization?.id,
+      userRole: options.userRole,
+      subscriptionPlan: options.subscriptionPlan,
+      entitledAssetIds: context.entitledAssetIds,
+      entitledPackIds: context.entitledPackIds,
+      strictEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
+    });
+  }
+
+  private filterAssetsForContext(
+    assets: PlatformAsset[],
+    context: {
+      organization: Organization | null;
+      entitledAssetIds: string[];
+      entitledPackIds: string[];
+    },
+    options: { userRole?: string; subscriptionPlan?: string },
+    fallbackPackIds: string[] = [],
+  ) {
+    if (!this.hasOrganizationContext(context)) return assets;
+    return assets.filter((asset) => {
+      const scopedAsset =
+        asset.packIds?.length || !fallbackPackIds.length
+          ? asset
+          : ({ ...asset, packIds: fallbackPackIds } as PlatformAsset);
+      return this.resolveAssetAccess(scopedAsset, context, options).isLaunchable;
+    });
+  }
+
+  private filterSerializedAssetsForContext(
+    assets: Array<Record<string, any>>,
+    organizationId?: string,
+  ) {
+    if (!organizationId) return assets;
+    return assets.filter((asset) => asset.isLaunchable);
+  }
+
+  private filterPacksForVisibleAssets(
+    packs: AssetPack[],
+    visibleAssetIds: Set<string>,
+    context: { organization: Organization | null },
+  ) {
+    if (!this.hasOrganizationContext(context)) return packs;
+    return packs.filter((pack) => (pack.assetIds || []).some((assetId) => visibleAssetIds.has(assetId)));
   }
 
   private serializeBuilderPack(
@@ -632,6 +755,8 @@ export class ProductCatalogService {
     const assets = (pack.assetIds || [])
       .map((assetId) => assetMap.get(assetId))
       .filter(Boolean) as PlatformAsset[];
+    const visibleAssets = this.filterAssetsForContext(assets, context, options, [pack.id]);
+    const visibleAssetIds = visibleAssets.map((asset) => asset.id);
 
     return {
       id: pack.id,
@@ -641,11 +766,11 @@ export class ProductCatalogService {
       productId,
       organizationTypes: pack.organizationTypes,
       targetRoles: pack.targetRoles,
-      assetIds: pack.assetIds,
+      assetIds: this.hasOrganizationContext(context) ? visibleAssetIds : pack.assetIds,
       requiredDependencies: pack.requiredDependencies,
       defaultModules: pack.defaultModules,
-      roles: this.resolvePackRoles(pack, assets),
-      workspaces: this.resolvePackWorkspaces(pack, assets),
+      roles: this.resolvePackRoles(pack, visibleAssets),
+      workspaces: this.resolvePackWorkspaces(pack, visibleAssets),
       pricingTier: pack.pricingTier,
       salesMetadata: pack.salesMetadata,
       buyerPersona: pack.buyerPersona || [],
@@ -653,7 +778,7 @@ export class ProductCatalogService {
       stakeholders: pack.stakeholders || [],
       expectedOutcomes: pack.expectedOutcomes || [],
       isPublished: pack.isPublished,
-      assets: assets.map((asset) =>
+      assets: visibleAssets.map((asset) =>
         this.serializeBuilderAsset(asset, context, options, [pack.id]),
       ),
     };
@@ -670,17 +795,7 @@ export class ProductCatalogService {
     fallbackPackIds: string[] = [],
   ) {
     const packIds = asset.packIds?.length ? asset.packIds : fallbackPackIds;
-    const access = this.entitlementService.resolveDecisionFromContext({
-      assetId: asset.id,
-      asset,
-      organization: context.organization,
-      organizationId: context.organization?.id,
-      userRole: options.userRole,
-      subscriptionPlan: options.subscriptionPlan,
-      entitledAssetIds: context.entitledAssetIds,
-      entitledPackIds: context.entitledPackIds,
-      strictEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
-    });
+    const access = this.resolveAssetAccess({ ...asset, packIds } as PlatformAsset, context, options);
 
     return {
       ...this.serializeAsset(asset),
@@ -727,6 +842,20 @@ export class ProductCatalogService {
     return [...services];
   }
 
+  private serializePlan(plan: CommercialPlan) {
+    return {
+      id: plan.id,
+      name: plan.name,
+      description: plan.description,
+      includedProductIds: plan.includedProductIds || [],
+      includedPackIds: plan.includedPackIds || [],
+      maxPackIds: plan.maxPackIds || [],
+      pricingTier: plan.pricingTier,
+      metadata: plan.metadata || {},
+      sortOrder: plan.sortOrder,
+    };
+  }
+
   private serializeProduct(product: Product) {
     return {
       id: product.id,
@@ -751,6 +880,26 @@ export class ProductCatalogService {
       readinessLabels: product.readinessLabels,
       complexity: product.complexity,
       commercialPlanIds: product.commercialPlanIds,
+    };
+  }
+
+  private serializePack(pack: AssetPack) {
+    return {
+      id: pack.id,
+      name: pack.name,
+      slug: pack.slug,
+      description: pack.description,
+      organizationTypes: pack.organizationTypes || [],
+      targetRoles: pack.targetRoles || [],
+      assetIds: pack.assetIds || [],
+      requiredDependencies: pack.requiredDependencies || [],
+      defaultModules: pack.defaultModules || [],
+      pricingTier: pack.pricingTier,
+      isPublished: pack.isPublished,
+      buyerPersona: pack.buyerPersona || [],
+      decisionMaker: pack.decisionMaker || [],
+      stakeholders: pack.stakeholders || [],
+      expectedOutcomes: pack.expectedOutcomes || [],
     };
   }
 
@@ -792,6 +941,7 @@ export class ProductCatalogService {
     product: Product,
     packs: AssetPack[],
     assets: PlatformAsset[],
+    visibleAssetIds = new Set(assets.map((asset) => asset.id)),
   ) {
     const sourceOutcomes = this.uniqueStrings([
       ...(product.outcomes || []),
@@ -812,13 +962,15 @@ export class ProductCatalogService {
         name: product.name,
         description: product.description,
       },
-      packs: packs.map((pack) => ({
-        id: pack.id,
-        slug: pack.slug,
-        name: pack.name,
-        description: pack.description,
-        assetIds: pack.assetIds || [],
-      })),
+      packs: packs
+        .map((pack) => ({
+          id: pack.id,
+          slug: pack.slug,
+          name: pack.name,
+          description: pack.description,
+          assetIds: (pack.assetIds || []).filter((assetId) => visibleAssetIds.has(assetId)),
+        }))
+        .filter((pack) => pack.assetIds.length),
       assets: assets.map((asset) => this.serializeAsset(asset)),
     }));
   }

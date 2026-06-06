@@ -375,6 +375,43 @@ export class SubscriptionsService {
     });
   }
 
+  async getUsageMeteringFramework(tenantContext: any, period = 'month') {
+    if (!tenantContext?.organizationId || !this.usageMeteringService) {
+      return {
+        organizationId: tenantContext?.organizationId || null,
+        period,
+        storage: {
+          source: 'usage_events',
+          billingSeparated: true,
+        },
+        meters: [],
+        categories: {
+          engagement: [],
+          platform: [],
+          integrations: [],
+        },
+        billingReadiness: {
+          currentBilling: 'unavailable without an organization context',
+          futureBillingCandidates: [],
+          retainedDimensions: [],
+        },
+        breakdowns: {
+          byWorkspace: [],
+          byAsset: [],
+          byRole: [],
+          byMeter: [],
+          byIntegration: [],
+        },
+        recentEvents: [],
+      };
+    }
+
+    return this.usageMeteringService.getUsageMeteringFramework({
+      organizationId: tenantContext.organizationId,
+      period,
+    });
+  }
+
   async recordUsageEvent(tenantContext: any, dto: any) {
     if (!this.usageMeteringService) return null;
     return this.usageMeteringService.recordFromTenantContext(tenantContext, dto.eventType, {

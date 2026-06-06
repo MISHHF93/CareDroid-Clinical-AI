@@ -6,7 +6,7 @@ import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { FEATURE_FLAGS } from '../config/featureFlags.config';
-import { getAssetAwareToolProjection } from '../data/assetAccess';
+import { filterVisibleTools, getAssetAwareToolProjection } from '../data/assetAccess';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { CARE_WORKSPACES } from '../config/workspace.config';
 import { QUICK_COMMAND_DESTINATION_ITEMS } from '../config/navigation.config';
@@ -220,7 +220,7 @@ export default function QuickCommandLauncher({
   const commandTools = useMemo(
     () =>
       FEATURE_FLAGS.platformEntitlements && platformContext
-        ? getAssetAwareToolProjection(accessContext, accessRole)
+        ? filterVisibleTools(getAssetAwareToolProjection(accessContext, accessRole))
         : getUserFacingToolRegistryProjection(),
     [accessContext, accessRole, platformContext]
   );

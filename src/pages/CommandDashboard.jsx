@@ -381,12 +381,24 @@ export default function CommandDashboard() {
           <p className="command-eyebrow">
             {branding?.displayName || model.organization?.name || 'CareDroid'} tenant command center
           </p>
-          <h1 id="command-dashboard-title">CareDroid Command Center</h1>
+          <div className="command-hero__brand-row">
+            {(branding?.dashboardLogoUrl || branding?.logoUrl) && (
+              <img
+                src={branding.dashboardLogoUrl || branding.logoUrl}
+                alt=""
+                className="command-hero__logo"
+              />
+            )}
+            <h1 id="command-dashboard-title">
+              {branding?.dashboardTitle ||
+                `${branding?.displayName || model.organization?.name || 'CareDroid'} Command Center`}
+            </h1>
+          </div>
           <p>
-            Spend the day from one clinical operating center: ask AI, open tools and calculators,
-            review alerts, check workspace context, and launch major modules without browsing the
-            sidebar. Active tenant: {tenant?.tenantId || model.organization?.slug || 'personal'} ·
-            workspace: {workspaceContextActive?.name || activeWorkspace?.name || 'Emergency'}.
+            {branding?.dashboardSubtitle ||
+              'Spend the day from one clinical operating center: ask AI, open tools and calculators, review alerts, check workspace context, and launch major modules without browsing the sidebar.'}{' '}
+            Active tenant: {tenant?.tenantId || model.organization?.slug || 'personal'} · workspace:{' '}
+            {workspaceContextActive?.name || activeWorkspace?.name || 'Emergency'}.
           </p>
         </div>
         <div className="command-hero__stats" aria-label="Dashboard inventory summary">

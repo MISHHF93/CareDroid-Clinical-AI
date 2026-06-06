@@ -9,6 +9,7 @@ import {
   PRIMARY_SIDEBAR_NAV_ITEMS,
   primaryNavPathMatches,
   SECONDARY_NAV_ITEMS,
+  SOLUTIONS_SIDEBAR_NAV_ITEMS,
 } from './primaryNavigation';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 
@@ -46,10 +47,12 @@ describe('primaryNavigation', () => {
     expect(ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
       ['Developer Catalog', '/tools/catalog'],
       ['System Health', '/system-health'],
+      ['SaaS Health', '/saas-health'],
       ['Feature Flags', '/feature-flags'],
       ['Plugins', '/plugins'],
       ['Dependency Map', '/dependency-map'],
       ['Dependency Graph', '/dependency-graph'],
+      ['Governance Registry', '/governance-registry'],
       ['Data Lineage', '/data-lineage'],
       ['Self Diagnostics', '/self-diagnostics'],
       ['Governance', '/ai-governance'],
@@ -58,6 +61,19 @@ describe('primaryNavigation', () => {
       ['Regulatory', '/regulatory'],
       ['Assets', '/assets'],
     ]);
+  });
+
+  it('keeps solution builder discoverable in the solutions group', () => {
+    expect(SOLUTIONS_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual(
+      expect.arrayContaining([
+        ['Solution Builder', '/solution-builder'],
+        ['Value Tracking', '/value-tracking'],
+        ['Customer Success', '/customer-success'],
+      ])
+    );
+    expect(getPrimaryNavItemForPath('/solution-builder')?.id).toBe('solution-builder');
+    expect(getPrimaryNavItemForPath('/value-tracking')?.id).toBe('value-tracking');
+    expect(getPrimaryNavItemForPath('/customer-success')?.id).toBe('customer-success');
   });
 
   it('does not duplicate visible sidebar destinations', () => {
@@ -142,6 +158,7 @@ describe('primaryNavigation', () => {
       ['/profile/settings', 'settings'],
       ['/profile/preferences', 'settings'],
       ['/settings', 'settings'],
+      ['/tenant-admin', 'tenant-admin'],
     ];
 
     for (const [path, itemId] of expected) {
@@ -157,6 +174,7 @@ describe('primaryNavigation', () => {
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.id)).toEqual([
       'profile',
       'settings',
+      'tenant-admin',
       'billing',
       'notifications',
     ]);

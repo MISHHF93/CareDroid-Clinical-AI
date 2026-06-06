@@ -117,7 +117,7 @@ Tools (execution layer)
 | `organizationTypes` | Empty = all org types |
 | `roleProfiles` | Empty = all role profiles |
 | `specialties` | Optional filter |
-| `lifecycle` | `draft` \| `active` \| `deprecated` \| `admin_only` |
+| `lifecycle` | `draft` \| `beta` \| `active` \| `deprecated` \| `archived` |
 | `pricingTier` | `core` \| `standard` \| `enterprise` \| `addon` |
 | `packIds` | Denormalized pack membership |
 | `dependencies` | Required asset ids |
@@ -127,7 +127,7 @@ Tools (execution layer)
 - `draft` — visible to org admins in lifecycle UI only
 - `active` — eligible for entitlements
 - `deprecated` — hidden from Discover; deep links may show deprecation banner
-- `admin_only` — requires `CONFIGURE_SYSTEM` or org admin membership
+- admin-only access — controlled through permission policy, governance metadata, feature flags, or entitlement rules
 
 ---
 
@@ -169,7 +169,7 @@ global role permissions
   ∩ organization entitled assets (packs)
   ∩ role profile asset filter
   ∩ asset permissionPolicy
-  ∩ lifecycle (active vs admin_only)
+  ∩ lifecycle (draft, beta, active, deprecated, archived)
 ```
 
 ---

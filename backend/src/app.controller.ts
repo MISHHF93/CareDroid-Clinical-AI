@@ -19,8 +19,25 @@ export class AppController {
   getSystemConfig() {
     const sessionConfig = this.configService.get<any>('session') || {};
     const ragConfig = this.configService.get<any>('rag') || {};
+    const environmentConfig = this.configService.get<any>('environment') || {};
+    const deploymentConfig = this.configService.get<any>('deployment') || {};
 
     return {
+      environment: {
+        name: environmentConfig.name || 'development',
+        allowed: environmentConfig.allowed || ['local', 'development', 'staging', 'production'],
+        bannerEnabled: environmentConfig.bannerEnabled !== false,
+        isProduction: environmentConfig.isProduction === true,
+        validation: environmentConfig.validation || { valid: true, source: 'runtime' },
+      },
+      deployment: {
+        id: deploymentConfig.id || null,
+        region: deploymentConfig.region || null,
+        version: deploymentConfig.version || '1.0.0',
+        commit: deploymentConfig.commit || null,
+        branch: deploymentConfig.branch || null,
+        deployedAt: deploymentConfig.deployedAt || null,
+      },
       rag: {
         enabled: ragConfig.enabled !== false,
         topK: ragConfig.retrieval?.topK || 5,

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { useWhiteLabel } from '../contexts/WhiteLabelContext';
 import PermissionGate from './PermissionGate';
 import BuildInfoBadge from './BuildInfoBadge';
 import { FEATURE_FLAGS } from '../config/featureFlags.config';
@@ -50,6 +51,7 @@ const Sidebar = forwardRef(function Sidebar(
     workspaceState,
     switchWorkspace,
   } = useUserIdentity();
+  const { branding } = useWhiteLabel();
   const { notifications } = useNotifications();
   const [showAdvanced, setShowAdvanced] = useState(false);
 
@@ -57,7 +59,7 @@ const Sidebar = forwardRef(function Sidebar(
   const displayName = account?.displayName || user?.fullName || user?.name || 'User';
   const displayRole = account?.specialty || account?.role || user?.role || 'Clinician';
   const displayOrganization =
-    organization?.name || account?.organization || user?.institution || 'Personal workspace';
+    branding.displayName || organization?.name || account?.organization || user?.institution || 'Personal workspace';
   const effectiveCollapsed = layoutCompact ? false : sidebarCollapsed;
   const recentConversations = conversations.slice(-4).reverse();
 
@@ -169,11 +171,15 @@ const Sidebar = forwardRef(function Sidebar(
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <div className="logo-icon" aria-hidden>
-            <NavIcon icon={CHROME_ICONS.hospital} size={28} />
+            {branding.logoUrl ? (
+              <img src={branding.logoUrl} alt="" className="sidebar-logo-img" />
+            ) : (
+              <NavIcon icon={CHROME_ICONS.hospital} size={28} />
+            )}
           </div>
           {!effectiveCollapsed && (
             <div className="logo-text">
-              <h1>CareDroid</h1>
+              <h1>{branding.displayName || 'CareDroid'}</h1>
             </div>
           )}
         </div>

@@ -8,6 +8,21 @@ import { API_ROUTES } from '../config/api.config';
 import logger from '../utils/logger';
 
 const SYSTEM_CONFIG_DEFAULTS = {
+  environment: {
+    name: 'development',
+    allowed: ['local', 'development', 'staging', 'production'],
+    bannerEnabled: true,
+    isProduction: false,
+    validation: { valid: true, source: 'frontend-defaults' },
+  },
+  deployment: {
+    id: null,
+    region: null,
+    version: '1.0.0',
+    commit: null,
+    branch: null,
+    deployedAt: null,
+  },
   rag: {
     enabled: false,
     topK: 5,

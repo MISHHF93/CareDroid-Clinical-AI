@@ -160,7 +160,7 @@ export class PlatformAssetsService {
 
     if (!entitled.size && !(strictEntitlements && hasOrganizationScope)) {
       const active = await this.assetRepository.find({
-        where: { lifecycle: PlatformAssetLifecycle.ACTIVE },
+        where: { lifecycle: In([PlatformAssetLifecycle.ACTIVE, PlatformAssetLifecycle.BETA]) },
       });
       active.forEach((row) => entitled.add(row.id));
     }

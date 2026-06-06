@@ -27,6 +27,12 @@ export function serviceLineName(id: string) {
   return SERVICE_LINE_BY_ID.get(id as ServiceLineId)?.name || id;
 }
 
+export function serviceLineIdsForDepartment(departmentId: string): ServiceLineId[] {
+  return SERVICE_LINE_TAXONOMY.filter((serviceLine) =>
+    (serviceLine.departmentIds as readonly string[]).includes(departmentId),
+  ).map((serviceLine) => serviceLine.id);
+}
+
 export function normalizeServiceLineId(value: unknown): ServiceLineId | null {
   if (!value) return null;
   const raw = String(value).trim().toLowerCase().replace(/_/g, '-');

@@ -59,7 +59,7 @@ const CHARTER_RULES = [
   {
     id: 'lifecycle-status',
     label: 'Every asset has lifecycle status',
-    detail: '`lifecycle` on platform asset (`draft|active|deprecated|admin_only`) or inventory `lifecycleState`.',
+    detail: '`lifecycle` on platform asset (`draft|beta|active|deprecated|archived`) or inventory `lifecycleState`.',
   },
 ];
 
@@ -512,7 +512,7 @@ export function getSaasComplianceDocument() {
     '| STRUCT-001 | **Critical** | Dual registry: `toolInventory.js` is launch source of truth; `platform_assets` covers ~20% of user-facing tools | Backfill `SEED_PLATFORM_ASSETS` from canonical inventory or generate assets on deploy |',
     '| STRUCT-002 | **High** | Eight AI agents seeded without `packIds` (not in any pack `assetIds`) | Add agents to `core-platform` and/or `ai-workflow-pack` `assetIds` |',
     '| STRUCT-003 | **High** | Commercial surfaces (`/products`, `/integrations-marketplace`) use `product-catalog` entities, not `platform_assets` | Register `assetType: integration` / product wrapper assets with packs |',
-    '| STRUCT-004 | **Medium** | Inventory lifecycle (`beta`, `experimental`) ≠ platform lifecycle enum (`draft`, `active`, `deprecated`, `admin_only`) | Map inventory states into platform asset lifecycle on sync |',
+    '| STRUCT-004 | **Resolved** | Inventory lifecycle now maps to platform lifecycle enum (`draft`, `beta`, `active`, `deprecated`, `archived`) | Keep admin-only as access policy instead of lifecycle |',
     '| STRUCT-005 | **Medium** | Seeded assets use empty `roleProfiles` / `workspaceTags` (implicit “all”) — compliant for assignment API but weak for explicit policy | Populate `roleProfiles` and `workspaceTags` per pack `targetRoles` / `defaultModules` |',
     '| STRUCT-006 | **Low** | `assetInventory.js` projection sets `packIds: []` for all tools | Derive packIds from entitlements API or seed map |',
     '| STRUCT-007 | **Low** | `/assistant?agent=` query not consumed in `Dashboard.jsx` | Wire agent asset id to assistant session context |',

@@ -10,9 +10,19 @@ export enum UsageEventType {
   STORAGE = 'storage',
   API_CALL = 'api_call',
   ACTIVE_USER = 'active_user',
+  INTEGRATION = 'integration',
 }
 
-export type UsageUnit = 'call' | 'launch' | 'run' | 'view' | 'event' | 'gb' | 'request' | 'user';
+export type UsageUnit =
+  | 'call'
+  | 'launch'
+  | 'run'
+  | 'view'
+  | 'event'
+  | 'gb'
+  | 'request'
+  | 'user'
+  | 'execution';
 
 export interface UsageLimitDefinition {
   eventType: UsageEventType;

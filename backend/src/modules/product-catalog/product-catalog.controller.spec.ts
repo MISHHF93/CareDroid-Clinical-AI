@@ -22,7 +22,14 @@ describe('ProductCatalogController tenant scope', () => {
     const assetDependencyGraphService = {
       getGraph: jest.fn().mockResolvedValue({ chains: [] }),
     };
+    const hospitalSolutionBuilderService = {
+      recommend: jest.fn().mockResolvedValue({ recommendedCommercialPlanId: 'enterprise' }),
+      apply: jest.fn().mockResolvedValue({ organizationId: 'org-1' }),
+    };
     const outcomesService = {};
+    const valueTrackingService = {
+      getOrganizationValueTracking: jest.fn().mockResolvedValue({ categories: {} }),
+    };
     const organizationsService = {
       assertMemberForUser: jest.fn().mockResolvedValue({ organizationId: 'org-1' }),
       assertAdminForUser: jest.fn().mockResolvedValue({ organizationId: 'org-1' }),
@@ -31,15 +38,20 @@ describe('ProductCatalogController tenant scope', () => {
     const controller = new ProductCatalogController(
       productCatalogService as any,
       assetDependencyGraphService as any,
+      hospitalSolutionBuilderService as any,
       maturityAssessmentService as any,
       outcomesService as any,
+      valueTrackingService as any,
       organizationsService as any,
     );
 
     return {
       controller,
       productCatalogService,
+      assetDependencyGraphService,
+      hospitalSolutionBuilderService,
       maturityAssessmentService,
+      valueTrackingService,
       organizationsService,
     };
   }
@@ -113,6 +125,61 @@ describe('ProductCatalogController tenant scope', () => {
     await controller.getPathway('sepsis');
 
     expect(productCatalogService.getCarePathwayBySlug).toHaveBeenCalledWith('sepsis');
+  });
+
+  it('resolves dependency graph with active tenant entitlement context', async () => {
+    const { controller, assetDependencyGraphService } = buildController();
+    const tenantReq = {
+      user: { id: 'user-1', role: 'physician', subscription: { tier: 'professional' } },
+      tenantContext: { organizationId: 'org-1', role: 'member', subscriptionPlan: 'starter' },
+    };
+
+    await controller.dependencyGraph(tenantReq);
+
+    expect(assetDependencyGraphService.getGraph).toHaveBeenCalledWith('org-1', {
+      userRole: 'member',
+      subscriptionPlan: 'starter',
+    });
+  });
+
+  it('checks membership before generating organization-scoped hospital solutions', async () => {
+    const { controller, hospitalSolutionBuilderService, organizationsService } = buildController();
+
+    await controller.recommendHospitalSolution(req, {
+      organizationId: 'org-1',
+      hospitalType: 'hospital',
+      departmentIds: ['emergency'],
+    });
+
+    expect(organizationsService.assertMemberForUser).toHaveBeenCalledWith('user-1', 'org-1');
+    expect(hospitalSolutionBuilderService.recommend).toHaveBeenCalledWith({
+      organizationId: 'org-1',
+      hospitalType: 'hospital',
+      departmentIds: ['emergency'],
+    });
+  });
+
+  it('requires admin access before applying hospital solutions', async () => {
+    const { controller, hospitalSolutionBuilderService, organizationsService } = buildController();
+    const dto = {
+      organizationId: 'org-1',
+      commercialPlanId: 'enterprise',
+      configurationPatch: { enabledPackIds: ['core-platform'] },
+    };
+
+    await controller.applyHospitalSolution(req, dto);
+
+    expect(organizationsService.assertAdminForUser).toHaveBeenCalledWith('user-1', 'org-1');
+    expect(hospitalSolutionBuilderService.apply).toHaveBeenCalledWith(req.user, dto);
+  });
+
+  it('checks membership before returning value tracking metrics', async () => {
+    const { controller, organizationsService, valueTrackingService } = buildController();
+
+    await controller.valueTracking(req, 'org-1', 'week');
+
+    expect(organizationsService.assertMemberForUser).toHaveBeenCalledWith('user-1', 'org-1');
+    expect(valueTrackingService.getOrganizationValueTracking).toHaveBeenCalledWith('org-1', 'week');
   });
 
   it('does not resolve product assets when organization membership is denied', async () => {

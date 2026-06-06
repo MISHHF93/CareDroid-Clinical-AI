@@ -100,6 +100,10 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
     return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: ['user-hidden'] };
   }
 
+  if (['draft', 'archived'].includes(tool.lifecycleState)) {
+    return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: [tool.lifecycleState] };
+  }
+
   const entitlementDecision = resolveEntitlementDecision(tool, context, userRole);
   if (!entitlementDecision.isLaunchable) {
     return {
@@ -109,10 +113,18 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
     };
   }
 
-  if (tool.lifecycleState === 'admin-only' || ADMIN_ONLY_TOOLS.has(assetId)) {
+  if (ADMIN_ONLY_TOOLS.has(assetId)) {
     if (!ADMIN_ROLES.has(userRole)) {
       return { accessState: ASSET_ACCESS_STATES.ADMIN_ONLY, reasons: ['admin-only'] };
     }
+  }
+
+  if (tool.lifecycleState === 'deprecated') {
+    return { accessState: ASSET_ACCESS_STATES.RESTRICTED, reasons: ['deprecated'] };
+  }
+
+  if (tool.lifecycleState === 'beta') {
+    return { accessState: ASSET_ACCESS_STATES.BETA, reasons: ['beta'] };
   }
 
   if (tool.executorStatus === TOOL_EXECUTOR_STATUS.UNSUPPORTED && tool.launchType !== 'calculator') {

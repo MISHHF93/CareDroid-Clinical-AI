@@ -116,6 +116,12 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellCss).toMatch(/\.app-shell-dev-mode-banner[\s\S]*flex:\s*0 0 auto/);
   });
 
+  it('renders a scroll-safe environment banner from validated app config', () => {
+    expect(appShellJsx).toContain('app-shell-environment-banner');
+    expect(appShellJsx).toContain('appConfig.app.environment');
+    expect(appShellCss).toMatch(/\.app-shell-environment-banner[\s\S]*flex:\s*0 0 auto/);
+  });
+
   it('gates Quick Command behind authenticated app shell state', () => {
     expect(appShellJsx).toContain('QuickCommandLauncher');
     expect(appShellJsx).toContain('isAuthed && (');

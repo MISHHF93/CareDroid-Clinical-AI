@@ -13,7 +13,14 @@ import {
   SIDEBAR_WIDTH_COLLAPSED_PX,
   SIDEBAR_WIDTH_EXPANDED_PX,
 } from '../config/layout.config';
+import appConfig from '../config/appConfig';
 import './AppShell.css';
+
+const environment = appConfig.app.environment || 'development';
+const deployment = appConfig.app.deployment || {};
+const shouldShowEnvironmentBanner =
+  appConfig.app.environmentValidation?.valid === false ||
+  (environment !== 'production' && appConfig.app.environmentValidation?.raw !== 'test');
 
 const AppShell = ({
   isAuthed = false,
@@ -263,6 +270,19 @@ const AppShell = ({
           id="main-content"
           tabIndex={-1}
         >
+          {isAuthed && shouldShowEnvironmentBanner && (
+            <div
+              className={`app-shell-environment-banner app-shell-environment-banner--${environment}`}
+              role="status"
+            >
+              <strong>{environment}</strong> environment
+              {deployment.id ? ` · deployment ${deployment.id}` : ''}
+              {deployment.commit ? ` · ${deployment.commit.slice(0, 12)}` : ''}
+              {appConfig.app.environmentValidation?.valid === false
+                ? ' · invalid environment fallback applied'
+                : ''}
+            </div>
+          )}
           {isAuthed && isDevAuthBypass && (
             <div className="app-shell-dev-mode-banner" role="status">
               <strong>{devAuthBannerLabel}</strong> is active. This session uses a local clinician

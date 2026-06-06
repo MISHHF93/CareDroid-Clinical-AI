@@ -6,6 +6,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller';
 import { BiometricController } from './biometric.controller';
 import { AuthService } from './auth.service';
+import { IdentityProviderRegistryService } from './identity-provider-registry.service';
 import { BiometricService } from './services/biometric.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
@@ -55,6 +56,7 @@ import { AuthorizationGuard } from './guards/authorization.guard';
   controllers: [AuthController, BiometricController],
   providers: [
     AuthService,
+    IdentityProviderRegistryService,
     BiometricService,
     JwtStrategy,
     AuthorizationGuard,

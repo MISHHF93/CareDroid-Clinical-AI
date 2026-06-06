@@ -56,6 +56,24 @@ vi.mock('../services/subscriptionApi', () => ({
   createCustomerPortalSession: vi.fn(),
 }));
 
+vi.mock('../services/enterpriseIdentityApi', () => ({
+  fetchIdentityProviderRegistry: vi.fn().mockResolvedValue({
+    ok: true,
+    data: { summary: { supported: 0, planned: 0, unavailable: 0 }, providers: [] },
+  }),
+}));
+
+vi.mock('../services/tenantIsolationApi', () => ({
+  fetchTenantDataIsolationAudit: vi.fn().mockResolvedValue({
+    ok: true,
+    data: {
+      status: 'tenant_isolated',
+      summary: { auditedDomains: 6, crossTenantReadAllowed: false },
+      domains: [],
+    },
+  }),
+}));
+
 function renderSettings() {
   return render(
     <MemoryRouter>

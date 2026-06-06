@@ -13,6 +13,7 @@ export {
   QUICK_COMMAND_DESTINATION_ITEMS,
   QUICK_COMMAND_NAV_ITEMS,
   SECONDARY_NAV_ITEMS,
+  SOLUTIONS_SIDEBAR_NAV_ITEMS,
   getPrimaryNavItemForPath,
   primaryNavPathMatches,
 } from '../config/navigation.config';

@@ -14,7 +14,7 @@ Audited against [`CARE_DROID_SAAS_ARCHITECTURE_CHARTER.md`](../CARE_DROID_SAAS_A
 4. **Every asset can be assigned to a workspace** — Workspace can scope the asset via `enabledToolIds`, `LEGACY_TOOL_ID_ALIASES`, or `workspaceTags`.
 5. **Every asset can be assigned to a role** — Role profile or `intendedRoles` / `roleProfiles` on the asset supports entitlement filtering.
 6. **Every asset has governance metadata** — `governance` JSON includes clinical risk, human review, audit, and validation status.
-7. **Every asset has lifecycle status** — `lifecycle` on platform asset (`draft|active|deprecated|admin_only`) or inventory `lifecycleState`.
+7. **Every asset has lifecycle status** — `lifecycle` on platform asset (`draft|beta|active|deprecated|archived`) or inventory `lifecycleState`.
 
 ## Executive summary
 
@@ -212,7 +212,7 @@ CareDroid runs a **dual registry**: 291 user-facing tools in `toolInventory.js` 
 | STRUCT-001 | **Critical** | Dual registry: `toolInventory.js` is launch source of truth; `platform_assets` covers ~20% of user-facing tools | Backfill `SEED_PLATFORM_ASSETS` from canonical inventory or generate assets on deploy |
 | STRUCT-002 | **High** | Eight AI agents seeded without `packIds` (not in any pack `assetIds`) | Add agents to `core-platform` and/or `ai-workflow-pack` `assetIds` |
 | STRUCT-003 | **High** | Commercial surfaces (`/products`, `/integrations-marketplace`) use `product-catalog` entities, not `platform_assets` | Register `assetType: integration` / product wrapper assets with packs |
-| STRUCT-004 | **Medium** | Inventory lifecycle (`beta`, `experimental`) ≠ platform lifecycle enum (`draft`, `active`, `deprecated`, `admin_only`) | Map inventory states into platform asset lifecycle on sync |
+| STRUCT-004 | **Resolved** | Inventory lifecycle now maps to platform lifecycle enum (`draft`, `beta`, `active`, `deprecated`, `archived`) | Keep admin-only as access policy instead of lifecycle |
 | STRUCT-005 | **Medium** | Seeded assets use empty `roleProfiles` / `workspaceTags` (implicit “all”) — compliant for assignment API but weak for explicit policy | Populate `roleProfiles` and `workspaceTags` per pack `targetRoles` / `defaultModules` |
 | STRUCT-006 | **Low** | `assetInventory.js` projection sets `packIds: []` for all tools | Derive packIds from entitlements API or seed map |
 | STRUCT-007 | **Low** | `/assistant?agent=` query not consumed in `Dashboard.jsx` | Wire agent asset id to assistant session context |

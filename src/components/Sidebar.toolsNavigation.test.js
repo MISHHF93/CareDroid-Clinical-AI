@@ -12,6 +12,7 @@ import {
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
   SECONDARY_NAV_ITEMS,
+  SOLUTIONS_SIDEBAR_NAV_ITEMS,
 } from '../config/navigation.config';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 
@@ -68,10 +69,12 @@ describe('Simplified sidebar navigation wiring', () => {
     for (const path of [
       '/tools/catalog',
       '/system-health',
+      '/saas-health',
       '/feature-flags',
       '/plugins',
       '/dependency-map',
       '/dependency-graph',
+      '/governance-registry',
       '/data-lineage',
       '/self-diagnostics',
       '/ai-governance',
@@ -101,6 +104,9 @@ describe('Simplified sidebar navigation wiring', () => {
 
   it('keeps secondary, operations, and account destinations available outside primary nav', () => {
     expect(SECONDARY_NAV_ITEMS.map((item) => item.path)).toEqual(['/discover', '/automation']);
+    expect(SOLUTIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual(
+      expect.arrayContaining(['/solution-builder', '/value-tracking', '/customer-success'])
+    );
     expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual([
       '/digital-twin',
       '/hospital-map',
@@ -113,6 +119,7 @@ describe('Simplified sidebar navigation wiring', () => {
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.path)).toEqual([
       '/profile',
       '/settings',
+      '/tenant-admin',
       '/billing',
       '/notifications',
     ]);

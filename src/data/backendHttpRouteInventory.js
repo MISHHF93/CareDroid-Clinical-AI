@@ -11,6 +11,8 @@
 export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/health', controller: 'AppController' },
   { method: 'GET', path: '/api/config/system', controller: 'AppController' },
+  { method: 'GET', path: '/api/tenant/context', controller: 'TenantContextController' },
+  { method: 'GET', path: '/api/tenant/isolation-audit', controller: 'TenantContextController' },
 
   { method: 'POST', path: '/api/auth/register', controller: 'AuthController' },
   { method: 'POST', path: '/api/auth/login', controller: 'AuthController' },
@@ -22,6 +24,7 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/auth/linkedin', controller: 'AuthController' },
   { method: 'GET', path: '/api/auth/linkedin/callback', controller: 'AuthController' },
   { method: 'POST', path: '/api/auth/magic-link', controller: 'AuthController' },
+  { method: 'GET', path: '/api/auth/identity-providers', controller: 'AuthController' },
   { method: 'GET', path: '/api/auth/oidc', controller: 'AuthController' },
   { method: 'GET', path: '/api/auth/saml', controller: 'AuthController' },
   { method: 'GET', path: '/api/auth/me', controller: 'AuthController' },
@@ -144,6 +147,7 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'PATCH', path: '/api/platform/me/role-profile', controller: 'PlatformAssetsController' },
   { method: 'GET', path: '/api/platform/assets', controller: 'PlatformAssetsController' },
   { method: 'GET', path: '/api/platform/assets/:assetId', controller: 'PlatformAssetsController' },
+  { method: 'GET', path: '/api/platform/governance-registry', controller: 'PlatformAssetsController' },
   { method: 'GET', path: '/api/platform/packs', controller: 'PlatformAssetsController' },
   { method: 'GET', path: '/api/platform/packs/:packId', controller: 'PlatformAssetsController' },
   { method: 'GET', path: '/api/platform/role-profiles', controller: 'PlatformAssetsController' },
@@ -305,6 +309,7 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'POST', path: '/api/privacy/requests', controller: 'PrivacyCenterController' },
   { method: 'GET', path: '/api/ehr-audit/summary', controller: 'EhrAuditController' },
   { method: 'GET', path: '/api/system-health', controller: 'ObservabilityController' },
+  { method: 'GET', path: '/api/saas-health', controller: 'SaasHealthController' },
   {
     method: 'GET',
     path: '/api/platform-systems/packs/:pack',

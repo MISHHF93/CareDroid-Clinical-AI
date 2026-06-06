@@ -11,6 +11,7 @@ import {
   InstitutionOidcIcon,
   InstitutionSamlIcon,
 } from '../components/auth/AuthProviderIcons';
+import { useWhiteLabel } from '../contexts/WhiteLabelContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import logger from '../utils/logger';
 import { NavIcon } from '../navigation/NavIcon';
@@ -26,6 +27,7 @@ const Auth = ({ onAuthSuccess }) => {
   const [twoFactorToken, setTwoFactorToken] = useState('');
   const enableDevAuthBypass = isDevAuthBypassEnabled();
   const { success, error, info } = useNotificationActions();
+  const { branding } = useWhiteLabel();
   const googleAuthUrl = buildApiUrl('/api/auth/google');
   const linkedinAuthUrl = buildApiUrl('/api/auth/linkedin');
   const [searchParams, setSearchParams] = useSearchParams();
@@ -259,10 +261,14 @@ const Auth = ({ onAuthSuccess }) => {
           {directSignInSection()}
 
           <header className="auth-panel__header">
-            <h1 className="auth-panel__title">{mode === 'login' ? 'Sign in' : 'Create account'}</h1>
+            <h1 className="auth-panel__title">
+              {mode === 'login'
+                ? branding.loginTitle || 'Sign in'
+                : `Create account for ${branding.displayName || 'CareDroid'}`}
+            </h1>
             <p className="auth-panel__subtitle">
               {mode === 'login'
-                ? 'Use your institutional or personal credentials.'
+                ? branding.loginSubtitle || 'Use your institutional or personal credentials.'
                 : 'Set up access for your clinical workspace.'}
             </p>
           </header>

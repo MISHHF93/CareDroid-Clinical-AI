@@ -9,6 +9,40 @@ import { ProductCatalogApi } from '../../services/productCatalogApi';
 import { PROFILE_ROLES } from '../../data/profileToolSegmentation';
 import './OrganizationPages.css';
 
+const splitList = (value) =>
+  String(value || '')
+    .split(/[\n,]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+
+const prettyJson = (value, fallback) => JSON.stringify(value ?? fallback, null, 2);
+
+const ASSET_LIFECYCLE_STATES = Object.freeze([
+  { value: 'draft', label: 'Draft' },
+  { value: 'beta', label: 'Beta' },
+  { value: 'active', label: 'Active' },
+  { value: 'deprecated', label: 'Deprecated' },
+  { value: 'archived', label: 'Archived' },
+]);
+
+const LIFECYCLE_MANAGED_ASSET_TYPES = Object.freeze([
+  'tool',
+  'clinical-tool',
+  'calculator',
+  'simulation',
+  'workflow',
+  'ai_agent',
+  'integration',
+]);
+
+function parseJsonField(value, fallback) {
+  try {
+    return JSON.parse(value || '');
+  } catch {
+    return fallback;
+  }
+}
+
 export function OrganizationDashboard() {
   const { organization, platformContext, entitledPackIds, refreshPlatformContext } = useUserIdentity();
   const { branding, integrations, subscription, tenant } = useOrganizationContext();
@@ -132,8 +166,17 @@ export function OrganizationSettings() {
     organizationType: 'hospital',
     country: '',
     displayName: '',
+    logoUrl: '',
+    faviconUrl: '',
     primaryColor: '',
     accentColor: '',
+    theme: 'system',
+    loginTitle: '',
+    loginSubtitle: '',
+    loginBackgroundImageUrl: '',
+    dashboardTitle: '',
+    dashboardSubtitle: '',
+    dashboardLogoUrl: '',
     subscriptionTier: 'free',
   });
   const [status, setStatus] = useState('');
@@ -667,6 +710,183 @@ export function PlatformAnalyticsPage() {
   );
 }
 
+function CustomerSuccessMetricCard({ label, metric, suffix = '' }) {
+  return (
+    <Card className="org-card org-analytics-metric">
+      <h2>{label}</h2>
+      <p>
+        {metric?.value ?? 0}
+        {suffix}
+      </p>
+    </Card>
+  );
+}
+
+export function CustomerSuccessDashboard() {
+  const { organization } = useUserIdentity();
+  const [period, setPeriod] = useState('month');
+  const [dashboard, setDashboard] = useState(null);
+  const [status, setStatus] = useState('');
+
+  useEffect(() => {
+    if (!organization?.id) return;
+    setStatus('');
+    PlatformAssetsApi.getCustomerSuccessDashboard(organization.id, period)
+      .then(setDashboard)
+      .catch((error) => {
+        setDashboard(null);
+        setStatus(error.message || 'Customer success unavailable.');
+      });
+  }, [organization?.id, period]);
+
+  if (!organization?.id) {
+    return (
+      <div className="org-page">
+        <header className="org-page-header">
+          <h1>Customer Success</h1>
+          <p className="org-page-subtitle">Link an organization to view customer health.</p>
+        </header>
+      </div>
+    );
+  }
+
+  const metrics = dashboard?.metrics || {};
+  const topAssets = metrics.assetUsage?.topAssets || [];
+  const underusedProducts = metrics.underusedProducts || [];
+  const signals = dashboard?.signals || [];
+
+  return (
+    <div className="org-page">
+      <header className="org-page-header">
+        <h1>Customer Success</h1>
+        <p className="org-page-subtitle">
+          Customer health, retention signals, adoption, active users, asset usage, AI usage,
+          simulations, workflows, and underused products for {organization.name}.
+        </p>
+        <div className="org-page-actions">
+          <label>
+            Period
+            <select value={period} onChange={(event) => setPeriod(event.target.value)}>
+              <option value="day">Day</option>
+              <option value="week">Week</option>
+              <option value="month">Month</option>
+            </select>
+          </label>
+          <Link to="/value-tracking">Value tracking</Link>
+          <Link to="/platform-analytics">Platform analytics</Link>
+        </div>
+      </header>
+
+      {!dashboard ? (
+        <Card className="org-card">
+          <p>{status || 'Loading customer success dashboard...'}</p>
+        </Card>
+      ) : (
+        <>
+          <div className="org-grid org-analytics-metrics">
+            <Card className="org-card org-analytics-metric">
+              <h2>Health score</h2>
+              <p>{dashboard.health?.score || 0}</p>
+              <span className={`org-status-pill org-status-pill--${dashboard.health?.status || 'available'}`}>
+                {dashboard.health?.status || 'needs-data'}
+              </span>
+            </Card>
+            <Card className="org-card org-analytics-metric">
+              <h2>Retention risk</h2>
+              <p>{dashboard.health?.retentionRisk || 'unknown'}</p>
+            </Card>
+            <CustomerSuccessMetricCard label="Adoption" metric={metrics.adoption} suffix="%" />
+            <CustomerSuccessMetricCard label="Active users" metric={metrics.activeUsers} />
+            <CustomerSuccessMetricCard label="Asset usage" metric={metrics.assetUsage} />
+            <CustomerSuccessMetricCard label="AI usage" metric={metrics.aiUsage} />
+            <CustomerSuccessMetricCard
+              label="Simulations completed"
+              metric={metrics.simulationsCompleted}
+            />
+            <CustomerSuccessMetricCard
+              label="Workflows completed"
+              metric={metrics.workflowsCompleted}
+            />
+          </div>
+
+          <section className="org-analytics-section">
+            <h2>Customer health signals</h2>
+            <div className="org-grid">
+              {signals.map((signal) => (
+                <Card key={signal.id} className="org-card">
+                  <span className={`org-status-pill org-status-pill--${signal.status}`}>
+                    {signal.status}
+                  </span>
+                  <h2>{signal.label}</h2>
+                  <p>{signal.message}</p>
+                </Card>
+              ))}
+            </div>
+          </section>
+
+          <section className="org-analytics-section">
+            <h2>Asset usage</h2>
+            <div className="org-grid">
+              <Card className="org-card">
+                <h2>Top assets</h2>
+                <ol className="org-analytics-list">
+                  {topAssets.map((asset) => (
+                    <li key={asset.id}>
+                      <span>
+                        <strong>{asset.label}</strong>
+                        <small>{asset.assetType || 'asset'}</small>
+                      </span>
+                      <b>{asset.count}</b>
+                    </li>
+                  ))}
+                  {!topAssets.length && <li>No asset usage yet.</li>}
+                </ol>
+              </Card>
+            </div>
+          </section>
+
+          <section className="org-analytics-section">
+            <h2>Underused products</h2>
+            <div className="org-grid">
+              {underusedProducts.map((product) => (
+                <Card key={product.id} className="org-card">
+                  <h2>{product.name}</h2>
+                  <p className="org-pack-meta">
+                    {product.enabledAssetCount} enabled assets · {product.usageCount} usage events
+                  </p>
+                  <div className="org-chip-list">
+                    {(product.expectedOutcomes || []).slice(0, 4).map((outcome) => (
+                      <span key={outcome} className="org-chip">
+                        {outcome}
+                      </span>
+                    ))}
+                  </div>
+                  <Link to={`/products/${product.slug}`}>Review product</Link>
+                </Card>
+              ))}
+              {!underusedProducts.length && (
+                <Card className="org-card">
+                  <p>No underused products detected for this period.</p>
+                </Card>
+              )}
+            </div>
+          </section>
+
+          <Card className="org-card">
+            <h2>Data sources</h2>
+            <p>
+              Usage events: {dashboard.sources?.usageEvents || 0} · Audit events:{' '}
+              {dashboard.sources?.auditEvents || 0} · Entitlements:{' '}
+              {dashboard.sources?.enabledEntitlements || 0} · Products:{' '}
+              {dashboard.sources?.products || 0}
+            </p>
+          </Card>
+        </>
+      )}
+    </div>
+  );
+}
+
 export function AssetLifecycleAdmin() {
   const [assets, setAssets] = useState([]);
   const [status, setStatus] = useState('');
@@ -680,6 +900,20 @@ export function AssetLifecycleAdmin() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const lifecycleCounts = useMemo(() => {
+    const counts = Object.fromEntries(ASSET_LIFECYCLE_STATES.map((state) => [state.value, 0]));
+    assets.forEach((asset) => {
+      const lifecycle = asset.lifecycle || asset.lifecycleStatus || 'active';
+      counts[lifecycle] = (counts[lifecycle] || 0) + 1;
+    });
+    return counts;
+  }, [assets]);
+
+  const managedAssetCount = useMemo(
+    () => assets.filter((asset) => LIFECYCLE_MANAGED_ASSET_TYPES.includes(asset.assetType)).length,
+    [assets]
+  );
 
   const setLifecycle = async (assetId, lifecycle) => {
     setStatus('Updating…');
@@ -696,14 +930,33 @@ export function AssetLifecycleAdmin() {
     <div className="org-page">
       <header className="org-page-header">
         <h1>Asset lifecycle</h1>
+        <p className="org-page-subtitle">
+          Manage draft, beta, active, deprecated, and archived states for tools, calculators,
+          simulations, workflows, AI agents, and integrations.
+        </p>
         <Link to="/settings/organization">← Settings</Link>
       </header>
+
+      <div className="org-lifecycle-summary" aria-label="Asset lifecycle summary">
+        {ASSET_LIFECYCLE_STATES.map((state) => (
+          <Card key={state.value} className="org-card org-lifecycle-summary-card">
+            <span className="org-pack-meta">{state.label}</span>
+            <strong>{lifecycleCounts[state.value] || 0}</strong>
+          </Card>
+        ))}
+        <Card className="org-card org-lifecycle-summary-card">
+          <span className="org-pack-meta">Managed asset types</span>
+          <strong>{managedAssetCount}</strong>
+        </Card>
+      </div>
+
       <table className="org-lifecycle-table">
         <thead>
           <tr>
             <th>Asset</th>
             <th>Type</th>
             <th>Lifecycle</th>
+            <th>Managed Scope</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -712,17 +965,26 @@ export function AssetLifecycleAdmin() {
             <tr key={asset.id}>
               <td>{asset.title}</td>
               <td>{asset.assetType}</td>
-              <td>{asset.lifecycle}</td>
               <td>
-                <Button variant="ghost" onClick={() => setLifecycle(asset.id, 'active')}>
-                  Active
-                </Button>
-                <Button variant="ghost" onClick={() => setLifecycle(asset.id, 'deprecated')}>
-                  Deprecate
-                </Button>
-                <Button variant="ghost" onClick={() => setLifecycle(asset.id, 'admin_only')}>
-                  Admin only
-                </Button>
+                <span className={`org-status-pill org-status-pill--${asset.lifecycle || 'active'}`}>
+                  {asset.lifecycle || asset.lifecycleStatus || 'active'}
+                </span>
+              </td>
+              <td>
+                {LIFECYCLE_MANAGED_ASSET_TYPES.includes(asset.assetType)
+                  ? 'Lifecycle-managed'
+                  : 'Catalog-managed'}
+              </td>
+              <td>
+                {ASSET_LIFECYCLE_STATES.map((state) => (
+                  <Button
+                    key={state.value}
+                    variant="ghost"
+                    onClick={() => setLifecycle(asset.id, state.value)}
+                  >
+                    {state.label}
+                  </Button>
+                ))}
               </td>
             </tr>
           ))}
@@ -977,6 +1239,452 @@ export function ServiceLinesPage() {
           </Card>
         </div>
       )}
+    </div>
+  );
+}
+
+export function TenantAdministrationCenter() {
+  const { organization, refreshPlatformContext } = useUserIdentity();
+  const [admin, setAdmin] = useState(null);
+  const [form, setForm] = useState({
+    name: '',
+    organizationType: 'hospital',
+    country: '',
+    displayName: '',
+    logoUrl: '',
+    faviconUrl: '',
+    primaryColor: '',
+    accentColor: '',
+    theme: 'system',
+    loginTitle: '',
+    loginSubtitle: '',
+    loginBackgroundImageUrl: '',
+    dashboardTitle: '',
+    dashboardSubtitle: '',
+    dashboardLogoUrl: '',
+    subscriptionTier: 'free',
+    departmentsText: '',
+    integrationsText: '',
+    integrationsRequestedText: '',
+    workspacesJson: '[]',
+    permissionsJson: '{}',
+  });
+  const [status, setStatus] = useState('');
+
+  const load = useCallback(async () => {
+    if (!organization?.id) return;
+    const result = await PlatformAssetsApi.getTenantAdministration(organization.id);
+    setAdmin(result);
+    setForm({
+      name: result.profile?.name || '',
+      organizationType: result.profile?.organizationType || 'hospital',
+      country: result.profile?.country || '',
+      displayName: result.branding?.displayName || result.profile?.name || '',
+      logoUrl: result.branding?.logoUrl || '',
+      faviconUrl: result.branding?.faviconUrl || '',
+      primaryColor: result.branding?.primaryColor || '',
+      accentColor: result.branding?.accentColor || '',
+      theme: result.branding?.theme || 'system',
+      loginTitle: result.branding?.loginTitle || '',
+      loginSubtitle: result.branding?.loginSubtitle || '',
+      loginBackgroundImageUrl: result.branding?.loginBackgroundImageUrl || '',
+      dashboardTitle: result.branding?.dashboardTitle || '',
+      dashboardSubtitle: result.branding?.dashboardSubtitle || '',
+      dashboardLogoUrl: result.branding?.dashboardLogoUrl || '',
+      subscriptionTier: result.subscriptions?.current?.tier || 'free',
+      departmentsText: (result.departments || []).join('\n'),
+      integrationsText: (result.integrations || [])
+        .filter((integration) => integration.status === 'enabled')
+        .map((integration) => integration.slug)
+        .join('\n'),
+      integrationsRequestedText: (result.noCodeConfiguration?.integrationsRequested || []).join('\n'),
+      workspacesJson: prettyJson(result.workspaces, []),
+      permissionsJson: prettyJson(result.permissions?.overrides, {}),
+    });
+  }, [organization?.id]);
+
+  useEffect(() => {
+    load().catch((error) => setStatus(error.message || 'Tenant administration unavailable.'));
+  }, [load]);
+
+  const save = async () => {
+    if (!organization?.id) {
+      setStatus('Create an organization before editing tenant administration.');
+      return;
+    }
+    setStatus('Saving tenant administration...');
+    const payload = {
+      name: form.name,
+      organizationType: form.organizationType,
+      country: form.country,
+      branding: {
+        displayName: form.displayName || form.name,
+        logoUrl: form.logoUrl || undefined,
+        faviconUrl: form.faviconUrl || undefined,
+        primaryColor: form.primaryColor || undefined,
+        accentColor: form.accentColor || undefined,
+        theme: form.theme || 'system',
+        loginTitle: form.loginTitle || undefined,
+        loginSubtitle: form.loginSubtitle || undefined,
+        loginBackgroundImageUrl: form.loginBackgroundImageUrl || undefined,
+        dashboardTitle: form.dashboardTitle || undefined,
+        dashboardSubtitle: form.dashboardSubtitle || undefined,
+        dashboardLogoUrl: form.dashboardLogoUrl || undefined,
+      },
+      subscription: {
+        tier: form.subscriptionTier,
+        status: admin?.subscriptions?.current?.status || 'active',
+        commercialPlanId: admin?.subscriptions?.current?.commercialPlanId || undefined,
+      },
+      departments: splitList(form.departmentsText),
+      integrations: splitList(form.integrationsText),
+      integrationsRequested: splitList(form.integrationsRequestedText),
+      workspaceDefaults: parseJsonField(form.workspacesJson, admin?.workspaces || []),
+      permissionsOverrides: parseJsonField(form.permissionsJson, admin?.permissions?.overrides || {}),
+    };
+    try {
+      const result = await PlatformAssetsApi.updateTenantAdministration(organization.id, payload);
+      setAdmin(result);
+      await refreshPlatformContext?.();
+      setStatus('Tenant administration saved.');
+    } catch (error) {
+      setStatus(error.message || 'Tenant administration update failed.');
+    }
+  };
+
+  if (!organization?.id) {
+    return (
+      <div className="org-page">
+        <header className="org-page-header">
+          <h1>Tenant Administration Center</h1>
+          <p className="org-page-subtitle">Create an organization before managing tenant settings.</p>
+        </header>
+      </div>
+    );
+  }
+
+  const users = admin?.users || [];
+  const roleProfiles = admin?.roles?.roleProfiles || [];
+  const permissionOverrides = admin?.permissions?.overrides || {};
+  const integrations = admin?.integrations || [];
+
+  return (
+    <div className="org-page">
+      <header className="org-page-header">
+        <h1>Tenant Administration Center</h1>
+        <p className="org-page-subtitle">
+          Tenant-scoped administration for organization profile, departments, workspaces, users,
+          roles, permissions, branding, integrations, and subscriptions without code changes.
+        </p>
+        <div className="org-page-actions">
+          <Link to="/organization">Organization home</Link>
+          <Link to="/solution-builder">Solution Builder</Link>
+          <Link to="/billing">Billing</Link>
+        </div>
+      </header>
+
+      <div className="org-grid org-analytics-metrics">
+        <Card className="org-card org-analytics-metric">
+          <h2>Departments</h2>
+          <p>{admin?.departments?.length || 0}</p>
+        </Card>
+        <Card className="org-card org-analytics-metric">
+          <h2>Workspaces</h2>
+          <p>{admin?.workspaces?.length || 0}</p>
+        </Card>
+        <Card className="org-card org-analytics-metric">
+          <h2>Users</h2>
+          <p>{users.length}</p>
+        </Card>
+        <Card className="org-card org-analytics-metric">
+          <h2>Integrations</h2>
+          <p>{integrations.filter((integration) => integration.status === 'enabled').length}</p>
+        </Card>
+      </div>
+
+      <div className="org-grid">
+        <Card className="org-card">
+          <h2>Organization profile</h2>
+          <label>
+            Name
+            <input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
+          </label>
+          <label>
+            Type
+            <select
+              value={form.organizationType}
+              onChange={(e) => setForm((f) => ({ ...f, organizationType: e.target.value }))}
+            >
+              {(admin?.supportedOrganizationTypes?.length
+                ? admin.supportedOrganizationTypes
+                : ['hospital', 'clinic', 'ems', 'university', 'research_center']
+              ).map((type) => (
+                <option key={type} value={type}>
+                  {type.replace(/_/g, ' ')}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Country
+            <input
+              value={form.country}
+              onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))}
+            />
+          </label>
+          <p className="org-pack-meta">
+            Tenant: {admin?.profile?.tenantId || organization.slug || 'current tenant'} ·{' '}
+            {admin?.profile?.complianceMode || 'hipaa'}
+          </p>
+        </Card>
+
+        <Card className="org-card">
+          <h2>White label branding</h2>
+          <label>
+            Display name
+            <input
+              value={form.displayName}
+              onChange={(e) => setForm((f) => ({ ...f, displayName: e.target.value }))}
+            />
+          </label>
+          <label>
+            Logo URL
+            <input
+              value={form.logoUrl}
+              placeholder="https://cdn.example.com/logo.svg"
+              onChange={(e) => setForm((f) => ({ ...f, logoUrl: e.target.value }))}
+            />
+          </label>
+          <label>
+            Favicon URL
+            <input
+              value={form.faviconUrl}
+              placeholder="https://cdn.example.com/favicon.ico"
+              onChange={(e) => setForm((f) => ({ ...f, faviconUrl: e.target.value }))}
+            />
+          </label>
+          <label>
+            Primary color
+            <input
+              value={form.primaryColor}
+              placeholder="#0f766e"
+              onChange={(e) => setForm((f) => ({ ...f, primaryColor: e.target.value }))}
+            />
+          </label>
+          <label>
+            Accent color
+            <input
+              value={form.accentColor}
+              placeholder="#2563eb"
+              onChange={(e) => setForm((f) => ({ ...f, accentColor: e.target.value }))}
+            />
+          </label>
+          <label>
+            Theme
+            <select value={form.theme} onChange={(e) => setForm((f) => ({ ...f, theme: e.target.value }))}>
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+        </Card>
+
+        <Card className="org-card">
+          <h2>Subscriptions</h2>
+          <label>
+            Tier
+            <select
+              value={form.subscriptionTier}
+              onChange={(e) => setForm((f) => ({ ...f, subscriptionTier: e.target.value }))}
+            >
+              {['free', 'starter', 'professional', 'enterprise', 'academic', 'government'].map((tier) => (
+                <option key={tier} value={tier}>
+                  {tier}
+                </option>
+              ))}
+            </select>
+          </label>
+          <p className="org-pack-meta">
+            Status: {admin?.subscriptions?.current?.status || 'active'} · source:{' '}
+            {admin?.subscriptions?.current?.source || 'tenant'}
+          </p>
+        </Card>
+      </div>
+
+      <div className="org-grid">
+        <Card className="org-card org-admin-wide-card">
+          <h2>Login screen</h2>
+          <label>
+            Login title
+            <input
+              value={form.loginTitle}
+              placeholder="Welcome to your hospital AI portal"
+              onChange={(e) => setForm((f) => ({ ...f, loginTitle: e.target.value }))}
+            />
+          </label>
+          <label>
+            Login subtitle
+            <textarea
+              value={form.loginSubtitle}
+              onChange={(e) => setForm((f) => ({ ...f, loginSubtitle: e.target.value }))}
+              rows={3}
+            />
+          </label>
+          <label>
+            Login background image URL
+            <input
+              value={form.loginBackgroundImageUrl}
+              placeholder="https://cdn.example.com/login-background.jpg"
+              onChange={(e) =>
+                setForm((f) => ({ ...f, loginBackgroundImageUrl: e.target.value }))
+              }
+            />
+          </label>
+        </Card>
+
+        <Card className="org-card org-admin-wide-card">
+          <h2>Dashboard branding</h2>
+          <label>
+            Dashboard title
+            <input
+              value={form.dashboardTitle}
+              placeholder="Hospital Command Center"
+              onChange={(e) => setForm((f) => ({ ...f, dashboardTitle: e.target.value }))}
+            />
+          </label>
+          <label>
+            Dashboard subtitle
+            <textarea
+              value={form.dashboardSubtitle}
+              onChange={(e) => setForm((f) => ({ ...f, dashboardSubtitle: e.target.value }))}
+              rows={3}
+            />
+          </label>
+          <label>
+            Dashboard logo URL
+            <input
+              value={form.dashboardLogoUrl}
+              placeholder="https://cdn.example.com/dashboard-logo.svg"
+              onChange={(e) => setForm((f) => ({ ...f, dashboardLogoUrl: e.target.value }))}
+            />
+          </label>
+        </Card>
+
+        <Card className="org-card org-admin-wide-card">
+          <h2>Departments</h2>
+          <p className="org-pack-meta">One department ID per line. These drive tenant-scoped workspaces and configuration.</p>
+          <textarea
+            value={form.departmentsText}
+            onChange={(e) => setForm((f) => ({ ...f, departmentsText: e.target.value }))}
+            rows={6}
+          />
+        </Card>
+
+        <Card className="org-card org-admin-wide-card">
+          <h2>Workspaces</h2>
+          <p className="org-pack-meta">Workspace defaults are JSON so admins can configure modules and tool access without code.</p>
+          <textarea
+            value={form.workspacesJson}
+            onChange={(e) => setForm((f) => ({ ...f, workspacesJson: e.target.value }))}
+            rows={8}
+          />
+        </Card>
+
+        <Card className="org-card org-admin-wide-card">
+          <h2>Permissions</h2>
+          <p className="org-pack-meta">
+            Overrides are stored in tenant settings. Catalog contains {admin?.permissions?.catalog?.length || 0} permissions.
+          </p>
+          <textarea
+            value={form.permissionsJson}
+            onChange={(e) => setForm((f) => ({ ...f, permissionsJson: e.target.value }))}
+            rows={8}
+          />
+          <div className="org-chip-list">
+            {Object.keys(permissionOverrides).map((role) => (
+              <span key={role} className="org-chip">
+                {role}
+              </span>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="org-card">
+          <h2>Users</h2>
+          <ul className="org-asset-list">
+            {users.map((user) => (
+              <li key={user.membershipId || user.userId}>
+                <span>{user.displayName}</span>
+                <small>
+                  {user.membershipRole} · {user.roleProfileId || 'no role profile'}
+                </small>
+                {user.specialty && <small>{user.specialty}</small>}
+              </li>
+            ))}
+            {!users.length && <li>No tenant users loaded yet.</li>}
+          </ul>
+        </Card>
+
+        <Card className="org-card">
+          <h2>Roles</h2>
+          <div className="org-chip-list">
+            {(admin?.roles?.membershipRoles || []).map((role) => (
+              <span key={role} className="org-chip">
+                {role}
+              </span>
+            ))}
+          </div>
+          <ul className="org-asset-list">
+            {roleProfiles.slice(0, 8).map((role) => (
+              <li key={role.id}>
+                <span>{role.label}</span>
+                <small>{(role.requiredPermissions || []).join(', ') || 'No explicit permissions'}</small>
+              </li>
+            ))}
+          </ul>
+        </Card>
+
+        <Card className="org-card">
+          <h2>Integrations</h2>
+          <label>
+            Enabled slugs
+            <textarea
+              value={form.integrationsText}
+              onChange={(e) => setForm((f) => ({ ...f, integrationsText: e.target.value }))}
+              rows={4}
+            />
+          </label>
+          <label>
+            Requested slugs
+            <textarea
+              value={form.integrationsRequestedText}
+              onChange={(e) => setForm((f) => ({ ...f, integrationsRequestedText: e.target.value }))}
+              rows={4}
+            />
+          </label>
+          <div className="org-integration-list">
+            {integrations.slice(0, 6).map((integration) => (
+              <div key={integration.slug} className="org-integration-row">
+                <span>
+                  <strong>{integration.name}</strong>
+                  <small>{integration.slug}</small>
+                </span>
+                <span className={`org-status-pill org-status-pill--${integration.status}`}>
+                  {integration.status}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <div className="org-page-actions">
+        <Button onClick={save}>Save tenant administration</Button>
+        <Button variant="ghost" onClick={load}>
+          Reload
+        </Button>
+      </div>
+      {status && <p className="org-status">{status}</p>}
     </div>
   );
 }

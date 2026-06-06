@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Req, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
@@ -40,6 +40,7 @@ export class AnalyticsController {
   @Post('analytics/events')
   async submitAnalyticsEvents(
     @Body() payload: AnalyticsPayloadDto,
+    @Req() req: any,
   ): Promise<{ status: string; recorded: number }> {
     const events = payload.events || [];
 
@@ -54,7 +55,11 @@ export class AnalyticsController {
         event: eventName,
         userId: event.userId,
         sessionId: event.sessionId || payload.sessionId || 'unknown',
-        properties: parameters,
+        properties: {
+          ...parameters,
+          organizationId: parameters.organizationId || req.tenantContext?.organizationId,
+          workspaceId: parameters.workspaceId || req.tenantContext?.workspaceId,
+        },
         timestamp,
       };
     });
@@ -70,6 +75,7 @@ export class AnalyticsController {
   @UseGuards(AuthGuard('jwt'), AuthorizationGuard)
   @RequirePermission(Permission.VIEW_ANALYTICS)
   async getMetrics(
+    @Req() req: any,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
     @Query('userId') userId?: string,
@@ -77,7 +83,12 @@ export class AnalyticsController {
     const end = endDate ? new Date(endDate) : new Date();
     const start = startDate ? new Date(startDate) : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
-    return this.analyticsService.getEventMetrics(start, end, userId);
+    return this.analyticsService.getEventMetrics(
+      start,
+      end,
+      userId,
+      req.tenantContext?.organizationId,
+    );
   }
 
   @Post('crashes')

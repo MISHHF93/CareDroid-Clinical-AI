@@ -230,7 +230,7 @@ Asset lifecycle should control catalog and launch behavior:
 - `draft`: visible only to platform or organization admins.
 - `active`: eligible for tenant entitlement and normal launch.
 - `deprecated`: hidden from discovery and shown with a deprecation warning on deep link.
-- `admin_only`: visible and launchable only to users with the required admin permission.
+- Admin-only access: controlled through permission policy, governance metadata, feature flags, or entitlement rules rather than lifecycle.
 
 ## Asset Packs
 

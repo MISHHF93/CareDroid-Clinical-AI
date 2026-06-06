@@ -31,6 +31,68 @@ interface UsagePeriod {
   end: Date;
 }
 
+type MeterBillingReadiness = 'operational' | 'future-billing-candidate';
+
+type UsageMeterDefinition = {
+  id: string;
+  label: string;
+  eventTypes: UsageEventType[];
+  unit: UsageUnit;
+  billingReadiness: MeterBillingReadiness;
+  description: string;
+};
+
+const USAGE_METERING_FRAMEWORK: UsageMeterDefinition[] = [
+  {
+    id: 'active-users',
+    label: 'Active users',
+    eventTypes: [UsageEventType.ACTIVE_USER],
+    unit: 'user',
+    billingReadiness: 'future-billing-candidate',
+    description: 'Unique tenant users observed through usage events plus explicit active-user meters.',
+  },
+  {
+    id: 'ai-requests',
+    label: 'AI requests',
+    eventTypes: [UsageEventType.AI_CALL],
+    unit: 'call',
+    billingReadiness: 'future-billing-candidate',
+    description: 'AI calls and model-backed assistant requests.',
+  },
+  {
+    id: 'simulation-runs',
+    label: 'Simulation runs',
+    eventTypes: [UsageEventType.SIMULATION],
+    unit: 'run',
+    billingReadiness: 'future-billing-candidate',
+    description: 'Simulation starts, completions, and scenario run meters.',
+  },
+  {
+    id: 'workflow-executions',
+    label: 'Workflow executions',
+    eventTypes: [UsageEventType.API_CALL, UsageEventType.TOOL_LAUNCH],
+    unit: 'execution',
+    billingReadiness: 'future-billing-candidate',
+    description: 'Workflow execution events identified by workflow metadata.',
+  },
+  {
+    id: 'api-calls',
+    label: 'API calls',
+    eventTypes: [UsageEventType.API_CALL],
+    unit: 'request',
+    billingReadiness: 'operational',
+    description: 'Tenant-scoped backend API requests recorded by the metering interceptor.',
+  },
+  {
+    id: 'integrations',
+    label: 'Integrations',
+    eventTypes: [UsageEventType.INTEGRATION, UsageEventType.API_CALL],
+    unit: 'event',
+    billingReadiness: 'future-billing-candidate',
+    description: 'Integration syncs, connector calls, and integration-tagged API events.',
+  },
+];
+
 @Injectable()
 export class UsageMeteringService {
   constructor(
@@ -146,8 +208,156 @@ export class UsageMeteringService {
     };
   }
 
+  async getUsageMeteringFramework(options: {
+    organizationId: string;
+    period?: string;
+  }) {
+    const period = this.resolvePeriod(options.period || 'month');
+    const events = await this.usageEventRepository.find({
+      where: {
+        organizationId: options.organizationId,
+        occurredAt: Between(period.start, period.end),
+      },
+      order: { occurredAt: 'DESC' },
+    });
+
+    const meters = USAGE_METERING_FRAMEWORK.map((definition) =>
+      this.buildFrameworkMeter(definition, events),
+    );
+
+    return {
+      organizationId: options.organizationId,
+      generatedAt: new Date().toISOString(),
+      period: this.serializePeriod(period),
+      storage: {
+        source: 'usage_events',
+        billingSeparated: true,
+        description:
+          'Usage metrics are stored as tenant-scoped operational events and are not invoices, charges, or Stripe usage records.',
+      },
+      meters,
+      categories: {
+        engagement: meters.filter((meter) =>
+          ['active-users', 'ai-requests', 'simulation-runs', 'workflow-executions'].includes(
+            meter.id,
+          ),
+        ),
+        platform: meters.filter((meter) => meter.id === 'api-calls'),
+        integrations: meters.filter((meter) => meter.id === 'integrations'),
+      },
+      billingReadiness: {
+        currentBilling: 'plan-limit summaries only; no metered charges are created from this endpoint',
+        futureBillingCandidates: meters
+          .filter((meter) => meter.billingReadiness === 'future-billing-candidate')
+          .map((meter) => meter.id),
+        retainedDimensions: ['organization', 'workspace', 'asset', 'role', 'user', 'integration'],
+      },
+      breakdowns: {
+        byWorkspace: this.groupUsage(events, (event) => event.workspaceId || 'unknown'),
+        byAsset: this.groupUsage(events, (event) => event.assetId || 'unknown'),
+        byRole: this.groupUsage(events, (event) => event.userRole || 'unknown'),
+        byMeter: this.groupUsage(events, (event) => this.meterIdForEvent(event)),
+        byIntegration: this.groupUsage(
+          events.filter((event) => this.isIntegrationEvent(event)),
+          (event) => this.integrationKey(event),
+        ),
+      },
+      recentEvents: events.slice(0, 25).map((event) => ({
+        id: event.id,
+        eventType: event.eventType,
+        meterId: this.meterIdForEvent(event),
+        quantity: Number(event.quantity || 0),
+        unit: event.unit,
+        workspaceId: event.workspaceId,
+        assetId: event.assetId,
+        userRole: event.userRole,
+        integration: this.isIntegrationEvent(event) ? this.integrationKey(event) : null,
+        occurredAt: event.occurredAt,
+      })),
+    };
+  }
+
   getPlanForTier(tier?: string | null): SubscriptionPlanDefinition {
     return getSubscriptionPlanDefinition(tier);
+  }
+
+  private buildFrameworkMeter(definition: UsageMeterDefinition, events: UsageEvent[]) {
+    const matchedEvents = events.filter((event) => this.eventMatchesMeter(definition.id, event));
+    const value =
+      definition.id === 'active-users'
+        ? this.activeUserValue(events)
+        : this.sum(matchedEvents);
+    return {
+      id: definition.id,
+      label: definition.label,
+      value,
+      unit: definition.unit,
+      eventTypes: definition.eventTypes,
+      events: matchedEvents.length,
+      billingReadiness: definition.billingReadiness,
+      billingSeparated: true,
+      description: definition.description,
+    };
+  }
+
+  private eventMatchesMeter(meterId: string, event: UsageEvent) {
+    if (meterId === 'active-users') {
+      return Boolean(event.userId) || event.eventType === UsageEventType.ACTIVE_USER;
+    }
+    if (meterId === 'workflow-executions') return this.isWorkflowEvent(event);
+    if (meterId === 'integrations') return this.isIntegrationEvent(event);
+    const definition = USAGE_METERING_FRAMEWORK.find((meter) => meter.id === meterId);
+    return Boolean(definition?.eventTypes.includes(event.eventType));
+  }
+
+  private meterIdForEvent(event: UsageEvent) {
+    if (this.isIntegrationEvent(event)) return 'integrations';
+    if (this.isWorkflowEvent(event)) return 'workflow-executions';
+    if (event.eventType === UsageEventType.AI_CALL) return 'ai-requests';
+    if (event.eventType === UsageEventType.SIMULATION) return 'simulation-runs';
+    if (event.eventType === UsageEventType.API_CALL) return 'api-calls';
+    if (event.eventType === UsageEventType.ACTIVE_USER) return 'active-users';
+    return event.eventType;
+  }
+
+  private activeUserValue(events: UsageEvent[]) {
+    const explicitActiveUsers = this.sum(
+      events.filter((event) => event.eventType === UsageEventType.ACTIVE_USER),
+    );
+    const uniqueUsers = this.countUnique(
+      events.map((event) => event.userId).filter(Boolean) as string[],
+    );
+    return Math.max(uniqueUsers, explicitActiveUsers);
+  }
+
+  private isWorkflowEvent(event: UsageEvent) {
+    const text = this.metadataText(event, ['surface', 'eventType', 'workflowId', 'workflowSlug']);
+    return text.includes('workflow');
+  }
+
+  private isIntegrationEvent(event: UsageEvent) {
+    if (event.eventType === UsageEventType.INTEGRATION) return true;
+    const text = this.metadataText(event, [
+      'surface',
+      'eventType',
+      'integrationId',
+      'integrationSlug',
+      'connector',
+      'path',
+    ]);
+    return text.includes('integration') || text.includes('/integrations/');
+  }
+
+  private integrationKey(event: UsageEvent) {
+    const metadata = this.metadata(event);
+    return (
+      this.metadataString(metadata, 'integrationSlug') ||
+      this.metadataString(metadata, 'integrationId') ||
+      this.metadataString(metadata, 'connector') ||
+      this.integrationKeyFromPath(this.metadataString(metadata, 'path')) ||
+      event.assetId ||
+      'integration'
+    );
   }
 
   private groupUsage(events: UsageEvent[], keyOf: (event: UsageEvent) => string) {
@@ -168,6 +378,35 @@ export class UsageMeteringService {
 
   private countUnique(values: string[]): number {
     return new Set(values).size;
+  }
+
+  private metadataText(row: { metadata?: Record<string, any> | string | null }, keys: string[]) {
+    const metadata = this.metadata(row);
+    return keys.map((key) => metadata?.[key]).filter(Boolean).join(' ').toLowerCase();
+  }
+
+  private metadataString(metadata: Record<string, any>, key: string): string | null {
+    const value = metadata?.[key];
+    return typeof value === 'string' && value.trim() ? value : null;
+  }
+
+  private metadata(row: { metadata?: Record<string, any> | string | null }) {
+    if (!row.metadata) return {};
+    if (typeof row.metadata === 'string') {
+      try {
+        return JSON.parse(row.metadata);
+      } catch {
+        return {};
+      }
+    }
+    return row.metadata;
+  }
+
+  private integrationKeyFromPath(path: string | null) {
+    if (!path) return null;
+    const segments = path.split('/').filter(Boolean);
+    const index = segments.findIndex((segment) => segment === 'integrations');
+    return index >= 0 && segments[index + 1] ? segments[index + 1] : null;
   }
 
   private defaultUnitFor(eventType: UsageEventType): UsageUnit {

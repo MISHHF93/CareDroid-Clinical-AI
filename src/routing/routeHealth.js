@@ -81,6 +81,8 @@ const BACKEND_CONTRACT_BY_APP_PATH = Object.freeze({
   '/devices': ['/api/hospital-map/devices'],
   '/fleet/map': ['/api/fleet/vehicles/live', '/api/fleet/routes/active'],
   '/system-health': ['/health', '/api/system-health'],
+  '/saas-health': ['/api/saas-health'],
+  '/governance-registry': ['/api/platform/governance-registry'],
   '/audit': ['/api/audit/logs', '/api/audit/statistics'],
   '/ai-governance': ['/api/ai-governance/summary', '/api/platform-governance/summary'],
   '/security': ['/api/security/summary', '/api/governance/ai-security/summary'],

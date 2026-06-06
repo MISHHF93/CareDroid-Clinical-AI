@@ -10,6 +10,8 @@ import {
   requestComplianceAccountDeletion,
   requestComplianceDataExport,
 } from '../services/complianceApi';
+import { fetchIdentityProviderRegistry } from '../services/enterpriseIdentityApi';
+import { fetchTenantDataIsolationAudit } from '../services/tenantIsolationApi';
 import {
   createCheckoutSession,
   createCustomerPortalSession,
@@ -57,6 +59,10 @@ const Settings = () => {
   const [subscription, setSubscription] = useState(null);
   const [plans, setPlans] = useState([]);
   const [selectedPlanId, setSelectedPlanId] = useState('');
+  const [identityRegistry, setIdentityRegistry] = useState(null);
+  const [identityStatus, setIdentityStatus] = useState('');
+  const [tenantIsolationAudit, setTenantIsolationAudit] = useState(null);
+  const [tenantIsolationStatus, setTenantIsolationStatus] = useState('');
   const { preference, resolvedTheme, setPreference } = useTheme();
   const { user, authToken, isAuthenticated, isLoading: authLoading } = useUser();
   const { success, error } = useNotificationActions();
@@ -116,6 +122,51 @@ const Settings = () => {
     }
 
     loadBilling();
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, canLoadBilling]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    fetchIdentityProviderRegistry().then((result) => {
+      if (cancelled) return;
+      if (result.ok) {
+        setIdentityRegistry(result.data);
+        setIdentityStatus('');
+      } else {
+        setIdentityRegistry(null);
+        setIdentityStatus(result.message || 'Unable to load identity provider registry.');
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (authLoading) return undefined;
+    if (!canLoadBilling) {
+      setTenantIsolationAudit(null);
+      setTenantIsolationStatus('Sign in as a tenant administrator to view the isolation audit.');
+      return undefined;
+    }
+
+    fetchTenantDataIsolationAudit().then((result) => {
+      if (cancelled) return;
+      if (result.ok) {
+        setTenantIsolationAudit(result.data);
+        setTenantIsolationStatus('');
+      } else {
+        setTenantIsolationAudit(null);
+        setTenantIsolationStatus(result.message || 'Unable to load tenant isolation audit.');
+      }
+    });
+
     return () => {
       cancelled = true;
     };
@@ -399,6 +450,107 @@ const Settings = () => {
                 Request data deletion
               </Button>
             </div>
+          </section>
+
+          <section className="settings-billing-card" aria-labelledby="enterprise-identity-title">
+            <div className="settings-billing-card__header">
+              <div>
+                <h3 id="enterprise-identity-title">Enterprise Identity</h3>
+                <p>
+                  Identity Provider Registry for SSO, SAML, OIDC, Azure AD, Okta, and Google
+                  Workspace readiness.
+                </p>
+              </div>
+              <span className="settings-billing-card__badge">Registry</span>
+            </div>
+
+            {identityStatus ? (
+              <div className="settings-billing-empty">{identityStatus}</div>
+            ) : (
+              <>
+                <div className="settings-billing-summary">
+                  <div>
+                    <span className="settings-billing-label">Supported</span>
+                    <strong>{identityRegistry?.summary?.supported ?? 0}</strong>
+                  </div>
+                  <div>
+                    <span className="settings-billing-label">Planned</span>
+                    <strong>{identityRegistry?.summary?.planned ?? 0}</strong>
+                  </div>
+                  <div>
+                    <span className="settings-billing-label">Unavailable</span>
+                    <strong>{identityRegistry?.summary?.unavailable ?? 0}</strong>
+                  </div>
+                </div>
+
+                <div className="settings-billing-plan-details">
+                  {(identityRegistry?.providers || []).map((provider) => (
+                    <div key={provider.id}>
+                      <strong>{provider.name}</strong>
+                      <span>
+                        {provider.status} · {provider.protocol}
+                        {provider.entryPath ? ` · ${provider.entryPath}` : ''}
+                      </span>
+                      <span>{provider.notes}</span>
+                    </div>
+                  ))}
+                  {!identityRegistry?.providers?.length && <span>Loading identity providers...</span>}
+                </div>
+              </>
+            )}
+          </section>
+
+          <section className="settings-billing-card" aria-labelledby="tenant-isolation-title">
+            <div className="settings-billing-card__header">
+              <div>
+                <h3 id="tenant-isolation-title">Tenant Data Isolation Audit</h3>
+                <p>
+                  Organization, user, workspace, asset, analytics, and audit-log controls that
+                  prevent cross-tenant data access.
+                </p>
+              </div>
+              <span className="settings-billing-card__badge">Tenant admin</span>
+            </div>
+
+            {tenantIsolationStatus ? (
+              <div className="settings-billing-empty">{tenantIsolationStatus}</div>
+            ) : (
+              <>
+                <div className="settings-billing-summary">
+                  <div>
+                    <span className="settings-billing-label">Status</span>
+                    <strong>{tenantIsolationAudit?.status || 'Loading...'}</strong>
+                  </div>
+                  <div>
+                    <span className="settings-billing-label">Domains audited</span>
+                    <strong>{tenantIsolationAudit?.summary?.auditedDomains ?? 0}</strong>
+                  </div>
+                  <div>
+                    <span className="settings-billing-label">Cross-tenant read</span>
+                    <strong>
+                      {tenantIsolationAudit?.summary?.crossTenantReadAllowed === false
+                        ? 'Blocked'
+                        : 'Loading...'}
+                    </strong>
+                  </div>
+                </div>
+
+                <div className="settings-billing-plan-details">
+                  {(tenantIsolationAudit?.domains || []).map((domain) => (
+                    <div key={domain.id}>
+                      <strong>{domain.name}</strong>
+                      <span>
+                        {domain.status} · {domain.tenantBoundary}
+                      </span>
+                      <span>{domain.residualRisk}</span>
+                    </div>
+                  ))}
+                  {!tenantIsolationAudit?.domains?.length && (
+                    <span>Loading tenant isolation audit...</span>
+                  )}
+                </div>
+              </>
+            )}
           </section>
 
           <section className="settings-billing-card" aria-labelledby="settings-billing-title">

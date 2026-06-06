@@ -12,9 +12,16 @@ export const SUPPORTED_ORGANIZATION_TYPES = Object.freeze([
 export type BrandingModel = {
   displayName: string;
   logoUrl?: string | null;
+  faviconUrl?: string | null;
   primaryColor?: string | null;
   accentColor?: string | null;
   theme?: string | null;
+  loginTitle?: string | null;
+  loginSubtitle?: string | null;
+  loginBackgroundImageUrl?: string | null;
+  dashboardTitle?: string | null;
+  dashboardSubtitle?: string | null;
+  dashboardLogoUrl?: string | null;
 };
 
 export type TenantModel = {

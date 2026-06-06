@@ -3,6 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { API_ROUTES, normalizeApiPath } from './api.config';
+import appConfig, { SUPPORTED_APP_ENVIRONMENTS, normalizeAppEnvironment } from './appConfig';
 import { AUTH_CONFIG } from './auth.config';
 import { FEATURE_FLAGS } from './featureFlags.config';
 import {
@@ -153,6 +154,27 @@ describe('canonical configuration contract', () => {
     expect(FEATURE_FLAGS).toHaveProperty('enableDevAuthBypass');
     expect(read('config/env.config.js')).toContain("from './featureFlags.config'");
     expect(read('config/auth.config.js')).toContain("from './env.config'");
+  });
+
+  it('normalizes frontend environment config and deployment metadata', () => {
+    expect(SUPPORTED_APP_ENVIRONMENTS).toEqual([
+      'local',
+      'development',
+      'staging',
+      'production',
+    ]);
+    expect(normalizeAppEnvironment('dev')).toBe('development');
+    expect(normalizeAppEnvironment('prod')).toBe('production');
+    expect(normalizeAppEnvironment('staging')).toBe('staging');
+    expect(normalizeAppEnvironment('qa')).toBe('development');
+    expect(appConfig.app.environmentValidation.allowed).toBe(SUPPORTED_APP_ENVIRONMENTS);
+    expect(appConfig.app.deployment).toEqual(
+      expect.objectContaining({
+        id: expect.any(String),
+        commit: expect.any(String),
+        branch: expect.any(String),
+      })
+    );
   });
 
   it('centralizes theme and layout contracts without page-owned viewport shells', () => {

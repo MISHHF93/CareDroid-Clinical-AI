@@ -9,6 +9,8 @@ import {
   fetchCurrentSubscription,
   fetchSubscriptionPlans,
 } from '../services/subscriptionApi';
+import { fetchIdentityProviderRegistry } from '../services/enterpriseIdentityApi';
+import { fetchTenantDataIsolationAudit } from '../services/tenantIsolationApi';
 import { createMockUserValue } from '../test/testRenderUtils';
 
 let mockUserState;
@@ -46,6 +48,14 @@ vi.mock('../services/subscriptionApi', () => ({
   fetchSubscriptionPlans: vi.fn(),
   createCheckoutSession: vi.fn(),
   createCustomerPortalSession: vi.fn(),
+}));
+
+vi.mock('../services/enterpriseIdentityApi', () => ({
+  fetchIdentityProviderRegistry: vi.fn(),
+}));
+
+vi.mock('../services/tenantIsolationApi', () => ({
+  fetchTenantDataIsolationAudit: vi.fn(),
 }));
 
 function renderSettings() {
@@ -87,6 +97,41 @@ describe('Settings Billing card', () => {
     });
     createCheckoutSession.mockResolvedValue({ ok: true, data: {} });
     createCustomerPortalSession.mockResolvedValue({ ok: true, data: {} });
+    fetchIdentityProviderRegistry.mockResolvedValue({
+      ok: true,
+      data: {
+        summary: { supported: 1, planned: 5, unavailable: 0 },
+        providers: [
+          {
+            id: 'google-workspace',
+            name: 'Google Workspace',
+            status: 'supported',
+            protocol: 'oauth2',
+            entryPath: '/api/auth/google',
+            notes: 'Google OAuth is configured.',
+          },
+        ],
+      },
+    });
+    fetchTenantDataIsolationAudit.mockResolvedValue({
+      ok: true,
+      data: {
+        status: 'tenant_isolated',
+        summary: {
+          auditedDomains: 6,
+          crossTenantReadAllowed: false,
+        },
+        domains: [
+          {
+            id: 'audit-logs',
+            name: 'Audit Logs',
+            status: 'enforced',
+            tenantBoundary: 'organizationId',
+            residualRisk: 'Integrity verification remains global.',
+          },
+        ],
+      },
+    });
   });
 
   it('renders backend-returned plan, status, payment state, and plan details', async () => {
@@ -139,5 +184,24 @@ describe('Settings Billing card', () => {
     expect(await screen.findByText(/sign in to view current plan/i)).toBeInTheDocument();
     expect(fetchCurrentSubscription).not.toHaveBeenCalled();
     expect(fetchSubscriptionPlans).not.toHaveBeenCalled();
+  });
+
+  it('renders enterprise identity provider registry readiness', async () => {
+    renderSettings();
+
+    expect(await screen.findByRole('heading', { name: /enterprise identity/i })).toBeInTheDocument();
+    expect(screen.getByText('Google Workspace')).toBeInTheDocument();
+    expect(screen.getByText(/supported · oauth2 · \/api\/auth\/google/i)).toBeInTheDocument();
+  });
+
+  it('renders tenant data isolation audit readiness', async () => {
+    renderSettings();
+
+    expect(
+      await screen.findByRole('heading', { name: /tenant data isolation audit/i })
+    ).toBeInTheDocument();
+    expect(screen.getByText('tenant_isolated')).toBeInTheDocument();
+    expect(screen.getByText('Audit Logs')).toBeInTheDocument();
+    expect(screen.getByText(/enforced · organizationId/i)).toBeInTheDocument();
   });
 });

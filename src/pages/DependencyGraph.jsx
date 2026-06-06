@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { ProductCatalogApi } from '../services/productCatalogApi';
 import './DependencyGraph.css';
 
@@ -40,13 +41,14 @@ function StageChain({ chain }) {
 }
 
 export default function DependencyGraph() {
+  const { organization } = useUserIdentity();
   const [graph, setGraph] = useState({ chains: [], issues: [], issueCounts: {}, summary: {} });
   const [issueFilter, setIssueFilter] = useState('all');
   const [status, setStatus] = useState('Loading dependency graph...');
 
   useEffect(() => {
     let active = true;
-    ProductCatalogApi.getAssetDependencyGraph()
+    ProductCatalogApi.getAssetDependencyGraph(organization?.id)
       .then((data) => {
         if (!active) return;
         setGraph(data);
@@ -58,7 +60,7 @@ export default function DependencyGraph() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [organization?.id]);
 
   const visibleIssues = useMemo(
     () =>

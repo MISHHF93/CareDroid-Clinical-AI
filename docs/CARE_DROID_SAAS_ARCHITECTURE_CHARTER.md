@@ -15,7 +15,7 @@ CareDroid is a **multi-tenant healthcare operating system**. Configuration (orga
 4. **Every asset can be assigned to a workspace** — Scoped via `enabledToolIds`, `LEGACY_TOOL_ID_ALIASES`, or workspace tags.
 5. **Every asset can be assigned to a role** — `role_profiles`, pack `targetRoles`, and/or asset `intendedRoles`.
 6. **Every asset has governance metadata** — `governance` JSON: clinical risk, human review, audit expectations, validation status.
-7. **Every asset has lifecycle status** — `lifecycle`: `draft` | `active` | `deprecated` | `admin_only` (or inventory `lifecycleState` during migration).
+7. **Every asset has lifecycle status** — `lifecycle`: `draft` | `beta` | `active` | `deprecated` | `archived` (or inventory `lifecycleState` during migration).
 
 ## Layer model
 

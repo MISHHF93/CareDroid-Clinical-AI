@@ -33,6 +33,8 @@ export class AnalyticsService {
     const analyticsEvent = this.analyticsEventRepository.create({
       event,
       userId,
+      organizationId: properties?.organizationId,
+      workspaceId: properties?.workspaceId,
       sessionId,
       properties: properties || {},
       platform: properties?.platform,
@@ -60,6 +62,8 @@ export class AnalyticsService {
       this.analyticsEventRepository.create({
         event: e.event,
         userId: e.userId,
+        organizationId: e.properties?.organizationId,
+        workspaceId: e.properties?.workspaceId,
         sessionId: e.sessionId,
         properties: e.properties || {},
         platform: e.properties?.platform,
@@ -77,13 +81,21 @@ export class AnalyticsService {
   /**
    * Get event metrics for a date range
    */
-  async getEventMetrics(startDate: Date, endDate: Date, userId?: string): Promise<EventMetrics> {
+  async getEventMetrics(
+    startDate: Date,
+    endDate: Date,
+    userId?: string,
+    organizationId?: string,
+  ): Promise<EventMetrics> {
     const whereClause: any = {
       createdAt: Between(startDate, endDate),
     };
 
     if (userId) {
       whereClause.userId = userId;
+    }
+    if (organizationId) {
+      whereClause.organizationId = organizationId;
     }
 
     const events = await this.analyticsEventRepository.find({
@@ -114,6 +126,9 @@ export class AnalyticsService {
       .createQueryBuilder('event')
       .select('COUNT(DISTINCT event.userId)', 'count')
       .where('event.createdAt > :yesterday', { yesterday })
+      .andWhere(organizationId ? 'event.organizationId = :organizationId' : '1=1', {
+        organizationId,
+      })
       .getRawOne()
       .then((result) => parseInt(result.count) || 0);
 
@@ -124,6 +139,9 @@ export class AnalyticsService {
       .createQueryBuilder('event')
       .select('COUNT(DISTINCT event.userId)', 'count')
       .where('event.createdAt > :lastWeek', { lastWeek })
+      .andWhere(organizationId ? 'event.organizationId = :organizationId' : '1=1', {
+        organizationId,
+      })
       .getRawOne()
       .then((result) => parseInt(result.count) || 0);
 
@@ -134,6 +152,9 @@ export class AnalyticsService {
       .createQueryBuilder('event')
       .select('COUNT(DISTINCT event.userId)', 'count')
       .where('event.createdAt > :lastMonth', { lastMonth })
+      .andWhere(organizationId ? 'event.organizationId = :organizationId' : '1=1', {
+        organizationId,
+      })
       .getRawOne()
       .then((result) => parseInt(result.count) || 0);
 

@@ -83,6 +83,26 @@ export class OrganizationsController {
     return this.organizationsService.getEngineForUser(req.user, organizationId);
   }
 
+  @Get(':organizationId/tenant-admin')
+  @OrganizationScoped()
+  @ApiOperation({ summary: 'Get tenant administration center model for the organization' })
+  async getTenantAdministration(@Req() req: any, @Param('organizationId') organizationId: string) {
+    this.assertTenantOrganization(req, organizationId);
+    return this.organizationsService.getTenantAdministration(req.user, organizationId);
+  }
+
+  @Patch(':organizationId/tenant-admin')
+  @OrganizationScoped({ admin: 'organization' })
+  @ApiOperation({ summary: 'Update tenant-scoped administration settings without code changes' })
+  async updateTenantAdministration(
+    @Req() req: any,
+    @Param('organizationId') organizationId: string,
+    @Body() dto: Record<string, unknown>,
+  ) {
+    this.assertTenantOrganization(req, organizationId);
+    return this.organizationsService.updateTenantAdministration(req.user, organizationId, dto);
+  }
+
   @Patch(':organizationId')
   @OrganizationScoped({ admin: 'organization' })
   @ApiOperation({ summary: 'Update organization settings' })

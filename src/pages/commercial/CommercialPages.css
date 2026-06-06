@@ -25,6 +25,15 @@
   gap: 16px;
 }
 
+.commercial-section {
+  margin-top: 24px;
+}
+
+.commercial-section > h2 {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+}
+
 .commercial-card {
   padding: 18px;
 }

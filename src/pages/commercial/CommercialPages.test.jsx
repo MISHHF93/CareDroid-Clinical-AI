@@ -7,10 +7,12 @@ import {
   CarePathwayDetailPage,
   CarePathwaysIndexPage,
   ConfigurationStudioPage,
+  HospitalSolutionBuilderPage,
   IntegrationReadinessPage,
   OrganizationOnboardingPage,
   ProductDetailPage,
   ProductsIndexPage,
+  ValueTrackingPage,
 } from './CommercialPages';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
@@ -40,11 +42,14 @@ vi.mock('../../services/productCatalogApi', () => ({
     getCarePathway: vi.fn(),
     getProductBuilder: vi.fn(),
     getIntegrationReadiness: vi.fn(),
+    getOrganizationValueTracking: vi.fn(),
     listAgents: vi.fn(),
     listCarePathways: vi.fn(),
     listProductBuilder: vi.fn(),
     listAssetPackBuilder: vi.fn(),
     listSpecialties: vi.fn(),
+    getHospitalSolutionRecommendation: vi.fn(),
+    applyHospitalSolution: vi.fn(),
     requestIntegration: vi.fn(),
     updateOrganizationConfiguration: vi.fn(),
   },
@@ -253,6 +258,80 @@ const integrationReadiness = {
   ],
 };
 
+const valueTracking = {
+  organizationId: 'org-1',
+  period: { key: 'month' },
+  executiveSummary: {
+    enabledPackCount: 4,
+    activeUsers: 12,
+    totalEngagementEvents: 88,
+    outcomeSignalCount: 6,
+  },
+  categories: {
+    clinical: [
+      {
+        id: 'protocol-adherence',
+        label: 'Protocol adherence',
+        value: 82,
+        unit: 'percent',
+        numerator: 41,
+        denominator: 50,
+        status: 'on-track',
+        description: 'Protocol adherence events.',
+      },
+      {
+        id: 'simulation-completion',
+        label: 'Simulation completion',
+        value: 9,
+        unit: 'count',
+        status: 'on-track',
+        description: 'Completed simulation runs.',
+      },
+    ],
+    operational: [
+      {
+        id: 'fleet-uptime',
+        label: 'Fleet uptime',
+        value: 97,
+        unit: 'percent',
+        status: 'on-track',
+        description: 'Fleet availability.',
+      },
+      {
+        id: 'response-times',
+        label: 'Response times',
+        value: 850,
+        unit: 'milliseconds',
+        status: 'on-track',
+        description: 'Average response time.',
+      },
+    ],
+    executive: [
+      {
+        id: 'adoption',
+        label: 'Adoption',
+        value: 29,
+        unit: 'percent',
+        status: 'watch',
+        description: 'Enabled pack adoption.',
+      },
+      {
+        id: 'engagement',
+        label: 'Engagement',
+        value: 12,
+        unit: 'count',
+        status: 'on-track',
+        description: 'Active users.',
+      },
+    ],
+  },
+  sources: {
+    auditEvents: 50,
+    usageEvents: 38,
+    enabledEntitlements: 4,
+  },
+};
+
 function renderPage(element) {
   return render(<MemoryRouter>{element}</MemoryRouter>);
 }
@@ -282,6 +361,16 @@ function renderProductDetail(route = '/products/emergency-department-suite') {
   );
 }
 
+function renderSolutionBuilderRoute(route = '/solution-builder') {
+  return render(
+    <MemoryRouter initialEntries={[route]}>
+      <Routes>
+        <Route path="/solution-builder" element={<HospitalSolutionBuilderPage />} />
+      </Routes>
+    </MemoryRouter>
+  );
+}
+
 async function renderOnboardingPage() {
   const view = renderPage(<OrganizationOnboardingPage />);
   await act(async () => {});
@@ -298,8 +387,26 @@ describe('Commercial builder pages', () => {
     ProductCatalogApi.listCarePathways.mockResolvedValue(carePathwayRows);
     ProductCatalogApi.getCarePathway.mockResolvedValue(carePathwayDetail);
     ProductCatalogApi.getIntegrationReadiness.mockResolvedValue(integrationReadiness);
+    ProductCatalogApi.getOrganizationValueTracking.mockResolvedValue(valueTracking);
     ProductCatalogApi.requestIntegration.mockResolvedValue({});
     ProductCatalogApi.listSpecialties.mockResolvedValue(specialtyRows);
+    ProductCatalogApi.getHospitalSolutionRecommendation.mockResolvedValue({
+      recommendedCommercialPlanId: 'enterprise',
+      products: [{ id: 'product-emergency-department', name: 'Emergency Department Solution' }],
+      packs: [{ id: 'emergency-department-pack', name: 'Emergency Department Pack' }],
+      workspaces: [{ id: 'emergency', name: 'Emergency Department' }],
+      aiAgents: [{ id: 'agent-emergency', title: 'Emergency AI' }],
+      integrations: [{ id: 'fhir-patient', slug: 'fhir-patient', name: 'FHIR Patient' }],
+      rationale: [{ type: 'department', message: '1 departments mapped to 1 product lines.' }],
+      configurationPatch: {
+        enabledProductIds: ['product-emergency-department'],
+        enabledPackIds: ['core-platform', 'emergency-department-pack'],
+        enabledAgentIds: ['agent-emergency'],
+        workspaceDefaults: [{ id: 'emergency', enabledToolIds: ['qsofa'] }],
+        integrationsRequested: ['fhir-patient'],
+      },
+    });
+    ProductCatalogApi.applyHospitalSolution.mockResolvedValue({ organizationId: 'org-1' });
     ProductCatalogApi.updateOrganizationConfiguration.mockResolvedValue({});
     ProductCatalogApi.completeOnboarding.mockResolvedValue({
       tenantProfile: {
@@ -396,6 +503,70 @@ describe('Commercial builder pages', () => {
       expect(ProductCatalogApi.requestIntegration).toHaveBeenCalledWith('org-1', 'fhir-patient');
     });
     expect(screen.getByText(/requested: fhir-patient/i)).toBeInTheDocument();
+  });
+
+  it('renders value tracking categories and period filter', async () => {
+    renderPage(<ValueTrackingPage />);
+
+    expect(await screen.findByRole('heading', { name: /^value tracking$/i })).toBeInTheDocument();
+    expect(ProductCatalogApi.getOrganizationValueTracking).toHaveBeenCalledWith('org-1', 'month');
+    expect(screen.getByRole('heading', { name: /protocol adherence/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /fleet uptime/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /adoption/i })).toBeInTheDocument();
+    expect(screen.getByText(/audit events: 50/i)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/value tracking period/i), {
+      target: { value: 'week' },
+    });
+
+    await waitFor(() => {
+      expect(ProductCatalogApi.getOrganizationValueTracking).toHaveBeenCalledWith('org-1', 'week');
+    });
+  });
+
+  it('builds and applies a hospital solution recommendation', async () => {
+    renderPage(<HospitalSolutionBuilderPage />);
+
+    expect(screen.getByRole('heading', { name: /hospital solution builder/i })).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/hospital type/i), {
+      target: { value: 'academic_medical_center' },
+    });
+    fireEvent.click(screen.getAllByRole('button', { name: /laboratory/i })[0]);
+    fireEvent.click(screen.getByRole('button', { name: /generate recommendation/i }));
+
+    await waitFor(() => {
+      expect(ProductCatalogApi.getHospitalSolutionRecommendation).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organizationId: 'org-1',
+          hospitalType: 'academic_medical_center',
+          departmentIds: expect.arrayContaining(['emergency', 'laboratory']),
+        }),
+      );
+    });
+
+    expect(await screen.findByText(/recommended caredroid deployment generated/i)).toBeInTheDocument();
+    expect(screen.getByText(/recommended plan/i)).toBeInTheDocument();
+    expect(screen.getByText(/emergency department solution/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/configuration patch preview/i).value).toContain('enabledProductIds');
+
+    fireEvent.click(screen.getByRole('button', { name: /apply to organization/i }));
+
+    await waitFor(() => {
+      expect(ProductCatalogApi.applyHospitalSolution).toHaveBeenCalledWith({
+        organizationId: 'org-1',
+        commercialPlanId: 'enterprise',
+        configurationPatch: expect.objectContaining({
+          enabledPackIds: ['core-platform', 'emergency-department-pack'],
+        }),
+      });
+    });
+    expect(mockIdentity.refreshPlatformContext).toHaveBeenCalled();
+  });
+
+  it('renders the /solution-builder route', () => {
+    renderSolutionBuilderRoute();
+
+    expect(screen.getByRole('heading', { name: /hospital solution builder/i })).toBeInTheDocument();
   });
 
   it('renders care pathway index cards with link counts and outcomes', async () => {

@@ -7,18 +7,22 @@ import { PlatformAssetsModule } from '../platform-assets/platform-assets.module'
 import { AssetPack } from '../platform-assets/entities/asset-pack.entity';
 import { OrganizationEntitlement } from '../platform-assets/entities/organization-entitlement.entity';
 import { PlatformAsset } from '../platform-assets/entities/platform-asset.entity';
+import { UsageEvent } from '../subscriptions/entities/usage-event.entity';
+import { AssetBasedRevenueService } from './asset-based-revenue.service';
 import { AssetDependencyGraphService } from './asset-dependency-graph.service';
 import { CarePathway } from './entities/care-pathway.entity';
 import { CommercialPlan } from './entities/commercial-plan.entity';
 import { IntegrationOffering } from './entities/integration-offering.entity';
 import { Product } from './entities/product.entity';
 import { SpecialtyCatalog } from './entities/specialty-catalog.entity';
+import { HospitalSolutionBuilderService } from './hospital-solution-builder.service';
 import { MaturityAssessmentService } from './maturity-assessment.service';
 import { OutcomesService } from './outcomes.service';
 import { ProductCatalogController } from './product-catalog.controller';
 import { ProductCatalogSeedService } from './product-catalog.seed.service';
 import { ProductCatalogService } from './product-catalog.service';
 import { ProductCatalogValidationService } from './product-catalog-validation.service';
+import { ValueTrackingService } from './value-tracking.service';
 
 @Module({
   imports: [
@@ -33,6 +37,7 @@ import { ProductCatalogValidationService } from './product-catalog-validation.se
       AssetPack,
       OrganizationEntitlement,
       AuditLog,
+      UsageEvent,
     ]),
     PlatformAssetsModule,
     OrganizationsModule,
@@ -43,8 +48,11 @@ import { ProductCatalogValidationService } from './product-catalog-validation.se
     ProductCatalogSeedService,
     ProductCatalogValidationService,
     AssetDependencyGraphService,
+    AssetBasedRevenueService,
+    HospitalSolutionBuilderService,
     MaturityAssessmentService,
     OutcomesService,
+    ValueTrackingService,
   ],
   exports: [ProductCatalogService, OutcomesService],
 })

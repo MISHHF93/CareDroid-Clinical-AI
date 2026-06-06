@@ -8,6 +8,9 @@ describe('AssetDependencyGraphService', () => {
     {} as any,
     {} as any,
     {} as any,
+    {} as any,
+    {} as any,
+    {} as any,
   );
 
   it('builds product to pack to asset to route to service to integration chains', () => {
@@ -127,5 +130,61 @@ describe('AssetDependencyGraphService', () => {
     });
     expect(graph.issues.map((issue) => issue.detail).join(' ')).toContain('missing asset missing-asset');
     expect(graph.issues.map((issue) => issue.detail).join(' ')).toContain('Orphan Asset');
+  });
+
+  it('filters organization dependency graph to entitled launchable assets', async () => {
+    const productRepository = {
+      find: jest.fn().mockResolvedValue([
+        {
+          id: 'product-emergency',
+          slug: 'emergency',
+          name: 'Emergency Department Solution',
+          packIds: ['core-platform', 'premium-pack'],
+          highlightAssetIds: [],
+        },
+      ]),
+    };
+    const packRepository = {
+      find: jest.fn().mockResolvedValue([
+        { id: 'core-platform', slug: 'core', name: 'Core Platform', assetIds: ['qsofa'] },
+        { id: 'premium-pack', slug: 'premium', name: 'Premium Pack', assetIds: ['locked-ai'] },
+      ]),
+    };
+    const assetRepository = {
+      find: jest.fn().mockResolvedValue([
+        { id: 'qsofa', title: 'qSOFA', assetType: PlatformAssetType.CALCULATOR, packIds: ['core-platform'] },
+        { id: 'locked-ai', title: 'Locked AI', assetType: PlatformAssetType.AI_AGENT, packIds: ['premium-pack'] },
+      ]),
+    };
+    const integrationRepository = { find: jest.fn().mockResolvedValue([]) };
+    const organizationRepository = { findOne: jest.fn().mockResolvedValue({ id: 'org-1' }) };
+    const platformAssetsService = {
+      resolveEntitledAssetIds: jest.fn().mockResolvedValue(['qsofa']),
+      getOrganizationEntitlements: jest.fn().mockResolvedValue([{ packId: 'core-platform' }]),
+      isStrictSaasEntitlementsEnabled: jest.fn().mockReturnValue(true),
+    };
+    const entitlementService = {
+      resolveDecisionFromContext: jest.fn(({ assetId }) => ({
+        assetId,
+        isLaunchable: assetId === 'qsofa',
+        state: assetId === 'qsofa' ? 'allowed' : 'locked',
+      })),
+    };
+    const scopedService = new AssetDependencyGraphService(
+      productRepository as any,
+      packRepository as any,
+      assetRepository as any,
+      integrationRepository as any,
+      organizationRepository as any,
+      platformAssetsService as any,
+      entitlementService as any,
+    );
+
+    const graph = await scopedService.getGraph('org-1', { subscriptionPlan: 'starter' });
+
+    expect(graph.chains).toHaveLength(1);
+    expect(graph.chains[0].asset.id).toBe('qsofa');
+    expect(graph.summary.assets).toBe(1);
+    expect(graph.chains.some((chain) => chain.asset.id === 'locked-ai')).toBe(false);
   });
 });

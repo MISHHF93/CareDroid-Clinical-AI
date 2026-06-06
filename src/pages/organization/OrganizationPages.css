@@ -39,10 +39,21 @@
 }
 
 .org-card input,
-.org-card select {
+.org-card select,
+.org-card textarea {
   display: block;
   width: 100%;
   margin-top: 0.25rem;
+}
+
+.org-card textarea {
+  min-height: 6rem;
+  resize: vertical;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace;
+}
+
+.org-admin-wide-card {
+  grid-column: span 2;
 }
 
 .org-status {
@@ -53,6 +64,22 @@
 .org-lifecycle-table {
   width: 100%;
   border-collapse: collapse;
+}
+
+.org-lifecycle-summary {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  margin-bottom: 1.25rem;
+}
+
+.org-lifecycle-summary-card {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.org-lifecycle-summary-card strong {
+  font-size: 1.5rem;
 }
 
 .org-lifecycle-table th,
@@ -175,6 +202,46 @@
   color: #334155;
 }
 
+.org-status-pill--healthy {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.org-status-pill--watch {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.org-status-pill--at-risk {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.org-status-pill--draft {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.org-status-pill--beta {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.org-status-pill--active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.org-status-pill--deprecated {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.org-status-pill--archived {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
 .org-analytics-section {
   margin: 1.5rem 0;
 }
@@ -217,6 +284,12 @@
 .org-analytics-list span {
   display: grid;
   gap: 0.15rem;
+}
+
+@media (max-width: 720px) {
+  .org-admin-wide-card {
+    grid-column: span 1;
+  }
 }
 
 .org-analytics-list small {

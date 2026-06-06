@@ -30,6 +30,23 @@
   min-width: 0;
 }
 
+.command-hero__brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.command-hero__logo {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 12px;
+  border: 1px solid var(--app-panel-border);
+  background: var(--app-surface-2);
+  padding: 4px;
+}
+
 .command-eyebrow {
   margin: 0 0 8px;
   color: var(--app-accent-interactive);

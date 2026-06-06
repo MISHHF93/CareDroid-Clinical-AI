@@ -61,6 +61,13 @@
   box-shadow: var(--sidebar-logo-shadow);
 }
 
+.sidebar-logo-img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
 .logo-text {
   min-width: 0;
   flex: 1;

@@ -54,6 +54,54 @@ const INTEGRATION_OPTIONS = [
   'telehealth',
 ];
 
+const SOLUTION_HOSPITAL_TYPES = [
+  { id: 'hospital', label: 'Hospital' },
+  { id: 'academic_medical_center', label: 'Academic medical center' },
+  { id: 'health_system', label: 'Health system' },
+  { id: 'government', label: 'Government hospital' },
+  { id: 'ems', label: 'EMS / transport' },
+  { id: 'research_institute', label: 'Research institute' },
+];
+
+const SOLUTION_DEPARTMENTS = [
+  { id: 'emergency', label: 'Emergency' },
+  { id: 'icu', label: 'ICU' },
+  { id: 'cardiology', label: 'Cardiology' },
+  { id: 'laboratory', label: 'Laboratory' },
+  { id: 'operations', label: 'Operations' },
+  { id: 'medical_iot', label: 'Medical IoT' },
+  { id: 'fleet', label: 'Fleet / EMS' },
+  { id: 'simulation', label: 'Simulation' },
+  { id: 'research', label: 'Research' },
+  { id: 'governance', label: 'Governance' },
+];
+
+const SOLUTION_PACK_OPTIONS = [
+  'core-platform',
+  'emergency-department-pack',
+  'icu-pack',
+  'cardiology-pack',
+  'laboratory-intelligence',
+  'hospital-operations',
+  'medical-iot-pack',
+  'fleet-logistics',
+  'digital-twin-pack',
+  'simulation-training-pack',
+  'research-education',
+  'governance-compliance-pack',
+];
+
+const SOLUTION_AGENT_OPTIONS = [
+  'agent-clinical',
+  'agent-emergency',
+  'agent-lab',
+  'agent-operations',
+  'agent-fleet',
+  'agent-education',
+  'agent-research',
+  'agent-governance',
+];
+
 function PageShell({ title, subtitle, children, actions }) {
   return (
     <div className="commercial-page">
@@ -945,6 +993,127 @@ export function OutcomesDashboardPage() {
   );
 }
 
+function ValueMetricCard({ metric }) {
+  const value = metric.value === null || metric.value === undefined ? 'No data' : metric.value;
+  const suffix =
+    metric.value === null || metric.value === undefined
+      ? ''
+      : metric.unit === 'percent'
+        ? '%'
+        : metric.unit === 'milliseconds'
+          ? ' ms'
+          : '';
+
+  return (
+    <Card className="commercial-card">
+      <span className="commercial-muted">{metric.status}</span>
+      <div className="commercial-metric-value">
+        {value}
+        {suffix}
+      </div>
+      <h2>{metric.label}</h2>
+      <p>{metric.description}</p>
+      {metric.denominator ? (
+        <p>
+          {metric.numerator ?? 0} / {metric.denominator} tracked events
+        </p>
+      ) : null}
+    </Card>
+  );
+}
+
+export function ValueTrackingPage() {
+  const { organization } = useUserIdentity();
+  const [period, setPeriod] = useState('month');
+  const [valueTracking, setValueTracking] = useState(null);
+  const [status, setStatus] = useState('');
+
+  useEffect(() => {
+    if (!organization?.id) return;
+    setStatus('');
+    ProductCatalogApi.getOrganizationValueTracking(organization.id, period)
+      .then(setValueTracking)
+      .catch((error) => {
+        setValueTracking(null);
+        setStatus(error.message);
+      });
+  }, [organization?.id, period]);
+
+  if (!organization?.id) {
+    return (
+      <PageShell title="Value tracking" subtitle="Link an organization to view value metrics.">
+        <Link to="/onboarding">
+          <Button variant="primary">Set up organization</Button>
+        </Link>
+      </PageShell>
+    );
+  }
+
+  if (!valueTracking) {
+    return (
+      <PageShell title="Loading value tracking…" subtitle={status || 'Collecting metric signals.'} />
+    );
+  }
+
+  const categories = [
+    ['Clinical', valueTracking.categories?.clinical || []],
+    ['Operational', valueTracking.categories?.operational || []],
+    ['Executive', valueTracking.categories?.executive || []],
+  ];
+
+  return (
+    <PageShell
+      title="Value Tracking"
+      subtitle="Clinical, operational, and executive value metrics for the active organization."
+      actions={
+        <div className="commercial-form-row">
+          <label htmlFor="value-tracking-period">Period</label>
+          <select
+            id="value-tracking-period"
+            aria-label="Value tracking period"
+            value={period}
+            onChange={(event) => setPeriod(event.target.value)}
+          >
+            <option value="day">Day</option>
+            <option value="week">Week</option>
+            <option value="month">Month</option>
+          </select>
+        </div>
+      }
+    >
+      <div className="commercial-grid">
+        <BuilderMetric label="Enabled packs" value={valueTracking.executiveSummary?.enabledPackCount || 0} />
+        <BuilderMetric label="Active users" value={valueTracking.executiveSummary?.activeUsers || 0} />
+        <BuilderMetric
+          label="Engagement events"
+          value={valueTracking.executiveSummary?.totalEngagementEvents || 0}
+        />
+        <BuilderMetric label="Outcome signals" value={valueTracking.executiveSummary?.outcomeSignalCount || 0} />
+      </div>
+
+      {categories.map(([category, metrics]) => (
+        <section key={category} className="commercial-section">
+          <h2>{category}</h2>
+          <div className="commercial-grid">
+            {metrics.map((metric) => (
+              <ValueMetricCard key={metric.id} metric={metric} />
+            ))}
+          </div>
+        </section>
+      ))}
+
+      <Card className="commercial-card">
+        <h2>Data sources</h2>
+        <p>
+          Audit events: {valueTracking.sources?.auditEvents || 0} · Usage events:{' '}
+          {valueTracking.sources?.usageEvents || 0} · Enabled entitlements:{' '}
+          {valueTracking.sources?.enabledEntitlements || 0}
+        </p>
+      </Card>
+    </PageShell>
+  );
+}
+
 export function IntegrationsMarketplacePage() {
   const { organization } = useUserIdentity();
   const [items, setItems] = useState([]);
@@ -1063,6 +1232,243 @@ export function IntegrationReadinessPage() {
           </Card>
         ))}
       </div>
+    </PageShell>
+  );
+}
+
+export function HospitalSolutionBuilderPage() {
+  const { organization, refreshPlatformContext } = useUserIdentity();
+  const [hospitalType, setHospitalType] = useState('hospital');
+  const [departmentIds, setDepartmentIds] = useState(['emergency', 'icu', 'operations']);
+  const [assetPackIds, setAssetPackIds] = useState(['core-platform']);
+  const [workspaceIds, setWorkspaceIds] = useState(['emergency', 'icu', 'operations']);
+  const [aiAgentIds, setAiAgentIds] = useState(['agent-clinical']);
+  const [integrationSlugs, setIntegrationSlugs] = useState(['fhir-patient', 'hl7-adt']);
+  const [goals, setGoals] = useState('Reduce triage time, improve asset visibility');
+  const [recommendation, setRecommendation] = useState(null);
+  const [status, setStatus] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [applying, setApplying] = useState(false);
+
+  const toggleValue = (value, setter) => {
+    setter((prev) => (prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]));
+  };
+
+  const buildPayload = () => ({
+    organizationId: organization?.id,
+    hospitalType,
+    departmentIds,
+    assetPackIds,
+    workspaceIds,
+    aiAgentIds,
+    integrationSlugs,
+    goals: csvToList(goals),
+  });
+
+  const generateRecommendation = async () => {
+    setLoading(true);
+    setStatus('');
+    try {
+      const nextRecommendation = await ProductCatalogApi.getHospitalSolutionRecommendation(buildPayload());
+      setRecommendation(nextRecommendation);
+      setStatus('Recommended CareDroid deployment generated.');
+    } catch (e) {
+      setStatus(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const applyRecommendation = async () => {
+    if (!organization?.id || !recommendation) return;
+    setApplying(true);
+    setStatus('');
+    try {
+      await ProductCatalogApi.applyHospitalSolution({
+        organizationId: organization.id,
+        commercialPlanId: recommendation.recommendedCommercialPlanId,
+        configurationPatch: recommendation.configurationPatch,
+      });
+      setStatus('Hospital solution applied to this organization.');
+      refreshPlatformContext?.();
+    } catch (e) {
+      setStatus(e.message);
+    } finally {
+      setApplying(false);
+    }
+  };
+
+  const patchPreview = recommendation
+    ? JSON.stringify(recommendation.configurationPatch, null, 2)
+    : 'Generate a recommendation to preview the configuration patch.';
+
+  return (
+    <PageShell
+      title="Hospital Solution Builder"
+      subtitle="Compose a hospital-specific CareDroid deployment from profile inputs without code changes."
+      actions={
+        <Link to="/configuration-studio">
+          <Button variant="secondary">Configuration studio</Button>
+        </Link>
+      }
+    >
+      {status && <p className="commercial-subtitle">{status}</p>}
+      <div className="commercial-config-grid">
+        <Card className="commercial-card commercial-config-card">
+          <h2>Profile</h2>
+          <p>Choose the organization type and deployment goals that guide the recommendation.</p>
+          <div className="commercial-form-row">
+            <label>Hospital type</label>
+            <select
+              aria-label="Hospital type"
+              value={hospitalType}
+              onChange={(event) => setHospitalType(event.target.value)}
+            >
+              {SOLUTION_HOSPITAL_TYPES.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="commercial-form-row">
+            <label>Target goals (comma-separated)</label>
+            <input aria-label="Target goals" value={goals} onChange={(event) => setGoals(event.target.value)} />
+          </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>Departments</h2>
+          <p>Select the departments and service areas the deployment must support.</p>
+          <div className="commercial-chip-list" aria-label="Departments">
+            {SOLUTION_DEPARTMENTS.map((department) => (
+              <button
+                key={department.id}
+                type="button"
+                className={`commercial-chip ${departmentIds.includes(department.id) ? 'selected' : ''}`}
+                onClick={() => toggleValue(department.id, setDepartmentIds)}
+              >
+                {department.label}
+              </button>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>Asset packs</h2>
+          <p>Optionally pin packs that must be included alongside the recommendation.</p>
+          <div className="commercial-chip-list" aria-label="Asset packs">
+            {SOLUTION_PACK_OPTIONS.map((packId) => (
+              <button
+                key={packId}
+                type="button"
+                className={`commercial-chip ${assetPackIds.includes(packId) ? 'selected' : ''}`}
+                onClick={() => toggleValue(packId, setAssetPackIds)}
+              >
+                {packId}
+              </button>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>Workspaces</h2>
+          <p>Choose the default workspaces that should be created for the tenant.</p>
+          <div className="commercial-chip-list" aria-label="Workspaces">
+            {SOLUTION_DEPARTMENTS.map((workspace) => (
+              <button
+                key={workspace.id}
+                type="button"
+                className={`commercial-chip ${workspaceIds.includes(workspace.id) ? 'selected' : ''}`}
+                onClick={() => toggleValue(workspace.id, setWorkspaceIds)}
+              >
+                {workspace.label}
+              </button>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>AI agents</h2>
+          <p>Select agents to force into the recommendation; department agents are added automatically.</p>
+          <div className="commercial-chip-list" aria-label="AI agents">
+            {SOLUTION_AGENT_OPTIONS.map((agentId) => (
+              <button
+                key={agentId}
+                type="button"
+                className={`commercial-chip ${aiAgentIds.includes(agentId) ? 'selected' : ''}`}
+                onClick={() => toggleValue(agentId, setAiAgentIds)}
+              >
+                {agentId}
+              </button>
+            ))}
+          </div>
+        </Card>
+
+        <Card className="commercial-card commercial-config-card">
+          <h2>Integrations</h2>
+          <p>Choose integration requests to include in the deployment patch.</p>
+          <div className="commercial-chip-list" aria-label="Integrations">
+            {INTEGRATION_OPTIONS.map((slug) => (
+              <button
+                key={slug}
+                type="button"
+                className={`commercial-chip ${integrationSlugs.includes(slug) ? 'selected' : ''}`}
+                onClick={() => toggleValue(slug, setIntegrationSlugs)}
+              >
+                {slug}
+              </button>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <div className="commercial-config-save">
+        <Button variant="primary" onClick={generateRecommendation} disabled={loading}>
+          {loading ? 'Generating...' : 'Generate recommendation'}
+        </Button>
+      </div>
+
+      {recommendation && (
+        <>
+          <div className="commercial-grid">
+            <BuilderMetric label="Recommended plan" value={recommendation.recommendedCommercialPlanId} />
+            <BuilderMetric label="Products" value={recommendation.products?.length || 0} />
+            <BuilderMetric label="Packs" value={recommendation.packs?.length || 0} />
+            <BuilderMetric label="Workspaces" value={recommendation.workspaces?.length || 0} />
+          </div>
+          <div className="commercial-config-grid">
+            <Card className="commercial-card commercial-config-card">
+              <h2>Recommended deployment</h2>
+              <p>
+                Products: {compactList((recommendation.products || []).map((product) => product.name), 5)}
+              </p>
+              <p>Packs: {compactList((recommendation.packs || []).map((pack) => pack.name), 5)}</p>
+              <p>AI agents: {compactList((recommendation.aiAgents || []).map((agent) => agent.title), 5)}</p>
+              <p>
+                Integrations:{' '}
+                {compactList((recommendation.integrations || []).map((integration) => integration.name), 5)}
+              </p>
+            </Card>
+            <Card className="commercial-card commercial-config-card">
+              <h2>Rationale</h2>
+              <ul className="commercial-compact-list">
+                {(recommendation.rationale || []).map((item) => (
+                  <li key={`${item.type}-${item.message}`}>{item.message}</li>
+                ))}
+              </ul>
+            </Card>
+            <Card className="commercial-card commercial-config-card">
+              <h2>Configuration patch preview</h2>
+              <textarea aria-label="Configuration patch preview" readOnly rows={12} value={patchPreview} />
+              <Button variant="primary" onClick={applyRecommendation} disabled={!organization?.id || applying}>
+                {applying ? 'Applying...' : 'Apply to organization'}
+              </Button>
+              {!organization?.id && <p>Join or create an organization before applying a recommendation.</p>}
+            </Card>
+          </div>
+        </>
+      )}
     </PageShell>
   );
 }

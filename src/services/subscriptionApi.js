@@ -64,6 +64,21 @@ export async function fetchUsageSummary({ period = 'month' } = {}) {
   }
 }
 
+export async function fetchUsageMeteringFramework({ period = 'month' } = {}) {
+  try {
+    const response = await apiFetch(
+      `/api/subscriptions/usage/metering?period=${encodeURIComponent(period)}`
+    );
+    const data = await parseJson(response, null);
+    if (!response.ok) {
+      return disabled(data?.message || getApiErrorMessage(null, response));
+    }
+    return { ok: true, data, message: '' };
+  } catch (error) {
+    return disabled(getApiErrorMessage(error));
+  }
+}
+
 export async function recordUsageEvent(payload = {}) {
   if (!payload.eventType) return disabled('Usage event type is required.');
 

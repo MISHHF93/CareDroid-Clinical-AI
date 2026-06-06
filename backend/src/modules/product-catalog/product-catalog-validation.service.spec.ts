@@ -68,7 +68,11 @@ describe('ProductCatalogValidationService', () => {
   it('allows unpacked assets explicitly marked internal or developer-only', async () => {
     assetRepo.find.mockResolvedValue([
       { id: 'dashboard', lifecycle: PlatformAssetLifecycle.ACTIVE },
-      { id: 'admin-panel', lifecycle: PlatformAssetLifecycle.ADMIN_ONLY },
+      {
+        id: 'admin-panel',
+        lifecycle: PlatformAssetLifecycle.ACTIVE,
+        governance: { adminOnly: true },
+      },
       {
         id: 'developer-console',
         lifecycle: PlatformAssetLifecycle.ACTIVE,

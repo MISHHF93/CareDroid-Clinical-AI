@@ -127,6 +127,18 @@ export const PlatformAssetsApi = {
     return response.json();
   },
 
+  async getGovernanceRegistry(params = {}) {
+    const search = new URLSearchParams();
+    if (params.query) search.set('query', params.query);
+    if (params.riskLevel && params.riskLevel !== 'all') search.set('riskLevel', params.riskLevel);
+    if (params.owner) search.set('owner', params.owner);
+    if (params.assetType && params.assetType !== 'all') search.set('assetType', params.assetType);
+    const qs = search.toString();
+    const response = await apiFetch(`/api/platform/governance-registry${qs ? `?${qs}` : ''}`);
+    if (!response.ok) throw new Error(`Governance registry failed (${response.status})`);
+    return response.json();
+  },
+
   async getDigitalTwin(organizationId) {
     const qs = organizationId ? `?organizationId=${encodeURIComponent(organizationId)}` : '';
     const response = await apiFetch(`/api/platform/digital-twin${qs}`);
@@ -137,6 +149,15 @@ export const PlatformAssetsApi = {
   async getOrganizationAnalytics(organizationId) {
     const response = await apiFetch(`/api/platform/organizations/${organizationId}/analytics`);
     if (!response.ok) throw new Error(`Organization analytics failed (${response.status})`);
+    return response.json();
+  },
+
+  async getCustomerSuccessDashboard(organizationId, period = 'month') {
+    const qs = period ? `?period=${encodeURIComponent(period)}` : '';
+    const response = await apiFetch(
+      `/api/platform/organizations/${organizationId}/customer-success${qs}`
+    );
+    if (!response.ok) throw new Error(`Customer success failed (${response.status})`);
     return response.json();
   },
 
@@ -203,6 +224,22 @@ export const PlatformAssetsApi = {
       body: JSON.stringify(payload),
     });
     if (!response.ok) throw new Error(`Update organization settings failed (${response.status})`);
+    return response.json();
+  },
+
+  async getTenantAdministration(organizationId) {
+    const response = await apiFetch(`/api/organizations/${organizationId}/tenant-admin`);
+    if (!response.ok) throw new Error(`Tenant administration failed (${response.status})`);
+    return response.json();
+  },
+
+  async updateTenantAdministration(organizationId, payload) {
+    const response = await apiFetch(`/api/organizations/${organizationId}/tenant-admin`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error(`Update tenant administration failed (${response.status})`);
     return response.json();
   },
 

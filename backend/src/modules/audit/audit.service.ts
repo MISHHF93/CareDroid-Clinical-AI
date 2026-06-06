@@ -163,18 +163,19 @@ export class AuditService {
     };
   }
 
-  async findByUser(userId: string, limit = 100) {
+  async findByUser(userId: string, limit = 100, organizationId?: string) {
     return this.auditRepository.find({
-      where: { userId },
+      where: { userId, ...(organizationId ? { organizationId } : {}) },
       order: { timestamp: 'DESC' },
       take: limit,
     });
   }
 
-  async findPhiAccess(_startDate: Date, _endDate: Date) {
+  async findPhiAccess(_startDate: Date, _endDate: Date, organizationId?: string) {
     return this.auditRepository.find({
       where: {
         phiAccessed: true,
+        ...(organizationId ? { organizationId } : {}),
       },
       order: { timestamp: 'DESC' },
     });
@@ -183,9 +184,9 @@ export class AuditService {
   /**
    * Find all logs by action type
    */
-  async findByAction(action: AuditAction, limit = 100) {
+  async findByAction(action: AuditAction, limit = 100, organizationId?: string) {
     return this.auditRepository.find({
-      where: { action },
+      where: { action, ...(organizationId ? { organizationId } : {}) },
       order: { timestamp: 'DESC' },
       take: limit,
     });
@@ -194,25 +195,40 @@ export class AuditService {
   /**
    * Find all logs within a date range
    */
-  async findByDateRange(startDate: Date, endDate: Date) {
-    return this.auditRepository
+  async findByDateRange(startDate: Date, endDate: Date, organizationId?: string) {
+    const query = this.auditRepository
       .createQueryBuilder('log')
       .where('log.timestamp >= :startDate', { startDate })
       .andWhere('log.timestamp <= :endDate', { endDate })
-      .orderBy('log.timestamp', 'DESC')
-      .getMany();
+      .orderBy('log.timestamp', 'DESC');
+
+    if (organizationId) {
+      query.andWhere('log.organizationId = :organizationId', { organizationId });
+    }
+
+    return query.getMany();
   }
 
   /**
    * Find logs by user within date range
    */
-  async findByUserAndDateRange(userId: string, startDate: Date, endDate: Date) {
-    return this.auditRepository
+  async findByUserAndDateRange(
+    userId: string,
+    startDate: Date,
+    endDate: Date,
+    organizationId?: string,
+  ) {
+    const query = this.auditRepository
       .createQueryBuilder('log')
       .where('log.userId = :userId', { userId })
       .andWhere('log.timestamp >= :startDate', { startDate })
       .andWhere('log.timestamp <= :endDate', { endDate })
-      .orderBy('log.timestamp', 'DESC')
-      .getMany();
+      .orderBy('log.timestamp', 'DESC');
+
+    if (organizationId) {
+      query.andWhere('log.organizationId = :organizationId', { organizationId });
+    }
+
+    return query.getMany();
   }
 }
