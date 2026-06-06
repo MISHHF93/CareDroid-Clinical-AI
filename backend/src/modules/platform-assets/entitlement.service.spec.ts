@@ -201,4 +201,40 @@ describe('EntitlementService', () => {
       expect(decision.isLaunchable).toBe(true);
     });
   });
+
+  it('records a blocked automation audit entry before denying launch', async () => {
+    const automationAuditService = { createEvent: jest.fn().mockResolvedValue({ id: 'audit-1' }) };
+    service = new EntitlementService(
+      {} as any,
+      {} as any,
+      new FeatureFlagService(),
+      automationAuditService as any,
+    );
+
+    await expect(
+      service.assertLaunchAllowed({
+        assetId: 'digital-twin',
+        organizationId: 'org-1',
+        workspaceId: 'workspace-1',
+        userId: 'user-1',
+        subscriptionPlan: SubscriptionTier.INSTITUTIONAL,
+        entitledAssetIds: ['digital-twin'],
+        entitledPackIds: [],
+      }),
+    ).rejects.toThrow(/Feature access denied: pack-required/);
+
+    expect(automationAuditService.createEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        triggerFired: 'Asset launch requested',
+        toolCalled: 'digital-twin',
+        status: 'blocked',
+        reason: 'pack-required',
+      }),
+      expect.objectContaining({
+        organizationId: 'org-1',
+        workspaceId: 'workspace-1',
+      }),
+      expect.objectContaining({ id: 'user-1' }),
+    );
+  });
 });

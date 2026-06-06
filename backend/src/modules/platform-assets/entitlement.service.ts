@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import {
@@ -16,6 +16,8 @@ import { OrganizationEntitlement } from './entities/organization-entitlement.ent
 import { PlatformAsset } from './entities/platform-asset.entity';
 import { EntitlementStatus, PlatformAssetLifecycle, PricingTier } from './enums/platform-asset.enums';
 import { FeatureFlagService } from './feature-flag.service';
+import { AutomationAuditService } from '../automation-audit/automation-audit.service';
+import { AutomationAuditStatus } from '../automation-audit/entities/automation-audit-event.entity';
 
 export interface EntitlementDecisionInput {
   assetId: string;
@@ -27,6 +29,8 @@ export interface EntitlementDecisionInput {
   entitledAssetIds?: string[];
   entitledPackIds?: string[];
   strictEntitlements?: boolean;
+  userId?: string | null;
+  workspaceId?: string | null;
 }
 
 export interface EntitlementDecision {
@@ -49,6 +53,7 @@ export class EntitlementService {
     @InjectRepository(OrganizationEntitlement)
     private readonly entitlementRepository: Repository<OrganizationEntitlement>,
     private readonly featureFlagService: FeatureFlagService,
+    @Optional() private readonly automationAuditService?: AutomationAuditService,
   ) {}
 
   async getEnabledPackIdsForOrganization(organizationId?: string | null): Promise<string[]> {
@@ -215,11 +220,66 @@ export class EntitlementService {
   async assertLaunchAllowed(input: EntitlementDecisionInput): Promise<EntitlementDecision> {
     const decision = await this.resolveDecision(input);
     if (!decision.isLaunchable) {
+      await this.recordBlockedLaunch(input, decision);
       throw new ForbiddenException(
         `Feature access denied: ${decision.reason}${decision.requiredPlan ? ` (${decision.requiredPlan})` : ''}`,
       );
     }
     return decision;
+  }
+
+  private async recordBlockedLaunch(
+    input: EntitlementDecisionInput,
+    decision: EntitlementDecision,
+  ) {
+    if (!this.automationAuditService) return;
+
+    try {
+      await this.automationAuditService.createEvent(
+        {
+          triggerFired: 'Asset launch requested',
+          conditionsEvaluated: [
+            { label: `rollout:${decision.rolloutState}`, result: decision.reason !== 'feature-disabled' },
+            { label: `entitlement:${decision.reason}`, result: false },
+          ],
+          actionSelected: 'Launch asset',
+          user: {
+            id: input.userId || 'system',
+            name: input.userId || 'System',
+          },
+          tenant: {
+            id: input.organizationId || input.organization?.id || 'unknown-tenant',
+            name: input.organization?.name || input.organizationId || 'Unknown tenant',
+          },
+          workspace: {
+            id: input.workspaceId || 'unknown-workspace',
+            name: input.workspaceId || 'Unknown workspace',
+          },
+          aiInvolvement: {
+            involved: input.assetId.startsWith('agent-') || input.assetId.includes('ai'),
+            summary: 'Entitlement gate blocked the asset launch before execution.',
+          },
+          toolCalled: input.assetId,
+          backendEndpoint: '/api/platform-assets/entitlements',
+          status: AutomationAuditStatus.BLOCKED,
+          reason: decision.reason,
+          timestamp: new Date().toISOString(),
+          reviewer: {
+            required: true,
+            name: 'Entitlement administrator',
+          },
+        },
+        {
+          organizationId: input.organizationId || input.organization?.id,
+          workspaceId: input.workspaceId,
+        },
+        {
+          id: input.userId || undefined,
+        },
+      );
+    } catch {
+      // Access denial must not depend on secondary audit persistence.
+    }
   }
 
   private planForPricingTier(tier?: string): SubscriptionTier {

@@ -98,9 +98,20 @@
   cursor: pointer;
 }
 
+.platform-secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 .platform-primary-link {
   background: var(--app-accent-interactive);
   color: var(--app-accent-contrast, #fff);
+}
+
+.platform-muted {
+  margin: 0;
+  color: var(--muted-text);
+  font-size: 0.88rem;
 }
 
 .platform-filter-bar {

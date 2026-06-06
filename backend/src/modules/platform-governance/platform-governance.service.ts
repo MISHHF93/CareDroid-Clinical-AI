@@ -24,6 +24,8 @@ import {
 } from './dto/platform-governance.dto';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
+import { AutomationAuditService } from '../automation-audit/automation-audit.service';
+import { AutomationAuditStatus } from '../automation-audit/entities/automation-audit-event.entity';
 
 const P0_CAPABILITIES = [
   'clinical-governance',
@@ -69,6 +71,7 @@ export class PlatformGovernanceService {
     @InjectRepository(PlatformSourceProvenance)
     private readonly sourceProvenance: Repository<PlatformSourceProvenance>,
     @Optional() private readonly auditService?: AuditService,
+    @Optional() private readonly automationAuditService?: AutomationAuditService,
   ) {}
 
   async getSummary(): Promise<PlatformGovernanceSummaryDto> {
@@ -343,6 +346,9 @@ export class PlatformGovernanceService {
     phiAccessed?: boolean;
     prompt?: string;
     action?: string;
+    userId?: string;
+    tenantId?: string;
+    workspaceId?: string;
   }): Promise<PlatformGateDecisionDto> {
     const reasons: string[] = [];
     const blockedActions = [
@@ -390,6 +396,10 @@ export class PlatformGovernanceService {
       metadata: { reasons, action: input.action },
     });
 
+    if (!allowed) {
+      await this.recordBlockedAutomationGate(input, reasons);
+    }
+
     if (injectionRisk) {
       await this.recordSecurityEvent({
         runId: input.runId,
@@ -419,6 +429,68 @@ export class PlatformGovernanceService {
         injectionRisk,
       },
     };
+  }
+
+  private async recordBlockedAutomationGate(
+    input: {
+      runId?: string;
+      capabilityId: string;
+      action?: string;
+      userId?: string;
+      tenantId?: string;
+      workspaceId?: string;
+      phiAccessed?: boolean;
+      prompt?: string;
+    },
+    reasons: string[],
+  ) {
+    if (!this.automationAuditService) return;
+
+    try {
+      await this.automationAuditService.createEvent(
+        {
+          triggerFired: 'Platform governance gate evaluated',
+          conditionsEvaluated: reasons.map((reason) => ({ label: reason, result: false })),
+          actionSelected: input.action || input.capabilityId,
+          user: {
+            id: input.userId || 'system',
+            name: input.userId || 'System',
+          },
+          tenant: {
+            id: input.tenantId || 'unknown-tenant',
+            name: input.tenantId || 'Unknown tenant',
+          },
+          workspace: {
+            id: input.workspaceId || 'unknown-workspace',
+            name: input.workspaceId || 'Unknown workspace',
+          },
+          aiInvolvement: {
+            involved: Boolean(input.prompt),
+            summary: input.prompt
+              ? 'AI prompt or automation request required governance review.'
+              : 'Governance gate evaluated a non-prompt automation request.',
+          },
+          toolCalled: input.capabilityId,
+          backendEndpoint: '/api/platform-governance/gate/evaluate',
+          status: AutomationAuditStatus.BLOCKED,
+          reason: reasons.join(', '),
+          timestamp: new Date().toISOString(),
+          reviewer: {
+            required: true,
+            name: 'Platform governance reviewer',
+          },
+        },
+        {
+          organizationId: input.tenantId,
+          workspaceId: input.workspaceId,
+        },
+        {
+          id: input.userId,
+        },
+      );
+    } catch (error) {
+      this.logger.warn(`Failed to record blocked automation gate: ${error}`);
+    }
   }
 
   async recordSecurityEvent(input: Partial<PlatformSecurityEvent>) {

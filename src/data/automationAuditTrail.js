@@ -183,9 +183,9 @@ export function getAutomationAuditEntries({ tenantId } = {}) {
   return rows.map(cloneEntry);
 }
 
-export function getAutomationAuditTenants() {
+export function getAutomationAuditTenants(entries = automationAuditEntries) {
   const tenants = new Map();
-  for (const entry of automationAuditEntries) {
+  for (const entry of entries) {
     tenants.set(entry.tenant.id, entry.tenant);
   }
   return [...tenants.values()].map((tenant) => ({ ...tenant }));

@@ -7,6 +7,7 @@ import offlineService from './offlineService';
 import { apiFetch } from './apiClient';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
+import { recordAutomationBlocked, recordAutomationFailure } from './automationAuditLogger';
 import logger from '../utils/logger';
 
 class SyncService {
@@ -148,6 +149,14 @@ class SyncService {
     if (messages.length === 0) return;
     if (!isBackendCapabilityEnabled('chatPersistence')) {
       logger.info('Skipping message sync — chat persistence API not available on server');
+      await recordAutomationBlocked({
+        triggerFired: 'Offline message sync requested',
+        conditionsEvaluated: [{ label: 'Chat persistence backend capability enabled', result: false }],
+        actionSelected: 'Sync offline chat messages',
+        toolCalled: 'offline-sync',
+        backendEndpoint: '/api/chat/messages',
+        reason: 'Chat persistence API is not available on this server.',
+      });
       return;
     }
 
@@ -187,6 +196,13 @@ class SyncService {
         }
       } catch (error) {
         logger.error(`Failed to sync message ${message.id}`, { error });
+        await recordAutomationFailure({
+          triggerFired: 'Offline message sync failed',
+          actionSelected: 'Sync offline chat message',
+          toolCalled: 'offline-sync',
+          backendEndpoint: '/api/chat/messages',
+          error,
+        });
       }
     }
 
@@ -200,6 +216,14 @@ class SyncService {
     if (conversations.length === 0) return;
     if (!isBackendCapabilityEnabled('chatPersistence')) {
       logger.info('Skipping conversation sync — chat persistence API not available on server');
+      await recordAutomationBlocked({
+        triggerFired: 'Offline conversation sync requested',
+        conditionsEvaluated: [{ label: 'Chat persistence backend capability enabled', result: false }],
+        actionSelected: 'Sync offline conversations',
+        toolCalled: 'offline-sync',
+        backendEndpoint: '/api/chat/conversations',
+        reason: 'Chat persistence API is not available on this server.',
+      });
       return;
     }
 
@@ -236,6 +260,13 @@ class SyncService {
         }
       } catch (error) {
         logger.error(`Failed to sync conversation ${conversation.id}`, { error });
+        await recordAutomationFailure({
+          triggerFired: 'Offline conversation sync failed',
+          actionSelected: 'Sync offline conversation',
+          toolCalled: 'offline-sync',
+          backendEndpoint: '/api/chat/conversations',
+          error,
+        });
       }
     }
 
@@ -249,6 +280,14 @@ class SyncService {
     if (toolResults.length === 0) return;
     if (!isBackendCapabilityEnabled('toolsResultsSync')) {
       logger.info('Skipping tool results sync — tools results API not available on server');
+      await recordAutomationBlocked({
+        triggerFired: 'Offline tool result sync requested',
+        conditionsEvaluated: [{ label: 'Tool results sync backend capability enabled', result: false }],
+        actionSelected: 'Sync offline tool results',
+        toolCalled: 'offline-sync',
+        backendEndpoint: '/api/tools/results',
+        reason: 'Tool results sync API is not available on this server.',
+      });
       return;
     }
 
@@ -280,6 +319,13 @@ class SyncService {
         await offlineService.markAsSynced('toolResults', result.id);
       } catch (error) {
         logger.error(`Failed to sync tool result ${result.id}`, { error });
+        await recordAutomationFailure({
+          triggerFired: 'Offline tool result sync failed',
+          actionSelected: 'Sync offline tool result',
+          toolCalled: 'offline-sync',
+          backendEndpoint: '/api/tools/results',
+          error,
+        });
       }
     }
 
@@ -317,6 +363,13 @@ class SyncService {
         await offlineService.markAsSynced('notifications', notification.id);
       } catch (error) {
         logger.error(`Failed to sync notification ${notification.id}`, { error });
+        await recordAutomationFailure({
+          triggerFired: 'Offline notification sync failed',
+          actionSelected: 'Sync offline notification state',
+          toolCalled: 'offline-sync',
+          backendEndpoint: '/api/notifications/:id/read',
+          error,
+        });
       }
     }
 
@@ -359,6 +412,13 @@ class SyncService {
         await offlineService.markAsSynced('auditLogs', log.id);
       } catch (error) {
         logger.error(`Failed to sync audit log ${log.id}`, { error });
+        await recordAutomationFailure({
+          triggerFired: 'Offline audit log sync failed',
+          actionSelected: 'Sync offline audit log',
+          toolCalled: 'offline-sync',
+          backendEndpoint: '/api/audit/sync',
+          error,
+        });
       }
     }
 
@@ -413,6 +473,13 @@ class SyncService {
       logger.info('Latest data downloaded');
     } catch (error) {
       logger.error('Failed to download latest data', { error });
+      await recordAutomationFailure({
+        triggerFired: 'Offline catalog refresh failed',
+        actionSelected: 'Download latest offline data',
+        toolCalled: 'offline-sync',
+        backendEndpoint: '/api/users/profile',
+        error,
+      });
     }
   }
 

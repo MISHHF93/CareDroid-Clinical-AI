@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { IntentClassifierService } from '../medical-control-plane/intent-classifier/intent-classifier.service';
 import { ToolOrchestratorService } from '../medical-control-plane/tool-orchestrator/tool-orchestrator.service';
 import { ToolExecutionErrorCode } from '../medical-control-plane/tool-orchestrator/tool-orchestrator.registry';
@@ -10,6 +10,8 @@ import { AlertService } from '../telemetry/alert.service';
 import { DeviceRegistryService } from '../telemetry/device-registry.service';
 import { TelemetryService } from '../telemetry/telemetry.service';
 import { PlatformSystemsService } from '../platform-systems/platform-systems.service';
+import { AutomationAuditService } from '../automation-audit/automation-audit.service';
+import { AutomationAuditStatus } from '../automation-audit/entities/automation-audit-event.entity';
 import { ParameterCollectorService } from './parameter-collector.service';
 import { ToolResolverService } from './tool-resolver.service';
 import { ValidationService } from './validation.service';
@@ -40,6 +42,7 @@ export class ToolExecutionService {
     private readonly deviceRegistryService: DeviceRegistryService,
     private readonly alertService: AlertService,
     private readonly platformSystemsService: PlatformSystemsService,
+    @Optional() private readonly automationAuditService?: AutomationAuditService,
   ) {}
 
   async executePrompt(request: ToolCallingRequest): Promise<ToolCallingResult> {
@@ -94,6 +97,16 @@ export class ToolExecutionService {
     );
 
     if (parameterState.needsFollowUp) {
+      await this.recordBlockedAutomation(request, {
+        toolId: resolution.definition.id,
+        triggerFired: 'Tool execution requested',
+        actionSelected: 'Collect required tool parameters',
+        reason: 'needs_parameters',
+        conditionsEvaluated: parameterState.missingRequired.map((param) => ({
+          label: `Required parameter present: ${param.name}`,
+          result: false,
+        })),
+      });
       return {
         success: false,
         status: 'needs_parameters',
@@ -141,6 +154,13 @@ export class ToolExecutionService {
     );
 
     if (!validation.valid) {
+      await this.recordBlockedAutomation(request, {
+        toolId: resolution.definition.id,
+        triggerFired: 'Tool execution requested',
+        actionSelected: 'Validate tool parameters',
+        reason: 'validation_failed',
+        conditionsEvaluated: validation.errors.map((error) => ({ label: error, result: false })),
+      });
       return {
         success: false,
         status: 'validation_failed',
@@ -211,6 +231,12 @@ export class ToolExecutionService {
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       this.logger.error(`Tool execution failed: ${message}`);
+      await this.recordFailedAutomation(request, {
+        toolId: resolution.definition.id,
+        triggerFired: 'Tool execution requested',
+        actionSelected: 'Execute backend tool',
+        error: message,
+      });
       this.recordLog(logs, 'execution', 'failed', message, {
         toolId: resolution.definition.id,
       });
@@ -398,13 +424,13 @@ export class ToolExecutionService {
     }
   }
 
-  private buildUnsupportedResponse(
+  private async buildUnsupportedResponse(
     request: ToolCallingRequest,
     resolution: ToolResolution,
     logs: ToolExecutionLogEntry[],
     startedAt: number,
     classification: ToolCallingRequest['classification'],
-  ): ToolCallingResult {
+  ): Promise<ToolCallingResult> {
     this.recordLog(logs, 'fallback', 'fallback', resolution.reason, {
       requestedToolId: request.toolId || classification?.toolId,
       launch: resolution.launch,
@@ -412,6 +438,13 @@ export class ToolExecutionService {
 
     const toolId =
       request.toolId || classification?.toolId || resolution.requestedToolId || 'unknown-tool';
+    await this.recordBlockedAutomation(request, {
+      toolId,
+      triggerFired: 'Tool execution requested',
+      actionSelected: 'Resolve backend tool executor',
+      reason: 'unsupported-tool',
+      conditionsEvaluated: [{ label: resolution.reason, result: false }],
+    });
     return {
       success: false,
       status: 'unsupported',
@@ -440,6 +473,103 @@ export class ToolExecutionService {
       errorCode: ToolExecutionErrorCode.UNSUPPORTED_TOOL,
       executionTimeMs: Date.now() - startedAt,
     };
+  }
+
+  private async recordBlockedAutomation(
+    request: ToolCallingRequest,
+    details: {
+      toolId: string;
+      triggerFired: string;
+      actionSelected: string;
+      reason: string;
+      conditionsEvaluated?: { label: string; result: boolean }[];
+    },
+  ) {
+    await this.recordAutomationAudit(request, {
+      ...details,
+      status: AutomationAuditStatus.BLOCKED,
+    });
+  }
+
+  private async recordFailedAutomation(
+    request: ToolCallingRequest,
+    details: {
+      toolId: string;
+      triggerFired: string;
+      actionSelected: string;
+      error: string;
+    },
+  ) {
+    await this.recordAutomationAudit(request, {
+      ...details,
+      status: AutomationAuditStatus.FAILED,
+      conditionsEvaluated: [{ label: 'Backend tool executed successfully', result: false }],
+    });
+  }
+
+  private async recordAutomationAudit(
+    request: ToolCallingRequest,
+    details: {
+      toolId: string;
+      triggerFired: string;
+      actionSelected: string;
+      status: AutomationAuditStatus;
+      reason?: string;
+      error?: string;
+      conditionsEvaluated?: { label: string; result: boolean }[];
+    },
+  ) {
+    if (!this.automationAuditService) return;
+
+    const tenant = request.context?.tenant || {};
+    try {
+      await this.automationAuditService.createEvent(
+        {
+          triggerFired: details.triggerFired,
+          conditionsEvaluated: details.conditionsEvaluated || [
+            { label: details.reason || details.error || details.status, result: false },
+          ],
+          actionSelected: details.actionSelected,
+          user: {
+            id: request.userId || tenant.userId || 'anonymous',
+            name: request.userId || tenant.userId || 'Anonymous',
+          },
+          tenant: {
+            id: tenant.organizationId || 'unknown-tenant',
+            name: tenant.organizationId || 'Unknown tenant',
+          },
+          workspace: {
+            id: tenant.workspaceId || 'unknown-workspace',
+            name: tenant.workspaceId || 'Unknown workspace',
+          },
+          aiInvolvement: {
+            involved: true,
+            summary: 'AI/tool-calling automation path evaluated a backend tool request.',
+          },
+          toolCalled: details.toolId,
+          backendEndpoint: '/api/tool-calling/execute',
+          status: details.status,
+          reason: details.reason,
+          error: details.error,
+          timestamp: new Date().toISOString(),
+          reviewer: {
+            required: details.status !== AutomationAuditStatus.SUCCESS,
+            name: 'Tool automation reviewer',
+          },
+        },
+        {
+          organizationId: tenant.organizationId,
+          workspaceId: tenant.workspaceId,
+        },
+        {
+          id: request.userId || tenant.userId,
+        },
+      );
+    } catch (error) {
+      this.logger.warn(
+        `Failed to record tool automation audit: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
   }
 
   private buildToolContext(

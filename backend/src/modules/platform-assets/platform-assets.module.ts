@@ -1,6 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditLog } from '../audit/entities/audit-log.entity';
+import { AutomationAuditModule } from '../automation-audit/automation-audit.module';
 import { FleetModule } from '../fleet/fleet.module';
 import { OrganizationMembership } from '../organizations/entities/organization-membership.entity';
 import { Product } from '../product-catalog/entities/product.entity';
@@ -44,6 +45,7 @@ import { ServiceLineArchitectureService } from './service-line-architecture.serv
       Product,
     ]),
     forwardRef(() => WorkspacesModule),
+    AutomationAuditModule,
     UserProfileModule,
     FleetModule,
   ],

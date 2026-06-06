@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AiModule } from '../ai/ai.module';
+import { AutomationAuditModule } from '../automation-audit/automation-audit.module';
 import { IntentClassifierModule } from '../medical-control-plane/intent-classifier/intent-classifier.module';
 import { ToolOrchestratorModule } from '../medical-control-plane/tool-orchestrator/tool-orchestrator.module';
 import { FleetModule } from '../fleet';
@@ -15,6 +16,7 @@ import { ValidationService } from './validation.service';
 @Module({
   imports: [
     AiModule,
+    AutomationAuditModule,
     IntentClassifierModule,
     ToolOrchestratorModule,
     FleetModule,

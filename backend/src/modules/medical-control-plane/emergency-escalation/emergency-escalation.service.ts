@@ -37,6 +37,7 @@ export interface EscalationResult {
   recommendations: string[];
   requiresImmediate911: boolean;
   medicalDirectorNotified: boolean;
+  simulationMode: boolean;
 }
 
 /**
@@ -56,6 +57,8 @@ export interface EscalationAction {
   priority: number; // 1 = highest
   description: string;
   executed: boolean;
+  simulated?: boolean;
+  externalIntegrationRequired?: boolean;
   timestamp?: Date;
 }
 
@@ -134,6 +137,8 @@ export class EmergencyEscalationService {
         requires911,
         medicalDirectorNotified,
         conversationId: dto.context.conversationId,
+        simulationMode: true,
+        externalIntegrationsConfigured: false,
       },
       ipAddress: '0.0.0.0',
       userAgent: 'system',
@@ -164,6 +169,7 @@ export class EmergencyEscalationService {
       recommendations,
       requiresImmediate911: requires911,
       medicalDirectorNotified,
+      simulationMode: true,
     };
   }
 
@@ -178,28 +184,34 @@ export class EmergencyEscalationService {
       actions.push({
         type: EscalationActionType.CALL_911,
         priority: 1,
-        description: '🚨 CALL 911 IMMEDIATELY - Life-threatening emergency detected',
+        description: 'SIMULATED 911 escalation placeholder - Life-threatening emergency detected',
         executed: false,
+        simulated: true,
+        externalIntegrationRequired: true,
       });
 
       actions.push({
         type: EscalationActionType.NOTIFY_MEDICAL_DIRECTOR,
         priority: 2,
-        description: '📞 Notify Medical Director on duty',
+        description: 'SIMULATED medical director notification placeholder',
         executed: false,
+        simulated: true,
+        externalIntegrationRequired: true,
       });
 
       actions.push({
         type: EscalationActionType.RAPID_RESPONSE_TEAM,
         priority: 3,
-        description: '🏥 Activate Rapid Response Team',
+        description: 'SIMULATED rapid response activation placeholder',
         executed: false,
+        simulated: true,
+        externalIntegrationRequired: true,
       });
 
       actions.push({
         type: EscalationActionType.ACTIVATE_PROTOCOL,
         priority: 4,
-        description: `📋 Activate ${this.getCriticalProtocol(category)} protocol`,
+        description: `Review ${this.getCriticalProtocol(category)} protocol`,
         executed: false,
       });
     }
@@ -209,21 +221,25 @@ export class EmergencyEscalationService {
       actions.push({
         type: EscalationActionType.NOTIFY_MEDICAL_DIRECTOR,
         priority: 1,
-        description: '📞 Notify Medical Director - Urgent assessment needed',
+        description: 'SIMULATED medical director notification placeholder - urgent assessment needed',
         executed: false,
+        simulated: true,
+        externalIntegrationRequired: true,
       });
 
       actions.push({
         type: EscalationActionType.PAGE_ON_CALL,
         priority: 2,
-        description: '📟 Page on-call physician',
+        description: 'SIMULATED on-call physician page placeholder',
         executed: false,
+        simulated: true,
+        externalIntegrationRequired: true,
       });
 
       actions.push({
         type: EscalationActionType.ACTIVATE_PROTOCOL,
         priority: 3,
-        description: `📋 Review ${category} management protocol`,
+        description: `Review ${category} management protocol`,
         executed: false,
       });
     }
@@ -233,8 +249,10 @@ export class EmergencyEscalationService {
       actions.push({
         type: EscalationActionType.NOTIFY_MEDICAL_DIRECTOR,
         priority: 1,
-        description: '📞 Notify Medical Director - Monitoring recommended',
+        description: 'SIMULATED medical director notification placeholder - monitoring recommended',
         executed: false,
+        simulated: true,
+        externalIntegrationRequired: true,
       });
 
       actions.push({
@@ -249,7 +267,7 @@ export class EmergencyEscalationService {
     actions.push({
       type: EscalationActionType.DOCUMENT_INCIDENT,
       priority: 99,
-      description: '📝 Document emergency incident in medical record',
+      description: 'Document emergency incident in audit trail',
       executed: false,
     });
 
@@ -266,29 +284,23 @@ export class EmergencyEscalationService {
     try {
       switch (action.type) {
         case EscalationActionType.CALL_911:
-          // In production: integrate with 911 dispatch system
           this.logger.error(
-            `🚨 911 ALERT: ${dto.category} emergency - User: ${dto.context.userId} - Location: ${dto.context.location || 'Unknown'}`,
+            `SIMULATED 911 escalation placeholder: ${dto.category} emergency - User: ${dto.context.userId} - Location: ${dto.context.location || 'Unknown'}`,
           );
-          // Placeholder: would call external 911 API
           return true;
 
         case EscalationActionType.NOTIFY_MEDICAL_DIRECTOR:
-          // In production: integrate with paging/notification system
           this.logger.warn(
-            `📞 MEDICAL DIRECTOR NOTIFICATION: ${dto.severity} ${dto.category} - User: ${dto.context.userId}`,
+            `SIMULATED medical director notification placeholder: ${dto.severity} ${dto.category} - User: ${dto.context.userId}`,
           );
-          // Placeholder: would send SMS/page/email to medical director
           return true;
 
         case EscalationActionType.PAGE_ON_CALL:
-          this.logger.warn(`📟 Paging on-call physician for ${dto.category}`);
-          // Placeholder: would page on-call physician
+          this.logger.warn(`SIMULATED on-call physician page placeholder for ${dto.category}`);
           return true;
 
         case EscalationActionType.RAPID_RESPONSE_TEAM:
-          this.logger.error(`🏥 RAPID RESPONSE TEAM ACTIVATED: ${dto.category}`);
-          // Placeholder: would activate rapid response team
+          this.logger.error(`SIMULATED rapid response team activation placeholder: ${dto.category}`);
           return true;
 
         case EscalationActionType.ACTIVATE_PROTOCOL:
@@ -345,12 +357,12 @@ export class EmergencyEscalationService {
     const severityLabel = severity.toUpperCase();
 
     let message = `${emoji} **${severityLabel} EMERGENCY DETECTED: ${category}**\n\n`;
-    message += `**Immediate Actions Taken:**\n`;
+    message += `**Simulated / Local Actions Recorded:**\n`;
     actions.forEach((action, index) => {
       message += `${index + 1}. ${action.description}\n`;
     });
 
-    message += `\n⚠️ **This is an automated emergency detection system.**\n`;
+    message += `\n⚠️ **This is an automated emergency detection system running in simulated escalation mode.**\n`;
     message += `**Do NOT rely solely on this system for medical emergencies.**\n\n`;
 
     if (severity === EmergencySeverity.CRITICAL) {

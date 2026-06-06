@@ -3,8 +3,18 @@ import {
   isBackendCapabilityEnabled,
   UNSUPPORTED_CAPABILITY_MESSAGE,
 } from '../config/backendApiCapabilities';
+import { recordAutomationBlocked } from './automationAuditLogger';
 
 function disabledResult(action) {
+  void recordAutomationBlocked({
+    triggerFired: `${action} requested`,
+    conditionsEvaluated: [{ label: 'Clinical alerts backend capability enabled', result: false }],
+    actionSelected: action,
+    toolCalled: 'clinical-alerts',
+    backendEndpoint: '/api/clinical/alerts',
+    reason: 'Clinical alerts backend capability is disabled or demo-only on this server.',
+  });
+
   return {
     ok: false,
     disabled: true,

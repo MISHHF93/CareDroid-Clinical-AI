@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -31,7 +32,7 @@ export class PlatformGovernanceController {
   @Post('gate/evaluate')
   @HttpCode(HttpStatus.OK)
   @Permissions(Permission.USE_AI_CHAT)
-  evaluateGate(@Body() body: Record<string, any>) {
+  evaluateGate(@Body() body: Record<string, any>, @Req() req: any) {
     return this.platformGovernanceService.evaluateGate({
       runId: body.runId,
       capabilityId: body.capabilityId || 'clinical-chat',
@@ -39,6 +40,9 @@ export class PlatformGovernanceController {
       phiAccessed: Boolean(body.phiAccessed),
       prompt: body.prompt,
       action: body.action,
+      userId: req.user?.id || req.user?.userId || req.user?.sub,
+      tenantId: req.tenantContext?.organizationId,
+      workspaceId: req.tenantContext?.workspaceId,
     });
   }
 

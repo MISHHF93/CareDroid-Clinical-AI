@@ -57,6 +57,7 @@ function buildService(overrides: Record<string, any> = {}) {
       repositories.observabilityEvents as any,
       repositories.sourceProvenance as any,
       overrides.auditService as any,
+      overrides.automationAuditService as any,
     ),
   };
 }
@@ -102,6 +103,7 @@ describe('PlatformGovernanceService', () => {
   });
 
   it('fails closed when required P0 policy, classification, or consent is missing', async () => {
+    const automationAuditService = { createEvent: jest.fn().mockResolvedValue({ id: 'automation-audit-1' }) };
     const { service } = buildService({
       classifications: [
         { capabilityId: 'ambient-scribe', status: PlatformGovernanceStatus.ACTIVE },
@@ -113,6 +115,7 @@ describe('PlatformGovernanceService', () => {
           status: PlatformGovernanceStatus.ACTIVE,
         },
       ],
+      automationAuditService,
     });
 
     const missingPolicy = await service.evaluateGate({
@@ -125,6 +128,15 @@ describe('PlatformGovernanceService', () => {
 
     expect(missingPolicy.allowed).toBe(false);
     expect(missingPolicy.reasons).toContain('active_governance_policy_missing');
+    expect(automationAuditService.createEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        triggerFired: 'Platform governance gate evaluated',
+        status: 'blocked',
+        reason: expect.stringContaining('active_governance_policy_missing'),
+      }),
+      expect.any(Object),
+      expect.any(Object),
+    );
 
     const missingConsent = await buildService({
       policies: [{ capabilityId: 'ambient-scribe', status: PlatformGovernanceStatus.ACTIVE }],

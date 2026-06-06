@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditModule } from '../audit/audit.module';
+import { AutomationAuditModule } from '../automation-audit/automation-audit.module';
 import { MetricsModule } from '../metrics/metrics.module';
 import { PlatformGovernanceController } from './platform-governance.controller';
 import { PlatformGovernanceService } from './platform-governance.service';
@@ -36,6 +37,7 @@ import {
       PlatformSourceProvenance,
     ]),
     AuditModule,
+    AutomationAuditModule,
     MetricsModule,
   ],
   controllers: [PlatformGovernanceController],

@@ -1,8 +1,15 @@
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import AutomationAuditTrail from './AutomationAuditTrail';
 import { resetAutomationAuditTrail } from '../data/automationAuditTrail';
+
+vi.mock('../services/automationAuditApi', () => ({
+  fetchAutomationAuditEntries: vi.fn().mockResolvedValue({
+    ok: false,
+    message: 'Automation audit API is unavailable; showing local fallback entries.',
+  }),
+}));
 
 function renderRoute() {
   return render(
@@ -19,16 +26,18 @@ describe('AutomationAuditTrail', () => {
     resetAutomationAuditTrail();
   });
 
-  it('renders the /automation-audit route', () => {
+  it('renders the /automation-audit route', async () => {
     renderRoute();
 
     expect(screen.getByRole('heading', { level: 1, name: /automation audit/i })).toBeInTheDocument();
     expect(screen.getByRole('note')).toHaveTextContent(/no invisible automation/i);
+    expect(await screen.findByRole('status')).toHaveTextContent(/local audit fallback active/i);
     expect(screen.getByLabelText(/automation audit entries/i)).toHaveTextContent(/high news2 threshold reached/i);
   });
 
-  it('shows successful, blocked, and reviewer-required audit metadata for the selected tenant', () => {
+  it('shows successful, blocked, and reviewer-required audit metadata for the selected tenant', async () => {
     renderRoute();
+    await screen.findByRole('status');
 
     const summary = screen.getByLabelText(/automation audit summary/i);
     expect(within(summary).getByText(/total events/i).nextSibling).toHaveTextContent('2');
@@ -39,8 +48,9 @@ describe('AutomationAuditTrail', () => {
     expect(screen.getByText(/notify clinician escalation pool/i)).toBeInTheDocument();
   });
 
-  it('filters audit entries by tenant', () => {
+  it('filters audit entries by tenant', async () => {
     renderRoute();
+    await screen.findByRole('status');
 
     expect(screen.queryByText(/laboratory workflow route returned 503/i)).not.toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(/tenant scope/i), {

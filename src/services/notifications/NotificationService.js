@@ -5,6 +5,7 @@
 
 import { resolveApiRoot } from '../../config/api.config';
 import { isBackendCapabilityEnabled } from '../../config/backendApiCapabilities';
+import { recordAutomationBlocked } from '../automationAuditLogger';
 
 const getDefaultApiBaseUrl = () => resolveApiRoot();
 
@@ -205,7 +206,16 @@ class NotificationService {
    */
   async sendViaChannel(channel, notification) {
     if (!isBackendCapabilityEnabled('notificationSendChannel')) {
-      throw new Error(`Server send channel "${channel}" is not available.`);
+      const error = new Error(`Server send channel "${channel}" is not available.`);
+      await recordAutomationBlocked({
+        triggerFired: 'Queue-style notification send requested',
+        conditionsEvaluated: [{ label: 'Notification send-channel backend capability enabled', result: false }],
+        actionSelected: `Send notification through ${channel}`,
+        toolCalled: 'notification-queue',
+        backendEndpoint: `/api/notifications/send/${channel}`,
+        reason: error.message,
+      });
+      throw error;
     }
 
     const payload = this.buildChannelPayload(channel, notification);

@@ -1,4 +1,5 @@
 import { apiFetch } from './apiClient';
+import { recordAutomationFailure } from './automationAuditLogger';
 import toolRegistry from '../data/toolRegistry';
 import { NLU_TO_REGISTRY_ID } from '../data/clinicalCatalogWiring';
 
@@ -101,6 +102,17 @@ class AdvancedRecommendationService {
       };
     } catch (error) {
       console.error('Intent classification error:', error);
+      await recordAutomationFailure({
+        triggerFired: 'Advanced tool recommendation intent classification failed',
+        actionSelected: 'Generate AI-assisted tool recommendations',
+        toolCalled: 'advanced-recommendation-service',
+        backendEndpoint: '/api/chat/intent-classify',
+        error,
+        aiInvolvement: {
+          involved: true,
+          summary: 'AI/NLU recommendation path fell back to keyword recommendations.',
+        },
+      });
       return {
         primaryIntent: 'unknown',
         confidence: 0.3,

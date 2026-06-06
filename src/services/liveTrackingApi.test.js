@@ -11,8 +11,14 @@ vi.mock('./apiClient', () => ({
   ),
 }));
 
+vi.mock('./automationAuditLogger', () => ({
+  recordAutomationBlocked: vi.fn(),
+  recordAutomationFailure: vi.fn(),
+}));
+
 import { isBackendCapabilityEnabled } from '../config/backendApiCapabilities';
 import { apiFetchJson } from './apiClient';
+import { recordAutomationBlocked, recordAutomationFailure } from './automationAuditLogger';
 import { fetchLiveTrackingCapability } from './liveTrackingApi';
 
 describe('liveTrackingApi', () => {
@@ -26,6 +32,12 @@ describe('liveTrackingApi', () => {
     expect(result).toMatchObject({ ok: false, unsupported: true });
     expect(isBackendCapabilityEnabled).toHaveBeenCalledWith('disabledCapability');
     expect(apiFetchJson).not.toHaveBeenCalled();
+    expect(recordAutomationBlocked).toHaveBeenCalledWith(
+      expect.objectContaining({
+        toolCalled: 'disabledCapability',
+        reason: 'Backend capability is disabled.',
+      })
+    );
   });
 
   it('normalizes successful demo contract responses', async () => {
@@ -63,5 +75,11 @@ describe('liveTrackingApi', () => {
       unsupported: false,
       message: 'backend unavailable',
     });
+    expect(recordAutomationFailure).toHaveBeenCalledWith(
+      expect.objectContaining({
+        toolCalled: 'hospitalMap',
+        error: expect.any(Error),
+      })
+    );
   });
 });

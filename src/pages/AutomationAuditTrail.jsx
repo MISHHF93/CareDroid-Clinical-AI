@@ -1,10 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   AUTOMATION_AUDIT_STATUS_LABELS,
   getAutomationAuditEntries,
   getAutomationAuditTenants,
   summarizeAutomationAuditTrail,
 } from '../data/automationAuditTrail';
+import { fetchAutomationAuditEntries } from '../services/automationAuditApi';
 import './AutomationAuditTrail.css';
 
 function formatTimestamp(timestamp) {
@@ -86,10 +87,47 @@ function AuditEntryCard({ entry }) {
 }
 
 export default function AutomationAuditTrail() {
-  const tenants = useMemo(() => getAutomationAuditTenants(), []);
+  const fallbackEntries = useMemo(() => getAutomationAuditEntries(), []);
+  const [allEntries, setAllEntries] = useState(fallbackEntries);
+  const [auditSource, setAuditSource] = useState('local');
+  const [auditError, setAuditError] = useState('');
+  const tenants = useMemo(() => getAutomationAuditTenants(allEntries), [allEntries]);
   const [tenantId, setTenantId] = useState(tenants[0]?.id || '');
-  const entries = useMemo(() => getAutomationAuditEntries({ tenantId }), [tenantId]);
+  const entries = useMemo(
+    () => (tenantId ? allEntries.filter((entry) => entry.tenant.id === tenantId) : allEntries),
+    [allEntries, tenantId]
+  );
   const summary = useMemo(() => summarizeAutomationAuditTrail(entries), [entries]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadAuditEntries() {
+      const result = await fetchAutomationAuditEntries();
+      if (!isMounted) return;
+
+      if (result.ok) {
+        setAllEntries(result.data);
+        setAuditSource('backend');
+        setAuditError('');
+        return;
+      }
+
+      setAllEntries(fallbackEntries);
+      setAuditSource('local');
+      setAuditError(result.message || 'Automation audit API is unavailable; showing local fallback entries.');
+    }
+
+    loadAuditEntries();
+    return () => {
+      isMounted = false;
+    };
+  }, [fallbackEntries]);
+
+  useEffect(() => {
+    if (tenantId && tenants.some((tenant) => tenant.id === tenantId)) return;
+    setTenantId(tenants[0]?.id || '');
+  }, [tenantId, tenants]);
 
   return (
     <main className="automation-audit-page">
@@ -117,6 +155,13 @@ export default function AutomationAuditTrail() {
       <section className="automation-audit-policy" role="note">
         <strong>No invisible automation</strong>
         <span>Failed automations log errors, blocked automations log reasons, and entries are tenant-scoped.</span>
+      </section>
+      <section className={`automation-audit-source automation-audit-source--${auditSource}`} role="status">
+        <strong>{auditSource === 'backend' ? 'Backend audit persistence active' : 'Local audit fallback active'}</strong>
+        <span>
+          {auditError ||
+            'Automation audit entries are loaded from the tenant-scoped backend audit endpoint.'}
+        </span>
       </section>
 
       <section className="automation-audit-summary" aria-label="Automation audit summary">

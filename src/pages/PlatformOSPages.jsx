@@ -348,7 +348,11 @@ export function WorkflowBuilderPage() {
   };
 
   return (
-    <PageShell eyebrow="Workflow Builder" title="Workflows" description="Create, save, edit, AI-generate, and launch workflows using calculators, AI prompts, dashboards, tools, and maps as blocks.">
+    <PageShell eyebrow="Workflow Builder" title="Workflows" description="Preview demo workflow chains using calculators, AI prompts, dashboards, tools, and maps as blocks. Save and AI-generation require a backend workflow service before they execute.">
+      <DataSourceNotice
+        label="Workflow demo preview"
+        detail="Saved workflow examples are frontend fixtures. Save draft and AI-generate are disabled until a durable workflow API exists."
+      />
       <section className="platform-workflow-layout">
         <div className="platform-panel">
           <label>
@@ -361,12 +365,17 @@ export function WorkflowBuilderPage() {
             <span>Create workflow</span>
             <input value={draftName} onChange={(event) => setDraftName(event.target.value)} placeholder="New workflow name" />
           </label>
-          <button type="button" className="platform-secondary-button">Save workflow draft</button>
-          <button type="button" className="platform-secondary-button">AI-generate workflow</button>
+          <button type="button" className="platform-secondary-button" disabled title="Requires durable workflow API">
+            Save workflow draft (demo disabled)
+          </button>
+          <button type="button" className="platform-secondary-button" disabled title="Requires workflow generation API">
+            AI-generate workflow (demo disabled)
+          </button>
         </div>
         <div className="platform-workflow-chain">
           <h2>{draftName || workflow.name}</h2>
           <p>{workflow.description}</p>
+          <p className="platform-muted">Execution mode: {workflow.executionMode}. Blocks can open existing tools, but this workflow is not saved, queued, or scheduled.</p>
           {workflow.blocks.map((block, index) => (
             <button key={block.id} type="button" onClick={() => launchBlock(block)}>
               <span>{index + 1}</span>

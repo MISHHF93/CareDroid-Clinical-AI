@@ -3,6 +3,7 @@ import {
   buildAssetRegistry,
   buildDigitalTwinSnapshot,
   buildGlobalSearchResults,
+  PLATFORM_WORKFLOWS,
   workspaceFilterSummary,
 } from './platformOperatingSystem';
 
@@ -27,5 +28,9 @@ describe('platformOperatingSystem', () => {
     expect(buildAssetRegistry()).toEqual(
       expect.arrayContaining([expect.objectContaining({ status: 'referenced' })])
     );
+  });
+
+  it('keeps workflow fixtures labeled as demo previews', () => {
+    expect(PLATFORM_WORKFLOWS.every((workflow) => workflow.executionMode === 'demo-preview')).toBe(true);
   });
 });

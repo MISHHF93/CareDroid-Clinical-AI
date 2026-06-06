@@ -1,4 +1,5 @@
 import { apiFetchJson, getApiErrorMessage } from './apiClient';
+import { recordAutomationFailure } from './automationAuditLogger';
 
 const UNKNOWN = 'unknown';
 
@@ -63,6 +64,13 @@ async function readJsonEndpoint(path) {
       message: response.ok ? '' : getApiErrorMessage(null, response),
     };
   } catch (error) {
+    await recordAutomationFailure({
+      triggerFired: `System health probe failed for ${path}`,
+      actionSelected: 'Read observability health endpoint',
+      toolCalled: 'system-health',
+      backendEndpoint: path,
+      error,
+    });
     return {
       ok: false,
       statusCode: 0,

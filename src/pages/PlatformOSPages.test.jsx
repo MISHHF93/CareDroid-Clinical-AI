@@ -74,25 +74,33 @@ describe('PlatformOSPages', () => {
   });
 
   it('renders timeline, notifications, digital twin, workflows, and assets', () => {
-    renderPage(<ClinicalTimelinePage />, '/timeline');
+    let view = renderPage(<ClinicalTimelinePage />, '/timeline');
     expect(screen.getByRole('heading', { name: /^timeline$/i })).toBeInTheDocument();
     expect(screen.getByText(/local timeline demo/i)).toBeInTheDocument();
+    view.unmount();
 
-    renderPage(<NotificationCenterPage />, '/notifications');
+    view = renderPage(<NotificationCenterPage />, '/notifications');
     expect(screen.getByRole('heading', { name: /notification center/i })).toBeInTheDocument();
+    view.unmount();
 
-    renderPage(<DigitalTwinPage />, '/digital-twin');
+    view = renderPage(<DigitalTwinPage />, '/digital-twin');
     expect(screen.getByRole('heading', { name: /digital twin/i })).toBeInTheDocument();
     expect(screen.getByText(/operations aggregate/i)).toBeInTheDocument();
     for (const path of ['/hospital-map', '/medical-iot', '/devices', '/fleet/map', '/live-map']) {
       expect(screen.getByRole('link', { name: new RegExp(path.replace('/', '\\/')) })).toHaveAttribute('href', path);
     }
+    view.unmount();
 
-    renderPage(<WorkflowBuilderPage />, '/workflows');
+    view = renderPage(<WorkflowBuilderPage />, '/workflows');
     expect(screen.getByRole('heading', { name: /workflows/i })).toBeInTheDocument();
+    expect(screen.getByText(/workflow demo preview/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /save workflow draft \(demo disabled\)/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /ai-generate workflow \(demo disabled\)/i })).toBeDisabled();
+    expect(screen.getByText(/not saved, queued, or scheduled/i)).toBeInTheDocument();
+    view.unmount();
 
     renderPage(<AssetLibraryPage />, '/assets');
     expect(screen.getByRole('heading', { name: /asset library/i })).toBeInTheDocument();
-    expect(screen.getByText(/local asset projection/i)).toBeInTheDocument();
+    expect(screen.getByText(/platform asset projection/i)).toBeInTheDocument();
   });
 });

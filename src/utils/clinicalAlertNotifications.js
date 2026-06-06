@@ -9,6 +9,7 @@ import {
   acknowledgeClinicalAlertApi,
   dismissClinicalAlertApi,
 } from '../services/clinicalAlertsApi';
+import { recordAutomationBlocked, recordAutomationFailure } from '../services/automationAuditLogger';
 
 export const sendClinicalAlert = async (alertData, options = {}) => {
   const {
@@ -89,6 +90,18 @@ export const sendClinicalAlert = async (alertData, options = {}) => {
     return { success: true, alertId: alertData.id };
   } catch (error) {
     console.error('Error sending clinical alert:', error);
+    await recordAutomationFailure({
+      triggerFired: 'Clinical alert delivery failed',
+      actionSelected: 'Deliver clinical alert notification',
+      toolCalled: 'clinical-alerts',
+      backendEndpoint: '/api/notifications',
+      error,
+      scope: { userId },
+      aiInvolvement: {
+        involved: Boolean(alertData.aiInvolvement),
+        summary: alertData.aiInvolvement || 'Clinical alert notification path.',
+      },
+    });
     return { success: false, error: error.message };
   }
 };
@@ -108,6 +121,15 @@ export const sendBatchClinicalAlerts = async (alerts, options = {}) => {
 
 export const acknowledgeClinicalAlert = async (alertId, userId = null) => {
   if (!isBackendCapabilityEnabled('clinicalAlerts')) {
+    await recordAutomationBlocked({
+      triggerFired: 'Clinical alert acknowledgement requested',
+      conditionsEvaluated: [{ label: 'Clinical alerts backend capability enabled', result: false }],
+      actionSelected: 'Acknowledge clinical alert',
+      toolCalled: 'clinical-alerts',
+      backendEndpoint: `/api/clinical/alerts/${alertId}/acknowledge`,
+      reason: 'Clinical alerts API is not available on this server.',
+      scope: { userId },
+    });
     return {
       success: true,
       alertId,
@@ -129,12 +151,28 @@ export const acknowledgeClinicalAlert = async (alertId, userId = null) => {
     return { success: true, alertId, data: result.data };
   } catch (error) {
     console.error('Error acknowledging alert:', error);
+    await recordAutomationFailure({
+      triggerFired: 'Clinical alert acknowledgement failed',
+      actionSelected: 'Acknowledge clinical alert',
+      toolCalled: 'clinical-alerts',
+      backendEndpoint: `/api/clinical/alerts/${alertId}/acknowledge`,
+      error,
+      scope: { userId },
+    });
     return { success: false, error: error.message };
   }
 };
 
 export const dismissClinicalAlert = async (alertId, reason = '') => {
   if (!isBackendCapabilityEnabled('clinicalAlerts')) {
+    await recordAutomationBlocked({
+      triggerFired: 'Clinical alert dismissal requested',
+      conditionsEvaluated: [{ label: 'Clinical alerts backend capability enabled', result: false }],
+      actionSelected: 'Dismiss clinical alert',
+      toolCalled: 'clinical-alerts',
+      backendEndpoint: `/api/clinical/alerts/${alertId}/dismiss`,
+      reason: 'Clinical alerts API is not available on this server.',
+    });
     return {
       success: true,
       alertId,
@@ -156,6 +194,13 @@ export const dismissClinicalAlert = async (alertId, reason = '') => {
     return { success: true, alertId, data: result.data };
   } catch (error) {
     console.error('Error dismissing alert:', error);
+    await recordAutomationFailure({
+      triggerFired: 'Clinical alert dismissal failed',
+      actionSelected: 'Dismiss clinical alert',
+      toolCalled: 'clinical-alerts',
+      backendEndpoint: `/api/clinical/alerts/${alertId}/dismiss`,
+      error,
+    });
     return { success: false, error: error.message };
   }
 };
@@ -227,11 +272,18 @@ export const subscribeToClinicalAlerts = (callbacks = {}) => {
   } = callbacks;
 
   if (!isBackendCapabilityEnabled('clinicalAlertsStream')) {
-    onError(
-      new Error(
-        'Clinical alerts stream is not available on this server. Use in-app notifications or refresh the alerts page.'
-      )
+    const error = new Error(
+      'Clinical alerts stream is not available on this server. Use in-app notifications or refresh the alerts page.'
     );
+    void recordAutomationBlocked({
+      triggerFired: 'Clinical alerts stream subscription requested',
+      conditionsEvaluated: [{ label: 'Clinical alerts stream backend capability enabled', result: false }],
+      actionSelected: 'Subscribe to live clinical alert stream',
+      toolCalled: 'clinical-alerts',
+      backendEndpoint: '/api/clinical/alerts/stream',
+      reason: error.message,
+    });
+    onError(error);
     return null;
   }
 
@@ -271,6 +323,13 @@ export const subscribeToClinicalAlerts = (callbacks = {}) => {
 
     return ws;
   } catch (error) {
+    void recordAutomationFailure({
+      triggerFired: 'Clinical alerts stream subscription failed',
+      actionSelected: 'Subscribe to live clinical alert stream',
+      toolCalled: 'clinical-alerts',
+      backendEndpoint: '/api/clinical/alerts/stream',
+      error,
+    });
     onError(error);
     return null;
   }

@@ -75,6 +75,7 @@ import { PlatformAssetsModule } from './modules/platform-assets/platform-assets.
 import { OrganizationsModule } from './modules/organizations/organizations.module';
 import { ProductCatalogModule } from './modules/product-catalog/product-catalog.module';
 import { TenantContextModule } from './modules/tenant-context/tenant-context.module';
+import { AutomationAuditModule } from './modules/automation-audit/automation-audit.module';
 
 // Monitoring & Observability
 import { LoggerModule } from './modules/common/logger.module';
@@ -209,6 +210,7 @@ function resolveDatabaseClient() {
     OrganizationsModule,
     ProductCatalogModule,
     TenantContextModule,
+    AutomationAuditModule,
 
     // Medical Control Plane (Intent Classification, Tool Orchestration)
     MedicalControlPlaneModule,

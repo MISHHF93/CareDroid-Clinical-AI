@@ -51,6 +51,7 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
   {
     id: 'chest-pain',
     name: 'Chest Pain Workflow',
+    executionMode: 'demo-preview',
     description: 'HEART, ECG Assistant, ACS Assistant, and documentation in sequence.',
     workspaceIds: ['cardiology', 'emergency'],
     blocks: [
@@ -63,6 +64,7 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
   {
     id: 'sepsis-escalation',
     name: 'Sepsis Escalation Workflow',
+    executionMode: 'demo-preview',
     description: 'qSOFA, NEWS2, SOFA, antibiotics, fluids, reassessment, and handoff.',
     workspaceIds: ['emergency', 'icu'],
     blocks: [
@@ -75,6 +77,7 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
   {
     id: 'device-maintenance',
     name: 'Device Maintenance Workflow',
+    executionMode: 'demo-preview',
     description: 'Telemetry alert, device detail, maintenance note, and assignment review.',
     workspaceIds: ['medical-iot', 'operations', 'governance'],
     blocks: [

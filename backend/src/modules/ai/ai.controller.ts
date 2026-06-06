@@ -121,6 +121,8 @@ export class AIController {
     await this.entitlementService.assertLaunchAllowed({
       assetId,
       organizationId: req.tenantContext?.organizationId,
+      workspaceId: req.tenantContext?.workspaceId,
+      userId: req.user?.id || req.user?.userId || req.user?.sub,
       userRole: req.tenantContext?.role || req.user?.role,
       subscriptionPlan: req.tenantContext?.subscriptionPlan || req.user?.subscription?.tier,
       strictEntitlements: true,

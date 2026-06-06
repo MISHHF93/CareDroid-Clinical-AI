@@ -140,6 +140,7 @@ export class ChatService {
       phiAccessed: aiRunEnvelope.policy.phiAccessed,
       prompt: message,
       action: 'assistant-chat',
+      userId,
     });
 
     if (governanceDecision?.reasons.includes('prompt_security_review_required')) {

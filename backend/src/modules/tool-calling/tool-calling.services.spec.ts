@@ -39,6 +39,9 @@ function makeExecutionService() {
     }),
     saveToolResult: jest.fn().mockResolvedValue({ id: 'log-1' }),
   };
+  const automationAuditService = {
+    createEvent: jest.fn().mockResolvedValue({ id: 'automation-audit-1' }),
+  };
   const service = new ToolExecutionService(
     {
       classify: jest.fn().mockResolvedValue({
@@ -85,9 +88,10 @@ function makeExecutionService() {
         reviewRequired: true,
       }),
     } as any,
+    automationAuditService as any,
   );
 
-  return { service, toolOrchestrator };
+  return { service, toolOrchestrator, automationAuditService };
 }
 
 describe('ToolResolverService', () => {
@@ -230,12 +234,19 @@ describe('ToolExecutionService', () => {
   });
 
   it('returns structured fallback for unsupported tools', async () => {
-    const { service } = makeExecutionService();
+    const { service, automationAuditService } = makeExecutionService();
 
     const result = await service.executePrompt({
       prompt: 'Run a made-up executor',
       toolId: 'not-a-tool',
       parameters: {},
+      userId: 'user-1',
+      context: {
+        tenant: {
+          organizationId: 'org-1',
+          workspaceId: 'workspace-1',
+        },
+      },
     });
 
     expect(result.success).toBe(false);
@@ -244,5 +255,18 @@ describe('ToolExecutionService', () => {
       type: 'unsupported-tool',
     });
     expect(result.executionLogs.some((entry) => entry.phase === 'fallback')).toBe(true);
+    expect(automationAuditService.createEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        triggerFired: 'Tool execution requested',
+        toolCalled: 'not-a-tool',
+        status: 'blocked',
+        reason: 'unsupported-tool',
+      }),
+      expect.objectContaining({
+        organizationId: 'org-1',
+        workspaceId: 'workspace-1',
+      }),
+      expect.objectContaining({ id: 'user-1' }),
+    );
   });
 });

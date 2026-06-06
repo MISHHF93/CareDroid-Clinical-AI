@@ -10,6 +10,7 @@
 
 .automation-audit-hero,
 .automation-audit-policy,
+.automation-audit-source,
 .automation-audit-summary,
 .automation-audit-entry {
   border: 1px solid var(--panel-border);
@@ -91,6 +92,25 @@
 
 .automation-audit-policy span {
   color: var(--text-secondary);
+}
+
+.automation-audit-source {
+  padding: 14px 16px;
+  display: grid;
+  gap: 4px;
+  background: var(--app-surface-1);
+}
+
+.automation-audit-source strong {
+  color: var(--text-primary);
+}
+
+.automation-audit-source span {
+  color: var(--text-secondary);
+}
+
+.automation-audit-source--local {
+  border-color: color-mix(in srgb, var(--app-warning, #d97706) 40%, var(--panel-border));
 }
 
 .automation-audit-summary {
