@@ -26,7 +26,8 @@ export class TenantContextController {
   @ApiOperation({ summary: 'Tenant data isolation audit report' })
   async isolationAudit(@Req() req: any) {
     const tenantContext =
-      req.tenantContext || (await this.tenantContextService.resolveForRequest(req.user, req.headers));
+      req.tenantContext ||
+      (await this.tenantContextService.resolveForRequest(req.user, req.headers));
     return this.tenantDataIsolationAuditService.getAuditReport(tenantContext);
   }
 }

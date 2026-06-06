@@ -30,7 +30,11 @@ describe('AIController organization usage', () => {
       assertLaunchAllowed: jest.fn().mockResolvedValue({ isLaunchable: true }),
     };
     return {
-      controller: new AIController(aiService as any, organizationsService as any, entitlementService as any),
+      controller: new AIController(
+        aiService as any,
+        organizationsService as any,
+        entitlementService as any,
+      ),
       aiService,
       organizationsService,
       entitlementService,

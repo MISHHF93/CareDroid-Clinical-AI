@@ -103,7 +103,9 @@ describe('PlatformGovernanceService', () => {
   });
 
   it('fails closed when required P0 policy, classification, or consent is missing', async () => {
-    const automationAuditService = { createEvent: jest.fn().mockResolvedValue({ id: 'automation-audit-1' }) };
+    const automationAuditService = {
+      createEvent: jest.fn().mockResolvedValue({ id: 'automation-audit-1' }),
+    };
     const { service } = buildService({
       classifications: [
         { capabilityId: 'ambient-scribe', status: PlatformGovernanceStatus.ACTIVE },

@@ -68,7 +68,10 @@ describe('PlatformContextService', () => {
         workspaceDefaults: [{ name: 'Emergency Command', type: 'emergency' }],
       },
     });
-    membershipRepository.findOne.mockResolvedValue({ role: 'admin', roleProfileId: 'emergency-physician' });
+    membershipRepository.findOne.mockResolvedValue({
+      role: 'admin',
+      roleProfileId: 'emergency-physician',
+    });
     productRepository.find.mockResolvedValue([
       {
         id: 'product-emergency-department',
@@ -86,7 +89,11 @@ describe('PlatformContextService', () => {
       { packId: 'core-platform' },
       { packId: 'emergency-department-pack' },
     ]);
-    platformAssetsService.resolveEntitledAssetIds.mockResolvedValue(['dashboard', 'qsofa', 'agent-emergency']);
+    platformAssetsService.resolveEntitledAssetIds.mockResolvedValue([
+      'dashboard',
+      'qsofa',
+      'agent-emergency',
+    ]);
     platformAssetsService.getRoleProfile.mockResolvedValue({ defaultAiAgentId: 'agent-emergency' });
     platformAssetsService.listPacks.mockResolvedValue([
       { id: 'core-platform' },

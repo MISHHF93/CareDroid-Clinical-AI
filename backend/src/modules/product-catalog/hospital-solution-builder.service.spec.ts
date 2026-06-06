@@ -221,7 +221,9 @@ describe('HospitalSolutionBuilderService', () => {
           assetAccess: [{ id: 'audit-logs' }],
         },
       ]),
-      reconcileOrganizationCommercialPlan: jest.fn().mockResolvedValue({ commercialPlanId: 'enterprise' }),
+      reconcileOrganizationCommercialPlan: jest
+        .fn()
+        .mockResolvedValue({ commercialPlanId: 'enterprise' }),
     };
     const organizationsService = {
       updateConfiguration: jest.fn().mockResolvedValue({ tenant: { organizationId: 'org-1' } }),
@@ -294,7 +296,12 @@ describe('HospitalSolutionBuilderService', () => {
       expect.arrayContaining(['laboratory-interface', 'scheduling']),
     );
     expect(recommendation.aiAgents.map((agent: any) => agent.id)).toEqual(
-      expect.arrayContaining(['agent-lab', 'agent-operations', 'agent-education', 'agent-governance']),
+      expect.arrayContaining([
+        'agent-lab',
+        'agent-operations',
+        'agent-education',
+        'agent-governance',
+      ]),
     );
     expect(recommendation.workspaces).toEqual(
       expect.arrayContaining([

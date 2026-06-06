@@ -119,7 +119,8 @@ export class OrganizationAnalyticsService {
     );
     const simulationCompletion = this.groupUsage(
       usageEvents.filter((event) => this.isSimulationCompletion(event)),
-      (event) => event.assetId || this.metadataString(event.metadata, 'simulationId') || 'simulation',
+      (event) =>
+        event.assetId || this.metadataString(event.metadata, 'simulationId') || 'simulation',
     ).map((metric) => this.decorateAssetMetric(metric, assetById));
     const dashboardEngagement = this.groupUsage(
       usageEvents.filter((event) => this.isDashboardEvent(event, assetById)),
@@ -240,10 +241,7 @@ export class OrganizationAnalyticsService {
     };
   }
 
-  private auditAssetUsage(
-    logs: AuditLog[],
-    assetById: Map<string, PlatformAsset>,
-  ): UsageMetric[] {
+  private auditAssetUsage(logs: AuditLog[], assetById: Map<string, PlatformAsset>): UsageMetric[] {
     const rows = new Map<string, UsageMetric>();
     for (const log of logs) {
       const resource = log.resource || '';
@@ -280,7 +278,10 @@ export class OrganizationAnalyticsService {
     return events.reduce((total, event) => total + Number(event.quantity || 0), 0);
   }
 
-  private metadataString(metadata: Record<string, any> | null | undefined, key: string): string | null {
+  private metadataString(
+    metadata: Record<string, any> | null | undefined,
+    key: string,
+  ): string | null {
     const value = metadata?.[key];
     return typeof value === 'string' && value.trim() ? value : null;
   }
@@ -298,7 +299,9 @@ export class OrganizationAnalyticsService {
 
   private isSimulationCompletion(event: UsageEvent): boolean {
     const status = this.metadataString(event.metadata, 'status') || '';
-    return event.eventType === UsageEventType.SIMULATION && (!status || status.includes('complete'));
+    return (
+      event.eventType === UsageEventType.SIMULATION && (!status || status.includes('complete'))
+    );
   }
 
   private isDashboardEvent(event: UsageEvent, assetById: Map<string, PlatformAsset>): boolean {

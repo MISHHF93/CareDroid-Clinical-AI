@@ -1,6 +1,10 @@
 import { BadRequestException } from '@nestjs/common';
 import { PlatformAsset } from './entities/platform-asset.entity';
-import { DEPARTMENT_IDS, normalizeDepartmentId, normalizeDepartmentIds } from './department-taxonomy';
+import {
+  DEPARTMENT_IDS,
+  normalizeDepartmentId,
+  normalizeDepartmentIds,
+} from './department-taxonomy';
 import {
   OrganizationType,
   PlatformAssetLifecycle,
@@ -160,7 +164,10 @@ const LIFECYCLE_ALIASES: Record<string, PlatformAssetLifecycle> = {
 export function normalizeRegistryType(value: unknown): AssetRegistryType | null {
   if (!value) return null;
   const raw = String(value).trim();
-  return TYPE_ALIASES[raw] || (REGISTRY_TYPES.has(raw as AssetRegistryType) ? (raw as AssetRegistryType) : null);
+  return (
+    TYPE_ALIASES[raw] ||
+    (REGISTRY_TYPES.has(raw as AssetRegistryType) ? (raw as AssetRegistryType) : null)
+  );
 }
 
 export function registryTypeToEntityAssetType(type: AssetRegistryType): PlatformAssetType {
@@ -222,7 +229,8 @@ export function platformAssetToRegistryMetadata(asset: PlatformAsset): AssetRegi
     requiredPermissions: asStringArray(asset.requiredPermissions),
     lifecycleStatus: normalizeAssetLifecycle(asset.lifecycle) || PlatformAssetLifecycle.DRAFT,
     subscriptionTier: normalizeSubscriptionTier(asset.pricingTier) || PricingTier.STANDARD,
-    riskLevel: normalizeRiskLevel(asset.riskLevel) || AssetRegistryRiskLevel.CLINICAL_DECISION_SUPPORT,
+    riskLevel:
+      normalizeRiskLevel(asset.riskLevel) || AssetRegistryRiskLevel.CLINICAL_DECISION_SUPPORT,
     demoStatus: normalizeDemoStatus(asset.demoStatus) || AssetDemoLiveStatus.DEMO,
   };
 }
@@ -231,7 +239,12 @@ export function validateAssetRegistryMetadata(
   metadata: Partial<AssetRegistryMetadata>,
 ): AssetRegistryValidationIssue[] {
   const issues: AssetRegistryValidationIssue[] = [];
-  const stringFields: Array<keyof AssetRegistryMetadata> = ['assetId', 'title', 'category', 'route'];
+  const stringFields: Array<keyof AssetRegistryMetadata> = [
+    'assetId',
+    'title',
+    'category',
+    'route',
+  ];
 
   for (const field of REQUIRED_ASSET_METADATA_FIELDS) {
     const value = metadata[field];
@@ -275,7 +288,10 @@ export function validateAssetRegistryMetadata(
   }
   for (const department of metadata.secondaryDepartments || []) {
     if (!DEPARTMENT_IDS.includes(department as any)) {
-      issues.push({ field: 'secondaryDepartments', message: `contains unsupported department ${department}` });
+      issues.push({
+        field: 'secondaryDepartments',
+        message: `contains unsupported department ${department}`,
+      });
     }
   }
 
@@ -291,7 +307,10 @@ export function validateAssetRegistryMetadata(
   return issues;
 }
 
-export function assertValidAssetRegistryMetadata(metadata: Partial<AssetRegistryMetadata>, label = 'asset') {
+export function assertValidAssetRegistryMetadata(
+  metadata: Partial<AssetRegistryMetadata>,
+  label = 'asset',
+) {
   const issues = validateAssetRegistryMetadata(metadata);
   if (issues.length) {
     throw new BadRequestException({

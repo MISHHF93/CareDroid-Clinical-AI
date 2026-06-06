@@ -6,6 +6,8 @@ import { UsageEventType, UsageUnit } from '../subscription-plans.config';
 @Index(['organizationId', 'workspaceId', 'occurredAt'])
 @Index(['organizationId', 'assetId', 'occurredAt'])
 @Index(['organizationId', 'eventType', 'occurredAt'])
+@Index(['organizationId', 'meterId', 'occurredAt'])
+@Index(['organizationId', 'idempotencyKey'], { unique: true })
 export class UsageEvent {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -27,6 +29,15 @@ export class UsageEvent {
 
   @Column({ type: 'varchar', enum: UsageEventType })
   eventType: UsageEventType;
+
+  @Column({ type: 'varchar', length: 80, nullable: true })
+  meterId: string | null;
+
+  @Column({ type: 'varchar', length: 120, nullable: true })
+  source: string | null;
+
+  @Column({ type: 'varchar', length: 180, nullable: true })
+  idempotencyKey: string | null;
 
   @Column({ type: 'float', default: 1 })
   quantity: number;

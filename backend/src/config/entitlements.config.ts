@@ -56,10 +56,7 @@ export const ENTITLEMENT_REGISTRY: EntitlementRule[] = [
     requiredPackIds: ['research-education'],
   },
   {
-    assetIds: [
-      'automation-news2-clinician-notification',
-      'automation-potassium-lab-workflow',
-    ],
+    assetIds: ['automation-news2-clinician-notification', 'automation-potassium-lab-workflow'],
     category: EntitlementCategory.AUTOMATIONS,
     featureFlagId: 'clinical-tools-core',
     requiredPlan: SubscriptionTier.PROFESSIONAL,
@@ -73,10 +70,7 @@ export const ENTITLEMENT_REGISTRY: EntitlementRule[] = [
     requiredPackIds: ['medical-iot-pack'],
   },
   {
-    assetIds: [
-      'automation-audit-event-review',
-      'automation-integration-unsupported-labeling',
-    ],
+    assetIds: ['automation-audit-event-review', 'automation-integration-unsupported-labeling'],
     category: EntitlementCategory.AUTOMATIONS,
     featureFlagId: 'ai-governance-center',
     requiredPlan: SubscriptionTier.ENTERPRISE,
@@ -97,14 +91,27 @@ export const ENTITLEMENT_REGISTRY: EntitlementRule[] = [
     requiredPackIds: ['hospital-operations'],
   },
   {
-    assetIds: ['fleet-dashboard', 'fleet-live-map', 'route-optimizer', 'predictive-maintenance', 'dispatch-ai'],
+    assetIds: [
+      'fleet-dashboard',
+      'fleet-live-map',
+      'route-optimizer',
+      'predictive-maintenance',
+      'dispatch-ai',
+    ],
     category: EntitlementCategory.FLEET,
     featureFlagId: 'fleet-command',
     requiredPlan: SubscriptionTier.PROFESSIONAL,
     requiredPackIds: ['fleet-logistics'],
   },
   {
-    assetIds: ['agent-clinical', 'agent-operations', 'agent-lab', 'agent-fleet', 'agent-education', 'agent-research'],
+    assetIds: [
+      'agent-clinical',
+      'agent-operations',
+      'agent-lab',
+      'agent-fleet',
+      'agent-education',
+      'agent-research',
+    ],
     category: EntitlementCategory.AI_AGENTS,
     featureFlagId: 'ai-clinical-copilot',
     requiredPlan: SubscriptionTier.PROFESSIONAL,
@@ -122,6 +129,7 @@ export const ENTITLEMENT_REGISTRY: EntitlementRule[] = [
 
 export const SUBSCRIPTION_TIER_RANK: Record<SubscriptionTier, number> = {
   [SubscriptionTier.FREE]: 0,
+  [SubscriptionTier.TRIAL]: 0,
   [SubscriptionTier.STARTER]: 0,
   [SubscriptionTier.PROFESSIONAL]: 1,
   [SubscriptionTier.ACADEMIC]: 1,

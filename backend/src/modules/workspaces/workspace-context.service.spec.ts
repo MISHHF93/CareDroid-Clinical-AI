@@ -29,7 +29,11 @@ describe('WorkspaceContextService', () => {
     findOne: jest.fn(),
   };
 
-  const user = { id: 'user-1', role: UserRole.PHYSICIAN, subscription: { tier: 'enterprise' } } as User;
+  const user = {
+    id: 'user-1',
+    role: UserRole.PHYSICIAN,
+    subscription: { tier: 'enterprise' },
+  } as User;
   const emergencyWorkspace = {
     id: 'workspace-1',
     type: WorkspaceType.EMERGENCY,

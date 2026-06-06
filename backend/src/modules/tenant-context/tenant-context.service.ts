@@ -1,13 +1,8 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  OrganizationMembership,
-} from '../organizations/entities/organization-membership.entity';
-import {
-  Subscription,
-  SubscriptionTier,
-} from '../subscriptions/entities/subscription.entity';
+import { OrganizationMembership } from '../organizations/entities/organization-membership.entity';
+import { Subscription, SubscriptionTier } from '../subscriptions/entities/subscription.entity';
 import { User } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
@@ -67,7 +62,10 @@ export class TenantContextService {
       user.id,
       requestedOrganizationId || profile?.organizationId,
     );
-    const workspaceMembership = await this.resolveWorkspaceMembership(user.id, requestedWorkspaceId);
+    const workspaceMembership = await this.resolveWorkspaceMembership(
+      user.id,
+      requestedWorkspaceId,
+    );
 
     const workspace = workspaceMembership?.workspace;
     const organizationId =

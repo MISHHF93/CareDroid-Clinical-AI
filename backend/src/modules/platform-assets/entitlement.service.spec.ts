@@ -1,6 +1,7 @@
 import { EntitlementAccessState } from '../../config/entitlements.config';
 import { FeatureFlagState } from '../../config/featureFlags.config';
 import { SubscriptionTier } from '../subscriptions/entities/subscription.entity';
+import { SubscriptionLifecycleState } from '../subscriptions/subscription-lifecycle.engine';
 import { UserRole } from '../users/entities/user.entity';
 import { EntitlementService } from './entitlement.service';
 import { FeatureFlagService } from './feature-flag.service';
@@ -48,6 +49,24 @@ describe('EntitlementService', () => {
       isLaunchable: false,
       reason: 'subscription-required',
       requiredPlan: SubscriptionTier.PROFESSIONAL,
+    });
+  });
+
+  it('blocks launch when subscription lifecycle is not active', () => {
+    const decision = service.resolveDecisionFromContext({
+      assetId: 'simulation-suite',
+      organization: { id: 'org-1' },
+      subscriptionPlan: SubscriptionTier.ENTERPRISE,
+      subscriptionLifecycleState: SubscriptionLifecycleState.SUSPENDED,
+      entitledAssetIds: ['simulation-suite'],
+      entitledPackIds: ['research-education'],
+    });
+
+    expect(decision).toMatchObject({
+      state: EntitlementAccessState.SUBSCRIPTION_REQUIRED,
+      isVisible: true,
+      isLaunchable: false,
+      reason: 'subscription-suspended',
     });
   });
 

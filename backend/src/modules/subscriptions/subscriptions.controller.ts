@@ -18,6 +18,10 @@ import { SubscriptionsService } from './subscriptions.service';
 import { CreateCheckoutDto } from './dto/create-checkout.dto';
 import { CustomerPortalDto } from './dto/customer-portal.dto';
 import { RecordUsageEventDto } from './dto/record-usage-event.dto';
+import {
+  ResolveSubscriptionEntitlementDto,
+  SubscriptionPlanTransitionDto,
+} from './dto/subscription-lifecycle.dto';
 import { ConfigService } from '@nestjs/config';
 import Stripe from 'stripe';
 import { Permission } from '../auth/enums/permission.enum';
@@ -85,11 +89,60 @@ export class SubscriptionsController {
     return this.subscriptionsService.getUserSubscription(req.user.id);
   }
 
+  @Get('lifecycle')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current subscription lifecycle and SaaS state' })
+  async getLifecycle(@Req() req: any) {
+    return this.subscriptionsService.getSubscriptionLifecycle(req.user.id);
+  }
+
+  @Post('entitlements/resolve')
+  @UseGuards(AuthGuard('jwt'))
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Resolve subscription lifecycle entitlement for a plan-gated feature' })
+  async resolveEntitlement(@Req() req: any, @Body() dto: ResolveSubscriptionEntitlementDto) {
+    return this.subscriptionsService.resolveEntitlement(
+      req.user.id,
+      dto.requiredTier,
+      dto.featureId,
+    );
+  }
+
+  @Post('upgrade')
+  @UseGuards(AuthGuard('jwt'))
+  @OrganizationScoped({ admin: 'organization', permissions: [Permission.MANAGE_SUBSCRIPTIONS] })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Upgrade current subscription through the SaaS lifecycle engine' })
+  async upgrade(@Req() req: any, @Body() dto: SubscriptionPlanTransitionDto) {
+    return this.subscriptionsService.upgradeSubscription(req.user.id, dto.targetTier, dto.reason);
+  }
+
+  @Post('downgrade')
+  @UseGuards(AuthGuard('jwt'))
+  @OrganizationScoped({ admin: 'organization', permissions: [Permission.MANAGE_SUBSCRIPTIONS] })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Downgrade current subscription through the SaaS lifecycle engine' })
+  async downgrade(@Req() req: any, @Body() dto: SubscriptionPlanTransitionDto) {
+    return this.subscriptionsService.downgradeSubscription(req.user.id, dto.targetTier, dto.reason);
+  }
+
+  @Post('trial/convert')
+  @UseGuards(AuthGuard('jwt'))
+  @OrganizationScoped({ admin: 'organization', permissions: [Permission.MANAGE_SUBSCRIPTIONS] })
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Convert a trial subscription to a paid or contracted plan' })
+  async convertTrial(@Req() req: any, @Body() dto: SubscriptionPlanTransitionDto) {
+    return this.subscriptionsService.convertTrial(req.user.id, dto.targetTier, dto.reason);
+  }
+
   @Get('billing')
   @UseGuards(AuthGuard('jwt'))
   @OrganizationScoped({ admin: 'organization', permissions: [Permission.MANAGE_SUBSCRIPTIONS] })
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get organization billing overview and current usage against plan limits' })
+  @ApiOperation({
+    summary: 'Get organization billing overview and current usage against plan limits',
+  })
   async getBillingOverview(@Req() req: any) {
     return this.subscriptionsService.getBillingOverview(req.user.id, req.tenantContext);
   }

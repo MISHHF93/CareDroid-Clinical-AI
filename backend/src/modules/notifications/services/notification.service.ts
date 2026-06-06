@@ -347,7 +347,10 @@ export class NotificationService {
     };
 
     // Create a visible pending record only. No worker consumes this record yet.
-    const notification = await this.createNotificationRecord(scheduledDto, NotificationStatus.PENDING);
+    const notification = await this.createNotificationRecord(
+      scheduledDto,
+      NotificationStatus.PENDING,
+    );
 
     this.logger.warn(
       `Notification schedule request stored as pending_record_only for ${scheduledFor.toISOString()} (user: ${dto.userId}); no queue worker is configured.`,

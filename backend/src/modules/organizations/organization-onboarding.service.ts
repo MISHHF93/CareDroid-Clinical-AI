@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, Optional } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
@@ -14,6 +14,7 @@ import {
   OrganizationMembership,
   OrganizationMembershipRole,
 } from './entities/organization-membership.entity';
+import { TenantProvisioningService } from './tenant-provisioning.service';
 
 @Injectable()
 export class OrganizationOnboardingService {
@@ -30,6 +31,7 @@ export class OrganizationOnboardingService {
     private readonly planRepository: Repository<CommercialPlan>,
     private readonly platformAssetsService: PlatformAssetsService,
     private readonly workspacesService: WorkspacesService,
+    @Optional() private readonly tenantProvisioningService?: TenantProvisioningService,
   ) {}
 
   async completeOnboarding(user: User, dto: OrganizationOnboardingDto) {
@@ -40,7 +42,8 @@ export class OrganizationOnboardingService {
 
     const packIds = await this.resolvePackIds(dto);
     const enabledProductIds = dto.enabledProductIds ?? dto.productIds ?? [];
-    const complianceMode = dto.complianceMode ?? this.resolveDefaultComplianceMode(dto.organizationType);
+    const complianceMode =
+      dto.complianceMode ?? this.resolveDefaultComplianceMode(dto.organizationType);
     const branding = {
       ...(dto.branding || {}),
       displayName: dto.branding?.displayName || dto.name,
@@ -116,6 +119,18 @@ export class OrganizationOnboardingService {
       }
     }
 
+    const provisioning = this.tenantProvisioningService
+      ? await this.tenantProvisioningService.provisionOrganization(user, org, {
+          workspaceSetups: dto.workspaceSetups,
+          packIds,
+          enabledProductIds,
+          integrationSlugs: dto.integrationSlugs,
+          defaultRoleProfileId: dto.defaultRoleProfileId,
+          complianceMode,
+          branding,
+        })
+      : null;
+
     const entitlements = await this.platformAssetsService.getOrganizationEntitlements(org.id);
     const installedPackIds = entitlements.map((e) => e.packId);
     const tenantProfile = {
@@ -137,6 +152,7 @@ export class OrganizationOnboardingService {
       integrationsRequested: dto.integrationSlugs || [],
       branding,
       complianceMode,
+      provisioning,
     };
 
     org.settings = {
@@ -159,6 +175,7 @@ export class OrganizationOnboardingService {
       complianceMode,
       branding,
       tenantProfile,
+      provisioning,
       status: 'configured',
       message: 'CareDroid deployment configured successfully.',
     };
@@ -199,7 +216,9 @@ export class OrganizationOnboardingService {
     return [...packIds];
   }
 
-  private resolveDefaultComplianceMode(type: OrganizationOnboardingDto['organizationType']): string {
+  private resolveDefaultComplianceMode(
+    type: OrganizationOnboardingDto['organizationType'],
+  ): string {
     return type === 'ems' ? 'ems' : 'hipaa';
   }
 }

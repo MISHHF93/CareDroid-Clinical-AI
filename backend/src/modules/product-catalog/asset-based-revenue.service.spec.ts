@@ -20,7 +20,9 @@ describe('AssetBasedRevenueService', () => {
   });
 
   it('projects the full organization-to-asset revenue hierarchy', () => {
-    expect(matrix.hierarchy).toBe('Organization -> Subscription -> Products -> Asset Packs -> Assets');
+    expect(matrix.hierarchy).toBe(
+      'Organization -> Subscription -> Products -> Asset Packs -> Assets',
+    );
     expect(matrix.summary.assets).toBe(SEED_PLATFORM_ASSETS.length);
     expect(matrix.summary.assetPacks).toBe(SEED_ASSET_PACKS.length);
     expect(matrix.summary.products).toBeGreaterThanOrEqual(SEED_PRODUCTS.length);
@@ -65,7 +67,9 @@ describe('AssetBasedRevenueService', () => {
   });
 
   it('keeps rows inside the canonical department and service-line taxonomies', () => {
-    const serviceLineNames = new Set<string>(SERVICE_LINE_TAXONOMY.map((serviceLine) => serviceLine.name));
+    const serviceLineNames = new Set<string>(
+      SERVICE_LINE_TAXONOMY.map((serviceLine) => serviceLine.name),
+    );
 
     for (const row of matrix.rows) {
       expect(row.department).toBeTruthy();

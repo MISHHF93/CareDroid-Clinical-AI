@@ -70,7 +70,9 @@ function codeFrom(codeableConcept: unknown) {
 }
 
 function codeFromCodeableOrFirstArray(codeableConcept: unknown) {
-  return codeFrom(Array.isArray(codeableConcept) ? firstArrayRecord(codeableConcept) : codeableConcept);
+  return codeFrom(
+    Array.isArray(codeableConcept) ? firstArrayRecord(codeableConcept) : codeableConcept,
+  );
 }
 
 function severityFromInterpretation(interpretation: string | undefined) {
@@ -204,10 +206,7 @@ export class IntegrationAutomationRouter {
     };
   }
 
-  private selectSafeAction(
-    event: NormalizedClinicalEvent,
-    trigger: AutomationTrigger,
-  ): SafeAction {
+  private selectSafeAction(event: NormalizedClinicalEvent, trigger: AutomationTrigger): SafeAction {
     if (event.kind === 'unsupported') {
       return this.unsupportedAction(event);
     }
@@ -276,7 +275,9 @@ export class IntegrationAutomationRouter {
       unit: firstString(quantity.unit, quantity.code),
       interpretation: firstString(interpretation.code, interpretation.display),
       status: firstString(payload.status),
-      severity: severityFromInterpretation(firstString(interpretation.code, interpretation.display)),
+      severity: severityFromInterpretation(
+        firstString(interpretation.code, interpretation.display),
+      ),
       occurredAt: firstString(payload.effectiveDateTime, payload.issued),
       payload,
     });
@@ -514,7 +515,9 @@ export class IntegrationAutomationRouter {
     };
   }
 
-  private normalizeSeverity(value: string | undefined): NormalizedClinicalEventSeverity | undefined {
+  private normalizeSeverity(
+    value: string | undefined,
+  ): NormalizedClinicalEventSeverity | undefined {
     const normalized = (value || '').toLowerCase();
     if (['critical', 'high', 'moderate', 'low', 'info'].includes(normalized)) {
       return normalized as NormalizedClinicalEventSeverity;

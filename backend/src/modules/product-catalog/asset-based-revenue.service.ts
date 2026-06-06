@@ -9,10 +9,7 @@ import {
   departmentName,
   inferDepartmentsForAsset,
 } from '../platform-assets/department-taxonomy';
-import {
-  SERVICE_LINE_TAXONOMY,
-  serviceLineName,
-} from '../platform-assets/service-line-taxonomy';
+import { SERVICE_LINE_TAXONOMY, serviceLineName } from '../platform-assets/service-line-taxonomy';
 import { CommercialPlan } from './entities/commercial-plan.entity';
 import { IntegrationOffering } from './entities/integration-offering.entity';
 import { Product } from './entities/product.entity';
@@ -257,15 +254,16 @@ export class AssetBasedRevenueService {
         rows: rows.length,
         validationIssues: issues.length + rowIssues.length,
       },
-      rows: rows.sort((a, b) =>
-        [
-          a.hospitalType.localeCompare(b.hospitalType),
-          a.serviceLine.localeCompare(b.serviceLine),
-          a.department.localeCompare(b.department),
-          a.product.localeCompare(b.product),
-          a.assetPack.localeCompare(b.assetPack),
-          a.asset.localeCompare(b.asset),
-        ].find((value) => value !== 0) || 0,
+      rows: rows.sort(
+        (a, b) =>
+          [
+            a.hospitalType.localeCompare(b.hospitalType),
+            a.serviceLine.localeCompare(b.serviceLine),
+            a.department.localeCompare(b.department),
+            a.product.localeCompare(b.product),
+            a.assetPack.localeCompare(b.assetPack),
+            a.asset.localeCompare(b.asset),
+          ].find((value) => value !== 0) || 0,
       ),
       validationIssues: [...issues, ...rowIssues],
     };
@@ -291,7 +289,10 @@ export class AssetBasedRevenueService {
       ...(productByPack.get(pack.id) || []),
       ...products.filter((product) => (product.highlightAssetIds || []).includes(asset.id)),
     ];
-    return this.uniqueBy(candidates.length ? candidates : [CORE_PLATFORM_PRODUCT], (product) => product.id);
+    return this.uniqueBy(
+      candidates.length ? candidates : [CORE_PLATFORM_PRODUCT],
+      (product) => product.id,
+    );
   }
 
   private static buildRow(input: {
@@ -324,7 +325,9 @@ export class AssetBasedRevenueService {
 
     return {
       hospitalType: this.titleize(
-        (input.pack.organizationTypes?.[0] || input.asset.organizationTypes?.[0] || 'hospital') as string,
+        (input.pack.organizationTypes?.[0] ||
+          input.asset.organizationTypes?.[0] ||
+          'hospital') as string,
       ),
       serviceLine: serviceLineName(input.serviceLineId),
       department: departmentName(input.departmentId),
@@ -337,10 +340,15 @@ export class AssetBasedRevenueService {
       category: input.asset.category || input.pack.name,
       buyer,
       roles,
-      integrations: this.unique([...(input.product.requiredIntegrations || []), ...linkedIntegrations]),
+      integrations: this.unique([
+        ...(input.product.requiredIntegrations || []),
+        ...linkedIntegrations,
+      ]),
       outcomes: this.unique([...productOutcomes, ...packOutcomes]),
       subscriptionTiers: planIds,
-      pricingTier: String(input.pack.pricingTier || input.asset.pricingTier || PricingTier.STANDARD),
+      pricingTier: String(
+        input.pack.pricingTier || input.asset.pricingTier || PricingTier.STANDARD,
+      ),
     };
   }
 
@@ -365,7 +373,9 @@ export class AssetBasedRevenueService {
     const inferred = inferDepartmentsForAsset(asset as PlatformAsset);
     return this.unique([
       asset.primaryDepartment || inferred.primaryDepartment,
-      ...((asset.secondaryDepartments?.length ? asset.secondaryDepartments : inferred.secondaryDepartments) || []),
+      ...((asset.secondaryDepartments?.length
+        ? asset.secondaryDepartments
+        : inferred.secondaryDepartments) || []),
     ]).filter(Boolean) as DepartmentId[];
   }
 

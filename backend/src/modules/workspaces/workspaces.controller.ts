@@ -60,7 +60,10 @@ export class WorkspacesController {
   }
 
   @Get('context')
-  @ApiOperation({ summary: 'Get active workspace context for dashboard, assets, recommendations, assistant, and shortcuts' })
+  @ApiOperation({
+    summary:
+      'Get active workspace context for dashboard, assets, recommendations, assistant, and shortcuts',
+  })
   async context(@Req() req: any) {
     return this.workspaceContextService.getCurrentContext(req.user);
   }

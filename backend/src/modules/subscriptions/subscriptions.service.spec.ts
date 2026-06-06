@@ -329,4 +329,128 @@ describe('SubscriptionsService', () => {
       expect((service as any).mapStripeStatus('unknown')).toBe(SubscriptionStatus.ACTIVE);
     });
   });
+
+  describe('subscription lifecycle operations', () => {
+    it('upgrades subscriptions through a valid upgrade path', async () => {
+      const existingSubscription = {
+        ...mockSubscription,
+        tier: SubscriptionTier.STARTER,
+        status: SubscriptionStatus.ACTIVE,
+        metadata: {},
+      };
+      mockSubscriptionRepository.findOne.mockResolvedValue(existingSubscription);
+      mockSubscriptionRepository.save.mockImplementation(async (row) => row);
+
+      const result = await service.upgradeSubscription(
+        '1',
+        SubscriptionTier.PROFESSIONAL,
+        'need simulation access',
+      );
+
+      expect(mockSubscriptionRepository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          tier: SubscriptionTier.PROFESSIONAL,
+          status: SubscriptionStatus.ACTIVE,
+          cancelAtPeriodEnd: false,
+          metadata: expect.objectContaining({
+            lifecycleLastAction: 'upgrade',
+            lifecycleLastReason: 'need simulation access',
+          }),
+        }),
+      );
+      expect(result.lifecycle.statusLabel).toBe('Active');
+      expect(mockAuditService.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          resource: 'subscription_lifecycle',
+          metadata: expect.objectContaining({ action: 'upgrade' }),
+        }),
+      );
+    });
+
+    it('downgrades subscriptions through a valid downgrade path', async () => {
+      const existingSubscription = {
+        ...mockSubscription,
+        tier: SubscriptionTier.ENTERPRISE,
+        status: SubscriptionStatus.ACTIVE,
+        metadata: {},
+      };
+      mockSubscriptionRepository.findOne.mockResolvedValue(existingSubscription);
+      mockSubscriptionRepository.save.mockImplementation(async (row) => row);
+
+      const result = await service.downgradeSubscription('1', SubscriptionTier.PROFESSIONAL);
+
+      expect(result.subscription.tier).toBe(SubscriptionTier.PROFESSIONAL);
+      expect(result.lifecycle.plan.id).toBe(SubscriptionTier.PROFESSIONAL);
+      expect(mockAuditService.log).toHaveBeenCalledWith(
+        expect.objectContaining({
+          metadata: expect.objectContaining({ action: 'downgrade' }),
+        }),
+      );
+    });
+
+    it('rejects invalid upgrade paths', async () => {
+      mockSubscriptionRepository.findOne.mockResolvedValue({
+        ...mockSubscription,
+        tier: SubscriptionTier.ENTERPRISE,
+        status: SubscriptionStatus.ACTIVE,
+      });
+
+      await expect(service.upgradeSubscription('1', SubscriptionTier.STARTER)).rejects.toThrow(
+        'Requested tier is not a valid upgrade path.',
+      );
+    });
+
+    it('converts active trials to a paid plan', async () => {
+      const existingTrial = {
+        ...mockSubscription,
+        tier: SubscriptionTier.TRIAL,
+        status: SubscriptionStatus.ACTIVE,
+        trialStart: new Date(Date.now() - 24 * 60 * 60 * 1000),
+        trialEnd: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+        metadata: {},
+      };
+      mockSubscriptionRepository.findOne.mockResolvedValue(existingTrial);
+      mockSubscriptionRepository.save.mockImplementation(async (row) => row);
+
+      const result = await service.convertTrial(
+        '1',
+        SubscriptionTier.STARTER,
+        'customer converted',
+      );
+
+      expect(result.subscription).toEqual(
+        expect.objectContaining({
+          tier: SubscriptionTier.STARTER,
+          status: SubscriptionStatus.ACTIVE,
+          trialStart: null,
+          trialEnd: null,
+          metadata: expect.objectContaining({
+            lifecycleLastAction: 'trial-conversion',
+          }),
+        }),
+      );
+      expect(result.lifecycle.isTrial).toBe(false);
+    });
+
+    it('resolves lifecycle entitlements for plan-gated features', async () => {
+      mockSubscriptionRepository.findOne.mockResolvedValue({
+        ...mockSubscription,
+        tier: SubscriptionTier.ENTERPRISE,
+        status: SubscriptionStatus.SUSPENDED,
+      });
+
+      const decision = await service.resolveEntitlement(
+        '1',
+        SubscriptionTier.PROFESSIONAL,
+        'simulation-suite',
+      );
+
+      expect(decision).toMatchObject({
+        featureId: 'simulation-suite',
+        isEntitled: false,
+        statusLabel: 'Suspended',
+        reason: 'subscription-suspended',
+      });
+    });
+  });
 });

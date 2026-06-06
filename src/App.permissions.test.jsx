@@ -24,7 +24,15 @@ describe('App clinical-intelligence route permissions', () => {
     expect(appSource).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
   });
 
-  it.each(['/dashboard', '/tools', '/assistant', '/profile', '/organization'])(
+  it.each([
+    '/dashboard',
+    '/tools',
+    '/assistant',
+    '/profile',
+    '/organization',
+    '/customer-portal',
+    '/success-center',
+  ])(
     '%s is an authenticated tenant-gated route',
     (path) => {
       const block = routeBlock(path);

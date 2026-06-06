@@ -40,7 +40,13 @@ const OUTCOME_NORMALIZATION_RULES = [
   },
   {
     label: 'Improve protocol adherence',
-    matches: ['protocol', 'pathway adherence', 'audit readiness', 'bundle compliance', 'acs pathway'],
+    matches: [
+      'protocol',
+      'pathway adherence',
+      'audit readiness',
+      'bundle compliance',
+      'acs pathway',
+    ],
   },
   {
     label: 'Improve simulation readiness',
@@ -64,7 +70,11 @@ const INTEGRATION_READINESS_CATALOG = [
   { id: 'emr-ehr', name: 'EMR/EHR', category: IntegrationCategory.EMR_EHR },
   { id: 'identity-providers', name: 'Identity Providers', category: IntegrationCategory.IDENTITY },
   { id: 'government-apis', name: 'Government APIs', category: IntegrationCategory.GOVERNMENT_APIS },
-  { id: 'scheduling-systems', name: 'Scheduling Systems', category: IntegrationCategory.SCHEDULING },
+  {
+    id: 'scheduling-systems',
+    name: 'Scheduling Systems',
+    category: IntegrationCategory.SCHEDULING,
+  },
 ] as const;
 
 @Injectable()
@@ -271,9 +281,9 @@ export class ProductCatalogService {
       entitledAssetIds = await this.platformAssetsService.resolveEntitledAssetIds({
         organizationId,
       });
-      entitledPackIds = (await this.platformAssetsService.getOrganizationEntitlements(organizationId)).map(
-        (row) => row.packId,
-      );
+      entitledPackIds = (
+        await this.platformAssetsService.getOrganizationEntitlements(organizationId)
+      ).map((row) => row.packId);
     }
 
     const assets = await this.assetRepository.find({
@@ -295,7 +305,9 @@ export class ProductCatalogService {
     const visibleAssets = this.filterSerializedAssetsForContext(serializedAssets, organizationId);
     const visibleAssetIds = new Set(visibleAssets.map((asset) => asset.id));
     const visiblePacks = organizationId
-      ? packs.filter((pack) => (pack.assetIds || []).some((assetId) => visibleAssetIds.has(assetId)))
+      ? packs.filter((pack) =>
+          (pack.assetIds || []).some((assetId) => visibleAssetIds.has(assetId)),
+        )
       : packs;
 
     return {
@@ -344,11 +356,15 @@ export class ProductCatalogService {
     const productPackIds = new Set(products.flatMap((product) => product.packIds || []));
     const packIds = [...new Set([...directPackIds, ...productPackIds])];
     const packs = packIds.length
-      ? (await this.packRepository.find({ where: { id: In(packIds) }, order: { name: 'ASC' } })) || []
+      ? (await this.packRepository.find({ where: { id: In(packIds) }, order: { name: 'ASC' } })) ||
+        []
       : [];
     const assetIds = [...new Set(packs.flatMap((pack) => pack.assetIds || []))];
     const assets = assetIds.length
-      ? (await this.assetRepository.find({ where: { id: In(assetIds) }, order: { title: 'ASC' } })) || []
+      ? (await this.assetRepository.find({
+          where: { id: In(assetIds) },
+          order: { title: 'ASC' },
+        })) || []
       : [];
 
     return {
@@ -409,7 +425,9 @@ export class ProductCatalogService {
     const protocols = this.serializePathwayAssets(pathway.protocolAssetIds, assetMap);
     const workflows = this.serializePathwayAssets(pathway.workflowAssetIds, assetMap);
     const simulations = this.serializePathwayAssets(pathway.simulationAssetIds, assetMap);
-    const aiAgent = pathway.aiAgentId ? assetMap.get(pathway.aiAgentId) || { id: pathway.aiAgentId } : null;
+    const aiAgent = pathway.aiAgentId
+      ? assetMap.get(pathway.aiAgentId) || { id: pathway.aiAgentId }
+      : null;
 
     return {
       ...pathway,
@@ -447,7 +465,10 @@ export class ProductCatalogService {
       ...new Set(registryRows.flatMap((agent) => this.agentAssetAccessIds(agent))),
     ];
     const accessAssets = accessAssetIds.length
-      ? await this.assetRepository.find({ where: { id: In(accessAssetIds) }, order: { title: 'ASC' } })
+      ? await this.assetRepository.find({
+          where: { id: In(accessAssetIds) },
+          order: { title: 'ASC' },
+        })
       : [];
     const assetById = new Map(accessAssets.map((asset) => [asset.id, asset]));
 
@@ -730,7 +751,9 @@ export class ProductCatalogService {
     context: { organization: Organization | null },
   ) {
     if (!this.hasOrganizationContext(context)) return packs;
-    return packs.filter((pack) => (pack.assetIds || []).some((assetId) => visibleAssetIds.has(assetId)));
+    return packs.filter((pack) =>
+      (pack.assetIds || []).some((assetId) => visibleAssetIds.has(assetId)),
+    );
   }
 
   private serializeBuilderPack(
@@ -795,7 +818,11 @@ export class ProductCatalogService {
     fallbackPackIds: string[] = [],
   ) {
     const packIds = asset.packIds?.length ? asset.packIds : fallbackPackIds;
-    const access = this.resolveAssetAccess({ ...asset, packIds } as PlatformAsset, context, options);
+    const access = this.resolveAssetAccess(
+      { ...asset, packIds } as PlatformAsset,
+      context,
+      options,
+    );
 
     return {
       ...this.serializeAsset(asset),
@@ -975,7 +1002,9 @@ export class ProductCatalogService {
     }));
   }
 
-  private toReadinessStatus(status?: IntegrationStatus | string | null): IntegrationReadinessStatus {
+  private toReadinessStatus(
+    status?: IntegrationStatus | string | null,
+  ): IntegrationReadinessStatus {
     if (status === IntegrationStatus.AVAILABLE) return IntegrationReadinessStatus.SUPPORTED;
     if (status === IntegrationStatus.BETA) return IntegrationReadinessStatus.DEMO;
     if (status === IntegrationStatus.ROADMAP) return IntegrationReadinessStatus.PLANNED;
@@ -1021,7 +1050,13 @@ export class ProductCatalogService {
   }
 
   private uniqueStrings(values: unknown[]): string[] {
-    return [...new Set(values.filter((value): value is string => typeof value === 'string' && Boolean(value.trim())))];
+    return [
+      ...new Set(
+        values.filter(
+          (value): value is string => typeof value === 'string' && Boolean(value.trim()),
+        ),
+      ),
+    ];
   }
 
   private agentPolicy(agent: PlatformAsset): Record<string, any> {
@@ -1035,6 +1070,8 @@ export class ProductCatalogService {
   }
 
   private stringArray(value: unknown): string[] {
-    return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : [];
+    return Array.isArray(value)
+      ? value.filter((item): item is string => typeof item === 'string')
+      : [];
   }
 }

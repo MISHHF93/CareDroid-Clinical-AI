@@ -9,6 +9,7 @@ import { PlatformAssetsService } from './platform-assets.service';
 import { WorkspacesService } from '../workspaces/workspaces.service';
 import { User } from '../users/entities/user.entity';
 import { EntitlementService } from './entitlement.service';
+import { normalizeLifecycleState } from '../subscriptions/subscription-lifecycle.engine';
 
 @Injectable()
 export class PlatformContextService {
@@ -87,6 +88,7 @@ export class PlatformContextService {
           organizationId: organization?.id,
           userRole: membership?.role,
           subscriptionPlan: user.subscription?.tier,
+          subscriptionLifecycleState: normalizeLifecycleState(user.subscription),
           entitledAssetIds,
           entitledPackIds,
           strictEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),
@@ -125,7 +127,9 @@ export class PlatformContextService {
       navigation: settings.navigation || {},
       branding: organization?.branding || settings.branding || {},
       dashboardLayout: settings.dashboardLayout || {},
-      workspaceDefaults: Array.isArray(settings.workspaceDefaults) ? settings.workspaceDefaults : [],
+      workspaceDefaults: Array.isArray(settings.workspaceDefaults)
+        ? settings.workspaceDefaults
+        : [],
       membership: membership
         ? {
             role: membership.role,

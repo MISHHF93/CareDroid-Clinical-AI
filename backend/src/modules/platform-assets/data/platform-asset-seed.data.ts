@@ -10,10 +10,7 @@ import {
   PlatformAssetType,
   PricingTier,
 } from '../enums/platform-asset.enums';
-import {
-  defaultRequiredPermissions,
-  inferDepartmentsForAsset,
-} from '../department-taxonomy';
+import { defaultRequiredPermissions, inferDepartmentsForAsset } from '../department-taxonomy';
 
 /** Legacy workspace enabledToolIds → canonical asset ids */
 export const LEGACY_TOOL_ID_ALIASES: Record<string, string[]> = {
@@ -92,79 +89,174 @@ const AI_AGENT_ASSETS = [
   {
     id: 'agent-clinical',
     title: 'Clinical AI',
-    description: 'General clinical reasoning, documentation support, care guidance, and safe handoff assistance.',
+    description:
+      'General clinical reasoning, documentation support, care guidance, and safe handoff assistance.',
     route: '/assistant',
     defaultForRoles: ['emergency physician', 'hospitalist', 'nurse', 'ICU clinician'],
     workspaceTags: ['emergency', 'icu', 'cardiology', 'operations'],
-    capabilities: ['Clinical reasoning', 'Patient summarization', 'Guideline retrieval', 'Care planning'],
-    assetAccess: ['assistant', 'patient-summary-ai', 'clinical-reasoning-engine', 'guideline-rag', 'protocols'],
-    toolCallingPermissions: ['read-clinical-context', 'invoke-calculators', 'retrieve-guidelines', 'draft-clinical-notes'],
+    capabilities: [
+      'Clinical reasoning',
+      'Patient summarization',
+      'Guideline retrieval',
+      'Care planning',
+    ],
+    assetAccess: [
+      'assistant',
+      'patient-summary-ai',
+      'clinical-reasoning-engine',
+      'guideline-rag',
+      'protocols',
+    ],
+    toolCallingPermissions: [
+      'read-clinical-context',
+      'invoke-calculators',
+      'retrieve-guidelines',
+      'draft-clinical-notes',
+    ],
   },
   {
     id: 'agent-operations',
     title: 'Operations AI',
-    description: 'Hospital operations command agent for throughput, capacity, incidents, and operational risk.',
+    description:
+      'Hospital operations command agent for throughput, capacity, incidents, and operational risk.',
     route: '/assistant',
     defaultForRoles: ['fleet operator', 'biomedical engineer', 'administrator'],
     workspaceTags: ['operations', 'medical-iot', 'fleet'],
-    capabilities: ['Capacity monitoring', 'Incident coordination', 'Operational routing', 'Service status triage'],
-    assetAccess: ['dashboard', 'digital-operations-center', 'hospital-map', 'system-health', 'live-map'],
-    toolCallingPermissions: ['read-operations-state', 'query-dashboards', 'summarize-incidents', 'recommend-workflows'],
+    capabilities: [
+      'Capacity monitoring',
+      'Incident coordination',
+      'Operational routing',
+      'Service status triage',
+    ],
+    assetAccess: [
+      'dashboard',
+      'digital-operations-center',
+      'hospital-map',
+      'system-health',
+      'live-map',
+    ],
+    toolCallingPermissions: [
+      'read-operations-state',
+      'query-dashboards',
+      'summarize-incidents',
+      'recommend-workflows',
+    ],
   },
   {
     id: 'agent-lab',
     title: 'Laboratory AI',
-    description: 'Laboratory intelligence agent for result interpretation, quality checks, and escalation support.',
+    description:
+      'Laboratory intelligence agent for result interpretation, quality checks, and escalation support.',
     route: '/assistant',
     defaultForRoles: ['pharmacist'],
     workspaceTags: ['laboratory', 'clinical'],
-    capabilities: ['Lab interpretation', 'Abnormal result escalation', 'Reference range support', 'Quality control review'],
+    capabilities: [
+      'Lab interpretation',
+      'Abnormal result escalation',
+      'Reference range support',
+      'Quality control review',
+    ],
     assetAccess: ['lab-interp', 'laboratory', 'abg-interpreter', 'lab-result-import'],
-    toolCallingPermissions: ['read-lab-results', 'invoke-lab-interpreters', 'retrieve-reference-ranges', 'draft-escalations'],
+    toolCallingPermissions: [
+      'read-lab-results',
+      'invoke-lab-interpreters',
+      'retrieve-reference-ranges',
+      'draft-escalations',
+    ],
   },
   {
     id: 'agent-fleet',
     title: 'Fleet AI',
-    description: 'Fleet and EMS coordination agent for dispatch, live tracking, routes, and maintenance risk.',
+    description:
+      'Fleet and EMS coordination agent for dispatch, live tracking, routes, and maintenance risk.',
     route: '/assistant',
     defaultForRoles: ['fleet operator'],
     workspaceTags: ['fleet', 'emergency', 'operations'],
-    capabilities: ['Dispatch support', 'Route optimization', 'Fleet telemetry review', 'Predictive maintenance triage'],
-    assetAccess: ['fleet-dashboard', 'fleet-live-map', 'route-optimizer', 'predictive-maintenance', 'dispatch-ai'],
-    toolCallingPermissions: ['read-fleet-state', 'optimize-routes', 'summarize-dispatch', 'flag-maintenance-risk'],
+    capabilities: [
+      'Dispatch support',
+      'Route optimization',
+      'Fleet telemetry review',
+      'Predictive maintenance triage',
+    ],
+    assetAccess: [
+      'fleet-dashboard',
+      'fleet-live-map',
+      'route-optimizer',
+      'predictive-maintenance',
+      'dispatch-ai',
+    ],
+    toolCallingPermissions: [
+      'read-fleet-state',
+      'optimize-routes',
+      'summarize-dispatch',
+      'flag-maintenance-risk',
+    ],
   },
   {
     id: 'agent-education',
     title: 'Education AI',
-    description: 'Training and simulation agent for scenarios, competencies, debriefing, and learner support.',
+    description:
+      'Training and simulation agent for scenarios, competencies, debriefing, and learner support.',
     route: '/assistant',
     defaultForRoles: ['medical student'],
     workspaceTags: ['education', 'simulation', 'research'],
-    capabilities: ['Scenario coaching', 'Simulation debriefing', 'Competency guidance', 'Learning plan support'],
+    capabilities: [
+      'Scenario coaching',
+      'Simulation debriefing',
+      'Competency guidance',
+      'Learning plan support',
+    ],
     assetAccess: ['simulation-suite', 'scenario-player', 'competencies', 'guideline-rag'],
-    toolCallingPermissions: ['launch-simulations', 'read-competencies', 'retrieve-learning-content', 'draft-debriefs'],
+    toolCallingPermissions: [
+      'launch-simulations',
+      'read-competencies',
+      'retrieve-learning-content',
+      'draft-debriefs',
+    ],
   },
   {
     id: 'agent-research',
     title: 'Research AI',
-    description: 'Research agent for evidence review, explainability, protocol support, and knowledge synthesis.',
+    description:
+      'Research agent for evidence review, explainability, protocol support, and knowledge synthesis.',
     route: '/assistant',
     defaultForRoles: ['researcher'],
     workspaceTags: ['research', 'education', 'governance'],
-    capabilities: ['Evidence synthesis', 'RAG-based literature review', 'Explainability review', 'Protocol drafting'],
+    capabilities: [
+      'Evidence synthesis',
+      'RAG-based literature review',
+      'Explainability review',
+      'Protocol drafting',
+    ],
     assetAccess: ['guideline-rag', 'research-evidence-hub', 'ai-explainability', 'knowledge-graph'],
-    toolCallingPermissions: ['retrieve-evidence', 'query-knowledge-graph', 'summarize-research', 'draft-protocols'],
+    toolCallingPermissions: [
+      'retrieve-evidence',
+      'query-knowledge-graph',
+      'summarize-research',
+      'draft-protocols',
+    ],
   },
   {
     id: 'agent-emergency',
     title: 'Emergency AI',
-    description: 'Emergency department agent for triage, risk scores, stroke/chest-pain workflows, and trauma support.',
+    description:
+      'Emergency department agent for triage, risk scores, stroke/chest-pain workflows, and trauma support.',
     route: '/assistant',
     defaultForRoles: ['emergency physician', 'nurse'],
     workspaceTags: ['emergency', 'fleet', 'operations'],
-    capabilities: ['Triage assistance', 'Emergency risk scoring', 'Stroke workflow support', 'Trauma scenario guidance'],
+    capabilities: [
+      'Triage assistance',
+      'Emergency risk scoring',
+      'Stroke workflow support',
+      'Trauma scenario guidance',
+    ],
     assetAccess: ['qsofa', 'news2', 'heart-score', 'nihss-stroke', 'simulation-suite'],
-    toolCallingPermissions: ['invoke-risk-scores', 'retrieve-emergency-protocols', 'summarize-triage', 'draft-handoff'],
+    toolCallingPermissions: [
+      'invoke-risk-scores',
+      'retrieve-emergency-protocols',
+      'summarize-triage',
+      'draft-handoff',
+    ],
   },
   {
     id: 'agent-governance',
@@ -173,9 +265,25 @@ const AI_AGENT_ASSETS = [
     route: '/assistant',
     defaultForRoles: ['administrator'],
     workspaceTags: ['governance', 'operations', 'research'],
-    capabilities: ['Audit review', 'Safety finding triage', 'Privacy and consent review', 'AI security policy support'],
-    assetAccess: ['audit-logs', 'ai-explainability', 'ai-governance', 'clinical-safety-audit', 'privacy-center'],
-    toolCallingPermissions: ['read-audit-events', 'review-governance-state', 'summarize-risk', 'draft-policy-notes'],
+    capabilities: [
+      'Audit review',
+      'Safety finding triage',
+      'Privacy and consent review',
+      'AI security policy support',
+    ],
+    assetAccess: [
+      'audit-logs',
+      'ai-explainability',
+      'ai-governance',
+      'clinical-safety-audit',
+      'privacy-center',
+    ],
+    toolCallingPermissions: [
+      'read-audit-events',
+      'review-governance-state',
+      'summarize-risk',
+      'draft-policy-notes',
+    ],
   },
 ];
 
@@ -271,13 +379,23 @@ const PACK_BUYER_METADATA_BY_ID: Record<
   'governance-compliance-pack': {
     buyerPersona: ['CIO', 'Compliance Officer'],
     decisionMaker: ['CIO', 'Compliance Officer'],
-    stakeholders: ['Privacy teams', 'Security teams', 'Clinical safety reviewers', 'Quality analysts'],
+    stakeholders: [
+      'Privacy teams',
+      'Security teams',
+      'Clinical safety reviewers',
+      'Quality analysts',
+    ],
     expectedOutcomes: ['audit readiness', 'AI governance'],
   },
   'digital-twin-pack': {
     buyerPersona: ['COO', 'Facilities Director'],
     decisionMaker: ['COO', 'Chief Operating Officer'],
-    stakeholders: ['Bed managers', 'Facilities teams', 'Transport coordinators', 'Incident command'],
+    stakeholders: [
+      'Bed managers',
+      'Facilities teams',
+      'Transport coordinators',
+      'Incident command',
+    ],
     expectedOutcomes: ['operations command center', 'capacity visibility'],
   },
   'ai-workflow-pack': {
@@ -823,56 +941,320 @@ const PLATFORM_DASHBOARD_ASSETS: MigratedAssetRecord[] = [
 ];
 
 const PLATFORM_SYSTEM_ASSETS: MigratedAssetRecord[] = [
-  ['fhir-connector', 'FHIR Connector', 'Interoperability', '/integrations/fhir', AssetRegistryType.INTEGRATION],
-  ['hl7-bridge', 'HL7 Bridge', 'Interoperability', '/integrations/hl7', AssetRegistryType.INTEGRATION],
-  ['ehr-patient-import', 'EHR Patient Import', 'Patient Data', '/patients/import', AssetRegistryType.INTEGRATION],
-  ['lab-result-import', 'Lab Result Import', 'Patient Data', '/patients/:patientId/labs/import', AssetRegistryType.INTEGRATION],
-  ['medication-list-import', 'Medication List Import', 'Patient Data', '/patients/:patientId/medications/import', AssetRegistryType.INTEGRATION],
-  ['observation-vitals-import', 'Observation And Vitals Import', 'Patient Data', '/patients/:patientId/observations/import', AssetRegistryType.INTEGRATION],
-  ['source-provenance', 'Source Provenance', 'Interoperability', '/integrations/source-provenance', AssetRegistryType.REPORT],
-  ['calculator-recommender-ai', 'Calculator Recommender AI', 'Clinical AI', '/tools/calculator-recommender', AssetRegistryType.AI_AGENT],
-  ['workflow-builder-ai', 'Workflow Builder AI', 'Clinical AI', '/tools/workflow-builder-ai', AssetRegistryType.AI_AGENT],
-  ['clinical-reasoning-engine', 'Clinical Reasoning Engine', 'Clinical AI', '/tools/clinical-reasoning-engine', AssetRegistryType.AI_AGENT],
-  ['guideline-rag', 'Guideline RAG', 'Reference', '/tools/guideline-rag', AssetRegistryType.CLINICAL_TOOL],
+  [
+    'fhir-connector',
+    'FHIR Connector',
+    'Interoperability',
+    '/integrations/fhir',
+    AssetRegistryType.INTEGRATION,
+  ],
+  [
+    'hl7-bridge',
+    'HL7 Bridge',
+    'Interoperability',
+    '/integrations/hl7',
+    AssetRegistryType.INTEGRATION,
+  ],
+  [
+    'ehr-patient-import',
+    'EHR Patient Import',
+    'Patient Data',
+    '/patients/import',
+    AssetRegistryType.INTEGRATION,
+  ],
+  [
+    'lab-result-import',
+    'Lab Result Import',
+    'Patient Data',
+    '/patients/:patientId/labs/import',
+    AssetRegistryType.INTEGRATION,
+  ],
+  [
+    'medication-list-import',
+    'Medication List Import',
+    'Patient Data',
+    '/patients/:patientId/medications/import',
+    AssetRegistryType.INTEGRATION,
+  ],
+  [
+    'observation-vitals-import',
+    'Observation And Vitals Import',
+    'Patient Data',
+    '/patients/:patientId/observations/import',
+    AssetRegistryType.INTEGRATION,
+  ],
+  [
+    'source-provenance',
+    'Source Provenance',
+    'Interoperability',
+    '/integrations/source-provenance',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'calculator-recommender-ai',
+    'Calculator Recommender AI',
+    'Clinical AI',
+    '/tools/calculator-recommender',
+    AssetRegistryType.AI_AGENT,
+  ],
+  [
+    'workflow-builder-ai',
+    'Workflow Builder AI',
+    'Clinical AI',
+    '/tools/workflow-builder-ai',
+    AssetRegistryType.AI_AGENT,
+  ],
+  [
+    'clinical-reasoning-engine',
+    'Clinical Reasoning Engine',
+    'Clinical AI',
+    '/tools/clinical-reasoning-engine',
+    AssetRegistryType.AI_AGENT,
+  ],
+  [
+    'guideline-rag',
+    'Guideline RAG',
+    'Reference',
+    '/tools/guideline-rag',
+    AssetRegistryType.CLINICAL_TOOL,
+  ],
   ['why-engine', 'Why Engine', 'Clinical AI', '/tools/why-engine', AssetRegistryType.AI_AGENT],
-  ['audit-trail-ai', 'Audit Trail AI', 'Governance', '/tools/audit-trail-ai', AssetRegistryType.AI_AGENT],
-  ['patient-workspace', 'Patient Workspace', 'Patient Workspace', '/patients/:patientId/workspace', AssetRegistryType.DASHBOARD],
-  ['patient-summary-ai', 'Patient Summary AI', 'Clinical AI', '/patients/:patientId/summary', AssetRegistryType.AI_AGENT],
-  ['timeline-live', 'Live Timeline', 'Patient Workspace', '/patients/:patientId/timeline', AssetRegistryType.DASHBOARD],
-  ['clinical-event-ai', 'Clinical Event AI', 'Clinical AI', '/patients/:patientId/events', AssetRegistryType.AI_AGENT],
-  ['risk-score-history', 'Risk Score History', 'Patient Workspace', '/patients/:patientId/risk-history', AssetRegistryType.REPORT],
-  ['care-plan-view', 'Care Plan View', 'Patient Workspace', '/patients/:patientId/care-plan', AssetRegistryType.DASHBOARD],
-  ['soap-builder', 'SOAP Builder', 'Documentation', '/tools/soap-builder', AssetRegistryType.TEMPLATE],
-  ['ambient-scribe', 'Ambient Scribe', 'Documentation', '/tools/ambient-scribe', AssetRegistryType.AI_AGENT],
-  ['clinical-dictation', 'Clinical Dictation', 'Documentation', '/tools/clinical-dictation', AssetRegistryType.AI_AGENT],
-  ['discharge-summary-ai', 'Discharge Summary AI', 'Documentation', '/tools/discharge-summary-ai', AssetRegistryType.AI_AGENT],
+  [
+    'audit-trail-ai',
+    'Audit Trail AI',
+    'Governance',
+    '/tools/audit-trail-ai',
+    AssetRegistryType.AI_AGENT,
+  ],
+  [
+    'patient-workspace',
+    'Patient Workspace',
+    'Patient Workspace',
+    '/patients/:patientId/workspace',
+    AssetRegistryType.DASHBOARD,
+  ],
+  [
+    'patient-summary-ai',
+    'Patient Summary AI',
+    'Clinical AI',
+    '/patients/:patientId/summary',
+    AssetRegistryType.AI_AGENT,
+  ],
+  [
+    'timeline-live',
+    'Live Timeline',
+    'Patient Workspace',
+    '/patients/:patientId/timeline',
+    AssetRegistryType.DASHBOARD,
+  ],
+  [
+    'clinical-event-ai',
+    'Clinical Event AI',
+    'Clinical AI',
+    '/patients/:patientId/events',
+    AssetRegistryType.AI_AGENT,
+  ],
+  [
+    'risk-score-history',
+    'Risk Score History',
+    'Patient Workspace',
+    '/patients/:patientId/risk-history',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'care-plan-view',
+    'Care Plan View',
+    'Patient Workspace',
+    '/patients/:patientId/care-plan',
+    AssetRegistryType.DASHBOARD,
+  ],
+  [
+    'soap-builder',
+    'SOAP Builder',
+    'Documentation',
+    '/tools/soap-builder',
+    AssetRegistryType.TEMPLATE,
+  ],
+  [
+    'ambient-scribe',
+    'Ambient Scribe',
+    'Documentation',
+    '/tools/ambient-scribe',
+    AssetRegistryType.AI_AGENT,
+  ],
+  [
+    'clinical-dictation',
+    'Clinical Dictation',
+    'Documentation',
+    '/tools/clinical-dictation',
+    AssetRegistryType.AI_AGENT,
+  ],
+  [
+    'discharge-summary-ai',
+    'Discharge Summary AI',
+    'Documentation',
+    '/tools/discharge-summary-ai',
+    AssetRegistryType.AI_AGENT,
+  ],
   ['referral-ai', 'Referral AI', 'Documentation', '/tools/referral-ai', AssetRegistryType.AI_AGENT],
-  ['prior-auth-ai', 'Prior Auth AI', 'Documentation', '/tools/prior-auth-ai', AssetRegistryType.AI_AGENT],
+  [
+    'prior-auth-ai',
+    'Prior Auth AI',
+    'Documentation',
+    '/tools/prior-auth-ai',
+    AssetRegistryType.AI_AGENT,
+  ],
   ['ai-governance', 'AI Governance', 'Governance', '/ai-governance', AssetRegistryType.REPORT],
-  ['clinical-governance', 'Clinical Governance', 'Governance', '/governance/clinical', AssetRegistryType.REPORT],
-  ['clinical-release-gates', 'Clinical Release Gates', 'Governance', '/governance/clinical/release-gates', AssetRegistryType.WORKFLOW],
-  ['clinical-safety-findings', 'Clinical Safety Findings', 'Governance', '/governance/clinical/safety-findings', AssetRegistryType.REPORT],
+  [
+    'clinical-governance',
+    'Clinical Governance',
+    'Governance',
+    '/governance/clinical',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'clinical-release-gates',
+    'Clinical Release Gates',
+    'Governance',
+    '/governance/clinical/release-gates',
+    AssetRegistryType.WORKFLOW,
+  ],
+  [
+    'clinical-safety-findings',
+    'Clinical Safety Findings',
+    'Governance',
+    '/governance/clinical/safety-findings',
+    AssetRegistryType.REPORT,
+  ],
   ['ai-security', 'AI Security', 'Security', '/security', AssetRegistryType.REPORT],
-  ['prompt-firewall', 'Prompt Firewall', 'Security', '/governance/ai-security/prompt-firewall', AssetRegistryType.INTEGRATION],
-  ['model-access-policy', 'Model Access Policy', 'Security', '/governance/ai-security/model-access', AssetRegistryType.PROTOCOL],
-  ['model-usage-dashboard', 'Model Usage Dashboard', 'Governance', '/governance/model-usage', AssetRegistryType.DASHBOARD],
-  ['cost-optimization-control-plane', 'Cost Optimization Control Plane', 'Governance', '/governance/costs', AssetRegistryType.DASHBOARD],
-  ['clinical-safety-audit', 'Clinical Safety Audit', 'Governance', '/governance/clinical-safety', AssetRegistryType.REPORT],
-  ['governance-registry', 'Platform Governance Registry', 'Governance', '/governance-registry', AssetRegistryType.REPORT],
-  ['consent-manager', 'Consent Manager', 'Governance', '/governance/consent', AssetRegistryType.WORKFLOW],
-  ['privacy-center', 'Privacy Center', 'Governance', '/governance/privacy', AssetRegistryType.REPORT],
-  ['regulatory-classification', 'Regulatory Classification', 'Regulatory', '/governance/regulatory', AssetRegistryType.REPORT],
-  ['intended-use-registry', 'Intended Use Registry', 'Regulatory', '/governance/regulatory/intended-use', AssetRegistryType.REPORT],
-  ['equity-monitoring', 'Equity Monitoring', 'Equity', '/governance/equity', AssetRegistryType.REPORT],
-  ['bias-finding-review', 'Bias Finding Review', 'Equity', '/governance/equity/findings', AssetRegistryType.WORKFLOW],
-  ['validation-sandbox', 'Validation Sandbox', 'Validation', '/governance/validation', AssetRegistryType.SIMULATION],
-  ['synthetic-patient-lab', 'Synthetic Patient Lab', 'Validation', '/governance/validation/synthetic-patients', AssetRegistryType.SIMULATION],
+  [
+    'prompt-firewall',
+    'Prompt Firewall',
+    'Security',
+    '/governance/ai-security/prompt-firewall',
+    AssetRegistryType.INTEGRATION,
+  ],
+  [
+    'model-access-policy',
+    'Model Access Policy',
+    'Security',
+    '/governance/ai-security/model-access',
+    AssetRegistryType.PROTOCOL,
+  ],
+  [
+    'model-usage-dashboard',
+    'Model Usage Dashboard',
+    'Governance',
+    '/governance/model-usage',
+    AssetRegistryType.DASHBOARD,
+  ],
+  [
+    'cost-optimization-control-plane',
+    'Cost Optimization Control Plane',
+    'Governance',
+    '/governance/costs',
+    AssetRegistryType.DASHBOARD,
+  ],
+  [
+    'clinical-safety-audit',
+    'Clinical Safety Audit',
+    'Governance',
+    '/governance/clinical-safety',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'governance-registry',
+    'Platform Governance Registry',
+    'Governance',
+    '/governance-registry',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'consent-manager',
+    'Consent Manager',
+    'Governance',
+    '/governance/consent',
+    AssetRegistryType.WORKFLOW,
+  ],
+  [
+    'privacy-center',
+    'Privacy Center',
+    'Governance',
+    '/governance/privacy',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'regulatory-classification',
+    'Regulatory Classification',
+    'Regulatory',
+    '/governance/regulatory',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'intended-use-registry',
+    'Intended Use Registry',
+    'Regulatory',
+    '/governance/regulatory/intended-use',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'equity-monitoring',
+    'Equity Monitoring',
+    'Equity',
+    '/governance/equity',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'bias-finding-review',
+    'Bias Finding Review',
+    'Equity',
+    '/governance/equity/findings',
+    AssetRegistryType.WORKFLOW,
+  ],
+  [
+    'validation-sandbox',
+    'Validation Sandbox',
+    'Validation',
+    '/governance/validation',
+    AssetRegistryType.SIMULATION,
+  ],
+  [
+    'synthetic-patient-lab',
+    'Synthetic Patient Lab',
+    'Validation',
+    '/governance/validation/synthetic-patients',
+    AssetRegistryType.SIMULATION,
+  ],
   ['human-review-queue', 'Human Review Queue', 'Review', '/review', AssetRegistryType.WORKFLOW],
-  ['consent-center', 'Consent Center', 'Governance', '/patients/:patientId/consent', AssetRegistryType.WORKFLOW],
+  [
+    'consent-center',
+    'Consent Center',
+    'Governance',
+    '/patients/:patientId/consent',
+    AssetRegistryType.WORKFLOW,
+  ],
   ['audit-trail-spine', 'Audit Trail Spine', 'Audit', '/audit', AssetRegistryType.REPORT],
-  ['ai-run-audit-timeline', 'AI Run Audit Timeline', 'Audit', '/audit/ai', AssetRegistryType.REPORT],
-  ['deployment-observability', 'Deployment Observability', 'Operations', '/operations/observability', AssetRegistryType.REPORT],
-  ['operations-incident-center', 'Operations Incident Center', 'Operations', '/operations/incidents', AssetRegistryType.WORKFLOW],
+  [
+    'ai-run-audit-timeline',
+    'AI Run Audit Timeline',
+    'Audit',
+    '/audit/ai',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'deployment-observability',
+    'Deployment Observability',
+    'Operations',
+    '/operations/observability',
+    AssetRegistryType.REPORT,
+  ],
+  [
+    'operations-incident-center',
+    'Operations Incident Center',
+    'Operations',
+    '/operations/incidents',
+    AssetRegistryType.WORKFLOW,
+  ],
 ].map(([id, title, category, route, type]) => ({
   id: id as string,
   title: title as string,
@@ -1093,7 +1475,13 @@ export const AUTOMATION_COMMERCIAL_ASSETS: MigratedAssetRecord[] = [
     pricingTier: PricingTier.ADDON,
     demoStatus: AssetDemoLiveStatus.DEMO_READY,
     permissionPolicy: {
-      allowedRoles: ['administrator', 'admin', 'owner', 'integration analyst', 'compliance officer'],
+      allowedRoles: [
+        'administrator',
+        'admin',
+        'owner',
+        'integration analyst',
+        'compliance officer',
+      ],
       permissions: ['VIEW_INTEGRATIONS', 'VIEW_GOVERNANCE'],
       logic: 'all',
       requiresHumanReview: true,
@@ -1139,12 +1527,42 @@ const WORKFLOW_TEMPLATE_ASSETS: MigratedAssetRecord[] = [
 }));
 
 const PLUGIN_ASSETS: MigratedAssetRecord[] = [
-  ['plugin-fluid-resuscitation-calculator', 'Fluid Resuscitation Calculator Plugin', AssetRegistryType.CALCULATOR, '/tools/catalog'],
-  ['plugin-anticoagulation-protocol', 'Anticoagulation Protocol Plugin', AssetRegistryType.PROTOCOL, '/protocols'],
-  ['plugin-pediatric-code-simulation', 'Pediatric Code Simulation Plugin', AssetRegistryType.SIMULATION, '/simulation'],
-  ['plugin-capacity-command-dashboard', 'Capacity Command Dashboard Plugin', AssetRegistryType.DASHBOARD, '/operations-center'],
-  ['plugin-discharge-workflow', 'Discharge Workflow Plugin', AssetRegistryType.WORKFLOW, '/assistant'],
-  ['plugin-guideline-copilot-extension', 'Guideline Copilot AI Extension', AssetRegistryType.AI_AGENT, '/assistant'],
+  [
+    'plugin-fluid-resuscitation-calculator',
+    'Fluid Resuscitation Calculator Plugin',
+    AssetRegistryType.CALCULATOR,
+    '/tools/catalog',
+  ],
+  [
+    'plugin-anticoagulation-protocol',
+    'Anticoagulation Protocol Plugin',
+    AssetRegistryType.PROTOCOL,
+    '/protocols',
+  ],
+  [
+    'plugin-pediatric-code-simulation',
+    'Pediatric Code Simulation Plugin',
+    AssetRegistryType.SIMULATION,
+    '/simulation',
+  ],
+  [
+    'plugin-capacity-command-dashboard',
+    'Capacity Command Dashboard Plugin',
+    AssetRegistryType.DASHBOARD,
+    '/operations-center',
+  ],
+  [
+    'plugin-discharge-workflow',
+    'Discharge Workflow Plugin',
+    AssetRegistryType.WORKFLOW,
+    '/assistant',
+  ],
+  [
+    'plugin-guideline-copilot-extension',
+    'Guideline Copilot AI Extension',
+    AssetRegistryType.AI_AGENT,
+    '/assistant',
+  ],
 ].map(([id, title, type, route]) => ({
   id: id as string,
   title: title as string,
@@ -1270,7 +1688,9 @@ function governanceForAsset(riskLevel: AssetRegistryRiskLevel, demoStatus: Asset
     evidenceSource: 'platform-asset-seed.data.ts',
     version: '1.0.0',
     auditRequirement:
-      clinicalReviewRequired || riskLevel === AssetRegistryRiskLevel.OPERATIONAL ? 'required' : 'standard',
+      clinicalReviewRequired || riskLevel === AssetRegistryRiskLevel.OPERATIONAL
+        ? 'required'
+        : 'standard',
     reviewSchedule:
       riskLevel === AssetRegistryRiskLevel.HIGH_RISK ||
       riskLevel === AssetRegistryRiskLevel.GOVERNANCE_REQUIRED
@@ -1289,7 +1709,10 @@ function normalizeSeedAsset(
   overrides: Partial<MigratedAssetRecord> = {},
 ): SeedPlatformAsset {
   const agent = AI_AGENT_ASSETS.find((row) => row.id === id);
-  const assetType = overrides.assetType || (overrides.type && registryTypeToEntityAssetType(overrides.type)) || (agent ? PlatformAssetType.AI_AGENT : inferAssetType(id));
+  const assetType =
+    overrides.assetType ||
+    (overrides.type && registryTypeToEntityAssetType(overrides.type)) ||
+    (agent ? PlatformAssetType.AI_AGENT : inferAssetType(id));
   const defaults = packDefaultsForAsset(packIds);
   const typeRisk =
     assetType === PlatformAssetType.AI_AGENT || assetType === PlatformAssetType.CLINICAL_TOOL
@@ -1308,7 +1731,11 @@ function normalizeSeedAsset(
     agent?.defaultForRoles,
     defaults.intendedRoles,
   );
-  const workspaceTags = union<string>(overrides.workspaceTags, agent?.workspaceTags, defaults.workspaceTags);
+  const workspaceTags = union<string>(
+    overrides.workspaceTags,
+    agent?.workspaceTags,
+    defaults.workspaceTags,
+  );
   const agentPermissionPolicy = agent
     ? {
         capabilities: agent.capabilities,
@@ -1319,7 +1746,8 @@ function normalizeSeedAsset(
         canCallTools: true,
       }
     : null;
-  const permissionPolicy = overrides.permissionPolicy || agentPermissionPolicy || DEFAULT_PERMISSION_POLICY;
+  const permissionPolicy =
+    overrides.permissionPolicy || agentPermissionPolicy || DEFAULT_PERMISSION_POLICY;
   const departmentInput = {
     id,
     title: overrides.title || agent?.title || titleize(id),
@@ -1327,7 +1755,9 @@ function normalizeSeedAsset(
     clinicalSpecialty: overrides.clinicalSpecialty,
     route: overrides.route || agent?.route,
     assetType,
-    workspaceTags: workspaceTags.length ? workspaceTags : agent?.workspaceTags || DEFAULT_WORKSPACE_TAGS,
+    workspaceTags: workspaceTags.length
+      ? workspaceTags
+      : agent?.workspaceTags || DEFAULT_WORKSPACE_TAGS,
     specialties: overrides.specialties || [],
     intendedRoles: intendedRoles.length ? intendedRoles : DEFAULT_INTENDED_ROLES,
     packIds,
@@ -1381,7 +1811,9 @@ function normalizeSeedAsset(
     organizationTypes: organizationTypes.length ? organizationTypes : DEFAULT_ORGANIZATION_TYPES,
     roleProfiles: overrides.roleProfiles || [],
     intendedRoles: intendedRoles.length ? intendedRoles : DEFAULT_INTENDED_ROLES,
-    workspaceTags: workspaceTags.length ? workspaceTags : agent?.workspaceTags || DEFAULT_WORKSPACE_TAGS,
+    workspaceTags: workspaceTags.length
+      ? workspaceTags
+      : agent?.workspaceTags || DEFAULT_WORKSPACE_TAGS,
     specialties: overrides.specialties || [],
     primaryDepartment,
     secondaryDepartments,
@@ -1423,7 +1855,11 @@ function buildAssetSeedRows(): SeedPlatformAsset[] {
 
   const migratedById = new Map(MIGRATED_CAPABILITY_ASSETS.map((asset) => [asset.id, asset]));
   return [...allIds].map((id) =>
-    normalizeSeedAsset(id, packByAsset.get(id) || migratedById.get(id)?.packIds || ['core-platform'], migratedById.get(id)),
+    normalizeSeedAsset(
+      id,
+      packByAsset.get(id) || migratedById.get(id)?.packIds || ['core-platform'],
+      migratedById.get(id),
+    ),
   );
 }
 

@@ -1,9 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DepartmentAssetMappingService } from './department-asset-mapping.service';
-import {
-  SERVICE_LINE_TAXONOMY,
-  serviceLineName,
-} from './service-line-taxonomy';
+import { SERVICE_LINE_TAXONOMY, serviceLineName } from './service-line-taxonomy';
 
 type DepartmentGraph = Awaited<ReturnType<DepartmentAssetMappingService['getDepartmentGraph']>>;
 type DepartmentNode = DepartmentGraph['departments'][number];
@@ -14,7 +11,9 @@ export class ServiceLineArchitectureService {
 
   async getServiceLineGraph(params: { organizationId?: string | null } = {}) {
     const departmentGraph = await this.departmentAssetMappingService.getDepartmentGraph(params);
-    const departmentById = new Map(departmentGraph.departments.map((department) => [department.id, department]));
+    const departmentById = new Map(
+      departmentGraph.departments.map((department) => [department.id, department]),
+    );
 
     const serviceLines = SERVICE_LINE_TAXONOMY.map((serviceLine) => {
       const departments = serviceLine.departmentIds
@@ -46,18 +45,20 @@ export class ServiceLineArchitectureService {
 
   async getServiceLineById(serviceLineId: string, params: { organizationId?: string | null } = {}) {
     const graph = await this.getServiceLineGraph(params);
-    return graph.serviceLines.find((serviceLine) => serviceLine.id === serviceLineId) || {
-      id: serviceLineId,
-      name: serviceLineName(serviceLineId),
-      departmentIds: [],
-      departmentCount: 0,
-      packCount: 0,
-      assetCount: 0,
-      userCount: 0,
-      departments: [],
-      packs: [],
-      assets: [],
-    };
+    return (
+      graph.serviceLines.find((serviceLine) => serviceLine.id === serviceLineId) || {
+        id: serviceLineId,
+        name: serviceLineName(serviceLineId),
+        departmentIds: [],
+        departmentCount: 0,
+        packCount: 0,
+        assetCount: 0,
+        userCount: 0,
+        departments: [],
+        packs: [],
+        assets: [],
+      }
+    );
   }
 
   private rollupPacks(departments: DepartmentNode[]) {
@@ -68,7 +69,9 @@ export class ServiceLineArchitectureService {
         if (!existing) {
           packById.set(pack.id, { ...pack, departmentIds: [department.id] });
         } else {
-          existing.assetIds = [...new Set([...(existing.assetIds || []), ...(pack.assetIds || [])])];
+          existing.assetIds = [
+            ...new Set([...(existing.assetIds || []), ...(pack.assetIds || [])]),
+          ];
           existing.departmentIds = [...new Set([...(existing.departmentIds || []), department.id])];
           existing.enabled = Boolean(existing.enabled || pack.enabled);
         }

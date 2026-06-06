@@ -2,10 +2,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { Permission } from '../auth/enums/permission.enum';
 import { UserRole } from '../users/entities/user.entity';
 import { TenantIsolationGuard } from './tenant-isolation.guard';
-import {
-  SKIP_TENANT_ISOLATION_KEY,
-  TENANT_SCOPE_KEY,
-} from './tenant-scope.decorator';
+import { SKIP_TENANT_ISOLATION_KEY, TENANT_SCOPE_KEY } from './tenant-scope.decorator';
 import { TenantScopePolicy } from './tenant-context.types';
 
 describe('TenantIsolationGuard', () => {

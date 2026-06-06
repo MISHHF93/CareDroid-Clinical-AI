@@ -36,7 +36,8 @@ export class ObservabilityService {
         id: 'frontend',
         label: 'Frontend Health',
         status:
-          systemHealth.frontendVersion && !['local', 'unknown'].includes(systemHealth.frontendVersion)
+          systemHealth.frontendVersion &&
+          !['local', 'unknown'].includes(systemHealth.frontendVersion)
             ? 'healthy'
             : 'warning',
         summary:
@@ -81,8 +82,7 @@ export class ObservabilityService {
       this.buildCheck({
         id: 'tenant',
         label: 'Tenant Health',
-        status:
-          process.env.CAREDROID_TENANT_ISOLATION_DISABLED === 'true' ? 'critical' : 'healthy',
+        status: process.env.CAREDROID_TENANT_ISOLATION_DISABLED === 'true' ? 'critical' : 'healthy',
         summary:
           process.env.CAREDROID_TENANT_ISOLATION_DISABLED === 'true'
             ? 'Tenant isolation has been explicitly disabled.'
@@ -149,7 +149,14 @@ export class ObservabilityService {
   ): 'healthy' | 'warning' | 'critical' {
     const normalized = String(signal || '').toLowerCase();
     const critical = overrides.critical || ['critical', 'failed', 'failure', 'error', 'offline'];
-    const warning = overrides.warning || ['warning', 'warn', 'guarded', 'synthetic', 'demo', 'unknown'];
+    const warning = overrides.warning || [
+      'warning',
+      'warn',
+      'guarded',
+      'synthetic',
+      'demo',
+      'unknown',
+    ];
     const healthy = overrides.healthy || ['healthy', 'ok', 'live', 'ready', 'active'];
 
     if (critical.some((item) => normalized.includes(item))) return 'critical';

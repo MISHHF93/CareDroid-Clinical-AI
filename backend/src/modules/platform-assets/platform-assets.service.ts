@@ -85,7 +85,11 @@ export class PlatformAssetsService {
   async getMarketplacePack(packId: string, params: { organizationId?: string | null } = {}) {
     const pack = await this.getPack(packId);
     const dependencyPacks = await this.packRepository.find({ order: { name: 'ASC' } });
-    const [projection] = await this.projectMarketplacePacks([pack], params.organizationId, dependencyPacks);
+    const [projection] = await this.projectMarketplacePacks(
+      [pack],
+      params.organizationId,
+      dependencyPacks,
+    );
     return projection;
   }
 
@@ -247,7 +251,9 @@ export class PlatformAssetsService {
     const [assets, roleProfiles, entitlements] = await Promise.all([
       this.assetRepository.find(),
       this.roleProfileRepository.find({ order: { label: 'ASC' } }),
-      organizationId ? this.entitlementRepository.find({ where: { organizationId } }) : Promise.resolve([]),
+      organizationId
+        ? this.entitlementRepository.find({ where: { organizationId } })
+        : Promise.resolve([]),
     ]);
     const assetById = new Map(assets.map((asset) => [asset.id, asset]));
     const packById = new Map(dependencyPacks.map((pack) => [pack.id, pack]));
@@ -382,7 +388,9 @@ export class PlatformAssetsService {
         .filter((row) => row.status === EntitlementStatus.ENABLED)
         .map((row) => row.packId),
     );
-    const dependencies = await this.packRepository.find({ where: { id: In(pack.requiredDependencies) } });
+    const dependencies = await this.packRepository.find({
+      where: { id: In(pack.requiredDependencies) },
+    });
     const dependencyById = new Map(dependencies.map((dependency) => [dependency.id, dependency]));
     return pack.requiredDependencies.map((dependencyId) => ({
       id: dependencyId,
@@ -394,7 +402,9 @@ export class PlatformAssetsService {
   private async findEnabledDependents(organizationId: string, packId: string) {
     const [packs, entitlements] = await Promise.all([
       this.packRepository.find(),
-      this.entitlementRepository.find({ where: { organizationId, status: EntitlementStatus.ENABLED } }),
+      this.entitlementRepository.find({
+        where: { organizationId, status: EntitlementStatus.ENABLED },
+      }),
     ]);
     const enabled = new Set(entitlements.map((row) => row.packId));
     return packs

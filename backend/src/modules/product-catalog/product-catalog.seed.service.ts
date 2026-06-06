@@ -82,7 +82,12 @@ export class ProductCatalogSeedService implements OnModuleInit {
           changed = true;
         }
       }
-      const expectedOutcomes = [...new Set([...(existing.expectedOutcomes || []), ...((row as any).expectedOutcomes || [])])];
+      const expectedOutcomes = [
+        ...new Set([
+          ...(existing.expectedOutcomes || []),
+          ...((row as any).expectedOutcomes || []),
+        ]),
+      ];
       if (expectedOutcomes.length !== (existing.expectedOutcomes || []).length) {
         existing.expectedOutcomes = expectedOutcomes;
         changed = true;
@@ -103,7 +108,15 @@ export class ProductCatalogSeedService implements OnModuleInit {
       }
 
       let changed = false;
-      for (const field of ['slug', 'name', 'category', 'status', 'linkedAssetId', 'docsUrl', 'sortOrder'] as const) {
+      for (const field of [
+        'slug',
+        'name',
+        'category',
+        'status',
+        'linkedAssetId',
+        'docsUrl',
+        'sortOrder',
+      ] as const) {
         const nextValue = (row as any)[field];
         if (nextValue !== undefined && (existing as any)[field] !== nextValue) {
           (existing as any)[field] = nextValue;

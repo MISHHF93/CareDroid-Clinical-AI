@@ -2,12 +2,20 @@ import { DEPARTMENT_IDS, DepartmentId } from './department-taxonomy';
 
 export const SERVICE_LINE_TAXONOMY = [
   { id: 'emergency-medicine', name: 'Emergency Medicine', departmentIds: ['emergency'] },
-  { id: 'critical-care', name: 'Critical Care', departmentIds: ['icu', 'respiratory-therapy', 'pharmacy'] },
+  {
+    id: 'critical-care',
+    name: 'Critical Care',
+    departmentIds: ['icu', 'respiratory-therapy', 'pharmacy'],
+  },
   { id: 'cardiology', name: 'Cardiology', departmentIds: ['cardiology'] },
   { id: 'neurology', name: 'Neurology', departmentIds: ['neurology', 'radiology'] },
   { id: 'pediatrics', name: 'Pediatrics', departmentIds: ['pediatrics'] },
   { id: 'surgery', name: 'Surgery', departmentIds: ['surgery', 'radiology', 'laboratory'] },
-  { id: 'laboratory-medicine', name: 'Laboratory Medicine', departmentIds: ['laboratory', 'pharmacy'] },
+  {
+    id: 'laboratory-medicine',
+    name: 'Laboratory Medicine',
+    departmentIds: ['laboratory', 'pharmacy'],
+  },
   {
     id: 'operations',
     name: 'Operations',
@@ -21,7 +29,9 @@ export type ServiceLineId = (typeof SERVICE_LINE_TAXONOMY)[number]['id'];
 
 export const SERVICE_LINE_IDS = SERVICE_LINE_TAXONOMY.map((serviceLine) => serviceLine.id);
 
-const SERVICE_LINE_BY_ID = new Map(SERVICE_LINE_TAXONOMY.map((serviceLine) => [serviceLine.id, serviceLine]));
+const SERVICE_LINE_BY_ID = new Map(
+  SERVICE_LINE_TAXONOMY.map((serviceLine) => [serviceLine.id, serviceLine]),
+);
 
 export function serviceLineName(id: string) {
   return SERVICE_LINE_BY_ID.get(id as ServiceLineId)?.name || id;

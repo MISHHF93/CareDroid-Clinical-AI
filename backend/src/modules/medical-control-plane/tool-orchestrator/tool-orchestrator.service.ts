@@ -126,6 +126,7 @@ export class ToolOrchestratorService {
   getToolsBySubscriptionTier(tier: SubscriptionTier): ToolListDto {
     const toolAccessMap: Record<SubscriptionTier, string[]> = {
       [SubscriptionTier.FREE]: ['sofa-calculator'],
+      [SubscriptionTier.TRIAL]: ['sofa-calculator'],
       [SubscriptionTier.STARTER]: ['sofa-calculator'],
       [SubscriptionTier.PROFESSIONAL]: ['sofa-calculator', 'drug-interactions'],
       [SubscriptionTier.ACADEMIC]: ['sofa-calculator', 'drug-interactions'],

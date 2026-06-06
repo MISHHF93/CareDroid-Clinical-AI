@@ -5,16 +5,9 @@ import { Permission } from '../auth/enums/permission.enum';
 import { UserRole } from '../users/entities/user.entity';
 import { OrganizationMembershipRole } from '../organizations/entities/organization-membership.entity';
 import { WorkspaceMembershipRole } from '../workspaces/entities/workspace-membership.entity';
-import {
-  SKIP_TENANT_ISOLATION_KEY,
-  TENANT_SCOPE_KEY,
-} from './tenant-scope.decorator';
+import { SKIP_TENANT_ISOLATION_KEY, TENANT_SCOPE_KEY } from './tenant-scope.decorator';
 import { extractTenantScopeFromRequest, isTenantBootstrapPath } from './tenant-scope.utils';
-import {
-  TenantAdminScope,
-  TenantContextRequest,
-  TenantScopePolicy,
-} from './tenant-context.types';
+import { TenantAdminScope, TenantContextRequest, TenantScopePolicy } from './tenant-context.types';
 
 const DEFAULT_POLICY: TenantScopePolicy = {
   level: 'tenant',

@@ -130,8 +130,12 @@ export class PlatformAssetsSeedService implements OnModuleInit {
       let changed = false;
       if (mergedAssetIds.length !== (existing.assetIds || []).length) {
         existing.assetIds = mergedAssetIds;
-        existing.defaultModules = [...new Set([...(existing.defaultModules || []), ...pack.defaultModules])];
-        existing.targetRoles = [...new Set([...(existing.targetRoles || []), ...((pack as any).targetRoles || [])])];
+        existing.defaultModules = [
+          ...new Set([...(existing.defaultModules || []), ...pack.defaultModules]),
+        ];
+        existing.targetRoles = [
+          ...new Set([...(existing.targetRoles || []), ...((pack as any).targetRoles || [])]),
+        ];
         changed = true;
       }
       const buyerFields: Array<keyof typeof existing> = [

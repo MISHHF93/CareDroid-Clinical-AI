@@ -40,7 +40,12 @@ describe('PlatformAssetsController entitlement visibility', () => {
   it('lists only entitled launchable assets for the current user', async () => {
     const { controller, platformAssetsService } = buildController();
 
-    const result = await controller.listAssets({ user: { id: 'user-1' } }, undefined, undefined, undefined);
+    const result = await controller.listAssets(
+      { user: { id: 'user-1' } },
+      undefined,
+      undefined,
+      undefined,
+    );
 
     expect(platformAssetsService.listAssets).toHaveBeenCalledWith({
       query: undefined,
@@ -54,8 +59,8 @@ describe('PlatformAssetsController entitlement visibility', () => {
   it('hides asset detail when the asset is not entitled', async () => {
     const { controller } = buildController();
 
-    await expect(controller.getAsset({ user: { id: 'user-1' } }, 'locked-ai')).rejects.toBeInstanceOf(
-      NotFoundException,
-    );
+    await expect(
+      controller.getAsset({ user: { id: 'user-1' } }, 'locked-ai'),
+    ).rejects.toBeInstanceOf(NotFoundException);
   });
 });

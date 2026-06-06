@@ -20,7 +20,11 @@ import {
   SEED_ASSET_PACKS,
   SEED_PLATFORM_ASSETS,
 } from '../platform-assets/data/platform-asset-seed.data';
-import { IntegrationCategory, IntegrationReadinessStatus, IntegrationStatus } from './enums/product-catalog.enums';
+import {
+  IntegrationCategory,
+  IntegrationReadinessStatus,
+  IntegrationStatus,
+} from './enums/product-catalog.enums';
 
 describe('ProductCatalogService', () => {
   let service: ProductCatalogService;
@@ -182,7 +186,11 @@ describe('ProductCatalogService', () => {
       expect.arrayContaining([
         expect.objectContaining({ name: 'FHIR', status: 'planned', sourceStatus: 'roadmap' }),
         expect.objectContaining({ name: 'LIS', status: 'demo', sourceStatus: 'beta' }),
-        expect.objectContaining({ name: 'Identity Providers', status: 'supported', sourceStatus: 'available' }),
+        expect.objectContaining({
+          name: 'Identity Providers',
+          status: 'supported',
+          sourceStatus: 'available',
+        }),
         expect.objectContaining({ name: 'EMR/EHR', status: 'unavailable', sourceStatus: null }),
       ]),
     );
@@ -361,7 +369,12 @@ describe('ProductCatalogService', () => {
     ]);
     packRepo.find.mockResolvedValue([
       { id: 'core-platform', name: 'Core Platform', slug: 'core', assetIds: ['qsofa'] },
-      { id: 'cardiology-pack', name: 'Cardiology Pack', slug: 'cardiology', assetIds: ['grace-acs'] },
+      {
+        id: 'cardiology-pack',
+        name: 'Cardiology Pack',
+        slug: 'cardiology',
+        assetIds: ['grace-acs'],
+      },
     ]);
     assetRepo.find.mockResolvedValue([
       { id: 'qsofa', title: 'qSOFA', assetType: 'calculator' },
@@ -440,7 +453,12 @@ describe('ProductCatalogService', () => {
 
     expect(graph.product.name).toBe('Emergency Department Solution');
     expect(graph.roles).toEqual(
-      expect.arrayContaining(['Emergency physicians', 'emergency physician', 'nurse', 'triage nurse']),
+      expect.arrayContaining([
+        'Emergency physicians',
+        'emergency physician',
+        'nurse',
+        'triage nurse',
+      ]),
     );
     expect(graph.workspaces).toEqual(expect.arrayContaining(['emergency', 'dashboard']));
     expect(graph.packs[0]).toMatchObject({
@@ -550,7 +568,9 @@ describe('ProductCatalogService', () => {
     packRepo.find.mockResolvedValue([pack]);
     assetRepo.find.mockResolvedValue([automationAsset]);
     orgRepo.findOne.mockResolvedValue({ id: 'org-1' });
-    platformAssetsService.resolveEntitledAssetIds.mockResolvedValue(['automation-audit-event-review']);
+    platformAssetsService.resolveEntitledAssetIds.mockResolvedValue([
+      'automation-audit-event-review',
+    ]);
     platformAssetsService.getOrganizationEntitlements.mockResolvedValue([
       { organizationId: 'org-1', packId: 'governance-compliance-pack', status: 'enabled' },
     ]);
@@ -580,14 +600,10 @@ describe('ProductCatalogService', () => {
     expect(unauthorized.assets).toEqual([]);
     expect(unauthorized.packs).toEqual([]);
     expect(authorized.assets).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: 'automation-audit-event-review' }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ id: 'automation-audit-event-review' })]),
     );
     expect(authorized.packs[0].assets).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ id: 'automation-audit-event-review' }),
-      ]),
+      expect.arrayContaining([expect.objectContaining({ id: 'automation-audit-event-review' })]),
     );
   });
 
@@ -628,7 +644,9 @@ describe('ProductCatalogService', () => {
 
     expect(pack).toMatchObject({
       id: 'digital-twin-pack',
-      products: [{ id: 'product-digital-twin', slug: 'digital-twin-suite', name: 'Digital Twin Suite' }],
+      products: [
+        { id: 'product-digital-twin', slug: 'digital-twin-suite', name: 'Digital Twin Suite' },
+      ],
       assets: [
         expect.objectContaining({
           id: 'digital-twin',
@@ -785,16 +803,12 @@ describe('ProductCatalogService', () => {
 
     const result = await service.getCarePathwayBySlug('sepsis');
 
-    expect(result.calculators).toEqual([
-      expect.objectContaining({ id: 'qsofa', title: 'qSOFA' }),
-    ]);
+    expect(result.calculators).toEqual([expect.objectContaining({ id: 'qsofa', title: 'qSOFA' })]);
     expect(result.protocols).toEqual([
       expect.objectContaining({ id: 'protocol-sepsis', title: 'Sepsis Management' }),
     ]);
     expect(result.workflows).toEqual([expect.objectContaining({ id: 'workflows' })]);
-    expect(result.simulations).toEqual([
-      expect.objectContaining({ id: 'sepsis-deterioration' }),
-    ]);
+    expect(result.simulations).toEqual([expect.objectContaining({ id: 'sepsis-deterioration' })]);
     expect(result.aiAgent).toMatchObject({ id: 'agent-clinical', title: 'Clinical AI' });
     expect(result.linkedAssetCounts).toEqual({
       calculators: 1,
@@ -831,7 +845,10 @@ describe('ProductCatalogService', () => {
       'org-1',
       'governance-compliance-pack',
     );
-    expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith('org-1', 'icu-pack');
+    expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith(
+      'org-1',
+      'icu-pack',
+    );
     expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith(
       'org-1',
       'core-platform',

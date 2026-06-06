@@ -14,6 +14,18 @@ export class RecordUsageEventDto {
   assetId?: string;
 
   @IsOptional()
+  @IsString()
+  meterId?: string;
+
+  @IsOptional()
+  @IsString()
+  source?: string;
+
+  @IsOptional()
+  @IsString()
+  idempotencyKey?: string;
+
+  @IsOptional()
   @IsNumber()
   @Min(0)
   quantity?: number;

@@ -13,7 +13,10 @@ import {
 import { User, UserRole } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
-import { OrganizationMembership, OrganizationMembershipRole } from './entities/organization-membership.entity';
+import {
+  OrganizationMembership,
+  OrganizationMembershipRole,
+} from './entities/organization-membership.entity';
 import { OrganizationsService } from './organizations.service';
 
 describe('OrganizationsService', () => {

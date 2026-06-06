@@ -35,7 +35,9 @@ export class AssetRegistryService {
     private readonly assetRepository: Repository<PlatformAsset>,
   ) {}
 
-  async listAssets(params: AssetRegistryListParams = {}): Promise<PlatformAssetRegistryProjection[]> {
+  async listAssets(
+    params: AssetRegistryListParams = {},
+  ): Promise<PlatformAssetRegistryProjection[]> {
     const rows = await this.assetRepository.find({ order: { title: 'ASC' } });
     return rows
       .map((row) => this.toRegistryProjection(row))

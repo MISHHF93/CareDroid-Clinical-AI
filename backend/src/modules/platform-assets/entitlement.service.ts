@@ -8,13 +8,18 @@ import {
 } from '../../config/entitlements.config';
 import { FeatureFlagState } from '../../config/featureFlags.config';
 import { SubscriptionTier } from '../subscriptions/entities/subscription.entity';
+import { SubscriptionLifecycleState } from '../subscriptions/subscription-lifecycle.engine';
 import { UserRole } from '../users/entities/user.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
 import { OrganizationMembershipRole } from '../organizations/entities/organization-membership.entity';
 import { AssetPack } from './entities/asset-pack.entity';
 import { OrganizationEntitlement } from './entities/organization-entitlement.entity';
 import { PlatformAsset } from './entities/platform-asset.entity';
-import { EntitlementStatus, PlatformAssetLifecycle, PricingTier } from './enums/platform-asset.enums';
+import {
+  EntitlementStatus,
+  PlatformAssetLifecycle,
+  PricingTier,
+} from './enums/platform-asset.enums';
 import { FeatureFlagService } from './feature-flag.service';
 import { AutomationAuditService } from '../automation-audit/automation-audit.service';
 import { AutomationAuditStatus } from '../automation-audit/entities/automation-audit-event.entity';
@@ -26,6 +31,7 @@ export interface EntitlementDecisionInput {
   organizationId?: string | null;
   userRole?: UserRole | string;
   subscriptionPlan?: SubscriptionTier | string;
+  subscriptionLifecycleState?: SubscriptionLifecycleState | string | null;
   entitledAssetIds?: string[];
   entitledPackIds?: string[];
   strictEntitlements?: boolean;
@@ -175,6 +181,19 @@ export class EntitlementService {
       };
     }
 
+    if (
+      input.subscriptionLifecycleState &&
+      input.subscriptionLifecycleState !== SubscriptionLifecycleState.ACTIVE
+    ) {
+      return {
+        ...base,
+        state: EntitlementAccessState.SUBSCRIPTION_REQUIRED,
+        isVisible: true,
+        isLaunchable: false,
+        reason: `subscription-${input.subscriptionLifecycleState}`,
+      };
+    }
+
     const currentPlan = input.subscriptionPlan || SubscriptionTier.FREE;
     const requiredPlan = rule?.requiredPlan || this.planForPricingTier(input.asset?.pricingTier);
     if (!subscriptionMeetsRequirement(currentPlan, requiredPlan)) {
@@ -249,7 +268,10 @@ export class EntitlementService {
         {
           triggerFired: 'Asset launch requested',
           conditionsEvaluated: [
-            { label: `rollout:${decision.rolloutState}`, result: decision.reason !== 'feature-disabled' },
+            {
+              label: `rollout:${decision.rolloutState}`,
+              result: decision.reason !== 'feature-disabled',
+            },
             { label: `entitlement:${decision.reason}`, result: false },
           ],
           actionSelected: 'Launch asset',
@@ -301,9 +323,11 @@ export class EntitlementService {
   }
 
   private isAdminRole(role?: string) {
-    return [UserRole.ADMIN, OrganizationMembershipRole.ADMIN, OrganizationMembershipRole.OWNER].includes(
-      role as UserRole | OrganizationMembershipRole,
-    );
+    return [
+      UserRole.ADMIN,
+      OrganizationMembershipRole.ADMIN,
+      OrganizationMembershipRole.OWNER,
+    ].includes(role as UserRole | OrganizationMembershipRole);
   }
 
   private isAllowedRole(asset?: Partial<PlatformAsset> | null, role?: string) {

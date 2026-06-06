@@ -3,7 +3,9 @@ export const CARE_ENVIRONMENTS = ['local', 'development', 'staging', 'production
 export type CareEnvironment = (typeof CARE_ENVIRONMENTS)[number];
 
 export function normalizeCareEnvironment(value?: string | null): CareEnvironment {
-  const normalized = String(value || '').trim().toLowerCase();
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase();
   if (normalized === 'dev') return 'development';
   if (normalized === 'prod') return 'production';
   if ((CARE_ENVIRONMENTS as readonly string[]).includes(normalized)) {

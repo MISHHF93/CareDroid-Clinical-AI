@@ -39,12 +39,14 @@ describe('OrganizationOnboardingService', () => {
         {
           provide: PlatformAssetsService,
           useValue: {
-            getOrganizationEntitlements: jest.fn().mockResolvedValue([
-              { packId: 'core-platform' },
-              { packId: 'emergency-medicine' },
-              { packId: 'fleet-logistics' },
-              { packId: 'enterprise-governance' },
-            ]),
+            getOrganizationEntitlements: jest
+              .fn()
+              .mockResolvedValue([
+                { packId: 'core-platform' },
+                { packId: 'emergency-medicine' },
+                { packId: 'fleet-logistics' },
+                { packId: 'enterprise-governance' },
+              ]),
             installPackForOrganization: jest.fn().mockResolvedValue({}),
             updateUserRoleProfile: jest.fn().mockResolvedValue({}),
           },
@@ -118,10 +120,22 @@ describe('OrganizationOnboardingService', () => {
       ],
     });
 
-    expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith('org-1', 'core-platform');
-    expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith('org-1', 'emergency-medicine');
-    expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith('org-1', 'fleet-logistics');
-    expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith('org-1', 'enterprise-governance');
+    expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith(
+      'org-1',
+      'core-platform',
+    );
+    expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith(
+      'org-1',
+      'emergency-medicine',
+    );
+    expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith(
+      'org-1',
+      'fleet-logistics',
+    );
+    expect(platformAssetsService.installPackForOrganization).toHaveBeenCalledWith(
+      'org-1',
+      'enterprise-governance',
+    );
     expect(workspacesService.createWorkspace).toHaveBeenCalledWith(
       user,
       expect.objectContaining({
@@ -151,7 +165,11 @@ describe('OrganizationOnboardingService', () => {
         status: 'configured',
         complianceMode: 'ems',
         branding: expect.objectContaining({ accentColor: '#00ff88' }),
-        installedPackIds: expect.arrayContaining(['core-platform', 'emergency-medicine', 'fleet-logistics']),
+        installedPackIds: expect.arrayContaining([
+          'core-platform',
+          'emergency-medicine',
+          'fleet-logistics',
+        ]),
         tenantProfile: expect.objectContaining({
           workspaces: expect.arrayContaining([expect.objectContaining({ name: 'EMS Command' })]),
           integrationsRequested: ['identity-sso'],

@@ -113,7 +113,8 @@ export class DigitalTwinService {
   private async resolveEntitlementPackIds(organizationId?: string) {
     if (!organizationId) return [];
     try {
-      const entitlements = await this.platformAssetsService.getOrganizationEntitlements(organizationId);
+      const entitlements =
+        await this.platformAssetsService.getOrganizationEntitlements(organizationId);
       return entitlements.map((row) => row.packId);
     } catch {
       return [];

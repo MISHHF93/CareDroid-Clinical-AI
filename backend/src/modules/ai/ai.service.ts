@@ -900,9 +900,7 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
       routingExpert: aiFoundation?.selectedExpert || routePlan?.selectedExpert,
       retrievalPolicy: aiFoundation?.retrievalPolicy || routePlan?.retrievalPolicy,
       requiresHumanReview:
-        aiFoundation?.requiresHumanReview ??
-        routePlan?.safetyPlan?.requiresHumanReview ??
-        false,
+        aiFoundation?.requiresHumanReview ?? routePlan?.safetyPlan?.requiresHumanReview ?? false,
       estimatedCost: aiFoundation?.estimatedCost ?? routePlan?.costPlan?.estimatedCost,
       costReductionApplied:
         aiFoundation?.costReductionApplied || routePlan?.costPlan?.costReductionApplied || [],
@@ -946,7 +944,8 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
     await this.platformGovernanceService.createReviewItem({
       organizationId: query.organizationId,
       runId: query.metadata?.aiFoundation?.runId || query.id,
-      capabilityId: query.agentId || query.metadata?.aiFoundation?.capabilityId || query.feature || 'ai',
+      capabilityId:
+        query.agentId || query.metadata?.aiFoundation?.capabilityId || query.feature || 'ai',
       reviewType: this.resolveReviewType(query),
       severity: this.resolveReviewSeverity(query),
       dueAt: this.resolveReviewDueAt(query),
@@ -973,7 +972,8 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
     const feature = (query.feature || '').toLowerCase();
     if (feature.includes('document')) return 'documentation';
     if (feature.includes('simulation')) return 'simulation';
-    if (query.routingExpert === 'operations' || query.routingExpert === 'fleet') return 'operational_ai';
+    if (query.routingExpert === 'operations' || query.routingExpert === 'fleet')
+      return 'operational_ai';
     if (query.routingExpert === 'documentation') return 'documentation';
     return 'clinical_ai';
   }

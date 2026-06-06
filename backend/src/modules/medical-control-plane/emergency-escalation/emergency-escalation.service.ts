@@ -221,7 +221,8 @@ export class EmergencyEscalationService {
       actions.push({
         type: EscalationActionType.NOTIFY_MEDICAL_DIRECTOR,
         priority: 1,
-        description: 'SIMULATED medical director notification placeholder - urgent assessment needed',
+        description:
+          'SIMULATED medical director notification placeholder - urgent assessment needed',
         executed: false,
         simulated: true,
         externalIntegrationRequired: true,
@@ -300,7 +301,9 @@ export class EmergencyEscalationService {
           return true;
 
         case EscalationActionType.RAPID_RESPONSE_TEAM:
-          this.logger.error(`SIMULATED rapid response team activation placeholder: ${dto.category}`);
+          this.logger.error(
+            `SIMULATED rapid response team activation placeholder: ${dto.category}`,
+          );
           return true;
 
         case EscalationActionType.ACTIVATE_PROTOCOL:

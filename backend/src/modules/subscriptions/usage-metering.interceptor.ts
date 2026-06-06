@@ -31,7 +31,10 @@ export class UsageMeteringInterceptor implements NestInterceptor {
           request.tenantContext,
           UsageEventType.API_CALL,
           {
+            source: path,
             metadata: {
+              source: path,
+              surface: 'api',
               method: request.method,
               path,
               statusCode: context.switchToHttp().getResponse()?.statusCode,

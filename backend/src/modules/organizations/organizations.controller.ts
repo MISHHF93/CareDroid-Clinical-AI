@@ -13,10 +13,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { OrganizationOnboardingDto } from '../product-catalog/dto/organization-onboarding.dto';
 import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
-import {
-  OrganizationScoped,
-  SkipTenantIsolation,
-} from '../tenant-context/tenant-scope.decorator';
+import { OrganizationScoped, SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { OrganizationOnboardingService } from './organization-onboarding.service';
@@ -77,7 +74,9 @@ export class OrganizationsController {
 
   @Get(':organizationId/engine')
   @OrganizationScoped()
-  @ApiOperation({ summary: 'Get organization engine model: tenant, branding, subscription, integrations' })
+  @ApiOperation({
+    summary: 'Get organization engine model: tenant, branding, subscription, integrations',
+  })
   async getEngine(@Req() req: any, @Param('organizationId') organizationId: string) {
     this.assertTenantOrganization(req, organizationId);
     return this.organizationsService.getEngineForUser(req.user, organizationId);

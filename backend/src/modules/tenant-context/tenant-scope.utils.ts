@@ -1,8 +1,4 @@
-import {
-  TENANT_HEADER_NAMES,
-  TenantContextRequest,
-  TenantScope,
-} from './tenant-context.types';
+import { TENANT_HEADER_NAMES, TenantContextRequest, TenantScope } from './tenant-context.types';
 
 const firstString = (value: unknown): string | undefined => {
   const raw = Array.isArray(value) ? value[0] : value;
@@ -72,7 +68,10 @@ export function isTenantBootstrapPath(request: TenantContextRequest): boolean {
   if (path === '/api/subscriptions/webhook') return true;
   if (method === 'GET' && path === '/api/organizations') return true;
   if (method === 'GET' && path === '/api/organizations/current') return true;
-  if (method === 'POST' && (path === '/api/organizations' || path === '/api/organizations/onboarding')) {
+  if (
+    method === 'POST' &&
+    (path === '/api/organizations' || path === '/api/organizations/onboarding')
+  ) {
     return true;
   }
 

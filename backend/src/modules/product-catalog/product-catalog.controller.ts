@@ -201,7 +201,10 @@ export class ProductCatalogController {
   }
 
   @Get('dependency-graph')
-  @ApiOperation({ summary: 'Project asset dependency graph across products, packs, assets, routes, services, and integrations' })
+  @ApiOperation({
+    summary:
+      'Project asset dependency graph across products, packs, assets, routes, services, and integrations',
+  })
   async dependencyGraph(@Req() req: any, @Query('organizationId') organizationId?: string) {
     const orgId = organizationId || req.tenantContext?.organizationId;
     if (orgId) {
@@ -236,7 +239,9 @@ export class ProductCatalogController {
   }
 
   @Get('organizations/:organizationId/value-tracking')
-  @ApiOperation({ summary: 'Organization value tracking metrics by clinical, operational, and executive category' })
+  @ApiOperation({
+    summary: 'Organization value tracking metrics by clinical, operational, and executive category',
+  })
   async valueTracking(
     @Req() req: any,
     @Param('organizationId') organizationId: string,

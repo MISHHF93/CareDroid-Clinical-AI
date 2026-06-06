@@ -130,6 +130,12 @@ const ProfileToolPreferences = lazyWithRetry(
 const ProfileWorkspaces = lazyWithRetry(() => import('./pages/profile/ProfileWorkspaces'));
 const ProfileSecurity = lazyWithRetry(() => import('./pages/profile/ProfileSecurity'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
+const CustomerPortalPage = lazyWithRetry(() =>
+  import('./pages/customer-portal/CustomerPortalPage')
+);
+const SuccessCenterPage = lazyWithRetry(() =>
+  import('./pages/success-center/SuccessCenterPage')
+);
 const BillingPage = lazyWithRetry(() => import('./pages/BillingPage'));
 const UsagePage = lazyWithRetry(() => import('./pages/UsagePage'));
 const {
@@ -1346,6 +1352,11 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/customer-portal',
+      element: <CustomerPortalPage />,
+      requiresAuth: true,
+    },
+    {
       path: '/billing',
       element: <BillingPage />,
       requiresAuth: true,
@@ -1393,6 +1404,11 @@ function AppRoutes() {
     {
       path: '/customer-success',
       element: <CustomerSuccessDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/success-center',
+      element: <SuccessCenterPage />,
       requiresAuth: true,
     },
     {

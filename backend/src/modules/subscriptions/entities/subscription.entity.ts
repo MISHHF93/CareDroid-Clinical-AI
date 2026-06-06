@@ -11,6 +11,7 @@ import { User } from '../../users/entities/user.entity';
 
 export enum SubscriptionTier {
   FREE = 'free',
+  TRIAL = 'trial',
   STARTER = 'starter',
   PROFESSIONAL = 'professional',
   INSTITUTIONAL = 'institutional',
@@ -21,6 +22,10 @@ export enum SubscriptionTier {
 
 export enum SubscriptionStatus {
   ACTIVE = 'active',
+  SUSPENDED = 'suspended',
+  EXPIRED = 'expired',
+  CANCELLED = 'cancelled',
+  PENDING = 'pending',
   CANCELED = 'canceled',
   PAST_DUE = 'past_due',
   TRIALING = 'trialing',

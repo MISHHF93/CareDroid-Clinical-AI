@@ -34,7 +34,8 @@ export class IdentityProviderRegistryService {
         protocol: 'policy',
         entryPath: null,
         tenantConfigurationRequired: true,
-        notes: 'Umbrella enterprise SSO policy layer for tenant-enforced identity provider routing.',
+        notes:
+          'Umbrella enterprise SSO policy layer for tenant-enforced identity provider routing.',
         capabilities: ['tenant-routing', 'domain-discovery', 'jit-provisioning-planned'],
       },
       {
@@ -45,7 +46,8 @@ export class IdentityProviderRegistryService {
         protocol: 'saml2',
         entryPath: '/api/auth/saml',
         tenantConfigurationRequired: true,
-        notes: 'Placeholder endpoint exists; full metadata exchange and assertion validation are planned.',
+        notes:
+          'Placeholder endpoint exists; full metadata exchange and assertion validation are planned.',
         capabilities: ['idp-metadata-planned', 'acs-endpoint-planned', 'signed-assertions-planned'],
       },
       {
@@ -56,8 +58,13 @@ export class IdentityProviderRegistryService {
         protocol: 'oidc',
         entryPath: '/api/auth/oidc',
         tenantConfigurationRequired: true,
-        notes: 'Placeholder endpoint exists; issuer discovery, client registration, and callback handling are planned.',
-        capabilities: ['issuer-discovery-planned', 'authorization-code-flow-planned', 'jwks-validation-planned'],
+        notes:
+          'Placeholder endpoint exists; issuer discovery, client registration, and callback handling are planned.',
+        capabilities: [
+          'issuer-discovery-planned',
+          'authorization-code-flow-planned',
+          'jwks-validation-planned',
+        ],
       },
       {
         id: 'azure-ad',

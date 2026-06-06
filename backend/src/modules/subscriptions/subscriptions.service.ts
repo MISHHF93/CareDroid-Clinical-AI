@@ -1,4 +1,10 @@
-import { Injectable, BadRequestException, NotFoundException, Logger, Optional } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  Logger,
+  Optional,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -8,11 +14,20 @@ import { User } from '../users/entities/user.entity';
 import { AuditService } from '../audit/audit.service';
 import { AuditAction } from '../audit/entities/audit-log.entity';
 import {
+  normalizeSubscriptionTier,
   getSubscriptionPlanDefinition,
   SUBSCRIPTION_PLAN_DEFINITIONS,
   UsageEventType,
 } from './subscription-plans.config';
 import { UsageMeteringService } from './usage-metering.service';
+import {
+  buildLifecycleSummary,
+  canDowngradeSubscription,
+  canUpgradeSubscription,
+  classifySubscriptionMovement,
+  resolveLifecycleEntitlement,
+  SubscriptionLifecycleState,
+} from './subscription-lifecycle.engine';
 
 @Injectable()
 export class SubscriptionsService {
@@ -265,6 +280,7 @@ export class SubscriptionsService {
   private getPriceIdForTier(tier: SubscriptionTier): string | null {
     switch (tier) {
       case SubscriptionTier.FREE:
+      case SubscriptionTier.TRIAL:
       case SubscriptionTier.STARTER:
         return this.configService.get<string>('stripe.plans.free.priceId');
       case SubscriptionTier.PROFESSIONAL:
@@ -322,6 +338,78 @@ export class SubscriptionsService {
     return this.subscriptionRepository.findOne({ where: { userId } });
   }
 
+  async getSubscriptionLifecycle(userId: string) {
+    const subscription = await this.getUserSubscription(userId);
+    return {
+      subscription,
+      lifecycle: buildLifecycleSummary(subscription),
+    };
+  }
+
+  async resolveEntitlement(userId: string, requiredTier: SubscriptionTier, featureId?: string) {
+    const subscription = await this.getUserSubscription(userId);
+    return {
+      featureId: featureId || null,
+      ...resolveLifecycleEntitlement({
+        subscription,
+        currentTier: subscription?.tier,
+        requiredTier,
+      }),
+    };
+  }
+
+  async upgradeSubscription(userId: string, targetTier: SubscriptionTier, reason?: string) {
+    const subscription = await this.ensureLifecycleSubscription(userId);
+    if (!canUpgradeSubscription(subscription.tier, targetTier)) {
+      throw new BadRequestException('Requested tier is not a valid upgrade path.');
+    }
+    return this.applyPlanTransition(subscription, targetTier, 'upgrade', reason);
+  }
+
+  async downgradeSubscription(userId: string, targetTier: SubscriptionTier, reason?: string) {
+    const subscription = await this.ensureLifecycleSubscription(userId);
+    if (!canDowngradeSubscription(subscription.tier, targetTier)) {
+      throw new BadRequestException('Requested tier is not a valid downgrade path.');
+    }
+    return this.applyPlanTransition(subscription, targetTier, 'downgrade', reason);
+  }
+
+  async convertTrial(userId: string, targetTier: SubscriptionTier, reason?: string) {
+    const subscription = await this.ensureLifecycleSubscription(userId);
+    const lifecycle = buildLifecycleSummary(subscription);
+    const normalizedTarget = normalizeSubscriptionTier(targetTier);
+    if (normalizedTarget === SubscriptionTier.TRIAL) {
+      throw new BadRequestException('Trial conversion requires a paid or contracted target plan.');
+    }
+    if (!lifecycle.isTrial) {
+      throw new BadRequestException('Only trial subscriptions can be converted.');
+    }
+    if (
+      lifecycle.state !== SubscriptionLifecycleState.ACTIVE &&
+      lifecycle.state !== SubscriptionLifecycleState.PENDING
+    ) {
+      throw new BadRequestException('Trial must be active or pending before conversion.');
+    }
+
+    subscription.tier = normalizedTarget;
+    subscription.status = SubscriptionStatus.ACTIVE;
+    subscription.trialStart = null;
+    subscription.trialEnd = null;
+    subscription.metadata = {
+      ...(subscription.metadata || {}),
+      lifecycleLastAction: 'trial-conversion',
+      lifecycleLastReason: reason || null,
+      lifecycleLastChangedAt: new Date().toISOString(),
+    };
+
+    const saved = await this.subscriptionRepository.save(subscription);
+    await this.logLifecycleChange(userId, 'trial-conversion', normalizedTarget, reason);
+    return {
+      subscription: saved,
+      lifecycle: buildLifecycleSummary(saved),
+    };
+  }
+
   async getBillingOverview(userId: string, tenantContext?: any) {
     const subscription = await this.getUserSubscription(userId);
     const currentPlan = getSubscriptionPlanDefinition(
@@ -339,6 +427,7 @@ export class SubscriptionsService {
       organizationId: tenantContext?.organizationId || null,
       workspaceId: tenantContext?.workspaceId || null,
       currentSubscription: subscription,
+      lifecycle: buildLifecycleSummary(subscription),
       currentPlan,
       plans: await this.getSubscriptionPlans(),
       usageSummary,
@@ -400,6 +489,7 @@ export class SubscriptionsService {
           byAsset: [],
           byRole: [],
           byMeter: [],
+          bySource: [],
           byIntegration: [],
         },
         recentEvents: [],
@@ -417,6 +507,9 @@ export class SubscriptionsService {
     return this.usageMeteringService.recordFromTenantContext(tenantContext, dto.eventType, {
       workspaceId: dto.workspaceId,
       assetId: dto.assetId,
+      meterId: dto.meterId,
+      source: dto.source,
+      idempotencyKey: dto.idempotencyKey,
       quantity: dto.quantity,
       unit: dto.unit,
       metadata: dto.metadata,
@@ -449,6 +542,72 @@ export class SubscriptionsService {
         totalTokens: query.totalTokens,
         cost: query.cost,
       },
+    });
+  }
+
+  private async ensureLifecycleSubscription(userId: string) {
+    const existing = await this.getUserSubscription(userId);
+    if (existing) return existing;
+
+    const now = new Date();
+    const trialEnd = new Date(now);
+    trialEnd.setDate(trialEnd.getDate() + 14);
+    const subscription = this.subscriptionRepository.create({
+      userId,
+      tier: SubscriptionTier.TRIAL,
+      status: SubscriptionStatus.ACTIVE,
+      trialStart: now,
+      trialEnd,
+      metadata: {
+        lifecycleCreatedBy: 'subscription-lifecycle-engine',
+      },
+    });
+    return this.subscriptionRepository.save(subscription);
+  }
+
+  private async applyPlanTransition(
+    subscription: Subscription,
+    targetTier: SubscriptionTier,
+    expectedMovement: 'upgrade' | 'downgrade',
+    reason?: string,
+  ) {
+    const normalizedTarget = normalizeSubscriptionTier(targetTier);
+    const movement = classifySubscriptionMovement(subscription.tier, normalizedTarget);
+    if (movement !== expectedMovement) {
+      throw new BadRequestException(`Requested tier is not a ${expectedMovement}.`);
+    }
+
+    subscription.tier = normalizedTarget;
+    subscription.status = SubscriptionStatus.ACTIVE;
+    subscription.cancelAtPeriodEnd = false;
+    subscription.metadata = {
+      ...(subscription.metadata || {}),
+      lifecycleLastAction: expectedMovement,
+      lifecycleLastReason: reason || null,
+      lifecycleLastChangedAt: new Date().toISOString(),
+    };
+
+    const saved = await this.subscriptionRepository.save(subscription);
+    await this.logLifecycleChange(subscription.userId, expectedMovement, normalizedTarget, reason);
+    return {
+      subscription: saved,
+      lifecycle: buildLifecycleSummary(saved),
+    };
+  }
+
+  private async logLifecycleChange(
+    userId: string,
+    action: string,
+    targetTier: SubscriptionTier,
+    reason?: string,
+  ) {
+    await this.auditService.log({
+      userId,
+      action: AuditAction.SUBSCRIPTION_CHANGE,
+      resource: 'subscription_lifecycle',
+      ipAddress: '0.0.0.0',
+      userAgent: 'system',
+      metadata: { action, targetTier, reason: reason || null },
     });
   }
 }

@@ -59,10 +59,16 @@ export class CustomerSuccessService {
     const enabledAssetIds = this.resolveEnabledAssetIds(enabledPackIds, packs);
     const assetUsage = this.assetUsage(usageEvents, auditLogs, assetById);
     const activeUsers = this.activeUserCount(usageEvents, auditLogs);
-    const aiUsage = this.sumUsage(usageEvents, UsageEventType.AI_CALL) + this.aiAuditCount(auditLogs);
+    const aiUsage =
+      this.sumUsage(usageEvents, UsageEventType.AI_CALL) + this.aiAuditCount(auditLogs);
     const simulationsCompleted = this.simulationsCompleted(usageEvents, auditLogs);
     const workflowsCompleted = this.workflowsCompleted(usageEvents, auditLogs);
-    const underusedProducts = this.underusedProducts(products, packById, assetUsage, enabledPackIds);
+    const underusedProducts = this.underusedProducts(
+      products,
+      packById,
+      assetUsage,
+      enabledPackIds,
+    );
     const adoptionScore = assets.length
       ? Math.round((enabledAssetIds.size / Math.max(assets.length, 1)) * 100)
       : 0;
@@ -88,8 +94,7 @@ export class CustomerSuccessService {
       health: {
         score: healthScore,
         status: healthScore >= 75 ? 'healthy' : healthScore >= 50 ? 'watch' : 'at-risk',
-        retentionRisk:
-          healthScore >= 75 ? 'low' : healthScore >= 50 ? 'medium' : 'high',
+        retentionRisk: healthScore >= 75 ? 'low' : healthScore >= 50 ? 'medium' : 'high',
       },
       metrics: {
         adoption: {
@@ -144,7 +149,9 @@ export class CustomerSuccessService {
     for (const log of auditLogs) {
       const resource = `${log.resource || ''} ${log.action || ''}`.toLowerCase();
       const asset = [...assetById.values()].find((candidate) =>
-        [candidate.id, candidate.route].filter(Boolean).some((token) => resource.includes(String(token).toLowerCase())),
+        [candidate.id, candidate.route]
+          .filter(Boolean)
+          .some((token) => resource.includes(String(token).toLowerCase())),
       );
       if (asset) usage.set(asset.id, (usage.get(asset.id) || 0) + 1);
     }
@@ -222,26 +229,42 @@ export class CustomerSuccessService {
     return (
       usageEvents
         .filter((event) => event.eventType === UsageEventType.SIMULATION)
-        .filter((event) => this.metadataText(event, ['status', 'eventType']).includes('complete') || !this.metadataText(event, ['status']))
+        .filter(
+          (event) =>
+            this.metadataText(event, ['status', 'eventType']).includes('complete') ||
+            !this.metadataText(event, ['status']),
+        )
         .reduce((total, event) => total + Number(event.quantity || 0), 0) +
-      auditLogs.filter((log) => this.matchesLog(log, ['simulation']) && this.matchesLog(log, ['complete', 'completion', 'finish'])).length
+      auditLogs.filter(
+        (log) =>
+          this.matchesLog(log, ['simulation']) &&
+          this.matchesLog(log, ['complete', 'completion', 'finish']),
+      ).length
     );
   }
 
   private workflowsCompleted(usageEvents: UsageEvent[], auditLogs: AuditLog[]) {
     return (
       usageEvents
-        .filter((event) => this.metadataText(event, ['surface', 'eventType', 'workflowId']).includes('workflow'))
+        .filter((event) =>
+          this.metadataText(event, ['surface', 'eventType', 'workflowId']).includes('workflow'),
+        )
         .filter((event) => this.metadataText(event, ['status', 'eventType']).includes('complete'))
         .reduce((total, event) => total + Number(event.quantity || 0), 0) +
-      auditLogs.filter((log) => this.matchesLog(log, ['workflow']) && this.matchesLog(log, ['complete', 'completion', 'finish'])).length
+      auditLogs.filter(
+        (log) =>
+          this.matchesLog(log, ['workflow']) &&
+          this.matchesLog(log, ['complete', 'completion', 'finish']),
+      ).length
     );
   }
 
   private aiAuditCount(logs: AuditLog[]) {
     return logs.filter((log) => {
       const haystack = `${log.resource || ''} ${log.action || ''}`.toLowerCase();
-      return haystack.includes('assistant') || haystack.includes('chat') || haystack.includes('ai_call');
+      return (
+        haystack.includes('assistant') || haystack.includes('chat') || haystack.includes('ai_call')
+      );
     }).length;
   }
 
@@ -274,7 +297,13 @@ export class CustomerSuccessService {
       25,
       input.underusedProducts.filter((product) => product.usageCount === 0).length * 5,
     );
-    return Math.max(0, Math.min(100, Math.round(input.adoptionScore * 0.4 + engagementScore * 0.6 - underusePenalty)));
+    return Math.max(
+      0,
+      Math.min(
+        100,
+        Math.round(input.adoptionScore * 0.4 + engagementScore * 0.6 - underusePenalty),
+      ),
+    );
   }
 
   private customerSignals(input: {
@@ -290,7 +319,8 @@ export class CustomerSuccessService {
       {
         id: 'adoption',
         label: 'Adoption',
-        status: input.adoptionScore >= 70 ? 'healthy' : input.adoptionScore >= 35 ? 'watch' : 'at-risk',
+        status:
+          input.adoptionScore >= 70 ? 'healthy' : input.adoptionScore >= 35 ? 'watch' : 'at-risk',
         message: `${input.adoptionScore}% of platform assets are enabled through current packs.`,
       },
       {
@@ -315,7 +345,9 @@ export class CustomerSuccessService {
       {
         id: 'underused-products',
         label: 'Underused products',
-        status: input.underusedProducts.some((product) => product.usageCount === 0) ? 'watch' : 'healthy',
+        status: input.underusedProducts.some((product) => product.usageCount === 0)
+          ? 'watch'
+          : 'healthy',
         message: `${input.underusedProducts.length} enabled products need customer success review.`,
       },
     ];
@@ -323,7 +355,11 @@ export class CustomerSuccessService {
 
   private metadataText(row: { metadata?: Record<string, any> | string | null }, keys: string[]) {
     const metadata = this.metadata(row);
-    return keys.map((key) => metadata?.[key]).filter(Boolean).join(' ').toLowerCase();
+    return keys
+      .map((key) => metadata?.[key])
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
   }
 
   private metadata(row: { metadata?: Record<string, any> | string | null }) {

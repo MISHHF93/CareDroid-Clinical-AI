@@ -7,7 +7,11 @@ import { AssetPack } from './entities/asset-pack.entity';
 import { OrganizationEntitlement } from './entities/organization-entitlement.entity';
 import { RoleProfile } from './entities/role-profile.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
-import { EntitlementStatus, PlatformAssetLifecycle, PricingTier } from './enums/platform-asset.enums';
+import {
+  EntitlementStatus,
+  PlatformAssetLifecycle,
+  PricingTier,
+} from './enums/platform-asset.enums';
 import { UserPreferencesService } from '../user-profile/user-preferences.service';
 
 describe('PlatformAssetsService', () => {
@@ -158,7 +162,11 @@ describe('PlatformAssetsService', () => {
       },
     ]);
     entitlementRepo.find.mockResolvedValue([
-      { organizationId: 'org-1', packId: 'emergency-department-pack', status: EntitlementStatus.ENABLED },
+      {
+        organizationId: 'org-1',
+        packId: 'emergency-department-pack',
+        status: EntitlementStatus.ENABLED,
+      },
     ]);
 
     const result = await service.listMarketplacePacks({ organizationId: 'org-1' });
@@ -213,7 +221,11 @@ describe('PlatformAssetsService', () => {
       },
     ]);
     entitlementRepo.find.mockResolvedValue([
-      { organizationId: 'org-1', packId: 'emergency-department-pack', status: EntitlementStatus.ENABLED },
+      {
+        organizationId: 'org-1',
+        packId: 'emergency-department-pack',
+        status: EntitlementStatus.ENABLED,
+      },
     ]);
     entitlementRepo.save.mockImplementation(async (row) => row);
 

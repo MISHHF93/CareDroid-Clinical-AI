@@ -18,6 +18,9 @@ interface RecordUsageInput {
   userRole?: string | null;
   subscriptionPlan?: string | null;
   assetId?: string | null;
+  meterId?: string | null;
+  source?: string | null;
+  idempotencyKey?: string | null;
   eventType: UsageEventType;
   quantity?: number;
   unit?: UsageUnit;
@@ -44,12 +47,13 @@ type UsageMeterDefinition = {
 
 const USAGE_METERING_FRAMEWORK: UsageMeterDefinition[] = [
   {
-    id: 'active-users',
-    label: 'Active users',
+    id: 'user-seats',
+    label: 'User seats',
     eventTypes: [UsageEventType.ACTIVE_USER],
     unit: 'user',
     billingReadiness: 'future-billing-candidate',
-    description: 'Unique tenant users observed through usage events plus explicit active-user meters.',
+    description:
+      'Unique tenant users observed through usage events plus explicit seat meters.',
   },
   {
     id: 'ai-requests',
@@ -76,12 +80,20 @@ const USAGE_METERING_FRAMEWORK: UsageMeterDefinition[] = [
     description: 'Workflow execution events identified by workflow metadata.',
   },
   {
-    id: 'api-calls',
-    label: 'API calls',
+    id: 'api-usage',
+    label: 'API usage',
     eventTypes: [UsageEventType.API_CALL],
     unit: 'request',
     billingReadiness: 'operational',
     description: 'Tenant-scoped backend API requests recorded by the metering interceptor.',
+  },
+  {
+    id: 'storage-usage',
+    label: 'Storage usage',
+    eventTypes: [UsageEventType.STORAGE],
+    unit: 'gb',
+    billingReadiness: 'future-billing-candidate',
+    description: 'Tenant-scoped storage usage snapshots or deltas measured in GB.',
   },
   {
     id: 'integrations',
@@ -106,6 +118,16 @@ export class UsageMeteringService {
     const occurredAt = input.occurredAt ? new Date(input.occurredAt) : new Date();
     const period = this.resolvePeriod('month', occurredAt);
     const unit = input.unit || this.defaultUnitFor(input.eventType);
+    const metadata = input.metadata || {};
+    const idempotencyKey = this.optionalString(input.idempotencyKey);
+    if (idempotencyKey) {
+      const existing = await this.usageEventRepository.findOne({
+        where: { organizationId: input.organizationId, idempotencyKey },
+      });
+      if (existing) return existing;
+    }
+    const meterId = this.resolveMeterId(input.eventType, input.meterId, metadata);
+    const source = this.resolveSource(input.source, metadata);
 
     const usageEvent = this.usageEventRepository.create({
       organizationId: input.organizationId,
@@ -114,13 +136,18 @@ export class UsageMeteringService {
       userRole: input.userRole || null,
       assetId: input.assetId || null,
       eventType: input.eventType,
+      meterId,
+      source,
+      idempotencyKey,
       quantity: input.quantity ?? 1,
       unit,
       periodStart: period.start,
       periodEnd: period.end,
       occurredAt,
       metadata: {
-        ...(input.metadata || {}),
+        ...metadata,
+        meterId,
+        source,
         subscriptionPlan: input.subscriptionPlan,
       },
     });
@@ -141,6 +168,9 @@ export class UsageMeteringService {
       subscriptionPlan: details.subscriptionPlan ?? tenantContext?.subscriptionPlan,
       eventType,
       assetId: details.assetId,
+      meterId: details.meterId,
+      source: details.source,
+      idempotencyKey: details.idempotencyKey,
       quantity: details.quantity,
       unit: details.unit,
       metadata: details.metadata,
@@ -197,21 +227,20 @@ export class UsageMeteringService {
       recentEvents: events.slice(0, 25).map((event) => ({
         id: event.id,
         eventType: event.eventType,
+        meterId: event.meterId || this.meterIdForEvent(event),
         quantity: Number(event.quantity || 0),
         unit: event.unit,
         organizationId: event.organizationId,
         workspaceId: event.workspaceId,
         assetId: event.assetId,
+        source: event.source || this.metadataString(this.metadata(event), 'source'),
         userRole: event.userRole,
         occurredAt: event.occurredAt,
       })),
     };
   }
 
-  async getUsageMeteringFramework(options: {
-    organizationId: string;
-    period?: string;
-  }) {
+  async getUsageMeteringFramework(options: { organizationId: string; period?: string }) {
     const period = this.resolvePeriod(options.period || 'month');
     const events = await this.usageEventRepository.find({
       where: {
@@ -238,25 +267,39 @@ export class UsageMeteringService {
       meters,
       categories: {
         engagement: meters.filter((meter) =>
-          ['active-users', 'ai-requests', 'simulation-runs', 'workflow-executions'].includes(
+          ['user-seats', 'ai-requests', 'simulation-runs', 'workflow-executions'].includes(
             meter.id,
           ),
         ),
-        platform: meters.filter((meter) => meter.id === 'api-calls'),
+        platform: meters.filter((meter) => ['api-usage', 'storage-usage'].includes(meter.id)),
         integrations: meters.filter((meter) => meter.id === 'integrations'),
       },
       billingReadiness: {
-        currentBilling: 'plan-limit summaries only; no metered charges are created from this endpoint',
+        currentBilling:
+          'plan-limit summaries only; no metered charges are created from this endpoint',
         futureBillingCandidates: meters
           .filter((meter) => meter.billingReadiness === 'future-billing-candidate')
           .map((meter) => meter.id),
-        retainedDimensions: ['organization', 'workspace', 'asset', 'role', 'user', 'integration'],
+        retainedDimensions: [
+          'organization',
+          'workspace',
+          'asset',
+          'role',
+          'user',
+          'meter',
+          'source',
+          'integration',
+          'billing_period',
+        ],
+        paymentProcessing: false,
       },
+      billingAttachmentContract: this.buildBillingAttachmentContract(meters),
       breakdowns: {
         byWorkspace: this.groupUsage(events, (event) => event.workspaceId || 'unknown'),
         byAsset: this.groupUsage(events, (event) => event.assetId || 'unknown'),
         byRole: this.groupUsage(events, (event) => event.userRole || 'unknown'),
         byMeter: this.groupUsage(events, (event) => this.meterIdForEvent(event)),
+        bySource: this.groupUsage(events, (event) => event.source || 'unknown'),
         byIntegration: this.groupUsage(
           events.filter((event) => this.isIntegrationEvent(event)),
           (event) => this.integrationKey(event),
@@ -268,6 +311,10 @@ export class UsageMeteringService {
         meterId: this.meterIdForEvent(event),
         quantity: Number(event.quantity || 0),
         unit: event.unit,
+        source: event.source,
+        billingPeriodStart: event.periodStart,
+        billingPeriodEnd: event.periodEnd,
+        idempotencyKey: event.idempotencyKey,
         workspaceId: event.workspaceId,
         assetId: event.assetId,
         userRole: event.userRole,
@@ -281,12 +328,38 @@ export class UsageMeteringService {
     return getSubscriptionPlanDefinition(tier);
   }
 
+  private buildBillingAttachmentContract(
+    meters: Array<ReturnType<UsageMeteringService['buildFrameworkMeter']>>,
+  ) {
+    return {
+      paymentProcessing: false,
+      invoiceLineItemReady: true,
+      pricingKeyField: 'meterId',
+      idempotencyField: 'idempotencyKey',
+      periodFields: ['periodStart', 'periodEnd'],
+      requiredMeters: [
+        'user-seats',
+        'ai-requests',
+        'simulation-runs',
+        'workflow-executions',
+        'api-usage',
+        'storage-usage',
+      ],
+      availableMeters: meters.map((meter) => ({
+        meterId: meter.id,
+        unit: meter.unit,
+        quantity: meter.value,
+        billingReadiness: meter.billingReadiness,
+      })),
+      note:
+        'These meters are billing-neutral usage facts. Future pricing can attach to meterId without changing feature emitters.',
+    };
+  }
+
   private buildFrameworkMeter(definition: UsageMeterDefinition, events: UsageEvent[]) {
     const matchedEvents = events.filter((event) => this.eventMatchesMeter(definition.id, event));
     const value =
-      definition.id === 'active-users'
-        ? this.activeUserValue(events)
-        : this.sum(matchedEvents);
+      definition.id === 'user-seats' ? this.activeUserValue(events) : this.sum(matchedEvents);
     return {
       id: definition.id,
       label: definition.label,
@@ -301,7 +374,8 @@ export class UsageMeteringService {
   }
 
   private eventMatchesMeter(meterId: string, event: UsageEvent) {
-    if (meterId === 'active-users') {
+    if (event.meterId === meterId) return true;
+    if (meterId === 'user-seats') {
       return Boolean(event.userId) || event.eventType === UsageEventType.ACTIVE_USER;
     }
     if (meterId === 'workflow-executions') return this.isWorkflowEvent(event);
@@ -311,12 +385,14 @@ export class UsageMeteringService {
   }
 
   private meterIdForEvent(event: UsageEvent) {
+    if (event.meterId) return event.meterId;
     if (this.isIntegrationEvent(event)) return 'integrations';
     if (this.isWorkflowEvent(event)) return 'workflow-executions';
     if (event.eventType === UsageEventType.AI_CALL) return 'ai-requests';
     if (event.eventType === UsageEventType.SIMULATION) return 'simulation-runs';
-    if (event.eventType === UsageEventType.API_CALL) return 'api-calls';
-    if (event.eventType === UsageEventType.ACTIVE_USER) return 'active-users';
+    if (event.eventType === UsageEventType.STORAGE) return 'storage-usage';
+    if (event.eventType === UsageEventType.API_CALL) return 'api-usage';
+    if (event.eventType === UsageEventType.ACTIVE_USER) return 'user-seats';
     return event.eventType;
   }
 
@@ -382,7 +458,11 @@ export class UsageMeteringService {
 
   private metadataText(row: { metadata?: Record<string, any> | string | null }, keys: string[]) {
     const metadata = this.metadata(row);
-    return keys.map((key) => metadata?.[key]).filter(Boolean).join(' ').toLowerCase();
+    return keys
+      .map((key) => metadata?.[key])
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
   }
 
   private metadataString(metadata: Record<string, any>, key: string): string | null {
@@ -409,8 +489,52 @@ export class UsageMeteringService {
     return index >= 0 && segments[index + 1] ? segments[index + 1] : null;
   }
 
+  private resolveMeterId(
+    eventType: UsageEventType,
+    requestedMeterId?: string | null,
+    metadata: Record<string, any> = {},
+  ) {
+    const normalized = this.optionalString(requestedMeterId) || this.metadataString(metadata, 'meterId');
+    if (normalized) return normalized;
+    if (this.metadataText({ metadata }, ['surface', 'eventType', 'workflowId', 'workflowSlug']).includes('workflow')) {
+      return 'workflow-executions';
+    }
+    if (
+      this.metadataText({ metadata }, [
+        'surface',
+        'eventType',
+        'integrationId',
+        'integrationSlug',
+        'connector',
+        'path',
+      ]).includes('integration')
+    ) {
+      return 'integrations';
+    }
+    if (eventType === UsageEventType.AI_CALL) return 'ai-requests';
+    if (eventType === UsageEventType.SIMULATION) return 'simulation-runs';
+    if (eventType === UsageEventType.STORAGE) return 'storage-usage';
+    if (eventType === UsageEventType.API_CALL) return 'api-usage';
+    if (eventType === UsageEventType.ACTIVE_USER) return 'user-seats';
+    return eventType;
+  }
+
+  private resolveSource(source?: string | null, metadata: Record<string, any> = {}) {
+    return (
+      this.optionalString(source) ||
+      this.metadataString(metadata, 'source') ||
+      this.metadataString(metadata, 'surface') ||
+      this.metadataString(metadata, 'path') ||
+      null
+    );
+  }
+
   private defaultUnitFor(eventType: UsageEventType): UsageUnit {
     return BILLABLE_USAGE_METERS.find((meter) => meter.eventType === eventType)?.unit || 'event';
+  }
+
+  private optionalString(value?: string | null) {
+    return typeof value === 'string' && value.trim() ? value.trim() : null;
   }
 
   private resolvePeriod(periodKey: string, anchor = new Date()): UsagePeriod {

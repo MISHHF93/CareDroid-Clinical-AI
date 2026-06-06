@@ -1,4 +1,7 @@
-import { AssetDependencyGraphService, ASSET_DEPENDENCY_ISSUE_TYPES } from './asset-dependency-graph.service';
+import {
+  AssetDependencyGraphService,
+  ASSET_DEPENDENCY_ISSUE_TYPES,
+} from './asset-dependency-graph.service';
 import { PlatformAssetType } from '../platform-assets/enums/platform-asset.enums';
 import { IntegrationCategory, IntegrationStatus, ProductType } from './enums/product-catalog.enums';
 
@@ -128,7 +131,9 @@ describe('AssetDependencyGraphService', () => {
       'duplicate-dependency': expect.any(Number),
       'orphan-asset': 1,
     });
-    expect(graph.issues.map((issue) => issue.detail).join(' ')).toContain('missing asset missing-asset');
+    expect(graph.issues.map((issue) => issue.detail).join(' ')).toContain(
+      'missing asset missing-asset',
+    );
     expect(graph.issues.map((issue) => issue.detail).join(' ')).toContain('Orphan Asset');
   });
 
@@ -152,8 +157,18 @@ describe('AssetDependencyGraphService', () => {
     };
     const assetRepository = {
       find: jest.fn().mockResolvedValue([
-        { id: 'qsofa', title: 'qSOFA', assetType: PlatformAssetType.CALCULATOR, packIds: ['core-platform'] },
-        { id: 'locked-ai', title: 'Locked AI', assetType: PlatformAssetType.AI_AGENT, packIds: ['premium-pack'] },
+        {
+          id: 'qsofa',
+          title: 'qSOFA',
+          assetType: PlatformAssetType.CALCULATOR,
+          packIds: ['core-platform'],
+        },
+        {
+          id: 'locked-ai',
+          title: 'Locked AI',
+          assetType: PlatformAssetType.AI_AGENT,
+          packIds: ['premium-pack'],
+        },
       ]),
     };
     const integrationRepository = { find: jest.fn().mockResolvedValue([]) };

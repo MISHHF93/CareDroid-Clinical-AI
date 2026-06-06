@@ -24,7 +24,9 @@ export type DepartmentId = (typeof DEPARTMENT_TAXONOMY)[number]['id'];
 
 export const DEPARTMENT_IDS = DEPARTMENT_TAXONOMY.map((department) => department.id);
 
-const DEPARTMENT_BY_ID = new Map(DEPARTMENT_TAXONOMY.map((department) => [department.id, department]));
+const DEPARTMENT_BY_ID = new Map(
+  DEPARTMENT_TAXONOMY.map((department) => [department.id, department]),
+);
 
 const DEPARTMENT_ALIASES: Record<string, DepartmentId> = {
   emergency: 'emergency',
@@ -127,8 +129,12 @@ export function defaultRequiredPermissions(input: Partial<PlatformAsset>): strin
   const permissions = new Set<string>();
   const policy = input.permissionPolicy || {};
   const policyPermissions = [
-    ...(Array.isArray((policy as any).requiredPermissions) ? (policy as any).requiredPermissions : []),
-    ...(Array.isArray((policy as any).toolCallingPermissions) ? (policy as any).toolCallingPermissions : []),
+    ...(Array.isArray((policy as any).requiredPermissions)
+      ? (policy as any).requiredPermissions
+      : []),
+    ...(Array.isArray((policy as any).toolCallingPermissions)
+      ? (policy as any).toolCallingPermissions
+      : []),
   ];
   policyPermissions.forEach((permission) => {
     if (typeof permission === 'string' && permission.trim()) permissions.add(permission);

@@ -38,6 +38,38 @@ export async function fetchCurrentSubscription() {
   }
 }
 
+export async function fetchSubscriptionLifecycle() {
+  try {
+    const response = await apiFetch('/api/subscriptions/lifecycle');
+    const data = await parseJson(response, null);
+    if (!response.ok) {
+      return disabled(data?.message || getApiErrorMessage(null, response));
+    }
+    return { ok: true, data, message: '' };
+  } catch (error) {
+    return disabled(getApiErrorMessage(error));
+  }
+}
+
+export async function resolveSubscriptionEntitlement({ requiredTier, featureId } = {}) {
+  if (!requiredTier) return disabled('Required subscription tier is required.');
+
+  try {
+    const response = await apiFetch('/api/subscriptions/entitlements/resolve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ requiredTier, featureId }),
+    });
+    const data = await parseJson(response, null);
+    if (!response.ok) {
+      return disabled(data?.message || getApiErrorMessage(null, response));
+    }
+    return { ok: true, data, message: '' };
+  } catch (error) {
+    return disabled(getApiErrorMessage(error));
+  }
+}
+
 export async function fetchBillingOverview() {
   try {
     const response = await apiFetch('/api/subscriptions/billing');
@@ -132,4 +164,35 @@ export async function createCustomerPortalSession({ returnUrl } = {}) {
   } catch (error) {
     return disabled(getApiErrorMessage(error));
   }
+}
+
+async function postPlanTransition(path, { targetTier, reason } = {}) {
+  if (!targetTier) return disabled('Target subscription tier is required.');
+
+  try {
+    const response = await apiFetch(path, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ targetTier, reason }),
+    });
+    const data = await parseJson(response, {});
+    if (!response.ok) {
+      return disabled(data?.message || getApiErrorMessage(null, response));
+    }
+    return { ok: true, data, message: '' };
+  } catch (error) {
+    return disabled(getApiErrorMessage(error));
+  }
+}
+
+export function upgradeSubscription({ targetTier, reason } = {}) {
+  return postPlanTransition('/api/subscriptions/upgrade', { targetTier, reason });
+}
+
+export function downgradeSubscription({ targetTier, reason } = {}) {
+  return postPlanTransition('/api/subscriptions/downgrade', { targetTier, reason });
+}
+
+export function convertTrialSubscription({ targetTier, reason } = {}) {
+  return postPlanTransition('/api/subscriptions/trial/convert', { targetTier, reason });
 }

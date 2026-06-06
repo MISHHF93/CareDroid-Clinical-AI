@@ -40,8 +40,12 @@ describe('ProductCatalogValidationService', () => {
         highlightAssetIds: [],
       })),
     );
-    packRepo.find.mockResolvedValue([{ id: 'core-platform', slug: 'core-platform', assetIds: ['dashboard'] }]);
-    assetRepo.find.mockResolvedValue([{ id: 'dashboard', lifecycle: PlatformAssetLifecycle.ACTIVE }]);
+    packRepo.find.mockResolvedValue([
+      { id: 'core-platform', slug: 'core-platform', assetIds: ['dashboard'] },
+    ]);
+    assetRepo.find.mockResolvedValue([
+      { id: 'dashboard', lifecycle: PlatformAssetLifecycle.ACTIVE },
+    ]);
     specialtyRepo.find.mockResolvedValue([]);
     pathwayRepo.find.mockResolvedValue([]);
   });

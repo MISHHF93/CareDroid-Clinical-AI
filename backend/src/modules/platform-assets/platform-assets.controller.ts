@@ -21,10 +21,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Permission } from '../auth/enums/permission.enum';
 import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
-import {
-  OrganizationScoped,
-  TenantScoped,
-} from '../tenant-context/tenant-scope.decorator';
+import { OrganizationScoped, TenantScoped } from '../tenant-context/tenant-scope.decorator';
 import { UserRole } from '../users/entities/user.entity';
 import { DigitalTwinService } from './digital-twin.service';
 import { OrganizationAnalyticsService } from './organization-analytics.service';
@@ -136,7 +133,12 @@ export class PlatformAssetsController {
     @Query('owner') owner?: string,
     @Query('assetType') assetType?: string,
   ) {
-    return this.platformGovernanceRegistryService.getRegistry({ query, riskLevel, owner, assetType });
+    return this.platformGovernanceRegistryService.getRegistry({
+      query,
+      riskLevel,
+      owner,
+      assetType,
+    });
   }
 
   @Get('departments')
@@ -162,7 +164,9 @@ export class PlatformAssetsController {
       this.assertTenantOrganization(req, orgId);
       await this.assertOrgMember(req.user.id, orgId);
     }
-    return this.departmentAssetMappingService.getDepartmentById(departmentId, { organizationId: orgId });
+    return this.departmentAssetMappingService.getDepartmentById(departmentId, {
+      organizationId: orgId,
+    });
   }
 
   @Get('service-lines')
@@ -188,7 +192,9 @@ export class PlatformAssetsController {
       this.assertTenantOrganization(req, orgId);
       await this.assertOrgMember(req.user.id, orgId);
     }
-    return this.serviceLineArchitectureService.getServiceLineById(serviceLineId, { organizationId: orgId });
+    return this.serviceLineArchitectureService.getServiceLineById(serviceLineId, {
+      organizationId: orgId,
+    });
   }
 
   @Get('packs')

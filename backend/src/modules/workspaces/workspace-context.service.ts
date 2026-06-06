@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EntitlementService } from '../platform-assets/entitlement.service';
 import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
+import { normalizeLifecycleState } from '../subscriptions/subscription-lifecycle.engine';
 import { User } from '../users/entities/user.entity';
 import { Organization } from './entities/organization.entity';
 import { WorkspaceType } from './entities/workspace.entity';
@@ -56,8 +57,11 @@ export class WorkspaceContextService {
     const definition = getWorkspaceDefinition(workspace.type || workspaceKey);
     const membership =
       options.explicitMembership ||
-      workspaceState.memberships?.find((row: { workspaceId: string }) => row.workspaceId === workspace.id);
-    const effectivePermissions = options.explicitPermissions || workspaceState.effectivePermissions || [];
+      workspaceState.memberships?.find(
+        (row: { workspaceId: string }) => row.workspaceId === workspace.id,
+      );
+    const effectivePermissions =
+      options.explicitPermissions || workspaceState.effectivePermissions || [];
     const organization = workspace.organizationId
       ? await this.organizationRepository.findOne({ where: { id: workspace.organizationId } })
       : null;
@@ -83,6 +87,7 @@ export class WorkspaceContextService {
           organizationId: organization?.id,
           userRole: membership?.role || user.role,
           subscriptionPlan: user.subscription?.tier,
+          subscriptionLifecycleState: normalizeLifecycleState(user.subscription),
           entitledAssetIds: visibleAssetIds,
           entitledPackIds,
           strictEntitlements: this.platformAssetsService.isStrictSaasEntitlementsEnabled(),

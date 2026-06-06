@@ -111,7 +111,10 @@ export class HospitalSolutionBuilderService {
       ...this.productIdsForHospitalType(hospitalType),
     ]);
     const products = productIds.length
-      ? await this.productRepository.find({ where: { id: In(productIds) }, order: { sortOrder: 'ASC' } })
+      ? await this.productRepository.find({
+          where: { id: In(productIds) },
+          order: { sortOrder: 'ASC' },
+        })
       : [];
     const packIds = unique([
       'core-platform',
@@ -135,11 +138,16 @@ export class HospitalSolutionBuilderService {
     );
     const integrationSlugs = unique([
       ...BASE_INTEGRATIONS,
-      ...serviceLineIds.flatMap((serviceLineId) => SERVICE_LINE_INTEGRATION_MAP[serviceLineId] || []),
+      ...serviceLineIds.flatMap(
+        (serviceLineId) => SERVICE_LINE_INTEGRATION_MAP[serviceLineId] || [],
+      ),
       ...selectedIntegrationSlugs,
     ]);
     const integrations = integrationSlugs.length
-      ? await this.integrationRepository.find({ where: { slug: In(integrationSlugs) }, order: { sortOrder: 'ASC' } })
+      ? await this.integrationRepository.find({
+          where: { slug: In(integrationSlugs) },
+          order: { sortOrder: 'ASC' },
+        })
       : [];
     const workspaceDefaults = this.buildWorkspaceDefaults(
       unique([...departmentIds, ...selectedWorkspaceIds]),
@@ -204,7 +212,14 @@ export class HospitalSolutionBuilderService {
         commercialPlanId: recommendedCommercialPlanId,
         targetPackIds: packs.map((pack) => pack.id),
       },
-      rationale: this.buildRationale(hospitalType, departmentIds, serviceLineIds, products, packs, integrations),
+      rationale: this.buildRationale(
+        hospitalType,
+        departmentIds,
+        serviceLineIds,
+        products,
+        packs,
+        integrations,
+      ),
     };
   }
 
@@ -212,7 +227,9 @@ export class HospitalSolutionBuilderService {
     const recommendation =
       dto.recommendation || (await this.recommend({ organizationId: dto.organizationId }));
     const configurationPatch =
-      dto.configurationPatch || (recommendation.configurationPatch as Record<string, unknown>) || {};
+      dto.configurationPatch ||
+      (recommendation.configurationPatch as Record<string, unknown>) ||
+      {};
     const commercialPlanId =
       dto.commercialPlanId ||
       (recommendation.recommendedCommercialPlanId as string | undefined) ||
@@ -220,9 +237,13 @@ export class HospitalSolutionBuilderService {
 
     const [configuration, entitlementPlan] = await Promise.all([
       this.organizationsService.updateConfiguration(user, dto.organizationId, configurationPatch),
-      this.productCatalogService.reconcileOrganizationCommercialPlan(dto.organizationId, commercialPlanId, {
-        disableRemovedPacks: false,
-      }),
+      this.productCatalogService.reconcileOrganizationCommercialPlan(
+        dto.organizationId,
+        commercialPlanId,
+        {
+          disableRemovedPacks: false,
+        },
+      ),
     ]);
 
     return {
@@ -377,8 +398,10 @@ export class HospitalSolutionBuilderService {
     const productType = product.productType as ProductType | string;
     if (productType === ProductType.EMERGENCY_DEPARTMENT) return 'Selected emergency coverage.';
     if (productType === ProductType.ICU) return 'Selected critical care coverage.';
-    if (productType === ProductType.HOSPITAL_OPERATIONS) return 'Hospital-wide operations visibility.';
-    if (departmentIds.includes(String(productType))) return `Selected ${this.titleize(productType)} department.`;
+    if (productType === ProductType.HOSPITAL_OPERATIONS)
+      return 'Hospital-wide operations visibility.';
+    if (departmentIds.includes(String(productType)))
+      return `Selected ${this.titleize(productType)} department.`;
     return 'Included by hospital type and deployment goals.';
   }
 

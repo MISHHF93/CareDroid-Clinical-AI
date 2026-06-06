@@ -1,14 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import {
-  AssetRegistryRiskLevel,
-  AssetRegistryType,
-} from './asset-registry.schema';
-import {
-  AssetRegistryService,
-  PlatformAssetRegistryProjection,
-} from './asset-registry.service';
+import { AssetRegistryRiskLevel, AssetRegistryType } from './asset-registry.schema';
+import { AssetRegistryService, PlatformAssetRegistryProjection } from './asset-registry.service';
 import { AssetPack } from './entities/asset-pack.entity';
 
 type GovernanceJson = Record<string, any>;
@@ -27,7 +21,9 @@ export class PlatformGovernanceRegistryService {
     private readonly packRepository: Repository<AssetPack>,
   ) {}
 
-  async getRegistry(params: { query?: string; riskLevel?: string; owner?: string; assetType?: string } = {}) {
+  async getRegistry(
+    params: { query?: string; riskLevel?: string; owner?: string; assetType?: string } = {},
+  ) {
     const [assets, packs] = await Promise.all([
       this.assetRegistryService.listAssets({ query: params.query, assetType: params.assetType }),
       this.packRepository.find({ order: { name: 'ASC' } }),
@@ -36,7 +32,9 @@ export class PlatformGovernanceRegistryService {
     const rows = assets
       .map((asset) => this.toRegistryRow(asset, packById))
       .filter((row) => !params.riskLevel || row.riskLevel === params.riskLevel)
-      .filter((row) => !params.owner || row.owner.toLowerCase().includes(params.owner.toLowerCase()));
+      .filter(
+        (row) => !params.owner || row.owner.toLowerCase().includes(params.owner.toLowerCase()),
+      );
 
     return {
       generatedAt: new Date().toISOString(),
@@ -58,7 +56,9 @@ export class PlatformGovernanceRegistryService {
   private toRegistryRow(asset: PlatformAssetRegistryProjection, packById: Map<string, AssetPack>) {
     const governance = (asset.governance || {}) as GovernanceJson;
     const primaryPack = (asset.packIds || []).map((packId) => packById.get(packId)).find(Boolean);
-    const riskLevel = this.stringValue(governance.riskLevel || governance.clinicalRiskLevel || asset.riskLevel);
+    const riskLevel = this.stringValue(
+      governance.riskLevel || governance.clinicalRiskLevel || asset.riskLevel,
+    );
     const owner =
       this.stringValue(governance.owner || governance.assetOwner || governance.businessOwner) ||
       this.packOwner(primaryPack) ||
@@ -67,12 +67,16 @@ export class PlatformGovernanceRegistryService {
       this.stringValue(governance.steward || governance.assetSteward || governance.dataSteward) ||
       this.stewardForAsset(asset);
     const approver =
-      this.stringValue(governance.approver || governance.approvalAuthority || governance.clinicalApprover) ||
-      this.approverForRisk(riskLevel);
+      this.stringValue(
+        governance.approver || governance.approvalAuthority || governance.clinicalApprover,
+      ) || this.approverForRisk(riskLevel);
     const evidenceSource =
-      this.stringValue(governance.evidenceSource || governance.validationEvidence || governance.sourceOfTruth) ||
-      this.evidenceSourceForAsset(asset, primaryPack);
-    const version = this.stringValue(governance.version || governance.catalogVersion || asset.catalogVersion) || '1.0.0';
+      this.stringValue(
+        governance.evidenceSource || governance.validationEvidence || governance.sourceOfTruth,
+      ) || this.evidenceSourceForAsset(asset, primaryPack);
+    const version =
+      this.stringValue(governance.version || governance.catalogVersion || asset.catalogVersion) ||
+      '1.0.0';
     const auditRequirement =
       this.stringValue(governance.auditRequirement) ||
       (governance.auditRequired === false ? 'standard' : this.auditRequirementForRisk(riskLevel));
@@ -119,7 +123,9 @@ export class PlatformGovernanceRegistryService {
     };
   }
 
-  private buildSummary(rows: Array<ReturnType<PlatformGovernanceRegistryService['toRegistryRow']>>) {
+  private buildSummary(
+    rows: Array<ReturnType<PlatformGovernanceRegistryService['toRegistryRow']>>,
+  ) {
     const byRiskLevel = rows.reduce<Record<string, number>>((acc, row) => {
       acc[row.riskLevel] = (acc[row.riskLevel] || 0) + 1;
       return acc;
@@ -170,7 +176,8 @@ export class PlatformGovernanceRegistryService {
   private approverForRisk(riskLevel: string) {
     if (riskLevel === AssetRegistryRiskLevel.HIGH_RISK) return 'Clinical Safety Board';
     if (riskLevel === AssetRegistryRiskLevel.GOVERNANCE_REQUIRED) return 'Governance Review Board';
-    if (riskLevel === AssetRegistryRiskLevel.CLINICAL_DECISION_SUPPORT) return 'Clinical Governance Lead';
+    if (riskLevel === AssetRegistryRiskLevel.CLINICAL_DECISION_SUPPORT)
+      return 'Clinical Governance Lead';
     if (riskLevel === AssetRegistryRiskLevel.OPERATIONAL) return 'Operations Governance Lead';
     return 'Asset Steward';
   }

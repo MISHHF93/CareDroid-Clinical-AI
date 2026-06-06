@@ -32,11 +32,7 @@ export class AutomationAuditController {
 
   @Post()
   async createEvent(@Body() body: CreateAutomationAuditEventDto, @Req() req: any) {
-    const event = await this.automationAuditService.createEvent(
-      body,
-      req.tenantContext,
-      req.user,
-    );
+    const event = await this.automationAuditService.createEvent(body, req.tenantContext, req.user);
 
     return {
       success: true,

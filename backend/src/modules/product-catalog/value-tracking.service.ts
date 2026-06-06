@@ -157,7 +157,8 @@ export class ValueTrackingService {
         id: 'outcomes',
         label: 'Outcomes',
         value: outcomeSignalCount,
-        description: 'Outcome, improvement, completion, and adherence signals observed this period.',
+        description:
+          'Outcome, improvement, completion, and adherence signals observed this period.',
       }),
     ];
 
@@ -174,7 +175,9 @@ export class ValueTrackingService {
         enabledPackCount: entitlements.length,
         activeUsers,
         totalEngagementEvents,
-        eventsPerActiveUser: activeUsers ? Number((totalEngagementEvents / activeUsers).toFixed(1)) : 0,
+        eventsPerActiveUser: activeUsers
+          ? Number((totalEngagementEvents / activeUsers).toFixed(1))
+          : 0,
         outcomeSignalCount,
       },
       sources: {

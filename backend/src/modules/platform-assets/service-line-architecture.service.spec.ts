@@ -99,17 +99,25 @@ describe('ServiceLineArchitectureService', () => {
       'Research',
     ]);
     expect(validateServiceLineDepartments()).toEqual([]);
-    SERVICE_LINE_TAXONOMY.flatMap((serviceLine) => serviceLine.departmentIds).forEach((departmentId) => {
-      expect(DEPARTMENT_IDS).toContain(departmentId);
-    });
+    SERVICE_LINE_TAXONOMY.flatMap((serviceLine) => serviceLine.departmentIds).forEach(
+      (departmentId) => {
+        expect(DEPARTMENT_IDS).toContain(departmentId);
+      },
+    );
   });
 
   it('rolls departments into service-line packs and assets', async () => {
     const graph = await service.getServiceLineGraph({ organizationId: 'org-1' });
-    const emergency = graph.serviceLines.find((serviceLine) => serviceLine.id === 'emergency-medicine');
-    const criticalCare = graph.serviceLines.find((serviceLine) => serviceLine.id === 'critical-care');
+    const emergency = graph.serviceLines.find(
+      (serviceLine) => serviceLine.id === 'emergency-medicine',
+    );
+    const criticalCare = graph.serviceLines.find(
+      (serviceLine) => serviceLine.id === 'critical-care',
+    );
 
-    expect(departmentAssetMappingService.getDepartmentGraph).toHaveBeenCalledWith({ organizationId: 'org-1' });
+    expect(departmentAssetMappingService.getDepartmentGraph).toHaveBeenCalledWith({
+      organizationId: 'org-1',
+    });
     expect(emergency).toMatchObject({
       name: 'Emergency Medicine',
       departmentCount: 1,
@@ -134,8 +142,6 @@ describe('ServiceLineArchitectureService', () => {
       'respiratory-therapy',
       'pharmacy',
     ]);
-    expect(criticalCare?.assets).toEqual([
-      expect.objectContaining({ id: 'sofa-score' }),
-    ]);
+    expect(criticalCare?.assets).toEqual([expect.objectContaining({ id: 'sofa-score' })]);
   });
 });

@@ -12,7 +12,11 @@ import {
 import { SEED_PLATFORM_ASSETS } from './data/platform-asset-seed.data';
 import { DEPARTMENT_IDS } from './department-taxonomy';
 import { PlatformAsset } from './entities/platform-asset.entity';
-import { PlatformAssetLifecycle, PlatformAssetType, PricingTier } from './enums/platform-asset.enums';
+import {
+  PlatformAssetLifecycle,
+  PlatformAssetType,
+  PricingTier,
+} from './enums/platform-asset.enums';
 
 describe('AssetRegistryService', () => {
   let service: AssetRegistryService;
@@ -140,14 +144,26 @@ describe('AssetRegistryService', () => {
       expect.arrayContaining([
         expect.objectContaining({ id: 'fhir-connector', assetType: PlatformAssetType.INTEGRATION }),
         expect.objectContaining({ id: 'protocol-sepsis', assetType: PlatformAssetType.PROTOCOL }),
-        expect.objectContaining({ id: 'sepsis-deterioration', assetType: PlatformAssetType.SIMULATION }),
-        expect.objectContaining({ id: 'news2-clinician-notification', assetType: PlatformAssetType.WORKFLOW }),
+        expect.objectContaining({
+          id: 'sepsis-deterioration',
+          assetType: PlatformAssetType.SIMULATION,
+        }),
+        expect.objectContaining({
+          id: 'news2-clinician-notification',
+          assetType: PlatformAssetType.WORKFLOW,
+        }),
         expect.objectContaining({ id: 'agent-clinical', assetType: PlatformAssetType.AI_AGENT }),
         expect.objectContaining({ id: 'fleet-map', assetType: PlatformAssetType.MAP }),
         expect.objectContaining({ id: 'devices', assetType: PlatformAssetType.IOT }),
-        expect.objectContaining({ id: 'model-usage-dashboard', assetType: PlatformAssetType.DASHBOARD }),
+        expect.objectContaining({
+          id: 'model-usage-dashboard',
+          assetType: PlatformAssetType.DASHBOARD,
+        }),
         expect.objectContaining({ id: 'privacy-center', assetType: PlatformAssetType.REPORT }),
-        expect.objectContaining({ id: 'discharge-summary-template', assetType: PlatformAssetType.TEMPLATE }),
+        expect.objectContaining({
+          id: 'discharge-summary-template',
+          assetType: PlatformAssetType.TEMPLATE,
+        }),
       ]),
     );
 

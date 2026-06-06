@@ -113,11 +113,7 @@ export class AIController {
 
   private async assertAiFeatureAllowed(req: any, context: any) {
     const assetId =
-      context?.assetId ||
-      context?.agentId ||
-      context?.toolId ||
-      context?.tool ||
-      'agent-clinical';
+      context?.assetId || context?.agentId || context?.toolId || context?.tool || 'agent-clinical';
     await this.entitlementService.assertLaunchAllowed({
       assetId,
       organizationId: req.tenantContext?.organizationId,

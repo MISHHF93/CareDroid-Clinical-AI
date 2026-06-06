@@ -245,9 +245,9 @@ describe('ProductCatalogController tenant scope', () => {
       new ForbiddenException('Organization admin access required'),
     );
 
-    await expect(controller.reconcileCommercialPlan(req, 'org-2', 'enterprise')).rejects.toBeInstanceOf(
-      ForbiddenException,
-    );
+    await expect(
+      controller.reconcileCommercialPlan(req, 'org-2', 'enterprise'),
+    ).rejects.toBeInstanceOf(ForbiddenException);
     expect(productCatalogService.reconcileOrganizationCommercialPlan).not.toHaveBeenCalled();
   });
 });

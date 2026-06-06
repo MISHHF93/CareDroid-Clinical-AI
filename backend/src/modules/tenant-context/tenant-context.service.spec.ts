@@ -42,7 +42,10 @@ describe('TenantContextService', () => {
           useValue: organizationMembershipRepository,
         },
         { provide: getRepositoryToken(Workspace), useValue: workspaceRepository },
-        { provide: getRepositoryToken(WorkspaceMembership), useValue: workspaceMembershipRepository },
+        {
+          provide: getRepositoryToken(WorkspaceMembership),
+          useValue: workspaceMembershipRepository,
+        },
         { provide: getRepositoryToken(UserWorkspaceState), useValue: workspaceStateRepository },
         { provide: getRepositoryToken(Subscription), useValue: subscriptionRepository },
       ],
@@ -128,8 +131,6 @@ describe('TenantContextService', () => {
       },
     });
 
-    await expect(service.resolveForRequest(user, {})).rejects.toBeInstanceOf(
-      ForbiddenException,
-    );
+    await expect(service.resolveForRequest(user, {})).rejects.toBeInstanceOf(ForbiddenException);
   });
 });

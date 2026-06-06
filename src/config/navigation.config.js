@@ -145,6 +145,15 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
     showInSidebar: false,
   },
   {
+    id: 'customer-portal',
+    label: 'Customer Portal',
+    mobileLabel: 'Portal',
+    path: CANONICAL_ROUTES.customerPortal,
+    matchPaths: [CANONICAL_ROUTES.customerPortal],
+    showInMobile: false,
+    showInSidebar: false,
+  },
+  {
     id: 'tenant-admin',
     label: 'Tenant Admin',
     mobileLabel: 'Tenant',
@@ -233,10 +242,10 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
   },
   {
     id: 'customer-success',
-    label: 'Customer Success',
+    label: 'Success Center',
     mobileLabel: 'Success',
-    path: CANONICAL_ROUTES.customerSuccess,
-    matchPaths: [CANONICAL_ROUTES.customerSuccess],
+    path: CANONICAL_ROUTES.successCenter,
+    matchPaths: [CANONICAL_ROUTES.customerSuccess, CANONICAL_ROUTES.successCenter],
     showInMobile: false,
   },
   {

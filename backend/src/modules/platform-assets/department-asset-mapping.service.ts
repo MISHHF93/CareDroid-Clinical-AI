@@ -45,8 +45,12 @@ export class DepartmentAssetMappingService {
       this.assetRepository.find({ order: { title: 'ASC' } }),
       this.packRepository.find({ order: { name: 'ASC' } }),
       this.roleProfileRepository.find({ order: { label: 'ASC' } }),
-      params.organizationId ? this.resolveDepartmentUsers(params.organizationId) : Promise.resolve([]),
-      params.organizationId ? this.resolveEnabledPackIds(params.organizationId) : Promise.resolve([]),
+      params.organizationId
+        ? this.resolveDepartmentUsers(params.organizationId)
+        : Promise.resolve([]),
+      params.organizationId
+        ? this.resolveEnabledPackIds(params.organizationId)
+        : Promise.resolve([]),
     ]);
     const assetsByDepartment = this.groupAssetsByDepartment(assets);
 
@@ -71,10 +75,16 @@ export class DepartmentAssetMappingService {
         name: department.name,
         assetCount: departmentAssets.length,
         packCount: departmentPacks.length,
-        userCount: users.filter((user) => this.userMatchesDepartment(user, department.id, roleProfiles)).length,
+        userCount: users.filter((user) =>
+          this.userMatchesDepartment(user, department.id, roleProfiles),
+        ).length,
         packs: departmentPacks,
-        assets: departmentAssets.map((asset) => this.serializeDepartmentAsset(asset, enabledPackIds)),
-        users: users.filter((user) => this.userMatchesDepartment(user, department.id, roleProfiles)),
+        assets: departmentAssets.map((asset) =>
+          this.serializeDepartmentAsset(asset, enabledPackIds),
+        ),
+        users: users.filter((user) =>
+          this.userMatchesDepartment(user, department.id, roleProfiles),
+        ),
       };
     });
 
@@ -87,16 +97,18 @@ export class DepartmentAssetMappingService {
 
   async getDepartmentById(departmentId: string, params: { organizationId?: string | null } = {}) {
     const graph = await this.getDepartmentGraph(params);
-    return graph.departments.find((department) => department.id === departmentId) || {
-      id: departmentId,
-      name: departmentName(departmentId),
-      assetCount: 0,
-      packCount: 0,
-      userCount: 0,
-      packs: [],
-      assets: [],
-      users: [],
-    };
+    return (
+      graph.departments.find((department) => department.id === departmentId) || {
+        id: departmentId,
+        name: departmentName(departmentId),
+        assetCount: 0,
+        packCount: 0,
+        userCount: 0,
+        packs: [],
+        assets: [],
+        users: [],
+      }
+    );
   }
 
   private groupAssetsByDepartment(assets: PlatformAsset[]) {
@@ -136,7 +148,9 @@ export class DepartmentAssetMappingService {
     const inferred = inferDepartmentsForAsset(asset);
     return [
       asset.primaryDepartment || inferred.primaryDepartment,
-      ...((asset.secondaryDepartments?.length ? asset.secondaryDepartments : inferred.secondaryDepartments) || []),
+      ...((asset.secondaryDepartments?.length
+        ? asset.secondaryDepartments
+        : inferred.secondaryDepartments) || []),
     ].filter(Boolean) as DepartmentId[];
   }
 
@@ -186,6 +200,8 @@ export class DepartmentAssetMappingService {
       .join(' ')
       .toLowerCase();
     const department = departmentName(departmentId).toLowerCase();
-    return text.includes(department.toLowerCase()) || text.includes(departmentId.replace(/-/g, ' '));
+    return (
+      text.includes(department.toLowerCase()) || text.includes(departmentId.replace(/-/g, ' '))
+    );
   }
 }

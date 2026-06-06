@@ -42,7 +42,10 @@ export class AutomationAuditService {
 
     const tenantId = requireContextValue(tenantContext.organizationId, dto.tenant.id);
     const workspaceId = requireContextValue(tenantContext.workspaceId, dto.workspace.id);
-    const userId = requireContextValue(actorContext.id || actorContext.userId || actorContext.sub, dto.user.id);
+    const userId = requireContextValue(
+      actorContext.id || actorContext.userId || actorContext.sub,
+      dto.user.id,
+    );
 
     const event = this.automationAuditRepository.create({
       triggerFired: dto.triggerFired,
@@ -69,7 +72,9 @@ export class AutomationAuditService {
     return this.automationAuditRepository.save(event);
   }
 
-  async listEvents(filters: { tenantId?: string; status?: AutomationAuditStatus; limit?: number } = {}) {
+  async listEvents(
+    filters: { tenantId?: string; status?: AutomationAuditStatus; limit?: number } = {},
+  ) {
     const tenantId = filters.tenantId;
     const limit = Math.min(Math.max(filters.limit || 100, 1), 500);
 

@@ -59,7 +59,8 @@ export class TenantDataIsolationAuditService {
         name: 'Organizations',
         status: 'bootstrap_scoped',
         tenantBoundary: 'organizationId',
-        accessPattern: 'Current-user membership list for bootstrap, OrganizationScoped for organization records.',
+        accessPattern:
+          'Current-user membership list for bootstrap, OrganizationScoped for organization records.',
         controls: [
           'Organization routes that read or mutate a specific organization require OrganizationScoped.',
           'Controller-level assertions reject requested organization IDs that differ from tenant context.',
@@ -78,7 +79,8 @@ export class TenantDataIsolationAuditService {
         name: 'Users',
         status: 'enforced',
         tenantBoundary: 'authenticated userId plus resolved organization membership',
-        accessPattern: 'Self-service profile routes use the authenticated user ID, not caller-supplied IDs.',
+        accessPattern:
+          'Self-service profile routes use the authenticated user ID, not caller-supplied IDs.',
         controls: [
           'Profile reads and updates resolve req.user.id server-side.',
           'Tenant context rejects spoofed user, role, plan, organization, or workspace headers.',
@@ -96,7 +98,8 @@ export class TenantDataIsolationAuditService {
         name: 'Workspaces',
         status: 'bootstrap_scoped',
         tenantBoundary: 'workspaceId inside organizationId',
-        accessPattern: 'Current-user workspace discovery, WorkspaceScoped for workspace-specific records.',
+        accessPattern:
+          'Current-user workspace discovery, WorkspaceScoped for workspace-specific records.',
         controls: [
           'Workspace-specific routes require WorkspaceScoped.',
           'Workspace membership must be active before a workspace can become tenant context.',
@@ -116,7 +119,8 @@ export class TenantDataIsolationAuditService {
         name: 'Assets',
         status: 'enforced',
         tenantBoundary: 'organization entitlement and workspace tenant context',
-        accessPattern: 'Tenant-scoped platform catalog with organization-scoped entitlement and analytics surfaces.',
+        accessPattern:
+          'Tenant-scoped platform catalog with organization-scoped entitlement and analytics surfaces.',
         controls: [
           'Platform asset controller is TenantScoped by default.',
           'Organization asset mapping, customer success, and value-tracking routes require OrganizationScoped.',
@@ -154,7 +158,8 @@ export class TenantDataIsolationAuditService {
         name: 'Audit Logs',
         status: 'enforced',
         tenantBoundary: 'organizationId plus current user for self audit views',
-        accessPattern: 'Audit log reads and statistics are filtered by resolved tenant organization.',
+        accessPattern:
+          'Audit log reads and statistics are filtered by resolved tenant organization.',
         controls: [
           'Audit log endpoints require authentication and audit permissions for administrative views.',
           'User audit views are constrained to req.user.id.',
@@ -167,7 +172,8 @@ export class TenantDataIsolationAuditService {
           'AuditService.findByDateRange',
           'AuditService.findPhiAccess',
         ],
-        residualRisk: 'Integrity verification remains global because hash-chain validation spans all audit logs.',
+        residualRisk:
+          'Integrity verification remains global because hash-chain validation spans all audit logs.',
       },
     ];
   }

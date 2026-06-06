@@ -43,10 +43,20 @@ export interface SubscriptionPlanDefinition {
 export const BILLABLE_USAGE_METERS: UsageLimitDefinition[] = [
   { eventType: UsageEventType.AI_CALL, label: 'AI calls', unit: 'call', limit: 0 },
   { eventType: UsageEventType.TOOL_LAUNCH, label: 'Tool launches', unit: 'launch', limit: 0 },
-  { eventType: UsageEventType.CALCULATOR_LAUNCH, label: 'Calculator launches', unit: 'launch', limit: 0 },
+  {
+    eventType: UsageEventType.CALCULATOR_LAUNCH,
+    label: 'Calculator launches',
+    unit: 'launch',
+    limit: 0,
+  },
   { eventType: UsageEventType.SIMULATION, label: 'Simulations', unit: 'run', limit: 0 },
   { eventType: UsageEventType.MAP_USAGE, label: 'Map usage', unit: 'view', limit: 0 },
-  { eventType: UsageEventType.IOT_TELEMETRY, label: 'IoT telemetry usage', unit: 'event', limit: 0 },
+  {
+    eventType: UsageEventType.IOT_TELEMETRY,
+    label: 'IoT telemetry usage',
+    unit: 'event',
+    limit: 0,
+  },
   { eventType: UsageEventType.STORAGE, label: 'Storage', unit: 'gb', limit: 0 },
   { eventType: UsageEventType.API_CALL, label: 'API calls', unit: 'request', limit: 0 },
   { eventType: UsageEventType.ACTIVE_USER, label: 'Active users', unit: 'user', limit: 0 },
@@ -59,6 +69,24 @@ const limits = (values: Partial<Record<UsageEventType, number | null>>): UsageLi
   }));
 
 export const SUBSCRIPTION_PLAN_DEFINITIONS: SubscriptionPlanDefinition[] = [
+  {
+    id: SubscriptionTier.TRIAL,
+    name: 'Trial',
+    description: 'Time-limited evaluation access for a new CareDroid tenant.',
+    priceMonthly: 0,
+    features: ['Trial workspace', 'Core clinical tools', 'Trial usage limits'],
+    limits: limits({
+      [UsageEventType.AI_CALL]: 250,
+      [UsageEventType.TOOL_LAUNCH]: 500,
+      [UsageEventType.CALCULATOR_LAUNCH]: 500,
+      [UsageEventType.SIMULATION]: 10,
+      [UsageEventType.MAP_USAGE]: 100,
+      [UsageEventType.IOT_TELEMETRY]: 1000,
+      [UsageEventType.STORAGE]: 5,
+      [UsageEventType.API_CALL]: 1000,
+      [UsageEventType.ACTIVE_USER]: 10,
+    }),
+  },
   {
     id: SubscriptionTier.STARTER,
     name: 'Starter',
@@ -151,7 +179,10 @@ export const SUBSCRIPTION_PLAN_DEFINITIONS: SubscriptionPlanDefinition[] = [
   },
 ];
 
-export function normalizeSubscriptionTier(tier?: SubscriptionTier | string | null): SubscriptionTier {
+export function normalizeSubscriptionTier(
+  tier?: SubscriptionTier | string | null,
+): SubscriptionTier {
+  if (tier === SubscriptionTier.TRIAL) return SubscriptionTier.TRIAL;
   if (tier === SubscriptionTier.FREE) return SubscriptionTier.STARTER;
   if (tier === SubscriptionTier.INSTITUTIONAL) return SubscriptionTier.ENTERPRISE;
   if (

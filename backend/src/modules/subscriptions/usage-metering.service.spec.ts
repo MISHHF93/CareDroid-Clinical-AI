@@ -11,6 +11,7 @@ describe('UsageMeteringService', () => {
     create: jest.fn((entity) => entity),
     save: jest.fn((entity) => Promise.resolve({ id: 'usage-1', ...entity })),
     find: jest.fn(),
+    findOne: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -26,6 +27,7 @@ describe('UsageMeteringService', () => {
 
     service = module.get(UsageMeteringService);
     jest.clearAllMocks();
+    usageEventRepository.findOne.mockResolvedValue(null);
   });
 
   it('records usage with tenant dimensions and monthly period boundaries', async () => {
@@ -53,6 +55,25 @@ describe('UsageMeteringService', () => {
         metadata: expect.objectContaining({ subscriptionPlan: SubscriptionTier.PROFESSIONAL }),
       }),
     );
+  });
+
+  it('deduplicates usage events when an idempotency key is provided', async () => {
+    usageEventRepository.findOne.mockResolvedValue({
+      id: 'usage-existing',
+      organizationId: 'org-1',
+      idempotencyKey: 'sim-run-1',
+    });
+
+    const result = await service.recordUsage({
+      organizationId: 'org-1',
+      eventType: UsageEventType.SIMULATION,
+      idempotencyKey: 'sim-run-1',
+      source: 'simulation-suite',
+      metadata: { scenarioId: 'sepsis-1' },
+    });
+
+    expect(result).toEqual(expect.objectContaining({ id: 'usage-existing' }));
+    expect(usageEventRepository.save).not.toHaveBeenCalled();
   });
 
   it('aggregates usage by event type, workspace, asset, role, and active users', async () => {
@@ -204,22 +225,38 @@ describe('UsageMeteringService', () => {
     });
     expect(framework.meters).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: 'active-users', value: 10, billingSeparated: true }),
+        expect.objectContaining({ id: 'user-seats', value: 10, billingSeparated: true }),
         expect.objectContaining({ id: 'ai-requests', value: 4 }),
         expect.objectContaining({ id: 'simulation-runs', value: 2 }),
         expect.objectContaining({ id: 'workflow-executions', value: 3 }),
+        expect.objectContaining({ id: 'api-usage', value: 3 }),
+        expect.objectContaining({ id: 'storage-usage', value: 0 }),
         expect.objectContaining({ id: 'integrations', value: 5 }),
       ]),
     );
     expect(framework.billingReadiness.futureBillingCandidates).toEqual(
       expect.arrayContaining([
-        'active-users',
+        'user-seats',
         'ai-requests',
         'simulation-runs',
         'workflow-executions',
+        'storage-usage',
         'integrations',
       ]),
     );
+    expect(framework.billingAttachmentContract).toMatchObject({
+      paymentProcessing: false,
+      pricingKeyField: 'meterId',
+      idempotencyField: 'idempotencyKey',
+      requiredMeters: expect.arrayContaining([
+        'user-seats',
+        'ai-requests',
+        'simulation-runs',
+        'workflow-executions',
+        'api-usage',
+        'storage-usage',
+      ]),
+    });
     expect(framework.breakdowns.byIntegration).toEqual([
       expect.objectContaining({ key: 'fhir', quantity: 5 }),
     ]);

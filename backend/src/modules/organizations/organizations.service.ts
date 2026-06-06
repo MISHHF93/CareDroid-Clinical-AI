@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
@@ -33,6 +34,7 @@ import {
   OrganizationMembership,
   OrganizationMembershipRole,
 } from './entities/organization-membership.entity';
+import { TenantProvisioningService } from './tenant-provisioning.service';
 
 @Injectable()
 export class OrganizationsService {
@@ -50,6 +52,7 @@ export class OrganizationsService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     private readonly platformAssetsService: PlatformAssetsService,
+    @Optional() private readonly tenantProvisioningService?: TenantProvisioningService,
   ) {}
 
   async getCurrentForUser(user: User) {
@@ -113,11 +116,14 @@ export class OrganizationsService {
   async getPublicWhiteLabel(tenantId: string) {
     const normalizedTenantId = String(tenantId || '').trim();
     if (!normalizedTenantId) throw new NotFoundException('Tenant not found');
-    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-      normalizedTenantId,
-    );
+    const isUuid =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+        normalizedTenantId,
+      );
     const org = await this.organizationRepository.findOne({
-      where: isUuid ? [{ id: normalizedTenantId }, { slug: normalizedTenantId }] : { slug: normalizedTenantId },
+      where: isUuid
+        ? [{ id: normalizedTenantId }, { slug: normalizedTenantId }]
+        : { slug: normalizedTenantId },
     });
     if (!org) throw new NotFoundException('Tenant not found');
     const settings = this.normalizeSettings(org.settings, org.organizationType);
@@ -156,8 +162,14 @@ export class OrganizationsService {
       }),
     );
 
-    await this.assignDefaultPacks(org.id, org.organizationType);
     await this.linkUserToOrganization(user.id, org.id);
+    if (this.tenantProvisioningService) {
+      await this.tenantProvisioningService.provisionOrganization(user, org, {
+        branding: dto.branding,
+      });
+    } else {
+      await this.assignDefaultPacks(org.id, org.organizationType);
+    }
 
     return this.getForUser(user, org.id);
   }
@@ -260,17 +272,25 @@ export class OrganizationsService {
     return this.getForUser(user, org.id);
   }
 
-  async updateOrganizationSettings(user: User, organizationId: string, updates: Record<string, unknown>) {
+  async updateOrganizationSettings(
+    user: User,
+    organizationId: string,
+    updates: Record<string, unknown>,
+  ) {
     await this.assertAdmin(user.id, organizationId);
     const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
     if (!org) throw new NotFoundException('Organization not found');
 
     if (updates.name && typeof updates.name === 'string') org.name = updates.name;
-    if (updates.organizationType && Object.values(OrganizationType).includes(updates.organizationType as any)) {
+    if (
+      updates.organizationType &&
+      Object.values(OrganizationType).includes(updates.organizationType as any)
+    ) {
       org.organizationType = updates.organizationType as OrganizationType;
       await this.assignDefaultPacks(org.id, org.organizationType);
     }
-    if (updates.country !== undefined && typeof updates.country === 'string') org.country = updates.country;
+    if (updates.country !== undefined && typeof updates.country === 'string')
+      org.country = updates.country;
 
     org.branding = this.normalizeBranding(
       {
@@ -360,7 +380,8 @@ export class OrganizationsService {
       subscriptions: {
         current: engine.subscription,
         settings: settings.subscription || {},
-        commercialPlanId: settings.commercialPlanId || engine.subscription?.commercialPlanId || null,
+        commercialPlanId:
+          settings.commercialPlanId || engine.subscription?.commercialPlanId || null,
       },
       noCodeConfiguration: {
         enabledProductIds: settings.enabledProductIds || [],
@@ -403,10 +424,17 @@ export class OrganizationsService {
       settingsPatch.permissionsOverrides = updates.permissionsOverrides;
     }
     if (this.isRecord(updates.navigation)) settingsPatch.navigation = updates.navigation;
-    if (this.isRecord(updates.dashboardLayout)) settingsPatch.dashboardLayout = updates.dashboardLayout;
+    if (this.isRecord(updates.dashboardLayout))
+      settingsPatch.dashboardLayout = updates.dashboardLayout;
 
     const organizationUpdates: Record<string, unknown> = {};
-    for (const key of ['name', 'organizationType', 'country', 'subscription', 'integrations'] as const) {
+    for (const key of [
+      'name',
+      'organizationType',
+      'country',
+      'subscription',
+      'integrations',
+    ] as const) {
       if (updates[key] !== undefined) organizationUpdates[key] = updates[key];
     }
     if (this.isRecord(updates.branding)) organizationUpdates.branding = updates.branding;
@@ -480,7 +508,10 @@ export class OrganizationsService {
     };
   }
 
-  private async buildOrganizationEngine(user: User, org: Organization): Promise<OrganizationEngineModel> {
+  private async buildOrganizationEngine(
+    user: User,
+    org: Organization,
+  ): Promise<OrganizationEngineModel> {
     const settings = this.normalizeSettings(org.settings, org.organizationType);
     const branding = this.normalizeBranding(org.branding || settings.branding, org.name);
     const subscription = await this.resolveSubscriptionModel(user, settings);
@@ -501,8 +532,12 @@ export class OrganizationsService {
         slug: org.slug,
         country: org.country,
         isDemoTenant: Boolean(settings.isDemoTenant),
-        complianceMode: String(settings.complianceMode || this.defaultComplianceMode(org.organizationType)),
-        workspaceDefaults: Array.isArray(settings.workspaceDefaults) ? settings.workspaceDefaults : [],
+        complianceMode: String(
+          settings.complianceMode || this.defaultComplianceMode(org.organizationType),
+        ),
+        workspaceDefaults: Array.isArray(settings.workspaceDefaults)
+          ? settings.workspaceDefaults
+          : [],
       },
       branding,
       subscription,
@@ -534,14 +569,21 @@ export class OrganizationsService {
     return typeof value === 'string' && value.trim().length ? value.trim() : null;
   }
 
-  private normalizeSettings(input: unknown, organizationType: OrganizationType): Record<string, any> {
+  private normalizeSettings(
+    input: unknown,
+    organizationType: OrganizationType,
+  ): Record<string, any> {
     const settings = (input && typeof input === 'object' ? input : {}) as Record<string, any>;
     return {
       complianceMode: settings.complianceMode || this.defaultComplianceMode(organizationType),
       departments: Array.isArray(settings.departments) ? settings.departments : [],
       specialties: Array.isArray(settings.specialties) ? settings.specialties : [],
-      workspaceDefaults: Array.isArray(settings.workspaceDefaults) ? settings.workspaceDefaults : [],
-      enabledProductIds: Array.isArray(settings.enabledProductIds) ? settings.enabledProductIds : [],
+      workspaceDefaults: Array.isArray(settings.workspaceDefaults)
+        ? settings.workspaceDefaults
+        : [],
+      enabledProductIds: Array.isArray(settings.enabledProductIds)
+        ? settings.enabledProductIds
+        : [],
       enabledPackIds: Array.isArray(settings.enabledPackIds) ? settings.enabledPackIds : [],
       assignedProductPackIds: Array.isArray(settings.assignedProductPackIds)
         ? settings.assignedProductPackIds
@@ -557,7 +599,8 @@ export class OrganizationsService {
       navigation: settings.navigation || {},
       dashboardLayout: settings.dashboardLayout || {},
       permissionsOverrides: settings.permissionsOverrides || {},
-      commercialPlanId: settings.commercialPlanId || settings.subscription?.commercialPlanId || null,
+      commercialPlanId:
+        settings.commercialPlanId || settings.subscription?.commercialPlanId || null,
       tenantProfile: settings.tenantProfile || null,
       ...settings,
     };
@@ -571,7 +614,8 @@ export class OrganizationsService {
         tier: subscription.tier,
         status: subscription.status,
         source: 'user-subscription' as const,
-        commercialPlanId: settings.commercialPlanId || settingsSubscription.commercialPlanId || null,
+        commercialPlanId:
+          settings.commercialPlanId || settingsSubscription.commercialPlanId || null,
         currentPeriodEnd: subscription.currentPeriodEnd,
       };
     }
@@ -580,7 +624,8 @@ export class OrganizationsService {
         tier: settingsSubscription.tier || settings.commercialPlanId || SubscriptionTier.FREE,
         status: settingsSubscription.status || SubscriptionStatus.ACTIVE,
         source: 'organization-settings' as const,
-        commercialPlanId: settings.commercialPlanId || settingsSubscription.commercialPlanId || null,
+        commercialPlanId:
+          settings.commercialPlanId || settingsSubscription.commercialPlanId || null,
         currentPeriodEnd: settingsSubscription.currentPeriodEnd || null,
       };
     }
@@ -593,7 +638,9 @@ export class OrganizationsService {
     };
   }
 
-  private async resolveIntegrationModels(settings: Record<string, any>): Promise<IntegrationModel[]> {
+  private async resolveIntegrationModels(
+    settings: Record<string, any>,
+  ): Promise<IntegrationModel[]> {
     const offerings = await this.integrationRepository.find({ order: { sortOrder: 'ASC' } });
     const requested = new Set<string>(settings.integrationsRequested || []);
     const enabled = new Set<string>(settings.integrations || []);
@@ -620,7 +667,11 @@ export class OrganizationsService {
 
   private defaultComplianceMode(type: OrganizationType) {
     if (type === OrganizationType.EMS) return 'ems';
-    if (type === OrganizationType.UNIVERSITY || type === OrganizationType.RESEARCH_INSTITUTE || type === OrganizationType.RESEARCH_CENTER) {
+    if (
+      type === OrganizationType.UNIVERSITY ||
+      type === OrganizationType.RESEARCH_INSTITUTE ||
+      type === OrganizationType.RESEARCH_CENTER
+    ) {
       return 'research';
     }
     return 'hipaa';
@@ -641,7 +692,9 @@ export class OrganizationsService {
     const productPackIds = new Set<string>();
     if (enabledProductIds.length) {
       const products = await this.productRepository.find({ where: { id: In(enabledProductIds) } });
-      products.forEach((product) => product.packIds?.forEach((packId) => productPackIds.add(packId)));
+      products.forEach((product) =>
+        product.packIds?.forEach((packId) => productPackIds.add(packId)),
+      );
     }
 
     const resolvedPackIds = new Set<string>(['core-platform']);

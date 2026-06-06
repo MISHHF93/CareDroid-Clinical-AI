@@ -40,8 +40,6 @@ describe('environment config', () => {
 
   it('validates supported environments and rejects unknown app environments', () => {
     expect(envValidationSchema.validate({ CARE_ENV: 'production' }).error).toBeUndefined();
-    expect(envValidationSchema.validate({ APP_ENV: 'qa' }).error?.message).toContain(
-      'APP_ENV',
-    );
+    expect(envValidationSchema.validate({ APP_ENV: 'qa' }).error?.message).toContain('APP_ENV');
   });
 });

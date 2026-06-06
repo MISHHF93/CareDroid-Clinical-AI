@@ -48,13 +48,18 @@ describe('SubscriptionsController', () => {
     subscriptionsService.getBillingOverview.mockResolvedValue({ organizationId: 'org-1' });
 
     await expect(controller.getBillingOverview(req)).resolves.toEqual({ organizationId: 'org-1' });
-    expect(subscriptionsService.getBillingOverview).toHaveBeenCalledWith('user-1', req.tenantContext);
+    expect(subscriptionsService.getBillingOverview).toHaveBeenCalledWith(
+      'user-1',
+      req.tenantContext,
+    );
   });
 
   it('returns tenant usage summary for requested period', async () => {
     subscriptionsService.getUsageSummary.mockResolvedValue({ period: { key: 'week' } });
 
-    await expect(controller.getUsageSummary(req, 'week')).resolves.toEqual({ period: { key: 'week' } });
+    await expect(controller.getUsageSummary(req, 'week')).resolves.toEqual({
+      period: { key: 'week' },
+    });
     expect(subscriptionsService.getUsageSummary).toHaveBeenCalledWith(req.tenantContext, 'week');
   });
 

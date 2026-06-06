@@ -71,7 +71,9 @@ export class ProductCatalogValidationService {
 
     for (const asset of assets) {
       if (!packagedAssetIds.has(asset.id) && !this.isExplicitlyInternalAsset(asset)) {
-        errors.push(`Asset ${asset.id}: not assigned to any pack or marked internal/developer-only`);
+        errors.push(
+          `Asset ${asset.id}: not assigned to any pack or marked internal/developer-only`,
+        );
       }
     }
 

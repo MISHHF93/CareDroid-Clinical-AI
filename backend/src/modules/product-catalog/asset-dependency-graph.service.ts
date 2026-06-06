@@ -78,7 +78,13 @@ export class AssetDependencyGraphService {
       return this.buildGraph(products, packs, assets, integrations);
     }
 
-    const scoped = await this.filterForEntitledAssets(products, packs, assets, organizationId, options);
+    const scoped = await this.filterForEntitledAssets(
+      products,
+      packs,
+      assets,
+      organizationId,
+      options,
+    );
     return this.buildGraph(scoped.products, scoped.packs, scoped.assets, integrations);
   }
 
@@ -97,31 +103,59 @@ export class AssetDependencyGraphService {
     const chains = products.flatMap((product) => {
       const productPackIds = product.packIds || [];
       const productHighlightAssetIds = product.highlightAssetIds || [];
-      this.addMissingProductReferences(product, productPackIds, productHighlightAssetIds, packMap, assetMap, issues);
+      this.addMissingProductReferences(
+        product,
+        productPackIds,
+        productHighlightAssetIds,
+        packMap,
+        assetMap,
+        issues,
+      );
       this.addDuplicateIssues('product', product.id, 'pack', productPackIds, issues);
-      this.addDuplicateIssues('product', product.id, 'highlight asset', productHighlightAssetIds, issues);
+      this.addDuplicateIssues(
+        'product',
+        product.id,
+        'highlight asset',
+        productHighlightAssetIds,
+        issues,
+      );
 
       const packChains = productPackIds.flatMap((packId) => {
         const pack = packMap.get(packId);
         if (!pack) return [];
         this.addMissingPackReferences(pack, assetMap, issues);
         this.addDuplicateIssues('asset pack', pack.id, 'asset', pack.assetIds || [], issues);
-        this.addDuplicateIssues('asset pack', pack.id, 'required dependency', pack.requiredDependencies || [], issues);
+        this.addDuplicateIssues(
+          'asset pack',
+          pack.id,
+          'required dependency',
+          pack.requiredDependencies || [],
+          issues,
+        );
 
         return (pack.assetIds || []).flatMap((assetId) => {
           const asset = assetMap.get(assetId);
           if (!asset) return [];
           linkedAssetIds.add(asset.id);
           this.addMissingAssetReferences(asset, assetMap, issues);
-          this.addDuplicateIssues('asset', asset.id, 'dependency', asset.dependencies || [], issues);
-          return [this.serializeChain(product, pack, asset, integrationsByAsset.get(asset.id) || [])];
+          this.addDuplicateIssues(
+            'asset',
+            asset.id,
+            'dependency',
+            asset.dependencies || [],
+            issues,
+          );
+          return [
+            this.serializeChain(product, pack, asset, integrationsByAsset.get(asset.id) || []),
+          ];
         });
       });
 
       const highlightChains = productHighlightAssetIds.flatMap((assetId) => {
         const asset = assetMap.get(assetId);
         if (!asset) return [];
-        if (productPackIds.some((packId) => packMap.get(packId)?.assetIds?.includes(assetId))) return [];
+        if (productPackIds.some((packId) => packMap.get(packId)?.assetIds?.includes(assetId)))
+          return [];
         linkedAssetIds.add(asset.id);
         this.addMissingAssetReferences(asset, assetMap, issues);
         return [this.serializeChain(product, null, asset, integrationsByAsset.get(asset.id) || [])];
@@ -145,7 +179,9 @@ export class AssetDependencyGraphService {
 
     const backendServices = unique(chains.flatMap((chain) => chain.backendServices));
     const routeCount = new Set(chains.map((chain) => chain.route).filter(Boolean)).size;
-    const linkedIntegrationIds = new Set(chains.flatMap((chain) => chain.integrations.map((integration) => integration.id)));
+    const linkedIntegrationIds = new Set(
+      chains.flatMap((chain) => chain.integrations.map((integration) => integration.id)),
+    );
 
     return {
       chains,
@@ -358,7 +394,9 @@ export class AssetDependencyGraphService {
     organizationId: string,
     options: { userRole?: string; subscriptionPlan?: string },
   ) {
-    const organization = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    const organization = await this.organizationRepository.findOne({
+      where: { id: organizationId },
+    });
     const [entitledAssetIds, entitlements] = await Promise.all([
       this.platformAssetsService.resolveEntitledAssetIds({ organizationId }),
       this.platformAssetsService.getOrganizationEntitlements(organizationId),
@@ -381,20 +419,26 @@ export class AssetDependencyGraphService {
     const visibleAssetIds = new Set(visibleAssets.map((asset) => asset.id));
     const visiblePacks = packs
       .filter((pack) => entitledPackIds.includes(pack.id))
-      .map((pack) => ({
-        ...pack,
-        assetIds: (pack.assetIds || []).filter((assetId) => visibleAssetIds.has(assetId)),
-      }) as AssetPack)
+      .map(
+        (pack) =>
+          ({
+            ...pack,
+            assetIds: (pack.assetIds || []).filter((assetId) => visibleAssetIds.has(assetId)),
+          }) as AssetPack,
+      )
       .filter((pack) => pack.assetIds.length);
     const visiblePackIds = new Set(visiblePacks.map((pack) => pack.id));
     const visibleProducts = products
-      .map((product) => ({
-        ...product,
-        packIds: (product.packIds || []).filter((packId) => visiblePackIds.has(packId)),
-        highlightAssetIds: (product.highlightAssetIds || []).filter((assetId) =>
-          visibleAssetIds.has(assetId),
-        ),
-      }) as Product)
+      .map(
+        (product) =>
+          ({
+            ...product,
+            packIds: (product.packIds || []).filter((packId) => visiblePackIds.has(packId)),
+            highlightAssetIds: (product.highlightAssetIds || []).filter((assetId) =>
+              visibleAssetIds.has(assetId),
+            ),
+          }) as Product,
+      )
       .filter((product) => product.packIds.length || product.highlightAssetIds.length);
 
     return {

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
+import { Workspace } from '../workspaces/entities/workspace.entity';
 import { PlatformAssetsModule } from '../platform-assets/platform-assets.module';
 import { WorkspacesModule } from '../workspaces/workspaces.module';
 import { CommercialPlan } from '../product-catalog/entities/commercial-plan.entity';
@@ -12,12 +13,14 @@ import { OrganizationMembership } from './entities/organization-membership.entit
 import { OrganizationOnboardingService } from './organization-onboarding.service';
 import { OrganizationsController } from './organizations.controller';
 import { OrganizationsService } from './organizations.service';
+import { TenantProvisioningService } from './tenant-provisioning.service';
 import { WhiteLabelController } from './white-label.controller';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       Organization,
+      Workspace,
       OrganizationMembership,
       UserProfile,
       Product,
@@ -29,7 +32,7 @@ import { WhiteLabelController } from './white-label.controller';
     WorkspacesModule,
   ],
   controllers: [OrganizationsController, WhiteLabelController],
-  providers: [OrganizationsService, OrganizationOnboardingService],
+  providers: [OrganizationsService, OrganizationOnboardingService, TenantProvisioningService],
   exports: [OrganizationsService],
 })
 export class OrganizationsModule {}

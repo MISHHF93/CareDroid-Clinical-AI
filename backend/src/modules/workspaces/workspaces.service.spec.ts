@@ -141,9 +141,9 @@ describe('WorkspacesService strict entitlements', () => {
     });
     platformAssetsService.resolveEntitledAssetIds.mockResolvedValue(['qsofa']);
 
-    await expect(service.updateTools(user, 'workspace-1', ['qsofa', 'locked-tool'])).rejects.toThrow(
-      ForbiddenException,
-    );
+    await expect(
+      service.updateTools(user, 'workspace-1', ['qsofa', 'locked-tool']),
+    ).rejects.toThrow(ForbiddenException);
 
     expect(workspaceRepository.save).not.toHaveBeenCalled();
   });
