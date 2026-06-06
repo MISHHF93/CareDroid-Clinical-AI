@@ -99,7 +99,7 @@ export const SECONDARY_NAV_ITEMS = Object.freeze([
     label: 'Automation',
     mobileLabel: 'Automate',
     path: CANONICAL_ROUTES.automation,
-    matchPaths: [CANONICAL_ROUTES.automation, CANONICAL_ROUTES.workflows],
+    matchPaths: [CANONICAL_ROUTES.automation, CANONICAL_ROUTES.automationAudit, CANONICAL_ROUTES.workflows],
     showInMobile: false,
     showInSidebar: false,
   },

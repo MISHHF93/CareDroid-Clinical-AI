@@ -11,6 +11,7 @@ export const CANONICAL_ROUTES = Object.freeze({
   dashboard: '/dashboard',
   discover: '/discover',
   automation: '/automation',
+  automationAudit: '/automation-audit',
   assistant: '/assistant',
   tools: '/tools',
   operations: '/operations',

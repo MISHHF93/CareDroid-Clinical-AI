@@ -1,0 +1,263 @@
+.automation-audit-page {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 32px;
+  display: grid;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.automation-audit-hero,
+.automation-audit-policy,
+.automation-audit-summary,
+.automation-audit-entry {
+  border: 1px solid var(--panel-border);
+  border-radius: 20px;
+  background: var(--panel-background);
+}
+
+.automation-audit-hero {
+  padding: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.automation-audit-eyebrow {
+  margin: 0 0 8px;
+  color: var(--app-accent-interactive);
+  font-size: var(--font-12, 12px);
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.automation-audit-page h1,
+.automation-audit-page h2 {
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.automation-audit-page h1 {
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+}
+
+.automation-audit-page p {
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.automation-audit-hero p {
+  max-width: 760px;
+  margin: 8px 0 0;
+}
+
+.automation-audit-tenant-filter {
+  min-width: min(100%, 280px);
+  display: grid;
+  gap: 8px;
+}
+
+.automation-audit-tenant-filter span,
+.automation-audit-summary span,
+.automation-audit-grid span {
+  color: var(--text-secondary);
+  font-size: var(--font-12, 12px);
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.automation-audit-tenant-filter select {
+  min-height: 44px;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--app-surface-1);
+  color: var(--text-primary);
+  padding: 0 12px;
+}
+
+.automation-audit-policy {
+  padding: 16px;
+  display: grid;
+  gap: 4px;
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--app-surface-1));
+}
+
+.automation-audit-policy strong {
+  color: var(--text-primary);
+}
+
+.automation-audit-policy span {
+  color: var(--text-secondary);
+}
+
+.automation-audit-summary {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.automation-audit-summary > div {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  background: var(--app-surface-2);
+  padding: 14px;
+}
+
+.automation-audit-summary strong {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+}
+
+.automation-audit-list {
+  display: grid;
+  gap: 14px;
+}
+
+.automation-audit-entry {
+  padding: 18px;
+  display: grid;
+  gap: 16px;
+  border-left-width: 6px;
+}
+
+.automation-audit-entry--success {
+  border-left-color: var(--app-success, #15803d);
+}
+
+.automation-audit-entry--blocked {
+  border-left-color: var(--app-warning, #d97706);
+}
+
+.automation-audit-entry--failed {
+  border-left-color: var(--app-danger, #b91c1c);
+}
+
+.automation-audit-entry header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.automation-audit-entry header p {
+  margin: 6px 0 0;
+}
+
+.automation-audit-entry time {
+  color: var(--text-secondary);
+  font-size: var(--font-12, 12px);
+  white-space: nowrap;
+}
+
+.automation-audit-status {
+  display: inline-flex;
+  width: fit-content;
+  margin-bottom: 8px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  padding: 6px 10px;
+  color: var(--text-secondary);
+  font-size: var(--font-12, 12px);
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.automation-audit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.automation-audit-grid > div {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  background: var(--app-surface-1);
+  padding: 12px;
+  min-width: 0;
+}
+
+.automation-audit-grid strong {
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.automation-audit-conditions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.automation-audit-conditions li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--app-surface-1);
+  color: var(--text-secondary);
+  padding: 8px 10px;
+}
+
+.condition-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+}
+
+.condition-dot--pass {
+  background: var(--app-success, #15803d);
+}
+
+.condition-dot--fail {
+  background: var(--app-danger, #b91c1c);
+}
+
+.automation-audit-note {
+  margin: 0;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--app-warning, #d97706) 10%, var(--app-surface-1));
+  padding: 12px;
+  font-weight: 750;
+}
+
+.automation-audit-note--error {
+  background: color-mix(in srgb, var(--app-danger, #b91c1c) 10%, var(--app-surface-1));
+}
+
+.automation-audit-ai,
+.automation-audit-empty {
+  margin: 0;
+}
+
+@media (max-width: 960px) {
+  .automation-audit-hero,
+  .automation-audit-entry header {
+    flex-direction: column;
+  }
+
+  .automation-audit-summary,
+  .automation-audit-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .automation-audit-page {
+    padding: 18px;
+  }
+
+  .automation-audit-summary,
+  .automation-audit-grid {
+    grid-template-columns: 1fr;
+  }
+}

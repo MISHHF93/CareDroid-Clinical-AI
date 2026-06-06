@@ -82,6 +82,7 @@ const {
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
 const CapabilityDiscovery = lazyWithRetry(() => import('./pages/CapabilityDiscovery'));
 const WorkflowAutomationBuilder = lazyWithRetry(() => import('./pages/WorkflowAutomationBuilder'));
+const AutomationAuditTrail = lazyWithRetry(() => import('./pages/AutomationAuditTrail'));
 const DependencyMap = lazyWithRetry(() => import('./pages/DependencyMap'));
 const DependencyGraph = lazyWithRetry(() => import('./pages/DependencyGraph'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
@@ -669,6 +670,11 @@ function AppRoutes() {
     {
       path: '/automation',
       element: <WorkflowAutomationBuilder />,
+      requiresAuth: true,
+    },
+    {
+      path: '/automation-audit',
+      element: <AutomationAuditTrail />,
       requiresAuth: true,
     },
     {
