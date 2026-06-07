@@ -544,6 +544,7 @@ export function buildResponsiveQaPages() {
     ['laboratory', 'Laboratory', '/laboratory', 'clinical'],
     ['3d-viewer', '3D Viewer', '/3d-viewer', 'visualization'],
     ['analytics', 'Platform Analytics', '/analytics', 'analytics'],
+    ['organization-intelligence', 'Organization Intelligence', '/organization-intelligence', 'analytics'],
     ['saas-health-enterprise', 'SaaS Health Center', '/saas-health', 'platform'],
     ['governance-registry-enterprise', 'Platform Governance Registry', '/governance-registry', 'platform'],
     ['feature-flags', 'Feature Flag Center', '/feature-flags', 'platform'],

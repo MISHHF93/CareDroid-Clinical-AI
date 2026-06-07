@@ -62,6 +62,7 @@ import MedicalIotDashboard from '../pages/MedicalIotDashboard';
 import DeviceFleetManagement from '../pages/DeviceFleetManagement';
 import ClinicalAlertsPage from '../pages/ClinicalAlertsPage';
 import FleetLiveMap from '../pages/fleet/FleetLiveMap';
+import { OrganizationIntelligenceProfile } from '../pages/organization/OrganizationPages';
 import { CORE_ROUTE_SMOKE, TIER_A_FORM_SMOKE_SLUGS } from './responsiveRegression.routes';
 
 vi.mock('../pages/tools/Calculators.css', () => ({}));
@@ -124,6 +125,18 @@ vi.mock('../contexts/UserIdentityContext', () => ({
   useUserIdentity: () => ({
     userId: '11111111-1111-4111-8111-111111111111',
     profile: { id: '11111111-1111-4111-8111-111111111111' },
+    organization: {
+      id: 'org-route-smoke',
+      name: 'Route Smoke Hospital',
+      organizationType: 'hospital',
+      slug: 'route-smoke-hospital',
+    },
+    entitledPackIds: ['core-platform'],
+    platformContext: {
+      entitledPackIds: ['core-platform'],
+      defaultAiAgentId: 'agent-clinical',
+      availablePacks: [{ id: 'core-platform', name: 'Core Platform', assetIds: ['qsofa'] }],
+    },
   }),
 }));
 
@@ -134,6 +147,93 @@ vi.mock('../hooks/useNotificationActions', () => ({
 vi.mock('../services/clinicalToolsApi', () => ({
   fetchBackendClinicalTools: vi.fn().mockResolvedValue({ ok: true, tools: [] }),
 }));
+
+vi.mock('../data/artifactKnowledgeGraph', () => {
+  const node = {
+    id: 'asset:route-smoke',
+    type: 'asset',
+    label: 'Route Smoke Asset',
+    summary: 'Small artifact graph fixture for route smoke.',
+    path: '/artifacts',
+    sourceId: 'route-smoke',
+    tags: ['smoke'],
+  };
+  const edge = {
+    id: 'asset:route-smoke|BELONGS_TO|pack:core-platform',
+    source: 'asset:route-smoke',
+    target: 'pack:core-platform',
+    type: 'BELONGS_TO',
+    rationale: 'Route smoke asset belongs to Core Platform.',
+  };
+  return {
+    ARTIFACT_KNOWLEDGE_GRAPH_NODE_TYPES: [
+      'asset',
+      'pack',
+      'product',
+      'workspace',
+      'organization',
+      'role',
+      'route',
+      'simulation',
+      'workflow',
+      'ai-agent',
+      'integration',
+    ],
+    ARTIFACT_KNOWLEDGE_GRAPH_RELATIONSHIPS: [
+      'USES',
+      'DEPENDS_ON',
+      'BELONGS_TO',
+      'RECOMMENDED_FOR',
+      'SIMILAR_TO',
+      'LAUNCHED_FROM',
+      'PART_OF',
+    ],
+    buildKnowledgeGraphAiPrompt: () => 'Open the Artifact Knowledge Graph.',
+    createArtifactKnowledgeGraphService: () => ({
+      buildSnapshot: () => ({
+        nodes: [node],
+        edges: [edge],
+        visibleNodeCount: 1,
+        matchingNodeCount: 1,
+        selectedNode: node,
+        neighbors: [],
+        relationshipRows: [
+          {
+            ...edge,
+            sourceLabel: 'Route Smoke Asset',
+            sourceType: 'asset',
+            targetLabel: 'Core Platform',
+            targetType: 'pack',
+          },
+        ],
+        orphanNodes: [],
+        duplicateGroups: [],
+        recommendations: [],
+        counts: {
+          asset: 1,
+          pack: 1,
+          product: 0,
+          workspace: 0,
+          organization: 0,
+          role: 0,
+          route: 0,
+          simulation: 0,
+          workflow: 0,
+          'ai-agent': 0,
+          integration: 0,
+        },
+        relationshipCounts: { BELONGS_TO: 1 },
+        summary: { nodes: 2, edges: 1 },
+        coverage: {
+          connectedAssetIds: ['asset:route-smoke'],
+          totalAssets: 1,
+          orphanAssetIds: [],
+          allAssetsConnected: true,
+        },
+      }),
+    }),
+  };
+});
 
 vi.mock('../services/platformSystemsApi', () => ({
   fetchPlatformSystemCapability: vi.fn().mockResolvedValue({
@@ -224,6 +324,48 @@ vi.mock('../services/platformAssetsApi', async (importOriginal) => {
           },
         ],
       }),
+      getOrganizationAnalytics: vi.fn().mockResolvedValue({
+        enabledPackIds: ['core-platform'],
+        dashboards: {
+          adoption: {
+            enabledPackCount: 1,
+            enabledAssetCount: 1,
+            totalAssetCount: 4,
+            adoptionScore: 25,
+          },
+          engagement: {
+            aiUsageCount: 0,
+            simulationCompletionCount: 0,
+            dashboardEngagementCount: 0,
+          },
+          underusedAssets: [{ id: 'qsofa', label: 'qSOFA', count: 0 }],
+          topAssets: [{ id: 'qsofa', label: 'qSOFA', count: 3 }],
+        },
+        dimensions: {
+          assetUsage: [{ id: 'qsofa', label: 'qSOFA', count: 3 }],
+          workspaceUsage: [{ id: 'emergency', label: 'Emergency', count: 3 }],
+          aiUsage: [],
+        },
+      }),
+      getCustomerSuccessDashboard: vi.fn().mockResolvedValue({
+        health: { score: 50, status: 'watch', retentionRisk: 'medium' },
+        metrics: {
+          adoption: { value: 25, enabledPackCount: 1, enabledAssetCount: 1, totalAssetCount: 4 },
+          activeUsers: { value: 1 },
+          assetUsage: { value: 3 },
+          aiUsage: { value: 0 },
+          simulationsCompleted: { value: 0 },
+          workflowsCompleted: { value: 0 },
+        },
+      }),
+      getTenantAdministration: vi.fn().mockResolvedValue({
+        profile: { id: 'org-route-smoke', name: 'Route Smoke Hospital', organizationType: 'hospital' },
+        departments: ['emergency'],
+        workspaces: [{ id: 'emergency', name: 'Emergency', enabledToolIds: ['qsofa'] }],
+      }),
+      listMarketplacePacks: vi.fn().mockResolvedValue([
+        { id: 'core-platform', name: 'Core Platform', assetIds: ['qsofa'] },
+      ]),
     },
   };
 });
@@ -572,6 +714,7 @@ const PAGE_BY_ID = {
   'fleet-command': FleetDashboard,
   'fleet-route-optimizer': RouteOptimizer,
   'fleet-predictive-maintenance': PredictiveMaintenance,
+  'organization-intelligence': OrganizationIntelligenceProfile,
 };
 
 const THEME_ROUTE_SMOKE_IDS = new Set([

@@ -131,6 +131,7 @@ describe('canonical route redirects', () => {
     expectRoute('/solution-builder', 'HospitalSolutionBuilderPage');
     expectRoute('/value-tracking', 'ValueTrackingPage');
     expectRoute('/customer-success', 'CustomerSuccessDashboard');
+    expectRoute('/organization-intelligence', 'OrganizationIntelligenceProfile');
     expectRoute('/configuration-studio', 'ConfigurationStudioPage');
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).not.toEqual(
       expect.arrayContaining([expect.objectContaining({ path: '/asset-packs' })])

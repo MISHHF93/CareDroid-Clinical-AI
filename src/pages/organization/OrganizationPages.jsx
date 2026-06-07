@@ -4,8 +4,10 @@ import Card from '../../components/ui/card';
 import Button from '../../components/ui/button';
 import { useOrganizationContext } from '../../contexts/OrganizationContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
+import { buildOrganizationIntelligenceProfile } from '../../data/organizationIntelligenceProfile';
 import { PROFILE_ROLES } from '../../data/profileToolSegmentation';
 import './OrganizationPages.css';
 
@@ -883,6 +885,229 @@ export function CustomerSuccessDashboard() {
           </Card>
         </>
       )}
+    </div>
+  );
+}
+
+function RecommendationList({ title, rows = [] }) {
+  return (
+    <Card className="org-card org-analytics-panel">
+      <h2>{title}</h2>
+      {rows.length ? (
+        <ol className="org-analytics-list">
+          {rows.slice(0, 6).map((row) => (
+            <li key={row.id}>
+              <span>
+                <strong>{row.title}</strong>
+                <small>{row.rationale}</small>
+                {row.route && <Link to={row.route}>{row.action}</Link>}
+              </span>
+              <b>{row.priority}</b>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="org-pack-meta">No recommendations in this category yet.</p>
+      )}
+    </Card>
+  );
+}
+
+function IntelligenceUsageList({ title, rows = [], emptyText = 'No usage signal yet.' }) {
+  return (
+    <Card className="org-card org-analytics-panel">
+      <h2>{title}</h2>
+      {rows.length ? (
+        <ol className="org-analytics-list">
+          {rows.slice(0, 8).map((row) => (
+            <li key={row.id || row.label}>
+              <span>
+                <strong>{row.label}</strong>
+                {row.metadata?.assetType && <small>{row.metadata.assetType}</small>}
+                {row.route && <Link to={row.route}>Open</Link>}
+              </span>
+              <b>{row.count}</b>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="org-pack-meta">{emptyText}</p>
+      )}
+    </Card>
+  );
+}
+
+export function OrganizationIntelligenceProfile() {
+  const userIdentity = useUserIdentity();
+  const organizationContext = useOrganizationContext();
+  const workspaceContext = useWorkspace();
+  const organization = organizationContext.organization || userIdentity.organization;
+  const [analytics, setAnalytics] = useState(null);
+  const [customerSuccess, setCustomerSuccess] = useState(null);
+  const [tenantAdministration, setTenantAdministration] = useState(null);
+  const [marketplacePacks, setMarketplacePacks] = useState([]);
+  const [status, setStatus] = useState('');
+
+  useEffect(() => {
+    if (!organization?.id) return;
+    let active = true;
+    setStatus('Loading organization intelligence...');
+    Promise.allSettled([
+      PlatformAssetsApi.getOrganizationAnalytics(organization.id),
+      PlatformAssetsApi.getCustomerSuccessDashboard(organization.id, 'month'),
+      PlatformAssetsApi.getTenantAdministration(organization.id),
+      PlatformAssetsApi.listMarketplacePacks({
+        organizationId: organization.id,
+        organizationType: organization.organizationType,
+      }),
+    ]).then(([analyticsResult, successResult, tenantResult, packsResult]) => {
+      if (!active) return;
+      setAnalytics(analyticsResult.status === 'fulfilled' ? analyticsResult.value : null);
+      setCustomerSuccess(successResult.status === 'fulfilled' ? successResult.value : null);
+      setTenantAdministration(tenantResult.status === 'fulfilled' ? tenantResult.value : null);
+      setMarketplacePacks(packsResult.status === 'fulfilled' ? packsResult.value || [] : []);
+      setStatus('');
+    });
+    return () => {
+      active = false;
+    };
+  }, [organization?.id, organization?.organizationType]);
+
+  const profile = useMemo(() => {
+    const platformContext = {
+      ...(userIdentity.platformContext || {}),
+      availablePacks: marketplacePacks.length
+        ? marketplacePacks
+        : userIdentity.platformContext?.availablePacks || [],
+    };
+    return buildOrganizationIntelligenceProfile({
+      organizationContext,
+      userIdentity: {
+        ...userIdentity,
+        platformContext,
+      },
+      workspaceContext,
+      analytics,
+      customerSuccess,
+      tenantAdministration,
+    });
+  }, [analytics, customerSuccess, marketplacePacks, organizationContext, tenantAdministration, userIdentity, workspaceContext]);
+
+  const metrics = [
+    ['Organization type', profile.organization.organizationType],
+    ['Departments', profile.departments.length],
+    ['Workspaces', profile.workspaces.length],
+    ['Enabled packs', profile.adoption.enabledPackCount],
+    ['Adoption', `${profile.adoption.score}%`],
+    ['AI usage', profile.usage.totals.aiUsage],
+    ['Asset usage', profile.usage.totals.assetUsage],
+    ['Health', profile.adoption.healthScore],
+  ];
+
+  return (
+    <div className="org-page">
+      <header className="org-page-header">
+        <h1>Organization Intelligence</h1>
+        <p className="org-page-subtitle">
+          Organization Intelligence Profile for {profile.organization.name}: behavior-aware
+          recommendations across packs, assets, AI usage, adoption, workflows, simulations, and automation.
+        </p>
+        <div className="org-page-actions">
+          <Link to="/platform-analytics">Platform analytics</Link>
+          <Link to="/customer-success">Customer success</Link>
+          <Link to="/tenant-admin">Tenant administration</Link>
+          <Link to="/asset-packs">Review packs</Link>
+        </div>
+      </header>
+
+      {status && <Card className="org-card"><p>{status}</p></Card>}
+
+      <section className="org-grid org-analytics-metrics" aria-label="Organization intelligence metrics">
+        {metrics.map(([label, value]) => (
+          <Card key={label} className="org-card org-analytics-metric">
+            <h2>{label}</h2>
+            <p>{value}</p>
+          </Card>
+        ))}
+      </section>
+
+      <section className="org-analytics-section">
+        <h2>Organization Intelligence Profile</h2>
+        <div className="org-grid">
+          <Card className="org-card">
+            <h2>Identity</h2>
+            <p>{profile.organization.name}</p>
+            <p className="org-pack-meta">
+              Tenant: {profile.organization.tenantId} · Subscription: {profile.organization.subscriptionTier}
+            </p>
+            <span className={`org-status-pill org-status-pill--${profile.organization.healthStatus}`}>
+              {profile.organization.healthStatus}
+            </span>
+          </Card>
+          <Card className="org-card">
+            <h2>Departments</h2>
+            <div className="org-chip-list">
+              {profile.departments.map((department) => (
+                <span key={department.id} className="org-chip">
+                  {department.name}
+                </span>
+              ))}
+              {!profile.departments.length && <span className="org-chip">No departments synced</span>}
+            </div>
+          </Card>
+          <Card className="org-card">
+            <h2>Workspaces</h2>
+            <p>{profile.activeWorkspace?.name || 'Organization-wide'} focus</p>
+            <div className="org-chip-list">
+              {profile.workspaces.slice(0, 6).map((workspace) => (
+                <span key={workspace.id} className="org-chip">
+                  {workspace.name}
+                </span>
+              ))}
+            </div>
+          </Card>
+          <Card className="org-card">
+            <h2>Packs</h2>
+            <p>{profile.packs.filter((pack) => pack.enabled).length} enabled</p>
+            <p className="org-pack-meta">{profile.packs.filter((pack) => !pack.enabled).length} missing candidates</p>
+          </Card>
+        </div>
+      </section>
+
+      <section className="org-analytics-section">
+        <h2>Usage and adoption</h2>
+        <div className="org-grid">
+          <IntelligenceUsageList title="Asset usage" rows={profile.usage.assetUsage} />
+          <IntelligenceUsageList title="AI usage" rows={profile.usage.aiUsage} />
+          <IntelligenceUsageList title="Workspace usage" rows={profile.usage.workspaceUsage} />
+          <IntelligenceUsageList title="Underused assets" rows={profile.usage.underusedAssets} />
+        </div>
+      </section>
+
+      <section className="org-analytics-section">
+        <h2>Adaptive recommendations</h2>
+        <div className="org-grid">
+          <RecommendationList title="Missing packs" rows={profile.recommendations.missingPacks} />
+          <RecommendationList title="Underused assets" rows={profile.recommendations.underusedAssets} />
+          <RecommendationList title="Workflow opportunities" rows={profile.recommendations.workflowOpportunities} />
+          <RecommendationList title="Simulation opportunities" rows={profile.recommendations.simulationOpportunities} />
+          <RecommendationList title="Automation opportunities" rows={profile.recommendations.automationOpportunities} />
+          <RecommendationList title="AI assist opportunities" rows={profile.recommendations.aiAssistOpportunities} />
+        </div>
+      </section>
+
+      <section className="org-analytics-section">
+        <h2>Platform adaptation signals</h2>
+        <div className="org-grid">
+          {profile.adaptationSignals.map((signal) => (
+            <Card key={signal.id} className="org-card">
+              <h2>{signal.label}</h2>
+              <p>{signal.value}</p>
+              <p className="org-pack-meta">{signal.rationale}</p>
+            </Card>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

@@ -150,6 +150,7 @@ const {
   AssetLifecycleAdmin,
   PlatformAnalyticsPage,
   CustomerSuccessDashboard,
+  OrganizationIntelligenceProfile,
   DepartmentsPage,
   ServiceLinesPage,
   TenantAdministrationCenter,
@@ -172,6 +173,11 @@ const {
   CustomerSuccessDashboard: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({
       default: m.CustomerSuccessDashboard,
+    }))
+  ),
+  OrganizationIntelligenceProfile: lazyWithRetry(() =>
+    import('./pages/organization/OrganizationPages').then((m) => ({
+      default: m.OrganizationIntelligenceProfile,
     }))
   ),
   DepartmentsPage: lazyWithRetry(() =>
@@ -1435,6 +1441,11 @@ function AppRoutes() {
     {
       path: '/customer-success',
       element: <CustomerSuccessDashboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/organization-intelligence',
+      element: <OrganizationIntelligenceProfile />,
       requiresAuth: true,
     },
     {

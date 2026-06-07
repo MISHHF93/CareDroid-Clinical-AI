@@ -128,6 +128,12 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'memory', path: '/memory', match: 'heading', heading: /memory dashboard/i },
   { id: 'training', path: '/training', match: 'heading', heading: /training dashboard/i },
   { id: 'analytics', path: '/analytics', match: 'heading', heading: /platform analytics/i },
+  {
+    id: 'organization-intelligence',
+    path: '/organization-intelligence',
+    match: 'heading',
+    heading: /organization intelligence/i,
+  },
   { id: 'feature-flags', path: '/feature-flags', match: 'heading', heading: /feature flag center/i },
   { id: 'plugins', path: '/plugins', match: 'heading', heading: /plugin marketplace/i },
   { id: 'dependency-map', path: '/dependency-map', match: 'heading', heading: /platform wiring map/i },
