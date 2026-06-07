@@ -68,14 +68,14 @@ describe('ToolsOverview unified inventory', () => {
     );
 
     expect(screen.getByRole('heading', { level: 1, name: /^tool library$/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /^all permitted$/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /^all$/i })).toHaveAttribute('aria-selected', 'true');
     expect(
       [...container.querySelectorAll('.stat-number')].map((node) => node.textContent)
     ).toContain(String(graph.counts.visible));
     expect(renderedCards.length).toBeGreaterThanOrEqual(graph.visibleTools.length);
     expect(new Set(renderedIds).size).toBe(renderedIds.length);
 
-    fireEvent.click(screen.getByRole('tab', { name: /^recommended for me$/i }));
+    fireEvent.click(screen.getByRole('tab', { name: /^recommended$/i }));
     const recommendedRenderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
       card.getAttribute('data-tool-id')
     );
@@ -87,7 +87,7 @@ describe('ToolsOverview unified inventory', () => {
   it('shows map tools in /tools search results', () => {
     mockToolPreferencesValue.profileSettings = { role: 'administrator' };
     const { container } = renderOverview();
-    fireEvent.click(screen.getByRole('tab', { name: /^all permitted$/i }));
+    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
     fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
       target: { value: 'map' },
     });
@@ -110,7 +110,7 @@ describe('ToolsOverview unified inventory', () => {
 
   it('renders each chat-assisted tool only as a single catalog card', () => {
     const { container } = renderOverview();
-    fireEvent.click(screen.getByRole('tab', { name: /^all permitted$/i }));
+    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
     const chatAssistedCount = [...container.querySelectorAll('.tool-card-large')].filter((card) =>
       /start guided chat/i.test(card.textContent || '')
     ).length;
@@ -123,10 +123,10 @@ describe('ToolsOverview unified inventory', () => {
     expect(container.textContent).not.toMatch(/open in assistant/i);
   }, 10000);
 
-  it('keeps calculators searchable from the SaaS permitted view', () => {
+  it('keeps calculators searchable from the unified all view', () => {
     const { container } = renderOverview();
 
-    fireEvent.click(screen.getByRole('tab', { name: /^all permitted$/i }));
+    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
     fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
       target: { value: 'qsofa' },
     });
@@ -144,16 +144,18 @@ describe('ToolsOverview unified inventory', () => {
     const tabs = screen.getAllByRole('tab').map((tab) => tab.textContent);
 
     const expectedLabels = [
-      'Recommended for Me',
-      'My Workspace',
-      'My Department',
-      'My Role',
-      'My Asset Packs',
-      'All Permitted',
-      'Locked',
-      'Hidden',
-      'Recent',
+      'Recommended',
+      'All',
+      'Calculators',
+      'Clinical Tools',
+      'AI Workflows',
+      'Simulations',
+      'Laboratory',
+      'Maps & IoT',
+      'Operations',
+      'Governance',
       'Favorites',
+      'Recent',
     ];
 
     expect(tabs).toEqual(expectedLabels);
@@ -183,13 +185,13 @@ describe('ToolsOverview unified inventory', () => {
   it('opens the all-tools view by default so source-backed tools are not hidden', () => {
     renderOverview();
 
-    expect(screen.getByRole('tab', { name: /^all permitted$/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /^all$/i })).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('opens /tools/calculators directly to the permitted SaaS view with search preserved', () => {
+  it('opens /tools/calculators directly to the calculator-filtered library with search preserved', () => {
     const { container } = renderOverview('/tools/calculators?q=meld');
 
-    expect(screen.getByRole('tab', { name: /^all permitted$/i })).toHaveAttribute(
+    expect(screen.getByRole('tab', { name: /^calculators$/i })).toHaveAttribute(
       'aria-selected',
       'true'
     );
@@ -208,8 +210,8 @@ describe('ToolsOverview unified inventory', () => {
     mockToolPreferencesValue.hiddenTools = [hiddenTool.id];
     const { container } = renderOverview();
 
-    fireEvent.click(screen.getByRole('tab', { name: /^recommended for me$/i }));
-    expect(screen.getByRole('tab', { name: /^recommended for me$/i })).toHaveAttribute(
+    fireEvent.click(screen.getByRole('tab', { name: /^recommended$/i }));
+    expect(screen.getByRole('tab', { name: /^recommended$/i })).toHaveAttribute(
       'aria-selected',
       'true'
     );

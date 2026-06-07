@@ -77,7 +77,7 @@ export default function SimulationScenarioPlayer() {
   };
 
   return (
-    <main className="ops-demo-page simulation-player">
+    <section className="ops-demo-page simulation-player">
       <section className="ops-demo-hero" aria-labelledby="simulation-player-title">
         <div className="ops-demo-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.trophy} size={34} />
@@ -314,6 +314,6 @@ export default function SimulationScenarioPlayer() {
           </div>
         </section>
       )}
-    </main>
+    </section>
   );
 }

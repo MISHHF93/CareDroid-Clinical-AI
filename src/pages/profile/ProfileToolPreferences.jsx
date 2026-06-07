@@ -113,7 +113,7 @@ export default function ProfileToolPreferences() {
   }, [graph.tools, graph.visibleTools, hiddenTools]);
 
   return (
-    <main className="profile-identity-page">
+    <section className="profile-identity-page">
       <div className="profile-identity-page__inner">
         <header className="profile-identity-page__header">
           <h1>Tool Preferences</h1>
@@ -217,6 +217,6 @@ export default function ProfileToolPreferences() {
           </div>
         </section>
       </div>
-    </main>
+    </section>
   );
 }

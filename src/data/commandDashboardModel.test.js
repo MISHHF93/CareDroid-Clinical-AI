@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { REGISTRY } from './clinicalToolIdContract';
-import { buildCommandDashboardModel, COMMAND_DASHBOARD_GROUPS } from './commandDashboardModel';
+import {
+  buildCapabilityReachabilityAudit,
+  buildCommandDashboardModel,
+  COMMAND_DASHBOARD_GROUPS,
+} from './commandDashboardModel';
+import { getMountedCapabilityGraph } from './mountedCapabilityGraph';
 import { getUserFacingToolRegistryProjection } from './toolInventory';
 
 describe('command dashboard model', () => {
@@ -72,6 +77,46 @@ describe('command dashboard model', () => {
     expect(curatedIds.length).toBeGreaterThan(0);
     for (const id of curatedIds) {
       expect(registryIds.has(id), id).toBe(true);
+    }
+  });
+
+  it('stitches major capabilities into dashboard, operations/tools, command, search, and AI alias reachability', () => {
+    const graph = getMountedCapabilityGraph();
+    const audit = buildCapabilityReachabilityAudit(graph);
+    const byId = new Map(audit.map((row) => [row.capabilityId, row]));
+
+    [
+      REGISTRY.qsofa,
+      REGISTRY.labInterp,
+      REGISTRY.hospitalMap,
+      REGISTRY.medicalIotDashboard,
+      REGISTRY.deviceFleetManagement,
+      REGISTRY.fleetLiveMap,
+      REGISTRY.simulationSuite,
+      REGISTRY.laboratoryDashboard,
+      REGISTRY.medical3dViewer,
+    ].forEach((id) => {
+      const row = byId.get(id);
+      expect(row, id).toBeTruthy();
+      expect(row.dashboard, id).toBe(true);
+      expect(row.command, id).toBe(true);
+      expect(row.search, id).toBe(true);
+      expect(row.aiAlias, id).toBe(true);
+      expect(row.tools || row.operations, id).toBe(true);
+    });
+  });
+
+  it('enriches dashboard panel tools with mounted SaaS metadata', () => {
+    const model = buildCommandDashboardModel();
+    const allPanelTools = Object.values(model.panels).flat();
+
+    expect(allPanelTools.length).toBeGreaterThan(0);
+    for (const tool of allPanelTools) {
+      expect(tool.mountedCapability, tool.id).toBeTruthy();
+      expect(tool.packIds.length, tool.id).toBeGreaterThan(0);
+      expect(tool.productIds.length, tool.id).toBeGreaterThan(0);
+      expect(tool.workspaceIds.length, tool.id).toBeGreaterThan(0);
+      expect(tool.aiAliases.length, tool.id).toBeGreaterThan(0);
     }
   });
 });

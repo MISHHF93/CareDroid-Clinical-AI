@@ -10,6 +10,24 @@ const sidebarCss = readFileSync(join(__dirname, '../components/Sidebar.css'), 'u
 const workspaceSwitcherCss = readFileSync(join(__dirname, '../components/WorkspaceSwitcher.css'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
 const appShellJsx = readFileSync(join(__dirname, '../layout/AppShell.jsx'), 'utf8');
+const primitivesSource = readFileSync(
+  join(__dirname, '../components/ui/CareDroidPrimitives.jsx'),
+  'utf8'
+);
+const primitivesCss = readFileSync(
+  join(__dirname, '../components/ui/CareDroidPrimitives.css'),
+  'utf8'
+);
+const drawerCss = readFileSync(join(__dirname, '../components/ui/Drawer.css'), 'utf8');
+const modalCss = readFileSync(join(__dirname, '../components/ui/Modal.css'), 'utf8');
+const emergencyBannerCss = readFileSync(
+  join(__dirname, '../components/alerts/EmergencyBanner.css'),
+  'utf8'
+);
+const notificationToastCss = readFileSync(
+  join(__dirname, '../components/notifications/NotificationToast.css'),
+  'utf8'
+);
 
 describe('CareDroid design language fit contract', () => {
   it('defines shared control, icon, shell, z-index, shadow, and focus tokens', () => {
@@ -55,5 +73,32 @@ describe('CareDroid design language fit contract', () => {
     expect(appShellJsx).toContain('<Sidebar');
     expect(appShellJsx).not.toContain('app-shell-bottom-nav');
     expect(appShellJsx).not.toContain('PRIMARY_MOBILE_NAV_ITEMS.map');
+  });
+
+  it('formalizes shared compact UI primitives for stitched pages', () => {
+    [
+      'SectionHeader',
+      'DashboardCard',
+      'ToolCard',
+      'StatusBadge',
+      'LoadingState',
+      'UnsupportedState',
+    ].forEach((symbol) => {
+      expect(primitivesSource).toContain(`function ${symbol}`);
+    });
+    expect(primitivesCss).toContain('.cd-dashboard-card');
+    expect(primitivesCss).toContain('.cd-tool-card');
+    expect(primitivesCss).toContain('.cd-state--unsupported');
+  });
+
+  it('uses tokenized overlay layers instead of hardcoded high z-index values', () => {
+    expect(drawerCss).toContain('z-index: var(--z-drawer');
+    expect(modalCss).toContain('z-index: var(--z-modal');
+    expect(emergencyBannerCss).toContain('z-index: var(--z-toast');
+    expect(notificationToastCss).toContain('z-index: var(--z-toast');
+
+    [drawerCss, modalCss, emergencyBannerCss, notificationToastCss].forEach((css) => {
+      expect(css).not.toMatch(/z-index:\s*(9998|9999|10000|99999|2000)\b/);
+    });
   });
 });

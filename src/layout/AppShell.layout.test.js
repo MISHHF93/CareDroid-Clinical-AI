@@ -18,6 +18,7 @@ const authShellCss = readFileSync(join(__dirname, 'AuthShell.css'), 'utf8');
 const layoutTokensCss = readFileSync(join(__dirname, '../styles/layout-breakpoints.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const appShellJsx = readFileSync(join(__dirname, 'AppShell.jsx'), 'utf8');
+const appJsx = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 
 describe('App shell layout — root and scroll', () => {
   it('allows document scroll and uses explicit overlay scroll locks only', () => {
@@ -172,6 +173,41 @@ describe('App shell layout — page scrollport', () => {
       /\.app-shell-main-wrap[\s\S]*width:\s*calc\(100% - var\(--app-main-inset/
     );
     expect(appShellCss).toMatch(/\.app-shell-main-wrap[\s\S]*overflow:\s*hidden/);
+  });
+
+  it('wraps authenticated routes in exactly one AppShell and does not expose a bottom nav', () => {
+    expect(appJsx.match(/<AppShell\b/g)).toHaveLength(1);
+    expect(appJsx).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
+    expect(appShellJsx.match(/data-layout-role="MainContent"/g)).toHaveLength(1);
+    expect(appShellJsx.match(/<Sidebar\b/g)).toHaveLength(1);
+    expect(`${appJsx}\n${appShellJsx}`).not.toContain('app-shell-bottom-nav');
+  });
+
+  it('keeps required authenticated page roots from nesting main landmarks', () => {
+    const requiredRouteFiles = [
+      '../pages/CommandDashboard.jsx',
+      '../pages/Operations.jsx',
+      '../pages/Profile.jsx',
+      '../pages/HospitalMapDashboard.jsx',
+      '../pages/MedicalIotDashboard.jsx',
+      '../pages/DeviceFleetManagement.jsx',
+      '../pages/LiveTrackingMap.jsx',
+      '../pages/DigitalTwinIntelligence.jsx',
+      '../pages/SimulationScenarioPlayer.jsx',
+      '../pages/LaboratoryDashboard.jsx',
+      '../pages/Medical3DViewer.jsx',
+      '../pages/profile/ProfileActivity.jsx',
+      '../pages/profile/ProfilePreferences.jsx',
+      '../pages/profile/ProfileSecurity.jsx',
+      '../pages/profile/ProfileToolPreferences.jsx',
+      '../pages/profile/ProfileWorkspaces.jsx',
+    ];
+
+    for (const file of requiredRouteFiles) {
+      const source = readFileSync(join(__dirname, file), 'utf8');
+      expect(source, file).not.toContain('<main');
+      expect(source, file).not.toContain('</main>');
+    }
   });
 
   it('keeps command dashboard out of the conversation-only scroll container', () => {

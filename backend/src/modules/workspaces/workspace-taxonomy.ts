@@ -87,7 +87,7 @@ const commonClinicalRoles = [
 ];
 
 const workspaceProfileDefaults = {
-  recommendedAssetPacks: ['clinical-core'],
+  recommendedAssetPacks: ['core-platform'],
   defaultDashboardWidgets: ['recommended-assets', 'recent-assets', 'notifications'],
   recommendedAIAgents: ['clinical-copilot'],
   visibleNavigationGroups: ['dashboard', 'assistant', 'tools'],
@@ -378,7 +378,7 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
       },
     ],
     recommendedAssetIds: ['drug-check', 'dose-calculator', 'calc-gfr', 'ckd-staging'],
-    recommendedAssetPacks: ['clinical-core', 'pharmacy-pack'],
+    recommendedAssetPacks: ['core-platform', 'laboratory-intelligence'],
     defaultDashboardWidgets: ['medication-safety', 'renal-dose-checks', 'recent-assets'],
     recommendedAIAgents: ['medication-safety-agent'],
     visibleNavigationGroups: ['dashboard', 'assistant', 'tools'],
@@ -620,7 +620,7 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
       'simulation-outcomes',
       'debrief-dashboard',
     ],
-    recommendedAssetPacks: ['education-simulation'],
+    recommendedAssetPacks: ['simulation-training-pack'],
     defaultDashboardWidgets: ['scenario-library', 'incomplete-debriefs', 'recommended-practice'],
     recommendedAIAgents: ['simulation-coach'],
     visibleNavigationGroups: ['dashboard', 'assistant', 'tools'],
@@ -759,7 +759,7 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
       'ai-governance',
       'ai-explainability',
     ],
-    recommendedAssetPacks: ['ai-evaluation-lab', 'governance-risk'],
+    recommendedAssetPacks: ['governance-compliance-pack', 'research-education'],
     defaultDashboardWidgets: ['model-benchmarks', 'safety-findings', 'evaluation-runs'],
     recommendedAIAgents: ['evaluation-agent'],
     visibleNavigationGroups: ['advanced', 'dashboard'],

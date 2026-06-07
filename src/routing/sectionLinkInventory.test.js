@@ -106,7 +106,7 @@ describe('section link inventory and route flattening', () => {
     expect(routes).toMatch(
       /export const FLEET_MAP_ROUTE_ALIASES = Object\.freeze\(\[[\s\S]*'\/fleet'[\s\S]*'\/fleet\/live-map'[\s\S]*'\/fleet\/tracking'/
     );
-    expect(routes).toContain('export const OPERATIONS_ROUTE_ALIASES = Object.freeze([])');
+    expect(routes).toContain("export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center'])");
     expect(routes).toContain(
       "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
     );

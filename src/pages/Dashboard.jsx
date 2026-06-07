@@ -409,7 +409,7 @@ function Dashboard() {
     const entry = toolRegistryById[panelRegistryId];
     if (!entry) {
       clearTool();
-      navigate({ pathname: '/home', search: '' }, { replace: true });
+      navigate({ pathname: '/dashboard', search: '' }, { replace: true });
       return;
     }
 

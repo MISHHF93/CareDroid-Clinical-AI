@@ -21,6 +21,9 @@ describe('route health graph', () => {
     expect(graph.routes.find((route) => route.path === '/tools/catalog')?.status).toBe(
       ROUTE_HEALTH_STATES.ACTIVE
     );
+    expect(graph.routes.find((route) => route.path === '/tools/calculators')?.owner).toBe(
+      'ToolsOverview'
+    );
   });
 
   it('has no blank routes', () => {

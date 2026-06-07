@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 9999;
+  z-index: var(--z-modal, 1100);
   padding: max(var(--space-4), env(safe-area-inset-top, 0px))
     max(var(--space-4), env(safe-area-inset-right, 0px))
     max(var(--space-4), env(safe-area-inset-bottom, 0px))

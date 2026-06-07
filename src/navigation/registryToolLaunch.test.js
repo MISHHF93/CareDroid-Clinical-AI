@@ -15,6 +15,7 @@ import {
   TOOL_LAUNCH_TYPES,
   TOOL_SURFACES,
 } from '../data/toolInventory';
+import { getMountedCapabilityGraph } from '../data/mountedCapabilityGraph';
 import { isKnownToolAreaPath, matchCalculatorRoute } from '../routes/clinicalToolRoutes';
 
 describe('registryToolLaunch', () => {
@@ -107,6 +108,22 @@ describe('registryToolLaunch', () => {
       if ([TOOL_SURFACES.TOOL_PAGE, TOOL_SURFACES.FLEET_PAGE, TOOL_SURFACES.HUB].includes(record.surface)) {
         expect(isKnownToolAreaPath(plan.pathname), record.id).toBe(true);
       }
+    }
+  });
+
+  it('resolves launch plans for every command-visible mounted capability', () => {
+    const allowedModes = new Set(['calculator-route', 'chat-assisted', 'tool-page', 'calculator-hub', 'fallback']);
+    const launchableCapabilities = getMountedCapabilityGraph().capabilities.filter(
+      (capability) => capability.commandVisible
+    );
+
+    expect(launchableCapabilities.length).toBeGreaterThan(0);
+    for (const capability of launchableCapabilities) {
+      const plan = getRegistryToolNavigation(capability.capabilityId);
+      expect(allowedModes.has(plan.mode), capability.capabilityId).toBe(true);
+      expect(plan.pathname, capability.capabilityId).toBeTruthy();
+      expect(plan.registryId, capability.capabilityId).toBeTruthy();
+      expect(plan.launch, capability.capabilityId).toBeTruthy();
     }
   });
 

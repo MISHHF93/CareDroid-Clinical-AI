@@ -54,7 +54,7 @@ export default function LaboratoryDashboard() {
   const criticalCount = LAB_RESULTS.filter((result) => result.status === 'Critical').length;
 
   return (
-    <main className="ops-demo-page laboratory-dashboard">
+    <section className="ops-demo-page laboratory-dashboard">
       <section className="ops-demo-hero" aria-labelledby="laboratory-title">
         <div className="ops-demo-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.tools} size={34} />
@@ -194,6 +194,6 @@ export default function LaboratoryDashboard() {
           </div>
         </aside>
       </section>
-    </main>
+    </section>
   );
 }

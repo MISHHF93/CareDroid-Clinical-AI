@@ -145,7 +145,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
   emergency: {
     allowedOrganizationTypes: ['hospital', 'clinic', 'ems', 'government'],
     allowedRoles: [...COMMON_CLINICAL_ROLES, 'fleet-operator'],
-    defaultAssetPacks: ['clinical-core', 'emergency-medicine'],
+    defaultAssetPacks: ['core-platform', 'emergency-medicine'],
     defaultDashboardWidgets: ['triage-risk', 'emergency-calculators', 'active-alerts'],
     defaultAIAgents: ['emergency-copilot'],
     defaultNavigationGroups: ['dashboard', 'assistant', 'tools', 'operations'],
@@ -154,7 +154,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
   icu: {
     allowedOrganizationTypes: ['hospital', 'long-term-care', 'government'],
     allowedRoles: ['icu-physician', 'nurse', 'biomedical-engineer', 'hospital-administrator', 'platform-admin'],
-    defaultAssetPacks: ['clinical-core', 'critical-care'],
+    defaultAssetPacks: ['core-platform', 'icu-pack'],
     defaultDashboardWidgets: ['sofa-trends', 'ventilator-context', 'telemetry-alerts'],
     defaultAIAgents: ['critical-care-copilot'],
     defaultNavigationGroups: ['dashboard', 'assistant', 'tools', 'operations'],
@@ -163,7 +163,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
   cardiology: {
     allowedOrganizationTypes: ['hospital', 'clinic', 'telehealth', 'university'],
     allowedRoles: ['cardiologist', 'emergency-physician', 'nurse', 'educator', 'student', 'hospital-administrator', 'platform-admin'],
-    defaultAssetPacks: ['clinical-core', 'cardiology-pack'],
+    defaultAssetPacks: ['core-platform', 'cardiology-pack'],
     defaultDashboardWidgets: ['chest-pain-risk', 'ecg-context', 'recent-cardiology-tools'],
     defaultAIAgents: ['cardiology-copilot'],
     defaultNavigationGroups: ['dashboard', 'assistant', 'tools'],
@@ -172,7 +172,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
   laboratory: {
     allowedOrganizationTypes: ['hospital', 'clinic', 'long-term-care', 'research-center', 'university'],
     allowedRoles: ['lab-technician', 'emergency-physician', 'icu-physician', 'nurse', 'researcher', 'educator', 'hospital-administrator', 'platform-admin'],
-    defaultAssetPacks: ['clinical-core', 'laboratory-intelligence'],
+    defaultAssetPacks: ['core-platform', 'laboratory-intelligence'],
     defaultDashboardWidgets: ['abnormal-labs', 'specimen-queue', 'lab-trends'],
     defaultAIAgents: ['lab-interpretation-agent'],
     defaultNavigationGroups: ['dashboard', 'assistant', 'tools'],
@@ -199,7 +199,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
   'medical-iot': {
     allowedOrganizationTypes: ['hospital', 'long-term-care', 'clinic', 'telehealth', 'government'],
     allowedRoles: ['biomedical-engineer', 'icu-physician', 'nurse', 'hospital-administrator', 'platform-admin'],
-    defaultAssetPacks: ['core-platform', 'medical-iot'],
+    defaultAssetPacks: ['core-platform', 'medical-iot-pack'],
     defaultDashboardWidgets: ['offline-devices', 'telemetry-freshness', 'battery-risk'],
     defaultAIAgents: ['device-telemetry-agent'],
     defaultNavigationGroups: ['operations', 'assistant'],
@@ -208,7 +208,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
   education: {
     allowedOrganizationTypes: ['university', 'hospital', 'research-center'],
     allowedRoles: ['educator', 'student', 'researcher', 'emergency-physician', 'nurse', 'platform-admin'],
-    defaultAssetPacks: ['clinical-core', 'education-simulation'],
+    defaultAssetPacks: ['core-platform', 'simulation-training-pack'],
     defaultDashboardWidgets: ['recommended-scenarios', 'competency-gaps', 'recent-debriefs'],
     defaultAIAgents: ['education-coach'],
     defaultNavigationGroups: ['dashboard', 'assistant', 'tools'],
@@ -217,7 +217,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
   simulation: {
     allowedOrganizationTypes: ['university', 'hospital', 'research-center'],
     allowedRoles: ['educator', 'student', 'researcher', 'emergency-physician', 'nurse', 'platform-admin'],
-    defaultAssetPacks: ['education-simulation'],
+    defaultAssetPacks: ['simulation-training-pack'],
     defaultDashboardWidgets: ['scenario-library', 'incomplete-debriefs', 'recommended-practice'],
     defaultAIAgents: ['simulation-coach'],
     defaultNavigationGroups: ['dashboard', 'assistant', 'tools'],
@@ -226,7 +226,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
   research: {
     allowedOrganizationTypes: ['research-center', 'university', 'hospital', 'government'],
     allowedRoles: ['researcher', 'educator', 'compliance-officer', 'hospital-administrator', 'platform-admin'],
-    defaultAssetPacks: ['clinical-core', 'research-intelligence'],
+    defaultAssetPacks: ['core-platform', 'research-education'],
     defaultDashboardWidgets: ['evidence-review', 'cohort-context', 'auditability'],
     defaultAIAgents: ['research-copilot'],
     defaultNavigationGroups: ['dashboard', 'assistant', 'tools', 'advanced'],
@@ -235,7 +235,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
   governance: {
     allowedOrganizationTypes: ['hospital', 'clinic', 'ems', 'university', 'research-center', 'long-term-care', 'telehealth', 'government'],
     allowedRoles: ['compliance-officer', 'hospital-administrator', 'platform-admin'],
-    defaultAssetPacks: ['core-platform', 'governance-risk'],
+    defaultAssetPacks: ['core-platform', 'governance-compliance-pack'],
     defaultDashboardWidgets: ['audit-readiness', 'policy-review', 'human-review'],
     defaultAIAgents: ['governance-agent'],
     defaultNavigationGroups: ['advanced', 'settings'],
@@ -244,7 +244,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
   'ai-evaluation': {
     allowedOrganizationTypes: ['research-center', 'university', 'hospital', 'government'],
     allowedRoles: ['researcher', 'educator', 'compliance-officer', 'platform-admin'],
-    defaultAssetPacks: ['ai-evaluation-lab', 'governance-risk'],
+    defaultAssetPacks: ['governance-compliance-pack', 'research-education'],
     defaultDashboardWidgets: ['model-benchmarks', 'safety-findings', 'evaluation-runs'],
     defaultAIAgents: ['evaluation-agent'],
     defaultNavigationGroups: ['advanced', 'dashboard'],
@@ -288,7 +288,7 @@ function normalizeWorkspaceDefinition(workspace) {
     workspaceId: workspace.id,
     allowedOrganizationTypes: metadata.allowedOrganizationTypes || ['hospital'],
     allowedRoles: metadata.allowedRoles || COMMON_CLINICAL_ROLES,
-    defaultAssetPacks: metadata.defaultAssetPacks || ['clinical-core'],
+    defaultAssetPacks: metadata.defaultAssetPacks || ['core-platform'],
     defaultAssets,
     defaultDashboardWidgets: metadata.defaultDashboardWidgets || ['recommended-assets', 'recent-assets'],
     defaultAIAgents: metadata.defaultAIAgents || ['clinical-copilot'],

@@ -141,6 +141,14 @@ describe('CommandDashboard', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/assistant');
   });
 
+  it('launches the operations quick prompt to the canonical operations hub', () => {
+    renderDashboard();
+
+    fireEvent.click(screen.getByRole('button', { name: /open operations/i }));
+
+    expect(screen.getByTestId('location')).toHaveTextContent('/operations');
+  });
+
   it('launches calculator cards through canonical launch behavior', () => {
     renderDashboard();
     const clinicalPanel = screen.getByRole('heading', { name: /my calculators/i }).closest('section');

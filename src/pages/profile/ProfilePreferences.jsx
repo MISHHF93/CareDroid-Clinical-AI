@@ -67,7 +67,7 @@ export default function ProfilePreferences() {
   };
 
   return (
-    <main className="profile-identity-page">
+    <section className="profile-identity-page">
       <div className="profile-identity-page__inner">
         <header className="profile-identity-page__header">
           <h1>Profile Preferences</h1>
@@ -189,6 +189,6 @@ export default function ProfilePreferences() {
           </div>
         </section>
       </div>
-    </main>
+    </section>
   );
 }

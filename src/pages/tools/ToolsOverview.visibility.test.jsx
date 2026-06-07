@@ -6,11 +6,6 @@ import {
   getUserFacingToolRegistryProjection,
   TOOL_SURFACES,
 } from '../../data/toolInventory';
-import {
-  buildProfileToolGraph,
-  buildUserToolProfile,
-  filterToolsForProfileGraph,
-} from '../../data/profileToolSegmentation';
 import { phantomToolReferences } from '../../data/sourceCodeToolDiscovery';
 import {
   mockConversationValue,
@@ -68,20 +63,8 @@ function openTool(container, id) {
   fireEvent.click(launchButton);
 }
 
-function expectedProfileVisibleTools(filter = 'all') {
-  const tools = getUserFacingToolRegistryProjection();
-  const profile = buildUserToolProfile({
-    activeWorkspaceId: 'all',
-    toolPreferences: mockToolPreferencesValue,
-  });
-  const graph = buildProfileToolGraph({ tools, profile });
-  return filterToolsForProfileGraph(graph, filter);
-}
-
-function expectedFilterBase(filter) {
-  return filter === 'calculator'
-    ? getUserFacingToolRegistryProjection()
-    : expectedProfileVisibleTools(filter);
+function expectedFilterBase() {
+  return getUserFacingToolRegistryProjection();
 }
 
 function expectedFilterIds(filter) {
@@ -132,7 +115,7 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
   it('renders one card per user-facing canonical tool and excludes phantom audit rows', () => {
     const { container } = renderOverview();
     showAllTools();
-    const userFacing = expectedProfileVisibleTools('all');
+    const userFacing = getUserFacingToolRegistryProjection();
     const renderedIds = [...container.querySelectorAll('[data-tool-id]')].map((node) =>
       node.getAttribute('data-tool-id')
     );

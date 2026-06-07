@@ -86,6 +86,11 @@ describe('backendFrontendExposure scan', () => {
     expect(scan.unguarded).toHaveLength(0);
   }, HEAVY_EXPOSURE_SCAN_TIMEOUT_MS);
 
+  it('keeps frontend API call ids unique', () => {
+    const ids = FRONTEND_API_CALLS.map((call) => call.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
   it('surfaces chat next-action and vitals endpoints through the canonical frontend inventory', () => {
     expect(FRONTEND_API_CALLS).toEqual(
       expect.arrayContaining([
@@ -117,6 +122,24 @@ describe('backendFrontendExposure scan', () => {
     for (const [method, path] of expectedUserIdentityCalls) {
       expect(FRONTEND_API_CALLS, `${method} ${path}`).toEqual(
         expect.arrayContaining([expect.objectContaining({ method, path })])
+      );
+      expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
+    }
+  });
+
+  it('covers memory dashboard and memory fabric client calls', () => {
+    const memoryCalls = [
+      ['GET', '/api/memory/dashboard'],
+      ['POST', '/api/memory/short'],
+      ['POST', '/api/memory/long'],
+      ['POST', '/api/memory/clinical'],
+      ['GET', '/api/memory/fabric/context'],
+      ['POST', '/api/memory/fabric/signals'],
+    ];
+
+    for (const [method, path] of memoryCalls) {
+      expect(FRONTEND_API_CALLS, `${method} ${path}`).toEqual(
+        expect.arrayContaining([expect.objectContaining({ method, path, capability: 'memory' })])
       );
       expect(findBackendRoute(method, path), `${method} ${path}`).toBeTruthy();
     }

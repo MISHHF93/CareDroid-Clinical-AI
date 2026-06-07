@@ -132,7 +132,7 @@ export default function DigitalTwinIntelligence() {
   );
 
   return (
-    <main className="twin-intel-page">
+    <section className="twin-intel-page">
       <section className="twin-intel-hero" aria-labelledby="digital-twin-intelligence-title">
         <div>
           <p className="twin-intel-eyebrow">Digital twin intelligence</p>
@@ -221,6 +221,6 @@ export default function DigitalTwinIntelligence() {
           route="/devices"
         />
       </section>
-    </main>
+    </section>
   );
 }

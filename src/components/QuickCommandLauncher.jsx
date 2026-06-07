@@ -8,6 +8,7 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import { filterVisibleTools, getAssetAwareToolProjection } from '../data/assetAccess';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
+import { getMountedCapabilityById } from '../data/mountedCapabilityGraph';
 import { CARE_WORKSPACES } from '../config/workspace.config';
 import { QUICK_COMMAND_DESTINATION_ITEMS } from '../config/navigation.config';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
@@ -88,6 +89,7 @@ function makeShortcutEntry(shortcut) {
 }
 
 function makeToolEntry(tool) {
+  const capability = getMountedCapabilityById(tool.id);
   return {
     id: `tool:${tool.id}`,
     sourceId: tool.id,
@@ -100,8 +102,24 @@ function makeToolEntry(tool) {
     color: tool.color,
     shortcut: tool.shortcut,
     tool,
-    aliases: [tool.nluToolId, ...(tool.features || []), ...(tool.useCases || [])],
+    capability,
+    aliases: [
+      tool.nluToolId,
+      ...(tool.features || []),
+      ...(tool.useCases || []),
+      ...(tool.aliases || []),
+      ...(capability?.aiAliases || []),
+    ],
   };
+}
+
+function uniqueEntriesById(entries) {
+  const seen = new Set();
+  return entries.filter((entry) => {
+    if (!entry?.id || seen.has(entry.id)) return false;
+    seen.add(entry.id);
+    return true;
+  });
 }
 
 function isPrimaryShellDuplicate(tool, navPathSet) {
@@ -118,8 +136,8 @@ export function buildQuickCommandEntries({
   recentToolIds = [],
   favoriteToolIds = [],
 } = {}) {
-  const workspaceEntries = workspaces.map(makeWorkspaceEntry);
-  const navEntries = navItems.map(makeNavEntry);
+  const workspaceEntries = uniqueEntriesById(workspaces.map(makeWorkspaceEntry));
+  const navEntries = uniqueEntriesById(navItems.map(makeNavEntry));
   const navPathSet = new Set(navEntries.map((entry) => entry.path).filter(Boolean));
   const allToolEntries = tools
     .filter((tool) => tool?.id && tool.isLaunchable !== false && !isPrimaryShellDuplicate(tool, navPathSet))

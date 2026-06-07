@@ -118,7 +118,7 @@ export default function Operations() {
   };
 
   return (
-    <main className="operating-workspace" aria-labelledby="operations-title">
+    <section className="operating-workspace" aria-labelledby="operations-title">
       <section className="operating-hero">
         <div className="operating-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.tools} size={28} />
@@ -185,6 +185,6 @@ export default function Operations() {
           ))}
         </div>
       </section>
-    </main>
+    </section>
   );
 }

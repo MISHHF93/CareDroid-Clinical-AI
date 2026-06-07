@@ -526,7 +526,7 @@ export default function HospitalMapDashboard() {
   };
 
   return (
-    <main className="hospital-map-page">
+    <section className="hospital-map-page">
       <section className="hospital-map-hero" aria-labelledby="hospital-map-title">
         <div>
           <p className="hospital-map-eyebrow">Hospital operations command</p>
@@ -738,6 +738,6 @@ export default function HospitalMapDashboard() {
           </div>
         </>
       ) : null}
-    </main>
+    </section>
   );
 }

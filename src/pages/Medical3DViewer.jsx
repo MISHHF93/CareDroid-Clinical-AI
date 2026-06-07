@@ -39,7 +39,7 @@ export default function Medical3DViewer() {
   );
 
   return (
-    <main className="ops-demo-page medical-viewer-page">
+    <section className="ops-demo-page medical-viewer-page">
       <section className="ops-demo-hero" aria-labelledby="viewer-title">
         <div className="ops-demo-hero__icon" aria-hidden>
           <NavIcon icon={CHROME_ICONS.artifacts} size={34} />
@@ -141,6 +141,6 @@ export default function Medical3DViewer() {
           </div>
         </aside>
       </section>
-    </main>
+    </section>
   );
 }

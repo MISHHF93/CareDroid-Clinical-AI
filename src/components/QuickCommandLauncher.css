@@ -51,7 +51,7 @@
 }
 
 .quick-command--mobile {
-  z-index: 950;
+  z-index: var(--z-popover, 940);
 }
 
 .quick-command--mobile .quick-command-backdrop {

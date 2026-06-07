@@ -15,7 +15,7 @@ export default function ProfileSecurity() {
   const { account, security } = useUserIdentity();
 
   return (
-    <main className="profile-identity-page">
+    <section className="profile-identity-page">
       <div className="profile-identity-page__inner">
         <header className="profile-identity-page__header">
           <h1>Profile Security</h1>
@@ -56,6 +56,6 @@ export default function ProfileSecurity() {
           </div>
         </Card>
       </div>
-    </main>
+    </section>
   );
 }

@@ -409,6 +409,10 @@ export default function CommandDashboard() {
   };
 
   const handlePromptAction = (action) => {
+    if (action.route) {
+      navigate(action.route);
+      return;
+    }
     if (action.toolId) {
       const tool = model.toolById[action.toolId];
       if (tool) {
@@ -420,7 +424,7 @@ export default function CommandDashboard() {
   };
 
   return (
-    <main className="command-dashboard">
+    <section className="command-dashboard">
       <section className="command-hero" aria-labelledby="command-dashboard-title">
         <div className="command-hero__content">
           <p className="command-eyebrow">
@@ -1043,6 +1047,6 @@ export default function CommandDashboard() {
           </div>
         </DashboardPanel>
       </div>
-    </main>
+    </section>
   );
 }

@@ -207,7 +207,7 @@ export default function LiveTrackingMap() {
   }), [assets]);
 
   return (
-    <main className="live-map-page">
+    <section className="live-map-page">
       <section className="live-map-hero" aria-labelledby="live-map-title">
         <div>
           <p className="live-map-eyebrow">Operational tracking cockpit</p>
@@ -390,6 +390,6 @@ export default function LiveTrackingMap() {
           </section>
         </>
       ) : null}
-    </main>
+    </section>
   );
 }

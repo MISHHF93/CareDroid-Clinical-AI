@@ -117,7 +117,7 @@
   border: 1px solid var(--app-input-border, rgba(255, 255, 255, 0.15));
   border-radius: var(--compact-card-radius, var(--radius-md));
   box-shadow: var(--shadow-3);
-  z-index: 1000;
+  z-index: var(--z-popover, 940);
   max-height: min(300px, calc(100dvh - 120px));
   overflow: hidden;
   display: flex;

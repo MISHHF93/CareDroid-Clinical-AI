@@ -137,7 +137,20 @@ describe('QuickCommandLauncher', () => {
     expect([...entries.recentEntries, ...entries.toolEntries].some((entry) => entry.sourceId === 'qsofa')).toBe(true);
     for (const entry of entries.toolEntries) {
       expect(inventoryIds.has(entry.sourceId), entry.sourceId).toBe(true);
+      expect(entry.capability, entry.sourceId).toBeTruthy();
+      expect(entry.aliases.length, entry.sourceId).toBeGreaterThan(0);
     }
+  });
+
+  it('searches canonical AI aliases from the mounted capability graph', () => {
+    const entries = buildQuickCommandEntries({
+      tools: getUserFacingToolRegistryProjection(),
+      recentToolIds: [],
+    });
+    const labEntry = entries.toolEntries.find((entry) => entry.sourceId === 'lab-interp');
+
+    expect(labEntry?.aliases).toEqual(expect.arrayContaining(['lab-interp', 'lab-interpreter']));
+    expect(entries.toolEntries.every((entry) => entry.path || entry.tool?.chatSeed)).toBe(true);
   });
 
   it('does not include non-launchable entitled-filtered tools', () => {
@@ -234,7 +247,6 @@ describe('QuickCommandLauncher', () => {
 
     expect(toolIds).toEqual(
       expect.arrayContaining([
-        'digital-operations-center',
         'clinical-documentation-assistant',
         'research-evidence-hub',
         'clinical-knowledge-graph',

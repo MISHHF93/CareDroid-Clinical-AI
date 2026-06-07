@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
@@ -37,16 +37,18 @@ import {
 import './ToolsOverview.css';
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
-  { value: 'recommended', label: 'Recommended for Me' },
-  { value: 'workspace', label: 'My Workspace' },
-  { value: 'department', label: 'My Department' },
-  { value: 'role', label: 'My Role' },
-  { value: 'asset-packs', label: 'My Asset Packs' },
-  { value: 'permitted', label: 'All Permitted' },
-  { value: 'locked', label: 'Locked' },
-  { value: 'hidden', label: 'Hidden' },
-  { value: 'recent', label: 'Recent' },
+  { value: 'recommended', label: 'Recommended' },
+  { value: 'all', label: 'All' },
+  { value: 'calculator', label: 'Calculators' },
+  { value: 'clinical-tools', label: 'Clinical Tools' },
+  { value: 'ai-workflows', label: 'AI Workflows' },
+  { value: 'simulations', label: 'Simulations' },
+  { value: 'laboratory', label: 'Laboratory' },
+  { value: 'maps-iot', label: 'Maps & IoT' },
+  { value: 'operations', label: 'Operations' },
+  { value: 'governance', label: 'Governance' },
   { value: 'favorites', label: 'Favorites' },
+  { value: 'recent', label: 'Recent' },
 ]);
 
 const TOOL_FILTER_OPTION_VALUES = new Set(TOOL_FILTER_OPTIONS.map((option) => option.value));
@@ -228,10 +230,11 @@ function accessRestrictionCopy(tool) {
 
 const ToolsOverview = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const requestedFilter = searchParams.get('filter');
   const requestedSearch = searchParams.get('q') || searchParams.get('search') || '';
-  const routeDefaultFilter = 'permitted';
+  const routeDefaultFilter = location.pathname === CANONICAL_ROUTES.calculators ? 'calculator' : 'all';
   const [search, setSearch] = useState(requestedSearch);
   const [toolFilter, setToolFilter] = useState(
     TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : routeDefaultFilter
@@ -449,7 +452,20 @@ const ToolsOverview = () => {
   const hiddenToolIdSet = useMemo(() => new Set(hiddenTools), [hiddenTools]);
   const profileFilteredTools = useMemo(
     () =>
-      ['recommended', 'workspace', 'department', 'role', 'asset-packs', 'permitted', 'locked', 'hidden', 'recent', 'favorites'].includes(toolFilter)
+      [
+        'recommended',
+        'all',
+        'calculator',
+        'clinical-tools',
+        'ai-workflows',
+        'simulations',
+        'laboratory',
+        'maps-iot',
+        'operations',
+        'governance',
+        'favorites',
+        'recent',
+      ].includes(toolFilter)
         ? tools
         : filterToolsForProfileGraph(profileToolGraph, toolFilter),
     [profileToolGraph, toolFilter, tools]
@@ -472,45 +488,23 @@ const ToolsOverview = () => {
   const filteredTools = useMemo(() => {
     let base = workspaceTools;
     if (toolFilter === 'recommended') base = profileToolGraph.recommendedTools;
-    else if (toolFilter === 'workspace') base = accessGroups.workspace;
-    else if (toolFilter === 'department') {
-      const department = normalizeSearch(saasProfile?.department || account?.department || '');
-      base = department
-        ? tools.filter((tool) => toolSearchBlob(tool).includes(department))
-        : workspaceTools;
-    }
-    else if (toolFilter === 'role') {
-      base = profileToolGraph.recommendedTools.length ? profileToolGraph.recommendedTools : tools;
-    }
-    else if (toolFilter === 'asset-packs') base = accessGroups.packs;
-    else if (toolFilter === 'permitted') base = accessGroups.permitted;
-    else if (toolFilter === 'locked') {
-      base = allToolsWithAccess.filter((tool) =>
-        [ASSET_ACCESS_STATES.LOCKED, ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED].includes(tool.accessState)
-      );
-    }
-    else if (toolFilter === 'hidden') {
-      base = allToolsWithAccess.filter((tool) => tool.accessState === ASSET_ACCESS_STATES.HIDDEN);
-    }
+    else if (toolFilter === 'all') base = isAllToolsWorkspace ? accessGroups.permitted : workspaceTools;
     else if (toolFilter === 'favorites') base = accessGroups.favorites;
     else if (toolFilter === 'recent') base = recentToolItems;
 
     return base.filter((tool) => {
-      if (toolFilter !== 'permitted' && !matchesToolFilter(tool, toolFilter)) return false;
+      if (toolFilter !== 'all' && !matchesToolFilter(tool, toolFilter)) return false;
       if (!searchQuery) return true;
       return toolSearchBlob(tool).includes(searchQuery);
     });
   }, [
-    account?.department,
-    allToolsWithAccess,
     workspaceTools,
     searchQuery,
     toolFilter,
     accessGroups,
+    isAllToolsWorkspace,
     profileToolGraph.recommendedTools,
     recentToolItems,
-    saasProfile?.department,
-    tools,
   ]);
 
   useEffect(() => {
@@ -579,13 +573,9 @@ const ToolsOverview = () => {
   const showSearchEmpty = !showWorkspaceEmpty && filteredTools.length === 0;
   const filterTabs = TOOL_FILTER_OPTIONS;
   const emptyStateCopy =
-    toolFilter === 'locked'
-      ? 'No locked tools match this view. Your current subscription and asset packs cover the visible library.'
-      : toolFilter === 'hidden'
-        ? 'No hidden tools match this view. Hidden tools can be restored from Profile > Tool preferences.'
-        : hiddenTools.length > 0
-          ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch filters.'
-          : 'No launchable tools match the current search and filter. Try a clinical alias or reset the filters.';
+    hiddenTools.length > 0
+      ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch filters.'
+      : 'No launchable tools match the current search and filter. Try a clinical alias or reset the filters.';
 
   return (
     <div className="tools-overview">
@@ -675,7 +665,7 @@ const ToolsOverview = () => {
             <div className="stat">
               <span className="stat-number">{filteredTools.length}</span>
               <span className="stat-label">
-                {searchQuery || toolFilter !== 'permitted'
+                {searchQuery || toolFilter !== 'all'
                   ? 'Matching'
                   : isAllToolsWorkspace
                     ? 'Shown'
@@ -752,7 +742,7 @@ const ToolsOverview = () => {
             className="btn-open-tool"
             onClick={() => {
               setSearch('');
-              setToolFilter('permitted');
+              setToolFilter(routeDefaultFilter);
             }}
           >
             Clear search and filters →

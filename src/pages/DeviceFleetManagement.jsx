@@ -209,7 +209,7 @@ export default function DeviceFleetManagement() {
   };
 
   return (
-    <main className="device-fleet-page">
+    <section className="device-fleet-page">
       <section className="device-fleet-hero" aria-labelledby="device-fleet-title">
         <div>
           <p className="device-fleet-eyebrow">Biomedical operations</p>
@@ -434,6 +434,6 @@ export default function DeviceFleetManagement() {
           </div>
         </>
       ) : null}
-    </main>
+    </section>
   );
 }

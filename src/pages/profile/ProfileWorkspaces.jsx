@@ -24,7 +24,7 @@ export default function ProfileWorkspaces() {
   };
 
   return (
-    <main className="profile-identity-page">
+    <section className="profile-identity-page">
       <div className="profile-identity-page__inner">
         <header className="profile-identity-page__header">
           <h1>Workspaces</h1>
@@ -107,6 +107,6 @@ export default function ProfileWorkspaces() {
           </div>
         </Card>
       </div>
-    </main>
+    </section>
   );
 }

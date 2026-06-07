@@ -24,6 +24,12 @@ import {
   TOOL_LAUNCH_TYPES,
   TOOL_SURFACES,
 } from './toolInventory';
+import {
+  getMountedCapabilityMetadata,
+  normalizeAssetPackIds,
+  productIdsForPackIds as canonicalProductIdsForPackIds,
+  workspaceIdsForPackIds as canonicalWorkspaceIdsForPackIds,
+} from './mountedCapabilityGraph';
 
 const uniq = (values) => [...new Set(values.flat().filter(Boolean))];
 const norm = (value) => String(value || '').trim().toLowerCase();
@@ -213,11 +219,13 @@ function inferPackIds(tool) {
     packs.push('research-education');
   }
   if (!packs.length) packs.push('core-platform');
-  return uniq(packs);
+  return normalizeAssetPackIds(uniq(packs));
 }
 
 function productIdsForPackIds(packIds) {
-  return uniq(packIds.flatMap((packId) => PRODUCT_IDS_BY_PACK_ID[packId] || []));
+  return canonicalProductIdsForPackIds(packIds).length
+    ? canonicalProductIdsForPackIds(packIds)
+    : uniq(packIds.flatMap((packId) => PRODUCT_IDS_BY_PACK_ID[packId] || []));
 }
 
 function workspaceIdsFor(packIds, tool) {
@@ -226,8 +234,10 @@ function workspaceIdsFor(packIds, tool) {
     label: tool.label || tool.name,
     route: tool.route || tool.path,
   });
+  const canonicalWorkspaceIds = canonicalWorkspaceIdsForPackIds(packIds);
   return uniq([
     ...(segmentation.workspaceTags || []),
+    ...canonicalWorkspaceIds,
     ...packIds.flatMap((packId) => PACK_IDS_BY_ID[packId]?.workspaceIds || []),
   ]).map((id) => (id === 'iot' || id === 'hospital-operations' ? 'operations' : id));
 }
@@ -347,22 +357,30 @@ function entitlementFor(id, context) {
 function mountedAssetFromTool(tool, context, contextPackByAsset) {
   const route = tool.route || tool.path || tool.navigationPath;
   const contextPackIds = contextPackByAsset.get(tool.id) || [];
-  const packIds = uniq([contextPackIds, inferPackIds(tool)]);
-  const productIds = productIdsForPackIds(packIds);
+  const mountedCapability = getMountedCapabilityMetadata(tool, contextPackIds);
+  const packIds = mountedCapability.packIds.length
+    ? mountedCapability.packIds
+    : uniq([contextPackIds, inferPackIds(tool)]);
+  const productIds = mountedCapability.productIds.length
+    ? mountedCapability.productIds
+    : productIdsForPackIds(packIds);
   const execution = executionFor(tool);
-  const workspaceIds = workspaceIdsFor(packIds, tool);
-  const roleIds = roleIdsFor(tool);
+  const workspaceIds = mountedCapability.workspaceIds.length
+    ? mountedCapability.workspaceIds
+    : workspaceIdsFor(packIds, tool);
+  const roleIds = uniq([mountedCapability.roleIds, roleIdsFor(tool)]);
 
   return {
     id: tool.id,
     canonicalInventoryId: tool.canonicalInventoryId || tool.id,
+    capabilityId: mountedCapability.capabilityId,
     assetType: assetTypeFor(tool),
     title: tool.label || tool.name || tool.id,
     description: tool.description || tool.safetyCopy || tool.notes || 'Mounted CareDroid platform asset.',
     category: tool.category || 'Clinical',
     route,
     lifecycle: tool.lifecycleState || 'active',
-    demoStatus: demoStatusFor(tool, execution),
+    demoStatus: mountedCapability.demoStatus || demoStatusFor(tool, execution),
     entitled: entitlementFor(tool.id, context),
     packIds,
     productIds,
@@ -402,13 +420,17 @@ function mountedAssetFromTool(tool, context, contextPackByAsset) {
       navigationPath: tool.navigationPath || route,
       sidebarVisible: Boolean(tool.sidebarVisible),
       catalogVisible: tool.userCatalogVisible !== false,
-      commandLaunchable: Boolean(route || tool.chatSeed),
+      commandLaunchable: mountedCapability.commandVisible,
+      searchVisible: mountedCapability.searchVisible,
+      aiAliases: mountedCapability.aiAliases,
     },
     evidence: {
       sourceFiles: uniq([tool.component, tool.auditRefs?.apiClient]),
       sourceKind: tool.auditRefs?.sourceKind || tool.sourceKind || 'toolInventory',
       tests: tool.auditRefs?.testCoverage || tool.testCoverage || [],
       backendStatus: execution.supportStatus,
+      mountedBackendSupport: mountedCapability.backendSupport,
+      mountedCapabilityVersion: mountedCapability.version,
     },
   };
 }
@@ -476,12 +498,20 @@ export function buildNavigationMountProjection() {
     ['advanced', ADVANCED_SIDEBAR_NAV_ITEMS],
     ['command', QUICK_COMMAND_DESTINATION_ITEMS],
   ];
-  return sections.flatMap(([section, items]) =>
-    items.map((item) => ({
-      ...item,
-      section,
-      sidebarVisible: section !== 'command' && item.showInSidebar !== false,
-      commandVisible: section === 'command',
-    }))
-  );
+  const seen = new Set();
+  return sections
+    .flatMap(([section, items]) =>
+      items.map((item) => ({
+        ...item,
+        section,
+        sidebarVisible: section !== 'command' && item.showInSidebar !== false,
+        commandVisible: section === 'command',
+      }))
+    )
+    .filter((item) => {
+      const key = `${item.section}:${item.id}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
 }

@@ -21,7 +21,7 @@
   position: fixed;
   top: calc(8px + env(safe-area-inset-top, 0px));
   left: calc(8px + env(safe-area-inset-left, 0px));
-  z-index: 2000;
+  z-index: var(--z-toast, 1200);
   min-height: var(--app-min-touch-target, 44px);
   display: inline-flex;
   align-items: center;

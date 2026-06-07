@@ -1,4 +1,5 @@
 import { REGISTRY } from './clinicalToolIdContract';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import {
   getUserFacingToolRegistryProjection,
   TOOL_EXECUTOR_STATUS,
@@ -7,6 +8,7 @@ import {
 } from './toolInventory';
 import { getAssetAwareToolProjection } from './assetAccess';
 import { getRoleBasedAssetRecommendations } from './assetRecommendation';
+import { getMountedCapabilityById, getMountedCapabilityGraph } from './mountedCapabilityGraph';
 
 export const COMMAND_DASHBOARD_PROMPTS = Object.freeze([
   {
@@ -61,7 +63,7 @@ export const COMMAND_DASHBOARD_PROMPTS = Object.freeze([
     id: 'open-operations',
     title: 'Open operations',
     prompt: 'Open the Operations hub for the current operational role.',
-    toolId: REGISTRY.digitalOperationsCenter,
+    route: CANONICAL_ROUTES.operations,
     description: 'Combine Digital Twin, Hospital Map, Medical IoT, Fleet, Notifications, and System Health.',
   },
   {
@@ -204,6 +206,22 @@ function selectToolsByIds(ids, byId) {
   return ids.map((id) => byId[id]).filter(Boolean);
 }
 
+function enrichWithMountedCapability(tool) {
+  const capability = getMountedCapabilityById(tool.id);
+  if (!capability) return tool;
+  return {
+    ...tool,
+    mountedCapability: capability,
+    packIds: capability.packIds,
+    productIds: capability.productIds,
+    workspaceIds: capability.workspaceIds,
+    roleIds: capability.roleIds,
+    aiAliases: capability.aiAliases,
+    demoStatus: capability.demoStatus,
+    backendSupport: capability.backendSupport,
+  };
+}
+
 function fallbackClinicalTools(tools) {
   return tools.filter(
     (tool) =>
@@ -292,7 +310,7 @@ function readinessDistribution(tools) {
 }
 
 export function buildCommandDashboardModel(tools = getUserFacingToolRegistryProjection()) {
-  const allTools = uniqueById(tools);
+  const allTools = uniqueById(tools.map(enrichWithMountedCapability));
   const byId = toolById(allTools);
   const clinicalFeatured = uniqueById([
     ...selectToolsByIds(COMMAND_DASHBOARD_GROUPS.clinical, byId),
@@ -385,6 +403,21 @@ export function buildCommandDashboardModel(tools = getUserFacingToolRegistryProj
       readinessDistribution: readinessDistribution(allTools),
     },
   };
+}
+
+export function buildCapabilityReachabilityAudit(graph = getMountedCapabilityGraph()) {
+  return graph.capabilities.map((capability) => ({
+    capabilityId: capability.capabilityId,
+    route: capability.route,
+    dashboard: capability.dashboardVisible,
+    tools: capability.toolsVisible,
+    operations: capability.operationsVisible,
+    command: capability.commandVisible,
+    search: capability.searchVisible,
+    aiAlias: capability.aiAliases.length > 0,
+    backendSupport: capability.backendSupport,
+    demoStatus: capability.demoStatus,
+  }));
 }
 
 export function getCommandDashboardModel(options = {}) {

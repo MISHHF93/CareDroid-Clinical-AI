@@ -224,6 +224,8 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/memory/long', controller: 'MemoryController' },
   { method: 'POST', path: '/api/memory/clinical', controller: 'MemoryController' },
   { method: 'GET', path: '/api/memory/clinical', controller: 'MemoryController' },
+  { method: 'GET', path: '/api/memory/fabric/context', controller: 'MemoryController' },
+  { method: 'POST', path: '/api/memory/fabric/signals', controller: 'MemoryController' },
 
   { method: 'GET', path: '/api/two-factor/generate', controller: 'TwoFactorController' },
   { method: 'POST', path: '/api/two-factor/enable', controller: 'TwoFactorController' },

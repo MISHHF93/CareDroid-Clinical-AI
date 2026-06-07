@@ -120,10 +120,10 @@ const ToolPageLayout = ({
     <div className={`tool-page${embedded ? ' tool-page--embedded' : ''}`}>
       {!embedded && (
         <div className="tool-breadcrumb">
-          <button type="button" onClick={() => navigate('/home')} className="breadcrumb-link">
+          <button type="button" onClick={() => navigate('/dashboard')} className="breadcrumb-link">
             <span className="breadcrumb-link-inner">
               <NavIcon icon={CHROME_ICONS.message} size={16} decorative />
-              <span>Home</span>
+              <span>Dashboard</span>
             </span>
           </button>
           <span className="breadcrumb-separator">›</span>

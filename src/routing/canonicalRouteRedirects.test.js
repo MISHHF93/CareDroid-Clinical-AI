@@ -113,6 +113,7 @@ describe('canonical route redirects', () => {
     expectRoute('/ai-evaluation', 'AiEvaluationDashboard');
     expectGeneratedRedirect('/ai/evaluation', '/ai-evaluation');
     expect(appSource).toContain("path: '/tools'");
+    expectRoute('/tools/calculators', 'ToolsOverview');
     expect(appSource).toContain("path: '/tools/calculators/:slug'");
     expect(appSource).not.toContain('to="/profile/preferences?tool-preferences"');
   });

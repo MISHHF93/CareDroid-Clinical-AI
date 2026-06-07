@@ -5,7 +5,7 @@
   top: 0;
   left: 0;
   right: 0;
-  z-index: 99999;
+  z-index: var(--z-toast, 1200);
   display: flex;
   align-items: center;
   gap: var(--space-4);
@@ -170,7 +170,7 @@
   gap: var(--space-3);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
   animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 9999;
+  z-index: var(--z-toast, 1200);
 }
 
 @keyframes slideIn {
@@ -248,7 +248,7 @@
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  z-index: 9998;
+  z-index: var(--z-modal, 1100);
   font-size: 24px;
 }
 

@@ -290,7 +290,7 @@ export default function MedicalIotDashboard() {
   }, [search, snapshot, statusFilter]);
 
   return (
-    <main className="medical-iot-page">
+    <section className="medical-iot-page">
       <section className="medical-iot-hero" aria-labelledby="medical-iot-title">
         <div>
           <p className="medical-iot-eyebrow">Connected care monitoring</p>
@@ -551,6 +551,6 @@ export default function MedicalIotDashboard() {
           </section>
         </>
       ) : null}
-    </main>
+    </section>
   );
 }

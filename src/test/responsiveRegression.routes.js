@@ -65,10 +65,10 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     heading: /developer catalog \/ source audit/i,
   },
   {
-    id: 'calculators-hub',
+    id: 'calculators-library-filter',
     path: '/tools/calculators',
     match: 'heading',
-    heading: /medical calculators/i,
+    heading: /^tool library$/i,
   },
   {
     id: 'ambient-scribe',
