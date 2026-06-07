@@ -21,6 +21,7 @@ const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 describe('Hospital operations wiring', () => {
   it('registers canonical hospital operations ids', () => {
     expect(HOSPITAL_OPERATIONS_REGISTRY_IDS).toEqual([
+      REGISTRY.digitalOperationsCenter,
       REGISTRY.hospitalMap,
       REGISTRY.deviceFleetManagement,
       REGISTRY.telemetryMonitoring,
@@ -47,11 +48,11 @@ describe('Hospital operations wiring', () => {
   it('keeps registry rows and catalog launches aligned', () => {
     for (const id of HOSPITAL_OPERATIONS_REGISTRY_IDS) {
       const reg = toolRegistryById[id];
-      expect(['/hospital-map', '/medical-iot', '/devices']).toContain(reg?.path);
+      expect(['/operations-center', '/hospital-map', '/medical-iot', '/devices']).toContain(reg?.path);
       expect(['Hospital Operations', 'IoT']).toContain(reg?.category);
 
       const launch = resolveCatalogLaunch(id);
-      expect(['/hospital-map', '/medical-iot', '/devices']).toContain(launch.path);
+      expect(['/operations-center', '/hospital-map', '/medical-iot', '/devices']).toContain(launch.path);
       expect(launch.registryId, id).toBe(id);
     }
   });

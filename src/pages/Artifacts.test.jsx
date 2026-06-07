@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import Artifacts from './Artifacts';
 
@@ -128,7 +128,13 @@ async function renderArtifacts() {
 describe('Artifacts page', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    globalThis.URL.createObjectURL = vi.fn(() => 'blob:artifact-csv');
+    globalThis.URL.revokeObjectURL = vi.fn();
     arrangeApi();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it('renders the artifact catalog with relationship graph and version history', async () => {
@@ -177,5 +183,15 @@ describe('Artifacts page', () => {
       expect(fetchArtifactVersions).toHaveBeenLastCalledWith('antimicrobial-timeout-protocol')
     );
     expect(within(detail).getByRole('heading', { name: /Antimicrobial Timeout Protocol/i })).toBeVisible();
+  });
+
+  it('downloads the filtered artifact CSV', async () => {
+    await renderArtifacts();
+
+    fireEvent.change(screen.getByLabelText(/Search artifacts/i), { target: { value: 'handoff' } });
+    fireEvent.click(screen.getByRole('button', { name: /Download CSV/i }));
+
+    expect(globalThis.URL.createObjectURL).toHaveBeenCalledTimes(1);
+    expect(globalThis.URL.revokeObjectURL).toHaveBeenCalledWith('blob:artifact-csv');
   });
 });

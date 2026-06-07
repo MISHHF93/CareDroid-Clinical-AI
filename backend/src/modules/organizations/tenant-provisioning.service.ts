@@ -66,7 +66,9 @@ export class TenantProvisioningService {
       organizationType: organization.organizationType,
       status: settings.tenant?.status || 'active',
       complianceMode:
-        options.complianceMode || settings.complianceMode || this.defaultComplianceMode(organization.organizationType),
+        options.complianceMode ||
+        settings.complianceMode ||
+        this.defaultComplianceMode(organization.organizationType),
       createdAt: settings.tenant?.createdAt || now,
     };
     settings.complianceMode = settings.tenant.complianceMode;
@@ -77,10 +79,18 @@ export class TenantProvisioningService {
       options.workspaceSetups || settings.workspaceDefaults,
     );
     settings.workspaceDefaults = workspaceDefaults;
-    const createdWorkspaces = await this.ensureDefaultWorkspaces(user, organization, workspaceDefaults);
+    const createdWorkspaces = await this.ensureDefaultWorkspaces(
+      user,
+      organization,
+      workspaceDefaults,
+    );
     workflow.push('default-workspaces-created');
 
-    const roleProfileId = await this.applyDefaultRole(user, organization.id, options.defaultRoleProfileId);
+    const roleProfileId = await this.applyDefaultRole(
+      user,
+      organization.id,
+      options.defaultRoleProfileId,
+    );
     workflow.push('default-roles-created');
 
     const packIds = this.resolvePackIds(organization.organizationType, settings, options.packIds);
@@ -94,7 +104,11 @@ export class TenantProvisioningService {
     settings.enabledPackIds = [...new Set([...(settings.enabledPackIds || []), ...packIds])];
     workflow.push('asset-packs-assigned');
 
-    const enabledAgentIds = await this.resolveAiAgentIds(roleProfileId, workspaceDefaults, settings);
+    const enabledAgentIds = await this.resolveAiAgentIds(
+      roleProfileId,
+      workspaceDefaults,
+      settings,
+    );
     settings.enabledAgentIds = enabledAgentIds;
     settings.defaultAiAgentId = settings.defaultAiAgentId || enabledAgentIds[0] || 'agent-clinical';
     workflow.push('ai-agents-assigned');
@@ -115,7 +129,8 @@ export class TenantProvisioningService {
         organization.name,
     };
 
-    settings.dashboardLayout = settings.dashboardLayout || this.defaultDashboardLayout(workspaceDefaults);
+    settings.dashboardLayout =
+      settings.dashboardLayout || this.defaultDashboardLayout(workspaceDefaults);
     settings.navigation = settings.navigation || {
       primaryLanding: '/customer-portal',
       customerRoutes: ['/customer-portal', '/success-center', '/billing', '/usage'],
@@ -164,9 +179,14 @@ export class TenantProvisioningService {
     };
   }
 
-  private async applyDefaultRole(user: User, organizationId: string, requestedRoleProfileId?: string | null) {
+  private async applyDefaultRole(
+    user: User,
+    organizationId: string,
+    requestedRoleProfileId?: string | null,
+  ) {
     const profile = await this.profileRepository.findOne({ where: { userId: user.id } });
-    const roleProfileId = requestedRoleProfileId || profile?.roleProfileId || this.defaultRoleProfileId(user.role);
+    const roleProfileId =
+      requestedRoleProfileId || profile?.roleProfileId || this.defaultRoleProfileId(user.role);
     if (profile && !profile.roleProfileId) {
       profile.roleProfileId = roleProfileId;
       profile.organizationId = organizationId;
@@ -188,14 +208,18 @@ export class TenantProvisioningService {
     organizationType: OrganizationType,
     configuredWorkspaces?: WorkspaceProvisioningInput[],
   ) {
-    const inputs = Array.isArray(configuredWorkspaces) && configuredWorkspaces.length
-      ? configuredWorkspaces
-      : this.defaultWorkspaceTypes(organizationType).map((type) => ({ type }));
+    const inputs =
+      Array.isArray(configuredWorkspaces) && configuredWorkspaces.length
+        ? configuredWorkspaces
+        : this.defaultWorkspaceTypes(organizationType).map((type) => ({ type }));
 
     return inputs
       .map((input) => this.normalizeWorkspaceDefault(input))
-      .filter((workspace): workspace is ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']> =>
-        Boolean(workspace),
+      .filter(
+        (
+          workspace,
+        ): workspace is ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']> =>
+          Boolean(workspace),
       );
   }
 
@@ -210,7 +234,9 @@ export class TenantProvisioningService {
       name: input.name || definition.name,
       enabledToolIds: input.enabledToolIds || settings.enabledToolIds,
       enabledModules: input.enabledModules || settings.enabledModules,
-      emergencyModeEnabled: Boolean(input.emergencyModeEnabled || [WorkspaceType.EMERGENCY, WorkspaceType.ICU].includes(type)),
+      emergencyModeEnabled: Boolean(
+        input.emergencyModeEnabled || [WorkspaceType.EMERGENCY, WorkspaceType.ICU].includes(type),
+      ),
       defaultDashboard: settings.defaultDashboard || definition.defaultDashboard,
       defaultAiAgentId: input.defaultAiAgentId || this.defaultAgentForWorkspace(type),
     };
@@ -219,7 +245,9 @@ export class TenantProvisioningService {
   private async ensureDefaultWorkspaces(
     user: User,
     organization: Organization,
-    workspaceDefaults: Array<NonNullable<ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']>>>,
+    workspaceDefaults: Array<
+      NonNullable<ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']>>
+    >,
   ) {
     const created = [];
     for (const workspace of workspaceDefaults) {
@@ -267,7 +295,9 @@ export class TenantProvisioningService {
 
   private async resolveAiAgentIds(
     roleProfileId: string,
-    workspaceDefaults: Array<NonNullable<ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']>>>,
+    workspaceDefaults: Array<
+      NonNullable<ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']>>
+    >,
     settings: Record<string, any>,
   ) {
     const ids = new Set<string>([...((settings.enabledAgentIds || []) as string[])]);
@@ -285,7 +315,9 @@ export class TenantProvisioningService {
   }
 
   private defaultDashboardLayout(
-    workspaceDefaults: Array<NonNullable<ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']>>>,
+    workspaceDefaults: Array<
+      NonNullable<ReturnType<TenantProvisioningService['normalizeWorkspaceDefault']>>
+    >,
   ) {
     return {
       primary: workspaceDefaults[0]?.id || 'command-center',
@@ -306,12 +338,23 @@ export class TenantProvisioningService {
       return [WorkspaceType.RESEARCH, WorkspaceType.EDUCATION, WorkspaceType.GOVERNANCE];
     }
     if (type === OrganizationType.UNIVERSITY || type === OrganizationType.ACADEMIC_MEDICAL_CENTER) {
-      return [WorkspaceType.EDUCATION, WorkspaceType.RESEARCH, WorkspaceType.EMERGENCY, WorkspaceType.GOVERNANCE];
+      return [
+        WorkspaceType.EDUCATION,
+        WorkspaceType.RESEARCH,
+        WorkspaceType.EMERGENCY,
+        WorkspaceType.GOVERNANCE,
+      ];
     }
     if (type === OrganizationType.CLINIC || type === OrganizationType.TELEHEALTH) {
       return [WorkspaceType.EMERGENCY, WorkspaceType.OPERATIONS];
     }
-    return [WorkspaceType.EMERGENCY, WorkspaceType.ICU, WorkspaceType.LABORATORY, WorkspaceType.OPERATIONS, WorkspaceType.GOVERNANCE];
+    return [
+      WorkspaceType.EMERGENCY,
+      WorkspaceType.ICU,
+      WorkspaceType.LABORATORY,
+      WorkspaceType.OPERATIONS,
+      WorkspaceType.GOVERNANCE,
+    ];
   }
 
   private defaultRoleProfileId(role?: UserRole) {
@@ -323,7 +366,9 @@ export class TenantProvisioningService {
 
   private defaultAgentForWorkspace(type: WorkspaceType) {
     if ([WorkspaceType.FLEET].includes(type)) return 'agent-fleet';
-    if ([WorkspaceType.OPERATIONS, WorkspaceType.MEDICAL_IOT, WorkspaceType.GOVERNANCE].includes(type)) {
+    if (
+      [WorkspaceType.OPERATIONS, WorkspaceType.MEDICAL_IOT, WorkspaceType.GOVERNANCE].includes(type)
+    ) {
       return 'agent-operations';
     }
     if ([WorkspaceType.LABORATORY].includes(type)) return 'agent-lab';

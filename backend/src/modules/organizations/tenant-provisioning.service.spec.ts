@@ -126,7 +126,13 @@ describe('TenantProvisioningService', () => {
           }),
           enabledAgentIds: expect.arrayContaining(['agent-clinical', 'agent-operations']),
           dashboardLayout: expect.objectContaining({
-            sections: expect.arrayContaining(['overview', 'workspaces', 'assets', 'integrations', 'success']),
+            sections: expect.arrayContaining([
+              'overview',
+              'workspaces',
+              'assets',
+              'integrations',
+              'success',
+            ]),
           }),
           provisioning: expect.objectContaining({ status: 'configured' }),
           tenantProfile: expect.objectContaining({

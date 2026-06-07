@@ -3858,7 +3858,7 @@ export const CLINICAL_TOOL_PATTERNS: ToolPattern[] = [
     optionalParameters: ['role', 'surface', 'incident', 'operations_context'],
     description:
       'Single operational command center combining Digital Twin, Hospital Map, Medical IoT, Fleet, Notifications, and System Health with role-based views',
-    category: 'fleet',
+    category: 'hospital-operations',
   },
 ];
 

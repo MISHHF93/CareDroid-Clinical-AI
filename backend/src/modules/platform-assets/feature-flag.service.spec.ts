@@ -23,22 +23,20 @@ describe('FeatureFlagService', () => {
       },
     };
 
-    expect(service.resolveState('ai-clinical-copilot', settings)).toBe(
-      FeatureFlagState.DISABLED,
-    );
+    expect(service.resolveState('ai-clinical-copilot', settings)).toBe(FeatureFlagState.DISABLED);
     expect(
       service.resolveState('ai-clinical-copilot', settings, { workspaceId: 'workspace-1' }),
     ).toBe(FeatureFlagState.ENABLED);
-    expect(
-      service.resolveState('ai-clinical-copilot', settings, { userRole: 'clinician' }),
-    ).toBe(FeatureFlagState.LOCKED);
+    expect(service.resolveState('ai-clinical-copilot', settings, { userRole: 'clinician' })).toBe(
+      FeatureFlagState.LOCKED,
+    );
     expect(service.resolveState('simulation-suite', settings)).toBe(FeatureFlagState.BETA);
     expect(service.resolveState('regulatory-workspace', settings)).toBe(
       FeatureFlagState.ADMIN_ONLY,
     );
-    expect(
-      service.resolveState('regulatory-workspace', settings, { includeInternal: true }),
-    ).toBe(FeatureFlagState.ENABLED);
+    expect(service.resolveState('regulatory-workspace', settings, { includeInternal: true })).toBe(
+      FeatureFlagState.ENABLED,
+    );
   });
 
   it('applies scoped flag updates and exposes a management model', () => {

@@ -722,6 +722,115 @@ export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/api/simulation/recommendations', controller: 'SimulationController' },
   { method: 'GET', path: '/api/source-provenance/:sourceId', controller: 'PlatformSystemsController' },
 
+  { method: 'GET', path: '/api/ai/organizations/:organizationId/usage', controller: 'AIController' },
+  { method: 'GET', path: '/api/asset-packs', controller: 'ProductCatalogController' },
+  { method: 'GET', path: '/api/automation-audit', controller: 'AutomationAuditController' },
+  { method: 'POST', path: '/api/automation-audit', controller: 'AutomationAuditController' },
+  { method: 'GET', path: '/api/organizations/current/engine', controller: 'OrganizationsController' },
+  { method: 'GET', path: '/api/organizations/:organizationId/engine', controller: 'OrganizationsController' },
+  {
+    method: 'GET',
+    path: '/api/organizations/:organizationId/feature-flags',
+    controller: 'OrganizationsController',
+  },
+  {
+    method: 'PATCH',
+    path: '/api/organizations/:organizationId/feature-flags',
+    controller: 'OrganizationsController',
+  },
+  {
+    method: 'PATCH',
+    path: '/api/organizations/:organizationId/settings',
+    controller: 'OrganizationsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/organizations/:organizationId/tenant-admin',
+    controller: 'OrganizationsController',
+  },
+  {
+    method: 'PATCH',
+    path: '/api/organizations/:organizationId/tenant-admin',
+    controller: 'OrganizationsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/organizations/:organizationId/value-tracking',
+    controller: 'ProductCatalogController',
+  },
+  {
+    method: 'PATCH',
+    path: '/api/organizations/:organizationId/commercial-plan',
+    controller: 'ProductCatalogController',
+  },
+  { method: 'GET', path: '/api/platform/departments', controller: 'PlatformAssetsController' },
+  {
+    method: 'GET',
+    path: '/api/platform/departments/:departmentId',
+    controller: 'PlatformAssetsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/platform/marketplace/packs',
+    controller: 'PlatformAssetsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/platform/marketplace/packs/:packId',
+    controller: 'PlatformAssetsController',
+  },
+  {
+    method: 'GET',
+    path: '/api/platform/organizations/:organizationId/customer-success',
+    controller: 'PlatformAssetsController',
+  },
+  { method: 'GET', path: '/api/platform/service-lines', controller: 'PlatformAssetsController' },
+  {
+    method: 'GET',
+    path: '/api/platform/service-lines/:serviceLineId',
+    controller: 'PlatformAssetsController',
+  },
+  { method: 'GET', path: '/api/products/builder', controller: 'ProductCatalogController' },
+  { method: 'GET', path: '/api/products/:slug/builder', controller: 'ProductCatalogController' },
+  { method: 'POST', path: '/api/solution-builder/apply', controller: 'ProductCatalogController' },
+  {
+    method: 'POST',
+    path: '/api/solution-builder/recommendations',
+    controller: 'ProductCatalogController',
+  },
+  { method: 'GET', path: '/api/subscriptions/billing', controller: 'SubscriptionsController' },
+  { method: 'GET', path: '/api/subscriptions/lifecycle', controller: 'SubscriptionsController' },
+  { method: 'GET', path: '/api/subscriptions/usage', controller: 'SubscriptionsController' },
+  {
+    method: 'GET',
+    path: '/api/subscriptions/usage/metering',
+    controller: 'SubscriptionsController',
+  },
+  { method: 'POST', path: '/api/subscriptions/downgrade', controller: 'SubscriptionsController' },
+  {
+    method: 'POST',
+    path: '/api/subscriptions/entitlements/resolve',
+    controller: 'SubscriptionsController',
+  },
+  {
+    method: 'POST',
+    path: '/api/subscriptions/trial/convert',
+    controller: 'SubscriptionsController',
+  },
+  { method: 'POST', path: '/api/subscriptions/upgrade', controller: 'SubscriptionsController' },
+  {
+    method: 'POST',
+    path: '/api/subscriptions/usage/events',
+    controller: 'SubscriptionsController',
+  },
+  { method: 'GET', path: '/api/white-label/:tenantId', controller: 'WhiteLabelController' },
+  { method: 'GET', path: '/api/workspaces/context', controller: 'WorkspacesController' },
+  {
+    method: 'GET',
+    path: '/api/workspaces/:workspaceId/context',
+    controller: 'WorkspacesController',
+  },
+
   { method: 'GET', path: '/api/metrics', controller: 'MetricsController' },
 ]);
 

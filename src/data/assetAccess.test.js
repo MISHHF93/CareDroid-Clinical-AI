@@ -63,8 +63,10 @@ describe('assetAccess', () => {
     expect(resolveAssetAccessState(tool, null, 'admin').accessState).toBe(ASSET_ACCESS_STATES.ALLOWED);
   });
 
-  it('applies canonical asset lifecycle states locally', () => {
-    expect(resolveAssetAccessState({ id: 'draft-tool', lifecycleState: 'draft' }, null, 'admin')).toEqual({
+  it('applies canonical asset lifecycle states within organization context', () => {
+    const organizationContext = { organization: { id: 'org-1' } };
+
+    expect(resolveAssetAccessState({ id: 'draft-tool', lifecycleState: 'draft' }, organizationContext, 'admin')).toEqual({
       accessState: ASSET_ACCESS_STATES.HIDDEN,
       reasons: ['draft'],
     });
@@ -76,7 +78,7 @@ describe('assetAccess', () => {
       accessState: ASSET_ACCESS_STATES.RESTRICTED,
       reasons: ['deprecated'],
     });
-    expect(resolveAssetAccessState({ id: 'archived-tool', lifecycleState: 'archived' }, null, 'admin')).toEqual({
+    expect(resolveAssetAccessState({ id: 'archived-tool', lifecycleState: 'archived' }, organizationContext, 'admin')).toEqual({
       accessState: ASSET_ACCESS_STATES.HIDDEN,
       reasons: ['archived'],
     });
@@ -207,7 +209,18 @@ describe('assetAccess', () => {
       },
     };
 
-    expect(resolveAssetAccessState(automation, null, 'student')).toEqual({
+    expect(
+      resolveAssetAccessState(
+        automation,
+        {
+          organization: { id: 'org-1' },
+          subscriptionPlan: 'institutional',
+          entitledAssetIds: ['automation-device-offline-maintenance'],
+          entitledPackIds: ['medical-iot-pack'],
+        },
+        'student'
+      )
+    ).toEqual({
       accessState: ASSET_ACCESS_STATES.HIDDEN,
       reasons: ['role-hidden'],
     });

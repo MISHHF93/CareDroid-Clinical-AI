@@ -107,14 +107,6 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
     return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: ['user-hidden'] };
   }
 
-  if (['draft', 'archived'].includes(tool.lifecycleState)) {
-    return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: [tool.lifecycleState] };
-  }
-
-  if (!hasAllowedRoleAccess(tool, userRole)) {
-    return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: ['role-hidden'] };
-  }
-
   const entitlementDecision = resolveEntitlementDecision(tool, context, userRole);
   if (!entitlementDecision.isLaunchable) {
     return {
@@ -122,6 +114,14 @@ export function resolveAssetAccessState(tool, context = getPlatformEntitlementCo
       reasons: entitlementDecision.reasons || [entitlementDecision.reason].filter(Boolean),
       decision: entitlementDecision,
     };
+  }
+
+  if (hasOrganization && !hasAllowedRoleAccess(tool, userRole)) {
+    return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: ['role-hidden'] };
+  }
+
+  if (hasOrganization && ['draft', 'archived'].includes(tool.lifecycleState)) {
+    return { accessState: ASSET_ACCESS_STATES.HIDDEN, reasons: [tool.lifecycleState] };
   }
 
   if (ADMIN_ONLY_TOOLS.has(assetId)) {

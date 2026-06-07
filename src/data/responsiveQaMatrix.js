@@ -526,6 +526,41 @@ export function buildResponsiveQaPages() {
     },
   ];
 
+  const smokeRoutePages = [
+    ['discover', 'Discover CareDroid Capabilities', '/discover', 'core'],
+    ['automation', 'Automation', '/automation', 'core'],
+    ['operations-center', 'Digital Operations Center', '/operations-center', 'operations'],
+    ['protocols', 'Protocol and Clinical Pathway Library', '/protocols', 'clinical'],
+    ['research', 'Research and Evidence Hub', '/research', 'clinical'],
+    ['documentation', 'Clinical Documentation Assistant', '/documentation', 'clinical'],
+    ['knowledge-graph', 'Clinical Knowledge Graph', '/knowledge-graph', 'clinical'],
+    ['predictive-analytics', 'Predictive Analytics Dashboard', '/predictive-analytics', 'analytics'],
+    ['clinical-decision-support', 'Clinical Decision Support Engine', '/clinical-decision-support', 'clinical'],
+    ['competencies', 'Competency Platform', '/competencies', 'simulation'],
+    ['credentials', 'Credentialing Platform', '/credentials', 'simulation'],
+    ['simulation', 'Medical Simulation Suite', '/simulation', 'simulation'],
+    ['simulation-scenario', 'Sepsis Deterioration Scenario', '/simulation/sepsis-deterioration', 'simulation'],
+    ['simulation-outcomes', 'Simulation Outcomes', '/simulation/outcomes', 'simulation'],
+    ['laboratory', 'Laboratory', '/laboratory', 'clinical'],
+    ['3d-viewer', '3D Viewer', '/3d-viewer', 'visualization'],
+    ['analytics', 'Platform Analytics', '/analytics', 'analytics'],
+    ['saas-health-enterprise', 'SaaS Health Center', '/saas-health', 'platform'],
+    ['governance-registry-enterprise', 'Platform Governance Registry', '/governance-registry', 'platform'],
+    ['feature-flags', 'Feature Flag Center', '/feature-flags', 'platform'],
+    ['plugins', 'Plugin Marketplace', '/plugins', 'platform'],
+    ['dependency-map', 'Platform Wiring Map', '/dependency-map', 'platform'],
+    ['dependency-graph', 'Asset Dependency Graph', '/dependency-graph', 'platform'],
+    ['data-lineage', 'Data Lineage Explorer', '/data-lineage', 'platform'],
+    ['self-diagnostics', 'Platform Self Diagnostics', '/self-diagnostics', 'platform'],
+  ];
+
+  const existingPaths = new Set(pages.map((page) => page.path));
+  for (const [id, label, path, category] of smokeRoutePages) {
+    if (existingPaths.has(path)) continue;
+    pages.push({ id, label, path, category });
+    existingPaths.add(path);
+  }
+
   for (const registryId of CLINICAL_TIER_A_CALCULATOR_REGISTRY_IDS) {
     const path =
       TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID[registryId] ||

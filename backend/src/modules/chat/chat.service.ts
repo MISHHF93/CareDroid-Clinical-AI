@@ -470,7 +470,10 @@ export class ChatService {
           confidence = confidenceScore.score;
         } else {
           // No RAG context, use direct AI response with tools
-          const knowledgeBasePrompt = this.buildKnowledgeBaseFirstPrompt(message, knowledgeBaseContext);
+          const knowledgeBasePrompt = this.buildKnowledgeBaseFirstPrompt(
+            message,
+            knowledgeBaseContext,
+          );
           const aiResponse = await this.aiService.invokeLLMWithTools(
             userId || 'anonymous',
             knowledgeBasePrompt || message,
@@ -487,7 +490,10 @@ export class ChatService {
         );
         ragContext = this.emptyRagContext(message, 'retrieval_failed');
 
-        const knowledgeBasePrompt = this.buildKnowledgeBaseFirstPrompt(message, knowledgeBaseContext);
+        const knowledgeBasePrompt = this.buildKnowledgeBaseFirstPrompt(
+          message,
+          knowledgeBaseContext,
+        );
         const aiResponse = await this.aiService.invokeLLMWithTools(
           userId || 'anonymous',
           knowledgeBasePrompt || message,
@@ -875,7 +881,9 @@ export class ChatService {
   }
 
   private formatKnowledgeBaseAssistantContext(knowledgeBaseContext?: Record<string, any>): string {
-    const matches = Array.isArray(knowledgeBaseContext?.matches) ? knowledgeBaseContext.matches : [];
+    const matches = Array.isArray(knowledgeBaseContext?.matches)
+      ? knowledgeBaseContext.matches
+      : [];
     if (!matches.length) {
       return '';
     }
@@ -883,9 +891,10 @@ export class ChatService {
     const articleSummaries = matches
       .slice(0, 3)
       .map((match: any, index: number) => {
-        const steps = Array.isArray(match.steps) && match.steps.length
-          ? `\nSteps: ${match.steps.slice(0, 4).join(' | ')}`
-          : '';
+        const steps =
+          Array.isArray(match.steps) && match.steps.length
+            ? `\nSteps: ${match.steps.slice(0, 4).join(' | ')}`
+            : '';
         return `[KB${index + 1}] ${match.title} (${match.category})\nSummary: ${match.summary}\nContent: ${match.content}${steps}\nRoute: ${match.route}`;
       })
       .join('\n\n');

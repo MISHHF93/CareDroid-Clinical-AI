@@ -417,8 +417,12 @@ export function AssetLibraryPage() {
             <strong>{asset.title}</strong>
             <span>{asset.description || asset.category}</span>
             <small>
-              {asset.lifecycle || asset.status}
+              {asset.lifecycle || asset.status} · {asset.execution?.label || asset.demoStatus || 'Mounted'}
               {asset.entitled === false ? ' · not entitled' : ''}
+            </small>
+            <small>
+              {(asset.productIds || []).slice(0, 2).join(', ') || 'core product'} ·{' '}
+              {(asset.packIds || []).slice(0, 2).join(', ') || 'core-platform'}
             </small>
           </article>
         ))}

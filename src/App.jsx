@@ -87,6 +87,7 @@ const DependencyMap = lazyWithRetry(() => import('./pages/DependencyMap'));
 const DependencyGraph = lazyWithRetry(() => import('./pages/DependencyGraph'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
 const Artifacts = lazyWithRetry(() => import('./pages/Artifacts'));
+const AiModelsPage = lazyWithRetry(() => import('./pages/AiModelsPage'));
 const MemoryDashboard = lazyWithRetry(() => import('./pages/MemoryDashboard'));
 const TrainingDashboard = lazyWithRetry(() => import('./pages/TrainingDashboard'));
 const AiEvaluationDashboard = lazyWithRetry(() => import('./pages/AiEvaluationDashboard'));
@@ -925,6 +926,12 @@ function AppRoutes() {
       path: '/artifacts',
       element: <Artifacts />,
       requiresAuth: true,
+    },
+    {
+      path: '/ai-models',
+      element: <AiModelsPage />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
     },
     {
       path: '/memory',

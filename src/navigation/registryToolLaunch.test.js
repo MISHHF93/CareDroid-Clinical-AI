@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, expect, vi } from 'vitest';
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 import toolRegistry from '../data/toolRegistry';
 import {
   applyRegistryToolLaunch,
@@ -19,6 +19,10 @@ import { isKnownToolAreaPath, matchCalculatorRoute } from '../routes/clinicalToo
 
 describe('registryToolLaunch', () => {
   beforeEach(() => {
+    setPlatformEntitlementContext(null);
+  });
+
+  afterEach(() => {
     setPlatformEntitlementContext(null);
   });
 
@@ -107,31 +111,36 @@ describe('registryToolLaunch', () => {
   });
 
   it('denies strict SaaS launches when org entitlements exclude the asset', () => {
-    setPlatformEntitlementContext({
+    const context = {
       organization: { id: 'org-1' },
       entitledAssetIds: ['qsofa'],
       strictSaasEntitlements: true,
-    });
+      role: 'admin',
+      effectivePermissions: ['USE_CALCULATORS'],
+    };
 
-    expect(isRegistryToolLaunchAllowed('news2')).toBe(false);
-    expect(resolveRegistryToolLaunchAccess('news2')).toMatchObject({
+    expect(isRegistryToolLaunchAllowed('news2', context)).toBe(false);
+    expect(resolveRegistryToolLaunchAccess('news2', context)).toMatchObject({
       allowed: false,
       accessState: 'locked',
     });
   });
 
   it('does not record, select, seed, or navigate to denied tools', () => {
-    setPlatformEntitlementContext({
+    const entitlementContext = {
       organization: { id: 'org-1' },
       entitledAssetIds: [],
       strictSaasEntitlements: true,
-    });
+      role: 'admin',
+      effectivePermissions: ['USE_CALCULATORS'],
+    };
     const handlers = {
       navigate: vi.fn(),
       addMessage: vi.fn(),
       selectTool: vi.fn(),
       setActiveTool: vi.fn(),
       recordToolAccess: vi.fn(),
+      entitlementContext,
     };
 
     applyRegistryToolLaunch('qsofa', handlers);
@@ -147,8 +156,9 @@ describe('registryToolLaunch', () => {
   });
 
   it('blocks deep links when platform context marks a feature subscription-required', () => {
-    setPlatformEntitlementContext({
+    const context = {
       organization: { id: 'org-1' },
+      role: 'admin',
       assetAccessDecisions: {
         'simulation-suite': {
           state: 'subscription-required',
@@ -157,10 +167,10 @@ describe('registryToolLaunch', () => {
           reason: 'subscription-required',
         },
       },
-    });
+    };
 
-    expect(isRegistryToolLaunchAllowed('simulation-suite')).toBe(false);
-    expect(resolveRegistryToolLaunchAccess('simulation-suite')).toMatchObject({
+    expect(isRegistryToolLaunchAllowed('simulation-suite', context)).toBe(false);
+    expect(resolveRegistryToolLaunchAccess('simulation-suite', context)).toMatchObject({
       allowed: false,
       accessState: 'subscription-required',
     });

@@ -43,7 +43,10 @@ describe('simulation, laboratory, and 3D viewer wiring', () => {
   it('adds simulation platform tools to dashboard quick-launch inventory groups', () => {
     const model = buildCommandDashboardModel();
     expect(model.panels.expandedCare.map((tool) => tool.id)).toEqual(
-      EXPECTED_TOOLS.map((tool) => tool.id)
+      expect.arrayContaining(EXPECTED_TOOLS.map((tool) => tool.id))
+    );
+    expect(model.panels.expandedCare.map((tool) => tool.id)).toEqual(
+      expect.arrayContaining([REGISTRY.competencyPlatform, REGISTRY.credentialingPlatform])
     );
   });
 });

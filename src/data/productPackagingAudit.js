@@ -101,7 +101,10 @@ function parseAssetPacks() {
   const constArrays = parseSeedConstArrays(seed);
   const packs = [];
   const packByAsset = new Map();
-  const section = seed.split('export const SEED_ASSET_PACKS')[1]?.split('export const DEFAULT_PACKS')[0] || '';
+  const section =
+    seed.split('const RAW_SEED_ASSET_PACKS')[1]?.split('export const SEED_ASSET_PACKS')[0] ||
+    seed.split('export const SEED_ASSET_PACKS')[1]?.split('export const DEFAULT_PACKS')[0] ||
+    '';
 
   for (const block of section.matchAll(/\{\s*id:\s*'([^']+)'([\s\S]*?)\n\s*\},/g)) {
     const id = block[1];

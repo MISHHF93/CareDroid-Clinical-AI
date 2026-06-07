@@ -42,33 +42,39 @@ export function buildEffectiveHttpPath(controllerPrefix, handlerPath, httpMethod
  * @returns {{ controller: string, method: string, path: string, file: string }[]}
  */
 export function parseControllerRoutesFromSource(source, filePath) {
-  const controllerMatch = source.match(/@Controller\(([^)]*)\)/);
-  const controllerName =
-    (controllerMatch
-      ? source.slice(controllerMatch.index).match(/export class (\w+)/)?.[1]
-      : source.match(/export class (\w+)/)?.[1]) ?? 'UnknownController';
-  let controllerPrefix = '';
-  if (controllerMatch) {
-    const arg = controllerMatch[1].trim();
-    const quoted = arg.match(/['"]([^'"]+)['"]/);
-    if (quoted) controllerPrefix = quoted[1];
-  }
-
   const routes = [];
-  const handlerRe = /@(Get|Post|Put|Patch|Delete)\(\s*(?:['"`]([^'"`]*?)['"`])?\s*\)/g;
-  let match;
-  while ((match = handlerRe.exec(source)) !== null) {
-    const httpMethod = match[1].toUpperCase();
-    const handlerPath = match[2] ?? '';
-    if (SKIP_HANDLER_PATHS.has(handlerPath)) continue;
-    if (!controllerPrefix && !handlerPath && controllerName === 'AppController') continue;
+  const controllerMatches = [...source.matchAll(/@Controller\(([^)]*)\)/g)];
+  const controllerBlocks = controllerMatches.length
+    ? controllerMatches.map((controllerMatch, index) => {
+        const start = controllerMatch.index;
+        const end = controllerMatches[index + 1]?.index ?? source.length;
+        return {
+          source: source.slice(start, end),
+          arg: controllerMatch[1],
+        };
+      })
+    : [{ source, arg: '' }];
 
-    routes.push({
-      controller: controllerName,
-      method: httpMethod,
-      path: buildEffectiveHttpPath(controllerPrefix, handlerPath, httpMethod),
-      file: filePath,
-    });
+  for (const block of controllerBlocks) {
+    const controllerName = block.source.match(/export class (\w+)/)?.[1] ?? 'UnknownController';
+    const quoted = block.arg.trim().match(/['"]([^'"]+)['"]/);
+    const controllerPrefix = quoted ? quoted[1] : '';
+
+    const handlerRe = /@(Get|Post|Put|Patch|Delete)\(\s*(?:['"`]([^'"`]*?)['"`])?\s*\)/g;
+    let match;
+    while ((match = handlerRe.exec(block.source)) !== null) {
+      const httpMethod = match[1].toUpperCase();
+      const handlerPath = match[2] ?? '';
+      if (SKIP_HANDLER_PATHS.has(handlerPath)) continue;
+      if (!controllerPrefix && !handlerPath && controllerName === 'AppController') continue;
+
+      routes.push({
+        controller: controllerName,
+        method: httpMethod,
+        path: buildEffectiveHttpPath(controllerPrefix, handlerPath, httpMethod),
+        file: filePath,
+      });
+    }
   }
   return routes;
 }

@@ -6,6 +6,7 @@ import {
   fetchArtifactVersions,
   fetchArtifacts,
 } from '../services/artifactsApi';
+import { ARTIFACT_SCHEMA_FIELDS, rowsToCsv } from '../data/artifactIntelligence';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import './Artifacts.css';
@@ -18,6 +19,28 @@ function typeLabel(type) {
   return TYPE_LABELS[type] || type;
 }
 
+function artifactId(artifact) {
+  return artifact?.artifactId || artifact?.id || '';
+}
+
+function artifactName(artifact) {
+  return artifact?.name || artifact?.title || artifactId(artifact);
+}
+
+function artifactTags(artifact) {
+  if (Array.isArray(artifact?.tags)) return artifact.tags;
+  if (typeof artifact?.tags === 'string' && artifact.tags !== 'unknown') return artifact.tags.split('|');
+  return [];
+}
+
+function artifactField(artifact, field) {
+  return artifact?.[field] || 'unknown';
+}
+
+function relationshipTargetId(relationship) {
+  return relationship.artifactId || relationship.targetArtifactId || relationship.target || '';
+}
+
 function formatDate(value) {
   if (!value) return 'Unknown';
   return new Intl.DateTimeFormat('en', {
@@ -28,13 +51,13 @@ function formatDate(value) {
 }
 
 function buildGraph(artifacts) {
-  const ids = new Set(artifacts.map((artifact) => artifact.id));
+  const ids = new Set(artifacts.map(artifactId));
   const edges = artifacts.flatMap((artifact) =>
     (artifact.relationships || [])
-      .filter((relationship) => ids.has(relationship.artifactId))
+      .filter((relationship) => ids.has(relationshipTargetId(relationship)))
       .map((relationship) => ({
-        source: artifact.id,
-        target: relationship.artifactId,
+        source: artifactId(artifact),
+        target: relationshipTargetId(relationship),
         type: relationship.type || 'related',
         label: relationship.label || relationship.type || 'related',
       }))
@@ -42,8 +65,8 @@ function buildGraph(artifacts) {
 
   return {
     nodes: artifacts.map((artifact) => ({
-      id: artifact.id,
-      title: artifact.title,
+      id: artifactId(artifact),
+      title: artifactName(artifact),
       type: artifact.type,
       version: artifact.version,
     })),
@@ -51,20 +74,51 @@ function buildGraph(artifacts) {
   };
 }
 
-function filterArtifacts(artifacts, query, type, tag) {
+function filterArtifacts(artifacts, filters) {
+  const {
+    query,
+    type,
+    tag,
+    sourceFile,
+    packProduct,
+    frontendStatus,
+    backendStatus,
+    riskLevel,
+    demoStatus,
+  } = filters;
   const normalizedQuery = query.trim().toLowerCase();
   return artifacts.filter((artifact) => {
     if (type !== 'all' && artifact.type !== type) return false;
-    if (tag !== 'all' && !(artifact.tags || []).includes(tag)) return false;
+    if (tag !== 'all' && !artifactTags(artifact).includes(tag)) return false;
+    if (sourceFile !== 'all' && artifactField(artifact, 'sourceFile') !== sourceFile) return false;
+    if (
+      packProduct !== 'all' &&
+      !`${artifactField(artifact, 'assetPack')}|${artifactField(artifact, 'product')}`
+        .split('|')
+        .includes(packProduct)
+    ) {
+      return false;
+    }
+    if (frontendStatus !== 'all' && artifactField(artifact, 'frontendStatus') !== frontendStatus) return false;
+    if (backendStatus !== 'all' && artifactField(artifact, 'backendStatus') !== backendStatus) return false;
+    if (riskLevel !== 'all' && artifactField(artifact, 'riskLevel') !== riskLevel) return false;
+    if (demoStatus !== 'all' && artifactField(artifact, 'demoStatus') !== demoStatus) return false;
     if (!normalizedQuery) return true;
 
     const searchable = [
       artifact.type,
-      artifact.title,
+      artifactName(artifact),
       artifact.description,
       artifact.version,
-      ...(artifact.tags || []),
-      ...(artifact.relationships || []).map((relationship) => relationship.artifactId),
+      artifact.sourceFile,
+      artifact.frontendStatus,
+      artifact.backendStatus,
+      artifact.demoStatus,
+      artifact.assetPack,
+      artifact.product,
+      artifact.workspace,
+      ...artifactTags(artifact),
+      ...(artifact.relationships || []).map(relationshipTargetId),
     ]
       .join(' ')
       .toLowerCase();
@@ -76,14 +130,42 @@ function currentVersionFallback(artifact) {
   if (!artifact) return [];
   return [
     {
-      id: `${artifact.id}:${artifact.version}`,
+      id: `${artifactId(artifact)}:${artifact.version || '1.0.0'}`,
       version: artifact.version,
-      title: artifact.title,
+      title: artifactName(artifact),
       description: artifact.description,
       changeSummary: 'Current catalog version',
       createdAt: artifact.createdAt,
     },
   ];
+}
+
+function canonicalizeArtifact(artifact) {
+  return Object.fromEntries(
+    ARTIFACT_SCHEMA_FIELDS.map((field) => [
+      field,
+      artifact[field] ||
+        (field === 'artifactId'
+          ? artifactId(artifact)
+          : field === 'name'
+            ? artifactName(artifact)
+            : field === 'tags'
+              ? artifactTags(artifact).join('|') || 'unknown'
+              : 'unknown'),
+    ])
+  );
+}
+
+function downloadTextFile(filename, contents, type) {
+  const blob = new Blob([contents], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }
 
 function RelationshipGraph({ artifacts, selectedId, onSelect }) {
@@ -176,6 +258,12 @@ export default function Artifacts() {
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [tagFilter, setTagFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState('all');
+  const [packProductFilter, setPackProductFilter] = useState('all');
+  const [frontendFilter, setFrontendFilter] = useState('all');
+  const [backendFilter, setBackendFilter] = useState('all');
+  const [riskFilter, setRiskFilter] = useState('all');
+  const [demoFilter, setDemoFilter] = useState('all');
   const [selectedId, setSelectedId] = useState('');
   const [versions, setVersions] = useState([]);
   const [graphMeta, setGraphMeta] = useState({ nodes: [], edges: [] });
@@ -203,9 +291,9 @@ export default function Artifacts() {
         graphResult.ok && graphResult.nodes.length > 0 ? graphResult : buildGraph(loadedArtifacts)
       );
       setSelectedId((current) =>
-        loadedArtifacts.some((artifact) => artifact.id === current)
+        loadedArtifacts.some((artifact) => artifactId(artifact) === current)
           ? current
-          : loadedArtifacts[0]?.id || ''
+          : artifactId(loadedArtifacts[0]) || ''
       );
       setNotice(catalogResult.ok ? '' : `Using local artifact catalog. ${catalogResult.message}`);
       setLoading(false);
@@ -218,13 +306,35 @@ export default function Artifacts() {
   }, []);
 
   const filteredArtifacts = useMemo(
-    () => filterArtifacts(artifacts, query, typeFilter, tagFilter),
-    [artifacts, query, typeFilter, tagFilter]
+    () =>
+      filterArtifacts(artifacts, {
+        query,
+        type: typeFilter,
+        tag: tagFilter,
+        sourceFile: sourceFilter,
+        packProduct: packProductFilter,
+        frontendStatus: frontendFilter,
+        backendStatus: backendFilter,
+        riskLevel: riskFilter,
+        demoStatus: demoFilter,
+      }),
+    [
+      artifacts,
+      query,
+      typeFilter,
+      tagFilter,
+      sourceFilter,
+      packProductFilter,
+      frontendFilter,
+      backendFilter,
+      riskFilter,
+      demoFilter,
+    ]
   );
 
   const selectedArtifact = useMemo(
     () =>
-      artifacts.find((artifact) => artifact.id === selectedId) ||
+      artifacts.find((artifact) => artifactId(artifact) === selectedId) ||
       filteredArtifacts[0] ||
       artifacts[0] ||
       null,
@@ -232,7 +342,27 @@ export default function Artifacts() {
   );
 
   const availableTags = useMemo(
-    () => [...new Set(artifacts.flatMap((artifact) => artifact.tags || []))].sort(),
+    () => [...new Set(artifacts.flatMap(artifactTags))].sort(),
+    [artifacts]
+  );
+
+  const filterOptions = useMemo(
+    () => ({
+      sourceFiles: [...new Set(artifacts.map((artifact) => artifactField(artifact, 'sourceFile')))].sort(),
+      packProducts: [
+        ...new Set(
+          artifacts.flatMap((artifact) =>
+            `${artifactField(artifact, 'assetPack')}|${artifactField(artifact, 'product')}`
+              .split('|')
+              .filter((value) => value && value !== 'unknown')
+          )
+        ),
+      ].sort(),
+      frontendStatuses: [...new Set(artifacts.map((artifact) => artifactField(artifact, 'frontendStatus')))].sort(),
+      backendStatuses: [...new Set(artifacts.map((artifact) => artifactField(artifact, 'backendStatus')))].sort(),
+      riskLevels: [...new Set(artifacts.map((artifact) => artifactField(artifact, 'riskLevel')))].sort(),
+      demoStatuses: [...new Set(artifacts.map((artifact) => artifactField(artifact, 'demoStatus')))].sort(),
+    }),
     [artifacts]
   );
 
@@ -245,7 +375,7 @@ export default function Artifacts() {
     let cancelled = false;
     setVersions(currentVersionFallback(selectedArtifact));
 
-    fetchArtifactVersions(selectedArtifact.id).then((result) => {
+    fetchArtifactVersions(artifactId(selectedArtifact)).then((result) => {
       if (cancelled) return;
       setVersions(result.ok && result.versions.length > 0 ? result.versions : currentVersionFallback(selectedArtifact));
     });
@@ -264,6 +394,24 @@ export default function Artifacts() {
     }),
     [artifacts.length, filteredArtifacts.length, graphMeta.edges.length, versions.length]
   );
+
+  const exportRows = useMemo(() => filteredArtifacts.map(canonicalizeArtifact), [filteredArtifacts]);
+
+  const handleDownloadCsv = () => {
+    downloadTextFile(
+      'caredroid_artifacts.csv',
+      rowsToCsv(exportRows, ARTIFACT_SCHEMA_FIELDS),
+      'text/csv;charset=utf-8'
+    );
+  };
+
+  const handleDownloadJson = () => {
+    downloadTextFile(
+      'caredroid_artifacts.json',
+      JSON.stringify(exportRows, null, 2),
+      'application/json;charset=utf-8'
+    );
+  };
 
   return (
     <main className="artifacts-page" aria-labelledby="artifacts-title">
@@ -316,6 +464,14 @@ export default function Artifacts() {
             placeholder="Search by title, tag, type, relationship..."
           />
         </label>
+        <div className="artifacts-downloads" aria-label="Artifact downloads">
+          <button type="button" onClick={handleDownloadCsv}>
+            Download CSV
+          </button>
+          <button type="button" onClick={handleDownloadJson}>
+            Download JSON
+          </button>
+        </div>
         <div className="artifacts-filter-row" aria-label="Filter by artifact type">
           <button
             type="button"
@@ -346,6 +502,74 @@ export default function Artifacts() {
             ))}
           </select>
         </label>
+        <div className="artifacts-select-grid">
+          <label className="artifacts-tag-filter">
+            <span>Source file</span>
+            <select value={sourceFilter} onChange={(event) => setSourceFilter(event.target.value)}>
+              <option value="all">All source files</option>
+              {filterOptions.sourceFiles.map((sourceFile) => (
+                <option key={sourceFile} value={sourceFile}>
+                  {sourceFile}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="artifacts-tag-filter">
+            <span>Pack / product</span>
+            <select value={packProductFilter} onChange={(event) => setPackProductFilter(event.target.value)}>
+              <option value="all">All packs and products</option>
+              {filterOptions.packProducts.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="artifacts-tag-filter">
+            <span>Frontend status</span>
+            <select value={frontendFilter} onChange={(event) => setFrontendFilter(event.target.value)}>
+              <option value="all">All frontend statuses</option>
+              {filterOptions.frontendStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="artifacts-tag-filter">
+            <span>Backend status</span>
+            <select value={backendFilter} onChange={(event) => setBackendFilter(event.target.value)}>
+              <option value="all">All backend statuses</option>
+              {filterOptions.backendStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="artifacts-tag-filter">
+            <span>Risk level</span>
+            <select value={riskFilter} onChange={(event) => setRiskFilter(event.target.value)}>
+              <option value="all">All risk levels</option>
+              {filterOptions.riskLevels.map((riskLevel) => (
+                <option key={riskLevel} value={riskLevel}>
+                  {riskLevel}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="artifacts-tag-filter">
+            <span>Demo/live status</span>
+            <select value={demoFilter} onChange={(event) => setDemoFilter(event.target.value)}>
+              <option value="all">All demo/live statuses</option>
+              {filterOptions.demoStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
       </section>
 
       <div className="artifacts-layout">
@@ -362,21 +586,21 @@ export default function Artifacts() {
             <div className="artifacts-card-list">
               {filteredArtifacts.map((artifact) => (
                 <button
-                  key={artifact.id}
+                  key={artifactId(artifact)}
                   type="button"
                   className={`artifacts-card${
-                    selectedArtifact?.id === artifact.id ? ' artifacts-card--selected' : ''
+                    artifactId(selectedArtifact) === artifactId(artifact) ? ' artifacts-card--selected' : ''
                   }`}
-                  onClick={() => setSelectedId(artifact.id)}
+                  onClick={() => setSelectedId(artifactId(artifact))}
                 >
                   <span className="artifacts-card__header">
                     <span className="artifacts-type">{typeLabel(artifact.type)}</span>
-                    <span className="artifacts-version">v{artifact.version}</span>
+                    <span className="artifacts-version">{artifact.version ? `v${artifact.version}` : artifactField(artifact, 'status')}</span>
                   </span>
-                  <span className="artifacts-card__title">{artifact.title}</span>
+                  <span className="artifacts-card__title">{artifactName(artifact)}</span>
                   <span className="artifacts-card__description">{artifact.description}</span>
                   <span className="artifacts-tags">
-                    {(artifact.tags || []).slice(0, 4).map((tag) => (
+                    {artifactTags(artifact).slice(0, 4).map((tag) => (
                       <span key={tag}>{tag}</span>
                     ))}
                   </span>
@@ -391,16 +615,35 @@ export default function Artifacts() {
             <>
               <div className="artifacts-detail__header">
                 <span className="artifacts-type">{typeLabel(selectedArtifact.type)}</span>
-                <strong>v{selectedArtifact.version}</strong>
+                <strong>{selectedArtifact.version ? `v${selectedArtifact.version}` : artifactField(selectedArtifact, 'status')}</strong>
               </div>
-              <h2>{selectedArtifact.title}</h2>
+              <h2>{artifactName(selectedArtifact)}</h2>
               <p>{selectedArtifact.description}</p>
               <dl className="artifacts-metadata">
                 <div>
                   <dt>ID</dt>
                   <dd>
-                    <code>{selectedArtifact.id}</code>
+                    <code>{artifactId(selectedArtifact)}</code>
                   </dd>
+                </div>
+                <div>
+                  <dt>Source</dt>
+                  <dd>{artifactField(selectedArtifact, 'sourceFile')}</dd>
+                </div>
+                <div>
+                  <dt>Pack / product</dt>
+                  <dd>{artifactField(selectedArtifact, 'assetPack')} / {artifactField(selectedArtifact, 'product')}</dd>
+                </div>
+                <div>
+                  <dt>Status</dt>
+                  <dd>
+                    {artifactField(selectedArtifact, 'frontendStatus')} / {artifactField(selectedArtifact, 'backendStatus')} /{' '}
+                    {artifactField(selectedArtifact, 'demoStatus')}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Risk</dt>
+                  <dd>{artifactField(selectedArtifact, 'riskLevel')}</dd>
                 </div>
                 <div>
                   <dt>Created</dt>
@@ -415,12 +658,12 @@ export default function Artifacts() {
                   <ul>
                     {selectedArtifact.relationships.map((relationship) => {
                       const target = artifacts.find(
-                        (artifact) => artifact.id === relationship.artifactId
+                        (artifact) => artifactId(artifact) === relationshipTargetId(relationship)
                       );
                       return (
-                        <li key={`${selectedArtifact.id}-${relationship.artifactId}`}>
-                          <button type="button" onClick={() => setSelectedId(relationship.artifactId)}>
-                            {target?.title || relationship.artifactId}
+                        <li key={`${artifactId(selectedArtifact)}-${relationshipTargetId(relationship)}`}>
+                          <button type="button" onClick={() => setSelectedId(relationshipTargetId(relationship))}>
+                            {target ? artifactName(target) : relationshipTargetId(relationship)}
                           </button>
                           <span>{relationship.label || relationship.type || 'related'}</span>
                         </li>
@@ -435,6 +678,48 @@ export default function Artifacts() {
           )}
         </aside>
       </div>
+
+      <section className="artifacts-panel" aria-labelledby="artifact-table-title">
+        <div className="artifacts-section-heading">
+          <h2 id="artifact-table-title">Artifact Table</h2>
+          <span>{filteredArtifacts.length} rows</span>
+        </div>
+        <div className="artifacts-table-wrap">
+          <table className="artifacts-table">
+            <thead>
+              <tr>
+                <th scope="col">Artifact</th>
+                <th scope="col">Type</th>
+                <th scope="col">Source</th>
+                <th scope="col">Pack / product</th>
+                <th scope="col">Frontend</th>
+                <th scope="col">Backend</th>
+                <th scope="col">Risk</th>
+                <th scope="col">Demo/live</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredArtifacts.slice(0, 80).map((artifact) => (
+                <tr key={`table-${artifactId(artifact)}`}>
+                  <td>
+                    <button type="button" onClick={() => setSelectedId(artifactId(artifact))}>
+                      {artifactName(artifact)}
+                    </button>
+                    <small>{artifactId(artifact)}</small>
+                  </td>
+                  <td>{typeLabel(artifact.type)}</td>
+                  <td>{artifactField(artifact, 'sourceFile')}</td>
+                  <td>{artifactField(artifact, 'assetPack')} / {artifactField(artifact, 'product')}</td>
+                  <td>{artifactField(artifact, 'frontendStatus')}</td>
+                  <td>{artifactField(artifact, 'backendStatus')}</td>
+                  <td>{artifactField(artifact, 'riskLevel')}</td>
+                  <td>{artifactField(artifact, 'demoStatus')}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <section className="artifacts-insight-grid">
         <div className="artifacts-panel">

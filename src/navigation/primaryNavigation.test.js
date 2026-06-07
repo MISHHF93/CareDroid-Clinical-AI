@@ -68,7 +68,7 @@ describe('primaryNavigation', () => {
       expect.arrayContaining([
         ['Solution Builder', '/solution-builder'],
         ['Value Tracking', '/value-tracking'],
-        ['Customer Success', '/customer-success'],
+        ['Success Center', '/success-center'],
       ])
     );
     expect(getPrimaryNavItemForPath('/solution-builder')?.id).toBe('solution-builder');
@@ -174,6 +174,11 @@ describe('primaryNavigation', () => {
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.id)).toEqual([
       'profile',
       'settings',
+      'customer-portal',
+      'knowledge-base',
+      'marketplace',
+      'enterprise-readiness',
+      'platform-admin',
       'tenant-admin',
       'billing',
       'notifications',

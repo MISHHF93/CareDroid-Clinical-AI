@@ -84,7 +84,8 @@
     "start:single": "npm run build:frontend && npm run backend:build && npm run backend:start",
     "plans:write-backlog": "node scripts/write-plan-implementation-backlog.mjs",
     "plans:scan-battery": "node scripts/run-plan-scan-battery.mjs",
-    "plans:write-progress": "node scripts/write-plan-progress-dashboard.mjs"
+    "plans:write-progress": "node scripts/write-plan-progress-dashboard.mjs",
+    "artifact-intelligence:generate": "node scripts/generate-artifact-intelligence.js"
   },
   "dependencies": {
     "@capacitor/android": "^5.6.0",

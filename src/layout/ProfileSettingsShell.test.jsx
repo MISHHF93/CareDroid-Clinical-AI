@@ -60,7 +60,8 @@ describe('canonical protected AppShell source-level route contract', () => {
 
   it('keeps protected shell wrapping centralized in resolveElement', () => {
     expect(appSource).toContain('if (requiresAuth) {');
-    expect(appSource).toContain('return <AppShellPage>{resolvedElement}</AppShellPage>;');
+    expect(appSource).toContain('<TenantRequired>');
+    expect(appSource).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
     expect(appSource.match(/<AppShellPage\b/g)).toHaveLength(1);
   });
 

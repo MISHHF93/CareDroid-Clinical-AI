@@ -2617,7 +2617,7 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
   {
     toolId: NLU.digitalOperationsCenter,
     toolName: 'Digital Operations Center',
-    category: 'fleet',
+    category: 'hospital-operations',
     description:
       'Single operational command center combining Digital Twin, Hospital Map, Medical IoT, Fleet, Notifications, and System Health with role-based priority views.',
     path: TOOL_LAUNCH_PATHS.operationsCenter,

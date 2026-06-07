@@ -153,6 +153,18 @@ export function getNluLaunchExpectation(nluToolId) {
     };
   }
 
+  if (nlu.path && !isCalculatorsHubPath(nlu.path) && nlu.path !== TOOL_LAUNCH_PATHS.assistant) {
+    return {
+      nluToolId,
+      kind: 'clinical-page',
+      registryId,
+      expectsDedicatedCalculatorPath: false,
+      expectsDashboardChat: false,
+      expectsChatSeed: Boolean(nlu.chatSeed),
+      allowsHubPath: false,
+    };
+  }
+
   return {
     nluToolId,
     kind: 'unknown-fallback',

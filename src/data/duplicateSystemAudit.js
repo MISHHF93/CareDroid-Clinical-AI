@@ -417,21 +417,21 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     duplicates: [
       {
         name: 'Dual registry (tools vs assets)',
-        instances: ['toolInventory.js (~291 user-facing)', 'SEED_PLATFORM_ASSETS (~59)'],
+        instances: ['toolInventory.js user-facing launch rows', 'SEED_PLATFORM_ASSETS', 'assetInventory.js mounted projection'],
         overlap: null,
-        risk: 'Pack gating incomplete for most tools',
+        risk: 'Manual projection drift if backend seed and frontend launch metadata diverge',
         action: 'wire',
         recommendation:
-          'Canonical launch: toolInventory; canonical entitlement: platform_assets. Sync seed from inventory build.',
+          'Canonical launch: toolInventory; canonical entitlement: platform_assets; canonical frontend mount: assetInventory projection.',
       },
       {
         name: 'Frontend projections',
         instances: ['assetInventory.js', 'assetAccess.js', 'assetEntitlements.js', 'buildAssetRegistry() demo'],
         overlap: null,
-        risk: 'packIds empty in assetInventory projection',
-        action: 'merge',
+        risk: 'Projection must continue to include pack/product/workspace/role metadata for every user-facing asset',
+        action: 'wire',
         recommendation:
-          'Canonical client context: UserIdentityContext + platformAssetsApi GET /api/platform/context; deprecate buildAssetRegistry().',
+          'Canonical client context: UserIdentityContext + platformAssetsApi GET /api/platform/context; assetInventory derives offline/demo metadata when backend context is unavailable.',
       },
       {
         name: 'Duplicate asset packs',
@@ -558,7 +558,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '### Top consolidation priorities',
     '',
     '1. **Routes** — Single path map in `routes.config.js`; stop duplicating in `TOOL_LAUNCH_PATHS`.',
-    '2. **Inventories** — `toolInventory.js` is the SPA launch authority; sync `platform_assets` seed from it.',
+    '2. **Inventories** — `toolInventory.js` is the SPA launch authority; `assetInventory.js` mounts it into product/pack/workspace/role metadata.',
     '3. **Workspace** — Merge three workspace models under API `enabledToolIds`; dedupe `LEGACY_TOOL_ID_ALIASES`.',
     '4. **Dashboards** — Rename `Dashboard.jsx` → `AssistantPage.jsx`; keep `CommandDashboard` as home.',
     '5. **Executors** — Backend `tool-orchestrator.registry.ts` owns ids; frontend mirrors via contract tests only.',
@@ -585,7 +585,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '| Workspace (server) | `GET/POST /api/workspaces` | localStorage-only gating |',
     '| Workspace (UX) | `src/data/workspaceArchitecture.js` via `workspace.config.js` | Duplicate CARE_WORKSPACES |',
     '| Asset entitlements | `backend/.../platform-asset-seed.data.ts` + DB | `buildAssetRegistry()` demo |',
-    '| Asset access (client) | `platformAssetsApi` + `UserIdentityContext` | Empty packIds in assetInventory |',
+    '| Asset access (client) | `platformAssetsApi` + `UserIdentityContext` + `assetInventory.js` | Empty pack/product projections |',
     '| Tool launch (client) | `toolInventory.js` + `registryToolLaunch.js` | — |',
     '| Executors | `backend/.../tool-orchestrator.registry.ts` | Extra REGISTERED lists in frontend |',
     '',

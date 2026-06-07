@@ -347,6 +347,7 @@ export default function CommandDashboard() {
       selectTool,
       setActiveTool,
       recordToolAccess,
+      context: workspaceAwarePlatformContext,
       replace: false,
     });
   };

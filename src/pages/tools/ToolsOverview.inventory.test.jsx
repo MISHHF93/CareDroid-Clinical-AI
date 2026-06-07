@@ -159,6 +159,9 @@ describe('ToolsOverview unified inventory', () => {
     const expectedLabels = [
       'All',
       'Recommended',
+      'Workspace',
+      'Organization',
+      'Permitted',
       'Calculators',
       'Diagnostics',
       'AI Workflows',
@@ -182,7 +185,7 @@ describe('ToolsOverview unified inventory', () => {
   }, 10000);
 
   it('shows a non-blank empty state for empty custom workspaces', () => {
-    mockWorkspaceValue.workspaces = [{ id: 'empty', name: 'Empty Workspace', toolIds: [] }];
+    mockWorkspaceValue.workspaces = [{ id: 'empty', name: 'Empty Workspace', toolIds: ['unknown-tool'] }];
     mockWorkspaceValue.activeWorkspaceId = 'empty';
 
     renderOverview();

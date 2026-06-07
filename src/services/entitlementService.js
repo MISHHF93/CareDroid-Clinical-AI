@@ -64,16 +64,19 @@ export function resolveEntitlementDecision(tool = {}, context = {}, userRole = '
     };
   }
 
+  const hasOrganization = Boolean(context?.organization?.id);
   const currentPlan =
     context?.subscriptionPlan ||
     context?.tenant?.subscriptionPlan ||
     context?.subscription?.tier ||
     SUBSCRIPTION_TIERS.FREE;
-  if (!subscriptionMeetsRequirement(currentPlan, rule?.requiredPlan || SUBSCRIPTION_TIERS.FREE)) {
+  if (
+    hasOrganization &&
+    !subscriptionMeetsRequirement(currentPlan, rule?.requiredPlan || SUBSCRIPTION_TIERS.FREE)
+  ) {
     return subscriptionDecision(base, 'subscription-required');
   }
 
-  const hasOrganization = Boolean(context?.organization?.id);
   const entitledAssetIds = new Set(context?.entitledAssetIds || []);
   const entitledPackIds = new Set(context?.entitledPackIds || []);
   const missingPack = rule?.requiredPackIds?.find((packId) => !entitledPackIds.has(packId));

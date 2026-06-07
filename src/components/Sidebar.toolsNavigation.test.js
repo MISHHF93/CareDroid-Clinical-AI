@@ -105,7 +105,7 @@ describe('Simplified sidebar navigation wiring', () => {
   it('keeps secondary, operations, and account destinations available outside primary nav', () => {
     expect(SECONDARY_NAV_ITEMS.map((item) => item.path)).toEqual(['/discover', '/automation']);
     expect(SOLUTIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual(
-      expect.arrayContaining(['/solution-builder', '/value-tracking', '/customer-success'])
+      expect.arrayContaining(['/solution-builder', '/value-tracking', '/success-center'])
     );
     expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual([
       '/digital-twin',
@@ -119,6 +119,11 @@ describe('Simplified sidebar navigation wiring', () => {
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.path)).toEqual([
       '/profile',
       '/settings',
+      '/customer-portal',
+      '/knowledge-base',
+      '/marketplace',
+      '/enterprise-readiness',
+      '/platform-admin',
       '/tenant-admin',
       '/billing',
       '/notifications',

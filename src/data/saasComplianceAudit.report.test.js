@@ -16,11 +16,12 @@ describe('saasComplianceAudit report', () => {
   it('builds compliance rows with violation tracking', () => {
     const rows = buildSaasComplianceRows();
     expect(rows.length).toBeGreaterThan(50);
-    const withViolations = rows.filter((r) => r.violations.length > 0);
-    expect(withViolations.length).toBeGreaterThan(0);
-    expect(rows.some((r) => r.layer === 'ai-agent' && r.violations.some((v) => v.rule === 'asset-in-pack'))).toBe(
+    expect(rows.filter((r) => r.packAssignment === '—')).toEqual([]);
+    expect(rows.filter((r) => r.governance !== 'Complete (seed template)')).toEqual([]);
+    expect(rows.some((r) => r.layer === 'ai-agent' && r.packAssignment.includes('ai-workflow-pack'))).toBe(
       true
     );
+    expect(rows.some((r) => r.assetId === 'qsofa' && r.packAssignment.includes('emergency-medicine'))).toBe(true);
   });
 
   it('writes docs/saas-compliance-audit.md when SAAS_COMPLIANCE_WRITE_DOCS=1', () => {

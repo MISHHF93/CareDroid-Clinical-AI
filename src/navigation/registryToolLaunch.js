@@ -153,8 +153,8 @@ export function getRegistryToolNavigation(toolId) {
  * }} handlers
  * @returns {RegistryToolNavigationPlan}
  */
-export function isRegistryToolLaunchAllowed(toolId) {
-  return resolveRegistryToolLaunchAccess(toolId).allowed;
+export function isRegistryToolLaunchAllowed(toolId, context) {
+  return resolveRegistryToolLaunchAccess(toolId, context).allowed;
 }
 
 export function resolveRegistryToolLaunchAccess(toolId, context = getPlatformEntitlementContext()) {
@@ -181,7 +181,11 @@ export function resolveRegistryToolLaunchAccess(toolId, context = getPlatformEnt
 }
 
 export function applyRegistryToolLaunch(toolId, handlers) {
-  const launchAccess = resolveRegistryToolLaunchAccess(toolId);
+  const hasExplicitContext = Object.prototype.hasOwnProperty.call(handlers, 'context');
+  const launchAccess = resolveRegistryToolLaunchAccess(
+    toolId,
+    hasExplicitContext ? handlers.context : handlers.entitlementContext
+  );
   if (!launchAccess.allowed) {
     handlers.navigate?.(
       {

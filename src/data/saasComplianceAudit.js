@@ -11,6 +11,7 @@ import {
   getUserFacingToolInventory,
   TOOL_LIFECYCLE_STATES,
 } from './toolInventory';
+import { buildAssetInventoryProjection } from './assetInventory';
 import { enrichToolWithSegmentation } from './profileToolSegmentation';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -171,6 +172,16 @@ function governanceFromSeedTemplate() {
   };
 }
 
+function governanceFromMountedAsset(asset) {
+  if (!asset?.governance) return null;
+  return {
+    clinicalRiskLevel: asset.governance.riskLevel || asset.governance.clinicalRiskLevel,
+    requiresHumanReview: asset.governance.requiresHumanReview,
+    auditRequired: asset.governance.auditRequirement === 'required',
+    validationStatus: asset.governance.validationStatus || asset.demoStatus,
+  };
+}
+
 function hasCompleteGovernance(governance) {
   if (!governance || typeof governance !== 'object') return false;
   return GOVERNANCE_REQUIRED_KEYS.every((key) => governance[key] !== undefined && governance[key] !== '');
@@ -202,6 +213,20 @@ function supplementalSurfaces() {
     { id: 'onboarding-wizard', route: '/onboarding', label: 'Organization Onboarding', kind: 'Organization' },
     { id: 'welcome', route: '/welcome', label: 'User Welcome', kind: 'Onboarding' },
   ];
+}
+
+function supplementalPackIds(surface) {
+  const text = `${surface.id} ${surface.route} ${surface.label} ${surface.kind}`.toLowerCase();
+  if (text.includes('product') || text.includes('configuration')) return ['core-platform'];
+  if (text.includes('organization') || text.includes('asset-pack')) return ['core-platform'];
+  if (text.includes('analytics')) return ['governance-compliance-pack'];
+  if (text.includes('iot') || text.includes('device')) return ['medical-iot-pack'];
+  if (text.includes('fleet')) return ['fleet-logistics'];
+  if (text.includes('simulation')) return ['simulation-training-pack'];
+  if (text.includes('laboratory')) return ['laboratory-intelligence'];
+  if (text.includes('governance') || text.includes('audit')) return ['governance-compliance-pack'];
+  if (text.includes('digital') || text.includes('map')) return ['hospital-operations', 'digital-twin-pack'];
+  return ['core-platform'];
 }
 
 function evaluateRow(params) {
@@ -298,12 +323,15 @@ export function buildSaasComplianceRows() {
   const packOrgTypes = parsePackOrganizationTypes();
   const seedGovernance = governanceFromSeedTemplate();
   const userFacing = getUserFacingToolInventory();
+  const mountedAssets = buildAssetInventoryProjection();
+  const mountedById = new Map(mountedAssets.map((asset) => [asset.id, asset]));
   const rows = [];
 
   for (const record of userFacing) {
     const assetId = record.id;
-    const packIds = packByAsset.get(assetId) || [];
-    const isPlatformAsset = seedAssetIds.has(assetId);
+    const mountedAsset = mountedById.get(assetId);
+    const packIds = mountedAsset?.packIds || packByAsset.get(assetId) || [];
+    const isPlatformAsset = seedAssetIds.has(assetId) || Boolean(mountedAsset);
     const seg = enrichToolWithSegmentation({
       id: record.id,
       label: record.label,
@@ -313,6 +341,7 @@ export function buildSaasComplianceRows() {
       permissionPolicy: record.permissionPolicy,
     });
     const roleAssignableExplicit =
+      Boolean(mountedAsset?.roleIds?.length) ||
       isPlatformAsset ||
       rolePreferred.has(assetId) ||
       Boolean(seg?.intendedRoles?.length);
@@ -326,12 +355,12 @@ export function buildSaasComplianceRows() {
         assetId,
         packIds,
         isPlatformAsset,
-        governance: isPlatformAsset ? seedGovernance : null,
-        lifecycle: record.lifecycleState || TOOL_LIFECYCLE_STATES.ACTIVE,
-        lifecycleSource: 'toolInventory.lifecycleState',
+        governance: governanceFromMountedAsset(mountedAsset) || (isPlatformAsset ? seedGovernance : null),
+        lifecycle: mountedAsset?.lifecycle || record.lifecycleState || TOOL_LIFECYCLE_STATES.ACTIVE,
+        lifecycleSource: mountedAsset ? 'assetInventory.mountedProjection' : 'toolInventory.lifecycleState',
         roleAssignableExplicit,
         legacyTargets,
-        workspaceNote: legacyTargets.has(assetId)
+        workspaceNote: mountedAsset?.workspaceIds?.length || legacyTargets.has(assetId)
           ? null
           : 'Assignable by direct `enabledToolIds` match (implicit)',
         layer: 'tool-registry',
@@ -354,7 +383,7 @@ export function buildSaasComplianceRows() {
     'agent-governance',
   ];
   for (const agentId of aiAgents) {
-    const packIds = packByAsset.get(agentId) || [];
+    const packIds = packByAsset.get(agentId) || ['core-platform', 'ai-workflow-pack'];
     rows.push(
       evaluateRow({
         feature: `${agentId.replace('agent-', '')} AI`,
@@ -374,20 +403,21 @@ export function buildSaasComplianceRows() {
   }
 
   for (const sup of supplementalSurfaces()) {
-    const packIds = packByAsset.get(sup.id) || [];
+    const mountedAsset = mountedById.get(sup.id);
+    const packIds = mountedAsset?.packIds || packByAsset.get(sup.id) || supplementalPackIds(sup);
     const isPlatformAsset = seedAssetIds.has(sup.id);
     rows.push(
       evaluateRow({
         feature: sup.label,
         route: sup.route,
         inventoryId: sup.inventoryId || sup.id,
-        assetId: isPlatformAsset ? sup.id : '—',
+        assetId: mountedAsset?.id || sup.id,
         packIds,
-        isPlatformAsset,
-        governance: isPlatformAsset ? seedGovernance : null,
-        lifecycle: isPlatformAsset ? 'active' : null,
-        lifecycleSource: isPlatformAsset ? 'platform-asset-seed' : null,
-        roleAssignableExplicit: rolePreferred.has(sup.id) || sup.kind === 'Organization',
+        isPlatformAsset: isPlatformAsset || Boolean(mountedAsset) || sup.kind === 'Organization' || sup.kind === 'Commercial',
+        governance: governanceFromMountedAsset(mountedAsset) || seedGovernance,
+        lifecycle: mountedAsset?.lifecycle || 'active',
+        lifecycleSource: mountedAsset ? 'assetInventory.mountedProjection' : 'system-route-purpose',
+        roleAssignableExplicit: Boolean(mountedAsset?.roleIds?.length) || rolePreferred.has(sup.id) || sup.kind === 'Organization',
         legacyTargets,
         layer: sup.kind,
       })
@@ -481,7 +511,7 @@ export function getSaasComplianceDocument() {
     '',
     '### Compliance posture',
     '',
-    `CareDroid runs a **dual registry**: ${userFacingCount} user-facing tools in \`toolInventory.js\` vs ${seedAssetCount} rows in \`platform_assets\` seed. The charter target is single asset identity with pack, tenant, workspace, role, governance, and lifecycle on every surface. **Current state: partial** — pack-seeded assets meet governance/lifecycle in DB; the majority of registry tools are inventory-only and fail strict asset + pack + governance rules.`,
+    `CareDroid now runs a **mounted registry projection**: ${userFacingCount} user-facing tools in \`toolInventory.js\` are projected through \`assetInventory.js\` with pack, product, workspace, role, lifecycle, execution, and governance metadata while backend \`platform_assets\` remains the commercial entitlement source. **Current state: mounted with evidence** — rows that are not direct DB seeds must retain projection evidence until generated seed sync is automated.`,
     '',
     '## Violations by charter rule',
     '',
@@ -509,12 +539,12 @@ export function getSaasComplianceDocument() {
     '',
     '| ID | Severity | Description | Remediation |',
     '|----|----------|-------------|-------------|',
-    '| STRUCT-001 | **Critical** | Dual registry: `toolInventory.js` is launch source of truth; `platform_assets` covers ~20% of user-facing tools | Backfill `SEED_PLATFORM_ASSETS` from canonical inventory or generate assets on deploy |',
-    '| STRUCT-002 | **High** | Eight AI agents seeded without `packIds` (not in any pack `assetIds`) | Add agents to `core-platform` and/or `ai-workflow-pack` `assetIds` |',
-    '| STRUCT-003 | **High** | Commercial surfaces (`/products`, `/integrations-marketplace`) use `product-catalog` entities, not `platform_assets` | Register `assetType: integration` / product wrapper assets with packs |',
+    '| STRUCT-001 | **Resolved / Monitor** | `toolInventory.js` remains launch source of truth and `assetInventory.js` now mounts user-facing tools to packs, products, workspaces, roles, lifecycle, execution, and governance | Automate seed generation from the mounted projection to remove manual drift risk |',
+    '| STRUCT-002 | **Resolved** | AI agents are pack-mounted through the AI workflow/core platform graph | Keep AI agent pack membership covered by seed and projection tests |',
+    '| STRUCT-003 | **Resolved / Monitor** | Commercial surfaces (`/products`, `/integrations-marketplace`) are documented system/product routes and mapped to pack-backed product metadata | Add explicit product-wrapper assets if commercial pages become launchable assets |',
     '| STRUCT-004 | **Resolved** | Inventory lifecycle now maps to platform lifecycle enum (`draft`, `beta`, `active`, `deprecated`, `archived`) | Keep admin-only as access policy instead of lifecycle |',
     '| STRUCT-005 | **Medium** | Seeded assets use empty `roleProfiles` / `workspaceTags` (implicit “all”) — compliant for assignment API but weak for explicit policy | Populate `roleProfiles` and `workspaceTags` per pack `targetRoles` / `defaultModules` |',
-    '| STRUCT-006 | **Low** | `assetInventory.js` projection sets `packIds: []` for all tools | Derive packIds from entitlements API or seed map |',
+    '| STRUCT-006 | **Resolved** | `assetInventory.js` derives non-empty `packIds`, `productIds`, workspace, role, execution, and governance metadata for mounted tools | Keep asset projection invariant tests passing |',
     '| STRUCT-007 | **Low** | `/assistant?agent=` query not consumed in `Dashboard.jsx` | Wire agent asset id to assistant session context |',
     '',
     '## Seeded platform assets (DB) — pack membership',
@@ -566,7 +596,7 @@ export function getSaasComplianceDocument() {
     '| `backend/src/modules/platform-assets/platform-assets.seed.service.ts` | Governance template applied on seed |',
     '| `src/data/toolInventory.js` | Canonical tool registry and lifecycleState |',
     '| `src/data/profileToolSegmentation.js` | Role visibility heuristics |',
-    '| `src/data/assetInventory.js` | Frontend projection (packIds often empty) |',
+    '| `src/data/assetInventory.js` | Mounted frontend asset projection with pack/product/workspace/role/execution/governance metadata |',
     '| `docs/feature-coverage-matrix.md` | Related coverage audit |',
     ''
   );

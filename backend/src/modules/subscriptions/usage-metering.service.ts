@@ -52,8 +52,7 @@ const USAGE_METERING_FRAMEWORK: UsageMeterDefinition[] = [
     eventTypes: [UsageEventType.ACTIVE_USER],
     unit: 'user',
     billingReadiness: 'future-billing-candidate',
-    description:
-      'Unique tenant users observed through usage events plus explicit seat meters.',
+    description: 'Unique tenant users observed through usage events plus explicit seat meters.',
   },
   {
     id: 'ai-requests',
@@ -351,8 +350,7 @@ export class UsageMeteringService {
         quantity: meter.value,
         billingReadiness: meter.billingReadiness,
       })),
-      note:
-        'These meters are billing-neutral usage facts. Future pricing can attach to meterId without changing feature emitters.',
+      note: 'These meters are billing-neutral usage facts. Future pricing can attach to meterId without changing feature emitters.',
     };
   }
 
@@ -494,9 +492,17 @@ export class UsageMeteringService {
     requestedMeterId?: string | null,
     metadata: Record<string, any> = {},
   ) {
-    const normalized = this.optionalString(requestedMeterId) || this.metadataString(metadata, 'meterId');
+    const normalized =
+      this.optionalString(requestedMeterId) || this.metadataString(metadata, 'meterId');
     if (normalized) return normalized;
-    if (this.metadataText({ metadata }, ['surface', 'eventType', 'workflowId', 'workflowSlug']).includes('workflow')) {
+    if (
+      this.metadataText({ metadata }, [
+        'surface',
+        'eventType',
+        'workflowId',
+        'workflowSlug',
+      ]).includes('workflow')
+    ) {
       return 'workflow-executions';
     }
     if (

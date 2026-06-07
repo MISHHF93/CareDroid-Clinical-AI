@@ -95,11 +95,12 @@ describe('Sidebar mobile render state', () => {
     expect(closeButton).toHaveAccessibleName(/close menu/i);
     const nav = container.querySelector('nav.sidebar-nav');
     expect(nav).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^dashboard$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^command center$/i })).toBeInTheDocument();
     expect(within(nav).getByRole('button', { name: /^assistant$/i })).toBeInTheDocument();
     expect(within(nav).getByRole('button', { name: /^tools$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^profile$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^settings$/i })).toBeInTheDocument();
+    expect(within(nav).getByRole('button', { name: /^operations$/i })).toBeInTheDocument();
+    expect(within(nav).queryByRole('button', { name: /^profile$/i })).not.toBeInTheDocument();
+    expect(within(nav).queryByRole('button', { name: /^settings$/i })).not.toBeInTheDocument();
     expect(within(nav).queryByRole('button', { name: /^hospital map$/i })).not.toBeInTheDocument();
     expect(within(nav).queryByRole('button', { name: /^fleet map$/i })).not.toBeInTheDocument();
   });
@@ -109,11 +110,10 @@ describe('Sidebar mobile render state', () => {
 
     const nav = screen.getByRole('navigation', { name: /primary navigation/i });
     for (const name of [
-      /^dashboard$/i,
+      /^command center$/i,
       /^assistant$/i,
       /^tools$/i,
-      /^profile$/i,
-      /^settings$/i,
+      /^operations$/i,
     ]) {
       expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
     }
@@ -125,9 +125,12 @@ describe('Sidebar mobile render state', () => {
     fireEvent.click(screen.getByRole('button', { name: /advanced/i }));
     expect(screen.queryByRole('button', { name: /^tool library$/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^calculators$/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^hospital map$/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^hospital map$/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^products$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^asset packs$/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /developer catalog/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /system health/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^security$/i })).toBeInTheDocument();
+    const advancedNav = screen.getByRole('navigation', { name: /^advanced navigation$/i });
+    expect(within(advancedNav).getByRole('button', { name: /^security$/i })).toBeInTheDocument();
   });
 });
