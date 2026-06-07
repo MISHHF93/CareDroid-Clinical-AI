@@ -99,6 +99,10 @@ export class EntitlementService {
     const rolloutState = this.featureFlagService.resolveState(
       featureFlagId,
       input.organization?.settings as Record<string, any>,
+      {
+        workspaceId: input.workspaceId,
+        userRole: input.userRole ? String(input.userRole) : null,
+      },
     );
 
     const base = {

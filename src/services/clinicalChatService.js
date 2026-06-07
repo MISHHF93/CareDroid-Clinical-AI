@@ -4,6 +4,7 @@ import {
   REGISTRY_ID_TO_ORCHESTRATOR_TOOL,
   registryIdToOrchestratorTool,
 } from '../data/clinicalCatalogWiring';
+import { buildKnowledgeBaseAssistantContext } from '../data/customerKnowledgeBase';
 
 export { REGISTRY_ID_TO_ORCHESTRATOR_TOOL };
 
@@ -37,6 +38,7 @@ export async function sendClinicalChatMessage({
     message,
     ...(tool ? { tool } : {}),
     ...(feature ? { feature } : {}),
+    knowledgeBaseContext: buildKnowledgeBaseAssistantContext(message),
     ...(workspaceContext ? { workspaceContext } : {}),
   };
   if (conversationId != null && String(conversationId).trim() !== '') {

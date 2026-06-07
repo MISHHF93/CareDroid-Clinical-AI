@@ -34,6 +34,33 @@ describe('EntitlementService', () => {
     });
   });
 
+  it('applies workspace-scoped feature flags during entitlement resolution', () => {
+    const decision = service.resolveDecisionFromContext({
+      assetId: 'dispatch-ai',
+      organization: {
+        id: 'org-1',
+        settings: {
+          featureFlagPlatform: {
+            tenantFlags: { 'fleet-command': FeatureFlagState.ENABLED },
+            workspaceFlags: {
+              'workspace-fleet': { 'fleet-command': FeatureFlagState.DISABLED },
+            },
+          },
+        },
+      },
+      workspaceId: 'workspace-fleet',
+      subscriptionPlan: SubscriptionTier.INSTITUTIONAL,
+      entitledAssetIds: ['dispatch-ai'],
+      entitledPackIds: ['fleet-logistics'],
+    });
+
+    expect(decision).toMatchObject({
+      state: EntitlementAccessState.DISABLED,
+      isLaunchable: false,
+      reason: 'feature-disabled',
+    });
+  });
+
   it('marks monetized access as subscription-required when rollout is enabled', () => {
     const decision = service.resolveDecisionFromContext({
       assetId: 'simulation-suite',

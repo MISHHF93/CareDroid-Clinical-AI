@@ -243,6 +243,22 @@ export const PlatformAssetsApi = {
     return response.json();
   },
 
+  async getFeatureFlags(organizationId) {
+    const response = await apiFetch(`/api/organizations/${organizationId}/feature-flags`);
+    if (!response.ok) throw new Error(`Feature flags failed (${response.status})`);
+    return response.json();
+  },
+
+  async updateFeatureFlag(organizationId, payload) {
+    const response = await apiFetch(`/api/organizations/${organizationId}/feature-flags`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error(`Update feature flag failed (${response.status})`);
+    return response.json();
+  },
+
   async setRoleProfile(roleProfileId) {
     const response = await apiFetch('/api/platform/me/role-profile', {
       method: 'PATCH',

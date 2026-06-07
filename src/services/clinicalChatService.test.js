@@ -172,6 +172,27 @@ describe('clinicalChatService', () => {
     expect(body.message).toBe('hi');
     expect(body.tool).toBe('drug-interactions');
     expect(body.conversationId).toBe(12);
+    expect(body.knowledgeBaseContext).toMatchObject({
+      searchedFirst: true,
+      query: 'hi',
+    });
+  });
+
+  it('sendClinicalChatMessage includes matching knowledge base articles before assistant routing', async () => {
+    apiFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ response: 'ok' }),
+    });
+
+    await sendClinicalChatMessage({
+      message: 'How do I fix tenant context access?',
+    });
+
+    const body = JSON.parse(apiFetch.mock.calls[0][1].body);
+    expect(body.knowledgeBaseContext.matches[0]).toMatchObject({
+      id: 'troubleshooting-tenant-context',
+      category: 'troubleshooting',
+    });
   });
 
   it('suggestClinicalAction posts patient context', async () => {

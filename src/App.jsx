@@ -136,6 +136,10 @@ const CustomerPortalPage = lazyWithRetry(() =>
 const SuccessCenterPage = lazyWithRetry(() =>
   import('./pages/success-center/SuccessCenterPage')
 );
+const KnowledgeBasePage = lazyWithRetry(() => import('./pages/KnowledgeBasePage'));
+const MarketplacePage = lazyWithRetry(() => import('./pages/MarketplacePage'));
+const EnterpriseReadinessPage = lazyWithRetry(() => import('./pages/EnterpriseReadinessPage'));
+const PlatformAdminPage = lazyWithRetry(() => import('./pages/PlatformAdminPage'));
 const BillingPage = lazyWithRetry(() => import('./pages/BillingPage'));
 const UsagePage = lazyWithRetry(() => import('./pages/UsagePage'));
 const {
@@ -1354,6 +1358,26 @@ function AppRoutes() {
     {
       path: '/customer-portal',
       element: <CustomerPortalPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/knowledge-base',
+      element: <KnowledgeBasePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/marketplace',
+      element: <MarketplacePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/enterprise-readiness',
+      element: <EnterpriseReadinessPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/platform-admin',
+      element: <PlatformAdminPage />,
       requiresAuth: true,
     },
     {

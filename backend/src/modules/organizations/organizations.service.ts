@@ -12,6 +12,10 @@ import { User } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
 import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
+import {
+  FeatureFlagService,
+  FeatureFlagUpdateInput,
+} from '../platform-assets/feature-flag.service';
 import { DEFAULT_PACKS_BY_ORGANIZATION_TYPE } from '../platform-assets/data/platform-asset-seed.data';
 import { OrganizationType } from '../platform-assets/enums/platform-asset.enums';
 import { IntegrationOffering } from '../product-catalog/entities/integration-offering.entity';
@@ -52,6 +56,7 @@ export class OrganizationsService {
     @InjectRepository(Product)
     private readonly productRepository: Repository<Product>,
     private readonly platformAssetsService: PlatformAssetsService,
+    @Optional() private readonly featureFlagService?: FeatureFlagService,
     @Optional() private readonly tenantProvisioningService?: TenantProvisioningService,
   ) {}
 
@@ -444,6 +449,54 @@ export class OrganizationsService {
     return this.getTenantAdministration(user, organizationId);
   }
 
+  async getFeatureFlagAdministration(user: User, organizationId: string) {
+    await this.assertMember(user.id, organizationId);
+    const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    if (!org) throw new NotFoundException('Organization not found');
+    const roleProfiles = await this.platformAssetsService.listRoleProfiles().catch(() => []);
+    return this.getFeatureFlagService().buildManagementModel({
+      organizationId,
+      organizationName: org.name,
+      settings: org.settings as Record<string, any>,
+      workspaceDefaults: Array.isArray((org.settings as Record<string, any>)?.workspaceDefaults)
+        ? (org.settings as Record<string, any>).workspaceDefaults
+        : [],
+      roleProfiles,
+    });
+  }
+
+  async updateFeatureFlagAdministration(
+    user: User,
+    organizationId: string,
+    update: FeatureFlagUpdateInput,
+  ) {
+    await this.assertAdmin(user.id, organizationId);
+    const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    if (!org) throw new NotFoundException('Organization not found');
+
+    const currentSettings = (org.settings || {}) as Record<string, any>;
+    let featureFlagPlatform: Record<string, any>;
+    try {
+      featureFlagPlatform = this.getFeatureFlagService().applyUpdate(currentSettings, {
+        ...update,
+        updatedBy: user.id,
+      });
+    } catch (error) {
+      throw new BadRequestException(
+        error instanceof Error ? error.message : 'Feature flag update failed',
+      );
+    }
+
+    org.settings = {
+      ...currentSettings,
+      featureFlagPlatform,
+      featureFlags: featureFlagPlatform,
+      featureFlagOverrides: featureFlagPlatform.tenantFlags,
+    };
+    await this.organizationRepository.save(org);
+    return this.getFeatureFlagAdministration(user, organizationId);
+  }
+
   async requestIntegration(user: User, organizationId: string, integrationSlug: string) {
     await this.assertAdmin(user.id, organizationId);
     const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
@@ -473,6 +526,10 @@ export class OrganizationsService {
 
   private isRecord(value: unknown): value is Record<string, unknown> {
     return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+  }
+
+  private getFeatureFlagService() {
+    return this.featureFlagService || new FeatureFlagService();
   }
 
   private async assertMember(userId: string, organizationId: string) {

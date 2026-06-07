@@ -1,7 +1,9 @@
 import { Test } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { PlatformAssetsService } from '../platform-assets/platform-assets.service';
+import { FeatureFlagService } from '../platform-assets/feature-flag.service';
 import { OrganizationType } from '../platform-assets/enums/platform-asset.enums';
+import { FeatureFlagState } from '../../config/featureFlags.config';
 import { IntegrationOffering } from '../product-catalog/entities/integration-offering.entity';
 import { Product } from '../product-catalog/entities/product.entity';
 import { IntegrationStatus } from '../product-catalog/enums/product-catalog.enums';
@@ -99,6 +101,7 @@ describe('OrganizationsService', () => {
         { provide: getRepositoryToken(IntegrationOffering), useValue: integrationRepository },
         { provide: getRepositoryToken(Product), useValue: productRepository },
         { provide: PlatformAssetsService, useValue: platformAssetsService },
+        FeatureFlagService,
       ],
     }).compile();
 
@@ -404,6 +407,65 @@ describe('OrganizationsService', () => {
           subscription: { tier: SubscriptionTier.ENTERPRISE, status: SubscriptionStatus.ACTIVE },
         }),
       }),
+    );
+  });
+
+  it('returns and updates organization scoped feature flags', async () => {
+    const flagOrg = {
+      ...org,
+      settings: {
+        ...(org.settings as Record<string, unknown>),
+        featureFlagPlatform: {
+          tenantFlags: { 'ai-clinical-copilot': FeatureFlagState.ENABLED },
+          workspaceFlags: {},
+          roleFlags: {},
+          betaFlags: {},
+          internalFlags: {},
+        },
+      },
+    } as Organization;
+    organizationRepository.findOne.mockResolvedValue(flagOrg);
+
+    const initial = await service.getFeatureFlagAdministration(user, 'org-1');
+    expect(initial.supportedScopes).toEqual(
+      expect.arrayContaining(['tenant', 'workspace', 'role', 'beta', 'internal']),
+    );
+    expect(initial.flags).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'ai-clinical-copilot',
+          scopes: expect.objectContaining({ tenant: FeatureFlagState.ENABLED }),
+        }),
+      ]),
+    );
+
+    const updated = await service.updateFeatureFlagAdministration(user, 'org-1', {
+      scope: 'role',
+      flagId: 'ai-clinical-copilot',
+      state: FeatureFlagState.DISABLED,
+      role: 'owner',
+    });
+
+    expect(organizationRepository.save).toHaveBeenCalledWith(
+      expect.objectContaining({
+        settings: expect.objectContaining({
+          featureFlagPlatform: expect.objectContaining({
+            roleFlags: {
+              owner: { 'ai-clinical-copilot': FeatureFlagState.DISABLED },
+            },
+          }),
+        }),
+      }),
+    );
+    expect(updated.flags).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'ai-clinical-copilot',
+          scopes: expect.objectContaining({
+            roles: expect.objectContaining({ owner: FeatureFlagState.DISABLED }),
+          }),
+        }),
+      ]),
     );
   });
 });

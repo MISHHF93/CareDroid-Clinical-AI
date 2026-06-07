@@ -58,6 +58,108 @@
   padding: 0 16px;
 }
 
+.feature-flag-tenant,
+.feature-flag-status,
+.feature-flag-scope-panel {
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  background: var(--app-surface-1);
+}
+
+.feature-flag-tenant {
+  flex: 0 1 280px;
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+}
+
+.feature-flag-tenant span,
+.feature-flag-scope-panel label {
+  color: var(--text-secondary);
+  font-size: var(--font-12, 12px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.feature-flag-tenant strong {
+  color: var(--text-primary);
+}
+
+.feature-flag-status {
+  padding: 14px 16px;
+}
+
+.feature-flag-status p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.feature-flag-status [role='alert'] {
+  color: var(--app-danger, #dc2626);
+}
+
+.feature-flag-scope-panel {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.feature-flag-scope-panel h2 {
+  margin: 0 0 4px;
+  color: var(--text-primary);
+}
+
+.feature-flag-scope-panel p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.feature-flag-scope-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 10px;
+}
+
+.feature-flag-scope-buttons button {
+  display: grid;
+  gap: 4px;
+  min-height: 82px;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  background: var(--panel-background);
+  color: var(--text-primary);
+  padding: 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.feature-flag-scope-buttons button.active {
+  border-color: var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--app-accent-interactive) 12%, transparent);
+}
+
+.feature-flag-scope-buttons span {
+  color: var(--text-secondary);
+  font-size: var(--font-12, 12px);
+  line-height: 1.4;
+}
+
+.feature-flag-scope-panel label {
+  display: grid;
+  gap: 8px;
+  max-width: 360px;
+}
+
+.feature-flag-scope-panel select {
+  min-height: 40px;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  background: var(--panel-background);
+  color: var(--text-primary);
+  padding: 0 10px;
+}
+
 .feature-flag-summary {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 150px), 1fr));
@@ -214,6 +316,11 @@
   border-color: var(--app-accent-interactive);
   background: color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
   color: var(--app-accent-interactive);
+}
+
+.feature-flag-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
 }
 
 @media (max-width: 720px) {

@@ -1,60 +1,107 @@
-import { beforeEach, describe, expect, it } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import FeatureFlagCenter from './FeatureFlagCenter';
+import { PlatformAssetsApi } from '../services/platformAssetsApi';
+
+const refreshPlatformContext = vi.fn();
+
+vi.mock('../contexts/TenantContext', () => ({
+  useTenantContext: () => ({
+    tenantContext: {
+      organizationId: 'org-1',
+      organizationName: 'Demo Hospital',
+    },
+  }),
+}));
+
+vi.mock('../contexts/UserContext', () => ({
+  Permission: {
+    CONFIGURE_SYSTEM: 'CONFIGURE_SYSTEM',
+  },
+  useUser: () => ({
+    hasPermission: (permission) => permission === 'CONFIGURE_SYSTEM',
+  }),
+}));
+
+vi.mock('../contexts/UserIdentityContext', () => ({
+  useUserIdentity: () => ({
+    platformContext: { organization: { id: 'org-1' } },
+    refreshPlatformContext,
+  }),
+}));
+
+vi.mock('../services/platformAssetsApi', () => ({
+  PlatformAssetsApi: {
+    getFeatureFlags: vi.fn(),
+    updateFeatureFlag: vi.fn(),
+  },
+}));
+
+function buildFlagModel(state = 'enabled') {
+  return {
+    organizationId: 'org-1',
+    organizationName: 'Demo Hospital',
+    supportedScopes: ['tenant', 'workspace', 'role', 'beta', 'internal'],
+    workspaces: [{ id: 'emergency', name: 'Emergency' }],
+    roles: ['owner', 'admin'],
+    flags: [
+      {
+        id: 'ai-clinical-copilot',
+        name: 'AI Clinical Copilot',
+        category: 'AI',
+        defaultState: 'enabled',
+        state,
+        owner: 'Clinical AI',
+        route: '/assistant',
+        description: 'Assistant rollout.',
+        rolloutNotes: 'Default-on for authenticated users.',
+        assetIds: ['assistant'],
+        scopes: {
+          tenant: state,
+          beta: null,
+          internal: null,
+          workspaces: {},
+          roles: {},
+        },
+      },
+    ],
+  };
+}
 
 describe('FeatureFlagCenter', () => {
   beforeEach(() => {
-    localStorage.clear();
+    vi.clearAllMocks();
+    PlatformAssetsApi.getFeatureFlags.mockResolvedValue(buildFlagModel());
+    PlatformAssetsApi.updateFeatureFlag.mockResolvedValue(buildFlagModel('disabled'));
   });
 
-  it('renders rollout controls for all requested categories and states', () => {
+  it('loads tenant feature flags and updates a scoped flag without deployment', async () => {
     render(<FeatureFlagCenter />);
 
-    expect(screen.getByRole('heading', { level: 1, name: /feature flag center/i })).toBeInTheDocument();
-    for (const category of ['AI', 'Tools', 'Calculators', 'Simulation', 'Maps', 'Fleet', 'IoT', 'Governance']) {
-      expect(screen.getByRole('heading', { name: category })).toBeInTheDocument();
-    }
-    for (const state of ['Enabled', 'Disabled', 'Beta', 'Experimental', 'Locked', 'Subscription required', 'Admin only']) {
-      expect(screen.getAllByRole('button', { name: state }).length).toBeGreaterThan(0);
-    }
-    expect(screen.getByText(/feature flags control rollout posture/i)).toBeInTheDocument();
-  });
+    expect(
+      await screen.findByRole('heading', { level: 1, name: /feature flag center/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByText('Demo Hospital')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /tenant flags/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /workspace flags/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /role flags/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /beta flags/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /internal flags/i })).toBeInTheDocument();
 
-  it('updates and persists a feature flag override without changing code defaults', () => {
-    render(<FeatureFlagCenter />);
+    const card = screen.getByRole('heading', { name: 'AI Clinical Copilot' }).closest('.feature-flag-card');
+    await userEvent.click(within(card).getByRole('button', { name: 'Disabled' }));
 
-    const controls = screen.getByLabelText(/AI Clinical Copilot rollout controls/i);
-    fireEvent.click(within(controls).getByRole('button', { name: /disabled/i }));
-
-    expect(within(controls).getByRole('button', { name: /disabled/i })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    );
-    expect(JSON.parse(localStorage.getItem('careDroid.featureFlagOverrides.v1'))).toMatchObject({
-      'ai-clinical-copilot': 'disabled',
+    await waitFor(() => {
+      expect(PlatformAssetsApi.updateFeatureFlag).toHaveBeenCalledWith(
+        'org-1',
+        expect.objectContaining({
+          scope: 'tenant',
+          flagId: 'ai-clinical-copilot',
+          state: 'disabled',
+        }),
+      );
     });
-  });
-
-  it('can reset runtime overrides back to registry defaults', () => {
-    localStorage.setItem(
-      'careDroid.featureFlagOverrides.v1',
-      JSON.stringify({ 'ai-clinical-copilot': 'locked' })
-    );
-
-    render(<FeatureFlagCenter />);
-
-    const controls = screen.getByLabelText(/AI Clinical Copilot rollout controls/i);
-    expect(within(controls).getByRole('button', { name: /locked/i })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: /reset to defaults/i }));
-
-    expect(localStorage.getItem('careDroid.featureFlagOverrides.v1')).toBeNull();
-    expect(within(controls).getByRole('button', { name: /^enabled$/i })).toHaveAttribute(
-      'aria-pressed',
-      'true'
-    );
+    expect(refreshPlatformContext).toHaveBeenCalled();
   });
 });

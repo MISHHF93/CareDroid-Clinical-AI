@@ -31,6 +31,10 @@ describe('App clinical-intelligence route permissions', () => {
     '/profile',
     '/organization',
     '/customer-portal',
+    '/knowledge-base',
+    '/marketplace',
+    '/enterprise-readiness',
+    '/platform-admin',
     '/success-center',
   ])(
     '%s is an authenticated tenant-gated route',

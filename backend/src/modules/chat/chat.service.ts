@@ -123,6 +123,7 @@ export class ChatService {
     conversationId?: number,
     userId?: string,
     userRole?: string,
+    knowledgeBaseContext?: Record<string, any>,
   ): Promise<QueryResponse> {
     this.logger.log(`💬 Processing chat message: "${message}"`);
     const startedAt = Date.now();
@@ -237,10 +238,12 @@ export class ChatService {
       ...this.aiContextManager.toModelContext(contextPacket),
       costOptimization,
       memoryContext,
+      knowledgeBaseContext,
     };
     const integrationMetadata = {
       costOptimization,
       memoryContext,
+      knowledgeBaseContext,
       platformGovernance: governanceDecision,
     };
     await this.aiGateway.logRoutingAudit({
@@ -311,6 +314,7 @@ export class ChatService {
       feature,
       conversationId,
       intentClassification: classification,
+      knowledgeBaseContext,
       aiFoundation: modelFoundationContext,
     };
 
@@ -426,9 +430,13 @@ export class ChatService {
           const retrievedContext =
             ragContext.contextText ||
             ragContext.chunks.map((chunk, i) => `[${i + 1}] ${chunk.text}`).join('\n\n');
+          const knowledgeBasePromptContext =
+            this.formatKnowledgeBaseAssistantContext(knowledgeBaseContext);
 
           const prompt = buildClinicalQueryPrompt({
-            retrievedContext,
+            retrievedContext: knowledgeBasePromptContext
+              ? `${knowledgeBasePromptContext}\n\n${retrievedContext}`
+              : retrievedContext,
             sources: ragContext.sources,
             userQuery: message,
             confidence: ragContext.confidence,
@@ -462,9 +470,10 @@ export class ChatService {
           confidence = confidenceScore.score;
         } else {
           // No RAG context, use direct AI response with tools
+          const knowledgeBasePrompt = this.buildKnowledgeBaseFirstPrompt(message, knowledgeBaseContext);
           const aiResponse = await this.aiService.invokeLLMWithTools(
             userId || 'anonymous',
-            message,
+            knowledgeBasePrompt || message,
             [],
             context,
           );
@@ -478,9 +487,10 @@ export class ChatService {
         );
         ragContext = this.emptyRagContext(message, 'retrieval_failed');
 
+        const knowledgeBasePrompt = this.buildKnowledgeBaseFirstPrompt(message, knowledgeBaseContext);
         const aiResponse = await this.aiService.invokeLLMWithTools(
           userId || 'anonymous',
-          message,
+          knowledgeBasePrompt || message,
           [],
           context,
         );
@@ -862,6 +872,36 @@ export class ChatService {
   private compactArtifactTitle(value: string): string {
     const title = this.compactAssistantText(value, 96);
     return title || 'Assistant AI output';
+  }
+
+  private formatKnowledgeBaseAssistantContext(knowledgeBaseContext?: Record<string, any>): string {
+    const matches = Array.isArray(knowledgeBaseContext?.matches) ? knowledgeBaseContext.matches : [];
+    if (!matches.length) {
+      return '';
+    }
+
+    const articleSummaries = matches
+      .slice(0, 3)
+      .map((match: any, index: number) => {
+        const steps = Array.isArray(match.steps) && match.steps.length
+          ? `\nSteps: ${match.steps.slice(0, 4).join(' | ')}`
+          : '';
+        return `[KB${index + 1}] ${match.title} (${match.category})\nSummary: ${match.summary}\nContent: ${match.content}${steps}\nRoute: ${match.route}`;
+      })
+      .join('\n\n');
+
+    return `Customer Knowledge Base was searched first. Use these customer-training articles before broader knowledge when relevant:\n\n${articleSummaries}`;
+  }
+
+  private buildKnowledgeBaseFirstPrompt(
+    message: string,
+    knowledgeBaseContext?: Record<string, any>,
+  ): string {
+    const context = this.formatKnowledgeBaseAssistantContext(knowledgeBaseContext);
+    if (!context) {
+      return '';
+    }
+    return `${context}\n\nCustomer question:\n${message}`;
   }
 
   private emptyRagContext(query: string, reason: string): RAGContext {

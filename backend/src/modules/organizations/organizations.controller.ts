@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Permission } from '../auth/enums/permission.enum';
 import { OrganizationOnboardingDto } from '../product-catalog/dto/organization-onboarding.dto';
 import { TenantIsolationGuard } from '../tenant-context/tenant-isolation.guard';
 import { OrganizationScoped, SkipTenantIsolation } from '../tenant-context/tenant-scope.decorator';
@@ -100,6 +101,30 @@ export class OrganizationsController {
   ) {
     this.assertTenantOrganization(req, organizationId);
     return this.organizationsService.updateTenantAdministration(req.user, organizationId, dto);
+  }
+
+  @Get(':organizationId/feature-flags')
+  @OrganizationScoped()
+  @ApiOperation({ summary: 'Get tenant-scoped feature flag rollout controls' })
+  async getFeatureFlags(@Req() req: any, @Param('organizationId') organizationId: string) {
+    this.assertTenantOrganization(req, organizationId);
+    return this.organizationsService.getFeatureFlagAdministration(req.user, organizationId);
+  }
+
+  @Patch(':organizationId/feature-flags')
+  @OrganizationScoped({ admin: 'organization', permissions: [Permission.CONFIGURE_SYSTEM] })
+  @ApiOperation({ summary: 'Update a tenant, workspace, role, beta, or internal feature flag' })
+  async updateFeatureFlags(
+    @Req() req: any,
+    @Param('organizationId') organizationId: string,
+    @Body() dto: Record<string, unknown>,
+  ) {
+    this.assertTenantOrganization(req, organizationId);
+    return this.organizationsService.updateFeatureFlagAdministration(
+      req.user,
+      organizationId,
+      dto as any,
+    );
   }
 
   @Patch(':organizationId')

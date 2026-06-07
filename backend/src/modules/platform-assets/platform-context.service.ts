@@ -86,6 +86,7 @@ export class PlatformContextService {
           asset,
           organization,
           organizationId: organization?.id,
+          workspaceId: activeWorkspace?.id,
           userRole: membership?.role,
           subscriptionPlan: user.subscription?.tier,
           subscriptionLifecycleState: normalizeLifecycleState(user.subscription),
