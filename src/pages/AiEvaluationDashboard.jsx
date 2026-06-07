@@ -17,6 +17,12 @@ import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './AiEvaluationDashboard.css';
 
 const LOWER_IS_BETTER = new Set(['hallucinationRate', 'latencyMs', 'costUsd']);
+const COMPARISON_DIMENSIONS = [
+  { id: 'models', label: 'Models' },
+  { id: 'prompts', label: 'Prompts' },
+  { id: 'agents', label: 'Agents' },
+  { id: 'ragStrategies', label: 'RAG strategies' },
+];
 
 function formatMetric(metricId, value) {
   const metric = EVALUATION_METRICS.find((item) => item.id === metricId);
@@ -41,9 +47,11 @@ function metricHint(metricId, benchmark) {
 function toTrendRows(trends = []) {
   return trends.map((point) => ({
     label: point.label,
+    modelQuality: Math.round(Number(point.metrics?.modelQuality || 0) * 100),
     accuracy: Math.round(Number(point.metrics?.accuracy || 0) * 100),
     hallucinationRate: Math.round(Number(point.metrics?.hallucinationRate || 0) * 100),
     retrievalPrecision: Math.round(Number(point.metrics?.retrievalPrecision || 0) * 100),
+    workflowSuccess: Math.round(Number(point.metrics?.workflowSuccess || 0) * 100),
     latencyMs: Math.round(Number(point.metrics?.latencyMs || 0)),
     costUsd: Number(point.metrics?.costUsd || 0),
   }));
@@ -51,9 +59,11 @@ function toTrendRows(trends = []) {
 
 function toQualityBars(metrics = {}) {
   return [
+    { name: 'Quality', value: Math.round(Number(metrics.modelQuality || 0) * 100) },
     { name: 'Accuracy', value: Math.round(Number(metrics.accuracy || 0) * 100) },
     { name: 'Retrieval', value: Math.round(Number(metrics.retrievalPrecision || 0) * 100) },
     { name: 'Tools', value: Math.round(Number(metrics.toolExecutionSuccess || 0) * 100) },
+    { name: 'Workflow', value: Math.round(Number(metrics.workflowSuccess || 0) * 100) },
     { name: 'Satisfaction', value: Math.round((Number(metrics.userSatisfaction || 0) / 5) * 100) },
   ];
 }
@@ -73,6 +83,46 @@ function BenchmarkCard({ benchmark }) {
         <span>{benchmark.benchmarkLabel}</span>
       </div>
       <p>{benchmark.observedLabel}</p>
+    </article>
+  );
+}
+
+function ComparisonCard({ row }) {
+  return (
+    <article className="ai-evaluation-comparison-card">
+      <div>
+        <strong>{row.label}</strong>
+        <span>
+          {row.runCount} runs - {row.sampleCount} cases
+        </span>
+      </div>
+      <dl>
+        <div>
+          <dt>Quality</dt>
+          <dd>{formatMetric('modelQuality', row.metrics?.modelQuality)}</dd>
+        </div>
+        <div>
+          <dt>Hallucination</dt>
+          <dd>{formatMetric('hallucinationRate', row.metrics?.hallucinationRate)}</dd>
+        </div>
+        <div>
+          <dt>Tools</dt>
+          <dd>{formatMetric('toolExecutionSuccess', row.metrics?.toolExecutionSuccess)}</dd>
+        </div>
+        <div>
+          <dt>Workflow</dt>
+          <dd>{formatMetric('workflowSuccess', row.metrics?.workflowSuccess)}</dd>
+        </div>
+        <div>
+          <dt>Latency</dt>
+          <dd>{formatMetric('latencyMs', row.metrics?.latencyMs)}</dd>
+        </div>
+        <div>
+          <dt>Cost</dt>
+          <dd>{formatMetric('costUsd', row.metrics?.costUsd)}</dd>
+        </div>
+      </dl>
+      <small>{Math.round(Number(row.benchmarkPassRate || 0) * 100)}% benchmark pass rate</small>
     </article>
   );
 }
@@ -102,6 +152,7 @@ export default function AiEvaluationDashboard() {
 
   const metrics = dashboard.aggregateMetrics || LOCAL_EVALUATION_DASHBOARD.aggregateMetrics;
   const benchmarks = dashboard.benchmarks || LOCAL_EVALUATION_DASHBOARD.benchmarks;
+  const comparisons = dashboard.comparisons || LOCAL_EVALUATION_DASHBOARD.comparisons || {};
   const benchmarkById = useMemo(
     () => Object.fromEntries(benchmarks.map((benchmark) => [benchmark.id, benchmark])),
     [benchmarks]
@@ -119,10 +170,10 @@ export default function AiEvaluationDashboard() {
         </div>
         <div>
           <p className="ai-evaluation-eyebrow">AI evaluation framework</p>
-          <h1 id="ai-evaluation-title">AI Evaluation</h1>
+            <h1 id="ai-evaluation-title">AI Evaluation Lab</h1>
           <p>
-            Track model quality, retrieval quality, tool execution, user satisfaction, latency, and
-            cost against release benchmarks.
+            Track model quality, hallucination rate, tool-call success, workflow success, latency,
+            and cost, then compare models, prompts, agents, and RAG strategies.
           </p>
         </div>
         <div className="ai-evaluation-hero__status">
@@ -158,11 +209,11 @@ export default function AiEvaluationDashboard() {
 
       <section className="dashboard-visual-grid" aria-label="AI evaluation charts and trends">
         <VisualizationPanel
-          title="Accuracy Trend"
-          description="Correct clinical answers across recent evaluation runs."
+          title="Model Quality Trend"
+          description="Composite model quality across recent evaluation runs."
           badge="Quality"
         >
-          <TrendChart data={trendRows} title="Accuracy trend" dataKey="accuracy" />
+          <TrendChart data={trendRows} title="Model quality trend" dataKey="modelQuality" />
         </VisualizationPanel>
 
         <VisualizationPanel
@@ -199,6 +250,27 @@ export default function AiEvaluationDashboard() {
         </VisualizationPanel>
       </section>
 
+      <section className="ai-evaluation-comparison-panel" aria-labelledby="ai-evaluation-comparisons-title">
+        <div className="ai-evaluation-section-heading">
+          <div>
+            <h2 id="ai-evaluation-comparisons-title">Comparison Lab</h2>
+            <p>Compare models, prompts, agents, and RAG strategies with the same benchmark metrics.</p>
+          </div>
+        </div>
+        <div className="ai-evaluation-comparison-grid">
+          {COMPARISON_DIMENSIONS.map((dimension) => (
+            <section key={dimension.id} aria-label={`${dimension.label} comparison`}>
+              <h3>{dimension.label}</h3>
+              <div className="ai-evaluation-comparison-list">
+                {(comparisons[dimension.id] || []).slice(0, 3).map((row) => (
+                  <ComparisonCard key={row.id} row={row} />
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </section>
+
       <section className="ai-evaluation-benchmark-panel" aria-labelledby="ai-evaluation-benchmarks-title">
         <div className="ai-evaluation-section-heading">
           <div>
@@ -229,7 +301,11 @@ export default function AiEvaluationDashboard() {
                 {run.datasetName} - {run.sampleCount} cases
               </span>
               <small>
-                {formatMetric('accuracy', run.metrics?.accuracy)} accuracy -{' '}
+                {run.promptName || 'Prompt unspecified'} - {run.agentName || 'Agent unspecified'} -{' '}
+                {run.ragStrategy || 'RAG unspecified'}
+              </small>
+              <small>
+                {formatMetric('modelQuality', run.metrics?.modelQuality)} quality -{' '}
                 {formatMetric('costUsd', run.metrics?.costUsd)} cost
               </small>
             </article>

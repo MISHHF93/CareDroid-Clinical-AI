@@ -20,6 +20,11 @@ import analyticsService from '../services/analyticsService';
 import { validateClinicalTool } from '../services/clinicalToolsApi';
 import { executeClinicalTool } from '../services/clinicalOrchestratorApi';
 import { buildUserToolProfile } from '../data/profileToolSegmentation';
+import { buildRoleIntelligenceProfile } from '../data/roleIntelligenceLayer';
+import {
+  trackRoleAiRequest,
+  trackRoleWorkflowLaunch,
+} from '../services/roleIntelligenceTelemetry';
 import {
   CHAT_SENSITIVE_CONFIRMATIONS,
   getChatCapabilitySuggestions,
@@ -159,6 +164,7 @@ function Dashboard() {
     preferences,
     recordActivity,
     platformContext,
+    memoryFabricContext,
   } = useUserIdentity();
   const {
     activeWorkspace: workspaceContextActive,
@@ -235,6 +241,7 @@ function Dashboard() {
   }, [scrollToConversationEnd]);
 
   const panelRegistryId = searchParams.get('tool');
+  const selectedAgentId = searchParams.get('agent');
   const calcFromUrl = searchParams.get('calc');
   const isChatMode = location.pathname === '/chat' || location.pathname === '/assistant';
   const selectedToolEntry = selectedTool ? getToolById(selectedTool) : null;
@@ -265,6 +272,30 @@ function Dashboard() {
       workspaceState?.activeWorkspaceId,
       workspaceState?.effectivePermissions,
       workspaceContextActive?.id,
+    ]
+  );
+  const roleIntelligenceProfile = useMemo(
+    () =>
+      buildRoleIntelligenceProfile({
+        account,
+        user,
+        preferences,
+        activeWorkspace,
+        workspaceState,
+        toolPreferences,
+        permissions: workspaceState?.effectivePermissions || [],
+        profile: assistantProfileContext,
+        platformContext,
+      }),
+    [
+      account,
+      activeWorkspace,
+      assistantProfileContext,
+      platformContext,
+      preferences,
+      toolPreferences,
+      user,
+      workspaceState,
     ]
   );
   const organizationAwareChatTools = useMemo(() => {
@@ -392,12 +423,23 @@ function Dashboard() {
       setActiveTool,
       recordToolAccess,
       replace: true,
+      roleIntelligenceProfile,
     });
 
     if (plan.mode === 'chat-assisted') {
       navigate({ pathname: '/assistant', search: '' }, { replace: true });
     }
-  }, [panelRegistryId, calcFromUrl, navigate, setActiveTool, recordToolAccess, clearTool, addMessage, selectTool]);
+  }, [
+    panelRegistryId,
+    calcFromUrl,
+    navigate,
+    setActiveTool,
+    recordToolAccess,
+    clearTool,
+    addMessage,
+    selectTool,
+    roleIntelligenceProfile,
+  ]);
 
   const submitChatMessage = async (messageText) => {
     if (!messageText.trim() || sending) return false;
@@ -417,6 +459,12 @@ function Dashboard() {
           source: 'assistant',
         },
       });
+      trackRoleAiRequest({
+        profile: roleIntelligenceProfile,
+        agentId: selectedAgentId,
+        toolId: selectedToolEntry?.id || selectedTool,
+        source: selectedToolEntry ? 'assistant-tool' : 'assistant',
+      });
       const apiTool = registryIdToChatToolParam(selectedTool);
       const { ok, data } = await sendClinicalChatMessage({
         message: text,
@@ -430,6 +478,7 @@ function Dashboard() {
           assistantContext: activeWorkspaceAssistantContext,
           visibleAssetIds: workspaceVisibleAssetIds,
         },
+        memoryContext: memoryFabricContext,
       });
 
       if (!ok) {
@@ -473,6 +522,14 @@ function Dashboard() {
       route: action.path || '/assistant',
       metadata: { toolId: action.registryId, source },
     });
+    if (/workflow/i.test(`${action.registryId} ${action.toolId} ${action.toolName} ${action.path}`)) {
+      trackRoleWorkflowLaunch({
+        profile: roleIntelligenceProfile,
+        workflowId: action.registryId || action.toolId,
+        route: action.path || '/assistant',
+        source,
+      });
+    }
     addMessage({
       role: 'assistant',
       content:
@@ -741,6 +798,11 @@ function Dashboard() {
     });
 
     try {
+      trackRoleAiRequest({
+        profile: roleIntelligenceProfile,
+        source: 'outreach-draft',
+        route: '/assistant',
+      });
       const { ok, data } = await sendClinicalChatMessage({
         message: outreachPreview,
         conversationId: activeConversationId,
@@ -751,6 +813,7 @@ function Dashboard() {
           label: workspaceContextActive?.name || workspaceLabel,
           assistantContext: activeWorkspaceAssistantContext,
         },
+        memoryContext: memoryFabricContext,
       });
 
       if (!ok) {

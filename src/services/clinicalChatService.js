@@ -18,7 +18,7 @@ export function registryIdToChatToolParam(registryId) {
 
 /**
  * POST /api/chat/message — shared by Dashboard, ChatInterface, and tools.
- * @param {{ message: string, tool?: string, feature?: string, conversationId?: number|string, authToken?: string|null, workspaceContext?: object }} params
+ * @param {{ message: string, tool?: string, feature?: string, conversationId?: number|string, authToken?: string|null, workspaceContext?: object, memoryContext?: object }} params
  * @returns {Promise<{ ok: boolean, status: number, data: object }>}
  */
 export async function sendClinicalChatMessage({
@@ -28,6 +28,7 @@ export async function sendClinicalChatMessage({
   conversationId,
   authToken,
   workspaceContext,
+  memoryContext,
 }) {
   const headers = { 'Content-Type': 'application/json' };
   if (authToken) {
@@ -40,6 +41,7 @@ export async function sendClinicalChatMessage({
     ...(feature ? { feature } : {}),
     knowledgeBaseContext: buildKnowledgeBaseAssistantContext(message),
     ...(workspaceContext ? { workspaceContext } : {}),
+    ...(memoryContext ? { memoryContext } : {}),
   };
   if (conversationId != null && String(conversationId).trim() !== '') {
     const n = Number(conversationId);

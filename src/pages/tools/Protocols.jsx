@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import CrossModuleLinkPanel from '../../components/CrossModuleLinkPanel';
 import ToolPageLayout from './ToolPageLayout';
 import ApiStateBanner from '../../components/ApiStateBanner';
 import { sendClinicalChatMessage } from '../../services/clinicalChatService';
@@ -128,6 +129,12 @@ const Protocols = ({ embedded = false, onCloseEmbedded } = {}) => {
             <Link to="/simulation">Linked simulations</Link>
           </div>
         </section>
+
+        <CrossModuleLinkPanel
+          moduleId="protocols"
+          title="Protocols connect calculators and AI agents"
+          description="Guideline steps stay linked to risk calculators and AI explanation so pathway context follows the user."
+        />
 
         <div className="protocol-library__search">
           <p className="protocol-library__search-helper">Search for a protocol or use quick launch below.</p>

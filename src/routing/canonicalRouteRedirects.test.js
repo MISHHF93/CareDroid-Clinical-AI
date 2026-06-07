@@ -107,6 +107,11 @@ describe('canonical route redirects', () => {
     expectRoute('/dependency-graph', 'DependencyGraph');
     expectRoute('/data-lineage', 'DataLineageExplorer');
     expectRoute('/self-diagnostics', 'PlatformSelfDiagnostics');
+    expectRoute('/platform-learning-engine', 'PlatformLearningEngine');
+    expectGeneratedRedirect('/platform-learning', '/platform-learning-engine');
+    expectRoute('/brain', 'CareDroidBrainDashboard');
+    expectRoute('/ai-evaluation', 'AiEvaluationDashboard');
+    expectGeneratedRedirect('/ai/evaluation', '/ai-evaluation');
     expect(appSource).toContain("path: '/tools'");
     expect(appSource).toContain("path: '/tools/calculators/:slug'");
     expect(appSource).not.toContain('to="/profile/preferences?tool-preferences"');

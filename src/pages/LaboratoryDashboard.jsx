@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import CrossModuleLinkPanel from '../components/CrossModuleLinkPanel';
 import StateSourceNotice from '../components/StateSourceNotice';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
@@ -79,6 +80,12 @@ export default function LaboratoryDashboard() {
           DEMO_LIVE_STATES.UNSUPPORTED,
         ]}
         details="Lab results, specimen queues, and trend cards are demo records. A live LIS/FHIR feed is not connected in this dashboard; operational specimen updates and clinical result posting are unsupported."
+      />
+
+      <CrossModuleLinkPanel
+        moduleId="laboratory"
+        title="Laboratory connects to simulation and 3D review"
+        description="Abnormal lab context can move back into training scenarios or forward into anatomy and model review without leaving the workflow."
       />
 
       <section className="ops-demo-grid ops-demo-grid--four" aria-label="Laboratory summary">

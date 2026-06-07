@@ -255,7 +255,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
   {
     id: 'ai-evaluation',
     capability: 'AI Evaluation',
-    frontendRoute: '/ai/evaluation',
+    frontendRoute: '/ai-evaluation',
     inventoryEntry: 'ai-evaluation',
     aiLaunchAlias: 'show evaluations',
     backendService: 'EvaluationService',

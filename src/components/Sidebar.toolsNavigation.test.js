@@ -77,6 +77,9 @@ describe('Simplified sidebar navigation wiring', () => {
       '/governance-registry',
       '/data-lineage',
       '/self-diagnostics',
+      '/platform-learning-engine',
+      '/brain',
+      '/ai-evaluation',
       '/ai-governance',
       '/security',
       '/audit',
@@ -89,6 +92,7 @@ describe('Simplified sidebar navigation wiring', () => {
     for (const path of [
       '/discover',
       '/automation',
+      '/digital-twin-intelligence',
       '/digital-twin',
       '/hospital-map',
       '/medical-iot',
@@ -108,6 +112,7 @@ describe('Simplified sidebar navigation wiring', () => {
       expect.arrayContaining(['/solution-builder', '/value-tracking', '/success-center'])
     );
     expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual([
+      '/digital-twin-intelligence',
       '/digital-twin',
       '/hospital-map',
       '/medical-iot',

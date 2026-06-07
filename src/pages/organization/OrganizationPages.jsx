@@ -9,6 +9,10 @@ import { PlatformAssetsApi } from '../../services/platformAssetsApi';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
 import { buildOrganizationIntelligenceProfile } from '../../data/organizationIntelligenceProfile';
 import { PROFILE_ROLES } from '../../data/profileToolSegmentation';
+import {
+  buildRoleIntelligenceProfile,
+  getRoleIntelligencePackRecommendations,
+} from '../../data/roleIntelligenceLayer';
 import './OrganizationPages.css';
 
 const splitList = (value) =>
@@ -414,7 +418,16 @@ export function OrganizationSettings() {
 }
 
 export function PackMarketplace() {
-  const { organization, platformContext, refreshPlatformContext } = useUserIdentity();
+  const {
+    organization,
+    platformContext,
+    refreshPlatformContext,
+    account,
+    preferences,
+    activeWorkspace,
+    workspaceState,
+    roleProfile,
+  } = useUserIdentity();
   const [packs, setPacks] = useState([]);
   const [packProductMap, setPackProductMap] = useState({});
   const [status, setStatus] = useState('');
@@ -437,6 +450,43 @@ export function PackMarketplace() {
   useEffect(() => {
     load().catch(() => setPacks([]));
   }, [load]);
+
+  const roleIntelligenceProfile = useMemo(
+    () =>
+      buildRoleIntelligenceProfile({
+        account,
+        preferences,
+        activeWorkspace,
+        workspaceState,
+        platformContext,
+        roleProfile,
+      }),
+    [account, activeWorkspace, platformContext, preferences, roleProfile, workspaceState]
+  );
+  const recommendedPacks = useMemo(
+    () =>
+      getRoleIntelligencePackRecommendations({
+        packs,
+        profile: roleIntelligenceProfile,
+        installedPackIds: platformContext?.entitledPackIds || [],
+        limit: packs.length || 6,
+      }),
+    [packs, platformContext?.entitledPackIds, roleIntelligenceProfile]
+  );
+  const recommendedPackIds = useMemo(
+    () => new Set(recommendedPacks.map((pack) => pack.id)),
+    [recommendedPacks]
+  );
+  const orderedPacks = useMemo(() => {
+    const byId = new Map(recommendedPacks.map((pack) => [pack.id, pack]));
+    return [...packs]
+      .map((pack) => byId.get(pack.id) || pack)
+      .sort((a, b) => {
+        const scoreDelta =
+          (b.roleIntelligence?.score || 0) - (a.roleIntelligence?.score || 0);
+        return scoreDelta || a.name.localeCompare(b.name);
+      });
+  }, [packs, recommendedPacks]);
 
   const togglePack = async (packId, enabled) => {
     if (!organization?.id) {
@@ -478,7 +528,7 @@ export function PackMarketplace() {
         </Card>
       )}
       <div className="org-pack-grid">
-        {packs.map((pack) => {
+        {orderedPacks.map((pack) => {
           const installed =
             Boolean(pack.enabled) || Boolean(platformContext?.entitledPackIds?.includes(pack.id));
           const expanded = expandedPackId === pack.id;
@@ -495,6 +545,12 @@ export function PackMarketplace() {
                   {installed ? 'enabled' : 'disabled'}
                 </span>
               </div>
+              {recommendedPackIds.has(pack.id) && (
+                <p className="org-pack-meta">
+                  <strong>Recommended Pack:</strong>{' '}
+                  {pack.roleIntelligence?.reason || `${roleIntelligenceProfile.roleLabel} role fit`}
+                </p>
+              )}
               <p>{pack.description}</p>
               <div className="org-pack-section">
                 <strong>Dependencies</strong>

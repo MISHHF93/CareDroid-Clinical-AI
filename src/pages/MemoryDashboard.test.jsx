@@ -11,7 +11,9 @@ vi.mock('./MemoryDashboard.css', () => ({}));
 
 const memoryApiMock = vi.hoisted(() => ({
   fetchMemoryDashboard: vi.fn(),
+  fetchMemoryFabricContext: vi.fn(),
   persistShortMemory: vi.fn(),
+  recordMemorySignal: vi.fn(),
 }));
 
 vi.mock('../services/memoryApi', () => ({
@@ -26,8 +28,19 @@ vi.mock('../services/memoryApi', () => ({
       clinical: { findings: [], summaries: [], scores: [] },
     },
   },
+  LOCAL_MEMORY_FABRIC_CONTEXT: {
+    organizationMemory: { commonSearches: [], successfulWorkflows: [] },
+    workspaceMemory: { recentAssets: [], visibleAssetIds: [] },
+    roleMemory: { preferredAssetIds: [] },
+    userMemory: { pinnedAssets: [], recentAssets: [] },
+    aiMemory: { shortTerm: {} },
+    artifactMemory: { references: [] },
+    rules: { rawPromptIncluded: false, rawSearchIncluded: false },
+  },
   fetchMemoryDashboard: memoryApiMock.fetchMemoryDashboard,
+  fetchMemoryFabricContext: memoryApiMock.fetchMemoryFabricContext,
   persistShortMemory: memoryApiMock.persistShortMemory,
+  recordMemorySignal: memoryApiMock.recordMemorySignal,
 }));
 
 vi.mock('../contexts/ConversationContext', () => ({
@@ -51,6 +64,9 @@ vi.mock('../contexts/UserIdentityContext', () => ({
         },
       ],
     },
+    preferences: { defaultDashboard: 'command' },
+    roleProfile: { id: 'clinical-lead' },
+    organization: { id: 'org-1' },
   }),
 }));
 
@@ -115,7 +131,32 @@ function arrangeDashboard() {
     },
     message: '',
   });
+  memoryApiMock.fetchMemoryFabricContext.mockResolvedValue({
+    ok: true,
+    organizationMemory: {
+      commonSearches: [
+        { id: 'search-1', title: 'Cardiology protocol filters', content: { searchLength: 18 } },
+      ],
+      successfulWorkflows: [
+        { id: 'workflow-fabric-1', title: 'Rounds checklist', content: { workflowId: 'rounds' } },
+      ],
+    },
+    workspaceMemory: { recentAssets: ['qsofa'], visibleAssetIds: ['qsofa', 'drug-check'] },
+    roleMemory: { role: 'clinician', preferredAssetIds: ['drug-check'] },
+    userMemory: { pinnedAssets: ['qsofa'], recentAssets: ['drug-check'], savedWorkflows: [] },
+    aiMemory: {
+      shortTerm: {
+        activeDashboard: { id: 'ai-dashboard', title: 'Active dashboard', content: { route: '/ai-memory' } },
+      },
+    },
+    artifactMemory: {
+      references: [{ id: 'artifact-1', title: 'Sepsis protocol', version: '1.0', tags: ['sepsis'] }],
+    },
+    rules: { rawPromptIncluded: false, rawSearchIncluded: false },
+    message: '',
+  });
   memoryApiMock.persistShortMemory.mockResolvedValue({ ok: true, data: {}, message: '' });
+  memoryApiMock.recordMemorySignal.mockResolvedValue({ ok: true, data: {}, message: '' });
   mockConversationValue.conversations = [
     { id: 'conversation-1', title: 'ICU rounds', date: '2026-05-25T12:05:00.000Z' },
   ];
@@ -151,6 +192,9 @@ describe('MemoryDashboard', () => {
     expect(screen.getAllByText('drug-check').length).toBeGreaterThan(0);
     expect(screen.getByText('qSOFA score')).toBeVisible();
     expect(screen.getByText('Recommended rounding workflow')).toBeVisible();
+    expect(screen.getByRole('heading', { name: /organization memory/i })).toBeInTheDocument();
+    expect(screen.getByText('Cardiology protocol filters')).toBeVisible();
+    expect(screen.getByText('Sepsis protocol')).toBeVisible();
 
     const activityPanel = screen.getByRole('heading', { name: /recent activity/i }).closest('section');
     expect(within(activityPanel).getByText('ICU rounds')).toBeVisible();
@@ -183,6 +227,14 @@ describe('MemoryDashboard', () => {
         type: 'active_calculator',
         title: 'qsofa',
       })
+    );
+    await waitFor(() =>
+      expect(memoryApiMock.recordMemorySignal).toHaveBeenCalledWith(
+        expect.objectContaining({
+          scope: 'user',
+          signalType: 'preferences',
+        })
+      )
     );
   });
 });

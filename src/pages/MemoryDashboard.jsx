@@ -7,8 +7,11 @@ import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import {
   LOCAL_MEMORY_DASHBOARD,
+  LOCAL_MEMORY_FABRIC_CONTEXT,
   fetchMemoryDashboard,
+  fetchMemoryFabricContext,
   persistShortMemory,
+  recordMemorySignal,
 } from '../services/memoryApi';
 import './MemoryDashboard.css';
 
@@ -134,9 +137,11 @@ function MemoryCard({ title, entries, empty }) {
 
 export default function MemoryDashboard() {
   const { conversations, activeConversationId, messages, selectedTool } = useConversation();
-  const { recentTools } = useToolPreferences();
-  const { activeWorkspace, aiPersonalization } = useUserIdentity();
+  const toolPreferences = useToolPreferences();
+  const { recentTools, pinned } = toolPreferences;
+  const { activeWorkspace, aiPersonalization, preferences, roleProfile, organization } = useUserIdentity();
   const [dashboard, setDashboard] = useState(LOCAL_MEMORY_DASHBOARD);
+  const [fabricContext, setFabricContext] = useState(LOCAL_MEMORY_FABRIC_CONTEXT);
   const [notice, setNotice] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -154,7 +159,10 @@ export default function MemoryDashboard() {
     let cancelled = false;
     async function loadMemory() {
       setLoading(true);
-      const result = await fetchMemoryDashboard();
+      const [result, fabricResult] = await Promise.all([
+        fetchMemoryDashboard(),
+        fetchMemoryFabricContext(),
+      ]);
       if (cancelled) return;
       setDashboard({
         recentActivity: result.recentActivity,
@@ -163,7 +171,12 @@ export default function MemoryDashboard() {
         savedWorkflows: result.savedWorkflows,
         aiContext: result.aiContext,
       });
-      setNotice(result.ok ? '' : `Using live session memory. ${result.message}`);
+      setFabricContext(fabricResult.ok ? fabricResult : LOCAL_MEMORY_FABRIC_CONTEXT);
+      setNotice(
+        result.ok && fabricResult.ok
+          ? ''
+          : `Using live session memory. ${result.message || fabricResult.message}`
+      );
       setLoading(false);
     }
     loadMemory();
@@ -207,6 +220,37 @@ export default function MemoryDashboard() {
       title: activeTool,
       workspaceId,
       content: { toolId: activeTool },
+    });
+  }, [recentTools, selectedTool, workspaceId]);
+
+  useEffect(() => {
+    recordMemorySignal({
+      scope: 'user',
+      signalType: 'preferences',
+      title: 'User memory preferences',
+      workspaceId,
+      content: {
+        defaultDashboard: preferences?.defaultDashboard,
+        pinnedToolIds: pinned || [],
+        recentToolIds: recentTools || [],
+        roleProfileId: roleProfile?.id,
+        organizationId: organization?.id,
+      },
+      tags: ['preferences', 'tool-preferences'],
+    });
+  }, [organization?.id, pinned, preferences?.defaultDashboard, recentTools, roleProfile?.id, workspaceId]);
+
+  useEffect(() => {
+    const activeTool = selectedTool || recentTools[0];
+    if (!activeTool) return;
+    recordMemorySignal({
+      scope: 'workspace',
+      signalType: 'recent_asset',
+      title: activeTool,
+      workspaceId,
+      assetId: activeTool,
+      content: { assetId: activeTool, source: 'memory-dashboard' },
+      tags: ['recent-asset'],
     });
   }, [recentTools, selectedTool, workspaceId]);
 
@@ -255,6 +299,66 @@ export default function MemoryDashboard() {
     ...(aiContext.clinical?.summaries || []),
     ...(aiContext.clinical?.scores || []),
   ];
+  const fabricCards = [
+    {
+      title: 'Organization Memory',
+      entries: [
+        ...(fabricContext.organizationMemory?.commonSearches || []),
+        ...(fabricContext.organizationMemory?.successfulWorkflows || []),
+      ],
+      empty: 'Organization-scoped searches and workflows will appear after safe memory signals are recorded.',
+    },
+    {
+      title: 'Workspace Memory',
+      entries: (fabricContext.workspaceMemory?.recentAssets || []).map((assetId) => ({
+        id: `workspace-${assetId}`,
+        title: assetId,
+        content: { assetId },
+      })),
+      empty: 'Workspace recent assets will appear here.',
+    },
+    {
+      title: 'Role Memory',
+      entries: (fabricContext.roleMemory?.preferredAssetIds || []).map((assetId) => ({
+        id: `role-${assetId}`,
+        title: assetId,
+        content: { role: fabricContext.roleMemory?.role, assetId },
+      })),
+      empty: 'Role-fit assets and role profile signals will appear here.',
+    },
+    {
+      title: 'User Memory',
+      entries: [
+        ...(fabricContext.userMemory?.pinnedAssets || []).map((assetId) => ({
+          id: `pinned-${assetId}`,
+          title: assetId,
+          content: { kind: 'pinned asset', assetId },
+        })),
+        ...(fabricContext.userMemory?.recentAssets || []).map((assetId) => ({
+          id: `recent-${assetId}`,
+          title: assetId,
+          content: { kind: 'recent asset', assetId },
+        })),
+      ],
+      empty: 'Pinned and recent user assets will appear here.',
+    },
+    {
+      title: 'AI Memory',
+      entries: Object.entries(fabricContext.aiMemory?.shortTerm || {})
+        .filter(([, value]) => Boolean(value))
+        .map(([key, value]) => ({
+          id: `ai-${key}`,
+          title: value.title || key,
+          content: value.content || value,
+        })),
+      empty: 'AI-safe short-term context will appear here.',
+    },
+    {
+      title: 'Artifact Memory',
+      entries: fabricContext.artifactMemory?.references || [],
+      empty: 'Artifact references, versions, tags, and relationships will appear here.',
+    },
+  ];
 
   return (
     <main className="memory-dashboard">
@@ -287,6 +391,21 @@ export default function MemoryDashboard() {
           <strong>{counts.clinical}</strong>
           <span>Clinical memories</span>
         </div>
+        <div>
+          <strong>{fabricContext.workspaceMemory?.visibleAssetIds?.length || 0}</strong>
+          <span>Fabric assets</span>
+        </div>
+      </section>
+
+      <section className="memory-context-grid" aria-label="AI memory fabric">
+        {fabricCards.map((card) => (
+          <MemoryCard
+            key={card.title}
+            title={card.title}
+            entries={card.entries}
+            empty={card.empty}
+          />
+        ))}
       </section>
 
       <section className="memory-layout">

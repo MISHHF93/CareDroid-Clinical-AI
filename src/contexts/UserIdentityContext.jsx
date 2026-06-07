@@ -6,6 +6,7 @@ import { useTenantContext } from './TenantContext';
 import { useWorkspace } from './WorkspaceContext';
 import { UserIdentityApi } from '../services/userIdentityApi';
 import { PlatformAssetsApi } from '../services/platformAssetsApi';
+import { fetchMemoryFabricContext, LOCAL_MEMORY_FABRIC_CONTEXT } from '../services/memoryApi';
 import { setPlatformEntitlementContext } from '../data/assetEntitlements';
 import logger from '../utils/logger';
 
@@ -46,6 +47,8 @@ const UserIdentityContext = createContext({
   hasEffectivePermission: () => false,
   platformContext: null,
   refreshPlatformContext: () => {},
+  memoryFabricContext: LOCAL_MEMORY_FABRIC_CONTEXT,
+  refreshMemoryFabricContext: () => {},
   organization: null,
   roleProfile: null,
   entitledAssetIds: [],
@@ -167,6 +170,7 @@ export const UserIdentityProvider = ({ children }) => {
   const { preference: themePreference, setPreference } = useTheme();
   const [operationalProfile, setOperationalProfile] = useState(null);
   const [platformContext, setPlatformContext] = useState(null);
+  const [memoryFabricContext, setMemoryFabricContext] = useState(LOCAL_MEMORY_FABRIC_CONTEXT);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -221,11 +225,27 @@ export const UserIdentityProvider = ({ children }) => {
     }
   }, [authToken, isAuthenticated]);
 
+  const refreshMemoryFabricContext = useCallback(async () => {
+    if (!isAuthenticated && !authToken) {
+      setMemoryFabricContext(LOCAL_MEMORY_FABRIC_CONTEXT);
+      return LOCAL_MEMORY_FABRIC_CONTEXT;
+    }
+    const result = await fetchMemoryFabricContext();
+    if (!result.ok) {
+      logger.warn('Memory fabric context unavailable', { message: result.message });
+      setMemoryFabricContext(LOCAL_MEMORY_FABRIC_CONTEXT);
+      return LOCAL_MEMORY_FABRIC_CONTEXT;
+    }
+    setMemoryFabricContext(result);
+    return result;
+  }, [authToken, isAuthenticated]);
+
   const refreshIdentity = useCallback(async () => {
     if (!isAuthenticated && !authToken) {
       setOperationalProfile(null);
       setPlatformContext(null);
       setPlatformEntitlementContext(null);
+      setMemoryFabricContext(LOCAL_MEMORY_FABRIC_CONTEXT);
       setError('');
       return null;
     }
@@ -233,6 +253,7 @@ export const UserIdentityProvider = ({ children }) => {
     const [result] = await Promise.all([
       UserIdentityApi.fetchOperationalProfile(),
       refreshPlatformContext(),
+      refreshMemoryFabricContext(),
     ]);
     setIsLoading(false);
     if (!result.ok) {
@@ -247,7 +268,14 @@ export const UserIdentityProvider = ({ children }) => {
     setOperationalProfile(normalized);
     setError('');
     return normalized;
-  }, [authToken, fallbackProfile, isAuthenticated, normalizeProfile, refreshPlatformContext]);
+  }, [
+    authToken,
+    fallbackProfile,
+    isAuthenticated,
+    normalizeProfile,
+    refreshMemoryFabricContext,
+    refreshPlatformContext,
+  ]);
 
   useEffect(() => {
     refreshIdentity();
@@ -354,6 +382,8 @@ export const UserIdentityProvider = ({ children }) => {
       hasEffectivePermission,
       platformContext,
       refreshPlatformContext,
+      memoryFabricContext,
+      refreshMemoryFabricContext,
       organization: platformContext?.organization || null,
       roleProfile: platformContext?.roleProfile || null,
       entitledAssetIds: platformContext?.entitledAssetIds || [],
@@ -364,10 +394,12 @@ export const UserIdentityProvider = ({ children }) => {
       error,
       hasEffectivePermission,
       isLoading,
+      memoryFabricContext,
       platformContext,
       profile,
       recordActivity,
       refreshIdentity,
+      refreshMemoryFabricContext,
       refreshPlatformContext,
       savePreferences,
       switchWorkspace,

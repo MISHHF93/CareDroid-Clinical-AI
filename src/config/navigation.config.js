@@ -73,6 +73,7 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
       '/analytics',
       '/costs',
       CANONICAL_ROUTES.usage,
+      CANONICAL_ROUTES.digitalTwinIntelligence,
       '/maps',
       '/tracking',
       '/live-tracking',
@@ -220,6 +221,14 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
 
 export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
   {
+    id: 'recommendations',
+    label: 'Recommendations',
+    mobileLabel: 'Recs',
+    path: CANONICAL_ROUTES.recommendations,
+    matchPaths: [CANONICAL_ROUTES.recommendations],
+    showInMobile: false,
+  },
+  {
     id: 'products',
     label: 'Products',
     mobileLabel: 'Products',
@@ -313,6 +322,15 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
 ]);
 
 export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
+  {
+    id: 'digital-twin-intelligence',
+    label: 'Twin Intelligence',
+    mobileLabel: 'Twin AI',
+    path: CANONICAL_ROUTES.digitalTwinIntelligence,
+    matchPaths: [CANONICAL_ROUTES.digitalTwinIntelligence],
+    matchPrefixes: [`${CANONICAL_ROUTES.digitalTwinIntelligence}/`],
+    showInMobile: false,
+  },
   {
     id: 'digital-twin',
     label: 'Digital Twin',
@@ -474,6 +492,33 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     matchPaths: [CANONICAL_ROUTES.selfDiagnostics],
     permission: ['VIEW_OPERATIONS', 'VIEW_OBSERVABILITY'],
     requireAllPermissions: true,
+    showInMobile: false,
+  },
+  {
+    id: 'platform-learning-engine',
+    label: 'Learning Engine',
+    mobileLabel: 'Learn',
+    path: CANONICAL_ROUTES.platformLearningEngine,
+    matchPaths: [CANONICAL_ROUTES.platformLearningEngine],
+    permission: 'VIEW_ANALYTICS',
+    showInMobile: false,
+  },
+  {
+    id: 'brain',
+    label: 'Brain',
+    mobileLabel: 'Brain',
+    path: CANONICAL_ROUTES.brain,
+    matchPaths: [CANONICAL_ROUTES.brain],
+    permission: 'VIEW_ANALYTICS',
+    showInMobile: false,
+  },
+  {
+    id: 'ai-evaluation',
+    label: 'AI Evaluation',
+    mobileLabel: 'Eval',
+    path: CANONICAL_ROUTES.aiEvaluation,
+    matchPaths: [CANONICAL_ROUTES.aiEvaluation, '/ai/evaluation'],
+    permission: 'VIEW_ANALYTICS',
     showInMobile: false,
   },
   {

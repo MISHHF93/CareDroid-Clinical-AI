@@ -12,11 +12,13 @@ const dashboard = vi.hoisted(() => ({
   generatedAt: '2026-05-26T00:00:00.000Z',
   metricDefinitions: [],
   aggregateMetrics: {
+    modelQuality: 0.94,
     hallucinationRate: 0.03,
     accuracy: 0.93,
     latencyMs: 780,
     retrievalPrecision: 0.89,
     toolExecutionSuccess: 0.99,
+    workflowSuccess: 0.95,
     userSatisfaction: 4.6,
     costUsd: 11.5,
   },
@@ -25,11 +27,13 @@ const dashboard = vi.hoisted(() => ({
       label: 'Run 1',
       runId: 'run-1',
       metrics: {
+        modelQuality: 0.92,
         hallucinationRate: 0.04,
         accuracy: 0.91,
         latencyMs: 840,
         retrievalPrecision: 0.86,
         toolExecutionSuccess: 0.98,
+        workflowSuccess: 0.93,
         userSatisfaction: 4.4,
         costUsd: 12.25,
       },
@@ -38,17 +42,26 @@ const dashboard = vi.hoisted(() => ({
       label: 'Run 2',
       runId: 'run-2',
       metrics: {
+        modelQuality: 0.94,
         hallucinationRate: 0.03,
         accuracy: 0.93,
         latencyMs: 780,
         retrievalPrecision: 0.89,
         toolExecutionSuccess: 0.99,
+        workflowSuccess: 0.95,
         userSatisfaction: 4.6,
         costUsd: 11.5,
       },
     },
   ],
   benchmarks: [
+    {
+      id: 'modelQuality',
+      label: 'Model quality',
+      observedLabel: '94%',
+      benchmarkLabel: '>= 90%',
+      passed: true,
+    },
     {
       id: 'hallucinationRate',
       label: 'Hallucination rate',
@@ -85,6 +98,13 @@ const dashboard = vi.hoisted(() => ({
       passed: true,
     },
     {
+      id: 'workflowSuccess',
+      label: 'Workflow success',
+      observedLabel: '95%',
+      benchmarkLabel: '>= 92%',
+      passed: true,
+    },
+    {
       id: 'userSatisfaction',
       label: 'User satisfaction',
       observedLabel: '4.60/5',
@@ -103,18 +123,99 @@ const dashboard = vi.hoisted(() => ({
     {
       id: 'run-2',
       modelName: 'caredroid-moe-clinical-router',
+      promptName: 'tool-calling-system-prompt-v3',
+      agentName: 'command-center-agent',
+      ragStrategy: 'memory-augmented-rag',
       datasetName: 'tool-calling-eval-v2',
       sampleCount: 160,
       metrics: {
+        modelQuality: 0.94,
         accuracy: 0.93,
+        workflowSuccess: 0.95,
         costUsd: 11.5,
       },
     },
   ],
+  comparisons: {
+    models: [
+      {
+        id: 'models-caredroid-moe-clinical-router',
+        label: 'caredroid-moe-clinical-router',
+        runCount: 1,
+        sampleCount: 160,
+        benchmarkPassRate: 1,
+        metrics: {
+          modelQuality: 0.94,
+          hallucinationRate: 0.03,
+          toolExecutionSuccess: 0.99,
+          workflowSuccess: 0.95,
+          latencyMs: 780,
+          costUsd: 11.5,
+        },
+      },
+    ],
+    prompts: [
+      {
+        id: 'prompts-tool-calling-system-prompt-v3',
+        label: 'tool-calling-system-prompt-v3',
+        runCount: 1,
+        sampleCount: 160,
+        benchmarkPassRate: 1,
+        metrics: {
+          modelQuality: 0.94,
+          hallucinationRate: 0.03,
+          toolExecutionSuccess: 0.99,
+          workflowSuccess: 0.95,
+          latencyMs: 780,
+          costUsd: 11.5,
+        },
+      },
+    ],
+    agents: [
+      {
+        id: 'agents-command-center-agent',
+        label: 'command-center-agent',
+        runCount: 1,
+        sampleCount: 160,
+        benchmarkPassRate: 1,
+        metrics: {
+          modelQuality: 0.94,
+          hallucinationRate: 0.03,
+          toolExecutionSuccess: 0.99,
+          workflowSuccess: 0.95,
+          latencyMs: 780,
+          costUsd: 11.5,
+        },
+      },
+    ],
+    ragStrategies: [
+      {
+        id: 'rag-memory-augmented-rag',
+        label: 'memory-augmented-rag',
+        runCount: 1,
+        sampleCount: 160,
+        benchmarkPassRate: 1,
+        metrics: {
+          modelQuality: 0.94,
+          hallucinationRate: 0.03,
+          toolExecutionSuccess: 0.99,
+          workflowSuccess: 0.95,
+          latencyMs: 780,
+          costUsd: 11.5,
+        },
+      },
+    ],
+  },
 }));
 
 vi.mock('../services/evaluationApi', () => ({
   EVALUATION_METRICS: [
+    {
+      id: 'modelQuality',
+      label: 'Model quality',
+      unit: 'percent',
+      direction: 'higher_is_better',
+    },
     {
       id: 'hallucinationRate',
       label: 'Hallucination rate',
@@ -132,6 +233,12 @@ vi.mock('../services/evaluationApi', () => ({
     {
       id: 'toolExecutionSuccess',
       label: 'Tool execution success',
+      unit: 'percent',
+      direction: 'higher_is_better',
+    },
+    {
+      id: 'workflowSuccess',
+      label: 'Workflow success',
       unit: 'percent',
       direction: 'higher_is_better',
     },
@@ -160,13 +267,16 @@ describe('AiEvaluationDashboard', () => {
   it('renders metrics, charts, benchmarks, and trends', async () => {
     render(<AiEvaluationDashboard />);
 
-    expect(screen.getByRole('heading', { level: 1, name: /ai evaluation/i })).toBeVisible();
+    expect(screen.getByRole('heading', { level: 1, name: /ai evaluation lab/i })).toBeVisible();
     expect(await screen.findByText('All gates passing')).toBeVisible();
+    expect(screen.getAllByText('Model quality').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Hallucination rate').length).toBeGreaterThan(0);
-    expect(screen.getByRole('img', { name: /accuracy trend/i })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /model quality trend/i })).toBeInTheDocument();
     expect(screen.getByRole('img', { name: /quality snapshot chart/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: /comparison lab/i })).toBeVisible();
+    expect(screen.getAllByText('tool-calling-system-prompt-v3').length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { level: 2, name: /benchmarks/i })).toBeVisible();
-    expect(screen.getByText('caredroid-moe-clinical-router')).toBeVisible();
+    expect(screen.getAllByText('caredroid-moe-clinical-router').length).toBeGreaterThan(0);
   });
 
   it('shows a local baseline notice when the API is unavailable', async () => {

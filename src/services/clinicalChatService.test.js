@@ -195,6 +195,29 @@ describe('clinicalChatService', () => {
     });
   });
 
+  it('sendClinicalChatMessage includes sanitized memory fabric context when provided', async () => {
+    apiFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ response: 'ok' }),
+    });
+
+    await sendClinicalChatMessage({
+      message: 'Use my workspace context',
+      memoryContext: {
+        workspaceMemory: { recentAssets: ['qsofa'] },
+        userMemory: { pinnedAssets: ['drug-check'] },
+        rules: { rawPromptIncluded: false, rawSearchIncluded: false },
+      },
+    });
+
+    const body = JSON.parse(apiFetch.mock.calls[0][1].body);
+    expect(body.memoryContext).toMatchObject({
+      workspaceMemory: { recentAssets: ['qsofa'] },
+      userMemory: { pinnedAssets: ['drug-check'] },
+      rules: { rawSearchIncluded: false },
+    });
+  });
+
   it('suggestClinicalAction posts patient context', async () => {
     apiFetch.mockResolvedValue({
       ok: true,

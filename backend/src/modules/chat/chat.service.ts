@@ -124,6 +124,7 @@ export class ChatService {
     userId?: string,
     userRole?: string,
     knowledgeBaseContext?: Record<string, any>,
+    clientMemoryContext?: Record<string, any>,
   ): Promise<QueryResponse> {
     this.logger.log(`💬 Processing chat message: "${message}"`);
     const startedAt = Date.now();
@@ -233,7 +234,10 @@ export class ChatService {
         primaryIntent: routePlan.primaryIntent,
       },
     });
-    const memoryContext = await this.buildAssistantMemoryContext(userId);
+    const memoryContext = {
+      server: await this.buildAssistantMemoryContext(userId),
+      fabric: this.sanitizeClientMemoryContext(clientMemoryContext),
+    };
     const modelFoundationContext = {
       ...this.aiContextManager.toModelContext(contextPacket),
       costOptimization,
@@ -733,6 +737,56 @@ export class ChatService {
       );
       return { available: false, reason: 'memory_context_unavailable' };
     }
+  }
+
+  private sanitizeClientMemoryContext(memoryContext?: Record<string, any>): Record<string, any> | null {
+    if (!memoryContext || typeof memoryContext !== 'object') {
+      return null;
+    }
+    const blockedKeys = new Set([
+      'tenant',
+      'organizationId',
+      'workspaceId',
+      'userId',
+      'patientId',
+      'patientName',
+      'prompt',
+      'query',
+      'queryText',
+      'rawInput',
+      'search',
+      'text',
+    ]);
+    const allowedTopLevel = new Set([
+      'organizationMemory',
+      'workspaceMemory',
+      'roleMemory',
+      'userMemory',
+      'aiMemory',
+      'artifactMemory',
+      'rules',
+    ]);
+    const sanitize = (value: any, depth = 0): any => {
+      if (depth > 4) return undefined;
+      if (Array.isArray(value)) {
+        return value.slice(0, 20).map((item) => sanitize(item, depth + 1));
+      }
+      if (!value || typeof value !== 'object') {
+        return ['string', 'number', 'boolean'].includes(typeof value) || value == null
+          ? value
+          : undefined;
+      }
+      return Object.fromEntries(
+        Object.entries(value)
+          .filter(([key]) => !blockedKeys.has(key))
+          .map(([key, item]) => [key, sanitize(item, depth + 1)]),
+      );
+    };
+    return Object.fromEntries(
+      Object.entries(memoryContext)
+        .filter(([key]) => allowedTopLevel.has(key))
+        .map(([key, value]) => [key, sanitize(value)]),
+    );
   }
 
   private async finalizeAssistantTurn(params: {

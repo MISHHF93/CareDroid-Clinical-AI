@@ -5,12 +5,14 @@ import { ClinicalMemoryService } from './clinical-memory.service';
 import { CreateClinicalMemoryDto } from './dto/create-clinical-memory.dto';
 import { CreateLongMemoryDto } from './dto/create-long-memory.dto';
 import { CreateShortMemoryDto } from './dto/create-short-memory.dto';
+import { RecordMemoryFabricSignalDto } from './dto/record-memory-fabric-signal.dto';
 import {
   ClinicalMemoryQueryDto,
   LongMemoryQueryDto,
   ShortMemoryQueryDto,
 } from './dto/memory-query.dto';
 import { LongMemoryService } from './long-memory.service';
+import { MemoryFabricService } from './memory-fabric.service';
 import { ShortMemoryService } from './short-memory.service';
 
 @ApiTags('memory')
@@ -22,6 +24,7 @@ export class MemoryController {
     private readonly shortMemoryService: ShortMemoryService,
     private readonly longMemoryService: LongMemoryService,
     private readonly clinicalMemoryService: ClinicalMemoryService,
+    private readonly memoryFabricService: MemoryFabricService,
   ) {}
 
   @Get('dashboard')
@@ -107,6 +110,29 @@ export class MemoryController {
   @ApiOperation({ summary: 'List current-user clinical memory' })
   async clinical(@Req() req: any, @Query() query: ClinicalMemoryQueryDto) {
     return { entries: await this.clinicalMemoryService.listForUser(req.user.id, query) };
+  }
+
+  @Get('fabric/context')
+  @ApiOperation({ summary: 'Get tenant-scoped AI memory fabric context' })
+  async fabricContext(@Req() req: any) {
+    return this.memoryFabricService.getContext({
+      user: req.user,
+      tenantContext: req.tenantContext,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+  }
+
+  @Post('fabric/signals')
+  @ApiOperation({ summary: 'Record a sanitized AI memory fabric signal' })
+  async recordFabricSignal(@Req() req: any, @Body() dto: RecordMemoryFabricSignalDto) {
+    return this.memoryFabricService.recordSignal({
+      user: req.user,
+      dto,
+      tenantContext: req.tenantContext,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
   }
 
   private toActivity(source: string, entry: any) {

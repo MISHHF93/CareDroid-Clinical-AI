@@ -1,6 +1,9 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import StateSourceNotice from '../components/StateSourceNotice';
+import { useUser } from '../contexts/UserContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
+import { buildRoleIntelligenceProfile } from '../data/roleIntelligenceLayer';
 import {
   buildDemoSimulationRun,
   buildScenarioDebrief,
@@ -9,11 +12,14 @@ import {
 } from '../data/medicalSimulationCatalog';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { trackRoleSimulationCompleted } from '../services/roleIntelligenceTelemetry';
 import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import './SimulationLaboratoryViewer.css';
 
 export default function SimulationScenarioPlayer() {
   const { scenarioId } = useParams();
+  const { user } = useUser();
+  const { account, preferences, activeWorkspace, workspaceState, platformContext, roleProfile } = useUserIdentity();
   const scenario = getSimulationScenarioById(scenarioId) || SIMULATION_SCENARIOS[0];
   const [run, setRun] = useState(() => buildDemoSimulationRun(scenario.id));
   const [decisionText, setDecisionText] = useState('');
@@ -22,6 +28,19 @@ export default function SimulationScenarioPlayer() {
   const debrief = useMemo(
     () => (run.status === 'completed' ? buildScenarioDebrief(scenario, selectedActions) : null),
     [run.status, scenario, selectedActions]
+  );
+  const roleIntelligenceProfile = useMemo(
+    () =>
+      buildRoleIntelligenceProfile({
+        account,
+        user,
+        preferences,
+        activeWorkspace,
+        workspaceState,
+        platformContext,
+        roleProfile,
+      }),
+    [account, activeWorkspace, platformContext, preferences, roleProfile, user, workspaceState]
   );
   const progress = Math.round((selectedActions.length / scenario.criticalActions.length) * 100);
 
@@ -40,6 +59,15 @@ export default function SimulationScenarioPlayer() {
   };
 
   const completeScenario = () => {
+    const completionDebrief = buildScenarioDebrief(scenario, selectedActions);
+    trackRoleSimulationCompleted({
+      profile: roleIntelligenceProfile,
+      scenarioId: scenario.id,
+      progress,
+      safetyScore: completionDebrief.scores.safetyScore,
+      selectedActionCount: selectedActions.length,
+      criticalActionCount: scenario.criticalActions.length,
+    });
     setRun((current) => ({
       ...current,
       status: 'completed',

@@ -50,7 +50,7 @@ export const TOOL_LAUNCH_PATHS = Object.freeze({
   memory: '/ai-memory',
   training: '/training',
   costs: '/costs',
-  aiEvaluation: '/ai/evaluation',
+  aiEvaluation: '/ai-evaluation',
   aiCommandCenter: '/ai-command-center',
   aiGovernance: '/ai-governance',
   aiSecurity: '/security',

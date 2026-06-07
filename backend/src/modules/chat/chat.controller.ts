@@ -42,6 +42,10 @@ class ChatMessageDto {
   @IsOptional()
   @IsObject()
   knowledgeBaseContext?: Record<string, any>;
+
+  @IsOptional()
+  @IsObject()
+  memoryContext?: Record<string, any>;
 }
 
 class IntentClassifyDto {
@@ -154,6 +158,7 @@ export class ChatController {
       userId,
       userRole,
       dto.knowledgeBaseContext,
+      dto.memoryContext,
     );
 
     return {

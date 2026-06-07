@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
+import CrossModuleLinkPanel from '../components/CrossModuleLinkPanel';
 import StateSourceNotice from '../components/StateSourceNotice';
 import { fetchMedicalIotSnapshot, formatTelemetryTime } from '../services/medicalIotService';
 import {
@@ -349,6 +350,12 @@ export default function MedicalIotDashboard() {
               DEMO_LIVE_STATES.UNSUPPORTED,
             ]}
             details="Connected-device cards, vitals streams, and map markers are demo/mock telemetry for monitoring UX only. If the backend telemetry contract is unavailable, local demo fixtures are shown; live patient-device control actions are unsupported."
+          />
+
+          <CrossModuleLinkPanel
+            moduleId="medical-iot"
+            title="Medical IoT connects to map and fleet context"
+            description="Telemetry alerts stay tied to the rooms, devices, and fleet workflows that explain where action may be needed."
           />
 
           <section className="medical-iot-summary" aria-label="Medical IoT status summary">

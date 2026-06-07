@@ -1,13 +1,18 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
+import { useUserIdentity } from '../contexts/UserIdentityContext';
+import CrossModuleLinkPanel from '../components/CrossModuleLinkPanel';
 import StateSourceNotice from '../components/StateSourceNotice';
 import { buildUserToolProfile } from '../data/profileToolSegmentation';
+import {
+  buildRoleIntelligenceProfile,
+  getRoleIntelligenceSimulationRecommendations,
+} from '../data/roleIntelligenceLayer';
 import {
   SIMULATION_CATEGORIES,
   SIMULATION_SCENARIOS,
   SIMULATION_SCENARIO_TYPES,
-  getRecommendedSimulationScenarios,
 } from '../data/medicalSimulationCatalog';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
@@ -16,8 +21,32 @@ import './SimulationLaboratoryViewer.css';
 
 export default function MedicalSimulationSuite() {
   const { user } = useUser();
+  const { account, preferences, activeWorkspace, workspaceState, platformContext, roleProfile } = useUserIdentity();
   const profile = useMemo(() => buildUserToolProfile({ user }), [user]);
-  const recommendedScenarios = useMemo(() => getRecommendedSimulationScenarios(profile), [profile]);
+  const roleIntelligenceProfile = useMemo(
+    () =>
+      buildRoleIntelligenceProfile({
+        account,
+        user,
+        preferences,
+        activeWorkspace,
+        workspaceState,
+        platformContext,
+        roleProfile,
+        profile,
+      }),
+    [account, activeWorkspace, platformContext, preferences, profile, roleProfile, user, workspaceState]
+  );
+  const recommendedScenarios = useMemo(
+    () =>
+      getRoleIntelligenceSimulationRecommendations({
+        scenarios: SIMULATION_SCENARIOS,
+        profile: roleIntelligenceProfile,
+        completedScenarioIds: roleIntelligenceProfile.behaviorSignals.completedSimulationIds,
+        limit: 4,
+      }),
+    [roleIntelligenceProfile]
+  );
   const [categoryFilter, setCategoryFilter] = useState('All');
   const filteredScenarios = useMemo(
     () =>
@@ -60,6 +89,12 @@ export default function MedicalSimulationSuite() {
           DEMO_LIVE_STATES.UNSUPPORTED,
         ]}
         details="Scenario cases, AI tutor prompts, recommendations, and progress are demo/simulated training data. Launching or completing a scenario updates local browser state only; live learner records and external clinical actions are unsupported."
+      />
+
+      <CrossModuleLinkPanel
+        moduleId="simulation"
+        title="Simulation connects to lab and anatomy review"
+        description="Training scenarios can jump into lab interpretation, anatomy review, telemetry, and operational modules when the case context calls for it."
       />
 
       <section className="ops-demo-grid ops-demo-grid--four" aria-label="Simulation status">
@@ -141,9 +176,9 @@ export default function MedicalSimulationSuite() {
           <div className="ops-demo-panel__header">
             <div>
               <p className="ops-demo-eyebrow">Role-based view</p>
-              <h2>Recommended for {profile.role}</h2>
+              <h2>Recommended for {roleIntelligenceProfile.roleLabel}</h2>
             </div>
-            <span className="ops-demo-badge">Profile segmentation</span>
+            <span className="ops-demo-badge">Profile segmentation · Role intelligence</span>
           </div>
           <div className="ops-demo-stack">
             {recommendedScenarios.map((scenario) => (
@@ -155,6 +190,7 @@ export default function MedicalSimulationSuite() {
                 <strong>{scenario.title}</strong>
                 <span>{scenario.category} - {scenario.difficulty}</span>
                 <small>{scenario.estimatedDurationMinutes} min - {scenario.type}</small>
+                <small>{scenario.roleIntelligence?.reason}</small>
               </Link>
             ))}
           </div>

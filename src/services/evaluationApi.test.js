@@ -18,6 +18,7 @@ vi.mock('./apiClient', () => ({
 }));
 
 const {
+  EVALUATION_METRICS,
   LOCAL_EVALUATION_DASHBOARD,
   createEvaluationRun,
   fetchEvaluationDashboard,
@@ -48,6 +49,11 @@ describe('evaluationApi', () => {
 
     expect(result.ok).toBe(false);
     expect(result.data).toBe(LOCAL_EVALUATION_DASHBOARD);
+    expect(EVALUATION_METRICS.map((metric) => metric.id)).toEqual(
+      expect.arrayContaining(['modelQuality', 'workflowSuccess'])
+    );
+    expect(result.data.comparisons.models.length).toBeGreaterThan(0);
+    expect(result.data.comparisons.ragStrategies.length).toBeGreaterThan(0);
     expect(apiFetchJson).not.toHaveBeenCalled();
   });
 

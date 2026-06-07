@@ -25,7 +25,7 @@ import { TOOL_LAUNCH_PATHS } from '../data/clinicalToolIdContract';
 import {
   getPlatformEntitlementContext,
 } from '../data/assetEntitlements';
-import { recordAssetLaunchUsage } from '../services/usageMeteringService';
+import { trackRoleAssetUsage, trackRoleWorkflowLaunch } from '../services/roleIntelligenceTelemetry';
 
 /**
  * @typedef {'calculator-route'|'chat-assisted'|'tool-page'|'calculator-hub'|'fallback'} RegistryToolLaunchMode
@@ -150,6 +150,7 @@ export function getRegistryToolNavigation(toolId) {
  *   recordToolAccess?: (id: string) => void;
  *   replace?: boolean;
  *   state?: unknown;
+ *   roleIntelligenceProfile?: Record<string, unknown>;
  * }} handlers
  * @returns {RegistryToolNavigationPlan}
  */
@@ -211,7 +212,18 @@ export function applyRegistryToolLaunch(toolId, handlers) {
     recordToolAccess?.(plan.registryId);
     selectTool?.(plan.registryId);
     setActiveTool?.(plan.registryId);
-    recordAssetLaunchUsage(plan, { source: 'registry-tool-launch' });
+    trackRoleAssetUsage(plan, {
+      profile: handlers.roleIntelligenceProfile,
+      source: 'registry-tool-launch',
+    });
+    if (/workflow/i.test(`${plan.mode} ${plan.pathname} ${plan.registryId}`)) {
+      trackRoleWorkflowLaunch({
+        profile: handlers.roleIntelligenceProfile,
+        workflowId: plan.registryId,
+        route: plan.pathname,
+        source: 'registry-tool-launch',
+      });
+    }
   }
 
   if (plan.shouldSeedChat && plan.launch?.chatSeed) {

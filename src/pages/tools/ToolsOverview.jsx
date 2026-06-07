@@ -22,12 +22,18 @@ import {
   getAssetAwareToolProjection,
   groupToolsByAccessView,
 } from '../../data/assetAccess';
-import { getRoleBasedAssetRecommendations } from '../../data/assetRecommendation';
+import {
+  buildRoleIntelligenceProfile,
+  getRoleIntelligenceAssetRecommendations,
+} from '../../data/roleIntelligenceLayer';
 import { FEATURE_FLAGS } from '../../config/featureFlags.config';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
-import { recordAssetLaunchUsage, USAGE_EVENT_TYPES } from '../../services/usageMeteringService';
+import {
+  trackRoleAssetUsage,
+  trackRoleSearchBehavior,
+} from '../../services/roleIntelligenceTelemetry';
 import './ToolsOverview.css';
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
@@ -256,19 +262,7 @@ const ToolsOverview = () => {
     workspaceState,
     platformContext,
     roleProfile,
-    organization,
   } = useUserIdentity();
-
-  const recommendations = useMemo(() => {
-    if (workspaceRecommendations.length) {
-      return workspaceRecommendations.map((recommendation) => ({
-        id: recommendation.assetId,
-        reason: recommendation.reason,
-      }));
-    }
-    return getRoleBasedAssetRecommendations({ account, roleProfile });
-  }, [account, roleProfile, workspaceRecommendations]);
-  const recommendedIds = useMemo(() => recommendations.map((t) => t.id), [recommendations]);
 
   const accessContext = useMemo(
     () => ({
@@ -297,15 +291,6 @@ const ToolsOverview = () => {
     [allToolsWithAccess]
   );
 
-  const accessGroups = useMemo(
-    () =>
-      groupToolsByAccessView(tools, {
-        favorites,
-        recent: recentTools,
-        recommendedIds,
-      }),
-    [tools, favorites, recentTools, recommendedIds]
-  );
   const toolById = useMemo(() => Object.fromEntries(tools.map((tool) => [tool.id, tool])), [tools]);
   const localActiveWorkspace = useMemo(
     () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
@@ -339,9 +324,63 @@ const ToolsOverview = () => {
       workspaceState?.effectivePermissions,
     ]
   );
+  const roleIntelligenceProfile = useMemo(
+    () =>
+      buildRoleIntelligenceProfile({
+        account,
+        user,
+        preferences,
+        activeWorkspace: workspaceContextActive || activeWorkspace || localActiveWorkspace,
+        workspaceState,
+        toolPreferences,
+        permissions: workspaceState?.effectivePermissions || [],
+        profile,
+        roleProfile,
+        platformContext,
+      }),
+    [
+      account,
+      activeWorkspace,
+      localActiveWorkspace,
+      platformContext,
+      preferences,
+      profile,
+      roleProfile,
+      toolPreferences,
+      user,
+      workspaceContextActive,
+      workspaceState,
+    ]
+  );
   const profileToolGraph = useMemo(
     () => buildProfileToolGraph({ tools, profile }),
     [profile, tools]
+  );
+  const roleAssetRecommendations = useMemo(() => {
+    if (workspaceRecommendations.length) {
+      return workspaceRecommendations.map((recommendation) => ({
+        id: recommendation.assetId,
+        reason: recommendation.reason,
+      }));
+    }
+    return getRoleIntelligenceAssetRecommendations({
+      tools,
+      profile: roleIntelligenceProfile,
+      limit: 24,
+    });
+  }, [roleIntelligenceProfile, tools, workspaceRecommendations]);
+  const recommendedIds = useMemo(
+    () => roleAssetRecommendations.map((recommendation) => recommendation.id),
+    [roleAssetRecommendations]
+  );
+  const accessGroups = useMemo(
+    () =>
+      groupToolsByAccessView(tools, {
+        favorites,
+        recent: recentTools,
+        recommendedIds,
+      }),
+    [tools, favorites, recentTools, recommendedIds]
   );
   const allToolIds = useMemo(() => tools.map((tool) => tool.id), [tools]);
   const workspaceToolIds = useMemo(
@@ -411,6 +450,19 @@ const ToolsOverview = () => {
     recentToolItems,
   ]);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      trackRoleSearchBehavior({
+        search,
+        resultCount: filteredTools.length,
+        filter: toolFilter,
+        profile: roleIntelligenceProfile,
+        source: 'tools-overview',
+      });
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [filteredTools.length, roleIntelligenceProfile, search, toolFilter]);
+
   const handleToolClick = (tool) => {
     if (tool.isLaunchable === false) return;
     applyRegistryToolLaunch(tool.id, {
@@ -419,6 +471,7 @@ const ToolsOverview = () => {
       selectTool,
       setActiveTool,
       recordToolAccess,
+      roleIntelligenceProfile,
     });
   };
 
@@ -433,9 +486,9 @@ const ToolsOverview = () => {
     if (tool.isLaunchable === false) return;
     const launch = resolveCatalogLaunch(tool.id);
     recordToolAccess(tool.id);
-    recordAssetLaunchUsage(
+    trackRoleAssetUsage(
       { registryId: tool.id, mode: 'chat-assisted', pathname: CANONICAL_ROUTES.assistant },
-      { source: 'tools-overview-assistant', eventType: USAGE_EVENT_TYPES.TOOL_LAUNCH }
+      { profile: roleIntelligenceProfile, source: 'tools-overview-assistant' }
     );
     selectTool(tool.id);
     setActiveTool(tool.id);
@@ -482,7 +535,7 @@ const ToolsOverview = () => {
             and access level.
           </p>
           <div className="tools-profile-summary" aria-label="Profile tool graph summary">
-            <span>{profile.role}</span>
+            <span>{roleIntelligenceProfile.roleLabel}</span>
             <span>{profile.specialty}</span>
             <span>{profileToolGraph.counts.visible} visible</span>
             <span>{profileToolGraph.counts.recommended} recommended</span>
@@ -674,6 +727,11 @@ const ToolsOverview = () => {
                   ) : null}
                   {tool.surface === 'chat-assisted' ? (
                     <span className="tool-category tool-category--guided">Guided</span>
+                  ) : null}
+                  {recommendedIds.includes(tool.id) ? (
+                    <span className="tool-category tool-category--guided">
+                      Recommended for {roleIntelligenceProfile.roleLabel}
+                    </span>
                   ) : null}
                   {tool.restrictionReason ? (
                     <span className="tool-category tool-category--restricted">

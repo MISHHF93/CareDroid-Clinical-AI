@@ -3548,7 +3548,7 @@ const toolRegistry = [
   {
     id: 'ai-evaluation',
     name: 'AI Evaluation',
-    path: '/ai/evaluation',
+    path: '/ai-evaluation',
     color: '#DC2626',
     description:
       'Evaluation framework for hallucination, accuracy, latency, retrieval, tool, satisfaction, and cost metrics',

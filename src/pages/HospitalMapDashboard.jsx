@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import CrossModuleLinkPanel from '../components/CrossModuleLinkPanel';
 import StateSourceNotice from '../components/StateSourceNotice';
 import {
   fetchHospitalMapSnapshot,
@@ -584,6 +585,12 @@ export default function HospitalMapDashboard() {
               DEMO_LIVE_STATES.UNSUPPORTED,
             ]}
             details="Floor plans, device positions, patient placeholders, and telemetry are demo/mock data. If the backend demo contract is unavailable, the page falls back to a local demo snapshot; live device writes or dispatch actions are unsupported."
+          />
+
+          <CrossModuleLinkPanel
+            moduleId="hospital-map"
+            title="Hospital Map connects to fleet and IoT"
+            description="Room and device location context stays connected to fleet movement and live device telemetry surfaces."
           />
 
           <section className="hospital-map-summary" aria-label="Hospital map status summary">

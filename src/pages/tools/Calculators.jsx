@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
+import CrossModuleLinkPanel from '../../components/CrossModuleLinkPanel';
 import ToolPageLayout from './ToolPageLayout';
 import './Calculators.css';
 import '../../styles/calculators-mobile-pr.css';
@@ -426,6 +427,12 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
       results={selectedCalculator && sharedResult ? { calculator: selectedCalculator.id, ...sharedResult } : null}
     >
       <div className="calculators-content">
+        <CrossModuleLinkPanel
+          moduleId="calculators"
+          title="Calculators connect protocols to AI agents"
+          description="Risk scores and severity tools stay connected to protocols for context and AI agents for explanation or next-action support."
+        />
+
         {CHAT_ASSISTED_TOOLS.length > 0 ? (
           <section className="calc-chat-assisted" aria-labelledby="calc-chat-assisted-heading">
             <div className="calc-chat-assisted-header">

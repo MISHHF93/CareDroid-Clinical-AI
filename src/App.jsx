@@ -81,6 +81,7 @@ const {
 };
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
 const CapabilityDiscovery = lazyWithRetry(() => import('./pages/CapabilityDiscovery'));
+const RecommendationsPage = lazyWithRetry(() => import('./pages/RecommendationsPage'));
 const WorkflowAutomationBuilder = lazyWithRetry(() => import('./pages/WorkflowAutomationBuilder'));
 const AutomationAuditTrail = lazyWithRetry(() => import('./pages/AutomationAuditTrail'));
 const DependencyMap = lazyWithRetry(() => import('./pages/DependencyMap'));
@@ -92,8 +93,11 @@ const MemoryDashboard = lazyWithRetry(() => import('./pages/MemoryDashboard'));
 const TrainingDashboard = lazyWithRetry(() => import('./pages/TrainingDashboard'));
 const AiEvaluationDashboard = lazyWithRetry(() => import('./pages/AiEvaluationDashboard'));
 const AiCommandCenterDashboard = lazyWithRetry(() => import('./pages/AiCommandCenterDashboard'));
+const PlatformLearningEngine = lazyWithRetry(() => import('./pages/PlatformLearningEngine'));
+const CareDroidBrainDashboard = lazyWithRetry(() => import('./pages/CareDroidBrainDashboard'));
 const Operations = lazyWithRetry(() => import('./pages/Operations'));
 const DigitalOperationsCenter = lazyWithRetry(() => import('./pages/DigitalOperationsCenter'));
+const DigitalTwinIntelligence = lazyWithRetry(() => import('./pages/DigitalTwinIntelligence'));
 const ResearchEvidenceHub = lazyWithRetry(() => import('./pages/ResearchEvidenceHub'));
 const ClinicalDocumentationAssistant = lazyWithRetry(() => import('./pages/ClinicalDocumentationAssistant'));
 const ClinicalKnowledgeGraph = lazyWithRetry(() => import('./pages/ClinicalKnowledgeGraph'));
@@ -685,6 +689,11 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/recommendations',
+      element: <RecommendationsPage />,
+      requiresAuth: true,
+    },
+    {
       path: '/automation',
       element: <WorkflowAutomationBuilder />,
       requiresAuth: true,
@@ -732,6 +741,11 @@ function AppRoutes() {
     {
       path: '/operations-center',
       element: <DigitalOperationsCenter />,
+      requiresAuth: true,
+    },
+    {
+      path: '/digital-twin-intelligence',
+      element: <DigitalTwinIntelligence />,
       requiresAuth: true,
     },
     {
@@ -956,7 +970,7 @@ function AppRoutes() {
       permission: [Permission.CONFIGURE_SYSTEM, Permission.VIEW_ANALYTICS],
     },
     {
-      path: '/ai/evaluation',
+      path: '/ai-evaluation',
       element: <AiEvaluationDashboard />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
@@ -964,6 +978,18 @@ function AppRoutes() {
     {
       path: '/ai-command-center',
       element: <AiCommandCenterDashboard />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/platform-learning-engine',
+      element: <PlatformLearningEngine />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/brain',
+      element: <CareDroidBrainDashboard />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },

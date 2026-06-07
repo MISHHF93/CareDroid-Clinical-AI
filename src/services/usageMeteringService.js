@@ -28,7 +28,7 @@ export function recordAssetLaunchUsage(plan, metadata = {}) {
   if (!assetId) return;
 
   void recordUsageEvent({
-    eventType: eventTypeForLaunch(plan),
+    eventType: metadata.eventType || eventTypeForLaunch(plan),
     assetId,
     quantity: 1,
     metadata: {

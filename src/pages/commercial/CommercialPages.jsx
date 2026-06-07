@@ -6,7 +6,12 @@ import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
 import { PROFILE_ROLES } from '../../data/profileToolSegmentation';
+import {
+  buildRoleIntelligenceProfile,
+  getRoleIntelligenceAgentRecommendations,
+} from '../../data/roleIntelligenceLayer';
 import { applyRegistryToolLaunch, getRegistryToolNavigation } from '../../navigation/registryToolLaunch';
+import { trackRoleAiRequest } from '../../services/roleIntelligenceTelemetry';
 import './CommercialPages.css';
 
 const ORG_TYPES = [
@@ -777,19 +782,63 @@ export function CarePathwayDetailPage() {
 }
 
 export function AgentsRegistryPage() {
+  const userIdentity = useUserIdentity();
   const [agents, setAgents] = useState([]);
 
   useEffect(() => {
     ProductCatalogApi.listAgents().then(setAgents).catch(() => setAgents([]));
   }, []);
 
+  const roleIntelligenceProfile = useMemo(
+    () =>
+      buildRoleIntelligenceProfile({
+        account: userIdentity.account,
+        preferences: userIdentity.preferences,
+        activeWorkspace: userIdentity.activeWorkspace,
+        workspaceState: userIdentity.workspaceState,
+        platformContext: userIdentity.platformContext,
+        roleProfile: userIdentity.roleProfile,
+      }),
+    [
+      userIdentity.account,
+      userIdentity.activeWorkspace,
+      userIdentity.platformContext,
+      userIdentity.preferences,
+      userIdentity.roleProfile,
+      userIdentity.workspaceState,
+    ]
+  );
+  const recommendedAgents = useMemo(
+    () =>
+      getRoleIntelligenceAgentRecommendations({
+        agents,
+        profile: roleIntelligenceProfile,
+        limit: agents.length || 4,
+      }),
+    [agents, roleIntelligenceProfile]
+  );
+  const recommendedAgentIds = useMemo(
+    () => new Set(recommendedAgents.map((agent) => agent.id)),
+    [recommendedAgents]
+  );
+  const orderedAgents = useMemo(() => {
+    const recById = new Map(recommendedAgents.map((agent) => [agent.id, agent]));
+    return [...agents]
+      .map((agent) => recById.get(agent.id) || agent)
+      .sort((a, b) => {
+        const aRecommended = recommendedAgentIds.has(a.id);
+        const bRecommended = recommendedAgentIds.has(b.id);
+        return Number(bRecommended) - Number(aRecommended) || (a.title || a.id).localeCompare(b.title || b.id);
+      });
+  }, [agents, recommendedAgentIds, recommendedAgents]);
+
   return (
     <PageShell
       title="AI Agent Registry"
-      subtitle="Domain-aware agents mapped to capabilities, assets, workspaces, roles, and tool-calling permissions."
+      subtitle={`Domain-aware agents mapped to capabilities, assets, workspaces, roles, and tool-calling permissions. Current role view: ${roleIntelligenceProfile.roleLabel}.`}
     >
       <div className="commercial-grid commercial-agent-grid">
-        {agents.map((agent) => (
+        {orderedAgents.map((agent) => (
           <Card key={agent.id} className="commercial-card commercial-agent-card">
             <div className="commercial-agent-card-header">
               <div>
@@ -798,6 +847,12 @@ export function AgentsRegistryPage() {
               </div>
               <span className="commercial-agent-status">{agent.canCallTools ? 'tool-calling' : 'read-only'}</span>
             </div>
+            {recommendedAgentIds.has(agent.id) && (
+              <section className="commercial-agent-section">
+                <strong>Recommended AI Agent</strong>
+                <p>{agent.roleIntelligence?.reason || `${roleIntelligenceProfile.roleLabel} role match`}</p>
+              </section>
+            )}
             <section className="commercial-agent-section">
               <strong>Capabilities</strong>
               <ChipList items={agent.capabilities || []} />
@@ -829,7 +884,16 @@ export function AgentsRegistryPage() {
               <strong>Tool calling permissions</strong>
               <ChipList items={agent.toolCallingPermissions || []} />
             </section>
-            <Link to={`/assistant?agent=${agent.id}`}>
+            <Link
+              to={`/assistant?agent=${agent.id}`}
+              onClick={() =>
+                trackRoleAiRequest({
+                  profile: roleIntelligenceProfile,
+                  agentId: agent.id,
+                  source: 'agent-registry-open',
+                })
+              }
+            >
               <Button variant="primary">Open agent</Button>
             </Link>
           </Card>

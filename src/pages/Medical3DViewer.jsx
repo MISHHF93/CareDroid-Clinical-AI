@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import CrossModuleLinkPanel from '../components/CrossModuleLinkPanel';
 import StateSourceNotice from '../components/StateSourceNotice';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
@@ -64,6 +65,12 @@ export default function Medical3DViewer() {
           DEMO_LIVE_STATES.UNSUPPORTED,
         ]}
         details="The canvas uses mock placeholder geometry only. No live imaging, DICOM renderer, GLB/GLTF asset manifest, or remote model service is connected; diagnostic image viewing and patient-specific model loading are unsupported."
+      />
+
+      <CrossModuleLinkPanel
+        moduleId="medical-3d-viewer"
+        title="3D Viewer connects back to simulation and lab context"
+        description="Anatomy and model review stays linked to the training and diagnostic modules that explain why the viewer was opened."
       />
 
       <section className="ops-demo-layout ops-demo-layout--viewer">

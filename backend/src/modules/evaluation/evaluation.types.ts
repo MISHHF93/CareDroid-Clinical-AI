@@ -1,20 +1,25 @@
 export type EvaluationMetricId =
+  | 'modelQuality'
   | 'hallucinationRate'
   | 'accuracy'
   | 'latencyMs'
   | 'retrievalPrecision'
   | 'toolExecutionSuccess'
+  | 'workflowSuccess'
   | 'userSatisfaction'
   | 'costUsd';
 
 export type EvaluationMetricDirection = 'higher_is_better' | 'lower_is_better';
+export type EvaluationComparisonDimension = 'models' | 'prompts' | 'agents' | 'ragStrategies';
 
 export interface EvaluationMetrics {
+  modelQuality: number;
   hallucinationRate: number;
   accuracy: number;
   latencyMs: number;
   retrievalPrecision: number;
   toolExecutionSuccess: number;
+  workflowSuccess: number;
   userSatisfaction: number;
   costUsd: number;
 }
@@ -51,6 +56,9 @@ export interface EvaluationTrendPoint {
 export interface EvaluationRun {
   id: string;
   modelName: string;
+  promptName: string;
+  agentName: string;
+  ragStrategy: string;
   datasetName: string;
   status: 'completed' | 'failed';
   sampleCount: number;
@@ -60,6 +68,7 @@ export interface EvaluationRun {
 }
 
 export interface EvaluationRawScores {
+  modelQuality?: number;
   factualClaims?: number;
   unsupportedClaims?: number;
   correctAnswers?: number;
@@ -68,6 +77,8 @@ export interface EvaluationRawScores {
   retrievalRetrievedResults?: number;
   toolExecutionsSucceeded?: number;
   toolExecutionsTotal?: number;
+  workflowsSucceeded?: number;
+  workflowsTotal?: number;
   userSatisfactionTotal?: number;
   userSatisfactionResponses?: number;
   latencyMs?: number;
@@ -76,12 +87,25 @@ export interface EvaluationRawScores {
 
 export interface CreateEvaluationRunDto {
   modelName?: string;
+  promptName?: string;
+  agentName?: string;
+  ragStrategy?: string;
   datasetName?: string;
   status?: 'completed' | 'failed';
   sampleCount?: number;
   metrics?: Partial<EvaluationMetrics>;
   rawScores?: EvaluationRawScores;
   notes?: string;
+}
+
+export interface EvaluationComparisonSummary {
+  id: string;
+  dimension: EvaluationComparisonDimension;
+  label: string;
+  runCount: number;
+  sampleCount: number;
+  metrics: EvaluationMetrics;
+  benchmarkPassRate: number;
 }
 
 export interface EvaluationDashboard {
@@ -91,4 +115,5 @@ export interface EvaluationDashboard {
   trends: EvaluationTrendPoint[];
   benchmarks: EvaluationBenchmark[];
   runs: EvaluationRun[];
+  comparisons: Record<EvaluationComparisonDimension, EvaluationComparisonSummary[]>;
 }

@@ -396,7 +396,7 @@ export function buildResponsiveQaPages() {
     {
       id: 'ai-evaluation',
       label: 'AI Evaluation',
-      path: '/ai/evaluation',
+      path: '/ai-evaluation',
       category: 'ai-system',
       registryId: REGISTRY.aiEvaluation,
     },

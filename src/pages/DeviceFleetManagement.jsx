@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import CrossModuleLinkPanel from '../components/CrossModuleLinkPanel';
 import StateSourceNotice from '../components/StateSourceNotice';
 import {
   fetchHospitalMapSnapshot,
@@ -266,6 +267,12 @@ export default function DeviceFleetManagement() {
               DEMO_LIVE_STATES.UNSUPPORTED,
             ]}
             details="Inventory, location history, maintenance, calibration, and firmware data come from the demo hospital map contract or local fallback. Row actions are browser-only placeholders; assignment, maintenance, firmware, and calibration write APIs are unsupported."
+          />
+
+          <CrossModuleLinkPanel
+            moduleId="fleet"
+            title="Fleet connects to map and IoT telemetry"
+            description="Fleet and device management stays linked to hospital map location context and device telemetry freshness."
           />
 
           <section className="device-fleet-summary" aria-label="Device fleet summary">

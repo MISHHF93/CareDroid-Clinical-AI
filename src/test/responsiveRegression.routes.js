@@ -141,7 +141,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'data-lineage', path: '/data-lineage', match: 'heading', heading: /data lineage explorer/i },
   { id: 'self-diagnostics', path: '/self-diagnostics', match: 'heading', heading: /platform self-diagnostics/i },
   { id: 'costs', path: '/costs', match: 'heading', heading: /cost analytics/i },
-  { id: 'ai-evaluation', path: '/ai/evaluation', match: 'heading', heading: /^ai evaluation$/i },
+  { id: 'ai-evaluation', path: '/ai-evaluation', match: 'heading', heading: /ai evaluation lab/i },
   {
     id: 'ai-command-center',
     path: '/ai-command-center',

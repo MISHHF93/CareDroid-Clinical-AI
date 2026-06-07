@@ -30,6 +30,7 @@ describe('primaryNavigation', () => {
 
   it('keeps operations destinations grouped for command/search instead of persistent sidebar nav', () => {
     expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
+      ['Twin Intelligence', '/digital-twin-intelligence'],
       ['Digital Twin', '/digital-twin'],
       ['Hospital Map', '/hospital-map'],
       ['Medical IoT', '/medical-iot'],
@@ -55,6 +56,9 @@ describe('primaryNavigation', () => {
       ['Governance Registry', '/governance-registry'],
       ['Data Lineage', '/data-lineage'],
       ['Self Diagnostics', '/self-diagnostics'],
+      ['Learning Engine', '/platform-learning-engine'],
+      ['Brain', '/brain'],
+      ['AI Evaluation', '/ai-evaluation'],
       ['Governance', '/ai-governance'],
       ['Security', '/security'],
       ['Audit', '/audit'],
@@ -147,6 +151,7 @@ describe('primaryNavigation', () => {
     expect(getPrimaryNavItemForPath('/fleet/route-optimizer')?.id).toBe('operations');
     expect(getPrimaryNavItemForPath('/operations/incidents')?.id).toBe('operations');
     expect(getPrimaryNavItemForPath('/digital-twin')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/digital-twin-intelligence')?.id).toBe('operations');
     expect(getPrimaryNavItemForPath('/operations')?.id).toBe('operations');
   });
 
