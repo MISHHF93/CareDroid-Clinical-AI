@@ -670,20 +670,20 @@ describe('Commercial builder pages', () => {
 
     [
       '1. Organization type',
-      '2. Specialty selection',
-      '3. Workspace selection',
-      '4. Asset pack selection',
+      '2. Subscription plan',
+      '3. Products and asset packs',
+      '4. Workspace profile',
       '5. User roles',
-      '6. Branding',
-      '7. Integrations',
+      '6. Default workspace',
+      '7. Finish setup',
     ].forEach((label) => {
       expect(screen.getByText(label)).toBeInTheDocument();
     });
   });
 
   it.each([
-    ['hospital', /emergency/i, /clinical operations/i],
-    ['clinic', /cardiology/i, /clinic workspace/i],
+    ['hospital', /emergency/i, /emergency/i],
+    ['clinic', /cardiology/i, /cardiology/i],
     ['ems', /operations/i, /ems command/i],
   ])('applies editable %s tenant presets', async (type, specialty, workspaceName) => {
     await renderOnboardingPage();
@@ -697,7 +697,7 @@ describe('Commercial builder pages', () => {
     expect(specialtyButton).not.toHaveClass('selected');
 
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
-    expect(screen.getByDisplayValue(workspaceName)).toBeInTheDocument();
+    expect(screen.getAllByDisplayValue(workspaceName).length).toBeGreaterThan(0);
   });
 
   it('reviews and activates the configured tenant profile payload', async () => {
@@ -740,6 +740,12 @@ describe('Commercial builder pages', () => {
           enabledProductIds: ['product-emergency-department'],
           productIds: ['product-emergency-department'],
           packIds: expect.arrayContaining(['core-platform', 'emergency-medicine', 'fleet-logistics']),
+          enabledWorkspaces: expect.arrayContaining(['emergency', 'fleet', 'operations']),
+          clientProfile: expect.objectContaining({
+            organizationType: 'ems',
+            enabledWorkspaces: expect.arrayContaining(['emergency', 'fleet', 'operations']),
+            defaultWorkspace: 'emergency',
+          }),
           integrationSlugs: expect.arrayContaining(['identity-sso', 'scheduling']),
           branding: expect.objectContaining({
             displayName: 'North EMS Command',

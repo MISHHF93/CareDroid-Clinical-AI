@@ -46,7 +46,7 @@ describe('simulation, laboratory, and 3D viewer pages', () => {
 
     expect(screen.getByRole('heading', { name: /debrief summary/i })).toBeInTheDocument();
     expect(screen.getByText(/what happened/i)).toBeInTheDocument();
-    expect(screen.getByText(/ai tutor feedback/i)).toBeInTheDocument();
+    expect(screen.getByText(/demo tutor feedback/i)).toBeInTheDocument();
   });
 
   it('renders simulation outcomes metrics and recommended practice', () => {

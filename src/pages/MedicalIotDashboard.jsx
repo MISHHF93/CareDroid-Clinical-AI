@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
+import ContextInsightCard from '../components/ContextInsightCard';
 import CrossModuleLinkPanel from '../components/CrossModuleLinkPanel';
 import StateSourceNotice from '../components/StateSourceNotice';
 import { fetchMedicalIotSnapshot, formatTelemetryTime } from '../services/medicalIotService';
@@ -304,11 +305,11 @@ export default function MedicalIotDashboard() {
           <Link to="/assistant" className="medical-iot-action">
             Ask Assistant
           </Link>
-          <Link to="/dashboard" className="medical-iot-action medical-iot-action--secondary">
-            Back to Command Dashboard
+          <Link to="/operations" className="medical-iot-action medical-iot-action--secondary">
+            Back to Operations
           </Link>
-          <Link to="/tools" className="medical-iot-action medical-iot-action--secondary">
-            Open Tool Library
+          <Link to="/devices" className="medical-iot-action medical-iot-action--secondary">
+            Open Devices
           </Link>
         </div>
       </section>
@@ -338,7 +339,41 @@ export default function MedicalIotDashboard() {
           <section className="medical-iot-source" role="status">
             <strong>{snapshot.sourceLabel}</strong>
             <span>Last updated: {formatTelemetryTime(snapshot.generatedAt)}</span>
-            {state.message ? <span>{state.message}</span> : null}
+          </section>
+
+          <section className="medical-iot-insights" aria-label="Medical IoT context insights">
+            <ContextInsightCard
+              title={counts.offline ? `${counts.offline} device(s) offline` : 'No offline devices'}
+              message={
+                counts.offline
+                  ? 'Review connectivity and location before relying on telemetry.'
+                  : 'All visible devices are reporting in this snapshot.'
+              }
+              source={snapshot.sourceLabel}
+              status={counts.offline ? 'action-required' : 'generated'}
+              demo={/demo|mock|fallback/i.test(snapshot.sourceLabel || state.message || '')}
+              actionLabel="Open Devices"
+              actionRoute="/devices"
+              timestamp={snapshot.generatedAt}
+            />
+            <ContextInsightCard
+              title={counts.warnings ? 'Telemetry needs review' : 'Telemetry stable'}
+              message={`${counts.warnings} warning/offline device(s), ${counts.alerts} active alert(s).`}
+              source="Local telemetry summary"
+              status={counts.warnings || counts.alerts ? 'action-required' : 'generated'}
+              actionLabel="Ask Assistant"
+              actionRoute="/assistant"
+              timestamp={snapshot.generatedAt}
+            />
+            <ContextInsightCard
+              title={state.message ? 'Backend status' : 'Context source'}
+              message={state.message || 'Medical IoT context is assembled from the current snapshot.'}
+              source={snapshot.sourceLabel}
+              status={/unavailable|fallback/i.test(state.message || '') ? 'unavailable' : 'demo'}
+              demo={!/unavailable/i.test(state.message || '')}
+              actionLabel="Back to Operations"
+              actionRoute="/operations"
+            />
           </section>
 
           <StateSourceNotice
@@ -382,7 +417,7 @@ export default function MedicalIotDashboard() {
               </select>
             </label>
             <label className="medical-iot-search">
-              <span>Search device, patient placeholder, location</span>
+              <span>Search device, demo patient label, location</span>
               <input
                 type="search"
                 value={search}

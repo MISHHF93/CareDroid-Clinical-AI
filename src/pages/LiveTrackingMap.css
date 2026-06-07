@@ -128,6 +128,13 @@
   padding: 10px 12px;
 }
 
+.live-map-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--compact-panel-gap, 10px);
+  min-width: 0;
+}
+
 .live-map-summary {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));

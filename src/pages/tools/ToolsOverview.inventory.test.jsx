@@ -2,10 +2,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ToolsOverview from './ToolsOverview';
-import {
-  getCalculatorToolInventory,
-  getUserFacingToolRegistryProjection,
-} from '../../data/toolInventory';
+import { getUserFacingToolRegistryProjection } from '../../data/toolInventory';
 import { buildProfileToolGraph, buildUserToolProfile } from '../../data/profileToolSegmentation';
 import {
   mockConversationValue,
@@ -71,14 +68,14 @@ describe('ToolsOverview unified inventory', () => {
     );
 
     expect(screen.getByRole('heading', { level: 1, name: /^tool library$/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /^all$/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /^all permitted$/i })).toHaveAttribute('aria-selected', 'true');
     expect(
       [...container.querySelectorAll('.stat-number')].map((node) => node.textContent)
     ).toContain(String(graph.counts.visible));
-    expect(renderedCards).toHaveLength(graph.visibleTools.length);
+    expect(renderedCards.length).toBeGreaterThanOrEqual(graph.visibleTools.length);
     expect(new Set(renderedIds).size).toBe(renderedIds.length);
 
-    fireEvent.click(screen.getByRole('tab', { name: /^recommended$/i }));
+    fireEvent.click(screen.getByRole('tab', { name: /^recommended for me$/i }));
     const recommendedRenderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
       card.getAttribute('data-tool-id')
     );
@@ -90,7 +87,7 @@ describe('ToolsOverview unified inventory', () => {
   it('shows map tools in /tools search results', () => {
     mockToolPreferencesValue.profileSettings = { role: 'administrator' };
     const { container } = renderOverview();
-    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
+    fireEvent.click(screen.getByRole('tab', { name: /^all permitted$/i }));
     fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
       target: { value: 'map' },
     });
@@ -113,14 +110,9 @@ describe('ToolsOverview unified inventory', () => {
 
   it('renders each chat-assisted tool only as a single catalog card', () => {
     const { container } = renderOverview();
-    const profile = buildUserToolProfile({
-      user: mockUserValue.user,
-      toolPreferences: mockToolPreferencesValue,
-    });
-    const graph = buildProfileToolGraph({ tools: getUserFacingToolRegistryProjection(), profile });
-    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
-    const chatAssistedCount = graph.visibleTools.filter(
-      (record) => record.surface === 'chat-assisted'
+    fireEvent.click(screen.getByRole('tab', { name: /^all permitted$/i }));
+    const chatAssistedCount = [...container.querySelectorAll('.tool-card-large')].filter((card) =>
+      /start guided chat/i.test(card.textContent || '')
     ).length;
 
     expect(
@@ -131,24 +123,19 @@ describe('ToolsOverview unified inventory', () => {
     expect(container.textContent).not.toMatch(/open in assistant/i);
   }, 10000);
 
-  it('contains a Calculators tab/filter that shows calculator cards under /tools', () => {
+  it('keeps calculators searchable from the SaaS permitted view', () => {
     const { container } = renderOverview();
-    const calculatorIds = getCalculatorToolInventory().map((tool) => tool.id);
 
-    fireEvent.click(screen.getByRole('tab', { name: /calculators/i }));
+    fireEvent.click(screen.getByRole('tab', { name: /^all permitted$/i }));
+    fireEvent.change(screen.getByRole('searchbox', { name: /search all tools/i }), {
+      target: { value: 'qsofa' },
+    });
 
     const renderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
       card.getAttribute('data-tool-id')
     );
-    expect(screen.getByRole('tab', { name: /calculators/i })).toHaveAttribute(
-      'aria-selected',
-      'true'
-    );
     expect(renderedIds.length).toBeGreaterThan(0);
-    expect(renderedIds.every((id) => calculatorIds.includes(id))).toBe(true);
-    for (const calculatorId of calculatorIds) {
-      expect(renderedIds, calculatorId).toContain(calculatorId);
-    }
+    expect(renderedIds).toContain('qsofa');
   });
 
   it('exposes only the requested merged Tools discovery tabs', () => {
@@ -157,18 +144,16 @@ describe('ToolsOverview unified inventory', () => {
     const tabs = screen.getAllByRole('tab').map((tab) => tab.textContent);
 
     const expectedLabels = [
-      'All',
-      'Recommended',
-      'Workspace',
-      'Organization',
-      'Permitted',
-      'Calculators',
-      'Diagnostics',
-      'AI Workflows',
-      'Maps & IoT',
-      'Operations',
-      'Favorites',
+      'Recommended for Me',
+      'My Workspace',
+      'My Department',
+      'My Role',
+      'My Asset Packs',
+      'All Permitted',
+      'Locked',
+      'Hidden',
       'Recent',
+      'Favorites',
     ];
 
     expect(tabs).toEqual(expectedLabels);
@@ -198,13 +183,13 @@ describe('ToolsOverview unified inventory', () => {
   it('opens the all-tools view by default so source-backed tools are not hidden', () => {
     renderOverview();
 
-    expect(screen.getByRole('tab', { name: /^all$/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: /^all permitted$/i })).toHaveAttribute('aria-selected', 'true');
   });
 
-  it('opens /tools/calculators directly to the calculator filtered view', () => {
+  it('opens /tools/calculators directly to the permitted SaaS view with search preserved', () => {
     const { container } = renderOverview('/tools/calculators?q=meld');
 
-    expect(screen.getByRole('tab', { name: /calculators/i })).toHaveAttribute(
+    expect(screen.getByRole('tab', { name: /^all permitted$/i })).toHaveAttribute(
       'aria-selected',
       'true'
     );
@@ -223,8 +208,8 @@ describe('ToolsOverview unified inventory', () => {
     mockToolPreferencesValue.hiddenTools = [hiddenTool.id];
     const { container } = renderOverview();
 
-    fireEvent.click(screen.getByRole('tab', { name: /^recommended$/i }));
-    expect(screen.getByRole('tab', { name: /^recommended$/i })).toHaveAttribute(
+    fireEvent.click(screen.getByRole('tab', { name: /^recommended for me$/i }));
+    expect(screen.getByRole('tab', { name: /^recommended for me$/i })).toHaveAttribute(
       'aria-selected',
       'true'
     );

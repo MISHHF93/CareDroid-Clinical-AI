@@ -262,7 +262,9 @@ describe('MemoryFabricService', () => {
       getActiveContext: jest.fn().mockResolvedValue({
         activeConversation: { id: 'short-1', title: 'Active chat', content: { message: 'raw' } },
       }),
-      remember: jest.fn().mockImplementation((_userId, dto) => Promise.resolve({ id: 'short-new', ...dto })),
+      remember: jest
+        .fn()
+        .mockImplementation((_userId, dto) => Promise.resolve({ id: 'short-new', ...dto })),
     };
     const longMemoryService = {
       getContext: jest.fn().mockResolvedValue({
@@ -271,7 +273,11 @@ describe('MemoryFabricService', () => {
           {
             id: 'search-allowed',
             title: 'Allowed search bucket',
-            content: { organizationId: 'org-1', signalType: MemoryFabricSignalType.COMMON_SEARCH, query: 'raw' },
+            content: {
+              organizationId: 'org-1',
+              signalType: MemoryFabricSignalType.COMMON_SEARCH,
+              query: 'raw',
+            },
             tags: ['memory-fabric', 'common-search'],
           },
           {
@@ -283,14 +289,26 @@ describe('MemoryFabricService', () => {
         ],
         savedTools: [
           { id: 'tool-1', title: 'qSOFA', content: { toolId: 'qsofa' }, tags: ['tool'] },
-          { id: 'tool-2', title: 'Locked asset', content: { toolId: 'locked-tool' }, tags: ['tool'] },
+          {
+            id: 'tool-2',
+            title: 'Locked asset',
+            content: { toolId: 'locked-tool' },
+            tags: ['tool'],
+          },
         ],
       }),
       savedWorkflowsForUser: jest.fn().mockResolvedValue([
         { id: 'workflow-1', title: 'Rounds', content: { workflowId: 'qsofa' }, tags: ['workflow'] },
-        { id: 'workflow-locked', title: 'Locked', content: { workflowId: 'locked-tool' }, tags: ['workflow'] },
+        {
+          id: 'workflow-locked',
+          title: 'Locked',
+          content: { workflowId: 'locked-tool' },
+          tags: ['workflow'],
+        },
       ]),
-      remember: jest.fn().mockImplementation((_userId, dto) => Promise.resolve({ id: 'long-new', ...dto })),
+      remember: jest
+        .fn()
+        .mockImplementation((_userId, dto) => Promise.resolve({ id: 'long-new', ...dto })),
     };
     const userActivityService = {
       summaryForUser: jest.fn().mockResolvedValue({
@@ -314,14 +332,24 @@ describe('MemoryFabricService', () => {
     const artifactsService = {
       list: jest.fn().mockResolvedValue({
         artifacts: [
-          { id: 'artifact-1', title: 'Protocol', type: 'protocol', version: '1.0', tags: ['sepsis'] },
+          {
+            id: 'artifact-1',
+            title: 'Protocol',
+            type: 'protocol',
+            version: '1.0',
+            tags: ['sepsis'],
+          },
         ],
       }),
     };
     const assetAccessService = {
       getUserAssetAccess: jest.fn().mockResolvedValue({
         entitledPackIds: ['pack-1'],
-        roleProfile: { id: 'role-1', label: 'Clinician', preferredAssetIds: ['qsofa', 'locked-tool'] },
+        roleProfile: {
+          id: 'role-1',
+          label: 'Clinician',
+          preferredAssetIds: ['qsofa', 'locked-tool'],
+        },
         access: [
           { assetId: 'qsofa', accessState: 'allowed' },
           { assetId: 'locked-tool', accessState: 'locked' },

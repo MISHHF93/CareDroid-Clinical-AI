@@ -216,6 +216,14 @@
   min-width: 0;
 }
 
+.command-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+  min-width: 0;
+}
+
 .command-prompt-chip,
 .command-tool-card,
 .command-recent-item {

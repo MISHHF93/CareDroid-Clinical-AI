@@ -7,6 +7,11 @@ import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
+import {
+  buildWorkspaceSetupFromRegistry,
+  getCanonicalWorkspaceRegistry,
+  saveLocalClientProfile,
+} from '../../config/workspace.config';
 import { buildOrganizationIntelligenceProfile } from '../../data/organizationIntelligenceProfile';
 import { PROFILE_ROLES } from '../../data/profileToolSegmentation';
 import {
@@ -1626,6 +1631,21 @@ export function TenantAdministrationCenter() {
     try {
       const result = await PlatformAssetsApi.updateTenantAdministration(organization.id, payload);
       setAdmin(result);
+      const workspaceDefaults = payload.workspaceDefaults || [];
+      saveLocalClientProfile({
+        source: 'tenant-admin',
+        organizationId: organization.id,
+        organizationName: payload.name || organization.name,
+        organizationType: payload.organizationType,
+        subscriptionPlan: payload.subscription.tier,
+        enabledWorkspaces: workspaceDefaults.map((workspace) => workspace.id || workspace.type).filter(Boolean),
+        enabledAssetPacks: workspaceDefaults.flatMap((workspace) => workspace.enabledAssetPacks || []),
+        defaultWorkspace: workspaceDefaults[0]?.id || workspaceDefaults[0]?.type || 'emergency',
+        roles: users.map((user) => user.roleProfileId || user.membershipRole).filter(Boolean),
+        departments: payload.departments,
+        integrations: payload.integrations,
+        branding: payload.branding,
+      });
       await refreshPlatformContext?.();
       setStatus('Tenant administration saved.');
     } catch (error) {
@@ -1648,6 +1668,37 @@ export function TenantAdministrationCenter() {
   const roleProfiles = admin?.roles?.roleProfiles || [];
   const permissionOverrides = admin?.permissions?.overrides || {};
   const integrations = admin?.integrations || [];
+  const workspaceDefaults = parseJsonField(form.workspacesJson, admin?.workspaces || []);
+  const enabledWorkspaceIds = new Set(workspaceDefaults.map((workspace) => workspace.id || workspace.type));
+  const defaultWorkspaceId = workspaceDefaults[0]?.id || workspaceDefaults[0]?.type || '';
+  const previewRole = roleProfiles[0]?.id || 'hospital-administrator';
+  const updateWorkspaceDefaults = (updater) => {
+    const next = typeof updater === 'function' ? updater(workspaceDefaults) : updater;
+    setForm((f) => ({ ...f, workspacesJson: prettyJson(next, []) }));
+  };
+  const toggleWorkspaceEnabled = (workspace) => {
+    updateWorkspaceDefaults((current) => {
+      const workspaceId = workspace.workspaceId || workspace.id;
+      if (current.some((item) => (item.id || item.type) === workspaceId)) {
+        return current.filter((item) => (item.id || item.type) !== workspaceId);
+      }
+      return [...current, buildWorkspaceSetupFromRegistry(workspaceId)];
+    });
+  };
+  const patchWorkspaceDefault = (workspaceId, patch) => {
+    updateWorkspaceDefaults((current) =>
+      current.map((workspace) =>
+        (workspace.id || workspace.type) === workspaceId ? { ...workspace, ...patch } : workspace
+      )
+    );
+  };
+  const setDefaultWorkspace = (workspaceId) => {
+    updateWorkspaceDefaults((current) => {
+      const target = current.find((workspace) => (workspace.id || workspace.type) === workspaceId);
+      if (!target) return current;
+      return [target, ...current.filter((workspace) => (workspace.id || workspace.type) !== workspaceId)];
+    });
+  };
 
   return (
     <div className="org-page">
@@ -1862,8 +1913,76 @@ export function TenantAdministrationCenter() {
         </Card>
 
         <Card className="org-card org-admin-wide-card">
+          <h2>Workspace configuration</h2>
+          <p className="org-pack-meta">
+            Enable tenant workspaces from the canonical registry, assign role and pack defaults, set
+            the default workspace, and preview access as {previewRole}.
+          </p>
+          <div className="org-grid">
+            {getCanonicalWorkspaceRegistry().map((workspace) => {
+              const workspaceId = workspace.workspaceId || workspace.id;
+              const enabled = enabledWorkspaceIds.has(workspaceId);
+              const configured = workspaceDefaults.find((item) => (item.id || item.type) === workspaceId) || {};
+              const roleText = (configured.allowedRoles || workspace.allowedRoles || []).join(', ');
+              const packText = (configured.enabledAssetPacks || workspace.defaultAssetPacks || []).join(', ');
+              const previewAllowed = !roleText || roleText.split(',').map((item) => item.trim()).includes(previewRole);
+              return (
+                <div key={workspaceId} className="org-integration-row">
+                  <span>
+                    <strong>{workspace.label}</strong>
+                    <small>{workspace.description}</small>
+                    <small>
+                      {workspace.subscriptionTier} · {workspace.allowedOrganizationTypes.join(', ')}
+                    </small>
+                    {enabled && (
+                      <>
+                        <label>
+                          Roles
+                          <input
+                            value={roleText}
+                            onChange={(e) =>
+                              patchWorkspaceDefault(workspaceId, {
+                                allowedRoles: splitList(e.target.value),
+                              })
+                            }
+                          />
+                        </label>
+                        <label>
+                          Asset packs
+                          <input
+                            value={packText}
+                            onChange={(e) =>
+                              patchWorkspaceDefault(workspaceId, {
+                                enabledAssetPacks: splitList(e.target.value),
+                              })
+                            }
+                          />
+                        </label>
+                      </>
+                    )}
+                  </span>
+                  <span>
+                    <Button variant={enabled ? 'secondary' : 'primary'} onClick={() => toggleWorkspaceEnabled(workspace)}>
+                      {enabled ? 'Disable' : 'Enable'}
+                    </Button>
+                    {enabled && (
+                      <Button variant="ghost" onClick={() => setDefaultWorkspace(workspaceId)}>
+                        {defaultWorkspaceId === workspaceId ? 'Default' : 'Set default'}
+                      </Button>
+                    )}
+                    <span className={`org-status-pill org-status-pill--${previewAllowed ? 'active' : 'disabled'}`}>
+                      {previewAllowed ? 'Role visible' : 'Role hidden'}
+                    </span>
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        <Card className="org-card org-admin-wide-card">
           <h2>Workspaces</h2>
-          <p className="org-pack-meta">Workspace defaults are JSON so admins can configure modules and tool access without code.</p>
+          <p className="org-pack-meta">Raw workspace defaults remain available as an escape hatch for advanced tenant configuration.</p>
           <textarea
             value={form.workspacesJson}
             onChange={(e) => setForm((f) => ({ ...f, workspacesJson: e.target.value }))}

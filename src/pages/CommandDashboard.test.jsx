@@ -154,8 +154,8 @@ describe('CommandDashboard', () => {
 
   it('surfaces Medical IoT as a first-class dashboard launch', () => {
     renderDashboard();
-    const iotPanel = screen.getByRole('heading', { name: /medical iot \/ device monitoring/i }).closest('section');
-    const iotButton = within(iotPanel).getByRole('button', { name: /open medical iot dashboard/i });
+    const operationsPanel = screen.getByRole('heading', { name: /operations summary/i }).closest('section');
+    const iotButton = within(operationsPanel).getByRole('button', { name: /open medical iot dashboard/i });
 
     fireEvent.click(iotButton);
 
@@ -165,7 +165,7 @@ describe('CommandDashboard', () => {
 
   it('surfaces Hospital Map as a first-class operations launch', () => {
     renderDashboard();
-    const operationsPanel = screen.getByRole('heading', { name: /^fleet$/i }).closest('section');
+    const operationsPanel = screen.getByRole('heading', { name: /operations summary/i }).closest('section');
     const hospitalMapButton = within(operationsPanel).getByRole('button', { name: /open hospital map/i });
 
     fireEvent.click(hospitalMapButton);

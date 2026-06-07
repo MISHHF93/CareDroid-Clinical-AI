@@ -8,6 +8,7 @@ import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useOrganizationContext } from '../contexts/OrganizationContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useNotifications } from '../contexts/NotificationContext';
+import ContextInsightCard from '../components/ContextInsightCard';
 import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
 import ProfileToolGraphCard from '../components/ProfileToolGraphCard';
 import { AdaptiveDashboardPanel } from './PlatformOSPages';
@@ -157,6 +158,13 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     icon: CHROME_ICONS.activity,
   },
   {
+    id: 'operations',
+    label: 'Operations',
+    description: 'Open the unified hub for maps, IoT, devices, fleet, alerts, telemetry, and maintenance.',
+    path: CANONICAL_ROUTES.operations,
+    icon: CHROME_ICONS.truck,
+  },
+  {
     id: 'notifications',
     label: 'Notifications',
     description: 'Review unread updates, preferences, and notification history.',
@@ -271,15 +279,35 @@ export default function CommandDashboard() {
   const navigate = useNavigate();
   const [assistantPrompt, setAssistantPrompt] = useState('');
   const { user, isDevAuthBypass, hasPermission } = useUser();
-  const { activeWorkspace, activity, aiPersonalization, platformContext, account, roleProfile } =
-    useUserIdentity();
+  const {
+    activeWorkspace,
+    activity,
+    aiPersonalization,
+    platformContext,
+    account,
+    roleProfile,
+    saasProfile,
+    enabledAssetPacks,
+    pinnedAssets,
+    recentAssets,
+  } = useUserIdentity();
   const { branding, tenant, subscription } = useOrganizationContext();
   const {
     activeWorkspace: workspaceContextActive,
     recommendations: workspaceRecommendations,
     shortcuts: workspaceShortcuts,
     visibleAssetIds: workspaceVisibleAssetIds,
+    recommendedAIAgents,
+    recommendedAssetPacks,
   } = useWorkspace();
+  const safeSaasProfile = saasProfile || {
+    role: user?.role || 'student',
+    specialty: account?.specialty || 'general',
+    department: account?.department || 'unassigned',
+    defaultWorkspace: activeWorkspace?.name || 'Emergency',
+    organizationType: account?.organizationType || 'hospital',
+    preferredAIStyle: 'balanced',
+  };
   const workspaceAwarePlatformContext = useMemo(
     () =>
       platformContext
@@ -293,7 +321,7 @@ export default function CommandDashboard() {
     [platformContext, workspaceVisibleAssetIds]
   );
   const { conversations, messages, addMessage, selectTool, setActiveTool } = useConversation();
-  const { recentTools, recordToolAccess } = useToolPreferences();
+  const { favorites, recentTools, recordToolAccess } = useToolPreferences();
   const { notifications = [] } = useNotifications();
   const systemConfig = useSystemConfig();
   const model = useMemo(
@@ -314,6 +342,22 @@ export default function CommandDashboard() {
         .filter(Boolean)
         .slice(0, 4),
     [model.toolById, recentTools]
+  );
+  const favoriteToolItems = useMemo(
+    () =>
+      favorites
+        .map((toolId) => model.toolById[toolId])
+        .filter(Boolean)
+        .slice(0, 4),
+    [favorites, model.toolById]
+  );
+  const recommendedToolItems = useMemo(
+    () =>
+      model.recommendedAssets
+        .map((recommendation) => model.toolById[recommendation.assetId || recommendation.id])
+        .filter(Boolean)
+        .slice(0, 4),
+    [model.recommendedAssets, model.toolById]
   );
   const recentAssistantOutputs = useMemo(
     () =>
@@ -399,13 +443,14 @@ export default function CommandDashboard() {
             {branding?.dashboardSubtitle ||
               'Spend the day from one clinical operating center: ask AI, open tools and calculators, review alerts, check workspace context, and launch major modules without browsing the sidebar.'}{' '}
             Active tenant: {tenant?.tenantId || model.organization?.slug || 'personal'} · workspace:{' '}
-            {workspaceContextActive?.name || activeWorkspace?.name || 'Emergency'}.
+            {workspaceContextActive?.name || activeWorkspace?.name || safeSaasProfile.defaultWorkspace || 'Emergency'} · role:{' '}
+            {safeSaasProfile.role}.
           </p>
         </div>
         <div className="command-hero__stats" aria-label="Dashboard inventory summary">
           <div>
-            <strong>{model.stats.totalTools}</strong>
-            <span>Org-aware tools</span>
+            <strong>{model.organization?.name || safeSaasProfile.organizationType}</strong>
+            <span>Organization</span>
           </div>
           <div>
             <strong>{subscription?.tier || 'free'}</strong>
@@ -416,12 +461,16 @@ export default function CommandDashboard() {
             <span>Workspace recs</span>
           </div>
           <div>
-            <strong>{unreadNotifications.length}</strong>
-            <span>Unread updates</span>
+            <strong>{enabledAssetPacks?.length || recommendedAssetPacks?.length || 0}</strong>
+            <span>Asset packs</span>
           </div>
           <div>
-            <strong>{activeAlerts.length}</strong>
-            <span>Active alerts</span>
+            <strong>{pinnedAssets?.length || 0}</strong>
+            <span>Pinned assets</span>
+          </div>
+          <div>
+            <strong>{recentAssets?.length || recentToolItems.length}</strong>
+            <span>Recent assets</span>
           </div>
         </div>
       </section>
@@ -454,6 +503,54 @@ export default function CommandDashboard() {
             Recent safe activity: {(activity?.recentTools || []).length} tools,{' '}
             {(activity?.recentAiChats || []).length} AI chats.
           </p>
+          <div className="command-insight-grid" aria-label="Workspace context insights">
+            <ContextInsightCard
+              title="Workspace profile"
+              message={`${safeSaasProfile.role} · ${safeSaasProfile.specialty || 'general'} · ${
+                safeSaasProfile.department || 'unassigned department'
+              }`}
+              source="Profile context"
+              status="generated"
+              actionLabel="Tune profile"
+              actionRoute={CANONICAL_ROUTES.profileSettings}
+            />
+            <ContextInsightCard
+              title="Suggested next action"
+              message={
+                recommendedToolItems[0]
+                  ? `Open ${recommendedToolItems[0].name} for this workspace.`
+                  : 'Use Assistant once to generate workspace recommendations.'
+              }
+              source={recommendedToolItems[0] ? 'Workspace inventory' : 'Empty recommendation state'}
+              status={recommendedToolItems[0] ? 'action-required' : 'empty'}
+              actionLabel={recommendedToolItems[0] ? `Open ${recommendedToolItems[0].name}` : 'Open Assistant'}
+              actionRoute={recommendedToolItems[0]?.path || CANONICAL_ROUTES.assistant}
+            />
+            <ContextInsightCard
+              title="Enabled packs"
+              message={
+                (enabledAssetPacks?.length ? enabledAssetPacks : recommendedAssetPacks || [])
+                  .slice(0, 3)
+                  .join(', ') || 'No organization asset packs are visible in this local context.'
+              }
+              source={enabledAssetPacks?.length ? 'Organization entitlements' : 'Workspace profile'}
+              status={enabledAssetPacks?.length ? 'live' : 'demo'}
+              demo={!enabledAssetPacks?.length}
+              actionLabel="Open tools"
+              actionRoute={CANONICAL_ROUTES.tools}
+            />
+            <ContextInsightCard
+              title="Assistant context"
+              message={(recommendedAIAgents?.length ? recommendedAIAgents : [model.defaultAiAgentId])
+                .slice(0, 2)
+                .join(', ')}
+              source="AI context"
+              status={recommendedAIAgents?.length ? 'generated' : 'demo'}
+              demo={!recommendedAIAgents?.length}
+              actionLabel="Ask Assistant"
+              actionRoute={CANONICAL_ROUTES.assistant}
+            />
+          </div>
           <div className="command-status-actions">
             <Link className="command-secondary-action" to="/workspaces">
               Open workspace
@@ -621,6 +718,48 @@ export default function CommandDashboard() {
         aria-label="Command Center personalized toolkits"
       >
         <DashboardPanel
+          title="Recommended for Me"
+          description="Profile, workspace, and role-aware suggestions from the unified asset inventory."
+          icon={CHROME_ICONS.sparkles}
+        >
+          <div className="command-tool-grid">
+            {recommendedToolItems.length > 0 ? (
+              recommendedToolItems.map((tool) => (
+                <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
+              ))
+            ) : (
+              <p className="command-empty-state">
+                No personalized recommendations yet. Use Assistant or switch workspace to refresh context.
+              </p>
+            )}
+          </div>
+          <Link className="command-panel-link" to={`${CANONICAL_ROUTES.tools}?filter=recommended`}>
+            Open Recommended Tools
+          </Link>
+        </DashboardPanel>
+
+        <DashboardPanel
+          title="Favorite Tools"
+          description="Pinned and favorite tools stay close to the command center without creating duplicate navigation."
+          icon={CHROME_ICONS.star}
+        >
+          <div className="command-tool-grid">
+            {favoriteToolItems.length > 0 ? (
+              favoriteToolItems.map((tool) => (
+                <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
+              ))
+            ) : (
+              <p className="command-empty-state">
+                No favorite tools yet. Favorite or pin tools from the Tools library.
+              </p>
+            )}
+          </div>
+          <Link className="command-panel-link" to={`${CANONICAL_ROUTES.tools}?filter=favorites`}>
+            Open Favorite Tools
+          </Link>
+        </DashboardPanel>
+
+        <DashboardPanel
           title="My Tools"
           description="High-value clinical, reference, and workflow tools surfaced from the unified inventory."
           icon={CHROME_ICONS.tools}
@@ -755,32 +894,17 @@ export default function CommandDashboard() {
         </DashboardPanel>
 
         <DashboardPanel
-          title="Fleet"
-          description="Tracking and operations tools stay visible without implying autonomous dispatch or control."
-          icon={CHROME_ICONS.tools}
+          title="Operations Summary"
+          description="Fleet, live maps, IoT, devices, telemetry, and maintenance stay grouped under Operations."
+          icon={CHROME_ICONS.truck}
         >
           <div className="command-tool-grid">
-            {model.panels.fleetOperations.map((tool) => (
+            {[...model.panels.fleetOperations, ...model.panels.medicalIot].map((tool) => (
               <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
             ))}
           </div>
-          <Link className="command-panel-link" to={CANONICAL_ROUTES.fleetMap}>
-            Open Fleet Map
-          </Link>
-        </DashboardPanel>
-
-        <DashboardPanel
-          title="Medical IoT / Device Monitoring"
-          description="Connected devices, vitals streams, telemetry alerts, battery, connectivity, and stale/offline signals."
-          icon={CHROME_ICONS.activity}
-        >
-          <div className="command-tool-grid">
-            {model.panels.medicalIot.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
-            ))}
-          </div>
-          <Link className="command-panel-link" to={CANONICAL_ROUTES.medicalIot}>
-            Open Medical IoT Dashboard
+          <Link className="command-panel-link" to={CANONICAL_ROUTES.operations}>
+            Open Operations
           </Link>
         </DashboardPanel>
 

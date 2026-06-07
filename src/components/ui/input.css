@@ -4,6 +4,8 @@
   flex-direction: column;
   gap: var(--app-space-sm, var(--space-2));
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .input-label {
@@ -21,12 +23,16 @@
   position: relative;
   display: flex;
   align-items: center;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .input-field {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   padding: 9px 12px;
-  min-height: var(--compact-control-height, 38px);
+  min-height: var(--app-input-height, var(--compact-control-height, 38px));
   font-size: var(--text-input-min, var(--font-16));
   font-family: inherit;
   color: var(--app-text-primary);
@@ -134,6 +140,7 @@
 /* Textarea */
 textarea.input-field {
   min-height: 82px;
+  max-width: 100%;
   resize: vertical;
   font-family: inherit;
 }

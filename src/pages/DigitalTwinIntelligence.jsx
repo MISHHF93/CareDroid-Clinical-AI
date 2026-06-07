@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ContextInsightCard from '../components/ContextInsightCard';
 import { buildDigitalTwinIntelligence } from '../data/digitalTwinIntelligence';
 import { buildDigitalTwinSnapshot } from '../data/platformOperatingSystem';
 import { fetchFleetLiveTrackingSnapshot } from '../services/fleetTelemetryService';
@@ -32,21 +33,19 @@ function ScoreCard({ score }) {
 
 function InsightCard({ insight }) {
   return (
-    <article className={`twin-intel-insight twin-intel-insight--${insight.severity}`}>
-      <div>
-        <span>Priority {insight.priority}</span>
-        <h3>{insight.title}</h3>
-      </div>
-      <p>{insight.detail}</p>
-      {insight.relatedFactors.length ? (
-        <ul>
-          {insight.relatedFactors.map((factor) => (
-            <li key={factor}>{factor}</li>
-          ))}
-        </ul>
-      ) : null}
-      <Link to={insight.route}>Review source</Link>
-    </article>
+    <ContextInsightCard
+      title={`P${insight.priority}: ${insight.title}`}
+      message={
+        insight.relatedFactors.length
+          ? `${insight.detail} Related: ${insight.relatedFactors.slice(0, 2).join(', ')}.`
+          : insight.detail
+      }
+      source="Local operational twin"
+      status={insight.severity === 'critical' || insight.severity === 'warning' ? 'action-required' : 'generated'}
+      confidence={0.72}
+      actionLabel="Review source"
+      actionRoute={insight.route}
+    />
   );
 }
 
@@ -156,7 +155,16 @@ export default function DigitalTwinIntelligence() {
         </nav>
       </section>
 
-      <p className="twin-intel-status">{status}</p>
+      <section className="twin-intel-context" aria-label="Digital twin context insight">
+        <ContextInsightCard
+          title="Operational twin source"
+          message={status}
+          source={/fallback|local|unable|unavailable/i.test(status) ? 'Fallback source' : 'Backend and local signals'}
+          status={/fallback|local|unable|unavailable/i.test(status) ? 'unavailable' : 'generated'}
+          actionLabel="Open Operations"
+          actionRoute="/operations"
+        />
+      </section>
 
       <section className="twin-intel-scores" aria-label="Digital twin intelligence scores">
         <ScoreCard score={intelligence.scores.healthScore} />

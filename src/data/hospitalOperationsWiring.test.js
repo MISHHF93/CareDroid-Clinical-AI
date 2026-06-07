@@ -48,11 +48,11 @@ describe('Hospital operations wiring', () => {
   it('keeps registry rows and catalog launches aligned', () => {
     for (const id of HOSPITAL_OPERATIONS_REGISTRY_IDS) {
       const reg = toolRegistryById[id];
-      expect(['/operations-center', '/hospital-map', '/medical-iot', '/devices']).toContain(reg?.path);
+      expect(['/operations', '/hospital-map', '/medical-iot', '/devices']).toContain(reg?.path);
       expect(['Hospital Operations', 'IoT']).toContain(reg?.category);
 
       const launch = resolveCatalogLaunch(id);
-      expect(['/operations-center', '/hospital-map', '/medical-iot', '/devices']).toContain(launch.path);
+      expect(['/operations', '/hospital-map', '/medical-iot', '/devices']).toContain(launch.path);
       expect(launch.registryId, id).toBe(id);
     }
   });

@@ -112,6 +112,20 @@ export class WorkspaceContextService {
     const shortcuts = (settings.shortcuts || [])
       .filter((shortcut) => !shortcut.assetId || visibleAssetSet.has(shortcut.assetId))
       .slice(0, 8);
+    const workspaceProfile = settings.workspaceProfile || {
+      workspaceId: definition.type,
+      name: definition.displayName,
+      description: definition.description,
+      allowedRoles: definition.allowedRoles || [],
+      intendedDepartments: definition.intendedDepartments || [],
+      defaultAssets: settings.enabledToolIds || [],
+      recommendedAssetPacks: definition.recommendedAssetPacks || [],
+      defaultDashboardWidgets: definition.defaultDashboardWidgets || [],
+      recommendedAIAgents: definition.recommendedAIAgents || [],
+      visibleNavigationGroups: definition.visibleNavigationGroups || [],
+      restrictedAssets: definition.restrictedAssets || [],
+      defaultFilters: definition.defaultFilters || {},
+    };
 
     return {
       workspace: {
@@ -121,6 +135,10 @@ export class WorkspaceContextService {
         description: workspace.branding?.description || definition.description,
         assistantContext: settings.assistantContext || definition.assistantContext,
         defaultDashboard: settings.defaultDashboard,
+        workspaceProfile,
+        defaultDashboardWidgets: workspaceProfile.defaultDashboardWidgets,
+        defaultFilters: workspaceProfile.defaultFilters,
+        restrictedAssets: workspaceProfile.restrictedAssets,
       },
       workspaceState,
       membership,
@@ -135,6 +153,11 @@ export class WorkspaceContextService {
           }
         : null,
       enabledToolIds,
+      defaultDashboardWidgets: workspaceProfile.defaultDashboardWidgets,
+      defaultFilters: workspaceProfile.defaultFilters,
+      restrictedAssets: workspaceProfile.restrictedAssets,
+      recommendedAIAgents: workspaceProfile.recommendedAIAgents,
+      recommendedAssetPacks: workspaceProfile.recommendedAssetPacks,
       visibleAssetIds,
       entitledPackIds,
       assetAccessDecisions,

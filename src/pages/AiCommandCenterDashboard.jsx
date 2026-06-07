@@ -5,8 +5,10 @@ import {
   MetricCard,
   TrendChart,
 } from '../components/dashboard/DashboardVisualizations';
+import ContextInsightCard from '../components/ContextInsightCard';
 import StateSourceNotice from '../components/StateSourceNotice';
 import { useSystemConfig } from '../contexts/SystemConfigContext';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import {
@@ -281,6 +283,35 @@ export default function AiCommandCenterDashboard() {
         ]}
         details="AI health, memory, cost, retrieval, and audit panels may combine backend snapshots with fallback/local metrics. Source status is shown above; backend-unavailable panels must not be interpreted as live production AI telemetry."
       />
+
+      <section className="ai-command-insights" aria-label="AI command center context insights">
+        <ContextInsightCard
+          title="Source mix"
+          message={`Evaluation ${sourceStatus.evaluation}, memory ${sourceStatus.memory}, cost ${sourceStatus.cost}.`}
+          source="Backend snapshot"
+          status={Object.values(sourceStatus).some((value) => value === 'fallback') ? 'unavailable' : 'live'}
+          actionLabel="Refresh"
+          actionRoute="/ai-command-center"
+          timestamp={lastUpdated}
+        />
+        <ContextInsightCard
+          title="Retrieval context"
+          message={`${ragEnabled} retrieval with ${snapshot.ragMetrics.retrievalLabel} precision. Grounded answers: ${snapshot.ragMetrics.groundedAnswers}.`}
+          source={systemConfig.isRagEnabled ? 'System config' : 'Fallback config'}
+          status={systemConfig.isRagEnabled ? 'generated' : 'demo'}
+          demo={!systemConfig.isRagEnabled}
+          actionLabel="Review metrics"
+          actionRoute="/ai-command-center"
+        />
+        <ContextInsightCard
+          title={snapshot.warnings.length ? 'Source warning' : 'No source warnings'}
+          message={snapshot.warnings[0] || 'No backend source warnings are active in this snapshot.'}
+          source="AI operations"
+          status={snapshot.warnings.length ? 'action-required' : 'generated'}
+          actionLabel="Open audit"
+          actionRoute={CANONICAL_ROUTES.audit}
+        />
+      </section>
 
       <section className="ai-command-metrics" aria-label="AI command center summary">
         <MetricCard

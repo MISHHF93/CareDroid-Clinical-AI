@@ -124,6 +124,7 @@ export class ChatService {
     userId?: string,
     userRole?: string,
     knowledgeBaseContext?: Record<string, any>,
+    clientWorkspaceContext?: Record<string, any>,
     clientMemoryContext?: Record<string, any>,
   ): Promise<QueryResponse> {
     this.logger.log(`💬 Processing chat message: "${message}"`);
@@ -238,16 +239,19 @@ export class ChatService {
       server: await this.buildAssistantMemoryContext(userId),
       fabric: this.sanitizeClientMemoryContext(clientMemoryContext),
     };
+    const workspaceContext = this.sanitizeClientWorkspaceContext(clientWorkspaceContext);
     const modelFoundationContext = {
       ...this.aiContextManager.toModelContext(contextPacket),
       costOptimization,
       memoryContext,
       knowledgeBaseContext,
+      workspaceContext,
     };
     const integrationMetadata = {
       costOptimization,
       memoryContext,
       knowledgeBaseContext,
+      workspaceContext,
       platformGovernance: governanceDecision,
     };
     await this.aiGateway.logRoutingAudit({
@@ -319,6 +323,7 @@ export class ChatService {
       conversationId,
       intentClassification: classification,
       knowledgeBaseContext,
+      workspaceContext,
       aiFoundation: modelFoundationContext,
     };
 
@@ -552,7 +557,11 @@ export class ChatService {
       const composed = this.aiResponseComposer.compose(
         {
           text: responseText,
-          suggestions: citations.length > 0 ? ['View sources', 'Related topics'] : [],
+          suggestions: this.mergeWorkspaceSuggestions(
+            citations.length > 0 ? ['View sources', 'Related topics'] : [],
+            message,
+            clientWorkspaceContext,
+          ),
           visualizations: [],
           intentClassification: classification,
           citations,
@@ -583,6 +592,11 @@ export class ChatService {
       const composed = this.aiResponseComposer.compose(
         {
           ...fallback,
+          suggestions: this.mergeWorkspaceSuggestions(
+            fallback.suggestions || [],
+            message,
+            clientWorkspaceContext,
+          ),
           intentClassification: classification,
         },
         aiRunEnvelope,
@@ -739,7 +753,9 @@ export class ChatService {
     }
   }
 
-  private sanitizeClientMemoryContext(memoryContext?: Record<string, any>): Record<string, any> | null {
+  private sanitizeClientMemoryContext(
+    memoryContext?: Record<string, any>,
+  ): Record<string, any> | null {
     if (!memoryContext || typeof memoryContext !== 'object') {
       return null;
     }
@@ -787,6 +803,72 @@ export class ChatService {
         .filter(([key]) => allowedTopLevel.has(key))
         .map(([key, value]) => [key, sanitize(value)]),
     );
+  }
+
+  private sanitizeClientWorkspaceContext(
+    context?: Record<string, any>,
+  ): Record<string, any> | null {
+    if (!context || typeof context !== 'object') return null;
+    return {
+      authorizationSource: 'server',
+      clientContextTrusted: false,
+      workspaceId: context.workspaceId,
+      workspaceKey: context.workspaceKey,
+      label: context.label,
+      assistantContext: context.assistantContext,
+      organization: context.organization
+        ? {
+            id: context.organization.id,
+            name: context.organization.name,
+            slug: context.organization.slug,
+            organizationType: context.organization.organizationType,
+          }
+        : null,
+      role: context.role || context.saasProfile?.role,
+      specialty: context.specialty || context.saasProfile?.specialty,
+      department: context.department || context.saasProfile?.department,
+      allowedAssets: Array.isArray(context.allowedAssets) ? context.allowedAssets.slice(0, 80) : [],
+      enabledAssetPacks: Array.isArray(context.enabledAssetPacks)
+        ? context.enabledAssetPacks.slice(0, 40)
+        : [],
+      recentAssets: Array.isArray(context.recentAssets) ? context.recentAssets.slice(0, 30) : [],
+      pinnedAssets: Array.isArray(context.pinnedAssets) ? context.pinnedAssets.slice(0, 30) : [],
+      permissions: Array.isArray(context.permissions) ? context.permissions.slice(0, 80) : [],
+      preferredAIStyle: context.saasProfile?.preferredAIStyle,
+    };
+  }
+
+  private mergeWorkspaceSuggestions(
+    suggestions: string[],
+    message: string,
+    workspaceContext?: Record<string, any>,
+  ) {
+    const context = this.sanitizeClientWorkspaceContext(workspaceContext);
+    const lower = message.toLowerCase();
+    const role = String(context?.role || '').toLowerCase();
+    const workspace = String(context?.workspaceKey || context?.label || '').toLowerCase();
+    const contextual: string[] = [];
+
+    if (
+      (role.includes('emergency') || workspace.includes('emergency')) &&
+      /chest pain|acs|troponin|stemi/.test(lower)
+    ) {
+      contextual.push('Open HEART', 'Open TIMI', 'Open GRACE', 'Open ACS workflow');
+    }
+    if (
+      (role.includes('fleet') || workspace.includes('fleet')) &&
+      /active units|units|vehicles|fleet/.test(lower)
+    ) {
+      contextual.push('Open Fleet Map', 'Open Live Tracking', 'Open Dispatch AI');
+    }
+    if (
+      (role.includes('biomedical') || workspace.includes('iot') || workspace.includes('device')) &&
+      /offline|device|telemetry|battery|maintenance/.test(lower)
+    ) {
+      contextual.push('Open Medical IoT', 'Open Device Fleet', 'Open Device Alerts');
+    }
+
+    return [...new Set([...contextual, ...(suggestions || [])])].slice(0, 6);
   }
 
   private async finalizeAssistantTurn(params: {

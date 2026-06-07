@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import ContextInsightCard from '../components/ContextInsightCard';
 import StateSourceNotice from '../components/StateSourceNotice';
 import { fetchFleetLiveTrackingSnapshot } from '../services/fleetTelemetryService';
 import { fetchHospitalMapSnapshot, formatHospitalMapTime } from '../services/hospitalMapService';
@@ -253,7 +254,37 @@ export default function LiveTrackingMap() {
           <section className="live-map-source" role="status">
             <strong>Demo operations telemetry - no live backend tracking connected</strong>
             <span>Last updated: {formatHospitalMapTime(state.fleet?.summary?.updatedAt || state.hospital?.generatedAt || state.iot?.generatedAt)}</span>
-            <span>Future data sources: fleet GPS, active routes, hospital floor devices, device telemetry, device alerts.</span>
+          </section>
+
+          <section className="live-map-insights" aria-label="Live tracking context insights">
+            <ContextInsightCard
+              title={summary.stale ? `${summary.stale} stale/offline marker(s)` : 'Markers reporting'}
+              message={
+                summary.stale
+                  ? 'Review stale or offline timestamps before acting on marker location.'
+                  : 'No stale/offline markers are visible in this combined snapshot.'
+              }
+              source="Combined demo snapshots"
+              status={summary.stale ? 'action-required' : 'generated'}
+              actionLabel="Open Medical IoT"
+              actionRoute="/medical-iot"
+            />
+            <ContextInsightCard
+              title="Layer mix"
+              message={`${summary.fleet} fleet, ${summary.hospital} hospital, ${summary.iot} Medical IoT marker(s).`}
+              source="Local computed"
+              status="generated"
+              actionLabel="Open Operations"
+              actionRoute="/operations"
+            />
+            <ContextInsightCard
+              title="Backend tracking"
+              message="Live GPS, active route, hospital floor-device, and device telemetry feeds are not connected here."
+              source="Backend unavailable"
+              status="unavailable"
+              actionLabel="Ask Assistant"
+              actionRoute="/assistant"
+            />
           </section>
 
           <StateSourceNotice

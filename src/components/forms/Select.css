@@ -2,6 +2,9 @@
 
 .select-container {
   position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .select-label {
@@ -20,12 +23,14 @@
 /* Select Trigger (Button that shows selection) */
 .select-trigger {
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   background: var(--navy-lighter);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--app-input-border, rgba(255, 255, 255, 0.1));
+  border-radius: var(--compact-card-radius, var(--radius-md));
   cursor: pointer;
   transition: all 0.2s ease;
   color: var(--text-color);
@@ -56,7 +61,7 @@
 }
 
 .select-trigger:focus:not(.select-trigger-disabled) {
-  outline: 2px solid var(--accent-1);
+  outline: var(--app-focus-ring-width, 2px) solid var(--app-focus-ring-aa, var(--accent-1));
   outline-offset: 2px;
 }
 
@@ -106,12 +111,14 @@
   top: calc(100% + 4px);
   left: 0;
   right: 0;
+  width: 100%;
+  max-width: min(100%, calc(100vw - 24px));
   background: var(--navy-lighter);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--app-input-border, rgba(255, 255, 255, 0.15));
+  border-radius: var(--compact-card-radius, var(--radius-md));
   box-shadow: var(--shadow-3);
   z-index: 1000;
-  max-height: 300px;
+  max-height: min(300px, calc(100dvh - 120px));
   overflow: hidden;
   display: flex;
   flex-direction: column;

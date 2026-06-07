@@ -18,7 +18,8 @@ const METRIC_DEFINITIONS: EvaluationMetricDefinition[] = [
   {
     id: 'modelQuality',
     label: 'Model quality',
-    description: 'Composite quality score across correctness, retrieval, tools, workflows, safety, latency, and cost.',
+    description:
+      'Composite quality score across correctness, retrieval, tools, workflows, safety, latency, and cost.',
     unit: 'percent',
     direction: 'higher_is_better',
     benchmark: 0.9,
@@ -327,21 +328,36 @@ export class EvaluationService {
 
   private normalizeMetrics(metrics: Partial<EvaluationMetrics>): EvaluationMetrics {
     const normalized = {
-      hallucinationRate: this.round(this.clamp(metrics.hallucinationRate ?? DEFAULT_METRICS.hallucinationRate, 0, 1), 4),
+      hallucinationRate: this.round(
+        this.clamp(metrics.hallucinationRate ?? DEFAULT_METRICS.hallucinationRate, 0, 1),
+        4,
+      ),
       accuracy: this.round(this.clamp(metrics.accuracy ?? DEFAULT_METRICS.accuracy, 0, 1), 4),
       latencyMs: Math.max(0, Math.round(metrics.latencyMs ?? DEFAULT_METRICS.latencyMs)),
-      retrievalPrecision: this.round(this.clamp(metrics.retrievalPrecision ?? DEFAULT_METRICS.retrievalPrecision, 0, 1), 4),
+      retrievalPrecision: this.round(
+        this.clamp(metrics.retrievalPrecision ?? DEFAULT_METRICS.retrievalPrecision, 0, 1),
+        4,
+      ),
       toolExecutionSuccess: this.round(
         this.clamp(metrics.toolExecutionSuccess ?? DEFAULT_METRICS.toolExecutionSuccess, 0, 1),
         4,
       ),
-      workflowSuccess: this.round(this.clamp(metrics.workflowSuccess ?? DEFAULT_METRICS.workflowSuccess, 0, 1), 4),
-      userSatisfaction: this.round(this.clamp(metrics.userSatisfaction ?? DEFAULT_METRICS.userSatisfaction, 0, 5), 2),
+      workflowSuccess: this.round(
+        this.clamp(metrics.workflowSuccess ?? DEFAULT_METRICS.workflowSuccess, 0, 1),
+        4,
+      ),
+      userSatisfaction: this.round(
+        this.clamp(metrics.userSatisfaction ?? DEFAULT_METRICS.userSatisfaction, 0, 5),
+        2,
+      ),
       costUsd: this.round(Math.max(0, metrics.costUsd ?? DEFAULT_METRICS.costUsd), 2),
     };
 
     return {
-      modelQuality: this.round(this.clamp(metrics.modelQuality ?? this.deriveModelQuality(normalized), 0, 1), 4),
+      modelQuality: this.round(
+        this.clamp(metrics.modelQuality ?? this.deriveModelQuality(normalized), 0, 1),
+        4,
+      ),
       ...normalized,
     };
   }
@@ -401,7 +417,10 @@ export class EvaluationService {
     const now = Date.now();
     const day = 24 * 60 * 60 * 1000;
     const seeds: Array<
-      Pick<EvaluationRun, 'modelName' | 'promptName' | 'agentName' | 'ragStrategy' | 'datasetName' | 'sampleCount'> & {
+      Pick<
+        EvaluationRun,
+        'modelName' | 'promptName' | 'agentName' | 'ragStrategy' | 'datasetName' | 'sampleCount'
+      > & {
         metrics: Partial<EvaluationMetrics>;
       }
     > = [

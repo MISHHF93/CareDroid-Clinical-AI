@@ -115,6 +115,8 @@ export class WorkspacesService {
 
     await this.auditService.log({
       userId: user.id,
+      workspaceId,
+      organizationId: membership.workspace?.organizationId,
       action: AuditAction.SECURITY_EVENT,
       resource: `workspace/${workspaceId}`,
       ipAddress,
@@ -376,6 +378,7 @@ export class WorkspacesService {
   }
 
   private serializeWorkspace(workspace: Workspace) {
+    const settings = workspace.settings || this.settingsForType(workspace.type);
     return {
       id: workspace.id,
       type: workspace.type,
@@ -384,7 +387,11 @@ export class WorkspacesService {
       organizationId: workspace.organizationId,
       parentWorkspaceId: workspace.parentWorkspaceId,
       branding: workspace.branding || { displayName: workspace.name },
-      settings: workspace.settings || this.settingsForType(workspace.type),
+      settings,
+      workspaceProfile: settings.workspaceProfile,
+      defaultDashboardWidgets: settings.workspaceProfile?.defaultDashboardWidgets || [],
+      defaultFilters: settings.workspaceProfile?.defaultFilters || {},
+      restrictedAssets: settings.workspaceProfile?.restrictedAssets || [],
       createdAt: workspace.createdAt,
       updatedAt: workspace.updatedAt,
     };

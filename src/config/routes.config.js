@@ -79,6 +79,7 @@ export const CANONICAL_ROUTES = Object.freeze({
   organizationIntelligence: '/organization-intelligence',
   organizationSettings: '/settings/organization',
   tenantAdmin: '/tenant-admin',
+  tenantAdminWorkspaces: '/tenant-admin/workspaces',
   organizationPacks: '/settings/organization/packs',
   organizationAssets: '/settings/organization/assets',
   platformAnalytics: '/platform-analytics',
@@ -143,7 +144,7 @@ export const FLEET_MAP_ROUTE_ALIASES = Object.freeze([
   '/fleet/live-map',
   '/fleet/tracking',
 ]);
-export const OPERATIONS_ROUTE_ALIASES = Object.freeze([]);
+export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center']);
 export const AUDIT_ROUTE_ALIASES = Object.freeze(['/audit-logs']);
 export const HOME_ROUTE_ALIASES = Object.freeze(['/home']);
 export const ORGANIZATION_PACKS_ROUTE_ALIASES = Object.freeze([]);
@@ -264,17 +265,6 @@ export const ROUTE_RECORDS = Object.freeze([
     aliases: OPERATIONS_ROUTE_ALIASES,
     matchPrefixes: ['/operations/'],
     navGroup: 'primary',
-  }),
-  Object.freeze({
-    id: 'operationsCenter',
-    path: CANONICAL_ROUTES.operationsCenter,
-    componentKey: 'DigitalOperationsCenter',
-    layout: 'app',
-    auth: 'required',
-    status: 'active',
-    aliases: [],
-    navGroup: 'operations',
-    notes: 'Digital operations command surface for throughput, capacity, maps, devices, and incidents.',
   }),
   Object.freeze({
     id: 'digitalTwin',

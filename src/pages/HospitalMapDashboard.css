@@ -135,6 +135,13 @@
   padding: 10px 12px;
 }
 
+.hospital-map-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--compact-panel-gap, 10px);
+  min-width: 0;
+}
+
 .hospital-map-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

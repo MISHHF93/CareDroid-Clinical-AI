@@ -82,6 +82,12 @@ export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
     path: '/ai-governance',
     description: 'AI governance, auditability, policy, and review controls.',
   },
+  aiEvaluation: {
+    id: 'ai-evaluation',
+    label: 'AI Evaluation',
+    path: '/ai-evaluation',
+    description: 'Evaluation lab, model quality, benchmark, and safety review.',
+  },
   profile: {
     id: 'profile',
     label: 'Profile',
@@ -108,7 +114,191 @@ export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
   },
 });
 
-export const CARE_WORKSPACES = Object.freeze([
+export const CLIENT_PROFILE_STORAGE_KEY = 'careDroid.clientProfile.v1';
+
+const COMMON_CLINICAL_ROLES = Object.freeze([
+  'emergency-physician',
+  'icu-physician',
+  'cardiologist',
+  'nurse',
+  'pharmacist',
+  'lab-technician',
+  'biomedical-engineer',
+  'hospital-administrator',
+  'researcher',
+  'educator',
+  'student',
+  'compliance-officer',
+  'platform-admin',
+]);
+
+const SUBSCRIPTION_TIER_RANK = Object.freeze({
+  free: 0,
+  starter: 1,
+  professional: 2,
+  academic: 2,
+  enterprise: 3,
+  government: 3,
+});
+
+const WORKSPACE_SAAS_METADATA = Object.freeze({
+  emergency: {
+    allowedOrganizationTypes: ['hospital', 'clinic', 'ems', 'government'],
+    allowedRoles: [...COMMON_CLINICAL_ROLES, 'fleet-operator'],
+    defaultAssetPacks: ['clinical-core', 'emergency-medicine'],
+    defaultDashboardWidgets: ['triage-risk', 'emergency-calculators', 'active-alerts'],
+    defaultAIAgents: ['emergency-copilot'],
+    defaultNavigationGroups: ['dashboard', 'assistant', 'tools', 'operations'],
+    subscriptionTier: 'starter',
+  },
+  icu: {
+    allowedOrganizationTypes: ['hospital', 'long-term-care', 'government'],
+    allowedRoles: ['icu-physician', 'nurse', 'biomedical-engineer', 'hospital-administrator', 'platform-admin'],
+    defaultAssetPacks: ['clinical-core', 'critical-care'],
+    defaultDashboardWidgets: ['sofa-trends', 'ventilator-context', 'telemetry-alerts'],
+    defaultAIAgents: ['critical-care-copilot'],
+    defaultNavigationGroups: ['dashboard', 'assistant', 'tools', 'operations'],
+    subscriptionTier: 'professional',
+  },
+  cardiology: {
+    allowedOrganizationTypes: ['hospital', 'clinic', 'telehealth', 'university'],
+    allowedRoles: ['cardiologist', 'emergency-physician', 'nurse', 'educator', 'student', 'hospital-administrator', 'platform-admin'],
+    defaultAssetPacks: ['clinical-core', 'cardiology-pack'],
+    defaultDashboardWidgets: ['chest-pain-risk', 'ecg-context', 'recent-cardiology-tools'],
+    defaultAIAgents: ['cardiology-copilot'],
+    defaultNavigationGroups: ['dashboard', 'assistant', 'tools'],
+    subscriptionTier: 'starter',
+  },
+  laboratory: {
+    allowedOrganizationTypes: ['hospital', 'clinic', 'long-term-care', 'research-center', 'university'],
+    allowedRoles: ['lab-technician', 'emergency-physician', 'icu-physician', 'nurse', 'researcher', 'educator', 'hospital-administrator', 'platform-admin'],
+    defaultAssetPacks: ['clinical-core', 'laboratory-intelligence'],
+    defaultDashboardWidgets: ['abnormal-labs', 'specimen-queue', 'lab-trends'],
+    defaultAIAgents: ['lab-interpretation-agent'],
+    defaultNavigationGroups: ['dashboard', 'assistant', 'tools'],
+    subscriptionTier: 'starter',
+  },
+  operations: {
+    allowedOrganizationTypes: ['hospital', 'clinic', 'ems', 'long-term-care', 'government', 'telehealth'],
+    allowedRoles: ['hospital-administrator', 'fleet-operator', 'biomedical-engineer', 'nurse', 'compliance-officer', 'platform-admin'],
+    defaultAssetPacks: ['core-platform', 'hospital-operations'],
+    defaultDashboardWidgets: ['operations-summary', 'capacity-status', 'active-alerts'],
+    defaultAIAgents: ['operations-copilot'],
+    defaultNavigationGroups: ['dashboard', 'operations', 'assistant'],
+    subscriptionTier: 'starter',
+  },
+  fleet: {
+    allowedOrganizationTypes: ['ems', 'hospital', 'government'],
+    allowedRoles: ['fleet-operator', 'biomedical-engineer', 'hospital-administrator', 'platform-admin'],
+    defaultAssetPacks: ['core-platform', 'fleet-logistics'],
+    defaultDashboardWidgets: ['fleet-status', 'route-risk', 'maintenance-readiness'],
+    defaultAIAgents: ['fleet-operations-agent'],
+    defaultNavigationGroups: ['operations', 'assistant'],
+    subscriptionTier: 'professional',
+  },
+  'medical-iot': {
+    allowedOrganizationTypes: ['hospital', 'long-term-care', 'clinic', 'telehealth', 'government'],
+    allowedRoles: ['biomedical-engineer', 'icu-physician', 'nurse', 'hospital-administrator', 'platform-admin'],
+    defaultAssetPacks: ['core-platform', 'medical-iot'],
+    defaultDashboardWidgets: ['offline-devices', 'telemetry-freshness', 'battery-risk'],
+    defaultAIAgents: ['device-telemetry-agent'],
+    defaultNavigationGroups: ['operations', 'assistant'],
+    subscriptionTier: 'professional',
+  },
+  education: {
+    allowedOrganizationTypes: ['university', 'hospital', 'research-center'],
+    allowedRoles: ['educator', 'student', 'researcher', 'emergency-physician', 'nurse', 'platform-admin'],
+    defaultAssetPacks: ['clinical-core', 'education-simulation'],
+    defaultDashboardWidgets: ['recommended-scenarios', 'competency-gaps', 'recent-debriefs'],
+    defaultAIAgents: ['education-coach'],
+    defaultNavigationGroups: ['dashboard', 'assistant', 'tools'],
+    subscriptionTier: 'academic',
+  },
+  simulation: {
+    allowedOrganizationTypes: ['university', 'hospital', 'research-center'],
+    allowedRoles: ['educator', 'student', 'researcher', 'emergency-physician', 'nurse', 'platform-admin'],
+    defaultAssetPacks: ['education-simulation'],
+    defaultDashboardWidgets: ['scenario-library', 'incomplete-debriefs', 'recommended-practice'],
+    defaultAIAgents: ['simulation-coach'],
+    defaultNavigationGroups: ['dashboard', 'assistant', 'tools'],
+    subscriptionTier: 'academic',
+  },
+  research: {
+    allowedOrganizationTypes: ['research-center', 'university', 'hospital', 'government'],
+    allowedRoles: ['researcher', 'educator', 'compliance-officer', 'hospital-administrator', 'platform-admin'],
+    defaultAssetPacks: ['clinical-core', 'research-intelligence'],
+    defaultDashboardWidgets: ['evidence-review', 'cohort-context', 'auditability'],
+    defaultAIAgents: ['research-copilot'],
+    defaultNavigationGroups: ['dashboard', 'assistant', 'tools', 'advanced'],
+    subscriptionTier: 'academic',
+  },
+  governance: {
+    allowedOrganizationTypes: ['hospital', 'clinic', 'ems', 'university', 'research-center', 'long-term-care', 'telehealth', 'government'],
+    allowedRoles: ['compliance-officer', 'hospital-administrator', 'platform-admin'],
+    defaultAssetPacks: ['core-platform', 'governance-risk'],
+    defaultDashboardWidgets: ['audit-readiness', 'policy-review', 'human-review'],
+    defaultAIAgents: ['governance-agent'],
+    defaultNavigationGroups: ['advanced', 'settings'],
+    subscriptionTier: 'professional',
+  },
+  'ai-evaluation': {
+    allowedOrganizationTypes: ['research-center', 'university', 'hospital', 'government'],
+    allowedRoles: ['researcher', 'educator', 'compliance-officer', 'platform-admin'],
+    defaultAssetPacks: ['ai-evaluation-lab', 'governance-risk'],
+    defaultDashboardWidgets: ['model-benchmarks', 'safety-findings', 'evaluation-runs'],
+    defaultAIAgents: ['evaluation-agent'],
+    defaultNavigationGroups: ['advanced', 'dashboard'],
+    subscriptionTier: 'academic',
+  },
+});
+
+export const WORKSPACE_ORGANIZATION_PRESETS = Object.freeze({
+  hospital: ['emergency', 'icu', 'cardiology', 'laboratory', 'operations', 'medical-iot', 'governance'],
+  clinic: ['cardiology', 'laboratory', 'governance'],
+  ems: ['emergency', 'fleet', 'operations'],
+  university: ['education', 'research', 'simulation', 'governance'],
+  'research-center': ['research', 'governance', 'ai-evaluation'],
+  research_center: ['research', 'governance', 'ai-evaluation'],
+  research_institute: ['research', 'governance', 'ai-evaluation'],
+  'long-term-care': ['medical-iot', 'laboratory', 'operations', 'governance'],
+  long_term_care: ['medical-iot', 'laboratory', 'operations', 'governance'],
+  telehealth: ['cardiology', 'operations', 'governance'],
+  government: ['emergency', 'operations', 'medical-iot', 'governance', 'ai-evaluation'],
+});
+
+function normalizeOrganizationType(value = 'hospital') {
+  return String(value || 'hospital').trim().toLowerCase().replace(/\s+/g, '-');
+}
+
+function normalizeRole(value = '') {
+  return String(value || '').trim().toLowerCase().replace(/\s+/g, '-');
+}
+
+function tierAllows(required = 'free', current = 'free') {
+  const requiredRank = SUBSCRIPTION_TIER_RANK[required] ?? 0;
+  const currentRank = SUBSCRIPTION_TIER_RANK[current] ?? 0;
+  return currentRank >= requiredRank;
+}
+
+function normalizeWorkspaceDefinition(workspace) {
+  const metadata = WORKSPACE_SAAS_METADATA[workspace.id] || {};
+  const defaultAssets = workspace.toolIds || [];
+  return {
+    ...workspace,
+    workspaceId: workspace.id,
+    allowedOrganizationTypes: metadata.allowedOrganizationTypes || ['hospital'],
+    allowedRoles: metadata.allowedRoles || COMMON_CLINICAL_ROLES,
+    defaultAssetPacks: metadata.defaultAssetPacks || ['clinical-core'],
+    defaultAssets,
+    defaultDashboardWidgets: metadata.defaultDashboardWidgets || ['recommended-assets', 'recent-assets'],
+    defaultAIAgents: metadata.defaultAIAgents || ['clinical-copilot'],
+    defaultNavigationGroups: metadata.defaultNavigationGroups || ['dashboard', 'assistant', 'tools'],
+    subscriptionTier: metadata.subscriptionTier || 'free',
+    status: metadata.status || 'active',
+  };
+}
+
+const CARE_WORKSPACE_BASE = [
   {
     id: 'emergency',
     label: 'Emergency',
@@ -307,7 +497,195 @@ export const CARE_WORKSPACES = Object.freeze([
       REGISTRY.hospitalOperationsCommand,
     ],
   },
-]);
+  {
+    id: 'simulation',
+    label: 'Simulation',
+    shortLabel: 'Simulation',
+    icon: 'Trophy',
+    path: '/workspace/simulation',
+    description: 'Simulation scenarios, role-based practice, structured debriefs, and competency reinforcement.',
+    aiContext:
+      'Frame guidance as simulated training support, recommend scenarios by role, and keep debriefs clearly local/demo unless backend training records are connected.',
+    routeIds: ['simulation', 'competencies', 'commandCenter'],
+    toolIds: [
+      REGISTRY.simulationSuite,
+      REGISTRY.scenarioPlayer,
+      REGISTRY.simulationOutcomes,
+      REGISTRY.debriefDashboard,
+      REGISTRY.competencyDashboard,
+    ],
+  },
+  {
+    id: 'ai-evaluation',
+    label: 'AI Evaluation',
+    shortLabel: 'AI Eval',
+    icon: 'ClipboardList',
+    path: '/workspace/ai-evaluation',
+    description: 'Evaluation lab, model quality, benchmark review, safety findings, and governance evidence.',
+    aiContext:
+      'Focus on evaluation evidence, benchmark quality, hallucination risk, safety findings, and governance-ready summaries.',
+    routeIds: ['aiEvaluation', 'governance', 'developerCatalog'],
+    toolIds: [
+      REGISTRY.aiEvaluation,
+      REGISTRY.aiCommandCenter,
+      REGISTRY.aiGovernance,
+      REGISTRY.aiSecurity,
+      REGISTRY.aiExplainability,
+      REGISTRY.clinicalAudit,
+    ],
+  },
+];
+
+export const CARE_WORKSPACES = Object.freeze(CARE_WORKSPACE_BASE.map(normalizeWorkspaceDefinition));
+
+function unique(values) {
+  return [...new Set((values || []).filter(Boolean))];
+}
+
+export function getWorkspacePresetForOrganizationType(organizationType = 'hospital') {
+  const normalized = normalizeOrganizationType(organizationType);
+  return WORKSPACE_ORGANIZATION_PRESETS[normalized] || WORKSPACE_ORGANIZATION_PRESETS.hospital;
+}
+
+export function getCanonicalWorkspaceRegistry() {
+  return CARE_WORKSPACES;
+}
+
+export function buildWorkspaceSetupFromRegistry(workspaceId) {
+  const workspace = getCareWorkspaceById(workspaceId);
+  return {
+    id: workspace.workspaceId,
+    type: workspace.workspaceId,
+    name: workspace.label,
+    displayName: workspace.label,
+    enabledToolIds: workspace.defaultAssets,
+    enabledModules: workspace.defaultNavigationGroups,
+    enabledAssetPacks: workspace.defaultAssetPacks,
+    defaultDashboard: workspace.defaultDashboardWidgets?.[0] || 'command',
+    defaultAiAgentId: workspace.defaultAIAgents?.[0] || 'clinical-copilot',
+    workspaceProfile: {
+      workspaceId: workspace.workspaceId,
+      label: workspace.label,
+      description: workspace.description,
+      allowedOrganizationTypes: workspace.allowedOrganizationTypes,
+      allowedRoles: workspace.allowedRoles,
+      defaultAssetPacks: workspace.defaultAssetPacks,
+      defaultAssets: workspace.defaultAssets,
+      defaultDashboardWidgets: workspace.defaultDashboardWidgets,
+      defaultAIAgents: workspace.defaultAIAgents,
+      defaultNavigationGroups: workspace.defaultNavigationGroups,
+      subscriptionTier: workspace.subscriptionTier,
+      status: workspace.status,
+    },
+  };
+}
+
+export function buildClientWorkspaceProfile({
+  organizationId = 'local-demo-tenant',
+  organizationName = 'Local Demo Organization',
+  organizationType = 'hospital',
+  subscriptionPlan = 'professional',
+  selectedProducts = [],
+  enabledAssetPacks = [],
+  enabledWorkspaces,
+  defaultWorkspace,
+  users = [],
+  roles = [],
+  departments = [],
+  integrations = [],
+  branding = {},
+} = {}) {
+  const presetWorkspaces = enabledWorkspaces?.length
+    ? enabledWorkspaces
+    : getWorkspacePresetForOrganizationType(organizationType);
+  const workspaceSetups = presetWorkspaces.map(buildWorkspaceSetupFromRegistry);
+  const assetPacks = unique([
+    ...enabledAssetPacks,
+    ...workspaceSetups.flatMap((workspace) => workspace.enabledAssetPacks || []),
+  ]);
+  const enabledAssets = unique(workspaceSetups.flatMap((workspace) => workspace.enabledToolIds || []));
+  const workspaceIds = workspaceSetups.map((workspace) => workspace.id);
+
+  return {
+    source: 'local-demo',
+    organizationId,
+    organizationName,
+    organizationType: normalizeOrganizationType(organizationType),
+    subscriptionPlan,
+    selectedProducts,
+    enabledAssetPacks: assetPacks,
+    enabledAssets,
+    enabledWorkspaces: workspaceIds,
+    defaultWorkspace: defaultWorkspace && workspaceIds.includes(defaultWorkspace)
+      ? defaultWorkspace
+      : workspaceIds[0] || DEFAULT_CARE_WORKSPACE_ID,
+    users,
+    roles: roles.length ? roles : ['hospital-administrator'],
+    departments,
+    integrations,
+    branding,
+    workspaceSetups,
+    defaultDashboard: {
+      route: '/dashboard',
+      workspaceId: defaultWorkspace && workspaceIds.includes(defaultWorkspace)
+        ? defaultWorkspace
+        : workspaceIds[0] || DEFAULT_CARE_WORKSPACE_ID,
+    },
+  };
+}
+
+export function readLocalClientProfile() {
+  try {
+    const raw = localStorage.getItem(CLIENT_PROFILE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+export function saveLocalClientProfile(profile) {
+  try {
+    localStorage.setItem(CLIENT_PROFILE_STORAGE_KEY, JSON.stringify(profile));
+    window.dispatchEvent(new CustomEvent('careDroid:clientProfileChanged', { detail: profile }));
+  } catch {
+    // Local profile is best-effort for demo/offline onboarding.
+  }
+  return profile;
+}
+
+export function filterWorkspacesForClient({
+  workspaces = CARE_WORKSPACES,
+  clientProfile,
+  organizationType,
+  subscriptionPlan,
+  role,
+  userWorkspaceIds,
+} = {}) {
+  const profile = clientProfile || {};
+  const orgType = normalizeOrganizationType(organizationType || profile.organizationType || 'hospital');
+  const tier = subscriptionPlan || profile.subscriptionPlan || 'professional';
+  const normalizedRole = normalizeRole(role || profile.roles?.[0] || '');
+  const enabledSet = new Set(profile.enabledWorkspaces?.length
+    ? profile.enabledWorkspaces
+    : getWorkspacePresetForOrganizationType(orgType));
+  const assignedSet = userWorkspaceIds?.length ? new Set(userWorkspaceIds) : null;
+  const adminRole = ['platform-admin', 'hospital-administrator'].includes(normalizedRole);
+
+  const filtered = workspaces.filter((workspace) => {
+    const workspaceId = workspace.workspaceId || workspace.id;
+    if (!enabledSet.has(workspaceId)) return false;
+    if (!workspace.allowedOrganizationTypes.map(normalizeOrganizationType).includes(orgType)) return false;
+    if (!tierAllows(workspace.subscriptionTier, tier)) return false;
+    if (assignedSet && !assignedSet.has(workspaceId)) return false;
+    if (normalizedRole && !adminRole) {
+      const allowedRoles = (workspace.allowedRoles || []).map(normalizeRole);
+      if (allowedRoles.length && !allowedRoles.includes(normalizedRole)) return false;
+    }
+    return workspace.status !== 'disabled';
+  });
+
+  return filtered.length ? filtered : [getCareWorkspaceById(profile.defaultWorkspace || DEFAULT_CARE_WORKSPACE_ID)];
+}
 
 const WORKSPACE_BY_ID = Object.freeze(
   Object.fromEntries(CARE_WORKSPACES.map((workspace) => [workspace.id, workspace]))

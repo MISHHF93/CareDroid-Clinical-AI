@@ -218,6 +218,37 @@ describe('clinicalChatService', () => {
     });
   });
 
+  it('sendClinicalChatMessage includes SaaS workspace context when provided', async () => {
+    apiFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ({ response: 'ok' }),
+    });
+
+    await sendClinicalChatMessage({
+      message: 'what should I use for chest pain?',
+      workspaceContext: {
+        workspaceKey: 'emergency',
+        role: 'emergency-physician',
+        allowedAssets: ['heart-score', 'timi-ua-nstemi'],
+        enabledAssetPacks: ['emergency-pack'],
+        pinnedAssets: ['heart-score'],
+        recentAssets: ['qsofa'],
+        permissions: ['VIEW_EMERGENCY'],
+      },
+    });
+
+    const body = JSON.parse(apiFetch.mock.calls[0][1].body);
+    expect(body.workspaceContext).toMatchObject({
+      workspaceKey: 'emergency',
+      role: 'emergency-physician',
+      allowedAssets: ['heart-score', 'timi-ua-nstemi'],
+      enabledAssetPacks: ['emergency-pack'],
+      pinnedAssets: ['heart-score'],
+      recentAssets: ['qsofa'],
+      permissions: ['VIEW_EMERGENCY'],
+    });
+  });
+
   it('suggestClinicalAction posts patient context', async () => {
     apiFetch.mockResolvedValue({
       ok: true,

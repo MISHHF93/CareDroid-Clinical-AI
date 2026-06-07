@@ -10,6 +10,13 @@ import { ActivityService } from './activity.service';
 import { UpdateOperationalProfileDto } from './dto/update-operational-profile.dto';
 import { UpdateUserPreferencesDto } from './dto/update-user-preferences.dto';
 import { ProfessionalProfile } from './entities/professional-profile.entity';
+import {
+  DEFAULT_SAAS_PROFILE,
+  ROLE_PERMISSION_PRESETS,
+  normalizeOrganizationType,
+  normalizeSaasRole,
+  uniqueStrings,
+} from './saas-profile.constants';
 import { UserPreferencesService } from './user-preferences.service';
 import { WorkspaceService } from './workspace.service';
 
@@ -41,6 +48,7 @@ export class UserProfileService {
     return {
       userId: user.id,
       account: this.buildAccount(user, professional),
+      saasProfile: this.buildSaasProfile(user, professional, preferences, workspace, activity),
       professional: this.serializeProfessional(user, professional),
       preferences,
       aiPersonalization,
@@ -82,6 +90,9 @@ export class UserProfileService {
     if (dto.avatarUrl !== undefined) profileUpdates.avatarUrl = dto.avatarUrl.trim();
     if (dto.specialty !== undefined) profileUpdates.specialty = dto.specialty.trim();
     if (dto.organization !== undefined) profileUpdates.institution = dto.organization.trim();
+    if (dto.organizationId !== undefined)
+      profileUpdates.organizationId = dto.organizationId || null;
+    if (dto.role !== undefined) profileUpdates.roleProfileId = normalizeSaasRole(dto.role);
     if (dto.country !== undefined) profileUpdates.country = dto.country.trim();
     if (dto.timezone !== undefined) profileUpdates.timezone = dto.timezone.trim();
     if (dto.licenseNumber !== undefined) profileUpdates.licenseNumber = dto.licenseNumber.trim();
@@ -107,18 +118,34 @@ export class UserProfileService {
     }
     await this.professionalRepository.save(professional);
 
+    const preferenceUpdate = await this.buildPreferenceUpdate(userId, dto);
+    if (Object.keys(preferenceUpdate).length > 0) {
+      await this.preferencesService.updatePreferences(
+        userId,
+        preferenceUpdate,
+        ipAddress,
+        userAgent,
+      );
+    }
+
     await this.auditService.log({
       userId,
+      organizationId: profile.organizationId || undefined,
       action: AuditAction.PROFILE_UPDATE,
       resource: `profile/${userId}`,
       ipAddress,
       userAgent,
       phiAccessed: false,
       metadata: {
-        modifiedFields: Object.keys({ ...profileUpdates, ...professionalUpdates }).filter(
+        modifiedFields: Object.keys({
+          ...profileUpdates,
+          ...professionalUpdates,
+          ...preferenceUpdate,
+        }).filter(
           (key) =>
             (professionalUpdates as any)[key] !== undefined ||
-            (profileUpdates as any)[key] !== undefined,
+            (profileUpdates as any)[key] !== undefined ||
+            (preferenceUpdate as any)[key] !== undefined,
         ),
       },
     });
@@ -193,6 +220,12 @@ export class UserProfileService {
       organization: profile.institution,
       department: professional.department,
       role: user.role,
+      saasRole: normalizeSaasRole(profile.roleProfileId || user.role),
+      organizationId: profile.organizationId,
+      organizationType: normalizeOrganizationType(
+        (professional as any).organizationType ||
+          (user.subscription?.metadata as any)?.organizationType,
+      ),
       country: profile.country,
       timezone: profile.timezone,
       language: profile.languagePreference,
@@ -216,6 +249,156 @@ export class UserProfileService {
       licenseNumber: profile.licenseNumber,
       licenseRegion: professional.licenseRegion,
     };
+  }
+
+  private buildSaasProfile(
+    user: User,
+    professional: ProfessionalProfile,
+    preferences: any,
+    workspace: any,
+    activity: any,
+  ) {
+    const profile = user.profile || ({} as UserProfile);
+    const toolPreferences = preferences?.toolPreferences || {};
+    const saasPreferences = toolPreferences.saasProfile || {};
+    const aiPreferences = preferences?.aiAssistantPreferences || {};
+    const subscriptionMetadata = user.subscription?.metadata || {};
+    const role = normalizeSaasRole(profile.roleProfileId || saasPreferences.role || user.role);
+    const permissionPreset = ROLE_PERMISSION_PRESETS[role] || DEFAULT_SAAS_PROFILE.permissions;
+    const subscriptionEntitlements = uniqueStrings([
+      ...(saasPreferences.subscriptionEntitlements || []),
+      ...(subscriptionMetadata.entitlements || []),
+      user.subscription?.tier,
+      ...DEFAULT_SAAS_PROFILE.subscriptionEntitlements,
+    ]);
+    const enabledAssetPacks = uniqueStrings([
+      ...(saasPreferences.enabledAssetPacks || []),
+      ...(subscriptionMetadata.enabledAssetPacks || []),
+      ...(subscriptionMetadata.assetPacks || []),
+      ...DEFAULT_SAAS_PROFILE.enabledAssetPacks,
+    ]);
+    const pinnedAssets = uniqueStrings([
+      ...(toolPreferences.pinnedAssetIds || []),
+      ...(toolPreferences.pinnedToolIds || []),
+      ...(saasPreferences.pinnedAssets || []),
+    ]);
+    const hiddenAssets = uniqueStrings([
+      ...(toolPreferences.hiddenAssetIds || []),
+      ...(toolPreferences.hiddenToolIds || []),
+      ...(saasPreferences.hiddenAssets || []),
+    ]);
+    const recentAssets = uniqueStrings([
+      ...(toolPreferences.recentAssetIds || []),
+      ...(toolPreferences.recentToolIds || []),
+      ...(saasPreferences.recentAssets || []),
+      ...(activity?.recentTools || []).map((item: any) => item.toolId || item.id || item),
+    ]);
+    const defaultWorkspace =
+      saasPreferences.defaultWorkspace ||
+      workspace?.activeWorkspaceId ||
+      workspace?.activeWorkspace?.id ||
+      DEFAULT_SAAS_PROFILE.defaultWorkspace;
+    const allowedWorkspaces = uniqueStrings([
+      ...(saasPreferences.allowedWorkspaces || []),
+      ...(workspace?.workspaces || []).map((item: any) => item.id),
+      defaultWorkspace,
+      ...DEFAULT_SAAS_PROFILE.allowedWorkspaces,
+    ]);
+
+    return {
+      userId: user.id,
+      organizationId: profile.organizationId,
+      organizationType: normalizeOrganizationType(
+        saasPreferences.organizationType || subscriptionMetadata.organizationType,
+      ),
+      displayName: profile.fullName || user.email,
+      email: user.email,
+      role,
+      specialty: profile.specialty || professional.specialties?.[0] || '',
+      department: professional.department || '',
+      defaultWorkspace,
+      allowedWorkspaces,
+      permissions: uniqueStrings([...(saasPreferences.permissions || []), ...permissionPreset]),
+      subscriptionEntitlements,
+      enabledAssetPacks,
+      pinnedAssets,
+      hiddenAssets,
+      recentAssets,
+      preferredAIStyle:
+        saasPreferences.preferredAIStyle ||
+        aiPreferences.responseStyle ||
+        DEFAULT_SAAS_PROFILE.preferredAIStyle,
+      themePreference: preferences?.theme || DEFAULT_SAAS_PROFILE.themePreference,
+      compactMode: Boolean(preferences?.compactMode ?? DEFAULT_SAAS_PROFILE.compactMode),
+      onboardingStatus: saasPreferences.onboardingStatus || DEFAULT_SAAS_PROFILE.onboardingStatus,
+    };
+  }
+
+  private async buildPreferenceUpdate(userId: string, dto: UpdateOperationalProfileDto) {
+    const preferences = await this.getPreferences(userId);
+    const toolPreferences = { ...(preferences.toolPreferences || {}) };
+    const saasProfile = { ...(toolPreferences.saasProfile || {}) };
+    const aiAssistantPreferences = { ...(preferences.aiAssistantPreferences || {}) };
+    const update: UpdateUserPreferencesDto = {};
+
+    const saasFields = [
+      'organizationType',
+      'role',
+      'defaultWorkspace',
+      'allowedWorkspaces',
+      'permissions',
+      'subscriptionEntitlements',
+      'enabledAssetPacks',
+      'preferredAIStyle',
+      'onboardingStatus',
+    ] as const;
+    for (const field of saasFields) {
+      if ((dto as any)[field] !== undefined) {
+        (saasProfile as any)[field] =
+          field === 'role'
+            ? normalizeSaasRole((dto as any)[field])
+            : field === 'organizationType'
+              ? normalizeOrganizationType((dto as any)[field])
+              : (dto as any)[field];
+      }
+    }
+
+    if (dto.pinnedAssets !== undefined) {
+      toolPreferences.pinnedAssetIds = dto.pinnedAssets;
+      toolPreferences.pinnedToolIds = dto.pinnedAssets;
+      saasProfile.pinnedAssets = dto.pinnedAssets;
+    }
+    if (dto.hiddenAssets !== undefined) {
+      toolPreferences.hiddenAssetIds = dto.hiddenAssets;
+      toolPreferences.hiddenToolIds = dto.hiddenAssets;
+      saasProfile.hiddenAssets = dto.hiddenAssets;
+    }
+    if (dto.recentAssets !== undefined) {
+      toolPreferences.recentAssetIds = dto.recentAssets;
+      toolPreferences.recentToolIds = dto.recentAssets;
+      saasProfile.recentAssets = dto.recentAssets;
+    }
+    if (dto.preferredAIStyle !== undefined) {
+      aiAssistantPreferences.responseStyle = dto.preferredAIStyle;
+    }
+    if (dto.themePreference !== undefined) {
+      update.theme = dto.themePreference;
+    }
+    if (dto.compactMode !== undefined) {
+      update.compactMode = dto.compactMode;
+    }
+
+    if (Object.keys(saasProfile).length > 0) {
+      update.toolPreferences = {
+        ...toolPreferences,
+        saasProfile,
+      };
+    }
+    if (Object.keys(aiAssistantPreferences).length > 0 && dto.preferredAIStyle !== undefined) {
+      update.aiAssistantPreferences = aiAssistantPreferences;
+    }
+
+    return update;
   }
 
   private async getProfessionalProfile(user: User) {

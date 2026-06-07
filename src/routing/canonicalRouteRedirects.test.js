@@ -37,10 +37,10 @@ describe('canonical route redirects', () => {
       "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
     );
     expectRoute('/operations', 'Operations');
-    expectRoute('/operations-center', 'DigitalOperationsCenter');
-    expect(appSource).not.toContain('OPERATIONS_ROUTE_ALIASES.map');
+    expectGeneratedRedirect('/operations-center', '/operations');
+    expect(appSource).not.toContain('DigitalOperationsCenter');
     expect(routeConfigSource).toContain(
-      'export const OPERATIONS_ROUTE_ALIASES = Object.freeze([])'
+      "export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center'])"
     );
     expect(appSource).not.toContain(
       'path: \'/dashboard\', element: <LegacyProtectedRouteRedirect to="/home" />'

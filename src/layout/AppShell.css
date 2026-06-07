@@ -48,7 +48,7 @@
 .app-shell-nav-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 900;
+  z-index: var(--z-overlay, 900);
   margin: 0;
   padding: 0;
   border: none;
@@ -151,7 +151,7 @@
 .app-shell-header {
   position: sticky;
   top: env(safe-area-inset-top, 0px);
-  z-index: 920;
+  z-index: var(--z-header, 920);
   flex: 0 0 auto;
   width: 100%;
   min-width: 0;
@@ -164,18 +164,18 @@
 
 .app-shell-menu-btn {
   position: absolute;
-  top: var(--space-3);
-  left: calc(var(--space-3) + env(safe-area-inset-left, 0px));
-  z-index: 960;
+  top: calc(6px + env(safe-area-inset-top, 0px));
+  left: calc(10px + env(safe-area-inset-left, 0px));
+  z-index: calc(var(--z-header, 920) + 40);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--touch-target-min, 44px);
-  height: var(--touch-target-min, 44px);
-  min-width: var(--touch-target-min, 44px);
-  min-height: var(--touch-target-min, 44px);
+  width: var(--app-icon-button-size, 44px);
+  height: var(--app-icon-button-size, 44px);
+  min-width: var(--app-icon-button-size, 44px);
+  min-height: var(--app-icon-button-size, 44px);
   padding: 0;
-  border-radius: var(--radius-md);
+  border-radius: var(--compact-card-radius, var(--radius-md));
   border: 1px solid var(--panel-border);
   background: var(--app-surface-glass);
   -webkit-backdrop-filter: blur(var(--app-blur-glass, 18px));
@@ -191,6 +191,13 @@
   border-color: var(--app-accent-interactive);
 }
 
+.app-shell-menu-btn:focus-visible,
+.app-shell-command-btn:focus-visible {
+  outline: var(--app-focus-ring-width, 2px) solid var(--app-focus-ring-aa, var(--app-accent-interactive));
+  outline-offset: var(--app-focus-ring-offset, 2px);
+  box-shadow: var(--app-focus-ring, 0 0 0 3px var(--app-focus));
+}
+
 .app-shell-menu-icon {
   display: inline-flex;
   align-items: center;
@@ -200,18 +207,18 @@
 
 .app-shell-command-btn {
   position: absolute;
-  top: var(--space-3);
-  right: calc(var(--space-3) + env(safe-area-inset-right, 0px));
-  z-index: 960;
+  top: calc(6px + env(safe-area-inset-top, 0px));
+  right: calc(10px + env(safe-area-inset-right, 0px));
+  z-index: calc(var(--z-header, 920) + 40);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--touch-target-min, 44px);
-  height: var(--touch-target-min, 44px);
-  min-width: var(--touch-target-min, 44px);
-  min-height: var(--touch-target-min, 44px);
+  width: var(--app-icon-button-size, 44px);
+  height: var(--app-icon-button-size, 44px);
+  min-width: var(--app-icon-button-size, 44px);
+  min-height: var(--app-icon-button-size, 44px);
   padding: 0;
-  border-radius: var(--radius-md);
+  border-radius: var(--compact-card-radius, var(--radius-md));
   border: 1px solid var(--panel-border);
   background: var(--app-surface-glass);
   -webkit-backdrop-filter: blur(var(--app-blur-glass, 18px));
@@ -223,8 +230,8 @@
 }
 
 .app-shell--compact .app-shell-command-btn {
-  top: var(--space-3);
-  right: calc(var(--space-3) + env(safe-area-inset-right, 0px));
+  top: calc(6px + env(safe-area-inset-top, 0px));
+  right: calc(10px + env(safe-area-inset-right, 0px));
 }
 
 .app-shell-command-btn:hover {
@@ -236,7 +243,8 @@
   align-items: center;
   gap: 10px;
   justify-content: flex-end;
-  padding: 10px 16px 0;
+  min-height: var(--app-shell-header-height, 56px);
+  padding: 6px 16px 6px;
   pointer-events: none;
 }
 
@@ -246,7 +254,8 @@
 
 .app-shell--compact .app-shell-workspace-bar {
   justify-content: center;
-  padding: 10px 56px 0;
+  min-height: var(--app-shell-compact-header-height, 56px);
+  padding: 6px 60px;
 }
 
 .app-shell-header-utilities {
@@ -254,6 +263,7 @@
   align-items: center;
   gap: 6px;
   min-width: 0;
+  max-width: 100%;
   padding: 4px;
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-lg, 14px);

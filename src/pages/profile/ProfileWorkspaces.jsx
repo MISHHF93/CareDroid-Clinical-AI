@@ -4,10 +4,23 @@ import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import './ProfileIdentityPages.css';
 
 export default function ProfileWorkspaces() {
-  const { activeWorkspace, workspaces, workspaceState, switchWorkspace, isLoading, error } = useUserIdentity();
+  const {
+    activeWorkspace,
+    workspaces,
+    workspaceState,
+    switchWorkspace,
+    updateProfile,
+    saasProfile,
+    isLoading,
+    error,
+  } = useUserIdentity();
 
   const handleSwitch = async (workspaceId) => {
     await switchWorkspace(workspaceId);
+  };
+
+  const handleSetDefault = async (workspace) => {
+    await updateProfile?.({ defaultWorkspace: workspace.type || workspace.workspaceKey || workspace.id });
   };
 
   return (
@@ -24,6 +37,7 @@ export default function ProfileWorkspaces() {
             <div>
               <strong>{activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'No active workspace'}</strong>
               <span>{activeWorkspace?.type || 'personal'} workspace</span>
+              <span>Default: {saasProfile?.defaultWorkspace || 'not set'}</span>
             </div>
             <select
               aria-label="Active workspace"
@@ -46,9 +60,16 @@ export default function ProfileWorkspaces() {
             <section key={workspace.id} className="profile-identity-card">
               <h3>{workspace.branding?.displayName || workspace.name}</h3>
               <p>{workspace.type} workspace</p>
+              {workspace.workspaceProfile?.description ? <p>{workspace.workspaceProfile.description}</p> : null}
               <p>
                 {(workspace.settings?.enabledToolIds || []).length} tools ·{' '}
                 {(workspace.settings?.enabledModules || []).join(', ') || 'dashboard'}
+              </p>
+              <p>
+                Widgets:{' '}
+                {(workspace.workspaceProfile?.defaultDashboardWidgets || workspace.defaultDashboardWidgets || [])
+                  .slice(0, 4)
+                  .join(', ') || 'recommended assets'}
               </p>
               <button
                 type="button"
@@ -57,6 +78,16 @@ export default function ProfileWorkspaces() {
                 disabled={workspace.id === workspaceState?.activeWorkspaceId}
               >
                 {workspace.id === workspaceState?.activeWorkspaceId ? 'Active' : 'Switch'}
+              </button>
+              <button
+                type="button"
+                className="profile-identity-button"
+                onClick={() => handleSetDefault(workspace)}
+                disabled={saasProfile?.defaultWorkspace === (workspace.type || workspace.workspaceKey || workspace.id)}
+              >
+                {saasProfile?.defaultWorkspace === (workspace.type || workspace.workspaceKey || workspace.id)
+                  ? 'Default'
+                  : 'Set default'}
               </button>
             </section>
           ))}

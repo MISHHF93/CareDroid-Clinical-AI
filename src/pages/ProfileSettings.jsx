@@ -25,6 +25,8 @@ const ProfileSettings = ({ authToken }) => {
     responseStyle: 'concise',
     citationLevel: 'standard',
     safetyTone: 'standard',
+    defaultWorkspace: 'emergency',
+    compactMode: false,
     pushEnabled: true,
     emailEnabled: true,
     securityAlerts: true,
@@ -37,6 +39,8 @@ const ProfileSettings = ({ authToken }) => {
     updateProfile,
     savePreferences,
     isLoading: identityLoading,
+    workspaces,
+    saasProfile,
   } = useUserIdentity();
   const { success, error } = useNotificationActions();
   const effectiveAuthToken = authToken || contextAuthToken;
@@ -100,11 +104,13 @@ const ProfileSettings = ({ authToken }) => {
       responseStyle: preferences?.aiAssistantPreferences?.responseStyle || 'concise',
       citationLevel: preferences?.aiAssistantPreferences?.citationLevel || 'standard',
       safetyTone: preferences?.aiAssistantPreferences?.safetyTone || 'standard',
+      defaultWorkspace: saasProfile?.defaultWorkspace || 'emergency',
+      compactMode: Boolean(saasProfile?.compactMode ?? preferences?.compactMode),
       pushEnabled: preferences?.notificationSettings?.pushEnabled !== false,
       emailEnabled: preferences?.notificationSettings?.emailEnabled !== false,
       securityAlerts: preferences?.notificationSettings?.securityAlerts !== false,
     });
-  }, [preferences]);
+  }, [preferences, saasProfile?.compactMode, saasProfile?.defaultWorkspace]);
 
   const payload = useMemo(
     () => ({
@@ -184,6 +190,7 @@ const ProfileSettings = ({ authToken }) => {
     event.preventDefault();
     const result = await savePreferences({
       theme: prefForm.theme,
+      compactMode: prefForm.compactMode,
       aiAssistantPreferences: {
         responseStyle: prefForm.responseStyle,
         citationLevel: prefForm.citationLevel,
@@ -196,6 +203,14 @@ const ProfileSettings = ({ authToken }) => {
         securityAlerts: prefForm.securityAlerts,
       },
     });
+    if (result.ok) {
+      await updateProfile({
+        defaultWorkspace: prefForm.defaultWorkspace,
+        preferredAIStyle: prefForm.responseStyle,
+        themePreference: prefForm.theme,
+        compactMode: prefForm.compactMode,
+      });
+    }
     setPreferenceStatus(result.ok ? 'Preferences saved.' : result.message || 'Unable to save preferences.');
   };
 
@@ -309,6 +324,19 @@ const ProfileSettings = ({ authToken }) => {
             style={{ display: 'grid', gap: '12px', marginTop: '18px' }}
           >
             <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
+              Default workspace
+              <select
+                value={prefForm.defaultWorkspace}
+                onChange={(event) => updatePreferenceField('defaultWorkspace', event.target.value)}
+              >
+                {(workspaces || []).map((workspace) => (
+                  <option key={workspace.id} value={workspace.type || workspace.workspaceKey || workspace.id}>
+                    {workspace.branding?.displayName || workspace.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
               Theme
               <select
                 value={prefForm.theme}
@@ -318,6 +346,14 @@ const ProfileSettings = ({ authToken }) => {
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
               </select>
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={prefForm.compactMode}
+                onChange={(event) => updatePreferenceField('compactMode', event.target.checked)}
+              />{' '}
+              Compact mode
             </label>
             <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
               AI response style

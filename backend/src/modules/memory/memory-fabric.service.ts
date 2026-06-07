@@ -9,7 +9,11 @@ import { UserActivityService } from '../user-activity/user-activity.service';
 import { LongMemoryType } from './entities/long-memory-entry.entity';
 import { ShortMemoryType } from './entities/short-memory-entry.entity';
 import { LongMemoryService } from './long-memory.service';
-import { MemoryFabricScope, MemoryFabricSignalType, MEMORY_FABRIC_TAG } from './memory-fabric.constants';
+import {
+  MemoryFabricScope,
+  MemoryFabricSignalType,
+  MEMORY_FABRIC_TAG,
+} from './memory-fabric.constants';
 import { RecordMemoryFabricSignalDto } from './dto/record-memory-fabric-signal.dto';
 import { ShortMemoryService } from './short-memory.service';
 
@@ -126,17 +130,23 @@ export class MemoryFabricService {
     const pinnedAssets = this.filterAssetIds(
       [
         ...(assetAccess?.pinnedAssetIds || []),
-        ...(longTerm.savedTools || []).map((entry) => entry.content?.assetId || entry.content?.toolId),
+        ...(longTerm.savedTools || []).map(
+          (entry) => entry.content?.assetId || entry.content?.toolId,
+        ),
       ],
       accessibleAssetIds,
     );
     const recentAssets = this.filterAssetIds(
       [
-        ...(activity.recentTools || []).map((item) => item.metadata?.toolId || item.metadata?.assetId),
+        ...(activity.recentTools || []).map(
+          (item) => item.metadata?.toolId || item.metadata?.assetId,
+        ),
         ...(activity.recentCalculators || []).map(
           (item) => item.metadata?.calculatorId || item.metadata?.toolId,
         ),
-        ...(longTerm.savedTools || []).map((entry) => entry.content?.assetId || entry.content?.toolId),
+        ...(longTerm.savedTools || []).map(
+          (entry) => entry.content?.assetId || entry.content?.toolId,
+        ),
       ],
       accessibleAssetIds,
     );
@@ -202,9 +212,9 @@ export class MemoryFabricService {
       },
       aiMemory: {
         shortTerm: this.sanitizeContent(shortTerm),
-        recentAiChats: (activity.recentAiChats || []).slice(0, 5).map((item) =>
-          this.sanitizeActivity(item),
-        ),
+        recentAiChats: (activity.recentAiChats || [])
+          .slice(0, 5)
+          .map((item) => this.sanitizeActivity(item)),
         savedPromptCount: personalization.savedPrompts?.length || 0,
         recentPromptCount: personalization.recentPrompts?.length || 0,
       },
@@ -293,7 +303,10 @@ export class MemoryFabricService {
     };
   }
 
-  private normalizeTenant(tenantContext: TenantContextLike = {}, userId?: string): TenantContextLike {
+  private normalizeTenant(
+    tenantContext: TenantContextLike = {},
+    userId?: string,
+  ): TenantContextLike {
     return {
       organizationId: tenantContext?.organizationId || null,
       workspaceId: tenantContext?.workspaceId || null,
@@ -394,7 +407,9 @@ export class MemoryFabricService {
       return value.slice(0, 20).map((item) => this.sanitizeContent(item));
     }
     if (!value || typeof value !== 'object') {
-      return ['string', 'number', 'boolean'].includes(typeof value) || value == null ? value : undefined;
+      return ['string', 'number', 'boolean'].includes(typeof value) || value == null
+        ? value
+        : undefined;
     }
     return Object.fromEntries(
       Object.entries(value)

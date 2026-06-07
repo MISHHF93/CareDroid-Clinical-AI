@@ -166,7 +166,7 @@ describe('Vite proxy and ports', () => {
   it('serves frontend on port 8000 and proxies API/health/socket in dev and preview', () => {
     const vite = readViteDevConfig();
     expect(vite.devPort).toBe(8000);
-    expect(vite.previewPort).toBe(4173);
+    expect(vite.previewPort).toBe(8000);
     expect(vite.proxyTarget).toBe('http://localhost:3000');
     expect(vite.proxiesApi).toBe(true);
     expect(vite.proxiesHealth).toBe(true);

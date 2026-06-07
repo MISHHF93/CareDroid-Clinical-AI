@@ -69,7 +69,7 @@ const REGISTRY_COMPONENT = Object.freeze({
   [REGISTRY.procedures]: 'src/pages/tools/ProcedureGuide.jsx',
   [REGISTRY.calculatorsHub]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.fleetCommand]: 'src/pages/fleet/FleetDashboard.jsx',
-  [REGISTRY.digitalOperationsCenter]: 'src/pages/DigitalOperationsCenter.jsx',
+  [REGISTRY.digitalOperationsCenter]: 'src/pages/Operations.jsx',
   [REGISTRY.predictiveMaintenance]: 'src/pages/fleet/PredictiveMaintenance.jsx',
   [REGISTRY.routeOptimizer]: 'src/pages/fleet/RouteOptimizer.jsx',
   [REGISTRY.researchEvidenceHub]: 'src/pages/ResearchEvidenceHub.jsx',

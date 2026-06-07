@@ -21,10 +21,12 @@ const VISIBLE_SIDEBAR_ITEMS = [
 describe('primaryNavigation', () => {
   it('exposes the simplified primary sidebar model in canonical order', () => {
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
-      ['Command Center', '/dashboard'],
+      ['Dashboard', '/dashboard'],
       ['Assistant', '/assistant'],
       ['Tools', '/tools'],
       ['Operations', '/operations'],
+      ['Profile', '/profile'],
+      ['Settings', '/settings'],
     ]);
   });
 
@@ -46,6 +48,11 @@ describe('primaryNavigation', () => {
 
   it('keeps developer and governance routes in the collapsed advanced group', () => {
     expect(ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
+      ['Asset Packs', '/asset-packs'],
+      ['Products', '/products'],
+      ['Organization', '/organization'],
+      ['Platform Admin', '/platform-admin'],
+      ['Configuration Studio', '/configuration-studio'],
       ['Developer Catalog', '/tools/catalog'],
       ['System Health', '/system-health'],
       ['SaaS Health', '/saas-health'],
@@ -122,6 +129,8 @@ describe('primaryNavigation', () => {
       '/assistant',
       '/tools',
       '/operations',
+      '/profile',
+      '/settings',
     ]);
   });
 
@@ -155,7 +164,7 @@ describe('primaryNavigation', () => {
     expect(getPrimaryNavItemForPath('/operations')?.id).toBe('operations');
   });
 
-  it('keeps account utilities outside persistent primary navigation', () => {
+  it('keeps profile and settings in primary navigation while account utilities remain searchable', () => {
     const expected = [
       ['/profile', 'profile'],
       ['/profile/activity', 'profile'],
@@ -163,7 +172,7 @@ describe('primaryNavigation', () => {
       ['/profile/settings', 'settings'],
       ['/profile/preferences', 'settings'],
       ['/settings', 'settings'],
-      ['/tenant-admin', 'tenant-admin'],
+      ['/tenant-admin', 'platform-admin'],
     ];
 
     for (const [path, itemId] of expected) {
@@ -172,13 +181,13 @@ describe('primaryNavigation', () => {
       expect(
         matches.map((item) => item.id),
         path
-      ).toEqual([]);
+      ).toEqual(['profile', 'settings'].includes(itemId) ? [itemId] : []);
       expect(getPrimaryNavItemForPath(path)?.id, path).toBe(itemId);
     }
 
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.id)).toEqual([
-      'profile',
-      'settings',
+      'discover',
+      'automation',
       'customer-portal',
       'knowledge-base',
       'marketplace',
@@ -191,10 +200,13 @@ describe('primaryNavigation', () => {
   });
 
   it('keeps Discover and Automation searchable without making them primary', () => {
-    expect(SECONDARY_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
-      ['Discover', '/discover'],
-      ['Automation', '/automation'],
-    ]);
+    expect(SECONDARY_NAV_ITEMS).toEqual([]);
+    expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual(
+      expect.arrayContaining([
+        ['Discover', '/discover'],
+        ['Automation', '/automation'],
+      ])
+    );
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => item.id)).not.toEqual(
       expect.arrayContaining(['discover', 'automation'])
     );

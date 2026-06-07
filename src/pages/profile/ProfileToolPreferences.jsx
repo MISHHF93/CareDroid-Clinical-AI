@@ -28,7 +28,7 @@ export default function ProfileToolPreferences() {
     resetToolRecommendations,
   } = toolPreferences;
   const { user } = useUser();
-  const { account, preferences, activeWorkspace, workspaceState } = useUserIdentity();
+  const { account, preferences, activeWorkspace, workspaceState, updateProfile, saasProfile } = useUserIdentity();
   const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace();
   const tools = useMemo(() => getUserFacingToolRegistryProjection(), []);
   const [status, setStatus] = useState('');
@@ -64,10 +64,35 @@ export default function ProfileToolPreferences() {
   const pinnedToolSet = useMemo(() => new Set(pinned), [pinned]);
   const hiddenToolSet = useMemo(() => new Set(hiddenTools), [hiddenTools]);
 
-  const updateSetting = (field, value) => {
+  const updateSetting = async (field, value) => {
     updateProfileSettings({ [field]: value });
     if (field === 'defaultWorkspace') setActiveWorkspaceId(value);
-    setStatus('Tool preferences saved locally.');
+    const backendField =
+      field === 'compactToolView'
+        ? { compactMode: value }
+        : field === 'responseStyle'
+          ? { preferredAIStyle: value }
+          : { [field]: value };
+    await updateProfile?.(backendField);
+    setStatus('Tool preferences saved.');
+  };
+
+  const handlePinnedToggle = async (toolId) => {
+    const nextPinned = pinnedToolSet.has(toolId)
+      ? pinned.filter((id) => id !== toolId)
+      : [...pinned, toolId];
+    togglePinned(toolId);
+    await updateProfile?.({ pinnedAssets: nextPinned });
+    setStatus(pinnedToolSet.has(toolId) ? 'Tool unpinned.' : 'Tool pinned.');
+  };
+
+  const handleHiddenToggle = async (toolId) => {
+    const nextHidden = hiddenToolSet.has(toolId)
+      ? hiddenTools.filter((id) => id !== toolId)
+      : [...hiddenTools, toolId];
+    toggleHidden(toolId);
+    await updateProfile?.({ hiddenAssets: nextHidden });
+    setStatus(hiddenToolSet.has(toolId) ? 'Tool restored.' : 'Tool hidden.');
   };
 
   const handleReset = () => {
@@ -97,6 +122,10 @@ export default function ProfileToolPreferences() {
 
         <Card>
           <form className="profile-identity-form" onSubmit={(event) => event.preventDefault()}>
+            <div className="profile-identity-muted">
+              Backend SaaS role: {saasProfile?.role || profile.role} · default workspace:{' '}
+              {saasProfile?.defaultWorkspace || profileSettings.defaultWorkspace || activeWorkspaceId}
+            </div>
             <label>
               Role
               <select value={profileSettings.role || profile.role} onChange={(event) => updateSetting('role', event.target.value)}>
@@ -176,10 +205,10 @@ export default function ProfileToolPreferences() {
                   </span>
                 </div>
                 <div className="profile-identity-actions">
-                  <button type="button" className="profile-identity-button" onClick={() => togglePinned(tool.id)}>
+                  <button type="button" className="profile-identity-button" onClick={() => handlePinnedToggle(tool.id)}>
                     {pinnedToolSet.has(tool.id) ? 'Unpin tool' : 'Pin tool'}
                   </button>
-                  <button type="button" className="profile-identity-button" onClick={() => toggleHidden(tool.id)}>
+                  <button type="button" className="profile-identity-button" onClick={() => handleHiddenToggle(tool.id)}>
                     {hiddenToolSet.has(tool.id) ? 'Show tool' : 'Hide tool'}
                   </button>
                 </div>

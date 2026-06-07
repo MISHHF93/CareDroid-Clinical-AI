@@ -58,9 +58,9 @@ export const COMMAND_DASHBOARD_PROMPTS = Object.freeze([
     description: 'Review deterioration, readmission, sepsis, ICU, device, and fleet maintenance predictions.',
   },
   {
-    id: 'open-operations-center',
-    title: 'Open operations center',
-    prompt: 'Open the Digital Operations Center for the current operational role.',
+    id: 'open-operations',
+    title: 'Open operations',
+    prompt: 'Open the Operations hub for the current operational role.',
     toolId: REGISTRY.digitalOperationsCenter,
     description: 'Combine Digital Twin, Hospital Map, Medical IoT, Fleet, Notifications, and System Health.',
   },

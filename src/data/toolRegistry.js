@@ -2891,7 +2891,7 @@ const toolRegistry = [
   {
     id: 'telemetry-monitoring',
     name: 'Telemetry Monitoring Center',
-    path: '/hospital-map',
+    path: '/medical-iot',
     color: '#14B8A6',
     description:
       'Timestamped telemetry monitoring for device connectivity, freshness, stale data, offline devices, and abnormal readings',
@@ -2959,11 +2959,11 @@ const toolRegistry = [
   },
   {
     id: 'digital-operations-center',
-    name: 'Digital Operations Center',
-    path: '/operations-center',
+    name: 'Operations Hub',
+    path: '/operations',
     color: '#1D4ED8',
     description:
-      'Single operational command center combining Digital Twin, Hospital Map, Medical IoT, Fleet, Notifications, and System Health with role-based views',
+      'Single operations hub combining Digital Twin, Hospital Map, Medical IoT, Fleet, Notifications, and System Health with role-based views',
     shortcut: 'Ctrl+Alt+O',
     category: 'Hospital Operations',
     features: [

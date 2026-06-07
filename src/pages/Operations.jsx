@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import ContextInsightCard from '../components/ContextInsightCard';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { CANONICAL_ROUTES } from '../config/routes.config';
@@ -8,6 +9,13 @@ import { CHROME_ICONS } from '../navigation/iconRegistry';
 import './OperatingWorkspace.css';
 
 const OPERATION_AREAS = Object.freeze([
+  {
+    title: 'Digital Twin',
+    body: 'Open the operational twin for capacity, occupancy, device status, fleet readiness, and predictive signals.',
+    path: CANONICAL_ROUTES.digitalTwin,
+    icon: CHROME_ICONS.brain,
+    label: 'Open twin',
+  },
   {
     title: 'Clinical alerts',
     body: 'Review priority clinical signals and route the next action into Assistant when needed.',
@@ -40,12 +48,28 @@ const OPERATION_AREAS = Object.freeze([
     label: 'Open IoT',
   },
   {
+    title: 'Fleet map',
+    body: 'Track mobile units and route status as a detail view under the unified Operations hub.',
+    path: CANONICAL_ROUTES.fleetMap,
+    toolId: 'fleet-live-map',
+    icon: CHROME_ICONS.truck,
+    label: 'Open fleet map',
+  },
+  {
     title: 'Live tracking map',
     body: 'Open the unified map for fleet, hospital device, and Medical IoT markers with demo tracking labels.',
     path: CANONICAL_ROUTES.liveMap,
     toolId: 'live-tracking-map',
     icon: CHROME_ICONS.shareLink,
     label: 'Open live map',
+  },
+  {
+    title: 'Telemetry',
+    body: 'Review telemetry freshness, stale readings, device signals, and operational monitoring context.',
+    path: CANONICAL_ROUTES.medicalIot,
+    toolId: 'telemetry-monitoring',
+    icon: CHROME_ICONS.lineChart,
+    label: 'Open telemetry',
   },
   {
     title: 'Fleet command',
@@ -70,20 +94,6 @@ const OPERATION_AREAS = Object.freeze([
     toolId: 'predictive-maintenance',
     icon: CHROME_ICONS.alert,
     label: 'View maintenance',
-  },
-  {
-    title: 'Analytics',
-    body: 'Track usage and performance indicators for clinical and operational workflows.',
-    path: '/analytics',
-    icon: CHROME_ICONS.lineChart,
-    label: 'Open analytics',
-  },
-  {
-    title: 'Audit logs',
-    body: 'Review access and trust events without exposing audit tooling as a clinician catalog.',
-    path: CANONICAL_ROUTES.audit,
-    icon: CHROME_ICONS.shield,
-    label: 'Open audit',
   },
 ]);
 
@@ -117,8 +127,8 @@ export default function Operations() {
           <p className="operating-eyebrow">Operational command</p>
           <h1 id="operations-title">Operations</h1>
           <p>
-            Fleet, alerts, analytics, and audit surfaces live together here so operations feels like
-            one system.
+            Digital Twin, Hospital Map, Medical IoT, Devices, Fleet, Live Map, Alerts, Telemetry,
+            and Maintenance live together here so operations feels like one system.
           </p>
         </div>
         <button
@@ -130,10 +140,32 @@ export default function Operations() {
         </button>
       </section>
 
+      <section className="operating-insights" aria-label="Operations context insights">
+        <ContextInsightCard
+          title="Suggested operations view"
+          message="Start with the operational twin when you need a cross-module picture."
+          source="Operations navigation"
+          status="action-required"
+          actionLabel="Open twin"
+          actionRoute={CANONICAL_ROUTES.digitalTwin}
+        />
+        <ContextInsightCard
+          title="Telemetry actions"
+          message="Device, fleet, map, and telemetry routes are available as separate source views."
+          source="Canonical routes"
+          status="generated"
+          actionLabel="Open live map"
+          actionRoute={CANONICAL_ROUTES.liveMap}
+        />
+      </section>
+
       <section className="operating-section" aria-labelledby="operation-areas-title">
         <div className="operating-section__header">
           <h2 id="operation-areas-title">Operational areas</h2>
-          <p>Each card preserves existing routes while reducing top-level navigation sprawl.</p>
+          <p>
+            Detail pages remain available, but this hub is the single user-facing way to find
+            operational maps, telemetry, alerts, and maintenance workflows.
+          </p>
         </div>
         <div className="operating-card-grid">
           {OPERATION_AREAS.map((area) => (

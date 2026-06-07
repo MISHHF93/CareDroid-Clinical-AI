@@ -155,8 +155,8 @@ export const PLUGIN_REGISTRY = Object.freeze([
       logic: PLUGIN_PERMISSION_LOGIC.ANY,
     },
     inventory: {
-      route: '/operations-center',
-      component: 'src/pages/DigitalOperationsCenter.jsx',
+      route: '/operations',
+      component: 'src/pages/Operations.jsx',
       description:
         'Dashboard plugin slot for capacity, bed, device, and operational command-center panels.',
       catalogVisible: true,

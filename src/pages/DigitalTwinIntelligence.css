@@ -87,6 +87,11 @@
   padding: 14px 16px;
 }
 
+.twin-intel-context {
+  display: grid;
+  gap: 14px;
+}
+
 .twin-intel-scores,
 .twin-intel-domains,
 .twin-intel-insights,

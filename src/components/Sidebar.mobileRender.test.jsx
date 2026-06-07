@@ -95,12 +95,16 @@ describe('Sidebar mobile render state', () => {
     expect(closeButton).toHaveAccessibleName(/close menu/i);
     const nav = container.querySelector('nav.sidebar-nav');
     expect(nav).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^command center$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^assistant$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^tools$/i })).toBeInTheDocument();
-    expect(within(nav).getByRole('button', { name: /^operations$/i })).toBeInTheDocument();
-    expect(within(nav).queryByRole('button', { name: /^profile$/i })).not.toBeInTheDocument();
-    expect(within(nav).queryByRole('button', { name: /^settings$/i })).not.toBeInTheDocument();
+    for (const name of [
+      /^dashboard$/i,
+      /^assistant$/i,
+      /^tools$/i,
+      /^operations$/i,
+      /^profile$/i,
+      /^settings$/i,
+    ]) {
+      expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
+    }
     expect(within(nav).queryByRole('button', { name: /^hospital map$/i })).not.toBeInTheDocument();
     expect(within(nav).queryByRole('button', { name: /^fleet map$/i })).not.toBeInTheDocument();
   });
@@ -110,15 +114,16 @@ describe('Sidebar mobile render state', () => {
 
     const nav = screen.getByRole('navigation', { name: /primary navigation/i });
     for (const name of [
-      /^command center$/i,
+      /^dashboard$/i,
       /^assistant$/i,
       /^tools$/i,
       /^operations$/i,
+      /^profile$/i,
+      /^settings$/i,
     ]) {
       expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
     }
 
-    expect(screen.getByLabelText(/org workspace/i)).toBeInTheDocument();
     expect(screen.queryByLabelText(/^workspace$/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /developer catalog/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^tool library$/i })).not.toBeInTheDocument();

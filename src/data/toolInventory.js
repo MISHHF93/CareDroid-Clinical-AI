@@ -387,7 +387,7 @@ const COMPONENT_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.resourceAllocationAssistant]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.deviceRecommendationAssistant]: 'src/pages/tools/Calculators.jsx',
   [REGISTRY.fleetCommand]: 'src/pages/fleet/FleetDashboard.jsx',
-  [REGISTRY.digitalOperationsCenter]: 'src/pages/DigitalOperationsCenter.jsx',
+  [REGISTRY.digitalOperationsCenter]: 'src/pages/Operations.jsx',
   [REGISTRY.fleetLiveMap]: 'src/pages/fleet/FleetLiveMap.jsx',
   [REGISTRY.predictiveMaintenance]: 'src/pages/fleet/PredictiveMaintenance.jsx',
   [REGISTRY.routeOptimizer]: 'src/pages/fleet/RouteOptimizer.jsx',

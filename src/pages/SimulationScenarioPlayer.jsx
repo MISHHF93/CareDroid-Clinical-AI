@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import ContextInsightCard from '../components/ContextInsightCard';
 import StateSourceNotice from '../components/StateSourceNotice';
 import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
@@ -99,8 +100,45 @@ export default function SimulationScenarioPlayer() {
           DEMO_LIVE_STATES.LOCAL_ONLY,
           DEMO_LIVE_STATES.UNSUPPORTED,
         ]}
-        details="Patient vitals, labs, timeline events, checklist state, AI tutor hints, and debriefs are simulated training content. Submitted decisions remain local and do not trigger real clinical workflows or external escalation."
+        details="Patient vitals, labs, timeline events, checklist state, demo tutor hints, and debriefs are simulated training content. Submitted decisions remain local and do not trigger real clinical workflows or external escalation."
       />
+
+      <section className="ops-demo-insights" aria-label="Simulation context insights">
+        <ContextInsightCard
+          title="Recommended scenario"
+          message={`${scenario.title} is selected for ${roleIntelligenceProfile.roleLabel || 'the current role'}.`}
+          source="Role profile"
+          status="demo"
+          demo
+          actionLabel="Back to library"
+          actionRoute="/simulation"
+        />
+        <ContextInsightCard
+          title={
+            run.status === 'completed'
+              ? 'Debrief ready'
+              : `${scenario.criticalActions.length - selectedActions.length} incomplete action(s)`
+          }
+          message={
+            run.status === 'completed'
+              ? 'Review the local structured debrief before using results for training records.'
+              : 'Complete critical actions or submit a decision before debrief.'
+          }
+          source="Local simulation run"
+          status={run.status === 'completed' ? 'generated' : 'action-required'}
+          actionLabel={run.status === 'completed' ? 'View outcomes' : 'Complete scenario'}
+          actionRoute={run.status === 'completed' ? '/simulation/outcomes' : '/simulation'}
+        />
+        <ContextInsightCard
+          title="Training source"
+          message="Scenario decisions and hints remain local and do not trigger clinical workflows."
+          source="Simulated content"
+          status="demo"
+          demo
+          actionLabel="Open Assistant"
+          actionRoute="/assistant"
+        />
+      </section>
 
       <section className="ops-demo-grid ops-demo-grid--four" aria-label="Scenario progress">
         <article className="ops-demo-metric">
@@ -190,7 +228,7 @@ export default function SimulationScenarioPlayer() {
             </label>
             <div className="ops-demo-actions">
               <button type="button" onClick={() => setShowHint((value) => !value)}>
-                AI tutor hint
+                Demo tutor hint
               </button>
               <button type="button" onClick={submitDecision}>
                 Submit decision
@@ -201,7 +239,7 @@ export default function SimulationScenarioPlayer() {
             </div>
             {showHint && (
               <div className="ops-demo-debrief">
-                <strong>AI tutor hint</strong>
+                <strong>Demo tutor hint</strong>
                 <p>
                   Prioritize the most time-sensitive safety risk, verify objective data, and use
                   closed-loop communication before moving to secondary tasks.
@@ -269,7 +307,7 @@ export default function SimulationScenarioPlayer() {
               <ul className="ops-demo-list">{debrief.safetyRisks.map((risk) => <li key={risk}>{risk}</li>)}</ul>
             </article>
             <article className="ops-demo-mini-card">
-              <strong>AI tutor feedback</strong>
+              <strong>Demo tutor feedback</strong>
               <span>{debrief.aiTutorFeedback}</span>
               <small>Time to critical action: {debrief.timeToCriticalActionSeconds}s</small>
             </article>

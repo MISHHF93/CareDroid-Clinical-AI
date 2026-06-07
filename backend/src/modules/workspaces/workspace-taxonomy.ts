@@ -14,12 +14,23 @@ export type WorkspaceDefinition = {
   name: string;
   displayName: string;
   description: string;
+  allowedRoles?: string[];
+  intendedDepartments?: string[];
   assistantContext: string;
   defaultDashboard: string;
   enabledToolIds: string[];
   enabledModules: string[];
   shortcuts: WorkspaceShortcutDefinition[];
   recommendedAssetIds: string[];
+  recommendedAssetPacks?: string[];
+  defaultDashboardWidgets?: string[];
+  recommendedAIAgents?: string[];
+  visibleNavigationGroups?: string[];
+  restrictedAssets?: string[];
+  defaultFilters?: Record<string, any>;
+  allowedOrganizationTypes?: string[];
+  subscriptionTier?: string;
+  status?: string;
   preferredMembershipRole?: WorkspaceMembershipRole;
 };
 
@@ -49,13 +60,87 @@ export const REQUESTED_WORKSPACE_TYPES = Object.freeze([
   WorkspaceType.ICU,
   WorkspaceType.CARDIOLOGY,
   WorkspaceType.LABORATORY,
+  WorkspaceType.PHARMACY,
   WorkspaceType.OPERATIONS,
   WorkspaceType.FLEET,
   WorkspaceType.MEDICAL_IOT,
   WorkspaceType.EDUCATION,
+  WorkspaceType.SIMULATION,
   WorkspaceType.RESEARCH,
   WorkspaceType.GOVERNANCE,
+  WorkspaceType.AI_EVALUATION,
+  WorkspaceType.ADMIN,
 ]);
+
+const commonClinicalRoles = [
+  'emergency-physician',
+  'icu-physician',
+  'cardiologist',
+  'nurse',
+  'pharmacist',
+  'lab-technician',
+  'researcher',
+  'educator',
+  'student',
+  'hospital-administrator',
+  'platform-admin',
+];
+
+const workspaceProfileDefaults = {
+  recommendedAssetPacks: ['clinical-core'],
+  defaultDashboardWidgets: ['recommended-assets', 'recent-assets', 'notifications'],
+  recommendedAIAgents: ['clinical-copilot'],
+  visibleNavigationGroups: ['dashboard', 'assistant', 'tools'],
+  restrictedAssets: [],
+  defaultFilters: { tools: 'recommended' },
+  allowedOrganizationTypes: ['hospital'],
+  subscriptionTier: 'starter',
+  status: 'active',
+};
+
+function withWorkspaceProfile(
+  definition: WorkspaceDefinition,
+  profile: Partial<WorkspaceDefinition> = {},
+): WorkspaceDefinition {
+  return {
+    ...definition,
+    allowedRoles: profile.allowedRoles || definition.allowedRoles || commonClinicalRoles,
+    intendedDepartments: profile.intendedDepartments || definition.intendedDepartments || [],
+    recommendedAssetPacks:
+      profile.recommendedAssetPacks ||
+      definition.recommendedAssetPacks ||
+      workspaceProfileDefaults.recommendedAssetPacks,
+    defaultDashboardWidgets:
+      profile.defaultDashboardWidgets ||
+      definition.defaultDashboardWidgets ||
+      workspaceProfileDefaults.defaultDashboardWidgets,
+    recommendedAIAgents:
+      profile.recommendedAIAgents ||
+      definition.recommendedAIAgents ||
+      workspaceProfileDefaults.recommendedAIAgents,
+    visibleNavigationGroups:
+      profile.visibleNavigationGroups ||
+      definition.visibleNavigationGroups ||
+      workspaceProfileDefaults.visibleNavigationGroups,
+    restrictedAssets:
+      profile.restrictedAssets ||
+      definition.restrictedAssets ||
+      workspaceProfileDefaults.restrictedAssets,
+    defaultFilters:
+      profile.defaultFilters ||
+      definition.defaultFilters ||
+      workspaceProfileDefaults.defaultFilters,
+    allowedOrganizationTypes:
+      profile.allowedOrganizationTypes ||
+      definition.allowedOrganizationTypes ||
+      workspaceProfileDefaults.allowedOrganizationTypes,
+    subscriptionTier:
+      profile.subscriptionTier ||
+      definition.subscriptionTier ||
+      workspaceProfileDefaults.subscriptionTier,
+    status: profile.status || definition.status || workspaceProfileDefaults.status,
+  };
+}
 
 export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> = {
   [WorkspaceType.PERSONAL]: {
@@ -255,6 +340,51 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
     ],
     recommendedAssetIds: ['lab-interp', 'laboratory-dashboard', 'abg-interpreter', 'calc-gfr'],
   },
+  [WorkspaceType.PHARMACY]: {
+    type: WorkspaceType.PHARMACY,
+    name: 'Pharmacy Workspace',
+    displayName: 'Pharmacy',
+    description:
+      'Medication safety, drug interactions, dosing support, formulary review, and pharmacy workflows.',
+    allowedRoles: ['pharmacist', 'hospital-administrator', 'platform-admin'],
+    intendedDepartments: ['pharmacy', 'medication-safety', 'clinical-operations'],
+    assistantContext:
+      'Prioritize medication safety, dose checking, interactions, contraindications, renal/hepatic adjustment, and pharmacist review.',
+    defaultDashboard: 'pharmacy',
+    enabledToolIds: [
+      'drug-check',
+      'dose-calculator',
+      'calc-gfr',
+      'ckd-staging',
+      'lab-interp',
+      'guideline-rag',
+    ],
+    enabledModules: ['dashboard', 'assistant', 'tools', 'pharmacy'],
+    shortcuts: [
+      baseShortcuts.assistant,
+      {
+        id: 'drug-check',
+        label: 'Drug Checker',
+        path: '/tools/drug-checker',
+        description: 'Open drug interactions and medication safety.',
+        assetId: 'drug-check',
+      },
+      {
+        id: 'dose-calculator',
+        label: 'Dose Calculator',
+        path: '/tools/calculators',
+        description: 'Open dose and renal adjustment calculators.',
+        assetId: 'dose-calculator',
+      },
+    ],
+    recommendedAssetIds: ['drug-check', 'dose-calculator', 'calc-gfr', 'ckd-staging'],
+    recommendedAssetPacks: ['clinical-core', 'pharmacy-pack'],
+    defaultDashboardWidgets: ['medication-safety', 'renal-dose-checks', 'recent-assets'],
+    recommendedAIAgents: ['medication-safety-agent'],
+    visibleNavigationGroups: ['dashboard', 'assistant', 'tools'],
+    restrictedAssets: ['ai-governance', 'audit-logs'],
+    defaultFilters: { tools: 'my-workspace', department: 'pharmacy' },
+  },
   [WorkspaceType.OPERATIONS]: {
     type: WorkspaceType.OPERATIONS,
     name: 'Operations Workspace',
@@ -442,6 +572,60 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
       'competency-platform',
     ],
   },
+  [WorkspaceType.SIMULATION]: {
+    type: WorkspaceType.SIMULATION,
+    name: 'Simulation Workspace',
+    displayName: 'Simulation',
+    description:
+      'Simulation scenarios, role-based practice, structured debriefs, and competency reinforcement.',
+    assistantContext:
+      'Frame guidance as simulated training support, recommend scenarios by role, and label local/demo training data clearly.',
+    defaultDashboard: 'simulation',
+    allowedRoles: [
+      'educator',
+      'student',
+      'researcher',
+      'emergency-physician',
+      'nurse',
+      'platform-admin',
+    ],
+    intendedDepartments: ['education', 'simulation', 'clinical-training'],
+    enabledToolIds: [
+      'simulation-suite',
+      'scenario-player',
+      'simulation-outcomes',
+      'debrief-dashboard',
+      'competency-dashboard',
+    ],
+    enabledModules: ['dashboard', 'assistant', 'simulation', 'education'],
+    shortcuts: [
+      {
+        id: 'simulation',
+        label: 'Simulation Suite',
+        path: '/simulation',
+        description: 'Open simulation scenarios.',
+        assetId: 'simulation-suite',
+      },
+      {
+        id: 'competencies',
+        label: 'Competencies',
+        path: '/competencies',
+        description: 'Open competency tracking.',
+        assetId: 'competency-dashboard',
+      },
+    ],
+    recommendedAssetIds: [
+      'simulation-suite',
+      'scenario-player',
+      'simulation-outcomes',
+      'debrief-dashboard',
+    ],
+    recommendedAssetPacks: ['education-simulation'],
+    defaultDashboardWidgets: ['scenario-library', 'incomplete-debriefs', 'recommended-practice'],
+    recommendedAIAgents: ['simulation-coach'],
+    visibleNavigationGroups: ['dashboard', 'assistant', 'tools'],
+    defaultFilters: { tools: 'my-workspace', department: 'education' },
+  },
   [WorkspaceType.RESEARCH]: {
     type: WorkspaceType.RESEARCH,
     name: 'Research Workspace',
@@ -533,14 +717,64 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
     recommendedAssetIds: ['ai-governance', 'audit-logs', 'clinical-audit', 'ai-security'],
     preferredMembershipRole: WorkspaceMembershipRole.ADMIN,
   },
+  [WorkspaceType.AI_EVALUATION]: {
+    type: WorkspaceType.AI_EVALUATION,
+    name: 'AI Evaluation Workspace',
+    displayName: 'AI Evaluation',
+    description:
+      'Evaluation lab, model quality, benchmark review, safety findings, and governance evidence.',
+    assistantContext:
+      'Focus on evaluation evidence, benchmark quality, hallucination risk, safety findings, and governance-ready summaries.',
+    defaultDashboard: 'ai-evaluation',
+    allowedRoles: ['researcher', 'educator', 'compliance-officer', 'platform-admin'],
+    intendedDepartments: ['research', 'ai-evaluation', 'governance'],
+    enabledToolIds: [
+      'ai-evaluation',
+      'ai-command-center',
+      'ai-governance',
+      'ai-security',
+      'ai-explainability',
+      'clinical-audit',
+    ],
+    enabledModules: ['dashboard', 'ai-evaluation', 'governance', 'audit'],
+    shortcuts: [
+      {
+        id: 'ai-evaluation',
+        label: 'AI Evaluation',
+        path: '/ai-evaluation',
+        description: 'Open evaluation lab.',
+        assetId: 'ai-evaluation',
+      },
+      {
+        id: 'ai-governance',
+        label: 'AI Governance',
+        path: '/ai-governance',
+        description: 'Open governance center.',
+        assetId: 'ai-governance',
+      },
+    ],
+    recommendedAssetIds: [
+      'ai-evaluation',
+      'ai-command-center',
+      'ai-governance',
+      'ai-explainability',
+    ],
+    recommendedAssetPacks: ['ai-evaluation-lab', 'governance-risk'],
+    defaultDashboardWidgets: ['model-benchmarks', 'safety-findings', 'evaluation-runs'],
+    recommendedAIAgents: ['evaluation-agent'],
+    visibleNavigationGroups: ['advanced', 'dashboard'],
+    defaultFilters: { tools: 'my-workspace', department: 'research' },
+    preferredMembershipRole: WorkspaceMembershipRole.ADMIN,
+  },
   [WorkspaceType.ADMIN]: {
     type: WorkspaceType.ADMIN,
     name: 'Admin Workspace',
-    displayName: 'Governance',
-    description: 'Legacy admin workspace mapped to Governance.',
+    displayName: 'Admin',
+    description:
+      'Platform administration, subscriptions, organization controls, audit, and governance.',
     assistantContext:
       'Focus on governance, auditability, compliance evidence, policy controls, safety review, and escalation paths.',
-    defaultDashboard: 'governance',
+    defaultDashboard: 'admin',
     enabledToolIds: [
       'audit-logs',
       'analytics',
@@ -565,8 +799,8 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
 };
 
 export function getWorkspaceDefinition(type: WorkspaceType | string): WorkspaceDefinition {
-  return (
-    WORKSPACE_DEFINITIONS[type as WorkspaceType] || WORKSPACE_DEFINITIONS[WorkspaceType.EMERGENCY]
+  return withWorkspaceProfile(
+    WORKSPACE_DEFINITIONS[type as WorkspaceType] || WORKSPACE_DEFINITIONS[WorkspaceType.EMERGENCY],
   );
 }
 
@@ -579,6 +813,24 @@ export function workspaceSettingsForType(type: WorkspaceType | string) {
     assistantContext: definition.assistantContext,
     shortcuts: definition.shortcuts,
     recommendedAssetIds: definition.recommendedAssetIds,
+    workspaceProfile: {
+      workspaceId: definition.type,
+      label: definition.displayName,
+      name: definition.displayName,
+      description: definition.description,
+      allowedRoles: definition.allowedRoles,
+      intendedDepartments: definition.intendedDepartments,
+      defaultAssets: definition.enabledToolIds,
+      recommendedAssetPacks: definition.recommendedAssetPacks,
+      defaultDashboardWidgets: definition.defaultDashboardWidgets,
+      recommendedAIAgents: definition.recommendedAIAgents,
+      visibleNavigationGroups: definition.visibleNavigationGroups,
+      restrictedAssets: definition.restrictedAssets,
+      defaultFilters: definition.defaultFilters,
+      allowedOrganizationTypes: definition.allowedOrganizationTypes,
+      subscriptionTier: definition.subscriptionTier,
+      status: definition.status,
+    },
     workspaceKey: definition.type,
     emergencyModeEnabled: definition.type === WorkspaceType.EMERGENCY,
   };

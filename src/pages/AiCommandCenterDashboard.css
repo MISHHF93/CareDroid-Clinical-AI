@@ -127,6 +127,13 @@
   font-size: 0.82rem;
 }
 
+.ai-command-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--compact-panel-gap, 10px);
+  min-width: 0;
+}
+
 .ai-command-metrics {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

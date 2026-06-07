@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CANONICAL_ROUTES } from '../../config/routes.config';
 import { useConversation } from '../../contexts/ConversationContext';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
@@ -37,18 +37,16 @@ import {
 import './ToolsOverview.css';
 
 const TOOL_FILTER_OPTIONS = Object.freeze([
-  { value: 'all', label: 'All' },
-  { value: 'recommended', label: 'Recommended' },
-  { value: 'workspace', label: 'Workspace' },
-  { value: 'organization', label: 'Organization' },
-  { value: 'permitted', label: 'Permitted' },
-  { value: 'calculator', label: 'Calculators' },
-  { value: 'diagnostics', label: 'Diagnostics' },
-  { value: 'ai-workflows', label: 'AI Workflows' },
-  { value: 'maps-iot', label: 'Maps & IoT' },
-  { value: 'operations', label: 'Operations' },
-  { value: 'favorites', label: 'Favorites' },
+  { value: 'recommended', label: 'Recommended for Me' },
+  { value: 'workspace', label: 'My Workspace' },
+  { value: 'department', label: 'My Department' },
+  { value: 'role', label: 'My Role' },
+  { value: 'asset-packs', label: 'My Asset Packs' },
+  { value: 'permitted', label: 'All Permitted' },
+  { value: 'locked', label: 'Locked' },
+  { value: 'hidden', label: 'Hidden' },
   { value: 'recent', label: 'Recent' },
+  { value: 'favorites', label: 'Favorites' },
 ]);
 
 const TOOL_FILTER_OPTION_VALUES = new Set(TOOL_FILTER_OPTIONS.map((option) => option.value));
@@ -84,7 +82,22 @@ function toolSearchBlob(tool) {
 }
 
 function matchesToolFilter(tool, filter) {
-  if (!filter || ['recommended', 'favorites', 'recent', 'workspace', 'organization', 'permitted', 'all'].includes(filter)) {
+  if (
+    !filter ||
+    [
+      'recommended',
+      'favorites',
+      'recent',
+      'workspace',
+      'department',
+      'role',
+      'asset-packs',
+      'permitted',
+      'locked',
+      'hidden',
+      'all',
+    ].includes(filter)
+  ) {
     return true;
   }
   if (filter === 'simulations') {
@@ -104,10 +117,13 @@ function matchesToolFilter(tool, filter) {
       (tool.category === 'Calculator' || tool.surface === 'calculator-form')
     );
   }
-  if (filter === 'diagnostics') {
+  if (filter === 'clinical-tools') {
     return (
+      ['Calculator', 'Diagnostic', 'Reference', 'Clinical'].includes(tool.category) ||
       tool.category === 'Diagnostic' ||
-      /diagnos|differential|triage|risk|score/i.test(`${tool.name} ${tool.description}`)
+      /diagnos|differential|triage|risk|score|protocol|drug|lab|clinical/i.test(
+        `${tool.name} ${tool.description} ${tool.path}`
+      )
     );
   }
   if (filter === 'ai-workflows') {
@@ -212,12 +228,10 @@ function accessRestrictionCopy(tool) {
 
 const ToolsOverview = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [searchParams] = useSearchParams();
   const requestedFilter = searchParams.get('filter');
   const requestedSearch = searchParams.get('q') || searchParams.get('search') || '';
-  const routeDefaultFilter =
-    location.pathname === CANONICAL_ROUTES.calculators ? 'calculator' : 'all';
+  const routeDefaultFilter = 'permitted';
   const [search, setSearch] = useState(requestedSearch);
   const [toolFilter, setToolFilter] = useState(
     TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : routeDefaultFilter
@@ -262,6 +276,7 @@ const ToolsOverview = () => {
     workspaceState,
     platformContext,
     roleProfile,
+    saasProfile,
   } = useUserIdentity();
 
   const accessContext = useMemo(
@@ -269,29 +284,56 @@ const ToolsOverview = () => {
       ...(platformContext || {}),
       account,
       activeWorkspace,
-        workspaceContextActive,
+      workspaceContextActive,
       preferences,
       workspaceState,
-        visibleAssetIds,
+      visibleAssetIds,
+      saasProfile,
     }),
-    [account, activeWorkspace, platformContext, preferences, visibleAssetIds, workspaceContextActive, workspaceState]
+    [
+      account,
+      activeWorkspace,
+      platformContext,
+      preferences,
+      saasProfile,
+      visibleAssetIds,
+      workspaceContextActive,
+      workspaceState,
+    ]
   );
-  const accessRole = platformContext?.membership?.role || account?.role || user?.role;
+  const accessRole = saasProfile?.role || platformContext?.membership?.role || account?.role || user?.role;
 
   const allToolsWithAccess = useMemo(() => {
     const projected = FEATURE_FLAGS.platformEntitlements
       && platformContext
       ? getAssetAwareToolProjection(accessContext, accessRole)
       : getUserFacingToolRegistryProjection();
-    return filterVisibleTools(projected);
-  }, [accessContext, accessRole, platformContext]);
+    const locallyHidden = new Set([
+      ...(hiddenTools || []),
+      ...(preferences?.toolPreferences?.hiddenAssetIds || []),
+      ...(preferences?.toolPreferences?.hiddenToolIds || []),
+      ...(saasProfile?.hiddenAssets || []),
+    ]);
+    return projected.map((tool) => {
+      const isHidden = locallyHidden.has(tool.id);
+      return {
+        ...tool,
+        accessState: isHidden ? ASSET_ACCESS_STATES.HIDDEN : tool.accessState || ASSET_ACCESS_STATES.ALLOWED,
+        accessLabel: isHidden ? 'Hidden' : tool.accessLabel || 'Available',
+        isLaunchable: isHidden ? false : tool.isLaunchable !== false,
+      };
+    });
+  }, [accessContext, accessRole, hiddenTools, platformContext, preferences?.toolPreferences, saasProfile?.hiddenAssets]);
 
   const tools = useMemo(
     () => filterVisibleTools(allToolsWithAccess),
     [allToolsWithAccess]
   );
 
-  const toolById = useMemo(() => Object.fromEntries(tools.map((tool) => [tool.id, tool])), [tools]);
+  const toolById = useMemo(
+    () => Object.fromEntries(allToolsWithAccess.map((tool) => [tool.id, tool])),
+    [allToolsWithAccess]
+  );
   const localActiveWorkspace = useMemo(
     () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
     [activeWorkspaceId, workspaces]
@@ -375,12 +417,12 @@ const ToolsOverview = () => {
   );
   const accessGroups = useMemo(
     () =>
-      groupToolsByAccessView(tools, {
+      groupToolsByAccessView(allToolsWithAccess, {
         favorites,
         recent: recentTools,
         recommendedIds,
       }),
-    [tools, favorites, recentTools, recommendedIds]
+    [allToolsWithAccess, favorites, recentTools, recommendedIds]
   );
   const allToolIds = useMemo(() => tools.map((tool) => tool.id), [tools]);
   const workspaceToolIds = useMemo(
@@ -407,7 +449,7 @@ const ToolsOverview = () => {
   const hiddenToolIdSet = useMemo(() => new Set(hiddenTools), [hiddenTools]);
   const profileFilteredTools = useMemo(
     () =>
-      toolFilter === 'calculator'
+      ['recommended', 'workspace', 'department', 'role', 'asset-packs', 'permitted', 'locked', 'hidden', 'recent', 'favorites'].includes(toolFilter)
         ? tools
         : filterToolsForProfileGraph(profileToolGraph, toolFilter),
     [profileToolGraph, toolFilter, tools]
@@ -431,23 +473,44 @@ const ToolsOverview = () => {
     let base = workspaceTools;
     if (toolFilter === 'recommended') base = profileToolGraph.recommendedTools;
     else if (toolFilter === 'workspace') base = accessGroups.workspace;
-    else if (toolFilter === 'organization') base = accessGroups.organization;
+    else if (toolFilter === 'department') {
+      const department = normalizeSearch(saasProfile?.department || account?.department || '');
+      base = department
+        ? tools.filter((tool) => toolSearchBlob(tool).includes(department))
+        : workspaceTools;
+    }
+    else if (toolFilter === 'role') {
+      base = profileToolGraph.recommendedTools.length ? profileToolGraph.recommendedTools : tools;
+    }
+    else if (toolFilter === 'asset-packs') base = accessGroups.packs;
     else if (toolFilter === 'permitted') base = accessGroups.permitted;
+    else if (toolFilter === 'locked') {
+      base = allToolsWithAccess.filter((tool) =>
+        [ASSET_ACCESS_STATES.LOCKED, ASSET_ACCESS_STATES.SUBSCRIPTION_REQUIRED].includes(tool.accessState)
+      );
+    }
+    else if (toolFilter === 'hidden') {
+      base = allToolsWithAccess.filter((tool) => tool.accessState === ASSET_ACCESS_STATES.HIDDEN);
+    }
     else if (toolFilter === 'favorites') base = accessGroups.favorites;
     else if (toolFilter === 'recent') base = recentToolItems;
 
     return base.filter((tool) => {
-      if (toolFilter !== 'all' && !matchesToolFilter(tool, toolFilter)) return false;
+      if (toolFilter !== 'permitted' && !matchesToolFilter(tool, toolFilter)) return false;
       if (!searchQuery) return true;
       return toolSearchBlob(tool).includes(searchQuery);
     });
   }, [
+    account?.department,
+    allToolsWithAccess,
     workspaceTools,
     searchQuery,
     toolFilter,
     accessGroups,
     profileToolGraph.recommendedTools,
     recentToolItems,
+    saasProfile?.department,
+    tools,
   ]);
 
   useEffect(() => {
@@ -516,9 +579,13 @@ const ToolsOverview = () => {
   const showSearchEmpty = !showWorkspaceEmpty && filteredTools.length === 0;
   const filterTabs = TOOL_FILTER_OPTIONS;
   const emptyStateCopy =
-    hiddenTools.length > 0
-      ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch to All.'
-      : 'No launchable tools match the current search and filter. Try a clinical alias or reset the filters.';
+    toolFilter === 'locked'
+      ? 'No locked tools match this view. Your current subscription and asset packs cover the visible library.'
+      : toolFilter === 'hidden'
+        ? 'No hidden tools match this view. Hidden tools can be restored from Profile > Tool preferences.'
+        : hiddenTools.length > 0
+          ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch filters.'
+          : 'No launchable tools match the current search and filter. Try a clinical alias or reset the filters.';
 
   return (
     <div className="tools-overview">
@@ -608,7 +675,7 @@ const ToolsOverview = () => {
             <div className="stat">
               <span className="stat-number">{filteredTools.length}</span>
               <span className="stat-label">
-                {searchQuery || toolFilter !== 'all'
+                {searchQuery || toolFilter !== 'permitted'
                   ? 'Matching'
                   : isAllToolsWorkspace
                     ? 'Shown'
@@ -685,7 +752,7 @@ const ToolsOverview = () => {
             className="btn-open-tool"
             onClick={() => {
               setSearch('');
-              setToolFilter('all');
+              setToolFilter('permitted');
             }}
           >
             Clear search and filters →

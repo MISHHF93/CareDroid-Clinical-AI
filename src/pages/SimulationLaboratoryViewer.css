@@ -79,6 +79,12 @@
   gap: var(--space-3);
 }
 
+.ops-demo-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--space-3);
+}
+
 .ops-demo-grid--three {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }

@@ -18,7 +18,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'discover', path: '/discover', match: 'heading', heading: /discover caredroid capabilities/i },
   { id: 'automation', path: '/automation', match: 'heading', heading: /^automation$/i },
   { id: 'assistant', path: '/assistant', match: 'composer' },
-  { id: 'operations-center', path: '/operations-center', match: 'heading', heading: /digital operations center/i },
+  { id: 'operations', path: '/operations', match: 'heading', heading: /^operations$/i },
   { id: 'tools-overview', path: '/tools', match: 'heading', heading: /^tool library$/i },
   { id: 'protocols', path: '/protocols', match: 'heading', heading: /protocol and clinical pathway library/i },
   { id: 'research', path: '/research', match: 'heading', heading: /research and evidence hub/i },

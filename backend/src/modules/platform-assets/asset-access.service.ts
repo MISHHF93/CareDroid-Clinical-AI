@@ -10,10 +10,14 @@ import { PlatformAssetsService } from './platform-assets.service';
 import { UserPreferencesService } from '../user-profile/user-preferences.service';
 import { PlatformContextService } from './platform-context.service';
 import { LEGACY_TOOL_ID_ALIASES } from './data/platform-asset-seed.data';
+import { SaasAssetAccessState } from '../user-profile/saas-profile.constants';
 
 export interface AssetAccessRecord {
   assetId: string;
   accessState: AssetAccessState;
+  effectiveAccessState: SaasAssetAccessState;
+  priority: number;
+  priorityReason: 'pinned' | 'workspace-recommended' | 'role-recommended' | 'recent' | 'permitted';
   reasons: string[];
 }
 
@@ -29,15 +33,31 @@ export class AssetAccessService {
     const ctx = await this.platformContextService.getContextForUser(user);
     const entitled = new Set(ctx.entitledAssetIds || []);
     const workspaceEnabled = new Set(this.resolveWorkspaceAssetIds(ctx.legacyToolAliases || []));
+    const activeWorkspace = ctx.workspace?.workspaces?.find(
+      (workspace: { id: string }) => workspace.id === ctx.workspace?.activeWorkspaceId,
+    );
+    const workspaceRecommended = new Set(
+      this.resolveWorkspaceAssetIds(activeWorkspace?.settings?.recommendedAssetIds || []),
+    );
+    const roleRecommended = new Set<string>(
+      (ctx.roleProfile?.recommendedAssetIds || []) as string[],
+    );
     const prefs = await this.userPreferencesService.getPreferences(user.id);
     const pinned = new Set([
       ...(prefs.toolPreferences?.pinnedAssetIds || []),
       ...(prefs.toolPreferences?.pinnedToolIds || []),
+      ...(prefs.toolPreferences?.saasProfile?.pinnedAssets || []),
     ]);
     const userHidden = new Set([
       ...(ctx.roleProfile?.hiddenAssetIds || []),
       ...(prefs.toolPreferences?.hiddenAssetIds || []),
       ...(prefs.toolPreferences?.hiddenToolIds || []),
+      ...(prefs.toolPreferences?.saasProfile?.hiddenAssets || []),
+    ]);
+    const recent = new Set([
+      ...(prefs.toolPreferences?.recentAssetIds || []),
+      ...(prefs.toolPreferences?.recentToolIds || []),
+      ...(prefs.toolPreferences?.saasProfile?.recentAssets || []),
     ]);
 
     const dbAssets = await this.platformAssetsService.listAssets({});
@@ -46,17 +66,23 @@ export class AssetAccessService {
     const ids =
       assetIds?.length > 0 ? assetIds : [...new Set([...entitled, ...dbAssets.map((a) => a.id)])];
 
-    const access: AssetAccessRecord[] = ids.map((assetId) =>
-      this.resolveAccess(assetId, {
-        user,
-        entitled,
-        hidden: userHidden,
-        asset: assetById.get(assetId),
-        hasOrganization: Boolean(ctx.organization?.id),
-        strictEntitlements: Boolean(ctx.strictSaasEntitlements),
-        workspaceEnabled,
-      }),
-    );
+    const access: AssetAccessRecord[] = ids
+      .map((assetId) =>
+        this.resolveAccess(assetId, {
+          user,
+          entitled,
+          hidden: userHidden,
+          asset: assetById.get(assetId),
+          hasOrganization: Boolean(ctx.organization?.id),
+          strictEntitlements: Boolean(ctx.strictSaasEntitlements),
+          workspaceEnabled,
+          pinned,
+          workspaceRecommended,
+          roleRecommended,
+          recent,
+        }),
+      )
+      .sort((a, b) => a.priority - b.priority || a.assetId.localeCompare(b.assetId));
 
     return {
       organization: ctx.organization,
@@ -68,6 +94,9 @@ export class AssetAccessService {
       hiddenAssetIds: [...userHidden],
       access,
       accessByAssetId: Object.fromEntries(access.map((row) => [row.assetId, row.accessState])),
+      effectiveAccessByAssetId: Object.fromEntries(
+        access.map((row) => [row.assetId, row.effectiveAccessState]),
+      ),
     };
   }
 
@@ -81,99 +110,95 @@ export class AssetAccessService {
       hasOrganization: boolean;
       strictEntitlements: boolean;
       workspaceEnabled: Set<string>;
+      pinned: Set<string>;
+      workspaceRecommended: Set<string>;
+      roleRecommended: Set<string>;
+      recent: Set<string>;
     },
   ): AssetAccessRecord {
     const reasons: string[] = [];
-    const { user, entitled, hidden, asset, hasOrganization, strictEntitlements, workspaceEnabled } =
-      params;
+    const {
+      user,
+      entitled,
+      hidden,
+      asset,
+      hasOrganization,
+      strictEntitlements,
+      workspaceEnabled,
+      pinned,
+      workspaceRecommended,
+      roleRecommended,
+      recent,
+    } = params;
+    const decorate = (accessState: AssetAccessState, stateReasons: string[]): AssetAccessRecord => {
+      const priority = this.resolvePriority(assetId, {
+        accessState,
+        pinned,
+        workspaceRecommended,
+        roleRecommended,
+        recent,
+      });
+      return {
+        assetId,
+        accessState,
+        effectiveAccessState: this.toSaasAccessState(accessState, priority.priorityReason),
+        priority: priority.priority,
+        priorityReason: priority.priorityReason,
+        reasons: stateReasons,
+      };
+    };
 
     if (hidden.has(assetId)) {
-      return { assetId, accessState: AssetAccessState.HIDDEN, reasons: ['user-hidden'] };
+      return decorate(AssetAccessState.HIDDEN, ['user-hidden']);
     }
 
     if (this.isAdminOnlyAsset(asset)) {
       if (user.role !== UserRole.ADMIN) {
-        return {
-          assetId,
-          accessState: AssetAccessState.REQUIRES_ADMIN,
-          reasons: ['admin-only-policy'],
-        };
+        return decorate(AssetAccessState.REQUIRES_ADMIN, ['admin-only-policy']);
       }
       reasons.push('admin-lifecycle-override');
     }
 
     if (asset?.lifecycle === PlatformAssetLifecycle.DRAFT) {
-      return { assetId, accessState: AssetAccessState.HIDDEN, reasons: ['draft'] };
+      return decorate(AssetAccessState.HIDDEN, ['draft']);
     }
 
     if (asset?.lifecycle === PlatformAssetLifecycle.ARCHIVED) {
-      return { assetId, accessState: AssetAccessState.HIDDEN, reasons: ['archived'] };
+      return decorate(AssetAccessState.HIDDEN, ['archived']);
     }
 
     if (asset?.governance?.requiresHumanReview && user.role === UserRole.STUDENT) {
-      return {
-        assetId,
-        accessState: AssetAccessState.REQUIRES_REVIEW,
-        reasons: ['human-review-required'],
-      };
+      return decorate(AssetAccessState.REQUIRES_REVIEW, ['human-review-required']);
     }
 
     if (asset?.backendStatus === BackendAssetStatus.UNSUPPORTED) {
-      return {
-        assetId,
-        accessState: AssetAccessState.UNSUPPORTED,
-        reasons: ['no-backend-executor'],
-      };
+      return decorate(AssetAccessState.UNSUPPORTED, ['no-backend-executor']);
     }
 
     if (asset?.demoStatus === 'demo' || asset?.backendStatus === BackendAssetStatus.DEMO) {
       if (hasOrganization && (strictEntitlements || entitled.size > 0) && !entitled.has(assetId)) {
-        return {
-          assetId,
-          accessState: AssetAccessState.LOCKED,
-          reasons: ['pack-not-enabled'],
-        };
+        return decorate(AssetAccessState.LOCKED, ['pack-not-enabled']);
       }
-      return {
-        assetId,
-        accessState: AssetAccessState.DEMO_ONLY,
-        reasons: ['demo-labeled'],
-      };
+      return decorate(AssetAccessState.DEMO_ONLY, ['demo-labeled']);
     }
 
     if (hasOrganization && (strictEntitlements || entitled.size > 0) && !entitled.has(assetId)) {
-      return {
-        assetId,
-        accessState: AssetAccessState.LOCKED,
-        reasons: ['not-in-entitled-packs'],
-      };
+      return decorate(AssetAccessState.LOCKED, ['not-in-entitled-packs']);
     }
 
     if (workspaceEnabled.size > 0 && !workspaceEnabled.has(assetId)) {
-      return {
-        assetId,
-        accessState: AssetAccessState.RESTRICTED,
-        reasons: ['workspace-not-enabled'],
-      };
+      return decorate(AssetAccessState.RESTRICTED, ['workspace-not-enabled']);
     }
 
     if (asset?.lifecycle === PlatformAssetLifecycle.DEPRECATED) {
-      return {
-        assetId,
-        accessState: AssetAccessState.RESTRICTED,
-        reasons: ['deprecated'],
-      };
+      return decorate(AssetAccessState.RESTRICTED, ['deprecated']);
     }
 
     if (asset?.lifecycle === PlatformAssetLifecycle.BETA) {
-      return {
-        assetId,
-        accessState: AssetAccessState.ALLOWED,
-        reasons: [...reasons, 'beta'],
-      };
+      return decorate(AssetAccessState.ALLOWED, [...reasons, 'beta']);
     }
 
-    return { assetId, accessState: AssetAccessState.ALLOWED, reasons };
+    return decorate(AssetAccessState.ALLOWED, reasons);
   }
 
   private isAdminOnlyAsset(asset?: PlatformAsset) {
@@ -194,5 +219,54 @@ export class AssetAccessService {
       aliases.forEach((id) => resolved.add(id));
     }
     return [...resolved];
+  }
+
+  private resolvePriority(
+    assetId: string,
+    params: {
+      accessState: AssetAccessState;
+      pinned: Set<string>;
+      workspaceRecommended: Set<string>;
+      roleRecommended: Set<string>;
+      recent: Set<string>;
+    },
+  ) {
+    if (
+      params.accessState !== AssetAccessState.ALLOWED &&
+      params.accessState !== AssetAccessState.DEMO_ONLY
+    ) {
+      return { priority: 900, priorityReason: 'permitted' as const };
+    }
+    if (params.pinned.has(assetId)) return { priority: 10, priorityReason: 'pinned' as const };
+    if (params.workspaceRecommended.has(assetId)) {
+      return { priority: 20, priorityReason: 'workspace-recommended' as const };
+    }
+    if (params.roleRecommended.has(assetId)) {
+      return { priority: 30, priorityReason: 'role-recommended' as const };
+    }
+    if (params.recent.has(assetId)) return { priority: 40, priorityReason: 'recent' as const };
+    return { priority: 50, priorityReason: 'permitted' as const };
+  }
+
+  private toSaasAccessState(
+    accessState: AssetAccessState,
+    priorityReason: AssetAccessRecord['priorityReason'],
+  ): SaasAssetAccessState {
+    if (accessState === AssetAccessState.HIDDEN) return 'hidden';
+    if (accessState === AssetAccessState.LOCKED) return 'locked';
+    if (
+      accessState === AssetAccessState.RESTRICTED ||
+      accessState === AssetAccessState.REQUIRES_ADMIN ||
+      accessState === AssetAccessState.REQUIRES_REVIEW
+    ) {
+      return 'restricted';
+    }
+    if (accessState === AssetAccessState.DEMO_ONLY) return 'demo-only';
+    if (accessState === AssetAccessState.UNSUPPORTED) return 'unsupported';
+    if (priorityReason === 'pinned') return 'pinned';
+    if (priorityReason === 'workspace-recommended' || priorityReason === 'role-recommended') {
+      return 'recommended';
+    }
+    return 'visible';
   }
 }

@@ -18,6 +18,18 @@
   line-height: 1.45;
 }
 
+.state-source-notice__details {
+  margin-top: 6px;
+  color: var(--muted-text, var(--text-secondary, #4b5563));
+}
+
+.state-source-notice__details summary {
+  width: fit-content;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
 .state-source-notice ul {
   display: flex;
   flex-wrap: wrap;

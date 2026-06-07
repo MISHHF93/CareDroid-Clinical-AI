@@ -5,6 +5,13 @@ import Button from '../../components/ui/button';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
+import {
+  buildClientWorkspaceProfile,
+  buildWorkspaceSetupFromRegistry,
+  getCanonicalWorkspaceRegistry,
+  getWorkspacePresetForOrganizationType,
+  saveLocalClientProfile,
+} from '../../config/workspace.config';
 import { PROFILE_ROLES } from '../../data/profileToolSegmentation';
 import {
   buildRoleIntelligenceProfile,
@@ -13,19 +20,6 @@ import {
 import { applyRegistryToolLaunch, getRegistryToolNavigation } from '../../navigation/registryToolLaunch';
 import { trackRoleAiRequest } from '../../services/roleIntelligenceTelemetry';
 import './CommercialPages.css';
-
-const ORG_TYPES = [
-  'hospital',
-  'academic_medical_center',
-  'clinic',
-  'ems',
-  'research_institute',
-  'health_system',
-  'long_term_care',
-  'home_care',
-  'telehealth',
-  'university',
-];
 
 const SPECIALTY_OPTIONS = [
   'emergency',
@@ -38,16 +32,6 @@ const SPECIALTY_OPTIONS = [
   'laboratory',
   'operations',
   'research',
-];
-
-const DEPARTMENT_OPTIONS = [
-  'Emergency',
-  'ICU',
-  'Cardiology',
-  'Laboratory',
-  'Operations',
-  'Pharmacy',
-  'Administration',
 ];
 
 const INTEGRATION_OPTIONS = [
@@ -1870,77 +1854,101 @@ export function ConfigurationStudioPage() {
 
 const ONBOARDING_STEPS = [
   'Organization type',
-  'Specialty selection',
-  'Workspace selection',
-  'Asset pack selection',
+  'Subscription plan',
+  'Products and asset packs',
+  'Workspace profile',
   'User roles',
-  'Branding',
-  'Integrations',
+  'Default workspace',
+  'Finish setup',
 ];
 
+function workspaceSetupsForOrganizationType(organizationType) {
+  return getWorkspacePresetForOrganizationType(organizationType).map((workspaceId) => {
+    const setup = buildWorkspaceSetupFromRegistry(workspaceId);
+    if (organizationType === 'ems' && workspaceId === 'emergency') {
+      return { ...setup, name: 'EMS Command', displayName: 'EMS Command', emergencyModeEnabled: true };
+    }
+    if (organizationType === 'ems' && workspaceId === 'fleet') {
+      return { ...setup, name: 'Fleet Operations', displayName: 'Fleet Operations' };
+    }
+    return {
+      ...setup,
+      emergencyModeEnabled: workspaceId === 'emergency',
+    };
+  });
+}
+
+function buildPresetFromRegistry(organizationType, overrides = {}) {
+  const workspaceSetups = workspaceSetupsForOrganizationType(organizationType);
+  const profile = buildClientWorkspaceProfile({
+    organizationType,
+    subscriptionPlan: overrides.subscriptionPlan || 'professional',
+    enabledWorkspaces: workspaceSetups.map((workspace) => workspace.id),
+    enabledAssetPacks: overrides.packIds || [],
+    roles: overrides.roles || [overrides.defaultRoleProfileId || 'hospital-administrator'],
+    departments: overrides.departments || [],
+  });
+  return {
+    specialties: overrides.specialties || workspaceSetups.map((workspace) => workspace.id),
+    departments: overrides.departments || workspaceSetups.map((workspace) => workspace.name),
+    packIds: profile.enabledAssetPacks,
+    integrationSlugs: overrides.integrationSlugs || ['identity-sso'],
+    complianceMode: overrides.complianceMode || 'hipaa',
+    defaultRoleProfileId: overrides.defaultRoleProfileId || 'hospital-administrator',
+    subscriptionPlan: overrides.subscriptionPlan || 'professional',
+    defaultWorkspace: profile.defaultWorkspace,
+    workspaceSetups,
+  };
+}
+
 const TENANT_PRESETS = {
-  hospital: {
-    specialties: ['emergency', 'icu', 'laboratory', 'operations'],
-    departments: ['Emergency', 'ICU', 'Laboratory', 'Operations', 'Administration'],
+  hospital: buildPresetFromRegistry('hospital', {
+    specialties: ['emergency', 'icu', 'cardiology', 'laboratory', 'operations'],
+    departments: ['Emergency', 'ICU', 'Cardiology', 'Laboratory', 'Operations', 'Administration'],
     packIds: ['core-platform', 'emergency-medicine', 'laboratory-intelligence', 'hospital-operations'],
     integrationSlugs: ['fhir-patient', 'hl7-adt', 'laboratory-interface', 'identity-sso'],
     complianceMode: 'hipaa',
     defaultRoleProfileId: 'emergency-physician',
-    workspaceSetups: [
-      {
-        name: 'Clinical Operations',
-        type: 'hospital',
-        enabledToolIds: ['calculators', 'drug-check', 'lab-interp', 'protocols', 'hospital-map'],
-        enabledModules: ['dashboard', 'tools', 'maps', 'medical-iot'],
-      },
-      {
-        name: 'Emergency Command',
-        type: 'emergency',
-        enabledToolIds: ['emergency-protocols', 'trauma-score', 'sofa-score', 'hospital-map'],
-        enabledModules: ['dashboard', 'alerts', 'maps', 'audit'],
-        emergencyModeEnabled: true,
-      },
-    ],
-  },
-  clinic: {
+  }),
+  clinic: buildPresetFromRegistry('clinic', {
     specialties: ['cardiology', 'laboratory', 'operations'],
     departments: ['Operations', 'Pharmacy', 'Administration'],
     packIds: ['core-platform', 'laboratory-intelligence', 'cardiology-pack'],
     integrationSlugs: ['fhir-patient', 'identity-sso', 'scheduling'],
     complianceMode: 'hipaa',
     defaultRoleProfileId: 'nurse',
-    workspaceSetups: [
-      {
-        name: 'Clinic Workspace',
-        type: 'hospital',
-        enabledToolIds: ['calculators', 'drug-check', 'lab-interp', 'protocols'],
-        enabledModules: ['dashboard', 'tools', 'calculators'],
-      },
-    ],
-  },
-  ems: {
+  }),
+  ems: buildPresetFromRegistry('ems', {
     specialties: ['emergency', 'operations'],
     departments: ['Emergency', 'Operations', 'Administration'],
     packIds: ['core-platform', 'emergency-medicine', 'fleet-logistics'],
     integrationSlugs: ['identity-sso', 'scheduling'],
     complianceMode: 'ems',
     defaultRoleProfileId: 'fleet-operator',
-    workspaceSetups: [
-      {
-        name: 'EMS Command',
-        type: 'emergency',
-        enabledToolIds: ['emergency-protocols', 'trauma-score', 'fleet-live-map'],
-        enabledModules: ['dashboard', 'alerts', 'fleet', 'maps'],
-        emergencyModeEnabled: true,
-      },
-      {
-        name: 'Fleet Operations',
-        type: 'fleet',
-        enabledToolIds: ['fleet-dashboard', 'fleet-live-map', 'route-optimizer', 'predictive-maintenance'],
-        enabledModules: ['fleet', 'live-tracking', 'operations'],
-      },
-    ],
-  },
+  }),
+  university: buildPresetFromRegistry('university', {
+    specialties: ['education', 'research', 'simulation'],
+    departments: ['Education', 'Research', 'Simulation', 'Governance'],
+    integrationSlugs: ['identity-sso', 'lms'],
+    complianceMode: 'academic',
+    defaultRoleProfileId: 'educator',
+    subscriptionPlan: 'academic',
+  }),
+  research_center: buildPresetFromRegistry('research-center', {
+    specialties: ['research', 'governance'],
+    departments: ['Research', 'AI Evaluation', 'Governance'],
+    integrationSlugs: ['identity-sso', 'fhir-patient'],
+    complianceMode: 'research',
+    defaultRoleProfileId: 'researcher',
+    subscriptionPlan: 'academic',
+  }),
+  long_term_care: buildPresetFromRegistry('long-term-care', {
+    specialties: ['operations', 'laboratory', 'medical-iot'],
+    departments: ['Operations', 'Laboratory', 'Device Management', 'Governance'],
+    integrationSlugs: ['identity-sso', 'fhir-patient'],
+    complianceMode: 'hipaa',
+    defaultRoleProfileId: 'nurse',
+  }),
 };
 
 export function OrganizationOnboardingPage() {
@@ -1963,10 +1971,12 @@ export function OrganizationOnboardingPage() {
     packIds: TENANT_PRESETS.hospital.packIds,
     productIds: [],
     commercialPlanId: '',
+    subscriptionPlan: TENANT_PRESETS.hospital.subscriptionPlan,
     integrationSlugs: TENANT_PRESETS.hospital.integrationSlugs,
     defaultRoleProfileId: TENANT_PRESETS.hospital.defaultRoleProfileId,
     roleAssignments: [],
     workspaceSetups: TENANT_PRESETS.hospital.workspaceSetups,
+    defaultWorkspace: TENANT_PRESETS.hospital.defaultWorkspace,
     branding: {
       displayName: '',
       accentColor: '',
@@ -2001,7 +2011,9 @@ export function OrganizationOnboardingPage() {
       packIds: preset.packIds,
       integrationSlugs: preset.integrationSlugs,
       defaultRoleProfileId: preset.defaultRoleProfileId,
+      subscriptionPlan: preset.subscriptionPlan,
       workspaceSetups: preset.workspaceSetups,
+      defaultWorkspace: preset.defaultWorkspace,
       complianceMode: preset.complianceMode,
     }));
   };
@@ -2050,6 +2062,22 @@ export function OrganizationOnboardingPage() {
     ...selectedProductGraphs.flatMap((row) => row.product.packIds || []),
   ]);
   const selectedPacks = packs.filter((pack) => selectedPackIds.has(pack.id));
+  const selectedWorkspaceIds = form.workspaceSetups.map((workspace) => workspace.id || workspace.type);
+  const clientProfile = buildClientWorkspaceProfile({
+    organizationId: form.slug || form.name || 'local-demo-tenant',
+    organizationName: form.branding.displayName || form.name || 'Local Demo Organization',
+    organizationType: form.organizationType,
+    subscriptionPlan: form.subscriptionPlan || form.commercialPlanId || 'professional',
+    selectedProducts: form.productIds,
+    enabledAssetPacks: [...selectedPackIds],
+    enabledWorkspaces: selectedWorkspaceIds,
+    defaultWorkspace: form.defaultWorkspace,
+    users: [],
+    roles: [form.defaultRoleProfileId, ...form.roleAssignments.map((assignment) => assignment.roleProfileId)].filter(Boolean),
+    departments: form.departments,
+    integrations: form.integrationSlugs,
+    branding: form.branding,
+  });
   const specialtyOptions = specialties.length
     ? specialties.map((specialty) => ({
         id: specialty.slug || specialty.id,
@@ -2059,12 +2087,12 @@ export function OrganizationOnboardingPage() {
 
   const finish = async () => {
     setError('');
+    const slug = form.slug || form.name.toLowerCase().replace(/\s+/g, '-');
+    const branding = {
+      ...form.branding,
+      displayName: form.branding.displayName || form.name,
+    };
     try {
-      const slug = form.slug || form.name.toLowerCase().replace(/\s+/g, '-');
-      const branding = {
-        ...form.branding,
-        displayName: form.branding.displayName || form.name,
-      };
       const result = await ProductCatalogApi.completeOnboarding({
         name: form.name,
         slug,
@@ -2076,17 +2104,48 @@ export function OrganizationOnboardingPage() {
         productIds: form.productIds,
         enabledProductIds: form.productIds,
         commercialPlanId: form.commercialPlanId || undefined,
+        subscriptionPlan: form.subscriptionPlan || form.commercialPlanId || undefined,
         integrationSlugs: form.integrationSlugs,
         defaultRoleProfileId: form.defaultRoleProfileId,
         roleAssignments: form.roleAssignments,
         workspaceSetups: form.workspaceSetups,
+        clientProfile,
+        enabledWorkspaces: clientProfile.enabledWorkspaces,
+        enabledAssetPacks: clientProfile.enabledAssetPacks,
+        enabledAssets: clientProfile.enabledAssets,
+        defaultWorkspace: clientProfile.defaultWorkspace,
         branding,
         complianceMode: form.complianceMode,
+      });
+      saveLocalClientProfile({
+        ...clientProfile,
+        source: 'backend',
+        organizationId: result.tenantProfile?.organization?.id || result.organization?.id || clientProfile.organizationId,
       });
       await refreshPlatformContext?.();
       setConfiguredTenantProfile(result.tenantProfile || result);
     } catch (e) {
-      setError(e.message);
+      const localProfile = saveLocalClientProfile(clientProfile);
+      setConfiguredTenantProfile({
+        source: 'local-demo',
+        localMode: true,
+        organization: {
+          id: localProfile.organizationId,
+          name: localProfile.organizationName,
+          organizationType: localProfile.organizationType,
+          slug,
+        },
+        workspaceDefaults: form.workspaceSetups,
+        workspaces: form.workspaceSetups,
+        installedPackIds: localProfile.enabledAssetPacks,
+        enabledAssets: localProfile.enabledAssets,
+        roleProfileId: form.defaultRoleProfileId,
+        defaultDashboard: localProfile.defaultDashboard,
+        branding,
+        complianceMode: form.complianceMode,
+        error: e.message,
+      });
+      setError(`Backend persistence unavailable. Saved a local/demo tenant profile. ${e.message}`);
     }
   };
 
@@ -2116,9 +2175,9 @@ export function OrganizationOnboardingPage() {
                 value={form.organizationType}
                 onChange={(e) => applyTenantPreset(e.target.value)}
               >
-                {['hospital', 'clinic', 'ems'].map((t) => (
+                {['hospital', 'clinic', 'ems', 'university', 'research_center', 'long_term_care'].map((t) => (
                   <option key={t} value={t}>
-                    {t}
+                    {t.replace(/_/g, ' ')}
                   </option>
                 ))}
               </select>
@@ -2132,6 +2191,19 @@ export function OrganizationOnboardingPage() {
       case 1:
         return (
           <>
+            <div className="commercial-form-row">
+              <label>Subscription plan</label>
+              <select
+                value={form.subscriptionPlan}
+                onChange={(e) => setForm({ ...form, subscriptionPlan: e.target.value })}
+              >
+                {['starter', 'professional', 'enterprise', 'academic', 'government'].map((plan) => (
+                  <option key={plan} value={plan}>
+                    {plan}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="commercial-chip-list">
               {specialtyOptions.map((specialty) => (
                 <button
@@ -2145,8 +2217,8 @@ export function OrganizationOnboardingPage() {
               ))}
             </div>
             <p className="commercial-subtitle">
-              Specialties shape the configured tenant profile and help seed the right workspaces,
-              packs, recommendations, and AI contexts.
+              Subscription and specialties shape the configured tenant profile and help seed the right
+              workspaces, packs, recommendations, and AI contexts.
             </p>
           </>
         );
@@ -2166,11 +2238,18 @@ export function OrganizationOnboardingPage() {
                   <label>Workspace type</label>
                   <select
                     value={workspace.type}
-                    onChange={(e) => updateWorkspace(index, { type: e.target.value })}
+                    onChange={(e) => {
+                      const next = buildWorkspaceSetupFromRegistry(e.target.value);
+                      updateWorkspace(index, {
+                        ...next,
+                        name: next.name,
+                        emergencyModeEnabled: e.target.value === 'emergency',
+                      });
+                    }}
                   >
-                    {['hospital', 'emergency', 'fleet', 'research', 'admin', 'personal'].map((type) => (
-                      <option key={type} value={type}>
-                        {type}
+                    {getCanonicalWorkspaceRegistry().map((workspaceOption) => (
+                      <option key={workspaceOption.workspaceId} value={workspaceOption.workspaceId}>
+                        {workspaceOption.label}
                       </option>
                     ))}
                   </select>
@@ -2302,6 +2381,19 @@ export function OrganizationOnboardingPage() {
         return (
           <>
             <div className="commercial-form-row">
+              <label>Default workspace</label>
+              <select
+                value={form.defaultWorkspace}
+                onChange={(e) => setForm({ ...form, defaultWorkspace: e.target.value })}
+              >
+                {form.workspaceSetups.map((workspace) => (
+                  <option key={workspace.id || workspace.type} value={workspace.id || workspace.type}>
+                    {workspace.name || workspace.displayName || workspace.type}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="commercial-form-row">
               <label>Display name</label>
               <input
                 value={form.branding.displayName}
@@ -2347,6 +2439,17 @@ export function OrganizationOnboardingPage() {
               Completing setup will create the organization, install packs, create workspaces,
               request integrations, and output the configured tenant profile.
             </p>
+            <ProductizationList
+              title="Onboarding output preview"
+              items={[
+                `Organization: ${form.name || 'pending'} (${form.organizationType})`,
+                `Enabled workspaces: ${clientProfile.enabledWorkspaces.join(', ')}`,
+                `Enabled asset packs: ${clientProfile.enabledAssetPacks.join(', ')}`,
+                `Enabled assets: ${clientProfile.enabledAssets.length}`,
+                `User role: ${form.defaultRoleProfileId}`,
+                `Default dashboard: /dashboard (${clientProfile.defaultWorkspace})`,
+              ]}
+            />
           </div>
         );
       default:
@@ -2358,11 +2461,20 @@ export function OrganizationOnboardingPage() {
     return (
       <PageShell
         title="Configured tenant profile"
-        subtitle="Your CareDroid tenant profile is configured and ready to use."
+        subtitle={
+          configuredTenantProfile.localMode
+            ? 'Demo/local mode: backend persistence was unavailable, so this tenant profile was saved in this browser.'
+            : 'Your CareDroid tenant profile is configured and ready to use.'
+        }
         actions={
-          <Button variant="primary" onClick={() => navigate('/organization')}>
-            Open organization
-          </Button>
+          <>
+            <Button variant="primary" onClick={() => navigate('/dashboard')}>
+              Open dashboard
+            </Button>
+            <Button variant="secondary" onClick={() => navigate('/organization')}>
+              Open organization
+            </Button>
+          </>
         }
       >
         <div className="commercial-grid">
@@ -2381,15 +2493,22 @@ export function OrganizationOnboardingPage() {
             items={configuredTenantProfile.specialties || form.specialties}
           />
           <ProductizationList
-            title="Workspaces"
+            title="Enabled Workspaces"
             items={(configuredTenantProfile.workspaces || configuredTenantProfile.workspaceDefaults || []).map(
               (workspace) =>
                 `${workspace.name || workspace.displayName} (${workspace.type})`
             )}
           />
           <ProductizationList
-            title="Asset packs"
+            title="Enabled Asset Packs"
             items={configuredTenantProfile.installedPackIds || form.packIds}
+          />
+          <ProductizationList
+            title="Enabled Assets"
+            items={[
+              `${configuredTenantProfile.enabledAssets?.length || clientProfile.enabledAssets.length} assets enabled`,
+              ...(configuredTenantProfile.enabledAssets || clientProfile.enabledAssets).slice(0, 8),
+            ]}
           />
           <ProductizationList
             title="User roles"
@@ -2400,6 +2519,13 @@ export function OrganizationOnboardingPage() {
               ...((configuredTenantProfile.roleAssignments || []).map(
                 (assignment) => `${assignment.email || 'invited user'}: ${assignment.roleProfileId}`
               )),
+            ]}
+          />
+          <ProductizationList
+            title="Default Dashboard"
+            items={[
+              `/dashboard`,
+              `Default workspace: ${configuredTenantProfile.defaultDashboard?.workspaceId || clientProfile.defaultWorkspace}`,
             ]}
           />
           <ProductizationList

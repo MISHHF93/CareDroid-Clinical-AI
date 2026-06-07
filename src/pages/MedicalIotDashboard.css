@@ -120,6 +120,13 @@
   color: var(--app-fg-muted);
 }
 
+.medical-iot-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: var(--compact-panel-gap, 10px);
+  min-width: 0;
+}
+
 .medical-iot-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));

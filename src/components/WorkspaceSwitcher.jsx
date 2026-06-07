@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
-  CARE_WORKSPACES,
   DEFAULT_CARE_WORKSPACE_ID,
   getCareWorkspaceById,
 } from '../config/workspace.config';
@@ -22,15 +21,19 @@ export default function WorkspaceSwitcher({ compact = false }) {
   const location = useLocation();
   const {
     activeWorkspaceId: contextWorkspaceId,
+    activeWorkspace: contextActiveWorkspace,
     switchWorkspace,
+    workspaces,
+    workspaceEmptyState,
   } = useWorkspace();
   const { refreshTenantContext } = useTenantContext();
   const { refreshIdentity } = useUserIdentity();
   const activeWorkspaceId = contextWorkspaceId || workspaceIdFromPath(location.pathname);
-  const activeWorkspace = getCareWorkspaceById(activeWorkspaceId);
+  const activeWorkspace = contextActiveWorkspace || getCareWorkspaceById(activeWorkspaceId);
+  const switcherWorkspaces = workspaces?.length ? workspaces : [getCareWorkspaceById(DEFAULT_CARE_WORKSPACE_ID)];
   const ActiveIcon = useMemo(
-    () => getWorkspaceIcon(activeWorkspace.icon),
-    [activeWorkspace.icon]
+    () => getWorkspaceIcon(activeWorkspace.icon || activeWorkspace.workspaceProfile?.icon),
+    [activeWorkspace.icon, activeWorkspace.workspaceProfile?.icon]
   );
 
   return (
@@ -42,7 +45,7 @@ export default function WorkspaceSwitcher({ compact = false }) {
       <select
         id="care-workspace-switcher"
         className="workspace-switcher__select"
-        value={activeWorkspace.id}
+        value={activeWorkspace.id || activeWorkspace.workspaceId}
         onChange={async (event) => {
           const nextWorkspaceId = event.target.value;
           await switchWorkspace(nextWorkspaceId);
@@ -52,12 +55,13 @@ export default function WorkspaceSwitcher({ compact = false }) {
         }}
         aria-label="Switch CareDroid workspace"
       >
-        {CARE_WORKSPACES.map((workspace) => (
+        {switcherWorkspaces.map((workspace) => (
           <option key={workspace.id} value={workspace.id}>
-            {workspace.label}
+            {workspace.label || workspace.name}
           </option>
         ))}
       </select>
+      {workspaceEmptyState ? <p className="workspace-switcher__empty">{workspaceEmptyState}</p> : null}
     </div>
   );
 }

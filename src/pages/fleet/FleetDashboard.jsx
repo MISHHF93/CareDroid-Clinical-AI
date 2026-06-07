@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import ContextInsightCard from '../../components/ContextInsightCard';
 import StateSourceNotice from '../../components/StateSourceNotice';
 import { useToolPreferences } from '../../contexts/ToolPreferencesContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
@@ -124,6 +125,57 @@ export default function FleetDashboard() {
           ]}
           details="Fleet command telemetry is mock/demo operational data unless a live telematics backend is connected. Dispatch writes, route assignment, and external fleet control remain unsupported from this dashboard."
         />
+
+        <section className="fleet-context-insights" aria-label="Fleet context insights">
+          <ContextInsightCard
+            title={
+              phase === 'ready' && summary?.maintenanceCount
+                ? `${summary.maintenanceCount} unit(s) need maintenance review`
+                : 'Maintenance context'
+            }
+            message={
+              phase === 'ready'
+                ? summary?.maintenanceCount
+                  ? 'Review maintenance status before dispatch decisions.'
+                  : 'No maintenance blockers are visible in this snapshot.'
+                : phase === 'error'
+                  ? errorMessage || 'Fleet telemetry is unavailable.'
+                  : 'Preparing maintenance context from fleet telemetry.'
+            }
+            source={summary?.source || 'Fleet telemetry'}
+            status={phase === 'error' ? 'unavailable' : summary?.maintenanceCount ? 'action-required' : 'generated'}
+            loading={phase === 'loading'}
+            error={phase === 'error' ? errorMessage : ''}
+            actionLabel="View maintenance"
+            actionRoute="/fleet/predictive-maintenance"
+            timestamp={summary?.updatedAt}
+          />
+          <ContextInsightCard
+            title={phase === 'ready' && lowEnergyVehicles.length ? 'Route delay risk' : 'Route readiness'}
+            message={
+              phase === 'ready'
+                ? lowEnergyVehicles.length
+                  ? `${lowEnergyVehicles.length} low-energy unit(s) may affect routing.`
+                  : 'No low-energy route risk is visible in this snapshot.'
+                : 'Route readiness updates after the fleet snapshot loads.'
+            }
+            source="Local fleet summary"
+            status={lowEnergyVehicles.length ? 'action-required' : 'generated'}
+            loading={phase === 'loading'}
+            actionLabel="Open fleet map"
+            actionRoute="/fleet/map"
+            timestamp={summary?.updatedAt}
+          />
+          <ContextInsightCard
+            title="Telemetry source"
+            message={statusMessage || 'Fleet insight cards use the current telemetry snapshot and do not write to dispatch systems.'}
+            source={summary?.source || 'Mock telemetry'}
+            status={phase === 'error' ? 'unavailable' : 'demo'}
+            demo={phase !== 'error'}
+            actionLabel="Ask Assistant"
+            actionRoute="/assistant"
+          />
+        </section>
 
         {phase === 'loading' ? (
           <div

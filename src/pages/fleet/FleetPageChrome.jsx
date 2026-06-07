@@ -48,11 +48,11 @@ export default function FleetPageChrome({
         <button
           type="button"
           className="fleet-back-btn"
-          onClick={() => navigate('/tools')}
-          aria-label="Back to tools catalog"
+          onClick={() => navigate('/operations')}
+          aria-label="Back to operations"
         >
           <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
-          <span style={{ marginLeft: 6 }}>Back to tools</span>
+          <span style={{ marginLeft: 6 }}>Back to operations</span>
         </button>
         <h1 id={`${toolId}-page-title`}>
           <NavIcon icon={getToolIcon(toolId)} size={28} aria-hidden />

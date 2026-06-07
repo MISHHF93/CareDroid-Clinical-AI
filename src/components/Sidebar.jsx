@@ -6,11 +6,9 @@ import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useWhiteLabel } from '../contexts/WhiteLabelContext';
 import PermissionGate from './PermissionGate';
 import BuildInfoBadge from './BuildInfoBadge';
-import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import {
   ADVANCED_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
-  SOLUTIONS_SIDEBAR_NAV_ITEMS,
   primaryNavPathMatches,
 } from '../config/navigation.config';
 import { NavIcon } from '../navigation/NavIcon';
@@ -46,10 +44,6 @@ const Sidebar = forwardRef(function Sidebar(
   const {
     account,
     organization,
-    activeWorkspace: activeOperationalWorkspace,
-    workspaces: operationalWorkspaces,
-    workspaceState,
-    switchWorkspace,
   } = useUserIdentity();
   const { branding } = useWhiteLabel();
   const { notifications } = useNotifications();
@@ -76,10 +70,6 @@ const Sidebar = forwardRef(function Sidebar(
 
   const primaryNavItems = useMemo(
     () => filterNav(PRIMARY_SIDEBAR_NAV_ITEMS),
-    [filterNav]
-  );
-  const solutionsNavItems = useMemo(
-    () => filterNav(SOLUTIONS_SIDEBAR_NAV_ITEMS),
     [filterNav]
   );
 
@@ -235,31 +225,6 @@ const Sidebar = forwardRef(function Sidebar(
               <div className="user-organization">{displayOrganization}</div>
             </div>
           </button>
-          <div className="sidebar-profile-links" aria-label="Account utilities">
-            <button type="button" onClick={() => handleNavClick('/profile')}>
-              Profile
-            </button>
-            <button type="button" onClick={() => handleNavClick('/settings')}>
-              Settings
-            </button>
-            <button type="button" onClick={() => handleNavClick('/profile/security')}>
-              Security
-            </button>
-          </div>
-          <div className="sidebar-operational-workspace">
-            <label htmlFor="sidebar-operational-workspace">Org Workspace</label>
-            <select
-              id="sidebar-operational-workspace"
-              value={workspaceState?.activeWorkspaceId || activeOperationalWorkspace?.id || ''}
-              onChange={(event) => switchWorkspace(event.target.value)}
-            >
-              {operationalWorkspaces.map((workspace) => (
-                <option key={workspace.id} value={workspace.id}>
-                  {workspace.branding?.displayName || workspace.name}
-                </option>
-              ))}
-            </select>
-          </div>
           <div
             className={`health-indicator ${healthStatus}`}
             role="status"
@@ -287,13 +252,6 @@ const Sidebar = forwardRef(function Sidebar(
           <div className="nav-section-title">{!effectiveCollapsed && 'Main'}</div>
           {primaryNavItems.map((item) => renderNavButton(item))}
         </nav>
-
-        {FEATURE_FLAGS.commercialSurfaces && (
-          <nav className="sidebar-nav sidebar-nav--solutions" aria-label="Solutions navigation">
-            <div className="nav-section-title">{!effectiveCollapsed && 'Solutions'}</div>
-            {solutionsNavItems.map((item) => renderNavButton(item))}
-          </nav>
-        )}
 
         <div className="sidebar-advanced">
           <button

@@ -2,7 +2,10 @@ import { describe, expect, it } from 'vitest';
 import {
   CARE_WORKSPACES,
   buildCareWorkspaceModel,
+  buildClientWorkspaceProfile,
+  filterWorkspacesForClient,
   getCareWorkspaceById,
+  getWorkspacePresetForOrganizationType,
 } from './workspaceArchitecture';
 
 describe('workspaceArchitecture', () => {
@@ -18,7 +21,72 @@ describe('workspaceArchitecture', () => {
       'education',
       'research',
       'governance',
+      'simulation',
+      'ai-evaluation',
     ]);
+  });
+
+  it('keeps each canonical workspace on the SaaS workspace contract', () => {
+    for (const workspace of CARE_WORKSPACES) {
+      expect(workspace).toEqual(
+        expect.objectContaining({
+          workspaceId: workspace.id,
+          label: expect.any(String),
+          description: expect.any(String),
+          allowedOrganizationTypes: expect.any(Array),
+          allowedRoles: expect.any(Array),
+          defaultAssetPacks: expect.any(Array),
+          defaultAssets: expect.any(Array),
+          defaultDashboardWidgets: expect.any(Array),
+          defaultAIAgents: expect.any(Array),
+          defaultNavigationGroups: expect.any(Array),
+          subscriptionTier: expect.any(String),
+          status: 'active',
+        })
+      );
+    }
+  });
+
+  it('builds organization workspace presets from the canonical registry', () => {
+    expect(getWorkspacePresetForOrganizationType('hospital')).toEqual([
+      'emergency',
+      'icu',
+      'cardiology',
+      'laboratory',
+      'operations',
+      'medical-iot',
+      'governance',
+    ]);
+    expect(getWorkspacePresetForOrganizationType('ems')).toEqual(['emergency', 'fleet', 'operations']);
+    expect(getWorkspacePresetForOrganizationType('university')).toEqual([
+      'education',
+      'research',
+      'simulation',
+      'governance',
+    ]);
+    expect(getWorkspacePresetForOrganizationType('research-center')).toEqual([
+      'research',
+      'governance',
+      'ai-evaluation',
+    ]);
+  });
+
+  it('filters workspace dropdown options by organization, tier, role, and assignment', () => {
+    const clientProfile = buildClientWorkspaceProfile({
+      organizationType: 'ems',
+      subscriptionPlan: 'professional',
+      enabledWorkspaces: ['emergency', 'fleet', 'operations', 'governance'],
+      roles: ['fleet-operator'],
+    });
+
+    const filtered = filterWorkspacesForClient({
+      clientProfile,
+      role: 'fleet-operator',
+      userWorkspaceIds: ['fleet', 'operations'],
+    }).map((workspace) => workspace.id);
+
+    expect(filtered).toEqual(['operations', 'fleet']);
+    expect(filtered).not.toContain('governance');
   });
 
   it('falls back to Emergency for unknown workspace ids', () => {

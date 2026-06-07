@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { TenantAdministrationCenter } from './OrganizationPages';
@@ -131,7 +131,34 @@ describe('TenantAdministrationCenter', () => {
     expect(screen.getByDisplayValue('https://cdn.example.com/logo.svg')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Demo Care Login')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Demo Care Command')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /workspace configuration/i })).toBeInTheDocument();
+    expect(screen.getByText('Medical IoT')).toBeInTheDocument();
     expect(PlatformAssetsApi.getTenantAdministration).toHaveBeenCalledWith('org-1');
+  });
+
+  it('enables and saves a workspace from the canonical registry', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <TenantAdministrationCenter />
+      </MemoryRouter>,
+    );
+
+    const fleetRow = (await screen.findByText('Fleet')).closest('.org-integration-row');
+    await user.click(within(fleetRow).getByRole('button', { name: /enable/i }));
+    await user.click(screen.getByRole('button', { name: /save tenant administration/i }));
+
+    await waitFor(() => {
+      expect(PlatformAssetsApi.updateTenantAdministration).toHaveBeenCalledWith(
+        'org-1',
+        expect.objectContaining({
+          workspaceDefaults: expect.arrayContaining([
+            expect.objectContaining({ id: 'emergency' }),
+            expect.objectContaining({ id: 'fleet', type: 'fleet' }),
+          ]),
+        }),
+      );
+    });
   });
 
   it('saves no-code tenant administration updates', async () => {

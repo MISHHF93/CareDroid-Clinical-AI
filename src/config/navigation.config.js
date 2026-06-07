@@ -9,8 +9,8 @@ import { CANONICAL_ROUTES } from './routes.config';
 export const PRIMARY_NAV_ITEMS = Object.freeze([
   {
     id: 'home',
-    label: 'Command Center',
-    mobileLabel: 'Command',
+    label: 'Dashboard',
+    mobileLabel: 'Dashboard',
     path: CANONICAL_ROUTES.dashboard,
     legacyPaths: ['/home'],
     matchPaths: ['/home', CANONICAL_ROUTES.dashboard],
@@ -83,30 +83,6 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     ],
     matchPrefixes: ['/operations/', '/fleet/'],
   },
-]);
-
-export const SECONDARY_NAV_ITEMS = Object.freeze([
-  {
-    id: 'discover',
-    label: 'Discover',
-    mobileLabel: 'Discover',
-    path: CANONICAL_ROUTES.discover,
-    matchPaths: [CANONICAL_ROUTES.discover],
-    showInMobile: false,
-    showInSidebar: false,
-  },
-  {
-    id: 'automation',
-    label: 'Automation',
-    mobileLabel: 'Automate',
-    path: CANONICAL_ROUTES.automation,
-    matchPaths: [CANONICAL_ROUTES.automation, CANONICAL_ROUTES.automationAudit, CANONICAL_ROUTES.workflows],
-    showInMobile: false,
-    showInSidebar: false,
-  },
-]);
-
-export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
   {
     id: 'profile',
     label: 'Profile',
@@ -119,8 +95,6 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
       '/profile/workspaces',
       '/profile/security',
     ],
-    showInMobile: false,
-    showInSidebar: false,
   },
   {
     id: 'settings',
@@ -142,6 +116,25 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
       '/welcome',
       '/onboarding',
     ],
+  },
+]);
+
+export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
+  {
+    id: 'discover',
+    label: 'Discover',
+    mobileLabel: 'Discover',
+    path: CANONICAL_ROUTES.discover,
+    matchPaths: [CANONICAL_ROUTES.discover],
+    showInMobile: false,
+    showInSidebar: false,
+  },
+  {
+    id: 'automation',
+    label: 'Automation',
+    mobileLabel: 'Automate',
+    path: CANONICAL_ROUTES.automation,
+    matchPaths: [CANONICAL_ROUTES.automation, CANONICAL_ROUTES.automationAudit, CANONICAL_ROUTES.workflows],
     showInMobile: false,
     showInSidebar: false,
   },
@@ -218,6 +211,8 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
     showInSidebar: false,
   },
 ]);
+
+export const SECONDARY_NAV_ITEMS = Object.freeze([]);
 
 export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
   {
@@ -401,6 +396,59 @@ export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
 ]);
 
 export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
+  {
+    id: 'asset-packs',
+    label: 'Asset Packs',
+    mobileLabel: 'Packs',
+    path: CANONICAL_ROUTES.assetPacks,
+    matchPaths: [CANONICAL_ROUTES.assetPacks],
+    showInMobile: false,
+  },
+  {
+    id: 'products',
+    label: 'Products',
+    mobileLabel: 'Products',
+    path: CANONICAL_ROUTES.products,
+    matchPaths: [CANONICAL_ROUTES.products, CANONICAL_ROUTES.plans],
+    matchPrefixes: [`${CANONICAL_ROUTES.products}/`, `${CANONICAL_ROUTES.plans}`],
+    showInMobile: false,
+  },
+  {
+    id: 'organization',
+    label: 'Organization',
+    mobileLabel: 'Org',
+    path: CANONICAL_ROUTES.organization,
+    matchPaths: [
+      CANONICAL_ROUTES.organization,
+      CANONICAL_ROUTES.organizationSettings,
+      CANONICAL_ROUTES.organizationPacks,
+      CANONICAL_ROUTES.organizationAssets,
+      CANONICAL_ROUTES.organizationIntelligence,
+      CANONICAL_ROUTES.departments,
+      CANONICAL_ROUTES.serviceLines,
+    ],
+    matchPrefixes: ['/organization/', '/settings/organization/'],
+    permission: 'MANAGE_ORGANIZATION',
+    showInMobile: false,
+  },
+  {
+    id: 'platform-admin',
+    label: 'Platform Admin',
+    mobileLabel: 'Admin',
+    path: CANONICAL_ROUTES.platformAdmin,
+    matchPaths: [CANONICAL_ROUTES.platformAdmin, CANONICAL_ROUTES.tenantAdmin],
+    permission: 'MANAGE_ORGANIZATION',
+    showInMobile: false,
+  },
+  {
+    id: 'configuration-studio',
+    label: 'Configuration Studio',
+    mobileLabel: 'Config',
+    path: CANONICAL_ROUTES.configurationStudio,
+    matchPaths: [CANONICAL_ROUTES.configurationStudio],
+    permission: 'CONFIGURE_SYSTEM',
+    showInMobile: false,
+  },
   {
     id: 'developer-audit',
     label: 'Developer Catalog',

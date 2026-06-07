@@ -6,6 +6,7 @@ import { useTenantContext } from './TenantContext';
 import { useWorkspace } from './WorkspaceContext';
 import { UserIdentityApi } from '../services/userIdentityApi';
 import { PlatformAssetsApi } from '../services/platformAssetsApi';
+import { readLocalClientProfile } from '../config/workspace.config';
 import { fetchMemoryFabricContext, LOCAL_MEMORY_FABRIC_CONTEXT } from '../services/memoryApi';
 import { setPlatformEntitlementContext } from '../data/assetEntitlements';
 import logger from '../utils/logger';
@@ -17,6 +18,7 @@ const BACKEND_TO_LOCAL_WORKSPACE = {
   icu: 'icu',
   cardiology: 'cardiology',
   laboratory: 'laboratory',
+  pharmacy: 'pharmacy',
   operations: 'operations',
   fleet: 'fleet',
   'medical-iot': 'medical-iot',
@@ -25,6 +27,23 @@ const BACKEND_TO_LOCAL_WORKSPACE = {
   governance: 'governance',
   admin: 'governance',
 };
+
+const DEFAULT_SAAS_PROFILE = Object.freeze({
+  organizationType: 'hospital',
+  role: 'student',
+  defaultWorkspace: 'emergency',
+  allowedWorkspaces: ['emergency', 'icu', 'cardiology', 'laboratory', 'operations'],
+  permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  subscriptionEntitlements: ['clinical-core'],
+  enabledAssetPacks: ['clinical-core'],
+  pinnedAssets: [],
+  hiddenAssets: [],
+  recentAssets: [],
+  preferredAIStyle: 'concise',
+  themePreference: 'system',
+  compactMode: false,
+  onboardingStatus: 'complete',
+});
 
 const UserIdentityContext = createContext({
   operationalProfile: null,
@@ -37,6 +56,7 @@ const UserIdentityContext = createContext({
   aiPersonalization: null,
   security: null,
   audit: null,
+  saasProfile: DEFAULT_SAAS_PROFILE,
   isLoading: false,
   error: '',
   refreshIdentity: () => {},
@@ -53,6 +73,11 @@ const UserIdentityContext = createContext({
   roleProfile: null,
   entitledAssetIds: [],
   entitledPackIds: [],
+  allowedWorkspaces: [],
+  enabledAssetPacks: [],
+  pinnedAssets: [],
+  hiddenAssets: [],
+  recentAssets: [],
 });
 
 export const useUserIdentity = () => {
@@ -64,6 +89,7 @@ export const useUserIdentity = () => {
 };
 
 function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themePreference, toolPrefs }) {
+  const clientProfile = readLocalClientProfile();
   const profile = user?.profile || {};
   const workspaces = (localWorkspaces || []).map((workspace) => ({
     id: workspace.id,
@@ -78,8 +104,30 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
   }));
   const activeWorkspace = workspaces.find((workspace) => workspace.id === activeWorkspaceId) || workspaces[0];
 
+  const saasProfile = {
+    ...DEFAULT_SAAS_PROFILE,
+    userId: user?.id || '',
+    organizationId: clientProfile?.organizationId || profile.organizationId || null,
+    organizationType: clientProfile?.organizationType || profile.organizationType || DEFAULT_SAAS_PROFILE.organizationType,
+    displayName: user?.fullName || user?.name || profile.fullName || user?.email || 'CareDroid User',
+    email: user?.email || '',
+    role: profile.roleProfileId || user?.role || DEFAULT_SAAS_PROFILE.role,
+    specialty: profile.specialty || '',
+    department: profile.department || '',
+    defaultWorkspace:
+      clientProfile?.defaultWorkspace || activeWorkspace?.id || activeWorkspaceId || DEFAULT_SAAS_PROFILE.defaultWorkspace,
+    allowedWorkspaces: clientProfile?.enabledWorkspaces || workspaces.map((workspace) => workspace.id),
+    subscriptionEntitlements: clientProfile?.enabledAssetPacks || DEFAULT_SAAS_PROFILE.subscriptionEntitlements,
+    enabledAssetPacks: clientProfile?.enabledAssetPacks || DEFAULT_SAAS_PROFILE.enabledAssetPacks,
+    pinnedAssets: toolPrefs.pinned || [],
+    hiddenAssets: toolPrefs.hiddenTools || [],
+    recentAssets: toolPrefs.recentTools || [],
+    themePreference: themePreference || DEFAULT_SAAS_PROFILE.themePreference,
+  };
+
   return {
     userId: user?.id || '',
+    saasProfile,
     account: {
       userId: user?.id || '',
       displayName: user?.fullName || user?.name || profile.fullName || user?.email || 'CareDroid User',
@@ -162,6 +210,57 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
   };
 }
 
+function normalizeSaasProfile(profile, workspaceState) {
+  const account = profile?.account || {};
+  const preferences = profile?.preferences || {};
+  const toolPreferences = preferences.toolPreferences || {};
+  const saasPreferences = toolPreferences.saasProfile || {};
+  const activeWorkspace = workspaceState?.activeWorkspace;
+  return {
+    ...DEFAULT_SAAS_PROFILE,
+    ...saasPreferences,
+    ...(profile?.saasProfile || {}),
+    userId: profile?.userId || account.userId || '',
+    organizationId: profile?.saasProfile?.organizationId || account.organizationId || null,
+    displayName: profile?.saasProfile?.displayName || account.displayName || 'CareDroid User',
+    email: profile?.saasProfile?.email || account.email || '',
+    role: profile?.saasProfile?.role || account.saasRole || account.role || DEFAULT_SAAS_PROFILE.role,
+    specialty: profile?.saasProfile?.specialty || account.specialty || '',
+    department: profile?.saasProfile?.department || account.department || '',
+    defaultWorkspace:
+      profile?.saasProfile?.defaultWorkspace ||
+      saasPreferences.defaultWorkspace ||
+      activeWorkspace?.workspaceKey ||
+      activeWorkspace?.type ||
+      DEFAULT_SAAS_PROFILE.defaultWorkspace,
+    allowedWorkspaces:
+      profile?.saasProfile?.allowedWorkspaces ||
+      saasPreferences.allowedWorkspaces ||
+      (workspaceState?.workspaces || []).map((workspace) => workspace.workspaceKey || workspace.type || workspace.id),
+    pinnedAssets:
+      profile?.saasProfile?.pinnedAssets ||
+      toolPreferences.pinnedAssetIds ||
+      toolPreferences.pinnedToolIds ||
+      [],
+    hiddenAssets:
+      profile?.saasProfile?.hiddenAssets ||
+      toolPreferences.hiddenAssetIds ||
+      toolPreferences.hiddenToolIds ||
+      [],
+    recentAssets:
+      profile?.saasProfile?.recentAssets ||
+      toolPreferences.recentAssetIds ||
+      toolPreferences.recentToolIds ||
+      [],
+    preferredAIStyle:
+      profile?.saasProfile?.preferredAIStyle ||
+      preferences.aiAssistantPreferences?.responseStyle ||
+      DEFAULT_SAAS_PROFILE.preferredAIStyle,
+    themePreference: profile?.saasProfile?.themePreference || preferences.theme || DEFAULT_SAAS_PROFILE.themePreference,
+    compactMode: Boolean(profile?.saasProfile?.compactMode ?? preferences.compactMode ?? false),
+  };
+}
+
 export const UserIdentityProvider = ({ children }) => {
   const { user, isAuthenticated, authToken } = useUser();
   const { refreshTenantContext } = useTenantContext();
@@ -195,7 +294,7 @@ export const UserIdentityProvider = ({ children }) => {
       workspaces.find((workspace) => workspace.id === workspaceState.activeWorkspaceId) ||
       workspaces[0];
 
-    return {
+    const normalized = {
       ...profile,
       workspace: {
         ...workspaceState,
@@ -203,6 +302,10 @@ export const UserIdentityProvider = ({ children }) => {
         activeWorkspace,
         activeWorkspaceId: activeWorkspace?.id || workspaceState.activeWorkspaceId,
       },
+    };
+    return {
+      ...normalized,
+      saasProfile: normalizeSaasProfile(normalized, normalized.workspace),
     };
   }, []);
 
@@ -284,6 +387,22 @@ export const UserIdentityProvider = ({ children }) => {
   const profile = operationalProfile || fallbackProfile;
   const workspaceState = profile?.workspace || {};
   const activeWorkspace = workspaceState.activeWorkspace;
+  const saasProfile = profile?.saasProfile || normalizeSaasProfile(profile, workspaceState);
+  const enrichedPlatformContext = useMemo(
+    () =>
+      platformContext
+        ? {
+            ...platformContext,
+            saasProfile,
+            preferences: profile?.preferences,
+            pinnedAssetIds: saasProfile.pinnedAssets,
+            hiddenAssetIds: saasProfile.hiddenAssets,
+            recentAssetIds: saasProfile.recentAssets,
+            enabledAssetPacks: saasProfile.enabledAssetPacks,
+          }
+        : null,
+    [platformContext, profile?.preferences, saasProfile],
+  );
 
   useEffect(() => {
     const localWorkspaceId = BACKEND_TO_LOCAL_WORKSPACE[activeWorkspace?.type];
@@ -372,6 +491,7 @@ export const UserIdentityProvider = ({ children }) => {
       aiPersonalization: profile?.aiPersonalization || null,
       security: profile?.security || null,
       audit: profile?.audit || null,
+      saasProfile,
       isLoading,
       error,
       refreshIdentity,
@@ -380,14 +500,19 @@ export const UserIdentityProvider = ({ children }) => {
       updateProfile,
       recordActivity,
       hasEffectivePermission,
-      platformContext,
+      platformContext: enrichedPlatformContext,
       refreshPlatformContext,
       memoryFabricContext,
       refreshMemoryFabricContext,
-      organization: platformContext?.organization || null,
-      roleProfile: platformContext?.roleProfile || null,
-      entitledAssetIds: platformContext?.entitledAssetIds || [],
-      entitledPackIds: platformContext?.entitledPackIds || [],
+      organization: enrichedPlatformContext?.organization || null,
+      roleProfile: enrichedPlatformContext?.roleProfile || null,
+      entitledAssetIds: enrichedPlatformContext?.entitledAssetIds || [],
+      entitledPackIds: enrichedPlatformContext?.entitledPackIds || [],
+      allowedWorkspaces: saasProfile.allowedWorkspaces || [],
+      enabledAssetPacks: saasProfile.enabledAssetPacks || [],
+      pinnedAssets: saasProfile.pinnedAssets || [],
+      hiddenAssets: saasProfile.hiddenAssets || [],
+      recentAssets: saasProfile.recentAssets || [],
     }),
     [
       activeWorkspace,
@@ -395,13 +520,14 @@ export const UserIdentityProvider = ({ children }) => {
       hasEffectivePermission,
       isLoading,
       memoryFabricContext,
-      platformContext,
+      enrichedPlatformContext,
       profile,
       recordActivity,
       refreshIdentity,
       refreshMemoryFabricContext,
       refreshPlatformContext,
       savePreferences,
+      saasProfile,
       switchWorkspace,
       updateProfile,
       workspaceState,

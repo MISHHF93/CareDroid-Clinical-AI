@@ -10,10 +10,7 @@ import { Organization } from '../workspaces/entities/organization.entity';
 import { Workspace, WorkspaceType } from '../workspaces/entities/workspace.entity';
 import { WorkspacesService } from '../workspaces/workspaces.service';
 import { getWorkspaceDefinition, workspaceSettingsForType } from '../workspaces/workspace-taxonomy';
-import {
-  OrganizationMembership,
-  OrganizationMembershipRole,
-} from './entities/organization-membership.entity';
+import { OrganizationMembership } from './entities/organization-membership.entity';
 
 type WorkspaceProvisioningInput = {
   id?: string;
@@ -335,24 +332,34 @@ export class TenantProvisioningService {
       return [WorkspaceType.EMERGENCY, WorkspaceType.FLEET, WorkspaceType.OPERATIONS];
     }
     if (type === OrganizationType.RESEARCH_CENTER || type === OrganizationType.RESEARCH_INSTITUTE) {
-      return [WorkspaceType.RESEARCH, WorkspaceType.EDUCATION, WorkspaceType.GOVERNANCE];
+      return [WorkspaceType.RESEARCH, WorkspaceType.GOVERNANCE, WorkspaceType.AI_EVALUATION];
     }
     if (type === OrganizationType.UNIVERSITY || type === OrganizationType.ACADEMIC_MEDICAL_CENTER) {
       return [
         WorkspaceType.EDUCATION,
         WorkspaceType.RESEARCH,
-        WorkspaceType.EMERGENCY,
+        WorkspaceType.SIMULATION,
+        WorkspaceType.GOVERNANCE,
+      ];
+    }
+    if (type === OrganizationType.LONG_TERM_CARE) {
+      return [
+        WorkspaceType.MEDICAL_IOT,
+        WorkspaceType.LABORATORY,
+        WorkspaceType.OPERATIONS,
         WorkspaceType.GOVERNANCE,
       ];
     }
     if (type === OrganizationType.CLINIC || type === OrganizationType.TELEHEALTH) {
-      return [WorkspaceType.EMERGENCY, WorkspaceType.OPERATIONS];
+      return [WorkspaceType.CARDIOLOGY, WorkspaceType.LABORATORY, WorkspaceType.GOVERNANCE];
     }
     return [
       WorkspaceType.EMERGENCY,
       WorkspaceType.ICU,
+      WorkspaceType.CARDIOLOGY,
       WorkspaceType.LABORATORY,
       WorkspaceType.OPERATIONS,
+      WorkspaceType.MEDICAL_IOT,
       WorkspaceType.GOVERNANCE,
     ];
   }

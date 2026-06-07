@@ -5,6 +5,7 @@ import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import ContextInsightCard from './ContextInsightCard';
 import {
   buildProfileToolGraph,
   buildUserToolProfile,
@@ -205,9 +206,33 @@ export default function ProfileToolGraphCard() {
       </div>
 
       <div className="profile-tool-graph-card__coverage">
-        <span>Specialty-specific: {specialtyTools.map((tool) => tool.name).join(', ') || 'No specialty-specific tools yet'}</span>
-        <span>Workspace-specific: {workspaceTools.map((tool) => tool.name).join(', ') || 'No workspace-specific tools yet'}</span>
-        <span>Assistant context: {assistantRecommendations.map((item) => item.label).join(', ')}</span>
+        <ContextInsightCard
+          title="Specialty tools"
+          message={specialtyTools.map((tool) => tool.name).join(', ') || 'No specialty-specific tools are available yet.'}
+          source="Profile tool graph"
+          status={specialtyTools.length ? 'generated' : 'empty'}
+          actionLabel="Open tools"
+          actionRoute="/tools"
+        />
+        <ContextInsightCard
+          title="Workspace tools"
+          message={workspaceTools.map((tool) => tool.name).join(', ') || 'No workspace-specific tools are available yet.'}
+          source="Workspace profile"
+          status={workspaceTools.length ? 'generated' : 'empty'}
+          actionLabel="Open workspace"
+          actionRoute="/workspaces"
+        />
+        <ContextInsightCard
+          title="Assistant context"
+          message={
+            assistantRecommendations.map((item) => item.label).join(', ') ||
+            'Assistant recommendations will appear after profile and workspace activity.'
+          }
+          source="Local recommendation graph"
+          status={assistantRecommendations.length ? 'generated' : 'empty'}
+          actionLabel="Ask Assistant"
+          actionRoute="/assistant"
+        />
       </div>
     </section>
   );

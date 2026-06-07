@@ -5,6 +5,91 @@
 
 /* Type, spacing, and touch tokens: design-tokens.css (loaded before this file) */
 
+/* —— App-wide fit contract: keep every surface inside its container —— */
+.app-shell,
+.app-shell *,
+.app-shell *::before,
+.app-shell *::after {
+  box-sizing: border-box;
+}
+
+.app-shell :is(
+    main,
+    section,
+    article,
+    header,
+    footer,
+    nav,
+    aside,
+    form,
+    fieldset,
+    label,
+    .card,
+    [class*='card'],
+    [class*='panel'],
+    [class*='grid'],
+    [class*='row'],
+    [class*='content'],
+    [class*='body']
+  ) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.app-shell :is(p, li, dd, dt, small, span, strong, h1, h2, h3, h4, h5, h6) {
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.app-shell :is(button, a.btn, .btn, input, select, textarea, summary, [role='button']) {
+  max-width: 100%;
+}
+
+.app-shell :is(button, a.btn, .btn, [role='button']) {
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
+}
+
+.app-shell :is(button, a.btn, .btn) > :is(svg, .nav-icon, [class*='icon']) {
+  flex: 0 0 auto;
+}
+
+.app-shell :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  min-height: var(--app-input-height, var(--compact-control-height, 38px));
+  border-radius: var(--compact-card-radius, var(--app-radius-md));
+  font-size: max(var(--text-input-min, 16px), 0.95rem);
+}
+
+.app-shell :is(table) {
+  width: 100%;
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+.app-shell :is(.table-wrap, .table-wrapper, [class*='table-container'], [class*='table-scroll']) {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.app-shell :is(img, svg, canvas, video, iframe) {
+  max-width: 100%;
+}
+
+.app-shell :is([class*='map'], [class*='chart'], [class*='visualization']) {
+  min-width: 0;
+}
+
+.app-shell :is(:focus-visible) {
+  outline: var(--app-focus-ring-width, 2px) solid var(--app-focus-ring-aa, var(--app-accent-interactive));
+  outline-offset: var(--app-focus-ring-offset, 2px);
+}
+
 /* —— Headings: prevent overflow in primary app surfaces —— */
 .app-scroll-container h1,
 .app-scroll-container h2,

@@ -62,11 +62,16 @@ describe('Simplified sidebar navigation wiring', () => {
   it('defines the reduced visible primary routes and advanced routes', () => {
     const navPaths = visibleSidebarItems.map((item) => item.path);
 
-    for (const path of ['/dashboard', '/assistant', '/tools', '/operations']) {
+    for (const path of ['/dashboard', '/assistant', '/tools', '/operations', '/profile', '/settings']) {
       expect(navPaths, path).toContain(path);
     }
 
     for (const path of [
+      '/asset-packs',
+      '/products',
+      '/organization',
+      '/platform-admin',
+      '/configuration-studio',
       '/tools/catalog',
       '/system-health',
       '/saas-health',
@@ -99,15 +104,13 @@ describe('Simplified sidebar navigation wiring', () => {
       '/devices',
       '/fleet/map',
       '/live-map',
-      '/profile',
-      '/settings',
     ]) {
       expect(navPaths, path).not.toContain(path);
     }
   });
 
   it('keeps secondary, operations, and account destinations available outside primary nav', () => {
-    expect(SECONDARY_NAV_ITEMS.map((item) => item.path)).toEqual(['/discover', '/automation']);
+    expect(SECONDARY_NAV_ITEMS).toEqual([]);
     expect(SOLUTIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual(
       expect.arrayContaining(['/solution-builder', '/value-tracking', '/success-center'])
     );
@@ -122,8 +125,8 @@ describe('Simplified sidebar navigation wiring', () => {
       '/usage',
     ]);
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.path)).toEqual([
-      '/profile',
-      '/settings',
+      '/discover',
+      '/automation',
       '/customer-portal',
       '/knowledge-base',
       '/marketplace',
@@ -150,6 +153,8 @@ describe('Simplified sidebar navigation wiring', () => {
   it('keeps Advanced collapsed and permission-gated', () => {
     expect(sidebarSource).toContain('showAdvanced &&');
     expect(sidebarSource).toContain('aria-expanded={showAdvanced}');
+    expect(sidebarSource).not.toContain('sidebar-nav--solutions');
+    expect(sidebarSource).not.toContain('sidebar-operational-workspace');
     expect(sidebarSource).toContain('PermissionGate');
     expect(sidebarSource).toContain('requireAll={item.requireAllPermissions}');
     expect(navigationConfigSource).toContain("label: 'Developer Catalog'");

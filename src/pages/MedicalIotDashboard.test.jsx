@@ -48,9 +48,12 @@ describe('MedicalIotDashboard', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: /medical iot dashboard/i })).toBeInTheDocument();
     expect((await screen.findAllByText(/demo telemetry/i)).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/demo insight/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/^unavailable$/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/context note/i)).not.toBeInTheDocument();
     expect(screen.getAllByText(/monitoring support only/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/mock telemetry, not live patient data/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /ask assistant/i })).toHaveAttribute('href', '/assistant');
+    expect(screen.getAllByRole('link', { name: /ask assistant/i })[0]).toHaveAttribute('href', '/assistant');
     expect(screen.getAllByText(/Bed 12 Pulse Oximeter/i).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('heading', { name: /^HR$/i }).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/SpO2/i).length).toBeGreaterThan(0);
@@ -123,5 +126,6 @@ describe('MedicalIotDashboard', () => {
     expect(container.querySelector('.medical-iot-location-workspace')).toBeTruthy();
     expect(container.querySelector('.medical-iot-map-canvas')).toBeTruthy();
     expect(container.querySelector('.medical-iot-detail')).toBeTruthy();
+    expect(container.querySelector('.context-insight-card')).toBeTruthy();
   });
 });

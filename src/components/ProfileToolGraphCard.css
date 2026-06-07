@@ -36,15 +36,19 @@
   text-decoration: none;
 }
 
-.profile-tool-graph-card__metrics,
-.profile-tool-graph-card__coverage {
+.profile-tool-graph-card__metrics {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.profile-tool-graph-card__metrics span,
-.profile-tool-graph-card__coverage span {
+.profile-tool-graph-card__coverage {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+}
+
+.profile-tool-graph-card__metrics span {
   display: inline-flex;
   align-items: center;
   padding: 6px 10px;
@@ -103,8 +107,7 @@
     flex-direction: column;
   }
 
-  .profile-tool-graph-card__metrics span,
-  .profile-tool-graph-card__coverage span {
+  .profile-tool-graph-card__metrics span {
     flex: 1 1 min(100%, 160px);
   }
 }

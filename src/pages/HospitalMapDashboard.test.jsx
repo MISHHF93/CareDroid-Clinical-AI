@@ -45,7 +45,9 @@ describe('HospitalMapDashboard', () => {
     renderHospitalMap();
 
     expect(await screen.findByRole('heading', { level: 1, name: /^hospital map$/i })).toBeInTheDocument();
-    expect(screen.getByText(/demo hospital map telemetry/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/demo hospital map telemetry/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/^unavailable$/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/context note/i)).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /hospital floor plan/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /room grid & bed grid/i })).toBeInTheDocument();
     expect(screen.getAllByText(/Bed 12A/i).length).toBeGreaterThan(0);
@@ -134,7 +136,7 @@ describe('HospitalMapDashboard', () => {
 
     renderHospitalMap();
 
-    expect(await screen.findByText(/backend demo hospital map contract/i)).toBeInTheDocument();
+    expect((await screen.findAllByText(/backend demo hospital map contract/i)).length).toBeGreaterThan(0);
     const marker = screen.getByRole('button', { name: /open icu 12 backend pump details/i });
     await user.click(marker);
 
@@ -188,5 +190,6 @@ describe('HospitalMapDashboard', () => {
     expect(container.querySelector('.hospital-map-page')).toBeTruthy();
     expect(container.querySelector('.hospital-map-canvas')).toBeTruthy();
     expect(container.querySelector('.hospital-map-detail')).toBeTruthy();
+    expect(container.querySelector('.context-insight-card')).toBeTruthy();
   });
 });

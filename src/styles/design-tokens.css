@@ -90,6 +90,18 @@
   --touch-target-comfortable: 48px;
   --app-min-touch-target: var(--touch-target-min);
   --app-min-touch-target-comfortable: var(--touch-target-comfortable);
+  --app-control-height-sm: 34px;
+  --app-control-height-md: 38px;
+  --app-control-height-lg: 44px;
+  --app-control-padding-x-sm: 10px;
+  --app-control-padding-x-md: 12px;
+  --app-control-padding-x-lg: 16px;
+  --app-icon-size-sm: 16px;
+  --app-icon-size-md: 20px;
+  --app-icon-size-lg: 24px;
+  --app-icon-button-size: var(--app-control-height-lg);
+  --app-input-height: var(--app-control-height-md);
+  --app-button-height: var(--app-control-height-md);
 
   /* —— Radius scale —— */
   --app-radius-sm: var(--radius-sm);
@@ -97,6 +109,7 @@
   --app-radius-lg: var(--radius-lg);
   --app-radius-xl: var(--radius-xl);
   --app-radius-2xl: var(--radius-2xl);
+  --app-radius-pill: 999px;
 
   /* —— Fluid page shell —— */
   --app-fluid-page-gutter: clamp(10px, 2vw, var(--space-lg));
@@ -124,7 +137,7 @@
   --compact-panel-gap: clamp(8px, 1.4vw, 12px);
   --compact-card-padding: clamp(10px, 1.6vw, 14px);
   --compact-panel-padding: clamp(12px, 2vw, 16px);
-  --compact-control-height: 38px;
+  --compact-control-height: var(--app-control-height-md);
   --compact-card-radius: 12px;
   --compact-panel-radius: 14px;
   --compact-shadow: none;
@@ -133,6 +146,30 @@
   --sidebar-width-expanded: 248px;
   --sidebar-width-collapsed: 58px;
   --sidebar-drawer-max-width: min(264px, 88vw);
+  --app-shell-header-height: 56px;
+  --app-shell-compact-header-height: 56px;
+  --app-sidebar-header-height: 56px;
+  --app-sidebar-header-padding-x: 10px;
+
+  /* z-index layers */
+  --z-base: 0;
+  --z-dropdown: 700;
+  --z-sticky: 800;
+  --z-overlay: 900;
+  --z-header: 920;
+  --z-popover: 940;
+  --z-drawer: 1000;
+  --z-modal: 1100;
+  --z-toast: 1200;
+
+  /* focus/elevation */
+  --app-focus-ring-width: 2px;
+  --app-focus-ring-offset: 2px;
+  --app-focus-ring: 0 0 0 3px var(--app-focus);
+  --app-elevation-none: none;
+  --app-elevation-card: var(--app-shadow-1);
+  --app-elevation-overlay: var(--app-shadow-2);
+  --app-elevation-subtle: var(--app-shadow-1);
 
   --app-content-max-width: 1760px;
   --app-keyboard-inset-bottom: 0px;

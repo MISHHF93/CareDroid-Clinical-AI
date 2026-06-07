@@ -529,7 +529,7 @@ export function buildResponsiveQaPages() {
   const smokeRoutePages = [
     ['discover', 'Discover CareDroid Capabilities', '/discover', 'core'],
     ['automation', 'Automation', '/automation', 'core'],
-    ['operations-center', 'Digital Operations Center', '/operations-center', 'operations'],
+    ['operations', 'Operations', '/operations', 'operations'],
     ['protocols', 'Protocol and Clinical Pathway Library', '/protocols', 'clinical'],
     ['research', 'Research and Evidence Hub', '/research', 'clinical'],
     ['documentation', 'Clinical Documentation Assistant', '/documentation', 'clinical'],

@@ -96,7 +96,6 @@ const AiCommandCenterDashboard = lazyWithRetry(() => import('./pages/AiCommandCe
 const PlatformLearningEngine = lazyWithRetry(() => import('./pages/PlatformLearningEngine'));
 const CareDroidBrainDashboard = lazyWithRetry(() => import('./pages/CareDroidBrainDashboard'));
 const Operations = lazyWithRetry(() => import('./pages/Operations'));
-const DigitalOperationsCenter = lazyWithRetry(() => import('./pages/DigitalOperationsCenter'));
 const DigitalTwinIntelligence = lazyWithRetry(() => import('./pages/DigitalTwinIntelligence'));
 const ResearchEvidenceHub = lazyWithRetry(() => import('./pages/ResearchEvidenceHub'));
 const ClinicalDocumentationAssistant = lazyWithRetry(() => import('./pages/ClinicalDocumentationAssistant'));
@@ -736,11 +735,6 @@ function AppRoutes() {
     {
       path: '/operations',
       element: <Operations />,
-      requiresAuth: true,
-    },
-    {
-      path: '/operations-center',
-      element: <DigitalOperationsCenter />,
       requiresAuth: true,
     },
     {
@@ -1441,6 +1435,11 @@ function AppRoutes() {
     },
     {
       path: '/tenant-admin',
+      element: <TenantAdministrationCenter />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tenant-admin/workspaces',
       element: <TenantAdministrationCenter />,
       requiresAuth: true,
     },

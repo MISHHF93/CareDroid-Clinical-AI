@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import ContextInsightCard from '../components/ContextInsightCard';
 import CrossModuleLinkPanel from '../components/CrossModuleLinkPanel';
 import StateSourceNotice from '../components/StateSourceNotice';
 import {
@@ -67,7 +68,7 @@ function DeviceDetailPanel({ device, room, bed, unit, maintenanceRecord, locatio
     return (
       <aside className="device-fleet-detail device-fleet-detail--empty" aria-label="Device fleet details">
         <h2>Device detail</h2>
-        <p>Select a fleet row or card to review assignment, health, service, and location history placeholders.</p>
+        <p>Select a fleet row or card to review assignment, health, service, and location history context.</p>
       </aside>
     );
   }
@@ -105,7 +106,7 @@ function DeviceDetailPanel({ device, room, bed, unit, maintenanceRecord, locatio
       </dl>
 
       <section className="device-fleet-detail-section">
-        <h3>Location History Placeholder</h3>
+        <h3>Location History</h3>
         {locationEvents.length ? (
           <ul className="device-fleet-history">
             {locationEvents.map((event) => (
@@ -117,7 +118,7 @@ function DeviceDetailPanel({ device, room, bed, unit, maintenanceRecord, locatio
             ))}
           </ul>
         ) : (
-          <p className="device-fleet-empty">No live location history endpoint exists yet; demo coordinate only.</p>
+          <p className="device-fleet-empty">No live location history endpoint is connected; demo coordinates are shown.</p>
         )}
       </section>
     </aside>
@@ -266,8 +267,53 @@ export default function DeviceFleetManagement() {
               DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
               DEMO_LIVE_STATES.UNSUPPORTED,
             ]}
-            details="Inventory, location history, maintenance, calibration, and firmware data come from the demo hospital map contract or local fallback. Row actions are browser-only placeholders; assignment, maintenance, firmware, and calibration write APIs are unsupported."
+            details="Inventory, location history, maintenance, calibration, and firmware data come from the demo hospital map contract or local fallback. Row actions are browser-only demo actions; assignment, maintenance, firmware, and calibration write APIs are unsupported."
           />
+
+          <section className="device-fleet-insights" aria-label="Device fleet context insights">
+            <ContextInsightCard
+              title={
+                summary.maintenanceDue
+                  ? `${summary.maintenanceDue} maintenance item(s) due`
+                  : 'Maintenance queue clear'
+              }
+              message={
+                summary.maintenanceDue
+                  ? 'Review service records before assignment.'
+                  : 'No maintenance blockers are visible in this snapshot.'
+              }
+              source={snapshot.sourceLabel}
+              status={summary.maintenanceDue ? 'action-required' : 'generated'}
+              actionLabel="Filter maintenance"
+              actionRoute="/devices"
+              timestamp={snapshot.generatedAt}
+            />
+            <ContextInsightCard
+              title={
+                summary.calibrationOverdue
+                  ? `${summary.calibrationOverdue} calibration item(s) overdue`
+                  : 'Calibration context'
+              }
+              message={
+                summary.calibrationOverdue
+                  ? 'Confirm calibration before clinical use.'
+                  : 'No calibration overdue state is visible in this snapshot.'
+              }
+              source="Local device summary"
+              status={summary.calibrationOverdue ? 'action-required' : 'generated'}
+              actionLabel="Open Hospital Map"
+              actionRoute="/hospital-map"
+              timestamp={snapshot.generatedAt}
+            />
+            <ContextInsightCard
+              title="Write actions unavailable"
+              message="Assignment, maintenance, firmware, and calibration actions are local-only until backend write APIs exist."
+              source="Backend unavailable"
+              status="unavailable"
+              actionLabel="Ask Assistant"
+              actionRoute="/assistant"
+            />
+          </section>
 
           <CrossModuleLinkPanel
             moduleId="fleet"

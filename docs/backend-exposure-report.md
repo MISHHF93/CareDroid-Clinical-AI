@@ -21,7 +21,7 @@
 | Setting | Value |
 |---------|-------|
 | Frontend dev port | 8000 |
-| Preview port | 4173 |
+| Preview port | 8000 |
 | Proxy target | http://localhost:3000 |
 | Proxies `/api` | yes |
 | Proxies `/health` | yes |

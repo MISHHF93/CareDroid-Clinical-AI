@@ -32,7 +32,7 @@ export const TOOL_LAUNCH_PATHS = Object.freeze({
   toolsOverview: '/tools',
   toolsCatalog: '/tools/catalog',
   calculatorsHub: '/tools/calculators',
-  operationsCenter: '/operations-center',
+  operationsCenter: '/operations',
   protocols: '/protocols',
   research: '/research',
   documentation: '/documentation',

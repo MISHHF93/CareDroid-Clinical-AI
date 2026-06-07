@@ -20,7 +20,12 @@ export default function StateSourceNotice({
     >
       <div>
         <strong>{title}</strong>
-        {details ? <p>{details}</p> : null}
+        {details ? (
+          <details className="state-source-notice__details">
+            <summary>Source details</summary>
+            <p>{details}</p>
+          </details>
+        ) : null}
       </div>
       <ul aria-label="Source state labels">
         {uniqueStates.map((state) => (

@@ -39,19 +39,12 @@ vi.mock('../components/Sidebar', async () => {
         {(!layoutCompact || mobileNavOpen) && (
           <>
             <nav aria-label="Primary navigation">
-              {['Command Center', 'Assistant', 'Tools', 'Operations'].map((label) => (
+              {['Dashboard', 'Assistant', 'Tools', 'Operations', 'Profile', 'Settings'].map((label) => (
                 <button key={label} type="button">
                   {label}
                 </button>
               ))}
             </nav>
-            <div aria-label="Account utilities">
-              {['Profile', 'Settings'].map((label) => (
-                <button key={label} type="button">
-                  {label}
-                </button>
-              ))}
-            </div>
           </>
         )}
       </aside>
@@ -122,12 +115,17 @@ describe('AppShell navigation surfaces', () => {
     expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
 
     const nav = within(sidebar).getByRole('navigation', { name: /primary navigation/i });
-    for (const name of [/^command center$/i, /^assistant$/i, /^tools$/i, /^operations$/i]) {
+    for (const name of [
+      /^dashboard$/i,
+      /^assistant$/i,
+      /^tools$/i,
+      /^operations$/i,
+      /^profile$/i,
+      /^settings$/i,
+    ]) {
       expect(screen.getAllByRole('button', { name })).toHaveLength(1);
       expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
     }
-    expect(within(nav).queryByRole('button', { name: /^profile$/i })).not.toBeInTheDocument();
-    expect(within(nav).queryByRole('button', { name: /^settings$/i })).not.toBeInTheDocument();
   });
 
   it('renders dashboard content without a bottom tab bar when sidebar exists', () => {

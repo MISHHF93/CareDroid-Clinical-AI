@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import ContextInsightCard from '../components/ContextInsightCard';
 import CrossModuleLinkPanel from '../components/CrossModuleLinkPanel';
 import StateSourceNotice from '../components/StateSourceNotice';
 import {
@@ -142,7 +143,7 @@ function DeviceDetailDrawer({ device, room, unit, bed, onClose }) {
         <StatusBadge value={device.status} />
         <span>Last seen: {formatHospitalMapTime(device.lastSeenAt)}</span>
         <span>Source: {device.locationSource}</span>
-        <span>Patient placeholder: {device.patientLabel}</span>
+        <span>Demo patient label: {device.patientLabel}</span>
       </div>
 
       <TelemetryParametersPanel device={device} />
@@ -542,8 +543,8 @@ export default function HospitalMapDashboard() {
           <button type="button" className="hospital-map-action hospital-map-action--secondary" onClick={launchMedicalIot}>
             Open Medical IoT
           </button>
-          <Link to="/dashboard" className="hospital-map-action hospital-map-action--secondary">
-            Dashboard
+          <Link to="/operations" className="hospital-map-action hospital-map-action--secondary">
+            Operations
           </Link>
         </div>
       </section>
@@ -573,7 +574,48 @@ export default function HospitalMapDashboard() {
           <section className="hospital-map-source" role="status">
             <strong>{snapshot.sourceLabel}</strong>
             <span>Last updated: {formatHospitalMapTime(snapshot.generatedAt)}</span>
-            {state.message ? <span>{state.message}</span> : null}
+          </section>
+
+          <section className="hospital-map-insights" aria-label="Hospital map context insights">
+            <ContextInsightCard
+              title={
+                summary.activeAlerts
+                  ? `${summary.activeAlerts} active map alert(s)`
+                  : 'No active map alerts'
+              }
+              message={
+                summary.activeAlerts
+                  ? 'Open alert detail before escalating clinical or device workflows.'
+                  : 'No alert markers are active in this snapshot.'
+              }
+              source={snapshot.sourceLabel}
+              status={summary.activeAlerts ? 'action-required' : 'generated'}
+              actionLabel="Ask Assistant"
+              actionRoute="/assistant"
+              timestamp={snapshot.generatedAt}
+            />
+            <ContextInsightCard
+              title={
+                summary.offline || summary.stale
+                  ? 'Device freshness needs review'
+                  : 'Device freshness stable'
+              }
+              message={`${summary.offline} offline, ${summary.stale} stale, ${summary.maintenanceDue} maintenance due.`}
+              source="Local map summary"
+              status={summary.offline || summary.stale || summary.maintenanceDue ? 'action-required' : 'generated'}
+              actionLabel="Open Medical IoT"
+              actionRoute="/medical-iot"
+              timestamp={snapshot.generatedAt}
+            />
+            <ContextInsightCard
+              title={state.message ? 'Backend status' : 'Map source'}
+              message={state.message || 'Hospital map context is assembled from the current floor-plan snapshot.'}
+              source={snapshot.sourceLabel}
+              status={/unavailable|fallback/i.test(state.message || '') ? 'unavailable' : 'demo'}
+              demo={!/unavailable/i.test(state.message || '')}
+              actionLabel="Open Devices"
+              actionRoute="/devices"
+            />
           </section>
 
           <StateSourceNotice
@@ -584,7 +626,7 @@ export default function HospitalMapDashboard() {
               DEMO_LIVE_STATES.BACKEND_UNAVAILABLE,
               DEMO_LIVE_STATES.UNSUPPORTED,
             ]}
-            details="Floor plans, device positions, patient placeholders, and telemetry are demo/mock data. If the backend demo contract is unavailable, the page falls back to a local demo snapshot; live device writes or dispatch actions are unsupported."
+            details="Floor plans, device positions, anonymized demo patient labels, and telemetry are demo/mock data. If the backend demo contract is unavailable, the page falls back to a local demo snapshot; live device writes or dispatch actions are unsupported."
           />
 
           <CrossModuleLinkPanel

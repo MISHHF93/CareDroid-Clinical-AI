@@ -22,6 +22,7 @@ describe('StateSourceNotice', () => {
     expect(within(notice).getByText(/^demo$/i)).toBeInTheDocument();
     expect(within(notice).getByText(/^backend unavailable$/i)).toBeInTheDocument();
     expect(within(notice).getByText(/^unsupported$/i)).toBeInTheDocument();
+    expect(within(notice).getByText(/^source details$/i)).toBeInTheDocument();
     expect(within(notice).getByText(/test source details/i)).toBeInTheDocument();
   });
 });

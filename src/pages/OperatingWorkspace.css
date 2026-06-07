@@ -76,6 +76,13 @@
   outline-offset: 3px;
 }
 
+.operating-insights {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr));
+  gap: var(--compact-page-gap, 14px);
+  min-width: 0;
+}
+
 .operating-section {
   display: grid;
   gap: var(--compact-panel-gap, 10px);

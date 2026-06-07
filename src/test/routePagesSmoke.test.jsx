@@ -43,7 +43,7 @@ import CommandDashboard from '../pages/CommandDashboard';
 import CapabilityDiscovery from '../pages/CapabilityDiscovery';
 import WorkflowAutomationBuilder from '../pages/WorkflowAutomationBuilder';
 import Dashboard from '../pages/Dashboard';
-import DigitalOperationsCenter from '../pages/DigitalOperationsCenter';
+import Operations from '../pages/Operations';
 import ResearchEvidenceHub from '../pages/ResearchEvidenceHub';
 import ClinicalDocumentationAssistant from '../pages/ClinicalDocumentationAssistant';
 import ClinicalKnowledgeGraph from '../pages/ClinicalKnowledgeGraph';
@@ -645,7 +645,7 @@ const PAGE_BY_ID = {
   discover: CapabilityDiscovery,
   automation: WorkflowAutomationBuilder,
   assistant: Dashboard,
-  'operations-center': DigitalOperationsCenter,
+  operations: Operations,
   research: ResearchEvidenceHub,
   documentation: ClinicalDocumentationAssistant,
   'knowledge-graph': ClinicalKnowledgeGraph,

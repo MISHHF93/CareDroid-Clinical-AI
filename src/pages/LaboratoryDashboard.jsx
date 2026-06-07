@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import ContextInsightCard from '../components/ContextInsightCard';
 import CrossModuleLinkPanel from '../components/CrossModuleLinkPanel';
 import StateSourceNotice from '../components/StateSourceNotice';
 import { NavIcon } from '../navigation/NavIcon';
@@ -88,6 +89,35 @@ export default function LaboratoryDashboard() {
         description="Abnormal lab context can move back into training scenarios or forward into anatomy and model review without leaving the workflow."
       />
 
+      <section className="ops-demo-insights" aria-label="Laboratory context insights">
+        <ContextInsightCard
+          title={`${abnormalCount} abnormal lab result(s)`}
+          message={criticalCount ? 'Critical lactate is flagged for review.' : 'Abnormal results are grouped for review.'}
+          source="Demo lab panel"
+          status={criticalCount ? 'action-required' : 'demo'}
+          demo={!criticalCount}
+          actionLabel="Open Lab Interpreter"
+          actionRoute="/tools/lab-interpreter"
+        />
+        <ContextInsightCard
+          title={`${SPECIMENS.length} specimen(s) in queue`}
+          message="Analyzer and microbiology statuses are local demo records."
+          source="Local specimen queue"
+          status="demo"
+          demo
+          actionLabel="Ask Assistant"
+          actionRoute="/assistant"
+        />
+        <ContextInsightCard
+          title="Trend source"
+          message="LIS/FHIR feeds are not connected, so trend cards are demo-only."
+          source="Backend unavailable"
+          status="unavailable"
+          actionLabel="Review source states"
+          actionRoute="/laboratory"
+        />
+      </section>
+
       <section className="ops-demo-grid ops-demo-grid--four" aria-label="Laboratory summary">
         <article className="ops-demo-metric">
           <span>Abnormal results</span>
@@ -161,13 +191,6 @@ export default function LaboratoryDashboard() {
           <h3>Available panels</h3>
           <div className="ops-demo-chip-list">
             {PANELS.map((panel) => <span key={panel}>{panel}</span>)}
-          </div>
-          <div className="ops-demo-debrief">
-            <strong>Trend cards</strong>
-            <p>
-              Demo trends highlight lactate, creatinine, troponin, electrolytes, glucose, and CBC
-              movement. Connect live LIS/FHIR feeds before using for patient operations.
-            </p>
           </div>
         </aside>
       </section>

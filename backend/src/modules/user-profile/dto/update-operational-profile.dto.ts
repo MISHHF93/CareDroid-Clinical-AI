@@ -1,4 +1,4 @@
-import { IsArray, IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsArray, IsBoolean, IsObject, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class UpdateOperationalProfileDto {
   @IsOptional()
@@ -71,4 +71,64 @@ export class UpdateOperationalProfileDto {
   @IsOptional()
   @IsObject()
   professional?: Record<string, any>;
+
+  @IsOptional()
+  @IsString()
+  organizationId?: string;
+
+  @IsOptional()
+  @IsString()
+  organizationType?: string;
+
+  @IsOptional()
+  @IsString()
+  role?: string;
+
+  @IsOptional()
+  @IsString()
+  defaultWorkspace?: string;
+
+  @IsOptional()
+  @IsArray()
+  allowedWorkspaces?: string[];
+
+  @IsOptional()
+  @IsArray()
+  permissions?: string[];
+
+  @IsOptional()
+  @IsArray()
+  subscriptionEntitlements?: string[];
+
+  @IsOptional()
+  @IsArray()
+  enabledAssetPacks?: string[];
+
+  @IsOptional()
+  @IsArray()
+  pinnedAssets?: string[];
+
+  @IsOptional()
+  @IsArray()
+  hiddenAssets?: string[];
+
+  @IsOptional()
+  @IsArray()
+  recentAssets?: string[];
+
+  @IsOptional()
+  @IsString()
+  preferredAIStyle?: string;
+
+  @IsOptional()
+  @IsString()
+  themePreference?: 'light' | 'dark' | 'system';
+
+  @IsOptional()
+  @IsBoolean()
+  compactMode?: boolean;
+
+  @IsOptional()
+  @IsString()
+  onboardingStatus?: string;
 }
