@@ -23,7 +23,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   { id: 'protocols', path: '/protocols', match: 'heading', heading: /protocol and clinical pathway library/i },
   { id: 'research', path: '/research', match: 'heading', heading: /research and evidence hub/i },
   { id: 'documentation', path: '/documentation', match: 'heading', heading: /clinical documentation assistant/i },
-  { id: 'knowledge-graph', path: '/knowledge-graph', match: 'heading', heading: /clinical knowledge graph/i },
+  { id: 'knowledge-graph', path: '/knowledge-graph', match: 'heading', heading: /artifact knowledge graph/i },
   { id: 'predictive-analytics', path: '/predictive-analytics', match: 'heading', heading: /predictive analytics dashboard/i },
   {
     id: 'clinical-decision-support',

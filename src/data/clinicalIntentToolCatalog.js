@@ -2429,14 +2429,14 @@ Then summarize entered findings, calculate the Wells DVT score, explain likely/u
   },
   {
     toolId: NLU.clinicalKnowledgeGraph,
-    toolName: 'Clinical Knowledge Graph',
+    toolName: 'Artifact Knowledge Graph',
     category: 'reference',
     description:
-      'Graph explorer connecting calculators, protocols, simulations, laboratory values, devices, and AI workflows with relationship search and explainability.',
+      'Graph explorer connecting assets, packs, products, workspaces, roles, routes, simulations, workflows, AI agents, and integrations with relationship search and explainability.',
     path: TOOL_LAUNCH_PATHS.knowledgeGraph,
     sidebarToolId: REGISTRY.clinicalKnowledgeGraph,
     chatSeed:
-      'Open the Clinical Knowledge Graph. Search and explain relationships across calculators, protocols, simulations, laboratory values, devices, and AI workflows. Keep explanations clinical-decision-support only.',
+      'Open the Artifact Knowledge Graph. Search and explain relationships across assets, packs, products, workspaces, roles, routes, simulations, workflows, AI agents, and integrations.',
     backendExecutable: false,
   },
   {

@@ -662,6 +662,17 @@ export const ROUTE_RECORDS = Object.freeze([
     notes: 'Machine-learning-ready artifact intelligence catalog with CSV/JSON export, feature rows, and resonance metadata.',
   }),
   Object.freeze({
+    id: 'knowledgeGraph',
+    path: CANONICAL_ROUTES.knowledgeGraph,
+    componentKey: 'ClinicalKnowledgeGraph',
+    layout: 'app',
+    auth: 'required',
+    status: 'active',
+    aliases: [],
+    navGroup: 'advanced',
+    notes: 'Artifact knowledge graph across assets, packs, products, workspaces, roles, routes, simulations, workflows, AI agents, and integrations.',
+  }),
+  Object.freeze({
     id: 'aiModels',
     path: CANONICAL_ROUTES.aiModels,
     componentKey: 'AiModelsPage',

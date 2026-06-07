@@ -3859,11 +3859,11 @@ const toolRegistry = [
   },
   {
     id: 'clinical-knowledge-graph',
-    name: 'Clinical Knowledge Graph',
+    name: 'Artifact Knowledge Graph',
     path: '/knowledge-graph',
     color: '#14B8A6',
     description:
-      'Relationship graph connecting calculators, protocols, simulations, laboratory values, devices, and AI workflows with search and graph explorer',
+      'Relationship graph connecting assets, packs, products, workspaces, roles, routes, simulations, workflows, AI agents, and integrations with search and graph explorer',
     shortcut: 'Ctrl+Shift+G',
     category: 'Reference',
     features: [

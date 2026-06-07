@@ -6,6 +6,7 @@
 }
 
 .knowledge-graph-hero,
+.knowledge-graph-stats,
 .knowledge-graph-panel,
 .knowledge-graph-node,
 .knowledge-graph-card {
@@ -31,6 +32,7 @@
 .knowledge-graph-hero p,
 .knowledge-graph-eyebrow,
 .knowledge-graph-node span,
+.knowledge-graph-card span,
 .knowledge-graph-card p,
 .knowledge-graph-edge small {
   color: var(--muted-text);
@@ -86,6 +88,21 @@
   padding: 0 14px;
 }
 
+.knowledge-graph-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  padding: 12px;
+}
+
+.knowledge-graph-stats .knowledge-graph-card {
+  background: var(--surface-2);
+}
+
+.knowledge-graph-stats strong {
+  font-size: 22px;
+}
+
 .knowledge-graph-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
@@ -131,12 +148,17 @@
   font-size: 12px;
 }
 
-.knowledge-graph-node--calculator { border-left: 4px solid #38bdf8; }
-.knowledge-graph-node--protocol { border-left: 4px solid #22c55e; }
+.knowledge-graph-node--asset { border-left: 4px solid #38bdf8; }
+.knowledge-graph-node--pack { border-left: 4px solid #22c55e; }
+.knowledge-graph-node--product { border-left: 4px solid #84cc16; }
+.knowledge-graph-node--workspace { border-left: 4px solid #f59e0b; }
+.knowledge-graph-node--organization { border-left: 4px solid #fb7185; }
+.knowledge-graph-node--role { border-left: 4px solid #f97316; }
+.knowledge-graph-node--route { border-left: 4px solid #64748b; }
 .knowledge-graph-node--simulation { border-left: 4px solid #a855f7; }
-.knowledge-graph-node--laboratory { border-left: 4px solid #f59e0b; }
-.knowledge-graph-node--device { border-left: 4px solid #ef4444; }
-.knowledge-graph-node--ai-workflow { border-left: 4px solid #14b8a6; }
+.knowledge-graph-node--workflow { border-left: 4px solid #14b8a6; }
+.knowledge-graph-node--ai-agent { border-left: 4px solid #06b6d4; }
+.knowledge-graph-node--integration { border-left: 4px solid #ef4444; }
 
 .knowledge-graph-edge-list,
 .knowledge-graph-neighbor-list {
@@ -170,6 +192,7 @@
   }
 
   .knowledge-graph-hero,
+  .knowledge-graph-stats,
   .knowledge-graph-layout,
   .knowledge-graph-search {
     grid-template-columns: 1fr;
