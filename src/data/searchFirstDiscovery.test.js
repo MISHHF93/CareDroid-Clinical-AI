@@ -70,11 +70,11 @@ describe('search-first discovery index', () => {
         expect.objectContaining({ kind: 'operation', sourceId: 'fleet' }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'high news2 escalation notify clinician' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'automated triage matrix vitals chief complaint' })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'automation',
-          sourceId: 'emergency-high-news2-alert',
+          sourceId: 'emergency-automated-triage-matrix',
           path: '/workspace/emergency/automations',
         }),
       ])

@@ -11,7 +11,7 @@ describe('AutomationEngine', () => {
   });
 
   it('runs an active automation and logs an audit event', () => {
-    const result = AutomationEngine.runAutomation('emergency-high-news2-alert', {
+    const result = AutomationEngine.runAutomation('emergency-automated-triage-matrix', {
       workspaceId: 'emergency',
       subscriptionTier: 'professional',
       humanReviewAvailable: true,
@@ -19,12 +19,12 @@ describe('AutomationEngine', () => {
     });
 
     expect(result.ok).toBe(true);
-    expect(result.outputs).toEqual(expect.arrayContaining(['alerts', 'AI guidance']));
+    expect(result.outputs).toEqual(expect.arrayContaining(['risk profile', 'calculator recommendations']));
     expect(result.auditEntry).toEqual(
       expect.objectContaining({
         workspace: expect.objectContaining({ id: 'emergency' }),
         status: 'success',
-        toolCalled: 'news2',
+        toolCalled: 'qsofa',
       })
     );
     expect(getAutomationAuditEntries()).toHaveLength(1);

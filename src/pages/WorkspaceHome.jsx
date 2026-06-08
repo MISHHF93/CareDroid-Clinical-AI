@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
@@ -11,6 +11,11 @@ import {
 import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import { workspaceFilterSummary } from '../data/platformOperatingSystem';
 import { getAutomationAuditEntries } from '../data/automationAuditTrail';
+import { getWorkspaceAutomations } from '../data/automationRegistry';
+import {
+  buildEmergencyCopilotGuidance,
+  routeEmergencyChiefComplaint,
+} from '../data/emergencyOperatingSystem';
 import WorkspaceDataPipelineService from '../services/workspaceDataPipelineService';
 import AutomationEngine from '../services/automationEngine';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
@@ -166,7 +171,14 @@ function WorkspaceAutomationHub({ workspaceId, solutionPackage, onRunAutomation 
                   <dt>Review</dt>
                   <dd>{automation.humanReviewRequired ? 'Required' : 'Not required'}</dd>
                 </div>
+                <div>
+                  <dt>Readiness</dt>
+                  <dd>{automation.readiness?.classification || 'Unclassified'}</dd>
+                </div>
               </dl>
+              {automation.readiness?.firstCustomerNote ? (
+                <span>{automation.readiness.firstCustomerNote}</span>
+              ) : null}
               <button
                 type="button"
                 className="workspace-secondary-action"
@@ -247,6 +259,583 @@ function WorkspaceAutomationHub({ workspaceId, solutionPackage, onRunAutomation 
   );
 }
 
+function EmergencyJourneyFlow({ journey = [] }) {
+  return (
+    <section className="workspace-panel emergency-journey-panel" aria-labelledby="emergency-journey-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Patient Journey</p>
+        <h2 id="emergency-journey-title">Canonical ED Flow</h2>
+        <p>Every automation maps to this operating path instead of launching as an isolated tool.</p>
+      </div>
+      <ol className="emergency-journey-flow">
+        {journey.map((stage) => (
+          <li key={stage.id}>
+            <strong>{stage.label}</strong>
+            <span>{stage.description}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  );
+}
+
+function EmergencyCommandCenter({ emergency, onLaunchRoute, onAskAssistant }) {
+  const commandWidgets = emergency.commandCenterWidgets || emergency.dashboardWidgets || [];
+  return (
+    <section className="emergency-command-center" aria-label="Emergency Command Center">
+      <div className="workspace-panel emergency-os-layout__wide">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">ED Command Center</p>
+          <h2>Emergency Command Center</h2>
+          <p>Most ED actions start here: waiting patients, high-risk review, alerts, assessments, recommended actions, and protocol guidance.</p>
+        </div>
+        <div className="emergency-command-grid">
+          {commandWidgets.map((widget) => (
+            <article
+              key={widget.id}
+              className={`emergency-command-widget emergency-dashboard-widget--${widget.severity}`}
+            >
+              <div>
+                <span>{widget.label}</span>
+                <strong>{widget.value}</strong>
+                <small>{widget.helper}</small>
+              </div>
+              <p>{widget.supportingDetail}</p>
+              <div className="emergency-command-actions">
+                <button
+                  type="button"
+                  className="workspace-secondary-action"
+                  onClick={() => onLaunchRoute(widget.primaryAction.target)}
+                >
+                  {widget.primaryAction.label}
+                </button>
+                <button
+                  type="button"
+                  className="workspace-secondary-action"
+                  onClick={() => onAskAssistant(widget.secondaryAction.prompt)}
+                >
+                  {widget.secondaryAction.label}
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+      <aside className="workspace-panel emergency-command-sidecar" aria-labelledby="emergency-command-flow-title">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Reduced Navigation</p>
+          <h2 id="emergency-command-flow-title">Dashboard-first workflow</h2>
+          <p>Deep routes remain available, but routine ED work starts from this Command Center.</p>
+        </div>
+        <ol className="emergency-journey-flow emergency-journey-flow--compact">
+          {emergency.patientJourney.slice(0, 5).map((stage) => (
+            <li key={stage.id}>
+              <strong>{stage.label}</strong>
+              <span>{stage.description}</span>
+            </li>
+          ))}
+        </ol>
+      </aside>
+    </section>
+  );
+}
+
+function EmergencyTriageOrchestrator({ orchestrator, onLaunchTool }) {
+  return (
+    <section className="workspace-panel" aria-labelledby="emergency-triage-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Triage Orchestrator</p>
+        <h2 id="emergency-triage-title">{orchestrator.label}</h2>
+        <p>{orchestrator.safetyStatement}</p>
+      </div>
+      <div className="emergency-orchestrator-flow" aria-label="Triage workflow">
+        <div>
+          <strong>Inputs</strong>
+          <ul>
+            {orchestrator.inputs.map((input) => (
+              <li key={input}>{input}</li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <strong>Auto-calculate</strong>
+          <div className="workspace-card-grid">
+            {orchestrator.calculatorSequence.map((calculator) => (
+              <button
+                key={calculator.id}
+                type="button"
+                className="workspace-route-card"
+                onClick={() => onLaunchTool({ id: calculator.id, name: calculator.label })}
+              >
+                <span className="workspace-route-card__icon" aria-hidden>
+                  <NavIcon icon={getToolIcon(calculator.id)} size={18} />
+                </span>
+                <span className="workspace-route-card__body">
+                  <strong>{calculator.label}</strong>
+                  <span>{calculator.trigger}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <strong>Outputs</strong>
+          <ul>
+            {orchestrator.outputs.map((output) => (
+              <li key={output}>{output}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function EmergencyEvidencePanel({ complaintContexts, complaintRoutes = [], onLaunchTool, onAskAssistant }) {
+  const [selectedComplaint, setSelectedComplaint] = useState(complaintRoutes[0]?.complaint || '');
+  const [complaintInput, setComplaintInput] = useState(complaintRoutes[0]?.complaint || '');
+  const [vitalsSummary, setVitalsSummary] = useState('BP, HR, RR, SpO2, temperature available for review');
+  const [selectedCalculatorIds, setSelectedCalculatorIds] = useState([]);
+  const routedComplaint = routeEmergencyChiefComplaint(complaintInput || selectedComplaint);
+  const routedCalculatorIds = (routedComplaint?.calculators || []).map((calculator) => calculator.id).join('|');
+  useEffect(() => {
+    setSelectedCalculatorIds((routedComplaint?.calculators || []).map((calculator) => calculator.id));
+  }, [routedComplaint?.routeId, routedCalculatorIds]);
+  const selectedCalculators = (routedComplaint?.calculators || []).filter((calculator) =>
+    selectedCalculatorIds.includes(calculator.id)
+  );
+  const copilotGuidance = buildEmergencyCopilotGuidance({
+    complaint: complaintInput || selectedComplaint,
+    vitals: vitalsSummary,
+    workspaceContext: 'Emergency evidence and workflow guidance',
+    selectedCalculators,
+  });
+  const selectedContext =
+    complaintContexts.find((context) => context.complaint === (routedComplaint?.complaint || selectedComplaint)) ||
+    complaintContexts[0];
+
+  return (
+    <section className="workspace-panel" aria-labelledby="emergency-evidence-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Chief Complaint Router</p>
+        <h2 id="emergency-evidence-title">Complaint-Driven Workflow Guidance</h2>
+        <p>Routes chief complaints to calculators, workflows, protocols, and referrals for human review.</p>
+      </div>
+      <div className="emergency-router-controls">
+        <label className="emergency-evidence-select">
+          <span>Chief complaint</span>
+          <select
+            value={selectedComplaint}
+            onChange={(event) => {
+              setSelectedComplaint(event.target.value);
+              setComplaintInput(event.target.value);
+            }}
+          >
+            {complaintRoutes.map((route) => (
+              <option key={route.routeId} value={route.complaint}>
+                {route.complaint}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="emergency-evidence-select">
+          <span>Complaint text</span>
+          <input
+            value={complaintInput}
+            onChange={(event) => setComplaintInput(event.target.value)}
+            placeholder="Enter chest pain, stroke symptoms, sepsis concern, or shortness of breath"
+          />
+        </label>
+        <label className="emergency-evidence-select">
+          <span>Vitals</span>
+          <input
+            value={vitalsSummary}
+            onChange={(event) => setVitalsSummary(event.target.value)}
+            placeholder="Enter BP, HR, RR, SpO2, temperature, or acuity context"
+          />
+        </label>
+      </div>
+      {routedComplaint ? (
+        <article className="workspace-automation-card emergency-router-card">
+          <div>
+            <strong>{routedComplaint.complaint}</strong>
+            <span>{routedComplaint.guidance}</span>
+          </div>
+          <dl>
+            <div>
+              <dt>Calculators</dt>
+              <dd>{routedComplaint.calculators.map((calculator) => calculator.label).join(', ')}</dd>
+            </div>
+            <div>
+              <dt>Workflows</dt>
+              <dd>{routedComplaint.workflows.join(', ')}</dd>
+            </div>
+            <div>
+              <dt>Protocols</dt>
+              <dd>{routedComplaint.protocols.join(', ')}</dd>
+            </div>
+            <div>
+              <dt>Referral</dt>
+              <dd>{routedComplaint.referrals.join(', ')}</dd>
+            </div>
+          </dl>
+          <p>{routedComplaint.safetyStatement}</p>
+          <div className="emergency-command-actions">
+            {routedComplaint.calculators.map((calculator) => (
+              <button
+                key={calculator.id}
+                type="button"
+                className="workspace-secondary-action"
+                onClick={() => onLaunchTool({ id: calculator.id, name: calculator.label })}
+              >
+                Open {calculator.label}
+              </button>
+            ))}
+            <button
+              type="button"
+              className="workspace-secondary-action"
+              onClick={() =>
+                onAskAssistant(
+                  `Review ${routedComplaint.complaint} workflow guidance: ${routedComplaint.guidance} ${routedComplaint.safetyStatement}`
+                )
+              }
+            >
+              Ask assistant for workflow guidance
+            </button>
+          </div>
+        </article>
+      ) : (
+        <p className="emergency-router-empty">
+          No complaint route matched. Use manual clinician review and choose a supported complaint path.
+        </p>
+      )}
+      <article className="workspace-automation-card emergency-copilot-card" aria-label="ED Copilot workflow guidance">
+        <div>
+          <strong>ED AI Copilot</strong>
+          <span>Explainable workflow guidance from complaint, vitals, workspace context, and selected calculators.</span>
+        </div>
+        {routedComplaint?.calculators?.length ? (
+          <fieldset className="emergency-copilot-calculators">
+            <legend>Selected calculators</legend>
+            {routedComplaint.calculators.map((calculator) => (
+              <label key={calculator.id}>
+                <input
+                  type="checkbox"
+                  checked={selectedCalculatorIds.includes(calculator.id)}
+                  onChange={(event) => {
+                    setSelectedCalculatorIds((current) =>
+                      event.target.checked
+                        ? [...new Set([...current, calculator.id])]
+                        : current.filter((calculatorId) => calculatorId !== calculator.id)
+                    );
+                  }}
+                />
+                <span>{calculator.label}</span>
+              </label>
+            ))}
+          </fieldset>
+        ) : null}
+        <dl>
+          <div>
+            <dt>Recommended tools</dt>
+            <dd>{copilotGuidance.recommendedTools.map((tool) => tool.label).join(', ') || 'Manual selection'}</dd>
+          </div>
+          <div>
+            <dt>Protocols</dt>
+            <dd>{copilotGuidance.protocols.join(', ') || 'Manual protocol review'}</dd>
+          </div>
+          <div>
+            <dt>Next workflow step</dt>
+            <dd>{copilotGuidance.nextWorkflowStep}</dd>
+          </div>
+          <div>
+            <dt>Simulations</dt>
+            <dd>{copilotGuidance.simulations.join(', ') || 'No simulation attached'}</dd>
+          </div>
+          <div>
+            <dt>Escalation suggestions</dt>
+            <dd>{copilotGuidance.escalationSuggestions.join(' ')}</dd>
+          </div>
+        </dl>
+        <div className="emergency-copilot-reasoning">
+          <strong>Reasoning</strong>
+          <ul>
+            {copilotGuidance.reasoning.map((reason) => (
+              <li key={reason.output}>{reason.explanation}</li>
+            ))}
+          </ul>
+        </div>
+        <p>{copilotGuidance.safetyBoundary}</p>
+        <button
+          type="button"
+          className="workspace-secondary-action"
+          onClick={() =>
+            onAskAssistant(
+              `Use ED AI Copilot guidance for ${copilotGuidance.inputs.complaint}. Recommended tools: ${copilotGuidance.recommendedTools
+                .map((tool) => tool.label)
+                .join(', ') || 'manual selection'}. Next step: ${copilotGuidance.nextWorkflowStep}. Explain reasoning and keep all outputs clinician-reviewed.`
+            )
+          }
+        >
+          Ask assistant with Copilot context
+        </button>
+      </article>
+      {selectedContext ? (
+        <div className="emergency-evidence-grid">
+          {[
+            ['Protocols', selectedContext.protocols],
+            ['Evidence', selectedContext.evidence],
+            ['Recommended calculators', selectedContext.recommendedCalculators],
+            ['Relevant workflows', selectedContext.workflows],
+            ['Simulations', selectedContext.simulations],
+          ].map(([title, items]) => (
+            <article key={title} className="workspace-capability-card emergency-evidence-card">
+              <span className="workspace-route-card__icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.formatPdf} size={18} />
+              </span>
+              <span className="workspace-route-card__body">
+                <strong>{title}</strong>
+                <span>{items.join(', ')}</span>
+              </span>
+            </article>
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function EmergencyAutomationList({ title, description, automations = [], visibility }) {
+  const items = automations.filter((automation) => automation.workspaceVisibility?.includes(visibility));
+  return (
+    <WorkspaceListPanel
+      title={title}
+      description={description}
+      items={items}
+      empty="No ED automations are assigned to this surface."
+      renderItem={(automation) => (
+        <WorkspaceCapabilityCard
+          key={automation.automationId}
+          icon={CHROME_ICONS.bolt}
+          item={{
+            id: automation.automationId,
+            label: automation.title,
+            detail: `${automation.trigger} Review: ${automation.humanReviewRequirement}`,
+          }}
+        />
+      )}
+    />
+  );
+}
+
+function EmergencyAnalyticsPanel({ analytics }) {
+  const metrics = analytics?.emergency || {};
+  return (
+    <section className="workspace-panel" aria-labelledby="emergency-analytics-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">ED Analytics</p>
+        <h2 id="emergency-analytics-title">Emergency Operating Metrics</h2>
+        <p>Tracks the ED SaaS operating model, not unrelated enterprise widgets.</p>
+      </div>
+      <div className="workspace-focus-metrics emergency-analytics-grid">
+        <div>
+          <span>Triage volume</span>
+          <strong>{metrics.triageVolume}</strong>
+          <small>Encounters</small>
+        </div>
+        <div>
+          <span>Calculator utilization</span>
+          <strong>{metrics.calculatorUtilization}</strong>
+          <small>qSOFA, NEWS2, HEART, Wells, Shock Index</small>
+        </div>
+        <div>
+          <span>Referral volume</span>
+          <strong>{metrics.referralVolume}</strong>
+          <small>Queue items</small>
+        </div>
+        <div>
+          <span>Documentation drafts</span>
+          <strong>{metrics.documentationDrafts}</strong>
+          <small>Review required</small>
+        </div>
+        <div>
+          <span>AI acceptance</span>
+          <strong>{Math.round((metrics.aiRecommendationAcceptance || 0) * 100)}%</strong>
+          <small>Accepted recommendations</small>
+        </div>
+        <div>
+          <span>Automation execution</span>
+          <strong>{metrics.automationExecution}</strong>
+          <small>Registered ED modules</small>
+        </div>
+        <div>
+          <span>Simulation completion</span>
+          <strong>{metrics.simulationCompletion}</strong>
+          <small>Academy completions</small>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function EmergencyProductTiers({
+  productTiers = [],
+  automations = [],
+  mvpPackage,
+  optionalAddOns = [],
+}) {
+  const automationsById = Object.fromEntries(
+    automations.map((automation) => [automation.automationId, automation])
+  );
+  return (
+    <section className="workspace-panel" aria-labelledby="emergency-products-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Packaging</p>
+        <h2 id="emergency-products-title">Emergency Department Solution</h2>
+        <p>Emergency Core is the smallest sellable package; everything else is an add-on.</p>
+      </div>
+      {mvpPackage ? (
+        <article className="workspace-automation-card emergency-mvp-package">
+          <div>
+            <strong>{mvpPackage.title} MVP</strong>
+            <span>{mvpPackage.positioning}</span>
+          </div>
+          <dl>
+            <div>
+              <dt>Buyer</dt>
+              <dd>{mvpPackage.buyerPersonas.join(', ')}</dd>
+            </div>
+            <div>
+              <dt>Billing</dt>
+              <dd>{mvpPackage.billingMetric}</dd>
+            </div>
+            <div>
+              <dt>Trial</dt>
+              <dd>{mvpPackage.trialPosture}</dd>
+            </div>
+            <div>
+              <dt>Dependency</dt>
+              <dd>{mvpPackage.implementationDependency}</dd>
+            </div>
+            <div>
+              <dt>EHR</dt>
+              <dd>{mvpPackage.ehrDependency}</dd>
+            </div>
+            <div>
+              <dt>Integration</dt>
+              <dd>{mvpPackage.integrationDependency}</dd>
+            </div>
+            <div>
+              <dt>Review</dt>
+              <dd>{mvpPackage.humanReviewRequirement}</dd>
+            </div>
+          </dl>
+          <div className="emergency-package-chip-grid" aria-label="Emergency Core MVP inclusions">
+            {mvpPackage.includedCapabilities.map((capability) => (
+              <span key={capability.id} className="workspace-tool-card__meta">
+                {capability.label}
+              </span>
+            ))}
+          </div>
+          <div className="emergency-core-capability-list" aria-label="Why each Emergency Core capability is included">
+            {mvpPackage.includedCapabilities.map((capability) => (
+              <div key={`${capability.id}-reason`}>
+                <strong>{capability.label}</strong>
+                <span>{capability.reason}</span>
+                <small>{capability.dependencyPosture}</small>
+              </div>
+            ))}
+          </div>
+          <span>{mvpPackage.packageRule}</span>
+          <span>{mvpPackage.upgradePath}</span>
+        </article>
+      ) : null}
+      {optionalAddOns.length ? (
+        <div className="workspace-panel__header emergency-addons-header">
+          <h2>Optional add-ons</h2>
+          <p>Expansion modules move beyond Core when the buyer is ready for workflow or integration depth.</p>
+        </div>
+      ) : null}
+      <div className="workspace-card-grid emergency-addons-grid">
+        {optionalAddOns.map((addOn) => (
+          <article key={addOn.addOnId} className="workspace-automation-card">
+            <div>
+              <strong>{addOn.title}</strong>
+              <span>{addOn.dependencyLevel}</span>
+            </div>
+            <dl>
+              <div>
+                <dt>Tier</dt>
+                <dd>{addOn.upgradeTier}</dd>
+              </div>
+              <div>
+                <dt>Modules</dt>
+                <dd>{addOn.automationIds.length}</dd>
+              </div>
+              <div>
+                <dt>Dependency</dt>
+                <dd>{addOn.implementationDependency}</dd>
+              </div>
+              <div>
+                <dt>Trial</dt>
+                <dd>{addOn.trialPosture}</dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+      <div className="workspace-card-grid">
+        {productTiers.map((tier) => (
+          <article key={tier.productId} className="workspace-automation-card">
+            <div>
+              <strong>{tier.title}</strong>
+              <span>
+                {tier.mvpPackageId
+                  ? `${tier.includedCapabilityIds?.length || 0} Core MVP capabilities at ${tier.tier} tier.`
+                  : `${tier.automationIds.length} ED automations available at ${tier.tier} tier.`}
+              </span>
+            </div>
+            <dl>
+              <div>
+                <dt>Ready</dt>
+                <dd>
+                  {
+                    tier.automationIds.filter(
+                      (automationId) =>
+                        automationsById[automationId]?.readiness?.classification === 'Ready to sell'
+                    ).length
+                  }
+                </dd>
+              </div>
+              <div>
+                <dt>Needs wiring</dt>
+                <dd>
+                  {
+                    tier.automationIds.filter(
+                      (automationId) =>
+                        automationsById[automationId]?.readiness?.classification === 'Needs wiring'
+                    ).length
+                  }
+                </dd>
+              </div>
+              <div>
+                <dt>Integration</dt>
+                <dd>
+                  {
+                    tier.automationIds.filter(
+                      (automationId) => automationsById[automationId]?.readiness?.requiresIntegration
+                    ).length
+                  }
+                </dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function WorkspaceHome() {
   const navigate = useNavigate();
   const { workspaceId = DEFAULT_CARE_WORKSPACE_ID, subpage } = useParams();
@@ -270,6 +859,7 @@ export default function WorkspaceHome() {
     () => WorkspaceDataPipelineService.normalizeWorkspaceData(canonicalWorkspaceId),
     [canonicalWorkspaceId]
   );
+  const isEmergencyWorkspace = canonicalWorkspaceId === 'emergency' && Boolean(pipelineData.emergency);
 
   useEffect(() => {
     if (workspaceId !== canonicalWorkspaceId) {
@@ -332,6 +922,11 @@ export default function WorkspaceHome() {
         `Open ${workspaceExperience.operatingLabel}.`,
       'user'
     );
+    navigate('/assistant');
+  };
+
+  const launchAssistantPrompt = (prompt) => {
+    addMessage(prompt, 'user');
     navigate('/assistant');
   };
 
@@ -447,7 +1042,15 @@ export default function WorkspaceHome() {
         </div>
       </section>
 
-      {activeSubpageId === 'dashboard' ? (
+      {isEmergencyWorkspace && activeSubpageId === 'dashboard' ? (
+        <EmergencyCommandCenter
+          emergency={pipelineData.emergency}
+          onLaunchRoute={launchRoute}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {!isEmergencyWorkspace && activeSubpageId === 'dashboard' ? (
         <section className="workspace-content-grid">
           <div className="workspace-panel">
           <div className="workspace-panel__header">
@@ -500,6 +1103,70 @@ export default function WorkspaceHome() {
         </section>
       ) : null}
 
+      {isEmergencyWorkspace && activeSubpageId === 'triage' ? (
+        <EmergencyTriageOrchestrator
+          orchestrator={pipelineData.emergency.triageOrchestrator}
+          onLaunchTool={launchTool}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'patients' ? (
+        <section className="emergency-os-layout">
+          <EmergencyJourneyFlow journey={pipelineData.emergency.patientJourney} />
+          <EmergencyAutomationList
+            title="Patient operating queues"
+            description="Patient-facing ED automations stay attached to journey stages and clinician review."
+            automations={getWorkspaceAutomations(canonicalWorkspaceId)}
+            visibility="patients"
+          />
+        </section>
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'referrals' ? (
+        <EmergencyAutomationList
+          title="Referral Queue"
+          description="Referral, consult, transfer, and prior authorization work routed from ED disposition."
+          automations={getWorkspaceAutomations(canonicalWorkspaceId)}
+          visibility="referrals"
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'documentation' ? (
+        <EmergencyAutomationList
+          title="Documentation Queue"
+          description="Documentation integrity, discharge summary drafting, and authorization drafts remain review-required."
+          automations={getWorkspaceAutomations(canonicalWorkspaceId)}
+          visibility="documentation"
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'evidence' ? (
+        <EmergencyEvidencePanel
+          complaintContexts={pipelineData.emergency.ragComplaintContext}
+          complaintRoutes={pipelineData.emergency.chiefComplaintRoutes}
+          onLaunchTool={launchTool}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'simulations' ? (
+        <EmergencyAutomationList
+          title="Simulation Academy"
+          description="Complaint and workflow gaps map to ED simulations and debriefs."
+          automations={getWorkspaceAutomations(canonicalWorkspaceId)}
+          visibility="simulations"
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'iot' ? (
+        <EmergencyAutomationList
+          title="Medical IoT Monitoring"
+          description="Device alerts and telemetry gaps feed ED patient risk context."
+          automations={getWorkspaceAutomations(canonicalWorkspaceId)}
+          visibility="iot"
+        />
+      ) : null}
+
       {activeSubpageId === 'tools' ? (
         <WorkspaceListPanel
           title={`${workspaceExperience.shortLabel} tools`}
@@ -526,12 +1193,25 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
-      {activeSubpageId === 'analytics' ? (
+      {isEmergencyWorkspace && activeSubpageId === 'analytics' ? (
+        <EmergencyAnalyticsPanel analytics={pipelineData.analytics} />
+      ) : null}
+
+      {!isEmergencyWorkspace && activeSubpageId === 'analytics' ? (
         <WorkspaceListPanel
           title="Workspace analytics"
           description="Analytics are normalized from registry metadata and honest backend status."
           items={Object.entries(pipelineData.analytics.counts).map(([label, value]) => ({ id: label, label, detail: String(value) }))}
           renderItem={(item) => <WorkspaceCapabilityCard key={item.id} item={item} icon={CHROME_ICONS.lineChart} />}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'automations' ? (
+        <EmergencyProductTiers
+          productTiers={pipelineData.emergency.productTiers}
+          automations={getWorkspaceAutomations(canonicalWorkspaceId)}
+          mvpPackage={pipelineData.emergency.mvpPackage}
+          optionalAddOns={pipelineData.emergency.optionalAddOns}
         />
       ) : null}
 
@@ -569,7 +1249,23 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
-      {!['dashboard', 'tools', 'workflows', 'automations', 'analytics', 'alerts', 'reports', 'settings'].includes(activeSubpageId) ? (
+      {![
+        'dashboard',
+        'tools',
+        'workflows',
+        'automations',
+        'analytics',
+        'alerts',
+        'reports',
+        'settings',
+        'triage',
+        'patients',
+        'referrals',
+        'documentation',
+        'evidence',
+        'simulations',
+        'iot',
+      ].includes(activeSubpageId) ? (
         <WorkspaceListPanel
           title={activeSubpage?.label || 'Workspace subpage'}
           description={`${activeSubpage?.label || 'This subpage'} is connected to ${pipelineData.mode.modeName} and uses the same workspace data pipeline.`}

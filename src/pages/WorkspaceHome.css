@@ -320,6 +320,307 @@
   gap: 16px;
 }
 
+.emergency-os-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: 16px;
+}
+
+.emergency-os-layout__wide {
+  min-width: 0;
+}
+
+.emergency-command-center {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.55fr);
+  gap: 16px;
+}
+
+.emergency-command-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.emergency-command-widget {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 16px;
+  background: var(--app-surface-2);
+}
+
+.emergency-command-widget span {
+  color: var(--muted-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.emergency-command-widget strong {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-color);
+  font-size: 1.45rem;
+}
+
+.emergency-command-widget small,
+.emergency-command-widget p {
+  color: var(--muted-text);
+  line-height: 1.35;
+}
+
+.emergency-command-widget p {
+  margin: 0;
+}
+
+.emergency-command-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.emergency-command-actions .workspace-secondary-action {
+  min-height: 34px;
+  padding: 7px 10px;
+}
+
+.emergency-command-sidecar {
+  align-self: start;
+}
+
+.emergency-journey-flow--compact li:nth-child(n + 4) {
+  display: none;
+}
+
+.emergency-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.emergency-dashboard-widget {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 13px;
+  background: var(--app-surface-2);
+}
+
+.emergency-dashboard-widget span {
+  color: var(--muted-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.emergency-dashboard-widget strong {
+  color: var(--text-color);
+  font-size: 1.35rem;
+}
+
+.emergency-dashboard-widget small {
+  color: var(--muted-text);
+  line-height: 1.35;
+}
+
+.emergency-dashboard-widget--high,
+.emergency-dashboard-widget--critical {
+  border-color: color-mix(in srgb, var(--workspace-os-accent, #ff4d5e) 46%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--workspace-os-accent, #ff4d5e) 10%, var(--app-surface-2));
+}
+
+.emergency-journey-flow {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.emergency-journey-flow li {
+  display: grid;
+  gap: 3px;
+  padding: 10px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 12px;
+  background: var(--app-surface-2);
+}
+
+.emergency-journey-flow span {
+  color: var(--muted-text);
+  font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.emergency-orchestrator-flow {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.5fr) minmax(0, 1.25fr) minmax(170px, 0.5fr);
+  gap: 14px;
+}
+
+.emergency-orchestrator-flow > div {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 13px;
+  background: var(--app-surface-2);
+}
+
+.emergency-orchestrator-flow ul {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--muted-text);
+}
+
+.emergency-evidence-select {
+  display: grid;
+  gap: 6px;
+  max-width: 360px;
+  margin-bottom: 12px;
+  color: var(--muted-text);
+  font-weight: 750;
+}
+
+.emergency-evidence-select select {
+  min-height: var(--compact-control-height, 38px);
+  border: 1px solid var(--app-panel-border);
+  border-radius: 10px;
+  background: var(--app-surface-2);
+  color: var(--text-color);
+  padding: 8px 10px;
+}
+
+.emergency-evidence-select input {
+  min-height: var(--compact-control-height, 38px);
+  border: 1px solid var(--app-panel-border);
+  border-radius: 10px;
+  background: var(--app-surface-2);
+  color: var(--text-color);
+  padding: 8px 10px;
+}
+
+.emergency-router-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.5fr) minmax(260px, 1fr);
+  gap: 12px;
+  align-items: end;
+}
+
+.emergency-router-card {
+  margin-bottom: 14px;
+}
+
+.emergency-copilot-card {
+  margin-bottom: 14px;
+}
+
+.emergency-copilot-calculators {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 14px;
+}
+
+.emergency-copilot-calculators legend {
+  padding: 0 6px;
+  color: var(--muted-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.emergency-copilot-calculators label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-color);
+  font-weight: 750;
+}
+
+.emergency-copilot-reasoning {
+  display: grid;
+  gap: 8px;
+}
+
+.emergency-copilot-reasoning ul {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted-text);
+}
+
+.emergency-router-card p,
+.emergency-copilot-card p,
+.emergency-router-empty {
+  margin: 0;
+  color: var(--muted-text);
+  line-height: 1.4;
+}
+
+.emergency-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.emergency-evidence-card:last-child {
+  grid-column: 1 / -1;
+}
+
+.emergency-analytics-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.emergency-mvp-package,
+.emergency-addons-grid {
+  margin-bottom: 14px;
+}
+
+.emergency-package-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.emergency-core-capability-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.emergency-core-capability-list > div {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.24);
+}
+
+.emergency-core-capability-list small {
+  color: var(--text-muted);
+}
+
+.emergency-addons-header {
+  margin-top: 16px;
+}
+
+.emergency-addons-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .workspace-automation-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.75fr);
@@ -350,7 +651,7 @@
 
 .workspace-automation-card dl {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
   gap: 8px;
   margin: 0;
 }
@@ -465,8 +766,22 @@
   .workspace-context-panel,
   .workspace-pipeline-status,
   .workspace-automation-layout,
-  .workspace-content-grid {
+  .workspace-content-grid,
+  .emergency-os-layout,
+  .emergency-command-center,
+  .emergency-command-grid,
+  .emergency-orchestrator-flow,
+  .emergency-router-controls,
+  .emergency-evidence-grid,
+  .emergency-core-capability-list,
+  .emergency-addons-grid {
     grid-template-columns: 1fr;
+  }
+
+  .emergency-dashboard-grid,
+  .emergency-command-grid,
+  .emergency-analytics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .workspace-service-list {
@@ -497,6 +812,12 @@
   }
 
   .workspace-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .emergency-dashboard-grid,
+  .emergency-command-grid,
+  .emergency-analytics-grid {
     grid-template-columns: 1fr;
   }
 }

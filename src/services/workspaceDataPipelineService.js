@@ -8,6 +8,24 @@ import {
   getSolutionPackageForWorkspace,
   getWorkspaceAutomations,
 } from '../data/automationRegistry';
+import {
+  EMERGENCY_ANALYTICS_EVENTS,
+  EMERGENCY_AI_COPILOT,
+  EMERGENCY_CHIEF_COMPLAINT_ROUTES,
+  EMERGENCY_COMMAND_CENTER_WIDGETS,
+  EMERGENCY_CORE_MVP_PACKAGE,
+  EMERGENCY_CUSTOMER_READINESS_CAPABILITIES,
+  EMERGENCY_DASHBOARD_WIDGETS,
+  EMERGENCY_FASTEST_TO_MARKET_OFFERINGS,
+  EMERGENCY_OPTIONAL_ADD_ONS,
+  EMERGENCY_PATIENT_JOURNEY,
+  EMERGENCY_RAG_COMPLAINT_CONTEXT,
+  EMERGENCY_SOLUTION_PACKAGES,
+  EMERGENCY_TRIAGE_ORCHESTRATOR,
+  EMERGENCY_WORKSPACE_ID,
+  buildEmergencyCopilotGuidance,
+  summarizeEmergencyCustomerReadiness,
+} from '../data/emergencyOperatingSystem';
 import { workspaceFilterSummary } from '../data/platformOperatingSystem';
 
 const PIPELINE_STAGES = Object.freeze([
@@ -87,7 +105,7 @@ function buildAlerts(workspaceId, mode) {
 
 function buildAnalytics(model, mode, recommendations, alerts) {
   const automations = getWorkspaceAutomations(model.workspace.id);
-  return {
+  const analytics = {
     workspaceId: model.workspace.id,
     modeName: mode.modeName,
     counts: {
@@ -109,6 +127,19 @@ function buildAnalytics(model, mode, recommendations, alerts) {
         ? Math.round((model.backendStatus.live.length / mode.backendServices.length) * 100)
         : 0,
   };
+  if (model.workspace.id === EMERGENCY_WORKSPACE_ID) {
+    analytics.emergency = {
+      triageVolume: 68,
+      calculatorUtilization: 41,
+      referralVolume: 9,
+      documentationDrafts: 14,
+      aiRecommendationAcceptance: 0.73,
+      automationExecution: automations.length,
+      simulationCompletion: 6,
+      trackedEvents: EMERGENCY_ANALYTICS_EVENTS,
+    };
+  }
+  return analytics;
 }
 
 export const WorkspaceDataPipelineService = {
@@ -130,6 +161,34 @@ export const WorkspaceDataPipelineService = {
       recommendations,
       alerts,
       analytics,
+      emergency:
+        model.workspace.id === EMERGENCY_WORKSPACE_ID
+          ? {
+              patientJourney: EMERGENCY_PATIENT_JOURNEY,
+              dashboardWidgets: EMERGENCY_DASHBOARD_WIDGETS,
+              commandCenterWidgets: EMERGENCY_COMMAND_CENTER_WIDGETS,
+              chiefComplaintRoutes: EMERGENCY_CHIEF_COMPLAINT_ROUTES,
+              aiCopilot: {
+                ...EMERGENCY_AI_COPILOT,
+                sampleGuidance: buildEmergencyCopilotGuidance({
+                  complaint: 'Chest Pain',
+                  vitals: 'Vitals available for clinician review',
+                  workspaceContext: 'Emergency Command Center',
+                  selectedCalculators: ['HEART'],
+                }),
+              },
+              triageOrchestrator: EMERGENCY_TRIAGE_ORCHESTRATOR,
+              ragComplaintContext: EMERGENCY_RAG_COMPLAINT_CONTEXT,
+              productTiers: EMERGENCY_SOLUTION_PACKAGES,
+              mvpPackage: EMERGENCY_CORE_MVP_PACKAGE,
+              optionalAddOns: EMERGENCY_OPTIONAL_ADD_ONS,
+              customerReadiness: {
+                capabilities: EMERGENCY_CUSTOMER_READINESS_CAPABILITIES,
+                summary: summarizeEmergencyCustomerReadiness(),
+                fastestToMarketOfferings: EMERGENCY_FASTEST_TO_MARKET_OFFERINGS,
+              },
+            }
+          : null,
       aiContext: this.getWorkspaceAIContext(model.workspace.id),
       sourceStatus: model.backendStatus.fallback.length
         ? 'Backend connected where wired; demo/local fallback where endpoints are not implemented.'
@@ -192,7 +251,20 @@ export const WorkspaceDataPipelineService = {
         title: automation.title,
         riskLevel: automation.riskLevel,
         humanReviewRequired: automation.humanReviewRequired,
+        journeyStages: automation.journeyStages || automation.requiredWorkflows || [],
+        workspaceVisibility: automation.workspaceVisibility || [],
+        readiness: automation.readiness || null,
       })),
+      emergency:
+        model.workspace.id === EMERGENCY_WORKSPACE_ID
+          ? {
+              complaintContexts: EMERGENCY_RAG_COMPLAINT_CONTEXT,
+              chiefComplaintRoutes: EMERGENCY_CHIEF_COMPLAINT_ROUTES,
+              aiCopilot: EMERGENCY_AI_COPILOT,
+              triageOrchestrator: EMERGENCY_TRIAGE_ORCHESTRATOR,
+              safetyStatement: EMERGENCY_TRIAGE_ORCHESTRATOR.safetyStatement,
+            }
+          : null,
     };
   },
 };

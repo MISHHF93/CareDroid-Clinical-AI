@@ -100,13 +100,44 @@ describe('workspaceArchitecture', () => {
     expect(getCareWorkspaceById('missing').id).toBe('emergency');
   });
 
+  it('keeps Emergency dashboard-first with reduced primary navigation', () => {
+    const emergency = getCareWorkspaceById('emergency');
+    const mode = getWorkspaceFunctionalityMode('emergency');
+
+    expect(emergency.defaultNavigationGroups).toEqual(['dashboard', 'automations']);
+    expect(emergency.defaultDashboardWidgets).toEqual([
+      'waiting-patients',
+      'high-risk-queue',
+      'critical-alerts',
+      'recent-assessments',
+      'recommended-actions',
+      'protocol-guidance',
+    ]);
+    expect(mode.dashboards).toEqual(emergency.defaultDashboardWidgets);
+    expect(mode.subpages.map((subpage) => subpage.id)).toEqual(
+      expect.arrayContaining(['triage', 'evidence', 'automations'])
+    );
+  });
+
   it('surfaces emergency tools contextually instead of as sidebar entries', () => {
     const model = buildCareWorkspaceModel('emergency');
     const toolIds = model.toolEntries.map((tool) => tool.id);
     const routePaths = model.routeEntries.map((route) => route.path);
 
     expect(toolIds).toEqual(
-      expect.arrayContaining(['qsofa', 'news2', 'sofa-score', 'nihss', 'heart-score', 'grace-acs'])
+      expect.arrayContaining([
+        'qsofa',
+        'news2',
+        'nihss',
+        'heart-score',
+        'wells-pe',
+        'wells-dvt-calculator',
+        'shock-index',
+        'guideline-rag',
+        'clinical-documentation-assistant',
+        'medical-iot-dashboard',
+        'simulation-suite',
+      ])
     );
     expect(routePaths).toEqual(expect.arrayContaining(['/assistant', '/tools/calculators', '/live-map']));
   });
@@ -159,7 +190,18 @@ describe('workspaceArchitecture', () => {
   });
 
   it('adds specialized subpages for operational workspaces without sidebar expansion', () => {
-    expect(getWorkspaceSubpageEntries('emergency').map((subpage) => subpage.id)).toContain('simulations');
+    expect(getWorkspaceSubpageEntries('emergency').map((subpage) => subpage.id)).toEqual([
+      'dashboard',
+      'triage',
+      'patients',
+      'referrals',
+      'documentation',
+      'evidence',
+      'simulations',
+      'iot',
+      'analytics',
+      'automations',
+    ]);
     expect(getWorkspaceSubpageEntries('medical-iot').map((subpage) => subpage.id)).toEqual(
       expect.arrayContaining(['devices', 'telemetry', 'maintenance'])
     );

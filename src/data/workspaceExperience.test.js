@@ -9,11 +9,11 @@ describe('workspace experience profiles', () => {
   it('makes Emergency feel like its own operating mode', () => {
     const profile = getWorkspaceExperienceProfile({ id: 'emergency', name: 'Emergency' });
 
-    expect(profile.operatingLabel).toBe('Emergency OS');
-    expect(profile.dashboardTitle).toMatch(/Emergency Command Center/);
+    expect(profile.operatingLabel).toBe('Emergency Department OS');
+    expect(profile.dashboardTitle).toMatch(/Emergency Department Command Center/);
     expect(profile.toolsTitle).toMatch(/Emergency Tool Console/);
-    expect(profile.recommendationsTitle).toMatch(/Emergency Recommendations/);
-    expect(profile.assistantTitle).toMatch(/Emergency Assistant/);
+    expect(profile.recommendationsTitle).toMatch(/ED Operating Recommendations/);
+    expect(profile.assistantTitle).toMatch(/Emergency Department Assistant/);
     expect(profile.quickPrompts.join(' ')).toMatch(/triage/i);
   });
 
