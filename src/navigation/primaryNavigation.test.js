@@ -51,6 +51,7 @@ describe('primaryNavigation', () => {
       ['Asset Packs', '/asset-packs'],
       ['Products', '/products'],
       ['Organization', '/organization'],
+      ['Executive', '/executive'],
       ['Platform Admin', '/platform-admin'],
       ['Configuration Studio', '/configuration-studio'],
       ['Developer Catalog', '/tools/catalog'],

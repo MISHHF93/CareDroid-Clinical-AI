@@ -432,6 +432,15 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     showInMobile: false,
   },
   {
+    id: 'executive',
+    label: 'Executive',
+    mobileLabel: 'Exec',
+    path: CANONICAL_ROUTES.executive,
+    matchPaths: [CANONICAL_ROUTES.executive],
+    permission: 'VIEW_ANALYTICS',
+    showInMobile: false,
+  },
+  {
     id: 'platform-admin',
     label: 'Platform Admin',
     mobileLabel: 'Admin',

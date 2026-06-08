@@ -15,6 +15,12 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     match: 'heading',
     heading: /caredroid command center/i,
   },
+  {
+    id: 'executive',
+    path: '/executive',
+    match: 'heading',
+    heading: /executive command center/i,
+  },
   { id: 'discover', path: '/discover', match: 'heading', heading: /discover caredroid capabilities/i },
   { id: 'automation', path: '/automation', match: 'heading', heading: /^automation$/i },
   { id: 'assistant', path: '/assistant', match: 'composer' },

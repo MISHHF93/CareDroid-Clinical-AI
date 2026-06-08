@@ -47,6 +47,7 @@ import Version from './pages/Version';
 
 // Authenticated shell pages — lazy for smaller initial JS (mobile LCP)
 const CommandDashboard = lazyWithRetry(() => import('./pages/CommandDashboard'));
+const ExecutiveCommandCenter = lazyWithRetry(() => import('./pages/ExecutiveCommandCenter'));
 const WorkspaceHome = lazyWithRetry(() => import('./pages/WorkspaceHome'));
 const {
   WorkspacesIndexPage,
@@ -681,6 +682,12 @@ function AppRoutes() {
       path: '/dashboard',
       element: <CommandDashboard />,
       requiresAuth: true,
+    },
+    {
+      path: '/executive',
+      element: <ExecutiveCommandCenter />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
     },
     {
       path: '/discover',

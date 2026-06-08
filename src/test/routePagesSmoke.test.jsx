@@ -40,6 +40,7 @@ import PlatformGovernanceWorkspace from '../pages/platform/PlatformGovernanceWor
 import SystemHealth from '../pages/SystemHealth';
 import SaasHealthCenter from '../pages/SaasHealthCenter';
 import CommandDashboard from '../pages/CommandDashboard';
+import ExecutiveCommandCenter from '../pages/ExecutiveCommandCenter';
 import CapabilityDiscovery from '../pages/CapabilityDiscovery';
 import WorkflowAutomationBuilder from '../pages/WorkflowAutomationBuilder';
 import Dashboard from '../pages/Dashboard';
@@ -642,6 +643,7 @@ vi.mock('../services/fleetTelemetryService', async (importOriginal) => {
 
 const PAGE_BY_ID = {
   dashboard: CommandDashboard,
+  executive: ExecutiveCommandCenter,
   discover: CapabilityDiscovery,
   automation: WorkflowAutomationBuilder,
   assistant: Dashboard,
