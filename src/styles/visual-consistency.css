@@ -1,0 +1,292 @@
+/**
+ * Visual consistency sweep.
+ * Late-loaded normalizers for legacy page CSS that predates the canonical
+ * CareDroid primitives. Keep behavior local to the app shell.
+ */
+
+:root {
+  --app-visual-page-max: var(--app-fluid-container-max-wide);
+  --app-visual-page-gap: var(--compact-page-gap, var(--app-fluid-section-gap));
+  --app-visual-panel-gap: var(--compact-panel-gap, var(--app-space-md));
+  --app-visual-header-padding: var(--compact-panel-padding, var(--app-card-padding-standard));
+  --app-visual-card-padding: var(--compact-card-padding, var(--app-card-padding-compact));
+  --app-visual-table-cell-padding: var(--app-space-sm);
+  --app-visual-control-gap: var(--app-space-sm);
+  --app-visual-control-radius: var(--compact-card-radius, var(--app-radius-md));
+  --app-visual-panel-radius: var(--compact-panel-radius, var(--app-radius-lg));
+}
+
+.app-shell :is(
+    [class$='-page'],
+    [class*='-page '],
+    [class$='-dashboard'],
+    [class*='-dashboard '],
+    .calculators-content,
+    .clinical-tool-catalog,
+    .org-page,
+    .biometric-container,
+    .consent-container,
+    .app-shell-page-body > main
+  ) {
+  min-width: 0;
+  width: 100%;
+  max-width: var(--app-visual-page-max);
+  margin-inline: auto;
+}
+
+.app-shell :is(
+    [class$='-page'],
+    [class*='-page '],
+    [class$='-dashboard'],
+    [class*='-dashboard '],
+    .calculators-content,
+    .clinical-tool-catalog,
+    .org-page
+  ) {
+  gap: var(--app-visual-page-gap);
+}
+
+.app-shell :is(
+    .cd-page-header,
+    [class$='-hero'],
+    [class*='-hero '],
+    [class$='-page-header'],
+    [class*='-page-header '],
+    .analytics-header,
+    .cost-header,
+    .biometric-header,
+    .consent-header
+  ) {
+  min-width: 0;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-visual-panel-radius);
+  background: var(--app-surface);
+  box-shadow: var(--app-elevation-none);
+  padding: var(--app-visual-header-padding);
+}
+
+.app-shell :is(
+    .cd-page-header,
+    [class$='-hero'],
+    [class*='-hero '],
+    [class$='-page-header'],
+    [class*='-page-header '],
+    .analytics-header,
+    .cost-header
+  )
+  :is(h1, .cd-page-header__title) {
+  color: var(--app-text-primary);
+  font-size: var(--app-type-title);
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+}
+
+.app-shell :is(
+    .cd-page-header,
+    [class$='-hero'],
+    [class*='-hero '],
+    [class$='-page-header'],
+    [class*='-page-header '],
+    .analytics-header,
+    .cost-header
+  )
+  :is(p, .cd-page-header__description, [class*='subtitle'], [class*='description']) {
+  color: var(--app-text-secondary);
+  font-size: var(--app-type-body);
+  line-height: var(--type-body-line-height);
+}
+
+.app-shell :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--app-text-primary);
+  font-family: inherit;
+  line-height: var(--type-heading-line-height);
+}
+
+.app-shell :is(h2, h3) {
+  letter-spacing: -0.01em;
+}
+
+.app-shell :is(p, li, td, th, label, input, select, textarea, button, a) {
+  font-family: inherit;
+}
+
+.app-shell :is(
+    .card,
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel '],
+    [class$='-widget'],
+    [class*='-widget '],
+    [class$='-notice'],
+    [class*='-notice '],
+    [class$='-state'],
+    [class*='-state ']
+  ) {
+  min-width: 0;
+  border-color: var(--app-border);
+  border-radius: var(--app-visual-panel-radius);
+  background-color: var(--app-surface);
+  color: var(--app-text-primary);
+  box-shadow: var(--app-elevation-none);
+}
+
+.app-shell :is(
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel '],
+    [class$='-widget'],
+    [class*='-widget '],
+    [class$='-notice'],
+    [class*='-notice '],
+    [class$='-state'],
+    [class*='-state ']
+  ):not(.card):not(.cd-metric-card):not(.cd-insight-card):not(.cd-status-widget) {
+  padding: var(--app-visual-card-padding);
+}
+
+.app-shell :is(
+    .card,
+    [class$='-card'],
+    [class*='-card '],
+    [class$='-panel'],
+    [class*='-panel '],
+    [class$='-widget'],
+    [class*='-widget ']
+  )
+  :is(h2, h3, h4) {
+  font-size: var(--app-type-subheading);
+  line-height: var(--type-subheading-line-height);
+}
+
+.app-shell :is(button, a)[class*='btn'],
+.app-shell :is(button, a)[class*='button'],
+.app-shell :is(button, a)[class*='action'],
+.app-shell :is(button, a)[class*='control'] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--app-visual-control-gap);
+  min-height: var(--app-button-height);
+  border-radius: var(--app-visual-control-radius);
+  font-size: var(--app-type-small);
+  font-weight: 650;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: normal;
+}
+
+.app-shell :is(
+    button[class*='secondary'],
+    a[class*='secondary'],
+    button[class*='ghost'],
+    a[class*='ghost'],
+    button[class*='tertiary'],
+    a[class*='tertiary']
+  ) {
+  border-color: var(--app-border);
+  background-color: var(--app-surface-raised);
+  color: var(--app-text-primary);
+}
+
+.app-shell :is(
+    button[class*='icon'],
+    a[class*='icon'],
+    button[class*='marker'],
+    button[class*='toggle']
+  ) {
+  flex: 0 0 auto;
+}
+
+.app-shell :is(button, a) :is(svg, .nav-icon, [class*='icon']) {
+  width: var(--app-icon-size-sm);
+  height: var(--app-icon-size-sm);
+}
+
+.app-shell :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+  min-height: var(--app-input-height);
+  border: 1px solid var(--app-input-border);
+  border-radius: var(--app-visual-control-radius);
+  background: var(--app-input-bg);
+  color: var(--app-text-primary);
+  font-size: max(var(--text-input-min), var(--app-type-small));
+  line-height: var(--type-body-line-height);
+}
+
+.app-shell :is(form, fieldset, [class*='form'], [class*='filter'], [class*='controls']) {
+  min-width: 0;
+}
+
+.app-shell :is(label, .cd-form-field, [class*='input-group'], [class*='field']) {
+  gap: var(--app-space-xs);
+}
+
+.app-shell :is(label, legend, th, [class*='label']) {
+  color: var(--app-text-muted);
+  font-size: var(--app-type-caption);
+  font-weight: 750;
+}
+
+.app-shell :is([class*='table-wrap'], [class*='table-wrapper'], [class*='table-container']) {
+  max-width: 100%;
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-visual-panel-radius);
+  overflow-x: auto;
+  overflow-y: hidden;
+  background: var(--app-surface);
+}
+
+.app-shell table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--app-text-primary);
+  font-size: var(--app-type-small);
+}
+
+.app-shell :is(th, td) {
+  padding: var(--app-visual-table-cell-padding);
+  border-bottom: 1px solid var(--app-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.app-shell th {
+  background: var(--app-table-header-bg);
+  color: var(--app-text-muted);
+  font-size: var(--app-type-caption);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.app-shell :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag']) {
+  border-radius: var(--app-radius-pill);
+  font-size: var(--app-type-caption);
+  line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .app-shell :is(
+      .cd-page-header,
+      [class$='-hero'],
+      [class*='-hero '],
+      [class$='-page-header'],
+      [class*='-page-header '],
+      .analytics-header,
+      .cost-header
+    ) {
+    padding: var(--app-card-padding-compact);
+  }
+
+  .app-shell :is(
+      button[class*='btn'],
+      a[class*='btn'],
+      button[class*='button'],
+      a[class*='button'],
+      button[class*='action'],
+      a[class*='action']
+    ):not([class*='icon']):not([class*='marker']):not([class*='toggle']) {
+    width: 100%;
+  }
+}

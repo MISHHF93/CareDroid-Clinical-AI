@@ -35,7 +35,8 @@
 
 .recommendations-hero h1,
 .recommendations-section h2,
-.recommendation-card h3 {
+.recommendation-card h3,
+.recommendation-card .cd-insight-card__title-group h3 {
   margin: 0;
   color: var(--text-primary);
 }
@@ -76,6 +77,7 @@
 .recommendations-stats span,
 .recommendations-controls label,
 .recommendation-card__header span,
+.recommendation-card .cd-insight-card__eyebrow,
 .recommendation-card__signals span {
   color: var(--text-secondary);
   font-size: var(--font-12, 12px);
@@ -85,9 +87,17 @@
 }
 
 .recommendations-profile strong,
+.recommendations-profile small,
 .recommendations-stats strong,
-.recommendation-card__header strong {
+.recommendation-card__header strong,
+.recommendation-card .cd-insight-card__meta {
   color: var(--text-primary);
+}
+
+.recommendations-profile small {
+  color: var(--text-secondary);
+  font-size: var(--font-12, 12px);
+  line-height: 1.35;
 }
 
 .recommendations-stats {
@@ -164,7 +174,8 @@
   padding: 16px;
 }
 
-.recommendation-card__header {
+.recommendation-card__header,
+.recommendation-card .cd-insight-card__header {
   display: flex;
   justify-content: space-between;
   gap: 8px;

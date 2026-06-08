@@ -498,86 +498,6 @@
   padding: 10px;
 }
 
-.nav-item--advanced {
-  min-height: var(--app-min-touch-target, 44px);
-  padding-left: 14px;
-  font-size: 13px;
-}
-
-.sidebar-advanced {
-  display: grid;
-  gap: 4px;
-}
-
-.sidebar-advanced-toggle {
-  width: 100%;
-  min-width: 0;
-  min-height: var(--app-min-touch-target, 44px);
-  padding: 7px 9px;
-  background: color-mix(in srgb, var(--sidebar-control-bg) 58%, transparent);
-  border: 1px solid var(--sidebar-control-border);
-  border-radius: 8px;
-  color: var(--sidebar-fg-muted);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-align: left;
-  line-height: 1.2;
-}
-
-.sidebar-advanced-toggle:hover,
-.sidebar-advanced-toggle--active {
-  background: var(--sidebar-item-hover-bg);
-  color: var(--sidebar-item-hover-fg);
-  border-color: var(--sidebar-item-hover-border);
-}
-
-.sidebar-advanced-toggle:focus-visible {
-  background: var(--sidebar-item-hover-bg);
-  color: var(--sidebar-item-hover-fg);
-  border-color: var(--sidebar-item-hover-border);
-  outline: 3px solid var(--sidebar-focus-ring);
-  outline-offset: 3px;
-}
-
-.sidebar-advanced-toggle--active {
-  outline: none;
-}
-
-.sidebar-advanced-toggle--active {
-  background: var(--sidebar-item-active-bg);
-  color: var(--sidebar-item-active-fg);
-  border-color: var(--sidebar-item-active-border);
-  font-weight: 600;
-}
-
-.sidebar-advanced-chevron {
-  margin-left: auto;
-  display: inline-flex;
-  color: var(--sidebar-fg-muted);
-}
-
-.sidebar-advanced-chevron svg {
-  transition: transform 0.2s;
-}
-
-.sidebar-advanced-links {
-  display: grid;
-  gap: 3px;
-  padding-left: 8px;
-  min-width: 0;
-}
-
-.sidebar-collapsed .sidebar-advanced-toggle {
-  justify-content: center;
-  padding: 10px;
-}
-
-.sidebar-collapsed .sidebar-advanced-links {
-  padding-left: 0;
-}
-
 /* Sections */
 .sidebar-section {
   display: flex;
@@ -927,54 +847,6 @@
   min-width: 0;
 }
 
-.footer-action {
-  width: 100%;
-  min-width: 0;
-  min-height: var(--app-min-touch-target, 44px);
-  padding: 7px;
-  background: var(--sidebar-action-surface);
-  border: 1px solid var(--sidebar-tool-border);
-  border-radius: 8px;
-  color: var(--sidebar-action-fg);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
-  position: relative;
-}
-
-.footer-action:hover {
-  background: var(--sidebar-action-hover-surface);
-  border-color: var(--sidebar-tool-border-hover);
-  color: var(--sidebar-action-hover-fg);
-}
-
-.footer-action:focus-visible {
-  outline: 2px solid var(--sidebar-focus-ring);
-  outline-offset: 2px;
-}
-
-.action-icon {
-  font-size: 18px;
-}
-
-.notification-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: var(--app-danger);
-  color: var(--sidebar-cta-fg);
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 18px;
-  text-align: center;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--app-danger) 45%, transparent);
-}
-
 .hipaa-badge {
   padding: 6px 8px;
   background: var(--sidebar-hipaa-bg);
@@ -996,13 +868,6 @@
   color: var(--sidebar-hipaa-fg);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
-
-.sidebar-build-info {
-  width: 100%;
-  border-color: var(--sidebar-divider);
-  background: color-mix(in srgb, var(--sidebar-surface-muted) 82%, transparent);
-  color: var(--sidebar-fg-muted);
 }
 
 .btn-signout {

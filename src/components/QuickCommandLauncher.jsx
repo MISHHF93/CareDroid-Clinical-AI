@@ -11,6 +11,10 @@ import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { getMountedCapabilityById } from '../data/mountedCapabilityGraph';
 import { CARE_WORKSPACES } from '../config/workspace.config';
 import { QUICK_COMMAND_DESTINATION_ITEMS } from '../config/navigation.config';
+import {
+  buildSearchFirstDiscoveryEntries,
+  searchDiscoveryText,
+} from '../data/searchFirstDiscovery';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getNavIcon, getToolIcon, getWorkspaceIcon } from '../navigation/iconRegistry';
@@ -18,7 +22,9 @@ import './QuickCommandLauncher.css';
 
 const MAX_RECENT_ITEMS = 5;
 const MAX_FAVORITE_ITEMS = 5;
-const MAX_DEFAULT_TOOL_ITEMS = 18;
+const MAX_DEFAULT_WORKSPACE_ITEMS = 4;
+const MAX_DEFAULT_DESTINATION_ITEMS = 6;
+const MAX_DEFAULT_TOOL_ITEMS = 10;
 
 function commandSearchText(entry) {
   return [
@@ -28,6 +34,7 @@ function commandSearchText(entry) {
     entry.category,
     entry.path,
     entry.shortcut,
+    entry.searchText,
     ...(entry.aliases || []),
   ]
     .filter(Boolean)
@@ -113,6 +120,27 @@ function makeToolEntry(tool) {
   };
 }
 
+function makeDiscoveryEntry(entry) {
+  const iconByKind = {
+    asset: CHROME_ICONS.artifacts,
+    workflow: CHROME_ICONS.clipboardList,
+    simulation: CHROME_ICONS.training,
+  };
+  return {
+    id: `discovery:${entry.id}`,
+    sourceId: entry.sourceId,
+    kind: entry.kind,
+    label: entry.title || entry.label,
+    description: entry.description,
+    category: `Discovery · ${entry.category}`,
+    path: entry.path,
+    icon: iconByKind[entry.kind] || CHROME_ICONS.search,
+    aliases: entry.aliases,
+    searchText: searchDiscoveryText(entry),
+    assistantPrompt: entry.assistantPrompt,
+  };
+}
+
 function uniqueEntriesById(entries) {
   const seen = new Set();
   return entries.filter((entry) => {
@@ -120,6 +148,14 @@ function uniqueEntriesById(entries) {
     seen.add(entry.id);
     return true;
   });
+}
+
+function navigationTargetFromPath(path = '') {
+  const [pathname, ...searchParts] = String(path).split('?');
+  return {
+    pathname,
+    search: searchParts.length ? `?${searchParts.join('?')}` : '',
+  };
 }
 
 function isPrimaryShellDuplicate(tool, navPathSet) {
@@ -135,6 +171,7 @@ export function buildQuickCommandEntries({
   workspaces = CARE_WORKSPACES,
   recentToolIds = [],
   favoriteToolIds = [],
+  discoveryEntries = buildSearchFirstDiscoveryEntries(),
 } = {}) {
   const workspaceEntries = uniqueEntriesById(workspaces.map(makeWorkspaceEntry));
   const navEntries = uniqueEntriesById(navItems.map(makeNavEntry));
@@ -166,8 +203,14 @@ export function buildQuickCommandEntries({
   const toolEntries = allToolEntries.filter(
     (entry) => !recentSourceIds.has(entry.sourceId) && !favoriteSourceIds.has(entry.sourceId)
   );
+  const searchableDiscoveryEntries = uniqueEntriesById(
+    discoveryEntries
+      .filter((entry) => ['asset', 'workflow', 'simulation'].includes(entry.kind))
+      .filter((entry) => !(entry.kind === 'asset' && toolById[entry.sourceId]))
+      .map(makeDiscoveryEntry)
+  );
 
-  return { workspaceEntries, navEntries, toolEntries, recentEntries, favoriteEntries };
+  return { workspaceEntries, navEntries, toolEntries, recentEntries, favoriteEntries, discoveryEntries: searchableDiscoveryEntries };
 }
 
 function Section({ title, children }) {
@@ -282,6 +325,13 @@ export default function QuickCommandLauncher({
         setActiveTool,
         recordToolAccess,
       });
+    } else if (['asset', 'workflow', 'simulation'].includes(entry.kind)) {
+      if (entry.path) {
+        navigate(navigationTargetFromPath(entry.path));
+      } else if (entry.assistantPrompt) {
+        addMessage(entry.assistantPrompt, 'user');
+        navigate({ pathname: '/assistant', search: '' });
+      }
     } else {
       if (entry.kind === 'workspace') {
         switchWorkspace(entry.sourceId);
@@ -308,22 +358,42 @@ export default function QuickCommandLauncher({
   const shortcutEntries = pickUnique(workspaceShortcutEntries.filter(matchesQuery));
   const workspaceEntries = pickUnique(entries.workspaceEntries.filter(matchesQuery));
   const navEntries = pickUnique(entries.navEntries.filter(matchesQuery));
+  const discoveryEntries = pickUnique(
+    entries.discoveryEntries
+      .filter(matchesQuery)
+      .slice(0, normalizedQuery ? entries.discoveryEntries.length : 8)
+  );
   const toolEntries = pickUnique(
     entries.toolEntries
       .filter(matchesQuery)
       .slice(0, normalizedQuery ? entries.toolEntries.length : MAX_DEFAULT_TOOL_ITEMS)
   );
+  const visibleWorkspaceEntries = normalizedQuery
+    ? workspaceEntries
+    : workspaceEntries.slice(0, MAX_DEFAULT_WORKSPACE_ITEMS);
+  const visibleNavEntries = normalizedQuery
+    ? navEntries
+    : navEntries.slice(0, MAX_DEFAULT_DESTINATION_ITEMS);
   const hasResults =
     recentEntries.length +
       favoriteEntries.length +
       shortcutEntries.length +
-      workspaceEntries.length +
-      navEntries.length +
+      visibleWorkspaceEntries.length +
+      visibleNavEntries.length +
+      discoveryEntries.length +
       toolEntries.length >
     0;
   const resultEntries = normalizedQuery
-    ? [...recentEntries, ...favoriteEntries, ...shortcutEntries, ...workspaceEntries, ...navEntries, ...toolEntries]
-    : [...recentEntries, ...favoriteEntries, ...shortcutEntries, ...workspaceEntries, ...navEntries, ...toolEntries];
+    ? [...recentEntries, ...favoriteEntries, ...shortcutEntries, ...workspaceEntries, ...navEntries, ...discoveryEntries, ...toolEntries]
+    : [
+        ...recentEntries,
+        ...favoriteEntries,
+        ...shortcutEntries,
+        ...visibleWorkspaceEntries,
+        ...visibleNavEntries,
+        ...discoveryEntries,
+        ...toolEntries,
+      ];
   const activeEntryId = resultEntries[activeIndex]?.id;
   const handleSearchKeyDown = (event) => {
     if (!resultEntries.length) return;
@@ -370,7 +440,7 @@ export default function QuickCommandLauncher({
           <span className="quick-command-search__icon" aria-hidden>
             <NavIcon icon={CHROME_ICONS.search} size={18} />
           </span>
-          <span className="sr-only">Search commands and tools across workspaces and routes</span>
+          <span className="sr-only">Search commands and tools across assets, workflows, simulations, workspaces, and routes</span>
           <input
             ref={inputRef}
             value={query}
@@ -379,7 +449,7 @@ export default function QuickCommandLauncher({
               setActiveIndex(0);
             }}
             onKeyDown={handleSearchKeyDown}
-            placeholder="Search workspaces, routes, calculators, tools..."
+            placeholder="Search assets, workflows, simulations, workspaces, routes, calculators, tools..."
           />
         </label>
 
@@ -431,20 +501,28 @@ export default function QuickCommandLauncher({
                 ))}
               </Section>
               <Section title="Workspaces">
-                {workspaceEntries.map((entry) => (
+                {visibleWorkspaceEntries.map((entry) => (
                   <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
                 ))}
               </Section>
-              <Section title="Destinations">
-                {navEntries.map((entry) => (
+              <Section title="Top Destinations">
+                {visibleNavEntries.map((entry) => (
                   <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
                 ))}
               </Section>
-              <Section title="Canonical Tools">
+              <Section title="Discovery">
+                {discoveryEntries.map((entry) => (
+                  <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
+                ))}
+              </Section>
+              <Section title="Suggested Tools">
                 {toolEntries.map((entry) => (
                   <CommandItem key={entry.id} entry={entry} onLaunch={launchEntry} active={entry.id === activeEntryId} />
                 ))}
               </Section>
+              <p className="quick-command-scope-note">
+                Search to reach all destinations, workspaces, assets, workflows, simulations, and tools.
+              </p>
             </>
           )}
         </div>

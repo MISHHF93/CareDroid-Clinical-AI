@@ -26,6 +26,10 @@ import './styles/mobile-first-layout.css';
 
 import './styles/mobile-performance.css';
 
+import './styles/visual-consistency.css';
+
+import './styles/mobile-first-recovery.css';
+
 import logger from './utils/logger';
 
 import { scheduleDeferredStartupTasks } from './utils/deferStartupTasks';

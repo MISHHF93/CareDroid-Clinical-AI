@@ -1,0 +1,226 @@
+/**
+ * Mobile-first recovery.
+ * Fixes legacy mobile clipping and nested scroll traps while preserving local
+ * scroll regions for drawers, sidebars, maps, tables, and chat.
+ */
+
+:root {
+  --app-mobile-action-reach-padding: max(88px, env(safe-area-inset-bottom, 0px));
+  --app-mobile-page-gutter: clamp(10px, 3.8vw, 16px);
+  --app-mobile-panel-gap: clamp(10px, 3vw, 14px);
+}
+
+@media (max-width: 900px) {
+  .app-shell-main-content {
+    overflow-x: clip;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scroll-padding-top: var(--app-compact-content-offset-top, var(--app-compact-chrome-height, 52px));
+    scroll-padding-bottom: max(
+      var(--app-mobile-action-reach-padding),
+      var(--app-keyboard-inset-bottom, 0px)
+    );
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-shell-page-body:not(.app-shell-page-body--conversation) {
+    min-height: auto;
+    overflow-x: clip;
+    overflow-y: visible;
+    overscroll-behavior: auto;
+    padding-bottom: max(
+      var(--app-mobile-action-reach-padding),
+      var(--app-keyboard-inset-bottom, 0px)
+    );
+  }
+
+  .app-shell-page-body:not(.app-shell-page-body--conversation) > * {
+    min-height: auto;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .sidebar {
+    width: min(100vw, var(--sidebar-drawer-max-width, 88vw));
+    height: var(--app-viewport-height, 100dvh);
+    max-height: var(--app-viewport-height, 100dvh);
+  }
+
+  .sidebar-content,
+  .drawer-body,
+  .quick-command-results {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .sidebar-content {
+    scroll-padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .drawer {
+    max-width: 100vw;
+    max-height: var(--app-viewport-height, 100dvh);
+  }
+
+  .drawer-body {
+    scroll-padding-bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  }
+
+  .drawer-footer {
+    padding-bottom: max(var(--space-4), env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (max-width: 768px) {
+  .app-shell :is(
+      .command-dashboard,
+      .tools-overview,
+      .tool-page,
+      .calculators-content,
+      .clinical-tool-catalog,
+      .lab-interpreter-content,
+      .diagnosis-tool-grid,
+      .analytics-dashboard,
+      .cost-analytics-dashboard,
+      .medical-iot-page,
+      .hospital-map-page,
+      .live-map-page,
+      .device-fleet-page,
+      .fleet-live-map-page,
+      .org-page,
+      [class$='-page'],
+      [class$='-dashboard']
+    ) {
+    padding-inline: var(--app-mobile-page-gutter);
+  }
+
+  .app-shell :is(
+      .dashboard-grid,
+      .analytics-grid,
+      .analytics-panel-grid,
+      .summary-grid,
+      .metrics-grid,
+      .tools-grid,
+      .tool-page-layout-grid,
+      .tool-page-layout-grid--fluid,
+      .calculator-selection,
+      .calc-input-grid,
+      .command-compact-action-grid,
+      .command-compressed-metrics,
+      [class*='card-grid'],
+      [class*='panel-grid'],
+      [class*='metric-grid']
+    ) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .app-shell :is(
+      .tool-header-actions,
+      .calc-actions,
+      .catalog-actions,
+      .drawer-actions,
+      .modal-actions,
+      .form-actions,
+      .settings-actions,
+      .profile-actions,
+      .marketplace-actions,
+      .recommendation-actions,
+      .artifacts-filter-row,
+      .platform-notification__actions,
+      [class$='-actions']
+    ) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--app-mobile-panel-gap);
+    max-width: 100%;
+  }
+
+  .app-shell :is(
+      .tool-header-actions,
+      .calc-actions,
+      .catalog-actions,
+      .drawer-actions,
+      .modal-actions,
+      .form-actions,
+      .settings-actions,
+      .profile-actions
+    )
+    > :is(button, a):not([class*='icon']):not([class*='marker']):not([class*='toggle']) {
+    flex: 1 1 min(100%, 180px);
+    min-height: var(--app-min-touch-target, 44px);
+  }
+
+  .app-shell :is(form, fieldset, [class*='form'], [class*='filters'], [class*='controls']) {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .app-shell :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
+    min-height: var(--app-min-touch-target, 44px);
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell :is(
+      .live-map-canvas,
+      .hospital-map-canvas,
+      .medical-iot-map-canvas,
+      .fleet-map-canvas,
+      .app-table-scroll-x,
+      .catalog-table-wrap,
+      .fleet-data-table-wrap,
+      .device-fleet-table-wrap,
+      .hospital-map-table-wrap,
+      .artifacts-table-wrap,
+      .lab-category-section
+    ) {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    touch-action: pan-x pan-y;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-shell :is(
+      .live-map-canvas,
+      .hospital-map-canvas,
+      .medical-iot-map-canvas,
+      .fleet-map-canvas
+    ) > * {
+    min-width: min(640px, calc(100vw - (2 * var(--app-mobile-page-gutter))));
+  }
+
+  .app-shell :is(
+      .app-table-scroll-x,
+      .catalog-table-wrap,
+      .fleet-data-table-wrap,
+      .device-fleet-table-wrap,
+      .hospital-map-table-wrap,
+      .artifacts-table-wrap,
+      .lab-category-section
+    )
+    :is(table, .catalog-table, .device-fleet-table, .artifacts-table, .org-lifecycle-table) {
+    min-width: max-content;
+  }
+
+  .app-shell :is(.drawer-actions, .modal-actions, .form-actions, .settings-actions, .profile-actions)
+    > :is(button, a):not([class*='icon']):not([class*='marker']):not([class*='toggle']) {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .app-shell :is(
+      .command-dashboard,
+      .tools-overview,
+      .tool-page,
+      .calculators-content,
+      .clinical-tool-catalog,
+      [class$='-page'],
+      [class$='-dashboard']
+    ) {
+    padding-inline: 10px;
+  }
+}

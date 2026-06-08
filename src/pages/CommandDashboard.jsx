@@ -8,19 +8,20 @@ import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useOrganizationContext } from '../contexts/OrganizationContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useNotifications } from '../contexts/NotificationContext';
-import ContextInsightCard from '../components/ContextInsightCard';
-import ProfileSummaryCard from '../components/profile/ProfileSummaryCard';
-import ProfileToolGraphCard from '../components/ProfileToolGraphCard';
-import { AdaptiveDashboardPanel } from './PlatformOSPages';
 import { getCommandDashboardModel } from '../data/commandDashboardModel';
 import {
-  CategoryBarChart,
-  DistributionDonutChart,
-  MetricCard,
+  buildWorkspaceAssistantPrompt,
+  getWorkspaceExperienceProfile,
+  normalizeWorkspaceShortcut,
+} from '../data/workspaceExperience';
+import { getFrontendOperatingSystemState } from '../data/frontendOperatingSystem';
+import {
   StatusCard,
-  TrendChart,
-  VisualizationPanel,
 } from '../components/dashboard/DashboardVisualizations';
+import {
+  InsightCard,
+  MetricCard as CompactMetricCard,
+} from '../components/ui/CareDroidPrimitives';
 import {
   getRegistryToolNavigation,
   applyRegistryToolLaunch,
@@ -84,12 +85,40 @@ function DashboardPanel({ title, description, icon, children, className = '' }) 
   );
 }
 
-function StatusItem({ label, value, tone = 'neutral' }) {
+function InsightChip({ label, value, tone = 'neutral' }) {
   return (
-    <div className={`command-status-item command-status-item--${tone}`}>
+    <div className={`command-insight-chip command-insight-chip--${tone}`}>
       <span>{label}</span>
       <strong>{value}</strong>
     </div>
+  );
+}
+
+function CompactActionCard({ item, onClick }) {
+  const content = (
+    <>
+      <span className="command-compact-action__icon" aria-hidden>
+        <NavIcon icon={item.icon} size={20} />
+      </span>
+      <span className="command-compact-action__body">
+        <strong>{item.label}</strong>
+        <span>{item.description}</span>
+      </span>
+    </>
+  );
+
+  if (onClick) {
+    return (
+      <button type="button" className="command-compact-action" onClick={onClick}>
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <Link className="command-compact-action" to={item.path}>
+      {content}
+    </Link>
   );
 }
 
@@ -121,6 +150,27 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     description: 'Open the focused calculator hub and severity scores.',
     path: CANONICAL_ROUTES.calculators,
     icon: CHROME_ICONS.calculator,
+  },
+  {
+    id: 'assets',
+    label: 'Assets',
+    description: 'Open the asset library directly from the dashboard.',
+    path: CANONICAL_ROUTES.assets,
+    icon: CHROME_ICONS.artifacts,
+  },
+  {
+    id: 'workflows',
+    label: 'Workflows',
+    description: 'Open workflow builder and journey automation without detouring through tools.',
+    path: CANONICAL_ROUTES.workflows,
+    icon: CHROME_ICONS.clipboardList,
+  },
+  {
+    id: 'results',
+    label: 'Results',
+    description: 'Review outcomes, signals, follow-up context, and recent workspace events.',
+    path: CANONICAL_ROUTES.timeline,
+    icon: CHROME_ICONS.clock,
   },
   {
     id: 'simulation',
@@ -222,18 +272,6 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
   },
 ]);
 
-function buildRecentUsageTrend(recentToolItems, messages) {
-  const assistantCount = messages.filter((message) => message.role === 'assistant').length;
-  const toolCount = recentToolItems.length;
-  return [
-    { label: 'Mon', value: Math.max(1, Math.round(toolCount / 2)) },
-    { label: 'Tue', value: Math.max(2, toolCount + 1) },
-    { label: 'Wed', value: Math.max(2, assistantCount) },
-    { label: 'Thu', value: Math.max(3, assistantCount + toolCount) },
-    { label: 'Now', value: Math.max(1, assistantCount + toolCount + 1) },
-  ];
-}
-
 function notificationTitle(notification) {
   return (
     notification.title ||
@@ -259,37 +297,16 @@ function isAlertNotification(notification) {
   return /alert|critical|high|urgent|warning/.test(text);
 }
 
-function isLaunchCardAllowed(card, platformContext) {
-  const decisions = platformContext?.assetAccessDecisions || {};
-  const aliases = {
-    fleet: ['fleet-map', 'fleet-live-map', 'live-tracking-map', 'fleet-command'],
-    tools: ['calculators', 'drug-check', 'lab-interp'],
-    workspace: [],
-    notifications: [],
-    activity: [],
-    'system-status': ['system-health', 'deployment-observability'],
-  };
-  const assetIds = aliases[card.id] || [card.id];
-  const matchedDecisions = assetIds.map((id) => decisions[id]).filter(Boolean);
-  if (!matchedDecisions.length) return true;
-  return matchedDecisions.some((decision) => decision.isLaunchable !== false);
-}
-
 export default function CommandDashboard() {
   const navigate = useNavigate();
   const [assistantPrompt, setAssistantPrompt] = useState('');
   const { user, isDevAuthBypass, hasPermission } = useUser();
   const {
     activeWorkspace,
-    activity,
-    aiPersonalization,
     platformContext,
     account,
     roleProfile,
     saasProfile,
-    enabledAssetPacks,
-    pinnedAssets,
-    recentAssets,
   } = useUserIdentity();
   const { branding, tenant, subscription } = useOrganizationContext();
   const {
@@ -297,9 +314,21 @@ export default function CommandDashboard() {
     recommendations: workspaceRecommendations,
     shortcuts: workspaceShortcuts,
     visibleAssetIds: workspaceVisibleAssetIds,
-    recommendedAIAgents,
-    recommendedAssetPacks,
   } = useWorkspace();
+  const workspaceExperience = useMemo(
+    () => getWorkspaceExperienceProfile(workspaceContextActive || activeWorkspace),
+    [activeWorkspace, workspaceContextActive]
+  );
+  const frontendOs = useMemo(
+    () =>
+      getFrontendOperatingSystemState({
+        pathname: CANONICAL_ROUTES.dashboard,
+        workspace: workspaceContextActive || activeWorkspace,
+        tenantId: tenant?.tenantId || 'personal',
+        plan: subscription?.tier || 'free',
+      }),
+    [activeWorkspace, subscription?.tier, tenant?.tenantId, workspaceContextActive]
+  );
   const safeSaasProfile = saasProfile || {
     role: user?.role || 'student',
     specialty: account?.specialty || 'general',
@@ -320,8 +349,8 @@ export default function CommandDashboard() {
         : platformContext,
     [platformContext, workspaceVisibleAssetIds]
   );
-  const { conversations, messages, addMessage, selectTool, setActiveTool } = useConversation();
-  const { favorites, recentTools, recordToolAccess } = useToolPreferences();
+  const { conversations, addMessage, selectTool, setActiveTool } = useConversation();
+  const { recentTools, recordToolAccess } = useToolPreferences();
   const { notifications = [] } = useNotifications();
   const systemConfig = useSystemConfig();
   const model = useMemo(
@@ -343,14 +372,6 @@ export default function CommandDashboard() {
         .slice(0, 4),
     [model.toolById, recentTools]
   );
-  const favoriteToolItems = useMemo(
-    () =>
-      favorites
-        .map((toolId) => model.toolById[toolId])
-        .filter(Boolean)
-        .slice(0, 4),
-    [favorites, model.toolById]
-  );
   const recommendedToolItems = useMemo(
     () =>
       model.recommendedAssets
@@ -359,31 +380,58 @@ export default function CommandDashboard() {
         .slice(0, 4),
     [model.recommendedAssets, model.toolById]
   );
-  const recentAssistantOutputs = useMemo(
-    () =>
-      messages
-        .filter((message) => message.role === 'assistant')
-        .slice(-3)
-        .reverse(),
-    [messages]
+  const dashboardLaunchCardsById = useMemo(
+    () => Object.fromEntries(DASHBOARD_LAUNCH_CARDS.map((card) => [card.id, card])),
+    []
   );
-  const recentUsageTrend = useMemo(
-    () => buildRecentUsageTrend(recentToolItems, messages),
-    [messages, recentToolItems]
+  const workspaceActionCards = useMemo(() => {
+    const selected = [
+      ...workspaceExperience.primaryActionIds
+        .map((id) => dashboardLaunchCardsById[id])
+        .filter(Boolean),
+      ...['assets', 'workflows', 'results', 'simulation', 'operations', 'tools', 'workspace']
+        .map((id) => dashboardLaunchCardsById[id])
+        .filter(Boolean),
+      ...workspaceExperience.routeEntries.map((route) => ({
+        id: `workspace-route-${route.id}`,
+        label: route.label,
+        description: route.description,
+        path: route.path,
+        icon: CHROME_ICONS.layoutDashboard,
+      })),
+      ...workspaceShortcuts
+        .map(normalizeWorkspaceShortcut)
+        .filter(Boolean)
+        .map((shortcut) => ({
+          id: `workspace-shortcut-${shortcut.id}`,
+          label: shortcut.label,
+          description: shortcut.description,
+          path: shortcut.path,
+          icon: CHROME_ICONS.layoutDashboard,
+        })),
+    ];
+    return [...new Map(selected.map((item) => [item.path || item.id, item])).values()].slice(0, 12);
+  }, [dashboardLaunchCardsById, workspaceExperience, workspaceShortcuts]);
+  const workspacePromptActions = useMemo(
+    () => [
+      ...workspaceExperience.quickPrompts.map((prompt, index) => ({
+        id: `workspace-prompt-${workspaceExperience.id}-${index}`,
+        title: prompt,
+        description: workspaceExperience.modeSummary,
+        prompt,
+      })),
+      ...model.prompts,
+    ].slice(0, 6),
+    [model.prompts, workspaceExperience]
   );
   const unreadNotifications = useMemo(
-    () => notifications.filter((notification) => !notification.read).slice(0, 4),
+    () => notifications.filter((notification) => !notification.read && !isAlertNotification(notification)).slice(0, 4),
     [notifications]
   );
   const activeAlerts = useMemo(
     () => notifications.filter(isAlertNotification).slice(0, 4),
     [notifications]
   );
-  const launchCards = useMemo(
-    () => DASHBOARD_LAUNCH_CARDS.filter((card) => isLaunchCardAllowed(card, workspaceAwarePlatformContext)),
-    [workspaceAwarePlatformContext]
-  );
-
   const launchTool = (tool) => {
     applyRegistryToolLaunch(tool.id, {
       navigate,
@@ -397,7 +445,7 @@ export default function CommandDashboard() {
   };
 
   const launchPrompt = (prompt) => {
-    addMessage(prompt, 'user');
+    addMessage(buildWorkspaceAssistantPrompt(prompt, workspaceExperience), 'user');
     navigate(CANONICAL_ROUTES.assistant);
   };
 
@@ -424,11 +472,11 @@ export default function CommandDashboard() {
   };
 
   return (
-    <section className="command-dashboard">
+    <section className="command-dashboard command-dashboard--compressed">
       <section className="command-hero" aria-labelledby="command-dashboard-title">
         <div className="command-hero__content">
           <p className="command-eyebrow">
-            {branding?.displayName || model.organization?.name || 'CareDroid'} tenant command center
+            {workspaceExperience.operatingLabel} · {branding?.displayName || model.organization?.name || 'CareDroid'}
           </p>
           <div className="command-hero__brand-row">
             {(branding?.dashboardLogoUrl || branding?.logoUrl) && (
@@ -440,270 +488,70 @@ export default function CommandDashboard() {
             )}
             <h1 id="command-dashboard-title">
               {branding?.dashboardTitle ||
-                `${branding?.displayName || model.organization?.name || 'CareDroid'} Command Center`}
+                workspaceExperience.dashboardTitle}
             </h1>
           </div>
           <p>
             {branding?.dashboardSubtitle ||
-              'Spend the day from one clinical operating center: ask AI, open tools and calculators, review alerts, check workspace context, and launch major modules without browsing the sidebar.'}{' '}
-            Active tenant: {tenant?.tenantId || model.organization?.slug || 'personal'} · workspace:{' '}
-            {workspaceContextActive?.name || activeWorkspace?.name || safeSaasProfile.defaultWorkspace || 'Emergency'} · role:{' '}
+              workspaceExperience.dashboardSubtitle}{' '}
+            Tenant: {tenant?.tenantId || model.organization?.slug || 'personal'} · workspace:{' '}
+            {workspaceExperience.label || workspaceContextActive?.name || activeWorkspace?.name || safeSaasProfile.defaultWorkspace || 'Emergency'} · role:{' '}
             {safeSaasProfile.role}.
           </p>
-        </div>
-        <div className="command-hero__stats" aria-label="Dashboard inventory summary">
-          <div>
-            <strong>{model.organization?.name || safeSaasProfile.organizationType}</strong>
-            <span>Organization</span>
-          </div>
-          <div>
-            <strong>{subscription?.tier || 'free'}</strong>
-            <span>Subscription</span>
-          </div>
-          <div>
-            <strong>{workspaceRecommendations.length || model.recommendedAssets.length}</strong>
-            <span>Workspace recs</span>
-          </div>
-          <div>
-            <strong>{enabledAssetPacks?.length || recommendedAssetPacks?.length || 0}</strong>
-            <span>Asset packs</span>
-          </div>
-          <div>
-            <strong>{pinnedAssets?.length || 0}</strong>
-            <span>Pinned assets</span>
-          </div>
-          <div>
-            <strong>{recentAssets?.length || recentToolItems.length}</strong>
-            <span>Recent assets</span>
-          </div>
-        </div>
-      </section>
-
-      <section className="command-dashboard__grid" aria-label="Personalized workspace summary">
-        <ProfileSummaryCard compact />
-        <DashboardPanel
-          title="My Workspace"
-          description={`Context-aware suggestions for ${activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'your workspace'}.`}
-          icon={CHROME_ICONS.sparkles}
-        >
-          <div className="command-prompt-grid">
-            {(aiPersonalization?.recommendedWorkflows || []).slice(0, 3).map((workflow) => (
-              <button
-                key={workflow.id || workflow.title}
-                type="button"
-                className="command-prompt-chip"
-                onClick={() =>
-                  workflow.toolId && model.toolById[workflow.toolId]
-                    ? launchTool(model.toolById[workflow.toolId])
-                    : null
-                }
-              >
-                <strong>{workflow.title}</strong>
-                <span>{workflow.reason}</span>
-              </button>
+          <div className="command-os-flow" aria-label="Frontend operating system flow">
+            {frontendOs.flowSteps.map((step) => (
+              <span key={step.id} className={`command-os-flow__step command-os-flow__step--${step.state}`}>
+                {step.label}
+              </span>
             ))}
           </div>
-          <p className="command-assistant-help">
-            Recent safe activity: {(activity?.recentTools || []).length} tools,{' '}
-            {(activity?.recentAiChats || []).length} AI chats.
-          </p>
-          <div className="command-insight-grid" aria-label="Workspace context insights">
-            <ContextInsightCard
-              title="Workspace profile"
-              message={`${safeSaasProfile.role} · ${safeSaasProfile.specialty || 'general'} · ${
-                safeSaasProfile.department || 'unassigned department'
-              }`}
-              source="Profile context"
-              status="generated"
-              actionLabel="Tune profile"
-              actionRoute={CANONICAL_ROUTES.profileSettings}
-            />
-            <ContextInsightCard
-              title="Suggested next action"
-              message={
-                recommendedToolItems[0]
-                  ? `Open ${recommendedToolItems[0].name} for this workspace.`
-                  : 'Use Assistant once to generate workspace recommendations.'
-              }
-              source={recommendedToolItems[0] ? 'Workspace inventory' : 'Empty recommendation state'}
-              status={recommendedToolItems[0] ? 'action-required' : 'empty'}
-              actionLabel={recommendedToolItems[0] ? `Open ${recommendedToolItems[0].name}` : 'Open Assistant'}
-              actionRoute={recommendedToolItems[0]?.path || CANONICAL_ROUTES.assistant}
-            />
-            <ContextInsightCard
-              title="Enabled packs"
-              message={
-                (enabledAssetPacks?.length ? enabledAssetPacks : recommendedAssetPacks || [])
-                  .slice(0, 3)
-                  .join(', ') || 'No organization asset packs are visible in this local context.'
-              }
-              source={enabledAssetPacks?.length ? 'Organization entitlements' : 'Workspace profile'}
-              status={enabledAssetPacks?.length ? 'live' : 'demo'}
-              demo={!enabledAssetPacks?.length}
-              actionLabel="Open tools"
-              actionRoute={CANONICAL_ROUTES.tools}
-            />
-            <ContextInsightCard
-              title="Assistant context"
-              message={(recommendedAIAgents?.length ? recommendedAIAgents : [model.defaultAiAgentId])
-                .slice(0, 2)
-                .join(', ')}
-              source="AI context"
-              status={recommendedAIAgents?.length ? 'generated' : 'demo'}
-              demo={!recommendedAIAgents?.length}
-              actionLabel="Ask Assistant"
-              actionRoute={CANONICAL_ROUTES.assistant}
-            />
-          </div>
-          <div className="command-status-actions">
-            <Link className="command-secondary-action" to="/workspaces">
-              Open workspace
-            </Link>
-            <Link className="command-secondary-action" to={CANONICAL_ROUTES.profileToolPreferences}>
-              Tune my toolkit
-            </Link>
-          </div>
-        </DashboardPanel>
+        </div>
+        <div className="command-insight-strip" aria-label="Dashboard context summary">
+          <InsightChip label="Mode" value={workspaceExperience.shortLabel} tone="good" />
+          <InsightChip label="Plan" value={subscription?.tier || 'free'} />
+          <InsightChip label="Recommendations" value={workspaceRecommendations.length || model.recommendedAssets.length} tone="good" />
+          <InsightChip label="Alerts" value={activeAlerts.length} tone={activeAlerts.length ? 'warning' : 'good'} />
+        </div>
       </section>
 
-      <AdaptiveDashboardPanel />
-
-      <ProfileToolGraphCard />
-
       <DashboardPanel
-        title="Quick Actions"
-        description={`Workspace shortcuts for ${workspaceContextActive?.name || 'the active workspace'}.`}
+        title="Actions"
+        description="Primary routes and workspace shortcuts, compressed into one launch row."
         icon={CHROME_ICONS.layoutDashboard}
       >
-        <div className="command-launch-grid">
-          {workspaceShortcuts.map((shortcut) => (
-            <Link key={`workspace-${shortcut.id}`} className="command-launch-card" to={shortcut.path}>
-              <span className="command-launch-card__icon" aria-hidden>
-                <NavIcon icon={CHROME_ICONS.layoutDashboard} size={21} />
-              </span>
-              <span className="command-launch-card__body">
-                <strong>{shortcut.label}</strong>
-                <span>{shortcut.description}</span>
-              </span>
-            </Link>
-          ))}
-          {launchCards.map((card) => (
-            <Link key={card.id} className="command-launch-card" to={card.path}>
-              <span className="command-launch-card__icon" aria-hidden>
-                <NavIcon icon={card.icon} size={21} />
-              </span>
-              <span className="command-launch-card__body">
-                <strong>{card.label}</strong>
-                <span>{card.description}</span>
-              </span>
-            </Link>
-          ))}
-        </div>
-      </DashboardPanel>
-
-      <section className="command-dashboard__grid" aria-label="Command Center updates">
-        <DashboardPanel
-          title="Notifications"
-          description="Unread updates stay visible in the Command Center before users visit notification settings."
-          icon={CHROME_ICONS.bell}
-        >
-          <div className="command-recent-list">
-            {unreadNotifications.length > 0 ? (
-              unreadNotifications.map((notification) => (
-                <Link
-                  key={notification.id || notificationTitle(notification)}
-                  className="command-recent-item"
-                  to={CANONICAL_ROUTES.notifications}
-                >
-                  <strong>{notificationTitle(notification)}</strong>
-                  <span>{notificationBody(notification)}</span>
-                </Link>
-              ))
-            ) : (
-              <p className="command-empty-state">
-                No unread notifications. Notification preferences and history remain one click away.
-              </p>
-            )}
-          </div>
-          <Link className="command-panel-link" to={CANONICAL_ROUTES.notifications}>
-            Open Notifications
-          </Link>
-        </DashboardPanel>
-
-        <DashboardPanel
-          title="Active Alerts"
-          description="Critical clinical and operations alerts are summarized here before deeper alert workflows."
-          icon={CHROME_ICONS.alert}
-        >
-          <div className="command-recent-list">
-            {activeAlerts.length > 0 ? (
-              activeAlerts.map((alert) => (
-                <Link
-                  key={alert.id || notificationTitle(alert)}
-                  className="command-recent-item command-recent-item--alert"
-                  to="/clinical/alerts"
-                >
-                  <strong>{notificationTitle(alert)}</strong>
-                  <span>{notificationBody(alert)}</span>
-                </Link>
-              ))
-            ) : (
-              <p className="command-empty-state">
-                No active alerts in this session. Use the alerts route or Digital Twin for deeper
-                operational review.
-              </p>
-            )}
-          </div>
-          <div className="command-status-actions">
-            <Link className="command-secondary-action" to="/clinical/alerts">
-              Open Active Alerts
-            </Link>
-            <Link className="command-secondary-action" to={CANONICAL_ROUTES.digitalTwin}>
-              Open Digital Twin
-            </Link>
-          </div>
-        </DashboardPanel>
-      </section>
-
-      <DashboardPanel
-        title="Simulation, Lab, and 3D"
-        description="Newly wired demo-ready clinical training, laboratory, and visualization surfaces."
-        icon={CHROME_ICONS.sparkles}
-      >
-        <div className="command-launch-grid">
-          {model.panels.expandedCare.map((tool) => (
-            <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
+        <div className="command-compact-action-grid">
+          {workspaceActionCards.map((item) => (
+            <CompactActionCard key={item.id} item={item} />
           ))}
         </div>
       </DashboardPanel>
 
       <DashboardPanel
         title="AI Assistant"
-        description="Start with the chatbot, then let canonical launch behavior route tools and calculators."
+        description="Ask once, then continue in the focused Assistant workspace."
         icon={CHROME_ICONS.bot}
         className="command-panel--assistant"
       >
         <form className="command-assistant-form" onSubmit={handleSubmit}>
-          <label htmlFor="command-assistant-prompt">Ask CareDroid what you need to do next</label>
+          <label htmlFor="command-assistant-prompt">Ask {workspaceExperience.assistantTitle} what you need to do next</label>
           <div className="command-assistant-input-row">
             <textarea
               id="command-assistant-prompt"
               value={assistantPrompt}
               onChange={(event) => setAssistantPrompt(event.target.value)}
-              placeholder="Ask anything clinical, then continue in the Assistant workspace..."
+              placeholder={workspaceExperience.assistantPlaceholder}
               rows={3}
             />
             <button type="submit" className="command-primary-action">
-              Open Assistant Workspace
+              Open {workspaceExperience.assistantTitle}
             </button>
           </div>
           <p className="command-assistant-help">
-            Free-text questions seed the active conversation and continue in the focused assistant
-            route.
+            {workspaceExperience.modeSummary} Free-text questions continue in the focused assistant route.
           </p>
         </form>
-        <div className="command-prompt-grid" aria-label="Suggested CareDroid prompts">
-          {model.prompts.map((action) => (
+        <div className="command-prompt-grid command-prompt-grid--compressed" aria-label="Suggested CareDroid prompts">
+          {workspacePromptActions.map((action) => (
             <button
               key={action.id}
               type="button"
@@ -719,11 +567,11 @@ export default function CommandDashboard() {
 
       <section
         className="command-dashboard__grid"
-        aria-label="Command Center personalized toolkits"
+        aria-label="Compressed recommendations and status"
       >
         <DashboardPanel
-          title="Recommended for Me"
-          description="Profile, workspace, and role-aware suggestions from the unified asset inventory."
+          title="Recommendations"
+          description="Role and workspace-aware tools, reduced to the next best actions."
           icon={CHROME_ICONS.sparkles}
         >
           <div className="command-tool-grid">
@@ -743,199 +591,43 @@ export default function CommandDashboard() {
         </DashboardPanel>
 
         <DashboardPanel
-          title="Favorite Tools"
-          description="Pinned and favorite tools stay close to the command center without creating duplicate navigation."
-          icon={CHROME_ICONS.star}
-        >
-          <div className="command-tool-grid">
-            {favoriteToolItems.length > 0 ? (
-              favoriteToolItems.map((tool) => (
-                <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
-              ))
-            ) : (
-              <p className="command-empty-state">
-                No favorite tools yet. Favorite or pin tools from the Tools library.
-              </p>
-            )}
-          </div>
-          <Link className="command-panel-link" to={`${CANONICAL_ROUTES.tools}?filter=favorites`}>
-            Open Favorite Tools
-          </Link>
-        </DashboardPanel>
-
-        <DashboardPanel
-          title="My Tools"
-          description="High-value clinical, reference, and workflow tools surfaced from the unified inventory."
-          icon={CHROME_ICONS.tools}
-        >
-          <div className="command-tool-grid">
-            {[...model.panels.clinicalTools, ...model.panels.referenceGuidelines]
-              .filter(
-                (tool) => tool.category !== 'Calculator' && tool.surface !== 'calculator-form'
-              )
-              .slice(0, 8)
-              .map((tool) => (
-                <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
-              ))}
-          </div>
-          <Link className="command-panel-link" to={`${CANONICAL_ROUTES.tools}?filter=all`}>
-            Open All Medical Tools
-          </Link>
-        </DashboardPanel>
-
-        <DashboardPanel
-          title="My Calculators"
-          description="Common scores and calculator routes stay one click away from the Command Center."
-          icon={CHROME_ICONS.calculator}
-        >
-          <div className="command-tool-grid">
-            {model.panels.calculators.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
-            ))}
-          </div>
-          <Link className="command-panel-link" to={CANONICAL_ROUTES.calculators}>
-            Open All Calculators
-          </Link>
-        </DashboardPanel>
-      </section>
-
-      <DashboardPanel
-        title="Command Analytics"
-        description="Inventory-derived command center metrics, launch modes, readiness, and recent session activity."
-        icon={CHROME_ICONS.barChart}
-      >
-        <div className="dashboard-metric-grid command-analytics-metrics">
-          <MetricCard
-            label="Total tools"
-            value={model.stats.totalTools}
-            hint="Unified inventory"
-            tone="good"
-          />
-          <MetricCard
-            label="Calculators"
-            value={model.stats.calculators}
-            hint="Dedicated and assisted scores"
-          />
-          <MetricCard
-            label="AI tools"
-            value={model.stats.aiTools}
-            hint="Backend or assistant-guided"
-          />
-          <MetricCard
-            label="Backend-backed"
-            value={model.stats.backendBacked}
-            hint="Executor/platform routes"
-          />
-          <MetricCard
-            label="Planned"
-            value={model.stats.unsupported}
-            hint="Unsupported or roadmap state"
-            tone={model.stats.unsupported > 0 ? 'warning' : 'good'}
-          />
-        </div>
-
-        <div className="dashboard-visual-grid command-analytics-grid">
-          <VisualizationPanel
-            title="Tool Category Distribution"
-            description="One count per canonical user-facing tool."
-          >
-            <CategoryBarChart
-              data={model.visualizations.categoryDistribution}
-              title="Tool category distribution"
-            />
-          </VisualizationPanel>
-          <VisualizationPanel
-            title="Launch Type Distribution"
-            description="How dashboard cards resolve at launch."
-          >
-            <DistributionDonutChart
-              data={model.visualizations.launchTypeDistribution}
-              title="Launch type distribution"
-            />
-          </VisualizationPanel>
-          <VisualizationPanel
-            title="Clinical Tier Distribution"
-            description="Tier A/B/C, fleet, IoT, and hub readiness."
-          >
-            <DistributionDonutChart
-              data={model.visualizations.tierDistribution}
-              title="Clinical tier distribution"
-            />
-          </VisualizationPanel>
-          <VisualizationPanel
-            title="Recent Activity Trend"
-            description="Session-derived activity trend, not a persisted audit log."
-            badge="Session data"
-          >
-            <TrendChart data={recentUsageTrend} title="Recent activity trend" />
-          </VisualizationPanel>
-        </div>
-      </DashboardPanel>
-
-      <div className="command-dashboard__grid">
-        <DashboardPanel
-          title="Clinical Tools Detail"
-          description="Calculators, diagnostics, emergency, and inpatient decision-support tools."
-          icon={CHROME_ICONS.calculator}
-        >
-          <div className="command-tool-grid">
-            {model.panels.clinicalTools.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
-            ))}
-          </div>
-        </DashboardPanel>
-
-        <DashboardPanel
-          title="Reference & Guidelines Detail"
-          description="Evidence retrieval, medication safety, labs, protocols, and procedure support."
-          icon={CHROME_ICONS.clipboardList}
-        >
-          <div className="command-tool-grid">
-            {model.panels.referenceGuidelines.map((tool) => (
-              <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
-            ))}
-          </div>
-        </DashboardPanel>
-
-        <DashboardPanel
-          title="Operations Summary"
-          description="Fleet, live maps, IoT, devices, telemetry, and maintenance stay grouped under Operations."
-          icon={CHROME_ICONS.truck}
-        >
-          <div className="command-tool-grid">
-            {[...model.panels.fleetOperations, ...model.panels.medicalIot].map((tool) => (
-              <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
-            ))}
-          </div>
-          <Link className="command-panel-link" to={CANONICAL_ROUTES.operations}>
-            Open Operations
-          </Link>
-        </DashboardPanel>
-
-        <DashboardPanel
-          title="Recent Activity"
-          description="Continue recent tools and assistant context from this session."
+          title="Signals"
+          description="Alerts, notifications, and recent activity in one compact feed."
           icon={CHROME_ICONS.clock}
         >
           <div className="command-recent-list">
-            {recentToolItems.length > 0 ? (
-              recentToolItems.map((tool) => (
-                <button
-                  key={tool.id}
-                  type="button"
-                  className="command-recent-item"
-                  onClick={() => launchTool(tool)}
-                >
-                  <strong>{tool.name}</strong>
-                  <span>{tool.category} - open again</span>
-                </button>
-              ))
-            ) : (
-              <p className="command-empty-state">
-                No recent tools yet. Start with Assistant or open a featured action.
-              </p>
-            )}
-            {conversations.slice(0, 3).map((conversation) => (
+            {activeAlerts.slice(0, 2).map((alert) => (
+              <Link
+                key={alert.id || notificationTitle(alert)}
+                className="command-recent-item command-recent-item--alert"
+                to="/clinical/alerts"
+              >
+                <strong>{notificationTitle(alert)}</strong>
+                <span>{notificationBody(alert)}</span>
+              </Link>
+            ))}
+            {unreadNotifications.slice(0, 2).map((notification) => (
+              <Link
+                key={notification.id || notificationTitle(notification)}
+                className="command-recent-item"
+                to={CANONICAL_ROUTES.notifications}
+              >
+                <strong>{notificationTitle(notification)}</strong>
+                <span>{notificationBody(notification)}</span>
+              </Link>
+            ))}
+            {recentToolItems.slice(0, 2).map((tool) => (
+              <button
+                key={tool.id}
+                type="button"
+                className="command-recent-item"
+                onClick={() => launchTool(tool)}
+              >
+                <strong>{tool.name}</strong>
+                <span>{tool.category} - open again</span>
+              </button>
+            ))}
+            {conversations.slice(0, 1).map((conversation) => (
               <button
                 key={conversation.id}
                 type="button"
@@ -946,69 +638,46 @@ export default function CommandDashboard() {
                 <span>Continue in Assistant</span>
               </button>
             ))}
-            {recentAssistantOutputs.map((message) => (
-              <button
-                key={message.id}
-                type="button"
-                className="command-recent-item"
-                onClick={() => navigate(CANONICAL_ROUTES.assistant)}
-              >
-                <strong>Recent AI output</strong>
-                <span>{String(message.content || '').slice(0, 90)}</span>
-              </button>
-            ))}
+            {!activeAlerts.length && !unreadNotifications.length && !recentToolItems.length && !conversations.length ? (
+              <p className="command-empty-state">No live signals yet. Start with Assistant or open an action.</p>
+            ) : null}
+          </div>
+          <div className="command-status-actions command-status-actions--row">
+            <Link className="command-secondary-action" to={CANONICAL_ROUTES.notifications}>
+              Notifications
+            </Link>
+            <Link className="command-secondary-action" to="/clinical/alerts">
+              Alerts
+            </Link>
           </div>
         </DashboardPanel>
 
         <DashboardPanel
-          title="System Status"
-          description="Backend-aware state without blocking local calculators or fleet pages."
+          title="Status"
+          description="System and inventory state as compact cards."
           icon={CHROME_ICONS.shield}
         >
-          <div className="command-status-grid" role="status">
-            <StatusItem
-              label="Session"
-              value={isDevAuthBypass ? 'Demo mode' : user?.role || 'Authenticated'}
-              tone={isDevAuthBypass ? 'warning' : 'good'}
-            />
-            <StatusItem
-              label="Backend config"
-              value={
-                systemConfig.loading
-                  ? 'Checking'
-                  : systemConfig.configDegraded
-                    ? 'Degraded'
-                    : 'Connected'
-              }
+          <div className="command-compressed-metrics" role="status">
+            <CompactMetricCard label="Tools" value={model.stats.totalTools} helper="Inventory" tone="good" />
+            <CompactMetricCard label="AI tools" value={model.stats.aiTools} helper="Assistant/backed" />
+            <CompactMetricCard
+              label="Backend"
+              value={systemConfig.configDegraded ? 'Degraded' : 'Ready'}
+              helper={systemConfig.loading ? 'Checking' : 'Config'}
               tone={systemConfig.configDegraded ? 'warning' : 'good'}
             />
-            <StatusItem
-              label="RAG"
-              value={systemConfig.isRagEnabled ? 'Enabled' : 'Unavailable'}
-              tone={systemConfig.isRagEnabled ? 'good' : 'neutral'}
-            />
-            <StatusItem label="Unsupported tools" value={model.stats.unsupported} tone="neutral" />
-            <StatusItem
-              label="API tools"
-              value={
-                Array.isArray(systemConfig.availableTools) ? systemConfig.availableTools.length : 0
-              }
-              tone="neutral"
+            <CompactMetricCard
+              label="Planned"
+              value={model.stats.unsupported}
+              helper="Roadmap"
+              tone={model.stats.unsupported > 0 ? 'warning' : 'good'}
             />
           </div>
-          <div className="dashboard-status-grid-visual command-system-status-cards">
+          <div className="command-status-card-row">
             <StatusCard
-              label="API status"
-              value={
-                systemConfig.loading
-                  ? 'Checking'
-                  : systemConfig.configDegraded
-                    ? 'Degraded'
-                    : 'Ready'
-              }
-              detail={
-                systemConfig.error || 'Dashboard remains usable while local tools stay available.'
-              }
+              label="Session"
+              value={isDevAuthBypass ? 'Demo' : user?.role || 'Authenticated'}
+              detail={systemConfig.error || 'Local tools remain available.'}
               tone={systemConfig.configDegraded || systemConfig.error ? 'warning' : 'good'}
             />
             <StatusCard
@@ -1018,17 +687,8 @@ export default function CommandDashboard() {
               tone={model.stats.unsupported > 0 ? 'warning' : 'good'}
             />
           </div>
-          <VisualizationPanel
-            title="Tool Readiness Distribution"
-            description="Backend, local, assistant-guided, and planned tool states."
-          >
-            <DistributionDonutChart
-              data={model.visualizations.readinessDistribution}
-              title="Tool readiness distribution"
-            />
-          </VisualizationPanel>
           {systemConfig.error ? <p className="command-status-note">{systemConfig.error}</p> : null}
-          <div className="command-status-actions">
+          <div className="command-status-actions command-status-actions--row">
             <button
               type="button"
               className="command-secondary-action"
@@ -1041,12 +701,12 @@ export default function CommandDashboard() {
             </Link>
             {canViewDeveloperCatalog ? (
               <Link className="command-secondary-action" to={CANONICAL_ROUTES.developerCatalog}>
-                Developer audit
+                Audit
               </Link>
             ) : null}
           </div>
         </DashboardPanel>
-      </div>
+      </section>
     </section>
   );
 }

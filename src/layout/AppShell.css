@@ -252,6 +252,47 @@
   pointer-events: auto;
 }
 
+.app-shell-os-strip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  max-width: min(520px, 42vw);
+  padding: 7px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--compact-card-radius, var(--radius-md));
+  background: var(--app-surface-glass);
+  -webkit-backdrop-filter: blur(var(--app-blur-glass, 18px));
+  backdrop-filter: blur(var(--app-blur-glass, 18px));
+  color: var(--app-fg-muted);
+  box-shadow: var(--shadow-1);
+  pointer-events: none;
+}
+
+.app-shell-os-strip strong,
+.app-shell-os-strip span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell-os-strip strong {
+  color: var(--text-primary);
+  font-size: var(--font-12);
+  font-weight: 850;
+  letter-spacing: 0.02em;
+}
+
+.app-shell-os-strip span {
+  font-size: var(--font-12);
+  font-weight: 700;
+}
+
+.app-shell-os-strip__stage {
+  color: var(--app-accent-interactive);
+}
+
 .app-shell--compact .app-shell-workspace-bar {
   justify-content: center;
   min-height: var(--app-shell-compact-header-height, 56px);
@@ -273,8 +314,7 @@
   box-shadow: var(--shadow-1);
 }
 
-.app-shell-header-command,
-.app-shell-header-action {
+.app-shell-header-command {
   min-height: 36px;
   border: 1px solid transparent;
   border-radius: var(--radius-md);
@@ -284,9 +324,7 @@
 }
 
 .app-shell-header-command:hover,
-.app-shell-header-command:focus-visible,
-.app-shell-header-action:hover,
-.app-shell-header-action:focus-visible {
+.app-shell-header-command:focus-visible {
   border-color: var(--app-accent-interactive);
   background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
   outline: none;
@@ -310,14 +348,6 @@
   font: inherit;
   font-size: 10px;
   font-weight: 850;
-}
-
-.app-shell-header-action {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  padding: 0;
 }
 
 /* MainContent is the primary vertical scrollport for tool/fleet/settings pages. */

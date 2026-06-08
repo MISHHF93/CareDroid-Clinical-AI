@@ -19,6 +19,19 @@
   margin: 0;
 }
 
+.commercial-header .cd-page-header__description {
+  color: var(--muted-text);
+  font-size: 14px;
+  margin: 0;
+}
+
+.commercial-header .cd-page-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
 .commercial-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));

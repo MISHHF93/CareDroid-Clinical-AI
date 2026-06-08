@@ -29,6 +29,17 @@ vi.mock('../hooks/useNotificationActions', () => ({
   useNotificationActions: () => ({ error: vi.fn(), success: vi.fn(), info: vi.fn() }),
 }));
 
+vi.mock('../contexts/WorkspaceContext', () => ({
+  useWorkspace: () => ({
+    activeWorkspaceId: 'medical-iot',
+    activeWorkspace: { id: 'medical-iot', name: 'Medical IoT' },
+    assistantContext: 'Interpret device telemetry and stale data carefully.',
+    visibleAssetIds: ['medical-iot-dashboard'],
+    recommendedAIAgents: ['device-telemetry-agent'],
+    recommendedAssetPacks: ['medical-iot-pack'],
+  }),
+}));
+
 describe('ChatInterface NLU integration', () => {
   const onAppendMessage = vi.fn();
 
@@ -68,7 +79,12 @@ describe('ChatInterface NLU integration', () => {
 
     expect(sendClinicalChatMessage.mock.calls[0][0]).toMatchObject({
       conversationId: 'conv-1',
+      workspaceContext: expect.objectContaining({
+        activeWorkspaceId: 'medical-iot',
+        operatingLabel: 'Medical IoT OS',
+      }),
     });
+    expect(screen.getAllByText(/medical iot os/i).length).toBeGreaterThan(0);
     expect(onAppendMessage).toHaveBeenCalled();
   });
 

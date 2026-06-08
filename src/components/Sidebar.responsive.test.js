@@ -94,9 +94,9 @@ describe('Sidebar responsive — active routes and keyboard', () => {
     expect(sidebarJsx).toMatch(/\.nav-item\.active/);
   });
 
-  it('advanced section uses a native button and keeps developer links collapsed', () => {
-    expect(sidebarJsx).toContain('sidebar-advanced-toggle');
-    expect(sidebarJsx).toContain('ADVANCED_SIDEBAR_NAV_ITEMS');
-    expect(sidebarJsx).toContain('aria-expanded={showAdvanced}');
+  it('does not render a persistent advanced navigation section', () => {
+    expect(sidebarJsx).not.toContain('sidebar-advanced-toggle');
+    expect(sidebarJsx).not.toContain('ADVANCED_SIDEBAR_NAV_ITEMS');
+    expect(sidebarJsx).not.toContain('aria-expanded={showAdvanced}');
   });
 });

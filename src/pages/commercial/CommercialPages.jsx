@@ -2,6 +2,12 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Card from '../../components/ui/card';
 import Button from '../../components/ui/button';
+import {
+  BadgeList,
+  InsightCard,
+  MetricCard,
+  PageShell as CanonicalPageShell,
+} from '../../components/ui/CareDroidPrimitives';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
@@ -99,28 +105,21 @@ const SOLUTION_AGENT_OPTIONS = [
 
 function PageShell({ title, subtitle, children, actions }) {
   return (
-    <div className="commercial-page">
-      <header className="commercial-header">
-        <h1>{title}</h1>
-        {subtitle && <p className="commercial-subtitle">{subtitle}</p>}
-        {actions && <div className="commercial-actions">{actions}</div>}
-      </header>
+    <CanonicalPageShell
+      as="div"
+      className="commercial-page"
+      headerClassName="commercial-header"
+      title={title}
+      description={subtitle}
+      actions={actions}
+    >
       {children}
-    </div>
+    </CanonicalPageShell>
   );
 }
 
 function ChipList({ items = [] }) {
-  if (!items?.length) return null;
-  return (
-    <div className="commercial-chip-list">
-      {items.map((item) => (
-        <span key={item} className="commercial-chip">
-          {item}
-        </span>
-      ))}
-    </div>
-  );
+  return <BadgeList items={items} className="commercial-chip-list" itemClassName="commercial-chip" />;
 }
 
 function assetAccessCopy(asset) {
@@ -170,25 +169,19 @@ function parseConfigJson(value, label, fallback) {
 }
 
 function BuilderMetric({ label, value }) {
-  return (
-    <Card className="commercial-card">
-      <span className="commercial-muted">{label}</span>
-      <div className="commercial-metric-value">{value}</div>
-    </Card>
-  );
+  return <MetricCard label={label} value={value} className="commercial-card" />;
 }
 
 function ProductizationList({ title, items = [] }) {
   if (!items?.length) return null;
   return (
-    <Card className="commercial-card">
-      <h2>{title}</h2>
+    <InsightCard title={title} className="commercial-card">
       <ul className="commercial-compact-list">
         {items.map((item) => (
           <li key={item}>{item}</li>
         ))}
       </ul>
-    </Card>
+    </InsightCard>
   );
 }
 

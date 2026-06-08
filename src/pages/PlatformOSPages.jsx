@@ -13,11 +13,11 @@ import {
   PLATFORM_WORKFLOWS,
   buildAssetRegistry,
   buildDigitalTwinSnapshot,
-  buildGlobalSearchResults,
   filterByWorkspace,
   filterText,
   workspaceFilterSummary,
 } from '../data/platformOperatingSystem';
+import { buildSearchFirstResults } from '../data/searchFirstDiscovery';
 import { buildDepartmentPerformanceIntelligence } from '../data/departmentPerformanceIntelligence';
 import { buildWorkspaceDependencyGraph } from '../data/crossWorkspaceIntelligence';
 import { buildWorkflowMiningReport } from '../data/workflowMiningEngine';
@@ -30,44 +30,43 @@ import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { buildAssetInventoryProjection } from '../data/assetInventory';
 import { NavIcon } from '../navigation/NavIcon';
 import { getWorkspaceIcon } from '../navigation/iconRegistry';
+import {
+  FilterPanel,
+  FormField,
+  InfoNotice,
+  InsightCard,
+  PageShell as CanonicalPageShell,
+} from '../components/ui/CareDroidPrimitives';
 import './PlatformOSPages.css';
 
 const PRIORITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
 
 function PageShell({ eyebrow, title, description, children, actions = null }) {
   return (
-    <main className="platform-os-page">
-      <header className="platform-os-hero">
-        <div>
-          <p className="platform-os-eyebrow">{eyebrow}</p>
-          <h1>{title}</h1>
-          <p>{description}</p>
-        </div>
-        {actions ? <div className="platform-os-actions">{actions}</div> : null}
-      </header>
+    <CanonicalPageShell
+      className="platform-os-page"
+      headerClassName="platform-os-hero"
+      eyebrow={eyebrow}
+      title={title}
+      description={description}
+      actions={actions}
+    >
       {children}
-    </main>
+    </CanonicalPageShell>
   );
 }
 
 function DataSourceNotice({ label, detail }) {
-  return (
-    <aside className="platform-source-notice" role="note">
-      <strong>{label}</strong>
-      <span>{detail}</span>
-    </aside>
-  );
+  return <InfoNotice label={label} detail={detail} className="platform-source-notice" />;
 }
 
 function FilterBar({ query, setQuery, workspaceId, setWorkspaceId, category, setCategory, categories }) {
   return (
-    <section className="platform-filter-bar" aria-label="Filters">
-      <label>
-        <span>Search</span>
+    <FilterPanel className="platform-filter-bar">
+      <FormField label="Search">
         <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search everything..." />
-      </label>
-      <label>
-        <span>Workspace</span>
+      </FormField>
+      <FormField label="Workspace">
         <select value={workspaceId} onChange={(event) => setWorkspaceId(event.target.value)}>
           <option value="all">All workspaces</option>
           {CARE_WORKSPACES.map((workspace) => (
@@ -76,10 +75,9 @@ function FilterBar({ query, setQuery, workspaceId, setWorkspaceId, category, set
             </option>
           ))}
         </select>
-      </label>
+      </FormField>
       {categories ? (
-        <label>
-          <span>Category</span>
+        <FormField label="Category">
           <select value={category} onChange={(event) => setCategory(event.target.value)}>
             <option value="all">All categories</option>
             {categories.map((item) => (
@@ -88,9 +86,9 @@ function FilterBar({ query, setQuery, workspaceId, setWorkspaceId, category, set
               </option>
             ))}
           </select>
-        </label>
+        </FormField>
       ) : null}
-    </section>
+    </FilterPanel>
   );
 }
 
@@ -112,12 +110,17 @@ function KnowledgeFacetSelect({ label, value, onChange, options }) {
 
 function ResultCard({ item, onOpen }) {
   return (
-    <button type="button" className="platform-result-card" onClick={() => onOpen(item)} aria-label={`Open ${item.title || item.label || item.name}`}>
-      <span className="platform-result-card__kind">{item.category || item.type || item.kind}</span>
-      <strong>{item.title || item.label || item.name}</strong>
-      <span>{item.description || item.body || item.detail}</span>
-      {item.path ? <small>{item.path}</small> : null}
-    </button>
+    <InsightCard
+      as="button"
+      type="button"
+      className="platform-result-card"
+      eyebrow={item.category || item.type || item.kind}
+      title={item.title || item.label || item.name}
+      description={item.description || item.body || item.detail}
+      meta={item.path}
+      onClick={() => onOpen(item)}
+      aria-label={`Open ${item.title || item.label || item.name}`}
+    />
   );
 }
 
@@ -166,14 +169,14 @@ export function SearchResultsPage() {
   const [workspaceId, setWorkspaceId] = useState('all');
   const [category, setCategory] = useState('all');
   const results = useMemo(
-    () => buildGlobalSearchResults({ query, workspaceId, category }),
+    () => buildSearchFirstResults({ query, workspaceId, category }),
     [query, workspaceId, category]
   );
   const launchTool = (tool) =>
     applyRegistryToolLaunch(tool.id, { navigate, recordToolAccess, replace: false });
 
   return (
-    <PageShell eyebrow="Search Everything" title="Global Search" description="Search routes, tools, calculators, dashboards, maps, workflows, settings, profile pages, notifications, documents, devices, rooms, and fleet assets.">
+    <PageShell eyebrow="Search Everything" title="Global Search" description="Search assets, workflows, simulations, workspaces, tools, calculators, dashboards, maps, notifications, devices, rooms, and fleet assets.">
       <DataSourceNotice
         label="Local Search Demo"
         detail="Results are assembled from the frontend platform inventory until the backend SearchService is exposed by a controller."
@@ -185,7 +188,7 @@ export function SearchResultsPage() {
         setWorkspaceId={setWorkspaceId}
         category={category}
         setCategory={setCategory}
-        categories={['workspace', 'dashboard', 'tool', 'calculator', 'map', 'workflow', 'notification', 'document', 'admin', 'library']}
+        categories={['workspace', 'asset', 'workflow', 'simulation', 'destination', 'dashboard', 'tool', 'calculator', 'map', 'notification', 'document', 'admin', 'library']}
       />
       <section className="platform-result-grid" aria-label="Search results">
         {results.map((item) => (

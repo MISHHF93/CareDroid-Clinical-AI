@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
 import Sidebar from '../components/Sidebar';
 import WorkspaceSwitcher from '../components/WorkspaceSwitcher';
 import { NavIcon } from '../navigation/NavIcon';
@@ -14,6 +15,7 @@ import {
   SIDEBAR_WIDTH_EXPANDED_PX,
 } from '../config/layout.config';
 import appConfig from '../config/appConfig';
+import { getFrontendOperatingSystemState } from '../data/frontendOperatingSystem';
 import './AppShell.css';
 
 const environment = appConfig.app.environment || 'development';
@@ -35,8 +37,8 @@ const AppShell = ({
   children,
 }) => {
   const { preference, resolvedTheme, setPreference } = useTheme();
+  const { activeWorkspace } = useWorkspace();
   const location = useLocation();
-  const navigate = useNavigate();
 
   const [isCompact, setIsCompact] = useState(getIsCompactViewport);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -67,10 +69,6 @@ const AppShell = ({
   };
 
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
-  const navigateToUtility = useCallback(
-    (path) => navigate({ pathname: path, search: '' }),
-    [navigate]
-  );
   const openQuickCommand = useCallback(() => {
     setQuickCommandOpen(true);
     setMobileNavOpen(false);
@@ -86,6 +84,16 @@ const AppShell = ({
   ]
     .filter(Boolean)
     .join(' ');
+  const frontendOs = useMemo(
+    () =>
+      getFrontendOperatingSystemState({
+        pathname: location.pathname,
+        workspace: activeWorkspace,
+        tenantId: deployment.id || 'local',
+        plan: environment,
+      }),
+    [activeWorkspace, location.pathname]
+  );
 
   useEffect(() => {
     closeMobileNav();
@@ -196,6 +204,13 @@ const AppShell = ({
               </button>
             )}
             <div className="app-shell-workspace-bar" aria-label="Workspace switcher">
+              {!isCompact && (
+                <div className="app-shell-os-strip" aria-label="Frontend operating system flow">
+                  <strong>{frontendOs.shellLabel}</strong>
+                  <span>{frontendOs.workspaceLabel}</span>
+                  <span className="app-shell-os-strip__stage">{frontendOs.currentStage.label}</span>
+                </div>
+              )}
               <WorkspaceSwitcher compact={isCompact} />
               {!isCompact && (
                 <div className="app-shell-header-utilities" aria-label="Header utilities">
@@ -210,44 +225,8 @@ const AppShell = ({
                     <span aria-hidden>
                       <NavIcon icon={CHROME_ICONS.search} size={17} />
                     </span>
-                    <span>Search</span>
+                    <span>Search everything</span>
                     <kbd>Ctrl K</kbd>
-                  </button>
-                  <button
-                    type="button"
-                    className="app-shell-header-action"
-                    onClick={() => navigateToUtility('/notifications')}
-                    aria-label="Open notifications"
-                    title="Notifications"
-                  >
-                    <NavIcon icon={CHROME_ICONS.bell} size={18} aria-hidden />
-                  </button>
-                  <button
-                    type="button"
-                    className="app-shell-header-action"
-                    onClick={() => navigateToUtility('/profile')}
-                    aria-label="Open profile"
-                    title="Profile"
-                  >
-                    <NavIcon icon={CHROME_ICONS.user} size={18} aria-hidden />
-                  </button>
-                  <button
-                    type="button"
-                    className="app-shell-header-action"
-                    onClick={() => navigateToUtility('/settings')}
-                    aria-label="Open settings"
-                    title="Settings"
-                  >
-                    <NavIcon icon={CHROME_ICONS.settings} size={18} aria-hidden />
-                  </button>
-                  <button
-                    type="button"
-                    className="app-shell-header-action"
-                    onClick={() => onSignOut?.()}
-                    aria-label="Sign out"
-                    title="Sign out"
-                  >
-                    <NavIcon icon={CHROME_ICONS.logOut} size={18} aria-hidden />
                   </button>
                 </div>
               )}

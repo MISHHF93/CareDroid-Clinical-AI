@@ -73,6 +73,23 @@ describe('PlatformOSPages', () => {
     expect(screen.getByRole('button', { name: /open hospital digital twin/i })).toBeInTheDocument();
   });
 
+  it('supports asset, workflow, simulation, and workspace search-first discovery', () => {
+    renderPage(<SearchResultsPage />, '/search');
+    const input = screen.getByPlaceholderText(/search everything/i);
+
+    fireEvent.change(input, { target: { value: 'medical iot dashboard' } });
+    expect(screen.getByRole('button', { name: /open medical iot dashboard/i })).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: 'sepsis escalation workflow' } });
+    expect(screen.getByRole('button', { name: /open sepsis escalation workflow/i })).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: 'sepsis deterioration simulation' } });
+    expect(screen.getByRole('button', { name: /open sepsis deterioration/i })).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: 'emergency workspace' } });
+    expect(screen.getByRole('button', { name: /open emergency workspace/i })).toBeInTheDocument();
+  });
+
   it('renders timeline, notifications, digital twin, workflows, and assets', () => {
     let view = renderPage(<ClinicalTimelinePage />, '/timeline');
     expect(screen.getByRole('heading', { name: /^timeline$/i })).toBeInTheDocument();

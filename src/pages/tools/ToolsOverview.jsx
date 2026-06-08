@@ -26,6 +26,7 @@ import {
   buildRoleIntelligenceProfile,
   getRoleIntelligenceAssetRecommendations,
 } from '../../data/roleIntelligenceLayer';
+import { getWorkspaceExperienceProfile } from '../../data/workspaceExperience';
 import { FEATURE_FLAGS } from '../../config/featureFlags.config';
 import { applyRegistryToolLaunch } from '../../navigation/registryToolLaunch';
 import { NavIcon } from '../../navigation/NavIcon';
@@ -341,6 +342,10 @@ const ToolsOverview = () => {
     () => workspaces.find((workspace) => workspace.id === activeWorkspaceId),
     [activeWorkspaceId, workspaces]
   );
+  const workspaceExperience = useMemo(
+    () => getWorkspaceExperienceProfile(workspaceContextActive || activeWorkspace || localActiveWorkspace),
+    [activeWorkspace, localActiveWorkspace, workspaceContextActive]
+  );
   const isBackendWorkspaceContext = Boolean(workspaceContext?.workspace);
   const isAllToolsWorkspace =
     activeWorkspaceId === 'all' || (!isBackendWorkspaceContext && !localActiveWorkspace?.toolIds?.length);
@@ -585,14 +590,18 @@ const ToolsOverview = () => {
             <span className="tools-overview-title-icon" aria-hidden>
               <NavIcon icon={CHROME_ICONS.tools} size={28} />
             </span>{' '}
-            Tool Library
+            {workspaceExperience.toolsTitle}
           </h1>
           <p className="header-subtitle">
-            Browse the canonical tool library prioritized for your role, specialty, workspace, pins,
-            and access level.
+            {workspaceExperience.toolsSubtitle}
           </p>
+          <div className="tools-workspace-os" aria-label="Active workspace operating mode">
+            <strong>{workspaceExperience.operatingLabel}</strong>
+            <span>{workspaceExperience.modeSummary}</span>
+          </div>
           <div className="tools-profile-summary" aria-label="Profile tool graph summary">
             <span>{roleIntelligenceProfile.roleLabel}</span>
+            <span>{workspaceExperience.shortLabel}</span>
             <span>{profile.specialty}</span>
             <span>{profileToolGraph.counts.visible} visible</span>
             <span>{profileToolGraph.counts.recommended} recommended</span>

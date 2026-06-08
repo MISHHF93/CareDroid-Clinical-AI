@@ -8,6 +8,7 @@ import {
   RECOMMENDATION_GROUPS,
   buildRecommendationEngine,
 } from '../data/recommendationEngine';
+import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import { ProductCatalogApi } from '../services/productCatalogApi';
 import {
   trackRoleAiRequest,
@@ -19,6 +20,7 @@ import {
   getRegistryToolNavigation,
 } from '../navigation/registryToolLaunch';
 import { recordAssetRecommendationAccepted } from '../services/usageMeteringService';
+import { InsightCard, StatusBadge } from '../components/ui/CareDroidPrimitives';
 import './RecommendationsPage.css';
 
 const GROUP_FILTERS = [{ id: 'all', label: 'All' }, ...RECOMMENDATION_GROUPS];
@@ -53,13 +55,14 @@ function RecommendationCard({ recommendation, onOpen }) {
     : recommendation.route || '/marketplace';
 
   return (
-    <article className="recommendation-card">
-      <div className="recommendation-card__header">
-        <span>{recommendation.type}</span>
-        <strong>{recommendation.score}</strong>
-      </div>
-      <h3>{recommendation.title}</h3>
-      <p>{recommendation.summary || recommendation.reason}</p>
+    <InsightCard
+      className="recommendation-card"
+      eyebrow={recommendation.type}
+      title={recommendation.title}
+      description={recommendation.summary || recommendation.reason}
+      meta={recommendation.score}
+      badge={<StatusBadge status={recommendation.score >= 85 ? 'ready' : 'demo'} />}
+    >
       <p className="recommendation-card__reason">{recommendation.reason}</p>
       <div className="recommendation-card__signals" aria-label={`${recommendation.title} source signals`}>
         {(recommendation.sourceSignals || []).slice(0, 4).map((signal) => (
@@ -75,7 +78,7 @@ function RecommendationCard({ recommendation, onOpen }) {
           Open recommendation
         </Link>
       )}
-    </article>
+    </InsightCard>
   );
 }
 
@@ -100,6 +103,10 @@ export default function RecommendationsPage() {
   const [productError, setProductError] = useState('');
   const [query, setQuery] = useState('');
   const [groupFilter, setGroupFilter] = useState('all');
+  const workspaceExperience = useMemo(
+    () => getWorkspaceExperienceProfile(workspaceContext.activeWorkspace || activeWorkspace),
+    [activeWorkspace, workspaceContext.activeWorkspace]
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -234,16 +241,16 @@ export default function RecommendationsPage() {
     <main className="recommendations-page">
       <header className="recommendations-hero">
         <div>
-          <p className="recommendations-eyebrow">Recommendation engine</p>
-          <h1>Recommended Capabilities</h1>
+          <p className="recommendations-eyebrow">{workspaceExperience.operatingLabel} · Recommendation engine</p>
+          <h1>{workspaceExperience.recommendationsTitle}</h1>
           <p>
-            Discover relevant tools, packs, products, AI agents, simulations, and protocols from your
-            role, workspace, organization, usage, search, simulation, and workflow signals.
+            {workspaceExperience.recommendationsSubtitle}
           </p>
         </div>
         <div className="recommendations-profile" aria-label="Recommendation profile">
-          <span>{profile.roleLabel || 'CareDroid profile'}</span>
-          <strong>{profile.workspaceLabel || activeWorkspace?.name || 'Current workspace'}</strong>
+          <span>{workspaceExperience.modeSummary}</span>
+          <strong>{profile.workspaceLabel || workspaceExperience.label || activeWorkspace?.name || 'Current workspace'}</strong>
+          <small>{profile.roleLabel || 'CareDroid profile'}</small>
         </div>
       </header>
 

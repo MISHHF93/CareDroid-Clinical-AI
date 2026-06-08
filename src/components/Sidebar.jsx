@@ -1,13 +1,10 @@
-import React, { forwardRef, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
-import { useNotifications } from '../contexts/NotificationContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useWhiteLabel } from '../contexts/WhiteLabelContext';
 import PermissionGate from './PermissionGate';
-import BuildInfoBadge from './BuildInfoBadge';
 import {
-  ADVANCED_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
   primaryNavPathMatches,
 } from '../config/navigation.config';
@@ -19,8 +16,8 @@ import './Sidebar.css';
  * Compact CareDroid navigation shell.
  *
  * Feature routes remain registered in App.jsx. The sidebar exposes one obvious
- * path to each major user task and keeps developer/governance surfaces behind
- * the Advanced group.
+ * path to each major user task. Other capabilities remain workspace, search,
+ * and recommendation driven.
  */
 const Sidebar = forwardRef(function Sidebar(
   {
@@ -46,10 +43,6 @@ const Sidebar = forwardRef(function Sidebar(
     organization,
   } = useUserIdentity();
   const { branding } = useWhiteLabel();
-  const { notifications } = useNotifications();
-  const [showAdvanced, setShowAdvanced] = useState(false);
-
-  const unreadCount = notifications.filter((n) => !n.read).length;
   const displayName = account?.displayName || user?.fullName || user?.name || 'User';
   const displayRole = account?.specialty || account?.role || user?.role || 'Clinician';
   const displayOrganization =
@@ -73,14 +66,6 @@ const Sidebar = forwardRef(function Sidebar(
     [filterNav]
   );
 
-  const advancedActive = useMemo(
-    () => ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => primaryNavPathMatches(item, location.pathname)),
-    [location.pathname]
-  );
-  useEffect(() => {
-    if (advancedActive) setShowAdvanced(true);
-  }, [advancedActive]);
-
   useEffect(() => {
     const node = ref?.current;
     if (!node || !layoutCompact) return undefined;
@@ -94,7 +79,7 @@ const Sidebar = forwardRef(function Sidebar(
 
   useEffect(() => {
     if (!layoutCompact || !mobileNavOpen || !ref?.current) return;
-    const active = ref.current.querySelector('.nav-item.active, .sidebar-advanced-toggle--active');
+    const active = ref.current.querySelector('.nav-item.active');
     active?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [layoutCompact, mobileNavOpen, location.pathname, ref]);
 
@@ -109,13 +94,13 @@ const Sidebar = forwardRef(function Sidebar(
     onCloseMobileNav();
   };
 
-  const renderNavButton = (item, { advanced = false } = {}) => {
+  const renderNavButton = (item) => {
     const isActive = primaryNavPathMatches(item, location.pathname);
     const button = (
       <button
         key={item.id}
         type="button"
-        className={`nav-item${advanced ? ' nav-item--advanced' : ''}${isActive ? ' active' : ''}`}
+        className={`nav-item${isActive ? ' active' : ''}`}
         onClick={() => handleNavClick(item.path)}
         title={effectiveCollapsed ? item.label : ''}
         aria-current={isActive ? 'page' : undefined}
@@ -253,46 +238,6 @@ const Sidebar = forwardRef(function Sidebar(
           {primaryNavItems.map((item) => renderNavButton(item))}
         </nav>
 
-        <div className="sidebar-advanced">
-          <button
-            type="button"
-            className={`sidebar-advanced-toggle${advancedActive ? ' sidebar-advanced-toggle--active' : ''}`}
-            onClick={() => setShowAdvanced((open) => !open)}
-            aria-expanded={showAdvanced}
-            aria-controls="sidebar-advanced-links"
-            aria-label="Advanced navigation"
-            title={effectiveCollapsed ? 'Advanced' : ''}
-          >
-            <span className="nav-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.shield} size={18} />
-            </span>
-            {!effectiveCollapsed && (
-              <>
-                <span className="nav-label">Advanced</span>
-                <span className="sidebar-advanced-chevron" aria-hidden>
-                  <NavIcon
-                    icon={CHROME_ICONS.chevronDown}
-                    size={14}
-                    style={{
-                      transform: showAdvanced ? 'rotate(0deg)' : 'rotate(-90deg)',
-                    }}
-                  />
-                </span>
-              </>
-            )}
-          </button>
-
-          {showAdvanced && (
-            <nav
-              id="sidebar-advanced-links"
-              className="sidebar-advanced-links"
-              aria-label="Advanced navigation"
-            >
-              {ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => renderNavButton(item, { advanced: true }))}
-            </nav>
-          )}
-        </div>
-
         {!effectiveCollapsed && recentConversations.length > 0 && (
           <div className="sidebar-section sidebar-section--recent-chats">
             <div className="section-header">
@@ -330,21 +275,6 @@ const Sidebar = forwardRef(function Sidebar(
       </div>
 
       <div className="sidebar-footer">
-        <button
-          type="button"
-          className="footer-action"
-          onClick={() => handleNavClick('/notifications')}
-          aria-label="Open notifications"
-          title="Notifications"
-        >
-          <span className="action-icon" aria-hidden>
-            <NavIcon icon={CHROME_ICONS.bell} size={18} />
-          </span>
-          {unreadCount > 0 && (
-            <span className="notification-badge">{unreadCount > 9 ? '9+' : unreadCount}</span>
-          )}
-        </button>
-
         {!effectiveCollapsed && (
           <div className="hipaa-badge">
             <span className="hipaa-icon" aria-hidden>
@@ -352,10 +282,6 @@ const Sidebar = forwardRef(function Sidebar(
             </span>
             <span className="hipaa-text">HIPAA</span>
           </div>
-        )}
-
-        {!effectiveCollapsed && (
-          <BuildInfoBadge className="sidebar-build-info" to="/system-health" />
         )}
 
         <button

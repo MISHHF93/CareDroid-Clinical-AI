@@ -13,10 +13,7 @@ import {
 } from './primaryNavigation';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 
-const VISIBLE_SIDEBAR_ITEMS = [
-  ...PRIMARY_SIDEBAR_NAV_ITEMS,
-  ...ADVANCED_SIDEBAR_NAV_ITEMS,
-];
+const VISIBLE_SIDEBAR_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 
 describe('primaryNavigation', () => {
   it('exposes the simplified primary sidebar model in canonical order', () => {
@@ -50,7 +47,7 @@ describe('primaryNavigation', () => {
     expect(getPrimaryNavItemForPath('/workspace-dependency-graph')?.id).toBe('workspace-dependency-graph');
   });
 
-  it('keeps developer and governance routes in the collapsed advanced group', () => {
+  it('keeps developer and governance routes in the searchable advanced catalog', () => {
     expect(ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
       ['Asset Packs', '/asset-packs'],
       ['Products', '/products'],

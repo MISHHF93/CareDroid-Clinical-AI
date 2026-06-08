@@ -610,21 +610,25 @@
   border-radius: 18px;
 }
 
-.hospital-map-table {
+.hospital-map-table,
+.hospital-map-table-wrap .cd-data-table {
   width: 100%;
   min-width: 820px;
   border-collapse: collapse;
 }
 
 .hospital-map-table th,
-.hospital-map-table td {
+.hospital-map-table td,
+.hospital-map-table-wrap .cd-data-table th,
+.hospital-map-table-wrap .cd-data-table td {
   border-bottom: 1px solid var(--app-panel-border);
   padding: 10px;
   text-align: left;
   vertical-align: top;
 }
 
-.hospital-map-table th {
+.hospital-map-table th,
+.hospital-map-table-wrap .cd-data-table th {
   color: var(--app-fg-muted);
   font-size: 0.78rem;
   letter-spacing: 0.04em;
@@ -632,7 +636,9 @@
 }
 
 .hospital-map-table td strong,
-.hospital-map-table td span {
+.hospital-map-table td span,
+.hospital-map-table-wrap .cd-data-table td strong,
+.hospital-map-table-wrap .cd-data-table td span {
   display: block;
 }
 

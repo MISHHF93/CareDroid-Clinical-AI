@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import ToolPanel from './ToolPanel';
 import AISourcePanel from './chat/AISourcePanel';
 import AiRouteMetadata from './chat/AiRouteMetadata';
@@ -8,6 +8,8 @@ import Citations, { CitationModal } from './Citations';
 import ConfidenceBadge from './ConfidenceBadge';
 import { sendClinicalChatMessage, mapChatResponseToAssistantMessage } from '../services/clinicalChatService';
 import { useNotificationActions } from '../hooks/useNotificationActions';
+import { useWorkspace } from '../contexts/WorkspaceContext';
+import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import './ChatInterface.css';
 
 const ChatInterface = ({
@@ -27,6 +29,23 @@ const ChatInterface = ({
   const messagesEndRef = useRef(null);
   const shouldStickToBottomRef = useRef(true);
   const { error: notifyError } = useNotificationActions();
+  const {
+    activeWorkspace,
+    activeWorkspaceId,
+    assistantContext,
+    visibleAssetIds,
+    recommendedAIAgents,
+    recommendedAssetPacks,
+  } = useWorkspace();
+  const workspaceExperience = getWorkspaceExperienceProfile(activeWorkspace);
+  const workspaceDiscoveryLabel = workspaceExperience.shortLabel || workspaceExperience.label;
+  const assistantDiscoveryPrompts = useMemo(
+    () => [
+      `Search ${workspaceDiscoveryLabel} assets, workflows, and simulations for my next step.`,
+      `Find the best workflow or simulation for ${workspaceDiscoveryLabel}.`,
+    ],
+    [workspaceDiscoveryLabel]
+  );
 
   const updateStickToBottom = () => {
     const scroller = messagesRef.current;
@@ -101,6 +120,15 @@ const ChatInterface = ({
         feature: currentFeature,
         conversationId,
         authToken,
+        workspaceContext: {
+          activeWorkspaceId,
+          operatingLabel: workspaceExperience.operatingLabel,
+          modeSummary: workspaceExperience.modeSummary,
+          assistantContext: assistantContext || workspaceExperience.assistantContext,
+          visibleAssetIds,
+          recommendedAIAgents,
+          recommendedAssetPacks,
+        },
       });
 
       if (!ok) {
@@ -140,9 +168,14 @@ const ChatInterface = ({
         className="chat-interface__messages app-scroll-container"
         onScroll={updateStickToBottom}
       >
+        <section className="chat-interface__workspace-banner" aria-label="Active assistant workspace">
+          <span>{workspaceExperience.operatingLabel}</span>
+          <strong>{workspaceExperience.assistantTitle}</strong>
+          <p>{assistantContext || workspaceExperience.modeSummary}</p>
+        </section>
         {messages.length === 0 && (
           <div className="chat-interface__empty">
-            Start a conversation to see messages here.
+            Start a conversation in {workspaceExperience.operatingLabel}.
           </div>
         )}
         {messages.map((message, index) => (
@@ -256,7 +289,7 @@ const ChatInterface = ({
 
       <div className="chat-interface__input-area">
         <div className="chat-interface__quick-actions">
-          {['Summarize a protocol', 'Check drug interaction', 'Interpret labs'].map((hint) => (
+            {[...workspaceExperience.quickPrompts, ...assistantDiscoveryPrompts].map((hint) => (
             <button
               key={hint}
               onClick={() => setInput(hint)}
@@ -273,7 +306,7 @@ const ChatInterface = ({
             onFocus={keepComposerVisible}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Ask CareDroid anything clinical..."
+            placeholder={workspaceExperience.assistantPlaceholder}
             disabled={isLoading}
             className="chat-interface__textarea"
             rows={1}

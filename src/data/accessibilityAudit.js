@@ -61,9 +61,8 @@ export function buildAccessibilityAudit(sourceSnapshot = {}) {
       'Icon-only sidebar buttons expose accessible names',
       has(sidebarJsx, 'aria-label={item.label}') &&
         has(sidebarJsx, 'aria-label="Start a new chat"') &&
-        has(sidebarJsx, 'aria-label="Open notifications"') &&
         has(sidebarJsx, 'aria-label="Sign out"'),
-      'Collapsed nav, new chat, notifications, and sign out controls have explicit labels.',
+      'Collapsed nav, new chat, and sign out controls have explicit labels.',
       'Do not rely on `title` as the accessible name for icon-only controls.'
     ),
     check(

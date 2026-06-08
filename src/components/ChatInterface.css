@@ -33,6 +33,36 @@
   text-align: center;
 }
 
+.chat-interface__workspace-banner {
+  display: grid;
+  gap: 4px;
+  max-width: min(860px, 100%);
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 34%, var(--panel-border));
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--app-accent-interactive) 9%, var(--surface-2));
+}
+
+.chat-interface__workspace-banner span {
+  color: var(--app-accent-interactive);
+  font-size: var(--font-12, 12px);
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.chat-interface__workspace-banner strong {
+  color: var(--text-color);
+  font-size: var(--app-type-subheading, 1rem);
+}
+
+.chat-interface__workspace-banner p {
+  margin: 0;
+  color: var(--muted-text);
+  font-size: var(--app-type-small, 0.875rem);
+  line-height: 1.45;
+}
+
 .chat-interface__message-row {
   display: flex;
   gap: clamp(8px, 2vw, 15px);

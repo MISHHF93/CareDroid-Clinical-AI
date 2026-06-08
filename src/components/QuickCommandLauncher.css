@@ -282,6 +282,18 @@
   background: var(--app-surface-2);
 }
 
+.quick-command-scope-note {
+  margin: 10px 4px 0;
+  padding: 9px 10px;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 72%, transparent);
+  border-radius: var(--compact-card-radius, 12px);
+  background: color-mix(in srgb, var(--app-surface-2) 62%, transparent);
+  color: var(--muted-text);
+  font-size: var(--font-12, 12px);
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 @media (max-width: 520px) {
   .quick-command-item {
     grid-template-columns: auto minmax(0, 1fr);

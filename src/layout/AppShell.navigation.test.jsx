@@ -11,6 +11,12 @@ vi.mock('../contexts/ThemeContext', () => ({
   }),
 }));
 
+vi.mock('../contexts/WorkspaceContext', () => ({
+  useWorkspace: () => ({
+    activeWorkspace: { id: 'emergency', name: 'Emergency' },
+  }),
+}));
+
 vi.mock('../components/WorkspaceSwitcher', () => ({
   default: () => <div data-testid="workspace-switcher">Workspace</div>,
 }));
@@ -91,9 +97,12 @@ describe('AppShell navigation surfaces', () => {
     expect(screen.getByTestId('app-sidebar')).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: /primary navigation/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open quick command/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /open notifications/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /open profile/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /open settings/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/caredroid frontend os/i);
+    expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/emergency/i);
+    expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/dashboard/i);
+    expect(screen.queryByRole('button', { name: /open notifications/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open profile/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open settings/i })).not.toBeInTheDocument();
     expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
   });
 
@@ -102,6 +111,7 @@ describe('AppShell navigation surfaces', () => {
 
     expect(screen.getByTestId('app-sidebar')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByRole('button', { name: /open navigation menu/i })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/frontend operating system flow/i)).not.toBeInTheDocument();
     expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
   });
 

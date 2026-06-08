@@ -189,7 +189,8 @@ describe('RecommendationsPage', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('heading', { level: 1, name: /recommended capabilities/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /emergency recommendations/i })).toBeInTheDocument();
+    expect(screen.getByText(/emergency os/i)).toBeInTheDocument();
     expect(screen.getByText('qSOFA')).toBeVisible();
     expect(screen.getByText('Sepsis Pack')).toBeVisible();
     expect(screen.getByText('Emergency Suite')).toBeVisible();

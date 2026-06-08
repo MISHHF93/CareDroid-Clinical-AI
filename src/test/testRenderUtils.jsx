@@ -73,7 +73,20 @@ export const mockUserValue = createMockUserValue();
 export const mockWorkspaceValue = {
   workspaces: [{ id: 'default', name: 'Default', toolIds: [] }],
   activeWorkspaceId: 'default',
+  activeWorkspace: { id: 'default', name: 'Default', toolIds: [] },
+  workspaceContext: null,
+  visibleAssetIds: [],
+  recommendations: [],
+  assistantContext: '',
+  shortcuts: [],
+  workspaceProfile: null,
+  defaultDashboardWidgets: [],
+  defaultFilters: {},
+  restrictedAssets: [],
+  recommendedAIAgents: [],
+  recommendedAssetPacks: [],
   setActiveWorkspaceId: vi.fn(),
+  switchWorkspace: vi.fn(),
   addWorkspace: vi.fn(),
 };
 

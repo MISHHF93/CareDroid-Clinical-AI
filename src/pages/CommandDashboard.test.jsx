@@ -7,6 +7,7 @@ import {
   mockNotificationsValue,
   mockToolPreferencesValue,
   mockUserValue,
+  mockWorkspaceValue,
 } from '../test/testRenderUtils';
 
 vi.mock('./CommandDashboard.css', () => ({}));
@@ -29,6 +30,10 @@ vi.mock('../contexts/ToolPreferencesContext', () => ({
 
 vi.mock('../contexts/NotificationContext', () => ({
   useNotifications: () => mockNotificationsValue,
+}));
+
+vi.mock('../contexts/WorkspaceContext', () => ({
+  useWorkspace: () => mockWorkspaceValue,
 }));
 
 vi.mock('../contexts/SystemConfigContext', () => ({
@@ -61,68 +66,77 @@ describe('CommandDashboard', () => {
     vi.clearAllMocks();
     mockToolPreferencesValue.recentTools = [];
     mockNotificationsValue.notifications = [];
+    mockWorkspaceValue.activeWorkspaceId = 'emergency';
+    mockWorkspaceValue.activeWorkspace = { id: 'emergency', name: 'Emergency' };
+    mockWorkspaceValue.workspaces = [{ id: 'emergency', name: 'Emergency', toolIds: [] }];
+    mockWorkspaceValue.recommendations = [];
+    mockWorkspaceValue.shortcuts = [];
+    mockWorkspaceValue.visibleAssetIds = [];
   });
 
-  it('renders the command center sections without blank states', () => {
+  it('renders compressed command center sections without the old dashboard wall', () => {
     renderDashboard();
 
-    expect(screen.getByRole('heading', { level: 1, name: /caredroid command center/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /emergency command center/i })).toBeInTheDocument();
+    expect(screen.getByText(/emergency os/i)).toBeInTheDocument();
     for (const name of [
+      /^actions$/i,
       /ai assistant/i,
-      /quick actions/i,
-      /my tools/i,
-      /my calculators/i,
-      /my workspace/i,
-      /notifications/i,
-      /active alerts/i,
-      /^recent activity$/i,
+      /^recommendations$/i,
+      /^signals$/i,
+      /^status$/i,
     ]) {
       expect(screen.getByRole('heading', { name })).toBeInTheDocument();
     }
-    expect(screen.getByText(/no recent tools yet/i)).toBeInTheDocument();
-  });
-
-  it('renders compact launch cards for primary dashboard entry points', () => {
-    renderDashboard();
-
-    const launchpad = screen.getByRole('heading', { name: /quick actions/i }).closest('section');
-    for (const name of [
-      /ai assistant/i,
-      /my workspace/i,
-      /my tools/i,
-      /my calculators/i,
-      /digital twin/i,
-      /notifications/i,
-      /active alerts/i,
-      /hospital map/i,
-      /medical iot/i,
-      /open live vehicle tracking/i,
-      /device management/i,
-      /recent activity/i,
-      /system status/i,
-    ]) {
-      expect(within(launchpad).getByRole('link', { name })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /command analytics/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /clinical tools detail/i })).not.toBeInTheDocument();
+    expect(screen.getByText(/triage risk, active alerts/i)).toBeInTheDocument();
+    const flow = screen.getByLabelText(/frontend operating system flow/i);
+    for (const step of ['AppShell', 'Workspace', 'Dashboard', 'Asset Launch', 'Workflow', 'Result']) {
+      expect(within(flow).getByText(step)).toBeInTheDocument();
     }
   });
 
-  it('renders inventory-backed dashboard charts and KPI cards', () => {
+  it('renders compact action cards for primary dashboard entry points', () => {
     renderDashboard();
 
-    expect(screen.getByText(/tool category distribution/i)).toBeInTheDocument();
-    expect(screen.getByText(/launch type distribution/i)).toBeInTheDocument();
-    expect(screen.getByText(/clinical tier distribution/i)).toBeInTheDocument();
-    expect(screen.getByText(/recent activity trend/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/total tools:/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/ai tools:/i)).toBeInTheDocument();
+    const launchpad = screen.getByRole('heading', { name: /^actions$/i }).closest('section');
+    for (const name of [
+      /^ai assistant/i,
+      /^assets/i,
+      /^workflows/i,
+      /^results/i,
+      /^medical simulation/i,
+      /^operations/i,
+      /^my workspace/i,
+      /^my tools/i,
+    ]) {
+      expect(within(launchpad).getByRole('link', { name })).toBeInTheDocument();
+    }
+    expect(within(launchpad).getByRole('link', { name: /^assets/i })).toHaveAttribute('href', '/assets');
+    expect(within(launchpad).getByRole('link', { name: /^workflows/i })).toHaveAttribute('href', '/workflows');
+    expect(within(launchpad).getByRole('link', { name: /^results/i })).toHaveAttribute('href', '/timeline');
+    expect(within(launchpad).getByRole('link', { name: /^medical simulation/i })).toHaveAttribute('href', '/simulation');
+    expect(within(launchpad).getByRole('link', { name: /^operations/i })).toHaveAttribute('href', '/operations');
+    expect(within(launchpad).queryByRole('link', { name: /system status/i })).not.toBeInTheDocument();
   });
 
-  it('keeps featured dashboard tool cards unique', () => {
+  it('renders compact status metrics instead of chart widgets', () => {
     renderDashboard();
-    const primarySections = [
-      screen.getByRole('heading', { name: /^my tools$/i }).closest('section'),
-      screen.getByRole('heading', { name: /^my calculators$/i }).closest('section'),
-    ];
-    const cards = primarySections.flatMap((section) => [...section.querySelectorAll('.command-tool-card')]);
+
+    const status = screen.getByRole('heading', { name: /^status$/i }).closest('section');
+    expect(within(status).getByText(/^tools$/i)).toBeInTheDocument();
+    expect(within(status).getByText(/^ai tools$/i)).toBeInTheDocument();
+    expect(within(status).getByText(/^backend$/i)).toBeInTheDocument();
+    expect(within(status).getByText(/^planned$/i)).toBeInTheDocument();
+    expect(screen.queryByText(/tool category distribution/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/launch type distribution/i)).not.toBeInTheDocument();
+  });
+
+  it('keeps recommended dashboard tool cards unique', () => {
+    renderDashboard();
+    const recommendations = screen.getByRole('heading', { name: /^recommendations$/i }).closest('section');
+    const cards = [...recommendations.querySelectorAll('.command-tool-card')];
     const labels = cards.map((card) => card.getAttribute('aria-label'));
 
     expect(cards.length).toBeGreaterThan(0);
@@ -132,57 +146,54 @@ describe('CommandDashboard', () => {
   it('seeds free text into assistant and routes to the focused workspace', () => {
     renderDashboard();
 
-    fireEvent.change(screen.getByLabelText(/ask caredroid what you need to do next/i), {
+    fireEvent.change(screen.getByLabelText(/ask emergency assistant what you need to do next/i), {
       target: { value: 'Help me triage chest pain' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /open assistant workspace/i }));
+    fireEvent.click(screen.getByRole('button', { name: /open emergency assistant/i }));
 
-    expect(mockConversationValue.addMessage).toHaveBeenCalledWith('Help me triage chest pain', 'user');
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringContaining('[Emergency OS]'),
+      'user'
+    );
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringContaining('Help me triage chest pain'),
+      'user'
+    );
     expect(screen.getByTestId('location')).toHaveTextContent('/assistant');
   });
 
-  it('launches the operations quick prompt to the canonical operations hub', () => {
+  it('changes dashboard identity for Medical IoT workspace', () => {
+    mockWorkspaceValue.activeWorkspaceId = 'medical-iot';
+    mockWorkspaceValue.activeWorkspace = { id: 'medical-iot', name: 'Medical IoT' };
+
     renderDashboard();
 
-    fireEvent.click(screen.getByRole('button', { name: /open operations/i }));
+    expect(screen.getByRole('heading', { level: 1, name: /medical iot command center/i })).toBeInTheDocument();
+    expect(screen.getByText(/medical iot os/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/offline devices/i)).toBeInTheDocument();
+  });
+
+  it('launches the operations action to the canonical operations hub', () => {
+    renderDashboard();
+
+    const actions = screen.getByRole('heading', { name: /^actions$/i }).closest('section');
+    fireEvent.click(within(actions).getByRole('link', { name: /^operations/i }));
 
     expect(screen.getByTestId('location')).toHaveTextContent('/operations');
   });
 
-  it('launches calculator cards through canonical launch behavior', () => {
+  it('launches recommended tool cards through canonical launch behavior', () => {
     renderDashboard();
-    const clinicalPanel = screen.getByRole('heading', { name: /my calculators/i }).closest('section');
-    const qsofaButton = within(clinicalPanel).getByRole('button', { name: /open qsofa/i });
+    const recommendations = screen.getByRole('heading', { name: /^recommendations$/i }).closest('section');
+    const firstToolButton = within(recommendations).getAllByRole('button', { name: /open /i })[0];
 
-    fireEvent.click(qsofaButton);
+    fireEvent.click(firstToolButton);
 
-    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('qsofa');
-    expect(screen.getByTestId('location')).toHaveTextContent('/tools/calculators/qsofa');
+    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalled();
+    expect(screen.getByTestId('location')).not.toHaveTextContent('/dashboard');
   });
 
-  it('surfaces Medical IoT as a first-class dashboard launch', () => {
-    renderDashboard();
-    const operationsPanel = screen.getByRole('heading', { name: /operations summary/i }).closest('section');
-    const iotButton = within(operationsPanel).getByRole('button', { name: /open medical iot dashboard/i });
-
-    fireEvent.click(iotButton);
-
-    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('medical-iot-dashboard');
-    expect(screen.getByTestId('location')).toHaveTextContent('/medical-iot');
-  });
-
-  it('surfaces Hospital Map as a first-class operations launch', () => {
-    renderDashboard();
-    const operationsPanel = screen.getByRole('heading', { name: /operations summary/i }).closest('section');
-    const hospitalMapButton = within(operationsPanel).getByRole('button', { name: /open hospital map/i });
-
-    fireEvent.click(hospitalMapButton);
-
-    expect(mockToolPreferencesValue.recordToolAccess).toHaveBeenCalledWith('hospital-map');
-    expect(screen.getByTestId('location')).toHaveTextContent('/hospital-map');
-  });
-
-  it('summarizes notifications and active alerts inside the command center', () => {
+  it('compresses notifications and active alerts into the signals panel', () => {
     mockNotificationsValue.notifications = [
       { id: 'n1', title: 'Lab result ready', message: 'CBC is ready', read: false, type: 'info' },
       { id: 'a1', title: 'Sepsis alert', message: 'High risk patient', read: false, type: 'critical' },
@@ -190,11 +201,11 @@ describe('CommandDashboard', () => {
 
     renderDashboard();
 
-    const notifications = screen.getByRole('heading', { name: /^notifications$/i }).closest('section');
-    const activeAlerts = screen.getByRole('heading', { name: /^active alerts$/i }).closest('section');
+    const signals = screen.getByRole('heading', { name: /^signals$/i }).closest('section');
 
-    expect(within(notifications).getByText(/lab result ready/i)).toBeInTheDocument();
-    expect(within(activeAlerts).getByText(/sepsis alert/i)).toBeInTheDocument();
-    expect(within(activeAlerts).getByRole('link', { name: /open digital twin/i })).toHaveAttribute('href', '/digital-twin');
+    expect(within(signals).getByText(/lab result ready/i)).toBeInTheDocument();
+    expect(within(signals).getAllByText(/sepsis alert/i)).toHaveLength(1);
+    expect(within(signals).getByRole('link', { name: /notifications/i })).toHaveAttribute('href', '/notifications');
+    expect(within(signals).getByRole('link', { name: /alerts/i })).toHaveAttribute('href', '/clinical/alerts');
   });
 });

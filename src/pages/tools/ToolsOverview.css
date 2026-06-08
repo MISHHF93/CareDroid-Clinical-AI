@@ -188,6 +188,28 @@
   margin: 0 0 12px;
 }
 
+.tools-workspace-os {
+  display: grid;
+  gap: 4px;
+  width: min(100%, 680px);
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 34%, var(--app-panel-border));
+  border-radius: var(--compact-card-radius, 12px);
+  background: color-mix(in srgb, var(--app-accent-interactive) 9%, var(--app-surface-1));
+}
+
+.tools-workspace-os strong {
+  color: var(--app-text-primary, var(--text-primary));
+  font-size: var(--app-type-small);
+}
+
+.tools-workspace-os span {
+  color: var(--app-text-muted, var(--text-secondary));
+  font-size: var(--app-type-caption);
+  line-height: 1.45;
+}
+
 .tools-profile-summary span {
   display: inline-flex;
   min-height: 28px;

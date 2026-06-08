@@ -106,6 +106,22 @@ describe('QuickCommandLauncher', () => {
     expect(screen.queryByRole('button', { name: /open drug checker/i })).not.toBeInTheDocument();
   });
 
+  it('keeps the default launcher compact while preserving full search access', () => {
+    renderQuickCommand({ defaultOpen: true });
+
+    expect(screen.getByText(/search to reach all destinations/i)).toBeInTheDocument();
+    expect(screen.getByText(/top destinations/i)).toBeInTheDocument();
+    expect(screen.getByText(/suggested tools/i)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open recommendations/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open governance workspace/i })).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
+      target: { value: 'governance workspace' },
+    });
+
+    expect(screen.getByRole('button', { name: /open governance workspace/i })).toBeInTheDocument();
+  });
+
   it('launches tool entries through canonical route behavior', () => {
     renderQuickCommand({ defaultOpen: true });
 
@@ -225,6 +241,23 @@ describe('QuickCommandLauncher', () => {
     fireEvent.click(screen.getByRole('button', { name: /open emergency workspace/i }));
 
     expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency');
+  });
+
+  it('searches and launches workflow and simulation discovery entries', () => {
+    renderQuickCommand({ defaultOpen: true });
+
+    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
+      target: { value: 'sepsis escalation workflow' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /open sepsis escalation workflow/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/workflows');
+
+    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
+    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
+      target: { value: 'sepsis deterioration simulation' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /open sepsis deterioration/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/simulation');
   });
 
   it('keeps shared calculator-hub tools searchable instead of hiding them as nav duplicates', () => {

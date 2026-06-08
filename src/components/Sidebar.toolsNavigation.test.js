@@ -24,10 +24,7 @@ const navigationConfigSource = readFileSync(
   join(__dirname, '../config/navigation.config.js'),
   'utf8'
 );
-const visibleSidebarItems = [
-  ...PRIMARY_SIDEBAR_NAV_ITEMS,
-  ...ADVANCED_SIDEBAR_NAV_ITEMS,
-];
+const visibleSidebarItems = PRIMARY_SIDEBAR_NAV_ITEMS;
 
 describe('Simplified sidebar navigation wiring', () => {
   it('keeps /tools and /tools/calculators as first-class canonical routes', () => {
@@ -44,7 +41,7 @@ describe('Simplified sidebar navigation wiring', () => {
 
   it('renders canonical primary navigation without duplicate tool-card shortcuts', () => {
     expect(sidebarSource).toContain('PRIMARY_SIDEBAR_NAV_ITEMS');
-    expect(sidebarSource).toContain('ADVANCED_SIDEBAR_NAV_ITEMS');
+    expect(sidebarSource).not.toContain('ADVANCED_SIDEBAR_NAV_ITEMS');
     expect(sidebarSource).not.toContain('getSidebarToolRegistryProjection');
     expect(sidebarSource).not.toContain('partitionSidebarTools');
     expect(sidebarSource).not.toContain('showToolsSection');
@@ -59,14 +56,21 @@ describe('Simplified sidebar navigation wiring', () => {
     expect(appShellSource).toContain('onClick={openQuickCommand}');
   });
 
-  it('defines the reduced visible primary routes and advanced routes', () => {
+  it('defines exactly the reduced visible primary routes', () => {
     const navPaths = visibleSidebarItems.map((item) => item.path);
 
-    for (const path of ['/dashboard', '/assistant', '/tools', '/operations', '/profile', '/settings']) {
-      expect(navPaths, path).toContain(path);
-    }
+    expect(navPaths).toEqual(['/dashboard', '/assistant', '/tools', '/operations', '/profile', '/settings']);
 
     for (const path of [
+      '/discover',
+      '/automation',
+      '/digital-twin-intelligence',
+      '/digital-twin',
+      '/hospital-map',
+      '/medical-iot',
+      '/devices',
+      '/fleet/map',
+      '/live-map',
       '/asset-packs',
       '/products',
       '/organization',
@@ -91,30 +95,18 @@ describe('Simplified sidebar navigation wiring', () => {
       '/regulatory',
       '/assets',
     ]) {
-      expect(navPaths, path).toContain(path);
-    }
-
-    for (const path of [
-      '/discover',
-      '/automation',
-      '/digital-twin-intelligence',
-      '/digital-twin',
-      '/hospital-map',
-      '/medical-iot',
-      '/devices',
-      '/fleet/map',
-      '/live-map',
-    ]) {
       expect(navPaths, path).not.toContain(path);
     }
   });
 
-  it('keeps secondary, operations, and account destinations available outside primary nav', () => {
+  it('keeps secondary, solutions, operations, advanced, and account destinations outside primary nav', () => {
     expect(SECONDARY_NAV_ITEMS).toEqual([]);
     expect(SOLUTIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual(
       expect.arrayContaining(['/solution-builder', '/value-tracking', '/success-center'])
     );
     expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual([
+      '/workflow-mining',
+      '/workspace-dependency-graph',
       '/digital-twin-intelligence',
       '/digital-twin',
       '/hospital-map',
@@ -128,6 +120,7 @@ describe('Simplified sidebar navigation wiring', () => {
       '/discover',
       '/automation',
       '/customer-portal',
+      '/knowledge-hub',
       '/knowledge-base',
       '/marketplace',
       '/enterprise-readiness',
@@ -136,6 +129,9 @@ describe('Simplified sidebar navigation wiring', () => {
       '/billing',
       '/notifications',
     ]);
+    expect(ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual(
+      expect.arrayContaining(['/tools/catalog', '/system-health', '/ai-governance', '/audit'])
+    );
   });
 
   it('does not duplicate visible sidebar destinations, labels, or non-canonical links', () => {
@@ -150,9 +146,12 @@ describe('Simplified sidebar navigation wiring', () => {
     }
   });
 
-  it('keeps Advanced collapsed and permission-gated', () => {
-    expect(sidebarSource).toContain('showAdvanced &&');
-    expect(sidebarSource).toContain('aria-expanded={showAdvanced}');
+  it('keeps non-primary destinations out of persistent sidebar navigation', () => {
+    expect(sidebarSource).not.toContain('showAdvanced &&');
+    expect(sidebarSource).not.toContain('aria-expanded={showAdvanced}');
+    expect(sidebarSource).not.toContain('sidebar-advanced-toggle');
+    expect(sidebarSource).not.toContain('aria-label="Open notifications"');
+    expect(sidebarSource).not.toContain('BuildInfoBadge');
     expect(sidebarSource).not.toContain('sidebar-nav--solutions');
     expect(sidebarSource).not.toContain('sidebar-operational-workspace');
     expect(sidebarSource).toContain('PermissionGate');

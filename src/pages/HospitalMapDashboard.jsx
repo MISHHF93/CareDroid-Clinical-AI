@@ -15,6 +15,11 @@ import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
+import {
+  DataTable,
+  MetricCard,
+  StatusBadge as CanonicalStatusBadge,
+} from '../components/ui/CareDroidPrimitives';
 import './HospitalMapDashboard.css';
 
 const DEVICE_TYPE_OPTIONS = ['all', 'Ventilator', 'Pulse oximeter', 'Infusion pump', 'ECG patch', 'Blood pressure monitor', 'Glucose monitor'];
@@ -27,19 +32,24 @@ function statusLabel(value) {
 
 function StatusBadge({ value }) {
   return (
-    <span className={`hospital-map-badge hospital-map-badge--${getDeviceStatusTone(value)}`}>
+    <CanonicalStatusBadge
+      status={getDeviceStatusTone(value)}
+      className={`hospital-map-badge hospital-map-badge--${getDeviceStatusTone(value)}`}
+    >
       {statusLabel(value)}
-    </span>
+    </CanonicalStatusBadge>
   );
 }
 
 function SummaryCard({ label, value, tone = 'neutral', hint }) {
   return (
-    <article className={`hospital-map-summary-card hospital-map-summary-card--${tone}`}>
-      <strong>{value}</strong>
-      <span>{label}</span>
-      {hint ? <small>{hint}</small> : null}
-    </article>
+    <MetricCard
+      label={label}
+      value={value}
+      helper={hint}
+      tone={tone}
+      className={`hospital-map-summary-card hospital-map-summary-card--${tone}`}
+    />
   );
 }
 
@@ -371,49 +381,46 @@ function RoomBedGrid({ rooms, beds, devices, unitsById, onSelectDevice }) {
 }
 
 function DeviceFleetTable({ devices, onSelectDevice }) {
+  const columns = [
+    {
+      header: 'Device',
+      key: 'device',
+      render: (device) => (
+        <>
+          <strong>{device.name}</strong>
+          <span>{device.type} - {device.serialNumber}</span>
+        </>
+      ),
+    },
+    { header: 'Status', key: 'status', render: (device) => <StatusBadge value={device.status} /> },
+    { header: 'Battery', key: 'battery', render: (device) => `${device.battery}%` },
+    { header: 'Maintenance', key: 'maintenance', render: (device) => statusLabel(device.maintenanceStatus) },
+    { header: 'Calibration', key: 'calibration', render: (device) => statusLabel(device.calibrationStatus) },
+    { header: 'Firmware', key: 'firmwareVersion' },
+    { header: 'Utilization', key: 'utilization', render: (device) => `${device.utilization}%` },
+    {
+      header: 'Action',
+      key: 'action',
+      render: (device) => (
+        <button type="button" className="hospital-map-table-action" onClick={() => onSelectDevice(device)}>
+          Details
+        </button>
+      ),
+    },
+  ];
+
   return (
     <section className="hospital-map-section" aria-labelledby="fleet-table-title">
       <h2 id="fleet-table-title">Device Fleet Management</h2>
       <p className="hospital-map-section-note">
         Demo inventory includes assignment, maintenance, calibration, firmware, battery, location, and utilization.
       </p>
-      <div className="hospital-map-table-wrap">
-        <table className="hospital-map-table">
-          <thead>
-            <tr>
-              <th>Device</th>
-              <th>Status</th>
-              <th>Battery</th>
-              <th>Maintenance</th>
-              <th>Calibration</th>
-              <th>Firmware</th>
-              <th>Utilization</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {devices.map((device) => (
-              <tr key={device.id}>
-                <td>
-                  <strong>{device.name}</strong>
-                  <span>{device.type} - {device.serialNumber}</span>
-                </td>
-                <td><StatusBadge value={device.status} /></td>
-                <td>{device.battery}%</td>
-                <td>{statusLabel(device.maintenanceStatus)}</td>
-                <td>{statusLabel(device.calibrationStatus)}</td>
-                <td>{device.firmwareVersion}</td>
-                <td>{device.utilization}%</td>
-                <td>
-                  <button type="button" className="hospital-map-table-action" onClick={() => onSelectDevice(device)}>
-                    Details
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <DataTable
+        className="hospital-map-table-wrap"
+        columns={columns}
+        rows={devices}
+        getRowKey={(device) => device.id}
+      />
     </section>
   );
 }

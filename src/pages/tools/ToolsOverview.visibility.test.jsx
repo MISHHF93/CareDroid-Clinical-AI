@@ -134,6 +134,18 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     }
   }, 30_000);
 
+  it('labels the library as the active workspace operating console', () => {
+    mockWorkspaceValue.workspaces = [{ id: 'medical-iot', name: 'Medical IoT', toolIds: [] }];
+    mockWorkspaceValue.activeWorkspaceId = 'medical-iot';
+    mockWorkspaceValue.activeWorkspace = { id: 'medical-iot', name: 'Medical IoT' };
+
+    renderOverview();
+
+    expect(screen.getByRole('heading', { level: 1, name: /medical iot tool console/i })).toBeInTheDocument();
+    expect(screen.getByText(/medical iot os/i)).toBeInTheDocument();
+    expect(screen.getByText(/device telemetry mode is active/i)).toBeInTheDocument();
+  });
+
   it.each([
     ['pe-score', 'wells-pe'],
     ['bleeding risk', 'has-bled'],
