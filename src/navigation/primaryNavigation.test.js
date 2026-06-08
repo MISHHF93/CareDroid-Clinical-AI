@@ -32,6 +32,8 @@ describe('primaryNavigation', () => {
 
   it('keeps operations destinations grouped for command/search instead of persistent sidebar nav', () => {
     expect(OPERATIONS_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
+      ['Workflow Mining', '/workflow-mining'],
+      ['Workspace Graph', '/workspace-dependency-graph'],
       ['Twin Intelligence', '/digital-twin-intelligence'],
       ['Digital Twin', '/digital-twin'],
       ['Hospital Map', '/hospital-map'],
@@ -44,6 +46,8 @@ describe('primaryNavigation', () => {
     for (const item of OPERATIONS_SIDEBAR_NAV_ITEMS) {
       expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((nav) => nav.path)).not.toContain(item.path);
     }
+    expect(getPrimaryNavItemForPath('/workflow-mining')?.id).toBe('workflow-mining');
+    expect(getPrimaryNavItemForPath('/workspace-dependency-graph')?.id).toBe('workspace-dependency-graph');
   });
 
   it('keeps developer and governance routes in the collapsed advanced group', () => {
@@ -66,6 +70,7 @@ describe('primaryNavigation', () => {
       ['Self Diagnostics', '/self-diagnostics'],
       ['Learning Engine', '/platform-learning-engine'],
       ['Brain', '/brain'],
+      ['Business Brain', '/business-brain'],
       ['AI Evaluation', '/ai-evaluation'],
       ['Governance', '/ai-governance'],
       ['Security', '/security'],
@@ -73,6 +78,7 @@ describe('primaryNavigation', () => {
       ['Regulatory', '/regulatory'],
       ['Assets', '/assets'],
     ]);
+    expect(getPrimaryNavItemForPath('/business-brain')?.id).toBe('business-brain');
   });
 
   it('keeps solution builder discoverable in the solutions group', () => {
@@ -80,11 +86,17 @@ describe('primaryNavigation', () => {
       expect.arrayContaining([
         ['Solution Builder', '/solution-builder'],
         ['Value Tracking', '/value-tracking'],
+        ['Product Intelligence', '/product-intelligence'],
+        ['Expansion Opportunities', '/expansion-opportunities'],
+        ['Readiness Assessment', '/maturity-assessment'],
         ['Success Center', '/success-center'],
       ])
     );
     expect(getPrimaryNavItemForPath('/solution-builder')?.id).toBe('solution-builder');
     expect(getPrimaryNavItemForPath('/value-tracking')?.id).toBe('value-tracking');
+    expect(getPrimaryNavItemForPath('/product-intelligence')?.id).toBe('product-intelligence');
+    expect(getPrimaryNavItemForPath('/expansion-opportunities')?.id).toBe('expansion-opportunities');
+    expect(getPrimaryNavItemForPath('/maturity-assessment')?.id).toBe('maturity-assessment');
     expect(getPrimaryNavItemForPath('/customer-success')?.id).toBe('customer-success');
   });
 
@@ -190,6 +202,7 @@ describe('primaryNavigation', () => {
       'discover',
       'automation',
       'customer-portal',
+      'knowledge-hub',
       'knowledge-base',
       'marketplace',
       'enterprise-readiness',
@@ -206,6 +219,7 @@ describe('primaryNavigation', () => {
       expect.arrayContaining([
         ['Discover', '/discover'],
         ['Automation', '/automation'],
+        ['Knowledge Hub', '/knowledge-hub'],
       ])
     );
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => item.id)).not.toEqual(

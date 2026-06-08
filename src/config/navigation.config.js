@@ -148,6 +148,15 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
     showInSidebar: false,
   },
   {
+    id: 'knowledge-hub',
+    label: 'Knowledge Hub',
+    mobileLabel: 'Hub',
+    path: CANONICAL_ROUTES.knowledgeHub,
+    matchPaths: [CANONICAL_ROUTES.knowledgeHub],
+    showInMobile: false,
+    showInSidebar: false,
+  },
+  {
     id: 'knowledge-base',
     label: 'Knowledge Base',
     mobileLabel: 'KB',
@@ -249,6 +258,14 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     showInMobile: false,
   },
   {
+    id: 'department-intelligence',
+    label: 'Department Intelligence',
+    mobileLabel: 'Dept IQ',
+    path: CANONICAL_ROUTES.departmentIntelligence,
+    matchPaths: [CANONICAL_ROUTES.departmentIntelligence],
+    showInMobile: false,
+  },
+  {
     id: 'service-lines',
     label: 'Service Lines',
     mobileLabel: 'Lines',
@@ -278,6 +295,30 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
     mobileLabel: 'Value',
     path: CANONICAL_ROUTES.valueTracking,
     matchPaths: [CANONICAL_ROUTES.valueTracking, CANONICAL_ROUTES.outcomes],
+    showInMobile: false,
+  },
+  {
+    id: 'product-intelligence',
+    label: 'Product Intelligence',
+    mobileLabel: 'Product IQ',
+    path: CANONICAL_ROUTES.productIntelligence,
+    matchPaths: [CANONICAL_ROUTES.productIntelligence],
+    showInMobile: false,
+  },
+  {
+    id: 'expansion-opportunities',
+    label: 'Expansion Opportunities',
+    mobileLabel: 'Expand',
+    path: CANONICAL_ROUTES.expansionOpportunities,
+    matchPaths: [CANONICAL_ROUTES.expansionOpportunities],
+    showInMobile: false,
+  },
+  {
+    id: 'maturity-assessment',
+    label: 'Readiness Assessment',
+    mobileLabel: 'Ready',
+    path: CANONICAL_ROUTES.maturityAssessment,
+    matchPaths: [CANONICAL_ROUTES.maturityAssessment],
     showInMobile: false,
   },
   {
@@ -317,6 +358,22 @@ export const SOLUTIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
 ]);
 
 export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
+  {
+    id: 'workflow-mining',
+    label: 'Workflow Mining',
+    mobileLabel: 'Journeys',
+    path: CANONICAL_ROUTES.workflowMining,
+    matchPaths: [CANONICAL_ROUTES.workflowMining],
+    showInMobile: false,
+  },
+  {
+    id: 'workspace-dependency-graph',
+    label: 'Workspace Graph',
+    mobileLabel: 'Graph',
+    path: CANONICAL_ROUTES.workspaceDependencyGraph,
+    matchPaths: [CANONICAL_ROUTES.workspaceDependencyGraph],
+    showInMobile: false,
+  },
   {
     id: 'digital-twin-intelligence',
     label: 'Twin Intelligence',
@@ -424,8 +481,6 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
       CANONICAL_ROUTES.organizationPacks,
       CANONICAL_ROUTES.organizationAssets,
       CANONICAL_ROUTES.organizationIntelligence,
-      CANONICAL_ROUTES.departments,
-      CANONICAL_ROUTES.serviceLines,
     ],
     matchPrefixes: ['/organization/', '/settings/organization/'],
     permission: 'MANAGE_ORGANIZATION',
@@ -570,6 +625,15 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     showInMobile: false,
   },
   {
+    id: 'business-brain',
+    label: 'Business Brain',
+    mobileLabel: 'Biz Brain',
+    path: CANONICAL_ROUTES.businessBrain,
+    matchPaths: [CANONICAL_ROUTES.businessBrain],
+    permission: 'VIEW_ANALYTICS',
+    showInMobile: false,
+  },
+  {
     id: 'ai-evaluation',
     label: 'AI Evaluation',
     mobileLabel: 'Eval',
@@ -675,8 +739,17 @@ export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
   PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => item.showInMobile !== false)
 );
 
+function uniqueNavItemsByPath(items) {
+  const seen = new Set();
+  return items.filter((item) => {
+    if (!item.path || seen.has(item.path)) return false;
+    seen.add(item.path);
+    return true;
+  });
+}
+
 export const QUICK_COMMAND_NAV_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
-export const QUICK_COMMAND_DESTINATION_ITEMS = Object.freeze([
+export const QUICK_COMMAND_DESTINATION_ITEMS = Object.freeze(uniqueNavItemsByPath([
   ...PRIMARY_SIDEBAR_NAV_ITEMS,
   ...SECONDARY_NAV_ITEMS,
   ...SOLUTIONS_SIDEBAR_NAV_ITEMS,
@@ -691,7 +764,7 @@ export const QUICK_COMMAND_DESTINATION_ITEMS = Object.freeze([
     matchPaths: ['/workspaces', '/workspace', '/workspace/clinical'],
     matchPrefixes: ['/workspace/'],
   },
-]);
+]));
 
 export function primaryNavPathMatches(item, pathname) {
   const normalized = pathname || '/';

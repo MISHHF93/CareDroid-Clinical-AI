@@ -17,6 +17,28 @@ type UsageMetric = {
   metadata?: Record<string, unknown>;
 };
 
+type AssetIntelligenceMetric = UsageMetric & {
+  launches: number;
+  totalDurationSeconds: number;
+  averageDurationSeconds: number;
+  repeatUsage: number;
+  abandonmentCount: number;
+  abandonmentRate: number;
+  recommendationsAccepted: number;
+  workflowCompletions: number;
+  workflowCompletionRate: number;
+  usefulnessScore: number;
+  decision: 'promote' | 'improve' | 'hide' | 'merge' | 'monitor';
+};
+
+const ASSET_UTILIZATION_EVENTS = Object.freeze({
+  ASSET_LAUNCHED: 'asset_launched',
+  ASSET_DURATION: 'asset_duration',
+  ASSET_ABANDONED: 'asset_abandoned',
+  RECOMMENDATION_ACCEPTED: 'recommendation_accepted',
+  WORKFLOW_COMPLETED: 'workflow_completed',
+});
+
 @Injectable()
 export class OrganizationAnalyticsService {
   constructor(
@@ -86,6 +108,11 @@ export class OrganizationAnalyticsService {
       if (!assetUsage.some((row) => row.id === metric.id)) assetUsage.push(metric);
     }
     assetUsage.sort((a, b) => b.count - a.count);
+    const assetIntelligence = this.buildAssetIntelligence(
+      usageEvents,
+      entitledAssetIds,
+      assetById,
+    );
 
     const packUsage = packs
       .filter((pack) => enabledPackIds.has(pack.id))
@@ -127,30 +154,34 @@ export class OrganizationAnalyticsService {
       (event) => event.assetId || this.metadataString(event.metadata, 'dashboardId') || 'dashboard',
     ).map((metric) => this.decorateAssetMetric(metric, assetById));
 
-    const underusedAssets = [...entitledAssetIds]
-      .map((assetId) => {
-        const asset = assetById.get(assetId);
-        const usage = assetUsage.find((metric) => metric.id === assetId);
-        return {
-          id: assetId,
-          label: asset?.title || assetId,
-          count: usage?.count || 0,
-          events: usage?.events || 0,
-          metadata: {
-            assetType: asset?.assetType,
-            category: asset?.category,
-            route: asset?.route,
-          },
-        };
-      })
-      .sort((a, b) => a.count - b.count)
+    const topAssets = assetIntelligence
+      .filter((asset) => asset.usefulnessScore > 0)
+      .sort(
+        (a, b) =>
+          b.usefulnessScore - a.usefulnessScore ||
+          b.launches - a.launches ||
+          a.label.localeCompare(b.label),
+      )
       .slice(0, 10);
-
-    const topAssets = assetUsage.slice(0, 10);
+    const underusedAssets = assetIntelligence
+      .filter((asset) => asset.usefulnessScore > 0 && asset.usefulnessScore < 20)
+      .sort(
+        (a, b) =>
+          a.usefulnessScore - b.usefulnessScore ||
+          a.launches - b.launches ||
+          a.label.localeCompare(b.label),
+      )
+      .slice(0, 10);
+    const unusedAssets = assetIntelligence
+      .filter((asset) => asset.usefulnessScore === 0)
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .slice(0, 10);
+    const mergeCandidates = this.buildMergeCandidates(assetIntelligence).slice(0, 10);
     const adoptionScore = assets.length
       ? Math.round((entitledAssetIds.size / Math.max(assets.length, 1)) * 100)
       : 0;
     const totalUsageEvents = this.sumUsage(usageEvents);
+    const utilizationSummary = this.summarizeAssetIntelligence(assetIntelligence);
 
     return {
       organizationId,
@@ -175,6 +206,7 @@ export class OrganizationAnalyticsService {
         searchQueries,
         simulationCompletion,
         dashboardEngagement,
+        assetIntelligence,
       },
       dashboards: {
         adoption: {
@@ -203,8 +235,17 @@ export class OrganizationAnalyticsService {
             (total, metric) => total + metric.count,
             0,
           ),
+          launchCount: utilizationSummary.launches,
+          usageDurationSeconds: utilizationSummary.totalDurationSeconds,
+          averageDurationSeconds: utilizationSummary.averageDurationSeconds,
+          repeatUsageCount: utilizationSummary.repeatUsage,
+          abandonmentCount: utilizationSummary.abandonmentCount,
+          recommendationsAcceptedCount: utilizationSummary.recommendationsAccepted,
+          workflowCompletionCount: utilizationSummary.workflowCompletions,
         },
         underusedAssets,
+        unusedAssets,
+        mergeCandidates,
         topAssets,
       },
       generatedAt: new Date().toISOString(),
@@ -268,6 +309,208 @@ export class OrganizationAnalyticsService {
     return [...rows.values()].sort((a, b) => b.count - a.count);
   }
 
+  private buildAssetIntelligence(
+    events: UsageEvent[],
+    entitledAssetIds: Set<string>,
+    assetById: Map<string, PlatformAsset>,
+  ): AssetIntelligenceMetric[] {
+    const rows = new Map<string, AssetIntelligenceMetric>();
+    const durationEventCounts = new Map<string, number>();
+    const actorCounts = new Map<string, Map<string, number>>();
+    const ensureRow = (assetId: string) => {
+      const existing = rows.get(assetId);
+      if (existing) return existing;
+      const asset = assetById.get(assetId);
+      const row: AssetIntelligenceMetric = {
+        id: assetId,
+        label: asset?.title || assetId,
+        count: 0,
+        events: 0,
+        launches: 0,
+        totalDurationSeconds: 0,
+        averageDurationSeconds: 0,
+        repeatUsage: 0,
+        abandonmentCount: 0,
+        abandonmentRate: 0,
+        recommendationsAccepted: 0,
+        workflowCompletions: 0,
+        workflowCompletionRate: 0,
+        usefulnessScore: 0,
+        decision: 'monitor',
+        metadata: {
+          assetType: asset?.assetType,
+          category: asset?.category,
+          route: asset?.route,
+        },
+      };
+      rows.set(assetId, row);
+      actorCounts.set(assetId, new Map());
+      return row;
+    };
+
+    for (const assetId of entitledAssetIds) ensureRow(assetId);
+
+    for (const event of events) {
+      const metadata = this.metadata(event);
+      const assetId =
+        event.assetId ||
+        this.metadataString(metadata, 'assetId') ||
+        this.metadataString(metadata, 'workflowId') ||
+        this.metadataString(metadata, 'recommendationId');
+      if (!assetId || assetId === 'unknown') continue;
+
+      const row = ensureRow(assetId);
+      const signal = this.metadataString(metadata, 'eventType');
+      row.events += 1;
+
+      if (this.isAssetLaunchSignal(event, signal)) {
+        row.launches += Math.max(1, Number(event.quantity || 0));
+      }
+      if (signal === ASSET_UTILIZATION_EVENTS.ASSET_DURATION) {
+        row.totalDurationSeconds += this.metadataNumber(metadata, 'durationSeconds');
+        durationEventCounts.set(assetId, (durationEventCounts.get(assetId) || 0) + 1);
+      }
+      if (signal === ASSET_UTILIZATION_EVENTS.ASSET_ABANDONED) {
+        row.abandonmentCount += 1;
+      }
+      if (signal === ASSET_UTILIZATION_EVENTS.RECOMMENDATION_ACCEPTED) {
+        row.recommendationsAccepted += 1;
+      }
+      if (signal === ASSET_UTILIZATION_EVENTS.WORKFLOW_COMPLETED) {
+        row.workflowCompletions += 1;
+      }
+
+      const actorKey = this.assetActorKey(event, metadata);
+      if (actorKey) {
+        const counts = actorCounts.get(assetId) || new Map<string, number>();
+        counts.set(actorKey, (counts.get(actorKey) || 0) + 1);
+        actorCounts.set(assetId, counts);
+      }
+    }
+
+    for (const row of rows.values()) {
+      const durationEvents = durationEventCounts.get(row.id) || 0;
+      const repeatActors = [...(actorCounts.get(row.id)?.values() || [])].filter(
+        (count) => count > 1,
+      ).length;
+      row.count = row.launches;
+      row.averageDurationSeconds = durationEvents
+        ? Math.round(row.totalDurationSeconds / durationEvents)
+        : 0;
+      row.repeatUsage = repeatActors;
+      row.abandonmentRate = row.launches
+        ? Number((row.abandonmentCount / row.launches).toFixed(2))
+        : 0;
+      row.workflowCompletionRate = row.launches
+        ? Number((row.workflowCompletions / row.launches).toFixed(2))
+        : 0;
+      row.usefulnessScore = this.calculateUsefulnessScore(row);
+      row.decision = this.decideAssetAction(row);
+      row.metadata = {
+        ...(row.metadata || {}),
+        launches: row.launches,
+        totalDurationSeconds: row.totalDurationSeconds,
+        averageDurationSeconds: row.averageDurationSeconds,
+        repeatUsage: row.repeatUsage,
+        abandonmentCount: row.abandonmentCount,
+        abandonmentRate: row.abandonmentRate,
+        recommendationsAccepted: row.recommendationsAccepted,
+        workflowCompletions: row.workflowCompletions,
+        workflowCompletionRate: row.workflowCompletionRate,
+        usefulnessScore: row.usefulnessScore,
+        decision: row.decision,
+      };
+    }
+
+    return [...rows.values()].sort(
+      (a, b) =>
+        b.usefulnessScore - a.usefulnessScore ||
+        b.launches - a.launches ||
+        a.label.localeCompare(b.label),
+    );
+  }
+
+  private summarizeAssetIntelligence(rows: AssetIntelligenceMetric[]) {
+    const totalDurationSeconds = rows.reduce(
+      (total, row) => total + row.totalDurationSeconds,
+      0,
+    );
+    const durationEvents = rows.filter((row) => row.averageDurationSeconds > 0).length;
+    return {
+      launches: rows.reduce((total, row) => total + row.launches, 0),
+      totalDurationSeconds,
+      averageDurationSeconds: durationEvents
+        ? Math.round(totalDurationSeconds / durationEvents)
+        : 0,
+      repeatUsage: rows.reduce((total, row) => total + row.repeatUsage, 0),
+      abandonmentCount: rows.reduce((total, row) => total + row.abandonmentCount, 0),
+      recommendationsAccepted: rows.reduce(
+        (total, row) => total + row.recommendationsAccepted,
+        0,
+      ),
+      workflowCompletions: rows.reduce((total, row) => total + row.workflowCompletions, 0),
+    };
+  }
+
+  private buildMergeCandidates(rows: AssetIntelligenceMetric[]): AssetIntelligenceMetric[] {
+    const candidates: AssetIntelligenceMetric[] = [];
+    for (const row of rows.filter((item) => item.usefulnessScore > 0 && item.usefulnessScore < 20)) {
+      const target = rows.find(
+        (candidate) =>
+          candidate.id !== row.id &&
+          candidate.usefulnessScore >= Math.max(20, row.usefulnessScore + 8) &&
+          this.assetsOverlap(row, candidate),
+      );
+      if (!target) continue;
+      candidates.push({
+        ...row,
+        decision: 'merge',
+        metadata: {
+          ...(row.metadata || {}),
+          decision: 'merge',
+          mergeTargetId: target.id,
+          mergeTargetLabel: target.label,
+          reason: `Low usefulness overlaps with stronger asset ${target.label}.`,
+        },
+      });
+    }
+    return candidates.sort(
+      (a, b) =>
+        a.usefulnessScore - b.usefulnessScore ||
+        a.label.localeCompare(b.label),
+    );
+  }
+
+  private calculateUsefulnessScore(row: AssetIntelligenceMetric): number {
+    const durationScore = Math.min(10, row.averageDurationSeconds / 30);
+    const score =
+      row.launches * 5 +
+      row.repeatUsage * 4 +
+      row.workflowCompletions * 8 +
+      row.recommendationsAccepted * 6 +
+      durationScore -
+      row.abandonmentRate * 20;
+    return Math.max(0, Math.round(score));
+  }
+
+  private decideAssetAction(
+    row: AssetIntelligenceMetric,
+  ): AssetIntelligenceMetric['decision'] {
+    if (row.usefulnessScore === 0) return 'hide';
+    if (row.usefulnessScore >= 45 && row.repeatUsage > 0) return 'promote';
+    if (row.usefulnessScore < 20) return 'improve';
+    return 'monitor';
+  }
+
+  private assetsOverlap(a: AssetIntelligenceMetric, b: AssetIntelligenceMetric): boolean {
+    const aMetadata = a.metadata || {};
+    const bMetadata = b.metadata || {};
+    return Boolean(
+      (aMetadata.assetType && aMetadata.assetType === bMetadata.assetType) ||
+        (aMetadata.category && aMetadata.category === bMetadata.category),
+    );
+  }
+
   private quantityForAsset(events: UsageEvent[], assetId: string): number {
     return events
       .filter((event) => event.assetId === assetId)
@@ -284,6 +527,58 @@ export class OrganizationAnalyticsService {
   ): string | null {
     const value = metadata?.[key];
     return typeof value === 'string' && value.trim() ? value : null;
+  }
+
+  private metadataNumber(metadata: Record<string, any> | null | undefined, key: string): number {
+    const value = Number(metadata?.[key]);
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  private metadata(row: { metadata?: Record<string, any> | string | null }) {
+    if (!row.metadata) return {};
+    if (typeof row.metadata === 'string') {
+      try {
+        return JSON.parse(row.metadata);
+      } catch {
+        return {};
+      }
+    }
+    return row.metadata;
+  }
+
+  private isAssetLaunchSignal(event: UsageEvent, signal: string | null): boolean {
+    if (signal === ASSET_UTILIZATION_EVENTS.ASSET_LAUNCHED) return true;
+    const behavioralSignals: string[] = [
+      ASSET_UTILIZATION_EVENTS.ASSET_DURATION,
+      ASSET_UTILIZATION_EVENTS.ASSET_ABANDONED,
+      ASSET_UTILIZATION_EVENTS.RECOMMENDATION_ACCEPTED,
+      ASSET_UTILIZATION_EVENTS.WORKFLOW_COMPLETED,
+    ];
+    if (
+      signal &&
+      behavioralSignals.includes(signal)
+    ) {
+      return false;
+    }
+    return (
+      Number(event.quantity || 0) > 0 &&
+      [
+        UsageEventType.TOOL_LAUNCH,
+        UsageEventType.CALCULATOR_LAUNCH,
+        UsageEventType.SIMULATION,
+        UsageEventType.MAP_USAGE,
+        UsageEventType.IOT_TELEMETRY,
+      ].includes(event.eventType)
+    );
+  }
+
+  private assetActorKey(event: UsageEvent, metadata: Record<string, any>): string | null {
+    return (
+      event.userId ||
+      this.metadataString(metadata, 'sessionId') ||
+      (event.workspaceId ? `workspace:${event.workspaceId}` : null) ||
+      (event.userRole ? `role:${event.userRole}` : null)
+    );
   }
 
   private isSearchEvent(event: UsageEvent): boolean {

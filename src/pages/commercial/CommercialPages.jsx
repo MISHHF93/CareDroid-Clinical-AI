@@ -17,6 +17,12 @@ import {
   buildRoleIntelligenceProfile,
   getRoleIntelligenceAgentRecommendations,
 } from '../../data/roleIntelligenceLayer';
+import { buildCustomerExpansionOpportunities } from '../../data/customerExpansionEngine';
+import {
+  DEFAULT_HOSPITAL_READINESS_QUESTIONNAIRE,
+  buildHospitalReadinessAssessment,
+} from '../../data/hospitalReadinessAssessment';
+import { buildProductIntelligenceLayer } from '../../data/productIntelligenceLayer';
 import { applyRegistryToolLaunch, getRegistryToolNavigation } from '../../navigation/registryToolLaunch';
 import { trackRoleAiRequest } from '../../services/roleIntelligenceTelemetry';
 import './CommercialPages.css';
@@ -183,6 +189,119 @@ function ProductizationList({ title, items = [] }) {
         ))}
       </ul>
     </Card>
+  );
+}
+
+export function CustomerExpansionOpportunitiesPage() {
+  const model = useMemo(() => buildCustomerExpansionOpportunities(), []);
+
+  return (
+    <PageShell
+      title="Expansion Opportunities"
+      subtitle="Commercial growth recommendations based on customer segment, current pack usage, readiness evidence, and adjacent workflows."
+    >
+      <div className="commercial-metrics-grid">
+        <BuilderMetric label="Customer segments" value={model.summary.customerSegmentCount} />
+        <BuilderMetric label="Opportunities" value={model.summary.opportunityCount} />
+        <BuilderMetric label="High confidence" value={model.summary.highConfidenceCount} />
+        <BuilderMetric label="Recommended packs" value={model.summary.recommendedPackCount} />
+      </div>
+
+      <div className="commercial-grid">
+        {model.segments.map((segment) => (
+          <Card key={segment.id} className="commercial-card commercial-wide-card">
+            <div className="commercial-card-header">
+              <div>
+                <span className="commercial-muted">{segment.segment}</span>
+                <h2>{segment.segment} expansion</h2>
+              </div>
+              <strong>{segment.topScore}</strong>
+            </div>
+            <p>{segment.summary}</p>
+            <p className="commercial-muted">Currently uses</p>
+            <ChipList items={segment.currentPacks} />
+
+            <div className="commercial-grid">
+              {segment.opportunities.map((opportunity) => (
+                <Card key={opportunity.id} className="commercial-card">
+                  <span className="commercial-muted">{opportunity.band.label}</span>
+                  <h3>{opportunity.recommendedPack}</h3>
+                  <p>{opportunity.expectedOutcome}</p>
+                  <p>
+                    <strong>Motion:</strong> {opportunity.motion}
+                  </p>
+                  <p>
+                    <strong>Opportunity score:</strong> {opportunity.score}
+                  </p>
+                  <ul className="commercial-compact-list">
+                    {opportunity.evidence.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </Card>
+              ))}
+            </div>
+          </Card>
+        ))}
+      </div>
+    </PageShell>
+  );
+}
+
+export function ProductIntelligenceLayerPage() {
+  const layer = useMemo(() => buildProductIntelligenceLayer(), []);
+
+  return (
+    <PageShell
+      title="Product Intelligence"
+      subtitle="Measure SaaS product success from Product -> Pack -> Asset -> Usage -> Outcome."
+    >
+      <div className="commercial-metrics-grid">
+        <BuilderMetric label="Products measured" value={layer.summary.productCount} />
+        <BuilderMetric label="Avg adoption" value={layer.summary.averageAdoption} />
+        <BuilderMetric label="Avg ROI" value={layer.summary.averageRoi} />
+        <BuilderMetric label="Avg health" value={layer.summary.averageHealth} />
+        <BuilderMetric label="Avg engagement" value={layer.summary.averageEngagement} />
+      </div>
+
+      <section className="commercial-section">
+        <h2>Product value scorecards</h2>
+        <div className="commercial-grid">
+          {layer.products.map((product) => (
+            <Card key={product.id} className="commercial-card">
+              <span className="commercial-muted">{product.health.band.label}</span>
+              <h2>{product.name}</h2>
+              <div className="commercial-metric">
+                <BuilderMetric label="Adoption" value={product.adoption.score} />
+                <BuilderMetric label="ROI" value={product.roi.score} />
+                <BuilderMetric label="Health" value={product.health.score} />
+                <BuilderMetric label="Engagement" value={product.engagement.score} />
+              </div>
+              <p>
+                ROI ratio: {product.roi.roiRatio} · Estimated value: $
+                {product.roi.estimatedValue.toLocaleString()} · Cost: $
+                {product.roi.implementationCost.toLocaleString()}
+              </p>
+              <p>
+                Usage: {product.engagement.launches} launches · {product.engagement.workflowCompletions}{' '}
+                workflow completions · {product.engagement.aiAssistedActions} AI-assisted actions
+              </p>
+              <ProductizationList title="Packs" items={product.valueChain.packs} />
+              <ProductizationList
+                title="Assets"
+                items={product.valueChain.assets.map((asset) => `${asset.name} (${asset.type})`)}
+              />
+              <ProductizationList
+                title="Outcomes"
+                items={product.valueChain.outcomes.map(
+                  (outcome) => `${outcome.label}: ${outcome.valueScore}`,
+                )}
+              />
+            </Card>
+          ))}
+        </div>
+      </section>
+    </PageShell>
   );
 }
 
@@ -895,14 +1014,14 @@ export function AgentsRegistryPage() {
 
 export function MaturityAssessmentPage() {
   const { organization } = useUserIdentity();
-  const [questionnaire, setQuestionnaire] = useState(null);
+  const [questionnaire, setQuestionnaire] = useState(DEFAULT_HOSPITAL_READINESS_QUESTIONNAIRE);
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
 
   useEffect(() => {
     ProductCatalogApi.getMaturityQuestionnaire()
       .then((data) => setQuestionnaire(data))
-      .catch(() => setQuestionnaire(null));
+      .catch(() => setQuestionnaire(DEFAULT_HOSPITAL_READINESS_QUESTIONNAIRE));
   }, []);
 
   const submit = async () => {
@@ -910,35 +1029,83 @@ export function MaturityAssessmentPage() {
       questionId,
       value: Number(value),
     }));
-    const res = await ProductCatalogApi.submitMaturityAssessment(
-      payload,
-      organization?.id
-    );
-    setResult(res);
+    try {
+      const res = await ProductCatalogApi.submitMaturityAssessment(
+        payload,
+        organization?.id
+      );
+      setResult({
+        ...res,
+        readinessAssessment: buildHospitalReadinessAssessment({ answers }),
+      });
+    } catch {
+      setResult({
+        readinessAssessment: buildHospitalReadinessAssessment({ answers }),
+      });
+    }
   };
 
   if (result) {
+    const readiness = result.readinessAssessment || buildHospitalReadinessAssessment({ answers });
+    const recommendationSections = [
+      ['Products', readiness.recommendations.products],
+      ['Packs', readiness.recommendations.packs],
+      ['Integrations', readiness.recommendations.integrations],
+      ['Training', readiness.recommendations.training],
+    ];
+
     return (
-      <PageShell title="Maturity results" subtitle={`Overall score: ${result.overallScore}/100`}>
-        <div className="commercial-metric">
-          {(result.dimensions || []).map((d) => (
-            <Card key={d.dimension} className="commercial-card">
-              <div className="commercial-metric-value">{d.score}</div>
-              <p>{d.dimension.replace(/_/g, ' ')}</p>
-            </Card>
-          ))}
+      <PageShell
+        title="Hospital Readiness Score"
+        subtitle={`Consultative readiness: ${readiness.hospitalReadinessScore}/100 · ${readiness.readinessBand.label}`}
+      >
+        <div className="commercial-metrics-grid">
+          <BuilderMetric label="Hospital Readiness Score" value={readiness.hospitalReadinessScore} />
+          <BuilderMetric label="Readiness band" value={readiness.readinessBand.label} />
+          <BuilderMetric label="Measured dimensions" value={readiness.summary.measuredDimensionCount} />
+          <BuilderMetric label="Recommendations" value={readiness.summary.recommendationCount} />
         </div>
-        <h2>Recommended products</h2>
-        <div className="commercial-grid">
-          {(result.recommendedProducts || []).map((p) => (
-            <Card key={p.id} className="commercial-card">
-              <h2>{p.name}</h2>
-              <Link to={`/products/${p.slug}`}>
-                <Button variant="primary">View</Button>
-              </Link>
-            </Card>
-          ))}
-        </div>
+
+        <section className="commercial-section">
+          <h2>Maturity dimensions</h2>
+          <div className="commercial-grid">
+            {readiness.dimensions.map((dimension) => (
+              <Card key={dimension.id} className="commercial-card">
+                <span className="commercial-muted">{dimension.level.label}</span>
+                <div className="commercial-metric-value">{dimension.score}</div>
+                <h3>{dimension.label}</h3>
+                <p><strong>Signals:</strong> {dimension.signals.join(', ')}</p>
+                <p><strong>Gaps:</strong> {dimension.gaps.join(', ')}</p>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <section className="commercial-section">
+          <h2>Consultative recommendations</h2>
+          <div className="commercial-grid">
+            {recommendationSections.map(([title, items]) => (
+              <ProductizationList key={title} title={title} items={items} />
+            ))}
+          </div>
+        </section>
+
+        {result.recommendedProducts?.length ? (
+          <>
+            <h2>Recommended products from assessment API</h2>
+            <div className="commercial-grid">
+              {result.recommendedProducts.map((p) => (
+                <Card key={p.id} className="commercial-card">
+                  <h2>{p.name}</h2>
+                  <Link to={`/products/${p.slug}`}>
+                    <Button variant="primary">View</Button>
+                  </Link>
+                </Card>
+              ))}
+            </div>
+          </>
+        ) : null}
+
         <Link to="/onboarding">
           <Button variant="secondary">Configure deployment</Button>
         </Link>
@@ -946,9 +1113,18 @@ export function MaturityAssessmentPage() {
     );
   }
 
+  const readinessPreview = buildHospitalReadinessAssessment({ answers });
+
   return (
-    <PageShell title="Hospital maturity assessment" subtitle="Consultative product recommendations.">
-      {(questionnaire?.questions || []).map((q) => (
+    <PageShell title="Hospital maturity assessment" subtitle="Consultative readiness scoring and product recommendations.">
+      <div className="commercial-metrics-grid">
+        <BuilderMetric label="Hospital Readiness Score" value={readinessPreview.hospitalReadinessScore} />
+        <BuilderMetric label="Readiness band" value={readinessPreview.readinessBand.label} />
+        <BuilderMetric label="Dimensions" value={readinessPreview.summary.measuredDimensionCount} />
+        <BuilderMetric label="Recommendation types" value={4} />
+      </div>
+
+      {(questionnaire?.questions || DEFAULT_HOSPITAL_READINESS_QUESTIONNAIRE.questions).map((q) => (
         <Card key={q.id} className="commercial-card" style={{ marginBottom: 12 }}>
           <h2>{q.question}</h2>
           <div className="commercial-chip-list">
@@ -965,8 +1141,22 @@ export function MaturityAssessmentPage() {
           </div>
         </Card>
       ))}
+
+      <section className="commercial-section">
+        <h2>Assessment dimensions</h2>
+        <div className="commercial-grid">
+          {readinessPreview.dimensions.map((dimension) => (
+            <Card key={dimension.id} className="commercial-card">
+              <span className="commercial-muted">{dimension.level.label}</span>
+              <h3>{dimension.label}</h3>
+              <p>{dimension.gaps[0]}</p>
+            </Card>
+          ))}
+        </div>
+      </section>
+
       <Button variant="primary" onClick={submit}>
-        Get recommendations
+        Get readiness recommendations
       </Button>
     </PageShell>
   );

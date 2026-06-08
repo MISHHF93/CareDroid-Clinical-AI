@@ -18,6 +18,7 @@ import {
   applyRegistryToolLaunch,
   getRegistryToolNavigation,
 } from '../navigation/registryToolLaunch';
+import { recordAssetRecommendationAccepted } from '../services/usageMeteringService';
 import './RecommendationsPage.css';
 
 const GROUP_FILTERS = [{ id: 'all', label: 'All' }, ...RECOMMENDATION_GROUPS];
@@ -193,6 +194,11 @@ export default function RecommendationsPage() {
         score: recommendation.score,
         source: 'recommendations',
       },
+    });
+    recordAssetRecommendationAccepted({
+      recommendation,
+      route: recommendation.route,
+      source: 'recommendations',
     });
 
     if (recommendation.type === 'tools') {

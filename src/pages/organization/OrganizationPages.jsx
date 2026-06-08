@@ -667,16 +667,22 @@ export function PlatformAnalyticsPage() {
   const packs = platformContext?.availablePacks || [];
   const dashboards = analytics?.dashboards || {};
   const dimensions = analytics?.dimensions || {};
+  const formatDuration = (seconds = 0) => {
+    if (!seconds) return '0s';
+    if (seconds < 60) return `${Math.round(seconds)}s`;
+    return `${Math.round(seconds / 60)}m`;
+  };
 
   const metricCards = [
     ['Enabled packs', dashboards.adoption?.enabledPackCount ?? analytics?.enabledPackCount ?? 0],
     ['Enabled assets', dashboards.adoption?.enabledAssetCount ?? 0],
     ['Adoption score', `${dashboards.adoption?.adoptionScore ?? 0}%`],
-    ['Usage events', dashboards.engagement?.totalUsageEvents ?? 0],
-    ['AI usage', dashboards.engagement?.aiUsageCount ?? analytics?.aiSessionCount ?? 0],
-    ['Search queries', dashboards.engagement?.searchQueryCount ?? 0],
-    ['Simulation completions', dashboards.engagement?.simulationCompletionCount ?? 0],
-    ['Dashboard engagement', dashboards.engagement?.dashboardEngagementCount ?? 0],
+    ['Launches', dashboards.engagement?.launchCount ?? dashboards.engagement?.totalUsageEvents ?? 0],
+    ['Avg duration', formatDuration(dashboards.engagement?.averageDurationSeconds ?? 0)],
+    ['Repeat usage', dashboards.engagement?.repeatUsageCount ?? 0],
+    ['Abandonments', dashboards.engagement?.abandonmentCount ?? 0],
+    ['AI recs accepted', dashboards.engagement?.recommendationsAcceptedCount ?? 0],
+    ['Workflow completions', dashboards.engagement?.workflowCompletionCount ?? 0],
   ];
 
   const renderMetricList = (title, rows = [], emptyText = 'No usage recorded yet.') => (
@@ -690,8 +696,13 @@ export function PlatformAnalyticsPage() {
                 <strong>{row.label || row.packName || row.resource || row.id || row.packId}</strong>
                 {row.metadata?.assetType && <small>{row.metadata.assetType}</small>}
                 {row.metadata?.status && <small>{row.metadata.status}</small>}
+                {row.metadata?.decision && <small>{row.metadata.decision}</small>}
+                {row.metadata?.mergeTargetLabel && (
+                  <small>Merge into {row.metadata.mergeTargetLabel}</small>
+                )}
+                {row.metadata?.reason && <small>{row.metadata.reason}</small>}
               </span>
-              <b>{row.count ?? row.events ?? row.status ?? 'enabled'}</b>
+              <b>{row.metadata?.usefulnessScore ?? row.count ?? row.events ?? row.status ?? 'enabled'}</b>
             </li>
           ))}
         </ol>
@@ -706,7 +717,7 @@ export function PlatformAnalyticsPage() {
       <header className="org-page-header">
         <h1>Platform analytics</h1>
         <p className="org-page-subtitle">
-          Adoption, engagement, underused assets, and top assets across the active organization.
+          Asset utilization intelligence for data-driven promotion, improvement, hiding, and merge decisions.
         </p>
       </header>
       {analytics ? (
@@ -733,6 +744,7 @@ export function PlatformAnalyticsPage() {
             <h2>Engagement</h2>
             <div className="org-grid">
               {renderMetricList('Asset usage', dimensions.assetUsage || [])}
+              {renderMetricList('Asset intelligence', dimensions.assetIntelligence || [])}
               {renderMetricList('AI usage', dimensions.aiUsage || [])}
               {renderMetricList('Search queries', dimensions.searchQueries || [])}
               {renderMetricList('Simulation completion', dimensions.simulationCompletion || [])}
@@ -741,16 +753,30 @@ export function PlatformAnalyticsPage() {
           </div>
 
           <div className="org-analytics-section">
-            <h2>Underused assets</h2>
+            <h2>Top assets</h2>
             <div className="org-grid">
-              {renderMetricList('Lowest engagement', dashboards.underusedAssets || [])}
+              {renderMetricList('Most useful assets', dashboards.topAssets || analytics.topTools || [])}
             </div>
           </div>
 
           <div className="org-analytics-section">
-            <h2>Top assets</h2>
+            <h2>Underused assets</h2>
             <div className="org-grid">
-              {renderMetricList('Most used assets', dashboards.topAssets || analytics.topTools || [])}
+              {renderMetricList('Low usefulness with activity', dashboards.underusedAssets || [])}
+            </div>
+          </div>
+
+          <div className="org-analytics-section">
+            <h2>Unused assets</h2>
+            <div className="org-grid">
+              {renderMetricList('No useful signal', dashboards.unusedAssets || [])}
+            </div>
+          </div>
+
+          <div className="org-analytics-section">
+            <h2>Merge candidates</h2>
+            <div className="org-grid">
+              {renderMetricList('Overlap with stronger assets', dashboards.mergeCandidates || [])}
             </div>
           </div>
         </>

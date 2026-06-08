@@ -18,8 +18,14 @@ import {
   filterText,
   workspaceFilterSummary,
 } from '../data/platformOperatingSystem';
+import { buildDepartmentPerformanceIntelligence } from '../data/departmentPerformanceIntelligence';
+import { buildWorkspaceDependencyGraph } from '../data/crossWorkspaceIntelligence';
+import { buildWorkflowMiningReport } from '../data/workflowMiningEngine';
+import { buildHealthcareKnowledgeHub } from '../data/healthcareKnowledgeHub';
+import { buildCareDroidBusinessBrain } from '../data/caredroidBusinessBrain';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { PlatformAssetsApi } from '../services/platformAssetsApi';
+import { recordWorkflowCompletion } from '../services/usageMeteringService';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { buildAssetInventoryProjection } from '../data/assetInventory';
 import { NavIcon } from '../navigation/NavIcon';
@@ -85,6 +91,22 @@ function FilterBar({ query, setQuery, workspaceId, setWorkspaceId, category, set
         </label>
       ) : null}
     </section>
+  );
+}
+
+function KnowledgeFacetSelect({ label, value, onChange, options }) {
+  return (
+    <label>
+      <span>{label}</span>
+      <select value={value} onChange={(event) => onChange(event.target.value)}>
+        <option value="all">All {label.toLowerCase()}</option>
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option.replace(/-/g, ' ')}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
@@ -169,6 +191,99 @@ export function SearchResultsPage() {
         {results.map((item) => (
           <ResultCard key={item.id} item={item} onOpen={(result) => openSearchResult(result, navigate, launchTool)} />
         ))}
+      </section>
+    </PageShell>
+  );
+}
+
+export function HealthcareKnowledgeHubPage() {
+  const [query, setQuery] = useState('');
+  const [specialty, setSpecialty] = useState('all');
+  const [role, setRole] = useState('all');
+  const [workspace, setWorkspace] = useState('all');
+  const [department, setDepartment] = useState('all');
+  const hub = useMemo(
+    () => buildHealthcareKnowledgeHub({ query, specialty, role, workspace, department }),
+    [department, query, role, specialty, workspace],
+  );
+
+  return (
+    <PageShell
+      eyebrow="Healthcare Knowledge Hub"
+      title="Knowledge Hub"
+      description="Search protocols, pathways, calculators, simulations, AI guidance, and documentation by specialty, role, workspace, and department."
+    >
+      <DataSourceNotice
+        label="Centralized knowledge index"
+        detail="Knowledge items are normalized across clinical, operational, AI, training, and documentation surfaces so users can discover the right next action."
+      />
+
+      <section className="platform-kpi-grid" aria-label="Knowledge hub summary">
+        <article>
+          <span>Knowledge items</span>
+          <strong>{hub.summary.totalItems}</strong>
+        </article>
+        <article>
+          <span>Visible results</span>
+          <strong>{hub.summary.resultCount}</strong>
+        </article>
+        <article>
+          <span>Categories</span>
+          <strong>{hub.summary.representedTypeCount}</strong>
+        </article>
+        <article>
+          <span>Search facets</span>
+          <strong>4</strong>
+        </article>
+      </section>
+
+      <section className="platform-filter-bar" aria-label="Knowledge hub filters">
+        <label>
+          <span>Search</span>
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search knowledge..."
+          />
+        </label>
+        <KnowledgeFacetSelect label="Specialty" value={specialty} onChange={setSpecialty} options={hub.facets.specialties} />
+        <KnowledgeFacetSelect label="Role" value={role} onChange={setRole} options={hub.facets.roles} />
+        <KnowledgeFacetSelect label="Workspace" value={workspace} onChange={setWorkspace} options={hub.facets.workspaces} />
+        <KnowledgeFacetSelect label="Department" value={department} onChange={setDepartment} options={hub.facets.departments} />
+      </section>
+
+      <section className="platform-result-grid" aria-label="Knowledge categories">
+        {hub.types.map((type) => (
+          <article key={type} className="platform-result-card platform-result-card--static">
+            <span className="platform-result-card__kind">category</span>
+            <strong>{type.replace(/_/g, ' ')}</strong>
+            <span>{hub.typeCounts[type]} matching items</span>
+          </article>
+        ))}
+      </section>
+
+      <section className="platform-result-grid" aria-label="Knowledge hub results">
+        {hub.results.map((item) => (
+          <article key={item.id} className="platform-result-card platform-result-card--static">
+            <span className="platform-result-card__kind">{item.type.replace(/_/g, ' ')}</span>
+            <strong>{item.title}</strong>
+            <span>{item.description}</span>
+            <small>{item.route}</small>
+            <small>
+              {item.specialties.join(', ')} · {item.roles.join(', ')}
+            </small>
+            <small>
+              {item.workspaces.join(', ')} · {item.departments.join(', ')}
+            </small>
+          </article>
+        ))}
+        {!hub.results.length ? (
+          <article className="platform-result-card platform-result-card--static">
+            <span className="platform-result-card__kind">empty</span>
+            <strong>No matching knowledge found</strong>
+            <span>Adjust specialty, role, workspace, department, or search text.</span>
+          </article>
+        ) : null}
       </section>
     </PageShell>
   );
@@ -341,10 +456,24 @@ export function WorkflowBuilderPage() {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState(PLATFORM_WORKFLOWS[0].id);
   const [draftName, setDraftName] = useState('');
+  const [completionStatus, setCompletionStatus] = useState('');
   const workflow = PLATFORM_WORKFLOWS.find((item) => item.id === selectedId) || PLATFORM_WORKFLOWS[0];
+  useEffect(() => {
+    setCompletionStatus('');
+  }, [selectedId]);
   const launchBlock = (block) => {
     if (block.path) navigate(block.path);
     if (block.toolId) applyRegistryToolLaunch(block.toolId, { navigate, replace: false });
+  };
+  const completeWorkflow = () => {
+    recordWorkflowCompletion({
+      workflowId: workflow.id,
+      assetId: workflow.id,
+      route: '/workflows',
+      source: 'workflow-builder',
+      blockCount: workflow.blocks.length,
+    });
+    setCompletionStatus(`${workflow.name} completion recorded.`);
   };
 
   return (
@@ -371,6 +500,10 @@ export function WorkflowBuilderPage() {
           <button type="button" className="platform-secondary-button" disabled title="Requires workflow generation API">
             AI-generate workflow (demo disabled)
           </button>
+          <button type="button" className="platform-secondary-button" onClick={completeWorkflow}>
+            Mark workflow complete
+          </button>
+          {completionStatus ? <p className="platform-muted">{completionStatus}</p> : null}
         </div>
         <div className="platform-workflow-chain">
           <h2>{draftName || workflow.name}</h2>
@@ -384,6 +517,364 @@ export function WorkflowBuilderPage() {
             </button>
           ))}
         </div>
+      </section>
+    </PageShell>
+  );
+}
+
+export function DepartmentIntelligencePage() {
+  const model = useMemo(() => buildDepartmentPerformanceIntelligence(), []);
+
+  return (
+    <PageShell
+      eyebrow="Department Performance Intelligence"
+      title="Department Intelligence"
+      description="Department health scores and measurable platform outcomes for clinical, diagnostic, and operational leaders."
+    >
+      <DataSourceNotice
+        label="Outcome intelligence model"
+        detail="Scores are privacy-safe aggregate outcomes from workflow, calculator, simulation, turnaround, interpretation, uptime, and maintenance signals."
+      />
+      <section className="platform-kpi-grid" aria-label="Department intelligence summary">
+        <article>
+          <span>Departments</span>
+          <strong>{model.summary.departmentCount}</strong>
+        </article>
+        <article>
+          <span>Avg health score</span>
+          <strong>{model.summary.averageHealthScore}</strong>
+        </article>
+        <article>
+          <span>Measurable outcomes</span>
+          <strong>{model.summary.measurableOutcomeCount}</strong>
+        </article>
+        <article>
+          <span>Attention departments</span>
+          <strong>{model.summary.attentionDepartmentCount}</strong>
+        </article>
+      </section>
+
+      <section className="platform-result-grid" aria-label="Department health scores">
+        {model.departments.map((department) => (
+          <article key={department.id} className="platform-result-card platform-result-card--static">
+            <span className="platform-result-card__kind">{department.healthBand.label}</span>
+            <strong>{department.name}</strong>
+            <span>{department.description}</span>
+            <small>Department Health Score: {department.healthScore}</small>
+            <small>{department.measurableOutcomeCount} measurable platform outcomes</small>
+          </article>
+        ))}
+      </section>
+
+      <section className="platform-workflow-layout" aria-label="Department outcome metrics">
+        {model.departments.map((department) => (
+          <article key={department.id} className="platform-panel">
+            <p className="platform-os-eyebrow">{department.healthBand.label}</p>
+            <h2>{department.name}</h2>
+            <p className="platform-muted">Department Health Score: {department.healthScore}</p>
+            <div className="platform-notification-list">
+              {department.metrics.map((metric) => (
+                <div key={metric.id} className="platform-notification">
+                  <div>
+                    <span>{metric.source}</span>
+                    <strong>{metric.label}</strong>
+                    <p>
+                      {metric.value} against target {metric.target}
+                    </p>
+                  </div>
+                  <div className="platform-notification__actions">
+                    <small>{metric.trend}</small>
+                    <strong>{metric.score}</strong>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </section>
+    </PageShell>
+  );
+}
+
+export function WorkflowMiningEnginePage() {
+  const report = useMemo(() => buildWorkflowMiningReport(), []);
+  const signalLabels = {
+    page_transition: 'Page transitions',
+    ai_launch: 'AI launches',
+    workflow_launch: 'Workflow launches',
+    tool_usage: 'Tool usage',
+    search_behavior: 'Search behavior',
+  };
+
+  return (
+    <PageShell
+      eyebrow="Workflow Mining Engine"
+      title="Workflow Mining"
+      description="Mined journey evidence for page transitions, AI launches, workflow launches, tool usage, and search behavior."
+    >
+      <DataSourceNotice
+        label="Behavioral journey model"
+        detail="Journeys are aggregate, privacy-safe behavioral patterns until the backend workflow-mining event stream is exposed."
+      />
+      <section className="platform-kpi-grid" aria-label="Workflow mining summary">
+        <article>
+          <span>Journeys</span>
+          <strong>{report.summary.journeyCount}</strong>
+        </article>
+        <article>
+          <span>Events analyzed</span>
+          <strong>{report.summary.eventCount}</strong>
+        </article>
+        <article>
+          <span>Friction signals</span>
+          <strong>{report.summary.frictionCount}</strong>
+        </article>
+        <article>
+          <span>Unnecessary clicks</span>
+          <strong>{report.summary.unnecessaryClickCount}</strong>
+        </article>
+      </section>
+
+      <section className="platform-result-grid" aria-label="Workflow mining signals">
+        {report.signalTypes.map((type) => (
+          <article key={type} className="platform-result-card platform-result-card--static">
+            <span className="platform-result-card__kind">signal</span>
+            <strong>{signalLabels[type]}</strong>
+            <span>{report.signalCounts[type]} observed journey events</span>
+            <small>{type}</small>
+          </article>
+        ))}
+      </section>
+
+      <section className="platform-workflow-layout" aria-label="Most common user journeys">
+        <article className="platform-panel">
+          <h2>Most Common User Journeys</h2>
+          <div className="platform-notification-list">
+            {report.mostCommonUserJourneys.map((journey, index) => (
+              <div key={journey.id} className="platform-notification">
+                <div>
+                  <span>rank #{index + 1}</span>
+                  <strong>{journey.title}</strong>
+                  <p>{journey.steps.join(' -> ')}</p>
+                  <small>{journey.frequency} journeys · {journey.completionRate}% completion</small>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="platform-panel">
+          <h2>Evidence-based UX improvements</h2>
+          <div className="platform-notification-list">
+            {report.recommendations.map((item) => (
+              <div key={`${item.journeyId}-${item.recommendation}`} className="platform-notification">
+                <div>
+                  <span>{item.journeyTitle}</span>
+                  <strong>{item.recommendation}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+
+      <section className="platform-workflow-layout" aria-label="Workflow mining findings">
+        <article className="platform-panel">
+          <h2>Friction and dead ends</h2>
+          <div className="platform-notification-list">
+            {[...report.friction, ...report.deadEnds].map((item) => (
+              <div key={`${item.journeyId}-${item.signal}`} className="platform-notification">
+                <div>
+                  <span>{item.journeyTitle}</span>
+                  <strong>{item.signal}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="platform-panel">
+          <h2>Unnecessary clicks</h2>
+          <div className="platform-notification-list">
+            {report.unnecessaryClicks.map((item) => (
+              <div key={`${item.journeyId}-${item.signal}`} className="platform-notification">
+                <div>
+                  <span>{item.journeyTitle}</span>
+                  <strong>{item.signal}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+    </PageShell>
+  );
+}
+
+export function CareDroidBusinessBrainPage() {
+  const brain = useMemo(() => buildCareDroidBusinessBrain(), []);
+
+  return (
+    <PageShell
+      eyebrow="CareDroid Business Brain"
+      title="Business Brain"
+      description="Business intelligence across SaaS, organization, workspace, asset, AI, automation, and simulation analytics."
+    >
+      <DataSourceNotice
+        label="Business intelligence layer"
+        detail="Aggregates platform operations and business operations into advisory recommendations for product, customer-success, clinical education, and commercial teams."
+      />
+
+      <section className="platform-kpi-grid" aria-label="Business brain summary">
+        <article>
+          <span>Analytics domains</span>
+          <strong>{brain.summary.analyticDomainCount}</strong>
+        </article>
+        <article>
+          <span>Recommendations</span>
+          <strong>{brain.summary.recommendationCount}</strong>
+        </article>
+        <article>
+          <span>High priority</span>
+          <strong>{brain.summary.highPriorityCount}</strong>
+        </article>
+        <article>
+          <span>Business score</span>
+          <strong>{brain.summary.averageBusinessScore}</strong>
+        </article>
+      </section>
+
+      <section className="platform-result-grid" aria-label="Business analytics aggregates">
+        {brain.analytics.map((domain) => (
+          <article key={domain.id} className="platform-result-card platform-result-card--static">
+            <span className="platform-result-card__kind">{domain.domain.replace(/_/g, ' ')}</span>
+            <strong>{domain.label}</strong>
+            <span>Score: {domain.score}</span>
+            <small>{domain.metrics.join(' · ')}</small>
+          </article>
+        ))}
+      </section>
+
+      <section className="platform-workflow-layout" aria-label="Business brain recommendations">
+        <article className="platform-panel">
+          <h2>Recommendations</h2>
+          <div className="platform-notification-list">
+            {brain.recommendations.map((item) => (
+              <div key={item.id} className="platform-notification">
+                <div>
+                  <span>{item.type.replace(/_/g, ' ')} · {item.priority}</span>
+                  <strong>{item.title}</strong>
+                  <p>{item.action}</p>
+                  <small>{item.evidence.join(' · ')}</small>
+                </div>
+                <div className="platform-notification__actions">
+                  <small>score</small>
+                  <strong>{item.score}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="platform-panel">
+          <h2>Owners</h2>
+          <div className="platform-notification-list">
+            {brain.recommendations.map((item) => (
+              <div key={`${item.id}-owners`} className="platform-notification">
+                <div>
+                  <span>{item.title}</span>
+                  <strong>{item.owners.join(', ')}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
+    </PageShell>
+  );
+}
+
+export function WorkspaceDependencyGraphPage() {
+  const graph = useMemo(() => buildWorkspaceDependencyGraph(), []);
+
+  return (
+    <PageShell
+      eyebrow="Cross-Workspace Intelligence"
+      title="Workspace Dependency Graph"
+      description="Map handoffs, signal flows, and operational dependencies so workspaces stop operating as isolated silos."
+    >
+      <DataSourceNotice
+        label="Workspace graph model"
+        detail="Dependencies are generated from canonical workspace definitions and evidence-backed relationship rules."
+      />
+      <section className="platform-kpi-grid" aria-label="Workspace dependency summary">
+        <article>
+          <span>Workspaces</span>
+          <strong>{graph.summary.workspaceCount}</strong>
+        </article>
+        <article>
+          <span>Dependencies</span>
+          <strong>{graph.summary.dependencyCount}</strong>
+        </article>
+        <article>
+          <span>High strength</span>
+          <strong>{graph.summary.highStrengthDependencyCount}</strong>
+        </article>
+        <article>
+          <span>Chains</span>
+          <strong>{graph.summary.chainCount}</strong>
+        </article>
+      </section>
+
+      <section className="platform-result-grid" aria-label="Workspace nodes">
+        {graph.nodes.map((node) => (
+          <article key={node.id} className="platform-result-card platform-result-card--static">
+            <span className="platform-result-card__kind">{node.type}</span>
+            <strong>{node.label}</strong>
+            <span>{node.description}</span>
+            <small>Outcome focus: {node.outcomeFocus}</small>
+            <small>{node.primarySignals.join(', ')}</small>
+          </article>
+        ))}
+      </section>
+
+      <section className="platform-workflow-layout" aria-label="Workspace dependency chains">
+        <article className="platform-panel">
+          <h2>Dependency chains</h2>
+          <div className="platform-notification-list">
+            {graph.chains.map((chain) => (
+              <div key={chain.id} className="platform-notification">
+                <div>
+                  <span>chain</span>
+                  <strong>{chain.label}</strong>
+                  <p>{chain.edgeIds.length} dependency edge{chain.edgeIds.length === 1 ? '' : 's'}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
+
+        <article className="platform-panel">
+          <h2>Relationship evidence</h2>
+          <div className="platform-notification-list">
+            {graph.edges.map((edge) => (
+              <div key={edge.id} className="platform-notification">
+                <div>
+                  <span>{edge.type}</span>
+                  <strong>
+                    {`${edge.sourceLabel} -> ${edge.targetLabel}`}
+                  </strong>
+                  <p>{edge.outcome}</p>
+                  <small>{edge.evidence.join(' · ')}</small>
+                </div>
+                <div className="platform-notification__actions">
+                  <small>strength</small>
+                  <strong>{edge.strength}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+        </article>
       </section>
     </PageShell>
   );

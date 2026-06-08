@@ -49,12 +49,54 @@ const analytics = {
       searchQueryCount: 4,
       simulationCompletionCount: 1,
       dashboardEngagementCount: 2,
+      launchCount: 9,
+      averageDurationSeconds: 120,
+      repeatUsageCount: 2,
+      abandonmentCount: 1,
+      recommendationsAcceptedCount: 1,
+      workflowCompletionCount: 1,
     },
-    underusedAssets: [{ id: 'unused-tool', label: 'Unused Tool', count: 0 }],
-    topAssets: [{ id: 'qsofa', label: 'qSOFA', count: 5, metadata: { assetType: 'calculator' } }],
+    underusedAssets: [
+      {
+        id: 'news2',
+        label: 'NEWS2',
+        count: 3,
+        metadata: { assetType: 'calculator', usefulnessScore: 8, decision: 'improve' },
+      },
+    ],
+    unusedAssets: [{ id: 'unused-tool', label: 'Unused Tool', count: 0 }],
+    mergeCandidates: [
+      {
+        id: 'news2',
+        label: 'NEWS2',
+        count: 3,
+        metadata: {
+          assetType: 'calculator',
+          usefulnessScore: 8,
+          decision: 'merge',
+          mergeTargetLabel: 'qSOFA',
+        },
+      },
+    ],
+    topAssets: [
+      {
+        id: 'qsofa',
+        label: 'qSOFA',
+        count: 5,
+        metadata: { assetType: 'calculator', usefulnessScore: 43, decision: 'monitor' },
+      },
+    ],
   },
   dimensions: {
     assetUsage: [{ id: 'qsofa', label: 'qSOFA', count: 5 }],
+    assetIntelligence: [
+      {
+        id: 'qsofa',
+        label: 'qSOFA',
+        count: 5,
+        metadata: { assetType: 'calculator', usefulnessScore: 43, decision: 'monitor' },
+      },
+    ],
     packUsage: [{ id: 'core-platform', label: 'Core Platform', count: 11 }],
     roleUsage: [{ id: 'clinician', label: 'clinician', count: 12 }],
     workspaceUsage: [{ id: 'emergency', label: 'emergency', count: 12 }],
@@ -77,11 +119,17 @@ describe('PlatformAnalyticsPage', () => {
     expect(await screen.findByRole('heading', { name: /platform analytics/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^adoption$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^engagement$/i })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /^underused assets$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^top assets$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^underused assets$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^unused assets$/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /^merge candidates$/i })).toBeInTheDocument();
     expect(screen.getByText('40%')).toBeInTheDocument();
+    expect(screen.getByText('Launches')).toBeInTheDocument();
+    expect(screen.getByText('2m')).toBeInTheDocument();
     expect(screen.getAllByText('qSOFA').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('NEWS2').length).toBeGreaterThan(0);
     expect(screen.getByText('Unused Tool')).toBeInTheDocument();
+    expect(screen.getByText('Merge into qSOFA')).toBeInTheDocument();
     expect(screen.getByText('Clinical AI')).toBeInTheDocument();
     expect(screen.getByText('Simulation Suite')).toBeInTheDocument();
     expect(screen.getByText('Command Center')).toBeInTheDocument();

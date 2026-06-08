@@ -10,6 +10,7 @@ const pageMocks = vi.hoisted(() => ({
   recordToolAccess: vi.fn(),
   navigateMock: vi.fn(),
   applyRegistryToolLaunch: vi.fn(),
+  recordAssetRecommendationAccepted: vi.fn(),
 }));
 
 vi.mock('react-router-dom', async () => {
@@ -66,6 +67,10 @@ vi.mock('../services/roleIntelligenceTelemetry', () => ({
   trackRoleAiRequest: vi.fn(),
   trackRoleSearchBehavior: vi.fn(),
   trackRoleWorkflowLaunch: vi.fn(),
+}));
+
+vi.mock('../services/usageMeteringService', () => ({
+  recordAssetRecommendationAccepted: pageMocks.recordAssetRecommendationAccepted,
 }));
 
 vi.mock('../navigation/registryToolLaunch', () => ({
@@ -217,6 +222,13 @@ describe('RecommendationsPage', () => {
       expect.objectContaining({
         type: 'recommendation_opened',
         title: 'qSOFA',
+      }),
+    );
+    expect(pageMocks.recordAssetRecommendationAccepted).toHaveBeenCalledWith(
+      expect.objectContaining({
+        recommendation: expect.objectContaining({ id: 'tools-qsofa' }),
+        route: '/tools/calculators/qsofa',
+        source: 'recommendations',
       }),
     );
   });

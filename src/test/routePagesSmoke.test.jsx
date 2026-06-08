@@ -64,6 +64,18 @@ import DeviceFleetManagement from '../pages/DeviceFleetManagement';
 import ClinicalAlertsPage from '../pages/ClinicalAlertsPage';
 import FleetLiveMap from '../pages/fleet/FleetLiveMap';
 import { OrganizationIntelligenceProfile } from '../pages/organization/OrganizationPages';
+import {
+  CareDroidBusinessBrainPage,
+  DepartmentIntelligencePage,
+  HealthcareKnowledgeHubPage,
+  WorkflowMiningEnginePage,
+  WorkspaceDependencyGraphPage,
+} from '../pages/PlatformOSPages';
+import {
+  CustomerExpansionOpportunitiesPage,
+  MaturityAssessmentPage,
+  ProductIntelligenceLayerPage,
+} from '../pages/commercial/CommercialPages';
 import { CORE_ROUTE_SMOKE, TIER_A_FORM_SMOKE_SLUGS } from './responsiveRegression.routes';
 
 vi.mock('../pages/tools/Calculators.css', () => ({}));
@@ -279,6 +291,20 @@ vi.mock('../services/productCatalogApi', () => ({
           integrations: [{ id: 'int-fhir', name: 'FHIR' }],
         },
       ],
+    }),
+    getMaturityQuestionnaire: vi.fn().mockResolvedValue({
+      questions: [
+        {
+          id: 'digital_maturity',
+          question: 'How mature is digital maturity?',
+          options: [{ value: 3, label: 'Ready' }],
+        },
+      ],
+    }),
+    submitMaturityAssessment: vi.fn().mockResolvedValue({
+      overallScore: 75,
+      dimensions: [{ dimension: 'digital_maturity', score: 75 }],
+      recommendedProducts: [],
     }),
   },
 }));
@@ -682,6 +708,7 @@ const PAGE_BY_ID = {
   memory: MemoryDashboard,
   training: TrainingDashboard,
   analytics: AnalyticsDashboard,
+  'knowledge-hub': HealthcareKnowledgeHubPage,
   'feature-flags': FeatureFlagCenter,
   plugins: PluginMarketplace,
   'dependency-map': DependencyMap,
@@ -692,6 +719,7 @@ const PAGE_BY_ID = {
   costs: CostAnalyticsDashboard,
   'ai-evaluation': AiEvaluationDashboard,
   'ai-command-center': AiCommandCenterDashboard,
+  'business-brain': CareDroidBusinessBrainPage,
   'integrations-platform': PlatformGovernanceWorkspace,
   'workflow-builder-ai': PlatformSystemPage,
   'patient-workspace-platform': PlatformSystemPage,
@@ -717,6 +745,12 @@ const PAGE_BY_ID = {
   'fleet-route-optimizer': RouteOptimizer,
   'fleet-predictive-maintenance': PredictiveMaintenance,
   'organization-intelligence': OrganizationIntelligenceProfile,
+  'department-intelligence': DepartmentIntelligencePage,
+  'workflow-mining': WorkflowMiningEnginePage,
+  'workspace-dependency-graph': WorkspaceDependencyGraphPage,
+  'product-intelligence': ProductIntelligenceLayerPage,
+  'expansion-opportunities': CustomerExpansionOpportunitiesPage,
+  'maturity-assessment': MaturityAssessmentPage,
 };
 
 const THEME_ROUTE_SMOKE_IDS = new Set([

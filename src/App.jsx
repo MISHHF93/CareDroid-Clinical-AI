@@ -52,10 +52,15 @@ const WorkspaceHome = lazyWithRetry(() => import('./pages/WorkspaceHome'));
 const {
   WorkspacesIndexPage,
   SearchResultsPage,
+  HealthcareKnowledgeHubPage,
   ClinicalTimelinePage,
   NotificationCenterPage,
   DigitalTwinPage,
   WorkflowBuilderPage,
+  DepartmentIntelligencePage,
+  WorkflowMiningEnginePage,
+  CareDroidBusinessBrainPage,
+  WorkspaceDependencyGraphPage,
   AssetLibraryPage,
 } = {
   WorkspacesIndexPage: lazyWithRetry(() =>
@@ -63,6 +68,9 @@ const {
   ),
   SearchResultsPage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.SearchResultsPage }))
+  ),
+  HealthcareKnowledgeHubPage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.HealthcareKnowledgeHubPage }))
   ),
   ClinicalTimelinePage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.ClinicalTimelinePage }))
@@ -75,6 +83,18 @@ const {
   ),
   WorkflowBuilderPage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.WorkflowBuilderPage }))
+  ),
+  DepartmentIntelligencePage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.DepartmentIntelligencePage }))
+  ),
+  WorkflowMiningEnginePage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.WorkflowMiningEnginePage }))
+  ),
+  CareDroidBusinessBrainPage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.CareDroidBusinessBrainPage }))
+  ),
+  WorkspaceDependencyGraphPage: lazyWithRetry(() =>
+    import('./pages/PlatformOSPages').then((m) => ({ default: m.WorkspaceDependencyGraphPage }))
   ),
   AssetLibraryPage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.AssetLibraryPage }))
@@ -214,6 +234,8 @@ const {
   MaturityAssessmentPage,
   OutcomesDashboardPage,
   ValueTrackingPage,
+  ProductIntelligenceLayerPage,
+  CustomerExpansionOpportunitiesPage,
   IntegrationsMarketplacePage,
   IntegrationReadinessPage,
   HospitalSolutionBuilderPage,
@@ -252,6 +274,14 @@ const {
   ),
   ValueTrackingPage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ValueTrackingPage }))
+  ),
+  ProductIntelligenceLayerPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ProductIntelligenceLayerPage }))
+  ),
+  CustomerExpansionOpportunitiesPage: lazyWithRetry(() =>
+    import('./pages/commercial/CommercialPages').then((m) => ({
+      default: m.CustomerExpansionOpportunitiesPage,
+    }))
   ),
   IntegrationsMarketplacePage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({
@@ -730,6 +760,11 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/knowledge-hub',
+      element: <HealthcareKnowledgeHubPage />,
+      requiresAuth: true,
+    },
+    {
       path: '/timeline',
       element: <ClinicalTimelinePage />,
       requiresAuth: true,
@@ -752,6 +787,21 @@ function AppRoutes() {
     {
       path: '/workflows',
       element: <WorkflowBuilderPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/department-intelligence',
+      element: <DepartmentIntelligencePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workflow-mining',
+      element: <WorkflowMiningEnginePage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workspace-dependency-graph',
+      element: <WorkspaceDependencyGraphPage />,
       requiresAuth: true,
     },
     {
@@ -991,6 +1041,12 @@ function AppRoutes() {
     {
       path: '/brain',
       element: <CareDroidBrainDashboard />,
+      requiresAuth: true,
+      permission: Permission.VIEW_ANALYTICS,
+    },
+    {
+      path: '/business-brain',
+      element: <CareDroidBusinessBrainPage />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },
@@ -1584,6 +1640,16 @@ function AppRoutes() {
     {
       path: '/value-tracking',
       element: <ValueTrackingPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/product-intelligence',
+      element: <ProductIntelligenceLayerPage />,
+      requiresAuth: true,
+    },
+    {
+      path: '/expansion-opportunities',
+      element: <CustomerExpansionOpportunitiesPage />,
       requiresAuth: true,
     },
     {
