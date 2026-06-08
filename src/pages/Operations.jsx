@@ -1,11 +1,17 @@
+import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { InsightCard, SectionHeader, StatusBadge } from '../components/ui/CareDroidPrimitives';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
+import { useWorkspace } from '../contexts/WorkspaceContext';
+import {
+  buildWorkspaceAssistantPrompt,
+  getWorkspaceExperienceProfile,
+} from '../data/workspaceExperience';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
-import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { CHROME_ICONS, getWorkspaceIcon } from '../navigation/iconRegistry';
 import './OperatingWorkspace.css';
 
 const PRIMARY_OPERATION_AREAS = Object.freeze([
@@ -143,10 +149,58 @@ const OPERATION_CONTINUATIONS = Object.freeze([
   },
 ]);
 
+const WORKSPACE_OPERATION_PRIORITIES = Object.freeze({
+  emergency: ['Clinical alerts', 'Hospital map', 'Medical IoT', 'Device fleet management'],
+  'medical-iot': ['Medical IoT', 'Device fleet management', 'Hospital map', 'Live Map'],
+  operations: ['Hospital map', 'Device fleet management', 'Medical IoT', 'Clinical alerts'],
+  fleet: ['Fleet Map', 'Fleet Command', 'Route Optimizer', 'Predictive Maintenance'],
+});
+
+function cssToken(value = 'default') {
+  return String(value || 'default').toLowerCase().replace(/[^a-z0-9-]/g, '-');
+}
+
+function workspaceThemeStyle(experience) {
+  return {
+    '--workspace-os-accent': experience.theme?.accent,
+    '--workspace-os-surface': experience.theme?.surface,
+    '--workspace-os-border': experience.theme?.border,
+  };
+}
+
+function getWorkspaceOperationAreas(workspaceId) {
+  const itemByTitle = Object.fromEntries(
+    [...PRIMARY_OPERATION_AREAS, ...OPERATION_DRILLDOWNS].map((area) => [area.title, area])
+  );
+  const priorityTitles = WORKSPACE_OPERATION_PRIORITIES[workspaceId] || WORKSPACE_OPERATION_PRIORITIES.operations;
+  return priorityTitles.map((title) => itemByTitle[title]).filter(Boolean);
+}
+
 export default function Operations() {
   const navigate = useNavigate();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
+  const { activeWorkspace, activeWorkspaceId } = useWorkspace();
+  const workspaceExperience = useMemo(
+    () => getWorkspaceExperienceProfile(activeWorkspace),
+    [activeWorkspace]
+  );
+  const workspaceOperationAreas = useMemo(
+    () => getWorkspaceOperationAreas(workspaceExperience.id || activeWorkspaceId),
+    [activeWorkspaceId, workspaceExperience.id]
+  );
+  const workspaceOperationTitles = useMemo(
+    () => new Set(workspaceOperationAreas.map((area) => area.title)),
+    [workspaceOperationAreas]
+  );
+  const workspaceDrilldowns = useMemo(
+    () => OPERATION_DRILLDOWNS.filter((area) => !workspaceOperationTitles.has(area.title)).slice(0, 3),
+    [workspaceOperationTitles]
+  );
+  const WorkspaceIcon = useMemo(
+    () => getWorkspaceIcon(activeWorkspace?.icon || activeWorkspace?.workspaceProfile?.icon),
+    [activeWorkspace?.icon, activeWorkspace?.workspaceProfile?.icon]
+  );
 
   const launchArea = (area) => {
     if (!area.toolId) {
@@ -163,40 +217,56 @@ export default function Operations() {
     });
   };
 
+  const launchWorkspaceAssistant = () => {
+    addMessage(
+      buildWorkspaceAssistantPrompt(
+        `What should operations focus on next in ${workspaceExperience.label}?`,
+        workspaceExperience
+      ),
+      'user'
+    );
+    navigate(CANONICAL_ROUTES.assistant);
+  };
+
   return (
-    <section className="operating-workspace" aria-labelledby="operations-title">
+    <section
+      className={`operating-workspace operating-workspace--${cssToken(workspaceExperience.tone)} operating-workspace--workspace-${cssToken(workspaceExperience.id)}`}
+      aria-labelledby="operations-title"
+      data-workspace-os={workspaceExperience.id}
+      style={workspaceThemeStyle(workspaceExperience)}
+    >
       <section className="operating-hero">
         <div className="operating-hero__icon" aria-hidden>
-          <NavIcon icon={CHROME_ICONS.activity} size={28} />
+          <NavIcon icon={WorkspaceIcon} size={28} />
         </div>
         <div className="operating-hero__copy">
-          <p className="operating-eyebrow">Operational command</p>
-          <h1 id="operations-title">Operations</h1>
+          <p className="operating-eyebrow">{workspaceExperience.operatingLabel}</p>
+          <h1 id="operations-title">{workspaceExperience.shortLabel} Operations</h1>
           <p>
-            Digital Twin, Hospital Map, Medical IoT, Devices, Fleet, Live Map, Alerts, Telemetry,
-            and Maintenance live together here so operations feels like one system.
+            {workspaceExperience.modeSummary} Operational routes, tools, alerts, maps, and
+            recommendations now follow the active workspace.
           </p>
         </div>
         <button
           type="button"
           className="operating-primary-action"
-          onClick={() => navigate(CANONICAL_ROUTES.digitalTwin)}
+          onClick={launchWorkspaceAssistant}
         >
-          Open twin
+          Ask {workspaceExperience.assistantTitle}
         </button>
       </section>
 
       <section className="operating-insights" aria-label="Operations context insights">
         <InsightCard
-          eyebrow="Recommended"
-          title="Suggested operations view"
-          description="Start with the operational twin when you need a cross-module picture."
+          eyebrow={workspaceExperience.environment}
+          title={`${workspaceExperience.shortLabel} priority`}
+          description={(workspaceExperience.operatingBrief || [workspaceExperience.dashboardSubtitle])[0]}
           badge={<StatusBadge status="warning">Action</StatusBadge>}
         />
         <InsightCard
-          eyebrow="Canonical routes"
-          title="Telemetry actions"
-          description="Device, fleet, map, and telemetry source views remain available as drill-downs from this hub."
+          eyebrow="Workspace context"
+          title={workspaceExperience.dashboardTitle}
+          description={workspaceExperience.dashboardSubtitle}
           badge={<StatusBadge status="generated">Generated</StatusBadge>}
         />
       </section>
@@ -204,11 +274,11 @@ export default function Operations() {
       <section className="operating-section" aria-labelledby="operation-areas-title">
         <SectionHeader
           id="operation-areas-title"
-          title="Operational areas"
-          description="Detail pages remain available, but this hub is the single user-facing way to find operational maps, telemetry, alerts, and maintenance workflows."
+          title={`${workspaceExperience.shortLabel} operational areas`}
+          description="These are the first operational actions for the active workspace. Other maps, telemetry, and fleet views stay available as drill-downs."
         />
         <div className="operating-card-grid">
-          {PRIMARY_OPERATION_AREAS.map((area) => (
+          {workspaceOperationAreas.map((area) => (
             <button
               key={area.title}
               type="button"
@@ -230,10 +300,10 @@ export default function Operations() {
         <SectionHeader
           id="operation-drilldowns-title"
           title="Drill-downs"
-          description="Lower-level map, fleet, routing, and maintenance tools stay reachable without becoming competing dashboard cards."
+          description={`Lower-level routes stay reachable without competing with ${workspaceExperience.shortLabel} priorities.`}
         />
         <div className="operating-drilldown-list">
-          {OPERATION_DRILLDOWNS.slice(0, 3).map((area) => (
+          {workspaceDrilldowns.map((area) => (
             <button
               key={area.title}
               type="button"
@@ -281,8 +351,8 @@ export default function Operations() {
       <section className="operating-section" aria-labelledby="operation-continuations-title">
         <SectionHeader
           id="operation-continuations-title"
-          title="Continue from Operations"
-          description="Operations does not end at a hub. Continue into workflow, result review, recommendations, or Assistant."
+          title={`Continue from ${workspaceExperience.shortLabel} Operations`}
+          description="Continue into workspace-aware workflows, result review, recommendations, or Assistant."
         />
         <div className="operating-drilldown-list">
           {OPERATION_CONTINUATIONS.map((action) => (

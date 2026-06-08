@@ -5,7 +5,7 @@ import {
 } from './searchFirstDiscovery';
 
 describe('search-first discovery index', () => {
-  it('indexes assets, workflows, simulations, protocols, AI, operations, and workspaces', () => {
+  it('indexes assets, workflows, simulations, protocols, AI, operations, commercial capabilities, and workspaces', () => {
     const entries = buildSearchFirstDiscoveryEntries();
     const kinds = new Set(entries.map((entry) => entry.kind));
 
@@ -19,6 +19,7 @@ describe('search-first discovery index', () => {
         'ai-agent',
         'ai-model',
         'operation',
+        'commercial',
         'workspace',
       ])
     );
@@ -71,7 +72,11 @@ describe('search-first discovery index', () => {
     );
     expect(buildSearchFirstResults({ query: 'high news2 escalation notify clinician' })).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ kind: 'automation', sourceId: 'news2-clinician-notification' }),
+        expect.objectContaining({
+          kind: 'automation',
+          sourceId: 'emergency-high-news2-alert',
+          path: '/workspace/emergency/automations',
+        }),
       ])
     );
   });
@@ -105,6 +110,43 @@ describe('search-first discovery index', () => {
     expect(buildSearchFirstResults({ query: 'workflow mining journeys' })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'workflow-mining', path: '/workflow-mining' }),
+      ])
+    );
+  });
+
+  it('indexes commercial catalog capabilities and row-level launch targets', () => {
+    expect(buildSearchFirstResults({ query: 'emergency department solution' })[0]).toEqual(
+      expect.objectContaining({
+        kind: 'commercial',
+        sourceId: 'specialty-emergency',
+        path: '/specialties/emergency',
+      })
+    );
+    expect(buildSearchFirstResults({ query: 'fhir patient integration' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'commercial',
+          sourceId: 'integration-fhir',
+          path: '/integrations-marketplace?category=fhir',
+        }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'hospital solution builder' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'commercial',
+          sourceId: 'solution-builder',
+          path: '/solution-builder',
+        }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'automation analytics human overrides' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'commercial',
+          sourceId: 'automation-analytics',
+          path: '/automation-analytics',
+        }),
       ])
     );
   });

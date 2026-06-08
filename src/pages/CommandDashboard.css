@@ -29,6 +29,7 @@
   align-items: stretch;
   gap: var(--compact-page-gap, 14px);
   padding: var(--compact-panel-padding, 16px);
+  box-shadow: var(--app-elevation-card, var(--shadow-1));
 }
 
 .command-dashboard--emergency .command-hero,
@@ -48,7 +49,7 @@
 
 .command-dashboard--compressed .command-hero {
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.78fr);
-  padding: clamp(14px, 2vw, 18px);
+  padding: clamp(18px, 2.4vw, 28px);
 }
 
 .command-hero__content {
@@ -92,7 +93,7 @@
 
 .command-hero h1 {
   margin: 0;
-  font-size: clamp(1.45rem, 2.4vw, 2.2rem);
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
   line-height: 1.05;
   letter-spacing: -0.035em;
 }
@@ -103,6 +104,34 @@
   color: var(--app-fg-muted);
   font-size: 0.92rem;
   line-height: 1.45;
+}
+
+.command-hero__context {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.command-hero__context span,
+.command-hero__context a,
+.command-utility-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  background: var(--app-surface-2);
+  color: var(--app-fg-muted);
+  font-size: var(--font-12);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.command-hero__context a,
+.command-utility-links a {
+  color: var(--app-accent-interactive);
 }
 
 .command-os-flow {
@@ -251,6 +280,7 @@
 .command-panel {
   min-width: 0;
   padding: var(--compact-panel-padding, 16px);
+  background: color-mix(in srgb, var(--app-surface-1) 94%, var(--app-bg));
 }
 
 .command-dashboard--compressed .command-panel {
@@ -427,6 +457,11 @@
   padding: 10px;
 }
 
+.command-prompt-chip--link {
+  display: block;
+  text-decoration: none;
+}
+
 .command-prompt-chip strong,
 .command-prompt-chip span,
 .command-tool-card__title,
@@ -454,7 +489,7 @@
 }
 
 .command-dashboard--compressed .command-dashboard__grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
   gap: 12px;
 }
 
@@ -463,6 +498,15 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min-compact, 11.5rem)), 1fr));
   gap: 8px;
   min-width: 0;
+}
+
+.command-utility-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--app-panel-border);
 }
 
 .command-compact-action {
@@ -479,6 +523,27 @@
   text-align: left;
   text-decoration: none;
   cursor: pointer;
+}
+
+.command-compact-action--primary {
+  min-height: 78px;
+  border-color: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 52%, var(--app-panel-border));
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 22%, var(--app-surface-2)),
+      var(--app-surface-2)
+    );
+  box-shadow: var(--app-elevation-card, var(--shadow-1));
+}
+
+.command-compact-action--primary .command-compact-action__icon {
+  color: var(--app-on-solid);
+  background: var(--accent-gradient);
+}
+
+.command-compact-action--primary strong {
+  font-size: var(--font-16);
 }
 
 .command-compact-action:hover,

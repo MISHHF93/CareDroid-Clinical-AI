@@ -317,8 +317,15 @@ describe('QuickCommandLauncher', () => {
     fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
       target: { value: 'high news2 escalation notify clinician' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /open high news2 escalation/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/workflows');
+    fireEvent.click(screen.getByRole('button', { name: /open sepsis detection workflow/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/automations');
+
+    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
+    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
+      target: { value: 'emergency department solution' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /open emergency department solution/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/specialties/emergency');
   });
 
   it('keeps shared calculator-hub tools searchable instead of hiding them as nav duplicates', () => {

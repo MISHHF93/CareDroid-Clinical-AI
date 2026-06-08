@@ -36,6 +36,7 @@ describe('WorkspaceContext backend context', () => {
             id: 'workspace-icu',
             type: 'icu',
             workspaceKey: 'icu',
+            displayName: 'ICU Backend Display',
             name: 'ICU Workspace',
             assistantContext: 'ICU assistant context',
             settings: { enabledToolIds: ['sofa-score'] },
@@ -45,6 +46,7 @@ describe('WorkspaceContext backend context', () => {
               {
                 id: 'workspace-icu',
                 type: 'icu',
+                displayName: 'ICU Backend Display',
                 settings: { workspaceKey: 'icu', enabledToolIds: ['sofa-score'] },
                 branding: { displayName: 'ICU' },
               },
@@ -66,6 +68,7 @@ describe('WorkspaceContext backend context', () => {
       expect(result.current.activeWorkspaceId).toBe('icu');
     });
     expect(result.current.visibleAssetIds).toEqual(['sofa-score']);
+    expect(result.current.activeWorkspace.name).toBe('ICU Backend Display');
     expect(result.current.recommendations).toEqual([
       expect.objectContaining({ assetId: 'sofa-score' }),
     ]);

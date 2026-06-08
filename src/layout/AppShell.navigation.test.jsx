@@ -3,6 +3,13 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppShell from './AppShell';
 
+const mocks = vi.hoisted(() => ({
+  userIdentity: {
+    preferences: { density: 'standard', compactMode: false },
+    saasProfile: { density: 'standard', compactMode: false },
+  },
+}));
+
 vi.mock('../contexts/ThemeContext', () => ({
   useTheme: () => ({
     preference: 'system',
@@ -15,6 +22,10 @@ vi.mock('../contexts/WorkspaceContext', () => ({
   useWorkspace: () => ({
     activeWorkspace: { id: 'emergency', name: 'Emergency' },
   }),
+}));
+
+vi.mock('../contexts/UserIdentityContext', () => ({
+  useUserIdentity: () => mocks.userIdentity,
 }));
 
 vi.mock('../components/WorkspaceSwitcher', () => ({
@@ -45,7 +56,7 @@ vi.mock('../components/Sidebar', async () => {
         {(!layoutCompact || mobileNavOpen) && (
           <>
             <nav aria-label="Primary navigation">
-              {['Dashboard', 'Assistant', 'Tools', 'Operations', 'Profile'].map((label) => (
+              {['Dashboard', 'Assistant', 'Tools', 'Operations', 'Workspace', 'Profile'].map((label) => (
                 <button key={label} type="button">
                   {label}
                 </button>
@@ -89,6 +100,10 @@ function renderShell(width, initialPath = '/dashboard') {
 describe('AppShell navigation surfaces', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.userIdentity = {
+      preferences: { density: 'standard', compactMode: false },
+      saasProfile: { density: 'standard', compactMode: false },
+    };
   });
 
   it('shows sidebar and hides bottom nav on desktop', () => {
@@ -97,6 +112,8 @@ describe('AppShell navigation surfaces', () => {
     expect(screen.getByTestId('app-sidebar')).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: /primary navigation/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open quick command/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/command center/i);
+    expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/dashboard/i);
     expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/caredroid frontend os/i);
     expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/emergency/i);
     expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/dashboard/i);
@@ -111,8 +128,21 @@ describe('AppShell navigation surfaces', () => {
 
     expect(screen.getByTestId('app-sidebar')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByRole('button', { name: /open navigation menu/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/dashboard/i);
     expect(screen.queryByLabelText(/frontend operating system flow/i)).not.toBeInTheDocument();
     expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
+  });
+
+  it('applies compact density from user preference at the shell boundary', () => {
+    mocks.userIdentity = {
+      preferences: { density: 'compact', compactMode: true },
+      saasProfile: { density: 'compact', compactMode: true },
+    };
+
+    const { container } = renderShell(1280);
+
+    expect(container.firstElementChild).toHaveClass('app-shell--density-compact');
+    expect(container.firstElementChild).toHaveAttribute('data-density', 'compact');
   });
 
   it('opens one mobile drawer navigation without duplicate bottom destinations', () => {
@@ -130,6 +160,7 @@ describe('AppShell navigation surfaces', () => {
       /^assistant$/i,
       /^tools$/i,
       /^operations$/i,
+      /^workspace$/i,
       /^profile$/i,
     ]) {
       expect(screen.getAllByRole('button', { name })).toHaveLength(1);
@@ -161,6 +192,21 @@ describe('AppShell navigation surfaces', () => {
     expect(screen.getByTestId('app-sidebar')).toBeInTheDocument();
     expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
     expect(screen.getByRole('main')).toHaveAttribute('data-layout-role', 'MainContent');
+    expect(screen.queryByRole('navigation', { name: /page continuations/i })).not.toBeInTheDocument();
+  });
+
+  it('adds continuation paths to authenticated content pages', () => {
+    renderShell(1280, '/profile');
+
+    const continuations = screen.getByRole('navigation', { name: /page continuations/i });
+    expect(within(continuations).getByRole('heading', { name: /related assets/i })).toBeInTheDocument();
+    expect(within(continuations).getByRole('heading', { name: /recommended next actions/i })).toBeInTheDocument();
+    expect(within(continuations).getByRole('heading', { name: /recent activity/i })).toBeInTheDocument();
+    expect(within(continuations).getByRole('heading', { name: /back to workspace/i })).toBeInTheDocument();
+    expect(within(continuations).getByRole('link', { name: /back to emergency/i })).toHaveAttribute(
+      'href',
+      '/workspace/emergency'
+    );
   });
 
   it('renders an environment banner in authenticated non-production shells', () => {

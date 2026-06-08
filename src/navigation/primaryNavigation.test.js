@@ -23,8 +23,10 @@ describe('primaryNavigation', () => {
       ['Assistant', '/assistant'],
       ['Tools', '/tools'],
       ['Operations', '/operations'],
+      ['Workspace', '/workspaces'],
       ['Profile', '/profile'],
     ]);
+    expect(PRIMARY_SIDEBAR_NAV_ITEMS).toHaveLength(6);
   });
 
   it('keeps operations destinations grouped for command/search instead of persistent sidebar nav', () => {
@@ -136,6 +138,7 @@ describe('primaryNavigation', () => {
       '/assistant',
       '/tools',
       '/operations',
+      '/workspaces',
       '/profile',
     ]);
   });
@@ -170,11 +173,14 @@ describe('primaryNavigation', () => {
     expect(getPrimaryNavItemForPath('/operations')?.id).toBe('operations');
   });
 
-  it('keeps profile primary while settings and account utilities remain outside the persistent shell', () => {
+  it('keeps profile and workspace primary while settings and account utilities remain outside the persistent shell', () => {
     const expected = [
       ['/profile', 'profile'],
       ['/profile/activity', 'profile'],
       ['/profile/tool-preferences', 'profile'],
+      ['/profile/workspaces', 'workspace'],
+      ['/workspaces', 'workspace'],
+      ['/workspace/emergency', 'workspace'],
       ['/profile/settings', 'settings'],
       ['/profile/preferences', 'settings'],
       ['/settings', 'settings'],
@@ -187,7 +193,7 @@ describe('primaryNavigation', () => {
       expect(
         matches.map((item) => item.id),
         path
-      ).toEqual(itemId === 'profile' ? [itemId] : []);
+      ).toEqual(['profile', 'workspace'].includes(itemId) ? [itemId] : []);
       expect(getPrimaryNavItemForPath(path)?.id, path).toBe(itemId);
     }
 

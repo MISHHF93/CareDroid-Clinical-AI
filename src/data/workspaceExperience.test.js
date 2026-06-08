@@ -43,4 +43,14 @@ describe('workspace experience profiles', () => {
     expect(buildWorkspaceAssistantPrompt('Check offline devices', profile)).toContain('[Medical IoT OS]');
     expect(buildWorkspaceAssistantPrompt('', profile)).toBe('');
   });
+
+  it('supports pharmacy and administration as first-class workspace modes', () => {
+    const pharmacy = getWorkspaceExperienceProfile({ id: 'pharmacy' });
+    const administration = getWorkspaceExperienceProfile({ id: 'administration' });
+
+    expect(pharmacy.operatingLabel).toBe('Pharmacy OS');
+    expect(pharmacy.quickPrompts.join(' ')).toMatch(/medication|renal|antibiotic/i);
+    expect(administration.operatingLabel).toBe('Administration OS');
+    expect(administration.quickPrompts.join(' ')).toMatch(/workspace|backend|SaaS/i);
+  });
 });

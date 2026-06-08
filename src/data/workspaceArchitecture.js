@@ -178,6 +178,15 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
     defaultNavigationGroups: ['dashboard', 'assistant', 'tools'],
     subscriptionTier: 'starter',
   },
+  pharmacy: {
+    allowedOrganizationTypes: ['hospital', 'clinic', 'long-term-care', 'telehealth', 'government'],
+    allowedRoles: ['pharmacist', 'emergency-physician', 'icu-physician', 'nurse', 'hospital-administrator', 'platform-admin'],
+    defaultAssetPacks: ['core-platform', 'pharmacy-safety'],
+    defaultDashboardWidgets: ['medication-safety', 'dose-review', 'renal-dose-risk'],
+    defaultAIAgents: ['pharmacy-safety-agent'],
+    defaultNavigationGroups: ['dashboard', 'assistant', 'tools'],
+    subscriptionTier: 'starter',
+  },
   operations: {
     allowedOrganizationTypes: ['hospital', 'clinic', 'ems', 'long-term-care', 'government', 'telehealth'],
     allowedRoles: ['hospital-administrator', 'fleet-operator', 'biomedical-engineer', 'nurse', 'compliance-officer', 'platform-admin'],
@@ -241,6 +250,15 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
     defaultNavigationGroups: ['advanced', 'settings'],
     subscriptionTier: 'professional',
   },
+  administration: {
+    allowedOrganizationTypes: ['hospital', 'clinic', 'ems', 'university', 'research-center', 'long-term-care', 'telehealth', 'government'],
+    allowedRoles: ['hospital-administrator', 'platform-admin'],
+    defaultAssetPacks: ['core-platform', 'administration-pack'],
+    defaultDashboardWidgets: ['tenant-health', 'workspace-setup', 'billing-readiness'],
+    defaultAIAgents: ['administration-agent'],
+    defaultNavigationGroups: ['settings', 'advanced', 'dashboard'],
+    subscriptionTier: 'professional',
+  },
   'ai-evaluation': {
     allowedOrganizationTypes: ['research-center', 'university', 'hospital', 'government'],
     allowedRoles: ['researcher', 'educator', 'compliance-officer', 'platform-admin'],
@@ -253,17 +271,17 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
 });
 
 export const WORKSPACE_ORGANIZATION_PRESETS = Object.freeze({
-  hospital: ['emergency', 'icu', 'cardiology', 'laboratory', 'operations', 'medical-iot', 'governance'],
-  clinic: ['cardiology', 'laboratory', 'governance'],
+  hospital: ['emergency', 'icu', 'cardiology', 'laboratory', 'pharmacy', 'operations', 'medical-iot', 'governance', 'administration'],
+  clinic: ['cardiology', 'laboratory', 'pharmacy', 'governance', 'administration'],
   ems: ['emergency', 'fleet', 'operations'],
   university: ['education', 'research', 'simulation', 'governance'],
   'research-center': ['research', 'governance', 'ai-evaluation'],
   research_center: ['research', 'governance', 'ai-evaluation'],
   research_institute: ['research', 'governance', 'ai-evaluation'],
-  'long-term-care': ['medical-iot', 'laboratory', 'operations', 'governance'],
-  long_term_care: ['medical-iot', 'laboratory', 'operations', 'governance'],
-  telehealth: ['cardiology', 'operations', 'governance'],
-  government: ['emergency', 'operations', 'medical-iot', 'governance', 'ai-evaluation'],
+  'long-term-care': ['medical-iot', 'laboratory', 'pharmacy', 'operations', 'governance'],
+  long_term_care: ['medical-iot', 'laboratory', 'pharmacy', 'operations', 'governance'],
+  telehealth: ['cardiology', 'pharmacy', 'operations', 'governance'],
+  government: ['emergency', 'operations', 'medical-iot', 'governance', 'administration', 'ai-evaluation'],
 });
 
 function normalizeOrganizationType(value = 'hospital') {
@@ -378,6 +396,26 @@ const CARE_WORKSPACE_BASE = [
       REGISTRY.labInterp,
       REGISTRY.laboratoryDashboard,
       REGISTRY.abgInterpreter,
+      REGISTRY.calcGfr,
+      REGISTRY.ckdStaging,
+    ],
+  },
+  {
+    id: 'pharmacy',
+    label: 'Pharmacy',
+    shortLabel: 'Pharmacy',
+    icon: 'Pill',
+    path: '/workspace/pharmacy',
+    description: 'Medication safety, interaction checks, dosing, antimicrobial guidance, and pharmacy review.',
+    aiContext:
+      'Prioritize medication safety, allergies, interactions, renal dosing, antimicrobial guidance, and pharmacist review.',
+    routeIds: ['assistant', 'tools', 'calculators', 'commandCenter'],
+    toolIds: [
+      REGISTRY.drugCheck,
+      REGISTRY.doseCalculator,
+      REGISTRY.antibioticGuide,
+      REGISTRY.pediatricDoseSafetyChecker,
+      REGISTRY.renalMonitoringDashboard,
       REGISTRY.calcGfr,
       REGISTRY.ckdStaging,
     ],
@@ -498,6 +536,23 @@ const CARE_WORKSPACE_BASE = [
     ],
   },
   {
+    id: 'administration',
+    label: 'Administration',
+    shortLabel: 'Admin',
+    icon: 'Settings',
+    path: '/workspace/administration',
+    description: 'Tenant setup, workspace configuration, billing readiness, access controls, and SaaS operations.',
+    aiContext:
+      'Focus on tenant setup, workspace configuration, access controls, billing readiness, SaaS architecture, and backend status.',
+    routeIds: ['settings', 'profile', 'systemHealth', 'developerCatalog'],
+    toolIds: [
+      REGISTRY.aiGovernance,
+      REGISTRY.aiSecurity,
+      REGISTRY.clinicalAudit,
+      REGISTRY.hospitalOperationsCommand,
+    ],
+  },
+  {
     id: 'simulation',
     label: 'Simulation',
     shortLabel: 'Simulation',
@@ -537,6 +592,296 @@ const CARE_WORKSPACE_BASE = [
 ];
 
 export const CARE_WORKSPACES = Object.freeze(CARE_WORKSPACE_BASE.map(normalizeWorkspaceDefinition));
+
+const BACKEND_STATUS = Object.freeze({
+  live: 'backend-wired',
+  fallback: 'demo-local-fallback',
+});
+
+const STANDARD_WORKSPACE_SUBPAGES = Object.freeze([
+  'dashboard',
+  'tools',
+  'workflows',
+  'automations',
+  'analytics',
+  'alerts',
+  'reports',
+  'settings',
+]);
+
+function makeSubpage(id, label = id) {
+  return {
+    id,
+    label: label
+      .split(/[-\s]+/)
+      .filter(Boolean)
+      .map((part) => `${part.charAt(0).toUpperCase()}${part.slice(1)}`)
+      .join(' '),
+  };
+}
+
+function normalizeMode(config) {
+  const subpageIds = config.subpages || STANDARD_WORKSPACE_SUBPAGES;
+  return Object.freeze({
+    ...config,
+    subpages: subpageIds.map((entry) =>
+      typeof entry === 'string' ? makeSubpage(entry) : makeSubpage(entry.id, entry.label || entry.id)
+    ),
+    dataPipeline: Object.freeze({
+      source: config.dataPipeline?.source || config.primaryDataSources || [],
+      ingestion: config.dataPipeline?.ingestion || ['workspace-context', 'api-client', 'local-fallback'],
+      normalization: config.dataPipeline?.normalization || ['asset-registry-join', 'workspace-mode-tags'],
+      workspaceContext: config.dataPipeline?.workspaceContext || `${config.workspaceId}-context`,
+      assetRecommendations: config.dataPipeline?.assetRecommendations || config.assets || [],
+      dashboardWidgets: config.dataPipeline?.dashboardWidgets || config.dashboards || [],
+      alerts: config.dataPipeline?.alerts || config.alerts || [],
+      aiContext: config.dataPipeline?.aiContext || config.aiAgents || [],
+      reports: config.dataPipeline?.reports || config.reports || [],
+    }),
+  });
+}
+
+export const WORKSPACE_FUNCTIONALITY_MODES = Object.freeze({
+  emergency: normalizeMode({
+    workspaceId: 'emergency',
+    modeName: 'Emergency Rapid Triage Mode',
+    purpose: 'Triage, escalation, pathway support, time-sensitive calculators, and emergency alerts.',
+    primaryUsers: ['Emergency physicians', 'Triage nurses', 'EMS coordinators', 'Hospital operations'],
+    primaryDataSources: ['frontend local/demo data', 'backend APIs', 'simulation data', 'AI events', 'user activity', 'asset usage', 'workflow events'],
+    dashboards: ['triage-risk', 'emergency-calculators', 'active-alerts'],
+    subpages: [...STANDARD_WORKSPACE_SUBPAGES, 'simulations'],
+    assets: ['qsofa', 'news2', 'sofa-score', 'nihss', 'heart-score', 'grace-acs'],
+    workflows: ['sepsis pathway', 'stroke pathway', 'chest pain pathway', 'trauma escalation'],
+    aiAgents: ['emergency-copilot'],
+    backendServices: [
+      { id: 'calculators', label: 'Calculators', endpoint: '/api/tools/execute', status: BACKEND_STATUS.live },
+      { id: 'simulations', label: 'Simulations', endpoint: '/api/simulations', status: BACKEND_STATUS.fallback },
+      { id: 'protocols', label: 'Protocols', endpoint: '/api/protocols', status: BACKEND_STATUS.fallback },
+      { id: 'ai-workflow', label: 'AI workflow', endpoint: '/api/chat', status: BACKEND_STATUS.live },
+    ],
+    alerts: ['sepsis risk', 'stroke window', 'chest pain escalation', 'critical vitals'],
+    reports: ['triage summary', 'pathway utilization', 'alert review'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  }),
+  icu: normalizeMode({
+    workspaceId: 'icu',
+    modeName: 'ICU Critical Care Mode',
+    purpose: 'Critical-care trends, ventilator context, acuity scoring, telemetry review, and escalation.',
+    primaryUsers: ['ICU physicians', 'Critical care nurses', 'Respiratory therapists', 'Biomedical engineers'],
+    primaryDataSources: ['backend APIs', 'telemetry', 'frontend local/demo data', 'AI events', 'workflow events'],
+    dashboards: ['sofa-trends', 'ventilator-context', 'telemetry-alerts'],
+    assets: ['sofa-score', 'rox-index', 'pao2-fio2-ratio', 'ventilator-support-assistant'],
+    workflows: ['sepsis escalation', 'ventilator review', 'deterioration monitoring'],
+    aiAgents: ['critical-care-copilot'],
+    backendServices: [
+      { id: 'calculators', label: 'Calculators', endpoint: '/api/tools/execute', status: BACKEND_STATUS.live },
+      { id: 'telemetry', label: 'Telemetry', endpoint: '/api/telemetry', status: BACKEND_STATUS.fallback },
+      { id: 'ai-workflow', label: 'AI workflow', endpoint: '/api/chat', status: BACKEND_STATUS.live },
+    ],
+    alerts: ['SOFA trend', 'oxygenation risk', 'telemetry gaps'],
+    reports: ['acuity review', 'ventilation summary', 'deterioration audit'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  }),
+  cardiology: normalizeMode({
+    workspaceId: 'cardiology',
+    modeName: 'Cardiology Risk Mode',
+    purpose: 'Chest pain, ACS, ECG, arrhythmia, and cardiac risk workflows.',
+    primaryUsers: ['Cardiologists', 'Emergency physicians', 'Cardiology nurses'],
+    primaryDataSources: ['backend APIs', 'frontend local/demo data', 'AI events', 'asset usage', 'workflow events'],
+    dashboards: ['chest-pain-risk', 'ecg-context', 'recent-cardiology-tools'],
+    assets: ['heart-score', 'timi-ua-nstemi', 'grace-acs', 'ecg-interpretation-assistant'],
+    workflows: ['ACS review', 'ECG interpretation', 'arrhythmia follow-up'],
+    aiAgents: ['cardiology-copilot'],
+    backendServices: [
+      { id: 'calculators', label: 'Calculators', endpoint: '/api/tools/execute', status: BACKEND_STATUS.live },
+      { id: 'ai-workflow', label: 'AI workflow', endpoint: '/api/chat', status: BACKEND_STATUS.live },
+    ],
+    alerts: ['ACS risk', 'ECG review needed', 'troponin follow-up'],
+    reports: ['chest pain review', 'cardiology utilization', 'ECG safety summary'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  }),
+  laboratory: normalizeMode({
+    workspaceId: 'laboratory',
+    modeName: 'Laboratory Interpretation Mode',
+    purpose: 'Lab interpretation, abnormal result review, specimen flow, critical values, and trends.',
+    primaryUsers: ['Lab technicians', 'Pathologists', 'Clinicians', 'Researchers'],
+    primaryDataSources: ['lab data', 'backend APIs', 'frontend local/demo data', 'AI events', 'workflow events'],
+    dashboards: ['abnormal-labs', 'specimen-queue', 'lab-trends'],
+    subpages: ['dashboard', 'tools', 'workflows', 'automations', 'results', 'specimens', 'trends', 'alerts', 'reports', 'settings'],
+    assets: ['lab-interp', 'laboratory-dashboard', 'abg-interpreter', 'calc-gfr', 'ckd-staging'],
+    workflows: ['critical value review', 'specimen queue review', 'trend interpretation'],
+    aiAgents: ['lab-interpretation-agent'],
+    backendServices: [
+      { id: 'lab-results', label: 'Lab results', endpoint: '/api/labs/results', status: BACKEND_STATUS.fallback },
+      { id: 'lab-interpretation', label: 'Lab interpretation', endpoint: '/api/tools/execute', status: BACKEND_STATUS.live },
+      { id: 'specimen-queue', label: 'Specimen queue', endpoint: '/api/labs/specimens', status: BACKEND_STATUS.fallback },
+      { id: 'trends', label: 'Lab trends', endpoint: '/api/labs/trends', status: BACKEND_STATUS.fallback },
+    ],
+    alerts: ['critical value', 'abnormal trend', 'delayed specimen'],
+    reports: ['lab trend report', 'critical value review', 'specimen throughput'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  }),
+  pharmacy: normalizeMode({
+    workspaceId: 'pharmacy',
+    modeName: 'Pharmacy Safety Mode',
+    purpose: 'Medication safety, interactions, dosing, renal adjustment, and pharmacist review.',
+    primaryUsers: ['Pharmacists', 'Clinicians', 'Nurses', 'Medication safety teams'],
+    primaryDataSources: ['backend APIs', 'frontend local/demo data', 'asset usage', 'AI events', 'workflow events'],
+    dashboards: ['medication-safety', 'dose-review', 'renal-dose-risk'],
+    assets: ['drug-check', 'dose-calculator', 'antibiotic-guide', 'pediatric-dose-safety-checker'],
+    workflows: ['interaction review', 'renal dosing review', 'antimicrobial guidance'],
+    aiAgents: ['pharmacy-safety-agent'],
+    backendServices: [
+      { id: 'drug-check', label: 'Drug interaction check', endpoint: '/api/tools/execute', status: BACKEND_STATUS.live },
+      { id: 'dosing', label: 'Dose calculation', endpoint: '/api/tools/execute', status: BACKEND_STATUS.live },
+      { id: 'medication-review', label: 'Medication review queue', endpoint: '/api/pharmacy/reviews', status: BACKEND_STATUS.fallback },
+    ],
+    alerts: ['interaction risk', 'renal dose risk', 'antibiotic review'],
+    reports: ['medication safety report', 'dose review summary', 'antimicrobial stewardship'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  }),
+  operations: normalizeMode({
+    workspaceId: 'operations',
+    modeName: 'Hospital Operations Mode',
+    purpose: 'Hospital map, digital twin, capacity, devices, alerts, and operational coordination.',
+    primaryUsers: ['Hospital administrators', 'Operations leads', 'Charge nurses', 'Biomedical engineers'],
+    primaryDataSources: ['backend APIs', 'telemetry', 'audit logs', 'user activity', 'workflow events', 'frontend local/demo data'],
+    dashboards: ['operations-summary', 'capacity-status', 'active-alerts'],
+    assets: ['hospital-map', 'hospital-operations-command', 'asset-tracking-dashboard', 'device-fleet-management'],
+    workflows: ['capacity review', 'incident command', 'device readiness'],
+    aiAgents: ['operations-copilot'],
+    backendServices: [
+      { id: 'hospital-map', label: 'Hospital map', endpoint: '/api/operations/map', status: BACKEND_STATUS.fallback },
+      { id: 'digital-twin', label: 'Digital twin', endpoint: '/api/operations/digital-twin', status: BACKEND_STATUS.fallback },
+      { id: 'capacity', label: 'Capacity', endpoint: '/api/operations/capacity', status: BACKEND_STATUS.fallback },
+      { id: 'alerts', label: 'Alerts', endpoint: '/api/alerts', status: BACKEND_STATUS.fallback },
+    ],
+    alerts: ['capacity constraint', 'device issue', 'incident command'],
+    reports: ['capacity report', 'operations review', 'incident summary'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  }),
+  fleet: normalizeMode({
+    workspaceId: 'fleet',
+    modeName: 'Fleet Dispatch Mode',
+    purpose: 'Vehicle tracking, dispatch, route issues, maintenance, and fleet analytics.',
+    primaryUsers: ['Fleet operators', 'EMS coordinators', 'Dispatch supervisors'],
+    primaryDataSources: ['fleet data', 'telemetry', 'backend APIs', 'frontend local/demo data', 'workflow events'],
+    dashboards: ['fleet-status', 'route-risk', 'maintenance-readiness'],
+    subpages: ['dashboard', 'tools', 'workflows', 'automations', 'map', 'dispatch', 'maintenance', 'analytics', 'alerts', 'reports', 'settings'],
+    assets: ['fleet-live-map', 'live-tracking-map', 'fleet-command', 'route-optimizer', 'predictive-maintenance'],
+    workflows: ['dispatch review', 'route optimization', 'maintenance readiness'],
+    aiAgents: ['fleet-operations-agent'],
+    backendServices: [
+      { id: 'vehicles', label: 'Vehicles', endpoint: '/api/fleet/vehicles', status: BACKEND_STATUS.fallback },
+      { id: 'tracking', label: 'Tracking', endpoint: '/api/fleet/tracking', status: BACKEND_STATUS.fallback },
+      { id: 'dispatch', label: 'Dispatch', endpoint: '/api/fleet/dispatch', status: BACKEND_STATUS.fallback },
+      { id: 'maintenance', label: 'Maintenance', endpoint: '/api/fleet/maintenance', status: BACKEND_STATUS.fallback },
+    ],
+    alerts: ['route delay', 'vehicle readiness', 'maintenance risk'],
+    reports: ['fleet readiness', 'dispatch summary', 'route analytics'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  }),
+  'medical-iot': normalizeMode({
+    workspaceId: 'medical-iot',
+    modeName: 'Medical IoT Telemetry Mode',
+    purpose: 'Device telemetry, offline devices, stale signals, maintenance, battery risk, and biomedical alerts.',
+    primaryUsers: ['Biomedical engineers', 'ICU clinicians', 'Nurses', 'Operations teams'],
+    primaryDataSources: ['telemetry', 'backend APIs', 'frontend local/demo data', 'asset usage', 'workflow events'],
+    dashboards: ['offline-devices', 'telemetry-freshness', 'battery-risk'],
+    subpages: ['dashboard', 'tools', 'workflows', 'automations', 'devices', 'telemetry', 'maintenance', 'analytics', 'alerts', 'reports', 'settings'],
+    assets: ['medical-iot-dashboard', 'telemetry-monitoring', 'device-maintenance', 'device-fleet-management'],
+    workflows: ['offline device review', 'telemetry gap review', 'maintenance dispatch'],
+    aiAgents: ['device-telemetry-agent'],
+    backendServices: [
+      { id: 'devices', label: 'Devices', endpoint: '/api/devices', status: BACKEND_STATUS.fallback },
+      { id: 'telemetry', label: 'Telemetry', endpoint: '/api/telemetry', status: BACKEND_STATUS.fallback },
+      { id: 'alerts', label: 'Alerts', endpoint: '/api/device-alerts', status: BACKEND_STATUS.fallback },
+      { id: 'maintenance', label: 'Maintenance', endpoint: '/api/device-maintenance', status: BACKEND_STATUS.fallback },
+    ],
+    alerts: ['offline device', 'telemetry gap', 'battery risk', 'maintenance due'],
+    reports: ['telemetry freshness', 'device risk', 'maintenance summary'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  }),
+  education: normalizeMode({
+    workspaceId: 'education',
+    modeName: 'Education Training Mode',
+    purpose: 'Simulation, competency tracking, debriefs, learner support, and guided practice.',
+    primaryUsers: ['Educators', 'Students', 'Clinical preceptors'],
+    primaryDataSources: ['simulation data', 'frontend local/demo data', 'user activity', 'AI events', 'workflow events'],
+    dashboards: ['recommended-scenarios', 'competency-gaps', 'recent-debriefs'],
+    assets: ['simulation-suite', 'scenario-player', 'competency-platform', 'debrief-dashboard'],
+    workflows: ['scenario assignment', 'debrief review', 'competency practice'],
+    aiAgents: ['education-coach'],
+    backendServices: [
+      { id: 'simulations', label: 'Simulations', endpoint: '/api/simulations', status: BACKEND_STATUS.fallback },
+      { id: 'competencies', label: 'Competencies', endpoint: '/api/competencies', status: BACKEND_STATUS.fallback },
+      { id: 'ai-workflow', label: 'AI workflow', endpoint: '/api/chat', status: BACKEND_STATUS.live },
+    ],
+    alerts: ['competency gap', 'incomplete debrief', 'recommended practice'],
+    reports: ['learner progress', 'competency review', 'simulation outcomes'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  }),
+  research: normalizeMode({
+    workspaceId: 'research',
+    modeName: 'Research Evidence Mode',
+    purpose: 'Evidence retrieval, literature review, explainability, auditability, and research workflows.',
+    primaryUsers: ['Researchers', 'Educators', 'Clinical governance teams'],
+    primaryDataSources: ['backend APIs', 'frontend local/demo data', 'AI events', 'asset usage', 'audit logs'],
+    dashboards: ['evidence-review', 'cohort-context', 'auditability'],
+    assets: ['guideline-rag', 'differential-ai', 'timeline-ai', 'ai-explainability'],
+    workflows: ['evidence review', 'cohort exploration', 'explainability review'],
+    aiAgents: ['research-copilot'],
+    backendServices: [
+      { id: 'guidelines', label: 'Guideline retrieval', endpoint: '/api/guidelines', status: BACKEND_STATUS.fallback },
+      { id: 'ai-workflow', label: 'AI workflow', endpoint: '/api/chat', status: BACKEND_STATUS.live },
+      { id: 'audit', label: 'Audit', endpoint: '/api/audit', status: BACKEND_STATUS.fallback },
+    ],
+    alerts: ['evidence gap', 'citation needed', 'auditability risk'],
+    reports: ['evidence review', 'research summary', 'explainability report'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+  }),
+  governance: normalizeMode({
+    workspaceId: 'governance',
+    modeName: 'Governance Review Mode',
+    purpose: 'Audit, security, regulatory risk, human review, and AI governance evidence.',
+    primaryUsers: ['Compliance officers', 'Security reviewers', 'Administrators', 'Platform admins'],
+    primaryDataSources: ['audit logs', 'AI events', 'backend APIs', 'user activity', 'workflow events'],
+    dashboards: ['audit-readiness', 'policy-review', 'human-review'],
+    subpages: ['dashboard', 'tools', 'workflows', 'automations', 'audit', 'security', 'risk', 'reviews', 'analytics', 'alerts', 'reports', 'settings'],
+    assets: ['ai-governance', 'ai-security', 'ai-explainability', 'clinical-audit'],
+    workflows: ['human review queue', 'security review', 'regulatory risk review'],
+    aiAgents: ['governance-agent'],
+    backendServices: [
+      { id: 'audit', label: 'Audit', endpoint: '/api/audit', status: BACKEND_STATUS.fallback },
+      { id: 'security', label: 'Security', endpoint: '/api/security', status: BACKEND_STATUS.fallback },
+      { id: 'regulatory', label: 'Regulatory', endpoint: '/api/regulatory', status: BACKEND_STATUS.fallback },
+      { id: 'human-review', label: 'Human review', endpoint: '/api/reviews', status: BACKEND_STATUS.fallback },
+    ],
+    alerts: ['audit gap', 'security event', 'review overdue', 'policy risk'],
+    reports: ['audit readiness', 'security summary', 'human review report'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS', 'MANAGE_SETTINGS'],
+  }),
+  administration: normalizeMode({
+    workspaceId: 'administration',
+    modeName: 'Administration SaaS Operations Mode',
+    purpose: 'Tenant setup, workspace management, access controls, SaaS readiness, and backend connection review.',
+    primaryUsers: ['Platform admins', 'Tenant admins', 'Hospital administrators'],
+    primaryDataSources: ['backend APIs', 'audit logs', 'user activity', 'asset usage', 'frontend local/demo data'],
+    dashboards: ['tenant-health', 'workspace-setup', 'billing-readiness'],
+    assets: ['ai-governance', 'ai-security', 'clinical-audit', 'hospital-operations-command'],
+    workflows: ['workspace setup', 'role review', 'entitlement review', 'backend readiness'],
+    aiAgents: ['administration-agent'],
+    backendServices: [
+      { id: 'tenant-admin', label: 'Tenant admin', endpoint: '/api/tenant', status: BACKEND_STATUS.fallback },
+      { id: 'workspace-admin', label: 'Workspace admin', endpoint: '/api/workspaces', status: BACKEND_STATUS.live },
+      { id: 'users', label: 'Users', endpoint: '/api/users', status: BACKEND_STATUS.fallback },
+      { id: 'billing', label: 'Billing', endpoint: '/api/billing', status: BACKEND_STATUS.fallback },
+    ],
+    alerts: ['configuration gap', 'backend fallback', 'role review', 'entitlement gap'],
+    reports: ['workspace setup report', 'SaaS readiness', 'tenant operations'],
+    permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS', 'MANAGE_SETTINGS'],
+  }),
+});
 
 function unique(values) {
   return [...new Set((values || []).filter(Boolean))];
@@ -704,6 +1049,60 @@ export function getCareWorkspaceById(workspaceId) {
   return WORKSPACE_BY_ID[workspaceId] || WORKSPACE_BY_ID[DEFAULT_CARE_WORKSPACE_ID];
 }
 
+export function getWorkspaceFunctionalityMode(workspaceId = DEFAULT_CARE_WORKSPACE_ID) {
+  const workspace = getCareWorkspaceById(workspaceId);
+  return (
+    WORKSPACE_FUNCTIONALITY_MODES[workspace.id] ||
+    normalizeMode({
+      workspaceId: workspace.id,
+      modeName: `${workspace.label} Workspace Mode`,
+      purpose: workspace.description,
+      primaryUsers: workspace.allowedRoles || [],
+      primaryDataSources: ['frontend local/demo data', 'backend APIs', 'user activity', 'asset usage'],
+      dashboards: workspace.defaultDashboardWidgets || [],
+      assets: workspace.defaultAssets || [],
+      workflows: workspace.defaultNavigationGroups || [],
+      aiAgents: workspace.defaultAIAgents || [],
+      backendServices: [
+        { id: 'workspace-context', label: 'Workspace context', endpoint: '/api/workspaces/context', status: BACKEND_STATUS.live },
+      ],
+      alerts: ['workspace notification'],
+      reports: ['workspace summary'],
+      permissions: ['VIEW_DASHBOARD', 'USE_ASSISTANT', 'VIEW_TOOLS'],
+    })
+  );
+}
+
+export function getWorkspaceSubpageEntries(workspaceId = DEFAULT_CARE_WORKSPACE_ID) {
+  const workspace = getCareWorkspaceById(workspaceId);
+  const mode = getWorkspaceFunctionalityMode(workspace.id);
+  return mode.subpages.map((subpage) => ({
+    ...subpage,
+    workspaceId: workspace.id,
+    path: `/workspace/${workspace.id}/${subpage.id}`,
+  }));
+}
+
+export function getWorkspaceSubpageById(workspaceId = DEFAULT_CARE_WORKSPACE_ID, subpageId = 'dashboard') {
+  const normalizedSubpageId = String(subpageId || 'dashboard').trim().toLowerCase();
+  return getWorkspaceSubpageEntries(workspaceId).find((subpage) => subpage.id === normalizedSubpageId) || null;
+}
+
+export function buildWorkspaceModeModel(workspaceId = DEFAULT_CARE_WORKSPACE_ID) {
+  const workspace = getCareWorkspaceById(workspaceId);
+  const mode = getWorkspaceFunctionalityMode(workspace.id);
+  const subpageEntries = getWorkspaceSubpageEntries(workspace.id);
+  return {
+    workspace,
+    mode,
+    subpageEntries,
+    backendStatus: {
+      live: mode.backendServices.filter((service) => service.status === BACKEND_STATUS.live),
+      fallback: mode.backendServices.filter((service) => service.status !== BACKEND_STATUS.live),
+    },
+  };
+}
+
 export function getCareWorkspaceRouteEntries(workspaceId) {
   const workspace = getCareWorkspaceById(workspaceId);
   return workspace.routeIds.map((routeId) => WORKSPACE_ROUTE_SHORTCUTS[routeId]).filter(Boolean);
@@ -725,16 +1124,22 @@ export function buildCareWorkspaceModel(
   const workspace = getCareWorkspaceById(workspaceId);
   const routeEntries = getCareWorkspaceRouteEntries(workspace.id);
   const toolEntries = getCareWorkspaceToolEntries(workspace.id, tools);
+  const modeModel = buildWorkspaceModeModel(workspace.id);
 
   return {
     workspace,
+    mode: modeModel.mode,
+    subpageEntries: modeModel.subpageEntries,
+    backendStatus: modeModel.backendStatus,
     routeEntries,
     toolEntries,
     stats: {
       routes: routeEntries.length,
+      subpages: modeModel.subpageEntries.length,
       tools: toolEntries.length,
       calculators: toolEntries.filter((tool) => tool.category === 'Calculator').length,
       backendBacked: toolEntries.filter((tool) => tool.executorStatus === 'registered').length,
+      dataSources: modeModel.mode.primaryDataSources.length,
     },
   };
 }

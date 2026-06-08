@@ -100,10 +100,11 @@ const {
     import('./pages/PlatformOSPages').then((m) => ({ default: m.AssetLibraryPage }))
   ),
 };
-const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
+const AssistantPage = lazyWithRetry(() => import('./pages/Dashboard'));
 const CapabilityDiscovery = lazyWithRetry(() => import('./pages/CapabilityDiscovery'));
 const RecommendationsPage = lazyWithRetry(() => import('./pages/RecommendationsPage'));
 const AutomationAuditTrail = lazyWithRetry(() => import('./pages/AutomationAuditTrail'));
+const AutomationAnalytics = lazyWithRetry(() => import('./pages/AutomationAnalytics'));
 const DependencyMap = lazyWithRetry(() => import('./pages/DependencyMap'));
 const DependencyGraph = lazyWithRetry(() => import('./pages/DependencyGraph'));
 const Patients = lazyWithRetry(() => import('./pages/Patients'));
@@ -734,8 +735,13 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/automation-analytics',
+      element: <AutomationAnalytics />,
+      requiresAuth: true,
+    },
+    {
       path: '/workspace',
-      element: <LegacyProtectedRouteRedirect to="/workspace/clinical" />,
+      element: <LegacyProtectedRouteRedirect to="/workspace/emergency" />,
       requiresAuth: true,
     },
     {
@@ -745,6 +751,11 @@ function AppRoutes() {
     },
     {
       path: '/workspace/:workspaceId',
+      element: <WorkspaceHome />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workspace/:workspaceId/:subpage',
       element: <WorkspaceHome />,
       requiresAuth: true,
     },
@@ -810,7 +821,7 @@ function AppRoutes() {
     })),
     {
       path: '/assistant',
-      element: <Dashboard />,
+      element: <AssistantPage />,
       requiresAuth: true,
     },
     {

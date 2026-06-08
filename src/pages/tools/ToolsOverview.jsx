@@ -299,6 +299,7 @@ const ToolsOverview = () => {
     platformContext,
     roleProfile,
     saasProfile,
+    switchWorkspace: switchIdentityWorkspace,
   } = useUserIdentity();
 
   const accessContext = useMemo(
@@ -500,6 +501,13 @@ const ToolsOverview = () => {
       }),
     [isAllToolsWorkspace, profileFilteredTools, toolFilter, workspaceToolIdSet]
   );
+  const workspaceRecommendedTools = useMemo(
+    () =>
+      profileToolGraph.recommendedTools.filter(
+        (tool) => isAllToolsWorkspace || workspaceToolIdSet.has(tool.id)
+      ),
+    [isAllToolsWorkspace, profileToolGraph.recommendedTools, workspaceToolIdSet]
+  );
   const searchQuery = normalizeSearch(search);
   const searchTokens = useMemo(() => searchQuery.split(/\s+/).filter(Boolean), [searchQuery]);
   const recentToolItems = useMemo(
@@ -509,9 +517,13 @@ const ToolsOverview = () => {
         .filter((tool) => tool && (isAllToolsWorkspace || workspaceToolIdSet.has(tool.id))),
     [isAllToolsWorkspace, recentTools, toolById, workspaceToolIdSet]
   );
+  const handleWorkspaceChange = async (workspaceId) => {
+    await switchWorkspace(workspaceId);
+    await switchIdentityWorkspace?.(workspaceId);
+  };
   const filteredTools = useMemo(() => {
     let base = workspaceTools;
-    if (toolFilter === 'recommended') base = profileToolGraph.recommendedTools;
+    if (toolFilter === 'recommended') base = workspaceRecommendedTools;
     else if (toolFilter === 'all') base = isAllToolsWorkspace ? accessGroups.permitted : workspaceTools;
     else if (toolFilter === 'favorites') base = accessGroups.favorites;
     else if (toolFilter === 'recent') base = recentToolItems;
@@ -528,8 +540,8 @@ const ToolsOverview = () => {
     toolFilter,
     accessGroups,
     isAllToolsWorkspace,
-    profileToolGraph.recommendedTools,
     recentToolItems,
+    workspaceRecommendedTools,
   ]);
 
   useEffect(() => {
@@ -616,7 +628,7 @@ const ToolsOverview = () => {
             <span>{roleIntelligenceProfile.roleLabel}</span>
             <span>{workspaceExperience.shortLabel}</span>
             <span>{profile.specialty}</span>
-            <span>{profileToolGraph.counts.recommended} recommended</span>
+            <span>{workspaceRecommendedTools.length} recommended</span>
             <span>{profileToolGraph.counts.restricted} restricted</span>
           </div>
           <div className="tools-workspace">
@@ -624,7 +636,9 @@ const ToolsOverview = () => {
             <select
               id="workspaceSelect"
               value={activeWorkspaceId}
-              onChange={(e) => switchWorkspace(e.target.value)}
+              onChange={(e) => {
+                void handleWorkspaceChange(e.target.value);
+              }}
             >
               {workspaces.map((workspace) => (
                 <option key={workspace.id} value={workspace.id}>
@@ -694,7 +708,7 @@ const ToolsOverview = () => {
               </span>
             </div>
             <div className="stat">
-              <span className="stat-number">{profileToolGraph.counts.recommended}</span>
+              <span className="stat-number">{workspaceRecommendedTools.length}</span>
               <span className="stat-label">Recommended</span>
             </div>
           </div>

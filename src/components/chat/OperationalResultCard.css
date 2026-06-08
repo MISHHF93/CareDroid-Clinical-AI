@@ -169,11 +169,8 @@
   min-width: 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-}
-
-.operational-result-card__details .tool-result-card {
-  margin: 0;
-  box-shadow: none;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--app-panel-border);
 }
 
 @media (max-width: 720px) {

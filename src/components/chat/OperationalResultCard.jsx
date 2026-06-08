@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import ToolCard from '../ToolCard';
+import { ToolResultBody } from '../ToolCard';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './OperationalResultCard.css';
@@ -224,7 +224,7 @@ export default function OperationalResultCard({
         )}
 
         <div className="operational-result-card__details">
-          <ToolCard toolResult={toolResult} />
+          <ToolResultBody toolResult={toolResult} />
         </div>
       </div>
     </section>

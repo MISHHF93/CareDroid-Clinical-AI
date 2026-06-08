@@ -1,6 +1,7 @@
 import React from 'react';
 import Card from '../../components/ui/card';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
+import { useWorkspace } from '../../contexts/WorkspaceContext';
 import './ProfileIdentityPages.css';
 
 export default function ProfileWorkspaces() {
@@ -14,8 +15,10 @@ export default function ProfileWorkspaces() {
     isLoading,
     error,
   } = useUserIdentity();
+  const { switchWorkspace: switchWorkspaceContext } = useWorkspace();
 
   const handleSwitch = async (workspaceId) => {
+    await switchWorkspaceContext(workspaceId);
     await switchWorkspace(workspaceId);
   };
 

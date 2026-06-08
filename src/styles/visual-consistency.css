@@ -14,6 +14,7 @@
   --app-visual-control-gap: var(--app-space-sm);
   --app-visual-control-radius: var(--compact-card-radius, var(--app-radius-md));
   --app-visual-panel-radius: var(--compact-panel-radius, var(--app-radius-lg));
+  --app-normalized-dashboard-grid-min: minmax(min(100%, var(--app-grid-card-min-density, 14rem)), 1fr);
 }
 
 .app-shell :is(
@@ -44,6 +45,37 @@
     .org-page
   ) {
   gap: var(--app-visual-page-gap);
+}
+
+/* Final normalization pass: one dashboard/card/form/table/search language. */
+.app-shell :is(
+    .analytics-summary,
+    .cost-summary,
+    .header-stats,
+    .platform-kpi-grid,
+    .dashboard-card-grid,
+    .metric-grid,
+    .stats-grid,
+    .summary-grid
+  ) {
+  display: grid;
+  gap: var(--app-visual-panel-gap);
+  grid-template-columns: repeat(auto-fit, var(--app-normalized-dashboard-grid-min));
+  min-width: 0;
+}
+
+.app-shell :is(
+    .analytics-grid,
+    .cost-grid,
+    .platform-workflow-layout,
+    .platform-result-grid,
+    .operating-card-grid,
+    .tools-grid,
+    .command-action-grid,
+    .command-launch-grid
+  ) {
+  gap: var(--app-visual-page-gap);
+  min-width: 0;
 }
 
 .app-shell :is(
@@ -128,6 +160,25 @@
   border-radius: var(--app-visual-panel-radius);
   background-color: var(--app-surface);
   color: var(--app-text-primary);
+  box-shadow: var(--app-elevation-none);
+}
+
+.app-shell :is(
+    .summary-card,
+    .cost-card,
+    .analytics-panel,
+    .cost-panel,
+    .tool-card-large,
+    .platform-result-card,
+    .platform-panel,
+    .operating-card,
+    .operating-drilldown,
+    .device-summary-card,
+    .medical-iot-card
+  ) {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-visual-panel-radius);
+  background: var(--app-surface);
   box-shadow: var(--app-elevation-none);
 }
 
@@ -218,7 +269,25 @@
   min-width: 0;
 }
 
-.app-shell :is(label, .cd-form-field, [class*='input-group'], [class*='field']) {
+.app-shell :is(
+    .cd-filter-panel,
+    [role='search'],
+    [class$='-controls'],
+    [class*='-controls '],
+    [class$='-filters'],
+    [class*='-filters '],
+    [class$='-toolbar'],
+    [class*='-toolbar ']
+  ) {
+  gap: var(--app-visual-control-gap);
+}
+
+.app-shell :is(.cd-form-field, [class*='input-group'], [class*='field']) {
+  display: grid;
+  gap: var(--app-space-xs);
+}
+
+.app-shell label {
   gap: var(--app-space-xs);
 }
 
@@ -235,6 +304,22 @@
   overflow-x: auto;
   overflow-y: hidden;
   background: var(--app-surface);
+}
+
+.app-shell :is(
+    .cd-table-wrap,
+    .catalog-table-wrap,
+    .device-fleet-table-wrap,
+    .hospital-map-table-wrap,
+    .user-table-wrapper,
+    .logs-table-container,
+    .tool-card-table-wrap,
+    .fleet-data-table-wrap
+  ) {
+  border: 1px solid var(--app-border);
+  border-radius: var(--app-visual-panel-radius);
+  background: var(--app-surface);
+  overflow-x: auto;
 }
 
 .app-shell table {
@@ -258,6 +343,41 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+}
+
+/* Preserve explicit hierarchy on the primary shell/dashboard surfaces. */
+.app-shell .app-shell-route-identity {
+  border-left: 3px solid var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--app-surface-glass) 82%, transparent);
+  box-shadow: var(--shadow-1);
+}
+
+.app-shell .command-hero {
+  padding: clamp(18px, 2.4vw, 28px);
+  background:
+    linear-gradient(135deg, var(--workspace-os-surface, var(--app-surface-2)), transparent 58%),
+    var(--app-surface-1);
+  box-shadow: var(--app-elevation-card, var(--shadow-1));
+}
+
+.app-shell .command-hero h1 {
+  font-size: clamp(1.75rem, 3vw, 2.75rem);
+  line-height: 1.05;
+}
+
+.app-shell .command-panel {
+  background: color-mix(in srgb, var(--app-surface-1) 94%, var(--app-bg));
+  box-shadow: var(--app-elevation-none);
+}
+
+.app-shell .command-compact-action--primary {
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 22%, var(--app-surface-2)),
+      var(--app-surface-2)
+    );
+  box-shadow: var(--app-elevation-card, var(--shadow-1));
 }
 
 .app-shell :is([class*='badge'], [class*='chip'], [class*='pill'], [class*='tag']) {

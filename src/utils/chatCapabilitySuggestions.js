@@ -217,9 +217,12 @@ const SEARCH_FIRST_ICON_BY_KIND = Object.freeze({
   'ai-agent': CHROME_ICONS.bot,
   'ai-model': CHROME_ICONS.brain,
   operation: CHROME_ICONS.activity,
+  dashboard: CHROME_ICONS.layoutDashboard,
   destination: CHROME_ICONS.search,
+  notification: CHROME_ICONS.bell,
   workspace: CHROME_ICONS.layoutDashboard,
   asset: CHROME_ICONS.artifacts,
+  commercial: CHROME_ICONS.circleDollar,
 });
 
 function makeSearchFirstSuggestion(entry, index) {
@@ -268,16 +271,17 @@ function normalizeSearchFirstQuery(input) {
   return tokens.join(' ').trim();
 }
 
-function getSearchFirstCapabilitySuggestions({ input, workspaceContext }) {
+function getSearchFirstCapabilitySuggestions({ input, workspaceContext, navigationPermissions = [] }) {
   const query = normalizeSearchFirstQuery(input);
   if (!query) return [];
   const scopedResults = buildSearchFirstResults({
     query,
     workspaceId: workspaceContext?.activeWorkspaceId || 'all',
+    navigationPermissions,
   });
   const results = scopedResults.length
     ? scopedResults
-    : buildSearchFirstResults({ query });
+    : buildSearchFirstResults({ query, navigationPermissions });
 
   return results
     .filter((entry) => entry.path || entry.tool?.id)
@@ -370,6 +374,7 @@ export function getChatCapabilitySuggestions({
   tools = getUserFacingToolRegistryProjection(),
   workspaceContext = null,
   recentToolIds = [],
+  navigationPermissions = [],
 } = {}) {
   const suggestions = [];
 
@@ -387,7 +392,7 @@ export function getChatCapabilitySuggestions({
     suggestions.push(suggestion);
   });
 
-  getSearchFirstCapabilitySuggestions({ input, workspaceContext }).forEach((suggestion) => {
+  getSearchFirstCapabilitySuggestions({ input, workspaceContext, navigationPermissions }).forEach((suggestion) => {
     suggestions.push(suggestion);
   });
 

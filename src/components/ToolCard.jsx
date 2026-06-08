@@ -16,10 +16,10 @@ function Notice({ variant, title, children }) {
   );
 }
 
-const ToolCard = React.memo(function ToolCard({ toolResult }) {
+export function ToolResultBody({ toolResult }) {
   if (!toolResult) return null;
 
-  const { toolId, toolName, result } = toolResult;
+  const { toolId, result } = toolResult;
   const { data, interpretation, citations, warnings, errors, disclaimer, timestamp } = result || {};
 
   const renderToolContent = () => {
@@ -39,6 +39,64 @@ const ToolCard = React.memo(function ToolCard({ toolResult }) {
   const interpVariant = errors?.length > 0 ? 'error' : warnings?.length > 0 ? 'warning' : 'info';
 
   return (
+    <>
+      {interpretation && (
+        <Notice variant={interpVariant}>
+          {interpretation}
+        </Notice>
+      )}
+
+      {renderToolContent()}
+
+      {warnings && warnings.length > 0 && (
+        <Notice variant="warning" title="Warnings">
+          <ul style={{ margin: 0, paddingLeft: 20 }}>
+            {warnings.map((warning, idx) => (
+              <li key={idx}>{warning}</li>
+            ))}
+          </ul>
+        </Notice>
+      )}
+
+      {citations && citations.length > 0 && (
+        <div style={{ marginTop: 16 }}>
+          <hr className="tool-card-divider" />
+          <div className="tool-card-muted" style={{ marginBottom: 8 }}>
+            <strong>References:</strong>
+          </div>
+          <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, fontSize: 12 }}>
+            {citations.map((citation, idx) => (
+              <li key={idx}>
+                {citation.title} - {citation.reference}
+                {citation.url && (
+                  <>
+                    {' '}
+                    <a href={citation.url} target="_blank" rel="noopener noreferrer">
+                      [Link]
+                    </a>
+                  </>
+                )}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {disclaimer && <p className="tool-card-disclaimer">⚠️ {disclaimer}</p>}
+
+      {timestamp && (
+        <span className="tool-card-ts">Executed at {new Date(timestamp).toLocaleString()}</span>
+      )}
+    </>
+  );
+}
+
+const ToolCard = React.memo(function ToolCard({ toolResult }) {
+  if (!toolResult) return null;
+
+  const { toolId, toolName } = toolResult;
+
+  return (
     <section className="tool-result-card" aria-label={toolName || 'Tool result'}>
       <header className="tool-result-card-header">
         <span className="tool-result-card-icon" aria-hidden>
@@ -47,53 +105,7 @@ const ToolCard = React.memo(function ToolCard({ toolResult }) {
         <span>{toolName}</span>
       </header>
       <div className="tool-result-card-body">
-        {interpretation && (
-          <Notice variant={interpVariant}>
-            {interpretation}
-          </Notice>
-        )}
-
-        {renderToolContent()}
-
-        {warnings && warnings.length > 0 && (
-          <Notice variant="warning" title="Warnings">
-            <ul style={{ margin: 0, paddingLeft: 20 }}>
-              {warnings.map((warning, idx) => (
-                <li key={idx}>{warning}</li>
-              ))}
-            </ul>
-          </Notice>
-        )}
-
-        {citations && citations.length > 0 && (
-          <div style={{ marginTop: 16 }}>
-            <hr className="tool-card-divider" />
-            <div className="tool-card-muted" style={{ marginBottom: 8 }}>
-              <strong>References:</strong>
-            </div>
-            <ul style={{ margin: '8px 0 0 0', paddingLeft: 20, fontSize: 12 }}>
-              {citations.map((citation, idx) => (
-                <li key={idx}>
-                  {citation.title} - {citation.reference}
-                  {citation.url && (
-                    <>
-                      {' '}
-                      <a href={citation.url} target="_blank" rel="noopener noreferrer">
-                        [Link]
-                      </a>
-                    </>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-
-        {disclaimer && <p className="tool-card-disclaimer">⚠️ {disclaimer}</p>}
-
-        {timestamp && (
-          <span className="tool-card-ts">Executed at {new Date(timestamp).toLocaleString()}</span>
-        )}
+        <ToolResultBody toolResult={toolResult} />
       </div>
     </section>
   );

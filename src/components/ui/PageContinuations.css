@@ -1,0 +1,92 @@
+.page-continuations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--compact-panel-gap, var(--app-space-md));
+  width: 100%;
+  min-width: 0;
+  margin-top: var(--compact-page-gap, var(--app-space-lg));
+}
+
+.page-continuations__panel {
+  display: grid;
+  align-content: start;
+  gap: var(--app-space-sm);
+  min-width: 0;
+  padding: var(--compact-card-padding, var(--app-card-padding-compact, 14px));
+  border: 1px solid var(--app-border, var(--panel-border));
+  border-radius: var(--compact-card-radius, var(--app-radius-lg));
+  background: color-mix(in srgb, var(--app-surface-1, var(--app-surface)) 92%, var(--app-bg));
+  color: var(--app-text-primary, var(--text-color));
+}
+
+.page-continuations__panel h2 {
+  margin: 0;
+  color: var(--app-text-primary, var(--text-color));
+  font-size: var(--app-type-subheading, var(--font-16));
+  line-height: var(--type-subheading-line-height, 1.3);
+}
+
+.page-continuations__panel p {
+  margin: 0;
+  color: var(--app-text-muted, var(--muted-text));
+  font-size: var(--app-type-small, var(--font-14));
+  line-height: var(--type-small-line-height, 1.45);
+}
+
+.page-continuations__links {
+  display: grid;
+  gap: var(--app-space-xs, 6px);
+  min-width: 0;
+}
+
+.page-continuations__links a,
+.page-continuations__workspace-link {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--app-border, var(--panel-border));
+  border-radius: var(--app-radius-md, 10px);
+  background: var(--app-surface-2, var(--surface-1));
+  color: inherit;
+  text-decoration: none;
+}
+
+.page-continuations__links a:hover,
+.page-continuations__links a:focus-visible,
+.page-continuations__workspace-link:hover,
+.page-continuations__workspace-link:focus-visible {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--app-border, var(--panel-border)));
+  outline: none;
+}
+
+.page-continuations__links strong,
+.page-continuations__links span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.page-continuations__links strong,
+.page-continuations__workspace-link {
+  color: var(--app-text-primary, var(--text-color));
+  font-size: var(--app-type-small, var(--font-14));
+  font-weight: 800;
+}
+
+.page-continuations__links span {
+  color: var(--app-text-muted, var(--muted-text));
+  font-size: var(--app-type-caption, var(--font-12));
+}
+
+.page-continuations__panel--workspace {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 34%, var(--app-border, var(--panel-border)));
+}
+
+@media (max-width: 640px) {
+  .page-continuations {
+    grid-template-columns: 1fr;
+  }
+}

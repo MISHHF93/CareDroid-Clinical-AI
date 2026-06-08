@@ -172,6 +172,15 @@ function BuilderMetric({ label, value }) {
   return <MetricCard label={label} value={value} className="commercial-card" />;
 }
 
+function InlineMetric({ label, value }) {
+  return (
+    <div className="commercial-inline-metric">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
 function ProductizationList({ title, items = [] }) {
   if (!items?.length) return null;
   return (
@@ -182,6 +191,20 @@ function ProductizationList({ title, items = [] }) {
         ))}
       </ul>
     </InsightCard>
+  );
+}
+
+function InlineProductizationList({ title, items = [] }) {
+  if (!items?.length) return null;
+  return (
+    <div className="commercial-inline-section">
+      <h3>{title}</h3>
+      <ul className="commercial-compact-list">
+        {items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -214,24 +237,30 @@ export function CustomerExpansionOpportunitiesPage() {
             <p className="commercial-muted">Currently uses</p>
             <ChipList items={segment.currentPacks} />
 
-            <div className="commercial-grid">
+            <div className="commercial-opportunity-list">
               {segment.opportunities.map((opportunity) => (
-                <Card key={opportunity.id} className="commercial-card">
-                  <span className="commercial-muted">{opportunity.band.label}</span>
-                  <h3>{opportunity.recommendedPack}</h3>
-                  <p>{opportunity.expectedOutcome}</p>
-                  <p>
-                    <strong>Motion:</strong> {opportunity.motion}
-                  </p>
-                  <p>
-                    <strong>Opportunity score:</strong> {opportunity.score}
-                  </p>
+                <article key={opportunity.id} className="commercial-opportunity-row">
+                  <div>
+                    <span className="commercial-muted">{opportunity.band.label}</span>
+                    <h3>{opportunity.recommendedPack}</h3>
+                    <p>{opportunity.expectedOutcome}</p>
+                  </div>
+                  <dl className="commercial-opportunity-meta">
+                    <div>
+                      <dt>Motion</dt>
+                      <dd>{opportunity.motion}</dd>
+                    </div>
+                    <div>
+                      <dt>Score</dt>
+                      <dd>{opportunity.score}</dd>
+                    </div>
+                  </dl>
                   <ul className="commercial-compact-list">
                     {opportunity.evidence.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
-                </Card>
+                </article>
               ))}
             </div>
           </Card>
@@ -264,11 +293,11 @@ export function ProductIntelligenceLayerPage() {
             <Card key={product.id} className="commercial-card">
               <span className="commercial-muted">{product.health.band.label}</span>
               <h2>{product.name}</h2>
-              <div className="commercial-metric">
-                <BuilderMetric label="Adoption" value={product.adoption.score} />
-                <BuilderMetric label="ROI" value={product.roi.score} />
-                <BuilderMetric label="Health" value={product.health.score} />
-                <BuilderMetric label="Engagement" value={product.engagement.score} />
+              <div className="commercial-inline-metrics" aria-label={`${product.name} metrics`}>
+                <InlineMetric label="Adoption" value={product.adoption.score} />
+                <InlineMetric label="ROI" value={product.roi.score} />
+                <InlineMetric label="Health" value={product.health.score} />
+                <InlineMetric label="Engagement" value={product.engagement.score} />
               </div>
               <p>
                 ROI ratio: {product.roi.roiRatio} · Estimated value: $
@@ -279,12 +308,12 @@ export function ProductIntelligenceLayerPage() {
                 Usage: {product.engagement.launches} launches · {product.engagement.workflowCompletions}{' '}
                 workflow completions · {product.engagement.aiAssistedActions} AI-assisted actions
               </p>
-              <ProductizationList title="Packs" items={product.valueChain.packs} />
-              <ProductizationList
+              <InlineProductizationList title="Packs" items={product.valueChain.packs} />
+              <InlineProductizationList
                 title="Assets"
                 items={product.valueChain.assets.map((asset) => `${asset.name} (${asset.type})`)}
               />
-              <ProductizationList
+              <InlineProductizationList
                 title="Outcomes"
                 items={product.valueChain.outcomes.map(
                   (outcome) => `${outcome.label}: ${outcome.valueScore}`,

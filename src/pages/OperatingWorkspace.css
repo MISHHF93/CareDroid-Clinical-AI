@@ -17,9 +17,11 @@
   align-items: center;
   gap: var(--compact-page-gap, 14px);
   padding: var(--compact-panel-padding, 16px);
-  border: 1px solid var(--panel-border);
+  border: 1px solid var(--workspace-os-border, var(--panel-border));
   border-radius: var(--compact-panel-radius, 14px);
-  background: var(--app-surface-1);
+  background:
+    linear-gradient(135deg, var(--workspace-os-surface, transparent), transparent 58%),
+    var(--app-surface-1);
   min-width: 0;
 }
 
@@ -30,8 +32,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: color-mix(in srgb, var(--app-accent-interactive) 18%, transparent);
-  color: var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 18%, transparent);
+  color: var(--workspace-os-accent, var(--app-accent-interactive));
 }
 
 .operating-hero__copy {
@@ -40,7 +42,7 @@
 
 .operating-eyebrow {
   margin: 0 0 6px;
-  color: var(--muted-text);
+  color: var(--workspace-os-accent, var(--muted-text));
   font-size: var(--font-12);
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -69,7 +71,11 @@
   padding: 0 var(--space-4);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
-  background: var(--accent-gradient);
+  background: linear-gradient(
+    135deg,
+    var(--workspace-os-accent, var(--app-accent-interactive)),
+    color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 72%, var(--app-accent-2, #7c3aed))
+  );
   color: var(--navy-ink);
   font-weight: 800;
   cursor: pointer;
@@ -83,7 +89,7 @@
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-md);
   background: var(--app-surface-2);
-  color: var(--app-accent-interactive);
+  color: var(--workspace-os-accent, var(--app-accent-interactive));
   font: inherit;
   font-weight: 800;
   cursor: pointer;
@@ -138,8 +144,8 @@
 }
 
 .operating-card:hover {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--panel-border));
-  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--app-surface-1));
+  border-color: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 42%, var(--panel-border));
+  background: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 8%, var(--app-surface-1));
 }
 
 .operating-card__icon {
@@ -150,7 +156,7 @@
   justify-content: center;
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--app-fg) 7%, transparent);
-  color: var(--app-accent-interactive);
+  color: var(--workspace-os-accent, var(--app-accent-interactive));
 }
 
 .operating-card__title {
@@ -168,7 +174,7 @@
 
 .operating-card__action {
   margin-top: auto;
-  color: var(--app-accent-interactive);
+  color: var(--workspace-os-accent, var(--app-accent-interactive));
   font-weight: 800;
 }
 
@@ -197,8 +203,8 @@
 
 .operating-drilldown:hover,
 .operating-inline-action:hover {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--panel-border));
-  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--app-surface-1));
+  border-color: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 42%, var(--panel-border));
+  background: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 8%, var(--app-surface-1));
 }
 
 .operating-drilldown__icon {
@@ -209,7 +215,7 @@
   justify-content: center;
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--app-fg) 7%, transparent);
-  color: var(--app-accent-interactive);
+  color: var(--workspace-os-accent, var(--app-accent-interactive));
 }
 
 .operating-drilldown strong,

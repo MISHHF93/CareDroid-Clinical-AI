@@ -69,7 +69,7 @@ export default function ProfileToolPreferences() {
     if (field === 'defaultWorkspace') setActiveWorkspaceId(value);
     const backendField =
       field === 'compactToolView'
-        ? { compactMode: value }
+        ? { compactMode: value, density: value ? 'compact' : 'standard' }
         : field === 'responseStyle'
           ? { preferredAIStyle: value }
           : { [field]: value };

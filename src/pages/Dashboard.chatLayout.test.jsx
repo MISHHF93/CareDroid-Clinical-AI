@@ -144,7 +144,8 @@ describe('Dashboard chat layout', () => {
   it('renders a complete clinical chat shell', async () => {
     renderDashboard('/assistant');
 
-    expect(screen.getByRole('heading', { level: 1, name: /caredroid assistant/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /emergency assistant/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/rapid triage mode is active/i).length).toBeGreaterThan(0);
     expect(screen.getByLabelText(/chat context/i)).toHaveTextContent(/online/i);
     expect(screen.getByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
     expect(screen.getByText(/decision support only/i)).toBeInTheDocument();
@@ -247,7 +248,7 @@ describe('Dashboard chat layout', () => {
     const user = userEvent.setup();
     renderDashboard('/assistant');
 
-    expect(screen.getByRole('heading', { level: 1, name: /caredroid assistant/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /emergency assistant/i })).toBeInTheDocument();
     const actionRail = screen.getByLabelText(/suggested actions/i);
     expect(within(actionRail).getByRole('button', { name: /drug checker/i })).toBeInTheDocument();
 

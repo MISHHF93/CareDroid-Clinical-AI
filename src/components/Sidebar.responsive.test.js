@@ -60,10 +60,9 @@ describe('Sidebar responsive — scroll and labels', () => {
     expect(sidebarCss).toMatch(/\.sidebar[\s\S]*overflow:\s*hidden/);
   });
 
-  it('tool and nav labels wrap by words without horizontal overflow', () => {
-    expect(sidebarCss).toContain('.sidebar-tool-card-title-row');
+  it('nav labels wrap by words without horizontal overflow', () => {
     expect(sidebarCss).toMatch(/\.nav-label[\s\S]*overflow-wrap:\s*break-word/);
-    expect(sidebarCss).toMatch(/\.sidebar-tool-card-name[\s\S]*overflow-wrap:\s*break-word/);
+    expect(sidebarCss).not.toContain('.sidebar-tool-card-title-row');
     expect(sidebarCss).toMatch(/\.nav-item[\s\S]*box-sizing:\s*border-box/);
     expect(sidebarCss).toMatch(/\.nav-icon > svg[\s\S]*height:\s*100%/);
   });

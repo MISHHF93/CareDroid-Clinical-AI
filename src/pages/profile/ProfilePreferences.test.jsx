@@ -12,6 +12,7 @@ const mocks = vi.hoisted(() => {
         theme: 'system',
         language: 'en',
         defaultDashboard: 'command',
+        density: 'standard',
         compactMode: false,
         aiAssistantPreferences: {
           responseStyle: 'concise',
@@ -43,6 +44,7 @@ describe('ProfilePreferences', () => {
     render(<ProfilePreferences />);
 
     fireEvent.change(screen.getByLabelText(/theme/i), { target: { value: 'dark' } });
+    fireEvent.change(screen.getByLabelText(/density/i), { target: { value: 'compact' } });
     fireEvent.change(screen.getByLabelText(/ai response style/i), { target: { value: 'teaching' } });
     fireEvent.click(screen.getByRole('button', { name: /save preferences/i }));
 
@@ -50,6 +52,8 @@ describe('ProfilePreferences', () => {
       expect(mocks.savePreferences).toHaveBeenCalledWith(
         expect.objectContaining({
           theme: 'dark',
+          density: 'compact',
+          compactMode: true,
           aiAssistantPreferences: expect.objectContaining({ responseStyle: 'teaching' }),
         }),
       );

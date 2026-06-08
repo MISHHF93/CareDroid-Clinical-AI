@@ -110,6 +110,9 @@ describe('PlatformOSPages', () => {
 
     fireEvent.change(input, { target: { value: 'fleet dispatch maintenance map' } });
     expect(screen.getByRole('button', { name: /^open fleet$/i })).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: 'emergency department solution' } });
+    expect(screen.getByRole('button', { name: /open emergency department solution/i })).toBeInTheDocument();
   });
 
   it('renders timeline, notifications, digital twin, workflows, and assets', () => {

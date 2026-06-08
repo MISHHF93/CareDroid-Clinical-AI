@@ -62,11 +62,24 @@ function DataSourceNotice({ label, detail }) {
   return <InfoNotice label={label} detail={detail} className="platform-source-notice" />;
 }
 
-function FilterBar({ query, setQuery, workspaceId, setWorkspaceId, category, setCategory, categories }) {
+function FilterBar({
+  query,
+  setQuery,
+  workspaceId,
+  setWorkspaceId,
+  category,
+  setCategory,
+  categories,
+  globalSearch = false,
+}) {
+  const searchLabel = globalSearch ? 'Search' : 'Filter this page';
+  const searchPlaceholder = globalSearch
+    ? 'Search everything...'
+    : 'Filter visible capabilities...';
   return (
     <FilterPanel className="platform-filter-bar">
-      <FormField label="Search">
-        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search everything..." />
+      <FormField label={searchLabel}>
+        <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={searchPlaceholder} />
       </FormField>
       <FormField label="Workspace">
         <select value={workspaceId} onChange={(event) => setWorkspaceId(event.target.value)}>
@@ -141,7 +154,7 @@ export function WorkspacesIndexPage() {
       eyebrow="Workspace Architecture"
       title="Workspaces"
       description="Clinical operating-system workspaces filter tools, calculators, dashboards, AI suggestions, maps, notifications, and workflows."
-      actions={<Link className="platform-primary-link" to="/workspace/clinical">Open Clinical Workspace</Link>}
+      actions={<Link className="platform-primary-link" to="/workspace/emergency">Open Emergency Workspace</Link>}
     >
       <section className="platform-workspace-grid">
         {CARE_WORKSPACES.map((workspace) => {
@@ -206,6 +219,7 @@ export function SearchResultsPage() {
         category={category}
         setCategory={setCategory}
         categories={['workspace', 'asset', 'tool', 'calculator', 'workflow', 'automation', 'simulation', 'protocol', 'ai-agent', 'ai-model', 'operation', 'destination', 'dashboard', 'map', 'notification', 'document', 'admin', 'library']}
+        globalSearch
       />
       <section className="platform-result-grid" aria-label="Search results">
         {visibleResults.map((item) => (

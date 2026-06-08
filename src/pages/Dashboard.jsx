@@ -8,10 +8,9 @@ import { useWorkspace } from '../contexts/WorkspaceContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import { toolRegistryById, getToolById } from '../data/toolRegistry';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
-import ToolVisualization from '../components/ToolVisualization';
+import AssistantResultRenderer from '../components/chat/AssistantResultRenderer';
 import AiRouteMetadata from '../components/chat/AiRouteMetadata';
 import ChatExecutionCard from '../components/chat/ChatExecutionCard';
-import OperationalResultCard from '../components/chat/OperationalResultCard';
 import Citations, { CitationModal } from '../components/Citations';
 import ConfidenceBadge from '../components/ConfidenceBadge';
 import ProfileToolGraphCard from '../components/ProfileToolGraphCard';
@@ -29,6 +28,7 @@ import {
   CHAT_SENSITIVE_CONFIRMATIONS,
   getChatCapabilitySuggestions,
 } from '../utils/chatCapabilitySuggestions';
+import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import { filterVisibleTools, getAssetAwareToolProjection } from '../data/assetAccess';
 import {
   buildExecutionParameters,
@@ -149,10 +149,10 @@ function buildOutreachChatPrompt({ intent: intentId, target, reason, timing, con
 }
 
 /**
- * Dashboard — clinical chat (full width). Tools open on dedicated /tools/* routes.
+ * AssistantPage — clinical chat (full width). Tools open on dedicated /tools/* routes.
  * Legacy URLs `/dashboard?tool=…` and `/chat?tool=…` redirect through canonical routes.
  */
-function Dashboard() {
+function AssistantPage() {
   const { authToken, hasPermission, user } = useUser();
   const { error, success } = useNotificationActions();
   const toolPreferences = useToolPreferences();
@@ -250,11 +250,40 @@ function Dashboard() {
   const isChatMode = location.pathname === '/chat' || location.pathname === '/assistant';
   const selectedToolEntry = selectedTool ? getToolById(selectedTool) : null;
   const activeConversationLabel = activeConversationId ? `Conversation ${activeConversationId}` : 'No conversation';
+  const workspaceExperience = useMemo(
+    () => getWorkspaceExperienceProfile(workspaceContextActive || activeWorkspace),
+    [activeWorkspace, workspaceContextActive]
+  );
   const workspaceLabel =
-    activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'Personal workspace';
+    workspaceContextActive?.name ||
+    workspaceExperience.shortLabel ||
+    activeWorkspace?.branding?.displayName ||
+    activeWorkspace?.name ||
+    'Personal workspace';
+  const workspaceStarterActions = useMemo(() => {
+    const workspacePrompts = (workspaceExperience.quickPrompts || []).slice(0, 1).map((prompt) => ({
+      title: `${workspaceExperience.shortLabel} priorities`,
+      body: workspaceExperience.modeSummary,
+      prompt,
+      icon: CHROME_ICONS.bot,
+      kind: 'workspace',
+    }));
+    const outreachAction = CHAT_EMPTY_ACTIONS.find((action) => action.workflow === 'outreach');
+    const defaultActions = CHAT_EMPTY_ACTIONS.filter((action) => action.workflow !== 'outreach').slice(0, 2);
+    return [...workspacePrompts, ...defaultActions, outreachAction].filter(Boolean).slice(0, 4);
+  }, [workspaceExperience]);
   const aiPreferenceLabel =
     preferences?.aiAssistantPreferences?.responseStyle || 'concise';
   const clinicianContextLabel = account?.specialty || account?.profession || account?.role || 'Clinical profile';
+  const navigationPermissions = useMemo(
+    () => [
+      ...(workspaceState?.effectivePermissions || []),
+      ...(platformContext?.permissions || []),
+      ...(account?.permissions || []),
+      ...(user?.permissions || []),
+    ],
+    [account?.permissions, platformContext?.permissions, user?.permissions, workspaceState?.effectivePermissions]
+  );
   const assistantProfileContext = useMemo(
     () =>
       buildUserToolProfile({
@@ -947,6 +976,7 @@ function Dashboard() {
             visibleAssetIds: workspaceVisibleAssetIds,
           },
           recentToolIds: toolPreferences.recentTools || [],
+          navigationPermissions,
         })
       );
     }, { timeout: 500 });
@@ -962,6 +992,7 @@ function Dashboard() {
     organizationAwareChatTools,
     activeWorkspaceAssistantContext,
     recommendationSource,
+    navigationPermissions,
     toolPreferences.recentTools,
     workspaceContextActive?.id,
     workspaceContextActive?.name,
@@ -1035,10 +1066,10 @@ function Dashboard() {
             </div>
             <div>
               <p className="dashboard-chat-eyebrow">
-                {isChatMode ? 'Assistant = act with guidance' : 'Home = see what matters'}
+                {isChatMode ? workspaceExperience.operatingLabel : 'Home = see what matters'}
               </p>
               <h1 id="dashboard-chat-title" className="dashboard-chat-title">
-                {isChatMode ? 'CareDroid Assistant' : 'Home'}
+                {isChatMode ? workspaceExperience.assistantTitle : 'Home'}
               </h1>
             </div>
           </div>
@@ -1119,11 +1150,11 @@ function Dashboard() {
               </div>
               <div className="dashboard-empty-inner">
                 <div className="dashboard-empty-title">
-                  {isChatMode ? 'CareDroid Assistant' : 'Start with what matters'}
+                  {isChatMode ? workspaceExperience.assistantTitle : 'Start with what matters'}
                 </div>
                 <div className="dashboard-empty-copy">
                   {isChatMode
-                    ? 'Chat can reason over free text, suggest next actions, collect missing inputs, preview tool execution, confirm risky steps, and show structured results.'
+                    ? `${workspaceExperience.modeSummary} ${workspaceExperience.assistantPlaceholder}`
                     : 'Review priority items, choose the next action, then use Chat to preview, confirm, and verify the result.'}
                 </div>
                 {isChatMode ? (
@@ -1137,7 +1168,7 @@ function Dashboard() {
                     </div>
                     <div className="dashboard-empty-section-title">Start with...</div>
                     <div className="dashboard-starter-grid" aria-label="Starter prompts">
-                      {CHAT_EMPTY_ACTIONS.slice(0, 4).map((starter) => (
+                      {workspaceStarterActions.map((starter) => (
                         <button
                           key={starter.title}
                           type="button"
@@ -1182,9 +1213,6 @@ function Dashboard() {
               const recoveryActionId = msg.metadata?.sourceExecutionActionId;
               const canRecoverExecution = recoveryActionId && executionActions[recoveryActionId];
               const aiFoundation = msg.aiFoundation || msg.metadata?.aiFoundation;
-              const visualizations = Array.isArray(msg.visualizations)
-                ? msg.visualizations.filter((viz) => !(msg.toolResult && viz?.type === 'tool-result'))
-                : [];
 
               return (
                 <div
@@ -1230,27 +1258,14 @@ function Dashboard() {
                       />
                     )}
                     <div className="dashboard-msg-body">{msg.content}</div>
-                    {msg.toolResult && (
-                      <OperationalResultCard
-                        toolResult={msg.toolResult}
-                        parameters={msg.metadata?.parameters}
-                        timestamp={msg.timestamp}
-                        followUpSuggestions={msg.suggestions}
-                        onRetry={
-                          canRecoverExecution ? () => handleRetryExecutionAction(recoveryActionId) : undefined
-                        }
-                        onEdit={
-                          canRecoverExecution ? () => handleEditExecutionAction(recoveryActionId) : undefined
-                        }
-                      />
-                    )}
-                    {visualizations.length > 0 && (
-                      <div className="dashboard-msg-viz">
-                        {visualizations.map((viz, idx) => (
-                          <ToolVisualization key={`${viz.type || 'viz'}-${idx}`} visualization={viz} />
-                        ))}
-                      </div>
-                    )}
+                    <AssistantResultRenderer
+                      message={msg}
+                      parameters={msg.metadata?.parameters}
+                      followUpSuggestions={msg.suggestions}
+                      onRetry={canRecoverExecution ? () => handleRetryExecutionAction(recoveryActionId) : undefined}
+                      onEdit={canRecoverExecution ? () => handleEditExecutionAction(recoveryActionId) : undefined}
+                      visualizationsClassName="dashboard-msg-viz"
+                    />
                     {msg.citations && msg.citations.length > 0 && msg.role === 'assistant' && (
                       <Citations citations={msg.citations} onViewDetails={(c) => setSelectedCitation(c)} />
                     )}
@@ -1625,4 +1640,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default AssistantPage;

@@ -24,7 +24,7 @@ import './QuickCommandLauncher.css';
 const MAX_RECENT_ITEMS = 5;
 const MAX_FAVORITE_ITEMS = 5;
 const MAX_DEFAULT_WORKSPACE_ITEMS = 2;
-const MAX_DEFAULT_DESTINATION_ITEMS = 5;
+const MAX_DEFAULT_DESTINATION_ITEMS = 6;
 const MAX_DEFAULT_TOOL_ITEMS = 4;
 
 function commandSearchText(entry) {
@@ -131,6 +131,10 @@ function makeDiscoveryEntry(entry) {
     'ai-agent': CHROME_ICONS.bot,
     'ai-model': CHROME_ICONS.brain,
     operation: CHROME_ICONS.activity,
+    dashboard: CHROME_ICONS.layoutDashboard,
+    destination: CHROME_ICONS.search,
+    notification: CHROME_ICONS.bell,
+    commercial: CHROME_ICONS.circleDollar,
   };
   return {
     id: `discovery:${entry.id}`,
@@ -177,7 +181,7 @@ export function buildQuickCommandEntries({
   workspaces = CARE_WORKSPACES,
   recentToolIds = [],
   favoriteToolIds = [],
-  discoveryEntries = buildSearchFirstDiscoveryEntries(),
+  discoveryEntries = null,
   navigationPermissions = [],
   includeContextualDestinations = true,
 } = {}) {
@@ -217,12 +221,29 @@ export function buildQuickCommandEntries({
   const toolEntries = allToolEntries.filter(
     (entry) => !recentSourceIds.has(entry.sourceId) && !favoriteSourceIds.has(entry.sourceId)
   );
+  const sourceDiscoveryEntries =
+    discoveryEntries ||
+    buildSearchFirstDiscoveryEntries({
+      navigationPermissions,
+      includeContextualDestinations,
+    });
   const searchableDiscoveryEntries = uniqueEntriesById(
-    discoveryEntries
+    sourceDiscoveryEntries
       .filter((entry) =>
-        ['asset', 'workflow', 'automation', 'simulation', 'protocol', 'ai-agent', 'ai-model', 'operation'].includes(
-          entry.kind
-        )
+        [
+          'asset',
+          'workflow',
+          'automation',
+          'simulation',
+          'protocol',
+          'ai-agent',
+          'ai-model',
+          'operation',
+          'dashboard',
+          'destination',
+          'notification',
+          'commercial',
+        ].includes(entry.kind)
       )
       .filter((entry) => !(entry.kind === 'asset' && toolById[entry.sourceId]))
       .map(makeDiscoveryEntry)
@@ -355,7 +376,22 @@ export default function QuickCommandLauncher({
         setActiveTool,
         recordToolAccess,
       });
-    } else if (['asset', 'workflow', 'simulation'].includes(entry.kind)) {
+    } else if (
+      [
+        'asset',
+        'workflow',
+        'automation',
+        'simulation',
+        'protocol',
+        'ai-agent',
+        'ai-model',
+        'operation',
+        'dashboard',
+        'destination',
+        'notification',
+        'commercial',
+      ].includes(entry.kind)
+    ) {
       if (entry.path) {
         navigate(navigationTargetFromPath(entry.path));
       } else if (entry.assistantPrompt) {
@@ -387,7 +423,7 @@ export default function QuickCommandLauncher({
   const pickUnique = (items) =>
     items.filter((entry) => {
       if (usedEntryIds.has(entry.id)) return false;
-      if (entry.path && usedEntryPaths.has(entry.path) && !(normalizedQuery && entry.id?.startsWith('discovery:'))) {
+      if (entry.path && usedEntryPaths.has(entry.path)) {
         return false;
       }
       usedEntryIds.add(entry.id);

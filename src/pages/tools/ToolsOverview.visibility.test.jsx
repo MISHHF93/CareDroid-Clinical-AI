@@ -105,6 +105,8 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     vi.clearAllMocks();
     mockWorkspaceValue.workspaces = [{ id: 'all', name: 'All Tools', toolIds: [] }];
     mockWorkspaceValue.activeWorkspaceId = 'all';
+    mockWorkspaceValue.activeWorkspace = { id: 'all', name: 'All Tools', toolIds: [] };
+    mockWorkspaceValue.visibleAssetIds = [];
     mockToolPreferencesValue.favorites = [];
     mockToolPreferencesValue.pinned = [];
     mockToolPreferencesValue.recentTools = [];
@@ -144,6 +146,20 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(screen.getByRole('heading', { level: 1, name: /medical iot tool console/i })).toBeInTheDocument();
     expect(screen.getByText(/medical iot os/i)).toBeInTheDocument();
     expect(screen.getByText(/device telemetry mode is active/i)).toBeInTheDocument();
+  });
+
+  it('keeps recommended cards scoped to the active workspace inventory', () => {
+    mockWorkspaceValue.workspaces = [{ id: 'emergency', name: 'Emergency', toolIds: ['qsofa'] }];
+    mockWorkspaceValue.activeWorkspaceId = 'emergency';
+    mockWorkspaceValue.activeWorkspace = { id: 'emergency', name: 'Emergency', toolIds: ['qsofa'] };
+    mockWorkspaceValue.visibleAssetIds = ['qsofa'];
+
+    const { container } = renderOverview();
+    const renderedIds = [...container.querySelectorAll('[data-tool-id]')].map((node) =>
+      node.getAttribute('data-tool-id')
+    );
+
+    expect(renderedIds.every((id) => mockWorkspaceValue.visibleAssetIds.includes(id))).toBe(true);
   });
 
   it('stitches tools into workflow and recommendation next actions', () => {

@@ -63,7 +63,8 @@ describe('Simplified sidebar navigation wiring', () => {
   it('defines exactly the reduced visible primary routes', () => {
     const navPaths = visibleSidebarItems.map((item) => item.path);
 
-    expect(navPaths).toEqual(['/dashboard', '/assistant', '/tools', '/operations', '/profile']);
+    expect(navPaths).toEqual(['/dashboard', '/assistant', '/tools', '/operations', '/workspaces', '/profile']);
+    expect(navPaths).toHaveLength(6);
 
     for (const path of [
       '/discover',
@@ -166,6 +167,8 @@ describe('Simplified sidebar navigation wiring', () => {
     expect(sidebarSource).toContain('requireAll={item.requireAllPermissions}');
     expect(navigationConfigSource).toContain("label: 'Developer Catalog'");
     expect(navigationConfigSource).toContain("permission: 'CONFIGURE_SYSTEM'");
+    expect(navigationConfigSource).toContain("label: 'Workspace'");
+    expect(navigationConfigSource).not.toContain("id: 'workspace',\n    label: 'Workspace',\n    mobileLabel: 'Work',\n    path: '/workspaces'");
   });
 
   it('closes the mobile drawer after navigation and starts new chats on /assistant', () => {

@@ -100,6 +100,7 @@ describe('Sidebar mobile render state', () => {
       /^assistant$/i,
       /^tools$/i,
       /^operations$/i,
+      /^workspace$/i,
       /^profile$/i,
     ]) {
       expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
@@ -118,13 +119,13 @@ describe('Sidebar mobile render state', () => {
       /^assistant$/i,
       /^tools$/i,
       /^operations$/i,
+      /^workspace$/i,
       /^profile$/i,
     ]) {
       expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
     }
 
     expect(within(nav).queryByRole('button', { name: /^settings$/i })).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/^workspace$/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /developer catalog/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^tool library$/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /advanced/i })).not.toBeInTheDocument();

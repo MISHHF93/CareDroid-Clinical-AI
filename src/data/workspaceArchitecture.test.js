@@ -3,9 +3,12 @@ import {
   CARE_WORKSPACES,
   buildCareWorkspaceModel,
   buildClientWorkspaceProfile,
+  getWorkspaceFunctionalityMode,
   filterWorkspacesForClient,
   getCareWorkspaceById,
   getWorkspacePresetForOrganizationType,
+  getWorkspaceSubpageById,
+  getWorkspaceSubpageEntries,
 } from './workspaceArchitecture';
 
 describe('workspaceArchitecture', () => {
@@ -15,12 +18,14 @@ describe('workspaceArchitecture', () => {
       'icu',
       'cardiology',
       'laboratory',
+      'pharmacy',
       'operations',
       'fleet',
       'medical-iot',
       'education',
       'research',
       'governance',
+      'administration',
       'simulation',
       'ai-evaluation',
     ]);
@@ -53,9 +58,11 @@ describe('workspaceArchitecture', () => {
       'icu',
       'cardiology',
       'laboratory',
+      'pharmacy',
       'operations',
       'medical-iot',
       'governance',
+      'administration',
     ]);
     expect(getWorkspacePresetForOrganizationType('ems')).toEqual(['emergency', 'fleet', 'operations']);
     expect(getWorkspacePresetForOrganizationType('university')).toEqual([
@@ -102,6 +109,69 @@ describe('workspaceArchitecture', () => {
       expect.arrayContaining(['qsofa', 'news2', 'sofa-score', 'nihss', 'heart-score', 'grace-acs'])
     );
     expect(routePaths).toEqual(expect.arrayContaining(['/assistant', '/tools/calculators', '/live-map']));
+  });
+
+  it('defines functionality modes and subpages for requested workspaces', () => {
+    for (const workspaceId of [
+      'emergency',
+      'icu',
+      'cardiology',
+      'laboratory',
+      'pharmacy',
+      'operations',
+      'fleet',
+      'medical-iot',
+      'education',
+      'research',
+      'governance',
+      'administration',
+    ]) {
+      const mode = getWorkspaceFunctionalityMode(workspaceId);
+      expect(mode).toEqual(
+        expect.objectContaining({
+          workspaceId,
+          modeName: expect.any(String),
+          purpose: expect.any(String),
+          primaryUsers: expect.any(Array),
+          primaryDataSources: expect.any(Array),
+          dashboards: expect.any(Array),
+          subpages: expect.any(Array),
+          assets: expect.any(Array),
+          workflows: expect.any(Array),
+          aiAgents: expect.any(Array),
+          backendServices: expect.any(Array),
+          dataPipeline: expect.objectContaining({
+            source: expect.any(Array),
+            workspaceContext: expect.any(String),
+            dashboardWidgets: expect.any(Array),
+            aiContext: expect.any(Array),
+          }),
+          alerts: expect.any(Array),
+          reports: expect.any(Array),
+          permissions: expect.any(Array),
+        })
+      );
+      expect(getWorkspaceSubpageEntries(workspaceId).map((subpage) => subpage.id)).toContain('dashboard');
+      expect(getWorkspaceSubpageById(workspaceId, 'dashboard')).toEqual(
+        expect.objectContaining({ path: `/workspace/${workspaceId}/dashboard` })
+      );
+    }
+  });
+
+  it('adds specialized subpages for operational workspaces without sidebar expansion', () => {
+    expect(getWorkspaceSubpageEntries('emergency').map((subpage) => subpage.id)).toContain('simulations');
+    expect(getWorkspaceSubpageEntries('medical-iot').map((subpage) => subpage.id)).toEqual(
+      expect.arrayContaining(['devices', 'telemetry', 'maintenance'])
+    );
+    expect(getWorkspaceSubpageEntries('fleet').map((subpage) => subpage.id)).toEqual(
+      expect.arrayContaining(['map', 'dispatch', 'maintenance'])
+    );
+    expect(getWorkspaceSubpageEntries('laboratory').map((subpage) => subpage.id)).toEqual(
+      expect.arrayContaining(['results', 'specimens', 'trends'])
+    );
+    expect(getWorkspaceSubpageEntries('governance').map((subpage) => subpage.id)).toEqual(
+      expect.arrayContaining(['audit', 'security', 'risk', 'reviews'])
+    );
   });
 
   it('defines specialty and acuity workspaces for AI launcher intents', () => {

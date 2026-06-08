@@ -66,20 +66,20 @@
 /* Button Sizes */
 .btn-sm {
   min-height: var(--app-control-height-sm, 34px);
-  padding: 7px 10px;
+  padding: calc(var(--compact-panel-gap, 8px) * 0.75) 10px;
   font-size: var(--font-14);
   border-radius: var(--app-radius-sm, var(--radius-sm));
 }
 
 .btn-md {
-  min-height: var(--app-button-height, var(--compact-control-height, 38px));
-  padding: 8px 14px;
+  min-height: var(--app-control-height-density, var(--app-button-height, var(--compact-control-height, 38px)));
+  padding: calc(var(--compact-panel-gap, 8px) * 0.85) 14px;
   font-size: var(--font-14);
 }
 
 .btn-lg {
   min-height: var(--app-control-height-lg, var(--app-min-touch-target, 44px));
-  padding: 10px 18px;
+  padding: var(--compact-panel-gap, 10px) 18px;
   font-size: var(--font-16);
   border-radius: var(--app-radius-lg, var(--radius-lg));
 }

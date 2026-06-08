@@ -93,6 +93,8 @@ describe('ProfileSettings operational profile save', () => {
     };
     mockPreferences = {
       theme: 'system',
+      density: 'standard',
+      compactMode: false,
       aiAssistantPreferences: {
         responseStyle: 'concise',
         citationLevel: 'standard',
@@ -175,6 +177,7 @@ describe('ProfileSettings operational profile save', () => {
     renderProfileSettings();
 
     await user.selectOptions(screen.getByLabelText(/theme/i), 'dark');
+    await user.selectOptions(screen.getByLabelText(/density/i), 'compact');
     await user.selectOptions(screen.getByLabelText(/ai response style/i), 'teaching');
     await user.click(screen.getByLabelText(/email notifications/i));
     await user.click(screen.getByRole('button', { name: /save preferences/i }));
@@ -183,6 +186,8 @@ describe('ProfileSettings operational profile save', () => {
       expect(mockSavePreferences).toHaveBeenCalledWith(
         expect.objectContaining({
           theme: 'dark',
+          density: 'compact',
+          compactMode: true,
           aiAssistantPreferences: expect.objectContaining({ responseStyle: 'teaching' }),
           notificationSettings: expect.objectContaining({ emailEnabled: false }),
         })

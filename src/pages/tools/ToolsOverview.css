@@ -350,7 +350,7 @@
 
 .tools-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--app-grid-card-min-density, 240px)), 1fr));
   gap: var(--compact-page-gap, 14px);
   margin-bottom: var(--compact-page-gap, 14px);
   min-width: 0;
@@ -361,7 +361,7 @@
   background: var(--app-surface);
   border: 1px solid var(--app-border);
   border-radius: var(--compact-panel-radius, 14px);
-  padding: var(--compact-panel-padding, 14px);
+  padding: var(--app-card-padding-density, var(--compact-panel-padding, 14px));
   cursor: pointer;
   transition: border-color 0.18s ease, background-color 0.18s ease;
   position: relative;
@@ -530,7 +530,7 @@
 .tool-description {
   color: var(--text-secondary);
   line-height: 1.4;
-  margin-bottom: 12px;
+  margin-bottom: var(--compact-panel-gap, 12px);
   font-size: 0.85rem;
   display: -webkit-box;
   overflow: hidden;
@@ -549,7 +549,7 @@
 }
 
 .tool-features {
-  margin-bottom: 12px;
+  margin-bottom: var(--compact-panel-gap, 12px);
 }
 
 .tool-features h4 {
@@ -585,7 +585,7 @@
 }
 
 .tool-use-cases {
-  margin-bottom: 12px;
+  margin-bottom: var(--compact-panel-gap, 12px);
 }
 
 .tool-use-cases h4 {
@@ -615,10 +615,19 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 12px;
-  padding-top: 12px;
+  margin-top: var(--compact-panel-gap, 12px);
+  padding-top: var(--compact-panel-gap, 12px);
   border-top: 1px solid var(--panel-border);
   min-width: 0;
+}
+
+.app-shell--density-compact .tool-features li:nth-child(n + 3),
+.app-shell--density-compact .use-case-tag:nth-child(n + 4) {
+  display: none;
+}
+
+.app-shell--density-compact .tool-card-large {
+  min-height: 0;
 }
 
 .btn-open-tool {

@@ -1,17 +1,206 @@
 import { CARE_WORKSPACES } from '../config/workspace.config';
 import { QUICK_COMMAND_DESTINATION_ITEMS, canExposeNavigationItem } from '../config/navigation.config';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 import { buildAssetInventoryProjection } from './assetInventory';
 import { PLATFORM_DASHBOARDS, PLATFORM_NOTIFICATIONS, PLATFORM_WORKFLOWS } from './platformOperatingSystem';
 import { SIMULATION_SCENARIOS } from './medicalSimulationCatalog';
 import { PROTOCOL_PATHWAYS } from './protocolPathwayLibrary';
 import { AI_MODEL_REGISTRY } from './aiModelRegistry';
 import { OPERATIONS_CENTER_SURFACES } from './digitalOperationsCenter';
-import { buildAutomationRuleLibrary } from './workflowAutomationBuilder';
+import { AUTOMATION_REGISTRY } from './automationRegistry';
 import { MARKETPLACE_ITEMS } from './marketplaceCatalog';
 
 function unique(values) {
   return [...new Set((values || []).flat().filter(Boolean).map(String))];
 }
+
+const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
+  {
+    id: 'products',
+    title: 'Product Catalog',
+    description: 'Search and launch CareDroid product packages, pack mappings, outcomes, and product detail pages.',
+    path: CANONICAL_ROUTES.products,
+    aliases: ['product catalog', 'products', 'solution catalog', 'product detail'],
+  },
+  {
+    id: 'asset-packs',
+    title: 'Asset Pack Builder',
+    description: 'Discover sellable asset packs and the products, routes, and assets each pack powers.',
+    path: CANONICAL_ROUTES.assetPacks,
+    aliases: ['packs', 'asset packs', 'package assets', 'pack builder'],
+  },
+  {
+    id: 'plans',
+    title: 'Commercial Plans',
+    description: 'Compare Starter, Professional, Enterprise, Academic, and Government packaging.',
+    path: CANONICAL_ROUTES.plans,
+    aliases: ['pricing', 'subscription', 'plans', 'commercial packaging'],
+  },
+  {
+    id: 'specialties',
+    title: 'Specialty Marketplace',
+    description: 'Find capabilities by clinical specialty and launch specialty-specific solution pages.',
+    path: CANONICAL_ROUTES.specialties,
+    aliases: ['specialty', 'emergency department solution', 'cardiology solution', 'clinical specialty'],
+  },
+  {
+    id: 'care-pathways',
+    title: 'Care Pathways',
+    description: 'Discover outcome-oriented pathways, pathway assets, and pathway launch routes.',
+    path: CANONICAL_ROUTES.carePathways,
+    aliases: ['pathways', 'care pathway', 'clinical pathway', 'outcome pathway'],
+  },
+  {
+    id: 'agents',
+    title: 'AI Agents Registry',
+    description: 'Launch commercial AI agents and workspace agent experiences from search.',
+    path: CANONICAL_ROUTES.agents,
+    aliases: ['agents', 'ai agents', 'copilot agents', 'agent registry'],
+  },
+  {
+    id: 'maturity-assessment',
+    title: 'Hospital Maturity Assessment',
+    description: 'Assess readiness and get consultative product recommendations.',
+    path: CANONICAL_ROUTES.maturityAssessment,
+    aliases: ['readiness', 'maturity', 'assessment', 'recommendations'],
+  },
+  {
+    id: 'outcomes',
+    title: 'Outcome Tracking',
+    description: 'Open leadership outcome metrics and value tracking signals.',
+    path: CANONICAL_ROUTES.outcomes,
+    aliases: ['outcomes', 'metrics', 'leadership metrics', 'value outcomes'],
+  },
+  {
+    id: 'value-tracking',
+    title: 'Value Tracking',
+    description: 'Review value metrics, adoption, and ROI signals for organizations.',
+    path: CANONICAL_ROUTES.valueTracking,
+    aliases: ['value', 'roi', 'adoption', 'value tracking'],
+  },
+  {
+    id: 'product-intelligence',
+    title: 'Product Intelligence',
+    description: 'Measure SaaS product health from product to pack to asset to outcome.',
+    path: CANONICAL_ROUTES.productIntelligence,
+    aliases: ['product intelligence', 'product health', 'adoption score', 'roi score'],
+  },
+  {
+    id: 'expansion-opportunities',
+    title: 'Customer Expansion Opportunities',
+    description: 'Find commercial growth recommendations by customer segment and pack usage.',
+    path: CANONICAL_ROUTES.expansionOpportunities,
+    aliases: ['expansion', 'upsell', 'cross sell', 'customer growth'],
+  },
+  {
+    id: 'integrations-marketplace',
+    title: 'Integrations Marketplace',
+    description: 'Discover FHIR, HL7, SSO, scheduling, lab, telehealth, and integration options.',
+    path: CANONICAL_ROUTES.integrationsMarketplace,
+    aliases: ['integrations', 'fhir', 'hl7', 'sso', 'lab interface', 'telehealth'],
+  },
+  {
+    id: 'integration-readiness',
+    title: 'Integration Readiness',
+    description: 'Review integration requirements, readiness gaps, and implementation next steps.',
+    path: CANONICAL_ROUTES.integrationReadiness,
+    aliases: ['readiness', 'integration readiness', 'implementation readiness'],
+  },
+  {
+    id: 'solution-builder',
+    title: 'Hospital Solution Builder',
+    description: 'Build a recommended hospital solution from organization type, departments, and packs.',
+    path: CANONICAL_ROUTES.solutionBuilder,
+    aliases: ['solution builder', 'hospital builder', 'recommend solution', 'implementation plan'],
+  },
+  {
+    id: 'automation-analytics',
+    title: 'Automation Analytics',
+    description: 'Track solution automation runs, adoption, failures, human overrides, and accepted AI recommendations.',
+    path: CANONICAL_ROUTES.automationAnalytics,
+    aliases: ['automation analytics', 'automation adoption', 'solution automation metrics', 'human overrides'],
+  },
+  {
+    id: 'configuration-studio',
+    title: 'Configuration Studio',
+    description: 'Open admin tenant configuration for products, packs, workspaces, and enabled capabilities.',
+    path: CANONICAL_ROUTES.configurationStudio,
+    aliases: ['configuration', 'tenant configuration', 'configuration studio', 'admin setup'],
+  },
+]);
+
+const COMMERCIAL_ROW_LEVEL_ENTRIES = Object.freeze([
+  {
+    id: 'specialty-emergency',
+    title: 'Emergency Department Solution',
+    description: 'Emergency specialty capabilities, triage workflows, calculators, alerts, and command routes.',
+    path: `${CANONICAL_ROUTES.specialties}/emergency`,
+    workspaceIds: ['emergency'],
+    aliases: ['ed', 'emergency medicine', 'triage solution', 'rapid response'],
+  },
+  {
+    id: 'specialty-cardiology',
+    title: 'Cardiology Solution',
+    description: 'Cardiology specialty capabilities, ACS pathways, cardiac calculators, and follow-up tools.',
+    path: `${CANONICAL_ROUTES.specialties}/cardiology`,
+    workspaceIds: ['cardiology'],
+    aliases: ['heart', 'acs', 'cardiac', 'chest pain'],
+  },
+  {
+    id: 'specialty-laboratory',
+    title: 'Laboratory Solution',
+    description: 'Laboratory interpretation, abnormal result workflows, specimen context, and lab tools.',
+    path: `${CANONICAL_ROUTES.specialties}/laboratory`,
+    workspaceIds: ['laboratory'],
+    aliases: ['labs', 'lab interpreter', 'critical values'],
+  },
+  {
+    id: 'pathway-sepsis',
+    title: 'Sepsis Care Pathway',
+    description: 'Find sepsis pathway assets, calculators, simulation, and escalation workflows.',
+    path: `${CANONICAL_ROUTES.carePathways}/sepsis`,
+    workspaceIds: ['emergency', 'icu'],
+    aliases: ['sepsis', 'qsofa', 'sofa', 'infection', 'deterioration'],
+  },
+  {
+    id: 'pathway-stroke',
+    title: 'Stroke Care Pathway',
+    description: 'Find stroke pathway assets, NIHSS support, simulations, and time-sensitive escalation.',
+    path: `${CANONICAL_ROUTES.carePathways}/stroke`,
+    workspaceIds: ['emergency', 'cardiology'],
+    aliases: ['stroke', 'nihss', 'tia', 'neurology'],
+  },
+  {
+    id: 'integration-fhir',
+    title: 'FHIR Patient Integration',
+    description: 'Launch FHIR patient integration discovery and readiness workflows.',
+    path: `${CANONICAL_ROUTES.integrationsMarketplace}?category=fhir`,
+    aliases: ['fhir', 'patient integration', 'ehr integration'],
+  },
+  {
+    id: 'integration-hl7',
+    title: 'HL7 ADT Integration',
+    description: 'Discover HL7 ADT integration readiness and implementation requirements.',
+    path: `${CANONICAL_ROUTES.integrationsMarketplace}?category=hl7`,
+    aliases: ['hl7', 'adt', 'admission discharge transfer'],
+  },
+  {
+    id: 'agent-emergency',
+    title: 'Emergency AI Agent',
+    description: 'Launch the Emergency agent with triage and escalation context.',
+    path: `${CANONICAL_ROUTES.assistant}?agent=agent-emergency`,
+    workspaceIds: ['emergency', 'assistant'],
+    aliases: ['emergency agent', 'triage agent', 'red flags'],
+  },
+  {
+    id: 'agent-operations',
+    title: 'Operations AI Agent',
+    description: 'Launch the Operations agent for maps, devices, alerts, and workflow coordination.',
+    path: `${CANONICAL_ROUTES.assistant}?agent=agent-operations`,
+    workspaceIds: ['operations', 'medical-iot', 'fleet', 'assistant'],
+    aliases: ['operations agent', 'device agent', 'fleet agent'],
+  },
+]);
 
 function searchBlob(entry) {
   return [
@@ -310,36 +499,38 @@ function operationEntries() {
 }
 
 function automationEntries() {
-  return buildAutomationRuleLibrary().map((rule) => ({
-    id: `automation:${rule.id}`,
-    sourceId: rule.id,
+  return AUTOMATION_REGISTRY.map((automation) => ({
+    id: `automation:${automation.automationId}`,
+    sourceId: automation.automationId,
     kind: 'automation',
     category: 'automation',
-    type: rule.executionMode,
-    title: rule.name,
-    label: rule.name,
-    description: rule.goal,
-    path: `/workflows?automation=${rule.id}`,
-    workspaceIds: unique([
-      /device|maintenance/i.test(rule.name) ? 'medical-iot' : null,
-      /news|clinician|lab|potassium/i.test(rule.name) ? 'emergency' : null,
-      'operations',
-    ]),
+    type: automation.type,
+    title: automation.title,
+    label: automation.title,
+    description: automation.description,
+    path: `/workspace/${automation.workspace}/automations`,
+    workspaceIds: unique([automation.workspace]),
     tags: unique([
-      rule.status,
-      rule.summary,
-      rule.automationOutcome,
-      rule.trigger?.label,
-      rule.trigger?.description,
-      rule.trigger?.source,
-      rule.condition?.label,
-      rule.condition?.description,
-      rule.action?.label,
-      rule.action?.description,
-      rule.action?.destination,
+      automation.status,
+      automation.type,
+      automation.department,
+      automation.trigger,
+      automation.riskLevel,
+      automation.aiInvolvement,
+      automation.outputs,
+      automation.actions,
+      automation.requiredAssets,
+      automation.requiredWorkflows,
+      automation.requiredIntegrations,
     ]),
-    aliases: [rule.trigger?.id, rule.condition?.id, rule.action?.id],
-    assistantPrompt: `Help me review or adapt the ${rule.name} automation.`,
+    aliases: unique([
+      automation.automationId,
+      automation.title,
+      automation.trigger,
+      automation.workspace,
+      ...automation.outputs,
+    ]),
+    assistantPrompt: `Help me review or adapt the ${automation.title} automation in the ${automation.workspace} workspace.`,
   }));
 }
 
@@ -355,6 +546,42 @@ function notificationEntries() {
     tags: [notification.priority, notification.type],
     assistantPrompt: `Help me triage this notification: ${notification.title}.`,
   }));
+}
+
+function commercialCapabilityEntries() {
+  const groupEntries = COMMERCIAL_CAPABILITY_GROUPS.map((capability) => ({
+    id: `commercial:${capability.id}`,
+    sourceId: capability.id,
+    kind: 'commercial',
+    category: 'commercial',
+    type: 'commercial-capability',
+    title: capability.title,
+    label: capability.title,
+    description: capability.description,
+    path: capability.path,
+    workspaceIds: capability.workspaceIds || ['commercial'],
+    tags: unique(['commercial', 'marketplace', capability.id]),
+    aliases: unique(capability.aliases),
+    assistantPrompt: `Help me find and launch ${capability.title}.`,
+  }));
+
+  const rowEntries = COMMERCIAL_ROW_LEVEL_ENTRIES.map((capability) => ({
+    id: `commercial-row:${capability.id}`,
+    sourceId: capability.id,
+    kind: 'commercial',
+    category: 'commercial',
+    type: 'commercial-row',
+    title: capability.title,
+    label: capability.title,
+    description: capability.description,
+    path: capability.path,
+    workspaceIds: unique([...(capability.workspaceIds || []), 'commercial']),
+    tags: unique(['commercial', 'catalog-row', capability.id]),
+    aliases: unique(capability.aliases),
+    assistantPrompt: `Help me launch or explain ${capability.title}.`,
+  }));
+
+  return [...groupEntries, ...rowEntries];
 }
 
 export function buildSearchFirstDiscoveryEntries({
@@ -376,6 +603,7 @@ export function buildSearchFirstDiscoveryEntries({
     ...workspaceAgentEntries(),
     ...operationEntries(),
     ...notificationEntries(),
+    ...commercialCapabilityEntries(),
   ];
 
   return entries.map((entry) => ({
@@ -387,6 +615,22 @@ export function buildSearchFirstDiscoveryEntries({
 export function filterSearchFirstDiscoveryEntries(entries, { query = '', workspaceId = 'all', category = 'all' } = {}) {
   const normalizedQuery = String(query || '').trim().toLowerCase();
   const queryTokens = normalizedQuery.split(/\s+/).filter(Boolean);
+  const scoreEntry = (entry) => {
+    if (!queryTokens.length) return 0;
+    const label = String(entry.title || entry.label || '').toLowerCase();
+    const aliases = (entry.aliases || []).map((alias) => String(alias).toLowerCase());
+    const text = searchDiscoveryText(entry);
+    return queryTokens.reduce((score, token) => {
+      if (label === token) return score + 120;
+      if (label.startsWith(token)) return score + 80;
+      if (aliases.some((alias) => alias === token || alias.startsWith(token))) return score + 70;
+      if (label.includes(token)) return score + 45;
+      if (aliases.some((alias) => alias.includes(token))) return score + 35;
+      if (text.includes(token)) return score + 10;
+      return score;
+    }, 0);
+  };
+
   return entries
     .filter((entry) => workspaceId === 'all' || (entry.workspaceIds || []).includes(workspaceId))
     .filter((entry) => category === 'all' || entry.category === category || entry.type === category || entry.kind === category)
@@ -395,7 +639,7 @@ export function filterSearchFirstDiscoveryEntries(entries, { query = '', workspa
       const text = searchDiscoveryText(entry);
       return queryTokens.every((token) => text.includes(token));
     })
-    .sort((a, b) => String(a.title || a.label).localeCompare(String(b.title || b.label)));
+    .sort((a, b) => scoreEntry(b) - scoreEntry(a) || String(a.title || a.label).localeCompare(String(b.title || b.label)));
 }
 
 export function buildSearchFirstResults(options = {}) {

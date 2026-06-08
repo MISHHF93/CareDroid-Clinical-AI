@@ -619,6 +619,22 @@
   color: var(--app-fg);
 }
 
+.diagnosis-panel .simple-tool-result-panel {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 16px 0 0;
+}
+
+.diagnosis-panel .simple-tool-result-panel + .simple-tool-result-panel {
+  margin-top: 16px;
+  border-top: 1px solid var(--app-panel-border);
+}
+
+.diagnosis-panel .simple-tool-result-panel:first-child {
+  padding-top: 0;
+}
+
 .diagnosis-panel--scroll {
   max-height: 80vh;
   overflow-y: auto;

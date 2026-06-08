@@ -41,6 +41,7 @@ const DEFAULT_SAAS_PROFILE = Object.freeze({
   recentAssets: [],
   preferredAIStyle: 'concise',
   themePreference: 'system',
+  density: 'standard',
   compactMode: false,
   onboardingStatus: 'complete',
 });
@@ -123,6 +124,8 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
     hiddenAssets: toolPrefs.hiddenTools || [],
     recentAssets: toolPrefs.recentTools || [],
     themePreference: themePreference || DEFAULT_SAAS_PROFILE.themePreference,
+    density: DEFAULT_SAAS_PROFILE.density,
+    compactMode: false,
   };
 
   return {
@@ -155,6 +158,7 @@ function buildFallbackProfile({ user, localWorkspaces, activeWorkspaceId, themeP
       theme: themePreference || 'system',
       language: profile.languagePreference || 'en',
       defaultDashboard: 'command',
+      density: DEFAULT_SAAS_PROFILE.density,
       compactMode: false,
       accessibility: { reduceMotion: false, highContrast: false, fontScale: 'default' },
       calculatorPreferences: { pinnedCalculatorIds: [], defaultUnits: 'metric', rememberInputs: false },
@@ -216,6 +220,11 @@ function normalizeSaasProfile(profile, workspaceState) {
   const toolPreferences = preferences.toolPreferences || {};
   const saasPreferences = toolPreferences.saasProfile || {};
   const activeWorkspace = workspaceState?.activeWorkspace;
+  const requestedDensity =
+    profile?.saasProfile?.density ||
+    preferences.density ||
+    (profile?.saasProfile?.compactMode ?? preferences.compactMode ? 'compact' : 'standard');
+  const density = requestedDensity === 'compact' ? 'compact' : 'standard';
   return {
     ...DEFAULT_SAAS_PROFILE,
     ...saasPreferences,
@@ -257,7 +266,8 @@ function normalizeSaasProfile(profile, workspaceState) {
       preferences.aiAssistantPreferences?.responseStyle ||
       DEFAULT_SAAS_PROFILE.preferredAIStyle,
     themePreference: profile?.saasProfile?.themePreference || preferences.theme || DEFAULT_SAAS_PROFILE.themePreference,
-    compactMode: Boolean(profile?.saasProfile?.compactMode ?? preferences.compactMode ?? false),
+    density,
+    compactMode: density === 'compact',
   };
 }
 

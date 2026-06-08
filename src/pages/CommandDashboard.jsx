@@ -14,7 +14,6 @@ import {
   getWorkspaceExperienceProfile,
   normalizeWorkspaceShortcut,
 } from '../data/workspaceExperience';
-import { getFrontendOperatingSystemState } from '../data/frontendOperatingSystem';
 import {
   StatusCard,
 } from '../components/dashboard/DashboardVisualizations';
@@ -42,7 +41,7 @@ function launchBadgeFor(tool) {
   return 'Open';
 }
 
-function ToolCard({ tool, onLaunch }) {
+function CommandToolLaunchCard({ tool, onLaunch }) {
   return (
     <LaunchActionCard
       className="command-tool-card"
@@ -112,23 +111,12 @@ function workspaceThemeStyle(experience) {
   };
 }
 
-function WorkspaceOperatingBrief({ experience }) {
-  return (
-    <div className="command-operating-brief" aria-label={`${experience.operatingLabel} operating brief`}>
-      <span>{experience.environment}</span>
-      <ul>
-        {(experience.operatingBrief || []).map((item) => (
-          <li key={item}>{item}</li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 function CompactActionCard({ item, onClick }) {
+  const isPrimaryAction = item.path === CANONICAL_ROUTES.assistant || item.id === 'assistant';
+
   return (
     <LaunchActionCard
-      className="command-compact-action"
+      className={`command-compact-action${isPrimaryAction ? ' command-compact-action--primary' : ''}`}
       to={onClick ? undefined : item.path}
       onClick={onClick}
       icon={item.icon}
@@ -139,18 +127,6 @@ function CompactActionCard({ item, onClick }) {
         body: 'command-compact-action__body',
       }}
     />
-  );
-}
-
-function LaunchGroup({ title, description, children }) {
-  return (
-    <div className="command-launch-group">
-      <div className="command-launch-group__header">
-        <h3>{title}</h3>
-        {description ? <p>{description}</p> : null}
-      </div>
-      {children}
-    </div>
   );
 }
 
@@ -217,6 +193,13 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     description: 'Open workflow builder and journey automation without detouring through tools.',
     path: CANONICAL_ROUTES.workflows,
     icon: CHROME_ICONS.clipboardList,
+  },
+  {
+    id: 'automation-analytics',
+    label: 'Automation Analytics',
+    description: 'Track solution automation runs, adoption, failures, human overrides, and AI acceptance.',
+    path: CANONICAL_ROUTES.automationAnalytics,
+    icon: CHROME_ICONS.bolt,
   },
   {
     id: 'results',
@@ -325,37 +308,6 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
   },
 ]);
 
-const DASHBOARD_COMPRESSION_SHORTCUTS = Object.freeze([
-  {
-    id: 'asset-shortcut',
-    label: 'Assets',
-    description: 'Open the asset library for broad discovery.',
-    path: CANONICAL_ROUTES.assets,
-    icon: CHROME_ICONS.artifacts,
-  },
-  {
-    id: 'workflow-shortcut',
-    label: 'Workflows',
-    description: 'Open workflow builder and automation journeys.',
-    path: CANONICAL_ROUTES.workflows,
-    icon: CHROME_ICONS.clipboardList,
-  },
-  {
-    id: 'simulation-shortcut',
-    label: 'Simulation',
-    description: 'Open simulation scenarios and training drills.',
-    path: CANONICAL_ROUTES.simulation,
-    icon: CHROME_ICONS.training,
-  },
-  {
-    id: 'operation-shortcut',
-    label: 'Operations',
-    description: 'Open maps, IoT, fleet, alerts, and maintenance.',
-    path: CANONICAL_ROUTES.operations,
-    icon: CHROME_ICONS.activity,
-  },
-]);
-
 function notificationTitle(notification) {
   return (
     notification.title ||
@@ -392,7 +344,7 @@ export default function CommandDashboard() {
     roleProfile,
     saasProfile,
   } = useUserIdentity();
-  const { branding, tenant, subscription } = useOrganizationContext();
+  const { branding, tenant } = useOrganizationContext();
   const {
     activeWorkspace: workspaceContextActive,
     recommendations: workspaceRecommendations,
@@ -402,16 +354,6 @@ export default function CommandDashboard() {
   const workspaceExperience = useMemo(
     () => getWorkspaceExperienceProfile(workspaceContextActive || activeWorkspace),
     [activeWorkspace, workspaceContextActive]
-  );
-  const frontendOs = useMemo(
-    () =>
-      getFrontendOperatingSystemState({
-        pathname: CANONICAL_ROUTES.dashboard,
-        workspace: workspaceContextActive || activeWorkspace,
-        tenantId: tenant?.tenantId || 'personal',
-        plan: subscription?.tier || 'free',
-      }),
-    [activeWorkspace, subscription?.tier, tenant?.tenantId, workspaceContextActive]
   );
   const safeSaasProfile = saasProfile || {
     role: user?.role || 'student',
@@ -433,7 +375,7 @@ export default function CommandDashboard() {
         : platformContext,
     [platformContext, workspaceVisibleAssetIds]
   );
-  const { conversations, addMessage, selectTool, setActiveTool } = useConversation();
+  const { addMessage, selectTool, setActiveTool } = useConversation();
   const { favorites, pinned, recentTools, recordToolAccess } = useToolPreferences();
   const { notifications = [] } = useNotifications();
   const systemConfig = useSystemConfig();
@@ -482,7 +424,7 @@ export default function CommandDashboard() {
   );
   const workspaceActionCards = useMemo(() => {
     const selected = [
-      ...['assistant', 'tools', 'operations', 'profile', 'workspace']
+      ...['assistant', 'tools', 'operations']
         .map((id) => dashboardLaunchCardsById[id])
         .filter(Boolean),
       ...workspaceExperience.primaryActionIds
@@ -509,7 +451,7 @@ export default function CommandDashboard() {
           icon: CHROME_ICONS.layoutDashboard,
         })),
     ];
-    return [...new Map(selected.map((item) => [item.path || item.id, item])).values()].slice(0, 5);
+    return [...new Map(selected.map((item) => [item.path || item.id, item])).values()].slice(0, 3);
   }, [dashboardLaunchCardsById, workspaceExperience, workspaceShortcuts]);
   const workspacePromptActions = useMemo(
     () => [
@@ -520,7 +462,7 @@ export default function CommandDashboard() {
         prompt,
       })),
       ...model.prompts,
-    ].slice(0, 3),
+    ].slice(0, 1),
     [model.prompts, workspaceExperience]
   );
   const unreadNotifications = useMemo(
@@ -531,6 +473,12 @@ export default function CommandDashboard() {
     () => notifications.filter(isAlertNotification).slice(0, 4),
     [notifications]
   );
+  const continueToolItems = useMemo(
+    () => [...new Map([...favoriteToolItems, ...recentToolItems].map((tool) => [tool.id, tool])).values()].slice(0, 3),
+    [favoriteToolItems, recentToolItems]
+  );
+  const hasLiveSignals = activeAlerts.length > 0 || unreadNotifications.length > 0 || recentToolItems.length > 0;
+  const showStatusPanel = systemConfig.loading || systemConfig.configDegraded || Boolean(systemConfig.error);
   const launchTool = (tool) => {
     applyRegistryToolLaunch(tool.id, {
       navigate,
@@ -594,24 +542,17 @@ export default function CommandDashboard() {
                 workspaceExperience.dashboardTitle}
             </h1>
           </div>
-          <p>
-            {branding?.dashboardSubtitle ||
-              workspaceExperience.dashboardSubtitle}{' '}
-            Tenant: {tenant?.tenantId || model.organization?.slug || 'personal'} · workspace:{' '}
-            {workspaceExperience.label || workspaceContextActive?.name || activeWorkspace?.name || safeSaasProfile.defaultWorkspace || 'Emergency'} · role:{' '}
-            {safeSaasProfile.role}.
-          </p>
-          <div className="command-os-flow" aria-label="Frontend operating system flow">
-            {frontendOs.flowSteps.slice(0, 4).map((step) => (
-              <span key={step.id} className={`command-os-flow__step command-os-flow__step--${step.state}`}>
-                {step.label}
-              </span>
-            ))}
+          <p>{branding?.dashboardSubtitle || workspaceExperience.dashboardSubtitle}</p>
+          <div className="command-hero__context" aria-label="Dashboard context">
+            <span>{workspaceExperience.label || workspaceContextActive?.name || activeWorkspace?.name || safeSaasProfile.defaultWorkspace || 'Emergency'}</span>
+            <span>{workspaceExperience.environment}</span>
+            <Link to={CANONICAL_ROUTES.systemHealth}>
+              {systemConfig.configDegraded ? 'Backend degraded' : 'Systems ready'}
+            </Link>
           </div>
-          <WorkspaceOperatingBrief experience={workspaceExperience} />
         </div>
         <div className="command-insight-strip" aria-label="Dashboard context summary">
-          {(workspaceExperience.focusMetrics || []).slice(0, 2).map((metric) => (
+          {(workspaceExperience.focusMetrics || []).slice(0, 1).map((metric) => (
             <InsightChip
               key={metric.label}
               label={metric.label}
@@ -626,7 +567,7 @@ export default function CommandDashboard() {
 
       <DashboardPanel
         title="Actions"
-        description="Primary routes and workspace shortcuts, compressed into one launch row."
+        description="Start with Assistant. Tools and Operations stay close for direct work."
         icon={CHROME_ICONS.layoutDashboard}
       >
         <div className="command-compact-action-grid">
@@ -634,51 +575,27 @@ export default function CommandDashboard() {
             <CompactActionCard key={item.id} item={item} />
           ))}
         </div>
-      </DashboardPanel>
-
-      <DashboardPanel
-        title="Launch Compression"
-        description="Asset, workflow, simulation, and operations paths stay within two clicks from the dashboard."
-        icon={CHROME_ICONS.artifacts}
-      >
-        <div className="command-launch-compression-grid">
-          <LaunchGroup title="Shortcuts" description="Canonical hubs are one click away.">
-            <div className="command-compact-action-grid">
-              {DASHBOARD_COMPRESSION_SHORTCUTS.map((item) => (
-                <CompactActionCard key={item.id} item={item} />
-              ))}
-            </div>
-          </LaunchGroup>
-
-          <LaunchGroup title="Favorites" description="Saved and pinned assets launch directly.">
-            {favoriteToolItems.length ? (
-              <div className="command-tool-grid">
-                {favoriteToolItems.map((tool) => (
-                  <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
-                ))}
-              </div>
-            ) : (
-              <p className="command-empty-state">
-                Pin or favorite tools from the Tools hub to make them one-click dashboard assets.
-              </p>
-            )}
-          </LaunchGroup>
-
-          <LaunchGroup title="Recents" description="Resume the assets you used most recently.">
-            {recentToolItems.length ? (
-              <div className="command-tool-grid">
-                {recentToolItems.slice(0, 2).map((tool) => (
-                  <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
-                ))}
-              </div>
-            ) : (
-              <p className="command-empty-state">
-                Recently launched assets will appear here after your first tool launch.
-              </p>
-            )}
-          </LaunchGroup>
+        <div className="command-utility-links" aria-label="Secondary dashboard access">
+          <Link to={CANONICAL_ROUTES.search}>Search</Link>
+          <Link to={CANONICAL_ROUTES.recommendations}>Recommendations</Link>
+          <Link to="/profile/workspaces">Workspaces</Link>
+          <Link to={CANONICAL_ROUTES.profile}>Profile</Link>
         </div>
       </DashboardPanel>
+
+      {continueToolItems.length > 0 && (
+        <DashboardPanel
+          title="Continue"
+          description="Pinned, favorite, and recent tools appear only when there is something to resume."
+          icon={CHROME_ICONS.clock}
+        >
+          <div className="command-tool-grid">
+            {continueToolItems.map((tool) => (
+              <CommandToolLaunchCard key={tool.id} tool={tool} onLaunch={launchTool} />
+            ))}
+          </div>
+        </DashboardPanel>
+      )}
 
       <DashboardPanel
         title="AI Assistant"
@@ -716,6 +633,10 @@ export default function CommandDashboard() {
               <span>{action.description}</span>
             </button>
           ))}
+          <Link className="command-prompt-chip command-prompt-chip--link" to={CANONICAL_ROUTES.recommendations}>
+            <strong>More recommendations</strong>
+            <span>Open role, workspace, and product-aware suggestions.</span>
+          </Link>
         </div>
       </DashboardPanel>
 
@@ -730,8 +651,8 @@ export default function CommandDashboard() {
         >
           <div className="command-tool-grid">
             {recommendedToolItems.length > 0 ? (
-              recommendedToolItems.map((tool) => (
-                <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
+              recommendedToolItems.slice(0, 2).map((tool) => (
+                <CommandToolLaunchCard key={tool.id} tool={tool} onLaunch={launchTool} />
               ))
             ) : (
               <p className="command-empty-state">
@@ -744,110 +665,98 @@ export default function CommandDashboard() {
           </Link>
         </DashboardPanel>
 
-        <DashboardPanel
-          title="Signals"
-          description="Alerts, notifications, and recent activity in one compact feed."
-          icon={CHROME_ICONS.clock}
-        >
-          <div className="command-recent-list">
-            {activeAlerts.slice(0, 2).map((alert) => (
-              <Link
-                key={alert.id || notificationTitle(alert)}
-                className="command-recent-item command-recent-item--alert"
-                to="/clinical/alerts"
-              >
-                <strong>{notificationTitle(alert)}</strong>
-                <span>{notificationBody(alert)}</span>
+        {hasLiveSignals && (
+          <DashboardPanel
+            title="Signals"
+            description="Only live alerts, unread notifications, or resumable tool activity appears here."
+            icon={CHROME_ICONS.clock}
+          >
+            <div className="command-recent-list">
+              {activeAlerts.slice(0, 2).map((alert) => (
+                <Link
+                  key={alert.id || notificationTitle(alert)}
+                  className="command-recent-item command-recent-item--alert"
+                  to="/clinical/alerts"
+                >
+                  <strong>{notificationTitle(alert)}</strong>
+                  <span>{notificationBody(alert)}</span>
+                </Link>
+              ))}
+              {unreadNotifications.slice(0, 1).map((notification) => (
+                <Link
+                  key={notification.id || notificationTitle(notification)}
+                  className="command-recent-item"
+                  to={CANONICAL_ROUTES.notifications}
+                >
+                  <strong>{notificationTitle(notification)}</strong>
+                  <span>{notificationBody(notification)}</span>
+                </Link>
+              ))}
+              {recentToolItems.slice(0, 1).map((tool) => (
+                <button
+                  key={tool.id}
+                  type="button"
+                  className="command-recent-item"
+                  onClick={() => launchTool(tool)}
+                >
+                  <strong>{tool.name}</strong>
+                  <span>{tool.category} - open again</span>
+                </button>
+              ))}
+            </div>
+            <div className="command-status-actions command-status-actions--row">
+              <Link className="command-secondary-action" to={CANONICAL_ROUTES.notifications}>
+                Notifications
               </Link>
-            ))}
-            {unreadNotifications.slice(0, 1).map((notification) => (
-              <Link
-                key={notification.id || notificationTitle(notification)}
-                className="command-recent-item"
-                to={CANONICAL_ROUTES.notifications}
-              >
-                <strong>{notificationTitle(notification)}</strong>
-                <span>{notificationBody(notification)}</span>
+              <Link className="command-secondary-action" to="/clinical/alerts">
+                Alerts
               </Link>
-            ))}
-            {recentToolItems.slice(0, 1).map((tool) => (
-              <button
-                key={tool.id}
-                type="button"
-                className="command-recent-item"
-                onClick={() => launchTool(tool)}
-              >
-                <strong>{tool.name}</strong>
-                <span>{tool.category} - open again</span>
-              </button>
-            ))}
-            {conversations.slice(0, 1).map((conversation) => (
-              <button
-                key={conversation.id}
-                type="button"
-                className="command-recent-item"
-                onClick={() => navigate(CANONICAL_ROUTES.assistant)}
-              >
-                <strong>{conversation.title || 'Conversation'}</strong>
-                <span>Continue in Assistant</span>
-              </button>
-            ))}
-            {!activeAlerts.length && !unreadNotifications.length && !recentToolItems.length && !conversations.length ? (
-              <p className="command-empty-state">No live signals yet. Start with Assistant or open an action.</p>
-            ) : null}
-          </div>
-          <div className="command-status-actions command-status-actions--row">
-            <Link className="command-secondary-action" to={CANONICAL_ROUTES.notifications}>
-              Notifications
-            </Link>
-            <Link className="command-secondary-action" to="/clinical/alerts">
-              Alerts
-            </Link>
-          </div>
-        </DashboardPanel>
+            </div>
+          </DashboardPanel>
+        )}
 
-        <DashboardPanel
-          title="Status"
-          description="System and inventory state as compact cards."
-          icon={CHROME_ICONS.shield}
-        >
-          <div className="command-compressed-metrics" role="status">
-            <CompactMetricCard label="Tools" value={model.stats.totalTools} helper="Inventory" tone="good" />
-            <CompactMetricCard label="AI tools" value={model.stats.aiTools} helper="Assistant/backed" />
-            <CompactMetricCard
-              label="Backend"
-              value={systemConfig.configDegraded ? 'Degraded' : 'Ready'}
-              helper={systemConfig.loading ? 'Checking' : 'Config'}
-              tone={systemConfig.configDegraded ? 'warning' : 'good'}
-            />
-          </div>
-          <div className="command-status-card-row">
-            <StatusCard
-              label="Session"
-              value={isDevAuthBypass ? 'Demo' : user?.role || 'Authenticated'}
-              detail={systemConfig.error || 'Local tools remain available.'}
-              tone={systemConfig.configDegraded || systemConfig.error ? 'warning' : 'good'}
-            />
-          </div>
-          {systemConfig.error ? <p className="command-status-note">{systemConfig.error}</p> : null}
-          <div className="command-status-actions command-status-actions--row">
-            <button
-              type="button"
-              className="command-secondary-action"
-              onClick={systemConfig.refresh}
-            >
-              Retry status
-            </button>
-            <Link className="command-secondary-action" to={CANONICAL_ROUTES.tools}>
-              Open Tool Library
-            </Link>
-            {canViewDeveloperCatalog ? (
-              <Link className="command-secondary-action" to={CANONICAL_ROUTES.developerCatalog}>
-                Audit
+        {showStatusPanel && (
+          <DashboardPanel
+            title="Status"
+            description="System status appears inline only when attention is needed."
+            icon={CHROME_ICONS.shield}
+          >
+            <div className="command-compressed-metrics" role="status">
+              <CompactMetricCard
+                label="Backend"
+                value={systemConfig.configDegraded ? 'Degraded' : 'Checking'}
+                helper={systemConfig.loading ? 'Checking' : 'Config'}
+                tone={systemConfig.configDegraded ? 'warning' : 'good'}
+              />
+            </div>
+            <div className="command-status-card-row">
+              <StatusCard
+                label="Session"
+                value={isDevAuthBypass ? 'Demo' : user?.role || 'Authenticated'}
+                detail={systemConfig.error || 'Local tools remain available.'}
+                tone={systemConfig.configDegraded || systemConfig.error ? 'warning' : 'good'}
+              />
+            </div>
+            {systemConfig.error ? <p className="command-status-note">{systemConfig.error}</p> : null}
+            <div className="command-status-actions command-status-actions--row">
+              <button
+                type="button"
+                className="command-secondary-action"
+                onClick={systemConfig.refresh}
+              >
+                Retry status
+              </button>
+              <Link className="command-secondary-action" to={CANONICAL_ROUTES.systemHealth}>
+                System Health
               </Link>
-            ) : null}
-          </div>
-        </DashboardPanel>
+              {canViewDeveloperCatalog ? (
+                <Link className="command-secondary-action" to={CANONICAL_ROUTES.developerCatalog}>
+                  Audit
+                </Link>
+              ) : null}
+            </div>
+          </DashboardPanel>
+        )}
       </section>
     </section>
   );

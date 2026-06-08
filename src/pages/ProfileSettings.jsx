@@ -26,7 +26,7 @@ const ProfileSettings = ({ authToken }) => {
     citationLevel: 'standard',
     safetyTone: 'standard',
     defaultWorkspace: 'emergency',
-    compactMode: false,
+    density: 'standard',
     pushEnabled: true,
     emailEnabled: true,
     securityAlerts: true,
@@ -105,12 +105,15 @@ const ProfileSettings = ({ authToken }) => {
       citationLevel: preferences?.aiAssistantPreferences?.citationLevel || 'standard',
       safetyTone: preferences?.aiAssistantPreferences?.safetyTone || 'standard',
       defaultWorkspace: saasProfile?.defaultWorkspace || 'emergency',
-      compactMode: Boolean(saasProfile?.compactMode ?? preferences?.compactMode),
+      density:
+        saasProfile?.density ||
+        preferences?.density ||
+        (saasProfile?.compactMode ?? preferences?.compactMode ? 'compact' : 'standard'),
       pushEnabled: preferences?.notificationSettings?.pushEnabled !== false,
       emailEnabled: preferences?.notificationSettings?.emailEnabled !== false,
       securityAlerts: preferences?.notificationSettings?.securityAlerts !== false,
     });
-  }, [preferences, saasProfile?.compactMode, saasProfile?.defaultWorkspace]);
+  }, [preferences, saasProfile?.compactMode, saasProfile?.defaultWorkspace, saasProfile?.density]);
 
   const payload = useMemo(
     () => ({
@@ -190,7 +193,8 @@ const ProfileSettings = ({ authToken }) => {
     event.preventDefault();
     const result = await savePreferences({
       theme: prefForm.theme,
-      compactMode: prefForm.compactMode,
+      density: prefForm.density,
+      compactMode: prefForm.density === 'compact',
       aiAssistantPreferences: {
         responseStyle: prefForm.responseStyle,
         citationLevel: prefForm.citationLevel,
@@ -208,7 +212,8 @@ const ProfileSettings = ({ authToken }) => {
         defaultWorkspace: prefForm.defaultWorkspace,
         preferredAIStyle: prefForm.responseStyle,
         themePreference: prefForm.theme,
-        compactMode: prefForm.compactMode,
+        density: prefForm.density,
+        compactMode: prefForm.density === 'compact',
       });
     }
     setPreferenceStatus(result.ok ? 'Preferences saved.' : result.message || 'Unable to save preferences.');
@@ -347,13 +352,15 @@ const ProfileSettings = ({ authToken }) => {
                 <option value="dark">Dark</option>
               </select>
             </label>
-            <label>
-              <input
-                type="checkbox"
-                checked={prefForm.compactMode}
-                onChange={(event) => updatePreferenceField('compactMode', event.target.checked)}
-              />{' '}
-              Compact mode
+            <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
+              Density
+              <select
+                value={prefForm.density}
+                onChange={(event) => updatePreferenceField('density', event.target.value)}
+              >
+                <option value="standard">Standard density</option>
+                <option value="compact">Compact density</option>
+              </select>
             </label>
             <label style={{ display: 'grid', gap: '6px', fontSize: '14px', fontWeight: 600 }}>
               AI response style

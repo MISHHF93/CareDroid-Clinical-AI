@@ -18,7 +18,7 @@ const CANONICAL_APP_SHELL_ROUTES = [
   ['/profile/settings', 'ProfileSettings', 'pages/ProfileSettings.jsx'],
   ['/dashboard', 'CommandDashboard', 'pages/CommandDashboard.jsx'],
   ['/tools', 'ToolsOverview', 'pages/tools/ToolsOverview.jsx'],
-  ['/assistant', 'Dashboard', 'pages/Dashboard.jsx'],
+  ['/assistant', 'AssistantPage', 'pages/Dashboard.jsx'],
   ['/hospital-map', 'HospitalMapDashboard', 'pages/HospitalMapDashboard.jsx'],
   ['/medical-iot', 'MedicalIotDashboard', 'pages/MedicalIotDashboard.jsx'],
   ['/devices', 'DeviceFleetManagement', 'pages/DeviceFleetManagement.jsx'],

@@ -63,10 +63,14 @@ describe('CareDroid design language fit contract', () => {
 
   it('fits workspace dropdown and compact shell controls inside mobile viewports', () => {
     expect(workspaceSwitcherCss).toMatch(/\.workspace-switcher\s*\{[\s\S]*grid-template-columns:\s*auto minmax\(0,\s*1fr\)/);
-    expect(workspaceSwitcherCss).toMatch(/\.workspace-switcher\s*\{[\s\S]*max-width:\s*min\(100%,\s*360px\)/);
-    expect(workspaceSwitcherCss).toMatch(/\.workspace-switcher--compact[\s\S]*calc\(100vw - 128px\)/);
+    expect(workspaceSwitcherCss).toMatch(/\.workspace-switcher\s*\{[\s\S]*max-width:\s*min\(100%,\s*22\.5rem\)/);
+    expect(workspaceSwitcherCss).toMatch(
+      /\.workspace-switcher--compact[\s\S]*calc\(100vw - \(\(var\(--app-icon-button-size/
+    );
     expect(appShellCss).toMatch(/\.app-shell-menu-btn[\s\S]*width:\s*var\(--app-icon-button-size/);
-    expect(appShellCss).toMatch(/\.app-shell--compact \.app-shell-workspace-bar[\s\S]*padding:\s*6px 60px/);
+    expect(appShellCss).toMatch(
+      /\.app-shell--compact \.app-shell-workspace-bar[\s\S]*padding-inline:\s*calc\(var\(--app-icon-button-size/
+    );
   });
 
   it('uses one navigation system without a conflicting bottom nav', () => {
@@ -77,10 +81,15 @@ describe('CareDroid design language fit contract', () => {
 
   it('formalizes shared compact UI primitives for stitched pages', () => {
     [
+      'PageShell',
       'SectionHeader',
+      'MetricCard',
       'DashboardCard',
       'ToolCard',
       'StatusBadge',
+      'FormField',
+      'FilterPanel',
+      'DataTable',
       'LoadingState',
       'UnsupportedState',
     ].forEach((symbol) => {
@@ -88,6 +97,8 @@ describe('CareDroid design language fit contract', () => {
     });
     expect(primitivesCss).toContain('.cd-dashboard-card');
     expect(primitivesCss).toContain('.cd-tool-card');
+    expect(primitivesCss).toContain('.cd-filter-panel');
+    expect(primitivesCss).toContain('.cd-data-table');
     expect(primitivesCss).toContain('.cd-state--unsupported');
   });
 

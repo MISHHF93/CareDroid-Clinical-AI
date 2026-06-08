@@ -9,7 +9,7 @@ export default function ProfilePreferences() {
     theme: 'system',
     language: 'en',
     defaultDashboard: 'command',
-    compactMode: false,
+    density: 'standard',
     responseStyle: 'concise',
     citationLevel: 'standard',
     safetyTone: 'standard',
@@ -24,7 +24,7 @@ export default function ProfilePreferences() {
       theme: preferences?.theme || 'system',
       language: preferences?.language || 'en',
       defaultDashboard: preferences?.defaultDashboard || 'command',
-      compactMode: Boolean(preferences?.compactMode),
+      density: preferences?.density || (preferences?.compactMode ? 'compact' : 'standard'),
       responseStyle: preferences?.aiAssistantPreferences?.responseStyle || 'concise',
       citationLevel: preferences?.aiAssistantPreferences?.citationLevel || 'standard',
       safetyTone: preferences?.aiAssistantPreferences?.safetyTone || 'standard',
@@ -50,7 +50,8 @@ export default function ProfilePreferences() {
       theme: form.theme,
       language: form.language,
       defaultDashboard: form.defaultDashboard,
-      compactMode: form.compactMode,
+      density: form.density,
+      compactMode: form.density === 'compact',
       aiAssistantPreferences: {
         responseStyle: form.responseStyle,
         citationLevel: form.citationLevel,
@@ -127,14 +128,11 @@ export default function ProfilePreferences() {
               </select>
             </label>
             <label>
-              <span>
-                <input
-                  type="checkbox"
-                  checked={form.compactMode}
-                  onChange={(event) => updateField('compactMode', event.target.checked)}
-                />{' '}
-                Compact mode
-              </span>
+              Density
+              <select value={form.density} onChange={(event) => updateField('density', event.target.value)}>
+                <option value="standard">Standard density</option>
+                <option value="compact">Compact density</option>
+              </select>
             </label>
             <label>
               <span>

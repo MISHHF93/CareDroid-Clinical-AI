@@ -62,6 +62,80 @@
   font-size: 13px;
 }
 
+.commercial-card h3,
+.commercial-inline-section h3,
+.commercial-opportunity-row h3 {
+  margin: 0 0 8px;
+  font-size: 0.95rem;
+}
+
+.commercial-inline-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: 10px;
+  margin: 14px 0 16px;
+}
+
+.commercial-inline-metric {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+  border-block: 1px solid var(--panel-border);
+}
+
+.commercial-inline-metric span,
+.commercial-opportunity-meta dt {
+  color: var(--muted-text);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.commercial-inline-metric strong {
+  font-size: 1.1rem;
+}
+
+.commercial-inline-section {
+  padding: 14px 0;
+  border-top: 1px solid var(--panel-border);
+}
+
+.commercial-opportunity-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.commercial-opportunity-row {
+  display: grid;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.commercial-opportunity-row p {
+  margin: 0;
+}
+
+.commercial-opportunity-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.commercial-opportunity-meta div {
+  display: grid;
+  gap: 4px;
+}
+
+.commercial-opportunity-meta dd {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .commercial-actions {
   display: flex;
   flex-wrap: wrap;

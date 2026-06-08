@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react'
 import ToolPanel from './ToolPanel';
 import AISourcePanel from './chat/AISourcePanel';
 import AiRouteMetadata from './chat/AiRouteMetadata';
-import ToolCard from './ToolCard';
-import ToolVisualization from './ToolVisualization';
+import AssistantResultRenderer from './chat/AssistantResultRenderer';
 import Citations, { CitationModal } from './Citations';
 import ConfidenceBadge from './ConfidenceBadge';
 import { sendClinicalChatMessage, mapChatResponseToAssistantMessage } from '../services/clinicalChatService';
@@ -208,18 +207,10 @@ const ChatInterface = ({
                   aiGateway={message.aiGateway || message.metadata?.aiGateway}
                 />
               )}
-              {message.toolResult && (
-                <div style={{ marginTop: '12px' }}>
-                  <ToolCard toolResult={message.toolResult} />
-                </div>
-              )}
-              {Array.isArray(message.visualizations) && message.visualizations.length > 0 && (
-                <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {message.visualizations.map((viz, idx) => (
-                    <ToolVisualization key={`${viz.type || 'viz'}-${idx}`} visualization={viz} />
-                  ))}
-                </div>
-              )}
+              <AssistantResultRenderer
+                message={message}
+                visualizationsStyle={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}
+              />
               {message.role === 'assistant' && (
                 <AISourcePanel
                   sourcePanel={

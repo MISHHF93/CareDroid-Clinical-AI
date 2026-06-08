@@ -32,9 +32,9 @@ describe('mobile performance — startup deferral', () => {
 });
 
 describe('mobile performance — routing & bundles', () => {
-  it('lazy-loads Dashboard for smaller initial chunk', () => {
+  it('lazy-loads AssistantPage for smaller initial chunk', () => {
     const app = read('src/App.jsx');
-    expect(app).toMatch(/const Dashboard = lazyWithRetry\(\(\) => import\('\.\/pages\/Dashboard'\)\)/);
+    expect(app).toMatch(/const AssistantPage = lazyWithRetry\(\(\) => import\('\.\/pages\/Dashboard'\)\)/);
     expect(app).not.toMatch(/import Dashboard from '\.\/pages\/Dashboard'/);
   });
 

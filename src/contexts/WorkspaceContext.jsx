@@ -169,7 +169,7 @@ export const WorkspaceProvider = ({ children }) => {
         id: workspaceKey,
         workspaceKey,
         backendWorkspaceId: workspace.id,
-        name: workspace.branding?.displayName || workspace.name || fallback.name,
+        name: workspace.displayName || workspace.label || workspace.branding?.displayName || workspace.name || fallback.name,
         path: `/workspace/${workspaceKey}`,
         assistantContext:
           workspace.assistantContext || workspace.settings?.assistantContext || fallback.assistantContext,

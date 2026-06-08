@@ -17,6 +17,35 @@
   padding-left: env(safe-area-inset-left, 0px);
 }
 
+.app-shell--density-standard {
+  --app-density-mode: standard;
+  --compact-page-gap: clamp(12px, 2vw, 18px);
+  --compact-panel-gap: clamp(10px, 1.6vw, 14px);
+  --compact-card-padding: clamp(12px, 1.8vw, 16px);
+  --compact-panel-padding: clamp(16px, 2.2vw, 22px);
+  --compact-control-height: var(--app-control-height-md, 38px);
+  --app-page-gap: var(--compact-page-gap);
+  --app-panel-gap: var(--compact-panel-gap);
+  --app-card-padding-density: var(--app-card-padding-standard, clamp(14px, 2vw, 18px));
+  --app-control-height-density: var(--app-control-height-md, 38px);
+  --app-grid-card-min-density: var(--app-grid-card-min, 14rem);
+}
+
+.app-shell--density-compact {
+  --app-density-mode: compact;
+  --compact-page-gap: clamp(8px, 1.2vw, 12px);
+  --compact-panel-gap: clamp(6px, 1vw, 10px);
+  --compact-card-padding: clamp(8px, 1.2vw, 12px);
+  --compact-panel-padding: clamp(10px, 1.5vw, 14px);
+  --compact-control-height: var(--app-control-height-sm, 34px);
+  --app-page-gap: var(--compact-page-gap);
+  --app-panel-gap: var(--compact-panel-gap);
+  --app-page-padding-roomy: clamp(10px, 1.6vw, 16px);
+  --app-card-padding-density: var(--compact-card-padding);
+  --app-control-height-density: var(--compact-control-height);
+  --app-grid-card-min-density: var(--app-grid-card-min-compact, 11.5rem);
+}
+
 .app-skip-link {
   position: fixed;
   top: calc(8px + env(safe-area-inset-top, 0px));
@@ -128,6 +157,10 @@
 
 .app-shell-dev-mode-banner strong {
   color: var(--text-primary);
+}
+
+.app-shell-page-continuations {
+  flex: 0 0 auto;
 }
 
 .app-shell--compact .app-shell-main-wrap {
@@ -265,6 +298,44 @@
   pointer-events: auto;
 }
 
+.app-shell-route-identity {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  max-width: min(280px, 34vw);
+  margin-right: auto;
+  padding: 7px 10px;
+  border-left: 3px solid var(--app-accent-interactive);
+  border-radius: var(--compact-card-radius, var(--radius-md));
+  background: color-mix(in srgb, var(--app-surface-glass) 82%, transparent);
+  -webkit-backdrop-filter: blur(var(--app-blur-glass, 18px));
+  backdrop-filter: blur(var(--app-blur-glass, 18px));
+  box-shadow: var(--shadow-1);
+}
+
+.app-shell-route-identity span,
+.app-shell-route-identity strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell-route-identity span {
+  color: var(--app-fg-muted);
+  font-size: var(--font-11);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.app-shell-route-identity strong {
+  color: var(--text-primary);
+  font-size: var(--font-14);
+  font-weight: 900;
+  line-height: 1.15;
+}
+
 .app-shell-os-strip {
   display: inline-flex;
   align-items: center;
@@ -311,6 +382,12 @@
   min-height: var(--app-shell-compact-header-height, 56px);
   padding-block: 6px;
   padding-inline: calc(var(--app-icon-button-size, 44px) + 16px);
+}
+
+.app-shell--compact .app-shell-route-identity {
+  max-width: min(42vw, 13rem);
+  margin-right: 0;
+  padding-block: 6px;
 }
 
 .app-shell-header-utilities {

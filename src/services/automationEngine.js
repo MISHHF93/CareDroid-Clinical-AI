@@ -1,0 +1,139 @@
+import {
+  AUTOMATION_STATUSES,
+  getAutomationById,
+  getWorkspaceAutomations,
+} from '../data/automationRegistry';
+import {
+  AUTOMATION_AUDIT_STATUSES,
+  logAutomationAuditEvent,
+} from '../data/automationAuditTrail';
+
+function conditionResult(condition, context = {}) {
+  if (/human review/i.test(condition)) {
+    return Boolean(context.humanReviewAvailable ?? true);
+  }
+  if (/integration|route configured|ticketing|telemetry|lab data|fleet data/i.test(condition)) {
+    return Boolean(context.integrationsEnabled ?? true);
+  }
+  return true;
+}
+
+function shouldBlock(automation, context = {}) {
+  if (!automation) return 'Automation not found.';
+  if (automation.status === AUTOMATION_STATUSES.DISABLED) return 'Automation is disabled.';
+  if (automation.subscriptionTier && context.subscriptionTier) {
+    const tierOrder = { free: 0, starter: 1, professional: 2, academic: 2, enterprise: 3, government: 3 };
+    if ((tierOrder[context.subscriptionTier] ?? 0) < (tierOrder[automation.subscriptionTier] ?? 0)) {
+      return `Requires ${automation.subscriptionTier} subscription.`;
+    }
+  }
+  if (automation.humanReviewRequired && context.humanReviewAvailable === false) {
+    return 'Human review is required but unavailable.';
+  }
+  return '';
+}
+
+function buildAuditEvent(automation, status, context = {}, extra = {}) {
+  return {
+    triggerFired: automation?.trigger || 'Automation trigger',
+    conditionsEvaluated: (automation?.conditions || []).map((condition) => ({
+      label: condition,
+      result: conditionResult(condition, context),
+    })),
+    actionSelected: (automation?.actions || [])[0] || 'Review automation',
+    user: context.user || { id: 'local-user', name: 'Local user' },
+    tenant: context.tenant || { id: 'local-demo-tenant', name: 'Local Demo Tenant' },
+    workspace: {
+      id: automation?.workspace || context.workspaceId || 'workspace',
+      name: `${automation?.workspace || context.workspaceId || 'Workspace'} Workspace`,
+    },
+    aiInvolvement: {
+      involved: Boolean(automation?.aiInvolvement),
+      summary: automation?.aiInvolvement || 'No AI involvement.',
+    },
+    toolCalled: (automation?.requiredAssets || [])[0] || 'none',
+    backendEndpoint: context.backendEndpoint || '/api/automation-audit/events',
+    status,
+    reviewer: {
+      required: Boolean(automation?.humanReviewRequired),
+      name: automation?.humanReviewRequired ? 'Workspace reviewer' : '',
+    },
+    ...extra,
+  };
+}
+
+export const AutomationEngine = {
+  evaluateAutomation(automationId, context = {}) {
+    const automation = getAutomationById(automationId);
+    const blockedReason = shouldBlock(automation, context);
+    const conditionResults = (automation?.conditions || []).map((condition) => ({
+      label: condition,
+      result: conditionResult(condition, context),
+    }));
+    const failedCondition = conditionResults.find((condition) => !condition.result);
+
+    if (blockedReason || failedCondition) {
+      return {
+        ok: false,
+        status: AUTOMATION_AUDIT_STATUSES.BLOCKED,
+        automation,
+        reason: blockedReason || `Condition failed: ${failedCondition.label}`,
+        conditionResults,
+        actions: [],
+      };
+    }
+
+    return {
+      ok: true,
+      status: AUTOMATION_AUDIT_STATUSES.SUCCESS,
+      automation,
+      reason: '',
+      conditionResults,
+      actions: automation.actions,
+    };
+  },
+
+  runAutomation(automationId, context = {}) {
+    const evaluation = this.evaluateAutomation(automationId, context);
+    if (!evaluation.automation) {
+      return {
+        ...evaluation,
+        auditEntry: null,
+      };
+    }
+    const auditEntry = logAutomationAuditEvent(
+      buildAuditEvent(evaluation.automation, evaluation.status, context, {
+        reason: evaluation.status === AUTOMATION_AUDIT_STATUSES.BLOCKED ? evaluation.reason : '',
+      })
+    );
+    return {
+      ...evaluation,
+      auditEntry,
+      outputs: evaluation.automation.outputs,
+      assistantPrompt: `Review ${evaluation.automation.title} in ${evaluation.automation.workspace}. ${evaluation.automation.aiInvolvement}`,
+    };
+  },
+
+  getWorkspaceAutomationState(workspaceId, context = {}) {
+    const automations = getWorkspaceAutomations(workspaceId);
+    const evaluations = automations.map((automation) => this.evaluateAutomation(automation.automationId, context));
+    return {
+      workspaceId,
+      activeAutomations: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.ACTIVE),
+      disabledAutomations: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.DISABLED),
+      demoAutomations: automations.filter((automation) => automation.status === AUTOMATION_STATUSES.DEMO),
+      blockedAutomations: evaluations.filter((evaluation) => !evaluation.ok).map((evaluation) => evaluation.automation),
+      settings: {
+        humanReviewRequired: automations.filter((automation) => automation.humanReviewRequired).length,
+        highRisk: automations.filter((automation) => automation.riskLevel === 'high').length,
+        subscriptionTiers: [...new Set(automations.map((automation) => automation.subscriptionTier))],
+      },
+    };
+  },
+};
+
+export const evaluateAutomation = AutomationEngine.evaluateAutomation.bind(AutomationEngine);
+export const runAutomation = AutomationEngine.runAutomation.bind(AutomationEngine);
+export const getWorkspaceAutomationState = AutomationEngine.getWorkspaceAutomationState.bind(AutomationEngine);
+
+export default AutomationEngine;

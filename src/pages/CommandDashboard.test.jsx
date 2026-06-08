@@ -12,6 +12,15 @@ import {
 
 vi.mock('./CommandDashboard.css', () => ({}));
 
+const mockSystemConfigValue = vi.hoisted(() => ({
+  loading: false,
+  error: null,
+  configDegraded: false,
+  isRagEnabled: true,
+  availableTools: [{ id: 'sofa-calculator' }],
+  refresh: vi.fn(),
+}));
+
 vi.mock('../contexts/UserContext', async (importOriginal) => {
   const actual = await importOriginal();
   return {
@@ -37,14 +46,7 @@ vi.mock('../contexts/WorkspaceContext', () => ({
 }));
 
 vi.mock('../contexts/SystemConfigContext', () => ({
-  useSystemConfig: () => ({
-    loading: false,
-    error: null,
-    configDegraded: false,
-    isRagEnabled: true,
-    availableTools: [{ id: 'sofa-calculator' }],
-    refresh: vi.fn(),
-  }),
+  useSystemConfig: () => mockSystemConfigValue,
 }));
 
 function LocationProbe() {
@@ -74,9 +76,13 @@ describe('CommandDashboard', () => {
     mockWorkspaceValue.recommendations = [];
     mockWorkspaceValue.shortcuts = [];
     mockWorkspaceValue.visibleAssetIds = [];
+    mockSystemConfigValue.loading = false;
+    mockSystemConfigValue.error = null;
+    mockSystemConfigValue.configDegraded = false;
+    mockSystemConfigValue.refresh = vi.fn();
   });
 
-  it('renders compressed command center sections without the old dashboard wall', () => {
+  it('renders decluttered command center sections without the old dashboard wall', () => {
     renderDashboard();
 
     expect(screen.getByRole('heading', { level: 1, name: /emergency command center/i })).toBeInTheDocument();
@@ -84,46 +90,45 @@ describe('CommandDashboard', () => {
     for (const name of [
       /^actions$/i,
       /ai assistant/i,
-      /launch compression/i,
       /^recommendations$/i,
-      /^signals$/i,
-      /^status$/i,
     ]) {
       expect(screen.getByRole('heading', { name })).toBeInTheDocument();
     }
+    expect(screen.queryByRole('heading', { name: /launch compression/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /^signals$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /^status$/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: /command analytics/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: /clinical tools detail/i })).not.toBeInTheDocument();
-    expect(screen.getByText(/triage risk, active alerts/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/emergency os operating brief/i)).toBeInTheDocument();
     expect(screen.getByText(/rapid response environment/i)).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /systems ready/i })).toHaveAttribute('href', '/system-health');
+    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/triage/i)).toBeInTheDocument();
     expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/red flags first/i)).toBeInTheDocument();
-    const flow = screen.getByLabelText(/frontend operating system flow/i);
-    for (const step of ['AppShell', 'Workspace', 'Dashboard', 'Asset Launch']) {
-      expect(within(flow).getByText(step)).toBeInTheDocument();
-    }
-    expect(within(flow).queryByText('Workflow')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/frontend operating system flow/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/emergency os operating brief/i)).not.toBeInTheDocument();
   });
 
   it('renders compact action cards for primary dashboard entry points', () => {
     renderDashboard();
 
     const launchpad = screen.getByRole('heading', { name: /^actions$/i }).closest('section');
+    const primaryCards = [...launchpad.querySelectorAll('.command-compact-action')];
+    expect(primaryCards).toHaveLength(3);
     for (const name of [
       /^ai assistant/i,
       /^tools/i,
       /^operations/i,
-      /^profile/i,
-      /^manage workspaces/i,
     ]) {
       expect(within(launchpad).getByRole('link', { name })).toBeInTheDocument();
     }
     expect(within(launchpad).getByRole('link', { name: /^ai assistant/i })).toHaveAttribute('href', '/assistant');
+    expect(within(launchpad).getByRole('link', { name: /^ai assistant/i })).toHaveClass('command-compact-action--primary');
     expect(within(launchpad).getByRole('link', { name: /^tools/i })).toHaveAttribute('href', '/tools');
+    expect(within(launchpad).getByRole('link', { name: /^tools/i })).not.toHaveClass('command-compact-action--primary');
     expect(within(launchpad).getByRole('link', { name: /^operations/i })).toHaveAttribute('href', '/operations');
+    expect(within(launchpad).getByRole('link', { name: /^search/i })).toHaveAttribute('href', '/search');
+    expect(within(launchpad).getByRole('link', { name: /^recommendations/i })).toHaveAttribute('href', '/recommendations');
     expect(within(launchpad).getByRole('link', { name: /^profile/i })).toHaveAttribute('href', '/profile');
-    expect(within(launchpad).getByRole('link', { name: /^manage workspaces/i })).toHaveAttribute('href', '/profile/workspaces');
-    expect(within(launchpad).queryByRole('link', { name: /^global search/i })).not.toBeInTheDocument();
-    expect(within(launchpad).queryByRole('link', { name: /^recommendations/i })).not.toBeInTheDocument();
+    expect(within(launchpad).getByRole('link', { name: /^workspaces/i })).toHaveAttribute('href', '/profile/workspaces');
     expect(within(launchpad).queryByRole('link', { name: /^workflows/i })).not.toBeInTheDocument();
     expect(within(launchpad).queryByRole('link', { name: /^medical simulation/i })).not.toBeInTheDocument();
     expect(within(launchpad).queryByRole('link', { name: /^assets/i })).not.toBeInTheDocument();
@@ -131,30 +136,38 @@ describe('CommandDashboard', () => {
     expect(within(launchpad).queryByRole('link', { name: /system status/i })).not.toBeInTheDocument();
   });
 
-  it('compresses dashboard routes to assets, workflows, simulations, and operations', () => {
+  it('shows continue cards only when there is resume context', () => {
+    const initialRender = renderDashboard();
+    expect(screen.queryByRole('heading', { name: /^continue$/i })).not.toBeInTheDocument();
+    initialRender.unmount();
+
     mockToolPreferencesValue.favorites = ['qsofa'];
     mockToolPreferencesValue.pinned = ['medical-iot-dashboard'];
     mockToolPreferencesValue.recentTools = ['drug-check'];
 
     renderDashboard();
 
-    const compression = screen.getByRole('heading', { name: /launch compression/i }).closest('section');
-    expect(within(compression).getByRole('link', { name: /^assets/i })).toHaveAttribute('href', '/assets');
-    expect(within(compression).getByRole('link', { name: /^workflows/i })).toHaveAttribute('href', '/workflows');
-    expect(within(compression).getByRole('link', { name: /^simulation/i })).toHaveAttribute('href', '/simulation');
-    expect(within(compression).getByRole('link', { name: /^operations/i })).toHaveAttribute('href', '/operations');
-    expect(within(compression).getByRole('button', { name: /open qsofa/i })).toBeInTheDocument();
-    expect(within(compression).getByRole('button', { name: /open medical iot dashboard/i })).toBeInTheDocument();
-    expect(within(compression).getByRole('button', { name: /open drug checker/i })).toBeInTheDocument();
+    const resume = screen.getByRole('heading', { name: /^continue$/i }).closest('section');
+    expect(screen.queryByRole('heading', { name: /launch compression/i })).not.toBeInTheDocument();
+    expect(within(resume).queryByRole('link', { name: /^assets/i })).not.toBeInTheDocument();
+    expect(within(resume).queryByRole('link', { name: /^workflows/i })).not.toBeInTheDocument();
+    expect(within(resume).getByRole('button', { name: /open qsofa/i })).toBeInTheDocument();
+    expect(within(resume).getByRole('button', { name: /open medical iot dashboard/i })).toBeInTheDocument();
+    expect(within(resume).getByRole('button', { name: /open drug checker/i })).toBeInTheDocument();
   });
 
-  it('renders compact status metrics instead of chart widgets', () => {
-    renderDashboard();
+  it('renders status only when system attention is needed', () => {
+    const initialRender = renderDashboard();
+    expect(screen.queryByRole('heading', { name: /^status$/i })).not.toBeInTheDocument();
+    initialRender.unmount();
 
+    mockSystemConfigValue.configDegraded = true;
+    mockSystemConfigValue.error = 'Remote config unavailable';
+    renderDashboard();
     const status = screen.getByRole('heading', { name: /^status$/i }).closest('section');
-    expect(within(status).getByText(/^tools$/i)).toBeInTheDocument();
-    expect(within(status).getByText(/^ai tools$/i)).toBeInTheDocument();
     expect(within(status).getByText(/^backend$/i)).toBeInTheDocument();
+    expect(within(status).getByText(/degraded/i)).toBeInTheDocument();
+    expect(within(status).getAllByText(/remote config unavailable/i).length).toBeGreaterThan(0);
     expect(within(status).queryByText(/^planned$/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/tool category distribution/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/launch type distribution/i)).not.toBeInTheDocument();
@@ -207,7 +220,7 @@ describe('CommandDashboard', () => {
     expect(screen.getByRole('heading', { level: 1, name: /medical iot command center/i })).toBeInTheDocument();
     expect(screen.getByText(/medical iot os/i)).toBeInTheDocument();
     expect(screen.getByText(/telemetry and device operations environment/i)).toBeInTheDocument();
-    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/device alerts/i)).toBeInTheDocument();
+    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/telemetry/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/offline devices/i)).toBeInTheDocument();
   });
 

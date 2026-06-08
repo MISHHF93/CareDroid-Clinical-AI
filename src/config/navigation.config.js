@@ -84,6 +84,14 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     matchPrefixes: ['/operations/', '/fleet/'],
   },
   {
+    id: 'workspace',
+    label: 'Workspace',
+    mobileLabel: 'Work',
+    path: CANONICAL_ROUTES.workspaces,
+    matchPaths: [CANONICAL_ROUTES.workspaces, CANONICAL_ROUTES.workspace, '/workspace/clinical', '/profile/workspaces'],
+    matchPrefixes: [`${CANONICAL_ROUTES.workspace}/`],
+  },
+  {
     id: 'profile',
     label: 'Profile',
     mobileLabel: 'Profile',
@@ -92,7 +100,6 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
       CANONICAL_ROUTES.profile,
       '/profile/activity',
       CANONICAL_ROUTES.profileToolPreferences,
-      '/profile/workspaces',
       '/profile/security',
     ],
   },
@@ -731,8 +738,8 @@ export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
   PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => item.showInMobile !== false)
 );
 
-const NORMAL_PRIMARY_NAV_IDS = new Set(['home', 'assistant', 'tools', 'operations', 'profile']);
-const UTILITY_NAV_IDS = new Set(['search', 'notifications', 'workspace']);
+const NORMAL_PRIMARY_NAV_IDS = new Set(['home', 'assistant', 'tools', 'operations', 'workspace', 'profile']);
+const UTILITY_NAV_IDS = new Set(['search', 'notifications']);
 const ADMIN_NAV_PERMISSION_BY_ID = Object.freeze({
   'customer-portal': ['MANAGE_SUBSCRIPTIONS'],
   'enterprise-readiness': ['VIEW_ANALYTICS'],
@@ -793,14 +800,6 @@ export const QUICK_COMMAND_DESTINATION_ITEMS = Object.freeze(uniqueNavItemsByPat
   ...OPERATIONS_SIDEBAR_NAV_ITEMS,
   ...ADVANCED_SIDEBAR_NAV_ITEMS,
   ...ACCOUNT_UTILITY_NAV_ITEMS,
-  {
-    id: 'workspace',
-    label: 'Workspace',
-    mobileLabel: 'Work',
-    path: '/workspaces',
-    matchPaths: ['/workspaces', '/workspace', '/workspace/clinical'],
-    matchPrefixes: ['/workspace/'],
-  },
 ]));
 
 export function primaryNavPathMatches(item, pathname) {

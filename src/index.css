@@ -38,8 +38,8 @@
   --font-24: 24px;
   --font-28: 28px;
   --font-36: 36px;
-  --text-display-fluid: clamp(1.35rem, 2.4vw + 0.6rem, 2.1rem);
-  --text-title-fluid: clamp(1.18rem, 2vw + 0.55rem, 1.55rem);
+  --text-display-fluid: clamp(1.55rem, 2.8vw + 0.65rem, 2.55rem);
+  --text-title-fluid: clamp(1.28rem, 2.2vw + 0.58rem, 1.85rem);
   --text-heading-fluid: clamp(1rem, 1.5vw + 0.55rem, 1.22rem);
   --text-body-fluid: clamp(0.875rem, 1vw + 0.5rem, 0.95rem);
   --text-caption-fluid: clamp(0.75rem, 1vw + 0.45rem, 0.8125rem);
