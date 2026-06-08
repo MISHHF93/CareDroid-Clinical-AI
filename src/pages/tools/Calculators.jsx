@@ -173,6 +173,16 @@ import {
 import ToolNotFound from './ToolNotFound';
 import { ClinicalExecutorFeedback } from '../../components/clinical/ClinicalExecutorFeedback';
 import ToolPreflightStatus from '../../components/clinical/ToolPreflightStatus';
+import {
+  CalcDecisionSupportLead,
+  CalcInterpretationRegion,
+  CalcPanelTitle,
+  CalcResultSafetyFooter,
+  CalcResultsEmptyIcon,
+  CalcResultsPanel,
+  ResultsPanelTitle,
+  scrollResultsIntoView as scrollCalcResultsIntoView,
+} from './calculatorPrimitives';
 
 // Hub cards still derive from builtinUiCalculators.map inside buildBuiltinHubCalculatorCards().
 const CALCULATORS = buildBuiltinHubCalculatorCards();
@@ -180,77 +190,6 @@ const CHAT_ASSISTED_TOOLS = getHubChatAssistedTools();
 const CHAT_ASSISTED_TOOL_BY_ID = Object.fromEntries(
   CHAT_ASSISTED_TOOLS.map((tool) => [tool.toolId, tool])
 );
-
-function CalcPanelTitle({ icon, children }) {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={icon} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">{children}</span>
-    </div>
-  );
-}
-
-function ResultsPanelTitle() {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={CHROME_ICONS.barChart} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">Results</span>
-    </div>
-  );
-}
-
-function CalcResultsEmptyIcon({ icon, size = 56 }) {
-  return (
-    <div className="calc-results-empty-icon" aria-hidden>
-      <NavIcon icon={icon} size={size} />
-    </div>
-  );
-}
-
-/** Shared PR1 lead line: clinical decision support, not diagnostic or prescriptive. */
-function CalcDecisionSupportLead() {
-  return (
-    <p className="calc-ds-lead">
-      <strong>Decision support only.</strong> Does not establish a diagnosis, confer diagnostic certainty, or replace
-      clinician judgment; follow local protocols.
-    </p>
-  );
-}
-
-function CalcResultSafetyFooter() {
-  return (
-    <p className="calc-result-safety-footer" role="note">
-      Output reflects the values you entered and may omit important clinical context. Do not treat this screen as
-      definitive proof of illness severity, eligibility, or treatment requirement, and do not use it alone to rule
-      in or rule out a diagnosis.
-    </p>
-  );
-}
-
-/** Distinct interpretation panel (region + heading id for screen readers). */
-function CalcInterpretationRegion({ headingId, title, severity, emphasizeRisk, children }) {
-  return (
-    <section
-      className={`calc-interpretation-box ${severity}${emphasizeRisk ? ' calc-interpretation-box--risk-emphasis' : ''}`}
-      role="region"
-      aria-labelledby={headingId}
-    >
-      <h3 id={headingId} className="calc-interpretation-title">
-        {title}
-      </h3>
-      {children}
-    </section>
-  );
-}
-
-function scrollCalcResultsIntoView(resultsEl) {
-  if (!resultsEl) return;
-  const reduceMotion =
-    typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  resultsEl.focus({ preventScroll: true });
-  resultsEl.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
-}
 
 function focusFirstFieldById(fieldIds) {
   for (const id of fieldIds) {
@@ -269,21 +208,6 @@ function calcFieldClass(base, invalid) {
 function calcDescribedBy(...ids) {
   const joined = ids.filter(Boolean).join(' ');
   return joined || undefined;
-}
-
-function CalcResultsPanel({ id, resultsRef, children }) {
-  return (
-    <div
-      ref={resultsRef}
-      id={id}
-      className="calculator-results"
-      aria-live="polite"
-      aria-atomic="true"
-      tabIndex={-1}
-    >
-      {children}
-    </div>
-  );
 }
 
 function CalculatorSelectCard({ calc, isActive, onSelect }) {

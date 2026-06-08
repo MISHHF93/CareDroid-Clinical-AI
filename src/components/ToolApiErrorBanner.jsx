@@ -1,4 +1,5 @@
 import React from 'react';
+import Alert from './ui/Alert';
 import './ToolApiErrorBanner.css';
 
 /**
@@ -8,17 +9,20 @@ export default function ToolApiErrorBanner({ message, onRetry, retryLabel = 'Try
   if (!message) return null;
 
   return (
-    <div
+    <Alert
+      tone="danger"
       className="tool-api-error-banner"
       role="alert"
       aria-live="polite"
+      action={
+        onRetry ? (
+          <button type="button" className="tool-api-error-banner__retry" onClick={onRetry}>
+            {retryLabel}
+          </button>
+        ) : null
+      }
     >
       <p className="tool-api-error-banner__text">{message}</p>
-      {onRetry ? (
-        <button type="button" className="tool-api-error-banner__retry" onClick={onRetry}>
-          {retryLabel}
-        </button>
-      ) : null}
-    </div>
+    </Alert>
   );
 }

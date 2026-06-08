@@ -21,6 +21,7 @@ import {
 import {
   MetricCard as CompactMetricCard,
 } from '../components/ui/CareDroidPrimitives';
+import LaunchActionCard from '../components/ui/LaunchActionCard';
 import {
   getRegistryToolNavigation,
   applyRegistryToolLaunch,
@@ -43,24 +44,29 @@ function launchBadgeFor(tool) {
 
 function ToolCard({ tool, onLaunch }) {
   return (
-    <button
-      type="button"
+    <LaunchActionCard
       className="command-tool-card"
       onClick={() => onLaunch(tool)}
-      aria-label={`Open ${tool.name}`}
-    >
-      <span className="command-tool-card__icon" style={{ color: tool.color }} aria-hidden>
-        <NavIcon icon={getToolIcon(tool.id)} size={22} />
-      </span>
-      <span className="command-tool-card__body">
-        <span className="command-tool-card__title">{tool.name}</span>
-        <span className="command-tool-card__desc">{tool.description}</span>
-        <span className="command-tool-card__meta">
+      ariaLabel={`Open ${tool.name}`}
+      icon={getToolIcon(tool.id)}
+      iconSize={22}
+      iconColor={tool.color}
+      title={tool.name}
+      description={tool.description}
+      meta={
+        <>
           <span>{tool.category}</span>
           <span>{launchBadgeFor(tool)}</span>
-        </span>
-      </span>
-    </button>
+        </>
+      }
+      classNames={{
+        icon: 'command-tool-card__icon',
+        body: 'command-tool-card__body',
+        title: 'command-tool-card__title',
+        description: 'command-tool-card__desc',
+        meta: 'command-tool-card__meta',
+      }}
+    />
   );
 }
 
@@ -120,30 +126,19 @@ function WorkspaceOperatingBrief({ experience }) {
 }
 
 function CompactActionCard({ item, onClick }) {
-  const content = (
-    <>
-      <span className="command-compact-action__icon" aria-hidden>
-        <NavIcon icon={item.icon} size={20} />
-      </span>
-      <span className="command-compact-action__body">
-        <strong>{item.label}</strong>
-        <span>{item.description}</span>
-      </span>
-    </>
-  );
-
-  if (onClick) {
-    return (
-      <button type="button" className="command-compact-action" onClick={onClick}>
-        {content}
-      </button>
-    );
-  }
-
   return (
-    <Link className="command-compact-action" to={item.path}>
-      {content}
-    </Link>
+    <LaunchActionCard
+      className="command-compact-action"
+      to={onClick ? undefined : item.path}
+      onClick={onClick}
+      icon={item.icon}
+      title={item.label}
+      description={item.description}
+      classNames={{
+        icon: 'command-compact-action__icon',
+        body: 'command-compact-action__body',
+      }}
+    />
   );
 }
 

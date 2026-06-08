@@ -2,6 +2,7 @@ import {
   getDemoLiveStateDescription,
   getDemoLiveStateLabel,
 } from '../utils/demoLiveState';
+import Alert from './ui/Alert';
 import './StateSourceNotice.css';
 
 export default function StateSourceNotice({
@@ -13,20 +14,19 @@ export default function StateSourceNotice({
   const uniqueStates = [...new Set(states)].filter(Boolean);
 
   return (
-    <section
+    <Alert
+      tone="info"
+      title={title}
       className={`state-source-notice${className ? ` ${className}` : ''}`}
       role="note"
       aria-label="Demo/live source state"
     >
-      <div>
-        <strong>{title}</strong>
-        {details ? (
-          <details className="state-source-notice__details">
-            <summary>Source details</summary>
-            <p>{details}</p>
-          </details>
-        ) : null}
-      </div>
+      {details ? (
+        <details className="state-source-notice__details">
+          <summary>Source details</summary>
+          <p>{details}</p>
+        </details>
+      ) : null}
       <ul aria-label="Source state labels">
         {uniqueStates.map((state) => (
           <li key={state}>
@@ -35,6 +35,6 @@ export default function StateSourceNotice({
           </li>
         ))}
       </ul>
-    </section>
+    </Alert>
   );
 }

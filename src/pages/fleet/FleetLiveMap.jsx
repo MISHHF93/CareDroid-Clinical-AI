@@ -10,6 +10,10 @@ import {
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
+import {
+  MetricCard,
+  StatusBadge as CanonicalStatusBadge,
+} from '../../components/ui/CareDroidPrimitives';
 import FleetPageChrome from './FleetPageChrome';
 import './FleetLiveMap.css';
 import './fleetUxShared.css';
@@ -44,16 +48,25 @@ function pathToPolyline(path = []) {
 }
 
 function VehicleBadge({ value, tone }) {
-  return <span className={`fleet-map-badge fleet-map-badge--${tone || value}`}>{statusLabel(value)}</span>;
+  return (
+    <CanonicalStatusBadge
+      status={tone || value}
+      className={`fleet-map-badge fleet-map-badge--${tone || value}`}
+    >
+      {statusLabel(value)}
+    </CanonicalStatusBadge>
+  );
 }
 
 function SummaryCard({ label, value, tone = 'neutral', hint }) {
   return (
-    <article className={`fleet-map-summary-card fleet-map-summary-card--${tone}`}>
-      <strong>{value}</strong>
-      <span>{label}</span>
-      {hint ? <small>{hint}</small> : null}
-    </article>
+    <MetricCard
+      label={label}
+      value={value}
+      helper={hint}
+      tone={tone}
+      className={`fleet-map-summary-card fleet-map-summary-card--${tone}`}
+    />
   );
 }
 

@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { NavIcon } from '../../navigation/NavIcon';
-import { getCalculatorSubIcon, CHROME_ICONS } from '../../navigation/iconRegistry';
+import { getCalculatorSubIcon } from '../../navigation/iconRegistry';
+import {
+  CalcDecisionSupportLead as SharedCalcDecisionSupportLead,
+  CalcPanelTitle,
+  CalcResultsEmptyIcon,
+  CalcResultsPanel,
+  ResultsPanelTitle,
+  ValidationErrors,
+  scrollResultsIntoView,
+} from './calculatorPrimitives';
 import {
   APACHE_II_COMPONENTS_META,
   CURB65_CRITERIA_META,
@@ -27,43 +35,13 @@ import {
   validateRtsInputs,
 } from '../../utils/emergencyCriticalCareCalculators';
 
-function CalcPanelTitle({ icon, children }) {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={icon} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">{children}</span>
-    </div>
-  );
-}
-
-function ResultsPanelTitle() {
-  return (
-    <div className="calculator-panel-title">
-      <NavIcon icon={CHROME_ICONS.barChart} size={22} aria-hidden />
-      <span className="calculator-panel-title-text">Results</span>
-    </div>
-  );
-}
-
 function CalcDecisionSupportLead() {
-  return (
-    <p className="calc-ds-lead">
-      <strong>Decision support only.</strong> {EMERGENCY_DECISION_SUPPORT_DISCLAIMER}
-    </p>
-  );
-}
-
-function scrollResultsIntoView(el) {
-  if (!el) return;
-  const reduceMotion =
-    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  el.focus({ preventScroll: true });
-  el.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'nearest' });
+  return <SharedCalcDecisionSupportLead>{EMERGENCY_DECISION_SUPPORT_DISCLAIMER}</SharedCalcDecisionSupportLead>;
 }
 
 function ResultPanel({ title, icon, result, emptyText, renderDetails }) {
   return (
-    <div className="calculator-results" tabIndex={-1} role="region" aria-label={`${title} results`}>
+    <CalcResultsPanel ariaLabel={`${title} results`}>
       <ResultsPanelTitle />
       {result ? (
         <>
@@ -100,28 +78,16 @@ function ResultPanel({ title, icon, result, emptyText, renderDetails }) {
         </>
       ) : (
         <div className="calc-results-empty">
-          <div className="calc-results-empty-icon" aria-hidden>
-            <NavIcon icon={icon} size={56} />
-          </div>
+          <CalcResultsEmptyIcon icon={icon} />
           <p>{emptyText}</p>
         </div>
       )}
-    </div>
+    </CalcResultsPanel>
   );
 }
 
 function ErrorList({ errors }) {
-  if (!errors.length) return null;
-  return (
-    <div className="calc-validation-errors" role="alert">
-      <strong>Check required fields:</strong>
-      <ul>
-        {errors.map((error) => (
-          <li key={error}>{error}</li>
-        ))}
-      </ul>
-    </div>
-  );
+  return <ValidationErrors errors={errors} />;
 }
 
 function Shell({ slug, title, subtitle, pediatric = false, children, result, emptyText, onResultChange, payload, renderDetails }) {

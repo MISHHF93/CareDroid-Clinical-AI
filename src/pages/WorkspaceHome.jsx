@@ -12,44 +12,44 @@ import { workspaceFilterSummary } from '../data/platformOperatingSystem';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon, getWorkspaceIcon } from '../navigation/iconRegistry';
+import LaunchActionCard from '../components/ui/LaunchActionCard';
 import './WorkspaceHome.css';
 
 function WorkspaceRouteCard({ route, onLaunch }) {
   return (
-    <button
-      type="button"
+    <LaunchActionCard
       className="workspace-route-card"
       onClick={() => onLaunch(route.path)}
-      aria-label={`Open ${route.label}`}
-    >
-      <span className="workspace-route-card__icon" aria-hidden>
-        <NavIcon icon={CHROME_ICONS.layoutDashboard} size={20} />
-      </span>
-      <span className="workspace-route-card__body">
-        <strong>{route.label}</strong>
-        <span>{route.description}</span>
-      </span>
-    </button>
+      ariaLabel={`Open ${route.label}`}
+      icon={CHROME_ICONS.layoutDashboard}
+      title={route.label}
+      description={route.description}
+      classNames={{
+        icon: 'workspace-route-card__icon',
+        body: 'workspace-route-card__body',
+      }}
+    />
   );
 }
 
 function WorkspaceToolCard({ tool, onLaunch }) {
   return (
-    <button
-      type="button"
+    <LaunchActionCard
       className="workspace-tool-card"
       onClick={() => onLaunch(tool)}
-      aria-label={`Open ${tool.name}`}
-    >
-      <span className="workspace-tool-card__icon" style={{ color: tool.color }} aria-hidden>
-        <NavIcon icon={getToolIcon(tool.id)} size={21} />
-      </span>
-      <span className="workspace-tool-card__body">
-        <strong>{tool.name}</strong>
-        <span>{tool.description}</span>
-        <span className="workspace-tool-card__meta">{tool.category}</span>
-      </span>
-    </button>
+      ariaLabel={`Open ${tool.name}`}
+      icon={getToolIcon(tool.id)}
+      iconSize={21}
+      iconColor={tool.color}
+      title={tool.name}
+      description={tool.description}
+      meta={tool.category}
+      classNames={{
+        icon: 'workspace-tool-card__icon',
+        body: 'workspace-tool-card__body',
+        meta: 'workspace-tool-card__meta',
+      }}
+    />
   );
 }
 

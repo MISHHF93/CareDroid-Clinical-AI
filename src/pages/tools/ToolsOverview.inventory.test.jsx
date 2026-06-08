@@ -53,7 +53,7 @@ describe('ToolsOverview unified inventory', () => {
     mockToolPreferencesValue.profileSettings = {};
   });
 
-  it('renders all allowed tools by default and still supports profile recommendations', () => {
+  it('renders recommended tools by default and keeps all allowed tools reachable', () => {
     const { container } = renderOverview();
     const profile = buildUserToolProfile({
       user: mockUserValue.user,
@@ -67,19 +67,19 @@ describe('ToolsOverview unified inventory', () => {
       card.getAttribute('data-tool-id')
     );
 
-    expect(screen.getByRole('heading', { level: 1, name: /^tool library$/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /^all$/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('heading', { level: 1, name: /^workspace tool console$/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /^recommended$/i })).toHaveAttribute('aria-selected', 'true');
     expect(
       [...container.querySelectorAll('.stat-number')].map((node) => node.textContent)
     ).toContain(String(graph.counts.visible));
-    expect(renderedCards.length).toBeGreaterThanOrEqual(graph.visibleTools.length);
+    expect(renderedCards.length).toBe(graph.recommendedTools.length);
     expect(new Set(renderedIds).size).toBe(renderedIds.length);
 
-    fireEvent.click(screen.getByRole('tab', { name: /^recommended$/i }));
-    const recommendedRenderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
+    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
+    const allRenderedIds = [...container.querySelectorAll('.tool-card-large')].map((card) =>
       card.getAttribute('data-tool-id')
     );
-    expect(recommendedRenderedIds).toHaveLength(graph.recommendedTools.length);
+    expect(allRenderedIds.length).toBeGreaterThanOrEqual(graph.visibleTools.length);
     expect(container.textContent).not.toMatch(/developer catalog \/ source audit/i);
     expect(screen.queryByText(/hidden APIs/i)).not.toBeInTheDocument();
   }, 10000);
@@ -147,19 +147,21 @@ describe('ToolsOverview unified inventory', () => {
       'Recommended',
       'All',
       'Calculators',
-      'Clinical Tools',
       'AI Workflows',
+      'Operations',
+    ];
+    const fullSelectLabels = [
+      'Clinical Tools',
       'Simulations',
       'Laboratory',
       'Maps & IoT',
-      'Operations',
       'Governance',
       'Favorites',
       'Recent',
     ];
 
     expect(tabs).toEqual(expectedLabels);
-    for (const label of expectedLabels) {
+    for (const label of [...expectedLabels, ...fullSelectLabels]) {
       expect(filter).toHaveTextContent(label);
     }
   }, 10000);
@@ -182,9 +184,11 @@ describe('ToolsOverview unified inventory', () => {
     expect(mockWorkspaceValue.setActiveWorkspaceId).toHaveBeenCalledWith('all');
   });
 
-  it('opens the all-tools view by default so source-backed tools are not hidden', () => {
+  it('opens the recommended view by default and keeps source-backed tools reachable through all', () => {
     renderOverview();
 
+    expect(screen.getByRole('tab', { name: /^recommended$/i })).toHaveAttribute('aria-selected', 'true');
+    fireEvent.click(screen.getByRole('tab', { name: /^all$/i }));
     expect(screen.getByRole('tab', { name: /^all$/i })).toHaveAttribute('aria-selected', 'true');
   });
 

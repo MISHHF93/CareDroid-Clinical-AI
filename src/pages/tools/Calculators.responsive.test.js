@@ -24,6 +24,7 @@ const mobilePrCss = readFileSync(
   'utf8'
 );
 const calculatorsJsx = readFileSync(join(__dirname, 'Calculators.jsx'), 'utf8');
+const calculatorPrimitivesJsx = readFileSync(join(__dirname, 'calculatorPrimitives.jsx'), 'utf8');
 const pr4aJsx = readFileSync(join(__dirname, 'pr4aCalculators.jsx'), 'utf8');
 const mentalJsx = readFileSync(join(__dirname, 'mentalHealthCalculators.jsx'), 'utf8');
 
@@ -178,7 +179,7 @@ describe('Calculators.css — responsive typography & touch', () => {
   });
 
   it('declares calculator-panel-title-text in calculator modules', () => {
-    expect(calculatorsJsx).toContain('calculator-panel-title-text');
+    expect(calculatorPrimitivesJsx).toContain('calculator-panel-title-text');
     expect(pr4aJsx).toContain('calculator-panel-title-text');
     expect(mentalJsx).toContain('calculator-panel-title-text');
   });

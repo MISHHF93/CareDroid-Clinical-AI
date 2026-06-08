@@ -1,5 +1,9 @@
 import React from 'react';
 import ToolApiErrorBanner from './ToolApiErrorBanner';
+import {
+  LoadingState,
+  UnsupportedState,
+} from './ui/CareDroidPrimitives';
 import './ApiStateBanner.css';
 
 /**
@@ -14,18 +18,22 @@ export default function ApiStateBanner({
 }) {
   if (loading) {
     return (
-      <div className="api-state-banner api-state-banner--loading" role="status" aria-live="polite">
-        <div className="api-state-banner__spinner" aria-hidden="true" />
-        <p className="api-state-banner__text">{loadingMessage}</p>
-      </div>
+      <LoadingState
+        title={loadingMessage}
+        className="api-state-banner api-state-banner--loading"
+        aria-live="polite"
+      />
     );
   }
 
   if (unsupportedMessage) {
     return (
-      <div className="api-state-banner api-state-banner--unsupported" role="status" aria-live="polite">
-        <p className="api-state-banner__text">{unsupportedMessage}</p>
-      </div>
+      <UnsupportedState
+        title="Unsupported"
+        description={unsupportedMessage}
+        className="api-state-banner api-state-banner--unsupported"
+        aria-live="polite"
+      />
     );
   }
 
