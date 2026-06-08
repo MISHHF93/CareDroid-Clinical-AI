@@ -205,9 +205,10 @@
 .artifacts-layout,
 .artifacts-insight-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.8fr);
+  grid-template-columns: minmax(0, 1.45fr) minmax(min(100%, 17.5rem), 0.8fr);
   gap: var(--compact-page-gap, 14px);
   align-items: start;
+  min-width: 0;
 }
 
 .artifacts-list,
@@ -215,6 +216,13 @@
 .artifacts-panel {
   padding: var(--compact-panel-padding, 16px);
   min-width: 0;
+}
+
+.artifacts-layout > *,
+.artifacts-insight-grid > *,
+.artifacts-detail > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 .artifacts-section-heading {
@@ -254,9 +262,11 @@
 .artifacts-card__header,
 .artifacts-detail__header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  min-width: 0;
 }
 
 .artifacts-type,
@@ -326,6 +336,17 @@
   top: var(--space-4);
   display: grid;
   gap: var(--compact-panel-gap, 10px);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: clip;
+}
+
+.artifacts-detail :is(h2, h3, p, span, strong, dt, dd, button, a) {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .artifacts-metadata {
@@ -337,6 +358,7 @@
 .artifacts-metadata div {
   display: grid;
   gap: 4px;
+  min-width: 0;
 }
 
 .artifacts-metadata dt,
@@ -350,6 +372,8 @@
 
 .artifacts-metadata dd {
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .artifacts-relationships ul,

@@ -10,6 +10,7 @@ import {
   ANDROID_QA_VIEWPORT_WIDTHS,
   RESPONSIVE_QA_VIEWPORTS,
   RESPONSIVE_QA_BROWSER_PROJECTS,
+  RESPONSIVE_QA_ZOOM_LEVELS,
   buildResponsiveQaPages,
 } from '../data/responsiveQaMatrix.js';
 import {
@@ -57,8 +58,9 @@ describe('Responsive regression coverage inventory', () => {
     expect(ANDROID_QA_VIEWPORT_WIDTHS).toContain(412);
     expect(RESPONSIVE_QA_VIEWPORTS).toHaveLength(13);
     expect(RESPONSIVE_QA_VIEWPORTS.map((v) => v.width)).toEqual(
-      expect.arrayContaining([320, 360, 375, 390, 412, 430, 480, 600, 768])
+      expect.arrayContaining([320, 360, 390, 412, 430, 768, 1024, 1280, 1440, 1920])
     );
+    expect(RESPONSIVE_QA_ZOOM_LEVELS).toEqual([80, 90, 100, 110, 125, 150]);
     expect(RESPONSIVE_QA_BROWSER_PROJECTS.map((b) => b.id)).toEqual([
       'chromium',
       'firefox',

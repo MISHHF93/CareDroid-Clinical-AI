@@ -36,6 +36,28 @@
   max-width: 100%;
 }
 
+.app-shell :is(
+    .command-dashboard,
+    .operating-workspace,
+    .dashboard-root,
+    .profile-page,
+    .settings-page,
+    .live-map-page,
+    .hospital-map-page,
+    .medical-iot-page,
+    .device-fleet-page,
+    .fleet-live-map-page,
+    .ops-demo-page,
+    .platform-admin-page,
+    .team-management,
+    .customer-portal-page
+  ) {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 .app-shell :is(p, li, dd, dt, small, span, strong, h1, h2, h3, h4, h5, h6) {
   overflow-wrap: break-word;
   word-break: normal;
@@ -45,7 +67,7 @@
   max-width: 100%;
 }
 
-.app-shell :is(button, a.btn, .btn, [role='button']) {
+.app-shell :is(button, a.btn, .btn, [role='button'], .launch-action-card) {
   min-width: 0;
   white-space: normal;
   text-align: center;
@@ -85,6 +107,31 @@
   min-width: 0;
 }
 
+.app-shell :is(
+    [class*='card'],
+    [class*='panel'],
+    [class*='summary'],
+    [class*='metric'],
+    [class*='tile']
+  ) {
+  min-width: 0;
+}
+
+.app-shell :is(
+    [class*='actions'],
+    [class*='controls'],
+    [class*='toolbar'],
+    [class*='filters'],
+    [class*='header']
+  ) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.app-shell :is([class*='actions'], [class*='controls'], [class*='toolbar']) {
+  flex-wrap: wrap;
+}
+
 .app-shell :is(:focus-visible) {
   outline: var(--app-focus-ring-width, 2px) solid var(--app-focus-ring-aa, var(--app-accent-interactive));
   outline-offset: var(--app-focus-ring-offset, 2px);
@@ -101,6 +148,16 @@
     .cost-analytics-dashboard,
     .tools-overview,
     .audit-logs-container,
+      .profile-page,
+      .settings-page,
+      .operating-workspace,
+      .command-dashboard,
+      .live-map-page,
+      .hospital-map-page,
+      .medical-iot-page,
+      .device-fleet-page,
+      .fleet-live-map-page,
+      .ops-demo-page,
     [class*='fleet-page'],
     [class*='fleet-dashboard'],
     [class*='predictive-maintenance'],
@@ -262,13 +319,34 @@
       .analytics-panel,
       .catalog-stat,
       .tool-card-large,
+      .launch-action-card,
+      .operating-card,
+      .operating-drilldown,
+      .profile-overview-card,
+      .settings-privacy-card,
+      .settings-billing-card,
+      .command-panel,
+      .command-hero,
       .tip-card
     ) {
     padding: var(--app-card-padding-compact);
   }
 
-  .tool-page {
-    padding: var(--app-page-padding-compact);
+  .tool-page,
+  .command-dashboard,
+  .operating-workspace,
+  .profile-page,
+  .settings-page,
+  .live-map-page,
+  .hospital-map-page,
+  .medical-iot-page,
+  .device-fleet-page,
+  .fleet-live-map-page,
+  .ops-demo-page,
+  .platform-admin-page,
+  .team-management,
+  .customer-portal-page {
+    padding: var(--app-mobile-page-padding, var(--app-page-padding-compact));
   }
 
   .calculators-content,

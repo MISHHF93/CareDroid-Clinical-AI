@@ -117,7 +117,7 @@
 
 .cds-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
+  grid-template-columns: minmax(0, 1.4fr) minmax(min(100%, 20rem), 0.8fr);
   gap: var(--space-4);
   align-items: start;
 }

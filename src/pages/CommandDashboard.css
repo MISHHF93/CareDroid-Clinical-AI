@@ -460,7 +460,7 @@
 
 .command-compact-action-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min-compact, 11.5rem)), 1fr));
   gap: 8px;
   min-width: 0;
 }
@@ -514,7 +514,7 @@
 
 .command-launch-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min, 14rem)), 1fr));
   gap: 8px;
   min-width: 0;
 }
@@ -561,6 +561,7 @@
 .command-launch-card__body strong,
 .command-launch-card__body span {
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .command-launch-card__body span {
@@ -744,7 +745,7 @@
 
 @media (max-width: 760px) {
   .command-dashboard {
-    padding: 10px;
+    padding: var(--app-mobile-page-padding, 10px);
   }
 
   .command-panel--assistant {

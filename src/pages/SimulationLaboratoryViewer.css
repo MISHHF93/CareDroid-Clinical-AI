@@ -1,8 +1,13 @@
 .ops-demo-page {
   display: grid;
-  gap: var(--space-5);
-  padding: var(--space-5);
+  gap: var(--app-page-gap, var(--space-5));
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--app-desktop-page-padding, var(--space-5));
   color: var(--text-color);
+  overflow-x: clip;
+  box-sizing: border-box;
 }
 
 .ops-demo-hero,
@@ -81,7 +86,7 @@
 
 .ops-demo-insights {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min, 14rem)), 1fr));
   gap: var(--space-3);
 }
 
@@ -114,17 +119,17 @@
 
 .ops-demo-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr);
+  grid-template-columns: minmax(0, 1.5fr) minmax(min(100%, 20rem), 0.8fr);
   gap: var(--space-4);
   align-items: start;
 }
 
 .ops-demo-layout--viewer {
-  grid-template-columns: minmax(0, 1.4fr) minmax(300px, 0.7fr);
+  grid-template-columns: minmax(0, 1.4fr) minmax(min(100%, 18.75rem), 0.7fr);
 }
 
 .ops-demo-layout--wide {
-  grid-template-columns: minmax(0, 1.6fr) minmax(340px, 0.7fr);
+  grid-template-columns: minmax(0, 1.6fr) minmax(min(100%, 21.25rem), 0.7fr);
 }
 
 .ops-demo-panel {
@@ -340,7 +345,7 @@
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 420px;
+  min-height: var(--app-map-min-height, 420px);
   overflow: hidden;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
@@ -417,7 +422,7 @@
 
 @media (max-width: 900px) {
   .ops-demo-page {
-    padding: var(--space-3);
+    padding: var(--app-mobile-page-padding, var(--space-3));
   }
 
   .ops-demo-hero,

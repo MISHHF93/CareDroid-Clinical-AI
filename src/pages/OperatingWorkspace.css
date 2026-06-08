@@ -8,6 +8,7 @@
   gap: var(--compact-page-gap, 14px);
   box-sizing: border-box;
   color: var(--text-color);
+  overflow-x: clip;
 }
 
 .operating-hero {
@@ -19,6 +20,7 @@
   border: 1px solid var(--panel-border);
   border-radius: var(--compact-panel-radius, 14px);
   background: var(--app-surface-1);
+  min-width: 0;
 }
 
 .operating-hero__icon {
@@ -57,10 +59,13 @@
   max-width: 68ch;
   color: var(--muted-text);
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .operating-primary-action {
   min-height: var(--compact-control-height, 38px);
+  min-width: 0;
+  max-width: 100%;
   padding: 0 var(--space-4);
   border: 1px solid transparent;
   border-radius: var(--radius-md);
@@ -72,6 +77,8 @@
 
 .operating-inline-action {
   min-height: var(--compact-control-height, 38px);
+  min-width: 0;
+  max-width: 100%;
   padding: 0 var(--space-3);
   border: 1px solid var(--panel-border);
   border-radius: var(--radius-md);
@@ -109,13 +116,13 @@
 
 .operating-card-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min, 14rem)), 1fr));
   gap: var(--compact-page-gap, 14px);
 }
 
 .operating-card {
   min-width: 0;
-  min-height: 132px;
+  min-height: clamp(7rem, 18vw, 8.25rem);
   display: grid;
   align-content: start;
   justify-items: start;
@@ -156,6 +163,7 @@
 .operating-card__body {
   color: var(--muted-text);
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .operating-card__action {
@@ -166,7 +174,7 @@
 
 .operating-drilldown-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min-compact, 11.5rem)), 1fr));
   gap: var(--space-3);
 }
 
@@ -227,5 +235,16 @@
 
   .operating-primary-action {
     width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .operating-card,
+  .operating-drilldown {
+    padding: var(--app-card-padding-compact, 10px);
+  }
+
+  .operating-drilldown {
+    grid-template-columns: minmax(0, 1fr);
   }
 }

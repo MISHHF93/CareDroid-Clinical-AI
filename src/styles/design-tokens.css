@@ -124,6 +124,11 @@
 
   --app-space-field: var(--space-2);
   --app-space-field-lg: var(--space-3);
+  --app-panel-gap: var(--compact-panel-gap);
+  --app-page-gap: var(--compact-page-gap);
+  --app-grid-card-min: 14rem;
+  --app-grid-card-min-compact: 11.5rem;
+  --app-grid-card-min-wide: 16rem;
   --app-card-padding-compact: clamp(10px, 1.8vw, 14px);
   --app-card-padding-standard: clamp(14px, 2vw, 18px);
   --app-card-padding-dashboard: clamp(14px, 2.2vw, 20px);
@@ -143,6 +148,8 @@
   --compact-shadow: none;
 
   /* App shell / sidebar layout */
+  --app-sidebar-width-expanded: 15.5rem;
+  --app-sidebar-width-collapsed: 3.625rem;
   --sidebar-width-expanded: 248px;
   --sidebar-width-collapsed: 58px;
   --sidebar-drawer-max-width: min(264px, 88vw);
@@ -150,6 +157,11 @@
   --app-shell-compact-header-height: 56px;
   --app-sidebar-header-height: 56px;
   --app-sidebar-header-padding-x: 10px;
+  --app-mobile-page-padding: var(--app-page-padding-compact);
+  --app-desktop-page-padding: var(--app-page-padding-roomy);
+  --app-map-min-height: clamp(18rem, 45dvh, 26rem);
+  --app-chart-min-height: clamp(14rem, 32dvh, 20rem);
+  --app-drawer-inline-padding: clamp(10px, 2vw, 16px);
 
   /* z-index layers */
   --z-base: 0;

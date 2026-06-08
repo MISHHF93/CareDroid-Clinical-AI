@@ -2,7 +2,19 @@
   flex: 1;
   display: flex;
   justify-content: center;
-  padding: 48px;
+  align-items: flex-start;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--app-desktop-page-padding, 48px);
+  overflow-x: clip;
+  box-sizing: border-box;
+}
+
+.profile-page > .card {
+  width: min(100%, 52rem);
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .profile-activity-card {
@@ -36,9 +48,11 @@
 
 .profile-overview-card__header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-start;
   gap: 12px;
+  min-width: 0;
 }
 
 .profile-overview-card__header h3 {
@@ -68,6 +82,7 @@
 
 .profile-overview-row {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 10px;
@@ -131,6 +146,7 @@
 
 .profile-preference-list div {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 12px;
   padding: 10px;
@@ -149,6 +165,8 @@
   color: var(--text-color);
   font-size: 13px;
   text-align: right;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .profile-activity-card__header {
@@ -227,6 +245,7 @@
 
 .profile-activity-item {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
@@ -322,7 +341,7 @@
 
 @media (max-width: 720px) {
   .profile-page {
-    padding: 24px 16px;
+    padding: var(--app-mobile-page-padding, 24px 16px);
   }
 
   .profile-overview-grid {
@@ -337,6 +356,17 @@
 
   .profile-activity-summary {
     grid-template-columns: 1fr;
+  }
+
+  .profile-overview-row,
+  .profile-preference-list div,
+  .profile-activity-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-preference-list dd {
+    text-align: left;
   }
 
   .profile-phi-panel__content {

@@ -227,7 +227,7 @@
 
 .device-fleet-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.6fr);
+  grid-template-columns: minmax(0, 1.4fr) minmax(min(100%, 20rem), 0.6fr);
   gap: var(--compact-page-gap, 14px);
   align-items: start;
   min-width: 0;

@@ -80,9 +80,10 @@
 
 .app-shell-dev-mode-banner {
   flex: 0 0 auto;
+  width: 100%;
   min-width: 0;
-  max-width: calc(100% - 32px);
-  margin: 8px 12px 0;
+  max-width: 100%;
+  margin: 8px 0 0;
   padding: 8px 10px;
   border: 1px solid color-mix(in srgb, var(--app-warning) 48%, var(--panel-border));
   border-radius: var(--compact-card-radius, var(--radius-md));
@@ -97,9 +98,10 @@
 
 .app-shell-environment-banner {
   flex: 0 0 auto;
+  width: 100%;
   min-width: 0;
-  max-width: calc(100% - 32px);
-  margin: 8px 12px 0;
+  max-width: 100%;
+  margin: 8px 0 0;
   padding: 8px 10px;
   border: 1px solid color-mix(in srgb, var(--app-accent-interactive) 45%, var(--panel-border));
   border-radius: var(--compact-card-radius, var(--radius-md));
@@ -162,18 +164,22 @@
   pointer-events: auto;
 }
 
-.app-shell-menu-btn {
-  position: absolute;
+.app-shell .app-shell-menu-btn {
+  position: fixed;
   top: calc(6px + env(safe-area-inset-top, 0px));
   left: calc(10px + env(safe-area-inset-left, 0px));
   z-index: calc(var(--z-header, 920) + 40);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--app-icon-button-size, 44px);
-  height: var(--app-icon-button-size, 44px);
-  min-width: var(--app-icon-button-size, 44px);
-  min-height: var(--app-icon-button-size, 44px);
+  width: var(--app-icon-button-size, 44px) !important;
+  inline-size: var(--app-icon-button-size, 44px) !important;
+  max-inline-size: var(--app-icon-button-size, 44px) !important;
+  height: var(--app-icon-button-size, 44px) !important;
+  block-size: var(--app-icon-button-size, 44px) !important;
+  max-block-size: var(--app-icon-button-size, 44px) !important;
+  min-width: var(--app-icon-button-size, 44px) !important;
+  min-height: var(--app-icon-button-size, 44px) !important;
   padding: 0;
   border-radius: var(--compact-card-radius, var(--radius-md));
   border: 1px solid var(--panel-border);
@@ -205,18 +211,22 @@
   color: inherit;
 }
 
-.app-shell-command-btn {
-  position: absolute;
+.app-shell .app-shell-command-btn {
+  position: fixed;
   top: calc(6px + env(safe-area-inset-top, 0px));
   right: calc(10px + env(safe-area-inset-right, 0px));
   z-index: calc(var(--z-header, 920) + 40);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--app-icon-button-size, 44px);
-  height: var(--app-icon-button-size, 44px);
-  min-width: var(--app-icon-button-size, 44px);
-  min-height: var(--app-icon-button-size, 44px);
+  width: var(--app-icon-button-size, 44px) !important;
+  inline-size: var(--app-icon-button-size, 44px) !important;
+  max-inline-size: var(--app-icon-button-size, 44px) !important;
+  height: var(--app-icon-button-size, 44px) !important;
+  block-size: var(--app-icon-button-size, 44px) !important;
+  max-block-size: var(--app-icon-button-size, 44px) !important;
+  min-width: var(--app-icon-button-size, 44px) !important;
+  min-height: var(--app-icon-button-size, 44px) !important;
   padding: 0;
   border-radius: var(--compact-card-radius, var(--radius-md));
   border: 1px solid var(--panel-border);
@@ -244,8 +254,11 @@
   gap: 10px;
   justify-content: flex-end;
   min-height: var(--app-shell-header-height, 56px);
-  padding: 6px 16px 6px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 6px clamp(10px, 1.8vw, 16px);
   pointer-events: none;
+  box-sizing: border-box;
 }
 
 .app-shell-workspace-bar > * {
@@ -296,7 +309,8 @@
 .app-shell--compact .app-shell-workspace-bar {
   justify-content: center;
   min-height: var(--app-shell-compact-header-height, 56px);
-  padding: 6px 60px;
+  padding-block: 6px;
+  padding-inline: calc(var(--app-icon-button-size, 44px) + 16px);
 }
 
 .app-shell-header-utilities {
@@ -335,8 +349,17 @@
   align-items: center;
   gap: 7px;
   padding: 0 10px;
+  min-width: 0;
+  max-width: min(100%, 18rem);
   font-size: var(--font-12);
   font-weight: 750;
+}
+
+.app-shell-header-command span:not([aria-hidden]) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .app-shell-header-command kbd {
@@ -456,15 +479,19 @@
 }
 
 @media (max-width: 380px) {
+  .app-shell--compact .app-shell-workspace-bar {
+    padding-inline: calc(var(--touch-target-min, 44px) + 12px);
+  }
+
   .app-shell-menu-btn {
     width: var(--touch-target-min, 44px);
     height: var(--touch-target-min, 44px);
-    left: calc(var(--space-2) + env(safe-area-inset-left, 0px));
+    left: calc(6px + env(safe-area-inset-left, 0px));
   }
 
   .app-shell-command-btn {
     top: calc(var(--space-2) + env(safe-area-inset-top, 0px));
-    right: calc(var(--space-2) + env(safe-area-inset-right, 0px));
+    right: calc(6px + env(safe-area-inset-right, 0px));
   }
 }
 

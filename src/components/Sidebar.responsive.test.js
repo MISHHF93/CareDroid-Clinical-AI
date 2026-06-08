@@ -19,6 +19,7 @@ describe('Sidebar responsive — mobile drawer', () => {
     expect(sidebarCss).toMatch(
       /@media \(max-width: 900px\)[\s\S]*\.sidebar[\s\S]*pointer-events:\s*none/
     );
+    expect(sidebarCss).toMatch(/width:\s*var\(--sidebar-drawer-max-width,\s*min\(264px,\s*88vw\)\)/);
     expect(sidebarCss).toMatch(
       /\.sidebar\.sidebar--open[\s\S]*pointer-events:\s*auto/
     );
@@ -63,6 +64,8 @@ describe('Sidebar responsive — scroll and labels', () => {
     expect(sidebarCss).toContain('.sidebar-tool-card-title-row');
     expect(sidebarCss).toMatch(/\.nav-label[\s\S]*overflow-wrap:\s*break-word/);
     expect(sidebarCss).toMatch(/\.sidebar-tool-card-name[\s\S]*overflow-wrap:\s*break-word/);
+    expect(sidebarCss).toMatch(/\.nav-item[\s\S]*box-sizing:\s*border-box/);
+    expect(sidebarCss).toMatch(/\.nav-icon > svg[\s\S]*height:\s*100%/);
   });
 });
 

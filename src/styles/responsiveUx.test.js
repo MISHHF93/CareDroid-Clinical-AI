@@ -10,6 +10,7 @@ import { describe, it, expect } from 'vitest';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const responsiveUxCss = readFileSync(join(__dirname, 'responsive-ux.css'), 'utf8');
 const layoutVisibilityCss = readFileSync(join(__dirname, 'layout-visibility.css'), 'utf8');
+const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const mainJsx = readFileSync(join(__dirname, '../main.jsx'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, '../layout/AppShell.css'), 'utf8');
@@ -48,10 +49,30 @@ describe('responsive-ux.css — global normalization', () => {
   });
 
   it('relies on design-tokens for fluid type scale', () => {
-    const designTokensCss = readFileSync(join(__dirname, 'design-tokens.css'), 'utf8');
     expect(designTokensCss).toContain('--app-type-title:');
     expect(designTokensCss).toContain('clamp(');
     expect(responsiveUxCss).toContain('var(--app-type-title)');
+  });
+
+  it('defines normalized sizing tokens for shell, cards, controls, grids, maps, and page padding', () => {
+    for (const token of [
+      '--app-sidebar-width-expanded',
+      '--app-sidebar-width-collapsed',
+      '--app-shell-header-height',
+      '--app-card-padding-standard',
+      '--app-panel-gap',
+      '--app-button-height',
+      '--app-icon-size-md',
+      '--app-input-height',
+      '--app-grid-card-min',
+      '--app-content-max-width',
+      '--app-mobile-page-padding',
+      '--app-desktop-page-padding',
+      '--app-map-min-height',
+      '--app-chart-min-height',
+    ]) {
+      expect(designTokensCss).toContain(token);
+    }
   });
 
   it('prevents heading overflow without character-stacking labels', () => {
@@ -130,6 +151,15 @@ describe('responsive-ux.css — global normalization', () => {
     expect(responsiveUxCss).toMatch(/@media \(max-width: 640px\)[\s\S]*--app-card-padding-compact/);
   });
 
+  it('normalizes major route roots and action rows for zoom-safe wrapping', () => {
+    expect(responsiveUxCss).toContain('.operating-workspace');
+    expect(responsiveUxCss).toContain('.profile-page');
+    expect(responsiveUxCss).toContain('.settings-page');
+    expect(responsiveUxCss).toContain('.device-fleet-page');
+    expect(responsiveUxCss).toMatch(/\[class\*='actions'\][\s\S]*flex-wrap:\s*wrap/);
+    expect(responsiveUxCss).toMatch(/\.launch-action-card[\s\S]*white-space:\s*normal/);
+  });
+
   it('keeps map canvases locally scrollable instead of clipping fixed-width floor plans', () => {
     for (const css of [liveMapCss, hospitalMapCss, medicalIotCss, fleetLiveMapCss]) {
       expect(css).toMatch(/-map-canvas[\s\S]*overflow-x:\s*auto/);
@@ -148,7 +178,7 @@ describe('responsive-ux.css — global normalization', () => {
     expect(deviceFleetCss).toMatch(/\.device-fleet-page\s*\{[\s\S]*overflow-x:\s*clip/);
     expect(deviceFleetCss).toMatch(/\.device-fleet-table-wrap\s*\{[\s\S]*overflow-x:\s*auto/);
     expect(deviceFleetCss).toMatch(/\.device-fleet-table\s*\{[\s\S]*min-width:\s*980px/);
-    expect(layoutVisibilityCss).toMatch(/\.fleet-data-table-wrap\s*\{[\s\S]*overflow-x:\s*auto/);
+    expect(layoutVisibilityCss).toMatch(/\.fleet-data-table-wrap,[\s\S]*overflow-x:\s*auto/);
   });
 
   it('collapses operational grids before phone widths', () => {

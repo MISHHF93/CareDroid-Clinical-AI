@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import {
@@ -101,10 +101,10 @@ describe('Sidebar mobile render state', () => {
       /^tools$/i,
       /^operations$/i,
       /^profile$/i,
-      /^settings$/i,
     ]) {
       expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
     }
+    expect(within(nav).queryByRole('button', { name: /^settings$/i })).not.toBeInTheDocument();
     expect(within(nav).queryByRole('button', { name: /^hospital map$/i })).not.toBeInTheDocument();
     expect(within(nav).queryByRole('button', { name: /^fleet map$/i })).not.toBeInTheDocument();
   });
@@ -119,23 +119,20 @@ describe('Sidebar mobile render state', () => {
       /^tools$/i,
       /^operations$/i,
       /^profile$/i,
-      /^settings$/i,
     ]) {
       expect(within(nav).getByRole('button', { name })).toBeInTheDocument();
     }
 
+    expect(within(nav).queryByRole('button', { name: /^settings$/i })).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/^workspace$/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /developer catalog/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^tool library$/i })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /advanced/i }));
+    expect(screen.queryByRole('button', { name: /advanced/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^tool library$/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^calculators$/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /^hospital map$/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^products$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^asset packs$/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /developer catalog/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /system health/i })).toBeInTheDocument();
-    const advancedNav = screen.getByRole('navigation', { name: /^advanced navigation$/i });
-    expect(within(advancedNav).getByRole('button', { name: /^security$/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^products$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /^asset packs$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('navigation', { name: /^advanced navigation$/i })).not.toBeInTheDocument();
   });
 });

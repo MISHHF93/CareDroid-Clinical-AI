@@ -5,7 +5,7 @@
 
 .timeline-ai-workspace {
   display: grid;
-  grid-template-columns: minmax(280px, 0.9fr) minmax(320px, 1.1fr);
+  grid-template-columns: minmax(min(100%, 17.5rem), 0.9fr) minmax(min(100%, 20rem), 1.1fr);
   gap: 20px;
   align-items: start;
 }

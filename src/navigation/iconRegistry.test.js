@@ -1,0 +1,49 @@
+import { describe, expect, it } from 'vitest';
+import {
+  ACCOUNT_UTILITY_NAV_ITEMS,
+  ADVANCED_SIDEBAR_NAV_ITEMS,
+  OPERATIONS_SIDEBAR_NAV_ITEMS,
+  PRIMARY_SIDEBAR_NAV_ITEMS,
+  SOLUTIONS_SIDEBAR_NAV_ITEMS,
+} from '../config/navigation.config';
+import { CHROME_ICONS, getNavIcon, getToolIcon } from './iconRegistry';
+
+const ALL_NAV_ITEMS = [
+  ...PRIMARY_SIDEBAR_NAV_ITEMS,
+  ...OPERATIONS_SIDEBAR_NAV_ITEMS,
+  ...SOLUTIONS_SIDEBAR_NAV_ITEMS,
+  ...ADVANCED_SIDEBAR_NAV_ITEMS,
+  ...ACCOUNT_UTILITY_NAV_ITEMS,
+];
+
+describe('iconRegistry semantic icon map', () => {
+  it('keeps Operations distinct from fleet or vehicle-only iconography', () => {
+    expect(getNavIcon('operations')).toBe(CHROME_ICONS.activity);
+    expect(getNavIcon('operations')).not.toBe(CHROME_ICONS.truck);
+    expect(getNavIcon('operations')).not.toBe(getNavIcon('fleet'));
+  });
+
+  it('keeps Fleet and dispatch routes vehicle-specific', () => {
+    expect(getNavIcon('fleet')).toBe(CHROME_ICONS.truck);
+    expect(getToolIcon('fleet-live-map')).toBe(CHROME_ICONS.truck);
+    expect(getToolIcon('fleet-command')).toBe(CHROME_ICONS.truck);
+  });
+
+  it('uses clinical operations symbols for devices, IoT, maps, governance, audit, profile, and settings', () => {
+    expect(getNavIcon('devices')).toBe(CHROME_ICONS.smartphone);
+    expect(getToolIcon('device-fleet-management')).toBe(CHROME_ICONS.smartphone);
+    expect(getNavIcon('medical-iot')).toBe(CHROME_ICONS.activity);
+    expect(getNavIcon('hospital-map')).toBe(CHROME_ICONS.hospital);
+    expect(getNavIcon('governance')).toBe(CHROME_ICONS.shield);
+    expect(getNavIcon('security')).toBe(CHROME_ICONS.lock);
+    expect(getNavIcon('audit')).toBe(CHROME_ICONS.clipboardList);
+    expect(getNavIcon('profile')).toBe(CHROME_ICONS.user);
+    expect(getNavIcon('settings')).toBe(CHROME_ICONS.settings);
+  });
+
+  it('resolves an icon for every navigation destination', () => {
+    for (const item of ALL_NAV_ITEMS) {
+      expect(getNavIcon(item.id), item.id).toBeTruthy();
+    }
+  });
+});

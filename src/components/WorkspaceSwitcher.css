@@ -4,8 +4,8 @@
   align-items: center;
   gap: 8px;
   width: fit-content;
-  min-width: min(100%, 220px);
-  max-width: min(100%, 360px);
+  min-width: min(100%, 13.75rem);
+  max-width: min(100%, 22.5rem);
   min-height: var(--app-control-height-lg, 44px);
   padding: 6px 8px;
   border: 1px solid var(--app-panel-border);
@@ -28,6 +28,8 @@
   text-transform: uppercase;
   white-space: nowrap;
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .workspace-switcher__select {
@@ -43,6 +45,7 @@
   font-weight: 700;
   outline: none;
   cursor: pointer;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
@@ -63,8 +66,8 @@
 }
 
 .workspace-switcher--compact {
-  width: min(100%, calc(100vw - 128px));
-  max-width: min(100%, 320px);
+  width: min(100%, calc(100vw - ((var(--app-icon-button-size, 44px) + 16px) * 2)));
+  max-width: min(100%, 20rem);
   min-width: 0;
   justify-self: center;
 }
@@ -77,6 +80,6 @@
   .workspace-switcher {
     gap: 6px;
     padding-inline: 7px;
-    max-width: calc(100vw - 128px);
+    max-width: calc(100vw - ((var(--touch-target-min, 44px) + 12px) * 2));
   }
 }

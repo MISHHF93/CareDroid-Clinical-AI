@@ -8,6 +8,7 @@ import {
   RESPONSIVE_QA_PAGES,
   RESPONSIVE_QA_VIEWPORTS,
   RESPONSIVE_QA_BROWSER_PROJECTS,
+  RESPONSIVE_QA_ZOOM_LEVELS,
   TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID,
   countResponsiveQaCells,
   buildResponsiveQaPages,
@@ -34,6 +35,7 @@ describe('responsiveQaMatrix', () => {
       expect.arrayContaining([320, 360, 375, 390, 412, 430, 480, 600, 768, 1024, 1280, 1440, 1920])
     );
     expect(RESPONSIVE_QA_BROWSER_PROJECTS).toHaveLength(4);
+    expect(RESPONSIVE_QA_ZOOM_LEVELS).toEqual([80, 90, 100, 110, 125, 150]);
   });
 
   it('keeps the production viewport meta Android-safe', () => {

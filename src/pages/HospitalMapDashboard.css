@@ -137,14 +137,14 @@
 
 .hospital-map-insights {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min, 14rem)), 1fr));
   gap: var(--compact-panel-gap, 10px);
   min-width: 0;
 }
 
 .hospital-map-summary {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min-compact, 11.5rem)), 1fr));
   gap: var(--compact-panel-gap, 10px);
   padding: var(--compact-panel-padding, 14px);
 }
@@ -233,7 +233,7 @@
 
 .hospital-map-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.55fr);
+  grid-template-columns: minmax(0, 1.45fr) minmax(min(100%, 20rem), 0.55fr);
   gap: var(--compact-page-gap, 14px);
   align-items: start;
   min-width: 0;
@@ -265,7 +265,7 @@
 .hospital-map-canvas {
   position: relative;
   width: 100%;
-  min-height: 360px;
+  min-height: var(--app-map-min-height, 360px);
   max-width: 100%;
   min-width: 0;
   overflow-x: auto;
@@ -518,7 +518,7 @@
 
 .hospital-map-lower-grid {
   display: grid;
-  grid-template-columns: minmax(320px, 0.8fr) minmax(0, 1.2fr);
+  grid-template-columns: minmax(min(100%, 20rem), 0.8fr) minmax(0, 1.2fr);
   gap: var(--compact-page-gap, 14px);
   min-width: 0;
 }

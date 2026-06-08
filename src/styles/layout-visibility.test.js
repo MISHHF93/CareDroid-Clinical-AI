@@ -22,7 +22,7 @@ describe('layout-visibility.css', () => {
   });
 
   it('uses minmax grids for tool cards', () => {
-    expect(layoutVisibilityCss).toMatch(/minmax\(min\(100%,\s*260px\)/);
+    expect(layoutVisibilityCss).toMatch(/minmax\(min\(100%,\s*var\(--app-grid-card-min/);
     expect(layoutVisibilityCss).toMatch(/\.catalog-table-wrap[\s\S]*overflow-x:\s*auto/);
   });
 
@@ -36,6 +36,24 @@ describe('layout-visibility.css', () => {
     expect(layoutVisibilityCss).toMatch(
       /\.dashboard-grid[\s\S]*minmax\(min\(100%,\s*400px\)/
     );
+  });
+
+  it('normalizes major route roots and high-risk local scroll wrappers', () => {
+    for (const selector of [
+      '.operating-workspace',
+      '.profile-page',
+      '.settings-page',
+      '.live-map-page',
+      '.hospital-map-page',
+      '.medical-iot-page',
+      '.device-fleet-page',
+      '.fleet-live-map-page',
+      '.ops-demo-page',
+    ]) {
+      expect(layoutVisibilityCss).toContain(selector);
+    }
+    expect(layoutVisibilityCss).toMatch(/\.device-fleet-table-wrap[\s\S]*overflow-x:\s*auto/);
+    expect(layoutVisibilityCss).toMatch(/\.ops-demo-table[\s\S]*overscroll-behavior-x:\s*contain/);
   });
 
   it('sets min-width 0 on calculator flex children', () => {

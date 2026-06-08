@@ -145,6 +145,15 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellCss).toMatch(/\.app-shell-header[\s\S]*pointer-events:\s*none/);
   });
 
+  it('keeps header controls zoom-safe with tokenized compact padding and truncation', () => {
+    expect(appShellCss).toMatch(/\.app-shell-workspace-bar[\s\S]*min-width:\s*0/);
+    expect(appShellCss).toMatch(
+      /\.app-shell--compact \.app-shell-workspace-bar[\s\S]*padding-inline:\s*calc\(var\(--app-icon-button-size/
+    );
+    expect(appShellCss).toMatch(/\.app-shell-header-command[\s\S]*max-width:\s*min\(100%,\s*18rem\)/);
+    expect(appShellCss).toMatch(/\.app-shell-header-command span:not\(\[aria-hidden\]\)[\s\S]*text-overflow:\s*ellipsis/);
+  });
+
   it('provides a WCAG bypass link and programmatic main focus target', () => {
     expect(appShellJsx).toContain('href="#main-content"');
     expect(appShellJsx).toContain('Skip to main content');

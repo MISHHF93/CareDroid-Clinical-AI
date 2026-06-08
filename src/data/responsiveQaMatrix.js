@@ -68,6 +68,9 @@ export const RESPONSIVE_QA_BROWSER_PROJECTS = Object.freeze([
   { id: 'msedge', label: 'Edge', engine: 'chromium', channel: 'msedge' },
 ]);
 
+/** Browser zoom acceptance levels for manual and targeted Playwright checks. */
+export const RESPONSIVE_QA_ZOOM_LEVELS = Object.freeze([80, 90, 100, 110, 125, 150]);
+
 /** Dedicated routes for Tier A calculators (must match App.jsx). */
 export const TIER_A_CALCULATOR_PATH_BY_REGISTRY_ID = Object.freeze({
   [REGISTRY.sofaScore]: '/tools/calculators/sofa',
@@ -680,7 +683,7 @@ export function formatResponsiveQaMatrixMarkdown() {
   const lines = [
     '# Responsive QA matrix',
     '',
-    `Generated from \`src/data/responsiveQaMatrix.js\`. Total cells: **${countResponsiveQaCells()}** (${RESPONSIVE_QA_PAGES.length} pages × ${RESPONSIVE_QA_VIEWPORTS.length} viewports × ${RESPONSIVE_QA_BROWSER_PROJECTS.length} browsers).`,
+    `Generated from \`src/data/responsiveQaMatrix.js\`. Total cells: **${countResponsiveQaCells()}** (${RESPONSIVE_QA_PAGES.length} pages × ${RESPONSIVE_QA_VIEWPORTS.length} viewports × ${RESPONSIVE_QA_BROWSER_PROJECTS.length} browsers). Zoom acceptance levels: ${RESPONSIVE_QA_ZOOM_LEVELS.join('%, ')}%.`,
     '',
     '## Browsers',
     '',
@@ -693,6 +696,10 @@ export function formatResponsiveQaMatrixMarkdown() {
     '| ID | Size | Label |',
     '| --- | --- | --- |',
     ...RESPONSIVE_QA_VIEWPORTS.map((v) => `| ${v.id} | ${v.width}×${v.height} | ${v.label} |`),
+    '',
+    '## Zoom',
+    '',
+    RESPONSIVE_QA_ZOOM_LEVELS.map((level) => `${level}%`).join(', '),
     '',
     '## Pages',
     '',

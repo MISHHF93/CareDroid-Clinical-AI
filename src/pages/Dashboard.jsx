@@ -372,7 +372,7 @@ function Dashboard() {
         title: 'Command dashboard',
         body: 'Review launch cards, fleet, maps, IoT, analytics, and system status from the main dashboard.',
         label: 'Open dashboard',
-        icon: CHROME_ICONS.tools,
+        icon: CHROME_ICONS.layoutDashboard,
         path: '/dashboard',
       },
     ],

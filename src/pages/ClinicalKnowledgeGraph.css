@@ -105,7 +105,7 @@
 
 .knowledge-graph-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  grid-template-columns: minmax(0, 1.1fr) minmax(min(100%, 20rem), 0.9fr);
   gap: 18px;
   align-items: start;
 }

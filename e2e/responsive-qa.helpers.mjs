@@ -24,7 +24,7 @@ export async function measurePageOverflow(page) {
     const doc = document.documentElement;
     const docOverflow = doc.scrollWidth - doc.clientWidth;
 
-    /** @type {{ selector: string, overflowPx: number, right: number, viewport: number }[]} */
+    /** @type {{ selector: string, overflowPx: number, left?: number, width?: number, right: number, viewport: number }[]} */
     const offenders = [];
 
     if (docOverflow > tolerance) {
@@ -71,6 +71,8 @@ export async function measurePageOverflow(page) {
         offenders.push({
           selector: `${el.tagName.toLowerCase()}${id}${cls}`,
           overflowPx: Math.round(overflowRight),
+          left: Math.round(rect.left),
+          width: Math.round(rect.width),
           right: Math.round(rect.right),
           viewport: vw,
         });
@@ -94,6 +96,7 @@ export async function measureVerticalScrollAccess(page) {
   return page.evaluate(({ tolerance }) => {
     const scrollport =
       document.querySelector('.app-shell-page-body:not(.app-shell-page-body--conversation)') ||
+      document.querySelector('.public-main') ||
       document.querySelector('.auth-shell') ||
       document.scrollingElement ||
       document.documentElement;
@@ -268,6 +271,16 @@ export const QA_AUTH_STORAGE = {
   }),
 };
 
+export const QA_TENANT_CONTEXT = {
+  organizationId: 'qa-organization',
+  organizationName: 'Responsive QA Hospital',
+  workspaceId: 'operations',
+  workspaceName: 'Operations Workspace',
+  userId: 'responsive-qa-user',
+  role: 'admin',
+  subscriptionPlan: 'enterprise',
+};
+
 /**
  * @param {import('@playwright/test').Page} page
  */
@@ -290,6 +303,13 @@ export async function installQaNetworkStubs(page) {
       status: 200,
       contentType: 'application/json',
       body: JSON.stringify(profile),
+    });
+  });
+  await page.route('**/api/tenant/context**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(QA_TENANT_CONTEXT),
     });
   });
   await page.route('**/api/tools**', async (route) => {
@@ -353,7 +373,10 @@ export async function waitForAppReady(page) {
   await page.waitForFunction(
     () => {
       const loader = document.querySelector('.page-loader');
-      const shell = document.querySelector('.app-shell-page-body');
+      const shell =
+        document.querySelector('.app-shell-page-body') ||
+        document.querySelector('.public-main') ||
+        document.querySelector('.legal-page');
       if (loader) return false;
       if (!shell) return false;
       const rect = shell.getBoundingClientRect();

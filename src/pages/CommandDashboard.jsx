@@ -244,7 +244,7 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     label: 'Laboratory',
     description: 'Review demo lab results, specimen queue, abnormal alerts, and trends.',
     path: CANONICAL_ROUTES.laboratory,
-    icon: CHROME_ICONS.tools,
+    icon: CHROME_ICONS.flask,
   },
   {
     id: '3d-viewer',
@@ -265,7 +265,7 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     label: 'Operations',
     description: 'Open the unified hub for maps, IoT, devices, fleet, alerts, telemetry, and maintenance.',
     path: CANONICAL_ROUTES.operations,
-    icon: CHROME_ICONS.truck,
+    icon: CHROME_ICONS.activity,
   },
   {
     id: 'notifications',
@@ -307,7 +307,7 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
     label: 'Device Management',
     description: 'Manage device fleet state, maintenance, and assignments.',
     path: CANONICAL_ROUTES.devices,
-    icon: CHROME_ICONS.wrench,
+    icon: CHROME_ICONS.smartphone,
   },
   {
     id: 'activity',
@@ -352,7 +352,7 @@ const DASHBOARD_COMPRESSION_SHORTCUTS = Object.freeze([
     label: 'Operations',
     description: 'Open maps, IoT, fleet, alerts, and maintenance.',
     path: CANONICAL_ROUTES.operations,
-    icon: CHROME_ICONS.truck,
+    icon: CHROME_ICONS.activity,
   },
 ]);
 

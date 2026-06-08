@@ -16,9 +16,13 @@ body {
 
 #root,
 .app-shell,
-.app-shell-main-wrap,
 .app-shell-page-body {
   inline-size: 100%;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+}
+
+.app-shell-main-wrap {
   max-inline-size: 100%;
   min-inline-size: 0;
 }
@@ -49,12 +53,18 @@ body {
 
 /* —— Standard tool / catalog / analytics page roots —— */
 .command-dashboard,
+.operating-workspace,
 .medical-iot-page,
+.live-map-page,
+.hospital-map-page,
+.device-fleet-page,
+.fleet-live-map-page,
 .tools-overview,
 .calculators-content,
 .clinical-tool-catalog,
 .tool-page,
 .lab-interpreter-content,
+.ops-demo-page,
 .simple-tool-page-inner,
 .diagnosis-tool-grid,
 .audit-logs-container,
@@ -65,6 +75,9 @@ body {
 .system-health-page,
 .profile-page,
 .profile-settings-page,
+.platform-admin-page,
+.team-management,
+.customer-portal-page,
 .page-container {
   width: 100%;
   max-width: 100%;
@@ -73,10 +86,18 @@ body {
 }
 
 .command-dashboard,
+.operating-workspace,
 .medical-iot-page,
+.live-map-page,
+.hospital-map-page,
+.device-fleet-page,
+.fleet-live-map-page,
 .tools-overview,
 .clinical-tool-catalog,
-.calculators-content {
+.calculators-content,
+.profile-page,
+.settings-page,
+.ops-demo-page {
   overflow-x: clip;
 }
 
@@ -101,7 +122,22 @@ body {
 .lab-results-panel,
 .clinical-executor-feedback,
 .fleet-page-content,
-.fleet-toolbar {
+.fleet-toolbar,
+.operating-card-grid,
+.operating-drilldown-list,
+.profile-overview-grid,
+.settings-billing-summary,
+.settings-privacy-actions,
+.settings-billing-actions,
+.command-launch-grid,
+.command-action-grid,
+.command-hero,
+.command-panel,
+.live-map-workspace,
+.hospital-map-workspace,
+.medical-iot-location-workspace,
+.fleet-map-workspace,
+.ops-demo-layout {
   min-width: 0;
   max-width: 100%;
 }
@@ -116,7 +152,12 @@ body {
 .app-table-scroll-x,
 .app-local-scroll-x,
 .lab-category-section,
-.fleet-data-table-wrap {
+.fleet-data-table-wrap,
+.device-fleet-table-wrap,
+.artifacts-table-wrap,
+.governance-registry-table,
+.team-table-wrapper,
+.ops-demo-table {
   overflow-x: auto;
   overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
@@ -127,7 +168,12 @@ body {
 .catalog-table-wrap,
 .app-local-scroll-x,
 .lab-category-section,
-.fleet-data-table-wrap {
+.fleet-data-table-wrap,
+.device-fleet-table-wrap,
+.artifacts-table-wrap,
+.governance-registry-table,
+.team-table-wrapper,
+.ops-demo-table {
   overscroll-behavior-x: contain;
 }
 
@@ -135,8 +181,11 @@ body {
 .tools-overview .tools-grid,
 .tools-overview .tools-recent-list,
 .tools-overview .tools-chat-only-grid,
-.tools-overview .tips-grid {
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+.tools-overview .tips-grid,
+.operating-card-grid,
+.operating-drilldown-list,
+.ops-demo-insights {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min, 14rem)), 1fr));
 }
 
 .catalog-stats {

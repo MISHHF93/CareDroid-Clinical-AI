@@ -6,7 +6,7 @@
   top: 0;
   min-height: var(--app-viewport-height, 100dvh);
   height: var(--app-viewport-height, 100dvh);
-  width: var(--sidebar-width-expanded, 248px);
+  width: var(--app-sidebar-width-expanded, var(--sidebar-width-expanded, 248px));
   max-width: 100%;
   min-width: 0;
   max-height: var(--app-viewport-height, 100dvh);
@@ -28,7 +28,7 @@
 }
 
 .sidebar-collapsed {
-  width: var(--sidebar-width-collapsed, 58px);
+  width: var(--app-sidebar-width-collapsed, var(--sidebar-width-collapsed, 58px));
 }
 
 /* Header */
@@ -444,6 +444,7 @@
   font-size: 14px;
   text-align: left;
   line-height: 1.2;
+  box-sizing: border-box;
 }
 
 .nav-item:hover {
@@ -473,6 +474,14 @@
   flex-shrink: 0;
   color: inherit;
   opacity: var(--nav-icon-opacity, 0.85);
+}
+
+.nav-icon > svg,
+.btn-icon > svg,
+.signout-icon > svg,
+.section-icon--svg > svg {
+  width: 100%;
+  height: 100%;
 }
 
 .nav-item.active .nav-icon {
@@ -1104,7 +1113,7 @@
  */
 @media (max-width: 900px) {
   .sidebar {
-    width: var(--sidebar-drawer-max-width, min(280px, 88vw));
+    width: var(--sidebar-drawer-max-width, min(264px, 88vw));
     max-width: 100vw;
     /* Equivalent closed state to translateX(-100%) with compositor-friendly 3D transform. */
     transform: translate3d(-100%, 0, 0);
@@ -1138,12 +1147,12 @@
   }
 
   .sidebar .sidebar-header {
-    padding-inline: 12px;
+    padding-inline: var(--app-drawer-inline-padding, 12px);
     grid-template-columns: minmax(0, 1fr) auto;
   }
 
   .sidebar .sidebar-content {
-    padding-inline: 12px;
+    padding-inline: var(--app-drawer-inline-padding, 12px);
     /* Independent scroll; long tool lists must not clip on Android */
     overflow-y: auto;
     overflow-x: clip;
@@ -1152,7 +1161,7 @@
   }
 
   .sidebar .sidebar-footer {
-    padding-inline: 12px;
+    padding-inline: var(--app-drawer-inline-padding, 12px);
     flex-shrink: 0;
   }
 }

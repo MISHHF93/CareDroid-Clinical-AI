@@ -137,6 +137,23 @@ describe('AppShell navigation surfaces', () => {
     }
   });
 
+  it.each([320, 390, 412, 768, 1024, 1440])(
+    'renders one navigation system without bottom nav at %ipx',
+    (width) => {
+      const { container } = renderShell(width);
+
+      expect(screen.getByRole('main')).toHaveAttribute('data-layout-role', 'MainContent');
+      expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
+
+      if (width <= 900) {
+        expect(screen.getByRole('button', { name: /open navigation menu/i })).toBeInTheDocument();
+        fireEvent.click(screen.getByRole('button', { name: /open navigation menu/i }));
+      }
+
+      expect(screen.getAllByRole('navigation', { name: /primary navigation/i })).toHaveLength(1);
+    }
+  );
+
   it('renders dashboard content without a bottom tab bar when sidebar exists', () => {
     const { container } = renderShell(1280, '/dashboard');
 

@@ -86,7 +86,7 @@ for (const pageDef of PAGES) {
 
       if (!overflow.pass) {
         const detail = overflow.offenders
-          .map((o) => `${o.selector} (+${o.overflowPx}px past viewport ${o.viewport})`)
+          .map((o) => `${o.selector} (+${o.overflowPx}px past viewport ${o.viewport}; left ${o.left}, width ${o.width}, right ${o.right})`)
           .join('; ');
         expect(
           overflow.pass,

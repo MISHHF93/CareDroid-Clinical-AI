@@ -29,7 +29,7 @@ const PRIMARY_OPERATION_AREAS = Object.freeze([
     body: 'Review medical device inventory, assignment, maintenance, calibration, firmware, battery, and demo-only action states.',
     path: CANONICAL_ROUTES.devices,
     toolId: 'device-fleet-management',
-    icon: CHROME_ICONS.tools,
+    icon: CHROME_ICONS.smartphone,
     label: 'Open devices',
   },
   {
@@ -37,7 +37,7 @@ const PRIMARY_OPERATION_AREAS = Object.freeze([
     body: 'Monitor connected devices, telemetry parameters, stale readings, and demo/device alert status.',
     path: CANONICAL_ROUTES.medicalIot,
     toolId: 'medical-iot-dashboard',
-    icon: CHROME_ICONS.lineChart,
+    icon: CHROME_ICONS.activity,
     label: 'Open IoT',
   },
 ]);
@@ -64,7 +64,7 @@ const OPERATION_DRILLDOWNS = Object.freeze([
     body: 'Monitor vehicle state, dispatch readiness, and live operational bottlenecks.',
     path: '/fleet/command',
     toolId: 'fleet-command',
-    icon: CHROME_ICONS.tools,
+    icon: CHROME_ICONS.truck,
     label: 'Open command',
   },
   {
@@ -72,7 +72,7 @@ const OPERATION_DRILLDOWNS = Object.freeze([
     body: 'Plan route sequencing while preserving human approval for dispatch decisions.',
     path: '/fleet/route-optimizer',
     toolId: 'route-optimizer',
-    icon: CHROME_ICONS.shareLink,
+    icon: CHROME_ICONS.route,
     label: 'Optimize routes',
   },
   {
@@ -167,7 +167,7 @@ export default function Operations() {
     <section className="operating-workspace" aria-labelledby="operations-title">
       <section className="operating-hero">
         <div className="operating-hero__icon" aria-hidden>
-          <NavIcon icon={CHROME_ICONS.tools} size={28} />
+          <NavIcon icon={CHROME_ICONS.activity} size={28} />
         </div>
         <div className="operating-hero__copy">
           <p className="operating-eyebrow">Operational command</p>
