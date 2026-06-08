@@ -105,7 +105,7 @@ Legacy tool, calculator, assistant, and workspace projections are not deleted. T
 
 The frontend projection declares product and pack taxonomies aligned to backend seed intent:
 
-- Emergency Department Solution
+- Emergency Flow Intelligence Platform
 - Hospital Operations Solution
 - ICU Suite
 - Cardiology Suite

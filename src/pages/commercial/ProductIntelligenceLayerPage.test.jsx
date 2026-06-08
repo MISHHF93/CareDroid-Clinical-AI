@@ -14,13 +14,13 @@ describe('ProductIntelligenceLayerPage', () => {
     expect(screen.getByText('Avg ROI')).toBeInTheDocument();
     expect(screen.getByText('Avg health')).toBeInTheDocument();
     expect(screen.getByText('Avg engagement')).toBeInTheDocument();
-    expect(screen.getByText('Emergency Department Solution')).toBeInTheDocument();
+    expect(screen.getByText('Emergency Flow Intelligence Platform')).toBeInTheDocument();
     expect(screen.getByText('Hospital Operations Command Center')).toBeInTheDocument();
     expect(screen.getByText('AI Governance Suite')).toBeInTheDocument();
     expect(screen.getAllByText('Packs').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Assets').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Outcomes').length).toBeGreaterThan(0);
-    expect(screen.getByText('qSOFA calculator (calculator)')).toBeInTheDocument();
-    expect(screen.getByText(/Triage standardization:/)).toBeInTheDocument();
+    expect(screen.getByText('ED command center (dashboard)')).toBeInTheDocument();
+    expect(screen.getByText(/Bottleneck reduction:/)).toBeInTheDocument();
   });
 });

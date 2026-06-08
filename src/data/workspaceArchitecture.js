@@ -3,7 +3,12 @@ import { getUserFacingToolRegistryProjection } from './toolInventory';
 import {
   EMERGENCY_ANALYTICS_EVENTS,
   EMERGENCY_COMMAND_CENTER_WIDGETS,
+  EMERGENCY_DEMO_TENANT,
+  EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT,
+  EMERGENCY_FLOW_INTELLIGENCE_PLATFORM,
+  EMERGENCY_ONBOARDING_EXPERIENCE,
   EMERGENCY_PATIENT_JOURNEY,
+  EMERGENCY_ROI_ESTIMATOR,
 } from './emergencyOperatingSystem';
 
 export const DEFAULT_CARE_WORKSPACE_ID = 'emergency';
@@ -328,10 +333,11 @@ const CARE_WORKSPACE_BASE = [
     shortLabel: 'Emergency',
     icon: 'Siren',
     path: '/workspace/emergency',
-    description: 'Emergency Department Operating System for triage, patients, evidence, referrals, documentation, IoT, simulations, and disposition.',
+    description:
+      'Emergency Flow Intelligence Platform for ED throughput, capacity, coordination, EMS handoff, triage, bed flow, referrals, discharge, equipment, surge prediction, and Copilot guidance.',
     aiContext:
-      'Prioritize the ED patient journey from arrival through discharge/admission. Collect vitals, chief complaint, and intake data; surface calculators, evidence, workflows, simulations, and human review prompts without autonomous clinical decisions.',
-    routeIds: ['assistant', 'calculators', 'liveMap', 'hospitalMap', 'medicalIot', 'simulation'],
+      'Prioritize ED flow bottlenecks from arrival through admission/discharge. Reduce waiting, handoff delays, bed pressure, referral friction, equipment gaps, and cognitive load while preserving human review and avoiding autonomous clinical decisions.',
+    routeIds: ['assistant', 'commandCenter', 'hospitalMap', 'medicalIot', 'liveMap', 'simulation', 'calculators'],
     toolIds: [
       REGISTRY.qsofa,
       REGISTRY.news2,
@@ -659,9 +665,9 @@ function normalizeMode(config) {
 export const WORKSPACE_FUNCTIONALITY_MODES = Object.freeze({
   emergency: normalizeMode({
     workspaceId: 'emergency',
-    modeName: 'Emergency Department Operating System',
+    modeName: 'Emergency Flow Intelligence Platform',
     purpose:
-      'Unified ED operating flow from patient arrival through triage, assessment, orders, results, disposition, and discharge/admission.',
+      'Unified ED flow intelligence from patient arrival through triage, assessment, orders, results, disposition, and admission/discharge.',
     primaryUsers: ['Emergency physicians', 'Triage nurses', 'Charge nurses', 'EMS coordinators', 'Hospital operations'],
     primaryDataSources: [
       'frontend local/demo data',
@@ -677,6 +683,11 @@ export const WORKSPACE_FUNCTIONALITY_MODES = Object.freeze({
     dashboards: EMERGENCY_COMMAND_CENTER_WIDGETS.map((widget) => widget.id),
     subpages: [
       'dashboard',
+      { id: 'flow', label: EMERGENCY_FLOW_INTELLIGENCE_PLATFORM.title.replace('Emergency ', '') },
+      { id: 'onboarding', label: EMERGENCY_ONBOARDING_EXPERIENCE.title.replace('Emergency Workspace ', '') },
+      { id: 'demo', label: EMERGENCY_DEMO_TENANT.mode === 'demo' ? 'Demo Mode' : 'Demo' },
+      { id: 'roi', label: EMERGENCY_ROI_ESTIMATOR.title.replace('ED ', '') },
+      { id: 'deployment', label: EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.title.replace('First Customer ', '') },
       'triage',
       'patients',
       'referrals',

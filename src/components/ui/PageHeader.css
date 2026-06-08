@@ -30,6 +30,21 @@
   overflow-wrap: anywhere;
 }
 
+.cd-page-header__title-row {
+  align-items: center;
+  display: flex;
+  gap: var(--app-space-sm, 8px);
+  min-width: 0;
+}
+
+.cd-page-header__icon {
+  align-items: center;
+  color: var(--app-accent-action, var(--app-accent-interactive));
+  display: inline-flex;
+  flex: 0 0 auto;
+  justify-content: center;
+}
+
 .cd-page-header__description {
   margin: 8px 0 0;
   color: var(--app-text-secondary);

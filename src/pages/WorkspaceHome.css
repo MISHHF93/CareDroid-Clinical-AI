@@ -579,8 +579,235 @@
   grid-column: 1 / -1;
 }
 
-.emergency-analytics-grid {
+.emergency-demo-layout {
+  display: grid;
+  gap: 16px;
+}
+
+.emergency-demo-summary {
+  display: grid;
+  gap: 10px;
+}
+
+.emergency-demo-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.emergency-demo-card {
+  align-content: start;
+}
+
+.emergency-demo-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.emergency-demo-labels span {
+  width: fit-content;
+  padding: 3px 8px;
+  border: 1px solid color-mix(in srgb, var(--app-warning, #f59e0b) 42%, var(--app-panel-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--app-warning, #f59e0b) 12%, transparent);
+  color: var(--app-warning, #f59e0b);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.emergency-deployment-layout {
+  display: grid;
+  gap: 16px;
+}
+
+.emergency-deployment-principle {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 14px;
+  background: var(--app-surface-2);
+}
+
+.emergency-deployment-principle span,
+.emergency-deployment-principle small {
+  color: var(--muted-text);
+  line-height: 1.4;
+}
+
+.emergency-deployment-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.emergency-deployment-card {
+  align-content: start;
+}
+
+.emergency-flow-layout {
+  display: grid;
+  gap: 16px;
+}
+
+.emergency-flow-stage-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.emergency-flow-stage-list span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 5px 10px;
+  border: 1px solid color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 36%, var(--app-panel-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 10%, transparent);
+  color: var(--text-color);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.emergency-flow-principle {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 14px;
+  background: var(--app-surface-2);
+}
+
+.emergency-flow-principle span,
+.emergency-flow-principle small {
+  color: var(--muted-text);
+  line-height: 1.4;
+}
+
+.emergency-flow-solution-grid,
+.emergency-flow-package-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.emergency-flow-solution-card {
+  align-content: start;
+}
+
+.emergency-flow-registry-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.emergency-roi-layout {
+  display: grid;
+  gap: 16px;
+}
+
+.emergency-roi-input-grid {
+  display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.emergency-roi-input {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.emergency-roi-input span {
+  color: var(--muted-text);
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.emergency-roi-input input {
+  min-height: var(--compact-control-height, 38px);
+  border: 1px solid var(--app-panel-border);
+  border-radius: 12px;
+  background: var(--app-surface-2);
+  color: var(--text-color);
+  padding: 8px 10px;
+}
+
+.emergency-roi-input small,
+.emergency-roi-assumptions small,
+.emergency-roi-assumptions span {
+  color: var(--muted-text);
+  line-height: 1.4;
+}
+
+.emergency-roi-output-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.emergency-roi-assumptions {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 14px;
+  background: var(--app-surface-2);
+}
+
+.emergency-onboarding-layout {
+  display: grid;
+  gap: 16px;
+}
+
+.emergency-onboarding-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.emergency-onboarding-timeline {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.emergency-onboarding-timeline li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 14px;
+  background: var(--app-surface-2);
+}
+
+.emergency-onboarding-timeline li > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  height: 34px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 14%, transparent);
+  color: var(--workspace-os-accent, var(--app-accent-interactive));
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.emergency-onboarding-timeline strong,
+.emergency-onboarding-timeline p {
+  display: block;
+}
+
+.emergency-onboarding-timeline p {
+  margin: 4px 0 10px;
+}
+
+.emergency-analytics-layout {
+  display: grid;
+  gap: 16px;
+}
+
+.emergency-analytics-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .emergency-mvp-package,
@@ -774,12 +1001,27 @@
   .emergency-router-controls,
   .emergency-evidence-grid,
   .emergency-core-capability-list,
+  .emergency-deployment-grid,
+  .emergency-demo-grid,
+  .emergency-flow-package-grid,
+  .emergency-flow-registry-grid,
+  .emergency-flow-solution-grid,
+  .emergency-onboarding-grid,
+  .emergency-roi-input-grid,
   .emergency-addons-grid {
     grid-template-columns: 1fr;
   }
 
   .emergency-dashboard-grid,
   .emergency-command-grid,
+  .emergency-deployment-grid,
+  .emergency-demo-grid,
+  .emergency-flow-package-grid,
+  .emergency-flow-registry-grid,
+  .emergency-flow-solution-grid,
+  .emergency-onboarding-grid,
+  .emergency-roi-input-grid,
+  .emergency-roi-output-grid,
   .emergency-analytics-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -817,6 +1059,14 @@
 
   .emergency-dashboard-grid,
   .emergency-command-grid,
+  .emergency-deployment-grid,
+  .emergency-demo-grid,
+  .emergency-flow-package-grid,
+  .emergency-flow-registry-grid,
+  .emergency-flow-solution-grid,
+  .emergency-onboarding-grid,
+  .emergency-roi-input-grid,
+  .emergency-roi-output-grid,
   .emergency-analytics-grid {
     grid-template-columns: 1fr;
   }

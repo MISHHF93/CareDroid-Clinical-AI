@@ -6,6 +6,12 @@ import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import {
+  DashboardGrid,
+  DashboardSection,
+  MetricCard,
+  PageShell,
+} from '../components/ui/CareDroidPrimitives';
+import {
   LOCAL_MEMORY_DASHBOARD,
   LOCAL_MEMORY_FABRIC_CONTEXT,
   fetchMemoryDashboard,
@@ -113,11 +119,7 @@ function ActivityItem({ item }) {
 
 function MemoryCard({ title, entries, empty }) {
   return (
-    <section className="memory-panel">
-      <div className="memory-panel__heading">
-        <h2>{title}</h2>
-        <span>{entries.length}</span>
-      </div>
+    <DashboardSection className="memory-panel" title={title} actions={<span>{entries.length}</span>}>
       {entries.length > 0 ? (
         <div className="memory-card-list">
           {entries.map((entry) => (
@@ -131,7 +133,7 @@ function MemoryCard({ title, entries, empty }) {
       ) : (
         <p className="memory-empty">{empty}</p>
       )}
-    </section>
+    </DashboardSection>
   );
 }
 
@@ -361,43 +363,25 @@ export default function MemoryDashboard() {
   ];
 
   return (
-    <main className="memory-dashboard">
-      <section className="memory-hero" aria-labelledby="memory-dashboard-title">
-        <div className="memory-hero__icon" aria-hidden>
-          <NavIcon icon={CHROME_ICONS.brain} size={28} />
-        </div>
-        <div>
-          <p className="memory-eyebrow">CareDroid memory architecture</p>
-          <h1 id="memory-dashboard-title">Memory Dashboard</h1>
-          <p>
-            Tracks the active clinical session, long-term user context, and clinical memory used to
-            ground CareDroid responses.
-          </p>
-        </div>
-      </section>
+    <PageShell
+      className="memory-dashboard"
+      eyebrow="CareDroid memory architecture"
+      title="Memory Dashboard"
+      titleId="memory-dashboard-title"
+      description="Tracks the active clinical session, long-term user context, and clinical memory used to ground CareDroid responses."
+      leadingIcon={<NavIcon icon={CHROME_ICONS.brain} size={28} />}
+    >
 
       {notice ? <p className="memory-notice">{notice}</p> : null}
 
-      <section className="memory-stats" aria-label="Memory summary">
-        <div>
-          <strong>{counts.shortTerm}</strong>
-          <span>Short-term slots</span>
-        </div>
-        <div>
-          <strong>{counts.longTerm}</strong>
-          <span>Long-term memories</span>
-        </div>
-        <div>
-          <strong>{counts.clinical}</strong>
-          <span>Clinical memories</span>
-        </div>
-        <div>
-          <strong>{fabricContext.workspaceMemory?.visibleAssetIds?.length || 0}</strong>
-          <span>Fabric assets</span>
-        </div>
-      </section>
+      <DashboardGrid variant="metrics" className="memory-stats" aria-label="Memory summary">
+        <MetricCard label="Short-term slots" value={counts.shortTerm} />
+        <MetricCard label="Long-term memories" value={counts.longTerm} />
+        <MetricCard label="Clinical memories" value={counts.clinical} />
+        <MetricCard label="Fabric assets" value={fabricContext.workspaceMemory?.visibleAssetIds?.length || 0} />
+      </DashboardGrid>
 
-      <section className="memory-context-grid" aria-label="AI memory fabric">
+      <DashboardGrid className="memory-context-grid" aria-label="AI memory fabric">
         {fabricCards.map((card) => (
           <MemoryCard
             key={card.title}
@@ -406,20 +390,22 @@ export default function MemoryDashboard() {
             empty={card.empty}
           />
         ))}
-      </section>
+      </DashboardGrid>
 
-      <section className="memory-layout">
+      <DashboardGrid className="memory-layout">
         <MemoryCard
           title="Recent Conversations"
           entries={recentConversations}
           empty="Recent assistant conversations will appear here as short-term memory."
         />
 
-        <section className="memory-panel memory-panel--activity" aria-labelledby="memory-activity-title">
-          <div className="memory-panel__heading">
-            <h2 id="memory-activity-title">Recent Activity</h2>
-            <span>{loading ? 'Loading' : `${recentActivity.length} items`}</span>
-          </div>
+        <DashboardSection
+          className="memory-panel memory-panel--activity"
+          aria-labelledby="memory-activity-title"
+          title="Recent Activity"
+          titleId="memory-activity-title"
+          actions={<span>{loading ? 'Loading' : `${recentActivity.length} items`}</span>}
+        >
           {recentActivity.length > 0 ? (
             <ul className="memory-activity-list">
               {recentActivity.map((item) => (
@@ -429,10 +415,10 @@ export default function MemoryDashboard() {
           ) : (
             <p className="memory-empty">No memory activity has been captured yet.</p>
           )}
-        </section>
-      </section>
+        </DashboardSection>
+      </DashboardGrid>
 
-      <section className="memory-layout">
+      <DashboardGrid className="memory-layout">
         <MemoryCard
           title="Saved Workflows"
           entries={savedWorkflows}
@@ -444,9 +430,9 @@ export default function MemoryDashboard() {
           entries={recentToolEntries}
           empty="Recently used assistant tools and calculators will appear here."
         />
-      </section>
+      </DashboardGrid>
 
-      <section className="memory-context-grid" aria-label="AI context">
+      <DashboardGrid className="memory-context-grid" aria-label="AI context">
         <MemoryCard
           title="AI Context"
           entries={shortEntries}
@@ -457,19 +443,15 @@ export default function MemoryDashboard() {
           entries={clinicalEntries}
           empty="Findings, summaries, and scores will appear after clinical memory is recorded."
         />
-        <section className="memory-panel">
-          <div className="memory-panel__heading">
-            <h2>Long-Term Context</h2>
-            <span>{counts.longTerm}</span>
-          </div>
+        <DashboardSection className="memory-panel" title="Long-Term Context" actions={<span>{counts.longTerm}</span>}>
           <p className="memory-empty">
             Preferences, history, and saved tools become durable context for future sessions.
           </p>
           <Link className="memory-link" to="/profile/preferences">
             Review preferences
           </Link>
-        </section>
-      </section>
-    </main>
+        </DashboardSection>
+      </DashboardGrid>
+    </PageShell>
   );
 }

@@ -76,7 +76,7 @@ describe('PlatformContextService', () => {
       {
         id: 'product-emergency-department',
         slug: 'emergency-department-suite',
-        name: 'Emergency Department Solution',
+        name: 'Emergency Flow Intelligence Platform',
         productType: 'emergency_department',
         packIds: ['emergency-department-pack'],
       },
@@ -117,7 +117,7 @@ describe('PlatformContextService', () => {
     expect(context.assignedProducts).toEqual([
       expect.objectContaining({
         id: 'product-emergency-department',
-        name: 'Emergency Department Solution',
+        name: 'Emergency Flow Intelligence Platform',
         packIds: ['emergency-department-pack'],
       }),
     ]);

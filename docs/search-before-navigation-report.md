@@ -35,7 +35,7 @@ Every major capability should be:
 ### Global Search
 
 - **Finding:** `searchFirstDiscovery` was the best canonical search index, but it lacked commercial/catalog row-level entries.
-- **Impact:** Users could find top-level commercial pages but not common launch targets such as Emergency Department Solution, Sepsis Care Pathway, FHIR Patient Integration, or AI agents.
+- **Impact:** Users could find top-level commercial pages but not common launch targets such as Emergency Flow Intelligence Platform, Sepsis Care Pathway, FHIR Patient Integration, or AI agents.
 - **Repair:** Added commercial capability and row-level entries to the shared search-first index.
 
 ### AI Search

@@ -3,8 +3,10 @@ import './PageHeader.css';
 export default function PageHeader({
   eyebrow,
   title,
+  titleId,
   description,
   actions,
+  leadingIcon,
   children,
   compact = false,
   className = '',
@@ -19,7 +21,10 @@ export default function PageHeader({
     >
       <div className="cd-page-header__content">
         {eyebrow ? <p className="cd-page-header__eyebrow">{eyebrow}</p> : null}
-        <h1 className="cd-page-header__title">{title}</h1>
+        <div className="cd-page-header__title-row">
+          {leadingIcon ? <span className="cd-page-header__icon" aria-hidden>{leadingIcon}</span> : null}
+          <h1 id={titleId} className="cd-page-header__title">{title}</h1>
+        </div>
         {description ? <p className="cd-page-header__description">{description}</p> : null}
         {children}
       </div>

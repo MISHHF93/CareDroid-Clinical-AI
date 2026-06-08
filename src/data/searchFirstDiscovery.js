@@ -132,11 +132,22 @@ const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
 const COMMERCIAL_ROW_LEVEL_ENTRIES = Object.freeze([
   {
     id: 'specialty-emergency',
-    title: 'Emergency Department Solution',
-    description: 'Emergency specialty capabilities, triage workflows, calculators, alerts, and command routes.',
+    title: 'Emergency Flow Intelligence Platform',
+    description: 'Emergency specialty capabilities, ED flow workflows, EMS handoff, bottleneck reduction, triage, command routes, and alerts.',
     path: `${CANONICAL_ROUTES.specialties}/emergency`,
     workspaceIds: ['emergency'],
-    aliases: ['ed', 'emergency medicine', 'triage solution', 'rapid response'],
+    aliases: [
+      'ed',
+      'emergency medicine',
+      'emergency flow intelligence',
+      'ems handoff',
+      'ambulance offload',
+      'bed flow',
+      'boarding pressure',
+      'surge prediction',
+      'triage solution',
+      'rapid response',
+    ],
   },
   {
     id: 'specialty-cardiology',

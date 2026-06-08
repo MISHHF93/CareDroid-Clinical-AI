@@ -40,7 +40,7 @@ describe('automationRegistry', () => {
   it('packages requested sellable healthcare solutions', () => {
     expect(getAutomationSolutionPackages().map((solution) => solution.title)).toEqual(
       expect.arrayContaining([
-        'Emergency Department Solution',
+        'Emergency Flow Intelligence Platform',
         'Laboratory Intelligence Solution',
         'Medical IoT Solution',
         'Fleet Operations Solution',
@@ -106,9 +106,9 @@ describe('automationRegistry', () => {
       'discharge-admission',
     ]);
     expect(emergency.products.map((product) => product.title)).toEqual([
-      'Emergency Core',
-      'Emergency Professional',
-      'Emergency Enterprise',
+      'Emergency Flow Starter',
+      'Emergency Flow Professional',
+      'Emergency Flow Enterprise',
     ]);
     expect(emergency.coreMvpPackage.includedCapabilities.map((capability) => capability.label)).toEqual([
       'qSOFA',
@@ -122,7 +122,7 @@ describe('automationRegistry', () => {
       'Workflow Guidance',
       'Workspace Dashboard',
     ]);
-    expect(emergency.products.find((product) => product.title === 'Emergency Core')).toEqual(
+    expect(emergency.products.find((product) => product.title === 'Emergency Flow Starter')).toEqual(
       expect.objectContaining({
         mvpPackageId: 'emergency-core-mvp',
         automationIds: ['emergency-automated-triage-matrix'],
@@ -141,7 +141,7 @@ describe('automationRegistry', () => {
       ])
     );
     expect(emergency.analyticsEvents).toEqual(
-      expect.arrayContaining(['triage_volume', 'calculator_utilization', 'automation_execution'])
+      expect.arrayContaining(['assessments_completed', 'calculators_used', 'workflow_launches'])
     );
   });
 

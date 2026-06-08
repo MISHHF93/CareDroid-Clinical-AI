@@ -39,7 +39,7 @@ const graph = {
       type: 'missing-dependency',
       severity: 'high',
       title: 'Missing product pack dependency',
-      detail: 'Emergency Department Solution references missing asset pack missing-pack.',
+      detail: 'Emergency Flow Intelligence Platform references missing asset pack missing-pack.',
     },
     {
       id: 'duplicate-pack',
@@ -59,7 +59,7 @@ const graph = {
   chains: [
     {
       id: 'product-emergency:emergency-pack:qsofa',
-      product: { id: 'product-emergency', name: 'Emergency Department Solution' },
+      product: { id: 'product-emergency', name: 'Emergency Flow Intelligence Platform' },
       assetPack: { id: 'emergency-pack', name: 'Emergency Department Pack' },
       asset: { id: 'qsofa', title: 'qSOFA', assetType: 'calculator', dependencies: [] },
       route: '/tools/calculators/qsofa',
@@ -84,7 +84,7 @@ describe('DependencyGraph', () => {
     expect(screen.getByText('Asset Packs')).toBeInTheDocument();
     expect(screen.getByText('Backend Services')).toBeInTheDocument();
     expect(screen.getByText('Integrations')).toBeInTheDocument();
-    expect(screen.getAllByText('Emergency Department Solution').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Emergency Flow Intelligence Platform').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Emergency Department Pack').length).toBeGreaterThan(0);
     expect(screen.getAllByText('qSOFA').length).toBeGreaterThan(0);
     expect(screen.getAllByText('/tools/calculators/qsofa').length).toBeGreaterThan(0);

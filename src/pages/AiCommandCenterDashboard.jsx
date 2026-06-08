@@ -7,6 +7,11 @@ import {
 } from '../components/dashboard/DashboardVisualizations';
 import ContextInsightCard from '../components/ContextInsightCard';
 import StateSourceNotice from '../components/StateSourceNotice';
+import {
+  DashboardGrid,
+  DashboardSection,
+  PageShell,
+} from '../components/ui/CareDroidPrimitives';
 import { useSystemConfig } from '../contexts/SystemConfigContext';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { NavIcon } from '../navigation/NavIcon';
@@ -123,22 +128,18 @@ function expertLoadBars(experts = []) {
 }
 
 function Panel({ title, icon, description, children, className = '' }) {
+  const titleId = `${title.replace(/\W+/g, '-').toLowerCase()}-panel-title`;
   return (
-    <section
+    <DashboardSection
       className={`ai-command-panel ${className}`.trim()}
-      aria-labelledby={`${title.replace(/\W+/g, '-').toLowerCase()}-panel-title`}
+      aria-labelledby={titleId}
+      title={title}
+      titleId={titleId}
+      description={description}
+      leadingIcon={<span className="ai-command-panel__icon"><NavIcon icon={icon} size={18} /></span>}
     >
-      <div className="ai-command-panel__header">
-        <span className="ai-command-panel__icon" aria-hidden>
-          <NavIcon icon={icon} size={18} />
-        </span>
-        <div>
-          <h2 id={`${title.replace(/\W+/g, '-').toLowerCase()}-panel-title`}>{title}</h2>
-          {description ? <p>{description}</p> : null}
-        </div>
-      </div>
       {children}
-    </section>
+    </DashboardSection>
   );
 }
 
@@ -234,16 +235,13 @@ export default function AiCommandCenterDashboard() {
   const sourceStatus = snapshot.sourceStatus || EMPTY_SNAPSHOT.sourceStatus;
 
   return (
-    <main className="ai-command-center">
-      <section className="ai-command-hero" aria-labelledby="ai-command-center-title">
-        <div>
-          <p className="ai-command-eyebrow">AI operations source mix</p>
-          <h1 id="ai-command-center-title">AI Command Center</h1>
-          <p>
-            Compact operational view of AI health, experts, RAG, memory, tools, spend, safety,
-            retrieval quality, and audit activity.
-          </p>
-        </div>
+    <PageShell
+      className="ai-command-center"
+      eyebrow="AI operations source mix"
+      title="AI Command Center"
+      titleId="ai-command-center-title"
+      description="Compact operational view of AI health, experts, RAG, memory, tools, spend, safety, retrieval quality, and audit activity."
+      actions={
         <div className="ai-command-live">
           <span
             className={`ai-command-live__dot ai-command-live__dot--${snapshot.health.status}`}
@@ -263,7 +261,8 @@ export default function AiCommandCenterDashboard() {
             Refresh
           </button>
         </div>
-      </section>
+      }
+    >
 
       {snapshot.warnings.length ? (
         <section className="ai-command-warning" aria-label="Data source warnings">
@@ -284,7 +283,7 @@ export default function AiCommandCenterDashboard() {
         details="AI health, memory, cost, retrieval, and audit panels may combine backend snapshots with fallback/local metrics. Source status is shown above; backend-unavailable panels must not be interpreted as live production AI telemetry."
       />
 
-      <section className="ai-command-insights" aria-label="AI command center context insights">
+      <DashboardGrid className="ai-command-insights" aria-label="AI command center context insights">
         <ContextInsightCard
           title="Source mix"
           message={`Evaluation ${sourceStatus.evaluation}, memory ${sourceStatus.memory}, cost ${sourceStatus.cost}.`}
@@ -311,9 +310,9 @@ export default function AiCommandCenterDashboard() {
           actionLabel="Open audit"
           actionRoute={CANONICAL_ROUTES.audit}
         />
-      </section>
+      </DashboardGrid>
 
-      <section className="ai-command-metrics" aria-label="AI command center summary">
+      <DashboardGrid variant="metrics" className="ai-command-metrics" aria-label="AI command center summary">
         <MetricCard
           label="AI health"
           value={snapshot.health.label}
@@ -360,9 +359,9 @@ export default function AiCommandCenterDashboard() {
           hint={`${percent(snapshot.ragMetrics.cacheHitRate)} cache hit rate`}
           tone={snapshot.retrievalQuality.precision >= 0.85 ? 'good' : 'warning'}
         />
-      </section>
+      </DashboardGrid>
 
-      <section className="ai-command-grid" aria-label="AI command center panels">
+      <DashboardGrid className="ai-command-grid" aria-label="AI command center panels">
         <Panel
           title="AI Health"
           icon={CHROME_ICONS.shield}
@@ -545,7 +544,7 @@ export default function AiCommandCenterDashboard() {
             )}
           </div>
         </Panel>
-      </section>
-    </main>
+      </DashboardGrid>
+    </PageShell>
   );
 }

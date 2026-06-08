@@ -9,21 +9,27 @@ import {
   getWorkspaceAutomations,
 } from '../data/automationRegistry';
 import {
-  EMERGENCY_ANALYTICS_EVENTS,
+  EMERGENCY_ANALYTICS_MVP,
   EMERGENCY_AI_COPILOT,
   EMERGENCY_CHIEF_COMPLAINT_ROUTES,
   EMERGENCY_COMMAND_CENTER_WIDGETS,
   EMERGENCY_CORE_MVP_PACKAGE,
   EMERGENCY_CUSTOMER_READINESS_CAPABILITIES,
   EMERGENCY_DASHBOARD_WIDGETS,
+  EMERGENCY_DEMO_TENANT,
   EMERGENCY_FASTEST_TO_MARKET_OFFERINGS,
+  EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT,
+  EMERGENCY_FLOW_INTELLIGENCE_PLATFORM,
+  EMERGENCY_ONBOARDING_EXPERIENCE,
   EMERGENCY_OPTIONAL_ADD_ONS,
   EMERGENCY_PATIENT_JOURNEY,
   EMERGENCY_RAG_COMPLAINT_CONTEXT,
+  EMERGENCY_ROI_ESTIMATOR,
   EMERGENCY_SOLUTION_PACKAGES,
   EMERGENCY_TRIAGE_ORCHESTRATOR,
   EMERGENCY_WORKSPACE_ID,
   buildEmergencyCopilotGuidance,
+  estimateEmergencyRoi,
   summarizeEmergencyCustomerReadiness,
 } from '../data/emergencyOperatingSystem';
 import { workspaceFilterSummary } from '../data/platformOperatingSystem';
@@ -128,16 +134,7 @@ function buildAnalytics(model, mode, recommendations, alerts) {
         : 0,
   };
   if (model.workspace.id === EMERGENCY_WORKSPACE_ID) {
-    analytics.emergency = {
-      triageVolume: 68,
-      calculatorUtilization: 41,
-      referralVolume: 9,
-      documentationDrafts: 14,
-      aiRecommendationAcceptance: 0.73,
-      automationExecution: automations.length,
-      simulationCompletion: 6,
-      trackedEvents: EMERGENCY_ANALYTICS_EVENTS,
-    };
+    analytics.emergency = EMERGENCY_ANALYTICS_MVP;
   }
   return analytics;
 }
@@ -167,6 +164,9 @@ export const WorkspaceDataPipelineService = {
               patientJourney: EMERGENCY_PATIENT_JOURNEY,
               dashboardWidgets: EMERGENCY_DASHBOARD_WIDGETS,
               commandCenterWidgets: EMERGENCY_COMMAND_CENTER_WIDGETS,
+              demoTenant: EMERGENCY_DEMO_TENANT,
+              firstCustomerDeployment: EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT,
+              flowIntelligencePlatform: EMERGENCY_FLOW_INTELLIGENCE_PLATFORM,
               chiefComplaintRoutes: EMERGENCY_CHIEF_COMPLAINT_ROUTES,
               aiCopilot: {
                 ...EMERGENCY_AI_COPILOT,
@@ -179,6 +179,10 @@ export const WorkspaceDataPipelineService = {
               },
               triageOrchestrator: EMERGENCY_TRIAGE_ORCHESTRATOR,
               ragComplaintContext: EMERGENCY_RAG_COMPLAINT_CONTEXT,
+              analyticsMvp: EMERGENCY_ANALYTICS_MVP,
+              onboarding: EMERGENCY_ONBOARDING_EXPERIENCE,
+              roiEstimator: EMERGENCY_ROI_ESTIMATOR,
+              roiEstimate: estimateEmergencyRoi(),
               productTiers: EMERGENCY_SOLUTION_PACKAGES,
               mvpPackage: EMERGENCY_CORE_MVP_PACKAGE,
               optionalAddOns: EMERGENCY_OPTIONAL_ADD_ONS,

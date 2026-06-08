@@ -21,17 +21,17 @@ const PRODUCTIZATION_METADATA = {
     ],
     requiredBackendCapabilities: [
       'Organization entitlement installation for emergency-department-pack and emergency-medicine',
-      'Emergency workspace presets for triage, alerts, calculators, protocols, maps, and simulation assets',
+      'Emergency workspace presets for ED command center, patient flow, triage, EMS handoff, referrals, analytics, and flow intelligence assets',
       'Role profiles for emergency physician and nurse recommendations',
-      'Clinical scoring, protocol launch, simulation launch, audit logging, and asset access projection',
-      'Organization analytics for launches, protocol usage, score usage, simulation completions, and workflow adoption',
+      'Clinical scoring, protocol launch, workflow launch, simulation launch, audit logging, and asset access projection',
+      'Organization analytics for ED flow bottlenecks, workflow launches, protocol usage, score usage, simulation completions, and adoption',
     ],
     requiredIntegrations: [
-      'EHR patient context through FHIR Patient, Encounter, Condition, MedicationRequest, and Observation',
-      'HL7 ADT feed for arrival, location, bed, and discharge events',
-      'Laboratory feed through FHIR DiagnosticReport and Observation',
-      'Imaging/PACS or radiology report links for stroke, trauma, and chest pain workflows',
-      'SSO/IAM and role provisioning for ED staff',
+      'Optional EHR patient context through FHIR Patient, Encounter, Condition, MedicationRequest, and Observation',
+      'Optional HL7 ADT feed for arrival, location, bed, and discharge events',
+      'Optional EMS CAD or ePCR handoff source for pre-hospital intelligence',
+      'Optional laboratory feed through FHIR DiagnosticReport and Observation',
+      'Optional SSO/IAM and role provisioning for ED staff',
     ],
     aiWorkflows: [
       'Triage risk summary from vitals, chief complaint, history, and labs',
@@ -41,13 +41,13 @@ const PRODUCTIZATION_METADATA = {
       'Simulation debrief summaries for emergency scenarios',
     ],
     dashboards: [
-      'ED command dashboard',
+      'ED flow command center',
       'Triage acuity and deterioration dashboard',
-      'Stroke, chest pain, and sepsis pathway dashboard',
-      'ED simulation and competency dashboard',
+      'EMS handoff and offload readiness dashboard',
+      'Bed pressure, referral queue, equipment, and staffing pressure dashboard',
     ],
-    pricingTierPlaceholder: 'Enterprise',
-    readinessLabels: ['integration-required', 'governance-required'],
+    pricingTierPlaceholder: 'Starter / Professional / Enterprise',
+    readinessLabels: ['standalone-demo-ready', 'starter-pilot-ready', 'optional-integrations'],
   },
   icu: {
     targetUsers: [
@@ -408,7 +408,7 @@ const PRODUCTIZATION_METADATA = {
 };
 
 export const REQUIRED_SELLABLE_PRODUCT_NAMES = [
-  'Emergency Department Solution',
+  'Emergency Flow Intelligence Platform',
   'Hospital Operations Solution',
   'Medical IoT Solution',
   'Simulation & Training Solution',
@@ -420,9 +420,9 @@ const RAW_SEED_PRODUCTS = [
   {
     id: 'product-emergency-department',
     slug: 'emergency-department-suite',
-    name: 'Emergency Department Solution',
+    name: 'Emergency Flow Intelligence Platform',
     description:
-      'ED risk stratification, triage calculators, trauma simulation, stroke and chest pain workflows.',
+      'ED and EMS flow intelligence for throughput, handoff, dynamic triage, bed pressure, referrals, discharge acceleration, equipment, surge prediction, Copilot, and command-center operations.',
     productType: ProductType.EMERGENCY_DEPARTMENT,
     packIds: ['emergency-department-pack', 'emergency-medicine'],
     highlightAssetIds: [
@@ -433,10 +433,15 @@ const RAW_SEED_PRODUCTS = [
       'automation-news2-clinician-notification',
       'automation-potassium-lab-workflow',
     ],
-    outcomes: ['faster risk stratification', 'standardized triage', 'simulation training'],
-    targetBuyers: ['ED director', 'hospital operations'],
+    outcomes: [
+      'reduced ED bottlenecks',
+      'improved EMS-to-ED handoff coordination',
+      'better bed flow and capacity visibility',
+      'lower clinician coordination burden',
+    ],
+    targetBuyers: ['ED director', 'COO', 'EMS leadership', 'hospital operations'],
     complexity: 'medium',
-    commercialPlanIds: ['professional', 'enterprise'],
+    commercialPlanIds: ['starter', 'professional', 'enterprise'],
     ...PRODUCTIZATION_METADATA.emergencyDepartment,
     sortOrder: 1,
   },
@@ -620,9 +625,9 @@ const RAW_SEED_PRODUCTS = [
 
 const OUTCOME_LABELS_BY_PRODUCT_ID: Record<string, string[]> = {
   'product-emergency-department': [
-    'Reduce triage time',
-    'Improve protocol adherence',
-    'Improve simulation readiness',
+    'Reduce ED bottlenecks',
+    'Improve EMS-to-ED handoff',
+    'Improve bed flow visibility',
   ],
   'product-hospital-operations': ['Improve asset visibility'],
   'product-icu': ['Improve sepsis detection', 'Improve protocol adherence'],

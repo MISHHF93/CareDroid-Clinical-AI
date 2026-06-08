@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { PageShell } from '../../components/ui/CareDroidPrimitives';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import './fleetUxShared.css';
@@ -44,33 +45,38 @@ export default function FleetPageChrome({
       >
         Skip to main content
       </a>
-      <header className="fleet-page-header">
-        <button
-          type="button"
-          className="fleet-back-btn"
-          onClick={() => navigate('/operations')}
-          aria-label="Back to operations"
-        >
-          <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
-          <span style={{ marginLeft: 6 }}>Back to operations</span>
-        </button>
-        <h1 id={`${toolId}-page-title`}>
-          <NavIcon icon={getToolIcon(toolId)} size={28} aria-hidden />
-          {title}
-        </h1>
-        {lead ? <p className="fleet-page-lead">{lead}</p> : null}
+      <PageShell
+        as="section"
+        className="fleet-page-chrome"
+        headerClassName="fleet-page-header"
+        titleId={`${toolId}-page-title`}
+        title={title}
+        description={lead}
+        leadingIcon={<NavIcon icon={getToolIcon(toolId)} size={28} />}
+        actions={
+          <button
+            type="button"
+            className="fleet-back-btn"
+            onClick={() => navigate('/operations')}
+            aria-label="Back to operations"
+          >
+            <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
+            <span style={{ marginLeft: 6 }}>Back to operations</span>
+          </button>
+        }
+      >
         {safetyNote ? (
           <FleetOperationalBanner variant={safetyVariant}>{safetyNote}</FleetOperationalBanner>
         ) : null}
-      </header>
-      <section
-        id={mainId}
-        className="fleet-page-content"
-        tabIndex={-1}
-        aria-labelledby={`${toolId}-page-title`}
-      >
-        {children}
-      </section>
+        <section
+          id={mainId}
+          className="fleet-page-content"
+          tabIndex={-1}
+          aria-labelledby={`${toolId}-page-title`}
+        >
+          {children}
+        </section>
+      </PageShell>
     </>
   );
 }

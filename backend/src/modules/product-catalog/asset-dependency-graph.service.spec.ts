@@ -22,7 +22,7 @@ describe('AssetDependencyGraphService', () => {
         {
           id: 'product-emergency',
           slug: 'emergency',
-          name: 'Emergency Department Solution',
+          name: 'Emergency Flow Intelligence Platform',
           productType: ProductType.EMERGENCY_DEPARTMENT,
           packIds: ['emergency-pack'],
           highlightAssetIds: [],
@@ -61,7 +61,7 @@ describe('AssetDependencyGraphService', () => {
 
     expect(graph.chains).toHaveLength(1);
     expect(graph.chains[0]).toMatchObject({
-      product: { id: 'product-emergency', name: 'Emergency Department Solution' },
+      product: { id: 'product-emergency', name: 'Emergency Flow Intelligence Platform' },
       assetPack: { id: 'emergency-pack', name: 'Emergency Department Pack' },
       asset: { id: 'qsofa', title: 'qSOFA' },
       route: '/tools/calculators/qsofa',
@@ -85,7 +85,7 @@ describe('AssetDependencyGraphService', () => {
         {
           id: 'product-emergency',
           slug: 'emergency',
-          name: 'Emergency Department Solution',
+          name: 'Emergency Flow Intelligence Platform',
           productType: ProductType.EMERGENCY_DEPARTMENT,
           packIds: ['emergency-pack', 'emergency-pack', 'missing-pack'],
           highlightAssetIds: ['missing-highlight'],
@@ -143,7 +143,7 @@ describe('AssetDependencyGraphService', () => {
         {
           id: 'product-emergency',
           slug: 'emergency',
-          name: 'Emergency Department Solution',
+          name: 'Emergency Flow Intelligence Platform',
           packIds: ['core-platform', 'premium-pack'],
           highlightAssetIds: [],
         },

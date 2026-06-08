@@ -2,13 +2,13 @@
 
 ## Executive Readiness View
 
-CareDroid's Emergency Workspace is sellable today as a frontend-led Emergency Department Operating System demo and first-customer pilot for triage standardization, ED command visibility, evidence surfacing, documentation readiness, and simulation practice. The strongest near-term offer is not autonomous clinical decision support. It is a review-required ED operations layer that organizes calculators, queues, evidence, and workflows around the ED patient journey.
+CareDroid's Emergency Workspace is sellable today as a frontend-led Emergency Flow Intelligence demo and first-customer pilot for throughput visibility, EMS handoff, triage standardization, ED command visibility, evidence surfacing, documentation readiness, and simulation practice. The strongest near-term offer is not autonomous clinical decision support. It is a review-required ED operations layer that organizes flow, queues, handoffs, evidence, and workflows around the ED patient journey.
 
 ## Stakeholder Lens
 
 ### ED Director
 
-The strongest value is standardized triage, high-risk visibility, complaint-specific evidence, and a coherent ED patient journey from arrival to discharge/admission. The ED Director can buy a pilot around triage calculator adoption, protocol surfacing, and high-risk patient review without waiting for deep EHR integration.
+The strongest value is standardized triage, high-risk visibility, EMS-to-ED handoff support, complaint-specific evidence, and a coherent ED patient journey from arrival to discharge/admission. The ED Director can buy a pilot around flow visibility, protocol surfacing, and high-risk patient review without waiting for deep EHR integration.
 
 ### Chief Nursing Officer
 
@@ -26,7 +26,7 @@ The strongest value is a structured implementation map. Standalone capabilities 
 
 | Capability | Classification | Can run standalone | Requires EHR access | Requires integrations | Buyer fit | First-customer note |
 |---|---|---:|---:|---:|---|---|
-| Automated Triage Matrix | Ready to sell | Yes | No for pilot, yes for production | Optional for pilot | ED Director, CNO, Clinical Informatics Lead | Sell as a triage calculator and risk-profile pilot with manual intake and clinician review. |
+| Automated Triage Matrix | Ready to sell | Yes | No for pilot, yes for production | Optional for pilot | ED Director, CNO, Clinical Informatics Lead | Sell as a flow-aware triage and risk-profile pilot with manual intake and clinician review. |
 | RAG Evidence Retrieval | Ready to sell | Yes | No | Optional protocol library | ED Director, Clinical Informatics Lead | Sell as complaint-specific protocols, evidence, calculators, workflows, and simulations with citations/review. |
 | Simulation Academy | Ready to sell | Yes | No | Optional LMS | CNO, ED Director | Sell as scenario recommendation and debrief support for sepsis, stroke, trauma, chest pain, and dyspnea. |
 | ED Command Dashboard | Ready to sell | Yes with demo/local data | No for pilot, yes for live census | Optional for pilot | COO, ED Director, CNO | Sell as a command-center pilot using local/demo or CSV-fed data before live ADT/EHR. |
@@ -40,7 +40,7 @@ The strongest value is a structured implementation map. Standalone capabilities 
 
 ## What Can Be Sold Today
 
-- ED Triage Calculator Pack: qSOFA, NEWS2, HEART, Wells PE, Wells DVT, Shock Index, and clinician-review risk profile.
+- Emergency Flow Starter: qSOFA, NEWS2, HEART, Wells PE, Wells DVT, Shock Index, clinician-review risk profile, ED command visibility, and guided next workflow.
 - ED Evidence Companion: complaint-specific evidence, protocols, calculators, workflows, and simulations for chest pain, stroke symptoms, sepsis concern, trauma, and shortness of breath.
 - Simulation Academy Starter: ED scenario recommendations and debrief support using standalone simulation assets.
 - ED Command Dashboard Pilot: waiting room, active patients, high-risk patients, alerts, staffing, referral, and documentation queue views with local/demo data.
@@ -73,7 +73,7 @@ The strongest value is a structured implementation map. Standalone capabilities 
 
 ## Top 5 Fastest-To-Market ED Offerings
 
-1. ED Triage Calculator Pack.
+1. Emergency Flow Starter.
 2. ED Evidence Companion.
 3. Simulation Academy Starter.
 4. ED Command Dashboard Pilot.
@@ -88,4 +88,4 @@ The strongest value is a structured implementation map. Standalone capabilities 
 
 ## Recommendation
 
-Lead with Emergency Core as a first-customer pilot: triage calculator pack, ED evidence companion, dashboard pilot, and documentation readiness demo. Position Emergency Professional and Emergency Enterprise as integration expansion paths, not prerequisites for the first sale.
+Lead with Emergency Flow Starter as a first-customer pilot: flow-aware triage, ED evidence companion, dashboard pilot, and documentation readiness demo. Position Emergency Flow Professional and Emergency Flow Enterprise as integration expansion paths, not prerequisites for the first sale.

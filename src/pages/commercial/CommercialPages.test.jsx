@@ -66,8 +66,8 @@ const productGraph = {
   product: {
     id: 'product-emergency-department',
     slug: 'emergency-department-suite',
-    name: 'Emergency Department Solution',
-    description: 'ED risk stratification and triage workflows.',
+    name: 'Emergency Flow Intelligence Platform',
+    description: 'ED flow intelligence, EMS handoff, triage, bed pressure, and command workflows.',
     packIds: ['emergency-department-pack'],
     targetBuyers: ['ED director'],
     buyerPersona: ['ED Director', 'Chief Medical Officer'],
@@ -122,8 +122,8 @@ const productGraph = {
       product: {
         id: 'product-emergency-department',
         slug: 'emergency-department-suite',
-        name: 'Emergency Department Solution',
-        description: 'ED risk stratification and triage workflows.',
+        name: 'Emergency Flow Intelligence Platform',
+        description: 'ED flow intelligence, EMS handoff, triage, bed pressure, and command workflows.',
         targetBuyers: ['ED director'],
         buyerPersona: ['ED Director', 'Chief Medical Officer'],
         decisionMaker: ['ED Director'],
@@ -148,7 +148,7 @@ const packGraph = {
   decisionMaker: ['ED Director'],
   stakeholders: ['Emergency physicians', 'Triage nurses'],
   expectedOutcomes: ['standardized triage'],
-  products: [{ id: 'product-emergency-department', name: 'Emergency Department Solution' }],
+  products: [{ id: 'product-emergency-department', name: 'Emergency Flow Intelligence Platform' }],
   assets: [{ id: 'qsofa', title: 'qSOFA', route: '/tools/calculators/qsofa', backendServices: ['ClinicalTools'] }],
 };
 
@@ -392,7 +392,7 @@ describe('Commercial builder pages', () => {
     ProductCatalogApi.listSpecialties.mockResolvedValue(specialtyRows);
     ProductCatalogApi.getHospitalSolutionRecommendation.mockResolvedValue({
       recommendedCommercialPlanId: 'enterprise',
-      products: [{ id: 'product-emergency-department', name: 'Emergency Department Solution' }],
+      products: [{ id: 'product-emergency-department', name: 'Emergency Flow Intelligence Platform' }],
       packs: [{ id: 'emergency-department-pack', name: 'Emergency Department Pack' }],
       workspaces: [{ id: 'emergency', name: 'Emergency Department' }],
       aiAgents: [{ id: 'agent-emergency', title: 'Emergency AI' }],

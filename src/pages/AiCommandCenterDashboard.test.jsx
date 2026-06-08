@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import AiCommandCenterDashboard from './AiCommandCenterDashboard';
 
 vi.mock('./AiCommandCenterDashboard.css', () => ({}));
@@ -128,7 +129,11 @@ describe('AiCommandCenterDashboard', () => {
 
   it('renders all AI command center panels and charts', async () => {
     const setIntervalSpy = vi.spyOn(window, 'setInterval');
-    render(<AiCommandCenterDashboard />);
+    render(
+      <MemoryRouter>
+        <AiCommandCenterDashboard />
+      </MemoryRouter>
+    );
 
     expect(screen.getByRole('heading', { level: 1, name: /ai command center/i })).toBeVisible();
     expect((await screen.findAllByText('Healthy')).length).toBeGreaterThan(0);
@@ -151,7 +156,11 @@ describe('AiCommandCenterDashboard', () => {
 
   it('supports manual live refresh', async () => {
     const user = userEvent.setup();
-    render(<AiCommandCenterDashboard />);
+    render(
+      <MemoryRouter>
+        <AiCommandCenterDashboard />
+      </MemoryRouter>
+    );
 
     await screen.findAllByText('Healthy');
     await user.click(screen.getByRole('button', { name: /refresh/i }));

@@ -2,13 +2,13 @@
 
 ## Goal
 
-Reduce the Emergency Department Solution to the smallest sellable package that can be piloted without deep EHR, ADT, device, staffing, referral, or payer integrations.
+Reduce the Emergency Flow Intelligence Platform to the smallest sellable package that can be piloted without deep EHR, ADT, device, staffing, referral, or payer integrations.
 
 ## Smallest Sellable Package
 
-### Emergency Core
+### Emergency Flow Starter
 
-Emergency Core is the MVP package. It contains only:
+Emergency Flow Starter is the MVP package. It contains only:
 
 - qSOFA
 - NEWS2
@@ -25,7 +25,7 @@ This package is pricing-ready because it can be positioned as a standalone ED tr
 
 ## Why These Capabilities Stay In Core
 
-| Capability | Reason it belongs in Emergency Core | Dependency posture |
+| Capability | Reason it belongs in Emergency Flow Starter | Dependency posture |
 |---|---|---|
 | qSOFA | High-value sepsis screening calculator for triage standardization. | Standalone/manual input. |
 | NEWS2 | Broad deterioration screening score for abnormal vitals. | Standalone/manual input. |
@@ -40,7 +40,7 @@ This package is pricing-ready because it can be positioned as a standalone ED tr
 
 ## Optional Add-Ons
 
-Everything outside Emergency Core becomes optional:
+Everything outside Emergency Flow Starter becomes optional:
 
 - Documentation Integrity
 - Discharge Summary Drafting
@@ -51,16 +51,16 @@ Everything outside Emergency Core becomes optional:
 - Virtual ED
 - Prior Authorization
 
-These add-ons are valuable, but they introduce EHR, ADT, documentation, staffing, device telemetry, LMS, telehealth, transfer center, secure messaging, or payer-policy dependencies. They should be sold as expansion modules after Emergency Core is accepted.
+These add-ons are valuable, but they introduce EHR, ADT, documentation, staffing, device telemetry, LMS, telehealth, transfer center, secure messaging, or payer-policy dependencies. They should be sold as expansion modules after Emergency Flow Starter is accepted.
 
 ## Pricing-Ready Metadata
 
-| Field | Emergency Core |
+| Field | Emergency Flow Starter |
 |---|---|
 | Package ID | `emergency-core-mvp` |
-| Product | Emergency Department Solution |
+| Product | Emergency Flow Intelligence Platform |
 | Buyer | ED Director, Chief Nursing Officer, COO, Clinical Informatics Lead |
-| Positioning | Standalone ED triage, evidence, workflow guidance, and dashboard pilot |
+| Positioning | Standalone ED flow, triage, evidence, workflow guidance, and command-center pilot |
 | Billing metric | Per ED site per month, with optional clinician-seat metric |
 | Trial posture | 30-60 day pilot with manual/local data and no EHR writeback |
 | Implementation dependency | Low |
@@ -71,8 +71,8 @@ These add-ons are valuable, but they introduce EHR, ADT, documentation, staffing
 
 ## Packaging Rule
 
-Emergency Core must remain narrow. If a capability requires patient-specific EHR data, external workflow submission, device telemetry, payer policy access, telehealth intake, or staffing system integration, it is not part of Core. It belongs in an add-on or higher-tier expansion bundle.
+Emergency Flow Starter must remain narrow. If a capability requires patient-specific EHR data, external workflow submission, device telemetry, payer policy access, telehealth intake, or staffing system integration, it is not part of Starter. It belongs in an add-on or higher-tier expansion bundle.
 
 ## Recommendation
 
-Lead first customer conversations with Emergency Core. Sell it as a low-integration ED operating pilot that standardizes triage calculators, surfaces protocol guidance, and demonstrates ED workspace value quickly. Use optional add-ons to expand after buyer validation.
+Lead first customer conversations with Emergency Flow Starter. Sell it as a low-integration ED flow pilot that standardizes triage signals, surfaces protocol guidance, and demonstrates ED command-center value quickly. Use optional add-ons to expand after buyer validation.

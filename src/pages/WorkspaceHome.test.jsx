@@ -79,23 +79,26 @@ describe('WorkspaceHome', () => {
 
     expect(screen.getByRole('heading', { name: /emergency workspace/i })).toBeInTheDocument();
     expect(screen.getByText(/emergency department operating environment/i)).toBeInTheDocument();
-    expect(screen.getByText(/canonical ED journey/i)).toBeInTheDocument();
+    expect(screen.getByText(/ED flow model/i)).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: /workspace subpages/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/workspace data status/i)).toHaveTextContent(/Emergency Department Operating System/i);
+    expect(screen.getByLabelText(/workspace data status/i)).toHaveTextContent(/Emergency Flow Intelligence Platform/i);
     expect(screen.getAllByText(/demo\/local fallback/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /emergency command center/i })).toBeInTheDocument();
     [
-      /Waiting Patients/i,
+      /Current Patients/i,
+      /Waiting Room/i,
       /High Risk Queue/i,
-      /Critical Alerts/i,
-      /Recent Assessments/i,
-      /Recommended Actions/i,
-      /Protocol Guidance/i,
+      /EMS Arrivals/i,
+      /Referral Queue/i,
+      /Bed Pressure/i,
+      /Equipment Status/i,
+      /Staffing Pressure/i,
+      /Alerts/i,
     ].forEach((label) => {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0);
     });
     expect(screen.getByRole('button', { name: /start triage review/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /retrieve complaint protocol/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /summarize offload risk/i })).toBeInTheDocument();
   });
 
   it('launches ED command center actions from the dashboard', () => {
@@ -137,7 +140,7 @@ describe('WorkspaceHome', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /^ask assistant$/i }));
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
-      expect.stringContaining('ED patient journey'),
+      expect.stringContaining('ED flow bottlenecks'),
       'user'
     );
     expect(screen.getByTestId('location')).toHaveTextContent('/assistant');
@@ -154,8 +157,8 @@ describe('WorkspaceHome', () => {
   it('renders workspace automation hub and previews automations through Assistant', () => {
     renderWorkspace('/workspace/emergency/automations');
 
-    expect(screen.getAllByRole('heading', { name: /emergency department solution/i }).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Emergency Core MVP/i)).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { name: /emergency flow intelligence platform/i }).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Emergency Flow Starter MVP/i)).toBeInTheDocument();
     expect(screen.getByText(/30-60 day pilot/i)).toBeInTheDocument();
     expect(screen.getAllByText(/not required for MVP pilot/i).length).toBeGreaterThan(1);
     expect(screen.getByText(/required for every clinical output/i)).toBeInTheDocument();
@@ -221,6 +224,169 @@ describe('WorkspaceHome', () => {
     expect(screen.getAllByText(/Shortness of Breath/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Wells PE/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Respiratory Protocol/i).length).toBeGreaterThan(0);
+  });
+
+  it('renders the ED analytics MVP route with ROI and adoption metrics', () => {
+    renderWorkspace('/workspace/emergency/analytics');
+
+    expect(screen.getByRole('heading', { name: /roi and adoption dashboard/i })).toBeInTheDocument();
+    expect(screen.getByText(/provide measurable value/i)).toBeInTheDocument();
+    [
+      /Assessments completed/i,
+      /Calculators used/i,
+      /Protocol retrievals/i,
+      /Workflow launches/i,
+      /AI requests/i,
+      /Simulation completion/i,
+    ].forEach((label) => {
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
+    });
+    expect(screen.getByRole('heading', { name: /demonstrate ROI and adoption/i })).toBeInTheDocument();
+    expect(screen.getByText(/time saved/i)).toBeInTheDocument();
+    expect(screen.getByText(/do not score autonomous clinical quality/i)).toBeInTheDocument();
+  });
+
+  it('renders the ED onboarding walkthrough and launches walkthrough targets', () => {
+    renderWorkspace('/workspace/emergency/onboarding');
+
+    expect(screen.getByRole('heading', { name: /emergency workspace onboarding/i })).toBeInTheDocument();
+    expect(screen.getByText(/understand the Emergency Workspace in 10 minutes/i)).toBeInTheDocument();
+    [
+      /Emergency Workspace overview/i,
+      /Calculators/i,
+      /Protocols/i,
+      /AI Copilot/i,
+      /Workflows/i,
+      /Analytics/i,
+    ].forEach((label) => {
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
+    });
+    expect(screen.getByRole('heading', { name: /run the first hospital demo/i })).toBeInTheDocument();
+    expect(screen.getByText(/Open the Emergency Workspace/i)).toBeInTheDocument();
+    expect(screen.getByText(/Close with analytics/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /open analytics/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/analytics');
+  });
+
+  it('renders Emergency Demo Mode with sample data clearly labeled as demo-only', () => {
+    renderWorkspace('/workspace/emergency/demo');
+
+    expect(screen.getByRole('heading', { name: /caredroid emergency demo hospital/i })).toBeInTheDocument();
+    expect(screen.getByText(/No live EHR, ADT, telemetry, protocol, or analytics integration/i)).toBeInTheDocument();
+    [
+      /Sample patients/i,
+      /Sample alerts/i,
+      /Sample workflows/i,
+      /Sample protocols/i,
+      /Sample analytics/i,
+    ].forEach((heading) => {
+      expect(screen.getByRole('heading', { name: heading })).toBeInTheDocument();
+    });
+    expect(screen.getAllByText(/Demo data/i).length).toBeGreaterThan(10);
+    expect(screen.getAllByText(/Demo tenant/i).length).toBeGreaterThan(10);
+    expect(screen.getAllByText(/No live integration/i).length).toBeGreaterThan(10);
+    expect(screen.getByText(/Demo Patient A/i)).toBeInTheDocument();
+    expect(screen.getByText(/Stroke window review/i)).toBeInTheDocument();
+    expect(screen.getByText(/ACS\/chest pain pathway/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('button', { name: /open sample/i })[0]);
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/evidence');
+  });
+
+  it('renders the ED ROI estimator for sales and onboarding discovery', () => {
+    renderWorkspace('/workspace/emergency/roi');
+
+    expect(screen.getByRole('heading', { name: /ed roi estimator/i })).toBeInTheDocument();
+    expect(screen.getByText(/sales discovery, onboarding/i)).toBeInTheDocument();
+    const annualVolumeInput = screen.getByLabelText(/annual ed volume/i);
+    const physicianInput = screen.getByLabelText(/physician count/i);
+    const nursingInput = screen.getByLabelText(/nursing count/i);
+    const assessmentsInput = screen.getByLabelText(/average assessments\/day/i);
+
+    expect(annualVolumeInput).toHaveValue(42000);
+    expect(physicianInput).toHaveValue(32);
+    expect(nursingInput).toHaveValue(88);
+    expect(assessmentsInput).toHaveValue(115);
+    expect(screen.getByText(/Estimated time saved/i)).toBeInTheDocument();
+    expect(screen.getByText(/Workflow efficiency/i)).toBeInTheDocument();
+    expect(screen.getByText(/Adoption potential/i)).toBeInTheDocument();
+    expect(screen.getByText(/planning estimate/i)).toBeInTheDocument();
+
+    fireEvent.change(annualVolumeInput, { target: { value: '60000' } });
+    fireEvent.change(assessmentsInput, { target: { value: '150' } });
+
+    expect(annualVolumeInput).toHaveValue(60000);
+    expect(assessmentsInput).toHaveValue(150);
+    expect(screen.getByText(/hours\/year/i)).toBeInTheDocument();
+  });
+
+  it('renders the first customer deployment blueprint with low-risk phases', () => {
+    renderWorkspace('/workspace/emergency/deployment');
+
+    expect(screen.getByRole('heading', { name: /first customer deployment blueprint/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/minimal operational risk/i).length).toBeGreaterThan(0);
+    [
+      /Standalone Emergency Workspace/i,
+      /Protocol Library/i,
+      /AI Copilot/i,
+      /Analytics/i,
+      /Optional Integrations/i,
+    ].forEach((phase) => {
+      expect(screen.getAllByText(phase).length).toBeGreaterThan(0);
+    });
+    expect(screen.getByText(/No integrations required/i)).toBeInTheDocument();
+    expect(screen.getByText(/No live writeback/i)).toBeInTheDocument();
+    expect(screen.getByText(/without requiring a full hospital-wide deployment/i)).toBeInTheDocument();
+  });
+
+  it('renders the Emergency Flow Intelligence platform as an end-to-end solution', () => {
+    renderWorkspace('/workspace/emergency/flow');
+
+    expect(screen.getAllByRole('heading', { name: /emergency flow intelligence platform/i }).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Reduce ED bottlenecks/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /hospitals pay for flow/i })).toBeInTheDocument();
+    expect(screen.getByText(/Too many patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/Too much cognitive load/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /throughput, capacity, coordination, and cognitive load/i })).toBeInTheDocument();
+    expect(screen.getByText(/arrival-to-triage time/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/boarding delay/i).length).toBeGreaterThan(0);
+    [
+      /Arrival/i,
+      /Triage/i,
+      /Assessment/i,
+      /Orders/i,
+      /Results/i,
+      /Disposition/i,
+      /Admission\/Discharge/i,
+    ].forEach((stage) => {
+      expect(screen.getAllByText(stage).length).toBeGreaterThan(0);
+    });
+    [
+      /Pre-Hospital Intelligence/i,
+      /EMS-to-ED Handoff/i,
+      /Dynamic Triage/i,
+      /Bed Flow Intelligence/i,
+      /Referral Automation/i,
+      /Discharge Acceleration/i,
+      /Equipment Intelligence/i,
+      /Surge Prediction/i,
+      /ED Copilot/i,
+      /ED Command Center/i,
+    ].forEach((solution) => {
+      expect(screen.getAllByText(solution).length).toBeGreaterThan(0);
+    });
+    expect(screen.getByText(/Automation registry/i)).toBeInTheDocument();
+    expect(screen.getByText(/Workflow registry/i)).toBeInTheDocument();
+    expect(screen.getByText(/Analytics model/i)).toBeInTheDocument();
+    expect(screen.getByText(/Dashboard model/i)).toBeInTheDocument();
+    expect(screen.getByText(/AI model/i)).toBeInTheDocument();
+    expect(screen.getByText(/SaaS packages/i)).toBeInTheDocument();
+    expect(screen.getByText(/Emergency Flow Enterprise/i)).toBeInTheDocument();
+    expect(screen.getByText(/Emergency Flow Starter can be demonstrated and piloted/i)).toBeInTheDocument();
+    expect(screen.getByText(/without ADT, EHR, EMS CAD/i)).toBeInTheDocument();
+    expect(screen.getByText(/without hospital-wide deployment/i)).toBeInTheDocument();
+    expect(screen.getByText(/never makes autonomous/i)).toBeInTheDocument();
   });
 
   it('redirects invalid workspace subpages to the normalized dashboard subpage', async () => {

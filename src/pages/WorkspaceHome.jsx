@@ -14,6 +14,7 @@ import { getAutomationAuditEntries } from '../data/automationAuditTrail';
 import { getWorkspaceAutomations } from '../data/automationRegistry';
 import {
   buildEmergencyCopilotGuidance,
+  estimateEmergencyRoi,
   routeEmergencyChiefComplaint,
 } from '../data/emergencyOperatingSystem';
 import WorkspaceDataPipelineService from '../services/workspaceDataPipelineService';
@@ -22,6 +23,12 @@ import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon, getWorkspaceIcon } from '../navigation/iconRegistry';
 import LaunchActionCard from '../components/ui/LaunchActionCard';
+import {
+  DashboardGrid,
+  DashboardSection,
+  MetricCard,
+  PageShell,
+} from '../components/ui/CareDroidPrimitives';
 import './WorkspaceHome.css';
 
 function WorkspaceRouteCard({ route, onLaunch }) {
@@ -97,15 +104,11 @@ function WorkspaceSubpageTabs({ workspaceId, subpages, activeSubpageId }) {
 
 function WorkspaceListPanel({ title, description, items = [], empty = 'No items available.', renderItem }) {
   return (
-    <section className="workspace-panel">
-      <div className="workspace-panel__header">
-        <h2>{title}</h2>
-        {description ? <p>{description}</p> : null}
-      </div>
-      <div className="workspace-card-grid">
+    <DashboardSection className="workspace-panel" title={title} description={description}>
+      <DashboardGrid className="workspace-card-grid">
         {items.length ? items.map(renderItem) : <p className="workspace-empty-state">{empty}</p>}
-      </div>
-    </section>
+      </DashboardGrid>
+    </DashboardSection>
   );
 }
 
@@ -287,7 +290,7 @@ function EmergencyCommandCenter({ emergency, onLaunchRoute, onAskAssistant }) {
         <div className="workspace-panel__header">
           <p className="workspace-eyebrow">ED Command Center</p>
           <h2>Emergency Command Center</h2>
-          <p>Most ED actions start here: waiting patients, high-risk review, alerts, assessments, recommended actions, and protocol guidance.</p>
+          <p>Most ED flow actions start here: current patients, waiting room, high-risk queue, EMS arrivals, referrals, bed pressure, equipment status, staffing pressure, and alerts.</p>
         </div>
         <div className="emergency-command-grid">
           {commandWidgets.map((widget) => (
@@ -628,50 +631,493 @@ function EmergencyAutomationList({ title, description, automations = [], visibil
   );
 }
 
-function EmergencyAnalyticsPanel({ analytics }) {
-  const metrics = analytics?.emergency || {};
+function DemoDataLabels({ item }) {
   return (
-    <section className="workspace-panel" aria-labelledby="emergency-analytics-title">
-      <div className="workspace-panel__header">
-        <p className="workspace-eyebrow">ED Analytics</p>
-        <h2 id="emergency-analytics-title">Emergency Operating Metrics</h2>
-        <p>Tracks the ED SaaS operating model, not unrelated enterprise widgets.</p>
+    <div className="emergency-demo-labels" aria-label="Demo data labels">
+      {[item.dataLabel, item.tenantLabel, item.integrationLabel].filter(Boolean).map((label) => (
+        <span key={label}>{label}</span>
+      ))}
+    </div>
+  );
+}
+
+function EmergencyDemoModePanel({ demoTenant, onLaunchRoute }) {
+  if (!demoTenant) return null;
+  const demoSections = [
+    ['Sample patients', demoTenant.samplePatients, (patient) => `${patient.chiefComplaint} · ${patient.stage} · ${patient.summary}`],
+    ['Sample alerts', demoTenant.sampleAlerts, (alert) => `${alert.severity} · ${alert.detail}`],
+    ['Sample workflows', demoTenant.sampleWorkflows, (workflow) => workflow.detail],
+    ['Sample protocols', demoTenant.sampleProtocols, (protocol) => `${protocol.protocol}: ${protocol.summary}`],
+    ['Sample analytics', demoTenant.sampleAnalytics, (metric) => `${metric.value} ${metric.unit} · ${metric.helper}`],
+  ];
+
+  return (
+    <section className="emergency-demo-layout" aria-label="Emergency demo mode">
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Demo Tenant</p>
+          <h2>{demoTenant.tenantName}</h2>
+          <p>{demoTenant.dataPosture}</p>
+        </div>
+        <div className="emergency-demo-summary">
+          <DemoDataLabels item={demoTenant.labels} />
+          <p>{demoTenant.safetyPosture}</p>
+        </div>
       </div>
-      <div className="workspace-focus-metrics emergency-analytics-grid">
-        <div>
-          <span>Triage volume</span>
-          <strong>{metrics.triageVolume}</strong>
-          <small>Encounters</small>
+
+      {demoSections.map(([title, items, detailForItem]) => (
+        <div key={title} className="workspace-panel">
+          <div className="workspace-panel__header">
+            <p className="workspace-eyebrow">Demo data</p>
+            <h2>{title}</h2>
+            <p>Prospect-ready sample content for evaluating the Emergency Workspace without integrations.</p>
+          </div>
+          <div className="workspace-card-grid emergency-demo-grid">
+            {items.map((item) => (
+              <article key={item.id} className="workspace-automation-card emergency-demo-card">
+                <div>
+                  <strong>{item.displayName || item.label || item.complaint}</strong>
+                  <span>{detailForItem(item)}</span>
+                </div>
+                <DemoDataLabels item={item} />
+                {item.targetRoute ? (
+                  <button
+                    type="button"
+                    className="workspace-secondary-action"
+                    onClick={() => onLaunchRoute(item.targetRoute)}
+                  >
+                    Open sample
+                  </button>
+                ) : null}
+              </article>
+            ))}
+          </div>
         </div>
-        <div>
-          <span>Calculator utilization</span>
-          <strong>{metrics.calculatorUtilization}</strong>
-          <small>qSOFA, NEWS2, HEART, Wells, Shock Index</small>
+      ))}
+    </section>
+  );
+}
+
+function EmergencyRoiEstimatorPanel({ estimator }) {
+  const defaultInputs = Object.fromEntries(
+    (estimator?.inputFields || []).map((field) => [field.id, field.defaultValue])
+  );
+  const [inputs, setInputs] = useState(defaultInputs);
+  const estimate = estimateEmergencyRoi(inputs);
+  const outputCards = [
+    {
+      id: 'estimatedTimeSaved',
+      label: 'Estimated time saved',
+      value: estimate.summary.estimatedTimeSaved,
+      helper: estimator?.outputDefinitions?.find((output) => output.id === 'estimatedTimeSaved')?.helper,
+    },
+    {
+      id: 'workflowEfficiency',
+      label: 'Workflow efficiency',
+      value: estimate.summary.workflowEfficiency,
+      helper: estimator?.outputDefinitions?.find((output) => output.id === 'workflowEfficiency')?.helper,
+    },
+    {
+      id: 'adoptionPotential',
+      label: 'Adoption potential',
+      value: estimate.summary.adoptionPotential,
+      helper: estimator?.outputDefinitions?.find((output) => output.id === 'adoptionPotential')?.helper,
+    },
+  ];
+
+  if (!estimator) return null;
+
+  return (
+    <section className="emergency-roi-layout" aria-label="ED ROI estimator">
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Sales and Onboarding</p>
+          <h2>{estimator.title}</h2>
+          <p>{estimator.goal}</p>
         </div>
-        <div>
-          <span>Referral volume</span>
-          <strong>{metrics.referralVolume}</strong>
-          <small>Queue items</small>
+        <div className="emergency-roi-input-grid">
+          {estimator.inputFields.map((field) => (
+            <label key={field.id} className="emergency-roi-input">
+              <span>{field.label}</span>
+              <input
+                type="number"
+                min="0"
+                value={inputs[field.id] ?? field.defaultValue}
+                onChange={(event) =>
+                  setInputs((current) => ({
+                    ...current,
+                    [field.id]: event.target.value,
+                  }))
+                }
+              />
+              <small>{field.helper}</small>
+            </label>
+          ))}
         </div>
-        <div>
-          <span>Documentation drafts</span>
-          <strong>{metrics.documentationDrafts}</strong>
-          <small>Review required</small>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Estimated Value</p>
+          <h2>ROI estimator output</h2>
+          <p>Use this during sales discovery and onboarding planning before live integrations are connected.</p>
         </div>
-        <div>
-          <span>AI acceptance</span>
-          <strong>{Math.round((metrics.aiRecommendationAcceptance || 0) * 100)}%</strong>
-          <small>Accepted recommendations</small>
+        <div className="workspace-focus-metrics emergency-roi-output-grid">
+          {outputCards.map((output) => (
+            <div key={output.id}>
+              <span>{output.label}</span>
+              <strong>{output.value}</strong>
+              <small>{output.helper}</small>
+            </div>
+          ))}
         </div>
-        <div>
-          <span>Automation execution</span>
-          <strong>{metrics.automationExecution}</strong>
-          <small>Registered ED modules</small>
+        <div className="emergency-roi-assumptions">
+          <strong>Planning assumptions</strong>
+          <span>
+            {estimate.assumptions.minutesSavedPerAssessment} minutes saved per assessment,{' '}
+            {Math.round(estimate.assumptions.workflowCoverageRate * 100)}% workflow coverage, and{' '}
+            {estimate.assumptions.minutesSavedPerWorkflowLaunch} minutes saved per workflow launch.
+          </span>
+          <small>{estimate.disclaimer}</small>
         </div>
-        <div>
-          <span>Simulation completion</span>
-          <strong>{metrics.simulationCompletion}</strong>
-          <small>Academy completions</small>
+      </div>
+    </section>
+  );
+}
+
+function EmergencyDeploymentBlueprintPanel({ blueprint }) {
+  if (!blueprint) return null;
+
+  return (
+    <section className="emergency-deployment-layout" aria-label="First customer deployment blueprint">
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Minimal Operational Risk</p>
+          <h2>{blueprint.title}</h2>
+          <p>{blueprint.goal}</p>
+        </div>
+        <article className="emergency-deployment-principle">
+          <strong>Deployment principle</strong>
+          <span>{blueprint.principle}</span>
+          <small>{blueprint.acceptance}</small>
+        </article>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Phased Rollout</p>
+          <h2>Demonstrate, pilot, sell, then integrate</h2>
+          <p>Each phase adds value without forcing a hospital-wide rollout.</p>
+        </div>
+        <div className="workspace-card-grid emergency-deployment-grid">
+          {blueprint.phases.map((phase) => (
+            <article key={phase.id} className="workspace-automation-card emergency-deployment-card">
+              <div>
+                <span className="workspace-tool-card__meta">{phase.phase}</span>
+                <strong>{phase.title}</strong>
+                <span>{phase.description}</span>
+              </div>
+              <dl>
+                <div>
+                  <dt>Risk</dt>
+                  <dd>{phase.operationalRisk}</dd>
+                </div>
+                <div>
+                  <dt>Integration</dt>
+                  <dd>{phase.integrationRequirement}</dd>
+                </div>
+                <div>
+                  <dt>Acceptance</dt>
+                  <dd>{phase.acceptance}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function EmergencyFlowIntelligencePanel({ platform }) {
+  if (!platform) return null;
+  const registryStats = [
+    ['Automation registry', platform.automationRegistry.length, 'Flow-aware automations'],
+    ['Workflow registry', platform.workflowRegistry.length, 'Review-required workflows'],
+    ['Analytics model', platform.analyticsModel.events.length, 'Bottleneck and adoption events'],
+    ['Dashboard model', platform.dashboardModel.widgets.length, 'Command-center widgets'],
+    ['AI model', platform.aiModel.agents.length, 'Flow-aware AI agents'],
+    ['SaaS packages', platform.saasPackagingModel.packages.length, 'Sellable tiers'],
+  ];
+
+  return (
+    <section className="emergency-flow-layout" aria-label="Emergency Flow Intelligence Platform">
+      <DashboardSection
+        className="workspace-panel"
+        eyebrow="Emergency Flow Intelligence"
+        title={platform.title}
+        description={platform.positioning}
+      >
+        <div className="emergency-flow-stage-list" aria-label="End-to-end patient flow">
+          {platform.patientFlow.map((stage) => (
+            <span key={stage}>{stage}</span>
+          ))}
+        </div>
+        <article className="emergency-flow-principle">
+          <strong>Primary objective</strong>
+          <span>{platform.primaryObjective}</span>
+          <small>{platform.acceptance}</small>
+        </article>
+      </DashboardSection>
+
+      <DashboardSection
+        className="workspace-panel"
+        eyebrow="Buyer Pain"
+        title="Hospitals pay for flow, not more calculators"
+        description="Emergency Flow Intelligence is framed around the operating pain ED leaders, EMS teams, and hospital operations already budget against."
+      >
+        <DashboardGrid className="workspace-card-grid emergency-flow-solution-grid">
+          {platform.marketPains.map((pain) => (
+            <article key={pain} className="workspace-automation-card emergency-flow-solution-card">
+              <strong>{pain}</strong>
+            </article>
+          ))}
+        </DashboardGrid>
+      </DashboardSection>
+
+      <DashboardSection
+        className="workspace-panel"
+        eyebrow="Commercial Value Drivers"
+        title="Throughput, capacity, coordination, and cognitive load"
+        description="These are the executive outcomes the Emergency Flow Intelligence Platform can prove during sales discovery and first-customer onboarding."
+      >
+        <DashboardGrid className="workspace-card-grid emergency-flow-solution-grid">
+          {platform.valueDrivers.map((driver) => (
+            <article key={driver.id} className="workspace-automation-card emergency-flow-solution-card">
+              <div>
+                <strong>{driver.title}</strong>
+                <span>{driver.description}</span>
+              </div>
+              <dl>
+                <div>
+                  <dt>Proof signals</dt>
+                  <dd>{driver.proofSignals.join(', ')}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </DashboardGrid>
+      </DashboardSection>
+
+      <DashboardSection
+        className="workspace-panel"
+        eyebrow="Commercial Solution Areas"
+        title="Ten areas mapped into one ED patient flow"
+        description="Each solution maps into the same ED patient flow instead of launching as an isolated calculator or tool."
+      >
+        <DashboardGrid className="workspace-card-grid emergency-flow-solution-grid">
+          {platform.solutions.map((solution) => (
+            <article key={solution.id} className="workspace-automation-card emergency-flow-solution-card">
+              <div>
+                <strong>{solution.title}</strong>
+                <span>{solution.buyerPain}</span>
+              </div>
+              <dl>
+                <div>
+                  <dt>Flow stages</dt>
+                  <dd>{solution.flowStages.join(', ')}</dd>
+                </div>
+                <div>
+                  <dt>Capabilities</dt>
+                  <dd>{solution.capabilities.join(', ')}</dd>
+                </div>
+                <div>
+                  <dt>Package</dt>
+                  <dd>{solution.packageTier}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </DashboardGrid>
+      </DashboardSection>
+
+      <DashboardSection
+        className="workspace-panel"
+        eyebrow="Platform Registries"
+        title="One operating model for all 10 areas"
+        description="Automation, workflow, analytics, dashboard, AI, and packaging models are all derived from the same solution architecture."
+      >
+        <DashboardGrid variant="metrics" className="workspace-focus-metrics emergency-flow-registry-grid">
+          {registryStats.map(([label, value, helper]) => (
+            <MetricCard key={label} label={label} value={value} helper={helper} />
+          ))}
+        </DashboardGrid>
+      </DashboardSection>
+
+      <DashboardSection
+        className="workspace-panel"
+        eyebrow="SaaS Packaging"
+        title={platform.saasPackagingModel.productName}
+        description={`Buyer personas: ${platform.saasPackagingModel.buyerPersonas.join(', ')}.`}
+      >
+        <DashboardGrid className="workspace-card-grid emergency-flow-package-grid">
+          {platform.saasPackagingModel.packages.map((solutionPackage) => (
+            <article key={solutionPackage.packageId} className="workspace-automation-card">
+              <div>
+                <strong>{solutionPackage.title}</strong>
+                <span>{solutionPackage.positioning}</span>
+              </div>
+              <dl>
+                <div>
+                  <dt>Solution areas</dt>
+                  <dd>{solutionPackage.solutionIds.length}</dd>
+                </div>
+                <div>
+                  <dt>Included IDs</dt>
+                  <dd>{solutionPackage.solutionIds.join(', ')}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </DashboardGrid>
+        <article className="emergency-flow-principle">
+          <strong>First-customer readiness</strong>
+          <span>{platform.firstCustomerReadiness.sellableNow}</span>
+          <small>{platform.firstCustomerReadiness.noIntegrationPosture}</small>
+        </article>
+        <article className="emergency-flow-principle">
+          <strong>Integration posture</strong>
+          <span>{platform.integrationPosture}</span>
+        </article>
+        <article className="emergency-flow-principle">
+          <strong>AI safety boundary</strong>
+          <span>{platform.aiModel.safetyBoundary}</span>
+        </article>
+      </DashboardSection>
+    </section>
+  );
+}
+
+function EmergencyOnboardingPanel({ onboarding, onLaunchRoute }) {
+  if (!onboarding) return null;
+  return (
+    <section className="emergency-onboarding-layout" aria-label="Emergency onboarding walkthrough">
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">10-Minute Hospital Onboarding</p>
+          <h2>{onboarding.title}</h2>
+          <p>{onboarding.goal}</p>
+        </div>
+        <div className="workspace-card-grid emergency-onboarding-grid">
+          {onboarding.sections.map((section) => (
+            <article key={section.id} className="workspace-automation-card">
+              <div>
+                <strong>{section.label}</strong>
+                <span>{section.summary}</span>
+              </div>
+              <dl>
+                <div>
+                  <dt>Time</dt>
+                  <dd>{section.duration}</dd>
+                </div>
+                <div>
+                  <dt>Outcome</dt>
+                  <dd>{section.outcome}</dd>
+                </div>
+              </dl>
+              <button
+                type="button"
+                className="workspace-secondary-action"
+                onClick={() => onLaunchRoute(section.targetRoute)}
+              >
+                Open {section.label}
+              </button>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Guided Walkthrough</p>
+          <h2>Run the first hospital demo</h2>
+          <p>{onboarding.takeaway}</p>
+        </div>
+        <ol className="emergency-onboarding-timeline">
+          {onboarding.walkthrough.map((step) => (
+            <li key={`${step.minute}-${step.title}`}>
+              <span>{step.minute}</span>
+              <div>
+                <strong>{step.title}</strong>
+                <p>{step.instruction}</p>
+                <button
+                  type="button"
+                  className="workspace-secondary-action"
+                  onClick={() => onLaunchRoute(step.targetRoute)}
+                >
+                  Go to step
+                </button>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  );
+}
+
+function EmergencyAnalyticsPanel({ analytics }) {
+  const emergencyAnalytics = analytics?.emergency || {};
+  const metrics = emergencyAnalytics.metrics || [];
+  const roiSummary = emergencyAnalytics.roiSummary || {};
+  return (
+    <section className="emergency-analytics-layout" aria-label="Emergency analytics MVP">
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">ED Analytics MVP</p>
+          <h2 id="emergency-analytics-title">ROI and adoption dashboard</h2>
+          <p>{emergencyAnalytics.goal || 'Demonstrate emergency workspace ROI and adoption.'}</p>
+        </div>
+        <div className="workspace-focus-metrics emergency-analytics-grid">
+          {metrics.map((metric) => (
+            <div key={metric.id}>
+              <span>{metric.label}</span>
+              <strong>{metric.value}</strong>
+              <small>{metric.unit}</small>
+              <small>{metric.helper}</small>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Buyer Proof</p>
+          <h2>Demonstrate ROI and adoption</h2>
+          <p>Converts pilot usage into ED buyer language without claiming autonomous clinical outcomes.</p>
+        </div>
+        <div className="workspace-card-grid">
+          {Object.entries(roiSummary).map(([id, detail]) => (
+            <WorkspaceCapabilityCard
+              key={id}
+              icon={CHROME_ICONS.lineChart}
+              item={{
+                id,
+                label: id.replace(/([A-Z])/g, ' $1').replace(/^./, (char) => char.toUpperCase()),
+                detail,
+              }}
+            />
+          ))}
+          {emergencyAnalytics.humanReviewStatement ? (
+            <WorkspaceCapabilityCard
+              icon={CHROME_ICONS.shield}
+              item={{
+                id: 'human-review-statement',
+                label: 'Human review posture',
+                detail: emergencyAnalytics.humanReviewStatement,
+              }}
+            />
+          ) : null}
         </div>
       </div>
     </section>
@@ -691,8 +1137,8 @@ function EmergencyProductTiers({
     <section className="workspace-panel" aria-labelledby="emergency-products-title">
       <div className="workspace-panel__header">
         <p className="workspace-eyebrow">Packaging</p>
-        <h2 id="emergency-products-title">Emergency Department Solution</h2>
-        <p>Emergency Core is the smallest sellable package; everything else is an add-on.</p>
+        <h2 id="emergency-products-title">Emergency Flow Intelligence Platform</h2>
+        <p>Emergency Flow Starter is the smallest sellable package; deeper flow, EMS, equipment, and surge capabilities expand from there.</p>
       </div>
       {mvpPackage ? (
         <article className="workspace-automation-card emergency-mvp-package">
@@ -730,14 +1176,14 @@ function EmergencyProductTiers({
               <dd>{mvpPackage.humanReviewRequirement}</dd>
             </div>
           </dl>
-          <div className="emergency-package-chip-grid" aria-label="Emergency Core MVP inclusions">
+          <div className="emergency-package-chip-grid" aria-label="Emergency Flow Starter MVP inclusions">
             {mvpPackage.includedCapabilities.map((capability) => (
               <span key={capability.id} className="workspace-tool-card__meta">
                 {capability.label}
               </span>
             ))}
           </div>
-          <div className="emergency-core-capability-list" aria-label="Why each Emergency Core capability is included">
+          <div className="emergency-core-capability-list" aria-label="Why each Emergency Flow Starter capability is included">
             {mvpPackage.includedCapabilities.map((capability) => (
               <div key={`${capability.id}-reason`}>
                 <strong>{capability.label}</strong>
@@ -942,21 +1388,15 @@ export default function WorkspaceHome() {
   };
 
   return (
-    <main
+    <PageShell
       className={`workspace-home workspace-home--${cssToken(workspaceExperience.tone)} workspace-home--workspace-${cssToken(workspaceExperience.id)}`}
       data-workspace-os={workspaceExperience.id}
       style={workspaceThemeStyle(workspaceExperience)}
-    >
-      <section className="workspace-hero" aria-labelledby="workspace-title">
-        <div className="workspace-hero__icon" aria-hidden>
-          <NavIcon icon={WorkspaceIcon} size={34} />
-        </div>
-        <div className="workspace-hero__content">
-          <p className="workspace-eyebrow">{workspaceExperience.operatingLabel}</p>
-          <h1 id="workspace-title">{model.workspace.label} Workspace</h1>
-          <p>{workspaceExperience.dashboardSubtitle || model.workspace.description}</p>
-        </div>
-        <div className="workspace-hero__actions">
+      eyebrow={workspaceExperience.operatingLabel}
+      title={`${model.workspace.label} Workspace`}
+      description={workspaceExperience.dashboardSubtitle || model.workspace.description}
+      actions={
+        <>
           <button type="button" className="workspace-primary-action" onClick={launchAssistantContext}>
             <NavIcon icon={CHROME_ICONS.bot} size={18} aria-hidden />
             Ask Assistant
@@ -964,9 +1404,9 @@ export default function WorkspaceHome() {
           <button type="button" className="workspace-secondary-action" onClick={() => launchRoute('/dashboard')}>
             Command Center
           </button>
-        </div>
-      </section>
-
+        </>
+      }
+    >
       <section className="workspace-operating-brief" aria-label={`${workspaceExperience.operatingLabel} brief`}>
         <div>
           <p className="workspace-eyebrow">{workspaceExperience.environment}</p>
@@ -977,7 +1417,7 @@ export default function WorkspaceHome() {
             ))}
           </ul>
         </div>
-        <div className="workspace-focus-metrics">
+        <DashboardGrid variant="metrics" className="workspace-focus-metrics">
           {(workspaceExperience.focusMetrics || []).slice(0, 2).map((metric) => (
             <div key={metric.label}>
               <span>{metric.label}</span>
@@ -985,7 +1425,7 @@ export default function WorkspaceHome() {
               <small>{metric.helper}</small>
             </div>
           ))}
-        </div>
+        </DashboardGrid>
       </section>
 
       <section className="workspace-switch-grid" aria-label="Workspace management">
@@ -1051,56 +1491,56 @@ export default function WorkspaceHome() {
       ) : null}
 
       {!isEmergencyWorkspace && activeSubpageId === 'dashboard' ? (
-        <section className="workspace-content-grid">
-          <div className="workspace-panel">
-          <div className="workspace-panel__header">
-            <h2>Context Panels</h2>
-            <p>Dashboards, maps, and settings that belong to this workspace.</p>
-          </div>
-          <div className="workspace-card-grid">
-            {visibleRouteEntries.map((route) => (
-              <WorkspaceRouteCard key={route.id} route={route} onLaunch={launchRoute} />
-            ))}
-          </div>
-          </div>
+        <DashboardGrid className="workspace-content-grid">
+          <DashboardSection
+            className="workspace-panel"
+            title="Context Panels"
+            description="Dashboards, maps, and settings that belong to this workspace."
+          >
+            <DashboardGrid className="workspace-card-grid">
+              {visibleRouteEntries.map((route) => (
+                <WorkspaceRouteCard key={route.id} route={route} onLaunch={launchRoute} />
+              ))}
+            </DashboardGrid>
+          </DashboardSection>
 
-          <div className="workspace-panel">
-          <div className="workspace-panel__header">
-            <h2>Recommended Tools</h2>
-            <p>Inventory-backed actions surfaced by context instead of sidebar sprawl.</p>
-          </div>
-          <div className="workspace-card-grid">
-            {visibleToolEntries.map((tool) => (
-              <WorkspaceToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
-            ))}
-          </div>
-          </div>
+          <DashboardSection
+            className="workspace-panel"
+            title="Recommended Tools"
+            description="Inventory-backed actions surfaced by context instead of sidebar sprawl."
+          >
+            <DashboardGrid className="workspace-card-grid">
+              {visibleToolEntries.map((tool) => (
+                <WorkspaceToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
+              ))}
+            </DashboardGrid>
+          </DashboardSection>
 
-          <div className="workspace-panel">
-          <div className="workspace-panel__header">
-            <h2>Notifications</h2>
-            <p>Workspace-filtered operational inbox items.</p>
-          </div>
-          <div className="workspace-card-grid">
-            {workspaceSummary.notifications.slice(0, 3).map((notification) => (
-              <button
-                key={notification.id}
-                type="button"
-                className="workspace-route-card"
-                onClick={() => navigate('/notifications')}
-              >
-                <span className="workspace-route-card__icon" aria-hidden>
-                  <NavIcon icon={CHROME_ICONS.bell} size={20} />
-                </span>
-                <span className="workspace-route-card__body">
-                  <strong>{notification.title}</strong>
-                  <span>{notification.body}</span>
-                </span>
-              </button>
-            ))}
-          </div>
-          </div>
-        </section>
+          <DashboardSection
+            className="workspace-panel"
+            title="Notifications"
+            description="Workspace-filtered operational inbox items."
+          >
+            <DashboardGrid className="workspace-card-grid">
+              {workspaceSummary.notifications.slice(0, 3).map((notification) => (
+                <button
+                  key={notification.id}
+                  type="button"
+                  className="workspace-route-card"
+                  onClick={() => navigate('/notifications')}
+                >
+                  <span className="workspace-route-card__icon" aria-hidden>
+                    <NavIcon icon={CHROME_ICONS.bell} size={20} />
+                  </span>
+                  <span className="workspace-route-card__body">
+                    <strong>{notification.title}</strong>
+                    <span>{notification.body}</span>
+                  </span>
+                </button>
+              ))}
+            </DashboardGrid>
+          </DashboardSection>
+        </DashboardGrid>
       ) : null}
 
       {isEmergencyWorkspace && activeSubpageId === 'triage' ? (
@@ -1193,6 +1633,32 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
+      {isEmergencyWorkspace && activeSubpageId === 'demo' ? (
+        <EmergencyDemoModePanel
+          demoTenant={pipelineData.emergency.demoTenant}
+          onLaunchRoute={launchRoute}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'roi' ? (
+        <EmergencyRoiEstimatorPanel estimator={pipelineData.emergency.roiEstimator} />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'deployment' ? (
+        <EmergencyDeploymentBlueprintPanel blueprint={pipelineData.emergency.firstCustomerDeployment} />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'flow' ? (
+        <EmergencyFlowIntelligencePanel platform={pipelineData.emergency.flowIntelligencePlatform} />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'onboarding' ? (
+        <EmergencyOnboardingPanel
+          onboarding={pipelineData.emergency.onboarding}
+          onLaunchRoute={launchRoute}
+        />
+      ) : null}
+
       {isEmergencyWorkspace && activeSubpageId === 'analytics' ? (
         <EmergencyAnalyticsPanel analytics={pipelineData.analytics} />
       ) : null}
@@ -1255,6 +1721,7 @@ export default function WorkspaceHome() {
         'workflows',
         'automations',
         'analytics',
+        'onboarding',
         'alerts',
         'reports',
         'settings',
@@ -1263,6 +1730,10 @@ export default function WorkspaceHome() {
         'referrals',
         'documentation',
         'evidence',
+        'demo',
+        'roi',
+        'deployment',
+        'flow',
         'simulations',
         'iot',
       ].includes(activeSubpageId) ? (
@@ -1276,6 +1747,6 @@ export default function WorkspaceHome() {
           renderItem={(item) => <WorkspaceCapabilityCard key={item.id} item={item} />}
         />
       ) : null}
-    </main>
+    </PageShell>
   );
 }

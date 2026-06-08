@@ -65,7 +65,7 @@ export const DEFAULT_HOSPITAL_READINESS_QUESTIONNAIRE = Object.freeze({
 
 export const HOSPITAL_READINESS_RECOMMENDATIONS = Object.freeze({
   products: [
-    'Emergency Department Solution',
+    'Emergency Flow Intelligence Platform',
     'Hospital Operations Command Center',
     'AI Governance Suite',
   ],

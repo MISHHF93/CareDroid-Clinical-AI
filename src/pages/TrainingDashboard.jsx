@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
+import { DashboardGrid, MetricCard, PageShell } from '../components/ui/CareDroidPrimitives';
 import {
   LOCAL_TRAINING_DASHBOARD,
   createTrainingRun,
@@ -112,48 +113,29 @@ export default function TrainingDashboard() {
   };
 
   return (
-    <main className="training-dashboard">
-      <section className="training-hero" aria-labelledby="training-dashboard-title">
-        <div className="training-hero__icon" aria-hidden>
-          <NavIcon icon={CHROME_ICONS.brain} size={30} />
-        </div>
-        <div>
-          <p className="training-eyebrow">AI model pipeline</p>
-          <h1 id="training-dashboard-title">Training Dashboard</h1>
-          <p>
-            Manage data preparation, labeling, embeddings, LoRA tuning, evaluation, and deployment
-            for prompt engineering, RAG, LoRA, and MoE routing.
-          </p>
-        </div>
+    <PageShell
+      className="training-dashboard"
+      eyebrow="AI model pipeline"
+      title="Training Dashboard"
+      titleId="training-dashboard-title"
+      description="Manage data preparation, labeling, embeddings, LoRA tuning, evaluation, and deployment for prompt engineering, RAG, LoRA, and MoE routing."
+      leadingIcon={<NavIcon icon={CHROME_ICONS.brain} size={30} />}
+      actions={
         <button type="button" onClick={handleCreateRun} disabled={creating}>
           {creating ? 'Queueing...' : 'Queue training run'}
         </button>
-      </section>
+      }
+    >
 
       {notice && <p className="training-notice">{notice}</p>}
 
-      <section className="training-metrics" aria-label="Evaluation metrics">
-        <div>
-          <span>Accuracy</span>
-          <strong>{formatMetric('accuracy', metrics.accuracy)}</strong>
-        </div>
-        <div>
-          <span>Hallucination rate</span>
-          <strong>{formatMetric('hallucinationRate', metrics.hallucinationRate)}</strong>
-        </div>
-        <div>
-          <span>Precision</span>
-          <strong>{formatMetric('precision', metrics.precision)}</strong>
-        </div>
-        <div>
-          <span>Latency</span>
-          <strong>{formatMetric('latencyMs', metrics.latencyMs)}</strong>
-        </div>
-        <div>
-          <span>Cost</span>
-          <strong>{formatMetric('costUsd', metrics.costUsd)}</strong>
-        </div>
-      </section>
+      <DashboardGrid variant="metrics" className="training-metrics" aria-label="Evaluation metrics">
+        <MetricCard label="Accuracy" value={formatMetric('accuracy', metrics.accuracy)} />
+        <MetricCard label="Hallucination rate" value={formatMetric('hallucinationRate', metrics.hallucinationRate)} />
+        <MetricCard label="Precision" value={formatMetric('precision', metrics.precision)} />
+        <MetricCard label="Latency" value={formatMetric('latencyMs', metrics.latencyMs)} />
+        <MetricCard label="Cost" value={formatMetric('costUsd', metrics.costUsd)} />
+      </DashboardGrid>
 
       <section className="training-progress-panel">
         <div className="training-panel-heading">
@@ -222,6 +204,6 @@ export default function TrainingDashboard() {
           </section>
         </aside>
       </section>
-    </main>
+    </PageShell>
   );
 }

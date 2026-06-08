@@ -6,6 +6,7 @@ import {
   VisualizationPanel,
 } from '../components/dashboard/DashboardVisualizations';
 import StateSourceNotice from '../components/StateSourceNotice';
+import { DashboardGrid, PageShell } from '../components/ui/CareDroidPrimitives';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import {
@@ -163,24 +164,20 @@ export default function AiEvaluationDashboard() {
   const failingBenchmarks = benchmarks.filter((benchmark) => !benchmark.passed).length;
 
   return (
-    <main className="ai-evaluation-dashboard">
-      <section className="ai-evaluation-hero" aria-labelledby="ai-evaluation-title">
-        <div className="ai-evaluation-hero__icon" aria-hidden>
-          <NavIcon icon={CHROME_ICONS.lineChart} size={30} />
-        </div>
-        <div>
-          <p className="ai-evaluation-eyebrow">AI evaluation framework</p>
-            <h1 id="ai-evaluation-title">AI Evaluation Lab</h1>
-          <p>
-            Track model quality, hallucination rate, tool-call success, workflow success, latency,
-            and cost, then compare models, prompts, agents, and RAG strategies.
-          </p>
-        </div>
+    <PageShell
+      className="ai-evaluation-dashboard"
+      eyebrow="AI evaluation framework"
+      title="AI Evaluation Lab"
+      titleId="ai-evaluation-title"
+      description="Track model quality, hallucination rate, tool-call success, workflow success, latency, and cost, then compare models, prompts, agents, and RAG strategies."
+      leadingIcon={<NavIcon icon={CHROME_ICONS.lineChart} size={30} />}
+      actions={
         <div className="ai-evaluation-hero__status">
           <span>{loading ? 'Syncing' : 'Updated'}</span>
           <strong>{failingBenchmarks === 0 ? 'All gates passing' : `${failingBenchmarks} gates need review`}</strong>
         </div>
-      </section>
+      }
+    >
 
       {notice ? <p className="ai-evaluation-notice">{notice}</p> : null}
 
@@ -195,7 +192,7 @@ export default function AiEvaluationDashboard() {
         details="Evaluation metrics use backend benchmark results when available and local baseline data when the backend is unavailable. Local baselines are release-readiness examples, not live production model quality."
       />
 
-      <section className="dashboard-metric-grid" aria-label="AI evaluation metrics">
+      <DashboardGrid variant="metrics" className="dashboard-metric-grid" aria-label="AI evaluation metrics">
         {EVALUATION_METRICS.map((metric) => (
           <MetricCard
             key={metric.id}
@@ -205,9 +202,9 @@ export default function AiEvaluationDashboard() {
             tone={metricTone(metric.id, benchmarkById[metric.id])}
           />
         ))}
-      </section>
+      </DashboardGrid>
 
-      <section className="dashboard-visual-grid" aria-label="AI evaluation charts and trends">
+      <DashboardGrid className="dashboard-visual-grid" aria-label="AI evaluation charts and trends">
         <VisualizationPanel
           title="Model Quality Trend"
           description="Composite model quality across recent evaluation runs."
@@ -248,7 +245,7 @@ export default function AiEvaluationDashboard() {
             color="var(--app-chart-5)"
           />
         </VisualizationPanel>
-      </section>
+      </DashboardGrid>
 
       <section className="ai-evaluation-comparison-panel" aria-labelledby="ai-evaluation-comparisons-title">
         <div className="ai-evaluation-section-heading">
@@ -312,6 +309,6 @@ export default function AiEvaluationDashboard() {
           ))}
         </div>
       </section>
-    </main>
+    </PageShell>
   );
 }

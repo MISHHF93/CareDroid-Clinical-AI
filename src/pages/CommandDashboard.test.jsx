@@ -85,8 +85,8 @@ describe('CommandDashboard', () => {
   it('renders decluttered command center sections without the old dashboard wall', () => {
     renderDashboard();
 
-    expect(screen.getByRole('heading', { level: 1, name: /emergency department command center/i })).toBeInTheDocument();
-    expect(screen.getByText(/emergency department os/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /emergency flow command center/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/emergency flow intelligence/i).length).toBeGreaterThan(0);
     for (const name of [
       /^actions$/i,
       /ai assistant/i,
@@ -102,7 +102,7 @@ describe('CommandDashboard', () => {
     expect(screen.getByText(/emergency department operating environment/i)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /systems ready/i })).toHaveAttribute('href', '/system-health');
     expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/flow/i)).toBeInTheDocument();
-    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/9 stages/i)).toBeInTheDocument();
+    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/7 stages/i)).toBeInTheDocument();
     expect(screen.queryByLabelText(/frontend operating system flow/i)).not.toBeInTheDocument();
     expect(screen.queryByLabelText(/emergency os operating brief/i)).not.toBeInTheDocument();
   });
@@ -195,13 +195,13 @@ describe('CommandDashboard', () => {
   it('seeds free text into assistant and routes to the focused workspace', () => {
     renderDashboard();
 
-    fireEvent.change(screen.getByLabelText(/ask emergency department assistant what you need to do next/i), {
+    fireEvent.change(screen.getByLabelText(/ask emergency flow copilot what you need to do next/i), {
       target: { value: 'Help me triage chest pain' },
     });
     fireEvent.click(screen.getByRole('button', { name: /ask assistant/i }));
 
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
-      expect.stringContaining('[Emergency Department OS]'),
+      expect.stringContaining('[Emergency Flow Intelligence]'),
       'user'
     );
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(

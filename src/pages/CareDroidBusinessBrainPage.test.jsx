@@ -14,7 +14,7 @@ describe('CareDroidBusinessBrainPage', () => {
     expect(screen.getByText('AI analytics')).toBeInTheDocument();
     expect(screen.getByText('Automation analytics')).toBeInTheDocument();
     expect(screen.getByText('Simulation analytics')).toBeInTheDocument();
-    expect(screen.getAllByText(/Expand Emergency Department Solution/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Expand Emergency Flow Intelligence Platform/).length).toBeGreaterThan(0);
     expect(screen.getAllByText('Retire low-signal legacy protocol pack').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Merge protocol lookup and workflow builder assets').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Onboard customers with low activation and high expansion fit').length).toBeGreaterThan(0);

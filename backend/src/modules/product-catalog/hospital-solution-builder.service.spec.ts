@@ -6,8 +6,8 @@ describe('HospitalSolutionBuilderService', () => {
     {
       id: 'product-emergency-department',
       slug: 'emergency-department-suite',
-      name: 'Emergency Department Solution',
-      description: 'ED support.',
+      name: 'Emergency Flow Intelligence Platform',
+      description: 'ED and EMS flow support.',
       productType: ProductType.EMERGENCY_DEPARTMENT,
       packIds: ['emergency-department-pack'],
       expectedOutcomes: ['Reduce triage time'],

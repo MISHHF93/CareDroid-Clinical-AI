@@ -8,13 +8,14 @@ export const PRODUCT_HEALTH_BANDS = Object.freeze([
 export const PRODUCT_INTELLIGENCE_PRODUCTS = Object.freeze([
   {
     id: 'emergency-department-solution',
-    name: 'Emergency Department Solution',
-    packs: ['Emergency Pack', 'Simulation Pack'],
+    name: 'Emergency Flow Intelligence Platform',
+    packs: ['Emergency Flow Pack', 'EMS Handoff Pack', 'Simulation Pack'],
     assets: [
-      { id: 'qsofa', name: 'qSOFA calculator', type: 'calculator' },
-      { id: 'sepsis-protocol', name: 'Sepsis escalation protocol', type: 'protocol' },
-      { id: 'ed-workflow', name: 'ED triage workflow', type: 'workflow' },
-      { id: 'patient-summary-ai', name: 'Patient summary AI', type: 'ai_tool' },
+      { id: 'ed-command-center', name: 'ED command center', type: 'dashboard' },
+      { id: 'ems-handoff', name: 'EMS-to-ED handoff workflow', type: 'workflow' },
+      { id: 'bed-flow', name: 'Bed flow intelligence', type: 'workflow' },
+      { id: 'surge-prediction', name: 'Surge prediction', type: 'analytics' },
+      { id: 'ed-copilot', name: 'ED Flow Copilot', type: 'ai_tool' },
     ],
     usage: {
       launches: 1240,
@@ -24,8 +25,9 @@ export const PRODUCT_INTELLIGENCE_PRODUCTS = Object.freeze([
       aiAssistedActions: 448,
     },
     outcomes: [
-      { id: 'triage-standardization', label: 'Triage standardization', valueScore: 86 },
-      { id: 'workflow-completion', label: 'Workflow completion lift', valueScore: 80 },
+      { id: 'bottleneck-reduction', label: 'Bottleneck reduction', valueScore: 86 },
+      { id: 'handoff-coordination', label: 'Handoff coordination lift', valueScore: 82 },
+      { id: 'flow-visibility', label: 'Flow visibility', valueScore: 84 },
     ],
     implementationCost: 140000,
     estimatedValue: 382000,

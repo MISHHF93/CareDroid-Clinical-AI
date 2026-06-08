@@ -23,14 +23,14 @@ describe('productIntelligenceLayer', () => {
     const layer = buildProductIntelligenceLayer();
     const emergency = layer.products.find((product) => product.id === 'emergency-department-solution');
 
-    expect(emergency.valueChain.product).toBe('Emergency Department Solution');
-    expect(emergency.valueChain.packs).toEqual(expect.arrayContaining(['Emergency Pack']));
+    expect(emergency.valueChain.product).toBe('Emergency Flow Intelligence Platform');
+    expect(emergency.valueChain.packs).toEqual(expect.arrayContaining(['Emergency Flow Pack']));
     expect(emergency.valueChain.assets).toEqual(
-      expect.arrayContaining([expect.objectContaining({ name: 'qSOFA calculator' })]),
+      expect.arrayContaining([expect.objectContaining({ name: 'ED command center' })]),
     );
     expect(emergency.valueChain.usage.launches).toBeGreaterThan(0);
     expect(emergency.valueChain.outcomes).toEqual(
-      expect.arrayContaining([expect.objectContaining({ label: 'Triage standardization' })]),
+      expect.arrayContaining([expect.objectContaining({ label: 'Bottleneck reduction' })]),
     );
   });
 

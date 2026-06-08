@@ -8,7 +8,7 @@ The SaaS Packaging Layer packages CareDroid into sellable organization-scoped of
 
 The six canonical sellable products are:
 
-- Emergency Department Solution
+- Emergency Flow Intelligence Platform
 - Hospital Operations Solution
 - Medical IoT Solution
 - Simulation & Training Solution

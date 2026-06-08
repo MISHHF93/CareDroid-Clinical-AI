@@ -9,6 +9,7 @@ import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import { buildPlatformAnalytics, PLATFORM_ANALYTICS_DECISIONS } from '../data/platformAnalytics';
 import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
+import { DashboardGrid, PageShell } from '../components/ui/CareDroidPrimitives';
 import './AnalyticsDashboard.css';
 
 const AnalyticsDashboard = () => {
@@ -94,25 +95,18 @@ const AnalyticsDashboard = () => {
   );
 
   return (
-    <div className="analytics-dashboard">
-      <header className="analytics-header">
-        <div>
-          <h1 className="analytics-page-title">
-            <span className="analytics-page-title-icon" aria-hidden>
-              <NavIcon icon={CHROME_ICONS.lineChart} size={28} />
-            </span>
-            <span>Platform Analytics</span>
-          </h1>
-          <p>
-            Privacy-safe telemetry for tool usage, calculator usage, AI launches, simulation
-            completion, dashboard activity, workflow usage, and search activity.
-          </p>
-        </div>
-        <div className="analytics-header-actions">
+    <PageShell
+      className="analytics-dashboard"
+      title="Platform Analytics"
+      description="Privacy-safe telemetry for tool usage, calculator usage, AI launches, simulation completion, dashboard activity, workflow usage, and search activity."
+      leadingIcon={<NavIcon icon={CHROME_ICONS.lineChart} size={28} />}
+      actions={
+        <>
           <span className="analytics-badge">Privacy-safe</span>
           <span className="analytics-user">Role: {user?.role || 'viewer'}</span>
-        </div>
-      </header>
+        </>
+      }
+    >
 
       {errorMessage && (
         <div className="analytics-error">
@@ -131,7 +125,7 @@ const AnalyticsDashboard = () => {
         details="Analytics uses backend aggregate metrics when available, plus local/offline tool activity and demo aggregate fallbacks. When the metrics backend is unavailable, the page clearly falls back instead of claiming live production analytics."
       />
 
-      <section className="analytics-summary">
+      <DashboardGrid variant="metrics" className="analytics-summary">
         <div className="summary-card">
           <h3>Total Events</h3>
           <p className="summary-value">{isLoading && !metrics ? '…' : analytics.summary.totalEvents}</p>
@@ -152,7 +146,7 @@ const AnalyticsDashboard = () => {
           <p className="summary-value">{analytics.summary.searchEvents}</p>
           <span className="summary-label">Query text never stored</span>
         </div>
-      </section>
+      </DashboardGrid>
 
       <section className="analytics-privacy" aria-label="Privacy-safe telemetry">
         <div>
@@ -166,7 +160,7 @@ const AnalyticsDashboard = () => {
         <span className="analytics-badge">No PHI</span>
       </section>
 
-      <section className="analytics-grid">
+      <DashboardGrid className="analytics-grid">
         <div className="analytics-panel">
           <h2>Most Used Tools</h2>
           {analytics.topUsed.map((tool) => (
@@ -213,9 +207,9 @@ const AnalyticsDashboard = () => {
             </div>
           ))}
         </div>
-      </section>
+      </DashboardGrid>
 
-      <section className="analytics-grid">
+      <DashboardGrid className="analytics-grid">
         <div className="analytics-panel">
           <h2>Adoption Trends</h2>
           {analytics.adoptionTrend.map((point) => (
@@ -244,7 +238,7 @@ const AnalyticsDashboard = () => {
             </div>
           ))}
         </div>
-      </section>
+      </DashboardGrid>
 
       <section className="analytics-recommendations">
         <h2>Product Decisions</h2>
@@ -266,7 +260,7 @@ const AnalyticsDashboard = () => {
           ))}
         </div>
       </section>
-    </div>
+    </PageShell>
   );
 };
 

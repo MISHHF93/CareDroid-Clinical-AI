@@ -1,6 +1,12 @@
 import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { InsightCard, SectionHeader, StatusBadge } from '../components/ui/CareDroidPrimitives';
+import {
+  DashboardGrid,
+  DashboardSection,
+  InsightCard,
+  PageShell,
+  StatusBadge,
+} from '../components/ui/CareDroidPrimitives';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
@@ -229,24 +235,14 @@ export default function Operations() {
   };
 
   return (
-    <section
+    <PageShell
       className={`operating-workspace operating-workspace--${cssToken(workspaceExperience.tone)} operating-workspace--workspace-${cssToken(workspaceExperience.id)}`}
-      aria-labelledby="operations-title"
       data-workspace-os={workspaceExperience.id}
       style={workspaceThemeStyle(workspaceExperience)}
-    >
-      <section className="operating-hero">
-        <div className="operating-hero__icon" aria-hidden>
-          <NavIcon icon={WorkspaceIcon} size={28} />
-        </div>
-        <div className="operating-hero__copy">
-          <p className="operating-eyebrow">{workspaceExperience.operatingLabel}</p>
-          <h1 id="operations-title">{workspaceExperience.shortLabel} Operations</h1>
-          <p>
-            {workspaceExperience.modeSummary} Operational routes, tools, alerts, maps, and
-            recommendations now follow the active workspace.
-          </p>
-        </div>
+      eyebrow={workspaceExperience.operatingLabel}
+      title={`${workspaceExperience.shortLabel} Operations`}
+      description={`${workspaceExperience.modeSummary} Operational routes, tools, alerts, maps, and recommendations now follow the active workspace.`}
+      actions={
         <button
           type="button"
           className="operating-primary-action"
@@ -254,9 +250,9 @@ export default function Operations() {
         >
           Ask {workspaceExperience.assistantTitle}
         </button>
-      </section>
-
-      <section className="operating-insights" aria-label="Operations context insights">
+      }
+    >
+      <DashboardGrid className="operating-insights" aria-label="Operations context insights">
         <InsightCard
           eyebrow={workspaceExperience.environment}
           title={`${workspaceExperience.shortLabel} priority`}
@@ -269,15 +265,17 @@ export default function Operations() {
           description={workspaceExperience.dashboardSubtitle}
           badge={<StatusBadge status="generated">Generated</StatusBadge>}
         />
-      </section>
+      </DashboardGrid>
 
-      <section className="operating-section" aria-labelledby="operation-areas-title">
-        <SectionHeader
-          id="operation-areas-title"
+      <DashboardSection
+        className="operating-section"
+        aria-labelledby="operation-areas-title"
+        titleId="operation-areas-title"
+        leadingIcon={<NavIcon icon={WorkspaceIcon} size={22} />}
           title={`${workspaceExperience.shortLabel} operational areas`}
           description="These are the first operational actions for the active workspace. Other maps, telemetry, and fleet views stay available as drill-downs."
-        />
-        <div className="operating-card-grid">
+      >
+        <DashboardGrid className="operating-card-grid">
           {workspaceOperationAreas.map((area) => (
             <button
               key={area.title}
@@ -293,16 +291,17 @@ export default function Operations() {
               <span className="operating-card__action">{area.label}</span>
             </button>
           ))}
-        </div>
-      </section>
+        </DashboardGrid>
+      </DashboardSection>
 
-      <section className="operating-section" aria-labelledby="operation-drilldowns-title">
-        <SectionHeader
-          id="operation-drilldowns-title"
-          title="Drill-downs"
-          description={`Lower-level routes stay reachable without competing with ${workspaceExperience.shortLabel} priorities.`}
-        />
-        <div className="operating-drilldown-list">
+      <DashboardSection
+        className="operating-section"
+        aria-labelledby="operation-drilldowns-title"
+        titleId="operation-drilldowns-title"
+        title="Drill-downs"
+        description={`Lower-level routes stay reachable without competing with ${workspaceExperience.shortLabel} priorities.`}
+      >
+        <DashboardGrid className="operating-drilldown-list">
           {workspaceDrilldowns.map((area) => (
             <button
               key={area.title}
@@ -319,16 +318,17 @@ export default function Operations() {
               </span>
             </button>
           ))}
-        </div>
-      </section>
+        </DashboardGrid>
+      </DashboardSection>
 
-      <section className="operating-section" aria-labelledby="operation-intelligence-title">
-        <SectionHeader
-          id="operation-intelligence-title"
-          title="Operations intelligence"
-          description="Analysis routes from the operations sidebar stay discoverable from the hub."
-        />
-        <div className="operating-drilldown-list">
+      <DashboardSection
+        className="operating-section"
+        aria-labelledby="operation-intelligence-title"
+        titleId="operation-intelligence-title"
+        title="Operations intelligence"
+        description="Analysis routes from the operations sidebar stay discoverable from the hub."
+      >
+        <DashboardGrid className="operating-drilldown-list">
           {OPERATION_INTELLIGENCE.slice(0, 2).map((area) => (
             <button
               key={area.title}
@@ -345,16 +345,17 @@ export default function Operations() {
               </span>
             </button>
           ))}
-        </div>
-      </section>
+        </DashboardGrid>
+      </DashboardSection>
 
-      <section className="operating-section" aria-labelledby="operation-continuations-title">
-        <SectionHeader
-          id="operation-continuations-title"
-          title={`Continue from ${workspaceExperience.shortLabel} Operations`}
-          description="Continue into workspace-aware workflows, result review, recommendations, or Assistant."
-        />
-        <div className="operating-drilldown-list">
+      <DashboardSection
+        className="operating-section"
+        aria-labelledby="operation-continuations-title"
+        titleId="operation-continuations-title"
+        title={`Continue from ${workspaceExperience.shortLabel} Operations`}
+        description="Continue into workspace-aware workflows, result review, recommendations, or Assistant."
+      >
+        <DashboardGrid className="operating-drilldown-list">
           {OPERATION_CONTINUATIONS.map((action) => (
             <Link
               key={action.title}
@@ -370,8 +371,8 @@ export default function Operations() {
               </span>
             </Link>
           ))}
-        </div>
-      </section>
-    </section>
+        </DashboardGrid>
+      </DashboardSection>
+    </PageShell>
   );
 }

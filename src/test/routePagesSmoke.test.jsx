@@ -283,7 +283,7 @@ vi.mock('../services/productCatalogApi', () => ({
       chains: [
         {
           id: 'product:pack:asset',
-          product: { id: 'product', name: 'Emergency Department Solution' },
+          product: { id: 'product', name: 'Emergency Flow Intelligence Platform' },
           assetPack: { id: 'pack', name: 'Emergency Department Pack' },
           asset: { id: 'asset', title: 'qSOFA', assetType: 'calculator', dependencies: [] },
           route: '/tools/calculators/qsofa',

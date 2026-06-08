@@ -21,7 +21,7 @@ Every seeded product receives buyer metadata. Existing product `targetBuyers` an
 
 Examples:
 
-- Emergency Department Solution: ED Director, Chief Medical Officer, ED clinicians, triage teams, faster risk stratification, standardized triage.
+- Emergency Flow Intelligence Platform: ED Director, COO, EMS leadership, ED clinicians, triage teams, reduced ED bottlenecks, improved handoff coordination, and better flow visibility.
 - Hospital Operations Solution: COO, Operations Director, facilities, bed management, incident command, capacity visibility.
 - Medical IoT Solution: Biomedical Engineering Lead, clinical engineering, device managers, IT operations, device uptime.
 - Governance & Compliance Solution: CIO, Compliance Officer, privacy, security, safety reviewers, audit readiness, AI governance.

@@ -68,7 +68,7 @@ export const SAAS_PRODUCTS = Object.freeze([
   }),
   Object.freeze({
     id: 'product-emergency-department',
-    name: 'Emergency Department Solution',
+    name: 'Emergency Flow Intelligence Platform',
     layer: 'product',
     packIds: ['emergency-department-pack', 'emergency-medicine'],
   }),

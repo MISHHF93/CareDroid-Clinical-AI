@@ -43,7 +43,7 @@ describe('MaturityAssessmentPage', () => {
     expect(screen.getByText('Packs')).toBeInTheDocument();
     expect(screen.getByText('Integrations')).toBeInTheDocument();
     expect(screen.getByText('Training')).toBeInTheDocument();
-    expect(screen.getByText('Emergency Department Solution')).toBeInTheDocument();
+    expect(screen.getByText('Emergency Flow Intelligence Platform')).toBeInTheDocument();
     expect(screen.getByText('Simulation Pack')).toBeInTheDocument();
     expect(screen.getByText('FHIR Patient Context')).toBeInTheDocument();
     expect(screen.getByText('AI governance enablement')).toBeInTheDocument();

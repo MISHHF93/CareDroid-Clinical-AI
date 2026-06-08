@@ -52,7 +52,7 @@ Automation types covered:
 
 Implemented as sellable solution packages:
 
-- Emergency Department Solution
+- Emergency Flow Intelligence Platform
 - Laboratory Intelligence Solution
 - Medical IoT Solution
 - Fleet Operations Solution
@@ -140,7 +140,7 @@ Packaging model:
 
 Examples:
 
-- Emergency Department Solution includes emergency workspace, clinical automations, emergency AI copilot, calculators, protocols, simulations, and outcomes.
+- Emergency Flow Intelligence Platform includes emergency workspace, ED command center, EMS handoff, dynamic triage, bed flow, referral, discharge, equipment, surge, ED Copilot, protocols, simulations, and outcomes.
 - Laboratory Intelligence Solution includes laboratory workspace, lab automations, reports, analytics, AI interpretation, and review workflows.
 - Medical IoT Solution includes medical-iot workspace, device fleet, telemetry, automations, alerts, and maintenance outcomes.
 - Fleet Operations Solution includes fleet workspace, route/dispatch/maintenance automations, AI support, and utilization outcomes.

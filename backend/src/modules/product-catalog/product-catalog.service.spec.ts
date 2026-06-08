@@ -87,7 +87,7 @@ describe('ProductCatalogService', () => {
     const productNames = new Set(SEED_PRODUCTS.map((product) => product.name));
 
     expect(REQUIRED_SELLABLE_PRODUCT_NAMES).toEqual([
-      'Emergency Department Solution',
+      'Emergency Flow Intelligence Platform',
       'Hospital Operations Solution',
       'Medical IoT Solution',
       'Simulation & Training Solution',
@@ -110,6 +110,29 @@ describe('ProductCatalogService', () => {
     SEED_COMMERCIAL_PLANS.forEach((plan) => {
       expect(plan.includedPackIds.length + plan.includedProductIds.length).toBeGreaterThan(0);
     });
+  });
+
+  it('keeps Emergency Flow sellable as a starter pilot with flow outcomes', () => {
+    const emergency = SEED_PRODUCTS.find((product) => product.id === 'product-emergency-department');
+
+    expect(emergency).toEqual(
+      expect.objectContaining({
+        name: 'Emergency Flow Intelligence Platform',
+        commercialPlanIds: expect.arrayContaining(['starter', 'professional', 'enterprise']),
+        pricingTierPlaceholder: 'Starter / Professional / Enterprise',
+        readinessLabels: expect.arrayContaining(['standalone-demo-ready', 'starter-pilot-ready']),
+        requiredIntegrations: expect.arrayContaining([
+          expect.stringMatching(/^Optional EHR patient context/i),
+          expect.stringMatching(/^Optional EMS CAD/i),
+        ]),
+        outcomes: expect.arrayContaining([
+          'reduced ED bottlenecks',
+          'improved EMS-to-ED handoff coordination',
+          'better bed flow and capacity visibility',
+          'lower clinician coordination burden',
+        ]),
+      })
+    );
   });
 
   it('defines buyer and stakeholder metadata for every seeded product and asset pack', () => {
@@ -402,12 +425,12 @@ describe('ProductCatalogService', () => {
       {
         id: 'product-emergency-department',
         slug: 'emergency-department-suite',
-        name: 'Emergency Department Solution',
+        name: 'Emergency Flow Intelligence Platform',
         productType: 'emergency_department',
         packIds: ['emergency-department-pack'],
         highlightAssetIds: ['qsofa'],
-        outcomes: ['faster risk stratification'],
-        expectedOutcomes: ['Reduce triage time'],
+        outcomes: ['reduced ED bottlenecks'],
+        expectedOutcomes: ['Reduce ED bottlenecks'],
         targetUsers: ['Emergency physicians'],
       },
     ]);
@@ -451,7 +474,7 @@ describe('ProductCatalogService', () => {
 
     const [graph] = (await service.getProductBuilderGraph()) as any[];
 
-    expect(graph.product.name).toBe('Emergency Department Solution');
+    expect(graph.product.name).toBe('Emergency Flow Intelligence Platform');
     expect(graph.roles).toEqual(
       expect.arrayContaining([
         'Emergency physicians',
@@ -484,8 +507,8 @@ describe('ProductCatalogService', () => {
     expect(graph.outcomeMappings).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          outcome: 'Reduce triage time',
-          product: expect.objectContaining({ name: 'Emergency Department Solution' }),
+          outcome: 'Reduce ED bottlenecks',
+          product: expect.objectContaining({ name: 'Emergency Flow Intelligence Platform' }),
           packs: expect.arrayContaining([
             expect.objectContaining({ id: 'emergency-department-pack' }),
           ]),

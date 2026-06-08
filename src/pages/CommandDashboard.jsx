@@ -19,6 +19,8 @@ import {
 } from '../components/dashboard/DashboardVisualizations';
 import {
   MetricCard as CompactMetricCard,
+  DashboardGrid,
+  DashboardSection,
 } from '../components/ui/CareDroidPrimitives';
 import LaunchActionCard from '../components/ui/LaunchActionCard';
 import {
@@ -71,21 +73,17 @@ function CommandToolLaunchCard({ tool, onLaunch }) {
 
 function DashboardPanel({ title, description, icon, children, className = '' }) {
   return (
-    <section
+    <DashboardSection
       className={`command-panel ${className}`.trim()}
       aria-labelledby={`${title.replace(/\W+/g, '-').toLowerCase()}-title`}
+      headerClassName="command-panel__header"
+      leadingIcon={<span className="command-panel__icon"><NavIcon icon={icon} size={22} /></span>}
+      title={title}
+      titleId={`${title.replace(/\W+/g, '-').toLowerCase()}-title`}
+      description={description}
     >
-      <div className="command-panel__header">
-        <span className="command-panel__icon" aria-hidden>
-          <NavIcon icon={icon} size={22} />
-        </span>
-        <div>
-          <h2 id={`${title.replace(/\W+/g, '-').toLowerCase()}-title`}>{title}</h2>
-          {description ? <p>{description}</p> : null}
-        </div>
-      </div>
       {children}
-    </section>
+    </DashboardSection>
   );
 }
 
@@ -570,11 +568,11 @@ export default function CommandDashboard() {
         description="Start with Assistant. Tools and Operations stay close for direct work."
         icon={CHROME_ICONS.layoutDashboard}
       >
-        <div className="command-compact-action-grid">
+        <DashboardGrid className="command-compact-action-grid">
           {workspaceActionCards.map((item) => (
             <CompactActionCard key={item.id} item={item} />
           ))}
-        </div>
+        </DashboardGrid>
         <div className="command-utility-links" aria-label="Secondary dashboard access">
           <Link to={CANONICAL_ROUTES.search}>Search</Link>
           <Link to={CANONICAL_ROUTES.recommendations}>Recommendations</Link>

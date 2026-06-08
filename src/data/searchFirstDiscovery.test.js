@@ -115,7 +115,16 @@ describe('search-first discovery index', () => {
   });
 
   it('indexes commercial catalog capabilities and row-level launch targets', () => {
-    expect(buildSearchFirstResults({ query: 'emergency department solution' })[0]).toEqual(
+    expect(buildSearchFirstResults({ query: 'emergency flow intelligence platform' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          kind: 'commercial',
+          sourceId: 'specialty-emergency',
+          path: '/specialties/emergency',
+        }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'ems handoff bed flow bottleneck' })[0]).toEqual(
       expect.objectContaining({
         kind: 'commercial',
         sourceId: 'specialty-emergency',

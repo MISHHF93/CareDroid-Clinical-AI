@@ -1,12 +1,12 @@
-# Emergency Department Operating System Report
+# Emergency Flow Intelligence Operating Report
 
 ## Goal
 
-Transform the Emergency Workspace from a collection of emergency-adjacent tools into a sellable Emergency Department Operating System (ED OS). The ED OS must run as a workspace mode inside the existing CareDroid AppShell and Sidebar, with one canonical patient journey, one emergency automation model, and one operational dashboard.
+Transform the Emergency Workspace from a collection of emergency-adjacent tools into a sellable Emergency Flow Intelligence Platform. The platform must run as a workspace mode inside the existing CareDroid AppShell and Sidebar, with one canonical patient journey, one emergency automation model, and one operational dashboard.
 
 ## Canonical Emergency Patient Journey
 
-The ED OS is anchored to this journey:
+Emergency Flow Intelligence is anchored to this journey:
 
 Patient -> Arrival -> Registration -> Triage -> Clinical Assessment -> Orders -> Results -> Disposition -> Discharge/Admission
 
@@ -29,9 +29,9 @@ Each ED automation must define trigger, inputs, outputs, required assets, requir
 
 Automation availability by tier:
 
-- Emergency Core: Automated Triage Matrix, Documentation Integrity, RAG Evidence Retrieval, Discharge Summary Drafting.
-- Emergency Professional: Core plus Referral Routing, Surge Staffing, Simulation Academy, Medical IoT Monitoring, Virtual ED.
-- Emergency Enterprise: Professional plus Prior Authorization and expanded enterprise integrations.
+- Emergency Flow Starter: Automated Triage Matrix, Documentation Integrity, RAG Evidence Retrieval, Discharge Summary Drafting.
+- Emergency Flow Professional: Starter plus Referral Routing, Surge Staffing, Simulation Academy, Medical IoT Monitoring, Virtual ED.
+- Emergency Flow Enterprise: Professional plus Prior Authorization and expanded enterprise integrations.
 
 ## Emergency Dashboard
 
@@ -50,7 +50,7 @@ Unrelated enterprise, billing, governance, and global platform widgets should st
 
 ## Emergency Subpages
 
-The ED OS uses the existing workspace route owner:
+Emergency Flow Intelligence uses the existing workspace route owner:
 
 - `/workspace/emergency/dashboard`
 - `/workspace/emergency/triage`

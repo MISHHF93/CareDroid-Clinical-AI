@@ -190,9 +190,10 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
     type: WorkspaceType.EMERGENCY,
     name: 'Emergency Workspace',
     displayName: 'Emergency',
-    description: 'Rapid triage, deterioration scoring, live alerts, and time-sensitive pathways.',
+    description:
+      'Emergency Flow Intelligence for ED throughput, EMS handoff, triage, bed flow, referrals, discharge, equipment, surge prediction, and command-center operations.',
     assistantContext:
-      'Prioritize ABCs, vitals, red flags, time-sensitive triage, and emergency calculators before broad browsing.',
+      'Prioritize ED flow bottlenecks, EMS arrivals, handoffs, waiting room pressure, bed pressure, referrals, discharge readiness, equipment constraints, surge signals, and human-reviewed workflow guidance.',
     defaultDashboard: 'emergency',
     enabledToolIds: [
       'qsofa',
@@ -205,15 +206,16 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
       'hospital-map',
       'fleet-live-map',
     ],
-    enabledModules: ['dashboard', 'assistant', 'alerts', 'calculators', 'maps', 'fleet'],
+    enabledModules: ['dashboard', 'assistant', 'alerts', 'flow', 'handoff', 'bed-flow', 'referrals', 'equipment', 'surge', 'calculators', 'maps', 'fleet'],
     shortcuts: [
       baseShortcuts.assistant,
+      baseShortcuts.dashboard,
       {
-        id: 'calculators',
-        label: 'Emergency Calculators',
-        path: '/tools/calculators',
-        description: 'Open deterioration and triage calculators.',
-        assetId: 'qsofa',
+        id: 'flow-intelligence',
+        label: 'Flow Intelligence',
+        path: '/workspace/emergency/flow',
+        description: 'Open ED flow, EMS handoff, bed pressure, referral, equipment, surge, and command-center model.',
+        assetId: 'hospital-operations-command',
       },
       {
         id: 'live-map',
@@ -223,7 +225,7 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
         assetId: 'live-tracking-map',
       },
     ],
-    recommendedAssetIds: ['qsofa', 'news2', 'sofa-score', 'nihss', 'heart-score', 'protocols'],
+    recommendedAssetIds: ['hospital-operations-command', 'qsofa', 'news2', 'nihss', 'protocols', 'hospital-map', 'medical-iot-dashboard'],
   },
   [WorkspaceType.ICU]: {
     type: WorkspaceType.ICU,

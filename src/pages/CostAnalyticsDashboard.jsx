@@ -6,6 +6,7 @@ import { toolRegistryById } from '../data/toolRegistry';
 import { NavIcon } from '../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../navigation/iconRegistry';
 import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
+import { DashboardGrid, PageShell } from '../components/ui/CareDroidPrimitives';
 import './CostAnalyticsDashboard.css';
 
 const CostAnalyticsDashboard = () => {
@@ -65,24 +66,22 @@ const CostAnalyticsDashboard = () => {
   }
 
   return (
-    <div className="cost-analytics-dashboard">
-      <header className="cost-header">
-        <div>
-          <h1 className="cost-header-title">
-            <NavIcon icon={CHROME_ICONS.circleDollar} size={32} aria-hidden />
-            Cost Analytics
-          </h1>
-          <p>Track tool usage costs and ROI for CareDroid platform.</p>
-        </div>
-        <div className="cost-header-actions">
+    <PageShell
+      className="cost-analytics-dashboard"
+      title="Cost Analytics"
+      description="Track tool usage costs and ROI for CareDroid platform."
+      leadingIcon={<NavIcon icon={CHROME_ICONS.circleDollar} size={32} />}
+      actions={
+        <>
           <button className="btn-secondary" onClick={() => setShowLimitModal(true)}>
             {costLimit ? 'Update Limit' : 'Set Budget'}
           </button>
           <button className="btn-danger" onClick={handleResetCosts}>
             Reset Data
           </button>
-        </div>
-      </header>
+        </>
+      }
+    >
 
       <StateSourceNotice
         title="Cost analytics source states"
@@ -115,7 +114,7 @@ const CostAnalyticsDashboard = () => {
       )}
 
       {/* Cost Summary Cards */}
-      <section className="cost-summary">
+      <DashboardGrid variant="metrics" className="cost-summary">
         <div className="cost-card">
           <h3>Total Cost</h3>
           <p className="cost-value">${costData.totalCost.toFixed(2)}</p>
@@ -151,7 +150,7 @@ const CostAnalyticsDashboard = () => {
           <p className="cost-value">{costData.executions.length}</p>
           <span className="cost-label">Tool uses</span>
         </div>
-      </section>
+      </DashboardGrid>
 
       {/* ROI Metrics */}
       <section className="cost-panel">
@@ -308,7 +307,7 @@ const CostAnalyticsDashboard = () => {
           </div>
         </div>
       )}
-    </div>
+    </PageShell>
   );
 };
 

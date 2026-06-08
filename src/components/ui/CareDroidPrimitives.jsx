@@ -7,9 +7,11 @@ import './CareDroidPrimitives.css';
 export function PageShell({
   eyebrow,
   title,
+  titleId,
   description,
   subtitle,
   actions,
+  leadingIcon,
   children,
   className = '',
   headerClassName = '',
@@ -22,8 +24,10 @@ export function PageShell({
       <PageHeader
         eyebrow={eyebrow}
         title={title}
+        titleId={titleId}
         description={description || subtitle}
         actions={actions}
+        leadingIcon={leadingIcon}
         className={headerClassName}
       />
       <div className={['cd-page-shell__content', contentClassName].filter(Boolean).join(' ')}>
@@ -33,16 +37,64 @@ export function PageShell({
   );
 }
 
-export function SectionHeader({ eyebrow, title, description, actions, className = '', ...props }) {
+export function SectionHeader({ eyebrow, title, titleId, description, actions, leadingIcon, className = '', ...props }) {
   return (
     <header className={['cd-section-header', className].filter(Boolean).join(' ')} {...props}>
-      <div className="cd-section-header__content">
-        {eyebrow ? <p className="cd-section-header__eyebrow">{eyebrow}</p> : null}
-        <h2 className="cd-section-header__title">{title}</h2>
-        {description ? <p className="cd-section-header__description">{description}</p> : null}
+      <div className="cd-section-header__main">
+        {leadingIcon ? <span className="cd-section-header__icon" aria-hidden>{leadingIcon}</span> : null}
+        <div className="cd-section-header__content">
+          {eyebrow ? <p className="cd-section-header__eyebrow">{eyebrow}</p> : null}
+          <h2 id={titleId} className="cd-section-header__title">{title}</h2>
+          {description ? <p className="cd-section-header__description">{description}</p> : null}
+        </div>
       </div>
       {actions ? <div className="cd-section-header__actions">{actions}</div> : null}
     </header>
+  );
+}
+
+export function DashboardSection({
+  eyebrow,
+  title,
+  titleId,
+  description,
+  actions,
+  leadingIcon,
+  children,
+  className = '',
+  headerClassName = '',
+  contentClassName = '',
+  as: Element = 'section',
+  ...props
+}) {
+  return (
+    <Element className={['cd-dashboard-section', className].filter(Boolean).join(' ')} {...props}>
+      <SectionHeader
+        eyebrow={eyebrow}
+        title={title}
+        titleId={titleId}
+        description={description}
+        actions={actions}
+        leadingIcon={leadingIcon}
+        className={headerClassName}
+      />
+      {children ? (
+        <div className={['cd-dashboard-section__content', contentClassName].filter(Boolean).join(' ')}>
+          {children}
+        </div>
+      ) : null}
+    </Element>
+  );
+}
+
+export function DashboardGrid({ children, variant = 'cards', className = '', as: Element = 'div', ...props }) {
+  return (
+    <Element
+      className={['cd-dashboard-grid', `cd-dashboard-grid--${variant}`, className].filter(Boolean).join(' ')}
+      {...props}
+    >
+      {children}
+    </Element>
   );
 }
 

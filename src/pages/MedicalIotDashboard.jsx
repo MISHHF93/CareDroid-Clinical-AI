@@ -12,6 +12,11 @@ import {
   TrendChart,
   VisualizationPanel,
 } from '../components/dashboard/DashboardVisualizations';
+import {
+  DashboardGrid,
+  FilterPanel,
+  PageShell,
+} from '../components/ui/CareDroidPrimitives';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
@@ -290,18 +295,13 @@ export default function MedicalIotDashboard() {
   }, [search, snapshot, statusFilter]);
 
   return (
-    <section className="medical-iot-page">
-      <section className="medical-iot-hero" aria-labelledby="medical-iot-title">
-        <div>
-          <p className="medical-iot-eyebrow">Connected care monitoring</p>
-          <h1 id="medical-iot-title">Medical IoT Dashboard</h1>
-          <p>
-            Monitor connected devices, patient telemetry, vitals streams, wearable data, and abnormal signal alerts
-            for {activeWorkspace?.branding?.displayName || activeWorkspace?.name || account?.organization || 'your workspace'}.
-            Device data is monitoring support only and does not replace clinician assessment.
-          </p>
-        </div>
-        <div className="medical-iot-hero-actions">
+    <PageShell
+      className="medical-iot-page"
+      eyebrow="Connected care monitoring"
+      title="Medical IoT Dashboard"
+      description={`Monitor connected devices, patient telemetry, vitals streams, wearable data, and abnormal signal alerts for ${activeWorkspace?.branding?.displayName || activeWorkspace?.name || account?.organization || 'your workspace'}. Device data is monitoring support only and does not replace clinician assessment.`}
+      actions={
+        <>
           <Link to="/assistant" className="medical-iot-action">
             Ask Assistant
           </Link>
@@ -311,8 +311,9 @@ export default function MedicalIotDashboard() {
           <Link to="/devices" className="medical-iot-action medical-iot-action--secondary">
             Open Devices
           </Link>
-        </div>
-      </section>
+        </>
+      }
+    >
 
       {state.loading ? (
         <section className="medical-iot-state" aria-label="Loading Medical IoT telemetry">
@@ -341,7 +342,7 @@ export default function MedicalIotDashboard() {
             <span>Last updated: {formatTelemetryTime(snapshot.generatedAt)}</span>
           </section>
 
-          <section className="medical-iot-insights" aria-label="Medical IoT context insights">
+          <DashboardGrid className="medical-iot-insights" aria-label="Medical IoT context insights">
             <ContextInsightCard
               title={counts.offline ? `${counts.offline} device(s) offline` : 'No offline devices'}
               message={
@@ -374,7 +375,7 @@ export default function MedicalIotDashboard() {
               actionLabel="Back to Operations"
               actionRoute="/operations"
             />
-          </section>
+          </DashboardGrid>
 
           <StateSourceNotice
             title="Medical IoT source states"
@@ -393,7 +394,7 @@ export default function MedicalIotDashboard() {
             description="Telemetry alerts stay tied to the rooms, devices, and fleet workflows that explain where action may be needed."
           />
 
-          <section className="medical-iot-summary" aria-label="Medical IoT status summary">
+          <DashboardGrid variant="metrics" className="medical-iot-summary" aria-label="Medical IoT status summary">
             <MetricCard label="Connected devices" value={snapshot.devices.length} hint="Demo registry count" />
             <MetricCard label="Online" value={counts.connected} hint="Reporting in snapshot" tone="good" />
             <MetricCard label="Offline" value={counts.offline} hint="Needs connectivity review" tone={counts.offline ? 'critical' : 'good'} />
@@ -403,9 +404,9 @@ export default function MedicalIotDashboard() {
               value={freshnessMinutes == null ? 'Unknown' : `${freshnessMinutes}m`}
               hint="Generated demo snapshot"
             />
-          </section>
+          </DashboardGrid>
 
-          <section className="medical-iot-filters" aria-label="Medical IoT map filters">
+          <FilterPanel className="medical-iot-filters" aria-label="Medical IoT map filters">
             <label>
               <span>Status</span>
               <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
@@ -425,7 +426,7 @@ export default function MedicalIotDashboard() {
                 placeholder="Try pulse, Home-7, Patient A..."
               />
             </label>
-          </section>
+          </FilterPanel>
 
           {snapshot.devices.length === 0 ? (
             <section className="medical-iot-state">
@@ -507,7 +508,7 @@ export default function MedicalIotDashboard() {
             </div>
           </section>
 
-          <section className="medical-iot-grid-row">
+          <DashboardGrid className="medical-iot-grid-row">
             <div className="medical-iot-section">
               <h2>Abnormal Reading Alerts</h2>
               {snapshot.alerts.length === 0 ? (
@@ -548,9 +549,9 @@ export default function MedicalIotDashboard() {
                 </div>
               )}
             </div>
-          </section>
+          </DashboardGrid>
         </>
       ) : null}
-    </section>
+    </PageShell>
   );
 }

@@ -424,9 +424,9 @@ export const AUTOMATION_REGISTRY_BY_ID = Object.freeze(
 export const SOLUTION_PACKAGES = Object.freeze([
   {
     solutionId: 'emergency-department-solution',
-    title: 'Emergency Department Solution',
+    title: 'Emergency Flow Intelligence Platform',
     workspace: 'emergency',
-    description: 'Sellable Emergency Department Operating System spanning arrival, triage, assessment, results, disposition, and discharge/admission.',
+    description: 'Sellable Emergency Flow Intelligence platform spanning ED throughput, EMS handoff, triage, bed flow, referrals, discharge, equipment, surge, Copilot, and command-center operations.',
     automationIds: AUTOMATION_REGISTRY.filter((automation) => automation.workspace === 'emergency').map((automation) => automation.automationId),
     aiAgents: ['emergency-copilot'],
     patientJourney: EMERGENCY_PATIENT_JOURNEY.map((stage) => stage.id),

@@ -46,7 +46,7 @@ describe('AnalyticsDashboard', () => {
   it('renders privacy-safe platform analytics dashboards', async () => {
     render(<AnalyticsDashboard />);
 
-    expect(screen.getByRole('heading', { name: /platform analytics/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: /platform analytics/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /privacy-safe telemetry/i })).toBeInTheDocument();
     expect(screen.getByText(/query text never stored/i)).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /most used tools/i })).toBeInTheDocument();

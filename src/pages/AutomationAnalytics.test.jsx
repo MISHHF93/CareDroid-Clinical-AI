@@ -10,7 +10,7 @@ describe('AutomationAnalytics', () => {
 
     expect(screen.getByRole('heading', { name: /automation analytics/i })).toBeInTheDocument();
     expect(screen.getByText(/automation runs, success, failures, adoption/i)).toBeInTheDocument();
-    expect(screen.getByText(/Emergency Department Solution/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Emergency Flow Intelligence Platform/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/Laboratory Intelligence Solution/i)).toBeInTheDocument();
     expect(screen.getByText(/Medical IoT Solution/i)).toBeInTheDocument();
     expect(screen.getByText(/Fleet Operations Solution/i)).toBeInTheDocument();

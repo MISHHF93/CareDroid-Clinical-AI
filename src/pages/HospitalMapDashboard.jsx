@@ -17,7 +17,10 @@ import { CHROME_ICONS } from '../navigation/iconRegistry';
 import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
 import {
   DataTable,
+  DashboardGrid,
+  FilterPanel,
   MetricCard,
+  PageShell,
   StatusBadge as CanonicalStatusBadge,
 } from '../components/ui/CareDroidPrimitives';
 import './HospitalMapDashboard.css';
@@ -533,17 +536,13 @@ export default function HospitalMapDashboard() {
   };
 
   return (
-    <section className="hospital-map-page">
-      <section className="hospital-map-hero" aria-labelledby="hospital-map-title">
-        <div>
-          <p className="hospital-map-eyebrow">Hospital operations command</p>
-          <h1 id="hospital-map-title">Hospital Map</h1>
-          <p>
-            View hospital floors, rooms, beds, medical devices, IoT telemetry, alerts, maintenance,
-            and fleet utilization. Monitoring support only; not a replacement for bedside alarms.
-          </p>
-        </div>
-        <div className="hospital-map-hero-actions">
+    <PageShell
+      className="hospital-map-page"
+      eyebrow="Hospital operations command"
+      title="Hospital Map"
+      description="View hospital floors, rooms, beds, medical devices, IoT telemetry, alerts, maintenance, and fleet utilization. Monitoring support only; not a replacement for bedside alarms."
+      actions={
+        <>
           <button type="button" className="hospital-map-action" onClick={askAssistant}>
             Ask Assistant
           </button>
@@ -553,8 +552,9 @@ export default function HospitalMapDashboard() {
           <Link to="/operations" className="hospital-map-action hospital-map-action--secondary">
             Operations
           </Link>
-        </div>
-      </section>
+        </>
+      }
+    >
 
       {state.loading ? (
         <section className="hospital-map-state" role="status" aria-label="Loading hospital map telemetry">
@@ -583,7 +583,7 @@ export default function HospitalMapDashboard() {
             <span>Last updated: {formatHospitalMapTime(snapshot.generatedAt)}</span>
           </section>
 
-          <section className="hospital-map-insights" aria-label="Hospital map context insights">
+          <DashboardGrid className="hospital-map-insights" aria-label="Hospital map context insights">
             <ContextInsightCard
               title={
                 summary.activeAlerts
@@ -623,7 +623,7 @@ export default function HospitalMapDashboard() {
               actionLabel="Open Devices"
               actionRoute="/devices"
             />
-          </section>
+          </DashboardGrid>
 
           <StateSourceNotice
             title="Hospital map source states"
@@ -642,7 +642,7 @@ export default function HospitalMapDashboard() {
             description="Room and device location context stays connected to fleet movement and live device telemetry surfaces."
           />
 
-          <section className="hospital-map-summary" aria-label="Hospital map status summary">
+          <DashboardGrid variant="metrics" className="hospital-map-summary" aria-label="Hospital map status summary">
             <SummaryCard label="Floors" value={summary.floors} />
             <SummaryCard label="Rooms" value={summary.rooms} />
             <SummaryCard label="Beds" value={summary.beds} />
@@ -651,9 +651,9 @@ export default function HospitalMapDashboard() {
             <SummaryCard label="Stale telemetry" value={summary.stale} tone={summary.stale ? 'warning' : 'good'} />
             <SummaryCard label="Active alerts" value={summary.activeAlerts} tone={summary.activeAlerts ? 'warning' : 'good'} />
             <SummaryCard label="Maintenance due" value={summary.maintenanceDue} tone={summary.maintenanceDue ? 'warning' : 'good'} />
-          </section>
+          </DashboardGrid>
 
-          <section className="hospital-map-filters" aria-label="Hospital map filters">
+          <FilterPanel className="hospital-map-filters" aria-label="Hospital map filters">
             <label>
               <span>Floor</span>
               <select value={selectedFloorId} onChange={(event) => setSelectedFloorId(event.target.value)}>
@@ -711,7 +711,7 @@ export default function HospitalMapDashboard() {
               <input type="checkbox" checked={alertOnly} onChange={(event) => setAlertOnly(event.target.checked)} />
               <span>Active alerts only</span>
             </label>
-          </section>
+          </FilterPanel>
 
           <div className="hospital-map-workspace">
             <FloorPlanViewer
@@ -739,12 +739,12 @@ export default function HospitalMapDashboard() {
             onSelectDevice={selectDevice}
           />
 
-          <div className="hospital-map-lower-grid">
+          <DashboardGrid className="hospital-map-lower-grid">
             <AlertsList alerts={filteredAlerts} devicesById={devicesById} onSelectDevice={selectDevice} />
             <DeviceFleetTable devices={filteredDevices} onSelectDevice={selectDevice} />
-          </div>
+          </DashboardGrid>
         </>
       ) : null}
-    </section>
+    </PageShell>
   );
 }
