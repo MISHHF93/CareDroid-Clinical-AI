@@ -27,12 +27,12 @@ export default function ProfileWorkspaces() {
     <section className="profile-identity-page">
       <div className="profile-identity-page__inner">
         <header className="profile-identity-page__header">
-          <h1>Workspaces</h1>
-          <p>Switch between personal, hospital, emergency, fleet, research, and admin operating contexts.</p>
+          <h1>Manage Workspaces</h1>
+          <p>Use one control to change the active workspace and set workspace defaults.</p>
         </header>
 
         <Card>
-          <h2 style={{ marginTop: 0 }}>Active Workspace</h2>
+          <h2 style={{ marginTop: 0 }}>Change Workspace</h2>
           <div className="profile-identity-row">
             <div>
               <strong>{activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'No active workspace'}</strong>
@@ -71,14 +71,6 @@ export default function ProfileWorkspaces() {
                   .slice(0, 4)
                   .join(', ') || 'recommended assets'}
               </p>
-              <button
-                type="button"
-                className="profile-identity-button profile-identity-button--secondary"
-                onClick={() => handleSwitch(workspace.id)}
-                disabled={workspace.id === workspaceState?.activeWorkspaceId}
-              >
-                {workspace.id === workspaceState?.activeWorkspaceId ? 'Active' : 'Switch'}
-              </button>
               <button
                 type="button"
                 className="profile-identity-button"

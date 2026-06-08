@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import WorkspaceHome from './WorkspaceHome';
 import {
@@ -53,6 +53,7 @@ function renderWorkspace(route = '/workspace/emergency') {
           }
         />
         <Route path="/assistant" element={<LocationProbe />} />
+        <Route path="/profile/workspaces" element={<LocationProbe />} />
       </Routes>
     </MemoryRouter>
   );
@@ -67,21 +68,34 @@ describe('WorkspaceHome', () => {
     renderWorkspace();
 
     expect(screen.getByRole('heading', { name: /emergency workspace/i })).toBeInTheDocument();
+    expect(screen.getByText(/rapid response environment/i)).toBeInTheDocument();
+    expect(screen.getByText(/prioritize triage/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open qsofa/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open live map/i })).toBeInTheDocument();
   });
 
-  it('switches workspaces and launches assistant with context', async () => {
+  it('renders Fleet as a distinct transport operating environment', () => {
+    renderWorkspace('/workspace/fleet');
+
+    expect(screen.getByRole('heading', { name: /fleet workspace/i })).toBeInTheDocument();
+    expect(screen.getByText(/transport logistics and dispatch environment/i)).toBeInTheDocument();
+    expect(screen.getByText(/fleet map, dispatch readiness/i)).toBeInTheDocument();
+    expect(screen.getByText(/vehicle location and route state/i)).toBeInTheDocument();
+  });
+
+  it('routes workspace management through profile and launches assistant with context', async () => {
     renderWorkspace();
 
-    fireEvent.click(screen.getByRole('button', { name: /^fleet$/i }));
-    await waitFor(() => {
-      expect(screen.getByTestId('location')).toHaveTextContent('/workspace/fleet');
-    });
+    fireEvent.click(screen.getByRole('link', { name: /manage workspaces/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/profile/workspaces');
+  });
 
-    fireEvent.click(screen.getByRole('button', { name: /ask in context/i }));
+  it('launches assistant with workspace context', () => {
+    renderWorkspace();
+
+    fireEvent.click(screen.getByRole('button', { name: /ask assistant/i }));
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
-      expect.stringContaining('logistics'),
+      expect.stringContaining('emergency'),
       'user'
     );
     expect(screen.getByTestId('location')).toHaveTextContent('/assistant');

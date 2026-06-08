@@ -211,7 +211,7 @@ export default function ProfileToolGraphCard() {
           message={specialtyTools.map((tool) => tool.name).join(', ') || 'No specialty-specific tools are available yet.'}
           source="Profile tool graph"
           status={specialtyTools.length ? 'generated' : 'empty'}
-          actionLabel="Open tools"
+          actionLabel="Browse tools"
           actionRoute="/tools"
         />
         <ContextInsightCard
@@ -219,8 +219,8 @@ export default function ProfileToolGraphCard() {
           message={workspaceTools.map((tool) => tool.name).join(', ') || 'No workspace-specific tools are available yet.'}
           source="Workspace profile"
           status={workspaceTools.length ? 'generated' : 'empty'}
-          actionLabel="Open workspace"
-          actionRoute="/workspaces"
+          actionLabel="Manage workspaces"
+          actionRoute="/profile/workspaces"
         />
         <ContextInsightCard
           title="Assistant context"

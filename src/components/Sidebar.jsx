@@ -48,7 +48,7 @@ const Sidebar = forwardRef(function Sidebar(
   const displayOrganization =
     branding.displayName || organization?.name || account?.organization || user?.institution || 'Personal workspace';
   const effectiveCollapsed = layoutCompact ? false : sidebarCollapsed;
-  const recentConversations = conversations.slice(-4).reverse();
+  const recentConversations = conversations.slice(-2).reverse();
 
   const hiddenNavIds = useMemo(() => {
     const settings = organization?.settings || {};

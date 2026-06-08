@@ -649,7 +649,7 @@ export const PLATFORM_SYSTEM_CAPABILITIES = Object.freeze([
     tier: PLATFORM_SYSTEM_TIERS.C,
     category: 'Governance',
     route: '/governance/privacy',
-    routeAliases: ['/privacy'],
+    routeAliases: ['/privacy/access-log', '/privacy/requests'],
     endpoint: '/api/privacy/access-log',
     method: 'GET',
     apiClient: 'src/services/platformSystemsApi.js',

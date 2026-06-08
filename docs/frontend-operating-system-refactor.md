@@ -90,3 +90,10 @@ Decision:
 - `npm run test:run -- src/data/frontendOperatingSystem.test.js src/layout/AppShell.navigation.test.jsx src/layout/AppShell.layout.test.js src/pages/CommandDashboard.test.jsx`
   - 4 test files passed.
   - 39 tests passed.
+
+## Entropy Reduction Update
+
+- Workflow stage ownership is now clearer: `/workflows` is canonical and `/automation` redirects there as a legacy protected alias.
+- Public legal/privacy pages remain outside the authenticated OS flow; protected privacy surfaces stay under governance/privacy routes.
+- Workspace stage state is safer because stale backend workspace context no longer leaks into the active workspace after a local switch.
+- The Operations hub now acts as the operations stage entry point, with maps, IoT, fleet, routing, and maintenance presented as drill-downs instead of competing dashboard surfaces.

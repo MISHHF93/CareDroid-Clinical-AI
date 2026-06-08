@@ -14,6 +14,7 @@ export {
   QUICK_COMMAND_NAV_ITEMS,
   SECONDARY_NAV_ITEMS,
   SOLUTIONS_SIDEBAR_NAV_ITEMS,
+  canExposeNavigationItem,
   getPrimaryNavItemForPath,
   primaryNavPathMatches,
 } from '../config/navigation.config';

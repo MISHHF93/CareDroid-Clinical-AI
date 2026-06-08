@@ -1,17 +1,20 @@
 .platform-admin-page {
   width: 100%;
   max-width: 1320px;
+  min-width: 0;
   margin: 0 auto;
   padding: 32px;
   display: grid;
   gap: 24px;
   box-sizing: border-box;
+  overflow-x: clip;
 }
 
 .platform-admin-hero,
 .platform-admin-chain,
 .platform-admin-metrics article,
 .platform-admin-overview-card {
+  min-width: 0;
   border: 1px solid var(--panel-border);
   border-radius: 20px;
   background: var(--panel-background);
@@ -52,7 +55,7 @@
 }
 
 .platform-admin-health-card {
-  min-width: 190px;
+  min-width: min(190px, 100%);
   border: 1px solid var(--panel-border);
   border-radius: 18px;
   background: var(--app-surface-1);
@@ -173,5 +176,9 @@
 
   .platform-admin-hero {
     flex-direction: column;
+  }
+
+  .platform-admin-health-card {
+    min-width: 0;
   }
 }

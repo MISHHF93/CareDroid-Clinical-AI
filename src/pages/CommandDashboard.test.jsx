@@ -64,6 +64,8 @@ function renderDashboard() {
 describe('CommandDashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockToolPreferencesValue.favorites = [];
+    mockToolPreferencesValue.pinned = [];
     mockToolPreferencesValue.recentTools = [];
     mockNotificationsValue.notifications = [];
     mockWorkspaceValue.activeWorkspaceId = 'emergency';
@@ -82,6 +84,7 @@ describe('CommandDashboard', () => {
     for (const name of [
       /^actions$/i,
       /ai assistant/i,
+      /launch compression/i,
       /^recommendations$/i,
       /^signals$/i,
       /^status$/i,
@@ -91,10 +94,14 @@ describe('CommandDashboard', () => {
     expect(screen.queryByRole('heading', { name: /command analytics/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: /clinical tools detail/i })).not.toBeInTheDocument();
     expect(screen.getByText(/triage risk, active alerts/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/emergency os operating brief/i)).toBeInTheDocument();
+    expect(screen.getByText(/rapid response environment/i)).toBeInTheDocument();
+    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/red flags first/i)).toBeInTheDocument();
     const flow = screen.getByLabelText(/frontend operating system flow/i);
-    for (const step of ['AppShell', 'Workspace', 'Dashboard', 'Asset Launch', 'Workflow', 'Result']) {
+    for (const step of ['AppShell', 'Workspace', 'Dashboard', 'Asset Launch']) {
       expect(within(flow).getByText(step)).toBeInTheDocument();
     }
+    expect(within(flow).queryByText('Workflow')).not.toBeInTheDocument();
   });
 
   it('renders compact action cards for primary dashboard entry points', () => {
@@ -103,22 +110,42 @@ describe('CommandDashboard', () => {
     const launchpad = screen.getByRole('heading', { name: /^actions$/i }).closest('section');
     for (const name of [
       /^ai assistant/i,
-      /^assets/i,
-      /^workflows/i,
-      /^results/i,
-      /^medical simulation/i,
+      /^tools/i,
       /^operations/i,
-      /^my workspace/i,
-      /^my tools/i,
+      /^profile/i,
+      /^manage workspaces/i,
     ]) {
       expect(within(launchpad).getByRole('link', { name })).toBeInTheDocument();
     }
-    expect(within(launchpad).getByRole('link', { name: /^assets/i })).toHaveAttribute('href', '/assets');
-    expect(within(launchpad).getByRole('link', { name: /^workflows/i })).toHaveAttribute('href', '/workflows');
-    expect(within(launchpad).getByRole('link', { name: /^results/i })).toHaveAttribute('href', '/timeline');
-    expect(within(launchpad).getByRole('link', { name: /^medical simulation/i })).toHaveAttribute('href', '/simulation');
+    expect(within(launchpad).getByRole('link', { name: /^ai assistant/i })).toHaveAttribute('href', '/assistant');
+    expect(within(launchpad).getByRole('link', { name: /^tools/i })).toHaveAttribute('href', '/tools');
     expect(within(launchpad).getByRole('link', { name: /^operations/i })).toHaveAttribute('href', '/operations');
+    expect(within(launchpad).getByRole('link', { name: /^profile/i })).toHaveAttribute('href', '/profile');
+    expect(within(launchpad).getByRole('link', { name: /^manage workspaces/i })).toHaveAttribute('href', '/profile/workspaces');
+    expect(within(launchpad).queryByRole('link', { name: /^global search/i })).not.toBeInTheDocument();
+    expect(within(launchpad).queryByRole('link', { name: /^recommendations/i })).not.toBeInTheDocument();
+    expect(within(launchpad).queryByRole('link', { name: /^workflows/i })).not.toBeInTheDocument();
+    expect(within(launchpad).queryByRole('link', { name: /^medical simulation/i })).not.toBeInTheDocument();
+    expect(within(launchpad).queryByRole('link', { name: /^assets/i })).not.toBeInTheDocument();
+    expect(within(launchpad).queryByRole('link', { name: /^calculators/i })).not.toBeInTheDocument();
     expect(within(launchpad).queryByRole('link', { name: /system status/i })).not.toBeInTheDocument();
+  });
+
+  it('compresses dashboard routes to assets, workflows, simulations, and operations', () => {
+    mockToolPreferencesValue.favorites = ['qsofa'];
+    mockToolPreferencesValue.pinned = ['medical-iot-dashboard'];
+    mockToolPreferencesValue.recentTools = ['drug-check'];
+
+    renderDashboard();
+
+    const compression = screen.getByRole('heading', { name: /launch compression/i }).closest('section');
+    expect(within(compression).getByRole('link', { name: /^assets/i })).toHaveAttribute('href', '/assets');
+    expect(within(compression).getByRole('link', { name: /^workflows/i })).toHaveAttribute('href', '/workflows');
+    expect(within(compression).getByRole('link', { name: /^simulation/i })).toHaveAttribute('href', '/simulation');
+    expect(within(compression).getByRole('link', { name: /^operations/i })).toHaveAttribute('href', '/operations');
+    expect(within(compression).getByRole('button', { name: /open qsofa/i })).toBeInTheDocument();
+    expect(within(compression).getByRole('button', { name: /open medical iot dashboard/i })).toBeInTheDocument();
+    expect(within(compression).getByRole('button', { name: /open drug checker/i })).toBeInTheDocument();
   });
 
   it('renders compact status metrics instead of chart widgets', () => {
@@ -128,7 +155,7 @@ describe('CommandDashboard', () => {
     expect(within(status).getByText(/^tools$/i)).toBeInTheDocument();
     expect(within(status).getByText(/^ai tools$/i)).toBeInTheDocument();
     expect(within(status).getByText(/^backend$/i)).toBeInTheDocument();
-    expect(within(status).getByText(/^planned$/i)).toBeInTheDocument();
+    expect(within(status).queryByText(/^planned$/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/tool category distribution/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/launch type distribution/i)).not.toBeInTheDocument();
   });
@@ -143,13 +170,22 @@ describe('CommandDashboard', () => {
     expect(new Set(labels).size).toBe(labels.length);
   });
 
+  it('renders active workspace recommendations before generic dashboard recommendations', () => {
+    mockWorkspaceValue.recommendations = [{ assetId: 'medical-iot-dashboard', reason: 'workspace fit' }];
+
+    renderDashboard();
+
+    const recommendations = screen.getByRole('heading', { name: /^recommendations$/i }).closest('section');
+    expect(within(recommendations).getByRole('button', { name: /open medical iot dashboard/i })).toBeInTheDocument();
+  });
+
   it('seeds free text into assistant and routes to the focused workspace', () => {
     renderDashboard();
 
     fireEvent.change(screen.getByLabelText(/ask emergency assistant what you need to do next/i), {
       target: { value: 'Help me triage chest pain' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /open emergency assistant/i }));
+    fireEvent.click(screen.getByRole('button', { name: /ask assistant/i }));
 
     expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
       expect.stringContaining('[Emergency OS]'),
@@ -170,7 +206,22 @@ describe('CommandDashboard', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: /medical iot command center/i })).toBeInTheDocument();
     expect(screen.getByText(/medical iot os/i)).toBeInTheDocument();
+    expect(screen.getByText(/telemetry and device operations environment/i)).toBeInTheDocument();
+    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/device alerts/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/offline devices/i)).toBeInTheDocument();
+  });
+
+  it('changes dashboard identity for Fleet workspace', () => {
+    mockWorkspaceValue.activeWorkspaceId = 'fleet';
+    mockWorkspaceValue.activeWorkspace = { id: 'fleet', name: 'Fleet' };
+
+    renderDashboard();
+
+    expect(screen.getByRole('heading', { level: 1, name: /fleet command center/i })).toBeInTheDocument();
+    expect(screen.getByText(/fleet os/i)).toBeInTheDocument();
+    expect(screen.getByText(/transport logistics and dispatch environment/i)).toBeInTheDocument();
+    expect(within(screen.getByLabelText(/dashboard context summary/i)).getByText(/fleet map/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/etas, route risk/i)).toBeInTheDocument();
   });
 
   it('launches the operations action to the canonical operations hub', () => {

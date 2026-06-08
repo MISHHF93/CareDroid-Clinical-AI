@@ -45,7 +45,7 @@ vi.mock('../components/Sidebar', async () => {
         {(!layoutCompact || mobileNavOpen) && (
           <>
             <nav aria-label="Primary navigation">
-              {['Dashboard', 'Assistant', 'Tools', 'Operations', 'Profile', 'Settings'].map((label) => (
+              {['Dashboard', 'Assistant', 'Tools', 'Operations', 'Profile'].map((label) => (
                 <button key={label} type="button">
                   {label}
                 </button>
@@ -131,7 +131,6 @@ describe('AppShell navigation surfaces', () => {
       /^tools$/i,
       /^operations$/i,
       /^profile$/i,
-      /^settings$/i,
     ]) {
       expect(screen.getAllByRole('button', { name })).toHaveLength(1);
       expect(within(nav).getByRole('button', { name })).toBeInTheDocument();

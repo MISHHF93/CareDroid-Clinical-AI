@@ -67,3 +67,10 @@ Findings:
 - `npm run test:run -- src/styles/mobileFirstRecovery.test.js src/test/mobileScrolling.contract.test.js src/styles/mobileFirstLayout.test.js src/styles/layout-visibility.test.js src/styles/responsiveUx.test.js`
   - 5 test files passed
   - 52 tests passed
+
+## Entropy Reduction Update
+
+- Added targeted mobile recovery coverage for notification preferences, team management, legal pages, and platform admin.
+- Team management now keeps its sortable user table in an approved local horizontal scroll wrapper and uses viewport-safe modal sizing.
+- Mobile sticky detail panels for hospital map, fleet map, and artifacts are neutralized through the recovery layer so they do not trap content on small screens.
+- The recovery tests now assert the local user table scroll wrapper and mobile sticky-panel override.

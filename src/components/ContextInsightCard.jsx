@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './ContextInsightCard.css';
 
 const STATUS_LABELS = Object.freeze({
@@ -51,9 +52,15 @@ export default function ContextInsightCard({
         {timestamp ? <time dateTime={timestamp}>{new Date(timestamp).toLocaleString()}</time> : null}
       </div>
       {actionLabel && actionRoute ? (
-        <a className="context-insight-card__action" href={actionRoute}>
-          {actionLabel}
-        </a>
+        actionRoute.startsWith('/') ? (
+          <Link className="context-insight-card__action" to={actionRoute}>
+            {actionLabel}
+          </Link>
+        ) : (
+          <a className="context-insight-card__action" href={actionRoute}>
+            {actionLabel}
+          </a>
+        )
       ) : null}
     </article>
   );

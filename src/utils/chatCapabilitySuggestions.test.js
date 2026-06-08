@@ -116,6 +116,40 @@ describe('chat capability suggestions', () => {
     expect(suggestions[0].id).toBe('billing-account');
   });
 
+  it('uses the search-first index for feature discovery suggestions', () => {
+    const suggestions = getChatCapabilitySuggestions({
+      input: 'where is sepsis management lactate pathway',
+      hasPermission: allowAll,
+    });
+
+    expect(suggestions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'search-first-protocol:sepsis',
+          label: 'Sepsis Management',
+          source: 'search-first-index',
+          path: '/protocols?pathway=sepsis',
+        }),
+      ])
+    );
+
+    const operationsSuggestions = getChatCapabilitySuggestions({
+      input: 'where is workflow mining journeys',
+      hasPermission: allowAll,
+    });
+
+    expect(operationsSuggestions).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'search-first-nav-destination:workflow-mining',
+          label: 'Workflow Mining',
+          source: 'search-first-index',
+          path: '/workflow-mining',
+        }),
+      ])
+    );
+  });
+
   it('marks sensitive Chat actions with confirmation details', () => {
     const suggestions = getChatCapabilitySuggestions({ hasPermission: allowAll });
     const byId = Object.fromEntries(suggestions.map((suggestion) => [suggestion.id, suggestion]));

@@ -42,7 +42,6 @@ import SaasHealthCenter from '../pages/SaasHealthCenter';
 import CommandDashboard from '../pages/CommandDashboard';
 import ExecutiveCommandCenter from '../pages/ExecutiveCommandCenter';
 import CapabilityDiscovery from '../pages/CapabilityDiscovery';
-import WorkflowAutomationBuilder from '../pages/WorkflowAutomationBuilder';
 import Dashboard from '../pages/Dashboard';
 import Operations from '../pages/Operations';
 import ResearchEvidenceHub from '../pages/ResearchEvidenceHub';
@@ -68,6 +67,7 @@ import {
   CareDroidBusinessBrainPage,
   DepartmentIntelligencePage,
   HealthcareKnowledgeHubPage,
+  WorkflowBuilderPage,
   WorkflowMiningEnginePage,
   WorkspaceDependencyGraphPage,
 } from '../pages/PlatformOSPages';
@@ -671,7 +671,7 @@ const PAGE_BY_ID = {
   dashboard: CommandDashboard,
   executive: ExecutiveCommandCenter,
   discover: CapabilityDiscovery,
-  automation: WorkflowAutomationBuilder,
+  workflows: WorkflowBuilderPage,
   assistant: Dashboard,
   operations: Operations,
   research: ResearchEvidenceHub,

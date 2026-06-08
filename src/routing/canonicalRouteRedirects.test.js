@@ -32,7 +32,8 @@ describe('canonical route redirects', () => {
     expectGeneratedRedirect('/chat', '/assistant');
     expect(appSource).toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
     expectRoute('/discover', 'CapabilityDiscovery');
-    expectRoute('/automation', 'WorkflowAutomationBuilder');
+    expectRoute('/workflows', 'WorkflowBuilderPage');
+    expectGeneratedRedirect('/automation', '/workflows');
     expect(routeConfigSource).toContain(
       "export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot'])"
     );

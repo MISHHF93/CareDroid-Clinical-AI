@@ -88,6 +88,10 @@
       .live-map-page,
       .device-fleet-page,
       .fleet-live-map-page,
+      .notification-preferences,
+      .team-management,
+      .legal-page,
+      .platform-admin-page,
       .org-page,
       [class$='-page'],
       [class$='-dashboard']
@@ -124,6 +128,7 @@
       .form-actions,
       .settings-actions,
       .profile-actions,
+      .modal-footer,
       .marketplace-actions,
       .recommendation-actions,
       .artifacts-filter-row,
@@ -156,6 +161,11 @@
     min-width: 0;
   }
 
+  .app-shell :is(.hospital-map-detail, .fleet-map-detail, .artifacts-detail) {
+    position: static;
+    top: auto;
+  }
+
   .app-shell :is(input:not([type='checkbox']):not([type='radio']), select, textarea) {
     min-height: var(--app-min-touch-target, 44px);
   }
@@ -171,6 +181,7 @@
       .catalog-table-wrap,
       .fleet-data-table-wrap,
       .device-fleet-table-wrap,
+      .user-table-wrapper,
       .hospital-map-table-wrap,
       .artifacts-table-wrap,
       .lab-category-section
@@ -197,11 +208,12 @@
       .catalog-table-wrap,
       .fleet-data-table-wrap,
       .device-fleet-table-wrap,
+      .user-table-wrapper,
       .hospital-map-table-wrap,
       .artifacts-table-wrap,
       .lab-category-section
     )
-    :is(table, .catalog-table, .device-fleet-table, .artifacts-table, .org-lifecycle-table) {
+    :is(table, .catalog-table, .device-fleet-table, .artifacts-table, .org-lifecycle-table, .user-table) {
     min-width: max-content;
   }
 

@@ -70,8 +70,22 @@
   cursor: pointer;
 }
 
+.operating-inline-action {
+  min-height: var(--compact-control-height, 38px);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  background: var(--app-surface-2);
+  color: var(--app-accent-interactive);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 .operating-primary-action:focus-visible,
-.operating-card:focus-visible {
+.operating-inline-action:focus-visible,
+.operating-card:focus-visible,
+.operating-drilldown:focus-visible {
   outline: 2px solid var(--app-focus);
   outline-offset: 3px;
 }
@@ -148,6 +162,57 @@
   margin-top: auto;
   color: var(--app-accent-interactive);
   font-weight: 800;
+}
+
+.operating-drilldown-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  gap: var(--space-3);
+}
+
+.operating-drilldown {
+  min-width: 0;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--compact-card-radius, 12px);
+  background: var(--app-surface-1);
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.operating-drilldown:hover,
+.operating-inline-action:hover {
+  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--panel-border));
+  background: color-mix(in srgb, var(--app-accent-interactive) 8%, var(--app-surface-1));
+}
+
+.operating-drilldown__icon {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--app-fg) 7%, transparent);
+  color: var(--app-accent-interactive);
+}
+
+.operating-drilldown strong,
+.operating-drilldown small {
+  display: block;
+}
+
+.operating-drilldown small {
+  margin-top: 2px;
+  color: var(--muted-text);
+  font-size: var(--font-12);
 }
 
 @media (max-width: 640px) {

@@ -31,6 +31,21 @@
   padding: var(--compact-panel-padding, 16px);
 }
 
+.command-dashboard--emergency .command-hero,
+.command-dashboard--iot .command-hero,
+.command-dashboard--fleet .command-hero {
+  border-color: var(--workspace-os-border);
+  background:
+    linear-gradient(135deg, var(--workspace-os-surface), transparent 54%),
+    var(--app-surface-1);
+}
+
+.command-dashboard--emergency .command-panel--assistant,
+.command-dashboard--iot .command-panel--assistant,
+.command-dashboard--fleet .command-panel--assistant {
+  border-color: var(--workspace-os-border);
+}
+
 .command-dashboard--compressed .command-hero {
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.78fr);
   padding: clamp(14px, 2vw, 18px);
@@ -64,6 +79,15 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.command-dashboard--emergency .command-eyebrow,
+.command-dashboard--iot .command-eyebrow,
+.command-dashboard--fleet .command-eyebrow,
+.command-dashboard--emergency .command-panel__icon,
+.command-dashboard--iot .command-panel__icon,
+.command-dashboard--fleet .command-panel__icon {
+  color: var(--workspace-os-accent);
 }
 
 .command-hero h1 {
@@ -106,9 +130,35 @@
 }
 
 .command-os-flow__step--current {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 58%, var(--app-panel-border));
-  background: color-mix(in srgb, var(--app-accent-interactive) 14%, var(--app-surface-2));
+  border-color: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 58%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 14%, var(--app-surface-2));
   color: var(--text-primary);
+}
+
+.command-operating-brief {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--workspace-os-border, var(--app-panel-border));
+  border-radius: var(--compact-card-radius, 12px);
+  background: var(--workspace-os-surface, var(--app-surface-2));
+}
+
+.command-operating-brief span {
+  display: block;
+  color: var(--workspace-os-accent, var(--app-accent-interactive));
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.command-operating-brief ul {
+  display: grid;
+  gap: 5px;
+  margin: 8px 0 0;
+  padding-left: 18px;
+  color: var(--app-fg-muted);
+  font-size: 0.86rem;
 }
 
 .command-hero__stats {
@@ -157,7 +207,8 @@
 }
 
 .command-insight-chip span,
-.command-insight-chip strong {
+.command-insight-chip strong,
+.command-insight-chip small {
   display: block;
   min-width: 0;
 }
@@ -177,8 +228,15 @@
   line-height: 1;
 }
 
+.command-insight-chip small {
+  margin-top: 4px;
+  color: var(--app-fg-muted);
+  font-size: 0.74rem;
+  line-height: 1.25;
+}
+
 .command-insight-chip--good {
-  border-color: color-mix(in srgb, var(--app-success) 28%, var(--app-panel-border));
+  border-color: color-mix(in srgb, var(--workspace-os-accent, var(--app-success)) 28%, var(--app-panel-border));
 }
 
 .command-insight-chip--warning {
@@ -224,6 +282,36 @@
   margin: 4px 0 0;
   color: var(--app-fg-muted);
   line-height: 1.45;
+}
+
+.command-launch-compression-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.command-launch-group {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--compact-card-radius, 12px);
+  background: var(--app-surface-2);
+}
+
+.command-launch-group__header {
+  margin-bottom: 10px;
+}
+
+.command-launch-group__header h3 {
+  margin: 0;
+  font-size: 0.92rem;
+  letter-spacing: -0.01em;
+}
+
+.command-launch-group__header p {
+  margin: 4px 0 0;
+  color: var(--app-fg-muted);
+  font-size: 0.82rem;
+  line-height: 1.35;
 }
 
 .command-panel--assistant {

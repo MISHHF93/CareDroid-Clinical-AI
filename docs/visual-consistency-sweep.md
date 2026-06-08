@@ -64,3 +64,10 @@ Decision:
 - `npm run test:run -- src/styles/visualConsistencySweep.test.js src/styles/responsiveUx.test.js src/styles/designLanguageFit.test.js`
   - 3 test files passed
   - 30 tests passed
+
+## Entropy Reduction Update
+
+- Replaced inline `100vw` shells in `GDPRNotice`, `HIPAANotice`, and `HelpCenter` with shell-safe `width: 100%`, `maxWidth: 100%`, and clipped overflow.
+- Normalized `NotificationPreferences` away from a standalone gradient viewport shell and into a bounded app-shell surface.
+- Added shrink-safe platform admin scorecard constraints so the admin page does not force horizontal overflow on mobile.
+- Added `visualMobileGuardrails.test.js` to protect the named legacy/public/admin outliers.

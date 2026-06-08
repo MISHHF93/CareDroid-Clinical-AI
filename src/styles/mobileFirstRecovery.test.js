@@ -41,6 +41,7 @@ describe('mobile-first recovery layer', () => {
       '.fleet-map-canvas',
       '.catalog-table-wrap',
       '.device-fleet-table-wrap',
+      '.user-table-wrapper',
     ].forEach((selector) => {
       expect(recoveryCss).toContain(selector);
     });
@@ -54,6 +55,10 @@ describe('mobile-first recovery layer', () => {
       '.tool-page',
       '.calculators-content',
       '.clinical-tool-catalog',
+      '.notification-preferences',
+      '.team-management',
+      '.legal-page',
+      '.platform-admin-page',
       '.command-dashboard',
       '.dashboard-grid',
       '.tool-header-actions',
@@ -64,5 +69,12 @@ describe('mobile-first recovery layer', () => {
     ].forEach((contract) => {
       expect(recoveryCss).toContain(contract);
     });
+  });
+
+  it('neutralizes sticky detail panels on mobile while allowing local table scroll', () => {
+    expect(recoveryCss).toMatch(
+      /\.app-shell :is\(\.hospital-map-detail, \.fleet-map-detail, \.artifacts-detail\)[\s\S]*position:\s*static/
+    );
+    expect(recoveryCss).toMatch(/:is\(table[\s\S]*\.user-table\)[\s\S]*min-width:\s*max-content/);
   });
 });

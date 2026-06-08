@@ -52,6 +52,7 @@ const TOOL_FILTER_OPTIONS = Object.freeze([
   { value: 'recent', label: 'Recent' },
 ]);
 
+const COMMON_TOOL_FILTER_VALUES = new Set(['recommended', 'all', 'calculator', 'ai-workflows', 'operations']);
 const TOOL_FILTER_OPTION_VALUES = new Set(TOOL_FILTER_OPTIONS.map((option) => option.value));
 
 function normalizeSearch(value) {
@@ -61,10 +62,12 @@ function normalizeSearch(value) {
 }
 
 function toolSearchBlob(tool) {
+  const mountedCapability = tool.mountedCapability || {};
   return [
     tool.id,
     tool.canonicalInventoryId,
     tool.name,
+    tool.label,
     tool.description,
     tool.category,
     tool.surface,
@@ -75,9 +78,24 @@ function toolSearchBlob(tool) {
     tool.nluToolId,
     tool.executorStatus,
     tool.shortcut,
+    tool.path,
+    tool.route,
+    tool.navigationPath,
     tool.searchText,
+    mountedCapability.capabilityId,
+    mountedCapability.title,
+    mountedCapability.description,
+    mountedCapability.route,
     ...(tool.features || []),
     ...(tool.useCases || []),
+    ...(tool.aliases || []),
+    ...(tool.aiAliases || []),
+    ...(tool.workspaceTags || []),
+    ...(tool.packIds || []),
+    ...(tool.productIds || []),
+    ...(mountedCapability.aiAliases || []),
+    ...(mountedCapability.workspaceIds || []),
+    ...(mountedCapability.roleIds || []),
   ]
     .filter(Boolean)
     .join(' ')
@@ -171,16 +189,16 @@ function primaryActionLabel(tool) {
   )
     return 'Admin only';
   if (tool.surface === 'chat-assisted' || tool.launchType === 'chat-assisted')
-    return 'Start guided chat';
+    return 'Ask Assistant';
   if (tool.category === 'Calculator' || tool.surface === 'calculator-form')
-    return 'Open calculator';
+    return 'Open';
   if (
     ['fleet-page', 'iot-dashboard', 'hospital-operations'].includes(tool.surface) ||
     ['Fleet', 'IoT', 'Hospital Operations'].includes(tool.category)
   ) {
-    return 'Open dashboard';
+    return 'Open';
   }
-  return 'Open tool';
+  return 'Open';
 }
 
 function hasMeaningfulAssistantAction(tool) {
@@ -235,7 +253,7 @@ const ToolsOverview = () => {
   const [searchParams] = useSearchParams();
   const requestedFilter = searchParams.get('filter');
   const requestedSearch = searchParams.get('q') || searchParams.get('search') || '';
-  const routeDefaultFilter = location.pathname === CANONICAL_ROUTES.calculators ? 'calculator' : 'all';
+  const routeDefaultFilter = location.pathname === CANONICAL_ROUTES.calculators ? 'calculator' : 'recommended';
   const [search, setSearch] = useState(requestedSearch);
   const [toolFilter, setToolFilter] = useState(
     TOOL_FILTER_OPTION_VALUES.has(requestedFilter) ? requestedFilter : routeDefaultFilter
@@ -483,6 +501,7 @@ const ToolsOverview = () => {
     [isAllToolsWorkspace, profileFilteredTools, toolFilter, workspaceToolIdSet]
   );
   const searchQuery = normalizeSearch(search);
+  const searchTokens = useMemo(() => searchQuery.split(/\s+/).filter(Boolean), [searchQuery]);
   const recentToolItems = useMemo(
     () =>
       recentTools
@@ -499,12 +518,13 @@ const ToolsOverview = () => {
 
     return base.filter((tool) => {
       if (toolFilter !== 'all' && !matchesToolFilter(tool, toolFilter)) return false;
-      if (!searchQuery) return true;
-      return toolSearchBlob(tool).includes(searchQuery);
+      if (!searchTokens.length) return true;
+      const text = toolSearchBlob(tool);
+      return searchTokens.every((token) => text.includes(token));
     });
   }, [
     workspaceTools,
-    searchQuery,
+    searchTokens,
     toolFilter,
     accessGroups,
     isAllToolsWorkspace,
@@ -535,13 +555,6 @@ const ToolsOverview = () => {
       recordToolAccess,
       roleIntelligenceProfile,
     });
-  };
-
-  const handleToolCardKeyDown = (event, tool) => {
-    if (event.target !== event.currentTarget) return;
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-    event.preventDefault();
-    handleToolClick(tool);
   };
 
   const handleAssistantLaunch = (tool) => {
@@ -576,7 +589,7 @@ const ToolsOverview = () => {
   }, [filteredTools, pinnedToolIdSet]);
   const showWorkspaceEmpty = !isAllToolsWorkspace && workspaceInventoryCount === 0;
   const showSearchEmpty = !showWorkspaceEmpty && filteredTools.length === 0;
-  const filterTabs = TOOL_FILTER_OPTIONS;
+  const filterTabs = TOOL_FILTER_OPTIONS.filter((option) => COMMON_TOOL_FILTER_VALUES.has(option.value));
   const emptyStateCopy =
     hiddenTools.length > 0
       ? 'No tools match this view. Some tools are hidden by your preferences; restore them from Profile > Tool preferences or switch filters.'
@@ -603,7 +616,6 @@ const ToolsOverview = () => {
             <span>{roleIntelligenceProfile.roleLabel}</span>
             <span>{workspaceExperience.shortLabel}</span>
             <span>{profile.specialty}</span>
-            <span>{profileToolGraph.counts.visible} visible</span>
             <span>{profileToolGraph.counts.recommended} recommended</span>
             <span>{profileToolGraph.counts.restricted} restricted</span>
           </div>
@@ -685,13 +697,51 @@ const ToolsOverview = () => {
               <span className="stat-number">{profileToolGraph.counts.recommended}</span>
               <span className="stat-label">Recommended</span>
             </div>
-            <div className="stat">
-              <span className="stat-number">{profileToolGraph.counts.pinned}</span>
-              <span className="stat-label">Pinned</span>
-            </div>
           </div>
         </div>
       </div>
+
+      <section className="tools-recent" aria-labelledby="tools-workflow-stitch-title">
+        <div className="tools-recent-header">
+          <h2 id="tools-workflow-stitch-title" className="tools-recent-title">
+            <span className="tools-recent-title-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.clipboardList} size={22} />
+            </span>
+            <span>Continue into workflow</span>
+          </h2>
+          <p>Turn the current tool context into a workflow, result trail, or recommendation path.</p>
+        </div>
+        <div className="tools-recent-list">
+          <button
+            type="button"
+            className="tools-recent-card"
+            onClick={() => navigate(`${CANONICAL_ROUTES.workflows}?source=tools&filter=${toolFilter}`)}
+          >
+            <span className="tools-recent-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.clipboardList} size={22} />
+            </span>
+            <div className="tools-recent-info">
+              <span className="tools-recent-name">Build workflow</span>
+              <span className="tools-recent-category">Use selected tools as workflow blocks</span>
+            </div>
+            <span className="tools-recent-action">Continue →</span>
+          </button>
+          <button
+            type="button"
+            className="tools-recent-card"
+            onClick={() => navigate(`${CANONICAL_ROUTES.recommendations}?source=tools&filter=${toolFilter}`)}
+          >
+            <span className="tools-recent-icon" aria-hidden>
+              <NavIcon icon={CHROME_ICONS.sparkles} size={22} />
+            </span>
+            <div className="tools-recent-info">
+              <span className="tools-recent-name">Recommended next action</span>
+              <span className="tools-recent-category">Pick the next best route from this context</span>
+            </div>
+            <span className="tools-recent-action">Open →</span>
+          </button>
+        </div>
+      </section>
 
       {recentToolItems.length > 0 && (
         <div className="tools-recent">
@@ -705,7 +755,7 @@ const ToolsOverview = () => {
             <p>Pick up where you left off with your most used tools.</p>
           </div>
           <div className="tools-recent-list">
-            {recentToolItems.map((tool) => (
+            {recentToolItems.slice(0, 3).map((tool) => (
               <button
                 key={tool.id}
                 className="tools-recent-card"
@@ -764,10 +814,6 @@ const ToolsOverview = () => {
               key={tool.id}
               data-tool-id={tool.id}
               className="tool-card-large"
-              onClick={() => handleToolClick(tool)}
-              onKeyDown={(event) => handleToolCardKeyDown(event, tool)}
-              role="button"
-              tabIndex={tool.isLaunchable === false ? -1 : 0}
               aria-disabled={tool.isLaunchable === false}
             >
               <div className="tool-card-header">

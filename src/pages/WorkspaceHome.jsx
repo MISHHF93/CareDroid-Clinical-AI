@@ -1,15 +1,13 @@
 import { useMemo } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useConversation } from '../contexts/ConversationContext';
 import { useToolPreferences } from '../contexts/ToolPreferencesContext';
-import { useTenantContext } from '../contexts/TenantContext';
-import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import {
-  CARE_WORKSPACES,
   DEFAULT_CARE_WORKSPACE_ID,
   buildCareWorkspaceModel,
 } from '../config/workspace.config';
+import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import { workspaceFilterSummary } from '../data/platformOperatingSystem';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
@@ -55,32 +53,54 @@ function WorkspaceToolCard({ tool, onLaunch }) {
   );
 }
 
+function cssToken(value = 'default') {
+  return String(value || 'default').toLowerCase().replace(/[^a-z0-9-]/g, '-');
+}
+
+function workspaceThemeStyle(experience) {
+  return {
+    '--workspace-os-accent': experience.theme?.accent,
+    '--workspace-os-surface': experience.theme?.surface,
+    '--workspace-os-border': experience.theme?.border,
+  };
+}
+
 export default function WorkspaceHome() {
   const navigate = useNavigate();
   const { workspaceId = DEFAULT_CARE_WORKSPACE_ID } = useParams();
   const { addMessage, selectTool, setActiveTool } = useConversation();
   const { recordToolAccess } = useToolPreferences();
-  const { refreshTenantContext } = useTenantContext();
-  const { refreshIdentity } = useUserIdentity();
   const {
     assistantContext,
     recommendations,
     shortcuts,
-    switchWorkspace,
   } = useWorkspace();
   const model = useMemo(() => buildCareWorkspaceModel(workspaceId), [workspaceId]);
+  const workspaceExperience = useMemo(
+    () => getWorkspaceExperienceProfile(model.workspace),
+    [model.workspace]
+  );
   const workspaceSummary = useMemo(() => workspaceFilterSummary(model.workspace.id), [model.workspace.id]);
   const WorkspaceIcon = getWorkspaceIcon(model.workspace.icon);
+  const visibleRouteEntries = useMemo(
+    () => (shortcuts.length ? shortcuts : model.routeEntries).slice(0, 4),
+    [model.routeEntries, shortcuts]
+  );
+  const visibleToolEntries = useMemo(
+    () =>
+      (recommendations.length
+        ? recommendations
+            .map((recommendation) =>
+              model.toolEntries.find((tool) => tool.id === recommendation.assetId)
+            )
+            .filter(Boolean)
+        : model.toolEntries
+      ).slice(0, 3),
+    [model.toolEntries, recommendations]
+  );
 
   const launchRoute = (path) => {
     navigate({ pathname: path, search: '' });
-  };
-
-  const activateWorkspace = async (nextWorkspaceId) => {
-    await switchWorkspace(nextWorkspaceId);
-    await refreshTenantContext();
-    await refreshIdentity();
-    navigate(`/workspace/${nextWorkspaceId}`);
   };
 
   const launchTool = (tool) => {
@@ -101,20 +121,24 @@ export default function WorkspaceHome() {
   };
 
   return (
-    <main className="workspace-home">
+    <main
+      className={`workspace-home workspace-home--${cssToken(workspaceExperience.tone)} workspace-home--workspace-${cssToken(workspaceExperience.id)}`}
+      data-workspace-os={workspaceExperience.id}
+      style={workspaceThemeStyle(workspaceExperience)}
+    >
       <section className="workspace-hero" aria-labelledby="workspace-title">
         <div className="workspace-hero__icon" aria-hidden>
           <NavIcon icon={WorkspaceIcon} size={34} />
         </div>
         <div className="workspace-hero__content">
-          <p className="workspace-eyebrow">Workspace Architecture</p>
+          <p className="workspace-eyebrow">{workspaceExperience.operatingLabel}</p>
           <h1 id="workspace-title">{model.workspace.label} Workspace</h1>
-          <p>{model.workspace.description}</p>
+          <p>{workspaceExperience.dashboardSubtitle || model.workspace.description}</p>
         </div>
         <div className="workspace-hero__actions">
           <button type="button" className="workspace-primary-action" onClick={launchAssistantContext}>
             <NavIcon icon={CHROME_ICONS.bot} size={18} aria-hidden />
-            Ask in context
+            Ask Assistant
           </button>
           <button type="button" className="workspace-secondary-action" onClick={() => launchRoute('/dashboard')}>
             Command Center
@@ -122,30 +146,39 @@ export default function WorkspaceHome() {
         </div>
       </section>
 
-      <section className="workspace-switch-grid" aria-label="Switch workspaces">
-        {CARE_WORKSPACES.map((workspace) => {
-          const Icon = getWorkspaceIcon(workspace.icon);
-          const active = workspace.id === model.workspace.id;
-          return (
-            <button
-              key={workspace.id}
-              type="button"
-              className={`workspace-chip${active ? ' workspace-chip--active' : ''}`}
-              onClick={() => activateWorkspace(workspace.id)}
-              aria-current={active ? 'page' : undefined}
-            >
-              <NavIcon icon={Icon} size={17} aria-hidden />
-              <span>{workspace.shortLabel}</span>
-            </button>
-          );
-        })}
+      <section className="workspace-operating-brief" aria-label={`${workspaceExperience.operatingLabel} brief`}>
+        <div>
+          <p className="workspace-eyebrow">{workspaceExperience.environment}</p>
+          <h2>{workspaceExperience.dashboardTitle}</h2>
+          <ul>
+            {(workspaceExperience.operatingBrief || []).slice(0, 2).map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+        <div className="workspace-focus-metrics">
+          {(workspaceExperience.focusMetrics || []).slice(0, 2).map((metric) => (
+            <div key={metric.label}>
+              <span>{metric.label}</span>
+              <strong>{metric.value}</strong>
+              <small>{metric.helper}</small>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="workspace-switch-grid" aria-label="Workspace management">
+        <Link className="workspace-chip workspace-chip--active" to="/profile/workspaces">
+          <NavIcon icon={WorkspaceIcon} size={17} aria-hidden />
+          <span>Manage workspaces</span>
+        </Link>
       </section>
 
       <section className="workspace-context-panel" aria-labelledby="workspace-context-title">
         <div>
           <p className="workspace-eyebrow">AI Context</p>
-          <h2 id="workspace-context-title">Tools appear when the work requires them</h2>
-          <p>{assistantContext || model.workspace.aiContext}</p>
+          <h2 id="workspace-context-title">{workspaceExperience.assistantTitle}</h2>
+          <p>{assistantContext || workspaceExperience.assistantContext || model.workspace.aiContext}</p>
         </div>
         <dl className="workspace-stats">
           <div>
@@ -155,10 +188,6 @@ export default function WorkspaceHome() {
           <div>
             <dt>Relevant tools</dt>
             <dd>{model.stats.tools}</dd>
-          </div>
-          <div>
-            <dt>Calculators</dt>
-            <dd>{model.stats.calculators}</dd>
           </div>
           <div>
             <dt>Notifications</dt>
@@ -174,7 +203,7 @@ export default function WorkspaceHome() {
             <p>Dashboards, maps, and settings that belong to this workspace.</p>
           </div>
           <div className="workspace-card-grid">
-            {(shortcuts.length ? shortcuts : model.routeEntries).map((route) => (
+            {visibleRouteEntries.map((route) => (
               <WorkspaceRouteCard key={route.id} route={route} onLaunch={launchRoute} />
             ))}
           </div>
@@ -186,14 +215,7 @@ export default function WorkspaceHome() {
             <p>Inventory-backed actions surfaced by context instead of sidebar sprawl.</p>
           </div>
           <div className="workspace-card-grid">
-            {(recommendations.length
-              ? recommendations
-                  .map((recommendation) =>
-                    model.toolEntries.find((tool) => tool.id === recommendation.assetId)
-                  )
-                  .filter(Boolean)
-              : model.toolEntries
-            ).map((tool) => (
+            {visibleToolEntries.map((tool) => (
               <WorkspaceToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
             ))}
           </div>
@@ -205,7 +227,7 @@ export default function WorkspaceHome() {
             <p>Workspace-filtered operational inbox items.</p>
           </div>
           <div className="workspace-card-grid">
-            {workspaceSummary.notifications.slice(0, 5).map((notification) => (
+            {workspaceSummary.notifications.slice(0, 3).map((notification) => (
               <button
                 key={notification.id}
                 type="button"

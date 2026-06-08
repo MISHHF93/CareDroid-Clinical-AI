@@ -8,6 +8,13 @@ import {
 
 const EXPERIENCE_OVERRIDES = Object.freeze({
   emergency: {
+    tone: 'emergency',
+    theme: {
+      accent: '#ff4d5e',
+      surface: 'rgba(255, 77, 94, 0.12)',
+      border: 'rgba(255, 77, 94, 0.36)',
+    },
+    environment: 'Rapid response environment',
     operatingLabel: 'Emergency OS',
     modeSummary: 'Rapid triage mode is active.',
     dashboardTitle: 'Emergency Command Center',
@@ -27,8 +34,25 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
       'What emergency calculators should I use next?',
       'Summarize red flags and escalation steps for this presentation.',
     ],
+    focusMetrics: [
+      { label: 'Triage', value: 'Immediate', helper: 'Red flags first' },
+      { label: 'Alerts', value: 'Critical', helper: 'Escalation-ready' },
+      { label: 'Assistant', value: 'Emergency', helper: 'Sepsis, stroke, chest pain' },
+    ],
+    operatingBrief: [
+      'Prioritize triage, active alerts, and deterioration signals.',
+      'Surface emergency calculators and escalation pathways before general tools.',
+      'Seed Assistant with emergency red-flag context.',
+    ],
   },
   'medical-iot': {
+    tone: 'iot',
+    theme: {
+      accent: '#2dd4bf',
+      surface: 'rgba(45, 212, 191, 0.12)',
+      border: 'rgba(45, 212, 191, 0.36)',
+    },
+    environment: 'Telemetry and device operations environment',
     operatingLabel: 'Medical IoT OS',
     modeSummary: 'Device telemetry mode is active.',
     dashboardTitle: 'Medical IoT Command Center',
@@ -47,6 +71,16 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
       'Which devices need attention based on stale telemetry?',
       'Summarize battery and maintenance risk for the current unit.',
       'What should biomedical engineering check first?',
+    ],
+    focusMetrics: [
+      { label: 'Telemetry', value: 'Live', helper: 'Freshness and drift' },
+      { label: 'Device alerts', value: 'Priority', helper: 'Offline and battery risk' },
+      { label: 'Maintenance', value: 'Biomedical', helper: 'Calibration and service' },
+    ],
+    operatingBrief: [
+      'Start with telemetry freshness and offline device alerts.',
+      'Highlight battery, calibration, and maintenance risk.',
+      'Seed Assistant with device-state and biomedical engineering context.',
     ],
   },
   operations: {
@@ -67,18 +101,39 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
     ],
   },
   fleet: {
+    tone: 'fleet',
+    theme: {
+      accent: '#f59e0b',
+      surface: 'rgba(245, 158, 11, 0.12)',
+      border: 'rgba(245, 158, 11, 0.36)',
+    },
+    environment: 'Transport logistics and dispatch environment',
     operatingLabel: 'Fleet OS',
     modeSummary: 'Transport logistics mode is active.',
     dashboardTitle: 'Fleet Command Center',
+    dashboardSubtitle:
+      'Fleet map, dispatch readiness, route risk, and maintenance signals are now prioritized.',
     toolsTitle: 'Fleet Tool Console',
     recommendationsTitle: 'Fleet Recommendations',
+    recommendationsSubtitle:
+      'Recommendations now emphasize dispatch, route sequencing, vehicle readiness, and maintenance risk.',
     assistantTitle: 'Fleet Assistant',
     assistantPlaceholder: 'Ask about ETAs, route risk, vehicles, dispatch support, or maintenance...',
-    primaryActionIds: ['fleet', 'operations', 'live-map', 'tools', 'assistant'],
+    primaryActionIds: ['fleet', 'live-map', 'operations', 'digital-twin', 'tools'],
     quickPrompts: [
       'Summarize route risk and transport readiness.',
       'Which vehicle or route needs attention first?',
       'Help me coordinate the next dispatch step.',
+    ],
+    focusMetrics: [
+      { label: 'Fleet map', value: 'Active', helper: 'Vehicle location and route state' },
+      { label: 'Dispatch', value: 'Ready', helper: 'Human-approved coordination' },
+      { label: 'Maintenance', value: 'Predictive', helper: 'Vehicle risk and readiness' },
+    ],
+    operatingBrief: [
+      'Start with fleet map and dispatch readiness.',
+      'Prioritize route risk, ETAs, and vehicle availability.',
+      'Surface maintenance signals before general operations tools.',
     ],
   },
   laboratory: {
@@ -144,6 +199,13 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
 });
 
 const DEFAULT_EXPERIENCE = Object.freeze({
+  tone: 'default',
+  theme: {
+    accent: 'var(--app-accent-interactive)',
+    surface: 'color-mix(in srgb, var(--app-accent-interactive) 10%, transparent)',
+    border: 'color-mix(in srgb, var(--app-accent-interactive) 30%, var(--app-panel-border))',
+  },
+  environment: 'Workspace-aware operating environment',
   operatingLabel: 'CareDroid OS',
   modeSummary: 'Workspace-aware mode is active.',
   dashboardTitle: 'Workspace Command Center',
@@ -161,6 +223,16 @@ const DEFAULT_EXPERIENCE = Object.freeze({
     'What should I focus on in this workspace?',
     'Which tools are most relevant right now?',
     'Summarize the current workspace priorities.',
+  ],
+  focusMetrics: [
+    { label: 'Workspace', value: 'Active', helper: 'Context-aware routes' },
+    { label: 'Tools', value: 'Filtered', helper: 'Role and access aware' },
+    { label: 'Assistant', value: 'Contextual', helper: 'Workspace-seeded prompts' },
+  ],
+  operatingBrief: [
+    'Use the active workspace to prioritize dashboards, tools, and recommendations.',
+    'Keep Assistant seeded with workspace context.',
+    'Route broad discovery through the shared shell.',
   ],
 });
 
@@ -211,6 +283,8 @@ export function getWorkspaceExperienceProfile(workspaceLike = null) {
     aiContext: workspace.aiContext,
     routeEntries,
     toolIds: workspaceLike?.toolIds?.length ? workspaceLike.toolIds : workspace.toolIds,
+    focusMetrics: override.focusMetrics || DEFAULT_EXPERIENCE.focusMetrics,
+    operatingBrief: override.operatingBrief || DEFAULT_EXPERIENCE.operatingBrief,
     dashboardSubtitle: override.dashboardSubtitle || workspace.description || DEFAULT_EXPERIENCE.dashboardSubtitle,
     toolsSubtitle: override.toolsSubtitle || workspace.description || DEFAULT_EXPERIENCE.toolsSubtitle,
     recommendationsSubtitle:

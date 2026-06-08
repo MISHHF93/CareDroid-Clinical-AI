@@ -135,7 +135,7 @@ export default function SimulationScenarioPlayer() {
           source="Simulated content"
           status="demo"
           demo
-          actionLabel="Open Assistant"
+          actionLabel="Ask Assistant"
           actionRoute="/assistant"
         />
       </section>

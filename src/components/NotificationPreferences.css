@@ -4,11 +4,14 @@
  */
 
 .notification-preferences {
-  max-width: 900px;
+  width: min(100%, 900px);
+  max-width: 100%;
+  min-width: 0;
   margin: 0 auto;
   padding: 2rem;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  min-height: 100vh;
+  background: var(--app-surface-0);
+  border-radius: var(--app-visual-panel-radius, 16px);
+  box-sizing: border-box;
 }
 
 .preferences-header {
@@ -39,9 +42,11 @@
 }
 
 .preferences-section {
+  min-width: 0;
   background: var(--app-surface-1);
   border-radius: 12px;
   padding: 2rem;
+  box-sizing: border-box;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   animation: slideUp 0.4s ease;
 }
@@ -171,6 +176,8 @@ input:checked + .slider:before {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
   margin-bottom: 0.5rem;
 }
 
@@ -204,6 +211,8 @@ input:checked + .slider:before {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
   margin-bottom: 0.5rem;
 }
 
@@ -696,6 +705,11 @@ input:checked + .slider:before {
 @media (max-width: 768px) {
   .notification-preferences {
     padding: 1rem;
+  }
+
+  .toggle-header,
+  .alert-header {
+    flex-wrap: wrap;
   }
 
   .preferences-section {

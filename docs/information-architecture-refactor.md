@@ -81,3 +81,10 @@ Recommendation and product/commercial surfaces remain available as routes and co
 
 - `npm run test:run -- src/components/Sidebar.toolsNavigation.test.js src/components/Sidebar.responsive.test.js src/navigation/primaryNavigation.test.js src/components/QuickCommandLauncher.test.jsx src/layout/AppShell.navigation.test.jsx src/layout/AppShell.layout.test.js` passed: 73 tests.
 - `npm run test:run -- src/data/accessibilityAudit.test.js` passed: 2 tests.
+
+## Entropy Reduction Update
+
+- `/workflows` is now the canonical workflow destination; `/automation` remains functional as a protected alias redirect.
+- Public `/privacy` remains public-only while enterprise/governance privacy references use protected privacy routes.
+- Product/commercial destinations stay under Solutions; platform/admin destinations stay under Account/Admin or Advanced/Admin; operations leaves stay under Operations/Search/Quick Command.
+- Quick Command workspace launches now refresh workspace, tenant, and identity context consistently.

@@ -5,12 +5,22 @@ import {
 } from './searchFirstDiscovery';
 
 describe('search-first discovery index', () => {
-  it('indexes assets, workflows, simulations, and workspaces', () => {
+  it('indexes assets, workflows, simulations, protocols, AI, operations, and workspaces', () => {
     const entries = buildSearchFirstDiscoveryEntries();
     const kinds = new Set(entries.map((entry) => entry.kind));
 
     expect([...kinds]).toEqual(
-      expect.arrayContaining(['asset', 'workflow', 'simulation', 'workspace'])
+      expect.arrayContaining([
+        'asset',
+        'workflow',
+        'automation',
+        'simulation',
+        'protocol',
+        'ai-agent',
+        'ai-model',
+        'operation',
+        'workspace',
+      ])
     );
   });
 
@@ -36,5 +46,66 @@ describe('search-first discovery index', () => {
       ])
     );
     expect(iotResults.every((entry) => entry.workspaceIds.includes('medical-iot'))).toBe(true);
+  });
+
+  it('finds protocols, AI records, operations, and automation templates from one search index', () => {
+    expect(buildSearchFirstResults({ query: 'sepsis management lactate pathway' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'protocol', sourceId: 'sepsis' }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'guardrails human review safety' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'ai-model', sourceId: 'guardrails' }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'clinical copilot agent' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'ai-agent', sourceId: 'agent-clinical-copilot' }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'fleet dispatch maintenance map' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'operation', sourceId: 'fleet' }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'high news2 escalation notify clinician' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'automation', sourceId: 'news2-clinician-notification' }),
+      ])
+    );
+  });
+
+  it('indexes canonical navigation destinations so hidden routes are still findable', () => {
+    expect(buildSearchFirstResults({ query: 'global search' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'destination', sourceId: 'search', path: '/search' }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'recommendations' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'destination', sourceId: 'recommendations', path: '/recommendations' }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'billing usage subscription' })).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'destination', sourceId: 'billing', path: '/billing' }),
+      ])
+    );
+    expect(
+      buildSearchFirstResults({
+        query: 'billing usage subscription',
+        navigationPermissions: ['MANAGE_SUBSCRIPTIONS'],
+      })
+    ).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'destination', sourceId: 'billing', path: '/billing' }),
+      ])
+    );
+    expect(buildSearchFirstResults({ query: 'workflow mining journeys' })).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'destination', sourceId: 'workflow-mining', path: '/workflow-mining' }),
+      ])
+    );
   });
 });

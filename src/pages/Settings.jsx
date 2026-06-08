@@ -5,7 +5,7 @@ import Button from '../components/ui/button';
 import { Drawer } from '../components/ui/Drawer';
 import { useNotificationActions } from '../hooks/useNotificationActions';
 import { useTheme } from '../contexts/ThemeContext';
-import { useUser } from '../contexts/UserContext';
+import { Permission, useUser } from '../contexts/UserContext';
 import {
   requestComplianceAccountDeletion,
   requestComplianceDataExport,
@@ -64,10 +64,16 @@ const Settings = () => {
   const [tenantIsolationAudit, setTenantIsolationAudit] = useState(null);
   const [tenantIsolationStatus, setTenantIsolationStatus] = useState('');
   const { preference, resolvedTheme, setPreference } = useTheme();
-  const { user, authToken, isAuthenticated, isLoading: authLoading } = useUser();
+  const { user, authToken, isAuthenticated, isLoading: authLoading, hasPermission } = useUser();
   const { success, error } = useNotificationActions();
   const accountEmail = user?.email || '';
   const canLoadBilling = Boolean(isAuthenticated || authToken || user);
+  const canViewPlatformAdmin = [
+    Permission.MANAGE_USERS,
+    Permission.MANAGE_SUBSCRIPTIONS,
+    Permission.CONFIGURE_SYSTEM,
+    Permission.VIEW_ANALYTICS,
+  ].some((permission) => hasPermission?.(permission));
 
   const deleteReady = useMemo(
     () =>
@@ -295,51 +301,48 @@ const Settings = () => {
           Configure CareDroid preferences and notifications.
         </p>
 
-        <div
-          style={{
-            marginTop: '16px',
-            padding: '12px',
-            borderRadius: '12px',
-            border: '1px solid var(--panel-border)',
-          }}
-        >
-          <div style={{ fontWeight: 600 }}>Organization platform</div>
-          <p style={{ fontSize: '12px', color: 'var(--muted-text)', margin: '6px 0 10px' }}>
-            Configure hospital type, solution packs, role profiles, and asset lifecycle without code changes.
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-            <Link to="/organization">
-              <Button variant="secondary">Organization dashboard</Button>
-            </Link>
-            <Link to="/settings/organization">
-              <Button variant="secondary">Organization settings</Button>
-            </Link>
-            <Link to="/settings/organization/packs">
-              <Button variant="secondary">Solution packs</Button>
-            </Link>
-            <Link to="/platform-analytics">
-              <Button variant="ghost">Platform analytics</Button>
-            </Link>
-            <Link to="/settings/organization/assets">
-              <Button variant="ghost">Asset lifecycle</Button>
-            </Link>
-            <Link to="/products">
-              <Button variant="ghost">Products</Button>
-            </Link>
-            <Link to="/onboarding">
-              <Button variant="ghost">Hospital onboarding</Button>
-            </Link>
-            <Link to="/configuration-studio">
-              <Button variant="ghost">Configuration studio</Button>
-            </Link>
-            <Link to="/outcomes">
-              <Button variant="ghost">Outcomes</Button>
-            </Link>
-            <Link to="/maturity-assessment">
-              <Button variant="ghost">Maturity assessment</Button>
-            </Link>
+        {canViewPlatformAdmin ? (
+          <div
+            style={{
+              marginTop: '16px',
+              padding: '12px',
+              borderRadius: '12px',
+              border: '1px solid var(--panel-border)',
+            }}
+          >
+            <div style={{ fontWeight: 600 }}>Organization platform</div>
+            <p style={{ fontSize: '12px', color: 'var(--muted-text)', margin: '6px 0 10px' }}>
+              Admin, billing, product, and configuration hubs are separated from normal preferences.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+              {hasPermission?.(Permission.VIEW_ANALYTICS) || hasPermission?.(Permission.MANAGE_USERS) ? (
+                <Link to="/organization">
+                  <Button variant="secondary">Organization dashboard</Button>
+                </Link>
+              ) : null}
+              {hasPermission?.(Permission.MANAGE_USERS) ? (
+                <Link to="/tenant-admin">
+                  <Button variant="secondary">Tenant admin</Button>
+                </Link>
+              ) : null}
+              {hasPermission?.(Permission.MANAGE_SUBSCRIPTIONS) ? (
+                <Link to="/billing">
+                  <Button variant="secondary">Billing</Button>
+                </Link>
+              ) : null}
+              {hasPermission?.(Permission.VIEW_ANALYTICS) ? (
+                <Link to="/products">
+                  <Button variant="ghost">Products</Button>
+                </Link>
+              ) : null}
+              {hasPermission?.(Permission.CONFIGURE_SYSTEM) ? (
+                <Link to="/configuration-studio">
+                  <Button variant="ghost">Configuration studio</Button>
+                </Link>
+              ) : null}
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <div style={{ marginTop: '20px', display: 'grid', gap: '14px' }}>
           <div style={{
@@ -662,8 +665,8 @@ const Settings = () => {
 
         <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
           <Button onClick={handleSave}>Save changes</Button>
-          <Link to="/assistant" style={{ color: 'var(--accent-green)', textDecoration: 'none', alignSelf: 'center' }}>
-            Back to Assistant
+          <Link to="/profile" style={{ color: 'var(--accent-green)', textDecoration: 'none', alignSelf: 'center' }}>
+            Back to Profile
           </Link>
         </div>
       </Card>

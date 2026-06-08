@@ -6,8 +6,11 @@ export default function HIPAANotice() {
 
   return (
     <div style={{
-      minHeight: '100vh',
-      width: '100vw',
+      minHeight: '100dvh',
+      width: '100%',
+      maxWidth: '100%',
+      boxSizing: 'border-box',
+      overflowX: 'clip',
       background: 'var(--navy-bg)',
       color: 'var(--text-color)',
       padding: '40px 20px'

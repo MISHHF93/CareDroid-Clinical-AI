@@ -7,9 +7,15 @@ import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import {
   mockConversationValue,
   mockToolPreferencesValue,
+  mockWorkspaceValue,
 } from '../test/testRenderUtils';
 
 vi.mock('./QuickCommandLauncher.css', () => ({}));
+
+const quickCommandMocks = vi.hoisted(() => ({
+  refreshIdentity: vi.fn(),
+  refreshTenantContext: vi.fn(),
+}));
 
 vi.mock('../contexts/ConversationContext', () => ({
   useConversation: () => mockConversationValue,
@@ -23,14 +29,25 @@ vi.mock('../contexts/UserContext', () => ({
   useUser: () => ({ user: { role: 'physician' } }),
 }));
 
+vi.mock('../contexts/TenantContext', () => ({
+  useTenantContext: () => ({
+    refreshTenantContext: quickCommandMocks.refreshTenantContext,
+  }),
+}));
+
 vi.mock('../contexts/UserIdentityContext', () => ({
   useUserIdentity: () => ({
     account: { role: 'physician' },
     activeWorkspace: null,
     preferences: null,
     platformContext: null,
+    refreshIdentity: quickCommandMocks.refreshIdentity,
     workspaceState: { effectivePermissions: [] },
   }),
+}));
+
+vi.mock('../contexts/WorkspaceContext', () => ({
+  useWorkspace: () => mockWorkspaceValue,
 }));
 
 function LocationProbe() {
@@ -70,6 +87,11 @@ describe('QuickCommandLauncher', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockToolPreferencesValue.recentTools = ['qsofa', 'medical-iot-dashboard'];
+    mockWorkspaceValue.activeWorkspaceId = 'emergency';
+    mockWorkspaceValue.activeWorkspace = { id: 'emergency', name: 'Emergency' };
+    mockWorkspaceValue.workspaces = [];
+    mockWorkspaceValue.shortcuts = [];
+    mockWorkspaceValue.visibleAssetIds = [];
   });
 
   it('opens and closes from the integrated launcher host', () => {
@@ -120,6 +142,12 @@ describe('QuickCommandLauncher', () => {
     });
 
     expect(screen.getByRole('button', { name: /open governance workspace/i })).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
+      target: { value: 'global search' },
+    });
+
+    expect(screen.getByRole('button', { name: /open global search/i })).toBeInTheDocument();
   });
 
   it('launches tool entries through canonical route behavior', () => {
@@ -232,7 +260,7 @@ describe('QuickCommandLauncher', () => {
     expect(toolIds).not.toContain('device-fleet-management');
   });
 
-  it('launches workspace entries as first-class command destinations', () => {
+  it('launches workspace entries as first-class command destinations', async () => {
     renderQuickCommand({ defaultOpen: true });
 
     fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
@@ -240,10 +268,15 @@ describe('QuickCommandLauncher', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: /open emergency workspace/i }));
 
-    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency');
+    await waitFor(() => {
+      expect(mockWorkspaceValue.switchWorkspace).toHaveBeenCalledWith('emergency');
+      expect(quickCommandMocks.refreshTenantContext).toHaveBeenCalled();
+      expect(quickCommandMocks.refreshIdentity).toHaveBeenCalled();
+      expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency');
+    });
   });
 
-  it('searches and launches workflow and simulation discovery entries', () => {
+  it('searches and launches search-first discovery entries', () => {
     renderQuickCommand({ defaultOpen: true });
 
     fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
@@ -258,6 +291,34 @@ describe('QuickCommandLauncher', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: /open sepsis deterioration/i }));
     expect(screen.getByTestId('location')).toHaveTextContent('/simulation');
+
+    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
+    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
+      target: { value: 'sepsis management lactate pathway' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /open sepsis management/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/protocols');
+
+    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
+    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
+      target: { value: 'guardrails human review safety' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /open guardrails/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/ai-governance');
+
+    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
+    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
+      target: { value: 'fleet dispatch maintenance map' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /^open fleet$/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/fleet');
+
+    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
+    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
+      target: { value: 'high news2 escalation notify clinician' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /open high news2 escalation/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/workflows');
   });
 
   it('keeps shared calculator-hub tools searchable instead of hiding them as nav duplicates', () => {

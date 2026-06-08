@@ -19,7 +19,6 @@ import {
   StatusCard,
 } from '../components/dashboard/DashboardVisualizations';
 import {
-  InsightCard,
   MetricCard as CompactMetricCard,
 } from '../components/ui/CareDroidPrimitives';
 import {
@@ -85,11 +84,37 @@ function DashboardPanel({ title, description, icon, children, className = '' }) 
   );
 }
 
-function InsightChip({ label, value, tone = 'neutral' }) {
+function InsightChip({ label, value, helper, tone = 'neutral' }) {
   return (
     <div className={`command-insight-chip command-insight-chip--${tone}`}>
       <span>{label}</span>
       <strong>{value}</strong>
+      {helper ? <small>{helper}</small> : null}
+    </div>
+  );
+}
+
+function cssToken(value = 'default') {
+  return String(value || 'default').toLowerCase().replace(/[^a-z0-9-]/g, '-');
+}
+
+function workspaceThemeStyle(experience) {
+  return {
+    '--workspace-os-accent': experience.theme?.accent,
+    '--workspace-os-surface': experience.theme?.surface,
+    '--workspace-os-border': experience.theme?.border,
+  };
+}
+
+function WorkspaceOperatingBrief({ experience }) {
+  return (
+    <div className="command-operating-brief" aria-label={`${experience.operatingLabel} operating brief`}>
+      <span>{experience.environment}</span>
+      <ul>
+        {(experience.operatingBrief || []).map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -122,7 +147,33 @@ function CompactActionCard({ item, onClick }) {
   );
 }
 
+function LaunchGroup({ title, description, children }) {
+  return (
+    <div className="command-launch-group">
+      <div className="command-launch-group__header">
+        <h3>{title}</h3>
+        {description ? <p>{description}</p> : null}
+      </div>
+      {children}
+    </div>
+  );
+}
+
 const DASHBOARD_LAUNCH_CARDS = Object.freeze([
+  {
+    id: 'search',
+    label: 'Global Search',
+    description: 'Find tools, calculators, protocols, workflows, AI agents, operations, and routes from one place.',
+    path: CANONICAL_ROUTES.search,
+    icon: CHROME_ICONS.search,
+  },
+  {
+    id: 'recommendations',
+    label: 'Recommendations',
+    description: 'Open role, workspace, product, AI, simulation, and protocol recommendations.',
+    path: CANONICAL_ROUTES.recommendations,
+    icon: CHROME_ICONS.sparkles,
+  },
   {
     id: 'assistant',
     label: 'AI Assistant',
@@ -132,21 +183,28 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
   },
   {
     id: 'workspace',
-    label: 'My Workspace',
-    description: 'Open workspace-specific routes, recommendations, and context.',
-    path: '/workspaces',
+    label: 'Manage Workspaces',
+    description: 'Change active workspace, defaults, and workspace context from one place.',
+    path: '/profile/workspaces',
     icon: CHROME_ICONS.layoutDashboard,
   },
   {
+    id: 'profile',
+    label: 'Profile',
+    description: 'Open profile, preferences, activity, security, and workspace settings.',
+    path: CANONICAL_ROUTES.profile,
+    icon: CHROME_ICONS.user,
+  },
+  {
     id: 'tools',
-    label: 'My Tools',
+    label: 'Tools',
     description: 'Browse every permitted clinical and operations tool.',
     path: CANONICAL_ROUTES.tools,
     icon: CHROME_ICONS.tools,
   },
   {
     id: 'calculators',
-    label: 'My Calculators',
+    label: 'Calculators',
     description: 'Open the focused calculator hub and severity scores.',
     path: CANONICAL_ROUTES.calculators,
     icon: CHROME_ICONS.calculator,
@@ -272,6 +330,37 @@ const DASHBOARD_LAUNCH_CARDS = Object.freeze([
   },
 ]);
 
+const DASHBOARD_COMPRESSION_SHORTCUTS = Object.freeze([
+  {
+    id: 'asset-shortcut',
+    label: 'Assets',
+    description: 'Open the asset library for broad discovery.',
+    path: CANONICAL_ROUTES.assets,
+    icon: CHROME_ICONS.artifacts,
+  },
+  {
+    id: 'workflow-shortcut',
+    label: 'Workflows',
+    description: 'Open workflow builder and automation journeys.',
+    path: CANONICAL_ROUTES.workflows,
+    icon: CHROME_ICONS.clipboardList,
+  },
+  {
+    id: 'simulation-shortcut',
+    label: 'Simulation',
+    description: 'Open simulation scenarios and training drills.',
+    path: CANONICAL_ROUTES.simulation,
+    icon: CHROME_ICONS.training,
+  },
+  {
+    id: 'operation-shortcut',
+    label: 'Operations',
+    description: 'Open maps, IoT, fleet, alerts, and maintenance.',
+    path: CANONICAL_ROUTES.operations,
+    icon: CHROME_ICONS.truck,
+  },
+]);
+
 function notificationTitle(notification) {
   return (
     notification.title ||
@@ -350,7 +439,7 @@ export default function CommandDashboard() {
     [platformContext, workspaceVisibleAssetIds]
   );
   const { conversations, addMessage, selectTool, setActiveTool } = useConversation();
-  const { recentTools, recordToolAccess } = useToolPreferences();
+  const { favorites, pinned, recentTools, recordToolAccess } = useToolPreferences();
   const { notifications = [] } = useNotifications();
   const systemConfig = useSystemConfig();
   const model = useMemo(
@@ -369,16 +458,28 @@ export default function CommandDashboard() {
       recentTools
         .map((toolId) => model.toolById[toolId])
         .filter(Boolean)
-        .slice(0, 4),
+        .slice(0, 3),
     [model.toolById, recentTools]
   );
-  const recommendedToolItems = useMemo(
+  const favoriteToolItems = useMemo(
     () =>
-      model.recommendedAssets
+      [...new Set([...(pinned || []), ...(favorites || [])])]
+        .map((toolId) => model.toolById[toolId])
+        .filter(Boolean)
+        .slice(0, 2),
+    [favorites, model.toolById, pinned]
+  );
+  const recommendedToolItems = useMemo(
+    () => {
+      const sourceRecommendations = workspaceRecommendations.length
+        ? workspaceRecommendations
+        : model.recommendedAssets;
+      return sourceRecommendations
         .map((recommendation) => model.toolById[recommendation.assetId || recommendation.id])
         .filter(Boolean)
-        .slice(0, 4),
-    [model.recommendedAssets, model.toolById]
+        .slice(0, 3);
+    },
+    [model.recommendedAssets, model.toolById, workspaceRecommendations]
   );
   const dashboardLaunchCardsById = useMemo(
     () => Object.fromEntries(DASHBOARD_LAUNCH_CARDS.map((card) => [card.id, card])),
@@ -386,22 +487,25 @@ export default function CommandDashboard() {
   );
   const workspaceActionCards = useMemo(() => {
     const selected = [
+      ...['assistant', 'tools', 'operations', 'profile', 'workspace']
+        .map((id) => dashboardLaunchCardsById[id])
+        .filter(Boolean),
       ...workspaceExperience.primaryActionIds
         .map((id) => dashboardLaunchCardsById[id])
         .filter(Boolean),
-      ...['assets', 'workflows', 'results', 'simulation', 'operations', 'tools', 'workspace']
-        .map((id) => dashboardLaunchCardsById[id])
-        .filter(Boolean),
-      ...workspaceExperience.routeEntries.map((route) => ({
-        id: `workspace-route-${route.id}`,
-        label: route.label,
-        description: route.description,
-        path: route.path,
-        icon: CHROME_ICONS.layoutDashboard,
-      })),
+      ...workspaceExperience.routeEntries
+        .slice(0, 3)
+        .map((route) => ({
+          id: `workspace-route-${route.id}`,
+          label: route.label,
+          description: route.description,
+          path: route.path,
+          icon: CHROME_ICONS.layoutDashboard,
+        })),
       ...workspaceShortcuts
         .map(normalizeWorkspaceShortcut)
         .filter(Boolean)
+        .slice(0, 2)
         .map((shortcut) => ({
           id: `workspace-shortcut-${shortcut.id}`,
           label: shortcut.label,
@@ -410,7 +514,7 @@ export default function CommandDashboard() {
           icon: CHROME_ICONS.layoutDashboard,
         })),
     ];
-    return [...new Map(selected.map((item) => [item.path || item.id, item])).values()].slice(0, 12);
+    return [...new Map(selected.map((item) => [item.path || item.id, item])).values()].slice(0, 5);
   }, [dashboardLaunchCardsById, workspaceExperience, workspaceShortcuts]);
   const workspacePromptActions = useMemo(
     () => [
@@ -421,7 +525,7 @@ export default function CommandDashboard() {
         prompt,
       })),
       ...model.prompts,
-    ].slice(0, 6),
+    ].slice(0, 3),
     [model.prompts, workspaceExperience]
   );
   const unreadNotifications = useMemo(
@@ -472,7 +576,11 @@ export default function CommandDashboard() {
   };
 
   return (
-    <section className="command-dashboard command-dashboard--compressed">
+    <section
+      className={`command-dashboard command-dashboard--compressed command-dashboard--${cssToken(workspaceExperience.tone)} command-dashboard--workspace-${cssToken(workspaceExperience.id)}`}
+      data-workspace-os={workspaceExperience.id}
+      style={workspaceThemeStyle(workspaceExperience)}
+    >
       <section className="command-hero" aria-labelledby="command-dashboard-title">
         <div className="command-hero__content">
           <p className="command-eyebrow">
@@ -499,17 +607,24 @@ export default function CommandDashboard() {
             {safeSaasProfile.role}.
           </p>
           <div className="command-os-flow" aria-label="Frontend operating system flow">
-            {frontendOs.flowSteps.map((step) => (
+            {frontendOs.flowSteps.slice(0, 4).map((step) => (
               <span key={step.id} className={`command-os-flow__step command-os-flow__step--${step.state}`}>
                 {step.label}
               </span>
             ))}
           </div>
+          <WorkspaceOperatingBrief experience={workspaceExperience} />
         </div>
         <div className="command-insight-strip" aria-label="Dashboard context summary">
-          <InsightChip label="Mode" value={workspaceExperience.shortLabel} tone="good" />
-          <InsightChip label="Plan" value={subscription?.tier || 'free'} />
-          <InsightChip label="Recommendations" value={workspaceRecommendations.length || model.recommendedAssets.length} tone="good" />
+          {(workspaceExperience.focusMetrics || []).slice(0, 2).map((metric) => (
+            <InsightChip
+              key={metric.label}
+              label={metric.label}
+              value={metric.value}
+              helper={metric.helper}
+              tone={metric.tone || 'good'}
+            />
+          ))}
           <InsightChip label="Alerts" value={activeAlerts.length} tone={activeAlerts.length ? 'warning' : 'good'} />
         </div>
       </section>
@@ -523,6 +638,50 @@ export default function CommandDashboard() {
           {workspaceActionCards.map((item) => (
             <CompactActionCard key={item.id} item={item} />
           ))}
+        </div>
+      </DashboardPanel>
+
+      <DashboardPanel
+        title="Launch Compression"
+        description="Asset, workflow, simulation, and operations paths stay within two clicks from the dashboard."
+        icon={CHROME_ICONS.artifacts}
+      >
+        <div className="command-launch-compression-grid">
+          <LaunchGroup title="Shortcuts" description="Canonical hubs are one click away.">
+            <div className="command-compact-action-grid">
+              {DASHBOARD_COMPRESSION_SHORTCUTS.map((item) => (
+                <CompactActionCard key={item.id} item={item} />
+              ))}
+            </div>
+          </LaunchGroup>
+
+          <LaunchGroup title="Favorites" description="Saved and pinned assets launch directly.">
+            {favoriteToolItems.length ? (
+              <div className="command-tool-grid">
+                {favoriteToolItems.map((tool) => (
+                  <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
+                ))}
+              </div>
+            ) : (
+              <p className="command-empty-state">
+                Pin or favorite tools from the Tools hub to make them one-click dashboard assets.
+              </p>
+            )}
+          </LaunchGroup>
+
+          <LaunchGroup title="Recents" description="Resume the assets you used most recently.">
+            {recentToolItems.length ? (
+              <div className="command-tool-grid">
+                {recentToolItems.slice(0, 2).map((tool) => (
+                  <ToolCard key={tool.id} tool={tool} onLaunch={launchTool} />
+                ))}
+              </div>
+            ) : (
+              <p className="command-empty-state">
+                Recently launched assets will appear here after your first tool launch.
+              </p>
+            )}
+          </LaunchGroup>
         </div>
       </DashboardPanel>
 
@@ -543,7 +702,7 @@ export default function CommandDashboard() {
               rows={3}
             />
             <button type="submit" className="command-primary-action">
-              Open {workspaceExperience.assistantTitle}
+              Ask Assistant
             </button>
           </div>
           <p className="command-assistant-help">
@@ -606,7 +765,7 @@ export default function CommandDashboard() {
                 <span>{notificationBody(alert)}</span>
               </Link>
             ))}
-            {unreadNotifications.slice(0, 2).map((notification) => (
+            {unreadNotifications.slice(0, 1).map((notification) => (
               <Link
                 key={notification.id || notificationTitle(notification)}
                 className="command-recent-item"
@@ -616,7 +775,7 @@ export default function CommandDashboard() {
                 <span>{notificationBody(notification)}</span>
               </Link>
             ))}
-            {recentToolItems.slice(0, 2).map((tool) => (
+            {recentToolItems.slice(0, 1).map((tool) => (
               <button
                 key={tool.id}
                 type="button"
@@ -666,12 +825,6 @@ export default function CommandDashboard() {
               helper={systemConfig.loading ? 'Checking' : 'Config'}
               tone={systemConfig.configDegraded ? 'warning' : 'good'}
             />
-            <CompactMetricCard
-              label="Planned"
-              value={model.stats.unsupported}
-              helper="Roadmap"
-              tone={model.stats.unsupported > 0 ? 'warning' : 'good'}
-            />
           </div>
           <div className="command-status-card-row">
             <StatusCard
@@ -679,12 +832,6 @@ export default function CommandDashboard() {
               value={isDevAuthBypass ? 'Demo' : user?.role || 'Authenticated'}
               detail={systemConfig.error || 'Local tools remain available.'}
               tone={systemConfig.configDegraded || systemConfig.error ? 'warning' : 'good'}
-            />
-            <StatusCard
-              label="Executor readiness"
-              value={`${model.stats.backendBacked} backed`}
-              detail={`${model.stats.unsupported} planned or unsupported entries tracked.`}
-              tone={model.stats.unsupported > 0 ? 'warning' : 'good'}
             />
           </div>
           {systemConfig.error ? <p className="command-status-note">{systemConfig.error}</p> : null}

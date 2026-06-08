@@ -24,6 +24,8 @@ import { InsightCard, StatusBadge } from '../components/ui/CareDroidPrimitives';
 import './RecommendationsPage.css';
 
 const GROUP_FILTERS = [{ id: 'all', label: 'All' }, ...RECOMMENDATION_GROUPS];
+const MAX_DEFAULT_RECOMMENDATION_GROUPS = 2;
+const MAX_VISIBLE_RECOMMENDATIONS_PER_GROUP = 3;
 
 function normalizeProducts(payload) {
   if (Array.isArray(payload)) return payload;
@@ -71,11 +73,11 @@ function RecommendationCard({ recommendation, onOpen }) {
       </div>
       {isTool ? (
         <button type="button" onClick={() => onOpen(recommendation)}>
-          Open tool
+          Open
         </button>
       ) : (
         <Link to={href} onClick={() => onOpen(recommendation)}>
-          Open recommendation
+          View details
         </Link>
       )}
     </InsightCard>
@@ -131,7 +133,7 @@ export default function RecommendationsPage() {
         user,
         account,
         preferences,
-        activeWorkspace,
+        activeWorkspace: workspaceContext.activeWorkspace || activeWorkspace,
         workspaceState,
         workspaceContext,
         organization,
@@ -259,7 +261,7 @@ export default function RecommendationsPage() {
           <span>Total</span>
           <strong>{recommendationModel.summary.total}</strong>
         </div>
-        {RECOMMENDATION_GROUPS.map((group) => (
+        {RECOMMENDATION_GROUPS.slice(0, 3).map((group) => (
           <div key={group.id}>
             <span>{group.label}</span>
             <strong>{recommendationModel.summary.groups[group.id] || 0}</strong>
@@ -291,7 +293,9 @@ export default function RecommendationsPage() {
       {productError ? <p className="recommendations-notice">{productError}</p> : null}
 
       <div className="recommendations-sections">
-        {RECOMMENDATION_GROUPS.map((group) => {
+        {RECOMMENDATION_GROUPS.filter((group) => groupFilter !== 'all' || (filteredGroups[group.id] || []).length > 0)
+          .slice(0, groupFilter === 'all' ? MAX_DEFAULT_RECOMMENDATION_GROUPS : RECOMMENDATION_GROUPS.length)
+          .map((group) => {
           const items = filteredGroups[group.id] || [];
           return (
             <section key={group.id} className="recommendations-section">
@@ -303,7 +307,7 @@ export default function RecommendationsPage() {
               </header>
               {items.length ? (
                 <div className="recommendations-grid">
-                  {items.map((recommendation) => (
+                  {items.slice(0, MAX_VISIBLE_RECOMMENDATIONS_PER_GROUP).map((recommendation) => (
                     <RecommendationCard
                       key={recommendation.id}
                       recommendation={recommendation}

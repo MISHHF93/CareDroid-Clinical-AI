@@ -41,7 +41,7 @@ function formatDate(value) {
 
 const Profile = () => {
   const { user, hasPermission } = useUser();
-  const { account, preferences, activity, aiPersonalization, activeWorkspace } = useUserIdentity();
+  const { account, preferences, activity, activeWorkspace } = useUserIdentity();
   const { favorites, pinned, recentTools } = useToolPreferences();
   const [activityState, setActivityState] = useState({
     loading: true,
@@ -61,7 +61,6 @@ const Profile = () => {
   const email = account?.email || user?.email || '—';
   const role = account?.role || user?.role || '—';
   const specialty = account?.specialty || user?.profile?.specialty || '—';
-  const institution = account?.organization || user?.institution || user?.profile?.institution || '—';
   const workspaceName =
     activeWorkspace?.branding?.displayName || activeWorkspace?.name || 'Personal workspace';
   const recentToolItems = useMemo(() => {
@@ -87,9 +86,7 @@ const Profile = () => {
       route: toolRegistryById[toolId]?.path,
     }));
   }, [favorites, pinned, preferences?.toolPreferences]);
-  const recentCalculators = activity?.recentCalculators || [];
   const aiPreferences = preferences?.aiAssistantPreferences || {};
-  const notificationSettings = preferences?.notificationSettings || {};
   const recentPhiCount = useMemo(
     () => activityState.logs.filter((log) => log.phiAccessed || log.action === 'PHI_ACCESS').length,
     [activityState.logs]
@@ -171,9 +168,7 @@ const Profile = () => {
         }}>
           <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Name:</strong> {displayName}</div>
           <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Email:</strong> {email}</div>
-          <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Specialty:</strong> {specialty}</div>
           <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Role:</strong> {role}</div>
-          <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Organization:</strong> {institution}</div>
           <div className="card-subtle" style={{ padding: '12px 16px' }}><strong>Workspace:</strong> {workspaceName}</div>
         </div>
 
@@ -185,7 +180,7 @@ const Profile = () => {
             </div>
             <div className="profile-overview-list">
               {recentToolItems.length > 0 ? (
-                recentToolItems.slice(0, 5).map((tool) => (
+                recentToolItems.slice(0, 3).map((tool) => (
                   <div key={tool.id || tool.label} className="profile-overview-row">
                     <span>{tool.label}</span>
                     {tool.route ? <Link to={tool.route}>Open</Link> : null}
@@ -193,25 +188,6 @@ const Profile = () => {
                 ))
               ) : (
                 <p>No recent tools yet.</p>
-              )}
-            </div>
-          </div>
-
-          <div className="profile-overview-card">
-            <div className="profile-overview-card__header">
-              <h3>Recent calculators</h3>
-              <Link to="/tools/calculators">Open calculators</Link>
-            </div>
-            <div className="profile-overview-list">
-              {recentCalculators.length > 0 ? (
-                recentCalculators.slice(0, 5).map((calculator) => (
-                  <div key={calculator.id || calculator.label} className="profile-overview-row">
-                    <span>{calculator.label}</span>
-                    {calculator.route ? <Link to={calculator.route}>Open</Link> : null}
-                  </div>
-                ))
-              ) : (
-                <p>No calculator history yet.</p>
               )}
             </div>
           </div>
@@ -247,11 +223,11 @@ const Profile = () => {
           <div className="profile-overview-card">
             <div className="profile-overview-card__header">
               <h3>Saved tools</h3>
-              <Link to="/tools">Manage tools</Link>
+              <Link to="/profile/tool-preferences">Tool preferences</Link>
             </div>
             <div className="profile-overview-list">
               {savedTools.length > 0 ? (
-                savedTools.slice(0, 6).map((tool) => (
+                savedTools.slice(0, 3).map((tool) => (
                   <div key={tool.id} className="profile-overview-row">
                     <span>{tool.label}</span>
                     {tool.route ? <Link to={tool.route}>Open</Link> : null}
@@ -266,7 +242,7 @@ const Profile = () => {
           <div className="profile-overview-card">
             <div className="profile-overview-card__header">
               <h3>Preferences</h3>
-              <Link to="/profile/settings">Edit settings</Link>
+              <Link to="/profile/preferences">Edit preferences</Link>
             </div>
             <dl className="profile-preference-list">
               <div>
@@ -280,17 +256,6 @@ const Profile = () => {
               <div>
                 <dt>Citations</dt>
                 <dd>{aiPreferences.citationLevel || 'standard'}</dd>
-              </div>
-              <div>
-                <dt>Notifications</dt>
-                <dd>
-                  {notificationSettings.pushEnabled === false ? 'Push off' : 'Push on'} ·{' '}
-                  {notificationSettings.emailEnabled === false ? 'Email off' : 'Email on'}
-                </dd>
-              </div>
-              <div>
-                <dt>Recommended AI</dt>
-                <dd>{aiPersonalization?.preferredBehavior || 'clinical_copilot'}</dd>
               </div>
             </dl>
           </div>
@@ -329,7 +294,7 @@ const Profile = () => {
 
           {!activityState.loading && activityState.logs.length > 0 && (
             <div className="profile-activity-list" aria-label="Recent account activity">
-              {activityState.logs.map((log) => (
+              {activityState.logs.slice(0, 3).map((log) => (
                 <article key={log.id || `${log.action}-${log.timestamp}`} className="profile-activity-item">
                   <div>
                     <div className="profile-activity-item__title">{formatAction(log.action)}</div>
@@ -409,17 +374,12 @@ const Profile = () => {
             fontSize: '14px',
           }}
         >
-          <Link to="/profile/settings">Profile settings</Link>
+          <Link to="/profile/settings">Edit profile</Link>
           <Link to="/profile/tool-preferences">Tool preferences</Link>
           <Link to="/profile/activity">Activity</Link>
-          <Link to="/profile/workspaces">Workspaces</Link>
+          <Link to="/profile/workspaces">Manage workspaces</Link>
           <Link to="/profile/security">Security</Link>
-          <Link to="/settings">App settings</Link>
-          <Link to="/notifications">Notifications</Link>
-          <Link to="/welcome">Welcome setup</Link>
-          {' · '}
-          <Link to="/onboarding">Hospital onboarding</Link>
-          <Link to="/biometric-setup">Biometric setup</Link>
+          <Link to="/settings">Platform settings</Link>
           {canViewPhiAccess && <Link to="/audit">Audit logs</Link>}
         </div>
         <div style={{ marginTop: '18px', fontSize: '12px', color: 'var(--muted-text)' }}>

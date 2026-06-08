@@ -8,6 +8,7 @@ import {
 import { getBackendBackedToolInventory, getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { buildProfileToolGraph, getProfileAssistantRecommendations } from '../data/profileToolSegmentation';
 import { getCareDroidDidYouKnowSuggestions } from '../data/capabilityDiscoveryEngine';
+import { buildSearchFirstResults } from '../data/searchFirstDiscovery';
 import { CHROME_ICONS, getToolIcon } from '../navigation/iconRegistry';
 import { Permission } from '../contexts/UserContext';
 
@@ -208,6 +209,82 @@ function getWorkspaceContextSuggestions({ tools, workspaceContext, recentToolIds
     }));
 }
 
+const SEARCH_FIRST_ICON_BY_KIND = Object.freeze({
+  workflow: CHROME_ICONS.clipboardList,
+  automation: CHROME_ICONS.bolt,
+  simulation: CHROME_ICONS.training,
+  protocol: CHROME_ICONS.stethoscope,
+  'ai-agent': CHROME_ICONS.bot,
+  'ai-model': CHROME_ICONS.brain,
+  operation: CHROME_ICONS.activity,
+  destination: CHROME_ICONS.search,
+  workspace: CHROME_ICONS.layoutDashboard,
+  asset: CHROME_ICONS.artifacts,
+});
+
+function makeSearchFirstSuggestion(entry, index) {
+  return {
+    id: `search-first-${entry.id}`,
+    label: entry.title || entry.label || entry.name,
+    description: entry.description || `Open ${entry.category || entry.kind}.`,
+    kind: entry.tool?.id ? 'route' : entry.kind || 'route',
+    toolId: entry.tool?.id,
+    path: entry.path,
+    icon: SEARCH_FIRST_ICON_BY_KIND[entry.kind] || CHROME_ICONS.search,
+    source: 'search-first-index',
+    defaultRank: 84 + index,
+    keywords: [
+      entry.id,
+      entry.sourceId,
+      entry.title,
+      entry.label,
+      entry.category,
+      entry.type,
+      ...(entry.tags || []),
+      ...(entry.aliases || []),
+    ],
+  };
+}
+
+const SEARCH_FIRST_QUERY_STOPWORDS = new Set([
+  'where',
+  'is',
+  'the',
+  'that',
+  'feature',
+  'find',
+  'open',
+  'show',
+  'me',
+  'please',
+]);
+
+function normalizeSearchFirstQuery(input) {
+  const tokens = String(input || '')
+    .toLowerCase()
+    .split(/\s+/)
+    .map((token) => token.replace(/[^a-z0-9-]/g, ''))
+    .filter((token) => token && !SEARCH_FIRST_QUERY_STOPWORDS.has(token));
+  return tokens.join(' ').trim();
+}
+
+function getSearchFirstCapabilitySuggestions({ input, workspaceContext }) {
+  const query = normalizeSearchFirstQuery(input);
+  if (!query) return [];
+  const scopedResults = buildSearchFirstResults({
+    query,
+    workspaceId: workspaceContext?.activeWorkspaceId || 'all',
+  });
+  const results = scopedResults.length
+    ? scopedResults
+    : buildSearchFirstResults({ query });
+
+  return results
+    .filter((entry) => entry.path || entry.tool?.id)
+    .slice(0, 5)
+    .map(makeSearchFirstSuggestion);
+}
+
 function makeExecutorSuggestion(registryId, index) {
   const record = typeof registryId === 'string' ? null : registryId;
   const canonicalId = record?.id || registryId;
@@ -307,6 +384,10 @@ export function getChatCapabilitySuggestions({
   });
 
   getWorkspaceContextSuggestions({ tools, workspaceContext, recentToolIds }).forEach((suggestion) => {
+    suggestions.push(suggestion);
+  });
+
+  getSearchFirstCapabilitySuggestions({ input, workspaceContext }).forEach((suggestion) => {
     suggestions.push(suggestion);
   });
 

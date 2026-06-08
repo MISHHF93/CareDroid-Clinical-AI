@@ -307,8 +307,8 @@ const ProfileSettings = ({ authToken }) => {
             >
               Save profile
             </Button>
-            <Link to="/assistant" style={{ color: '#00FF88', textDecoration: 'none', alignSelf: 'center' }}>
-              Back to Assistant
+            <Link to="/profile" style={{ color: '#00FF88', textDecoration: 'none', alignSelf: 'center' }}>
+              Back to Profile
             </Link>
           </div>
         </Card>

@@ -182,7 +182,7 @@ describe('RecommendationsPage', () => {
     vi.clearAllMocks();
   });
 
-  it('renders grouped recommendations for every output type', async () => {
+  it('renders next-best recommendations first and keeps every output type filterable', async () => {
     render(
       <MemoryRouter>
         <RecommendationsPage />
@@ -193,12 +193,22 @@ describe('RecommendationsPage', () => {
     expect(screen.getByText(/emergency os/i)).toBeInTheDocument();
     expect(screen.getByText('qSOFA')).toBeVisible();
     expect(screen.getByText('Sepsis Pack')).toBeVisible();
-    expect(screen.getByText('Emergency Suite')).toBeVisible();
-    expect(screen.getByText('Clinical Copilot')).toBeVisible();
-    expect(screen.getByText('Sepsis Simulation')).toBeVisible();
-    expect(screen.getByText('Sepsis Protocol')).toBeVisible();
+    expect(screen.queryByText('Emergency Suite')).not.toBeInTheDocument();
 
     await waitFor(() => expect(screen.getByLabelText(/recommendation filters/i)).toBeInTheDocument());
+    const typeFilter = screen.getByLabelText(/type/i);
+
+    fireEvent.change(typeFilter, { target: { value: 'products' } });
+    expect(screen.getByText('Emergency Suite')).toBeVisible();
+
+    fireEvent.change(typeFilter, { target: { value: 'aiAgents' } });
+    expect(screen.getByText('Clinical Copilot')).toBeVisible();
+
+    fireEvent.change(typeFilter, { target: { value: 'simulations' } });
+    expect(screen.getByText('Sepsis Simulation')).toBeVisible();
+
+    fireEvent.change(typeFilter, { target: { value: 'protocols' } });
+    expect(screen.getByText('Sepsis Protocol')).toBeVisible();
   });
 
   it('opens tool recommendations through registry launch plumbing', async () => {
@@ -209,7 +219,7 @@ describe('RecommendationsPage', () => {
     );
 
     await waitFor(() => expect(screen.getByText('qSOFA')).toBeVisible());
-    fireEvent.click(screen.getByRole('button', { name: /open tool/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^open$/i }));
 
     expect(pageMocks.applyRegistryToolLaunch).toHaveBeenCalledWith(
       'qsofa',

@@ -101,6 +101,9 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     label: 'Settings',
     mobileLabel: 'Settings',
     path: CANONICAL_ROUTES.settings,
+    showInSidebar: false,
+    showInMobile: false,
+    disclosure: 'account',
     matchPaths: [
       CANONICAL_ROUTES.settings,
       CANONICAL_ROUTES.profileSettings,
@@ -121,6 +124,16 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
 
 export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
   {
+    id: 'search',
+    label: 'Global Search',
+    mobileLabel: 'Search',
+    path: CANONICAL_ROUTES.search,
+    matchPaths: [CANONICAL_ROUTES.search],
+    showInMobile: false,
+    showInSidebar: false,
+    disclosure: 'utility',
+  },
+  {
     id: 'discover',
     label: 'Discover',
     mobileLabel: 'Discover',
@@ -128,15 +141,17 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
     matchPaths: [CANONICAL_ROUTES.discover],
     showInMobile: false,
     showInSidebar: false,
+    disclosure: 'contextual',
   },
   {
-    id: 'automation',
-    label: 'Automation',
-    mobileLabel: 'Automate',
-    path: CANONICAL_ROUTES.automation,
-    matchPaths: [CANONICAL_ROUTES.automation, CANONICAL_ROUTES.automationAudit, CANONICAL_ROUTES.workflows],
+    id: 'workflows',
+    label: 'Workflows',
+    mobileLabel: 'Flows',
+    path: CANONICAL_ROUTES.workflows,
+    matchPaths: [CANONICAL_ROUTES.workflows, CANONICAL_ROUTES.automation, CANONICAL_ROUTES.automationAudit],
     showInMobile: false,
     showInSidebar: false,
+    disclosure: 'contextual',
   },
   {
     id: 'customer-portal',
@@ -146,6 +161,8 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
     matchPaths: [CANONICAL_ROUTES.customerPortal],
     showInMobile: false,
     showInSidebar: false,
+    disclosure: 'admin',
+    permission: 'MANAGE_SUBSCRIPTIONS',
   },
   {
     id: 'knowledge-hub',
@@ -218,6 +235,7 @@ export const ACCOUNT_UTILITY_NAV_ITEMS = Object.freeze([
     matchPaths: [CANONICAL_ROUTES.notifications, '/notification-preferences'],
     showInMobile: false,
     showInSidebar: false,
+    disclosure: 'utility',
   },
 ]);
 
@@ -454,23 +472,6 @@ export const OPERATIONS_SIDEBAR_NAV_ITEMS = Object.freeze([
 
 export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
   {
-    id: 'asset-packs',
-    label: 'Asset Packs',
-    mobileLabel: 'Packs',
-    path: CANONICAL_ROUTES.assetPacks,
-    matchPaths: [CANONICAL_ROUTES.assetPacks],
-    showInMobile: false,
-  },
-  {
-    id: 'products',
-    label: 'Products',
-    mobileLabel: 'Products',
-    path: CANONICAL_ROUTES.products,
-    matchPaths: [CANONICAL_ROUTES.products, CANONICAL_ROUTES.plans],
-    matchPrefixes: [`${CANONICAL_ROUTES.products}/`, `${CANONICAL_ROUTES.plans}`],
-    showInMobile: false,
-  },
-  {
     id: 'organization',
     label: 'Organization',
     mobileLabel: 'Org',
@@ -493,15 +494,6 @@ export const ADVANCED_SIDEBAR_NAV_ITEMS = Object.freeze([
     path: CANONICAL_ROUTES.executive,
     matchPaths: [CANONICAL_ROUTES.executive],
     permission: 'VIEW_ANALYTICS',
-    showInMobile: false,
-  },
-  {
-    id: 'platform-admin',
-    label: 'Platform Admin',
-    mobileLabel: 'Admin',
-    path: CANONICAL_ROUTES.platformAdmin,
-    matchPaths: [CANONICAL_ROUTES.platformAdmin, CANONICAL_ROUTES.tenantAdmin],
-    permission: 'MANAGE_ORGANIZATION',
     showInMobile: false,
   },
   {
@@ -738,6 +730,51 @@ export const PRIMARY_SIDEBAR_NAV_ITEMS = Object.freeze(
 export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
   PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => item.showInMobile !== false)
 );
+
+const NORMAL_PRIMARY_NAV_IDS = new Set(['home', 'assistant', 'tools', 'operations', 'profile']);
+const UTILITY_NAV_IDS = new Set(['search', 'notifications', 'workspace']);
+const ADMIN_NAV_PERMISSION_BY_ID = Object.freeze({
+  'customer-portal': ['MANAGE_SUBSCRIPTIONS'],
+  'enterprise-readiness': ['VIEW_ANALYTICS'],
+  'platform-admin': ['CONFIGURE_SYSTEM', 'MANAGE_USERS'],
+  'tenant-admin': ['MANAGE_USERS', 'MANAGE_ORGANIZATION'],
+  billing: ['MANAGE_SUBSCRIPTIONS'],
+});
+
+function normalizePermissionList(permission) {
+  if (!permission) return [];
+  return Array.isArray(permission) ? permission : [permission];
+}
+
+function hasRequiredPermission(item, permissionSet) {
+  const permissions = normalizePermissionList(item.permission);
+  if (!permissions.length) return true;
+  if (item.requireAllPermissions) {
+    return permissions.every((permission) => permissionSet.has(permission));
+  }
+  return permissions.some((permission) => permissionSet.has(permission));
+}
+
+export function canExposeNavigationItem(
+  item,
+  { permissions = [], includeContextual = false, relevantDestinationIds = [] } = {}
+) {
+  if (!item?.id || !item.path) return false;
+  const permissionSet = new Set(permissions || []);
+  const relevantIds = new Set(relevantDestinationIds || []);
+  if (!hasRequiredPermission(item, permissionSet)) return false;
+
+  if (NORMAL_PRIMARY_NAV_IDS.has(item.id) || UTILITY_NAV_IDS.has(item.id)) return true;
+  if (item.id === 'settings') return false;
+
+  const adminPermissions = ADMIN_NAV_PERMISSION_BY_ID[item.id];
+  if (adminPermissions) {
+    return adminPermissions.some((permission) => permissionSet.has(permission));
+  }
+
+  if (relevantIds.has(item.id)) return true;
+  return includeContextual && item.disclosure !== 'admin';
+}
 
 function uniqueNavItemsByPath(items) {
   const seen = new Set();

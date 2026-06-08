@@ -3,6 +3,7 @@ import {
   ACCOUNT_UTILITY_NAV_ITEMS,
   ADVANCED_SIDEBAR_NAV_ITEMS,
   OPERATIONS_SIDEBAR_NAV_ITEMS,
+  canExposeNavigationItem,
   getPrimaryNavItemForPath,
   PRIMARY_MOBILE_NAV_ITEMS,
   PRIMARY_NAV_BY_ID,
@@ -23,7 +24,6 @@ describe('primaryNavigation', () => {
       ['Tools', '/tools'],
       ['Operations', '/operations'],
       ['Profile', '/profile'],
-      ['Settings', '/settings'],
     ]);
   });
 
@@ -49,11 +49,8 @@ describe('primaryNavigation', () => {
 
   it('keeps developer and governance routes in the searchable advanced catalog', () => {
     expect(ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
-      ['Asset Packs', '/asset-packs'],
-      ['Products', '/products'],
       ['Organization', '/organization'],
       ['Executive', '/executive'],
-      ['Platform Admin', '/platform-admin'],
       ['Configuration Studio', '/configuration-studio'],
       ['Developer Catalog', '/tools/catalog'],
       ['System Health', '/system-health'],
@@ -140,7 +137,6 @@ describe('primaryNavigation', () => {
       '/tools',
       '/operations',
       '/profile',
-      '/settings',
     ]);
   });
 
@@ -174,7 +170,7 @@ describe('primaryNavigation', () => {
     expect(getPrimaryNavItemForPath('/operations')?.id).toBe('operations');
   });
 
-  it('keeps profile and settings in primary navigation while account utilities remain searchable', () => {
+  it('keeps profile primary while settings and account utilities remain outside the persistent shell', () => {
     const expected = [
       ['/profile', 'profile'],
       ['/profile/activity', 'profile'],
@@ -182,7 +178,7 @@ describe('primaryNavigation', () => {
       ['/profile/settings', 'settings'],
       ['/profile/preferences', 'settings'],
       ['/settings', 'settings'],
-      ['/tenant-admin', 'platform-admin'],
+      ['/tenant-admin', 'tenant-admin'],
     ];
 
     for (const [path, itemId] of expected) {
@@ -191,13 +187,14 @@ describe('primaryNavigation', () => {
       expect(
         matches.map((item) => item.id),
         path
-      ).toEqual(['profile', 'settings'].includes(itemId) ? [itemId] : []);
+      ).toEqual(itemId === 'profile' ? [itemId] : []);
       expect(getPrimaryNavItemForPath(path)?.id, path).toBe(itemId);
     }
 
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.id)).toEqual([
+      'search',
       'discover',
-      'automation',
+      'workflows',
       'customer-portal',
       'knowledge-hub',
       'knowledge-base',
@@ -210,17 +207,38 @@ describe('primaryNavigation', () => {
     ]);
   });
 
-  it('keeps Discover and Automation searchable without making them primary', () => {
+  it('applies progressive disclosure rules to command and search destinations', () => {
+    const byId = Object.fromEntries(
+      [
+        ...Object.values(PRIMARY_NAV_BY_ID),
+        ...ACCOUNT_UTILITY_NAV_ITEMS,
+        ...SOLUTIONS_SIDEBAR_NAV_ITEMS,
+        ...OPERATIONS_SIDEBAR_NAV_ITEMS,
+        ...ADVANCED_SIDEBAR_NAV_ITEMS,
+      ].map((item) => [item.id, item])
+    );
+
+    expect(canExposeNavigationItem(byId.home)).toBe(true);
+    expect(canExposeNavigationItem(byId.profile)).toBe(true);
+    expect(canExposeNavigationItem(byId.settings)).toBe(false);
+    expect(canExposeNavigationItem(byId.search)).toBe(true);
+    expect(canExposeNavigationItem(byId['workflow-mining'])).toBe(false);
+    expect(canExposeNavigationItem(byId['workflow-mining'], { includeContextual: true })).toBe(true);
+    expect(canExposeNavigationItem(byId['platform-admin'], { includeContextual: true })).toBe(false);
+    expect(canExposeNavigationItem(byId['platform-admin'], { permissions: ['CONFIGURE_SYSTEM'] })).toBe(true);
+  });
+
+  it('keeps Discover and Workflows searchable without making them primary', () => {
     expect(SECONDARY_NAV_ITEMS).toEqual([]);
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual(
       expect.arrayContaining([
         ['Discover', '/discover'],
-        ['Automation', '/automation'],
+        ['Workflows', '/workflows'],
         ['Knowledge Hub', '/knowledge-hub'],
       ])
     );
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => item.id)).not.toEqual(
-      expect.arrayContaining(['discover', 'automation'])
+      expect.arrayContaining(['discover', 'workflows'])
     );
   });
 });

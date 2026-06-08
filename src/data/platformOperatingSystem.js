@@ -54,6 +54,12 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
     executionMode: 'demo-preview',
     description: 'HEART, ECG Assistant, ACS Assistant, and documentation in sequence.',
     workspaceIds: ['cardiology', 'emergency'],
+    resultSummary: 'Chest pain workflow preview completed. Review the timeline, then continue with documentation or recommendations.',
+    recommendedNextActions: [
+      { label: 'Review workflow result timeline', path: '/timeline?kind=workflow' },
+      { label: 'Open chest pain recommendations', path: '/recommendations?source=workflow&workflow=chest-pain' },
+      { label: 'Ask Assistant for documentation', path: '/assistant' },
+    ],
     blocks: [
       { id: 'heart', type: 'calculator', label: 'HEART', toolId: 'heart-score' },
       { id: 'ecg', type: 'ai-prompt', label: 'ECG Assistant', toolId: 'ecg-interpretation-assistant' },
@@ -67,6 +73,12 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
     executionMode: 'demo-preview',
     description: 'qSOFA, NEWS2, SOFA, antibiotics, fluids, reassessment, and handoff.',
     workspaceIds: ['emergency', 'icu'],
+    resultSummary: 'Sepsis escalation preview completed. Review the result trail and choose the next recommended escalation action.',
+    recommendedNextActions: [
+      { label: 'Review sepsis workflow result', path: '/timeline?kind=workflow' },
+      { label: 'Open escalation recommendations', path: '/recommendations?source=workflow&workflow=sepsis-escalation' },
+      { label: 'Ask Assistant for handoff', path: '/assistant' },
+    ],
     blocks: [
       { id: 'qsofa', type: 'calculator', label: 'qSOFA', toolId: 'qsofa' },
       { id: 'news2', type: 'calculator', label: 'NEWS2', toolId: 'news2' },
@@ -80,6 +92,12 @@ export const PLATFORM_WORKFLOWS = Object.freeze([
     executionMode: 'demo-preview',
     description: 'Telemetry alert, device detail, maintenance note, and assignment review.',
     workspaceIds: ['medical-iot', 'operations', 'governance'],
+    resultSummary: 'Device maintenance preview completed. Review the timeline, then continue to operational recommendations.',
+    recommendedNextActions: [
+      { label: 'Review maintenance result timeline', path: '/timeline?kind=workflow' },
+      { label: 'Open operations recommendations', path: '/recommendations?source=workflow&workflow=device-maintenance' },
+      { label: 'Ask Assistant for maintenance handoff', path: '/assistant' },
+    ],
     blocks: [
       { id: 'telemetry', type: 'dashboard', label: 'Telemetry', path: '/medical-iot' },
       { id: 'device', type: 'dashboard', label: 'Device Fleet', path: '/devices' },

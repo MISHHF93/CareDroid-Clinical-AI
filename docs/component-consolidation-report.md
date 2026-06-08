@@ -96,3 +96,10 @@ Shared styling lives in `src/components/ui/CareDroidPrimitives.css`.
 - Migrate fleet widgets, IoT cards, system health, SaaS health, and diagnostics to `MetricCard`, `StatusWidget`, and `StatusBadge`.
 - Retire or adapt duplicate `Badge`/`StatusBadge` exports from `components/data-display/DataDisplay.jsx` once all callers use `components/ui/Badge.jsx` and `CareDroidPrimitives`.
 - Migrate page-local `DecisionSupportNotice` implementations in specialty calculator packs to `InfoNotice`.
+
+## Entropy Reduction Update
+
+- Refactored `Operations` to use shared `InsightCard`, `StatusBadge`, and `SectionHeader` primitives for its hub insight and section surfaces.
+- Split operational primary cards from lower-level drill-down controls so Fleet, Live Map, routing, and maintenance do not compete with the canonical Operations hub.
+- Added a focused `Operations` test to keep primary operational cards and drill-downs from collapsing back into one duplicate card wall.
+- Deferred full `TeamManagement` table migration to `DataTable`; this pass instead added local scroll/mobile guardrails because the page still needs sortable table behavior.

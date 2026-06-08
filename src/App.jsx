@@ -103,7 +103,6 @@ const {
 const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
 const CapabilityDiscovery = lazyWithRetry(() => import('./pages/CapabilityDiscovery'));
 const RecommendationsPage = lazyWithRetry(() => import('./pages/RecommendationsPage'));
-const WorkflowAutomationBuilder = lazyWithRetry(() => import('./pages/WorkflowAutomationBuilder'));
 const AutomationAuditTrail = lazyWithRetry(() => import('./pages/AutomationAuditTrail'));
 const DependencyMap = lazyWithRetry(() => import('./pages/DependencyMap'));
 const DependencyGraph = lazyWithRetry(() => import('./pages/DependencyGraph'));
@@ -727,11 +726,6 @@ function AppRoutes() {
     {
       path: '/recommendations',
       element: <RecommendationsPage />,
-      requiresAuth: true,
-    },
-    {
-      path: '/automation',
-      element: <WorkflowAutomationBuilder />,
       requiresAuth: true,
     },
     {

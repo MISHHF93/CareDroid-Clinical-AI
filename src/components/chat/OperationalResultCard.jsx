@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import ToolCard from '../ToolCard';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
@@ -81,17 +82,38 @@ function summarizeOutput(toolResult, status) {
 
 function nextBestActions(status, followUpSuggestions) {
   const suggested = asArray(followUpSuggestions).slice(0, 2);
-  if (suggested.length > 0) return suggested;
+  if (suggested.length > 0) {
+    return [
+      ...suggested.slice(0, 1),
+      { label: 'Open recommended next actions', path: '/recommendations' },
+    ];
+  }
   if (status === 'failed') {
-    return ['Review the failure explanation.', 'Edit inputs and retry if still clinically appropriate.'];
+    return [
+      'Review the failure explanation.',
+      { label: 'Ask Assistant for recovery', path: '/assistant' },
+    ];
   }
   if (status === 'warning') {
-    return ['Review warnings in context.', 'Document the decision support output if used.'];
+    return [
+      { label: 'Review warnings in timeline', path: '/timeline' },
+      'Document the decision support output if used.',
+    ];
   }
   if (status === 'needs setup') {
-    return ['Open the related tool or settings page.', 'Retry after setup is complete.'];
+    return [
+      { label: 'Open settings', path: '/settings' },
+      'Retry after setup is complete.',
+    ];
   }
-  return ['Review the detailed output.', 'Use clinician judgment before acting on the result.'];
+  return [
+    { label: 'Review detailed output', path: '/timeline' },
+    { label: 'Open recommended next actions', path: '/recommendations' },
+  ];
+}
+
+function actionLabel(action) {
+  return typeof action === 'string' ? action : action.label;
 }
 
 export default function OperationalResultCard({
@@ -173,7 +195,13 @@ export default function OperationalResultCard({
           <div className="operational-result-card__label">Next best actions</div>
           <ul className="operational-result-card__actions">
             {nextBestActions(status, followUpSuggestions).map((action) => (
-              <li key={action}>{action}</li>
+              <li key={actionLabel(action)}>
+                {typeof action === 'object' && action.path ? (
+                  <Link to={action.path}>{action.label}</Link>
+                ) : (
+                  actionLabel(action)
+                )}
+              </li>
             ))}
           </ul>
         </div>

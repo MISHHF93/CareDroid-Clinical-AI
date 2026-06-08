@@ -7,12 +7,25 @@
 }
 
 .workspace-hero,
+.workspace-operating-brief,
 .workspace-context-panel,
 .workspace-panel {
   border: 1px solid var(--app-panel-border);
   border-radius: var(--compact-card-radius, 16px);
   background: var(--app-surface-1);
   box-shadow: var(--shadow-1);
+}
+
+.workspace-home--emergency .workspace-hero,
+.workspace-home--emergency .workspace-operating-brief,
+.workspace-home--iot .workspace-hero,
+.workspace-home--iot .workspace-operating-brief,
+.workspace-home--fleet .workspace-hero,
+.workspace-home--fleet .workspace-operating-brief {
+  border-color: var(--workspace-os-border);
+  background:
+    linear-gradient(135deg, var(--workspace-os-surface), transparent 58%),
+    var(--app-surface-1);
 }
 
 .workspace-hero {
@@ -30,8 +43,8 @@
   width: 58px;
   height: 58px;
   border-radius: 18px;
-  background: color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
-  color: var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 14%, transparent);
+  color: var(--workspace-os-accent, var(--app-accent-interactive));
 }
 
 .workspace-hero h1,
@@ -55,7 +68,7 @@
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--app-accent-interactive);
+  color: var(--workspace-os-accent, var(--app-accent-interactive));
 }
 
 .workspace-hero__actions {
@@ -87,7 +100,7 @@
 }
 
 .workspace-primary-action {
-  background: var(--app-accent-interactive);
+  background: var(--workspace-os-accent, var(--app-accent-interactive));
   color: var(--app-accent-contrast, #fff);
 }
 
@@ -116,9 +129,68 @@
 }
 
 .workspace-chip--active {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, transparent);
-  background: color-mix(in srgb, var(--app-accent-interactive) 12%, var(--app-surface-1));
+  border-color: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 42%, transparent);
+  background: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 12%, var(--app-surface-1));
   color: var(--text-color);
+}
+
+.workspace-operating-brief {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.82fr);
+  gap: 16px;
+  align-items: start;
+  padding: clamp(14px, 2.5vw, 20px);
+  margin: 16px 0;
+}
+
+.workspace-operating-brief h2 {
+  margin: 4px 0 0;
+}
+
+.workspace-operating-brief ul {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted-text);
+}
+
+.workspace-focus-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.workspace-focus-metrics div {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--workspace-os-border, var(--app-panel-border));
+  border-radius: 12px;
+  background: var(--workspace-os-surface, var(--app-surface-2));
+}
+
+.workspace-focus-metrics span,
+.workspace-focus-metrics strong,
+.workspace-focus-metrics small {
+  display: block;
+}
+
+.workspace-focus-metrics span {
+  color: var(--muted-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.workspace-focus-metrics strong {
+  margin-top: 4px;
+  color: var(--text-color);
+}
+
+.workspace-focus-metrics small {
+  margin-top: 4px;
+  color: var(--muted-text);
 }
 
 .workspace-context-panel {
@@ -196,7 +268,7 @@
 .workspace-tool-card:focus-visible,
 .workspace-chip:hover,
 .workspace-chip:focus-visible {
-  border-color: color-mix(in srgb, var(--app-accent-interactive) 42%, var(--app-panel-border));
+  border-color: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 42%, var(--app-panel-border));
   outline: none;
 }
 
@@ -208,8 +280,8 @@
   width: 34px;
   height: 34px;
   border-radius: 11px;
-  background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
-  color: var(--app-accent-interactive);
+  background: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 10%, transparent);
+  color: var(--workspace-os-accent, var(--app-accent-interactive));
 }
 
 .workspace-route-card__body,
@@ -230,15 +302,20 @@
   width: fit-content;
   padding: 2px 8px;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--app-accent-interactive) 10%, transparent);
-  color: var(--app-accent-interactive) !important;
+  background: color-mix(in srgb, var(--workspace-os-accent, var(--app-accent-interactive)) 10%, transparent);
+  color: var(--workspace-os-accent, var(--app-accent-interactive)) !important;
   font-weight: 700;
 }
 
 @media (max-width: 860px) {
   .workspace-hero,
+  .workspace-operating-brief,
   .workspace-context-panel,
   .workspace-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .workspace-focus-metrics {
     grid-template-columns: 1fr;
   }
 

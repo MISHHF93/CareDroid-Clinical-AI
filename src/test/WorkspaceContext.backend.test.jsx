@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { WorkspaceProvider, useWorkspace } from '../contexts/WorkspaceContext';
 
 const mocks = vi.hoisted(() => ({
@@ -71,5 +71,53 @@ describe('WorkspaceContext backend context', () => {
     ]);
     expect(result.current.assistantContext).toBe('ICU assistant context');
     expect(result.current.shortcuts).toEqual([expect.objectContaining({ id: 'sofa' })]);
+  });
+
+  it('does not leak stale backend context after switching to a local workspace', async () => {
+    mocks.apiFetch.mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          workspace: {
+            id: 'workspace-icu',
+            type: 'icu',
+            workspaceKey: 'icu',
+            name: 'ICU Workspace',
+            assistantContext: 'ICU assistant context',
+          },
+          workspaceState: {
+            workspaces: [
+              {
+                id: 'workspace-icu',
+                type: 'icu',
+                settings: { workspaceKey: 'icu', enabledToolIds: ['sofa-score'] },
+                branding: { displayName: 'ICU' },
+              },
+            ],
+          },
+          visibleAssetIds: ['sofa-score'],
+          recommendations: [{ assetId: 'sofa-score', reason: 'workspace' }],
+          assistantContext: 'ICU assistant context',
+          shortcuts: [{ id: 'sofa', label: 'SOFA', path: '/tools/calculators' }],
+        }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      ),
+    );
+
+    const wrapper = ({ children }) => <WorkspaceProvider>{children}</WorkspaceProvider>;
+    const { result } = renderHook(() => useWorkspace(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.activeWorkspaceId).toBe('icu');
+    });
+
+    await act(async () => {
+      await result.current.switchWorkspace('emergency');
+    });
+
+    expect(result.current.activeWorkspaceId).toBe('emergency');
+    expect(result.current.workspaceContext).toBeNull();
+    expect(result.current.recommendations).toEqual([]);
+    expect(result.current.visibleAssetIds).not.toEqual(['sofa-score']);
+    expect(result.current.assistantContext).not.toBe('ICU assistant context');
   });
 });

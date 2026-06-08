@@ -61,3 +61,10 @@ Findings:
 - `npm run test:run -- src/data/workspaceExperience.test.js src/pages/CommandDashboard.test.jsx src/pages/tools/ToolsOverview.visibility.test.jsx src/pages/RecommendationsPage.test.jsx src/components/ChatInterface.nlu.test.jsx`
   - 5 test files passed
   - 31 tests passed
+
+## Entropy Reduction Update
+
+- `WorkspaceContext` now ignores backend workspace context when it does not match the active workspace, preventing stale visible assets, recommendations, shortcuts, and assistant context after a workspace switch.
+- Dashboard recommendation cards now render active workspace recommendations before generic recommendation-engine output.
+- Recommendations pass the active workspace-context workspace into the recommendation engine when available.
+- Quick Command workspace launches now call the shared workspace switch path and refresh tenant and identity context before navigating to the workspace.

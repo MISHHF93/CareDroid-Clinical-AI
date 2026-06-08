@@ -48,6 +48,10 @@ describe('Simplified sidebar navigation wiring', () => {
     expect(sidebarSource).not.toContain('applyRegistryToolLaunch');
   });
 
+  it('keeps sidebar recent chats capped for entropy compression', () => {
+    expect(sidebarSource).toContain('conversations.slice(-2).reverse()');
+  });
+
   it('keeps removed sidebar props out of AppShell wiring', () => {
     expect(appShellSource).not.toContain('onOpenToolsOverview');
     expect(appShellSource).not.toContain('onOpenToolsCatalog');
@@ -59,7 +63,7 @@ describe('Simplified sidebar navigation wiring', () => {
   it('defines exactly the reduced visible primary routes', () => {
     const navPaths = visibleSidebarItems.map((item) => item.path);
 
-    expect(navPaths).toEqual(['/dashboard', '/assistant', '/tools', '/operations', '/profile', '/settings']);
+    expect(navPaths).toEqual(['/dashboard', '/assistant', '/tools', '/operations', '/profile']);
 
     for (const path of [
       '/discover',
@@ -117,8 +121,9 @@ describe('Simplified sidebar navigation wiring', () => {
       '/usage',
     ]);
     expect(ACCOUNT_UTILITY_NAV_ITEMS.map((item) => item.path)).toEqual([
+      '/search',
       '/discover',
-      '/automation',
+      '/workflows',
       '/customer-portal',
       '/knowledge-hub',
       '/knowledge-base',
@@ -131,6 +136,9 @@ describe('Simplified sidebar navigation wiring', () => {
     ]);
     expect(ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => item.path)).toEqual(
       expect.arrayContaining(['/tools/catalog', '/system-health', '/ai-governance', '/audit'])
+    );
+    expect(ADVANCED_SIDEBAR_NAV_ITEMS.map((item) => item.path)).not.toEqual(
+      expect.arrayContaining(['/asset-packs', '/products', '/platform-admin'])
     );
   });
 

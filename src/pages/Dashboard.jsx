@@ -335,7 +335,7 @@ function Dashboard() {
     () => [
       {
         title: 'Start clinical assessment',
-        body: 'Open Assistant with a structured case prompt and choose calculators, evidence, or documentation from there.',
+        body: 'Ask Assistant with a structured case prompt and choose calculators, evidence, or documentation from there.',
         label: 'Start assessment',
         icon: CHROME_ICONS.stethoscope,
         prompt: 'Start a clinical assessment for this patient presentation:',
@@ -1137,7 +1137,7 @@ function Dashboard() {
                     </div>
                     <div className="dashboard-empty-section-title">Start with...</div>
                     <div className="dashboard-starter-grid" aria-label="Starter prompts">
-                      {CHAT_EMPTY_ACTIONS.map((starter) => (
+                      {CHAT_EMPTY_ACTIONS.slice(0, 4).map((starter) => (
                         <button
                           key={starter.title}
                           type="button"
@@ -1316,7 +1316,7 @@ function Dashboard() {
               )}
             </div>
             <div className="dashboard-recs-row">
-              {capabilitySuggestions.map((suggestion) => (
+              {capabilitySuggestions.slice(0, 7).map((suggestion) => (
                 <button
                   key={suggestion.id}
                   type="button"

@@ -118,3 +118,12 @@ Recommended next passes:
 - Updated `src/layout/AppShell.navigation.test.jsx` and `src/components/QuickCommandLauncher.test.jsx` for the flatter shell contracts.
 - Updated `src/components/Sidebar.toolsNavigation.test.js` to match the current operations and account utility navigation surface uncovered during verification.
 - Verified with `npm run test:run -- src/layout/AppShell.navigation.test.jsx src/components/QuickCommandLauncher.test.jsx src/layout/AppShell.layout.test.js src/components/Sidebar.toolsNavigation.test.js` (47 tests passing).
+
+## Entropy Reduction Update
+
+- Made `/workflows` the canonical workflow destination and reduced `/automation` to a protected redirect alias.
+- Kept public `/privacy` owned by the public privacy policy and moved protected privacy catalog aliases to protected privacy routes.
+- Removed duplicate searchable ownership for Products, Asset Packs, and Platform Admin from the Advanced catalog; those destinations now belong to Solutions or Account/Admin.
+- Tightened workspace context so backend-provided assets, recommendations, shortcuts, and assistant context only apply when they match the active workspace.
+- Consolidated the Operations surface into primary hub cards plus compact drill-downs, reducing equal-weight duplicate operational widgets.
+- Added visual/mobile guardrails for legacy public notices, notification preferences, team management, platform admin scorecards, local table scroll, and mobile sticky detail panels.

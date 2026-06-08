@@ -37,3 +37,9 @@ Reduce clicks by flattening the most common dashboard journeys.
 
 - `npm run test:run -- src/pages/CommandDashboard.test.jsx` passed: 8 tests.
 - IDE diagnostics reported no linter errors for `CommandDashboard.jsx` or `CommandDashboard.test.jsx`.
+
+## Entropy Reduction Update
+
+- `/workflows` is now the sole canonical Workflow destination for dashboard and command/search journeys.
+- `/automation` remains functional as a protected legacy redirect to `/workflows`, so old links keep working without creating another workflow surface.
+- Operations now keeps primary journeys on `/operations`, with fleet, maps, IoT, routing, and maintenance as drill-downs from the hub.

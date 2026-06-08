@@ -39,6 +39,8 @@ import {
 } from '../components/ui/CareDroidPrimitives';
 import './PlatformOSPages.css';
 
+const MAX_VISIBLE_SEARCH_RESULTS = 8;
+
 const PRIORITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 };
 
 function PageShell({ eyebrow, title, description, children, actions = null }) {
@@ -164,19 +166,34 @@ export function WorkspacesIndexPage() {
 export function SearchResultsPage() {
   const navigate = useNavigate();
   const { recordToolAccess } = useToolPreferences();
+  const { user } = useUser();
+  const { workspaceState, platformContext, account } = useUserIdentity();
   const [params] = useSearchParams();
   const [query, setQuery] = useState(params.get('q') || '');
   const [workspaceId, setWorkspaceId] = useState('all');
   const [category, setCategory] = useState('all');
+  const navigationPermissions = useMemo(
+    () => [
+      ...(workspaceState?.effectivePermissions || []),
+      ...(platformContext?.permissions || []),
+      ...(account?.permissions || []),
+      ...(user?.permissions || []),
+    ],
+    [account?.permissions, platformContext?.permissions, user?.permissions, workspaceState?.effectivePermissions]
+  );
   const results = useMemo(
-    () => buildSearchFirstResults({ query, workspaceId, category }),
-    [query, workspaceId, category]
+    () => buildSearchFirstResults({ query, workspaceId, category, navigationPermissions }),
+    [category, navigationPermissions, query, workspaceId]
+  );
+  const visibleResults = useMemo(
+    () => (query.trim() ? results : results.slice(0, MAX_VISIBLE_SEARCH_RESULTS)),
+    [query, results]
   );
   const launchTool = (tool) =>
     applyRegistryToolLaunch(tool.id, { navigate, recordToolAccess, replace: false });
 
   return (
-    <PageShell eyebrow="Search Everything" title="Global Search" description="Search assets, workflows, simulations, workspaces, tools, calculators, dashboards, maps, notifications, devices, rooms, and fleet assets.">
+    <PageShell eyebrow="Search Everything" title="Global Search" description="Search assets, tools, calculators, workflows, simulations, protocols, AI agents, operations, workspaces, dashboards, maps, notifications, devices, rooms, and fleet assets.">
       <DataSourceNotice
         label="Local Search Demo"
         detail="Results are assembled from the frontend platform inventory until the backend SearchService is exposed by a controller."
@@ -188,13 +205,18 @@ export function SearchResultsPage() {
         setWorkspaceId={setWorkspaceId}
         category={category}
         setCategory={setCategory}
-        categories={['workspace', 'asset', 'workflow', 'simulation', 'destination', 'dashboard', 'tool', 'calculator', 'map', 'notification', 'document', 'admin', 'library']}
+        categories={['workspace', 'asset', 'tool', 'calculator', 'workflow', 'automation', 'simulation', 'protocol', 'ai-agent', 'ai-model', 'operation', 'destination', 'dashboard', 'map', 'notification', 'document', 'admin', 'library']}
       />
       <section className="platform-result-grid" aria-label="Search results">
-        {results.map((item) => (
+        {visibleResults.map((item) => (
           <ResultCard key={item.id} item={item} onOpen={(result) => openSearchResult(result, navigate, launchTool)} />
         ))}
       </section>
+      {results.length > visibleResults.length ? (
+        <p className="platform-muted-copy" role="status">
+          Showing top {visibleResults.length} of {results.length} results. Refine search to reveal more.
+        </p>
+      ) : null}
     </PageShell>
   );
 }
@@ -457,13 +479,25 @@ export function DigitalTwinPage() {
 
 export function WorkflowBuilderPage() {
   const navigate = useNavigate();
-  const [selectedId, setSelectedId] = useState(PLATFORM_WORKFLOWS[0].id);
+  const [searchParams] = useSearchParams();
+  const requestedWorkflowId = searchParams.get('workflow');
+  const initialWorkflowId = PLATFORM_WORKFLOWS.some((item) => item.id === requestedWorkflowId)
+    ? requestedWorkflowId
+    : PLATFORM_WORKFLOWS[0].id;
+  const [selectedId, setSelectedId] = useState(initialWorkflowId);
   const [draftName, setDraftName] = useState('');
   const [completionStatus, setCompletionStatus] = useState('');
+  const [completionResult, setCompletionResult] = useState(null);
   const workflow = PLATFORM_WORKFLOWS.find((item) => item.id === selectedId) || PLATFORM_WORKFLOWS[0];
   useEffect(() => {
     setCompletionStatus('');
+    setCompletionResult(null);
   }, [selectedId]);
+  useEffect(() => {
+    if (requestedWorkflowId && PLATFORM_WORKFLOWS.some((item) => item.id === requestedWorkflowId)) {
+      setSelectedId(requestedWorkflowId);
+    }
+  }, [requestedWorkflowId]);
   const launchBlock = (block) => {
     if (block.path) navigate(block.path);
     if (block.toolId) applyRegistryToolLaunch(block.toolId, { navigate, replace: false });
@@ -477,6 +511,11 @@ export function WorkflowBuilderPage() {
       blockCount: workflow.blocks.length,
     });
     setCompletionStatus(`${workflow.name} completion recorded.`);
+    setCompletionResult({
+      title: `${workflow.name} Result`,
+      summary: workflow.resultSummary || `${workflow.name} completed. Review the result and choose the next action.`,
+      actions: workflow.recommendedNextActions || [],
+    });
   };
 
   return (
@@ -521,6 +560,28 @@ export function WorkflowBuilderPage() {
           ))}
         </div>
       </section>
+      {completionResult ? (
+        <section className="platform-result-grid" aria-label="Workflow result and next actions">
+          <article className="platform-result-card platform-result-card--static">
+            <span className="platform-result-card__kind">workflow result</span>
+            <strong>{completionResult.title}</strong>
+            <span>{completionResult.summary}</span>
+            <small>Result is connected to Timeline, Recommendations, and Assistant.</small>
+          </article>
+          {completionResult.actions.map((action) => (
+            <Link
+              key={action.path || action.label}
+              className="platform-result-card"
+              to={action.path}
+              aria-label={action.label}
+            >
+              <span className="platform-result-card__kind">next action</span>
+              <strong>{action.label}</strong>
+              <span>Continue from this workflow result without losing context.</span>
+            </Link>
+          ))}
+        </section>
+      ) : null}
     </PageShell>
   );
 }

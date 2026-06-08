@@ -13,6 +13,22 @@ import { useUser } from './UserContext';
 
 const STORAGE_KEY = 'careDroid.workspaces.v1';
 
+function workspaceKeyFromContext(context) {
+  return (
+    context?.workspace?.workspaceKey ||
+    context?.workspace?.settings?.workspaceKey ||
+    context?.workspace?.type ||
+    context?.workspace?.id ||
+    ''
+  );
+}
+
+function workspaceContextMatchesActive(context, activeWorkspaceId) {
+  if (!context) return false;
+  const contextKey = workspaceKeyFromContext(context);
+  return Boolean(contextKey && activeWorkspaceId && contextKey === activeWorkspaceId);
+}
+
 const defaultWorkspaces = (clientProfile = null, role = '') => {
   const userFacingTools = getUserFacingToolRegistryProjection();
   const byCategory = userFacingTools.reduce((acc, tool) => {
@@ -234,10 +250,15 @@ export const WorkspaceProvider = ({ children }) => {
       );
       if (!target) {
         setActiveWorkspaceId(workspaceId || DEFAULT_CARE_WORKSPACE_ID);
+        setWorkspaceContext(null);
         return { ok: true, data: null, source: 'local' };
       }
 
-      setActiveWorkspaceId(target.workspaceKey || target.id);
+      const targetWorkspaceId = target.workspaceKey || target.id;
+      setActiveWorkspaceId(targetWorkspaceId);
+      setWorkspaceContext((current) =>
+        workspaceContextMatchesActive(current, targetWorkspaceId) ? current : null
+      );
       if (!target.backendWorkspaceId || (!isAuthenticated && !authToken)) {
         return { ok: true, data: null, source: 'local' };
       }
@@ -269,24 +290,28 @@ export const WorkspaceProvider = ({ children }) => {
     () => workspaces.find((workspace) => workspace.id === activeWorkspaceId) || workspaces[0] || null,
     [activeWorkspaceId, workspaces]
   );
+  const activeWorkspaceContext = useMemo(
+    () => (workspaceContextMatchesActive(workspaceContext, activeWorkspaceId) ? workspaceContext : null),
+    [activeWorkspaceId, workspaceContext]
+  );
 
   const value = useMemo(
     () => ({
       workspaces,
       activeWorkspaceId,
       activeWorkspace,
-      workspaceContext,
-      visibleAssetIds: workspaceContext?.visibleAssetIds || activeWorkspace?.toolIds || [],
-      recommendations: workspaceContext?.recommendations || [],
-      assistantContext: workspaceContext?.assistantContext || activeWorkspace?.assistantContext || '',
-      shortcuts: workspaceContext?.shortcuts || activeWorkspace?.shortcuts || [],
-      workspaceProfile: workspaceContext?.workspace?.workspaceProfile || activeWorkspace?.workspaceProfile || null,
+      workspaceContext: activeWorkspaceContext,
+      visibleAssetIds: activeWorkspaceContext?.visibleAssetIds || activeWorkspace?.toolIds || [],
+      recommendations: activeWorkspaceContext?.recommendations || [],
+      assistantContext: activeWorkspaceContext?.assistantContext || activeWorkspace?.assistantContext || '',
+      shortcuts: activeWorkspaceContext?.shortcuts || activeWorkspace?.shortcuts || [],
+      workspaceProfile: activeWorkspaceContext?.workspace?.workspaceProfile || activeWorkspace?.workspaceProfile || null,
       defaultDashboardWidgets:
-        workspaceContext?.defaultDashboardWidgets || activeWorkspace?.defaultDashboardWidgets || [],
-      defaultFilters: workspaceContext?.defaultFilters || activeWorkspace?.defaultFilters || {},
-      restrictedAssets: workspaceContext?.restrictedAssets || activeWorkspace?.restrictedAssets || [],
-      recommendedAIAgents: workspaceContext?.recommendedAIAgents || activeWorkspace?.workspaceProfile?.defaultAIAgents || [],
-      recommendedAssetPacks: workspaceContext?.recommendedAssetPacks || activeWorkspace?.workspaceProfile?.defaultAssetPacks || [],
+        activeWorkspaceContext?.defaultDashboardWidgets || activeWorkspace?.defaultDashboardWidgets || [],
+      defaultFilters: activeWorkspaceContext?.defaultFilters || activeWorkspace?.defaultFilters || {},
+      restrictedAssets: activeWorkspaceContext?.restrictedAssets || activeWorkspace?.restrictedAssets || [],
+      recommendedAIAgents: activeWorkspaceContext?.recommendedAIAgents || activeWorkspace?.workspaceProfile?.defaultAIAgents || [],
+      recommendedAssetPacks: activeWorkspaceContext?.recommendedAssetPacks || activeWorkspace?.workspaceProfile?.defaultAssetPacks || [],
       clientProfile,
       workspaceEmptyState: workspaces.length
         ? ''
@@ -303,12 +328,12 @@ export const WorkspaceProvider = ({ children }) => {
     [
       activeWorkspace,
       activeWorkspaceId,
+      activeWorkspaceContext,
       clientProfile,
       error,
       isLoading,
       refreshWorkspaceContext,
       switchWorkspace,
-      workspaceContext,
       workspaces,
     ]
   );

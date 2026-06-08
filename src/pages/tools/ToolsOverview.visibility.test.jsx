@@ -146,11 +146,23 @@ describe('ToolsOverview complete visibility, search, filters, and launch', () =>
     expect(screen.getByText(/device telemetry mode is active/i)).toBeInTheDocument();
   });
 
+  it('stitches tools into workflow and recommendation next actions', () => {
+    renderOverview();
+
+    expect(screen.getByRole('heading', { name: /continue into workflow/i })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /build workflow/i }));
+    expect(navigateMock).toHaveBeenLastCalledWith('/workflows?source=tools&filter=recommended');
+
+    fireEvent.click(screen.getByRole('button', { name: /recommended next action/i }));
+    expect(navigateMock).toHaveBeenLastCalledWith('/recommendations?source=tools&filter=recommended');
+  }, 30_000);
+
   it.each([
     ['pe-score', 'wells-pe'],
     ['bleeding risk', 'has-bled'],
     ['early warning score', 'news2'],
     ['kidney disease staging', 'ckd-staging'],
+    ['lab interpreter', 'lab-interp'],
   ])('finds %s by alias or clinical phrase', (query, expectedId) => {
     const { container } = renderOverview();
     showAllTools();

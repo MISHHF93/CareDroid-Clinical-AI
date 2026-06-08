@@ -527,8 +527,9 @@ export function buildResponsiveQaPages() {
   ];
 
   const smokeRoutePages = [
+    ['executive', 'Executive Command Center', '/executive', 'core'],
     ['discover', 'Discover CareDroid Capabilities', '/discover', 'core'],
-    ['automation', 'Automation', '/automation', 'core'],
+    ['workflows', 'Workflows', '/workflows', 'core'],
     ['operations', 'Operations', '/operations', 'operations'],
     ['protocols', 'Protocol and Clinical Pathway Library', '/protocols', 'clinical'],
     ['research', 'Research and Evidence Hub', '/research', 'clinical'],
@@ -544,7 +545,15 @@ export function buildResponsiveQaPages() {
     ['laboratory', 'Laboratory', '/laboratory', 'clinical'],
     ['3d-viewer', '3D Viewer', '/3d-viewer', 'visualization'],
     ['analytics', 'Platform Analytics', '/analytics', 'analytics'],
+    ['knowledge-hub', 'Knowledge Hub', '/knowledge-hub', 'knowledge'],
+    ['workflow-mining', 'Workflow Mining', '/workflow-mining', 'operations'],
+    ['workspace-dependency-graph', 'Workspace Dependency Graph', '/workspace-dependency-graph', 'operations'],
     ['organization-intelligence', 'Organization Intelligence', '/organization-intelligence', 'analytics'],
+    ['department-intelligence', 'Department Intelligence', '/department-intelligence', 'analytics'],
+    ['product-intelligence', 'Product Intelligence', '/product-intelligence', 'commercial'],
+    ['expansion-opportunities', 'Expansion Opportunities', '/expansion-opportunities', 'commercial'],
+    ['maturity-assessment', 'Hospital Maturity Assessment', '/maturity-assessment', 'commercial'],
+    ['business-brain', 'Business Brain', '/business-brain', 'analytics'],
     ['saas-health-enterprise', 'SaaS Health Center', '/saas-health', 'platform'],
     ['governance-registry-enterprise', 'Platform Governance Registry', '/governance-registry', 'platform'],
     ['feature-flags', 'Feature Flag Center', '/feature-flags', 'platform'],

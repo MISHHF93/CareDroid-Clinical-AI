@@ -871,9 +871,9 @@ export const ROUTE_RECORDS = Object.freeze([
     layout: 'app',
     auth: 'required',
     status: 'active',
-    aliases: [],
+    aliases: [CANONICAL_ROUTES.automation],
     navGroup: 'secondary',
-    notes: 'Workflow route kept distinct while /automation merge decision remains pending.',
+    notes: 'Canonical workflow route. Legacy /automation redirects here to avoid duplicate workflow UI ownership.',
   }),
 ]);
 

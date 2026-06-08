@@ -1,9 +1,13 @@
 /* Legal Page Styles */
 
 .legal-page {
+  width: 100%;
   max-width: 900px;
+  min-width: 0;
   margin: 0 auto;
   color: var(--text-color);
+  overflow-x: clip;
+  box-sizing: border-box;
 }
 
 /* Header Section */
