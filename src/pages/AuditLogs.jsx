@@ -2,6 +2,17 @@ import React, { useState, useEffect } from 'react';
 import './AuditLogs.css';
 import { apiFetch } from '../services/apiClient';
 import logger from '../utils/logger';
+import {
+  ActionRow,
+  DashboardGrid,
+  DashboardSection,
+  FilterPanel,
+  InfoNotice,
+  LoadingState,
+  MetricCard,
+  OverflowCanvas,
+  PageShell,
+} from '../components/ui/CareDroidPrimitives';
 
 export default function AuditLogs() {
   const [logs, setLogs] = useState([]);
@@ -143,14 +154,15 @@ export default function AuditLogs() {
   };
 
   return (
-    <div className="audit-logs-container">
-      <div className="audit-logs-header">
-        <h1>Audit Logs</h1>
-        <p className="subtitle">Complete audit trail of all system activities and PHI access</p>
-      </div>
+    <PageShell
+      className="audit-logs-container"
+      contentClassName="cd-page-stack cd-page-stack--compact audit-logs-container__content"
+      title="Audit Logs"
+      description="Complete audit trail of all system activities and PHI access"
+    >
 
       {/* Integrity Status */}
-      <div className={`integrity-status status-${integrityStatus.toLowerCase()}`}>
+      <InfoNotice className={`integrity-status status-${integrityStatus.toLowerCase()}`} role="status">
         <span className="status-icon">
           {integrityStatus === 'VALID' && '✓'}
           {integrityStatus === 'TAMPERED' && '⚠️'}
@@ -167,46 +179,36 @@ export default function AuditLogs() {
         >
           Re-verify
         </button>
-      </div>
+      </InfoNotice>
 
       {/* Statistics */}
       {stats && (
-        <div className="stats-section">
+        <DashboardSection
+          className="stats-section"
+          title={`Statistics (${stats.totalLogs} logs)`}
+          actions={
           <button 
             className="stats-toggle"
             onClick={() => setShowStats(!showStats)}
           >
-            {showStats ? '▼' : '▶'} Statistics ({stats.totalLogs} logs)
+            {showStats ? 'Hide statistics' : 'Show statistics'}
           </button>
+          }
+        >
           {showStats && (
-            <div className="stats-grid">
-              <div className="stat-card">
-                <div className="stat-label">Total Logs</div>
-                <div className="stat-value">{stats.totalLogs}</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">PHI Access Events</div>
-                <div className="stat-value">{stats.phiAccessCount}</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Security Events</div>
-                <div className="stat-value">{stats.securityEventCount}</div>
-              </div>
-              <div className="stat-card">
-                <div className="stat-label">Integrity Status</div>
-                <div className={`stat-value ${stats.integrityStatus.toLowerCase()}`}>
-                  {stats.integrityStatus}
-                </div>
-              </div>
-            </div>
+            <DashboardGrid variant="metrics" className="stats-grid">
+              <MetricCard className="stat-card" label="Total Logs" value={stats.totalLogs} />
+              <MetricCard className="stat-card" label="PHI Access Events" value={stats.phiAccessCount} />
+              <MetricCard className="stat-card" label="Security Events" value={stats.securityEventCount} />
+              <MetricCard className="stat-card" label="Integrity Status" value={stats.integrityStatus} />
+            </DashboardGrid>
           )}
-        </div>
+        </DashboardSection>
       )}
 
       {/* Filters */}
-      <div className="filters-section">
-        <h3>Filter Logs</h3>
-        <div className="filter-grid">
+      <DashboardSection className="filters-section" title="Filter Logs">
+        <FilterPanel className="filter-grid">
           <div className="filter-group">
             <label>User ID</label>
             <input
@@ -248,41 +250,36 @@ export default function AuditLogs() {
               onChange={handleFilterChange}
             />
           </div>
-        </div>
-        <div className="filter-buttons">
+        </FilterPanel>
+        <ActionRow className="filter-buttons">
           <button className="btn btn-primary" onClick={applyFilters}>
             Apply Filters
           </button>
           <button className="btn btn-secondary" onClick={clearFilters}>
             Clear Filters
           </button>
-        </div>
-      </div>
+        </ActionRow>
+      </DashboardSection>
 
       {/* Error Display */}
       {error && (
-        <div className="error-alert">
-          <strong>Error:</strong> {error}
-        </div>
+        <InfoNotice className="error-alert" tone="warning" label="Error:" detail={error} />
       )}
 
       {/* Loading State */}
       {loading && (
-        <div className="loading-container">
-          <div className="spinner"></div>
-          <p>Loading audit logs...</p>
-        </div>
+        <LoadingState className="loading-container" title="Loading audit logs..." />
       )}
 
       {/* Audit Logs Table */}
       {!loading && logs.length === 0 && !error && (
-        <div className="empty-state">
+        <InfoNotice className="empty-state" role="status">
           <p>No audit logs found matching your criteria.</p>
-        </div>
+        </InfoNotice>
       )}
 
       {!loading && logs.length > 0 && (
-        <div className="logs-table-container">
+        <OverflowCanvas className="logs-table-container" minWidth="920px">
           <table className="logs-table">
             <thead>
               <tr>
@@ -336,8 +333,8 @@ export default function AuditLogs() {
               ))}
             </tbody>
           </table>
-        </div>
+        </OverflowCanvas>
       )}
-    </div>
+    </PageShell>
   );
 }

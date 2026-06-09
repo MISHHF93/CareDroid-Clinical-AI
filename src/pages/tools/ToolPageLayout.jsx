@@ -14,6 +14,11 @@ import analyticsService from '../../services/analyticsService';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon } from '../../navigation/iconRegistry';
 import ClinicalDecisionSupportDisclaimer from '../../components/clinical/ClinicalDecisionSupportDisclaimer';
+import {
+  ActionRow,
+  PageShell,
+  Surface,
+} from '../../components/ui/CareDroidPrimitives';
 import './ToolPageLayout.css';
 
 const AI_DOCUMENTATION_TOOL_IDS = new Set([
@@ -116,8 +121,51 @@ const ToolPageLayout = ({
     }
   };
 
+  const headerActions = (
+    <ActionRow align="end" className="tool-header-actions">
+      {actions}
+      {results && (
+        <button
+          className="btn-share-tool btn-share-tool--with-icon"
+          onClick={() => setShowShareModal(true)}
+          title="Export or share your results"
+          type="button"
+        >
+          <NavIcon icon={CHROME_ICONS.upload} size={16} aria-hidden />
+          <span>Share Results</span>
+        </button>
+      )}
+      <button
+        className="btn-share-tool"
+        onClick={handleShareSession}
+        type="button"
+      >
+        Share Local Session
+      </button>
+      {embedded ? (
+        <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => onCloseEmbedded?.()}>
+          <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
+          <span>Close panel</span>
+        </button>
+      ) : (
+        <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => navigate('/tools')}>
+          <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
+          <span>Tools</span>
+        </button>
+      )}
+    </ActionRow>
+  );
+
   return (
-    <div className={`tool-page${embedded ? ' tool-page--embedded' : ''}`}>
+    <PageShell
+      as={embedded ? 'section' : 'main'}
+      className={`tool-page${embedded ? ' tool-page--embedded' : ''}`}
+      contentClassName="cd-page-stack cd-page-stack--compact tool-page__content"
+      title={tool.name}
+      description={tool.description}
+      leadingIcon={<NavIcon icon={getToolIcon(tool.id)} size={28} />}
+      actions={headerActions}
+    >
       {!embedded && (
         <div className="tool-breadcrumb">
           <button type="button" onClick={() => navigate('/dashboard')} className="breadcrumb-link">
@@ -138,66 +186,21 @@ const ToolPageLayout = ({
         </div>
       )}
 
-      {/* Tool Header */}
-      <div className="tool-header">
-        <div className="tool-header-left">
-          <div className="tool-header-icon">
-            <span className="tool-header-icon-inner" aria-hidden>
-              <NavIcon icon={getToolIcon(tool.id)} size={28} />
-            </span>
-          </div>
-          <div className="tool-header-info">
-            <h1>{tool.name}</h1>
-            <p>{tool.description}</p>
-            <div className="tool-header-meta">
-              <span className="tool-category-badge">
-                {tool.category}
-              </span>
-              {tool.shortcut ? <span className="tool-shortcut-badge">Quick access</span> : null}
-            </div>
-          </div>
-        </div>
-        <div className="tool-header-actions">
-          {actions}
-          {results && (
-            <button
-              className="btn-share-tool btn-share-tool--with-icon"
-              onClick={() => setShowShareModal(true)}
-              title="Export or share your results"
-              type="button"
-            >
-              <NavIcon icon={CHROME_ICONS.upload} size={16} aria-hidden />
-              <span>Share Results</span>
-            </button>
-          )}
-          <button
-            className="btn-share-tool"
-            onClick={handleShareSession}
-          >
-            Share Local Session
-          </button>
-          {embedded ? (
-            <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => onCloseEmbedded?.()}>
-              <NavIcon icon={CHROME_ICONS.close} size={16} aria-hidden />
-              <span>Close panel</span>
-            </button>
-          ) : (
-            <button type="button" className="btn-back-to-tools btn-back-to-tools--with-icon" onClick={() => navigate('/tools')}>
-              <NavIcon icon={CHROME_ICONS.arrowLeft} size={16} aria-hidden />
-              <span>Tools</span>
-            </button>
-          )}
-        </div>
+      <div className="tool-header-meta tool-header-meta--shell">
+        <span className="tool-category-badge">
+          {tool.category}
+        </span>
+        {tool.shortcut ? <span className="tool-shortcut-badge">Quick access</span> : null}
       </div>
 
       {/* Tool Content */}
-      <div className="tool-content">
+      <Surface className="tool-content">
         <ClinicalDecisionSupportDisclaimer variant={disclaimerVariantForTool(tool.id)} />
         {children}
-      </div>
+      </Surface>
 
       {(clinicalInsights || riskData) && (
-        <div className={`clinical-insights-panel severity-${(riskData?.severity || clinicalInsights?.severity)}`}>
+        <Surface className={`clinical-insights-panel severity-${(riskData?.severity || clinicalInsights?.severity)}`}>
           <div className="clinical-insights-header">
             <h3>Clinical Intelligence</h3>
             <span className={`clinical-insights-badge ${riskData?.severity || clinicalInsights?.severity}`}>
@@ -286,11 +289,11 @@ const ToolPageLayout = ({
               </ul>
             </div>
           )}
-        </div>
+        </Surface>
       )}
 
       {!embedded && (
-        <div className="ai-integration-panel">
+        <Surface className="ai-integration-panel">
           <div className="ai-panel-header">
             <h3 className="ai-panel-title-with-icon">
               <NavIcon icon={CHROME_ICONS.bot} size={22} aria-hidden />
@@ -334,7 +337,7 @@ const ToolPageLayout = ({
               Tip: use the buttons above when you want guidance without memorizing command phrases.
             </span>
           </div>
-        </div>
+        </Surface>
       )}
 
       {showShareModal && (
@@ -345,7 +348,7 @@ const ToolPageLayout = ({
           onClose={() => setShowShareModal(false)}
         />
       )}
-    </div>
+    </PageShell>
   );
 };
 

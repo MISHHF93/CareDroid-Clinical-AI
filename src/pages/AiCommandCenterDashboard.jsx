@@ -237,6 +237,7 @@ export default function AiCommandCenterDashboard() {
   return (
     <PageShell
       className="ai-command-center"
+      contentClassName="cd-page-stack cd-page-stack--compact ai-command-center__content"
       eyebrow="AI operations source mix"
       title="AI Command Center"
       titleId="ai-command-center-title"

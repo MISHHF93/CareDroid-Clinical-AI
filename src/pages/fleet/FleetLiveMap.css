@@ -57,38 +57,8 @@
   color: var(--text-secondary);
 }
 
-.fleet-map-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min-compact, 11.5rem)), 1fr));
-  gap: var(--compact-panel-gap, 10px);
-  margin-bottom: var(--compact-page-gap, 14px);
-  padding: var(--compact-panel-padding, 14px);
-}
-
 .fleet-map-summary-card {
   min-width: 0;
-  border-radius: var(--compact-card-radius, 12px);
-  padding: 10px;
-  background: var(--app-surface-2);
-}
-
-.fleet-map-summary-card strong {
-  display: block;
-  font-size: 1.35rem;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-.fleet-map-summary-card span,
-.fleet-map-summary-card small {
-  display: block;
-  margin-top: 6px;
-  font-weight: 700;
-}
-
-.fleet-map-summary-card small {
-  color: var(--text-secondary);
-  font-size: 0.78rem;
 }
 
 .fleet-map-summary-card--good {
@@ -101,14 +71,6 @@
 
 .fleet-map-summary-card--critical {
   border: 1px solid color-mix(in srgb, var(--app-danger) 38%, var(--app-panel-border));
-}
-
-.fleet-map-filters {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--compact-panel-gap, 10px);
-  margin-bottom: var(--compact-page-gap, 14px);
-  padding: var(--compact-panel-padding, 14px);
 }
 
 .fleet-map-filters label {
@@ -147,11 +109,8 @@
 }
 
 .fleet-map-workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(min(100%, 20rem), 0.55fr);
-  gap: var(--compact-page-gap, 14px);
+  --app-detail-rail-width: 21rem;
   align-items: start;
-  min-width: 0;
 }
 
 .fleet-map-panel,

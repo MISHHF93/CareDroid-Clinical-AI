@@ -1,6 +1,5 @@
 .medical-iot-page {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--compact-page-gap, 14px);
   width: 100%;
   min-width: 0;
@@ -31,7 +30,6 @@
   box-sizing: border-box !important;
 }
 
-.medical-iot-hero,
 .medical-iot-section,
 .medical-iot-detail,
 .medical-iot-state,
@@ -45,15 +43,6 @@
   box-sizing: border-box;
 }
 
-.medical-iot-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: var(--compact-page-gap, 14px);
-  align-items: end;
-  padding: var(--compact-panel-padding, 16px);
-  background: var(--app-surface-1);
-}
-
 .medical-iot-eyebrow {
   margin: 0 0 8px;
   color: var(--app-accent-interactive);
@@ -63,21 +52,6 @@
   text-transform: uppercase;
 }
 
-.medical-iot-hero h1 {
-  margin: 0;
-  font-size: clamp(1.4rem, 2.4vw, 2rem);
-  line-height: 1.08;
-  letter-spacing: -0.035em;
-}
-
-.medical-iot-hero p {
-  max-width: 820px;
-  margin: 8px 0 0;
-  color: var(--app-fg-muted);
-  line-height: 1.45;
-}
-
-.medical-iot-hero-actions,
 .medical-iot-alert-list,
 .medical-iot-trend-list {
   display: flex;
@@ -143,17 +117,11 @@
 }
 
 .medical-iot-insights {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min, 14rem)), 1fr));
-  gap: var(--compact-panel-gap, 10px);
   min-width: 0;
 }
 
 .medical-iot-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min-compact, 11.5rem)), 1fr));
-  gap: var(--compact-panel-gap, 10px);
-  padding: var(--compact-panel-padding, 14px);
+  min-width: 0;
 }
 
 .medical-iot-summary > div,
@@ -175,13 +143,6 @@
   margin-top: 6px;
   color: var(--app-fg-muted);
   font-weight: 700;
-}
-
-.medical-iot-filters {
-  display: grid;
-  grid-template-columns: minmax(180px, 0.35fr) minmax(0, 0.65fr);
-  gap: var(--compact-panel-gap, 10px);
-  padding: var(--compact-panel-padding, 14px);
 }
 
 .medical-iot-filters label {
@@ -246,18 +207,12 @@
 
 .medical-iot-device-grid,
 .medical-iot-vitals-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min-compact, 11.5rem)), 1fr));
-  gap: var(--compact-panel-gap, 10px);
   min-width: 0;
 }
 
 .medical-iot-location-workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1.35fr) minmax(min(100%, 20rem), 0.65fr);
-  gap: var(--compact-page-gap, 14px);
+  --app-detail-rail-width: 21rem;
   align-items: start;
-  min-width: 0;
 }
 
 .medical-iot-grid-row {

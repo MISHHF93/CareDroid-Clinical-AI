@@ -6,93 +6,18 @@
   box-sizing: border-box;
 }
 
-.automation-analytics-hero,
-.automation-analytics-panel,
-.automation-analytics-metric {
-  border: 1px solid var(--app-panel-border);
-  border-radius: var(--compact-panel-radius, 16px);
-  background: var(--app-surface-1);
-  box-shadow: var(--shadow-1);
-}
-
-.automation-analytics-hero {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 16px;
-  align-items: center;
-  padding: clamp(16px, 3vw, 24px);
-  margin-bottom: 16px;
-}
-
-.automation-analytics-hero__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 54px;
-  height: 54px;
-  border-radius: 17px;
-  background: color-mix(in srgb, var(--app-accent-interactive) 14%, transparent);
-  color: var(--app-accent-interactive);
-}
-
-.automation-analytics-hero h1,
-.automation-analytics-panel h2 {
-  margin: 0;
-}
-
-.automation-analytics-hero p,
 .automation-analytics-row span,
 .automation-analytics-row small {
   color: var(--muted-text);
   line-height: 1.45;
 }
 
-.automation-analytics-eyebrow {
-  margin: 0 0 4px;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--app-accent-interactive);
-}
-
 .automation-analytics-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.automation-analytics-metric {
-  display: grid;
-  gap: 4px;
-  padding: 14px;
-}
-
-.automation-analytics-metric span,
-.automation-analytics-metric small {
-  color: var(--muted-text);
-}
-
-.automation-analytics-metric span {
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-
-.automation-analytics-metric strong {
-  font-size: clamp(1.35rem, 3vw, 2rem);
+  margin: 0;
 }
 
 .automation-analytics-layout {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-}
-
-.automation-analytics-panel {
-  padding: clamp(14px, 2.5vw, 18px);
+  align-items: start;
 }
 
 .automation-analytics-list {
@@ -108,11 +33,4 @@
   border-radius: 13px;
   border: 1px solid var(--app-panel-border);
   background: var(--app-surface-2);
-}
-
-@media (max-width: 860px) {
-  .automation-analytics-hero,
-  .automation-analytics-layout {
-    grid-template-columns: 1fr;
-  }
 }

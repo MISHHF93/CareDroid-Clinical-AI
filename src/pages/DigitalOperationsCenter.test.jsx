@@ -51,7 +51,7 @@ describe('DigitalOperationsCenter', () => {
     renderOperationsCenter();
 
     expect(screen.getByRole('heading', { name: /care team operations/i })).toBeInTheDocument();
-    const priorityLane = screen.getByRole('heading', { name: /priority lane/i }).closest('article');
+    const priorityLane = screen.getByRole('heading', { name: /priority lane/i }).closest('.operations-center-card');
     expect(within(priorityLane).getByText(/hospital map/i)).toBeInTheDocument();
     expect(within(priorityLane).getByText(/medical iot/i)).toBeInTheDocument();
     expect(within(priorityLane).getByRole('link', { name: /^fleet$/i })).toBeInTheDocument();

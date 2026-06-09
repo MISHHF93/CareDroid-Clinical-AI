@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Card from '../components/ui/card';
 import Button from '../components/ui/button';
 import Input from '../components/ui/input';
 import TwoFactorSettings from '../components/TwoFactorSettings';
 import { useUser } from '../contexts/UserContext';
 import { useUserIdentity } from '../contexts/UserIdentityContext';
 import { useNotificationActions } from '../hooks/useNotificationActions';
-import { PageContainer } from '../layout/PageContainer';
+import {
+  ActionRow,
+  DashboardSection,
+  PageShell,
+} from '../components/ui/CareDroidPrimitives';
 import './ProfileSettings.css';
 
 const ProfileSettings = ({ authToken }) => {
@@ -220,20 +223,18 @@ const ProfileSettings = ({ authToken }) => {
   };
 
   return (
-    <PageContainer
-      as="main"
-      size="narrow"
+    <PageShell
       className="profile-settings-page"
-      aria-labelledby="profile-settings-title"
+      contentClassName="cd-page-stack cd-page-stack--compact profile-settings-stack"
+      title="Profile Settings"
+      titleId="profile-settings-title"
+      description="Update your backend-backed clinical profile and institutional details."
     >
-      <div className="page-stack profile-settings-stack">
-        <Card>
-          <h2 id="profile-settings-title" style={{ marginTop: 0 }}>
-            Profile Settings
-          </h2>
-          <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
-            Update your backend-backed clinical profile and institutional details.
-          </p>
+        <DashboardSection
+          className="profile-settings-section"
+          title="Clinical profile"
+          description="Backend-backed clinical profile and institutional details."
+        >
           {!effectiveAuthToken && (
             <div className="api-state-banner api-state-banner--warning" role="status">
               Sign in to save profile changes to the backend.
@@ -303,7 +304,7 @@ const ProfileSettings = ({ authToken }) => {
               membership and RBAC policies.
             </div>
           </form>
-          <div style={{ display: 'flex', gap: '12px', marginTop: '18px', flexWrap: 'wrap' }}>
+          <ActionRow className="profile-settings-actions">
             <Button
               type="submit"
               form="profile-settings-form"
@@ -315,14 +316,14 @@ const ProfileSettings = ({ authToken }) => {
             <Link to="/profile" style={{ color: '#00FF88', textDecoration: 'none', alignSelf: 'center' }}>
               Back to Profile
             </Link>
-          </div>
-        </Card>
+          </ActionRow>
+        </DashboardSection>
 
-        <Card>
-          <h2 style={{ marginTop: 0 }}>AI, Notification, and Theme Preferences</h2>
-          <p style={{ color: 'var(--muted-text)', fontSize: '14px' }}>
-            Tune the assistant response style, notification channels, security alerts, and app theme.
-          </p>
+        <DashboardSection
+          className="profile-settings-section"
+          title="AI, Notification, and Theme Preferences"
+          description="Tune the assistant response style, notification channels, security alerts, and app theme."
+        >
           <form
             id="profile-preferences-form"
             onSubmit={handleSavePreferences}
@@ -424,7 +425,7 @@ const ProfileSettings = ({ authToken }) => {
               </label>
             </div>
           </form>
-          <div style={{ display: 'flex', gap: '12px', marginTop: '18px', flexWrap: 'wrap' }}>
+          <ActionRow className="profile-settings-actions">
             <Button type="submit" form="profile-preferences-form" disabled={identityLoading}>
               Save preferences
             </Button>
@@ -433,13 +434,12 @@ const ProfileSettings = ({ authToken }) => {
                 {preferenceStatus}
               </span>
             ) : null}
-          </div>
-        </Card>
+          </ActionRow>
+        </DashboardSection>
 
         {/* Two-Factor Authentication Settings */}
         <TwoFactorSettings authToken={authToken} />
-      </div>
-    </PageContainer>
+    </PageShell>
   );
 };
 

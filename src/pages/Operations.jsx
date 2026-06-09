@@ -237,6 +237,7 @@ export default function Operations() {
   return (
     <PageShell
       className={`operating-workspace operating-workspace--${cssToken(workspaceExperience.tone)} operating-workspace--workspace-${cssToken(workspaceExperience.id)}`}
+      contentClassName="cd-page-stack cd-page-stack--compact operating-workspace__content"
       data-workspace-os={workspaceExperience.id}
       style={workspaceThemeStyle(workspaceExperience)}
       eyebrow={workspaceExperience.operatingLabel}

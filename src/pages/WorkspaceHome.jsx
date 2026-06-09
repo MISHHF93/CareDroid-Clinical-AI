@@ -1390,6 +1390,7 @@ export default function WorkspaceHome() {
   return (
     <PageShell
       className={`workspace-home workspace-home--${cssToken(workspaceExperience.tone)} workspace-home--workspace-${cssToken(workspaceExperience.id)}`}
+      contentClassName="cd-page-stack cd-page-stack--compact workspace-home__content"
       data-workspace-os={workspaceExperience.id}
       style={workspaceThemeStyle(workspaceExperience)}
       eyebrow={workspaceExperience.operatingLabel}

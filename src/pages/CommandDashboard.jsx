@@ -21,6 +21,7 @@ import {
   MetricCard as CompactMetricCard,
   DashboardGrid,
   DashboardSection,
+  PageShell,
 } from '../components/ui/CareDroidPrimitives';
 import LaunchActionCard from '../components/ui/LaunchActionCard';
 import {
@@ -516,40 +517,38 @@ export default function CommandDashboard() {
     launchPrompt(action.prompt);
   };
 
+  const dashboardLogoUrl = branding?.dashboardLogoUrl || branding?.logoUrl;
+
   return (
-    <section
+    <PageShell
       className={`command-dashboard command-dashboard--compressed command-dashboard--${cssToken(workspaceExperience.tone)} command-dashboard--workspace-${cssToken(workspaceExperience.id)}`}
+      contentClassName="cd-page-stack cd-page-stack--compact command-dashboard__content"
       data-workspace-os={workspaceExperience.id}
       style={workspaceThemeStyle(workspaceExperience)}
-    >
-      <section className="command-hero" aria-labelledby="command-dashboard-title">
-        <div className="command-hero__content">
-          <p className="command-eyebrow">
-            {workspaceExperience.operatingLabel} · {branding?.displayName || model.organization?.name || 'CareDroid'}
-          </p>
-          <div className="command-hero__brand-row">
-            {(branding?.dashboardLogoUrl || branding?.logoUrl) && (
-              <img
-                src={branding.dashboardLogoUrl || branding.logoUrl}
-                alt=""
-                className="command-hero__logo"
-              />
-            )}
-            <h1 id="command-dashboard-title">
-              {branding?.dashboardTitle ||
-                workspaceExperience.dashboardTitle}
-            </h1>
-          </div>
-          <p>{branding?.dashboardSubtitle || workspaceExperience.dashboardSubtitle}</p>
-          <div className="command-hero__context" aria-label="Dashboard context">
-            <span>{workspaceExperience.label || workspaceContextActive?.name || activeWorkspace?.name || safeSaasProfile.defaultWorkspace || 'Emergency'}</span>
-            <span>{workspaceExperience.environment}</span>
-            <Link to={CANONICAL_ROUTES.systemHealth}>
-              {systemConfig.configDegraded ? 'Backend degraded' : 'Systems ready'}
-            </Link>
-          </div>
+      eyebrow={`${workspaceExperience.operatingLabel} · ${branding?.displayName || model.organization?.name || 'CareDroid'}`}
+      title={branding?.dashboardTitle || workspaceExperience.dashboardTitle}
+      titleId="command-dashboard-title"
+      description={branding?.dashboardSubtitle || workspaceExperience.dashboardSubtitle}
+      leadingIcon={
+        dashboardLogoUrl ? (
+          <img
+            src={dashboardLogoUrl}
+            alt=""
+            className="command-hero__logo"
+          />
+        ) : null
+      }
+      actions={
+        <div className="command-hero__context" aria-label="Dashboard context">
+          <span>{workspaceExperience.label || workspaceContextActive?.name || activeWorkspace?.name || safeSaasProfile.defaultWorkspace || 'Emergency'}</span>
+          <span>{workspaceExperience.environment}</span>
+          <Link to={CANONICAL_ROUTES.systemHealth}>
+            {systemConfig.configDegraded ? 'Backend degraded' : 'Systems ready'}
+          </Link>
         </div>
-        <div className="command-insight-strip" aria-label="Dashboard context summary">
+      }
+    >
+      <DashboardGrid variant="dense" className="command-insight-strip" aria-label="Dashboard context summary">
           {(workspaceExperience.focusMetrics || []).slice(0, 1).map((metric) => (
             <InsightChip
               key={metric.label}
@@ -560,8 +559,7 @@ export default function CommandDashboard() {
             />
           ))}
           <InsightChip label="Alerts" value={activeAlerts.length} tone={activeAlerts.length ? 'warning' : 'good'} />
-        </div>
-      </section>
+      </DashboardGrid>
 
       <DashboardPanel
         title="Actions"
@@ -756,6 +754,6 @@ export default function CommandDashboard() {
           </DashboardPanel>
         )}
       </section>
-    </section>
+    </PageShell>
   );
 }

@@ -1,6 +1,5 @@
 .device-fleet-page {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--compact-page-gap, 14px);
   width: 100%;
   min-width: 0;
@@ -145,36 +144,8 @@
   background: color-mix(in srgb, var(--app-danger) 10%, var(--app-surface-1));
 }
 
-.device-fleet-summary {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: var(--compact-panel-gap, 10px);
-  padding: var(--compact-panel-padding, 14px);
-}
-
 .device-fleet-summary-card {
   min-width: 0;
-  border-radius: var(--compact-card-radius, 12px);
-  padding: 10px;
-  background: var(--app-surface-2);
-}
-
-.device-fleet-summary-card strong {
-  display: block;
-  font-size: 1.35rem;
-  line-height: 1;
-}
-
-.device-fleet-summary-card span,
-.device-fleet-summary-card small {
-  display: block;
-  margin-top: 6px;
-  font-weight: 900;
-}
-
-.device-fleet-summary-card small {
-  color: var(--app-fg-muted);
-  font-size: 0.78rem;
 }
 
 .device-fleet-summary-card--good {
@@ -187,13 +158,6 @@
 
 .device-fleet-summary-card--critical {
   border: 1px solid color-mix(in srgb, var(--app-danger) 35%, var(--app-panel-border));
-}
-
-.device-fleet-filters {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--compact-panel-gap, 10px);
-  padding: var(--compact-panel-padding, 14px);
 }
 
 .device-fleet-filters label {
@@ -226,11 +190,8 @@
 }
 
 .device-fleet-workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(min(100%, 20rem), 0.6fr);
-  gap: var(--compact-page-gap, 14px);
+  --app-detail-rail-width: 21rem;
   align-items: start;
-  min-width: 0;
 }
 
 .device-fleet-section,

@@ -9,17 +9,13 @@ import {
 } from '../data/automationAuditTrail';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import { NavIcon } from '../navigation/NavIcon';
+import {
+  DashboardGrid,
+  DashboardSection,
+  MetricCard,
+  PageShell,
+} from '../components/ui/CareDroidPrimitives';
 import './AutomationAnalytics.css';
-
-function MetricCard({ label, value, helper }) {
-  return (
-    <article className="automation-analytics-metric">
-      <span>{label}</span>
-      <strong>{value}</strong>
-      <small>{helper}</small>
-    </article>
-  );
-}
 
 export default function AutomationAnalytics() {
   const registrySummary = summarizeAutomationRegistry();
@@ -38,32 +34,25 @@ export default function AutomationAnalytics() {
   );
 
   return (
-    <main className="automation-analytics-page">
-      <section className="automation-analytics-hero">
-        <div className="automation-analytics-hero__icon" aria-hidden>
-          <NavIcon icon={CHROME_ICONS.bolt} size={30} />
-        </div>
-        <div>
-          <p className="automation-analytics-eyebrow">Solution automation analytics</p>
-          <h1>Automation Analytics</h1>
-          <p>
-            Tracks automation runs, success, failures, adoption, human overrides, and accepted AI
-            recommendations across sellable healthcare solutions.
-          </p>
-        </div>
-      </section>
+    <PageShell
+      className="automation-analytics-page"
+      contentClassName="cd-page-stack cd-page-stack--compact automation-analytics-page__content"
+      eyebrow="Solution automation analytics"
+      title="Automation Analytics"
+      description="Tracks automation runs, success, failures, adoption, human overrides, and accepted AI recommendations across sellable healthcare solutions."
+      leadingIcon={<NavIcon icon={CHROME_ICONS.bolt} size={28} />}
+    >
 
-      <section className="automation-analytics-grid" aria-label="Automation metrics">
+      <DashboardGrid variant="metrics" className="automation-analytics-grid" aria-label="Automation metrics">
         <MetricCard label="Automations" value={registrySummary.total} helper={`${registrySummary.active} active`} />
         <MetricCard label="Runs" value={totals.runs} helper={`${totals.successes} successful`} />
         <MetricCard label="Failures" value={totals.failures} helper="Demo analytics seed" />
         <MetricCard label="Human overrides" value={totals.humanOverrides} helper={`${auditSummary.reviewerRequired} audit reviews`} />
         <MetricCard label="AI accepted" value={totals.aiRecommendationsAccepted} helper="Recommendations accepted" />
-      </section>
+      </DashboardGrid>
 
-      <section className="automation-analytics-layout">
-        <article className="automation-analytics-panel">
-          <h2>Sellable solution packages</h2>
+      <DashboardGrid variant="split" className="automation-analytics-layout">
+        <DashboardSection className="automation-analytics-panel" title="Sellable solution packages">
           <div className="automation-analytics-list">
             {solutionPackages.map((solution) => (
               <div key={solution.solutionId} className="automation-analytics-row">
@@ -73,10 +62,9 @@ export default function AutomationAnalytics() {
               </div>
             ))}
           </div>
-        </article>
+        </DashboardSection>
 
-        <article className="automation-analytics-panel">
-          <h2>Automation adoption</h2>
+        <DashboardSection className="automation-analytics-panel" title="Automation adoption">
           <div className="automation-analytics-list">
             {analyticsRows.slice(0, 8).map((row) => (
               <div key={row.automationId} className="automation-analytics-row">
@@ -86,8 +74,8 @@ export default function AutomationAnalytics() {
               </div>
             ))}
           </div>
-        </article>
-      </section>
-    </main>
+        </DashboardSection>
+      </DashboardGrid>
+    </PageShell>
   );
 }

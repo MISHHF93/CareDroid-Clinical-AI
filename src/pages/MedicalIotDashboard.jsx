@@ -13,9 +13,14 @@ import {
   VisualizationPanel,
 } from '../components/dashboard/DashboardVisualizations';
 import {
+  ActionRow,
   DashboardGrid,
+  DashboardSection,
+  DetailRail,
   FilterPanel,
+  OverflowCanvas,
   PageShell,
+  WorkspaceSplit,
 } from '../components/ui/CareDroidPrimitives';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
@@ -114,18 +119,17 @@ function trendColor(index) {
 
 function DeviceLocationMap({ devices, selectedDeviceId, onSelectDevice }) {
   return (
-    <section className="medical-iot-section medical-iot-location-section" aria-labelledby="medical-iot-location-title">
-      <div className="medical-iot-section-header">
-        <div>
-          <h2 id="medical-iot-location-title">Device Location Map</h2>
-          <p>Demo marker panel for connected-device location, status, freshness, and offline visibility.</p>
-        </div>
-        <span className="medical-iot-badge medical-iot-badge--neutral">Demo data</span>
-      </div>
+    <DashboardSection
+      className="medical-iot-section medical-iot-location-section"
+      title="Device Location Map"
+      titleId="medical-iot-location-title"
+      description="Demo marker panel for connected-device location, status, freshness, and offline visibility."
+      actions={<span className="medical-iot-badge medical-iot-badge--neutral">Demo data</span>}
+    >
       {devices.length === 0 ? (
         <p className="medical-iot-empty">No device location markers match the current filters.</p>
       ) : (
-        <div className="medical-iot-map-canvas" role="img" aria-label="Demo Medical IoT device location map">
+        <OverflowCanvas className="medical-iot-map-canvas" minWidth="720px" role="img" aria-label="Demo Medical IoT device location map">
           <svg viewBox="0 0 1000 620" aria-hidden="true" focusable="false">
             <rect x="36" y="42" width="888" height="520" rx="28" className="medical-iot-map-shell" />
             <rect x="96" y="280" width="748" height="58" rx="18" className="medical-iot-map-corridor" />
@@ -150,29 +154,29 @@ function DeviceLocationMap({ devices, selectedDeviceId, onSelectDevice }) {
               </button>
             ))}
           </div>
-        </div>
+        </OverflowCanvas>
       )}
       <div className="medical-iot-map-legend" aria-label="Medical IoT status legend">
         <span><i className="medical-iot-dot medical-iot-dot--good" /> Online</span>
         <span><i className="medical-iot-dot medical-iot-dot--warning" /> Warning/stale</span>
         <span><i className="medical-iot-dot medical-iot-dot--critical" /> Offline/abnormal</span>
       </div>
-    </section>
+    </DashboardSection>
   );
 }
 
 function DeviceDetailDrawer({ device, onClose }) {
   if (!device) {
     return (
-      <aside className="medical-iot-detail medical-iot-detail--empty" aria-label="Medical IoT device details">
+      <DetailRail className="medical-iot-detail medical-iot-detail--empty" aria-label="Medical IoT device details">
         <h2>Device Detail Drawer</h2>
         <p>Select a device card or marker to review status, location, battery, connectivity, and timestamp.</p>
-      </aside>
+      </DetailRail>
     );
   }
 
   return (
-    <aside className="medical-iot-detail" aria-label={`${device.name} details`}>
+    <DetailRail sticky className="medical-iot-detail" aria-label={`${device.name} details`}>
       <div className="medical-iot-detail-header">
         <div>
           <p className="medical-iot-eyebrow">Device Detail Drawer</p>
@@ -183,7 +187,7 @@ function DeviceDetailDrawer({ device, onClose }) {
           <NavIcon icon={CHROME_ICONS.close} size={18} aria-hidden />
         </button>
       </div>
-      <dl className="medical-iot-detail-grid">
+      <DashboardGrid as="dl" variant="summary" className="medical-iot-detail-grid">
         <div><dt>Status</dt><dd><span className={`medical-iot-badge medical-iot-badge--${statusTone(device.status)}`}>{device.status}</span></dd></div>
         <div><dt>Freshness</dt><dd>{device.freshness || device.status}</dd></div>
         <div><dt>Location</dt><dd>{device.location?.label || 'Unknown location'}</dd></div>
@@ -195,8 +199,8 @@ function DeviceDetailDrawer({ device, onClose }) {
         <div><dt>Last seen</dt><dd>{formatTelemetryTime(device.lastSeenAt)}</dd></div>
         <div><dt>Active alerts</dt><dd>{device.activeAlerts?.join(', ') || 'None'}</dd></div>
         <div><dt>Tracking support</dt><dd>Demo marker only</dd></div>
-      </dl>
-    </aside>
+      </DashboardGrid>
+    </DetailRail>
   );
 }
 
@@ -297,11 +301,12 @@ export default function MedicalIotDashboard() {
   return (
     <PageShell
       className="medical-iot-page"
+      contentClassName="cd-page-stack cd-page-stack--compact medical-iot-page__content"
       eyebrow="Connected care monitoring"
       title="Medical IoT Dashboard"
       description={`Monitor connected devices, patient telemetry, vitals streams, wearable data, and abnormal signal alerts for ${activeWorkspace?.branding?.displayName || activeWorkspace?.name || account?.organization || 'your workspace'}. Device data is monitoring support only and does not replace clinician assessment.`}
       actions={
-        <>
+        <ActionRow align="end" className="medical-iot-actions">
           <Link to="/assistant" className="medical-iot-action">
             Ask Assistant
           </Link>
@@ -311,7 +316,7 @@ export default function MedicalIotDashboard() {
           <Link to="/devices" className="medical-iot-action medical-iot-action--secondary">
             Open Devices
           </Link>
-        </>
+        </ActionRow>
       }
     >
 
@@ -337,10 +342,10 @@ export default function MedicalIotDashboard() {
 
       {!state.loading && !state.error && snapshot ? (
         <>
-          <section className="medical-iot-source" role="status">
+          <ActionRow className="medical-iot-source" role="status">
             <strong>{snapshot.sourceLabel}</strong>
             <span>Last updated: {formatTelemetryTime(snapshot.generatedAt)}</span>
-          </section>
+          </ActionRow>
 
           <DashboardGrid className="medical-iot-insights" aria-label="Medical IoT context insights">
             <ContextInsightCard
@@ -437,16 +442,15 @@ export default function MedicalIotDashboard() {
               </p>
             </section>
           ) : (
-            <div className="medical-iot-location-workspace">
+            <WorkspaceSplit ratio="wide" className="medical-iot-location-workspace">
               <div>
                 <DeviceLocationMap
                   devices={filteredDevices}
                   selectedDeviceId={selectedDeviceId}
                   onSelectDevice={(device) => setSelectedDeviceId(device.id)}
                 />
-                <section className="medical-iot-section" aria-labelledby="medical-iot-devices-title">
-                  <h2 id="medical-iot-devices-title">Connected Devices</h2>
-                  <div className="medical-iot-device-grid">
+                <DashboardSection className="medical-iot-section" title="Connected Devices" titleId="medical-iot-devices-title">
+                  <DashboardGrid className="medical-iot-device-grid">
                     {filteredDevices.map((device) => (
                       <DeviceCard
                         key={device.id}
@@ -455,31 +459,31 @@ export default function MedicalIotDashboard() {
                         onSelect={(nextDevice) => setSelectedDeviceId(nextDevice.id)}
                       />
                     ))}
-                  </div>
-                </section>
+                  </DashboardGrid>
+                </DashboardSection>
               </div>
               <DeviceDetailDrawer device={selectedDevice} onClose={() => setSelectedDeviceId(null)} />
-            </div>
+            </WorkspaceSplit>
           )}
 
-          <section className="medical-iot-section" aria-labelledby="medical-iot-vitals-title">
-            <h2 id="medical-iot-vitals-title">Patient Vitals Streams</h2>
+          <DashboardSection className="medical-iot-section" title="Patient Vitals Streams" titleId="medical-iot-vitals-title">
             {snapshot.vitals.length === 0 ? (
               <p className="medical-iot-empty">No vitals streams are reporting right now.</p>
             ) : (
-              <div className="medical-iot-vitals-grid">
+              <DashboardGrid className="medical-iot-vitals-grid">
                 {snapshot.vitals.map((vital) => (
                   <VitalCard key={vital.id} vital={vital} />
                 ))}
-              </div>
+              </DashboardGrid>
             )}
-          </section>
+          </DashboardSection>
 
-          <section className="medical-iot-section" aria-labelledby="medical-iot-visuals-title">
-            <h2 id="medical-iot-visuals-title">Telemetry Visual Analytics</h2>
-            <p className="medical-iot-visual-note">
-              Demo data - mock telemetry, not live patient data and not for clinical decisions.
-            </p>
+          <DashboardSection
+            className="medical-iot-section"
+            title="Telemetry Visual Analytics"
+            titleId="medical-iot-visuals-title"
+            description="Demo data - mock telemetry, not live patient data and not for clinical decisions."
+          >
             <div className="dashboard-visual-grid medical-iot-visual-grid">
               <VisualizationPanel title="Device Status Distribution" description="Online, warning, and offline connected-device states." badge="Demo data">
                 <CategoryBarChart data={deviceStatusDistribution} title="Medical IoT device status distribution" />
@@ -506,11 +510,10 @@ export default function MedicalIotDashboard() {
                 />
               </VisualizationPanel>
             </div>
-          </section>
+          </DashboardSection>
 
           <DashboardGrid className="medical-iot-grid-row">
-            <div className="medical-iot-section">
-              <h2>Abnormal Reading Alerts</h2>
+            <DashboardSection className="medical-iot-section" title="Abnormal Reading Alerts">
               {snapshot.alerts.length === 0 ? (
                 <p className="medical-iot-empty">No abnormal reading alerts.</p>
               ) : (
@@ -529,10 +532,9 @@ export default function MedicalIotDashboard() {
                   ))}
                 </div>
               )}
-            </div>
+            </DashboardSection>
 
-            <div className="medical-iot-section">
-              <h2>Recent Telemetry Trends</h2>
+            <DashboardSection className="medical-iot-section" title="Recent Telemetry Trends">
               {snapshot.trends.length === 0 ? (
                 <p className="medical-iot-empty">No recent telemetry trends.</p>
               ) : (
@@ -548,7 +550,7 @@ export default function MedicalIotDashboard() {
                   ))}
                 </div>
               )}
-            </div>
+            </DashboardSection>
           </DashboardGrid>
         </>
       ) : null}

@@ -11,8 +11,12 @@ import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS } from '../../navigation/iconRegistry';
 import { DEMO_LIVE_STATES } from '../../utils/demoLiveState';
 import {
+  DashboardGrid,
+  DashboardSection,
+  FilterPanel,
   MetricCard,
   StatusBadge as CanonicalStatusBadge,
+  WorkspaceSplit,
 } from '../../components/ui/CareDroidPrimitives';
 import FleetPageChrome from './FleetPageChrome';
 import './FleetLiveMap.css';
@@ -326,7 +330,7 @@ export default function FleetLiveMap() {
               details="Vehicle GPS, routes, alerts, and utilization are demo/mock tracking records. If the fleet telemetry backend is unavailable, the page uses demo fallback data; dispatch, autonomous routing, and emergency-response writes are unsupported."
             />
 
-            <section className="fleet-map-summary" aria-label="Fleet map status summary">
+            <DashboardGrid variant="metrics" className="fleet-map-summary" aria-label="Fleet map status summary">
               <SummaryCard label="Vehicles" value={snapshot.summary.totalVehicles} />
               <SummaryCard label="Active/on job" value={snapshot.summary.activeVehicles} />
               <SummaryCard label="Available" value={snapshot.summary.availableVehicles} tone="good" />
@@ -337,9 +341,9 @@ export default function FleetLiveMap() {
               <SummaryCard label="Stale GPS" value={snapshot.summary.staleVehicles} tone={snapshot.summary.staleVehicles ? 'warning' : 'good'} />
               <SummaryCard label="Offline" value={snapshot.summary.offlineVehicles} tone={snapshot.summary.offlineVehicles ? 'critical' : 'good'} hint="Last updated required" />
               <SummaryCard label="Alerts" value={snapshot.summary.activeAlerts} tone={snapshot.summary.activeAlerts ? 'warning' : 'good'} />
-            </section>
+            </DashboardGrid>
 
-            <section className="fleet-map-filters" aria-label="Fleet map filters">
+            <FilterPanel className="fleet-map-filters" aria-label="Fleet map filters">
               <label>
                 <span>Status</span>
                 <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
@@ -369,9 +373,9 @@ export default function FleetLiveMap() {
                 <input type="checkbox" checked={routeOnly} onChange={(event) => setRouteOnly(event.target.checked)} />
                 <span>Vehicles on active routes only</span>
               </label>
-            </section>
+            </FilterPanel>
 
-            <div className="fleet-map-workspace">
+            <WorkspaceSplit ratio="wide" className="fleet-map-workspace">
               <FleetMapCanvas
                 vehicles={filteredVehicles}
                 routes={visibleRoutes}
@@ -384,11 +388,10 @@ export default function FleetLiveMap() {
                 alerts={selectedVehicle ? alertsByVehicleId[selectedVehicle.id] || [] : []}
                 onClose={() => setSelectedVehicleId(null)}
               />
-            </div>
+            </WorkspaceSplit>
 
-            <section className="fleet-map-roster" aria-labelledby="fleet-map-roster-title">
-              <h2 id="fleet-map-roster-title">Vehicle Utilization</h2>
-              <div className="fleet-map-roster-grid">
+            <DashboardSection className="fleet-map-roster" title="Vehicle Utilization" titleId="fleet-map-roster-title">
+              <DashboardGrid className="fleet-map-roster-grid">
                 {filteredVehicles.map((vehicle) => (
                   <button
                     key={vehicle.id}
@@ -403,8 +406,8 @@ export default function FleetLiveMap() {
                     <span>Alerts: {(alertsByVehicleId[vehicle.id] || []).length}</span>
                   </button>
                 ))}
-              </div>
-            </section>
+              </DashboardGrid>
+            </DashboardSection>
 
             {filteredVehicles.length === 0 ? (
               <section className="fleet-map-state" role="status">

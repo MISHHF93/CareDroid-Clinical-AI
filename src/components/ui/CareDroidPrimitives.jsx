@@ -98,6 +98,82 @@ export function DashboardGrid({ children, variant = 'cards', className = '', as:
   );
 }
 
+export function PageStack({ children, density = 'standard', className = '', as: Element = 'div', ...props }) {
+  return (
+    <Element className={['cd-page-stack', `cd-page-stack--${density}`, className].filter(Boolean).join(' ')} {...props}>
+      {children}
+    </Element>
+  );
+}
+
+export function HeroPanel({
+  eyebrow,
+  title,
+  titleId,
+  description,
+  actions,
+  leadingIcon,
+  children,
+  className = '',
+  as: Element = 'section',
+  ...props
+}) {
+  return (
+    <Element className={['cd-hero-panel', className].filter(Boolean).join(' ')} {...props}>
+      <SectionHeader
+        eyebrow={eyebrow}
+        title={title}
+        titleId={titleId}
+        description={description}
+        actions={actions}
+        leadingIcon={leadingIcon}
+      />
+      {children ? <div className="cd-hero-panel__content">{children}</div> : null}
+    </Element>
+  );
+}
+
+export function Surface({ children, tone = 'default', className = '', as: Element = 'div', ...props }) {
+  return (
+    <Element className={['cd-surface', `cd-surface--${tone}`, className].filter(Boolean).join(' ')} {...props}>
+      {children}
+    </Element>
+  );
+}
+
+export function ActionRow({ children, align = 'start', className = '', as: Element = 'div', ...props }) {
+  return (
+    <Element className={['cd-action-row', `cd-action-row--${align}`, className].filter(Boolean).join(' ')} {...props}>
+      {children}
+    </Element>
+  );
+}
+
+export function WorkspaceSplit({ children, ratio = 'balanced', className = '', as: Element = 'div', ...props }) {
+  return (
+    <Element className={['cd-workspace-split', `cd-workspace-split--${ratio}`, className].filter(Boolean).join(' ')} {...props}>
+      {children}
+    </Element>
+  );
+}
+
+export function DetailRail({ children, sticky = false, className = '', as: Element = 'aside', ...props }) {
+  return (
+    <Element className={['cd-detail-rail', sticky ? 'cd-detail-rail--sticky' : '', className].filter(Boolean).join(' ')} {...props}>
+      {children}
+    </Element>
+  );
+}
+
+export function OverflowCanvas({ children, minWidth, className = '', as: Element = 'div', ...props }) {
+  const style = minWidth ? { '--cd-overflow-canvas-min-width': minWidth, ...props.style } : props.style;
+  return (
+    <Element {...props} className={['cd-overflow-canvas', className].filter(Boolean).join(' ')} style={style}>
+      {children}
+    </Element>
+  );
+}
+
 export function MetricCard({ label, value, helper, suffix = '', tone = 'neutral', className = '', ...props }) {
   return (
     <Card compact className={['cd-metric-card', `cd-metric-card--${tone}`, className].filter(Boolean).join(' ')} {...props}>
@@ -222,11 +298,12 @@ export function BadgeList({ items = [], tone = 'neutral', className = '', itemCl
   );
 }
 
-export function InfoNotice({ label, detail, tone = 'info', className = '', ...props }) {
+export function InfoNotice({ label, detail, children, tone = 'info', className = '', ...props }) {
   return (
     <aside className={['cd-info-notice', `cd-info-notice--${tone}`, className].filter(Boolean).join(' ')} role="note" {...props}>
-      <strong>{label}</strong>
+      {label ? <strong>{label}</strong> : null}
       {detail ? <span>{detail}</span> : null}
+      {children}
     </aside>
   );
 }

@@ -6,6 +6,11 @@ import { buildDigitalTwinSnapshot } from '../data/platformOperatingSystem';
 import { fetchFleetLiveTrackingSnapshot } from '../services/fleetTelemetryService';
 import { fetchHospitalMapSnapshot } from '../services/hospitalMapService';
 import { fetchMedicalIotSnapshot } from '../services/medicalIotService';
+import {
+  DashboardGrid,
+  DashboardSection,
+  PageShell,
+} from '../components/ui/CareDroidPrimitives';
 import './DigitalTwinIntelligence.css';
 
 const SURFACE_LINKS = [
@@ -63,14 +68,12 @@ function DomainCard({ domain }) {
 
 function QueueList({ title, items, empty, route }) {
   return (
-    <section className="twin-intel-panel">
-      <header>
-        <div>
-          <p className="twin-intel-eyebrow">Predictive queue</p>
-          <h2>{title}</h2>
-        </div>
-        {route ? <Link to={route}>Open source</Link> : null}
-      </header>
+    <DashboardSection
+      className="twin-intel-panel"
+      eyebrow="Predictive queue"
+      title={title}
+      actions={route ? <Link to={route}>Open source</Link> : null}
+    >
       {items.length ? (
         <ul className="twin-intel-queue">
           {items.slice(0, 8).map((item) => (
@@ -83,7 +86,7 @@ function QueueList({ title, items, empty, route }) {
       ) : (
         <p className="twin-intel-empty">{empty}</p>
       )}
-    </section>
+    </DashboardSection>
   );
 }
 
@@ -132,20 +135,14 @@ export default function DigitalTwinIntelligence() {
   );
 
   return (
-    <section className="twin-intel-page">
-      <section className="twin-intel-hero" aria-labelledby="digital-twin-intelligence-title">
-        <div>
-          <p className="twin-intel-eyebrow">Digital twin intelligence</p>
-          <h1 id="digital-twin-intelligence-title">Predictive Operational Twin</h1>
-          <p>
-            Hospital Map, Fleet, and Medical IoT signals are combined into explainable health,
-            risk, and readiness scores so operations can act before issues become incidents.
-          </p>
-          <p className="twin-intel-support-copy">
-            Operational decision support only. Human teams must validate source data before
-            dispatch, staffing, admission, discharge, or maintenance action.
-          </p>
-        </div>
+    <PageShell
+      className="twin-intel-page"
+      contentClassName="cd-page-stack cd-page-stack--compact twin-intel-page__content"
+      eyebrow="Digital twin intelligence"
+      title="Predictive Operational Twin"
+      titleId="digital-twin-intelligence-title"
+      description="Hospital Map, Fleet, and Medical IoT signals are combined into explainable health, risk, and readiness scores so operations can act before issues become incidents."
+      actions={
         <nav className="twin-intel-surface-links" aria-label="Operational twin source surfaces">
           {SURFACE_LINKS.map((link) => (
             <Link key={link.path} to={link.path}>
@@ -153,7 +150,12 @@ export default function DigitalTwinIntelligence() {
             </Link>
           ))}
         </nav>
-      </section>
+      }
+    >
+      <p className="twin-intel-support-copy">
+        Operational decision support only. Human teams must validate source data before
+        dispatch, staffing, admission, discharge, or maintenance action.
+      </p>
 
       <section className="twin-intel-context" aria-label="Digital twin context insight">
         <ContextInsightCard
@@ -166,42 +168,40 @@ export default function DigitalTwinIntelligence() {
         />
       </section>
 
-      <section className="twin-intel-scores" aria-label="Digital twin intelligence scores">
+      <DashboardGrid variant="metrics" className="twin-intel-scores" aria-label="Digital twin intelligence scores">
         <ScoreCard score={intelligence.scores.healthScore} />
         <ScoreCard score={intelligence.scores.riskScore} />
         <ScoreCard score={intelligence.scores.readinessScore} />
-      </section>
+      </DashboardGrid>
 
-      <section className="twin-intel-panel" aria-labelledby="predictive-insights-title">
-        <header>
-          <div>
-            <p className="twin-intel-eyebrow">Predictive insights</p>
-            <h2 id="predictive-insights-title">Before it becomes reactive</h2>
-          </div>
-          <span>{intelligence.riskBand} risk band</span>
-        </header>
-        <div className="twin-intel-insights">
+      <DashboardSection
+        className="twin-intel-panel"
+        eyebrow="Predictive insights"
+        title="Before it becomes reactive"
+        titleId="predictive-insights-title"
+        actions={<span>{intelligence.riskBand} risk band</span>}
+      >
+        <DashboardGrid className="twin-intel-insights">
           {intelligence.insights.map((insight) => (
             <InsightCard key={insight.id} insight={insight} />
           ))}
-        </div>
-      </section>
+        </DashboardGrid>
+      </DashboardSection>
 
-      <section className="twin-intel-panel" aria-labelledby="domain-breakdown-title">
-        <header>
-          <div>
-            <p className="twin-intel-eyebrow">Operational domains</p>
-            <h2 id="domain-breakdown-title">Rooms, devices, assets, telemetry, alerts, occupancy, maintenance</h2>
-          </div>
-        </header>
-        <div className="twin-intel-domains">
+      <DashboardSection
+        className="twin-intel-panel"
+        eyebrow="Operational domains"
+        title="Rooms, devices, assets, telemetry, alerts, occupancy, maintenance"
+        titleId="domain-breakdown-title"
+      >
+        <DashboardGrid variant="summary" className="twin-intel-domains">
           {domains.map((domain) => (
             <DomainCard key={domain.label} domain={domain} />
           ))}
-        </div>
-      </section>
+        </DashboardGrid>
+      </DashboardSection>
 
-      <section className="twin-intel-grid">
+      <DashboardGrid className="twin-intel-grid">
         <QueueList
           title="Alert queue"
           items={alertItems}
@@ -220,7 +220,7 @@ export default function DigitalTwinIntelligence() {
           empty="No maintenance readiness blockers detected."
           route="/devices"
         />
-      </section>
-    </section>
+      </DashboardGrid>
+    </PageShell>
   );
 }

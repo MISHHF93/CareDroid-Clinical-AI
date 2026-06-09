@@ -538,6 +538,7 @@ export default function HospitalMapDashboard() {
   return (
     <PageShell
       className="hospital-map-page"
+      contentClassName="cd-page-stack cd-page-stack--compact hospital-map-page__content"
       eyebrow="Hospital operations command"
       title="Hospital Map"
       description="View hospital floors, rooms, beds, medical devices, IoT telemetry, alerts, maintenance, and fleet utilization. Monitoring support only; not a replacement for bedside alarms."

@@ -4,23 +4,10 @@
   margin: 0 auto;
 }
 
-.org-page-header {
-  margin-bottom: 1.5rem;
-}
-
-.org-page-subtitle {
-  color: var(--muted-foreground, #64748b);
-  margin-top: 0.25rem;
-}
-
 .org-page-actions {
-  display: flex;
   gap: 0.75rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
 }
 
-.org-grid,
 .org-pack-grid {
   display: grid;
   gap: 1rem;

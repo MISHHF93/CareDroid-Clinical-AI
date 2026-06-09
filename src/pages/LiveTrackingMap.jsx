@@ -9,6 +9,18 @@ import { fetchMedicalIotSnapshot } from '../services/medicalIotService';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
+import {
+  ActionRow,
+  DashboardGrid,
+  DashboardSection,
+  DetailRail,
+  FilterPanel,
+  InfoNotice,
+  MetricCard,
+  OverflowCanvas,
+  PageShell,
+  WorkspaceSplit,
+} from '../components/ui/CareDroidPrimitives';
 import './LiveTrackingMap.css';
 
 const TOOL_ID = 'live-tracking-map';
@@ -28,27 +40,22 @@ function normalizeStatus(value) {
 }
 
 function SummaryCard({ label, value, tone = 'neutral', hint }) {
-  return (
-    <article className={`live-map-summary-card live-map-summary-card--${tone}`}>
-      <strong>{value}</strong>
-      <span>{label}</span>
-      {hint ? <small>{hint}</small> : null}
-    </article>
-  );
+  const toneMap = { good: 'success', critical: 'danger' };
+  return <MetricCard className="live-map-summary-card" label={label} value={value} helper={hint} tone={toneMap[tone] || tone} />;
 }
 
 function DetailDrawer({ asset, onClose }) {
   if (!asset) {
     return (
-      <aside className="live-map-detail live-map-detail--empty" aria-label="Live tracking details">
+      <DetailRail className="live-map-detail live-map-detail--empty" aria-label="Live tracking details">
         <h2>Tracking Detail Drawer</h2>
         <p>Select any vehicle or device marker to review location, status, source, timestamp, and safety scope.</p>
-      </aside>
+      </DetailRail>
     );
   }
 
   return (
-    <aside className="live-map-detail" aria-label={`${asset.name} details`}>
+    <DetailRail sticky className="live-map-detail" aria-label={`${asset.name} details`}>
       <div className="live-map-detail-header">
         <div>
           <p className="live-map-eyebrow">{asset.categoryLabel}</p>
@@ -59,7 +66,7 @@ function DetailDrawer({ asset, onClose }) {
           <NavIcon icon={CHROME_ICONS.close} size={18} aria-hidden />
         </button>
       </div>
-      <dl className="live-map-detail-grid">
+      <DashboardGrid as="dl" variant="summary" className="live-map-detail-grid">
         <div><dt>Status</dt><dd><span className={`live-map-badge live-map-badge--${toneForStatus(asset.status)}`}>{normalizeStatus(asset.status)}</span></dd></div>
         <div><dt>Last updated</dt><dd>{formatHospitalMapTime(asset.lastSeenAt)}</dd></div>
         <div><dt>Source</dt><dd>{asset.source}</dd></div>
@@ -67,8 +74,8 @@ function DetailDrawer({ asset, onClose }) {
         {asset.extra.map((item) => (
           <div key={item.label}><dt>{item.label}</dt><dd>{item.value}</dd></div>
         ))}
-      </dl>
-    </aside>
+      </DashboardGrid>
+    </DetailRail>
   );
 }
 
@@ -207,29 +214,28 @@ export default function LiveTrackingMap() {
   }), [assets]);
 
   return (
-    <section className="live-map-page">
-      <section className="live-map-hero" aria-labelledby="live-map-title">
-        <div>
-          <p className="live-map-eyebrow">Operational tracking cockpit</p>
-          <h1 id="live-map-title">Live Tracking Map</h1>
-          <p>
-            Main live tracking experience for fleet vehicles, hospital indoor devices, and Medical IoT
-            status markers. Current implementation uses clearly labeled demo data only.
-          </p>
-        </div>
-        <div className="live-map-actions">
+    <PageShell
+      className="live-map-page"
+      contentClassName="cd-page-stack cd-page-stack--compact live-map-page__content"
+      eyebrow="Operational tracking cockpit"
+      title="Live Tracking Map"
+      titleId="live-map-title"
+      description="Main live tracking experience for fleet vehicles, hospital indoor devices, and Medical IoT status markers. Current implementation uses clearly labeled demo data only."
+      actions={
+        <ActionRow align="end" className="live-map-actions">
           <Link to="/assistant" className="live-map-action">Ask Assistant</Link>
           <Link to="/fleet/map" className="live-map-action live-map-action--secondary">Fleet Map</Link>
           <Link to="/hospital-map" className="live-map-action live-map-action--secondary">Hospital Map</Link>
           <Link to="/medical-iot" className="live-map-action live-map-action--secondary">Medical IoT</Link>
-        </div>
-      </section>
+        </ActionRow>
+      }
+    >
 
-      <section className="live-map-safety" role="note">
-        <strong>Safety scope:</strong> Demo tracking support only. Not a replacement for clinical alarms,
-        bedside monitoring, dispatch systems of record, or clinician/dispatcher decisions. Stale and
-        offline timestamps must be reviewed before action.
-      </section>
+      <InfoNotice
+        className="live-map-safety"
+        label="Safety scope:"
+        detail="Demo tracking support only. Not a replacement for clinical alarms, bedside monitoring, dispatch systems of record, or clinician/dispatcher decisions. Stale and offline timestamps must be reviewed before action."
+      />
 
       {state.loading ? (
         <section className="live-map-state" role="status" aria-label="Loading live tracking map">
@@ -251,12 +257,12 @@ export default function LiveTrackingMap() {
 
       {!state.loading && !state.error ? (
         <>
-          <section className="live-map-source" role="status">
+          <ActionRow className="live-map-source" role="status">
             <strong>Demo operations telemetry - no live backend tracking connected</strong>
             <span>Last updated: {formatHospitalMapTime(state.fleet?.summary?.updatedAt || state.hospital?.generatedAt || state.iot?.generatedAt)}</span>
-          </section>
+          </ActionRow>
 
-          <section className="live-map-insights" aria-label="Live tracking context insights">
+          <DashboardGrid className="live-map-insights" aria-label="Live tracking context insights">
             <ContextInsightCard
               title={summary.stale ? `${summary.stale} stale/offline marker(s)` : 'Markers reporting'}
               message={
@@ -285,7 +291,7 @@ export default function LiveTrackingMap() {
               actionLabel="Ask Assistant"
               actionRoute="/assistant"
             />
-          </section>
+          </DashboardGrid>
 
           <StateSourceNotice
             title="Combined live map source states"
@@ -298,16 +304,16 @@ export default function LiveTrackingMap() {
             details="The map combines demo fleet, hospital, and Medical IoT snapshots with mock coordinates. If any backend source is unavailable, its local/demo fallback is used; dispatch, routing, and clinical action writes are unsupported."
           />
 
-          <section className="live-map-summary" aria-label="Live tracking summary">
+          <DashboardGrid variant="metrics" className="live-map-summary" aria-label="Live tracking summary">
             <SummaryCard label="Markers" value={summary.total} />
             <SummaryCard label="Fleet vehicles" value={summary.fleet} />
             <SummaryCard label="Hospital devices" value={summary.hospital} />
             <SummaryCard label="Medical IoT" value={summary.iot} />
             <SummaryCard label="Stale/offline" value={summary.stale} tone={summary.stale ? 'critical' : 'good'} />
             <SummaryCard label="Warnings" value={summary.warnings} tone={summary.warnings ? 'warning' : 'good'} />
-          </section>
+          </DashboardGrid>
 
-          <section className="live-map-filters" aria-label="Live tracking map filters">
+          <FilterPanel className="live-map-filters" aria-label="Live tracking map filters">
             <label>
               <span>Layer</span>
               <select value={category} onChange={(event) => setCategory(event.target.value)}>
@@ -333,18 +339,17 @@ export default function LiveTrackingMap() {
                 placeholder="Try Van 312, ICU, Home..."
               />
             </label>
-          </section>
+          </FilterPanel>
 
-          <div className="live-map-workspace">
-            <section className="live-map-panel" aria-labelledby="live-map-canvas-title">
-              <div className="live-map-panel-header">
-                <div>
-                  <h2 id="live-map-canvas-title">Combined Tracking Canvas</h2>
-                  <p>Fleet, hospital, and IoT markers share one operational overview while retaining their route-specific detail views.</p>
-                </div>
-                <span className="live-map-badge live-map-badge--demo">Demo data</span>
-              </div>
-              <div className="live-map-canvas" role="img" aria-label="Combined demo live tracking map">
+          <WorkspaceSplit ratio="wide" className="live-map-workspace">
+            <DashboardSection
+              className="live-map-panel"
+              title="Combined Tracking Canvas"
+              titleId="live-map-canvas-title"
+              description="Fleet, hospital, and IoT markers share one operational overview while retaining their route-specific detail views."
+              actions={<span className="live-map-badge live-map-badge--demo">Demo data</span>}
+            >
+              <OverflowCanvas className="live-map-canvas" minWidth="720px" role="img" aria-label="Combined demo live tracking map">
                 <svg viewBox="0 0 1000 620" aria-hidden="true" focusable="false">
                   <rect x="34" y="38" width="900" height="540" rx="30" className="live-map-shell" />
                   <path d="M120 470 C250 360, 390 340, 530 250 S720 150, 860 120" className="live-map-road" />
@@ -369,10 +374,10 @@ export default function LiveTrackingMap() {
                     </button>
                   ))}
                 </div>
-              </div>
-            </section>
+              </OverflowCanvas>
+            </DashboardSection>
             <DetailDrawer asset={selectedAsset} onClose={() => setSelectedAssetId(null)} />
-          </div>
+          </WorkspaceSplit>
 
           {filteredAssets.length === 0 ? (
             <section className="live-map-state" role="status">
@@ -390,6 +395,6 @@ export default function LiveTrackingMap() {
           </section>
         </>
       ) : null}
-    </section>
+    </PageShell>
   );
 }

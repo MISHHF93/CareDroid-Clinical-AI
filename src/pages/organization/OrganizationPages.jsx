@@ -2,6 +2,11 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Card from '../../components/ui/card';
 import Button from '../../components/ui/button';
+import {
+  ActionRow,
+  DashboardGrid,
+  PageShell,
+} from '../../components/ui/CareDroidPrimitives';
 import { useOrganizationContext } from '../../contexts/OrganizationContext';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
@@ -69,13 +74,13 @@ export function OrganizationDashboard() {
   const packs = platformContext?.entitledPacks || [];
 
   return (
-    <div className="org-page">
-      <header className="org-page-header">
-        <h1>{organization?.name || 'Organization'}</h1>
-        <p className="org-page-subtitle">
-          {organization?.organizationType || 'Configure an organization to unlock pack-based workflows.'}
-        </p>
-        <div className="org-page-actions">
+    <PageShell
+      className="org-page"
+      contentClassName="cd-page-stack cd-page-stack--compact org-page__content"
+      title={organization?.name || 'Organization'}
+      description={organization?.organizationType || 'Configure an organization to unlock pack-based workflows.'}
+      actions={
+        <ActionRow align="end" className="org-page-actions">
           <Link to="/settings/organization">
             <Button variant="secondary">Organization settings</Button>
           </Link>
@@ -91,10 +96,11 @@ export function OrganizationDashboard() {
           <Link to="/outcomes">
             <Button variant="secondary">Outcomes</Button>
           </Link>
-        </div>
-      </header>
+        </ActionRow>
+      }
+    >
 
-      <div className="org-grid">
+      <DashboardGrid className="org-grid">
         <Card className="org-card">
           <h2>Enabled packs</h2>
           <p>{entitledPackIds?.length || 0} active solution packs</p>
@@ -151,12 +157,12 @@ export function OrganizationDashboard() {
             <p>{analytics.aiSessionCount} AI sessions</p>
           </Card>
         )}
-      </div>
+      </DashboardGrid>
 
       <Button variant="ghost" onClick={() => refreshPlatformContext()}>
         Refresh platform context
       </Button>
-    </div>
+    </PageShell>
   );
 }
 

@@ -1,9 +1,19 @@
 .profile-settings-page {
   min-height: auto;
+  max-width: 880px;
+  margin-inline: auto;
 }
 
 .profile-settings-stack {
   width: 100%;
+}
+
+.profile-settings-section {
+  min-width: 0;
+}
+
+.profile-settings-actions {
+  margin-top: 18px;
 }
 
 .profile-settings-grid {

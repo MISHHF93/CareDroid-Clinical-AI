@@ -6,7 +6,13 @@ import { toolRegistryById } from '../data/toolRegistry';
 import { NavIcon } from '../navigation/NavIcon';
 import { getToolIcon, CHROME_ICONS } from '../navigation/iconRegistry';
 import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
-import { DashboardGrid, PageShell } from '../components/ui/CareDroidPrimitives';
+import {
+  ActionRow,
+  DashboardGrid,
+  DashboardSection,
+  MetricCard,
+  PageShell,
+} from '../components/ui/CareDroidPrimitives';
 import './CostAnalyticsDashboard.css';
 
 const CostAnalyticsDashboard = () => {
@@ -68,18 +74,19 @@ const CostAnalyticsDashboard = () => {
   return (
     <PageShell
       className="cost-analytics-dashboard"
+      contentClassName="cd-page-stack cd-page-stack--compact cost-analytics-dashboard__content"
       title="Cost Analytics"
       description="Track tool usage costs and ROI for CareDroid platform."
       leadingIcon={<NavIcon icon={CHROME_ICONS.circleDollar} size={32} />}
       actions={
-        <>
+        <ActionRow align="end" className="cost-header-actions">
           <button className="btn-secondary" onClick={() => setShowLimitModal(true)}>
             {costLimit ? 'Update Limit' : 'Set Budget'}
           </button>
           <button className="btn-danger" onClick={handleResetCosts}>
             Reset Data
           </button>
-        </>
+        </ActionRow>
       }
     >
 
@@ -115,11 +122,7 @@ const CostAnalyticsDashboard = () => {
 
       {/* Cost Summary Cards */}
       <DashboardGrid variant="metrics" className="cost-summary">
-        <div className="cost-card">
-          <h3>Total Cost</h3>
-          <p className="cost-value">${costData.totalCost.toFixed(2)}</p>
-          <span className="cost-label">All time</span>
-        </div>
+        <MetricCard className="cost-card" label="Total Cost" value={`$${costData.totalCost.toFixed(2)}`} helper="All time" />
         <div className="cost-card">
           <h3>Monthly Cost</h3>
           <p className="cost-value">${costData.monthlyCost.toFixed(2)}</p>
@@ -136,26 +139,20 @@ const CostAnalyticsDashboard = () => {
             </div>
           )}
         </div>
-        <div className="cost-card">
-          <h3>Avg Cost/Tool</h3>
-          <p className="cost-value">
-            ${costData.executions.length > 0 
+        <MetricCard
+          className="cost-card"
+          label="Avg Cost/Tool"
+          value={`$${costData.executions.length > 0
               ? (costData.totalCost / costData.executions.length).toFixed(3)
-              : '0.00'}
-          </p>
-          <span className="cost-label">Per execution</span>
-        </div>
-        <div className="cost-card">
-          <h3>Total Executions</h3>
-          <p className="cost-value">{costData.executions.length}</p>
-          <span className="cost-label">Tool uses</span>
-        </div>
+              : '0.00'}`}
+          helper="Per execution"
+        />
+        <MetricCard className="cost-card" label="Total Executions" value={costData.executions.length} helper="Tool uses" />
       </DashboardGrid>
 
       {/* ROI Metrics */}
-      <section className="cost-panel">
-        <h2>Return on Investment (ROI)</h2>
-        <div className="roi-grid">
+      <DashboardSection className="cost-panel" title="Return on Investment (ROI)">
+        <DashboardGrid variant="summary" className="roi-grid">
           <div className="roi-metric">
             <span className="roi-label">Time Saved</span>
             <strong className="roi-value">{roiMetrics.timeSavedHours} hrs</strong>
@@ -178,15 +175,14 @@ const CostAnalyticsDashboard = () => {
             <span className="roi-label">ROI</span>
             <strong className="roi-value roi-value-large">{roiMetrics.roi}%</strong>
           </div>
-        </div>
+        </DashboardGrid>
         <p className="roi-note">
           * Calculation assumes 5 minutes saved per tool use and $75/hr clinician rate
         </p>
-      </section>
+      </DashboardSection>
 
       {/* Cost by Tool */}
-      <section className="cost-panel">
-        <h2>Top Spending Tools</h2>
+      <DashboardSection className="cost-panel" title="Top Spending Tools">
         {topTools.length === 0 ? (
           <p className="cost-empty">No tool usage recorded yet.</p>
         ) : (
@@ -217,11 +213,10 @@ const CostAnalyticsDashboard = () => {
             );
           })
         )}
-      </section>
+      </DashboardSection>
 
       {/* Cost by Category */}
-      <section className="cost-panel">
-        <h2>Cost by Category</h2>
+      <DashboardSection className="cost-panel" title="Cost by Category">
         {Object.keys(costData.categoryCosts).length === 0 ? (
           <p className="cost-empty">No category data available yet.</p>
         ) : (
@@ -250,11 +245,10 @@ const CostAnalyticsDashboard = () => {
               );
             })
         )}
-      </section>
+      </DashboardSection>
 
       {/* Cost Trends Chart */}
-      <section className="cost-panel">
-        <h2>30-Day Cost Trend</h2>
+      <DashboardSection className="cost-panel" title="30-Day Cost Trend">
         <div className="cost-chart">
           {costTrends.map((day, index) => {
             const maxCost = Math.max(...costTrends.map(d => d.cost), 1);
@@ -276,7 +270,7 @@ const CostAnalyticsDashboard = () => {
             );
           })}
         </div>
-      </section>
+      </DashboardSection>
 
       {/* Cost Limit Modal */}
       {showLimitModal && (

@@ -109,6 +109,7 @@ function PageShell({ title, subtitle, children, actions }) {
       as="div"
       className="commercial-page"
       headerClassName="commercial-header"
+      contentClassName="cd-page-stack cd-page-stack--compact commercial-page__content"
       title={title}
       description={subtitle}
       actions={actions}

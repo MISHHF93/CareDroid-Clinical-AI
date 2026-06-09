@@ -97,6 +97,7 @@ const AnalyticsDashboard = () => {
   return (
     <PageShell
       className="analytics-dashboard"
+      contentClassName="cd-page-stack cd-page-stack--compact analytics-dashboard__content"
       title="Platform Analytics"
       description="Privacy-safe telemetry for tool usage, calculator usage, AI launches, simulation completion, dashboard activity, workflow usage, and search activity."
       leadingIcon={<NavIcon icon={CHROME_ICONS.lineChart} size={28} />}

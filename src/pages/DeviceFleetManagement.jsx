@@ -13,6 +13,18 @@ import {
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS } from '../navigation/iconRegistry';
 import { DEMO_LIVE_STATES } from '../utils/demoLiveState';
+import {
+  ActionRow,
+  DashboardGrid,
+  DashboardSection,
+  DetailRail,
+  FilterPanel,
+  InfoNotice,
+  MetricCard,
+  OverflowCanvas,
+  PageShell,
+  WorkspaceSplit,
+} from '../components/ui/CareDroidPrimitives';
 import './DeviceFleetManagement.css';
 
 const TOOL_ID = 'device-fleet-management';
@@ -33,13 +45,8 @@ function StatusBadge({ value }) {
 }
 
 function SummaryCard({ label, value, tone = 'neutral', hint }) {
-  return (
-    <article className={`device-fleet-summary-card device-fleet-summary-card--${tone}`}>
-      <strong>{value}</strong>
-      <span>{label}</span>
-      {hint ? <small>{hint}</small> : null}
-    </article>
-  );
+  const toneMap = { good: 'success', critical: 'danger' };
+  return <MetricCard className="device-fleet-summary-card" label={label} value={value} helper={hint} tone={toneMap[tone] || tone} />;
 }
 
 function deviceSearchBlob(device, room, bed, unit) {
@@ -66,15 +73,15 @@ function deviceSearchBlob(device, room, bed, unit) {
 function DeviceDetailPanel({ device, room, bed, unit, maintenanceRecord, locationEvents, actionNote, onClose }) {
   if (!device) {
     return (
-      <aside className="device-fleet-detail device-fleet-detail--empty" aria-label="Device fleet details">
+      <DetailRail className="device-fleet-detail device-fleet-detail--empty" aria-label="Device fleet details">
         <h2>Device detail</h2>
         <p>Select a fleet row or card to review assignment, health, service, and location history context.</p>
-      </aside>
+      </DetailRail>
     );
   }
 
   return (
-    <aside className="device-fleet-detail" aria-label={`${device.name} details`}>
+    <DetailRail sticky className="device-fleet-detail" aria-label={`${device.name} details`}>
       <div className="device-fleet-detail-header">
         <div>
           <p className="device-fleet-eyebrow">Demo Device Fleet Detail</p>
@@ -94,7 +101,7 @@ function DeviceDetailPanel({ device, room, bed, unit, maintenanceRecord, locatio
 
       {actionNote ? <p className="device-fleet-action-note">{actionNote}</p> : null}
 
-      <dl className="device-fleet-detail-grid">
+      <DashboardGrid as="dl" variant="summary" className="device-fleet-detail-grid">
         <div><dt>Serial</dt><dd>{device.serialNumber}</dd></div>
         <div><dt>Firmware</dt><dd>{device.firmwareVersion}</dd></div>
         <div><dt>Battery</dt><dd>{device.battery}% ({device.chargingState})</dd></div>
@@ -103,10 +110,9 @@ function DeviceDetailPanel({ device, room, bed, unit, maintenanceRecord, locatio
         <div><dt>Calibration</dt><dd>{statusLabel(device.calibrationStatus)}</dd></div>
         <div><dt>Utilization</dt><dd>{device.utilization}%</dd></div>
         <div><dt>Last service</dt><dd>{maintenanceRecord ? formatHospitalMapTime(maintenanceRecord.dueAt) : 'Demo record not available'}</dd></div>
-      </dl>
+      </DashboardGrid>
 
-      <section className="device-fleet-detail-section">
-        <h3>Location History</h3>
+      <DashboardSection as="section" className="device-fleet-detail-section" title="Location History">
         {locationEvents.length ? (
           <ul className="device-fleet-history">
             {locationEvents.map((event) => (
@@ -120,8 +126,8 @@ function DeviceDetailPanel({ device, room, bed, unit, maintenanceRecord, locatio
         ) : (
           <p className="device-fleet-empty">No live location history endpoint is connected; demo coordinates are shown.</p>
         )}
-      </section>
-    </aside>
+      </DashboardSection>
+    </DetailRail>
   );
 }
 
@@ -209,28 +215,27 @@ export default function DeviceFleetManagement() {
   };
 
   return (
-    <section className="device-fleet-page">
-      <section className="device-fleet-hero" aria-labelledby="device-fleet-title">
-        <div>
-          <p className="device-fleet-eyebrow">Biomedical operations</p>
-          <h1 id="device-fleet-title">Device Fleet Management</h1>
-          <p>
-            Manage the visible medical device inventory with assignment, maintenance, calibration,
-            firmware, battery, utilization, and location-history context. Demo actions are local only.
-          </p>
-        </div>
-        <div className="device-fleet-hero-actions">
+    <PageShell
+      className="device-fleet-page"
+      contentClassName="cd-page-stack cd-page-stack--compact device-fleet-page__content"
+      eyebrow="Biomedical operations"
+      title="Device Fleet Management"
+      titleId="device-fleet-title"
+      description="Manage the visible medical device inventory with assignment, maintenance, calibration, firmware, battery, utilization, and location-history context. Demo actions are local only."
+      actions={
+        <ActionRow align="end" className="device-fleet-hero-actions">
           <Link to="/assistant" className="device-fleet-action">Ask Assistant</Link>
           <Link to="/hospital-map" className="device-fleet-action device-fleet-action--secondary">Open Hospital Map</Link>
           <Link to="/medical-iot" className="device-fleet-action device-fleet-action--secondary">Open Medical IoT</Link>
-        </div>
-      </section>
+        </ActionRow>
+      }
+    >
 
-      <section className="device-fleet-safety" role="note">
-        <strong>Demo/local actions only.</strong> Backend write endpoints for assignment, maintenance,
-        calibration, firmware updates, and status changes are not connected. This page is monitoring
-        and planning support only.
-      </section>
+      <InfoNotice
+        className="device-fleet-safety"
+        label="Demo/local actions only."
+        detail="Backend write endpoints for assignment, maintenance, calibration, firmware updates, and status changes are not connected. This page is monitoring and planning support only."
+      />
 
       {state.loading ? (
         <section className="device-fleet-state" role="status" aria-label="Loading device fleet">
@@ -252,11 +257,11 @@ export default function DeviceFleetManagement() {
 
       {!state.loading && !state.error && snapshot ? (
         <>
-          <section className="device-fleet-source" role="status">
+          <ActionRow className="device-fleet-source" role="status">
             <strong>{snapshot.sourceLabel}</strong>
             <span>Last updated: {formatHospitalMapTime(snapshot.generatedAt)}</span>
             {state.message ? <span>{state.message}</span> : null}
-          </section>
+          </ActionRow>
 
           <StateSourceNotice
             title="Device fleet source states"
@@ -270,7 +275,7 @@ export default function DeviceFleetManagement() {
             details="Inventory, location history, maintenance, calibration, and firmware data come from the demo hospital map contract or local fallback. Row actions are browser-only demo actions; assignment, maintenance, firmware, and calibration write APIs are unsupported."
           />
 
-          <section className="device-fleet-insights" aria-label="Device fleet context insights">
+          <DashboardGrid className="device-fleet-insights" aria-label="Device fleet context insights">
             <ContextInsightCard
               title={
                 summary.maintenanceDue
@@ -313,7 +318,7 @@ export default function DeviceFleetManagement() {
               actionLabel="Ask Assistant"
               actionRoute="/assistant"
             />
-          </section>
+          </DashboardGrid>
 
           <CrossModuleLinkPanel
             moduleId="fleet"
@@ -321,16 +326,16 @@ export default function DeviceFleetManagement() {
             description="Fleet and device management stays linked to hospital map location context and device telemetry freshness."
           />
 
-          <section className="device-fleet-summary" aria-label="Device fleet summary">
+          <DashboardGrid variant="metrics" className="device-fleet-summary" aria-label="Device fleet summary">
             <SummaryCard label="Devices" value={summary.devices} />
             <SummaryCard label="Offline" value={summary.offline} tone={summary.offline ? 'critical' : 'good'} />
             <SummaryCard label="Stale" value={summary.stale} tone={summary.stale ? 'warning' : 'good'} />
             <SummaryCard label="Low battery" value={summary.lowBattery} tone={summary.lowBattery ? 'warning' : 'good'} />
             <SummaryCard label="Maintenance due" value={summary.maintenanceDue} tone={summary.maintenanceDue ? 'warning' : 'good'} />
             <SummaryCard label="Calibration overdue" value={summary.calibrationOverdue} tone={summary.calibrationOverdue ? 'critical' : 'good'} />
-          </section>
+          </DashboardGrid>
 
-          <section className="device-fleet-filters" aria-label="Device fleet filters">
+          <FilterPanel className="device-fleet-filters" aria-label="Device fleet filters">
             <label>
               <span>Status</span>
               <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
@@ -366,15 +371,14 @@ export default function DeviceFleetManagement() {
                 placeholder="Try pump, ICU-14, DEMO-PUMP..."
               />
             </label>
-          </section>
+          </FilterPanel>
 
-          <div className="device-fleet-workspace">
-            <section className="device-fleet-section" aria-labelledby="device-inventory-title">
-              <h2 id="device-inventory-title">Device Inventory</h2>
+          <WorkspaceSplit ratio="wide" className="device-fleet-workspace">
+            <DashboardSection className="device-fleet-section" title="Device Inventory" titleId="device-inventory-title">
               <p className="device-fleet-section-note">
                 Action menu entries are demo/local only until audited backend write endpoints exist.
               </p>
-              <div className="device-fleet-table-wrap">
+              <OverflowCanvas className="device-fleet-table-wrap" minWidth="760px">
                 <table className="device-fleet-table">
                   <thead>
                     <tr>
@@ -415,11 +419,11 @@ export default function DeviceFleetManagement() {
                     ))}
                   </tbody>
                 </table>
-              </div>
+              </OverflowCanvas>
               {filteredDevices.length === 0 ? (
                 <p className="device-fleet-empty">No devices match the current filters.</p>
               ) : null}
-            </section>
+            </DashboardSection>
 
             <DeviceDetailPanel
               device={selectedDevice}
@@ -431,9 +435,9 @@ export default function DeviceFleetManagement() {
               actionNote={selectedActionNote}
               onClose={() => setSelectedDeviceId(null)}
             />
-          </div>
+          </WorkspaceSplit>
         </>
       ) : null}
-    </section>
+    </PageShell>
   );
 }

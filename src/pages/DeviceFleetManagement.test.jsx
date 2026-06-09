@@ -38,8 +38,8 @@ describe('DeviceFleetManagement', () => {
 
     expect(await screen.findByRole('heading', { level: 1, name: /device fleet management/i })).toBeInTheDocument();
     expect(screen.getByText(/demo\/local actions only/i)).toBeInTheDocument();
-    expect(screen.getByText(/demo hospital map telemetry/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /ask assistant/i })).toHaveAttribute('href', '/assistant');
+    expect(screen.getAllByText(/demo hospital map telemetry/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /ask assistant/i })[0]).toHaveAttribute('href', '/assistant');
     expect(screen.getByRole('heading', { name: /device inventory/i })).toBeInTheDocument();
     expect(screen.getAllByText(/firmware/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/maintenance/i).length).toBeGreaterThan(0);
@@ -57,7 +57,7 @@ describe('DeviceFleetManagement', () => {
     await user.click(screen.getByRole('button', { name: /view details/i }));
     const detail = screen.getByRole('complementary', { name: /room 210 glucose monitor details/i });
     expect(within(detail).getByText(/firmware/i)).toBeInTheDocument();
-    expect(within(detail).getByText(/location history placeholder/i)).toBeInTheDocument();
+    expect(within(detail).getByText(/No live location history endpoint is connected/i)).toBeInTheDocument();
     expect(within(detail).getByText(/calibration/i)).toBeInTheDocument();
   });
 

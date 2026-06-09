@@ -434,7 +434,7 @@ describe('Commercial builder pages', () => {
     renderPage(<ProductsIndexPage />);
 
     expect(await screen.findByRole('heading', { name: /reduce triage time/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /emergency department solution/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /emergency flow intelligence platform/i })).toHaveAttribute(
       'href',
       '/products/emergency-department-suite'
     );
@@ -449,7 +449,7 @@ describe('Commercial builder pages', () => {
   it('renders product detail role and workspace mappings', async () => {
     renderProductDetail();
 
-    expect(await screen.findByRole('heading', { name: /emergency department solution/i })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: /emergency flow intelligence platform/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^roles$/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^workspaces$/i })).toBeInTheDocument();
     expect(elementsContaining('Stakeholders: Emergency physicians, Triage nurses').length).toBeGreaterThan(0);
@@ -463,7 +463,7 @@ describe('Commercial builder pages', () => {
 
     expect(await screen.findByRole('heading', { name: /emergency department pack/i })).toBeInTheDocument();
     expect(screen.getByText(/depends on:/i)).toBeInTheDocument();
-    expect(screen.getByText(/emergency department solution/i)).toBeInTheDocument();
+    expect(screen.getByText(/emergency flow intelligence platform/i)).toBeInTheDocument();
     expect(elementsContaining('Buyer persona: ED Director, Chief Medical Officer').length).toBeGreaterThan(0);
     expect(elementsContaining('Expected outcomes: standardized triage').length).toBeGreaterThan(0);
     expect(screen.getByText(/tools\/calculators\/qsofa/i)).toBeInTheDocument();
@@ -546,7 +546,7 @@ describe('Commercial builder pages', () => {
 
     expect(await screen.findByText(/recommended caredroid deployment generated/i)).toBeInTheDocument();
     expect(screen.getByText(/recommended plan/i)).toBeInTheDocument();
-    expect(screen.getByText(/emergency department solution/i)).toBeInTheDocument();
+    expect(screen.getByText(/emergency flow intelligence platform/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/configuration patch preview/i).value).toContain('enabledProductIds');
 
     fireEvent.click(screen.getByRole('button', { name: /apply to organization/i }));
@@ -601,7 +601,7 @@ describe('Commercial builder pages', () => {
   it('saves full tenant configuration from configuration studio', async () => {
     renderPage(<ConfigurationStudioPage />);
 
-    expect(await screen.findByRole('button', { name: /emergency department solution/i })).toHaveClass(
+    expect(await screen.findByRole('button', { name: /emergency flow intelligence platform/i })).toHaveClass(
       'selected',
     );
     expect(screen.getByRole('heading', { name: /navigation/i })).toBeInTheDocument();
@@ -713,8 +713,8 @@ describe('Commercial builder pages', () => {
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
     expect(screen.getByDisplayValue(/ems command/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
-    await screen.findByRole('button', { name: /emergency department solution/i });
-    fireEvent.click(screen.getByRole('button', { name: /emergency department solution/i }));
+    await screen.findByRole('button', { name: /emergency flow intelligence platform/i });
+    fireEvent.click(screen.getByRole('button', { name: /emergency flow intelligence platform/i }));
 
     fireEvent.click(screen.getByRole('button', { name: /next/i }));
     expect(screen.getByDisplayValue(/fleet operator/i)).toBeInTheDocument();

@@ -1,6 +1,5 @@
 .live-map-page {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: var(--compact-page-gap, 14px);
   width: 100%;
   min-width: 0;
@@ -135,36 +134,8 @@
   min-width: 0;
 }
 
-.live-map-summary {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--app-grid-card-min-compact, 11.5rem)), 1fr));
-  gap: var(--compact-panel-gap, 10px);
-  padding: var(--compact-panel-padding, 14px);
-}
-
 .live-map-summary-card {
   min-width: 0;
-  border-radius: var(--compact-card-radius, 12px);
-  padding: 10px;
-  background: var(--app-surface-2);
-}
-
-.live-map-summary-card strong {
-  display: block;
-  font-size: 1.35rem;
-  line-height: 1;
-}
-
-.live-map-summary-card span,
-.live-map-summary-card small {
-  display: block;
-  margin-top: 6px;
-  font-weight: 800;
-}
-
-.live-map-summary-card small {
-  color: var(--app-fg-muted);
-  font-size: 0.78rem;
 }
 
 .live-map-summary-card--good {
@@ -177,13 +148,6 @@
 
 .live-map-summary-card--critical {
   border: 1px solid color-mix(in srgb, var(--app-danger) 35%, var(--app-panel-border));
-}
-
-.live-map-filters {
-  display: grid;
-  grid-template-columns: minmax(160px, 0.25fr) minmax(160px, 0.25fr) minmax(0, 0.5fr);
-  gap: var(--compact-panel-gap, 10px);
-  padding: var(--compact-panel-padding, 14px);
 }
 
 .live-map-filters label {
@@ -208,11 +172,8 @@
 }
 
 .live-map-workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(min(100%, 20rem), 0.55fr);
-  gap: var(--compact-page-gap, 14px);
+  --app-detail-rail-width: 21rem;
   align-items: start;
-  min-width: 0;
 }
 
 .live-map-panel,
