@@ -444,6 +444,34 @@
   list-style: none;
 }
 
+.emergency-journey-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.emergency-journey-summary span,
+.emergency-journey-meta {
+  display: inline-flex;
+  width: fit-content;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--workspace-os-accent, #ff4d5e) 8%, var(--app-surface-2));
+  color: var(--muted-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.emergency-journey-summary span {
+  padding: 7px 10px;
+}
+
+.emergency-journey-meta {
+  padding: 5px 8px;
+}
+
 .emergency-journey-flow li {
   display: grid;
   gap: 3px;
@@ -456,6 +484,190 @@
 .emergency-journey-flow span {
   color: var(--muted-text);
   font-size: 0.84rem;
+  line-height: 1.35;
+}
+
+.emergency-journey-insights {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.emergency-journey-insights p {
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 12px;
+  background: var(--app-surface-2);
+}
+
+.emergency-queue-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.emergency-queue-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 14px;
+  background: var(--app-surface-2);
+}
+
+.emergency-queue-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.emergency-queue-card__header h3 {
+  margin: 2px 0 0;
+}
+
+.emergency-queue-card__header strong {
+  color: var(--text-color);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.emergency-queue-metrics {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.emergency-queue-metrics div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--app-panel-border);
+}
+
+.emergency-queue-metrics dt {
+  color: var(--muted-text);
+  font-size: 0.82rem;
+}
+
+.emergency-queue-metrics dd {
+  margin: 0;
+  color: var(--text-color);
+  font-weight: 700;
+  text-align: right;
+}
+
+.emergency-queue-warning {
+  margin: 0;
+  padding: 9px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--workspace-os-accent, #ff4d5e) 12%, var(--app-surface-2));
+}
+
+.emergency-prearrival-workflow {
+  margin-bottom: 12px;
+}
+
+.emergency-prearrival-vitals,
+.emergency-prearrival-risk-bundle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.emergency-prearrival-vitals span,
+.emergency-prearrival-risk-bundle span {
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: var(--app-surface);
+  color: var(--muted-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.emergency-prearrival-risk-bundle {
+  display: grid;
+}
+
+.emergency-prearrival-risk-bundle strong {
+  color: var(--text-color);
+}
+
+.emergency-capacity-score {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.6fr) minmax(0, 1.4fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.emergency-capacity-score > div {
+  display: grid;
+  gap: 5px;
+  padding: 14px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 16px;
+  background: var(--app-surface-2);
+}
+
+.emergency-capacity-score span {
+  color: var(--muted-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.emergency-capacity-score strong {
+  color: var(--text-color);
+  font-size: clamp(2rem, 5vw, 3.4rem);
+  line-height: 1;
+}
+
+.emergency-capacity-score small {
+  color: var(--muted-text);
+  line-height: 1.4;
+}
+
+.emergency-capacity-score--yellow > div,
+.emergency-capacity-score--orange > div,
+.emergency-capacity-score--red > div {
+  border-color: color-mix(in srgb, var(--workspace-os-accent, #ff4d5e) 46%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--workspace-os-accent, #ff4d5e) 10%, var(--app-surface-2));
+}
+
+.emergency-referral-table {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.emergency-referral-table [role='row'] {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.5fr) repeat(4, minmax(90px, 0.8fr));
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 12px;
+  background: var(--app-surface-2);
+}
+
+.emergency-referral-table__header {
+  color: var(--muted-text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.emergency-referral-table small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted-text);
   line-height: 1.35;
 }
 

@@ -20,6 +20,7 @@ describe('emergencyOperatingSystem complaint router', () => {
       'Chest Pain',
       'Stroke Symptoms',
       'Sepsis Concern',
+      'Trauma',
       'Shortness of Breath',
     ]);
   });
@@ -58,8 +59,18 @@ describe('emergencyOperatingSystem complaint router', () => {
       expect.objectContaining({
         complaint: 'Shortness of Breath',
         calculators: [expect.objectContaining({ label: 'Wells PE' })],
-        protocols: ['Respiratory Protocol'],
+        protocols: expect.arrayContaining(['Respiratory Protocol']),
         safetyStatement: expect.stringMatching(/does not diagnose PE/i),
+      })
+    );
+    expect(routeEmergencyChiefComplaint('trauma activation')).toEqual(
+      expect.objectContaining({
+        complaint: 'Trauma',
+        workflows: ['Trauma Pathway'],
+        protocols: expect.arrayContaining(['Trauma Pathway']),
+        simulations: expect.arrayContaining(['trauma bay team simulation']),
+        referrals: ['Trauma surgery review'],
+        safetyStatement: expect.stringMatching(/does not diagnose injuries/i),
       })
     );
   });
@@ -97,7 +108,7 @@ describe('emergencyOperatingSystem complaint router', () => {
       expect.objectContaining({
         copilotId: 'emergency-ai-copilot',
         matchedRouteId: 'chief-complaint-chest-pain',
-        protocols: ['ACS/chest pain pathway'],
+        protocols: expect.arrayContaining(['ACS/chest pain pathway']),
         nextWorkflowStep: expect.stringMatching(/ACS Workflow/i),
         safetyBoundary: expect.stringMatching(/No autonomous diagnosis/i),
       })

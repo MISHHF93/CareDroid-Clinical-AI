@@ -1,54 +1,13 @@
 import { REGISTRY } from './clinicalToolIdContract';
+import {
+  CLINICAL_INTENT_ROUTES,
+  routeClinicalIntent,
+} from './clinicalIntentRouter';
+import { PATIENT_JOURNEY_STATES } from './patientJourneyEngine';
 
 export const EMERGENCY_WORKSPACE_ID = 'emergency';
 
-export const EMERGENCY_PATIENT_JOURNEY = Object.freeze([
-  Object.freeze({
-    id: 'patient',
-    label: 'Patient',
-    description: 'Person or EMS case entering the ED operating model.',
-  }),
-  Object.freeze({
-    id: 'arrival',
-    label: 'Arrival',
-    description: 'Door, EMS handoff, walk-in, virtual ED, or transfer entry event.',
-  }),
-  Object.freeze({
-    id: 'registration',
-    label: 'Registration',
-    description: 'Identity, encounter, source, payer, consent, and intake capture.',
-  }),
-  Object.freeze({
-    id: 'triage',
-    label: 'Triage',
-    description: 'Vitals, chief complaint, acuity, red flags, and calculator routing.',
-  }),
-  Object.freeze({
-    id: 'clinical-assessment',
-    label: 'Clinical Assessment',
-    description: 'Clinician assessment, differential support, protocols, and evidence review.',
-  }),
-  Object.freeze({
-    id: 'orders',
-    label: 'Orders',
-    description: 'Orders, diagnostics, medications, and protocol-linked order context.',
-  }),
-  Object.freeze({
-    id: 'results',
-    label: 'Results',
-    description: 'Lab, imaging, device, and external result review.',
-  }),
-  Object.freeze({
-    id: 'disposition',
-    label: 'Disposition',
-    description: 'Referral, consult, observation, transfer, discharge, or admission routing.',
-  }),
-  Object.freeze({
-    id: 'discharge-admission',
-    label: 'Discharge/Admission',
-    description: 'Drafted summaries, prior authorization support, handoff, and closure.',
-  }),
-]);
+export const EMERGENCY_PATIENT_JOURNEY = PATIENT_JOURNEY_STATES;
 
 export const EMERGENCY_JOURNEY_BY_ID = Object.freeze(
   Object.fromEntries(EMERGENCY_PATIENT_JOURNEY.map((stage) => [stage.id, stage]))
@@ -69,7 +28,7 @@ export const EMERGENCY_DASHBOARD_WIDGETS = Object.freeze([
     value: 42,
     helper: '11 in assessment, 8 pending results',
     severity: 'medium',
-    journeyStages: ['clinical-assessment', 'orders', 'results'],
+    journeyStages: ['assessment', 'orders', 'results', 'reassessment'],
   }),
   Object.freeze({
     id: 'high-risk-patients',
@@ -77,7 +36,7 @@ export const EMERGENCY_DASHBOARD_WIDGETS = Object.freeze([
     value: 6,
     helper: 'NEWS2/qSOFA/Shock Index review',
     severity: 'critical',
-    journeyStages: ['triage', 'clinical-assessment'],
+    journeyStages: ['triage', 'waiting', 'assessment'],
   }),
   Object.freeze({
     id: 'critical-alerts',
@@ -85,7 +44,7 @@ export const EMERGENCY_DASHBOARD_WIDGETS = Object.freeze([
     value: 4,
     helper: 'Stroke window, sepsis concern, trauma bay',
     severity: 'critical',
-    journeyStages: ['triage', 'clinical-assessment', 'results'],
+    journeyStages: ['triage', 'assessment', 'results', 'reassessment'],
   }),
   Object.freeze({
     id: 'device-alerts',
@@ -93,7 +52,7 @@ export const EMERGENCY_DASHBOARD_WIDGETS = Object.freeze([
     value: 5,
     helper: 'Telemetry stale or monitor disconnected',
     severity: 'high',
-    journeyStages: ['triage', 'clinical-assessment', 'results'],
+    journeyStages: ['triage', 'assessment', 'results'],
   }),
   Object.freeze({
     id: 'staffing-status',
@@ -109,7 +68,7 @@ export const EMERGENCY_DASHBOARD_WIDGETS = Object.freeze([
     value: 9,
     helper: '4 consult drafts need review',
     severity: 'medium',
-    journeyStages: ['clinical-assessment', 'results', 'disposition'],
+    journeyStages: ['assessment', 'results', 'disposition', 'follow-up'],
   }),
   Object.freeze({
     id: 'documentation-queue',
@@ -117,7 +76,7 @@ export const EMERGENCY_DASHBOARD_WIDGETS = Object.freeze([
     value: 14,
     helper: '7 discharge drafts, 3 integrity gaps',
     severity: 'medium',
-    journeyStages: ['clinical-assessment', 'results', 'discharge-admission'],
+    journeyStages: ['assessment', 'results', 'admission', 'discharge'],
   }),
 ]);
 
@@ -185,11 +144,11 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     value: 3,
     helper: '2 handoff summaries pending, 1 offload risk',
     severity: 'high',
-    targetSurface: 'flow',
+    targetSurface: 'pre-arrival',
     primaryAction: Object.freeze({
       label: 'Review EMS handoffs',
       actionType: 'route',
-      target: '/workspace/emergency/flow',
+      target: '/workspace/emergency/pre-arrival',
     }),
     secondaryAction: Object.freeze({
       label: 'Summarize offload risk',
@@ -384,69 +343,7 @@ export const EMERGENCY_RAG_COMPLAINT_CONTEXT = Object.freeze([
   }),
 ]);
 
-export const EMERGENCY_CHIEF_COMPLAINT_ROUTES = Object.freeze([
-  Object.freeze({
-    routeId: 'chief-complaint-chest-pain',
-    complaint: 'Chest Pain',
-    aliases: ['chest pain', 'chest pressure', 'acs concern', 'possible acs', 'cardiac chest pain'],
-    calculators: Object.freeze([
-      Object.freeze({ id: REGISTRY.heartScore, label: 'HEART' }),
-    ]),
-    workflows: Object.freeze(['ACS Workflow']),
-    protocols: Object.freeze(['ACS/chest pain pathway']),
-    referrals: Object.freeze(['Cardiology Referral']),
-    guidance:
-      'Route chest pain to HEART review, ACS workflow guidance, and cardiology referral criteria for clinician review.',
-    safetyStatement:
-      'This route supports workflow guidance only. It does not diagnose ACS or make autonomous referral decisions.',
-  }),
-  Object.freeze({
-    routeId: 'chief-complaint-stroke-symptoms',
-    complaint: 'Stroke Symptoms',
-    aliases: ['stroke symptoms', 'stroke concern', 'weakness', 'facial droop', 'slurred speech', 'neuro deficit'],
-    calculators: Object.freeze([
-      Object.freeze({ id: REGISTRY.nihss, label: 'NIHSS' }),
-    ]),
-    workflows: Object.freeze(['Stroke Workflow']),
-    protocols: Object.freeze(['stroke window workflow']),
-    referrals: Object.freeze(['Neurology referral criteria']),
-    guidance:
-      'Route stroke symptoms to NIHSS review and stroke workflow guidance for time-sensitive clinician review.',
-    safetyStatement:
-      'This route supports stroke workflow guidance only. It does not diagnose stroke or determine treatment eligibility.',
-  }),
-  Object.freeze({
-    routeId: 'chief-complaint-sepsis-concern',
-    complaint: 'Sepsis Concern',
-    aliases: ['sepsis concern', 'possible sepsis', 'infection', 'fever hypotension', 'tachypnea infection'],
-    calculators: Object.freeze([
-      Object.freeze({ id: REGISTRY.qsofa, label: 'qSOFA' }),
-      Object.freeze({ id: REGISTRY.news2, label: 'NEWS2' }),
-    ]),
-    workflows: Object.freeze(['Sepsis Workflow']),
-    protocols: Object.freeze(['sepsis pathway']),
-    referrals: Object.freeze(['Clinician escalation review']),
-    guidance:
-      'Route sepsis concern to qSOFA, NEWS2, and sepsis workflow guidance for clinician escalation review.',
-    safetyStatement:
-      'This route supports sepsis workflow guidance only. It does not diagnose sepsis or order treatment.',
-  }),
-  Object.freeze({
-    routeId: 'chief-complaint-shortness-of-breath',
-    complaint: 'Shortness of Breath',
-    aliases: ['shortness of breath', 'sob', 'dyspnea', 'respiratory distress', 'pe concern'],
-    calculators: Object.freeze([
-      Object.freeze({ id: REGISTRY.wellsPe, label: 'Wells PE' }),
-    ]),
-    workflows: Object.freeze(['Respiratory Workflow']),
-    protocols: Object.freeze(['Respiratory Protocol']),
-    referrals: Object.freeze(['Respiratory escalation review']),
-    guidance:
-      'Route shortness of breath to Wells PE review and respiratory protocol guidance for clinician review.',
-    safetyStatement:
-      'This route supports respiratory workflow guidance only. It does not diagnose PE or determine disposition.',
-  }),
-]);
+export const EMERGENCY_CHIEF_COMPLAINT_ROUTES = CLINICAL_INTENT_ROUTES;
 
 export const EMERGENCY_AI_COPILOT = Object.freeze({
   copilotId: 'emergency-ai-copilot',
@@ -576,7 +473,7 @@ export const EMERGENCY_DEMO_TENANT = Object.freeze({
       id: 'ED-DEMO-002',
       displayName: 'Demo Patient B',
       chiefComplaint: 'Stroke symptoms',
-      stage: 'clinical-assessment',
+      stage: 'assessment',
       acuity: 'Time-sensitive protocol',
       location: 'Assessment bay',
       summary: 'Facial droop sample case with NIHSS and stroke protocol retrieval attached.',
@@ -1314,7 +1211,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
     requiredIntegrations: ['EHR encounter feed', 'ADT', 'vitals monitor', 'triage queue'],
     humanReviewRequirement: 'Required before acuity, diagnosis, orders, or disposition are finalized.',
     workspaceVisibility: ['dashboard', 'triage', 'patients', 'automations', 'analytics'],
-    journeyStages: ['arrival', 'registration', 'triage', 'clinical-assessment'],
+    journeyStages: ['arrival', 'registration', 'triage', 'waiting', 'assessment'],
     subscriptionTier: 'starter',
     riskLevel: 'high',
     status: 'active',
@@ -1347,7 +1244,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
     requiredIntegrations: ['EHR referrals', 'provider directory', 'transfer center', 'secure messaging'],
     humanReviewRequirement: 'Required before referral, transfer, or consult is sent.',
     workspaceVisibility: ['dashboard', 'referrals', 'patients', 'automations', 'analytics'],
-    journeyStages: ['clinical-assessment', 'results', 'disposition'],
+    journeyStages: ['assessment', 'results', 'disposition', 'admission', 'follow-up'],
     subscriptionTier: 'professional',
     riskLevel: 'medium',
     status: 'active',
@@ -1376,7 +1273,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
     requiredIntegrations: ['staff scheduling', 'bed board', 'ADT', 'operations command'],
     humanReviewRequirement: 'Required for staffing changes, diversion posture, and operational escalation.',
     workspaceVisibility: ['dashboard', 'triage', 'analytics', 'automations'],
-    journeyStages: ['arrival', 'triage', 'clinical-assessment', 'disposition'],
+    journeyStages: ['arrival', 'triage', 'waiting', 'assessment', 'disposition', 'admission'],
     subscriptionTier: 'professional',
     riskLevel: 'medium',
     status: 'active',
@@ -1405,7 +1302,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
     requiredIntegrations: ['learning management system', 'competency records'],
     humanReviewRequirement: 'Required for credentialing credit and competency sign-off.',
     workspaceVisibility: ['dashboard', 'simulations', 'automations', 'analytics'],
-    journeyStages: ['triage', 'clinical-assessment', 'disposition'],
+    journeyStages: ['triage', 'assessment', 'reassessment', 'disposition'],
     subscriptionTier: 'professional',
     riskLevel: 'low',
     status: 'active',
@@ -1434,7 +1331,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
     requiredIntegrations: ['medical device feed', 'biomedical ticketing', 'patient monitor integration'],
     humanReviewRequirement: 'Required when device state may affect patient monitoring or care escalation.',
     workspaceVisibility: ['dashboard', 'iot', 'patients', 'automations', 'analytics'],
-    journeyStages: ['triage', 'clinical-assessment', 'results'],
+    journeyStages: ['triage', 'assessment', 'results', 'reassessment'],
     subscriptionTier: 'professional',
     riskLevel: 'high',
     status: 'active',
@@ -1467,7 +1364,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
     requiredIntegrations: ['EHR notes', 'orders/results feed', 'audit logs'],
     humanReviewRequirement: 'Required before documentation is signed, exported, billed, or sent.',
     workspaceVisibility: ['dashboard', 'documentation', 'patients', 'automations', 'analytics'],
-    journeyStages: ['registration', 'clinical-assessment', 'orders', 'results', 'disposition', 'discharge-admission'],
+    journeyStages: ['registration', 'assessment', 'orders', 'results', 'reassessment', 'disposition', 'admission', 'discharge'],
     subscriptionTier: 'starter',
     riskLevel: 'high',
     status: 'active',
@@ -1499,7 +1396,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
     requiredIntegrations: ['guideline store', 'local protocol library', 'clinical intelligence API'],
     humanReviewRequirement: 'Required before protocol selection, orders, diagnosis, or disposition action.',
     workspaceVisibility: ['dashboard', 'triage', 'evidence', 'patients', 'automations', 'analytics'],
-    journeyStages: ['triage', 'clinical-assessment', 'orders', 'results', 'disposition'],
+    journeyStages: ['triage', 'assessment', 'orders', 'results', 'reassessment', 'disposition'],
     subscriptionTier: 'starter',
     riskLevel: 'medium',
     status: 'active',
@@ -1531,7 +1428,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
     requiredIntegrations: ['telehealth platform', 'patient portal', 'EMS handoff', 'EHR encounter feed'],
     humanReviewRequirement: 'Required before escalation, disposition, referral, or ED arrival routing.',
     workspaceVisibility: ['dashboard', 'triage', 'patients', 'automations', 'analytics'],
-    journeyStages: ['arrival', 'registration', 'triage', 'clinical-assessment', 'disposition'],
+    journeyStages: ['arrival', 'registration', 'triage', 'waiting', 'assessment', 'disposition'],
     subscriptionTier: 'professional',
     riskLevel: 'high',
     status: 'active',
@@ -1560,7 +1457,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
     requiredIntegrations: ['EHR documentation', 'medication reconciliation', 'orders/results feed'],
     humanReviewRequirement: 'Required before signature, patient release, admission handoff, or export.',
     workspaceVisibility: ['dashboard', 'documentation', 'patients', 'automations', 'analytics'],
-    journeyStages: ['results', 'disposition', 'discharge-admission'],
+    journeyStages: ['results', 'reassessment', 'disposition', 'admission', 'discharge', 'follow-up'],
     subscriptionTier: 'starter',
     riskLevel: 'medium',
     status: 'active',
@@ -1593,7 +1490,7 @@ export const EMERGENCY_AUTOMATION_MODULES = Object.freeze([
     requiredIntegrations: ['payer policy API', 'EHR orders', 'document export queue'],
     humanReviewRequirement: 'Required before payer submission or external transmission.',
     workspaceVisibility: ['dashboard', 'documentation', 'referrals', 'automations', 'analytics'],
-    journeyStages: ['disposition', 'discharge-admission'],
+    journeyStages: ['disposition', 'admission', 'discharge', 'follow-up'],
     subscriptionTier: 'enterprise',
     riskLevel: 'medium',
     status: 'active',
@@ -1957,19 +1854,7 @@ function normalizeComplaintText(complaint = '') {
 }
 
 export function routeEmergencyChiefComplaint(complaint = '') {
-  const normalized = normalizeComplaintText(complaint);
-  if (!normalized) {
-    return null;
-  }
-
-  const route =
-    EMERGENCY_CHIEF_COMPLAINT_ROUTES.find((candidate) =>
-      candidate.aliases.some((alias) => {
-        const normalizedAlias = normalizeComplaintText(alias);
-        return normalized.includes(normalizedAlias) || normalizedAlias.includes(normalized);
-      })
-    ) || null;
-
+  const route = routeClinicalIntent(complaint);
   if (!route) {
     return null;
   }
@@ -2024,7 +1909,10 @@ export function buildEmergencyCopilotGuidance(input = {}) {
     ...selectedCalculators,
   ]);
   const protocols = Object.freeze([...(routedComplaint?.protocols || [])]);
-  const simulations = Object.freeze([...(routedComplaint?.ragContext?.simulations || [])]);
+  const simulations = Object.freeze([
+    ...(routedComplaint?.simulations || []),
+    ...(routedComplaint?.ragContext?.simulations || []),
+  ]);
   const escalationSuggestions = Object.freeze([
     routedComplaint
       ? `Review ${routedComplaint.complaint} escalation criteria with a clinician before any action.`

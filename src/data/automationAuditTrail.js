@@ -88,6 +88,7 @@ function cloneEntry(entry) {
   return {
     ...entry,
     conditionsEvaluated: [...(entry.conditionsEvaluated || [])],
+    patientJourneyStates: [...(entry.patientJourneyStates || [])],
     user: { ...(entry.user || {}) },
     tenant: { ...(entry.tenant || {}) },
     workspace: { ...(entry.workspace || {}) },
@@ -140,6 +141,7 @@ export function createAutomationAuditEntry(event) {
     triggerFired: event.triggerFired,
     conditionsEvaluated: normalizeConditions(event.conditionsEvaluated),
     actionSelected: event.actionSelected,
+    patientJourneyStates: [...(event.patientJourneyStates || [])],
     user: normalizeEntity(event.user, 'unknown-user', 'Unknown user'),
     tenant: normalizeEntity(event.tenant, 'unknown-tenant', 'Unknown tenant'),
     workspace: normalizeEntity(event.workspace, 'unknown-workspace', 'Unknown workspace'),

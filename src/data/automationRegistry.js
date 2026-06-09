@@ -8,6 +8,7 @@ import {
   EMERGENCY_PATIENT_JOURNEY,
   EMERGENCY_SOLUTION_PACKAGES,
 } from './emergencyOperatingSystem';
+import { PATIENT_JOURNEY_STATE_IDS } from './patientJourneyEngine';
 
 export const AUTOMATION_TYPES = Object.freeze({
   CLINICAL: 'Clinical',
@@ -55,7 +56,13 @@ function normalizeAutomation(definition) {
   });
 }
 
+function normalizePatientJourneyStages(stages = []) {
+  return [...new Set(stages.filter((stage) => PATIENT_JOURNEY_STATE_IDS.includes(stage)))];
+}
+
 function normalizeEmergencyAutomation(module) {
+  const patientJourneyStates = normalizePatientJourneyStages(module.journeyStages || []);
+
   return normalizeAutomation({
     ...module,
     type: AUTOMATION_TYPES[module.type?.toUpperCase().replace(/\s+/g, '_')] || module.type,
@@ -65,7 +72,9 @@ function normalizeEmergencyAutomation(module) {
     organizationTypes: ['hospital', 'ems', 'government'],
     conditions: module.inputs || [],
     aiInvolvement: `${module.requiredAI.join(', ')} supports recommendations only; ${module.humanReviewRequirement}`,
-    requiredWorkflows: module.journeyStages || [],
+    journeyStages: patientJourneyStates,
+    patientJourneyStates,
+    requiredWorkflows: patientJourneyStates,
     requiredIntegrations: module.requiredIntegrations || [],
     humanReviewRequired: /required/i.test(module.humanReviewRequirement),
     outputs: module.outputs || [],

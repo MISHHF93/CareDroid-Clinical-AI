@@ -27,7 +27,229 @@ describe('WorkspaceDataPipelineService', () => {
     expect(data.recommendations.some((item) => item.assetId === 'qsofa')).toBe(true);
     expect(data.analytics.counts.automations).toBe(10);
     expect(data.analytics.solutionPackage.title).toBe('Emergency Flow Intelligence Platform');
-    expect(data.emergency.patientJourney.map((stage) => stage.id)).toContain('disposition');
+    expect(data.emergency.patientJourney.map((stage) => stage.id)).toEqual([
+      'arrival',
+      'registration',
+      'triage',
+      'waiting',
+      'assessment',
+      'orders',
+      'results',
+      'reassessment',
+      'disposition',
+      'admission',
+      'discharge',
+      'follow-up',
+    ]);
+    expect(data.emergency.patientJourney[0]).toEqual(
+      expect.objectContaining({
+        automationCount: expect.any(Number),
+        metrics: expect.objectContaining({
+          activePatients: expect.any(Number),
+          targetMinutes: expect.any(Number),
+        }),
+      })
+    );
+    expect(data.emergency.patientJourneyEngine).toEqual(
+      expect.objectContaining({
+        metrics: expect.objectContaining({
+          totalStates: 12,
+          automationCount: 10,
+          automationCoveragePercent: 100,
+        }),
+        bottlenecks: expect.arrayContaining([
+          expect.objectContaining({
+            stateId: expect.any(String),
+          }),
+        ]),
+        recommendations: expect.arrayContaining([
+          expect.objectContaining({
+            stateId: expect.any(String),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.queueIntelligence).toEqual(
+      expect.objectContaining({
+        metrics: expect.objectContaining({
+          queueCount: 7,
+          bottleneckCount: expect.any(Number),
+          highestRiskQueue: expect.objectContaining({
+            queueId: expect.any(String),
+          }),
+        }),
+        queues: expect.arrayContaining([
+          expect.objectContaining({
+            label: 'Waiting Room',
+            count: expect.any(Number),
+            waitTime: expect.any(Number),
+            oldestPatient: expect.objectContaining({ waitMinutes: expect.any(Number) }),
+            riskLevel: expect.any(String),
+            throughput: expect.any(Number),
+          }),
+        ]),
+        recommendations: expect.arrayContaining([
+          expect.objectContaining({
+            action: expect.stringMatching(/before downstream queues degrade/i),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.emsPreArrival).toEqual(
+      expect.objectContaining({
+        workflow: expect.arrayContaining([
+          expect.objectContaining({ label: 'EMS Assessment' }),
+          expect.objectContaining({ label: 'Arrival' }),
+        ]),
+        metrics: expect.objectContaining({
+          incomingCount: 3,
+          nextEtaMinutes: expect.any(Number),
+          handoffReadyCount: 3,
+        }),
+        queue: expect.objectContaining({
+          label: 'Pre-arrival queue',
+          incomingPatients: expect.arrayContaining([
+            expect.objectContaining({
+              etaMinutes: expect.any(Number),
+              riskScoreBundle: expect.arrayContaining([
+                expect.objectContaining({ label: expect.any(String) }),
+              ]),
+              handoffSummary: expect.any(String),
+            }),
+          ]),
+        }),
+        recommendations: expect.arrayContaining([
+          expect.objectContaining({
+            action: expect.stringMatching(/before arrival/i),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.capacityIntelligence).toEqual(
+      expect.objectContaining({
+        score: expect.any(Number),
+        riskLevel: expect.stringMatching(/Green|Yellow|Orange|Red/),
+        occupancyPercent: expect.any(Number),
+        signals: expect.arrayContaining([
+          expect.objectContaining({ id: 'currentCensus', value: expect.any(Number) }),
+          expect.objectContaining({ id: 'occupiedSpaces', value: expect.any(Number) }),
+          expect.objectContaining({ id: 'availableSpaces', value: expect.any(Number) }),
+          expect.objectContaining({ id: 'pendingAdmissions', value: expect.any(Number) }),
+          expect.objectContaining({ id: 'boardingPatients', value: expect.any(Number) }),
+          expect.objectContaining({ id: 'emsArrivals', value: expect.any(Number) }),
+          expect.objectContaining({ id: 'dischargeCandidates', value: expect.any(Number) }),
+        ]),
+        recommendations: expect.arrayContaining([
+          expect.objectContaining({
+            action: expect.any(String),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.referralHub).toEqual(
+      expect.objectContaining({
+        flowStages: expect.arrayContaining([
+          expect.objectContaining({ label: 'Request' }),
+          expect.objectContaining({ label: 'Closed' }),
+        ]),
+        departments: ['Cardiology', 'Neurology', 'Psychiatry', 'Internal Medicine', 'Surgery'],
+        metrics: expect.objectContaining({
+          total: expect.any(Number),
+          delayed: expect.any(Number),
+          accepted: expect.any(Number),
+          closed: expect.any(Number),
+        }),
+        delays: expect.arrayContaining([
+          expect.objectContaining({
+            department: expect.any(String),
+            delayMinutes: expect.any(Number),
+          }),
+        ]),
+        recommendations: expect.arrayContaining([
+          expect.objectContaining({
+            action: expect.stringMatching(/Confirm owner/i),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.boardingIntelligence).toEqual(
+      expect.objectContaining({
+        score: expect.any(Number),
+        metrics: expect.objectContaining({
+          boardingCount: expect.any(Number),
+          boardingTime: expect.any(Number),
+          longestBoardingMinutes: expect.any(Number),
+          pendingBeds: expect.any(Number),
+          bedPressure: expect.any(String),
+        }),
+        longestBoarders: expect.arrayContaining([
+          expect.objectContaining({
+            patientLabel: expect.any(String),
+            boardingMinutes: expect.any(Number),
+            pendingBedType: expect.any(String),
+          }),
+        ]),
+        recommendations: expect.arrayContaining([
+          expect.objectContaining({
+            action: expect.any(String),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.automationMarketplace).toEqual(
+      expect.objectContaining({
+        metrics: expect.objectContaining({
+          totalModules: 10,
+          enabledModules: expect.any(Number),
+          disabledModules: expect.any(Number),
+          categories: 8,
+        }),
+        categories: expect.arrayContaining([
+          expect.objectContaining({ category: 'Triage' }),
+          expect.objectContaining({ category: 'Referral' }),
+          expect.objectContaining({ category: 'Documentation' }),
+          expect.objectContaining({ category: 'EMS' }),
+          expect.objectContaining({ category: 'Capacity' }),
+          expect.objectContaining({ category: 'Boarding' }),
+          expect.objectContaining({ category: 'Equipment' }),
+          expect.objectContaining({ category: 'Discharge' }),
+        ]),
+        modules: expect.arrayContaining([
+          expect.objectContaining({
+            enabled: expect.any(Boolean),
+            disabled: expect.any(Boolean),
+            subscriptionTier: expect.any(String),
+            workspaceVisibility: expect.any(Array),
+            roiEstimate: expect.any(String),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.operatingSystem).toEqual(
+      expect.objectContaining({
+        title: 'Emergency Department Operating System',
+        route: '/workspace/emergency',
+        status: 'standalone-saas-ready',
+        responsibilities: ['patient flow', 'queue flow', 'referral flow', 'EMS flow', 'capacity flow', 'discharge flow'],
+        patientFlow: expect.any(Object),
+        queueFlow: expect.any(Object),
+        referralFlow: expect.any(Object),
+        emsFlow: expect.any(Object),
+        capacityFlow: expect.any(Object),
+        dischargeFlow: expect.objectContaining({
+          dischargeCandidates: expect.any(Number),
+        }),
+        copilot: expect.objectContaining({
+          copilotId: 'emergency-ai-copilot',
+        }),
+        analytics: expect.objectContaining({
+          route: '/workspace/emergency/analytics',
+        }),
+        automationMarketplace: expect.objectContaining({
+          metrics: expect.objectContaining({ totalModules: 10 }),
+        }),
+      })
+    );
     expect(data.emergency.dashboardWidgets.map((widget) => widget.label)).toEqual(
       expect.arrayContaining(['Waiting Room', 'Active Patients', 'Documentation Queue'])
     );
@@ -54,8 +276,16 @@ describe('WorkspaceDataPipelineService', () => {
         }),
       })
     );
+    expect(data.emergency.commandCenterWidgets.find((widget) => widget.id === 'ems-arrivals')).toEqual(
+      expect.objectContaining({
+        targetSurface: 'pre-arrival',
+        primaryAction: expect.objectContaining({
+          target: '/workspace/emergency/pre-arrival',
+        }),
+      })
+    );
     expect(data.subpages.map((subpage) => subpage.id)).toEqual(
-      expect.arrayContaining(['demo', 'deployment', 'flow', 'onboarding', 'roi'])
+      expect.arrayContaining(['boarding', 'capacity', 'command-center', 'demo', 'deployment', 'flow', 'onboarding', 'pre-arrival', 'queues', 'roi'])
     );
     expect(data.emergency.demoTenant).toEqual(
       expect.objectContaining({
@@ -175,6 +405,7 @@ describe('WorkspaceDataPipelineService', () => {
       'Chest Pain',
       'Stroke Symptoms',
       'Sepsis Concern',
+      'Trauma',
       'Shortness of Breath',
     ]);
     expect(data.emergency.chiefComplaintRoutes[0]).toEqual(
@@ -182,7 +413,19 @@ describe('WorkspaceDataPipelineService', () => {
         calculators: [expect.objectContaining({ label: 'HEART' })],
         workflows: ['ACS Workflow'],
         referrals: ['Cardiology Referral'],
+        simulations: ['ACS chest pain simulation'],
         safetyStatement: expect.stringMatching(/does not diagnose/i),
+      })
+    );
+    expect(data.emergency.clinicalIntentRouter).toEqual(
+      expect.objectContaining({
+        outputSchema: ['calculators', 'protocols', 'workflows', 'simulations', 'referrals'],
+        routes: expect.arrayContaining([
+          expect.objectContaining({
+            complaint: 'Trauma',
+            workflows: ['Trauma Pathway'],
+          }),
+        ]),
       })
     );
     expect(data.emergency.aiCopilot).toEqual(

@@ -34,6 +34,8 @@ function shouldBlock(automation, context = {}) {
 }
 
 function buildAuditEvent(automation, status, context = {}, extra = {}) {
+  const patientJourneyStates = automation?.patientJourneyStates || automation?.journeyStages || automation?.requiredWorkflows || [];
+
   return {
     triggerFired: automation?.trigger || 'Automation trigger',
     conditionsEvaluated: (automation?.conditions || []).map((condition) => ({
@@ -41,6 +43,7 @@ function buildAuditEvent(automation, status, context = {}, extra = {}) {
       result: conditionResult(condition, context),
     })),
     actionSelected: (automation?.actions || [])[0] || 'Review automation',
+    patientJourneyStates,
     user: context.user || { id: 'local-user', name: 'Local user' },
     tenant: context.tenant || { id: 'local-demo-tenant', name: 'Local Demo Tenant' },
     workspace: {
@@ -65,6 +68,7 @@ function buildAuditEvent(automation, status, context = {}, extra = {}) {
 export const AutomationEngine = {
   evaluateAutomation(automationId, context = {}) {
     const automation = getAutomationById(automationId);
+    const patientJourneyStates = automation?.patientJourneyStates || automation?.journeyStages || automation?.requiredWorkflows || [];
     const blockedReason = shouldBlock(automation, context);
     const conditionResults = (automation?.conditions || []).map((condition) => ({
       label: condition,
@@ -79,6 +83,7 @@ export const AutomationEngine = {
         automation,
         reason: blockedReason || `Condition failed: ${failedCondition.label}`,
         conditionResults,
+        patientJourneyStates,
         actions: [],
       };
     }
@@ -89,6 +94,7 @@ export const AutomationEngine = {
       automation,
       reason: '',
       conditionResults,
+      patientJourneyStates,
       actions: automation.actions,
     };
   },
@@ -110,6 +116,12 @@ export const AutomationEngine = {
       ...evaluation,
       auditEntry,
       outputs: evaluation.automation.outputs,
+      patientJourneyStates:
+        evaluation.patientJourneyStates ||
+        evaluation.automation.patientJourneyStates ||
+        evaluation.automation.journeyStages ||
+        evaluation.automation.requiredWorkflows ||
+        [],
       assistantPrompt: `Review ${evaluation.automation.title} in ${evaluation.automation.workspace}. ${evaluation.automation.aiInvolvement}`,
     };
   },

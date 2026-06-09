@@ -20,11 +20,15 @@ describe('AutomationEngine', () => {
 
     expect(result.ok).toBe(true);
     expect(result.outputs).toEqual(expect.arrayContaining(['risk profile', 'calculator recommendations']));
+    expect(result.patientJourneyStates).toEqual(
+      expect.arrayContaining(['arrival', 'registration', 'triage', 'waiting', 'assessment'])
+    );
     expect(result.auditEntry).toEqual(
       expect.objectContaining({
         workspace: expect.objectContaining({ id: 'emergency' }),
         status: 'success',
         toolCalled: 'qsofa',
+        patientJourneyStates: expect.arrayContaining(['triage', 'assessment']),
       })
     );
     expect(getAutomationAuditEntries()).toHaveLength(1);

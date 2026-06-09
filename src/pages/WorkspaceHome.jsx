@@ -262,7 +262,58 @@ function WorkspaceAutomationHub({ workspaceId, solutionPackage, onRunAutomation 
   );
 }
 
-function EmergencyJourneyFlow({ journey = [] }) {
+function EmergencyAutomationMarketplacePanel({ marketplace = {} }) {
+  const categories = marketplace.categories || [];
+  const metrics = marketplace.metrics || {};
+
+  return (
+    <section className="workspace-panel emergency-automation-marketplace" aria-labelledby="ed-automation-marketplace-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">SaaS Marketplace</p>
+        <h2 id="ed-automation-marketplace-title">ED Automation Marketplace</h2>
+        <p>{marketplace.packagingStatement || 'Emergency automations are packaged as sellable SaaS modules.'}</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="ED automation marketplace metrics">
+        <span>{metrics.totalModules || 0} modules</span>
+        <span>{metrics.enabledModules || 0} enabled</span>
+        <span>{metrics.disabledModules || 0} disabled</span>
+        <span>{metrics.categories || 0} categories</span>
+      </div>
+      <div className="emergency-queue-grid">
+        {categories.map((category) => (
+          <article key={category.category} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">Marketplace Category</span>
+                <h3>{category.category}</h3>
+              </div>
+              <strong>{category.moduleCount}</strong>
+            </div>
+            <p>
+              {category.enabledCount} enabled · {category.disabledCount} disabled
+            </p>
+            <div className="emergency-journey-insights">
+              {category.modules.map((module) => (
+                <p key={`${category.category}-${module.automationId}`}>
+                  <strong>{module.title}:</strong> {module.subscriptionTier} · {module.enabled ? 'enabled' : 'disabled'} ·{' '}
+                  {module.roiEstimate}
+                  <br />
+                  <span>Visibility: {module.workspaceVisibility.join(', ')}</span>
+                </p>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function EmergencyJourneyFlow({ journey = [], engine = {} }) {
+  const metrics = engine.metrics;
+  const bottlenecks = engine.bottlenecks || [];
+  const recommendations = engine.recommendations || [];
+
   return (
     <section className="workspace-panel emergency-journey-panel" aria-labelledby="emergency-journey-title">
       <div className="workspace-panel__header">
@@ -270,14 +321,499 @@ function EmergencyJourneyFlow({ journey = [] }) {
         <h2 id="emergency-journey-title">Canonical ED Flow</h2>
         <p>Every automation maps to this operating path instead of launching as an isolated tool.</p>
       </div>
+      {metrics ? (
+        <div className="emergency-journey-summary" aria-label="Patient journey metrics">
+          <span>{metrics.activePatients} active patients</span>
+          <span>{metrics.waitingPatients} waiting</span>
+          <span>{metrics.bottleneckCount} bottlenecks</span>
+          <span>{metrics.automationCoveragePercent}% automation coverage</span>
+        </div>
+      ) : null}
       <ol className="emergency-journey-flow">
         {journey.map((stage) => (
           <li key={stage.id}>
             <strong>{stage.label}</strong>
             <span>{stage.description}</span>
+            <small className="emergency-journey-meta">
+              {stage.automationCount || 0} automations | {stage.metrics?.waitingPatients || 0} waiting | target{' '}
+              {stage.metrics?.targetMinutes || stage.targetMinutes} min
+            </small>
           </li>
         ))}
       </ol>
+      {bottlenecks.length || recommendations.length ? (
+        <div className="emergency-journey-insights" aria-label="Patient journey recommendations">
+          {bottlenecks.slice(0, 2).map((bottleneck) => (
+            <p key={bottleneck.stateId}>
+              <strong>{bottleneck.label} bottleneck:</strong> {bottleneck.reason}
+            </p>
+          ))}
+          {recommendations.slice(0, 2).map((recommendation) => (
+            <p key={recommendation.id}>
+              <strong>{recommendation.title}:</strong> {recommendation.action}
+            </p>
+          ))}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function EmergencyQueueIntelligencePanel({ queueIntelligence = {}, onAskAssistant }) {
+  const queues = queueIntelligence.queues || [];
+  const metrics = queueIntelligence.metrics || {};
+  const bottlenecks = queueIntelligence.bottlenecks || [];
+  const recommendations = queueIntelligence.recommendations || [];
+
+  return (
+    <section className="workspace-panel emergency-queue-panel" aria-labelledby="emergency-queue-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Queue Intelligence</p>
+        <h2 id="emergency-queue-title">Emergency Queue Intelligence</h2>
+        <p>CareDroid watches ED queue pressure, oldest-patient waits, risk, and throughput before staff notice bottlenecks.</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="Emergency queue metrics">
+        <span>{metrics.totalCount || 0} queued items</span>
+        <span>{metrics.averageWaitTime || 0} min average wait</span>
+        <span>{metrics.totalThroughput || 0}/hr throughput</span>
+        <span>{metrics.bottleneckCount || 0} early warnings</span>
+      </div>
+      <div className="emergency-queue-grid">
+        {queues.map((queue) => (
+          <article
+            key={queue.id}
+            className={`emergency-queue-card emergency-dashboard-widget--${queue.bottleneck?.severity || queue.riskLevel}`}
+          >
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{queue.riskLevel} risk</span>
+                <h3>{queue.label}</h3>
+              </div>
+              <strong>{queue.count}</strong>
+            </div>
+            <p>{queue.description}</p>
+            <dl className="emergency-queue-metrics">
+              <div>
+                <dt>Wait time</dt>
+                <dd>{queue.waitTime} min</dd>
+              </div>
+              <div>
+                <dt>Oldest patient</dt>
+                <dd>
+                  {queue.oldestPatient.label} ({queue.oldestPatient.waitMinutes} min)
+                </dd>
+              </div>
+              <div>
+                <dt>Throughput</dt>
+                <dd>{queue.throughput}/hr</dd>
+              </div>
+            </dl>
+            {queue.bottleneck ? (
+              <p className="emergency-queue-warning">
+                <strong>Early warning:</strong> {queue.bottleneck.reason}
+              </p>
+            ) : null}
+          </article>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Emergency queue recommendations">
+        {bottlenecks.slice(0, 3).map((bottleneck) => (
+          <p key={bottleneck.queueId}>
+            <strong>{bottleneck.label}:</strong> {bottleneck.reason}
+          </p>
+        ))}
+        {recommendations.slice(0, 3).map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Prioritize Emergency Queue Intelligence bottlenecks: ${recommendations
+              .slice(0, 3)
+              .map((recommendation) => recommendation.title)
+              .join(', ')}. Keep all actions human-reviewed.`
+          )
+        }
+      >
+        Ask assistant to prioritize queue bottlenecks
+      </button>
+    </section>
+  );
+}
+
+function EmergencyPreArrivalPanel({ preArrival = {}, onAskAssistant }) {
+  const workflow = preArrival.workflow || [];
+  const queue = preArrival.queue || {};
+  const incomingPatients = queue.incomingPatients || [];
+  const metrics = preArrival.metrics || {};
+  const recommendations = preArrival.recommendations || [];
+
+  return (
+    <section className="workspace-panel emergency-prearrival-panel" aria-labelledby="emergency-prearrival-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">EMS to ED Pipeline</p>
+        <h2 id="emergency-prearrival-title">EMS Pre-arrival Workspace</h2>
+        <p>Patient journey context starts before arrival with structured EMS assessment, complaint, vitals, risk profile, ED notification, and arrival readiness.</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="EMS pre-arrival metrics">
+        <span>{metrics.incomingCount || 0} incoming patients</span>
+        <span>{metrics.nextEtaMinutes || 0} min next ETA</span>
+        <span>{metrics.criticalCount || 0} critical risk</span>
+        <span>{metrics.handoffReadyCount || 0} handoffs ready</span>
+      </div>
+      <ol className="emergency-journey-flow emergency-prearrival-workflow">
+        {workflow.map((step) => (
+          <li key={step.id}>
+            <strong>{step.label}</strong>
+            <span>{step.description}</span>
+          </li>
+        ))}
+      </ol>
+      <div className="emergency-queue-grid">
+        {incomingPatients.map((patient) => (
+          <article
+            key={patient.id}
+            className={`emergency-queue-card emergency-dashboard-widget--${patient.riskLevel}`}
+          >
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{patient.unit}</span>
+                <h3>{patient.patientLabel}</h3>
+              </div>
+              <strong>{patient.etaMinutes}m</strong>
+            </div>
+            <p>{patient.complaint}</p>
+            <dl className="emergency-queue-metrics">
+              <div>
+                <dt>ETA</dt>
+                <dd>{patient.etaMinutes} min</dd>
+              </div>
+              <div>
+                <dt>Risk level</dt>
+                <dd>{patient.riskLevel}</dd>
+              </div>
+              <div>
+                <dt>ED notification</dt>
+                <dd>{patient.notificationStatus}</dd>
+              </div>
+            </dl>
+            <div className="emergency-prearrival-vitals" aria-label={`${patient.patientLabel} vitals`}>
+              <span>BP {patient.vitals.bloodPressure}</span>
+              <span>HR {patient.vitals.heartRate}</span>
+              <span>RR {patient.vitals.respiratoryRate}</span>
+              <span>SpO2 {patient.vitals.oxygenSaturation}</span>
+            </div>
+            <div className="emergency-prearrival-risk-bundle">
+              <strong>Risk score bundle</strong>
+              {patient.riskScoreBundle.map((score) => (
+                <span key={score.id}>
+                  {score.label}: {score.value} ({score.riskLevel})
+                </span>
+              ))}
+            </div>
+            <p className="emergency-queue-warning">
+              <strong>Handoff summary:</strong> {patient.handoffSummary}
+            </p>
+          </article>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="EMS pre-arrival recommendations">
+        {recommendations.slice(0, 3).map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+        <p>
+          <strong>Safety boundary:</strong> {preArrival.safetyStatement}
+        </p>
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Prepare ED for incoming EMS patients: ${incomingPatients
+              .slice(0, 3)
+              .map((patient) => `${patient.patientLabel} ETA ${patient.etaMinutes} minutes, ${patient.complaint}`)
+              .join('; ')}. Keep all triage and clinical actions human-reviewed.`
+          )
+        }
+      >
+        Ask assistant to prepare ED handoff
+      </button>
+    </section>
+  );
+}
+
+function EmergencyCapacityIntelligencePanel({ capacity = {}, onAskAssistant }) {
+  const signals = capacity.signals || [];
+  const recommendations = capacity.recommendations || [];
+
+  return (
+    <section className="workspace-panel emergency-capacity-panel" aria-labelledby="emergency-capacity-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Capacity Intelligence</p>
+        <h2 id="emergency-capacity-title">Emergency Capacity Intelligence</h2>
+        <p>Staff can understand department pressure instantly from census, spaces, admissions, boarding, EMS arrivals, and discharge candidates.</p>
+      </div>
+      <div className={`emergency-capacity-score emergency-capacity-score--${cssToken(capacity.riskLevel)}`}>
+        <div>
+          <span>Capacity Score</span>
+          <strong>{capacity.score ?? 0}</strong>
+          <small>{capacity.occupancyPercent ?? 0}% occupied</small>
+        </div>
+        <div>
+          <span>Risk Level</span>
+          <strong>{capacity.riskLevel || 'Green'}</strong>
+          <small>{capacity.summary}</small>
+        </div>
+      </div>
+      <div className="emergency-queue-grid">
+        {signals.map((signal) => (
+          <article key={signal.id} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">Pressure signal</span>
+                <h3>{signal.label}</h3>
+              </div>
+              <strong>{signal.value}</strong>
+            </div>
+            <p>{signal.helper}</p>
+          </article>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Emergency capacity recommendations">
+        {recommendations.map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Summarize ED capacity pressure. Capacity score ${capacity.score}, risk level ${capacity.riskLevel}. ${recommendations
+              .slice(0, 3)
+              .map((recommendation) => recommendation.title)
+              .join(', ')}. Keep operational actions human-reviewed.`
+          )
+        }
+      >
+        Ask assistant to summarize capacity pressure
+      </button>
+    </section>
+  );
+}
+
+function EmergencyReferralHubPanel({ referralHub = {}, automations = [], onAskAssistant }) {
+  const flowStages = referralHub.flowStages || [];
+  const departmentQueues = referralHub.departmentQueues || [];
+  const referrals = referralHub.referrals || [];
+  const metrics = referralHub.metrics || {};
+  const delays = referralHub.delays || [];
+  const recommendations = referralHub.recommendations || [];
+  const referralAutomations = automations.filter((automation) => automation.workspaceVisibility?.includes('referrals'));
+
+  return (
+    <section className="workspace-panel emergency-referral-panel" aria-labelledby="emergency-referral-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">ReferralHub</p>
+        <h2 id="emergency-referral-title">Referral Intelligence Network</h2>
+        <p>Tracks referral requests from classification through department queue, review, acceptance, and closure so delays become measurable.</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="ReferralHub metrics">
+        <span>{metrics.active || 0} active referrals</span>
+        <span>{metrics.delayed || 0} delayed</span>
+        <span>{metrics.accepted || 0} accepted</span>
+        <span>{metrics.closed || 0} closed</span>
+      </div>
+      <ol className="emergency-journey-flow emergency-prearrival-workflow">
+        {flowStages.map((stage) => (
+          <li key={stage.id}>
+            <strong>{stage.label}</strong>
+            <span>Target: {stage.targetMinutes} min</span>
+          </li>
+        ))}
+      </ol>
+      <div className="emergency-queue-grid">
+        {departmentQueues.map((queue) => (
+          <article key={queue.department} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">Department Queue</span>
+                <h3>{queue.department}</h3>
+              </div>
+              <strong>{queue.count}</strong>
+            </div>
+            <dl className="emergency-queue-metrics">
+              <div>
+                <dt>Delayed</dt>
+                <dd>{queue.delayedCount}</dd>
+              </div>
+              <div>
+                <dt>Avg elapsed</dt>
+                <dd>{queue.averageElapsedMinutes} min</dd>
+              </div>
+              <div>
+                <dt>Oldest referral</dt>
+                <dd>{queue.oldestReferral?.id || 'None'}</dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+      <div className="emergency-referral-table" role="table" aria-label="Referral rows">
+        <div role="row" className="emergency-referral-table__header">
+          <span role="columnheader">Referral</span>
+          <span role="columnheader">Department</span>
+          <span role="columnheader">Stage</span>
+          <span role="columnheader">Elapsed</span>
+          <span role="columnheader">Priority</span>
+        </div>
+        {referrals.map((referral) => (
+          <div key={referral.id} role="row">
+            <span role="cell">
+              <strong>{referral.id}</strong>
+              <small>{referral.patientLabel}: {referral.reason}</small>
+            </span>
+            <span role="cell">{referral.department}</span>
+            <span role="cell">{referral.stageLabel}</span>
+            <span role="cell">{referral.elapsedMinutes} min</span>
+            <span role="cell">{referral.priority}</span>
+          </div>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Referral delay recommendations">
+        {delays.slice(0, 3).map((delay) => (
+          <p key={delay.referralId}>
+            <strong>{delay.department} delay:</strong> {delay.reason}
+          </p>
+        ))}
+        {recommendations.slice(0, 3).map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+        <p>
+          <strong>Safety boundary:</strong> {referralHub.safetyStatement}
+        </p>
+      </div>
+      {referralAutomations.length ? (
+        <div className="emergency-journey-insights" aria-label="Referral automations">
+          {referralAutomations.map((automation) => (
+            <p key={automation.automationId}>
+              <strong>{automation.title}:</strong> {automation.description}
+            </p>
+          ))}
+        </div>
+      ) : null}
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Prioritize ReferralHub delays: ${recommendations
+              .slice(0, 3)
+              .map((recommendation) => recommendation.title)
+              .join(', ')}. Keep referral sending, acceptance, and closure human-reviewed.`
+          )
+        }
+      >
+        Ask assistant to prioritize referral delays
+      </button>
+    </section>
+  );
+}
+
+function EmergencyBoardingIntelligencePanel({ boarding = {}, onAskAssistant }) {
+  const metrics = boarding.metrics || {};
+  const boarders = boarding.boarders || [];
+  const longestBoarders = boarding.longestBoarders || [];
+  const recommendations = boarding.recommendations || [];
+
+  return (
+    <section className="workspace-panel emergency-boarding-panel" aria-labelledby="emergency-boarding-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Boarding Intelligence</p>
+        <h2 id="emergency-boarding-title">Boarding Intelligence Engine</h2>
+        <p>Tracks admitted patients waiting for beds so boarding becomes visible, measurable, and ready for operations review.</p>
+      </div>
+      <div className={`emergency-capacity-score emergency-capacity-score--${cssToken(metrics.bedPressure)}`}>
+        <div>
+          <span>Boarding Risk Score</span>
+          <strong>{boarding.score ?? 0}</strong>
+          <small>{metrics.bedPressure || 'Moderate'} bed pressure</small>
+        </div>
+        <div>
+          <span>Boarding Snapshot</span>
+          <strong>{metrics.boardingCount || 0}</strong>
+          <small>
+            {metrics.boardingTime || 0} min avg boarding time · {metrics.pendingBeds || 0} pending beds
+          </small>
+        </div>
+      </div>
+      <div className="emergency-journey-summary" aria-label="Boarding metrics">
+        <span>{metrics.boardingCount || 0} boarding patients</span>
+        <span>{metrics.boardingTime || 0} min boarding time</span>
+        <span>{metrics.longestBoardingMinutes || 0} min longest boarder</span>
+        <span>{metrics.pendingBeds || 0} pending beds</span>
+      </div>
+      <div className="emergency-referral-table" role="table" aria-label="Boarding patients">
+        <div role="row" className="emergency-referral-table__header">
+          <span role="columnheader">Patient</span>
+          <span role="columnheader">Service</span>
+          <span role="columnheader">Boarding time</span>
+          <span role="columnheader">Pending bed</span>
+          <span role="columnheader">Location</span>
+        </div>
+        {boarders.map((boarder) => (
+          <div key={boarder.patientId} role="row">
+            <span role="cell">
+              <strong>{boarder.patientLabel}</strong>
+              <small>{boarder.acuity}</small>
+            </span>
+            <span role="cell">{boarder.admittedService}</span>
+            <span role="cell">{boarder.boardingMinutes} min</span>
+            <span role="cell">{boarder.pendingBedType}</span>
+            <span role="cell">{boarder.location}</span>
+          </div>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Longest boarders">
+        {longestBoarders.map((boarder) => (
+          <p key={boarder.patientId}>
+            <strong>{boarder.patientLabel}:</strong> {boarder.boardingMinutes} minutes waiting for {boarder.pendingBedType}.
+          </p>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Boarding recommendations">
+        {recommendations.map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+        <p>
+          <strong>Safety boundary:</strong> {boarding.safetyStatement}
+        </p>
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Summarize ED boarding pressure. Boarding risk score ${boarding.score}, ${metrics.boardingCount} admitted patients waiting for beds, ${metrics.pendingBeds} pending beds. Keep bed assignment and transfer actions human-reviewed.`
+          )
+        }
+      >
+        Ask assistant to summarize boarding pressure
+      </button>
     </section>
   );
 }
@@ -339,6 +875,153 @@ function EmergencyCommandCenter({ emergency, onLaunchRoute, onAskAssistant }) {
           ))}
         </ol>
       </aside>
+    </section>
+  );
+}
+
+function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute, onAskAssistant }) {
+  const operatingSystem = emergency.operatingSystem;
+  const commandWidgets = emergency.commandCenterWidgets || [];
+  const widgetById = Object.fromEntries(commandWidgets.map((widget) => [widget.id, widget]));
+  const waitingRoomQueue = emergency.queueIntelligence?.queues?.find((queue) => queue.id === 'waiting-room');
+  const emsPreArrival = emergency.emsPreArrival;
+  const boarding = emergency.boardingIntelligence;
+  const referralHub = emergency.referralHub;
+  const capacity = emergency.capacityIntelligence;
+  const automationState = AutomationEngine.getWorkspaceAutomationState(workspaceId);
+  const automationCount =
+    automationState.activeAutomations.length + automationState.demoAutomations.length + automationState.blockedAutomations.length;
+
+  const directorSections = [
+    {
+      id: 'waiting-room',
+      label: 'Waiting Room',
+      value: waitingRoomQueue?.count ?? widgetById['waiting-room']?.value ?? 0,
+      helper: `${waitingRoomQueue?.waitTime ?? 0} min wait · ${waitingRoomQueue?.riskLevel || 'medium'} risk`,
+      detail: waitingRoomQueue?.bottleneck?.reason || widgetById['waiting-room']?.supportingDetail,
+      target: '/workspace/emergency/queues',
+      assistantPrompt: 'Summarize waiting room pressure, oldest waits, and near-term triage actions for ED leadership.',
+      severity: waitingRoomQueue?.bottleneck?.severity || widgetById['waiting-room']?.severity || 'medium',
+    },
+    {
+      id: 'ems-arrivals',
+      label: 'EMS Arrivals',
+      value: emsPreArrival?.metrics?.incomingCount ?? widgetById['ems-arrivals']?.value ?? 0,
+      helper: `${emsPreArrival?.metrics?.nextEtaMinutes ?? 0} min next ETA · ${emsPreArrival?.metrics?.criticalCount ?? 0} critical`,
+      detail: 'Inbound EMS context, ETA, risk bundles, and handoff summaries before arrival.',
+      target: '/workspace/emergency/pre-arrival',
+      assistantPrompt: 'Summarize inbound EMS arrivals, ETA, risk bundles, and handoff readiness for ED leadership.',
+      severity: (emsPreArrival?.metrics?.criticalCount || 0) > 0 ? 'critical' : 'medium',
+    },
+    {
+      id: 'high-risk-queue',
+      label: 'High Risk Queue',
+      value: widgetById['high-risk-queue']?.value ?? emergency.patientJourneyEngine?.metrics?.highRiskPatients ?? 0,
+      helper: widgetById['high-risk-queue']?.helper || 'Risk scores and clinician review queues',
+      detail: 'Calculator-triggered risk review for patients needing clinician confirmation.',
+      target: '/workspace/emergency/triage',
+      assistantPrompt: 'Summarize high-risk ED patients by calculators, wait state, and clinician review needs.',
+      severity: widgetById['high-risk-queue']?.severity || 'critical',
+    },
+    {
+      id: 'boarding-pressure',
+      label: 'Boarding Pressure',
+      value: boarding?.metrics?.boardingCount ?? 0,
+      helper: `${boarding?.metrics?.boardingTime ?? 0} min avg · ${boarding?.metrics?.pendingBeds ?? 0} pending beds`,
+      detail: `Boarding risk score ${boarding?.score ?? 0}; longest boarder ${boarding?.metrics?.longestBoardingMinutes ?? 0} min.`,
+      target: '/workspace/emergency/boarding',
+      assistantPrompt: 'Summarize ED boarding pressure, longest boarders, pending beds, and bed-management next steps.',
+      severity: (boarding?.score || 0) >= 80 ? 'critical' : 'high',
+    },
+    {
+      id: 'referral-queue',
+      label: 'Referral Queue',
+      value: referralHub?.metrics?.active ?? widgetById['referral-queue']?.value ?? 0,
+      helper: `${referralHub?.metrics?.delayed ?? 0} delayed · ${referralHub?.metrics?.accepted ?? 0} accepted`,
+      detail: 'Consult, transfer, specialty, and follow-up referrals by department queue.',
+      target: '/workspace/emergency/referrals',
+      assistantPrompt: 'Prioritize delayed ED referrals by department queue, stage, elapsed time, and disposition dependency.',
+      severity: (referralHub?.metrics?.delayed || 0) > 0 ? 'high' : 'medium',
+    },
+    {
+      id: 'capacity-score',
+      label: 'Capacity Score',
+      value: capacity?.score ?? 0,
+      helper: `${capacity?.riskLevel || 'Green'} · ${capacity?.occupancyPercent ?? 0}% occupied`,
+      detail: capacity?.summary || 'Current capacity posture from census, beds, boarding, EMS, and discharge candidates.',
+      target: '/workspace/emergency/capacity',
+      assistantPrompt: 'Summarize ED capacity score, risk level, occupied spaces, pending admissions, EMS arrivals, and discharge candidates.',
+      severity: ['Red', 'Orange'].includes(capacity?.riskLevel) ? 'critical' : 'medium',
+    },
+    {
+      id: 'equipment-status',
+      label: 'Equipment Status',
+      value: widgetById['equipment-status']?.value ?? 'Monitor',
+      helper: widgetById['equipment-status']?.helper || 'Device telemetry and medical IoT readiness',
+      detail: widgetById['equipment-status']?.supportingDetail || 'Equipment and telemetry gaps that may affect ED care flow.',
+      target: '/workspace/emergency/iot',
+      assistantPrompt: 'Summarize ED equipment status, telemetry gaps, device readiness, and biomedical review needs.',
+      severity: widgetById['equipment-status']?.severity || 'high',
+    },
+    {
+      id: 'automation-status',
+      label: 'Automation Status',
+      value: automationCount,
+      helper: `${automationState.activeAutomations.length} active · ${automationState.settings.humanReviewRequired} review-required`,
+      detail: 'Automation registry status across triage, referrals, documentation, IoT, simulations, and governance.',
+      target: '/workspace/emergency/automations',
+      assistantPrompt: 'Summarize Emergency automation status, active modules, review-required actions, and blocked automations.',
+      severity: automationState.blockedAutomations.length ? 'high' : 'medium',
+    },
+  ];
+
+  return (
+    <section className="workspace-panel emergency-director-command-center" aria-labelledby="emergency-director-command-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">ED Director Screen</p>
+        <h2 id="emergency-director-command-title">Emergency Command Center</h2>
+        <p>Leadership can scan department status in under 60 seconds across flow, risk, capacity, boarding, referrals, equipment, and automations.</p>
+        {operatingSystem ? <p>{operatingSystem.positioning}</p> : null}
+      </div>
+      {operatingSystem?.leadershipSummary ? (
+        <div className="emergency-journey-summary" aria-label="Emergency operating system summary">
+          <span>{operatingSystem.leadershipSummary.activePatients} active patients</span>
+          <span>{operatingSystem.leadershipSummary.queueBottlenecks} queue bottlenecks</span>
+          <span>{operatingSystem.leadershipSummary.capacityScore} capacity score</span>
+          <span>{operatingSystem.leadershipSummary.automationModules} SaaS modules</span>
+        </div>
+      ) : null}
+      <div className="emergency-command-grid">
+        {directorSections.map((section) => (
+          <article
+            key={section.id}
+            className={`emergency-command-widget emergency-dashboard-widget--${section.severity}`}
+          >
+            <div>
+              <span>{section.label}</span>
+              <strong>{section.value}</strong>
+              <small>{section.helper}</small>
+            </div>
+            <p>{section.detail}</p>
+            <div className="emergency-command-actions">
+              <button
+                type="button"
+                className="workspace-secondary-action"
+                onClick={() => onLaunchRoute(section.target)}
+              >
+                Open {section.label}
+              </button>
+              <button
+                type="button"
+                className="workspace-secondary-action"
+                onClick={() => onAskAssistant(section.assistantPrompt)}
+              >
+                Ask assistant
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }
@@ -420,9 +1103,9 @@ function EmergencyEvidencePanel({ complaintContexts, complaintRoutes = [], onLau
   return (
     <section className="workspace-panel" aria-labelledby="emergency-evidence-title">
       <div className="workspace-panel__header">
-        <p className="workspace-eyebrow">Chief Complaint Router</p>
+        <p className="workspace-eyebrow">Clinical Intent Router</p>
         <h2 id="emergency-evidence-title">Complaint-Driven Workflow Guidance</h2>
-        <p>Routes chief complaints to calculators, workflows, protocols, and referrals for human review.</p>
+        <p>Routes chief complaints to calculators, protocols, workflows, simulations, and referrals for human review.</p>
       </div>
       <div className="emergency-router-controls">
         <label className="emergency-evidence-select">
@@ -446,7 +1129,7 @@ function EmergencyEvidencePanel({ complaintContexts, complaintRoutes = [], onLau
           <input
             value={complaintInput}
             onChange={(event) => setComplaintInput(event.target.value)}
-            placeholder="Enter chest pain, stroke symptoms, sepsis concern, or shortness of breath"
+            placeholder="Enter chest pain, stroke symptoms, sepsis concern, trauma, or shortness of breath"
           />
         </label>
         <label className="emergency-evidence-select">
@@ -476,6 +1159,10 @@ function EmergencyEvidencePanel({ complaintContexts, complaintRoutes = [], onLau
             <div>
               <dt>Protocols</dt>
               <dd>{routedComplaint.protocols.join(', ')}</dd>
+            </div>
+            <div>
+              <dt>Simulations</dt>
+              <dd>{routedComplaint.simulations.join(', ')}</dd>
             </div>
             <div>
               <dt>Referral</dt>
@@ -1296,11 +1983,12 @@ export default function WorkspaceHome() {
   } = useWorkspace();
   const model = useMemo(() => buildCareWorkspaceModel(workspaceId), [workspaceId]);
   const canonicalWorkspaceId = model.workspace.id || DEFAULT_CARE_WORKSPACE_ID;
+  const defaultSubpageId = canonicalWorkspaceId === 'emergency' ? 'command-center' : 'dashboard';
   const activeSubpage = useMemo(
-    () => getWorkspaceSubpageById(canonicalWorkspaceId, subpage || 'dashboard'),
-    [canonicalWorkspaceId, subpage]
+    () => getWorkspaceSubpageById(canonicalWorkspaceId, subpage || defaultSubpageId),
+    [canonicalWorkspaceId, defaultSubpageId, subpage]
   );
-  const activeSubpageId = activeSubpage?.id || 'dashboard';
+  const activeSubpageId = activeSubpage?.id || defaultSubpageId;
   const pipelineData = useMemo(
     () => WorkspaceDataPipelineService.normalizeWorkspaceData(canonicalWorkspaceId),
     [canonicalWorkspaceId]
@@ -1313,13 +2001,13 @@ export default function WorkspaceHome() {
       return;
     }
     if (subpage && !activeSubpage) {
-      navigate(`/workspace/${canonicalWorkspaceId}/dashboard`, { replace: true });
+      navigate(`/workspace/${canonicalWorkspaceId}/${defaultSubpageId}`, { replace: true });
       return;
     }
     if (activeWorkspaceId !== canonicalWorkspaceId) {
       void switchWorkspace(canonicalWorkspaceId);
     }
-  }, [activeSubpage, activeSubpageId, activeWorkspaceId, canonicalWorkspaceId, navigate, subpage, switchWorkspace, workspaceId]);
+  }, [activeSubpage, activeSubpageId, activeWorkspaceId, canonicalWorkspaceId, defaultSubpageId, navigate, subpage, switchWorkspace, workspaceId]);
   const workspaceExperience = useMemo(
     () => getWorkspaceExperienceProfile(model.workspace),
     [model.workspace]
@@ -1402,7 +2090,7 @@ export default function WorkspaceHome() {
             <NavIcon icon={CHROME_ICONS.bot} size={18} aria-hidden />
             Ask Assistant
           </button>
-          <button type="button" className="workspace-secondary-action" onClick={() => launchRoute('/dashboard')}>
+          <button type="button" className="workspace-secondary-action" onClick={() => launchRoute(`/workspace/${canonicalWorkspaceId}/${defaultSubpageId}`)}>
             Command Center
           </button>
         </>
@@ -1483,6 +2171,15 @@ export default function WorkspaceHome() {
         </div>
       </section>
 
+      {isEmergencyWorkspace && activeSubpageId === 'command-center' ? (
+        <EmergencyDirectorCommandCenter
+          emergency={pipelineData.emergency}
+          workspaceId={canonicalWorkspaceId}
+          onLaunchRoute={launchRoute}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
       {isEmergencyWorkspace && activeSubpageId === 'dashboard' ? (
         <EmergencyCommandCenter
           emergency={pipelineData.emergency}
@@ -1544,6 +2241,34 @@ export default function WorkspaceHome() {
         </DashboardGrid>
       ) : null}
 
+      {isEmergencyWorkspace && activeSubpageId === 'queues' ? (
+        <EmergencyQueueIntelligencePanel
+          queueIntelligence={pipelineData.emergency.queueIntelligence}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'pre-arrival' ? (
+        <EmergencyPreArrivalPanel
+          preArrival={pipelineData.emergency.emsPreArrival}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'capacity' ? (
+        <EmergencyCapacityIntelligencePanel
+          capacity={pipelineData.emergency.capacityIntelligence}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'boarding' ? (
+        <EmergencyBoardingIntelligencePanel
+          boarding={pipelineData.emergency.boardingIntelligence}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
       {isEmergencyWorkspace && activeSubpageId === 'triage' ? (
         <EmergencyTriageOrchestrator
           orchestrator={pipelineData.emergency.triageOrchestrator}
@@ -1553,7 +2278,10 @@ export default function WorkspaceHome() {
 
       {isEmergencyWorkspace && activeSubpageId === 'patients' ? (
         <section className="emergency-os-layout">
-          <EmergencyJourneyFlow journey={pipelineData.emergency.patientJourney} />
+          <EmergencyJourneyFlow
+            journey={pipelineData.emergency.patientJourney}
+            engine={pipelineData.emergency.patientJourneyEngine}
+          />
           <EmergencyAutomationList
             title="Patient operating queues"
             description="Patient-facing ED automations stay attached to journey stages and clinician review."
@@ -1564,11 +2292,10 @@ export default function WorkspaceHome() {
       ) : null}
 
       {isEmergencyWorkspace && activeSubpageId === 'referrals' ? (
-        <EmergencyAutomationList
-          title="Referral Queue"
-          description="Referral, consult, transfer, and prior authorization work routed from ED disposition."
+        <EmergencyReferralHubPanel
+          referralHub={pipelineData.emergency.referralHub}
           automations={getWorkspaceAutomations(canonicalWorkspaceId)}
-          visibility="referrals"
+          onAskAssistant={launchAssistantPrompt}
         />
       ) : null}
 
@@ -1627,11 +2354,16 @@ export default function WorkspaceHome() {
       ) : null}
 
       {activeSubpageId === 'automations' ? (
-        <WorkspaceAutomationHub
-          workspaceId={canonicalWorkspaceId}
-          solutionPackage={pipelineData.analytics.solutionPackage}
-          onRunAutomation={previewAutomation}
-        />
+        <>
+          {isEmergencyWorkspace ? (
+            <EmergencyAutomationMarketplacePanel marketplace={pipelineData.emergency.automationMarketplace} />
+          ) : null}
+          <WorkspaceAutomationHub
+            workspaceId={canonicalWorkspaceId}
+            solutionPackage={pipelineData.analytics.solutionPackage}
+            onRunAutomation={previewAutomation}
+          />
+        </>
       ) : null}
 
       {isEmergencyWorkspace && activeSubpageId === 'demo' ? (
@@ -1717,6 +2449,7 @@ export default function WorkspaceHome() {
       ) : null}
 
       {![
+        'command-center',
         'dashboard',
         'tools',
         'workflows',

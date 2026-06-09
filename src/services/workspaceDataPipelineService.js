@@ -8,6 +8,7 @@ import {
   getSolutionPackageForWorkspace,
   getWorkspaceAutomations,
 } from '../data/automationRegistry';
+import ClinicalIntentRouter from '../data/clinicalIntentRouter';
 import {
   EMERGENCY_ANALYTICS_MVP,
   EMERGENCY_AI_COPILOT,
@@ -32,7 +33,15 @@ import {
   estimateEmergencyRoi,
   summarizeEmergencyCustomerReadiness,
 } from '../data/emergencyOperatingSystem';
+import PatientJourneyEngine from '../data/patientJourneyEngine';
 import { workspaceFilterSummary } from '../data/platformOperatingSystem';
+import BoardingIntelligenceEngine from './boardingIntelligenceEngine';
+import EdAutomationMarketplace from './edAutomationMarketplace';
+import EmsPreArrivalPipelineService from './emsPreArrivalPipelineService';
+import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
+import EmergencyOperatingSystemService from './emergencyOperatingSystemService';
+import QueueIntelligenceService from './queueIntelligenceService';
+import ReferralHub from './referralHub';
 
 const PIPELINE_STAGES = Object.freeze([
   'Source',
@@ -147,6 +156,37 @@ export const WorkspaceDataPipelineService = {
     const recommendations = buildRecommendations(model, mode);
     const alerts = buildAlerts(model.workspace.id, mode);
     const analytics = buildAnalytics(model, mode, recommendations, alerts);
+    const workspaceAutomations = getWorkspaceAutomations(model.workspace.id);
+    const patientJourneyEngine =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? {
+            metrics: PatientJourneyEngine.getJourneyMetrics({ automations: workspaceAutomations }),
+            bottlenecks: PatientJourneyEngine.getJourneyBottlenecks(),
+            recommendations: PatientJourneyEngine.getJourneyRecommendations({ automations: workspaceAutomations }),
+          }
+        : null;
+    const queueIntelligence =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? QueueIntelligenceService.getQueueDashboard() : null;
+    const emsPreArrival =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmsPreArrivalPipelineService.getPreArrivalDashboard() : null;
+    const capacityIntelligence =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? EmergencyCapacityIntelligenceService.getCapacityDashboard()
+        : null;
+    const referralHub =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? ReferralHub.getReferralDashboard() : null;
+    const boardingIntelligence =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? BoardingIntelligenceEngine.getBoardingDashboard()
+        : null;
+    const automationMarketplace =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? EdAutomationMarketplace.getMarketplaceDashboard(workspaceAutomations)
+        : null;
+    const operatingSystem =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? EmergencyOperatingSystemService.getOperatingSystem({ automations: workspaceAutomations })
+        : null;
 
     return {
       workspace: model.workspace,
@@ -161,13 +201,28 @@ export const WorkspaceDataPipelineService = {
       emergency:
         model.workspace.id === EMERGENCY_WORKSPACE_ID
           ? {
-              patientJourney: EMERGENCY_PATIENT_JOURNEY,
+              patientJourney: PatientJourneyEngine.getPatientJourney({ automations: workspaceAutomations }),
+              patientJourneyEngine,
+              queueIntelligence,
+              emsPreArrival,
+              capacityIntelligence,
+              referralHub,
+              boardingIntelligence,
+              automationMarketplace,
+              operatingSystem,
+              canonicalPatientJourney: EMERGENCY_PATIENT_JOURNEY,
               dashboardWidgets: EMERGENCY_DASHBOARD_WIDGETS,
               commandCenterWidgets: EMERGENCY_COMMAND_CENTER_WIDGETS,
               demoTenant: EMERGENCY_DEMO_TENANT,
               firstCustomerDeployment: EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT,
               flowIntelligencePlatform: EMERGENCY_FLOW_INTELLIGENCE_PLATFORM,
               chiefComplaintRoutes: EMERGENCY_CHIEF_COMPLAINT_ROUTES,
+              clinicalIntentRouter: {
+                routes: ClinicalIntentRouter.getRoutes(),
+                outputSchema: ['calculators', 'protocols', 'workflows', 'simulations', 'referrals'],
+                safetyStatement:
+                  'Complaint routing provides workflow guidance only. Clinician review is required for all clinical decisions.',
+              },
               aiCopilot: {
                 ...EMERGENCY_AI_COPILOT,
                 sampleGuidance: buildEmergencyCopilotGuidance({
@@ -255,6 +310,7 @@ export const WorkspaceDataPipelineService = {
         title: automation.title,
         riskLevel: automation.riskLevel,
         humanReviewRequired: automation.humanReviewRequired,
+        patientJourneyStates: automation.patientJourneyStates || automation.journeyStages || automation.requiredWorkflows || [],
         journeyStages: automation.journeyStages || automation.requiredWorkflows || [],
         workspaceVisibility: automation.workspaceVisibility || [],
         readiness: automation.readiness || null,
@@ -264,6 +320,10 @@ export const WorkspaceDataPipelineService = {
           ? {
               complaintContexts: EMERGENCY_RAG_COMPLAINT_CONTEXT,
               chiefComplaintRoutes: EMERGENCY_CHIEF_COMPLAINT_ROUTES,
+              clinicalIntentRouter: {
+                routes: ClinicalIntentRouter.getRoutes(),
+                outputSchema: ['calculators', 'protocols', 'workflows', 'simulations', 'referrals'],
+              },
               aiCopilot: EMERGENCY_AI_COPILOT,
               triageOrchestrator: EMERGENCY_TRIAGE_ORCHESTRATOR,
               safetyStatement: EMERGENCY_TRIAGE_ORCHESTRATOR.safetyStatement,

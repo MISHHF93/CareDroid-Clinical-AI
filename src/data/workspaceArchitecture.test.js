@@ -104,19 +104,25 @@ describe('workspaceArchitecture', () => {
     const emergency = getCareWorkspaceById('emergency');
     const mode = getWorkspaceFunctionalityMode('emergency');
 
-    expect(emergency.defaultNavigationGroups).toEqual(['dashboard', 'automations']);
+    expect(emergency.defaultNavigationGroups).toEqual(['command-center', 'automations']);
     expect(emergency.defaultDashboardWidgets).toEqual([
-      'waiting-patients',
+      'current-patients',
+      'waiting-room',
       'high-risk-queue',
-      'critical-alerts',
-      'recent-assessments',
-      'recommended-actions',
-      'protocol-guidance',
+      'ems-arrivals',
+      'referral-queue',
+      'bed-pressure',
+      'equipment-status',
+      'staffing-pressure',
+      'flow-alerts',
     ]);
     expect(mode.dashboards).toEqual(emergency.defaultDashboardWidgets);
     expect(mode.subpages.map((subpage) => subpage.id)).toEqual(
-      expect.arrayContaining(['triage', 'evidence', 'automations'])
+      expect.arrayContaining(['command-center', 'pre-arrival', 'queues', 'capacity', 'boarding', 'triage', 'evidence', 'automations'])
     );
+    expect(mode.workflows).toContain('EMS pre-arrival pipeline');
+    expect(mode.workflows).toContain('capacity intelligence');
+    expect(mode.workflows).toContain('boarding intelligence');
   });
 
   it('surfaces emergency tools contextually instead of as sidebar entries', () => {
@@ -191,7 +197,17 @@ describe('workspaceArchitecture', () => {
 
   it('adds specialized subpages for operational workspaces without sidebar expansion', () => {
     expect(getWorkspaceSubpageEntries('emergency').map((subpage) => subpage.id)).toEqual([
+      'command-center',
       'dashboard',
+      'flow',
+      'onboarding',
+      'demo',
+      'roi',
+      'deployment',
+      'pre-arrival',
+      'queues',
+      'capacity',
+      'boarding',
       'triage',
       'patients',
       'referrals',

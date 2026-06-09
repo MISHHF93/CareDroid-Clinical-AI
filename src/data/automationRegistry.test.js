@@ -6,6 +6,7 @@ import {
   getWorkspaceAutomations,
   summarizeAutomationRegistry,
 } from './automationRegistry';
+import { PATIENT_JOURNEY_STATE_IDS } from './patientJourneyEngine';
 
 describe('automationRegistry', () => {
   it('defines canonical automation metadata for every automation', () => {
@@ -89,21 +90,32 @@ describe('automationRegistry', () => {
     }
   });
 
+  it('attaches every emergency automation to valid patient journey states', () => {
+    for (const automation of getWorkspaceAutomations('emergency')) {
+      expect(automation.patientJourneyStates.length).toBeGreaterThan(0);
+      expect(automation.requiredWorkflows).toEqual(automation.patientJourneyStates);
+      expect(automation.patientJourneyStates.every((stateId) => PATIENT_JOURNEY_STATE_IDS.includes(stateId))).toBe(true);
+    }
+  });
+
   it('packages the emergency department solution into product tiers', () => {
     const emergency = getAutomationSolutionPackages().find(
       (solution) => solution.solutionId === 'emergency-department-solution'
     );
 
     expect(emergency.patientJourney).toEqual([
-      'patient',
       'arrival',
       'registration',
       'triage',
-      'clinical-assessment',
+      'waiting',
+      'assessment',
       'orders',
       'results',
+      'reassessment',
       'disposition',
-      'discharge-admission',
+      'admission',
+      'discharge',
+      'follow-up',
     ]);
     expect(emergency.products.map((product) => product.title)).toEqual([
       'Emergency Flow Starter',
