@@ -12,7 +12,7 @@ import { WhiteLabelProvider } from './contexts/WhiteLabelContext';
 import { UserIdentityProvider } from './contexts/UserIdentityContext';
 import { CostTrackingProvider } from './contexts/CostTrackingContext';
 import { SystemConfigProvider } from './contexts/SystemConfigContext';
-import { TenantContextProvider, TenantRequired } from './contexts/TenantContext';
+import { TenantContextProvider } from './contexts/TenantContext';
 import OfflineProvider from './contexts/OfflineProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import PermissionGate from './components/PermissionGate';
@@ -588,11 +588,7 @@ function AppRoutes() {
     }
 
     if (requiresAuth) {
-      return (
-        <TenantRequired>
-          <AppShellPage>{resolvedElement}</AppShellPage>
-        </TenantRequired>
-      );
+      return <AppShellPage>{resolvedElement}</AppShellPage>;
     }
 
     return resolvedElement;
@@ -601,11 +597,7 @@ function AppRoutes() {
   const routes = [
     {
       path: '/',
-      element: (
-        <PublicShell>
-          <WelcomePage />
-        </PublicShell>
-      ),
+      element: <Navigate to="/dashboard" replace />,
       publicOnly: true,
     },
     {

@@ -23,7 +23,7 @@ describe('canonical route/auth architecture', () => {
     expect(appSource).toMatch(
       /path:\s*'\/tools\/calculators\/:slug'[\s\S]*<Calculators \/>[\s\S]*requiresAuth:\s*true/
     );
-    expect(appSource).toContain('<TenantRequired>');
+    expect(appSource).not.toContain('<TenantRequired>');
     expect(appSource).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
     expect(appSource.match(/<AppShellPage\b/g)).toHaveLength(1);
   });

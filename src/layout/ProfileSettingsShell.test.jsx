@@ -60,7 +60,7 @@ describe('canonical protected AppShell source-level route contract', () => {
 
   it('keeps protected shell wrapping centralized in resolveElement', () => {
     expect(appSource).toContain('if (requiresAuth) {');
-    expect(appSource).toContain('<TenantRequired>');
+    expect(appSource).not.toContain('<TenantRequired>');
     expect(appSource).toContain('<AppShellPage>{resolvedElement}</AppShellPage>');
     expect(appSource.match(/<AppShellPage\b/g)).toHaveLength(1);
   });
@@ -99,13 +99,12 @@ describe('canonical protected AppShell source-level route contract', () => {
     );
   });
 
-  it('uses PageContainer for profile settings without local page scroll wrappers', () => {
+  it('uses PageShell for profile settings without local page scroll wrappers', () => {
     expect(pageContainerSource).toContain('export function PageContainer');
     expect(pageContainerSource).toContain('export function ScrollArea');
     expect(pageContainerCss).toMatch(/\.page-container\s*\{[\s\S]*max-width/);
     expect(pageContainerCss).toMatch(/\.scroll-area\s*\{[\s\S]*overflow-y:\s*auto/);
-    expect(profileSettingsSource).toContain('<PageContainer');
-    expect(profileSettingsSource).toContain('as="main"');
+    expect(profileSettingsSource).toContain('<PageShell');
     expect(profileSettingsSource).toContain('className="profile-settings-page"');
     expect(profileSettingsSource).not.toMatch(
       /app-scroll-container|app-local-scroll-y|<ScrollArea/

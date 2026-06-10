@@ -1,7 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { createLocalPlatformAccessSession } from '../auth/devAuthBypass';
 import { AUTH_CONFIG } from '../config/auth.config';
-import { apiFetchJson } from '../services/apiClient';
 import logger from '../utils/logger';
 
 /**
@@ -13,6 +11,17 @@ import logger from '../utils/logger';
 
 const AUTH_TOKEN_KEY = AUTH_CONFIG.tokenStorageKey;
 const USER_PROFILE_KEY = AUTH_CONFIG.userProfileStorageKey;
+
+const OPEN_ACCESS_USER = Object.freeze({
+  id: 'open-access-user',
+  email: 'open-access@caredroid.local',
+  name: 'CareDroid Clinician',
+  fullName: 'CareDroid Clinician',
+  role: 'physician',
+  authMode: 'open-access',
+  isEmailVerified: true,
+  twoFactorEnabled: false,
+});
 
 // Permission enum (matches backend)
 export const Permission = {
@@ -159,163 +168,35 @@ export const useUser = () => {
 };
 
 export const UserProvider = ({ children }) => {
-  const [user, setUserState] = useState(null);
+  const [user, setUserState] = useState(OPEN_ACCESS_USER);
   const [authToken, setAuthTokenState] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Initialize from localStorage on mount
+  // Public product mode: the frontend opens directly without auth or team verification.
   useEffect(() => {
-    logger.info('UserContext initialization');
-    
-    const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
-    const storedProfile = localStorage.getItem(USER_PROFILE_KEY);
-
-    logger.debug('localStorage snapshot', {
-      hasToken: Boolean(storedToken),
-      hasProfile: Boolean(storedProfile),
-      tokenValue: storedToken,
-    });
-    if (storedProfile) {
-      try {
-        logger.debug('Stored profile data', { profile: JSON.parse(storedProfile) });
-      } catch (e) {
-        logger.warn('Stored profile parse error', { error: e });
-      }
-    }
-
-    // Load token
-    if (storedToken) {
-      logger.info('Loading token into state');
-      setAuthTokenState(storedToken);
-    } else {
-      const session = createLocalPlatformAccessSession();
-      logger.info('No stored token found; starting platform access session');
-      setAuthTokenState(session.token);
-      setUserState(session.user);
-      setIsLoading(false);
-      return;
-    }
-
-    // Load profile
-    let loadedProfile = false;
-    if (storedProfile) {
-      try {
-        const profile = JSON.parse(storedProfile);
-        logger.info('Loading profile into state', { profile });
-        setUserState(profile);
-        loadedProfile = true;
-      } catch (error) {
-        logger.error('Failed to parse stored user profile', { error });
-        localStorage.removeItem(USER_PROFILE_KEY);
-      }
-    } else {
-      logger.warn('No profile in localStorage');
-    }
-
-    if (!storedToken || loadedProfile) {
-      setIsLoading(false);
-    }
-    logger.info('UserContext init complete');
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(USER_PROFILE_KEY);
+    logger.info('Open access mode initialized without auth token');
   }, []);
 
-  // Fetch user profile when token changes
-  useEffect(() => {
-    if (!authToken) {
-      setIsLoading(false);
-      return undefined;
-    }
-    if (user) {
-      setIsLoading(false);
-      return undefined;
-    }
-
-    let cancelled = false;
-
-    const fetchUserProfile = async () => {
-      setIsLoading(true);
-      try {
-        const { response, data: profile } = await apiFetchJson('/api/users/profile', {
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (response.ok) {
-          if (!cancelled) {
-            setUserState(profile);
-            localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
-          }
-        } else {
-          // If profile fetch fails and we're in dev mode, use mock profile
-          const storedProfile = localStorage.getItem(USER_PROFILE_KEY);
-          if (storedProfile) {
-            try {
-              const profile = JSON.parse(storedProfile);
-              if (!cancelled) setUserState(profile);
-              logger.info('Using stored mock profile from localStorage');
-            } catch (parseError) {
-              logger.error('Failed to parse stored profile', { error: parseError });
-            }
-          }
-        }
-      } catch (error) {
-        logger.error('Failed to fetch user profile', { error });
-        // Try to use stored mock profile if backend is unavailable
-        const storedProfile = localStorage.getItem(USER_PROFILE_KEY);
-        if (storedProfile) {
-          try {
-            const profile = JSON.parse(storedProfile);
-            if (!cancelled) setUserState(profile);
-            logger.info('Using stored mock profile (backend unavailable)');
-          } catch (parseError) {
-            logger.error('Failed to parse stored profile', { error: parseError });
-          }
-        } else if (!cancelled) {
-          const session = createLocalPlatformAccessSession();
-          setAuthTokenState(session.token);
-          setUserState(session.user);
-          logger.info('Using platform access profile (backend unavailable)');
-        }
-      } finally {
-        if (!cancelled) setIsLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-    return () => {
-      cancelled = true;
-    };
-  }, [authToken, user]);
-
   const setUser = (newUser) => {
-    setUserState(newUser);
-    if (newUser) {
-      setIsLoading(false);
-    }
-    if (newUser) {
-      localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(newUser));
-    } else {
-      localStorage.removeItem(USER_PROFILE_KEY);
-    }
+    setUserState(newUser || OPEN_ACCESS_USER);
+    setIsLoading(false);
+    localStorage.removeItem(USER_PROFILE_KEY);
   };
 
   const setAuthToken = (token) => {
-    setAuthTokenState(token);
-    if (token) {
-      if (!user) setIsLoading(true);
-      localStorage.setItem(AUTH_TOKEN_KEY, token);
-    } else {
-      setIsLoading(false);
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-    }
+    setAuthTokenState(token || '');
+    setIsLoading(false);
+    localStorage.removeItem(AUTH_TOKEN_KEY);
   };
 
   const signOut = () => {
-    const session = createLocalPlatformAccessSession();
-    setUserState(session.user);
-    setAuthTokenState(session.token);
+    setUserState(OPEN_ACCESS_USER);
+    setAuthTokenState('');
     setIsLoading(false);
+    localStorage.removeItem(AUTH_TOKEN_KEY);
+    localStorage.removeItem(USER_PROFILE_KEY);
   };
 
   /**
@@ -345,7 +226,7 @@ export const UserProvider = ({ children }) => {
     return permissions.every((permission) => rolePermissions.includes(permission));
   };
 
-  const isAuthenticated = Boolean(authToken);
+  const isAuthenticated = false;
   const isDevAuthBypass = Boolean(
     user?.isDevAuthBypass ||
       user?.authMode === 'platform-access' ||

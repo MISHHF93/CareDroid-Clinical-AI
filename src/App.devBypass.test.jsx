@@ -59,7 +59,7 @@ function AuthStateProbe() {
   const { isAuthenticated, isDevAuthBypass, user } = useUser();
   return (
     <output data-testid="auth-state">
-      {isAuthenticated ? 'authenticated' : 'anonymous'}:{isDevAuthBypass ? 'platform' : 'standard'}:
+      {isAuthenticated ? 'authenticated' : 'anonymous'}:{isDevAuthBypass ? 'platform' : 'open'}:
       {user?.role || 'none'}
     </output>
   );
@@ -116,14 +116,6 @@ describe('Welcome page platform access', () => {
     await waitFor(() => {
       expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
     });
-    expect(localStorage.getItem('caredroid_access_token')).toBe('welcome-dev-token');
-    expect(JSON.parse(localStorage.getItem('caredroid_user_profile'))).toEqual(
-      expect.objectContaining({
-        authMode: 'platform-access',
-        isDevAuthBypass: true,
-        role: 'physician',
-      })
-    );
   });
 });
 
@@ -140,7 +132,7 @@ it('shows platform access when VITE_DEMO_MODE=true and still routes to dashboard
   });
 });
 
-it('starts platform access automatically when no stored auth exists', async () => {
+it('starts open access automatically when no stored auth exists', async () => {
   localStorage.clear();
 
   render(
@@ -150,19 +142,13 @@ it('starts platform access automatically when no stored auth exists', async () =
   );
 
   await waitFor(() => {
-    expect(screen.getByTestId('auth-state')).toHaveTextContent('authenticated:platform:physician');
+    expect(screen.getByTestId('auth-state')).toHaveTextContent('anonymous:open:physician');
   });
-  expect(localStorage.getItem('caredroid_access_token')).toBe('welcome-dev-token');
-  expect(JSON.parse(localStorage.getItem('caredroid_user_profile'))).toEqual(
-    expect.objectContaining({
-      authMode: 'platform-access',
-      devAuthLabel: 'Platform Access',
-      isDevAuthBypass: true,
-    })
-  );
+  expect(localStorage.getItem('caredroid_access_token')).toBeNull();
+  expect(localStorage.getItem('caredroid_user_profile')).toBeNull();
 });
 
-it('restores persisted platform access after refresh-compatible remounts', async () => {
+it('clears persisted auth and keeps open access after refresh-compatible remounts', async () => {
   localStorage.setItem('caredroid_access_token', 'persisted-demo-token');
   localStorage.setItem(
     'caredroid_user_profile',
@@ -182,6 +168,8 @@ it('restores persisted platform access after refresh-compatible remounts', async
   );
 
   await waitFor(() => {
-    expect(screen.getByTestId('auth-state')).toHaveTextContent('authenticated:platform:physician');
+    expect(screen.getByTestId('auth-state')).toHaveTextContent('anonymous:open:physician');
   });
+  expect(localStorage.getItem('caredroid_access_token')).toBeNull();
+  expect(localStorage.getItem('caredroid_user_profile')).toBeNull();
 });

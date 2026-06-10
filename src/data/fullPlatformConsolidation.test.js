@@ -120,14 +120,16 @@ const REQUIRED_BACKEND_ROUTES = Object.freeze([
 ]);
 
 describe('full platform consolidation contract', () => {
-  it('bypasses /auth while preserving platform access wiring', () => {
+  it('bypasses /auth with direct open access and no team verification wrapper', () => {
     for (const snippet of REQUIRED_AUTH_SNIPPETS) {
       expect(appSource).toContain(snippet);
     }
 
     expect(authSource).toContain('Enter Platform');
     expect(authSource).toContain('directSignInSection');
-    expect(userContextSource).toContain('createLocalPlatformAccessSession');
+    expect(userContextSource).toContain('OPEN_ACCESS_USER');
+    expect(userContextSource).toContain("authMode: 'open-access'");
+    expect(appSource).not.toContain('<TenantRequired>');
     expect(appShellSource).toContain('app-shell-dev-mode-banner');
     expect(devAuthSource).toContain('AUTH_CONFIG.demo.exposed');
     expect(authConfigSource).toContain('ENV_CONFIG.demoMode');
