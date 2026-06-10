@@ -1,0 +1,43 @@
+{
+  "diagnostics": {
+    "path": "/dashboard",
+    "strip": {
+      "left": 268,
+      "width": 1152,
+      "right": 1420
+    },
+    "chips": [
+      {
+        "text": "Flow7 stagesArrival to admission/discharge",
+        "left": 268,
+        "top": 319,
+        "width": 572,
+        "height": 82,
+        "right": 840,
+        "bottom": 401
+      },
+      {
+        "text": "Alerts0",
+        "left": 848,
+        "top": 319,
+        "width": 572,
+        "height": 82,
+        "right": 1420,
+        "bottom": 401
+      }
+    ]
+  },
+  "overflow": {
+    "pass": true,
+    "docOverflowPx": 0,
+    "offenders": []
+  },
+  "overlaps": {
+    "pass": true,
+    "offenders": [],
+    "checked": {
+      "controls": 25,
+      "textNodes": 11
+    }
+  }
+}

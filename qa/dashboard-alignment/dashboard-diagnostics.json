@@ -1,0 +1,108 @@
+{
+  "diagnostics": {
+    "path": "/dashboard",
+    "headerControls": [
+      {
+        "selector": "header button, header a, header select, .app-shell-topbar button, .app-shell-topbar a, .app-shell-topbar select",
+        "text": "EmergencyICUCardiologyPharmacyOperationsAdministration",
+        "left": 1065,
+        "top": 13,
+        "width": 136,
+        "height": 38,
+        "right": 1201,
+        "bottom": 51
+      },
+      {
+        "selector": "header button, header a, header select, .app-shell-topbar button, .app-shell-topbar a, .app-shell-topbar select",
+        "text": "Search everythingCtrl K",
+        "left": 1225,
+        "top": 14,
+        "width": 194,
+        "height": 36,
+        "right": 1419,
+        "bottom": 50
+      },
+      {
+        "selector": "header button, header a, header select, .app-shell-topbar button, .app-shell-topbar a, .app-shell-topbar select",
+        "text": "Systems ready",
+        "left": 1296,
+        "top": 156,
+        "width": 107,
+        "height": 30,
+        "right": 1403,
+        "bottom": 186
+      }
+    ],
+    "cards": [],
+    "headings": [
+      {
+        "selector": "h1, h2, h3",
+        "text": "CareDroid Clinical AI",
+        "left": 52,
+        "top": 19,
+        "width": 149,
+        "height": 18,
+        "right": 201,
+        "bottom": 37
+      },
+      {
+        "selector": "h1, h2, h3",
+        "text": "Emergency Flow Command Center",
+        "left": 285,
+        "top": 175,
+        "width": 489,
+        "height": 36,
+        "right": 774,
+        "bottom": 211
+      },
+      {
+        "selector": "h1, h2, h3",
+        "text": "Actions",
+        "left": 323,
+        "top": 428,
+        "width": 442,
+        "height": 26,
+        "right": 765,
+        "bottom": 454
+      },
+      {
+        "selector": "h1, h2, h3",
+        "text": "AI Assistant",
+        "left": 323,
+        "top": 696,
+        "width": 393,
+        "height": 26,
+        "right": 716,
+        "bottom": 721
+      },
+      {
+        "selector": "h1, h2, h3",
+        "text": "Recommendations",
+        "left": 323,
+        "top": 1044,
+        "width": 434,
+        "height": 26,
+        "right": 757,
+        "bottom": 1069
+      }
+    ],
+    "viewport": {
+      "width": 1440,
+      "height": 1000,
+      "scrollWidth": 1440
+    }
+  },
+  "overflow": {
+    "pass": true,
+    "docOverflowPx": 0,
+    "offenders": []
+  },
+  "overlaps": {
+    "pass": true,
+    "offenders": [],
+    "checked": {
+      "controls": 25,
+      "textNodes": 11
+    }
+  }
+}
