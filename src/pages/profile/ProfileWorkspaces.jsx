@@ -2,6 +2,7 @@ import React from 'react';
 import Card from '../../components/ui/card';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { useWorkspace } from '../../contexts/WorkspaceContext';
+import { isFutureWorkspace } from '../../config/workspace.config';
 import './ProfileIdentityPages.css';
 
 export default function ProfileWorkspaces() {
@@ -16,6 +17,9 @@ export default function ProfileWorkspaces() {
     error,
   } = useUserIdentity();
   const { switchWorkspace: switchWorkspaceContext } = useWorkspace();
+  const visibleWorkspaces = workspaces.filter(
+    (workspace) => !isFutureWorkspace(workspace.workspaceKey || workspace.type || workspace.id)
+  );
 
   const handleSwitch = async (workspaceId) => {
     await switchWorkspaceContext(workspaceId);
@@ -48,7 +52,7 @@ export default function ProfileWorkspaces() {
               onChange={(event) => handleSwitch(event.target.value)}
               disabled={isLoading}
             >
-              {workspaces.map((workspace) => (
+              {visibleWorkspaces.map((workspace) => (
                 <option key={workspace.id} value={workspace.id}>
                   {workspace.branding?.displayName || workspace.name}
                 </option>
@@ -59,7 +63,7 @@ export default function ProfileWorkspaces() {
         </Card>
 
         <div className="profile-identity-grid">
-          {workspaces.map((workspace) => (
+          {visibleWorkspaces.map((workspace) => (
             <section key={workspace.id} className="profile-identity-card">
               <h3>{workspace.branding?.displayName || workspace.name}</h3>
               <p>{workspace.type} workspace</p>

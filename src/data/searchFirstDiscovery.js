@@ -1,4 +1,4 @@
-import { CARE_WORKSPACES } from '../config/workspace.config';
+import { getActiveWorkspaceRegistry, isFutureWorkspace } from '../config/workspace.config';
 import { QUICK_COMMAND_DESTINATION_ITEMS, canExposeNavigationItem } from '../config/navigation.config';
 import { CANONICAL_ROUTES } from '../config/routes.config';
 import { buildAssetInventoryProjection } from './assetInventory';
@@ -12,6 +12,28 @@ import { MARKETPLACE_ITEMS } from './marketplaceCatalog';
 
 function unique(values) {
   return [...new Set((values || []).flat().filter(Boolean).map(String))];
+}
+
+const ACTIVE_WORKSPACE_ID_SET = new Set(getActiveWorkspaceRegistry().map((workspace) => workspace.id));
+const NON_WORKSPACE_SCOPE_IDS = new Set(['assistant', 'clinical', 'commercial']);
+const FUTURE_MODULE_ROUTE_PREFIXES = Object.freeze([
+  '/fleet',
+  '/medical-iot',
+  '/devices',
+  '/laboratory',
+  '/research',
+  '/governance',
+  '/ai-governance',
+]);
+
+function hasActiveWorkspaceScope(entry) {
+  const workspaceIds = entry.workspaceIds || [];
+  if (!workspaceIds.length) return true;
+  return workspaceIds.some((workspaceId) => ACTIVE_WORKSPACE_ID_SET.has(workspaceId) || NON_WORKSPACE_SCOPE_IDS.has(workspaceId));
+}
+
+function isFutureModuleRoute(path = '') {
+  return FUTURE_MODULE_ROUTE_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 }
 
 const COMMERCIAL_CAPABILITY_GROUPS = Object.freeze([
@@ -238,7 +260,7 @@ export function searchDiscoveryText(entry) {
 }
 
 function workspaceEntries() {
-  return CARE_WORKSPACES.map((workspace) => ({
+  return getActiveWorkspaceRegistry().map((workspace) => ({
     id: `workspace:${workspace.id}`,
     sourceId: workspace.id,
     kind: 'workspace',
@@ -289,6 +311,7 @@ function navigationDestinationEntries({
         includeContextual: includeContextualDestinations,
       })
     )
+    .filter((destination) => !isFutureModuleRoute(destination.path))
     .map((destination) => ({
     id: `nav-destination:${destination.id}`,
     sourceId: destination.id,
@@ -465,7 +488,7 @@ function marketplaceAgentEntries() {
 }
 
 function workspaceAgentEntries() {
-  const entries = CARE_WORKSPACES.flatMap((workspace) =>
+  const entries = getActiveWorkspaceRegistry().flatMap((workspace) =>
     (workspace.defaultAIAgents || workspace.workspaceProfile?.defaultAIAgents || []).map((agentId) => ({
       id: `ai-agent:${workspace.id}:${agentId}`,
       sourceId: agentId,
@@ -486,7 +509,7 @@ function workspaceAgentEntries() {
 }
 
 function operationEntries() {
-  return OPERATIONS_CENTER_SURFACES.map((surface) => ({
+  return OPERATIONS_CENTER_SURFACES.filter((surface) => !isFutureWorkspace(surface.id)).map((surface) => ({
     id: `operation:${surface.id}`,
     sourceId: surface.id,
     kind: 'operation',
@@ -615,7 +638,9 @@ export function buildSearchFirstDiscoveryEntries({
     ...operationEntries(),
     ...notificationEntries(),
     ...commercialCapabilityEntries(),
-  ];
+  ]
+    .filter(hasActiveWorkspaceScope)
+    .filter((entry) => !isFutureModuleRoute(entry.path));
 
   return entries.map((entry) => ({
     ...entry,

@@ -7,6 +7,7 @@ import {
   DEFAULT_CARE_WORKSPACE_ID,
   buildCareWorkspaceModel,
   getWorkspaceSubpageById,
+  isFutureWorkspace,
 } from '../config/workspace.config';
 import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import { workspaceFilterSummary } from '../data/platformOperatingSystem';
@@ -126,6 +127,32 @@ function WorkspaceCapabilityCard({ item, icon = CHROME_ICONS.activity }) {
         {detail ? <span>{detail}</span> : null}
       </span>
     </article>
+  );
+}
+
+function FutureWorkspacePanel({ workspace, onLaunchEmergency }) {
+  return (
+    <section className="workspace-panel" aria-labelledby="future-workspace-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">{workspace.roadmapLabel || 'Future Module'}</p>
+        <h2 id="future-workspace-title">{workspace.label} is coming later</h2>
+        <p>{workspace.productFocus || 'This workspace is preserved in the codebase as a roadmap module.'}</p>
+      </div>
+      <div className="emergency-journey-insights" aria-label="Future module status">
+        <p>
+          <strong>Status:</strong> {workspace.availabilityLabel || 'Coming Later'}.
+        </p>
+        <p>
+          <strong>Product focus:</strong> Emergency Department Operating System.
+        </p>
+        <p>
+          <strong>Code posture:</strong> hidden from active workspace selection, not deleted.
+        </p>
+      </div>
+      <button type="button" className="workspace-secondary-action" onClick={onLaunchEmergency}>
+        Open Emergency OS
+      </button>
+    </section>
   );
 }
 
@@ -550,6 +577,313 @@ function EmergencyPreArrivalPanel({ preArrival = {}, onAskAssistant }) {
   );
 }
 
+function EmergencyThroughputPanel({ throughput = {}, kpiLayer = {}, onAskAssistant }) {
+  const kpi = throughput.kpi || {};
+  const delays = throughput.delays || [];
+  const bottlenecks = throughput.bottlenecks || [];
+  const metrics = kpiLayer.metrics || [];
+
+  return (
+    <section className="workspace-panel" aria-labelledby="emergency-throughput-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Door-to-Doctor Intelligence</p>
+        <h2 id="emergency-throughput-title">Emergency Throughput</h2>
+        <p>Leadership can monitor arrival, triage, provider assessment, delays, bottlenecks, and staffing pressure from one throughput view.</p>
+        <p>Canonical KPI source: EmergencyKPILayer.</p>
+      </div>
+      <DashboardGrid variant="metrics" className="workspace-focus-metrics">
+        <MetricCard label="Door-to-Doctor" value={`${kpi.value || 0} min`} helper={`${kpi.targetCompliance || 0}% target compliance`} />
+        <MetricCard label="90th percentile" value={`${kpi.p90 || 0} min`} helper="Longest tail of current demo shift" />
+        <MetricCard label="Longest active wait" value={`${kpi.longestActiveWait || 0} min`} helper={throughput.staffingPressure?.state || 'staffing pressure'} />
+      </DashboardGrid>
+      <div className="emergency-queue-grid">
+        {metrics.map((metric) => (
+          <article key={metric.metricId} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{metric.dataState}</span>
+                <h3>{metric.label}</h3>
+              </div>
+              <strong>{metric.value}</strong>
+            </div>
+            <p>{metric.sourceSignals.join(', ')}</p>
+            <small>Target: {metric.target || 'not configured'} {metric.unit}</small>
+          </article>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Throughput delay insights">
+        {delays.slice(0, 3).map((delay) => (
+          <p key={delay.patientId}>
+            <strong>{delay.patientId}:</strong> {delay.reason}
+          </p>
+        ))}
+        {bottlenecks.map((bottleneck) => (
+          <p key={bottleneck.id}>
+            <strong>{bottleneck.label} bottleneck:</strong> {bottleneck.reason}
+          </p>
+        ))}
+        <p>
+          <strong>Source:</strong> {throughput.sourceState}
+        </p>
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() => onAskAssistant('Summarize Door-to-Doctor throughput, current delays, bottlenecks, and staffing pressure for ED leadership.')}
+      >
+        Ask assistant to summarize throughput
+      </button>
+    </section>
+  );
+}
+
+function EmergencyWaitingRoomPanel({ waitingRoom = {}, onAskAssistant }) {
+  const metrics = waitingRoom.metrics || {};
+  const reassessmentQueue = waitingRoom.reassessmentQueue || {};
+  const recommendations = waitingRoom.recommendations || [];
+
+  return (
+    <section className="workspace-panel" aria-labelledby="emergency-waiting-room-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Waiting Room Intelligence</p>
+        <h2 id="emergency-waiting-room-title">Waiting Room Health</h2>
+        <p>Treat the waiting room as a managed queue with visible wait duration, patient count, risk, and reassessment need.</p>
+      </div>
+      <div className={`emergency-capacity-score emergency-capacity-score--${cssToken(waitingRoom.riskState)}`}>
+        <div>
+          <span>Waiting Room Health Score</span>
+          <strong>{waitingRoom.healthScore || 0}</strong>
+          <small>{waitingRoom.riskState || 'Normal'}</small>
+        </div>
+        <div>
+          <span>ReassessmentQueue</span>
+          <strong>{reassessmentQueue.count || 0}</strong>
+          <small>{reassessmentQueue.criticalCount || 0} critical · {reassessmentQueue.urgentCount || 0} urgent</small>
+        </div>
+      </div>
+      <DashboardGrid variant="metrics" className="workspace-focus-metrics">
+        <MetricCard label="Patient count" value={metrics.patientCount || 0} helper="Active waiting room patients" />
+        <MetricCard label="Median wait" value={`${metrics.waitDuration || 0} min`} helper="Current waiting-room wait duration" />
+        <MetricCard label="Oldest wait" value={`${metrics.oldestWaitMinutes || 0} min`} helper="Oldest active waiting patient" />
+      </DashboardGrid>
+      <div className="emergency-queue-grid">
+        {(reassessmentQueue.items || []).map((item) => (
+          <article key={item.patientId} className={`emergency-queue-card emergency-dashboard-widget--${item.priority}`}>
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{item.priority} reassessment</span>
+                <h3>{item.patientId}</h3>
+              </div>
+              <strong>{item.waitDuration}m</strong>
+            </div>
+            <p>{item.triggerReason}</p>
+            <small>{item.recommendedAction}</small>
+          </article>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Waiting room recommendations">
+        {recommendations.slice(0, 4).map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+        <p>
+          <strong>Source:</strong> {waitingRoom.sourceState}
+        </p>
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() => onAskAssistant('Prioritize waiting room pressure, reassessment recommendations, oldest waits, and queue bottlenecks.')}
+      >
+        Ask assistant to prioritize waiting room pressure
+      </button>
+    </section>
+  );
+}
+
+function EmergencyEmsOffloadPanel({ emsOffload = {}, onAskAssistant }) {
+  const metrics = emsOffload.metrics || {};
+  const handoffs = emsOffload.handoffs || [];
+  const arrivalEtaTimeline = emsOffload.arrivalEtaTimeline || [];
+
+  return (
+    <section className="workspace-panel" aria-labelledby="emergency-ems-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">EMS Offload Command Center</p>
+        <h2 id="emergency-ems-title">EMS Pressure</h2>
+        <p>Track incoming ambulances, arrival ETA, waiting handoffs, and offload delays from one command center.</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="EMS offload metrics">
+        <span>{metrics.incomingAmbulances || 0} incoming ambulances</span>
+        <span>{metrics.nextEtaMinutes || 0} min next ETA</span>
+        <span>{metrics.waitingHandoffs || 0} waiting handoffs</span>
+        <span>{metrics.longestOffloadDelay || 0} min longest offload</span>
+      </div>
+      <div className="emergency-queue-grid">
+        {arrivalEtaTimeline.map((arrival) => (
+          <article key={arrival.patientId} className={`emergency-queue-card emergency-dashboard-widget--${arrival.riskLevel}`}>
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{arrival.unitId}</span>
+                <h3>{arrival.patientId}</h3>
+              </div>
+              <strong>{arrival.etaMinutes}m</strong>
+            </div>
+            <p>{arrival.complaint}</p>
+          </article>
+        ))}
+        {handoffs.map((handoff) => (
+          <article key={handoff.patientId} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{handoff.status}</span>
+                <h3>{handoff.unitId}</h3>
+              </div>
+              <strong>{handoff.offloadDelayMinutes}m</strong>
+            </div>
+            <p>{handoff.patientId} arrived {handoff.arrivalTime}</p>
+          </article>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="EMS offload recommendations">
+        {(emsOffload.recommendations || []).map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+        <p>
+          <strong>Source:</strong> {emsOffload.sourceState}
+        </p>
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() => onAskAssistant('Summarize EMS pressure, incoming ambulance ETAs, waiting handoffs, and offload delays.')}
+      >
+        Ask assistant to summarize EMS pressure
+      </button>
+    </section>
+  );
+}
+
+function EmergencyResourceBoardPanel({ resourceBoard = {}, onAskAssistant }) {
+  const metrics = resourceBoard.metrics || {};
+  const resources = resourceBoard.resources || [];
+
+  return (
+    <section className="workspace-panel" aria-labelledby="emergency-resources-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Emergency Resource Board</p>
+        <h2 id="emergency-resources-title">Operational Resources</h2>
+        <p>Staff can understand rooms, stretchers, monitors, telemetry units, and infusion pumps by availability status.</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="Resource board metrics">
+        <span>{metrics.available || 0} available</span>
+        <span>{metrics.occupied || 0} occupied</span>
+        <span>{metrics.outOfService || 0} out of service</span>
+        <span>{metrics.shortageCount || 0} shortages</span>
+      </div>
+      <div className="emergency-queue-grid">
+        {resources.map((resource) => (
+          <article key={resource.id} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{resource.status}</span>
+                <h3>{resource.label}</h3>
+              </div>
+              <strong>{resource.available}</strong>
+            </div>
+            <dl className="emergency-queue-metrics">
+              <div>
+                <dt>Occupied</dt>
+                <dd>{resource.occupied}</dd>
+              </div>
+              <div>
+                <dt>Out of service</dt>
+                <dd>{resource.outOfService}</dd>
+              </div>
+              <div>
+                <dt>Availability</dt>
+                <dd>{resource.availabilityRate}%</dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Resource recommendations">
+        {(resourceBoard.recommendations || []).map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+        <p>
+          <strong>Source:</strong> {resourceBoard.sourceState}
+        </p>
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() => onAskAssistant('Summarize ED resource availability, shortages, out-of-service equipment, and operational actions.')}
+      >
+        Ask assistant to summarize resources
+      </button>
+    </section>
+  );
+}
+
+function EmergencyEscalationPanel({ escalationEngine = {}, onAskAssistant }) {
+  const metrics = escalationEngine.metrics || {};
+  const escalations = escalationEngine.escalations || [];
+
+  return (
+    <section className="workspace-panel" aria-labelledby="emergency-escalations-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Emergency Escalation Engine</p>
+        <h2 id="emergency-escalations-title">Operational Risk</h2>
+        <p>Capacity overload, boarding overload, EMS congestion, high-risk queue growth, and critical device outages surface early.</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="Escalation metrics">
+        <span>{metrics.activeEscalations || 0} active escalations</span>
+        <span>{metrics.criticalEscalations || 0} critical</span>
+        <span>{metrics.urgentEscalations || 0} urgent</span>
+      </div>
+      <div className="emergency-queue-grid">
+        {escalations.map((escalation) => (
+          <article key={escalation.id} className={`emergency-queue-card emergency-dashboard-widget--${escalation.severity}`}>
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{escalation.severity}</span>
+                <h3>{escalation.trigger}</h3>
+              </div>
+              <strong>{escalation.affectedWorkflow}</strong>
+            </div>
+            <p>{escalation.reason}</p>
+            <small>{escalation.recommendedAction}</small>
+          </article>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Escalation recommendations">
+        {(escalationEngine.recommendations || []).map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+        <p>
+          <strong>Source:</strong> {escalationEngine.sourceState}
+        </p>
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() => onAskAssistant('Summarize active ED operational escalations and recommended leadership actions.')}
+      >
+        Ask assistant to summarize escalations
+      </button>
+    </section>
+  );
+}
+
 function EmergencyCapacityIntelligencePanel({ capacity = {}, onAskAssistant }) {
   const signals = capacity.signals || [];
   const recommendations = capacity.recommendations || [];
@@ -884,22 +1218,37 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
   const commandWidgets = emergency.commandCenterWidgets || [];
   const widgetById = Object.fromEntries(commandWidgets.map((widget) => [widget.id, widget]));
   const waitingRoomQueue = emergency.queueIntelligence?.queues?.find((queue) => queue.id === 'waiting-room');
+  const waitingRoomIntelligence = emergency.waitingRoomIntelligence;
   const emsPreArrival = emergency.emsPreArrival;
+  const emsOffload = emergency.emsOffload;
   const boarding = emergency.boardingIntelligence;
   const referralHub = emergency.referralHub;
   const capacity = emergency.capacityIntelligence;
+  const resourceBoard = emergency.resourceBoard;
+  const escalationEngine = emergency.escalationEngine;
+  const kpiLayer = emergency.kpiLayer;
   const automationState = AutomationEngine.getWorkspaceAutomationState(workspaceId);
   const automationCount =
     automationState.activeAutomations.length + automationState.demoAutomations.length + automationState.blockedAutomations.length;
 
   const directorSections = [
     {
+      id: 'door-to-doctor',
+      label: 'Door-to-Doctor',
+      value: `${kpiLayer?.metricById?.doorToDoctor?.value ?? 0}m`,
+      helper: `${kpiLayer?.metricById?.doorToDoctor?.targetCompliance ?? 0}% target compliance`,
+      detail: 'Arrival, triage, and provider timestamps drive the canonical throughput KPI.',
+      target: '/workspace/emergency/throughput',
+      assistantPrompt: 'Summarize Door-to-Doctor throughput, bottlenecks, delays, and staffing pressure.',
+      severity: (kpiLayer?.metricById?.doorToDoctor?.value || 0) > 60 ? 'high' : 'medium',
+    },
+    {
       id: 'waiting-room',
       label: 'Waiting Room',
-      value: waitingRoomQueue?.count ?? widgetById['waiting-room']?.value ?? 0,
-      helper: `${waitingRoomQueue?.waitTime ?? 0} min wait · ${waitingRoomQueue?.riskLevel || 'medium'} risk`,
+      value: waitingRoomIntelligence?.healthScore ?? waitingRoomQueue?.count ?? widgetById['waiting-room']?.value ?? 0,
+      helper: `${waitingRoomIntelligence?.riskState || waitingRoomQueue?.riskLevel || 'medium'} · ${waitingRoomIntelligence?.metrics?.reassessmentNeed ?? 0} reassessments`,
       detail: waitingRoomQueue?.bottleneck?.reason || widgetById['waiting-room']?.supportingDetail,
-      target: '/workspace/emergency/queues',
+      target: '/workspace/emergency/waiting-room',
       assistantPrompt: 'Summarize waiting room pressure, oldest waits, and near-term triage actions for ED leadership.',
       severity: waitingRoomQueue?.bottleneck?.severity || widgetById['waiting-room']?.severity || 'medium',
     },
@@ -907,11 +1256,11 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
       id: 'ems-arrivals',
       label: 'EMS Arrivals',
       value: emsPreArrival?.metrics?.incomingCount ?? widgetById['ems-arrivals']?.value ?? 0,
-      helper: `${emsPreArrival?.metrics?.nextEtaMinutes ?? 0} min next ETA · ${emsPreArrival?.metrics?.criticalCount ?? 0} critical`,
-      detail: 'Inbound EMS context, ETA, risk bundles, and handoff summaries before arrival.',
-      target: '/workspace/emergency/pre-arrival',
-      assistantPrompt: 'Summarize inbound EMS arrivals, ETA, risk bundles, and handoff readiness for ED leadership.',
-      severity: (emsPreArrival?.metrics?.criticalCount || 0) > 0 ? 'critical' : 'medium',
+      helper: `${emsOffload?.metrics?.waitingHandoffs ?? 0} handoffs · ${emsOffload?.metrics?.longestOffloadDelay ?? 0} min longest`,
+      detail: 'Inbound EMS context, ETA, waiting handoffs, and offload delay pressure.',
+      target: '/workspace/emergency/ems',
+      assistantPrompt: 'Summarize EMS arrivals, ETA, waiting handoffs, and offload delays for ED leadership.',
+      severity: emsOffload?.metrics?.pressureState === 'critical' ? 'critical' : 'medium',
     },
     {
       id: 'high-risk-queue',
@@ -955,13 +1304,23 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
     },
     {
       id: 'equipment-status',
-      label: 'Equipment Status',
-      value: widgetById['equipment-status']?.value ?? 'Monitor',
-      helper: widgetById['equipment-status']?.helper || 'Device telemetry and medical IoT readiness',
-      detail: widgetById['equipment-status']?.supportingDetail || 'Equipment and telemetry gaps that may affect ED care flow.',
-      target: '/workspace/emergency/iot',
-      assistantPrompt: 'Summarize ED equipment status, telemetry gaps, device readiness, and biomedical review needs.',
-      severity: widgetById['equipment-status']?.severity || 'high',
+      label: 'Resource Availability',
+      value: resourceBoard?.metrics?.available ?? widgetById['equipment-status']?.value ?? 'Monitor',
+      helper: `${resourceBoard?.metrics?.shortageCount ?? 0} shortages · ${resourceBoard?.metrics?.outOfService ?? 0} out of service`,
+      detail: widgetById['equipment-status']?.supportingDetail || 'Rooms, stretchers, monitors, telemetry units, and infusion pumps by status.',
+      target: '/workspace/emergency/resources',
+      assistantPrompt: 'Summarize ED resource availability, shortages, and out-of-service equipment.',
+      severity: (resourceBoard?.metrics?.shortageCount || 0) > 0 ? 'high' : 'medium',
+    },
+    {
+      id: 'escalation-status',
+      label: 'Escalations',
+      value: escalationEngine?.metrics?.activeEscalations ?? 0,
+      helper: `${escalationEngine?.metrics?.criticalEscalations ?? 0} critical · ${escalationEngine?.metrics?.urgentEscalations ?? 0} urgent`,
+      detail: 'Operational risks surfaced from capacity, boarding, EMS, queue growth, and device/resource pressure.',
+      target: '/workspace/emergency/escalations',
+      assistantPrompt: 'Summarize ED operational escalations and recommended leadership actions.',
+      severity: (escalationEngine?.metrics?.criticalEscalations || 0) > 0 ? 'critical' : 'high',
     },
     {
       id: 'automation-status',
@@ -1328,7 +1687,7 @@ function DemoDataLabels({ item }) {
   );
 }
 
-function EmergencyDemoModePanel({ demoTenant, onLaunchRoute }) {
+function EmergencyDemoModePanel({ demoTenant, demoEnvironment, onLaunchRoute }) {
   if (!demoTenant) return null;
   const demoSections = [
     ['Sample patients', demoTenant.samplePatients, (patient) => `${patient.chiefComplaint} · ${patient.stage} · ${patient.summary}`],
@@ -1349,8 +1708,42 @@ function EmergencyDemoModePanel({ demoTenant, onLaunchRoute }) {
         <div className="emergency-demo-summary">
           <DemoDataLabels item={demoTenant.labels} />
           <p>{demoTenant.safetyPosture}</p>
+          {demoEnvironment ? (
+            <div className="emergency-journey-summary" aria-label="Emergency demo environment metrics">
+              <span>{demoEnvironment.metrics.patientCount} demo patients</span>
+              <span>{demoEnvironment.metrics.waitingRoomPatients} waiting room</span>
+              <span>{demoEnvironment.metrics.boardingPatients} boarding</span>
+              <span>{demoEnvironment.metrics.emsPatients} EMS</span>
+            </div>
+          ) : null}
         </div>
       </div>
+
+      {demoEnvironment ? (
+        <div className="workspace-panel">
+          <div className="workspace-panel__header">
+            <p className="workspace-eyebrow">Emergency Demo Environment</p>
+            <h2>Realistic ED OS demo tenant</h2>
+            <p>{demoEnvironment.safetyStatement}</p>
+          </div>
+          <div className="workspace-card-grid emergency-demo-grid">
+            {demoEnvironment.patients.slice(0, 12).map((patient) => (
+              <article key={patient.patientId} className="workspace-automation-card emergency-demo-card">
+                <div>
+                  <strong>{patient.label}</strong>
+                  <span>
+                    {patient.journeyLabel} · {patient.complaint} · risk {patient.riskScore}
+                  </span>
+                </div>
+                <div className="emergency-demo-labels" aria-label={`${patient.patientId} demo labels`}>
+                  <span>{patient.demoLabel}</span>
+                  <span>No live integration</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       {demoSections.map(([title, items, detailForItem]) => (
         <div key={title} className="workspace-panel">
@@ -1360,7 +1753,7 @@ function EmergencyDemoModePanel({ demoTenant, onLaunchRoute }) {
             <p>Prospect-ready sample content for evaluating the Emergency Workspace without integrations.</p>
           </div>
           <div className="workspace-card-grid emergency-demo-grid">
-            {items.map((item) => (
+            {(items || []).map((item) => (
               <article key={item.id} className="workspace-automation-card emergency-demo-card">
                 <div>
                   <strong>{item.displayName || item.label || item.complaint}</strong>
@@ -1381,6 +1774,47 @@ function EmergencyDemoModePanel({ demoTenant, onLaunchRoute }) {
           </div>
         </div>
       ))}
+    </section>
+  );
+}
+
+function EmergencySimulationScenariosPanel({ simulationScenarios = {} }) {
+  const scenarios = simulationScenarios.scenarios || [];
+  return (
+    <section className="workspace-panel" aria-labelledby="emergency-simulation-scenarios-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Emergency Simulation Scenarios</p>
+        <h2 id="emergency-simulation-scenarios-title">Operational Training</h2>
+        <p>Training mirrors real ED operational problems by reusing Emergency Workspace signals, KPIs, queues, resources, and escalations.</p>
+      </div>
+      <DashboardGrid variant="metrics" className="workspace-focus-metrics">
+        <MetricCard label="Scenarios" value={simulationScenarios.metrics?.scenarioCount || 0} helper="Operational ED scenarios" />
+        <MetricCard label="Debrief metrics" value={simulationScenarios.metrics?.debriefMetrics || 0} helper="Timeline, KPIs, queues, decisions" />
+        <MetricCard label="Source state" value="Simulated" helper="Training only" />
+      </DashboardGrid>
+      <div className="emergency-queue-grid">
+        {scenarios.map((scenario) => (
+          <article key={scenario.scenarioId} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">Scenario</span>
+                <h3>{scenario.scenarioName}</h3>
+              </div>
+              <strong>{scenario.pressureSignals.length}</strong>
+            </div>
+            <p>{scenario.triggerPattern}</p>
+            <small>Success: {scenario.successCriteria}</small>
+          </article>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Simulation safety statement">
+        <p>
+          <strong>Source:</strong> {simulationScenarios.sourceState}
+        </p>
+        <p>
+          <strong>Safety boundary:</strong> {simulationScenarios.safetyStatement}
+        </p>
+      </div>
     </section>
   );
 }
@@ -1496,6 +1930,12 @@ function EmergencyDeploymentBlueprintPanel({ blueprint }) {
           <h2>Demonstrate, pilot, sell, then integrate</h2>
           <p>Each phase adds value without forcing a hospital-wide rollout.</p>
         </div>
+        {blueprint.minimumSellableCapabilities?.length ? (
+          <article className="emergency-deployment-principle">
+            <strong>Minimum sellable Emergency OS</strong>
+            <span>{blueprint.minimumSellableCapabilities.join(', ')}</span>
+          </article>
+        ) : null}
         <div className="workspace-card-grid emergency-deployment-grid">
           {blueprint.phases.map((phase) => (
             <article key={phase.id} className="workspace-automation-card emergency-deployment-card">
@@ -1518,6 +1958,125 @@ function EmergencyDeploymentBlueprintPanel({ blueprint }) {
                   <dd>{phase.acceptance}</dd>
                 </div>
               </dl>
+            </article>
+          ))}
+        </div>
+        {blueprint.rolloutPlans?.length ? (
+          <div className="workspace-card-grid emergency-deployment-grid">
+            {blueprint.rolloutPlans.map((plan) => (
+              <article key={plan.id} className="workspace-automation-card emergency-deployment-card">
+                <div>
+                  <span className="workspace-tool-card__meta">First Customer Path</span>
+                  <strong>{plan.label}</strong>
+                  <span>{plan.outcome}</span>
+                </div>
+                <dl>
+                  <div>
+                    <dt>Focus</dt>
+                    <dd>{plan.focus.join(', ')}</dd>
+                  </div>
+                </dl>
+              </article>
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function EmergencyImplementationSummaryPanel({ summary, onLaunchRoute }) {
+  if (!summary) return null;
+
+  return (
+    <section className="emergency-deployment-layout" aria-label="Emergency OS implementation summary">
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Implementation Write-up</p>
+          <h2>{summary.title}</h2>
+          <p>{summary.purpose}</p>
+        </div>
+        <article className="emergency-deployment-principle">
+          <strong>Current posture</strong>
+          <span>{summary.implementationPosture}</span>
+          <small>Source write-up: {summary.sourceDocument}</small>
+        </article>
+        <div className="workspace-focus-metrics emergency-roi-output-grid">
+          <div>
+            <span>Coverage docs</span>
+            <strong>{summary.coverage.length}</strong>
+            <small>Markdown plans mapped to app routes and services</small>
+          </div>
+          <div>
+            <span>Focused tests</span>
+            <strong>{summary.verification.tests}</strong>
+            <small>{summary.verification.testFiles} files · {summary.verification.status}</small>
+          </div>
+          <div>
+            <span>Future modules</span>
+            <strong>{summary.frozenModules.length}</strong>
+            <small>Preserved in code and hidden from active ED OS discovery</small>
+          </div>
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Docs to Code Coverage</p>
+          <h2>Every ED OS plan has an application surface</h2>
+          <p>Each row maps a markdown plan to its route, deterministic service, and acceptance result.</p>
+        </div>
+        <div className="workspace-card-grid emergency-deployment-grid">
+          {summary.coverage.map((item) => (
+            <article key={item.doc} className="workspace-automation-card emergency-deployment-card">
+              <div>
+                <span className="workspace-tool-card__meta">{item.doc}</span>
+                <strong>{item.capability}</strong>
+                <span>{item.acceptance}</span>
+              </div>
+              <dl>
+                <div>
+                  <dt>Status</dt>
+                  <dd>{item.status}</dd>
+                </div>
+                <div>
+                  <dt>Service</dt>
+                  <dd>{item.service}</dd>
+                </div>
+                <div>
+                  <dt>Route</dt>
+                  <dd>{item.route}</dd>
+                </div>
+              </dl>
+              <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute(item.route)}>
+                Open capability
+              </button>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">MVP Boundary</p>
+          <h2>Sell ED OS without pretending integrations exist</h2>
+          <p>These boundaries keep the first-customer pilot honest and focused.</p>
+        </div>
+        <div className="emergency-journey-insights">
+          <p>
+            <strong>Minimum sellable ED OS:</strong> {summary.minimumSellableCapabilities.join(', ')}.
+          </p>
+          <p>
+            <strong>Verification:</strong> {summary.verification.lintStatus}; {summary.verification.tests} focused tests passing.
+          </p>
+          <p>
+            <strong>Frozen modules:</strong> {summary.frozenModules.join(', ')}.
+          </p>
+        </div>
+        <div className="workspace-card-grid emergency-deployment-grid">
+          {summary.intentionalBoundaries.map((boundary) => (
+            <article key={boundary} className="workspace-automation-card emergency-deployment-card">
+              <strong>{boundary}</strong>
             </article>
           ))}
         </div>
@@ -1753,12 +2312,33 @@ function EmergencyOnboardingPanel({ onboarding, onLaunchRoute }) {
   );
 }
 
-function EmergencyAnalyticsPanel({ analytics }) {
+function EmergencyAnalyticsPanel({ analytics, kpiLayer, demoEnvironment }) {
   const emergencyAnalytics = analytics?.emergency || {};
   const metrics = emergencyAnalytics.metrics || [];
   const roiSummary = emergencyAnalytics.roiSummary || {};
+  const kpiMetrics = kpiLayer?.metrics || [];
   return (
     <section className="emergency-analytics-layout" aria-label="Emergency analytics MVP">
+      {kpiMetrics.length ? (
+        <div className="workspace-panel">
+          <div className="workspace-panel__header">
+            <p className="workspace-eyebrow">EmergencyKPILayer</p>
+            <h2>Canonical ED KPIs</h2>
+            <p>{kpiLayer.safetyStatement}</p>
+          </div>
+          <div className="workspace-focus-metrics emergency-analytics-grid">
+            {kpiMetrics.map((metric) => (
+              <div key={metric.metricId}>
+                <span>{metric.label}</span>
+                <strong>{metric.value}</strong>
+                <small>{metric.unit}</small>
+                <small>{metric.trend} · {metric.dataState}</small>
+              </div>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       <div className="workspace-panel">
         <div className="workspace-panel__header">
           <p className="workspace-eyebrow">ED Analytics MVP</p>
@@ -1802,6 +2382,16 @@ function EmergencyAnalyticsPanel({ analytics }) {
                 id: 'human-review-statement',
                 label: 'Human review posture',
                 detail: emergencyAnalytics.humanReviewStatement,
+              }}
+            />
+          ) : null}
+          {demoEnvironment ? (
+            <WorkspaceCapabilityCard
+              icon={CHROME_ICONS.layoutDashboard}
+              item={{
+                id: 'demo-environment-coverage',
+                label: `${demoEnvironment.metrics.patientCount} clearly labeled demo patients`,
+                detail: `${demoEnvironment.metrics.reassessmentNeeded} reassessment needs, ${demoEnvironment.metrics.emsPatients} EMS cases, ${demoEnvironment.metrics.boardingPatients} boarders.`,
               }}
             />
           ) : null}
@@ -1994,6 +2584,7 @@ export default function WorkspaceHome() {
     [canonicalWorkspaceId]
   );
   const isEmergencyWorkspace = canonicalWorkspaceId === 'emergency' && Boolean(pipelineData.emergency);
+  const isFutureModule = isFutureWorkspace(model.workspace);
 
   useEffect(() => {
     if (workspaceId !== canonicalWorkspaceId) {
@@ -2004,10 +2595,10 @@ export default function WorkspaceHome() {
       navigate(`/workspace/${canonicalWorkspaceId}/${defaultSubpageId}`, { replace: true });
       return;
     }
-    if (activeWorkspaceId !== canonicalWorkspaceId) {
+    if (!isFutureModule && activeWorkspaceId !== canonicalWorkspaceId) {
       void switchWorkspace(canonicalWorkspaceId);
     }
-  }, [activeSubpage, activeSubpageId, activeWorkspaceId, canonicalWorkspaceId, defaultSubpageId, navigate, subpage, switchWorkspace, workspaceId]);
+  }, [activeSubpage, activeSubpageId, activeWorkspaceId, canonicalWorkspaceId, defaultSubpageId, isFutureModule, navigate, subpage, switchWorkspace, workspaceId]);
   const workspaceExperience = useMemo(
     () => getWorkspaceExperienceProfile(model.workspace),
     [model.workspace]
@@ -2171,6 +2762,13 @@ export default function WorkspaceHome() {
         </div>
       </section>
 
+      {isFutureModule ? (
+        <FutureWorkspacePanel
+          workspace={model.workspace}
+          onLaunchEmergency={() => navigate('/workspace/emergency/command-center')}
+        />
+      ) : null}
+
       {isEmergencyWorkspace && activeSubpageId === 'command-center' ? (
         <EmergencyDirectorCommandCenter
           emergency={pipelineData.emergency}
@@ -2188,7 +2786,7 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
-      {!isEmergencyWorkspace && activeSubpageId === 'dashboard' ? (
+      {!isEmergencyWorkspace && !isFutureModule && activeSubpageId === 'dashboard' ? (
         <DashboardGrid className="workspace-content-grid">
           <DashboardSection
             className="workspace-panel"
@@ -2248,9 +2846,31 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
+      {isEmergencyWorkspace && activeSubpageId === 'throughput' ? (
+        <EmergencyThroughputPanel
+          throughput={pipelineData.emergency.doorToDoctorIntelligence}
+          kpiLayer={pipelineData.emergency.kpiLayer}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'waiting-room' ? (
+        <EmergencyWaitingRoomPanel
+          waitingRoom={pipelineData.emergency.waitingRoomIntelligence}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
       {isEmergencyWorkspace && activeSubpageId === 'pre-arrival' ? (
         <EmergencyPreArrivalPanel
           preArrival={pipelineData.emergency.emsPreArrival}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'ems' ? (
+        <EmergencyEmsOffloadPanel
+          emsOffload={pipelineData.emergency.emsOffload}
           onAskAssistant={launchAssistantPrompt}
         />
       ) : null}
@@ -2265,6 +2885,20 @@ export default function WorkspaceHome() {
       {isEmergencyWorkspace && activeSubpageId === 'boarding' ? (
         <EmergencyBoardingIntelligencePanel
           boarding={pipelineData.emergency.boardingIntelligence}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'resources' ? (
+        <EmergencyResourceBoardPanel
+          resourceBoard={pipelineData.emergency.resourceBoard}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'escalations' ? (
+        <EmergencyEscalationPanel
+          escalationEngine={pipelineData.emergency.escalationEngine}
           onAskAssistant={launchAssistantPrompt}
         />
       ) : null}
@@ -2318,12 +2952,7 @@ export default function WorkspaceHome() {
       ) : null}
 
       {isEmergencyWorkspace && activeSubpageId === 'simulations' ? (
-        <EmergencyAutomationList
-          title="Simulation Academy"
-          description="Complaint and workflow gaps map to ED simulations and debriefs."
-          automations={getWorkspaceAutomations(canonicalWorkspaceId)}
-          visibility="simulations"
-        />
+        <EmergencySimulationScenariosPanel simulationScenarios={pipelineData.emergency.simulationScenarios} />
       ) : null}
 
       {isEmergencyWorkspace && activeSubpageId === 'iot' ? (
@@ -2335,7 +2964,7 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
-      {activeSubpageId === 'tools' ? (
+      {!isFutureModule && activeSubpageId === 'tools' ? (
         <WorkspaceListPanel
           title={`${workspaceExperience.shortLabel} tools`}
           description="Workspace assets stay inside the page model rather than the sidebar."
@@ -2344,7 +2973,7 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
-      {activeSubpageId === 'workflows' ? (
+      {!isFutureModule && activeSubpageId === 'workflows' ? (
         <WorkspaceListPanel
           title="Workspace workflows"
           description="Workflow recommendations are mode-driven and can launch existing tools or assistant context."
@@ -2353,7 +2982,7 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
-      {activeSubpageId === 'automations' ? (
+      {!isFutureModule && activeSubpageId === 'automations' ? (
         <>
           {isEmergencyWorkspace ? (
             <EmergencyAutomationMarketplacePanel marketplace={pipelineData.emergency.automationMarketplace} />
@@ -2369,6 +2998,7 @@ export default function WorkspaceHome() {
       {isEmergencyWorkspace && activeSubpageId === 'demo' ? (
         <EmergencyDemoModePanel
           demoTenant={pipelineData.emergency.demoTenant}
+          demoEnvironment={pipelineData.emergency.demoEnvironment}
           onLaunchRoute={launchRoute}
         />
       ) : null}
@@ -2379,6 +3009,13 @@ export default function WorkspaceHome() {
 
       {isEmergencyWorkspace && activeSubpageId === 'deployment' ? (
         <EmergencyDeploymentBlueprintPanel blueprint={pipelineData.emergency.firstCustomerDeployment} />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'implementation' ? (
+        <EmergencyImplementationSummaryPanel
+          summary={pipelineData.emergency.implementationSummary}
+          onLaunchRoute={launchRoute}
+        />
       ) : null}
 
       {isEmergencyWorkspace && activeSubpageId === 'flow' ? (
@@ -2393,10 +3030,14 @@ export default function WorkspaceHome() {
       ) : null}
 
       {isEmergencyWorkspace && activeSubpageId === 'analytics' ? (
-        <EmergencyAnalyticsPanel analytics={pipelineData.analytics} />
+        <EmergencyAnalyticsPanel
+          analytics={pipelineData.analytics}
+          kpiLayer={pipelineData.emergency.kpiLayer}
+          demoEnvironment={pipelineData.emergency.demoEnvironment}
+        />
       ) : null}
 
-      {!isEmergencyWorkspace && activeSubpageId === 'analytics' ? (
+      {!isEmergencyWorkspace && !isFutureModule && activeSubpageId === 'analytics' ? (
         <WorkspaceListPanel
           title="Workspace analytics"
           description="Analytics are normalized from registry metadata and honest backend status."
@@ -2414,7 +3055,7 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
-      {activeSubpageId === 'alerts' ? (
+      {!isFutureModule && activeSubpageId === 'alerts' ? (
         <WorkspaceListPanel
           title="Active alerts"
           description="Alerts combine workspace-mode risks with local/demo operational notifications."
@@ -2423,7 +3064,7 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
-      {activeSubpageId === 'reports' ? (
+      {!isFutureModule && activeSubpageId === 'reports' ? (
         <WorkspaceListPanel
           title="Reports"
           description="Reports describe the current workspace mode and available evidence surfaces."
@@ -2432,7 +3073,7 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
-      {activeSubpageId === 'settings' ? (
+      {!isFutureModule && activeSubpageId === 'settings' ? (
         <WorkspaceListPanel
           title="Workspace settings"
           description="Settings reflect permissions, backend connections, and SaaS workspace configuration."
@@ -2448,7 +3089,7 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
-      {![
+      {!isFutureModule && ![
         'command-center',
         'dashboard',
         'tools',
@@ -2467,6 +3108,11 @@ export default function WorkspaceHome() {
         'demo',
         'roi',
         'deployment',
+        'throughput',
+        'waiting-room',
+        'ems',
+        'resources',
+        'escalations',
         'flow',
         'simulations',
         'iot',

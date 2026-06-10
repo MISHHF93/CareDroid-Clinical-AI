@@ -95,13 +95,13 @@ describe('WorkspaceHome', () => {
       /Boarding Pressure/i,
       /Referral Queue/i,
       /Capacity Score/i,
-      /Equipment Status/i,
+      /Resource Availability/i,
       /Automation Status/i,
     ].forEach((label) => {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0);
     });
     fireEvent.click(screen.getByRole('button', { name: /open ems arrivals/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/pre-arrival');
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/ems');
   });
 
   it('launches ED command center actions from the dashboard', () => {
@@ -129,15 +129,25 @@ describe('WorkspaceHome', () => {
     expect(screen.getAllByText(/Boarding Pressure/i).length).toBeGreaterThan(0);
   });
 
-  it('renders Fleet as a distinct transport operating environment', () => {
+  it('renders frozen workspaces as Coming Later roadmap modules', () => {
     mockWorkspaceValue.activeWorkspaceId = 'emergency';
-    renderWorkspace('/workspace/fleet');
+    const fleet = renderWorkspace('/workspace/fleet');
 
     expect(screen.getByRole('heading', { name: /fleet workspace/i })).toBeInTheDocument();
-    expect(screen.getByText(/transport logistics and dispatch environment/i)).toBeInTheDocument();
-    expect(screen.getByText(/fleet map, dispatch readiness/i)).toBeInTheDocument();
-    expect(screen.getByText(/vehicle location and route state/i)).toBeInTheDocument();
-    expect(mockWorkspaceValue.switchWorkspace).toHaveBeenCalledWith('fleet');
+    expect(screen.getByRole('heading', { name: /fleet is coming later/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Emergency Department Operating System/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/hidden from active workspace selection/i)).toBeInTheDocument();
+    expect(mockWorkspaceValue.switchWorkspace).not.toHaveBeenCalledWith('fleet');
+    fleet.unmount();
+
+    const research = renderWorkspace('/workspace/research');
+    expect(screen.getByRole('heading', { name: /research is coming later/i })).toBeInTheDocument();
+    expect(mockWorkspaceValue.switchWorkspace).not.toHaveBeenCalledWith('research');
+    research.unmount();
+
+    renderWorkspace('/workspace/education');
+    expect(screen.getByRole('heading', { name: /education is coming later/i })).toBeInTheDocument();
+    expect(mockWorkspaceValue.switchWorkspace).not.toHaveBeenCalledWith('education');
   });
 
   it('routes workspace management through profile and launches assistant with context', async () => {
@@ -158,12 +168,12 @@ describe('WorkspaceHome', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/assistant');
   });
 
-  it('renders workspace subpages without creating a blank route', () => {
+  it('preserves frozen workspace subpage deep links without rendering the old module', () => {
     renderWorkspace('/workspace/laboratory/results');
 
-    expect(screen.getByRole('heading', { name: /^results$/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/Laboratory Interpretation Mode/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/same workspace data pipeline/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /laboratory workspace/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /laboratory is coming later/i })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /^results$/i })).not.toBeInTheDocument();
   });
 
   it('renders workspace automation hub and previews automations through Assistant', () => {
@@ -401,7 +411,32 @@ describe('WorkspaceHome', () => {
     });
     expect(screen.getByText(/No integrations required/i)).toBeInTheDocument();
     expect(screen.getByText(/No live writeback/i)).toBeInTheDocument();
+    expect(screen.getByText(/Minimum sellable Emergency OS/i)).toBeInTheDocument();
+    expect(screen.getByText(/Patient Journey Engine, Queue Intelligence, ED Copilot, Referral Intelligence, EMS Intelligence, Analytics/i)).toBeInTheDocument();
+    expect(screen.getByText(/30-day pilot plan/i)).toBeInTheDocument();
+    expect(screen.getByText(/60-day rollout plan/i)).toBeInTheDocument();
+    expect(screen.getByText(/90-day expansion plan/i)).toBeInTheDocument();
     expect(screen.getByText(/without requiring a full hospital-wide deployment/i)).toBeInTheDocument();
+  });
+
+  it('renders the Emergency OS implementation summary write-up in the application', () => {
+    renderWorkspace('/workspace/emergency/implementation');
+
+    expect(screen.getByRole('heading', { name: /emergency os mvp implementation summary/i })).toBeInTheDocument();
+    expect(screen.getByText(/docs\/emergency-os-mvp-implementation-summary\.md/i)).toBeInTheDocument();
+    expect(screen.getByText(/Every ED OS plan has an application surface/i)).toBeInTheDocument();
+    expect(screen.getByText(/Door-to-Doctor Intelligence/i)).toBeInTheDocument();
+    expect(screen.getByText(/Waiting Room Intelligence/i)).toBeInTheDocument();
+    expect(screen.getByText(/Emergency KPI Layer/i)).toBeInTheDocument();
+    expect(screen.getByText(/First Customer Path/i)).toBeInTheDocument();
+    expect(screen.getByText(/Patient Journey Engine, Queue Intelligence, ED Copilot, Referral Intelligence, EMS Intelligence, Analytics/i)).toBeInTheDocument();
+    expect(screen.getByText(/9 files/i)).toBeInTheDocument();
+    expect(screen.getByText(/69 focused tests passing/i)).toBeInTheDocument();
+    expect(screen.getByText(/Research Workspace, Education Workspace, Governance Workspace, Fleet Workspace, Medical IoT Workspace, Laboratory Workspace/i)).toBeInTheDocument();
+    expect(screen.getByText(/No live EHR or ADT ingestion in the MVP/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getAllByRole('button', { name: /open capability/i })[0]);
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/throughput');
   });
 
   it('renders the Emergency Flow Intelligence platform as an end-to-end solution', () => {
@@ -479,6 +514,43 @@ describe('WorkspaceHome', () => {
       'user'
     );
     expect(screen.getByTestId('location')).toHaveTextContent('/assistant');
+  });
+
+  it('renders the new ED OS MVP dashboards', () => {
+    const throughput = renderWorkspace('/workspace/emergency/throughput');
+    expect(screen.getByRole('heading', { name: /emergency throughput/i })).toBeInTheDocument();
+    expect(screen.getByText(/Door-to-Doctor Intelligence/i)).toBeInTheDocument();
+    expect(screen.getByText(/EmergencyKPILayer/i)).toBeInTheDocument();
+    throughput.unmount();
+
+    const waitingRoom = renderWorkspace('/workspace/emergency/waiting-room');
+    expect(screen.getByRole('heading', { name: /waiting room health/i })).toBeInTheDocument();
+    expect(screen.getByText(/Waiting Room Health Score/i)).toBeInTheDocument();
+    expect(screen.getByText(/ReassessmentQueue/i)).toBeInTheDocument();
+    waitingRoom.unmount();
+
+    const ems = renderWorkspace('/workspace/emergency/ems');
+    expect(screen.getByRole('heading', { name: /ems pressure/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/waiting handoffs/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/longest offload/i).length).toBeGreaterThan(0);
+    ems.unmount();
+
+    const resources = renderWorkspace('/workspace/emergency/resources');
+    expect(screen.getByRole('heading', { name: /operational resources/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Rooms/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Infusion Pumps/i).length).toBeGreaterThan(0);
+    resources.unmount();
+
+    const escalations = renderWorkspace('/workspace/emergency/escalations');
+    expect(screen.getByRole('heading', { name: /operational risk/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Capacity overload/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Critical device outage/i).length).toBeGreaterThan(0);
+    escalations.unmount();
+
+    renderWorkspace('/workspace/emergency/simulations');
+    expect(screen.getByRole('heading', { name: /operational training/i })).toBeInTheDocument();
+    expect(screen.getByText(/Mass Casualty/i)).toBeInTheDocument();
+    expect(screen.getByText(/Boarding Crisis/i)).toBeInTheDocument();
   });
 
   it('renders EMS pre-arrival context before the patient arrives', () => {
@@ -564,14 +636,16 @@ describe('WorkspaceHome', () => {
     });
   });
 
-  it('renders workspace-specific tool and alert assets by mode', () => {
+  it('keeps frozen Medical IoT and Governance routes as roadmap placeholders', () => {
     const { unmount } = renderWorkspace('/workspace/medical-iot/devices');
-    expect(screen.getByRole('heading', { name: /^devices$/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/offline device|telemetry gap|battery risk/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('heading', { name: /medical iot workspace/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /medical iot is coming later/i })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /^devices$/i })).not.toBeInTheDocument();
     unmount();
 
     renderWorkspace('/workspace/governance/security');
-    expect(screen.getByRole('heading', { name: /^security$/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/security event|audit gap|review overdue/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('heading', { name: /governance workspace/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /governance is coming later/i })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /^security$/i })).not.toBeInTheDocument();
   });
 });

@@ -141,7 +141,7 @@ describe('QuickCommandLauncher', () => {
       target: { value: 'governance workspace' },
     });
 
-    expect(screen.getByRole('button', { name: /open governance workspace/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /open governance workspace/i })).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
       target: { value: 'global search' },
@@ -232,14 +232,15 @@ describe('QuickCommandLauncher', () => {
         'emergency',
         'icu',
         'cardiology',
-        'laboratory',
         'operations',
-        'fleet',
-        'medical-iot',
-        'education',
-        'research',
-        'governance',
+        'pharmacy',
+        'administration',
+        'simulation',
+        'ai-evaluation',
       ])
+    );
+    expect(workspaceIds).not.toEqual(
+      expect.arrayContaining(['laboratory', 'fleet', 'medical-iot', 'education', 'research', 'governance'])
     );
     expect(navIds).toEqual(
       expect.arrayContaining([
@@ -250,12 +251,10 @@ describe('QuickCommandLauncher', () => {
         'operations',
         'live-map',
         'hospital-map',
-        'medical-iot',
-        'devices',
-        'fleet',
       ])
     );
     expect(navIds).not.toContain('calculators');
+    expect(navIds).not.toEqual(expect.arrayContaining(['medical-iot', 'devices', 'fleet', 'governance']));
     expect(toolIds).not.toContain('live-tracking-map');
     expect(toolIds).not.toContain('device-fleet-management');
   });
@@ -301,30 +300,16 @@ describe('QuickCommandLauncher', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
     fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
-      target: { value: 'guardrails human review safety' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /open guardrails/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/ai-governance');
-
-    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
-    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
-      target: { value: 'fleet dispatch maintenance map' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /^open fleet$/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/fleet');
-
-    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
-    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
       target: { value: 'high news2 escalation notify clinician' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /open sepsis detection workflow/i }));
+    fireEvent.click(screen.getByRole('button', { name: /open automated triage matrix/i }));
     expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/automations');
 
     fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
     fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
-      target: { value: 'emergency department solution' },
+      target: { value: 'emergency flow intelligence platform' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /open emergency department solution/i }));
+    fireEvent.click(screen.getByRole('button', { name: /open emergency flow intelligence platform/i }));
     expect(screen.getByTestId('location')).toHaveTextContent('/specialties/emergency');
   });
 
@@ -339,7 +324,7 @@ describe('QuickCommandLauncher', () => {
     expect(toolIds).not.toContain('calculators');
   });
 
-  it('finds simulation, laboratory, and 3D viewer launch entries', () => {
+  it('finds simulation and 3D viewer launch entries while hiding frozen laboratory tools', () => {
     const entries = buildQuickCommandEntries({
       tools: getUserFacingToolRegistryProjection(),
       recentToolIds: [],
@@ -349,7 +334,6 @@ describe('QuickCommandLauncher', () => {
     expect(toolIds).toEqual(
       expect.arrayContaining([
         'clinical-documentation-assistant',
-        'research-evidence-hub',
         'clinical-knowledge-graph',
         'predictive-analytics-dashboard',
         'clinical-decision-support',
@@ -358,9 +342,9 @@ describe('QuickCommandLauncher', () => {
         'simulation-suite',
         'scenario-player',
         'simulation-outcomes',
-        'laboratory-dashboard',
         'medical-3d-viewer',
       ])
     );
+    expect(toolIds).not.toContain('laboratory-dashboard');
   });
 });

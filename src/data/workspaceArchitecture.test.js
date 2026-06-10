@@ -5,10 +5,13 @@ import {
   buildClientWorkspaceProfile,
   getWorkspaceFunctionalityMode,
   filterWorkspacesForClient,
+  FUTURE_WORKSPACE_IDS,
+  getActiveWorkspaceRegistry,
   getCareWorkspaceById,
   getWorkspacePresetForOrganizationType,
   getWorkspaceSubpageById,
   getWorkspaceSubpageEntries,
+  isFutureWorkspace,
 } from './workspaceArchitecture';
 
 describe('workspaceArchitecture', () => {
@@ -46,10 +49,37 @@ describe('workspaceArchitecture', () => {
           defaultAIAgents: expect.any(Array),
           defaultNavigationGroups: expect.any(Array),
           subscriptionTier: expect.any(String),
-          status: 'active',
+          lifecycleStage: expect.any(String),
+          status: expect.any(String),
         })
       );
     }
+  });
+
+  it('marks non-Emergency focus areas as future modules without deleting them', () => {
+    expect(FUTURE_WORKSPACE_IDS).toEqual([
+      'research',
+      'education',
+      'governance',
+      'fleet',
+      'medical-iot',
+      'laboratory',
+    ]);
+    for (const workspaceId of FUTURE_WORKSPACE_IDS) {
+      const workspace = getCareWorkspaceById(workspaceId);
+      expect(isFutureWorkspace(workspace)).toBe(true);
+      expect(workspace).toEqual(
+        expect.objectContaining({
+          status: 'roadmap',
+          lifecycleStage: 'future-module',
+          roadmapLabel: 'Future Module',
+          availabilityLabel: 'Coming Later',
+        })
+      );
+    }
+    expect(getActiveWorkspaceRegistry().map((workspace) => workspace.id)).not.toEqual(
+      expect.arrayContaining(FUTURE_WORKSPACE_IDS)
+    );
   });
 
   it('builds organization workspace presets from the canonical registry', () => {
@@ -92,8 +122,9 @@ describe('workspaceArchitecture', () => {
       userWorkspaceIds: ['fleet', 'operations'],
     }).map((workspace) => workspace.id);
 
-    expect(filtered).toEqual(['operations', 'fleet']);
+    expect(filtered).toEqual(['operations']);
     expect(filtered).not.toContain('governance');
+    expect(filtered).not.toContain('fleet');
   });
 
   it('falls back to Emergency for unknown workspace ids', () => {
@@ -204,10 +235,16 @@ describe('workspaceArchitecture', () => {
       'demo',
       'roi',
       'deployment',
+      'implementation',
+      'throughput',
+      'waiting-room',
       'pre-arrival',
+      'ems',
       'queues',
       'capacity',
       'boarding',
+      'resources',
+      'escalations',
       'triage',
       'patients',
       'referrals',

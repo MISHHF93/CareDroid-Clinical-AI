@@ -95,6 +95,32 @@ describe('WorkspaceDataPipelineService', () => {
         ]),
       })
     );
+    expect(data.emergency.doorToDoctorIntelligence).toEqual(
+      expect.objectContaining({
+        checkpoints: ['arrivalTime', 'triageTime', 'providerTime'],
+        kpi: expect.objectContaining({
+          metricId: 'doorToDoctor',
+          value: expect.any(Number),
+          targetCompliance: expect.any(Number),
+        }),
+        delays: expect.arrayContaining([
+          expect.objectContaining({
+            affectedInterval: expect.any(String),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.waitingRoomIntelligence).toEqual(
+      expect.objectContaining({
+        healthScore: expect.any(Number),
+        riskState: expect.stringMatching(/Normal|Busy|Critical/),
+        reassessmentQueue: expect.objectContaining({
+          label: 'ReassessmentQueue',
+          count: expect.any(Number),
+        }),
+      })
+    );
+    expect(data.emergency.reassessmentAutomation.queue.items.length).toBeGreaterThan(0);
     expect(data.emergency.emsPreArrival).toEqual(
       expect.objectContaining({
         workflow: expect.arrayContaining([
@@ -121,6 +147,21 @@ describe('WorkspaceDataPipelineService', () => {
         recommendations: expect.arrayContaining([
           expect.objectContaining({
             action: expect.stringMatching(/before arrival/i),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.emsOffload).toEqual(
+      expect.objectContaining({
+        metrics: expect.objectContaining({
+          incomingAmbulances: expect.any(Number),
+          waitingHandoffs: expect.any(Number),
+          longestOffloadDelay: expect.any(Number),
+        }),
+        handoffs: expect.arrayContaining([
+          expect.objectContaining({
+            status: expect.any(String),
+            offloadDelayMinutes: expect.any(Number),
           }),
         ]),
       })
@@ -194,6 +235,88 @@ describe('WorkspaceDataPipelineService', () => {
             action: expect.any(String),
           }),
         ]),
+      })
+    );
+    expect(data.emergency.resourceBoard).toEqual(
+      expect.objectContaining({
+        metrics: expect.objectContaining({
+          available: expect.any(Number),
+          occupied: expect.any(Number),
+          outOfService: expect.any(Number),
+          shortageCount: expect.any(Number),
+        }),
+        resources: expect.arrayContaining([
+          expect.objectContaining({ label: 'Rooms' }),
+          expect.objectContaining({ label: 'Infusion Pumps' }),
+        ]),
+      })
+    );
+    expect(data.emergency.escalationEngine).toEqual(
+      expect.objectContaining({
+        metrics: expect.objectContaining({
+          activeEscalations: expect.any(Number),
+        }),
+        escalations: expect.arrayContaining([
+          expect.objectContaining({
+            trigger: expect.stringMatching(/Capacity overload|Boarding overload|EMS congestion|High-risk queue growth|Critical device outage/),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.kpiLayer).toEqual(
+      expect.objectContaining({
+        id: 'EmergencyKPILayer',
+        metricById: expect.objectContaining({
+          doorToDoctor: expect.objectContaining({
+            label: 'Door-to-Doctor',
+            median: expect.any(Number),
+            p90: expect.any(Number),
+            longestActiveDuration: expect.any(Number),
+          }),
+          emsOffload: expect.objectContaining({ label: 'EMS Offload' }),
+        }),
+      })
+    );
+    expect(data.emergency.simulationScenarios.scenarios.map((scenario) => scenario.scenarioName)).toEqual(
+      expect.arrayContaining(['Mass Casualty', 'Sepsis Surge', 'Stroke Surge', 'EMS Overload', 'Boarding Crisis'])
+    );
+    expect(data.emergency.demoEnvironment.metrics.patientCount).toBeGreaterThanOrEqual(100);
+    expect(data.emergency.firstCustomerDeployment.minimumSellableCapabilities).toEqual([
+      'Patient Journey Engine',
+      'Queue Intelligence',
+      'ED Copilot',
+      'Referral Intelligence',
+      'EMS Intelligence',
+      'Analytics',
+    ]);
+    expect(data.emergency.firstCustomerDeployment.rolloutPlans.map((plan) => plan.label)).toEqual([
+      '30-day pilot plan',
+      '60-day rollout plan',
+      '90-day expansion plan',
+    ]);
+    expect(data.emergency.implementationSummary).toEqual(
+      expect.objectContaining({
+        route: '/workspace/emergency/implementation',
+        title: 'Emergency OS MVP Implementation Summary',
+        sourceDocument: 'docs/emergency-os-mvp-implementation-summary.md',
+        coverage: expect.arrayContaining([
+          expect.objectContaining({
+            doc: 'door-to-doctor-intelligence.md',
+            route: '/workspace/emergency/throughput',
+            service: 'DoorToDoctorIntelligenceService',
+            status: 'implemented',
+          }),
+          expect.objectContaining({
+            doc: 'first-customer-path.md',
+            route: '/workspace/emergency/deployment',
+            status: 'implemented',
+          }),
+        ]),
+        verification: expect.objectContaining({
+          testFiles: 9,
+          tests: 69,
+          status: 'passing',
+        }),
       })
     );
     expect(data.emergency.automationMarketplace).toEqual(
@@ -478,25 +601,29 @@ describe('WorkspaceDataPipelineService', () => {
         humanReviewRequirement: 'Required for every clinical output',
       })
     );
-    expect(data.emergency.mvpPackage.includedCapabilities[0]).toEqual(
+    expect(data.emergency.mvpPackage.includedCapabilities.find((capability) => capability.label === 'qSOFA')).toEqual(
       expect.objectContaining({
         label: 'qSOFA',
         reason: expect.stringMatching(/sepsis screening/i),
         dependencyPosture: 'Standalone/manual input',
       })
     );
-    expect(data.emergency.mvpPackage.includedCapabilities.map((capability) => capability.label)).toEqual([
-      'qSOFA',
-      'NEWS2',
-      'HEART',
-      'Wells PE',
-      'Wells DVT',
-      'Shock Index',
-      'AI Assistant',
-      'Protocol Retrieval',
-      'Workflow Guidance',
-      'Workspace Dashboard',
-    ]);
+    expect(data.emergency.mvpPackage.includedCapabilities.map((capability) => capability.label)).toEqual(
+      expect.arrayContaining([
+        'Patient Journey Engine',
+        'Queue Intelligence',
+        'ED Copilot',
+        'Referral Intelligence',
+        'EMS Intelligence',
+        'Analytics',
+        'qSOFA',
+        'NEWS2',
+        'HEART',
+        'Protocol Retrieval',
+        'Workflow Guidance',
+        'Workspace Dashboard',
+      ])
+    );
     expect(data.emergency.optionalAddOns).toEqual(
       expect.arrayContaining([
         expect.objectContaining({

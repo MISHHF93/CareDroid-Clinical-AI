@@ -3,10 +3,20 @@ import { getUserFacingToolRegistryProjection } from './toolInventory';
 import {
   CARE_WORKSPACES,
   buildCareWorkspaceModel,
+  getActiveWorkspaceRegistry,
   getCareWorkspaceById,
 } from './workspaceArchitecture';
 
 const now = new Date('2026-05-29T20:00:00.000Z');
+const FUTURE_MODULE_ROUTE_PREFIXES = Object.freeze([
+  '/fleet',
+  '/medical-iot',
+  '/devices',
+  '/laboratory',
+  '/research',
+  '/governance',
+  '/ai-governance',
+]);
 
 function minutesAgo(minutes) {
   return new Date(now.getTime() - minutes * 60_000).toISOString();
@@ -138,8 +148,20 @@ export function filterText(items, query) {
   );
 }
 
+function isFutureModuleRoute(path = '') {
+  return FUTURE_MODULE_ROUTE_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+}
+
+function hasActiveWorkspaceScope(item, activeWorkspaceIds) {
+  const workspaceIds = item.workspaceIds || [];
+  if (!workspaceIds.length) return true;
+  return workspaceIds.some((workspaceId) => activeWorkspaceIds.has(workspaceId));
+}
+
 export function buildGlobalSearchResults({ query = '', workspaceId = 'all', category = 'all' } = {}) {
-  const workspaceItems = CARE_WORKSPACES.map((workspace) => ({
+  const activeWorkspaces = getActiveWorkspaceRegistry();
+  const activeWorkspaceIds = new Set(activeWorkspaces.map((workspace) => workspace.id));
+  const workspaceItems = activeWorkspaces.map((workspace) => ({
     id: `workspace:${workspace.id}`,
     sourceId: workspace.id,
     title: `${workspace.label} Workspace`,
@@ -156,7 +178,7 @@ export function buildGlobalSearchResults({ query = '', workspaceId = 'all', cate
     category: tool.category === 'Calculator' ? 'calculator' : 'tool',
     path: tool.path,
     tool,
-    workspaceIds: CARE_WORKSPACES.filter((workspace) =>
+    workspaceIds: activeWorkspaces.filter((workspace) =>
       buildCareWorkspaceModel(workspace.id).toolEntries.some((entry) => entry.id === tool.id)
     ).map((workspace) => workspace.id),
   }));
@@ -198,7 +220,7 @@ export function buildGlobalSearchResults({ query = '', workspaceId = 'all', cate
     ...notificationItems,
     ...workflowItems,
     ...assetItems,
-  ];
+  ].filter((item) => !isFutureModuleRoute(item.path) && hasActiveWorkspaceScope(item, activeWorkspaceIds));
   results = filterByWorkspace(results, workspaceId);
   if (category !== 'all') results = results.filter((item) => item.category === category || item.type === category);
   return filterText(results, query).sort((a, b) => String(a.title).localeCompare(String(b.title)));

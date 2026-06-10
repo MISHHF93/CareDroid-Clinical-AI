@@ -38,26 +38,26 @@ describe('search-first discovery index', () => {
     );
   });
 
-  it('filters workspace-specific discovery results', () => {
+  it('filters workspace-specific discovery results to active workspaces', () => {
+    const emergencyResults = buildSearchFirstResults({ query: 'emergency workspace', workspaceId: 'emergency' });
     const iotResults = buildSearchFirstResults({ query: 'device telemetry', workspaceId: 'medical-iot' });
 
-    expect(iotResults).toEqual(
+    expect(emergencyResults).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: 'workspace', sourceId: 'emergency' }),
+      ])
+    );
+    expect(iotResults).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'workspace', sourceId: 'medical-iot' }),
       ])
     );
-    expect(iotResults.every((entry) => entry.workspaceIds.includes('medical-iot'))).toBe(true);
   });
 
-  it('finds protocols, AI records, operations, and automation templates from one search index', () => {
+  it('finds protocols, AI agents, and automation templates from one search index', () => {
     expect(buildSearchFirstResults({ query: 'sepsis management lactate pathway' })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'protocol', sourceId: 'sepsis' }),
-      ])
-    );
-    expect(buildSearchFirstResults({ query: 'guardrails human review safety' })).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ kind: 'ai-model', sourceId: 'guardrails' }),
       ])
     );
     expect(buildSearchFirstResults({ query: 'clinical copilot agent' })).toEqual(
@@ -65,7 +65,7 @@ describe('search-first discovery index', () => {
         expect.objectContaining({ kind: 'ai-agent', sourceId: 'agent-clinical-copilot' }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'fleet dispatch maintenance map' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'fleet dispatch maintenance map' })).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'operation', sourceId: 'fleet' }),
       ])

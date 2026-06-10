@@ -23,6 +23,7 @@ import {
   EMERGENCY_FLOW_INTELLIGENCE_PLATFORM,
   EMERGENCY_ONBOARDING_EXPERIENCE,
   EMERGENCY_OPTIONAL_ADD_ONS,
+  EMERGENCY_OS_IMPLEMENTATION_SUMMARY,
   EMERGENCY_PATIENT_JOURNEY,
   EMERGENCY_RAG_COMPLAINT_CONTEXT,
   EMERGENCY_ROI_ESTIMATOR,
@@ -36,12 +37,21 @@ import {
 import PatientJourneyEngine from '../data/patientJourneyEngine';
 import { workspaceFilterSummary } from '../data/platformOperatingSystem';
 import BoardingIntelligenceEngine from './boardingIntelligenceEngine';
+import DoorToDoctorIntelligenceService from './doorToDoctorIntelligenceService';
 import EdAutomationMarketplace from './edAutomationMarketplace';
 import EmsPreArrivalPipelineService from './emsPreArrivalPipelineService';
+import EmsOffloadCommandCenterService from './emsOffloadCommandCenterService';
 import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
+import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
+import EmergencyEscalationEngineService from './emergencyEscalationEngineService';
+import EmergencyKPILayerService from './emergencyKpiLayerService';
+import EmergencyResourceBoardService from './emergencyResourceBoardService';
+import EmergencySimulationScenariosService from './emergencySimulationScenariosService';
 import EmergencyOperatingSystemService from './emergencyOperatingSystemService';
 import QueueIntelligenceService from './queueIntelligenceService';
+import ReassessmentAutomationService from './reassessmentAutomationService';
 import ReferralHub from './referralHub';
+import WaitingRoomIntelligenceService from './waitingRoomIntelligenceService';
 
 const PIPELINE_STAGES = Object.freeze([
   'Source',
@@ -167,8 +177,16 @@ export const WorkspaceDataPipelineService = {
         : null;
     const queueIntelligence =
       model.workspace.id === EMERGENCY_WORKSPACE_ID ? QueueIntelligenceService.getQueueDashboard() : null;
+    const doorToDoctorIntelligence =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? DoorToDoctorIntelligenceService.getDashboard() : null;
+    const waitingRoomIntelligence =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? WaitingRoomIntelligenceService.getWaitingRoomDashboard() : null;
+    const reassessmentAutomation =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? ReassessmentAutomationService.getDashboard() : null;
     const emsPreArrival =
       model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmsPreArrivalPipelineService.getPreArrivalDashboard() : null;
+    const emsOffload =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmsOffloadCommandCenterService.getDashboard() : null;
     const capacityIntelligence =
       model.workspace.id === EMERGENCY_WORKSPACE_ID
         ? EmergencyCapacityIntelligenceService.getCapacityDashboard()
@@ -179,6 +197,16 @@ export const WorkspaceDataPipelineService = {
       model.workspace.id === EMERGENCY_WORKSPACE_ID
         ? BoardingIntelligenceEngine.getBoardingDashboard()
         : null;
+    const resourceBoard =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmergencyResourceBoardService.getResourceBoard() : null;
+    const escalationEngine =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmergencyEscalationEngineService.getEscalationDashboard() : null;
+    const kpiLayer =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmergencyKPILayerService.getKpiLayer() : null;
+    const simulationScenarios =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmergencySimulationScenariosService.getScenarioDashboard() : null;
+    const demoEnvironment =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmergencyDemoEnvironmentService.getDemoEnvironment() : null;
     const automationMarketplace =
       model.workspace.id === EMERGENCY_WORKSPACE_ID
         ? EdAutomationMarketplace.getMarketplaceDashboard(workspaceAutomations)
@@ -204,10 +232,19 @@ export const WorkspaceDataPipelineService = {
               patientJourney: PatientJourneyEngine.getPatientJourney({ automations: workspaceAutomations }),
               patientJourneyEngine,
               queueIntelligence,
+              doorToDoctorIntelligence,
+              waitingRoomIntelligence,
+              reassessmentAutomation,
               emsPreArrival,
+              emsOffload,
               capacityIntelligence,
               referralHub,
               boardingIntelligence,
+              resourceBoard,
+              escalationEngine,
+              kpiLayer,
+              simulationScenarios,
+              demoEnvironment,
               automationMarketplace,
               operatingSystem,
               canonicalPatientJourney: EMERGENCY_PATIENT_JOURNEY,
@@ -215,6 +252,7 @@ export const WorkspaceDataPipelineService = {
               commandCenterWidgets: EMERGENCY_COMMAND_CENTER_WIDGETS,
               demoTenant: EMERGENCY_DEMO_TENANT,
               firstCustomerDeployment: EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT,
+              implementationSummary: EMERGENCY_OS_IMPLEMENTATION_SUMMARY,
               flowIntelligencePlatform: EMERGENCY_FLOW_INTELLIGENCE_PLATFORM,
               chiefComplaintRoutes: EMERGENCY_CHIEF_COMPLAINT_ROUTES,
               clinicalIntentRouter: {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import ProfileWorkspaces from './ProfileWorkspaces';
 
 const switchWorkspace = vi.fn();
@@ -29,6 +29,13 @@ vi.mock('../../contexts/UserIdentityContext', () => ({
         branding: { displayName: 'Hospital Operations' },
         settings: { enabledToolIds: ['medical-iot'], enabledModules: ['dashboard', 'medical-iot'] },
       },
+      {
+        id: 'research',
+        type: 'research',
+        name: 'Research Workspace',
+        branding: { displayName: 'Research Workspace' },
+        settings: { enabledToolIds: ['literature-review'], enabledModules: ['research'] },
+      },
     ],
     workspaceState: {
       activeWorkspaceId: 'hospital-1',
@@ -41,16 +48,19 @@ vi.mock('../../contexts/UserIdentityContext', () => ({
 }));
 
 describe('ProfileWorkspaces', () => {
-  it('renders workspace switching and effective permissions', () => {
+  it('renders workspace switching and effective permissions', async () => {
     render(<ProfileWorkspaces />);
 
     expect(screen.getByRole('heading', { name: /workspaces/i })).toBeInTheDocument();
     expect(screen.getAllByText('Hospital Operations').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Research Workspace')).not.toBeInTheDocument();
     expect(screen.getByText('ACCESS_MEDICAL_IOT')).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText(/active workspace/i), {
       target: { value: 'personal-1' },
     });
-    expect(switchWorkspace).toHaveBeenCalledWith('personal-1');
+    await waitFor(() => {
+      expect(switchWorkspace).toHaveBeenCalledWith('personal-1');
+    });
   });
 });

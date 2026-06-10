@@ -672,6 +672,37 @@ export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
   goal: 'Deploy CareDroid for the first ED customer with minimal operational risk.',
   principle:
     'Start with a standalone Emergency Workspace, keep every clinical output human-reviewed, and add integrations only after the buyer sees value.',
+  minimumSellableCapabilities: Object.freeze([
+    'Patient Journey Engine',
+    'Queue Intelligence',
+    'ED Copilot',
+    'Referral Intelligence',
+    'EMS Intelligence',
+    'Analytics',
+  ]),
+  rolloutPlans: Object.freeze([
+    Object.freeze({
+      id: '30-day-pilot',
+      label: '30-day pilot plan',
+      outcome:
+        'Staff can walk through patient flow, queue pressure, Copilot guidance, referrals, EMS handoffs, and basic analytics without integrations.',
+      focus: Object.freeze(['demo tenant', 'patient journey', 'queues', 'Copilot', 'referrals', 'EMS', 'analytics']),
+    }),
+    Object.freeze({
+      id: '60-day-rollout',
+      label: '60-day rollout plan',
+      outcome:
+        'The ED has validated workflows, tuned thresholds, role-specific views, and measurable adoption for a department-level operating review.',
+      focus: Object.freeze(['workflow validation', 'threshold tuning', 'role views', 'weekly analytics review', 'source-state labels']),
+    }),
+    Object.freeze({
+      id: '90-day-expansion',
+      label: '90-day expansion plan',
+      outcome:
+        'The customer can justify continued ED-only use or expansion based on throughput, coordination, referral, EMS, and analytics value.',
+      focus: Object.freeze(['read-only feeds', 'KPI rollups', 'escalations', 'resource visibility', 'ROI review']),
+    }),
+  ]),
   phases: Object.freeze([
     Object.freeze({
       id: 'phase-1-standalone-emergency-workspace',
@@ -731,6 +762,122 @@ export const EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT = Object.freeze({
   ]),
   acceptance:
     'Emergency Workspace can be demonstrated, piloted, and sold without requiring a full hospital-wide deployment.',
+});
+
+export const EMERGENCY_OS_IMPLEMENTATION_SUMMARY = Object.freeze({
+  route: '/workspace/emergency/implementation',
+  title: 'Emergency OS MVP Implementation Summary',
+  purpose:
+    'Document and display what has been implemented for the ED OS MVP, what markdown plan each capability satisfies, and which live integrations remain intentionally out of scope.',
+  sourceDocument: 'docs/emergency-os-mvp-implementation-summary.md',
+  implementationPosture:
+    'Frontend/demo deterministic ED operating system with clearly labeled local data and no live hospital integration requirement.',
+  coverage: Object.freeze([
+    Object.freeze({
+      doc: 'door-to-doctor-intelligence.md',
+      capability: 'Door-to-Doctor Intelligence',
+      route: '/workspace/emergency/throughput',
+      service: 'DoorToDoctorIntelligenceService',
+      acceptance: 'Leadership can monitor throughput.',
+      status: 'implemented',
+    }),
+    Object.freeze({
+      doc: 'waiting-room-intelligence.md',
+      capability: 'Waiting Room Intelligence',
+      route: '/workspace/emergency/waiting-room',
+      service: 'WaitingRoomIntelligenceService',
+      acceptance: 'Waiting room pressure becomes visible.',
+      status: 'implemented',
+    }),
+    Object.freeze({
+      doc: 'reassessment-automation.md',
+      capability: 'Reassessment Queue',
+      route: '/workspace/emergency/waiting-room',
+      service: 'ReassessmentAutomationService',
+      acceptance: 'Patients do not disappear into the waiting room.',
+      status: 'implemented',
+    }),
+    Object.freeze({
+      doc: 'ems-offload-command-center.md',
+      capability: 'EMS Offload Command Center',
+      route: '/workspace/emergency/ems',
+      service: 'EmsOffloadCommandCenterService',
+      acceptance: 'EMS pressure becomes measurable.',
+      status: 'implemented',
+    }),
+    Object.freeze({
+      doc: 'emergency-resource-board.md',
+      capability: 'Emergency Resource Board',
+      route: '/workspace/emergency/resources',
+      service: 'EmergencyResourceBoardService',
+      acceptance: 'Staff can understand resource availability.',
+      status: 'implemented',
+    }),
+    Object.freeze({
+      doc: 'emergency-escalation-engine.md',
+      capability: 'Emergency Escalation Engine',
+      route: '/workspace/emergency/escalations',
+      service: 'EmergencyEscalationEngineService',
+      acceptance: 'Operational issues are surfaced early.',
+      status: 'implemented',
+    }),
+    Object.freeze({
+      doc: 'emergency-kpi-layer.md',
+      capability: 'Emergency KPI Layer',
+      route: '/workspace/emergency/analytics',
+      service: 'EmergencyKPILayerService',
+      acceptance: 'All metrics originate from one source.',
+      status: 'implemented',
+    }),
+    Object.freeze({
+      doc: 'emergency-simulation-scenarios.md',
+      capability: 'Emergency Simulation Scenarios',
+      route: '/workspace/emergency/simulations',
+      service: 'EmergencySimulationScenariosService',
+      acceptance: 'Training mirrors real operational problems.',
+      status: 'implemented',
+    }),
+    Object.freeze({
+      doc: 'emergency-demo-environment.md',
+      capability: 'Emergency Demo Environment',
+      route: '/workspace/emergency/demo',
+      service: 'EmergencyDemoEnvironmentService',
+      acceptance: 'Prospects can experience ED OS without integrations.',
+      status: 'implemented',
+    }),
+    Object.freeze({
+      doc: 'first-customer-path.md',
+      capability: 'First Customer Path',
+      route: '/workspace/emergency/deployment',
+      service: 'EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT',
+      acceptance: 'CareDroid can be piloted by an Emergency Department without requiring hospital-wide deployment.',
+      status: 'implemented',
+    }),
+  ]),
+  minimumSellableCapabilities: EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.minimumSellableCapabilities,
+  verification: Object.freeze({
+    testCommand:
+      'npm run test:run -- src/services/emergencyOsMvpServices.test.js src/services/workspaceDataPipelineService.test.js src/services/emergencyOperatingSystemService.test.js src/pages/WorkspaceHome.test.jsx src/components/QuickCommandLauncher.test.jsx src/data/searchFirstDiscovery.test.js src/data/platformOperatingSystem.test.js src/pages/profile/ProfileWorkspaces.test.jsx src/data/workspaceArchitecture.test.js',
+    testFiles: 9,
+    tests: 69,
+    status: 'passing',
+    lintStatus: 'No linter errors on edited files',
+  }),
+  frozenModules: Object.freeze([
+    'Research Workspace',
+    'Education Workspace',
+    'Governance Workspace',
+    'Fleet Workspace',
+    'Medical IoT Workspace',
+    'Laboratory Workspace',
+  ]),
+  intentionalBoundaries: Object.freeze([
+    'No live EHR or ADT ingestion in the MVP.',
+    'No EMS CAD feed integration in the MVP.',
+    'No live bed board, staffing, or device telemetry integration in the MVP.',
+    'No autonomous diagnosis, orders, disposition, or escalation.',
+    'No stored simulation debrief engine yet.',
+  ]),
 });
 
 export const EMERGENCY_FLOW_STAGES = Object.freeze([
@@ -1523,7 +1670,7 @@ export const EMERGENCY_CORE_MVP_PACKAGE = Object.freeze({
     ED_BUYER_PERSONAS.CLINICAL_INFORMATICS_LEAD,
   ],
   positioning:
-    'Standalone ED triage, evidence, workflow guidance, and dashboard pilot.',
+    'Standalone ED operating system pilot for patient journey, queues, Copilot, referrals, EMS, and analytics.',
   implementationDependency: 'Low',
   ehrDependency: 'Not required for MVP pilot',
   integrationDependency: 'Not required for MVP pilot',
@@ -1535,8 +1682,50 @@ export const EMERGENCY_CORE_MVP_PACKAGE = Object.freeze({
   recommendation:
     'Lead first customer conversations with Emergency Flow Starter as a low-integration ED flow intelligence pilot.',
   upgradePath:
-    'Add documentation, referrals, staffing, simulation, medical IoT, virtual ED, and prior authorization modules.',
+    'Add resource board, escalation engine, simulation scenarios, capacity command, device telemetry, staffing, governance, and enterprise reporting after the ED pilot proves value.',
   includedCapabilities: Object.freeze([
+    Object.freeze({
+      id: 'patient-journey-engine',
+      label: 'Patient Journey Engine',
+      type: 'operating-model',
+      reason: 'Canonical ED patient journey from arrival through discharge/admission.',
+      dependencyPosture: 'Standalone/demo or manual data',
+    }),
+    Object.freeze({
+      id: 'queue-intelligence',
+      label: 'Queue Intelligence',
+      type: 'operating-model',
+      reason: 'Makes waiting room, triage, provider, referral, admission, discharge, and reassessment queues visible.',
+      dependencyPosture: 'Standalone/demo or manual data',
+    }),
+    Object.freeze({
+      id: 'ed-copilot',
+      label: 'ED Copilot',
+      type: 'assistant',
+      reason: 'Complaint-aware workflow guidance, protocol lookup, and next-step suggestions for human review.',
+      dependencyPosture: 'Available with current assistant flow',
+    }),
+    Object.freeze({
+      id: 'referral-intelligence',
+      label: 'Referral Intelligence',
+      type: 'operating-model',
+      reason: 'Tracks consult, transfer, specialty, and follow-up referral visibility without hospital-wide rollout.',
+      dependencyPosture: 'Standalone/demo or manual queue data',
+    }),
+    Object.freeze({
+      id: 'ems-intelligence',
+      label: 'EMS Intelligence',
+      type: 'operating-model',
+      reason: 'Tracks incoming arrivals, ETA, handoff status, and offload pressure.',
+      dependencyPosture: 'Standalone/demo or manual EMS handoff data',
+    }),
+    Object.freeze({
+      id: 'emergency-analytics',
+      label: 'Analytics',
+      type: 'analytics',
+      reason: 'Shows adoption, queue pressure, referral delay, EMS offload, and journey throughput.',
+      dependencyPosture: 'Local/demo pilot events',
+    }),
     Object.freeze({
       id: REGISTRY.qsofa,
       label: 'qSOFA',

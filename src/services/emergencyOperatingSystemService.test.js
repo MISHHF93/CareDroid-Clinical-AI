@@ -30,6 +30,9 @@ describe('EmergencyOperatingSystemService', () => {
 
     expect(operatingSystem.patientFlow.engine.metrics.totalStates).toBe(12);
     expect(operatingSystem.queueFlow.metrics.queueCount).toBe(7);
+    expect(operatingSystem.throughput.kpi.metricId).toBe('doorToDoctor');
+    expect(operatingSystem.waitingRoom.riskState).toMatch(/Normal|Busy|Critical/);
+    expect(operatingSystem.reassessment.queue.label).toBe('ReassessmentQueue');
     expect(operatingSystem.referralFlow.departments).toEqual([
       'Cardiology',
       'Neurology',
@@ -38,8 +41,21 @@ describe('EmergencyOperatingSystemService', () => {
       'Surgery',
     ]);
     expect(operatingSystem.emsFlow.metrics.incomingCount).toBeGreaterThan(0);
+    expect(operatingSystem.emsOffload.metrics.waitingHandoffs).toBeGreaterThan(0);
     expect(operatingSystem.capacityFlow.score).toEqual(expect.any(Number));
     expect(operatingSystem.boardingFlow.metrics.boardingCount).toBeGreaterThan(0);
+    expect(operatingSystem.resourceBoard.resources.map((resource) => resource.label)).toEqual(
+      expect.arrayContaining(['Rooms', 'Stretchers', 'Monitors', 'Telemetry Units', 'Infusion Pumps'])
+    );
+    expect(operatingSystem.escalationEngine.metrics.activeEscalations).toBeGreaterThan(0);
+    expect(operatingSystem.kpiLayer.metricById).toEqual(
+      expect.objectContaining({
+        doorToDoctor: expect.objectContaining({ label: 'Door-to-Doctor' }),
+        boardingTime: expect.objectContaining({ label: 'Boarding Time' }),
+      })
+    );
+    expect(operatingSystem.simulationScenarios.scenarios).toHaveLength(5);
+    expect(operatingSystem.demoEnvironment.metrics.patientCount).toBeGreaterThanOrEqual(100);
     expect(operatingSystem.copilot.copilotId).toBe('emergency-ai-copilot');
     expect(operatingSystem.analytics.route).toBe('/workspace/emergency/analytics');
     expect(operatingSystem.automationMarketplace.metrics.totalModules).toBe(10);
@@ -71,10 +87,16 @@ describe('EmergencyOperatingSystemService', () => {
         activePatients: expect.any(Number),
         waitingPatients: expect.any(Number),
         queueBottlenecks: expect.any(Number),
+        doorToDoctor: expect.any(Number),
+        waitingRoomHealthScore: expect.any(Number),
+        reassessmentQueue: expect.any(Number),
         emsArrivals: expect.any(Number),
+        emsOffloadDelay: expect.any(Number),
         capacityScore: expect.any(Number),
         referralDelays: expect.any(Number),
         boardingCount: expect.any(Number),
+        resourceShortages: expect.any(Number),
+        activeEscalations: expect.any(Number),
         automationModules: 10,
       })
     );

@@ -13,6 +13,16 @@ describe('platformOperatingSystem', () => {
     expect(buildGlobalSearchResults({ query: 'qsofa', workspaceId: 'emergency' }).some((item) => item.title.toLowerCase().includes('qsofa'))).toBe(true);
   });
 
+  it('keeps future module workspaces out of global search results', () => {
+    expect(buildGlobalSearchResults({ query: 'research workspace' })).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ category: 'workspace', sourceId: 'research' }),
+      ])
+    );
+    expect(buildGlobalSearchResults({ query: 'fleet map' }).map((item) => item.path)).not.toContain('/fleet/map');
+    expect(buildGlobalSearchResults({ query: 'medical iot' }).map((item) => item.path)).not.toContain('/medical-iot');
+  });
+
   it('filters workspace context across tools, calculators, maps, notifications, and workflows', () => {
     const summary = workspaceFilterSummary('emergency');
     expect(summary.calculators.map((tool) => tool.id)).toEqual(

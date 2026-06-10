@@ -7,11 +7,20 @@ import {
 } from '../data/emergencyOperatingSystem';
 import PatientJourneyEngine from '../data/patientJourneyEngine';
 import BoardingIntelligenceEngine from './boardingIntelligenceEngine';
+import DoorToDoctorIntelligenceService from './doorToDoctorIntelligenceService';
 import EdAutomationMarketplace from './edAutomationMarketplace';
 import EmsPreArrivalPipelineService from './emsPreArrivalPipelineService';
+import EmsOffloadCommandCenterService from './emsOffloadCommandCenterService';
 import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
+import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
+import EmergencyEscalationEngineService from './emergencyEscalationEngineService';
+import EmergencyKPILayerService from './emergencyKpiLayerService';
+import EmergencyResourceBoardService from './emergencyResourceBoardService';
+import EmergencySimulationScenariosService from './emergencySimulationScenariosService';
 import QueueIntelligenceService from './queueIntelligenceService';
+import ReassessmentAutomationService from './reassessmentAutomationService';
 import ReferralHub from './referralHub';
+import WaitingRoomIntelligenceService from './waitingRoomIntelligenceService';
 
 function buildDischargeFlow({ queueDashboard, capacityDashboard, automationMarketplace }) {
   const dischargeQueue = queueDashboard.queues.find((queue) => queue.id === 'discharge-queue') || null;
@@ -42,10 +51,19 @@ export const EmergencyOperatingSystemService = Object.freeze({
       recommendations: PatientJourneyEngine.getJourneyRecommendations({ automations }),
     });
     const queueFlow = QueueIntelligenceService.getQueueDashboard();
+    const doorToDoctor = DoorToDoctorIntelligenceService.getDashboard();
+    const waitingRoom = WaitingRoomIntelligenceService.getWaitingRoomDashboard();
+    const reassessment = ReassessmentAutomationService.getDashboard();
     const emsFlow = EmsPreArrivalPipelineService.getPreArrivalDashboard();
+    const emsOffload = EmsOffloadCommandCenterService.getDashboard();
     const capacityFlow = EmergencyCapacityIntelligenceService.getCapacityDashboard();
     const referralFlow = ReferralHub.getReferralDashboard();
     const boardingFlow = BoardingIntelligenceEngine.getBoardingDashboard();
+    const resourceBoard = EmergencyResourceBoardService.getResourceBoard();
+    const escalationEngine = EmergencyEscalationEngineService.getEscalationDashboard();
+    const kpiLayer = EmergencyKPILayerService.getKpiLayer();
+    const simulationScenarios = EmergencySimulationScenariosService.getScenarioDashboard();
+    const demoEnvironment = EmergencyDemoEnvironmentService.getDemoEnvironment();
     const automationMarketplace = EdAutomationMarketplace.getMarketplaceDashboard(automations);
     const dischargeFlow = buildDischargeFlow({
       queueDashboard: queueFlow,
@@ -77,10 +95,19 @@ export const EmergencyOperatingSystemService = Object.freeze({
         engine: patientJourneyEngine,
       }),
       queueFlow,
+      throughput: doorToDoctor,
+      waitingRoom,
+      reassessment,
       referralFlow,
       emsFlow,
+      emsOffload,
       capacityFlow,
       boardingFlow,
+      resourceBoard,
+      escalationEngine,
+      kpiLayer,
+      simulationScenarios,
+      demoEnvironment,
       dischargeFlow,
       copilot: Object.freeze({
         ...EMERGENCY_AI_COPILOT,
@@ -93,10 +120,16 @@ export const EmergencyOperatingSystemService = Object.freeze({
         activePatients: patientJourneyEngine.metrics.activePatients,
         waitingPatients: patientJourneyEngine.metrics.waitingPatients,
         queueBottlenecks: queueFlow.metrics.bottleneckCount,
+        doorToDoctor: kpiLayer.metricById.doorToDoctor.value,
+        waitingRoomHealthScore: waitingRoom.healthScore,
+        reassessmentQueue: reassessment.metrics.total,
         emsArrivals: emsFlow.metrics.incomingCount,
+        emsOffloadDelay: emsOffload.metrics.currentOffloadDelay,
         capacityScore: capacityFlow.score,
         referralDelays: referralFlow.metrics.delayed,
         boardingCount: boardingFlow.metrics.boardingCount,
+        resourceShortages: resourceBoard.metrics.shortageCount,
+        activeEscalations: escalationEngine.metrics.activeEscalations,
         automationModules: automationMarketplace.metrics.totalModules,
       }),
       positioning:

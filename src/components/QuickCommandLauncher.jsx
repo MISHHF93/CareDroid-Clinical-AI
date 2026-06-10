@@ -10,7 +10,7 @@ import { FEATURE_FLAGS } from '../config/featureFlags.config';
 import { filterVisibleTools, getAssetAwareToolProjection } from '../data/assetAccess';
 import { getUserFacingToolRegistryProjection } from '../data/toolInventory';
 import { getMountedCapabilityById } from '../data/mountedCapabilityGraph';
-import { CARE_WORKSPACES } from '../config/workspace.config';
+import { getActiveWorkspaceRegistry, isFutureWorkspace } from '../config/workspace.config';
 import { QUICK_COMMAND_DESTINATION_ITEMS, canExposeNavigationItem } from '../config/navigation.config';
 import {
   buildSearchFirstDiscoveryEntries,
@@ -26,6 +26,15 @@ const MAX_FAVORITE_ITEMS = 5;
 const MAX_DEFAULT_WORKSPACE_ITEMS = 2;
 const MAX_DEFAULT_DESTINATION_ITEMS = 6;
 const MAX_DEFAULT_TOOL_ITEMS = 4;
+const FUTURE_MODULE_ROUTE_PREFIXES = Object.freeze([
+  '/fleet',
+  '/medical-iot',
+  '/devices',
+  '/laboratory',
+  '/research',
+  '/governance',
+  '/ai-governance',
+]);
 
 function commandSearchText(entry) {
   return [
@@ -66,6 +75,12 @@ function makeNavEntry(item) {
     icon: getNavIcon(item.id),
     shortcut: item.id === 'assistant' ? '/ask' : null,
   };
+}
+
+function isFutureNavigationItem(item) {
+  if (isFutureWorkspace(item.id)) return true;
+  const path = item.path || '';
+  return FUTURE_MODULE_ROUTE_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 }
 
 function makeWorkspaceEntry(workspace) {
@@ -178,25 +193,27 @@ function isPrimaryShellDuplicate(tool, navPathSet) {
 export function buildQuickCommandEntries({
   tools = getUserFacingToolRegistryProjection(),
   navItems = QUICK_COMMAND_DESTINATION_ITEMS,
-  workspaces = CARE_WORKSPACES,
+  workspaces = getActiveWorkspaceRegistry(),
   recentToolIds = [],
   favoriteToolIds = [],
   discoveryEntries = null,
   navigationPermissions = [],
   includeContextualDestinations = true,
 } = {}) {
-  const workspaceEntries = uniqueEntriesById(workspaces.map(makeWorkspaceEntry));
+  const activeWorkspaces = getActiveWorkspaceRegistry(workspaces);
+  const workspaceEntries = uniqueEntriesById(activeWorkspaces.map(makeWorkspaceEntry));
   const exposedNavItems = navItems.filter((item) =>
     canExposeNavigationItem(item, {
       permissions: navigationPermissions,
       includeContextual: includeContextualDestinations,
     })
   );
-  const navEntries = uniqueEntriesById(exposedNavItems.map(makeNavEntry));
+  const navEntries = uniqueEntriesById(exposedNavItems.filter((item) => !isFutureNavigationItem(item)).map(makeNavEntry));
   const navPathSet = new Set(navEntries.map((entry) => entry.path).filter(Boolean));
   const allToolEntries = tools
     .filter((tool) => tool?.id && tool.isLaunchable !== false && !isPrimaryShellDuplicate(tool, navPathSet))
-    .map(makeToolEntry);
+    .map(makeToolEntry)
+    .filter((entry) => !isFutureNavigationItem(entry));
   const toolById = Object.fromEntries(allToolEntries.map((entry) => [entry.sourceId, entry]));
   const seenRecentIds = new Set();
   const recentEntries = recentToolIds
@@ -338,7 +355,7 @@ export default function QuickCommandLauncher({
     () =>
       buildQuickCommandEntries({
         tools: commandTools,
-        workspaces: contextWorkspaces?.length ? contextWorkspaces : CARE_WORKSPACES,
+        workspaces: getActiveWorkspaceRegistry(contextWorkspaces?.length ? contextWorkspaces : getActiveWorkspaceRegistry()),
         recentToolIds: recentTools,
         favoriteToolIds: favorites,
         navigationPermissions,

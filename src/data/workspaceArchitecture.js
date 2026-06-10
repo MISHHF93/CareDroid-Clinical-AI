@@ -151,6 +151,26 @@ const SUBSCRIPTION_TIER_RANK = Object.freeze({
   government: 3,
 });
 
+export const FUTURE_WORKSPACE_IDS = Object.freeze([
+  'research',
+  'education',
+  'governance',
+  'fleet',
+  'medical-iot',
+  'laboratory',
+]);
+
+const FUTURE_WORKSPACE_ID_SET = new Set(FUTURE_WORKSPACE_IDS);
+
+export const FUTURE_WORKSPACE_LIFECYCLE = Object.freeze({
+  lifecycleStage: 'future-module',
+  status: 'roadmap',
+  roadmapLabel: 'Future Module',
+  availabilityLabel: 'Coming Later',
+  productFocus:
+    'Frozen from the primary product surface while CareDroid focuses on the Emergency Department Operating System.',
+});
+
 const WORKSPACE_SAAS_METADATA = Object.freeze({
   emergency: {
     allowedOrganizationTypes: ['hospital', 'clinic', 'ems', 'government'],
@@ -311,6 +331,7 @@ function tierAllows(required = 'free', current = 'free') {
 function normalizeWorkspaceDefinition(workspace) {
   const metadata = WORKSPACE_SAAS_METADATA[workspace.id] || {};
   const defaultAssets = workspace.toolIds || [];
+  const futureLifecycle = FUTURE_WORKSPACE_ID_SET.has(workspace.id) ? FUTURE_WORKSPACE_LIFECYCLE : null;
   return {
     ...workspace,
     workspaceId: workspace.id,
@@ -322,7 +343,11 @@ function normalizeWorkspaceDefinition(workspace) {
     defaultAIAgents: metadata.defaultAIAgents || ['clinical-copilot'],
     defaultNavigationGroups: metadata.defaultNavigationGroups || ['dashboard', 'assistant', 'tools'],
     subscriptionTier: metadata.subscriptionTier || 'free',
-    status: metadata.status || 'active',
+    lifecycleStage: futureLifecycle?.lifecycleStage || metadata.lifecycleStage || 'active',
+    roadmapLabel: futureLifecycle?.roadmapLabel || metadata.roadmapLabel || null,
+    availabilityLabel: futureLifecycle?.availabilityLabel || metadata.availabilityLabel || 'Available',
+    productFocus: futureLifecycle?.productFocus || metadata.productFocus || null,
+    status: futureLifecycle?.status || metadata.status || 'active',
   };
 }
 
@@ -689,10 +714,16 @@ export const WORKSPACE_FUNCTIONALITY_MODES = Object.freeze({
       { id: 'demo', label: EMERGENCY_DEMO_TENANT.mode === 'demo' ? 'Demo Mode' : 'Demo' },
       { id: 'roi', label: EMERGENCY_ROI_ESTIMATOR.title.replace('ED ', '') },
       { id: 'deployment', label: EMERGENCY_FIRST_CUSTOMER_DEPLOYMENT.title.replace('First Customer ', '') },
+      { id: 'implementation', label: 'Implementation' },
+      { id: 'throughput', label: 'Throughput' },
+      { id: 'waiting-room', label: 'Waiting Room' },
       { id: 'pre-arrival', label: 'Pre-arrival' },
+      { id: 'ems', label: 'EMS' },
       { id: 'queues', label: 'Queues' },
       { id: 'capacity', label: 'Capacity' },
       { id: 'boarding', label: 'Boarding' },
+      { id: 'resources', label: 'Resources' },
+      { id: 'escalations', label: 'Escalations' },
       'triage',
       'patients',
       'referrals',
@@ -991,6 +1022,16 @@ export function getCanonicalWorkspaceRegistry() {
   return CARE_WORKSPACES;
 }
 
+export function isFutureWorkspace(workspaceOrId) {
+  const workspaceId =
+    typeof workspaceOrId === 'string' ? workspaceOrId : workspaceOrId?.workspaceId || workspaceOrId?.id;
+  return FUTURE_WORKSPACE_ID_SET.has(workspaceId);
+}
+
+export function getActiveWorkspaceRegistry(workspaces = CARE_WORKSPACES) {
+  return workspaces.filter((workspace) => workspace.status === 'active' && !isFutureWorkspace(workspace));
+}
+
 export function buildWorkspaceSetupFromRegistry(workspaceId) {
   const workspace = getCareWorkspaceById(workspaceId);
   return {
@@ -1113,6 +1154,7 @@ export function filterWorkspacesForClient({
 
   const filtered = workspaces.filter((workspace) => {
     const workspaceId = workspace.workspaceId || workspace.id;
+    if (isFutureWorkspace(workspace) || workspace.status !== 'active') return false;
     if (!enabledSet.has(workspaceId)) return false;
     if (!workspace.allowedOrganizationTypes.map(normalizeOrganizationType).includes(orgType)) return false;
     if (!tierAllows(workspace.subscriptionTier, tier)) return false;
@@ -1121,10 +1163,10 @@ export function filterWorkspacesForClient({
       const allowedRoles = (workspace.allowedRoles || []).map(normalizeRole);
       if (allowedRoles.length && !allowedRoles.includes(normalizedRole)) return false;
     }
-    return workspace.status !== 'disabled';
+    return true;
   });
 
-  return filtered.length ? filtered : [getCareWorkspaceById(profile.defaultWorkspace || DEFAULT_CARE_WORKSPACE_ID)];
+  return filtered.length ? filtered : [getCareWorkspaceById(DEFAULT_CARE_WORKSPACE_ID)];
 }
 
 const WORKSPACE_BY_ID = Object.freeze(
