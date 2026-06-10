@@ -81,6 +81,15 @@ describe('WorkspaceHome', () => {
     expect(screen.getByText(/emergency department operating environment/i)).toBeInTheDocument();
     expect(screen.getByText(/ED flow model/i)).toBeInTheDocument();
     expect(screen.getByRole('navigation', { name: /workspace subpages/i })).toBeInTheDocument();
+    expect(screen.getByText(/Final compressed navigation/i)).toBeInTheDocument();
+    expect(screen.getByText(/9 core tabs/i)).toBeInTheDocument();
+    expect(screen.getByText(/More Emergency capabilities/i)).toBeInTheDocument();
+    expect(screen.getByText(/Flattened ED tasks/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /scan ed status/i })).toBeInTheDocument();
+    expect(screen.getByText(/5 core actions visible/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/More ED actions/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Clinical work/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Pilot proof/i).length).toBeGreaterThan(0);
     expect(screen.getByLabelText(/workspace data status/i)).toHaveTextContent(/Emergency Flow Intelligence Platform/i);
     expect(screen.getAllByText(/demo\/local fallback/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('heading', { name: /emergency command center/i })).toBeInTheDocument();
@@ -120,15 +129,150 @@ describe('WorkspaceHome', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/assistant');
   });
 
+  it('keeps compressed Emergency capabilities reachable from disclosure controls', () => {
+    renderWorkspace('/workspace/emergency');
+
+    fireEvent.click(screen.getByText(/More Emergency capabilities/i));
+    fireEvent.click(screen.getByRole('link', { name: /Analytics/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/analytics');
+  });
+
   it('renders the ED director hero screen at the command center route', () => {
     renderWorkspace('/workspace/emergency/command-center');
 
+    expect(screen.getByRole('heading', { name: /queue, alerts, risk, actions/i })).toBeInTheDocument();
+    ['Queue', 'Alerts', 'High Risk Patients', 'Actions'].forEach((section) => {
+      expect(screen.getAllByText(new RegExp(section, 'i')).length).toBeGreaterThan(0);
+    });
+    expect(screen.getByText(/Visual noise reduction/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/36%/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Expand complaint pathways/i)).toBeInTheDocument();
+    expect(screen.getByText(/Details: workflow sections/i)).toBeInTheDocument();
+    expect(screen.getByText(/Drill-down: director metrics/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /command-to-action launcher/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /stroke patient/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /show high-risk waiting patients/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /fast, focused, operational/i })).toBeInTheDocument();
+    expect(screen.getByText(/Clicks reduced/i)).toBeInTheDocument();
+    expect(screen.getByText(/Tabs reduced/i)).toBeInTheDocument();
+    expect(screen.getByText(/Duplicate actions removed/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /personalized dashboard, actions, and recommendations/i })).toBeInTheDocument();
+    ['ED Physician', 'Charge Nurse', 'Triage Nurse', 'Resident', 'ED Director'].forEach((role) => {
+      expect(screen.getByRole('tab', { name: new RegExp(role, 'i') })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText(/Expand complaint pathways/i));
+    expect(screen.getByRole('heading', { name: /start with the presentation/i })).toBeInTheDocument();
+    ['Chest Pain', 'Stroke', 'Sepsis', 'Trauma', 'Respiratory Distress'].forEach((complaint) => {
+      expect(screen.getByRole('button', { name: new RegExp(`start ${complaint}`, 'i') })).toBeInTheDocument();
+    });
+    expect(screen.getAllByText(/Workflow/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Calculators/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Protocols/i).length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByText(/Details: workflow sections/i));
+    expect(screen.getByRole('heading', { name: /80% of ed activity starts here/i })).toBeInTheDocument();
+    [
+      /Current Queue/i,
+      /High Risk Patients/i,
+      /EMS Arrivals/i,
+      /Alerts/i,
+      /Referrals/i,
+      /Capacity/i,
+      /AI Recommendations/i,
+    ].forEach((section) => {
+      expect(screen.getAllByText(section).length).toBeGreaterThan(0);
+    });
+    expect(screen.getAllByText(/Suggested Action/i).length).toBeGreaterThanOrEqual(7);
+    [/Escalate/i, /Reassess/i, /Review/i, /Refer/i, /Complete/i].forEach((action) => {
+      expect(screen.getAllByText(action).length).toBeGreaterThan(0);
+    });
+
+    fireEvent.click(screen.getByText(/Drill-down: director metrics/i));
     expect(screen.getByRole('heading', { name: /emergency command center/i })).toBeInTheDocument();
     expect(screen.getByText(/Leadership can scan department status in under 60 seconds/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Door-to-Direction/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: /open door-to-direction/i })).toBeInTheDocument();
     expect(screen.getAllByText(/Automation Status/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Boarding Pressure/i).length).toBeGreaterThan(0);
+  });
+
+  it('personalizes the ED command center by role without separate apps', () => {
+    const chargeScenario = renderWorkspace('/workspace/emergency');
+
+    expect(screen.getByRole('tab', { name: /ed physician/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByLabelText(/ED Physician personalized dashboard/i)).toHaveTextContent(/Clinical risk/i);
+    expect(screen.getByText(/Start with high-risk patients/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('tab', { name: /charge nurse/i }));
+    expect(screen.getByRole('tab', { name: /charge nurse/i })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByLabelText(/Charge Nurse personalized dashboard/i)).toHaveTextContent(/Rooms, flow/i);
+    expect(screen.getByText(/Use the Whiteboard as the first operational surface/i)).toBeInTheDocument();
+    fireEvent.click(screen.getAllByRole('button', { name: /open whiteboard/i })[0]);
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/whiteboard');
+    chargeScenario.unmount();
+
+    renderWorkspace('/workspace/emergency');
+    fireEvent.click(screen.getByRole('tab', { name: /resident/i }));
+    expect(screen.getByLabelText(/Resident personalized dashboard/i)).toHaveTextContent(/Learning-safe workflows/i);
+    fireEvent.click(screen.getByRole('button', { name: /ask teaching summary/i }));
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringContaining('resident-safe ED teaching summary'),
+      'user'
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency');
+  });
+
+  it('launches Emergency Copilot text commands into workspace actions', () => {
+    const strokeScenario = renderWorkspace('/workspace/emergency');
+    fireEvent.change(screen.getAllByLabelText(/emergency copilot command/i)[0], {
+      target: { value: 'Stroke patient' },
+    });
+    expect(screen.getByLabelText(/Resolved Emergency Copilot action/i)).toHaveTextContent(/Stroke Symptoms command/i);
+    expect(screen.getByLabelText(/Resolved Emergency Copilot action/i)).toHaveTextContent(/NIHSS/i);
+    fireEvent.click(screen.getByRole('button', { name: /launch command/i }));
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringContaining('Stroke Symptoms pathway'),
+      'user'
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/evidence');
+    strokeScenario.unmount();
+
+    renderWorkspace('/workspace/emergency');
+    fireEvent.click(screen.getByRole('button', { name: /show high-risk waiting patients/i }));
+    fireEvent.click(screen.getByRole('button', { name: /launch command/i }));
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringContaining('Show high-risk waiting patients'),
+      'user'
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/waiting-room');
+  });
+
+  it('runs primary one-screen ED actions without leaving the workspace', () => {
+    renderWorkspace('/workspace/emergency');
+
+    fireEvent.click(screen.getByRole('button', { name: /review current queue/i }));
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringContaining('Prioritize the current ED queue'),
+      'user'
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency');
+  });
+
+  it('launches complaint pathways without routing through tools or calculators first', () => {
+    renderWorkspace('/workspace/emergency');
+
+    fireEvent.click(screen.getByText(/Expand complaint pathways/i));
+    fireEvent.click(screen.getByRole('button', { name: /start chest pain/i }));
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringContaining('Launch Chest Pain complaint pathway'),
+      'user'
+    );
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringContaining('ACS Workflow'),
+      'user'
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency');
   });
 
   it('renders dedicated ED director and charge nurse views', () => {
@@ -150,11 +294,17 @@ describe('WorkspaceHome', () => {
 
     expect(screen.getByRole('heading', { name: /emergency digital whiteboard/i })).toBeInTheDocument();
     expect(screen.getByText(/Staff can track patient flow visually/i)).toBeInTheDocument();
+    ['Patient', 'Queue', 'Alert', 'Referral', 'EMS Arrival'].forEach((action) => {
+      expect(screen.getAllByRole('button', { name: new RegExp(action, 'i') }).length).toBeGreaterThan(0);
+    });
     ['Arrival', 'Triage', 'Waiting', 'Assessment', 'Orders', 'Results', 'Disposition'].forEach((column) => {
       expect(screen.getAllByText(column).length).toBeGreaterThan(0);
     });
     expect(screen.getAllByText(/Sample patient DEMO-ED/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Demo data/i).length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole('button', { name: /ems arrival/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/ems');
   });
 
   it('renders the ED Patient Path with Door-to-Direction metrics', () => {
@@ -282,9 +432,25 @@ describe('WorkspaceHome', () => {
 
   it('renders the ED triage orchestrator and evidence context', () => {
     const { unmount } = renderWorkspace('/workspace/emergency/triage');
-    expect(screen.getByRole('heading', { name: /triage orchestrator/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /qsofa/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /single triage workflow/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/complaint/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/vitals/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/patient age/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/risk factors/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Risk Bundle/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Recommended Workflow/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Recommended Calculators/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Escalation Flags/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: /qsofa/i }).length).toBeGreaterThan(0);
     expect(screen.getByText(/does not make autonomous/i)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText(/complaint/i), { target: { value: 'Chest Pain' } });
+    expect(screen.getAllByText(/ACS Workflow/i).length).toBeGreaterThan(0);
+    fireEvent.click(screen.getByRole('button', { name: /review triage bundle/i }));
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringContaining('Review compressed triage bundle'),
+      'user'
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent('/assistant');
     unmount();
 
     renderWorkspace('/workspace/emergency/evidence');

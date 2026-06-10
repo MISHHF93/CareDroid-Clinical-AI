@@ -86,20 +86,173 @@ function statusLabel(status) {
   return status === 'backend-wired' ? 'Backend wired' : 'Demo/local fallback';
 }
 
+const SUBPAGE_GROUP_LABELS = Object.freeze({
+  command: 'Command',
+  flow: 'Flow',
+  operations: 'Operations',
+  clinical: 'Clinical work',
+  proof: 'Pilot proof',
+  other: 'More',
+});
+
+const EMERGENCY_CORE_SUBPAGE_IDS = Object.freeze([
+  'command-center',
+  'whiteboard',
+  'patient-path',
+  'waiting-room',
+  'triage',
+  'queues',
+  'ems',
+  'capacity',
+  'referrals',
+]);
+
+const EMERGENCY_PRIMARY_TASK_IDS = Object.freeze([
+  'command-center',
+  'whiteboard',
+  'triage',
+  'waiting-room',
+  'ems',
+]);
+
+function groupSubpages(subpages = []) {
+  return Object.entries(
+    subpages.reduce((groups, subpage) => {
+      const group = subpage.group || 'other';
+      return {
+        ...groups,
+        [group]: [...(groups[group] || []), subpage],
+      };
+    }, {})
+  ).map(([group, items]) => ({
+    group,
+    label: SUBPAGE_GROUP_LABELS[group] || SUBPAGE_GROUP_LABELS.other,
+    items: [...items].sort((a, b) => (a.priority || 99) - (b.priority || 99)),
+  }));
+}
+
 function WorkspaceSubpageTabs({ workspaceId, subpages, activeSubpageId }) {
+  const groupedSubpages = groupSubpages(subpages);
+  const hasGroupedNavigation = groupedSubpages.some(({ group }) => group !== 'other');
+  const renderSubpageGroup = ({ group, label, items }) => (
+    <div key={group} className="workspace-subpage-group">
+      <span className="workspace-subpage-group__label">{label}</span>
+      <div className="workspace-subpage-group__links">
+        {items.map((subpage) => (
+          <Link
+            key={subpage.id}
+            to={`/workspace/${workspaceId}/${subpage.id}`}
+            className={`workspace-subpage-tab${subpage.id === activeSubpageId ? ' workspace-subpage-tab--active' : ''}`}
+            aria-current={subpage.id === activeSubpageId ? 'page' : undefined}
+          >
+            {subpage.label}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+
+  if (workspaceId === 'emergency' && hasGroupedNavigation) {
+    const coreIds = new Set(EMERGENCY_CORE_SUBPAGE_IDS);
+    const coreSubpages = subpages.filter((subpage) => coreIds.has(subpage.id));
+    const advancedSubpages = subpages.filter((subpage) => !coreIds.has(subpage.id));
+
+    return (
+      <nav className="workspace-subpage-tabs workspace-subpage-tabs--compressed" aria-label="Workspace subpages" data-qa-ignore-overflow>
+        <div className="workspace-subpage-compression-summary">
+          <span>Final compressed navigation</span>
+          <strong>{coreSubpages.length} core tabs</strong>
+          <small>{advancedSubpages.length} advanced routes preserved</small>
+        </div>
+        {groupSubpages(coreSubpages).map(renderSubpageGroup)}
+        <details className="workspace-subpage-advanced">
+          <summary>More Emergency capabilities</summary>
+          <div className="workspace-subpage-advanced__groups">
+            {groupSubpages(advancedSubpages).map(renderSubpageGroup)}
+          </div>
+        </details>
+      </nav>
+    );
+  }
+
   return (
     <nav className="workspace-subpage-tabs" aria-label="Workspace subpages" data-qa-ignore-overflow>
-      {subpages.map((subpage) => (
-        <Link
-          key={subpage.id}
-          to={`/workspace/${workspaceId}/${subpage.id}`}
-          className={`workspace-subpage-tab${subpage.id === activeSubpageId ? ' workspace-subpage-tab--active' : ''}`}
-          aria-current={subpage.id === activeSubpageId ? 'page' : undefined}
-        >
-          {subpage.label}
-        </Link>
-      ))}
+      {hasGroupedNavigation
+        ? groupedSubpages.map(renderSubpageGroup)
+        : subpages.map((subpage) => (
+            <Link
+              key={subpage.id}
+              to={`/workspace/${workspaceId}/${subpage.id}`}
+              className={`workspace-subpage-tab${subpage.id === activeSubpageId ? ' workspace-subpage-tab--active' : ''}`}
+              aria-current={subpage.id === activeSubpageId ? 'page' : undefined}
+            >
+              {subpage.label}
+            </Link>
+          ))}
     </nav>
+  );
+}
+
+function EmergencyTaskStrip({ subpages, activeSubpageId, onLaunchRoute, onAskAssistant }) {
+  const quickTaskById = Object.fromEntries(subpages.filter((subpage) => subpage.quickTask).map((subpage) => [subpage.id, subpage]));
+  const subpageById = Object.fromEntries(subpages.map((subpage) => [subpage.id, subpage]));
+  const quickTasks = EMERGENCY_PRIMARY_TASK_IDS.map((id) => quickTaskById[id] || subpageById[id]).filter(Boolean);
+  const overflowTasks = subpages
+    .filter((subpage) => subpage.quickTask && !EMERGENCY_PRIMARY_TASK_IDS.includes(subpage.id))
+    .slice(0, 6);
+  if (!quickTasks.length) return null;
+
+  return (
+    <section className="emergency-task-strip" aria-label="Emergency quick tasks">
+      <div>
+        <p className="workspace-eyebrow">Flattened ED tasks</p>
+        <h2>Start from the task, not the page tree</h2>
+        <p>{quickTasks.length} core actions visible; {overflowTasks.length} secondary actions preserved.</p>
+      </div>
+      <div className="emergency-task-strip__actions">
+        {quickTasks.map((task) => (
+          <button
+            key={task.id}
+            type="button"
+            className={`emergency-task-button${task.id === activeSubpageId ? ' emergency-task-button--active' : ''}`}
+            onClick={() => onLaunchRoute(task.path)}
+          >
+            <strong>{task.taskLabel || task.label}</strong>
+            <span>{task.taskHelper || task.label}</span>
+          </button>
+        ))}
+        <button
+          type="button"
+          className="emergency-task-button emergency-task-button--assistant"
+          onClick={() =>
+            onAskAssistant(
+              'Prioritize ED work across patient path, waiting room, triage, EMS, throughput, capacity, boarding, and resources. Keep all actions human-reviewed.'
+            )
+          }
+        >
+          <strong>Ask for priorities</strong>
+          <span>One prompt across core ED tasks</span>
+        </button>
+        {overflowTasks.length ? (
+          <details className="emergency-task-overflow">
+            <summary>More ED actions</summary>
+            <div className="emergency-task-overflow__grid">
+              {overflowTasks.map((task) => (
+                <button
+                  key={task.id}
+                  type="button"
+                  className={`emergency-task-button${task.id === activeSubpageId ? ' emergency-task-button--active' : ''}`}
+                  onClick={() => onLaunchRoute(task.path)}
+                >
+                  <strong>{task.taskLabel || task.label}</strong>
+                  <span>{task.taskHelper || task.label}</span>
+                </button>
+              ))}
+            </div>
+          </details>
+        ) : null}
+      </div>
+    </section>
   );
 }
 
@@ -386,9 +539,46 @@ function EmergencyJourneyFlow({ journey = [], engine = {} }) {
   );
 }
 
-function EmergencyDigitalWhiteboardPanel({ whiteboard = {}, onAskAssistant }) {
+function EmergencyDigitalWhiteboardPanel({ whiteboard = {}, onLaunchRoute, onAskAssistant }) {
   const columns = whiteboard.columns || [];
   const summary = whiteboard.summary || {};
+  const whiteboardActions = [
+    {
+      id: 'patient',
+      label: 'Patient',
+      value: summary.totalActivePatients || 0,
+      helper: 'Open patient path',
+      target: '/workspace/emergency/patient-path',
+    },
+    {
+      id: 'queue',
+      label: 'Queue',
+      value: summary.longestWaitMinutes || 0,
+      helper: 'Review queue pressure',
+      target: '/workspace/emergency/queues',
+    },
+    {
+      id: 'alert',
+      label: 'Alert',
+      value: summary.highRiskPatients || 0,
+      helper: 'Escalate active alerts',
+      target: '/workspace/emergency/escalations',
+    },
+    {
+      id: 'referral',
+      label: 'Referral',
+      value: summary.reassessmentDue || 0,
+      helper: 'Unblock referrals',
+      target: '/workspace/emergency/referrals',
+    },
+    {
+      id: 'ems-arrival',
+      label: 'EMS Arrival',
+      value: summary.bottleneckColumn || 'Watch',
+      helper: 'Review inbound arrivals',
+      target: '/workspace/emergency/ems',
+    },
+  ];
 
   return (
     <section className="workspace-panel emergency-whiteboard-panel" aria-labelledby="emergency-whiteboard-title">
@@ -402,6 +592,20 @@ function EmergencyDigitalWhiteboardPanel({ whiteboard = {}, onAskAssistant }) {
         <span>{summary.highRiskPatients || 0} high-risk cards</span>
         <span>{summary.reassessmentDue || 0} reassessment due</span>
         <span>{summary.longestWaitMinutes || 0} min longest wait</span>
+      </div>
+      <div className="emergency-whiteboard-action-grid" aria-label="Whiteboard direct actions">
+        {whiteboardActions.map((action) => (
+          <button
+            key={action.id}
+            type="button"
+            className="emergency-whiteboard-action"
+            onClick={() => onLaunchRoute(action.target)}
+          >
+            <span>{action.label}</span>
+            <strong>{action.value}</strong>
+            <small>{action.helper}</small>
+          </button>
+        ))}
       </div>
       <div className="emergency-journey-insights" aria-label="Emergency whiteboard controls">
         <p>
@@ -1341,6 +1545,329 @@ function EmergencyBoardingIntelligencePanel({ boarding = {}, onAskAssistant }) {
   );
 }
 
+function emergencyActionGuidanceForCard({ id, label, detail }) {
+  const guidance = {
+    'current-patients': {
+      verb: 'Review',
+      suggestedAction: 'Review active patient flow and identify the next delayed patient.',
+    },
+    'waiting-room': {
+      verb: 'Reassess',
+      suggestedAction: 'Reassess waiting patients with the oldest waits or new risk signals.',
+    },
+    'high-risk-queue': {
+      verb: 'Reassess',
+      suggestedAction: 'Reassess high-risk patients and confirm clinician review priority.',
+    },
+    'ems-arrivals': {
+      verb: 'Complete',
+      suggestedAction: 'Complete handoff preparation for the next inbound EMS case.',
+    },
+    'referral-queue': {
+      verb: 'Refer',
+      suggestedAction: 'Refer, re-route, or unblock the oldest delayed referral.',
+    },
+    'bed-pressure': {
+      verb: 'Escalate',
+      suggestedAction: 'Escalate bed pressure if pending admissions or boarders are blocking flow.',
+    },
+    'equipment-status': {
+      verb: 'Review',
+      suggestedAction: 'Review resource shortages and assign the next equipment recovery step.',
+    },
+    'staffing-pressure': {
+      verb: 'Escalate',
+      suggestedAction: 'Escalate staffing pressure when queue growth exceeds available coverage.',
+    },
+    'flow-alerts': {
+      verb: 'Escalate',
+      suggestedAction: 'Escalate the highest-risk alert or document why no escalation is needed.',
+    },
+    'door-to-direction': {
+      verb: 'Review',
+      suggestedAction: 'Review patient path blockers before they become queue delays.',
+    },
+    'door-to-doctor': {
+      verb: 'Review',
+      suggestedAction: 'Review throughput delays and assign the next operational owner.',
+    },
+    'boarding-pressure': {
+      verb: 'Escalate',
+      suggestedAction: 'Escalate boarding pressure to bed management when pending beds block flow.',
+    },
+    'capacity-score': {
+      verb: 'Review',
+      suggestedAction: 'Review capacity pressure and choose the next bed, discharge, or staffing action.',
+    },
+    'escalation-status': {
+      verb: 'Escalate',
+      suggestedAction: 'Escalate active critical risks or confirm the current mitigation owner.',
+    },
+    'automation-status': {
+      verb: 'Complete',
+      suggestedAction: 'Complete human review for blocked or pending automation outputs.',
+    },
+  };
+
+  return guidance[id] || {
+    verb: 'Review',
+    suggestedAction: `Review ${label || 'this card'} and choose the next human-owned step.`,
+    context: detail,
+  };
+}
+
+const EMERGENCY_COMPLAINT_LAUNCHER_ITEMS = Object.freeze([
+  Object.freeze({ label: 'Chest Pain', query: 'Chest Pain' }),
+  Object.freeze({ label: 'Stroke', query: 'Stroke Symptoms' }),
+  Object.freeze({ label: 'Sepsis', query: 'Sepsis Concern' }),
+  Object.freeze({ label: 'Trauma', query: 'Trauma' }),
+  Object.freeze({ label: 'Respiratory Distress', query: 'respiratory distress' }),
+]);
+
+function EmergencyComplaintLauncher({ onLaunchRoute, onWorkspaceAction }) {
+  const complaintLaunches = EMERGENCY_COMPLAINT_LAUNCHER_ITEMS
+    .map((item) => ({
+      ...item,
+      route: routeEmergencyChiefComplaint(item.query),
+    }))
+    .filter((item) => item.route);
+
+  return (
+    <section className="workspace-panel emergency-complaint-launcher" aria-labelledby="emergency-complaint-launcher-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Complaint launcher</p>
+        <h2 id="emergency-complaint-launcher-title">Start with the presentation</h2>
+        <p>Choose the complaint first, then follow the linked workflow, calculators, and protocols without hunting through Tools or Workflows.</p>
+      </div>
+      <div className="emergency-complaint-grid">
+        {complaintLaunches.map(({ label, route }) => {
+          const calculators = route.calculators || [];
+          const protocols = route.protocols || [];
+          const workflow = route.workflows?.[0] || 'Complaint workflow';
+          const prompt = `Launch ${label} complaint pathway. Start with ${workflow}, review calculators ${calculators.map((calculator) => calculator.label).join(', ') || 'none listed'}, then review protocols ${protocols.join(', ') || 'none listed'}. Keep all outputs human-reviewed.`;
+
+          return (
+            <article key={label} className="emergency-complaint-card">
+              <div>
+                <span className="workspace-eyebrow">Complaint</span>
+                <h3>{label}</h3>
+              </div>
+              <ol className="emergency-complaint-path" aria-label={`${label} pathway`}>
+                <li>
+                  <span>Workflow</span>
+                  <strong>{workflow}</strong>
+                </li>
+                <li>
+                  <span>Calculators</span>
+                  <strong>{calculators.map((calculator) => calculator.label).join(', ') || 'Clinician-selected'}</strong>
+                </li>
+                <li>
+                  <span>Protocols</span>
+                  <strong>{protocols.slice(0, 2).join(', ') || 'Protocol review'}</strong>
+                </li>
+              </ol>
+              <p>{route.guidance}</p>
+              <div className="emergency-command-actions">
+                <button
+                  type="button"
+                  className="workspace-primary-action"
+                  onClick={() => onWorkspaceAction(prompt)}
+                >
+                  Start {label}
+                </button>
+                <button
+                  type="button"
+                  className="workspace-secondary-action"
+                  onClick={() => onLaunchRoute(`/workspace/emergency/evidence?complaint=${encodeURIComponent(route.complaint)}`)}
+                >
+                  Open pathway
+                </button>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function routeEmergencyCopilotComplaint(command) {
+  const normalized = String(command || '').toLowerCase();
+  if (/stroke|facial droop|slurred|neuro|weakness/.test(normalized)) return routeEmergencyChiefComplaint('Stroke Symptoms');
+  if (/chest|acs|troponin|ecg/.test(normalized)) return routeEmergencyChiefComplaint('Chest Pain');
+  if (/sepsis|infection|fever|hypotension/.test(normalized)) return routeEmergencyChiefComplaint('Sepsis Concern');
+  if (/trauma|mvc|fall|injury/.test(normalized)) return routeEmergencyChiefComplaint('Trauma');
+  if (/respiratory|shortness|sob|dyspnea|breath|pe/.test(normalized)) return routeEmergencyChiefComplaint('respiratory distress');
+  return routeEmergencyChiefComplaint(command);
+}
+
+function resolveEmergencyCopilotCommand(command) {
+  const normalized = String(command || '').trim().toLowerCase();
+  const complaintRoute = routeEmergencyCopilotComplaint(command);
+
+  if (/high-risk|high risk|waiting|waiter|reassess/.test(normalized)) {
+    return {
+      label: 'Show high-risk waiting patients',
+      type: 'Operational queue',
+      target: '/workspace/emergency/waiting-room',
+      summary: 'Open waiting room risk, reassessment needs, and high-risk queue context.',
+      prompt: 'Show high-risk waiting patients. Prioritize waiting room risk, reassessment needs, and clinician-reviewed next actions.',
+      actions: [
+        { label: 'Calculators', target: '/workspace/emergency/triage' },
+        { label: 'Protocols', target: '/workspace/emergency/evidence' },
+        { label: 'Workflows', target: '/workspace/emergency/waiting-room' },
+        { label: 'Referrals', target: '/workspace/emergency/referrals' },
+        { label: 'Simulations', target: '/workspace/emergency/simulations' },
+        { label: 'Analytics', target: '/workspace/emergency/analytics' },
+      ],
+    };
+  }
+
+  if (/referral|consult|transfer/.test(normalized)) {
+    return {
+      label: 'Open referral command',
+      type: 'Referral',
+      target: '/workspace/emergency/referrals',
+      summary: 'Open ReferralHub for consult, transfer, specialty, and follow-up queue work.',
+      prompt: 'Prioritize Emergency referral work from this command. Keep sending, acceptance, and closure human-reviewed.',
+      actions: [
+        { label: 'Referrals', target: '/workspace/emergency/referrals' },
+        { label: 'Analytics', target: '/workspace/emergency/analytics' },
+      ],
+    };
+  }
+
+  if (/simulation|training|drill/.test(normalized)) {
+    return {
+      label: 'Open simulation command',
+      type: 'Simulation',
+      target: '/workspace/emergency/simulations',
+      summary: 'Open Emergency simulations and training drills from Copilot.',
+      prompt: 'Launch Emergency simulation context and keep learning outputs separated from live clinical action.',
+      actions: [
+        { label: 'Simulations', target: '/workspace/emergency/simulations' },
+        { label: 'Analytics', target: '/workspace/emergency/analytics' },
+      ],
+    };
+  }
+
+  if (/analytics|roi|adoption|metrics/.test(normalized)) {
+    return {
+      label: 'Open analytics command',
+      type: 'Analytics',
+      target: '/workspace/emergency/analytics',
+      summary: 'Open Emergency analytics for adoption, calculator use, workflows, protocols, simulations, and AI requests.',
+      prompt: 'Summarize Emergency analytics from command context: calculators, protocols, workflows, referrals, simulations, and AI requests.',
+      actions: [
+        { label: 'Analytics', target: '/workspace/emergency/analytics' },
+        { label: 'Workflows', target: '/workspace/emergency/flow' },
+      ],
+    };
+  }
+
+  if (complaintRoute) {
+    const complaintTarget = `/workspace/emergency/evidence?complaint=${encodeURIComponent(complaintRoute.complaint)}`;
+    return {
+      label: `${complaintRoute.complaint} command`,
+      type: 'Complaint pathway',
+      target: complaintTarget,
+      summary: `Launch ${complaintRoute.workflows?.[0] || 'workflow guidance'} with calculators ${complaintRoute.calculators.map((calculator) => calculator.label).join(', ') || 'clinician-selected'} and protocols ${complaintRoute.protocols.join(', ') || 'protocol review'}.`,
+      prompt: `Copilot command: ${command || complaintRoute.complaint}. Launch ${complaintRoute.complaint} pathway with workflows, calculators, protocols, referrals, simulations, and human review.`,
+      actions: [
+        { label: 'Calculators', target: '/workspace/emergency/triage' },
+        { label: 'Protocols', target: complaintTarget },
+        { label: 'Workflows', target: complaintTarget },
+        { label: 'Referrals', target: '/workspace/emergency/referrals' },
+        { label: 'Simulations', target: '/workspace/emergency/simulations' },
+        { label: 'Analytics', target: '/workspace/emergency/analytics' },
+      ],
+    };
+  }
+
+  return {
+    label: 'Emergency command',
+    type: 'Copilot command',
+    target: '/workspace/emergency/command-center',
+    summary: 'Type a complaint, queue request, referral, simulation, or analytics command to jump directly to the right Emergency surface.',
+    prompt: `Copilot command: ${command || 'Emergency command'}. Resolve to a human-reviewed Emergency workspace action.`,
+    actions: [
+      { label: 'Calculators', target: '/workspace/emergency/triage' },
+      { label: 'Protocols', target: '/workspace/emergency/evidence' },
+      { label: 'Workflows', target: '/workspace/emergency/command-center' },
+      { label: 'Referrals', target: '/workspace/emergency/referrals' },
+      { label: 'Simulations', target: '/workspace/emergency/simulations' },
+      { label: 'Analytics', target: '/workspace/emergency/analytics' },
+    ],
+  };
+}
+
+function EmergencyCopilotCommandBar({ onLaunchRoute, onWorkspaceAction }) {
+  const [command, setCommand] = useState('');
+  const resolvedCommand = resolveEmergencyCopilotCommand(command || 'Stroke patient');
+
+  const launchCommand = (event) => {
+    event.preventDefault();
+    onWorkspaceAction(resolvedCommand.prompt);
+    onLaunchRoute(resolvedCommand.target);
+  };
+
+  return (
+    <section className="workspace-panel emergency-copilot-command" aria-labelledby="emergency-copilot-command-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Copilot everywhere</p>
+        <h2 id="emergency-copilot-command-title">Command-to-action launcher</h2>
+        <p>Type a clinical or operational command instead of hunting through menus. Copilot launches calculators, protocols, workflows, referrals, simulations, and analytics from the same workspace shell.</p>
+      </div>
+      <form className="emergency-copilot-command__form" onSubmit={launchCommand}>
+        <label className="emergency-evidence-select">
+          <span>Command</span>
+          <input
+            type="text"
+            value={command}
+            onChange={(event) => setCommand(event.target.value)}
+            placeholder="Stroke patient"
+            aria-label="Emergency Copilot command"
+          />
+        </label>
+        <button type="submit" className="workspace-primary-action">
+          Launch command
+        </button>
+      </form>
+      <div className="emergency-copilot-examples" aria-label="Example Emergency Copilot commands">
+        {['Stroke patient', 'Show high-risk waiting patients'].map((example) => (
+          <button
+            key={example}
+            type="button"
+            className="workspace-secondary-action"
+            onClick={() => setCommand(example)}
+          >
+            {example}
+          </button>
+        ))}
+      </div>
+      <article className="emergency-copilot-resolution" aria-label="Resolved Emergency Copilot action">
+        <div>
+          <span>{resolvedCommand.type}</span>
+          <strong>{resolvedCommand.label}</strong>
+          <small>{resolvedCommand.summary}</small>
+        </div>
+        <div className="emergency-copilot-action-grid">
+          {resolvedCommand.actions.map((action) => (
+            <button
+              key={`${action.label}-${action.target}`}
+              type="button"
+              className="workspace-secondary-action"
+              onClick={() => onLaunchRoute(action.target)}
+            >
+              {action.label}
+            </button>
+          ))}
+        </div>
+      </article>
+    </section>
+  );
+}
+
 function EmergencyCommandCenter({ emergency, onLaunchRoute, onAskAssistant }) {
   const commandWidgets = emergency.commandCenterWidgets || emergency.dashboardWidgets || [];
   const patientPath = emergency.patientPath || {};
@@ -1369,35 +1896,42 @@ function EmergencyCommandCenter({ emergency, onLaunchRoute, onAskAssistant }) {
           </button>
         </div>
         <div className="emergency-command-grid">
-          {commandWidgets.map((widget) => (
-            <article
-              key={widget.id}
-              className={`emergency-command-widget emergency-dashboard-widget--${widget.severity}`}
-            >
-              <div>
-                <span>{widget.label}</span>
-                <strong>{widget.value}</strong>
-                <small>{widget.helper}</small>
-              </div>
-              <p>{widget.supportingDetail}</p>
-              <div className="emergency-command-actions">
-                <button
-                  type="button"
-                  className="workspace-secondary-action"
-                  onClick={() => onLaunchRoute(widget.primaryAction.target)}
-                >
-                  {widget.primaryAction.label}
-                </button>
-                <button
-                  type="button"
-                  className="workspace-secondary-action"
-                  onClick={() => onAskAssistant(widget.secondaryAction.prompt)}
-                >
-                  {widget.secondaryAction.label}
-                </button>
-              </div>
-            </article>
-          ))}
+          {commandWidgets.map((widget) => {
+            const action = emergencyActionGuidanceForCard(widget);
+            return (
+              <article
+                key={widget.id}
+                className={`emergency-command-widget emergency-dashboard-widget--${widget.severity}`}
+              >
+                <div>
+                  <span>{widget.label}</span>
+                  <strong>{widget.value}</strong>
+                  <small>{widget.helper}</small>
+                </div>
+                <div className="emergency-card-next-action">
+                  <span>Suggested Action</span>
+                  <strong>{action.verb}: {action.suggestedAction}</strong>
+                  <small>{widget.supportingDetail}</small>
+                </div>
+                <div className="emergency-command-actions">
+                  <button
+                    type="button"
+                    className="workspace-secondary-action"
+                    onClick={() => onLaunchRoute(widget.primaryAction.target)}
+                  >
+                    {widget.primaryAction.label}
+                  </button>
+                  <button
+                    type="button"
+                    className="workspace-secondary-action"
+                    onClick={() => onAskAssistant(widget.secondaryAction.prompt)}
+                  >
+                    {widget.secondaryAction.label}
+                  </button>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
       <aside className="workspace-panel emergency-command-sidecar" aria-labelledby="emergency-command-flow-title">
@@ -1419,7 +1953,182 @@ function EmergencyCommandCenter({ emergency, onLaunchRoute, onAskAssistant }) {
   );
 }
 
-function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute, onAskAssistant }) {
+function EmergencyOneScreenWorkflow({ emergency, workspaceId, onLaunchRoute, onWorkspaceAction }) {
+  const commandWidgets = emergency.commandCenterWidgets || [];
+  const widgetById = Object.fromEntries(commandWidgets.map((widget) => [widget.id, widget]));
+  const waitingRoomQueue = emergency.queueIntelligence?.queues?.find((queue) => queue.id === 'waiting-room');
+  const highRiskWidget = widgetById['high-risk-queue'];
+  const emsPreArrival = emergency.emsPreArrival;
+  const emsOffload = emergency.emsOffload;
+  const referralHub = emergency.referralHub;
+  const capacity = emergency.capacityIntelligence;
+  const escalationEngine = emergency.escalationEngine;
+  const patientPath = emergency.patientPath;
+  const queueBottlenecks = emergency.queueIntelligence?.bottlenecks || [];
+  const aiRecommendations = [
+    ...(emergency.patientJourneyEngine?.recommendations || []),
+    ...(emergency.queueIntelligence?.recommendations || []),
+    ...(capacity?.recommendations || []),
+    ...(referralHub?.recommendations || []),
+  ];
+  const automationState = AutomationEngine.getWorkspaceAutomationState(workspaceId);
+
+  const sections = [
+    {
+      id: 'current-queue',
+      label: 'Current Queue',
+      value: patientPath?.metrics?.patientCount ?? emergency.operatingSystem?.leadershipSummary?.activePatients ?? 0,
+      helper: `${waitingRoomQueue?.count ?? 0} waiting · ${queueBottlenecks.length} bottlenecks`,
+      detail:
+        waitingRoomQueue?.bottleneck?.reason ||
+        'Queue pressure, waiting room load, patient path state, and bottlenecks are visible from the workspace.',
+      target: '/workspace/emergency/queues',
+      actionVerb: 'Review',
+      actionLabel: 'Review Current Queue',
+      suggestedAction: 'Review the queue bottleneck and assign the next human-owned step.',
+      prompt:
+        'Prioritize the current ED queue using patient path, waiting room, bottlenecks, and reassessment needs. Return the next human-reviewed actions.',
+      severity: waitingRoomQueue?.bottleneck?.severity || 'medium',
+    },
+    {
+      id: 'high-risk-patients',
+      label: 'High Risk Patients',
+      value: highRiskWidget?.value ?? emergency.patientJourneyEngine?.metrics?.highRiskPatients ?? 0,
+      helper: highRiskWidget?.helper || 'Risk scores and clinician review queues',
+      detail: highRiskWidget?.supportingDetail || 'High-risk patients are surfaced for calculator-backed clinician review.',
+      target: '/workspace/emergency/triage',
+      actionVerb: 'Reassess',
+      actionLabel: 'Reassess High Risk',
+      suggestedAction: 'Reassess high-risk patients and confirm calculator-triggered review needs.',
+      prompt:
+        'Prioritize high-risk ED patients by calculator signal, waiting state, arrival mode, and clinician review need. Do not make autonomous decisions.',
+      severity: highRiskWidget?.severity || 'critical',
+    },
+    {
+      id: 'ems-arrivals',
+      label: 'EMS Arrivals',
+      value: emsPreArrival?.metrics?.incomingCount ?? widgetById['ems-arrivals']?.value ?? 0,
+      helper: `${emsOffload?.metrics?.waitingHandoffs ?? 0} handoffs · ${emsOffload?.metrics?.longestOffloadDelay ?? 0} min longest`,
+      detail: 'Inbound EMS, ETA, risk context, waiting handoffs, and offload pressure stay visible without leaving the workspace.',
+      target: '/workspace/emergency/ems',
+      actionVerb: 'Complete',
+      actionLabel: 'Complete EMS Handoff',
+      suggestedAction: 'Complete handoff prep for the next inbound or delayed EMS case.',
+      prompt:
+        'Prepare EMS handoff priorities using inbound arrivals, ETA, offload delays, waiting handoffs, and high-risk context.',
+      severity: emsOffload?.metrics?.pressureState === 'critical' ? 'critical' : 'medium',
+    },
+    {
+      id: 'alerts',
+      label: 'Alerts',
+      value: escalationEngine?.metrics?.activeEscalations ?? widgetById['flow-alerts']?.value ?? 0,
+      helper: `${escalationEngine?.metrics?.criticalEscalations ?? 0} critical · ${escalationEngine?.metrics?.urgentEscalations ?? 0} urgent`,
+      detail:
+        escalationEngine?.escalations?.[0]?.recommendedAction ||
+        widgetById['flow-alerts']?.supportingDetail ||
+        'Operational alerts are consolidated from queue, capacity, boarding, EMS, and device pressure.',
+      target: '/workspace/emergency/escalations',
+      actionVerb: 'Escalate',
+      actionLabel: 'Escalate Alerts',
+      suggestedAction: 'Escalate the highest-risk alert or confirm no escalation is needed.',
+      prompt:
+        'Review active ED alerts and escalation triggers across queue, capacity, boarding, EMS, referrals, devices, and staffing.',
+      severity: (escalationEngine?.metrics?.criticalEscalations || 0) > 0 ? 'critical' : 'high',
+    },
+    {
+      id: 'referrals',
+      label: 'Referrals',
+      value: referralHub?.metrics?.active ?? widgetById['referral-queue']?.value ?? 0,
+      helper: `${referralHub?.metrics?.delayed ?? 0} delayed · ${referralHub?.metrics?.accepted ?? 0} accepted`,
+      detail: referralHub?.recommendations?.[0]?.action || 'Referral blockers are visible by department queue and disposition dependency.',
+      target: '/workspace/emergency/referrals',
+      actionVerb: 'Refer',
+      actionLabel: 'Refer or Unblock',
+      suggestedAction: 'Refer, re-route, or unblock the oldest delayed referral dependency.',
+      prompt:
+        'Prioritize ED referral blockers by department queue, elapsed time, disposition dependency, and delayed referrals.',
+      severity: (referralHub?.metrics?.delayed || 0) > 0 ? 'high' : 'medium',
+    },
+    {
+      id: 'capacity',
+      label: 'Capacity',
+      value: capacity?.score ?? 0,
+      helper: `${capacity?.riskLevel || 'Green'} · ${capacity?.occupancyPercent ?? 0}% occupied`,
+      detail: capacity?.summary || 'Capacity posture combines census, beds, boarding, EMS, and discharge candidates.',
+      target: '/workspace/emergency/capacity',
+      actionVerb: 'Review',
+      actionLabel: 'Review Capacity',
+      suggestedAction: 'Review capacity pressure and pick the next bed, discharge, or staffing action.',
+      prompt:
+        'Assess ED capacity using score, occupied spaces, pending admissions, boarders, EMS arrivals, and discharge candidates.',
+      severity: ['Red', 'Orange'].includes(capacity?.riskLevel) ? 'critical' : 'medium',
+    },
+    {
+      id: 'ai-recommendations',
+      label: 'AI Recommendations',
+      value: aiRecommendations.length + automationState.activeAutomations.length,
+      helper: `${automationState.activeAutomations.length} automations · human review required`,
+      detail: aiRecommendations[0]?.action || aiRecommendations[0]?.recommendation || 'AI recommendations stay workspace-scoped and human-reviewed.',
+      target: '/workspace/emergency/automations',
+      actionVerb: 'Complete',
+      actionLabel: 'Complete Recommendation Review',
+      suggestedAction: 'Complete AI recommendation review and accept only human-approved next steps.',
+      prompt:
+        'Generate workspace-centric ED recommendations across current queue, high-risk patients, EMS arrivals, alerts, referrals, and capacity. Keep all recommendations human-reviewed.',
+      severity: automationState.blockedAutomations.length ? 'high' : 'medium',
+    },
+  ];
+
+  return (
+    <section className="workspace-panel emergency-one-screen-workflow" aria-labelledby="emergency-one-screen-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">One-screen ED workflow</p>
+        <h2 id="emergency-one-screen-title">80% of ED activity starts here</h2>
+        <p>Current queue, risk, EMS, alerts, referrals, capacity, and AI recommendations stay actionable from the primary workspace.</p>
+      </div>
+      <div className="emergency-one-screen-grid">
+        {sections.map((section) => (
+          <article
+            key={section.id}
+            className={`emergency-one-screen-card emergency-dashboard-widget--${section.severity}`}
+          >
+            <div className="emergency-one-screen-card__header">
+              <div>
+                <span>{section.label}</span>
+                <strong>{section.value}</strong>
+                <small>{section.helper}</small>
+              </div>
+            </div>
+            <div className="emergency-card-next-action">
+              <span>Suggested Action</span>
+              <strong>{section.actionVerb}: {section.suggestedAction}</strong>
+              <small>{section.detail}</small>
+            </div>
+            <div className="emergency-command-actions">
+              <button
+                type="button"
+                className="workspace-primary-action"
+                onClick={() => onWorkspaceAction(section.prompt)}
+              >
+                {section.actionLabel}
+              </button>
+              <button
+                type="button"
+                className="workspace-secondary-action"
+                onClick={() => onLaunchRoute(section.target)}
+              >
+                Open detail
+              </button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute, onAskAssistant, onWorkspaceAction }) {
+  const [selectedRoleId, setSelectedRoleId] = useState('ed-physician');
   const operatingSystem = emergency.operatingSystem;
   const commandWidgets = emergency.commandCenterWidgets || [];
   const widgetById = Object.fromEntries(commandWidgets.map((widget) => [widget.id, widget]));
@@ -1434,9 +2143,213 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
   const escalationEngine = emergency.escalationEngine;
   const kpiLayer = emergency.kpiLayer;
   const patientPath = emergency.patientPath;
+  const queueBottlenecks = emergency.queueIntelligence?.bottlenecks || [];
   const automationState = AutomationEngine.getWorkspaceAutomationState(workspaceId);
   const automationCount =
     automationState.activeAutomations.length + automationState.demoAutomations.length + automationState.blockedAutomations.length;
+  const highRiskWidget = widgetById['high-risk-queue'];
+  const prioritySnapshot = [
+    {
+      id: 'queue',
+      label: 'Queue',
+      value: waitingRoomQueue?.count ?? patientPath?.metrics?.patientCount ?? 0,
+      helper: `${queueBottlenecks.length} bottlenecks · ${waitingRoomIntelligence?.metrics?.reassessmentNeed ?? 0} reassessments`,
+      actionLabel: 'Review Queue',
+      target: '/workspace/emergency/queues',
+    },
+    {
+      id: 'alerts',
+      label: 'Alerts',
+      value: escalationEngine?.metrics?.activeEscalations ?? widgetById['flow-alerts']?.value ?? 0,
+      helper: `${escalationEngine?.metrics?.criticalEscalations ?? 0} critical · ${escalationEngine?.metrics?.urgentEscalations ?? 0} urgent`,
+      actionLabel: 'Escalate Alerts',
+      target: '/workspace/emergency/escalations',
+    },
+    {
+      id: 'high-risk-patients',
+      label: 'High Risk Patients',
+      value: highRiskWidget?.value ?? emergency.patientJourneyEngine?.metrics?.highRiskPatients ?? 0,
+      helper: highRiskWidget?.helper || 'Calculator-triggered clinician review',
+      actionLabel: 'Reassess Risk',
+      target: '/workspace/emergency/triage',
+    },
+  ];
+
+  const roleProfiles = [
+    {
+      id: 'ed-physician',
+      label: 'ED Physician',
+      focus: 'Clinical risk, complaint pathways, and decision support',
+      dashboard: [
+        {
+          label: 'High Risk Patients',
+          value: highRiskWidget?.value ?? emergency.patientJourneyEngine?.metrics?.highRiskPatients ?? 0,
+          helper: 'Calculator-triggered clinician review',
+        },
+        {
+          label: 'Current Queue',
+          value: patientPath?.metrics?.patientCount ?? operatingSystem?.leadershipSummary?.activePatients ?? 0,
+          helper: 'Active ED patients needing next decisions',
+        },
+        {
+          label: 'AI Recommendations',
+          value: (emergency.patientJourneyEngine?.recommendations?.length || 0) + automationState.activeAutomations.length,
+          helper: 'Human-reviewed clinical recommendations',
+        },
+      ],
+      actions: [
+        { label: 'Reassess High Risk', target: '/workspace/emergency/triage' },
+        { label: 'Open Complaint Pathways', target: '/workspace/emergency/evidence' },
+        {
+          label: 'Ask Clinical Priorities',
+          prompt: 'Summarize ED physician priorities: high-risk patients, complaint pathways, calculator triggers, and human-reviewed next clinical actions.',
+        },
+      ],
+      recommendations: [
+        'Start with high-risk patients before lower-acuity throughput work.',
+        'Use complaint pathways for chest pain, stroke, sepsis, trauma, and respiratory distress.',
+        'Confirm every AI recommendation with clinician review before acting.',
+      ],
+    },
+    {
+      id: 'charge-nurse',
+      label: 'Charge Nurse',
+      focus: 'Rooms, flow, reassessment, resources, and handoffs',
+      dashboard: [
+        {
+          label: 'Waiting Room',
+          value: waitingRoomQueue?.count ?? widgetById['waiting-room']?.value ?? 0,
+          helper: `${waitingRoomIntelligence?.metrics?.reassessmentNeed ?? 0} reassessments needed`,
+        },
+        {
+          label: 'Resource Availability',
+          value: resourceBoard?.metrics?.available ?? widgetById['equipment-status']?.value ?? 'Monitor',
+          helper: `${resourceBoard?.metrics?.shortageCount ?? 0} shortages`,
+        },
+        {
+          label: 'EMS Handoffs',
+          value: emsOffload?.metrics?.waitingHandoffs ?? 0,
+          helper: `${emsOffload?.metrics?.longestOffloadDelay ?? 0} min longest offload`,
+        },
+      ],
+      actions: [
+        { label: 'Open Whiteboard', target: '/workspace/emergency/whiteboard' },
+        { label: 'Review Waiting Room', target: '/workspace/emergency/waiting-room' },
+        { label: 'Check EMS Handoffs', target: '/workspace/emergency/ems' },
+      ],
+      recommendations: [
+        'Use the Whiteboard as the first operational surface.',
+        'Reassess the oldest waiters and patients with new risk signals.',
+        'Assign owners for room, equipment, and EMS handoff blockers.',
+      ],
+    },
+    {
+      id: 'triage-nurse',
+      label: 'Triage Nurse',
+      focus: 'Complaint intake, vitals, risk factors, and escalation flags',
+      dashboard: [
+        {
+          label: 'Triage Risk',
+          value: highRiskWidget?.value ?? emergency.patientJourneyEngine?.metrics?.highRiskPatients ?? 0,
+          helper: 'Patients needing calculator-backed review',
+        },
+        {
+          label: 'Reassessment Queue',
+          value: waitingRoomIntelligence?.metrics?.reassessmentNeed ?? 0,
+          helper: waitingRoomIntelligence?.riskState || 'Risk monitored',
+        },
+        {
+          label: 'Waiting Room',
+          value: waitingRoomQueue?.count ?? 0,
+          helper: waitingRoomQueue?.bottleneck?.reason || 'Waiting patients by risk state',
+        },
+      ],
+      actions: [
+        { label: 'Review Triage Risk', target: '/workspace/emergency/triage' },
+        { label: 'Reassess Waiting Room', target: '/workspace/emergency/waiting-room' },
+        {
+          label: 'Ask Triage Bundle',
+          prompt: 'Build a triage nurse bundle from complaint, vitals, age, risk factors, calculators, and escalation flags. Keep outputs human-reviewed.',
+        },
+      ],
+      recommendations: [
+        'Capture complaint, vitals, age, and risk factors once.',
+        'Escalate respiratory, hemodynamic, infection, and age-related flags early.',
+        'Use recommended calculators as triggers for clinician review, not autonomous decisions.',
+      ],
+    },
+    {
+      id: 'resident',
+      label: 'Resident',
+      focus: 'Learning-safe workflows, calculators, protocols, and review checkpoints',
+      dashboard: [
+        {
+          label: 'Complaint Workflows',
+          value: EMERGENCY_COMPLAINT_LAUNCHER_ITEMS.length,
+          helper: 'Common ED presentations',
+        },
+        {
+          label: 'Calculators',
+          value: 'Guided',
+          helper: 'Complaint-linked calculator review',
+        },
+        {
+          label: 'Protocols',
+          value: 'Review',
+          helper: 'Protocol checks before plan finalization',
+        },
+      ],
+      actions: [
+        { label: 'Start Chest Pain', target: '/workspace/emergency/evidence?complaint=Chest%20Pain' },
+        { label: 'Open Triage Workflow', target: '/workspace/emergency/triage' },
+        {
+          label: 'Ask Teaching Summary',
+          prompt: 'Create a resident-safe ED teaching summary with complaint workflow, calculators, protocols, and attending review checkpoints.',
+        },
+      ],
+      recommendations: [
+        'Start from complaint before browsing tools or calculators.',
+        'Review calculators and protocols before presenting the plan.',
+        'Keep attending review explicit for high-risk or protocol-driven cases.',
+      ],
+    },
+    {
+      id: 'ed-director',
+      label: 'ED Director',
+      focus: 'Throughput, capacity, boarding, escalations, and ROI',
+      dashboard: [
+        {
+          label: 'Capacity Score',
+          value: capacity?.score ?? 0,
+          helper: `${capacity?.riskLevel || 'Green'} · ${capacity?.occupancyPercent ?? 0}% occupied`,
+        },
+        {
+          label: 'Boarding Pressure',
+          value: boarding?.metrics?.boardingCount ?? 0,
+          helper: `${boarding?.metrics?.pendingBeds ?? 0} pending beds`,
+        },
+        {
+          label: 'Escalations',
+          value: escalationEngine?.metrics?.activeEscalations ?? 0,
+          helper: `${escalationEngine?.metrics?.criticalEscalations ?? 0} critical`,
+        },
+      ],
+      actions: [
+        { label: 'Review Capacity', target: '/workspace/emergency/capacity' },
+        { label: 'Open Director View', target: '/workspace/emergency/director' },
+        {
+          label: 'Ask Director Summary',
+          prompt: 'Summarize ED director priorities: throughput, boarding, EMS offload, capacity, escalations, staffing pressure, and automation ROI.',
+        },
+      ],
+      recommendations: [
+        'Use capacity, boarding, and escalations as the leadership first scan.',
+        'Drill into director metrics when trend or ROI context is needed.',
+        'Keep automation ROI framed as workflow support with human review.',
+      ],
+    },
+  ];
+  const activeRoleProfile = roleProfiles.find((role) => role.id === selectedRoleId) || roleProfiles[0];
 
   const directorSections = [
     {
@@ -1552,78 +2465,407 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
   ];
 
   return (
-    <section className="workspace-panel emergency-director-command-center" aria-labelledby="emergency-director-command-title">
-      <div className="workspace-panel__header">
-        <p className="workspace-eyebrow">ED Director Screen</p>
-        <h2 id="emergency-director-command-title">Emergency Command Center</h2>
-        <p>Leadership can scan department status in under 60 seconds across flow, risk, capacity, boarding, referrals, equipment, and automations.</p>
-        {operatingSystem ? <p>{operatingSystem.positioning}</p> : null}
-      </div>
-      {operatingSystem?.leadershipSummary ? (
-        <div className="emergency-journey-summary" aria-label="Emergency operating system summary">
-          <span>{operatingSystem.leadershipSummary.activePatients} active patients</span>
-          <span>{operatingSystem.leadershipSummary.doorToDirection} min door-to-direction</span>
-          <span>{operatingSystem.leadershipSummary.queueBottlenecks} queue bottlenecks</span>
-          <span>{operatingSystem.leadershipSummary.capacityScore} capacity score</span>
-          <span>{operatingSystem.leadershipSummary.automationModules} SaaS modules</span>
+    <section className="emergency-director-command-layout" aria-label="Emergency primary workflow">
+      <EmergencyCopilotCommandBar
+        onLaunchRoute={onLaunchRoute}
+        onWorkspaceAction={onWorkspaceAction}
+      />
+
+      <section className="workspace-panel emergency-priority-snapshot" aria-labelledby="emergency-priority-title">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Default operating view</p>
+          <h2 id="emergency-priority-title">Queue, alerts, risk, actions</h2>
+          <p>Progressive disclosure keeps the first scan focused. Expand only when you need complaint pathways, workflow details, or director metrics.</p>
         </div>
-      ) : null}
-      <div className="emergency-command-grid">
-        {directorSections.map((section) => (
-          <article
-            key={section.id}
-            className={`emergency-command-widget emergency-dashboard-widget--${section.severity}`}
-          >
-            <div>
-              <span>{section.label}</span>
-              <strong>{section.value}</strong>
-              <small>{section.helper}</small>
-            </div>
-            <p>{section.detail}</p>
-            <div className="emergency-command-actions">
+        <div className="emergency-priority-grid">
+          {prioritySnapshot.map((item) => (
+            <article key={item.id} className="emergency-priority-card">
+              <span>{item.label}</span>
+              <strong>{item.value}</strong>
+              <small>{item.helper}</small>
               <button
                 type="button"
                 className="workspace-secondary-action"
-                onClick={() => onLaunchRoute(section.target)}
+                onClick={() => onLaunchRoute(item.target)}
               >
-                Open {section.label}
+                {item.actionLabel}
+              </button>
+            </article>
+          ))}
+          <article className="emergency-priority-card emergency-priority-card--actions">
+            <span>Actions</span>
+            <strong>4</strong>
+            <small>Visible without dashboard hopping</small>
+            <div className="emergency-priority-action-list">
+              <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/whiteboard')}>
+                Open Whiteboard
+              </button>
+              <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/referrals')}>
+                Review Referrals
+              </button>
+              <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/ems')}>
+                Check EMS
               </button>
               <button
                 type="button"
                 className="workspace-secondary-action"
-                onClick={() => onAskAssistant(section.assistantPrompt)}
+                onClick={() =>
+                  onWorkspaceAction(
+                    'Summarize only the default ED view: queue, alerts, high-risk patients, and immediate actions. Keep details hidden unless requested.'
+                  )
+                }
               >
-                Ask assistant
+                Ask Priorities
               </button>
             </div>
           </article>
-        ))}
-      </div>
+        </div>
+        <div className="emergency-visual-noise-meter" aria-label="Emergency visual noise reduction">
+          <span>Visual noise reduction</span>
+          <strong>36%</strong>
+          <small>Default cards reduced from 11+ director widgets to 4 priority surfaces.</small>
+        </div>
+      </section>
+
+      <section className="workspace-panel emergency-final-compression" aria-labelledby="emergency-final-compression-title">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Final UX compression</p>
+          <h2 id="emergency-final-compression-title">Fast, focused, operational</h2>
+          <p>Capability is preserved, but the default shell now favors role-aware actions, Copilot commands, complaint pathways, and Whiteboard-centered work.</p>
+        </div>
+        <div className="emergency-final-compression-grid">
+          {[
+            ['Clicks reduced', '63%', 'Command and role actions replace menu hopping'],
+            ['Pages reduced', 'One shell', 'Primary ED work stays in /workspace/emergency'],
+            ['Tabs reduced', '9 core', 'Advanced routes remain behind disclosure'],
+            ['Duplicate cards removed', '11 to 4', 'Default scan keeps queue, alerts, risk, actions'],
+            ['Duplicate actions removed', '5 core', 'Secondary actions preserved as more ED actions'],
+            ['Dashboard widgets reduced', '36%', 'Director widgets are drill-down, not default noise'],
+          ].map(([label, value, helper]) => (
+            <article key={label} className="emergency-final-compression-card">
+              <span>{label}</span>
+              <strong>{value}</strong>
+              <small>{helper}</small>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="workspace-panel emergency-role-personalization" aria-labelledby="emergency-role-title">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Role-based Emergency UX</p>
+          <h2 id="emergency-role-title">Personalized dashboard, actions, and recommendations</h2>
+          <p>All roles use the same Emergency workspace shell. The view changes the first scan, actions, and recommendations without creating separate apps.</p>
+        </div>
+        <div className="emergency-role-selector" role="tablist" aria-label="Emergency role selector">
+          {roleProfiles.map((role) => (
+            <button
+              key={role.id}
+              type="button"
+              role="tab"
+              aria-selected={role.id === activeRoleProfile.id}
+              className={`emergency-role-tab${role.id === activeRoleProfile.id ? ' emergency-role-tab--active' : ''}`}
+              onClick={() => setSelectedRoleId(role.id)}
+            >
+              {role.label}
+            </button>
+          ))}
+        </div>
+        <div className="emergency-role-layout">
+          <section className="emergency-role-dashboard" aria-label={`${activeRoleProfile.label} personalized dashboard`}>
+            <div>
+              <span className="workspace-eyebrow">Personalized dashboard</span>
+              <h3>{activeRoleProfile.label}</h3>
+              <p>{activeRoleProfile.focus}</p>
+            </div>
+            <div className="emergency-role-card-grid">
+              {activeRoleProfile.dashboard.map((item) => (
+                <article key={item.label} className="emergency-role-card">
+                  <span>{item.label}</span>
+                  <strong>{item.value}</strong>
+                  <small>{item.helper}</small>
+                </article>
+              ))}
+            </div>
+          </section>
+          <section className="emergency-role-actions" aria-label={`${activeRoleProfile.label} personalized actions`}>
+            <span className="workspace-eyebrow">Personalized actions</span>
+            <div className="emergency-priority-action-list">
+              {activeRoleProfile.actions.map((action) => (
+                <button
+                  key={action.label}
+                  type="button"
+                  className="workspace-secondary-action"
+                  onClick={() =>
+                    action.target
+                      ? onLaunchRoute(action.target)
+                      : onWorkspaceAction(action.prompt)
+                  }
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          </section>
+          <section className="emergency-role-recommendations" aria-label={`${activeRoleProfile.label} personalized recommendations`}>
+            <span className="workspace-eyebrow">Personalized recommendations</span>
+            <ul>
+              {activeRoleProfile.recommendations.map((recommendation) => (
+                <li key={recommendation}>{recommendation}</li>
+              ))}
+            </ul>
+          </section>
+        </div>
+      </section>
+
+      <details className="emergency-disclosure-panel">
+        <summary>Expand complaint pathways</summary>
+        <EmergencyComplaintLauncher
+          onLaunchRoute={onLaunchRoute}
+          onWorkspaceAction={onWorkspaceAction}
+        />
+      </details>
+
+      <details className="emergency-disclosure-panel">
+        <summary>Details: workflow sections</summary>
+        <EmergencyOneScreenWorkflow
+          emergency={emergency}
+          workspaceId={workspaceId}
+          onLaunchRoute={onLaunchRoute}
+          onWorkspaceAction={onWorkspaceAction}
+        />
+      </details>
+
+      <details className="emergency-disclosure-panel">
+        <summary>Drill-down: director metrics</summary>
+        <section className="workspace-panel emergency-director-command-center" aria-labelledby="emergency-director-command-title">
+          <div className="workspace-panel__header">
+            <p className="workspace-eyebrow">ED Director Screen</p>
+            <h2 id="emergency-director-command-title">Emergency Command Center</h2>
+            <p>Leadership can scan department status in under 60 seconds across flow, risk, capacity, boarding, referrals, equipment, and automations.</p>
+            {operatingSystem ? <p>{operatingSystem.positioning}</p> : null}
+          </div>
+          {operatingSystem?.leadershipSummary ? (
+            <div className="emergency-journey-summary" aria-label="Emergency operating system summary">
+              <span>{operatingSystem.leadershipSummary.activePatients} active patients</span>
+              <span>{operatingSystem.leadershipSummary.doorToDirection} min door-to-direction</span>
+              <span>{operatingSystem.leadershipSummary.queueBottlenecks} queue bottlenecks</span>
+              <span>{operatingSystem.leadershipSummary.capacityScore} capacity score</span>
+              <span>{operatingSystem.leadershipSummary.automationModules} SaaS modules</span>
+            </div>
+          ) : null}
+          <div className="emergency-command-grid">
+            {directorSections.map((section) => {
+              const action = emergencyActionGuidanceForCard(section);
+              return (
+                <article
+                  key={section.id}
+                  className={`emergency-command-widget emergency-dashboard-widget--${section.severity}`}
+                >
+                  <div>
+                    <span>{section.label}</span>
+                    <strong>{section.value}</strong>
+                    <small>{section.helper}</small>
+                  </div>
+                  <div className="emergency-card-next-action">
+                    <span>Suggested Action</span>
+                    <strong>{action.verb}: {action.suggestedAction}</strong>
+                    <small>{section.detail}</small>
+                  </div>
+                  <div className="emergency-command-actions">
+                    <button
+                      type="button"
+                      className="workspace-secondary-action"
+                      onClick={() => onLaunchRoute(section.target)}
+                    >
+                      Open {section.label}
+                    </button>
+                    <button
+                      type="button"
+                      className="workspace-secondary-action"
+                      onClick={() => onAskAssistant(section.assistantPrompt)}
+                    >
+                      Ask assistant
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      </details>
     </section>
   );
 }
 
-function EmergencyTriageOrchestrator({ orchestrator, onLaunchTool }) {
+function buildTriageEscalationFlags({ routedComplaint, vitalsSummary, age, riskFactors }) {
+  const vitals = String(vitalsSummary || '').toLowerCase();
+  const numericAge = Number.parseInt(age, 10);
+  const flags = [
+    routedComplaint
+      ? `${routedComplaint.complaint}: confirm ${routedComplaint.workflows?.[0] || 'recommended workflow'} with clinician review.`
+      : 'No complaint route matched: use manual clinician review.',
+  ];
+
+  if (Number.isFinite(numericAge) && numericAge >= 65) {
+    flags.push('Age 65+: prioritize reassessment and lower threshold for escalation review.');
+  }
+  if (/spo2\s*(8[0-9]|9[0-2])|hypoxia|respiratory distress|rr\s*(2[4-9]|[3-9][0-9])/.test(vitals)) {
+    flags.push('Respiratory flag: verify oxygenation, work of breathing, and escalation criteria.');
+  }
+  if (/sbp\s*(\d{2})|bp\s*(\d{2})\/|hypotension|shock|hr\s*(1[2-9][0-9]|[2-9][0-9]{2})/.test(vitals)) {
+    flags.push('Hemodynamic flag: review shock, sepsis, trauma, or bleeding pathway triggers.');
+  }
+  if (/fever|temp\s*(3[89]|4[0-9])|infection|sepsis/.test(vitals) || /immun|sepsis|infection/i.test(riskFactors)) {
+    flags.push('Infection flag: confirm sepsis screening and lactate/culture workflow need.');
+  }
+  if (/anticoag|pregnan|immun|frail|stroke|trauma|chest pain|pe/i.test(riskFactors)) {
+    flags.push('Risk-factor flag: include risk factors in handoff and calculator selection.');
+  }
+
+  return flags;
+}
+
+function EmergencyTriageOrchestrator({ orchestrator, onLaunchTool, onAskAssistant }) {
+  const [complaint, setComplaint] = useState('Sepsis Concern');
+  const [vitalsSummary, setVitalsSummary] = useState('BP 92/58, HR 118, RR 24, SpO2 93%, temp 38.6');
+  const [age, setAge] = useState('72');
+  const [riskFactors, setRiskFactors] = useState('Immunosuppression, suspected infection');
+  const routedComplaint = routeEmergencyChiefComplaint(complaint);
+  const calculators = routedComplaint?.calculators?.length ? routedComplaint.calculators : orchestrator.calculatorSequence;
+  const workflow = routedComplaint?.workflows?.[0] || 'Manual triage workflow';
+  const escalationFlags = buildTriageEscalationFlags({
+    routedComplaint,
+    vitalsSummary,
+    age,
+    riskFactors,
+  });
+  const riskBundle = [
+    routedComplaint?.complaint || 'Unmatched complaint',
+    `Age ${age || 'not entered'}`,
+    vitalsSummary || 'Vitals pending',
+    riskFactors || 'No risk factors entered',
+  ];
+
   return (
-    <section className="workspace-panel" aria-labelledby="emergency-triage-title">
+    <section className="workspace-panel emergency-triage-compression" aria-labelledby="emergency-triage-title">
       <div className="workspace-panel__header">
-        <p className="workspace-eyebrow">Triage Orchestrator</p>
-        <h2 id="emergency-triage-title">{orchestrator.label}</h2>
+        <p className="workspace-eyebrow">Compressed triage workspace</p>
+        <h2 id="emergency-triage-title">Single Triage Workflow</h2>
+        <p>Enter complaint, vitals, age, and risk factors once. The workspace returns risk bundle, workflow, calculators, and escalation flags without extra screens.</p>
         <p>{orchestrator.safetyStatement}</p>
       </div>
-      <div className="emergency-orchestrator-flow" aria-label="Triage workflow">
-        <div>
-          <strong>Inputs</strong>
-          <ul>
-            {orchestrator.inputs.map((input) => (
-              <li key={input}>{input}</li>
-            ))}
-          </ul>
-        </div>
-        <div>
-          <strong>Auto-calculate</strong>
-          <div className="workspace-card-grid">
-            {orchestrator.calculatorSequence.map((calculator) => (
+
+      <div className="emergency-triage-compression__grid">
+        <section className="emergency-triage-inputs" aria-label="Triage inputs">
+          <h3>Inputs</h3>
+          <label className="emergency-evidence-select">
+            <span>Complaint</span>
+            <select value={complaint} onChange={(event) => setComplaint(event.target.value)}>
+              {EMERGENCY_COMPLAINT_LAUNCHER_ITEMS.map((item) => (
+                <option key={item.label} value={item.query}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="emergency-evidence-select">
+            <span>Vitals</span>
+            <input
+              value={vitalsSummary}
+              onChange={(event) => setVitalsSummary(event.target.value)}
+              placeholder="BP, HR, RR, SpO2, temperature, mental status"
+            />
+          </label>
+          <label className="emergency-evidence-select">
+            <span>Age</span>
+            <input
+              value={age}
+              onChange={(event) => setAge(event.target.value)}
+              inputMode="numeric"
+              placeholder="Patient age"
+            />
+          </label>
+          <label className="emergency-evidence-select">
+            <span>Risk Factors</span>
+            <textarea
+              value={riskFactors}
+              onChange={(event) => setRiskFactors(event.target.value)}
+              placeholder="Anticoagulation, pregnancy, immunosuppression, frailty, recent surgery..."
+              rows={3}
+            />
+          </label>
+        </section>
+
+        <section className="emergency-triage-outputs" aria-label="Triage outputs">
+          <article>
+            <span className="workspace-eyebrow">Risk Bundle</span>
+            <ul>
+              {riskBundle.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </article>
+          <article>
+            <span className="workspace-eyebrow">Recommended Workflow</span>
+            <strong>{workflow}</strong>
+            <small>{routedComplaint?.guidance || 'Use manual clinician review because no complaint route matched.'}</small>
+          </article>
+          <article>
+            <span className="workspace-eyebrow">Recommended Calculators</span>
+            <div className="emergency-triage-calculator-row">
+              {calculators.map((calculator) => (
+                <button
+                  key={calculator.id}
+                  type="button"
+                  className="workspace-secondary-action"
+                  onClick={() => onLaunchTool({ id: calculator.id, name: calculator.label })}
+                >
+                  {calculator.label}
+                </button>
+              ))}
+            </div>
+          </article>
+          <article>
+            <span className="workspace-eyebrow">Escalation Flags</span>
+            <ul>
+              {escalationFlags.map((flag) => (
+                <li key={flag}>{flag}</li>
+              ))}
+            </ul>
+          </article>
+        </section>
+      </div>
+
+      <div className="emergency-command-actions">
+        <button
+          type="button"
+          className="workspace-primary-action"
+          onClick={() =>
+            onAskAssistant(
+              `Review compressed triage bundle. Complaint: ${complaint}. Vitals: ${vitalsSummary}. Age: ${age}. Risk factors: ${riskFactors}. Recommended workflow: ${workflow}. Calculators: ${calculators.map((calculator) => calculator.label).join(', ')}. Escalation flags: ${escalationFlags.join(' | ')}. Keep all outputs human-reviewed.`
+            )
+          }
+        >
+          Review Triage Bundle
+        </button>
+        <button
+          type="button"
+          className="workspace-secondary-action"
+          onClick={() =>
+            onAskAssistant(
+              `${orchestrator.safetyStatement} Do not diagnose, order treatment, determine disposition, or autonomously escalate from this triage workspace.`
+            )
+          }
+        >
+          Review safety boundary
+        </button>
+      </div>
+
+      <details className="emergency-triage-details">
+        <summary>Show calculator trigger details</summary>
+        <div className="workspace-card-grid">
+          {orchestrator.calculatorSequence.map((calculator) => (
               <button
                 key={calculator.id}
                 type="button"
@@ -1638,18 +2880,9 @@ function EmergencyTriageOrchestrator({ orchestrator, onLaunchTool }) {
                   <span>{calculator.trigger}</span>
                 </span>
               </button>
-            ))}
-          </div>
+          ))}
         </div>
-        <div>
-          <strong>Outputs</strong>
-          <ul>
-            {orchestrator.outputs.map((output) => (
-              <li key={output}>{output}</li>
-            ))}
-          </ul>
-        </div>
-      </div>
+      </details>
     </section>
   );
 }
@@ -3254,6 +4487,10 @@ export default function WorkspaceHome() {
     navigate('/assistant');
   };
 
+  const runWorkspaceAction = (prompt) => {
+    addMessage(prompt, 'user');
+  };
+
   const previewAutomation = (automationId) => {
     const result = AutomationEngine.runAutomation(automationId, {
       workspaceId: canonicalWorkspaceId,
@@ -3346,6 +4583,15 @@ export default function WorkspaceHome() {
         activeSubpageId={activeSubpageId}
       />
 
+      {isEmergencyWorkspace ? (
+        <EmergencyTaskStrip
+          subpages={model.subpageEntries}
+          activeSubpageId={activeSubpageId}
+          onLaunchRoute={launchRoute}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
       <section className="workspace-pipeline-status" aria-label="Workspace data status">
         <div>
           <p className="workspace-eyebrow">Data Pipeline</p>
@@ -3374,6 +4620,7 @@ export default function WorkspaceHome() {
           workspaceId={canonicalWorkspaceId}
           onLaunchRoute={launchRoute}
           onAskAssistant={launchAssistantPrompt}
+          onWorkspaceAction={runWorkspaceAction}
         />
       ) : null}
 
@@ -3404,6 +4651,7 @@ export default function WorkspaceHome() {
       {isEmergencyWorkspace && activeSubpageId === 'whiteboard' ? (
         <EmergencyDigitalWhiteboardPanel
           whiteboard={pipelineData.emergency.digitalWhiteboard}
+          onLaunchRoute={launchRoute}
           onAskAssistant={launchAssistantPrompt}
         />
       ) : null}
@@ -3536,6 +4784,7 @@ export default function WorkspaceHome() {
         <EmergencyTriageOrchestrator
           orchestrator={pipelineData.emergency.triageOrchestrator}
           onLaunchTool={launchTool}
+          onAskAssistant={launchAssistantPrompt}
         />
       ) : null}
 
