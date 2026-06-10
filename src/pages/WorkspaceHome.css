@@ -587,6 +587,13 @@
   padding: 6px 8px;
 }
 
+.emergency-copilot-route-note {
+  margin: 0;
+  color: var(--muted-text);
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
 .emergency-final-compression {
   border-color: var(--workspace-os-border, var(--app-panel-border));
   background:
@@ -671,6 +678,13 @@
 
 .emergency-priority-card small {
   color: var(--muted-text);
+  line-height: 1.35;
+}
+
+.emergency-priority-card em {
+  color: var(--muted-text);
+  font-size: 0.82rem;
+  font-style: normal;
   line-height: 1.35;
 }
 
@@ -844,6 +858,15 @@
 
 .emergency-role-card small,
 .emergency-role-recommendations li {
+  color: var(--muted-text);
+  line-height: 1.35;
+}
+
+.emergency-role-action-list {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-left: 18px;
   color: var(--muted-text);
   line-height: 1.35;
 }

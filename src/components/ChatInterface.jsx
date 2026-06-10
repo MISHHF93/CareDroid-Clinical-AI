@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import ToolPanel from './ToolPanel';
 import AISourcePanel from './chat/AISourcePanel';
 import AiRouteMetadata from './chat/AiRouteMetadata';
@@ -37,14 +37,6 @@ const ChatInterface = ({
     recommendedAssetPacks,
   } = useWorkspace();
   const workspaceExperience = getWorkspaceExperienceProfile(activeWorkspace);
-  const workspaceDiscoveryLabel = workspaceExperience.shortLabel || workspaceExperience.label;
-  const assistantDiscoveryPrompts = useMemo(
-    () => [
-      `Search ${workspaceDiscoveryLabel} assets, workflows, and simulations for my next step.`,
-      `Find the best workflow or simulation for ${workspaceDiscoveryLabel}.`,
-    ],
-    [workspaceDiscoveryLabel]
-  );
 
   const updateStickToBottom = () => {
     const scroller = messagesRef.current;
@@ -167,14 +159,9 @@ const ChatInterface = ({
         className="chat-interface__messages app-scroll-container"
         onScroll={updateStickToBottom}
       >
-        <section className="chat-interface__workspace-banner" aria-label="Active assistant workspace">
-          <span>{workspaceExperience.operatingLabel}</span>
-          <strong>{workspaceExperience.assistantTitle}</strong>
-          <p>{assistantContext || workspaceExperience.modeSummary}</p>
-        </section>
         {messages.length === 0 && (
           <div className="chat-interface__empty">
-            Start a conversation in {workspaceExperience.operatingLabel}.
+            {workspaceExperience.assistantPlaceholder}
           </div>
         )}
         {messages.map((message, index) => (
@@ -279,18 +266,6 @@ const ChatInterface = ({
       {(currentTool || currentFeature) && <ToolPanel tool={currentTool} feature={currentFeature} />}
 
       <div className="chat-interface__input-area">
-        <div className="chat-interface__quick-actions">
-            {[...workspaceExperience.quickPrompts, ...assistantDiscoveryPrompts].map((hint) => (
-            <button
-              key={hint}
-              onClick={() => setInput(hint)}
-              className="btn-ghost"
-              style={{ fontSize: '12px', padding: '6px 10px' }}
-            >
-              {hint}
-            </button>
-          ))}
-        </div>
         <div className="chat-interface__composer">
           <textarea
             value={input}

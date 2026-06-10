@@ -226,38 +226,40 @@ const AppShell = ({
                 </span>
               </button>
             )}
-            <div className="app-shell-workspace-bar" aria-label="Workspace switcher">
-              <div className="app-shell-route-identity" aria-label="Current page">
-                <span>{routeIdentity.section}</span>
-                <strong>{routeIdentity.label}</strong>
+            {!isConversationViewport && (
+              <div className="app-shell-workspace-bar" aria-label="Workspace switcher">
+                <div className="app-shell-route-identity" aria-label="Current page">
+                  <span>{routeIdentity.section}</span>
+                  <strong>{routeIdentity.label}</strong>
+                </div>
+                {!isCompact && (
+                  <div className="app-shell-os-strip" aria-label="Frontend operating system flow">
+                    <strong>{frontendOs.shellLabel}</strong>
+                    <span>{frontendOs.workspaceLabel}</span>
+                    <span className="app-shell-os-strip__stage">{frontendOs.currentStage.label}</span>
+                  </div>
+                )}
+                <WorkspaceSwitcher compact={isCompact} />
+                {!isCompact && (
+                  <div className="app-shell-header-utilities" aria-label="Header utilities">
+                    <button
+                      type="button"
+                      className="app-shell-header-command"
+                      onClick={openQuickCommand}
+                      aria-expanded={quickCommandOpen}
+                      aria-haspopup="dialog"
+                      aria-label="Open Quick Command"
+                    >
+                      <span aria-hidden>
+                        <NavIcon icon={CHROME_ICONS.search} size={17} />
+                      </span>
+                      <span>Search everything</span>
+                      <kbd>Ctrl K</kbd>
+                    </button>
+                  </div>
+                )}
               </div>
-              {!isCompact && (
-                <div className="app-shell-os-strip" aria-label="Frontend operating system flow">
-                  <strong>{frontendOs.shellLabel}</strong>
-                  <span>{frontendOs.workspaceLabel}</span>
-                  <span className="app-shell-os-strip__stage">{frontendOs.currentStage.label}</span>
-                </div>
-              )}
-              <WorkspaceSwitcher compact={isCompact} />
-              {!isCompact && (
-                <div className="app-shell-header-utilities" aria-label="Header utilities">
-                  <button
-                    type="button"
-                    className="app-shell-header-command"
-                    onClick={openQuickCommand}
-                    aria-expanded={quickCommandOpen}
-                    aria-haspopup="dialog"
-                    aria-label="Open Quick Command"
-                  >
-                    <span aria-hidden>
-                      <NavIcon icon={CHROME_ICONS.search} size={17} />
-                    </span>
-                    <span>Search everything</span>
-                    <kbd>Ctrl K</kbd>
-                  </button>
-                </div>
-              )}
-            </div>
+            )}
           </header>
         )}
         {isAuthed && (

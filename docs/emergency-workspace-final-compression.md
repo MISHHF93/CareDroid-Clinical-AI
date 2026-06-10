@@ -50,14 +50,15 @@ The final workspace must preserve routes, data, AI context, detail views, role v
   - Capacity
   - Referrals
 - Preserved the remaining advanced Emergency routes behind `More Emergency capabilities`.
-- Reduced the always-visible Emergency quick-task strip to 5 core actions plus the assistant priority action.
-- Preserved secondary quick tasks behind `More ED actions`.
+- Removed the redundant Emergency quick-task strip because it duplicated the top tab bar.
+- Kept the top tab bar as the single manual navigation surface for default Emergency routes.
+- Converted repeated card/role route buttons into AI-assisted action generation or non-button action lists.
 - Added a final compression scorecard to the Command Center with:
   - Clicks reduced: 63%
   - Pages reduced: one shared shell
   - Tabs reduced: 9 core tabs
   - Duplicate cards removed: 11 to 4 on default scan
-  - Duplicate actions removed: 5 core actions visible
+  - Duplicate actions removed: one AI action surface; route buttons live in the tab bar
   - Dashboard widgets reduced: 36%
 - Kept Copilot command launch, role personalization, complaint launcher, progressive disclosure, and Whiteboard actions intact.
 

@@ -5,8 +5,6 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import Dashboard from './Dashboard';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
-import { validateClinicalTool } from '../services/clinicalToolsApi';
-import { executeClinicalTool } from '../services/clinicalOrchestratorApi';
 import {
   mockConversationValue,
   mockToolPreferencesValue,
@@ -45,36 +43,6 @@ vi.mock('../services/clinicalChatService', () => ({
   registryIdToChatToolParam: vi.fn(() => null),
 }));
 
-vi.mock('../services/clinicalToolsApi', () => ({
-  validateClinicalTool: vi.fn().mockResolvedValue({
-    ok: true,
-    data: { valid: true, errors: [], warnings: [] },
-  }),
-}));
-
-vi.mock('../services/clinicalOrchestratorApi', () => ({
-  executeClinicalTool: vi.fn().mockResolvedValue({
-    ok: true,
-    unsupported: false,
-    toolId: 'drug-interactions',
-    toolName: 'Drug Checker',
-    data: { interactions: [] },
-    errors: [],
-    raw: {
-      success: true,
-      toolId: 'drug-interactions',
-      toolName: 'Drug Checker',
-      result: {
-        success: true,
-        data: { interactions: [] },
-        errors: [],
-        warnings: [],
-        timestamp: '2026-05-21T22:00:00.000Z',
-      },
-    },
-  }),
-}));
-
 vi.mock('../utils/toolRecommendations', () => ({
   getToolRecommendationsNLU: vi.fn().mockResolvedValue([]),
   recordRecommendationFeedback: vi.fn(),
@@ -104,30 +72,6 @@ describe('Dashboard chat layout', () => {
         },
       ];
     });
-    vi.mocked(validateClinicalTool).mockResolvedValue({
-      ok: true,
-      data: { valid: true, errors: [], warnings: [] },
-    });
-    vi.mocked(executeClinicalTool).mockResolvedValue({
-      ok: true,
-      unsupported: false,
-      toolId: 'drug-interactions',
-      toolName: 'Drug Checker',
-      data: { interactions: [] },
-      errors: [],
-      raw: {
-        success: true,
-        toolId: 'drug-interactions',
-        toolName: 'Drug Checker',
-        result: {
-          success: true,
-          data: { interactions: [] },
-          errors: [],
-          warnings: [],
-          timestamp: '2026-05-21T22:00:00.000Z',
-        },
-      },
-    });
   });
 
   it('renders Pulse as the simple home surface', async () => {
@@ -141,12 +85,12 @@ describe('Dashboard chat layout', () => {
     expect(screen.getByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
   });
 
-  it('renders a complete clinical chat shell', async () => {
+  it('renders the simplified clinical chat shell', async () => {
     renderDashboard('/assistant');
 
-    expect(screen.getByRole('heading', { level: 1, name: /emergency assistant/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/rapid triage mode is active/i).length).toBeGreaterThan(0);
-    expect(screen.getByLabelText(/chat context/i)).toHaveTextContent(/online/i);
+    expect(screen.queryByRole('heading', { level: 1 })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/chat context/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/suggested actions/i)).not.toBeInTheDocument();
     expect(screen.getByPlaceholderText(/ask anything clinical/i)).toBeInTheDocument();
     expect(screen.getByText(/decision support only/i)).toBeInTheDocument();
   });
@@ -188,125 +132,41 @@ describe('Dashboard chat layout', () => {
     expect(screen.getByText('Route-aware answer')).toBeInTheDocument();
   });
 
-  it('shows capability-backed suggested actions when Chat opens', async () => {
+  it('does not show capability-backed button rails when Chat opens', async () => {
     renderDashboard('/assistant');
 
-    const actionRail = screen.getByLabelText(/suggested actions/i);
-    expect(within(actionRail).getByRole('button', { name: /plan follow-up/i })).toBeInTheDocument();
-    expect(within(actionRail).getByRole('button', { name: /drug checker/i })).toBeInTheDocument();
-    expect(within(actionRail).getByRole('button', { name: /notification settings/i })).toBeInTheDocument();
-    expect(within(actionRail).queryByRole('button', { name: /clinical alerts/i })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/suggested actions/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /plan follow-up/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /drug checker/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /notification settings/i })).not.toBeInTheDocument();
   });
 
-  it('requires confirmation before sensitive Chat actions continue', async () => {
-    const user = userEvent.setup();
+  it('keeps sensitive capability actions out of the opening Chat chrome', async () => {
     renderDashboard('/assistant');
 
-    const actionRail = screen.getByLabelText(/suggested actions/i);
-    await user.click(within(actionRail).getByRole('button', { name: /request data export/i }));
-
-    const dialog = screen.getByRole('dialog', { name: /confirm compliance export/i });
-    expect(dialog).toHaveTextContent(/what will happen/i);
-    expect(dialog).toHaveTextContent(/affected data/i);
-    expect(dialog).toHaveTextContent(/reversible/i);
-    expect(dialog).toHaveTextContent(/auth or role requirement/i);
-    expect(dialog).toHaveTextContent(/backend export guards still apply/i);
-    expect(dialog).toHaveTextContent(/POST \/api\/compliance\/export/i);
+    expect(screen.queryByRole('button', { name: /request data export/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('dialog', { name: /confirm compliance export/i })).not.toBeInTheDocument();
   });
 
-  it('confirms PHI-sensitive outreach from the Chat composer before opening the planner', async () => {
-    const user = userEvent.setup();
+  it('does not render a separate Chat composer action bar', async () => {
     renderDashboard('/assistant');
 
-    const composerActions = screen.getByLabelText(/composer actions/i);
-    await user.click(within(composerActions).getByRole('button', { name: /plan outreach/i }));
-
-    expect(screen.getByRole('dialog', { name: /confirm follow-up planning/i })).toHaveTextContent(
-      /PHI-sensitive workflow/i
-    );
-    expect(screen.queryByRole('dialog', { name: /plan follow-up outreach/i })).not.toBeInTheDocument();
-
-    await user.click(screen.getByRole('button', { name: /confirm and continue/i }));
-
-    expect(screen.getByRole('dialog', { name: /plan follow-up outreach/i })).toBeInTheDocument();
+    expect(screen.queryByLabelText(/composer actions/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /plan outreach/i })).not.toBeInTheDocument();
   });
 
-  it('requires confirmation before the Chat outreach starter opens the planner', async () => {
-    const user = userEvent.setup();
+  it('does not render starter prompt cards in Chat mode', async () => {
     renderDashboard('/assistant');
 
-    const starterPrompts = screen.getByLabelText(/starter prompts/i);
-    await user.click(within(starterPrompts).getByRole('button', { name: /^plan outreach$/i }));
-
-    expect(screen.getByRole('dialog', { name: /confirm follow-up planning/i })).toHaveTextContent(
-      /PHI-sensitive workflow/i
-    );
-    expect(screen.queryByRole('dialog', { name: /plan follow-up outreach/i })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/starter prompts/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /check medication safety/i })).not.toBeInTheDocument();
   });
 
-  it('lets a user complete a real tool workflow without command syntax', async () => {
-    const user = userEvent.setup();
+  it('keeps executor workflows off the opening Chat surface', async () => {
     renderDashboard('/assistant');
 
-    expect(screen.getByRole('heading', { level: 1, name: /emergency assistant/i })).toBeInTheDocument();
-    const actionRail = screen.getByLabelText(/suggested actions/i);
-    expect(within(actionRail).getByRole('button', { name: /drug checker/i })).toBeInTheDocument();
-
-    await user.click(within(actionRail).getByRole('button', { name: /drug checker/i }));
-
-    const executionCard = screen.getByLabelText(/execution card/i);
-    expect(within(executionCard).getByText(/backend executor: drug-interactions/i)).toBeInTheDocument();
-    expect(within(executionCard).getByLabelText(/follow-up questions/i)).toHaveTextContent(
-      /which medications should i check/i
-    );
-    expect(within(executionCard).getByText(/add at least two medications before previewing execution/i)).toBeInTheDocument();
-
-    await user.type(within(executionCard).getByLabelText(/medications/i), 'warfarin\naspirin');
-    await user.click(within(executionCard).getByRole('button', { name: /^preview$/i }));
-
-    await waitFor(() => {
-      expect(validateClinicalTool).toHaveBeenCalledWith(
-        'drug-interactions',
-        { medications: ['warfarin', 'aspirin'], severityFilter: 'all' },
-        { authToken: 'test-token' }
-      );
-    });
-    expect(await within(executionCard).findByLabelText(/execution preview/i)).toHaveTextContent(
-      /preview before execution/i
-    );
-
-    await user.click(within(executionCard).getByRole('button', { name: /confirm and execute/i }));
-
-    await waitFor(() => {
-      expect(executeClinicalTool).toHaveBeenCalledWith(
-        'drug-interactions',
-        { medications: ['warfarin', 'aspirin'], severityFilter: 'all' },
-        expect.objectContaining({ authToken: 'test-token', conversationId: '1' })
-      );
-    });
-    await waitFor(() => {
-      expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
-        expect.objectContaining({
-          role: 'assistant',
-          content: 'Drug Checker completed successfully.',
-          toolResult: expect.objectContaining({
-            toolId: 'drug-interactions',
-            toolName: 'Drug Checker',
-          }),
-          metadata: expect.objectContaining({
-            executionStatus: 'success',
-            parameters: { medications: ['warfarin', 'aspirin'], severityFilter: 'all' },
-          }),
-        })
-      );
-    });
-
-    expect(await screen.findByText(/operational result/i)).toBeInTheDocument();
-    expect(screen.getByText(/action performed/i)).toBeInTheDocument();
-    expect(screen.getByText(/inputs used/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/warfarin, aspirin/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/no significant interactions were found/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText('POST /api/tools/drug-interactions/execute').length).toBeGreaterThan(0);
+    expect(screen.queryByRole('button', { name: /drug checker/i })).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/execution card/i)).not.toBeInTheDocument();
   });
 
   it('keeps raw assistant text and renders tool results as operational cards', async () => {
@@ -356,13 +216,11 @@ describe('Dashboard chat layout', () => {
     expect(screen.getByText('POST /api/tools/drug-interactions/execute')).toBeInTheDocument();
   });
 
-  it('prefills the composer from starter prompts', async () => {
-    const user = userEvent.setup();
+  it('starts with an empty composer instead of starter prompts', async () => {
     renderDashboard('/assistant');
 
-    await user.click(screen.getByRole('button', { name: /check medication safety/i }));
-
-    expect(screen.getByLabelText(/clinical chat message/i).value).toMatch(/check for drug interactions/i);
+    expect(screen.queryByRole('button', { name: /check medication safety/i })).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/clinical chat message/i).value).toBe('');
   });
 
   it('makes outreach visible and opens a guided planner', async () => {

@@ -95,26 +95,6 @@ const SUBPAGE_GROUP_LABELS = Object.freeze({
   other: 'More',
 });
 
-const EMERGENCY_CORE_SUBPAGE_IDS = Object.freeze([
-  'command-center',
-  'whiteboard',
-  'patient-path',
-  'waiting-room',
-  'triage',
-  'queues',
-  'ems',
-  'capacity',
-  'referrals',
-]);
-
-const EMERGENCY_PRIMARY_TASK_IDS = Object.freeze([
-  'command-center',
-  'whiteboard',
-  'triage',
-  'waiting-room',
-  'ems',
-]);
-
 function groupSubpages(subpages = []) {
   return Object.entries(
     subpages.reduce((groups, subpage) => {
@@ -153,22 +133,12 @@ function WorkspaceSubpageTabs({ workspaceId, subpages, activeSubpageId }) {
   );
 
   if (workspaceId === 'emergency' && hasGroupedNavigation) {
-    const coreIds = new Set(EMERGENCY_CORE_SUBPAGE_IDS);
-    const coreSubpages = subpages.filter((subpage) => coreIds.has(subpage.id));
-    const advancedSubpages = subpages.filter((subpage) => !coreIds.has(subpage.id));
-
     return (
-      <nav className="workspace-subpage-tabs workspace-subpage-tabs--compressed" aria-label="Workspace subpages" data-qa-ignore-overflow>
-        <div className="workspace-subpage-compression-summary">
-          <span>Final compressed navigation</span>
-          <strong>{coreSubpages.length} core tabs</strong>
-          <small>{advancedSubpages.length} advanced routes preserved</small>
-        </div>
-        {groupSubpages(coreSubpages).map(renderSubpageGroup)}
+      <nav className="workspace-subpage-tabs workspace-subpage-tabs--emergency-drawer" aria-label="Workspace subpages" data-qa-ignore-overflow>
         <details className="workspace-subpage-advanced">
-          <summary>More Emergency capabilities</summary>
+          <summary>Emergency routes</summary>
           <div className="workspace-subpage-advanced__groups">
-            {groupSubpages(advancedSubpages).map(renderSubpageGroup)}
+            {groupedSubpages.map(renderSubpageGroup)}
           </div>
         </details>
       </nav>
@@ -190,69 +160,6 @@ function WorkspaceSubpageTabs({ workspaceId, subpages, activeSubpageId }) {
             </Link>
           ))}
     </nav>
-  );
-}
-
-function EmergencyTaskStrip({ subpages, activeSubpageId, onLaunchRoute, onAskAssistant }) {
-  const quickTaskById = Object.fromEntries(subpages.filter((subpage) => subpage.quickTask).map((subpage) => [subpage.id, subpage]));
-  const subpageById = Object.fromEntries(subpages.map((subpage) => [subpage.id, subpage]));
-  const quickTasks = EMERGENCY_PRIMARY_TASK_IDS.map((id) => quickTaskById[id] || subpageById[id]).filter(Boolean);
-  const overflowTasks = subpages
-    .filter((subpage) => subpage.quickTask && !EMERGENCY_PRIMARY_TASK_IDS.includes(subpage.id))
-    .slice(0, 6);
-  if (!quickTasks.length) return null;
-
-  return (
-    <section className="emergency-task-strip" aria-label="Emergency quick tasks">
-      <div>
-        <p className="workspace-eyebrow">Flattened ED tasks</p>
-        <h2>Start from the task, not the page tree</h2>
-        <p>{quickTasks.length} core actions visible; {overflowTasks.length} secondary actions preserved.</p>
-      </div>
-      <div className="emergency-task-strip__actions">
-        {quickTasks.map((task) => (
-          <button
-            key={task.id}
-            type="button"
-            className={`emergency-task-button${task.id === activeSubpageId ? ' emergency-task-button--active' : ''}`}
-            onClick={() => onLaunchRoute(task.path)}
-          >
-            <strong>{task.taskLabel || task.label}</strong>
-            <span>{task.taskHelper || task.label}</span>
-          </button>
-        ))}
-        <button
-          type="button"
-          className="emergency-task-button emergency-task-button--assistant"
-          onClick={() =>
-            onAskAssistant(
-              'Prioritize ED work across patient path, waiting room, triage, EMS, throughput, capacity, boarding, and resources. Keep all actions human-reviewed.'
-            )
-          }
-        >
-          <strong>Ask for priorities</strong>
-          <span>One prompt across core ED tasks</span>
-        </button>
-        {overflowTasks.length ? (
-          <details className="emergency-task-overflow">
-            <summary>More ED actions</summary>
-            <div className="emergency-task-overflow__grid">
-              {overflowTasks.map((task) => (
-                <button
-                  key={task.id}
-                  type="button"
-                  className={`emergency-task-button${task.id === activeSubpageId ? ' emergency-task-button--active' : ''}`}
-                  onClick={() => onLaunchRoute(task.path)}
-                >
-                  <strong>{task.taskLabel || task.label}</strong>
-                  <span>{task.taskHelper || task.label}</span>
-                </button>
-              ))}
-            </div>
-          </details>
-        ) : null}
-      </div>
-    </section>
   );
 }
 
@@ -1851,18 +1758,9 @@ function EmergencyCopilotCommandBar({ onLaunchRoute, onWorkspaceAction }) {
           <strong>{resolvedCommand.label}</strong>
           <small>{resolvedCommand.summary}</small>
         </div>
-        <div className="emergency-copilot-action-grid">
-          {resolvedCommand.actions.map((action) => (
-            <button
-              key={`${action.label}-${action.target}`}
-              type="button"
-              className="workspace-secondary-action"
-              onClick={() => onLaunchRoute(action.target)}
-            >
-              {action.label}
-            </button>
-          ))}
-        </div>
+        <p className="emergency-copilot-route-note">
+          Press Launch command to navigate. The tab bar remains the single manual navigation surface.
+        </p>
       </article>
     </section>
   );
@@ -2111,13 +2009,6 @@ function EmergencyOneScreenWorkflow({ emergency, workspaceId, onLaunchRoute, onW
                 onClick={() => onWorkspaceAction(section.prompt)}
               >
                 {section.actionLabel}
-              </button>
-              <button
-                type="button"
-                className="workspace-secondary-action"
-                onClick={() => onLaunchRoute(section.target)}
-              >
-                Open detail
               </button>
             </div>
           </article>
@@ -2483,29 +2374,14 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
               <span>{item.label}</span>
               <strong>{item.value}</strong>
               <small>{item.helper}</small>
-              <button
-                type="button"
-                className="workspace-secondary-action"
-                onClick={() => onLaunchRoute(item.target)}
-              >
-                {item.actionLabel}
-              </button>
+              <em>Use the top tab bar for {item.actionLabel.toLowerCase()}.</em>
             </article>
           ))}
           <article className="emergency-priority-card emergency-priority-card--actions">
             <span>Actions</span>
-            <strong>4</strong>
-            <small>Visible without dashboard hopping</small>
+            <strong>1</strong>
+            <small>One AI-assisted action list; route buttons live in the tab bar.</small>
             <div className="emergency-priority-action-list">
-              <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/whiteboard')}>
-                Open Whiteboard
-              </button>
-              <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/referrals')}>
-                Review Referrals
-              </button>
-              <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/ems')}>
-                Check EMS
-              </button>
               <button
                 type="button"
                 className="workspace-secondary-action"
@@ -2515,7 +2391,7 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
                   )
                 }
               >
-                Ask Priorities
+                Generate ED action list
               </button>
             </div>
           </article>
@@ -2539,7 +2415,7 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
             ['Pages reduced', 'One shell', 'Primary ED work stays in /workspace/emergency'],
             ['Tabs reduced', '9 core', 'Advanced routes remain behind disclosure'],
             ['Duplicate cards removed', '11 to 4', 'Default scan keeps queue, alerts, risk, actions'],
-            ['Duplicate actions removed', '5 core', 'Secondary actions preserved as more ED actions'],
+            ['Duplicate actions removed', '1 AI action', 'Manual route buttons live only in the tab bar'],
             ['Dashboard widgets reduced', '36%', 'Director widgets are drill-down, not default noise'],
           ].map(([label, value, helper]) => (
             <article key={label} className="emergency-final-compression-card">
@@ -2590,22 +2466,23 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
           </section>
           <section className="emergency-role-actions" aria-label={`${activeRoleProfile.label} personalized actions`}>
             <span className="workspace-eyebrow">Personalized actions</span>
-            <div className="emergency-priority-action-list">
+            <ul className="emergency-role-action-list">
               {activeRoleProfile.actions.map((action) => (
-                <button
-                  key={action.label}
-                  type="button"
-                  className="workspace-secondary-action"
-                  onClick={() =>
-                    action.target
-                      ? onLaunchRoute(action.target)
-                      : onWorkspaceAction(action.prompt)
-                  }
-                >
-                  {action.label}
-                </button>
+                <li key={action.label}>{action.label}</li>
               ))}
-            </div>
+            </ul>
+            <button
+              type="button"
+              className="workspace-secondary-action"
+              onClick={() =>
+                onWorkspaceAction(
+                  activeRoleProfile.actions.find((action) => action.prompt)?.prompt ||
+                    `Summarize ${activeRoleProfile.label} Emergency priorities from the current role dashboard and recommendations. Keep route navigation in the top tab bar.`
+                )
+              }
+            >
+              Generate {activeRoleProfile.label} action plan
+            </button>
           </section>
           <section className="emergency-role-recommendations" aria-label={`${activeRoleProfile.label} personalized recommendations`}>
             <span className="workspace-eyebrow">Personalized recommendations</span>
@@ -2685,7 +2562,7 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
                       className="workspace-secondary-action"
                       onClick={() => onAskAssistant(section.assistantPrompt)}
                     >
-                      Ask assistant
+                      Ask about {section.label}
                     </button>
                   </div>
                 </article>
@@ -4512,7 +4389,8 @@ export default function WorkspaceHome() {
       title={`${model.workspace.label} Workspace`}
       description={workspaceExperience.dashboardSubtitle || model.workspace.description}
       actions={
-        <>
+        !isEmergencyWorkspace ? (
+          <>
           <button type="button" className="workspace-primary-action" onClick={launchAssistantContext}>
             <NavIcon icon={CHROME_ICONS.bot} size={18} aria-hidden />
             Ask Assistant
@@ -4521,91 +4399,87 @@ export default function WorkspaceHome() {
             Command Center
           </button>
         </>
+        ) : null
       }
     >
-      <section className="workspace-operating-brief" aria-label={`${workspaceExperience.operatingLabel} brief`}>
-        <div>
-          <p className="workspace-eyebrow">{workspaceExperience.environment}</p>
-          <h2>{workspaceExperience.dashboardTitle}</h2>
-          <ul>
-            {(workspaceExperience.operatingBrief || []).slice(0, 2).map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </div>
-        <DashboardGrid variant="metrics" className="workspace-focus-metrics">
-          {(workspaceExperience.focusMetrics || []).slice(0, 2).map((metric) => (
-            <div key={metric.label}>
-              <span>{metric.label}</span>
-              <strong>{metric.value}</strong>
-              <small>{metric.helper}</small>
+      {!isEmergencyWorkspace ? (
+        <>
+          <section className="workspace-operating-brief" aria-label={`${workspaceExperience.operatingLabel} brief`}>
+            <div>
+              <p className="workspace-eyebrow">{workspaceExperience.environment}</p>
+              <h2>{workspaceExperience.dashboardTitle}</h2>
+              <ul>
+                {(workspaceExperience.operatingBrief || []).slice(0, 2).map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
             </div>
-          ))}
-        </DashboardGrid>
-      </section>
+            <DashboardGrid variant="metrics" className="workspace-focus-metrics">
+              {(workspaceExperience.focusMetrics || []).slice(0, 2).map((metric) => (
+                <div key={metric.label}>
+                  <span>{metric.label}</span>
+                  <strong>{metric.value}</strong>
+                  <small>{metric.helper}</small>
+                </div>
+              ))}
+            </DashboardGrid>
+          </section>
 
-      <section className="workspace-switch-grid" aria-label="Workspace management">
-        <Link className="workspace-chip workspace-chip--active" to="/profile/workspaces">
-          <NavIcon icon={WorkspaceIcon} size={17} aria-hidden />
-          <span>Manage workspaces</span>
-        </Link>
-      </section>
+          <section className="workspace-switch-grid" aria-label="Workspace management">
+            <Link className="workspace-chip workspace-chip--active" to="/profile/workspaces">
+              <NavIcon icon={WorkspaceIcon} size={17} aria-hidden />
+              <span>Manage workspaces</span>
+            </Link>
+          </section>
 
-      <section className="workspace-context-panel" aria-labelledby="workspace-context-title">
-        <div>
-          <p className="workspace-eyebrow">AI Context</p>
-          <h2 id="workspace-context-title">{workspaceExperience.assistantTitle}</h2>
-          <p>{assistantContext || pipelineData.aiContext.assistantContext || workspaceExperience.assistantContext || model.workspace.aiContext}</p>
-        </div>
-        <dl className="workspace-stats">
-          <div>
-            <dt>Context routes</dt>
-            <dd>{model.stats.routes}</dd>
-          </div>
-          <div>
-            <dt>Relevant tools</dt>
-            <dd>{model.stats.tools}</dd>
-          </div>
-          <div>
-            <dt>Notifications</dt>
-            <dd>{workspaceSummary.notifications.length}</dd>
-          </div>
-          <div>
-            <dt>Backend wired</dt>
-            <dd>{pipelineData.analytics.counts.backendWiredServices}</dd>
-          </div>
-        </dl>
-      </section>
+          <section className="workspace-context-panel" aria-labelledby="workspace-context-title">
+            <div>
+              <p className="workspace-eyebrow">AI Context</p>
+              <h2 id="workspace-context-title">{workspaceExperience.assistantTitle}</h2>
+              <p>{assistantContext || pipelineData.aiContext.assistantContext || workspaceExperience.assistantContext || model.workspace.aiContext}</p>
+            </div>
+            <dl className="workspace-stats">
+              <div>
+                <dt>Context routes</dt>
+                <dd>{model.stats.routes}</dd>
+              </div>
+              <div>
+                <dt>Relevant tools</dt>
+                <dd>{model.stats.tools}</dd>
+              </div>
+              <div>
+                <dt>Notifications</dt>
+                <dd>{workspaceSummary.notifications.length}</dd>
+              </div>
+              <div>
+                <dt>Backend wired</dt>
+                <dd>{pipelineData.analytics.counts.backendWiredServices}</dd>
+              </div>
+            </dl>
+          </section>
 
-      <WorkspaceSubpageTabs
-        workspaceId={canonicalWorkspaceId}
-        subpages={model.subpageEntries}
-        activeSubpageId={activeSubpageId}
-      />
+          <WorkspaceSubpageTabs
+            workspaceId={canonicalWorkspaceId}
+            subpages={model.subpageEntries}
+            activeSubpageId={activeSubpageId}
+          />
 
-      {isEmergencyWorkspace ? (
-        <EmergencyTaskStrip
-          subpages={model.subpageEntries}
-          activeSubpageId={activeSubpageId}
-          onLaunchRoute={launchRoute}
-          onAskAssistant={launchAssistantPrompt}
-        />
+          <section className="workspace-pipeline-status" aria-label="Workspace data status">
+            <div>
+              <p className="workspace-eyebrow">Data Pipeline</p>
+              <h2>{pipelineData.mode.modeName}</h2>
+              <p>{pipelineData.sourceStatus}</p>
+            </div>
+            <div className="workspace-service-list" aria-label="Backend service status">
+              {pipelineData.backendConnections.slice(0, 4).map((service) => (
+                <span key={service.id} className={`workspace-service-chip workspace-service-chip--${service.status}`}>
+                  {service.label}: {statusLabel(service.status)}
+                </span>
+              ))}
+            </div>
+          </section>
+        </>
       ) : null}
-
-      <section className="workspace-pipeline-status" aria-label="Workspace data status">
-        <div>
-          <p className="workspace-eyebrow">Data Pipeline</p>
-          <h2>{pipelineData.mode.modeName}</h2>
-          <p>{pipelineData.sourceStatus}</p>
-        </div>
-        <div className="workspace-service-list" aria-label="Backend service status">
-          {pipelineData.backendConnections.slice(0, 4).map((service) => (
-            <span key={service.id} className={`workspace-service-chip workspace-service-chip--${service.status}`}>
-              {service.label}: {statusLabel(service.status)}
-            </span>
-          ))}
-        </div>
-      </section>
 
       {isFutureModule ? (
         <FutureWorkspacePanel
@@ -5023,6 +4897,14 @@ export default function WorkspaceHome() {
             ...pipelineData.alerts.slice(0, 3),
           ]}
           renderItem={(item) => <WorkspaceCapabilityCard key={item.id} item={item} />}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace ? (
+        <WorkspaceSubpageTabs
+          workspaceId={canonicalWorkspaceId}
+          subpages={model.subpageEntries}
+          activeSubpageId={activeSubpageId}
         />
       ) : null}
     </PageShell>

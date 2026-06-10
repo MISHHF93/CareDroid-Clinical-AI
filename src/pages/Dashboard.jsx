@@ -1059,61 +1059,59 @@ function AssistantPage() {
   return (
     <div className="dashboard-root">
       <div className="dashboard-main">
-        <header className="dashboard-chat-header" aria-labelledby="dashboard-chat-title">
-          <div className="dashboard-chat-header__identity">
-            <div className="dashboard-chat-header__icon" aria-hidden>
-              <NavIcon icon={isChatMode ? CHROME_ICONS.bot : CHROME_ICONS.barChart} size={22} />
-            </div>
-            <div>
-              <p className="dashboard-chat-eyebrow">
-                {isChatMode ? workspaceExperience.operatingLabel : 'Home = see what matters'}
-              </p>
-              <h1 id="dashboard-chat-title" className="dashboard-chat-title">
-                {isChatMode ? workspaceExperience.assistantTitle : 'Home'}
-              </h1>
-            </div>
-          </div>
-          <div className="dashboard-chat-header__status" aria-label="Chat context and workspace status">
-            <div className="dashboard-header-group" aria-label="Current context">
-              <span className="dashboard-header-group__label">Context</span>
-              <span className="dashboard-context-pill">{activeConversationLabel}</span>
-              <span className="dashboard-context-pill dashboard-context-pill--profile">
-                {clinicianContextLabel}
-              </span>
-              {selectedToolEntry && (
-                <span className="dashboard-context-pill dashboard-context-pill--tool">
-                  <NavIcon icon={getToolIcon(selectedToolEntry.id)} size={14} aria-hidden />
-                  {selectedToolEntry.name}
-                </span>
-              )}
-            </div>
-            <div className="dashboard-header-group" aria-label="Workspace status">
-              <span className="dashboard-header-group__label">Workspace</span>
-              <span className="dashboard-context-pill">{workspaceLabel}</span>
-              <span className="dashboard-context-pill dashboard-context-pill--online">
-                <NavIcon icon={CHROME_ICONS.checkCircle} size={14} aria-hidden />
-                Online
-              </span>
-              <span className="dashboard-context-pill">AI: {aiPreferenceLabel}</span>
-            </div>
-            <div className="dashboard-header-group" aria-label="Available tools">
-              <span className="dashboard-header-group__label">Available tools</span>
-              <div className="dashboard-header-tools">
-                {availableChatTools.map((tool) => (
-                  <button
-                    key={tool.id}
-                    type="button"
-                    className="dashboard-header-tool"
-                    onClick={() => addExecutionAction(tool, 'header')}
-                  >
-                    <NavIcon icon={getToolIcon(tool.id)} size={14} aria-hidden />
-                    {tool.name}
-                  </button>
-                ))}
+        {!isChatMode && (
+          <header className="dashboard-chat-header" aria-labelledby="dashboard-chat-title">
+            <div className="dashboard-chat-header__identity">
+              <div className="dashboard-chat-header__icon" aria-hidden>
+                <NavIcon icon={CHROME_ICONS.barChart} size={22} />
+              </div>
+              <div>
+                <p className="dashboard-chat-eyebrow">Home = see what matters</p>
+                <h1 id="dashboard-chat-title" className="dashboard-chat-title">Home</h1>
               </div>
             </div>
-          </div>
-        </header>
+            <div className="dashboard-chat-header__status" aria-label="Chat context and workspace status">
+              <div className="dashboard-header-group" aria-label="Current context">
+                <span className="dashboard-header-group__label">Context</span>
+                <span className="dashboard-context-pill">{activeConversationLabel}</span>
+                <span className="dashboard-context-pill dashboard-context-pill--profile">
+                  {clinicianContextLabel}
+                </span>
+                {selectedToolEntry && (
+                  <span className="dashboard-context-pill dashboard-context-pill--tool">
+                    <NavIcon icon={getToolIcon(selectedToolEntry.id)} size={14} aria-hidden />
+                    {selectedToolEntry.name}
+                  </span>
+                )}
+              </div>
+              <div className="dashboard-header-group" aria-label="Workspace status">
+                <span className="dashboard-header-group__label">Workspace</span>
+                <span className="dashboard-context-pill">{workspaceLabel}</span>
+                <span className="dashboard-context-pill dashboard-context-pill--online">
+                  <NavIcon icon={CHROME_ICONS.checkCircle} size={14} aria-hidden />
+                  Online
+                </span>
+                <span className="dashboard-context-pill">AI: {aiPreferenceLabel}</span>
+              </div>
+              <div className="dashboard-header-group" aria-label="Available tools">
+                <span className="dashboard-header-group__label">Available tools</span>
+                <div className="dashboard-header-tools">
+                  {availableChatTools.map((tool) => (
+                    <button
+                      key={tool.id}
+                      type="button"
+                      className="dashboard-header-tool"
+                      onClick={() => addExecutionAction(tool, 'header')}
+                    >
+                      <NavIcon icon={getToolIcon(tool.id)} size={14} aria-hidden />
+                      {tool.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </header>
+        )}
 
         <div
           ref={scrollRef}
@@ -1158,34 +1156,7 @@ function AssistantPage() {
                     : 'Review priority items, choose the next action, then use Chat to preview, confirm, and verify the result.'}
                 </div>
                 {isChatMode ? (
-                  <>
-                    <div className="dashboard-empty-capabilities" aria-label="What Chat can do">
-                      <span>Free-text clinical questions</span>
-                      <span>Suggested follow-up actions</span>
-                      <span>Validated executor previews</span>
-                      <span>Confirmation before execution</span>
-                      <span>Structured result cards</span>
-                    </div>
-                    <div className="dashboard-empty-section-title">Start with...</div>
-                    <div className="dashboard-starter-grid" aria-label="Starter prompts">
-                      {workspaceStarterActions.map((starter) => (
-                        <button
-                          key={starter.title}
-                          type="button"
-                          className="dashboard-starter-card"
-                          aria-label={starter.title}
-                          onClick={() => handleStarterPrompt(starter)}
-                        >
-                          <span className="dashboard-starter-card__icon" aria-hidden>
-                            <NavIcon icon={starter.icon} size={18} />
-                          </span>
-                          <span className="dashboard-starter-card__title">{starter.title}</span>
-                          <span className="dashboard-starter-card__body">{starter.body}</span>
-                          <span className="dashboard-starter-card__prompt">{starter.prompt}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </>
+                  null
                 ) : (
                   <div className="dashboard-pulse-grid" aria-label="Priority actions">
                     {pulseActions.map((action) => (
@@ -1321,55 +1292,46 @@ function AssistantPage() {
         </div>
 
         <div className="dashboard-composer">
-          <div className="dashboard-action-rail" aria-label="Suggested actions">
-            <div className="dashboard-action-rail__meta">
-              <span className="dashboard-recs-label">Suggested actions</span>
-              {latestExecutionAction && (
-                <span className="dashboard-action-rail__status">
-                  Execution: {latestExecutionAction.toolName} · {latestExecutionAction.status}
-                </span>
-              )}
-            </div>
-            <div className="dashboard-recs-row">
-              {capabilitySuggestions.slice(0, 7).map((suggestion) => (
+          {!isChatMode && (
+            <>
+              <div className="dashboard-action-rail" aria-label="Suggested actions">
+                <div className="dashboard-action-rail__meta">
+                  <span className="dashboard-recs-label">Suggested actions</span>
+                  {latestExecutionAction && (
+                    <span className="dashboard-action-rail__status">
+                      Execution: {latestExecutionAction.toolName} · {latestExecutionAction.status}
+                    </span>
+                  )}
+                </div>
+                <div className="dashboard-recs-row">
+                  {capabilitySuggestions.slice(0, 7).map((suggestion) => (
+                    <button
+                      key={suggestion.id}
+                      type="button"
+                      className={`dashboard-action-chip dashboard-action-chip--${suggestion.kind}`}
+                      onClick={() => handleCapabilitySuggestion(suggestion)}
+                      disabled={sending && suggestion.kind === 'executor'}
+                      title={suggestion.description}
+                    >
+                      <NavIcon icon={suggestion.icon} size={16} aria-hidden />
+                      {suggestion.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="dashboard-composer-actions" aria-label="Composer actions">
                 <button
-                  key={suggestion.id}
                   type="button"
-                  className={`dashboard-action-chip dashboard-action-chip--${suggestion.kind}`}
-                  onClick={() => handleCapabilitySuggestion(suggestion)}
-                  disabled={sending && suggestion.kind === 'executor'}
-                  title={suggestion.description}
+                  className="dashboard-guided-action"
+                  onClick={openOutreachPlanner}
+                  disabled={sending}
                 >
-                  <NavIcon icon={suggestion.icon} size={16} aria-hidden />
-                  {suggestion.label}
+                  <NavIcon icon={CHROME_ICONS.messageCircle} size={16} aria-hidden />
+                  Plan outreach
                 </button>
-              ))}
-            </div>
-          </div>
-          <div className="dashboard-composer-actions" aria-label="Composer actions">
-            <button
-              type="button"
-              className="dashboard-guided-action"
-              onClick={() => {
-                if (!isChatMode) {
-                  openOutreachPlanner();
-                  return;
-                }
-                openSensitiveActionConfirmation(
-                  {
-                    id: 'follow-up-planning',
-                    label: 'Plan follow-up',
-                    confirmation: CHAT_SENSITIVE_CONFIRMATIONS['follow-up-planning'],
-                  },
-                  openOutreachPlanner
-                );
-              }}
-              disabled={sending}
-            >
-              <NavIcon icon={CHROME_ICONS.messageCircle} size={16} aria-hidden />
-              Plan outreach
-            </button>
-          </div>
+              </div>
+            </>
+          )}
           <form className="dashboard-input-row" onSubmit={handleSubmitMessage}>
             <textarea
               ref={composerInputRef}

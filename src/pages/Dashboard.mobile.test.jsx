@@ -79,16 +79,15 @@ describe('Dashboard Chat mobile layout contracts', () => {
 
     expect(screen.getByLabelText(/clinical chat message/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /send/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/composer actions/i)).toBeInTheDocument();
+    expect(screen.queryByLabelText(/composer actions/i)).not.toBeInTheDocument();
   });
 
-  it('renders suggestion chips in the Chat action rail on mobile', async () => {
+  it('removes redundant suggestion chips from the Assistant page on mobile', async () => {
     renderDashboard('/assistant');
 
-    const rail = screen.getByLabelText(/suggested actions/i);
     await waitFor(() => {
-      expect(within(rail).getByRole('button', { name: /plan follow-up/i })).toBeInTheDocument();
-      expect(within(rail).getByRole('button', { name: /drug checker/i })).toBeInTheDocument();
+      expect(screen.queryByLabelText(/suggested actions/i)).not.toBeInTheDocument();
+      expect(screen.queryByLabelText(/composer actions/i)).not.toBeInTheDocument();
     });
   });
 
@@ -123,7 +122,7 @@ describe('Dashboard Chat mobile layout contracts', () => {
 });
 
 describe('Dashboard Chat mobile CSS contracts', () => {
-  it('uses horizontal scrolling for suggestion chips instead of vertical wrapping', () => {
+  it('keeps legacy suggestion rail CSS horizontally scrollable when rendered outside Assistant chat mode', () => {
     expect(dashboardCss).toMatch(/\.dashboard-recs-row\s*\{[\s\S]*flex-wrap:\s*nowrap/);
     expect(dashboardCss).toMatch(/\.dashboard-recs-row\s*\{[\s\S]*overflow-x:\s*auto/);
     expect(dashboardCss).toMatch(/\.dashboard-action-chip\s*\{[\s\S]*flex:\s*0 0 auto/);
