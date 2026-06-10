@@ -3,7 +3,7 @@ import { AUTH_CONFIG } from '../config/auth.config';
 import { apiFetchJson } from '../services/apiClient';
 import logger from '../utils/logger';
 
-export const DEV_AUTH_LABEL = 'Demo Mode';
+export const DEV_AUTH_LABEL = 'Platform Access';
 export const AUTH_TOKEN_KEY = AUTH_CONFIG.tokenStorageKey;
 export const USER_PROFILE_KEY = AUTH_CONFIG.userProfileStorageKey;
 
@@ -12,26 +12,38 @@ export const isDevAuthBypassEnabled = () =>
 
 export const withDevSessionMarker = (user) => ({
   ...user,
-  authMode: 'local-dev-demo',
+  authMode: 'platform-access',
   isDevAuthBypass: true,
   devAuthLabel: DEV_AUTH_LABEL,
 });
 
 export const buildDevDemoUser = () =>
   withDevSessionMarker({
-    id: 'dev-demo-user',
-    email: 'demo@caredroid.local',
-    name: 'Demo Clinician',
+    id: 'platform-access-user',
+    email: 'access@caredroid.local',
+    name: 'CareDroid Clinician',
     role: 'physician',
-    fullName: 'Demo Clinician',
+    fullName: 'CareDroid Clinician',
     isEmailVerified: true,
     twoFactorEnabled: false,
     createdAt: new Date().toISOString(),
   });
 
+export function createLocalPlatformAccessSession() {
+  const user = buildDevDemoUser();
+  const token = (appConfig.dev.bearerToken || '').trim() || 'platform-access-token';
+  localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(user));
+  localStorage.setItem(AUTH_TOKEN_KEY, token);
+  return {
+    token,
+    user,
+    backendBacked: false,
+  };
+}
+
 export async function createDevAuthSession() {
   if (!isDevAuthBypassEnabled()) {
-    throw new Error('Demo mode is disabled.');
+    throw new Error('Platform access is disabled.');
   }
 
   try {
@@ -47,24 +59,21 @@ export async function createDevAuthSession() {
       };
     }
   } catch (err) {
-    if (!AUTH_CONFIG.demo.allowLocalFallback) {
-      logger.error('Backend demo session unavailable and local fallback is disabled', { err });
+    if (!AUTH_CONFIG.demo.allowLocalFallback && !AUTH_CONFIG.demo.exposed) {
+      logger.error('Backend platform access session unavailable and local fallback is disabled', { err });
       throw err;
     }
-    logger.warn('Dev session API unavailable, using local demo session only', { err });
+    logger.warn('Platform access API unavailable, using local clinician session only', { err });
   }
 
-  const mockUser = buildDevDemoUser();
-  const fallbackToken = (appConfig.dev.bearerToken || '').trim() || 'dev-bypass-token';
-  localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(mockUser));
-  localStorage.setItem(AUTH_TOKEN_KEY, fallbackToken);
-  logger.info('Demo mode auth bypass: stored token and mock profile (no API)', {
+  const session = createLocalPlatformAccessSession();
+  logger.info('Platform access: stored token and local clinician profile (no API)', {
     label: DEV_AUTH_LABEL,
   });
 
   return {
-    token: fallbackToken,
-    user: mockUser,
+    token: session.token,
+    user: session.user,
     backendBacked: false,
   };
 }

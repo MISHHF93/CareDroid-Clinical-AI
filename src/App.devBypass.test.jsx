@@ -59,7 +59,7 @@ function AuthStateProbe() {
   const { isAuthenticated, isDevAuthBypass, user } = useUser();
   return (
     <output data-testid="auth-state">
-      {isAuthenticated ? 'authenticated' : 'anonymous'}:{isDevAuthBypass ? 'demo' : 'standard'}:
+      {isAuthenticated ? 'authenticated' : 'anonymous'}:{isDevAuthBypass ? 'platform' : 'standard'}:
       {user?.role || 'none'}
     </output>
   );
@@ -76,7 +76,7 @@ function renderWelcome() {
   );
 }
 
-describe('Welcome page demo mode access', () => {
+describe('Welcome page platform access', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -85,11 +85,11 @@ describe('Welcome page demo mode access', () => {
     mocks.apiFetchJson.mockRejectedValue(new Error('backend unavailable'));
   });
 
-  it('shows one demo mode action in development even with flags disabled', () => {
+  it('shows one platform access action in development even with flags disabled', () => {
     renderWelcome();
 
     expect(
-      screen.queryByRole('button', { name: /continue in demo mode/i })
+      screen.queryByRole('button', { name: /enter platform/i })
     ).toBeInTheDocument();
 
     expect(
@@ -97,21 +97,21 @@ describe('Welcome page demo mode access', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('allows demo mode when flags are disabled in local dev and routes to dashboard', async () => {
+  it('allows platform access when flags are disabled in local dev and routes to dashboard', async () => {
     renderWelcome();
 
-    fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
+    fireEvent.click(screen.getByRole('button', { name: /enter platform/i }));
 
     await waitFor(() => {
       expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
     });
   });
 
-  it('uses the demo mode action when explicitly enabled and routes to dashboard', async () => {
+  it('uses the platform access action when explicitly enabled and routes to dashboard', async () => {
     mocks.appConfig.features.enableDevAuthBypass = true;
     renderWelcome();
 
-    fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
+    fireEvent.click(screen.getByRole('button', { name: /enter platform/i }));
 
     await waitFor(() => {
       expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
@@ -119,7 +119,7 @@ describe('Welcome page demo mode access', () => {
     expect(localStorage.getItem('caredroid_access_token')).toBe('welcome-dev-token');
     expect(JSON.parse(localStorage.getItem('caredroid_user_profile'))).toEqual(
       expect.objectContaining({
-        authMode: 'local-dev-demo',
+        authMode: 'platform-access',
         isDevAuthBypass: true,
         role: 'physician',
       })
@@ -128,28 +128,50 @@ describe('Welcome page demo mode access', () => {
 });
 
 
-it('shows demo mode when VITE_DEMO_MODE=true and still routes to dashboard', async () => {
+it('shows platform access when VITE_DEMO_MODE=true and still routes to dashboard', async () => {
   mocks.appConfig.features.enableDevAuthBypass = false;
   mocks.appConfig.features.enableDemoMode = true;
   renderWelcome();
 
-  fireEvent.click(screen.getByRole('button', { name: /continue in demo mode/i }));
+  fireEvent.click(screen.getByRole('button', { name: /enter platform/i }));
 
   await waitFor(() => {
     expect(screen.getByTestId('location')).toHaveTextContent('/dashboard');
   });
 });
 
-it('restores persisted demo auth after refresh-compatible remounts', async () => {
+it('starts platform access automatically when no stored auth exists', async () => {
+  localStorage.clear();
+
+  render(
+    <UserProvider>
+      <AuthStateProbe />
+    </UserProvider>
+  );
+
+  await waitFor(() => {
+    expect(screen.getByTestId('auth-state')).toHaveTextContent('authenticated:platform:physician');
+  });
+  expect(localStorage.getItem('caredroid_access_token')).toBe('welcome-dev-token');
+  expect(JSON.parse(localStorage.getItem('caredroid_user_profile'))).toEqual(
+    expect.objectContaining({
+      authMode: 'platform-access',
+      devAuthLabel: 'Platform Access',
+      isDevAuthBypass: true,
+    })
+  );
+});
+
+it('restores persisted platform access after refresh-compatible remounts', async () => {
   localStorage.setItem('caredroid_access_token', 'persisted-demo-token');
   localStorage.setItem(
     'caredroid_user_profile',
     JSON.stringify({
-      id: 'dev-demo-user',
+      id: 'platform-access-user',
       role: 'physician',
-      authMode: 'local-dev-demo',
+      authMode: 'platform-access',
       isDevAuthBypass: true,
-      devAuthLabel: 'Demo Mode',
+      devAuthLabel: 'Platform Access',
     })
   );
 
@@ -160,6 +182,6 @@ it('restores persisted demo auth after refresh-compatible remounts', async () =>
   );
 
   await waitFor(() => {
-    expect(screen.getByTestId('auth-state')).toHaveTextContent('authenticated:demo:physician');
+    expect(screen.getByTestId('auth-state')).toHaveTextContent('authenticated:platform:physician');
   });
 });

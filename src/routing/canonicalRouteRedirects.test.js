@@ -21,9 +21,11 @@ function expectGeneratedRedirect(path, to) {
 }
 
 describe('canonical route redirects', () => {
-  it('preserves signup alias intent on the single canonical auth route', () => {
-    expect(appSource).toContain('AUTH_SIGNUP_PATH_ALIASES.includes(location.pathname)');
-    expect(appSource).toContain("search.set('mode', 'signup')");
+  it('bypasses auth aliases and sends visitors straight to the dashboard', () => {
+    expect(appSource).toContain('function AuthPathRedirect()');
+    expect(appSource).toContain('<Navigate to="/dashboard" replace />');
+    expect(appSource).not.toContain('AUTH_SIGNUP_PATH_ALIASES.includes(location.pathname)');
+    expect(appSource).not.toContain("search.set('mode', 'signup')");
   });
 
   it('keeps command dashboard canonical and legacy chat paths as redirects', () => {
@@ -167,12 +169,12 @@ describe('canonical route redirects', () => {
     expect(routeConfigSource).toContain("export const MEDICAL_3D_VIEWER_ROUTE_ALIASES = Object.freeze(['/anatomy-viewer'])");
   });
 
-  it('normalizes auth aliases to a single /auth route and preserves signup intent', () => {
+  it('normalizes auth aliases to the dashboard instead of rendering an auth page', () => {
     expect(appSource).toMatch(
-      /path:\s*'\/auth'[\s\S]*?<AuthShell>[\s\S]*?<AuthPage\s*\/>[\s\S]*?<\/AuthShell>[\s\S]*?publicOnly:\s*true/
+      /path:\s*'\/auth'[\s\S]*?element:\s*<Navigate to="\/dashboard" replace \/>[\s\S]*?publicOnly:\s*true/
     );
     expect(appSource).toContain('AUTH_PATH_ALIASES.map((path) => ({');
-    expect(appSource).toContain("pathname: '/auth'");
+    expect(appSource).toContain('element: <AuthPathRedirect />');
   });
 
   it('redirects legacy singular calculator paths to plural canonical calculator routes', () => {

@@ -19,6 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = dirname(__dirname);
 const appSource = readFileSync(join(srcRoot, 'App.jsx'), 'utf8');
 const appShellSource = readFileSync(join(srcRoot, 'layout/AppShell.jsx'), 'utf8');
+const userContextSource = readFileSync(join(srcRoot, 'contexts/UserContext.jsx'), 'utf8');
 const authSource = readFileSync(join(srcRoot, 'pages/Auth.jsx'), 'utf8');
 const devAuthSource = readFileSync(join(srcRoot, 'auth/devAuthBypass.js'), 'utf8');
 const appConfigSource = readFileSync(join(srcRoot, 'config/appConfig.js'), 'utf8');
@@ -32,8 +33,7 @@ const viteConfigSource = readFileSync(join(dirname(srcRoot), 'vite.config.js'), 
 const REQUIRED_AUTH_SNIPPETS = Object.freeze([
   "path: '/auth'",
   'AUTH_PATH_ALIASES.map',
-  "pathname: '/auth'",
-  'buildAuthRedirectSearch(location)',
+  'element: <Navigate to="/dashboard" replace />',
 ]);
 
 const REQUIRED_ROUTES = Object.freeze([
@@ -120,13 +120,14 @@ const REQUIRED_BACKEND_ROUTES = Object.freeze([
 ]);
 
 describe('full platform consolidation contract', () => {
-  it('keeps /auth canonical with visible direct/demo sign-in wiring', () => {
+  it('bypasses /auth while preserving platform access wiring', () => {
     for (const snippet of REQUIRED_AUTH_SNIPPETS) {
       expect(appSource).toContain(snippet);
     }
 
-    expect(authSource).toContain('Continue in Demo Mode');
+    expect(authSource).toContain('Enter Platform');
     expect(authSource).toContain('directSignInSection');
+    expect(userContextSource).toContain('createLocalPlatformAccessSession');
     expect(appShellSource).toContain('app-shell-dev-mode-banner');
     expect(devAuthSource).toContain('AUTH_CONFIG.demo.exposed');
     expect(authConfigSource).toContain('ENV_CONFIG.demoMode');
@@ -148,7 +149,7 @@ describe('full platform consolidation contract', () => {
       "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
     );
     expect(routeConfigSource).toContain(
-      'export const OPERATIONS_ROUTE_ALIASES = Object.freeze([])'
+      "export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center'])"
     );
     expect(routeConfigSource).toContain("export const HOME_ROUTE_ALIASES = Object.freeze(['/home'])");
     expect(routeConfigSource).toContain('export const PROTECTED_ROUTE_ALIAS_REDIRECTS = Object.freeze(');

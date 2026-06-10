@@ -728,7 +728,7 @@ export default function CommandDashboard() {
             <div className="command-status-card-row">
               <StatusCard
                 label="Session"
-                value={isDevAuthBypass ? 'Demo' : user?.role || 'Authenticated'}
+                value={isDevAuthBypass ? 'Platform' : user?.role || 'Authenticated'}
                 detail={systemConfig.error || 'Local tools remain available.'}
                 tone={systemConfig.configDegraded || systemConfig.error ? 'warning' : 'good'}
               />

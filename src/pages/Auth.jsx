@@ -160,8 +160,8 @@ const Auth = ({ onAuthSuccess }) => {
   const applyDevSession = async ({ forceDirect = false } = {}) => {
     if (!forceDirect && !enableDevAuthBypass) {
       error(
-        'Local demo access disabled',
-        'Set VITE_ENABLE_DEV_AUTH_BYPASS=true to enable local/demo sign-in.'
+        'Platform access disabled',
+        'Enable platform access or sign in with an account to continue.'
       );
       return;
     }
@@ -174,12 +174,12 @@ const Auth = ({ onAuthSuccess }) => {
       info(
         'Signing in',
         session.backendBacked
-          ? 'Demo mode with API access.'
-          : 'Demo mode using local UI data only. Start the backend for tool APIs.'
+          ? 'Platform access started with API support.'
+          : 'Platform access started with local UI data while backend APIs are unavailable.'
       );
     } catch (err) {
-      logger.error('Demo mode auth bypass failed', { err });
-      error('Demo mode failed', 'Unable to start the local demo session.');
+      logger.error('Platform access failed', { err });
+      error('Platform access failed', 'Unable to start the platform access session.');
     }
   };
 
@@ -193,9 +193,9 @@ const Auth = ({ onAuthSuccess }) => {
     return (
       <section
         className={`auth-dev-oneclick${compact ? ' auth-dev-oneclick--compact' : ''}`}
-        aria-label="Demo mode access"
+        aria-label="Platform access"
       >
-        <p className="auth-division-tag">Demo mode</p>
+        <p className="auth-division-tag">Platform access</p>
         <Button
           type="button"
           variant="success"
@@ -203,11 +203,11 @@ const Auth = ({ onAuthSuccess }) => {
           onClick={handleDirectSignIn}
           leftIcon={<NavIcon icon={CHROME_ICONS.zap} size={20} aria-hidden />}
         >
-          Continue in Demo Mode
+          Enter Platform
         </Button>
         <p className="auth-dev-oneclick__hint">
-          Uses a persisted demo clinician session and routes into the same app shell as every other
-          sign-in method.
+          Uses a clinician access session and routes into the same app shell as every other sign-in
+          method.
         </p>
       </section>
     );

@@ -111,7 +111,7 @@ describe('App shell layout — page scrollport', () => {
     expect(appShellCss).toMatch(/\.app-shell-page-body > \*[\s\S]*max-width:\s*100%/);
   });
 
-  it('renders an explicit dev/demo mode banner without changing the scrollport', () => {
+  it('renders an explicit platform access banner without changing the scrollport', () => {
     expect(appShellJsx).toContain('app-shell-dev-mode-banner');
     expect(appShellJsx).toContain('isDevAuthBypass');
     expect(appShellCss).toMatch(/\.app-shell-dev-mode-banner[\s\S]*flex:\s*0 0 auto/);

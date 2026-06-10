@@ -37,7 +37,7 @@ const AppShell = ({
   onSignOut,
   healthStatus,
   isDevAuthBypass = false,
-  devAuthBannerLabel = 'Demo Mode',
+  devAuthBannerLabel = 'Platform Access',
   children,
 }) => {
   const { preference, resolvedTheme, setPreference } = useTheme();
@@ -292,7 +292,7 @@ const AppShell = ({
           {isAuthed && isDevAuthBypass && (
             <div className="app-shell-dev-mode-banner" role="status">
               <strong>{devAuthBannerLabel}</strong> is active. This session uses a local clinician
-              profile and does not weaken production authentication.
+              profile and does not weaken production API authentication.
             </div>
           )}
           {children}

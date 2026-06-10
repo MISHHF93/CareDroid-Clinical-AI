@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createLocalPlatformAccessSession } from '../auth/devAuthBypass';
 import { AUTH_CONFIG } from '../config/auth.config';
 import { apiFetchJson } from '../services/apiClient';
 import logger from '../utils/logger';
@@ -187,7 +188,12 @@ export const UserProvider = ({ children }) => {
       logger.info('Loading token into state');
       setAuthTokenState(storedToken);
     } else {
-      logger.warn('No token in localStorage');
+      const session = createLocalPlatformAccessSession();
+      logger.info('No stored token found; starting platform access session');
+      setAuthTokenState(session.token);
+      setUserState(session.user);
+      setIsLoading(false);
+      return;
     }
 
     // Load profile
@@ -265,6 +271,11 @@ export const UserProvider = ({ children }) => {
           } catch (parseError) {
             logger.error('Failed to parse stored profile', { error: parseError });
           }
+        } else if (!cancelled) {
+          const session = createLocalPlatformAccessSession();
+          setAuthTokenState(session.token);
+          setUserState(session.user);
+          logger.info('Using platform access profile (backend unavailable)');
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -301,10 +312,10 @@ export const UserProvider = ({ children }) => {
   };
 
   const signOut = () => {
-    setUserState(null);
-    setAuthTokenState('');
-    localStorage.removeItem(AUTH_TOKEN_KEY);
-    localStorage.removeItem(USER_PROFILE_KEY);
+    const session = createLocalPlatformAccessSession();
+    setUserState(session.user);
+    setAuthTokenState(session.token);
+    setIsLoading(false);
   };
 
   /**
@@ -337,6 +348,7 @@ export const UserProvider = ({ children }) => {
   const isAuthenticated = Boolean(authToken);
   const isDevAuthBypass = Boolean(
     user?.isDevAuthBypass ||
+      user?.authMode === 'platform-access' ||
       user?.authMode === 'local-dev-demo' ||
       user?.authMode === 'dev-demo'
   );

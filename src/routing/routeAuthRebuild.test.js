@@ -5,11 +5,12 @@ const appSource = readFileSync(join(__dirname, '..', 'App.jsx'), 'utf8');
 const routeConfigSource = readFileSync(join(__dirname, '..', 'config/routes.config.js'), 'utf8');
 
 describe('canonical route/auth architecture', () => {
-  it('defines canonical auth and alias redirects', () => {
+  it('bypasses canonical auth and routes aliases to the dashboard', () => {
     expect(appSource).toMatch(
-      /path:\s*'\/auth'[\s\S]*<AuthShell>[\s\S]*<AuthPage \/>[\s\S]*<\/AuthShell>[\s\S]*publicOnly:\s*true/
+      /path:\s*'\/auth'[\s\S]*element:\s*<Navigate to="\/dashboard" replace \/>[\s\S]*publicOnly:\s*true/
     );
-    expect(appSource).toContain("pathname: '/auth'");
+    expect(appSource).toContain('function AuthPathRedirect()');
+    expect(appSource).toContain('<Navigate to="/dashboard" replace />');
   });
 
   it('keeps one canonical tools and calculators route system', () => {
@@ -40,7 +41,7 @@ describe('canonical route/auth architecture', () => {
       "export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog'])"
     );
     expect(routeConfigSource).toContain(
-      'export const OPERATIONS_ROUTE_ALIASES = Object.freeze([])'
+      "export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center'])"
     );
     expect(routeConfigSource).toMatch(
       /export const FLEET_MAP_ROUTE_ALIASES = Object\.freeze\(\[[\s\S]*'\/fleet'[\s\S]*'\/fleet\/live-map'[\s\S]*'\/fleet\/tracking'/

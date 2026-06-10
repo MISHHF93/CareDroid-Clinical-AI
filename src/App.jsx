@@ -20,7 +20,6 @@ import { NotificationToastContainer } from './components/notifications/Notificat
 import AppShell from './layout/AppShell';
 import AuthShell from './layout/AuthShell';
 import { PublicShell } from './layout/PublicShell';
-import Auth from './pages/Auth';
 import { createDevAuthSession, isDevAuthBypassEnabled } from './auth/devAuthBypass';
 import { useNotificationActions } from './hooks/useNotificationActions';
 import logger from './utils/logger';
@@ -28,7 +27,6 @@ import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
 import {
   AUTH_PATH_ALIASES,
-  AUTH_SIGNUP_PATH_ALIASES,
   PROTECTED_ROUTE_ALIAS_REDIRECTS,
 } from './config/routes.config';
 import {
@@ -380,51 +378,9 @@ const PageLoader = () => (
 
 logger.info('App.jsx loaded - Medical AI Chat Application');
 
-function buildAuthRedirectSearch(location) {
-  const current = `${location.pathname}${location.search || ''}${location.hash || ''}`;
-  if (
-    !location.pathname ||
-    location.pathname === '/auth' ||
-    location.pathname.startsWith('/auth/')
-  ) {
-    return '';
-  }
-  const search = new URLSearchParams();
-  search.set('next', current);
-  return `?${search.toString()}`;
-}
-
-function getSafePostAuthPath(location) {
-  const search = new URLSearchParams(location.search);
-  const next = search.get('next') || location.state?.from;
-  if (!next || typeof next !== 'string') return '/dashboard';
-  if (!next.startsWith('/') || next.startsWith('//')) return '/dashboard';
-  if (next === '/auth' || next.startsWith('/auth?') || next.startsWith('/auth/')) {
-    return '/dashboard';
-  }
-  return next;
-}
-
 function NotificationToasts() {
   const { notifications, removeNotification } = useNotifications();
   return <NotificationToastContainer toasts={notifications} onDismiss={removeNotification} />;
-}
-
-// ==================== AUTH PAGE ====================
-function AuthPage() {
-  const { setAuthToken, setUser } = useUser();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleAuthSuccess = (token, user) => {
-    flushSync(() => {
-      setAuthToken(token);
-      if (user) setUser(user);
-    });
-    navigate(getSafePostAuthPath(location), { replace: true });
-  };
-
-  return <Auth onAuthSuccess={handleAuthSuccess} />;
 }
 
 // ==================== WELCOME PAGE ====================
@@ -444,13 +400,13 @@ export function WelcomePage() {
       info(
         'Signing in',
         session.backendBacked
-          ? 'Demo mode with API access.'
-          : 'Demo mode using local UI data only. Start the backend for tool APIs.'
+          ? 'Platform access started with API support.'
+          : 'Platform access started with local UI data while backend APIs are unavailable.'
       );
       navigate('/dashboard', { replace: true });
     } catch (err) {
-      logger.error('Demo mode auth bypass failed from welcome page', { err });
-      error('Demo mode failed', 'Unable to start the local demo session.');
+      logger.error('Platform access failed from welcome page', { err });
+      error('Platform access failed', 'Unable to start the platform access session.');
     }
   };
 
@@ -509,15 +465,15 @@ export function WelcomePage() {
           </button>
           {enableDevAuthBypass && (
             <button type="button" className="welcome-page-dev-cta" onClick={handleDirectSignIn}>
-              Continue in Demo Mode
+              Enter Platform
             </button>
           )}
         </div>
 
         {enableDevAuthBypass && (
           <p className="welcome-page-dev-note">
-            Demo mode is enabled for local or hosted demos and uses the same app shell routes as
-            signed-in clinicians.
+            Platform access is enabled for visitors and uses the same app shell routes as signed-in
+            clinicians.
           </p>
         )}
 
@@ -560,7 +516,7 @@ function AppShellPage({ children }) {
       onSignOut={handleSignOut}
       healthStatus="online"
       isDevAuthBypass={isDevAuthBypass}
-      devAuthBannerLabel={user?.devAuthLabel || 'Demo Mode'}
+      devAuthBannerLabel={user?.devAuthLabel || 'Platform Access'}
     >
       {children}
     </AppShell>
@@ -573,23 +529,9 @@ function LegacyOAuthCallbackRedirect() {
   return <Navigate to={{ pathname: '/auth-callback', search: location.search }} replace />;
 }
 
-/** This SPA only implements sign-in at `/auth`; common paths redirect here. */
+/** Auth entry aliases are bypassed for the public platform build. */
 function AuthPathRedirect() {
-  const location = useLocation();
-  const search = new URLSearchParams(location.search);
-  if (AUTH_SIGNUP_PATH_ALIASES.includes(location.pathname) && !search.has('mode')) {
-    search.set('mode', 'signup');
-  }
-  return (
-    <Navigate
-      to={{
-        pathname: '/auth',
-        search: search.toString() ? `?${search.toString()}` : '',
-        hash: location.hash,
-      }}
-      replace
-    />
-  );
+  return <Navigate to="/dashboard" replace />;
 }
 
 /** Legacy protected paths stay deep-linkable while canonical routes own the UI. */
@@ -601,7 +543,6 @@ function LegacyProtectedRouteRedirect({ to }) {
 // ==================== ROUTING ====================
 function AppRoutes() {
   const { isAuthenticated, isLoading } = useUser();
-  const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
@@ -628,16 +569,6 @@ function AppRoutes() {
     permission,
     requireAllPermissions = false,
   }) => {
-    if (requiresAuth && !isAuthenticated) {
-      return (
-        <Navigate
-          to={{ pathname: '/auth', search: buildAuthRedirectSearch(location) }}
-          replace
-          state={{ from: `${location.pathname}${location.search || ''}${location.hash || ''}` }}
-        />
-      );
-    }
-
     if (publicOnly && isAuthenticated) {
       return <Navigate to="/dashboard" replace />;
     }
@@ -679,11 +610,7 @@ function AppRoutes() {
     },
     {
       path: '/auth',
-      element: (
-        <AuthShell>
-          <AuthPage />
-        </AuthShell>
-      ),
+      element: <Navigate to="/dashboard" replace />,
       publicOnly: true,
     },
     {

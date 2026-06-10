@@ -72,6 +72,7 @@ export function TenantContextProvider({ children }) {
   const canUseDemoTenant = Boolean(
     isDevAuthBypass ||
       user?.isDevAuthBypass ||
+      user?.authMode === 'platform-access' ||
       user?.authMode === 'local-dev-demo' ||
       user?.authMode === 'dev-demo'
   );
