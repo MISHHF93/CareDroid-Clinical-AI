@@ -125,8 +125,64 @@ describe('WorkspaceHome', () => {
 
     expect(screen.getByRole('heading', { name: /emergency command center/i })).toBeInTheDocument();
     expect(screen.getByText(/Leadership can scan department status in under 60 seconds/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Door-to-Direction/i).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: /open door-to-direction/i })).toBeInTheDocument();
     expect(screen.getAllByText(/Automation Status/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Boarding Pressure/i).length).toBeGreaterThan(0);
+  });
+
+  it('renders dedicated ED director and charge nurse views', () => {
+    const director = renderWorkspace('/workspace/emergency/director');
+    expect(screen.getByRole('heading', { name: /ed director view/i })).toBeInTheDocument();
+    expect(screen.getByText(/throughput, boarding, EMS offload, staffing pressure, adoption analytics, and automation ROI/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Patient Path/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Automation ROI/i).length).toBeGreaterThan(0);
+    director.unmount();
+
+    renderWorkspace('/workspace/emergency/charge-nurse');
+    expect(screen.getByRole('heading', { name: /charge nurse view/i })).toBeInTheDocument();
+    expect(screen.getByText(/Room availability, waiting patients, reassessment queue, critical alerts, device availability/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Reassessment Queue/i).length).toBeGreaterThan(0);
+  });
+
+  it('renders the ED digital whiteboard with demo patient cards', () => {
+    renderWorkspace('/workspace/emergency/whiteboard');
+
+    expect(screen.getByRole('heading', { name: /emergency digital whiteboard/i })).toBeInTheDocument();
+    expect(screen.getByText(/Staff can track patient flow visually/i)).toBeInTheDocument();
+    ['Arrival', 'Triage', 'Waiting', 'Assessment', 'Orders', 'Results', 'Disposition'].forEach((column) => {
+      expect(screen.getAllByText(column).length).toBeGreaterThan(0);
+    });
+    expect(screen.getAllByText(/Sample patient DEMO-ED/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Demo data/i).length).toBeGreaterThan(0);
+  });
+
+  it('renders the ED Patient Path with Door-to-Direction metrics', () => {
+    renderWorkspace('/workspace/emergency/patient-path');
+
+    expect(screen.getByRole('heading', { name: /emergency patient path/i })).toBeInTheDocument();
+    expect(screen.getAllByText(/Door-to-Direction/i).length).toBeGreaterThan(0);
+    [
+      /Arrival Signal/i,
+      /Patient Known/i,
+      /Risk Known/i,
+      /Queue Known/i,
+      /Next Action Known/i,
+      /Destination Known/i,
+      /Throughput Measured/i,
+    ].forEach((label) => {
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
+    });
+    expect(screen.getAllByText(/Sample patient DEMO-ED/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Next action:/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Demo data/i).length).toBeGreaterThan(0);
+
+    fireEvent.click(screen.getByRole('button', { name: /explain patient flow blockers/i }));
+    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+      expect.stringContaining('Explain ED patient flow blockers'),
+      'user'
+    );
+    expect(screen.getByTestId('location')).toHaveTextContent('/assistant');
   });
 
   it('renders frozen workspaces as Coming Later roadmap modules', () => {
@@ -189,6 +245,8 @@ describe('WorkspaceHome', () => {
       /Boarding/i,
       /Equipment/i,
       /Discharge/i,
+      /Simulation/i,
+      /Analytics/i,
     ].forEach((category) => {
       expect(screen.getAllByText(category).length).toBeGreaterThan(0);
     });
@@ -249,6 +307,19 @@ describe('WorkspaceHome', () => {
     expect(screen.getByRole('button', { name: /ask assistant with copilot context/i })).toBeInTheDocument();
   });
 
+  it('renders the search-first ED knowledge layer', () => {
+    renderWorkspace('/workspace/emergency/knowledge');
+
+    expect(screen.getByRole('heading', { name: /emergency knowledge layer/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/search emergency knowledge/i)).toBeInTheDocument();
+    expect(screen.getByText(/Protocols, calculators, pathways, simulations, evidence, and workflows/i)).toBeInTheDocument();
+    expect(screen.getByText(/Chest Pain \/ ACS Guidance/i)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText(/search emergency knowledge/i), { target: { value: 'sepsis' } });
+    expect(screen.getByText(/Sepsis Workflow Guidance/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Chest Pain \/ ACS Guidance/i)).not.toBeInTheDocument();
+  });
+
   it('routes alternate ED chief complaints to workflow guidance', () => {
     renderWorkspace('/workspace/emergency/evidence');
 
@@ -286,6 +357,8 @@ describe('WorkspaceHome', () => {
       /Psychiatry/i,
       /Internal Medicine/i,
       /Surgery/i,
+      /ICU/i,
+      /Laboratory/i,
     ].forEach((label) => {
       expect(screen.getAllByText(label).length).toBeGreaterThan(0);
     });
@@ -318,6 +391,18 @@ describe('WorkspaceHome', () => {
     expect(screen.getByRole('heading', { name: /demonstrate ROI and adoption/i })).toBeInTheDocument();
     expect(screen.getByText(/time saved/i)).toBeInTheDocument();
     expect(screen.getByText(/do not score autonomous clinical quality/i)).toBeInTheDocument();
+  });
+
+  it('renders the Emergency Automation ROI route with measurable value signals', () => {
+    renderWorkspace('/workspace/emergency/automation-roi');
+
+    expect(screen.getByRole('heading', { name: /emergency automation roi/i })).toBeInTheDocument();
+    expect(screen.getByText(/time saved, clicks reduced, queue impact, throughput impact, and adoption/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Time saved/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Clicks reduced/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Queue impact/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Adoption/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/workflow value only/i)).toBeInTheDocument();
   });
 
   it('renders the ED onboarding walkthrough and launches walkthrough targets', () => {
@@ -501,6 +586,7 @@ describe('WorkspaceHome', () => {
       /Referral Queue/i,
       /Admission Queue/i,
       /Discharge Queue/i,
+      /EMS Pre-Arrival Queue/i,
     ].forEach((queueLabel) => {
       expect(screen.getAllByText(queueLabel).length).toBeGreaterThan(0);
     });

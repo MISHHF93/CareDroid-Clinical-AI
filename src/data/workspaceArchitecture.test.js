@@ -149,7 +149,21 @@ describe('workspaceArchitecture', () => {
     ]);
     expect(mode.dashboards).toEqual(emergency.defaultDashboardWidgets);
     expect(mode.subpages.map((subpage) => subpage.id)).toEqual(
-      expect.arrayContaining(['command-center', 'pre-arrival', 'queues', 'capacity', 'boarding', 'triage', 'evidence', 'automations'])
+      expect.arrayContaining([
+        'command-center',
+        'patient-path',
+        'whiteboard',
+        'pre-arrival',
+        'queues',
+        'capacity',
+        'boarding',
+        'triage',
+        'knowledge',
+        'automations',
+        'automation-roi',
+        'director',
+        'charge-nurse',
+      ])
     );
     expect(mode.workflows).toContain('EMS pre-arrival pipeline');
     expect(mode.workflows).toContain('capacity intelligence');
@@ -228,32 +242,38 @@ describe('workspaceArchitecture', () => {
 
   it('adds specialized subpages for operational workspaces without sidebar expansion', () => {
     expect(getWorkspaceSubpageEntries('emergency').map((subpage) => subpage.id)).toEqual([
-      'command-center',
       'dashboard',
+      'command-center',
+      'patient-path',
+      'whiteboard',
+      'queues',
+      'pre-arrival',
+      'triage',
+      'referrals',
+      'boarding',
+      'capacity',
+      'throughput',
+      'knowledge',
+      'automations',
+      'analytics',
+      'automation-roi',
+      'director',
+      'charge-nurse',
+      'demo',
       'flow',
       'onboarding',
-      'demo',
       'roi',
       'deployment',
       'implementation',
-      'throughput',
       'waiting-room',
-      'pre-arrival',
       'ems',
-      'queues',
-      'capacity',
-      'boarding',
       'resources',
       'escalations',
-      'triage',
       'patients',
-      'referrals',
       'documentation',
       'evidence',
       'simulations',
       'iot',
-      'analytics',
-      'automations',
     ]);
     expect(getWorkspaceSubpageEntries('medical-iot').map((subpage) => subpage.id)).toEqual(
       expect.arrayContaining(['devices', 'telemetry', 'maintenance'])

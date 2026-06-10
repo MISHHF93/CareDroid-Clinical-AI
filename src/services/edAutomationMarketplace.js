@@ -9,16 +9,18 @@ export const ED_AUTOMATION_MARKETPLACE_CATEGORIES = Object.freeze([
   'Boarding',
   'Equipment',
   'Discharge',
+  'Simulation',
+  'Analytics',
 ]);
 
 const AUTOMATION_CATEGORY_MAP = Object.freeze({
   'emergency-automated-triage-matrix': ['Triage'],
   'emergency-referral-routing': ['Referral'],
-  'emergency-surge-staffing': ['Capacity', 'Boarding'],
-  'emergency-simulation-academy': ['Triage'],
+  'emergency-surge-staffing': ['Capacity', 'Boarding', 'Analytics'],
+  'emergency-simulation-academy': ['Triage', 'Simulation'],
   'emergency-medical-iot-monitoring': ['Equipment'],
   'emergency-documentation-integrity': ['Documentation'],
-  'emergency-rag-evidence-retrieval': ['Triage'],
+  'emergency-rag-evidence-retrieval': ['Triage', 'Analytics'],
   'emergency-virtual-ed': ['EMS'],
   'emergency-discharge-summary-drafting': ['Discharge', 'Documentation'],
   'emergency-prior-authorization': ['Referral', 'Discharge'],

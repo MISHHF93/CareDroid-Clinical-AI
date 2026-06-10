@@ -29,7 +29,7 @@ describe('EmergencyOperatingSystemService', () => {
     const operatingSystem = EmergencyOperatingSystemService.getOperatingSystem();
 
     expect(operatingSystem.patientFlow.engine.metrics.totalStates).toBe(12);
-    expect(operatingSystem.queueFlow.metrics.queueCount).toBe(7);
+    expect(operatingSystem.queueFlow.metrics.queueCount).toBe(8);
     expect(operatingSystem.throughput.kpi.metricId).toBe('doorToDoctor');
     expect(operatingSystem.waitingRoom.riskState).toMatch(/Normal|Busy|Critical/);
     expect(operatingSystem.reassessment.queue.label).toBe('ReassessmentQueue');
@@ -39,6 +39,8 @@ describe('EmergencyOperatingSystemService', () => {
       'Psychiatry',
       'Internal Medicine',
       'Surgery',
+      'ICU',
+      'Laboratory',
     ]);
     expect(operatingSystem.emsFlow.metrics.incomingCount).toBeGreaterThan(0);
     expect(operatingSystem.emsOffload.metrics.waitingHandoffs).toBeGreaterThan(0);
@@ -56,9 +58,39 @@ describe('EmergencyOperatingSystemService', () => {
     );
     expect(operatingSystem.simulationScenarios.scenarios).toHaveLength(5);
     expect(operatingSystem.demoEnvironment.metrics.patientCount).toBeGreaterThanOrEqual(100);
+    expect(operatingSystem.digitalWhiteboard.summary.totalActivePatients).toBeGreaterThan(0);
+    expect(operatingSystem.patientPath).toEqual(
+      expect.objectContaining({
+        route: '/workspace/emergency/patient-path',
+        metrics: expect.objectContaining({
+          doorToDirectionMinutes: expect.any(Number),
+          targetCompliance: expect.any(Number),
+        }),
+        milestones: expect.arrayContaining([
+          expect.objectContaining({ label: 'Arrival Signal' }),
+          expect.objectContaining({ label: 'Throughput Measured' }),
+        ]),
+      })
+    );
+    expect(operatingSystem.digitalWhiteboard.columns.map((column) => column.label)).toEqual([
+      'Arrival',
+      'Triage',
+      'Waiting',
+      'Assessment',
+      'Orders',
+      'Results',
+      'Disposition',
+    ]);
     expect(operatingSystem.copilot.copilotId).toBe('emergency-ai-copilot');
     expect(operatingSystem.analytics.route).toBe('/workspace/emergency/analytics');
     expect(operatingSystem.automationMarketplace.metrics.totalModules).toBe(10);
+    expect(operatingSystem.automationRoi).toEqual(
+      expect.objectContaining({
+        route: '/workspace/emergency/automation-roi',
+        metricDefinitions: ['time saved', 'clicks reduced', 'queue impact', 'throughput impact', 'adoption'],
+      })
+    );
+    expect(operatingSystem.knowledgeLayer.results.length).toBeGreaterThan(5);
   });
 
   it('builds discharge flow from queue, capacity, and automation marketplace signals', () => {
@@ -87,6 +119,8 @@ describe('EmergencyOperatingSystemService', () => {
         activePatients: expect.any(Number),
         waitingPatients: expect.any(Number),
         queueBottlenecks: expect.any(Number),
+        doorToDirection: expect.any(Number),
+        doorToDirectionCompliance: expect.any(Number),
         doorToDoctor: expect.any(Number),
         waitingRoomHealthScore: expect.any(Number),
         reassessmentQueue: expect.any(Number),

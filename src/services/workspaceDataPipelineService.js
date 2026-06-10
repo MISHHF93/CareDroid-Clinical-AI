@@ -34,8 +34,10 @@ import {
   estimateEmergencyRoi,
   summarizeEmergencyCustomerReadiness,
 } from '../data/emergencyOperatingSystem';
+import EmergencyKnowledgeLayer from '../data/emergencyKnowledgeLayer';
 import PatientJourneyEngine from '../data/patientJourneyEngine';
 import { workspaceFilterSummary } from '../data/platformOperatingSystem';
+import AutomationROIService from './automationROIService';
 import BoardingIntelligenceEngine from './boardingIntelligenceEngine';
 import DoorToDoctorIntelligenceService from './doorToDoctorIntelligenceService';
 import EdAutomationMarketplace from './edAutomationMarketplace';
@@ -47,7 +49,9 @@ import EmergencyEscalationEngineService from './emergencyEscalationEngineService
 import EmergencyKPILayerService from './emergencyKpiLayerService';
 import EmergencyResourceBoardService from './emergencyResourceBoardService';
 import EmergencySimulationScenariosService from './emergencySimulationScenariosService';
+import EmergencyWhiteboardService from './emergencyWhiteboardService';
 import EmergencyOperatingSystemService from './emergencyOperatingSystemService';
+import EmergencyPatientPathService from './emergencyPatientPathService';
 import QueueIntelligenceService from './queueIntelligenceService';
 import ReassessmentAutomationService from './reassessmentAutomationService';
 import ReferralHub from './referralHub';
@@ -211,6 +215,16 @@ export const WorkspaceDataPipelineService = {
       model.workspace.id === EMERGENCY_WORKSPACE_ID
         ? EdAutomationMarketplace.getMarketplaceDashboard(workspaceAutomations)
         : null;
+    const automationRoi =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? AutomationROIService.getAutomationRoiDashboard(workspaceAutomations)
+        : null;
+    const digitalWhiteboard =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmergencyWhiteboardService.getWhiteboard() : null;
+    const knowledgeLayer =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmergencyKnowledgeLayer.getDashboard() : null;
+    const patientPath =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmergencyPatientPathService.getPatientPathDashboard() : null;
     const operatingSystem =
       model.workspace.id === EMERGENCY_WORKSPACE_ID
         ? EmergencyOperatingSystemService.getOperatingSystem({ automations: workspaceAutomations })
@@ -246,6 +260,10 @@ export const WorkspaceDataPipelineService = {
               simulationScenarios,
               demoEnvironment,
               automationMarketplace,
+              automationRoi,
+              digitalWhiteboard,
+              knowledgeLayer,
+              patientPath,
               operatingSystem,
               canonicalPatientJourney: EMERGENCY_PATIENT_JOURNEY,
               dashboardWidgets: EMERGENCY_DASHBOARD_WIDGETS,

@@ -6,6 +6,7 @@ export const EMERGENCY_QUEUE_IDS = Object.freeze([
   'referral-queue',
   'admission-queue',
   'discharge-queue',
+  'ems-pre-arrival-queue',
 ]);
 
 export const EMERGENCY_QUEUE_DEFINITIONS = Object.freeze([
@@ -65,6 +66,14 @@ export const EMERGENCY_QUEUE_DEFINITIONS = Object.freeze([
     targetWaitMinutes: 45,
     minimumThroughput: 4,
   }),
+  Object.freeze({
+    id: 'ems-pre-arrival-queue',
+    label: 'EMS Pre-Arrival Queue',
+    description: 'Inbound EMS patients waiting for ED notification, receiving status, and structured handoff review.',
+    journeyStates: ['arrival', 'triage'],
+    targetWaitMinutes: 20,
+    minimumThroughput: 3,
+  }),
 ]);
 
 export const EMERGENCY_QUEUE_DEFINITION_BY_ID = Object.freeze(
@@ -120,6 +129,13 @@ export const DEFAULT_EMERGENCY_QUEUE_STATE = Object.freeze({
     oldestPatient: Object.freeze({ id: 'ED-1004', label: 'ED-1004', waitMinutes: 58, acuity: 'Follow-up pending' }),
     riskLevel: 'medium',
     throughput: 4,
+  }),
+  'ems-pre-arrival-queue': Object.freeze({
+    count: 5,
+    waitTime: 17,
+    oldestPatient: Object.freeze({ id: 'EMS-204', label: 'EMS-204', waitMinutes: 29, acuity: 'Inbound stroke review' }),
+    riskLevel: 'high',
+    throughput: 2,
   }),
 });
 

@@ -72,7 +72,7 @@ describe('WorkspaceDataPipelineService', () => {
     expect(data.emergency.queueIntelligence).toEqual(
       expect.objectContaining({
         metrics: expect.objectContaining({
-          queueCount: 7,
+          queueCount: 8,
           bottleneckCount: expect.any(Number),
           highestRiskQueue: expect.objectContaining({
             queueId: expect.any(String),
@@ -193,7 +193,7 @@ describe('WorkspaceDataPipelineService', () => {
           expect.objectContaining({ label: 'Request' }),
           expect.objectContaining({ label: 'Closed' }),
         ]),
-        departments: ['Cardiology', 'Neurology', 'Psychiatry', 'Internal Medicine', 'Surgery'],
+        departments: ['Cardiology', 'Neurology', 'Psychiatry', 'Internal Medicine', 'Surgery', 'ICU', 'Laboratory'],
         metrics: expect.objectContaining({
           total: expect.any(Number),
           delayed: expect.any(Number),
@@ -325,7 +325,7 @@ describe('WorkspaceDataPipelineService', () => {
           totalModules: 10,
           enabledModules: expect.any(Number),
           disabledModules: expect.any(Number),
-          categories: 8,
+          categories: 10,
         }),
         categories: expect.arrayContaining([
           expect.objectContaining({ category: 'Triage' }),
@@ -336,6 +336,8 @@ describe('WorkspaceDataPipelineService', () => {
           expect.objectContaining({ category: 'Boarding' }),
           expect.objectContaining({ category: 'Equipment' }),
           expect.objectContaining({ category: 'Discharge' }),
+          expect.objectContaining({ category: 'Simulation' }),
+          expect.objectContaining({ category: 'Analytics' }),
         ]),
         modules: expect.arrayContaining([
           expect.objectContaining({
@@ -344,6 +346,78 @@ describe('WorkspaceDataPipelineService', () => {
             subscriptionTier: expect.any(String),
             workspaceVisibility: expect.any(Array),
             roiEstimate: expect.any(String),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.digitalWhiteboard).toEqual(
+      expect.objectContaining({
+        route: '/workspace/emergency/whiteboard',
+        summary: expect.objectContaining({
+          totalActivePatients: expect.any(Number),
+          highRiskPatients: expect.any(Number),
+          reassessmentDue: expect.any(Number),
+        }),
+        columns: expect.arrayContaining([
+          expect.objectContaining({ label: 'Arrival' }),
+          expect.objectContaining({ label: 'Triage' }),
+          expect.objectContaining({ label: 'Waiting' }),
+          expect.objectContaining({ label: 'Assessment' }),
+          expect.objectContaining({ label: 'Orders' }),
+          expect.objectContaining({ label: 'Results' }),
+          expect.objectContaining({ label: 'Disposition' }),
+        ]),
+      })
+    );
+    expect(data.emergency.patientPath).toEqual(
+      expect.objectContaining({
+        route: '/workspace/emergency/patient-path',
+        metrics: expect.objectContaining({
+          doorToDirectionMinutes: expect.any(Number),
+          targetCompliance: expect.any(Number),
+          patientsWithoutDirection: expect.any(Number),
+        }),
+        milestones: expect.arrayContaining([
+          expect.objectContaining({ label: 'Patient Known' }),
+          expect.objectContaining({ label: 'Next Action Known' }),
+        ]),
+        patients: expect.arrayContaining([
+          expect.objectContaining({
+            patientId: expect.stringMatching(/^DEMO-ED-/),
+            assignedQueue: expect.objectContaining({ label: expect.any(String) }),
+            destination: expect.objectContaining({ label: expect.any(String) }),
+            nextAction: expect.any(String),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.knowledgeLayer).toEqual(
+      expect.objectContaining({
+        route: '/workspace/emergency/knowledge',
+        design: 'search-first',
+        domains: expect.arrayContaining(['protocol', 'calculator', 'pathway', 'simulation', 'evidence', 'workflow']),
+        results: expect.arrayContaining([
+          expect.objectContaining({
+            title: 'Chest Pain / ACS Guidance',
+            relatedCalculators: expect.arrayContaining(['heart-score']),
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.automationRoi).toEqual(
+      expect.objectContaining({
+        route: '/workspace/emergency/automation-roi',
+        metricDefinitions: ['time saved', 'clicks reduced', 'queue impact', 'throughput impact', 'adoption'],
+        totals: expect.objectContaining({
+          automationsTracked: 10,
+          estimatedMinutesSaved: expect.any(Number),
+          estimatedClicksReduced: expect.any(Number),
+        }),
+        automations: expect.arrayContaining([
+          expect.objectContaining({
+            valueScore: expect.any(Number),
+            timeSaved: expect.objectContaining({ totalMinutes: expect.any(Number) }),
+            queueImpact: expect.objectContaining({ estimatedMinutesReduced: expect.any(Number) }),
           }),
         ]),
       })
@@ -370,6 +444,18 @@ describe('WorkspaceDataPipelineService', () => {
         }),
         automationMarketplace: expect.objectContaining({
           metrics: expect.objectContaining({ totalModules: 10 }),
+        }),
+        automationRoi: expect.objectContaining({
+          route: '/workspace/emergency/automation-roi',
+        }),
+        knowledgeLayer: expect.objectContaining({
+          route: '/workspace/emergency/knowledge',
+        }),
+        digitalWhiteboard: expect.objectContaining({
+          route: '/workspace/emergency/whiteboard',
+        }),
+        patientPath: expect.objectContaining({
+          route: '/workspace/emergency/patient-path',
         }),
       })
     );
@@ -408,7 +494,24 @@ describe('WorkspaceDataPipelineService', () => {
       })
     );
     expect(data.subpages.map((subpage) => subpage.id)).toEqual(
-      expect.arrayContaining(['boarding', 'capacity', 'command-center', 'demo', 'deployment', 'flow', 'onboarding', 'pre-arrival', 'queues', 'roi'])
+      expect.arrayContaining([
+        'automation-roi',
+        'boarding',
+        'capacity',
+        'charge-nurse',
+        'command-center',
+        'demo',
+        'deployment',
+        'director',
+        'flow',
+        'knowledge',
+        'onboarding',
+        'patient-path',
+        'pre-arrival',
+        'queues',
+        'roi',
+        'whiteboard',
+      ])
     );
     expect(data.emergency.demoTenant).toEqual(
       expect.objectContaining({

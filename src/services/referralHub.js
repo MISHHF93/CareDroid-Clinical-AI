@@ -13,6 +13,8 @@ export const REFERRAL_DEPARTMENTS = Object.freeze([
   'Psychiatry',
   'Internal Medicine',
   'Surgery',
+  'ICU',
+  'Laboratory',
 ]);
 
 export const DEFAULT_REFERRALS = Object.freeze([
@@ -81,6 +83,28 @@ export const DEFAULT_REFERRALS = Object.freeze([
     requestedBy: 'ED clinician',
     reason: 'Follow-up cardiology clinic routing',
     handoffSummary: 'Referral closed after outpatient follow-up instructions were reviewed.',
+  }),
+  Object.freeze({
+    id: 'REF-1007',
+    patientLabel: 'ED-1009',
+    department: 'ICU',
+    stage: 'department-queue',
+    priority: 'high',
+    elapsedMinutes: 44,
+    requestedBy: 'ED physician',
+    reason: 'Admission review for worsening respiratory status',
+    handoffSummary: 'NEWS2, oxygen requirement, and boarding pressure context ready for ICU review.',
+  }),
+  Object.freeze({
+    id: 'REF-1008',
+    patientLabel: 'ED-1031',
+    department: 'Laboratory',
+    stage: 'review',
+    priority: 'medium',
+    elapsedMinutes: 37,
+    requestedBy: 'Charge nurse',
+    reason: 'Delayed critical lab follow-up',
+    handoffSummary: 'Results queue delay and sepsis review context need laboratory coordination.',
   }),
 ]);
 

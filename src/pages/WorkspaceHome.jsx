@@ -88,7 +88,7 @@ function statusLabel(status) {
 
 function WorkspaceSubpageTabs({ workspaceId, subpages, activeSubpageId }) {
   return (
-    <nav className="workspace-subpage-tabs" aria-label="Workspace subpages">
+    <nav className="workspace-subpage-tabs" aria-label="Workspace subpages" data-qa-ignore-overflow>
       {subpages.map((subpage) => (
         <Link
           key={subpage.id}
@@ -382,6 +382,195 @@ function EmergencyJourneyFlow({ journey = [], engine = {} }) {
           ))}
         </div>
       ) : null}
+    </section>
+  );
+}
+
+function EmergencyDigitalWhiteboardPanel({ whiteboard = {}, onAskAssistant }) {
+  const columns = whiteboard.columns || [];
+  const summary = whiteboard.summary || {};
+
+  return (
+    <section className="workspace-panel emergency-whiteboard-panel" aria-labelledby="emergency-whiteboard-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Demo data · Patient flow board</p>
+        <h2 id="emergency-whiteboard-title">Emergency Digital Whiteboard</h2>
+        <p>Staff can track patient flow visually across arrival, triage, waiting, assessment, orders, results, and disposition.</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="Emergency whiteboard summary">
+        <span>{summary.totalActivePatients || 0} active demo patients</span>
+        <span>{summary.highRiskPatients || 0} high-risk cards</span>
+        <span>{summary.reassessmentDue || 0} reassessment due</span>
+        <span>{summary.longestWaitMinutes || 0} min longest wait</span>
+      </div>
+      <div className="emergency-journey-insights" aria-label="Emergency whiteboard controls">
+        <p>
+          <strong>Filters:</strong> {(whiteboard.filters || []).slice(0, 6).join(', ')}
+        </p>
+        <p>
+          <strong>Search:</strong> {(whiteboard.searchFields || []).join(', ')}
+        </p>
+        <p>
+          <strong>Source:</strong> {whiteboard.sourceState || 'Demo data · No live integration'}
+        </p>
+      </div>
+      <div className="emergency-queue-grid">
+        {columns.map((column) => (
+          <article key={column.id} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{column.highRiskCount || 0} high risk</span>
+                <h3>{column.label}</h3>
+              </div>
+              <strong>{column.count || 0}</strong>
+            </div>
+            <div className="emergency-journey-insights">
+              {(column.cards || []).slice(0, 3).map((card) => (
+                <p key={card.patientId}>
+                  <strong>{card.displayName}</strong> · age {card.age} · {card.complaint}
+                  <br />
+                  <span>
+                    {card.riskLevel} risk · {card.waitingTime} min · {card.assignedQueue}
+                  </span>
+                  <br />
+                  <span>Next action: {card.nextAction}</span>
+                  {card.alerts.length ? (
+                    <>
+                      <br />
+                      <span>Alerts: {card.alerts.join(', ')}</span>
+                    </>
+                  ) : null}
+                </p>
+              ))}
+            </div>
+          </article>
+        ))}
+      </div>
+      <p className="emergency-queue-warning">
+        <strong>Safety boundary:</strong> {whiteboard.safetyStatement}
+      </p>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Summarize Emergency Digital Whiteboard pressure. ${summary.totalActivePatients || 0} demo patients, ${summary.highRiskPatients || 0} high-risk cards, bottleneck column ${summary.bottleneckColumn || 'unknown'}. Keep all actions human-reviewed.`
+          )
+        }
+      >
+        Ask assistant to summarize whiteboard pressure
+      </button>
+    </section>
+  );
+}
+
+function EmergencyPatientPathPanel({ patientPath = {}, onAskAssistant }) {
+  const metrics = patientPath.metrics || {};
+  const milestones = patientPath.milestones || [];
+  const patients = patientPath.patients || [];
+  const recommendations = patientPath.recommendations || [];
+
+  return (
+    <section className="workspace-panel emergency-patient-path-panel" aria-labelledby="emergency-patient-path-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Door-to-Direction</p>
+        <h2 id="emergency-patient-path-title">Emergency Patient Path</h2>
+        <p>
+          {patientPath.salesNarrative ||
+            'Every arrival becomes a known, risk-routed, queue-assigned, action-ready patient flow object.'}
+        </p>
+      </div>
+
+      <div className="emergency-patient-path-hero">
+        <div>
+          <span>Door-to-Direction</span>
+          <strong>{metrics.doorToDirectionMinutes || 0} min</strong>
+          <small>{metrics.targetCompliance || 0}% within {metrics.targetDoorToDirectionMinutes || 10} min target</small>
+        </div>
+        <div>
+          <span>Patients visible</span>
+          <strong>{metrics.patientCount || patients.length}</strong>
+          <small>{metrics.highRiskPatients || 0} high-risk patients routed</small>
+        </div>
+        <div>
+          <span>Open direction gaps</span>
+          <strong>{metrics.patientsWithoutDirection || 0}</strong>
+          <small>{metrics.highRiskNotActioned || 0} high-risk over action target</small>
+        </div>
+      </div>
+
+      <ol className="emergency-patient-path-line" aria-label="Patient path milestones">
+        {milestones.map((milestone) => (
+          <li key={milestone.id} className={`emergency-patient-path-line__step emergency-patient-path-line__step--${cssToken(milestone.status)}`}>
+            <span>{milestone.label}</span>
+            <strong>{milestone.value ?? 0} {milestone.unit || 'min'}</strong>
+            <small>Target {milestone.targetMinutes} min</small>
+          </li>
+        ))}
+      </ol>
+
+      <div className="emergency-patient-path-grid" aria-label="Patient path cards">
+        {patients.slice(0, 12).map((patient) => (
+          <article key={patient.patientId} className={`emergency-patient-path-card emergency-patient-path-card--${cssToken(patient.riskLevel)}`}>
+            <div className="emergency-patient-path-card__header">
+              <div>
+                <span className="workspace-eyebrow">{patient.arrivalMode}</span>
+                <h3>{patient.displayName}</h3>
+              </div>
+              <strong>{patient.timing?.doorToDirectionMinutes || 0} min</strong>
+            </div>
+            <p>{patient.complaint} · {patient.currentState}</p>
+            <dl className="emergency-queue-metrics">
+              <div>
+                <dt>Risk</dt>
+                <dd>{patient.riskLevel}</dd>
+              </div>
+              <div>
+                <dt>Queue</dt>
+                <dd>{patient.assignedQueue?.label}</dd>
+              </div>
+              <div>
+                <dt>Destination</dt>
+                <dd>{patient.destination?.label}</dd>
+              </div>
+            </dl>
+            <p className="emergency-queue-warning">
+              <strong>Next action:</strong> {patient.nextAction}
+            </p>
+            {patient.calculators?.length ? (
+              <div className="emergency-prearrival-risk-bundle" aria-label={`${patient.patientId} calculators`}>
+                {patient.calculators.map((calculator) => (
+                  <span key={calculator.id}>{calculator.label}</span>
+                ))}
+              </div>
+            ) : null}
+          </article>
+        ))}
+      </div>
+
+      <div className="emergency-journey-insights" aria-label="Patient path recommendations">
+        {recommendations.slice(0, 4).map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+        <p>
+          <strong>Source:</strong> {patientPath.sourceState || 'Demo data · No live integration'}
+        </p>
+        <p>{patientPath.safetyStatement}</p>
+      </div>
+
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Explain ED patient flow blockers and next operational actions. Door-to-Direction is ${metrics.doorToDirectionMinutes || 0} minutes with ${metrics.patientsWithoutDirection || 0} direction gaps. Keep all actions human-reviewed.`
+          )
+        }
+      >
+        Explain patient flow blockers
+      </button>
     </section>
   );
 }
@@ -1154,6 +1343,8 @@ function EmergencyBoardingIntelligencePanel({ boarding = {}, onAskAssistant }) {
 
 function EmergencyCommandCenter({ emergency, onLaunchRoute, onAskAssistant }) {
   const commandWidgets = emergency.commandCenterWidgets || emergency.dashboardWidgets || [];
+  const patientPath = emergency.patientPath || {};
+  const pathMetrics = patientPath.metrics || {};
   return (
     <section className="emergency-command-center" aria-label="Emergency Command Center">
       <div className="workspace-panel emergency-os-layout__wide">
@@ -1161,6 +1352,21 @@ function EmergencyCommandCenter({ emergency, onLaunchRoute, onAskAssistant }) {
           <p className="workspace-eyebrow">ED Command Center</p>
           <h2>Emergency Command Center</h2>
           <p>Most ED flow actions start here: current patients, waiting room, high-risk queue, EMS arrivals, referrals, bed pressure, equipment status, staffing pressure, and alerts.</p>
+        </div>
+        <div className="emergency-patient-path-strip" aria-label="Door-to-Direction summary">
+          <div>
+            <span>Door-to-Direction</span>
+            <strong>{pathMetrics.doorToDirectionMinutes || 0} min</strong>
+            <small>{pathMetrics.targetCompliance || 0}% within target</small>
+          </div>
+          <div>
+            <span>Patient path</span>
+            <strong>{pathMetrics.patientCount || 0}</strong>
+            <small>known, risk-routed, queue-assigned</small>
+          </div>
+          <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/patient-path')}>
+            Open Patient Path
+          </button>
         </div>
         <div className="emergency-command-grid">
           {commandWidgets.map((widget) => (
@@ -1227,11 +1433,22 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
   const resourceBoard = emergency.resourceBoard;
   const escalationEngine = emergency.escalationEngine;
   const kpiLayer = emergency.kpiLayer;
+  const patientPath = emergency.patientPath;
   const automationState = AutomationEngine.getWorkspaceAutomationState(workspaceId);
   const automationCount =
     automationState.activeAutomations.length + automationState.demoAutomations.length + automationState.blockedAutomations.length;
 
   const directorSections = [
+    {
+      id: 'door-to-direction',
+      label: 'Door-to-Direction',
+      value: `${patientPath?.metrics?.doorToDirectionMinutes ?? 0}m`,
+      helper: `${patientPath?.metrics?.targetCompliance ?? 0}% patients within target`,
+      detail: 'Arrival to known, risk-routed, queue-assigned, action-ready patient flow object.',
+      target: '/workspace/emergency/patient-path',
+      assistantPrompt: 'Summarize Door-to-Direction patient path blockers, direction gaps, and human-reviewed next actions.',
+      severity: (patientPath?.metrics?.doorToDirectionMinutes || 0) > 10 ? 'high' : 'medium',
+    },
     {
       id: 'door-to-doctor',
       label: 'Door-to-Doctor',
@@ -1345,6 +1562,7 @@ function EmergencyDirectorCommandCenter({ emergency, workspaceId, onLaunchRoute,
       {operatingSystem?.leadershipSummary ? (
         <div className="emergency-journey-summary" aria-label="Emergency operating system summary">
           <span>{operatingSystem.leadershipSummary.activePatients} active patients</span>
+          <span>{operatingSystem.leadershipSummary.doorToDirection} min door-to-direction</span>
           <span>{operatingSystem.leadershipSummary.queueBottlenecks} queue bottlenecks</span>
           <span>{operatingSystem.leadershipSummary.capacityScore} capacity score</span>
           <span>{operatingSystem.leadershipSummary.automationModules} SaaS modules</span>
@@ -1684,6 +1902,101 @@ function DemoDataLabels({ item }) {
         <span key={label}>{label}</span>
       ))}
     </div>
+  );
+}
+
+function EmergencyKnowledgeLayerPanel({ knowledgeLayer = {}, onLaunchRoute, onAskAssistant }) {
+  const [query, setQuery] = useState('');
+  const lowerQuery = query.trim().toLowerCase();
+  const results = lowerQuery
+    ? (knowledgeLayer.results || []).filter((item) =>
+        [
+          item.title,
+          item.domain,
+          item.summary,
+          ...(item.complaintTags || []),
+          ...(item.aliases || []),
+          ...(item.workflowIds || []),
+        ]
+          .join(' ')
+          .toLowerCase()
+          .includes(lowerQuery)
+      )
+    : knowledgeLayer.results || [];
+
+  return (
+    <section className="workspace-panel emergency-knowledge-panel" aria-labelledby="emergency-knowledge-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Search-first ED knowledge</p>
+        <h2 id="emergency-knowledge-title">Emergency Knowledge Layer</h2>
+        <p>Protocols, calculators, pathways, simulations, evidence, and workflows are centralized for fast human-reviewed guidance.</p>
+      </div>
+      <label className="workspace-form-field" htmlFor="emergency-knowledge-search">
+        <span>Search emergency knowledge</span>
+        <input
+          id="emergency-knowledge-search"
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Try chest pain, sepsis, stroke, referral, boarding..."
+        />
+      </label>
+      <div className="emergency-journey-summary" aria-label="Emergency knowledge domains">
+        {(knowledgeLayer.domains || []).map((domain) => (
+          <span key={domain}>{domain}</span>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Emergency knowledge quick filters">
+        <p>
+          <strong>Quick filters:</strong> {(knowledgeLayer.quickFilters || []).join(', ')}
+        </p>
+        <p>
+          <strong>Source:</strong> {knowledgeLayer.sourceState}
+        </p>
+      </div>
+      <div className="emergency-queue-grid">
+        {results.map((item) => (
+          <article key={item.knowledgeId} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{item.domain}</span>
+                <h3>{item.title}</h3>
+              </div>
+              <strong>{item.sourceState}</strong>
+            </div>
+            <p>{item.summary}</p>
+            <div className="emergency-journey-insights">
+              <p>
+                <strong>Calculators:</strong> {item.relatedCalculators?.length ? item.relatedCalculators.join(', ') : 'No calculator required'}
+              </p>
+              <p>
+                <strong>Workflows:</strong> {(item.workflowIds || []).join(', ')}
+              </p>
+              <p>
+                <strong>Tags:</strong> {(item.complaintTags || []).join(', ')}
+              </p>
+            </div>
+            <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute(item.launchTarget)}>
+              Open knowledge target
+            </button>
+          </article>
+        ))}
+      </div>
+      <p className="emergency-queue-warning">
+        <strong>Safety boundary:</strong> {knowledgeLayer.safetyStatement}
+      </p>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Use Emergency Knowledge Layer context for ${query || 'current ED flow'}. Recommend calculators, protocols, workflow next steps, referral options, and simulations for human review only.`
+          )
+        }
+      >
+        Ask assistant with knowledge context
+      </button>
+    </section>
   );
 }
 
@@ -2312,6 +2625,291 @@ function EmergencyOnboardingPanel({ onboarding, onLaunchRoute }) {
   );
 }
 
+function EmergencyDirectorViewPanel({ emergency = {}, onLaunchRoute, onAskAssistant }) {
+  const summary = emergency.operatingSystem?.leadershipSummary || {};
+  const roiTotals = emergency.automationRoi?.totals || {};
+  const kpis = emergency.kpiLayer?.metrics || [];
+  const boarding = emergency.boardingIntelligence?.metrics || {};
+
+  return (
+    <section className="workspace-panel emergency-director-view" aria-labelledby="emergency-director-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Leadership view</p>
+        <h2 id="emergency-director-title">ED Director View</h2>
+        <p>Throughput, boarding, EMS offload, staffing pressure, adoption analytics, and automation ROI in one scan.</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="ED director summary">
+        <span>{summary.doorToDirection || 0} min door-to-direction</span>
+        <span>{summary.doorToDoctor || 0} min door-to-doctor</span>
+        <span>{summary.boardingCount || 0} boarding patients</span>
+        <span>{summary.emsArrivals || 0} EMS arrivals</span>
+        <span>{roiTotals.estimatedMinutesSaved || 0} min saved</span>
+      </div>
+      <div className="emergency-queue-grid">
+        {[
+          {
+            id: 'patient-path',
+            title: 'Patient Path',
+            value: `${summary.doorToDirection || 0} min`,
+            detail: `${summary.doorToDirectionCompliance || 0}% of patients are known, risk-routed, queue-assigned, and action-ready within target.`,
+            route: '/workspace/emergency/patient-path',
+          },
+          {
+            id: 'throughput',
+            title: 'Throughput',
+            value: `${summary.doorToDoctor || 0} min`,
+            detail: 'Door-to-doctor, length of stay, triage, disposition, referral, and discharge delay KPIs.',
+            route: '/workspace/emergency/throughput',
+          },
+          {
+            id: 'boarding',
+            title: 'Boarding',
+            value: `${boarding.boardingCount || 0} boarders`,
+            detail: `${boarding.boardingTime || 0} min average boarding time; ${boarding.pendingBeds || 0} pending beds.`,
+            route: '/workspace/emergency/boarding',
+          },
+          {
+            id: 'ems-offload',
+            title: 'EMS Offload',
+            value: `${summary.emsOffloadDelay || 0} min`,
+            detail: 'Current offload delay and inbound EMS pressure.',
+            route: '/workspace/emergency/pre-arrival',
+          },
+          {
+            id: 'staffing-pressure',
+            title: 'Staffing Pressure',
+            value: `${summary.queueBottlenecks || 0} bottlenecks`,
+            detail: 'Queue bottlenecks, resource shortages, reassessment load, and active escalations.',
+            route: '/workspace/emergency/charge-nurse',
+          },
+          {
+            id: 'adoption-analytics',
+            title: 'Adoption Analytics',
+            value: `${roiTotals.totalRuns || 0} runs`,
+            detail: `${roiTotals.adoptedAutomations || 0} adopted automations tracked during the demo shift.`,
+            route: '/workspace/emergency/automation-roi',
+          },
+          {
+            id: 'automation-roi',
+            title: 'Automation ROI',
+            value: `${roiTotals.estimatedClicksReduced || 0} clicks`,
+            detail: `${roiTotals.queueMinutesReduced || 0} queue minutes and ${roiTotals.throughputMinutesReduced || 0} throughput minutes reduced.`,
+            route: '/workspace/emergency/automation-roi',
+          },
+        ].map((signal) => (
+          <article key={signal.id} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">Director signal</span>
+                <h3>{signal.title}</h3>
+              </div>
+              <strong>{signal.value}</strong>
+            </div>
+            <p>{signal.detail}</p>
+            <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute(signal.route)}>
+              Open {signal.title}
+            </button>
+          </article>
+        ))}
+      </div>
+      <div className="emergency-journey-insights" aria-label="Director KPI layer">
+        {kpis.slice(0, 4).map((metric) => (
+          <p key={metric.metricId}>
+            <strong>{metric.label}:</strong> {metric.value} {metric.unit} · target {metric.target || 'review'}
+          </p>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Summarize ED Director View: throughput ${summary.doorToDoctor} min door-to-doctor, ${summary.boardingCount} boarding patients, ${summary.emsArrivals} EMS arrivals, ${roiTotals.estimatedMinutesSaved || 0} minutes saved. Keep recommendations operational and human-reviewed.`
+          )
+        }
+      >
+        Ask assistant for director summary
+      </button>
+    </section>
+  );
+}
+
+function EmergencyChargeNurseViewPanel({ emergency = {}, onLaunchRoute, onAskAssistant }) {
+  const resources = emergency.resourceBoard || {};
+  const waitingRoom = emergency.waitingRoomIntelligence || {};
+  const reassessment = emergency.reassessmentAutomation || {};
+  const capacity = emergency.capacityIntelligence || {};
+  const alerts = emergency.escalationEngine?.escalations || [];
+
+  return (
+    <section className="workspace-panel emergency-charge-nurse-view" aria-labelledby="emergency-charge-nurse-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Operational nurse view</p>
+        <h2 id="emergency-charge-nurse-title">Charge Nurse View</h2>
+        <p>Room availability, waiting patients, reassessment queue, critical alerts, device availability, and next operational actions.</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="Charge nurse summary">
+        <span>{capacity.signals?.find((signal) => signal.id === 'availableSpaces')?.value || 0} available spaces</span>
+        <span>{waitingRoom.metrics?.patientCount || 0} waiting patients</span>
+        <span>{reassessment.metrics?.total || 0} reassessment queue</span>
+        <span>{resources.metrics?.shortageCount || 0} resource shortages</span>
+      </div>
+      <div className="emergency-queue-grid">
+        <article className="emergency-queue-card">
+          <div className="emergency-queue-card__header">
+            <div>
+              <span className="workspace-eyebrow">Rooms</span>
+              <h3>Room Availability</h3>
+            </div>
+            <strong>{capacity.riskLevel || 'Green'}</strong>
+          </div>
+          <p>{capacity.summary}</p>
+          <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/capacity')}>
+            Open capacity
+          </button>
+        </article>
+        <article className="emergency-queue-card">
+          <div className="emergency-queue-card__header">
+            <div>
+              <span className="workspace-eyebrow">Waiting</span>
+              <h3>Waiting Patients</h3>
+            </div>
+            <strong>{waitingRoom.metrics?.patientCount || 0}</strong>
+          </div>
+          <p>Waiting room health score {waitingRoom.healthScore || 0}; risk state {waitingRoom.riskState || 'green'}.</p>
+          <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/waiting-room')}>
+            Open waiting room
+          </button>
+        </article>
+        <article className="emergency-queue-card">
+          <div className="emergency-queue-card__header">
+            <div>
+              <span className="workspace-eyebrow">Reassessment</span>
+              <h3>Reassessment Queue</h3>
+            </div>
+            <strong>{reassessment.metrics?.total || 0}</strong>
+          </div>
+          <p>{reassessment.recommendations?.[0]?.action || 'Review reassessment queue and high-risk waiting patients.'}</p>
+          <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/waiting-room')}>
+            Open reassessments
+          </button>
+        </article>
+        <article className="emergency-queue-card">
+          <div className="emergency-queue-card__header">
+            <div>
+              <span className="workspace-eyebrow">Devices</span>
+              <h3>Device Availability</h3>
+            </div>
+            <strong>{resources.metrics?.available || 0}</strong>
+          </div>
+          <p>{resources.summary || 'Device and resource readiness from the Emergency Resource Board.'}</p>
+          <button type="button" className="workspace-secondary-action" onClick={() => onLaunchRoute('/workspace/emergency/resources')}>
+            Open resources
+          </button>
+        </article>
+      </div>
+      <div className="emergency-journey-insights" aria-label="Critical alerts and next operational actions">
+        {alerts.slice(0, 3).map((alert) => (
+          <p key={alert.id}>
+            <strong>{alert.trigger}:</strong> {alert.recommendedAction}
+          </p>
+        ))}
+        {(capacity.recommendations || []).slice(0, 2).map((recommendation) => (
+          <p key={recommendation.id}>
+            <strong>{recommendation.title}:</strong> {recommendation.action}
+          </p>
+        ))}
+      </div>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Prioritize Charge Nurse View operational actions: ${waitingRoom.metrics?.patientCount || 0} waiting patients, ${reassessment.metrics?.total || 0} reassessments, ${resources.metrics?.shortageCount || 0} resource shortages. Keep all actions human-reviewed.`
+          )
+        }
+      >
+        Ask assistant for charge nurse actions
+      </button>
+    </section>
+  );
+}
+
+function EmergencyAutomationRoiPanel({ roi = {}, onAskAssistant }) {
+  const totals = roi.totals || {};
+  const automations = roi.automations || [];
+
+  return (
+    <section className="workspace-panel emergency-automation-roi-panel" aria-labelledby="emergency-automation-roi-title">
+      <div className="workspace-panel__header">
+        <p className="workspace-eyebrow">Automation value</p>
+        <h2 id="emergency-automation-roi-title">Emergency Automation ROI</h2>
+        <p>Every automation justifies itself through time saved, clicks reduced, queue impact, throughput impact, and adoption.</p>
+      </div>
+      <div className="emergency-journey-summary" aria-label="Emergency automation ROI totals">
+        <span>{totals.automationsTracked || 0} automations tracked</span>
+        <span>{totals.estimatedMinutesSaved || 0} min saved</span>
+        <span>{totals.estimatedClicksReduced || 0} clicks reduced</span>
+        <span>{totals.totalRuns || 0} automation runs</span>
+      </div>
+      <div className="emergency-journey-insights" aria-label="Emergency automation ROI definitions">
+        <p>
+          <strong>Measured:</strong> {(roi.metricDefinitions || []).join(', ')}
+        </p>
+        <p>
+          <strong>Source:</strong> {roi.sourceState}
+        </p>
+      </div>
+      <div className="emergency-queue-grid">
+        {automations.slice(0, 8).map((automation) => (
+          <article key={automation.automationId} className="emergency-queue-card">
+            <div className="emergency-queue-card__header">
+              <div>
+                <span className="workspace-eyebrow">{automation.measurementState}</span>
+                <h3>{automation.title}</h3>
+              </div>
+              <strong>{automation.valueScore}</strong>
+            </div>
+            <dl className="emergency-queue-metrics">
+              <div>
+                <dt>Time saved</dt>
+                <dd>{automation.timeSaved.totalMinutes} min</dd>
+              </div>
+              <div>
+                <dt>Clicks reduced</dt>
+                <dd>{automation.clicksReduced.totalClicks}</dd>
+              </div>
+              <div>
+                <dt>Queue impact</dt>
+                <dd>{automation.queueImpact.estimatedMinutesReduced} min</dd>
+              </div>
+              <div>
+                <dt>Adoption</dt>
+                <dd>{automation.adoptionRate}%</dd>
+              </div>
+            </dl>
+            <p>{automation.roiEstimate}</p>
+          </article>
+        ))}
+      </div>
+      <p className="emergency-queue-warning">
+        <strong>Safety boundary:</strong> {roi.safetyStatement}
+      </p>
+      <button
+        type="button"
+        className="workspace-secondary-action"
+        onClick={() =>
+          onAskAssistant(
+            `Summarize Emergency Automation ROI: ${totals.estimatedMinutesSaved || 0} minutes saved, ${totals.estimatedClicksReduced || 0} clicks reduced, ${totals.queueMinutesReduced || 0} queue minutes reduced. Keep this as workflow ROI only.`
+          )
+        }
+      >
+        Ask assistant to summarize automation ROI
+      </button>
+    </section>
+  );
+}
+
 function EmergencyAnalyticsPanel({ analytics, kpiLayer, demoEnvironment }) {
   const emergencyAnalytics = analytics?.emergency || {};
   const metrics = emergencyAnalytics.metrics || [];
@@ -2623,7 +3221,8 @@ export default function WorkspaceHome() {
   );
 
   const launchRoute = (path) => {
-    navigate({ pathname: path, search: '' });
+    const [pathname, search = ''] = String(path).split('?');
+    navigate({ pathname, search: search ? `?${search}` : '' });
   };
 
   const launchTool = (tool) => {
@@ -2782,6 +3381,36 @@ export default function WorkspaceHome() {
         <EmergencyCommandCenter
           emergency={pipelineData.emergency}
           onLaunchRoute={launchRoute}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'director' ? (
+        <EmergencyDirectorViewPanel
+          emergency={pipelineData.emergency}
+          onLaunchRoute={launchRoute}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'charge-nurse' ? (
+        <EmergencyChargeNurseViewPanel
+          emergency={pipelineData.emergency}
+          onLaunchRoute={launchRoute}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'whiteboard' ? (
+        <EmergencyDigitalWhiteboardPanel
+          whiteboard={pipelineData.emergency.digitalWhiteboard}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'patient-path' ? (
+        <EmergencyPatientPathPanel
+          patientPath={pipelineData.emergency.patientPath}
           onAskAssistant={launchAssistantPrompt}
         />
       ) : null}
@@ -2951,6 +3580,14 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
+      {isEmergencyWorkspace && activeSubpageId === 'knowledge' ? (
+        <EmergencyKnowledgeLayerPanel
+          knowledgeLayer={pipelineData.emergency.knowledgeLayer}
+          onLaunchRoute={launchRoute}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
       {isEmergencyWorkspace && activeSubpageId === 'simulations' ? (
         <EmergencySimulationScenariosPanel simulationScenarios={pipelineData.emergency.simulationScenarios} />
       ) : null}
@@ -3005,6 +3642,13 @@ export default function WorkspaceHome() {
 
       {isEmergencyWorkspace && activeSubpageId === 'roi' ? (
         <EmergencyRoiEstimatorPanel estimator={pipelineData.emergency.roiEstimator} />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'automation-roi' ? (
+        <EmergencyAutomationRoiPanel
+          roi={pipelineData.emergency.automationRoi}
+          onAskAssistant={launchAssistantPrompt}
+        />
       ) : null}
 
       {isEmergencyWorkspace && activeSubpageId === 'deployment' ? (
@@ -3092,9 +3736,13 @@ export default function WorkspaceHome() {
       {!isFutureModule && ![
         'command-center',
         'dashboard',
+        'director',
+        'charge-nurse',
+        'whiteboard',
         'tools',
         'workflows',
         'automations',
+        'automation-roi',
         'analytics',
         'onboarding',
         'alerts',
@@ -3105,6 +3753,7 @@ export default function WorkspaceHome() {
         'referrals',
         'documentation',
         'evidence',
+        'knowledge',
         'demo',
         'roi',
         'deployment',

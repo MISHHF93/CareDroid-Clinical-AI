@@ -1,0 +1,2232 @@
+{
+  "phase": "after",
+  "generatedAt": "2026-06-10T06:19:19.924Z",
+  "diagnostics": [
+    {
+      "route": {
+        "id": "emergency-root",
+        "path": "/workspace/emergency"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-root-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 2221,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 12
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency",
+        "activeTab": "Command Center",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Command Center",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 1,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-root",
+        "path": "/workspace/emergency"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-root-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 4399,
+        "scrollHeight": 4399,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 8
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency",
+        "activeTab": "Command Center",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Command Center",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 1,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-dashboard",
+        "path": "/workspace/emergency/dashboard"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-dashboard-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 2302,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 48,
+          "textNodes": 16
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/dashboard",
+        "activeTab": "Dashboard",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Command Center",
+          "Dashboard-first workflow",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 2,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-dashboard",
+        "path": "/workspace/emergency/dashboard"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-dashboard-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 4290,
+        "scrollHeight": 4290,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 9,
+          "textNodes": 7
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/dashboard",
+        "activeTab": "Dashboard",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Command Center",
+          "Dashboard-first workflow",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 2,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-command-center",
+        "path": "/workspace/emergency/command-center"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-command-center-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 2221,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 12
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/command-center",
+        "activeTab": "Command Center",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Command Center",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 1,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-command-center",
+        "path": "/workspace/emergency/command-center"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-command-center-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 4399,
+        "scrollHeight": 4399,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 8
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/command-center",
+        "activeTab": "Command Center",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Command Center",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 1,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-patient-path",
+        "path": "/workspace/emergency/patient-path"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-patient-path-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 4021,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 11
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/patient-path",
+        "activeTab": "Patient Path",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Patient Path",
+          "Sample patient DEMO-ED-1001",
+          "Sample patient DEMO-ED-1002",
+          "Sample patient DEMO-ED-1003",
+          "Sample patient DEMO-ED-1004",
+          "Sample patient DEMO-ED-1005",
+          "Sample patient DEMO-ED-1006"
+        ],
+        "shellCount": 2,
+        "visibleCards": 9,
+        "demoLabels": 16,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-patient-path",
+        "path": "/workspace/emergency/patient-path"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-patient-path-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 7905,
+        "scrollHeight": 7905,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 7
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/patient-path",
+        "activeTab": "Patient Path",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Patient Path",
+          "Sample patient DEMO-ED-1001",
+          "Sample patient DEMO-ED-1002",
+          "Sample patient DEMO-ED-1003",
+          "Sample patient DEMO-ED-1004",
+          "Sample patient DEMO-ED-1005",
+          "Sample patient DEMO-ED-1006"
+        ],
+        "shellCount": 2,
+        "visibleCards": 9,
+        "demoLabels": 16,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-whiteboard",
+        "path": "/workspace/emergency/whiteboard"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-whiteboard-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 2367,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 14
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/whiteboard",
+        "activeTab": "Whiteboard",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Digital Whiteboard",
+          "Arrival",
+          "Triage",
+          "Waiting",
+          "Assessment",
+          "Orders",
+          "Results"
+        ],
+        "shellCount": 2,
+        "visibleCards": 8,
+        "demoLabels": 18,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-whiteboard",
+        "path": "/workspace/emergency/whiteboard"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-whiteboard-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 3206,
+        "scrollHeight": 3206,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 9
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/whiteboard",
+        "activeTab": "Whiteboard",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Digital Whiteboard",
+          "Arrival",
+          "Triage",
+          "Waiting",
+          "Assessment",
+          "Orders",
+          "Results"
+        ],
+        "shellCount": 2,
+        "visibleCards": 8,
+        "demoLabels": 18,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-queues",
+        "path": "/workspace/emergency/queues"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-queues-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 2818,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 19
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/queues",
+        "activeTab": "Queues",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Queue Intelligence",
+          "Waiting Room",
+          "Triage Queue",
+          "Provider Queue",
+          "Results Queue",
+          "Referral Queue",
+          "Admission Queue"
+        ],
+        "shellCount": 2,
+        "visibleCards": 17,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-queues",
+        "path": "/workspace/emergency/queues"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-queues-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 5256,
+        "scrollHeight": 5256,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 9
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/queues",
+        "activeTab": "Queues",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Queue Intelligence",
+          "Waiting Room",
+          "Triage Queue",
+          "Provider Queue",
+          "Results Queue",
+          "Referral Queue",
+          "Admission Queue"
+        ],
+        "shellCount": 2,
+        "visibleCards": 17,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-pre-arrival",
+        "path": "/workspace/emergency/pre-arrival"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-pre-arrival-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 2824,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 13
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/pre-arrival",
+        "activeTab": "Pre Arrival",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "EMS Pre-arrival Workspace",
+          "Inbound EMS 1048",
+          "Inbound EMS 1049",
+          "Inbound EMS 1050",
+          "Pre Arrival",
+          "Related Assets",
+          "Recommended Next Actions"
+        ],
+        "shellCount": 2,
+        "visibleCards": 12,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-pre-arrival",
+        "path": "/workspace/emergency/pre-arrival"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-pre-arrival-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 4548,
+        "scrollHeight": 4548,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 9
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/pre-arrival",
+        "activeTab": "Pre Arrival",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "EMS Pre-arrival Workspace",
+          "Inbound EMS 1048",
+          "Inbound EMS 1049",
+          "Inbound EMS 1050",
+          "Pre Arrival",
+          "Related Assets",
+          "Recommended Next Actions"
+        ],
+        "shellCount": 2,
+        "visibleCards": 12,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-triage",
+        "path": "/workspace/emergency/triage"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-triage-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 1692,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 49,
+          "textNodes": 17
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/triage",
+        "activeTab": "Triage",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Triage Orchestrator",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 1,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-triage",
+        "path": "/workspace/emergency/triage"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-triage-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 2149,
+        "scrollHeight": 2149,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 9,
+          "textNodes": 10
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/triage",
+        "activeTab": "Triage",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Triage Orchestrator",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 1,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-referrals",
+        "path": "/workspace/emergency/referrals"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-referrals-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 3265,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 13
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/referrals",
+        "activeTab": "Referrals",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Referral Intelligence Network",
+          "Cardiology",
+          "Neurology",
+          "Psychiatry",
+          "Internal Medicine",
+          "Surgery",
+          "ICU"
+        ],
+        "shellCount": 2,
+        "visibleCards": 8,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-referrals",
+        "path": "/workspace/emergency/referrals"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-referrals-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 5901,
+        "scrollHeight": 5901,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 10
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/referrals",
+        "activeTab": "Referrals",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Referral Intelligence Network",
+          "Cardiology",
+          "Neurology",
+          "Psychiatry",
+          "Internal Medicine",
+          "Surgery",
+          "ICU"
+        ],
+        "shellCount": 2,
+        "visibleCards": 8,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-boarding",
+        "path": "/workspace/emergency/boarding"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-boarding-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 2559,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 11
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/boarding",
+        "activeTab": "Boarding",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Boarding Intelligence Engine",
+          "Boarding",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 9,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-boarding",
+        "path": "/workspace/emergency/boarding"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-boarding-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 3893,
+        "scrollHeight": 3893,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 7
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/boarding",
+        "activeTab": "Boarding",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Boarding Intelligence Engine",
+          "Boarding",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 9,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-capacity",
+        "path": "/workspace/emergency/capacity"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-capacity-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 2259,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 11
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/capacity",
+        "activeTab": "Capacity",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Capacity Intelligence",
+          "Current census",
+          "Occupied spaces",
+          "Available spaces",
+          "Pending admissions",
+          "Boarding patients",
+          "EMS arrivals"
+        ],
+        "shellCount": 2,
+        "visibleCards": 16,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-capacity",
+        "path": "/workspace/emergency/capacity"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-capacity-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 3555,
+        "scrollHeight": 3555,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 7
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/capacity",
+        "activeTab": "Capacity",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Capacity Intelligence",
+          "Current census",
+          "Occupied spaces",
+          "Available spaces",
+          "Pending admissions",
+          "Boarding patients",
+          "EMS arrivals"
+        ],
+        "shellCount": 2,
+        "visibleCards": 16,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-throughput",
+        "path": "/workspace/emergency/throughput"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-throughput-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 1954,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 12
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/throughput",
+        "activeTab": "Throughput",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Throughput",
+          "Door-to-Doctor",
+          "Length of Stay",
+          "Boarding Time",
+          "EMS Offload",
+          "Referral Delay",
+          "Discharge Time"
+        ],
+        "shellCount": 2,
+        "visibleCards": 7,
+        "demoLabels": 16,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-throughput",
+        "path": "/workspace/emergency/throughput"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-throughput-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 2851,
+        "scrollHeight": 2851,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 8
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/throughput",
+        "activeTab": "Throughput",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Throughput",
+          "Door-to-Doctor",
+          "Length of Stay",
+          "Boarding Time",
+          "EMS Offload",
+          "Referral Delay",
+          "Discharge Time"
+        ],
+        "shellCount": 2,
+        "visibleCards": 7,
+        "demoLabels": 16,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-knowledge",
+        "path": "/workspace/emergency/knowledge"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-knowledge-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 3170,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 48,
+          "textNodes": 13
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/knowledge",
+        "activeTab": "Knowledge",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Knowledge Layer",
+          "Chest Pain / ACS Guidance",
+          "Stroke Window Guidance",
+          "Sepsis Workflow Guidance",
+          "Trauma Pathway",
+          "Respiratory Distress Guidance",
+          "Abdominal Pain Pathways"
+        ],
+        "shellCount": 2,
+        "visibleCards": 12,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-knowledge",
+        "path": "/workspace/emergency/knowledge"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-knowledge-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 6171,
+        "scrollHeight": 6171,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 9,
+          "textNodes": 10
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/knowledge",
+        "activeTab": "Knowledge",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Knowledge Layer",
+          "Chest Pain / ACS Guidance",
+          "Stroke Window Guidance",
+          "Sepsis Workflow Guidance",
+          "Trauma Pathway",
+          "Respiratory Distress Guidance",
+          "Abdominal Pain Pathways"
+        ],
+        "shellCount": 2,
+        "visibleCards": 12,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-automations",
+        "path": "/workspace/emergency/automations"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-automations-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 9638,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 16
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/automations",
+        "activeTab": "Automations",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "ED Automation Marketplace",
+          "Triage",
+          "Referral",
+          "Documentation",
+          "EMS",
+          "Capacity",
+          "Boarding"
+        ],
+        "shellCount": 2,
+        "visibleCards": 41,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-automations",
+        "path": "/workspace/emergency/automations"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-automations-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 17472,
+        "scrollHeight": 17472,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 10
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/automations",
+        "activeTab": "Automations",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "ED Automation Marketplace",
+          "Triage",
+          "Referral",
+          "Documentation",
+          "EMS",
+          "Capacity",
+          "Boarding"
+        ],
+        "shellCount": 2,
+        "visibleCards": 41,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-analytics",
+        "path": "/workspace/emergency/analytics"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-analytics-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 2409,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 11
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/analytics",
+        "activeTab": "Analytics",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Canonical ED KPIs",
+          "ROI and adoption dashboard",
+          "Demonstrate ROI and adoption",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 9,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-analytics",
+        "path": "/workspace/emergency/analytics"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-analytics-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 3615,
+        "scrollHeight": 3615,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 7
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/analytics",
+        "activeTab": "Analytics",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Canonical ED KPIs",
+          "ROI and adoption dashboard",
+          "Demonstrate ROI and adoption",
+          "Related Assets",
+          "Recommended Next Actions",
+          "Recent Activity",
+          "Back to Workspace"
+        ],
+        "shellCount": 2,
+        "visibleCards": 9,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-automation-roi",
+        "path": "/workspace/emergency/automation-roi"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-automation-roi-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 2117,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 13
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/automation-roi",
+        "activeTab": "Automation ROI",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Automation ROI",
+          "RAG Evidence Retrieval",
+          "Automated Triage Matrix",
+          "Referral Routing",
+          "Documentation Integrity",
+          "Discharge Summary Drafting",
+          "Surge Staffing"
+        ],
+        "shellCount": 2,
+        "visibleCards": 9,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-automation-roi",
+        "path": "/workspace/emergency/automation-roi"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-automation-roi-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 3935,
+        "scrollHeight": 3935,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 9
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/automation-roi",
+        "activeTab": "Automation ROI",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Emergency Automation ROI",
+          "RAG Evidence Retrieval",
+          "Automated Triage Matrix",
+          "Referral Routing",
+          "Documentation Integrity",
+          "Discharge Summary Drafting",
+          "Surge Staffing"
+        ],
+        "shellCount": 2,
+        "visibleCards": 9,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-director",
+        "path": "/workspace/emergency/director"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-director-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 1939,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 19
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/director",
+        "activeTab": "Director",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "ED Director View",
+          "Patient Path",
+          "Throughput",
+          "Boarding",
+          "EMS Offload",
+          "Staffing Pressure",
+          "Adoption Analytics"
+        ],
+        "shellCount": 2,
+        "visibleCards": 8,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-director",
+        "path": "/workspace/emergency/director"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-director-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 2913,
+        "scrollHeight": 2913,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 9,
+          "textNodes": 9
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/director",
+        "activeTab": "Director",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "ED Director View",
+          "Patient Path",
+          "Throughput",
+          "Boarding",
+          "EMS Offload",
+          "Staffing Pressure",
+          "Adoption Analytics"
+        ],
+        "shellCount": 2,
+        "visibleCards": 8,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-charge-nurse",
+        "path": "/workspace/emergency/charge-nurse"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-charge-nurse-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 1744,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 19
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/charge-nurse",
+        "activeTab": "Charge Nurse",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Charge Nurse View",
+          "Room Availability",
+          "Waiting Patients",
+          "Reassessment Queue",
+          "Device Availability",
+          "Related Assets",
+          "Recommended Next Actions"
+        ],
+        "shellCount": 2,
+        "visibleCards": 5,
+        "demoLabels": 13,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-charge-nurse",
+        "path": "/workspace/emergency/charge-nurse"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-charge-nurse-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 2596,
+        "scrollHeight": 2596,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 9,
+          "textNodes": 9
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/charge-nurse",
+        "activeTab": "Charge Nurse",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "Charge Nurse View",
+          "Room Availability",
+          "Waiting Patients",
+          "Reassessment Queue",
+          "Device Availability",
+          "Related Assets",
+          "Recommended Next Actions"
+        ],
+        "shellCount": 2,
+        "visibleCards": 5,
+        "demoLabels": 13,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-demo",
+        "path": "/workspace/emergency/demo"
+      },
+      "viewport": {
+        "id": "desktop",
+        "width": 1440,
+        "height": 1000
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-demo-desktop.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 936,
+        "scrollHeight": 4610,
+        "overflowY": "auto",
+        "needsScroll": true,
+        "canScroll": true
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 47,
+          "textNodes": 12
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/demo",
+        "activeTab": "Demo Mode",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "CareDroid Emergency Demo Hospital",
+          "Realistic ED OS demo tenant",
+          "Sample patients",
+          "Sample alerts",
+          "Sample workflows",
+          "Sample protocols",
+          "Sample analytics"
+        ],
+        "shellCount": 2,
+        "visibleCards": 41,
+        "demoLabels": 177,
+        "scrollWidth": 1440,
+        "clientWidth": 1440
+      }
+    },
+    {
+      "route": {
+        "id": "emergency-demo",
+        "path": "/workspace/emergency/demo"
+      },
+      "viewport": {
+        "id": "mobile",
+        "width": 390,
+        "height": 844
+      },
+      "screenshot": "C:\\Users\\borah\\CareDroid-Clinical-AI\\qa\\emergency-os-ux-screenshots\\after\\emergency-demo-mobile.png",
+      "ok": true,
+      "errors": [],
+      "overflow": {
+        "pass": true,
+        "docOverflowPx": 0,
+        "offenders": []
+      },
+      "verticalScroll": {
+        "pass": true,
+        "selector": ".app-shell-main-content.app-shell-page-body",
+        "clientHeight": 8114,
+        "scrollHeight": 8114,
+        "overflowY": "visible",
+        "needsScroll": false,
+        "canScroll": false
+      },
+      "overlaps": {
+        "pass": true,
+        "offenders": [],
+        "checked": {
+          "controls": 8,
+          "textNodes": 8
+        }
+      },
+      "summary": {
+        "pathname": "/workspace/emergency/demo",
+        "activeTab": "Demo Mode",
+        "headings": [
+          "CareDroid Clinical AI",
+          "Emergency Workspace",
+          "Emergency Flow Command Center",
+          "Emergency Flow Copilot",
+          "Emergency Flow Intelligence Platform",
+          "CareDroid Emergency Demo Hospital",
+          "Realistic ED OS demo tenant",
+          "Sample patients",
+          "Sample alerts",
+          "Sample workflows",
+          "Sample protocols",
+          "Sample analytics"
+        ],
+        "shellCount": 2,
+        "visibleCards": 41,
+        "demoLabels": 177,
+        "scrollWidth": 390,
+        "clientWidth": 390
+      }
+    }
+  ]
+}

@@ -28,6 +28,12 @@
     var(--app-surface-1);
 }
 
+.workspace-home--workspace-emergency .workspace-operating-brief,
+.workspace-home--workspace-emergency .workspace-switch-grid,
+.workspace-home--workspace-emergency .workspace-context-panel {
+  display: none;
+}
+
 .workspace-hero {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
@@ -388,6 +394,50 @@
   padding: 7px 10px;
 }
 
+.emergency-patient-path-strip {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.6fr) minmax(220px, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid var(--workspace-os-border, var(--app-panel-border));
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--workspace-os-accent, #ff4d5e) 8%, var(--app-surface-2));
+}
+
+.emergency-patient-path-strip div,
+.emergency-patient-path-hero div {
+  min-width: 0;
+}
+
+.emergency-patient-path-strip span,
+.emergency-patient-path-hero span,
+.emergency-patient-path-line__step span {
+  color: var(--muted-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.emergency-patient-path-strip strong,
+.emergency-patient-path-hero strong,
+.emergency-patient-path-line__step strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-color);
+}
+
+.emergency-patient-path-strip small,
+.emergency-patient-path-hero small,
+.emergency-patient-path-line__step small {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted-text);
+  line-height: 1.35;
+}
+
 .emergency-command-sidecar {
   align-self: start;
 }
@@ -499,6 +549,89 @@
   border: 1px solid var(--app-panel-border);
   border-radius: 12px;
   background: var(--app-surface-2);
+}
+
+.emergency-patient-path-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.emergency-patient-path-hero {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.emergency-patient-path-hero div,
+.emergency-patient-path-line__step {
+  padding: 14px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 16px;
+  background: var(--app-surface-2);
+}
+
+.emergency-patient-path-hero strong {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+}
+
+.emergency-patient-path-line {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.emergency-patient-path-line__step {
+  position: relative;
+  min-width: 0;
+}
+
+.emergency-patient-path-line__step--delayed,
+.emergency-patient-path-card--critical,
+.emergency-patient-path-card--high {
+  border-color: color-mix(in srgb, var(--workspace-os-accent, #ff4d5e) 46%, var(--app-panel-border));
+  background: color-mix(in srgb, var(--workspace-os-accent, #ff4d5e) 10%, var(--app-surface-2));
+}
+
+.emergency-patient-path-line__step--watch,
+.emergency-patient-path-card--medium {
+  border-color: color-mix(in srgb, var(--app-warning, #f59e0b) 40%, var(--app-panel-border));
+}
+
+.emergency-patient-path-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.emergency-patient-path-card {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 16px;
+  background: var(--app-surface-2);
+}
+
+.emergency-patient-path-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.emergency-patient-path-card__header h3 {
+  margin: 2px 0 0;
+}
+
+.emergency-patient-path-card__header strong {
+  color: var(--text-color);
+  font-size: 1.6rem;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .emergency-queue-grid {
@@ -1209,6 +1342,9 @@
   .emergency-os-layout,
   .emergency-command-center,
   .emergency-command-grid,
+  .emergency-patient-path-strip,
+  .emergency-patient-path-hero,
+  .emergency-patient-path-line,
   .emergency-orchestrator-flow,
   .emergency-router-controls,
   .emergency-evidence-grid,
@@ -1258,11 +1394,88 @@
   .workspace-automation-card dl {
     grid-template-columns: 1fr;
   }
+
+  .emergency-referral-table {
+    gap: 10px;
+  }
+
+  .emergency-referral-table__header {
+    display: none !important;
+  }
+
+  .emergency-referral-table [role='row'] {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 8px;
+  }
+
+  .emergency-referral-table [role='cell'] {
+    display: grid;
+    grid-template-columns: minmax(88px, max-content) minmax(0, 1fr);
+    gap: 8px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .emergency-referral-table [role='cell']::before {
+    color: var(--muted-text);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .emergency-referral-table [role='cell']:nth-child(1)::before {
+    content: 'Referral';
+  }
+
+  .emergency-referral-table [role='cell']:nth-child(2)::before {
+    content: 'Dept';
+  }
+
+  .emergency-referral-table [role='cell']:nth-child(3)::before {
+    content: 'Stage';
+  }
+
+  .emergency-referral-table [role='cell']:nth-child(4)::before {
+    content: 'Elapsed';
+  }
+
+  .emergency-referral-table [role='cell']:nth-child(5)::before {
+    content: 'Priority';
+  }
+
+  .emergency-patient-path-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 430px) {
   .workspace-home {
     padding: 14px;
+  }
+
+  .workspace-home--workspace-emergency .workspace-operating-brief,
+  .workspace-home--workspace-emergency .workspace-switch-grid,
+  .workspace-home--workspace-emergency .workspace-context-panel,
+  .workspace-home--workspace-emergency .workspace-pipeline-status {
+    display: none;
+  }
+
+  .workspace-home--workspace-emergency .workspace-subpage-tabs {
+    flex-wrap: nowrap;
+    margin-bottom: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+
+  .workspace-home--workspace-emergency .workspace-subpage-tab {
+    flex: 0 0 auto;
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 0.84rem;
+    white-space: nowrap;
   }
 
   .workspace-stats {
