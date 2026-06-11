@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Save, X } from 'lucide-react';
 import './ClinicalScoreCalculator.css';
 
@@ -58,6 +58,17 @@ function createInitialValues(calculatorId, patient) {
       rr22: typeof patient?.vitals?.rr === 'number' && patient.vitals.rr >= 22 ? 1 : 0,
       sbp100:
         typeof patient?.vitals?.bpSystolic === 'number' && patient.vitals.bpSystolic <= 100 ? 1 : 0,
+    };
+  }
+
+  if (calculatorId === 'heart') {
+    const age = Number(patient?.age);
+    return {
+      history: 0,
+      ecg: 0,
+      age: Number.isFinite(age) && age >= 65 ? 2 : Number.isFinite(age) && age >= 45 ? 1 : 0,
+      riskFactors: 0,
+      troponin: 0,
     };
   }
 
@@ -189,6 +200,17 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
   const maxValue = maxForCalculator(calculatorId);
   const label = CALCULATOR_LABEL[calculatorId] || 'Clinical Score';
 
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      onClose?.();
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [onClose]);
+
   const saveScore = () => {
     onSaveScore?.({
       calculatorId,
@@ -199,6 +221,40 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
       values,
     });
     onClose?.();
+  };
+
+  const renderFieldControl = (field) => {
+    if (calculatorId === 'qsofa') {
+      const isActive = Number(values[field.id] || 0) === 1;
+      return (
+        <button
+          type="button"
+          className={`clinical-score-modal__toggle${isActive ? ' clinical-score-modal__toggle--active' : ''}`}
+          aria-pressed={isActive}
+          aria-label={`${field.label}: ${isActive ? 'Yes' : 'No'}`}
+          onClick={() =>
+            setValues((current) => ({ ...current, [field.id]: current[field.id] ? 0 : 1 }))
+          }
+        >
+          {isActive ? 'Yes' : 'No'}
+        </button>
+      );
+    }
+
+    return (
+      <select
+        value={values[field.id] ?? 0}
+        onChange={(event) =>
+          setValues((current) => ({ ...current, [field.id]: Number(event.target.value) }))
+        }
+      >
+        {Array.from({ length: maxValue + 1 }, (_, value) => (
+          <option key={value} value={value}>
+            {value}
+          </option>
+        ))}
+      </select>
+    );
   };
 
   return (
@@ -220,18 +276,7 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
             {fields.map((field) => (
               <label key={field.id}>
                 <span>{field.label}</span>
-                <select
-                  value={values[field.id] ?? 0}
-                  onChange={(event) =>
-                    setValues((current) => ({ ...current, [field.id]: Number(event.target.value) }))
-                  }
-                >
-                  {Array.from({ length: maxValue + 1 }, (_, value) => (
-                    <option key={value} value={value}>
-                      {value}
-                    </option>
-                  ))}
-                </select>
+                {renderFieldControl(field)}
               </label>
             ))}
           </div>
@@ -241,6 +286,9 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
             <strong>{total}</strong>
             <h3>{interpretation.band}</h3>
             <p>{interpretation.recommendation}</p>
+            {calculatorId === 'heart' ? (
+              <small>Age field is pre-filled from the linked patient when available.</small>
+            ) : null}
             {calculatorId === 'qsofa' ? (
               <small>RR and SBP are pre-filled from current patient vitals when available.</small>
             ) : null}
@@ -253,7 +301,7 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
           </button>
           <button type="button" className="clinical-score-modal__save" onClick={saveScore}>
             <Save size={16} aria-hidden />
-            Save Score to Patient
+            Save to Patient
           </button>
         </footer>
       </section>

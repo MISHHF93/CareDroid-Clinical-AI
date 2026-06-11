@@ -95,6 +95,33 @@
   white-space: nowrap;
 }
 
+.ed-whiteboard__new-patient {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  height: 30px;
+  min-height: 30px;
+  padding: 0 var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--status-stable) 44%, var(--color-border-default));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-stable) 16%, var(--color-elevated));
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 900;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ed-whiteboard__new-patient:hover,
+.ed-whiteboard__new-patient:focus-visible {
+  border-color: var(--status-stable);
+  background: color-mix(in srgb, var(--status-stable) 24%, var(--color-elevated));
+  outline: none;
+}
+
 .ed-whiteboard__filters::-webkit-scrollbar {
   display: none;
 }
@@ -224,10 +251,15 @@
 
 .ed-whiteboard__body {
   position: relative;
-  display: block;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
   min-width: 0;
   min-height: 0;
   overflow: hidden;
+}
+
+.ed-whiteboard__body--queue-collapsed {
+  grid-template-columns: 44px minmax(0, 1fr);
 }
 
 .ed-whiteboard__content {

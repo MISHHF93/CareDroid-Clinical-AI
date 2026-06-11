@@ -33,9 +33,9 @@ const MERGE_DUPLICATES = Object.freeze([
   {
     id: 'dashboard-dual-home',
     primary: 'src/pages/CommandDashboard.jsx',
-    duplicate: 'src/pages/Dashboard.jsx',
+    duplicate: 'removed: src/pages/Dashboard.jsx',
     route: '/assistant vs /dashboard',
-    note: 'Assistant chat (Dashboard.jsx) vs command home (CommandDashboard.jsx); naming collision',
+    note: 'Former assistant page duplicate removed; ED Copilot now lives in src/components/ChatInterface.jsx.',
   },
   {
     id: 'pack-marketplace-dual',

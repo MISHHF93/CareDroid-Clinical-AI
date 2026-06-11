@@ -157,7 +157,7 @@ function buildSurfaceInventory({
     {
       type: UX_SURFACE_TYPES.DASHBOARDS,
       count: countDashboards(tools),
-      sources: ['src/pages/Dashboard.jsx', 'src/pages/CommandDashboard.jsx', 'src/data/toolRegistry.js'],
+      sources: ['src/pages/CommandDashboard.jsx', 'src/components/ChatInterface.jsx', 'src/data/toolRegistry.js'],
     },
     {
       type: 'manual QA',

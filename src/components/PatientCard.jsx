@@ -20,7 +20,10 @@ import {
   movePatientToState as movePatientWithJourneyRules,
 } from '../../engine/journeyEngine';
 import JourneyTimeline from './JourneyTimeline';
-import { createClinicalScoreEvent, createClinicalScoreNote } from './ClinicalScoreCalculator';
+import ClinicalScoreCalculator, {
+  createClinicalScoreEvent,
+  createClinicalScoreNote,
+} from './ClinicalScoreCalculator';
 import ProtocolSuggestion, {
   createProtocolLaunchEvent,
   getProtocolSuggestions,
@@ -48,6 +51,11 @@ const ALL_FLAGS = [
 ];
 
 const ACTIVE_REFERRAL_TERMINAL_STATUSES = new Set(['Completed', 'Declined']);
+const SCORE_OPTIONS = [
+  { id: 'heart', label: 'HEART Score' },
+  { id: 'qsofa', label: 'qSOFA' },
+  { id: 'nihss', label: 'NIHSS' },
+];
 
 const CATEGORY_CLASS = {
   'Chest Pain': 'cardiac',
@@ -103,6 +111,10 @@ function categoryClass(category) {
   return CATEGORY_CLASS[category] || 'default';
 }
 
+function transitionErrorMessage(error) {
+  return error instanceof Error ? error.message : 'Unable to move patient state.';
+}
+
 function vitalTone(label, value) {
   if (value === null || value === undefined) return 'muted';
   if (label === 'HR') {
@@ -145,6 +157,19 @@ function latestPreviousVitals(patient) {
     spo2: typeof metadata.previousSpo2 === 'number' ? metadata.previousSpo2 : null,
     temp: typeof metadata.previousTemp === 'number' ? metadata.previousTemp : null,
   };
+}
+
+function savedScoreBadges(patient) {
+  return [...(patient.timeline || [])]
+    .filter((event) => event.type === 'ClinicalScoreSaved')
+    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+    .slice(0, 3)
+    .map((event) => ({
+      id: event.id,
+      label: event.metadata?.scoreLabel || event.metadata?.scoreId || 'Score',
+      total: event.metadata?.scoreTotal,
+      interpretation: event.metadata?.interpretation,
+    }));
 }
 
 function vitalItems(vitals, previousVitals = {}) {
@@ -279,20 +304,19 @@ export function PatientDetailPanel() {
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const updatePatient = useEmergencyStore((state) => state.updatePatient);
-  const movePatientToState = useEmergencyStore((state) => state.movePatientToState);
   const addVitals = useEmergencyStore((state) => state.addVitals);
   const addFlag = useEmergencyStore((state) => state.addFlag);
   const removeFlag = useEmergencyStore((state) => state.removeFlag);
   const addNote = useEmergencyStore((state) => state.addNote);
   const assignStaff = useEmergencyStore((state) => state.assignStaff);
   const assignRoom = useEmergencyStore((state) => state.assignRoom);
-  const dischargePatient = useEmergencyStore((state) => state.dischargePatient);
   const [vitalsOpen, setVitalsOpen] = useState(false);
   const [vitalsForm, setVitalsForm] = useState(() => buildVitalsForm(patient?.vitals || {}));
   const [noteText, setNoteText] = useState('');
   const [selectedFlag, setSelectedFlag] = useState('ReassessmentDue');
   const [transitionError, setTransitionError] = useState('');
   const [staffSelectorOpen, setStaffSelectorOpen] = useState(false);
+  const [scoreCalculatorId, setScoreCalculatorId] = useState('');
   const filteredPatientsForShortcuts = useMemo(() => {
     const query = whiteboardSearchQuery.trim().toLowerCase();
     const queue = activeQueueFilter
@@ -319,6 +343,7 @@ export function PatientDetailPanel() {
     setNoteText('');
     setVitalsOpen(false);
     setTransitionError('');
+    setScoreCalculatorId('');
   }, [patient?.id, patient?.vitals]);
 
   useEffect(() => {
@@ -339,11 +364,15 @@ export function PatientDetailPanel() {
         event.preventDefault();
         const shortcutNextState = getNextStates(patient.state)[0];
         if (!shortcutNextState) return;
-        const result = movePatientWithJourneyRules(patient.id, shortcutNextState, {
-          staffId: patient.assignedStaffId || activeShift.chargeStaffId,
-          note: 'Moved via PatientDetailPanel keyboard shortcut.',
-        });
-        setTransitionError(result.ok ? '' : result.reason);
+        try {
+          movePatientWithJourneyRules(patient.id, shortcutNextState, {
+            staffId: patient.assignedStaffId || activeShift.chargeStaffId,
+            note: 'Moved via PatientDetailPanel keyboard shortcut.',
+          });
+          setTransitionError('');
+        } catch (error) {
+          setTransitionError(transitionErrorMessage(error));
+        }
         return;
       }
 
@@ -424,11 +453,15 @@ export function PatientDetailPanel() {
 
   const handleMoveToNextState = () => {
     if (!nextState) return;
-    const result = movePatientWithJourneyRules(patient.id, nextState, {
-      staffId: patient.assignedStaffId || activeShift.chargeStaffId,
-      note: 'Moved from PatientDetailPanel.',
-    });
-    setTransitionError(result.ok ? '' : result.reason);
+    try {
+      movePatientWithJourneyRules(patient.id, nextState, {
+        staffId: patient.assignedStaffId || activeShift.chargeStaffId,
+        note: 'Moved from PatientDetailPanel.',
+      });
+      setTransitionError('');
+    } catch (error) {
+      setTransitionError(transitionErrorMessage(error));
+    }
   };
 
   const handleProtocolLaunch = (suggestion) => {
@@ -543,6 +576,28 @@ export function PatientDetailPanel() {
             compact
           />
         </section>
+      ) : null}
+
+      <section className="patient-detail__section">
+        <div className="patient-detail__section-heading">
+          <span>Clinical Scores</span>
+        </div>
+        <div className="patient-detail__score-launcher">
+          {SCORE_OPTIONS.map((score) => (
+            <button key={score.id} type="button" onClick={() => setScoreCalculatorId(score.id)}>
+              Launch {score.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {scoreCalculatorId ? (
+        <ClinicalScoreCalculator
+          calculatorId={scoreCalculatorId}
+          patient={patient}
+          onClose={() => setScoreCalculatorId('')}
+          onSaveScore={handleScoreSave}
+        />
       ) : null}
 
       <section className="patient-detail__section">
@@ -740,12 +795,35 @@ export function PatientDetailPanel() {
         <button type="button" onClick={() => addFlag(patient.id, selectedFlag)}>
           Add Flag
         </button>
-        <button type="button" onClick={() => dischargePatient(patient.id)}>
+        <button
+          type="button"
+          onClick={() => {
+            try {
+              movePatientWithJourneyRules(patient.id, PatientState.Discharge, {
+                staffId: patient.assignedStaffId || activeShift.chargeStaffId,
+                note: 'Discharge requested from PatientDetailPanel.',
+              });
+              setTransitionError('');
+            } catch (error) {
+              setTransitionError(transitionErrorMessage(error));
+            }
+          }}
+        >
           Discharge
         </button>
         <button
           type="button"
-          onClick={() => movePatientToState(patient.id, PatientState.Admission)}
+          onClick={() => {
+            try {
+              movePatientWithJourneyRules(patient.id, PatientState.Admission, {
+                staffId: patient.assignedStaffId || activeShift.chargeStaffId,
+                note: 'Transfer to admission requested from PatientDetailPanel.',
+              });
+              setTransitionError('');
+            } catch (error) {
+              setTransitionError(transitionErrorMessage(error));
+            }
+          }}
         >
           Transfer
         </button>
@@ -758,6 +836,7 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
   const [staffMenuOpen, setStaffMenuOpen] = useState(false);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const patients = useEmergencyStore((state) => state.patients);
+  const referrals = useEmergencyStore((state) => state.referrals);
   const allStaff = useEmergencyStore((state) => state.staff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const assignStaff = useEmergencyStore((state) => state.assignStaff);
@@ -773,6 +852,10 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
   const hasReassessment = hasPatientFlag(patient, 'ReassessmentDue');
   const hasDeterioration = hasPatientFlag(patient, 'DeteriorationRisk');
   const hasEmsArrival = hasPatientFlag(patient, 'EMSArrival') || Boolean(patient.emsArrival);
+  const activeReferralCount = referrals.filter(
+    (referral) => referral.patientId === patient.id && isActiveReferral(referral)
+  ).length;
+  const scoreBadges = savedScoreBadges(patient);
 
   return (
     <article
@@ -807,6 +890,11 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
           <span className="patient-card__demographics">
             {patient.age}/{patient.sex[0] || 'U'}
           </span>
+          {activeReferralCount ? (
+            <span className="patient-card__referral-badge">
+              {activeReferralCount} referral{activeReferralCount === 1 ? '' : 's'}
+            </span>
+          ) : null}
           {hasEmsArrival ? <span className="patient-card__ems-badge">EMS</span> : null}
         </div>
       </div>
@@ -872,6 +960,15 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
       </div>
 
       <div className="patient-card__flags" aria-label="Patient flags">
+        {scoreBadges.map((score) => (
+          <span
+            key={score.id}
+            className="patient-card__score-badge"
+            title={`${score.label}: ${score.total} (${score.interpretation || 'saved'})`}
+          >
+            {score.label} {score.total ?? ''}
+          </span>
+        ))}
         {patient.flags.map((flag) => {
           const flagType = getPatientFlagType(flag);
           const Icon = FLAG_ICONS[flagType] || AlertTriangle;

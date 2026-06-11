@@ -6,6 +6,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ChatInterface from './ChatInterface';
+import { useEmergencyStore } from '../../store/emergencyStore';
 
 vi.mock('./ChatInterface.css', () => ({}));
 vi.mock('./ToolPanel', () => ({ default: () => <div data-testid="tool-panel" /> }));
@@ -184,14 +185,18 @@ describe('ChatInterface NLU integration', () => {
       patientCount: 2,
       capacitySnapshot: expect.objectContaining({ score: 'Yellow' }),
     });
-    expect(payload.workspaceContext.edCopilot.systemPrompt).toMatch(/Never suggest autonomous clinical decisions/i);
+    expect(payload.workspaceContext.edCopilot.systemPrompt).toMatch(/Never recommend autonomous actions/i);
+    expect(payload.messages[0].content).toMatch(/You are the ED Copilot for a busy Emergency Department/i);
+    expect(payload.messages[0].content).toMatch(/Current department snapshot:/);
+    expect(payload.messages[0].content).toMatch(/Priorities: P1 first\. Flag deteriorating patients\./);
     expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
-      intent: 'FILTER_BY_COMPLAINT',
+      intent: 'FILTER_COMPLAINT',
+      complaint: 'chest pain',
       value: 'chest pain',
     });
     expect(payload.messages[0]).toMatchObject({ role: 'system' });
-    expect(payload.messages[0].content).toMatch(/Detected structured command intent/);
-    expect(payload.messages[0].content).toMatch(/FILTER_BY_COMPLAINT/);
+    expect(payload.messages[0].content).toMatch(/User intent detected: FILTER_COMPLAINT/);
+    expect(payload.messages[0].content).toMatch(/include JSON: \{"action":"\.\.\.","params":\{\.\.\.\}\}/);
     expect(payload.workspaceContext.edCopilot.queueHealth[0]).toHaveProperty('health');
     expect(payload.workspaceContext.edCopilot.flaggedReassessments).toHaveLength(1);
     expect(setWhiteboardFilter).toHaveBeenCalledWith({ queue: null, complaint: 'chest' });
@@ -214,13 +219,39 @@ describe('ChatInterface NLU integration', () => {
       />,
     );
 
-    expect(screen.getByText(/apply this action/i)).toBeInTheDocument();
+    expect(screen.getByText(/suggested action/i)).toBeInTheDocument();
     expect(flagPatientForReassessment).not.toHaveBeenCalled();
 
-    await user.click(screen.getByRole('button', { name: /yes/i }));
+    await user.click(screen.getByRole('button', { name: /apply/i }));
 
     expect(flagPatientForReassessment).toHaveBeenCalledWith('tor-uc-001', 'ReassessmentDue');
     expect(screen.getByText(/applied/i)).toBeInTheDocument();
+  });
+
+  it('parses suggested action JSON with params and dismisses the card', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ChatInterface
+        messages={[
+          {
+            id: 'assistant-action-params',
+            role: 'assistant',
+            content:
+              'Suggested for review.\n\n```json\n{"action":"FLAG_PATIENT","params":{"patientId":"tor-uc-001","patientName":"Maya Chen","flag":"ReassessmentDue","reason":"Long wait"}}\n```',
+          },
+        ]}
+        onAppendMessage={onAppendMessage}
+      />,
+    );
+
+    expect(screen.getByText(/suggested action/i)).toBeInTheDocument();
+    expect(screen.getByText(/flag maya chen for reassessment/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /dismiss/i }));
+
+    expect(screen.queryByText(/suggested action/i)).not.toBeInTheDocument();
+    expect(flagPatientForReassessment).not.toHaveBeenCalled();
   });
 
   it('does not auto-apply reassessment whiteboard actions from assistant responses', async () => {
@@ -260,9 +291,11 @@ describe('ChatInterface NLU integration', () => {
     expect(flagPatientForReassessment).not.toHaveBeenCalled();
     const payload = sendClinicalChatMessage.mock.calls[0][0];
     expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
-      intent: 'ACTION_FLAG_REASSESSMENT',
+      intent: 'ACTION_FLAG',
       target: 'Maya Chen',
+      flag: 'ReassessmentDue',
     });
+    expect(payload.messages[0].content).toMatch(/User intent detected: ACTION_FLAG/);
   });
 
   it('quick-sends ED Copilot actions with structured intents', async () => {
@@ -290,6 +323,47 @@ describe('ChatInterface NLU integration', () => {
     expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
       intent: 'QUERY_EMS',
     });
+  });
+
+  it('launches calculator locally for ED Copilot run score commands', async () => {
+    activeWorkspaceId = 'emergency';
+    const user = userEvent.setup();
+    const dispatchSpy = vi.spyOn(window, 'dispatchEvent');
+    const patient = useEmergencyStore.getState().patients[0];
+    const patientName = `${patient.firstName} ${patient.lastName}`;
+
+    render(
+      <ChatInterface
+        currentTool={null}
+        conversationId="conv-ed"
+        messages={[]}
+        onAppendMessage={onAppendMessage}
+        authToken="test-token"
+      />,
+    );
+
+    await user.type(screen.getByRole('textbox'), `Run HEART score for ${patientName}`);
+    await user.keyboard('{Enter}');
+
+    await waitFor(() => {
+      expect(sendClinicalChatMessage).toHaveBeenCalled();
+    });
+
+    const payload = sendClinicalChatMessage.mock.calls[0][0];
+    expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
+      intent: 'LAUNCH_CALCULATOR',
+      score: 'HEART score',
+      patientId: patient.id,
+    });
+    expect(dispatchSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'ed:open-calculator',
+        detail: expect.objectContaining({
+          calculatorId: 'heart',
+          patientId: patient.id,
+        }),
+      })
+    );
   });
 
   it('shows Copilot unavailable retry state on API failure', async () => {

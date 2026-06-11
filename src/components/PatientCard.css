@@ -172,6 +172,24 @@
   min-width: 0;
 }
 
+.patient-card__score-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  max-width: 96px;
+  padding: 0 var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--status-info) 34%, var(--color-border-default));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-info) 12%, var(--color-elevated));
+  color: var(--status-info);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .patient-card__right-pills {
   flex: 0 0 auto;
   justify-content: flex-end;
@@ -508,6 +526,23 @@
   color: var(--status-info);
 }
 
+.patient-card__flags .patient-card__score-badge {
+  justify-content: center;
+  width: auto;
+  max-width: 92px;
+  height: 16px;
+  padding: 0 var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--status-info) 34%, var(--color-border-default));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-info) 12%, var(--color-elevated));
+  color: var(--status-info);
+  font-size: 10px;
+  font-weight: 900;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .patient-detail {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
@@ -752,6 +787,19 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
+}
+
+.patient-detail__score-launcher {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.patient-detail__score-launcher button {
+  min-height: 34px;
+  padding: 0 var(--space-2);
+  border-color: color-mix(in srgb, var(--status-info) 34%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 10%, var(--color-surface));
 }
 
 .patient-detail__vital {

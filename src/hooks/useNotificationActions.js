@@ -1,11 +1,35 @@
 import { useNotifications } from '../contexts/NotificationContext';
+import { dispatch as dispatchAlert } from '../../engine/alertEngine';
+
+const ALERT_SEVERITY_BY_NOTIFICATION_TYPE = {
+  success: 'Info',
+  info: 'Info',
+  warning: 'Warning',
+  error: 'Warning',
+  critical: 'Critical',
+};
+
+function dispatchNotificationAlert(type, title, message, action = null) {
+  return dispatchAlert({
+    id: `alert-notification-${type}-${String(title || 'notice')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')}`,
+    type: 'System',
+    severity: ALERT_SEVERITY_BY_NOTIFICATION_TYPE[type] || 'Info',
+    title,
+    message,
+    actionLabel: action?.label,
+    actionFn: action?.onClick,
+  });
+}
 
 /**
  * Hook for easily adding notifications from any component
- * 
+ *
  * Usage:
  * const { addNotification } = useNotificationActions();
- * 
+ *
  * addNotification({
  *   type: 'success',
  *   title: 'Success!',
@@ -20,6 +44,7 @@ export const useNotificationActions = () => {
      * Add a success notification (green check)
      */
     success: (title, message, action = null) => {
+      dispatchNotificationAlert('success', title, message, action);
       return addNotification({
         type: 'success',
         title,
@@ -32,6 +57,7 @@ export const useNotificationActions = () => {
      * Add an error notification (red X)
      */
     error: (title, message, action = null) => {
+      dispatchNotificationAlert('error', title, message, action);
       return addNotification({
         type: 'error',
         title,
@@ -44,6 +70,7 @@ export const useNotificationActions = () => {
      * Add a warning notification (orange caution)
      */
     warning: (title, message, action = null) => {
+      dispatchNotificationAlert('warning', title, message, action);
       return addNotification({
         type: 'warning',
         title,
@@ -56,6 +83,7 @@ export const useNotificationActions = () => {
      * Add an info notification (blue i)
      */
     info: (title, message, action = null) => {
+      dispatchNotificationAlert('info', title, message, action);
       return addNotification({
         type: 'info',
         title,
@@ -69,6 +97,7 @@ export const useNotificationActions = () => {
      * These persist until manually removed and show with high prominence
      */
     critical: (title, message, action = null) => {
+      dispatchNotificationAlert('critical', title, message, action);
       return addNotification({
         type: 'critical',
         title,
@@ -81,6 +110,7 @@ export const useNotificationActions = () => {
      * Add an update/product notification
      */
     update: (title, message, action = null) => {
+      dispatchNotificationAlert('info', title, message, action);
       return addNotification({
         type: 'info',
         title,
@@ -93,6 +123,7 @@ export const useNotificationActions = () => {
      * Add an announcement notification
      */
     announcement: (title, message, action = null) => {
+      dispatchNotificationAlert('info', title, message, action);
       return addNotification({
         type: 'info',
         title,
@@ -115,10 +146,10 @@ export const useNotificationActions = () => {
 
 /**
  * Example usage in a component:
- * 
+ *
  * function SaveButton() {
  *   const { success, error } = useNotificationActions();
- * 
+ *
  *   const handleSave = async () => {
  *     try {
  *       await api.save(data);
@@ -127,7 +158,7 @@ export const useNotificationActions = () => {
  *       error('Error', 'Failed to save changes. Please try again.');
  *     }
  *   };
- * 
+ *
  *   return <button onClick={handleSave}>Save</button>;
  * }
  */

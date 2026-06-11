@@ -10,6 +10,9 @@ import {
 } from '../types/emergency';
 
 const REASSESSMENT_INTERVAL_MS = 60_000;
+const LONG_WAIT_THRESHOLD_MINUTES = 45;
+const P1_P2_VITALS_OVERDUE_MINUTES = 30;
+const P3_VITALS_OVERDUE_MINUTES = 60;
 
 type TimerHandle = number;
 
@@ -26,11 +29,13 @@ interface DesiredFlag {
   severity: PatientFlagSeverity;
 }
 
-const MANAGED_FLAG_TYPES = new Set<PatientFlagType>([
+export const REASSESSMENT_FLAG_TYPES: readonly PatientFlagType[] = [
   'ReassessmentDue',
   'HighRisk',
   'DeteriorationRisk',
-]);
+];
+
+const MANAGED_FLAG_TYPES = new Set<PatientFlagType>(REASSESSMENT_FLAG_TYPES);
 
 const PRE_ASSESSMENT_STATES = new Set<PatientState>([
   PatientState.Arrival,
@@ -49,13 +54,26 @@ const minutesSince = (timestamp: string | null, now: Date): number => {
   return Math.max(0, Math.round((now.getTime() - parsed) / 60_000));
 };
 
+const latestStateTimestamp = (patient: Patient, state: PatientState): string | null => {
+  const event = [...patient.timeline].reverse().find((item) => {
+    const stateTarget = item.toState || item.to;
+    return stateTarget === state || item.summary.toLowerCase().includes(`to ${state.toLowerCase()}`);
+  });
+
+  if (event?.timestamp) return event.timestamp;
+  if (state === PatientState.Arrival) return patient.arrivalTime;
+  if (state === PatientState.Triage) return patient.triageTime;
+  if (state === patient.state) return patient.triageTime ?? patient.arrivalTime;
+  return null;
+};
+
 const isWaitingPastThreshold = (patient: Patient, now: Date): boolean =>
   patient.state === PatientState.Waiting &&
-  minutesSince(patient.triageTime ?? patient.arrivalTime, now) > 45;
+  minutesSince(latestStateTimestamp(patient, PatientState.Waiting), now) > LONG_WAIT_THRESHOLD_MINUTES;
 
 const vitalsOverdueThreshold = (priority: Priority): number | null => {
-  if (priority === Priority.P1 || priority === Priority.P2) return 30;
-  if (priority === Priority.P3) return 60;
+  if (priority === Priority.P1 || priority === Priority.P2) return P1_P2_VITALS_OVERDUE_MINUTES;
+  if (priority === Priority.P3) return P3_VITALS_OVERDUE_MINUTES;
   return null;
 };
 
@@ -69,30 +87,41 @@ const hasPriorityMismatch = (patient: Patient): boolean =>
   (patient.priority === Priority.P1 || patient.priority === Priority.P2) &&
   PRE_ASSESSMENT_STATES.has(patient.state);
 
-const hasDeteriorationSignal = (patient: Patient): boolean => {
+const deteriorationReasons = (patient: Patient): string[] => {
   const { hr, spo2, temp, bpSystolic } = patient.vitals;
+  const reasons: string[] = [];
 
-  return (
-    (typeof hr === 'number' && (hr > 120 || hr < 50)) ||
-    (typeof spo2 === 'number' && spo2 < 94) ||
-    (typeof temp === 'number' && temp > 38.5) ||
-    (typeof bpSystolic === 'number' && (bpSystolic < 90 || bpSystolic > 180))
-  );
+  if (typeof hr === 'number' && (hr > 120 || hr < 50)) reasons.push(`HR ${hr}`);
+  if (typeof spo2 === 'number' && spo2 < 94) reasons.push(`SpO2 ${spo2}%`);
+  if (typeof temp === 'number' && temp > 38.5) reasons.push(`Temp ${temp}C`);
+  if (typeof bpSystolic === 'number' && (bpSystolic < 90 || bpSystolic > 180)) {
+    reasons.push(`SBP ${bpSystolic}`);
+  }
+
+  return reasons;
+};
+
+const hasDeteriorationSignal = (patient: Patient): boolean => {
+  return deteriorationReasons(patient).length > 0;
 };
 
 const desiredFlagsForPatient = (patient: Patient, now: Date): DesiredFlag[] => {
   const desiredFlags: DesiredFlag[] = [];
+  const reassessmentReasons: string[] = [];
 
   if (isWaitingPastThreshold(patient, now)) {
+    reassessmentReasons.push(`Waiting more than ${LONG_WAIT_THRESHOLD_MINUTES} minutes`);
+  }
+
+  if (hasVitalsOverdue(patient, now)) {
+    const threshold = vitalsOverdueThreshold(patient.priority);
+    reassessmentReasons.push(`${patient.priority} vitals overdue more than ${threshold} minutes`);
+  }
+
+  if (reassessmentReasons.length) {
     desiredFlags.push({
       type: 'ReassessmentDue',
-      reason: 'Extended wait',
-      severity: 'Warning',
-    });
-  } else if (hasVitalsOverdue(patient, now)) {
-    desiredFlags.push({
-      type: 'ReassessmentDue',
-      reason: 'Vitals overdue',
+      reason: reassessmentReasons.join('; '),
       severity: 'Warning',
     });
   }
@@ -108,7 +137,7 @@ const desiredFlagsForPatient = (patient: Patient, now: Date): DesiredFlag[] => {
   if (hasDeteriorationSignal(patient)) {
     desiredFlags.push({
       type: 'DeteriorationRisk',
-      reason: 'Abnormal vitals',
+      reason: `Abnormal vitals: ${deteriorationReasons(patient).join(', ')}`,
       severity: 'Critical',
     });
   }

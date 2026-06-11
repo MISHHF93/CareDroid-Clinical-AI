@@ -14,7 +14,8 @@ export const REFERRAL_DEPARTMENTS = Object.freeze([
   'Internal Medicine',
   'Surgery',
   'ICU',
-  'Laboratory',
+  'Radiology',
+  'Other',
 ]);
 
 export const DEFAULT_REFERRALS = Object.freeze([
@@ -98,7 +99,7 @@ export const DEFAULT_REFERRALS = Object.freeze([
   Object.freeze({
     id: 'REF-1008',
     patientLabel: 'ED-1031',
-    department: 'Laboratory',
+    department: 'Radiology',
     stage: 'review',
     priority: 'medium',
     elapsedMinutes: 37,
@@ -113,7 +114,7 @@ const PRIORITY_WEIGHT = Object.freeze({ low: 1, medium: 2, high: 3, critical: 4 
 
 function normalizeReferral(referral = {}) {
   const stage = STAGE_BY_ID[referral.stage] ? referral.stage : 'request';
-  const department = REFERRAL_DEPARTMENTS.includes(referral.department) ? referral.department : 'Internal Medicine';
+  const department = REFERRAL_DEPARTMENTS.includes(referral.department) ? referral.department : 'Other';
 
   return Object.freeze({
     id: referral.id || 'REF-UNKNOWN',

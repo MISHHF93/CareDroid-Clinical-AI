@@ -1,7 +1,15 @@
 import { hasPatientFlag, useEmergencyStore } from '../store/emergencyStore';
 import {
+  getNextStates,
+  movePatientToState as movePatientWithJourneyRules,
+} from './journeyEngine';
+import { runCapacityIntelligence } from './capacityEngine';
+import { runEmergencyReassessment } from './reassessmentEngine';
+import { dispatch as dispatchAlert } from './alertEngine';
+import {
   PatientState,
   Priority,
+  QueueType,
   type EMSArrival,
   type EMSUnit,
   type JourneyEvent,
@@ -12,14 +20,17 @@ import {
 } from '../types/emergency';
 
 const FLOW_INTERVAL_MS = 30_000;
-const SAFETY_INTERVAL_MS = 120_000;
-const EMS_INTERVAL_MS = 300_000;
+const ARRIVAL_AND_SAFETY_INTERVAL_MS = 60_000;
+const EMS_INTERVAL_MS = 180_000;
+const ALERT_INTERVAL_MS = 300_000;
+export const SIMULATION_STATUS_EVENT = 'ed:simulation-status';
 
 type TimerHandle = number;
 
 interface SimulationEngine {
   start: () => void;
   stop: () => void;
+  toggle: () => boolean;
   isRunning: () => boolean;
 }
 
@@ -42,18 +53,6 @@ interface EMSPreArrivalTemplate {
   severity: EMSArrival['severity'];
   vitals: Omit<Vitals, 'recordedAt'>;
 }
-
-const VALID_STATE_FLOW: Partial<Record<PatientState, PatientState[]>> = {
-  [PatientState.Arrival]: [PatientState.Registration],
-  [PatientState.Registration]: [PatientState.Triage],
-  [PatientState.Triage]: [PatientState.Waiting, PatientState.Assessment],
-  [PatientState.Waiting]: [PatientState.Assessment],
-  [PatientState.Assessment]: [PatientState.Orders, PatientState.Results, PatientState.Disposition],
-  [PatientState.Orders]: [PatientState.Results],
-  [PatientState.Results]: [PatientState.Disposition],
-  [PatientState.Disposition]: [PatientState.Admission, PatientState.Discharge],
-  [PatientState.Admission]: [PatientState.Discharge],
-};
 
 const ARRIVAL_TEMPLATES: ArrivalTemplate[] = [
   {
@@ -156,6 +155,86 @@ const ARRIVAL_TEMPLATES: ArrivalTemplate[] = [
       pain: 2,
     },
   },
+  {
+    firstName: 'Avery',
+    lastName: 'Chen',
+    age: 8,
+    sex: 'Female',
+    dob: '2018-09-08',
+    chiefComplaint: 'Pediatric fever and cough after daycare exposure in North York',
+    complaintCategory: 'Pediatric',
+    priority: Priority.P4,
+    vitals: {
+      hr: 112,
+      bpSystolic: 104,
+      bpDiastolic: 66,
+      spo2: 98,
+      temp: 38.3,
+      rr: 22,
+      gcs: 15,
+      pain: 2,
+    },
+  },
+  {
+    firstName: 'Owen',
+    lastName: 'MacDonald',
+    age: 73,
+    sex: 'Male',
+    dob: '1953-11-15',
+    chiefComplaint: 'Intermittent chest tightness while walking near Union Station',
+    complaintCategory: 'Chest Pain',
+    priority: Priority.P3,
+    vitals: {
+      hr: 96,
+      bpSystolic: 152,
+      bpDiastolic: 88,
+      spo2: 97,
+      temp: 36.7,
+      rr: 18,
+      gcs: 15,
+      pain: 3,
+    },
+  },
+  {
+    firstName: 'Priya',
+    lastName: 'Shah',
+    age: 31,
+    sex: 'Female',
+    dob: '1995-03-05',
+    chiefComplaint: 'Right lower quadrant abdominal pain from Scarborough walk-in clinic',
+    complaintCategory: 'Abdominal Pain',
+    priority: Priority.P3,
+    vitals: {
+      hr: 100,
+      bpSystolic: 118,
+      bpDiastolic: 74,
+      spo2: 99,
+      temp: 37.4,
+      rr: 18,
+      gcs: 15,
+      pain: 7,
+    },
+  },
+  {
+    firstName: 'Jamal',
+    lastName: 'Brooks',
+    age: 46,
+    sex: 'Male',
+    dob: '1980-07-19',
+    chiefComplaint: 'Anxiety and palpitations after stressful commute on Line 1',
+    complaintCategory: 'Psychiatric',
+    priority: Priority.P4,
+    vitals: {
+      hr: 108,
+      bpSystolic: 136,
+      bpDiastolic: 84,
+      spo2: 99,
+      temp: 36.8,
+      rr: 20,
+      gcs: 15,
+      pain: 0,
+    },
+  },
 ];
 
 const EMS_TEMPLATES: EMSPreArrivalTemplate[] = [
@@ -207,6 +286,38 @@ const EMS_TEMPLATES: EMSPreArrivalTemplate[] = [
       pain: 2,
     },
   },
+  {
+    complaint: 'Crushing chest pain with diaphoresis near Queen Street West',
+    category: 'Chest Pain',
+    priority: Priority.P2,
+    severity: 'Critical',
+    vitals: {
+      hr: 124,
+      bpSystolic: 184,
+      bpDiastolic: 102,
+      spo2: 93,
+      temp: 36.9,
+      rr: 24,
+      gcs: 15,
+      pain: 9,
+    },
+  },
+  {
+    complaint: 'Possible stroke, facial droop and slurred speech in Etobicoke',
+    category: 'Stroke',
+    priority: Priority.P2,
+    severity: 'Critical',
+    vitals: {
+      hr: 88,
+      bpSystolic: 178,
+      bpDiastolic: 96,
+      spo2: 96,
+      temp: 36.5,
+      rr: 18,
+      gcs: 14,
+      pain: 0,
+    },
+  },
 ];
 
 const clamp = (value: number, min: number, max: number): number =>
@@ -221,13 +332,6 @@ const nowIso = (): string => new Date().toISOString();
 
 const minutesFromNow = (minutes: number): string =>
   new Date(Date.now() + minutes * 60_000).toISOString();
-
-const minutesSince = (timestamp: string | null): number => {
-  if (!timestamp) return 0;
-  const parsed = new Date(timestamp).getTime();
-  if (!Number.isFinite(parsed)) return 0;
-  return Math.max(0, Math.round((Date.now() - parsed) / 60_000));
-};
 
 const createJourneyEvent = (
   patientId: string,
@@ -251,7 +355,7 @@ const pickActivePatients = (patients: Patient[]): Patient[] =>
   );
 
 const nextStateForPatient = (patient: Patient): PatientState | null => {
-  const candidates = VALID_STATE_FLOW[patient.state] ?? [];
+  const candidates = getNextStates(patient.state);
   if (!candidates.length) return null;
 
   if (patient.priority === Priority.P1 || patient.priority === Priority.P2) {
@@ -273,25 +377,57 @@ const advanceRandomPatient = (): void => {
   const nextState = nextStateForPatient(patient);
   if (!nextState) return;
 
-  store.movePatientToState(patient.id, nextState);
+  try {
+    movePatientWithJourneyRules(patient.id, nextState, {
+      staffId: patient.assignedStaffId || 'simulation-engine',
+      note: 'Advanced by emergency simulation flow tick.',
+    });
+  } catch {
+    // Simulation ticks should not interrupt the live whiteboard if a patient changes mid-tick.
+  }
 };
 
-const varyVitals = (vitals: Vitals): Vitals => ({
-  hr: vitals.hr === null ? null : clamp(vitals.hr + randomInt(-4, 5), 45, 150),
-  bpSystolic:
-    vitals.bpSystolic === null ? null : clamp(vitals.bpSystolic + randomInt(-6, 6), 80, 220),
-  bpDiastolic:
-    vitals.bpDiastolic === null ? null : clamp(vitals.bpDiastolic + randomInt(-4, 4), 40, 130),
-  spo2: vitals.spo2 === null ? null : clamp(vitals.spo2 + randomInt(-1, 1), 88, 100),
-  temp:
-    vitals.temp === null
-      ? null
-      : Number(clamp(vitals.temp + randomInt(-2, 2) / 10, 35.4, 40.5).toFixed(1)),
-  rr: vitals.rr === null ? null : clamp(vitals.rr + randomInt(-2, 2), 10, 32),
-  gcs: vitals.gcs,
-  pain: vitals.pain === null ? null : clamp(vitals.pain + randomInt(-1, 1), 0, 10),
-  recordedAt: nowIso(),
-});
+const numericVital = (value: Vitals[keyof Vitals]): number | null =>
+  typeof value === 'number' && Number.isFinite(value) ? value : null;
+
+const fluctuate = (
+  value: Vitals[keyof Vitals],
+  deltaMin: number,
+  deltaMax: number,
+  min: number,
+  max: number,
+  precision = 0
+): number | null => {
+  const numeric = numericVital(value);
+  if (numeric === null) return null;
+  const nextValue = clamp(numeric + randomInt(deltaMin, deltaMax) / 10 ** precision, min, max);
+  return precision ? Number(nextValue.toFixed(precision)) : Math.round(nextValue);
+};
+
+const addOccasionalAbnormalSignal = (vitals: Vitals): Vitals => {
+  if (Math.random() > 0.14) return vitals;
+
+  const abnormalPattern = randomItem(['tachycardia', 'hypoxia', 'fever', 'hypotension', 'hypertension']);
+  if (abnormalPattern === 'tachycardia') return { ...vitals, hr: randomInt(122, 138) };
+  if (abnormalPattern === 'hypoxia') return { ...vitals, spo2: randomInt(90, 93) };
+  if (abnormalPattern === 'fever') return { ...vitals, temp: Number((randomInt(386, 394) / 10).toFixed(1)) };
+  if (abnormalPattern === 'hypotension') return { ...vitals, bpSystolic: randomInt(82, 89) };
+  return { ...vitals, bpSystolic: randomInt(181, 198) };
+};
+
+const varyVitals = (vitals: Vitals): Vitals =>
+  addOccasionalAbnormalSignal({
+    ...vitals,
+    hr: fluctuate(vitals.hr, -4, 5, 45, 150),
+    bpSystolic: fluctuate(vitals.bpSystolic, -6, 6, 80, 220),
+    bpDiastolic: fluctuate(vitals.bpDiastolic, -4, 4, 40, 130),
+    spo2: fluctuate(vitals.spo2, -1, 1, 88, 100),
+    temp: fluctuate(vitals.temp, -2, 2, 35.4, 40.5, 1),
+    rr: fluctuate(vitals.rr, -2, 2, 10, 32),
+    gcs: vitals.gcs,
+    pain: fluctuate(vitals.pain, -1, 1, 0, 10),
+    recordedAt: nowIso(),
+  });
 
 const updateRandomVitals = (): void => {
   const store = useEmergencyStore.getState();
@@ -349,29 +485,16 @@ const addFlagIfMissing = (patient: Patient, flag: PatientFlagType, reason: strin
 };
 
 const runSafetyAndCapacityChecks = (): void => {
-  const store = useEmergencyStore.getState();
-
-  pickActivePatients(store.patients).forEach((patient) => {
-    if (patient.state === PatientState.Waiting && minutesSince(patient.arrivalTime) > 45) {
-      addFlagIfMissing(patient, 'ReassessmentDue', 'Extended wait');
-    }
-
-    if (
-      (patient.priority === Priority.P1 || patient.priority === Priority.P2) &&
-      patient.state !== PatientState.Assessment
-    ) {
-      addFlagIfMissing(patient, 'HighRisk', 'High priority not yet assessed');
-    }
-  });
-
-  useEmergencyStore.getState().updateCapacity();
+  runEmergencyReassessment();
+  runCapacityIntelligence();
+  useEmergencyStore.getState().updateAlerts();
 };
 
 const createEMSPreArrival = (template: EMSPreArrivalTemplate): EMSArrival => {
   const id = `ems-arrival-sim-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
   const unitNumber = randomInt(100, 999);
   const unitId = `ems-unit-sim-${unitNumber}`;
-  const etaMinutes = randomInt(7, 18);
+  const etaMinutes = randomInt(5, 15);
   const estimatedArrivalTime = minutesFromNow(etaMinutes);
   const createdAt = nowIso();
 
@@ -430,38 +553,158 @@ const addEMSPreArrivalNotification = (): void => {
   useEmergencyStore.getState().addEMSArrival(arrival);
 };
 
+const triggerBottleneckAlert = (): void => {
+  const store = useEmergencyStore.getState();
+  const queues = store.queues.filter((queue) => queue.patientIds.length > 0);
+  const queue = queues.length
+    ? [...queues].sort((a, b) => b.longestWaitMinutes - a.longestWaitMinutes)[0]
+    : null;
+  const queueType = queue?.type ?? QueueType.Waiting;
+  const patientCount = queue?.patientIds.length ?? randomInt(4, 8);
+  const averageWait = Math.max(queue?.averageWaitMinutes ?? 0, randomInt(32, 58));
+  const detectedAt = nowIso();
+
+  store.setBottleneckAlert({
+    queue: queueType,
+    reason: `${queue?.name ?? queueType} queue pressure building: ${patientCount} patients, avg ${averageWait}min.`,
+    severity: averageWait >= 45 ? 'Red' : 'Yellow',
+    detectedAt,
+  });
+
+  dispatchAlert({
+    id: `alert-simulation-bottleneck-${queueType}`,
+    type: 'Queue',
+    severity: averageWait >= 45 ? 'Critical' : 'Warning',
+    title: 'Demo bottleneck developing',
+    message: `${queue?.name ?? queueType} queue has ${patientCount} patients with an average wait of ${averageWait} minutes.`,
+    actionLabel: 'Review Queue',
+    actionType: 'OPEN_QUEUE',
+    autoDismissAfter: 5,
+  });
+};
+
+const triggerReferralUnacknowledgedAlert = (): void => {
+  const store = useEmergencyStore.getState();
+  const patient = randomItem(pickActivePatients(store.patients));
+  if (!patient) return;
+  const elapsed = randomInt(16, 42);
+
+  dispatchAlert({
+    id: `alert-simulation-referral-${patient.id}`,
+    type: 'Referral',
+    severity: elapsed >= 30 ? 'Critical' : 'Warning',
+    title: 'Demo referral unacknowledged',
+    message: `${patientDisplayName(patient)} has an Internal Medicine referral with no acknowledgement after ${elapsed}m.`,
+    patientId: patient.id,
+    actionLabel: 'View Referral',
+    actionType: 'OPEN_REFERRALS',
+    autoDismissAfter: elapsed >= 30 ? undefined : 5,
+  });
+};
+
+const triggerDeteriorationSignalAlert = (): void => {
+  const store = useEmergencyStore.getState();
+  const patient = randomItem(pickActivePatients(store.patients));
+  if (!patient) return;
+  const abnormalVitals = {
+    ...varyVitals(patient.vitals),
+    hr: randomInt(124, 136),
+    spo2: randomInt(90, 93),
+    recordedAt: nowIso(),
+  };
+
+  store.addVitals(patient.id, abnormalVitals);
+  addFlagIfMissing(patient, 'DeteriorationRisk', 'Simulation deterioration signal');
+  dispatchAlert({
+    id: `alert-simulation-deterioration-${patient.id}`,
+    type: 'Reassessment',
+    severity: 'Critical',
+    title: 'Demo deterioration signal',
+    message: `${patientDisplayName(patient)} has new abnormal vitals in the demo stream.`,
+    patientId: patient.id,
+    actionLabel: 'View Patient',
+    actionType: 'VIEW_PATIENT',
+  });
+};
+
+const triggerRandomDemoAlert = (): void => {
+  randomItem([triggerBottleneckAlert, triggerReferralUnacknowledgedAlert, triggerDeteriorationSignalAlert])();
+};
+
 const runFlowTick = (): void => {
   advanceRandomPatient();
   updateRandomVitals();
+};
+
+const runArrivalAndSafetyTick = (): void => {
   addRandomArrival();
+  runSafetyAndCapacityChecks();
+};
+
+export const isEmergencySimulationAvailable = (): boolean => {
+  const nodeEnv = (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env
+    ?.NODE_ENV;
+  const viteEnv = import.meta.env;
+  if (viteEnv.MODE === 'test') return false;
+  const isDemoMode = viteEnv.VITE_DEMO_MODE === 'true';
+  if (nodeEnv) return nodeEnv !== 'production' || isDemoMode;
+  return !viteEnv.PROD || isDemoMode;
+};
+
+const emitSimulationStatus = (running: boolean): void => {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(
+    new CustomEvent(SIMULATION_STATUS_EVENT, {
+      detail: { running, available: isEmergencySimulationAvailable() },
+    })
+  );
 };
 
 const createSimulationEngine = (): SimulationEngine => {
   let flowTimer: TimerHandle | null = null;
-  let safetyTimer: TimerHandle | null = null;
+  let arrivalAndSafetyTimer: TimerHandle | null = null;
   let emsTimer: TimerHandle | null = null;
+  let alertTimer: TimerHandle | null = null;
 
   const stop = (): void => {
     if (flowTimer) window.clearInterval(flowTimer);
-    if (safetyTimer) window.clearInterval(safetyTimer);
+    if (arrivalAndSafetyTimer) window.clearInterval(arrivalAndSafetyTimer);
     if (emsTimer) window.clearInterval(emsTimer);
+    if (alertTimer) window.clearInterval(alertTimer);
     flowTimer = null;
-    safetyTimer = null;
+    arrivalAndSafetyTimer = null;
     emsTimer = null;
+    alertTimer = null;
+    emitSimulationStatus(false);
   };
 
   const start = (): void => {
-    if (flowTimer || typeof window === 'undefined') return;
+    if (flowTimer || typeof window === 'undefined' || !isEmergencySimulationAvailable()) return;
 
     flowTimer = window.setInterval(runFlowTick, FLOW_INTERVAL_MS);
-    safetyTimer = window.setInterval(runSafetyAndCapacityChecks, SAFETY_INTERVAL_MS);
+    arrivalAndSafetyTimer = window.setInterval(
+      runArrivalAndSafetyTick,
+      ARRIVAL_AND_SAFETY_INTERVAL_MS
+    );
     emsTimer = window.setInterval(addEMSPreArrivalNotification, EMS_INTERVAL_MS);
+    alertTimer = window.setInterval(triggerRandomDemoAlert, ALERT_INTERVAL_MS);
     runSafetyAndCapacityChecks();
+    emitSimulationStatus(true);
+  };
+
+  const toggle = (): boolean => {
+    if (flowTimer) {
+      stop();
+      return false;
+    }
+    start();
+    return Boolean(flowTimer);
   };
 
   return {
     start,
     stop,
+    toggle,
     isRunning: () => Boolean(flowTimer),
   };
 };
@@ -471,5 +714,34 @@ export const emergencySimulationEngine: SimulationEngine = createSimulationEngin
 export const startEmergencySimulation = (): void => emergencySimulationEngine.start();
 
 export const stopEmergencySimulation = (): void => emergencySimulationEngine.stop();
+
+export const toggleEmergencySimulation = (): boolean => emergencySimulationEngine.toggle();
+
+export const isEmergencySimulationRunning = (): boolean => emergencySimulationEngine.isRunning();
+
+let keyboardShortcutInstalled = false;
+
+export const installEmergencySimulationShortcut = (): void => {
+  if (keyboardShortcutInstalled || typeof window === 'undefined' || !isEmergencySimulationAvailable()) {
+    return;
+  }
+
+  keyboardShortcutInstalled = true;
+  window.addEventListener('keydown', (event) => {
+    if (!event.ctrlKey || !event.shiftKey || event.key.toLowerCase() !== 'd') return;
+    event.preventDefault();
+    toggleEmergencySimulation();
+  });
+};
+
+export const initializeEmergencySimulation = (): void => {
+  if (typeof window === 'undefined' || !isEmergencySimulationAvailable()) return;
+  installEmergencySimulationShortcut();
+  startEmergencySimulation();
+};
+
+if (typeof window !== 'undefined' && isEmergencySimulationAvailable()) {
+  window.setTimeout(initializeEmergencySimulation, 0);
+}
 
 export type { SimulationEngine };

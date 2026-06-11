@@ -42,7 +42,8 @@
 .referral-panel__header button,
 .referral-form__header button,
 .referral-form__actions button,
-.referral-row__actions button {
+.referral-row__actions button,
+.referral-row__view button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -64,6 +65,25 @@
   border-color: color-mix(in srgb, var(--status-info) 42%, var(--color-border-default));
   background: color-mix(in srgb, var(--status-info) 14%, var(--color-elevated));
   color: var(--status-info);
+}
+
+.referral-panel__header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.referral-panel__header-actions > strong {
+  display: inline-grid;
+  place-items: center;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-info) 18%, var(--color-elevated));
+  color: var(--status-info);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-lg);
 }
 
 .referral-panel__metrics {
@@ -268,7 +288,7 @@
 
 .referral-row {
   display: grid;
-  grid-template-columns: minmax(160px, 0.9fr) minmax(220px, 1.2fr) auto auto auto;
+  grid-template-columns: minmax(160px, 0.9fr) minmax(220px, 1.2fr) auto auto auto auto;
   align-items: center;
   gap: var(--space-3);
   min-width: 0;
@@ -292,12 +312,6 @@
   display: grid;
   gap: 3px;
   min-width: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
 }
 
 .referral-row__patient strong,
@@ -387,6 +401,16 @@
 .referral-row__response,
 .referral-row__actions {
   grid-column: 1 / -1;
+}
+
+.referral-row__view {
+  display: inline-flex;
+  justify-content: flex-end;
+}
+
+.referral-row__view button {
+  min-height: 30px;
+  color: var(--status-info);
 }
 
 .referral-row__summary,

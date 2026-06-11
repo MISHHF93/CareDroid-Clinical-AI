@@ -9,7 +9,6 @@ import {
   Gauge,
   Info,
   LayoutDashboard,
-  Settings,
   Share2,
   Truck,
   X,
@@ -22,13 +21,21 @@ import { useConversation } from '../contexts/ConversationContext';
 import { useUser } from '../contexts/UserContext';
 import { hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
 import { PatientState } from '../../types/emergency';
+import { movePatientToState as movePatientWithJourneyRules } from '../../engine/journeyEngine';
+import { REASSESSMENT_FLAG_TYPES } from '../../engine/reassessmentEngine';
+import {
+  initializeEmergencySimulation,
+  isEmergencySimulationAvailable,
+  isEmergencySimulationRunning,
+  SIMULATION_STATUS_EVENT,
+} from '../../engine/simulation';
 import { buildStaffWorkloads, getStaffRebalanceSuggestion } from '../utils/staffManagement';
 import './AppShell.css';
 
 const NAV_ITEMS = [
   {
     id: 'whiteboard',
-    label: 'Whiteboard',
+    label: 'Emergency Whiteboard',
     path: '/emergency',
     icon: LayoutDashboard,
     activePaths: ['/emergency', '/workspace/emergency', '/workspace/emergency/whiteboard'],
@@ -76,13 +83,6 @@ const NAV_ITEMS = [
     icon: Bot,
     activePaths: ['/emergency/copilot', '/workspace/emergency/copilot', '/assistant', '/chat'],
   },
-  {
-    id: 'settings',
-    label: 'Settings',
-    path: '/settings',
-    icon: Settings,
-    activePaths: ['/settings', '/workspace/emergency/settings', '/profile/settings'],
-  },
 ];
 
 const ACTIVE_PATIENT_STATES = new Set(
@@ -107,7 +107,7 @@ const SHORTCUT_GROUPS = [
     ],
   },
   {
-    title: 'Whiteboard',
+    title: 'Emergency Whiteboard',
     shortcuts: [
       ['1-5', 'Set queue filter by index'],
       ['G', 'Grid view'],
@@ -166,6 +166,10 @@ function patientName(patient) {
   return patient ? `${patient.firstName} ${patient.lastName}` : 'Unknown patient';
 }
 
+function hasReassessmentManagedFlag(patient) {
+  return REASSESSMENT_FLAG_TYPES.some((flagType) => hasPatientFlag(patient, flagType));
+}
+
 function capacityToneClass(riskLevel) {
   return String(riskLevel || 'Green').toLowerCase();
 }
@@ -184,6 +188,29 @@ function CapacityBadge({ onClick, expanded }) {
       <span className="ed-capacity-badge__dot" aria-hidden />
       <span>{capacity.label}</span>
       <strong>{capacity.score}</strong>
+    </button>
+  );
+}
+
+function ReassessmentBadge({ count, onClick, expanded }) {
+  const hasFlaggedPatients = count > 0;
+
+  return (
+    <button
+      type="button"
+      className={[
+        'ed-reassessment-badge',
+        hasFlaggedPatients ? 'ed-reassessment-badge--active' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      onClick={onClick}
+      aria-label={`${count} flagged patient${count === 1 ? '' : 's'} for reassessment`}
+      aria-expanded={expanded}
+    >
+      <span className="ed-reassessment-badge__pulse" aria-hidden />
+      <AlertTriangle size={15} strokeWidth={2.2} aria-hidden />
+      <strong>{count}</strong>
     </button>
   );
 }
@@ -297,7 +324,6 @@ function CapacityDetailPanel({ open, onClose }) {
   const rooms = useEmergencyStore((state) => state.rooms);
   const referrals = useEmergencyStore((state) => state.referrals);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
-  const dischargePatient = useEmergencyStore((state) => state.dischargePatient);
   const [recommendations, setRecommendations] = useState([]);
   const [now, setNow] = useState(() => new Date());
   const tone = capacityToneClass(capacity.riskLevel);
@@ -468,7 +494,19 @@ function CapacityDetailPanel({ open, onClose }) {
                         In Disposition {formatDuration(minutes)}
                       </span>
                     </div>
-                    <button type="button" onClick={() => dischargePatient(patient.id)}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        try {
+                          movePatientWithJourneyRules(patient.id, PatientState.Discharge, {
+                            staffId: patient.assignedStaffId || 'capacity-panel',
+                            note: 'Expedited from CapacityDetailPanel discharge pipeline.',
+                          });
+                        } catch {
+                          // The capacity list only shows disposition patients; stale clicks can be ignored.
+                        }
+                      }}
+                    >
                       Expedite Discharge
                     </button>
                   </article>
@@ -602,12 +640,9 @@ function StaffManagementPanel({ open, workloads, rebalanceSuggestion }) {
   );
 }
 
-function isAlertActive(alert, now) {
+function isAlertActive(alert) {
   if (alert.dismissedAt) return false;
-  if (!alert.autoDismissAfter) return true;
-  const createdAt = new Date(alert.createdAt).getTime();
-  if (!Number.isFinite(createdAt)) return true;
-  return now.getTime() - createdAt < alert.autoDismissAfter * 1000;
+  return true;
 }
 
 function alertToneClass(severity) {
@@ -673,14 +708,34 @@ function AlertDrawer({ open, alerts, onClose, onDismiss, onAction }) {
   );
 }
 
-function CriticalAlertToast({ alerts, onDismiss, onAction }) {
-  const criticalAlerts = alerts.filter((alert) => alert.severity === 'Critical').slice(0, 3);
-  if (!criticalAlerts.length) return null;
+function AlertToastStack({ alerts, onDismiss, onAction }) {
+  const [hiddenToastIds, setHiddenToastIds] = useState(() => new Set());
+  const toastAlerts = useMemo(
+    () => alerts.filter((alert) => !hiddenToastIds.has(alert.id)).slice(0, 3),
+    [alerts, hiddenToastIds]
+  );
+
+  useEffect(() => {
+    const timers = toastAlerts
+      .filter((alert) => alert.severity !== 'Critical')
+      .map((alert) =>
+        window.setTimeout(() => {
+          setHiddenToastIds((current) => new Set(current).add(alert.id));
+        }, (alert.autoDismissAfter || 5) * 1000)
+      );
+
+    return () => timers.forEach((timer) => window.clearTimeout(timer));
+  }, [toastAlerts]);
+
+  if (!toastAlerts.length) return null;
 
   return (
-    <div className="ed-alert-toast-stack" aria-live="assertive" aria-label="Critical alert toasts">
-      {criticalAlerts.map((alert) => (
-        <article key={alert.id} className="ed-alert-toast">
+    <div className="ed-alert-toast-stack" aria-live="assertive" aria-label="Alert toasts">
+      {toastAlerts.map((alert) => (
+        <article
+          key={alert.id}
+          className={`ed-alert-toast ed-alert-toast--${alertToneClass(alert.severity)}`}
+        >
           <div>
             <strong>{alert.title}</strong>
             <p>{alert.message}</p>
@@ -691,7 +746,17 @@ function CriticalAlertToast({ alerts, onDismiss, onAction }) {
                 View Patient
               </button>
             ) : null}
-            <button type="button" onClick={() => onDismiss(alert.id)} aria-label="Dismiss alert">
+            <button
+              type="button"
+              onClick={() => {
+                if (alert.severity === 'Critical') {
+                  onDismiss(alert.id);
+                  return;
+                }
+                setHiddenToastIds((current) => new Set(current).add(alert.id));
+              }}
+              aria-label="Dismiss alert toast"
+            >
               <X size={14} aria-hidden />
             </button>
           </div>
@@ -778,8 +843,7 @@ const AppShell = ({
   const reassessmentCount = useEmergencyStore(
     (state) =>
       state.patients.filter(
-        (patient) =>
-          ACTIVE_PATIENT_STATES.has(patient.state) && hasPatientFlag(patient, 'ReassessmentDue')
+        (patient) => ACTIVE_PATIENT_STATES.has(patient.state) && hasReassessmentManagedFlag(patient)
       ).length
   );
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
@@ -795,11 +859,27 @@ const AppShell = ({
   const [isCapacityDetailOpen, setIsCapacityDetailOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isShortcutReferenceOpen, setIsShortcutReferenceOpen] = useState(false);
+  const [isDemoSimulationActive, setIsDemoSimulationActive] = useState(
+    () => isEmergencySimulationAvailable() && isEmergencySimulationRunning()
+  );
   const routeNotice = location.state?.edNotice;
 
   useEffect(() => {
     const timer = window.setInterval(() => setClock(new Date()), 1000);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isEmergencySimulationAvailable()) return undefined;
+
+    const syncSimulationStatus = () => {
+      setIsDemoSimulationActive(isEmergencySimulationRunning());
+    };
+
+    initializeEmergencySimulation();
+    syncSimulationStatus();
+    window.addEventListener(SIMULATION_STATUS_EVENT, syncSimulationStatus);
+    return () => window.removeEventListener(SIMULATION_STATUS_EVENT, syncSimulationStatus);
   }, []);
 
   useEffect(() => {
@@ -829,8 +909,6 @@ const AppShell = ({
         return;
       }
 
-      if (isEditableShortcutTarget(event.target)) return;
-
       const key = event.key.toLowerCase();
       const run = (callback) => {
         event.preventDefault();
@@ -841,6 +919,8 @@ const AppShell = ({
         run(() => setIsCommandPaletteOpen(true));
         return;
       }
+
+      if (isEditableShortcutTarget(event.target)) return;
 
       if (event.key === '?') {
         run(() => setIsShortcutReferenceOpen(true));
@@ -915,13 +995,28 @@ const AppShell = ({
     [staffWorkloads]
   );
   const activeAlerts = useMemo(
-    () => alerts.filter((alert) => isAlertActive(alert, clock)),
-    [alerts, clock]
+    () => alerts.filter((alert) => isAlertActive(alert)),
+    [alerts]
   );
   const hasCriticalAlert = activeAlerts.some((alert) => alert.severity === 'Critical');
   const hasWarningAlert = activeAlerts.some((alert) => alert.severity === 'Warning');
   const handleAlertAction = useCallback(
     (alert) => {
+      if (typeof alert.actionFn === 'function') {
+        alert.actionFn();
+        setIsAlertDrawerOpen(false);
+        return;
+      }
+
+      if (alert.actionType === 'OPEN_REFERRALS') {
+        const search = alert.patientId
+          ? `?patientId=${encodeURIComponent(alert.patientId)}`
+          : '';
+        navigate(`/emergency/referrals${search}`);
+        setIsAlertDrawerOpen(false);
+        return;
+      }
+
       if (alert.patientId) {
         selectPatient(alert.patientId);
         setIsAlertDrawerOpen(false);
@@ -1036,6 +1131,11 @@ const AppShell = ({
         setIsCapacityDetailOpen(true);
       }
 
+      if (command.type === 'OPEN_REASSESSMENT_QUEUE') {
+        navigate('/emergency');
+        setIsReassessmentDrawerOpen(true);
+      }
+
       if (command.type === 'CLEAR_FILTERS') {
         setQueueFilter(null);
         setWhiteboardSearchQuery('');
@@ -1113,6 +1213,11 @@ const AppShell = ({
             <time className="ed-shift-clock" dateTime={clock.toISOString()}>
               {formatShiftClock(clock)}
             </time>
+            {isDemoSimulationActive ? (
+              <span className="ed-demo-badge" title="Development demo simulation is running">
+                DEMO
+              </span>
+            ) : null}
           </div>
 
           <div className="ed-os-header__center">
@@ -1123,6 +1228,11 @@ const AppShell = ({
           </div>
 
           <div className="ed-os-header__right">
+            <ReassessmentBadge
+              count={reassessmentCount}
+              expanded={isReassessmentDrawerOpen}
+              onClick={() => setIsReassessmentDrawerOpen((open) => !open)}
+            />
             <div className="ed-alert-menu">
               <button
                 type="button"
@@ -1167,7 +1277,7 @@ const AppShell = ({
           onDismiss={dismissAlert}
           onAction={handleAlertAction}
         />
-        <CriticalAlertToast
+        <AlertToastStack
           alerts={activeAlerts}
           onDismiss={dismissAlert}
           onAction={handleAlertAction}

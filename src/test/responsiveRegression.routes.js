@@ -13,7 +13,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     id: 'dashboard',
     path: '/dashboard',
     match: 'heading',
-    heading: /emergency flow command center/i,
+    heading: /emergency whiteboard/i,
   },
   {
     id: 'executive',
@@ -23,9 +23,8 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
   },
   { id: 'discover', path: '/discover', match: 'heading', heading: /discover caredroid capabilities/i },
   { id: 'workflows', path: '/workflows', match: 'heading', heading: /^workflows$/i },
-  { id: 'assistant', path: '/assistant', match: 'composer' },
   { id: 'operations', path: '/operations', match: 'heading', heading: /emergency operations/i },
-  { id: 'tools-overview', path: '/tools', match: 'heading', heading: /emergency flow console/i },
+  { id: 'tools-overview', path: '/tools', match: 'heading', heading: /emergency os console/i },
   { id: 'protocols', path: '/protocols', match: 'heading', heading: /protocol and clinical pathway library/i },
   { id: 'research', path: '/research', match: 'heading', heading: /research and evidence hub/i },
   { id: 'documentation', path: '/documentation', match: 'heading', heading: /clinical documentation assistant/i },
@@ -74,7 +73,7 @@ export const CORE_ROUTE_SMOKE = Object.freeze([
     id: 'calculators-library-filter',
     path: '/tools/calculators',
     match: 'heading',
-    heading: /emergency flow console/i,
+    heading: /emergency os console/i,
   },
   {
     id: 'ambient-scribe',

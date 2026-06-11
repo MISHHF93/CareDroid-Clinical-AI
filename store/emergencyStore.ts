@@ -1,5 +1,11 @@
 import { create } from 'zustand';
-import { deriveAlerts } from '../engine/alertEngine';
+import {
+  deriveAlerts,
+  isDerivedAlertId,
+  normalizeAlert,
+  registerAlertDispatcher,
+  type AlertDispatchInput,
+} from '../engine/alertEngine';
 import {
   PatientState,
   Priority,
@@ -30,6 +36,10 @@ import {
 type PatientPatch = Partial<Omit<Patient, 'id'>>;
 type PatientFlagDetails = Partial<Pick<PatientFlag, 'reason' | 'detectedAt' | 'severity'>>;
 type PatientFlagInput = PatientFlag | PatientFlagType;
+type MovePatientStateOptions = {
+  flags?: PatientFlag[];
+  timelineEvent?: JourneyEvent;
+};
 type ReferralCreateInput = Pick<
   Referral,
   'patientId' | 'requestingStaffId' | 'targetDepartment' | 'urgency' | 'reason' | 'clinicalSummary'
@@ -55,8 +65,8 @@ interface EmergencyStoreState {
   bottleneckAlert: BottleneckAlert | null;
   addPatient: (patient: Patient) => void;
   updatePatient: (id: string, patch: PatientPatch) => void;
-  dischargePatient: (id: string) => void;
-  movePatientToState: (id: string, state: PatientState) => void;
+  dischargePatient: (id: string, options?: MovePatientStateOptions) => void;
+  movePatientToState: (id: string, state: PatientState, options?: MovePatientStateOptions) => void;
   assignStaff: (patientId: string, staffId: string) => void;
   assignRoom: (patientId: string, roomId: string) => void;
   addFlag: (patientId: string, flag: PatientFlagInput, details?: PatientFlagDetails) => void;
@@ -70,6 +80,7 @@ interface EmergencyStoreState {
   setQueueFilter: (type: QueueType | null) => void;
   setWhiteboardSearchQuery: (query: string) => void;
   setBottleneckAlert: (alert: BottleneckAlert | null) => void;
+  dispatchAlert: (alert: AlertDispatchInput) => Alert;
   updateAlerts: () => void;
   dismissAlert: (alertId: string) => void;
   createReferral: (input: ReferralCreateInput) => void;
@@ -1375,7 +1386,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       };
     }),
 
-  dischargePatient: (id) =>
+  dischargePatient: (id, options = {}) =>
     set((state) => {
       const patient = state.patients.find((candidate) => candidate.id === id);
       const previousRoomId = patient?.roomId ?? null;
@@ -1385,12 +1396,16 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
         state: PatientState.Discharge,
         roomId: null,
         assignedStaffId: null,
+        flags: options.flags ?? [],
         timeline: [
           ...current.timeline,
-          actionEvent(current.id, 'DispositionUpdated', 'Patient discharged from Emergency OS.', {
-            fromState: current.state,
-            toState: PatientState.Discharge,
-          }),
+          options.timelineEvent ??
+            actionEvent(current.id, 'DispositionUpdated', 'Patient discharged from Emergency OS.', {
+              from: current.state,
+              to: PatientState.Discharge,
+              fromState: current.state,
+              toState: PatientState.Discharge,
+            }),
         ],
       }));
       const rooms: Room[] = state.rooms.map(
@@ -1420,17 +1435,21 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       };
     }),
 
-  movePatientToState: (id, nextState) =>
+  movePatientToState: (id, nextState, options = {}) =>
     set((state) => {
       const patients = updatePatients(state.patients, id, (patient) => ({
         ...patient,
         state: nextState,
+        flags: options.flags ?? patient.flags,
         timeline: [
           ...patient.timeline,
-          actionEvent(patient.id, 'StateChange', `Moved patient to ${nextState}.`, {
-            fromState: patient.state,
-            toState: nextState,
-          }),
+          options.timelineEvent ??
+            actionEvent(patient.id, 'StateChange', `Moved patient to ${nextState}.`, {
+              from: patient.state,
+              to: nextState,
+              fromState: patient.state,
+              toState: nextState,
+            }),
         ],
       }));
       return {
@@ -1638,9 +1657,37 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
 
   setBottleneckAlert: (alert) => set({ bottleneckAlert: alert }),
 
+  dispatchAlert: (alert) => {
+    let dispatchedAlert = normalizeAlert(alert);
+    set((state) => {
+      const existing = state.alerts.find((candidate) => candidate.id === dispatchedAlert.id);
+      dispatchedAlert = existing
+        ? {
+            ...existing,
+            ...dispatchedAlert,
+            createdAt: existing.createdAt || dispatchedAlert.createdAt,
+            dismissedAt: undefined,
+          }
+        : dispatchedAlert;
+
+      const alerts = existing
+        ? state.alerts.map((candidate) =>
+            candidate.id === dispatchedAlert.id ? dispatchedAlert : candidate
+          )
+        : [dispatchedAlert, ...state.alerts];
+
+      return {
+        alerts: alerts.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ),
+      };
+    });
+    return dispatchedAlert;
+  },
+
   updateAlerts: () =>
-    set((state) => ({
-      alerts: deriveAlerts(
+    set((state) => {
+      const derivedAlerts = deriveAlerts(
         {
           patients: state.patients,
           capacity: state.capacity,
@@ -1650,8 +1697,18 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           bottleneckAlert: state.bottleneckAlert,
         },
         state.alerts
-      ),
-    })),
+      );
+      const derivedIds = new Set(derivedAlerts.map((alert) => alert.id));
+      const manualAlerts = state.alerts.filter(
+        (alert) => !derivedIds.has(alert.id) && !isDerivedAlertId(alert.id)
+      );
+
+      return {
+        alerts: [...derivedAlerts, ...manualAlerts].sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ),
+      };
+    }),
 
   dismissAlert: (alertId) =>
     set((state) => ({
@@ -1909,6 +1966,8 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       };
     }),
 }));
+
+registerAlertDispatcher((alert) => useEmergencyStore.getState().dispatchAlert(alert));
 
 export const emergencyStoreApi = useEmergencyStore;
 

@@ -1,6 +1,10 @@
 import { createContext, useCallback, useMemo } from 'react';
 import { PatientState, QueueType } from '../../types/emergency';
 import { createPatientFlag, hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
+import {
+  getNextStates,
+  movePatientToState as movePatientWithJourneyRules,
+} from '../../engine/journeyEngine';
 
 export const DAILY_TORONTO_URGENT_CARE_VOLUME = 100;
 
@@ -28,19 +32,6 @@ const QUEUE_TARGET_STATE_MAP = Object.freeze({
   [QueueType.Reassessment]: PatientState.Assessment,
 });
 
-const PATIENT_STATE_SEQUENCE = Object.freeze([
-  PatientState.Arrival,
-  PatientState.Registration,
-  PatientState.Triage,
-  PatientState.Waiting,
-  PatientState.Assessment,
-  PatientState.Orders,
-  PatientState.Results,
-  PatientState.Disposition,
-  PatientState.Admission,
-  PatientState.Discharge,
-]);
-
 export function getQueueForPatientState(state) {
   if (
     state === PatientState.Arrival ||
@@ -60,6 +51,10 @@ function patientDisplayName(patient) {
 
 function staffDisplayName(staff) {
   return staff.name || `${staff.firstName} ${staff.lastName}`.trim();
+}
+
+function transitionErrorMessage(error) {
+  return error instanceof Error ? error.message : 'Unable to move patient state.';
 }
 
 function patientLocation(patient, rooms) {
@@ -207,7 +202,6 @@ export function useEmergencyDepartment() {
   const addPatientToStore = useEmergencyStore((state) => state.addPatient);
   const addFlag = useEmergencyStore((state) => state.addFlag);
   const assignStaff = useEmergencyStore((state) => state.assignStaff);
-  const movePatientToState = useEmergencyStore((state) => state.movePatientToState);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
   const setWhiteboardSearchQuery = useEmergencyStore((state) => state.setWhiteboardSearchQuery);
 
@@ -330,15 +324,27 @@ export function useEmergencyDepartment() {
         };
       }
 
-      movePatientToState(patientId, nextState);
-      return {
-        ok: true,
-        patient: { ...patient, state: nextState },
-        auditEvent: null,
-        message: `${patient.name} moved from ${patient.state} to ${nextState}.`,
-      };
+      try {
+        const result = movePatientWithJourneyRules(patientId, nextState, {
+          staffId: patient.assignedStaffId || undefined,
+          note: 'Moved from EmergencyDepartmentContext.',
+        });
+        return {
+          ok: true,
+          patient: { ...patient, state: result.to },
+          auditEvent: result.timelineEvent,
+          message: `${patient.name} moved from ${result.from} to ${result.to}.`,
+        };
+      } catch (error) {
+        return {
+          ok: false,
+          patient,
+          auditEvent: null,
+          message: transitionErrorMessage(error),
+        };
+      }
     },
-    [legacyPatients, movePatientToState]
+    [legacyPatients]
   );
 
   const movePatientToNextState = useCallback(
@@ -351,8 +357,7 @@ export function useEmergencyDepartment() {
         };
       }
 
-      const currentIndex = PATIENT_STATE_SEQUENCE.indexOf(patient.state);
-      const nextState = PATIENT_STATE_SEQUENCE[currentIndex + 1] || null;
+      const nextState = getNextStates(patient.state)[0] || null;
       if (!nextState) {
         return {
           ok: false,

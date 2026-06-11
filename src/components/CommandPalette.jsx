@@ -15,23 +15,23 @@ const BASE_COMMANDS = [
   },
   {
     id: 'find-patient',
-    label: 'Find patient [name]',
+    label: 'Find [name]',
     hint: 'F',
     keywords: ['search', 'whiteboard', 'patient'],
-    build: (query) => ({ type: 'FIND_PATIENT', value: extractValue(query, /^find\s+patient\s*/i) }),
+    build: (query) => ({ type: 'FIND_PATIENT', value: extractValue(query, /^find(?:\s+patient)?\s*/i) }),
   },
   {
     id: 'open-ems',
-    label: 'Open EMS pipeline',
+    label: 'EMS Pipeline',
     hint: 'E',
     keywords: ['pre-arrival', 'ambulance', 'pipeline'],
     build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/ems' }),
   },
   {
-    id: 'referral',
-    label: 'Referral for [patient]',
+    id: 'new-referral',
+    label: 'New Referral',
     hint: 'R',
-    keywords: ['consult', 'referrals'],
+    keywords: ['consult', 'referrals', 'referral for patient'],
     build: (query) => ({
       type: 'OPEN_REFERRAL',
       value: extractValue(query, /^referral\s+for\s*/i),
@@ -39,45 +39,52 @@ const BASE_COMMANDS = [
   },
   {
     id: 'heart',
-    label: 'Run HEART score',
+    label: 'HEART Score',
     hint: 'H',
-    keywords: ['calculator', 'chest pain'],
+    keywords: ['calculator', 'chest pain', 'run heart'],
     build: () => ({ type: 'OPEN_CALCULATOR', calculatorId: 'heart' }),
   },
   {
     id: 'qsofa',
-    label: 'Run qSOFA',
+    label: 'qSOFA',
     hint: 'Q',
-    keywords: ['calculator', 'sepsis'],
+    keywords: ['calculator', 'sepsis', 'run qsofa'],
     build: () => ({ type: 'OPEN_CALCULATOR', calculatorId: 'qsofa' }),
   },
   {
     id: 'nihss',
-    label: 'Run NIHSS',
+    label: 'NIHSS',
     hint: 'S',
-    keywords: ['calculator', 'stroke'],
+    keywords: ['calculator', 'stroke', 'run nihss'],
     build: () => ({ type: 'OPEN_CALCULATOR', calculatorId: 'nihss' }),
   },
   {
     id: 'capacity',
-    label: 'Capacity status',
+    label: 'Capacity Status',
     hint: 'C',
     keywords: ['capacity', 'pressure'],
     build: () => ({ type: 'OPEN_CAPACITY' }),
   },
   {
     id: 'shift-summary',
-    label: 'Shift summary',
+    label: 'Shift Summary',
     hint: '⇧S',
     keywords: ['handoff', 'summary'],
     build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/shift' }),
   },
   {
     id: 'clear-filters',
-    label: 'Clear all filters',
+    label: 'Clear Filters',
     hint: 'Esc',
     keywords: ['reset', 'whiteboard'],
     build: () => ({ type: 'CLEAR_FILTERS' }),
+  },
+  {
+    id: 'reassessment-queue',
+    label: 'Reassessment Queue',
+    hint: 'R',
+    keywords: ['reassessment', 'review', 'drawer'],
+    build: () => ({ type: 'OPEN_REASSESSMENT_QUEUE' }),
   },
   {
     id: 'flag-patient',
@@ -150,6 +157,30 @@ function findPatient(value, patients) {
   );
 }
 
+function isActivePatient(patient) {
+  return patient.state !== 'Discharge' && patient.state !== 'Deceased';
+}
+
+function patientSearchScore(patient, query) {
+  const normalizedQuery = String(query || '').trim().toLowerCase();
+  if (!normalizedQuery) return -1;
+  const fields = [patientName(patient), patient.mrn, patient.chiefComplaint, patient.complaintCategory]
+    .filter(Boolean)
+    .map((field) => String(field).toLowerCase());
+
+  if (fields.some((field) => field === normalizedQuery)) return 120;
+  const containingField = fields.find((field) => field.includes(normalizedQuery));
+  if (containingField) return 90 - containingField.indexOf(normalizedQuery);
+
+  const initials = patientName(patient)
+    .split(/\s+/)
+    .map((part) => part[0])
+    .join('')
+    .toLowerCase();
+  if (initials.startsWith(normalizedQuery)) return 80;
+  return -1;
+}
+
 export default function CommandPalette({ open, onClose, onExecute }) {
   const patients = useEmergencyStore((state) => state.patients);
   const addFlag = useEmergencyStore((state) => state.addFlag);
@@ -169,12 +200,35 @@ export default function CommandPalette({ open, onClose, onExecute }) {
 
   const commands = useMemo(() => {
     const dynamicCommands = [];
-    const findValue = extractValue(query, /^find\s+patient\s*/i);
+    const findValue = extractValue(query, /^find(?:\s+patient)?\s*/i);
     const referralValue = extractValue(query, /^referral\s+for\s*/i);
     const flagValue = extractValue(query, /^flag\s*/i);
+    const patientQuery = query.trim();
 
-    if (/^find\s+patient\s+/i.test(query) && findValue) {
+    if (patientQuery && !/^(find|referral\s+for|flag)\b/i.test(patientQuery)) {
       patients
+        .filter(isActivePatient)
+        .map((patient) => ({ patient, score: patientSearchScore(patient, patientQuery) }))
+        .filter((item) => item.score >= 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 5)
+        .forEach(({ patient }) => {
+          dynamicCommands.push({
+            id: `patient-${patient.id}`,
+            label: `${patientName(patient)} · ${patient.mrn}`,
+            hint: 'Open',
+            keywords: [patient.chiefComplaint, patient.complaintCategory],
+            build: () => ({
+              type: 'VIEW_PATIENT',
+              patientId: patient.id,
+            }),
+          });
+        });
+    }
+
+    if (/^find(?:\s+patient)?\s+/i.test(query) && findValue) {
+      patients
+        .filter(isActivePatient)
         .filter((patient) => patientName(patient).toLowerCase().includes(findValue.toLowerCase()))
         .slice(0, 5)
         .forEach((patient) => {

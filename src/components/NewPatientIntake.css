@@ -11,11 +11,11 @@
 .new-patient-intake__panel {
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr) auto;
-  width: min(1120px, calc(100vw - var(--space-8)));
-  height: min(820px, calc(100dvh - var(--space-8)));
-  margin: auto;
+  width: 100vw;
+  height: 100dvh;
+  margin: 0;
   border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-lg);
+  border-radius: 0;
   background: var(--color-surface);
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.54);
   overflow: hidden;
@@ -130,7 +130,7 @@
   display: grid;
   align-content: start;
   gap: var(--space-5);
-  max-width: 920px;
+  max-width: 1120px;
   margin: 0 auto;
   padding: var(--space-8) var(--space-5);
 }

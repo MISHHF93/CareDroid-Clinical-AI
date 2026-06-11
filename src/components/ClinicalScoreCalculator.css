@@ -136,7 +136,8 @@
   font-weight: 900;
 }
 
-.clinical-score-modal__fields select {
+.clinical-score-modal__fields select,
+.clinical-score-modal__toggle {
   height: 40px;
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-md);
@@ -146,6 +147,16 @@
   font-family: var(--font-mono);
   font-size: var(--font-size-lg);
   font-weight: 900;
+}
+
+.clinical-score-modal__toggle {
+  cursor: pointer;
+}
+
+.clinical-score-modal__toggle--active {
+  border-color: color-mix(in srgb, var(--status-warning) 50%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-warning) 18%, var(--color-background));
+  color: var(--status-warning);
 }
 
 .clinical-score-modal__result {
@@ -189,7 +200,8 @@
 
 .clinical-score-modal button:hover,
 .clinical-score-modal button:focus-visible,
-.clinical-score-modal select:focus-visible {
+.clinical-score-modal select:focus-visible,
+.clinical-score-modal__toggle:focus-visible {
   border-color: var(--status-info);
   color: var(--color-text-primary);
   outline: none;

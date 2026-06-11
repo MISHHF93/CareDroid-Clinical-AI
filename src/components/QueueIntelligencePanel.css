@@ -1,25 +1,36 @@
 .queue-intel {
+  position: relative;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
+  width: 240px;
   min-width: 0;
   min-height: 0;
   height: 100%;
   border-right: 1px solid var(--color-border-subtle);
   background: var(--color-surface);
   overflow: hidden;
+  transition: width 180ms var(--ease-smooth, ease);
+}
+
+.queue-intel--collapsed {
+  width: 44px;
 }
 
 .queue-intel__header {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: var(--space-2);
   min-height: 48px;
-  padding: var(--space-2);
+  padding: var(--space-2) var(--space-5) var(--space-2) var(--space-2);
   border-bottom: 1px solid var(--color-border-subtle);
 }
 
 .queue-intel__collapse {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-end: -15px;
+  z-index: 4;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -29,7 +40,12 @@
   border-radius: var(--radius-md);
   background: var(--color-elevated);
   color: var(--color-text-secondary);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.32);
   cursor: pointer;
+}
+
+.queue-intel--collapsed .queue-intel__collapse {
+  inset-inline-end: 7px;
 }
 
 .queue-intel__header h2 {
@@ -75,7 +91,6 @@
   line-height: 1.2;
 }
 
-.queue-intel__bottleneck span,
 .queue-intel__bottleneck small {
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
@@ -93,11 +108,11 @@
 
 .queue-intel__row {
   display: grid;
-  grid-template-columns: 22px minmax(0, 1fr) 14px auto 8px;
+  grid-template-columns: 22px minmax(0, 1fr) auto 8px;
   grid-template-areas:
-    'icon name warning count health'
-    'icon avg avg avg avg'
-    'icon oldest oldest oldest oldest';
+    'icon name count health'
+    'icon avg avg avg'
+    'icon oldest oldest oldest';
   gap: 2px var(--space-2);
   min-width: 0;
   padding: var(--space-2);
@@ -111,7 +126,8 @@
 }
 
 .queue-intel__warning {
-  grid-area: warning;
+  grid-area: name;
+  justify-self: end;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -153,7 +169,8 @@
   grid-area: count;
   color: var(--color-text-primary);
   font-family: var(--font-mono);
-  font-size: var(--font-size-xl);
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
   line-height: 1;
 }
 
@@ -218,14 +235,16 @@
 }
 
 .queue-intel__footer button {
+  justify-self: start;
   min-height: 30px;
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-md);
-  background: var(--color-elevated);
-  color: var(--color-text-secondary);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--status-info);
   font: inherit;
   font-size: var(--font-size-sm);
   font-weight: 800;
+  text-decoration: underline;
   cursor: pointer;
 }
 
@@ -240,6 +259,8 @@
 
 .queue-intel--collapsed .queue-intel__header {
   grid-template-columns: 1fr;
+  justify-items: center;
+  padding-inline: var(--space-1);
 }
 
 .queue-intel--collapsed .queue-intel__header div,

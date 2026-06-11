@@ -519,17 +519,15 @@ function LegacyProtectedRouteRedirect({ to, state }) {
   );
 }
 
-function EmergencyComingSoonRedirect({ label = 'This workspace' }) {
+function FutureReleaseStub({ label = 'This module' }) {
   return (
-    <LegacyProtectedRouteRedirect
-      to="/emergency"
-      state={{
-        edNotice: {
-          title: `${label} is coming soon`,
-          message: 'This module is parked while the Emergency OS workflow is consolidated.',
-        },
-      }}
-    />
+    <section className="ed-route-panel ed-route-panel--future" aria-labelledby="future-release-title">
+      <header className="ed-route-panel__header">
+        <span>Emergency OS</span>
+        <h1 id="future-release-title">{label} — Coming in a future release</h1>
+        <p>This module is parked while the Emergency OS workflow remains the active shell.</p>
+      </header>
+    </section>
   );
 }
 
@@ -557,8 +555,8 @@ function EmergencyCopilotRedirect() {
 function WorkspaceRouteRedirect() {
   const { workspaceId, subpage } = useParams();
   const workspaceLabel = workspaceId
-    ? `${workspaceId.charAt(0).toUpperCase()}${workspaceId.slice(1).replace(/-/g, ' ')} workspace`
-    : 'Workspace';
+    ? `${workspaceId.charAt(0).toUpperCase()}${workspaceId.slice(1).replace(/-/g, ' ')} module`
+    : 'Emergency OS module';
 
   if (workspaceId === 'emergency') {
     const routeMap = {
@@ -579,7 +577,7 @@ function WorkspaceRouteRedirect() {
     return <LegacyProtectedRouteRedirect to={routeMap[subpage] || '/emergency'} />;
   }
 
-  return <EmergencyComingSoonRedirect label={workspaceLabel} />;
+  return <FutureReleaseStub label={workspaceLabel} />;
 }
 
 function EmergencyQueueRoute() {
@@ -808,12 +806,12 @@ function AppRoutes() {
     },
     {
       path: '/emergency/settings',
-      element: <LegacyProtectedRouteRedirect to="/settings" />,
+      element: <FutureReleaseStub label="Emergency OS settings" />,
       requiresAuth: true,
     },
     {
       path: '/emergency/*',
-      element: <EmergencyComingSoonRedirect label="Emergency OS module" />,
+      element: <FutureReleaseStub label="Emergency OS module" />,
       requiresAuth: true,
     },
 
@@ -875,12 +873,12 @@ function AppRoutes() {
     },
     {
       path: '/workspace/emergency/settings',
-      element: <LegacyProtectedRouteRedirect to="/settings" />,
+      element: <FutureReleaseStub label="Emergency OS settings" />,
       requiresAuth: true,
     },
     {
       path: '/workspaces',
-      element: <EmergencyComingSoonRedirect label="Workspace directory" />,
+      element: <FutureReleaseStub label="Emergency OS directory" />,
       requiresAuth: true,
     },
     {
@@ -910,12 +908,12 @@ function AppRoutes() {
     },
     {
       path: '/digital-twin',
-      element: <EmergencyComingSoonRedirect label="Digital twin" />,
+      element: <FutureReleaseStub label="Digital twin" />,
       requiresAuth: true,
     },
     {
       path: '/operations',
-      element: <EmergencyComingSoonRedirect label="Operations workspace" />,
+      element: <FutureReleaseStub label="Operations" />,
       requiresAuth: true,
     },
     {
@@ -1191,25 +1189,25 @@ function AppRoutes() {
     },
     {
       path: '/live-map',
-      element: <EmergencyComingSoonRedirect label="Live map" />,
+      element: <FutureReleaseStub label="Live map" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
     {
       path: '/medical-iot',
-      element: <EmergencyComingSoonRedirect label="Medical IoT" />,
+      element: <FutureReleaseStub label="Medical IoT" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
     {
       path: '/hospital-map',
-      element: <EmergencyComingSoonRedirect label="Hospital map" />,
+      element: <FutureReleaseStub label="Hospital map" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
     {
       path: '/devices',
-      element: <EmergencyComingSoonRedirect label="Device fleet" />,
+      element: <FutureReleaseStub label="Device fleet" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
@@ -1288,27 +1286,27 @@ function AppRoutes() {
     },
     {
       path: '/simulation',
-      element: <EmergencyComingSoonRedirect label="Simulation workspace" />,
+      element: <FutureReleaseStub label="Simulation" />,
       requiresAuth: true,
     },
     {
       path: '/simulation/outcomes',
-      element: <EmergencyComingSoonRedirect label="Simulation outcomes" />,
+      element: <FutureReleaseStub label="Simulation outcomes" />,
       requiresAuth: true,
     },
     {
       path: '/simulation/sepsis-deterioration',
-      element: <EmergencyComingSoonRedirect label="Simulation scenario" />,
+      element: <FutureReleaseStub label="Simulation scenario" />,
       requiresAuth: true,
     },
     {
       path: '/simulation/:scenarioId',
-      element: <EmergencyComingSoonRedirect label="Simulation scenario" />,
+      element: <FutureReleaseStub label="Simulation scenario" />,
       requiresAuth: true,
     },
     {
       path: '/laboratory',
-      element: <EmergencyComingSoonRedirect label="Laboratory workspace" />,
+      element: <FutureReleaseStub label="Laboratory" />,
       requiresAuth: true,
     },
     {
@@ -1508,23 +1506,23 @@ function AppRoutes() {
 
     {
       path: '/fleet/command',
-      element: <EmergencyComingSoonRedirect label="Fleet command" />,
+      element: <FutureReleaseStub label="Fleet command" />,
       requiresAuth: true,
     },
     {
       path: '/fleet/map',
-      element: <EmergencyComingSoonRedirect label="Fleet map" />,
+      element: <FutureReleaseStub label="Fleet map" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
     {
       path: '/fleet/predictive-maintenance',
-      element: <EmergencyComingSoonRedirect label="Fleet predictive maintenance" />,
+      element: <FutureReleaseStub label="Fleet predictive maintenance" />,
       requiresAuth: true,
     },
     {
       path: '/fleet/route-optimizer',
-      element: <EmergencyComingSoonRedirect label="Fleet route optimizer" />,
+      element: <FutureReleaseStub label="Fleet route optimizer" />,
       requiresAuth: true,
     },
     {
@@ -1534,7 +1532,7 @@ function AppRoutes() {
     },
     {
       path: '/fleet/*',
-      element: <EmergencyComingSoonRedirect label="Fleet workspace" />,
+      element: <FutureReleaseStub label="Fleet" />,
       requiresAuth: true,
     },
 

@@ -260,7 +260,7 @@ export interface BottleneckAlert {
 
 export type AlertSeverity = 'Info' | 'Warning' | 'Critical';
 
-export type AlertType = 'Reassessment' | 'Capacity' | 'EMS' | 'Referral' | 'Queue';
+export type AlertType = 'Reassessment' | 'Capacity' | 'EMS' | 'Referral' | 'Queue' | 'System';
 
 export interface Alert {
   id: EntityId;
@@ -270,6 +270,7 @@ export interface Alert {
   message: string;
   patientId?: EntityId;
   actionLabel?: string;
+  actionFn?: () => void;
   actionType?: string;
   createdAt: ISODateString;
   dismissedAt?: ISODateString;

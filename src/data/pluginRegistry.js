@@ -186,7 +186,7 @@ export const PLUGIN_REGISTRY = Object.freeze([
     },
     inventory: {
       route: '/assistant',
-      component: 'src/pages/Dashboard.jsx',
+      component: 'src/components/ChatInterface.jsx',
       description:
         'Workflow plugin slot for discharge checklist orchestration, documentation handoff, and follow-up planning.',
       catalogVisible: true,
@@ -216,7 +216,7 @@ export const PLUGIN_REGISTRY = Object.freeze([
     },
     inventory: {
       route: '/assistant',
-      component: 'src/pages/Dashboard.jsx',
+      component: 'src/components/ChatInterface.jsx',
       description:
         'AI extension plugin for evidence-aware guideline comparison and cited assistant responses.',
       catalogVisible: true,

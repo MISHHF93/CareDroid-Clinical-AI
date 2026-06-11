@@ -9,10 +9,10 @@ import './NewPatientIntake.css';
 const COMPLAINT_CATEGORIES = [
   'Chest Pain',
   'Shortness of Breath',
-  'Stroke/Neurological',
-  'Sepsis/Infection',
+  'Stroke',
+  'Sepsis',
   'Abdominal Pain',
-  'Trauma/Injury',
+  'Trauma',
   'Psychiatric',
   'Pediatric',
   'Other',
@@ -48,11 +48,11 @@ const INITIAL_VITALS = {
 
 const STEPS = ['Identity', 'Chief Complaint', 'Vitals', 'Triage Priority', 'Confirm & Add'];
 
-function generateMrn() {
+export function generateMrn() {
   return `ED-${Math.floor(100000 + Math.random() * 900000)}`;
 }
 
-function calculateAge(dob) {
+export function calculateAge(dob) {
   if (!dob) return null;
   const birthDate = new Date(`${dob}T00:00:00`);
   if (!Number.isFinite(birthDate.getTime())) return null;
@@ -72,7 +72,7 @@ function parseNumber(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function vitalTone(field, value) {
+export function vitalTone(field, value) {
   const numericValue = parseNumber(value);
   if (numericValue === null) return 'empty';
 
@@ -104,38 +104,61 @@ function vitalTone(field, value) {
   return 'normal';
 }
 
-function suggestPriority(complaintCategory, vitals) {
+export function suggestPriority(complaintCategory, vitals, complaintText = '') {
   const hr = parseNumber(vitals.hr);
   const spo2 = parseNumber(vitals.spo2);
   const sbp = parseNumber(vitals.bpSystolic);
+  const dbp = parseNumber(vitals.bpDiastolic);
   const gcs = parseNumber(vitals.gcs);
   const temp = parseNumber(vitals.temp);
   const rr = parseNumber(vitals.rr);
+  const pain = parseNumber(vitals.pain);
+  const complaint = `${complaintCategory} ${complaintText}`.toLowerCase();
+  const hasDiaphoresis = /\b(diaphoresis|diaphoretic|sweat|sweating|clammy)\b/.test(complaint);
+  const hasSevereTrauma = /\b(major|severe|penetrating|unstable|ejected|fall|polytrauma)\b/.test(
+    complaint
+  );
+  const hasSuicidalRisk = /\b(suicidal|suicide|self[-\s]?harm|overdose)\b/.test(complaint);
 
   if (
     (typeof spo2 === 'number' && spo2 < 90) ||
     (typeof hr === 'number' && (hr < 40 || hr > 150)) ||
     (typeof sbp === 'number' && sbp < 90) ||
+    (typeof rr === 'number' && (rr < 8 || rr > 32)) ||
     (typeof gcs === 'number' && gcs <= 8)
   ) {
     return Priority.P1;
   }
 
+  if (complaintCategory === 'Chest Pain' && hasDiaphoresis) return Priority.P2;
+  if (complaintCategory === 'Stroke') return Priority.P2;
+  if (complaintCategory === 'Trauma' && hasSevereTrauma) return Priority.P2;
+  if (complaintCategory === 'Psychiatric' && hasSuicidalRisk) return Priority.P2;
   if (
-    ['Chest Pain', 'Shortness of Breath', 'Stroke/Neurological', 'Sepsis/Infection'].includes(
-      complaintCategory
-    ) ||
-    (typeof spo2 === 'number' && spo2 < 94) ||
-    (typeof hr === 'number' && hr > 120) ||
-    (typeof sbp === 'number' && sbp > 180) ||
-    (typeof temp === 'number' && temp > 38.5) ||
-    (typeof rr === 'number' && rr > 24) ||
-    (typeof gcs === 'number' && gcs < 15)
+    complaintCategory === 'Sepsis' &&
+    ((typeof temp === 'number' && temp > 38.5) ||
+      (typeof sbp === 'number' && sbp <= 100) ||
+      (typeof rr === 'number' && rr >= 22) ||
+      (typeof gcs === 'number' && gcs < 15))
   ) {
     return Priority.P2;
   }
 
-  if (['Abdominal Pain', 'Trauma/Injury', 'Psychiatric', 'Pediatric'].includes(complaintCategory)) {
+  if (
+    ['Chest Pain', 'Shortness of Breath', 'Sepsis'].includes(complaintCategory) ||
+    (typeof spo2 === 'number' && spo2 < 94) ||
+    (typeof hr === 'number' && hr > 120) ||
+    (typeof sbp === 'number' && sbp > 180) ||
+    (typeof dbp === 'number' && dbp > 120) ||
+    (typeof temp === 'number' && temp > 38.5) ||
+    (typeof rr === 'number' && rr > 24) ||
+    (typeof gcs === 'number' && gcs < 15) ||
+    (typeof pain === 'number' && pain >= 9)
+  ) {
+    return Priority.P2;
+  }
+
+  if (['Abdominal Pain', 'Trauma', 'Psychiatric', 'Pediatric'].includes(complaintCategory)) {
     return Priority.P3;
   }
 
@@ -171,10 +194,6 @@ function fieldLabel(field) {
   return labels[field] || field;
 }
 
-function priorityShortLabel(priority) {
-  return CTAS_LABELS[priority].split('· ')[1] || CTAS_LABELS[priority];
-}
-
 function canContinue(step, identity, age, complaintCategory, complaintText) {
   if (step === 0) {
     return Boolean(
@@ -204,8 +223,8 @@ export default function NewPatientIntake({ open, onClose }) {
 
   const age = useMemo(() => calculateAge(identity.dob), [identity.dob]);
   const suggestedPriority = useMemo(
-    () => suggestPriority(complaintCategory, vitals),
-    [complaintCategory, vitals]
+    () => suggestPriority(complaintCategory, vitals, complaintText),
+    [complaintCategory, complaintText, vitals]
   );
   const selectedPriority = priorityOverride || suggestedPriority;
   const canAdvance = canContinue(step, identity, age, complaintCategory, complaintText);
@@ -257,6 +276,7 @@ export default function NewPatientIntake({ open, onClose }) {
       triageTime: now,
       lastAssessedTime: vitalsSkipped ? null : now,
       chiefComplaint: complaintText.trim(),
+      complaint: complaintText.trim(),
       complaintCategory,
       state: PatientState.Triage,
       priority: selectedPriority,
@@ -498,7 +518,7 @@ export default function NewPatientIntake({ open, onClose }) {
                     onClick={() => setPriorityOverride(priority)}
                   >
                     <strong>{priority}</strong>
-                    <span>{priorityShortLabel(priority)}</span>
+                    <span>{CTAS_LABELS[priority]}</span>
                   </button>
                 ))}
               </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Ambulance, Bed, CheckCircle2 } from 'lucide-react';
+import { Ambulance, Bed, CheckCircle2, Clock3 } from 'lucide-react';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import EMSPressureScore from './EMSPressureScore';
 import './EMSPipeline.css';
@@ -36,6 +36,12 @@ function crewLabel(arrival) {
   return arrival.crewNames?.length ? arrival.crewNames.join(' / ') : 'Crew pending';
 }
 
+function unitLabel(arrival) {
+  return arrival.unitName && arrival.unitName !== arrival.unitId
+    ? `${arrival.unitName} · ${crewLabel(arrival)}`
+    : crewLabel(arrival);
+}
+
 function roomName(rooms, roomId) {
   return rooms.find((room) => room.id === roomId)?.name || 'Bay pending';
 }
@@ -48,22 +54,27 @@ function EMSArrivalRow({ arrival, now, rooms, onPrepareBay, onConvert }) {
   return (
     <article className={`ems-pipeline__row ems-pipeline__row--${tone}`}>
       <div className="ems-pipeline__unit">
-        <strong>{arrival.unitName || arrival.unitId}</strong>
-        <span>{crewLabel(arrival)}</span>
+        <strong>{arrival.unitId}</strong>
+        <span>{unitLabel(arrival)}</span>
       </div>
 
       <div className="ems-pipeline__complaint">
-        <strong>{arrival.chiefComplaint}</strong>
+        <div className="ems-pipeline__complaint-title">
+          <strong>{arrival.chiefComplaint}</strong>
+          <span
+            className={`ems-pipeline__severity ems-pipeline__severity--${arrival.severity.toLowerCase()}`}
+          >
+            {arrival.severity}
+          </span>
+        </div>
         <span>{arrival.mechanismOfInjury || arrival.notes}</span>
       </div>
 
-      <span
-        className={`ems-pipeline__severity ems-pipeline__severity--${arrival.severity.toLowerCase()}`}
+      <time
+        className={`ems-pipeline__eta ems-pipeline__eta--${tone}`}
+        dateTime={arrival.estimatedArrivalTime}
       >
-        {arrival.severity}
-      </span>
-
-      <time className="ems-pipeline__eta" dateTime={arrival.estimatedArrivalTime}>
+        <Clock3 size={14} aria-hidden />
         {formatEta(remaining, arrival.status)}
       </time>
 
@@ -94,6 +105,7 @@ function EMSArrivalRow({ arrival, now, rooms, onPrepareBay, onConvert }) {
             Add to Whiteboard
           </button>
         ) : null}
+        {arrival.patientId ? <span className="ems-pipeline__prepared">Whiteboard active</span> : null}
       </div>
     </article>
   );
@@ -102,7 +114,6 @@ function EMSArrivalRow({ arrival, now, rooms, onPrepareBay, onConvert }) {
 export default function EMSPipeline() {
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const rooms = useEmergencyStore((state) => state.rooms);
-  const updateEMSArrival = useEmergencyStore((state) => state.updateEMSArrival);
   const prepareEMSBay = useEmergencyStore((state) => state.prepareEMSBay);
   const convertEMSArrivalToPatient = useEmergencyStore((state) => state.convertEMSArrivalToPatient);
   const [now, setNow] = useState(() => new Date());
@@ -121,13 +132,10 @@ export default function EMSPipeline() {
     activeArrivals.forEach((arrival) => {
       if (arrival.status !== 'Inbound') return;
       if (minutesRemaining(arrival, now) <= 0) {
-        updateEMSArrival(arrival.id, {
-          status: 'Arrived',
-          arrivedAt: arrival.arrivedAt || now.toISOString(),
-        });
+        convertEMSArrivalToPatient(arrival.id);
       }
     });
-  }, [activeArrivals, now, updateEMSArrival]);
+  }, [activeArrivals, convertEMSArrivalToPatient, now]);
 
   const incoming = activeArrivals
     .filter((arrival) => arrival.status === 'Inbound' && minutesRemaining(arrival, now) > 0)
@@ -135,10 +143,7 @@ export default function EMSPipeline() {
   const awaitingHandoff = activeArrivals
     .filter(
       (arrival) =>
-        (arrival.status === 'Arrived' ||
-          arrival.status === 'Handoff' ||
-          minutesRemaining(arrival, now) <= 0) &&
-        !arrival.patientId
+        arrival.status === 'Arrived' || arrival.status === 'Handoff' || minutesRemaining(arrival, now) <= 0
     )
     .sort((a, b) => minutesRemaining(a, now) - minutesRemaining(b, now));
 
@@ -149,12 +154,13 @@ export default function EMSPipeline() {
           <span>Pre-arrival coordination</span>
           <h1 id="ems-pipeline-title">EMS Pipeline</h1>
         </div>
-        <strong>{incoming.length}</strong>
+        <div className="ems-pipeline__header-actions">
+          <EMSPressureScore />
+          <strong aria-label={`${incoming.length} incoming EMS units`}>{incoming.length}</strong>
+        </div>
       </header>
 
       <div className="ems-pipeline__sections">
-        <EMSPressureScore variant="gauge" />
-
         <section className="ems-pipeline__section">
           <div className="ems-pipeline__section-heading">
             <Ambulance size={17} aria-hidden />

@@ -545,7 +545,7 @@ export function getSaasComplianceDocument() {
     '| STRUCT-004 | **Resolved** | Inventory lifecycle now maps to platform lifecycle enum (`draft`, `beta`, `active`, `deprecated`, `archived`) | Keep admin-only as access policy instead of lifecycle |',
     '| STRUCT-005 | **Medium** | Seeded assets use empty `roleProfiles` / `workspaceTags` (implicit “all”) — compliant for assignment API but weak for explicit policy | Populate `roleProfiles` and `workspaceTags` per pack `targetRoles` / `defaultModules` |',
     '| STRUCT-006 | **Resolved** | `assetInventory.js` derives non-empty `packIds`, `productIds`, workspace, role, execution, and governance metadata for mounted tools | Keep asset projection invariant tests passing |',
-    '| STRUCT-007 | **Low** | `/assistant?agent=` query not consumed in `Dashboard.jsx` | Wire agent asset id to assistant session context |',
+    '| STRUCT-007 | **Low** | `/assistant?agent=` query now resolves through ED Copilot shell alias | Wire agent asset id to Copilot session context |',
     '',
     '## Seeded platform assets (DB) — pack membership',
     '',

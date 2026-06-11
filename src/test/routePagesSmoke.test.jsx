@@ -42,7 +42,6 @@ import SaasHealthCenter from '../pages/SaasHealthCenter';
 import CommandDashboard from '../pages/CommandDashboard';
 import ExecutiveCommandCenter from '../pages/ExecutiveCommandCenter';
 import CapabilityDiscovery from '../pages/CapabilityDiscovery';
-import Dashboard from '../pages/Dashboard';
 import Operations from '../pages/Operations';
 import ResearchEvidenceHub from '../pages/ResearchEvidenceHub';
 import ClinicalDocumentationAssistant from '../pages/ClinicalDocumentationAssistant';
@@ -672,7 +671,6 @@ const PAGE_BY_ID = {
   executive: ExecutiveCommandCenter,
   discover: CapabilityDiscovery,
   workflows: WorkflowBuilderPage,
-  assistant: Dashboard,
   operations: Operations,
   research: ResearchEvidenceHub,
   documentation: ClinicalDocumentationAssistant,
@@ -755,7 +753,6 @@ const PAGE_BY_ID = {
 
 const THEME_ROUTE_SMOKE_IDS = new Set([
   'dashboard',
-  'assistant',
   'tools-overview',
   'fleet-live-map',
   'calculators-library-filter',
@@ -779,7 +776,6 @@ const RESPONSIVE_UX_VIEWPORT_WIDTHS = Object.freeze([
 ]);
 const RESPONSIVE_MATRIX_ROUTE_IDS = new Set([
   'dashboard',
-  'assistant',
   'tools-overview',
   'fleet-live-map',
   'calculators-library-filter',

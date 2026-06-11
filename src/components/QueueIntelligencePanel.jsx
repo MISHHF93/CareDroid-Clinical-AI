@@ -72,12 +72,15 @@ function suggestedAction(queueType) {
 }
 
 function detectBottleneck(queueRows) {
-  const rankedQueues = queueRows
-    .filter((queue) => queue.count > 0)
-    .sort((a, b) => b.count - a.count || b.averageWaitMinutes - a.averageWaitMinutes);
+  const activeQueues = queueRows.filter((queue) => queue.count > 0);
+  if (!activeQueues.length) return null;
 
-  const queue = rankedQueues[0];
-  if (!queue) return null;
+  const highestCount = Math.max(...activeQueues.map((queue) => queue.count));
+  const longestWait = Math.max(...activeQueues.map((queue) => queue.oldestWaitMinutes));
+  const queue = activeQueues.find(
+    (candidate) => candidate.count === highestCount && candidate.oldestWaitMinutes === longestWait
+  );
+  if (!queue || queue.count < 2 || queue.oldestWaitMinutes < 20) return null;
 
   const downstreamType = DOWNSTREAM_QUEUE[queue.type];
   if (!downstreamType) return null;
@@ -89,7 +92,7 @@ function detectBottleneck(queueRows) {
 
   return {
     queue: queue.type,
-    reason: `${queue.count} patients waiting avg ${queue.averageWaitMinutes}min with no downstream movement`,
+    reason: `${queue.count} patients, avg ${queue.averageWaitMinutes}min`,
     severity,
     detectedAt: new Date().toISOString(),
   };
@@ -122,6 +125,19 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
         queueRows.reduce((sum, queue) => sum + queue.averageWaitMinutes, 0) / queueRows.length
       )
     : 0;
+  const overallHealthScore = Math.max(
+    0,
+    Math.min(
+      100,
+      100 -
+        queueRows.reduce((sum, queue) => {
+          if (queue.health === 'red') return sum + 12;
+          if (queue.health === 'yellow') return sum + 6;
+          return sum;
+        }, 0) -
+        Math.max(0, overallAverage - 20)
+    )
+  );
 
   useEffect(() => {
     const runDetection = () => {
@@ -149,7 +165,7 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
         </button>
         <div>
           <h2>Queue Intelligence</h2>
-          <span>{formatWait(overallAverage)} avg</span>
+          <span>{overallHealthScore} overall health</span>
         </div>
       </header>
 
@@ -158,8 +174,9 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
           className={`queue-intel__bottleneck queue-intel__bottleneck--${bottleneckAlert.severity.toLowerCase()}`}
           role="status"
         >
-          <strong>Bottleneck detected in {bottleneckAlert.queue}</strong>
-          <span>Reason: {bottleneckAlert.reason}</span>
+          <strong>
+            Bottleneck: {bottleneckAlert.queue} — {bottleneckAlert.reason}
+          </strong>
           <small>{suggestedAction(bottleneckAlert.queue)}</small>
         </section>
       ) : null}

@@ -172,7 +172,7 @@ function resolveComponent(registryId, nluToolId, builtinSlug) {
       registryId
     )
   ) {
-    return 'src/pages/tools/Calculators.jsx (hub card) + src/pages/Dashboard.jsx (chat)';
+    return 'src/pages/tools/Calculators.jsx (hub card) + src/components/ChatInterface.jsx (ED Copilot)';
   }
   if (registryId === REGISTRY.calculatorsHub) return REGISTRY_COMPONENT[REGISTRY.calculatorsHub];
   return '—';

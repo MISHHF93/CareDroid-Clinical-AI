@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Grid3X3, List } from 'lucide-react';
+import { Grid3X3, List, Plus } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { getPatientFlagType, hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
 import PatientCard, { PatientDetailPanel } from './PatientCard';
 import NewPatientIntake from './NewPatientIntake';
+import QueueIntelligencePanel from './QueueIntelligencePanel';
 import ClinicalScoreCalculator, {
   CALCULATOR_BY_SUGGESTION_ID,
   createClinicalScoreEvent,
@@ -112,6 +113,7 @@ export default function EmergencyWhiteboard() {
   const addNote = useEmergencyStore((state) => state.addNote);
   const addFlag = useEmergencyStore((state) => state.addFlag);
   const [viewMode, setViewMode] = useState('grid');
+  const [queuePanelCollapsed, setQueuePanelCollapsed] = useState(false);
   const [newPatientOpen, setNewPatientOpen] = useState(false);
   const [calculatorLaunch, setCalculatorLaunch] = useState(null);
   const [keyboardPatientId, setKeyboardPatientId] = useState(null);
@@ -371,6 +373,14 @@ export default function EmergencyWhiteboard() {
           {whiteboardSearchQuery ? (
             <span className="ed-whiteboard__search-chip">Search: {whiteboardSearchQuery}</span>
           ) : null}
+          <button
+            type="button"
+            className="ed-whiteboard__new-patient"
+            onClick={() => setNewPatientOpen(true)}
+          >
+            <Plus size={15} aria-hidden />
+            New Patient
+          </button>
           <div className="ed-whiteboard__filters" aria-label="Whiteboard filters">
             {FILTERS.map((filter) => {
               const isActive = activeQueueFilter === filter.type;
@@ -435,11 +445,16 @@ export default function EmergencyWhiteboard() {
       <div
         className={[
           'ed-whiteboard__body',
+          queuePanelCollapsed ? 'ed-whiteboard__body--queue-collapsed' : '',
           selectedPatientId ? 'ed-whiteboard__body--detail-open' : '',
         ]
           .filter(Boolean)
           .join(' ')}
       >
+        <QueueIntelligencePanel
+          collapsed={queuePanelCollapsed}
+          onCollapsedChange={setQueuePanelCollapsed}
+        />
         <div className="ed-whiteboard__content">
           {isStoreInitializing && viewMode === 'grid' ? (
             <div className="ed-whiteboard__grid" aria-label="Loading patient whiteboard">

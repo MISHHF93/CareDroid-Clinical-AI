@@ -1,4 +1,4 @@
-import { useEmergencyStore } from '../store/emergencyStore';
+import { getPatientFlagType, useEmergencyStore } from '../store/emergencyStore';
 import {
   PatientState,
   Priority,
@@ -7,7 +7,6 @@ import {
   type PatientFlag,
   type PatientFlagType,
 } from '../types/emergency';
-import { getPatientFlagType } from '../store/emergencyStore';
 
 export const VALID_TRANSITIONS: Readonly<Record<PatientState, readonly PatientState[]>> = {
   [PatientState.Arrival]: [PatientState.Registration],
@@ -26,30 +25,83 @@ export const VALID_TRANSITIONS: Readonly<Record<PatientState, readonly PatientSt
 export interface MovePatientOptions {
   staffId?: string;
   note?: string;
+  timestamp?: string;
 }
 
-export type MovePatientResult =
-  | {
-      ok: true;
-      patientId: string;
-      from: PatientState;
-      to: PatientState;
-    }
-  | {
-      ok: false;
-      reason: string;
-    };
+export interface MovePatientResult {
+  ok: true;
+  patientId: string;
+  from: PatientState;
+  to: PatientState;
+  timelineEvent: JourneyEvent;
+  removedFlags: PatientFlagType[];
+}
+
+export class PatientJourneyTransitionError extends Error {
+  patientId?: string;
+  fromState?: PatientState;
+  toState?: PatientState;
+  validNextStates: PatientState[];
+
+  constructor(
+    message: string,
+    details: {
+      patientId?: string;
+      fromState?: PatientState;
+      toState?: PatientState;
+      validNextStates?: PatientState[];
+    } = {}
+  ) {
+    super(message);
+    this.name = 'PatientJourneyTransitionError';
+    this.patientId = details.patientId;
+    this.fromState = details.fromState;
+    this.toState = details.toState;
+    this.validNextStates = details.validNextStates ?? [];
+  }
+}
 
 export function getNextStates(currentState: PatientState): PatientState[] {
   return [...(VALID_TRANSITIONS[currentState] || [])];
 }
 
 function patientName(patient: Patient): string {
-  return `${patient.firstName} ${patient.lastName}`;
+  return patient.name || `${patient.firstName} ${patient.lastName}`.trim() || patient.id;
 }
 
-function isLegalTransition(fromState: PatientState, targetState: PatientState): boolean {
+export function isLegalTransition(fromState: PatientState, targetState: PatientState): boolean {
   return getNextStates(fromState).includes(targetState);
+}
+
+function formatNextStates(states: PatientState[]): string {
+  return states.length ? states.join(', ') : 'no further states';
+}
+
+export function assertLegalTransition(patient: Patient, targetState: PatientState): void {
+  const nextStates = getNextStates(patient.state);
+
+  if (patient.state === targetState) {
+    throw new PatientJourneyTransitionError(`${patientName(patient)} is already in ${targetState}.`, {
+      patientId: patient.id,
+      fromState: patient.state,
+      toState: targetState,
+      validNextStates: nextStates,
+    });
+  }
+
+  if (!isLegalTransition(patient.state, targetState)) {
+    throw new PatientJourneyTransitionError(
+      `Illegal transition from ${patient.state} to ${targetState}. Valid next state(s): ${formatNextStates(
+        nextStates
+      )}.`,
+      {
+        patientId: patient.id,
+        fromState: patient.state,
+        toState: targetState,
+        validNextStates: nextStates,
+      }
+    );
+  }
 }
 
 function staleFlagsForTransition(
@@ -95,12 +147,20 @@ function removeStaleFlags(patient: Patient, targetState: PatientState): PatientF
   return patient.flags.filter((flag) => !staleFlags.has(getPatientFlagType(flag)));
 }
 
+function removedFlagTypes(
+  beforeFlags: PatientFlag[],
+  afterFlags: PatientFlag[]
+): PatientFlagType[] {
+  const after = new Set(afterFlags.map((flag) => getPatientFlagType(flag)));
+  return beforeFlags.map((flag) => getPatientFlagType(flag)).filter((flagType) => !after.has(flagType));
+}
+
 function buildJourneyEvent(
   patient: Patient,
   targetState: PatientState,
   options: MovePatientOptions
 ): JourneyEvent {
-  const timestamp = new Date().toISOString();
+  const timestamp = options.timestamp || new Date().toISOString();
 
   return {
     id: `journey-${patient.id}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -133,33 +193,28 @@ export function movePatientToState(
   const patient = store.patients.find((candidate) => candidate.id === patientId);
 
   if (!patient) {
-    return {
-      ok: false,
-      reason: `Patient ${patientId} was not found.`,
-    };
+    throw new PatientJourneyTransitionError(`Patient ${patientId} was not found.`, {
+      patientId,
+      toState: targetState,
+    });
   }
 
-  if (patient.state === targetState) {
-    return {
-      ok: false,
-      reason: `${patientName(patient)} is already in ${targetState}.`,
-    };
-  }
+  assertLegalTransition(patient, targetState);
 
-  if (!isLegalTransition(patient.state, targetState)) {
-    const nextStates = getNextStates(patient.state);
-    const nextStateLabel = nextStates.length ? nextStates.join(', ') : 'no further states';
-    return {
-      ok: false,
-      reason: `Illegal transition from ${patient.state} to ${targetState}. Valid next state(s): ${nextStateLabel}.`,
-    };
-  }
+  const nextFlags = removeStaleFlags(patient, targetState);
+  const timelineEvent = buildJourneyEvent(patient, targetState, options);
 
-  store.updatePatient(patientId, {
-    state: targetState,
-    flags: removeStaleFlags(patient, targetState),
-    timeline: [...patient.timeline, buildJourneyEvent(patient, targetState, options)],
-  });
+  if (targetState === PatientState.Discharge) {
+    store.dischargePatient(patientId, {
+      flags: nextFlags,
+      timelineEvent,
+    });
+  } else {
+    store.movePatientToState(patientId, targetState, {
+      flags: nextFlags,
+      timelineEvent,
+    });
+  }
   useEmergencyStore.getState().updateCapacity();
 
   return {
@@ -167,5 +222,17 @@ export function movePatientToState(
     patientId,
     from: patient.state,
     to: targetState,
+    timelineEvent,
+    removedFlags: removedFlagTypes(patient.flags, nextFlags),
   };
 }
+
+export const PatientJourneyEngine = Object.freeze({
+  validTransitions: VALID_TRANSITIONS,
+  getNextStates,
+  isLegalTransition,
+  assertLegalTransition,
+  movePatientToState,
+});
+
+export default PatientJourneyEngine;

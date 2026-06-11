@@ -57,7 +57,6 @@ describe('compact UX/UI flattening contracts', () => {
       read('pages/CommandDashboard.css'),
       read('pages/tools/ToolsOverview.css'),
       read('pages/tools/Calculators.css'),
-      read('pages/Dashboard.css'),
       read('pages/MedicalIotDashboard.css'),
       read('pages/LiveTrackingMap.css'),
       read('pages/HospitalMapDashboard.css'),

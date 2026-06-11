@@ -24,13 +24,16 @@ describe('ReferralHub', () => {
       'Psychiatry',
       'Internal Medicine',
       'Surgery',
+      'ICU',
+      'Radiology',
+      'Other',
     ]);
   });
 
   it('groups referrals by department queue', () => {
     const queues = getDepartmentQueues();
 
-    expect(queues).toHaveLength(5);
+    expect(queues).toHaveLength(8);
     expect(queues.find((queue) => queue.department === 'Cardiology')).toEqual(
       expect.objectContaining({
         count: 2,
@@ -48,8 +51,8 @@ describe('ReferralHub', () => {
 
     expect(metrics).toEqual(
       expect.objectContaining({
-        total: 6,
-        active: 5,
+        total: 8,
+        active: 7,
         delayed: delays.length,
         accepted: 1,
         closed: 1,

@@ -295,12 +295,12 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
     duplicates: [
       {
         name: 'Home vs assistant',
-        instances: ['CommandDashboard (/dashboard)', 'Dashboard (/assistant)'],
-        overlap: 2,
-        risk: 'Name collision; different purposes',
-        action: 'merge',
+        instances: ['CommandDashboard (/dashboard)', 'ChatInterface ED Copilot panel'],
+        overlap: 1,
+        risk: 'Resolved — former Dashboard.jsx assistant page was removed.',
+        action: 'legacy',
         recommendation:
-          'Rename Dashboard.jsx → AssistantPage.jsx; canonical home: CommandDashboard.',
+          'Keep /dashboard owned by CommandDashboard and /assistant as an ED Copilot alias into the shell.',
       },
       {
         name: 'Platform dashboard registry',
@@ -560,7 +560,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '1. **Routes** — Single path map in `routes.config.js`; stop duplicating in `TOOL_LAUNCH_PATHS`.',
     '2. **Inventories** — `toolInventory.js` is the SPA launch authority; `assetInventory.js` mounts it into product/pack/workspace/role metadata.',
     '3. **Workspace** — Merge three workspace models under API `enabledToolIds`; dedupe `LEGACY_TOOL_ID_ALIASES`.',
-    '4. **Dashboards** — Rename `Dashboard.jsx` → `AssistantPage.jsx`; keep `CommandDashboard` as home.',
+    '4. **Dashboards** — Keep `CommandDashboard` as home; ED Copilot owns assistant chat in the shell.',
     '5. **Executors** — Backend `tool-orchestrator.registry.ts` owns ids; frontend mirrors via contract tests only.',
     '6. **Pack routes** — One pack marketplace URL under organization settings.',
     '',
@@ -579,7 +579,7 @@ export function formatDuplicateSystemAuditMarkdown(report = buildDuplicateSystem
     '| Calculator hub | `src/data/calculatorHubManifest.js` | Calculators.jsx card arrays |',
     '| Calculator routes | `src/routes/clinicalToolRoutes.js` | App.jsx one-off paths |',
     '| Command home | `src/pages/CommandDashboard.jsx` + `commandDashboardModel.js` | platformOperatingSystem tiles |',
-    '| Assistant UI | `src/pages/Dashboard.jsx` (rename recommended) | — |',
+    '| Assistant UI | `src/components/ChatInterface.jsx` (ED Copilot panel) | Removed `Dashboard.jsx` assistant page |',
     '| Auth | `src/config/auth.config.js` + `routes.config.js` | Inline token keys |',
     '| API paths | `src/config/api.config.js` | Hard-coded `/api/...` strings |',
     '| Workspace (server) | `GET/POST /api/workspaces` | localStorage-only gating |',

@@ -89,10 +89,10 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
 
   return (
     <article className={`referral-row referral-row--${urgencyTone(referral.urgency)}`}>
-      <button type="button" className="referral-row__patient" onClick={() => onSelectPatient(patient?.id)}>
+      <div className="referral-row__patient">
         <strong>{patientName(patient)}</strong>
         <span>{patient?.mrn || 'MRN pending'}</span>
-      </button>
+      </div>
 
       <div className="referral-row__department">
         <strong>{referral.targetDepartment}</strong>
@@ -111,6 +111,12 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
       <span className={`referral-row__status referral-row__status--${referral.status.toLowerCase()}`}>
         {referral.status}
       </span>
+
+      <div className="referral-row__view">
+        <button type="button" onClick={() => onSelectPatient(patient?.id)}>
+          View
+        </button>
+      </div>
 
       <p className="referral-row__summary">{referral.clinicalSummary}</p>
 
@@ -314,12 +320,15 @@ export default function ReferralPanel() {
       <header className="referral-panel__header">
         <div>
           <span>Referral Intelligence</span>
-          <h1 id="referral-panel-title">Referral Panel</h1>
+          <h1 id="referral-panel-title">Referrals</h1>
         </div>
-        <button type="button" onClick={() => setFormOpen((open) => !open)}>
-          <FilePlus2 size={16} aria-hidden />
-          New Referral
-        </button>
+        <div className="referral-panel__header-actions">
+          <strong aria-label={`${metrics.active} active referrals`}>{metrics.active}</strong>
+          <button type="button" onClick={() => setFormOpen((open) => !open)}>
+            <FilePlus2 size={16} aria-hidden />
+            New Referral
+          </button>
+        </div>
       </header>
 
       <div className="referral-panel__metrics" aria-label="Referral metrics">

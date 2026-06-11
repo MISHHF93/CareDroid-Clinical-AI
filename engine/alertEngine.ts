@@ -19,8 +19,18 @@ export interface AlertEngineInputs {
   bottleneckAlert: BottleneckAlert | null;
 }
 
+export type AlertDispatchInput = Omit<Alert, 'id' | 'createdAt' | 'type' | 'severity'> &
+  Partial<Pick<Alert, 'id' | 'createdAt' | 'type' | 'severity'>>;
+
 const ACTIVE_EMS_STATUSES = new Set(['Inbound', 'Arrived', 'Handoff']);
-const REFERRAL_TERMINAL_STATUSES = new Set(['Accepted', 'Completed', 'Declined']);
+const REFERRAL_ACCEPTANCE_CLOSED_STATUSES = new Set(['Accepted', 'Completed', 'Declined']);
+const DEFAULT_TOAST_SECONDS: Record<AlertSeverity, number | undefined> = {
+  Info: 5,
+  Warning: 5,
+  Critical: undefined,
+};
+
+let alertDispatchHandler: ((alert: AlertDispatchInput) => Alert) | null = null;
 
 function hasPatientFlag(patient: Patient, flagType: string): boolean {
   return patient.flags.some((flag) => (typeof flag === 'string' ? flag : flag.type) === flagType);
@@ -53,6 +63,46 @@ function makeAlert(input: Omit<Alert, 'createdAt'>, now: Date): Alert {
     ...input,
     createdAt: now.toISOString(),
   };
+}
+
+function slug(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 48);
+}
+
+export function normalizeAlert(input: AlertDispatchInput, now = new Date()): Alert {
+  const severity = input.severity || 'Info';
+  const type = input.type || 'System';
+  return {
+    ...input,
+    id:
+      input.id ||
+      `alert-${slug(type)}-${slug(input.title || 'notification')}-${now.getTime()}-${Math.random()
+        .toString(36)
+        .slice(2, 7)}`,
+    type,
+    severity,
+    title: input.title,
+    message: input.message,
+    createdAt: input.createdAt || now.toISOString(),
+    autoDismissAfter: input.autoDismissAfter ?? DEFAULT_TOAST_SECONDS[severity],
+  };
+}
+
+export function registerAlertDispatcher(handler: (alert: AlertDispatchInput) => Alert): void {
+  alertDispatchHandler = handler;
+}
+
+export function dispatch(alert: AlertDispatchInput): Alert {
+  if (alertDispatchHandler) return alertDispatchHandler(alert);
+  return normalizeAlert(alert);
+}
+
+export function isDerivedAlertId(alertId: string): boolean {
+  return /^alert-(reassessment|capacity|ems|referral|queue|bottleneck)-/.test(alertId);
 }
 
 function deriveReassessmentAlerts(patients: Patient[], now: Date): Alert[] {
@@ -96,7 +146,7 @@ function deriveCapacityAlerts(capacity: CapacitySnapshot, now: Date): Alert[] {
         message: `${capacity.label}: score ${capacity.score}, occupancy ${capacity.currentOccupancy}/${capacity.maxCapacity}, boarding ${capacity.boardingCount}.`,
         actionLabel: 'Review Capacity',
         actionType: 'OPEN_CAPACITY',
-        autoDismissAfter: severity === 'Info' ? 30 : undefined,
+        autoDismissAfter: severity === 'Critical' ? undefined : 5,
       },
       now
     ),
@@ -130,7 +180,7 @@ function deriveReferralAlerts(referrals: Referral[], patients: Patient[], now: D
   referrals.forEach((referral) => {
     const elapsed = minutesSince(referral.requestedAt, now);
     const patientLabel = patientName(patientById.get(referral.patientId));
-    const isAwaitingAcceptance = !REFERRAL_TERMINAL_STATUSES.has(referral.status);
+    const isAwaitingAcceptance = !REFERRAL_ACCEPTANCE_CLOSED_STATUSES.has(referral.status);
 
     if (referral.status === 'Sent' && !referral.respondedAt && elapsed >= 15) {
       alerts.push(
@@ -142,8 +192,8 @@ function deriveReferralAlerts(referrals: Referral[], patients: Patient[], now: D
             title: 'Referral unacknowledged',
             message: `${patientLabel} to ${referral.targetDepartment} has not been acknowledged after ${elapsed}m.`,
             patientId: referral.patientId,
-            actionLabel: 'View Patient',
-            actionType: 'VIEW_PATIENT',
+            actionLabel: 'View Referral',
+            actionType: 'OPEN_REFERRALS',
           },
           now
         )
@@ -157,11 +207,11 @@ function deriveReferralAlerts(referrals: Referral[], patients: Patient[], now: D
             id: `alert-referral-urgent-${referral.id}`,
             type: 'Referral',
             severity: 'Warning',
-            title: 'Urgent referral not accepted',
+            title: 'Referral escalation required',
             message: `${patientLabel} to ${referral.targetDepartment} has waited ${elapsed}m without acceptance.`,
             patientId: referral.patientId,
-            actionLabel: 'View Patient',
-            actionType: 'VIEW_PATIENT',
+            actionLabel: 'View Referral',
+            actionType: 'OPEN_REFERRALS',
           },
           now
         )
@@ -178,8 +228,8 @@ function deriveReferralAlerts(referrals: Referral[], patients: Patient[], now: D
             title: 'Emergent referral not accepted',
             message: `${patientLabel} to ${referral.targetDepartment} has waited ${elapsed}m without acceptance.`,
             patientId: referral.patientId,
-            actionLabel: 'View Patient',
-            actionType: 'VIEW_PATIENT',
+            actionLabel: 'View Referral',
+            actionType: 'OPEN_REFERRALS',
           },
           now
         )

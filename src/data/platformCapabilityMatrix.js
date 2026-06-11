@@ -56,7 +56,7 @@ const FOUNDATION_CAPABILITIES = Object.freeze([
     aiLaunchAlias: 'ask caredroid',
     backendService: 'ChatService',
     apiEndpoint: 'POST /api/chat/message',
-    testCoverage: ['src/pages/Dashboard.chatLayout.test.jsx', 'src/utils/chatCapabilitySuggestions.test.js'],
+    testCoverage: ['src/components/ChatInterface.nlu.test.jsx', 'src/utils/chatCapabilitySuggestions.test.js'],
   },
   {
     id: 'hospital-map',

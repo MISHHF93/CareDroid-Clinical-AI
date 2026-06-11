@@ -108,61 +108,22 @@ function matchPatientTarget(target, patients = []) {
   );
 }
 
+function intentParams(detectedIntent) {
+  if (!detectedIntent) return {};
+  const { intent, ...params } = detectedIntent;
+  return params;
+}
+
 function detectEdCopilotIntent(message, patients = []) {
   const normalized = normalizeCommandText(message);
   const lower = normalized.toLowerCase();
 
-  if (/who\s+has\s+been\s+waiting\s+the\s+longest|longest\s+waiting/.test(lower)) {
+  if (/\bwaiting\s+longest\b|\blongest\s+waiting\b|\blongest\s+wait\b/.test(lower)) {
     return { intent: 'QUERY_LONGEST_WAIT' };
   }
 
-  const complaintMatch = lower.match(/^show\s+me\s+all\s+(.+?)\s+patients$/);
-  if (complaintMatch?.[1]) {
-    return {
-      intent: 'FILTER_BY_COMPLAINT',
-      value: complaintMatch[1].trim(),
-    };
-  }
-
-  if (/^(what'?s|what\s+is)\s+our\s+capacity$/.test(lower) || /^capacity\s+status$/.test(lower)) {
+  if (/\bcapacity\b/.test(lower)) {
     return { intent: 'QUERY_CAPACITY' };
-  }
-
-  const reassessmentMatch = normalized.match(/^flag\s+(.+?)\s+for\s+reassessment$/i);
-  if (reassessmentMatch?.[1]) {
-    const target = reassessmentMatch[1].trim();
-    const matchedPatient = matchPatientTarget(target, patients);
-    return {
-      intent: 'ACTION_FLAG_REASSESSMENT',
-      target,
-      ...(matchedPatient
-        ? {
-            patientId: matchedPatient.id,
-            patientName: patientDisplayName(matchedPatient),
-            patientLocation: matchedPatient.location,
-          }
-        : {}),
-    };
-  }
-
-  if (/^(what'?s|what\s+is)\s+the\s+ems\s+situation$/.test(lower)) {
-    return { intent: 'QUERY_EMS' };
-  }
-
-  if (/^ems\s+update$/.test(lower)) {
-    return { intent: 'QUERY_EMS' };
-  }
-
-  if (/^(any|are\s+there\s+any)\s+high[-\s]?risk\s+patients$/.test(lower)) {
-    return { intent: 'QUERY_HIGH_RISK' };
-  }
-
-  if (/^who\s+needs\s+attention$/.test(lower)) {
-    return { intent: 'QUERY_HIGH_RISK' };
-  }
-
-  if (/^reassessment\s+queue$/.test(lower)) {
-    return { intent: 'QUERY_REASSESSMENT_QUEUE' };
   }
 
   const calculatorMatch = normalized.match(/^run\s+(.+?)\s+for\s+(.+)$/i);
@@ -182,18 +143,76 @@ function detectEdCopilotIntent(message, patients = []) {
     };
   }
 
+  const reassessmentMatch = normalized.match(/^flag\s+(.+?)\s+for\s+reassessment$/i);
+  if (reassessmentMatch?.[1]) {
+    const target = reassessmentMatch[1].trim();
+    const matchedPatient = matchPatientTarget(target, patients);
+    return {
+      intent: 'ACTION_FLAG',
+      target,
+      flag: 'ReassessmentDue',
+      ...(matchedPatient
+        ? {
+            patientId: matchedPatient.id,
+            patientName: patientDisplayName(matchedPatient),
+            patientLocation: matchedPatient.location,
+          }
+        : {}),
+    };
+  }
+
+  if (/\b(ems|ambulance|ambulances)\b/.test(lower)) {
+    return { intent: 'QUERY_EMS' };
+  }
+
+  if (/\bhigh[-\s]?risk\b/.test(lower)) {
+    return { intent: 'QUERY_HIGH_RISK' };
+  }
+
+  if (/^who\s+needs\s+attention$/.test(lower)) {
+    return { intent: 'QUERY_HIGH_RISK' };
+  }
+
+  if (/^reassessment\s+queue$/.test(lower)) {
+    return { intent: 'QUERY_REASSESSMENT_QUEUE' };
+  }
+
+  const complaintMatch = normalized.match(/^show(?:\s+me)?(?:\s+all)?\s+(.+?)(?:\s+patients?)?$/i);
+  if (complaintMatch?.[1]) {
+    const complaint = complaintMatch[1].trim();
+    return {
+      intent: 'FILTER_COMPLAINT',
+      complaint,
+      value: complaint,
+    };
+  }
+
   return null;
+}
+
+function normalizeCalculatorCommandId(value) {
+  const normalized = String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+score$/i, '')
+    .replace(/[^a-z0-9]+/g, '');
+  if (['heart', 'heartscore'].includes(normalized)) return 'heart';
+  if (['qsofa', 'quicksofa'].includes(normalized)) return 'qsofa';
+  if (['nihss', 'stroke'].includes(normalized)) return 'nihss';
+  return normalized;
 }
 
 function formatStructuredIntentBlock(detectedIntent) {
   if (!detectedIntent) return null;
+  const params = intentParams(detectedIntent);
   return [
-    'Detected structured command intent:',
-    JSON.stringify(detectedIntent, null, 2),
-    ...(detectedIntent.intent === 'ACTION_FLAG_REASSESSMENT'
+    `User intent detected: ${detectedIntent.intent}.`,
+    `Intent params: ${JSON.stringify(params)}.`,
+    'Respond accordingly and if action suggested, include JSON: {"action":"...","params":{...}}',
+    ...(detectedIntent.intent === 'ACTION_FLAG'
       ? [
-          'For this ACTION intent, answer briefly and include a standalone JSON action suggestion exactly like:',
-          '{"action":"FLAG_PATIENT","patientId":"...","flag":"ReassessmentDue"}',
+          'For reassessment flag actions, answer briefly and include a standalone JSON action suggestion exactly like:',
+          '{"action":"FLAG_PATIENT","params":{"patientId":"...","patientName":"...","flag":"ReassessmentDue","reason":"ED Copilot suggested reassessment review"}}',
           'If the patient cannot be resolved confidently, ask the clinician to clarify instead of inventing a patientId.',
         ]
       : []),
@@ -228,41 +247,36 @@ function buildRequestedEdCopilotSystemPrompt({
   emsPressure,
   referrals,
   detectedIntent,
-  staffRebalanceSuggestion,
 }) {
   const activePatients = patients.filter(isActivePatient);
   const highRiskCount = activePatients.filter(isHighRiskPatient).length;
+  const bottleneck = bottleneckAlert?.queue || bottleneckAlert?.reason || 'None';
 
   return [
-    'You are the ED Copilot for an Emergency Department OS. You assist clinical staff in a high-pressure ED with ~100 patients/day and a team of under 10.',
+    'You are the ED Copilot for a busy Emergency Department.',
+    'You assist clinical staff — never make autonomous clinical decisions. Always surface for human review.',
+    'Be concise. Staff are under pressure.',
     '',
     'Current department snapshot:',
-    `- Active patients: ${activePatients.length}`,
-    `- Capacity score: ${capacity.score} (${capacity.label})`,
-    `- High-risk patients: ${highRiskCount}`,
-    `- Reassessment queue: ${reassessmentCount} patients due`,
-    `- EMS pressure: ${emsPressure.score} (${emsPressure.band.label})`,
-    `- Bottleneck detected: ${bottleneckAlert?.queue || 'None'}`,
-    `- Active referrals: ${activeReferralCount(referrals)} pending`,
-    `- Staff balance: ${staffRebalanceSuggestion?.message || 'No imbalance detected'}`,
+    `Active patients: ${activePatients.length}`,
+    `Capacity: ${capacity.score} (${capacity.label})`,
+    `High risk: ${highRiskCount}`,
+    `Reassessment queue: ${reassessmentCount}`,
+    `EMS pressure: ${emsPressure.score}`,
+    `Active referrals: ${activeReferralCount(referrals)}`,
+    `Bottleneck: ${bottleneck || 'None'}`,
     '',
-    'Patient list (brief):',
+    'Patients:',
     formatBriefPatientList(activePatients),
     '',
-    'Rules you must always follow:',
-    '1. Never make autonomous clinical decisions',
-    '2. Always surface information for human review',
-    '3. Be concise — staff are busy',
-    '4. Prioritize P1/P2 patients in all recommendations',
-    '5. If you suggest an action, always frame as a suggestion',
+    'Priorities: P1 first. Flag deteriorating patients.',
+    'Never recommend autonomous actions.',
     ...(detectedIntent ? ['', formatStructuredIntentBlock(detectedIntent)] : []),
   ].join('\n');
 }
 
 function buildEdCopilotSystemPrompt(args) {
-  const { emsPressure } = args;
-  const emsPressureContext = buildEMSPressureCopilotContext(emsPressure);
-  return `${buildRequestedEdCopilotSystemPrompt(args)}\n\nOperational UI context: Understand ED commands and include whiteboardAction only for UI filtering, human-review flags, or calculator launch requests like { type: "openCalculator", calculatorId: "heart" | "qsofa" | "nihss", patientId?: string }. Never suggest autonomous clinical decisions. ${emsPressureContext || ''}`;
+  return buildRequestedEdCopilotSystemPrompt(args);
 }
 
 function normalizeHistoryMessage(message) {
@@ -326,14 +340,16 @@ function extractJsonObjects(content) {
 
 function normalizeCopilotActionSuggestion(action) {
   if (!action || typeof action !== 'object') return null;
-  if (action.action !== 'FLAG_PATIENT') return null;
+  if (!['FLAG_PATIENT', 'ACTION_FLAG', 'FLAG_REASSESSMENT'].includes(action.action)) return null;
+
+  const params = action.params && typeof action.params === 'object' ? action.params : action;
 
   return {
     action: 'FLAG_PATIENT',
-    patientId: action.patientId || action.target || '',
-    patientName: action.patientName || '',
-    flag: action.flag || 'ReassessmentDue',
-    reason: action.reason || action.flag || 'ED Copilot suggested reassessment review',
+    patientId: params.patientId || params.target || '',
+    patientName: params.patientName || params.name || '',
+    flag: params.flag || 'ReassessmentDue',
+    reason: params.reason || params.flag || 'ED Copilot suggested reassessment review',
   };
 }
 
@@ -426,13 +442,14 @@ const COMMAND_PALETTE_OPTIONS = [
 
 function CopilotActionCard({ action, status, onApply, onDismiss }) {
   if (!action) return null;
+  if (status === 'dismissed') return null;
 
   const target = action.patientName || action.patientId || 'matched patient';
 
   return (
     <div className="chat-interface__action-card">
       <div>
-        <strong>Apply this action?</strong>
+        <strong>⚡ Suggested Action</strong>
         <p>
           Flag {target} for reassessment
           {action.flag ? ` (${action.flag})` : ''}.
@@ -446,10 +463,10 @@ function CopilotActionCard({ action, status, onApply, onDismiss }) {
         ) : (
           <>
             <button type="button" className="btn-primary" onClick={onApply}>
-              Yes
+              Apply
             </button>
             <button type="button" className="btn-secondary" onClick={onDismiss}>
-              No
+              Dismiss
             </button>
           </>
         )}
@@ -775,6 +792,17 @@ const ChatInterface = ({
       onAppendMessage?.(conversationId, assistantMessage);
       if (assistantMessage.metadata?.whiteboardAction?.type !== 'flagReassessment') {
         applyWhiteboardAction(assistantMessage.metadata?.whiteboardAction);
+      }
+      if (
+        detectedCommandIntent?.intent === 'LAUNCH_CALCULATOR' &&
+        detectedCommandIntent.patientId &&
+        !assistantMessage.metadata?.whiteboardAction
+      ) {
+        applyWhiteboardAction({
+          type: 'openCalculator',
+          calculatorId: normalizeCalculatorCommandId(detectedCommandIntent.score),
+          patientId: detectedCommandIntent.patientId,
+        });
       }
     } catch {
       onAppendMessage?.(conversationId, {

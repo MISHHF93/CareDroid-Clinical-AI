@@ -21,7 +21,7 @@ export const SIDEBAR_WIDTH_COLLAPSED_PX = 58;
 /** Split calculator / lab / diagnosis forms — two columns from this width up */
 export const SPLIT_FORM_MEDIA_QUERY = '(min-width: 1024px)';
 
-/** Match Dashboard.css narrow tweaks at 600px */
+/** Match narrow content tweaks at 600px */
 export const NARROW_MEDIA_QUERY = '(max-width: 600px)';
 
 /** Must match `--app-compact-chrome-height` in layout-breakpoints.css / AppShell.css */

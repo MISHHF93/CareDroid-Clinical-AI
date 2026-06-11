@@ -32,10 +32,10 @@ describe('mobile performance — startup deferral', () => {
 });
 
 describe('mobile performance — routing & bundles', () => {
-  it('lazy-loads AssistantPage for smaller initial chunk', () => {
+  it('keeps the removed assistant page out of the initial chunk', () => {
     const app = read('src/App.jsx');
-    expect(app).toMatch(/const AssistantPage = lazyWithRetry\(\(\) => import\('\.\/pages\/Dashboard'\)\)/);
-    expect(app).not.toMatch(/import Dashboard from '\.\/pages\/Dashboard'/);
+    expect(app).not.toMatch(/pages\/Dashboard/);
+    expect(app).toContain('EmergencyCopilotRedirect');
   });
 
   it('vite manualChunks isolates calculators, catalog, dashboard, dexie, firebase', () => {
@@ -73,10 +73,10 @@ describe('mobile performance — CLS & images', () => {
 });
 
 describe('mobile performance — render & interaction', () => {
-  it('memoizes ToolCard and defers dashboard recommendations', () => {
+  it('memoizes ToolCard and removes the duplicate assistant dashboard page', () => {
     expect(read('src/components/ToolCard.jsx')).toContain('React.memo');
-    const dash = read('src/pages/Dashboard.jsx');
-    expect(dash).toContain('scheduleIdleWork');
+    const app = read('src/App.jsx');
+    expect(app).not.toContain("import Dashboard from './pages/Dashboard'");
   });
 
   it('documents audit in docs/mobile-performance-audit.md', () => {

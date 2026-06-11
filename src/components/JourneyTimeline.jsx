@@ -64,6 +64,10 @@ function priorityClass(priority) {
   return 'journey-timeline--p5';
 }
 
+function transitionErrorMessage(error) {
+  return error instanceof Error ? error.message : 'Unable to move patient state.';
+}
+
 export default function JourneyTimeline({ patient, staffId, onTransitionError }) {
   const [pendingState, setPendingState] = useState(null);
   const currentIndex = STATE_FLOW.indexOf(patient.state);
@@ -90,12 +94,16 @@ export default function JourneyTimeline({ patient, staffId, onTransitionError })
 
   const confirmMove = () => {
     if (!pendingState) return;
-    const result = movePatientToState(patient.id, pendingState, {
-      staffId,
-      note: `Moved from JourneyTimeline confirmation to ${pendingState}.`,
-    });
-    onTransitionError?.(result.ok ? '' : result.reason);
-    if (result.ok) setPendingState(null);
+    try {
+      movePatientToState(patient.id, pendingState, {
+        staffId,
+        note: `Moved from JourneyTimeline confirmation to ${pendingState}.`,
+      });
+      onTransitionError?.('');
+      setPendingState(null);
+    } catch (error) {
+      onTransitionError?.(transitionErrorMessage(error));
+    }
   };
 
   return (

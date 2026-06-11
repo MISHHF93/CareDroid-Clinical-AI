@@ -11,7 +11,6 @@ const appShellCss = readFileSync(join(srcRoot, 'layout/AppShell.css'), 'utf8');
 const authShellCss = readFileSync(join(srcRoot, 'layout/AuthShell.css'), 'utf8');
 const commandDashboardCss = readFileSync(join(srcRoot, 'pages/CommandDashboard.css'), 'utf8');
 const medicalIotCss = readFileSync(join(srcRoot, 'pages/MedicalIotDashboard.css'), 'utf8');
-const dashboardCss = readFileSync(join(srcRoot, 'pages/Dashboard.css'), 'utf8');
 const chartCss = readFileSync(join(srcRoot, 'components/dashboard/DashboardVisualizations.css'), 'utf8');
 const toolsOverviewCss = readFileSync(join(srcRoot, 'pages/tools/ToolsOverview.css'), 'utf8');
 const toolPageLayoutCss = readFileSync(join(srcRoot, 'pages/tools/ToolPageLayout.css'), 'utf8');
@@ -69,7 +68,6 @@ describe('theme color system revamp', () => {
       authShellCss,
       commandDashboardCss,
       medicalIotCss,
-      dashboardCss,
       chartCss,
       toolsOverviewCss,
     ].join('\n');

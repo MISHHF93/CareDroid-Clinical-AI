@@ -37,7 +37,7 @@ export const PROTOCOL_SUGGESTIONS_BY_COMPLAINT = {
       summary: 'Guide structured dyspnoea assessment and respiratory handoff context.',
     },
   ],
-  'Stroke/Neurological': [
+  Stroke: [
     {
       id: 'nihss',
       label: 'NIHSS',
@@ -52,7 +52,7 @@ export const PROTOCOL_SUGGESTIONS_BY_COMPLAINT = {
       summary: 'Surface last-known-well, imaging readiness, and neurology workflow reminders.',
     },
   ],
-  'Sepsis/Infection': [
+  Sepsis: [
     {
       id: 'qsofa',
       label: 'qSOFA',
@@ -89,7 +89,7 @@ export const PROTOCOL_SUGGESTIONS_BY_COMPLAINT = {
       summary: 'Guide abdominal pain workflow context and escalation cues.',
     },
   ],
-  'Trauma/Injury': [
+  Trauma: [
     {
       id: 'trauma-protocol',
       label: 'Trauma Protocol',
@@ -115,14 +115,16 @@ export const PROTOCOL_SUGGESTIONS_BY_COMPLAINT = {
 
 const COMPLAINT_ALIAS = {
   Respiratory: 'Shortness of Breath',
-  'Infectious Respiratory': 'Sepsis/Infection',
-  Infectious: 'Sepsis/Infection',
-  Neurologic: 'Stroke/Neurological',
-  Neuro: 'Stroke/Neurological',
-  Orthopedic: 'Trauma/Injury',
-  Musculoskeletal: 'Trauma/Injury',
-  Trauma: 'Trauma/Injury',
-  Headache: 'Stroke/Neurological',
+  'Infectious Respiratory': 'Sepsis',
+  Infectious: 'Sepsis',
+  'Sepsis/Infection': 'Sepsis',
+  Neurologic: 'Stroke',
+  Neuro: 'Stroke',
+  'Stroke/Neurological': 'Stroke',
+  Orthopedic: 'Trauma',
+  Musculoskeletal: 'Trauma',
+  'Trauma/Injury': 'Trauma',
+  Headache: 'Stroke',
 };
 
 export function normalizeComplaintCategory(complaintCategory) {
@@ -219,7 +221,7 @@ export default function ProtocolSuggestion({
         aria-label="Protocol suggestions"
       >
         <div>
-          <strong>Suggested for {normalizedComplaint}:</strong>
+          <strong>Suggest: {suggestions.map((suggestion) => suggestion.label).join(' + ')}</strong>
           <span aria-hidden>Launch?</span>
         </div>
         <div className="protocol-suggestion__chips">
