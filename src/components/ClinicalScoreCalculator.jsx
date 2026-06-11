@@ -160,21 +160,25 @@ function interpretScore(calculatorId, total) {
   };
 }
 
-export function createClinicalScoreEvent(patientId, score, timestamp) {
+export function createClinicalScoreEvent(patientId, score, timestamp, staffId = null) {
   return {
     id: `score-${patientId}-${score.calculatorId}-${Date.now()}-${Math.random()
       .toString(36)
       .slice(2, 7)}`,
     patientId,
-    type: 'ClinicalScoreSaved',
+    type: 'SCORE',
     timestamp,
+    staffId,
     summary: `Saved ${score.label}: ${score.total} (${score.interpretation}).`,
     metadata: {
       scoreId: score.calculatorId,
       scoreLabel: score.label,
       scoreTotal: score.total,
+      result: score.total,
+      band: score.interpretation,
       interpretation: score.interpretation,
       recommendation: score.recommendation,
+      staffId,
     },
   };
 }

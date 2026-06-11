@@ -18,6 +18,7 @@ import {
   fetchCurrentSubscription,
   fetchSubscriptionPlans,
 } from '../services/subscriptionApi';
+import { fetchMyAuditLogs } from '../services/auditApi';
 import './Settings.css';
 
 const DATA_DELETE_CONFIRMATION = 'DELETE MY DATA';
@@ -63,6 +64,11 @@ const Settings = () => {
   const [identityStatus, setIdentityStatus] = useState('');
   const [tenantIsolationAudit, setTenantIsolationAudit] = useState(null);
   const [tenantIsolationStatus, setTenantIsolationStatus] = useState('');
+  const [auditLogState, setAuditLogState] = useState({
+    status: 'loading',
+    message: '',
+    logs: [],
+  });
   const { preference, resolvedTheme, setPreference } = useTheme();
   const { user, authToken, isAuthenticated, isLoading: authLoading, hasPermission } = useUser();
   const { success, error } = useNotificationActions();
@@ -132,6 +138,26 @@ const Settings = () => {
       cancelled = true;
     };
   }, [authLoading, canLoadBilling]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setAuditLogState((current) => ({ ...current, status: 'loading', message: '' }));
+    fetchMyAuditLogs(20).then((result) => {
+      if (cancelled) return;
+      if (result.ok) {
+        setAuditLogState({ status: 'ready', message: '', logs: result.logs || [] });
+      } else {
+        setAuditLogState({
+          status: 'error',
+          message: result.message || 'Unable to load audit log.',
+          logs: [],
+        });
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -453,6 +479,43 @@ const Settings = () => {
                 Request data deletion
               </Button>
             </div>
+          </section>
+
+          <section className="settings-billing-card" aria-labelledby="settings-audit-log-title">
+            <div className="settings-billing-card__header">
+              <div>
+                <h3 id="settings-audit-log-title">Audit Log</h3>
+                <p>
+                  Last 20 current-user audit events from the protected backend audit trail,
+                  including Emergency OS sync events when available.
+                </p>
+              </div>
+              <span className="settings-billing-card__badge">Audit</span>
+            </div>
+
+            {auditLogState.status === 'loading' ? (
+              <div className="settings-billing-empty">Loading audit events...</div>
+            ) : auditLogState.status === 'error' ? (
+              <div className="settings-billing-empty">{auditLogState.message}</div>
+            ) : auditLogState.logs.length ? (
+              <div className="settings-audit-log-list">
+                {auditLogState.logs.slice(0, 20).map((log) => (
+                  <article key={log.id || `${log.action}-${log.timestamp}`} className="settings-audit-log-item">
+                    <div>
+                      <strong>{log.action || 'audit_event'}</strong>
+                      <span>{log.resource || 'No resource recorded'}</span>
+                    </div>
+                    <time dateTime={log.timestamp || log.createdAt}>
+                      {log.timestamp || log.createdAt
+                        ? new Date(log.timestamp || log.createdAt).toLocaleString()
+                        : 'No timestamp'}
+                    </time>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="settings-billing-empty">No audit events returned by the backend.</div>
+            )}
           </section>
 
           <section className="settings-billing-card" aria-labelledby="enterprise-identity-title">

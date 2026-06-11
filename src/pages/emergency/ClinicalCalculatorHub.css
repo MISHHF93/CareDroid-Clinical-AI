@@ -1,0 +1,274 @@
+.clinical-calculator-hub {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: var(--app-page-padding, 24px);
+  box-sizing: border-box;
+}
+
+.clinical-calculator-hub__header,
+.clinical-calculator-hub__patient-bar,
+.clinical-calculator-hub__workspace {
+  background: var(--app-surface-1);
+  border: 1px solid var(--app-panel-border);
+  border-radius: var(--compact-panel-radius, 18px);
+  box-shadow: var(--compact-shadow, none);
+}
+
+.clinical-calculator-hub__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 420px);
+  gap: 16px;
+  align-items: end;
+  padding: 22px;
+}
+
+.clinical-calculator-hub__eyebrow,
+.clinical-calculator-hub__patient-bar span,
+.clinical-calculator-shell__header span {
+  display: block;
+  color: var(--app-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.clinical-calculator-hub__header h1,
+.clinical-calculator-shell__header h2 {
+  margin: 4px 0;
+  color: var(--app-text-primary);
+  line-height: 1.1;
+}
+
+.clinical-calculator-hub__header p,
+.clinical-calculator-shell__header p,
+.clinical-calculator-hub__patient-bar small,
+.clinical-calculator-shell__context p {
+  margin: 0;
+  color: var(--app-text-secondary);
+}
+
+.clinical-calculator-hub__search {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--app-text-secondary);
+}
+
+.clinical-calculator-hub__search input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 12px;
+  background: var(--app-surface);
+  color: var(--app-text-primary);
+  padding: 0 14px;
+  box-sizing: border-box;
+}
+
+.clinical-calculator-hub__tabs {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.clinical-calculator-hub__tabs button,
+.clinical-calculator-card button,
+.clinical-calculator-shell__header button {
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  background: var(--app-surface-1);
+  color: var(--app-text-primary);
+  cursor: pointer;
+  font: inherit;
+}
+
+.clinical-calculator-hub__tabs button {
+  flex: 0 0 auto;
+  padding: 9px 14px;
+  font-weight: 700;
+}
+
+.clinical-calculator-hub__tabs button.is-active {
+  border-color: var(--app-accent-interactive, var(--accent-1));
+  background: color-mix(in srgb, var(--app-accent-interactive, var(--accent-1)) 14%, var(--app-surface-1));
+}
+
+.clinical-calculator-hub__patient-bar {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+  gap: 18px;
+  align-items: center;
+  padding: 16px 18px;
+}
+
+.clinical-calculator-hub__patient-bar strong {
+  color: var(--app-text-primary);
+}
+
+.clinical-calculator-hub__vitals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.clinical-calculator-hub__vitals span,
+.clinical-calculator-card__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  background: var(--app-surface);
+  color: var(--app-text-secondary);
+  padding: 6px 9px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.clinical-calculator-hub__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+}
+
+.clinical-calculator-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 16px;
+  background: var(--app-surface-1);
+}
+
+.clinical-calculator-card.is-active {
+  border-color: var(--app-accent-interactive, var(--accent-1));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-accent-interactive, var(--accent-1)) 18%, transparent);
+}
+
+.clinical-calculator-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+}
+
+.clinical-calculator-card__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  color: var(--app-text-primary);
+}
+
+.clinical-calculator-card strong {
+  color: var(--app-text-primary);
+  line-height: 1.25;
+}
+
+.clinical-calculator-card p {
+  flex: 1 1 auto;
+  margin: 0;
+  color: var(--app-text-secondary);
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.clinical-calculator-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.clinical-calculator-card button {
+  align-self: flex-start;
+  padding: 8px 14px;
+  font-weight: 700;
+}
+
+.clinical-calculator-hub__workspace {
+  padding: 18px;
+}
+
+.clinical-calculator-shell__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.clinical-calculator-shell__header button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 8px 14px;
+  font-weight: 700;
+}
+
+.clinical-calculator-shell__save:not(:disabled) {
+  border-color: var(--app-accent-interactive, var(--accent-1));
+  background: var(--app-accent-interactive, var(--accent-1));
+  color: var(--app-accent-on-action, #fff);
+}
+
+.clinical-calculator-shell__header button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.clinical-calculator-shell__context,
+.clinical-calculator-shell__saved,
+.clinical-calculator-hub__select,
+.clinical-calculator-hub__empty {
+  border: 1px solid var(--app-panel-border);
+  border-radius: 14px;
+  background: var(--app-surface);
+  padding: 12px 14px;
+}
+
+.clinical-calculator-shell__context,
+.clinical-calculator-shell__saved {
+  margin-bottom: 14px;
+}
+
+.clinical-calculator-shell__saved {
+  color: var(--success, #0f766e);
+  font-weight: 700;
+}
+
+.clinical-calculator-hub__select,
+.clinical-calculator-hub__empty {
+  text-align: center;
+  color: var(--app-text-secondary);
+}
+
+.clinical-calculator-hub__select h2 {
+  margin: 8px 0 4px;
+  color: var(--app-text-primary);
+}
+
+@media (max-width: 860px) {
+  .clinical-calculator-hub__header,
+  .clinical-calculator-hub__patient-bar,
+  .clinical-calculator-shell__header {
+    grid-template-columns: 1fr;
+  }
+
+  .clinical-calculator-hub__vitals {
+    justify-content: flex-start;
+  }
+
+  .clinical-calculator-shell__header button {
+    justify-self: start;
+  }
+}

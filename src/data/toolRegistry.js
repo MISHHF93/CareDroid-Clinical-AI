@@ -2152,19 +2152,19 @@ const toolRegistry = [
   },
   {
     id: 'pediatric-dose-safety-checker',
-    name: 'Pediatric Dose Safety Checker',
+    name: 'Pediatric Emergency Drug Calculator',
     path: '/tools/calculators/pediatric-dose-safety-checker',
     panelTool: 'calculators',
     initialCalc: 'pediatric-dose-safety-checker',
     color: '#B45309',
     description:
-      'Placeholder-only pediatric medication safety checklist; no patient-specific dose calculation',
+      'Pediatric ED emergency drug quick-reference with weight or age-estimated dosing table and verification prompts',
     category: 'Calculator',
-    features: ['Weight/unit verification', 'Governed-protocol gate', 'No mg/kg dosing output'],
+    features: ['Weight/age estimate', 'Emergency drug dose table', 'Independent verification prompts'],
     useCases: [
-      'Pediatric medication safety review',
-      'Pharmacy consult prep',
-      'Protocol-governance checks',
+      'Pediatric resuscitation reference',
+      'Broselow-style fallback when measured weight unavailable',
+      'High-alert medication double-check',
     ],
   },
   {

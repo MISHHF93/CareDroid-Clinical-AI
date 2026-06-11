@@ -98,6 +98,7 @@ const NAV_ICONS = {
   automation: Zap,
   assistant: Bot,
   tools: Wrench,
+  'clinical-tools': Stethoscope,
   calculators: Calculator,
   'digital-twin': Activity,
   'live-map': Route,

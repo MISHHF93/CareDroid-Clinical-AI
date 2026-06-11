@@ -1,0 +1,125 @@
+.emergency-analytics {
+  display: grid;
+  gap: var(--space-4);
+  min-height: 100%;
+  padding: var(--space-4);
+  overflow-y: auto;
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.emergency-analytics__header,
+.emergency-analytics__card {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-xl);
+  background: var(--color-surface);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+}
+
+.emergency-analytics__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-4);
+}
+
+.emergency-analytics__header span,
+.emergency-analytics__card header span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.emergency-analytics__header h1 {
+  margin: var(--space-1) 0;
+  font-size: var(--font-size-2xl);
+}
+
+.emergency-analytics__header p,
+.emergency-analytics__card header small {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.emergency-analytics__header strong {
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-info) 14%, transparent);
+  color: var(--status-info);
+  padding: 5px 10px;
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+}
+
+.emergency-analytics__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
+.emergency-analytics__card {
+  display: grid;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-4);
+}
+
+.emergency-analytics__card header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.emergency-analytics__heatmap {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.emergency-analytics__heatmap span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  border-radius: var(--radius-md);
+  background: color-mix(
+    in srgb,
+    var(--status-info) calc((var(--heat, 0) * 70%) + 8%),
+    var(--color-elevated)
+  );
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+}
+
+.emergency-analytics__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.emergency-analytics__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+}
+
+.emergency-analytics__legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+}
+
+@media (max-width: 980px) {
+  .emergency-analytics__grid {
+    grid-template-columns: 1fr;
+  }
+}

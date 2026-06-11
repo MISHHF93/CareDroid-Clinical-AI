@@ -1518,3 +1518,55 @@ ul.calc-breakdown-list .calc-breakdown-item {
     font-size: 0.8125rem;
   }
 }
+
+.pediatric-drug-reference-table {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.pediatric-drug-reference-table__header,
+.pediatric-drug-reference-table__row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.15fr) minmax(120px, 1fr) minmax(90px, 0.85fr) minmax(62px, 0.45fr);
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 10px;
+  background: var(--app-surface);
+  font-size: 0.8rem;
+}
+
+.pediatric-drug-reference-table__header {
+  color: var(--app-text-secondary);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.pediatric-drug-reference-table__row {
+  border-left-width: 4px;
+}
+
+.pediatric-drug-reference-table__row strong,
+.pediatric-drug-reference-table__row small {
+  display: block;
+}
+
+.pediatric-drug-reference-table__row small {
+  color: var(--app-text-secondary);
+  margin-top: 2px;
+}
+
+.pediatric-drug-reference-table__row--critical {
+  border-left-color: var(--danger);
+}
+
+.pediatric-drug-reference-table__row--high {
+  border-left-color: var(--warning);
+}
+
+.pediatric-drug-reference-table__row--moderate {
+  border-left-color: var(--info, var(--status-info, #38bdf8));
+}

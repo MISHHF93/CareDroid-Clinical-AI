@@ -25,6 +25,13 @@
   padding: var(--space-4);
 }
 
+.shift-summary__header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
 .shift-summary__header span,
 .shift-summary__section-heading span,
 .shift-summary__modal header span {
@@ -43,6 +50,7 @@
 }
 
 .shift-summary__header p,
+.shift-summary__source,
 .shift-summary__inline-note,
 .shift-summary__event-list span,
 .shift-summary__protocols span {
@@ -123,6 +131,29 @@
   color: var(--color-text-primary);
   font-family: var(--font-mono);
   font-size: var(--font-size-xl);
+}
+
+.shift-summary__trend {
+  justify-self: start;
+  border-radius: var(--radius-pill);
+  padding: 2px 7px;
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+}
+
+.shift-summary__trend--up {
+  background: color-mix(in srgb, var(--status-warning) 14%, transparent);
+  color: var(--status-warning);
+}
+
+.shift-summary__trend--down {
+  background: color-mix(in srgb, var(--status-stable) 14%, transparent);
+  color: var(--status-stable);
+}
+
+.shift-summary__trend--flat {
+  background: color-mix(in srgb, var(--status-info) 12%, transparent);
+  color: var(--status-info);
 }
 
 .shift-summary__queue-grid {

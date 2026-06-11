@@ -126,7 +126,7 @@ const ProfileToolPreferences = lazyWithRetry(
 );
 const ProfileWorkspaces = lazyWithRetry(() => import('./pages/profile/ProfileWorkspaces'));
 const ProfileSecurity = lazyWithRetry(() => import('./pages/profile/ProfileSecurity'));
-const Settings = lazyWithRetry(() => import('./pages/Settings'));
+const EmergencySettings = lazyWithRetry(() => import('./pages/emergency/EmergencySettings'));
 const CustomerPortalPage = lazyWithRetry(
   () => import('./pages/customer-portal/CustomerPortalPage')
 );
@@ -301,6 +301,10 @@ const ClinicalAudit = lazyWithRetry(() => import('./pages/tools/ClinicalAudit'))
 const ToolsOverview = lazyWithRetry(() => import('./pages/tools/ToolsOverview'));
 const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
 const Calculators = lazyWithRetry(() => import('./pages/tools/Calculators'));
+const ClinicalCalculatorHub = lazyWithRetry(
+  () => import('./pages/emergency/ClinicalCalculatorHub')
+);
+const EmergencyAnalytics = lazyWithRetry(() => import('./pages/emergency/EmergencyAnalytics'));
 const DrugChecker = lazyWithRetry(() => import('./pages/tools/DrugChecker'));
 const LabInterpreter = lazyWithRetry(() => import('./pages/tools/LabInterpreter'));
 const Protocols = lazyWithRetry(() => import('./pages/tools/Protocols'));
@@ -567,7 +571,7 @@ function WorkspaceRouteRedirect() {
       referrals: '/emergency/referrals',
       capacity: '/emergency/capacity',
       boarding: '/emergency/capacity',
-      analytics: '/emergency/capacity',
+      analytics: '/emergency/analytics',
       'shift-summary': '/emergency/shift',
       shift: '/emergency/shift',
       'command-center': '/emergency',
@@ -775,6 +779,11 @@ function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/emergency/tools',
+      element: <ClinicalCalculatorHub />,
+      requiresAuth: true,
+    },
+    {
       path: '/emergency/whiteboard',
       element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
@@ -791,7 +800,7 @@ function AppRoutes() {
     },
     {
       path: '/emergency/analytics',
-      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
+      element: <EmergencyAnalytics />,
       requiresAuth: true,
     },
     {
@@ -806,7 +815,7 @@ function AppRoutes() {
     },
     {
       path: '/emergency/settings',
-      element: <FutureReleaseStub label="Emergency OS settings" />,
+      element: <EmergencySettings />,
       requiresAuth: true,
     },
     {
@@ -1585,7 +1594,7 @@ function AppRoutes() {
     },
     {
       path: '/settings',
-      element: <Settings />,
+      element: <EmergencySettings />,
       requiresAuth: true,
     },
     {

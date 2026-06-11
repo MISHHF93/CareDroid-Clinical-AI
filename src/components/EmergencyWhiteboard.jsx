@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Grid3X3, List, Plus } from 'lucide-react';
+import { Grid3X3, List, Plus, Search } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { getPatientFlagType, hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
 import PatientCard, { PatientDetailPanel } from './PatientCard';
@@ -64,7 +64,12 @@ function matchesFilter(patient, filterType) {
   if (filterType === 'Referral') return Boolean(patient.referral);
   if (filterType === 'Admission') return patient.state === PatientState.Admission;
   if (filterType === 'Discharge') return patient.state === PatientState.Discharge;
-  if (filterType === 'Reassessment') return hasPatientFlag(patient, 'ReassessmentDue');
+  if (filterType === 'Reassessment') {
+    return (
+      hasPatientFlag(patient, 'ReassessmentDue') ||
+      hasPatientFlag(patient, 'ScoreReassessmentRecommended')
+    );
+  }
   if (filterType === 'HighRisk') return isHighRisk(patient);
   if (filterType === 'EMS') return hasPatientFlag(patient, 'EMSArrival');
   if (filterType === 'Boarding') return hasPatientFlag(patient, 'PendingAdmission');
@@ -109,6 +114,10 @@ export default function EmergencyWhiteboard() {
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
+  const setWhiteboardSearchQuery = useEmergencyStore((state) => state.setWhiteboardSearchQuery);
+  const patientBackendSearch = useEmergencyStore((state) => state.patientBackendSearch);
+  const searchBackendPatients = useEmergencyStore((state) => state.searchBackendPatients);
+  const realtimeConnection = useEmergencyStore((state) => state.realtimeConnection);
   const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const addNote = useEmergencyStore((state) => state.addNote);
   const addFlag = useEmergencyStore((state) => state.addFlag);
@@ -129,6 +138,10 @@ export default function EmergencyWhiteboard() {
     () => patients.filter((patient) => ACTIVE_STATES.has(patient.state)),
     [patients]
   );
+  const backendMatchedPatientIds = useMemo(() => {
+    if (patientBackendSearch.query !== whiteboardSearchQuery.trim()) return new Set();
+    return new Set((patientBackendSearch.results || []).map((result) => result.patientId));
+  }, [patientBackendSearch.query, patientBackendSearch.results, whiteboardSearchQuery]);
 
   const filteredPatients = useMemo(() => {
     const basePatients = activePatients.filter((patient) =>
@@ -139,6 +152,7 @@ export default function EmergencyWhiteboard() {
       ? basePatients.filter((patient) => {
           const name = `${patient.firstName} ${patient.lastName}`.toLowerCase();
           return (
+            backendMatchedPatientIds.has(patient.id) ||
             name.includes(query) ||
             patient.mrn.toLowerCase().includes(query) ||
             patient.chiefComplaint.toLowerCase().includes(query) ||
@@ -152,7 +166,7 @@ export default function EmergencyWhiteboard() {
       if (p1Delta !== 0) return p1Delta;
       return waitMinutes(b.arrivalTime) - waitMinutes(a.arrivalTime);
     });
-  }, [activePatients, activeQueueFilter, whiteboardSearchQuery]);
+  }, [activePatients, activeQueueFilter, backendMatchedPatientIds, whiteboardSearchQuery]);
 
   const filterCounts = useMemo(
     () =>
@@ -233,6 +247,15 @@ export default function EmergencyWhiteboard() {
       setKeyboardPatientId(selectedPatientId || filteredPatients[0].id);
     }
   }, [filteredPatients, keyboardPatientId, selectedPatientId]);
+
+  useEffect(() => {
+    const query = whiteboardSearchQuery.trim();
+    if (query.length < 2) return;
+    const timer = window.setTimeout(() => {
+      void searchBackendPatients(query);
+    }, 260);
+    return () => window.clearTimeout(timer);
+  }, [searchBackendPatients, whiteboardSearchQuery]);
 
   useEffect(() => {
     const handleOpenIntake = () => setNewPatientOpen(true);
@@ -348,7 +371,7 @@ export default function EmergencyWhiteboard() {
     updatePatient(currentPatient.id, {
       timeline: [
         ...currentPatient.timeline,
-        createClinicalScoreEvent(currentPatient.id, score, timestamp),
+        createClinicalScoreEvent(currentPatient.id, score, timestamp, authorStaffId),
       ],
     });
     addNote(
@@ -370,8 +393,22 @@ export default function EmergencyWhiteboard() {
           <span>{activePatients.length} live patients</span>
         </div>
         <div className="ed-whiteboard__topbar-actions">
+          <label className="ed-whiteboard__search" aria-label="Search patients">
+            <Search size={14} aria-hidden />
+            <input
+              value={whiteboardSearchQuery}
+              placeholder="Search backend patients..."
+              onChange={(event) => setWhiteboardSearchQuery(event.target.value)}
+            />
+          </label>
           {whiteboardSearchQuery ? (
-            <span className="ed-whiteboard__search-chip">Search: {whiteboardSearchQuery}</span>
+            <span className="ed-whiteboard__search-chip">
+              {patientBackendSearch.status === 'loading'
+                ? 'Backend lookup...'
+                : patientBackendSearch.results?.length
+                  ? `${patientBackendSearch.results.length} backend match${patientBackendSearch.results.length === 1 ? '' : 'es'}`
+                  : `Search: ${whiteboardSearchQuery}`}
+            </span>
           ) : null}
           <button
             type="button"
@@ -421,6 +458,12 @@ export default function EmergencyWhiteboard() {
           </div>
         </div>
       </header>
+
+      {realtimeConnection.status !== 'connected' ? (
+        <div className="ed-whiteboard__live-banner" role="status" aria-live="polite">
+          Live updates paused - reconnecting. Polling every 30 seconds.
+        </div>
+      ) : null}
 
       <NewPatientIntake open={newPatientOpen} onClose={() => setNewPatientOpen(false)} />
       {calculatorLaunch && calculatorPatient ? (
@@ -569,7 +612,7 @@ export default function EmergencyWhiteboard() {
           ) : null}
           {!isStoreInitializing && !filteredPatients.length ? (
             <div className="ed-whiteboard__empty" role="status">
-              Department Clear
+              {whiteboardSearchQuery ? patientBackendSearch.message || 'No patients match this search.' : 'Department Clear'}
             </div>
           ) : null}
         </div>

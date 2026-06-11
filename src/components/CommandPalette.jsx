@@ -1,9 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { buildBuiltinHubCalculatorCards } from '../data/calculatorHubManifest';
+import { DRUG_REFERENCE_TOOLS } from '../utils/drugReferenceTools';
 import './CommandPalette.css';
 
 const RECENT_COMMANDS_KEY = 'caredroid.ed.commandPalette.recents.v1';
+const HUB_CALCULATORS = buildBuiltinHubCalculatorCards();
 
 const BASE_COMMANDS = [
   {
@@ -38,11 +41,32 @@ const BASE_COMMANDS = [
     }),
   },
   {
+    id: 'clinical-tools',
+    label: 'Clinical Tools',
+    hint: 'T',
+    keywords: ['calculator', 'calculators', 'scores', 'tools', 'stethoscope'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/tools' }),
+  },
+  {
+    id: 'drug-references',
+    label: 'Drug References',
+    hint: 'D',
+    keywords: ['drugs', 'dose', 'dosing', 'antibiotic', 'antidote', 'reversal', 'medications'],
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/tools?category=Reference' }),
+  },
+  {
+    id: 'pediatric-emergency-drugs',
+    label: 'Pediatric Emergency Drug Calculator',
+    hint: 'Dose',
+    keywords: ['dose pediatric', 'broselow', 'resuscitation drugs', 'rsi dose'],
+    build: () => ({ type: 'OPEN_CALCULATOR', calculatorId: 'pediatric-dose-safety-checker' }),
+  },
+  {
     id: 'heart',
     label: 'HEART Score',
     hint: 'H',
     keywords: ['calculator', 'chest pain', 'run heart'],
-    build: () => ({ type: 'OPEN_CALCULATOR', calculatorId: 'heart' }),
+    build: () => ({ type: 'OPEN_CALCULATOR', calculatorId: 'heart-score' }),
   },
   {
     id: 'qsofa',
@@ -184,6 +208,8 @@ function patientSearchScore(patient, query) {
 export default function CommandPalette({ open, onClose, onExecute }) {
   const patients = useEmergencyStore((state) => state.patients);
   const addFlag = useEmergencyStore((state) => state.addFlag);
+  const patientBackendSearch = useEmergencyStore((state) => state.patientBackendSearch);
+  const searchBackendPatients = useEmergencyStore((state) => state.searchBackendPatients);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const [recentCommandIds, setRecentCommandIds] = useState(() => readRecentCommands());
@@ -198,12 +224,28 @@ export default function CommandPalette({ open, onClose, onExecute }) {
     window.setTimeout(() => inputRef.current?.focus(), 0);
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return undefined;
+    const patientQuery = extractValue(query, /^find(?:\s+patient)?\s*/i) || query.trim();
+    if (patientQuery.length < 2) return undefined;
+    if (/^(run|dose|referral\s+for|flag)\b/i.test(query)) return undefined;
+
+    const timer = window.setTimeout(() => {
+      void searchBackendPatients(patientQuery);
+    }, 220);
+    return () => window.clearTimeout(timer);
+  }, [open, query, searchBackendPatients]);
+
   const commands = useMemo(() => {
     const dynamicCommands = [];
     const findValue = extractValue(query, /^find(?:\s+patient)?\s*/i);
     const referralValue = extractValue(query, /^referral\s+for\s*/i);
     const flagValue = extractValue(query, /^flag\s*/i);
+    const runValue = extractValue(query, /^run\s+/i);
+    const doseValue = extractValue(query, /^dose\s+/i);
     const patientQuery = query.trim();
+    const backendSearchQuery = /^find(?:\s+patient)?\s+/i.test(query) ? findValue : patientQuery;
+    const backendMatchedIds = new Set();
 
     if (patientQuery && !/^(find|referral\s+for|flag)\b/i.test(patientQuery)) {
       patients
@@ -215,6 +257,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         .forEach(({ patient }) => {
           dynamicCommands.push({
             id: `patient-${patient.id}`,
+            patientId: patient.id,
             label: `${patientName(patient)} · ${patient.mrn}`,
             hint: 'Open',
             keywords: [patient.chiefComplaint, patient.complaintCategory],
@@ -226,6 +269,29 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         });
     }
 
+    if (
+      backendSearchQuery &&
+      patientBackendSearch.query === backendSearchQuery.trim() &&
+      patientBackendSearch.results?.length
+    ) {
+      patientBackendSearch.results.slice(0, 5).forEach((result) => {
+        if (!result.patientId || backendMatchedIds.has(result.patientId)) return;
+        backendMatchedIds.add(result.patientId);
+        dynamicCommands.unshift({
+          id: `backend-patient-${result.patientId}`,
+            patientId: result.patientId,
+          label: `${result.displayName || result.patientId} · ${result.mrn || 'backend match'}`,
+          hint: result.backendVerified ? 'Backend' : 'Lookup',
+          keywords: [result.chiefComplaint, result.complaintCategory, result.mrn],
+          build: () => ({
+            type: 'VIEW_PATIENT',
+            patientId: result.patientId,
+            backendVerified: result.backendVerified,
+          }),
+        });
+      });
+    }
+
     if (/^find(?:\s+patient)?\s+/i.test(query) && findValue) {
       patients
         .filter(isActivePatient)
@@ -234,6 +300,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         .forEach((patient) => {
           dynamicCommands.push({
             id: `find-${patient.id}`,
+            patientId: patient.id,
             label: `Find patient ${patientName(patient)}`,
             hint: 'Enter',
             keywords: [patient.mrn, patient.chiefComplaint],
@@ -255,6 +322,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         .forEach((patient) => {
           dynamicCommands.push({
             id: `referral-${patient.id}`,
+            patientId: patient.id,
             label: `Referral for ${patientName(patient)}`,
             hint: 'Enter',
             keywords: [patient.mrn, patient.chiefComplaint],
@@ -274,6 +342,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         .forEach((patient) => {
           dynamicCommands.push({
             id: `flag-${patient.id}`,
+            patientId: patient.id,
             label: `Flag ${patientName(patient)}`,
             hint: 'Enter',
             keywords: [patient.mrn, patient.chiefComplaint],
@@ -282,6 +351,64 @@ export default function CommandPalette({ open, onClose, onExecute }) {
               value: patientName(patient),
               patientId: patient.id,
             }),
+          });
+        });
+    }
+
+    const calculatorQuery = /^run\s+/i.test(query) ? runValue : patientQuery;
+    if (calculatorQuery && !/^(find|referral\s+for|flag)\b/i.test(query)) {
+      HUB_CALCULATORS.map((calculator) => ({
+        calculator,
+        score: scoreCommand(
+          {
+            label: calculator.name,
+            keywords: [calculator.id, calculator.description, 'run calculator', 'clinical tool'],
+          },
+          calculatorQuery
+        ),
+      }))
+        .filter((item) => item.score >= 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 6)
+        .forEach(({ calculator }) => {
+          dynamicCommands.push({
+            id: `run-${calculator.id}`,
+            label: `Run ${calculator.name}`,
+            hint: 'Run',
+            keywords: [calculator.id, calculator.description],
+            build: () => ({ type: 'OPEN_CALCULATOR', calculatorId: calculator.id }),
+          });
+        });
+    }
+
+    const referenceQuery = /^dose\s+/i.test(query) ? doseValue || 'dose' : patientQuery;
+    if (referenceQuery && !/^(find|referral\s+for|flag)\b/i.test(query)) {
+      DRUG_REFERENCE_TOOLS.map((tool) => ({
+        tool,
+        score: scoreCommand(
+          {
+            label: tool.name,
+            keywords: [tool.id, tool.description, ...(tool.keywords || []), 'drug reference', 'dose'],
+          },
+          referenceQuery
+        ),
+      }))
+        .filter((item) => item.score >= 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 4)
+        .forEach(({ tool }) => {
+          if (tool.status === 'coming-soon') return;
+          dynamicCommands.push({
+            id: `drug-ref-${tool.id}`,
+            label: /^dose\s+/i.test(query) && tool.id === 'pediatric-dose-safety-checker'
+              ? `Dose ${doseValue || 'pediatric emergency drugs'}`
+              : `Open ${tool.name}`,
+            hint: tool.id === 'pediatric-dose-safety-checker' ? 'Dose' : 'Open',
+            keywords: tool.keywords,
+            build: () =>
+              tool.launchMode === 'route'
+                ? { type: 'OPEN_ROUTE', path: tool.path }
+                : { type: 'OPEN_CALCULATOR', calculatorId: tool.id },
           });
         });
     }
@@ -298,8 +425,15 @@ export default function CommandPalette({ open, onClose, onExecute }) {
       return recentCommands.length ? recentCommands : BASE_COMMANDS.slice(0, 6);
     }
 
-    return [...dynamicCommands, ...scored.sort((a, b) => b.score - a.score)].slice(0, 8);
-  }, [patients, query, recentCommandIds]);
+    const mergedCommands = [...dynamicCommands, ...scored.sort((a, b) => b.score - a.score)];
+    return mergedCommands
+      .filter(
+        (command, index, list) =>
+          !command.patientId ||
+          list.findIndex((candidate) => candidate.patientId === command.patientId) === index
+      )
+      .slice(0, 8);
+  }, [patientBackendSearch.query, patientBackendSearch.results, patients, query, recentCommandIds]);
 
   useEffect(() => {
     setActiveIndex(0);

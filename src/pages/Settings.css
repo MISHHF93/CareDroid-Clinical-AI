@@ -180,6 +180,41 @@
   gap: 8px;
 }
 
+.settings-audit-log-list {
+  display: grid;
+  gap: 8px;
+}
+
+.settings-audit-log-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--surface-1);
+  color: var(--text-color);
+}
+
+.settings-audit-log-item > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.settings-audit-log-item strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.settings-audit-log-item span,
+.settings-audit-log-item time {
+  color: var(--muted-text);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
 .settings-billing-plan-details span {
   color: var(--muted-text);
 }

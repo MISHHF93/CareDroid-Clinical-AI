@@ -71,11 +71,12 @@ describe('Pediatrics and OB-GYN Clinical Tools Pack', () => {
     }
   });
 
-  it('keeps pediatric dose support placeholder-only', () => {
+  it('wires pediatric emergency drug support with verification guardrails', () => {
     const launch = resolveCatalogLaunch(REGISTRY.pediatricDoseSafetyChecker);
     const copy = `${launch.chatSeed || ''} ${clinicalIntentToolsById[REGISTRY.pediatricDoseSafetyChecker]?.description || ''}`.toLowerCase();
-    expect(copy).toMatch(/placeholder only|placeholder-only/i);
-    expect(copy).toMatch(/do not provide|does not calculate|no patient-specific dose/i);
-    expect(copy).not.toMatch(/calculate \d+|recommend \d+|\b\d+(\.\d+)?\s*mg\/kg/i);
+    expect(copy).toMatch(/pediatric emergency drug|emergency drug/i);
+    expect(copy).toMatch(/weight|age-estimated|dosing table|quick reference/i);
+    expect(copy).toMatch(/verify|local pediatric|pals|policy/i);
+    expect(copy).not.toMatch(/autonomous|prescribe|administer without/i);
   });
 });

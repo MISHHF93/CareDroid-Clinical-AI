@@ -11,7 +11,12 @@ const ACTIVE_STATES = new Set(
   )
 );
 
-const FLAG_PRIORITY = ['DeteriorationRisk', 'HighRisk', 'ReassessmentDue'];
+const FLAG_PRIORITY = [
+  'DeteriorationRisk',
+  'HighRisk',
+  'ScoreReassessmentRecommended',
+  'ReassessmentDue',
+];
 const SEVERITY_RANK = {
   Critical: 0,
   Warning: 1,

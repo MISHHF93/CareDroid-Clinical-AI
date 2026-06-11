@@ -41,7 +41,8 @@ export type PatientFlagType =
   | 'HighRisk'
   | 'PendingAdmission'
   | 'EMSArrival'
-  | 'Isolation';
+  | 'Isolation'
+  | 'ScoreReassessmentRecommended';
 
 export type PatientFlagSeverity = 'Info' | 'Warning' | 'Critical';
 
@@ -92,6 +93,7 @@ export type JourneyEventType =
   | 'FlagAdded'
   | 'FlagRemoved'
   | 'ProtocolLaunched'
+  | 'SCORE'
   | 'ClinicalScoreSaved';
 
 export interface JourneyEvent {
@@ -128,6 +130,9 @@ export type ReferralStatus =
   | 'Sent'
   | 'Acknowledged'
   | 'Accepted'
+  | 'TransferRequested'
+  | 'TransportArranged'
+  | 'PatientDeparted'
   | 'Declined'
   | 'Completed';
 
@@ -156,6 +161,7 @@ export interface Referral {
   respondedAt?: ISODateString;
   completedAt?: ISODateString;
   responseNote?: string;
+  workflow?: 'Referral' | 'Transfer';
 }
 
 export type EMSArrivalStatus = 'Inbound' | 'Arrived' | 'Handoff' | 'Complete' | 'Cancelled';

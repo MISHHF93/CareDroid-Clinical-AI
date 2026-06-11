@@ -102,8 +102,10 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
   const queues = useEmergencyStore((state) => state.queues);
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
   const bottleneckAlert = useEmergencyStore((state) => state.bottleneckAlert);
+  const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
   const setBottleneckAlert = useEmergencyStore((state) => state.setBottleneckAlert);
+  const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
 
   const queueRows = useMemo(
     () =>
@@ -148,6 +150,10 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
     const intervalId = window.setInterval(runDetection, 60_000);
     return () => window.clearInterval(intervalId);
   }, [queueRows, setBottleneckAlert]);
+
+  useEffect(() => {
+    void loadEmergencyAnalytics({ force: true });
+  }, [loadEmergencyAnalytics, queues]);
 
   return (
     <aside
@@ -212,6 +218,24 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
           );
         })}
       </div>
+
+      {!collapsed ? (
+        <section className="queue-intel__performance" aria-label="Today's queue performance">
+          <strong>Today's performance</strong>
+          {(emergencyAnalytics.data?.queuePerformance || []).slice(0, 5).map((queue) => (
+            <div key={queue.id || queue.type}>
+              <span>{queue.name || queue.type}</span>
+              <small>
+                Avg {formatWait(queue.avgWaitMinutes)} vs yesterday{' '}
+                {formatWait(queue.yesterdayAvgWaitMinutes)} · {queue.throughputCount} through
+              </small>
+            </div>
+          ))}
+          {!emergencyAnalytics.data?.queuePerformance?.length ? (
+            <small>No backend queue analytics returned yet.</small>
+          ) : null}
+        </section>
+      ) : null}
 
       <footer className="queue-intel__footer">
         <span>Updated {latestUpdatedAt(queues)}</span>

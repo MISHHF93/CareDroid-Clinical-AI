@@ -66,6 +66,14 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     ],
   },
   {
+    id: 'clinical-tools',
+    label: 'Clinical Tools',
+    mobileLabel: 'Tools',
+    path: CANONICAL_ROUTES.emergencyTools,
+    matchPaths: ['/emergency/tools', '/tools/calculators'],
+    matchPrefixes: ['/tools/calculators/'],
+  },
+  {
     id: 'profile',
     label: 'Profile',
     mobileLabel: 'Profile',

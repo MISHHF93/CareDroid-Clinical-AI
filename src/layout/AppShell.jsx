@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
   AlertTriangle,
+  BarChart3,
   Bell,
   Bot,
   ChevronRight,
@@ -30,6 +32,10 @@ import {
   SIMULATION_STATUS_EVENT,
 } from '../../engine/simulation';
 import { buildStaffWorkloads, getStaffRebalanceSuggestion } from '../utils/staffManagement';
+import {
+  emergencyPermissionsForUser,
+  emergencyRoleForUser,
+} from '../utils/emergencyRolePermissions';
 import './AppShell.css';
 
 const NAV_ITEMS = [
@@ -75,6 +81,13 @@ const NAV_ITEMS = [
       '/workspace/emergency/capacity',
       '/workspace/emergency/boarding',
     ],
+  },
+  {
+    id: 'analytics',
+    label: 'Analytics',
+    path: '/emergency/analytics',
+    icon: BarChart3,
+    activePaths: ['/emergency/analytics', '/workspace/emergency/analytics'],
   },
   {
     id: 'copilot',
@@ -154,6 +167,48 @@ function formatShiftClock(date) {
     second: '2-digit',
     hour12: false,
   }).format(date);
+}
+
+function formatShiftDuration(activeShift, clock) {
+  if (!activeShift?.startTime) return 'No active shift';
+  if (activeShift.status === 'Closed') return 'Shift ended';
+  const elapsedMs = Math.max(0, clock.getTime() - new Date(activeShift.startTime).getTime());
+  const hours = Math.floor(elapsedMs / 3_600_000);
+  const minutes = Math.floor((elapsedMs % 3_600_000) / 60_000);
+  return `${hours}h ${String(minutes).padStart(2, '0')}m active`;
+}
+
+function realtimeStatusLabel(connection) {
+  if (connection.status === 'connected') return 'Real-time connected';
+  if (connection.status === 'reconnecting') return 'Reconnecting...';
+  return 'Real-time disconnected';
+}
+
+function RealtimeConnectionIndicator({ connection }) {
+  const tone =
+    connection.status === 'connected'
+      ? 'connected'
+      : connection.status === 'reconnecting'
+        ? 'reconnecting'
+        : 'disconnected';
+  const title =
+    connection.message ||
+    (connection.status === 'connected'
+      ? 'Real-time connected'
+      : connection.status === 'reconnecting'
+        ? 'Reconnecting...'
+        : 'Real-time disconnected');
+
+  return (
+    <span
+      className={`ed-realtime-status ed-realtime-status--${tone}`}
+      title={title}
+      aria-label={realtimeStatusLabel(connection)}
+      role="status"
+    >
+      <span aria-hidden />
+    </span>
+  );
 }
 
 function minutesSince(timestamp, now) {
@@ -318,12 +373,51 @@ function buildCapacityRecommendations({
   return recommendations.slice(0, 3);
 }
 
+function CapacityHistorySparkline({ history = [] }) {
+  if (!history.length) {
+    return <p className="capacity-detail-panel__empty">No capacity history returned yet.</p>;
+  }
+
+  return (
+    <div className="capacity-history-sparkline" aria-label="Capacity score over last 8 hours">
+      <ResponsiveContainer width="100%" height={126}>
+        <LineChart data={history} margin={{ top: 8, right: 8, bottom: 0, left: -24 }}>
+          <XAxis dataKey="label" tick={{ fontSize: 10 }} />
+          <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
+          <Tooltip />
+          <Line
+            type="monotone"
+            dataKey="score"
+            name="Capacity score"
+            stroke="var(--status-info)"
+            strokeWidth={2}
+            dot={(props) => {
+              const level = String(props.payload?.riskLevel || '').toLowerCase();
+              const fill =
+                level === 'red'
+                  ? 'var(--status-critical)'
+                  : level === 'orange'
+                    ? '#f97316'
+                    : level === 'yellow'
+                      ? 'var(--status-warning)'
+                      : 'var(--status-stable)';
+              return <circle cx={props.cx} cy={props.cy} r={3.5} fill={fill} />;
+            }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 function CapacityDetailPanel({ open, onClose }) {
   const capacity = useEmergencyStore((state) => state.capacity);
   const patients = useEmergencyStore((state) => state.patients);
   const rooms = useEmergencyStore((state) => state.rooms);
   const referrals = useEmergencyStore((state) => state.referrals);
   const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
+  const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
+  const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
   const [recommendations, setRecommendations] = useState([]);
   const [now, setNow] = useState(() => new Date());
   const tone = capacityToneClass(capacity.riskLevel);
@@ -362,9 +456,10 @@ function CapacityDetailPanel({ open, onClose }) {
     }
 
     setNow(new Date());
+    void loadEmergencyAnalytics({ force: true });
     const timer = window.setInterval(() => setNow(new Date()), 1000);
     return () => window.clearInterval(timer);
-  }, [open]);
+  }, [loadEmergencyAnalytics, open]);
 
   useEffect(() => {
     if (!open || recommendations.length) return;
@@ -398,6 +493,16 @@ function CapacityDetailPanel({ open, onClose }) {
             <p>{capacity.label}</p>
           </div>
           <small>Last recalculated {secondsSince(capacity.generatedAt, now)} seconds ago</small>
+        </section>
+
+        <section className="capacity-detail-panel__section">
+          <div className="capacity-detail-panel__section-heading">
+            <span>Capacity History</span>
+            <small>
+              {emergencyAnalytics.source === 'backend' ? 'Backend' : 'Local fallback'} · last 8h
+            </small>
+          </div>
+          <CapacityHistorySparkline history={emergencyAnalytics.data?.capacityHistory || []} />
         </section>
 
         <section className="capacity-detail-panel__section">
@@ -597,8 +702,105 @@ function StaffAvatar({ user, onClick, expanded }) {
       aria-expanded={expanded}
       aria-label={user?.fullName || user?.name || 'Current staff member'}
     >
-      {initials || 'ED'}
+      {user?.avatarUrl ? <img src={user.avatarUrl} alt="" loading="lazy" /> : initials || 'ED'}
     </button>
+  );
+}
+
+function ShiftControls({ activeShift, staff, clock, canManageShift, onStartShift, onEndShift }) {
+  const [open, setOpen] = useState(false);
+  const [startTime, setStartTime] = useState(() => new Date().toISOString().slice(0, 16));
+  const [selectedStaffIds, setSelectedStaffIds] = useState(() => staff.map((member) => member.id));
+  const isActive = activeShift?.status === 'Active';
+
+  useEffect(() => {
+    setSelectedStaffIds((current) => {
+      if (current.length) return current;
+      return staff.map((member) => member.id);
+    });
+  }, [staff]);
+
+  const toggleStaff = (staffId) => {
+    setSelectedStaffIds((current) =>
+      current.includes(staffId) ? current.filter((id) => id !== staffId) : [...current, staffId]
+    );
+  };
+
+  const submitStartShift = (event) => {
+    event.preventDefault();
+    onStartShift({
+      startTime: new Date(startTime).toISOString(),
+      staffIds: selectedStaffIds.length ? selectedStaffIds : staff.map((member) => member.id),
+      chargeStaffId: selectedStaffIds[0] || staff[0]?.id,
+    });
+    setOpen(false);
+  };
+
+  return (
+    <div className="ed-shift-control">
+      <button
+        type="button"
+        className="ed-shift-control__trigger"
+        onClick={() => setOpen((current) => !current)}
+        aria-expanded={open}
+      >
+        <span>{formatShiftDuration(activeShift, clock)}</span>
+        <strong>{isActive ? 'End Shift' : 'Start Shift'}</strong>
+      </button>
+      {open ? (
+        <section className="ed-shift-control__panel" aria-label="Shift management">
+          <header>
+            <span>Shift Management</span>
+            <strong>{canManageShift ? 'Admin' : 'View only'}</strong>
+          </header>
+          {!canManageShift ? (
+            <p>Only Admin can start or end shifts. Current duration remains visible in the header.</p>
+          ) : isActive ? (
+            <>
+              <p>
+                Active since {new Date(activeShift.startTime).toLocaleString()} with{' '}
+                {activeShift.staffIds.length} staff on duty.
+              </p>
+              <button
+                type="button"
+                className="ed-shift-control__danger"
+                onClick={() => {
+                  onEndShift(new Date().toISOString());
+                  setOpen(false);
+                }}
+              >
+                End Shift and Open Summary
+              </button>
+            </>
+          ) : (
+            <form onSubmit={submitStartShift}>
+              <label>
+                Start date and time
+                <input
+                  type="datetime-local"
+                  value={startTime}
+                  onChange={(event) => setStartTime(event.target.value)}
+                />
+              </label>
+              <fieldset>
+                <legend>Staff on duty</legend>
+                {staff.map((member) => (
+                  <label key={member.id} className="ed-shift-control__staff-check">
+                    <input
+                      type="checkbox"
+                      checked={selectedStaffIds.includes(member.id)}
+                      onChange={() => toggleStaff(member.id)}
+                    />
+                    <span>{member.displayName || `${member.firstName} ${member.lastName}`}</span>
+                  </label>
+                ))}
+              </fieldset>
+              <button type="submit">Start Shift</button>
+            </form>
+          )}
+        </section>
+      ) : null}
+    </div>
   );
 }
 
@@ -621,10 +823,14 @@ function StaffManagementPanel({ open, workloads, rebalanceSuggestion }) {
       <div className="ed-staff-panel__list">
         {workloads.map((member) => (
           <article key={member.id} className="ed-staff-panel__row">
-            <span className="ed-staff-panel__avatar">{member.initials}</span>
+            {member.avatarUrl ? (
+              <img className="ed-staff-panel__avatar" src={member.avatarUrl} alt="" loading="lazy" />
+            ) : (
+              <span className="ed-staff-panel__avatar">{member.initials}</span>
+            )}
             <div className="ed-staff-panel__identity">
               <strong>{member.displayName}</strong>
-              <span>{member.roleLabel}</span>
+              <span className="ed-staff-panel__role-badge">{member.roleLabel}</span>
             </div>
             <strong className="ed-staff-panel__count">{member.assignedCount}</strong>
             <div
@@ -829,6 +1035,12 @@ const AppShell = ({
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
+  const loadBackendStaffProfile = useEmergencyStore((state) => state.loadBackendStaffProfile);
+  const startShift = useEmergencyStore((state) => state.startShift);
+  const endShift = useEmergencyStore((state) => state.endShift);
+  const realtimeConnection = useEmergencyStore((state) => state.realtimeConnection);
+  const startRealtime = useEmergencyStore((state) => state.startRealtime);
+  const stopRealtime = useEmergencyStore((state) => state.stopRealtime);
   const capacity = useEmergencyStore((state) => state.capacity);
   const alerts = useEmergencyStore((state) => state.alerts);
   const updateAlerts = useEmergencyStore((state) => state.updateAlerts);
@@ -837,6 +1049,7 @@ const AppShell = ({
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
   const setWhiteboardSearchQuery = useEmergencyStore((state) => state.setWhiteboardSearchQuery);
+  const searchBackendPatients = useEmergencyStore((state) => state.searchBackendPatients);
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
@@ -868,6 +1081,15 @@ const AppShell = ({
     const timer = window.setInterval(() => setClock(new Date()), 1000);
     return () => window.clearInterval(timer);
   }, []);
+
+  useEffect(() => {
+    void loadBackendStaffProfile();
+  }, [loadBackendStaffProfile]);
+
+  useEffect(() => {
+    startRealtime();
+    return () => stopRealtime();
+  }, [startRealtime, stopRealtime]);
 
   useEffect(() => {
     if (!isEmergencySimulationAvailable()) return undefined;
@@ -990,6 +1212,25 @@ const AppShell = ({
     () => buildStaffWorkloads(staff, patients, activeShift),
     [activeShift, patients, staff]
   );
+  const emergencyRole = emergencyRoleForUser(user);
+  const emergencyPermissions = emergencyPermissionsForUser(user);
+  const currentStaffProfile = useMemo(
+    () =>
+      staff.find((member) => member.email && member.email === user?.email) ||
+      staff.find((member) => user?.id && member.id.includes(user.id)) ||
+      null,
+    [staff, user]
+  );
+  const headerUser = useMemo(
+    () => ({
+      ...user,
+      fullName: currentStaffProfile?.displayName || user?.fullName || user?.name,
+      name: currentStaffProfile?.displayName || user?.name,
+      avatarUrl: currentStaffProfile?.avatarUrl || user?.avatarUrl,
+      roleLabel: currentStaffProfile?.roleLabel || emergencyRole,
+    }),
+    [currentStaffProfile, emergencyRole, user]
+  );
   const staffRebalanceSuggestion = useMemo(
     () => getStaffRebalanceSuggestion(staffWorkloads),
     [staffWorkloads]
@@ -1043,6 +1284,14 @@ const AppShell = ({
     [navigate, selectPatient]
   );
 
+  const handleEndShift = useCallback(
+    (endedAt) => {
+      endShift(endedAt);
+      navigate('/emergency/shift');
+    },
+    [endShift, navigate]
+  );
+
   const patientForCommand = useCallback(
     (patientId) => {
       if (patientId) return patients.find((patient) => patient.id === patientId) || null;
@@ -1077,7 +1326,7 @@ const AppShell = ({
   );
 
   const executeCommand = useCallback(
-    (command) => {
+    async (command) => {
       if (!command?.type) return;
 
       if (command.type === 'OPEN_INTAKE') {
@@ -1086,9 +1335,14 @@ const AppShell = ({
       }
 
       if (command.type === 'FIND_PATIENT') {
-        const patient = command.patientId
+        let patient = command.patientId
           ? patientForCommand(command.patientId)
           : findPatientByValue(command.value);
+        if (!patient && command.value) {
+          const backendSearch = await searchBackendPatients(command.value);
+          const firstMatchedPatientId = backendSearch.results?.[0]?.patientId;
+          patient = firstMatchedPatientId ? patientForCommand(firstMatchedPatientId) : null;
+        }
         setQueueFilter(null);
         setWhiteboardSearchQuery(command.value || '');
         if (patient?.id) selectPatient(patient.id);
@@ -1112,19 +1366,16 @@ const AppShell = ({
       }
 
       if (command.type === 'OPEN_CALCULATOR') {
-        const patient = patientForCommand(command.patientId);
-        navigate('/emergency');
+        const patient = command.patientId
+          ? patientForCommand(command.patientId)
+          : selectedPatientId
+            ? patientForCommand(selectedPatientId)
+            : null;
         if (patient?.id) selectPatient(patient.id);
-        window.setTimeout(() => {
-          window.dispatchEvent(
-            new CustomEvent('ed:open-calculator', {
-              detail: {
-                calculatorId: command.calculatorId,
-                patientId: patient?.id || null,
-              },
-            })
-          );
-        }, 50);
+        const params = new URLSearchParams();
+        if (command.calculatorId) params.set('tool', command.calculatorId);
+        if (patient?.id) params.set('patientId', patient.id);
+        navigate(`/emergency/tools${params.toString() ? `?${params.toString()}` : ''}`);
       }
 
       if (command.type === 'OPEN_CAPACITY') {
@@ -1154,10 +1405,46 @@ const AppShell = ({
       findPatientByValue,
       patientForCommand,
       selectPatient,
+      selectedPatientId,
       setQueueFilter,
       setWhiteboardSearchQuery,
+      searchBackendPatients,
     ]
   );
+
+  useEffect(() => {
+    const handleCalculatorLaunch = (event) => {
+      const calculatorId =
+        event.detail?.calculatorId || event.detail?.toolId || event.detail?.value || '';
+      if (!calculatorId) return;
+      const requestedPatientId = event.detail?.patientId || event.detail?.target || null;
+      const patient = requestedPatientId
+        ? patientForCommand(requestedPatientId)
+        : selectedPatientId
+          ? patientForCommand(selectedPatientId)
+          : null;
+      if (patient?.id) selectPatient(patient.id);
+      const params = new URLSearchParams();
+      params.set('tool', calculatorId);
+      if (patient?.id) params.set('patientId', patient.id);
+      navigate(`/emergency/tools?${params.toString()}`);
+    };
+
+    window.addEventListener('ed:open-calculator', handleCalculatorLaunch);
+    return () => window.removeEventListener('ed:open-calculator', handleCalculatorLaunch);
+  }, [navigate, patientForCommand, selectPatient, selectedPatientId]);
+
+  useEffect(() => {
+    const handleClinicalToolsLaunch = (event) => {
+      const search = event.detail?.search ? `?${event.detail.search}` : '';
+      navigate(`/emergency/tools${search}`, {
+        state: { pendingPatient: event.detail?.pendingPatient || null },
+      });
+    };
+
+    window.addEventListener('ed:open-clinical-tools', handleClinicalToolsLaunch);
+    return () => window.removeEventListener('ed:open-clinical-tools', handleClinicalToolsLaunch);
+  }, [navigate]);
 
   return (
     <div
@@ -1213,6 +1500,15 @@ const AppShell = ({
             <time className="ed-shift-clock" dateTime={clock.toISOString()}>
               {formatShiftClock(clock)}
             </time>
+            <ShiftControls
+              activeShift={activeShift}
+              staff={staff}
+              clock={clock}
+              canManageShift={emergencyPermissions.canManageShift}
+              onStartShift={startShift}
+              onEndShift={handleEndShift}
+            />
+            <RealtimeConnectionIndicator connection={realtimeConnection} />
             {isDemoSimulationActive ? (
               <span className="ed-demo-badge" title="Development demo simulation is running">
                 DEMO
@@ -1257,7 +1553,7 @@ const AppShell = ({
             </div>
             <div className="ed-staff-menu">
               <StaffAvatar
-                user={user}
+                user={headerUser}
                 expanded={isStaffPanelOpen}
                 onClick={() => setIsStaffPanelOpen((open) => !open)}
               />

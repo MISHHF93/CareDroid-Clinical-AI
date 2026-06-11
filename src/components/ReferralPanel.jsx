@@ -3,6 +3,10 @@ import { useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock3, FilePlus2, Search, Send, XCircle } from 'lucide-react';
 import { PatientState } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import {
+  persistEmergencyReferral,
+  updateEmergencyTransferWorkflow,
+} from '../services/emergencyTransportApi';
 import './ReferralPanel.css';
 
 const ACTIVE_STATES = new Set(
@@ -11,7 +15,17 @@ const ACTIVE_STATES = new Set(
   )
 );
 
-const REFERRAL_STATUSES = ['Draft', 'Sent', 'Acknowledged', 'Accepted', 'Declined', 'Completed'];
+const REFERRAL_STATUSES = [
+  'Draft',
+  'Sent',
+  'Acknowledged',
+  'Accepted',
+  'TransferRequested',
+  'TransportArranged',
+  'PatientDeparted',
+  'Declined',
+  'Completed',
+];
 
 const TARGET_DEPARTMENTS = [
   'Cardiology',
@@ -32,6 +46,13 @@ const INITIAL_FORM = {
   urgency: 'Routine',
   reason: '',
   clinicalSummary: '',
+  workflow: 'Referral',
+};
+
+const STATUS_LABEL = {
+  TransferRequested: 'Transfer Requested',
+  TransportArranged: 'Transport Arranged',
+  PatientDeparted: 'Patient Departed',
 };
 
 function patientName(patient) {
@@ -83,6 +104,17 @@ function urgencyTone(urgency) {
   return 'routine';
 }
 
+function statusLabel(status) {
+  return STATUS_LABEL[status] || status;
+}
+
+function acknowledgementMinutes(referral) {
+  const start = new Date(referral.requestedAt).getTime();
+  const end = new Date(referral.respondedAt).getTime();
+  if (!Number.isFinite(start) || !Number.isFinite(end) || end < start) return null;
+  return Math.round((end - start) / 60000);
+}
+
 function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChange, onSelectPatient }) {
   const elapsed = formatElapsed(elapsedMinutes(referral.requestedAt, now));
   const needsResponseNote = referral.status === 'Sent';
@@ -109,7 +141,7 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
       </time>
 
       <span className={`referral-row__status referral-row__status--${referral.status.toLowerCase()}`}>
-        {referral.status}
+        {statusLabel(referral.status)}
       </span>
 
       <div className="referral-row__view">
@@ -173,6 +205,35 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
           ) : null}
 
           {referral.status === 'Accepted' ? (
+            <>
+              {referral.workflow === 'Transfer' ? (
+                <button type="button" onClick={() => onStatusChange(referral.id, 'TransportArranged')}>
+                  Arrange Transport
+                </button>
+              ) : null}
+              {referral.workflow !== 'Transfer' ? (
+                <button type="button" onClick={() => onStatusChange(referral.id, 'Completed')}>
+                  <CheckCircle2 size={14} aria-hidden />
+                  Complete
+                </button>
+              ) : null}
+            </>
+          ) : null}
+
+          {referral.status === 'TransferRequested' ? (
+            <button type="button" onClick={() => onStatusChange(referral.id, 'Accepted')}>
+              <CheckCircle2 size={14} aria-hidden />
+              Accept Transfer
+            </button>
+          ) : null}
+
+          {referral.status === 'TransportArranged' ? (
+            <button type="button" onClick={() => onStatusChange(referral.id, 'PatientDeparted')}>
+              Patient Departed
+            </button>
+          ) : null}
+
+          {referral.status === 'PatientDeparted' ? (
             <button type="button" onClick={() => onStatusChange(referral.id, 'Completed')}>
               <CheckCircle2 size={14} aria-hidden />
               Complete
@@ -199,6 +260,7 @@ export default function ReferralPanel() {
   const [form, setForm] = useState(INITIAL_FORM);
   const [responseNotes, setResponseNotes] = useState({});
   const [formError, setFormError] = useState('');
+  const [backendStatus, setBackendStatus] = useState('');
 
   useEffect(() => {
     const intervalId = window.setInterval(() => setNow(new Date()), 30_000);
@@ -235,8 +297,18 @@ export default function ReferralPanel() {
     [referrals]
   );
 
-  const metrics = useMemo(
-    () => ({
+  const metrics = useMemo(() => {
+    const acknowledgementSamples = referrals.map(acknowledgementMinutes).filter(Number.isFinite);
+    const avgAcknowledgement = acknowledgementSamples.length
+      ? Math.round(
+          acknowledgementSamples.reduce((sum, minutes) => sum + minutes, 0) /
+            acknowledgementSamples.length
+        )
+      : 0;
+    const department = referrals.find((referral) => Number.isFinite(acknowledgementMinutes(referral)))
+      ?.targetDepartment;
+
+    return {
       active: referrals.filter((referral) => !['Completed', 'Declined'].includes(referral.status))
         .length,
       emergent: referrals.filter(
@@ -244,9 +316,11 @@ export default function ReferralPanel() {
       ).length,
       awaitingResponse: referrals.filter((referral) => referral.status === 'Sent').length,
       accepted: referrals.filter((referral) => referral.status === 'Accepted').length,
-    }),
-    [referrals]
-  );
+      transfers: referrals.filter((referral) => referral.workflow === 'Transfer').length,
+      avgAcknowledgement,
+      acknowledgementDepartment: department || 'All services',
+    };
+  }, [referrals]);
 
   const selectFormPatient = (patient) => {
     setForm((current) => ({
@@ -292,7 +366,7 @@ export default function ReferralPanel() {
       return;
     }
 
-    createReferral({
+    const payload = {
       patientId: selectedPatient.id,
       requestingStaffId:
         selectedPatient.assignedStaffId || activeShift.chargeStaffId || staff[0]?.id || 'system-referrals',
@@ -301,6 +375,16 @@ export default function ReferralPanel() {
       reason: form.reason.trim(),
       clinicalSummary: form.clinicalSummary.trim(),
       status,
+      workflow: form.workflow,
+    };
+
+    createReferral(payload);
+    persistEmergencyReferral(payload).then((result) => {
+      setBackendStatus(
+        result.ok
+          ? 'Referral persisted to backend.'
+          : result.message || 'Referral backend persistence endpoint is not available yet.'
+      );
     });
     resetForm();
     setFormOpen(false);
@@ -308,6 +392,15 @@ export default function ReferralPanel() {
 
   const handleStatusChange = (referralId, status, responseNote = '') => {
     updateReferralStatus(referralId, status, responseNote);
+    if (['TransferRequested', 'TransportArranged', 'PatientDeparted'].includes(status)) {
+      updateEmergencyTransferWorkflow(referralId, status).then((result) => {
+        setBackendStatus(
+          result.ok
+            ? 'Transfer workflow synced to backend.'
+            : result.message || 'Transfer workflow backend endpoint is not available yet.'
+        );
+      });
+    }
     setResponseNotes((current) => ({ ...current, [referralId]: '' }));
   };
 
@@ -324,9 +417,29 @@ export default function ReferralPanel() {
         </div>
         <div className="referral-panel__header-actions">
           <strong aria-label={`${metrics.active} active referrals`}>{metrics.active}</strong>
-          <button type="button" onClick={() => setFormOpen((open) => !open)}>
+          <button
+            type="button"
+            onClick={() => {
+              setForm((current) => ({ ...current, workflow: 'Referral' }));
+              setFormOpen((open) => !open);
+            }}
+          >
             <FilePlus2 size={16} aria-hidden />
             New Referral
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setForm((current) => ({
+                ...current,
+                workflow: 'Transfer',
+                targetDepartment: 'Other',
+                urgency: 'Urgent',
+              }));
+              setFormOpen(true);
+            }}
+          >
+            New Transfer
           </button>
         </div>
       </header>
@@ -348,14 +461,25 @@ export default function ReferralPanel() {
           <span>Accepted</span>
           <strong>{metrics.accepted}</strong>
         </div>
+        <div>
+          <span>Avg acknowledgement</span>
+          <strong>{metrics.avgAcknowledgement}m</strong>
+          <small>{metrics.acknowledgementDepartment}</small>
+        </div>
+        <div>
+          <span>Transfers</span>
+          <strong>{metrics.transfers}</strong>
+        </div>
       </div>
+
+      {backendStatus ? <p className="referral-panel__backend-status">{backendStatus}</p> : null}
 
       {formOpen ? (
         <form className="referral-form" onSubmit={(event) => event.preventDefault()}>
           <div className="referral-form__header">
             <div>
-              <span>New Referral</span>
-              <h2>Consult Request</h2>
+              <span>{form.workflow === 'Transfer' ? 'New Transfer' : 'New Referral'}</span>
+              <h2>{form.workflow === 'Transfer' ? 'Inter-Facility Transfer' : 'Consult Request'}</h2>
             </div>
             <button type="button" onClick={() => setFormOpen(false)}>
               Close
@@ -449,13 +573,21 @@ export default function ReferralPanel() {
             <button type="button" onClick={() => setForm((current) => ({ ...current, clinicalSummary: buildClinicalSummary(selectedPatient) }))}>
               Auto-fill summary
             </button>
-            <button type="button" onClick={() => submitReferral('Draft')}>
-              Save Draft
-            </button>
-            <button type="button" className="referral-form__send" onClick={() => submitReferral('Sent')}>
-              <Send size={14} aria-hidden />
-              Send Referral
-            </button>
+            {form.workflow === 'Referral' ? (
+              <button type="button" onClick={() => submitReferral('Draft')}>
+                Save Draft
+              </button>
+            ) : null}
+            {form.workflow === 'Transfer' ? (
+              <button type="button" className="referral-form__send" onClick={() => submitReferral('TransferRequested')}>
+                Request Transfer
+              </button>
+            ) : (
+              <button type="button" className="referral-form__send" onClick={() => submitReferral('Sent')}>
+                <Send size={14} aria-hidden />
+                Send Referral
+              </button>
+            )}
           </div>
         </form>
       ) : null}
@@ -464,7 +596,7 @@ export default function ReferralPanel() {
         {groupedReferrals.map((group) => (
           <section key={group.status} className="referral-group" aria-labelledby={`referrals-${group.status}`}>
             <div className="referral-group__heading">
-              <h2 id={`referrals-${group.status}`}>{group.status}</h2>
+              <h2 id={`referrals-${group.status}`}>{statusLabel(group.status)}</h2>
               <span>{group.referrals.length}</span>
             </div>
 

@@ -32,10 +32,109 @@ import {
   type Staff,
   type Vitals,
 } from '../types/emergency';
+import {
+  fetchPatientManagementBundle,
+  searchPatientsFromBackend,
+} from '../src/services/patientManagementApi';
+import {
+  fetchOperationalStaffProfile,
+  recordEmergencyActivity,
+  syncEmergencyAuditEvent,
+} from '../src/services/emergencyStaffingApi';
+import { startEmergencyRealtime } from '../src/services/emergencyRealtimeService';
+import {
+  buildLocalEmergencyAnalytics,
+  fetchEmergencyOperationalAnalytics,
+} from '../src/services/emergencyAnalyticsApi';
 
 type PatientPatch = Partial<Omit<Patient, 'id'>>;
 type PatientFlagDetails = Partial<Pick<PatientFlag, 'reason' | 'detectedAt' | 'severity'>>;
 type PatientFlagInput = PatientFlag | PatientFlagType;
+type PatientBackendDetailStatus = 'idle' | 'loading' | 'ready' | 'error';
+type PatientBackendDetailsEntry = {
+  patientId: string;
+  status: PatientBackendDetailStatus;
+  loadedAt?: string;
+  error?: string;
+  partial?: boolean;
+  data?: any;
+};
+type PatientBackendSearchState = {
+  query: string;
+  status: PatientBackendDetailStatus;
+  results: any[];
+  message?: string;
+  backendSearchAvailable?: boolean;
+};
+type RealtimeConnectionStatus = 'connected' | 'reconnecting' | 'disconnected';
+type RealtimeConnectionState = {
+  status: RealtimeConnectionStatus;
+  mode: 'none' | 'sse' | 'websocket' | 'polling';
+  message: string;
+  updatedAt?: string;
+};
+type RealtimeEventEnvelope = {
+  type: string;
+  payload?: any;
+  receivedAt?: string;
+};
+type EmergencyAnalyticsState = {
+  status: PatientBackendDetailStatus;
+  source: 'backend' | 'client-fallback';
+  loadedAt?: string;
+  message?: string;
+  data?: any;
+};
+type EmergencySettingsState = {
+  departmentCapacityTarget: number;
+  thresholds: {
+    waitWarningMinutes: number;
+    waitCriticalMinutes: number;
+    capacityWarningPercent: number;
+    emsOffloadTargetMinutes: number;
+    reassessmentIntervals: Record<string, number>;
+  };
+  alertRules: Record<string, { enabled: boolean; severity: PatientFlagSeverity | Alert['severity'] }>;
+  featureFlags: Record<string, boolean>;
+};
+
+const DEFAULT_EMERGENCY_SETTINGS: EmergencySettingsState = {
+  departmentCapacityTarget: 30,
+  thresholds: {
+    waitWarningMinutes: 45,
+    waitCriticalMinutes: 60,
+    capacityWarningPercent: 80,
+    emsOffloadTargetMinutes: 15,
+    reassessmentIntervals: {
+      P1: 15,
+      P2: 30,
+      P3: 60,
+      P4: 120,
+      P5: 180,
+    },
+  },
+  alertRules: {
+    Reassessment: { enabled: true, severity: 'Warning' },
+    Capacity: { enabled: true, severity: 'Warning' },
+    EMS: { enabled: true, severity: 'Warning' },
+    Referral: { enabled: true, severity: 'Warning' },
+    Queue: { enabled: true, severity: 'Warning' },
+    System: { enabled: true, severity: 'Info' },
+  },
+  featureFlags: {
+    simulationMode: false,
+    emsModule: true,
+    referralModule: true,
+    analytics: true,
+  },
+};
+type ShiftStartInput = {
+  startTime: string;
+  endTime?: string;
+  staffIds: string[];
+  chargeStaffId?: string;
+  name?: string;
+};
 type MovePatientStateOptions = {
   flags?: PatientFlag[];
   timelineEvent?: JourneyEvent;
@@ -44,7 +143,8 @@ type ReferralCreateInput = Pick<
   Referral,
   'patientId' | 'requestingStaffId' | 'targetDepartment' | 'urgency' | 'reason' | 'clinicalSummary'
 > & {
-  status?: Extract<ReferralStatus, 'Draft' | 'Sent'>;
+  status?: Extract<ReferralStatus, 'Draft' | 'Sent' | 'TransferRequested'>;
+  workflow?: Referral['workflow'];
 };
 
 interface EmergencyStoreState {
@@ -63,6 +163,11 @@ interface EmergencyStoreState {
   activeQueueFilter: QueueType | null;
   whiteboardSearchQuery: string;
   bottleneckAlert: BottleneckAlert | null;
+  patientBackendDetails: Record<string, PatientBackendDetailsEntry>;
+  patientBackendSearch: PatientBackendSearchState;
+  realtimeConnection: RealtimeConnectionState;
+  emergencyAnalytics: EmergencyAnalyticsState;
+  emergencySettings: EmergencySettingsState;
   addPatient: (patient: Patient) => void;
   updatePatient: (id: string, patch: PatientPatch) => void;
   dischargePatient: (id: string, options?: MovePatientStateOptions) => void;
@@ -79,6 +184,15 @@ interface EmergencyStoreState {
   setCopilotOpen: (open: boolean) => void;
   setQueueFilter: (type: QueueType | null) => void;
   setWhiteboardSearchQuery: (query: string) => void;
+  loadPatientBackendDetails: (
+    patientId: string,
+    options?: { force?: boolean }
+  ) => Promise<PatientBackendDetailsEntry | null>;
+  searchBackendPatients: (query: string) => Promise<PatientBackendSearchState>;
+  clearBackendPatientSearch: () => void;
+  loadBackendStaffProfile: () => Promise<void>;
+  startShift: (input: ShiftStartInput) => void;
+  endShift: (endedAt?: string) => void;
   setBottleneckAlert: (alert: BottleneckAlert | null) => void;
   dispatchAlert: (alert: AlertDispatchInput) => Alert;
   updateAlerts: () => void;
@@ -87,8 +201,19 @@ interface EmergencyStoreState {
   updateReferralStatus: (referralId: string, status: ReferralStatus, responseNote?: string) => void;
   addEMSArrival: (arrival: EMSArrival) => void;
   updateEMSArrival: (id: string, patch: Partial<EMSArrival>) => void;
+  updateEMSUnit: (id: string, patch: Partial<EMSUnit>) => void;
   prepareEMSBay: (arrivalId: string) => void;
   convertEMSArrivalToPatient: (arrivalId: string) => void;
+  setRealtimeConnection: (status: Partial<RealtimeConnectionState>) => void;
+  handleRealtimeEvent: (event: RealtimeEventEnvelope) => void;
+  pollRealtimeFallback: () => Promise<void>;
+  startRealtime: () => void;
+  stopRealtime: () => void;
+  loadEmergencyAnalytics: (options?: { force?: boolean }) => Promise<EmergencyAnalyticsState>;
+  saveEmergencySettings: (patch: Partial<EmergencySettingsState>) => void;
+  upsertRoom: (room: Partial<Room> & { id?: string }) => void;
+  deactivateRoom: (roomId: string) => void;
+  upsertStaffMember: (staff: Partial<Staff> & { id?: string }) => void;
 }
 
 const MOCK_NOW = '2026-06-10T18:15:00-04:00';
@@ -198,6 +323,7 @@ const DEFAULT_FLAG_SEVERITY: Record<PatientFlagType, PatientFlagSeverity> = {
   PendingAdmission: 'Info',
   EMSArrival: 'Info',
   Isolation: 'Warning',
+  ScoreReassessmentRecommended: 'Warning',
 };
 
 const DEFAULT_FLAG_REASON: Record<PatientFlagType, string> = {
@@ -208,6 +334,7 @@ const DEFAULT_FLAG_REASON: Record<PatientFlagType, string> = {
   PendingAdmission: 'Admission pending',
   EMSArrival: 'EMS arrival',
   Isolation: 'Isolation precautions',
+  ScoreReassessmentRecommended: 'Score reassessment recommended',
 };
 
 export const getPatientFlagType = (flag: PatientFlagInput): PatientFlagType =>
@@ -241,7 +368,12 @@ const seedFlag = (type: PatientFlagType, reason?: string): PatientFlag =>
   });
 
 const patientMatchesQueue = (patient: Patient, type: QueueType): boolean => {
-  if (type === 'Reassessment') return hasPatientFlag(patient, 'ReassessmentDue');
+  if (type === 'Reassessment') {
+    return (
+      hasPatientFlag(patient, 'ReassessmentDue') ||
+      hasPatientFlag(patient, 'ScoreReassessmentRecommended')
+    );
+  }
   if (type === 'Provider') {
     return patient.state === PatientState.Assessment || patient.state === PatientState.Orders;
   }
@@ -261,8 +393,92 @@ const patientMatchesQueue = (patient: Patient, type: QueueType): boolean => {
   return patient.state === type;
 };
 
-const computeQueues = (patients: Patient[], referrals: Referral[] = []): Queue[] => {
+const criticalLabSummary = (data: any): string => {
+  const criticalLabs = Array.isArray(data?.labs)
+    ? data.labs.filter((lab: any) => lab?.isCritical)
+    : [];
+  return criticalLabs
+    .slice(0, 3)
+    .map((lab: any) =>
+      [lab.name, lab.value, lab.unit]
+        .filter((item) => item !== undefined && item !== null && item !== '')
+        .join(' ')
+    )
+    .filter(Boolean)
+    .join(', ');
+};
+
+const staffRoleFromBackend = (role?: string): Staff['role'] => {
+  const normalized = String(role || '').toLowerCase();
+  if (normalized.includes('admin')) return 'Administrator';
+  if (normalized.includes('nurse')) return 'Nurse';
+  if (normalized.includes('tech')) return 'Technician';
+  if (normalized.includes('paramedic')) return 'Paramedic';
+  if (normalized.includes('resident')) return 'Resident';
+  if (normalized.includes('consult')) return 'Consultant';
+  if (normalized.includes('physician') || normalized.includes('doctor') || normalized.includes('md')) {
+    return 'Attending';
+  }
+  return 'Attending';
+};
+
+const staffFromOperationalProfile = (profile: any, activeShift: Shift): Staff | null => {
+  const account = profile?.account || {};
+  if (!profile?.userId && !account.userId) return null;
+  const displayName = account.displayName || account.email || 'Backend Staff';
+  const [firstName = displayName, ...rest] = String(displayName).split(/\s+/);
+  const lastName = rest.join(' ');
+  return {
+    id: `backend-${profile.userId || account.userId}`,
+    firstName,
+    lastName,
+    name: displayName,
+    displayName,
+    email: account.email,
+    avatarUrl: account.avatarUrl,
+    role: staffRoleFromBackend(account.role || account.saasRole || account.profession),
+    roleLabel: account.saasRole || account.role,
+    status: 'OnShift',
+    shiftId: activeShift.id,
+    assignedPatientIds: [],
+    currentRoomId: undefined,
+  };
+};
+
+const upsertStaff = (staff: Staff[], nextStaff: Staff | null): Staff[] => {
+  if (!nextStaff) return staff;
+  if (staff.some((member) => member.id === nextStaff.id)) {
+    return staff.map((member) => (member.id === nextStaff.id ? { ...member, ...nextStaff } : member));
+  }
+  return [...staff, nextStaff];
+};
+
+const syncJourneyAuditEvent = (event: JourneyEvent): void => {
+  void syncEmergencyAuditEvent({
+    action: 'clinical_data_access',
+    resourceType: 'journey-event',
+    resourceId: event.id,
+    timestamp: event.timestamp,
+  });
+};
+
+const syncJourneyAuditEvents = (events: JourneyEvent[] = []): void => {
+  events.forEach(syncJourneyAuditEvent);
+};
+
+const newTimelineEvents = (before: Patient | undefined, after: Patient | undefined): JourneyEvent[] => {
+  if (!before || !after) return [];
+  const beforeIds = new Set(before.timeline.map((event) => event.id));
+  return after.timeline.filter((event) => !beforeIds.has(event.id));
+};
+
+const computeQueues = (
+  patients: Patient[],
+  referrals: Referral[] = [],
+  settings: EmergencySettingsState = DEFAULT_EMERGENCY_SETTINGS
+): Queue[] => {
   const now = new Date();
+  const targetWait = settings.thresholds.waitWarningMinutes || 45;
 
   return QUEUE_TYPES.map((type) => {
     if (type === 'Referral') {
@@ -276,7 +492,7 @@ const computeQueues = (patients: Patient[], referrals: Referral[] = []): Queue[]
         type,
         name: QUEUE_LABELS[type],
         patientIds: activeReferrals.map((referral) => referral.patientId),
-        targetWaitMinutes: QUEUE_TARGET_WAIT_MINUTES[type],
+        targetWaitMinutes: type === 'Waiting' ? targetWait : QUEUE_TARGET_WAIT_MINUTES[type],
         averageWaitMinutes: activeReferrals.length
           ? Math.round(totalWait / activeReferrals.length)
           : 0,
@@ -297,7 +513,7 @@ const computeQueues = (patients: Patient[], referrals: Referral[] = []): Queue[]
       type,
       name: QUEUE_LABELS[type],
       patientIds: queuedPatients.map((patient) => patient.id),
-      targetWaitMinutes: QUEUE_TARGET_WAIT_MINUTES[type],
+      targetWaitMinutes: type === 'Waiting' ? targetWait : QUEUE_TARGET_WAIT_MINUTES[type],
       averageWaitMinutes: queuedPatients.length ? Math.round(totalWait / queuedPatients.length) : 0,
       longestWaitMinutes: waits.length ? Math.max(...waits) : 0,
       criticalCount: queuedPatients.filter((patient) => patient.priority === Priority.P1).length,
@@ -307,9 +523,11 @@ const computeQueues = (patients: Patient[], referrals: Referral[] = []): Queue[]
 };
 
 const capacityBandForScore = (
-  score: number
+  score: number,
+  settings: EmergencySettingsState = DEFAULT_EMERGENCY_SETTINGS
 ): { riskLevel: CapacityRiskLevel; label: CapacitySnapshot['label'] } => {
-  if (score >= 80) return { riskLevel: 'Green', label: 'Capacity Normal' };
+  const warningScore = Math.max(1, Math.min(99, settings.thresholds.capacityWarningPercent || 80));
+  if (score >= warningScore) return { riskLevel: 'Green', label: 'Capacity Normal' };
   if (score >= 60) return { riskLevel: 'Yellow', label: 'Capacity Moderate' };
   if (score >= 40) return { riskLevel: 'Orange', label: 'Capacity Strained' };
   return { riskLevel: 'Red', label: 'Capacity Critical' };
@@ -330,17 +548,20 @@ const hasDischargeEventInPast60Minutes = (patient: Patient, now: Date): boolean 
 const computeCapacity = (
   patients: Patient[],
   rooms: Room[],
-  emsArrivals: EMSArrival[] = []
+  emsArrivals: EMSArrival[] = [],
+  settings: EmergencySettingsState = DEFAULT_EMERGENCY_SETTINGS
 ): CapacitySnapshot => {
   const now = new Date();
   const activePatients = patients.filter(isActivePatient);
   const totalActivePatients = activePatients.length;
-  const maxCapacity = rooms.length;
+  const maxCapacity = settings.departmentCapacityTarget || rooms.length;
   const occupiedRoomCount = rooms.filter(
     (room) => room.status === 'Occupied' || room.currentPatientId !== null
   ).length;
   const occupancyPercent = maxCapacity ? Math.round((occupiedRoomCount / maxCapacity) * 100) : 0;
-  const occupancyThreshold = Math.floor(maxCapacity * 0.8);
+  const occupancyThreshold = Math.floor(
+    maxCapacity * ((settings.thresholds.capacityWarningPercent || 80) / 100)
+  );
   const occupancyOveragePatients = Math.max(0, occupiedRoomCount - occupancyThreshold);
   const waitingPatients = patients.filter((patient) => patient.state === PatientState.Waiting);
   const boardingPatients = patients.filter((patient) => patient.state === PatientState.Admission);
@@ -362,7 +583,7 @@ const computeCapacity = (
   if (occupancyOveragePatients > 0) {
     deductions.push({
       id: 'room-occupancy-over-80',
-      label: `${occupancyOveragePatients} patient${occupancyOveragePatients === 1 ? '' : 's'} over 80% room occupancy`,
+      label: `${occupancyOveragePatients} patient${occupancyOveragePatients === 1 ? '' : 's'} over ${settings.thresholds.capacityWarningPercent}% room occupancy`,
       value: occupancyOveragePatients * 5,
     });
   }
@@ -401,7 +622,7 @@ const computeCapacity = (
 
   const totalDeductions = deductions.reduce((sum, deduction) => sum + deduction.value, 0);
   const score = Math.max(0, Math.min(100, 100 - totalDeductions));
-  const band = capacityBandForScore(score);
+  const band = capacityBandForScore(score, settings);
   const longestWaitMinutes = Math.max(
     0,
     ...waitingPatients.map((patient) => minutesSince(patient.arrivalTime, now))
@@ -452,19 +673,27 @@ const deriveOperationalState = (
   patients: Patient[],
   rooms: Room[],
   referrals: Referral[] = [],
-  emsArrivals: EMSArrival[] = []
+  emsArrivals: EMSArrival[] = [],
+  settings: EmergencySettingsState = DEFAULT_EMERGENCY_SETTINGS
 ): Pick<EmergencyStoreState, 'queues' | 'capacity'> => ({
-  queues: computeQueues(patients, referrals),
-  capacity: computeCapacity(patients, rooms, emsArrivals),
+  queues: computeQueues(patients, referrals, settings),
+  capacity: computeCapacity(patients, rooms, emsArrivals, settings),
 });
 
 let operationalRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+let emergencyRealtimeUnsubscribe: (() => void) | null = null;
 
 const updatePatients = (
   patients: Patient[],
   patientId: string,
   updater: (patient: Patient) => Patient
-): Patient[] => patients.map((patient) => (patient.id === patientId ? updater(patient) : patient));
+): Patient[] =>
+  patients.map((patient) => {
+    if (patient.id !== patientId) return patient;
+    const updated = updater(patient);
+    syncJourneyAuditEvents(newTimelineEvents(patient, updated));
+    return updated;
+  });
 
 const syncReferralsFromPatients = (patients: Patient[], referrals: Referral[]): Referral[] => {
   const byId = new Map(referrals.map((referral) => [referral.id, referral]));
@@ -474,6 +703,39 @@ const syncReferralsFromPatients = (patients: Patient[], referrals: Referral[]): 
     }
   });
   return [...byId.values()];
+};
+
+const realtimeEventType = (type?: string): string =>
+  String(type || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[\s.-]+/g, '_');
+
+const realtimePatientId = (payload: any): string =>
+  payload?.patientId || payload?.patient_id || payload?.id || payload?.patient?.id || '';
+
+const realtimeVitals = (payload: any): Vitals | null => {
+  const source = payload?.vitals || payload?.observations || payload;
+  if (!source || typeof source !== 'object') return null;
+  return {
+    hr: source.hr ?? source.heartRate ?? source.heart_rate ?? null,
+    bpSystolic: source.bpSystolic ?? source.systolic ?? source.bp_systolic ?? null,
+    bpDiastolic: source.bpDiastolic ?? source.diastolic ?? source.bp_diastolic ?? null,
+    spo2: source.spo2 ?? source.oxygenSaturation ?? source.oxygen_saturation ?? null,
+    temp: source.temp ?? source.temperature ?? null,
+    rr: source.rr ?? source.respiratoryRate ?? source.respiratory_rate ?? null,
+    gcs: source.gcs ?? null,
+    pain: source.pain ?? source.painScore ?? source.pain_score ?? null,
+    recordedAt: source.recordedAt || source.effectiveDateTime || source.timestamp || new Date().toISOString(),
+  };
+};
+
+const realtimePatientPatch = (payload: any): PatientPatch => {
+  const source = payload?.patient || payload?.patch || payload?.data || payload || {};
+  const blockedKeys = new Set(['id', 'patientId', 'patient_id', 'vitals']);
+  return Object.fromEntries(
+    Object.entries(source).filter(([key, value]) => !blockedKeys.has(key) && value !== undefined)
+  ) as PatientPatch;
 };
 
 const mockStaff: Staff[] = [
@@ -1336,7 +1598,8 @@ const initialDerived = deriveOperationalState(
   mockPatients,
   mockRooms,
   mockReferrals,
-  mockEMSArrivals
+  mockEMSArrivals,
+  DEFAULT_EMERGENCY_SETTINGS
 );
 const initialAlerts = deriveAlerts({
   patients: mockPatients,
@@ -1347,7 +1610,7 @@ const initialAlerts = deriveAlerts({
   bottleneckAlert: null,
 });
 
-export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
+export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
   patients: mockPatients,
   staff: mockStaff,
   rooms: mockRooms,
@@ -1363,6 +1626,27 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
   activeQueueFilter: null,
   whiteboardSearchQuery: '',
   bottleneckAlert: null,
+  patientBackendDetails: {},
+  patientBackendSearch: {
+    query: '',
+    status: 'idle',
+    results: [],
+    message: '',
+    backendSearchAvailable: false,
+  },
+  realtimeConnection: {
+    status: 'disconnected',
+    mode: 'none',
+    message: 'Real-time disconnected.',
+    updatedAt: undefined,
+  },
+  emergencyAnalytics: {
+    status: 'idle',
+    source: 'client-fallback',
+    message: '',
+    data: undefined,
+  },
+  emergencySettings: DEFAULT_EMERGENCY_SETTINGS,
 
   addPatient: (patient) =>
     set((state) => {
@@ -1371,7 +1655,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       return {
         patients,
         referrals,
-        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1382,7 +1666,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       return {
         patients,
         referrals,
-        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1431,7 +1715,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
         staff,
         selectedPatientId: state.selectedPatientId === id ? null : state.selectedPatientId,
         referrals,
-        ...deriveOperationalState(patients, rooms, referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, rooms, referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1454,7 +1738,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       }));
       return {
         patients,
-        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1488,7 +1772,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       return {
         patients,
         staff,
-        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1517,7 +1801,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       return {
         patients,
         rooms,
-        ...deriveOperationalState(patients, rooms, state.referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, rooms, state.referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1543,7 +1827,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       });
       return {
         patients,
-        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1566,7 +1850,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       });
       return {
         patients,
-        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1602,7 +1886,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       }));
       return {
         patients,
-        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1620,7 +1904,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       }));
       return {
         patients,
-        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1635,9 +1919,14 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           capacity: computeCapacity(
             latestState.patients,
             latestState.rooms,
-            latestState.emsArrivals
+            latestState.emsArrivals,
+            latestState.emergencySettings
           ),
-          queues: computeQueues(latestState.patients, latestState.referrals),
+          queues: computeQueues(
+            latestState.patients,
+            latestState.referrals,
+            latestState.emergencySettings
+          ),
         }));
         operationalRefreshTimer = null;
       }, 100);
@@ -1654,6 +1943,210 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
   setQueueFilter: (type) => set({ activeQueueFilter: type }),
 
   setWhiteboardSearchQuery: (query) => set({ whiteboardSearchQuery: query }),
+
+  loadPatientBackendDetails: async (patientId, options = {}) => {
+    if (!patientId) return null;
+    const existing = get().patientBackendDetails[patientId];
+    if (!options.force && (existing?.status === 'ready' || existing?.status === 'loading')) {
+      return existing;
+    }
+
+    const loadingEntry: PatientBackendDetailsEntry = {
+      patientId,
+      status: 'loading',
+      data: existing?.data,
+      loadedAt: existing?.loadedAt,
+    };
+    set((state) => ({
+      patientBackendDetails: {
+        ...state.patientBackendDetails,
+        [patientId]: loadingEntry,
+      },
+    }));
+
+    const result = await fetchPatientManagementBundle(patientId);
+    const nextEntry: PatientBackendDetailsEntry = result.ok
+      ? {
+          patientId,
+          status: 'ready',
+          loadedAt: new Date().toISOString(),
+          partial: result.partial,
+          error: result.partial ? result.error : '',
+          data: result.data,
+        }
+      : {
+          patientId,
+          status: 'error',
+          loadedAt: new Date().toISOString(),
+          error: result.error || 'Unable to load patient backend details.',
+          data: existing?.data,
+        };
+
+    set((state) => ({
+      patientBackendDetails: {
+        ...state.patientBackendDetails,
+        [patientId]: nextEntry,
+      },
+    }));
+
+    if (result.ok) {
+      const labSummary = criticalLabSummary(result.data);
+      if (labSummary) {
+        get().addFlag(patientId, 'DeteriorationRisk', {
+          reason: `Critical lab result from backend: ${labSummary}`,
+          severity: 'Critical',
+        });
+      }
+    }
+    return nextEntry;
+  },
+
+  searchBackendPatients: async (query) => {
+    const trimmed = query.trim();
+    const loadingState: PatientBackendSearchState = {
+      query: trimmed,
+      status: trimmed ? 'loading' : 'idle',
+      results: [],
+      message: '',
+      backendSearchAvailable: false,
+    };
+    set({ patientBackendSearch: loadingState });
+
+    if (!trimmed) {
+      return loadingState;
+    }
+
+    const result = await searchPatientsFromBackend(trimmed, { localPatients: get().patients });
+    const nextSearch: PatientBackendSearchState = {
+      query: trimmed,
+      status: result.ok ? 'ready' : 'error',
+      results: result.results || [],
+      message: result.message || result.error || '',
+      backendSearchAvailable: Boolean(result.backendSearchAvailable),
+    };
+
+    const detailEntries = Object.fromEntries(
+      nextSearch.results
+        .filter((item) => item.backendDetail)
+        .map((item) => [
+          item.patientId,
+          {
+            patientId: item.patientId,
+            status: 'ready',
+            loadedAt: new Date().toISOString(),
+            error: item.error || '',
+            data: item.backendDetail,
+          } satisfies PatientBackendDetailsEntry,
+        ])
+    );
+
+    set((state) => ({
+      patientBackendSearch: nextSearch,
+      patientBackendDetails: {
+        ...state.patientBackendDetails,
+        ...detailEntries,
+      },
+    }));
+    return nextSearch;
+  },
+
+  clearBackendPatientSearch: () =>
+    set({
+      patientBackendSearch: {
+        query: '',
+        status: 'idle',
+        results: [],
+        message: '',
+        backendSearchAvailable: false,
+      },
+    }),
+
+  loadBackendStaffProfile: async () => {
+    const result = await fetchOperationalStaffProfile();
+    if (!result.ok || !result.data) return;
+    set((state) => {
+      const backendStaff = staffFromOperationalProfile(result.data, state.activeShift);
+      const staff = upsertStaff(state.staff, backendStaff);
+      const staffIds = backendStaff
+        ? Array.from(new Set([...state.activeShift.staffIds, backendStaff.id]))
+        : state.activeShift.staffIds;
+      return {
+        staff,
+        activeShift: {
+          ...state.activeShift,
+          staffIds,
+          chargeStaffId: state.activeShift.chargeStaffId || backendStaff?.id || state.activeShift.chargeStaffId,
+        },
+      };
+    });
+  },
+
+  startShift: (input) =>
+    set((state) => {
+      const now = new Date().toISOString();
+      const shift: Shift = {
+        id: `shift-${Date.now()}`,
+        name: input.name || `ED shift ${new Date(input.startTime || now).toLocaleString()}`,
+        startTime: input.startTime || now,
+        endTime: input.endTime || new Date(new Date(input.startTime || now).getTime() + 8 * 60 * 60 * 1000).toISOString(),
+        status: 'Active',
+        chargeStaffId: input.chargeStaffId || input.staffIds[0] || state.activeShift.chargeStaffId,
+        staffIds: input.staffIds.length ? input.staffIds : state.staff.map((member) => member.id),
+        handoffNotes: [],
+      };
+      void recordEmergencyActivity({
+        category: 'workspace',
+        label: 'Emergency shift started',
+        route: '/emergency',
+        metadata: {
+          shiftId: shift.id,
+          startTime: shift.startTime,
+          staffIds: shift.staffIds,
+          backendPersistence: 'activity-log',
+        },
+      });
+      void syncEmergencyAuditEvent({
+        action: 'security_event',
+        resourceType: 'shift',
+        resourceId: shift.id,
+        timestamp: shift.startTime,
+      });
+      return {
+        activeShift: shift,
+        staff: state.staff.map((member) => ({
+          ...member,
+          status: shift.staffIds.includes(member.id) ? 'OnShift' : 'OffShift',
+          shiftId: shift.staffIds.includes(member.id) ? shift.id : member.shiftId,
+        })),
+      };
+    }),
+
+  endShift: (endedAt) =>
+    set((state) => {
+      const timestamp = endedAt || new Date().toISOString();
+      const shift: Shift = {
+        ...state.activeShift,
+        endTime: timestamp,
+        status: 'Closed',
+      };
+      void recordEmergencyActivity({
+        category: 'workspace',
+        label: 'Emergency shift ended',
+        route: '/emergency/shift',
+        metadata: {
+          shiftId: shift.id,
+          endTime: timestamp,
+          backendPersistence: 'activity-log',
+        },
+      });
+      void syncEmergencyAuditEvent({
+        action: 'security_event',
+        resourceType: 'shift',
+        resourceId: shift.id,
+        timestamp,
+      });
+      return { activeShift: shift };
+    }),
 
   setBottleneckAlert: (alert) => set({ bottleneckAlert: alert }),
 
@@ -1732,6 +2225,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
         clinicalSummary: input.clinicalSummary,
         status: input.status || 'Sent',
         requestedAt: now,
+        workflow: input.workflow || 'Referral',
       };
       const referrals = [...state.referrals, referral];
       const patients = updatePatients(state.patients, input.patientId, (patient) => ({
@@ -1759,7 +2253,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       return {
         patients,
         referrals,
-        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1770,11 +2264,15 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
 
       const now = new Date().toISOString();
       const timestampPatch: Partial<Referral> = {};
-      if (nextStatus === 'Sent') timestampPatch.requestedAt = now;
-      if (['Acknowledged', 'Accepted', 'Declined'].includes(nextStatus)) {
+      if (nextStatus === 'Sent' || nextStatus === 'TransferRequested') timestampPatch.requestedAt = now;
+      if (
+        ['Acknowledged', 'Accepted', 'Declined', 'TransportArranged', 'PatientDeparted'].includes(
+          nextStatus
+        )
+      ) {
         timestampPatch.respondedAt = existing.respondedAt || now;
       }
-      if (nextStatus === 'Completed') timestampPatch.completedAt = now;
+      if (nextStatus === 'Completed' || nextStatus === 'PatientDeparted') timestampPatch.completedAt = now;
 
       const referrals = state.referrals.map((referral) =>
         referral.id === referralId
@@ -1810,7 +2308,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       return {
         patients,
         referrals,
-        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals),
+        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1836,7 +2334,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
                 activeArrivalId: arrival.id,
               },
             ],
-        ...deriveOperationalState(state.patients, state.rooms, state.referrals, emsArrivals),
+        ...deriveOperationalState(state.patients, state.rooms, state.referrals, emsArrivals, state.emergencySettings),
       };
     }),
 
@@ -1847,9 +2345,14 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       );
       return {
         emsArrivals,
-        ...deriveOperationalState(state.patients, state.rooms, state.referrals, emsArrivals),
+        ...deriveOperationalState(state.patients, state.rooms, state.referrals, emsArrivals, state.emergencySettings),
       };
     }),
+
+  updateEMSUnit: (id, patch) =>
+    set((state) => ({
+      emsUnits: state.emsUnits.map((unit) => (unit.id === id ? { ...unit, ...patch } : unit)),
+    })),
 
   prepareEMSBay: (arrivalId) =>
     set((state) => {
@@ -1962,7 +2465,255 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
         referrals,
         selectedPatientId: patientId,
         activeQueueFilter: null,
-        ...deriveOperationalState(patients, rooms, referrals, emsArrivals),
+        ...deriveOperationalState(patients, rooms, referrals, emsArrivals, state.emergencySettings),
+      };
+    }),
+
+  setRealtimeConnection: (status) =>
+    set((state) => ({
+      realtimeConnection: {
+        ...state.realtimeConnection,
+        ...status,
+        updatedAt: status.updatedAt || new Date().toISOString(),
+      },
+    })),
+
+  handleRealtimeEvent: (event) => {
+    const type = realtimeEventType(event?.type);
+    const payload = event?.payload || {};
+    const state = get();
+
+    if (['patient_updated', 'patient_update', 'patient_changed'].includes(type)) {
+      const patientId = realtimePatientId(payload);
+      if (patientId) state.updatePatient(patientId, realtimePatientPatch(payload));
+      return;
+    }
+
+    if (['new_arrival', 'patient_created', 'patient_arrived'].includes(type)) {
+      const patient = payload.patient || payload;
+      if (patient?.id && !state.patients.some((candidate) => candidate.id === patient.id)) {
+        state.addPatient(patient as Patient);
+      } else if (patient?.id) {
+        state.updatePatient(patient.id, realtimePatientPatch(patient));
+      }
+      return;
+    }
+
+    if (['vitals_updated', 'vital_signs_updated', 'observation_created'].includes(type)) {
+      const patientId = realtimePatientId(payload);
+      const nextVitals = realtimeVitals(payload);
+      if (patientId && nextVitals) state.addVitals(patientId, nextVitals);
+      return;
+    }
+
+    if (['alert_fired', 'alert_triggered', 'clinical_alert'].includes(type)) {
+      state.dispatchAlert(payload.alert || payload);
+      return;
+    }
+
+    if (['ems_update', 'ems_unit_updated'].includes(type)) {
+      const unit = payload.unit || payload.emsUnit || payload;
+      const unitId = unit.id || unit.unitId;
+      if (unitId) state.updateEMSUnit(unitId, unit);
+      return;
+    }
+
+    if (['ems_arrival', 'ems_arrival_updated', 'ems_notification'].includes(type)) {
+      const arrival = payload.arrival || payload;
+      if (!arrival?.id) return;
+      if (state.emsArrivals.some((candidate) => candidate.id === arrival.id)) {
+        state.updateEMSArrival(arrival.id, arrival);
+      } else {
+        state.addEMSArrival(arrival as EMSArrival);
+      }
+      return;
+    }
+
+    if (['lab_result', 'lab_resulted', 'result_received'].includes(type)) {
+      const patientId = realtimePatientId(payload);
+      if (patientId) void state.loadPatientBackendDetails(patientId, { force: true });
+    }
+  },
+
+  pollRealtimeFallback: async () => {
+    const state = get();
+    const activePatientIds = state.patients
+      .filter((patient) => patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased)
+      .slice(0, 12)
+      .map((patient) => patient.id);
+    await Promise.all(
+      activePatientIds.map((patientId) =>
+        state.loadPatientBackendDetails(patientId, { force: true }).catch(() => null)
+      )
+    );
+    state.updateAlerts();
+  },
+
+  startRealtime: () => {
+    if (emergencyRealtimeUnsubscribe) return;
+    emergencyRealtimeUnsubscribe = startEmergencyRealtime({
+      onStatus: (status: RealtimeConnectionState) => get().setRealtimeConnection(status),
+      onEvent: (event: RealtimeEventEnvelope) => get().handleRealtimeEvent(event),
+      onPoll: () => get().pollRealtimeFallback(),
+    });
+  },
+
+  stopRealtime: () => {
+    emergencyRealtimeUnsubscribe?.();
+    emergencyRealtimeUnsubscribe = null;
+    set({
+      realtimeConnection: {
+        status: 'disconnected',
+        mode: 'none',
+        message: 'Real-time disconnected.',
+        updatedAt: new Date().toISOString(),
+      },
+    });
+  },
+
+  loadEmergencyAnalytics: async (options = {}) => {
+    const current = get().emergencyAnalytics;
+    if (!options.force && current.status === 'ready' && current.loadedAt) return current;
+
+    set((state) => ({
+      emergencyAnalytics: {
+        ...state.emergencyAnalytics,
+        status: 'loading',
+        message: '',
+      },
+    }));
+
+    const backend = await fetchEmergencyOperationalAnalytics();
+    if (backend.ok && backend.data) {
+      const nextState: EmergencyAnalyticsState = {
+        status: 'ready',
+        source: 'backend',
+        loadedAt: new Date().toISOString(),
+        message: '',
+        data: backend.data,
+      };
+      set({ emergencyAnalytics: nextState });
+      return nextState;
+    }
+
+    const state = get();
+    const nextState: EmergencyAnalyticsState = {
+      status: 'ready',
+      source: 'client-fallback',
+      loadedAt: new Date().toISOString(),
+      message: backend.message || 'Backend ED analytics endpoint not available; using local operational state.',
+      data: buildLocalEmergencyAnalytics({
+        patients: state.patients,
+        queues: state.queues,
+        capacity: state.capacity,
+        activeShift: state.activeShift,
+      }),
+    };
+    set({ emergencyAnalytics: nextState });
+    return nextState;
+  },
+
+  saveEmergencySettings: (patch) =>
+    set((state) => {
+      const emergencySettings: EmergencySettingsState = {
+        ...state.emergencySettings,
+        ...patch,
+        thresholds: {
+          ...state.emergencySettings.thresholds,
+          ...(patch.thresholds || {}),
+          reassessmentIntervals: {
+            ...state.emergencySettings.thresholds.reassessmentIntervals,
+            ...(patch.thresholds?.reassessmentIntervals || {}),
+          },
+        },
+        alertRules: {
+          ...state.emergencySettings.alertRules,
+          ...(patch.alertRules || {}),
+        },
+        featureFlags: {
+          ...state.emergencySettings.featureFlags,
+          ...(patch.featureFlags || {}),
+        },
+      };
+      return {
+        emergencySettings,
+        ...deriveOperationalState(
+          state.patients,
+          state.rooms,
+          state.referrals,
+          state.emsArrivals,
+          emergencySettings
+        ),
+      };
+    }),
+
+  upsertRoom: (room) =>
+    set((state) => {
+      const id = room.id || `room-${Date.now()}`;
+      const nextRoom: Room = {
+        id,
+        name: room.name || `Room ${state.rooms.length + 1}`,
+        type: room.type || 'Assessment',
+        status: room.status || 'Available',
+        currentPatientId: room.currentPatientId ?? null,
+        isIsolationCapable: Boolean(room.isIsolationCapable),
+      };
+      const rooms = state.rooms.some((candidate) => candidate.id === id)
+        ? state.rooms.map((candidate) => (candidate.id === id ? { ...candidate, ...nextRoom } : candidate))
+        : [...state.rooms, nextRoom];
+      return {
+        rooms,
+        ...deriveOperationalState(
+          state.patients,
+          rooms,
+          state.referrals,
+          state.emsArrivals,
+          state.emergencySettings
+        ),
+      };
+    }),
+
+  deactivateRoom: (roomId) =>
+    set((state) => {
+      const rooms = state.rooms.map((room) =>
+        room.id === roomId ? { ...room, status: 'Blocked' as const, currentPatientId: null } : room
+      );
+      return {
+        rooms,
+        ...deriveOperationalState(
+          state.patients,
+          rooms,
+          state.referrals,
+          state.emsArrivals,
+          state.emergencySettings
+        ),
+      };
+    }),
+
+  upsertStaffMember: (staffInput) =>
+    set((state) => {
+      const id = staffInput.id || `staff-${Date.now()}`;
+      const [firstName = 'New', ...rest] = String(staffInput.name || '').split(' ').filter(Boolean);
+      const nextStaff: Staff = {
+        id,
+        firstName: staffInput.firstName || firstName || 'New',
+        lastName: staffInput.lastName || rest.join(' ') || 'Staff',
+        name: staffInput.name,
+        displayName: staffInput.displayName || staffInput.name,
+        email: staffInput.email,
+        avatarUrl: staffInput.avatarUrl,
+        role: staffInput.role || 'Nurse',
+        roleLabel: staffInput.roleLabel,
+        status: staffInput.status || 'OffShift',
+        shiftId: staffInput.shiftId ?? null,
+        assignedPatientIds: staffInput.assignedPatientIds || [],
+        activePatients: staffInput.activePatients,
+        currentRoomId: staffInput.currentRoomId,
+      };
+      return {
+        staff: state.staff.some((candidate) => candidate.id === id)
+          ? state.staff.map((candidate) => (candidate.id === id ? { ...candidate, ...nextStaff } : candidate))
+          : [...state.staff, nextStaff],
       };
     }),
 }));

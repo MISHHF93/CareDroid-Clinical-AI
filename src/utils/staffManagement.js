@@ -1,4 +1,5 @@
 import { PatientState } from '../../types/emergency';
+import { emergencyRoleForStaff } from './emergencyRolePermissions';
 
 const ACTIVE_PATIENT_STATES = new Set(
   Object.values(PatientState).filter(
@@ -17,6 +18,8 @@ export function staffInitials(staff) {
 }
 
 export function staffRoleLabel(role) {
+  const normalized = emergencyRoleForStaff({ role });
+  if (['MD', 'RN', 'PA', 'Tech', 'Admin'].includes(normalized)) return normalized;
   if (role === 'Attending' || role === 'Consultant') return 'MD';
   if (role === 'TriageNurse' || role === 'ChargeNurse') return 'RN';
   if (role === 'Technician' || role === 'Paramedic') return 'Tech';

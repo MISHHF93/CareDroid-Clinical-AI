@@ -68,7 +68,7 @@ function transitionErrorMessage(error) {
   return error instanceof Error ? error.message : 'Unable to move patient state.';
 }
 
-export default function JourneyTimeline({ patient, staffId, onTransitionError }) {
+export default function JourneyTimeline({ patient, staffId, onTransitionError, canTransitionState }) {
   const [pendingState, setPendingState] = useState(null);
   const currentIndex = STATE_FLOW.indexOf(patient.state);
 
@@ -142,8 +142,12 @@ export default function JourneyTimeline({ patient, staffId, onTransitionError })
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                onClick={() => (entry.isFuture ? setPendingState(entry.state) : null)}
-                disabled={!entry.isFuture}
+                onClick={() =>
+                  entry.isFuture && canTransitionState?.(entry.state) !== false
+                    ? setPendingState(entry.state)
+                    : null
+                }
+                disabled={!entry.isFuture || canTransitionState?.(entry.state) === false}
               >
                 <span className="journey-timeline__dot" />
                 <strong>{entry.state}</strong>

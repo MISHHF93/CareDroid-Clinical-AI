@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
-import { Copy, Printer, X } from 'lucide-react';
+import { useEffect, useMemo, useState } from 'react';
+import { Copy, Download, Printer, X } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { useUser } from '../contexts/UserContext';
 import { sendClinicalChatMessage } from '../services/clinicalChatService';
+import { exportEmergencyShiftReport } from '../services/emergencyAnalyticsApi';
 import './ShiftSummary.css';
 
 const QUEUE_BREACH_THRESHOLDS = {
@@ -220,8 +221,26 @@ function StatCard({ label, value, helper }) {
     <article className="shift-summary__stat-card">
       <span>{label}</span>
       <strong>{value}</strong>
-      {helper ? <small>{helper}</small> : null}
+      {typeof helper === 'string' ? <small>{helper}</small> : helper || null}
     </article>
+  );
+}
+
+function trendSymbol(trend) {
+  if (!trend) return '→';
+  if (trend.direction === 'up') return '↑';
+  if (trend.direction === 'down') return '↓';
+  return '→';
+}
+
+function TrendHelper({ trend, suffix = '' }) {
+  if (!trend) return null;
+  const delta = Math.abs(Number(trend.delta || 0));
+  return (
+    <small className={`shift-summary__trend shift-summary__trend--${trend.direction}`}>
+      {trendSymbol(trend)} {delta}
+      {suffix} vs last shift
+    </small>
   );
 }
 
@@ -250,14 +269,40 @@ export default function ShiftSummary() {
   const capacity = useEmergencyStore((state) => state.capacity);
   const referrals = useEmergencyStore((state) => state.referrals);
   const activeShift = useEmergencyStore((state) => state.activeShift);
+  const emergencyAnalytics = useEmergencyStore((state) => state.emergencyAnalytics);
+  const loadEmergencyAnalytics = useEmergencyStore((state) => state.loadEmergencyAnalytics);
   const [handoffBrief, setHandoffBrief] = useState('');
   const [handoffError, setHandoffError] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [exportStatus, setExportStatus] = useState('');
   const [copied, setCopied] = useState(false);
   const metrics = useMemo(
     () => buildShiftMetrics({ patients, queues, capacity, referrals, activeShift }),
     [activeShift, capacity, patients, queues, referrals]
   );
+  const backendShift = emergencyAnalytics.data?.shift || {};
+
+  useEffect(() => {
+    void loadEmergencyAnalytics({ force: true });
+  }, [loadEmergencyAnalytics, patients, queues, capacity, activeShift]);
+
+  const exportShiftReport = async () => {
+    setExportStatus('Checking backend export endpoint...');
+    const result = await exportEmergencyShiftReport();
+    if (!result.ok) {
+      setExportStatus(result.message || 'Shift report export is not available yet.');
+      return;
+    }
+    const url = URL.createObjectURL(result.blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = result.filename || 'emergency-shift-report.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    setExportStatus('Shift report exported.');
+  };
 
   const generateHandoffBrief = async () => {
     setIsGenerating(true);
@@ -276,7 +321,11 @@ export default function ShiftSummary() {
             enabled: true,
             systemPrompt:
               'You are the ED Copilot. Write a concise, print-ready shift handoff brief for clinical staff. Surface information for human review and never make autonomous clinical decisions.',
-            shiftSummary: metrics,
+            shiftSummary: {
+              ...metrics,
+              backendAnalytics: emergencyAnalytics.data || null,
+              analyticsSource: emergencyAnalytics.source,
+            },
           },
         },
       });
@@ -308,24 +357,52 @@ export default function ShiftSummary() {
             })}{' '}
             · {metrics.patients.length} patients tracked
           </p>
+          <small className="shift-summary__source">
+            Analytics source:{' '}
+            {emergencyAnalytics.source === 'backend' ? 'Backend aggregates' : 'Client fallback'}
+          </small>
         </div>
-        <button type="button" onClick={generateHandoffBrief} disabled={isGenerating}>
-          {isGenerating ? 'Generating...' : 'Generate Handoff Brief'}
-        </button>
+        <div className="shift-summary__header-actions">
+          <button type="button" onClick={exportShiftReport}>
+            <Download size={15} aria-hidden />
+            Export Shift Report
+          </button>
+          <button type="button" onClick={generateHandoffBrief} disabled={isGenerating}>
+            {isGenerating ? 'Generating...' : 'Generate Handoff Brief'}
+          </button>
+        </div>
       </header>
+
+      {emergencyAnalytics.message || exportStatus ? (
+        <p className="shift-summary__inline-note">
+          {exportStatus || emergencyAnalytics.message}
+        </p>
+      ) : null}
 
       <section className="shift-summary__section">
         <div className="shift-summary__section-heading">
           <span>Stats</span>
         </div>
         <div className="shift-summary__stats-grid">
-          <StatCard label="Total patients seen" value={metrics.stats.totalSeen} helper="Admitted + discharged" />
+          <StatCard
+            label="Total patients seen"
+            value={backendShift.patientsSeen ?? metrics.stats.totalSeen}
+            helper={<TrendHelper trend={backendShift.comparison?.patientsSeen} />}
+          />
           <StatCard label="Avg door-to-triage" value={formatMinutes(metrics.stats.averageDoorToTriage)} />
           <StatCard label="Avg door-to-provider" value={formatMinutes(metrics.stats.averageDoorToProvider)} />
-          <StatCard label="Avg length of stay" value={formatMinutes(metrics.stats.averageLengthOfStay)} />
-          <StatCard label="Discharges" value={metrics.stats.dischargeCount} />
-          <StatCard label="Admissions" value={metrics.stats.admissionCount} />
-          <StatCard label="LWBS" value={metrics.stats.lwbsCount} />
+          <StatCard
+            label="Avg length of stay"
+            value={formatMinutes(backendShift.avgLosMinutes ?? metrics.stats.averageLengthOfStay)}
+            helper={<TrendHelper trend={backendShift.comparison?.avgLosMinutes} suffix="m" />}
+          />
+          <StatCard label="Discharges" value={backendShift.dischargeCount ?? metrics.stats.dischargeCount} />
+          <StatCard label="Admissions" value={backendShift.admissionCount ?? metrics.stats.admissionCount} />
+          <StatCard
+            label="LWBS"
+            value={backendShift.lwbsCount ?? metrics.stats.lwbsCount}
+            helper={<TrendHelper trend={backendShift.comparison?.lwbsCount} />}
+          />
         </div>
       </section>
 

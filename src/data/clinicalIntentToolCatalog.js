@@ -941,14 +941,14 @@ Score appearance, pulse, grimace, activity, and respiration (0–2 each) at 1 an
   },
   {
     toolId: NLU.pediatricDoseSafetyChecker,
-    toolName: 'Pediatric Dose Safety Checker',
+    toolName: 'Pediatric Emergency Drug Calculator',
     category: 'calculator',
     description:
-      'Placeholder-only pediatric medication safety checklist that blocks patient-specific dose calculation.',
+      'Pediatric ED emergency drug quick-reference with weight or age-estimated dosing table and verification prompts.',
     path: '/tools/calculators/pediatric-dose-safety-checker',
     sidebarToolId: REGISTRY.pediatricDoseSafetyChecker,
     chatSeed:
-      'Help me document pediatric medication safety checks without calculating a dose: medication context, weight in kg, governed institutional protocol availability, concentration, route, frequency, maximum dose source, allergies, renal/hepatic context, and independent verification. Placeholder only; do not provide mg/kg doses, dose ranges, titration, infusion rates, medication recommendations, or prescriptions unless governed by an approved protocol outside this build.',
+      'Open the pediatric emergency drug calculator for a weight-based ED quick reference covering resuscitation drugs, RSI drugs, glucose, mannitol, and fluid bolus volumes. Decision support only; verify measured weight, concentrations, max doses, contraindications, and local pediatric/PALS policy before any administration.',
     backendExecutable: false,
   },
   {
@@ -3299,9 +3299,9 @@ export const builtinUiCalculators = [
   },
   {
     id: 'pediatric-dose-safety-checker',
-    name: 'Pediatric Dose Safety Checker',
+    name: 'Pediatric Emergency Drug Calculator',
     description:
-      'Placeholder-only pediatric medication safety checker; no patient-specific dose calculation.',
+      'Pediatric ED emergency drug quick-reference with weight or age-estimated dosing table and verification prompts.',
     path: '/tools/calculators/pediatric-dose-safety-checker',
     calcQuery: '/tools/calculators?calc=pediatric-dose-safety-checker',
     implementation: 'Client-side in pediatricsObgynCalculators.jsx (pediatricsObgynCalculators.js)',

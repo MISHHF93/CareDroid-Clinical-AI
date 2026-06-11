@@ -22,6 +22,8 @@ import {
   buildStaffWorkloads,
   getStaffRebalanceSuggestion,
 } from '../utils/staffManagement';
+import { formatScoresForCopilot } from '../utils/clinicalScoreEvents';
+import { drugReferenceToolListForCopilot } from '../utils/drugReferenceTools';
 import './ChatInterface.css';
 
 function waitMinutes(arrivalTime) {
@@ -232,10 +234,19 @@ function formatBriefPatientList(patients = []) {
   if (!sortedPatients.length) return '- No active patients';
 
   return sortedPatients
-    .map(
-      (patient) =>
-        `- ${patientDisplayName(patient)} | ${patient.chiefComplaint || patient.complaint || 'Complaint pending'} | ${patient.state} | Wait: ${waitMinutes(patient.arrivalTime)}min | Priority: ${patient.priority}`
-    )
+    .map((patient) => {
+      const scoreContext = formatScoresForCopilot(patient);
+      return [
+        `- ${patientDisplayName(patient)}`,
+        patient.chiefComplaint || patient.complaint || 'Complaint pending',
+        patient.state,
+        `Wait: ${waitMinutes(patient.arrivalTime)}min`,
+        `Priority: ${patient.priority}`,
+        scoreContext ? `Scores run: ${scoreContext}` : null,
+      ]
+        .filter(Boolean)
+        .join(' | ');
+    })
     .join('\n');
 }
 
@@ -265,6 +276,7 @@ function buildRequestedEdCopilotSystemPrompt({
     `EMS pressure: ${emsPressure.score}`,
     `Active referrals: ${activeReferralCount(referrals)}`,
     `Bottleneck: ${bottleneck || 'None'}`,
+    `Drug reference tools available: ${drugReferenceToolListForCopilot()}`,
     '',
     'Patients:',
     formatBriefPatientList(activePatients),
@@ -532,7 +544,10 @@ const ChatInterface = ({
           patients: emergencyPatients,
           capacity: emergencyCapacity,
           reassessmentCount: emergencyPatients.filter(
-            (patient) => isActivePatient(patient) && hasPatientFlag(patient, 'ReassessmentDue')
+            (patient) =>
+              isActivePatient(patient) &&
+              (hasPatientFlag(patient, 'ReassessmentDue') ||
+                hasPatientFlag(patient, 'ScoreReassessmentRecommended'))
           ).length,
           queueHealth: edQueueHealth,
           reassessmentQueue,
@@ -719,7 +734,10 @@ const ChatInterface = ({
             const emergencyState = useEmergencyStore.getState();
             const currentEmsPressure = calculateEMSPressureScore(emergencyState.emsArrivals);
             const reassessmentCount = emergencyState.patients.filter(
-              (patient) => isActivePatient(patient) && hasPatientFlag(patient, 'ReassessmentDue')
+              (patient) =>
+                isActivePatient(patient) &&
+                (hasPatientFlag(patient, 'ReassessmentDue') ||
+                  hasPatientFlag(patient, 'ScoreReassessmentRecommended'))
             ).length;
             const currentStaffRebalanceSuggestion = getStaffRebalanceSuggestion(
               buildStaffWorkloads(

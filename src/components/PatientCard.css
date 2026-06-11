@@ -1,12 +1,12 @@
 .patient-card {
   position: relative;
   display: grid;
-  grid-template-rows: 22px 24px 24px 22px 1fr;
+  grid-template-rows: 20px 22px 22px 20px 18px 16px;
   gap: 2px;
   width: 100%;
-  height: 120px;
-  min-height: 120px;
-  max-height: 120px;
+  height: 132px;
+  min-height: 132px;
+  max-height: 132px;
   padding: var(--space-2) var(--space-2) var(--space-1) var(--space-3);
   border: 1px solid var(--color-border-subtle);
   border-left: 4px solid var(--priority-p5);
@@ -26,6 +26,8 @@
 
 .patient-card:hover,
 .patient-card:focus-visible {
+  z-index: 3;
+  overflow: visible;
   border-color: color-mix(in srgb, var(--status-info) 50%, var(--color-border-default));
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.34);
   outline: none;
@@ -186,6 +188,70 @@
   font-weight: 900;
   line-height: 1;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patient-card__allergy-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 0 var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--status-critical) 42%, var(--color-border-default));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-critical) 16%, var(--color-elevated));
+  color: var(--status-critical);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.patient-card__hover-summary {
+  position: absolute;
+  inset-inline: var(--space-2) auto;
+  top: calc(100% + var(--space-1));
+  z-index: 8;
+  display: none;
+  min-width: 230px;
+  max-width: 280px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-elevated);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.patient-card:hover .patient-card__hover-summary,
+.patient-card:focus-visible .patient-card__hover-summary {
+  display: grid;
+  gap: 3px;
+}
+
+.patient-card__hover-summary strong {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+}
+
+.patient-card__hover-summary small {
+  color: var(--color-text-muted);
+}
+
+.patient-card__hover-alert {
+  color: var(--status-critical);
+  font-weight: 900;
+}
+
+.patient-card__diagnosis {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -381,6 +447,29 @@
   font-size: 10px;
   font-weight: 900;
   line-height: 1;
+  object-fit: cover;
+  overflow: hidden;
+}
+
+.patient-card__staff-avatar img,
+.staff-selector__avatar:is(img) {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.staff-selector__role-badge {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid color-mix(in srgb, var(--status-info) 35%, transparent);
+  border-radius: 999px;
+  padding: 1px 6px;
+  background: color-mix(in srgb, var(--status-info) 12%, transparent);
+  color: var(--status-info);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .patient-card__staff-avatar {
@@ -526,6 +615,10 @@
   color: var(--status-info);
 }
 
+.patient-card__flags span[aria-label='ScoreReassessmentRecommended'] {
+  color: var(--status-warning);
+}
+
 .patient-card__flags .patient-card__score-badge {
   justify-content: center;
   width: auto;
@@ -541,6 +634,24 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.patient-card__flags .patient-card__score-badge--red {
+  border-color: color-mix(in srgb, var(--status-critical) 42%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-critical) 18%, var(--color-elevated));
+  color: var(--status-critical);
+}
+
+.patient-card__flags .patient-card__score-badge--yellow {
+  border-color: color-mix(in srgb, var(--status-warning) 42%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-warning) 18%, var(--color-elevated));
+  color: var(--status-warning);
+}
+
+.patient-card__flags .patient-card__score-badge--green {
+  border-color: color-mix(in srgb, var(--status-stable) 42%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-stable) 16%, var(--color-elevated));
+  color: var(--status-stable);
 }
 
 .patient-detail {
@@ -789,6 +900,26 @@
   gap: var(--space-2);
 }
 
+.patient-detail__vitals-history {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.patient-detail__vitals-chart {
+  min-width: 0;
+  height: 190px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-elevated);
+}
+
+.patient-detail__vitals-history small {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
 .patient-detail__score-launcher {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -800,6 +931,326 @@
   padding: 0 var(--space-2);
   border-color: color-mix(in srgb, var(--status-info) 34%, var(--color-border-default));
   background: color-mix(in srgb, var(--status-info) 10%, var(--color-surface));
+}
+
+.patient-detail__score-history {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.patient-detail__backend-status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--color-elevated);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 800;
+}
+
+.patient-detail__backend-status--ready {
+  border-color: color-mix(in srgb, var(--status-stable) 34%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-stable) 12%, var(--color-elevated));
+  color: var(--status-stable);
+}
+
+.patient-detail__backend-status--loading {
+  border-color: color-mix(in srgb, var(--status-info) 34%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 12%, var(--color-elevated));
+  color: var(--status-info);
+}
+
+.patient-detail__backend-status--error {
+  border-color: color-mix(in srgb, var(--status-warning) 34%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-warning) 12%, var(--color-elevated));
+  color: var(--status-warning);
+}
+
+.patient-detail__data-tabs {
+  display: flex;
+  gap: var(--space-1);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.patient-detail__data-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.patient-detail__data-tabs button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 30px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--color-elevated);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.patient-detail__data-tabs button strong {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.patient-detail__data-tabs button:hover,
+.patient-detail__data-tabs button:focus-visible,
+.patient-detail__data-tab--active {
+  border-color: var(--status-info);
+  background: color-mix(in srgb, var(--status-info) 14%, var(--color-elevated));
+  color: var(--status-info);
+  outline: none;
+}
+
+.patient-detail__data-panel,
+.patient-detail__data-subsection,
+.patient-detail__data-list,
+.patient-detail__lab-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.patient-detail__data-subsection h3 {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.patient-detail__data-list article,
+.patient-detail__lab-list article {
+  display: grid;
+  gap: 2px;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-elevated);
+}
+
+.patient-detail__data-list article span,
+.patient-detail__lab-list article span {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.patient-detail__data-list article small,
+.patient-detail__lab-list article small {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.patient-detail__lab--abnormal {
+  border-color: color-mix(in srgb, var(--status-warning) 42%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-warning) 10%, var(--color-elevated));
+}
+
+.patient-detail__lab--critical {
+  border-color: color-mix(in srgb, var(--status-critical) 58%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-critical) 14%, var(--color-elevated));
+  box-shadow: inset 3px 0 0 var(--status-critical);
+}
+
+.patient-detail__lab--critical strong,
+.patient-detail__lab--critical span {
+  color: var(--status-critical);
+}
+
+.patient-detail__order-action-row {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.patient-detail__order-action-row button {
+  justify-self: start;
+  min-height: 30px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font: inherit;
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+}
+
+.patient-detail__order-action-row small {
+  color: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.patient-detail__order-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.patient-detail__order-list article {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-elevated);
+}
+
+.patient-detail__order-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.patient-detail__order-list article > div span,
+.patient-detail__data-subsection h3 span {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.patient-detail__order-list dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1);
+  margin: 0;
+}
+
+.patient-detail__order-list dl div {
+  min-width: 0;
+}
+
+.patient-detail__order-list dt {
+  color: var(--color-text-muted);
+  font-size: 10px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.patient-detail__order-list dd {
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patient-detail__diagnosis-field {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+}
+
+.patient-detail__diagnosis-field input {
+  min-height: 34px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--color-elevated);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.patient-detail__diagnosis-field small {
+  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.patient-detail__allergy-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+.patient-detail__allergy-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: 24px;
+  padding: 0 var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--status-warning) 34%, var(--color-border-default));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-warning) 10%, var(--color-elevated));
+  color: var(--status-warning);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+}
+
+.patient-detail__allergy-chip--critical {
+  border-color: color-mix(in srgb, var(--status-critical) 44%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-critical) 14%, var(--color-elevated));
+  color: var(--status-critical);
+}
+
+.patient-detail__allergy-chip small {
+  color: inherit;
+  font-size: 10px;
+  opacity: 0.82;
+}
+
+.patient-detail__score-row {
+  display: grid;
+  grid-template-columns:
+    minmax(92px, 1.3fr) minmax(42px, 0.45fr) minmax(86px, 1fr)
+    minmax(58px, 0.6fr) minmax(74px, 0.8fr);
+  gap: var(--space-2);
+  align-items: center;
+  min-width: 0;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  border-left: 3px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.patient-detail__score-row strong,
+.patient-detail__score-row span,
+.patient-detail__score-row time {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.patient-detail__score-row strong {
+  color: var(--color-text-primary);
+}
+
+.patient-detail__score-row--red {
+  border-left-color: var(--status-critical);
+}
+
+.patient-detail__score-row--yellow {
+  border-left-color: var(--status-warning);
+}
+
+.patient-detail__score-row--green {
+  border-left-color: var(--status-stable);
 }
 
 .patient-detail__vital {
@@ -926,6 +1377,17 @@
 .patient-detail__referral-list {
   display: grid;
   gap: var(--space-2);
+}
+
+.patient-detail__referral-history {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.patient-detail__referral-history strong {
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
 }
 
 .patient-detail__referral-card {

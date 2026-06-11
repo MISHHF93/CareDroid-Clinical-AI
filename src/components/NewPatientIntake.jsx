@@ -4,6 +4,7 @@ import { PatientState, Priority } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { createClinicalScoreEvent, createClinicalScoreNote } from './ClinicalScoreCalculator';
 import ProtocolSuggestion, { createProtocolLaunchEvent } from './ProtocolSuggestion';
+import { getSuggestedToolsForComplaint } from '../utils/clinicalToolSuggestions';
 import './NewPatientIntake.css';
 
 const COMPLAINT_CATEGORIES = [
@@ -227,6 +228,10 @@ export default function NewPatientIntake({ open, onClose }) {
     [complaintCategory, complaintText, vitals]
   );
   const selectedPriority = priorityOverride || suggestedPriority;
+  const suggestedTools = useMemo(
+    () => getSuggestedToolsForComplaint(complaintCategory),
+    [complaintCategory]
+  );
   const canAdvance = canContinue(step, identity, age, complaintCategory, complaintText);
   const draftPatient = useMemo(
     () => ({
@@ -260,7 +265,9 @@ export default function NewPatientIntake({ open, onClose }) {
     const protocolEvents = launchedProtocols.map((suggestion) =>
       createProtocolLaunchEvent(patientId, complaintCategory, suggestion, now)
     );
-    const scoreEvents = savedScores.map((score) => createClinicalScoreEvent(patientId, score, now));
+    const scoreEvents = savedScores.map((score) =>
+      createClinicalScoreEvent(patientId, score, now, 'system-intake')
+    );
     const scoreNotes = savedScores.map((score) =>
       createClinicalScoreNote(patientId, score, 'system-intake', now)
     );
@@ -314,6 +321,32 @@ export default function NewPatientIntake({ open, onClose }) {
     setQueueFilter(null);
     selectPatient(patientId);
     resetAndClose();
+  };
+
+  const pendingPatientForTools = () => ({
+    mrn,
+    firstName: identity.firstName,
+    lastName: identity.lastName,
+    age: age ?? null,
+    sex: identity.sex,
+    complaintCategory,
+    chiefComplaint: complaintText,
+    vitals: normalizeVitals(vitalsSkipped ? INITIAL_VITALS : vitals, new Date().toISOString()),
+  });
+
+  const openComplaintTools = (toolId = '') => {
+    const params = new URLSearchParams();
+    if (complaintCategory) params.set('complaint', complaintCategory);
+    if (toolId) params.set('tool', toolId);
+    window.dispatchEvent(
+      new CustomEvent('ed:open-clinical-tools', {
+        detail: {
+          search: params.toString(),
+          pendingPatient: pendingPatientForTools(),
+        },
+      })
+    );
+    onClose?.();
   };
 
   return (
@@ -431,6 +464,25 @@ export default function NewPatientIntake({ open, onClose }) {
                   </button>
                 ))}
               </div>
+              <button
+                type="button"
+                className="new-patient-intake__clinical-tools"
+                onClick={() => openComplaintTools()}
+              >
+                Open Clinical Tools for {complaintCategory}
+              </button>
+              {complaintCategory ? (
+                <div className="new-patient-intake__tool-banner">
+                  <span>Suggested tools for {complaintCategory}:</span>
+                  <div>
+                    {suggestedTools.map((tool) => (
+                      <button key={tool.id} type="button" onClick={() => openComplaintTools(tool.id)}>
+                        {tool.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               <ProtocolSuggestion
                 complaintCategory={complaintCategory}
                 patient={draftPatient}

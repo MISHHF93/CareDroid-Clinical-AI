@@ -185,7 +185,7 @@ import {
 } from './calculatorPrimitives';
 
 // Hub cards still derive from builtinUiCalculators.map inside buildBuiltinHubCalculatorCards().
-const CALCULATORS = buildBuiltinHubCalculatorCards();
+export const CALCULATORS = buildBuiltinHubCalculatorCards();
 const CHAT_ASSISTED_TOOLS = getHubChatAssistedTools();
 const CHAT_ASSISTED_TOOL_BY_ID = Object.fromEntries(
   CHAT_ASSISTED_TOOLS.map((tool) => [tool.toolId, tool])
@@ -208,6 +208,10 @@ function calcFieldClass(base, invalid) {
 function calcDescribedBy(...ids) {
   const joined = ids.filter(Boolean).join(' ');
   return joined || undefined;
+}
+
+function patientValueToField(value) {
+  return value === null || value === undefined || Number.isNaN(Number(value)) ? '' : String(value);
 }
 
 function CalculatorSelectCard({ calc, isActive, onSelect }) {
@@ -486,14 +490,14 @@ const Calculators = ({ embedded = false, onCloseEmbedded, initialCalculatorId = 
 /**
  * Calculator Interface Component
  */
-const CalculatorInterface = ({ calculator, onResultChange }) => {
+export const CalculatorInterface = ({ calculator, onResultChange, patientContext = null }) => {
   switch (calculator.id) {
     case 'sofa':
       return <SOFACalculator onResultChange={onResultChange} />;
     case 'qsofa':
-      return <QSOFACalculator onResultChange={onResultChange} />;
+      return <QSOFACalculator onResultChange={onResultChange} patientContext={patientContext} />;
     case 'news2':
-      return <NEWS2Calculator onResultChange={onResultChange} />;
+      return <NEWS2Calculator onResultChange={onResultChange} patientContext={patientContext} />;
     case 'apache-ii':
       return <ApacheIICalculator onResultChange={onResultChange} />;
     case 'curb-65':
@@ -669,7 +673,7 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
     case 'neonatal-bilirubin-risk-helper':
       return <NeonatalBilirubinRiskHelper onResultChange={onResultChange} />;
     case 'pediatric-dose-safety-checker':
-      return <PediatricDoseSafetyChecker onResultChange={onResultChange} />;
+      return <PediatricDoseSafetyChecker onResultChange={onResultChange} patientContext={patientContext} />;
     case 'shock-index':
       return <ShockIndexCalculator onResultChange={onResultChange} />;
     case 'anion-gap':
@@ -698,11 +702,14 @@ const CalculatorInterface = ({ calculator, onResultChange }) => {
 /**
  * qSOFA — bedside screening (Sepsis-3). Decision support only; not a substitute for clinical judgment.
  */
-const QSOFACalculator = ({ onResultChange }) => {
-  const [respiratoryRate, setRespiratoryRate] = useState('');
-  const [systolicBloodPressure, setSystolicBloodPressure] = useState('');
+const QSOFACalculator = ({ onResultChange, patientContext = null }) => {
+  const patientVitals = patientContext?.vitals || {};
+  const [respiratoryRate, setRespiratoryRate] = useState(() => patientValueToField(patientVitals.rr));
+  const [systolicBloodPressure, setSystolicBloodPressure] = useState(() =>
+    patientValueToField(patientVitals.bpSystolic)
+  );
   const [alteredMentation, setAlteredMentation] = useState(false);
-  const [gcs, setGcs] = useState('');
+  const [gcs, setGcs] = useState(() => patientValueToField(patientVitals.gcs));
   const [validationErrors, setValidationErrors] = useState([]);
   const [result, setResult] = useState(null);
   const resultsRef = useRef(null);
@@ -963,15 +970,16 @@ const QSOFACalculator = ({ onResultChange }) => {
 /**
  * NEWS2 — RCP standard acute physiology score. Decision support only; follow local escalation policy.
  */
-const NEWS2Calculator = ({ onResultChange }) => {
-  const [respiratoryRate, setRespiratoryRate] = useState('');
-  const [spo2, setSpo2] = useState('');
+const NEWS2Calculator = ({ onResultChange, patientContext = null }) => {
+  const patientVitals = patientContext?.vitals || {};
+  const [respiratoryRate, setRespiratoryRate] = useState(() => patientValueToField(patientVitals.rr));
+  const [spo2, setSpo2] = useState(() => patientValueToField(patientVitals.spo2));
   const [spo2Scale, setSpo2Scale] = useState('1');
   const [supplementalOxygen, setSupplementalOxygen] = useState(false);
-  const [systolicBp, setSystolicBp] = useState('');
-  const [pulse, setPulse] = useState('');
+  const [systolicBp, setSystolicBp] = useState(() => patientValueToField(patientVitals.bpSystolic));
+  const [pulse, setPulse] = useState(() => patientValueToField(patientVitals.hr));
   const [newConfusion, setNewConfusion] = useState(false);
-  const [temperature, setTemperature] = useState('');
+  const [temperature, setTemperature] = useState(() => patientValueToField(patientVitals.temp));
   const [validationErrors, setValidationErrors] = useState([]);
   const [result, setResult] = useState(null);
   const resultsRef = useRef(null);

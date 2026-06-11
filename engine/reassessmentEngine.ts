@@ -10,9 +10,7 @@ import {
 } from '../types/emergency';
 
 const REASSESSMENT_INTERVAL_MS = 60_000;
-const LONG_WAIT_THRESHOLD_MINUTES = 45;
-const P1_P2_VITALS_OVERDUE_MINUTES = 30;
-const P3_VITALS_OVERDUE_MINUTES = 60;
+const P1_P2_SCORE_STALE_MINUTES = 120;
 
 type TimerHandle = number;
 
@@ -33,6 +31,7 @@ export const REASSESSMENT_FLAG_TYPES: readonly PatientFlagType[] = [
   'ReassessmentDue',
   'HighRisk',
   'DeteriorationRisk',
+  'ScoreReassessmentRecommended',
 ];
 
 const MANAGED_FLAG_TYPES = new Set<PatientFlagType>(REASSESSMENT_FLAG_TYPES);
@@ -54,6 +53,8 @@ const minutesSince = (timestamp: string | null, now: Date): number => {
   return Math.max(0, Math.round((now.getTime() - parsed) / 60_000));
 };
 
+const emergencySettings = () => useEmergencyStore.getState().emergencySettings;
+
 const latestStateTimestamp = (patient: Patient, state: PatientState): string | null => {
   const event = [...patient.timeline].reverse().find((item) => {
     const stateTarget = item.toState || item.to;
@@ -69,11 +70,14 @@ const latestStateTimestamp = (patient: Patient, state: PatientState): string | n
 
 const isWaitingPastThreshold = (patient: Patient, now: Date): boolean =>
   patient.state === PatientState.Waiting &&
-  minutesSince(latestStateTimestamp(patient, PatientState.Waiting), now) > LONG_WAIT_THRESHOLD_MINUTES;
+  minutesSince(latestStateTimestamp(patient, PatientState.Waiting), now) >
+    (emergencySettings()?.thresholds?.waitWarningMinutes || 45);
 
 const vitalsOverdueThreshold = (priority: Priority): number | null => {
-  if (priority === Priority.P1 || priority === Priority.P2) return P1_P2_VITALS_OVERDUE_MINUTES;
-  if (priority === Priority.P3) return P3_VITALS_OVERDUE_MINUTES;
+  const intervals = emergencySettings()?.thresholds?.reassessmentIntervals || {};
+  if (priority === Priority.P1) return intervals.P1 || 15;
+  if (priority === Priority.P2) return intervals.P2 || 30;
+  if (priority === Priority.P3) return intervals.P3 || 60;
   return null;
 };
 
@@ -87,6 +91,25 @@ const hasPriorityMismatch = (patient: Patient): boolean =>
   (patient.priority === Priority.P1 || patient.priority === Priority.P2) &&
   PRE_ASSESSMENT_STATES.has(patient.state);
 
+const latestScoreTimestamp = (patient: Patient): string | null => {
+  const event = [...patient.timeline]
+    .reverse()
+    .find((item) => item.type === 'SCORE' || item.type === 'ClinicalScoreSaved');
+  return event?.timestamp ?? null;
+};
+
+const scoreStalenessMinutes = (patient: Patient, now: Date): number | null => {
+  const timestamp = latestScoreTimestamp(patient);
+  if (!timestamp) return null;
+  return minutesSince(timestamp, now);
+};
+
+const hasStaleScore = (patient: Patient, now: Date): boolean => {
+  if (patient.priority !== Priority.P1 && patient.priority !== Priority.P2) return false;
+  const ageMinutes = scoreStalenessMinutes(patient, now);
+  return ageMinutes !== null && ageMinutes > P1_P2_SCORE_STALE_MINUTES;
+};
+
 const deteriorationReasons = (patient: Patient): string[] => {
   const { hr, spo2, temp, bpSystolic } = patient.vitals;
   const reasons: string[] = [];
@@ -97,6 +120,17 @@ const deteriorationReasons = (patient: Patient): string[] => {
   if (typeof bpSystolic === 'number' && (bpSystolic < 90 || bpSystolic > 180)) {
     reasons.push(`SBP ${bpSystolic}`);
   }
+
+  const backendDetails = useEmergencyStore.getState().patientBackendDetails?.[patient.id]?.data;
+  const criticalLabs = Array.isArray(backendDetails?.labs)
+    ? backendDetails.labs.filter((lab: any) => lab?.isCritical)
+    : [];
+  criticalLabs.slice(0, 3).forEach((lab: any) => {
+    const result = [lab.name, lab.value, lab.unit]
+      .filter((item) => item !== undefined && item !== null && item !== '')
+      .join(' ');
+    reasons.push(`Critical lab ${result || 'reported'}`);
+  });
 
   return reasons;
 };
@@ -110,7 +144,9 @@ const desiredFlagsForPatient = (patient: Patient, now: Date): DesiredFlag[] => {
   const reassessmentReasons: string[] = [];
 
   if (isWaitingPastThreshold(patient, now)) {
-    reassessmentReasons.push(`Waiting more than ${LONG_WAIT_THRESHOLD_MINUTES} minutes`);
+    reassessmentReasons.push(
+      `Waiting more than ${emergencySettings()?.thresholds?.waitWarningMinutes || 45} minutes`
+    );
   }
 
   if (hasVitalsOverdue(patient, now)) {
@@ -139,6 +175,15 @@ const desiredFlagsForPatient = (patient: Patient, now: Date): DesiredFlag[] => {
       type: 'DeteriorationRisk',
       reason: `Abnormal vitals: ${deteriorationReasons(patient).join(', ')}`,
       severity: 'Critical',
+    });
+  }
+
+  if (hasStaleScore(patient, now)) {
+    const ageMinutes = scoreStalenessMinutes(patient, now);
+    desiredFlags.push({
+      type: 'ScoreReassessmentRecommended',
+      reason: `Score reassessment recommended; latest score is ${ageMinutes} minutes old`,
+      severity: 'Warning',
     });
   }
 
