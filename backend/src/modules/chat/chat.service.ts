@@ -261,6 +261,27 @@ export class ChatService {
       userId,
     });
 
+    if (workspaceContext?.edCopilot?.enabled) {
+      const response = await this.handleEdCopilot(message, workspaceContext.edCopilot);
+      const composed = this.aiResponseComposer.compose(
+        response,
+        aiRunEnvelope,
+        routePlan,
+        contextPacket,
+        integrationMetadata,
+      );
+      await this.finalizeAssistantTurn({
+        message,
+        response: composed,
+        userId,
+        conversationId,
+        costOptimization,
+        routePlan,
+        latencyMs: Date.now() - startedAt,
+      });
+      return composed;
+    }
+
     // ========================================
     // STEP 2: EMERGENCY DETECTION & ESCALATION
     // ========================================
@@ -835,6 +856,35 @@ export class ChatService {
       pinnedAssets: Array.isArray(context.pinnedAssets) ? context.pinnedAssets.slice(0, 30) : [],
       permissions: Array.isArray(context.permissions) ? context.permissions.slice(0, 80) : [],
       preferredAIStyle: context.saasProfile?.preferredAIStyle,
+      edCopilot: this.sanitizeEdCopilotContext(context.edCopilot),
+    };
+  }
+
+  private sanitizeEdCopilotContext(context?: Record<string, any>): Record<string, any> | null {
+    if (!context || typeof context !== 'object' || context.enabled !== true) return null;
+
+    return {
+      enabled: true,
+      systemPrompt: String(context.systemPrompt || '').slice(0, 4000),
+      patientCount: Number(context.patientCount) || 0,
+      capacitySnapshot: context.capacitySnapshot || null,
+      queueHealth: Array.isArray(context.queueHealth) ? context.queueHealth.slice(0, 12) : [],
+      flaggedReassessments: Array.isArray(context.flaggedReassessments)
+        ? context.flaggedReassessments.slice(0, 20)
+        : [],
+      patients: Array.isArray(context.patients)
+        ? context.patients.slice(0, 80).map((patient: any) => ({
+            id: patient.id,
+            name: patient.name,
+            location: patient.location,
+            complaint: patient.complaint,
+            state: patient.state,
+            priority: patient.priority,
+            waitMinutes: Number(patient.waitMinutes) || 0,
+            assignedTo: patient.assignedTo,
+          }))
+        : [],
+      safetyBoundary: String(context.safetyBoundary || '').slice(0, 500),
     };
   }
 
@@ -1212,6 +1262,239 @@ export class ChatService {
     }
 
     return analysis;
+  }
+
+  private async handleEdCopilot(
+    message: string,
+    edContext: Record<string, any>,
+  ): Promise<QueryResponse> {
+    const commandResponse = this.handleEdCopilotCommand(message, edContext);
+    if (commandResponse) return commandResponse;
+
+    const anthropicText = await this.invokeAnthropicEdCopilot(message, edContext);
+    const text =
+      anthropicText ||
+      [
+        '**ED Copilot**',
+        'I reviewed the current ED whiteboard context. Ask about longest waits, complaint cohorts, capacity, or reassessment flags.',
+        '',
+        '_Human review required. I will not make autonomous clinical decisions, orders, disposition, admission, discharge, or treatment recommendations._',
+      ].join('\n');
+
+    return this.buildEdCopilotResponse({
+      text,
+      command: 'general',
+      edContext,
+    });
+  }
+
+  private handleEdCopilotCommand(
+    message: string,
+    edContext: Record<string, any>,
+  ): QueryResponse | null {
+    const lower = message.toLowerCase();
+    const patients = Array.isArray(edContext.patients) ? edContext.patients : [];
+
+    if (/waiting.*longest|longest.*waiting/.test(lower)) {
+      const waiting = [...patients].sort(
+        (a, b) => Number(b.waitMinutes || 0) - Number(a.waitMinutes || 0),
+      );
+      const top = waiting.slice(0, 5);
+      const lines = top.length
+        ? top.map(
+            (patient, index) =>
+              `${index + 1}. ${patient.name} (${patient.location || 'unassigned'}) - ${patient.waitMinutes} min, ${patient.state}, ${patient.complaint}`,
+          )
+        : ['No waiting-time data is available.'];
+
+      return this.buildEdCopilotResponse({
+        text: `**Longest waiting patients**\n\n${lines.join('\n')}\n\n_Surface for human review before any clinical or operational action._`,
+        command: 'longest_waiting',
+        edContext,
+        items: top,
+      });
+    }
+
+    if (/chest pain/.test(lower) && /show|all|patients|list/.test(lower)) {
+      const chestPainPatients = patients.filter((patient) =>
+        String(patient.complaint || '').toLowerCase().includes('chest'),
+      );
+      const lines = chestPainPatients.length
+        ? chestPainPatients.map(
+            (patient) =>
+              `- ${patient.name} (${patient.location || 'unassigned'}) - ${patient.state}, ${patient.priority}, wait ${patient.waitMinutes} min`,
+          )
+        : ['No chest pain patients are on the current whiteboard context.'];
+
+      return this.buildEdCopilotResponse({
+        text: `**Chest pain patients**\n\n${lines.join('\n')}\n\n_Review these patients in the whiteboard. No autonomous diagnosis or disposition is suggested._`,
+        command: 'show_chest_pain',
+        edContext,
+        items: chestPainPatients,
+        whiteboardAction: {
+          type: 'filterComplaint',
+          complaint: 'chest',
+          requiresHumanReview: true,
+        },
+      });
+    }
+
+    if (/capacity|occupancy|boarding/.test(lower)) {
+      const capacity = edContext.capacitySnapshot || {};
+      return this.buildEdCopilotResponse({
+        text: [
+          '**Current ED capacity**',
+          '',
+          `- Score: ${capacity.score || 'Unknown'}`,
+          `- Occupancy: ${capacity.currentOccupancy ?? '?'} / ${capacity.maxCapacity ?? '?'} (${capacity.occupancyPercent ?? '?'}%)`,
+          `- Boarding/admission patients: ${capacity.boardingCount ?? 0}`,
+          `- Reassessment queue: ${capacity.reassessmentQueueLength ?? 0}`,
+          '',
+          '_Capacity visibility only. Human charge/clinical leadership review is required before staffing, bed, admission, transfer, or discharge actions._',
+        ].join('\n'),
+        command: 'capacity_status',
+        edContext,
+      });
+    }
+
+    const flagMatch = lower.match(/flag\s+(?:bed|patient)\s+([a-z0-9-]+)/i);
+    if (flagMatch) {
+      const target = flagMatch[1];
+      const matchedPatient = patients.find((patient) => {
+        const fields = [
+          patient.id,
+          patient.name,
+          patient.location,
+          String(patient.location || '').replace(/^bed\s*/i, ''),
+        ];
+        return fields.some((field) => String(field || '').trim().toLowerCase() === target);
+      });
+
+      if (!matchedPatient) {
+        return this.buildEdCopilotResponse({
+          text: `**Reassessment flag not applied**\n\nI could not match ${target.toUpperCase().startsWith('TOR-') ? target : `bed ${target}`} to a current whiteboard patient. Please verify the bed or patient identifier.\n\n_No autonomous clinical action was taken._`,
+          command: 'flag_reassessment_unmatched',
+          edContext,
+        });
+      }
+
+      return this.buildEdCopilotResponse({
+        text: `**Reassessment flag prepared**\n\nI flagged ${matchedPatient.name} (${matchedPatient.location || matchedPatient.id}) for human reassessment review on the whiteboard.\n\n_No autonomous clinical action was taken._`,
+        command: 'flag_reassessment',
+        edContext,
+        items: [matchedPatient],
+        whiteboardAction: {
+          type: 'flagReassessment',
+          target: matchedPatient.location || matchedPatient.id || target,
+          reason: 'ED Copilot manual reassessment flag for human review',
+          requiresHumanReview: true,
+        },
+      });
+    }
+
+    return null;
+  }
+
+  private buildEdCopilotResponse(params: {
+    text: string;
+    command: string;
+    edContext: Record<string, any>;
+    items?: any[];
+    whiteboardAction?: Record<string, any>;
+  }): QueryResponse {
+    const structured = {
+      command: params.command,
+      patientCount: params.edContext.patientCount,
+      capacityScore: params.edContext.capacitySnapshot?.score,
+      queueHealth: params.edContext.queueHealth,
+      flaggedReassessments: params.edContext.flaggedReassessments,
+      items: params.items || [],
+      whiteboardAction: params.whiteboardAction || null,
+      requiresHumanReview: true,
+      safetyBoundary:
+        'Decision support only. No autonomous diagnosis, treatment, orders, disposition, admission, discharge, staffing, bed, or transfer decisions.',
+    };
+
+    return {
+      text: params.text,
+      suggestions: [
+        'Who has been waiting the longest?',
+        'Show me all chest pain patients',
+        "What's our capacity right now?",
+      ],
+      visualizations: [
+        {
+          type: 'ed-copilot-response',
+          data: structured,
+        },
+      ],
+      confidence: 0.9,
+      metadata: {
+        edCopilot: structured,
+        whiteboardAction: params.whiteboardAction,
+        modelProvider: 'anthropic',
+        safety: {
+          requiresHumanReview: true,
+          autonomousClinicalDecisionsAllowed: false,
+        },
+      },
+    };
+  }
+
+  private async invokeAnthropicEdCopilot(
+    message: string,
+    edContext: Record<string, any>,
+  ): Promise<string> {
+    const apiKey =
+      this.configService.get<string>('ANTHROPIC_API_KEY') ||
+      this.configService.get<string>('anthropic.apiKey');
+    if (!apiKey) return '';
+
+    const model =
+      this.configService.get<string>('ANTHROPIC_MODEL') ||
+      this.configService.get<string>('anthropic.model') ||
+      'claude-3-5-sonnet-20241022';
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 700,
+          temperature: 0.2,
+          system: edContext.systemPrompt,
+          messages: [
+            {
+              role: 'user',
+              content: message,
+            },
+          ],
+        }),
+      });
+
+      if (!response.ok) {
+        this.logger.warn(`Anthropic ED Copilot request failed: ${response.status}`);
+        return '';
+      }
+
+      const data = await response.json().catch(() => ({}));
+      const content = Array.isArray(data?.content) ? data.content : [];
+      return content
+        .map((item: any) => (item?.type === 'text' ? item.text : ''))
+        .filter(Boolean)
+        .join('\n')
+        .trim();
+    } catch (error) {
+      this.logger.warn(
+        `Anthropic ED Copilot request error: ${error instanceof Error ? error.message : String(error)}`,
+      );
+      return '';
+    }
   }
 
   /**

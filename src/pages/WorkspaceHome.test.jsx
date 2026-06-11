@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import WorkspaceHome from './WorkspaceHome';
+import { EmergencyDepartmentProvider } from '../contexts/EmergencyDepartmentContext';
 import {
   mockConversationValue,
   mockToolPreferencesValue,
@@ -38,28 +39,30 @@ function LocationProbe() {
 function renderWorkspace(route = '/workspace/emergency') {
   return render(
     <MemoryRouter initialEntries={[route]}>
-      <Routes>
-        <Route
-          path="/workspace/:workspaceId"
-          element={
-            <>
-              <WorkspaceHome />
-              <LocationProbe />
-            </>
-          }
-        />
-        <Route
-          path="/workspace/:workspaceId/:subpage"
-          element={
-            <>
-              <WorkspaceHome />
-              <LocationProbe />
-            </>
-          }
-        />
-        <Route path="/assistant" element={<LocationProbe />} />
-        <Route path="/profile/workspaces" element={<LocationProbe />} />
-      </Routes>
+      <EmergencyDepartmentProvider>
+        <Routes>
+          <Route
+            path="/workspace/:workspaceId"
+            element={
+              <>
+                <WorkspaceHome />
+                <LocationProbe />
+              </>
+            }
+          />
+          <Route
+            path="/workspace/:workspaceId/:subpage"
+            element={
+              <>
+                <WorkspaceHome />
+                <LocationProbe />
+              </>
+            }
+          />
+          <Route path="/assistant" element={<LocationProbe />} />
+          <Route path="/profile/workspaces" element={<LocationProbe />} />
+        </Routes>
+      </EmergencyDepartmentProvider>
     </MemoryRouter>
   );
 }
@@ -106,23 +109,14 @@ describe('WorkspaceHome', () => {
     expect(screen.queryByLabelText(/workspace data status/i)).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /^Emergency Whiteboard$/i })).toBeInTheDocument();
     expect(screen.getByText(/Primary workspace screen/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Patient Flow, Queue Flow, EMS Flow, Capacity Flow, and Decision Support/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/50-150 patients\/day/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Detailed tools stay contextual/i)).toBeInTheDocument();
+    expect(screen.getByText(/Journey controls/i)).toBeInTheDocument();
+    expect(screen.getByText(/Toronto urgent care flow/i)).toBeInTheDocument();
+    expect(screen.getByText(/patients\/day across chest pain/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/emergency whiteboard summary/i)).toHaveTextContent(/active patients/i);
-    [
-      /Patients/i,
-      /Queues/i,
-      /Alerts/i,
-      /Referrals/i,
-      /EMS Arrivals/i,
-      /Boarding/i,
-      /Capacity/i,
-    ].forEach((label) => {
-      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
-    });
-    fireEvent.click(screen.getByRole('button', { name: /ems arrivals/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/ems');
+    expect(screen.getByLabelText(/emergency whiteboard summary/i)).toHaveTextContent(/Capacity score/i);
+    expect(screen.getByLabelText(/queue counts/i)).toHaveTextContent(/Waiting/i);
+    expect(screen.getByText(/Maya Chen/i)).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /move to next state/i }).length).toBeGreaterThan(0);
   });
 
   it('launches ED command center actions from the dashboard', () => {
@@ -349,16 +343,6 @@ describe('WorkspaceHome', () => {
       fireEvent.submit(input.closest('form'));
     };
 
-    const whiteboard = renderWorkspace('/workspace/emergency');
-    expect(screen.getByRole('heading', { name: /navigate from whiteboard/i })).toBeInTheDocument();
-    submitCopilot(/whiteboard emergency copilot command/i, 'Show longest waiting patients');
-    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
-      expect.stringContaining('Show longest waiting patients'),
-      'user'
-    );
-    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/waiting-room');
-    whiteboard.unmount();
-
     const patientCards = renderWorkspace('/workspace/emergency/patient-path');
     expect(screen.getByRole('heading', { name: /navigate patient cards with copilot/i })).toBeInTheDocument();
     submitCopilot(/patient cards emergency copilot command/i, 'Find high-risk patients');
@@ -409,15 +393,16 @@ describe('WorkspaceHome', () => {
     expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/ems');
   });
 
-  it('starts primary ED actions from the Whiteboard', () => {
+  it('moves patients through the journey from the Whiteboard', () => {
     renderWorkspace('/workspace/emergency');
 
-    fireEvent.click(screen.getByRole('button', { name: /ask assistant to summarize whiteboard pressure/i }));
-    expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
-      expect.stringContaining('Summarize Emergency Whiteboard pressure'),
-      'user'
-    );
-    expect(screen.getByTestId('location')).toHaveTextContent('/assistant');
+    const patientCard = screen.getByText(/Maya Chen/i).closest('article');
+    expect(patientCard).toHaveTextContent(/Assessment/i);
+
+    fireEvent.click(within(patientCard).getByRole('button', { name: /move to next state/i }));
+
+    expect(patientCard).toHaveTextContent(/Orders/i);
+    expect(patientCard).toHaveTextContent(/Last moved/i);
   });
 
   it('launches complaint pathways without routing through tools or calculators first', () => {
@@ -454,53 +439,108 @@ describe('WorkspaceHome', () => {
     expect(screen.getAllByText(/Reassessment Queue/i).length).toBeGreaterThan(0);
   });
 
-  it('renders the primary ED whiteboard with demo patient cards and operating actions', () => {
+  it('renders the primary ED whiteboard with demo patient cards and operating actions', async () => {
     renderWorkspace('/workspace/emergency');
 
     expect(screen.getByRole('heading', { name: /^Emergency Whiteboard$/i })).toBeInTheDocument();
-    expect(screen.getByText(/No dashboard hopping/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Patient Flow, Queue Flow, EMS Flow, Capacity Flow, and Decision Support/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Detailed tools stay contextual/i)).toBeInTheDocument();
-    ['Patients', 'Queues', 'Alerts', 'Referrals', 'EMS Arrivals', 'Boarding', 'Capacity'].forEach((action) => {
-      expect(screen.getAllByRole('button', { name: new RegExp(action, 'i') }).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Journey controls/i)).toBeInTheDocument();
+    expect(screen.getByText(/Toronto urgent care flow/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/patients in ReassessmentQueue/i)).toHaveTextContent(/ReassessmentQueue/i);
+    expect(screen.getByLabelText(/CapacityBanner/i)).toHaveTextContent(/Capacity Intelligence/i);
+    expect(screen.getByLabelText(/CapacityBanner/i)).toHaveTextContent(/Occupancy/i);
+    expect(screen.getByLabelText(/CapacityBanner/i)).toHaveTextContent(/Boarding/i);
+    expect(screen.getByLabelText(/CapacityBanner/i)).toHaveTextContent(/Reassessment/i);
+    expect(screen.getByLabelText(/shift summary view/i)).toHaveTextContent(/Patients seen/i);
+    expect(screen.getByLabelText(/shift summary view/i)).toHaveTextContent(/Avg wait/i);
+    expect(screen.getByLabelText(/shift summary view/i)).toHaveTextContent(/Dispositions/i);
+    expect(screen.getByLabelText(/shift summary view/i)).toHaveTextContent(/Flagged events/i);
+    expect(screen.getByLabelText(/emergency whiteboard summary/i)).toHaveTextContent(/Total patients/i);
+    expect(screen.getByLabelText(/emergency whiteboard summary/i)).toHaveTextContent(/Capacity score/i);
+    expect(screen.getByLabelText(/queue counts/i)).toHaveTextContent(/Triage/i);
+    expect(screen.getByLabelText(/queue counts/i)).toHaveTextContent(/Provider/i);
+    const queuePanel = screen.getByLabelText(/emergency queue panel/i);
+    expect(within(queuePanel).getByRole('heading', { name: /queue panel/i })).toBeInTheDocument();
+    ['Waiting', 'Triage', 'Provider', 'Results', 'Referral', 'Admission', 'Discharge', 'Reassessment'].forEach((queue) => {
+      expect(within(queuePanel).getByRole('button', { name: new RegExp(queue, 'i') })).toBeInTheDocument();
     });
-    [
-      'EMS Incoming',
-      'Waiting',
-      'Triage',
-      'In Assessment',
-      'Orders Pending',
-      'Results Pending',
-      'Reassessment Due',
-      'Disposition',
-      'Discharge Ready',
-    ].forEach((column) => {
-      expect(screen.getAllByText(column).length).toBeGreaterThan(0);
+    expect(within(queuePanel).getAllByText(/avg wait/i).length).toBe(8);
+    expect(screen.getByText(/Red = high risk/i)).toBeInTheDocument();
+    expect(screen.getByText(/Yellow = waiting too long/i)).toBeInTheDocument();
+    expect(screen.getByText(/Green = stable/i)).toBeInTheDocument();
+    expect(screen.getByText(/Maya Chen/i)).toBeInTheDocument();
+    expect(screen.getByText(/Chest pain after climbing stairs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Lucas Martin/i)).toBeInTheDocument();
+    expect(screen.getByText(/Fever and cough after school outbreak/i)).toBeInTheDocument();
+    expect(screen.queryByText(/^Location$/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/staff assignment panel/i)).toHaveTextContent(/Team of 5/i);
+    expect(screen.getByLabelText(/staff assignment panel/i)).toHaveTextContent(/Dr\. Ahmed Khan/i);
+    expect(screen.getByLabelText(/staff assignment panel/i)).toHaveTextContent(/RN Marcus Lee/i);
+    expect(screen.getByLabelText(/staff workload per person/i)).toHaveTextContent(/Physician/i);
+    fireEvent.change(screen.getByLabelText(/Assign Lucas Martin/i), {
+      target: { value: 'Dr. Laura Singh' },
     });
-    expect(screen.getByLabelText(/emergency whiteboard summary/i)).toHaveTextContent(/patients today/i);
-    expect(screen.getByLabelText(/emergency whiteboard summary/i)).toHaveTextContent(/avg wait/i);
-    expect(screen.getAllByText(/Assigned clinician:/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/EMS Handoff Pipeline:/i)).toBeInTheDocument();
-    expect(screen.getByText(/Incoming, En Route, Arriving, Arrived/i)).toBeInTheDocument();
-    expect(screen.getByText(/Reassessment Intelligence:/i)).toBeInTheDocument();
-    expect(screen.getByText(/waiting duration, risk score changes, abnormal vitals, reassessment intervals/i)).toBeInTheDocument();
-    expect(screen.getByText(/Capacity Engine:/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Capacity Score/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/discharge opportunities/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/bottlenecks/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/overloaded queues/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Emergency Flow Engine:/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Next Recommended Action:/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Arrival, Triage, Waiting, Assessment, Orders, Results, Disposition/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Needs Reassessment/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Inbound EMS/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/EMS status:/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/ED Handoff Summary:/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Sample patient DEMO-ED/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Demo data/i).length).toBeGreaterThan(0);
+    expect(screen.getByLabelText(/Assign Lucas Martin/i)).toHaveValue('Dr. Laura Singh');
+    expect(screen.getAllByRole('button', { name: /move to next state/i }).length).toBeGreaterThan(0);
+    await waitFor(() =>
+      expect(mockConversationValue.addMessage).toHaveBeenCalledWith(
+        expect.objectContaining({
+          role: 'assistant',
+          content: expect.stringContaining('Capacity Alert:'),
+        })
+      )
+    );
+  });
 
-    fireEvent.click(screen.getByRole('button', { name: /ems arrivals/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/ems');
+  it('filters the ED whiteboard from the collapsible QueuePanel', () => {
+    renderWorkspace('/workspace/emergency');
+
+    const queuePanel = screen.getByLabelText(/emergency queue panel/i);
+    fireEvent.click(within(queuePanel).getByRole('button', { name: /^Waiting/i }));
+
+    expect(screen.getByText(/Showing 1 Waiting queue patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/Lucas Martin/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Maya Chen/i)).not.toBeInTheDocument();
+
+    fireEvent.click(within(queuePanel).getByRole('button', { name: /collapse/i }));
+    expect(within(queuePanel).queryByRole('button', { name: /^Waiting/i })).not.toBeInTheDocument();
+
+    fireEvent.click(within(queuePanel).getByRole('button', { name: /expand/i }));
+    expect(within(queuePanel).getByRole('button', { name: /^Waiting/i })).toBeInTheDocument();
+
+    fireEvent.click(within(queuePanel).getByRole('button', { name: /all active patients/i }));
+    expect(screen.getByText(/Showing all active whiteboard patients/i)).toBeInTheDocument();
+    expect(screen.getByText(/Maya Chen/i)).toBeInTheDocument();
+  });
+
+  it('adds a new triage patient from the whiteboard chat intake flow', () => {
+    renderWorkspace('/workspace/emergency');
+
+    fireEvent.click(screen.getByRole('button', { name: /new patient/i }));
+    const chatPanel = screen.getByLabelText(/new patient chat panel/i);
+
+    expect(within(chatPanel).getByRole('heading', { name: /step 1 of 4/i })).toBeInTheDocument();
+    fireEvent.click(within(chatPanel).getByRole('button', { name: /chest pain/i }));
+    fireEvent.click(within(chatPanel).getByRole('button', { name: /continue/i }));
+
+    expect(within(chatPanel).getByRole('heading', { name: /step 2 of 4/i })).toBeInTheDocument();
+    fireEvent.change(within(chatPanel).getByLabelText(/^HR$/i), { target: { value: '118' } });
+    fireEvent.change(within(chatPanel).getByLabelText(/^BP$/i), { target: { value: '146/88' } });
+    fireEvent.change(within(chatPanel).getByLabelText(/^SpO2$/i), { target: { value: '96' } });
+    fireEvent.change(within(chatPanel).getByLabelText(/^Temp$/i), { target: { value: '36.9' } });
+    fireEvent.change(within(chatPanel).getByLabelText(/^RR$/i), { target: { value: '22' } });
+    fireEvent.click(within(chatPanel).getByRole('button', { name: /continue/i }));
+
+    expect(within(chatPanel).getByRole('heading', { name: /step 3 of 4/i })).toBeInTheDocument();
+    expect(within(chatPanel).getByText(/HEART Score/i)).toBeInTheDocument();
+    fireEvent.click(within(chatPanel).getByRole('button', { name: /continue/i }));
+
+    expect(within(chatPanel).getByRole('heading', { name: /step 4 of 4/i })).toBeInTheDocument();
+    expect(within(chatPanel).getAllByText(/Triage/i).length).toBeGreaterThan(0);
+    fireEvent.click(within(chatPanel).getByRole('button', { name: /confirm and add patient/i }));
+
+    expect(screen.queryByLabelText(/new patient chat panel/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/New ED Patient 9/i)).toBeInTheDocument();
+    expect(screen.getByText(/Showing 3 Triage queue patients/i)).toBeInTheDocument();
   });
 
   it('renders the ED Patient Path with Door-to-Direction metrics', () => {

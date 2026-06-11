@@ -7,9 +7,50 @@ import Citations, { CitationModal } from './Citations';
 import ConfidenceBadge from './ConfidenceBadge';
 import { sendClinicalChatMessage, mapChatResponseToAssistantMessage } from '../services/clinicalChatService';
 import { useNotificationActions } from '../hooks/useNotificationActions';
+import { getQueueForPatientState, useEmergencyDepartment } from '../contexts/EmergencyDepartmentContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
 import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import './ChatInterface.css';
+
+function waitMinutes(arrivalTime) {
+  const arrivedAt = new Date(arrivalTime).getTime();
+  if (!Number.isFinite(arrivedAt)) return 0;
+  return Math.max(0, Math.round((Date.now() - arrivedAt) / 60000));
+}
+
+function queueHealth(avgWait) {
+  if (avgWait > 60) return 'red';
+  if (avgWait > 30) return 'yellow';
+  return 'green';
+}
+
+function buildEdQueueHealth(patients = [], queueCounts = {}) {
+  return Object.entries(queueCounts).map(([queueType, count]) => {
+    const queuedPatients = patients.filter((patient) => getQueueForPatientState(patient.state) === queueType);
+    const averageWait = queuedPatients.length
+      ? Math.round(queuedPatients.reduce((sum, patient) => sum + waitMinutes(patient.arrivalTime), 0) / queuedPatients.length)
+      : 0;
+
+    return {
+      queueType,
+      count,
+      averageWait,
+      health: queueHealth(averageWait),
+    };
+  });
+}
+
+function buildEdCopilotSystemPrompt({ patients, capacitySnapshot, queueHealth: health, reassessmentQueue }) {
+  return [
+    'You are CareDroid ED Copilot for an Emergency Department operating system.',
+    `Current patient count: ${patients.length}.`,
+    `Capacity score: ${capacitySnapshot.score}. Occupancy ${capacitySnapshot.currentOccupancy}/${capacitySnapshot.maxCapacity}; boarding ${capacitySnapshot.boardingCount}; reassessment queue ${capacitySnapshot.reassessmentQueueLength}.`,
+    `Queue health: ${health.map((queue) => `${queue.queueType}=${queue.health} (${queue.count}, avg ${queue.averageWait} min)`).join('; ')}.`,
+    `Flagged reassessments: ${reassessmentQueue.length ? reassessmentQueue.map((item) => `${item.patientName}: ${item.reasons.join(', ')}`).join('; ') : 'none'}.`,
+    'Understand ED operational commands, return concise structured responses, and include whiteboardAction only for UI filtering or human-review flags.',
+    'Never suggest autonomous clinical decisions, diagnoses, orders, disposition, admission, discharge, or treatment. Always surface findings for human review.',
+  ].join('\n');
+}
 
 const ChatInterface = ({
   currentTool,
@@ -26,6 +67,7 @@ const ChatInterface = ({
   const [selectedCitation, setSelectedCitation] = useState(null);
   const messagesRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
   const shouldStickToBottomRef = useRef(true);
   const { error: notifyError } = useNotificationActions();
   const {
@@ -36,7 +78,64 @@ const ChatInterface = ({
     recommendedAIAgents,
     recommendedAssetPacks,
   } = useWorkspace();
+  const {
+    patients,
+    queueCounts,
+    capacitySnapshot,
+    reassessmentQueue,
+    setWhiteboardFilter,
+    flagPatientForReassessment,
+  } = useEmergencyDepartment();
   const workspaceExperience = getWorkspaceExperienceProfile(activeWorkspace);
+  const isEmergencyCopilot = activeWorkspaceId === 'emergency';
+  const edQueueHealth = isEmergencyCopilot
+    ? buildEdQueueHealth(patients, queueCounts)
+    : [];
+  const edCopilotContext = isEmergencyCopilot
+    ? {
+        enabled: true,
+        systemPrompt: buildEdCopilotSystemPrompt({
+          patients,
+          capacitySnapshot,
+          queueHealth: edQueueHealth,
+          reassessmentQueue,
+        }),
+        patientCount: patients.length,
+        capacitySnapshot,
+        queueHealth: edQueueHealth,
+        flaggedReassessments: reassessmentQueue,
+        patients: patients.map((patient) => ({
+          id: patient.id,
+          name: patient.name,
+          location: patient.location,
+          complaint: patient.complaint,
+          state: patient.state,
+          priority: patient.priority,
+          waitMinutes: waitMinutes(patient.arrivalTime),
+          assignedTo: patient.assignedTo,
+        })),
+        safetyBoundary:
+          'Decision support only. Never make autonomous clinical decisions; all actions require human review.',
+      }
+    : null;
+
+  const applyWhiteboardAction = useCallback((action) => {
+    if (!action?.type) return;
+
+    if (action.type === 'filterComplaint') {
+      setWhiteboardFilter({ queue: null, complaint: action.complaint || action.value || '' });
+      return;
+    }
+
+    if (action.type === 'filterQueue') {
+      setWhiteboardFilter({ queue: action.queue || action.value || null });
+      return;
+    }
+
+    if (action.type === 'flagReassessment') {
+      flagPatientForReassessment(action.target || action.patientId || action.location, action.reason);
+    }
+  }, [flagPatientForReassessment, setWhiteboardFilter]);
 
   const updateStickToBottom = () => {
     const scroller = messagesRef.current;
@@ -84,6 +183,27 @@ const ChatInterface = ({
     }
   }, [prefillText]);
 
+  useEffect(() => {
+    if (!isEmergencyCopilot) return undefined;
+
+    const handleCopilotShortcut = (event) => {
+      const target = event.target;
+      const isEditable =
+        target?.tagName === 'INPUT' ||
+        target?.tagName === 'TEXTAREA' ||
+        target?.isContentEditable;
+
+      if (event.key !== '/' || isEditable || event.metaKey || event.ctrlKey || event.altKey) return;
+
+      event.preventDefault();
+      shouldStickToBottomRef.current = true;
+      inputRef.current?.focus();
+    };
+
+    window.addEventListener('keydown', handleCopilotShortcut);
+    return () => window.removeEventListener('keydown', handleCopilotShortcut);
+  }, [isEmergencyCopilot]);
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
@@ -112,6 +232,8 @@ const ChatInterface = ({
         conversationId,
         authToken,
         workspaceContext: {
+          workspaceId: activeWorkspaceId,
+          workspaceKey: activeWorkspaceId,
           activeWorkspaceId,
           operatingLabel: workspaceExperience.operatingLabel,
           modeSummary: workspaceExperience.modeSummary,
@@ -119,6 +241,7 @@ const ChatInterface = ({
           visibleAssetIds,
           recommendedAIAgents,
           recommendedAssetPacks,
+          ...(edCopilotContext ? { edCopilot: edCopilotContext } : {}),
         },
       });
 
@@ -128,6 +251,7 @@ const ChatInterface = ({
 
       const assistantMessage = mapChatResponseToAssistantMessage(data);
       onAppendMessage?.(conversationId, assistantMessage);
+      applyWhiteboardAction(assistantMessage.metadata?.whiteboardAction);
     } catch {
       onAppendMessage?.(conversationId, {
         role: 'assistant',
@@ -268,6 +392,7 @@ const ChatInterface = ({
       <div className="chat-interface__input-area">
         <div className="chat-interface__composer">
           <textarea
+            ref={inputRef}
             value={input}
             onFocus={keepComposerVisible}
             onChange={(e) => setInput(e.target.value)}

@@ -24,6 +24,7 @@ import AutomationEngine from '../services/automationEngine';
 import { applyRegistryToolLaunch } from '../navigation/registryToolLaunch';
 import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon, getWorkspaceIcon } from '../navigation/iconRegistry';
+import EmergencyWhiteboard from '../components/EmergencyWhiteboard';
 import LaunchActionCard from '../components/ui/LaunchActionCard';
 import {
   DashboardGrid,
@@ -1154,6 +1155,10 @@ function EmergencyDigitalWhiteboardPanel({ whiteboard = {}, onLaunchRoute, onAsk
       target: '/workspace/emergency/capacity',
     },
   ];
+
+  if (!whiteboard.useLegacyWhiteboard) {
+    return <EmergencyWhiteboard />;
+  }
 
   return (
     <section className="workspace-panel emergency-whiteboard-panel" aria-labelledby="emergency-whiteboard-title">
@@ -3015,7 +3020,7 @@ function EmergencyCommandCenter({ emergency, onLaunchRoute, onAskAssistant }) {
   );
 }
 
-function EmergencyOneScreenWorkflow({ emergency, workspaceId, onLaunchRoute, onWorkspaceAction }) {
+function EmergencyOneScreenWorkflow({ emergency, workspaceId, onLaunchRoute: _onLaunchRoute, onWorkspaceAction }) {
   const commandWidgets = emergency.commandCenterWidgets || [];
   const widgetById = Object.fromEntries(commandWidgets.map((widget) => [widget.id, widget]));
   const waitingRoomQueue = emergency.queueIntelligence?.queues?.find((queue) => queue.id === 'waiting-room');

@@ -13,6 +13,7 @@ import { UserIdentityProvider } from './contexts/UserIdentityContext';
 import { CostTrackingProvider } from './contexts/CostTrackingContext';
 import { SystemConfigProvider } from './contexts/SystemConfigContext';
 import { TenantContextProvider } from './contexts/TenantContext';
+import { EmergencyDepartmentProvider } from './contexts/EmergencyDepartmentContext';
 import OfflineProvider from './contexts/OfflineProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import PermissionGate from './components/PermissionGate';
@@ -2069,14 +2070,16 @@ function App() {
                         <WhiteLabelProvider>
                           <ConversationProvider>
                             <SystemConfigProvider>
-                              <OfflineProvider>
-                                <ErrorBoundary>
-                                  <Suspense fallback={<PageLoader />}>
-                                    <AppRoutes />
-                                  </Suspense>
-                                  <NotificationToasts />
-                                </ErrorBoundary>
-                              </OfflineProvider>
+                              <EmergencyDepartmentProvider>
+                                <OfflineProvider>
+                                  <ErrorBoundary>
+                                    <Suspense fallback={<PageLoader />}>
+                                      <AppRoutes />
+                                    </Suspense>
+                                    <NotificationToasts />
+                                  </ErrorBoundary>
+                                </OfflineProvider>
+                              </EmergencyDepartmentProvider>
                             </SystemConfigProvider>
                           </ConversationProvider>
                         </WhiteLabelProvider>

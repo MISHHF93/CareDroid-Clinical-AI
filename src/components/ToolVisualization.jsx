@@ -95,6 +95,31 @@ const ToolVisualization = ({ visualization }) => {
           <div>{data?.message || 'Potential anomaly detected.'}</div>
         </div>
       );
+    case 'ed-copilot-response':
+      return (
+        <div className="viz-card">
+          <h4>ED Copilot Summary</h4>
+          {renderKeyValue({
+            command: data?.command,
+            patientCount: data?.patientCount,
+            capacityScore: data?.capacityScore,
+            requiresHumanReview: data?.requiresHumanReview ? 'Yes' : 'No',
+            whiteboardAction: data?.whiteboardAction?.type || 'None',
+          })}
+          {Array.isArray(data?.items) && data.items.length > 0 && (
+            <ul className="viz-list">
+              {data.items.slice(0, 5).map((item, index) => (
+                <li key={item.id || index}>
+                  {item.name || item.patientName || item.id} - {item.state || item.complaint || 'review'}
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="viz-alert viz-moderate">
+            {data?.safetyBoundary || 'Human review required before action.'}
+          </div>
+        </div>
+      );
     default:
       return (
         <div className="viz-card">

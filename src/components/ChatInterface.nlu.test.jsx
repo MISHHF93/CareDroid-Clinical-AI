@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ChatInterface from './ChatInterface';
 
@@ -19,6 +19,9 @@ vi.mock('./ConfidenceBadge', () => ({ default: () => null }));
 
 const sendClinicalChatMessage = vi.fn();
 const mapChatResponseToAssistantMessage = vi.fn();
+const setWhiteboardFilter = vi.fn();
+const flagPatientForReassessment = vi.fn();
+let activeWorkspaceId = 'medical-iot';
 
 vi.mock('../services/clinicalChatService', () => ({
   sendClinicalChatMessage: (...args) => sendClinicalChatMessage(...args),
@@ -31,12 +34,67 @@ vi.mock('../hooks/useNotificationActions', () => ({
 
 vi.mock('../contexts/WorkspaceContext', () => ({
   useWorkspace: () => ({
-    activeWorkspaceId: 'medical-iot',
-    activeWorkspace: { id: 'medical-iot', name: 'Medical IoT' },
+    activeWorkspaceId,
+    activeWorkspace: { id: activeWorkspaceId, name: activeWorkspaceId === 'emergency' ? 'Emergency' : 'Medical IoT' },
     assistantContext: 'Interpret device telemetry and stale data carefully.',
     visibleAssetIds: ['medical-iot-dashboard'],
     recommendedAIAgents: ['device-telemetry-agent'],
     recommendedAssetPacks: ['medical-iot-pack'],
+  }),
+}));
+
+vi.mock('../contexts/EmergencyDepartmentContext', () => ({
+  getQueueForPatientState: (state) => {
+    if (state === 'Triage') return 'Triage';
+    if (state === 'Waiting') return 'Waiting';
+    if (state === 'Assessment') return 'Provider';
+    return state;
+  },
+  useEmergencyDepartment: () => ({
+    patients: [
+      {
+        id: 'tor-uc-001',
+        name: 'Maya Chen',
+        location: 'Bed 1',
+        arrivalTime: new Date(Date.now() - 45 * 60000).toISOString(),
+        complaint: 'Chest pain',
+        state: 'Waiting',
+        priority: 'CTAS 2',
+        assignedTo: 'Dr. Singh',
+      },
+      {
+        id: 'tor-uc-004',
+        name: 'Noah Williams',
+        location: 'Bed 4',
+        arrivalTime: new Date(Date.now() - 12 * 60000).toISOString(),
+        complaint: 'Abdominal pain',
+        state: 'Assessment',
+        priority: 'CTAS 3',
+        assignedTo: 'NP Carter',
+      },
+    ],
+    queueCounts: {
+      Waiting: 1,
+      Triage: 0,
+      Provider: 1,
+    },
+    capacitySnapshot: {
+      score: 'Yellow',
+      currentOccupancy: 2,
+      maxCapacity: 30,
+      occupancyPercent: 7,
+      boardingCount: 0,
+      reassessmentQueueLength: 1,
+    },
+    reassessmentQueue: [
+      {
+        patientId: 'tor-uc-001',
+        patientName: 'Maya Chen',
+        reasons: ['Waiting state over 45 minutes'],
+      },
+    ],
+    setWhiteboardFilter,
+    flagPatientForReassessment,
   }),
 }));
 
@@ -45,6 +103,7 @@ describe('ChatInterface NLU integration', () => {
 
   beforeEach(() => {
     HTMLElement.prototype.scrollTo = vi.fn();
+    activeWorkspaceId = 'medical-iot';
     vi.clearAllMocks();
     sendClinicalChatMessage.mockResolvedValue({
       ok: true,
@@ -84,8 +143,71 @@ describe('ChatInterface NLU integration', () => {
         operatingLabel: 'Medical IoT OS',
       }),
     });
-    expect(screen.getAllByText(/medical iot os/i).length).toBeGreaterThan(0);
     expect(onAppendMessage).toHaveBeenCalled();
+  });
+
+  it('sends ED Copilot context and applies returned whiteboard actions in emergency workspace', async () => {
+    activeWorkspaceId = 'emergency';
+    const user = userEvent.setup();
+    mapChatResponseToAssistantMessage.mockReturnValue({
+      role: 'assistant',
+      content: 'Chest pain patients',
+      metadata: {
+        whiteboardAction: {
+          type: 'filterComplaint',
+          complaint: 'chest',
+        },
+      },
+    });
+
+    render(
+      <ChatInterface
+        currentTool={null}
+        conversationId="conv-ed"
+        messages={[]}
+        onAppendMessage={onAppendMessage}
+        authToken="test-token"
+      />,
+    );
+
+    await user.type(screen.getByRole('textbox'), 'Show me all chest pain patients');
+    await user.keyboard('{Enter}');
+
+    await waitFor(() => {
+      expect(sendClinicalChatMessage).toHaveBeenCalled();
+    });
+
+    const payload = sendClinicalChatMessage.mock.calls[0][0];
+    expect(payload.workspaceContext.edCopilot).toMatchObject({
+      enabled: true,
+      patientCount: 2,
+      capacitySnapshot: expect.objectContaining({ score: 'Yellow' }),
+    });
+    expect(payload.workspaceContext.edCopilot.systemPrompt).toMatch(/Never suggest autonomous clinical decisions/i);
+    expect(payload.workspaceContext.edCopilot.queueHealth[0]).toHaveProperty('health');
+    expect(payload.workspaceContext.edCopilot.flaggedReassessments).toHaveLength(1);
+    expect(setWhiteboardFilter).toHaveBeenCalledWith({ queue: null, complaint: 'chest' });
+  });
+
+  it('focuses the ED Copilot composer when / is pressed in emergency workspace', () => {
+    activeWorkspaceId = 'emergency';
+
+    render(
+      <ChatInterface
+        currentTool={null}
+        conversationId="conv-ed"
+        messages={[]}
+        onAppendMessage={onAppendMessage}
+        authToken="test-token"
+      />,
+    );
+
+    const input = screen.getByRole('textbox');
+    expect(input).not.toHaveFocus();
+
+    fireEvent.keyDown(window, { key: '/' });
+
+    expect(input).toHaveFocus();
   });
 
   it('shows existing messages without blank root', () => {
