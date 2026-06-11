@@ -1,0 +1,72 @@
+const config = {
+  content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
+  theme: {
+    colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
+      inherit: 'inherit',
+      background: 'var(--color-background)',
+      surface: 'var(--color-surface)',
+      elevated: 'var(--color-elevated)',
+      border: {
+        subtle: 'var(--color-border-subtle)',
+        DEFAULT: 'var(--color-border-default)',
+      },
+      text: {
+        primary: 'var(--color-text-primary)',
+        secondary: 'var(--color-text-secondary)',
+        muted: 'var(--color-text-muted)',
+      },
+      status: {
+        critical: 'var(--status-critical)',
+        warning: 'var(--status-warning)',
+        stable: 'var(--status-stable)',
+        inactive: 'var(--status-inactive)',
+        info: 'var(--status-info)',
+      },
+      critical: 'var(--status-critical)',
+      warning: 'var(--status-warning)',
+      stable: 'var(--status-stable)',
+      inactive: 'var(--status-inactive)',
+      info: 'var(--status-info)',
+    },
+    fontFamily: {
+      ui: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+      mono: ['JetBrains Mono', 'SFMono-Regular', 'Consolas', 'Liberation Mono', 'monospace'],
+    },
+    fontSize: {
+      xs: ['11px', { lineHeight: '16px' }],
+      sm: ['12px', { lineHeight: '16px' }],
+      base: ['14px', { lineHeight: '20px' }],
+      md: ['15px', { lineHeight: '22px' }],
+      lg: ['17px', { lineHeight: '24px' }],
+      xl: ['20px', { lineHeight: '28px' }],
+      '2xl': ['24px', { lineHeight: '32px' }],
+    },
+    spacing: {
+      '0': '0px',
+      '0.5': '2px',
+      '1': '4px',
+      '1.5': '6px',
+      '2': '8px',
+      '3': '12px',
+      '4': '16px',
+      '5': '20px',
+      '6': '24px',
+      '8': '32px',
+      '10': '40px',
+      '12': '48px',
+    },
+    borderRadius: {
+      none: '0px',
+      sm: 'var(--radius-sm)',
+      md: 'var(--radius-md)',
+      lg: 'var(--radius-lg)',
+      pill: 'var(--radius-pill)',
+      full: 'var(--radius-pill)',
+    },
+    extend: {},
+  },
+};
+
+export default config;

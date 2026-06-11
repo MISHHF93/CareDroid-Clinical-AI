@@ -1,320 +1,338 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { useTheme } from '../contexts/ThemeContext';
-import { useUserIdentity } from '../contexts/UserIdentityContext';
-import { useWorkspace } from '../contexts/WorkspaceContext';
-import Sidebar from '../components/Sidebar';
-import WorkspaceSwitcher from '../components/WorkspaceSwitcher';
-import PageContinuations from '../components/ui/PageContinuations';
-import { NavIcon } from '../navigation/NavIcon';
-import { CHROME_ICONS } from '../navigation/iconRegistry';
-import { useDrawerFocus } from '../hooks/useDrawerFocus';
-import QuickCommandLauncher from '../components/QuickCommandLauncher';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
-  COMPACT_MEDIA_QUERY,
-  getIsCompactViewport,
-  SIDEBAR_WIDTH_COLLAPSED_PX,
-  SIDEBAR_WIDTH_EXPANDED_PX,
-} from '../config/layout.config';
-import appConfig from '../config/appConfig';
-import { getFrontendOperatingSystemState } from '../data/frontendOperatingSystem';
-import { getPrimaryNavItemForPath } from '../config/navigation.config';
-import EmergencyCapacityIntelligenceService from '../services/emergencyCapacityIntelligenceService';
+  Bell,
+  Bot,
+  ChevronRight,
+  ClipboardList,
+  Gauge,
+  LayoutDashboard,
+  Settings,
+  Share2,
+  Truck,
+} from 'lucide-react';
+import ChatInterface from '../components/ChatInterface';
+import EMSPressureScore, {
+  calculateEMSPressureScore,
+  isEMSPressureElevated,
+} from '../components/EMSPressureScore';
+import ReassessmentDrawer from '../components/ReassessmentDrawer';
+import { useConversation } from '../contexts/ConversationContext';
+import { useUser } from '../contexts/UserContext';
+import { hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
+import { PatientState } from '../../types/emergency';
 import './AppShell.css';
 
-const environment = appConfig.app.environment || 'development';
-const deployment = appConfig.app.deployment || {};
-const shouldShowEnvironmentBanner =
-  appConfig.app.environmentValidation?.valid === false ||
-  (environment !== 'production' && appConfig.app.environmentValidation?.raw !== 'test');
-const LOCAL_CONTINUATION_ROUTES = new Set(['/assistant', '/chat', '/dashboard', '/home']);
+const NAV_ITEMS = [
+  {
+    id: 'whiteboard',
+    label: 'Whiteboard',
+    path: '/workspace/emergency',
+    icon: LayoutDashboard,
+    activePaths: ['/workspace/emergency', '/workspace/emergency/whiteboard'],
+  },
+  {
+    id: 'queue',
+    label: 'Queue',
+    path: '/workspace/emergency/queues',
+    icon: ClipboardList,
+    activePaths: ['/workspace/emergency/queues', '/workspace/emergency/waiting-room'],
+  },
+  {
+    id: 'ems',
+    label: 'EMS',
+    path: '/workspace/emergency/ems',
+    icon: Truck,
+    activePaths: ['/workspace/emergency/ems', '/workspace/emergency/pre-arrival'],
+  },
+  {
+    id: 'referrals',
+    label: 'Referrals',
+    path: '/workspace/emergency/referrals',
+    icon: Share2,
+    activePaths: ['/workspace/emergency/referrals'],
+  },
+  {
+    id: 'capacity',
+    label: 'Capacity',
+    path: '/workspace/emergency/capacity',
+    icon: Gauge,
+    activePaths: ['/workspace/emergency/capacity', '/workspace/emergency/boarding'],
+  },
+  {
+    id: 'copilot',
+    label: 'Copilot',
+    path: '/workspace/emergency/command-center',
+    icon: Bot,
+    activePaths: ['/workspace/emergency/command-center', '/assistant', '/chat'],
+  },
+  {
+    id: 'settings',
+    label: 'Settings',
+    path: '/settings',
+    icon: Settings,
+    activePaths: ['/settings', '/profile/settings'],
+  },
+];
+
+const ACTIVE_PATIENT_STATES = new Set(
+  Object.values(PatientState).filter(
+    (state) => state !== PatientState.Discharge && state !== PatientState.Deceased
+  )
+);
+
+function isNavItemActive(item, pathname) {
+  return item.activePaths.some((activePath) => {
+    if (activePath === '/workspace/emergency') {
+      return pathname === activePath;
+    }
+
+    return pathname === activePath || pathname.startsWith(`${activePath}/`);
+  });
+}
+
+function formatShiftClock(date) {
+  return new Intl.DateTimeFormat(undefined, {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  }).format(date);
+}
+
+function CapacityBadge() {
+  const capacityScore = useEmergencyStore((state) => state.capacity.score);
+  return (
+    <div className="ed-capacity-badge" role="status" aria-label="Capacity status">
+      <span className="ed-capacity-badge__dot" aria-hidden />
+      <span>Capacity</span>
+      <strong>{capacityScore}</strong>
+    </div>
+  );
+}
+
+function StaffAvatar({ user }) {
+  const initials = useMemo(() => {
+    const name = user?.fullName || user?.name || user?.email || 'ED';
+    return name
+      .split(/\s|@/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('');
+  }, [user]);
+
+  return (
+    <div
+      className="ed-staff-avatar"
+      aria-label={user?.fullName || user?.name || 'Current staff member'}
+    >
+      {initials || 'ED'}
+    </div>
+  );
+}
 
 const AppShell = ({
   isAuthed = false,
-  conversations,
   activeConversation,
-  onSelectConversation,
   onNewConversation,
   onSignOut,
-  healthStatus,
+  healthStatus = 'online',
   isDevAuthBypass = false,
   devAuthBannerLabel = 'Platform Access',
   children,
 }) => {
-  const { preference, resolvedTheme, setPreference } = useTheme();
-  const { preferences, saasProfile } = useUserIdentity();
-  const { activeWorkspace } = useWorkspace();
   const location = useLocation();
-
-  const [isCompact, setIsCompact] = useState(getIsCompactViewport);
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [quickCommandOpen, setQuickCommandOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const menuButtonRef = useRef(null);
-  const sidebarRef = useRef(null);
+  const { user, authToken } = useUser();
+  const { messages, addMessage } = useConversation();
+  const reassessmentCount = useEmergencyStore(
+    (state) =>
+      state.patients.filter(
+        (patient) =>
+          ACTIVE_PATIENT_STATES.has(patient.state) && hasPatientFlag(patient, 'ReassessmentDue')
+      ).length
+  );
+  const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
+  const [clock, setClock] = useState(() => new Date());
+  const [isCopilotCollapsed, setIsCopilotCollapsed] = useState(false);
+  const [isReassessmentDrawerOpen, setIsReassessmentDrawerOpen] = useState(false);
 
   useEffect(() => {
-    const mq = window.matchMedia(COMPACT_MEDIA_QUERY);
-    const onChange = () => {
-      setIsCompact(mq.matches);
-      if (!mq.matches) setMobileNavOpen(false);
-    };
-    mq.addEventListener('change', onChange);
-    return () => mq.removeEventListener('change', onChange);
+    const timer = window.setInterval(() => setClock(new Date()), 1000);
+    return () => window.clearInterval(timer);
   }, []);
 
-  const mainInsetPx = useMemo(() => {
-    if (isCompact) return 0;
-    return sidebarCollapsed ? SIDEBAR_WIDTH_COLLAPSED_PX : SIDEBAR_WIDTH_EXPANDED_PX;
-  }, [isCompact, sidebarCollapsed]);
-
-  const cycleTheme = () => {
-    const order = ['system', 'light', 'dark'];
-    const i = order.indexOf(preference);
-    setPreference(order[(i + 1) % order.length]);
-  };
-
-  const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
-  const openQuickCommand = useCallback(() => {
-    setQuickCommandOpen(true);
-    setMobileNavOpen(false);
-  }, []);
-  const closeQuickCommand = useCallback(() => setQuickCommandOpen(false), []);
-  const isConversationViewport = ['/chat', '/assistant'].includes(location.pathname);
-  const shouldShowPageContinuations =
-    isAuthed && !LOCAL_CONTINUATION_ROUTES.has(location.pathname);
-  const density =
-    saasProfile?.density ||
-    preferences?.density ||
-    (saasProfile?.compactMode || preferences?.compactMode ? 'compact' : 'standard');
-  const densityMode = density === 'compact' ? 'compact' : 'standard';
-  const mainContentClassName = [
-    'app-shell-main-content',
-    'app-shell-page-body',
-    isConversationViewport
-      ? 'app-shell-main-content--conversation app-shell-page-body--conversation'
-      : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-  const frontendOs = useMemo(
-    () =>
-      getFrontendOperatingSystemState({
-        pathname: location.pathname,
-        workspace: activeWorkspace,
-        tenantId: deployment.id || 'local',
-        plan: environment,
-      }),
-    [activeWorkspace, location.pathname]
+  const handleAppendMessage = useCallback(
+    (_conversationId, message) => {
+      addMessage(message);
+    },
+    [addMessage]
   );
-  const routeIdentity = useMemo(() => {
-    const navItem = getPrimaryNavItemForPath(location.pathname);
-    const label = navItem?.label || frontendOs.currentStage?.label || 'Current workspace';
-    const section = navItem?.id === 'home' ? 'Command center' : frontendOs.currentStage?.label;
-    return {
-      label,
-      section,
-    };
-  }, [frontendOs.currentStage?.label, location.pathname]);
-  const emergencyCapacity = useMemo(
-    () =>
-      location.pathname.startsWith('/workspace/emergency')
-        ? EmergencyCapacityIntelligenceService.getCapacityDashboard()
-        : null,
+
+  const closeReassessmentDrawer = useCallback(() => {
+    setIsReassessmentDrawerOpen(false);
+  }, []);
+
+  const activeNavId = useMemo(
+    () => NAV_ITEMS.find((item) => isNavItemActive(item, location.pathname))?.id,
     [location.pathname]
   );
-
-  useEffect(() => {
-    closeMobileNav();
-    closeQuickCommand();
-  }, [location.pathname, location.search, closeMobileNav, closeQuickCommand]);
-
-  useEffect(() => {
-    if (!isAuthed) return undefined;
-    const onKeyDown = (event) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        openQuickCommand();
-      }
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [isAuthed, openQuickCommand]);
-
-  useDrawerFocus({
-    isOpen: isAuthed && isCompact && mobileNavOpen,
-    containerRef: sidebarRef,
-    restoreFocusRef: menuButtonRef,
-  });
-
-  useEffect(() => {
-    if (!mobileNavOpen || !isCompact) return;
-    const onKey = (e) => {
-      if (e.key === 'Escape') closeMobileNav();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [mobileNavOpen, isCompact, closeMobileNav]);
+  const emsPressure = useMemo(
+    () => calculateEMSPressureScore(emsArrivals, clock),
+    [emsArrivals, clock]
+  );
+  const shouldFlashEMSNav = isEMSPressureElevated(emsPressure);
 
   return (
     <div
       className={[
-        'app-shell',
-        `app-shell--density-${densityMode}`,
-        isCompact ? 'app-shell--compact' : '',
-        isAuthed ? 'app-shell--authed' : '',
-        isCompact && mobileNavOpen ? 'app-shell--nav-open' : '',
+        'ed-os-shell',
+        isAuthed ? 'ed-os-shell--authed' : '',
+        isCopilotCollapsed ? 'ed-os-shell--copilot-collapsed' : '',
       ]
         .filter(Boolean)
         .join(' ')}
-      style={{
-        ['--app-main-inset']: `${mainInsetPx}px`,
-      }}
-      data-density={densityMode}
     >
       {isAuthed && (
-        <a className="app-skip-link" href="#main-content">
+        <a className="ed-skip-link" href="#main-content">
           Skip to main content
         </a>
       )}
 
-      {isAuthed && isCompact && mobileNavOpen && (
-        <button
-          type="button"
-          className="app-shell-nav-backdrop"
-          aria-label="Close navigation menu"
-          onClick={closeMobileNav}
+      <aside className="ed-nav-rail" aria-label="Emergency OS navigation">
+        <nav className="ed-nav-rail__items">
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive = item.id === activeNavId;
+
+            return (
+              <Link
+                key={item.id}
+                to={item.path}
+                className={[
+                  'ed-nav-rail__item',
+                  isActive ? 'ed-nav-rail__item--active' : '',
+                  item.id === 'ems' && shouldFlashEMSNav ? 'ed-nav-rail__item--flash' : '',
+                  item.id === 'ems' && shouldFlashEMSNav
+                    ? `ed-nav-rail__item--flash-${emsPressure.band.id}`
+                    : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                aria-label={item.label}
+                aria-current={isActive ? 'page' : undefined}
+                title={item.label}
+              >
+                <Icon size={21} strokeWidth={2.1} aria-hidden />
+              </Link>
+            );
+          })}
+        </nav>
+      </aside>
+
+      <div className="ed-os-shell__workspace">
+        <header className="ed-os-header" aria-label="Emergency OS header">
+          <div className="ed-os-header__left">
+            <strong className="ed-os-wordmark">Emergency OS</strong>
+            <time className="ed-shift-clock" dateTime={clock.toISOString()}>
+              {formatShiftClock(clock)}
+            </time>
+          </div>
+
+          <div className="ed-os-header__center">
+            <CapacityBadge />
+            <EMSPressureScore />
+          </div>
+
+          <div className="ed-os-header__right">
+            <button
+              type="button"
+              className={[
+                'ed-reassessment-badge',
+                reassessmentCount > 0 ? 'ed-reassessment-badge--active' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              onClick={() => setIsReassessmentDrawerOpen((open) => !open)}
+              disabled={reassessmentCount === 0}
+              aria-label={`${reassessmentCount} patients require reassessment`}
+              aria-expanded={isReassessmentDrawerOpen}
+            >
+              <span className="ed-reassessment-badge__pulse" aria-hidden />
+              <strong>{reassessmentCount}</strong>
+            </button>
+            <button type="button" className="ed-icon-button" aria-label="Open alerts">
+              <Bell size={18} strokeWidth={2.1} aria-hidden />
+              <span className="ed-icon-button__indicator" aria-hidden />
+            </button>
+            <StaffAvatar user={user} />
+            <div className="ed-shift-status" aria-label={`Shift status ${healthStatus}`}>
+              <span className="ed-shift-status__dot" aria-hidden />
+              <span>Shift Active</span>
+            </div>
+            {onSignOut ? (
+              <button type="button" className="ed-shift-signout" onClick={onSignOut}>
+                Sign out
+              </button>
+            ) : null}
+          </div>
+        </header>
+
+        <ReassessmentDrawer
+          open={isReassessmentDrawerOpen}
+          count={reassessmentCount}
+          onClose={closeReassessmentDrawer}
         />
-      )}
 
-      <Sidebar
-        ref={sidebarRef}
-        conversations={conversations}
-        activeConversation={activeConversation}
-        onSelectConversation={onSelectConversation}
-        onNewConversation={onNewConversation}
-        onSignOut={onSignOut}
-        healthStatus={healthStatus}
-        layoutCompact={isCompact}
-        mobileNavOpen={mobileNavOpen}
-        onCloseMobileNav={closeMobileNav}
-        sidebarCollapsed={sidebarCollapsed}
-        onSidebarCollapsedChange={setSidebarCollapsed}
-      />
-
-      <div className="app-shell-main-wrap">
-        {isAuthed && (
-          <header className="app-shell-header" aria-label="Application header">
-            {isCompact && (
-              <button
-                ref={menuButtonRef}
-                type="button"
-                className="app-shell-menu-btn"
-                onClick={() => setMobileNavOpen((open) => !open)}
-                aria-expanded={mobileNavOpen}
-                aria-controls="app-sidebar-nav"
-                aria-label={mobileNavOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              >
-                <span className="app-shell-menu-icon" aria-hidden>
-                  <NavIcon icon={CHROME_ICONS.menu} size={22} />
-                </span>
-              </button>
-            )}
-            {isCompact && (
-              <button
-                type="button"
-                className="app-shell-command-btn"
-                onClick={openQuickCommand}
-                aria-expanded={quickCommandOpen}
-                aria-haspopup="dialog"
-                aria-label="Open Quick Command"
-              >
-                <span aria-hidden>
-                  <NavIcon icon={CHROME_ICONS.search} size={22} />
-                </span>
-              </button>
-            )}
-            {!isConversationViewport && (
-              <div className="app-shell-workspace-bar" aria-label="Workspace switcher">
-                <div className="app-shell-route-identity" aria-label="Current page">
-                  <span>{routeIdentity.section}</span>
-                  <strong>{routeIdentity.label}</strong>
-                </div>
-                {!isCompact && (
-                  <div className="app-shell-os-strip" aria-label="Frontend operating system flow">
-                    <strong>{frontendOs.shellLabel}</strong>
-                    <span>{frontendOs.workspaceLabel}</span>
-                    <span className="app-shell-os-strip__stage">{frontendOs.currentStage.label}</span>
-                    {emergencyCapacity ? (
-                      <span className="app-shell-os-strip__stage">
-                        Capacity {emergencyCapacity.riskLevel} · {emergencyCapacity.score}
-                      </span>
-                    ) : null}
-                  </div>
-                )}
-                <WorkspaceSwitcher compact={isCompact} />
-                {!isCompact && (
-                  <div className="app-shell-header-utilities" aria-label="Header utilities">
-                    <button
-                      type="button"
-                      className="app-shell-header-command"
-                      onClick={openQuickCommand}
-                      aria-expanded={quickCommandOpen}
-                      aria-haspopup="dialog"
-                      aria-label="Open Quick Command"
-                    >
-                      <span aria-hidden>
-                        <NavIcon icon={CHROME_ICONS.search} size={17} />
-                      </span>
-                      <span>Search everything</span>
-                      <kbd>Ctrl K</kbd>
-                    </button>
-                  </div>
-                )}
+        <div className="ed-os-shell__body">
+          <main
+            className="ed-os-main"
+            data-layout-role="MainContent"
+            id="main-content"
+            tabIndex={-1}
+          >
+            {isAuthed && isDevAuthBypass && (
+              <div className="ed-os-banner" role="status">
+                <strong>{devAuthBannerLabel}</strong> active
               </div>
             )}
-          </header>
-        )}
-        {isAuthed && (
-          <QuickCommandLauncher
-            isOpen={quickCommandOpen}
-            isCompact={isCompact}
-            onClose={closeQuickCommand}
-            themePreference={preference}
-            resolvedTheme={resolvedTheme}
-            onCycleTheme={cycleTheme}
-          />
-        )}
-        <main
-          className={mainContentClassName}
-          data-layout-role="MainContent"
-          id="main-content"
-          tabIndex={-1}
-        >
-          {isAuthed && shouldShowEnvironmentBanner && (
-            <div
-              className={`app-shell-environment-banner app-shell-environment-banner--${environment}`}
-              role="status"
+            {children}
+          </main>
+
+          <aside
+            className="ed-copilot-panel"
+            aria-label="ED Copilot chat"
+            aria-expanded={!isCopilotCollapsed}
+          >
+            <button
+              type="button"
+              className="ed-copilot-panel__toggle"
+              onClick={() => setIsCopilotCollapsed((collapsed) => !collapsed)}
+              aria-label={isCopilotCollapsed ? 'Expand ED Copilot' : 'Collapse ED Copilot'}
+              aria-expanded={!isCopilotCollapsed}
             >
-              <strong>{environment}</strong> environment
-              {deployment.id ? ` · deployment ${deployment.id}` : ''}
-              {deployment.commit ? ` · ${deployment.commit.slice(0, 12)}` : ''}
-              {appConfig.app.environmentValidation?.valid === false
-                ? ' · invalid environment fallback applied'
-                : ''}
+              <ChevronRight size={18} strokeWidth={2.2} aria-hidden />
+            </button>
+
+            <div className="ed-copilot-panel__content" aria-hidden={isCopilotCollapsed}>
+              <div className="ed-copilot-panel__header">
+                <div>
+                  <span>ED Copilot</span>
+                  <strong>Operational Chat</strong>
+                </div>
+                <button type="button" onClick={onNewConversation} className="ed-copilot-panel__new">
+                  New
+                </button>
+              </div>
+              <ChatInterface
+                conversationId={activeConversation}
+                messages={messages}
+                onAppendMessage={handleAppendMessage}
+                authToken={authToken}
+              />
             </div>
-          )}
-          {isAuthed && isDevAuthBypass && (
-            <div className="app-shell-dev-mode-banner" role="status">
-              <strong>{devAuthBannerLabel}</strong> is active. This session uses a local clinician
-              profile and does not weaken production API authentication.
-            </div>
-          )}
-          {children}
-          {shouldShowPageContinuations && (
-            <PageContinuations className="app-shell-page-continuations" />
-          )}
-        </main>
+          </aside>
+        </div>
       </div>
     </div>
   );

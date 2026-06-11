@@ -1,0 +1,116 @@
+.ems-pressure {
+  --ems-pressure-color: var(--status-stable);
+  --ems-pressure-bg: color-mix(in srgb, var(--ems-pressure-color) 10%, var(--color-elevated));
+  --ems-pressure-border: color-mix(
+    in srgb,
+    var(--ems-pressure-color) 38%,
+    var(--color-border-default)
+  );
+}
+
+.ems-pressure--moderate {
+  --ems-pressure-color: var(--status-warning);
+}
+
+.ems-pressure--elevated {
+  --ems-pressure-color: #f97316;
+}
+
+.ems-pressure--critical {
+  --ems-pressure-color: var(--status-critical);
+}
+
+.ems-pressure--badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 28px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--ems-pressure-border);
+  border-radius: var(--radius-pill);
+  background: var(--ems-pressure-bg);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.ems-pressure--badge strong {
+  color: var(--ems-pressure-color);
+  font-family: var(--font-mono);
+  font-weight: 900;
+}
+
+.ems-pressure__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--ems-pressure-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ems-pressure-color) 18%, transparent);
+}
+
+.ems-pressure--gauge {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border: 1px solid var(--ems-pressure-border);
+  border-radius: var(--radius-lg);
+  background: var(--ems-pressure-bg);
+}
+
+.ems-pressure__gauge {
+  --ems-pressure-deg: calc(var(--ems-pressure-score) * 3.6deg);
+  display: grid;
+  place-items: center;
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, var(--color-surface) 58%, transparent 60%),
+    conic-gradient(var(--ems-pressure-color) var(--ems-pressure-deg), var(--color-border-subtle) 0);
+}
+
+.ems-pressure__gauge strong {
+  grid-area: 1 / 1;
+  color: var(--color-text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-2xl);
+  line-height: 1;
+}
+
+.ems-pressure__gauge span {
+  grid-area: 1 / 1;
+  align-self: end;
+  margin-bottom: 24px;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.ems-pressure__body {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.ems-pressure__body span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.ems-pressure__body h2 {
+  margin: 0;
+  color: var(--ems-pressure-color);
+  font-size: var(--font-size-xl);
+}
+
+.ems-pressure__body p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}

@@ -5,10 +5,18 @@ import AiRouteMetadata from './chat/AiRouteMetadata';
 import AssistantResultRenderer from './chat/AssistantResultRenderer';
 import Citations, { CitationModal } from './Citations';
 import ConfidenceBadge from './ConfidenceBadge';
-import { sendClinicalChatMessage, mapChatResponseToAssistantMessage } from '../services/clinicalChatService';
+import {
+  sendClinicalChatMessage,
+  mapChatResponseToAssistantMessage,
+} from '../services/clinicalChatService';
 import { useNotificationActions } from '../hooks/useNotificationActions';
-import { getQueueForPatientState, useEmergencyDepartment } from '../contexts/EmergencyDepartmentContext';
+import {
+  getQueueForPatientState,
+  useEmergencyDepartment,
+} from '../contexts/EmergencyDepartmentContext';
 import { useWorkspace } from '../contexts/WorkspaceContext';
+import { useEmergencyStore } from '../../store/emergencyStore';
+import { buildEMSPressureCopilotContext, calculateEMSPressureScore } from './EMSPressureScore';
 import { getWorkspaceExperienceProfile } from '../data/workspaceExperience';
 import './ChatInterface.css';
 
@@ -26,9 +34,14 @@ function queueHealth(avgWait) {
 
 function buildEdQueueHealth(patients = [], queueCounts = {}) {
   return Object.entries(queueCounts).map(([queueType, count]) => {
-    const queuedPatients = patients.filter((patient) => getQueueForPatientState(patient.state) === queueType);
+    const queuedPatients = patients.filter(
+      (patient) => getQueueForPatientState(patient.state) === queueType
+    );
     const averageWait = queuedPatients.length
-      ? Math.round(queuedPatients.reduce((sum, patient) => sum + waitMinutes(patient.arrivalTime), 0) / queuedPatients.length)
+      ? Math.round(
+          queuedPatients.reduce((sum, patient) => sum + waitMinutes(patient.arrivalTime), 0) /
+            queuedPatients.length
+        )
       : 0;
 
     return {
@@ -40,14 +53,24 @@ function buildEdQueueHealth(patients = [], queueCounts = {}) {
   });
 }
 
-function buildEdCopilotSystemPrompt({ patients, capacitySnapshot, queueHealth: health, reassessmentQueue }) {
+function buildEdCopilotSystemPrompt({
+  patients,
+  capacitySnapshot,
+  queueHealth: health,
+  reassessmentQueue,
+  bottleneckAlert,
+  emsPressure,
+}) {
+  const emsPressureContext = buildEMSPressureCopilotContext(emsPressure);
   return [
     'You are CareDroid ED Copilot for an Emergency Department operating system.',
     `Current patient count: ${patients.length}.`,
     `Capacity score: ${capacitySnapshot.score}. Occupancy ${capacitySnapshot.currentOccupancy}/${capacitySnapshot.maxCapacity}; boarding ${capacitySnapshot.boardingCount}; reassessment queue ${capacitySnapshot.reassessmentQueueLength}.`,
     `Queue health: ${health.map((queue) => `${queue.queueType}=${queue.health} (${queue.count}, avg ${queue.averageWait} min)`).join('; ')}.`,
+    `Bottleneck alert: ${bottleneckAlert ? `${bottleneckAlert.severity} in ${bottleneckAlert.queue}. ${bottleneckAlert.reason}. Detected ${bottleneckAlert.detectedAt}.` : 'none'}.`,
+    `EMS pressure: ${emsPressure.score}/100, ${emsPressure.band.label}. ${emsPressureContext || 'No elevated EMS pressure action required.'}`,
     `Flagged reassessments: ${reassessmentQueue.length ? reassessmentQueue.map((item) => `${item.patientName}: ${item.reasons.join(', ')}`).join('; ') : 'none'}.`,
-    'Understand ED operational commands, return concise structured responses, and include whiteboardAction only for UI filtering or human-review flags.',
+    'Understand ED operational commands, return concise structured responses, and include whiteboardAction only for UI filtering, human-review flags, or calculator launch requests like { type: "openCalculator", calculatorId: "heart" | "qsofa" | "nihss", patientId?: string }.',
     'Never suggest autonomous clinical decisions, diagnoses, orders, disposition, admission, discharge, or treatment. Always surface findings for human review.',
   ].join('\n');
 }
@@ -86,11 +109,12 @@ const ChatInterface = ({
     setWhiteboardFilter,
     flagPatientForReassessment,
   } = useEmergencyDepartment();
+  const bottleneckAlert = useEmergencyStore((state) => state.bottleneckAlert);
+  const emsArrivals = useEmergencyStore((state) => state.emsArrivals);
   const workspaceExperience = getWorkspaceExperienceProfile(activeWorkspace);
   const isEmergencyCopilot = activeWorkspaceId === 'emergency';
-  const edQueueHealth = isEmergencyCopilot
-    ? buildEdQueueHealth(patients, queueCounts)
-    : [];
+  const edQueueHealth = isEmergencyCopilot ? buildEdQueueHealth(patients, queueCounts) : [];
+  const emsPressure = calculateEMSPressureScore(emsArrivals);
   const edCopilotContext = isEmergencyCopilot
     ? {
         enabled: true,
@@ -99,10 +123,15 @@ const ChatInterface = ({
           capacitySnapshot,
           queueHealth: edQueueHealth,
           reassessmentQueue,
+          bottleneckAlert,
+          emsPressure,
         }),
         patientCount: patients.length,
         capacitySnapshot,
         queueHealth: edQueueHealth,
+        bottleneckAlert,
+        emsPressure,
+        emsPressureContext: buildEMSPressureCopilotContext(emsPressure),
         flaggedReassessments: reassessmentQueue,
         patients: patients.map((patient) => ({
           id: patient.id,
@@ -119,23 +148,41 @@ const ChatInterface = ({
       }
     : null;
 
-  const applyWhiteboardAction = useCallback((action) => {
-    if (!action?.type) return;
+  const applyWhiteboardAction = useCallback(
+    (action) => {
+      if (!action?.type) return;
 
-    if (action.type === 'filterComplaint') {
-      setWhiteboardFilter({ queue: null, complaint: action.complaint || action.value || '' });
-      return;
-    }
+      if (action.type === 'filterComplaint') {
+        setWhiteboardFilter({ queue: null, complaint: action.complaint || action.value || '' });
+        return;
+      }
 
-    if (action.type === 'filterQueue') {
-      setWhiteboardFilter({ queue: action.queue || action.value || null });
-      return;
-    }
+      if (action.type === 'filterQueue') {
+        setWhiteboardFilter({ queue: action.queue || action.value || null });
+        return;
+      }
 
-    if (action.type === 'flagReassessment') {
-      flagPatientForReassessment(action.target || action.patientId || action.location, action.reason);
-    }
-  }, [flagPatientForReassessment, setWhiteboardFilter]);
+      if (action.type === 'flagReassessment') {
+        flagPatientForReassessment(
+          action.target || action.patientId || action.location,
+          action.reason
+        );
+        return;
+      }
+
+      if (action.type === 'openCalculator' || action.type === 'launchCalculator') {
+        window.dispatchEvent(
+          new CustomEvent('ed:open-calculator', {
+            detail: {
+              calculatorId: action.calculatorId || action.toolId || action.value,
+              patientId: action.patientId || action.target || null,
+            },
+          })
+        );
+      }
+    },
+    [flagPatientForReassessment, setWhiteboardFilter]
+  );
 
   const updateStickToBottom = () => {
     const scroller = messagesRef.current;
@@ -189,9 +236,7 @@ const ChatInterface = ({
     const handleCopilotShortcut = (event) => {
       const target = event.target;
       const isEditable =
-        target?.tagName === 'INPUT' ||
-        target?.tagName === 'TEXTAREA' ||
-        target?.isContentEditable;
+        target?.tagName === 'INPUT' || target?.tagName === 'TEXTAREA' || target?.isContentEditable;
 
       if (event.key !== '/' || isEditable || event.metaKey || event.ctrlKey || event.altKey) return;
 
@@ -210,7 +255,7 @@ const ChatInterface = ({
     const userMessage = {
       role: 'user',
       content: input,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
     shouldStickToBottomRef.current = true;
@@ -219,7 +264,7 @@ const ChatInterface = ({
       conversationId,
       tool: currentTool,
       feature: currentFeature,
-      length: input.length
+      length: input.length,
     });
     setInput('');
     setIsLoading(true);
@@ -255,14 +300,14 @@ const ChatInterface = ({
     } catch {
       onAppendMessage?.(conversationId, {
         role: 'assistant',
-        content: 'I\'m having trouble connecting to the server. Please try again in a moment.',
-        timestamp: new Date()
+        content: "I'm having trouble connecting to the server. Please try again in a moment.",
+        timestamp: new Date(),
       });
       notifyError('Connection failed', 'Unable to reach the server. Please try again.');
       onTrackEvent?.('message_error', {
         conversationId,
         tool: currentTool,
-        feature: currentFeature
+        feature: currentFeature,
       });
     } finally {
       setIsLoading(false);
@@ -284,9 +329,7 @@ const ChatInterface = ({
         onScroll={updateStickToBottom}
       >
         {messages.length === 0 && (
-          <div className="chat-interface__empty">
-            {workspaceExperience.assistantPlaceholder}
-          </div>
+          <div className="chat-interface__empty">{workspaceExperience.assistantPlaceholder}</div>
         )}
         {messages.map((message, index) => (
           <div
@@ -311,16 +354,22 @@ const ChatInterface = ({
                   <ConfidenceBadge confidence={message.confidence} />
                 </div>
               )}
-              {message.role === 'assistant' && (message.aiFoundation || message.metadata?.aiFoundation) && (
-                <AiRouteMetadata
-                  aiFoundation={message.aiFoundation || message.metadata?.aiFoundation}
-                  routePlan={message.metadata?.routePlan}
-                  aiGateway={message.aiGateway || message.metadata?.aiGateway}
-                />
-              )}
+              {message.role === 'assistant' &&
+                (message.aiFoundation || message.metadata?.aiFoundation) && (
+                  <AiRouteMetadata
+                    aiFoundation={message.aiFoundation || message.metadata?.aiFoundation}
+                    routePlan={message.metadata?.routePlan}
+                    aiGateway={message.aiGateway || message.metadata?.aiGateway}
+                  />
+                )}
               <AssistantResultRenderer
                 message={message}
-                visualizationsStyle={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '10px' }}
+                visualizationsStyle={{
+                  marginTop: '12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}
               />
               {message.role === 'assistant' && (
                 <AISourcePanel
@@ -347,18 +396,19 @@ const ChatInterface = ({
                   message.ragContext?.sourcePanel?.references?.length ||
                   message.ragContext?.references?.length
                 ) && (
-                <Citations
-                  citations={message.citations}
-                  onViewDetails={(citation) => setSelectedCitation(citation)}
-                />
-              )}
+                  <Citations
+                    citations={message.citations}
+                    onViewDetails={(citation) => setSelectedCitation(citation)}
+                  />
+                )}
               <div className="chat-interface__meta">
                 {message.timestamp
                   ? new Date(message.timestamp).toLocaleTimeString()
                   : 'Unknown time'}
                 {message.ragContext && message.ragContext.sourcesFound > 0 && (
                   <span style={{ marginLeft: '12px', opacity: 0.7 }}>
-                    • {message.ragContext.chunksRetrieved} chunks from {message.ragContext.sourcesFound} sources
+                    • {message.ragContext.chunksRetrieved} chunks from{' '}
+                    {message.ragContext.sourcesFound} sources
                   </span>
                 )}
               </div>
@@ -378,8 +428,12 @@ const ChatInterface = ({
             <div className="chat-interface__loading-bubble">
               <div style={{ display: 'flex', gap: '8px' }}>
                 <div className="dot-pulse">●</div>
-                <div className="dot-pulse" style={{ animationDelay: '0.2s' }}>●</div>
-                <div className="dot-pulse" style={{ animationDelay: '0.4s' }}>●</div>
+                <div className="dot-pulse" style={{ animationDelay: '0.2s' }}>
+                  ●
+                </div>
+                <div className="dot-pulse" style={{ animationDelay: '0.4s' }}>
+                  ●
+                </div>
               </div>
             </div>
           </div>
@@ -420,10 +474,7 @@ const ChatInterface = ({
       </div>
 
       {selectedCitation && (
-        <CitationModal
-          citation={selectedCitation}
-          onClose={() => setSelectedCitation(null)}
-        />
+        <CitationModal citation={selectedCitation} onClose={() => setSelectedCitation(null)} />
       )}
 
       <style>{`

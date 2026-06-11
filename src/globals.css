@@ -1,0 +1,207 @@
+:root,
+html,
+html[data-theme='dark'],
+html[data-theme='light'] {
+  color-scheme: dark;
+
+  /* ED OS color primitives */
+  --color-background: #0a0e1a;
+  --color-surface: #111827;
+  --color-elevated: #1c2333;
+  --color-border-subtle: #1f2937;
+  --color-border-default: #374151;
+  --color-text-primary: #f9fafb;
+  --color-text-secondary: #9ca3af;
+  --color-text-muted: #6b7280;
+
+  /* Semantic clinical status colors */
+  --status-critical: #ef4444;
+  --status-warning: #f59e0b;
+  --status-stable: #10b981;
+  --status-inactive: #6b7280;
+  --status-info: #3b82f6;
+
+  /* Typography */
+  --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 15px;
+  --font-size-lg: 17px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+
+  /* 4px base spacing system */
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Component radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: var(--radius-lg);
+  --radius-2xl: var(--radius-lg);
+  --radius-pill: 999px;
+
+  /* Existing app token bridge */
+  --app-bg: var(--color-background);
+  --app-background: var(--color-background);
+  --app-navy-ink: var(--color-background);
+  --app-fg: var(--color-text-primary);
+  --app-fg-muted: var(--color-text-secondary);
+  --app-text-primary: var(--color-text-primary);
+  --app-text-secondary: var(--color-text-secondary);
+  --app-text-muted: var(--color-text-muted);
+  --app-panel-bg: var(--color-surface);
+  --app-panel-border: var(--color-border-default);
+  --app-border: var(--color-border-default);
+  --app-border-subtle: var(--color-border-subtle);
+  --app-border-strong: color-mix(
+    in srgb,
+    var(--color-border-default) 72%,
+    var(--color-text-primary)
+  );
+  --app-surface: var(--color-surface);
+  --app-surface-0: var(--color-background);
+  --app-surface-1: var(--color-surface);
+  --app-surface-2: var(--color-elevated);
+  --app-surface-elevated: var(--color-elevated);
+  --app-surface-raised: var(--color-elevated);
+  --app-surface-muted: color-mix(in srgb, var(--color-elevated) 74%, var(--color-background));
+  --app-surface-subtle: color-mix(in srgb, var(--color-surface) 80%, var(--color-background));
+  --app-surface-glass: color-mix(in srgb, var(--color-surface) 88%, transparent);
+  --app-divider-on-surface: color-mix(in srgb, var(--color-text-primary) 12%, transparent);
+  --app-overlay-on-surface: color-mix(in srgb, var(--color-text-primary) 7%, transparent);
+  --app-overlay-on-surface-strong: color-mix(in srgb, var(--color-text-primary) 14%, transparent);
+  --app-shadow-1: 0 10px 24px rgba(0, 0, 0, 0.22);
+  --app-shadow-2: 0 18px 44px rgba(0, 0, 0, 0.32);
+  --app-accent: var(--status-info);
+  --app-accent-2: var(--status-stable);
+  --app-accent-interactive: var(--status-info);
+  --app-accent-hover: color-mix(in srgb, var(--status-info) 86%, white);
+  --app-danger: var(--status-critical);
+  --app-warning: var(--status-warning);
+  --app-success: var(--status-stable);
+  --app-info: var(--status-info);
+  --app-disabled: var(--status-inactive);
+  --app-focus: color-mix(in srgb, var(--status-info) 24%, transparent);
+  --app-focus-ring-aa: var(--status-info);
+  --app-hover: color-mix(in srgb, var(--status-info) 12%, transparent);
+  --app-input-bg: color-mix(in srgb, var(--color-elevated) 70%, var(--color-background));
+  --app-input-bg-hover: var(--color-elevated);
+  --app-input-border: var(--color-border-default);
+  --app-table-header-bg: color-mix(in srgb, var(--color-elevated) 72%, var(--color-background));
+  --app-table-row-hover: color-mix(in srgb, var(--status-info) 8%, transparent);
+  --app-on-solid: #ffffff;
+  --app-mesh-cyan: color-mix(in srgb, var(--status-info) 8%, transparent);
+  --app-mesh-green: color-mix(in srgb, var(--status-stable) 5%, transparent);
+  --app-scrollbar-track: color-mix(in srgb, var(--color-surface) 82%, var(--color-background));
+  --app-scrollbar-thumb: var(--color-border-default);
+  --app-scrollbar-thumb-hover: var(--color-text-muted);
+  --app-code-bg: var(--color-background);
+  --app-tool-card-body-bg: var(--color-surface);
+  --app-tool-card-body-fg: var(--color-text-primary);
+  --app-chart-1: var(--status-info);
+  --app-chart-2: var(--status-stable);
+  --app-chart-3: var(--status-warning);
+  --app-chart-4: var(--status-critical);
+  --app-chart-5: var(--color-text-muted);
+  --app-chart-6: var(--color-border-default);
+
+  --app-font-family-body: var(--font-ui);
+  --app-font-family-mono: var(--font-mono);
+  --font-10: var(--font-size-xs);
+  --font-11: var(--font-size-xs);
+  --font-12: var(--font-size-sm);
+  --font-13: var(--font-size-base);
+  --font-14: var(--font-size-base);
+  --font-15: var(--font-size-md);
+  --font-16: var(--font-size-lg);
+  --font-18: var(--font-size-lg);
+  --font-20: var(--font-size-xl);
+  --font-22: var(--font-size-xl);
+  --font-24: var(--font-size-2xl);
+  --font-28: var(--font-size-2xl);
+  --font-36: var(--font-size-2xl);
+  --text-xs: var(--font-size-xs);
+  --text-sm: var(--font-size-sm);
+  --text-base: var(--font-size-base);
+  --text-md: var(--font-size-md);
+  --text-lg: var(--font-size-lg);
+  --text-xl: var(--font-size-xl);
+  --text-2xl: var(--font-size-2xl);
+  --text-body: var(--font-size-base);
+  --text-small: var(--font-size-sm);
+  --text-caption: var(--font-size-xs);
+  --text-mono: var(--font-size-sm);
+  --app-type-body: var(--font-size-base);
+  --app-type-small: var(--font-size-sm);
+  --app-type-caption: var(--font-size-xs);
+  --app-type-label: var(--font-size-sm);
+  --app-type-helper: var(--font-size-xs);
+  --app-type-mono: var(--font-size-sm);
+
+  --app-radius-sm: var(--radius-sm);
+  --app-radius-md: var(--radius-md);
+  --app-radius-lg: var(--radius-lg);
+  --app-radius-xl: var(--radius-lg);
+  --app-radius-2xl: var(--radius-lg);
+  --app-radius-pill: var(--radius-pill);
+
+  --app-status-critical: var(--status-critical);
+  --app-status-degraded: var(--status-warning);
+  --app-status-online: var(--status-stable);
+  --app-status-offline: var(--status-inactive);
+  --app-status-demo: var(--status-info);
+  --app-status-unsupported: var(--status-inactive);
+
+  --navy-bg: var(--color-background);
+  --navy-ink: var(--color-background);
+  --navy-lighter: var(--color-elevated);
+  --text-color: var(--color-text-primary);
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-text-muted);
+  --muted-text: var(--color-text-secondary);
+  --panel-bg: var(--color-surface);
+  --panel-background: var(--color-surface);
+  --panel-border: var(--color-border-default);
+  --border-color: var(--color-border-default);
+  --surface-0: var(--color-background);
+  --surface-1: var(--color-surface);
+  --surface-2: var(--color-elevated);
+  --surface-muted: var(--app-surface-muted);
+  --surface-glass: var(--app-surface-glass);
+  --border-subtle: var(--color-border-subtle);
+  --danger: var(--status-critical);
+  --error-color: var(--status-critical);
+  --warning: var(--status-warning);
+  --success: var(--status-stable);
+  --success-color: var(--status-stable);
+  --info: var(--status-info);
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: var(--font-size-base);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+code,
+kbd,
+pre,
+samp,
+.type-mono {
+  font-family: var(--font-mono);
+}
