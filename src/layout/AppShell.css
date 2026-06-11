@@ -11,7 +11,13 @@
   height: var(--app-viewport-height, 100dvh);
   min-height: 100dvh;
   overflow: hidden;
-  background: var(--color-background);
+  background:
+    radial-gradient(
+      circle at 8% 0%,
+      color-mix(in srgb, var(--status-info) 10%, transparent),
+      transparent 32rem
+    ),
+    linear-gradient(180deg, var(--bg-base) 0%, #070b14 100%);
   color: var(--color-text-primary);
   font-family: var(--font-ui);
 }
@@ -47,8 +53,9 @@
   width: var(--ed-rail-width);
   min-width: var(--ed-rail-width);
   height: 100%;
-  border-right: 1px solid var(--color-border-subtle);
-  background: var(--color-surface);
+  border-right: 1px solid var(--border-subtle);
+  background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-base) 100%);
+  box-shadow: inset -1px 0 0 color-mix(in srgb, var(--border-default) 42%, transparent);
 }
 
 .ed-nav-rail__items {
@@ -80,14 +87,15 @@
 .ed-nav-rail__item:hover,
 .ed-nav-rail__item:focus-visible {
   color: var(--color-text-secondary);
-  background: color-mix(in srgb, var(--status-info) 8%, transparent);
+  background: color-mix(in srgb, var(--status-info) 10%, transparent);
   outline: none;
 }
 
 .ed-nav-rail__item--active {
   border-left-color: var(--status-info);
   color: var(--status-info);
-  background: color-mix(in srgb, var(--status-info) 12%, transparent);
+  background: color-mix(in srgb, var(--status-info) 14%, var(--bg-base));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--status-info) 14%, transparent);
 }
 
 .ed-nav-rail__item--flash {
@@ -121,6 +129,7 @@
   min-height: 0;
   height: 100%;
   overflow: hidden;
+  background: var(--bg-base);
 }
 
 .ed-os-header {
@@ -131,8 +140,13 @@
   height: var(--ed-header-height);
   min-height: var(--ed-header-height);
   padding: 0 var(--space-4);
-  border-bottom: 1px solid var(--color-border-subtle);
-  background: var(--color-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--bg-surface) 96%, var(--status-info) 4%) 0%,
+    var(--bg-surface) 100%
+  );
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--border-default) 40%, transparent);
 }
 
 .ed-shortcuts-modal {
@@ -291,18 +305,32 @@
 }
 
 .ed-os-wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   color: var(--color-text-primary);
   font-size: var(--font-size-md);
-  font-weight: 800;
-  letter-spacing: -0.01em;
+  font-weight: 900;
+  letter-spacing: 0.01em;
   white-space: nowrap;
+}
+
+.ed-os-wordmark::before {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--status-stable);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--status-stable) 14%, transparent);
+  content: '';
 }
 
 .ed-shift-clock {
   padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--color-border-subtle);
+  border: 1px solid var(--border-subtle);
   border-radius: var(--radius-pill);
-  color: var(--color-text-secondary);
+  background: color-mix(in srgb, var(--bg-elevated) 76%, var(--bg-base));
+  color: var(--text-secondary);
   font-family: var(--font-mono);
   font-size: var(--font-size-sm);
   line-height: 1;
@@ -1313,7 +1341,7 @@
   min-height: 0;
   overflow: auto;
   padding: 0;
-  background: var(--color-background);
+  background: var(--bg-base);
 }
 
 .ed-os-main:focus {
@@ -1336,12 +1364,117 @@
   color: var(--color-text-primary);
 }
 
+.ed-os-banner--route-notice {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  border-bottom-color: color-mix(in srgb, var(--status-info) 42%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 10%, var(--color-surface));
+}
+
+.ed-route-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-height: 100%;
+  padding: var(--space-5);
+  background:
+    radial-gradient(
+      circle at top right,
+      color-mix(in srgb, var(--status-info) 10%, transparent),
+      transparent 34rem
+    ),
+    var(--color-background);
+}
+
+.ed-route-panel__header {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.ed-route-panel__header span,
+.ed-route-panel__metrics span,
+.ed-route-panel__list small {
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ed-route-panel__header h1 {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.ed-route-panel__header p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.ed-route-panel__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.ed-route-panel__metrics article,
+.ed-route-panel__list article {
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 94%, transparent);
+  box-shadow: var(--shadow-sm);
+}
+
+.ed-route-panel__metrics article {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+}
+
+.ed-route-panel__metrics strong {
+  color: var(--color-text-primary);
+  font-size: 1.9rem;
+}
+
+.ed-route-panel__metrics small,
+.ed-route-panel__list span {
+  color: var(--color-text-secondary);
+}
+
+.ed-route-panel__list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.ed-route-panel__list article {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+}
+
+.ed-route-panel__list article div {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.ed-route-panel--queue .queue-intel {
+  width: min(920px, 100%);
+  max-width: 100%;
+  min-height: 0;
+  align-self: stretch;
+}
+
 .ed-copilot-panel {
   position: relative;
   min-width: 0;
   min-height: 0;
   border-left: 1px solid var(--color-border-subtle);
-  background: var(--color-surface);
+  background: var(--bg-surface);
   overflow: hidden;
 }
 
@@ -1374,7 +1507,7 @@
 }
 
 .ed-os-shell--copilot-collapsed .ed-copilot-panel {
-  background: var(--color-elevated);
+  background: var(--bg-elevated);
 }
 
 .ed-os-shell--copilot-collapsed .ed-copilot-panel__toggle {
@@ -1525,6 +1658,10 @@
 }
 
 @media (max-width: 1024px) {
+  .ed-route-panel__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .ed-os-shell {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) 64px;
@@ -1662,5 +1799,25 @@
 
   .ed-copilot-panel__header {
     min-height: 70px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ed-os-banner--route-notice {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .ed-route-panel {
+    padding: var(--space-3);
+  }
+
+  .ed-route-panel__metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .ed-route-panel__list article {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

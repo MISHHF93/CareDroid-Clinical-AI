@@ -9,17 +9,12 @@ import {
   DoorOpen,
   FilePlus2,
   ShieldAlert,
-  Share2,
   UserRoundCheck,
   X,
 } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { getPatientFlagType, hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
-import {
-  buildStaffWorkloads,
-  staffDisplayName,
-  staffInitials,
-} from '../utils/staffManagement';
+import { buildStaffWorkloads, staffDisplayName, staffInitials } from '../utils/staffManagement';
 import {
   getNextStates,
   movePatientToState as movePatientWithJourneyRules,
@@ -102,12 +97,6 @@ function isEditableShortcutTarget(target) {
 
 function isActiveReferral(referral) {
   return referral && !ACTIVE_REFERRAL_TERMINAL_STATUSES.has(referral.status);
-}
-
-function referralStatusLabel(referrals) {
-  if (referrals.some((referral) => referral.status === 'Accepted')) return 'Accepted';
-  if (referrals.some((referral) => referral.status === 'Sent')) return 'Sent';
-  return 'Pending';
 }
 
 function categoryClass(category) {
@@ -230,24 +219,6 @@ function parseOptionalNumber(value) {
   if (value === '') return null;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : null;
-}
-
-function savedScoreBadges(patient) {
-  const latestByScore = new Map();
-  patient.timeline
-    .filter((event) => event.type === 'ClinicalScoreSaved' && event.metadata)
-    .forEach((event) => {
-      const scoreId = event.metadata.scoreId;
-      if (typeof scoreId !== 'string') return;
-      latestByScore.set(scoreId, {
-        id: scoreId,
-        label: typeof event.metadata.scoreLabel === 'string' ? event.metadata.scoreLabel : 'Score',
-        total: typeof event.metadata.scoreTotal === 'number' ? event.metadata.scoreTotal : null,
-        interpretation:
-          typeof event.metadata.interpretation === 'string' ? event.metadata.interpretation : '',
-      });
-    });
-  return [...latestByScore.values()].slice(-3);
 }
 
 function StaffWorkloadIndicator({ member }) {
@@ -395,9 +366,7 @@ export function PatientDetailPanel() {
           (candidate) => candidate.id === patient.id
         );
         const nextIndex =
-          currentIndex === -1
-            ? 0
-            : (currentIndex + 1) % filteredPatientsForShortcuts.length;
+          currentIndex === -1 ? 0 : (currentIndex + 1) % filteredPatientsForShortcuts.length;
         selectPatient(filteredPatientsForShortcuts[nextIndex].id);
       }
     };
@@ -492,7 +461,7 @@ export function PatientDetailPanel() {
   };
 
   const handleNewReferral = () => {
-    navigate(`/workspace/emergency/referrals?patientId=${encodeURIComponent(patient.id)}&new=1`);
+    navigate(`/emergency/referrals?patientId=${encodeURIComponent(patient.id)}&new=1`);
   };
 
   return (
@@ -708,7 +677,9 @@ export function PatientDetailPanel() {
                   <strong>{referral.targetDepartment}</strong>
                   <span>{referral.reason}</span>
                 </div>
-                <span className={`patient-detail__referral-chip patient-detail__referral-chip--${referral.status.toLowerCase()}`}>
+                <span
+                  className={`patient-detail__referral-chip patient-detail__referral-chip--${referral.status.toLowerCase()}`}
+                >
                   {referral.status === 'Acknowledged' || referral.status === 'Draft'
                     ? 'Pending'
                     : referral.status}
@@ -790,14 +761,6 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
   const allStaff = useEmergencyStore((state) => state.staff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const assignStaff = useEmergencyStore((state) => state.assignStaff);
-  const allReferrals = useEmergencyStore((state) => state.referrals);
-  const referrals = useMemo(
-    () =>
-      allReferrals.filter(
-        (referral) => referral.patientId === patient.id && isActiveReferral(referral)
-      ),
-    [allReferrals, patient.id]
-  );
   const staff = allStaff.find((candidate) => candidate.id === patient.assignedStaffId);
   const room = useEmergencyStore((state) =>
     state.rooms.find((candidate) => candidate.id === patient.roomId)
@@ -805,13 +768,11 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
   const staffWorkloads = buildStaffWorkloads(allStaff, patients, activeShift);
   const wait = waitMinutes(patient.arrivalTime);
   const isLongWait = wait > 60;
+  const isWaitOverTarget = wait > 45;
   const priority = priorityTone(patient.priority);
   const hasReassessment = hasPatientFlag(patient, 'ReassessmentDue');
   const hasDeterioration = hasPatientFlag(patient, 'DeteriorationRisk');
   const hasEmsArrival = hasPatientFlag(patient, 'EMSArrival') || Boolean(patient.emsArrival);
-  const hasActiveReferral = referrals.length > 0;
-  const referralStatus = hasActiveReferral ? referralStatusLabel(referrals) : null;
-  const scoreBadges = savedScoreBadges(patient);
 
   return (
     <article
@@ -843,29 +804,21 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
           <span>{patient.mrn}</span>
         </div>
         <div className="patient-card__right-pills">
-          {hasActiveReferral ? <span className="patient-card__referral-badge">Referral</span> : null}
-          {hasEmsArrival ? <span className="patient-card__ems-badge">EMS</span> : null}
           <span className="patient-card__demographics">
             {patient.age}/{patient.sex[0] || 'U'}
           </span>
+          {hasEmsArrival ? <span className="patient-card__ems-badge">EMS</span> : null}
         </div>
       </div>
 
       <div className="patient-card__row patient-card__row--badges">
         <span
           className={`patient-card__complaint patient-card__complaint--${categoryClass(patient.complaintCategory)}`}
+          title={patient.chiefComplaint}
         >
-          {patient.complaintCategory}
+          {patient.chiefComplaint}
         </span>
         <span className="patient-card__state">{patient.state}</span>
-        {referralStatus ? (
-          <span
-            className={`patient-card__referral-status patient-card__referral-status--${referralStatus.toLowerCase()}`}
-          >
-            <Share2 size={11} aria-hidden />
-            {referralStatus}
-          </span>
-        ) : null}
       </div>
 
       <div className="patient-card__row patient-card__vitals" aria-label="Vitals">
@@ -880,7 +833,15 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
       </div>
 
       <div className="patient-card__row patient-card__row--location">
-        <span className={`patient-card__wait${isLongWait ? ' patient-card__wait--long' : ''}`}>
+        <span
+          className={[
+            'patient-card__wait',
+            isWaitOverTarget ? 'patient-card__wait--elevated' : '',
+            isLongWait ? 'patient-card__wait--long' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        >
           {formatWait(wait)} wait
         </span>
         <div className="patient-card__staff-control" onClick={(event) => event.stopPropagation()}>
@@ -911,16 +872,6 @@ function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
       </div>
 
       <div className="patient-card__flags" aria-label="Patient flags">
-        {scoreBadges.map((score) => (
-          <span
-            key={score.id}
-            className="patient-card__score-badge"
-            title={score.interpretation}
-            aria-label={`${score.label} score`}
-          >
-            {score.label.replace(' Score', '')} {score.total ?? '--'}
-          </span>
-        ))}
         {patient.flags.map((flag) => {
           const flagType = getPatientFlagType(flag);
           const Icon = FLAG_ICONS[flagType] || AlertTriangle;

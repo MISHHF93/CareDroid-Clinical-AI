@@ -18,11 +18,11 @@ export const CANONICAL_ROUTES = Object.freeze({
   assistant: '/assistant',
   tools: '/tools',
   operations: '/operations',
-  emergencyWorkspace: '/workspace/emergency',
-  emergencyPatients: '/workspace/emergency/patients',
-  emergencyEms: '/workspace/emergency/ems',
-  emergencyOperations: '/workspace/emergency/flow',
-  emergencyCopilot: '/workspace/emergency/command-center',
+  emergencyWorkspace: '/emergency',
+  emergencyPatients: '/emergency',
+  emergencyEms: '/emergency/ems',
+  emergencyOperations: '/emergency/queues',
+  emergencyCopilot: '/emergency/copilot',
   workspace: '/workspace',
   workspaces: '/workspaces',
   operationsCenter: '/operations-center',
@@ -194,7 +194,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'C-suite hospital leadership dashboard for platform value, adoption, operational readiness, compliance, security, and alerts.',
+    notes:
+      'C-suite hospital leadership dashboard for platform value, adoption, operational readiness, compliance, security, and alerts.',
   }),
   Object.freeze({
     id: 'assistant',
@@ -215,7 +216,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'solutions',
-    notes: 'Role, workspace, organization, usage, search, simulation, and workflow powered capability recommendations.',
+    notes:
+      'Role, workspace, organization, usage, search, simulation, and workflow powered capability recommendations.',
   }),
   Object.freeze({
     id: 'knowledgeHub',
@@ -226,7 +228,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'account',
-    notes: 'Centralized healthcare knowledge hub for protocols, pathways, calculators, simulations, AI guidance, and documentation.',
+    notes:
+      'Centralized healthcare knowledge hub for protocols, pathways, calculators, simulations, AI guidance, and documentation.',
   }),
   Object.freeze({
     id: 'knowledgeBase',
@@ -247,7 +250,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'account',
-    notes: 'Unified extensibility marketplace for asset packs, workflows, simulations, protocols, AI agents, and integrations.',
+    notes:
+      'Unified extensibility marketplace for asset packs, workflows, simulations, protocols, AI agents, and integrations.',
   }),
   Object.freeze({
     id: 'enterpriseReadiness',
@@ -258,7 +262,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'account',
-    notes: 'Enterprise readiness center with weighted SSO, RBAC, tenant isolation, audit, governance, integration, and security scoring.',
+    notes:
+      'Enterprise readiness center with weighted SSO, RBAC, tenant isolation, audit, governance, integration, and security scoring.',
   }),
   Object.freeze({
     id: 'platformAdmin',
@@ -269,7 +274,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'account',
-    notes: 'SaaS operating system layer unifying organization, subscription, products, packs, assets, workspaces, users, AI agents, and automations.',
+    notes:
+      'SaaS operating system layer unifying organization, subscription, products, packs, assets, workspaces, users, AI agents, and automations.',
   }),
   Object.freeze({
     id: 'tools',
@@ -325,7 +331,8 @@ export const ROUTE_RECORDS = Object.freeze([
     aliases: [],
     matchPrefixes: ['/digital-twin-intelligence/'],
     navGroup: 'operations',
-    notes: 'Predictive operational twin combining Hospital Map, Fleet, Medical IoT, occupancy, telemetry, alerts, and maintenance readiness.',
+    notes:
+      'Predictive operational twin combining Hospital Map, Fleet, Medical IoT, occupancy, telemetry, alerts, and maintenance readiness.',
   }),
   Object.freeze({
     id: 'hospitalMap',
@@ -419,7 +426,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'operations',
-    notes: 'Fleet command dashboard retained as an operations detail route while /fleet/map is the canonical map entry.',
+    notes:
+      'Fleet command dashboard retained as an operations detail route while /fleet/map is the canonical map entry.',
   }),
   Object.freeze({
     id: 'audit',
@@ -452,7 +460,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'Business intelligence layer aggregating platform and business analytics into advisory recommendations.',
+    notes:
+      'Business intelligence layer aggregating platform and business analytics into advisory recommendations.',
   }),
   Object.freeze({
     id: 'organization',
@@ -486,7 +495,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'products',
-    notes: 'Department performance intelligence with health scores and measurable platform outcomes.',
+    notes:
+      'Department performance intelligence with health scores and measurable platform outcomes.',
   }),
   Object.freeze({
     id: 'workflowMining',
@@ -497,7 +507,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'operations',
-    notes: 'Workflow mining engine for common journeys, friction, dead ends, and unnecessary clicks.',
+    notes:
+      'Workflow mining engine for common journeys, friction, dead ends, and unnecessary clicks.',
   }),
   Object.freeze({
     id: 'workspaceDependencyGraph',
@@ -508,7 +519,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'operations',
-    notes: 'Cross-workspace intelligence dependency graph for handoffs, signals, and operational relationships.',
+    notes:
+      'Cross-workspace intelligence dependency graph for handoffs, signals, and operational relationships.',
   }),
   Object.freeze({
     id: 'organizationIntelligence',
@@ -519,7 +531,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'Organization intelligence profile with behavior-aware pack, asset, AI, workflow, simulation, and automation recommendations.',
+    notes:
+      'Organization intelligence profile with behavior-aware pack, asset, AI, workflow, simulation, and automation recommendations.',
   }),
   Object.freeze({
     id: 'platformLearningEngine',
@@ -530,7 +543,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: ['/platform-learning'],
     navGroup: 'advanced',
-    notes: 'Privacy-safe platform learning engine that turns usage signals into optimization suggestions.',
+    notes:
+      'Privacy-safe platform learning engine that turns usage signals into optimization suggestions.',
   }),
   Object.freeze({
     id: 'brain',
@@ -541,7 +555,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'Centralized CareDroid Brain intelligence layer across platform, organization, role, asset, automation, memory, recommendations, and learning systems.',
+    notes:
+      'Centralized CareDroid Brain intelligence layer across platform, organization, role, asset, automation, memory, recommendations, and learning systems.',
   }),
   Object.freeze({
     id: 'products',
@@ -628,7 +643,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'products',
-    notes: 'Integration marketplace route documented as product/system purpose until integration assets are launchable.',
+    notes:
+      'Integration marketplace route documented as product/system purpose until integration assets are launchable.',
   }),
   Object.freeze({
     id: 'departments',
@@ -661,7 +677,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'products',
-    notes: 'Integration readiness across interoperability, identity, government, and scheduling systems.',
+    notes:
+      'Integration readiness across interoperability, identity, government, and scheduling systems.',
   }),
   Object.freeze({
     id: 'configurationStudio',
@@ -705,7 +722,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'products',
-    notes: 'Product intelligence layer for adoption, ROI, health, and engagement value-chain metrics.',
+    notes:
+      'Product intelligence layer for adoption, ROI, health, and engagement value-chain metrics.',
   }),
   Object.freeze({
     id: 'expansionOpportunities',
@@ -738,7 +756,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'account',
-    notes: 'Tenant-scoped customer portal for subscription, entitlements, organization profile, users, integrations, invoices, support, and release notes.',
+    notes:
+      'Tenant-scoped customer portal for subscription, entitlements, organization profile, users, integrations, invoices, support, and release notes.',
   }),
   Object.freeze({
     id: 'successCenter',
@@ -749,7 +768,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'products',
-    notes: 'Tenant-scoped success center for adoption, workspace adoption, asset usage, AI usage, simulation, workflow, onboarding, and health score.',
+    notes:
+      'Tenant-scoped success center for adoption, workspace adoption, asset usage, AI usage, simulation, workflow, onboarding, and health score.',
   }),
   Object.freeze({
     id: 'billing',
@@ -782,7 +802,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'SaaS health center for frontend, backend, API, integrations, tenant, AI, and simulation health.',
+    notes:
+      'SaaS health center for frontend, backend, API, integrations, tenant, AI, and simulation health.',
   }),
   Object.freeze({
     id: 'governanceRegistry',
@@ -793,7 +814,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'Platform governance registry for owner, steward, approver, risk, evidence, version, audit, and review schedules.',
+    notes:
+      'Platform governance registry for owner, steward, approver, risk, evidence, version, audit, and review schedules.',
   }),
   Object.freeze({
     id: 'dependencyGraph',
@@ -804,7 +826,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'Asset dependency graph across products, packs, assets, routes, backend services, and integrations.',
+    notes:
+      'Asset dependency graph across products, packs, assets, routes, backend services, and integrations.',
   }),
   Object.freeze({
     id: 'artifacts',
@@ -815,7 +838,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'Machine-learning-ready artifact intelligence catalog with CSV/JSON export, feature rows, and resonance metadata.',
+    notes:
+      'Machine-learning-ready artifact intelligence catalog with CSV/JSON export, feature rows, and resonance metadata.',
   }),
   Object.freeze({
     id: 'knowledgeGraph',
@@ -826,7 +850,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'Artifact knowledge graph across assets, packs, products, workspaces, roles, routes, simulations, workflows, AI agents, and integrations.',
+    notes:
+      'Artifact knowledge graph across assets, packs, products, workspaces, roles, routes, simulations, workflows, AI agents, and integrations.',
   }),
   Object.freeze({
     id: 'aiModels',
@@ -837,7 +862,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'Unified AI model registry for gateway, MoE, RAG, tool calling, resonance, tutoring, cost, guardrails, and evaluation systems.',
+    notes:
+      'Unified AI model registry for gateway, MoE, RAG, tool calling, resonance, tutoring, cost, guardrails, and evaluation systems.',
   }),
   Object.freeze({
     id: 'aiEvaluation',
@@ -848,7 +874,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: ['/ai/evaluation'],
     navGroup: 'advanced',
-    notes: 'AI Evaluation Lab for model quality, hallucination, tool-call, workflow, latency, cost, and comparison benchmarks.',
+    notes:
+      'AI Evaluation Lab for model quality, hallucination, tool-call, workflow, latency, cost, and comparison benchmarks.',
   }),
   Object.freeze({
     id: 'tenantAdmin',
@@ -881,7 +908,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [CANONICAL_ROUTES.automation],
     navGroup: 'secondary',
-    notes: 'Canonical workflow route. Legacy /automation redirects here to avoid duplicate workflow UI ownership.',
+    notes:
+      'Canonical workflow route. Legacy /automation redirects here to avoid duplicate workflow UI ownership.',
   }),
   Object.freeze({
     id: 'automationAnalytics',
@@ -892,7 +920,8 @@ export const ROUTE_RECORDS = Object.freeze([
     status: 'active',
     aliases: [],
     navGroup: 'advanced',
-    notes: 'Automation analytics across solution packages, workspace automations, audit events, human overrides, and AI recommendation adoption.',
+    notes:
+      'Automation analytics across solution packages, workspace automations, audit events, human overrides, and AI recommendation adoption.',
   }),
 ]);
 
@@ -965,7 +994,10 @@ export const ROUTE_ALIAS_GROUPS = Object.freeze({
     aliases: aliasesForRoute('medical3dViewer'),
   }),
   liveMap: Object.freeze({ target: CANONICAL_ROUTES.liveMap, aliases: aliasesForRoute('liveMap') }),
-  fleetMap: Object.freeze({ target: CANONICAL_ROUTES.fleetMap, aliases: aliasesForRoute('fleetMap') }),
+  fleetMap: Object.freeze({
+    target: CANONICAL_ROUTES.fleetMap,
+    aliases: aliasesForRoute('fleetMap'),
+  }),
   operations: Object.freeze({
     target: CANONICAL_ROUTES.operations,
     aliases: aliasesForRoute('operations'),

@@ -1,14 +1,16 @@
-import { CapacityScore, PatientState } from '../types';
+import { CapacityScore, PatientState } from '../../types/emergency';
 
 export const MAX_ED_PATIENT_CAPACITY = 30;
 
 function scoreRank(score) {
-  return {
-    [CapacityScore.Green]: 0,
-    [CapacityScore.Yellow]: 1,
-    [CapacityScore.Orange]: 2,
-    [CapacityScore.Red]: 3,
-  }[score] ?? 0;
+  return (
+    {
+      [CapacityScore.Green]: 0,
+      [CapacityScore.Yellow]: 1,
+      [CapacityScore.Orange]: 2,
+      [CapacityScore.Red]: 3,
+    }[score] ?? 0
+  );
 }
 
 function highestScore(scores) {
@@ -44,8 +46,12 @@ export function getCapacitySnapshot({
   reassessmentQueueLength = 0,
   maxCapacity = MAX_ED_PATIENT_CAPACITY,
 } = {}) {
-  const currentOccupancy = patients.filter((patient) => patient.state !== PatientState.Discharge).length;
-  const boardingCount = patients.filter((patient) => patient.state === PatientState.Admission).length;
+  const currentOccupancy = patients.filter(
+    (patient) => patient.state !== PatientState.Discharge
+  ).length;
+  const boardingCount = patients.filter(
+    (patient) => patient.state === PatientState.Admission
+  ).length;
   const occupancyPercent = Math.round((currentOccupancy / maxCapacity) * 100);
   const score = highestScore([
     occupancyScore(occupancyPercent),

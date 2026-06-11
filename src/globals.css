@@ -4,15 +4,24 @@ html[data-theme='dark'],
 html[data-theme='light'] {
   color-scheme: dark;
 
-  /* ED OS color primitives */
-  --color-background: #0a0e1a;
-  --color-surface: #111827;
-  --color-elevated: #1c2333;
-  --color-border-subtle: #1f2937;
-  --color-border-default: #374151;
-  --color-text-primary: #f9fafb;
-  --color-text-secondary: #9ca3af;
-  --color-text-muted: #6b7280;
+  /* Emergency OS dark clinical primitives */
+  --bg-base: #0a0e1a;
+  --bg-surface: #111827;
+  --bg-elevated: #1c2333;
+  --border-subtle: #1f2937;
+  --border-default: #374151;
+  --text-primary: #f9fafb;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  --color-background: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-elevated: var(--bg-elevated);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border-default);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
 
   /* Semantic clinical status colors */
   --status-critical: #ef4444;
@@ -20,6 +29,13 @@ html[data-theme='light'] {
   --status-stable: #10b981;
   --status-inactive: #6b7280;
   --status-info: #3b82f6;
+
+  /* Emergency severity ladder */
+  --priority-p1: #ef4444;
+  --priority-p2: #f97316;
+  --priority-p3: #f59e0b;
+  --priority-p4: #10b981;
+  --priority-p5: #6b7280;
 
   /* Typography */
   --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

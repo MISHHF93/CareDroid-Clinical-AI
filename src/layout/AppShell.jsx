@@ -5,7 +5,6 @@ import {
   Bell,
   Bot,
   ChevronRight,
-  ClipboardCheck,
   ClipboardList,
   Gauge,
   Info,
@@ -17,77 +16,72 @@ import {
 } from 'lucide-react';
 import ChatInterface from '../components/ChatInterface';
 import CommandPalette from '../components/CommandPalette';
-import EMSPressureScore, {
-  calculateEMSPressureScore,
-  isEMSPressureElevated,
-} from '../components/EMSPressureScore';
+import { calculateEMSPressureScore, isEMSPressureElevated } from '../components/EMSPressureScore';
 import ReassessmentDrawer from '../components/ReassessmentDrawer';
 import { useConversation } from '../contexts/ConversationContext';
 import { useUser } from '../contexts/UserContext';
 import { hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
 import { PatientState } from '../../types/emergency';
-import {
-  buildStaffWorkloads,
-  getStaffRebalanceSuggestion,
-} from '../utils/staffManagement';
+import { buildStaffWorkloads, getStaffRebalanceSuggestion } from '../utils/staffManagement';
 import './AppShell.css';
 
 const NAV_ITEMS = [
   {
     id: 'whiteboard',
     label: 'Whiteboard',
-    path: '/workspace/emergency',
+    path: '/emergency',
     icon: LayoutDashboard,
-    activePaths: ['/workspace/emergency', '/workspace/emergency/whiteboard'],
+    activePaths: ['/emergency', '/workspace/emergency', '/workspace/emergency/whiteboard'],
   },
   {
     id: 'queue',
     label: 'Queue',
-    path: '/workspace/emergency/queues',
+    path: '/emergency/queues',
     icon: ClipboardList,
-    activePaths: ['/workspace/emergency/queues', '/workspace/emergency/waiting-room'],
+    activePaths: [
+      '/emergency/queues',
+      '/workspace/emergency/queues',
+      '/workspace/emergency/waiting-room',
+    ],
   },
   {
     id: 'ems',
     label: 'EMS',
-    path: '/workspace/emergency/ems',
+    path: '/emergency/ems',
     icon: Truck,
-    activePaths: ['/workspace/emergency/ems', '/workspace/emergency/pre-arrival'],
+    activePaths: ['/emergency/ems', '/workspace/emergency/ems', '/workspace/emergency/pre-arrival'],
   },
   {
     id: 'referrals',
     label: 'Referrals',
-    path: '/workspace/emergency/referrals',
+    path: '/emergency/referrals',
     icon: Share2,
-    activePaths: ['/workspace/emergency/referrals'],
+    activePaths: ['/emergency/referrals', '/workspace/emergency/referrals'],
   },
   {
     id: 'capacity',
     label: 'Capacity',
-    path: '/workspace/emergency/capacity',
+    path: '/emergency/capacity',
     icon: Gauge,
-    activePaths: ['/workspace/emergency/capacity', '/workspace/emergency/boarding'],
-  },
-  {
-    id: 'shift-summary',
-    label: 'Shift Summary',
-    path: '/workspace/emergency/shift-summary',
-    icon: ClipboardCheck,
-    activePaths: ['/workspace/emergency/shift-summary'],
+    activePaths: [
+      '/emergency/capacity',
+      '/workspace/emergency/capacity',
+      '/workspace/emergency/boarding',
+    ],
   },
   {
     id: 'copilot',
     label: 'Copilot',
-    path: '/workspace/emergency/command-center',
+    path: '/emergency/copilot',
     icon: Bot,
-    activePaths: ['/workspace/emergency/command-center', '/assistant', '/chat'],
+    activePaths: ['/emergency/copilot', '/workspace/emergency/copilot', '/assistant', '/chat'],
   },
   {
     id: 'settings',
     label: 'Settings',
     path: '/settings',
     icon: Settings,
-    activePaths: ['/settings', '/profile/settings'],
+    activePaths: ['/settings', '/workspace/emergency/settings', '/profile/settings'],
   },
 ];
 
@@ -145,7 +139,7 @@ function isEditableShortcutTarget(target) {
 
 function isNavItemActive(item, pathname) {
   return item.activePaths.some((activePath) => {
-    if (activePath === '/workspace/emergency') {
+    if (activePath === '/emergency' || activePath === '/workspace/emergency') {
       return pathname === activePath;
     }
 
@@ -249,13 +243,19 @@ function minutesUntil(timestamp, now) {
 function roomTone(room, patientById) {
   const patient = room.currentPatientId ? patientById.get(room.currentPatientId) : null;
   if (patient?.state === PatientState.Admission) return 'boarding';
-  if (room.type === 'Isolation' || (patient && hasPatientFlag(patient, 'Isolation'))) return 'isolation';
+  if (room.type === 'Isolation' || (patient && hasPatientFlag(patient, 'Isolation')))
+    return 'isolation';
   if (room.status === 'Available') return 'available';
   if (room.status === 'Occupied' || room.currentPatientId) return 'occupied';
   return 'unavailable';
 }
 
-function buildCapacityRecommendations({ capacity, boardingPatients, dischargePatients, incomingEMS }) {
+function buildCapacityRecommendations({
+  capacity,
+  boardingPatients,
+  dischargePatients,
+  incomingEMS,
+}) {
   const recommendations = [];
 
   if (boardingPatients.length) {
@@ -320,8 +320,7 @@ function CapacityDetailPanel({ open, onClose }) {
         .filter((arrival) => arrival.status === 'Inbound')
         .sort(
           (a, b) =>
-            new Date(a.estimatedArrivalTime).getTime() -
-            new Date(b.estimatedArrivalTime).getTime()
+            new Date(a.estimatedArrivalTime).getTime() - new Date(b.estimatedArrivalTime).getTime()
         ),
     [emsArrivals]
   );
@@ -396,10 +395,22 @@ function CapacityDetailPanel({ open, onClose }) {
             })}
           </div>
           <div className="capacity-room-grid__legend" aria-label="Room grid legend">
-            <span><i className="capacity-room-grid__room--available" />Available</span>
-            <span><i className="capacity-room-grid__room--occupied" />Occupied</span>
-            <span><i className="capacity-room-grid__room--boarding" />Boarding</span>
-            <span><i className="capacity-room-grid__room--isolation" />Isolation</span>
+            <span>
+              <i className="capacity-room-grid__room--available" />
+              Available
+            </span>
+            <span>
+              <i className="capacity-room-grid__room--occupied" />
+              Occupied
+            </span>
+            <span>
+              <i className="capacity-room-grid__room--boarding" />
+              Boarding
+            </span>
+            <span>
+              <i className="capacity-room-grid__room--isolation" />
+              Isolation
+            </span>
           </div>
         </section>
 
@@ -411,14 +422,19 @@ function CapacityDetailPanel({ open, onClose }) {
           <div className="capacity-detail-panel__list">
             {boardingPatients.length ? (
               boardingPatients.map((patient) => {
-                const minutes = minutesSince(latestStateTimestamp(patient, PatientState.Admission), now);
+                const minutes = minutesSince(
+                  latestStateTimestamp(patient, PatientState.Admission),
+                  now
+                );
                 return (
                   <article key={patient.id}>
                     <div>
                       <strong>{patientName(patient)}</strong>
                       <span>{targetDepartmentForPatient(patient, referrals)}</span>
                     </div>
-                    <em className={`capacity-duration capacity-duration--${durationTone(minutes, 60, 120)}`}>
+                    <em
+                      className={`capacity-duration capacity-duration--${durationTone(minutes, 60, 120)}`}
+                    >
                       Boarding since {formatDuration(minutes)}
                     </em>
                   </article>
@@ -438,7 +454,10 @@ function CapacityDetailPanel({ open, onClose }) {
           <div className="capacity-detail-panel__list">
             {dischargePatients.length ? (
               dischargePatients.map((patient) => {
-                const minutes = minutesSince(latestStateTimestamp(patient, PatientState.Disposition), now);
+                const minutes = minutesSince(
+                  latestStateTimestamp(patient, PatientState.Disposition),
+                  now
+                );
                 return (
                   <article key={patient.id}>
                     <div>
@@ -476,7 +495,9 @@ function CapacityDetailPanel({ open, onClose }) {
                       <strong>{arrival.unitName || arrival.unitId}</strong>
                       <span>{arrival.chiefComplaint}</span>
                     </div>
-                    <em className={`capacity-duration capacity-duration--${arrival.severity === 'Critical' ? 'critical' : 'normal'}`}>
+                    <em
+                      className={`capacity-duration capacity-duration--${arrival.severity === 'Critical' ? 'critical' : 'normal'}`}
+                    >
                       ETA {eta === null ? '--' : `${eta}m`} · {arrival.severity}
                     </em>
                   </article>
@@ -732,8 +753,6 @@ const AppShell = ({
   isAuthed = false,
   activeConversation,
   onNewConversation,
-  onSignOut,
-  healthStatus = 'online',
   isDevAuthBypass = false,
   devAuthBannerLabel = 'Platform Access',
   children,
@@ -753,6 +772,9 @@ const AppShell = ({
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
   const setWhiteboardSearchQuery = useEmergencyStore((state) => state.setWhiteboardSearchQuery);
+  const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
+  const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
+  const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
   const reassessmentCount = useEmergencyStore(
     (state) =>
       state.patients.filter(
@@ -766,13 +788,14 @@ const AppShell = ({
     [patients]
   );
   const [clock, setClock] = useState(() => new Date());
-  const [isCopilotCollapsed, setIsCopilotCollapsed] = useState(false);
+  const isCopilotCollapsed = !copilotOpen;
   const [isReassessmentDrawerOpen, setIsReassessmentDrawerOpen] = useState(false);
   const [isAlertDrawerOpen, setIsAlertDrawerOpen] = useState(false);
   const [isStaffPanelOpen, setIsStaffPanelOpen] = useState(false);
   const [isCapacityDetailOpen, setIsCapacityDetailOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isShortcutReferenceOpen, setIsShortcutReferenceOpen] = useState(false);
+  const routeNotice = location.state?.edNotice;
 
   useEffect(() => {
     const timer = window.setInterval(() => setClock(new Date()), 1000);
@@ -825,7 +848,7 @@ const AppShell = ({
       }
 
       if (event.shiftKey && key === 's') {
-        run(() => navigate('/workspace/emergency/shift-summary'));
+        run(() => navigate('/emergency/shift'));
         return;
       }
 
@@ -838,19 +861,19 @@ const AppShell = ({
 
       if (key === 'n') {
         run(() => {
-          navigate('/workspace/emergency');
+          navigate('/emergency');
           window.setTimeout(() => window.dispatchEvent(new CustomEvent('ed:open-intake')), 50);
         });
         return;
       }
 
       if (key === 'c') {
-        run(() => setIsCopilotCollapsed((collapsed) => !collapsed));
+        run(toggleCopilot);
         return;
       }
 
       if (key === 'e') {
-        run(() => navigate('/workspace/emergency/ems'));
+        run(() => navigate('/emergency/ems'));
         return;
       }
 
@@ -861,7 +884,7 @@ const AppShell = ({
 
     window.addEventListener('keydown', handleGlobalShortcut);
     return () => window.removeEventListener('keydown', handleGlobalShortcut);
-  }, [closeAllPanels, navigate]);
+  }, [closeAllPanels, navigate, toggleCopilot]);
 
   const handleAppendMessage = useCallback(
     (_conversationId, message) => {
@@ -912,13 +935,13 @@ const AppShell = ({
       }
 
       if (alert.actionType === 'OPEN_EMS') {
-        navigate('/workspace/emergency/ems');
+        navigate('/emergency/ems');
         setIsAlertDrawerOpen(false);
         return;
       }
 
       if (alert.actionType === 'OPEN_QUEUE') {
-        navigate('/workspace/emergency/queues');
+        navigate('/emergency/queues');
         setIsAlertDrawerOpen(false);
       }
     },
@@ -931,18 +954,26 @@ const AppShell = ({
       if (selectedPatientId) {
         return patients.find((patient) => patient.id === selectedPatientId) || null;
       }
-      return patients.find((patient) => ACTIVE_PATIENT_STATES.has(patient.state)) || patients[0] || null;
+      return (
+        patients.find((patient) => ACTIVE_PATIENT_STATES.has(patient.state)) || patients[0] || null
+      );
     },
     [patients, selectedPatientId]
   );
 
   const findPatientByValue = useCallback(
     (value) => {
-      const query = String(value || '').trim().toLowerCase();
+      const query = String(value || '')
+        .trim()
+        .toLowerCase();
       if (!query) return null;
       return (
-        patients.find((patient) => `${patient.firstName} ${patient.lastName}`.toLowerCase() === query) ||
-        patients.find((patient) => `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(query)) ||
+        patients.find(
+          (patient) => `${patient.firstName} ${patient.lastName}`.toLowerCase() === query
+        ) ||
+        patients.find((patient) =>
+          `${patient.firstName} ${patient.lastName}`.toLowerCase().includes(query)
+        ) ||
         patients.find((patient) => patient.mrn.toLowerCase().includes(query)) ||
         null
       );
@@ -955,7 +986,7 @@ const AppShell = ({
       if (!command?.type) return;
 
       if (command.type === 'OPEN_INTAKE') {
-        navigate('/workspace/emergency');
+        navigate('/emergency');
         window.setTimeout(() => window.dispatchEvent(new CustomEvent('ed:open-intake')), 50);
       }
 
@@ -966,7 +997,7 @@ const AppShell = ({
         setQueueFilter(null);
         setWhiteboardSearchQuery(command.value || '');
         if (patient?.id) selectPatient(patient.id);
-        navigate('/workspace/emergency');
+        navigate('/emergency');
       }
 
       if (command.type === 'OPEN_ROUTE') {
@@ -982,12 +1013,12 @@ const AppShell = ({
           : command.value
             ? `?patientSearch=${encodeURIComponent(command.value)}&new=1`
             : '?new=1';
-        navigate(`/workspace/emergency/referrals${params}`);
+        navigate(`/emergency/referrals${params}`);
       }
 
       if (command.type === 'OPEN_CALCULATOR') {
         const patient = patientForCommand(command.patientId);
-        navigate('/workspace/emergency');
+        navigate('/emergency');
         if (patient?.id) selectPatient(patient.id);
         window.setTimeout(() => {
           window.dispatchEvent(
@@ -1008,12 +1039,12 @@ const AppShell = ({
       if (command.type === 'CLEAR_FILTERS') {
         setQueueFilter(null);
         setWhiteboardSearchQuery('');
-        navigate('/workspace/emergency');
+        navigate('/emergency');
       }
 
       if (command.type === 'VIEW_PATIENT') {
         if (command.patientId) selectPatient(command.patientId);
-        navigate('/workspace/emergency');
+        navigate('/emergency');
       }
 
       setIsCommandPaletteOpen(false);
@@ -1089,26 +1120,9 @@ const AppShell = ({
               expanded={isCapacityDetailOpen}
               onClick={() => setIsCapacityDetailOpen((open) => !open)}
             />
-            <EMSPressureScore />
           </div>
 
           <div className="ed-os-header__right">
-            <button
-              type="button"
-              className={[
-                'ed-reassessment-badge',
-                reassessmentCount > 0 ? 'ed-reassessment-badge--active' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              onClick={() => setIsReassessmentDrawerOpen((open) => !open)}
-              disabled={reassessmentCount === 0}
-              aria-label={`${reassessmentCount} patients require reassessment`}
-              aria-expanded={isReassessmentDrawerOpen}
-            >
-              <span className="ed-reassessment-badge__pulse" aria-hidden />
-              <strong>{reassessmentCount}</strong>
-            </button>
             <div className="ed-alert-menu">
               <button
                 type="button"
@@ -1123,7 +1137,7 @@ const AppShell = ({
                 aria-expanded={isAlertDrawerOpen}
                 onClick={() => setIsAlertDrawerOpen((open) => !open)}
               >
-              <Bell size={18} strokeWidth={2.1} aria-hidden />
+                <Bell size={18} strokeWidth={2.1} aria-hidden />
                 {activeAlerts.length ? (
                   <span className="ed-icon-button__count">{activeAlerts.length}</span>
                 ) : (
@@ -1143,23 +1157,8 @@ const AppShell = ({
                 rebalanceSuggestion={staffRebalanceSuggestion}
               />
             </div>
-            <div className="ed-shift-status" aria-label={`Shift status ${healthStatus}`}>
-              <span className="ed-shift-status__dot" aria-hidden />
-              <span>Shift Active</span>
-            </div>
-            {onSignOut ? (
-              <button type="button" className="ed-shift-signout" onClick={onSignOut}>
-                Sign out
-              </button>
-            ) : null}
           </div>
         </header>
-
-        {staffRebalanceSuggestion ? (
-          <div className="ed-staff-rebalance-banner" role="status">
-            {staffRebalanceSuggestion.message}
-          </div>
-        ) : null}
 
         <AlertDrawer
           open={isAlertDrawerOpen}
@@ -1206,6 +1205,12 @@ const AppShell = ({
                 <strong>{devAuthBannerLabel}</strong> active
               </div>
             )}
+            {routeNotice && (
+              <div className="ed-os-banner ed-os-banner--route-notice" role="status">
+                <strong>{routeNotice.title}</strong>
+                {routeNotice.message ? <span>{routeNotice.message}</span> : null}
+              </div>
+            )}
             {children}
           </main>
 
@@ -1217,7 +1222,7 @@ const AppShell = ({
             <button
               type="button"
               className="ed-copilot-panel__toggle"
-              onClick={() => setIsCopilotCollapsed((collapsed) => !collapsed)}
+              onClick={toggleCopilot}
               aria-label={isCopilotCollapsed ? 'Expand ED Copilot' : 'Collapse ED Copilot'}
               aria-expanded={!isCopilotCollapsed}
             >
@@ -1243,13 +1248,17 @@ const AppShell = ({
                   </div>
                 </div>
                 <div className="ed-copilot-panel__actions">
-                  <button type="button" onClick={onNewConversation} className="ed-copilot-panel__new">
+                  <button
+                    type="button"
+                    onClick={onNewConversation}
+                    className="ed-copilot-panel__new"
+                  >
                     New
                   </button>
                   <button
                     type="button"
                     className="ed-copilot-panel__minimize"
-                    onClick={() => setIsCopilotCollapsed(true)}
+                    onClick={() => setCopilotOpen(false)}
                     aria-label="Minimize ED Copilot"
                   >
                     <ChevronRight size={16} strokeWidth={2.2} aria-hidden />

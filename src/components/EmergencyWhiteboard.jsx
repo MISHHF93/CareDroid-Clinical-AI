@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Grid3X3, List, Plus } from 'lucide-react';
+import { Grid3X3, List } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { getPatientFlagType, hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
 import PatientCard, { PatientDetailPanel } from './PatientCard';
-import QueueIntelligencePanel from './QueueIntelligencePanel';
 import NewPatientIntake from './NewPatientIntake';
 import ClinicalScoreCalculator, {
   CALCULATOR_BY_SUGGESTION_ID,
@@ -113,7 +112,6 @@ export default function EmergencyWhiteboard() {
   const addNote = useEmergencyStore((state) => state.addNote);
   const addFlag = useEmergencyStore((state) => state.addFlag);
   const [viewMode, setViewMode] = useState('grid');
-  const [queuePanelCollapsed, setQueuePanelCollapsed] = useState(false);
   const [newPatientOpen, setNewPatientOpen] = useState(false);
   const [calculatorLaunch, setCalculatorLaunch] = useState(null);
   const [keyboardPatientId, setKeyboardPatientId] = useState(null);
@@ -173,12 +171,12 @@ export default function EmergencyWhiteboard() {
       { label: 'Avg Wait', value: `${averageWait(activePatients)}m` },
       { label: 'High Risk', value: activePatients.filter(isHighRisk).length },
       {
-        label: 'In Boarding',
+        label: 'Boarding',
         value: activePatients.filter((patient) => matchesFilter(patient, 'Boarding')).length,
       },
-      { label: 'Capacity Score', value: capacity.score },
+      { label: 'Capacity', value: `${capacity.occupancyPercent}%` },
     ],
-    [activePatients, capacity.score]
+    [activePatients, capacity.occupancyPercent]
   );
   const calculatorPatient = calculatorLaunch
     ? patients.find((patient) => patient.id === calculatorLaunch.patientId)
@@ -196,21 +194,14 @@ export default function EmergencyWhiteboard() {
 
     const totalRows = Math.ceil(filteredPatients.length / gridColumnCount);
     const startRow = Math.max(0, Math.floor(gridScrollTop / VIRTUALIZED_CARD_ROW_HEIGHT) - 3);
-    const visibleRowCount =
-      Math.ceil(gridViewportHeight / VIRTUALIZED_CARD_ROW_HEIGHT) + 6;
+    const visibleRowCount = Math.ceil(gridViewportHeight / VIRTUALIZED_CARD_ROW_HEIGHT) + 6;
     const endRow = Math.min(totalRows, startRow + visibleRowCount);
     return {
       patients: filteredPatients.slice(startRow * gridColumnCount, endRow * gridColumnCount),
       paddingTop: startRow * VIRTUALIZED_CARD_ROW_HEIGHT,
       paddingBottom: Math.max(0, (totalRows - endRow) * VIRTUALIZED_CARD_ROW_HEIGHT),
     };
-  }, [
-    filteredPatients,
-    gridColumnCount,
-    gridScrollTop,
-    gridViewportHeight,
-    shouldVirtualizeGrid,
-  ]);
+  }, [filteredPatients, gridColumnCount, gridScrollTop, gridViewportHeight, shouldVirtualizeGrid]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setIsStoreInitializing(false), 180);
@@ -233,7 +224,10 @@ export default function EmergencyWhiteboard() {
       setKeyboardPatientId(null);
       return;
     }
-    if (!keyboardPatientId || !filteredPatients.some((patient) => patient.id === keyboardPatientId)) {
+    if (
+      !keyboardPatientId ||
+      !filteredPatients.some((patient) => patient.id === keyboardPatientId)
+    ) {
       setKeyboardPatientId(selectedPatientId || filteredPatients[0].id);
     }
   }, [filteredPatients, keyboardPatientId, selectedPatientId]);
@@ -297,7 +291,7 @@ export default function EmergencyWhiteboard() {
     }
 
     const key = event.key.toLowerCase();
-    if (/^[1-5]$/.test(event.key)) {
+    if (/^[1-6]$/.test(event.key)) {
       event.preventDefault();
       const filter = FILTERS[Number(event.key) - 1];
       setQueueFilter(filter?.type || null);
@@ -375,18 +369,8 @@ export default function EmergencyWhiteboard() {
         </div>
         <div className="ed-whiteboard__topbar-actions">
           {whiteboardSearchQuery ? (
-            <span className="ed-whiteboard__search-chip">
-              Search: {whiteboardSearchQuery}
-            </span>
+            <span className="ed-whiteboard__search-chip">Search: {whiteboardSearchQuery}</span>
           ) : null}
-          <button
-            type="button"
-            className="ed-whiteboard__new-patient"
-            onClick={() => setNewPatientOpen(true)}
-          >
-            <Plus size={15} aria-hidden />
-            New Patient
-          </button>
           <div className="ed-whiteboard__filters" aria-label="Whiteboard filters">
             {FILTERS.map((filter) => {
               const isActive = activeQueueFilter === filter.type;
@@ -412,6 +396,7 @@ export default function EmergencyWhiteboard() {
               aria-pressed={viewMode === 'grid'}
             >
               <Grid3X3 size={15} aria-hidden />
+              <span>Grid</span>
             </button>
             <button
               type="button"
@@ -421,6 +406,7 @@ export default function EmergencyWhiteboard() {
               aria-pressed={viewMode === 'list'}
             >
               <List size={16} aria-hidden />
+              <span>List</span>
             </button>
           </div>
         </div>
@@ -450,15 +436,10 @@ export default function EmergencyWhiteboard() {
         className={[
           'ed-whiteboard__body',
           selectedPatientId ? 'ed-whiteboard__body--detail-open' : '',
-          queuePanelCollapsed ? 'ed-whiteboard__body--queue-collapsed' : '',
         ]
           .filter(Boolean)
           .join(' ')}
       >
-        <QueueIntelligencePanel
-          collapsed={queuePanelCollapsed}
-          onCollapsedChange={setQueuePanelCollapsed}
-        />
         <div className="ed-whiteboard__content">
           {isStoreInitializing && viewMode === 'grid' ? (
             <div className="ed-whiteboard__grid" aria-label="Loading patient whiteboard">
@@ -528,7 +509,9 @@ export default function EmergencyWhiteboard() {
                         data-patient-card-id={patient.id}
                         tabIndex={0}
                         className={
-                          patient.id === keyboardPatientId ? 'ed-whiteboard__row--keyboard-selected' : ''
+                          patient.id === keyboardPatientId
+                            ? 'ed-whiteboard__row--keyboard-selected'
+                            : ''
                         }
                         onFocus={() => setKeyboardPatientId(patient.id)}
                         onClick={() => selectPatient(patient.id)}
@@ -575,7 +558,11 @@ export default function EmergencyWhiteboard() {
             </div>
           ) : null}
         </div>
-        <PatientDetailPanel />
+        {selectedPatientId ? (
+          <div className="ed-whiteboard__detail-overlay">
+            <PatientDetailPanel />
+          </div>
+        ) : null}
       </div>
     </section>
   );

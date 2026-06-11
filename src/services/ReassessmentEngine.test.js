@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import ReassessmentEngine from './ReassessmentEngine';
-import { PatientState } from '../types';
+import { PatientState } from '../../types/emergency';
 
 const now = new Date('2026-06-11T01:42:00.000Z').getTime();
 

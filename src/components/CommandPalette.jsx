@@ -25,14 +25,17 @@ const BASE_COMMANDS = [
     label: 'Open EMS pipeline',
     hint: 'E',
     keywords: ['pre-arrival', 'ambulance', 'pipeline'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/workspace/emergency/ems' }),
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/ems' }),
   },
   {
     id: 'referral',
     label: 'Referral for [patient]',
     hint: 'R',
     keywords: ['consult', 'referrals'],
-    build: (query) => ({ type: 'OPEN_REFERRAL', value: extractValue(query, /^referral\s+for\s*/i) }),
+    build: (query) => ({
+      type: 'OPEN_REFERRAL',
+      value: extractValue(query, /^referral\s+for\s*/i),
+    }),
   },
   {
     id: 'heart',
@@ -67,7 +70,7 @@ const BASE_COMMANDS = [
     label: 'Shift summary',
     hint: '⇧S',
     keywords: ['handoff', 'summary'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/workspace/emergency/shift-summary' }),
+    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/shift' }),
   },
   {
     id: 'clear-filters',
@@ -96,7 +99,9 @@ const FLAG_OPTIONS = [
 ];
 
 function extractValue(query, pattern) {
-  return String(query || '').replace(pattern, '').trim();
+  return String(query || '')
+    .replace(pattern, '')
+    .trim();
 }
 
 function patientName(patient) {
@@ -133,7 +138,9 @@ function writeRecentCommands(commands) {
 }
 
 function findPatient(value, patients) {
-  const query = String(value || '').trim().toLowerCase();
+  const query = String(value || '')
+    .trim()
+    .toLowerCase();
   if (!query) return null;
   return (
     patients.find((patient) => patientName(patient).toLowerCase() === query) ||
@@ -143,11 +150,7 @@ function findPatient(value, patients) {
   );
 }
 
-export default function CommandPalette({
-  open,
-  onClose,
-  onExecute,
-}) {
+export default function CommandPalette({ open, onClose, onExecute }) {
   const patients = useEmergencyStore((state) => state.patients);
   const addFlag = useEmergencyStore((state) => state.addFlag);
   const [query, setQuery] = useState('');
@@ -180,14 +183,20 @@ export default function CommandPalette({
             label: `Find patient ${patientName(patient)}`,
             hint: 'Enter',
             keywords: [patient.mrn, patient.chiefComplaint],
-            build: () => ({ type: 'FIND_PATIENT', value: patientName(patient), patientId: patient.id }),
+            build: () => ({
+              type: 'FIND_PATIENT',
+              value: patientName(patient),
+              patientId: patient.id,
+            }),
           });
         });
     }
 
     if (/^referral\s+for\s+/i.test(query) && referralValue) {
       patients
-        .filter((patient) => patientName(patient).toLowerCase().includes(referralValue.toLowerCase()))
+        .filter((patient) =>
+          patientName(patient).toLowerCase().includes(referralValue.toLowerCase())
+        )
         .slice(0, 5)
         .forEach((patient) => {
           dynamicCommands.push({
@@ -195,7 +204,11 @@ export default function CommandPalette({
             label: `Referral for ${patientName(patient)}`,
             hint: 'Enter',
             keywords: [patient.mrn, patient.chiefComplaint],
-            build: () => ({ type: 'OPEN_REFERRAL', value: patientName(patient), patientId: patient.id }),
+            build: () => ({
+              type: 'OPEN_REFERRAL',
+              value: patientName(patient),
+              patientId: patient.id,
+            }),
           });
         });
     }
@@ -210,7 +223,11 @@ export default function CommandPalette({
             label: `Flag ${patientName(patient)}`,
             hint: 'Enter',
             keywords: [patient.mrn, patient.chiefComplaint],
-            build: () => ({ type: 'OPEN_FLAG_DIALOG', value: patientName(patient), patientId: patient.id }),
+            build: () => ({
+              type: 'OPEN_FLAG_DIALOG',
+              value: patientName(patient),
+              patientId: patient.id,
+            }),
           });
         });
     }

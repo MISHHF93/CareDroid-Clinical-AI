@@ -1,4 +1,4 @@
-import { PatientState } from '../types';
+import { PatientState } from '../../types/emergency';
 import { PATIENT_STATE_SEQUENCE } from './PatientJourneyEngine';
 
 export const REASSESSMENT_INTERVAL_MS = 60000;
@@ -17,7 +17,9 @@ function minutesSince(timestamp, now = Date.now()) {
 
 function isHighPriority(patient) {
   const priority = String(patient?.priority || '').toLowerCase();
-  return priority.includes('ctas 1') || priority.includes('ctas 2') || priority.includes('critical');
+  return (
+    priority.includes('ctas 1') || priority.includes('ctas 2') || priority.includes('critical')
+  );
 }
 
 function isBeforeAssessment(state) {
@@ -32,7 +34,10 @@ export function evaluatePatientForReassessment(patient, options = {}) {
   const vitalsAgeMinutes = minutesSince(patient.vitalsUpdatedAt, now);
   const reasons = [];
 
-  if (patient.state === PatientState.Waiting && waitingMinutes > WAITING_REASSESSMENT_THRESHOLD_MINUTES) {
+  if (
+    patient.state === PatientState.Waiting &&
+    waitingMinutes > WAITING_REASSESSMENT_THRESHOLD_MINUTES
+  ) {
     reasons.push(`Waiting ${waitingMinutes} minutes`);
   }
 

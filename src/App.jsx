@@ -1,6 +1,14 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { flushSync } from 'react-dom';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useNavigate,
+  useLocation,
+  useParams,
+} from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { UserProvider, useUser, Permission } from './contexts/UserContext';
 import { NotificationProvider, useNotifications } from './contexts/NotificationContext';
@@ -18,6 +26,11 @@ import OfflineProvider from './contexts/OfflineProvider';
 import ErrorBoundary from './components/ErrorBoundary';
 import PermissionGate from './components/PermissionGate';
 import { NotificationToastContainer } from './components/notifications/NotificationToast';
+import EmergencyWhiteboard from './components/EmergencyWhiteboard';
+import EMSPipeline from './components/EMSPipeline';
+import QueueIntelligencePanel from './components/QueueIntelligencePanel';
+import ReferralPanel from './components/ReferralPanel';
+import ShiftSummary from './components/ShiftSummary';
 import AppShell from './layout/AppShell';
 import AuthShell from './layout/AuthShell';
 import { PublicShell } from './layout/PublicShell';
@@ -26,15 +39,13 @@ import { useNotificationActions } from './hooks/useNotificationActions';
 import logger from './utils/logger';
 import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
-import {
-  AUTH_PATH_ALIASES,
-  PROTECTED_ROUTE_ALIAS_REDIRECTS,
-} from './config/routes.config';
+import { AUTH_PATH_ALIASES, PROTECTED_ROUTE_ALIAS_REDIRECTS } from './config/routes.config';
 import {
   CALCULATOR_ROUTE_DEFS,
   LEGACY_CALCULATOR_ROUTE_ALIASES,
 } from './routes/clinicalToolRoutes';
 import { lazyWithRetry } from './utils/lazyWithRetry';
+import { useEmergencyStore } from '../store/emergencyStore';
 
 // Page imports - Public
 import { PrivacyPolicy } from './pages/legal/PrivacyPolicy';
@@ -45,26 +56,16 @@ import HelpCenter from './pages/HelpCenter';
 import Version from './pages/Version';
 
 // Authenticated shell pages — lazy for smaller initial JS (mobile LCP)
-const CommandDashboard = lazyWithRetry(() => import('./pages/CommandDashboard'));
-const ExecutiveCommandCenter = lazyWithRetry(() => import('./pages/ExecutiveCommandCenter'));
-const WorkspaceHome = lazyWithRetry(() => import('./pages/WorkspaceHome'));
 const {
-  WorkspacesIndexPage,
   SearchResultsPage,
   HealthcareKnowledgeHubPage,
   ClinicalTimelinePage,
   NotificationCenterPage,
-  DigitalTwinPage,
   WorkflowBuilderPage,
-  DepartmentIntelligencePage,
   WorkflowMiningEnginePage,
-  CareDroidBusinessBrainPage,
   WorkspaceDependencyGraphPage,
   AssetLibraryPage,
 } = {
-  WorkspacesIndexPage: lazyWithRetry(() =>
-    import('./pages/PlatformOSPages').then((m) => ({ default: m.WorkspacesIndexPage }))
-  ),
   SearchResultsPage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.SearchResultsPage }))
   ),
@@ -77,20 +78,11 @@ const {
   NotificationCenterPage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.NotificationCenterPage }))
   ),
-  DigitalTwinPage: lazyWithRetry(() =>
-    import('./pages/PlatformOSPages').then((m) => ({ default: m.DigitalTwinPage }))
-  ),
   WorkflowBuilderPage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.WorkflowBuilderPage }))
   ),
-  DepartmentIntelligencePage: lazyWithRetry(() =>
-    import('./pages/PlatformOSPages').then((m) => ({ default: m.DepartmentIntelligencePage }))
-  ),
   WorkflowMiningEnginePage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.WorkflowMiningEnginePage }))
-  ),
-  CareDroidBusinessBrainPage: lazyWithRetry(() =>
-    import('./pages/PlatformOSPages').then((m) => ({ default: m.CareDroidBusinessBrainPage }))
   ),
   WorkspaceDependencyGraphPage: lazyWithRetry(() =>
     import('./pages/PlatformOSPages').then((m) => ({ default: m.WorkspaceDependencyGraphPage }))
@@ -99,40 +91,21 @@ const {
     import('./pages/PlatformOSPages').then((m) => ({ default: m.AssetLibraryPage }))
   ),
 };
-const AssistantPage = lazyWithRetry(() => import('./pages/Dashboard'));
 const CapabilityDiscovery = lazyWithRetry(() => import('./pages/CapabilityDiscovery'));
 const RecommendationsPage = lazyWithRetry(() => import('./pages/RecommendationsPage'));
 const AutomationAuditTrail = lazyWithRetry(() => import('./pages/AutomationAuditTrail'));
-const AutomationAnalytics = lazyWithRetry(() => import('./pages/AutomationAnalytics'));
 const DependencyMap = lazyWithRetry(() => import('./pages/DependencyMap'));
 const DependencyGraph = lazyWithRetry(() => import('./pages/DependencyGraph'));
-const Patients = lazyWithRetry(() => import('./pages/Patients'));
 const Artifacts = lazyWithRetry(() => import('./pages/Artifacts'));
-const AiModelsPage = lazyWithRetry(() => import('./pages/AiModelsPage'));
-const MemoryDashboard = lazyWithRetry(() => import('./pages/MemoryDashboard'));
-const TrainingDashboard = lazyWithRetry(() => import('./pages/TrainingDashboard'));
-const AiEvaluationDashboard = lazyWithRetry(() => import('./pages/AiEvaluationDashboard'));
-const AiCommandCenterDashboard = lazyWithRetry(() => import('./pages/AiCommandCenterDashboard'));
-const PlatformLearningEngine = lazyWithRetry(() => import('./pages/PlatformLearningEngine'));
-const CareDroidBrainDashboard = lazyWithRetry(() => import('./pages/CareDroidBrainDashboard'));
-const Operations = lazyWithRetry(() => import('./pages/Operations'));
-const DigitalTwinIntelligence = lazyWithRetry(() => import('./pages/DigitalTwinIntelligence'));
 const ResearchEvidenceHub = lazyWithRetry(() => import('./pages/ResearchEvidenceHub'));
-const ClinicalDocumentationAssistant = lazyWithRetry(() => import('./pages/ClinicalDocumentationAssistant'));
+const ClinicalDocumentationAssistant = lazyWithRetry(
+  () => import('./pages/ClinicalDocumentationAssistant')
+);
 const ClinicalKnowledgeGraph = lazyWithRetry(() => import('./pages/ClinicalKnowledgeGraph'));
-const PredictiveAnalyticsDashboard = lazyWithRetry(() => import('./pages/PredictiveAnalyticsDashboard'));
 const ClinicalDecisionSupport = lazyWithRetry(() => import('./pages/ClinicalDecisionSupport'));
 const Competencies = lazyWithRetry(() => import('./pages/Competencies'));
 const Credentials = lazyWithRetry(() => import('./pages/Credentials'));
-const MedicalSimulationSuite = lazyWithRetry(() => import('./pages/MedicalSimulationSuite'));
-const SimulationScenarioPlayer = lazyWithRetry(() => import('./pages/SimulationScenarioPlayer'));
-const SimulationOutcomes = lazyWithRetry(() => import('./pages/SimulationOutcomes'));
-const LaboratoryDashboard = lazyWithRetry(() => import('./pages/LaboratoryDashboard'));
 const Medical3DViewer = lazyWithRetry(() => import('./pages/Medical3DViewer'));
-const LiveTrackingMap = lazyWithRetry(() => import('./pages/LiveTrackingMap'));
-const MedicalIotDashboard = lazyWithRetry(() => import('./pages/MedicalIotDashboard'));
-const HospitalMapDashboard = lazyWithRetry(() => import('./pages/HospitalMapDashboard'));
-const DeviceFleetManagement = lazyWithRetry(() => import('./pages/DeviceFleetManagement'));
 const PlatformSystemPage = lazyWithRetry(() => import('./pages/platform/PlatformSystemPage'));
 const PlatformGovernanceWorkspace = lazyWithRetry(
   () => import('./pages/platform/PlatformGovernanceWorkspace')
@@ -154,12 +127,10 @@ const ProfileToolPreferences = lazyWithRetry(
 const ProfileWorkspaces = lazyWithRetry(() => import('./pages/profile/ProfileWorkspaces'));
 const ProfileSecurity = lazyWithRetry(() => import('./pages/profile/ProfileSecurity'));
 const Settings = lazyWithRetry(() => import('./pages/Settings'));
-const CustomerPortalPage = lazyWithRetry(() =>
-  import('./pages/customer-portal/CustomerPortalPage')
+const CustomerPortalPage = lazyWithRetry(
+  () => import('./pages/customer-portal/CustomerPortalPage')
 );
-const SuccessCenterPage = lazyWithRetry(() =>
-  import('./pages/success-center/SuccessCenterPage')
-);
+const SuccessCenterPage = lazyWithRetry(() => import('./pages/success-center/SuccessCenterPage'));
 const KnowledgeBasePage = lazyWithRetry(() => import('./pages/KnowledgeBasePage'));
 const MarketplacePage = lazyWithRetry(() => import('./pages/MarketplacePage'));
 const EnterpriseReadinessPage = lazyWithRetry(() => import('./pages/EnterpriseReadinessPage'));
@@ -171,7 +142,6 @@ const {
   OrganizationSettings,
   PackMarketplace,
   AssetLifecycleAdmin,
-  PlatformAnalyticsPage,
   CustomerSuccessDashboard,
   OrganizationIntelligenceProfile,
   DepartmentsPage,
@@ -179,19 +149,22 @@ const {
   TenantAdministrationCenter,
 } = {
   OrganizationDashboard: lazyWithRetry(() =>
-    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.OrganizationDashboard }))
+    import('./pages/organization/OrganizationPages').then((m) => ({
+      default: m.OrganizationDashboard,
+    }))
   ),
   OrganizationSettings: lazyWithRetry(() =>
-    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.OrganizationSettings }))
+    import('./pages/organization/OrganizationPages').then((m) => ({
+      default: m.OrganizationSettings,
+    }))
   ),
   PackMarketplace: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({ default: m.PackMarketplace }))
   ),
   AssetLifecycleAdmin: lazyWithRetry(() =>
-    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.AssetLifecycleAdmin }))
-  ),
-  PlatformAnalyticsPage: lazyWithRetry(() =>
-    import('./pages/organization/OrganizationPages').then((m) => ({ default: m.PlatformAnalyticsPage }))
+    import('./pages/organization/OrganizationPages').then((m) => ({
+      default: m.AssetLifecycleAdmin,
+    }))
   ),
   CustomerSuccessDashboard: lazyWithRetry(() =>
     import('./pages/organization/OrganizationPages').then((m) => ({
@@ -266,7 +239,9 @@ const {
     import('./pages/commercial/CommercialPages').then((m) => ({ default: m.AgentsRegistryPage }))
   ),
   MaturityAssessmentPage: lazyWithRetry(() =>
-    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.MaturityAssessmentPage }))
+    import('./pages/commercial/CommercialPages').then((m) => ({
+      default: m.MaturityAssessmentPage,
+    }))
   ),
   OutcomesDashboardPage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({ default: m.OutcomesDashboardPage }))
@@ -275,7 +250,9 @@ const {
     import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ValueTrackingPage }))
   ),
   ProductIntelligenceLayerPage: lazyWithRetry(() =>
-    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ProductIntelligenceLayerPage }))
+    import('./pages/commercial/CommercialPages').then((m) => ({
+      default: m.ProductIntelligenceLayerPage,
+    }))
   ),
   CustomerExpansionOpportunitiesPage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({
@@ -298,7 +275,9 @@ const {
     }))
   ),
   ConfigurationStudioPage: lazyWithRetry(() =>
-    import('./pages/commercial/CommercialPages').then((m) => ({ default: m.ConfigurationStudioPage }))
+    import('./pages/commercial/CommercialPages').then((m) => ({
+      default: m.ConfigurationStudioPage,
+    }))
   ),
   OrganizationOnboardingPage: lazyWithRetry(() =>
     import('./pages/commercial/CommercialPages').then((m) => ({
@@ -306,8 +285,6 @@ const {
     }))
   ),
 };
-const AnalyticsDashboard = lazyWithRetry(() => import('./pages/AnalyticsDashboard'));
-const CostAnalyticsDashboard = lazyWithRetry(() => import('./pages/CostAnalyticsDashboard'));
 const ConsentFlow = lazyWithRetry(() =>
   import('./pages/legal/ConsentFlow').then((m) => ({ default: m.ConsentFlow }))
 );
@@ -360,11 +337,6 @@ const PatientSummaryAi = lazyWithRetry(() => import('./pages/tools/PatientSummar
 const OrderSetAi = lazyWithRetry(() => import('./pages/tools/OrderSetAi'));
 const AiExplainability = lazyWithRetry(() => import('./pages/tools/AiExplainability'));
 const ToolNotFound = lazyWithRetry(() => import('./pages/tools/ToolNotFound'));
-const ToolsAreaFallback = lazyWithRetry(() => import('./pages/tools/ToolsAreaFallback'));
-const FleetDashboard = lazyWithRetry(() => import('./pages/fleet/FleetDashboard'));
-const FleetLiveMap = lazyWithRetry(() => import('./pages/fleet/FleetLiveMap'));
-const PredictiveMaintenance = lazyWithRetry(() => import('./pages/fleet/PredictiveMaintenance'));
-const RouteOptimizer = lazyWithRetry(() => import('./pages/fleet/RouteOptimizer'));
 
 // Clinical Intelligence pages
 const ClinicalAlertsPage = lazyWithRetry(() => import('./pages/ClinicalAlertsPage'));
@@ -532,13 +504,155 @@ function LegacyOAuthCallbackRedirect() {
 
 /** Auth entry aliases are bypassed for the public platform build. */
 function AuthPathRedirect() {
-  return <Navigate to="/workspace/emergency" replace />;
+  return <Navigate to="/emergency" replace />;
 }
 
 /** Legacy protected paths stay deep-linkable while canonical routes own the UI. */
-function LegacyProtectedRouteRedirect({ to }) {
+function LegacyProtectedRouteRedirect({ to, state }) {
   const location = useLocation();
-  return <Navigate to={{ pathname: to, search: location.search, hash: location.hash }} replace />;
+  return (
+    <Navigate
+      to={{ pathname: to, search: location.search, hash: location.hash }}
+      replace
+      state={state}
+    />
+  );
+}
+
+function EmergencyComingSoonRedirect({ label = 'This workspace' }) {
+  return (
+    <LegacyProtectedRouteRedirect
+      to="/emergency"
+      state={{
+        edNotice: {
+          title: `${label} is coming soon`,
+          message: 'This module is parked while the Emergency OS workflow is consolidated.',
+        },
+      }}
+    />
+  );
+}
+
+function EmergencyCopilotRedirect() {
+  const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
+
+  useEffect(() => {
+    setCopilotOpen(true);
+  }, [setCopilotOpen]);
+
+  return (
+    <LegacyProtectedRouteRedirect
+      to="/emergency"
+      state={{
+        edNotice: {
+          title: 'ED Copilot is open in the right panel',
+          message:
+            'Chat and AI workflows now live in the persistent Copilot panel, not a page route.',
+        },
+      }}
+    />
+  );
+}
+
+function WorkspaceRouteRedirect() {
+  const { workspaceId, subpage } = useParams();
+  const workspaceLabel = workspaceId
+    ? `${workspaceId.charAt(0).toUpperCase()}${workspaceId.slice(1).replace(/-/g, ' ')} workspace`
+    : 'Workspace';
+
+  if (workspaceId === 'emergency') {
+    const routeMap = {
+      whiteboard: '/emergency',
+      queues: '/emergency/queues',
+      queue: '/emergency/queues',
+      ems: '/emergency/ems',
+      referrals: '/emergency/referrals',
+      capacity: '/emergency/capacity',
+      boarding: '/emergency/capacity',
+      analytics: '/emergency/capacity',
+      'shift-summary': '/emergency/shift',
+      shift: '/emergency/shift',
+      'command-center': '/emergency',
+      copilot: '/emergency',
+    };
+
+    return <LegacyProtectedRouteRedirect to={routeMap[subpage] || '/emergency'} />;
+  }
+
+  return <EmergencyComingSoonRedirect label={workspaceLabel} />;
+}
+
+function EmergencyQueueRoute() {
+  return (
+    <section
+      className="ed-route-panel ed-route-panel--queue"
+      aria-labelledby="emergency-queue-title"
+    >
+      <header className="ed-route-panel__header">
+        <span>Emergency OS</span>
+        <h1 id="emergency-queue-title">Queue Intelligence</h1>
+        <p>Live waiting, triage, provider, referral, admission, and reassessment pressure.</p>
+      </header>
+      <QueueIntelligencePanel collapsed={false} onCollapsedChange={() => {}} />
+    </section>
+  );
+}
+
+function EmergencyCapacityRoute() {
+  const capacity = useEmergencyStore((state) => state.capacity);
+  const queues = useEmergencyStore((state) => state.queues);
+
+  return (
+    <section className="ed-route-panel" aria-labelledby="emergency-capacity-title">
+      <header className="ed-route-panel__header">
+        <span>Emergency OS</span>
+        <h1 id="emergency-capacity-title">Capacity Detail</h1>
+        <p>Current department pressure, room occupancy, boarding risk, and queue load.</p>
+      </header>
+
+      <div className="ed-route-panel__metrics" aria-label="Capacity metrics">
+        <article>
+          <span>Capacity Score</span>
+          <strong>{capacity.score}</strong>
+          <small>{capacity.label}</small>
+        </article>
+        <article>
+          <span>Occupancy</span>
+          <strong>
+            {capacity.currentOccupancy}/{capacity.maxCapacity}
+          </strong>
+          <small>{capacity.occupancyPercent}% rooms occupied</small>
+        </article>
+        <article>
+          <span>Boarding</span>
+          <strong>{capacity.boardingCount}</strong>
+          <small>{capacity.admissionPendingCount} admission pending</small>
+        </article>
+        <article>
+          <span>EMS Inbound</span>
+          <strong>{capacity.emsInboundCount}</strong>
+          <small>{capacity.incomingEMSCriticalCount} critical</small>
+        </article>
+      </div>
+
+      <div className="ed-route-panel__list" aria-label="Queue pressure">
+        {queues
+          .filter((queue) => queue.patientIds.length > 0)
+          .map((queue) => (
+            <article key={queue.id}>
+              <div>
+                <strong>{queue.name}</strong>
+                <span>
+                  {queue.patientIds.length} patients · Avg {queue.averageWaitMinutes}m · Oldest{' '}
+                  {queue.longestWaitMinutes}m
+                </span>
+              </div>
+              <small>{queue.criticalCount} critical</small>
+            </article>
+          ))}
+      </div>
+    </section>
+  );
 }
 
 // ==================== ROUTING ====================
@@ -571,7 +685,7 @@ function AppRoutes() {
     requireAllPermissions = false,
   }) => {
     if (publicOnly && isAuthenticated) {
-      return <Navigate to="/workspace/emergency" replace />;
+      return <Navigate to="/emergency" replace />;
     }
 
     let resolvedElement = element;
@@ -588,7 +702,7 @@ function AppRoutes() {
       );
     }
 
-    if (requiresAuth) {
+    if (requiresAuth || !publicOnly) {
       return <AppShellPage>{resolvedElement}</AppShellPage>;
     }
 
@@ -598,12 +712,12 @@ function AppRoutes() {
   const routes = [
     {
       path: '/',
-      element: <Navigate to="/workspace/emergency" replace />,
+      element: <Navigate to="/emergency" replace />,
       publicOnly: true,
     },
     {
       path: '/auth',
-      element: <Navigate to="/workspace/emergency" replace />,
+      element: <Navigate to="/emergency" replace />,
       publicOnly: true,
     },
     {
@@ -627,15 +741,90 @@ function AppRoutes() {
       element: <AuthPathRedirect />,
       publicOnly: true,
     })),
+    {
+      path: '/emergency',
+      element: <EmergencyWhiteboard />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/queues',
+      element: <EmergencyQueueRoute />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/ems',
+      element: <EMSPipeline />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/referrals',
+      element: <ReferralPanel />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/capacity',
+      element: <EmergencyCapacityRoute />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/shift',
+      element: <ShiftSummary />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/copilot',
+      element: <EmergencyCopilotRedirect />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/whiteboard',
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/patients',
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/queue',
+      element: <LegacyProtectedRouteRedirect to="/emergency/queues" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/analytics',
+      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/boarding',
+      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/command-center',
+      element: <EmergencyCopilotRedirect />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/settings',
+      element: <LegacyProtectedRouteRedirect to="/settings" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/emergency/*',
+      element: <EmergencyComingSoonRedirect label="Emergency OS module" />,
+      requiresAuth: true,
+    },
 
     {
       path: '/dashboard',
-      element: <CommandDashboard />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
     },
     {
       path: '/executive',
-      element: <ExecutiveCommandCenter />,
+      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },
@@ -656,27 +845,52 @@ function AppRoutes() {
     },
     {
       path: '/automation-analytics',
-      element: <AutomationAnalytics />,
+      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
       requiresAuth: true,
     },
     {
       path: '/workspace',
-      element: <LegacyProtectedRouteRedirect to="/workspace/emergency" />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workspace/emergency/whiteboard',
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workspace/emergency/queue',
+      element: <LegacyProtectedRouteRedirect to="/emergency/queues" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workspace/emergency/queues',
+      element: <LegacyProtectedRouteRedirect to="/emergency/queues" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workspace/emergency/copilot',
+      element: <EmergencyCopilotRedirect />,
+      requiresAuth: true,
+    },
+    {
+      path: '/workspace/emergency/settings',
+      element: <LegacyProtectedRouteRedirect to="/settings" />,
       requiresAuth: true,
     },
     {
       path: '/workspaces',
-      element: <WorkspacesIndexPage />,
+      element: <EmergencyComingSoonRedirect label="Workspace directory" />,
       requiresAuth: true,
     },
     {
       path: '/workspace/:workspaceId',
-      element: <WorkspaceHome />,
+      element: <WorkspaceRouteRedirect />,
       requiresAuth: true,
     },
     {
       path: '/workspace/:workspaceId/:subpage',
-      element: <WorkspaceHome />,
+      element: <WorkspaceRouteRedirect />,
       requiresAuth: true,
     },
     {
@@ -696,17 +910,17 @@ function AppRoutes() {
     },
     {
       path: '/digital-twin',
-      element: <DigitalTwinPage />,
+      element: <EmergencyComingSoonRedirect label="Digital twin" />,
       requiresAuth: true,
     },
     {
       path: '/operations',
-      element: <Operations />,
+      element: <EmergencyComingSoonRedirect label="Operations workspace" />,
       requiresAuth: true,
     },
     {
       path: '/digital-twin-intelligence',
-      element: <DigitalTwinIntelligence />,
+      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
       requiresAuth: true,
     },
     {
@@ -716,7 +930,7 @@ function AppRoutes() {
     },
     {
       path: '/department-intelligence',
-      element: <DepartmentIntelligencePage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
       requiresAuth: true,
     },
     {
@@ -741,130 +955,130 @@ function AppRoutes() {
     })),
     {
       path: '/assistant',
-      element: <AssistantPage />,
+      element: <EmergencyCopilotRedirect />,
       requiresAuth: true,
     },
     {
       path: '/patients',
-      element: <Patients />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
     },
     {
       path: '/patients/import',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.WRITE_PHI],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/labs/import',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.WRITE_PHI],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/medications/import',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.WRITE_PHI],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/observations/import',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.WRITE_PHI],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/workspace',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: Permission.READ_PHI,
     },
     {
       path: '/patients/:patientId/summary',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/timeline',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: Permission.READ_PHI,
     },
     {
       path: '/patients/:patientId/events',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/risk-history',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: Permission.READ_PHI,
     },
     {
       path: '/patients/:patientId/care-plan',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: Permission.READ_PHI,
     },
     {
       path: '/patients/:patientId/consent',
-      element: <PlatformGovernanceWorkspace />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: Permission.MANAGE_CONSENT,
     },
     {
       path: '/patients/:patientId/source-data',
-      element: <PlatformGovernanceWorkspace />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: Permission.READ_PHI,
     },
     {
       path: '/patients/:patientId/review',
-      element: <PlatformGovernanceWorkspace />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_REVIEW_QUEUE],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/privacy',
-      element: <PlatformGovernanceWorkspace />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_PRIVACY_CENTER],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/workflows',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/workflows/:workflowId',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/documentation',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
     },
     {
       path: '/patients/:patientId/documentation/:documentId',
-      element: <PlatformSystemPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.USE_AI_CHAT],
       requireAllPermissions: true,
@@ -925,77 +1139,77 @@ function AppRoutes() {
     },
     {
       path: '/ai-models',
-      element: <AiModelsPage />,
+      element: <EmergencyCopilotRedirect />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },
     {
       path: '/memory',
-      element: <MemoryDashboard />,
+      element: <EmergencyCopilotRedirect />,
       requiresAuth: true,
     },
     {
       path: '/ai-memory',
-      element: <MemoryDashboard />,
+      element: <EmergencyCopilotRedirect />,
       requiresAuth: true,
     },
     {
       path: '/training',
-      element: <TrainingDashboard />,
+      element: <EmergencyCopilotRedirect />,
       requiresAuth: true,
       permission: [Permission.CONFIGURE_SYSTEM, Permission.VIEW_ANALYTICS],
     },
     {
       path: '/ai-evaluation',
-      element: <AiEvaluationDashboard />,
+      element: <EmergencyCopilotRedirect />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },
     {
       path: '/ai-command-center',
-      element: <AiCommandCenterDashboard />,
+      element: <EmergencyCopilotRedirect />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },
     {
       path: '/platform-learning-engine',
-      element: <PlatformLearningEngine />,
+      element: <EmergencyCopilotRedirect />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },
     {
       path: '/brain',
-      element: <CareDroidBrainDashboard />,
+      element: <EmergencyCopilotRedirect />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },
     {
       path: '/business-brain',
-      element: <CareDroidBusinessBrainPage />,
+      element: <EmergencyCopilotRedirect />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },
     {
       path: '/live-map',
-      element: <LiveTrackingMap />,
+      element: <EmergencyComingSoonRedirect label="Live map" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
     {
       path: '/medical-iot',
-      element: <MedicalIotDashboard />,
+      element: <EmergencyComingSoonRedirect label="Medical IoT" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
     {
       path: '/hospital-map',
-      element: <HospitalMapDashboard />,
+      element: <EmergencyComingSoonRedirect label="Hospital map" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
     {
       path: '/devices',
-      element: <DeviceFleetManagement />,
+      element: <EmergencyComingSoonRedirect label="Device fleet" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
@@ -1054,7 +1268,7 @@ function AppRoutes() {
     },
     {
       path: '/predictive-analytics',
-      element: <PredictiveAnalyticsDashboard />,
+      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
       requiresAuth: true,
     },
     {
@@ -1074,27 +1288,27 @@ function AppRoutes() {
     },
     {
       path: '/simulation',
-      element: <MedicalSimulationSuite />,
+      element: <EmergencyComingSoonRedirect label="Simulation workspace" />,
       requiresAuth: true,
     },
     {
       path: '/simulation/outcomes',
-      element: <SimulationOutcomes />,
+      element: <EmergencyComingSoonRedirect label="Simulation outcomes" />,
       requiresAuth: true,
     },
     {
       path: '/simulation/sepsis-deterioration',
-      element: <SimulationScenarioPlayer />,
+      element: <EmergencyComingSoonRedirect label="Simulation scenario" />,
       requiresAuth: true,
     },
     {
       path: '/simulation/:scenarioId',
-      element: <SimulationScenarioPlayer />,
+      element: <EmergencyComingSoonRedirect label="Simulation scenario" />,
       requiresAuth: true,
     },
     {
       path: '/laboratory',
-      element: <LaboratoryDashboard />,
+      element: <EmergencyComingSoonRedirect label="Laboratory workspace" />,
       requiresAuth: true,
     },
     {
@@ -1294,23 +1508,23 @@ function AppRoutes() {
 
     {
       path: '/fleet/command',
-      element: <FleetDashboard />,
+      element: <EmergencyComingSoonRedirect label="Fleet command" />,
       requiresAuth: true,
     },
     {
       path: '/fleet/map',
-      element: <FleetLiveMap />,
+      element: <EmergencyComingSoonRedirect label="Fleet map" />,
       requiresAuth: true,
       permission: [Permission.READ_PHI, Permission.VIEW_ANALYTICS, Permission.CONFIGURE_SYSTEM],
     },
     {
       path: '/fleet/predictive-maintenance',
-      element: <PredictiveMaintenance />,
+      element: <EmergencyComingSoonRedirect label="Fleet predictive maintenance" />,
       requiresAuth: true,
     },
     {
       path: '/fleet/route-optimizer',
-      element: <RouteOptimizer />,
+      element: <EmergencyComingSoonRedirect label="Fleet route optimizer" />,
       requiresAuth: true,
     },
     {
@@ -1320,7 +1534,7 @@ function AppRoutes() {
     },
     {
       path: '/fleet/*',
-      element: <ToolsAreaFallback />,
+      element: <EmergencyComingSoonRedirect label="Fleet workspace" />,
       requiresAuth: true,
     },
 
@@ -1448,7 +1662,7 @@ function AppRoutes() {
     },
     {
       path: '/platform-analytics',
-      element: <PlatformAnalyticsPage />,
+      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
       requiresAuth: true,
     },
     {
@@ -1847,13 +2061,13 @@ function AppRoutes() {
     },
     {
       path: '/analytics',
-      element: <AnalyticsDashboard />,
+      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },
     {
       path: '/costs',
-      element: <CostAnalyticsDashboard />,
+      element: <LegacyProtectedRouteRedirect to="/emergency/capacity" />,
       requiresAuth: true,
       permission: Permission.VIEW_ANALYTICS,
     },

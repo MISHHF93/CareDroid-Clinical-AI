@@ -1,4 +1,4 @@
-import { PatientState } from '../types';
+import { PatientState } from '../../types/emergency';
 
 export const PATIENT_STATE_SEQUENCE = Object.freeze([
   PatientState.Arrival,

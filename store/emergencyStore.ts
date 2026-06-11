@@ -32,12 +32,7 @@ type PatientFlagDetails = Partial<Pick<PatientFlag, 'reason' | 'detectedAt' | 's
 type PatientFlagInput = PatientFlag | PatientFlagType;
 type ReferralCreateInput = Pick<
   Referral,
-  | 'patientId'
-  | 'requestingStaffId'
-  | 'targetDepartment'
-  | 'urgency'
-  | 'reason'
-  | 'clinicalSummary'
+  'patientId' | 'requestingStaffId' | 'targetDepartment' | 'urgency' | 'reason' | 'clinicalSummary'
 > & {
   status?: Extract<ReferralStatus, 'Draft' | 'Sent'>;
 };
@@ -71,17 +66,14 @@ interface EmergencyStoreState {
   updateCapacity: () => void;
   selectPatient: (id: string | null) => void;
   toggleCopilot: () => void;
+  setCopilotOpen: (open: boolean) => void;
   setQueueFilter: (type: QueueType | null) => void;
   setWhiteboardSearchQuery: (query: string) => void;
   setBottleneckAlert: (alert: BottleneckAlert | null) => void;
   updateAlerts: () => void;
   dismissAlert: (alertId: string) => void;
   createReferral: (input: ReferralCreateInput) => void;
-  updateReferralStatus: (
-    referralId: string,
-    status: ReferralStatus,
-    responseNote?: string
-  ) => void;
+  updateReferralStatus: (referralId: string, status: ReferralStatus, responseNote?: string) => void;
   addEMSArrival: (arrival: EMSArrival) => void;
   updateEMSArrival: (id: string, patch: Partial<EMSArrival>) => void;
   prepareEMSBay: (arrivalId: string) => void;
@@ -341,11 +333,16 @@ const computeCapacity = (
   const occupancyOveragePatients = Math.max(0, occupiedRoomCount - occupancyThreshold);
   const waitingPatients = patients.filter((patient) => patient.state === PatientState.Waiting);
   const boardingPatients = patients.filter((patient) => patient.state === PatientState.Admission);
-  const reassessmentQueue = patients.filter((patient) => hasPatientFlag(patient, 'ReassessmentDue'));
+  const reassessmentQueue = patients.filter((patient) =>
+    hasPatientFlag(patient, 'ReassessmentDue')
+  );
   const incomingEMS = emsArrivals.filter((arrival) => arrival.status === 'Inbound');
-  const incomingEMSCriticalCount = incomingEMS.filter((arrival) => arrival.severity === 'Critical').length;
-  const dischargeReadyCount = patients.filter((patient) => patient.state === PatientState.Disposition)
-    .length;
+  const incomingEMSCriticalCount = incomingEMS.filter(
+    (arrival) => arrival.severity === 'Critical'
+  ).length;
+  const dischargeReadyCount = patients.filter(
+    (patient) => patient.state === PatientState.Disposition
+  ).length;
   const dischargesPast60Minutes = patients.filter((patient) =>
     hasDischargeEventInPast60Minutes(patient, now)
   ).length;
@@ -1324,7 +1321,12 @@ const mockActiveShift: Shift = {
 };
 
 const mockReferrals = syncReferralsFromPatients(mockPatients, []);
-const initialDerived = deriveOperationalState(mockPatients, mockRooms, mockReferrals, mockEMSArrivals);
+const initialDerived = deriveOperationalState(
+  mockPatients,
+  mockRooms,
+  mockReferrals,
+  mockEMSArrivals
+);
 const initialAlerts = deriveAlerts({
   patients: mockPatients,
   capacity: initialDerived.capacity,
@@ -1431,7 +1433,10 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           }),
         ],
       }));
-      return { patients, ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals) };
+      return {
+        patients,
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+      };
     }),
 
   assignStaff: (patientId, staffId) =>
@@ -1517,7 +1522,10 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           ],
         };
       });
-      return { patients, ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals) };
+      return {
+        patients,
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+      };
     }),
 
   removeFlag: (patientId, flag) =>
@@ -1537,7 +1545,10 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           ],
         };
       });
-      return { patients, ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals) };
+      return {
+        patients,
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+      };
     }),
 
   addVitals: (patientId, nextVitals) =>
@@ -1570,7 +1581,10 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           }),
         ],
       }));
-      return { patients, ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals) };
+      return {
+        patients,
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+      };
     }),
 
   addNote: (patientId, noteToAdd) =>
@@ -1585,7 +1599,10 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           }),
         ],
       }));
-      return { patients, ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals) };
+      return {
+        patients,
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+      };
     }),
 
   updateCapacity: () =>
@@ -1612,6 +1629,8 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
   selectPatient: (id) => set({ selectedPatientId: id }),
 
   toggleCopilot: () => set((state) => ({ copilotOpen: !state.copilotOpen })),
+
+  setCopilotOpen: (open) => set({ copilotOpen: open }),
 
   setQueueFilter: (type) => set({ activeQueueFilter: type }),
 
@@ -1716,13 +1735,18 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
         referral: patient.referral?.id === referralId ? nextReferral : patient.referral,
         timeline: [
           ...patient.timeline,
-          actionEvent(patient.id, 'ReferralCreated', `Referral ${referralId} moved to ${nextStatus}.`, {
-            metadata: {
-              referralId,
-              status: nextStatus,
-              responseNote: responseNote?.trim() || null,
-            },
-          }),
+          actionEvent(
+            patient.id,
+            'ReferralCreated',
+            `Referral ${referralId} moved to ${nextStatus}.`,
+            {
+              metadata: {
+                referralId,
+                status: nextStatus,
+                responseNote: responseNote?.trim() || null,
+              },
+            }
+          ),
         ],
       }));
 

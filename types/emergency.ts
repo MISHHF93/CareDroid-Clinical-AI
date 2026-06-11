@@ -32,6 +32,8 @@ export const PriorityLabel: Record<Priority, string> = {
   [Priority.P5]: 'Non-Urgent',
 };
 
+export type PatientPriority = Priority | string | number;
+
 export type PatientFlagType =
   | 'ReassessmentDue'
   | 'DeteriorationRisk'
@@ -51,18 +53,28 @@ export interface PatientFlag {
 }
 
 export type Sex = 'Female' | 'Male' | 'Intersex' | 'Unknown' | 'Unspecified';
+export type VitalValue = string | number | null;
 
 export interface Vitals {
-  hr: number | null;
-  bpSystolic: number | null;
-  bpDiastolic: number | null;
-  spo2: number | null;
-  temp: number | null;
-  rr: number | null;
-  gcs: number | null;
-  pain: number | null;
+  hr: VitalValue;
+  bpSystolic: VitalValue;
+  bpDiastolic: VitalValue;
+  spo2: VitalValue;
+  temp: VitalValue;
+  rr: VitalValue;
+  gcs: VitalValue;
+  pain: VitalValue;
   recordedAt: ISODateString;
+  temperature?: VitalValue;
+  heartRate?: VitalValue;
+  respiratoryRate?: VitalValue;
+  bloodPressure?: VitalValue;
+  oxygenSaturation?: VitalValue;
+  painScore?: VitalValue;
+  [key: string]: VitalValue | ISODateString | undefined;
 }
+
+export type PatientVitals = Vitals;
 
 export type JourneyEventType =
   | 'Arrival'
@@ -179,18 +191,23 @@ export interface Patient {
   mrn: string;
   firstName: string;
   lastName: string;
+  name?: string;
   dob: LocalDateString;
   age: number;
   sex: Sex;
+  location?: string;
   arrivalTime: ISODateString;
   triageTime: ISODateString | null;
   lastAssessedTime: ISODateString | null;
   chiefComplaint: string;
+  complaint?: string;
   complaintCategory: string;
   state: PatientState;
   priority: Priority;
   vitals: Vitals;
+  vitalsUpdatedAt?: ISODateString;
   assignedStaffId: EntityId | null;
+  assignedTo?: string | null;
   roomId: EntityId | null;
   flags: PatientFlag[];
   timeline: JourneyEvent[];
@@ -199,23 +216,26 @@ export interface Patient {
   notes: Note[];
 }
 
-export type QueueType =
-  | 'Arrival'
-  | 'Registration'
-  | 'Triage'
-  | 'Waiting'
-  | 'Provider'
-  | 'Assessment'
-  | 'Orders'
-  | 'Results'
-  | 'Disposition'
-  | 'Admission'
-  | 'Discharge'
-  | 'Reassessment'
-  | 'Referral'
-  | 'EMS'
-  | 'HighRisk'
-  | 'Boarding';
+export const QueueType = Object.freeze({
+  Arrival: 'Arrival',
+  Registration: 'Registration',
+  Triage: 'Triage',
+  Waiting: 'Waiting',
+  Provider: 'Provider',
+  Assessment: 'Assessment',
+  Orders: 'Orders',
+  Results: 'Results',
+  Disposition: 'Disposition',
+  Admission: 'Admission',
+  Discharge: 'Discharge',
+  Reassessment: 'Reassessment',
+  Referral: 'Referral',
+  EMS: 'EMS',
+  HighRisk: 'HighRisk',
+  Boarding: 'Boarding',
+} as const);
+
+export type QueueType = (typeof QueueType)[keyof typeof QueueType];
 
 export interface Queue {
   id: EntityId;
@@ -240,12 +260,7 @@ export interface BottleneckAlert {
 
 export type AlertSeverity = 'Info' | 'Warning' | 'Critical';
 
-export type AlertType =
-  | 'Reassessment'
-  | 'Capacity'
-  | 'EMS'
-  | 'Referral'
-  | 'Queue';
+export type AlertType = 'Reassessment' | 'Capacity' | 'EMS' | 'Referral' | 'Queue';
 
 export interface Alert {
   id: EntityId;
@@ -279,11 +294,28 @@ export interface Staff {
   id: EntityId;
   firstName: string;
   lastName: string;
+  name?: string;
+  displayName?: string;
+  email?: string;
+  avatarUrl?: string;
   role: StaffRole;
+  roleLabel?: string;
   status: StaffStatus;
   shiftId: EntityId | null;
   assignedPatientIds: EntityId[];
+  activePatients?: number;
   currentRoomId?: EntityId;
+}
+
+export type StaffMember = Staff;
+
+export interface StaffWorkload {
+  staffId: EntityId;
+  name: string;
+  role: StaffRole | string;
+  activePatients: number;
+  assignedPatientIds?: EntityId[];
+  workloadPercent?: number;
 }
 
 export type RoomType =
@@ -329,7 +361,15 @@ export interface EMSUnit {
   lastKnownLocation?: string;
 }
 
-export type CapacityRiskLevel = 'Green' | 'Yellow' | 'Orange' | 'Red';
+export const CapacityScore = Object.freeze({
+  Green: 'Green',
+  Yellow: 'Yellow',
+  Orange: 'Orange',
+  Red: 'Red',
+} as const);
+
+export type CapacityScore = (typeof CapacityScore)[keyof typeof CapacityScore];
+export type CapacityRiskLevel = CapacityScore;
 export type CapacityStatusLabel =
   | 'Capacity Normal'
   | 'Capacity Moderate'
@@ -372,4 +412,33 @@ export interface CapacitySnapshot {
   label: CapacityStatusLabel;
   deductions: CapacityScoreDeduction[];
   score: number;
+  capacityScore?: CapacityScore;
+  reassessmentQueueLength?: number;
+}
+
+export interface ReassessmentQueueItem {
+  patientId: EntityId;
+  patientName: string;
+  state: PatientState;
+  priority: PatientPriority;
+  waitingMinutes: number;
+  vitalsAgeMinutes: number;
+  reasons: string[];
+  flaggedAt: ISODateString;
+}
+
+export interface WhiteboardFilter {
+  queue?: QueueType | null;
+  complaint?: string | null;
+}
+
+export interface PatientJourneyAuditEvent {
+  id: EntityId;
+  patientId: EntityId;
+  patientName: string;
+  fromState: PatientState;
+  toState: PatientState;
+  transitionedAt: ISODateString;
+  actor: string;
+  reason: string;
 }

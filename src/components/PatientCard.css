@@ -6,9 +6,10 @@
   width: 100%;
   height: 120px;
   min-height: 120px;
+  max-height: 120px;
   padding: var(--space-2) var(--space-2) var(--space-1) var(--space-3);
   border: 1px solid var(--color-border-subtle);
-  border-left: 4px solid var(--status-inactive);
+  border-left: 4px solid var(--priority-p5);
   border-radius: var(--radius-lg);
   background: var(--color-surface);
   color: var(--color-text-primary);
@@ -26,7 +27,7 @@
 .patient-card:hover,
 .patient-card:focus-visible {
   border-color: color-mix(in srgb, var(--status-info) 50%, var(--color-border-default));
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.34);
   outline: none;
   transform: translateY(-1px);
 }
@@ -39,36 +40,49 @@
 }
 
 .patient-card--p1 {
-  border-left-color: var(--status-critical);
+  border-left-color: var(--priority-p1);
   background:
     radial-gradient(
       circle at 18% 12%,
-      color-mix(in srgb, var(--status-critical) 13%, transparent),
+      color-mix(in srgb, var(--priority-p1) 13%, transparent),
       transparent 42%
     ),
     var(--color-surface);
-  box-shadow: inset 16px 0 28px color-mix(in srgb, var(--status-critical) 10%, transparent);
+  box-shadow: inset 16px 0 28px color-mix(in srgb, var(--priority-p1) 10%, transparent);
 }
 
 .patient-card--p2 {
-  border-left-color: var(--status-warning);
-  box-shadow: inset 16px 0 28px color-mix(in srgb, var(--status-warning) 10%, transparent);
+  border-left-color: var(--priority-p2);
+  background:
+    radial-gradient(
+      circle at 18% 12%,
+      color-mix(in srgb, var(--priority-p2) 11%, transparent),
+      transparent 42%
+    ),
+    var(--color-surface);
+  box-shadow: inset 16px 0 28px color-mix(in srgb, var(--priority-p2) 10%, transparent);
 }
 
 .patient-card--p3 {
-  border-left-color: #eab308;
+  border-left-color: var(--priority-p3);
 }
 
 .patient-card--p4 {
-  border-left-color: var(--status-stable);
+  border-left-color: var(--priority-p4);
 }
 
 .patient-card--p5 {
-  border-left-color: var(--status-inactive);
+  border-left-color: var(--priority-p5);
 }
 
 .patient-card--ems {
-  background: color-mix(in srgb, var(--status-info) 8%, var(--color-surface));
+  background:
+    radial-gradient(
+      circle at 88% 12%,
+      color-mix(in srgb, var(--status-info) 12%, transparent),
+      transparent 32%
+    ),
+    color-mix(in srgb, var(--status-info) 7%, var(--color-surface));
 }
 
 .patient-card--reassessment {
@@ -89,11 +103,11 @@
 @keyframes patient-card-reassessment-pulse {
   0%,
   100% {
-    border-left-color: var(--status-warning);
+    border-left-color: var(--priority-p3);
   }
 
   50% {
-    border-left-color: color-mix(in srgb, var(--status-warning) 55%, white);
+    border-left-color: color-mix(in srgb, var(--priority-p3) 55%, white);
   }
 }
 
@@ -125,6 +139,7 @@
   display: inline-flex;
   align-items: baseline;
   gap: var(--space-2);
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -132,7 +147,7 @@
   min-width: 0;
   overflow: hidden;
   color: var(--color-text-primary);
-  font-size: var(--font-size-base);
+  font-size: 14px;
   font-weight: 800;
   line-height: 1;
   text-overflow: ellipsis;
@@ -143,7 +158,7 @@
   flex: 0 0 auto;
   color: var(--color-text-muted);
   font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
+  font-size: 11px;
   line-height: 1;
 }
 
@@ -159,6 +174,8 @@
 
 .patient-card__right-pills {
   flex: 0 0 auto;
+  justify-content: flex-end;
+  margin-left: auto;
 }
 
 .patient-card__demographics,
@@ -188,7 +205,8 @@
 }
 
 .patient-card__ems-badge {
-  background: color-mix(in srgb, var(--status-info) 18%, var(--color-elevated));
+  border: 1px solid color-mix(in srgb, var(--status-info) 36%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 20%, var(--color-elevated));
   color: var(--status-info);
 }
 
@@ -218,6 +236,8 @@
 }
 
 .patient-card__complaint {
+  flex: 1 1 auto;
+  max-width: min(100%, 70%);
   overflow: hidden;
   color: var(--color-text-primary);
   text-overflow: ellipsis;
@@ -257,6 +277,8 @@
 }
 
 .patient-card__vital {
+  display: inline-flex;
+  align-items: center;
   flex: 1 1 0;
   min-width: 0;
   overflow: hidden;
@@ -267,6 +289,13 @@
   line-height: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.patient-card__vital + .patient-card__vital::before {
+  flex: 0 0 auto;
+  margin-right: var(--space-1);
+  color: var(--color-text-muted);
+  content: '|';
 }
 
 .patient-card__vital--warning {
@@ -296,6 +325,11 @@
 
 .patient-card__wait {
   font-family: var(--font-mono);
+}
+
+.patient-card__wait--elevated {
+  color: var(--color-text-primary);
+  font-weight: 900;
 }
 
 .patient-card__wait--long {
@@ -435,11 +469,16 @@
 .patient-card__room {
   max-width: 46%;
   overflow: hidden;
+  padding: 2px 6px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--color-elevated);
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .patient-card__flags {
+  justify-content: flex-start;
   align-self: end;
   min-height: 14px;
   overflow: hidden;
@@ -449,29 +488,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 16px;
+  width: 14px;
   height: 14px;
   border-radius: var(--radius-sm);
   color: var(--color-text-muted);
-}
-
-.patient-card__flags .patient-card__score-badge {
-  width: auto;
-  min-width: 0;
-  max-width: 88px;
-  height: 16px;
-  padding: 0 var(--space-1);
-  border: 1px solid color-mix(in srgb, var(--status-info) 36%, var(--color-border-default));
-  border-radius: var(--radius-pill);
-  background: color-mix(in srgb, var(--status-info) 12%, var(--color-elevated));
-  color: var(--status-info);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 900;
-  line-height: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .patient-card__flags span[aria-label='ReassessmentDue'],
