@@ -5,7 +5,7 @@ import { AuthorizationGuard } from '../auth/guards/authorization.guard';
 import { RequirePermission } from '../auth/decorators/permissions.decorator';
 import { Permission } from '../auth/enums/permission.enum';
 import { MedicalSource } from '../rag/dto/medical-source.dto';
-import { IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsObject, IsOptional, IsString } from 'class-validator';
 
 class ChatMessage3DDto {
   @IsString()
@@ -26,6 +26,10 @@ class ChatMessage3DDto {
 class ChatMessageDto {
   @IsString()
   message: string;
+
+  @IsOptional()
+  @IsArray()
+  messages?: Array<{ role: string; content: string }>;
 
   @IsOptional()
   @IsString()
@@ -164,6 +168,7 @@ export class ChatController {
       dto.knowledgeBaseContext,
       dto.workspaceContext,
       dto.memoryContext,
+      dto.messages,
     );
 
     return {

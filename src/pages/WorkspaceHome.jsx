@@ -26,6 +26,8 @@ import { NavIcon } from '../navigation/NavIcon';
 import { CHROME_ICONS, getToolIcon, getWorkspaceIcon } from '../navigation/iconRegistry';
 import EMSPipeline from '../components/EMSPipeline';
 import EmergencyWhiteboard from '../components/EmergencyWhiteboard';
+import ReferralPanel from '../components/ReferralPanel';
+import ShiftSummary from '../components/ShiftSummary';
 import LaunchActionCard from '../components/ui/LaunchActionCard';
 import {
   DashboardGrid,
@@ -136,6 +138,7 @@ const EMERGENCY_OS_NAV_ACTIVE_MAP = Object.freeze({
     'automations',
     'documentation',
     'simulations',
+    'shift-summary',
   ],
   copilot: ['command-center', 'triage', 'evidence', 'knowledge'],
 });
@@ -6371,6 +6374,14 @@ export default function WorkspaceHome() {
 
   if (isEmergencyWorkspace && activeSubpageId === 'ems') {
     return <EMSPipeline />;
+  }
+
+  if (isEmergencyWorkspace && activeSubpageId === 'referrals') {
+    return <ReferralPanel />;
+  }
+
+  if (isEmergencyWorkspace && activeSubpageId === 'shift-summary') {
+    return <ShiftSummary />;
   }
 
   return (

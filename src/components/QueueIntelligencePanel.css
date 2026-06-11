@@ -175,6 +175,19 @@
 
 .queue-intel__health--red {
   background: var(--status-critical);
+  animation: queue-health-red-pulse 1.2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-critical) 42%, transparent);
+}
+
+@keyframes queue-health-red-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--status-critical) 42%, transparent);
+  }
+
+  50% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, var(--status-critical) 0%, transparent);
+  }
 }
 
 .queue-intel__row small {

@@ -1,4 +1,5 @@
 .ed-whiteboard {
+  position: relative;
   display: grid;
   grid-template-rows: 48px 64px minmax(0, 1fr);
   width: 100%;
@@ -8,6 +9,24 @@
   overflow: hidden;
   background: var(--color-background);
   color: var(--color-text-primary);
+  isolation: isolate;
+}
+
+.ed-whiteboard::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.026) 0,
+      rgba(255, 255, 255, 0.026) 1px,
+      transparent 1px,
+      transparent 5px
+    ),
+    radial-gradient(circle at 18% 12%, rgba(0, 255, 136, 0.035), transparent 32%);
+  content: '';
+  pointer-events: none;
 }
 
 .ed-whiteboard__topbar {
@@ -80,6 +99,20 @@
   justify-content: flex-end;
   gap: var(--space-2);
   min-width: 0;
+}
+
+.ed-whiteboard__search-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--status-info) 34%, var(--color-border-default));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--status-info) 12%, var(--color-elevated));
+  color: var(--status-info);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .ed-whiteboard__filters::-webkit-scrollbar {
@@ -246,6 +279,40 @@
   overflow-y: auto;
 }
 
+.ed-whiteboard__grid--virtualized {
+  contain: content;
+}
+
+.ed-whiteboard__virtual-spacer {
+  grid-column: 1 / -1;
+  pointer-events: none;
+}
+
+.ed-whiteboard__skeleton-card {
+  height: 120px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--color-surface) 86%, white 0%) 0%,
+      color-mix(in srgb, var(--color-surface) 72%, white 9%) 42%,
+      color-mix(in srgb, var(--color-surface) 86%, white 0%) 84%
+    );
+  background-size: 220% 100%;
+  animation: ed-whiteboard-skeleton 1.15s ease-in-out infinite;
+}
+
+@keyframes ed-whiteboard-skeleton {
+  0% {
+    background-position: 120% 0;
+  }
+
+  100% {
+    background-position: -120% 0;
+  }
+}
+
 .ed-whiteboard__list {
   min-width: 0;
   min-height: 0;
@@ -296,6 +363,11 @@
 .ed-whiteboard__list tbody tr:focus-visible td {
   background: color-mix(in srgb, var(--status-info) 8%, var(--color-surface));
   outline: none;
+}
+
+.ed-whiteboard__list tbody .ed-whiteboard__row--keyboard-selected td {
+  background: color-mix(in srgb, var(--status-info) 14%, var(--color-surface));
+  box-shadow: inset 3px 0 0 var(--status-info);
 }
 
 .ed-whiteboard__list td strong {
@@ -382,6 +454,32 @@
 }
 
 @media (max-width: 1024px) {
+  .ed-whiteboard {
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+
+  .ed-whiteboard__topbar {
+    min-height: 56px;
+    height: auto;
+    flex-wrap: wrap;
+    padding-block: var(--space-2);
+  }
+
+  .ed-whiteboard__new-patient,
+  .ed-whiteboard__filter,
+  .ed-whiteboard__view-toggle button {
+    min-height: 44px;
+  }
+
+  .ed-whiteboard__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ed-whiteboard__body--detail-open,
+  .ed-whiteboard__body--queue-collapsed.ed-whiteboard__body--detail-open {
+    grid-template-columns: 240px minmax(0, 1fr) 0;
+  }
+
   .ed-whiteboard__stat-card {
     padding-inline: var(--space-2);
   }

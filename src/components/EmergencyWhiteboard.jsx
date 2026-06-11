@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Grid3X3, List, Plus } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { getPatientFlagType, hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
@@ -86,22 +86,44 @@ function staffName(staff) {
   return staff ? `${staff.firstName} ${staff.lastName}` : 'Unassigned';
 }
 
+const VIRTUALIZED_GRID_THRESHOLD = 50;
+const VIRTUALIZED_CARD_ROW_HEIGHT = 132;
+
+function isEditableShortcutTarget(target) {
+  return (
+    target?.tagName === 'INPUT' ||
+    target?.tagName === 'TEXTAREA' ||
+    target?.tagName === 'SELECT' ||
+    target?.isContentEditable
+  );
+}
+
 export default function EmergencyWhiteboard() {
   const patients = useEmergencyStore((state) => state.patients);
   const staff = useEmergencyStore((state) => state.staff);
   const rooms = useEmergencyStore((state) => state.rooms);
   const capacity = useEmergencyStore((state) => state.capacity);
   const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
+  const whiteboardSearchQuery = useEmergencyStore((state) => state.whiteboardSearchQuery);
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const setQueueFilter = useEmergencyStore((state) => state.setQueueFilter);
   const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const addNote = useEmergencyStore((state) => state.addNote);
+  const addFlag = useEmergencyStore((state) => state.addFlag);
   const [viewMode, setViewMode] = useState('grid');
   const [queuePanelCollapsed, setQueuePanelCollapsed] = useState(false);
   const [newPatientOpen, setNewPatientOpen] = useState(false);
   const [calculatorLaunch, setCalculatorLaunch] = useState(null);
+  const [keyboardPatientId, setKeyboardPatientId] = useState(null);
+  const [isStoreInitializing, setIsStoreInitializing] = useState(true);
+  const [gridScrollTop, setGridScrollTop] = useState(0);
+  const [gridViewportHeight, setGridViewportHeight] = useState(720);
+  const [gridColumnCount, setGridColumnCount] = useState(() =>
+    typeof window !== 'undefined' && window.innerWidth <= 1180 ? 2 : 3
+  );
+  const gridRef = useRef(null);
 
   const activePatients = useMemo(
     () => patients.filter((patient) => ACTIVE_STATES.has(patient.state)),
@@ -112,13 +134,25 @@ export default function EmergencyWhiteboard() {
     const basePatients = activePatients.filter((patient) =>
       matchesFilter(patient, activeQueueFilter)
     );
+    const query = whiteboardSearchQuery.trim().toLowerCase();
+    const searchedPatients = query
+      ? basePatients.filter((patient) => {
+          const name = `${patient.firstName} ${patient.lastName}`.toLowerCase();
+          return (
+            name.includes(query) ||
+            patient.mrn.toLowerCase().includes(query) ||
+            patient.chiefComplaint.toLowerCase().includes(query) ||
+            patient.complaintCategory.toLowerCase().includes(query)
+          );
+        })
+      : basePatients;
 
-    return [...basePatients].sort((a, b) => {
+    return [...searchedPatients].sort((a, b) => {
       const p1Delta = Number(b.priority === Priority.P1) - Number(a.priority === Priority.P1);
       if (p1Delta !== 0) return p1Delta;
       return waitMinutes(b.arrivalTime) - waitMinutes(a.arrivalTime);
     });
-  }, [activePatients, activeQueueFilter]);
+  }, [activePatients, activeQueueFilter, whiteboardSearchQuery]);
 
   const filterCounts = useMemo(
     () =>
@@ -149,8 +183,67 @@ export default function EmergencyWhiteboard() {
   const calculatorPatient = calculatorLaunch
     ? patients.find((patient) => patient.id === calculatorLaunch.patientId)
     : null;
+  const shouldVirtualizeGrid =
+    viewMode === 'grid' && filteredPatients.length > VIRTUALIZED_GRID_THRESHOLD;
+  const virtualizedGrid = useMemo(() => {
+    if (!shouldVirtualizeGrid) {
+      return {
+        patients: filteredPatients,
+        paddingTop: 0,
+        paddingBottom: 0,
+      };
+    }
+
+    const totalRows = Math.ceil(filteredPatients.length / gridColumnCount);
+    const startRow = Math.max(0, Math.floor(gridScrollTop / VIRTUALIZED_CARD_ROW_HEIGHT) - 3);
+    const visibleRowCount =
+      Math.ceil(gridViewportHeight / VIRTUALIZED_CARD_ROW_HEIGHT) + 6;
+    const endRow = Math.min(totalRows, startRow + visibleRowCount);
+    return {
+      patients: filteredPatients.slice(startRow * gridColumnCount, endRow * gridColumnCount),
+      paddingTop: startRow * VIRTUALIZED_CARD_ROW_HEIGHT,
+      paddingBottom: Math.max(0, (totalRows - endRow) * VIRTUALIZED_CARD_ROW_HEIGHT),
+    };
+  }, [
+    filteredPatients,
+    gridColumnCount,
+    gridScrollTop,
+    gridViewportHeight,
+    shouldVirtualizeGrid,
+  ]);
 
   useEffect(() => {
+    const timer = window.setTimeout(() => setIsStoreInitializing(false), 180);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const updateGridMetrics = () => {
+      setGridViewportHeight(gridRef.current?.clientHeight || 720);
+      setGridColumnCount(window.innerWidth <= 1180 ? 2 : 3);
+    };
+
+    updateGridMetrics();
+    window.addEventListener('resize', updateGridMetrics);
+    return () => window.removeEventListener('resize', updateGridMetrics);
+  }, []);
+
+  useEffect(() => {
+    if (!filteredPatients.length) {
+      setKeyboardPatientId(null);
+      return;
+    }
+    if (!keyboardPatientId || !filteredPatients.some((patient) => patient.id === keyboardPatientId)) {
+      setKeyboardPatientId(selectedPatientId || filteredPatients[0].id);
+    }
+  }, [filteredPatients, keyboardPatientId, selectedPatientId]);
+
+  useEffect(() => {
+    const handleOpenIntake = () => setNewPatientOpen(true);
+    const handleCloseOverlays = () => {
+      setNewPatientOpen(false);
+      setCalculatorLaunch(null);
+    };
     const handleOpenCalculator = (event) => {
       const rawCalculatorId =
         event.detail?.calculatorId || event.detail?.toolId || event.detail?.value || '';
@@ -163,9 +256,89 @@ export default function EmergencyWhiteboard() {
       selectPatient(patientId);
     };
 
+    window.addEventListener('ed:open-intake', handleOpenIntake);
+    window.addEventListener('ed:close-overlays', handleCloseOverlays);
     window.addEventListener('ed:open-calculator', handleOpenCalculator);
-    return () => window.removeEventListener('ed:open-calculator', handleOpenCalculator);
+    return () => {
+      window.removeEventListener('ed:open-intake', handleOpenIntake);
+      window.removeEventListener('ed:close-overlays', handleCloseOverlays);
+      window.removeEventListener('ed:open-calculator', handleOpenCalculator);
+    };
   }, [selectPatient, selectedPatientId]);
+
+  const moveKeyboardSelection = (direction) => {
+    if (!filteredPatients.length) return;
+    const currentIndex = Math.max(
+      0,
+      filteredPatients.findIndex((patient) => patient.id === keyboardPatientId)
+    );
+    const nextIndex =
+      direction === 'next'
+        ? Math.min(currentIndex + 1, filteredPatients.length - 1)
+        : Math.max(currentIndex - 1, 0);
+    const nextPatientId = filteredPatients[nextIndex].id;
+    setKeyboardPatientId(nextPatientId);
+    window.setTimeout(() => {
+      document
+        .querySelector(`[data-patient-card-id="${nextPatientId}"]`)
+        ?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }, 0);
+  };
+
+  const handleWhiteboardShortcut = (event) => {
+    if (
+      event.defaultPrevented ||
+      newPatientOpen ||
+      calculatorLaunch ||
+      isEditableShortcutTarget(event.target) ||
+      event.target?.closest?.('.patient-detail')
+    ) {
+      return;
+    }
+
+    const key = event.key.toLowerCase();
+    if (/^[1-5]$/.test(event.key)) {
+      event.preventDefault();
+      const filter = FILTERS[Number(event.key) - 1];
+      setQueueFilter(filter?.type || null);
+      return;
+    }
+
+    if (key === 'g') {
+      event.preventDefault();
+      setViewMode('grid');
+      return;
+    }
+
+    if (key === 'l') {
+      event.preventDefault();
+      setViewMode('list');
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      moveKeyboardSelection('next');
+      return;
+    }
+
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveKeyboardSelection('previous');
+      return;
+    }
+
+    if (event.key === 'Enter' && keyboardPatientId) {
+      event.preventDefault();
+      selectPatient(keyboardPatientId);
+      return;
+    }
+
+    if (key === 'f' && keyboardPatientId) {
+      event.preventDefault();
+      addFlag(keyboardPatientId, 'ReassessmentDue');
+    }
+  };
 
   const saveCalculatorScore = (score) => {
     if (!calculatorPatient) return;
@@ -189,13 +362,23 @@ export default function EmergencyWhiteboard() {
   };
 
   return (
-    <section className="ed-whiteboard" aria-labelledby="ed-whiteboard-title">
+    <section
+      className="ed-whiteboard"
+      aria-labelledby="ed-whiteboard-title"
+      tabIndex={0}
+      onKeyDown={handleWhiteboardShortcut}
+    >
       <header className="ed-whiteboard__topbar">
         <div className="ed-whiteboard__title">
           <h1 id="ed-whiteboard-title">Emergency Whiteboard</h1>
           <span>{activePatients.length} live patients</span>
         </div>
         <div className="ed-whiteboard__topbar-actions">
+          {whiteboardSearchQuery ? (
+            <span className="ed-whiteboard__search-chip">
+              Search: {whiteboardSearchQuery}
+            </span>
+          ) : null}
           <button
             type="button"
             className="ed-whiteboard__new-patient"
@@ -277,14 +460,48 @@ export default function EmergencyWhiteboard() {
           onCollapsedChange={setQueuePanelCollapsed}
         />
         <div className="ed-whiteboard__content">
-          {filteredPatients.length && viewMode === 'grid' ? (
-            <div className="ed-whiteboard__grid" aria-label="Patient whiteboard">
-              {filteredPatients.map((patient) => (
-                <PatientCard key={patient.id} patient={patient} />
+          {isStoreInitializing && viewMode === 'grid' ? (
+            <div className="ed-whiteboard__grid" aria-label="Loading patient whiteboard">
+              {Array.from({ length: 8 }, (_, index) => (
+                <div key={index} className="ed-whiteboard__skeleton-card" />
               ))}
             </div>
           ) : null}
-          {filteredPatients.length && viewMode === 'list' ? (
+          {!isStoreInitializing && filteredPatients.length && viewMode === 'grid' ? (
+            <div
+              ref={gridRef}
+              className={[
+                'ed-whiteboard__grid',
+                shouldVirtualizeGrid ? 'ed-whiteboard__grid--virtualized' : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+              aria-label="Patient whiteboard"
+              onScroll={(event) => setGridScrollTop(event.currentTarget.scrollTop)}
+            >
+              {virtualizedGrid.paddingTop ? (
+                <div
+                  className="ed-whiteboard__virtual-spacer"
+                  style={{ height: virtualizedGrid.paddingTop }}
+                />
+              ) : null}
+              {virtualizedGrid.patients.map((patient) => (
+                <PatientCard
+                  key={patient.id}
+                  patient={patient}
+                  keyboardSelected={patient.id === keyboardPatientId}
+                  onKeyboardFocus={() => setKeyboardPatientId(patient.id)}
+                />
+              ))}
+              {virtualizedGrid.paddingBottom ? (
+                <div
+                  className="ed-whiteboard__virtual-spacer"
+                  style={{ height: virtualizedGrid.paddingBottom }}
+                />
+              ) : null}
+            </div>
+          ) : null}
+          {!isStoreInitializing && filteredPatients.length && viewMode === 'list' ? (
             <div className="ed-whiteboard__list" aria-label="Patient whiteboard list">
               <table>
                 <thead>
@@ -308,7 +525,12 @@ export default function EmergencyWhiteboard() {
                     return (
                       <tr
                         key={patient.id}
+                        data-patient-card-id={patient.id}
                         tabIndex={0}
+                        className={
+                          patient.id === keyboardPatientId ? 'ed-whiteboard__row--keyboard-selected' : ''
+                        }
+                        onFocus={() => setKeyboardPatientId(patient.id)}
                         onClick={() => selectPatient(patient.id)}
                         onKeyDown={(event) => {
                           if (event.key === 'Enter' || event.key === ' ') {
@@ -347,7 +569,7 @@ export default function EmergencyWhiteboard() {
               </table>
             </div>
           ) : null}
-          {!filteredPatients.length ? (
+          {!isStoreInitializing && !filteredPatients.length ? (
             <div className="ed-whiteboard__empty" role="status">
               Department Clear
             </div>

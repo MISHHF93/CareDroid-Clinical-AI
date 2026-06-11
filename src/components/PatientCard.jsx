@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Activity,
   AlertTriangle,
@@ -6,12 +7,19 @@ import {
   Bed,
   Clock3,
   DoorOpen,
+  FilePlus2,
   ShieldAlert,
+  Share2,
   UserRoundCheck,
   X,
 } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { getPatientFlagType, hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
+import {
+  buildStaffWorkloads,
+  staffDisplayName,
+  staffInitials,
+} from '../utils/staffManagement';
 import {
   getNextStates,
   movePatientToState as movePatientWithJourneyRules,
@@ -43,6 +51,8 @@ const ALL_FLAGS = [
   'EMSArrival',
   'Isolation',
 ];
+
+const ACTIVE_REFERRAL_TERMINAL_STATUSES = new Set(['Completed', 'Declined']);
 
 const CATEGORY_CLASS = {
   'Chest Pain': 'cardiac',
@@ -81,13 +91,23 @@ function patientName(patient) {
   return `${patient.firstName} ${patient.lastName}`;
 }
 
-function staffName(staff) {
-  return staff ? `${staff.firstName} ${staff.lastName}` : 'Unassigned';
+function isEditableShortcutTarget(target) {
+  return (
+    target?.tagName === 'INPUT' ||
+    target?.tagName === 'TEXTAREA' ||
+    target?.tagName === 'SELECT' ||
+    target?.isContentEditable
+  );
 }
 
-function staffInitials(staff) {
-  if (!staff) return 'NA';
-  return `${staff.firstName?.[0] || ''}${staff.lastName?.[0] || ''}`.toUpperCase() || 'NA';
+function isActiveReferral(referral) {
+  return referral && !ACTIVE_REFERRAL_TERMINAL_STATUSES.has(referral.status);
+}
+
+function referralStatusLabel(referrals) {
+  if (referrals.some((referral) => referral.status === 'Accepted')) return 'Accepted';
+  if (referrals.some((referral) => referral.status === 'Sent')) return 'Sent';
+  return 'Pending';
 }
 
 function categoryClass(category) {
@@ -230,9 +250,58 @@ function savedScoreBadges(patient) {
   return [...latestByScore.values()].slice(-3);
 }
 
+function StaffWorkloadIndicator({ member }) {
+  return (
+    <span
+      className={`staff-selector__workload staff-selector__workload--${member.workloadTone}`}
+      aria-label={`${member.assignedCount} assigned patients`}
+    >
+      <span style={{ width: `${Math.max(8, member.workloadPercent)}%` }} />
+    </span>
+  );
+}
+
+function StaffAssignmentSelector({ patient, workloads, onAssign, compact = false, onClose }) {
+  return (
+    <div className={`staff-selector${compact ? ' staff-selector--compact' : ''}`}>
+      {workloads.map((member) => (
+        <button
+          key={member.id}
+          type="button"
+          className={[
+            'staff-selector__option',
+            patient.assignedStaffId === member.id ? 'staff-selector__option--selected' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          onClick={(event) => {
+            event.stopPropagation();
+            onAssign(patient.id, member.id);
+            onClose?.();
+          }}
+        >
+          <span className="staff-selector__avatar">{member.initials}</span>
+          <span className="staff-selector__body">
+            <strong>{member.displayName}</strong>
+            <small>
+              {member.roleLabel} · {member.assignedCount} patients
+            </small>
+            <StaffWorkloadIndicator member={member} />
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export function PatientDetailPanel() {
+  const navigate = useNavigate();
   const selectedPatientId = useEmergencyStore((state) => state.selectedPatientId);
   const patients = useEmergencyStore((state) => state.patients);
+  const queues = useEmergencyStore((state) => state.queues);
+  const activeQueueFilter = useEmergencyStore((state) => state.activeQueueFilter);
+  const whiteboardSearchQuery = useEmergencyStore((state) => state.whiteboardSearchQuery);
+  const referrals = useEmergencyStore((state) => state.referrals);
   const patient = patients.find((candidate) => candidate.id === selectedPatientId);
   const staff = useEmergencyStore((state) => state.staff);
   const rooms = useEmergencyStore((state) => state.rooms);
@@ -252,6 +321,27 @@ export function PatientDetailPanel() {
   const [noteText, setNoteText] = useState('');
   const [selectedFlag, setSelectedFlag] = useState('ReassessmentDue');
   const [transitionError, setTransitionError] = useState('');
+  const [staffSelectorOpen, setStaffSelectorOpen] = useState(false);
+  const filteredPatientsForShortcuts = useMemo(() => {
+    const query = whiteboardSearchQuery.trim().toLowerCase();
+    const queue = activeQueueFilter
+      ? queues.find((candidate) => candidate.type === activeQueueFilter)
+      : null;
+    return patients.filter((candidate) => {
+      if (candidate.state === PatientState.Discharge || candidate.state === PatientState.Deceased) {
+        return false;
+      }
+      if (queue && !queue.patientIds.includes(candidate.id)) return false;
+      if (!query) return true;
+      const name = `${candidate.firstName} ${candidate.lastName}`.toLowerCase();
+      return (
+        name.includes(query) ||
+        candidate.mrn.toLowerCase().includes(query) ||
+        candidate.chiefComplaint.toLowerCase().includes(query) ||
+        candidate.complaintCategory.toLowerCase().includes(query)
+      );
+    });
+  }, [activeQueueFilter, patients, queues, whiteboardSearchQuery]);
 
   useEffect(() => {
     setVitalsForm(buildVitalsForm(patient?.vitals || {}));
@@ -259,6 +349,62 @@ export function PatientDetailPanel() {
     setVitalsOpen(false);
     setTransitionError('');
   }, [patient?.id, patient?.vitals]);
+
+  useEffect(() => {
+    if (!patient) return undefined;
+
+    const handlePatientDetailShortcut = (event) => {
+      if (
+        event.defaultPrevented ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        isEditableShortcutTarget(event.target)
+      ) {
+        return;
+      }
+
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        const shortcutNextState = getNextStates(patient.state)[0];
+        if (!shortcutNextState) return;
+        const result = movePatientWithJourneyRules(patient.id, shortcutNextState, {
+          staffId: patient.assignedStaffId || activeShift.chargeStaffId,
+          note: 'Moved via PatientDetailPanel keyboard shortcut.',
+        });
+        setTransitionError(result.ok ? '' : result.reason);
+        return;
+      }
+
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        selectPatient(null);
+        return;
+      }
+
+      if (event.key.toLowerCase() === 'a' && !event.shiftKey) {
+        event.preventDefault();
+        setStaffSelectorOpen((open) => !open);
+        return;
+      }
+
+      if (event.key === 'Tab' && !event.shiftKey) {
+        event.preventDefault();
+        if (!filteredPatientsForShortcuts.length) return;
+        const currentIndex = filteredPatientsForShortcuts.findIndex(
+          (candidate) => candidate.id === patient.id
+        );
+        const nextIndex =
+          currentIndex === -1
+            ? 0
+            : (currentIndex + 1) % filteredPatientsForShortcuts.length;
+        selectPatient(filteredPatientsForShortcuts[nextIndex].id);
+      }
+    };
+
+    window.addEventListener('keydown', handlePatientDetailShortcut);
+    return () => window.removeEventListener('keydown', handlePatientDetailShortcut);
+  }, [activeShift.chargeStaffId, filteredPatientsForShortcuts, patient, selectPatient]);
 
   if (!patient) return null;
 
@@ -269,8 +415,13 @@ export function PatientDetailPanel() {
   const chronologicalNotes = [...patient.notes].sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
+  const activeReferrals = referrals
+    .filter((referral) => referral.patientId === patient.id && isActiveReferral(referral))
+    .sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
   const noteAuthorFallback =
     patient.assignedStaffId || activeShift.chargeStaffId || staff[0]?.id || 'system';
+  const staffWorkloads = buildStaffWorkloads(staff, patients, activeShift);
+  const assignedStaff = staff.find((member) => member.id === patient.assignedStaffId);
 
   const submitVitals = (event) => {
     event.preventDefault();
@@ -340,6 +491,10 @@ export function PatientDetailPanel() {
     addNote(patient.id, createClinicalScoreNote(patient.id, score, authorStaffId, timestamp));
   };
 
+  const handleNewReferral = () => {
+    navigate(`/workspace/emergency/referrals?patientId=${encodeURIComponent(patient.id)}&new=1`);
+  };
+
   return (
     <aside className="patient-detail" aria-label="Patient detail panel">
       <header className="patient-detail__header">
@@ -383,6 +538,27 @@ export function PatientDetailPanel() {
             <small className="patient-detail__error">{transitionError}</small>
           ) : null}
         </div>
+      </section>
+
+      <section className="patient-detail__section patient-detail__staff-assignment">
+        <div className="patient-detail__section-heading">
+          <span>Assigned to</span>
+          <button type="button" onClick={() => setStaffSelectorOpen((open) => !open)}>
+            Edit
+          </button>
+        </div>
+        <div className="patient-detail__assigned-staff">
+          <span className="patient-card__staff-avatar">{staffInitials(assignedStaff)}</span>
+          <strong>{staffDisplayName(assignedStaff)}</strong>
+        </div>
+        {staffSelectorOpen ? (
+          <StaffAssignmentSelector
+            patient={patient}
+            workloads={staffWorkloads}
+            onAssign={assignStaff}
+            onClose={() => setStaffSelectorOpen(false)}
+          />
+        ) : null}
       </section>
 
       {protocolSuggestions.length ? (
@@ -498,7 +674,7 @@ export function PatientDetailPanel() {
             const author = staff.find((candidate) => candidate.id === note.authorStaffId);
             return (
               <article key={note.id}>
-                <strong>{staffName(author)}</strong>
+                <strong>{staffDisplayName(author)}</strong>
                 <time>{formatClock(note.createdAt)}</time>
                 <p>{note.body}</p>
               </article>
@@ -516,27 +692,50 @@ export function PatientDetailPanel() {
         </form>
       </section>
 
-      {patient.referral ? (
-        <section className="patient-detail__section">
-          <div className="patient-detail__section-heading">
-            <span>Referral</span>
-          </div>
-          <dl className="patient-detail__referral">
-            <div>
-              <dt>Destination</dt>
-              <dd>{patient.referral.destinationFacility || patient.referral.destinationService}</dd>
-            </div>
-            <div>
-              <dt>Status</dt>
-              <dd>{patient.referral.status}</dd>
-            </div>
-            <div>
-              <dt>Sent</dt>
-              <dd>{formatClock(patient.referral.requestedAt)}</dd>
-            </div>
-          </dl>
-        </section>
-      ) : null}
+      <section className="patient-detail__section">
+        <div className="patient-detail__section-heading">
+          <span>Active Referrals</span>
+          <button type="button" onClick={handleNewReferral}>
+            <FilePlus2 size={13} aria-hidden />
+            New Referral
+          </button>
+        </div>
+        <div className="patient-detail__referral-list">
+          {activeReferrals.length ? (
+            activeReferrals.map((referral) => (
+              <article key={referral.id} className="patient-detail__referral-card">
+                <div>
+                  <strong>{referral.targetDepartment}</strong>
+                  <span>{referral.reason}</span>
+                </div>
+                <span className={`patient-detail__referral-chip patient-detail__referral-chip--${referral.status.toLowerCase()}`}>
+                  {referral.status === 'Acknowledged' || referral.status === 'Draft'
+                    ? 'Pending'
+                    : referral.status}
+                </span>
+                <dl className="patient-detail__referral">
+                  <div>
+                    <dt>Urgency</dt>
+                    <dd>{referral.urgency}</dd>
+                  </div>
+                  <div>
+                    <dt>Sent</dt>
+                    <dd>{formatClock(referral.requestedAt)}</dd>
+                  </div>
+                  {referral.responseNote ? (
+                    <div>
+                      <dt>Response</dt>
+                      <dd>{referral.responseNote}</dd>
+                    </div>
+                  ) : null}
+                </dl>
+              </article>
+            ))
+          ) : (
+            <p>No active referrals</p>
+          )}
+        </div>
+      </section>
 
       <div className="patient-detail__actions">
         <label>
@@ -548,7 +747,7 @@ export function PatientDetailPanel() {
             <option value="">Unassigned</option>
             {staff.map((member) => (
               <option key={member.id} value={member.id}>
-                {staffName(member)}
+                {staffDisplayName(member)}
               </option>
             ))}
           </select>
@@ -584,35 +783,58 @@ export function PatientDetailPanel() {
   );
 }
 
-export default function PatientCard({ patient }) {
+function PatientCard({ patient, keyboardSelected = false, onKeyboardFocus }) {
+  const [staffMenuOpen, setStaffMenuOpen] = useState(false);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
-  const staff = useEmergencyStore((state) =>
-    state.staff.find((candidate) => candidate.id === patient.assignedStaffId)
+  const patients = useEmergencyStore((state) => state.patients);
+  const allStaff = useEmergencyStore((state) => state.staff);
+  const activeShift = useEmergencyStore((state) => state.activeShift);
+  const assignStaff = useEmergencyStore((state) => state.assignStaff);
+  const allReferrals = useEmergencyStore((state) => state.referrals);
+  const referrals = useMemo(
+    () =>
+      allReferrals.filter(
+        (referral) => referral.patientId === patient.id && isActiveReferral(referral)
+      ),
+    [allReferrals, patient.id]
   );
+  const staff = allStaff.find((candidate) => candidate.id === patient.assignedStaffId);
   const room = useEmergencyStore((state) =>
     state.rooms.find((candidate) => candidate.id === patient.roomId)
   );
+  const staffWorkloads = buildStaffWorkloads(allStaff, patients, activeShift);
   const wait = waitMinutes(patient.arrivalTime);
   const isLongWait = wait > 60;
   const priority = priorityTone(patient.priority);
   const hasReassessment = hasPatientFlag(patient, 'ReassessmentDue');
   const hasDeterioration = hasPatientFlag(patient, 'DeteriorationRisk');
   const hasEmsArrival = hasPatientFlag(patient, 'EMSArrival') || Boolean(patient.emsArrival);
+  const hasActiveReferral = referrals.length > 0;
+  const referralStatus = hasActiveReferral ? referralStatusLabel(referrals) : null;
   const scoreBadges = savedScoreBadges(patient);
 
   return (
-    <button
-      type="button"
+    <article
+      role="button"
+      tabIndex={0}
       className={[
         'patient-card',
         `patient-card--${priority}`,
+        keyboardSelected ? 'patient-card--keyboard-selected' : '',
         hasReassessment ? 'patient-card--reassessment' : '',
         hasDeterioration ? 'patient-card--deterioration' : '',
         hasEmsArrival ? 'patient-card--ems' : '',
       ]
         .filter(Boolean)
         .join(' ')}
+      data-patient-card-id={patient.id}
+      onFocus={onKeyboardFocus}
       onClick={() => selectPatient(patient.id)}
+      onKeyDown={(event) => {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        event.preventDefault();
+        selectPatient(patient.id);
+      }}
       aria-label={`Open details for ${patientName(patient)}`}
     >
       <div className="patient-card__row patient-card__row--identity">
@@ -621,6 +843,7 @@ export default function PatientCard({ patient }) {
           <span>{patient.mrn}</span>
         </div>
         <div className="patient-card__right-pills">
+          {hasActiveReferral ? <span className="patient-card__referral-badge">Referral</span> : null}
           {hasEmsArrival ? <span className="patient-card__ems-badge">EMS</span> : null}
           <span className="patient-card__demographics">
             {patient.age}/{patient.sex[0] || 'U'}
@@ -635,6 +858,14 @@ export default function PatientCard({ patient }) {
           {patient.complaintCategory}
         </span>
         <span className="patient-card__state">{patient.state}</span>
+        {referralStatus ? (
+          <span
+            className={`patient-card__referral-status patient-card__referral-status--${referralStatus.toLowerCase()}`}
+          >
+            <Share2 size={11} aria-hidden />
+            {referralStatus}
+          </span>
+        ) : null}
       </div>
 
       <div className="patient-card__row patient-card__vitals" aria-label="Vitals">
@@ -652,13 +883,27 @@ export default function PatientCard({ patient }) {
         <span className={`patient-card__wait${isLongWait ? ' patient-card__wait--long' : ''}`}>
           {formatWait(wait)} wait
         </span>
-        <span
-          className="patient-card__staff"
-          title={staff ? `${staff.firstName} ${staff.lastName}` : 'Unassigned'}
-        >
-          <UserRoundCheck size={12} aria-hidden />
-          {staffInitials(staff)}
-        </span>
+        <div className="patient-card__staff-control" onClick={(event) => event.stopPropagation()}>
+          <button
+            type="button"
+            className="patient-card__staff-avatar"
+            title={staffDisplayName(staff)}
+            aria-label={`Assign staff for ${patientName(patient)}`}
+            aria-expanded={staffMenuOpen}
+            onClick={() => setStaffMenuOpen((open) => !open)}
+          >
+            {staff ? staffInitials(staff) : <UserRoundCheck size={12} aria-hidden />}
+          </button>
+          {staffMenuOpen ? (
+            <StaffAssignmentSelector
+              patient={patient}
+              workloads={staffWorkloads}
+              onAssign={assignStaff}
+              compact
+              onClose={() => setStaffMenuOpen(false)}
+            />
+          ) : null}
+        </div>
         <span className="patient-card__room">
           <DoorOpen size={12} aria-hidden />
           {room?.name || patient.roomId || 'No room'}
@@ -686,6 +931,8 @@ export default function PatientCard({ patient }) {
           );
         })}
       </div>
-    </button>
+    </article>
   );
 }
+
+export default memo(PatientCard);

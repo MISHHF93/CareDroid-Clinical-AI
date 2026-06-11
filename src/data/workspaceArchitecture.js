@@ -824,6 +824,7 @@ export const WORKSPACE_FUNCTIONALITY_MODES = Object.freeze({
       { id: 'resources', label: 'Resources', group: 'operations', priority: 5 },
       { id: 'escalations', label: 'Escalations', group: 'operations', priority: 6 },
       { id: 'iot', label: 'IoT', group: 'operations', priority: 7 },
+      { id: 'shift-summary', label: 'Shift Summary', group: 'operations', priority: 8 },
       { id: 'referrals', label: 'Referrals', group: 'clinical', priority: 1 },
       { id: 'knowledge', label: 'Knowledge', group: 'clinical', priority: 2 },
       { id: 'evidence', label: 'Evidence', group: 'clinical', priority: 3 },

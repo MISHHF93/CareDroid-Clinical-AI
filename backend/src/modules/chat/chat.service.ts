@@ -126,6 +126,7 @@ export class ChatService {
     knowledgeBaseContext?: Record<string, any>,
     clientWorkspaceContext?: Record<string, any>,
     clientMemoryContext?: Record<string, any>,
+    requestMessages?: Array<{ role: string; content: string }>,
   ): Promise<QueryResponse> {
     this.logger.log(`💬 Processing chat message: "${message}"`);
     const startedAt = Date.now();
@@ -262,7 +263,7 @@ export class ChatService {
     });
 
     if (workspaceContext?.edCopilot?.enabled) {
-      const response = await this.handleEdCopilot(message, workspaceContext.edCopilot);
+      const response = await this.handleEdCopilot(message, workspaceContext.edCopilot, requestMessages);
       const composed = this.aiResponseComposer.compose(
         response,
         aiRunEnvelope,
@@ -1267,11 +1268,12 @@ export class ChatService {
   private async handleEdCopilot(
     message: string,
     edContext: Record<string, any>,
+    requestMessages?: Array<{ role: string; content: string }>,
   ): Promise<QueryResponse> {
     const commandResponse = this.handleEdCopilotCommand(message, edContext);
     if (commandResponse) return commandResponse;
 
-    const anthropicText = await this.invokeAnthropicEdCopilot(message, edContext);
+    const anthropicText = await this.invokeAnthropicEdCopilot(message, edContext, requestMessages);
     const text =
       anthropicText ||
       [
@@ -1294,6 +1296,220 @@ export class ChatService {
   ): QueryResponse | null {
     const lower = message.toLowerCase();
     const patients = Array.isArray(edContext.patients) ? edContext.patients : [];
+    const detectedIntent = edContext.detectedIntent || null;
+
+    if (/handoff|shift summary|shift handoff/i.test(message) && edContext.shiftSummary) {
+      const summary = edContext.shiftSummary || {};
+      const stats = summary.stats || {};
+      const clinical = summary.clinical || {};
+      const longestWait = summary.longestWait || {};
+      const orangeEvents = summary.capacityEvents?.orange || [];
+      const redEvents = summary.capacityEvents?.red || [];
+
+      return this.buildEdCopilotResponse({
+        text: [
+          'ED Shift Handoff Brief',
+          '',
+          `Shift volume: ${summary.patients?.length ?? 0} tracked patients; ${stats.totalSeen ?? 0} seen through admission/discharge.`,
+          `Flow: avg door-to-triage ${stats.averageDoorToTriage ?? 0} min, avg door-to-provider ${stats.averageDoorToProvider ?? 0} min, avg LOS ${stats.averageLengthOfStay ?? 0} min.`,
+          `Disposition: ${stats.dischargeCount ?? 0} discharged, ${stats.admissionCount ?? 0} admitted, ${stats.lwbsCount ?? 0} LWBS.`,
+          `Queues: longest wait ${longestWait.queue || 'None'} at ${longestWait.minutes ?? 0} min; ${summary.queueBreachCount ?? 0} queue breaches above threshold.`,
+          `Capacity: ${orangeEvents.length} Orange episode(s), ${redEvents.length} Red episode(s), ${Number(summary.boardingHours || 0).toFixed(1)} boarding hours.`,
+          `Clinical events: ${clinical.p1Seen ?? 0} P1 patients, ${clinical.referralsSent ?? 0} referrals sent (${clinical.referralsAccepted ?? 0} accepted, ${clinical.referralsDeclined ?? 0} declined), ${clinical.reassessmentsFlagged ?? 0} reassessments flagged and ${clinical.reassessmentsCompleted ?? 0} completed.`,
+          '',
+          'Suggested watch items for human review:',
+          '- Review any breached queues and longest-wait patients before handoff.',
+          '- Reconfirm active boarding/admission patients and pending referral responses.',
+          '- Verify reassessment flags and unresolved high-priority patients with the incoming lead.',
+          '',
+          'Decision support only. Human clinical and operational review is required.',
+        ].join('\n'),
+        command: 'shift_handoff',
+        edContext,
+      });
+    }
+
+    if (detectedIntent?.intent === 'QUERY_LONGEST_WAIT') {
+      const waiting = [...patients].sort(
+        (a, b) => Number(b.waitMinutes || 0) - Number(a.waitMinutes || 0),
+      );
+      const top = waiting.slice(0, 5);
+      const lines = top.length
+        ? top.map(
+            (patient, index) =>
+              `${index + 1}. ${patient.name} (${patient.location || 'unassigned'}) - ${patient.waitMinutes} min, ${patient.state}, ${patient.complaint}`,
+          )
+        : ['No waiting-time data is available.'];
+
+      return this.buildEdCopilotResponse({
+        text: `**Longest waiting patients**\n\n${lines.join('\n')}\n\n_Surface for human review before any clinical or operational action._`,
+        command: 'longest_waiting',
+        edContext,
+        items: top,
+      });
+    }
+
+    if (detectedIntent?.intent === 'FILTER_BY_COMPLAINT') {
+      const complaint = String(detectedIntent.value || '').toLowerCase();
+      const complaintPatients = patients.filter((patient) =>
+        String(patient.complaint || '').toLowerCase().includes(complaint),
+      );
+      const lines = complaintPatients.length
+        ? complaintPatients.map(
+            (patient) =>
+              `- ${patient.name} (${patient.location || 'unassigned'}) - ${patient.state}, ${patient.priority}, wait ${patient.waitMinutes} min`,
+          )
+        : [`No ${detectedIntent.value || 'matching'} patients are on the current whiteboard context.`];
+
+      return this.buildEdCopilotResponse({
+        text: `**${detectedIntent.value || 'Matching'} patients**\n\n${lines.join('\n')}\n\n_Review these patients in the whiteboard. No autonomous diagnosis or disposition is suggested._`,
+        command: 'filter_by_complaint',
+        edContext,
+        items: complaintPatients,
+        whiteboardAction: {
+          type: 'filterComplaint',
+          complaint: detectedIntent.value,
+          requiresHumanReview: true,
+        },
+      });
+    }
+
+    if (detectedIntent?.intent === 'QUERY_CAPACITY') {
+      const capacity = edContext.capacitySnapshot || {};
+      return this.buildEdCopilotResponse({
+        text: [
+          '**Current ED capacity**',
+          '',
+          `- Score: ${capacity.score || 'Unknown'}`,
+          `- Occupancy: ${capacity.currentOccupancy ?? '?'} / ${capacity.maxCapacity ?? '?'} (${capacity.occupancyPercent ?? '?'}%)`,
+          `- Boarding/admission patients: ${capacity.boardingCount ?? 0}`,
+          `- Reassessment queue: ${capacity.reassessmentQueueLength ?? 0}`,
+          '',
+          '_Capacity visibility only. Human charge/clinical leadership review is required before staffing, bed, admission, transfer, or discharge actions._',
+        ].join('\n'),
+        command: 'capacity_status',
+        edContext,
+      });
+    }
+
+    if (detectedIntent?.intent === 'QUERY_EMS') {
+      const emsPressure = edContext.emsPressure || {};
+      return this.buildEdCopilotResponse({
+        text: [
+          '**EMS situation**',
+          '',
+          `- EMS pressure: ${emsPressure.score ?? 'Unknown'} (${emsPressure.band?.label || 'No label'})`,
+          `- Inbound units: ${emsPressure.incomingUnits ?? 0}`,
+          `- Awaiting handoff: ${emsPressure.awaitingHandoff ?? 0}`,
+          `- Critical pending: ${emsPressure.criticalPending ?? 0}`,
+          '',
+          '_This is operational visibility only. Human review is required before any bay, staffing, transfer, or treatment action._',
+        ].join('\n'),
+        command: 'ems_situation',
+        edContext,
+      });
+    }
+
+    if (detectedIntent?.intent === 'QUERY_HIGH_RISK') {
+      const highRiskPatients = patients.filter((patient) => {
+        const priority = String(patient.priority || '').toUpperCase();
+        return priority.includes('P1') || priority.includes('P2') || priority.includes('CTAS 1') || priority.includes('CTAS 2');
+      });
+      const lines = highRiskPatients.length
+        ? highRiskPatients.map(
+            (patient) =>
+              `- ${patient.name} (${patient.location || 'unassigned'}) - ${patient.priority}, ${patient.state}, ${patient.complaint}`,
+          )
+        : ['No P1/P2 high-risk patients are visible in the current context.'];
+
+      return this.buildEdCopilotResponse({
+        text: `**High-risk patients**\n\n${lines.join('\n')}\n\n_Suggest reviewing P1/P2 patients first. No autonomous clinical decision is made._`,
+        command: 'high_risk_patients',
+        edContext,
+        items: highRiskPatients,
+      });
+    }
+
+    if (detectedIntent?.intent === 'QUERY_REASSESSMENT_QUEUE') {
+      const reassessments = Array.isArray(edContext.flaggedReassessments)
+        ? edContext.flaggedReassessments
+        : [];
+      const lines = reassessments.length
+        ? reassessments.map(
+            (item) =>
+              `- ${item.patientName || item.patientId}: ${(item.reasons || ['Reassessment due']).join(', ')}`,
+          )
+        : ['No reassessment flags are visible in the current context.'];
+
+      return this.buildEdCopilotResponse({
+        text: `**Reassessment queue**\n\n${lines.join('\n')}\n\n_Surface these for human review before any clinical action._`,
+        command: 'reassessment_queue',
+        edContext,
+        items: reassessments,
+      });
+    }
+
+    if (detectedIntent?.intent === 'ACTION_FLAG_REASSESSMENT') {
+      const matchedPatient = patients.find((patient) => patient.id === detectedIntent.patientId);
+      if (!matchedPatient) {
+        return this.buildEdCopilotResponse({
+          text: `**Reassessment flag not applied**\n\nI could not confidently match "${detectedIntent.target || 'that patient'}" to a current whiteboard patient. Please verify the bed or patient identifier.\n\n_No autonomous clinical action was taken._`,
+          command: 'flag_reassessment_unmatched',
+          edContext,
+        });
+      }
+
+      const action = {
+        action: 'FLAG_PATIENT',
+        patientId: matchedPatient.id,
+        flag: 'ReassessmentDue',
+      };
+
+      return this.buildEdCopilotResponse({
+        text: [
+          '**Reassessment flag suggestion**',
+          '',
+          `I suggest flagging ${matchedPatient.name} (${matchedPatient.location || matchedPatient.id}) for human reassessment review.`,
+          '',
+          '```json',
+          JSON.stringify(action),
+          '```',
+          '',
+          '_No action has been applied yet. Please review before accepting._',
+        ].join('\n'),
+        command: 'flag_reassessment',
+        edContext,
+        items: [matchedPatient],
+        whiteboardAction: {
+          type: 'flagReassessment',
+          patientId: matchedPatient.id,
+          target: matchedPatient.id,
+          patientName: matchedPatient.name,
+          reason: 'ED Copilot suggested reassessment flag for human review',
+          requiresHumanReview: true,
+        },
+      });
+    }
+
+    if (detectedIntent?.intent === 'LAUNCH_CALCULATOR') {
+      return this.buildEdCopilotResponse({
+        text: [
+          '**Calculator launch suggestion**',
+          '',
+          `I can open ${detectedIntent.score} for ${detectedIntent.patientName || detectedIntent.patient || 'the selected patient'} for human-entered scoring.`,
+          '',
+          '_Use the calculator as decision support only and verify all inputs._',
+        ].join('\n'),
+        command: 'launch_calculator',
+        edContext,
+        whiteboardAction: {
+          type: 'openCalculator',
+          calculatorId: detectedIntent.score,
+          patientId: detectedIntent.patientId,
+          requiresHumanReview: true,
+        },
+      });
+    }
 
     if (/waiting.*longest|longest.*waiting/.test(lower)) {
       const waiting = [...patients].sort(
@@ -1378,15 +1594,33 @@ export class ChatService {
         });
       }
 
+      const action = {
+        action: 'FLAG_PATIENT',
+        patientId: matchedPatient.id,
+        flag: 'ReassessmentDue',
+      };
+
       return this.buildEdCopilotResponse({
-        text: `**Reassessment flag prepared**\n\nI flagged ${matchedPatient.name} (${matchedPatient.location || matchedPatient.id}) for human reassessment review on the whiteboard.\n\n_No autonomous clinical action was taken._`,
+        text: [
+          '**Reassessment flag suggestion**',
+          '',
+          `I suggest flagging ${matchedPatient.name} (${matchedPatient.location || matchedPatient.id}) for human reassessment review.`,
+          '',
+          '```json',
+          JSON.stringify(action),
+          '```',
+          '',
+          '_No action has been applied yet. Please review before accepting._',
+        ].join('\n'),
         command: 'flag_reassessment',
         edContext,
         items: [matchedPatient],
         whiteboardAction: {
           type: 'flagReassessment',
-          target: matchedPatient.location || matchedPatient.id || target,
-          reason: 'ED Copilot manual reassessment flag for human review',
+          patientId: matchedPatient.id,
+          target: matchedPatient.id || matchedPatient.location || target,
+          patientName: matchedPatient.name,
+          reason: 'ED Copilot suggested reassessment flag for human review',
           requiresHumanReview: true,
         },
       });
@@ -1444,6 +1678,7 @@ export class ChatService {
   private async invokeAnthropicEdCopilot(
     message: string,
     edContext: Record<string, any>,
+    requestMessages?: Array<{ role: string; content: string }>,
   ): Promise<string> {
     const apiKey =
       this.configService.get<string>('ANTHROPIC_API_KEY') ||
@@ -1454,6 +1689,18 @@ export class ChatService {
       this.configService.get<string>('ANTHROPIC_MODEL') ||
       this.configService.get<string>('anthropic.model') ||
       'claude-3-5-sonnet-20241022';
+
+    const systemPrompt =
+      requestMessages?.find((item) => item?.role === 'system' && item.content)?.content ||
+      edContext.systemPrompt;
+    const anthropicMessages =
+      requestMessages
+        ?.filter((item) => item?.role === 'user' || item?.role === 'assistant')
+        .map((item) => ({
+          role: item.role,
+          content: item.content,
+        }))
+        .filter((item) => item.content) || [];
 
     try {
       const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1467,13 +1714,15 @@ export class ChatService {
           model,
           max_tokens: 700,
           temperature: 0.2,
-          system: edContext.systemPrompt,
-          messages: [
-            {
-              role: 'user',
-              content: message,
-            },
-          ],
+          system: systemPrompt,
+          messages: anthropicMessages.length
+            ? anthropicMessages
+            : [
+                {
+                  role: 'user',
+                  content: message,
+                },
+              ],
         }),
       });
 

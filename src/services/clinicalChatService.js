@@ -18,11 +18,12 @@ export function registryIdToChatToolParam(registryId) {
 
 /**
  * POST /api/chat/message — shared by Dashboard, ChatInterface, and tools.
- * @param {{ message: string, tool?: string, feature?: string, conversationId?: number|string, authToken?: string|null, workspaceContext?: object, memoryContext?: object }} params
+ * @param {{ message: string, messages?: Array<{role: string, content: string}>, tool?: string, feature?: string, conversationId?: number|string, authToken?: string|null, workspaceContext?: object, memoryContext?: object }} params
  * @returns {Promise<{ ok: boolean, status: number, data: object }>}
  */
 export async function sendClinicalChatMessage({
   message,
+  messages,
   tool,
   feature,
   conversationId,
@@ -37,6 +38,7 @@ export async function sendClinicalChatMessage({
 
   const body = {
     message,
+    ...(Array.isArray(messages) && messages.length ? { messages } : {}),
     ...(tool ? { tool } : {}),
     ...(feature ? { feature } : {}),
     knowledgeBaseContext: buildKnowledgeBaseAssistantContext(message),

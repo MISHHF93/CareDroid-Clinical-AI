@@ -113,25 +113,37 @@ export interface Note {
 
 export type ReferralStatus =
   | 'Draft'
-  | 'Pending'
   | 'Sent'
+  | 'Acknowledged'
   | 'Accepted'
   | 'Declined'
-  | 'Completed'
-  | 'Cancelled';
+  | 'Completed';
+
+export type ReferralDepartment =
+  | 'Cardiology'
+  | 'Neurology'
+  | 'Psychiatry'
+  | 'Internal Medicine'
+  | 'Surgery'
+  | 'ICU'
+  | 'Radiology'
+  | 'Other';
+
+export type ReferralUrgency = 'Routine' | 'Urgent' | 'Emergent';
 
 export interface Referral {
   id: EntityId;
   patientId: EntityId;
-  destinationService: string;
-  destinationFacility?: string;
+  requestingStaffId: EntityId;
+  targetDepartment: ReferralDepartment;
+  urgency: ReferralUrgency;
   reason: string;
+  clinicalSummary: string;
   status: ReferralStatus;
-  requestedByStaffId: EntityId;
   requestedAt: ISODateString;
   respondedAt?: ISODateString;
-  acceptedByStaffId?: EntityId;
-  notes?: string;
+  completedAt?: ISODateString;
+  responseNote?: string;
 }
 
 export type EMSArrivalStatus = 'Inbound' | 'Arrived' | 'Handoff' | 'Complete' | 'Cancelled';
@@ -226,6 +238,29 @@ export interface BottleneckAlert {
   detectedAt: ISODateString;
 }
 
+export type AlertSeverity = 'Info' | 'Warning' | 'Critical';
+
+export type AlertType =
+  | 'Reassessment'
+  | 'Capacity'
+  | 'EMS'
+  | 'Referral'
+  | 'Queue';
+
+export interface Alert {
+  id: EntityId;
+  type: AlertType;
+  severity: AlertSeverity;
+  title: string;
+  message: string;
+  patientId?: EntityId;
+  actionLabel?: string;
+  actionType?: string;
+  createdAt: ISODateString;
+  dismissedAt?: ISODateString;
+  autoDismissAfter?: number;
+}
+
 export type StaffRole =
   | 'Attending'
   | 'Resident'
@@ -294,14 +329,27 @@ export interface EMSUnit {
   lastKnownLocation?: string;
 }
 
-export type CapacityRiskLevel = 'Stable' | 'Warning' | 'Critical';
+export type CapacityRiskLevel = 'Green' | 'Yellow' | 'Orange' | 'Red';
+export type CapacityStatusLabel =
+  | 'Capacity Normal'
+  | 'Capacity Moderate'
+  | 'Capacity Strained'
+  | 'Capacity Critical';
+
+export interface CapacityScoreDeduction {
+  id: string;
+  label: string;
+  value: number;
+}
 
 export interface CapacitySnapshot {
   id: EntityId;
   generatedAt: ISODateString;
+  totalActivePatients: number;
   currentOccupancy: number;
   maxCapacity: number;
   occupancyPercent: number;
+  occupancyOveragePatients: number;
   waitingCount: number;
   triageCount: number;
   assessmentCount: number;
@@ -313,8 +361,15 @@ export interface CapacitySnapshot {
   staffedRoomCount: number;
   availableRoomCount: number;
   reassessmentDueCount: number;
+  incomingEMSCount: number;
+  incomingEMSCriticalCount: number;
+  dischargeReadyCount: number;
+  dischargesPast60Minutes: number;
+  hasRecentDischarge: boolean;
   longestWaitMinutes: number;
   averageWaitMinutes: number;
   riskLevel: CapacityRiskLevel;
+  label: CapacityStatusLabel;
+  deductions: CapacityScoreDeduction[];
   score: number;
 }

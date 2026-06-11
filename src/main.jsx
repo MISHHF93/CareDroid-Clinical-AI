@@ -12,6 +12,7 @@ import {
   startEmergencyReassessment,
   stopEmergencyReassessment,
 } from '../engine/reassessmentEngine';
+import { startCapacityIntelligence, stopCapacityIntelligence } from '../engine/capacityEngine';
 import { startEmergencySimulation, stopEmergencySimulation } from '../engine/simulation';
 
 import './index.css';
@@ -56,11 +57,13 @@ scheduleDeferredStartupTasks();
 
 startEmergencySimulation();
 startEmergencyReassessment();
+startCapacityIntelligence();
 
 if (import.meta.hot) {
   import.meta.hot.dispose(() => {
     stopEmergencySimulation();
     stopEmergencyReassessment();
+    stopCapacityIntelligence();
   });
 }
 

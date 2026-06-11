@@ -113,6 +113,7 @@ describe('ChatInterface NLU integration', () => {
       role: 'assistant',
       content: 'Assistant reply',
     });
+    flagPatientForReassessment.mockReturnValue({ ok: true, message: 'Flag applied' });
   });
 
   it('renders composer and sends message via clinicalChatService', async () => {
@@ -184,9 +185,170 @@ describe('ChatInterface NLU integration', () => {
       capacitySnapshot: expect.objectContaining({ score: 'Yellow' }),
     });
     expect(payload.workspaceContext.edCopilot.systemPrompt).toMatch(/Never suggest autonomous clinical decisions/i);
+    expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
+      intent: 'FILTER_BY_COMPLAINT',
+      value: 'chest pain',
+    });
+    expect(payload.messages[0]).toMatchObject({ role: 'system' });
+    expect(payload.messages[0].content).toMatch(/Detected structured command intent/);
+    expect(payload.messages[0].content).toMatch(/FILTER_BY_COMPLAINT/);
     expect(payload.workspaceContext.edCopilot.queueHealth[0]).toHaveProperty('health');
     expect(payload.workspaceContext.edCopilot.flaggedReassessments).toHaveLength(1);
     expect(setWhiteboardFilter).toHaveBeenCalledWith({ queue: null, complaint: 'chest' });
+  });
+
+  it('renders reassessment action JSON as a confirmable card', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ChatInterface
+        messages={[
+          {
+            id: 'assistant-action-1',
+            role: 'assistant',
+            content:
+              'I suggest flagging Maya Chen for reassessment.\n\n```json\n{"action":"FLAG_PATIENT","patientId":"tor-uc-001","flag":"ReassessmentDue"}\n```',
+          },
+        ]}
+        onAppendMessage={onAppendMessage}
+      />,
+    );
+
+    expect(screen.getByText(/apply this action/i)).toBeInTheDocument();
+    expect(flagPatientForReassessment).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole('button', { name: /yes/i }));
+
+    expect(flagPatientForReassessment).toHaveBeenCalledWith('tor-uc-001', 'ReassessmentDue');
+    expect(screen.getByText(/applied/i)).toBeInTheDocument();
+  });
+
+  it('does not auto-apply reassessment whiteboard actions from assistant responses', async () => {
+    activeWorkspaceId = 'emergency';
+    const user = userEvent.setup();
+    mapChatResponseToAssistantMessage.mockReturnValue({
+      id: 'assistant-action-2',
+      role: 'assistant',
+      content:
+        'I suggest flagging Maya Chen for reassessment.\n\n```json\n{"action":"FLAG_PATIENT","patientId":"tor-uc-001","flag":"ReassessmentDue"}\n```',
+      metadata: {
+        whiteboardAction: {
+          type: 'flagReassessment',
+          patientId: 'tor-uc-001',
+          reason: 'ED Copilot suggested reassessment flag for human review',
+        },
+      },
+    });
+
+    render(
+      <ChatInterface
+        currentTool={null}
+        conversationId="conv-ed"
+        messages={[]}
+        onAppendMessage={onAppendMessage}
+        authToken="test-token"
+      />,
+    );
+
+    await user.type(screen.getByRole('textbox'), 'Flag Maya Chen for reassessment');
+    await user.keyboard('{Enter}');
+
+    await waitFor(() => {
+      expect(sendClinicalChatMessage).toHaveBeenCalled();
+    });
+
+    expect(flagPatientForReassessment).not.toHaveBeenCalled();
+    const payload = sendClinicalChatMessage.mock.calls[0][0];
+    expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
+      intent: 'ACTION_FLAG_REASSESSMENT',
+      target: 'Maya Chen',
+    });
+  });
+
+  it('quick-sends ED Copilot actions with structured intents', async () => {
+    activeWorkspaceId = 'emergency';
+    const user = userEvent.setup();
+
+    render(
+      <ChatInterface
+        currentTool={null}
+        conversationId="conv-ed"
+        messages={[]}
+        onAppendMessage={onAppendMessage}
+        authToken="test-token"
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: /ems update/i }));
+
+    await waitFor(() => {
+      expect(sendClinicalChatMessage).toHaveBeenCalled();
+    });
+
+    const payload = sendClinicalChatMessage.mock.calls[0][0];
+    expect(payload.message).toBe('EMS update');
+    expect(payload.workspaceContext.edCopilot.detectedIntent).toMatchObject({
+      intent: 'QUERY_EMS',
+    });
+  });
+
+  it('shows Copilot unavailable retry state on API failure', async () => {
+    const user = userEvent.setup();
+    sendClinicalChatMessage.mockResolvedValueOnce({ ok: false, status: 503, data: {} });
+
+    render(
+      <ChatInterface
+        currentTool={null}
+        conversationId="conv-1"
+        messages={[]}
+        onAppendMessage={onAppendMessage}
+        authToken="test-token"
+      />,
+    );
+
+    await user.type(screen.getByRole('textbox'), 'Capacity status');
+    await user.keyboard('{Enter}');
+
+    await waitFor(() => {
+      expect(onAppendMessage).toHaveBeenCalledWith(
+        'conv-1',
+        expect.objectContaining({
+          content: 'Copilot unavailable — check connection',
+          metadata: expect.objectContaining({ isCopilotError: true }),
+        }),
+      );
+    });
+  });
+
+  it('renders retry button on Copilot error messages', async () => {
+    const user = userEvent.setup();
+
+    render(
+      <ChatInterface
+        currentTool={null}
+        conversationId="conv-1"
+        messages={[
+          {
+            id: 'error-1',
+            role: 'assistant',
+            content: 'Copilot unavailable — check connection',
+            metadata: {
+              isCopilotError: true,
+              retryMessage: 'Capacity status',
+            },
+          },
+        ]}
+        onAppendMessage={onAppendMessage}
+        authToken="test-token"
+      />,
+    );
+
+    await user.click(screen.getByRole('button', { name: /retry/i }));
+
+    await waitFor(() => {
+      expect(sendClinicalChatMessage).toHaveBeenCalled();
+    });
+    expect(sendClinicalChatMessage.mock.calls[0][0]).toMatchObject({ message: 'Capacity status' });
   });
 
   it('focuses the ED Copilot composer when / is pressed in emergency workspace', () => {

@@ -1,0 +1,192 @@
+.command-palette__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal, 1000);
+  display: grid;
+  place-items: start center;
+  padding-top: min(14vh, 120px);
+  background: rgba(0, 0, 0, 0.52);
+  backdrop-filter: blur(6px);
+}
+
+.command-palette {
+  position: relative;
+  display: grid;
+  width: min(600px, calc(100vw - 32px));
+  max-height: min(680px, 82vh);
+  overflow: hidden;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: 18px;
+  background: var(--color-elevated);
+  color: var(--color-text-primary);
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.48);
+}
+
+.command-palette__search {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: center;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border-subtle);
+}
+
+.command-palette__search input {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  font-size: var(--font-size-base);
+  outline: none;
+}
+
+.command-palette__search button,
+.command-palette__flag-dialog button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.command-palette__body {
+  display: grid;
+  gap: 4px;
+  padding: var(--space-2);
+  overflow-y: auto;
+}
+
+.command-palette__eyebrow {
+  padding: var(--space-1) var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.command-palette__item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  min-height: 46px;
+  padding: 0 var(--space-3);
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  color: var(--color-text-primary);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.command-palette__item--active,
+.command-palette__item:hover,
+.command-palette__item:focus-visible {
+  border-color: color-mix(in srgb, var(--status-info) 42%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 12%, var(--color-surface));
+  outline: none;
+}
+
+.command-palette__item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-palette__item kbd {
+  min-width: 34px;
+  padding: 3px 7px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.command-palette__body p {
+  margin: var(--space-3);
+  color: var(--color-text-muted);
+}
+
+.command-palette__flag-dialog {
+  position: absolute;
+  inset-inline: var(--space-3);
+  inset-block-end: var(--space-3);
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--status-warning) 38%, var(--color-border-default));
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.36);
+}
+
+.command-palette__flag-dialog strong {
+  color: var(--color-text-primary);
+}
+
+.command-palette__flag-dialog select {
+  min-height: 36px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-elevated);
+  color: var(--color-text-primary);
+  font: inherit;
+}
+
+.command-palette__flag-dialog > div {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+@media (max-width: 1024px) {
+  .command-palette__overlay {
+    place-items: end center;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.36);
+    backdrop-filter: blur(10px);
+  }
+
+  .command-palette {
+    width: 100%;
+    max-height: min(78vh, 720px);
+    border-inline: 0;
+    border-bottom: 0;
+    border-radius: 22px 22px 0 0;
+  }
+
+  .command-palette::before {
+    justify-self: center;
+    width: 48px;
+    height: 5px;
+    margin-top: 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--color-text-muted) 50%, transparent);
+    content: '';
+  }
+
+  .command-palette__search {
+    padding-block: var(--space-3);
+  }
+
+  .command-palette__search button,
+  .command-palette__flag-dialog button,
+  .command-palette__item {
+    min-height: 44px;
+  }
+}

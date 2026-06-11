@@ -1,9 +1,12 @@
 import { create } from 'zustand';
+import { deriveAlerts } from '../engine/alertEngine';
 import {
   PatientState,
   Priority,
+  type Alert,
   type BottleneckAlert,
   type CapacityRiskLevel,
+  type CapacityScoreDeduction,
   type CapacitySnapshot,
   type EMSArrival,
   type EMSUnit,
@@ -16,6 +19,7 @@ import {
   type Queue,
   type QueueType,
   type Referral,
+  type ReferralStatus,
   type Room,
   type Sex,
   type Shift,
@@ -26,6 +30,17 @@ import {
 type PatientPatch = Partial<Omit<Patient, 'id'>>;
 type PatientFlagDetails = Partial<Pick<PatientFlag, 'reason' | 'detectedAt' | 'severity'>>;
 type PatientFlagInput = PatientFlag | PatientFlagType;
+type ReferralCreateInput = Pick<
+  Referral,
+  | 'patientId'
+  | 'requestingStaffId'
+  | 'targetDepartment'
+  | 'urgency'
+  | 'reason'
+  | 'clinicalSummary'
+> & {
+  status?: Extract<ReferralStatus, 'Draft' | 'Sent'>;
+};
 
 interface EmergencyStoreState {
   patients: Patient[];
@@ -37,9 +52,11 @@ interface EmergencyStoreState {
   emsUnits: EMSUnit[];
   emsArrivals: EMSArrival[];
   referrals: Referral[];
+  alerts: Alert[];
   selectedPatientId: string | null;
   copilotOpen: boolean;
   activeQueueFilter: QueueType | null;
+  whiteboardSearchQuery: string;
   bottleneckAlert: BottleneckAlert | null;
   addPatient: (patient: Patient) => void;
   updatePatient: (id: string, patch: PatientPatch) => void;
@@ -55,7 +72,16 @@ interface EmergencyStoreState {
   selectPatient: (id: string | null) => void;
   toggleCopilot: () => void;
   setQueueFilter: (type: QueueType | null) => void;
+  setWhiteboardSearchQuery: (query: string) => void;
   setBottleneckAlert: (alert: BottleneckAlert | null) => void;
+  updateAlerts: () => void;
+  dismissAlert: (alertId: string) => void;
+  createReferral: (input: ReferralCreateInput) => void;
+  updateReferralStatus: (
+    referralId: string,
+    status: ReferralStatus,
+    responseNote?: string
+  ) => void;
   addEMSArrival: (arrival: EMSArrival) => void;
   updateEMSArrival: (id: string, patch: Partial<EMSArrival>) => void;
   prepareEMSBay: (arrivalId: string) => void;
@@ -123,7 +149,7 @@ const QUEUE_LABELS: Record<QueueType, string> = {
 };
 
 const isOpenReferral = (referral?: Referral): boolean =>
-  Boolean(referral && !['Completed', 'Cancelled', 'Declined'].includes(referral.status));
+  Boolean(referral && !['Completed', 'Declined'].includes(referral.status));
 
 const isActivePatient = (patient: Patient): boolean =>
   patient.state !== PatientState.Discharge && patient.state !== PatientState.Deceased;
@@ -213,7 +239,6 @@ const seedFlag = (type: PatientFlagType, reason?: string): PatientFlag =>
 
 const patientMatchesQueue = (patient: Patient, type: QueueType): boolean => {
   if (type === 'Reassessment') return hasPatientFlag(patient, 'ReassessmentDue');
-  if (type === 'Referral') return isOpenReferral(patient.referral);
   if (type === 'Provider') {
     return patient.state === PatientState.Assessment || patient.state === PatientState.Orders;
   }
@@ -233,10 +258,33 @@ const patientMatchesQueue = (patient: Patient, type: QueueType): boolean => {
   return patient.state === type;
 };
 
-const computeQueues = (patients: Patient[]): Queue[] => {
+const computeQueues = (patients: Patient[], referrals: Referral[] = []): Queue[] => {
   const now = new Date();
 
   return QUEUE_TYPES.map((type) => {
+    if (type === 'Referral') {
+      const activeReferrals = referrals.filter(isOpenReferral);
+      const patientById = new Map(patients.map((patient) => [patient.id, patient]));
+      const waits = activeReferrals.map((referral) => minutesSince(referral.requestedAt, now));
+      const totalWait = waits.reduce((sum, wait) => sum + wait, 0);
+
+      return {
+        id: `queue-${type.toLowerCase()}`,
+        type,
+        name: QUEUE_LABELS[type],
+        patientIds: activeReferrals.map((referral) => referral.patientId),
+        targetWaitMinutes: QUEUE_TARGET_WAIT_MINUTES[type],
+        averageWaitMinutes: activeReferrals.length
+          ? Math.round(totalWait / activeReferrals.length)
+          : 0,
+        longestWaitMinutes: waits.length ? Math.max(...waits) : 0,
+        criticalCount: activeReferrals.filter(
+          (referral) => patientById.get(referral.patientId)?.priority === Priority.P1
+        ).length,
+        updatedAt: now.toISOString(),
+      };
+    }
+
     const queuedPatients = patients.filter((patient) => patientMatchesQueue(patient, type));
     const waits = queuedPatients.map((patient) => minutesSince(patient.arrivalTime, now));
     const totalWait = waits.reduce((sum, wait) => sum + wait, 0);
@@ -255,69 +303,154 @@ const computeQueues = (patients: Patient[]): Queue[] => {
   });
 };
 
-const computeCapacity = (patients: Patient[], rooms: Room[]): CapacitySnapshot => {
+const capacityBandForScore = (
+  score: number
+): { riskLevel: CapacityRiskLevel; label: CapacitySnapshot['label'] } => {
+  if (score >= 80) return { riskLevel: 'Green', label: 'Capacity Normal' };
+  if (score >= 60) return { riskLevel: 'Yellow', label: 'Capacity Moderate' };
+  if (score >= 40) return { riskLevel: 'Orange', label: 'Capacity Strained' };
+  return { riskLevel: 'Red', label: 'Capacity Critical' };
+};
+
+const hasDischargeEventInPast60Minutes = (patient: Patient, now: Date): boolean =>
+  patient.timeline.some((event) => {
+    const eventTime = new Date(event.timestamp).getTime();
+    if (!Number.isFinite(eventTime)) return false;
+    if (now.getTime() - eventTime > 60 * 60_000) return false;
+    return (
+      event.toState === PatientState.Discharge ||
+      event.to === PatientState.Discharge ||
+      event.summary.toLowerCase().includes('discharged')
+    );
+  });
+
+const computeCapacity = (
+  patients: Patient[],
+  rooms: Room[],
+  emsArrivals: EMSArrival[] = []
+): CapacitySnapshot => {
+  const now = new Date();
   const activePatients = patients.filter(isActivePatient);
+  const totalActivePatients = activePatients.length;
   const maxCapacity = rooms.length;
-  const currentOccupancy = activePatients.length;
-  const occupancyPercent = Math.round((currentOccupancy / maxCapacity) * 100);
+  const occupiedRoomCount = rooms.filter(
+    (room) => room.status === 'Occupied' || room.currentPatientId !== null
+  ).length;
+  const occupancyPercent = maxCapacity ? Math.round((occupiedRoomCount / maxCapacity) * 100) : 0;
+  const occupancyThreshold = Math.floor(maxCapacity * 0.8);
+  const occupancyOveragePatients = Math.max(0, occupiedRoomCount - occupancyThreshold);
   const waitingPatients = patients.filter((patient) => patient.state === PatientState.Waiting);
+  const boardingPatients = patients.filter((patient) => patient.state === PatientState.Admission);
+  const reassessmentQueue = patients.filter((patient) => hasPatientFlag(patient, 'ReassessmentDue'));
+  const incomingEMS = emsArrivals.filter((arrival) => arrival.status === 'Inbound');
+  const incomingEMSCriticalCount = incomingEMS.filter((arrival) => arrival.severity === 'Critical').length;
+  const dischargeReadyCount = patients.filter((patient) => patient.state === PatientState.Disposition)
+    .length;
+  const dischargesPast60Minutes = patients.filter((patient) =>
+    hasDischargeEventInPast60Minutes(patient, now)
+  ).length;
+  const deductions: CapacityScoreDeduction[] = [];
+
+  if (occupancyOveragePatients > 0) {
+    deductions.push({
+      id: 'room-occupancy-over-80',
+      label: `${occupancyOveragePatients} patient${occupancyOveragePatients === 1 ? '' : 's'} over 80% room occupancy`,
+      value: occupancyOveragePatients * 5,
+    });
+  }
+
+  if (boardingPatients.length > 0) {
+    deductions.push({
+      id: 'boarding-patients',
+      label: `${boardingPatients.length} boarding patient${boardingPatients.length === 1 ? '' : 's'}`,
+      value: boardingPatients.length * 8,
+    });
+  }
+
+  if (reassessmentQueue.length > 3) {
+    deductions.push({
+      id: 'reassessment-queue',
+      label: 'Reassessment queue over 3 patients',
+      value: 10,
+    });
+  }
+
+  if (incomingEMSCriticalCount > 0) {
+    deductions.push({
+      id: 'incoming-critical-ems',
+      label: `${incomingEMSCriticalCount} incoming critical EMS case${incomingEMSCriticalCount === 1 ? '' : 's'}`,
+      value: incomingEMSCriticalCount * 5,
+    });
+  }
+
+  if (dischargesPast60Minutes === 0) {
+    deductions.push({
+      id: 'no-recent-discharges',
+      label: 'No discharges in past 60 minutes',
+      value: 10,
+    });
+  }
+
+  const totalDeductions = deductions.reduce((sum, deduction) => sum + deduction.value, 0);
+  const score = Math.max(0, Math.min(100, 100 - totalDeductions));
+  const band = capacityBandForScore(score);
   const longestWaitMinutes = Math.max(
     0,
-    ...waitingPatients.map((patient) => minutesSince(patient.arrivalTime))
+    ...waitingPatients.map((patient) => minutesSince(patient.arrivalTime, now))
   );
   const averageWaitMinutes = waitingPatients.length
     ? Math.round(
-        waitingPatients.reduce((sum, patient) => sum + minutesSince(patient.arrivalTime), 0) /
+        waitingPatients.reduce((sum, patient) => sum + minutesSince(patient.arrivalTime, now), 0) /
           waitingPatients.length
       )
     : 0;
-  const score = Math.min(
-    100,
-    Math.round(
-      occupancyPercent +
-        patients.filter((patient) => patient.state === PatientState.Admission).length * 4 +
-        patients.filter((patient) => hasPatientFlag(patient, 'ReassessmentDue')).length * 3 +
-        patients.filter((patient) => patient.emsArrival?.status === 'Inbound').length * 5
-    )
-  );
-  const riskLevel: CapacityRiskLevel =
-    score >= 85 ? 'Critical' : score >= 65 ? 'Warning' : 'Stable';
 
   return {
     id: 'capacity-current',
-    generatedAt: new Date().toISOString(),
-    currentOccupancy,
+    generatedAt: now.toISOString(),
+    totalActivePatients,
+    currentOccupancy: occupiedRoomCount,
     maxCapacity,
     occupancyPercent,
+    occupancyOveragePatients,
     waitingCount: waitingPatients.length,
     triageCount: patients.filter((patient) => patient.state === PatientState.Triage).length,
     assessmentCount: patients.filter((patient) => patient.state === PatientState.Assessment).length,
-    boardingCount: patients.filter((patient) => patient.state === PatientState.Admission).length,
+    boardingCount: boardingPatients.length,
     admissionPendingCount: patients.filter((patient) => hasPatientFlag(patient, 'PendingAdmission'))
       .length,
-    dischargePendingCount: patients.filter((patient) => patient.state === PatientState.Disposition)
-      .length,
-    emsInboundCount: patients.filter((patient) => patient.emsArrival?.status === 'Inbound').length,
+    dischargePendingCount: dischargeReadyCount,
+    emsInboundCount: incomingEMS.length,
     isolationRequiredCount: patients.filter((patient) => hasPatientFlag(patient, 'Isolation'))
       .length,
-    staffedRoomCount: rooms.filter((room) => room.currentPatientId !== null).length,
+    staffedRoomCount: occupiedRoomCount,
     availableRoomCount: rooms.filter((room) => room.status === 'Available').length,
-    reassessmentDueCount: patients.filter((patient) => hasPatientFlag(patient, 'ReassessmentDue'))
-      .length,
+    reassessmentDueCount: reassessmentQueue.length,
+    incomingEMSCount: incomingEMS.length,
+    incomingEMSCriticalCount,
+    dischargeReadyCount,
+    dischargesPast60Minutes,
+    hasRecentDischarge: dischargesPast60Minutes > 0,
     longestWaitMinutes,
     averageWaitMinutes,
-    riskLevel,
+    riskLevel: band.riskLevel,
+    label: band.label,
+    deductions,
     score,
   };
 };
 
 const deriveOperationalState = (
   patients: Patient[],
-  rooms: Room[]
+  rooms: Room[],
+  referrals: Referral[] = [],
+  emsArrivals: EMSArrival[] = []
 ): Pick<EmergencyStoreState, 'queues' | 'capacity'> => ({
-  queues: computeQueues(patients),
-  capacity: computeCapacity(patients, rooms),
+  queues: computeQueues(patients, referrals),
+  capacity: computeCapacity(patients, rooms, emsArrivals),
 });
+
+let operationalRefreshTimer: ReturnType<typeof setTimeout> | null = null;
 
 const updatePatients = (
   patients: Patient[],
@@ -325,8 +458,15 @@ const updatePatients = (
   updater: (patient: Patient) => Patient
 ): Patient[] => patients.map((patient) => (patient.id === patientId ? updater(patient) : patient));
 
-const referralsFromPatients = (patients: Patient[]): Referral[] =>
-  patients.flatMap((patient) => (patient.referral ? [patient.referral] : []));
+const syncReferralsFromPatients = (patients: Patient[], referrals: Referral[]): Referral[] => {
+  const byId = new Map(referrals.map((referral) => [referral.id, referral]));
+  patients.forEach((patient) => {
+    if (patient.referral) {
+      byId.set(patient.referral.id, patient.referral);
+    }
+  });
+  return [...byId.values()];
+};
 
 const mockStaff: Staff[] = [
   {
@@ -487,26 +627,29 @@ const mockRooms: Room[] = [
 const referralPt008: Referral = {
   id: 'ref-pt-008',
   patientId: 'pt-008',
-  destinationService: 'Orthopedics',
-  destinationFacility: "St. Michael's Hospital Fracture Clinic",
+  requestingStaffId: 'staff-priya-nair',
+  targetDepartment: 'Surgery',
+  urgency: 'Urgent',
   reason: 'Distal radius fracture review after fall near Queen Station.',
-  status: 'Pending',
-  requestedByStaffId: 'staff-priya-nair',
+  clinicalSummary:
+    '40F with wrist deformity after fall. Vitals stable, pain 6/10, X-ray reviewed and splinted. Orthopedic review requested.',
+  status: 'Sent',
   requestedAt: '2026-06-10T16:45:00-04:00',
-  notes: 'X-ray reviewed; splinted, awaiting ortho callback.',
 };
 
 const referralPt011: Referral = {
   id: 'ref-pt-011',
   patientId: 'pt-011',
-  destinationService: 'General Internal Medicine',
-  destinationFacility: 'Toronto General Hospital',
+  requestingStaffId: 'staff-priya-nair',
+  targetDepartment: 'Internal Medicine',
+  urgency: 'Urgent',
   reason: 'Admission request for persistent COPD exacerbation requiring oxygen.',
+  clinicalSummary:
+    '66M with COPD exacerbation, SpO2 91%, RR 26, persistent oxygen requirement after EMS nebulizer. Admission requested for ongoing respiratory care.',
   status: 'Accepted',
-  requestedByStaffId: 'staff-priya-nair',
   requestedAt: '2026-06-10T15:25:00-04:00',
   respondedAt: '2026-06-10T17:05:00-04:00',
-  acceptedByStaffId: 'staff-priya-nair',
+  responseNote: 'Accepted to General Internal Medicine when monitored bed is available.',
 };
 
 const note = (
@@ -1180,7 +1323,16 @@ const mockActiveShift: Shift = {
   handoffNotes: [],
 };
 
-const initialDerived = deriveOperationalState(mockPatients, mockRooms);
+const mockReferrals = syncReferralsFromPatients(mockPatients, []);
+const initialDerived = deriveOperationalState(mockPatients, mockRooms, mockReferrals, mockEMSArrivals);
+const initialAlerts = deriveAlerts({
+  patients: mockPatients,
+  capacity: initialDerived.capacity,
+  emsArrivals: mockEMSArrivals,
+  referrals: mockReferrals,
+  queues: initialDerived.queues,
+  bottleneckAlert: null,
+});
 
 export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
   patients: mockPatients,
@@ -1191,29 +1343,33 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
   activeShift: mockActiveShift,
   emsUnits: mockEMSUnits,
   emsArrivals: mockEMSArrivals,
-  referrals: referralsFromPatients(mockPatients),
+  referrals: mockReferrals,
+  alerts: initialAlerts,
   selectedPatientId: 'pt-001',
   copilotOpen: true,
   activeQueueFilter: null,
+  whiteboardSearchQuery: '',
   bottleneckAlert: null,
 
   addPatient: (patient) =>
     set((state) => {
       const patients = [...state.patients, patient];
+      const referrals = syncReferralsFromPatients(patients, state.referrals);
       return {
         patients,
-        referrals: referralsFromPatients(patients),
-        ...deriveOperationalState(patients, state.rooms),
+        referrals,
+        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals),
       };
     }),
 
   updatePatient: (id, patch) =>
     set((state) => {
       const patients = updatePatients(state.patients, id, (patient) => ({ ...patient, ...patch }));
+      const referrals = syncReferralsFromPatients(patients, state.referrals);
       return {
         patients,
-        referrals: referralsFromPatients(patients),
-        ...deriveOperationalState(patients, state.rooms),
+        referrals,
+        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals),
       };
     }),
 
@@ -1250,13 +1406,15 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           : member
       );
 
+      const referrals = syncReferralsFromPatients(patients, state.referrals);
+
       return {
         patients,
         rooms,
         staff,
         selectedPatientId: state.selectedPatientId === id ? null : state.selectedPatientId,
-        referrals: referralsFromPatients(patients),
-        ...deriveOperationalState(patients, rooms),
+        referrals,
+        ...deriveOperationalState(patients, rooms, referrals, state.emsArrivals),
       };
     }),
 
@@ -1273,7 +1431,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           }),
         ],
       }));
-      return { patients, ...deriveOperationalState(patients, state.rooms) };
+      return { patients, ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals) };
     }),
 
   assignStaff: (patientId, staffId) =>
@@ -1303,7 +1461,11 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
         return member;
       });
 
-      return { patients, staff, ...deriveOperationalState(patients, state.rooms) };
+      return {
+        patients,
+        staff,
+        ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals),
+      };
     }),
 
   assignRoom: (patientId, roomId) =>
@@ -1328,7 +1490,11 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
         return room;
       });
 
-      return { patients, rooms, ...deriveOperationalState(patients, rooms) };
+      return {
+        patients,
+        rooms,
+        ...deriveOperationalState(patients, rooms, state.referrals, state.emsArrivals),
+      };
     }),
 
   addFlag: (patientId, flag, details) =>
@@ -1351,7 +1517,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           ],
         };
       });
-      return { patients, ...deriveOperationalState(patients, state.rooms) };
+      return { patients, ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals) };
     }),
 
   removeFlag: (patientId, flag) =>
@@ -1371,7 +1537,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           ],
         };
       });
-      return { patients, ...deriveOperationalState(patients, state.rooms) };
+      return { patients, ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals) };
     }),
 
   addVitals: (patientId, nextVitals) =>
@@ -1404,7 +1570,7 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           }),
         ],
       }));
-      return { patients, ...deriveOperationalState(patients, state.rooms) };
+      return { patients, ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals) };
     }),
 
   addNote: (patientId, noteToAdd) =>
@@ -1419,14 +1585,29 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
           }),
         ],
       }));
-      return { patients, ...deriveOperationalState(patients, state.rooms) };
+      return { patients, ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals) };
     }),
 
   updateCapacity: () =>
-    set((state) => ({
-      capacity: computeCapacity(state.patients, state.rooms),
-      queues: computeQueues(state.patients),
-    })),
+    set((state) => {
+      if (operationalRefreshTimer) {
+        clearTimeout(operationalRefreshTimer);
+      }
+
+      operationalRefreshTimer = setTimeout(() => {
+        useEmergencyStore.setState((latestState) => ({
+          capacity: computeCapacity(
+            latestState.patients,
+            latestState.rooms,
+            latestState.emsArrivals
+          ),
+          queues: computeQueues(latestState.patients, latestState.referrals),
+        }));
+        operationalRefreshTimer = null;
+      }, 100);
+
+      return state;
+    }),
 
   selectPatient: (id) => set({ selectedPatientId: id }),
 
@@ -1434,36 +1615,160 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
 
   setQueueFilter: (type) => set({ activeQueueFilter: type }),
 
+  setWhiteboardSearchQuery: (query) => set({ whiteboardSearchQuery: query }),
+
   setBottleneckAlert: (alert) => set({ bottleneckAlert: alert }),
 
-  addEMSArrival: (arrival) =>
+  updateAlerts: () =>
     set((state) => ({
-      emsArrivals: [...state.emsArrivals, arrival],
-      emsUnits: state.emsUnits.some((unit) => unit.id === arrival.unitId)
-        ? state.emsUnits.map((unit) =>
-            unit.id === arrival.unitId
-              ? { ...unit, status: 'Inbound', activeArrivalId: arrival.id }
-              : unit
-          )
-        : [
-            ...state.emsUnits,
-            {
-              id: arrival.unitId,
-              callSign: arrival.unitName,
-              agency: 'Toronto Paramedic Services',
-              status: 'Inbound',
-              crewStaffIds: [],
-              activeArrivalId: arrival.id,
-            },
-          ],
-    })),
-
-  updateEMSArrival: (id, patch) =>
-    set((state) => ({
-      emsArrivals: state.emsArrivals.map((arrival) =>
-        arrival.id === id ? { ...arrival, ...patch } : arrival
+      alerts: deriveAlerts(
+        {
+          patients: state.patients,
+          capacity: state.capacity,
+          emsArrivals: state.emsArrivals,
+          referrals: state.referrals,
+          queues: state.queues,
+          bottleneckAlert: state.bottleneckAlert,
+        },
+        state.alerts
       ),
     })),
+
+  dismissAlert: (alertId) =>
+    set((state) => ({
+      alerts: state.alerts.map((alert) =>
+        alert.id === alertId && !alert.dismissedAt
+          ? { ...alert, dismissedAt: new Date().toISOString() }
+          : alert
+      ),
+    })),
+
+  createReferral: (input) =>
+    set((state) => {
+      const now = new Date().toISOString();
+      const referral: Referral = {
+        id: `ref-${input.patientId}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        patientId: input.patientId,
+        requestingStaffId: input.requestingStaffId,
+        targetDepartment: input.targetDepartment,
+        urgency: input.urgency,
+        reason: input.reason,
+        clinicalSummary: input.clinicalSummary,
+        status: input.status || 'Sent',
+        requestedAt: now,
+      };
+      const referrals = [...state.referrals, referral];
+      const patients = updatePatients(state.patients, input.patientId, (patient) => ({
+        ...patient,
+        referral,
+        timeline: [
+          ...patient.timeline,
+          actionEvent(
+            patient.id,
+            'ReferralCreated',
+            `${referral.status === 'Draft' ? 'Drafted' : 'Sent'} ${referral.targetDepartment} referral.`,
+            {
+              actorStaffId: referral.requestingStaffId,
+              metadata: {
+                referralId: referral.id,
+                targetDepartment: referral.targetDepartment,
+                urgency: referral.urgency,
+                status: referral.status,
+              },
+            }
+          ),
+        ],
+      }));
+
+      return {
+        patients,
+        referrals,
+        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals),
+      };
+    }),
+
+  updateReferralStatus: (referralId, nextStatus, responseNote) =>
+    set((state) => {
+      const existing = state.referrals.find((referral) => referral.id === referralId);
+      if (!existing) return state;
+
+      const now = new Date().toISOString();
+      const timestampPatch: Partial<Referral> = {};
+      if (nextStatus === 'Sent') timestampPatch.requestedAt = now;
+      if (['Acknowledged', 'Accepted', 'Declined'].includes(nextStatus)) {
+        timestampPatch.respondedAt = existing.respondedAt || now;
+      }
+      if (nextStatus === 'Completed') timestampPatch.completedAt = now;
+
+      const referrals = state.referrals.map((referral) =>
+        referral.id === referralId
+          ? {
+              ...referral,
+              ...timestampPatch,
+              status: nextStatus,
+              responseNote: responseNote?.trim() || referral.responseNote,
+            }
+          : referral
+      );
+      const nextReferral = referrals.find((referral) => referral.id === referralId) || existing;
+      const patients = updatePatients(state.patients, existing.patientId, (patient) => ({
+        ...patient,
+        referral: patient.referral?.id === referralId ? nextReferral : patient.referral,
+        timeline: [
+          ...patient.timeline,
+          actionEvent(patient.id, 'ReferralCreated', `Referral ${referralId} moved to ${nextStatus}.`, {
+            metadata: {
+              referralId,
+              status: nextStatus,
+              responseNote: responseNote?.trim() || null,
+            },
+          }),
+        ],
+      }));
+
+      return {
+        patients,
+        referrals,
+        ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals),
+      };
+    }),
+
+  addEMSArrival: (arrival) =>
+    set((state) => {
+      const emsArrivals = [...state.emsArrivals, arrival];
+      return {
+        emsArrivals,
+        emsUnits: state.emsUnits.some((unit) => unit.id === arrival.unitId)
+          ? state.emsUnits.map((unit) =>
+              unit.id === arrival.unitId
+                ? { ...unit, status: 'Inbound', activeArrivalId: arrival.id }
+                : unit
+            )
+          : [
+              ...state.emsUnits,
+              {
+                id: arrival.unitId,
+                callSign: arrival.unitName,
+                agency: 'Toronto Paramedic Services',
+                status: 'Inbound',
+                crewStaffIds: [],
+                activeArrivalId: arrival.id,
+              },
+            ],
+        ...deriveOperationalState(state.patients, state.rooms, state.referrals, emsArrivals),
+      };
+    }),
+
+  updateEMSArrival: (id, patch) =>
+    set((state) => {
+      const emsArrivals = state.emsArrivals.map((arrival) =>
+        arrival.id === id ? { ...arrival, ...patch } : arrival
+      );
+      return {
+        emsArrivals,
+        ...deriveOperationalState(state.patients, state.rooms, state.referrals, emsArrivals),
+      };
+    }),
 
   prepareEMSBay: (arrivalId) =>
     set((state) => {
@@ -1566,16 +1871,17 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
       const emsUnits = state.emsUnits.map((unit) =>
         unit.id === arrival.unitId ? { ...unit, status: 'AtHospital' } : unit
       );
+      const referrals = syncReferralsFromPatients(patients, state.referrals);
 
       return {
         patients,
         rooms,
         emsArrivals,
         emsUnits,
-        referrals: referralsFromPatients(patients),
+        referrals,
         selectedPatientId: patientId,
         activeQueueFilter: null,
-        ...deriveOperationalState(patients, rooms),
+        ...deriveOperationalState(patients, rooms, referrals, emsArrivals),
       };
     }),
 }));
@@ -1583,10 +1889,21 @@ export const useEmergencyStore = create<EmergencyStoreState>((set) => ({
 export const emergencyStoreApi = useEmergencyStore;
 
 export const selectFilteredPatients = (state: EmergencyStoreState): Patient[] => {
-  if (!state.activeQueueFilter) return state.patients;
-  const queue = state.queues.find((candidate) => candidate.type === state.activeQueueFilter);
-  if (!queue) return [];
-  return state.patients.filter((patient) => queue.patientIds.includes(patient.id));
+  const query = state.whiteboardSearchQuery.trim().toLowerCase();
+  const queue = state.activeQueueFilter
+    ? state.queues.find((candidate) => candidate.type === state.activeQueueFilter)
+    : null;
+  return state.patients.filter((patient) => {
+    if (queue && !queue.patientIds.includes(patient.id)) return false;
+    if (!query) return true;
+    const name = `${patient.firstName} ${patient.lastName}`.toLowerCase();
+    return (
+      name.includes(query) ||
+      patient.mrn.toLowerCase().includes(query) ||
+      patient.chiefComplaint.toLowerCase().includes(query) ||
+      patient.complaintCategory.toLowerCase().includes(query)
+    );
+  });
 };
 
 export type { EmergencyStoreState, PatientPatch };
