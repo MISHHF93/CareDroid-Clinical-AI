@@ -113,7 +113,9 @@ describe('ProductCatalogService', () => {
   });
 
   it('keeps Emergency Flow sellable as a starter pilot with flow outcomes', () => {
-    const emergency = SEED_PRODUCTS.find((product) => product.id === 'product-emergency-department');
+    const emergency = SEED_PRODUCTS.find(
+      (product) => product.id === 'product-emergency-department',
+    );
 
     expect(emergency).toEqual(
       expect.objectContaining({
@@ -131,7 +133,7 @@ describe('ProductCatalogService', () => {
           'better bed flow and capacity visibility',
           'lower clinician coordination burden',
         ]),
-      })
+      }),
     );
   });
 

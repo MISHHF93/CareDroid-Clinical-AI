@@ -95,6 +95,7 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     disclosure: 'account',
     matchPaths: [
       CANONICAL_ROUTES.settings,
+      CANONICAL_ROUTES.settingsFeatures,
       CANONICAL_ROUTES.profileSettings,
       '/profile/preferences',
       '/profile-settings',

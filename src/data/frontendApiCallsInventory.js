@@ -23,6 +23,9 @@ export const FRONTEND_API_CALLS = Object.freeze([
   { id: 'chat-messages-sync', method: 'POST', path: '/api/chat/messages', client: 'syncService.js', capability: 'chatPersistence', notes: 'No route — gated off' },
   { id: 'chat-conversations-sync', method: 'POST', path: '/api/chat/conversations', client: 'syncService.js', capability: 'chatPersistence' },
 
+  { id: 'settings-features-get', method: 'GET', path: '/api/settings/features', client: 'emergencySettingsApi.js / featureStore.ts' },
+  { id: 'settings-features-patch', method: 'PATCH', path: '/api/settings/features', client: 'emergencySettingsApi.js / featureStore.ts' },
+
   { id: 'protocols-list', method: 'GET', path: '/api/protocols', client: 'clinicalContentApi.js' },
   { id: 'protocols-categories', method: 'GET', path: '/api/protocols/categories', client: 'clinicalContentApi.js' },
   { id: 'drugs-list', method: 'GET', path: '/api/drugs', client: 'clinicalContentApi.js' },

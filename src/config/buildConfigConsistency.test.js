@@ -51,9 +51,9 @@ describe('build and service config consistency', () => {
     expect(dockerfile).toContain('CMD ["npm", "run", "dev:lan"]');
   });
 
-  it('keeps OpenAI API keys backend-only', () => {
-    expect(read('.env.example')).not.toContain('VITE_OPENAI_API_KEY=');
-    expect(read('src/config/appConfig.js')).not.toContain('VITE_OPENAI_API_KEY');
+  it('keeps provider API keys out of browser config', () => {
+    expect(read('.env.example')).not.toContain('VITE_ANTHROPIC_API_KEY=');
+    expect(read('src/config/appConfig.js')).not.toContain('VITE_ANTHROPIC_API_KEY');
     expect(read('src/services/openaiService.ts')).toContain('API_ROUTES.chat.message');
   });
 });

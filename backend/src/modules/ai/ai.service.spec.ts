@@ -8,33 +8,21 @@ import { AIQuery } from './entities/ai-query.entity';
 import { AuditService } from '../audit/audit.service';
 import { MetricsService } from '../metrics/metrics.service';
 import { PlatformGovernanceService } from '../platform-governance';
-
-// Mock OpenAI module
-jest.mock('openai', () => {
-  return {
-    default: jest.fn().mockImplementation(() => ({
-      chat: {
-        completions: {
-          create: jest.fn(),
-        },
-      },
-    })),
-  };
-});
+import { unifiedAIClient } from '../../../../lib/ai/client';
 
 describe('AIService', () => {
   let service: AIService;
   let _configService: ConfigService;
 
   const defaultConfigLookup = (key: string) => {
-    if (key === 'OPENAI_API_KEY') return 'sk-test-key';
-    if (key === 'openai') {
+    if (key === 'ANTHROPIC_API_KEY') return 'sk-test-key';
+    if (key === 'ai') {
       return {
-        model: 'gpt-4o-mini',
+        model: 'claude-sonnet-4-20250514',
         maxTokens: 1200,
         temperature: 0.2,
         rateLimits: {
-          free: { dailyLimit: 10, model: 'gpt-4o-mini', maxTokens: 1200 },
+          free: { dailyLimit: 10, model: 'claude-sonnet-4-20250514', maxTokens: 1200 },
         },
       };
     }
@@ -125,6 +113,7 @@ describe('AIService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(unifiedAIClient, 'request').mockRejectedValue(new Error('AI unavailable'));
     mockConfigService.get.mockImplementation(defaultConfigLookup);
   });
 
@@ -261,7 +250,7 @@ describe('AIService', () => {
       // Mock getUsageToday to return under limit
       jest.spyOn(service as any, 'getUsageToday').mockResolvedValue(5);
 
-      // Since we can't easily mock OpenAI API, this will throw an error
+      // Since the unified client is mocked to fail, this should get past rate limiting first.
       // but it should get past the rate limiting check
       await expect(service.invokeLLM(userId, prompt)).rejects.toThrow();
 
@@ -272,21 +261,17 @@ describe('AIService', () => {
     it('persists commercial AI usage dimensions with query records', async () => {
       const userId = '1';
       const prompt = 'Summarize cardiology risk for this encounter';
-      const openaiCreate = jest.fn().mockResolvedValue({
-        choices: [
-          {
-            message: { content: 'Structured clinical summary' },
-            finish_reason: 'stop',
-          },
-        ],
+      jest.mocked(unifiedAIClient.request).mockResolvedValue({
+        content: 'Structured clinical summary',
+        toolCalls: [],
         usage: {
-          prompt_tokens: 80,
-          completion_tokens: 40,
-          total_tokens: 120,
+          inputTokens: 80,
+          outputTokens: 40,
+          totalTokens: 120,
         },
+        requestType: 'COPILOT_CHAT',
       });
 
-      (service as any).openai = { chat: { completions: { create: openaiCreate } } };
       mockSubscriptionRepository.findOne.mockResolvedValue({ tier: SubscriptionTier.FREE });
       jest.spyOn(service as any, 'getUsageToday').mockResolvedValue(0);
 
@@ -331,7 +316,7 @@ describe('AIService', () => {
           assetId: 'differential-ai',
           agentId: 'cardiology-agent',
           modelClass: 'standard',
-          modelVersion: 'gpt-4o-mini',
+          modelVersion: 'claude-sonnet-4-20250514',
           routingExpert: 'cardiology',
           retrievalPolicy: 'guideline',
           requiresHumanReview: true,
@@ -361,7 +346,7 @@ describe('AIService', () => {
             workspaceId: '22222222-2222-2222-2222-222222222222',
             assetId: 'differential-ai',
             agentId: 'cardiology-agent',
-            modelVersion: 'gpt-4o-mini',
+            modelVersion: 'claude-sonnet-4-20250514',
           }),
         }),
       );

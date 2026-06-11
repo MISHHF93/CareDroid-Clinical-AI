@@ -60,7 +60,7 @@ services:
       REDIS_PORT: 6379
       JWT_SECRET: ${JWT_SECRET:-your-secret-key-change-in-production}
       ENCRYPTION_MASTER_KEY: ${ENCRYPTION_MASTER_KEY:- }
-      OPENAI_API_KEY: ${OPENAI_API_KEY:- }
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:- }
       PINECONE_API_KEY: ${PINECONE_API_KEY:- }
       NLU_SERVICE_URL: ${NLU_SERVICE_URL:-http://nlu:8001}
       # Email Configuration
@@ -76,7 +76,7 @@ services:
       RAG_ENABLED: ${RAG_ENABLED:-true}
       PINECONE_ENVIRONMENT: ${PINECONE_ENVIRONMENT:-us-east-1-aws}
       PINECONE_INDEX_NAME: ${PINECONE_INDEX_NAME:-caredroid-medical-knowledge}
-      RAG_MODEL: ${RAG_MODEL:-text-embedding-ada-002}
+      RAG_MODEL: ${RAG_MODEL:-local-deterministic-embedding}
       # ML Services
       ANOMALY_DETECTION_URL: ${ANOMALY_DETECTION_URL:-http://anomaly-detection:5000}
       ANOMALY_DETECTION_ENABLED: ${ANOMALY_DETECTION_ENABLED:-true}

@@ -18,12 +18,11 @@ import { ToolMetricsService } from '../src/modules/metrics/tool-metrics.service'
  * 4. Retrieval
  * 5. Source extraction
  *
- * Note: These tests require valid API keys for OpenAI and Pinecone.
- * Set OPENAI_API_KEY and PINECONE_API_KEY in .env.test
+ * Note: These tests require a valid Pinecone API key.
+ * Set PINECONE_API_KEY in .env.test
  */
 
-const describeIfLiveRagConfigured =
-  process.env.OPENAI_API_KEY && process.env.PINECONE_API_KEY ? describe : describe.skip;
+const describeIfLiveRagConfigured = process.env.PINECONE_API_KEY ? describe : describe.skip;
 
 describeIfLiveRagConfigured('RAG System (e2e)', () => {
   let module: TestingModule;

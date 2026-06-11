@@ -7,7 +7,7 @@ describe('ChatService ED Copilot wiring', () => {
   it('routes emergency workspace chat through ED Copilot with Anthropic support', () => {
     expect(source).toContain('workspaceContext?.edCopilot?.enabled');
     expect(source).toContain('handleEdCopilot');
-    expect(source).toContain('https://api.anthropic.com/v1/messages');
+    expect(source).toContain('unifiedAIClient.request');
     expect(source).toContain('ANTHROPIC_API_KEY');
   });
 

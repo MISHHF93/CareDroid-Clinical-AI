@@ -29,6 +29,7 @@ import {
   movePatientToState as movePatientWithJourneyRules,
 } from '../../engine/journeyEngine';
 import JourneyTimeline from './JourneyTimeline';
+import FeatureGate from './FeatureGate';
 import { useUser } from '../contexts/UserContext';
 import ClinicalScoreCalculator, {
   createClinicalScoreEvent,
@@ -73,6 +74,16 @@ const SCORE_OPTIONS = [
   { id: 'qsofa', label: 'qSOFA' },
   { id: 'nihss', label: 'NIHSS' },
 ];
+
+const BACKEND_DATA_FEATURE_BY_TAB = {
+  medications: 'medication_history',
+  orders: 'imaging_orders',
+  labs: 'lab_results_panel',
+  visits: 'visit_history',
+  imaging: 'imaging_orders',
+  observations: 'vitals_history_chart',
+  diagnosis: 'icd10_lookup',
+};
 
 const CATEGORY_CLASS = {
   'Chest Pain': 'cardiac',
@@ -893,7 +904,9 @@ export function PatientDetailPanel() {
             </div>
           ))}
         </div>
-        <VitalsHistoryChart readings={vitalsHistoryReadings} />
+        <FeatureGate feature="vitals_history_chart" showPlaceholder compact>
+          <VitalsHistoryChart readings={vitalsHistoryReadings} />
+        </FeatureGate>
         {vitalsOpen && emergencyPermissions.canUpdateVitals ? (
           <form className="patient-detail__vitals-form" onSubmit={submitVitals}>
             {Object.entries(vitalsForm).map(([field, value]) => (
@@ -940,6 +953,7 @@ export function PatientDetailPanel() {
         </div>
 
         {clinicalDataTab === 'medications' ? (
+          <FeatureGate feature={BACKEND_DATA_FEATURE_BY_TAB.medications} showPlaceholder compact>
           <div className="patient-detail__data-panel">
             <div className="patient-detail__data-subsection">
               <h3>Known Allergies</h3>
@@ -979,9 +993,11 @@ export function PatientDetailPanel() {
               )}
             </div>
           </div>
+          </FeatureGate>
         ) : null}
 
         {clinicalDataTab === 'orders' ? (
+          <FeatureGate feature={BACKEND_DATA_FEATURE_BY_TAB.orders} showPlaceholder compact>
           <div className="patient-detail__data-panel">
             <div className="patient-detail__order-action-row">
               <button
@@ -1037,9 +1053,11 @@ export function PatientDetailPanel() {
               </section>
             ))}
           </div>
+          </FeatureGate>
         ) : null}
 
         {clinicalDataTab === 'labs' ? (
+          <FeatureGate feature={BACKEND_DATA_FEATURE_BY_TAB.labs} showPlaceholder compact>
           <div className="patient-detail__data-panel">
             {labs.length ? (
               <div className="patient-detail__lab-list">
@@ -1068,9 +1086,11 @@ export function PatientDetailPanel() {
               <p>No backend lab result records returned.</p>
             )}
           </div>
+          </FeatureGate>
         ) : null}
 
         {clinicalDataTab === 'visits' ? (
+          <FeatureGate feature={BACKEND_DATA_FEATURE_BY_TAB.visits} showPlaceholder compact>
           <div className="patient-detail__data-panel">
             {visits.length ? (
               <div className="patient-detail__data-list">
@@ -1086,9 +1106,11 @@ export function PatientDetailPanel() {
               <p>No backend visit history returned.</p>
             )}
           </div>
+          </FeatureGate>
         ) : null}
 
         {clinicalDataTab === 'imaging' ? (
+          <FeatureGate feature={BACKEND_DATA_FEATURE_BY_TAB.imaging} showPlaceholder compact>
           <div className="patient-detail__data-panel">
             {imaging.length ? (
               <div className="patient-detail__data-list">
@@ -1106,9 +1128,11 @@ export function PatientDetailPanel() {
               <p>No backend imaging records returned.</p>
             )}
           </div>
+          </FeatureGate>
         ) : null}
 
         {clinicalDataTab === 'observations' ? (
+          <FeatureGate feature={BACKEND_DATA_FEATURE_BY_TAB.observations} showPlaceholder compact>
           <div className="patient-detail__data-panel">
             {observations.length ? (
               <div className="patient-detail__data-list">
@@ -1126,9 +1150,11 @@ export function PatientDetailPanel() {
               <p>No backend observation or vitals-history records returned.</p>
             )}
           </div>
+          </FeatureGate>
         ) : null}
 
         {clinicalDataTab === 'diagnosis' ? (
+          <FeatureGate feature={BACKEND_DATA_FEATURE_BY_TAB.diagnosis} showPlaceholder compact>
           <div className="patient-detail__data-panel">
             <label className="patient-detail__diagnosis-field">
               Diagnosis
@@ -1158,6 +1184,7 @@ export function PatientDetailPanel() {
               <p>No backend diagnosis or ICD-10 records returned.</p>
             )}
           </div>
+          </FeatureGate>
         ) : null}
 
         {clinicalDataTab === 'documents' ? (

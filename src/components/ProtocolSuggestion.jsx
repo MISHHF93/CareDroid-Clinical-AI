@@ -1,9 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ExternalLink, X } from 'lucide-react';
 import ClinicalScoreCalculator, {
   CALCULATOR_BY_SUGGESTION_ID,
   isClinicalCalculatorSuggestion,
 } from './ClinicalScoreCalculator';
+import { sendClinicalChatMessage } from '../services/clinicalChatService';
 import './ProtocolSuggestion.css';
 
 export const PROTOCOL_SUGGESTIONS_BY_COMPLAINT = {
@@ -209,10 +210,60 @@ export default function ProtocolSuggestion({
 }) {
   const [activeSuggestion, setActiveSuggestion] = useState(null);
   const [activeCalculatorId, setActiveCalculatorId] = useState(null);
+  const [aiSuggestions, setAiSuggestions] = useState([]);
+  const [aiLoading, setAiLoading] = useState(false);
   const normalizedComplaint = normalizeComplaintCategory(complaintCategory);
   const suggestions = useMemo(() => getProtocolSuggestions(complaintCategory), [complaintCategory]);
+  const displayedSuggestions = aiSuggestions.length ? aiSuggestions : suggestions;
 
-  if (!complaintCategory || suggestions.length === 0) return null;
+  useEffect(() => {
+    if (!complaintCategory) return undefined;
+    let cancelled = false;
+    setAiLoading(true);
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await sendClinicalChatMessage({
+          message: `Suggest ordered ED protocols and tools for complaint: ${complaintCategory}. Return concise ordered suggestions only.`,
+          requestType: 'PROTOCOL_SUGGEST',
+          workspaceContext: {
+            workspaceId: 'emergency',
+            workspaceKey: 'emergency',
+            aiRequest: {
+              requestType: 'PROTOCOL_SUGGEST',
+              complaint: complaintCategory,
+              patientId: patient?.id,
+              patientContext: patient
+                ? {
+                    complaint: patient.complaint || patient.chiefComplaint,
+                    vitals: patient.vitals,
+                    priority: patient.priority,
+                    state: patient.state,
+                  }
+                : undefined,
+            },
+          },
+        });
+        if (cancelled || !response.ok) return;
+        const labels = parseSuggestionLabels(response.data.response);
+        setAiSuggestions(
+          labels.map((label, index) => ({
+            id: `ai-protocol-${index}-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`,
+            label,
+            kind: 'AI suggestion',
+            summary: 'Suggested by unified AI protocol assist for human review.',
+          }))
+        );
+      } finally {
+        if (!cancelled) setAiLoading(false);
+      }
+    }, 500);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [complaintCategory, patient]);
+
+  if (!complaintCategory || displayedSuggestions.length === 0) return null;
 
   return (
     <>
@@ -221,11 +272,11 @@ export default function ProtocolSuggestion({
         aria-label="Protocol suggestions"
       >
         <div>
-          <strong>Suggest: {suggestions.map((suggestion) => suggestion.label).join(' + ')}</strong>
-          <span aria-hidden>Launch?</span>
+          <strong>Suggest: {displayedSuggestions.map((suggestion) => suggestion.label).join(' + ')}</strong>
+          <span aria-hidden>{aiLoading ? 'Refreshing AI suggestions...' : 'Launch?'}</span>
         </div>
         <div className="protocol-suggestion__chips">
-          {suggestions.map((suggestion) => (
+          {displayedSuggestions.map((suggestion) => (
             <button
               key={suggestion.id}
               type="button"
@@ -259,4 +310,12 @@ export default function ProtocolSuggestion({
       ) : null}
     </>
   );
+}
+
+function parseSuggestionLabels(text = '') {
+  return String(text)
+    .split(/\n|,/)
+    .map((line) => line.replace(/^\s*(?:[-*]|\d+[.)])\s*/, '').trim())
+    .filter(Boolean)
+    .slice(0, 5);
 }

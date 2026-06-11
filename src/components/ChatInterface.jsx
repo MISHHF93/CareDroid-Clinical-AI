@@ -10,6 +10,7 @@ import {
   mapChatResponseToAssistantMessage,
 } from '../services/clinicalChatService';
 import { useNotificationActions } from '../hooks/useNotificationActions';
+import { useFeature } from '../hooks/useFeature';
 import {
   getQueueForPatientState,
   useEmergencyDepartment,
@@ -507,6 +508,7 @@ const ChatInterface = ({
   const inputRef = useRef(null);
   const shouldStickToBottomRef = useRef(true);
   const { error: notifyError } = useNotificationActions();
+  const { enabled: copilotToolActionsEnabled } = useFeature('copilot_tool_actions');
   const {
     activeWorkspace,
     activeWorkspaceId,
@@ -770,6 +772,7 @@ const ChatInterface = ({
         messages: requestMessages,
         tool: currentTool,
         feature: currentFeature,
+        requestType: isEmergencyCopilot ? 'COPILOT_CHAT' : undefined,
         conversationId,
         authToken,
         workspaceContext: {
@@ -782,6 +785,14 @@ const ChatInterface = ({
           visibleAssetIds,
           recommendedAIAgents,
           recommendedAssetPacks,
+          ...(isEmergencyCopilot
+            ? {
+                aiRequest: {
+                  requestType: 'COPILOT_CHAT',
+                  toolsEnabled: copilotToolActionsEnabled,
+                },
+              }
+            : {}),
           ...(edCopilotContext
             ? {
                 edCopilot: {

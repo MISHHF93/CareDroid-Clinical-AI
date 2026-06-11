@@ -63,7 +63,7 @@ function createRoutePlan(): ExpertRoutePlan {
       orchestrationMode: 'skip',
     },
     costPlan: {
-      preferredModel: 'gpt-4o-mini',
+      preferredModel: 'claude-sonnet-4-20250514',
       maxTokens: 1600,
       allowFallback: true,
       estimatedCost: 0.09,

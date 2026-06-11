@@ -16,6 +16,7 @@ import {
   RouteEvidence,
   SelectedExpertRoute,
 } from './ai-foundation.types';
+import { UNIFIED_AI_MODEL } from '../../../../../lib/ai/client';
 
 interface ExpertCandidate extends SelectedExpertRoute {
   evidence: RouteEvidence[];
@@ -306,9 +307,9 @@ export class AiRoutingEngineService {
       primaryIntent === PrimaryIntent.EMERGENCY ||
       selectedExperts.some((expert) => expert.expertId === 'emergency')
     ) {
-      return 'gpt-4o';
+      return UNIFIED_AI_MODEL;
     }
-    return 'gpt-4o-mini';
+    return UNIFIED_AI_MODEL;
   }
 
   private selectExpertModel(

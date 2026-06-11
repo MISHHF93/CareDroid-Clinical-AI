@@ -19,6 +19,25 @@ async function guardedJson(capability, path, options = {}) {
   }
 }
 
+async function requestSettingsJson(path, options = {}) {
+  try {
+    const response = await apiFetch(path, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      },
+    });
+    const data = await parseApiResponse(response, { fallback: {} });
+    if (!response.ok) {
+      return { ok: false, data: null, message: data?.message || getApiErrorMessage(null, response), status: response.status };
+    }
+    return { ok: true, data, message: data?.message || '', status: response.status };
+  } catch (error) {
+    return { ok: false, data: null, message: getApiErrorMessage(error), status: error?.status || 0 };
+  }
+}
+
 function organizationId() {
   return getTenantContext()?.organizationId || '';
 }
@@ -103,4 +122,48 @@ export function updateOrganizationFeatureFlag(payload) {
     method: 'PATCH',
     body: JSON.stringify(payload),
   });
+}
+
+export function fetchSettingsFeatureFlags() {
+  return requestSettingsJson('/api/settings/features');
+}
+
+export function updateSettingsFeatureFlag({ featureId, enabled, changedBy, timestamp }) {
+  return requestSettingsJson('/api/settings/features', {
+    method: 'PATCH',
+    body: JSON.stringify({
+      featureId,
+      enabled,
+      changedBy,
+      timestamp,
+    }),
+  });
+}
+
+export function subscribeToSettingsFeatureChanges(onChange) {
+  const supabaseClient =
+    (typeof window !== 'undefined' && window.supabase) ||
+    (typeof globalThis !== 'undefined' && globalThis.supabase);
+  if (!supabaseClient?.channel || typeof onChange !== 'function') {
+    return () => {};
+  }
+
+  const channel = supabaseClient
+    .channel('features')
+    .on(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: 'feature_flags' },
+      (payload) => onChange(payload),
+    )
+    .subscribe();
+
+  return () => {
+    if (typeof supabaseClient.removeChannel === 'function') {
+      supabaseClient.removeChannel(channel);
+      return;
+    }
+    if (typeof channel?.unsubscribe === 'function') {
+      channel.unsubscribe();
+    }
+  };
 }

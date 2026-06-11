@@ -24,7 +24,7 @@ export default registerAs('rag', () => ({
    * Embeddings Configuration
    */
   embeddings: {
-    model: process.env.RAG_MODEL || process.env.EMBEDDING_MODEL || 'text-embedding-ada-002',
+    model: process.env.RAG_MODEL || process.env.EMBEDDING_MODEL || 'local-deterministic-embedding',
     dimension: parseInt(process.env.EMBEDDING_DIMENSION || '1536', 10),
     batchSize: parseInt(process.env.EMBEDDING_BATCH_SIZE || '100', 10),
   },
@@ -52,8 +52,7 @@ export default registerAs('rag', () => ({
    */
   reranking: {
     enabled: process.env.RERANK_ENABLED === 'true',
-    provider: process.env.RERANK_PROVIDER || 'cohere',
-    apiKey: process.env.COHERE_API_KEY,
-    model: process.env.RERANK_MODEL || 'rerank-english-v2.0',
+    provider: process.env.RERANK_PROVIDER || 'local',
+    model: process.env.RERANK_MODEL || 'local-keyword-reranker',
   },
 }));

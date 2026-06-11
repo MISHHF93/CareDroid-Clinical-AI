@@ -1,18 +1,17 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import OpenAI from 'openai';
+import { createHash } from 'crypto';
 
 /**
- * OpenAI Embeddings Service
+ * Embeddings Service
  *
- * Generates embeddings using OpenAI's text-embedding-ada-002 model.
- * Embeddings are 1536-dimensional vectors used for semantic search.
+ * Generates deterministic local embeddings for semantic search without creating
+ * a second external AI API client.
  */
 
 @Injectable()
 export class OpenAIEmbeddingsService {
   private readonly logger = new Logger(OpenAIEmbeddingsService.name);
-  private readonly openai: OpenAI;
   private readonly model: string;
   private readonly dimension: number;
   private readonly maxBatchSize: number;
@@ -25,32 +24,16 @@ export class OpenAIEmbeddingsService {
   constructor(private readonly configService: ConfigService) {
     const ragConfig = this.configService.get<any>('rag');
     const ragEmbeddings = ragConfig?.embeddings || {};
-    const openaiConfig = this.configService.get<any>('openai');
 
-    this.model = ragEmbeddings.model || 'text-embedding-ada-002';
+    this.model = ragEmbeddings.model || 'local-deterministic-embedding';
     this.dimension = ragEmbeddings.dimension || 1536;
     this.maxBatchSize = ragEmbeddings.batchSize || 100;
-
-    const apiKey = openaiConfig?.apiKey;
-
-    if (!apiKey) {
-      this.logger.warn('OPENAI_API_KEY is not configured. Embeddings service will not function.');
-      // Create a dummy OpenAI client to prevent null errors
-      this.openai = null as any;
-      return;
-    }
-
-    this.openai = new OpenAI({ apiKey });
   }
 
   /**
    * Generate embedding for a single text
    */
   async embed(text: string): Promise<number[]> {
-    if (!this.openai) {
-      throw new Error('OpenAI API key not configured. Cannot generate embeddings.');
-    }
-
     const cacheKey = this.cacheKey(text);
     const cached = this.embeddingCache.get(cacheKey);
     if (cached && cached.expiresAt > Date.now()) {
@@ -68,12 +51,7 @@ export class OpenAIEmbeddingsService {
 
   private async fetchEmbedding(text: string, cacheKey: string): Promise<number[]> {
     try {
-      const response = await this.openai.embeddings.create({
-        model: this.model,
-        input: text,
-      });
-
-      const embedding = response.data[0].embedding;
+      const embedding = this.generateLocalEmbedding(text);
       this.embeddingCache.set(cacheKey, {
         value: embedding,
         expiresAt: Date.now() + this.cacheTtlMs,
@@ -134,25 +112,16 @@ export class OpenAIEmbeddingsService {
           `Processing embedding batch ${i + 1}/${batches.length} (${batch.length} texts)`,
         );
 
-        const response = await this.openai.embeddings.create({
-          model: this.model,
-          input: batch.map(([, entry]) => entry.text),
-        });
-
-        response.data.forEach((item, batchIndex) => {
-          const [cacheKey, entry] = batch[batchIndex];
+        batch.forEach(([cacheKey, entry]) => {
+          const embedding = this.generateLocalEmbedding(entry.text);
           this.embeddingCache.set(cacheKey, {
-            value: item.embedding,
+            value: embedding,
             expiresAt: Date.now() + this.cacheTtlMs,
           });
           for (const originalIndex of entry.indexes) {
-            results[originalIndex] = [...item.embedding];
+            results[originalIndex] = [...embedding];
           }
         });
-
-        if (i < batches.length - 1) {
-          await this.sleep(100);
-        }
       }
 
       return results;
@@ -178,7 +147,7 @@ export class OpenAIEmbeddingsService {
   }
 
   /**
-   * Verify that the OpenAI API is accessible
+   * Verify that local embedding generation is available.
    */
   async healthCheck(): Promise<boolean> {
     if (this.healthCheckCache && this.healthCheckCache.expiresAt > Date.now()) {
@@ -191,10 +160,30 @@ export class OpenAIEmbeddingsService {
       return true;
     } catch (error) {
       const err = error instanceof Error ? error : new Error(String(error));
-      this.logger.error(`OpenAI embeddings health check failed: ${err.message}`);
+      this.logger.error(`Embeddings health check failed: ${err.message}`);
       this.healthCheckCache = { value: false, expiresAt: Date.now() + this.healthCheckTtlMs };
       return false;
     }
+  }
+
+  private generateLocalEmbedding(text: string): number[] {
+    const vector = new Array(this.dimension).fill(0);
+    const tokens = String(text || '')
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, ' ')
+      .split(/\s+/)
+      .filter(Boolean);
+
+    for (const token of tokens.length ? tokens : ['empty']) {
+      const digest = createHash('sha256').update(token).digest();
+      const index = digest.readUInt32BE(0) % this.dimension;
+      const sign = digest.readUInt32BE(4) % 2 === 0 ? 1 : -1;
+      const weight = 1 + (digest.readUInt32BE(8) % 1000) / 1000;
+      vector[index] += sign * weight;
+    }
+
+    const magnitude = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0)) || 1;
+    return vector.map((value) => Number((value / magnitude).toFixed(6)));
   }
 
   private cacheKey(text: string): string {
@@ -202,12 +191,5 @@ export class OpenAIEmbeddingsService {
       .trim()
       .replace(/\s+/g, ' ')
       .toLowerCase()}`;
-  }
-
-  /**
-   * Sleep utility for rate limiting
-   */
-  private sleep(ms: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

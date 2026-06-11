@@ -11,6 +11,7 @@ import {
   GatewayRunEnvelope,
   SelectedExpertRoute,
 } from './moe-router.types';
+import { UNIFIED_AI_MODEL } from '../../../../lib/ai/client';
 
 @Injectable()
 export class MoERouterService {
@@ -249,9 +250,9 @@ export class MoERouterService {
       primaryIntent === PrimaryIntent.EMERGENCY ||
       selectedExperts.some((expert) => expert.expertId === 'emergency')
     ) {
-      return 'gpt-4o';
+      return UNIFIED_AI_MODEL;
     }
-    return 'gpt-4o-mini';
+    return UNIFIED_AI_MODEL;
   }
 
   private selectExpertModel(

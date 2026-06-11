@@ -24,6 +24,35 @@ export class AuditController {
 
   constructor(private readonly auditService: AuditService) {}
 
+  @Post('sync')
+  async syncAuditEvent(@Body() body: Record<string, any>, @Req() req: any) {
+    const action = String(body.action || body.eventType || 'client_audit_event');
+    const resourceType = String(body.resourceType || 'client');
+    const resourceId = body.resourceId ? String(body.resourceId) : 'event';
+    const log = await this.auditService.log({
+      userId: req.user?.id,
+      actorUserId: req.user?.id,
+      organizationId: req.tenantContext?.organizationId,
+      workspaceId: req.tenantContext?.workspaceId,
+      action: AuditAction.SECURITY_EVENT,
+      resource: `${resourceType}:${resourceId}`,
+      ipAddress: req.ip || req.socket?.remoteAddress || 'unknown',
+      userAgent: req.headers?.['user-agent'] || 'unknown',
+      metadata: {
+        ...body.metadata,
+        eventType: action,
+        resourceType,
+        resourceId,
+        clientTimestamp: body.timestamp || null,
+      },
+    });
+
+    return {
+      success: true,
+      data: log,
+    };
+  }
+
   /**
    * Get audit logs (admin only)
    * Supports filtering by user, date range, and action type

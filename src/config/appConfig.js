@@ -143,9 +143,7 @@ const appConfig = {
     },
   },
   ai: {
-    openai: {
-      model: getEnvValue('VITE_OPENAI_MODEL', 'gpt-4'),
-    },
+    model: getEnvValue('VITE_AI_MODEL', 'claude-sonnet-4-20250514'),
   },
 };
 

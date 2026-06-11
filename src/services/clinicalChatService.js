@@ -18,7 +18,7 @@ export function registryIdToChatToolParam(registryId) {
 
 /**
  * POST /api/chat/message — shared by Dashboard, ChatInterface, and tools.
- * @param {{ message: string, messages?: Array<{role: string, content: string}>, tool?: string, feature?: string, conversationId?: number|string, authToken?: string|null, workspaceContext?: object, memoryContext?: object }} params
+ * @param {{ message: string, messages?: Array<{role: string, content: string}>, tool?: string, feature?: string, requestType?: string, conversationId?: number|string, authToken?: string|null, workspaceContext?: object, memoryContext?: object }} params
  * @returns {Promise<{ ok: boolean, status: number, data: object }>}
  */
 export async function sendClinicalChatMessage({
@@ -26,6 +26,7 @@ export async function sendClinicalChatMessage({
   messages,
   tool,
   feature,
+  requestType,
   conversationId,
   authToken,
   workspaceContext,
@@ -42,7 +43,21 @@ export async function sendClinicalChatMessage({
     ...(tool ? { tool } : {}),
     ...(feature ? { feature } : {}),
     knowledgeBaseContext: buildKnowledgeBaseAssistantContext(message),
-    ...(workspaceContext ? { workspaceContext } : {}),
+    ...(workspaceContext || requestType
+      ? {
+          workspaceContext: {
+            ...(workspaceContext || {}),
+            ...(requestType
+              ? {
+                  aiRequest: {
+                    ...((workspaceContext && workspaceContext.aiRequest) || {}),
+                    requestType,
+                  },
+                }
+              : {}),
+          },
+        }
+      : {}),
     ...(memoryContext ? { memoryContext } : {}),
   };
   if (conversationId != null && String(conversationId).trim() !== '') {

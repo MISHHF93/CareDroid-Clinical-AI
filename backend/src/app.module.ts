@@ -14,7 +14,7 @@ import emailConfig from './config/email.config';
 import redisConfig from './config/redis.config';
 import stripeConfig from './config/stripe.config';
 import datadogConfig from './config/datadog.config';
-import openaiConfig from './config/openai.config';
+import aiConfig from './config/ai.config';
 import encryptionConfig from './config/encryption.config';
 import loggerConfig from './config/logger.config';
 import ragConfig from './config/rag.config';
@@ -116,7 +116,7 @@ function resolveDatabaseClient() {
         redisConfig,
         stripeConfig,
         datadogConfig,
-        openaiConfig,
+        aiConfig,
         encryptionConfig,
         loggerConfig,
         ragConfig,

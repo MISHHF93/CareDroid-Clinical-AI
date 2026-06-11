@@ -311,16 +311,15 @@ export default function ShiftSummary() {
 
     try {
       const response = await sendClinicalChatMessage({
-        message: buildHandoffPrompt(metrics),
+        message: `${buildHandoffPrompt(metrics)}\n\nWrite approximately 300 words.`,
         authToken,
+        requestType: 'HANDOFF_BRIEF',
         workspaceContext: {
           activeWorkspaceId: 'emergency',
           workspaceId: 'emergency',
           workspaceKey: 'emergency',
-          edCopilot: {
-            enabled: true,
-            systemPrompt:
-              'You are the ED Copilot. Write a concise, print-ready shift handoff brief for clinical staff. Surface information for human review and never make autonomous clinical decisions.',
+          aiRequest: {
+            requestType: 'HANDOFF_BRIEF',
             shiftSummary: {
               ...metrics,
               backendAnalytics: emergencyAnalytics.data || null,

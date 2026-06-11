@@ -155,6 +155,11 @@
   box-shadow: 0 0 0 2px color-mix(in srgb, var(--app-accent-interactive, var(--accent-1)) 18%, transparent);
 }
 
+.clinical-calculator-card--disabled {
+  border-style: dashed;
+  opacity: 0.78;
+}
+
 .clinical-calculator-card__header {
   display: flex;
   align-items: flex-start;
@@ -191,6 +196,16 @@
   align-self: flex-start;
   padding: 8px 14px;
   font-weight: 700;
+}
+
+.clinical-calculator-card a {
+  align-self: flex-start;
+  border: 1px solid var(--app-panel-border);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: var(--app-accent-interactive, var(--accent-1));
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .clinical-calculator-hub__workspace {

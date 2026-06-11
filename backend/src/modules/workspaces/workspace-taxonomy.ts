@@ -206,7 +206,20 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
       'hospital-map',
       'fleet-live-map',
     ],
-    enabledModules: ['dashboard', 'assistant', 'alerts', 'flow', 'handoff', 'bed-flow', 'referrals', 'equipment', 'surge', 'calculators', 'maps', 'fleet'],
+    enabledModules: [
+      'dashboard',
+      'assistant',
+      'alerts',
+      'flow',
+      'handoff',
+      'bed-flow',
+      'referrals',
+      'equipment',
+      'surge',
+      'calculators',
+      'maps',
+      'fleet',
+    ],
     shortcuts: [
       baseShortcuts.assistant,
       baseShortcuts.dashboard,
@@ -214,7 +227,8 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
         id: 'flow-intelligence',
         label: 'Flow Intelligence',
         path: '/workspace/emergency/flow',
-        description: 'Open ED flow, EMS handoff, bed pressure, referral, equipment, surge, and command-center model.',
+        description:
+          'Open ED flow, EMS handoff, bed pressure, referral, equipment, surge, and command-center model.',
         assetId: 'hospital-operations-command',
       },
       {
@@ -225,7 +239,15 @@ export const WORKSPACE_DEFINITIONS: Record<WorkspaceType, WorkspaceDefinition> =
         assetId: 'live-tracking-map',
       },
     ],
-    recommendedAssetIds: ['hospital-operations-command', 'qsofa', 'news2', 'nihss', 'protocols', 'hospital-map', 'medical-iot-dashboard'],
+    recommendedAssetIds: [
+      'hospital-operations-command',
+      'qsofa',
+      'news2',
+      'nihss',
+      'protocols',
+      'hospital-map',
+      'medical-iot-dashboard',
+    ],
   },
   [WorkspaceType.ICU]: {
     type: WorkspaceType.ICU,

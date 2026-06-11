@@ -1,10 +1,11 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { CheckCircle2, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { PatientState, Priority } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
 import { createClinicalScoreEvent, createClinicalScoreNote } from './ClinicalScoreCalculator';
 import ProtocolSuggestion, { createProtocolLaunchEvent } from './ProtocolSuggestion';
 import { getSuggestedToolsForComplaint } from '../utils/clinicalToolSuggestions';
+import { sendClinicalChatMessage } from '../services/clinicalChatService';
 import './NewPatientIntake.css';
 
 const COMPLAINT_CATEGORIES = [
@@ -207,6 +208,14 @@ function canContinue(step, identity, age, complaintCategory, complaintText) {
   return true;
 }
 
+function parseAiChipLabels(text = '') {
+  return String(text)
+    .split(/\n|,/)
+    .map((line) => line.replace(/^\s*(?:[-*]|\d+[.)])\s*/, '').trim())
+    .filter(Boolean)
+    .slice(0, 4);
+}
+
 export default function NewPatientIntake({ open, onClose }) {
   const addPatient = useEmergencyStore((state) => state.addPatient);
   const selectPatient = useEmergencyStore((state) => state.selectPatient);
@@ -221,6 +230,8 @@ export default function NewPatientIntake({ open, onClose }) {
   const [priorityOverride, setPriorityOverride] = useState('');
   const [launchedProtocols, setLaunchedProtocols] = useState([]);
   const [savedScores, setSavedScores] = useState([]);
+  const [aiIntakeChips, setAiIntakeChips] = useState([]);
+  const [aiIntakeLoading, setAiIntakeLoading] = useState(false);
 
   const age = useMemo(() => calculateAge(identity.dob), [identity.dob]);
   const suggestedPriority = useMemo(
@@ -242,6 +253,37 @@ export default function NewPatientIntake({ open, onClose }) {
     }),
     [identity.firstName, identity.lastName, mrn, vitals, vitalsSkipped]
   );
+
+  useEffect(() => {
+    if (step !== 1 || !complaintCategory || complaintText.trim().length < 3) return undefined;
+    let cancelled = false;
+    setAiIntakeLoading(true);
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await sendClinicalChatMessage({
+          message: `For intake complaint "${complaintText.trim()}" in category "${complaintCategory}", suggest protocol chips for human triage review. Keep it concise.`,
+          requestType: 'INTAKE_SUGGESTION',
+          workspaceContext: {
+            workspaceId: 'emergency',
+            workspaceKey: 'emergency',
+            aiRequest: {
+              requestType: 'INTAKE_SUGGESTION',
+              complaint: complaintText.trim(),
+              patientContext: pendingPatientForTools(),
+            },
+          },
+        });
+        if (cancelled || !response.ok) return;
+        setAiIntakeChips(parseAiChipLabels(response.data.response));
+      } finally {
+        if (!cancelled) setAiIntakeLoading(false);
+      }
+    }, 700);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [complaintCategory, complaintText, step]);
 
   if (!open) return null;
 
@@ -473,8 +515,15 @@ export default function NewPatientIntake({ open, onClose }) {
               </button>
               {complaintCategory ? (
                 <div className="new-patient-intake__tool-banner">
-                  <span>Suggested tools for {complaintCategory}:</span>
+                  <span>
+                    {aiIntakeLoading ? 'AI reviewing intake...' : `Suggested tools for ${complaintCategory}:`}
+                  </span>
                   <div>
+                    {aiIntakeChips.map((label) => (
+                      <button key={`ai-${label}`} type="button" onClick={() => openComplaintTools(label)}>
+                        {label}
+                      </button>
+                    ))}
                     {suggestedTools.map((tool) => (
                       <button key={tool.id} type="button" onClick={() => openComplaintTools(tool.id)}>
                         {tool.label}

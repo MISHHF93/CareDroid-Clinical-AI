@@ -497,6 +497,91 @@ export class OrganizationsService {
     return this.getFeatureFlagAdministration(user, organizationId);
   }
 
+  async getEmergencyFeatureSettings(user: User, organizationId: string) {
+    await this.assertMember(user.id, organizationId);
+    const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    if (!org) throw new NotFoundException('Organization not found');
+
+    const settings = (org.settings || {}) as Record<string, any>;
+    const emergencyOs = this.isRecord(settings.emergencyOs)
+      ? (settings.emergencyOs as Record<string, any>)
+      : {};
+    const flags = this.recordOfBooleans(
+      emergencyOs.featureFlags ||
+        emergencyOs.featureFlagOverrides ||
+        settings.emergencyFeatureFlags,
+    );
+
+    return {
+      tier: this.resolveEmergencyFeatureTier(settings),
+      flags,
+      updatedAt: typeof emergencyOs.updatedAt === 'string' ? emergencyOs.updatedAt : null,
+      updatedBy: typeof emergencyOs.updatedBy === 'string' ? emergencyOs.updatedBy : null,
+    };
+  }
+
+  async updateEmergencyFeatureSetting(
+    user: User,
+    organizationId: string,
+    input: {
+      featureId?: string;
+      enabled?: boolean;
+      changedBy?: string;
+      timestamp?: string;
+    },
+  ) {
+    await this.assertAdmin(user.id, organizationId);
+    const featureId = String(input.featureId || '').trim();
+    if (!featureId) throw new BadRequestException('featureId is required');
+    if (typeof input.enabled !== 'boolean') {
+      throw new BadRequestException('enabled must be a boolean');
+    }
+
+    const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
+    if (!org) throw new NotFoundException('Organization not found');
+
+    const settings = (org.settings || {}) as Record<string, any>;
+    const emergencyOs = this.isRecord(settings.emergencyOs)
+      ? (settings.emergencyOs as Record<string, any>)
+      : {};
+    const flags = {
+      ...this.recordOfBooleans(
+        emergencyOs.featureFlags ||
+          emergencyOs.featureFlagOverrides ||
+          settings.emergencyFeatureFlags,
+      ),
+      [featureId]: input.enabled,
+    };
+    const timestamp = input.timestamp || new Date().toISOString();
+    const changedBy = input.changedBy || user.id;
+
+    org.settings = {
+      ...settings,
+      emergencyFeatureFlags: flags,
+      emergencyOs: {
+        ...emergencyOs,
+        featureFlags: flags,
+        featureTier: this.resolveEmergencyFeatureTier(settings),
+        updatedAt: timestamp,
+        updatedBy: changedBy,
+      },
+    };
+    await this.organizationRepository.save(org);
+
+    return {
+      tier: this.resolveEmergencyFeatureTier(org.settings as Record<string, any>),
+      flags,
+      updatedAt: timestamp,
+      updatedBy: changedBy,
+      changed: {
+        featureId,
+        enabled: input.enabled,
+        changedBy,
+        timestamp,
+      },
+    };
+  }
+
   async requestIntegration(user: User, organizationId: string, integrationSlug: string) {
     await this.assertAdmin(user.id, organizationId);
     const org = await this.organizationRepository.findOne({ where: { id: organizationId } });
@@ -526,6 +611,32 @@ export class OrganizationsService {
 
   private isRecord(value: unknown): value is Record<string, unknown> {
     return Boolean(value && typeof value === 'object' && !Array.isArray(value));
+  }
+
+  private recordOfBooleans(value: unknown): Record<string, boolean> {
+    if (!this.isRecord(value)) return {};
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(([key]) => Boolean(key))
+        .map(([key, enabled]) => [key, Boolean(enabled)]),
+    );
+  }
+
+  private resolveEmergencyFeatureTier(settings: Record<string, any> = {}) {
+    const emergencyOs = this.isRecord(settings.emergencyOs)
+      ? (settings.emergencyOs as Record<string, any>)
+      : {};
+    const rawTier =
+      emergencyOs.featureTier ||
+      emergencyOs.tier ||
+      settings.featureTier ||
+      settings.tier ||
+      settings.subscription?.tier ||
+      settings.subscription?.planTier;
+    const normalized = String(rawTier || '').toLowerCase();
+    if (normalized === 'enterprise' || normalized === 'institutional') return 'enterprise';
+    if (normalized === 'core' || normalized === 'free' || normalized === 'starter') return 'core';
+    return 'professional';
   }
 
   private getFeatureFlagService() {

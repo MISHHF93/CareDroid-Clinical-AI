@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { setDepartmentContextStoreReader } from '../lib/ai/contextEngine';
+import { setToolRegistryStoreReader } from '../lib/ai/toolRegistry';
 import {
   deriveAlerts,
   isDerivedAlertId,
@@ -2719,6 +2721,8 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
 }));
 
 registerAlertDispatcher((alert) => useEmergencyStore.getState().dispatchAlert(alert));
+setDepartmentContextStoreReader(() => useEmergencyStore.getState());
+setToolRegistryStoreReader(() => useEmergencyStore.getState());
 
 export const emergencyStoreApi = useEmergencyStore;
 

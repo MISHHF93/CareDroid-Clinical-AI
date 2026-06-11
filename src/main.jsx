@@ -14,6 +14,7 @@ import {
 } from '../engine/reassessmentEngine';
 import { startCapacityIntelligence, stopCapacityIntelligence } from '../engine/capacityEngine';
 import { startEmergencySimulation, stopEmergencySimulation } from '../engine/simulation';
+import { useFeatureStore } from '../store/featureStore';
 
 import './index.css';
 
@@ -55,7 +56,14 @@ window.addEventListener('unhandledrejection', (event) => {
 
 scheduleDeferredStartupTasks();
 
-startEmergencySimulation();
+void useFeatureStore
+  .getState()
+  .initializeFlags()
+  .then(() => {
+    if (useFeatureStore.getState().isEnabled('simulation_engine')) {
+      startEmergencySimulation();
+    }
+  });
 startEmergencyReassessment();
 startCapacityIntelligence();
 

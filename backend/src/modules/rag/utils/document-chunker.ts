@@ -1,11 +1,11 @@
-import { encoding_for_model } from 'tiktoken';
+import { get_encoding } from 'tiktoken';
 import { DocumentChunk, IngestDocumentDto } from '../dto/medical-source.dto';
 
 /**
  * Document Chunker
  *
  * Splits documents into overlapping chunks for optimal RAG retrieval.
- * Uses tiktoken for accurate token counting compatible with OpenAI models.
+ * Uses tiktoken for stable token counting during local RAG chunking.
  */
 
 export class DocumentChunker {
@@ -14,8 +14,7 @@ export class DocumentChunker {
   private readonly overlap: number;
 
   constructor(chunkSize: number = 512, overlap: number = 50) {
-    // Initialize tiktoken encoder for GPT models
-    this.encoder = encoding_for_model('gpt-4');
+    this.encoder = get_encoding('cl100k_base');
     this.chunkSize = chunkSize;
     this.overlap = overlap;
   }

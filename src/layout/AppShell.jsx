@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
@@ -6,12 +6,15 @@ import {
   BarChart3,
   Bell,
   Bot,
+  CalendarClock,
   ChevronRight,
   ClipboardList,
   Gauge,
   Info,
   LayoutDashboard,
+  Settings,
   Share2,
+  Stethoscope,
   Truck,
   X,
 } from 'lucide-react';
@@ -22,6 +25,8 @@ import ReassessmentDrawer from '../components/ReassessmentDrawer';
 import { useConversation } from '../contexts/ConversationContext';
 import { useUser } from '../contexts/UserContext';
 import { hasPatientFlag, useEmergencyStore } from '../../store/emergencyStore';
+import { useFeatureStore } from '../../store/featureStore';
+import { FEATURE_REGISTRY_BY_ID } from '../../lib/features/featureRegistry';
 import { PatientState } from '../../types/emergency';
 import { movePatientToState as movePatientWithJourneyRules } from '../../engine/journeyEngine';
 import { REASSESSMENT_FLAG_TYPES } from '../../engine/reassessmentEngine';
@@ -38,65 +43,53 @@ import {
 } from '../utils/emergencyRolePermissions';
 import './AppShell.css';
 
-const NAV_ITEMS = [
-  {
-    id: 'whiteboard',
-    label: 'Emergency Whiteboard',
-    path: '/emergency',
-    icon: LayoutDashboard,
-    activePaths: ['/emergency', '/workspace/emergency', '/workspace/emergency/whiteboard'],
-  },
-  {
-    id: 'queue',
-    label: 'Queue',
-    path: '/emergency/queues',
-    icon: ClipboardList,
-    activePaths: [
-      '/emergency/queues',
-      '/workspace/emergency/queues',
-      '/workspace/emergency/waiting-room',
-    ],
-  },
-  {
-    id: 'ems',
-    label: 'EMS',
-    path: '/emergency/ems',
-    icon: Truck,
-    activePaths: ['/emergency/ems', '/workspace/emergency/ems', '/workspace/emergency/pre-arrival'],
-  },
-  {
-    id: 'referrals',
-    label: 'Referrals',
-    path: '/emergency/referrals',
-    icon: Share2,
-    activePaths: ['/emergency/referrals', '/workspace/emergency/referrals'],
-  },
-  {
-    id: 'capacity',
-    label: 'Capacity',
-    path: '/emergency/capacity',
-    icon: Gauge,
-    activePaths: [
-      '/emergency/capacity',
-      '/workspace/emergency/capacity',
-      '/workspace/emergency/boarding',
-    ],
-  },
-  {
-    id: 'analytics',
-    label: 'Analytics',
-    path: '/emergency/analytics',
-    icon: BarChart3,
-    activePaths: ['/emergency/analytics', '/workspace/emergency/analytics'],
-  },
-  {
-    id: 'copilot',
-    label: 'Copilot',
-    path: '/emergency/copilot',
-    icon: Bot,
-    activePaths: ['/emergency/copilot', '/workspace/emergency/copilot', '/assistant', '/chat'],
-  },
+const SIDEBAR_ORDER = [
+  'emergency_whiteboard',
+  'queue_intelligence',
+  'ems_pipeline',
+  'referral_intelligence',
+  'capacity_intelligence',
+  'clinical_calculator_hub',
+  'shift_summary',
+  'emergency_settings',
 ];
+
+const SIDEBAR_ICON_COMPONENTS = {
+  analytics: BarChart3,
+  capacity: Gauge,
+  calculators: Stethoscope,
+  ems: Truck,
+  operations: ClipboardList,
+  referrals: Share2,
+  settings: Settings,
+  shift: CalendarClock,
+  whiteboard: LayoutDashboard,
+};
+
+const SIDEBAR_ACTIVE_PATHS = {
+  emergency_whiteboard: ['/emergency', '/workspace/emergency', '/workspace/emergency/whiteboard'],
+  queue_intelligence: ['/emergency/queues', '/workspace/emergency/queues', '/workspace/emergency/waiting-room'],
+  ems_pipeline: ['/emergency/ems', '/workspace/emergency/ems', '/workspace/emergency/pre-arrival'],
+  referral_intelligence: ['/emergency/referrals', '/workspace/emergency/referrals'],
+  capacity_intelligence: ['/emergency/capacity', '/workspace/emergency/capacity', '/workspace/emergency/boarding'],
+  clinical_calculator_hub: ['/emergency/tools', '/tools/calculators'],
+  shift_summary: ['/emergency/shift', '/workspace/emergency/shift-summary', '/workspace/emergency/shift'],
+  emergency_settings: ['/settings', '/settings/features', '/emergency/settings'],
+};
+
+export function buildSidebarItems(isEnabled) {
+  return SIDEBAR_ORDER.map((featureId) => FEATURE_REGISTRY_BY_ID[featureId])
+    .filter((feature) => feature?.sidebarIcon && isEnabled(feature.id))
+    .map((feature) => ({
+      id: feature.id,
+      featureId: feature.id,
+      label: feature.label,
+      path: feature.sidebarRoute || '/emergency',
+      icon: SIDEBAR_ICON_COMPONENTS[feature.sidebarIcon] || LayoutDashboard,
+      activePaths: SIDEBAR_ACTIVE_PATHS[feature.id] || [feature.sidebarRoute || '/emergency'],
+      tier: feature.tier,
+    }));
+}
 
 const ACTIVE_PATIENT_STATES = new Set(
   Object.values(PatientState).filter(
@@ -140,6 +133,22 @@ const SHORTCUT_GROUPS = [
     ],
   },
 ];
+
+const SIDEBAR_NEW_FEATURES_KEY = 'caredroid.emergency.sidebarNewFeatures.v1';
+
+function readSessionFeatureSet() {
+  if (typeof sessionStorage === 'undefined') return new Set();
+  try {
+    return new Set(JSON.parse(sessionStorage.getItem(SIDEBAR_NEW_FEATURES_KEY) || '[]'));
+  } catch (_error) {
+    return new Set();
+  }
+}
+
+function writeSessionFeatureSet(featureIds) {
+  if (typeof sessionStorage === 'undefined') return;
+  sessionStorage.setItem(SIDEBAR_NEW_FEATURES_KEY, JSON.stringify([...featureIds]));
+}
 
 function isEditableShortcutTarget(target) {
   return (
@@ -1053,6 +1062,11 @@ const AppShell = ({
   const copilotOpen = useEmergencyStore((state) => state.copilotOpen);
   const toggleCopilot = useEmergencyStore((state) => state.toggleCopilot);
   const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
+  const featureFlags = useFeatureStore((state) => state.flags);
+  const featureOverrides = useFeatureStore((state) => state.overrides);
+  const featureTier = useFeatureStore((state) => state.tier);
+  const isFeatureEnabled = useFeatureStore((state) => state.isEnabled);
+  const toggleFeature = useFeatureStore((state) => state.toggleFeature);
   const reassessmentCount = useEmergencyStore(
     (state) =>
       state.patients.filter(
@@ -1072,14 +1086,54 @@ const AppShell = ({
   const [isCapacityDetailOpen, setIsCapacityDetailOpen] = useState(false);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isShortcutReferenceOpen, setIsShortcutReferenceOpen] = useState(false);
+  const [sidebarMenu, setSidebarMenu] = useState(null);
+  const longPressTimerRef = useRef(null);
+  const suppressSidebarClickRef = useRef(false);
+  const previousSidebarFeatureIdsRef = useRef(null);
+  const [newSidebarFeatureIds, setNewSidebarFeatureIds] = useState(() => readSessionFeatureSet());
   const [isDemoSimulationActive, setIsDemoSimulationActive] = useState(
     () => isEmergencySimulationAvailable() && isEmergencySimulationRunning()
   );
   const routeNotice = location.state?.edNotice;
+  const sidebarItems = useMemo(
+    () => buildSidebarItems(isFeatureEnabled),
+    [featureFlags, featureOverrides, featureTier, isFeatureEnabled]
+  );
 
   useEffect(() => {
     const timer = window.setInterval(() => setClock(new Date()), 1000);
     return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const currentIds = new Set(sidebarItems.map((item) => item.featureId));
+    if (!previousSidebarFeatureIdsRef.current) {
+      previousSidebarFeatureIdsRef.current = currentIds;
+      return;
+    }
+
+    const sessionIds = readSessionFeatureSet();
+    currentIds.forEach((featureId) => {
+      if (!previousSidebarFeatureIdsRef.current.has(featureId) && !sessionIds.has(featureId)) {
+        sessionIds.add(featureId);
+      }
+    });
+    previousSidebarFeatureIdsRef.current = currentIds;
+    setNewSidebarFeatureIds(sessionIds);
+    writeSessionFeatureSet(sessionIds);
+  }, [sidebarItems]);
+
+  useEffect(() => {
+    const closeSidebarMenu = () => setSidebarMenu(null);
+    const closeSidebarMenuOnEscape = (event) => {
+      if (event.key === 'Escape') setSidebarMenu(null);
+    };
+    window.addEventListener('click', closeSidebarMenu);
+    window.addEventListener('keydown', closeSidebarMenuOnEscape);
+    return () => {
+      window.removeEventListener('click', closeSidebarMenu);
+      window.removeEventListener('keydown', closeSidebarMenuOnEscape);
+    };
   }, []);
 
   useEffect(() => {
@@ -1200,8 +1254,8 @@ const AppShell = ({
   }, []);
 
   const activeNavId = useMemo(
-    () => NAV_ITEMS.find((item) => isNavItemActive(item, location.pathname))?.id,
-    [location.pathname]
+    () => sidebarItems.find((item) => isNavItemActive(item, location.pathname))?.id,
+    [location.pathname, sidebarItems]
   );
   const emsPressure = useMemo(
     () => calculateEMSPressureScore(emsArrivals, clock),
@@ -1446,6 +1500,73 @@ const AppShell = ({
     return () => window.removeEventListener('ed:open-clinical-tools', handleClinicalToolsLaunch);
   }, [navigate]);
 
+  const clearSidebarLongPress = useCallback(() => {
+    if (longPressTimerRef.current) {
+      window.clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+  }, []);
+
+  const openSidebarMenu = useCallback((event, item) => {
+    event.preventDefault();
+    event.stopPropagation();
+    clearSidebarLongPress();
+    setSidebarMenu({
+      item,
+      x: Math.min(event.clientX || 64, window.innerWidth - 220),
+      y: Math.min(event.clientY || 72, window.innerHeight - 132),
+    });
+  }, [clearSidebarLongPress]);
+
+  const handleSidebarPointerDown = useCallback(
+    (event, item) => {
+      if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
+      const clientX = event.clientX || 64;
+      const clientY = event.clientY || 72;
+      clearSidebarLongPress();
+      longPressTimerRef.current = window.setTimeout(() => {
+        suppressSidebarClickRef.current = true;
+        setSidebarMenu({
+          item,
+          x: Math.min(clientX, window.innerWidth - 220),
+          y: Math.min(clientY, window.innerHeight - 132),
+        });
+      }, 520);
+    },
+    [clearSidebarLongPress]
+  );
+
+  const handleSidebarPointerEnd = useCallback(() => {
+    clearSidebarLongPress();
+    window.setTimeout(() => {
+      suppressSidebarClickRef.current = false;
+    }, 0);
+  }, [clearSidebarLongPress]);
+
+  const handleSidebarClick = useCallback((event) => {
+    if (!suppressSidebarClickRef.current) return;
+    event.preventDefault();
+    event.stopPropagation();
+  }, []);
+
+  const handleDisableSidebarFeature = useCallback(async () => {
+    if (!sidebarMenu?.item || sidebarMenu.item.tier === 'core') return;
+    const item = sidebarMenu.item;
+    setSidebarMenu(null);
+    try {
+      await toggleFeature(item.featureId, false);
+    } catch (_error) {
+      // toggleFeature reverts failed optimistic updates; keep the rail stable.
+    }
+  }, [sidebarMenu, toggleFeature]);
+
+  const handleOpenFeatureSettings = useCallback(() => {
+    if (!sidebarMenu?.item) return;
+    const featureId = sidebarMenu.item.featureId;
+    setSidebarMenu(null);
+    navigate(`/settings/features#feature-${featureId}`);
+  }, [navigate, sidebarMenu]);
+
   return (
     <div
       className={[
@@ -1464,9 +1585,10 @@ const AppShell = ({
 
       <aside className="ed-nav-rail" aria-label="Emergency OS navigation">
         <nav className="ed-nav-rail__items">
-          {NAV_ITEMS.map((item) => {
+          {sidebarItems.map((item) => {
             const Icon = item.icon;
             const isActive = item.id === activeNavId;
+            const isNew = newSidebarFeatureIds.has(item.featureId);
 
             return (
               <Link
@@ -1474,23 +1596,53 @@ const AppShell = ({
                 to={item.path}
                 className={[
                   'ed-nav-rail__item',
+                  'ed-nav-rail__item--appearing',
                   isActive ? 'ed-nav-rail__item--active' : '',
-                  item.id === 'ems' && shouldFlashEMSNav ? 'ed-nav-rail__item--flash' : '',
-                  item.id === 'ems' && shouldFlashEMSNav
+                  isNew ? 'ed-nav-rail__item--new' : '',
+                  item.featureId === 'ems_pipeline' && shouldFlashEMSNav ? 'ed-nav-rail__item--flash' : '',
+                  item.featureId === 'ems_pipeline' && shouldFlashEMSNav
                     ? `ed-nav-rail__item--flash-${emsPressure.band.id}`
                     : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
-                aria-label={item.label}
+                aria-label={isNew ? `${item.label}. New.` : item.label}
                 aria-current={isActive ? 'page' : undefined}
-                title={item.label}
+                title={isNew ? `${item.label} - New` : item.label}
+                onClick={handleSidebarClick}
+                onContextMenu={(event) => openSidebarMenu(event, item)}
+                onPointerDown={(event) => handleSidebarPointerDown(event, item)}
+                onPointerUp={handleSidebarPointerEnd}
+                onPointerCancel={handleSidebarPointerEnd}
+                onPointerLeave={handleSidebarPointerEnd}
               >
                 <Icon size={21} strokeWidth={2.1} aria-hidden />
+                {isNew ? <span className="ed-nav-rail__new-dot" aria-hidden /> : null}
               </Link>
             );
           })}
         </nav>
+        {sidebarMenu ? (
+          <div
+            className="ed-nav-context-menu"
+            style={{ left: sidebarMenu.x, top: sidebarMenu.y }}
+            role="menu"
+            aria-label={`${sidebarMenu.item.label} feature shortcuts`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              type="button"
+              role="menuitem"
+              disabled={sidebarMenu.item.tier === 'core'}
+              onClick={handleDisableSidebarFeature}
+            >
+              Disable {sidebarMenu.item.label}
+            </button>
+            <button type="button" role="menuitem" onClick={handleOpenFeatureSettings}>
+              Feature Settings
+            </button>
+          </div>
+        ) : null}
       </aside>
 
       <div className="ed-os-shell__workspace">

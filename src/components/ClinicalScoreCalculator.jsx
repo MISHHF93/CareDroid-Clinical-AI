@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Save, X } from 'lucide-react';
+import { sendClinicalChatMessage } from '../services/clinicalChatService';
+import { useFeature } from '../hooks/useFeature';
 import './ClinicalScoreCalculator.css';
 
 export const CALCULATOR_BY_SUGGESTION_ID = {
@@ -197,7 +199,11 @@ export function createClinicalScoreNote(patientId, score, authorStaffId, timesta
 }
 
 export default function ClinicalScoreCalculator({ calculatorId, patient, onClose, onSaveScore }) {
+  const { enabled: scoreAiAssistEnabled } = useFeature('score_ai_assist');
   const [values, setValues] = useState(() => createInitialValues(calculatorId, patient));
+  const [assistText, setAssistText] = useState('');
+  const [assistError, setAssistError] = useState('');
+  const [assistLoading, setAssistLoading] = useState(false);
   const fields = fieldsForCalculator(calculatorId);
   const total = useMemo(() => totalScore(values), [values]);
   const interpretation = interpretScore(calculatorId, total);
@@ -225,6 +231,43 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
       values,
     });
     onClose?.();
+  };
+
+  const requestAiAssist = async () => {
+    if (!patient) return;
+    setAssistLoading(true);
+    setAssistError('');
+    try {
+      const response = await sendClinicalChatMessage({
+        message: [
+          `Based on the vitals, key fields to consider are requested for ${label}.`,
+          'Provide scoring guidance only. Do not diagnose, recommend disposition, or invent missing fields.',
+        ].join('\n'),
+        requestType: 'SCORE_ASSIST',
+        workspaceContext: {
+          workspaceId: 'emergency',
+          workspaceKey: 'emergency',
+          aiRequest: {
+            requestType: 'SCORE_ASSIST',
+            patientId: patient.id,
+            calculatorType: calculatorId,
+            patientVitals: patient.vitals,
+            patientContext: {
+              complaint: patient.complaint || patient.chiefComplaint,
+              priority: patient.priority,
+              state: patient.state,
+              age: patient.age,
+            },
+          },
+        },
+      });
+      if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+      setAssistText(response.data.response || 'No guidance returned.');
+    } catch (_error) {
+      setAssistError('Unable to generate AI scoring guidance.');
+    } finally {
+      setAssistLoading(false);
+    }
   };
 
   const renderFieldControl = (field) => {
@@ -290,6 +333,13 @@ export default function ClinicalScoreCalculator({ calculatorId, patient, onClose
             <strong>{total}</strong>
             <h3>{interpretation.band}</h3>
             <p>{interpretation.recommendation}</p>
+            {patient && scoreAiAssistEnabled ? (
+              <button type="button" onClick={requestAiAssist} disabled={assistLoading}>
+                {assistLoading ? 'Reviewing...' : 'AI Assist'}
+              </button>
+            ) : null}
+            {assistText ? <small>{assistText}</small> : null}
+            {assistError ? <small>{assistError}</small> : null}
             {calculatorId === 'heart' ? (
               <small>Age field is pre-filled from the linked patient when available.</small>
             ) : null}

@@ -30,6 +30,7 @@ import { LongMemoryService } from '../src/modules/memory/long-memory.service';
 import { ClinicalMemoryService } from '../src/modules/memory/clinical-memory.service';
 import { ArtifactsService } from '../src/modules/artifacts/artifacts.service';
 import { EvaluationService } from '../src/modules/evaluation/evaluation.service';
+import { unifiedAIClient } from '../../lib/ai/client';
 
 describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
   let aiService: AIService;
@@ -46,7 +47,7 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
           useValue: {
             get: (key: string) => {
               const config = {
-                OPENAI_API_KEY: process.env.OPENAI_API_KEY || 'sk-test-key',
+                ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY || 'sk-test-key',
               };
               return config[key];
             },
@@ -290,6 +291,12 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
 
     aiService = module.get<AIService>(AIService);
     chatService = module.get<ChatService>(ChatService);
+    jest.spyOn(unifiedAIClient, 'request').mockResolvedValue({
+      content: 'Default AI response',
+      toolCalls: [],
+      usage: { inputTokens: 10, outputTokens: 5, totalTokens: 15 },
+      requestType: 'COPILOT_CHAT',
+    });
   });
 
   afterAll(async () => {
@@ -339,38 +346,25 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
     });
 
     it('should return response with toolCalls array', async () => {
-      // Mock the OpenAI response to include tool calls
-      jest.spyOn(aiService['openai'].chat.completions, 'create').mockResolvedValueOnce({
-        choices: [
+      jest.mocked(unifiedAIClient.request).mockResolvedValueOnce({
+        content: 'I can help you calculate the SOFA score.',
+        toolCalls: [
           {
-            message: {
-              content: 'I can help you calculate the SOFA score.',
-              tool_calls: [
-                {
-                  id: 'call_123',
-                  function: {
-                    name: 'sofa_calculator',
-                    arguments: JSON.stringify({
-                      respiratory: 8.5,
-                      coagulation: 150,
-                      liver: 1.2,
-                      cardiovascular: 'none',
-                      cns: 15,
-                      renal: 0.8,
-                    }),
-                  },
-                },
-              ],
+            id: 'call_123',
+            name: 'sofa_calculator',
+            input: {
+              respiratory: 8.5,
+              coagulation: 150,
+              liver: 1.2,
+              cardiovascular: 'none',
+              cns: 15,
+              renal: 0.8,
             },
-            finish_reason: 'tool_calls',
           },
         ],
-        usage: {
-          prompt_tokens: 100,
-          completion_tokens: 50,
-          total_tokens: 150,
-        },
-      } as any);
+        usage: { inputTokens: 100, outputTokens: 50, totalTokens: 150 },
+        requestType: 'COPILOT_CHAT',
+      });
 
       const result = await aiService.invokeLLMWithTools('test-user-123', 'Calculate SOFA score');
 
@@ -385,22 +379,12 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
         { role: 'assistant', content: 'Which medications are you taking?' },
       ];
 
-      jest.spyOn(aiService['openai'].chat.completions, 'create').mockResolvedValueOnce({
-        choices: [
-          {
-            message: {
-              content: 'I found a potential interaction.',
-              tool_calls: [],
-            },
-            finish_reason: 'end_turn',
-          },
-        ],
-        usage: {
-          prompt_tokens: 200,
-          completion_tokens: 50,
-          total_tokens: 250,
-        },
-      } as any);
+      jest.mocked(unifiedAIClient.request).mockResolvedValueOnce({
+        content: 'I found a potential interaction.',
+        toolCalls: [],
+        usage: { inputTokens: 200, outputTokens: 50, totalTokens: 250 },
+        requestType: 'COPILOT_CHAT',
+      });
 
       const result = await aiService.invokeLLMWithTools(
         'test-user-123',
@@ -488,9 +472,7 @@ describe('Tool Calling Integration (Batch 15 Phase 1)', () => {
 
   describe('Error Handling (Step 5)', () => {
     it('should handle API errors gracefully', async () => {
-      jest
-        .spyOn(aiService['openai'].chat.completions, 'create')
-        .mockRejectedValueOnce(new Error('OpenAI API Error'));
+      jest.mocked(unifiedAIClient.request).mockRejectedValueOnce(new Error('AI API Error'));
 
       try {
         await aiService.invokeLLMWithTools('test-user-123', 'Test message');

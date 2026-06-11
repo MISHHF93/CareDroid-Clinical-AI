@@ -43,6 +43,9 @@ import { ArtifactsService } from '../artifacts/artifacts.service';
 import { ArtifactType } from '../artifacts/entities/artifact.entity';
 import { EvaluationService } from '../evaluation/evaluation.service';
 import { PlatformGovernanceService } from '../platform-governance';
+import { Message, unifiedAIClient } from '../../../../lib/ai/client';
+import { buildSystemPrompt } from '../../../../lib/ai/contextEngine';
+import { getToolsForRequestType } from '../../../../lib/ai/toolRegistry';
 
 interface QueryResponse {
   text: string;
@@ -263,7 +266,14 @@ export class ChatService {
     });
 
     if (workspaceContext?.edCopilot?.enabled) {
-      const response = await this.handleEdCopilot(message, workspaceContext.edCopilot, requestMessages);
+      const response = await this.handleEdCopilot(
+        message,
+        {
+          ...workspaceContext.edCopilot,
+          toolsEnabled: workspaceContext.aiRequest?.toolsEnabled !== false,
+        },
+        requestMessages,
+      );
       const composed = this.aiResponseComposer.compose(
         response,
         aiRunEnvelope,
@@ -343,6 +353,10 @@ export class ChatService {
       tool,
       feature,
       conversationId,
+      requestType: workspaceContext?.aiRequest?.requestType,
+      patientContext: workspaceContext?.aiRequest?.patientContext,
+      patientVitals: workspaceContext?.aiRequest?.patientVitals,
+      shiftSummary: workspaceContext?.aiRequest?.shiftSummary,
       intentClassification: classification,
       knowledgeBaseContext,
       workspaceContext,
@@ -378,8 +392,8 @@ export class ChatService {
     // detect intent -> collect missing fields -> execute -> summarize result.
     const toolCallingClassification = this.buildToolCallingClassification(
       message,
-      tool,
-      feature,
+      workspaceContext?.aiRequest?.requestType ? undefined : tool,
+      workspaceContext?.aiRequest?.requestType ? undefined : feature,
       classification,
     );
     if (toolCallingClassification) {
@@ -857,7 +871,24 @@ export class ChatService {
       pinnedAssets: Array.isArray(context.pinnedAssets) ? context.pinnedAssets.slice(0, 30) : [],
       permissions: Array.isArray(context.permissions) ? context.permissions.slice(0, 80) : [],
       preferredAIStyle: context.saasProfile?.preferredAIStyle,
+      aiRequest: this.sanitizeAiRequestContext(context.aiRequest),
       edCopilot: this.sanitizeEdCopilotContext(context.edCopilot),
+    };
+  }
+
+  private sanitizeAiRequestContext(context?: Record<string, any>): Record<string, any> | null {
+    if (!context || typeof context !== 'object') return null;
+    const requestType = String(context.requestType || '');
+    return {
+      requestType,
+      patientId: context.patientId ? String(context.patientId) : undefined,
+      calculatorType: context.calculatorType ? String(context.calculatorType) : undefined,
+      complaint: context.complaint ? String(context.complaint).slice(0, 500) : undefined,
+      summaryOnly: Boolean(context.summaryOnly),
+      patientVitals: context.patientVitals || undefined,
+      patientContext: context.patientContext || undefined,
+      shiftSummary: context.shiftSummary || undefined,
+      toolsEnabled: context.toolsEnabled !== false,
     };
   }
 
@@ -1352,14 +1383,18 @@ export class ChatService {
     if (detectedIntent?.intent === 'FILTER_BY_COMPLAINT') {
       const complaint = String(detectedIntent.value || '').toLowerCase();
       const complaintPatients = patients.filter((patient) =>
-        String(patient.complaint || '').toLowerCase().includes(complaint),
+        String(patient.complaint || '')
+          .toLowerCase()
+          .includes(complaint),
       );
       const lines = complaintPatients.length
         ? complaintPatients.map(
             (patient) =>
               `- ${patient.name} (${patient.location || 'unassigned'}) - ${patient.state}, ${patient.priority}, wait ${patient.waitMinutes} min`,
           )
-        : [`No ${detectedIntent.value || 'matching'} patients are on the current whiteboard context.`];
+        : [
+            `No ${detectedIntent.value || 'matching'} patients are on the current whiteboard context.`,
+          ];
 
       return this.buildEdCopilotResponse({
         text: `**${detectedIntent.value || 'Matching'} patients**\n\n${lines.join('\n')}\n\n_Review these patients in the whiteboard. No autonomous diagnosis or disposition is suggested._`,
@@ -1413,7 +1448,12 @@ export class ChatService {
     if (detectedIntent?.intent === 'QUERY_HIGH_RISK') {
       const highRiskPatients = patients.filter((patient) => {
         const priority = String(patient.priority || '').toUpperCase();
-        return priority.includes('P1') || priority.includes('P2') || priority.includes('CTAS 1') || priority.includes('CTAS 2');
+        return (
+          priority.includes('P1') ||
+          priority.includes('P2') ||
+          priority.includes('CTAS 1') ||
+          priority.includes('CTAS 2')
+        );
       });
       const lines = highRiskPatients.length
         ? highRiskPatients.map(
@@ -1533,7 +1573,9 @@ export class ChatService {
 
     if (/chest pain/.test(lower) && /show|all|patients|list/.test(lower)) {
       const chestPainPatients = patients.filter((patient) =>
-        String(patient.complaint || '').toLowerCase().includes('chest'),
+        String(patient.complaint || '')
+          .toLowerCase()
+          .includes('chest'),
       );
       const lines = chestPainPatients.length
         ? chestPainPatients.map(
@@ -1583,7 +1625,12 @@ export class ChatService {
           patient.location,
           String(patient.location || '').replace(/^bed\s*/i, ''),
         ];
-        return fields.some((field) => String(field || '').trim().toLowerCase() === target);
+        return fields.some(
+          (field) =>
+            String(field || '')
+              .trim()
+              .toLowerCase() === target,
+        );
       });
 
       if (!matchedPatient) {
@@ -1680,67 +1727,35 @@ export class ChatService {
     edContext: Record<string, any>,
     requestMessages?: Array<{ role: string; content: string }>,
   ): Promise<string> {
-    const apiKey =
-      this.configService.get<string>('ANTHROPIC_API_KEY') ||
-      this.configService.get<string>('anthropic.apiKey');
-    if (!apiKey) return '';
-
-    const model =
-      this.configService.get<string>('ANTHROPIC_MODEL') ||
-      this.configService.get<string>('anthropic.model') ||
-      'claude-3-5-sonnet-20241022';
-
-    const systemPrompt =
-      requestMessages?.find((item) => item?.role === 'system' && item.content)?.content ||
-      edContext.systemPrompt;
-    const anthropicMessages =
+    const systemPrompt = buildSystemPrompt(edContext as any, 'COPILOT_CHAT');
+    const messages: Message[] =
       requestMessages
         ?.filter((item) => item?.role === 'user' || item?.role === 'assistant')
         .map((item) => ({
-          role: item.role,
+          role: (item.role === 'assistant' ? 'assistant' : 'user') as Message['role'],
           content: item.content,
         }))
         .filter((item) => item.content) || [];
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model,
-          max_tokens: 700,
-          temperature: 0.2,
-          system: systemPrompt,
-          messages: anthropicMessages.length
-            ? anthropicMessages
-            : [
-                {
-                  role: 'user',
-                  content: message,
-                },
-              ],
-        }),
+      unifiedAIClient.configure({
+        apiKey:
+          this.configService.get<string>('ANTHROPIC_API_KEY') ||
+          this.configService.get<string>('anthropic.apiKey'),
       });
 
-      if (!response.ok) {
-        this.logger.warn(`Anthropic ED Copilot request failed: ${response.status}`);
-        return '';
-      }
-
-      const data = await response.json().catch(() => ({}));
-      const content = Array.isArray(data?.content) ? data.content : [];
-      return content
-        .map((item: any) => (item?.type === 'text' ? item.text : ''))
-        .filter(Boolean)
-        .join('\n')
-        .trim();
+      const response = await unifiedAIClient.request({
+        requestType: 'COPILOT_CHAT',
+        systemPrompt,
+        messages: messages.length ? messages : [{ role: 'user', content: message }],
+        maxTokens: 700,
+        context: edContext as any,
+        tools: edContext?.toolsEnabled === false ? [] : getToolsForRequestType('COPILOT_CHAT'),
+      });
+      return typeof response.content === 'string' ? response.content.trim() : '';
     } catch (error) {
       this.logger.warn(
-        `Anthropic ED Copilot request error: ${error instanceof Error ? error.message : String(error)}`,
+        `ED Copilot AI request error: ${error instanceof Error ? error.message : String(error)}`,
       );
       return '';
     }

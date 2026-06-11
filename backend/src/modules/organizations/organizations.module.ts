@@ -13,6 +13,7 @@ import { OrganizationMembership } from './entities/organization-membership.entit
 import { OrganizationOnboardingService } from './organization-onboarding.service';
 import { OrganizationsController } from './organizations.controller';
 import { OrganizationsService } from './organizations.service';
+import { SettingsFeaturesController } from './settings-features.controller';
 import { TenantProvisioningService } from './tenant-provisioning.service';
 import { WhiteLabelController } from './white-label.controller';
 
@@ -31,7 +32,7 @@ import { WhiteLabelController } from './white-label.controller';
     PlatformAssetsModule,
     WorkspacesModule,
   ],
-  controllers: [OrganizationsController, WhiteLabelController],
+  controllers: [OrganizationsController, SettingsFeaturesController, WhiteLabelController],
   providers: [OrganizationsService, OrganizationOnboardingService, TenantProvisioningService],
   exports: [OrganizationsService],
 })

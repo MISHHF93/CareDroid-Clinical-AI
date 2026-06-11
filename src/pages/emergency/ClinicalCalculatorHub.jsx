@@ -4,6 +4,9 @@ import { CalculatorInterface, CALCULATORS } from '../tools/Calculators';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
 import { useEmergencyStore } from '../../../store/emergencyStore';
+import { FEATURE_REGISTRY } from '../../../lib/features/featureRegistry';
+import FeatureGate from '../../components/FeatureGate';
+import { useFeature } from '../../hooks/useFeature';
 import { DRUG_REFERENCE_TOOLS } from '../../utils/drugReferenceTools';
 import './ClinicalCalculatorHub.css';
 
@@ -153,6 +156,42 @@ const TOOL_ALIASES = Object.freeze({
   broselow: 'pediatric-dose-safety-checker',
 });
 
+const FEATURE_BY_TOOL_ID = Object.freeze(
+  FEATURE_REGISTRY.reduce((acc, feature) => {
+    (feature.relatedTools || []).forEach((toolId) => {
+      acc[toolId] = feature.id;
+    });
+    return acc;
+  }, {})
+);
+
+const CALCULATOR_FEATURE_ALIASES = Object.freeze({
+  heart: 'heart_score',
+  'heart-score': 'heart_score',
+  qsofa: 'qsofa',
+  nihss: 'nihss',
+  'curb-65': 'curb65',
+  'wells-pe': 'wells_pe',
+  news2: 'news2',
+  'timi-ua-nstemi': 'timi',
+  alvarado: 'alvarado',
+  pews: 'pews',
+  phq9: 'phq9',
+  gad7: 'gad7',
+  'columbia-suicide-severity-workflow': 'columbia_suicide',
+  gcs: 'glasgow_coma',
+  'pediatric-dose-safety-checker': 'pediatric_drug_calc',
+  'egfr-ckd-epi': 'egfr_calc',
+  gfr: 'egfr_calc',
+  'anion-gap': 'anion_gap',
+  'corrected-qt': 'corrected_qt',
+  'shock-index': 'shock_index',
+});
+
+function featureForTool(toolId) {
+  return CALCULATOR_FEATURE_ALIASES[toolId] || FEATURE_BY_TOOL_ID[toolId] || null;
+}
+
 const COMPLAINT_TO_CATEGORY = Object.freeze({
   'Chest Pain': 'Cardiac',
   'Shortness of Breath': 'Respiratory',
@@ -213,6 +252,54 @@ function summarizeResult(result) {
   return { total, interpretation, recommendation };
 }
 
+function DisabledCalculatorCard({ tool, featureId }) {
+  return (
+    <article className="clinical-calculator-card clinical-calculator-card--disabled">
+      <div className="clinical-calculator-card__header">
+        <span className="clinical-calculator-card__icon" aria-hidden>
+          <NavIcon icon={getCalculatorSubIcon(tool.id)} size={22} />
+        </span>
+        <strong>{tool.name}</strong>
+      </div>
+      <p>{tool.description}</p>
+      <div className="clinical-calculator-card__meta">
+        <span>{tool.domain}</span>
+        <span>Disabled</span>
+      </div>
+      <a href={`/settings/features#feature-${featureId}`}>Enable in Settings</a>
+    </article>
+  );
+}
+
+function ClinicalToolCard({ tool, active, displayPatient, onLaunch }) {
+  const featureId = featureForTool(tool.id);
+  const { enabled } = useFeature(featureId);
+
+  if (!enabled) {
+    return <DisabledCalculatorCard tool={tool} featureId={featureId} />;
+  }
+
+  return (
+    <article className={`clinical-calculator-card${active ? ' is-active' : ''}`}>
+      <div className="clinical-calculator-card__header">
+        <span className="clinical-calculator-card__icon" aria-hidden>
+          <NavIcon icon={getCalculatorSubIcon(tool.id)} size={22} />
+        </span>
+        <strong>{tool.name}</strong>
+      </div>
+      <p>{tool.description}</p>
+      <div className="clinical-calculator-card__meta">
+        <span>{tool.domain}</span>
+        {displayPatient ? <span>Linked to patient</span> : <span>Standalone</span>}
+        {tool.status === 'coming-soon' ? <span>Coming soon</span> : null}
+      </div>
+      <button type="button" onClick={() => onLaunch(tool.id)} disabled={tool.status === 'coming-soon'}>
+        {tool.status === 'coming-soon' ? 'Coming soon' : 'Launch'}
+      </button>
+    </article>
+  );
+}
+
 export default function ClinicalCalculatorHub() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -255,6 +342,7 @@ export default function ClinicalCalculatorHub() {
     []
   );
   const activeTool = tools.find((tool) => tool.id === queryToolId) || null;
+  const activeToolFeature = activeTool ? featureForTool(activeTool.id) : null;
   const filteredTools = tools.filter((tool) => {
     const inCategory = activeCategory === 'All' || tool.domain === activeCategory;
     const haystack = `${tool.name} ${tool.id} ${tool.description} ${tool.domain} ${(tool.keywords || []).join(' ')}`.toLowerCase();
@@ -401,26 +489,19 @@ export default function ClinicalCalculatorHub() {
 
       <section className="clinical-calculator-hub__grid" aria-label="Clinical tool cards">
         {filteredTools.map((tool) => (
-          <article
+          <FeatureGate
             key={tool.id}
-            className={`clinical-calculator-card${activeTool?.id === tool.id ? ' is-active' : ''}`}
+            feature={featureForTool(tool.id)}
+            showPlaceholder
+            placeholder={<DisabledCalculatorCard tool={tool} featureId={featureForTool(tool.id)} />}
           >
-            <div className="clinical-calculator-card__header">
-              <span className="clinical-calculator-card__icon" aria-hidden>
-                <NavIcon icon={getCalculatorSubIcon(tool.id)} size={22} />
-              </span>
-              <strong>{tool.name}</strong>
-            </div>
-            <p>{tool.description}</p>
-            <div className="clinical-calculator-card__meta">
-              <span>{tool.domain}</span>
-              {displayPatient ? <span>Linked to patient</span> : <span>Standalone</span>}
-              {tool.status === 'coming-soon' ? <span>Coming soon</span> : null}
-            </div>
-            <button type="button" onClick={() => launchTool(tool.id)} disabled={tool.status === 'coming-soon'}>
-              {tool.status === 'coming-soon' ? 'Coming soon' : 'Launch'}
-            </button>
-          </article>
+            <ClinicalToolCard
+              tool={tool}
+              active={activeTool?.id === tool.id}
+              displayPatient={displayPatient}
+              onLaunch={launchTool}
+            />
+          </FeatureGate>
         ))}
         {!filteredTools.length ? (
           <div className="clinical-calculator-hub__empty">No tools match this search.</div>
@@ -428,7 +509,9 @@ export default function ClinicalCalculatorHub() {
       </section>
 
       <section className="clinical-calculator-hub__workspace" aria-label="Calculator workspace">
-        {activeTool && activeTool.launchMode !== 'calculator' ? (
+        {activeTool ? (
+          <FeatureGate feature={activeToolFeature} showPlaceholder>
+            {activeTool.launchMode !== 'calculator' ? (
           <div className="clinical-calculator-hub__select">
             <NavIcon icon={CHROME_ICONS.drugs || CHROME_ICONS.pill || CHROME_ICONS.stethoscope} size={44} aria-hidden />
             <h2>{activeTool.name}</h2>
@@ -439,7 +522,7 @@ export default function ClinicalCalculatorHub() {
               </button>
             ) : null}
           </div>
-        ) : activeTool ? (
+            ) : (
           <>
             <div className="clinical-calculator-shell__header">
               <button type="button" onClick={() => navigate('/emergency/tools')}>
@@ -477,6 +560,8 @@ export default function ClinicalCalculatorHub() {
               }}
             />
           </>
+            )}
+          </FeatureGate>
         ) : (
           <div className="clinical-calculator-hub__select">
             <NavIcon icon={CHROME_ICONS.stethoscope} size={44} aria-hidden />

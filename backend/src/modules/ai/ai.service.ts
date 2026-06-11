@@ -1,6 +1,5 @@
 import { Injectable, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import OpenAI from 'openai';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, MoreThanOrEqual } from 'typeorm';
 import { User } from '../users/entities/user.entity';
@@ -11,6 +10,16 @@ import { AuditAction } from '../audit/entities/audit-log.entity';
 import { MetricsService } from '../metrics/metrics.service';
 import { PlatformGovernanceService } from '../platform-governance';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
+import {
+  AIRequestType,
+  AIError,
+  Message,
+  ToolDefinition,
+  UNIFIED_AI_MODEL,
+  unifiedAIClient,
+} from '../../../../lib/ai/client';
+import { buildSystemPrompt } from '../../../../lib/ai/contextEngine';
+import { getToolsForRequestType } from '../../../../lib/ai/toolRegistry';
 
 interface RateLimitConfig {
   dailyLimit: number;
@@ -18,26 +27,15 @@ interface RateLimitConfig {
   maxTokens: number;
 }
 
-interface OpenaiPricing {
+interface AiModelPricing {
   inputPer1kTokens: number;
   outputPer1kTokens: number;
 }
 
-interface ToolDefinition {
-  name: string;
-  description: string;
-  input_schema: {
-    type: string;
-    properties: Record<string, any>;
-    required: string[];
-  };
-}
-
 @Injectable()
 export class AIService {
-  private readonly openai: OpenAI;
   private readonly rateLimits: Map<SubscriptionTier, RateLimitConfig>;
-  private readonly openaiPricing: Map<string, OpenaiPricing>;
+  private readonly aiPricing: Map<string, AiModelPricing>;
   private readonly toolDefinitions: ToolDefinition[];
   private readonly temperature: number;
   private readonly subscriptionTierCacheTtlMs = 30 * 1000;
@@ -59,51 +57,49 @@ export class AIService {
     @Optional() private readonly platformGovernanceService?: PlatformGovernanceService,
     @Optional() private readonly subscriptionsService?: SubscriptionsService,
   ) {
-    const openaiConfig = this.configService.get<any>('openai') || {};
-    const openaiRateLimits = openaiConfig.rateLimits || {};
-    const defaultModel = openaiConfig.model || 'gpt-4o';
-    const defaultMaxTokens = openaiConfig.maxTokens || 2000;
-    this.temperature = openaiConfig.temperature ?? 0.7;
+    const aiConfig = this.configService.get<any>('ai') || {};
+    const aiRateLimits = aiConfig.rateLimits || {};
+    const defaultModel = UNIFIED_AI_MODEL;
+    const defaultMaxTokens = aiConfig.maxTokens || 2000;
+    this.temperature = aiConfig.temperature ?? 0.7;
 
-    const apiKey = this.configService.get<string>('OPENAI_API_KEY');
-    if (apiKey) {
-      this.openai = new OpenAI({
-        apiKey,
-      });
-    }
+    unifiedAIClient.configure({
+      apiKey:
+        this.configService.get<string>('ANTHROPIC_API_KEY') ||
+        this.configService.get<string>('anthropic.apiKey'),
+    });
 
-    // Rate limits from openai.config.ts
+    // Rate limits from unified AI config.
     this.rateLimits = new Map([
       [
         SubscriptionTier.FREE,
         {
-          dailyLimit: openaiRateLimits.free?.dailyLimit ?? 10,
-          model: openaiRateLimits.free?.model ?? defaultModel,
-          maxTokens: openaiRateLimits.free?.maxTokens ?? defaultMaxTokens,
+          dailyLimit: aiRateLimits.free?.dailyLimit ?? 10,
+          model: defaultModel,
+          maxTokens: aiRateLimits.free?.maxTokens ?? defaultMaxTokens,
         },
       ],
       [
         SubscriptionTier.PROFESSIONAL,
         {
-          dailyLimit: openaiRateLimits.professional?.dailyLimit ?? 1000,
-          model: openaiRateLimits.professional?.model ?? defaultModel,
-          maxTokens: openaiRateLimits.professional?.maxTokens ?? defaultMaxTokens,
+          dailyLimit: aiRateLimits.professional?.dailyLimit ?? 1000,
+          model: defaultModel,
+          maxTokens: aiRateLimits.professional?.maxTokens ?? defaultMaxTokens,
         },
       ],
       [
         SubscriptionTier.INSTITUTIONAL,
         {
-          dailyLimit: openaiRateLimits.institutional?.dailyLimit ?? 10000,
-          model: openaiRateLimits.institutional?.model ?? defaultModel,
-          maxTokens: openaiRateLimits.institutional?.maxTokens ?? defaultMaxTokens,
+          dailyLimit: aiRateLimits.institutional?.dailyLimit ?? 10000,
+          model: defaultModel,
+          maxTokens: aiRateLimits.institutional?.maxTokens ?? defaultMaxTokens,
         },
       ],
     ]);
 
-    // OpenAI pricing (USD per 1K tokens, as of Jan 2026)
-    this.openaiPricing = new Map([
-      ['gpt-4o', { inputPer1kTokens: 0.03, outputPer1kTokens: 0.06 }],
-      ['gpt-4o-mini', { inputPer1kTokens: 0.00015, outputPer1kTokens: 0.0006 }],
+    // Claude Sonnet pricing estimate (USD per 1K tokens).
+    this.aiPricing = new Map([
+      [UNIFIED_AI_MODEL, { inputPer1kTokens: 0.003, outputPer1kTokens: 0.015 }],
     ]);
 
     // Legacy LLM function schema. Canonical executor IDs/aliases live in
@@ -207,7 +203,7 @@ export class AIService {
    * Calculate cost in USD based on model and token usage
    */
   private calculateCost(model: string, inputTokens: number, outputTokens: number): number {
-    const pricing = this.openaiPricing.get(model);
+    const pricing = this.aiPricing.get(model);
     if (!pricing) {
       return 0;
     }
@@ -217,11 +213,9 @@ export class AIService {
   }
 
   async invokeLLM(userId: string, prompt: string, context?: any) {
-    if (!this.openai) {
-      throw new Error('OpenAI API key not configured');
-    }
     const tier = await this.getSubscriptionTier(userId);
     const config = this.getRateLimitConfig(tier);
+    const requestType = this.resolveRequestType(context, 'COPILOT_CHAT');
 
     // Check rate limit
     const usageToday = await this.getUsageToday(userId);
@@ -232,48 +226,38 @@ export class AIService {
     }
 
     try {
-      // Build messages
-      const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
-        {
-          role: 'system',
-          content: `You are CareDroid, an AI clinical assistant. Provide evidence-based, structured medical information. Always include sources and note that this is not a substitute for professional medical advice.`,
-        },
-      ];
-
-      if (context) {
-        messages.push({
-          role: 'system',
-          content: `Context: ${JSON.stringify(context)}`,
-        });
-      }
-
-      messages.push({ role: 'user', content: prompt });
-
-      // Call OpenAI
       const startTime = Date.now();
-      const response = await this.openai.chat.completions.create({
-        model: config.model,
-        messages,
-        max_tokens: config.maxTokens,
-        temperature: this.temperature,
+      const response = await unifiedAIClient.request({
+        requestType,
+        systemPrompt:
+          'You are CareDroid, an AI clinical assistant. Provide evidence-based, structured medical information. Always include sources and note that this is not a substitute for professional medical advice.',
+        messages: [{ role: 'user', content: prompt }],
+        maxTokens: config.maxTokens,
+        context,
       });
       const latencyMs = Date.now() - startTime;
+      const content = this.responseContentToText(response.content);
 
       const result = {
-        content: response.choices[0].message.content,
+        content,
         model: config.model,
-        tokensUsed: response.usage?.total_tokens || 0,
-        finishReason: response.choices[0].finish_reason,
+        tokensUsed: response.usage.totalTokens,
+        finishReason: 'stop',
       };
 
       // Calculate and record cost
       const costUsd = this.calculateCost(
         config.model,
-        response.usage?.prompt_tokens || 0,
-        response.usage?.completion_tokens || 0,
+        response.usage.inputTokens,
+        response.usage.outputTokens,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
-      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
+      const aiUsageMetadata = this.buildAiUsageMetadata(
+        context,
+        config.model,
+        config.maxTokens,
+        requestType,
+      );
 
       // Log query to database
       await this.logQuery({
@@ -282,9 +266,9 @@ export class AIService {
         response: result.content,
         status: QueryStatus.SUCCESS,
         model: config.model,
-        promptTokens: response.usage?.prompt_tokens || 0,
-        completionTokens: response.usage?.completion_tokens || 0,
-        totalTokens: response.usage?.total_tokens || 0,
+        promptTokens: response.usage.inputTokens,
+        completionTokens: response.usage.outputTokens,
+        totalTokens: response.usage.totalTokens,
         cost: costUsd,
         latencyMs,
         feature: context?.feature || 'chat',
@@ -295,6 +279,7 @@ export class AIService {
           temperature: this.temperature,
           maxTokens: config.maxTokens,
           finishReason: result.finishReason,
+          requestType,
           ...aiUsageMetadata,
         },
       });
@@ -306,7 +291,7 @@ export class AIService {
         resource: 'ai/query',
         metadata: {
           aiFoundation: this.extractAiFoundationMetadata(context),
-          prompt: prompt.substring(0, 100),
+          requestType,
           model: config.model,
           tokensUsed: result.tokensUsed,
         },
@@ -316,7 +301,12 @@ export class AIService {
 
       return result;
     } catch (error) {
-      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
+      const aiUsageMetadata = this.buildAiUsageMetadata(
+        context,
+        config.model,
+        config.maxTokens,
+        requestType,
+      );
       // Log failed query
       await this.logQuery({
         userId,
@@ -327,7 +317,8 @@ export class AIService {
         feature: context?.feature || 'chat',
         conversationId: context?.conversationId,
         metadata: {
-          error: error instanceof Error ? error.message : String(error),
+          error: this.formatSafeError(error),
+          requestType,
           ...aiUsageMetadata,
         },
       });
@@ -336,11 +327,9 @@ export class AIService {
   }
 
   async generateStructuredJSON(userId: string, prompt: string, schema: any, context?: any) {
-    if (!this.openai) {
-      throw new Error('OpenAI API key not configured');
-    }
     const tier = await this.getSubscriptionTier(userId);
     const config = this.getRateLimitConfig(tier);
+    const requestType = this.resolveRequestType(context, 'SCORE_ASSIST');
 
     // Check rate limit
     const usageToday = await this.getUsageToday(userId);
@@ -351,42 +340,45 @@ export class AIService {
     }
 
     try {
-      const response = await this.openai.chat.completions.create({
-        model: config.model,
+      const response = await unifiedAIClient.request({
+        requestType,
+        systemPrompt:
+          'You are CareDroid, an AI clinical assistant. Generate only valid JSON matching the provided schema. Be accurate, evidence-based, and do not include prose outside the JSON object.',
         messages: [
           {
-            role: 'system',
-            content: `You are CareDroid, an AI clinical assistant. Generate structured JSON outputs according to the provided schema. Be accurate and evidence-based.`,
-          },
-          {
             role: 'user',
-            content: `${prompt}\n\nSchema: ${JSON.stringify(schema)}`,
+            content: `${prompt}\n\nSchema: ${JSON.stringify(schema)}\n\nReturn only valid JSON.`,
           },
         ],
-        max_tokens: config.maxTokens,
-        temperature: Math.min(this.temperature, 0.5),
-        response_format: { type: 'json_object' },
+        maxTokens: config.maxTokens,
+        context,
       });
 
-      const result = JSON.parse(response.choices[0].message.content);
-      const totalTokens = response.usage?.total_tokens || 0;
+      const rawContent = this.responseContentToText(response.content);
+      const result = this.parseJsonResponse(rawContent);
+      const totalTokens = response.usage.totalTokens;
 
       // Calculate and record cost
       const costUsd = this.calculateCost(
         config.model,
-        response.usage?.prompt_tokens || 0,
-        response.usage?.completion_tokens || 0,
+        response.usage.inputTokens,
+        response.usage.outputTokens,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
-      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
+      const aiUsageMetadata = this.buildAiUsageMetadata(
+        context,
+        config.model,
+        config.maxTokens,
+        requestType,
+      );
       await this.logQuery({
         userId,
         prompt,
-        response: response.choices[0].message.content,
+        response: rawContent,
         status: QueryStatus.SUCCESS,
         model: config.model,
-        promptTokens: response.usage?.prompt_tokens || 0,
-        completionTokens: response.usage?.completion_tokens || 0,
+        promptTokens: response.usage.inputTokens,
+        completionTokens: response.usage.outputTokens,
         totalTokens,
         cost: costUsd,
         feature: context?.feature || 'structured_json',
@@ -395,6 +387,7 @@ export class AIService {
         toolUsed: context?.tool || context?.intentClassification?.toolId,
         metadata: {
           schemaKeys: Object.keys(schema),
+          requestType,
           ...aiUsageMetadata,
         },
       });
@@ -406,7 +399,7 @@ export class AIService {
         resource: 'ai/structured',
         metadata: {
           aiFoundation: this.extractAiFoundationMetadata(context),
-          prompt: prompt.substring(0, 100),
+          requestType,
           schema: Object.keys(schema),
           model: config.model,
           tokensUsed: totalTokens,
@@ -417,7 +410,12 @@ export class AIService {
 
       return result;
     } catch (error) {
-      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
+      const aiUsageMetadata = this.buildAiUsageMetadata(
+        context,
+        config.model,
+        config.maxTokens,
+        requestType,
+      );
       await this.logQuery({
         userId,
         prompt,
@@ -427,7 +425,8 @@ export class AIService {
         feature: context?.feature || 'structured_json',
         conversationId: context?.conversationId,
         metadata: {
-          error: error instanceof Error ? error.message : String(error),
+          error: this.formatSafeError(error),
+          requestType,
           ...aiUsageMetadata,
         },
       });
@@ -558,8 +557,9 @@ export class AIService {
     try {
       const saved = await this.aiQueryRepository.save({
         userId: data.userId,
-        prompt: data.prompt,
-        response: data.response,
+        prompt: this.redactedAiQueryValue('prompt', data.feature),
+        response:
+          data.response === null ? null : this.redactedAiQueryValue('response', data.feature),
         status: data.status,
         model: data.model,
         promptTokens: data.promptTokens || 0,
@@ -599,6 +599,10 @@ export class AIService {
       // Log error but don't fail the request
       console.error('Failed to log AI query:', error);
     }
+  }
+
+  private redactedAiQueryValue(kind: 'prompt' | 'response', feature?: string): string {
+    return `[redacted:${kind}:${feature || 'ai'}]`;
   }
 
   private async getUsageToday(userId: string): Promise<number> {
@@ -685,15 +689,12 @@ export class AIService {
   async invokeLLMWithTools(
     userId: string,
     prompt: string,
-    conversationHistory?: OpenAI.Chat.ChatCompletionMessageParam[],
+    conversationHistory?: Array<{ role?: string; content?: any }>,
     context?: any,
   ) {
-    if (!this.openai) {
-      throw new Error('OpenAI API key not configured');
-    }
-
     const tier = await this.getSubscriptionTier(userId);
     const config = this.getRateLimitConfig(tier);
+    const requestType = this.resolveRequestType(context, 'COPILOT_CHAT');
 
     // Check rate limit
     const usageToday = await this.getUsageToday(userId);
@@ -704,90 +705,64 @@ export class AIService {
     }
 
     try {
-      // Build messages
-      const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
-
-      // Add system prompt
-      messages.push({
-        role: 'system',
-        content: `You are CareDroid, an AI clinical assistant with access to SOFA calculator, drug interaction checker, and lab interpreter tools. 
-When a user asks a question that requires any of these tools, use them to provide accurate clinical information.
-Always include sources and note that this is not a substitute for professional medical advice.
-Use tools judiciously - only invoke them when truly needed for the query.`,
-      });
-
-      // Add context if provided
-      if (context) {
-        messages.push({
-          role: 'system',
-          content: `Context: ${JSON.stringify(context)}`,
-        } as OpenAI.Chat.ChatCompletionMessageParam);
-      }
+      const systemPrompt = buildSystemPrompt((context || {}) as any, requestType);
 
       // Add conversation history if provided
+      const messages: Message[] = [];
       if (conversationHistory && conversationHistory.length > 0) {
-        messages.push(...conversationHistory);
+        messages.push(...this.normalizeConversationHistory(conversationHistory));
       }
 
       // Add current prompt
       messages.push({ role: 'user', content: prompt });
 
-      // Call OpenAI with tools
-      const response = await this.openai.chat.completions.create({
-        model: config.model,
+      const response = await unifiedAIClient.request({
+        requestType,
+        systemPrompt,
         messages,
-        max_tokens: config.maxTokens,
-        temperature: Math.min(this.temperature, 0.5),
-        tools: this.toolDefinitions.map((tool) => ({
-          type: 'function',
-          function: {
-            name: tool.name,
-            description: tool.description,
-            parameters: tool.input_schema,
-          },
-        })) as any,
+        maxTokens: config.maxTokens,
+        context,
+        tools: context?.tools || getToolsForRequestType(requestType),
       });
 
       // Handle response with potential tool calls
-      const assistantMessage = response.choices[0].message;
-      const toolCalls: any[] = [];
-
-      // Parse tool_use blocks if using native tools
-      if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
-        for (const toolCall of assistantMessage.tool_calls) {
-          toolCalls.push({
-            toolName: toolCall.function.name,
-            toolId: toolCall.id,
-            parameters: JSON.parse(toolCall.function.arguments),
-          });
-        }
-      }
+      const toolCalls = response.toolCalls.map((toolCall) => ({
+        toolName: toolCall.name,
+        toolId: toolCall.id,
+        parameters: toolCall.input,
+      }));
+      const content = this.responseContentToText(response.content);
 
       const result = {
-        content: assistantMessage.content || '',
+        content,
         model: config.model,
-        tokensUsed: response.usage?.total_tokens || 0,
-        finishReason: response.choices[0].finish_reason,
+        tokensUsed: response.usage.totalTokens,
+        finishReason: toolCalls.length > 0 ? 'tool_use' : 'stop',
         toolCalls,
       };
 
       // Calculate and record cost
       const costUsd = this.calculateCost(
         config.model,
-        response.usage?.prompt_tokens || 0,
-        response.usage?.completion_tokens || 0,
+        response.usage.inputTokens,
+        response.usage.outputTokens,
       );
       this.metricsService.recordOpenaiCost(config.model, userId, costUsd);
-      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
+      const aiUsageMetadata = this.buildAiUsageMetadata(
+        context,
+        config.model,
+        config.maxTokens,
+        requestType,
+      );
       await this.logQuery({
         userId,
         prompt,
         response: result.content,
         status: QueryStatus.SUCCESS,
         model: config.model,
-        promptTokens: response.usage?.prompt_tokens || 0,
-        completionTokens: response.usage?.completion_tokens || 0,
-        totalTokens: response.usage?.total_tokens || 0,
+        promptTokens: response.usage.inputTokens,
+        completionTokens: response.usage.outputTokens,
+        totalTokens: response.usage.totalTokens,
         cost: costUsd,
         feature: context?.feature || 'chat_with_tools',
         conversationId: context?.conversationId,
@@ -796,6 +771,7 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
         metadata: {
           finishReason: result.finishReason,
           toolCallCount: toolCalls.length,
+          requestType,
           ...aiUsageMetadata,
         },
       });
@@ -807,7 +783,7 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
         resource: 'ai/query-with-tools',
         metadata: {
           aiFoundation: this.extractAiFoundationMetadata(context),
-          prompt: prompt.substring(0, 100),
+          requestType,
           model: config.model,
           tokensUsed: result.tokensUsed,
           toolCallCount: toolCalls.length,
@@ -818,7 +794,12 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
 
       return result;
     } catch (error) {
-      const aiUsageMetadata = this.buildAiUsageMetadata(context, config.model, config.maxTokens);
+      const aiUsageMetadata = this.buildAiUsageMetadata(
+        context,
+        config.model,
+        config.maxTokens,
+        requestType,
+      );
       await this.logQuery({
         userId,
         prompt,
@@ -828,7 +809,8 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
         feature: context?.feature || 'chat_with_tools',
         conversationId: context?.conversationId,
         metadata: {
-          error: error instanceof Error ? error.message : String(error),
+          error: this.formatSafeError(error),
+          requestType,
           ...aiUsageMetadata,
         },
       });
@@ -836,6 +818,82 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
         `AI query with tools failed: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
+  }
+
+  private normalizeConversationHistory(
+    history: Array<{ role?: string; content?: any }>,
+  ): Message[] {
+    return history
+      .filter((message) => message?.role === 'user' || message?.role === 'assistant')
+      .map((message) => ({
+        role: (message.role === 'assistant' ? 'assistant' : 'user') as Message['role'],
+        content:
+          typeof message.content === 'string' ? message.content : JSON.stringify(message.content),
+      }))
+      .filter((message) => message.content);
+  }
+
+  private responseContentToText(content: string | ReadableStream<Uint8Array>): string {
+    return typeof content === 'string' ? content : '';
+  }
+
+  private parseJsonResponse(content: string): any {
+    try {
+      return JSON.parse(content);
+    } catch (_error) {
+      const match = content.match(/\{[\s\S]*\}/);
+      if (match) {
+        return JSON.parse(match[0]);
+      }
+      throw new Error('AI response did not contain valid JSON');
+    }
+  }
+
+  private formatSafeError(error: unknown): string {
+    if (error instanceof AIError) {
+      return `${error.code}${error.status ? `:${error.status}` : ''}`;
+    }
+    return error instanceof Error ? error.name : 'UnknownError';
+  }
+
+  private resolveRequestType(context: any, fallback: AIRequestType): AIRequestType {
+    const candidate = context?.requestType;
+    if (this.isAIRequestType(candidate)) {
+      return candidate;
+    }
+
+    const feature = String(
+      context?.feature || context?.intentType || context?.tool || '',
+    ).toLowerCase();
+    if (feature.includes('handoff')) return 'HANDOFF_BRIEF';
+    if (feature.includes('shift')) return 'SHIFT_SUMMARY';
+    if (feature.includes('summary') || feature.includes('structured_json'))
+      return 'CLINICAL_SUMMARY';
+    if (feature.includes('score') || feature.includes('calculator') || feature.includes('lab')) {
+      return 'SCORE_ASSIST';
+    }
+    if (feature.includes('intake')) return 'INTAKE_SUGGESTION';
+    if (feature.includes('protocol') || feature.includes('reference') || feature.includes('rag')) {
+      return 'PROTOCOL_SUGGEST';
+    }
+    if (feature.includes('triage') || feature.includes('intent')) return 'TRIAGE_ASSIST';
+    return fallback;
+  }
+
+  private isAIRequestType(value: unknown): value is AIRequestType {
+    return (
+      typeof value === 'string' &&
+      [
+        'COPILOT_CHAT',
+        'CLINICAL_SUMMARY',
+        'SCORE_ASSIST',
+        'INTAKE_SUGGESTION',
+        'HANDOFF_BRIEF',
+        'PROTOCOL_SUGGEST',
+        'TRIAGE_ASSIST',
+        'SHIFT_SUMMARY',
+      ].includes(value)
+    );
   }
 
   private extractAiFoundationMetadata(context?: any): Record<string, any> | undefined {
@@ -866,6 +924,7 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
     context: any,
     modelVersion: string,
     maxTokens?: number,
+    requestType?: AIRequestType,
   ): Record<string, any> {
     const aiFoundation = this.extractAiFoundationMetadata(context);
     const routePlan = context?.routePlan;
@@ -908,6 +967,7 @@ Use tools judiciously - only invoke them when truly needed for the query.`,
 
     return {
       aiFoundation,
+      requestType,
       ...(routePlan
         ? {
             routePlan: {

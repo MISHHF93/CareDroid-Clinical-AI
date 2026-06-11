@@ -36,6 +36,9 @@ import AuthShell from './layout/AuthShell';
 import { PublicShell } from './layout/PublicShell';
 import { createDevAuthSession, isDevAuthBypassEnabled } from './auth/devAuthBypass';
 import { useNotificationActions } from './hooks/useNotificationActions';
+import { useFeature } from './hooks/useFeature';
+import { subscribeToFeatureFlagSync } from '../store/featureStore';
+import { FEATURE_REGISTRY_BY_ID } from '../lib/features/featureRegistry';
 import logger from './utils/logger';
 import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
@@ -127,6 +130,7 @@ const ProfileToolPreferences = lazyWithRetry(
 const ProfileWorkspaces = lazyWithRetry(() => import('./pages/profile/ProfileWorkspaces'));
 const ProfileSecurity = lazyWithRetry(() => import('./pages/profile/ProfileSecurity'));
 const EmergencySettings = lazyWithRetry(() => import('./pages/emergency/EmergencySettings'));
+const FeatureManagement = lazyWithRetry(() => import('./pages/settings/FeatureManagement'));
 const CustomerPortalPage = lazyWithRetry(
   () => import('./pages/customer-portal/CustomerPortalPage')
 );
@@ -360,6 +364,21 @@ function NotificationToasts() {
   return <NotificationToastContainer toasts={notifications} onDismiss={removeNotification} />;
 }
 
+function FeatureFlagSyncToasts() {
+  const { info } = useNotificationActions();
+
+  useEffect(() => {
+    const unsubscribe = subscribeToFeatureFlagSync((change) => {
+      const label = FEATURE_REGISTRY_BY_ID[change.featureId]?.label || change.featureId;
+      const staffName = change.changedBy || 'another staff member';
+      info('Feature updated', `${label} was toggled by ${staffName}.`);
+    });
+    return unsubscribe;
+  }, [info]);
+
+  return null;
+}
+
 // ==================== WELCOME PAGE ====================
 export function WelcomePage() {
   const navigate = useNavigate();
@@ -532,6 +551,25 @@ function FutureReleaseStub({ label = 'This module' }) {
         <p>This module is parked while the Emergency OS workflow remains the active shell.</p>
       </header>
     </section>
+  );
+}
+
+function FeatureRouteGuard({ feature, children }) {
+  const { enabled, feature: featureDefinition } = useFeature(feature);
+  if (enabled) return children;
+
+  const label = featureDefinition?.label || feature;
+  return (
+    <Navigate
+      to="/emergency"
+      replace
+      state={{
+        edNotice: {
+          title: 'Feature disabled',
+          message: `${label} is disabled. Enable it in Settings > Feature Management.`,
+        },
+      }}
+    />
   );
 }
 
@@ -750,37 +788,65 @@ function AppRoutes() {
     },
     {
       path: '/emergency/queues',
-      element: <EmergencyQueueRoute />,
+      element: (
+        <FeatureRouteGuard feature="queue_intelligence">
+          <EmergencyQueueRoute />
+        </FeatureRouteGuard>
+      ),
       requiresAuth: true,
     },
     {
       path: '/emergency/ems',
-      element: <EMSPipeline />,
+      element: (
+        <FeatureRouteGuard feature="ems_pipeline">
+          <EMSPipeline />
+        </FeatureRouteGuard>
+      ),
       requiresAuth: true,
     },
     {
       path: '/emergency/referrals',
-      element: <ReferralPanel />,
+      element: (
+        <FeatureRouteGuard feature="referral_intelligence">
+          <ReferralPanel />
+        </FeatureRouteGuard>
+      ),
       requiresAuth: true,
     },
     {
       path: '/emergency/capacity',
-      element: <EmergencyCapacityRoute />,
+      element: (
+        <FeatureRouteGuard feature="capacity_intelligence">
+          <EmergencyCapacityRoute />
+        </FeatureRouteGuard>
+      ),
       requiresAuth: true,
     },
     {
       path: '/emergency/shift',
-      element: <ShiftSummary />,
+      element: (
+        <FeatureRouteGuard feature="shift_summary">
+          <ShiftSummary />
+        </FeatureRouteGuard>
+      ),
       requiresAuth: true,
     },
     {
       path: '/emergency/copilot',
-      element: <EmergencyCopilotRedirect />,
+      element: (
+        <FeatureRouteGuard feature="ed_copilot">
+          <EmergencyCopilotRedirect />
+        </FeatureRouteGuard>
+      ),
       requiresAuth: true,
     },
     {
       path: '/emergency/tools',
-      element: <ClinicalCalculatorHub />,
+      element: (
+        <FeatureRouteGuard feature="clinical_calculator_hub">
+          <ClinicalCalculatorHub />
+        </FeatureRouteGuard>
+      ),
       requiresAuth: true,
     },
     {
@@ -800,7 +866,11 @@ function AppRoutes() {
     },
     {
       path: '/emergency/analytics',
-      element: <EmergencyAnalytics />,
+      element: (
+        <FeatureRouteGuard feature="shift_analytics">
+          <EmergencyAnalytics />
+        </FeatureRouteGuard>
+      ),
       requiresAuth: true,
     },
     {
@@ -810,7 +880,11 @@ function AppRoutes() {
     },
     {
       path: '/emergency/command-center',
-      element: <EmergencyCopilotRedirect />,
+      element: (
+        <FeatureRouteGuard feature="ed_copilot">
+          <EmergencyCopilotRedirect />
+        </FeatureRouteGuard>
+      ),
       requiresAuth: true,
     },
     {
@@ -962,7 +1036,11 @@ function AppRoutes() {
     })),
     {
       path: '/assistant',
-      element: <EmergencyCopilotRedirect />,
+      element: (
+        <FeatureRouteGuard feature="ed_copilot">
+          <EmergencyCopilotRedirect />
+        </FeatureRouteGuard>
+      ),
       requiresAuth: true,
     },
     {
@@ -1596,6 +1674,12 @@ function AppRoutes() {
       path: '/settings',
       element: <EmergencySettings />,
       requiresAuth: true,
+    },
+    {
+      path: '/settings/features',
+      element: <FeatureManagement />,
+      requiresAuth: true,
+      permission: Permission.CONFIGURE_SYSTEM,
     },
     {
       path: '/customer-portal',
@@ -2297,6 +2381,7 @@ function App() {
                                     <Suspense fallback={<PageLoader />}>
                                       <AppRoutes />
                                     </Suspense>
+                                    <FeatureFlagSyncToasts />
                                     <NotificationToasts />
                                   </ErrorBoundary>
                                 </OfflineProvider>

@@ -37,7 +37,7 @@ export class AIQuery {
   status: QueryStatus;
 
   @Column({ type: 'varchar', length: 100 })
-  model: string; // e.g., 'gpt-4', 'gpt-3.5-turbo'
+  model: string; // e.g., 'claude-sonnet-4-20250514'
 
   @Column({ type: 'int', default: 0 })
   promptTokens: number;

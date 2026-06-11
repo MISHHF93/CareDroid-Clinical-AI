@@ -1,0 +1,33 @@
+.feature-gate-placeholder {
+  display: grid;
+  gap: 8px;
+  border: 1px dashed var(--app-panel-border, var(--panel-border));
+  border-radius: 14px;
+  padding: 14px;
+  background: color-mix(in srgb, var(--app-surface-1, var(--surface-1)) 88%, transparent);
+  color: var(--app-text-primary, var(--text-color));
+}
+
+.feature-gate-placeholder--compact {
+  gap: 6px;
+  padding: 10px 12px;
+}
+
+.feature-gate-placeholder > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.feature-gate-placeholder p {
+  margin: 0;
+  color: var(--app-text-secondary, var(--muted-text));
+  font-size: 0.86rem;
+}
+
+.feature-gate-placeholder a {
+  color: var(--app-accent-interactive, #8ed8ff);
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-decoration: none;
+}

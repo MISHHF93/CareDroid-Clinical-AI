@@ -3,39 +3,33 @@ import { ConfigService } from '@nestjs/config';
 import { RetrievedChunk } from '../dto/rag-context.dto';
 
 /**
- * Cohere Reranker Service
+ * Reranker Service
  *
- * Reranks retrieved chunks using Cohere's semantic reranking API
- * Improves retrieval quality by reordering results based on semantic relevance to the query
+ * Reranks retrieved chunks locally to avoid creating a second external AI API client.
  */
 
 @Injectable()
 export class CohereRankerService {
   private readonly logger = new Logger(CohereRankerService.name);
-  private readonly apiKey: string;
   private readonly model: string;
   private readonly enabled: boolean;
-  private readonly baseUrl = 'https://api.cohere.ai/v1/rerank';
 
   constructor(private readonly configService: ConfigService) {
     const ragConfig = this.configService.get<any>('rag') || {};
     const rerankingConfig = ragConfig.reranking || {};
 
-    this.apiKey = rerankingConfig.apiKey || '';
-    this.model = rerankingConfig.model || 'rerank-english-v2.0';
-    this.enabled = rerankingConfig.enabled === true && !!this.apiKey;
+    this.model = rerankingConfig.model || 'local-keyword-reranker';
+    this.enabled = rerankingConfig.enabled === true;
 
     if (this.enabled) {
-      this.logger.log(`Cohere reranking enabled with model: ${this.model}`);
+      this.logger.log(`Local reranking enabled with model: ${this.model}`);
     } else {
-      this.logger.warn(
-        'Cohere reranking disabled. Set RERANK_ENABLED=true and COHERE_API_KEY to enable.',
-      );
+      this.logger.warn('Reranking disabled. Set RERANK_ENABLED=true to enable local reranking.');
     }
   }
 
   /**
-   * Rerank retrieved chunks using Cohere API
+   * Rerank retrieved chunks using local lexical overlap.
    * @param query Original search query
    * @param chunks Retrieved chunks to rerank
    * @param topK Number of top results to return after reranking
@@ -60,47 +54,19 @@ export class CohereRankerService {
         `Reranking ${chunks.length} chunks for query: "${query.substring(0, 50)}..."`,
       );
 
-      // Prepare documents for Cohere
-      const documents = chunks.map((chunk, index) => ({
-        index,
-        text: chunk.text.substring(0, 1000), // Cohere has 1000 char limit per doc
-      }));
-
-      // Call Cohere Rerank API
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: this.model,
-          query,
-          documents,
-          top_n: topK,
-          return_documents: false, // We already have docs, just need scores
-        }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(
-          `Cohere API error: ${response.status} - ${error.message || 'Unknown error'}`,
-        );
-      }
-
-      const result = await response.json();
-
-      // Map reranked results back to chunks
-      const rerankedChunks: RetrievedChunk[] = result.results
-        .map((ranking: any) => {
-          const originalChunk = chunks[ranking.index];
+      const queryTerms = this.termSet(query);
+      const rerankedChunks: RetrievedChunk[] = chunks
+        .map((chunk) => {
+          const chunkTerms = this.termSet(chunk.text);
+          const overlap = [...queryTerms].filter((term) => chunkTerms.has(term)).length;
+          const lexicalScore = queryTerms.size ? overlap / queryTerms.size : 0;
           return {
-            ...originalChunk,
-            score: ranking.relevance_score, // Update score from Cohere
+            ...chunk,
+            score: Number((chunk.score * 0.7 + lexicalScore * 0.3).toFixed(6)),
             _reranked: true,
           };
         })
+        .sort((a, b) => b.score - a.score)
         .slice(0, topK);
 
       this.logger.debug(`Reranked to top ${rerankedChunks.length} results`);
@@ -132,32 +98,19 @@ export class CohereRankerService {
   }
 
   /**
-   * Health check for Cohere API connectivity
+   * Health check for local reranking.
    */
   async healthCheck(): Promise<boolean> {
-    if (!this.enabled) {
-      return true; // Not enabled is considered healthy
-    }
+    return true;
+  }
 
-    try {
-      // Test with a simple rerank call
-      const response = await fetch(this.baseUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.apiKey}`,
-        },
-        body: JSON.stringify({
-          model: this.model,
-          query: 'test',
-          documents: [{ index: 0, text: 'test document' }],
-          top_n: 1,
-        }),
-      });
-
-      return response.ok;
-    } catch (_error) {
-      return false;
-    }
+  private termSet(text: string): Set<string> {
+    return new Set(
+      String(text || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, ' ')
+        .split(/\s+/)
+        .filter((term) => term.length > 2),
+    );
   }
 }

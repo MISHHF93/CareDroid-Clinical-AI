@@ -108,11 +108,7 @@ export class OrganizationAnalyticsService {
       if (!assetUsage.some((row) => row.id === metric.id)) assetUsage.push(metric);
     }
     assetUsage.sort((a, b) => b.count - a.count);
-    const assetIntelligence = this.buildAssetIntelligence(
-      usageEvents,
-      entitledAssetIds,
-      assetById,
-    );
+    const assetIntelligence = this.buildAssetIntelligence(usageEvents, entitledAssetIds, assetById);
 
     const packUsage = packs
       .filter((pack) => enabledPackIds.has(pack.id))
@@ -431,10 +427,7 @@ export class OrganizationAnalyticsService {
   }
 
   private summarizeAssetIntelligence(rows: AssetIntelligenceMetric[]) {
-    const totalDurationSeconds = rows.reduce(
-      (total, row) => total + row.totalDurationSeconds,
-      0,
-    );
+    const totalDurationSeconds = rows.reduce((total, row) => total + row.totalDurationSeconds, 0);
     const durationEvents = rows.filter((row) => row.averageDurationSeconds > 0).length;
     return {
       launches: rows.reduce((total, row) => total + row.launches, 0),
@@ -444,17 +437,16 @@ export class OrganizationAnalyticsService {
         : 0,
       repeatUsage: rows.reduce((total, row) => total + row.repeatUsage, 0),
       abandonmentCount: rows.reduce((total, row) => total + row.abandonmentCount, 0),
-      recommendationsAccepted: rows.reduce(
-        (total, row) => total + row.recommendationsAccepted,
-        0,
-      ),
+      recommendationsAccepted: rows.reduce((total, row) => total + row.recommendationsAccepted, 0),
       workflowCompletions: rows.reduce((total, row) => total + row.workflowCompletions, 0),
     };
   }
 
   private buildMergeCandidates(rows: AssetIntelligenceMetric[]): AssetIntelligenceMetric[] {
     const candidates: AssetIntelligenceMetric[] = [];
-    for (const row of rows.filter((item) => item.usefulnessScore > 0 && item.usefulnessScore < 20)) {
+    for (const row of rows.filter(
+      (item) => item.usefulnessScore > 0 && item.usefulnessScore < 20,
+    )) {
       const target = rows.find(
         (candidate) =>
           candidate.id !== row.id &&
@@ -475,9 +467,7 @@ export class OrganizationAnalyticsService {
       });
     }
     return candidates.sort(
-      (a, b) =>
-        a.usefulnessScore - b.usefulnessScore ||
-        a.label.localeCompare(b.label),
+      (a, b) => a.usefulnessScore - b.usefulnessScore || a.label.localeCompare(b.label),
     );
   }
 
@@ -493,9 +483,7 @@ export class OrganizationAnalyticsService {
     return Math.max(0, Math.round(score));
   }
 
-  private decideAssetAction(
-    row: AssetIntelligenceMetric,
-  ): AssetIntelligenceMetric['decision'] {
+  private decideAssetAction(row: AssetIntelligenceMetric): AssetIntelligenceMetric['decision'] {
     if (row.usefulnessScore === 0) return 'hide';
     if (row.usefulnessScore >= 45 && row.repeatUsage > 0) return 'promote';
     if (row.usefulnessScore < 20) return 'improve';
@@ -554,10 +542,7 @@ export class OrganizationAnalyticsService {
       ASSET_UTILIZATION_EVENTS.RECOMMENDATION_ACCEPTED,
       ASSET_UTILIZATION_EVENTS.WORKFLOW_COMPLETED,
     ];
-    if (
-      signal &&
-      behavioralSignals.includes(signal)
-    ) {
+    if (signal && behavioralSignals.includes(signal)) {
       return false;
     }
     return (

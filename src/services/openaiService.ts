@@ -1,6 +1,7 @@
 /**
- * Wrapper service for OpenAI API integration
- * Provides typed interface for chat completions and other OpenAI features
+ * Compatibility wrapper for legacy chat-completion callers.
+ * Frontend requests are proxied through the backend unified AI client.
+ * @deprecated Prefer feature-specific backend AI requests with explicit requestType.
  */
 
 import appConfig from '../config/appConfig';
@@ -20,25 +21,25 @@ export interface ChatCompletionRequest {
   top_p?: number;
 }
 
-export interface OpenAIResponse {
+export interface AIProxyResponse {
   success: boolean;
   data?: any;
   error?: string;
   status?: number;
 }
 
-class OpenAIService {
+class AIProxyService {
   private model: string;
 
   constructor() {
-    this.model = appConfig.ai.openai.model;
+    this.model = appConfig.ai.model;
   }
 
   /**
    * Create a chat completion request
    * @param request Chat completion request with messages
    */
-  async createChatCompletion(request: ChatCompletionRequest): Promise<OpenAIResponse> {
+  async createChatCompletion(request: ChatCompletionRequest): Promise<AIProxyResponse> {
     try {
       const lastUserMessage = [...request.messages].reverse().find((message) => message.role === 'user');
       const { response, data } = await apiFetchJson(API_ROUTES.chat.message, {
@@ -65,24 +66,24 @@ class OpenAIService {
       };
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      logger.error('OpenAI API request failed', error);
+      logger.error('AI backend request failed', error);
       return { success: false, error: message, status: 500 };
     }
   }
 
   /**
-   * Extract the response text from OpenAI chat completion
+   * Extract the response text from a chat completion-shaped payload.
    */
   extractResponseText(data: any): string {
     if (data?.choices?.[0]?.message?.content) {
       return data.choices[0].message.content;
     }
-    logger.warn('Could not extract text from OpenAI response');
+    logger.warn('Could not extract text from AI response');
     return '';
   }
 
   /**
-   * Check if OpenAI is configured
+   * Check if the AI proxy is configured.
    */
   isConfigured(): boolean {
     return !!this.model;
@@ -100,8 +101,8 @@ class OpenAIService {
    */
   setConfig(_apiKey: string, model: string, _baseUrl?: string): void {
     this.model = model;
-    logger.info(`OpenAI config updated: model=${model}`);
+    logger.info(`AI proxy config updated: model=${model}`);
   }
 }
 
-export default new OpenAIService();
+export default new AIProxyService();

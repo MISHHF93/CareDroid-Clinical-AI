@@ -54,6 +54,7 @@ export const CANONICAL_ROUTES = Object.freeze({
   profileSettings: '/profile/settings',
   profileToolPreferences: '/profile/tool-preferences',
   settings: '/settings',
+  settingsFeatures: '/settings/features',
   customerPortal: '/customer-portal',
   knowledgeHub: '/knowledge-hub',
   knowledgeBase: '/knowledge-base',

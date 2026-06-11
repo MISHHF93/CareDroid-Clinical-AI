@@ -314,7 +314,7 @@ describe('Audit Logging E2E', () => {
         ipAddress: '192.168.1.1',
         userAgent: 'CareDroid/1.0',
         metadata: {
-          model: 'gpt-4o',
+          model: 'claude-sonnet-4-20250514',
           tokensUsed: 250,
           latency: 1250,
           temperature: 0.7,
@@ -323,7 +323,7 @@ describe('Audit Logging E2E', () => {
       });
 
       expect(log.metadata).toEqual({
-        model: 'gpt-4o',
+        model: 'claude-sonnet-4-20250514',
         tokensUsed: 250,
         latency: 1250,
         temperature: 0.7,

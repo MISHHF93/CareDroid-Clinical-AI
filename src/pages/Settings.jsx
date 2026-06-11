@@ -366,6 +366,11 @@ const Settings = () => {
                   <Button variant="ghost">Configuration studio</Button>
                 </Link>
               ) : null}
+              {hasPermission?.(Permission.CONFIGURE_SYSTEM) ? (
+                <Link to="/settings/features">
+                  <Button variant="secondary">Feature management</Button>
+                </Link>
+              ) : null}
             </div>
           </div>
         ) : null}

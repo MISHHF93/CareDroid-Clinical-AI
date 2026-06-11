@@ -11,6 +11,8 @@
 export const BACKEND_HTTP_ROUTES = Object.freeze([
   { method: 'GET', path: '/health', controller: 'AppController' },
   { method: 'GET', path: '/api/config/system', controller: 'AppController' },
+  { method: 'GET', path: '/api/settings/features', controller: 'SettingsFeaturesController' },
+  { method: 'PATCH', path: '/api/settings/features', controller: 'SettingsFeaturesController' },
   { method: 'GET', path: '/api/tenant/context', controller: 'TenantContextController' },
   { method: 'GET', path: '/api/tenant/isolation-audit', controller: 'TenantContextController' },
 

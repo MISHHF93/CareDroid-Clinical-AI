@@ -44,7 +44,7 @@ export const envValidationSchema = Joi.object({
   DATABASE_NAME: Joi.string().optional(),
   JWT_SECRET: productionSecret('JWT_SECRET', 'CHANGE_ME_IN_PRODUCTION'),
   ENCRYPTION_MASTER_KEY: Joi.string().allow('').optional(),
-  OPENAI_API_KEY: Joi.string().allow('').optional(),
+  ANTHROPIC_API_KEY: Joi.string().allow('').optional(),
   ENABLE_DEV_AUTH_BYPASS: Joi.boolean()
     .truthy('true')
     .truthy('1')
