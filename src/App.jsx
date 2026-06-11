@@ -531,7 +531,7 @@ function LegacyOAuthCallbackRedirect() {
 
 /** Auth entry aliases are bypassed for the public platform build. */
 function AuthPathRedirect() {
-  return <Navigate to="/dashboard" replace />;
+  return <Navigate to="/workspace/emergency" replace />;
 }
 
 /** Legacy protected paths stay deep-linkable while canonical routes own the UI. */
@@ -570,7 +570,7 @@ function AppRoutes() {
     requireAllPermissions = false,
   }) => {
     if (publicOnly && isAuthenticated) {
-      return <Navigate to="/dashboard" replace />;
+      return <Navigate to="/workspace/emergency" replace />;
     }
 
     let resolvedElement = element;
@@ -597,12 +597,12 @@ function AppRoutes() {
   const routes = [
     {
       path: '/',
-      element: <Navigate to="/dashboard" replace />,
+      element: <Navigate to="/workspace/emergency" replace />,
       publicOnly: true,
     },
     {
       path: '/auth',
-      element: <Navigate to="/dashboard" replace />,
+      element: <Navigate to="/workspace/emergency" replace />,
       publicOnly: true,
     },
     {

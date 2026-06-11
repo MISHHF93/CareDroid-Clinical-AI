@@ -5,12 +5,12 @@ const appSource = readFileSync(join(__dirname, '..', 'App.jsx'), 'utf8');
 const routeConfigSource = readFileSync(join(__dirname, '..', 'config/routes.config.js'), 'utf8');
 
 describe('canonical route/auth architecture', () => {
-  it('bypasses canonical auth and routes aliases to the dashboard', () => {
+  it('bypasses canonical auth and routes aliases to the Emergency Whiteboard', () => {
     expect(appSource).toMatch(
-      /path:\s*'\/auth'[\s\S]*element:\s*<Navigate to="\/dashboard" replace \/>[\s\S]*publicOnly:\s*true/
+      /path:\s*'\/auth'[\s\S]*element:\s*<Navigate to="\/workspace\/emergency" replace \/>[\s\S]*publicOnly:\s*true/
     );
     expect(appSource).toContain('function AuthPathRedirect()');
-    expect(appSource).toContain('<Navigate to="/dashboard" replace />');
+    expect(appSource).toContain('<Navigate to="/workspace/emergency" replace />');
   });
 
   it('keeps one canonical tools and calculators route system', () => {

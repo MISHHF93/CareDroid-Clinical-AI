@@ -19,11 +19,11 @@ const VISIBLE_SIDEBAR_ITEMS = PRIMARY_SIDEBAR_NAV_ITEMS;
 describe('primaryNavigation', () => {
   it('exposes the simplified primary sidebar model in canonical order', () => {
     expect(PRIMARY_SIDEBAR_NAV_ITEMS.map((item) => [item.label, item.path])).toEqual([
-      ['Dashboard', '/dashboard'],
-      ['Assistant', '/assistant'],
-      ['Tools', '/tools'],
-      ['Operations', '/operations'],
-      ['Workspace', '/workspaces'],
+      ['Whiteboard', '/workspace/emergency'],
+      ['Patients', '/workspace/emergency/patients'],
+      ['EMS', '/workspace/emergency/ems'],
+      ['Operations', '/workspace/emergency/flow'],
+      ['Copilot', '/workspace/emergency/command-center'],
       ['Profile', '/profile'],
     ]);
     expect(PRIMARY_SIDEBAR_NAV_ITEMS).toHaveLength(6);
@@ -134,11 +134,11 @@ describe('primaryNavigation', () => {
 
   it('keeps the compact drawer navigation subset canonical', () => {
     expect(PRIMARY_MOBILE_NAV_ITEMS.map((item) => item.path)).toEqual([
-      '/dashboard',
-      '/assistant',
-      '/tools',
-      '/operations',
-      '/workspaces',
+      '/workspace/emergency',
+      '/workspace/emergency/patients',
+      '/workspace/emergency/ems',
+      '/workspace/emergency/flow',
+      '/workspace/emergency/command-center',
       '/profile',
     ]);
   });
@@ -148,52 +148,49 @@ describe('primaryNavigation', () => {
     expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID['developer-audit'], '/tools/catalog')).toBe(
       true
     );
-    expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID.tools, '/tools/catalog')).toBe(false);
+    expect(PRIMARY_NAV_BY_ID.tools).toBeUndefined();
     expect(primaryNavPathMatches(PRIMARY_NAV_BY_ID.settings, '/tools/catalog')).toBe(false);
   });
 
-  it('keeps calculator routes under the Tools nav item without a duplicate sidebar destination', () => {
+  it('keeps calculator routes outside primary nav without a duplicate sidebar destination', () => {
     expect(ADVANCED_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools/calculators')).toBe(
       false
     );
-    expect(getPrimaryNavItemForPath('/tools/calculators/sofa')?.id).toBe('tools');
+    expect(PRIMARY_SIDEBAR_NAV_ITEMS.some((item) => item.path === '/tools')).toBe(false);
   });
 
-  it('keeps operations leaf routes under the primary Operations concept', () => {
-    expect(getPrimaryNavItemForPath('/live-map')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/maps')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/hospital-map')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/medical-iot')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/devices')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/fleet/map')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/fleet/route-optimizer')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/operations/incidents')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/digital-twin')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/digital-twin-intelligence')?.id).toBe('operations');
-    expect(getPrimaryNavItemForPath('/operations')?.id).toBe('operations');
+  it('keeps Emergency operations routes under the primary Operations concept', () => {
+    expect(getPrimaryNavItemForPath('/workspace/emergency/flow')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/workspace/emergency/referrals')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/workspace/emergency/capacity')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/workspace/emergency/analytics')?.id).toBe('operations');
+    expect(getPrimaryNavItemForPath('/workspace/emergency/boarding')?.id).toBe('operations');
   });
 
-  it('keeps profile and workspace primary while settings and account utilities remain outside the persistent shell', () => {
+  it('keeps Emergency OS surfaces primary while settings and account utilities remain outside the persistent shell', () => {
     const expected = [
       ['/profile', 'profile'],
       ['/profile/activity', 'profile'],
       ['/profile/tool-preferences', 'profile'],
-      ['/profile/workspaces', 'workspace'],
-      ['/workspaces', 'workspace'],
-      ['/workspace/emergency', 'workspace'],
+      ['/workspace/emergency/patients', 'patients'],
+      ['/workspace/emergency/ems', 'ems'],
+      ['/workspace/emergency/command-center', 'assistant'],
+      ['/workspaces', undefined],
+      ['/workspace/emergency', 'home'],
       ['/profile/settings', 'settings'],
       ['/profile/preferences', 'settings'],
       ['/settings', 'settings'],
       ['/tenant-admin', 'tenant-admin'],
     ];
 
+    const persistentIds = new Set(['home', 'patients', 'ems', 'operations', 'assistant', 'profile']);
     for (const [path, itemId] of expected) {
       const matches = PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => primaryNavPathMatches(item, path));
 
       expect(
         matches.map((item) => item.id),
         path
-      ).toEqual(['profile', 'workspace'].includes(itemId) ? [itemId] : []);
+      ).toEqual(persistentIds.has(itemId) ? [itemId] : []);
       expect(getPrimaryNavItemForPath(path)?.id, path).toBe(itemId);
     }
 

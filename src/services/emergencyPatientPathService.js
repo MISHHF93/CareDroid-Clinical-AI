@@ -2,6 +2,7 @@ import ClinicalIntentRouter from '../data/clinicalIntentRouter';
 import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
 import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
 import EmergencyWhiteboardService from './emergencyWhiteboardService';
+import EmsPreArrivalPipelineService from './emsPreArrivalPipelineService';
 import BoardingIntelligenceEngine from './boardingIntelligenceEngine';
 import DoorToDoctorIntelligenceService from './doorToDoctorIntelligenceService';
 import QueueIntelligenceService from './queueIntelligenceService';
@@ -265,6 +266,57 @@ function buildPatientPath(patient, index, context) {
   });
 }
 
+function buildEmsPatientPath(patient, index, context) {
+  const card = context.cardByPatientId.get(patient.id);
+  const intentRoute = ClinicalIntentRouter.routeComplaint(patient.complaint);
+  const timing = Object.freeze({
+    doorToKnownMinutes: 0,
+    doorToRiskMinutes: 0,
+    doorToQueueMinutes: 0,
+    doorToActionMinutes: patient.handoffStatus === 'Arriving' ? 1 : 2,
+    doorToDestinationMinutes: Math.max(1, patient.etaMinutes),
+    doorToDirectionMinutes: patient.handoffStatus === 'Arriving' ? 1 : 2,
+  });
+
+  return Object.freeze({
+    patientId: patient.id,
+    displayName: patient.patientLabel,
+    arrivalMode: 'EMS',
+    complaint: patient.complaint,
+    currentState: patient.handoffStatus,
+    journeyStateId: 'arrival',
+    riskScore: ['critical', 'high'].includes(patient.riskLevel) ? 90 : 60,
+    riskLevel: patient.riskLevel,
+    assignedQueue: Object.freeze({
+      id: 'ems-pre-arrival-queue',
+      label: 'EMS Pre-Arrival Queue',
+      riskLevel: patient.riskLevel,
+      waitTime: patient.etaMinutes,
+    }),
+    calculators: Object.freeze(intentRoute?.calculators || []),
+    workflows: Object.freeze(intentRoute?.workflows || []),
+    protocols: Object.freeze(intentRoute?.protocols || []),
+    destination: Object.freeze({
+      id: 'ed-arrival-triage',
+      label: 'ED arrival and triage',
+      status: 'Inbound handoff review',
+      owner: 'Charge nurse',
+    }),
+    nextAction: `Review ED Handoff Summary from ${patient.unit} before arrival.`,
+    blockers: Object.freeze(patient.notificationStatus !== 'sent' ? ['ED notification is pending.'] : []),
+    alerts: Object.freeze(card?.alerts || [`${patient.handoffStatus} EMS handoff`]),
+    timing,
+    edHandoffSummary: patient.edHandoffSummary,
+    handoffStatus: patient.handoffStatus,
+    etaMinutes: patient.etaMinutes,
+    sourceState: 'EMS Handoff Pipeline',
+    safetyStatement:
+      intentRoute?.safetyStatement ||
+      'EMS handoff supports ED preparation and patient journey visibility only. It does not diagnose, treat, or determine disposition.',
+    sortIndex: index,
+  });
+}
+
 function getMetricStatus(value, target) {
   if (value <= target) return 'on-target';
   if (value <= target * 1.5) return 'watch';
@@ -342,6 +394,7 @@ function buildRecommendations(patients, queueDashboard, capacityDashboard, refer
 
 function buildContext() {
   const demoEnvironment = EmergencyDemoEnvironmentService.getDemoEnvironment();
+  const emsPreArrival = EmsPreArrivalPipelineService.getPreArrivalDashboard();
   const whiteboard = EmergencyWhiteboardService.getWhiteboard();
   const queueDashboard = QueueIntelligenceService.getQueueDashboard();
   const referralDashboard = ReferralHub.getReferralDashboard();
@@ -351,6 +404,7 @@ function buildContext() {
 
   return {
     demoEnvironment,
+    emsPreArrival,
     whiteboard,
     queueDashboard,
     referralDashboard,
@@ -371,7 +425,12 @@ export const EmergencyPatientPathService = Object.freeze({
   getPatientPathDashboard() {
     const context = buildContext();
     const patients = Object.freeze(
-      context.demoEnvironment.patients.map((patient, index) => buildPatientPath(patient, index, context))
+      [
+        ...context.emsPreArrival.queue.incomingPatients.map((patient, index) => buildEmsPatientPath(patient, index, context)),
+        ...context.demoEnvironment.patients.map((patient, index) =>
+          buildPatientPath(patient, index + context.emsPreArrival.queue.incomingPatients.length, context)
+        ),
+      ]
     );
     const metrics = buildMetrics(patients);
 

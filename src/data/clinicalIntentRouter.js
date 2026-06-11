@@ -1,14 +1,50 @@
 import { REGISTRY } from './clinicalToolIdContract';
 
+export const COMPLAINT_FIRST_NAVIGATION_STEPS = Object.freeze([
+  'Complaint',
+  'Workflow',
+  'Calculators',
+  'Protocols',
+  'Referrals',
+  'AI Copilot',
+]);
+
+function joinLabels(items = [], fallback = 'Human-reviewed step') {
+  if (!items.length) return fallback;
+  return items.map((item) => item.label || item).join(', ');
+}
+
+function buildComplaintNavigationFlow(route) {
+  return Object.freeze([
+    Object.freeze({ step: 'Complaint', label: route.complaint }),
+    Object.freeze({ step: 'Workflow', label: route.workflows?.[0] || 'Complaint workflow' }),
+    Object.freeze({ step: 'Calculators', label: joinLabels(route.calculators, 'No calculator required before clinician review') }),
+    Object.freeze({ step: 'Protocols', label: joinLabels(route.protocols, 'Protocol review') }),
+    Object.freeze({ step: 'Referrals', label: joinLabels(route.referrals, 'Referral review if indicated') }),
+    Object.freeze({ step: 'AI Copilot', label: 'ED AI Copilot explains the complaint-specific pathway' }),
+  ]);
+}
+
 function freezeRoute(route) {
-  return Object.freeze({
+  const calculators = Object.freeze((route.calculators || []).map((calculator) => Object.freeze(calculator)));
+  const protocols = Object.freeze(route.protocols || []);
+  const workflows = Object.freeze(route.workflows || []);
+  const referrals = Object.freeze(route.referrals || []);
+  const routeWithFrozenFields = {
     ...route,
     aliases: Object.freeze(route.aliases || []),
-    calculators: Object.freeze((route.calculators || []).map((calculator) => Object.freeze(calculator))),
-    protocols: Object.freeze(route.protocols || []),
-    workflows: Object.freeze(route.workflows || []),
+    calculators,
+    protocols,
+    workflows,
     simulations: Object.freeze(route.simulations || []),
-    referrals: Object.freeze(route.referrals || []),
+    referrals,
+  };
+
+  return Object.freeze({
+    ...routeWithFrozenFields,
+    navigationMode: 'complaint-first',
+    navigationSteps: COMPLAINT_FIRST_NAVIGATION_STEPS,
+    navigationFlow: buildComplaintNavigationFlow(routeWithFrozenFields),
   });
 }
 
@@ -89,6 +125,50 @@ export const CLINICAL_INTENT_ROUTES = Object.freeze([
     safetyStatement:
       'This route supports respiratory workflow guidance only. It does not diagnose PE or determine disposition.',
   }),
+  freezeRoute({
+    routeId: 'chief-complaint-abdominal-pain',
+    complaint: 'Abdominal Pain',
+    aliases: ['abdominal pain', 'belly pain', 'gi bleed', 'pancreatitis', 'surgical abdomen', 'vomiting'],
+    calculators: [
+      { id: REGISTRY.ransonCriteria, label: 'Ranson Criteria' },
+      { id: REGISTRY.bisapScore, label: 'BISAP' },
+      { id: REGISTRY.glasgowBlatchfordScore, label: 'Glasgow-Blatchford' },
+    ],
+    protocols: ['Abdominal Pain Pathway', 'GI bleed and pancreatitis review', 'surgical abdomen red flag review'],
+    workflows: ['Abdominal Pain Workflow'],
+    simulations: ['abdominal pain escalation simulation'],
+    referrals: ['Surgery or GI referral review'],
+    guidance:
+      'Route abdominal pain to abdominal pain workflow guidance, GI/surgical red flag review, and indicated calculator prompts for clinician review.',
+    safetyStatement:
+      'This route supports abdominal pain workflow guidance only. It does not diagnose surgical abdomen, GI bleeding, or pancreatitis.',
+  }),
+  freezeRoute({
+    routeId: 'chief-complaint-psychiatric-crisis',
+    complaint: 'Psychiatric Crisis',
+    aliases: [
+      'psychiatric crisis',
+      'behavioral health crisis',
+      'suicidal ideation',
+      'self harm',
+      'self-harm',
+      'agitation',
+      'psychosis',
+    ],
+    calculators: [
+      { id: REGISTRY.columbiaSuicideSeverityWorkflow, label: 'C-SSRS' },
+      { id: REGISTRY.phq9, label: 'PHQ-9' },
+      { id: REGISTRY.gad7, label: 'GAD-7' },
+    ],
+    protocols: ['Behavioral health safety pathway', 'suicide risk and observation protocol'],
+    workflows: ['Psychiatric Crisis Workflow'],
+    simulations: ['behavioral health safety simulation'],
+    referrals: ['Psychiatry or crisis team referral'],
+    guidance:
+      'Route psychiatric crisis to behavioral health safety workflow, suicide risk screening, observation context, and psychiatry or crisis team referral review.',
+    safetyStatement:
+      'This route supports psychiatric crisis workflow guidance only. It does not diagnose, determine capacity, or replace emergency safety assessment.',
+  }),
 ]);
 
 function normalizeComplaintText(complaint = '') {
@@ -111,12 +191,17 @@ export function routeClinicalIntent(complaint = '') {
   return Object.freeze({
     ...route,
     routingMode: 'workflow-guidance',
+    navigationMode: 'complaint-first',
+    navigationSteps: COMPLAINT_FIRST_NAVIGATION_STEPS,
     outputs: Object.freeze({
+      complaint: route.complaint,
+      workflow: route.workflows[0] || null,
       calculators: route.calculators,
       protocols: route.protocols,
       workflows: route.workflows,
-      simulations: route.simulations,
       referrals: route.referrals,
+      aiCopilot: 'ED AI Copilot',
+      simulations: route.simulations,
     }),
   });
 }

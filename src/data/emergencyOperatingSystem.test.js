@@ -9,6 +9,7 @@ import {
   EMERGENCY_FLOW_INTELLIGENCE_PLATFORM,
   EMERGENCY_ONBOARDING_EXPERIENCE,
   EMERGENCY_ROI_ESTIMATOR,
+  buildDynamicRiskBundle,
   buildEmergencyCopilotGuidance,
   estimateEmergencyRoi,
   routeEmergencyChiefComplaint,
@@ -22,6 +23,8 @@ describe('emergencyOperatingSystem complaint router', () => {
       'Sepsis Concern',
       'Trauma',
       'Shortness of Breath',
+      'Abdominal Pain',
+      'Psychiatric Crisis',
     ]);
   });
 
@@ -32,7 +35,8 @@ describe('emergencyOperatingSystem complaint router', () => {
         calculators: [expect.objectContaining({ label: 'HEART' })],
         workflows: ['ACS Workflow'],
         referrals: ['Cardiology Referral'],
-        routingMode: 'workflow-guidance',
+        routingMode: 'complaint-first-workflow-guidance',
+        navigationSteps: ['Complaint', 'Workflow', 'Calculators', 'Protocols', 'Referrals', 'AI Copilot'],
         safetyStatement: expect.stringMatching(/does not diagnose ACS/i),
       })
     );
@@ -73,10 +77,58 @@ describe('emergencyOperatingSystem complaint router', () => {
         safetyStatement: expect.stringMatching(/does not diagnose injuries/i),
       })
     );
+    expect(routeEmergencyChiefComplaint('abdominal pain')).toEqual(
+      expect.objectContaining({
+        complaint: 'Abdominal Pain',
+        workflows: ['Abdominal Pain Workflow'],
+        calculators: expect.arrayContaining([expect.objectContaining({ label: 'BISAP' })]),
+        referrals: ['Surgery or GI referral review'],
+        safetyStatement: expect.stringMatching(/does not diagnose surgical abdomen/i),
+      })
+    );
+    expect(routeEmergencyChiefComplaint('psychiatric crisis')).toEqual(
+      expect.objectContaining({
+        complaint: 'Psychiatric Crisis',
+        workflows: ['Psychiatric Crisis Workflow'],
+        calculators: expect.arrayContaining([expect.objectContaining({ label: 'C-SSRS' })]),
+        referrals: ['Psychiatry or crisis team referral'],
+        safetyStatement: expect.stringMatching(/does not diagnose/i),
+      })
+    );
   });
 
   it('returns null for unsupported complaint text', () => {
     expect(routeEmergencyChiefComplaint('medication refill')).toBeNull();
+  });
+
+  it('builds one Dynamic Risk Bundle Engine profile from complaint, age, vitals, and risk factors', () => {
+    expect(
+      buildDynamicRiskBundle({
+        chiefComplaint: 'chest pain',
+        age: 58,
+        vitals: 'BP 92/58, HR 124',
+        riskFactors: 'diabetes and diaphoresis',
+      }).emergencyRiskProfile
+    ).toEqual(
+      expect.objectContaining({
+        title: 'Emergency Risk Profile',
+        consolidated: true,
+        complaint: 'Chest Pain',
+        calculators: [
+          expect.objectContaining({ label: 'HEART' }),
+          expect.objectContaining({ label: 'Shock Index' }),
+        ],
+        noDisconnectedCalculators: true,
+      })
+    );
+    expect(buildDynamicRiskBundle({ chiefComplaint: 'stroke symptoms' }).riskBundle.map((item) => item.label)).toEqual([
+      'NIHSS',
+      'GCS',
+    ]);
+    expect(buildDynamicRiskBundle({ chiefComplaint: 'possible sepsis' }).riskBundle.map((item) => item.label)).toEqual([
+      'qSOFA',
+      'NEWS2',
+    ]);
   });
 
   it('builds explainable ED Copilot workflow guidance without autonomous decisions', () => {
@@ -84,14 +136,16 @@ describe('emergencyOperatingSystem complaint router', () => {
       'complaint',
       'vitals',
       'workspaceContext',
-      'selectedCalculators',
+      'surfacedCalculators',
     ]);
     expect(EMERGENCY_AI_COPILOT.outputSchema).toEqual(
       expect.arrayContaining([
-        'recommendedTools',
+        'complaint',
+        'workflow',
+        'surfacedCalculators',
         'protocols',
-        'nextWorkflowStep',
-        'simulations',
+        'referrals',
+        'aiCopilot',
         'escalationSuggestions',
         'reasoning',
       ])
@@ -101,13 +155,18 @@ describe('emergencyOperatingSystem complaint router', () => {
       complaint: 'chest pressure',
       vitals: 'HR 118, RR 22, SpO2 94%',
       workspaceContext: 'Emergency Command Center',
-      selectedCalculators: ['HEART'],
+      surfacedCalculators: ['HEART'],
     });
 
     expect(guidance).toEqual(
       expect.objectContaining({
         copilotId: 'emergency-ai-copilot',
         matchedRouteId: 'chief-complaint-chest-pain',
+        navigationMode: 'complaint-first',
+        workflow: 'ACS Workflow',
+        referrals: expect.arrayContaining(['Cardiology Referral']),
+        aiCopilot: 'ED AI Copilot',
+        surfacedCalculators: expect.arrayContaining([expect.objectContaining({ label: 'HEART' })]),
         protocols: expect.arrayContaining(['ACS/chest pain pathway']),
         nextWorkflowStep: expect.stringMatching(/ACS Workflow/i),
         safetyBoundary: expect.stringMatching(/No autonomous diagnosis/i),

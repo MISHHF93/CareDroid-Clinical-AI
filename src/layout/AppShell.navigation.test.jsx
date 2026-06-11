@@ -56,7 +56,7 @@ vi.mock('../components/Sidebar', async () => {
         {(!layoutCompact || mobileNavOpen) && (
           <>
             <nav aria-label="Primary navigation">
-              {['Dashboard', 'Assistant', 'Tools', 'Operations', 'Workspace', 'Profile'].map((label) => (
+              {['Whiteboard', 'Patients', 'EMS', 'Operations', 'Copilot', 'Profile'].map((label) => (
                 <button key={label} type="button">
                   {label}
                 </button>
@@ -113,7 +113,7 @@ describe('AppShell navigation surfaces', () => {
     expect(screen.getByRole('navigation', { name: /primary navigation/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /open quick command/i })).toBeInTheDocument();
     expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/command center/i);
-    expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/dashboard/i);
+    expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/whiteboard/i);
     expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/caredroid frontend os/i);
     expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/emergency/i);
     expect(screen.getByLabelText(/frontend operating system flow/i)).toHaveTextContent(/dashboard/i);
@@ -128,7 +128,7 @@ describe('AppShell navigation surfaces', () => {
 
     expect(screen.getByTestId('app-sidebar')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByRole('button', { name: /open navigation menu/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/dashboard/i);
+    expect(screen.getByLabelText(/current page/i)).toHaveTextContent(/whiteboard/i);
     expect(screen.queryByLabelText(/frontend operating system flow/i)).not.toBeInTheDocument();
     expect(container.querySelector('.app-shell-bottom-nav')).not.toBeInTheDocument();
   });
@@ -156,11 +156,11 @@ describe('AppShell navigation surfaces', () => {
 
     const nav = within(sidebar).getByRole('navigation', { name: /primary navigation/i });
     for (const name of [
-      /^dashboard$/i,
-      /^assistant$/i,
-      /^tools$/i,
+      /^whiteboard$/i,
+      /^patients$/i,
+      /^ems$/i,
       /^operations$/i,
-      /^workspace$/i,
+      /^copilot$/i,
       /^profile$/i,
     ]) {
       expect(screen.getAllByRole('button', { name })).toHaveLength(1);

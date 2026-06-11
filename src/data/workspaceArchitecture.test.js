@@ -131,11 +131,13 @@ describe('workspaceArchitecture', () => {
     expect(getCareWorkspaceById('missing').id).toBe('emergency');
   });
 
-  it('keeps Emergency dashboard-first with reduced primary navigation', () => {
+  it('keeps Emergency whiteboard-first with reduced dashboard hopping', () => {
     const emergency = getCareWorkspaceById('emergency');
     const mode = getWorkspaceFunctionalityMode('emergency');
 
-    expect(emergency.defaultNavigationGroups).toEqual(['command-center', 'automations']);
+    expect(emergency.defaultNavigationGroups).toEqual(['whiteboard', 'patients', 'ems', 'operations', 'copilot']);
+    expect(mode.modeName).toBe('Emergency OS');
+    expect(mode.purpose).toMatch(/patient flow, queue flow, EMS flow, capacity flow, and decision support/i);
     expect(emergency.defaultDashboardWidgets).toEqual([
       'current-patients',
       'waiting-room',
@@ -150,9 +152,9 @@ describe('workspaceArchitecture', () => {
     expect(mode.dashboards).toEqual(emergency.defaultDashboardWidgets);
     expect(mode.subpages.map((subpage) => subpage.id)).toEqual(
       expect.arrayContaining([
+        'whiteboard',
         'command-center',
         'patient-path',
-        'whiteboard',
         'pre-arrival',
         'queues',
         'capacity',
@@ -242,16 +244,18 @@ describe('workspaceArchitecture', () => {
 
   it('adds specialized subpages for operational workspaces without sidebar expansion', () => {
     expect(getWorkspaceSubpageEntries('emergency').map((subpage) => subpage.id)).toEqual([
+      'whiteboard',
       'dashboard',
       'command-center',
       'patient-path',
+      'intake',
+      'patient-context',
       'director',
       'charge-nurse',
       'waiting-room',
       'triage',
       'queues',
       'throughput',
-      'whiteboard',
       'patients',
       'ems',
       'pre-arrival',
@@ -268,6 +272,7 @@ describe('workspaceArchitecture', () => {
       'automations',
       'automation-roi',
       'analytics',
+      'intake-analytics',
       'demo',
       'flow',
       'onboarding',
@@ -275,7 +280,14 @@ describe('workspaceArchitecture', () => {
       'deployment',
       'implementation',
     ]);
-    expect(getWorkspaceSubpageEntries('emergency').filter((subpage) => subpage.quickTask)).toHaveLength(8);
+    expect(getWorkspaceSubpageEntries('emergency').filter((subpage) => subpage.quickTask)).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          id: 'whiteboard',
+          taskLabel: 'Open Emergency Whiteboard',
+        }),
+      ])
+    );
     expect(getWorkspaceSubpageEntries('emergency').map((subpage) => subpage.group)).toEqual(
       expect.arrayContaining(['command', 'flow', 'operations', 'clinical', 'proof'])
     );

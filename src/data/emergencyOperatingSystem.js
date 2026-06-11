@@ -1,5 +1,6 @@
 import { REGISTRY } from './clinicalToolIdContract';
 import {
+  COMPLAINT_FIRST_NAVIGATION_STEPS,
   CLINICAL_INTENT_ROUTES,
   routeClinicalIntent,
 } from './clinicalIntentRouter';
@@ -127,7 +128,7 @@ export const EMERGENCY_COMMAND_CENTER_WIDGETS = Object.freeze([
     severity: 'critical',
     targetSurface: 'triage',
     primaryAction: Object.freeze({
-      label: 'Open risk calculators',
+      label: 'Open complaint workflow',
       actionType: 'route',
       target: '/workspace/emergency/triage',
     }),
@@ -292,13 +293,177 @@ export const EMERGENCY_TRIAGE_ORCHESTRATOR = Object.freeze({
   ]),
   outputs: Object.freeze([
     'risk profile',
-    'recommended calculator list',
+    'complaint-specific workflow path',
+    'surfaced calculator prompts',
     'red flag summary',
     'clinician review queue item',
   ]),
+  dynamicRiskBundleEngine: Object.freeze({
+    engineId: 'dynamic-risk-bundle-engine',
+    inputSchema: Object.freeze(['chief complaint', 'age', 'vitals', 'risk factors']),
+    outputSchema: Object.freeze(['Risk Bundle', 'Emergency Risk Profile']),
+    displayRule: 'Display one consolidated Emergency Risk Profile instead of disconnected calculators.',
+  }),
   safetyStatement:
     'The triage orchestrator generates risk profiles and review prompts only. It does not make autonomous diagnoses, disposition decisions, or treatment decisions.',
 });
+
+export const DYNAMIC_RISK_BUNDLE_RULES = Object.freeze([
+  Object.freeze({
+    complaint: 'Chest Pain',
+    aliases: Object.freeze(['chest pain', 'chest pressure', 'acs']),
+    calculators: Object.freeze([
+      Object.freeze({ id: REGISTRY.heartScore, label: 'HEART', reason: 'ACS risk workflow context' }),
+      Object.freeze({ id: REGISTRY.shockIndex, label: 'Shock Index', reason: 'Hemodynamic instability screen' }),
+    ]),
+  }),
+  Object.freeze({
+    complaint: 'Stroke Symptoms',
+    aliases: Object.freeze(['stroke', 'stroke symptoms', 'facial droop', 'slurred speech', 'neuro deficit']),
+    calculators: Object.freeze([
+      Object.freeze({ id: REGISTRY.nihss, label: 'NIHSS', reason: 'Stroke deficit severity context' }),
+      Object.freeze({ id: REGISTRY.gcsCalculator, label: 'GCS', reason: 'Consciousness and neurologic handoff context' }),
+    ]),
+  }),
+  Object.freeze({
+    complaint: 'Sepsis Concern',
+    aliases: Object.freeze(['sepsis', 'sepsis concern', 'infection', 'fever hypotension']),
+    calculators: Object.freeze([
+      Object.freeze({ id: REGISTRY.qsofa, label: 'qSOFA', reason: 'Sepsis screening context' }),
+      Object.freeze({ id: REGISTRY.news2, label: 'NEWS2', reason: 'Physiologic deterioration context' }),
+    ]),
+  }),
+  Object.freeze({
+    complaint: 'Shortness of Breath',
+    aliases: Object.freeze(['shortness of breath', 'sob', 'dyspnea', 'respiratory distress']),
+    calculators: Object.freeze([
+      Object.freeze({ id: REGISTRY.news2, label: 'NEWS2', reason: 'Respiratory deterioration context' }),
+      Object.freeze({ id: REGISTRY.wellsPe, label: 'Wells PE', reason: 'PE workflow context when clinically appropriate' }),
+    ]),
+  }),
+  Object.freeze({
+    complaint: 'Trauma',
+    aliases: Object.freeze(['trauma', 'mvc', 'fall injury', 'penetrating trauma']),
+    calculators: Object.freeze([
+      Object.freeze({ id: REGISTRY.shockIndex, label: 'Shock Index', reason: 'Hemodynamic instability screen' }),
+      Object.freeze({ id: REGISTRY.gcsCalculator, label: 'GCS', reason: 'Trauma neurologic handoff context' }),
+    ]),
+  }),
+  Object.freeze({
+    complaint: 'Abdominal Pain',
+    aliases: Object.freeze(['abdominal pain', 'belly pain', 'gi bleed', 'pancreatitis']),
+    calculators: Object.freeze([
+      Object.freeze({ id: REGISTRY.bisapScore, label: 'BISAP', reason: 'Pancreatitis severity context when suspected' }),
+      Object.freeze({ id: REGISTRY.glasgowBlatchfordScore, label: 'Glasgow-Blatchford', reason: 'GI bleed workflow context when suspected' }),
+    ]),
+  }),
+  Object.freeze({
+    complaint: 'Psychiatric Crisis',
+    aliases: Object.freeze(['psychiatric crisis', 'behavioral health crisis', 'suicidal ideation', 'self harm']),
+    calculators: Object.freeze([
+      Object.freeze({ id: REGISTRY.columbiaSuicideSeverityWorkflow, label: 'C-SSRS', reason: 'Suicide risk workflow context' }),
+      Object.freeze({ id: REGISTRY.phq9, label: 'PHQ-9', reason: 'Depression screening context when appropriate' }),
+    ]),
+  }),
+]);
+
+function findDynamicRiskBundleRule(chiefComplaint = '') {
+  const normalized = normalizeComplaintText(chiefComplaint);
+  if (!normalized) return null;
+
+  return (
+    DYNAMIC_RISK_BUNDLE_RULES.find((rule) =>
+      rule.aliases.some((alias) => {
+        const normalizedAlias = normalizeComplaintText(alias);
+        return normalized.includes(normalizedAlias) || normalizedAlias.includes(normalized);
+      })
+    ) || null
+  );
+}
+
+function buildRiskFlags({ age, vitals, riskFactors, matchedComplaint }) {
+  const numericAge = Number.parseInt(age, 10);
+  const vitalsText = String(vitals || '').toLowerCase();
+  const riskText = String(riskFactors || '').toLowerCase();
+  const flags = [
+    matchedComplaint
+      ? `${matchedComplaint} bundle selected from chief complaint.`
+      : 'No supported complaint bundle matched; use manual clinician review.',
+  ];
+
+  if (Number.isFinite(numericAge) && numericAge >= 65) {
+    flags.push('Age 65+ increases reassessment priority.');
+  }
+  if (/bp\s*(\d{2})\/|sbp\s*(\d{2})|hypotension|shock|hr\s*(1[2-9][0-9]|[2-9][0-9]{2})/.test(vitalsText)) {
+    flags.push('Hemodynamic concern detected from vitals text.');
+  }
+  if (/rr\s*(2[4-9]|[3-9][0-9])|spo2\s*(8[0-9]|9[0-2])|hypoxia|respiratory distress/.test(vitalsText)) {
+    flags.push('Respiratory concern detected from vitals text.');
+  }
+  if (/fever|temp\s*(3[89]|4[0-9])|infection|sepsis/.test(vitalsText) || /immun|infection|sepsis/.test(riskText)) {
+    flags.push('Infection or immunosuppression concern detected.');
+  }
+  if (/anticoag|pregnan|stroke|trauma|self[-\s]?harm|suicid|chest pain|pe/.test(riskText)) {
+    flags.push('Risk factors should be preserved in handoff and clinician review.');
+  }
+
+  return Object.freeze(flags);
+}
+
+function profileSeverity(flags = []) {
+  if (flags.length >= 4) return 'critical review';
+  if (flags.length >= 3) return 'high review';
+  return 'standard review';
+}
+
+export function buildDynamicRiskBundle({
+  chiefComplaint = '',
+  age = '',
+  vitals = '',
+  riskFactors = '',
+} = {}) {
+  const routedComplaint = routeEmergencyChiefComplaint(chiefComplaint);
+  const matchedRule = findDynamicRiskBundleRule(routedComplaint?.complaint || chiefComplaint);
+  const matchedComplaint = matchedRule?.complaint || routedComplaint?.complaint || null;
+  const calculators = Object.freeze(
+    (matchedRule?.calculators || routedComplaint?.calculators || []).map((calculator) =>
+      Object.freeze({
+        ...calculator,
+        reviewStatus: 'clinician review required',
+      })
+    )
+  );
+  const flags = buildRiskFlags({ age, vitals, riskFactors, matchedComplaint });
+  const workflow = routedComplaint?.workflows?.[0] || (matchedComplaint ? `${matchedComplaint} Workflow` : 'Manual clinician review');
+
+  return Object.freeze({
+    engineId: 'dynamic-risk-bundle-engine',
+    title: 'Dynamic Risk Bundle Engine',
+    input: Object.freeze({
+      chiefComplaint,
+      age,
+      vitals,
+      riskFactors,
+    }),
+    outputType: 'Risk Bundle',
+    matchedComplaint,
+    workflow,
+    riskBundle: calculators,
+    emergencyRiskProfile: Object.freeze({
+      title: 'Emergency Risk Profile',
+      consolidated: true,
+      severity: profileSeverity(flags),
+      complaint: matchedComplaint || 'Unmatched complaint',
+      summary: `${matchedComplaint || 'Unmatched complaint'} risk profile from complaint, age, vitals, and risk factors.`,
+      calculators,
+      flags,
+      noDisconnectedCalculators: true,
+      reviewRequirement: 'Clinician review is required before triage, diagnosis, orders, disposition, referral, or escalation.',
+    }),
+    safetyStatement:
+      'Dynamic Risk Bundle Engine creates one consolidated Emergency Risk Profile. It does not diagnose, score autonomously, order treatment, or determine disposition.',
+  });
+}
 
 export const EMERGENCY_RAG_COMPLAINT_CONTEXT = Object.freeze([
   Object.freeze({
@@ -341,6 +506,22 @@ export const EMERGENCY_RAG_COMPLAINT_CONTEXT = Object.freeze([
     workflows: ['RAG evidence retrieval', 'medical IoT monitoring', 'referral routing'],
     simulations: ['respiratory distress simulation', 'PE risk workflow simulation'],
   }),
+  Object.freeze({
+    complaint: 'Abdominal Pain',
+    protocols: ['abdominal pain pathway', 'GI bleed and pancreatitis review', 'surgical abdomen red flag review'],
+    evidence: ['GI bleed risk evidence', 'pancreatitis severity evidence', 'surgical abdomen red flag context'],
+    recommendedCalculators: [REGISTRY.ransonCriteria, REGISTRY.bisapScore, REGISTRY.glasgowBlatchfordScore],
+    workflows: ['abdominal pain workflow', 'referral routing', 'documentation integrity'],
+    simulations: ['abdominal pain escalation simulation', 'GI bleed handoff drill'],
+  }),
+  Object.freeze({
+    complaint: 'Psychiatric Crisis',
+    protocols: ['behavioral health safety pathway', 'suicide risk and observation protocol', 'crisis referral criteria'],
+    evidence: ['suicide risk screening context', 'agitation safety pathway', 'behavioral health observation evidence'],
+    recommendedCalculators: [REGISTRY.columbiaSuicideSeverityWorkflow, REGISTRY.phq9, REGISTRY.gad7],
+    workflows: ['psychiatric crisis workflow', 'safety observation review', 'referral routing'],
+    simulations: ['behavioral health safety simulation', 'crisis handoff drill'],
+  }),
 ]);
 
 export const EMERGENCY_CHIEF_COMPLAINT_ROUTES = CLINICAL_INTENT_ROUTES;
@@ -349,20 +530,22 @@ export const EMERGENCY_AI_COPILOT = Object.freeze({
   copilotId: 'emergency-ai-copilot',
   title: 'ED AI Copilot',
   role:
-    'Converts complaint, vitals, workspace context, and selected calculators into explainable ED workflow guidance.',
-  inputSchema: Object.freeze(['complaint', 'vitals', 'workspaceContext', 'selectedCalculators']),
+    'Converts complaint, vitals, and workspace context into explainable ED workflow guidance with calculators surfaced automatically inside the pathway.',
+  inputSchema: Object.freeze(['complaint', 'vitals', 'workspaceContext', 'surfacedCalculators']),
   outputSchema: Object.freeze([
-    'recommendedTools',
+    'complaint',
+    'workflow',
+    'surfacedCalculators',
     'protocols',
-    'nextWorkflowStep',
-    'simulations',
+    'referrals',
+    'aiCopilot',
     'escalationSuggestions',
     'reasoning',
   ]),
   safetyBoundary:
     'Workflow guidance only. No autonomous diagnosis, disposition, treatment, orders, or escalation decisions.',
   reasoningRequirement:
-    'Always explain which complaint route, vitals context, workspace context, and selected calculators informed each recommendation.',
+    'Always explain which complaint route, vitals context, workspace context, and automatically surfaced calculators informed each recommendation.',
   reviewRequirement: 'Clinician review is required for every Copilot output.',
 });
 
@@ -1257,7 +1440,7 @@ export const EMERGENCY_ONBOARDING_EXPERIENCE = Object.freeze({
       label: 'AI Copilot',
       duration: '2 minutes',
       summary:
-        'Explain how ED Copilot turns complaint, vitals, workspace context, and selected calculators into review-required workflow guidance.',
+        'Explain how ED Copilot turns complaint, vitals, workspace context, and automatically surfaced calculators into review-required workflow guidance.',
       outcome: 'The team understands explainability and that Copilot does not diagnose, order, disposition, or autonomously escalate.',
       targetRoute: '/workspace/emergency/evidence',
     }),
@@ -2052,7 +2235,9 @@ export function routeEmergencyChiefComplaint(complaint = '') {
     ...route,
     matchedComplaint: complaint,
     ragContext: getEmergencyRagContextForComplaint(route.complaint),
-    routingMode: 'workflow-guidance',
+    routingMode: 'complaint-first-workflow-guidance',
+    navigationMode: 'complaint-first',
+    navigationSteps: COMPLAINT_FIRST_NAVIGATION_STEPS,
   });
 }
 
@@ -2091,11 +2276,11 @@ export function buildEmergencyCopilotGuidance(input = {}) {
   const complaint = String(input.complaint || '').trim();
   const vitals = String(input.vitals || input.vitalsSummary || '').trim();
   const workspaceContext = String(input.workspaceContext || 'Emergency Workspace').trim();
-  const selectedCalculators = uniqueCalculators(input.selectedCalculators || []);
+  const surfacedCalculators = uniqueCalculators(input.surfacedCalculators || input.selectedCalculators || []);
   const routedComplaint = routeEmergencyChiefComplaint(complaint);
   const recommendedTools = uniqueCalculators([
     ...(routedComplaint?.calculators || []),
-    ...selectedCalculators,
+    ...surfacedCalculators,
   ]);
   const protocols = Object.freeze([...(routedComplaint?.protocols || [])]);
   const simulations = Object.freeze([
@@ -2112,7 +2297,7 @@ export function buildEmergencyCopilotGuidance(input = {}) {
     'Do not diagnose, order treatment, determine disposition, or autonomously escalate from Copilot output.',
   ]);
   const nextWorkflowStep = routedComplaint
-    ? `${routedComplaint.workflows[0]}: open recommended tools, review protocols, and confirm next step with a clinician.`
+    ? `${routedComplaint.workflows[0]}: follow the complaint pathway, review surfaced calculators and protocols, then confirm the next step with a clinician.`
     : 'Manual clinician review: select a supported complaint route or continue standard ED assessment.';
 
   return Object.freeze({
@@ -2121,9 +2306,16 @@ export function buildEmergencyCopilotGuidance(input = {}) {
       complaint,
       vitals,
       workspaceContext,
-      selectedCalculators,
+      surfacedCalculators,
     }),
     matchedRouteId: routedComplaint?.routeId || null,
+    navigationMode: 'complaint-first',
+    navigationSteps: COMPLAINT_FIRST_NAVIGATION_STEPS,
+    navigationFlow: routedComplaint?.navigationFlow || Object.freeze([]),
+    workflow: routedComplaint?.workflows?.[0] || null,
+    referrals: Object.freeze([...(routedComplaint?.referrals || [])]),
+    aiCopilot: EMERGENCY_AI_COPILOT.title,
+    surfacedCalculators: recommendedTools,
     recommendedTools,
     protocols,
     nextWorkflowStep,
@@ -2135,7 +2327,7 @@ export function buildEmergencyCopilotGuidance(input = {}) {
       Object.freeze({
         output: 'recommendedTools',
         explanation: routedComplaint
-          ? `${routedComplaint.complaint} matched a supported ED route, so route calculators and selected calculators are recommended for review.`
+          ? `${routedComplaint.complaint} matched a supported ED route, so calculators are surfaced automatically inside the complaint workflow.`
           : 'No complaint route matched, so no route-specific tools were added.',
       }),
       Object.freeze({

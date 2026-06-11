@@ -154,7 +154,7 @@ const Sidebar = forwardRef(function Sidebar(
           </div>
           {!effectiveCollapsed && (
             <div className="logo-text">
-              <h1>{branding.displayName || 'CareDroid'}</h1>
+              <h1>{branding.displayName || 'CareDroid Emergency OS'}</h1>
             </div>
           )}
         </div>
@@ -230,7 +230,7 @@ const Sidebar = forwardRef(function Sidebar(
           <span className="btn-icon" aria-hidden>
             <NavIcon icon={CHROME_ICONS.sparkles} size={18} />
           </span>
-          {!effectiveCollapsed && <span>New Chat</span>}
+          {!effectiveCollapsed && <span>ED Copilot</span>}
         </button>
 
         <nav className="sidebar-nav" aria-label="Primary navigation">

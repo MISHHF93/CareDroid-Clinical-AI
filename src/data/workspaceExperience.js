@@ -14,19 +14,19 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
       surface: 'rgba(255, 77, 94, 0.12)',
       border: 'rgba(255, 77, 94, 0.36)',
     },
-    environment: 'Emergency department operating environment',
-    operatingLabel: 'Emergency Flow Intelligence',
-    modeSummary: 'Emergency Flow Intelligence mode is active.',
-    dashboardTitle: 'Emergency Flow Command Center',
+    environment: 'CareDroid Emergency OS',
+    operatingLabel: 'CareDroid Emergency OS',
+    modeSummary: 'CareDroid Emergency OS mode is active.',
+    dashboardTitle: 'Emergency Whiteboard',
     dashboardSubtitle:
-      'Patient flow, EMS arrivals, bed pressure, referral queues, equipment status, staffing pressure, and high-risk alerts are prioritized.',
-    toolsTitle: 'Emergency Flow Console',
+      'AI-assisted patient flow for small emergency departments, urgent care clinics, and clinics handling 50-150 patients/day with fewer than 10 staff.',
+    toolsTitle: 'Emergency OS Console',
     toolsSubtitle:
       'Calculators, protocols, AI guidance, referrals, discharge, equipment, and surge workflows stay tied to the end-to-end ED flow.',
-    recommendationsTitle: 'ED Flow Recommendations',
+    recommendationsTitle: 'Emergency OS Recommendations',
     recommendationsSubtitle:
       'Recommendations emphasize throughput, capacity, coordination, cognitive load, human review, and bottleneck reduction.',
-    assistantTitle: 'Emergency Flow Copilot',
+    assistantTitle: 'Emergency OS Copilot',
     assistantPlaceholder: 'Ask about ED flow, EMS handoff, triage, bed pressure, referrals, discharge, equipment, surge, or bottlenecks...',
     primaryActionIds: ['assistant', 'active-alerts', 'hospital-map', 'workflows', 'tools', 'calculators'],
     quickPrompts: [
@@ -35,14 +35,14 @@ const EXPERIENCE_OVERRIDES = Object.freeze({
       'Show discharge, referral, and bed-flow opportunities that could reduce waiting and boarding.',
     ],
     focusMetrics: [
-      { label: 'Flow', value: '7 stages', helper: 'Arrival to admission/discharge' },
-      { label: 'Solutions', value: '10 areas', helper: 'Flow, capacity, coordination' },
+      { label: 'Volume', value: '50-150', helper: 'patients/day pilot posture' },
+      { label: 'Team', value: '<10', helper: 'staff operating model' },
       { label: 'Review', value: 'Required', helper: 'No autonomous decisions' },
     ],
     operatingBrief: [
-      'Start with the ED flow model: Arrival, Triage, Assessment, Orders, Results, Disposition, Admission/Discharge.',
-      'Surface the ED director view: current patients, waiting room, high-risk queue, EMS arrivals, referrals, beds, equipment, staffing, and alerts.',
-      'Route pre-hospital, handoff, triage, bed flow, referral, discharge, equipment, surge, Copilot, and command-center work to human review.',
+      'Start from the Whiteboard, not dashboards: every operational action begins with visible patient, queue, EMS, capacity, and decision-support context.',
+      'Hide calculators, workflows, protocols, analytics, automations, referrals, boarding, and capacity behind contextual actions and Copilot routing.',
+      'Optimize for a small clinical team managing 50-150 patients/day by reducing clicks, searching, cognitive load, and missed operational signals.',
     ],
   },
   'medical-iot': {

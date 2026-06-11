@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import EmsPreArrivalPipelineService, {
+  EMS_HANDOFF_STATUSES,
   EMS_PRE_ARRIVAL_WORKFLOW,
   getIncomingPatients,
   getPreArrivalDashboard,
@@ -28,6 +29,7 @@ describe('EmsPreArrivalPipelineService', () => {
       expect.objectContaining({
         riskLevel: 'critical',
         etaMinutes: expect.any(Number),
+        handoffStatus: expect.stringMatching(/Incoming|En Route|Arriving|Arrived/),
         complaint: expect.any(String),
         vitals: expect.objectContaining({
           bloodPressure: expect.any(String),
@@ -39,7 +41,15 @@ describe('EmsPreArrivalPipelineService', () => {
             riskLevel: expect.any(String),
           }),
         ]),
+        riskIndicators: expect.arrayContaining([expect.any(String)]),
         handoffSummary: expect.stringMatching(/inbound/i),
+        edHandoffSummary: expect.objectContaining({
+          title: 'ED Handoff Summary',
+          attachedToPatientJourney: true,
+          journeyAttachment: expect.objectContaining({
+            label: 'EMS handoff attached before arrival',
+          }),
+        }),
       })
     );
   });
@@ -54,16 +64,24 @@ describe('EmsPreArrivalPipelineService', () => {
         id: 'ems-pre-arrival-queue',
         count: 3,
         criticalCount: 2,
+        statusCounts: expect.objectContaining({
+          Incoming: expect.any(Number),
+          'En Route': expect.any(Number),
+          Arriving: expect.any(Number),
+          Arrived: expect.any(Number),
+        }),
         nextArrival: expect.objectContaining({
-          etaMinutes: 6,
+          etaMinutes: 4,
         }),
       })
     );
     expect(metrics).toEqual(
       expect.objectContaining({
         incomingCount: 3,
-        nextEtaMinutes: 6,
+        nextEtaMinutes: 4,
         handoffReadyCount: 3,
+        whiteboardVisibleCount: 3,
+        journeyAttachmentCount: 3,
       })
     );
     expect(recommendations).toEqual(
@@ -80,16 +98,32 @@ describe('EmsPreArrivalPipelineService', () => {
 
     expect(dashboard).toEqual(
       expect.objectContaining({
+        pipelineId: 'ems-handoff-pipeline',
+        inputSchema: ['complaint', 'vitals', 'ETA', 'risk indicators'],
+        statuses: EMS_HANDOFF_STATUSES,
+        output: 'ED Handoff Summary',
         workflow: expect.any(Array),
         queue: expect.objectContaining({
           incomingPatients: expect.arrayContaining([
             expect.objectContaining({
               etaMinutes: expect.any(Number),
+              handoffStatus: expect.any(String),
               riskScoreBundle: expect.any(Array),
+              riskIndicators: expect.any(Array),
               handoffSummary: expect.any(String),
+              edHandoffSummary: expect.objectContaining({
+                title: 'ED Handoff Summary',
+                attachedToPatientJourney: true,
+              }),
             }),
           ]),
         }),
+        edHandoffSummaries: expect.arrayContaining([
+          expect.objectContaining({
+            title: 'ED Handoff Summary',
+            attachedToPatientJourney: true,
+          }),
+        ]),
         safetyStatement: expect.stringMatching(/pre-arrival context/i),
       })
     );

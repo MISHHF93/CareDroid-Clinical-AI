@@ -8,12 +8,12 @@ const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
 const routeConfigSource = readFileSync(join(__dirname, '../config/routes.config.js'), 'utf8');
 
 describe('auth canonical flow wiring', () => {
-  it('bypasses the auth page and redirects auth aliases into the dashboard', () => {
+  it('bypasses the auth page and redirects auth aliases into the Emergency Whiteboard', () => {
     expect(appSource).toMatch(
-      /path:\s*'\/auth'[\s\S]*element:\s*<Navigate to="\/dashboard" replace \/>[\s\S]*publicOnly:\s*true/
+      /path:\s*'\/auth'[\s\S]*element:\s*<Navigate to="\/workspace\/emergency" replace \/>[\s\S]*publicOnly:\s*true/
     );
     expect(appSource).toContain('function AuthPathRedirect()');
-    expect(appSource).toContain('<Navigate to="/dashboard" replace />');
+    expect(appSource).toContain('<Navigate to="/workspace/emergency" replace />');
     expect(appSource).toContain('...AUTH_PATH_ALIASES.map');
   });
 

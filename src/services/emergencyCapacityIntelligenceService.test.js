@@ -50,17 +50,33 @@ describe('EmergencyCapacityIntelligenceService', () => {
 
     expect(recommendations).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: 'boarding-relief' }),
-        expect.objectContaining({ id: 'admission-handoff' }),
-        expect.objectContaining({ id: 'ems-arrival-readiness' }),
-        expect.objectContaining({ id: 'discharge-acceleration' }),
+        expect.objectContaining({ id: 'overloaded-queues', category: 'overloaded queues' }),
+        expect.objectContaining({ id: 'boarding-relief', category: 'bottlenecks' }),
+        expect.objectContaining({ id: 'admission-handoff', category: 'bottlenecks' }),
+        expect.objectContaining({ id: 'ems-arrival-readiness', category: 'bottlenecks' }),
+        expect.objectContaining({ id: 'discharge-acceleration', category: 'discharge opportunities' }),
       ])
     );
     expect(dashboard).toEqual(
       expect.objectContaining({
+        engineId: 'capacity-engine',
+        title: 'Capacity Engine',
+        inputSchema: ['occupancy', 'boarding', 'pending admissions', 'discharge candidates', 'EMS arrivals'],
+        output: 'Capacity Score',
         score: expect.any(Number),
         riskLevel: expect.stringMatching(/Green|Yellow|Orange|Red/),
         occupancyPercent: expect.any(Number),
+        recommendationCategories: expect.objectContaining({
+          dischargeOpportunities: expect.arrayContaining([
+            expect.objectContaining({ category: 'discharge opportunities' }),
+          ]),
+          bottlenecks: expect.arrayContaining([
+            expect.objectContaining({ category: 'bottlenecks' }),
+          ]),
+          overloadedQueues: expect.arrayContaining([
+            expect.objectContaining({ category: 'overloaded queues' }),
+          ]),
+        }),
         summary: expect.stringMatching(/capacity posture/i),
       })
     );

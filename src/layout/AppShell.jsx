@@ -19,6 +19,7 @@ import {
 import appConfig from '../config/appConfig';
 import { getFrontendOperatingSystemState } from '../data/frontendOperatingSystem';
 import { getPrimaryNavItemForPath } from '../config/navigation.config';
+import EmergencyCapacityIntelligenceService from '../services/emergencyCapacityIntelligenceService';
 import './AppShell.css';
 
 const environment = appConfig.app.environment || 'development';
@@ -115,6 +116,13 @@ const AppShell = ({
       section,
     };
   }, [frontendOs.currentStage?.label, location.pathname]);
+  const emergencyCapacity = useMemo(
+    () =>
+      location.pathname.startsWith('/workspace/emergency')
+        ? EmergencyCapacityIntelligenceService.getCapacityDashboard()
+        : null,
+    [location.pathname]
+  );
 
   useEffect(() => {
     closeMobileNav();
@@ -237,6 +245,11 @@ const AppShell = ({
                     <strong>{frontendOs.shellLabel}</strong>
                     <span>{frontendOs.workspaceLabel}</span>
                     <span className="app-shell-os-strip__stage">{frontendOs.currentStage.label}</span>
+                    {emergencyCapacity ? (
+                      <span className="app-shell-os-strip__stage">
+                        Capacity {emergencyCapacity.riskLevel} · {emergencyCapacity.score}
+                      </span>
+                    ) : null}
                   </div>
                 )}
                 <WorkspaceSwitcher compact={isCompact} />

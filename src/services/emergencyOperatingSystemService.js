@@ -16,6 +16,7 @@ import EmsOffloadCommandCenterService from './emsOffloadCommandCenterService';
 import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
 import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
 import EmergencyEscalationEngineService from './emergencyEscalationEngineService';
+import EmergencyFlowEngineService from './emergencyFlowEngineService';
 import EmergencyIntakeOperatingSystemService, {
   getEmergencyIntakeAutomationFeed,
 } from './emergencyIntakeOperatingSystemService';
@@ -66,6 +67,7 @@ export const EmergencyOperatingSystemService = Object.freeze({
     const emsFlow = EmsPreArrivalPipelineService.getPreArrivalDashboard();
     const emsOffload = EmsOffloadCommandCenterService.getDashboard();
     const capacityFlow = EmergencyCapacityIntelligenceService.getCapacityDashboard();
+    const flowEngine = EmergencyFlowEngineService.getFlowEngine();
     const referralFlow = ReferralHub.getReferralDashboard();
     const boardingFlow = BoardingIntelligenceEngine.getBoardingDashboard();
     const resourceBoard = EmergencyResourceBoardService.getResourceBoard();
@@ -117,6 +119,7 @@ export const EmergencyOperatingSystemService = Object.freeze({
       emsFlow,
       emsOffload,
       capacityFlow,
+      flowEngine,
       boardingFlow,
       resourceBoard,
       escalationEngine,
@@ -126,6 +129,7 @@ export const EmergencyOperatingSystemService = Object.freeze({
       digitalWhiteboard,
       patientPath,
       intakeOperatingSystem,
+      smartArrival: intakeOperatingSystem.smartArrival,
       dischargeFlow,
       copilot: Object.freeze({
         ...EMERGENCY_AI_COPILOT,
@@ -140,6 +144,8 @@ export const EmergencyOperatingSystemService = Object.freeze({
         activePatients: patientJourneyEngine.metrics.activePatients,
         intakeArrivals:
           intakeOperatingSystem.commandCenter.trackedStates.find((state) => state.id === 'arrivals')?.value || 0,
+        smartArrivalSummaries:
+          intakeOperatingSystem.smartArrival?.generatedSnapshot?.status === 'finalized' ? 1 : 0,
         triageReadyFromIntake:
           intakeOperatingSystem.commandCenter.trackedStates.find((state) => state.id === 'triage-ready-patients')?.value || 0,
         registrationCompletionScore: intakeOperatingSystem.registrationCompletionScore.score,
@@ -153,6 +159,8 @@ export const EmergencyOperatingSystemService = Object.freeze({
         emsArrivals: emsFlow.metrics.incomingCount,
         emsOffloadDelay: emsOffload.metrics.currentOffloadDelay,
         capacityScore: capacityFlow.score,
+        flowDetections: flowEngine.metrics.activeDetections,
+        nextRecommendedActions: flowEngine.nextRecommendedActions.length,
         referralDelays: referralFlow.metrics.delayed,
         boardingCount: boardingFlow.metrics.boardingCount,
         resourceShortages: resourceBoard.metrics.shortageCount,

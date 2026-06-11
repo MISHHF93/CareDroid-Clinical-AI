@@ -3,6 +3,7 @@ export const EMERGENCY_QUEUE_IDS = Object.freeze([
   'triage-queue',
   'provider-queue',
   'results-queue',
+  'reassessment-queue',
   'referral-queue',
   'admission-queue',
   'discharge-queue',
@@ -41,6 +42,14 @@ export const EMERGENCY_QUEUE_DEFINITIONS = Object.freeze([
     journeyStates: ['orders', 'results', 'reassessment'],
     targetWaitMinutes: 60,
     minimumThroughput: 5,
+  }),
+  Object.freeze({
+    id: 'reassessment-queue',
+    label: 'Reassessment Queue',
+    description: 'Patients requiring repeat vitals, clinician reassessment, or staff concern review.',
+    journeyStates: ['waiting', 'assessment', 'reassessment'],
+    targetWaitMinutes: 30,
+    minimumThroughput: 4,
   }),
   Object.freeze({
     id: 'referral-queue',
@@ -108,6 +117,13 @@ export const DEFAULT_EMERGENCY_QUEUE_STATE = Object.freeze({
     oldestPatient: Object.freeze({ id: 'ED-1019', label: 'ED-1019', waitMinutes: 122, acuity: 'Sepsis review' }),
     riskLevel: 'high',
     throughput: 4,
+  }),
+  'reassessment-queue': Object.freeze({
+    count: 7,
+    waitTime: 36,
+    oldestPatient: Object.freeze({ id: 'ED-1042', label: 'ED-1042', waitMinutes: 96, acuity: 'Needs Reassessment' }),
+    riskLevel: 'critical',
+    throughput: 3,
   }),
   'referral-queue': Object.freeze({
     count: 9,
@@ -230,7 +246,12 @@ export const QueueIntelligenceService = Object.freeze({
     return Object.freeze({
       queueCount: queues.length,
       totalCount,
+      patientsToday: 112,
+      patientsWaiting: queues.find((queue) => queue.id === 'waiting-room')?.count || 0,
       averageWaitTime: Math.round(weightedWait / weight),
+      longestWait: Math.max(0, ...queues.map((queue) => queue.oldestPatient.waitMinutes)),
+      patientsNeedingReassessment: queues.find((queue) => queue.id === 'reassessment-queue')?.count || 0,
+      bottleneckQueue: highestRiskQueue?.label || 'None',
       totalThroughput,
       bottleneckCount: bottlenecks.length,
       highestRiskQueue: highestRiskQueue

@@ -9,11 +9,17 @@ describe('workspace experience profiles', () => {
   it('makes Emergency feel like its own operating mode', () => {
     const profile = getWorkspaceExperienceProfile({ id: 'emergency', name: 'Emergency' });
 
-    expect(profile.operatingLabel).toBe('Emergency Flow Intelligence');
-    expect(profile.dashboardTitle).toMatch(/Emergency Flow Command Center/);
-    expect(profile.toolsTitle).toMatch(/Emergency Flow Console/);
-    expect(profile.recommendationsTitle).toMatch(/ED Flow Recommendations/);
-    expect(profile.assistantTitle).toMatch(/Emergency Flow Copilot/);
+    expect(profile.operatingLabel).toBe('CareDroid Emergency OS');
+    expect(profile.dashboardTitle).toMatch(/Emergency Whiteboard/);
+    expect(profile.toolsTitle).toMatch(/Emergency OS Console/);
+    expect(profile.recommendationsTitle).toMatch(/Emergency OS Recommendations/);
+    expect(profile.assistantTitle).toMatch(/Emergency OS Copilot/);
+    expect(profile.focusMetrics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ label: 'Volume', value: '50-150' }),
+        expect.objectContaining({ label: 'Team', value: '<10' }),
+      ])
+    );
     expect(profile.quickPrompts.join(' ')).toMatch(/bottlenecks|triage/i);
   });
 

@@ -5,6 +5,14 @@ export const CAPACITY_RISK_LEVELS = Object.freeze({
   RED: 'Red',
 });
 
+export const CAPACITY_ENGINE_INPUTS = Object.freeze([
+  'occupancy',
+  'boarding',
+  'pending admissions',
+  'discharge candidates',
+  'EMS arrivals',
+]);
+
 export const DEFAULT_EMERGENCY_CAPACITY_STATE = Object.freeze({
   currentCensus: 67,
   occupiedSpaces: 58,
@@ -111,13 +119,28 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
   const state = normalizeCapacityState(capacityState);
   const score = getCapacityScore(state);
   const riskLevel = getCapacityRiskLevel(score);
+  const occupancyPercent = calculateOccupancyPercent(state);
   const recommendations = [];
+
+  if (occupancyPercent >= 85 || state.availableSpaces <= 5) {
+    recommendations.push(
+      Object.freeze({
+        id: 'overloaded-queues',
+        title: 'Review overloaded queues',
+        category: 'overloaded queues',
+        priority: riskLevel,
+        rationale: `${occupancyPercent}% occupancy with ${state.availableSpaces} available spaces indicates constrained ED throughput.`,
+        action: 'Review waiting, triage, admission, discharge, and EMS queues for immediate human-owned decompression steps.',
+      })
+    );
+  }
 
   if (state.boardingPatients >= 5) {
     recommendations.push(
       Object.freeze({
         id: 'boarding-relief',
         title: 'Escalate boarding relief',
+        category: 'bottlenecks',
         priority: riskLevel,
         rationale: `${state.boardingPatients} boarding patients are consuming ED capacity.`,
         action: 'Coordinate inpatient bed placement, charge nurse review, and operations escalation.',
@@ -130,6 +153,7 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
       Object.freeze({
         id: 'admission-handoff',
         title: 'Prioritize admission handoffs',
+        category: 'bottlenecks',
         priority: riskLevel,
         rationale: `${state.pendingAdmissions} pending admissions are delaying capacity recovery.`,
         action: 'Review admission queue blockers and prepare handoff summaries for receiving units.',
@@ -142,6 +166,7 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
       Object.freeze({
         id: 'ems-arrival-readiness',
         title: 'Prepare for EMS arrivals',
+        category: 'bottlenecks',
         priority: riskLevel,
         rationale: `${state.emsArrivals} EMS arrivals may increase near-term demand.`,
         action: 'Review pre-arrival handoffs, open treatment spaces, and alert triage leadership.',
@@ -154,6 +179,7 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
       Object.freeze({
         id: 'discharge-acceleration',
         title: 'Accelerate discharge candidates',
+        category: 'discharge opportunities',
         priority: 'Yellow',
         rationale: `${state.dischargeCandidates} discharge candidates can release capacity after review.`,
         action: 'Prioritize discharge summaries, follow-up instructions, and final clinician review.',
@@ -166,6 +192,7 @@ export function getCapacityRecommendations(capacityState = DEFAULT_EMERGENCY_CAP
       Object.freeze({
         id: 'capacity-watch',
         title: 'Maintain capacity watch',
+        category: 'bottlenecks',
         priority: riskLevel,
         rationale: 'Capacity posture is stable.',
         action: 'Continue monitoring census, spaces, admissions, EMS arrivals, and discharge candidates.',
@@ -181,14 +208,24 @@ export function getCapacityDashboard(capacityState = DEFAULT_EMERGENCY_CAPACITY_
   const score = getCapacityScore(state);
   const riskLevel = getCapacityRiskLevel(score);
   const occupancyPercent = calculateOccupancyPercent(state);
+  const recommendations = getCapacityRecommendations(state);
 
   return Object.freeze({
+    engineId: 'capacity-engine',
+    title: 'Capacity Engine',
+    inputSchema: CAPACITY_ENGINE_INPUTS,
+    output: 'Capacity Score',
     score,
     riskLevel,
     occupancyPercent,
     state,
     signals: getCapacitySignals(state),
-    recommendations: getCapacityRecommendations(state),
+    recommendations,
+    recommendationCategories: Object.freeze({
+      dischargeOpportunities: Object.freeze(recommendations.filter((item) => item.category === 'discharge opportunities')),
+      bottlenecks: Object.freeze(recommendations.filter((item) => item.category === 'bottlenecks')),
+      overloadedQueues: Object.freeze(recommendations.filter((item) => item.category === 'overloaded queues')),
+    }),
     summary:
       `${riskLevel} capacity posture with ${state.currentCensus} current census, ` +
       `${state.boardingPatients} boarding patients, ${state.pendingAdmissions} pending admissions, ` +

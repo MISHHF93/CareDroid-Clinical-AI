@@ -178,7 +178,7 @@ const WORKSPACE_SAAS_METADATA = Object.freeze({
     defaultAssetPacks: ['core-platform', 'emergency-medicine'],
     defaultDashboardWidgets: EMERGENCY_COMMAND_CENTER_WIDGETS.map((widget) => widget.id),
     defaultAIAgents: ['emergency-copilot'],
-    defaultNavigationGroups: ['command-center', 'automations'],
+    defaultNavigationGroups: ['whiteboard', 'patients', 'ems', 'operations', 'copilot'],
     subscriptionTier: 'starter',
   },
   icu: {
@@ -359,7 +359,7 @@ const CARE_WORKSPACE_BASE = [
     icon: 'Siren',
     path: '/workspace/emergency',
     description:
-      'Emergency Flow Intelligence Platform for ED throughput, capacity, coordination, EMS handoff, triage, bed flow, referrals, discharge, equipment, surge prediction, and Copilot guidance.',
+      'CareDroid Emergency OS is an AI-assisted patient flow platform for small emergency departments, urgent care clinics, and clinics handling 50-150 patients/day with fewer than 10 staff.',
     aiContext:
       'Prioritize ED flow bottlenecks from arrival through admission/discharge. Reduce waiting, handoff delays, bed pressure, referral friction, equipment gaps, and cognitive load while preserving human review and avoiding autonomous clinical decisions.',
     routeIds: ['assistant', 'commandCenter', 'hospitalMap', 'medicalIot', 'liveMap', 'simulation', 'calculators'],
@@ -699,9 +699,9 @@ function normalizeMode(config) {
 export const WORKSPACE_FUNCTIONALITY_MODES = Object.freeze({
   emergency: normalizeMode({
     workspaceId: 'emergency',
-    modeName: 'Emergency Flow Intelligence Platform',
+    modeName: 'Emergency OS',
     purpose:
-      'Unified ED flow intelligence from patient arrival through triage, assessment, orders, results, disposition, and admission/discharge.',
+      'CareDroid Emergency OS for patient flow, queue flow, EMS flow, capacity flow, and decision support in small ED, urgent care, and clinic operations.',
     primaryUsers: ['Emergency physicians', 'Triage nurses', 'Charge nurses', 'EMS coordinators', 'Hospital operations'],
     primaryDataSources: [
       'frontend local/demo data',
@@ -719,15 +719,21 @@ export const WORKSPACE_FUNCTIONALITY_MODES = Object.freeze({
     ],
     dashboards: EMERGENCY_COMMAND_CENTER_WIDGETS.map((widget) => widget.id),
     subpages: [
-      { id: 'dashboard', label: 'Overview', group: 'command', priority: 2 },
+      {
+        id: 'whiteboard',
+        label: 'Whiteboard',
+        group: 'command',
+        priority: 1,
+        quickTask: true,
+        taskLabel: 'Open Emergency Whiteboard',
+        taskHelper: 'Patients, queues, alerts, EMS, boarding, capacity',
+      },
+      { id: 'dashboard', label: 'Overview', group: 'command', priority: 8 },
       {
         id: 'command-center',
         label: 'Command Center',
         group: 'command',
-        priority: 1,
-        quickTask: true,
-        taskLabel: 'Scan ED status',
-        taskHelper: '60-second operating view',
+        priority: 9,
       },
       {
         id: 'patient-path',
@@ -786,7 +792,6 @@ export const WORKSPACE_FUNCTIONALITY_MODES = Object.freeze({
         taskLabel: 'Check throughput',
         taskHelper: 'Door-to-doctor KPIs',
       },
-      { id: 'whiteboard', label: 'Whiteboard', group: 'flow', priority: 5 },
       { id: 'patients', label: 'Patients', group: 'flow', priority: 6 },
       {
         id: 'ems',

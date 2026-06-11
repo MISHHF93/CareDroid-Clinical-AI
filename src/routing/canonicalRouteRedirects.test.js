@@ -21,9 +21,9 @@ function expectGeneratedRedirect(path, to) {
 }
 
 describe('canonical route redirects', () => {
-  it('bypasses auth aliases and sends visitors straight to the dashboard', () => {
+  it('bypasses auth aliases and sends visitors straight to the Emergency Whiteboard', () => {
     expect(appSource).toContain('function AuthPathRedirect()');
-    expect(appSource).toContain('<Navigate to="/dashboard" replace />');
+    expect(appSource).toContain('<Navigate to="/workspace/emergency" replace />');
     expect(appSource).not.toContain('AUTH_SIGNUP_PATH_ALIASES.includes(location.pathname)');
     expect(appSource).not.toContain("search.set('mode', 'signup')");
   });
@@ -169,9 +169,9 @@ describe('canonical route redirects', () => {
     expect(routeConfigSource).toContain("export const MEDICAL_3D_VIEWER_ROUTE_ALIASES = Object.freeze(['/anatomy-viewer'])");
   });
 
-  it('normalizes auth aliases to the dashboard instead of rendering an auth page', () => {
+  it('normalizes auth aliases to the Emergency Whiteboard instead of rendering an auth page', () => {
     expect(appSource).toMatch(
-      /path:\s*'\/auth'[\s\S]*?element:\s*<Navigate to="\/dashboard" replace \/>[\s\S]*?publicOnly:\s*true/
+      /path:\s*'\/auth'[\s\S]*?element:\s*<Navigate to="\/workspace\/emergency" replace \/>[\s\S]*?publicOnly:\s*true/
     );
     expect(appSource).toContain('AUTH_PATH_ALIASES.map((path) => ({');
     expect(appSource).toContain('element: <AuthPathRedirect />');

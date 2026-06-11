@@ -14,6 +14,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
         serviceId: 'emergency-intake-operating-system',
         route: '/workspace/emergency/intake',
         unifiedCapabilities: expect.arrayContaining([
+          'Smart Arrival',
           'Smart Intake',
           'Document Intelligence',
           'Identity Resolution',
@@ -106,6 +107,43 @@ describe('EmergencyIntakeOperatingSystemService', () => {
       'Triage-ready patients',
     ]);
     expect(intake.registrationCompletionScore.label).toBe('Registration Completion Score');
+    expect(intake.smartArrival).toEqual(
+      expect.objectContaining({
+        title: 'Smart Arrival',
+        operatingModel: expect.stringMatching(/not a separate intake app/i),
+        capturePipeline: expect.arrayContaining([
+          expect.objectContaining({ label: 'Capture ID document' }),
+          expect.objectContaining({ label: 'OCR extraction' }),
+          expect.objectContaining({ label: 'Demographic extraction' }),
+          expect.objectContaining({ label: 'Insurance metadata extraction' }),
+          expect.objectContaining({ label: 'Referral document ingestion' }),
+          expect.objectContaining({ label: 'Medication list ingestion' }),
+          expect.objectContaining({ label: 'Allergy extraction' }),
+        ]),
+        generatedSnapshot: expect.objectContaining({
+          status: 'finalized',
+          contains: expect.arrayContaining([
+            'demographics',
+            'allergies',
+            'medications',
+            'chronic conditions',
+            'referral reason',
+            'arrival complaint',
+          ]),
+        }),
+        confirmationGate: expect.objectContaining({
+          requiredBeforeFinalizing: true,
+          acceptedConfirmationActors: expect.arrayContaining(['patient', 'staff']),
+          rule: expect.stringMatching(/patient confirmation or staff confirmation/i),
+          blocksAutonomousFinalization: true,
+        }),
+        emergencyWorkspaceFeed: expect.objectContaining({
+          route: '/workspace/emergency',
+          separateIntakeAppCreated: false,
+          arrivalState: expect.stringMatching(/inside Emergency OS already summarized/i),
+        }),
+      })
+    );
     expect(intake.implementationTraceability).toEqual(
       expect.objectContaining({
         totalPlans: 19,
@@ -130,6 +168,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
         'Document review workspace',
         'Identity resolution review',
         'Medication and allergy capture review',
+        'Smart Arrival summary in Emergency Workspace',
         'Emergency command center and Patient Journey Engine views',
       ])
     );
@@ -176,7 +215,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
     });
 
     expect(DocumentIntelligenceService.getSupportedInputs()).toEqual(
-      expect.arrayContaining(["driver's license", 'health card', 'insurance card', 'referral letters', 'discharge papers'])
+      expect.arrayContaining(['ID document', "driver's license", 'health card', 'insurance card', 'referral letters', 'discharge papers'])
     );
     expect(DocumentIntelligenceService.getAcceptedInputChannels()).toEqual(
       expect.arrayContaining(['uploaded', 'scanned', 'photographed', 'integration-supplied'])
@@ -233,6 +272,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
     const intake = EmergencyIntakeOperatingSystemService.getOperatingSystem();
 
     expect(intake.marketplace.modules.map((module) => module.title)).toEqual([
+      'Smart Arrival',
       'Smart Intake',
       'OCR Intake',
       'Identity Resolution',
@@ -242,7 +282,7 @@ describe('EmergencyIntakeOperatingSystemService', () => {
       'Voice Intake',
       'Multi-Language Intake',
     ]);
-    expect(intake.patientJourneyFeed).toHaveLength(11);
+    expect(intake.patientJourneyFeed).toHaveLength(12);
     expect(intake.patientJourneyFeed.every((module) => module.validJourneyStages)).toBe(true);
     expect(intake.patientJourneyFeed.map((module) => module.title)).toEqual(
       expect.arrayContaining(['Consent and Verification', 'Pre-Triage Queue', 'Intake Analytics'])
@@ -252,6 +292,13 @@ describe('EmergencyIntakeOperatingSystemService', () => {
     );
     expect(getEmergencyIntakeAutomationFeed()).toEqual(
       expect.arrayContaining([
+        expect.objectContaining({
+          automationId: 'emergency-intake-smart-arrival',
+          title: 'Smart Arrival',
+          humanReviewRequired: true,
+          patientJourneyStates: expect.arrayContaining(['arrival', 'registration', 'triage']),
+          source: 'EmergencyIntakeOperatingSystemService',
+        }),
         expect.objectContaining({
           automationId: 'emergency-intake-smart-intake',
           title: 'Smart Intake',
@@ -311,6 +358,19 @@ describe('EmergencyIntakeOperatingSystemService', () => {
     ]);
     expect(intake.patientSnapshot.sections.every((section) => section.sourceRecords.length > 0)).toBe(true);
     expect(intake.patientSnapshot.identityAnchor).toBe('confirmed intake record');
+    expect(intake.patientSnapshot.structuredSummary).toEqual(
+      expect.objectContaining({
+        demographics: expect.objectContaining({
+          displayName: 'Jordan Lee',
+          dateOfBirth: '1971-04-12',
+        }),
+        allergies: expect.arrayContaining(['Penicillin - rash - confirmed']),
+        medications: expect.arrayContaining(['Warfarin - patient reported - verification required']),
+        chronicConditions: expect.arrayContaining(['Hypertension']),
+        referralReason: expect.stringMatching(/chest pain/i),
+        arrivalComplaint: 'Chest Pain',
+      })
+    );
     expect(intake.patientSnapshot.freshnessIndicators).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ context: 'demographics', freshness: expect.stringMatching(/confirmed/i) }),

@@ -89,6 +89,10 @@ const FALLBACK = Layers;
 const NAV_ICONS = {
   workspace: Layers,
   home: LayoutDashboard,
+  patients: Users,
+  ems: Truck,
+  whiteboard: LayoutDashboard,
+  copilot: Bot,
   discover: Lightbulb,
   recommendations: Sparkles,
   automation: Zap,

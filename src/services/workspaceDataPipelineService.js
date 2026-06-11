@@ -46,6 +46,7 @@ import EmsOffloadCommandCenterService from './emsOffloadCommandCenterService';
 import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
 import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
 import EmergencyEscalationEngineService from './emergencyEscalationEngineService';
+import EmergencyFlowEngineService from './emergencyFlowEngineService';
 import EmergencyKPILayerService from './emergencyKpiLayerService';
 import EmergencyIntakeOperatingSystemService, {
   getEmergencyIntakeAutomationFeed,
@@ -208,6 +209,8 @@ export const WorkspaceDataPipelineService = {
       model.workspace.id === EMERGENCY_WORKSPACE_ID
         ? EmergencyCapacityIntelligenceService.getCapacityDashboard()
         : null;
+    const flowEngine =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmergencyFlowEngineService.getFlowEngine() : null;
     const referralHub =
       model.workspace.id === EMERGENCY_WORKSPACE_ID ? ReferralHub.getReferralDashboard() : null;
     const boardingIntelligence =
@@ -268,6 +271,7 @@ export const WorkspaceDataPipelineService = {
               emsPreArrival,
               emsOffload,
               capacityIntelligence,
+              flowEngine,
               referralHub,
               boardingIntelligence,
               resourceBoard,
@@ -281,6 +285,7 @@ export const WorkspaceDataPipelineService = {
               knowledgeLayer,
               patientPath,
               intakeOperatingSystem,
+              smartArrival: intakeOperatingSystem.smartArrival,
               operatingSystem,
               canonicalPatientJourney: EMERGENCY_PATIENT_JOURNEY,
               dashboardWidgets: EMERGENCY_DASHBOARD_WIDGETS,
@@ -292,7 +297,7 @@ export const WorkspaceDataPipelineService = {
               chiefComplaintRoutes: EMERGENCY_CHIEF_COMPLAINT_ROUTES,
               clinicalIntentRouter: {
                 routes: ClinicalIntentRouter.getRoutes(),
-                outputSchema: ['calculators', 'protocols', 'workflows', 'simulations', 'referrals'],
+                outputSchema: ['complaint', 'workflow', 'calculators', 'protocols', 'referrals', 'aiCopilot'],
                 safetyStatement:
                   'Complaint routing provides workflow guidance only. Clinician review is required for all clinical decisions.',
               },
@@ -395,7 +400,7 @@ export const WorkspaceDataPipelineService = {
               chiefComplaintRoutes: EMERGENCY_CHIEF_COMPLAINT_ROUTES,
               clinicalIntentRouter: {
                 routes: ClinicalIntentRouter.getRoutes(),
-                outputSchema: ['calculators', 'protocols', 'workflows', 'simulations', 'referrals'],
+                outputSchema: ['complaint', 'workflow', 'calculators', 'protocols', 'referrals', 'aiCopilot'],
               },
               aiCopilot: EMERGENCY_AI_COPILOT,
               triageOrchestrator: EMERGENCY_TRIAGE_ORCHESTRATOR,

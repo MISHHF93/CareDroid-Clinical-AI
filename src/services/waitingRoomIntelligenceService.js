@@ -41,6 +41,15 @@ export const WaitingRoomIntelligenceService = Object.freeze({
         oldestWaitMinutes: waitingRoom.oldestPatient?.waitMinutes || 0,
         reassessmentNeed: reassessment.metrics.total,
         criticalReassessmentNeed: reassessment.metrics.critical,
+        abnormalVitals: reassessment.metrics.abnormalVitals,
+        riskScoreChanges: reassessment.metrics.riskScoreChanges,
+        reassessmentIntervalsExceeded: reassessment.metrics.reassessmentIntervalsExceeded,
+      }),
+      reassessmentIntelligence: Object.freeze({
+        engineId: reassessment.engineId,
+        thresholds: reassessment.queue.thresholds,
+        alerts: reassessment.alerts,
+        preventionGoal: reassessment.queue.preventionGoal,
       }),
       reassessmentQueue: reassessment.queue,
       recommendations: Object.freeze([

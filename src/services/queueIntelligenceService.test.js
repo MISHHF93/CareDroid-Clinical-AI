@@ -15,18 +15,22 @@ describe('QueueIntelligenceService', () => {
       'triage-queue',
       'provider-queue',
       'results-queue',
+      'reassessment-queue',
       'referral-queue',
       'admission-queue',
       'discharge-queue',
+      'ems-pre-arrival-queue',
     ]);
     expect(QueueIntelligenceService.getQueues().map((queue) => queue.label)).toEqual([
       'Waiting Room',
       'Triage Queue',
       'Provider Queue',
       'Results Queue',
+      'Reassessment Queue',
       'Referral Queue',
       'Admission Queue',
       'Discharge Queue',
+      'EMS Pre-Arrival Queue',
     ]);
   });
 
@@ -96,10 +100,16 @@ describe('QueueIntelligenceService', () => {
   it('builds a dashboard payload with bottlenecks attached to queues', () => {
     const dashboard = getQueueDashboard();
 
-    expect(dashboard.queues).toHaveLength(7);
+    expect(dashboard.queues).toHaveLength(9);
     expect(dashboard.metrics).toEqual(
       expect.objectContaining({
-        queueCount: 7,
+        queueCount: 9,
+        patientsToday: expect.any(Number),
+        patientsWaiting: expect.any(Number),
+        averageWaitTime: expect.any(Number),
+        longestWait: expect.any(Number),
+        patientsNeedingReassessment: expect.any(Number),
+        bottleneckQueue: expect.any(String),
         bottleneckCount: expect.any(Number),
         highestRiskQueue: expect.objectContaining({
           queueId: expect.any(String),

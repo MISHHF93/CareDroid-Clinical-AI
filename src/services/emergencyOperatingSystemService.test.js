@@ -30,7 +30,23 @@ describe('EmergencyOperatingSystemService', () => {
     const operatingSystem = EmergencyOperatingSystemService.getOperatingSystem();
 
     expect(operatingSystem.patientFlow.engine.metrics.totalStates).toBe(12);
-    expect(operatingSystem.patientFlow.engine.metrics.automationCount).toBe(21);
+    expect(operatingSystem.patientFlow.engine.metrics.automationCount).toBe(22);
+    expect(operatingSystem.smartArrival).toEqual(
+      expect.objectContaining({
+        title: 'Smart Arrival',
+        generatedSnapshot: expect.objectContaining({
+          status: 'finalized',
+          contains: expect.arrayContaining(['demographics', 'arrival complaint']),
+        }),
+        confirmationGate: expect.objectContaining({
+          requiredBeforeFinalizing: true,
+          acceptedConfirmationActors: expect.arrayContaining(['patient', 'staff']),
+        }),
+        emergencyWorkspaceFeed: expect.objectContaining({
+          separateIntakeAppCreated: false,
+        }),
+      })
+    );
     expect(operatingSystem.patientFlow.journey.find((stage) => stage.id === 'registration')).toEqual(
       expect.objectContaining({
         automations: expect.arrayContaining([
@@ -45,7 +61,15 @@ describe('EmergencyOperatingSystemService', () => {
     expect(operatingSystem.queueFlow.metrics.queueCount).toBe(8);
     expect(operatingSystem.throughput.kpi.metricId).toBe('doorToDoctor');
     expect(operatingSystem.waitingRoom.riskState).toMatch(/Normal|Busy|Critical/);
-    expect(operatingSystem.reassessment.queue.label).toBe('ReassessmentQueue');
+    expect(operatingSystem.reassessment.queue.label).toBe('Reassessment Queue');
+    expect(operatingSystem.reassessment.alerts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          label: 'Needs Reassessment',
+          generatedFrom: 'Reassessment Intelligence',
+        }),
+      ])
+    );
     expect(operatingSystem.referralFlow.departments).toEqual([
       'Cardiology',
       'Neurology',
@@ -72,6 +96,46 @@ describe('EmergencyOperatingSystemService', () => {
     expect(operatingSystem.simulationScenarios.scenarios).toHaveLength(5);
     expect(operatingSystem.demoEnvironment.metrics.patientCount).toBeGreaterThanOrEqual(100);
     expect(operatingSystem.digitalWhiteboard.summary.totalActivePatients).toBeGreaterThan(0);
+    expect(operatingSystem.emsFlow).toEqual(
+      expect.objectContaining({
+        pipelineId: 'ems-handoff-pipeline',
+        statuses: ['Incoming', 'En Route', 'Arriving', 'Arrived'],
+        edHandoffSummaries: expect.arrayContaining([
+          expect.objectContaining({
+            title: 'ED Handoff Summary',
+            attachedToPatientJourney: true,
+          }),
+        ]),
+      })
+    );
+    expect(operatingSystem.digitalWhiteboard.cards).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          patientId: 'DEMO-ED-1001',
+          needsReassessment: true,
+          alerts: expect.arrayContaining(['Needs Reassessment']),
+        }),
+        expect.objectContaining({
+          patientId: expect.stringMatching(/^EMS-/),
+          handoffStatus: expect.stringMatching(/Incoming|En Route|Arriving|Arrived/),
+          edHandoffSummary: expect.objectContaining({ title: 'ED Handoff Summary' }),
+        }),
+      ])
+    );
+    expect(operatingSystem.flowEngine).toEqual(
+      expect.objectContaining({
+        engineId: 'emergency-flow-engine',
+        nextRecommendedActions: expect.arrayContaining([
+          expect.objectContaining({
+            action: expect.any(String),
+            reason: expect.any(String),
+          }),
+        ]),
+        metrics: expect.objectContaining({
+          activeDetections: expect.any(Number),
+        }),
+      })
+    );
     expect(operatingSystem.patientPath).toEqual(
       expect.objectContaining({
         route: '/workspace/emergency/patient-path',
@@ -82,6 +146,12 @@ describe('EmergencyOperatingSystemService', () => {
         milestones: expect.arrayContaining([
           expect.objectContaining({ label: 'Arrival Signal' }),
           expect.objectContaining({ label: 'Throughput Measured' }),
+        ]),
+        patients: expect.arrayContaining([
+          expect.objectContaining({
+            patientId: expect.stringMatching(/^EMS-/),
+            edHandoffSummary: expect.objectContaining({ title: 'ED Handoff Summary' }),
+          }),
         ]),
       })
     );
@@ -130,6 +200,7 @@ describe('EmergencyOperatingSystemService', () => {
     expect(operatingSystem.leadershipSummary).toEqual(
       expect.objectContaining({
         activePatients: expect.any(Number),
+        smartArrivalSummaries: expect.any(Number),
         waitingPatients: expect.any(Number),
         queueBottlenecks: expect.any(Number),
         doorToDirection: expect.any(Number),
@@ -140,6 +211,8 @@ describe('EmergencyOperatingSystemService', () => {
         emsArrivals: expect.any(Number),
         emsOffloadDelay: expect.any(Number),
         capacityScore: expect.any(Number),
+        flowDetections: expect.any(Number),
+        nextRecommendedActions: expect.any(Number),
         referralDelays: expect.any(Number),
         boardingCount: expect.any(Number),
         resourceShortages: expect.any(Number),

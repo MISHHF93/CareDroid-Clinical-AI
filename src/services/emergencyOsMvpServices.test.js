@@ -25,7 +25,7 @@ describe('Emergency OS MVP services', () => {
     expect(throughput.checkpoints).toEqual(['arrivalTime', 'triageTime', 'providerTime']);
     expect(waitingRoom.riskState).toMatch(/Normal|Busy|Critical/);
     expect(waitingRoom.sourceState).toMatch(/Demo data/);
-    expect(reassessment.queue.label).toBe('ReassessmentQueue');
+    expect(reassessment.queue.label).toBe('Reassessment Queue');
     expect(reassessment.queue.items.length).toBeGreaterThan(0);
     expect(ems.metrics.waitingHandoffs).toBeGreaterThan(0);
     expect(resources.resources.map((resource) => resource.label)).toEqual(

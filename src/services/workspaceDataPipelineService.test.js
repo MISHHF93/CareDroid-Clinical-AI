@@ -54,7 +54,7 @@ describe('WorkspaceDataPipelineService', () => {
       expect.objectContaining({
         metrics: expect.objectContaining({
           totalStates: 12,
-          automationCount: 21,
+          automationCount: 22,
           automationCoveragePercent: 100,
         }),
         bottlenecks: expect.arrayContaining([
@@ -94,6 +94,26 @@ describe('WorkspaceDataPipelineService', () => {
         patientSnapshot: expect.objectContaining({
           route: '/workspace/emergency/patient-context',
           clinicianReviewStatus: 'review required',
+          structuredSummary: expect.objectContaining({
+            referralReason: expect.stringMatching(/chest pain/i),
+            arrivalComplaint: 'Chest Pain',
+          }),
+        }),
+        smartArrival: expect.objectContaining({
+          route: '/workspace/emergency/intake',
+          generatedSnapshot: expect.objectContaining({
+            status: 'finalized',
+            contains: expect.arrayContaining(['demographics', 'allergies', 'medications']),
+          }),
+          confirmationGate: expect.objectContaining({
+            requiredBeforeFinalizing: true,
+            acceptedConfirmationActors: expect.arrayContaining(['patient', 'staff']),
+          }),
+          emergencyWorkspaceFeed: expect.objectContaining({
+            route: '/workspace/emergency',
+            separateIntakeAppCreated: false,
+            arrivalState: expect.stringMatching(/inside Emergency OS already summarized/i),
+          }),
         }),
         analytics: expect.objectContaining({
           route: '/workspace/emergency/intake-analytics',
@@ -108,19 +128,27 @@ describe('WorkspaceDataPipelineService', () => {
     expect(data.emergency.operatingSystem).toEqual(
       expect.objectContaining({
         responsibilities: expect.arrayContaining(['intake flow']),
+        smartArrival: expect.objectContaining({
+          title: 'Smart Arrival',
+        }),
         intakeOperatingSystem: expect.objectContaining({
           serviceId: 'emergency-intake-operating-system',
         }),
         leadershipSummary: expect.objectContaining({
+          smartArrivalSummaries: expect.any(Number),
           registrationCompletionScore: expect.any(Number),
           triageReadyFromIntake: expect.any(Number),
         }),
       })
     );
+    expect(data.emergency.smartArrival).toBe(data.emergency.intakeOperatingSystem.smartArrival);
     expect(data.emergency.queueIntelligence).toEqual(
       expect.objectContaining({
         metrics: expect.objectContaining({
-          queueCount: 8,
+          queueCount: 9,
+          patientsToday: expect.any(Number),
+          patientsNeedingReassessment: expect.any(Number),
+          bottleneckQueue: expect.any(String),
           bottleneckCount: expect.any(Number),
           highestRiskQueue: expect.objectContaining({
             queueId: expect.any(String),
@@ -162,15 +190,35 @@ describe('WorkspaceDataPipelineService', () => {
       expect.objectContaining({
         healthScore: expect.any(Number),
         riskState: expect.stringMatching(/Normal|Busy|Critical/),
+        reassessmentIntelligence: expect.objectContaining({
+          engineId: 'reassessment-intelligence',
+          preventionGoal: expect.stringMatching(/Prevent forgotten patients/i),
+          alerts: expect.arrayContaining([
+            expect.objectContaining({ label: 'Needs Reassessment' }),
+          ]),
+        }),
         reassessmentQueue: expect.objectContaining({
-          label: 'ReassessmentQueue',
+          label: 'Reassessment Queue',
           count: expect.any(Number),
+          thresholds: expect.arrayContaining([
+            'waiting duration',
+            'risk score changes',
+            'abnormal vitals',
+            'reassessment intervals',
+          ]),
+          alerts: expect.arrayContaining([
+            expect.objectContaining({ label: 'Needs Reassessment' }),
+          ]),
         }),
       })
     );
     expect(data.emergency.reassessmentAutomation.queue.items.length).toBeGreaterThan(0);
     expect(data.emergency.emsPreArrival).toEqual(
       expect.objectContaining({
+        pipelineId: 'ems-handoff-pipeline',
+        inputSchema: ['complaint', 'vitals', 'ETA', 'risk indicators'],
+        statuses: ['Incoming', 'En Route', 'Arriving', 'Arrived'],
+        output: 'ED Handoff Summary',
         workflow: expect.arrayContaining([
           expect.objectContaining({ label: 'EMS Assessment' }),
           expect.objectContaining({ label: 'Arrival' }),
@@ -185,13 +233,25 @@ describe('WorkspaceDataPipelineService', () => {
           incomingPatients: expect.arrayContaining([
             expect.objectContaining({
               etaMinutes: expect.any(Number),
+              handoffStatus: expect.stringMatching(/Incoming|En Route|Arriving|Arrived/),
+              riskIndicators: expect.arrayContaining([expect.any(String)]),
               riskScoreBundle: expect.arrayContaining([
                 expect.objectContaining({ label: expect.any(String) }),
               ]),
               handoffSummary: expect.any(String),
+              edHandoffSummary: expect.objectContaining({
+                title: 'ED Handoff Summary',
+                attachedToPatientJourney: true,
+              }),
             }),
           ]),
         }),
+        edHandoffSummaries: expect.arrayContaining([
+          expect.objectContaining({
+            title: 'ED Handoff Summary',
+            attachedToPatientJourney: true,
+          }),
+        ]),
         recommendations: expect.arrayContaining([
           expect.objectContaining({
             action: expect.stringMatching(/before arrival/i),
@@ -216,6 +276,9 @@ describe('WorkspaceDataPipelineService', () => {
     );
     expect(data.emergency.capacityIntelligence).toEqual(
       expect.objectContaining({
+        engineId: 'capacity-engine',
+        inputSchema: ['occupancy', 'boarding', 'pending admissions', 'discharge candidates', 'EMS arrivals'],
+        output: 'Capacity Score',
         score: expect.any(Number),
         riskLevel: expect.stringMatching(/Green|Yellow|Orange|Red/),
         occupancyPercent: expect.any(Number),
@@ -230,9 +293,15 @@ describe('WorkspaceDataPipelineService', () => {
         ]),
         recommendations: expect.arrayContaining([
           expect.objectContaining({
+            category: expect.stringMatching(/discharge opportunities|bottlenecks|overloaded queues/),
             action: expect.any(String),
           }),
         ]),
+        recommendationCategories: expect.objectContaining({
+          dischargeOpportunities: expect.any(Array),
+          bottlenecks: expect.any(Array),
+          overloadedQueues: expect.any(Array),
+        }),
       })
     );
     expect(data.emergency.referralHub).toEqual(
@@ -401,19 +470,99 @@ describe('WorkspaceDataPipelineService', () => {
     expect(data.emergency.digitalWhiteboard).toEqual(
       expect.objectContaining({
         route: '/workspace/emergency/whiteboard',
+        primaryWorkspaceRoute: '/workspace/emergency',
+        primarySurface: true,
+        operatingAreas: expect.arrayContaining(['patients', 'queues', 'alerts', 'referrals', 'EMS arrivals', 'boarding', 'capacity']),
+        emsHandoffPipeline: expect.objectContaining({
+          pipelineId: 'ems-handoff-pipeline',
+          statuses: ['Incoming', 'En Route', 'Arriving', 'Arrived'],
+          output: 'ED Handoff Summary',
+        }),
+        reassessmentIntelligence: expect.objectContaining({
+          engineId: 'reassessment-intelligence',
+          alerts: expect.arrayContaining([
+            expect.objectContaining({ label: 'Needs Reassessment' }),
+          ]),
+          thresholds: expect.arrayContaining([
+            'waiting duration',
+            'risk score changes',
+            'abnormal vitals',
+            'reassessment intervals',
+          ]),
+        }),
+        capacityEngine: expect.objectContaining({
+          engineId: 'capacity-engine',
+          output: 'Capacity Score',
+          score: expect.any(Number),
+          riskLevel: expect.stringMatching(/Green|Yellow|Orange|Red/),
+          recommendations: expect.arrayContaining([
+            expect.objectContaining({
+              category: expect.stringMatching(/discharge opportunities|bottlenecks|overloaded queues/),
+            }),
+          ]),
+        }),
+        flowEngine: expect.objectContaining({
+          engineId: 'emergency-flow-engine',
+          monitoredStages: expect.arrayContaining([
+            expect.objectContaining({ label: 'Arrival' }),
+            expect.objectContaining({ label: 'Disposition' }),
+          ]),
+          nextRecommendedActions: expect.arrayContaining([
+            expect.objectContaining({
+              action: expect.any(String),
+              reason: expect.any(String),
+            }),
+          ]),
+        }),
         summary: expect.objectContaining({
+          patientsToday: expect.any(Number),
           totalActivePatients: expect.any(Number),
+          waitingPatients: expect.any(Number),
+          currentAverageWait: expect.any(Number),
           highRiskPatients: expect.any(Number),
           reassessmentDue: expect.any(Number),
+          needsReassessment: expect.any(Number),
+          reassessmentAlerts: expect.any(Number),
+          referralDelays: expect.any(Number),
+          emsArrivals: expect.any(Number),
+          emsHandoffSummaries: expect.any(Number),
+          boardingPatients: expect.any(Number),
+          capacityScore: expect.any(Number),
+          capacityRiskLevel: expect.stringMatching(/Green|Yellow|Orange|Red/),
+          capacityRecommendations: expect.any(Number),
+          capacityPressure: expect.any(Number),
+          flowDetections: expect.any(Number),
+          nextRecommendedActions: expect.any(Number),
         }),
+        cards: expect.arrayContaining([
+          expect.objectContaining({
+            patientId: 'DEMO-ED-1001',
+            acuity: expect.any(String),
+            assignedClinician: expect.any(String),
+            needsReassessment: true,
+            alerts: expect.arrayContaining(['Needs Reassessment']),
+            reassessmentAlert: expect.objectContaining({
+              label: 'Needs Reassessment',
+            }),
+          }),
+          expect.objectContaining({
+            patientId: expect.stringMatching(/^EMS-/),
+            handoffStatus: expect.stringMatching(/Incoming|En Route|Arriving|Arrived/),
+            edHandoffSummary: expect.objectContaining({
+              title: 'ED Handoff Summary',
+            }),
+          }),
+        ]),
         columns: expect.arrayContaining([
-          expect.objectContaining({ label: 'Arrival' }),
-          expect.objectContaining({ label: 'Triage' }),
+          expect.objectContaining({ label: 'EMS Incoming' }),
           expect.objectContaining({ label: 'Waiting' }),
-          expect.objectContaining({ label: 'Assessment' }),
-          expect.objectContaining({ label: 'Orders' }),
-          expect.objectContaining({ label: 'Results' }),
+          expect.objectContaining({ label: 'Triage' }),
+          expect.objectContaining({ label: 'In Assessment' }),
+          expect.objectContaining({ label: 'Orders Pending' }),
+          expect.objectContaining({ label: 'Results Pending' }),
+          expect.objectContaining({ label: 'Reassessment Due' }),
           expect.objectContaining({ label: 'Disposition' }),
+          expect.objectContaining({ label: 'Discharge Ready' }),
         ]),
       })
     );
@@ -430,6 +579,15 @@ describe('WorkspaceDataPipelineService', () => {
           expect.objectContaining({ label: 'Next Action Known' }),
         ]),
         patients: expect.arrayContaining([
+          expect.objectContaining({
+            patientId: expect.stringMatching(/^EMS-/),
+            arrivalMode: 'EMS',
+            handoffStatus: expect.stringMatching(/Incoming|En Route|Arriving|Arrived/),
+            edHandoffSummary: expect.objectContaining({
+              title: 'ED Handoff Summary',
+              attachedToPatientJourney: true,
+            }),
+          }),
           expect.objectContaining({
             patientId: expect.stringMatching(/^DEMO-ED-/),
             assignedQueue: expect.objectContaining({ label: expect.any(String) }),
@@ -637,6 +795,36 @@ describe('WorkspaceDataPipelineService', () => {
         }),
       })
     );
+    expect(data.emergency.flowEngine).toEqual(
+      expect.objectContaining({
+        engineId: 'emergency-flow-engine',
+        monitoredStages: expect.arrayContaining([
+          expect.objectContaining({ label: 'Arrival' }),
+          expect.objectContaining({ label: 'Triage' }),
+          expect.objectContaining({ label: 'Waiting' }),
+          expect.objectContaining({ label: 'Assessment' }),
+          expect.objectContaining({ label: 'Orders' }),
+          expect.objectContaining({ label: 'Results' }),
+          expect.objectContaining({ label: 'Disposition' }),
+        ]),
+        detectionTypes: expect.arrayContaining([
+          'stalled patients',
+          'delayed referrals',
+          'delayed reassessments',
+          'excessive wait times',
+          'boarding pressure',
+        ]),
+        nextRecommendedActions: expect.arrayContaining([
+          expect.objectContaining({
+            action: expect.any(String),
+            reason: expect.any(String),
+          }),
+        ]),
+        metrics: expect.objectContaining({
+          activeDetections: expect.any(Number),
+        }),
+      })
+    );
     expect(data.emergency.flowIntelligencePlatform.solutions).toHaveLength(10);
     expect(data.emergency.flowIntelligencePlatform.workflowRegistry.length).toBeGreaterThan(10);
     expect(data.emergency.flowIntelligencePlatform.analyticsModel.events.length).toBeGreaterThan(10);
@@ -680,8 +868,24 @@ describe('WorkspaceDataPipelineService', () => {
     expect(data.emergency.triageOrchestrator.calculatorSequence.map((calculator) => calculator.id)).toEqual(
       expect.arrayContaining(['qsofa', 'news2', 'heart-score', 'wells-pe', 'wells-dvt-calculator', 'shock-index'])
     );
+    expect(data.emergency.triageOrchestrator.dynamicRiskBundleEngine).toEqual(
+      expect.objectContaining({
+        engineId: 'dynamic-risk-bundle-engine',
+        inputSchema: ['chief complaint', 'age', 'vitals', 'risk factors'],
+        outputSchema: ['Risk Bundle', 'Emergency Risk Profile'],
+        displayRule: expect.stringMatching(/one consolidated Emergency Risk Profile/i),
+      })
+    );
     expect(data.emergency.ragComplaintContext.map((context) => context.complaint)).toEqual(
-      expect.arrayContaining(['Chest Pain', 'Stroke Symptoms', 'Sepsis Concern', 'Trauma', 'Shortness of Breath'])
+      expect.arrayContaining([
+        'Chest Pain',
+        'Stroke Symptoms',
+        'Sepsis Concern',
+        'Trauma',
+        'Shortness of Breath',
+        'Abdominal Pain',
+        'Psychiatric Crisis',
+      ])
     );
     expect(data.emergency.chiefComplaintRoutes.map((route) => route.complaint)).toEqual([
       'Chest Pain',
@@ -689,6 +893,8 @@ describe('WorkspaceDataPipelineService', () => {
       'Sepsis Concern',
       'Trauma',
       'Shortness of Breath',
+      'Abdominal Pain',
+      'Psychiatric Crisis',
     ]);
     expect(data.emergency.chiefComplaintRoutes[0]).toEqual(
       expect.objectContaining({
@@ -696,16 +902,25 @@ describe('WorkspaceDataPipelineService', () => {
         workflows: ['ACS Workflow'],
         referrals: ['Cardiology Referral'],
         simulations: ['ACS chest pain simulation'],
+        navigationSteps: ['Complaint', 'Workflow', 'Calculators', 'Protocols', 'Referrals', 'AI Copilot'],
         safetyStatement: expect.stringMatching(/does not diagnose/i),
       })
     );
     expect(data.emergency.clinicalIntentRouter).toEqual(
       expect.objectContaining({
-        outputSchema: ['calculators', 'protocols', 'workflows', 'simulations', 'referrals'],
+        outputSchema: ['complaint', 'workflow', 'calculators', 'protocols', 'referrals', 'aiCopilot'],
         routes: expect.arrayContaining([
           expect.objectContaining({
             complaint: 'Trauma',
             workflows: ['Trauma Pathway'],
+          }),
+          expect.objectContaining({
+            complaint: 'Abdominal Pain',
+            workflows: ['Abdominal Pain Workflow'],
+          }),
+          expect.objectContaining({
+            complaint: 'Psychiatric Crisis',
+            workflows: ['Psychiatric Crisis Workflow'],
           }),
         ]),
       })
@@ -713,9 +928,9 @@ describe('WorkspaceDataPipelineService', () => {
     expect(data.emergency.aiCopilot).toEqual(
       expect.objectContaining({
         copilotId: 'emergency-ai-copilot',
-        inputSchema: ['complaint', 'vitals', 'workspaceContext', 'selectedCalculators'],
+        inputSchema: ['complaint', 'vitals', 'workspaceContext', 'surfacedCalculators'],
         sampleGuidance: expect.objectContaining({
-          recommendedTools: expect.arrayContaining([expect.objectContaining({ label: 'HEART' })]),
+          surfacedCalculators: expect.arrayContaining([expect.objectContaining({ label: 'HEART' })]),
           reasoning: expect.any(Array),
         }),
       })
@@ -841,7 +1056,7 @@ describe('WorkspaceDataPipelineService', () => {
       expect(context.automations).toEqual(expect.any(Array));
     }
     expect(getWorkspaceAIContext('emergency').emergency.chiefComplaintRoutes.map((route) => route.complaint)).toEqual(
-      expect.arrayContaining(['Chest Pain', 'Sepsis Concern', 'Shortness of Breath'])
+      expect.arrayContaining(['Chest Pain', 'Sepsis Concern', 'Shortness of Breath', 'Abdominal Pain', 'Psychiatric Crisis'])
     );
     expect(getWorkspaceAIContext('emergency').emergency.aiCopilot).toEqual(
       expect.objectContaining({

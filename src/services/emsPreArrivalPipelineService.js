@@ -31,12 +31,14 @@ export const EMS_PRE_ARRIVAL_WORKFLOW = Object.freeze([
   }),
 ]);
 
+export const EMS_HANDOFF_STATUSES = Object.freeze(['Incoming', 'En Route', 'Arriving', 'Arrived']);
+
 export const DEFAULT_EMS_INCOMING_PATIENTS = Object.freeze([
   Object.freeze({
     id: 'EMS-1048',
     patientLabel: 'Inbound EMS 1048',
     unit: 'Medic 12',
-    etaMinutes: 6,
+    etaMinutes: 4,
     complaint: 'Chest pain with diaphoresis',
     vitals: Object.freeze({
       bloodPressure: '92/58',
@@ -49,6 +51,7 @@ export const DEFAULT_EMS_INCOMING_PATIENTS = Object.freeze([
       Object.freeze({ id: 'shock-index', label: 'Shock Index', value: '1.28', riskLevel: 'high' }),
       Object.freeze({ id: 'heart', label: 'HEART context', value: 'Needs ED review', riskLevel: 'medium' }),
     ]),
+    riskIndicators: Object.freeze(['hypotension', 'tachycardia', 'diaphoresis', 'possible ACS']),
     riskLevel: 'critical',
     handoffSummary:
       'Medic 12 inbound with chest pain, hypotension, tachycardia, and diaphoresis. Prepare high-risk cardiac review and clinician handoff.',
@@ -72,6 +75,7 @@ export const DEFAULT_EMS_INCOMING_PATIENTS = Object.freeze([
       Object.freeze({ id: 'nihss', label: 'NIHSS context', value: 'Screen positive', riskLevel: 'high' }),
       Object.freeze({ id: 'stroke-window', label: 'Stroke window', value: 'Under review', riskLevel: 'critical' }),
     ]),
+    riskIndicators: Object.freeze(['facial droop', 'speech change', 'stroke window review']),
     riskLevel: 'critical',
     handoffSummary:
       'Medic 4 inbound with facial droop and speech change. Stroke window review and CT readiness recommended for ED team review.',
@@ -95,6 +99,7 @@ export const DEFAULT_EMS_INCOMING_PATIENTS = Object.freeze([
       Object.freeze({ id: 'news2', label: 'NEWS2 context', value: 'Elevated respiratory risk', riskLevel: 'high' }),
       Object.freeze({ id: 'wells-pe', label: 'Wells PE context', value: 'Consider review', riskLevel: 'medium' }),
     ]),
+    riskIndicators: Object.freeze(['tachypnea', 'hypoxia', 'fever', 'respiratory distress']),
     riskLevel: 'high',
     handoffSummary:
       'Medic 7 inbound with dyspnea, fever, tachypnea, and low oxygen saturation. Prepare respiratory protocol and triage review.',
@@ -110,25 +115,71 @@ const RISK_PRIORITY = Object.freeze({
   critical: 3,
 });
 
-function normalizeIncomingPatient(patient = {}) {
+function deriveHandoffStatus(etaMinutes = 0) {
+  if (etaMinutes <= 0) return 'Arrived';
+  if (etaMinutes <= 5) return 'Arriving';
+  if (etaMinutes <= 15) return 'En Route';
+  return 'Incoming';
+}
+
+function formatVitals(vitals = {}) {
+  return `BP ${vitals.bloodPressure || 'pending'}, HR ${vitals.heartRate || 'pending'}, RR ${vitals.respiratoryRate || 'pending'}, SpO2 ${vitals.oxygenSaturation || 'pending'}, Temp ${vitals.temperature || 'pending'}`;
+}
+
+function buildEdHandoffSummary(patient) {
   return Object.freeze({
+    id: `${patient.id}-ed-handoff-summary`,
+    title: 'ED Handoff Summary',
+    patientId: patient.id,
+    patientLabel: patient.patientLabel,
+    unit: patient.unit,
+    status: patient.handoffStatus,
+    etaMinutes: patient.etaMinutes,
+    complaint: patient.complaint,
+    vitals: patient.vitals,
+    riskIndicators: patient.riskIndicators,
+    riskScoreBundle: patient.riskScoreBundle,
+    summary:
+      patient.handoffSummary ||
+      `${patient.unit} inbound with ${patient.complaint}. ETA ${patient.etaMinutes} minutes. Risk indicators: ${patient.riskIndicators.join(', ') || 'pending'}.`,
+    attachedToPatientJourney: true,
+    journeyAttachment: Object.freeze({
+      journeyStateId: 'arrival',
+      status: 'attached',
+      label: 'EMS handoff attached before arrival',
+    }),
+  });
+}
+
+function normalizeIncomingPatient(patient = {}) {
+  const etaMinutes = Number(patient.etaMinutes || 0);
+  const vitals = Object.freeze({
+    bloodPressure: patient.vitals?.bloodPressure || 'pending',
+    heartRate: patient.vitals?.heartRate || 'pending',
+    respiratoryRate: patient.vitals?.respiratoryRate || 'pending',
+    oxygenSaturation: patient.vitals?.oxygenSaturation || 'pending',
+    temperature: patient.vitals?.temperature || 'pending',
+  });
+  const normalized = {
     id: patient.id || 'EMS-UNKNOWN',
     patientLabel: patient.patientLabel || patient.id || 'Inbound EMS patient',
     unit: patient.unit || 'EMS unit',
-    etaMinutes: Number(patient.etaMinutes || 0),
+    etaMinutes,
     complaint: patient.complaint || 'Complaint pending',
-    vitals: Object.freeze({
-      bloodPressure: patient.vitals?.bloodPressure || 'pending',
-      heartRate: patient.vitals?.heartRate || 'pending',
-      respiratoryRate: patient.vitals?.respiratoryRate || 'pending',
-      oxygenSaturation: patient.vitals?.oxygenSaturation || 'pending',
-      temperature: patient.vitals?.temperature || 'pending',
-    }),
+    vitals,
     riskScoreBundle: Object.freeze([...(patient.riskScoreBundle || [])]),
+    riskIndicators: Object.freeze([...(patient.riskIndicators || [])]),
     riskLevel: patient.riskLevel || 'medium',
     handoffSummary: patient.handoffSummary || 'EMS handoff summary pending.',
     notificationStatus: patient.notificationStatus || 'pending',
-    journeyState: patient.journeyState || 'arrival',
+    handoffStatus: patient.handoffStatus || deriveHandoffStatus(etaMinutes),
+    journeyState: patient.journeyState || 'ems-prearrival',
+  };
+
+  return Object.freeze({
+    ...normalized,
+    vitalsSummary: formatVitals(vitals),
+    edHandoffSummary: buildEdHandoffSummary(normalized),
   });
 }
 
@@ -156,6 +207,14 @@ export const EmsPreArrivalPipelineService = Object.freeze({
       label: 'Pre-arrival queue',
       count: incomingPatients.length,
       incomingPatients,
+      statusCounts: Object.freeze(
+        Object.fromEntries(
+          EMS_HANDOFF_STATUSES.map((status) => [
+            status,
+            incomingPatients.filter((patient) => patient.handoffStatus === status).length,
+          ])
+        )
+      ),
       nextArrival: incomingPatients.length ? incomingPatients.reduce((soonest, patient) => (patient.etaMinutes < soonest.etaMinutes ? patient : soonest)) : null,
       criticalCount: incomingPatients.filter((patient) => patient.riskLevel === 'critical').length,
       pendingNotifications: incomingPatients.filter((patient) => patient.notificationStatus !== 'sent').length,
@@ -174,6 +233,8 @@ export const EmsPreArrivalPipelineService = Object.freeze({
         ? Math.round(etaValues.reduce((sum, eta) => sum + eta, 0) / etaValues.length)
         : 0,
       handoffReadyCount: queue.incomingPatients.filter((patient) => patient.handoffSummary && patient.riskScoreBundle.length).length,
+      whiteboardVisibleCount: queue.incomingPatients.filter((patient) => patient.handoffStatus !== 'Arrived').length,
+      journeyAttachmentCount: queue.incomingPatients.filter((patient) => patient.edHandoffSummary?.attachedToPatientJourney).length,
     });
   },
 
@@ -197,9 +258,15 @@ export const EmsPreArrivalPipelineService = Object.freeze({
   getPreArrivalDashboard(patients = DEFAULT_EMS_INCOMING_PATIENTS) {
     const queue = this.getPreArrivalQueue(patients);
     return Object.freeze({
+      pipelineId: 'ems-handoff-pipeline',
+      title: 'EMS Handoff Pipeline',
+      inputSchema: Object.freeze(['complaint', 'vitals', 'ETA', 'risk indicators']),
+      statuses: EMS_HANDOFF_STATUSES,
+      output: 'ED Handoff Summary',
       workflow: this.getWorkflow(),
       queue,
       metrics: this.getPreArrivalMetrics(patients),
+      edHandoffSummaries: Object.freeze(queue.incomingPatients.map((patient) => patient.edHandoffSummary)),
       recommendations: this.getPreArrivalRecommendations(patients),
       safetyStatement:
         'EMS pre-arrival context supports ED preparation only. Clinicians remain responsible for triage, diagnosis, orders, and disposition.',

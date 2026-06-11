@@ -33,7 +33,7 @@ const viteConfigSource = readFileSync(join(dirname(srcRoot), 'vite.config.js'), 
 const REQUIRED_AUTH_SNIPPETS = Object.freeze([
   "path: '/auth'",
   'AUTH_PATH_ALIASES.map',
-  'element: <Navigate to="/dashboard" replace />',
+  'element: <Navigate to="/workspace/emergency" replace />',
 ]);
 
 const REQUIRED_ROUTES = Object.freeze([
