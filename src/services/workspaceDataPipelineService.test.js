@@ -54,7 +54,7 @@ describe('WorkspaceDataPipelineService', () => {
       expect.objectContaining({
         metrics: expect.objectContaining({
           totalStates: 12,
-          automationCount: 10,
+          automationCount: 21,
           automationCoveragePercent: 100,
         }),
         bottlenecks: expect.arrayContaining([
@@ -67,6 +67,54 @@ describe('WorkspaceDataPipelineService', () => {
             stateId: expect.any(String),
           }),
         ]),
+      })
+    );
+    expect(data.emergency.patientJourney.find((stage) => stage.id === 'registration')).toEqual(
+      expect.objectContaining({
+        automations: expect.arrayContaining([
+          expect.objectContaining({
+            automationId: 'emergency-intake-smart-intake',
+            title: 'Smart Intake',
+            humanReviewRequired: true,
+          }),
+        ]),
+      })
+    );
+    expect(data.emergency.intakeOperatingSystem).toEqual(
+      expect.objectContaining({
+        serviceId: 'emergency-intake-operating-system',
+        commandCenter: expect.objectContaining({
+          route: '/workspace/emergency/intake',
+          trackedStates: expect.arrayContaining([
+            expect.objectContaining({ label: 'Arrivals' }),
+            expect.objectContaining({ label: 'Pending verification' }),
+            expect.objectContaining({ label: 'Triage-ready patients' }),
+          ]),
+        }),
+        patientSnapshot: expect.objectContaining({
+          route: '/workspace/emergency/patient-context',
+          clinicianReviewStatus: 'review required',
+        }),
+        analytics: expect.objectContaining({
+          route: '/workspace/emergency/intake-analytics',
+        }),
+        implementationTraceability: expect.objectContaining({
+          totalPlans: 19,
+          implementedPlans: 19,
+          routes: expect.arrayContaining(['/workspace/emergency/intake', '/workspace/emergency/patient-context']),
+        }),
+      })
+    );
+    expect(data.emergency.operatingSystem).toEqual(
+      expect.objectContaining({
+        responsibilities: expect.arrayContaining(['intake flow']),
+        intakeOperatingSystem: expect.objectContaining({
+          serviceId: 'emergency-intake-operating-system',
+        }),
+        leadershipSummary: expect.objectContaining({
+          registrationCompletionScore: expect.any(Number),
+          triageReadyFromIntake: expect.any(Number),
+        }),
       })
     );
     expect(data.emergency.queueIntelligence).toEqual(
@@ -427,7 +475,15 @@ describe('WorkspaceDataPipelineService', () => {
         title: 'Emergency Department Operating System',
         route: '/workspace/emergency',
         status: 'standalone-saas-ready',
-        responsibilities: ['patient flow', 'queue flow', 'referral flow', 'EMS flow', 'capacity flow', 'discharge flow'],
+        responsibilities: expect.arrayContaining([
+          'patient flow',
+          'intake flow',
+          'queue flow',
+          'referral flow',
+          'EMS flow',
+          'capacity flow',
+          'discharge flow',
+        ]),
         patientFlow: expect.any(Object),
         queueFlow: expect.any(Object),
         referralFlow: expect.any(Object),

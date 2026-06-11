@@ -133,8 +133,67 @@ describe('WorkspaceHome', () => {
     renderWorkspace('/workspace/emergency');
 
     fireEvent.click(screen.getByText(/Emergency routes/i));
-    fireEvent.click(screen.getByRole('link', { name: /Analytics/i }));
+    fireEvent.click(screen.getByRole('link', { name: /^Analytics$/i }));
     expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/analytics');
+  });
+
+  it('renders Emergency Intake OS command center, patient context, and analytics routes', () => {
+    const intakeRoute = renderWorkspace('/workspace/emergency/intake');
+
+    expect(screen.getByRole('heading', { name: /emergency intake command center/i })).toBeInTheDocument();
+    expect(screen.getByText(/registration completion score/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /create intake record/i })).toBeInTheDocument();
+    expect(screen.getByText(/Only confirmed values are promoted/i)).toBeInTheDocument();
+    expect(screen.getByText(/conflict highlighted/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/missing required value/i).length).toBeGreaterThan(1);
+    expect(screen.getByText(/documents become structured data/i)).toBeInTheDocument();
+    expect(screen.getByText(/uploaded, scanned, photographed, integration-supplied/i)).toBeInTheDocument();
+    expect(screen.getByText(/unresolved: groupId/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /referral document ingestion/i })).toBeInTheDocument();
+    expect(screen.getByText(/source references stored/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/pre-triage queue/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Queue position 1/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /voice assisted intake/i })).toBeInTheDocument();
+    expect(screen.getByText(/speech-derived fields remain proposed/i)).toBeInTheDocument();
+    expect(screen.getByText(/My name is Jordan Lee/i)).toBeInTheDocument();
+    expect(screen.getByText(/requires staff confirmation/i)).toBeInTheDocument();
+    expect(screen.getByText(/intake is packaged as a sellable/i)).toBeInTheDocument();
+    expect(screen.getByText(/Core to Pro/i)).toBeInTheDocument();
+    intakeRoute.unmount();
+
+    const patientContextRoute = renderWorkspace('/workspace/emergency/patient-context');
+
+    expect(screen.getByRole('heading', { name: /^Patient Snapshot$/i })).toBeInTheDocument();
+    expect(screen.getByText(/Who is this patient\?/i)).toBeInTheDocument();
+    expect(screen.getByText(/Key medications\?/i)).toBeInTheDocument();
+    expect(screen.getByText(/demographics freshness/i)).toBeInTheDocument();
+    expect(screen.getByText(/medications freshness/i)).toBeInTheDocument();
+    expect(screen.getByText(/Duplicates:/i)).toBeInTheDocument();
+    expect(screen.getByText(/Confidence Score/i)).toBeInTheDocument();
+    expect(screen.getByText(/MRN-204421/i)).toBeInTheDocument();
+    expect(screen.getByText(/Resolution workflow/i)).toBeInTheDocument();
+    patientContextRoute.unmount();
+
+    renderWorkspace('/workspace/emergency/intake-analytics');
+    expect(screen.getByRole('heading', { name: /patient intake analytics/i })).toBeInTheDocument();
+    expect(screen.getByText(/Average registration time/i)).toBeInTheDocument();
+    expect(screen.getByText(/averageRegistrationTime/i)).toBeInTheDocument();
+    expect(screen.getByText(/document-processing-volume trend/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /patient flow door to triage/i })).toBeInTheDocument();
+    expect(screen.getByText(/T\+0m to T\+1m/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /first five minute experience/i })).toBeInTheDocument();
+    expect(screen.getByText(/no autonomous triage decision/i)).toBeInTheDocument();
+    expect(screen.getByText(/triage staff · measured/i)).toBeInTheDocument();
+    expect(screen.getByText(/Unresolved: allergy confirmation incomplete/i)).toBeInTheDocument();
+    expect(screen.getByText(/all intake automations feed emergency os/i)).toBeInTheDocument();
+    expect(screen.getByText(/Consent and Verification/i)).toBeInTheDocument();
+    expect(screen.getByText(/Intake Analytics:/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /markdown plans linked to implementation/i })).toBeInTheDocument();
+    expect(screen.getByText(/19 plans/i)).toBeInTheDocument();
+    expect(screen.getByText(/docs\/smart-patient-intake-engine.md/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /product surfaces connected/i })).toBeInTheDocument();
+    expect(screen.getByText(/Document review workspace/i)).toBeInTheDocument();
+    expect(screen.getByText(/Emergency command center and Patient Journey Engine views/i)).toBeInTheDocument();
   });
 
   it('renders the ED director hero screen at the command center route', () => {
@@ -442,6 +501,8 @@ describe('WorkspaceHome', () => {
     expect(screen.getAllByText(/Recommended Calculators/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Escalation Flags/i).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('button', { name: /qsofa/i }).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Critical risk information/i)).toBeInTheDocument();
+    expect(screen.getByText(/Warfarin reported/i)).toBeInTheDocument();
     expect(screen.getByText(/does not make autonomous/i)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText(/complaint/i), { target: { value: 'Chest Pain' } });
     expect(screen.getAllByText(/ACS Workflow/i).length).toBeGreaterThan(0);

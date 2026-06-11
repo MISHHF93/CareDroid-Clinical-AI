@@ -15,6 +15,7 @@ describe('EmergencyOperatingSystemService', () => {
         status: 'standalone-saas-ready',
         responsibilities: [
           'patient flow',
+          'intake flow',
           'queue flow',
           'referral flow',
           'EMS flow',
@@ -29,6 +30,18 @@ describe('EmergencyOperatingSystemService', () => {
     const operatingSystem = EmergencyOperatingSystemService.getOperatingSystem();
 
     expect(operatingSystem.patientFlow.engine.metrics.totalStates).toBe(12);
+    expect(operatingSystem.patientFlow.engine.metrics.automationCount).toBe(21);
+    expect(operatingSystem.patientFlow.journey.find((stage) => stage.id === 'registration')).toEqual(
+      expect.objectContaining({
+        automations: expect.arrayContaining([
+          expect.objectContaining({
+            automationId: 'emergency-intake-smart-intake',
+            title: 'Smart Intake',
+            humanReviewRequired: true,
+          }),
+        ]),
+      })
+    );
     expect(operatingSystem.queueFlow.metrics.queueCount).toBe(8);
     expect(operatingSystem.throughput.kpi.metricId).toBe('doorToDoctor');
     expect(operatingSystem.waitingRoom.riskState).toMatch(/Normal|Busy|Critical/);

@@ -446,6 +446,537 @@ function EmergencyJourneyFlow({ journey = [], engine = {} }) {
   );
 }
 
+function EmergencyIntakeCommandCenterPanel({ intake = {}, onLaunchRoute, onAskAssistant }) {
+  const commandCenter = intake.commandCenter || {};
+  const registrationScore = intake.registrationCompletionScore || {};
+  const intakeRecord = intake.intakeRecord || {};
+  const governance = intake.governance || {};
+  const preTriageQueue = intake.preTriageQueue || {};
+  const marketplace = intake.marketplace || {};
+  const documentIntelligence = intake.documentIntelligence || {};
+  const referralDocumentIngestion = intake.referralDocumentIngestion || {};
+  const voiceIntake = intake.voiceIntake || {};
+
+  return (
+    <section className="emergency-os-layout" aria-label="Emergency Intake Command Center">
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Emergency Intake OS</p>
+          <h2>{commandCenter.title || 'Emergency Intake Command Center'}</h2>
+          <p>
+            Monitor arrivals, registration, pending verification, pending intake review, and triage-ready patients before
+            triage starts.
+          </p>
+        </div>
+        <div className="workspace-focus-metrics emergency-analytics-grid" aria-label="Emergency intake tracked states">
+          {(commandCenter.trackedStates || []).map((state) => (
+            <div key={state.id}>
+              <span>{state.label}</span>
+              <strong>{state.value}</strong>
+              <small>active intake window</small>
+            </div>
+          ))}
+        </div>
+        <div className="emergency-journey-insights">
+          <p>
+            <strong>Supported modes:</strong> {(intake.supportedIntakeModes || commandCenter.intakeModes || []).join(', ')}
+          </p>
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Registration Accelerator</p>
+          <h2>{registrationScore.label || 'Registration Completion Score'}</h2>
+          <p>One readiness signal shows whether demographic, identity, contact, insurance, and forms are complete.</p>
+        </div>
+        <div className="emergency-journey-summary" aria-label="Registration completion score">
+          <span>{registrationScore.score || 0}% complete</span>
+          <span>{registrationScore.status || 'needs review'}</span>
+          <span>{(registrationScore.missingFields || []).length} missing fields</span>
+          <span>{(registrationScore.conflictingFields || []).length} conflicts</span>
+        </div>
+        <div className="emergency-journey-insights">
+          {(commandCenter.bottleneckSignals || []).map((signal) => (
+            <p key={signal.id}>
+              <strong>{signal.label}:</strong> {signal.value} · {signal.severity}
+            </p>
+          ))}
+          {(commandCenter.staleItems || []).slice(0, 2).map((item) => (
+            <p key={item.patientId}>
+              <strong>{item.label}:</strong> {item.delayedState} for {item.ageMinutes} min · {item.intakeMode}
+            </p>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="workspace-secondary-action"
+          onClick={() => onLaunchRoute('/workspace/emergency/patient-context')}
+        >
+          Open Patient Snapshot
+        </button>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Verified intake record</p>
+          <h2>{intakeRecord.title || 'Create Intake Record'}</h2>
+          <p>{intakeRecord.promotionRule || 'Only confirmed values are promoted into the intake record.'}</p>
+        </div>
+        <div className="emergency-journey-summary" aria-label="Intake governance summary">
+          <span>{(intakeRecord.confirmedFields || []).length} tracked fields</span>
+          <span>{(intakeRecord.draftSuggestions || []).length} draft suggestions</span>
+          <span>{governance.verificationRule || 'Verification required'}</span>
+        </div>
+        <div className="emergency-journey-insights">
+          {(intakeRecord.fieldProposals || []).map((proposal) => (
+            <p key={proposal.field}>
+              <strong>{proposal.field}:</strong> {proposal.confirmationState} · {proposal.source}
+              {proposal.conflict ? ' · conflict highlighted' : ''}
+              {proposal.missing ? ' · missing required value' : ''}
+            </p>
+          ))}
+          {(intakeRecord.draftSuggestions || []).map((suggestion) => (
+            <p key={`${suggestion.field}-${suggestion.source}`}>
+              <strong>{suggestion.field}:</strong> {suggestion.value} · {suggestion.reason}
+            </p>
+          ))}
+          <p>
+            <strong>Consent/audit:</strong> {(governance.artifacts?.consentCapture?.records || []).length} consent records ·{' '}
+            {(governance.artifacts?.auditLog || []).length} audit events · correction workflow required
+          </p>
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">DocumentIntelligenceService</p>
+          <h2>Documents become structured data</h2>
+          <p>Capture, OCR, extraction, validation, review, and structured records preserve source references.</p>
+        </div>
+        <div className="emergency-journey-summary" aria-label="Document intelligence summary">
+          <span>{(documentIntelligence.supportedInputs || []).length} intake inputs</span>
+          <span>{(documentIntelligence.acceptedInputChannels || []).join(', ')}</span>
+          <span>{(documentIntelligence.records || []).length} structured records</span>
+          <span>{documentIntelligence.searchable ? 'searchable' : 'not searchable'}</span>
+          <span>{(documentIntelligence.pipeline || []).join(' -> ')}</span>
+        </div>
+        <div className="emergency-queue-grid">
+          {(documentIntelligence.records || []).map((record) => (
+            <article key={record.sourceDocumentReference} className="emergency-queue-card">
+              <div className="emergency-queue-card__header">
+                <div>
+                  <span className="workspace-eyebrow">{record.structuredRecord.reviewState}</span>
+                  <h3>{record.documentType}</h3>
+                </div>
+                <strong>{record.extractedFields.length}</strong>
+              </div>
+              <p>{record.sourceDocumentReference}</p>
+              <small>
+                {record.structuredRecord.reviewerAttribution} ·{' '}
+                {(record.structuredRecord.unresolvedFields || []).length
+                  ? `unresolved: ${record.structuredRecord.unresolvedFields.join(', ')}`
+                  : 'review complete'}
+              </small>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">External document ingestion</p>
+          <h2>{referralDocumentIngestion.title || 'Referral Document Ingestion'}</h2>
+          <p>External clinical documents become searchable by patient, document type, extracted concept, source, and review state.</p>
+        </div>
+        <div className="emergency-journey-summary" aria-label="Referral document ingestion summary">
+          <span>{(referralDocumentIngestion.supportedDocuments || []).length} document types</span>
+          <span>{(referralDocumentIngestion.extractedConcepts || []).join(', ')}</span>
+          <span>{referralDocumentIngestion.sourceReferencesStored ? 'source references stored' : 'source references missing'}</span>
+        </div>
+        <div className="emergency-journey-insights">
+          {(referralDocumentIngestion.records || []).slice(0, 3).map((record) => (
+            <p key={record.sourceDocumentReference}>
+              <strong>{record.documentType}:</strong> {record.sourceDocumentReference} · {record.structuredRecord.reviewState}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Pre-Triage Queue</p>
+          <h2>{preTriageQueue.title || 'Pre-Triage Queue'}</h2>
+          <p>{preTriageQueue.decisionBoundary || 'No autonomous triage decisions.'}</p>
+        </div>
+        <div className="emergency-queue-grid">
+          {(preTriageQueue.patients || []).map((patient) => (
+            <article key={patient.patientId} className="emergency-queue-card">
+              <div className="emergency-queue-card__header">
+                <div>
+                  <span className="workspace-eyebrow">{patient.confirmationStatus}</span>
+                  <h3>{patient.displayName}</h3>
+                </div>
+                <strong>{patient.complaint}</strong>
+              </div>
+              <p>{patient.demographicSummary} · {patient.intakeMode}</p>
+              <p>
+                <strong>Risk:</strong> {patient.riskIndicators.join(', ')}
+              </p>
+              <p>
+                <strong>Missing:</strong> {patient.missingOrUnconfirmedFields.length ? patient.missingOrUnconfirmedFields.join(', ') : 'None'}
+              </p>
+              <small>Queue position {patient.queuePosition} · {patient.arrivalOrIntakeTimestamp}</small>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Voice accessibility</p>
+          <h2>{voiceIntake.title || 'Voice Assisted Intake'}</h2>
+          <p>{voiceIntake.accessibilityStatement}</p>
+        </div>
+        <div className="emergency-journey-summary" aria-label="Voice intake conversion flow">
+          {(voiceIntake.conversionFlow || []).map((step) => (
+            <span key={step}>{step}</span>
+          ))}
+        </div>
+        <div className="emergency-journey-insights">
+          <p>
+            <strong>Transcript:</strong> {voiceIntake.sampleTranscript}
+          </p>
+          <p>
+            <strong>Structured fields:</strong> {(voiceIntake.structuredFields || []).join(', ')}
+          </p>
+          {(voiceIntake.mappedFields || []).map((field) => (
+            <p key={field.field}>
+              <strong>{field.field}:</strong> {field.value} · {field.correctionState}
+            </p>
+          ))}
+          <p>
+            <strong>Review and correction:</strong>{' '}
+            {voiceIntake.reviewAndCorrectionRequired ? 'required before confirmation' : 'not configured'}
+          </p>
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Sellable product category</p>
+          <h2>{marketplace.title || 'Emergency Intake Automation Marketplace'}</h2>
+          <p>{marketplace.packagingStatement}</p>
+        </div>
+        <div className="emergency-journey-summary" aria-label="Emergency intake marketplace metrics">
+          <span>{marketplace.metrics?.totalModules || 0} modules</span>
+          <span>{marketplace.metrics?.includedInCore || 0} core included</span>
+          <span>{marketplace.metrics?.addOnModules || 0} add-ons</span>
+          <span>{marketplace.metrics?.reviewControlledModules || 0} review controlled</span>
+        </div>
+        <div className="emergency-journey-insights">
+          {(marketplace.modules || []).slice(0, 4).map((module) => (
+            <p key={module.moduleId}>
+              <strong>{module.title}:</strong> Core {module.tierAvailability.core}, Pro {module.tierAvailability.pro},
+              Enterprise {module.tierAvailability.enterprise}
+            </p>
+          ))}
+          {(marketplace.upgradePaths || []).map((path) => (
+            <p key={`${path.from}-${path.to}`}>
+              <strong>{path.from} to {path.to}:</strong> unlocks {path.unlocks.join(', ')}
+            </p>
+          ))}
+        </div>
+        <button
+          type="button"
+          className="workspace-secondary-action"
+          onClick={() =>
+            onAskAssistant(
+              'Summarize Emergency Intake OS bottlenecks, registration completion, pending verification, and pre-triage readiness. Keep it operational and review-required.'
+            )
+          }
+        >
+          Ask assistant for intake summary
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function EmergencyPatientContextPanel({ intake = {}, onAskAssistant }) {
+  const snapshot = intake.patientSnapshot || {};
+  const medicationSummary = intake.medicationSummary || {};
+  const allergyRiskCapture = intake.allergyRiskCapture || {};
+  const identityResolution = intake.identityResolution || {};
+  const flags = medicationSummary.flags || {};
+
+  return (
+    <section className="emergency-os-layout" aria-label="Patient Snapshot">
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Patient Snapshot</p>
+          <h2>{snapshot.title || 'Patient Snapshot'}</h2>
+          <p>
+            Source-cited patient context generated in {snapshot.generatedWithinSeconds || 'seconds'} seconds and marked
+            {` ${snapshot.clinicianReviewStatus || 'review required'}`}.
+          </p>
+        </div>
+        <div className="emergency-queue-grid">
+          {(snapshot.sections || []).map((section) => (
+            <article key={section.id} className="emergency-queue-card">
+              <div className="emergency-queue-card__header">
+                <div>
+                  <span className="workspace-eyebrow">Source cited</span>
+                  <h3>{section.question}</h3>
+                </div>
+              </div>
+              <p>{section.answer}</p>
+              <small>Sources: {section.sourceRecords.join(', ')}</small>
+            </article>
+          ))}
+        </div>
+        <div className="emergency-journey-insights">
+          {(snapshot.freshnessIndicators || []).map((indicator) => (
+            <p key={indicator.context}>
+              <strong>{indicator.context} freshness:</strong> {indicator.freshness} · {indicator.source}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Medication Capture</p>
+          <h2>{medicationSummary.title || 'Medication Summary'}</h2>
+          <p>Duplicates, missing information, and uncertain entries stay flagged until human verification.</p>
+        </div>
+        <div className="emergency-journey-insights">
+          <p>
+            <strong>Duplicates:</strong> {(flags.duplicates || []).join(', ') || 'None'}
+          </p>
+          <p>
+            <strong>Missing information:</strong> {(flags.missingInformation || []).join(', ') || 'None'}
+          </p>
+          <p>
+            <strong>Uncertain entries:</strong> {(flags.uncertainEntries || []).join(', ') || 'None'}
+          </p>
+        </div>
+        <div className="emergency-queue-grid">
+          {(medicationSummary.entries || []).map((entry) => (
+            <article key={`${entry.name}-${entry.source}`} className="emergency-queue-card">
+              <strong>{entry.name}</strong>
+              <p>{[entry.dose, entry.route, entry.frequency].filter(Boolean).join(' · ') || 'Incomplete medication details'}</p>
+              <small>{entry.source} · {entry.verificationStatus}</small>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Allergy and risk capture</p>
+          <h2>{allergyRiskCapture.title || 'Allergy and Risk Capture'}</h2>
+          <p>Critical risk information displays prominently in triage while confirmed and pending values remain distinct.</p>
+        </div>
+        <div className="emergency-queue-grid">
+          {(allergyRiskCapture.collected || []).map((item) => (
+            <article key={`${item.type}-${item.label}`} className="emergency-queue-card">
+              <span className="workspace-eyebrow">{item.type}</span>
+              <strong>{item.label}</strong>
+              <p>{item.status} · {item.source}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Identity resolution</p>
+          <h2>{identityResolution.title || 'Emergency Identity Resolution Layer'}</h2>
+          <p>Uncertain matches require review before staff select an existing record or create a new record.</p>
+        </div>
+        <div className="emergency-journey-summary" aria-label="Identity resolution confidence score">
+          <span>{identityResolution.confidenceScore?.label || 'Confidence Score'}</span>
+          <span>{identityResolution.confidenceScore?.value || 0}</span>
+          <span>{identityResolution.confidenceScore?.status || 'review required'}</span>
+        </div>
+        <div className="emergency-journey-insights">
+          {(identityResolution.candidateMatches || []).map((candidate) => (
+            <p key={candidate.candidateRecordId}>
+              <strong>{candidate.candidateRecordId}:</strong> {candidate.confidenceScore} · matched{' '}
+              {candidate.matchedFields.join(', ')} · conflicts {candidate.conflictingFields.join(', ')}
+            </p>
+          ))}
+          <p>
+            <strong>Resolution workflow:</strong> {(identityResolution.resolutionWorkflow || []).slice(0, 3).join(', ')}
+          </p>
+        </div>
+        <p className="emergency-queue-warning">
+          <strong>Safety boundary:</strong> {snapshot.safetyStatement}
+        </p>
+        <button
+          type="button"
+          className="workspace-secondary-action"
+          onClick={() =>
+            onAskAssistant(
+              'Summarize this Patient Snapshot with source citations and clinician review language. Do not diagnose or reconcile medications.'
+            )
+          }
+        >
+          Ask assistant for reviewed summary
+        </button>
+      </div>
+    </section>
+  );
+}
+
+function EmergencyIntakeAnalyticsPanel({ intake = {} }) {
+  const analytics = intake.analytics || {};
+  const doorToTriage = intake.doorToTriage || {};
+  const firstFiveMinuteExperience = intake.firstFiveMinuteExperience || {};
+  const patientJourneyFeed = intake.patientJourneyFeed || [];
+  const implementationTraceability = intake.implementationTraceability || {};
+  const productSurfaces = intake.productSurfaces || [];
+
+  return (
+    <section className="emergency-analytics-layout" aria-label="Emergency intake analytics">
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Patient Intake Analytics</p>
+          <h2>{analytics.title || 'Patient Intake Analytics'}</h2>
+          <p>Registration, verification, document volume, completion rate, and triage readiness become measurable.</p>
+        </div>
+        <div className="workspace-focus-metrics emergency-analytics-grid">
+          {(analytics.metrics || []).map((metric) => (
+            <div key={metric.id}>
+              <span>{metric.label}</span>
+              <strong>{metric.value}</strong>
+              <small>{metric.unit}</small>
+            </div>
+          ))}
+        </div>
+        <div className="emergency-journey-insights">
+          {Object.entries(analytics.metricDefinitions || {}).slice(0, 3).map(([id, definition]) => (
+            <p key={id}>
+              <strong>{id}:</strong> {definition}
+            </p>
+          ))}
+          {(analytics.trends || []).map((trend) => (
+            <p key={trend.metricId}>
+              <strong>{trend.metricId} trend:</strong> {trend.direction} · {trend.comparison}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Door-to-Triage</p>
+          <h2>{doorToTriage.title || 'Patient Flow Door To Triage'}</h2>
+          <p>First 15-minute intake stages track processing time, bottlenecks, and completion rates.</p>
+        </div>
+        <ol className="emergency-journey-flow">
+          {(doorToTriage.stages || []).map((stage) => (
+            <li key={stage.id}>
+              <strong>{stage.label}</strong>
+              <span>{stage.status}</span>
+              <small className="emergency-journey-meta">
+                {stage.processingMinutes} min | {stage.completionRate}% complete
+                {stage.bottleneck ? ` | ${stage.bottleneck}` : ''}
+              </small>
+              <small className="emergency-journey-meta">
+                {stage.startTimestamp} to {stage.completionTimestamp || 'pending'} | {stage.responsibleRole}
+              </small>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">First 5 minutes</p>
+          <h2>{firstFiveMinuteExperience.title || 'First Five Minute Experience'}</h2>
+          <p>{firstFiveMinuteExperience.improvementStatement}</p>
+        </div>
+        <div className="workspace-focus-metrics emergency-analytics-grid">
+          {(firstFiveMinuteExperience.measures || []).map((measure) => (
+            <div key={measure.id}>
+              <span>{measure.label}</span>
+              <strong>{measure.value}</strong>
+              <small>{measure.unit}</small>
+              <small>{measure.completionTimestamp} · {measure.verificationStatus}</small>
+              <small>{measure.responsibleRole} · {measure.completionStatus}</small>
+              <small>
+                Unresolved:{' '}
+                {(measure.missingOrUnresolvedFields || []).length
+                  ? measure.missingOrUnresolvedFields.join(', ')
+                  : 'none'}
+              </small>
+            </div>
+          ))}
+        </div>
+        <div className="emergency-journey-insights">
+          <p>
+            <strong>Blockers:</strong> {(firstFiveMinuteExperience.blockers || []).join(', ')}
+          </p>
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Patient Journey Engine feed</p>
+          <h2>All intake automations feed Emergency OS</h2>
+          <p>Every intake module declares valid patient journey states and remains review-controlled.</p>
+        </div>
+        <div className="emergency-journey-insights">
+          {patientJourneyFeed.map((module) => (
+            <p key={module.moduleId}>
+              <strong>{module.title}:</strong> {module.patientJourneyStates.join(', ')} ·{' '}
+              {module.validJourneyStages ? 'valid journey states' : 'invalid journey mapping'}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Plan traceability</p>
+          <h2>Markdown plans linked to implementation</h2>
+          <p>{implementationTraceability.status}</p>
+        </div>
+        <div className="emergency-journey-summary" aria-label="Intake implementation traceability">
+          <span>{implementationTraceability.totalPlans || 0} plans</span>
+          <span>{implementationTraceability.implementedPlans || 0} implemented</span>
+          <span>{(implementationTraceability.routes || []).length} routes</span>
+          <span>{(implementationTraceability.tests || []).length} test files</span>
+        </div>
+        <div className="emergency-journey-insights">
+          {(implementationTraceability.docs || []).slice(0, 6).map((doc) => (
+            <p key={doc.docPath}>
+              <strong>{doc.capability}:</strong> {doc.docPath} · {doc.acceptance}
+            </p>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-panel">
+        <div className="workspace-panel__header">
+          <p className="workspace-eyebrow">Emergency Intake OS surfaces</p>
+          <h2>Product surfaces connected</h2>
+          <p>Intake dashboards, review workspaces, queue surfaces, and Emergency OS views share one governed model.</p>
+        </div>
+        <div className="emergency-journey-insights">
+          {productSurfaces.map((surface) => (
+            <p key={`${surface.surface}-${surface.artifact}`}>
+              <strong>{surface.surface}:</strong> {surface.route} · {surface.artifact}
+            </p>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function EmergencyDigitalWhiteboardPanel({ whiteboard = {}, onLaunchRoute, onAskAssistant }) {
   const columns = whiteboard.columns || [];
   const summary = whiteboard.summary || {};
@@ -2603,11 +3134,12 @@ function buildTriageEscalationFlags({ routedComplaint, vitalsSummary, age, riskF
   return flags;
 }
 
-function EmergencyTriageOrchestrator({ orchestrator, onLaunchTool, onAskAssistant }) {
+function EmergencyTriageOrchestrator({ orchestrator, intake, onLaunchTool, onAskAssistant }) {
   const [complaint, setComplaint] = useState('Sepsis Concern');
   const [vitalsSummary, setVitalsSummary] = useState('BP 92/58, HR 118, RR 24, SpO2 93%, temp 38.6');
   const [age, setAge] = useState('72');
   const [riskFactors, setRiskFactors] = useState('Immunosuppression, suspected infection');
+  const allergyRiskCapture = intake?.allergyRiskCapture || {};
   const routedComplaint = routeEmergencyChiefComplaint(complaint);
   const calculators = routedComplaint?.calculators?.length ? routedComplaint.calculators : orchestrator.calculatorSequence;
   const workflow = routedComplaint?.workflows?.[0] || 'Manual triage workflow';
@@ -2632,6 +3164,20 @@ function EmergencyTriageOrchestrator({ orchestrator, onLaunchTool, onAskAssistan
         <p>Enter complaint, vitals, age, and risk factors once. The workspace returns risk bundle, workflow, calculators, and escalation flags without extra screens.</p>
         <p>{orchestrator.safetyStatement}</p>
       </div>
+
+      {(allergyRiskCapture.collected || []).length ? (
+        <section className="emergency-journey-insights" aria-label="Prominent triage risk information">
+          <p>
+            <strong>Critical risk information:</strong> allergies, adverse reactions, anticoagulants, pregnancy status,
+            and major chronic conditions are surfaced from intake for triage review.
+          </p>
+          {(allergyRiskCapture.collected || []).map((item) => (
+            <p key={`${item.type}-${item.label}`}>
+              <strong>{item.type}:</strong> {item.label} · {item.status} · {item.source}
+            </p>
+          ))}
+        </section>
+      ) : null}
 
       <div className="emergency-triage-compression__grid">
         <section className="emergency-triage-inputs" aria-label="Triage inputs">
@@ -4537,6 +5083,21 @@ export default function WorkspaceHome() {
         />
       ) : null}
 
+      {isEmergencyWorkspace && activeSubpageId === 'intake' ? (
+        <EmergencyIntakeCommandCenterPanel
+          intake={pipelineData.emergency.intakeOperatingSystem}
+          onLaunchRoute={launchRoute}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'patient-context' ? (
+        <EmergencyPatientContextPanel
+          intake={pipelineData.emergency.intakeOperatingSystem}
+          onAskAssistant={launchAssistantPrompt}
+        />
+      ) : null}
+
       {!isEmergencyWorkspace && !isFutureModule && activeSubpageId === 'dashboard' ? (
         <DashboardGrid className="workspace-content-grid">
           <DashboardSection
@@ -4657,6 +5218,7 @@ export default function WorkspaceHome() {
       {isEmergencyWorkspace && activeSubpageId === 'triage' ? (
         <EmergencyTriageOrchestrator
           orchestrator={pipelineData.emergency.triageOrchestrator}
+          intake={pipelineData.emergency.intakeOperatingSystem}
           onLaunchTool={launchTool}
           onAskAssistant={launchAssistantPrompt}
         />
@@ -4802,6 +5364,10 @@ export default function WorkspaceHome() {
           kpiLayer={pipelineData.emergency.kpiLayer}
           demoEnvironment={pipelineData.emergency.demoEnvironment}
         />
+      ) : null}
+
+      {isEmergencyWorkspace && activeSubpageId === 'intake-analytics' ? (
+        <EmergencyIntakeAnalyticsPanel intake={pipelineData.emergency.intakeOperatingSystem} />
       ) : null}
 
       {!isEmergencyWorkspace && !isFutureModule && activeSubpageId === 'analytics' ? (

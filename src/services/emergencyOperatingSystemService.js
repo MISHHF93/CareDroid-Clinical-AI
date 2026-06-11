@@ -16,6 +16,9 @@ import EmsOffloadCommandCenterService from './emsOffloadCommandCenterService';
 import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenceService';
 import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
 import EmergencyEscalationEngineService from './emergencyEscalationEngineService';
+import EmergencyIntakeOperatingSystemService, {
+  getEmergencyIntakeAutomationFeed,
+} from './emergencyIntakeOperatingSystemService';
 import EmergencyKPILayerService from './emergencyKpiLayerService';
 import EmergencyPatientPathService from './emergencyPatientPathService';
 import EmergencyResourceBoardService from './emergencyResourceBoardService';
@@ -47,7 +50,9 @@ function buildDischargeFlow({ queueDashboard, capacityDashboard, automationMarke
 
 export const EmergencyOperatingSystemService = Object.freeze({
   getOperatingSystem(options = {}) {
-    const automations = options.automations || getWorkspaceAutomations('emergency');
+    const marketplaceAutomations = options.marketplaceAutomations || getWorkspaceAutomations('emergency');
+    const automations =
+      options.automations || Object.freeze([...marketplaceAutomations, ...getEmergencyIntakeAutomationFeed()]);
     const patientJourney = PatientJourneyEngine.getPatientJourney({ automations });
     const patientJourneyEngine = Object.freeze({
       metrics: PatientJourneyEngine.getJourneyMetrics({ automations }),
@@ -68,11 +73,12 @@ export const EmergencyOperatingSystemService = Object.freeze({
     const kpiLayer = EmergencyKPILayerService.getKpiLayer();
     const simulationScenarios = EmergencySimulationScenariosService.getScenarioDashboard();
     const demoEnvironment = EmergencyDemoEnvironmentService.getDemoEnvironment();
-    const automationMarketplace = EdAutomationMarketplace.getMarketplaceDashboard(automations);
-    const automationRoi = AutomationROIService.getAutomationRoiDashboard(automations);
+    const automationMarketplace = EdAutomationMarketplace.getMarketplaceDashboard(marketplaceAutomations);
+    const automationRoi = AutomationROIService.getAutomationRoiDashboard(marketplaceAutomations);
     const digitalWhiteboard = EmergencyWhiteboardService.getWhiteboard();
     const knowledgeLayer = EmergencyKnowledgeLayer.getDashboard();
     const patientPath = EmergencyPatientPathService.getPatientPathDashboard();
+    const intakeOperatingSystem = EmergencyIntakeOperatingSystemService.getOperatingSystem();
     const dischargeFlow = buildDischargeFlow({
       queueDashboard: queueFlow,
       capacityDashboard: capacityFlow,
@@ -92,6 +98,7 @@ export const EmergencyOperatingSystemService = Object.freeze({
       status: 'standalone-saas-ready',
       responsibilities: Object.freeze([
         'patient flow',
+        'intake flow',
         'queue flow',
         'referral flow',
         'EMS flow',
@@ -118,6 +125,7 @@ export const EmergencyOperatingSystemService = Object.freeze({
       demoEnvironment,
       digitalWhiteboard,
       patientPath,
+      intakeOperatingSystem,
       dischargeFlow,
       copilot: Object.freeze({
         ...EMERGENCY_AI_COPILOT,
@@ -130,6 +138,11 @@ export const EmergencyOperatingSystemService = Object.freeze({
       knowledgeLayer,
       leadershipSummary: Object.freeze({
         activePatients: patientJourneyEngine.metrics.activePatients,
+        intakeArrivals:
+          intakeOperatingSystem.commandCenter.trackedStates.find((state) => state.id === 'arrivals')?.value || 0,
+        triageReadyFromIntake:
+          intakeOperatingSystem.commandCenter.trackedStates.find((state) => state.id === 'triage-ready-patients')?.value || 0,
+        registrationCompletionScore: intakeOperatingSystem.registrationCompletionScore.score,
         doorToDirection: patientPath.metrics.doorToDirectionMinutes,
         doorToDirectionCompliance: patientPath.metrics.targetCompliance,
         waitingPatients: patientJourneyEngine.metrics.waitingPatients,

@@ -47,6 +47,9 @@ import EmergencyCapacityIntelligenceService from './emergencyCapacityIntelligenc
 import EmergencyDemoEnvironmentService from './emergencyDemoEnvironmentService';
 import EmergencyEscalationEngineService from './emergencyEscalationEngineService';
 import EmergencyKPILayerService from './emergencyKpiLayerService';
+import EmergencyIntakeOperatingSystemService, {
+  getEmergencyIntakeAutomationFeed,
+} from './emergencyIntakeOperatingSystemService';
 import EmergencyResourceBoardService from './emergencyResourceBoardService';
 import EmergencySimulationScenariosService from './emergencySimulationScenariosService';
 import EmergencyWhiteboardService from './emergencyWhiteboardService';
@@ -171,12 +174,22 @@ export const WorkspaceDataPipelineService = {
     const alerts = buildAlerts(model.workspace.id, mode);
     const analytics = buildAnalytics(model, mode, recommendations, alerts);
     const workspaceAutomations = getWorkspaceAutomations(model.workspace.id);
+    const intakeOperatingSystem =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? EmergencyIntakeOperatingSystemService.getOperatingSystem()
+        : null;
+    const intakeAutomationFeed =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID ? getEmergencyIntakeAutomationFeed() : [];
+    const emergencyJourneyAutomations =
+      model.workspace.id === EMERGENCY_WORKSPACE_ID
+        ? Object.freeze([...workspaceAutomations, ...intakeAutomationFeed])
+        : workspaceAutomations;
     const patientJourneyEngine =
       model.workspace.id === EMERGENCY_WORKSPACE_ID
         ? {
-            metrics: PatientJourneyEngine.getJourneyMetrics({ automations: workspaceAutomations }),
+            metrics: PatientJourneyEngine.getJourneyMetrics({ automations: emergencyJourneyAutomations }),
             bottlenecks: PatientJourneyEngine.getJourneyBottlenecks(),
-            recommendations: PatientJourneyEngine.getJourneyRecommendations({ automations: workspaceAutomations }),
+            recommendations: PatientJourneyEngine.getJourneyRecommendations({ automations: emergencyJourneyAutomations }),
           }
         : null;
     const queueIntelligence =
@@ -227,7 +240,10 @@ export const WorkspaceDataPipelineService = {
       model.workspace.id === EMERGENCY_WORKSPACE_ID ? EmergencyPatientPathService.getPatientPathDashboard() : null;
     const operatingSystem =
       model.workspace.id === EMERGENCY_WORKSPACE_ID
-        ? EmergencyOperatingSystemService.getOperatingSystem({ automations: workspaceAutomations })
+        ? EmergencyOperatingSystemService.getOperatingSystem({
+            automations: emergencyJourneyAutomations,
+            marketplaceAutomations: workspaceAutomations,
+          })
         : null;
 
     return {
@@ -243,7 +259,7 @@ export const WorkspaceDataPipelineService = {
       emergency:
         model.workspace.id === EMERGENCY_WORKSPACE_ID
           ? {
-              patientJourney: PatientJourneyEngine.getPatientJourney({ automations: workspaceAutomations }),
+              patientJourney: PatientJourneyEngine.getPatientJourney({ automations: emergencyJourneyAutomations }),
               patientJourneyEngine,
               queueIntelligence,
               doorToDoctorIntelligence,
@@ -264,6 +280,7 @@ export const WorkspaceDataPipelineService = {
               digitalWhiteboard,
               knowledgeLayer,
               patientPath,
+              intakeOperatingSystem,
               operatingSystem,
               canonicalPatientJourney: EMERGENCY_PATIENT_JOURNEY,
               dashboardWidgets: EMERGENCY_DASHBOARD_WIDGETS,
