@@ -27,8 +27,8 @@ describe('build and service config consistency', () => {
   });
 
   it('keeps backend production entrypoint aligned with package.json', () => {
-    expect(read('backend/package.json')).toContain('"start:prod": "node dist/src/main.js"');
-    expect(read('backend/Dockerfile')).toContain('CMD ["node", "dist/src/main.js"]');
+    expect(read('backend/package.json')).toContain('"start:prod": "node dist/backend/src/main.js"');
+    expect(read('backend/Dockerfile')).toContain('CMD ["node", "dist/backend/src/main.js"]');
   });
 
   it('normalizes NLU defaults to port 8001', () => {

@@ -98,7 +98,8 @@ describe('Wiring audit — registry IDs and route slugs', () => {
   it.each(WIRING_AUDIT_TIER_A_IDS)('%s registers dedicated calculator route before hub', (id) => {
     const spec = WIRING_AUDIT_TOOL_SPECS[id];
     expect(matchCalculatorRoute(spec.routePath)?.calculatorSlug).toBe(id);
-    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
   });
 
   it.each(WIRING_AUDIT_TIER_B_IDS)('%s has no dedicated /tools/calculators/<id> App route', (id) => {

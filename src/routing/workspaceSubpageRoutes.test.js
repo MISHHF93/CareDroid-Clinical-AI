@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS } from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -19,6 +20,15 @@ describe('workspace subpage routes', () => {
     expect(routeBlock).toContain('<WorkspaceRouteRedirect />');
     expect(routeBlock).toContain('requiresAuth: true');
     expect(routeBlock).not.toMatch(/<AppShell\b|<Sidebar\b|app-shell-page-body/);
+    expect(WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS).toMatchObject({
+      whiteboard: '/emergency/whiteboard',
+      patients: '/emergency/patients',
+      queues: '/emergency/queues',
+      'command-center': '/emergency/whiteboard',
+      copilot: '/emergency/copilot',
+    });
+    expect(appSource).toContain('WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS[subpage]');
+    expect(appSource).not.toContain('const routeMap = {');
   });
 
   it('keeps automation analytics as a future-release redirect into Emergency OS', () => {

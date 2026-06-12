@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import Card from '../components/ui/card';
 import { useTenantContext } from '../contexts/TenantContext';
+import PageShell from './commercial/CommercialPageShell';
 import { fetchUsageMeteringFramework, fetchUsageSummary } from '../services/subscriptionApi';
 import './commercial/CommercialPages.css';
 
@@ -58,20 +59,19 @@ export default function UsagePage() {
   }, [period]);
 
   return (
-    <div className="commercial-page">
-      <header className="commercial-header">
-        <h1>Usage</h1>
-        <p className="commercial-subtitle">
-          Usage by organization, workspace, asset, user role, and time period for{' '}
-          {tenantContext?.organizationName || 'this tenant'}.
-        </p>
+    <PageShell
+      title="Usage"
+      subtitle={`Usage by organization, workspace, asset, user role, and time period for ${
+        tenantContext?.organizationName || 'this tenant'
+      }.`}
+      actions={
         <select value={period} onChange={(event) => setPeriod(event.target.value)}>
           <option value="day">Today</option>
           <option value="week">This week</option>
           <option value="month">This month</option>
         </select>
-      </header>
-
+      }
+    >
       {error && <p style={{ color: '#ff6b6b' }}>{error}</p>}
       {isLoading ? (
         <p>Loading usage...</p>
@@ -122,6 +122,6 @@ export default function UsagePage() {
           </section>
         </>
       )}
-    </div>
+    </PageShell>
   );
 }

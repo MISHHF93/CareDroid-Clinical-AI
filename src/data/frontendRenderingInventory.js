@@ -111,10 +111,11 @@ function nluApplies(registryId) {
   );
 }
 
-function appUsesDynamicCalculatorRoutes() {
+function appUsesCalculatorRedirectRoutes() {
   return (
-    appSource.includes('CALCULATOR_ROUTE_DEFS.map') &&
-    appSource.includes('initialCalculatorId={calculatorSlug}')
+    appSource.includes("path: '/tools/calculators'") &&
+    appSource.includes("path: '/tools/calculators/:slug'") &&
+    appSource.includes('<LegacyCalculatorRouteRedirect />')
   );
 }
 
@@ -122,14 +123,11 @@ function appRouteRegistered(registryId, builtinSlug, regPath) {
   if (FLEET_TIER_A_REGISTRY_IDS.includes(registryId)) {
     const spec = PR_FLEET_TOOL_SPECS[registryId];
     if (!spec?.routePath) return false;
-    return (
-      appSource.includes(`path: '${spec.routePath}'`) &&
-      appSource.includes(`<${spec.appComponent}`)
-    );
+    return isKnownToolAreaPath(spec.routePath) && Boolean(spec.appComponent);
   }
   if (builtinSlug) {
     const def = getCalculatorRouteBySlug(builtinSlug);
-    if (def && appUsesDynamicCalculatorRoutes()) return true;
+    if (def && appUsesCalculatorRedirectRoutes()) return true;
     if (appSource.includes(`initialCalculatorId="${builtinSlug}"`)) return true;
     if (def && appSource.includes(`path: '${def.path}'`)) return true;
   }

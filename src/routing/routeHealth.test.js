@@ -10,7 +10,7 @@ describe('route health graph', () => {
     expect(graph.routes.length).toBeGreaterThan(0);
     expect(graph.routes.every((route) => route.path && validStates.has(route.status))).toBe(true);
     expect(graph.routes.find((route) => route.path === '/dashboard')?.status).toBe(
-      ROUTE_HEALTH_STATES.ACTIVE
+      ROUTE_HEALTH_STATES.ALIAS
     );
     expect(graph.routes.find((route) => route.path === '/home')?.status).toBe(
       ROUTE_HEALTH_STATES.DEPRECATED
@@ -19,10 +19,10 @@ describe('route health graph', () => {
       ROUTE_HEALTH_STATES.ALIAS
     );
     expect(graph.routes.find((route) => route.path === '/tools/catalog')?.status).toBe(
-      ROUTE_HEALTH_STATES.ACTIVE
+      ROUTE_HEALTH_STATES.HIDDEN
     );
     expect(graph.routes.find((route) => route.path === '/tools/calculators')?.owner).toBe(
-      'ToolsOverview'
+      'legacy-redirect'
     );
   });
 

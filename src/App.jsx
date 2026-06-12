@@ -40,11 +40,12 @@ import { FEATURE_REGISTRY_BY_ID } from '../lib/features/featureRegistry';
 import logger from './utils/logger';
 import { NavIcon } from './navigation/NavIcon';
 import { CHROME_ICONS } from './navigation/iconRegistry';
-import { AUTH_PATH_ALIASES, PROTECTED_ROUTE_ALIAS_REDIRECTS } from './config/routes.config';
 import {
-  CALCULATOR_ROUTE_DEFS,
-  LEGACY_CALCULATOR_ROUTE_ALIASES,
-} from './routes/clinicalToolRoutes';
+  AUTH_PATH_ALIASES,
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  PROTECTED_ROUTE_ALIAS_REDIRECTS,
+  WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS,
+} from './config/routes.config';
 import { lazyWithRetry } from './utils/lazyWithRetry';
 import { useEmergencyStore } from '../store/emergencyStore';
 
@@ -300,9 +301,6 @@ const AuthCallback = lazyWithRetry(() => import('./pages/AuthCallback'));
 
 const SharedToolSession = lazyWithRetry(() => import('./pages/tools/SharedToolSession'));
 const ClinicalAudit = lazyWithRetry(() => import('./pages/tools/ClinicalAudit'));
-const ToolsOverview = lazyWithRetry(() => import('./pages/tools/ToolsOverview'));
-const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalToolCatalog'));
-const Calculators = lazyWithRetry(() => import('./pages/tools/Calculators'));
 const EmergencyAnalytics = lazyWithRetry(() => import('./pages/emergency/EmergencyAnalytics'));
 const SmartIntake = lazyWithRetry(() => import('./pages/emergency/SmartIntake'));
 const ClinicalCalculatorHub = lazyWithRetry(() => import('./pages/emergency/ClinicalCalculatorHub'));
@@ -341,7 +339,6 @@ const TimelineAi = lazyWithRetry(() => import('./pages/tools/TimelineAi'));
 const PatientSummaryAi = lazyWithRetry(() => import('./pages/tools/PatientSummaryAi'));
 const OrderSetAi = lazyWithRetry(() => import('./pages/tools/OrderSetAi'));
 const AiExplainability = lazyWithRetry(() => import('./pages/tools/AiExplainability'));
-const ToolNotFound = lazyWithRetry(() => import('./pages/tools/ToolNotFound'));
 
 // Clinical Intelligence pages
 const ClinicalAlertsPage = lazyWithRetry(() => import('./pages/ClinicalAlertsPage'));
@@ -700,28 +697,11 @@ function WorkspaceRouteRedirect() {
   const { workspaceId, subpage } = useParams();
 
   if (workspaceId === 'emergency') {
-    const routeMap = {
-      whiteboard: '/emergency/whiteboard',
-      patients: '/emergency/patients',
-      queues: '/emergency/queues',
-      queue: '/emergency/queues',
-      reassessment: '/emergency/reassessment',
-      ems: '/emergency/ems',
-      referrals: '/emergency/referrals',
-      capacity: '/emergency/capacity',
-      boarding: '/emergency/boarding',
-      analytics: '/emergency/analytics',
-      pulse: '/emergency/pulse',
-      'department-pulse': '/emergency/pulse',
-      'shift-summary': '/emergency/shift',
-      shift: '/emergency/shift',
-      intake: '/emergency/intake',
-      'smart-intake': '/emergency/intake',
-      'command-center': '/emergency/whiteboard',
-      copilot: '/emergency/copilot',
-    };
-
-    return <LegacyProtectedRouteRedirect to={routeMap[subpage] || '/emergency/whiteboard'} />;
+    return (
+      <LegacyProtectedRouteRedirect
+        to={WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS[subpage] || '/emergency/whiteboard'}
+      />
+    );
   }
 
   return <LegacyProtectedRouteRedirect to="/emergency/whiteboard" />;
@@ -999,47 +979,6 @@ function EmergencyCapacityRoute({ variant = 'capacity' }) {
     </section>
   );
 }
-
-const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([
-  ['/auth', '/emergency/whiteboard'],
-  ['/ems', '/emergency/ems'],
-  ['/intake', '/emergency/intake'],
-  ['/queues', '/emergency/queues'],
-  ['/queue', '/emergency/queues'],
-  ['/reassessment', '/emergency/reassessment'],
-  ['/capacity', '/emergency/capacity'],
-  ['/boarding', '/emergency/boarding'],
-  ['/referrals', '/emergency/referrals'],
-  ['/analytics', '/emergency/analytics'],
-  ['/emergency/smart-intake', '/emergency/intake'],
-  ['/emergency/queue', '/emergency/queues'],
-  ['/emergency/command-center', '/emergency/whiteboard'],
-  ['/workspace/emergency/pulse', '/emergency/pulse'],
-  ['/workspace/emergency/charge-nurse', '/emergency/pulse'],
-  ['/workspace/emergency', '/emergency/whiteboard'],
-  ['/workspace/emergency/whiteboard', '/emergency/whiteboard'],
-  ['/workspace/emergency/intake', '/emergency/intake'],
-  ['/workspace/emergency/patients', '/emergency/patients'],
-  ['/workspace/emergency/queue', '/emergency/queues'],
-  ['/workspace/emergency/queues', '/emergency/queues'],
-  ['/workspace/emergency/ems', '/emergency/ems'],
-  ['/workspace/emergency/referrals', '/emergency/referrals'],
-  ['/workspace/emergency/capacity', '/emergency/capacity'],
-  ['/workspace/emergency/boarding', '/emergency/boarding'],
-  ['/workspace/emergency/tools', '/emergency/copilot'],
-  ['/workspace/emergency/shift-summary', '/emergency/shift'],
-  ['/workspace/emergency/shift', '/emergency/shift'],
-  ['/workspace/emergency/settings', '/emergency/settings'],
-  ['/workspace/emergency/copilot', '/emergency/copilot'],
-  ['/workspace/emergency/command-center', '/emergency/whiteboard'],
-  ['/patients', '/emergency/patients'],
-  ['/patients/*', '/emergency/patients'],
-  ['/settings', '/emergency/settings'],
-  ['/settings/general', '/emergency/settings'],
-  ['/settings/thresholds', '/emergency/settings'],
-  ['/settings/staff', '/emergency/settings'],
-  ['/settings/integrations', '/emergency/settings'],
-]);
 
 const FUTURE_RELEASE_ROUTES = Object.freeze([
   ['Executive Command Center', '/executive'],
@@ -1383,7 +1322,7 @@ export function AppRoutes() {
       element: <LegacyToolRouteRedirect toolId="drug-check" />,
       requiresAuth: true,
     },
-    ...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({
+    ...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => ({
       path,
       element: <LegacyProtectedRouteRedirect to={to} />,
       requiresAuth: true,

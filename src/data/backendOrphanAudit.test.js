@@ -54,7 +54,7 @@ describe('backend orphan audit', () => {
     const orphan = assertNoOrphanedBackendFunctionality();
     expect(exposure.ok).toBe(true);
     expect(orphan.ok).toBe(true);
-  }, 15000);
+  }, HEAVY_ORPHAN_SCAN_TIMEOUT_MS);
 
   it('orphaned-backend-functions markdown generator is non-empty', () => {
     const md = formatOrphanedBackendFunctionsMarkdown();

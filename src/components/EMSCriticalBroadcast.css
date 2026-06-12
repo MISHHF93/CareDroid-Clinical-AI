@@ -38,13 +38,13 @@
 .ems-critical-banner {
   position: fixed;
   inset-block-start: var(--ed-header-height, 48px);
-  inset-inline: var(--ed-rail-width, 56px) 0;
+  inset-inline: var(--ed-rail-width, 56px) var(--ed-right-alarm-lane-width, 360px);
   z-index: 1250;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-4);
-  min-height: 44px;
+  min-height: var(--ed-critical-ems-banner-height, 44px);
   padding: 0 var(--space-4);
   background: #b91c1c;
   color: white;
@@ -78,12 +78,12 @@
 
 .ems-critical-checklist {
   position: fixed;
-  inset-block: calc(var(--ed-header-height, 48px) + 44px) 0;
+  inset-block: calc(var(--ed-header-height, 48px) + var(--ed-critical-ems-banner-height, 44px)) 0;
   inset-inline-end: 0;
   z-index: 1260;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  width: min(360px, calc(100vw - var(--ed-rail-width, 56px)));
+  width: var(--ed-right-alarm-lane-width, min(360px, calc(100vw - var(--ed-rail-width, 56px))));
   border-left: 1px solid rgba(248, 113, 113, 0.42);
   background: color-mix(in srgb, #1f0a0a 92%, var(--color-elevated));
   color: white;
@@ -214,6 +214,7 @@
 @media (max-width: 780px) {
   .ems-critical-banner {
     inset-inline-start: 0;
+    inset-inline-end: 0;
     flex-wrap: wrap;
     min-height: 56px;
   }

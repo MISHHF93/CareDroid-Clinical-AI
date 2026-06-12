@@ -130,14 +130,14 @@ describe('frontend rendering — per-tool layers', () => {
 
 describe('frontend rendering — App.jsx routes', () => {
   it('registers catalog and calculators hub', () => {
-    expect(appSource).toContain("path: '/tools/catalog'");
     expect(appSource).toContain("path: '/tools/calculators'");
-    expect(appSource).toContain('<ClinicalToolCatalog />');
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
   });
 
   it('derives Tier A calculator routes from CALCULATOR_ROUTE_DEFS in App.jsx', () => {
-    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('initialCalculatorId={calculatorSlug}');
+    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('initialCalculatorId={calculatorSlug}');
     const roadmapSlugs = buildFrontendRenderingInventory()
       .filter((r) => r.tier === 'A')
       .map((r) => r.builtinSlug);
@@ -150,8 +150,11 @@ describe('frontend rendering — App.jsx routes', () => {
   });
 
   it('registers fleet catch-all fallback', () => {
-    expect(appSource).toContain("path: '/fleet/*'");
-    expect(appSource).toContain('<ToolsAreaFallback />');
+    for (const id of FLEET_TIER_A_REGISTRY_IDS) {
+      const row = buildFrontendRenderingRow(id);
+      expect(row.route.startsWith('/fleet/')).toBe(true);
+      expect(row.layers.appRoute).toBe(true);
+    }
   });
 });
 

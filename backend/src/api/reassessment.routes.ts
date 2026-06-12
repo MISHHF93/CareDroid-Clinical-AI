@@ -38,7 +38,9 @@ router.post('/:patientId/reassess', async (req, res) => {
 
     return res.json({ message: 'Reassessment recorded', patient });
   } catch (error: any) {
-    return res.status(reassessmentErrorStatus(error)).json({ error: error.message || 'Reassessment failed' });
+    return res
+      .status(reassessmentErrorStatus(error))
+      .json({ error: error.message || 'Reassessment failed' });
   }
 });
 
@@ -54,7 +56,9 @@ router.post('/:patientId/dismiss', async (req, res) => {
     await reassessmentService.dismissReassessment(patientId, reason, clinician);
     return res.json({ message: 'Reassessment dismissed' });
   } catch (error: any) {
-    return res.status(reassessmentErrorStatus(error)).json({ error: error.message || 'Dismissal failed' });
+    return res
+      .status(reassessmentErrorStatus(error))
+      .json({ error: error.message || 'Dismissal failed' });
   }
 });
 

@@ -2,6 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS,
   ROUTE_ALIAS_REDIRECTS,
 } from '../config/routes.config';
 import {
@@ -92,18 +93,31 @@ const BACKEND_ROUTE_PATHS = new Set(BACKEND_HTTP_ROUTES.map((route) => route.pat
 const ROUTE_OWNERSHIP_GROUPS = Object.freeze({
   PlatformGovernanceWorkspace: 'platform-governance-workspace',
   PlatformSystemPage: 'platform-system-page',
-  Calculators: 'calculator-routes',
+  CalculatorInventoryProjection: 'calculator-inventory-projection',
   LegacyProtectedRouteRedirect: 'legacy-redirect',
+  LegacyCalculatorRouteRedirect: 'legacy-redirect',
+  LegacyToolRouteRedirect: 'legacy-redirect',
   Navigate: 'router-redirect',
   ToolNotFound: 'tools-fallback',
   ToolsAreaFallback: 'area-fallback',
+  ToolInventoryProjection: 'tool-inventory-projection',
 });
 
 const SUPPORT_PAGE_PATTERNS = [
   /\.test\.jsx$/,
   /Widgets\.jsx$/,
   /ToolPageLayout\.jsx$/,
+  /ToolsOverview\.jsx$/,
+  /ClinicalToolCatalog\.jsx$/,
+  /ToolNotFound\.jsx$/,
+  /CommercialPageShell\.jsx$/,
   /FleetPageChrome\.jsx$/,
+  /LaboratoryDashboard\.jsx$/,
+  /MedicalSimulationSuite\.jsx$/,
+  /Patients\.jsx$/,
+  /SimulationOutcomes\.jsx$/,
+  /SimulationScenarioPlayer\.jsx$/,
+  /ToolsAreaFallback\.jsx$/,
   /Operations\.jsx$/,
   /platform\/components\//,
   /Calculators\.jsx$/,
@@ -160,6 +174,8 @@ function inferStatus({ path, owner, block, generatedKind }) {
   if (DEPRECATED_LEGACY_PATHS.has(normalized)) return ROUTE_HEALTH_STATES.DEPRECATED;
   if (generatedKind === 'auth-alias' || owner === 'Navigate') return ROUTE_HEALTH_STATES.ALIAS;
   if (owner === 'LegacyProtectedRouteRedirect') return ROUTE_HEALTH_STATES.ALIAS;
+  if (generatedKind === 'calculator-inventory-projection') return ROUTE_HEALTH_STATES.ALIAS;
+  if (generatedKind === 'tool-inventory-projection') return ROUTE_HEALTH_STATES.HIDDEN;
   if (NAVIGATION_VISIBLE_PATHS.has(normalized)) return ROUTE_HEALTH_STATES.ACTIVE;
   if (
     HIDDEN_PATHS.has(normalized) ||
@@ -213,6 +229,11 @@ function generatedAliasEntries() {
       target: alias.to,
       generatedKind: alias.routeId === 'auth' ? 'auth-alias' : `${alias.routeId}-alias`,
     })),
+    ...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map((alias) => ({
+      path: alias.path,
+      target: alias.to,
+      generatedKind: `${alias.routeId}-alias`,
+    })),
     ...LEGACY_CALCULATOR_ROUTE_ALIASES.map((alias) => ({
       path: alias.path,
       target: alias.to,
@@ -229,21 +250,21 @@ function generatedAliasEntries() {
   );
 }
 
-function generatedActiveRouteEntries() {
+function generatedInventoryProjectionEntries() {
   const calculatorEntries = CALCULATOR_ROUTE_DEFS.map((route) =>
     buildRouteEntry({
       path: route.path,
-      source: 'CALCULATOR_ROUTE_DEFS',
-      generatedKind: 'calculator-route',
-      owner: 'Calculators',
+      source: 'calculator-inventory-projection',
+      generatedKind: 'calculator-inventory-projection',
+      owner: 'CalculatorInventoryProjection',
     })
   );
   const toolEntries = REGISTRY_TOOL_PATHS.map((path) =>
     buildRouteEntry({
       path,
-      source: 'tool-inventory-route',
-      generatedKind: 'tool-inventory-route',
-      owner: path.startsWith('/fleet') ? 'FleetRoute' : 'ToolRoute',
+      source: 'tool-inventory-projection',
+      generatedKind: 'tool-inventory-projection',
+      owner: 'ToolInventoryProjection',
     })
   );
   const visibleTools = getFrontendVisibleToolInventory();
@@ -274,9 +295,13 @@ function mergeRouteEntries(entries) {
       ROUTE_HEALTH_STATES.ORPHANED,
     ];
     const preferred =
-      statusPriority.indexOf(entry.status) < statusPriority.indexOf(existing.status)
-        ? entry
-        : existing;
+      existing.source === 'App.jsx' && entry.source !== 'App.jsx'
+        ? existing
+        : entry.source === 'App.jsx' && existing.source !== 'App.jsx'
+          ? entry
+          : statusPriority.indexOf(entry.status) < statusPriority.indexOf(existing.status)
+            ? entry
+            : existing;
     byPath.set(entry.path, {
       ...preferred,
       sources: unique([...(existing.sources || [existing.source]), entry.source]),
@@ -380,7 +405,7 @@ export function buildRouteHealthGraph() {
   const rawRoutes = [
     ...directAppRouteEntries(),
     ...generatedAliasEntries(),
-    ...generatedActiveRouteEntries(),
+    ...generatedInventoryProjectionEntries(),
   ];
   const routes = mergeRouteEntries(rawRoutes);
   const referenced = referencedRoutePaths();

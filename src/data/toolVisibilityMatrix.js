@@ -93,7 +93,13 @@ function appRouteRegistered(path, registryId, builtinSlug) {
   }
   if (builtinSlug) {
     const def = getCalculatorRouteBySlug(builtinSlug);
-    if (def && appSource.includes('CALCULATOR_ROUTE_DEFS.map')) return true;
+    if (
+      def &&
+      appSource.includes("path: '/tools/calculators/:slug'") &&
+      appSource.includes('<LegacyCalculatorRouteRedirect />')
+    ) {
+      return true;
+    }
   }
   return appSource.includes(`path: '${path}'`);
 }

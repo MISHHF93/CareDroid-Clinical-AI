@@ -211,7 +211,8 @@ describe('PR4A ten-area — 8. route resolution', () => {
   it.each(PR4A_TOOL_IDS)('App.jsx mounts calculator routes via CALCULATOR_ROUTE_DEFS for %s', (id) => {
     const path = PR4A_ROUTE_BY_REGISTRY_ID[id];
     expect(matchCalculatorRoute(path)?.calculatorSlug).toBe(id);
-    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
   });
 });
 

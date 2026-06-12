@@ -10,6 +10,11 @@ const layoutTokensCss = readFileSync(join(__dirname, '../styles/layout-breakpoin
 const indexCss = readFileSync(join(__dirname, '../index.css'), 'utf8');
 const appShellJsx = readFileSync(join(__dirname, 'AppShell.jsx'), 'utf8');
 const appJsx = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
+const crisisModeCss = readFileSync(join(__dirname, '../components/CrisisMode.css'), 'utf8');
+const emsCriticalBroadcastCss = readFileSync(
+  join(__dirname, '../components/EMSCriticalBroadcast.css'),
+  'utf8'
+);
 
 describe('single AppShell contract', () => {
   it('keeps AppShell as the only route shell wrapper', () => {
@@ -60,6 +65,20 @@ describe('single AppShell contract', () => {
     expect(layoutTokensCss).toContain('--app-compact-content-offset-top');
     expect(COMPACT_MEDIA_QUERY).toBe('(max-width: 900px)');
     expect(appShellCss).toContain('@media (max-width: 1024px)');
+  });
+
+  it('reserves right-side alarm lanes for stroke checklist, crisis actions, and toasts', () => {
+    expect(appShellCss).toContain('--ed-right-alarm-lane-width');
+    expect(appShellCss).toContain('--ed-crisis-action-panel-width');
+    expect(emsCriticalBroadcastCss).toMatch(
+      /\.ems-critical-banner\s*\{[\s\S]*inset-inline:\s*var\(--ed-rail-width,\s*56px\)\s+var\(--ed-right-alarm-lane-width,\s*360px\)/
+    );
+    expect(emsCriticalBroadcastCss).toMatch(
+      /\.ems-critical-checklist\s*\{[\s\S]*width:\s*var\(--ed-right-alarm-lane-width/
+    );
+    expect(crisisModeCss).toContain('.ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel');
+    expect(appShellCss).toContain('.ed-os-shell:has(.ems-critical-checklist) .ed-whiteboard__detail-overlay');
+    expect(appShellCss).toContain('.ed-os-shell:has(.ems-critical-checklist) .ed-alert-toast-stack');
   });
 
   it('provides a WCAG bypass link and programmatic main focus target', () => {

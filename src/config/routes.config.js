@@ -200,6 +200,75 @@ export const AUDIT_ROUTE_ALIASES = Object.freeze(['/audit-logs']);
 export const HOME_ROUTE_ALIASES = Object.freeze(['/dashboard', '/home', '/workspace', '/app', '/whiteboard']);
 export const ORGANIZATION_PACKS_ROUTE_ALIASES = Object.freeze([]);
 
+export const LEGACY_EMERGENCY_ROUTE_REDIRECTS = Object.freeze([
+  ['/auth', CANONICAL_ROUTES.emergencyWhiteboard],
+  ['/ems', CANONICAL_ROUTES.emergencyEms],
+  ['/intake', CANONICAL_ROUTES.emergencyIntake],
+  ['/queues', CANONICAL_ROUTES.emergencyQueues],
+  ['/queue', CANONICAL_ROUTES.emergencyQueues],
+  ['/reassessment', CANONICAL_ROUTES.emergencyReassessment],
+  ['/capacity', CANONICAL_ROUTES.emergencyCapacity],
+  ['/boarding', CANONICAL_ROUTES.emergencyBoarding],
+  ['/referrals', CANONICAL_ROUTES.emergencyReferrals],
+  ['/analytics', CANONICAL_ROUTES.emergencyAnalytics],
+  ['/emergency/smart-intake', CANONICAL_ROUTES.emergencyIntake],
+  ['/emergency/queue', CANONICAL_ROUTES.emergencyQueues],
+  ['/emergency/command-center', CANONICAL_ROUTES.emergencyWhiteboard],
+  ['/workspace/emergency/pulse', '/emergency/pulse'],
+  ['/workspace/emergency/charge-nurse', '/emergency/pulse'],
+  ['/workspace/emergency', CANONICAL_ROUTES.emergencyWhiteboard],
+  ['/workspace/emergency/whiteboard', CANONICAL_ROUTES.emergencyWhiteboard],
+  ['/workspace/emergency/intake', CANONICAL_ROUTES.emergencyIntake],
+  ['/workspace/emergency/patients', CANONICAL_ROUTES.emergencyPatients],
+  ['/workspace/emergency/queue', CANONICAL_ROUTES.emergencyQueues],
+  ['/workspace/emergency/queues', CANONICAL_ROUTES.emergencyQueues],
+  ['/workspace/emergency/ems', CANONICAL_ROUTES.emergencyEms],
+  ['/workspace/emergency/referrals', CANONICAL_ROUTES.emergencyReferrals],
+  ['/workspace/emergency/capacity', CANONICAL_ROUTES.emergencyCapacity],
+  ['/workspace/emergency/boarding', CANONICAL_ROUTES.emergencyBoarding],
+  ['/workspace/emergency/tools', CANONICAL_ROUTES.emergencyCopilot],
+  ['/workspace/emergency/shift-summary', '/emergency/shift'],
+  ['/workspace/emergency/shift', '/emergency/shift'],
+  ['/workspace/emergency/settings', CANONICAL_ROUTES.emergencySettings],
+  ['/workspace/emergency/copilot', CANONICAL_ROUTES.emergencyCopilot],
+  ['/workspace/emergency/command-center', CANONICAL_ROUTES.emergencyWhiteboard],
+  ['/patients', CANONICAL_ROUTES.emergencyPatients],
+  ['/patients/*', CANONICAL_ROUTES.emergencyPatients],
+  ['/settings', CANONICAL_ROUTES.emergencySettings],
+  ['/settings/general', CANONICAL_ROUTES.emergencySettings],
+  ['/settings/thresholds', CANONICAL_ROUTES.emergencySettings],
+  ['/settings/staff', CANONICAL_ROUTES.emergencySettings],
+  ['/settings/integrations', CANONICAL_ROUTES.emergencySettings],
+].map(([path, to]) =>
+  Object.freeze({
+    path,
+    to,
+    routeId: 'legacy-emergency',
+    auth: 'required',
+  })
+));
+
+export const WORKSPACE_EMERGENCY_SUBPAGE_REDIRECTS = Object.freeze({
+  whiteboard: CANONICAL_ROUTES.emergencyWhiteboard,
+  patients: CANONICAL_ROUTES.emergencyPatients,
+  queues: CANONICAL_ROUTES.emergencyQueues,
+  queue: CANONICAL_ROUTES.emergencyQueues,
+  reassessment: CANONICAL_ROUTES.emergencyReassessment,
+  ems: CANONICAL_ROUTES.emergencyEms,
+  referrals: CANONICAL_ROUTES.emergencyReferrals,
+  capacity: CANONICAL_ROUTES.emergencyCapacity,
+  boarding: CANONICAL_ROUTES.emergencyBoarding,
+  analytics: CANONICAL_ROUTES.emergencyAnalytics,
+  pulse: '/emergency/pulse',
+  'department-pulse': '/emergency/pulse',
+  'shift-summary': '/emergency/shift',
+  shift: '/emergency/shift',
+  intake: CANONICAL_ROUTES.emergencyIntake,
+  'smart-intake': CANONICAL_ROUTES.emergencyIntake,
+  'command-center': CANONICAL_ROUTES.emergencyWhiteboard,
+  copilot: CANONICAL_ROUTES.emergencyCopilot,
+});
+
 export const ROUTE_RECORDS = Object.freeze([
   Object.freeze({
     id: 'auth',

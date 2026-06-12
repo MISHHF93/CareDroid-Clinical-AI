@@ -1,9 +1,9 @@
 import React from 'react';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it } from 'vitest';
 import EmergencyWhiteboard from './EmergencyWhiteboard';
-import { selectFilteredPatients, useEmergencyStore } from '../../store/emergencyStore';
+import { useEmergencyStore } from '../../store/emergencyStore';
 import { PatientState } from '../../types/emergency';
 
 const originalState = useEmergencyStore.getState();
@@ -23,24 +23,27 @@ describe('EmergencyWhiteboard store reactivity', () => {
       );
     });
 
-    const patient = selectFilteredPatients(useEmergencyStore.getState())[0];
-    const patientName = `${patient.firstName} ${patient.lastName}`;
-    const patientButtonName = `Open details for ${patientName}`;
-
     render(
       <MemoryRouter>
         <EmergencyWhiteboard />
       </MemoryRouter>
     );
 
-    expect(await screen.findByRole('button', { name: patientButtonName })).toBeInTheDocument();
+    let patientCard;
+    await waitFor(() => {
+      patientCard = document.querySelector('[data-patient-card-id]');
+      expect(patientCard).toBeTruthy();
+    });
+    const patientId = patientCard.dataset.patientCardId;
+
+    expect(patientId).toBeTruthy();
 
     act(() => {
-      useEmergencyStore.getState().movePatientToState(patient.id, PatientState.Discharge);
+      useEmergencyStore.getState().movePatientToState(patientId, PatientState.Discharge);
     });
 
     await waitFor(() => {
-      expect(screen.queryByRole('button', { name: patientButtonName })).not.toBeInTheDocument();
+      expect(document.querySelector(`[data-patient-card-id="${patientId}"]`)).not.toBeInTheDocument();
     });
   });
 });

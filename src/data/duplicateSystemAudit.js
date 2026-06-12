@@ -74,14 +74,14 @@ export const DUPLICATE_AUDIT_SECTIONS = Object.freeze([
         name: 'Calculator deep links',
         instances: [
           'clinicalToolRoutes.js → CALCULATOR_ROUTE_DEFS',
-          'App.jsx CALCULATOR_ROUTE_DEFS.map',
+          'App.jsx LegacyCalculatorRouteRedirect for /tools/calculators',
           'toolInventory per-tool `route`',
         ],
         overlap: CALCULATOR_ROUTE_DEFS.length,
         risk: 'Slug/path mismatch between hub and inventory',
         action: 'merge',
         recommendation:
-          'Canonical: `toolInventory.js` records; project routes via `clinicalToolRoutes.js` only.',
+          'Canonical: `clinicalToolRoutes.js` indexes calculator slugs; App.jsx keeps one Copilot redirect surface for calculator paths.',
       },
       {
         name: 'Pack marketplace URLs',

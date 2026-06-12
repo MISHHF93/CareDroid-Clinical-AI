@@ -55,11 +55,11 @@ describe('Calculators.jsx route wiring', () => {
     expect(ROADMAP_FRONTEND_REGISTRY_IDS.length).toBe(25);
   });
 
-  it('registers calculators hub and catalog in App.jsx', () => {
+  it('registers calculator hub redirects in App.jsx', () => {
     expect(appSource).toContain("path: '/tools/calculators'");
     expect(appSource).toContain("path: '/tools/calculators/:slug'");
-    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('initialCalculatorId={calculatorSlug}');
-    expect(appSource).toContain("path: '/tools/catalog'");
+    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).not.toContain('initialCalculatorId={calculatorSlug}');
   });
 });

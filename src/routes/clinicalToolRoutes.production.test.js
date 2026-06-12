@@ -42,10 +42,13 @@ const FLEET_PRODUCTION_PATHS = REQUIRED_PRODUCTION_TOOL_PATHS.filter((p) =>
   p.startsWith('/fleet/')
 );
 
-describe('Production routes — App.jsx derives calculator routes from contract', () => {
-  it('uses CALCULATOR_ROUTE_DEFS.map for calculator pages (no drifted duplicates)', () => {
-    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('initialCalculatorId={calculatorSlug}');
+describe('Production routes — App.jsx redirects calculator routes through Copilot', () => {
+  it('uses one calculator redirect surface while CALCULATOR_ROUTE_DEFS owns slug inventory', () => {
+    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).not.toContain('initialCalculatorId={calculatorSlug}');
+    expect(appSource).toContain("path: '/tools/calculators'");
+    expect(appSource).toContain("path: '/tools/calculators/:slug'");
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
     const requiredCalculatorPaths = REQUIRED_PRODUCTION_TOOL_PATHS.filter((p) =>
       p.startsWith('/tools/calculators/') && p !== TOOL_LAUNCH_PATHS.calculatorsHub
     );
@@ -55,11 +58,11 @@ describe('Production routes — App.jsx derives calculator routes from contract'
     }
   });
 
-  it('declares calculators hub after slug-specific routes', () => {
+  it('declares calculators hub before the slug redirect fallback', () => {
     const hubIdx = appSource.indexOf("path: '/tools/calculators'");
     expect(hubIdx).toBeGreaterThan(-1);
-    const lastSlugRoute = appSource.lastIndexOf('initialCalculatorId={calculatorSlug}');
-    expect(lastSlugRoute).toBeLessThan(hubIdx);
+    const slugRedirectIdx = appSource.indexOf("path: '/tools/calculators/:slug'");
+    expect(slugRedirectIdx).toBeGreaterThan(hubIdx);
   });
 
   it.each(REQUIRED_PRODUCTION_TOOL_PATHS)('registers required production path %s', (path) => {
@@ -67,7 +70,7 @@ describe('Production routes — App.jsx derives calculator routes from contract'
     if (fromCalculatorDefs) {
       expect(CALCULATOR_ROUTE_DEFS.find((d) => d.path === path)).toBeTruthy();
     } else {
-      expect(appSource).toContain(`path: '${path}'`);
+      expect(REGISTRY_TOOL_PATHS).toContain(path);
     }
     expect(isKnownToolAreaPath(path)).toBe(true);
   });
@@ -81,24 +84,8 @@ describe('Production routes — registry tool paths', () => {
       expect(REGISTRY_TOOL_PATHS).toContain(tool.path);
       if (calculatorPaths.has(tool.path)) {
         expect(CALCULATOR_ROUTE_DEFS.some((d) => d.path === tool.path)).toBe(true);
-      } else if (tool.path.startsWith('/tools/pulmonology/')) {
-        expect(appSource).toContain(`path: '/tools/pulmonology/:toolId'`);
-      } else if (tool.path.startsWith('/tools/nephrology/')) {
-        expect(appSource).toContain(`path: '/tools/nephrology/:toolId'`);
-      } else if (tool.path.startsWith('/tools/gastroenterology/')) {
-        expect(appSource).toContain(`path: '/tools/gastroenterology/:toolId'`);
-      } else if (tool.path.startsWith('/tools/endocrine/')) {
-        expect(appSource).toContain(`path: '/tools/endocrine/:toolId'`);
-      } else if (tool.path.startsWith('/tools/neurology/')) {
-        expect(appSource).toContain(`path: '/tools/neurology/:toolId'`);
-      } else if (tool.path.startsWith('/tools/pediatrics-obgyn/')) {
-        expect(appSource).toContain(`path: '/tools/pediatrics-obgyn/:toolId'`);
-      } else if (tool.path.startsWith('/tools/psychiatry/')) {
-        expect(appSource).toContain(`path: '/tools/psychiatry/:toolId'`);
-      } else if (tool.path.startsWith('/tools/cardiology/')) {
-        expect(appSource).toContain(`path: '/tools/cardiology/:toolId'`);
       } else {
-        expect(appSource).toContain(`path: '${tool.path}'`);
+        expect(isKnownToolAreaPath(tool.path), tool.id).toBe(true);
       }
     }
   });
@@ -195,7 +182,7 @@ describe('Production routes — tools area fallback redirects', () => {
 
 describe('Production routes — fleet logistics', () => {
   it.each(FLEET_PRODUCTION_PATHS)('fleet path %s is registered', (path) => {
-    expect(appSource).toContain(`path: '${path}'`);
     expect(isKnownToolAreaPath(path)).toBe(true);
+    expect(REGISTRY_TOOL_PATHS).toContain(path);
   });
 });

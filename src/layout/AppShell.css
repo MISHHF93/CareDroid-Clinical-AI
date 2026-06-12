@@ -3,6 +3,9 @@
   --ed-header-height: 48px;
   --ed-copilot-width: 380px;
   --ed-copilot-collapsed-width: 44px;
+  --ed-critical-ems-banner-height: 44px;
+  --ed-right-alarm-lane-width: min(360px, calc(100vw - var(--ed-rail-width)));
+  --ed-crisis-action-panel-width: min(420px, calc(100vw - var(--ed-rail-width)));
 
   display: grid;
   grid-template-columns: var(--ed-rail-width) minmax(0, 1fr);
@@ -724,6 +727,7 @@
   transition:
     opacity 160ms var(--ease-smooth, ease),
     transform 160ms var(--ease-smooth, ease),
+    inset-inline-end 160ms var(--ease-smooth, ease),
     visibility 0ms linear 160ms;
 }
 
@@ -1248,6 +1252,48 @@
   display: grid;
   gap: var(--space-2);
   width: min(420px, calc(100vw - 32px));
+}
+
+.ed-os-shell:has(.ems-critical-checklist) .capacity-detail-panel {
+  inset-inline-end: var(--ed-right-alarm-lane-width);
+  width: min(440px, calc(100vw - var(--ed-rail-width) - var(--ed-right-alarm-lane-width)));
+}
+
+.ed-os-shell:has(.crisis-action-panel):not(:has(.ems-critical-checklist)) .capacity-detail-panel {
+  inset-inline-end: var(--ed-crisis-action-panel-width);
+  width: min(440px, calc(100vw - var(--ed-rail-width) - var(--ed-crisis-action-panel-width)));
+}
+
+.ed-os-shell:has(.ems-critical-banner) .ed-os-main {
+  scroll-padding-block-start: calc(var(--ed-critical-ems-banner-height) + var(--space-3));
+}
+
+.ed-os-shell:has(.ems-critical-checklist) .ed-whiteboard {
+  padding-block-start: var(--ed-critical-ems-banner-height);
+}
+
+.ed-os-shell:has(.ems-critical-checklist) .ed-whiteboard__detail-overlay {
+  inset-inline-end: calc(var(--space-3) + var(--ed-right-alarm-lane-width));
+  width: min(400px, calc(100vw - var(--ed-rail-width) - var(--ed-right-alarm-lane-width) - 48px));
+  min-width: min(340px, calc(100vw - var(--ed-rail-width) - var(--ed-right-alarm-lane-width) - 48px));
+}
+
+.ed-os-shell:has(.crisis-action-panel):not(:has(.ems-critical-checklist)) .ed-whiteboard__detail-overlay {
+  inset-inline-end: calc(var(--space-3) + var(--ed-crisis-action-panel-width));
+  width: min(400px, calc(100vw - var(--ed-rail-width) - var(--ed-crisis-action-panel-width) - 48px));
+  min-width: min(340px, calc(100vw - var(--ed-rail-width) - var(--ed-crisis-action-panel-width) - 48px));
+}
+
+.ed-os-shell:has(.ems-critical-checklist) .ed-alert-toast-stack {
+  inset-block-start: calc(var(--ed-header-height) + var(--ed-critical-ems-banner-height) + var(--space-4));
+  inset-block-end: auto;
+  inset-inline-end: calc(var(--ed-right-alarm-lane-width) + var(--space-4));
+  width: min(360px, calc(100vw - var(--ed-rail-width) - var(--ed-right-alarm-lane-width) - 32px));
+}
+
+.ed-os-shell:has(.crisis-action-panel):not(:has(.ems-critical-checklist)) .ed-alert-toast-stack {
+  inset-inline-end: calc(var(--ed-crisis-action-panel-width) + var(--space-4));
+  width: min(360px, calc(100vw - var(--ed-rail-width) - var(--ed-crisis-action-panel-width) - 32px));
 }
 
 .ed-critical-vitals-banner {
@@ -2206,6 +2252,25 @@
     border-left: 0;
     border-radius: 0;
     box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  }
+
+  .ed-os-shell:has(.ems-critical-checklist) .capacity-detail-panel,
+  .ed-os-shell:has(.crisis-action-panel):not(:has(.ems-critical-checklist)) .capacity-detail-panel {
+    inset: 0;
+    width: auto;
+  }
+
+  .ed-os-shell:has(.ems-critical-checklist) .ed-whiteboard,
+  .ed-os-shell:has(.ems-critical-banner) .ed-whiteboard {
+    padding-block-start: 0;
+  }
+
+  .ed-os-shell:has(.ems-critical-checklist) .ed-alert-toast-stack {
+    inset-block-start: auto;
+    inset-inline-end: var(--space-3);
+    inset-inline-start: var(--space-3);
+    inset-block-end: calc(64px + env(safe-area-inset-bottom, 0px) + var(--space-3));
+    width: auto;
   }
 
   .ed-alert-drawer {

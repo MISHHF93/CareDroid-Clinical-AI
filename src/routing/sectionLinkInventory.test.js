@@ -8,7 +8,10 @@ import {
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
 } from '../config/navigation.config';
-import { PROTECTED_ROUTE_ALIAS_REDIRECTS } from '../config/routes.config';
+import {
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  PROTECTED_ROUTE_ALIAS_REDIRECTS,
+} from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
@@ -102,7 +105,14 @@ describe('section link inventory and route flattening', () => {
 
   it('preserves legacy route aliases as redirects, not duplicate user-facing pages', () => {
     const app = read('App.jsx');
-    expect(app).toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
+    expect(app).not.toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
+    expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/emergency/smart-intake', to: '/emergency/intake' }),
+        expect.objectContaining({ path: '/patients/*', to: '/emergency/patients' }),
+        expect.objectContaining({ path: '/workspace/emergency/tools', to: '/emergency/copilot' }),
+      ])
+    );
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/home', to: '/emergency/whiteboard' }),
@@ -111,7 +121,7 @@ describe('section link inventory and route flattening', () => {
     );
     expect(app).toContain("path: '/tools/calculators/:slug'");
     expect(app).toContain('<LegacyCalculatorRouteRedirect />');
-    expect(app).toContain('...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({');
+    expect(app).toContain('...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => ({');
     expect(app).toContain('...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({');
     expect(app).not.toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
     expect(app).not.toContain("path: '/home', element: <AppShellPage>");

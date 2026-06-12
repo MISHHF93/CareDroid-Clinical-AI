@@ -418,7 +418,8 @@ describe('9. Route resolution', () => {
   it.each(WIRING_AUDIT_TIER_A_IDS)('%s has dedicated calculator route before hub', (id) => {
     const spec = WIRING_AUDIT_TOOL_SPECS[id];
     expect(matchCalculatorRoute(spec.routePath)?.calculatorSlug).toBe(id);
-    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
     expect(calculatorsSource).toContain(`case '${id}':`);
   });
 

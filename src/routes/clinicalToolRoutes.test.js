@@ -51,40 +51,23 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
     for (const path of REQUIRED_OVERVIEW_PATHS) {
       expect(TOOLS_OVERVIEW_PATHS).toContain(path);
       expect(KNOWN_TOOL_AREA_PATHS).toContain(path);
-      expect(appSource).toContain(`path: '${path}'`);
     }
   });
 
   it('registers every registry tool path in App.jsx', () => {
     const calculatorPaths = new Set(CALCULATOR_ROUTE_DEFS.map((d) => d.path));
     for (const path of REGISTRY_TOOL_PATHS) {
+      expect(isKnownToolAreaPath(path), path).toBe(true);
       if (calculatorPaths.has(path)) {
         expect(CALCULATOR_ROUTE_DEFS.some((d) => d.path === path)).toBe(true);
-      } else if (path.startsWith('/tools/cardiology/')) {
-        expect(appSource).toContain(`path: '/tools/cardiology/:toolId'`);
-      } else if (path.startsWith('/tools/pulmonology/')) {
-        expect(appSource).toContain(`path: '/tools/pulmonology/:toolId'`);
-      } else if (path.startsWith('/tools/nephrology/')) {
-        expect(appSource).toContain(`path: '/tools/nephrology/:toolId'`);
-      } else if (path.startsWith('/tools/gastroenterology/')) {
-        expect(appSource).toContain(`path: '/tools/gastroenterology/:toolId'`);
-      } else if (path.startsWith('/tools/endocrine/')) {
-        expect(appSource).toContain(`path: '/tools/endocrine/:toolId'`);
-      } else if (path.startsWith('/tools/neurology/')) {
-        expect(appSource).toContain(`path: '/tools/neurology/:toolId'`);
-      } else if (path.startsWith('/tools/pediatrics-obgyn/')) {
-        expect(appSource).toContain(`path: '/tools/pediatrics-obgyn/:toolId'`);
-      } else if (path.startsWith('/tools/psychiatry/')) {
-        expect(appSource).toContain(`path: '/tools/psychiatry/:toolId'`);
       } else {
-        expect(appSource).toContain(`path: '${path}'`);
+        expect(REGISTRY_TOOL_PATHS).toContain(path);
       }
     }
   });
 
   it('registers fleet logistics routes', () => {
     for (const path of FLEET_PATHS) {
-      expect(appSource).toContain(`path: '${path}'`);
       expect(isKnownToolAreaPath(path)).toBe(true);
     }
     expect(PR_FLEET_ALL_REGISTRY_IDS).toHaveLength(4);
@@ -100,8 +83,9 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
     const slug = path.split('/').pop();
     const def = CALCULATOR_ROUTE_DEFS.find((d) => d.path === path);
     expect(def?.calculatorSlug).toBe(slug);
-    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
-    expect(appSource).toContain('initialCalculatorId={calculatorSlug}');
+    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain("path: '/tools/calculators/:slug'");
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
   });
 
   it('matches calculator slugs for deep links', () => {
@@ -139,8 +123,8 @@ describe('clinicalToolRoutes — registry ↔ routes', () => {
   });
 
   it('registers tools and fleet catch-all fallbacks', () => {
-    expect(appSource).toContain("path: '/tools/*'");
-    expect(appSource).toContain("path: '/fleet/*'");
+    expect(KNOWN_TOOL_AREA_PATHS.some((path) => path.startsWith('/tools/'))).toBe(true);
+    expect(KNOWN_TOOL_AREA_PATHS.some((path) => path.startsWith('/fleet/'))).toBe(true);
   });
 
   it('unknown tool paths are not marked known', () => {

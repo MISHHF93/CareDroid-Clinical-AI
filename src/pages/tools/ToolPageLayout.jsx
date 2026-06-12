@@ -158,7 +158,7 @@ const ToolPageLayout = ({
 
   return (
     <PageShell
-      as={embedded ? 'section' : 'main'}
+      as="section"
       className={`tool-page${embedded ? ' tool-page--embedded' : ''}`}
       contentClassName="cd-page-stack cd-page-stack--compact tool-page__content"
       title={tool.name}

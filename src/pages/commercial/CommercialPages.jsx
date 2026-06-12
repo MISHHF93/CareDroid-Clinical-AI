@@ -6,8 +6,8 @@ import {
   BadgeList,
   InsightCard,
   MetricCard,
-  PageShell as CanonicalPageShell,
 } from '../../components/ui/CareDroidPrimitives';
+import PageShell from './CommercialPageShell';
 import { useUserIdentity } from '../../contexts/UserIdentityContext';
 import { ProductCatalogApi } from '../../services/productCatalogApi';
 import { PlatformAssetsApi } from '../../services/platformAssetsApi';
@@ -102,22 +102,6 @@ const SOLUTION_AGENT_OPTIONS = [
   'agent-research',
   'agent-governance',
 ];
-
-function PageShell({ title, subtitle, children, actions }) {
-  return (
-    <CanonicalPageShell
-      as="div"
-      className="commercial-page"
-      headerClassName="commercial-header"
-      contentClassName="cd-page-stack cd-page-stack--compact commercial-page__content"
-      title={title}
-      description={subtitle}
-      actions={actions}
-    >
-      {children}
-    </CanonicalPageShell>
-  );
-}
 
 function ChipList({ items = [] }) {
   return <BadgeList items={items} className="commercial-chip-list" itemClassName="commercial-chip" />;
@@ -2758,11 +2742,10 @@ export function OrganizationOnboardingPage() {
   }
 
   return (
-    <div className="commercial-page">
-      <header className="commercial-header">
-        <h1>Organization onboarding</h1>
-        <p className="commercial-subtitle">Configure your CareDroid deployment in minutes.</p>
-      </header>
+    <PageShell
+      title="Organization onboarding"
+      subtitle="Configure your CareDroid deployment in minutes."
+    >
       <div className="commercial-steps">
         {ONBOARDING_STEPS.map((label, idx) => (
           <span
@@ -2792,6 +2775,6 @@ export function OrganizationOnboardingPage() {
           )}
         </div>
       </Card>
-    </div>
+    </PageShell>
   );
 }

@@ -248,7 +248,8 @@ describe('PR2 coverage — invalid input handling (MELD)', () => {
 
 describe('PR2 coverage — registry & routes', () => {
   it('registers Tier-A calculator routes via CALCULATOR_ROUTE_DEFS before hub', () => {
-    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
     for (const id of PR2_TIER_A_CALCULATOR_REGISTRY_IDS) {
       expect(matchCalculatorRoute(`${HUB}/${id}`)?.calculatorSlug).toBe(id);
     }

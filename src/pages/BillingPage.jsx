@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Card from '../components/ui/card';
 import Button from '../components/ui/button';
 import { useTenantContext } from '../contexts/TenantContext';
+import PageShell from './commercial/CommercialPageShell';
 import {
   createCheckoutSession,
   createCustomerPortalSession,
@@ -56,19 +57,16 @@ export default function BillingPage() {
   };
 
   if (isLoading) {
-    return <div className="commercial-page">Loading billing overview...</div>;
+    return <PageShell title="Billing" subtitle="Loading billing overview..." />;
   }
 
   return (
-    <div className="commercial-page">
-      <header className="commercial-header">
-        <h1>Billing</h1>
-        <p className="commercial-subtitle">
-          Manage subscription plan, billing status, and monthly usage limits for{' '}
-          {tenantContext?.organizationName || 'this organization'}.
-        </p>
-      </header>
-
+    <PageShell
+      title="Billing"
+      subtitle={`Manage subscription plan, billing status, and monthly usage limits for ${
+        tenantContext?.organizationName || 'this organization'
+      }.`}
+    >
       {error && <p style={{ color: '#ff6b6b' }}>{error}</p>}
 
       <div className="commercial-grid">
@@ -128,6 +126,6 @@ export default function BillingPage() {
           ))}
         </div>
       </section>
-    </div>
+    </PageShell>
   );
 }

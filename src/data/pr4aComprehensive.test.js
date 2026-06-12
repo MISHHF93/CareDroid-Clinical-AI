@@ -352,7 +352,8 @@ describe('PR4A comprehensive — 8. route resolution', () => {
   });
 
   it('registers dedicated calculator routes via CALCULATOR_ROUTE_DEFS before hub', () => {
-    expect(appSource).toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).not.toContain('CALCULATOR_ROUTE_DEFS.map');
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
     for (const id of PR4A_TOOL_IDS) {
       expect(matchCalculatorRoute(PR4A_ROUTE_BY_REGISTRY_ID[id])?.calculatorSlug).toBe(id);
     }

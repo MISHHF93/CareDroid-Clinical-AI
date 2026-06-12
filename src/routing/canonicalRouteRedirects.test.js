@@ -2,7 +2,11 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_APP_ROUTE_TREE, PROTECTED_ROUTE_ALIAS_REDIRECTS } from '../config/routes.config';
+import {
+  CANONICAL_APP_ROUTE_TREE,
+  LEGACY_EMERGENCY_ROUTE_REDIRECTS,
+  PROTECTED_ROUTE_ALIAS_REDIRECTS,
+} from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -50,7 +54,14 @@ describe('canonical route tree', () => {
   });
 
   it('redirects duplicates and legacy aliases to canonical routes', () => {
-    expect(appSource).toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
+    expect(appSource).not.toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
+    expect(LEGACY_EMERGENCY_ROUTE_REDIRECTS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/emergency/queue', to: '/emergency/queues' }),
+        expect.objectContaining({ path: '/workspace/emergency', to: '/emergency/whiteboard' }),
+        expect.objectContaining({ path: '/settings/general', to: '/emergency/settings' }),
+      ])
+    );
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ path: '/dashboard', to: '/emergency/whiteboard' }),
@@ -58,12 +69,11 @@ describe('canonical route tree', () => {
         expect.objectContaining({ path: '/tools', to: '/emergency/copilot' }),
       ])
     );
-    expect(appSource).toContain("['/emergency/queue', '/emergency/queues']");
     expect(appSource).toContain("path: '/tools/calculators/:slug'");
     expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
     expect(appSource).toContain("path: '/tools/drug-checker'");
     expect(appSource).toContain('<LegacyToolRouteRedirect toolId="drug-check" />');
-    expect(appSource).toContain('...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({');
+    expect(appSource).toContain('...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => ({');
   });
 
   it('redirects non-canonical modules back to the Emergency OS whiteboard', () => {

@@ -89,14 +89,18 @@
 .crisis-action-panel {
   position: fixed;
   inset: 0 0 0 auto;
-  z-index: 80;
+  z-index: 960;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  width: min(480px, 100vw);
+  width: var(--ed-crisis-action-panel-width, min(420px, 100vw));
   border-left: 1px solid var(--color-border-default);
   background: var(--color-surface);
   color: var(--color-text-primary);
   box-shadow: -24px 0 60px rgba(0, 0, 0, 0.48);
+  transition:
+    inset-inline-end 180ms var(--ease-smooth, ease),
+    width 180ms var(--ease-smooth, ease),
+    height 180ms var(--ease-smooth, ease);
 }
 
 .crisis-action-panel header {
@@ -233,5 +237,41 @@
   .crisis-mode-banner__actions,
   .crisis-action-panel__escalation {
     width: 100%;
+  }
+}
+
+.ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel {
+  inset-block-start: calc(var(--ed-header-height, 48px) + var(--ed-critical-ems-banner-height, 44px));
+  inset-inline-end: var(--ed-right-alarm-lane-width, 360px);
+  width: min(320px, calc(100vw - var(--ed-rail-width, 56px) - var(--ed-right-alarm-lane-width, 360px)));
+}
+
+@media (max-width: 1280px) {
+  .ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel {
+    inset-block: auto 0;
+    inset-inline: var(--ed-rail-width, 56px) var(--ed-right-alarm-lane-width, 360px);
+    z-index: 1240;
+    width: auto;
+    height: min(42vh, 360px);
+    border-top: 1px solid var(--color-border-default);
+    border-left: 0;
+    box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.5);
+  }
+
+  .ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel header {
+    padding-block: var(--space-3);
+  }
+}
+
+@media (max-width: 900px) {
+  .ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel {
+    inset-inline-start: 0;
+  }
+}
+
+@media (max-width: 780px) {
+  .ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel {
+    inset-inline-end: 0;
+    height: min(46vh, 380px);
   }
 }

@@ -15,7 +15,9 @@ const smartIntakeErrorStatus = (error: any) => {
 };
 
 const sendSmartIntakeError = (res: any, error: any) =>
-  res.status(smartIntakeErrorStatus(error)).json({ error: error.message || 'Smart Intake request failed' });
+  res
+    .status(smartIntakeErrorStatus(error))
+    .json({ error: error.message || 'Smart Intake request failed' });
 
 router.post('/sessions', async (req, res) => {
   try {
