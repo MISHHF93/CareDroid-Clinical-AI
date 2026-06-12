@@ -43,6 +43,12 @@ import ProtocolSuggestion, {
   createProtocolLaunchEvent,
   getProtocolSuggestions,
 } from './ProtocolSuggestion';
+import {
+  generateDifferentialAi,
+  generateOrderSetAi,
+  generatePatientSummaryAi,
+  queryGuidelineEvidence,
+} from '../services/clinicalIntelligenceApi';
 import { formatScoreAge, getRecentSavedScores, getSavedScores } from '../utils/clinicalScoreEvents';
 import { getAutoScorePrefill } from '../utils/autoScorePopulator';
 import { activeReassessmentReminders, hasDueReassessmentReminder, reminderStage } from '../utils/reassessmentScheduler';
@@ -89,6 +95,71 @@ const SCORE_OPTIONS = [
   { id: 'heart', label: 'HEART Score' },
   { id: 'qsofa', label: 'qSOFA' },
   { id: 'nihss', label: 'NIHSS' },
+];
+const INLINE_SCORE_IDS = new Set(SCORE_OPTIONS.map((score) => score.id));
+const SCORE_LAUNCH_GROUPS = [
+  {
+    id: 'recommended',
+    label: 'Complaint fit',
+    matches: () => true,
+    tools: [],
+  },
+  {
+    id: 'respiratory',
+    label: 'Respiratory',
+    matches: (patient) => /breath|resp|copd|asthma|hypox|pneumonia|pe\b|oxygen/i.test(
+      `${patient.complaintCategory || ''} ${patient.chiefComplaint || ''}`
+    ),
+    tools: [
+      { id: 'qsofa', label: 'qSOFA', inlineId: 'qsofa' },
+      { id: 'news2', label: 'NEWS2' },
+      { id: 'rox-index', label: 'ROX' },
+      { id: 'pao2-fio2-ratio', label: 'PaO2/FiO2' },
+      { id: 'wells-pe', label: 'Wells PE' },
+      { id: 'perc', label: 'PERC' },
+    ],
+  },
+  {
+    id: 'cardiac',
+    label: 'Cardiac',
+    matches: (patient) => /chest|cardiac|acs|stemi|nstemi|mi\b|syncope/i.test(
+      `${patient.complaintCategory || ''} ${patient.chiefComplaint || ''}`
+    ),
+    tools: [
+      { id: 'heart-score', label: 'HEART', inlineId: 'heart' },
+      { id: 'timi-ua-nstemi', label: 'TIMI' },
+      { id: 'grace-acs', label: 'GRACE ACS' },
+    ],
+  },
+  {
+    id: 'neuro',
+    label: 'Neuro',
+    matches: (patient) => /stroke|neuro|weakness|aphasia|seizure|headache|tia/i.test(
+      `${patient.complaintCategory || ''} ${patient.chiefComplaint || ''}`
+    ),
+    tools: [
+      { id: 'nihss', label: 'NIHSS', inlineId: 'nihss' },
+      { id: 'abcd2', label: 'ABCD2' },
+      { id: 'gcs', label: 'GCS' },
+    ],
+  },
+  {
+    id: 'critical-care',
+    label: 'Critical care',
+    matches: () => true,
+    tools: [
+      { id: 'qsofa', label: 'qSOFA', inlineId: 'qsofa' },
+      { id: 'sofa', label: 'SOFA' },
+      { id: 'mews', label: 'MEWS' },
+      { id: 'gcs', label: 'GCS' },
+    ],
+  },
+];
+const CLINICAL_AI_ACTIONS = [
+  { id: 'summary', label: 'Summarize', serviceLabel: 'Patient Summary AI' },
+  { id: 'differential', label: 'Differential', serviceLabel: 'Differential AI' },
+  { id: 'guidelines', label: 'Guidelines', serviceLabel: 'Guideline RAG' },
+  { id: 'orders', label: 'Order Set', serviceLabel: 'Order Set AI' },
 ];
 const REFERRAL_DEPARTMENTS = [
   'Cardiology',
@@ -227,6 +298,84 @@ function primaryDiagnosis(entry) {
 function formatDiagnosis(diagnosis) {
   if (!diagnosis) return '';
   return [diagnosis.code, diagnosis.label].filter(Boolean).join(' · ');
+}
+
+function patientVitalsSummary(vitals) {
+  if (!vitals) return 'Vitals pending';
+  const bp =
+    vitals.bpSystolic != null
+      ? `BP ${vitals.bpSystolic}/${vitals.bpDiastolic ?? '--'}`
+      : null;
+  return [
+    bp,
+    vitals.hr != null ? `HR ${vitals.hr}` : null,
+    vitals.rr != null ? `RR ${vitals.rr}` : null,
+    vitals.spo2 != null ? `SpO2 ${vitals.spo2}%` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ') || 'Vitals pending';
+}
+
+function compactList(items = [], formatter = (item) => String(item)) {
+  return items.slice(0, 8).map(formatter).filter(Boolean).join('; ');
+}
+
+function patientContextText(patient, { medications, allergies, labs, diagnoses, observations, backendDocuments }) {
+  const latestObservation = observations[0];
+  return [
+    `${patientName(patient)}, ${patient.age}/${patient.sex}, ${patient.chiefComplaint || patient.complaintCategory}`,
+    `Priority ${patient.priority}, state ${patient.state}`,
+    `Vitals: ${patientVitalsSummary(patient.vitals)}`,
+    latestObservation ? `Latest backend observation: ${latestObservation.label} ${latestObservation.value || ''}` : '',
+    medications.length ? `Medications: ${compactList(medications, (medication) => medication.name)}` : '',
+    allergies.length ? `Allergies: ${compactList(allergies, (allergy) => `${allergy.substance} ${allergy.severity || ''}`)}` : '',
+    labs.length ? `Labs: ${compactList(labs, (lab) => `${lab.name} ${lab.value || ''} ${lab.unit || ''}`)}` : '',
+    diagnoses.length ? `Diagnoses: ${compactList(diagnoses, formatDiagnosis)}` : '',
+    backendDocuments.length ? `Documents: ${compactList(backendDocuments, (document) => document.title)}` : '',
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+function clinicalAiOutputText(data) {
+  if (!data) return 'No response body returned.';
+  if (typeof data === 'string') return data;
+  const directText =
+    data.summary ||
+    data.response ||
+    data.recommendation ||
+    data.clinicalSummary ||
+    data.answer ||
+    data.narrative;
+  if (directText) return String(directText);
+  return JSON.stringify(data, null, 2);
+}
+
+function scoreLaunchGroupsForPatient(patient) {
+  const matchedGroups = SCORE_LAUNCH_GROUPS.filter(
+    (group) => !['recommended', 'critical-care'].includes(group.id) && group.matches(patient)
+  );
+  const recommendedTools = matchedGroups.flatMap((group) => group.tools).slice(0, 6);
+  const seen = new Set();
+  const uniqueRecommended = recommendedTools.filter((tool) => {
+    const key = tool.inlineId || tool.id;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  return [
+    {
+      id: 'recommended',
+      label: 'Complaint fit',
+      tools: uniqueRecommended.length ? uniqueRecommended : SCORE_OPTIONS.map((score) => ({
+        id: score.id,
+        label: score.label,
+        inlineId: score.id,
+      })),
+    },
+    ...matchedGroups,
+    SCORE_LAUNCH_GROUPS.find((group) => group.id === 'critical-care'),
+  ].filter(Boolean);
 }
 
 function isEditableShortcutTarget(target) {
@@ -685,6 +834,10 @@ export function PatientDetailPanel() {
   const [scoreCalculatorId, setScoreCalculatorId] = useState('');
   const [dismissedAutoScoreBanners, setDismissedAutoScoreBanners] = useState({});
   const [clinicalDataTab, setClinicalDataTab] = useState('medications');
+  const [clinicalAiOpen, setClinicalAiOpen] = useState(false);
+  const [clinicalAiLoading, setClinicalAiLoading] = useState('');
+  const [clinicalAiError, setClinicalAiError] = useState('');
+  const [clinicalAiResult, setClinicalAiResult] = useState(null);
   const [fastReferralOpen, setFastReferralOpen] = useState(false);
   const [fastReferralDepartment, setFastReferralDepartment] = useState('Cardiology');
   const [fastReferralUrgency, setFastReferralUrgency] = useState('Urgent');
@@ -722,6 +875,10 @@ export function PatientDetailPanel() {
     setCompletionPromptReminderId('');
     setScoreCalculatorId('');
     setClinicalDataTab('medications');
+    setClinicalAiOpen(false);
+    setClinicalAiLoading('');
+    setClinicalAiError('');
+    setClinicalAiResult(null);
     setFastReferralOpen(false);
     setFastReferralDepartment('Cardiology');
     setFastReferralUrgency('Urgent');
@@ -857,6 +1014,7 @@ export function PatientDetailPanel() {
   const currentDiagnosis = primaryDiagnosis(patientBackendEntry);
   const vitalsHistoryReadings = buildVitalsHistory(patient, observations);
   const orderGroups = groupedOrders(orders);
+  const scoreLaunchGroups = scoreLaunchGroupsForPatient(patient);
   const clinicalDataTabs = [
     { id: 'medications', label: 'Medication History', count: medications.length + allergies.length },
     { id: 'orders', label: 'Orders', count: orders.length },
@@ -889,6 +1047,14 @@ export function PatientDetailPanel() {
   const activeScorePrefill =
     scoreCalculatorId && scoreCalculatorId === autoScorePrefill?.calculatorId ? autoScorePrefill : null;
   const patientVitalsAlerts = activeVitalsAlerts(patient, ['critical', 'warning']);
+  const clinicalAiContext = patientContextText(patient, {
+    medications,
+    allergies,
+    labs,
+    diagnoses,
+    observations,
+    backendDocuments,
+  });
   const patientReassessmentFlags = patient.flags.filter((flag) =>
     REASSESSMENT_MANAGED_FLAGS.has(getPatientFlagType(flag))
   );
@@ -1068,12 +1234,79 @@ export function PatientDetailPanel() {
     setFastReferralSummary('');
   };
 
+  const runClinicalAiAction = async (actionId) => {
+    const action = CLINICAL_AI_ACTIONS.find((candidate) => candidate.id === actionId);
+    if (!action) return;
+
+    const basePayload = {
+      patientId: patient.id,
+      patientContext: clinicalAiContext,
+      chiefComplaint: patient.chiefComplaint,
+      complaintCategory: patient.complaintCategory,
+      vitals: patient.vitals,
+      activeAlerts: patientVitalsAlerts.map((alert) => alert.reason),
+      savedScores: savedScores.map((score) => ({
+        label: score.toolName,
+        result: score.result,
+        band: score.band,
+      })),
+    };
+    const calls = {
+      summary: () => generatePatientSummaryAi(basePayload),
+      differential: () =>
+        generateDifferentialAi({
+          ...basePayload,
+          clinicalScenario: clinicalAiContext,
+        }),
+      guidelines: () =>
+        queryGuidelineEvidence({
+          clinicalQuestion: `What ED guideline evidence is relevant for ${patient.chiefComplaint || patient.complaintCategory}?`,
+          patientContext: clinicalAiContext,
+        }),
+      orders: () =>
+        generateOrderSetAi({
+          ...basePayload,
+          clinicalScenario: clinicalAiContext,
+        }),
+    };
+
+    setClinicalAiOpen(true);
+    setClinicalAiLoading(actionId);
+    setClinicalAiError('');
+    setClinicalAiResult(null);
+    const response = await calls[actionId]();
+    if (response.ok) {
+      setClinicalAiResult({
+        actionId,
+        label: action.serviceLabel,
+        text: clinicalAiOutputText(response.data),
+      });
+    } else {
+      setClinicalAiError(response.message || `${action.serviceLabel} is unavailable.`);
+    }
+    setClinicalAiLoading('');
+  };
+
   const handleOpenClinicalTools = () => {
     const params = new URLSearchParams({
       patientId: patient.id,
       complaint: patient.complaintCategory || '',
     });
     navigate(`/emergency/copilot?${params.toString()}`);
+  };
+
+  const openScoreTool = (tool) => {
+    const inlineId = tool.inlineId || (INLINE_SCORE_IDS.has(tool.id) ? tool.id : '');
+    if (inlineId) {
+      setScoreCalculatorId(inlineId);
+      return;
+    }
+    const params = new URLSearchParams({
+      calc: tool.id,
+      patientId: patient.id,
+      complaint: patient.complaintCategory || '',
+    });
+    navigate(`/tools/calculators?${params.toString()}`);
   };
 
   const handleOpenPediatricDrugs = () => {
@@ -1319,6 +1552,51 @@ export function PatientDetailPanel() {
             ))}
             <button type="submit">Save vitals</button>
           </form>
+        ) : null}
+      </section>
+
+      <section className="patient-detail__section patient-detail__clinical-ai">
+        <div className="patient-detail__section-heading">
+          <span>Clinical Intelligence</span>
+          <button type="button" onClick={() => setClinicalAiOpen((open) => !open)}>
+            {clinicalAiOpen ? 'Hide AI' : 'Show AI'}
+          </button>
+        </div>
+        <p className="patient-detail__clinical-ai-scope">
+          Backend AI uses this selected patient, current vitals, saved scores, and loaded backend record
+          context. Outputs stay review-only.
+        </p>
+        {clinicalAiOpen ? (
+          <>
+            <div className="patient-detail__clinical-ai-actions" aria-label="Clinical intelligence actions">
+              {CLINICAL_AI_ACTIONS.map((action) => (
+                <button
+                  key={action.id}
+                  type="button"
+                  onClick={() => runClinicalAiAction(action.id)}
+                  disabled={Boolean(clinicalAiLoading)}
+                >
+                  {clinicalAiLoading === action.id ? `Running ${action.label}...` : action.label}
+                </button>
+              ))}
+            </div>
+            {clinicalAiError ? (
+              <p className="patient-detail__clinical-ai-error" role="alert">
+                {clinicalAiError}
+              </p>
+            ) : null}
+            {clinicalAiResult ? (
+              <article className="patient-detail__clinical-ai-result">
+                <strong>{clinicalAiResult.label}</strong>
+                <pre>{clinicalAiResult.text}</pre>
+              </article>
+            ) : (
+              <p className="patient-detail__clinical-ai-empty">
+                Choose an AI action to generate a patient-scoped summary, differential, guideline
+                evidence, or order-set suggestion.
+              </p>
+            )}
+          </>
         ) : null}
       </section>
 
@@ -1629,11 +1907,24 @@ export function PatientDetailPanel() {
             <p>No scores run for this patient yet.</p>
           )}
         </div>
-        <div className="patient-detail__score-launcher">
-          {SCORE_OPTIONS.map((score) => (
-            <button key={score.id} type="button" onClick={() => setScoreCalculatorId(score.id)}>
-              Quick {score.label}
-            </button>
+        <div className="patient-detail__score-groups" aria-label="Medical calculators and equations">
+          {scoreLaunchGroups.map((group) => (
+            <section key={group.id} className="patient-detail__score-group">
+              <strong>{group.label}</strong>
+              <div className="patient-detail__score-launcher">
+                {group.tools.map((tool) => (
+                  <button
+                    key={`${group.id}-${tool.inlineId || tool.id}`}
+                    type="button"
+                    onClick={() => openScoreTool(tool)}
+                    title={tool.inlineId ? 'Open inline patient scorecard' : 'Open calculator hub with patient context'}
+                  >
+                    {tool.inlineId ? 'Quick ' : ''}
+                    {tool.label}
+                  </button>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       </section>

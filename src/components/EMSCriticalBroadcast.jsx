@@ -129,6 +129,8 @@ export default function EMSCriticalBroadcast() {
   const staff = useEmergencyStore((state) => state.staff);
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const checkCriticalEMSChecklistItem = useEmergencyStore((state) => state.checkCriticalEMSChecklistItem);
+  const completeCriticalEMSChecklist = useEmergencyStore((state) => state.completeCriticalEMSChecklist);
+  const convertEMSArrivalToPatient = useEmergencyStore((state) => state.convertEMSArrivalToPatient);
   const now = useNow();
   const arrival = activeCriticalArrivals(emsArrivals)[0];
   const currentStaff = useMemo(
@@ -136,13 +138,14 @@ export default function EMSCriticalBroadcast() {
     [activeShift, staff, user]
   );
   const [showOverlay, setShowOverlay] = useState(false);
+  const [collapsedArrivalIds, setCollapsedArrivalIds] = useState({});
 
   useEffect(() => {
-    if (!arrival?.id) return undefined;
+    if (!arrival?.id || arrival.criticalChecklist?.completedAt) return undefined;
     setShowOverlay(true);
     const timer = window.setTimeout(() => setShowOverlay(false), 5000);
     return () => window.clearTimeout(timer);
-  }, [arrival?.id]);
+  }, [arrival?.criticalChecklist?.completedAt, arrival?.id]);
 
   if (!arrival) return null;
 
@@ -152,6 +155,10 @@ export default function EMSCriticalBroadcast() {
   const progress = items.length ? Math.round((completedCount / items.length) * 100) : 0;
   const assignedBay = roomName(rooms, arrival.preparedRoomId || arrival.criticalChecklist.assignedRoomId);
   const doctors = physicianList(staff, activeShift);
+  const isPrepComplete = Boolean(arrival.criticalChecklist.completedAt);
+  const isCollapsed = Boolean(collapsedArrivalIds[arrival.id]);
+  const isChecklistExpanded = !isPrepComplete && !isCollapsed;
+  const canMarkPrepComplete = items.length > 0 && completedCount >= items.length;
 
   const toggleItem = (item, checked) => {
     checkCriticalEMSChecklistItem(arrival.id, {
@@ -162,6 +169,32 @@ export default function EMSCriticalBroadcast() {
       staffName: currentStaff.staffName,
       timestamp: new Date().toISOString(),
     });
+  };
+
+  const minimizeChecklist = () => {
+    setCollapsedArrivalIds((current) => ({ ...current, [arrival.id]: true }));
+  };
+
+  const reopenChecklist = () => {
+    setCollapsedArrivalIds((current) => {
+      const next = { ...current };
+      delete next[arrival.id];
+      return next;
+    });
+  };
+
+  const markPrepComplete = () => {
+    if (!canMarkPrepComplete) return;
+    completeCriticalEMSChecklist(arrival.id, {
+      staffId: currentStaff.staffId,
+      staffName: currentStaff.staffName,
+      timestamp: new Date().toISOString(),
+    });
+    minimizeChecklist();
+  };
+
+  const addToWhiteboard = () => {
+    convertEMSArrivalToPatient(arrival.id);
   };
 
   return (
@@ -175,15 +208,48 @@ export default function EMSCriticalBroadcast() {
         </section>
       ) : null}
 
-      <section className="ems-critical-banner" role="alert" aria-live="polite">
+      <section
+        className={[
+          'ems-critical-banner',
+          isCollapsed ? 'ems-critical-banner--collapsed' : '',
+          isPrepComplete ? 'ems-critical-banner--complete' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        role="alert"
+        aria-live="polite"
+      >
         <strong>{arrival.chiefComplaint || arrival.prearrivalComplaint} inbound</strong>
         <span>ETA {countdownParts(arrival, now).label}</span>
         <span>{assignedBay}</span>
+        {isPrepComplete ? (
+          <span>Prep complete by {arrival.criticalChecklist.completedByStaffName || 'team'}</span>
+        ) : null}
+        <div className="ems-critical-banner__actions">
+          {isChecklistExpanded ? (
+            <button type="button" onClick={minimizeChecklist}>
+              Minimize
+            </button>
+          ) : !isPrepComplete ? (
+            <button type="button" onClick={reopenChecklist}>
+              Reopen prep
+            </button>
+          ) : null}
+          <button type="button" onClick={addToWhiteboard}>
+            Add to whiteboard
+          </button>
+        </div>
       </section>
 
-      <aside className="ems-critical-checklist" aria-label={arrival.criticalChecklist.title}>
+      {isChecklistExpanded ? (
+      <aside className="ems-critical-checklist ems-critical-checklist--expanded" aria-label={arrival.criticalChecklist.title}>
         <header>
-          <span>Critical EMS prep</span>
+          <div className="ems-critical-checklist__header-row">
+            <span>Critical EMS prep</span>
+            <button type="button" onClick={minimizeChecklist}>
+              Minimize
+            </button>
+          </div>
           <h2>{arrival.criticalChecklist.title}</h2>
           <p>
             {arrival.unitName} · {arrivalHeadline(arrival, now)} · {assignedBay}
@@ -194,6 +260,14 @@ export default function EMSCriticalBroadcast() {
           <strong>
             {completedCount}/{items.length} complete
           </strong>
+          <div className="ems-critical-checklist__actions">
+            <button type="button" onClick={markPrepComplete} disabled={!canMarkPrepComplete}>
+              Mark prep complete
+            </button>
+            <button type="button" onClick={addToWhiteboard}>
+              Add to whiteboard
+            </button>
+          </div>
         </header>
 
         <div className="ems-critical-checklist__items">
@@ -223,6 +297,7 @@ export default function EMSCriticalBroadcast() {
           })}
         </div>
       </aside>
+      ) : null}
     </>
   );
 }

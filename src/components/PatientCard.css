@@ -1305,7 +1305,7 @@
 
 .patient-detail__score-launcher {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(86px, 1fr));
   gap: var(--space-2);
 }
 
@@ -1314,6 +1314,79 @@
   padding: 0 var(--space-2);
   border-color: color-mix(in srgb, var(--status-info) 34%, var(--color-border-default));
   background: color-mix(in srgb, var(--status-info) 10%, var(--color-surface));
+}
+
+.patient-detail__score-groups,
+.patient-detail__score-group,
+.patient-detail__clinical-ai {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.patient-detail__score-group {
+  padding: var(--space-2);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--status-info) 5%, var(--color-surface));
+}
+
+.patient-detail__score-group > strong {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.patient-detail__clinical-ai-scope,
+.patient-detail__clinical-ai-empty {
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.patient-detail__clinical-ai-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: var(--space-2);
+}
+
+.patient-detail__clinical-ai-actions button {
+  min-height: 34px;
+  border-color: color-mix(in srgb, var(--status-info) 34%, var(--color-border-default));
+  background: color-mix(in srgb, var(--status-info) 10%, var(--color-surface));
+  padding: 0 var(--space-2);
+}
+
+.patient-detail__clinical-ai-actions button:disabled {
+  cursor: wait;
+  opacity: 0.64;
+}
+
+.patient-detail__clinical-ai-error {
+  padding: var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--status-critical) 46%, var(--color-border-default));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--status-critical) 10%, var(--color-surface));
+  color: var(--status-critical) !important;
+}
+
+.patient-detail__clinical-ai-result {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--status-info) 28%, var(--color-border-default));
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.patient-detail__clinical-ai-result pre {
+  max-height: 220px;
+  margin: 0;
+  overflow: auto;
+  color: var(--color-text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1.45;
+  white-space: pre-wrap;
 }
 
 .patient-detail__score-history {

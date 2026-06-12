@@ -185,6 +185,11 @@ type CriticalChecklistCheckInput = {
   staffName: string;
   timestamp?: string;
 };
+type CriticalChecklistCompletionInput = {
+  staffId: string;
+  staffName: string;
+  timestamp?: string;
+};
 type ReferralCreateInput = Pick<
   Referral,
   'patientId' | 'requestingStaffId' | 'targetDepartment' | 'urgency' | 'reason' | 'clinicalSummary'
@@ -289,6 +294,7 @@ interface EmergencyStoreState {
   updateEMSUnit: (id: string, patch: Partial<EMSUnit>) => void;
   prepareEMSBay: (arrivalId: string) => void;
   checkCriticalEMSChecklistItem: (arrivalId: string, input: CriticalChecklistCheckInput) => void;
+  completeCriticalEMSChecklist: (arrivalId: string, input: CriticalChecklistCompletionInput) => void;
   convertEMSArrivalToPatient: (arrivalId: string) => void;
   setRealtimeConnection: (status: Partial<RealtimeConnectionState>) => void;
   handleRealtimeEvent: (event: RealtimeEventEnvelope) => void;
@@ -927,6 +933,9 @@ function ensureCriticalEMSPreparedState(
         assignedRoomId: assignedRoom?.id || arrival.criticalChecklist?.assignedRoomId,
         assignedRoomName: assignedRoom?.name || arrival.criticalChecklist?.assignedRoomName,
         completions: arrival.criticalChecklist?.completions || [],
+        completedAt: arrival.criticalChecklist?.completedAt,
+        completedByStaffId: arrival.criticalChecklist?.completedByStaffId,
+        completedByStaffName: arrival.criticalChecklist?.completedByStaffName,
       },
     };
   });
@@ -3240,6 +3249,22 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
           criticalChecklist: {
             ...arrival.criticalChecklist,
             completions,
+          },
+        };
+      }),
+    })),
+
+  completeCriticalEMSChecklist: (arrivalId, input) =>
+    set((state) => ({
+      emsArrivals: state.emsArrivals.map((arrival) => {
+        if (arrival.id !== arrivalId || !arrival.criticalChecklist) return arrival;
+        return {
+          ...arrival,
+          criticalChecklist: {
+            ...arrival.criticalChecklist,
+            completedAt: input.timestamp || new Date().toISOString(),
+            completedByStaffId: input.staffId,
+            completedByStaffName: input.staffName,
           },
         };
       }),

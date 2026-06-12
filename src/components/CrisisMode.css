@@ -240,14 +240,14 @@
   }
 }
 
-.ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel {
+.ed-os-shell:has(.ems-critical-checklist--expanded) .crisis-action-panel {
   inset-block-start: calc(var(--ed-header-height, 48px) + var(--ed-critical-ems-banner-height, 44px));
   inset-inline-end: var(--ed-right-alarm-lane-width, 360px);
   width: min(320px, calc(100vw - var(--ed-rail-width, 56px) - var(--ed-right-alarm-lane-width, 360px)));
 }
 
 @media (max-width: 1280px) {
-  .ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel {
+  .ed-os-shell:has(.ems-critical-checklist--expanded) .crisis-action-panel {
     inset-block: auto 0;
     inset-inline: var(--ed-rail-width, 56px) var(--ed-right-alarm-lane-width, 360px);
     z-index: 1240;
@@ -258,19 +258,19 @@
     box-shadow: 0 -24px 60px rgba(0, 0, 0, 0.5);
   }
 
-  .ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel header {
+  .ed-os-shell:has(.ems-critical-checklist--expanded) .crisis-action-panel header {
     padding-block: var(--space-3);
   }
 }
 
 @media (max-width: 900px) {
-  .ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel {
+  .ed-os-shell:has(.ems-critical-checklist--expanded) .crisis-action-panel {
     inset-inline-start: 0;
   }
 }
 
 @media (max-width: 780px) {
-  .ed-os-shell:has(.ems-critical-checklist) .crisis-action-panel {
+  .ed-os-shell:has(.ems-critical-checklist--expanded) .crisis-action-panel {
     inset-inline-end: 0;
     height: min(46vh, 380px);
   }

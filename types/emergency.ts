@@ -204,6 +204,9 @@ export interface CriticalChecklistRecord {
   assignedRoomId?: EntityId;
   assignedRoomName?: string;
   completions: CriticalChecklistCompletion[];
+  completedAt?: ISODateString;
+  completedByStaffId?: EntityId;
+  completedByStaffName?: string;
   savedToPatientAt?: ISODateString;
 }
 

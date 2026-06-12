@@ -104,6 +104,21 @@ describe('emergencyStore EMS arrival conversion', () => {
       checkedByStaffName: 'Priya Nair',
     });
 
+    useEmergencyStore.getState().completeCriticalEMSChecklist(arrival.id, {
+      staffId: 'staff-priya-nair',
+      staffName: 'Priya Nair',
+      timestamp: '2026-06-11T21:18:00-04:00',
+    });
+
+    expect(
+      useEmergencyStore
+        .getState()
+        .emsArrivals.find((candidate) => candidate.id === arrival.id)?.criticalChecklist
+    ).toMatchObject({
+      completedAt: '2026-06-11T21:18:00-04:00',
+      completedByStaffName: 'Priya Nair',
+    });
+
     useEmergencyStore.getState().convertEMSArrivalToPatient(arrival.id);
 
     const convertedArrival = useEmergencyStore
@@ -118,6 +133,8 @@ describe('emergencyStore EMS arrival conversion', () => {
       chiefComplaint: 'STEMI',
       criticalChecklist: expect.objectContaining({
         type: 'stemi',
+        completedAt: '2026-06-11T21:18:00-04:00',
+        completedByStaffName: 'Priya Nair',
         savedToPatientAt: expect.any(String),
       }),
     });
