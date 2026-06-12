@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ACCOUNT_UTILITY_NAV_ITEMS,
   ADVANCED_SIDEBAR_NAV_ITEMS,
+  APP_SHELL_NAV_ITEMS,
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
   SOLUTIONS_SIDEBAR_NAV_ITEMS,
@@ -39,6 +40,19 @@ describe('iconRegistry semantic icon map', () => {
     expect(getNavIcon('audit')).toBe(CHROME_ICONS.clipboardList);
     expect(getNavIcon('profile')).toBe(CHROME_ICONS.user);
     expect(getNavIcon('settings')).toBe(CHROME_ICONS.settings);
+  });
+
+  it('keeps Emergency OS rail icons semantically distinct', () => {
+    expect(getNavIcon('emergency-whiteboard')).toBe(CHROME_ICONS.layoutDashboard);
+    expect(getNavIcon('emergency-patients')).toBe(CHROME_ICONS.users);
+    expect(getNavIcon('queues')).toBe(CHROME_ICONS.clock);
+    expect(getNavIcon('reassessment')).toBe(CHROME_ICONS.calendarClock);
+    expect(getNavIcon('capacity')).toBe(CHROME_ICONS.gauge);
+    expect(getNavIcon('boarding')).toBe(CHROME_ICONS.hospital);
+    expect(getNavIcon('referrals')).toBe(CHROME_ICONS.share);
+
+    const railIcons = APP_SHELL_NAV_ITEMS.map((item) => getNavIcon(item.iconKey || item.id));
+    expect(new Set(railIcons).size).toBeGreaterThanOrEqual(10);
   });
 
   it('resolves an icon for every navigation destination', () => {

@@ -3,21 +3,11 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import {
   AlertTriangle,
-  Activity,
   Baby,
-  BarChart3,
   Bell,
   Bot,
-  CalendarClock,
   ChevronRight,
-  ClipboardList,
-  Gauge,
   Info,
-  LayoutDashboard,
-  Settings,
-  Share2,
-  Stethoscope,
-  Truck,
   X,
 } from 'lucide-react';
 import ChatInterface from '../components/ChatInterface';
@@ -51,32 +41,19 @@ import { pendingReminderCountForStaff } from '../utils/reassessmentScheduler';
 import { emergencyPermissionsForUser, emergencyRoleForUser } from '../utils/emergencyRolePermissions';
 import { APP_SHELL_NAV_ITEMS } from '../config/navigation.config';
 import { LAYOUT_SCROLL_CONTRACT } from '../config/layout.config';
+import { getNavIcon } from '../navigation/iconRegistry';
 import './AppShell.css';
-
-const SIDEBAR_ICON_COMPONENTS = {
-  analytics: BarChart3,
-  capacity: Gauge,
-  calculators: Stethoscope,
-  ems: Truck,
-  intake: ClipboardList,
-  operations: ClipboardList,
-  pulse: Activity,
-  referrals: Share2,
-  settings: Settings,
-  shift: CalendarClock,
-  whiteboard: LayoutDashboard,
-};
 
 export function buildSidebarItems(isEnabled) {
   return APP_SHELL_NAV_ITEMS.map((item) => {
     const feature = FEATURE_REGISTRY_BY_ID[item.featureId];
-    if (!feature?.sidebarIcon || !isEnabled(feature.id)) return null;
+    if (!feature || !isEnabled(feature.id)) return null;
     return {
       id: item.id,
       featureId: item.featureId,
-      label: feature.label,
+      label: item.label,
       path: item.path,
-      icon: SIDEBAR_ICON_COMPONENTS[feature.sidebarIcon] || LayoutDashboard,
+      icon: getNavIcon(item.iconKey || item.id),
       activePaths: item.activePaths,
       tier: feature.tier,
     };

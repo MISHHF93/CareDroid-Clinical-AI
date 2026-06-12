@@ -41,6 +41,9 @@ describe('AppShell navigation surfaces', () => {
   it('keeps nav items in the canonical AppShell config array', () => {
     expect(navigationConfig).toContain('export const APP_SHELL_NAV_ITEMS');
     expect(appShellJsx).toContain('APP_SHELL_NAV_ITEMS.map');
+    expect(appShellJsx).toContain('label: item.label');
+    expect(appShellJsx).toContain('icon: getNavIcon(item.iconKey || item.id)');
+    expect(appShellJsx).not.toContain('SIDEBAR_ICON_COMPONENTS');
     expect(APP_SHELL_NAV_ITEMS.map((item) => item.featureId)).toEqual([
       'emergency_whiteboard',
       'emergency_patients',
@@ -60,6 +63,7 @@ describe('AppShell navigation surfaces', () => {
   it('keeps each rail item wired to a route and active path list', () => {
     for (const item of APP_SHELL_NAV_ITEMS) {
       expect(item.path, item.id).toMatch(/^\//);
+      expect(item.iconKey, item.id).toMatch(/^[a-z0-9-]+$/);
       expect(item.activePaths.length, item.id).toBeGreaterThan(0);
       expect(item.activePaths.every((path) => path.startsWith('/')), item.id).toBe(true);
     }
