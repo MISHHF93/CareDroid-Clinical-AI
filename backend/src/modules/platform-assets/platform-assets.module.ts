@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuditLog } from '../audit/entities/audit-log.entity';
 import { AutomationAuditModule } from '../automation-audit/automation-audit.module';
@@ -6,6 +6,7 @@ import { FleetModule } from '../fleet/fleet.module';
 import { OrganizationMembership } from '../organizations/entities/organization-membership.entity';
 import { Product } from '../product-catalog/entities/product.entity';
 import { UsageEvent } from '../subscriptions/entities/usage-event.entity';
+import { UserProfileModule } from '../user-profile/user-profile.module';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
 import { UserWorkspaceState } from '../workspaces/entities/user-workspace-state.entity';
@@ -48,6 +49,7 @@ import { ServiceLineArchitectureService } from './service-line-architecture.serv
     ]),
     AutomationAuditModule,
     FleetModule,
+    forwardRef(() => UserProfileModule),
   ],
   controllers: [PlatformAssetsController],
   providers: [

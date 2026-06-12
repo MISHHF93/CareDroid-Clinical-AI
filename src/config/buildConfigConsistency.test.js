@@ -31,6 +31,15 @@ describe('build and service config consistency', () => {
     expect(read('backend/Dockerfile')).toContain('CMD ["node", "dist/backend/src/main.js"]');
   });
 
+  it('keeps backend dev scripts pointed at the widened build entrypoint', () => {
+    const backendPackageJson = read('backend/package.json');
+
+    expect(backendPackageJson).toContain('"start": "nest start --entryFile backend/src/main"');
+    expect(backendPackageJson).toContain(
+      '"start:dev": "nest start --watch --entryFile backend/src/main"',
+    );
+  });
+
   it('normalizes NLU defaults to port 8001', () => {
     expect(read('backend/.env.example')).toContain('NLU_SERVICE_URL=http://localhost:8001');
     expect(read('backend/src/config/nlu.config.ts')).toContain('http://localhost:8001');
