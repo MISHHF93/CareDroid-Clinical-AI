@@ -49,6 +49,8 @@ describe('single AppShell contract', () => {
 
   it('passes dashboard prompt deep links into the persistent ED Copilot', () => {
     expect(appShellJsx).toContain("params.get('prompt')");
+    expect(appShellJsx).toContain("params.get('tool') || params.get('calc')");
+    expect(appShellJsx).toContain('Launch ${tool} in ED Copilot workflow.');
     expect(appShellJsx).toContain('prefillText={copilotPrefillText}');
   });
 

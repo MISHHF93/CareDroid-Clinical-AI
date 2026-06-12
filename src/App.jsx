@@ -1322,6 +1322,21 @@ export function AppRoutes() {
       element: <LegacyToolRouteRedirect toolId="drug-check" />,
       requiresAuth: true,
     },
+    {
+      path: '/tools/lab-interpreter',
+      element: <LegacyToolRouteRedirect toolId="lab-interp" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/calculator-recommender',
+      element: <LegacyToolRouteRedirect toolId="calculator-recommender-ai" />,
+      requiresAuth: true,
+    },
+    {
+      path: '/protocols',
+      element: <LegacyToolRouteRedirect toolId="protocols" />,
+      requiresAuth: true,
+    },
     ...LEGACY_EMERGENCY_ROUTE_REDIRECTS.map(({ path, to }) => ({
       path,
       element: <LegacyProtectedRouteRedirect to={to} />,

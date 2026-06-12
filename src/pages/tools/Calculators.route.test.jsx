@@ -62,4 +62,13 @@ describe('Calculators.jsx route wiring', () => {
     expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
     expect(appSource).not.toContain('initialCalculatorId={calculatorSlug}');
   });
+
+  it('redirects backend-backed lab and protocol tools into the ED Copilot hub', () => {
+    expect(appSource).toContain("path: '/tools/lab-interpreter'");
+    expect(appSource).toContain('<LegacyToolRouteRedirect toolId="lab-interp" />');
+    expect(appSource).toContain("path: '/tools/calculator-recommender'");
+    expect(appSource).toContain('<LegacyToolRouteRedirect toolId="calculator-recommender-ai" />');
+    expect(appSource).toContain("path: '/protocols'");
+    expect(appSource).toContain('<LegacyToolRouteRedirect toolId="protocols" />');
+  });
 });

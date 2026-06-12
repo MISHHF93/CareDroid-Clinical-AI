@@ -1087,7 +1087,20 @@ const AppShell = ({
   const routeNotice = location.state?.edNotice;
   const copilotPrefillText = useMemo(() => {
     const params = new URLSearchParams(location.search);
-    return params.get('prompt') || '';
+    const prompt = params.get('prompt');
+    if (prompt) return prompt;
+    const tool = params.get('tool') || params.get('calc');
+    if (!tool) return '';
+    const patientId = params.get('patientId');
+    const complaint = params.get('complaint');
+    return [
+      `Launch ${tool} in ED Copilot workflow.`,
+      patientId ? `Patient ID: ${patientId}.` : '',
+      complaint ? `Complaint: ${complaint}.` : '',
+      'Keep output concise, human-reviewed, and scoped to Emergency Department operations.',
+    ]
+      .filter(Boolean)
+      .join(' ');
   }, [location.search]);
   const pediatricDrugPatient = useMemo(
     () =>

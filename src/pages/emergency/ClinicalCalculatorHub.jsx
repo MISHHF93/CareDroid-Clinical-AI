@@ -2,6 +2,9 @@ import { useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CalculatorInterface, CALCULATORS } from '../tools/Calculators';
 import DrugChecker from '../tools/DrugChecker';
+import LabInterpreter from '../tools/LabInterpreter';
+import Protocols from '../tools/Protocols';
+import CalculatorRecommender from '../tools/CalculatorRecommender';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
 import { useEmergencyStore } from '../../../store/emergencyStore';
@@ -155,7 +158,72 @@ const TOOL_ALIASES = Object.freeze({
   dose: 'pediatric-dose-safety-checker',
   'pediatric dose': 'pediatric-dose-safety-checker',
   broselow: 'pediatric-dose-safety-checker',
+  labs: 'lab-interp',
+  lab: 'lab-interp',
+  'lab interpreter': 'lab-interp',
+  protocols: 'protocols',
+  protocol: 'protocols',
+  pathways: 'protocols',
+  'calculator recommender': 'calculator-recommender-ai',
+  recommender: 'calculator-recommender-ai',
 });
+
+const ED_WORKFLOW_TOOLS = Object.freeze([
+  {
+    id: 'lab-interp',
+    name: 'Lab Interpreter',
+    description: 'Backend-executed lab interpretation for ED review.',
+    domain: 'Reference',
+    status: 'built',
+    launchMode: 'embedded',
+    keywords: ['labs', 'lab interpreter', 'results', 'abnormal labs'],
+  },
+  {
+    id: 'protocols',
+    name: 'Protocols and Pathways',
+    description: 'ED protocol library with AI explanation and pathway context.',
+    domain: 'Reference',
+    status: 'built',
+    launchMode: 'embedded',
+    keywords: ['protocol', 'pathway', 'sepsis', 'stroke', 'stemi', 'respiratory failure'],
+  },
+  {
+    id: 'calculator-recommender-ai',
+    name: 'Calculator Recommender AI',
+    description: 'Suggests existing CareDroid calculators from ED complaint context.',
+    domain: 'Reference',
+    status: 'built',
+    launchMode: 'embedded',
+    keywords: ['recommend calculator', 'which score', 'complaint pathway', 'ai'],
+  },
+  {
+    id: 'guideline-rag',
+    name: 'Guideline Evidence AI',
+    description: 'Uses ED Copilot to query guideline evidence with department context.',
+    domain: 'Reference',
+    status: 'built',
+    launchMode: 'copilot',
+    keywords: ['guideline', 'evidence', 'rag', 'clinical evidence'],
+  },
+  {
+    id: 'order-set-ai',
+    name: 'Order Set AI',
+    description: 'Uses ED Copilot to draft order-set considerations for clinician review.',
+    domain: 'Reference',
+    status: 'built',
+    launchMode: 'copilot',
+    keywords: ['orders', 'order set', 'clinical orders'],
+  },
+  {
+    id: 'differential-ai',
+    name: 'Differential AI',
+    description: 'Uses ED Copilot to frame differential considerations for clinician review.',
+    domain: 'Reference',
+    status: 'built',
+    launchMode: 'copilot',
+    keywords: ['differential', 'diagnosis', 'ddx'],
+  },
+]);
 
 const FEATURE_BY_TOOL_ID = Object.freeze(
   FEATURE_REGISTRY.reduce((acc, feature) => {
@@ -339,6 +407,7 @@ export default function ClinicalCalculatorHub() {
         ...tool,
         domain: 'Reference',
       })),
+      ...ED_WORKFLOW_TOOLS,
     ],
     []
   );
@@ -513,18 +582,44 @@ export default function ClinicalCalculatorHub() {
         {activeTool ? (
           <FeatureGate feature={activeToolFeature} showPlaceholder>
             {activeTool.id === 'drug-check' ? (
-          <DrugChecker embedded />
+              <DrugChecker embedded />
+            ) : activeTool.id === 'lab-interp' ? (
+              <LabInterpreter embedded />
+            ) : activeTool.id === 'protocols' ? (
+              <Protocols embedded />
+            ) : activeTool.id === 'calculator-recommender-ai' ? (
+              <CalculatorRecommender embedded />
+            ) : activeTool.launchMode === 'copilot' ? (
+              <div className="clinical-calculator-hub__select">
+                <NavIcon icon={CHROME_ICONS.bot || CHROME_ICONS.stethoscope} size={44} aria-hidden />
+                <h2>{activeTool.name}</h2>
+                <p>{activeTool.description}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const params = new URLSearchParams(searchParams);
+                    params.set('tool', activeTool.id);
+                    params.set(
+                      'prompt',
+                      `Launch ${activeTool.name} for ED review${displayPatient ? ` for ${patientName(displayPatient)}` : ''}. Keep recommendations human-reviewed and cite uncertainty.`
+                    );
+                    navigate(`/emergency/copilot?${params.toString()}`, { state: location.state });
+                  }}
+                >
+                  Open in ED Copilot
+                </button>
+              </div>
             ) : activeTool.launchMode !== 'calculator' ? (
-          <div className="clinical-calculator-hub__select">
-            <NavIcon icon={CHROME_ICONS.drugs || CHROME_ICONS.pill || CHROME_ICONS.stethoscope} size={44} aria-hidden />
-            <h2>{activeTool.name}</h2>
-            <p>{activeTool.description}</p>
-            {activeTool.path ? (
-              <button type="button" onClick={() => navigate(activeTool.path)}>
-                Open Reference Tool
-              </button>
-            ) : null}
-          </div>
+              <div className="clinical-calculator-hub__select">
+                <NavIcon icon={CHROME_ICONS.drugs || CHROME_ICONS.pill || CHROME_ICONS.stethoscope} size={44} aria-hidden />
+                <h2>{activeTool.name}</h2>
+                <p>{activeTool.description}</p>
+                {activeTool.path ? (
+                  <button type="button" onClick={() => navigate(activeTool.path)}>
+                    Open Reference Tool
+                  </button>
+                ) : null}
+              </div>
             ) : (
           <>
             <div className="clinical-calculator-shell__header">
