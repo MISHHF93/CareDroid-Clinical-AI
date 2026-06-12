@@ -1,99 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useEmergencyStore } from '../../store/emergencyStore';
+import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
 import { buildBuiltinHubCalculatorCards } from '../data/calculatorHubManifest';
 import { DRUG_REFERENCE_TOOLS } from '../utils/drugReferenceTools';
 import './CommandPalette.css';
 
 const RECENT_COMMANDS_KEY = 'caredroid.ed.commandPalette.recents.v1';
 const HUB_CALCULATORS = buildBuiltinHubCalculatorCards();
-
-const EMERGENCY_OS_ROUTE_COMMANDS = [
-  {
-    id: 'open-whiteboard',
-    label: 'Open Whiteboard',
-    hint: 'W',
-    keywords: ['whiteboard', 'board', 'patient flow', 'operational screen'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/whiteboard' }),
-  },
-  {
-    id: 'open-patients',
-    label: 'Open Patients',
-    hint: 'P',
-    keywords: ['patients', 'patient list', 'snapshots'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/patients' }),
-  },
-  {
-    id: 'open-ems',
-    label: 'Open EMS',
-    hint: 'E',
-    keywords: ['ems', 'pre-arrival', 'ambulance', 'pipeline'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/ems' }),
-  },
-  {
-    id: 'open-intake',
-    label: 'Open Smart Intake',
-    hint: 'I',
-    keywords: ['intake', 'arrival', 'identity', 'registration', 'ocr'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/intake' }),
-  },
-  {
-    id: 'open-queues',
-    label: 'Open Queues',
-    hint: 'Q',
-    keywords: ['queues', 'queue intelligence', 'waiting', 'who next'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/queues' }),
-  },
-  {
-    id: 'open-reassessment',
-    label: 'Open Reassessment',
-    hint: 'R',
-    keywords: ['reassessment', 'due', 'safety', 'review'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/reassessment' }),
-  },
-  {
-    id: 'open-capacity',
-    label: 'Open Capacity',
-    hint: 'C',
-    keywords: ['capacity', 'rooms', 'pressure', 'occupancy'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/capacity' }),
-  },
-  {
-    id: 'open-boarding',
-    label: 'Open Boarding',
-    hint: 'B',
-    keywords: ['boarding', 'admission pending', 'boarders'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/boarding' }),
-  },
-  {
-    id: 'open-referrals',
-    label: 'Open Referrals',
-    hint: 'Ref',
-    keywords: ['referrals', 'consults', 'transfer', 'specialty'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/referrals' }),
-  },
-  {
-    id: 'open-copilot',
-    label: 'Open ED Copilot',
-    hint: 'AI',
-    keywords: ['copilot', 'assistant', 'ai', 'chat'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/copilot' }),
-  },
-  {
-    id: 'open-analytics',
-    label: 'Open Analytics',
-    hint: 'A',
-    keywords: ['analytics', 'throughput', 'metrics', 'trends'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/analytics' }),
-  },
-  {
-    id: 'open-settings',
-    label: 'Open Settings',
-    hint: 'S',
-    keywords: ['settings', 'thresholds', 'staff', 'configuration'],
-    build: () => ({ type: 'OPEN_ROUTE', path: '/emergency/settings' }),
-  },
-];
 
 const BASE_COMMANDS = [
   ...EMERGENCY_OS_ROUTE_COMMANDS,
@@ -283,12 +197,14 @@ export default function CommandPalette({ open, onClose, onExecute }) {
   const [recentCommandIds, setRecentCommandIds] = useState(() => readRecentCommands());
   const [flagTarget, setFlagTarget] = useState(null);
   const [selectedFlag, setSelectedFlag] = useState('ReassessmentDue');
+  const [inlineMessage, setInlineMessage] = useState('');
   const inputRef = useRef(null);
 
   useEffect(() => {
     if (!open) return;
     setQuery('');
     setActiveIndex(0);
+    setInlineMessage('');
     window.setTimeout(() => inputRef.current?.focus(), 0);
   }, [open]);
 
@@ -526,8 +442,11 @@ export default function CommandPalette({ open, onClose, onExecute }) {
         setFlagTarget(patient);
         return;
       }
+      setInlineMessage('Type "flag" plus an active patient name or MRN to open the flag dialog.');
+      return;
     }
 
+    setInlineMessage('');
     onExecute(payload);
   };
 
@@ -587,6 +506,7 @@ export default function CommandPalette({ open, onClose, onExecute }) {
 
         <div className="command-palette__body">
           {!query.trim() ? <span className="command-palette__eyebrow">Recent commands</span> : null}
+          {inlineMessage ? <p role="status">{inlineMessage}</p> : null}
           {commands.map((command, index) => (
             <button
               key={command.id}

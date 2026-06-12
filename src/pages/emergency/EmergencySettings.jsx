@@ -40,9 +40,9 @@ function asArray(value) {
   return [];
 }
 
-function Section({ title, subtitle, children, action }) {
+function Section({ id, title, subtitle, children, action }) {
   return (
-    <section className="emergency-settings__section">
+    <section id={id} className="emergency-settings__section">
       <header>
         <div>
           <span>{title}</span>
@@ -96,15 +96,23 @@ export default function EmergencySettings() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchIntegrationStatuses().then((result) => {
-      if (cancelled) return;
-      const fhir = asArray(result.fhir?.data?.data || result.fhir?.data).map((item) => ({ ...item, kind: 'FHIR' }));
-      const hl7 = asArray(result.hl7?.data?.data || result.hl7?.data).map((item) => ({ ...item, kind: 'HL7' }));
-      setIntegrations([...fhir, ...hl7]);
-    });
-    fetchProtocolsAdmin().then((result) => {
-      if (!cancelled && result.ok) setProtocols(asArray(result.data));
-    });
+    fetchIntegrationStatuses()
+      .then((result) => {
+        if (cancelled) return;
+        const fhir = asArray(result.fhir?.data?.data || result.fhir?.data).map((item) => ({ ...item, kind: 'FHIR' }));
+        const hl7 = asArray(result.hl7?.data?.data || result.hl7?.data).map((item) => ({ ...item, kind: 'HL7' }));
+        setIntegrations([...fhir, ...hl7]);
+      })
+      .catch((error) => {
+        if (!cancelled) setStatus(`Integration status unavailable: ${error.message}`);
+      });
+    fetchProtocolsAdmin()
+      .then((result) => {
+        if (!cancelled && result.ok) setProtocols(asArray(result.data));
+      })
+      .catch((error) => {
+        if (!cancelled) setStatus(`Protocol admin status unavailable: ${error.message}`);
+      });
     return () => {
       cancelled = true;
     };
@@ -192,6 +200,7 @@ export default function EmergencySettings() {
       </header>
 
       <Section
+        id="department"
         title="Department Setup"
         subtitle={`Room management and department capacity target. ${roomSummary}.`}
         action={<button type="button" onClick={saveDepartment}>Save Department</button>}
@@ -224,7 +233,7 @@ export default function EmergencySettings() {
         </div>
       </Section>
 
-      <Section title="Thresholds" subtitle="CapacityEngine, ReassessmentEngine, queue pressure, and EMS offload targets." action={<button type="button" onClick={saveThresholds}>Save Thresholds</button>}>
+      <Section id="thresholds" title="Thresholds" subtitle="CapacityEngine, ReassessmentEngine, queue pressure, and EMS offload targets." action={<button type="button" onClick={saveThresholds}>Save Thresholds</button>}>
         <div className="emergency-settings__grid">
           {[
             ['waitWarningMinutes', 'Wait warning threshold (min)'],
@@ -253,7 +262,7 @@ export default function EmergencySettings() {
         </div>
       </Section>
 
-      <Section title="Alert Rules" subtitle="Toggle individual alert types and override severity." action={<button type="button" onClick={saveAlerts}>Save Alert Rules</button>}>
+      <Section id="alerts" title="Alert Rules" subtitle="Toggle individual alert types and override severity." action={<button type="button" onClick={saveAlerts}>Save Alert Rules</button>}>
         <div className="emergency-settings__rules">
           {Object.entries(alertRules).map(([rule, config]) => (
             <article key={rule}>
@@ -269,7 +278,7 @@ export default function EmergencySettings() {
         </div>
       </Section>
 
-      <Section title="Staff Management" subtitle="Local staff roster mapped to backend staff settings when available." action={<button type="button" onClick={saveStaff}>Save Staff</button>}>
+      <Section id="staff" title="Staff Management" subtitle="Local staff roster mapped to backend staff settings when available." action={<button type="button" onClick={saveStaff}>Save Staff</button>}>
         <div className="emergency-settings__inline">
           <button type="button" onClick={addStaff}>Add Staff</button>
         </div>
@@ -289,7 +298,7 @@ export default function EmergencySettings() {
         </div>
       </Section>
 
-      <Section title="Integrations" subtitle="Read-only EHR, FHIR, and HL7 backend status panel.">
+      <Section id="integrations" title="Integrations" subtitle="Read-only EHR, FHIR, and HL7 backend status panel.">
         <div className="emergency-settings__cards">
           {integrations.length ? integrations.map((integration) => {
             const id = integration.id || integration.connectionId || integration.interfaceId || integration.name || integration.kind;
@@ -300,7 +309,7 @@ export default function EmergencySettings() {
                 <span className={`emergency-settings__status emergency-settings__status--${tone}`} />
                 <strong>{label}</strong>
                 <small>{integration.kind} · {integration.status || integration.health || integration.state || 'Demo backend'}</small>
-                <button type="button" onClick={() => testIntegrationConnection(integration.kind, id).then((result) => setStatus(result.ok ? `${label} test sent.` : result.message))}>
+                <button type="button" onClick={() => testIntegrationConnection(integration.kind, id).then((result) => setStatus(result.ok ? `${label} test sent.` : result.message)).catch((error) => setStatus(`${label} test failed: ${error.message}`))}>
                   Test Connection
                 </button>
               </article>
@@ -309,7 +318,7 @@ export default function EmergencySettings() {
         </div>
       </Section>
 
-      <Section title="Protocol Activation" subtitle="Existing protocol admin endpoints are available for activation/deactivation.">
+      <Section id="protocols" title="Protocol Activation" subtitle="Existing protocol admin endpoints are available for activation/deactivation.">
         <div className="emergency-settings__cards">
           {protocols.slice(0, 8).map((protocol) => {
             const id = protocol.id || protocol._id || protocol.name;
@@ -321,7 +330,7 @@ export default function EmergencySettings() {
                 <button type="button" onClick={() => updateProtocolAdmin(id, { ...protocol, active: !active, isActive: !active }).then((result) => {
                   setStatus(result.ok ? 'Protocol updated.' : result.message);
                   if (result.ok) setProtocols((current) => current.map((item) => (item === protocol ? { ...item, active: !active, isActive: !active } : item)));
-                })}>
+                }).catch((error) => setStatus(`Protocol update failed: ${error.message}`))}>
                   {active ? 'Deactivate' : 'Activate'}
                 </button>
               </article>
@@ -330,7 +339,7 @@ export default function EmergencySettings() {
         </div>
       </Section>
 
-      <Section title="Feature Flags" subtitle="Tenant feature flags managed by the shared feature store." action={<button type="button" onClick={saveFeatureFlags} disabled={featureLoading}>Save Feature Flags</button>}>
+      <Section id="features" title="Feature Flags" subtitle="Tenant feature flags managed by the shared feature store." action={<button type="button" onClick={saveFeatureFlags} disabled={featureLoading}>Save Feature Flags</button>}>
         <div className="emergency-settings__rules">
           {FEATURE_FLAG_ROWS.map(([featureId, label]) => (
             <article key={featureId}>

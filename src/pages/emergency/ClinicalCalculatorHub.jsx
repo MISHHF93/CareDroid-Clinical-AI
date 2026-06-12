@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { CalculatorInterface, CALCULATORS } from '../tools/Calculators';
+import DrugChecker from '../tools/DrugChecker';
 import { NavIcon } from '../../navigation/NavIcon';
 import { CHROME_ICONS, getCalculatorSubIcon } from '../../navigation/iconRegistry';
 import { useEmergencyStore } from '../../../store/emergencyStore';
@@ -511,7 +512,9 @@ export default function ClinicalCalculatorHub() {
       <section className="clinical-calculator-hub__workspace" aria-label="Calculator workspace">
         {activeTool ? (
           <FeatureGate feature={activeToolFeature} showPlaceholder>
-            {activeTool.launchMode !== 'calculator' ? (
+            {activeTool.id === 'drug-check' ? (
+          <DrugChecker embedded />
+            ) : activeTool.launchMode !== 'calculator' ? (
           <div className="clinical-calculator-hub__select">
             <NavIcon icon={CHROME_ICONS.drugs || CHROME_ICONS.pill || CHROME_ICONS.stethoscope} size={44} aria-hidden />
             <h2>{activeTool.name}</h2>
@@ -525,7 +528,7 @@ export default function ClinicalCalculatorHub() {
             ) : (
           <>
             <div className="clinical-calculator-shell__header">
-              <button type="button" onClick={() => navigate('/emergency/tools')}>
+              <button type="button" onClick={() => navigate('/emergency/copilot')}>
                 All tools
               </button>
               <div>

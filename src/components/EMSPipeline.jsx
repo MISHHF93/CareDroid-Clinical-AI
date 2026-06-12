@@ -170,26 +170,44 @@ export default function EMSPipeline() {
 
   useEffect(() => {
     let cancelled = false;
-    fetchEmsFleetSnapshot().then((result) => {
-      if (cancelled) return;
-      if (result.ok) {
+    fetchEmsFleetSnapshot()
+      .then((result) => {
+        if (cancelled) return;
+        if (result.ok) {
+          setFleetSnapshot({
+            status: 'ready',
+            units: result.data?.units || [],
+            message: result.data?.sourceLabel || result.message || '',
+          });
+        } else {
+          setFleetSnapshot({ status: 'error', units: [], message: result.message || 'EMS unit backend unavailable.' });
+        }
+      })
+      .catch((error) => {
+        if (cancelled) return;
         setFleetSnapshot({
-          status: 'ready',
-          units: result.data?.units || [],
-          message: result.data?.sourceLabel || result.message || '',
+          status: 'error',
+          units: [],
+          message: error.message || 'EMS unit backend unavailable.',
         });
-      } else {
-        setFleetSnapshot({ status: 'error', units: [], message: result.message || 'EMS unit backend unavailable.' });
-      }
-    });
-    fetchEmergencyDiversionStatus().then((result) => {
-      if (cancelled) return;
-      setDiversionStatus({
-        status: result.ok ? 'ready' : 'unavailable',
-        data: result.data,
-        message: result.message || '',
       });
-    });
+    fetchEmergencyDiversionStatus()
+      .then((result) => {
+        if (cancelled) return;
+        setDiversionStatus({
+          status: result.ok ? 'ready' : 'unavailable',
+          data: result.data,
+          message: result.message || '',
+        });
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setDiversionStatus({
+          status: 'unavailable',
+          data: null,
+          message: error.message || 'Diversion status backend unavailable.',
+        });
+      });
     return () => {
       cancelled = true;
     };
@@ -265,9 +283,9 @@ export default function EMSPipeline() {
           {diversionStatus.status === 'ready' && diversionStatus.data ? (
             <div className="ems-pipeline__diversion">
               <strong>Diversion Status</strong>
-              <button type="button" aria-pressed={Boolean(diversionStatus.data.active)}>
+              <span role="status" aria-label="Diversion status">
                 {diversionStatus.data.active ? 'Active diversion' : 'No diversion'}
-              </button>
+              </span>
             </div>
           ) : null}
           <div className="ems-pipeline__unit-grid">

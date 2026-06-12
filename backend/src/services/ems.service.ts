@@ -56,7 +56,10 @@ export class EMSService {
     status: EMSStatus,
     etaMinutes?: number,
   ): Promise<IPatient | null> {
-    const patient = await Patient.findOne({ ems_unit_id: emsUnitId, ems_status: { $ne: 'arrived' } });
+    const patient = await Patient.findOne({
+      ems_unit_id: emsUnitId,
+      ems_status: { $ne: 'arrived' },
+    });
     if (!patient) return null;
 
     patient.ems_status = status;
@@ -81,7 +84,11 @@ export class EMSService {
     return patient;
   }
 
-  async confirmArrival(emsUnitId: string, realName?: string, realAge?: string): Promise<IPatient | null> {
+  async confirmArrival(
+    emsUnitId: string,
+    realName?: string,
+    realAge?: string,
+  ): Promise<IPatient | null> {
     const patient = await Patient.findOne({ ems_unit_id: emsUnitId });
     if (!patient) return null;
 

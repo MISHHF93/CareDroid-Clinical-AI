@@ -1,4 +1,4 @@
-import { apiFetch, parseApiResponse } from './apiClient';
+import { apiFetch, getApiErrorMessage, parseApiResponse } from './apiClient';
 
 const jsonHeaders = { 'Content-Type': 'application/json' };
 
@@ -8,7 +8,11 @@ async function postJson(path, body) {
     headers: jsonHeaders,
     body: JSON.stringify(body),
   });
-  return parseApiResponse(response);
+  const payload = await parseApiResponse(response);
+  if (!response.ok) {
+    throw new Error(payload?.error || payload?.message || getApiErrorMessage(null, response));
+  }
+  return payload;
 }
 
 export const SmartIntakeApi = Object.freeze({

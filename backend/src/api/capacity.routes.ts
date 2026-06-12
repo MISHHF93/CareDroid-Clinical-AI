@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { capacityService } from '../services/capacity.service';
+import { capacityService } from '../services';
 
 const router = Router();
 

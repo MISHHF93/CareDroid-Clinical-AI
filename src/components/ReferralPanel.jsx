@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock3, FilePlus2, Search, Send, XCircle } from 'lucide-react';
 import { PatientState } from '../../types/emergency';
 import { useEmergencyStore } from '../../store/emergencyStore';
@@ -19,6 +19,7 @@ const REFERRAL_STATUSES = [
   'Draft',
   'Sent',
   'Acknowledged',
+  'InfoRequested',
   'Accepted',
   'TransferRequested',
   'TransportArranged',
@@ -50,6 +51,7 @@ const INITIAL_FORM = {
 };
 
 const STATUS_LABEL = {
+  InfoRequested: 'Info Requested',
   TransferRequested: 'Transfer Requested',
   TransportArranged: 'Transport Arranged',
   PatientDeparted: 'Patient Departed',
@@ -246,6 +248,7 @@ function ReferralRow({ referral, patient, now, note, onNoteChange, onStatusChang
 }
 
 export default function ReferralPanel() {
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const referrals = useEmergencyStore((state) => state.referrals);
   const patients = useEmergencyStore((state) => state.patients);
@@ -261,6 +264,7 @@ export default function ReferralPanel() {
   const [responseNotes, setResponseNotes] = useState({});
   const [formError, setFormError] = useState('');
   const [backendStatus, setBackendStatus] = useState('');
+  const [backendPending, setBackendPending] = useState(false);
 
   useEffect(() => {
     const intervalId = window.setInterval(() => setNow(new Date()), 30_000);
@@ -379,13 +383,19 @@ export default function ReferralPanel() {
     };
 
     createReferral(payload);
-    persistEmergencyReferral(payload).then((result) => {
-      setBackendStatus(
-        result.ok
-          ? 'Referral persisted to backend.'
-          : result.message || 'Referral backend persistence endpoint is not available yet.'
-      );
-    });
+    setBackendPending(true);
+    persistEmergencyReferral(payload)
+      .then((result) => {
+        setBackendStatus(
+          result.ok
+            ? 'Referral persisted to backend.'
+            : result.message || 'Referral saved locally; backend persistence endpoint is not available yet.'
+        );
+      })
+      .catch((error) => {
+        setBackendStatus(`Referral saved locally; backend sync failed: ${error.message}`);
+      })
+      .finally(() => setBackendPending(false));
     resetForm();
     setFormOpen(false);
   };
@@ -393,19 +403,31 @@ export default function ReferralPanel() {
   const handleStatusChange = (referralId, status, responseNote = '') => {
     updateReferralStatus(referralId, status, responseNote);
     if (['TransferRequested', 'TransportArranged', 'PatientDeparted'].includes(status)) {
-      updateEmergencyTransferWorkflow(referralId, status).then((result) => {
-        setBackendStatus(
-          result.ok
-            ? 'Transfer workflow synced to backend.'
-            : result.message || 'Transfer workflow backend endpoint is not available yet.'
-        );
-      });
+      setBackendPending(true);
+      updateEmergencyTransferWorkflow(referralId, status)
+        .then((result) => {
+          setBackendStatus(
+            result.ok
+              ? 'Transfer workflow synced to backend.'
+              : result.message || 'Transfer updated locally; backend endpoint is not available yet.'
+          );
+        })
+        .catch((error) => {
+          setBackendStatus(`Transfer updated locally; backend sync failed: ${error.message}`);
+        })
+        .finally(() => setBackendPending(false));
     }
     setResponseNotes((current) => ({ ...current, [referralId]: '' }));
   };
 
   const handleSelectPatient = (patientId) => {
-    if (patientId) selectPatient(patientId);
+    if (!patientId) {
+      setBackendStatus('Patient record is unavailable for this referral.');
+      return;
+    }
+
+    selectPatient(patientId);
+    navigate('/emergency/patients');
   };
 
   return (
@@ -472,7 +494,11 @@ export default function ReferralPanel() {
         </div>
       </div>
 
-      {backendStatus ? <p className="referral-panel__backend-status">{backendStatus}</p> : null}
+      {backendStatus || backendPending ? (
+        <p className="referral-panel__backend-status" role={backendStatus?.includes('failed') ? 'alert' : 'status'}>
+          {backendPending ? 'Syncing referral workflow with backend...' : backendStatus}
+        </p>
+      ) : null}
 
       {formOpen ? (
         <form className="referral-form" onSubmit={(event) => event.preventDefault()}>
@@ -570,22 +596,32 @@ export default function ReferralPanel() {
 
           <div className="referral-form__actions">
             {formError ? <p role="alert">{formError}</p> : null}
-            <button type="button" onClick={() => setForm((current) => ({ ...current, clinicalSummary: buildClinicalSummary(selectedPatient) }))}>
+            <button
+              type="button"
+              onClick={() => {
+                if (!selectedPatient) {
+                  setFormError('Select a patient to auto-fill a clinical summary.');
+                  return;
+                }
+                setFormError('');
+                setForm((current) => ({ ...current, clinicalSummary: buildClinicalSummary(selectedPatient) }));
+              }}
+            >
               Auto-fill summary
             </button>
             {form.workflow === 'Referral' ? (
-              <button type="button" onClick={() => submitReferral('Draft')}>
+              <button type="button" onClick={() => submitReferral('Draft')} disabled={backendPending}>
                 Save Draft
               </button>
             ) : null}
             {form.workflow === 'Transfer' ? (
-              <button type="button" className="referral-form__send" onClick={() => submitReferral('TransferRequested')}>
+              <button type="button" className="referral-form__send" onClick={() => submitReferral('TransferRequested')} disabled={backendPending}>
                 Request Transfer
               </button>
             ) : (
-              <button type="button" className="referral-form__send" onClick={() => submitReferral('Sent')}>
+              <button type="button" className="referral-form__send" onClick={() => submitReferral('Sent')} disabled={backendPending}>
                 <Send size={14} aria-hidden />
-                Send Referral
+                {backendPending ? 'Sending...' : 'Send Referral'}
               </button>
             )}
           </div>

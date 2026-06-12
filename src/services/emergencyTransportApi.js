@@ -64,8 +64,9 @@ export async function fetchEmsFleetSnapshot() {
 }
 
 export function persistEmergencyReferral(referral) {
-  return guardedJson('emergencyReferralPersistence', '/api/emergency/referrals', {
+  return guardedJson('emergencyReferralPersistence', '/api/referrals', {
     method: 'POST',
+    headers: { 'content-type': 'application/json' },
     body: JSON.stringify(referral),
   });
 }

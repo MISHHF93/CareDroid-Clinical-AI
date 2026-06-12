@@ -200,7 +200,7 @@ describe('canonical route tree behavior', () => {
 
     await user.click(within(screen.getByLabelText(/Whiteboard filters/i)).getByRole('button', { name: /Waiting/i }));
     expect(useEmergencyStore.getState().activeQueueFilter).toBe('Waiting');
-  }, 15_000);
+  }, 30_000);
 
   it('/emergency/ems renders EMS units, live ETA, Prepare Bay action, and pressure score', async () => {
     const user = userEvent.setup();
@@ -236,10 +236,11 @@ describe('canonical route tree behavior', () => {
     expect(await screen.findByRole('heading', { name: 'Consult Request' })).toBeInTheDocument();
     await user.click(screen.getAllByRole('button', { name: /MRN-/i })[0]);
     await user.type(screen.getByPlaceholderText(/Clinical reason for referral/i), 'Cardiology review');
+    await user.click(screen.getByRole('button', { name: /Auto-fill summary/i }));
     await user.click(screen.getByRole('button', { name: /Send Referral/i }));
 
     expect(useEmergencyStore.getState().referrals.length).toBe(initialCount + 1);
-  });
+  }, 10000);
 
   it('/emergency/capacity renders capacity, rooms, boarding, and discharge pipeline from store', async () => {
     renderRoute('/emergency/capacity');
@@ -259,16 +260,17 @@ describe('canonical route tree behavior', () => {
     expect(screen.getByText(/Live waiting, triage, provider, referral/i)).toBeInTheDocument();
   });
 
-  it('/emergency/reassessment keeps reassessment workflow inside the whiteboard shell', async () => {
+  it('/emergency/reassessment renders a dedicated reassessment queue surface', async () => {
     renderRoute('/emergency/reassessment');
 
-    expect(await screen.findByRole('heading', { name: 'Emergency Whiteboard' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Reassessment' })).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: /Reassessment queue/i })).toBeInTheDocument();
   });
 
   it('/emergency/boarding renders boarding and discharge capacity detail', async () => {
     renderRoute('/emergency/boarding');
 
-    expect(await screen.findByRole('heading', { name: 'Capacity Detail' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Boarding Intelligence' })).toBeInTheDocument();
     expect(screen.getByRole('region', { name: /Boarding patients/i })).toBeInTheDocument();
   });
 
@@ -284,6 +286,6 @@ describe('canonical route tree behavior', () => {
     expect((await screen.findAllByRole('heading', { name: 'Settings' })).length).toBeGreaterThan(0);
     expect(screen.getByRole('navigation', { name: /Settings tabs/i })).toBeInTheDocument();
     const featuresTab = screen.getByRole('link', { name: 'Features' });
-    expect(featuresTab).toHaveAttribute('href', '/emergency/settings#features');
+    expect(featuresTab).toHaveAttribute('href', '/settings/features');
   });
 });

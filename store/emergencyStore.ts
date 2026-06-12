@@ -37,8 +37,10 @@ import {
   type Vitals,
 } from '../types/emergency';
 import {
+  createEmergencyPatientRecord,
   fetchPatientManagementBundle,
   searchPatientsFromBackend,
+  updateEmergencyPatientRecord,
 } from '../src/services/patientManagementApi';
 import {
   fetchOperationalStaffProfile,
@@ -189,6 +191,22 @@ type ReferralCreateInput = Pick<
 > & {
   status?: Extract<ReferralStatus, 'Draft' | 'Sent' | 'TransferRequested'>;
   workflow?: Referral['workflow'];
+};
+
+const syncPatientCreateToBackend = (patient: Patient) => {
+  void createEmergencyPatientRecord(patient).then((result) => {
+    if (!result.ok) {
+      console.warn('Emergency patient create sync failed', result.message);
+    }
+  });
+};
+
+const syncPatientPatchToBackend = (patientId: string, patch: PatientPatch) => {
+  void updateEmergencyPatientRecord(patientId, patch).then((result) => {
+    if (!result.ok) {
+      console.warn('Emergency patient update sync failed', result.message);
+    }
+  });
 };
 
 interface EmergencyStoreState {
@@ -507,6 +525,13 @@ const DEFAULT_FLAG_REASON: Record<PatientFlagType, string> = {
   DeterioratingNeuro: 'Deteriorating neuro status',
   ScoreReassessmentRecommended: 'Score reassessment recommended',
 };
+
+const REASSESSMENT_MANAGED_FLAG_TYPES = new Set<PatientFlagType>([
+  'ReassessmentDue',
+  'ScoreReassessmentRecommended',
+  'DeteriorationRisk',
+  'HighRisk',
+]);
 
 export const getPatientFlagType = (flag: PatientFlagInput): PatientFlagType =>
   typeof flag === 'string' ? flag : flag.type;
@@ -1928,7 +1953,8 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
     });
   },
 
-  addPatient: (patient) =>
+  addPatient: (patient) => {
+    syncPatientCreateToBackend(patient);
     set((state) => {
       const patients = [...state.patients, patient];
       const referrals = syncReferralsFromPatients(patients, state.referrals);
@@ -1937,9 +1963,11 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
         referrals,
         ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals, state.emergencySettings),
       };
-    }),
+    });
+  },
 
-  updatePatient: (id, patch) =>
+  updatePatient: (id, patch) => {
+    syncPatientPatchToBackend(id, patch);
     set((state) => {
       const patients = updatePatients(state.patients, id, (patient) => ({ ...patient, ...patch }));
       const referrals = syncReferralsFromPatients(patients, state.referrals);
@@ -1948,9 +1976,16 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
         referrals,
         ...deriveOperationalState(patients, state.rooms, referrals, state.emsArrivals, state.emergencySettings),
       };
-    }),
+    });
+  },
 
-  dischargePatient: (id, options = {}) =>
+  dischargePatient: (id, options = {}) => {
+    syncPatientPatchToBackend(id, {
+      state: PatientState.Discharge,
+      roomId: null,
+      assignedStaffId: null,
+      flags: options.flags ?? [],
+    });
     set((state) => {
       const patient = state.patients.find((candidate) => candidate.id === id);
       const previousRoomId = patient?.roomId ?? null;
@@ -1997,9 +2032,14 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
         referrals,
         ...deriveOperationalState(patients, rooms, referrals, state.emsArrivals, state.emergencySettings),
       };
-    }),
+    });
+  },
 
-  movePatientToState: (id, nextState, options = {}) =>
+  movePatientToState: (id, nextState, options = {}) => {
+    syncPatientPatchToBackend(id, {
+      state: nextState,
+      flags: options.flags,
+    });
     set((state) => {
       const patients = updatePatients(state.patients, id, (patient) => ({
         ...patient,
@@ -2020,7 +2060,8 @@ export const useEmergencyStore = create<EmergencyStoreState>((set, get) => ({
         patients,
         ...deriveOperationalState(patients, state.rooms, state.referrals, state.emsArrivals, state.emergencySettings),
       };
-    }),
+    });
+  },
 
   assignStaff: (patientId, staffId, options = {}) =>
     set((state) => {
@@ -3912,9 +3953,13 @@ export const selectReassessmentQueue = (
   if (state.patients === reassessmentQueueInput) return reassessmentQueueOutput;
   reassessmentQueueInput = state.patients;
   reassessmentQueueOutput = selectActivePatients(state)
-    .filter((patient) => hasPatientFlag(patient, 'ReassessmentDue'))
+    .filter((patient) =>
+      patient.flags.some((flag) => REASSESSMENT_MANAGED_FLAG_TYPES.has(getPatientFlagType(flag)))
+    )
     .map((patient) => {
-      const reassessmentFlags = patient.flags.filter((flag) => flag.type === 'ReassessmentDue');
+      const reassessmentFlags = patient.flags.filter((flag) =>
+        REASSESSMENT_MANAGED_FLAG_TYPES.has(getPatientFlagType(flag))
+      );
       const longWait = longWaitStatus(patient);
       return {
         patientId: patient.id,
@@ -3939,7 +3984,7 @@ export const selectReassessmentQueue = (
 export const selectReassessmentCount = (state: EmergencyStoreState): number =>
   selectActivePatients(state).filter(
     (patient) =>
-      hasPatientFlag(patient, 'ReassessmentDue') || hasPatientFlag(patient, 'ScoreReassessmentRecommended')
+      patient.flags.some((flag) => REASSESSMENT_MANAGED_FLAG_TYPES.has(getPatientFlagType(flag)))
   ).length;
 
 let activeAlertsInput: Alert[] | null = null;

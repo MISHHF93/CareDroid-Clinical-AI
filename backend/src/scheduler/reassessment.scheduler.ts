@@ -26,7 +26,9 @@ export class ReassessmentScheduler {
         }
 
         if (overduePatients.length > 0) {
-          console.log(`[ReassessmentScheduler] ${overduePatients.length} patients need reassessment`);
+          console.log(
+            `[ReassessmentScheduler] ${overduePatients.length} patients need reassessment`,
+          );
         }
       } catch (error) {
         console.error('[ReassessmentScheduler] Error:', error);

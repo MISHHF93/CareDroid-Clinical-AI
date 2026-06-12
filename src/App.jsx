@@ -305,6 +305,7 @@ const ClinicalToolCatalog = lazyWithRetry(() => import('./pages/tools/ClinicalTo
 const Calculators = lazyWithRetry(() => import('./pages/tools/Calculators'));
 const EmergencyAnalytics = lazyWithRetry(() => import('./pages/emergency/EmergencyAnalytics'));
 const SmartIntake = lazyWithRetry(() => import('./pages/emergency/SmartIntake'));
+const ClinicalCalculatorHub = lazyWithRetry(() => import('./pages/emergency/ClinicalCalculatorHub'));
 const DrugChecker = lazyWithRetry(() => import('./pages/tools/DrugChecker'));
 const LabInterpreter = lazyWithRetry(() => import('./pages/tools/LabInterpreter'));
 const Protocols = lazyWithRetry(() => import('./pages/tools/Protocols'));
@@ -481,7 +482,6 @@ function AppShellPage({ children }) {
   const { signOut, user, isDevAuthBypass } = useUser();
   const { conversations, activeConversationId, selectConversation, addConversation } =
     useConversation();
-  const emergencyPatientCount = useEmergencyStore((state) => state.patients.length);
   const isEmergencyHydrating = useEmergencyStore((state) => state.isHydrating);
   const hasEmergencyHydrated = useEmergencyStore((state) => state.hasHydrated);
   const ensureEmergencyHydrated = useEmergencyStore((state) => state.ensureHydrated);
@@ -498,16 +498,16 @@ function AppShellPage({ children }) {
 
   const handleNewConversation = () => {
     addConversation();
-    navigate({ pathname: '/assistant', search: '' }, { replace: true });
+    navigate({ pathname: '/emergency/copilot', search: '' }, { replace: true });
   };
 
   const handleSelectConversation = (conversationId) => {
     selectConversation(conversationId);
-    navigate({ pathname: '/assistant', search: '' }, { replace: true });
+    navigate({ pathname: '/emergency/copilot', search: '' }, { replace: true });
   };
 
   const shellContent =
-    isEmergencyHydrating || !hasEmergencyHydrated || emergencyPatientCount === 0 ? (
+    isEmergencyHydrating || !hasEmergencyHydrated ? (
       <section className="ed-route-panel" aria-busy="true" aria-labelledby="emergency-loading-title">
         <header className="ed-route-panel__header">
           <span>Emergency OS</span>
@@ -563,9 +563,49 @@ function LegacyProtectedRouteRedirect({ to, state }) {
   );
 }
 
+function LegacyCalculatorRouteRedirect() {
+  const { slug } = useParams();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const calculatorId = slug || params.get('calc') || params.get('tool');
+
+  if (calculatorId) {
+    params.set('tool', calculatorId);
+  }
+
+  return (
+    <Navigate
+      to={{
+        pathname: '/emergency/copilot',
+        search: params.toString() ? `?${params.toString()}` : '',
+      }}
+      replace
+    />
+  );
+}
+
+function LegacyToolRouteRedirect({ toolId }) {
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+
+  if (toolId) {
+    params.set('tool', toolId);
+  }
+
+  return (
+    <Navigate
+      to={{
+        pathname: '/emergency/copilot',
+        search: params.toString() ? `?${params.toString()}` : '',
+      }}
+      replace
+    />
+  );
+}
+
 const SETTINGS_TABS = Object.freeze([
   { label: 'General', to: '/emergency/settings' },
-  { label: 'Features', to: '/emergency/settings#features' },
+  { label: 'Features', to: '/settings/features' },
   { label: 'Thresholds', to: '/emergency/settings#thresholds' },
   { label: 'Staff', to: '/emergency/settings#staff' },
   { label: 'Integrations', to: '/emergency/settings#integrations' },
@@ -634,7 +674,7 @@ function FeatureRouteGuard({ feature, children }) {
   );
 }
 
-function EmergencyCopilotRedirect() {
+function EmergencyCopilotRoute() {
   const setCopilotOpen = useEmergencyStore((state) => state.setCopilotOpen);
 
   useEffect(() => {
@@ -642,16 +682,17 @@ function EmergencyCopilotRedirect() {
   }, [setCopilotOpen]);
 
   return (
-    <LegacyProtectedRouteRedirect
-      to="/emergency/whiteboard"
-      state={{
-        edNotice: {
-          title: 'ED Copilot is open in the right panel',
-          message:
-            'Chat and AI workflows now live in the persistent Copilot panel, not a page route.',
-        },
-      }}
-    />
+    <section className="ed-route-panel" aria-labelledby="emergency-copilot-title">
+      <header className="ed-route-panel__header">
+        <span>Emergency OS</span>
+        <h1 id="emergency-copilot-title">ED Copilot Workflows</h1>
+        <p>
+          Launch complaint-driven calculators and clinical tools while the persistent Copilot panel
+          stays open for human-reviewed guidance.
+        </p>
+      </header>
+      <ClinicalCalculatorHub />
+    </section>
   );
 }
 
@@ -687,6 +728,8 @@ function WorkspaceRouteRedirect() {
 }
 
 function EmergencyQueueRoute() {
+  const [collapsed, setCollapsed] = useState(false);
+
   return (
     <section
       className="ed-route-panel ed-route-panel--queue"
@@ -697,12 +740,110 @@ function EmergencyQueueRoute() {
         <h1 id="emergency-queue-title">Queue Intelligence</h1>
         <p>Live waiting, triage, provider, referral, admission, and reassessment pressure.</p>
       </header>
-      <QueueIntelligencePanel collapsed={false} onCollapsedChange={() => {}} />
+      <QueueIntelligencePanel collapsed={collapsed} onCollapsedChange={setCollapsed} />
     </section>
   );
 }
 
-function EmergencyCapacityRoute() {
+const REASSESSMENT_ROUTE_FLAG_TYPES = new Set([
+  'DeteriorationRisk',
+  'HighRisk',
+  'ScoreReassessmentRecommended',
+  'ReassessmentDue',
+]);
+
+function hasReassessmentRouteFlag(patient) {
+  return patient.flags?.some((flag) => REASSESSMENT_ROUTE_FLAG_TYPES.has(flag.type)) || false;
+}
+
+function EmergencyPatientsRoute() {
+  return (
+    <EmergencyWhiteboard
+      title="Patients"
+      subtitle="Active ED patient list, search, patient detail, and workflow actions."
+      defaultViewMode="list"
+    />
+  );
+}
+
+function EmergencyReassessmentRoute() {
+  const navigate = useNavigate();
+  const patients = useEmergencyStore((state) => state.patients);
+  const selectPatient = useEmergencyStore((state) => state.selectPatient);
+  const reassessmentPatients = patients.filter(
+    (patient) =>
+      patient.state !== PatientState.Discharge &&
+      patient.state !== PatientState.Deceased &&
+      hasReassessmentRouteFlag(patient)
+  );
+
+  return (
+    <section className="ed-route-panel" aria-labelledby="emergency-reassessment-title">
+      <header className="ed-route-panel__header">
+        <span>Emergency OS</span>
+        <h1 id="emergency-reassessment-title">Reassessment</h1>
+        <p>Patients requiring reassessment, escalation review, or deterioration checks.</p>
+      </header>
+
+      <div className="ed-route-panel__metrics" aria-label="Reassessment metrics">
+        <article>
+          <span>Due Now</span>
+          <strong>{reassessmentPatients.length}</strong>
+          <small>active patients flagged</small>
+        </article>
+        <article>
+          <span>High Priority</span>
+          <strong>{reassessmentPatients.filter((patient) => ['P1', 'P2'].includes(patient.priority)).length}</strong>
+          <small>P1/P2 reassessment queue</small>
+        </article>
+        <article>
+          <span>Source</span>
+          <strong>Local</strong>
+          <small>Store-backed safety queue</small>
+        </article>
+      </div>
+
+      <section className="ed-route-panel__list" aria-label="Reassessment queue">
+        <header>
+          <strong>Reassessment Queue</strong>
+          <small>{reassessmentPatients.length} patients</small>
+        </header>
+        {reassessmentPatients.length ? (
+          reassessmentPatients.map((patient) => (
+            <article key={patient.id}>
+              <div>
+                <strong>
+                  {patient.firstName} {patient.lastName}
+                </strong>
+                <span>
+                  {patient.priority} · {patient.mrn} · {patient.chiefComplaint}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  selectPatient(patient.id);
+                  navigate('/emergency/patients');
+                }}
+              >
+                Assess Now
+              </button>
+            </article>
+          ))
+        ) : (
+          <article>
+            <div>
+              <strong>No reassessments due</strong>
+              <span>All active patients are inside the current reassessment window.</span>
+            </div>
+          </article>
+        )}
+      </section>
+    </section>
+  );
+}
+
+function EmergencyCapacityRoute({ variant = 'capacity' }) {
   const capacity = useEmergencyStore((state) => state.capacity);
   const queues = useEmergencyStore((state) => state.queues);
   const rooms = useEmergencyStore((state) => state.rooms);
@@ -716,13 +857,20 @@ function EmergencyCapacityRoute() {
   const patientByRoomId = new Map(
     patients.filter((patient) => patient.roomId).map((patient) => [patient.roomId, patient])
   );
+  const isBoardingRoute = variant === 'boarding';
 
   return (
     <section className="ed-route-panel" aria-labelledby="emergency-capacity-title">
       <header className="ed-route-panel__header">
         <span>Emergency OS</span>
-        <h1 id="emergency-capacity-title">Capacity Detail</h1>
-        <p>Current department pressure, room occupancy, boarding risk, and queue load.</p>
+        <h1 id="emergency-capacity-title">
+          {isBoardingRoute ? 'Boarding Intelligence' : 'Capacity Detail'}
+        </h1>
+        <p>
+          {isBoardingRoute
+            ? 'Admission holds, bed pressure, disposition readiness, and boarding risk.'
+            : 'Current department pressure, room occupancy, boarding risk, and queue load.'}
+        </p>
       </header>
 
       <div className="ed-route-panel__metrics" aria-label="Capacity metrics">
@@ -854,11 +1002,6 @@ function EmergencyCapacityRoute() {
 
 const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([
   ['/auth', '/emergency/whiteboard'],
-  ['/dashboard', '/emergency/whiteboard'],
-  ['/home', '/emergency/whiteboard'],
-  ['/workspace', '/emergency/whiteboard'],
-  ['/app', '/emergency/whiteboard'],
-  ['/whiteboard', '/emergency/whiteboard'],
   ['/ems', '/emergency/ems'],
   ['/intake', '/emergency/intake'],
   ['/queues', '/emergency/queues'],
@@ -868,10 +1011,6 @@ const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([
   ['/boarding', '/emergency/boarding'],
   ['/referrals', '/emergency/referrals'],
   ['/analytics', '/emergency/analytics'],
-  ['/assistant', '/emergency/copilot'],
-  ['/chat', '/emergency/copilot'],
-  ['/ai', '/emergency/copilot'],
-  ['/copilot', '/emergency/copilot'],
   ['/emergency/smart-intake', '/emergency/intake'],
   ['/emergency/queue', '/emergency/queues'],
   ['/emergency/command-center', '/emergency/whiteboard'],
@@ -887,19 +1026,12 @@ const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([
   ['/workspace/emergency/referrals', '/emergency/referrals'],
   ['/workspace/emergency/capacity', '/emergency/capacity'],
   ['/workspace/emergency/boarding', '/emergency/boarding'],
-  ['/workspace/emergency/tools', '/emergency/tools'],
+  ['/workspace/emergency/tools', '/emergency/copilot'],
   ['/workspace/emergency/shift-summary', '/emergency/shift'],
   ['/workspace/emergency/shift', '/emergency/shift'],
   ['/workspace/emergency/settings', '/emergency/settings'],
   ['/workspace/emergency/copilot', '/emergency/copilot'],
   ['/workspace/emergency/command-center', '/emergency/whiteboard'],
-  ['/tools', '/emergency/tools'],
-  ['/tools/calculators', '/emergency/tools'],
-  ['/tools/calculators/:slug', '/emergency/tools'],
-  ['/all-tools', '/emergency/tools'],
-  ['/clinical-tools', '/emergency/tools'],
-  ['/catalog', '/emergency/tools'],
-  ['/calculators', '/emergency/tools'],
   ['/patients', '/emergency/patients'],
   ['/patients/*', '/emergency/patients'],
   ['/settings', '/emergency/settings'],
@@ -916,7 +1048,6 @@ const FUTURE_RELEASE_ROUTES = Object.freeze([
   ['Automation Audit', '/automation-audit'],
   ['Automation Analytics', '/automation-analytics'],
   ['Workspace Directory', '/workspaces'],
-  ['Search', '/search'],
   ['Knowledge Hub', '/knowledge-hub'],
   ['Timeline', '/timeline'],
   ['Digital Twin', '/digital-twin'],
@@ -1131,7 +1262,7 @@ export function AppRoutes() {
     },
     {
       path: '/emergency/patients',
-      element: <EmergencyWhiteboard />,
+      element: <EmergencyPatientsRoute />,
       requiresAuth: true,
     },
     {
@@ -1164,7 +1295,7 @@ export function AppRoutes() {
     },
     {
       path: '/emergency/reassessment',
-      element: <EmergencyWhiteboard />,
+      element: <EmergencyReassessmentRoute />,
       requiresAuth: true,
     },
     {
@@ -1188,15 +1319,15 @@ export function AppRoutes() {
     {
       path: '/emergency/boarding',
       element: (
-        <FeatureRouteGuard feature="capacity_intelligence">
-          <EmergencyCapacityRoute />
+        <FeatureRouteGuard feature="boarding_intelligence">
+          <EmergencyCapacityRoute variant="boarding" />
         </FeatureRouteGuard>
       ),
       requiresAuth: true,
     },
     {
       path: '/emergency/copilot',
-      element: <EmergencyCopilotRedirect />,
+      element: <EmergencyCopilotRoute />,
       requiresAuth: true,
     },
     {
@@ -1220,13 +1351,33 @@ export function AppRoutes() {
       requiresAuth: true,
     },
     {
+      path: '/search',
+      element: <SearchResultsPage />,
+      requiresAuth: true,
+    },
+    {
       path: '/settings',
       element: <LegacyProtectedRouteRedirect to="/emergency/settings" />,
       requiresAuth: true,
     },
     {
       path: '/settings/features',
-      element: <LegacyProtectedRouteRedirect to="/emergency/settings" />,
+      element: <SettingsFeaturesRoute />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/calculators',
+      element: <LegacyCalculatorRouteRedirect />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/calculators/:slug',
+      element: <LegacyCalculatorRouteRedirect />,
+      requiresAuth: true,
+    },
+    {
+      path: '/tools/drug-checker',
+      element: <LegacyToolRouteRedirect toolId="drug-check" />,
       requiresAuth: true,
     },
     ...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({

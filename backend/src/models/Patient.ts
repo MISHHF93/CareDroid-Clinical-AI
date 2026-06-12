@@ -112,7 +112,11 @@ const PatientSchema = new Schema<IPatient>(
     next_reassessment_due: { type: Date, default: null },
     reassessment_history: { type: [ReassessmentHistorySchema], default: [] },
 
-    triage_code: { type: String, enum: ['CTAS1', 'CTAS2', 'CTAS3', 'CTAS4', 'CTAS5', null], default: null },
+    triage_code: {
+      type: String,
+      enum: ['CTAS1', 'CTAS2', 'CTAS3', 'CTAS4', 'CTAS5', null],
+      default: null,
+    },
 
     safety_override: { type: Boolean, default: false },
     safety_override_reason: { type: String, default: null },

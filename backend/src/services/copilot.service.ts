@@ -17,7 +17,8 @@ interface CopilotResponse {
   timestamp: Date;
 }
 
-const HUMAN_REVIEW_REQUIRED = 'Human review required. This is not a replacement for clinical judgment.';
+const HUMAN_REVIEW_REQUIRED =
+  'Human review required. This is not a replacement for clinical judgment.';
 
 export class CopilotService {
   private safetyRules = {
@@ -173,7 +174,10 @@ export class CopilotService {
   private async getStrokeWorkflow(_query: CopilotQuery): Promise<CopilotResponse> {
     return {
       suggestion: `Stroke Workflow: 1) Last known well time, 2) NIHSS, 3) Non-contrast CT, 4) CTA if candidate, 5) tPA if <4.5h, 6) Thrombectomy if large vessel occlusion. ${HUMAN_REVIEW_REQUIRED}`,
-      data: { protocol: 'stroke', steps: ['Last known well', 'NIHSS', 'CT', 'CTA', 'tPA', 'Thrombectomy'] },
+      data: {
+        protocol: 'stroke',
+        steps: ['Last known well', 'NIHSS', 'CT', 'CTA', 'tPA', 'Thrombectomy'],
+      },
       requires_review: true,
       safety_check_passed: true,
       timestamp: new Date(),
@@ -185,11 +189,13 @@ export class CopilotService {
     const patientMatch = query.query.match(/patient\s+([A-Za-z0-9_-]+)/i);
     if (!patientMatch) {
       return {
-        suggestion: 'Please specify which patient. Example: "Move patient 64b... to higher priority"',
+        suggestion:
+          'Please specify which patient. Example: "Move patient 64b... to higher priority"',
         data: null,
         requires_review: true,
         safety_check_passed: false,
-        safety_message: 'Priority changes require an explicit patient identifier and clinician review.',
+        safety_message:
+          'Priority changes require an explicit patient identifier and clinician review.',
         timestamp: new Date(),
       };
     }
@@ -252,9 +258,15 @@ export class CopilotService {
     return [1, 2, 3, 4, 5].includes(score) ? (score as 1 | 2 | 3 | 4 | 5) : null;
   }
 
-  private evaluatePrioritySafety(patient: IPatient, requestedDps: 1 | 2 | 3 | 4 | 5): { ok: boolean; message: string } {
+  private evaluatePrioritySafety(
+    patient: IPatient,
+    requestedDps: 1 | 2 | 3 | 4 | 5,
+  ): { ok: boolean; message: string } {
     if (requestedDps <= patient.dps_score) {
-      return { ok: true, message: 'Priority escalation or equivalent priority is allowed for human review.' };
+      return {
+        ok: true,
+        message: 'Priority escalation or equivalent priority is allowed for human review.',
+      };
     }
 
     const safetyReasons = this.safetyFloorReasons(patient);

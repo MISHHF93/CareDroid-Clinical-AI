@@ -9,72 +9,96 @@ import { CANONICAL_ROUTES } from './routes.config';
 export const APP_SHELL_NAV_ITEMS = Object.freeze([
   {
     id: 'emergency_whiteboard',
+    label: 'Emergency Whiteboard',
+    mobileLabel: 'Board',
     featureId: 'emergency_whiteboard',
     path: CANONICAL_ROUTES.emergencyWorkspace,
     activePaths: [CANONICAL_ROUTES.emergencyWorkspace],
   },
   {
     id: 'emergency_patients',
+    label: 'Patients',
+    mobileLabel: 'Patients',
     featureId: 'emergency_patients',
     path: CANONICAL_ROUTES.emergencyPatients,
     activePaths: [CANONICAL_ROUTES.emergencyPatients],
   },
   {
     id: 'ems_pipeline',
+    label: 'EMS',
+    mobileLabel: 'EMS',
     featureId: 'ems_pipeline',
     path: CANONICAL_ROUTES.emergencyEms,
     activePaths: [CANONICAL_ROUTES.emergencyEms],
   },
   {
     id: 'smart_intake',
+    label: 'Smart Intake',
+    mobileLabel: 'Intake',
     featureId: 'smart_intake',
     path: CANONICAL_ROUTES.emergencySmartIntake,
     activePaths: [CANONICAL_ROUTES.emergencySmartIntake],
   },
   {
     id: 'queue_intelligence',
+    label: 'Queues',
+    mobileLabel: 'Queues',
     featureId: 'queue_intelligence',
     path: CANONICAL_ROUTES.emergencyQueues,
     activePaths: [CANONICAL_ROUTES.emergencyQueues],
   },
   {
     id: 'reassessment_engine',
+    label: 'Reassessment',
+    mobileLabel: 'Review',
     featureId: 'reassessment_engine',
     path: CANONICAL_ROUTES.emergencyReassessment,
     activePaths: [CANONICAL_ROUTES.emergencyReassessment],
   },
   {
     id: 'capacity_intelligence',
+    label: 'Capacity',
+    mobileLabel: 'Capacity',
     featureId: 'capacity_intelligence',
-    path: '/emergency/capacity',
-    activePaths: ['/emergency/capacity'],
+    path: CANONICAL_ROUTES.emergencyCapacity,
+    activePaths: [CANONICAL_ROUTES.emergencyCapacity],
   },
   {
     id: 'boarding_intelligence',
+    label: 'Boarding',
+    mobileLabel: 'Boarding',
     featureId: 'boarding_intelligence',
     path: CANONICAL_ROUTES.emergencyBoarding,
     activePaths: [CANONICAL_ROUTES.emergencyBoarding],
   },
   {
     id: 'referral_intelligence',
+    label: 'Referrals',
+    mobileLabel: 'Referrals',
     featureId: 'referral_intelligence',
     path: CANONICAL_ROUTES.emergencyReferrals,
     activePaths: [CANONICAL_ROUTES.emergencyReferrals],
   },
   {
     id: 'ed_copilot',
+    label: 'ED Copilot',
+    mobileLabel: 'Copilot',
     featureId: 'ed_copilot',
     path: CANONICAL_ROUTES.emergencyCopilot,
     activePaths: [CANONICAL_ROUTES.emergencyCopilot],
   },
   {
     id: 'emergency_analytics',
+    label: 'Analytics',
+    mobileLabel: 'Analytics',
     featureId: 'emergency_analytics',
     path: CANONICAL_ROUTES.emergencyAnalytics,
     activePaths: [CANONICAL_ROUTES.emergencyAnalytics],
   },
   {
     id: 'emergency_settings',
+    label: 'Settings',
+    mobileLabel: 'Settings',
     featureId: 'emergency_settings',
     path: CANONICAL_ROUTES.emergencySettings,
     activePaths: [CANONICAL_ROUTES.emergencySettings],
@@ -144,8 +168,8 @@ export const PRIMARY_NAV_ITEMS = Object.freeze([
     id: 'clinical-tools',
     label: 'Clinical Tools',
     mobileLabel: 'Tools',
-    path: CANONICAL_ROUTES.emergencyTools,
-    matchPaths: ['/emergency/tools', '/tools/calculators'],
+    path: CANONICAL_ROUTES.emergencyCopilot,
+    matchPaths: [CANONICAL_ROUTES.emergencyCopilot, '/emergency/tools', '/tools/calculators'],
     matchPrefixes: ['/tools/calculators/'],
   },
   {
@@ -796,93 +820,6 @@ export const PRIMARY_MOBILE_NAV_ITEMS = Object.freeze(
   PRIMARY_SIDEBAR_NAV_ITEMS.filter((item) => item.showInMobile !== false)
 );
 
-const EMERGENCY_OS_QUICK_COMMAND_DESTINATIONS = Object.freeze([
-  {
-    id: 'emergency_whiteboard',
-    label: 'Emergency Whiteboard',
-    mobileLabel: 'Board',
-    path: CANONICAL_ROUTES.emergencyWhiteboard,
-    matchPaths: [CANONICAL_ROUTES.emergencyWhiteboard],
-  },
-  {
-    id: 'emergency_patients',
-    label: 'Patients',
-    mobileLabel: 'Patients',
-    path: CANONICAL_ROUTES.emergencyPatients,
-    matchPaths: [CANONICAL_ROUTES.emergencyPatients],
-  },
-  {
-    id: 'ems_pipeline',
-    label: 'EMS',
-    mobileLabel: 'EMS',
-    path: CANONICAL_ROUTES.emergencyEms,
-    matchPaths: [CANONICAL_ROUTES.emergencyEms],
-  },
-  {
-    id: 'smart_intake',
-    label: 'Smart Intake',
-    mobileLabel: 'Intake',
-    path: CANONICAL_ROUTES.emergencyIntake,
-    matchPaths: [CANONICAL_ROUTES.emergencyIntake],
-  },
-  {
-    id: 'queue_intelligence',
-    label: 'Queues',
-    mobileLabel: 'Queues',
-    path: CANONICAL_ROUTES.emergencyQueues,
-    matchPaths: [CANONICAL_ROUTES.emergencyQueues],
-  },
-  {
-    id: 'reassessment_engine',
-    label: 'Reassessment',
-    mobileLabel: 'Review',
-    path: CANONICAL_ROUTES.emergencyReassessment,
-    matchPaths: [CANONICAL_ROUTES.emergencyReassessment],
-  },
-  {
-    id: 'capacity_intelligence',
-    label: 'Capacity',
-    mobileLabel: 'Capacity',
-    path: CANONICAL_ROUTES.emergencyCapacity,
-    matchPaths: [CANONICAL_ROUTES.emergencyCapacity],
-  },
-  {
-    id: 'boarding_intelligence',
-    label: 'Boarding',
-    mobileLabel: 'Boarding',
-    path: CANONICAL_ROUTES.emergencyBoarding,
-    matchPaths: [CANONICAL_ROUTES.emergencyBoarding],
-  },
-  {
-    id: 'referral_intelligence',
-    label: 'Referrals',
-    mobileLabel: 'Referrals',
-    path: CANONICAL_ROUTES.emergencyReferrals,
-    matchPaths: [CANONICAL_ROUTES.emergencyReferrals],
-  },
-  {
-    id: 'ed_copilot',
-    label: 'ED Copilot',
-    mobileLabel: 'Copilot',
-    path: CANONICAL_ROUTES.emergencyCopilot,
-    matchPaths: [CANONICAL_ROUTES.emergencyCopilot],
-  },
-  {
-    id: 'emergency_analytics',
-    label: 'Analytics',
-    mobileLabel: 'Analytics',
-    path: CANONICAL_ROUTES.emergencyAnalytics,
-    matchPaths: [CANONICAL_ROUTES.emergencyAnalytics],
-  },
-  {
-    id: 'emergency_settings',
-    label: 'Settings',
-    mobileLabel: 'Settings',
-    path: CANONICAL_ROUTES.emergencySettings,
-    matchPaths: [CANONICAL_ROUTES.emergencySettings],
-  },
-]);
-
 const NORMAL_PRIMARY_NAV_IDS = new Set([
   'home',
   'patients',
@@ -890,7 +827,7 @@ const NORMAL_PRIMARY_NAV_IDS = new Set([
   'operations',
   'assistant',
   'profile',
-  ...EMERGENCY_OS_QUICK_COMMAND_DESTINATIONS.map((item) => item.id),
+  ...APP_SHELL_NAV_ITEMS.map((item) => item.id),
 ]);
 const UTILITY_NAV_IDS = new Set(['search', 'notifications']);
 const ADMIN_NAV_PERMISSION_BY_ID = Object.freeze({
@@ -945,8 +882,20 @@ function uniqueNavItemsByPath(items) {
   });
 }
 
-export const QUICK_COMMAND_NAV_ITEMS = EMERGENCY_OS_QUICK_COMMAND_DESTINATIONS;
-export const QUICK_COMMAND_DESTINATION_ITEMS = EMERGENCY_OS_QUICK_COMMAND_DESTINATIONS;
+function quickCommandDestinationFromAppShellItem(item) {
+  return Object.freeze({
+    id: item.id,
+    label: item.label,
+    mobileLabel: item.mobileLabel,
+    path: item.path,
+    matchPaths: item.matchPaths || item.activePaths || [item.path],
+  });
+}
+
+export const QUICK_COMMAND_NAV_ITEMS = Object.freeze(
+  APP_SHELL_NAV_ITEMS.map(quickCommandDestinationFromAppShellItem)
+);
+export const QUICK_COMMAND_DESTINATION_ITEMS = QUICK_COMMAND_NAV_ITEMS;
 
 export function primaryNavPathMatches(item, pathname) {
   const normalized = pathname || '/';

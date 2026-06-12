@@ -1,7 +1,14 @@
 import { Router } from 'express';
-import { reassessmentService } from '../services/reassessment.service';
+import { reassessmentService } from '../services';
 
 const router = Router();
+
+const reassessmentErrorStatus = (error: any) => {
+  const message = String(error?.message || '');
+  if (/not found/i.test(message)) return 404;
+  if (/invalid|required|reason|score|clinician|notes/i.test(message)) return 400;
+  return 500;
+};
 
 router.get('/due', async (_req, res) => {
   try {
@@ -31,7 +38,7 @@ router.post('/:patientId/reassess', async (req, res) => {
 
     return res.json({ message: 'Reassessment recorded', patient });
   } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+    return res.status(reassessmentErrorStatus(error)).json({ error: error.message || 'Reassessment failed' });
   }
 });
 
@@ -47,7 +54,7 @@ router.post('/:patientId/dismiss', async (req, res) => {
     await reassessmentService.dismissReassessment(patientId, reason, clinician);
     return res.json({ message: 'Reassessment dismissed' });
   } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+    return res.status(reassessmentErrorStatus(error)).json({ error: error.message || 'Dismissal failed' });
   }
 });
 

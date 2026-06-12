@@ -6,6 +6,25 @@ Scanned 2209 text/code files. Resolved 5609 relative import edges. Found 282 bac
 
 Files below are unmounted, orphan candidates, duplicate/future artifacts, or tests/support files according to import reachability and path classification.
 
+## Pilot Readiness Addendum
+
+Focused Emergency OS findings from the revenue-readiness pass:
+
+| File / symbol | Status | Classification | Pilot decision |
+| --- | --- | --- | --- |
+| `src/pages/emergency/DepartmentPulse.jsx` / `DepartmentPulse` | Exists and is test-imported, but no active route mounts it. `/emergency/pulse` redirects to `/emergency/analytics`. | Component Not Mounted, Legacy Artifact | Keep archived/review unless charge-nurse pulse becomes a pilot workflow. |
+| `src/pages/WorkspaceHome.jsx` / `WorkspaceHome` | Legacy workspace page; active workspace routes redirect into canonical `/emergency/*`. | Legacy Artifact | Future-module review. Do not expose in pilot. |
+| `src/components/ShiftSummary.jsx` / `ShiftSummary` | Only production path was legacy `WorkspaceHome`; active shift actions route to analytics. | Component Not Mounted | Wire into analytics later or archive/review. |
+| `src/components/QuickCommandLauncher.jsx` | Duplicate launcher; active shell uses `CommandPalette`. | Duplicate Logic, Legacy Artifact | Keep out of active pilot shell. |
+| `src/pages/tools/*` tool pages | Many are exported/tested but no longer mounted by active router. Calculators and DrugChecker are embedded through ED Copilot. | Future Module, Legacy Artifact | Keep only embedded calculator/drug-check flow active for pilot. |
+| `src/navigation/registryToolLaunch.js` | Still has legacy launch plans for `/assistant`, `/tools/catalog`, and `/tools/calculators`. | Legacy Redirect Risk | Route-level redirects protect users; registry alignment remains recommended before public launch. |
+
+Safe route-render fixes applied in this pass:
+
+- `/emergency/patients` now renders `EmergencyPatientsRoute`.
+- `/emergency/reassessment` now renders `EmergencyReassessmentRoute`.
+- `/emergency/boarding` now renders `EmergencyCapacityRoute` with `variant="boarding"`.
+
 | File |Imported By |Imports |Classification |
 | --- | --- | --- | --- |
 | backend/src/models/Patient.ts | 6 | 0 | Connected Emergency OS |

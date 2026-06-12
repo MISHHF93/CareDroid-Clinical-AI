@@ -1,10 +1,20 @@
 import { Router } from 'express';
-import { emsService } from '../services/ems.service';
+import { emsService } from '../services';
 
 const router = Router();
+const EMS_STATUSES = new Set(['Inbound', 'Arrived', 'Handoff', 'Complete', 'Cancelled']);
 
 router.post('/alert', async (req, res) => {
   try {
+    if (!req.body?.ems_unit_id && !req.body?.unitId) {
+      return res.status(400).json({ error: 'ems_unit_id is required' });
+    }
+    if (req.body?.eta_minutes !== undefined && !Number.isFinite(Number(req.body.eta_minutes))) {
+      return res.status(400).json({ error: 'eta_minutes must be numeric' });
+    }
+    if (!req.body?.triage_code && !req.body?.priority) {
+      return res.status(400).json({ error: 'triage_code is required' });
+    }
     const patient = await emsService.createPrehospitalAlert(req.body);
     const io = req.app.get('io');
     io?.to?.('whiteboard')?.emit?.('ems_alert_received', patient);
@@ -18,6 +28,13 @@ router.patch('/status/:emsUnitId', async (req, res) => {
   try {
     const { emsUnitId } = req.params;
     const { status, eta_minutes } = req.body;
+
+    if (!EMS_STATUSES.has(status)) {
+      return res.status(400).json({ error: 'status is invalid' });
+    }
+    if (eta_minutes !== undefined && !Number.isFinite(Number(eta_minutes))) {
+      return res.status(400).json({ error: 'eta_minutes must be numeric' });
+    }
 
     const patient = await emsService.updateEMSStatus(emsUnitId, status, eta_minutes);
     if (!patient) {

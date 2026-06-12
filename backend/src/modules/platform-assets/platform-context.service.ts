@@ -166,8 +166,9 @@ export class PlatformContextService {
     });
     const state = await this.workspaceStateRepository.findOne({ where: { userId: user.id } });
     const activeMembership =
-      memberships.find((workspaceMembership) => workspaceMembership.workspaceId === state?.activeWorkspaceId) ||
-      memberships[0];
+      memberships.find(
+        (workspaceMembership) => workspaceMembership.workspaceId === state?.activeWorkspaceId,
+      ) || memberships[0];
 
     return {
       workspaces: memberships

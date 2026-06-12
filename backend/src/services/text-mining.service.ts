@@ -4,7 +4,9 @@ export class TextMiningService {
   extractDemographics(text = ''): Partial<ExtractedDemographics> {
     const demographics: Partial<ExtractedDemographics> = {};
     const normalized = String(text);
-    const dob = normalized.match(/\b(?:dob|date of birth)[:\s]+([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4})/i);
+    const dob = normalized.match(
+      /\b(?:dob|date of birth)[:\s]+([0-9]{4}-[0-9]{2}-[0-9]{2}|[0-9]{1,2}\/[0-9]{1,2}\/[0-9]{2,4})/i,
+    );
     const mrn = normalized.match(/\b(?:mrn|medical record)[:\s#-]+([A-Z0-9-]+)/i);
     const phone = normalized.match(/\b(?:phone|tel)[:\s]+([+0-9().\-\s]{7,})/i);
 

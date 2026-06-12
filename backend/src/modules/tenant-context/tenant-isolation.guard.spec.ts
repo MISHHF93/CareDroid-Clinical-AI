@@ -56,7 +56,9 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/organizations/org-b',
     };
 
-    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
   });
 
   it('rejects authenticated tenant-scoped requests when tenant context is missing', async () => {
@@ -68,7 +70,9 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/ai/usage',
     };
 
-    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
   });
 
   it('denies workspace mismatch for workspace-scoped APIs', async () => {
@@ -86,7 +90,9 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/workspaces/workspace-b/tools',
     };
 
-    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
   });
 
   it('allows required permissions from workspace effective permissions', async () => {
@@ -126,7 +132,9 @@ describe('TenantIsolationGuard', () => {
       originalUrl: '/api/organizations/org-a',
     };
 
-    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(guard.canActivate(buildContext(request))).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
   });
 
   it('allows admin-scoped access for permitted organization admins', async () => {

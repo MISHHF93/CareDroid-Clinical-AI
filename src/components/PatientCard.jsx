@@ -77,6 +77,12 @@ const ALL_FLAGS = [
   'DeterioratingNeuro',
   'ScoreReassessmentRecommended',
 ];
+const REASSESSMENT_MANAGED_FLAGS = new Set([
+  'ReassessmentDue',
+  'ScoreReassessmentRecommended',
+  'DeteriorationRisk',
+  'HighRisk',
+]);
 
 const ACTIVE_REFERRAL_TERMINAL_STATUSES = new Set(['Completed', 'Declined']);
 const SCORE_OPTIONS = [
@@ -883,6 +889,9 @@ export function PatientDetailPanel() {
   const activeScorePrefill =
     scoreCalculatorId && scoreCalculatorId === autoScorePrefill?.calculatorId ? autoScorePrefill : null;
   const patientVitalsAlerts = activeVitalsAlerts(patient, ['critical', 'warning']);
+  const patientReassessmentFlags = patient.flags.filter((flag) =>
+    REASSESSMENT_MANAGED_FLAGS.has(getPatientFlagType(flag))
+  );
   const activeDueReminder = activeReassessmentReminders(patient).find((reminder) => {
     const stage = reminderStage(reminder);
     return stage === 'due' || stage === 'overdue';
@@ -919,6 +928,38 @@ export function PatientDetailPanel() {
     completeReassessmentReminder(patient.id, completionPromptReminder.id, {
       completedBy: noteAuthorFallback,
       timestamp: new Date().toISOString(),
+    });
+    setCompletionPromptReminderId('');
+  };
+
+  const completeManualReassessment = () => {
+    const timestamp = new Date().toISOString();
+    const reassessmentFlagTypes = new Set(patientReassessmentFlags.map(getPatientFlagType));
+    updatePatient(patient.id, {
+      flags: patient.flags.filter((flag) => !reassessmentFlagTypes.has(getPatientFlagType(flag))),
+      timeline: [
+        ...patient.timeline,
+        {
+          id: `reassessment-complete-${patient.id}-${Date.now()}`,
+          patientId: patient.id,
+          type: 'ReassessmentReminderCompleted',
+          timestamp,
+          staffId: noteAuthorFallback,
+          actorStaffId: noteAuthorFallback,
+          summary: 'Reassessment completed and safety flags cleared.',
+          metadata: {
+            clearedFlags: Array.from(reassessmentFlagTypes),
+          },
+        },
+      ],
+    });
+    addNote(patient.id, {
+      id: `note-reassessment-${patient.id}-${Date.now()}`,
+      patientId: patient.id,
+      authorStaffId: noteAuthorFallback,
+      type: 'Clinical',
+      body: 'Reassessment completed. Safety flags reviewed and cleared.',
+      createdAt: timestamp,
     });
     setCompletionPromptReminderId('');
   };
@@ -1032,7 +1073,7 @@ export function PatientDetailPanel() {
       patientId: patient.id,
       complaint: patient.complaintCategory || '',
     });
-    navigate(`/emergency/tools?${params.toString()}`);
+    navigate(`/emergency/copilot?${params.toString()}`);
   };
 
   const handleOpenPediatricDrugs = () => {
@@ -1636,6 +1677,11 @@ export function PatientDetailPanel() {
             </button>
           </div>
         ) : null}
+        {patientReassessmentFlags.length ? (
+          <button type="button" onClick={completeManualReassessment}>
+            Complete reassessment
+          </button>
+        ) : null}
       </section>
 
       <section className="patient-detail__section">
@@ -2100,9 +2146,14 @@ function PatientCard({ patient, keyboardSelected = false, highlighted = false, o
           <button
             type="button"
             className="patient-card__staff-avatar"
-            title={staffDisplayName(staff)}
+            title={
+              emergencyPermissions.canAssignStaff
+                ? staffDisplayName(staff)
+                : `Role ${emergencyRoleForUser(user)} cannot assign staff`
+            }
             aria-label={`Assign staff for ${patientName(patient)}`}
             aria-expanded={staffMenuOpen}
+            disabled={!emergencyPermissions.canAssignStaff}
             onClick={() => {
               if (emergencyPermissions.canAssignStaff) {
                 setStaffMenuOpen((open) => !open);

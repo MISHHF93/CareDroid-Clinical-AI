@@ -1,4 +1,9 @@
-import { ExtractedAllergy, ExtractedDemographics, ExtractedMedication, IntakeInputSource } from '../models/SmartIntake';
+import {
+  ExtractedAllergy,
+  ExtractedDemographics,
+  ExtractedMedication,
+  IntakeInputSource,
+} from '../models/SmartIntake';
 
 export interface NormalizedOcrPayload {
   source: IntakeInputSource;

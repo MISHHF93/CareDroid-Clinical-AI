@@ -12,20 +12,18 @@ function routeBlockFor(path) {
 }
 
 describe('workspace subpage routes', () => {
-  it('keeps workspace subpages on the protected WorkspaceHome route owner', () => {
+  it('keeps workspace subpages on the protected Emergency OS redirect owner', () => {
     const routeBlock = routeBlockFor('/workspace/:workspaceId/:subpage');
 
     expect(routeBlock).toBeTruthy();
-    expect(routeBlock).toContain('<WorkspaceHome />');
+    expect(routeBlock).toContain('<WorkspaceRouteRedirect />');
     expect(routeBlock).toContain('requiresAuth: true');
     expect(routeBlock).not.toMatch(/<AppShell\b|<Sidebar\b|app-shell-page-body/);
   });
 
-  it('adds protected automation analytics as the top-level automation metrics page', () => {
-    const routeBlock = routeBlockFor('/automation-analytics');
-
-    expect(routeBlock).toBeTruthy();
-    expect(routeBlock).toContain('<AutomationAnalytics />');
-    expect(routeBlock).toContain('requiresAuth: true');
+  it('keeps automation analytics as a future-release redirect into Emergency OS', () => {
+    expect(appSource).toContain("['Automation Analytics', '/automation-analytics']");
+    expect(appSource).toContain('...FUTURE_RELEASE_ROUTES.map(([, path]) => ({');
+    expect(appSource).toContain('<LegacyProtectedRouteRedirect to="/emergency/whiteboard" />');
   });
 });

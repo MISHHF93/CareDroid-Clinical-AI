@@ -136,13 +136,13 @@ export const CANONICAL_APP_ROUTE_TREE = Object.freeze([
   { path: '/', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/emergency', type: 'redirect', to: '/emergency/whiteboard' },
   { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
-  { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyWhiteboard' },
+  { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
   { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
   { path: '/emergency/intake', type: 'page', componentKey: 'SmartIntake' },
   { path: '/emergency/queues', type: 'page', componentKey: 'EmergencyQueueRoute' },
-  { path: '/emergency/reassessment', type: 'page', componentKey: 'EmergencyWhiteboard' },
+  { path: '/emergency/reassessment', type: 'page', componentKey: 'EmergencyReassessmentRoute' },
   { path: '/emergency/capacity', type: 'page', componentKey: 'CapacityDetail' },
-  { path: '/emergency/boarding', type: 'page', componentKey: 'CapacityDetail' },
+  { path: '/emergency/boarding', type: 'page', componentKey: 'EmergencyBoardingRoute' },
   { path: '/emergency/referrals', type: 'page', componentKey: 'ReferralPanel' },
   { path: '/emergency/copilot', type: 'page', componentKey: 'EmergencyCopilotPanel' },
   { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
@@ -178,8 +178,13 @@ export const AUTH_SIGNUP_PATH_ALIASES = Object.freeze([
   '/accounts/signup',
 ]);
 
-export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/chat', '/ai', '/copilot']);
-export const TOOLS_ROUTE_ALIASES = Object.freeze(['/all-tools', '/clinical-tools', '/catalog']);
+export const ASSISTANT_ROUTE_ALIASES = Object.freeze(['/assistant', '/chat', '/ai', '/copilot']);
+export const TOOLS_ROUTE_ALIASES = Object.freeze([
+  '/tools',
+  '/all-tools',
+  '/clinical-tools',
+  '/catalog',
+]);
 export const CALCULATORS_ROUTE_ALIASES = Object.freeze(['/calculators']);
 export const SIMULATION_ROUTE_ALIASES = Object.freeze(['/medical-simulation']);
 export const LABORATORY_ROUTE_ALIASES = Object.freeze(['/lab']);
@@ -192,7 +197,7 @@ export const FLEET_MAP_ROUTE_ALIASES = Object.freeze([
 ]);
 export const OPERATIONS_ROUTE_ALIASES = Object.freeze(['/operations-center']);
 export const AUDIT_ROUTE_ALIASES = Object.freeze(['/audit-logs']);
-export const HOME_ROUTE_ALIASES = Object.freeze(['/home']);
+export const HOME_ROUTE_ALIASES = Object.freeze(['/dashboard', '/home', '/workspace', '/app', '/whiteboard']);
 export const ORGANIZATION_PACKS_ROUTE_ALIASES = Object.freeze([]);
 
 export const ROUTE_RECORDS = Object.freeze([
@@ -207,11 +212,11 @@ export const ROUTE_RECORDS = Object.freeze([
   }),
   Object.freeze({
     id: 'dashboard',
-    path: CANONICAL_ROUTES.dashboard,
-    componentKey: 'CommandDashboard',
+    path: CANONICAL_ROUTES.emergencyWhiteboard,
+    componentKey: 'EmergencyWhiteboard',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'redirect',
     aliases: HOME_ROUTE_ALIASES,
     navGroup: 'primary',
   }),
@@ -229,11 +234,11 @@ export const ROUTE_RECORDS = Object.freeze([
   }),
   Object.freeze({
     id: 'assistant',
-    path: CANONICAL_ROUTES.assistant,
-    componentKey: 'AssistantPage',
+    path: CANONICAL_ROUTES.emergencyCopilot,
+    componentKey: 'EmergencyCopilotPanel',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'redirect',
     aliases: ASSISTANT_ROUTE_ALIASES,
     navGroup: 'primary',
   }),
@@ -309,33 +314,33 @@ export const ROUTE_RECORDS = Object.freeze([
   }),
   Object.freeze({
     id: 'tools',
-    path: CANONICAL_ROUTES.tools,
-    componentKey: 'ToolsOverview',
+    path: CANONICAL_ROUTES.emergencyCopilot,
+    componentKey: 'EmergencyCopilotPanel',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'redirect',
     aliases: TOOLS_ROUTE_ALIASES,
     matchPrefixes: ['/tools/'],
     navGroup: 'primary',
   }),
   Object.freeze({
     id: 'calculators',
-    path: CANONICAL_ROUTES.calculators,
-    componentKey: 'Calculators',
+    path: CANONICAL_ROUTES.emergencyCopilot,
+    componentKey: 'EmergencyCopilotPanel',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'redirect',
     aliases: CALCULATORS_ROUTE_ALIASES,
     matchPrefixes: ['/tools/calculators/'],
     navGroup: 'tools',
   }),
   Object.freeze({
     id: 'operations',
-    path: CANONICAL_ROUTES.operations,
-    componentKey: 'Operations',
+    path: CANONICAL_ROUTES.emergencyQueues,
+    componentKey: 'EmergencyQueueRoute',
     layout: 'app',
     auth: 'required',
-    status: 'active',
+    status: 'redirect',
     aliases: OPERATIONS_ROUTE_ALIASES,
     matchPrefixes: ['/operations/'],
     navGroup: 'primary',

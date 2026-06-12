@@ -38,7 +38,9 @@ export class MPIService {
       });
     }
 
-    const patients = query.length ? await Patient.find({ $or: query }).limit(25) : await Patient.find().limit(50);
+    const patients = query.length
+      ? await Patient.find({ $or: query }).limit(25)
+      : await Patient.find().limit(50);
     return patients
       .map((patient) => this.scorePatient(patient, demographics))
       .filter((candidate) => candidate.matchScore > 0)
@@ -46,18 +48,35 @@ export class MPIService {
       .slice(0, 10);
   }
 
-  private scorePatient(patient: IPatient, demographics: ExtractedDemographics): PatientMatchCandidate {
+  private scorePatient(
+    patient: IPatient,
+    demographics: ExtractedDemographics,
+  ): PatientMatchCandidate {
     const matchedFields: string[] = [];
     const conflictingFields: string[] = [];
     let score = 0;
     const patientNames = splitName(patient.name);
 
-    this.compare('firstName', patientNames.firstName, demographics.firstName, matchedFields, conflictingFields, () => {
-      score += 12;
-    });
-    this.compare('lastName', patientNames.lastName, demographics.lastName, matchedFields, conflictingFields, () => {
-      score += 16;
-    });
+    this.compare(
+      'firstName',
+      patientNames.firstName,
+      demographics.firstName,
+      matchedFields,
+      conflictingFields,
+      () => {
+        score += 12;
+      },
+    );
+    this.compare(
+      'lastName',
+      patientNames.lastName,
+      demographics.lastName,
+      matchedFields,
+      conflictingFields,
+      () => {
+        score += 16;
+      },
+    );
     if (
       demographics.previousNames?.some((name) =>
         patient.previous_names.map(normalize).includes(normalize(name)),
@@ -66,23 +85,56 @@ export class MPIService {
       matchedFields.push('previousNames');
       score += 8;
     }
-    this.compare('dateOfBirth', patient.date_of_birth, demographics.dateOfBirth, matchedFields, conflictingFields, () => {
-      score += 25;
-    });
-    this.compare('phone', patient.phone, demographics.phone, matchedFields, conflictingFields, () => {
-      score += 12;
-    });
-    this.compare('email', patient.email, demographics.email, matchedFields, conflictingFields, () => {
-      score += 10;
-    });
-    this.compare('address', patient.address, demographics.address, matchedFields, conflictingFields, () => {
-      score += 8;
-    });
+    this.compare(
+      'dateOfBirth',
+      patient.date_of_birth,
+      demographics.dateOfBirth,
+      matchedFields,
+      conflictingFields,
+      () => {
+        score += 25;
+      },
+    );
+    this.compare(
+      'phone',
+      patient.phone,
+      demographics.phone,
+      matchedFields,
+      conflictingFields,
+      () => {
+        score += 12;
+      },
+    );
+    this.compare(
+      'email',
+      patient.email,
+      demographics.email,
+      matchedFields,
+      conflictingFields,
+      () => {
+        score += 10;
+      },
+    );
+    this.compare(
+      'address',
+      patient.address,
+      demographics.address,
+      matchedFields,
+      conflictingFields,
+      () => {
+        score += 8;
+      },
+    );
     this.compare('sex', patient.sex, demographics.sex, matchedFields, conflictingFields, () => {
       score += 5;
     });
 
-    score += this.scoreIdentifiers(patient.identifiers || [], demographics, matchedFields, conflictingFields);
+    score += this.scoreIdentifiers(
+      patient.identifiers || [],
+      demographics,
+      matchedFields,
+      conflictingFields,
+    );
 
     const boundedScore = Math.min(100, Math.max(0, score - conflictingFields.length * 5));
     const recommendedAction =

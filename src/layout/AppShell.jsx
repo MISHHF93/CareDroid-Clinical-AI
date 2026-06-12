@@ -262,6 +262,8 @@ function ReassessmentBadge({ count, onClick, expanded }) {
       onClick={onClick}
       aria-label={`${count} flagged patient${count === 1 ? '' : 's'} for reassessment`}
       aria-expanded={expanded}
+      disabled={!hasFlaggedPatients}
+      title={hasFlaggedPatients ? 'Open reassessment queue' : 'No reassessments due'}
     >
       <span className="ed-reassessment-badge__pulse" aria-hidden />
       <AlertTriangle size={15} strokeWidth={2.2} aria-hidden />
@@ -1060,6 +1062,7 @@ const AppShell = ({
   const activeShift = useEmergencyStore((state) => state.activeShift);
   const loadBackendStaffProfile = useEmergencyStore((state) => state.loadBackendStaffProfile);
   const startShift = useEmergencyStore((state) => state.startShift);
+  const endShift = useEmergencyStore((state) => state.endShift);
   const assignStaff = useEmergencyStore((state) => state.assignStaff);
   const realtimeConnection = useEmergencyStore((state) => state.realtimeConnection);
   const startRealtime = useEmergencyStore((state) => state.startRealtime);
@@ -1182,6 +1185,12 @@ const AppShell = ({
     const timer = window.setInterval(updateAlerts, 30_000);
     return () => window.clearInterval(timer);
   }, [updateAlerts]);
+
+  useEffect(() => {
+    if (location.pathname === '/emergency/reassessment') {
+      setIsReassessmentDrawerOpen(true);
+    }
+  }, [location.pathname]);
 
   const closeTopmostPanel = useCallback(() => {
     if (isPediatricDrugCalculatorOpen) {
@@ -1432,9 +1441,10 @@ const AppShell = ({
 
   const handleEndShift = useCallback(
     () => {
+      endShift(new Date().toISOString());
       navigate('/emergency/analytics?handoff=1');
     },
-    [navigate]
+    [endShift, navigate]
   );
 
   const patientForCommand = useCallback(
@@ -1484,9 +1494,13 @@ const AppShell = ({
           ? patientForCommand(command.patientId)
           : findPatientByValue(command.value);
         if (!patient && command.value) {
-          const backendSearch = await searchBackendPatients(command.value);
-          const firstMatchedPatientId = backendSearch.results?.[0]?.patientId;
-          patient = firstMatchedPatientId ? patientForCommand(firstMatchedPatientId) : null;
+          try {
+            const backendSearch = await searchBackendPatients(command.value);
+            const firstMatchedPatientId = backendSearch.results?.[0]?.patientId;
+            patient = firstMatchedPatientId ? patientForCommand(firstMatchedPatientId) : null;
+          } catch (error) {
+            console.warn('Command palette patient search failed', error);
+          }
         }
         setQueueFilter(null);
         setWhiteboardSearchQuery(command.value || '');
@@ -1530,7 +1544,7 @@ const AppShell = ({
         const params = new URLSearchParams();
         if (command.calculatorId) params.set('tool', command.calculatorId);
         if (patient?.id) params.set('patientId', patient.id);
-        navigate(`/emergency/tools${params.toString() ? `?${params.toString()}` : ''}`);
+        navigate(`/emergency/copilot${params.toString() ? `?${params.toString()}` : ''}`);
       }
 
       if (command.type === 'OPEN_PEDIATRIC_DRUGS') {
@@ -1605,7 +1619,7 @@ const AppShell = ({
       const params = new URLSearchParams();
       params.set('tool', calculatorId);
       if (patient?.id) params.set('patientId', patient.id);
-      navigate(`/emergency/tools?${params.toString()}`);
+      navigate(`/emergency/copilot?${params.toString()}`);
     };
 
     window.addEventListener('ed:open-calculator', handleCalculatorLaunch);
@@ -1615,7 +1629,7 @@ const AppShell = ({
   useEffect(() => {
     const handleClinicalToolsLaunch = (event) => {
       const search = event.detail?.search ? `?${event.detail.search}` : '';
-      navigate(`/emergency/tools${search}`, {
+      navigate(`/emergency/copilot${search}`, {
         state: { pendingPatient: event.detail?.pendingPatient || null },
       });
     };

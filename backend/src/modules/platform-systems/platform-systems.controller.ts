@@ -1,9 +1,11 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Optional,
   Param,
   Patch,
@@ -180,13 +182,20 @@ export class PlatformSystemsController {
   @Permissions(Permission.READ_PHI)
   @ApiOperation({ summary: 'Get one Emergency OS patient by id' })
   getEmergencyPatient(@Param('patientId') patientId: string) {
-    return this.emergencyPatients.find((patient) => patient.id === patientId) || null;
+    const patient = this.emergencyPatients.find((candidate) => candidate.id === patientId);
+    if (!patient) {
+      throw new NotFoundException(`Emergency patient ${patientId} was not found`);
+    }
+    return patient;
   }
 
   @Post('patients')
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Create an Emergency OS intake patient' })
   createEmergencyPatient(@Body() body: Record<string, any>) {
+    if (!body?.chiefComplaint && !body?.complaint) {
+      throw new BadRequestException('chiefComplaint or complaint is required');
+    }
     const now = new Date().toISOString();
     const patientId = body.id || `pt-${Date.now()}`;
     const patient = {
@@ -236,16 +245,16 @@ export class PlatformSystemsController {
   @Patch('patients/:patientId')
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Patch an Emergency OS patient' })
-  updateEmergencyPatient(
-    @Param('patientId') patientId: string,
-    @Body() body: Record<string, any>,
-  ) {
+  updateEmergencyPatient(@Param('patientId') patientId: string, @Body() body: Record<string, any>) {
     let updatedPatient: Record<string, any> | null = null;
     this.emergencyPatients = this.emergencyPatients.map((patient) => {
       if (patient.id !== patientId) return patient;
       updatedPatient = { ...patient, ...body, id: patient.id };
       return updatedPatient;
     });
+    if (!updatedPatient) {
+      throw new NotFoundException(`Emergency patient ${patientId} was not found`);
+    }
     return updatedPatient;
   }
 
@@ -291,6 +300,12 @@ export class PlatformSystemsController {
   @Permissions(Permission.READ_PHI, Permission.WRITE_PHI)
   @ApiOperation({ summary: 'Create an Emergency OS referral' })
   createEmergencyReferral(@Body() body: Record<string, any>) {
+    if (!body?.patientId) {
+      throw new BadRequestException('patientId is required');
+    }
+    if (!this.emergencyPatients.some((patient) => patient.id === body.patientId)) {
+      throw new NotFoundException(`Emergency patient ${body.patientId} was not found`);
+    }
     const now = new Date().toISOString();
     const referral = {
       id: body.id || `ref-${body.patientId || 'patient'}-${Date.now()}`,

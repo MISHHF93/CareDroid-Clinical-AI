@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { CANONICAL_APP_ROUTE_TREE } from '../config/routes.config';
+import { CANONICAL_APP_ROUTE_TREE, PROTECTED_ROUTE_ALIAS_REDIRECTS } from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appSource = readFileSync(join(__dirname, '../App.jsx'), 'utf8');
@@ -17,13 +17,13 @@ describe('canonical route tree', () => {
       { path: '/', type: 'redirect', to: '/emergency/whiteboard' },
       { path: '/emergency', type: 'redirect', to: '/emergency/whiteboard' },
       { path: '/emergency/whiteboard', type: 'page', componentKey: 'EmergencyWhiteboard' },
-      { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyWhiteboard' },
+      { path: '/emergency/patients', type: 'page', componentKey: 'EmergencyPatientsRoute' },
       { path: '/emergency/ems', type: 'page', componentKey: 'EMSPipeline' },
       { path: '/emergency/intake', type: 'page', componentKey: 'SmartIntake' },
       { path: '/emergency/queues', type: 'page', componentKey: 'EmergencyQueueRoute' },
-      { path: '/emergency/reassessment', type: 'page', componentKey: 'EmergencyWhiteboard' },
+      { path: '/emergency/reassessment', type: 'page', componentKey: 'EmergencyReassessmentRoute' },
       { path: '/emergency/capacity', type: 'page', componentKey: 'CapacityDetail' },
-      { path: '/emergency/boarding', type: 'page', componentKey: 'CapacityDetail' },
+      { path: '/emergency/boarding', type: 'page', componentKey: 'EmergencyBoardingRoute' },
       { path: '/emergency/referrals', type: 'page', componentKey: 'ReferralPanel' },
       { path: '/emergency/copilot', type: 'page', componentKey: 'EmergencyCopilotPanel' },
       { path: '/emergency/analytics', type: 'page', componentKey: 'EmergencyAnalytics' },
@@ -43,17 +43,26 @@ describe('canonical route tree', () => {
     expect(appSource).toContain('<EmergencyQueueRoute />');
     expect(appSource).toContain('<ReferralPanel />');
     expect(appSource).toContain('<EmergencyCapacityRoute />');
-    expect(appSource).toContain('<EmergencyCopilotRedirect />');
+    expect(appSource).toContain('<EmergencyCopilotRoute />');
+    expect(appSource).toContain('<ClinicalCalculatorHub />');
     expect(appSource).toContain('<EmergencyAnalytics />');
     expect(appSource).toContain('element: <SettingsRoute />');
   });
 
   it('redirects duplicates and legacy aliases to canonical routes', () => {
     expect(appSource).toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
-    expect(appSource).toContain("['/dashboard', '/emergency/whiteboard']");
-    expect(appSource).toContain("['/assistant', '/emergency/copilot']");
+    expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/dashboard', to: '/emergency/whiteboard' }),
+        expect.objectContaining({ path: '/assistant', to: '/emergency/copilot' }),
+        expect.objectContaining({ path: '/tools', to: '/emergency/copilot' }),
+      ])
+    );
     expect(appSource).toContain("['/emergency/queue', '/emergency/queues']");
-    expect(appSource).toContain("['/tools/calculators/:slug', '/emergency/tools']");
+    expect(appSource).toContain("path: '/tools/calculators/:slug'");
+    expect(appSource).toContain('<LegacyCalculatorRouteRedirect />');
+    expect(appSource).toContain("path: '/tools/drug-checker'");
+    expect(appSource).toContain('<LegacyToolRouteRedirect toolId="drug-check" />');
     expect(appSource).toContain('...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({');
   });
 

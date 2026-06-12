@@ -10,6 +10,7 @@ import {
   EMERGENCY_PATIENT_JOURNEY,
   EMERGENCY_ROI_ESTIMATOR,
 } from './emergencyOperatingSystem';
+import { CANONICAL_ROUTES } from '../config/routes.config';
 
 export const DEFAULT_CARE_WORKSPACE_ID = 'emergency';
 
@@ -17,25 +18,25 @@ export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
   assistant: {
     id: 'assistant',
     label: 'AI Assistant',
-    path: '/assistant',
+    path: CANONICAL_ROUTES.emergencyCopilot,
     description: 'Ask questions, reason through cases, and launch context-aware tools.',
   },
   commandCenter: {
     id: 'command-center',
     label: 'Command Center',
-    path: '/dashboard',
+    path: CANONICAL_ROUTES.emergencyWhiteboard,
     description: 'Compact operating overview, recent work, and recommendations.',
   },
   tools: {
     id: 'tools',
     label: 'Tool Library',
-    path: '/tools',
+    path: CANONICAL_ROUTES.emergencyCopilot,
     description: 'Full canonical tool library when browsing is needed.',
   },
   calculators: {
     id: 'calculators',
     label: 'Calculators',
-    path: '/tools/calculators',
+    path: CANONICAL_ROUTES.emergencyCopilot,
     description: 'Focused calculator hub and direct calculator routes.',
   },
   hospitalMap: {
@@ -107,7 +108,7 @@ export const WORKSPACE_ROUTE_SHORTCUTS = Object.freeze({
   settings: {
     id: 'settings',
     label: 'Settings',
-    path: '/settings',
+    path: CANONICAL_ROUTES.emergencySettings,
     description: 'Preferences, notification settings, team, and account setup.',
   },
   systemHealth: {
@@ -357,7 +358,7 @@ const CARE_WORKSPACE_BASE = [
     label: 'Emergency',
     shortLabel: 'Emergency',
     icon: 'Siren',
-    path: '/workspace/emergency',
+    path: CANONICAL_ROUTES.emergencyWhiteboard,
     description:
       'CareDroid Emergency OS is an AI-assisted patient flow platform for small emergency departments, urgent care clinics, and clinics handling 50-150 patients/day with fewer than 10 staff.',
     aiContext:

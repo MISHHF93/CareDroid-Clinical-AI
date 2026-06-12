@@ -144,10 +144,10 @@ describe('QuickCommandLauncher', () => {
     expect(screen.queryByRole('button', { name: /open governance workspace/i })).not.toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
-      target: { value: 'global search' },
+      target: { value: 'whiteboard' },
     });
 
-    expect(screen.getByRole('button', { name: /open global search/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /open emergency workspace/i })).toBeInTheDocument();
   });
 
   it('launches tool entries through canonical route behavior', () => {
@@ -242,21 +242,21 @@ describe('QuickCommandLauncher', () => {
     expect(workspaceIds).not.toEqual(
       expect.arrayContaining(['laboratory', 'fleet', 'medical-iot', 'education', 'research', 'governance'])
     );
-    expect(navIds).toEqual(
-      expect.arrayContaining([
-        'workspace',
-        'home',
-        'assistant',
-        'tools',
-        'operations',
-        'live-map',
-        'hospital-map',
-      ])
-    );
-    expect(navIds).not.toContain('calculators');
-    expect(navIds).not.toEqual(expect.arrayContaining(['medical-iot', 'devices', 'fleet', 'governance']));
-    expect(toolIds).not.toContain('live-tracking-map');
-    expect(toolIds).not.toContain('device-fleet-management');
+    expect(navIds).toEqual([
+      'emergency_whiteboard',
+      'emergency_patients',
+      'ems_pipeline',
+      'smart_intake',
+      'queue_intelligence',
+      'reassessment_engine',
+      'capacity_intelligence',
+      'boarding_intelligence',
+      'referral_intelligence',
+      'ed_copilot',
+      'emergency_analytics',
+      'emergency_settings',
+    ]);
+    expect(toolIds).toEqual(expect.arrayContaining(['qsofa', 'news2']));
   });
 
   it('launches workspace entries as first-class command destinations', async () => {
@@ -271,46 +271,18 @@ describe('QuickCommandLauncher', () => {
       expect(mockWorkspaceValue.switchWorkspace).toHaveBeenCalledWith('emergency');
       expect(quickCommandMocks.refreshTenantContext).toHaveBeenCalled();
       expect(quickCommandMocks.refreshIdentity).toHaveBeenCalled();
-      expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency');
+      expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard');
     });
   });
 
-  it('searches and launches search-first discovery entries', () => {
+  it('searches and launches Emergency OS discovery entries', () => {
     renderQuickCommand({ defaultOpen: true });
 
     fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
-      target: { value: 'sepsis escalation workflow' },
+      target: { value: 'boarding boarders' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /open sepsis escalation workflow/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/workflows');
-
-    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
-    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
-      target: { value: 'sepsis deterioration simulation' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /open sepsis deterioration/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/simulation');
-
-    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
-    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
-      target: { value: 'sepsis management lactate pathway' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /open sepsis management/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/protocols');
-
-    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
-    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
-      target: { value: 'high news2 escalation notify clinician' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /open automated triage matrix/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency/automations');
-
-    fireEvent.click(screen.getByRole('button', { name: /open command host/i }));
-    fireEvent.change(screen.getByLabelText(/search commands and tools/i), {
-      target: { value: 'emergency flow intelligence platform' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /open emergency flow intelligence platform/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/specialties/emergency');
+    fireEvent.click(screen.getByRole('button', { name: /open boarding/i }));
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/boarding');
   });
 
   it('keeps shared calculator-hub tools searchable instead of hiding them as nav duplicates', () => {

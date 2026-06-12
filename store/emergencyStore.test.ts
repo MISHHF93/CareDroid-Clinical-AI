@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { hasPatientFlag, selectActiveAlerts, selectReassessmentQueue, useEmergencyStore } from './emergencyStore';
+import { movePatientToState as movePatientWithJourneyRules } from '../engine/journeyEngine';
 import { PatientState, Priority } from '../types/emergency';
 
 const originalState = useEmergencyStore.getState();
@@ -121,6 +122,118 @@ describe('emergencyStore EMS arrival conversion', () => {
       }),
     });
     expect(patient?.timeline.some((event) => event.type === 'EMSCriticalChecklistSaved')).toBe(true);
+  });
+});
+
+describe('first customer walkthrough', () => {
+  it('creates a patient, triages, reassesses, dispositions, and discharges', () => {
+    const now = '2026-06-12T05:30:00.000Z';
+    const patient = {
+      id: 'walkthrough-patient-001',
+      mrn: 'ED-WALK-001',
+      firstName: 'Pilot',
+      lastName: 'Patient',
+      dob: '1975-03-01',
+      age: 51,
+      sex: 'Female' as const,
+      arrivalTime: now,
+      triageTime: now,
+      lastAssessedTime: null,
+      chiefComplaint: 'Chest pain',
+      complaint: 'Chest pain',
+      complaintCategory: 'Chest Pain',
+      state: PatientState.Triage,
+      priority: Priority.P3,
+      vitals: {
+        hr: 92,
+        bpSystolic: 144,
+        bpDiastolic: 88,
+        spo2: 97,
+        temp: 36.8,
+        rr: 18,
+        gcs: 15,
+        pain: 6,
+        recordedAt: now,
+      },
+      assignedStaffId: null,
+      roomId: null,
+      flags: [],
+      timeline: [
+        {
+          id: 'walkthrough-arrival',
+          patientId: 'walkthrough-patient-001',
+          type: 'Triage' as const,
+          timestamp: now,
+          summary: 'Walkthrough patient created from quick intake.',
+        },
+      ],
+      notes: [],
+    };
+
+    useEmergencyStore.getState().addPatient(patient);
+    let activePatient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patient.id);
+
+    expect(activePatient).toMatchObject({
+      state: PatientState.Triage,
+      priority: Priority.P3,
+    });
+
+    movePatientWithJourneyRules(patient.id, PatientState.Waiting, {
+      staffId: 'staff-priya-nair',
+      timestamp: '2026-06-12T05:35:00.000Z',
+    });
+    useEmergencyStore.getState().addFlag(patient.id, 'ReassessmentDue', {
+      reason: 'First customer walkthrough reassessment',
+      detectedAt: '2026-06-12T05:40:00.000Z',
+    });
+
+    expect(selectReassessmentQueue(useEmergencyStore.getState())[0]).toMatchObject({
+      patientId: patient.id,
+    });
+
+    useEmergencyStore.getState().removeFlag(patient.id, 'ReassessmentDue');
+    useEmergencyStore.getState().addNote(patient.id, {
+      id: 'walkthrough-reassessment-note',
+      patientId: patient.id,
+      authorStaffId: 'staff-priya-nair',
+      type: 'Clinical',
+      body: 'Walkthrough reassessment completed; patient safe to move to assessment.',
+      createdAt: '2026-06-12T05:45:00.000Z',
+    });
+
+    activePatient = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patient.id);
+    expect(activePatient && hasPatientFlag(activePatient, 'ReassessmentDue')).toBe(false);
+    expect(activePatient?.notes.at(-1)?.body).toMatch(/reassessment completed/i);
+
+    movePatientWithJourneyRules(patient.id, PatientState.Assessment, {
+      staffId: 'staff-priya-nair',
+      timestamp: '2026-06-12T05:50:00.000Z',
+    });
+    movePatientWithJourneyRules(patient.id, PatientState.Disposition, {
+      staffId: 'staff-priya-nair',
+      timestamp: '2026-06-12T06:15:00.000Z',
+    });
+    movePatientWithJourneyRules(patient.id, PatientState.Discharge, {
+      staffId: 'staff-priya-nair',
+      timestamp: '2026-06-12T06:30:00.000Z',
+    });
+
+    const discharged = useEmergencyStore
+      .getState()
+      .patients.find((candidate) => candidate.id === patient.id);
+
+    expect(discharged).toMatchObject({
+      state: PatientState.Discharge,
+      roomId: null,
+      assignedStaffId: null,
+    });
+    expect(discharged?.timeline.map((event) => event.to)).toEqual(
+      expect.arrayContaining([PatientState.Waiting, PatientState.Assessment, PatientState.Disposition, PatientState.Discharge])
+    );
   });
 });
 

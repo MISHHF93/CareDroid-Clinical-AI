@@ -2,13 +2,17 @@ import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
+import { EMERGENCY_OS_ROUTE_COMMANDS } from '../config/commandPalette.config';
 import { APP_SHELL_NAV_ITEMS } from '../config/navigation.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const appShellJsx = readFileSync(join(__dirname, 'AppShell.jsx'), 'utf8');
 const appShellCss = readFileSync(join(__dirname, 'AppShell.css'), 'utf8');
 const navigationConfig = readFileSync(join(__dirname, '../config/navigation.config.js'), 'utf8');
-const commandPaletteSource = readFileSync(join(__dirname, '../components/CommandPalette.jsx'), 'utf8');
+const commandPaletteSource = readFileSync(
+  join(__dirname, '../config/commandPalette.config.js'),
+  'utf8'
+);
 
 const PRIMARY_EMERGENCY_OS_PATHS = [
   '/emergency/whiteboard',
@@ -67,9 +71,10 @@ describe('AppShell navigation surfaces', () => {
   });
 
   it('keeps every primary Emergency OS route reachable from the command palette', () => {
-    expect(commandPaletteSource).toContain('const EMERGENCY_OS_ROUTE_COMMANDS');
+    expect(commandPaletteSource).toContain('export const EMERGENCY_OS_ROUTE_COMMANDS');
+    const commandPaths = EMERGENCY_OS_ROUTE_COMMANDS.map((command) => command.build().path);
     for (const path of PRIMARY_EMERGENCY_OS_PATHS) {
-      expect(commandPaletteSource, path).toContain(`path: '${path}'`);
+      expect(commandPaths, path).toContain(path);
     }
   });
 

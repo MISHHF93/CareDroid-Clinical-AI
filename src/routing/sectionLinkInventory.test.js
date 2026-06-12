@@ -8,6 +8,7 @@ import {
   OPERATIONS_SIDEBAR_NAV_ITEMS,
   PRIMARY_SIDEBAR_NAV_ITEMS,
 } from '../config/navigation.config';
+import { PROTECTED_ROUTE_ALIAS_REDIRECTS } from '../config/routes.config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const srcRoot = join(__dirname, '..');
@@ -81,7 +82,11 @@ describe('section link inventory and route flattening', () => {
   });
 
   it('keeps developer catalog aliases away from normal clinician links', () => {
-    expect(read('App.jsx')).toContain("['/catalog', '/emergency/tools']");
+    expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/catalog', to: '/emergency/copilot' }),
+      ])
+    );
     expect(read('pages/tools/ToolsOverview.jsx')).not.toContain("navigate('/tools/catalog')");
     expect(read('layout/AppShell.jsx')).not.toContain("navigate('/tools/catalog')");
   });
@@ -98,11 +103,16 @@ describe('section link inventory and route flattening', () => {
   it('preserves legacy route aliases as redirects, not duplicate user-facing pages', () => {
     const app = read('App.jsx');
     expect(app).toContain('const DUPLICATE_ROUTE_REDIRECTS = Object.freeze([');
-    expect(app).toContain("['/home', '/emergency/whiteboard']");
-    expect(app).toContain("['/chat', '/emergency/copilot']");
-    expect(app).toContain("['/tools/calculators/:slug', '/emergency/tools']");
+    expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ path: '/home', to: '/emergency/whiteboard' }),
+        expect.objectContaining({ path: '/chat', to: '/emergency/copilot' }),
+      ])
+    );
+    expect(app).toContain("path: '/tools/calculators/:slug'");
+    expect(app).toContain('<LegacyCalculatorRouteRedirect />');
     expect(app).toContain('...DUPLICATE_ROUTE_REDIRECTS.map(([path, to]) => ({');
-    expect(app).not.toContain('PROTECTED_ROUTE_ALIAS_REDIRECTS.map');
+    expect(app).toContain('...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({');
     expect(app).not.toContain('LEGACY_CALCULATOR_ROUTE_ALIASES.map');
     expect(app).not.toContain("path: '/home', element: <AppShellPage>");
     expect(app).not.toContain("path: '/chat', element: <AppShellPage>");

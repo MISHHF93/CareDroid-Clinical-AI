@@ -96,12 +96,22 @@ export interface PatientMatchCandidate {
   matchedFields: string[];
   conflictingFields: string[];
   explanation: string;
-  recommendedAction: 'link_after_staff_confirmation' | 'possible_duplicate_review' | 'create_new_patient' | 'manual_review';
+  recommendedAction:
+    | 'link_after_staff_confirmation'
+    | 'possible_duplicate_review'
+    | 'create_new_patient'
+    | 'manual_review';
 }
 
 export interface DocumentCapture {
   id: string;
-  type: 'id_card' | 'health_card' | 'referral_letter' | 'medication_list' | 'allergy_list' | 'discharge_summary';
+  type:
+    | 'id_card'
+    | 'health_card'
+    | 'referral_letter'
+    | 'medication_list'
+    | 'allergy_list'
+    | 'discharge_summary';
   filename?: string;
   uploadedBy: string;
   uploadedAt: Date;
@@ -164,7 +174,14 @@ export interface SmartIntakeOutput {
 }
 
 export interface IntakeSession extends Document {
-  status: 'started' | 'capturing_inputs' | 'review_ocr' | 'matching' | 'verifying' | 'completed' | 'manual_review';
+  status:
+    | 'started'
+    | 'capturing_inputs'
+    | 'review_ocr'
+    | 'matching'
+    | 'verifying'
+    | 'completed'
+    | 'manual_review';
   inputs: unknown[];
   evidence: IdentityEvidence[];
   documents: DocumentCapture[];

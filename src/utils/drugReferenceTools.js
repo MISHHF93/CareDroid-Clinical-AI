@@ -4,8 +4,8 @@ export const DRUG_REFERENCE_TOOLS = Object.freeze([
     name: 'Drug Interaction Checker',
     description: 'Fully built interaction, contraindication, and medication safety checker.',
     status: 'built',
-    launchMode: 'route',
-    path: '/tools/drug-checker',
+    launchMode: 'reference',
+    path: '/emergency/copilot?tool=drug-check',
     keywords: ['drugs', 'interactions', 'contraindications', 'medication safety'],
   },
   {
@@ -14,7 +14,7 @@ export const DRUG_REFERENCE_TOOLS = Object.freeze([
     description: 'Weight or age-based ED quick reference for resuscitation drugs and fluid bolus volumes.',
     status: 'built',
     launchMode: 'calculator',
-    path: '/emergency/tools?tool=pediatric-dose-safety-checker',
+    path: '/emergency/copilot?tool=pediatric-dose-safety-checker',
     keywords: ['dose', 'pediatric', 'broselow', 'resuscitation', 'rsi'],
   },
   {

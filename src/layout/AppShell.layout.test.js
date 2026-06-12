@@ -24,7 +24,7 @@ describe('single AppShell contract', () => {
   it('renders one sidebar rail, one header, one main region, and one Copilot panel', () => {
     expect(appShellJsx.match(/className="ed-nav-rail"/g)).toHaveLength(1);
     expect(appShellJsx.match(/className="ed-os-header"/g)).toHaveLength(1);
-    expect(appShellJsx.match(/data-layout-role="MainContent"/g)).toHaveLength(1);
+    expect(appShellJsx.match(/data-layout-role={LAYOUT_SCROLL_CONTRACT.mainContentRole}/g)).toHaveLength(1);
     expect(appShellJsx.match(/className="ed-copilot-panel"/g)).toHaveLength(1);
     expect(appShellJsx).not.toContain('<Sidebar');
     expect(appShellJsx).not.toContain('app-shell-bottom-nav');
@@ -42,8 +42,8 @@ describe('single AppShell contract', () => {
     expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*height:\s*var\(--app-viewport-height/);
     expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(/\.ed-os-shell__body\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*overflow:\s*auto/);
-    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*min-width:\s*0/);
+    expect(appShellCss).toMatch(/\.ed-os-main,[\s\S]*\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
+    expect(appShellCss).toMatch(/\.ed-os-main,[\s\S]*\.app-shell-main-content\s*\{[\s\S]*min-width:\s*0/);
   });
 
   it('keeps document scroll unlocked outside explicit overlay locks', () => {

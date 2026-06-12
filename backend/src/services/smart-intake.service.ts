@@ -5,10 +5,7 @@ import { ocrService } from './ocr.service';
 import { textMiningService } from './text-mining.service';
 import {
   DocumentCapture,
-  ExtractedAllergy,
   ExtractedDemographics,
-  ExtractedMedication,
-  FinalIntakeAction,
   IdentityAuditAction,
   IdentityEvidence,
   IntakeInputSource,
@@ -54,12 +51,24 @@ export class SmartIntakeService {
     return session;
   }
 
-  async addManualEntry(sessionId: string, manual: ExtractedDemographics & { chiefComplaint?: string; staffNotes?: string }, actor: string) {
+  async addManualEntry(
+    sessionId: string,
+    manual: ExtractedDemographics & { chiefComplaint?: string; staffNotes?: string },
+    actor: string,
+  ) {
     const session = await this.getSession(sessionId);
     session.status = 'capturing_inputs';
     session.inputs.push({ source: 'manual_entry', manual, staffNotes: manual.staffNotes });
-    this.addEvidenceFromDemographics(session, manual as Record<string, unknown>, 'manual_entry', 1, false);
-    session.auditLog.push(this.audit('field_edited', actor, { source: 'manual_entry', fields: Object.keys(manual) }));
+    this.addEvidenceFromDemographics(
+      session,
+      manual as Record<string, unknown>,
+      'manual_entry',
+      1,
+      false,
+    );
+    session.auditLog.push(
+      this.audit('field_edited', actor, { source: 'manual_entry', fields: Object.keys(manual) }),
+    );
     await session.save();
     return this.output(session);
   }
@@ -80,8 +89,16 @@ export class SmartIntakeService {
     session.documents.push(capture);
     session.inputs.push({ source: this.documentSource(capture.type), documents: [capture] });
     const minedDemographics = this.textMining.extractFromDocument(document);
-    this.addEvidenceFromDemographics(session, minedDemographics, this.documentSource(capture.type), 0.55, true);
-    session.auditLog.push(this.audit('document_uploaded', actor, { documentId: capture.id, type: capture.type }));
+    this.addEvidenceFromDemographics(
+      session,
+      minedDemographics,
+      this.documentSource(capture.type),
+      0.55,
+      true,
+    );
+    session.auditLog.push(
+      this.audit('document_uploaded', actor, { documentId: capture.id, type: capture.type }),
+    );
     await session.save();
     return this.output(session);
   }
@@ -124,10 +141,14 @@ export class SmartIntakeService {
     const session = await this.getSession(sessionId);
     session.inputs.push({ source: 'ems_prearrival', ems });
     if (ems?.temporaryId) {
-      session.evidence.push(this.evidence('emsTemporaryId', ems.temporaryId, 'ems_prearrival', 0.95, false));
+      session.evidence.push(
+        this.evidence('emsTemporaryId', ems.temporaryId, 'ems_prearrival', 0.95, false),
+      );
     }
     if (ems?.chiefComplaint) {
-      session.evidence.push(this.evidence('chiefComplaint', ems.chiefComplaint, 'ems_prearrival', 0.8, true));
+      session.evidence.push(
+        this.evidence('chiefComplaint', ems.chiefComplaint, 'ems_prearrival', 0.8, true),
+      );
     }
     session.auditLog.push(this.audit('ems_evidence_added', actor, { emsUnitId: ems?.emsUnitId }));
     await session.save();
@@ -141,9 +162,13 @@ export class SmartIntakeService {
     const candidates = await this.matcher.findCandidates(demographics);
     session.matchCandidates = candidates;
     session.duplicateWarning = candidates.some((candidate) => candidate.matchScore >= 85);
-    session.auditLog.push(this.audit('candidate_match_generated', actor, { count: candidates.length }));
+    session.auditLog.push(
+      this.audit('candidate_match_generated', actor, { count: candidates.length }),
+    );
     if (session.duplicateWarning) {
-      session.auditLog.push(this.audit('duplicate_warning_shown', actor, { candidates: candidates.slice(0, 3) }));
+      session.auditLog.push(
+        this.audit('duplicate_warning_shown', actor, { candidates: candidates.slice(0, 3) }),
+      );
     }
     await session.save();
     return this.output(session);
@@ -158,7 +183,9 @@ export class SmartIntakeService {
   ) {
     const session = await this.getSession(sessionId);
     session.status = 'verifying';
-    const evidence = session.evidence.find((item) => item.field === field && item.verificationDecision === 'pending');
+    const evidence = session.evidence.find(
+      (item) => item.field === field && item.verificationDecision === 'pending',
+    );
     if (!evidence) throw new Error(`No pending evidence found for field ${field}`);
     evidence.reviewedBy = actor;
     evidence.reviewedAt = new Date();
@@ -167,7 +194,11 @@ export class SmartIntakeService {
     if (decision === 'edited') evidence.value = editedValue;
     if (evidence.verified) session.verifiedSnapshot[field] = evidence.value;
     const action: IdentityAuditAction =
-      decision === 'approved' ? 'field_verified' : decision === 'edited' ? 'field_edited' : 'field_rejected';
+      decision === 'approved'
+        ? 'field_verified'
+        : decision === 'edited'
+          ? 'field_edited'
+          : 'field_rejected';
     session.auditLog.push(this.audit(action, actor, { field, edited: decision === 'edited' }));
     await session.save();
     return this.output(session);
@@ -191,10 +222,17 @@ export class SmartIntakeService {
     const session = await this.getSession(sessionId);
     this.assertCriticalFieldsReviewed(session);
     if (session.duplicateWarning) {
-      const overrideReviewed = session.auditLog.some((entry) => entry.action === 'manual_override_used');
-      if (!overrideReviewed) throw new Error('High-confidence duplicate requires manual override before creating a new patient');
+      const overrideReviewed = session.auditLog.some(
+        (entry) => entry.action === 'manual_override_used',
+      );
+      if (!overrideReviewed)
+        throw new Error(
+          'High-confidence duplicate requires manual override before creating a new patient',
+        );
     }
-    const snapshot = this.fhir.normalizePatientSnapshot(session.verifiedSnapshot as Record<string, any>);
+    const snapshot = this.fhir.normalizePatientSnapshot(
+      session.verifiedSnapshot as Record<string, any>,
+    );
     const patient = new Patient({
       name: `${snapshot.firstName || 'New'} ${snapshot.lastName || 'Patient'}`.trim(),
       age: snapshot.age || 'Unknown',
@@ -221,7 +259,11 @@ export class SmartIntakeService {
     return this.output(session);
   }
 
-  async continueUnknown(sessionId: string, label: 'Unknown Male' | 'Unknown Female' | 'Unknown Patient', actor: string) {
+  async continueUnknown(
+    sessionId: string,
+    label: 'Unknown Male' | 'Unknown Female' | 'Unknown Patient',
+    actor: string,
+  ) {
     const session = await this.getSession(sessionId);
     const temporaryEncounterId = id('UNK-ENC');
     const patient = new Patient({
@@ -250,14 +292,21 @@ export class SmartIntakeService {
     session.temporaryEncounterId = temporaryEncounterId;
     session.finalAction = 'continue_as_unknown_patient';
     session.status = 'completed';
-    session.auditLog.push(this.audit('unknown_patient_created', actor, { patientId: String(patient._id), temporaryEncounterId }));
+    session.auditLog.push(
+      this.audit('unknown_patient_created', actor, {
+        patientId: String(patient._id),
+        temporaryEncounterId,
+      }),
+    );
     await session.save();
     return this.output(session);
   }
 
   async reconcileUnknown(sessionId: string, patientId: string, actor: string) {
     const session = await this.getSession(sessionId);
-    const unknown = session.linkedPatientId ? await Patient.findById(session.linkedPatientId) : null;
+    const unknown = session.linkedPatientId
+      ? await Patient.findById(session.linkedPatientId)
+      : null;
     if (!unknown) throw new Error('Unknown patient record not found for reconciliation');
     unknown.identity_reconciled = true;
     unknown.alerts.push(`Unknown patient reconciled to ${patientId} by ${actor}`);
@@ -272,7 +321,9 @@ export class SmartIntakeService {
     const session = await this.getSession(sessionId);
     const tenantEnabled = Boolean(payload.enabledByTenant);
     if (!tenantEnabled || !payload.consentGranted) {
-      throw new Error('Biometric capture blocked unless tenant approval and patient consent are both active');
+      throw new Error(
+        'Biometric capture blocked unless tenant approval and patient consent are both active',
+      );
     }
     session.biometricConsent = {
       enabledByTenant: tenantEnabled,
@@ -284,7 +335,9 @@ export class SmartIntakeService {
       providerReference: payload.providerReference,
       modality: payload.modality,
     };
-    session.auditLog.push(this.audit('biometric_consent_granted', actor, { modality: payload.modality }));
+    session.auditLog.push(
+      this.audit('biometric_consent_granted', actor, { modality: payload.modality }),
+    );
     await session.save();
     return this.output(session);
   }
@@ -320,9 +373,9 @@ export class SmartIntakeService {
       if (value === undefined || value === null || value === '') continue;
       session.evidence.push(this.evidence(field, value, source, confidence, redacted));
     }
-    session.missingFieldWarnings = REQUIRED_CRITICAL_FIELDS
-      .filter((field) => !fieldValue(session, field))
-      .map((field) => `Missing critical identity field: ${field}`);
+    session.missingFieldWarnings = REQUIRED_CRITICAL_FIELDS.filter(
+      (field) => !fieldValue(session, field),
+    ).map((field) => `Missing critical identity field: ${field}`);
   }
 
   private evidence(
@@ -361,13 +414,17 @@ export class SmartIntakeService {
       'externalEhrId',
       'referralSourceId',
     ];
-    return Object.fromEntries(fields.map((field) => [field, fieldValue(session, field)]).filter(([, value]) => value)) as ExtractedDemographics;
+    return Object.fromEntries(
+      fields.map((field) => [field, fieldValue(session, field)]).filter(([, value]) => value),
+    ) as ExtractedDemographics;
   }
 
   private output(session: IntakeSession): SmartIntakeOutput {
     const evidence = session.evidence.map((item) => redactedEvidence(item));
     const confidenceScore = evidence.length
-      ? Number((evidence.reduce((sum, item) => sum + item.confidence, 0) / evidence.length).toFixed(2))
+      ? Number(
+          (evidence.reduce((sum, item) => sum + item.confidence, 0) / evidence.length).toFixed(2),
+        )
       : 0;
     return {
       verifiedPatientSnapshot: session.verifiedSnapshot,
@@ -394,14 +451,20 @@ export class SmartIntakeService {
 
   private assertCriticalFieldsReviewed(session: IntakeSession) {
     const pendingCritical = session.evidence.filter(
-      (item) => REQUIRED_CRITICAL_FIELDS.includes(item.field) && item.verificationDecision === 'pending',
+      (item) =>
+        REQUIRED_CRITICAL_FIELDS.includes(item.field) && item.verificationDecision === 'pending',
     );
     if (pendingCritical.length) {
-      throw new Error(`Critical fields require staff review: ${pendingCritical.map((item) => item.field).join(', ')}`);
+      throw new Error(
+        `Critical fields require staff review: ${pendingCritical.map((item) => item.field).join(', ')}`,
+      );
     }
   }
 
-  private identifiersFromSnapshot(snapshot: Record<string, any>, verified: boolean): IPatientIdentifier[] {
+  private identifiersFromSnapshot(
+    snapshot: Record<string, any>,
+    verified: boolean,
+  ): IPatientIdentifier[] {
     const now = new Date();
     return [
       ['mrn', snapshot.mrn],
@@ -420,7 +483,11 @@ export class SmartIntakeService {
     return 'id_document_scan';
   }
 
-  private audit(action: IdentityAuditAction, actor: string, details: Record<string, unknown>): PatientIdentityAuditLog {
+  private audit(
+    action: IdentityAuditAction,
+    actor: string,
+    details: Record<string, unknown>,
+  ): PatientIdentityAuditLog {
     return {
       id: id('audit'),
       action,

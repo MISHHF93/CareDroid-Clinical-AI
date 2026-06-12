@@ -1,5 +1,8 @@
 import React, { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AlertTriangle, CheckCircle2, FileScan, Link2, UserPlus, UserRoundX } from 'lucide-react';
+import { useEmergencyStore } from '../../../store/emergencyStore';
+import { PatientState, Priority } from '../../../types/emergency';
 import { SMART_INTAKE_DEMO } from '../../data/smartIntakeFixtures';
 import SmartIntakeApi from '../../services/smartIntakeApi';
 import './SmartIntake.css';
@@ -20,11 +23,80 @@ function fieldTone(status) {
   return 'unverified';
 }
 
+function extractedFieldValue(fieldName, fallback = '') {
+  return SMART_INTAKE_DEMO.extractedFields.find((field) => field.field === fieldName)?.extracted || fallback;
+}
+
+function ageFromDob(dob) {
+  const date = new Date(`${dob}T00:00:00`);
+  if (!Number.isFinite(date.getTime())) return 0;
+  const today = new Date();
+  let age = today.getFullYear() - date.getFullYear();
+  const monthDelta = today.getMonth() - date.getMonth();
+  if (monthDelta < 0 || (monthDelta === 0 && today.getDate() < date.getDate())) age -= 1;
+  return Math.max(0, age);
+}
+
+function buildSmartIntakePatient(sessionId, label = 'Smart Intake patient') {
+  const now = new Date().toISOString();
+  const dob = extractedFieldValue('dateOfBirth', '');
+  const firstName = label === 'Unknown Patient' ? 'Unknown' : extractedFieldValue('firstName', 'Smart');
+  const lastName = label === 'Unknown Patient' ? 'Patient' : extractedFieldValue('lastName', 'Intake');
+  return {
+    id: `smart-intake-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    mrn: extractedFieldValue('healthCardNumber', `SI-${Date.now()}`),
+    firstName,
+    lastName,
+    dob,
+    age: ageFromDob(dob),
+    sex: extractedFieldValue('sex', 'Unspecified'),
+    arrivalTime: now,
+    triageTime: now,
+    lastAssessedTime: null,
+    chiefComplaint: 'Smart Intake identity review',
+    complaint: 'Smart Intake identity review',
+    complaintCategory: 'Other',
+    state: PatientState.Triage,
+    priority: Priority.P3,
+    vitals: {
+      hr: null,
+      bpSystolic: null,
+      bpDiastolic: null,
+      spo2: null,
+      temp: null,
+      rr: null,
+      gcs: null,
+      pain: null,
+      recordedAt: now,
+    },
+    assignedStaffId: null,
+    roomId: null,
+    flags: [],
+    timeline: [
+      {
+        id: `evt-smart-intake-${sessionId}-${Date.now()}`,
+        patientId: '',
+        type: 'Triage',
+        timestamp: now,
+        summary: `${label} created from Smart Intake session ${sessionId}.`,
+        metadata: { smartIntakeSessionId: sessionId },
+      },
+    ],
+    notes: [],
+  };
+}
+
 export default function SmartIntake() {
+  const navigate = useNavigate();
+  const addPatient = useEmergencyStore((state) => state.addPatient);
+  const selectPatient = useEmergencyStore((state) => state.selectPatient);
   const [activeStep, setActiveStep] = useState(0);
   const [selectedCandidateId, setSelectedCandidateId] = useState(SMART_INTAKE_DEMO.candidates[0]?.patientId || null);
   const [sessionId, setSessionId] = useState(SMART_INTAKE_DEMO.sessionId);
   const [statusMessage, setStatusMessage] = useState('Demo review loaded. Backend API is used when Mongoose Emergency OS runtime is enabled.');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isStarting, setIsStarting] = useState(false);
+  const [pendingAction, setPendingAction] = useState('');
   const [fieldDecisions, setFieldDecisions] = useState(() =>
     Object.fromEntries(SMART_INTAKE_DEMO.extractedFields.map((field) => [field.field, field.status]))
   );
@@ -35,14 +107,19 @@ export default function SmartIntake() {
   );
 
   const startBackendSession = async () => {
+    setIsStarting(true);
+    setErrorMessage('');
     try {
       const result = await SmartIntakeApi.createSession('Smart Intake RN');
       setSessionId(result.sessionId || result.session?._id || SMART_INTAKE_DEMO.sessionId);
       setStatusMessage('Backend Smart Intake session created.');
       setActiveStep(1);
     } catch (error) {
+      setErrorMessage(`Backend Smart Intake unavailable: ${error.message}`);
       setStatusMessage(`Using local demo workflow: ${error.message}`);
       setActiveStep(1);
+    } finally {
+      setIsStarting(false);
     }
   };
 
@@ -51,6 +128,36 @@ export default function SmartIntake() {
       ...current,
       [field]: decision === 'edited' ? 'overridden' : decision === 'approved' ? 'verified' : 'missing',
     }));
+  };
+
+  const addSmartIntakePatientToWhiteboard = (label) => {
+    const patient = buildSmartIntakePatient(sessionId, label);
+    const timeline = patient.timeline.map((event) => ({ ...event, patientId: patient.id }));
+    addPatient({ ...patient, timeline });
+    selectPatient(patient.id);
+    navigate('/emergency/patients');
+    return patient;
+  };
+
+  const completeFinalAction = async (actionLabel, backendAction, localCompletion) => {
+    setPendingAction(actionLabel);
+    setErrorMessage('');
+    try {
+      const result = await backendAction();
+      localCompletion?.(result);
+      setStatusMessage(
+        `${actionLabel} confirmed for session ${result.sessionId || sessionId}. Identity audit trail updated for human review.`
+      );
+    } catch (error) {
+      localCompletion?.(null);
+      setErrorMessage(`Backend confirmation failed: ${error.message}`);
+      setStatusMessage(
+        `${actionLabel} recorded locally for session ${sessionId}. Backend confirmation is pending human review.`
+      );
+    } finally {
+      setActiveStep(SMART_INTAKE_DEMO.steps.length - 1);
+      setPendingAction('');
+    }
   };
 
   const selectedCandidate = SMART_INTAKE_DEMO.candidates.find((candidate) => candidate.patientId === selectedCandidateId);
@@ -66,9 +173,9 @@ export default function SmartIntake() {
             linking, or continuing as an unknown patient.
           </p>
         </div>
-        <button type="button" onClick={startBackendSession}>
+        <button type="button" onClick={startBackendSession} disabled={isStarting}>
           <FileScan size={18} aria-hidden />
-          Start Intake
+          {isStarting ? 'Starting...' : 'Start Intake'}
         </button>
       </header>
 
@@ -86,6 +193,11 @@ export default function SmartIntake() {
       <div className="smart-intake__status" role="status">
         <strong>Session:</strong> {sessionId} · {statusMessage}
       </div>
+      {errorMessage ? (
+        <div className="smart-intake__status smart-intake__status--error" role="alert">
+          {errorMessage}
+        </div>
+      ) : null}
 
       <div className="smart-intake__grid">
         <section className="smart-intake__panel" aria-labelledby="extracted-title">
@@ -171,21 +283,61 @@ export default function SmartIntake() {
       </div>
 
       <section className="smart-intake__actions" aria-label="Final Smart Intake actions">
-        <button type="button" disabled={!verificationComplete}>
+        <button
+          type="button"
+          disabled={!verificationComplete || !selectedCandidate || Boolean(pendingAction)}
+          onClick={() =>
+            completeFinalAction(
+              `Linked ${selectedCandidate?.displayName || 'selected patient'}`,
+              () => SmartIntakeApi.linkPatient(sessionId, selectedCandidate.patientId, 'Smart Intake RN'),
+              () => {
+                selectPatient(selectedCandidate.patientId);
+                navigate('/emergency/patients');
+              }
+            )
+          }
+        >
           <Link2 size={17} aria-hidden />
-          Link to Existing Patient
+          {pendingAction.startsWith('Linked') ? 'Linking...' : 'Link to Existing Patient'}
         </button>
-        <button type="button" disabled={!verificationComplete}>
+        <button
+          type="button"
+          disabled={!verificationComplete || Boolean(pendingAction)}
+          onClick={() =>
+            completeFinalAction('Create-new-patient intake', () =>
+              SmartIntakeApi.createPatient(sessionId, 'Smart Intake RN'),
+              () => addSmartIntakePatientToWhiteboard('Smart Intake patient')
+            )
+          }
+        >
           <UserPlus size={17} aria-hidden />
-          Create New Patient
+          {pendingAction === 'Create-new-patient intake' ? 'Creating...' : 'Create New Patient'}
         </button>
-        <button type="button">
+        <button
+          type="button"
+          disabled={Boolean(pendingAction)}
+          onClick={() =>
+            completeFinalAction('Unknown-patient intake', () =>
+              SmartIntakeApi.continueUnknown(sessionId, 'Unknown Patient', 'Smart Intake RN'),
+              () => addSmartIntakePatientToWhiteboard('Unknown Patient')
+            )
+          }
+        >
           <UserRoundX size={17} aria-hidden />
-          Continue as Unknown Patient
+          {pendingAction === 'Unknown-patient intake' ? 'Recording...' : 'Continue as Unknown Patient'}
         </button>
-        <button type="button" disabled={!verificationComplete}>
+        <button
+          type="button"
+          disabled={!verificationComplete || Boolean(pendingAction)}
+          onClick={() =>
+            completeFinalAction('Sent-to-triage intake', () =>
+              SmartIntakeApi.createPatient(sessionId, 'Smart Intake RN'),
+              () => addSmartIntakePatientToWhiteboard('Smart Intake triage patient')
+            )
+          }
+        >
           <CheckCircle2 size={17} aria-hidden />
-          Send to Triage
+          {pendingAction === 'Sent-to-triage intake' ? 'Sending...' : 'Send to Triage'}
         </button>
       </section>
 

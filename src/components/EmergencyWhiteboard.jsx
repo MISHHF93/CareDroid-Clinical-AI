@@ -63,7 +63,11 @@ function isEditableShortcutTarget(target) {
   );
 }
 
-export default function EmergencyWhiteboard() {
+export default function EmergencyWhiteboard({
+  title = 'Emergency Whiteboard',
+  subtitle = null,
+  defaultViewMode = 'grid',
+}) {
   const patients = useEmergencyStore((state) => state.patients);
   const activePatients = useEmergencyStore(selectActivePatients);
   const filteredPatients = useEmergencyStore(selectFilteredPatients);
@@ -84,7 +88,7 @@ export default function EmergencyWhiteboard() {
   const updatePatient = useEmergencyStore((state) => state.updatePatient);
   const addNote = useEmergencyStore((state) => state.addNote);
   const addFlag = useEmergencyStore((state) => state.addFlag);
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState(defaultViewMode);
   const [queuePanelCollapsed, setQueuePanelCollapsed] = useState(false);
   const [newPatientOpen, setNewPatientOpen] = useState(false);
   const [calculatorLaunch, setCalculatorLaunch] = useState(null);
@@ -360,8 +364,8 @@ export default function EmergencyWhiteboard() {
     >
       <header className="ed-whiteboard__topbar">
         <div className="ed-whiteboard__title">
-          <h1 id="ed-whiteboard-title">Emergency Whiteboard</h1>
-          <span>{activePatients.length} live patients</span>
+          <h1 id="ed-whiteboard-title">{title}</h1>
+          <span>{subtitle || `${activePatients.length} live patients`}</span>
         </div>
         <div className="ed-whiteboard__topbar-actions">
           <label className="ed-whiteboard__search" aria-label="Search patients">

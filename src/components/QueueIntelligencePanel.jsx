@@ -186,7 +186,12 @@ export default function QueueIntelligencePanel({ collapsed, onCollapsedChange })
 
       <footer className="queue-intel__footer">
         <span>Updated {latestUpdatedAt(queues)}</span>
-        <button type="button" onClick={() => setQueueFilter(null)}>
+        <button
+          type="button"
+          onClick={() => setQueueFilter(null)}
+          disabled={!activeQueueFilter}
+          title={activeQueueFilter ? 'Clear active queue filter' : 'No active filter'}
+        >
           Clear Filter
         </button>
       </footer>

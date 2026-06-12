@@ -36,11 +36,11 @@ describe('canonical configuration contract', () => {
     expect(CANONICAL_ROUTES.auth).toBe('/auth');
     expect(AUTH_CONFIG.canonicalRoute).toBe(CANONICAL_ROUTES.auth);
     expect(getRouteAliasTarget('/signin')).toBe('/auth');
-    expect(getRouteAliasTarget('/chat')).toBe('/assistant');
-    expect(getRouteAliasTarget('/copilot')).toBe('/assistant');
-    expect(getRouteAliasTarget('/catalog')).toBe('/tools');
+    expect(getRouteAliasTarget('/chat')).toBe('/emergency/copilot');
+    expect(getRouteAliasTarget('/copilot')).toBe('/emergency/copilot');
+    expect(getRouteAliasTarget('/catalog')).toBe('/emergency/copilot');
     expect(getRouteAliasTarget('/fleet')).toBe('/fleet/map');
-    expect(getRouteAliasTarget('/home')).toBe('/dashboard');
+    expect(getRouteAliasTarget('/home')).toBe('/emergency/whiteboard');
     expect(getRouteAliasTarget('/automation')).toBe('/workflows');
     expect(getRouteAliasTarget('/asset-packs')).toBeNull();
     expect(getRouteAliasTarget('/privacy')).toBeNull();
@@ -66,16 +66,19 @@ describe('canonical configuration contract', () => {
     const routeIds = ROUTE_RECORDS.map((route) => route.id);
 
     expect(new Set(routeIds).size).toBe(routeIds.length);
-    expect(ROUTE_RECORDS_BY_ID.dashboard.path).toBe('/dashboard');
+    expect(ROUTE_RECORDS_BY_ID.dashboard.path).toBe('/emergency/whiteboard');
     expect(ROUTE_RECORDS_BY_ID.dashboard.aliases).toContain('/home');
+    expect(ROUTE_RECORDS_BY_ID.assistant.path).toBe('/emergency/copilot');
+    expect(ROUTE_RECORDS_BY_ID.tools.path).toBe('/emergency/copilot');
+    expect(ROUTE_RECORDS_BY_ID.calculators.path).toBe('/emergency/copilot');
     expect(ROUTE_RECORDS_BY_ID.assetPacks.path).toBe('/asset-packs');
     expect(ROUTE_RECORDS_BY_ID.assetPacks.componentKey).toBe('PackMarketplace');
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.path).toBe('/settings/organization/packs');
     expect(ROUTE_RECORDS_BY_ID.organizationPacks.aliases).toBe(ORGANIZATION_PACKS_ROUTE_ALIASES);
     expect(PROTECTED_ROUTE_ALIAS_REDIRECTS).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ path: '/home', to: '/dashboard', routeId: 'dashboard' }),
-        expect.objectContaining({ path: '/chat', to: '/assistant', routeId: 'assistant' }),
+        expect.objectContaining({ path: '/home', to: '/emergency/whiteboard', routeId: 'dashboard' }),
+        expect.objectContaining({ path: '/chat', to: '/emergency/copilot', routeId: 'assistant' }),
         expect.objectContaining({ path: '/automation', to: '/workflows', routeId: 'workflows' }),
       ])
     );

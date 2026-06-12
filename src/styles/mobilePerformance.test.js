@@ -35,7 +35,7 @@ describe('mobile performance — routing & bundles', () => {
   it('keeps the removed assistant page out of the initial chunk', () => {
     const app = read('src/App.jsx');
     expect(app).not.toMatch(/pages\/Dashboard/);
-    expect(app).toContain('EmergencyCopilotRedirect');
+    expect(app).toContain('EmergencyCopilotRoute');
   });
 
   it('vite manualChunks isolates calculators, catalog, dashboard, dexie, firebase', () => {

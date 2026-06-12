@@ -20,7 +20,7 @@ const CANONICAL_APP_SHELL_ROUTES = [
   ['/emergency/capacity', '<EmergencyCapacityRoute />'],
   ['/emergency/boarding', '<EmergencyCapacityRoute />'],
   ['/emergency/referrals', '<ReferralPanel />'],
-  ['/emergency/copilot', '<EmergencyCopilotRedirect />'],
+  ['/emergency/copilot', '<EmergencyCopilotRoute />'],
   ['/emergency/analytics', '<EmergencyAnalytics />'],
   ['/emergency/settings', '<SettingsRoute />'],
 ];
@@ -64,10 +64,10 @@ describe('canonical protected AppShell source-level route contract', () => {
   it('keeps AppShell as the only shell owner for main content and sidebar', () => {
     expect(appShellSource.match(/className="ed-nav-rail"/g)).toHaveLength(1);
     expect(appShellSource.match(/<header className="ed-os-header"/g)).toHaveLength(1);
-    expect(appShellSource.match(/data-layout-role="MainContent"/g)).toHaveLength(1);
+    expect(appShellSource.match(/data-layout-role=\{LAYOUT_SCROLL_CONTRACT\.mainContentRole\}/g)).toHaveLength(1);
     expect(appShellSource.match(/<main\b/g)).toHaveLength(1);
     expect(appShellSource.match(/className="ed-copilot-panel"/g)).toHaveLength(1);
-    expect(appShellSource).toContain('data-layout-role="MainContent"');
+    expect(appShellSource).toContain('data-layout-role={LAYOUT_SCROLL_CONTRACT.mainContentRole}');
     expect(appSource).not.toContain('className="app-shell-page-body"');
   });
 
@@ -76,6 +76,6 @@ describe('canonical protected AppShell source-level route contract', () => {
     expect(indexCss).not.toMatch(/body\s*\{[^}]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(/\.ed-os-shell\s*\{[\s\S]*overflow:\s*hidden/);
     expect(appShellCss).toMatch(/\.ed-os-shell__body\s*\{[\s\S]*overflow:\s*hidden/);
-    expect(appShellCss).toMatch(/\.ed-os-main\s*\{[\s\S]*overflow:\s*auto/);
+    expect(appShellCss).toMatch(/\.ed-os-main,[\s\S]*\.app-shell-main-content\s*\{[\s\S]*overflow:\s*auto/);
   });
 });

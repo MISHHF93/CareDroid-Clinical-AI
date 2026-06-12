@@ -192,7 +192,7 @@ describe('workspaceArchitecture', () => {
         'simulation-suite',
       ])
     );
-    expect(routePaths).toEqual(expect.arrayContaining(['/assistant', '/tools/calculators', '/live-map']));
+    expect(routePaths).toEqual(expect.arrayContaining(['/emergency/copilot', '/emergency/whiteboard', '/live-map']));
   });
 
   it('defines functionality modes and subpages for requested workspaces', () => {
@@ -264,6 +264,7 @@ describe('workspaceArchitecture', () => {
       'resources',
       'escalations',
       'iot',
+      'shift-summary',
       'referrals',
       'knowledge',
       'evidence',

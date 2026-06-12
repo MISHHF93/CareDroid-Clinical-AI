@@ -63,13 +63,13 @@ describe('PlatformOSPages', () => {
       <MemoryRouter initialEntries={['/workspaces']}>
         <Routes>
           <Route path="/workspaces" element={<><WorkspacesIndexPage /><LocationProbe /></>} />
-          <Route path="/workspace/:workspaceId" element={<LocationProbe />} />
+          <Route path="*" element={<LocationProbe />} />
         </Routes>
       </MemoryRouter>
     );
 
     fireEvent.click(screen.getByRole('button', { name: /emergency/i }));
-    expect(screen.getByTestId('location')).toHaveTextContent('/workspace/emergency');
+    expect(screen.getByTestId('location')).toHaveTextContent('/emergency/whiteboard');
   });
 
   it('renders global search with quick launch results', () => {
@@ -78,41 +78,23 @@ describe('PlatformOSPages', () => {
     expect(screen.getAllByRole('button', { name: /^open /i })).toHaveLength(8);
     expect(screen.getByText(/showing top 8/i)).toBeInTheDocument();
     fireEvent.change(screen.getByPlaceholderText(/search everything/i), {
-      target: { value: 'digital twin' },
+      target: { value: 'boarding boarders' },
     });
-    expect(screen.getByRole('button', { name: /open hospital digital twin/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /open boarding/i })).toBeInTheDocument();
   });
 
-  it('supports asset, workflow, simulation, protocol, AI, operation, and workspace search-first discovery', () => {
+  it('supports Emergency OS search-first discovery', () => {
     renderPage(<SearchResultsPage />, '/search');
     const input = screen.getByPlaceholderText(/search everything/i);
 
-    fireEvent.change(input, { target: { value: 'medical iot dashboard' } });
-    expect(screen.getByRole('button', { name: /open medical iot dashboard/i })).toBeInTheDocument();
+    fireEvent.change(input, { target: { value: 'whiteboard patient flow' } });
+    expect(screen.getByRole('button', { name: /open emergency whiteboard/i })).toBeInTheDocument();
 
-    fireEvent.change(input, { target: { value: 'sepsis escalation workflow' } });
-    expect(screen.getByRole('button', { name: /open sepsis escalation workflow/i })).toBeInTheDocument();
+    fireEvent.change(input, { target: { value: 'ems ambulance' } });
+    expect(screen.getByRole('button', { name: /open ems/i })).toBeInTheDocument();
 
-    fireEvent.change(input, { target: { value: 'sepsis deterioration simulation' } });
-    expect(screen.getByRole('button', { name: /open sepsis deterioration/i })).toBeInTheDocument();
-
-    fireEvent.change(input, { target: { value: 'emergency workspace' } });
-    expect(screen.getByRole('button', { name: /open emergency workspace/i })).toBeInTheDocument();
-
-    fireEvent.change(input, { target: { value: 'sepsis management lactate pathway' } });
-    expect(screen.getByRole('button', { name: /open sepsis management/i })).toBeInTheDocument();
-
-    fireEvent.change(input, { target: { value: 'guardrails human review safety' } });
-    expect(screen.getByRole('button', { name: /open guardrails/i })).toBeInTheDocument();
-
-    fireEvent.change(input, { target: { value: 'clinical copilot agent' } });
-    expect(screen.getByRole('button', { name: /open clinical copilot agent/i })).toBeInTheDocument();
-
-    fireEvent.change(input, { target: { value: 'fleet dispatch maintenance map' } });
-    expect(screen.getByRole('button', { name: /^open fleet$/i })).toBeInTheDocument();
-
-    fireEvent.change(input, { target: { value: 'emergency department solution' } });
-    expect(screen.getByRole('button', { name: /open emergency department solution/i })).toBeInTheDocument();
+    fireEvent.change(input, { target: { value: 'analytics throughput trends' } });
+    expect(screen.getByRole('button', { name: /open analytics/i })).toBeInTheDocument();
   });
 
   it('renders timeline, notifications, digital twin, workflows, and assets', () => {

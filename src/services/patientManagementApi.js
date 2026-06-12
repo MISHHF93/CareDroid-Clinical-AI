@@ -9,6 +9,8 @@ export const PATIENT_MANAGEMENT_ENDPOINTS = Object.freeze({
   sourceData: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/source-data`,
   reviewItems: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/review-items`,
   privacyAccessLog: (patientId) => `/api/privacy/patient/${encodeURIComponent(patientId)}/access-log`,
+  createPatient: '/api/patients',
+  updatePatient: (patientId) => `/api/patients/${encodeURIComponent(patientId)}`,
   importEhrPatient: '/api/patients/import/ehr',
   importLabs: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/import/labs`,
   importMedications: (patientId) => `/api/patients/${encodeURIComponent(patientId)}/import/medications`,
@@ -353,6 +355,45 @@ async function requestJson(path, options = {}) {
   } catch (error) {
     return { ok: false, data: null, error: getApiErrorMessage(error), status: 0 };
   }
+}
+
+async function writePatient(endpoint, options) {
+  try {
+    const { response, data } = await apiFetchJson(endpoint, {
+      headers: { 'content-type': 'application/json' },
+      ...options,
+    });
+    if (!response.ok) {
+      return {
+        ok: false,
+        status: response.status,
+        message: data?.error || data?.message || getApiErrorMessage(null, response),
+        data,
+      };
+    }
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    return {
+      ok: false,
+      status: 0,
+      message: getApiErrorMessage(error),
+      data: null,
+    };
+  }
+}
+
+export function createEmergencyPatientRecord(patient) {
+  return writePatient(PATIENT_MANAGEMENT_ENDPOINTS.createPatient, {
+    method: 'POST',
+    body: JSON.stringify(patient),
+  });
+}
+
+export function updateEmergencyPatientRecord(patientId, patch) {
+  return writePatient(PATIENT_MANAGEMENT_ENDPOINTS.updatePatient(patientId), {
+    method: 'PATCH',
+    body: JSON.stringify(patch),
+  });
 }
 
 export async function fetchPatientManagementBundle(patientId, options = {}) {

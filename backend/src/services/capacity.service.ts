@@ -152,7 +152,9 @@ export class CapacityService {
       recommendations.push('Prepare for multiple EMS arrivals, consider diversion if Red');
     }
     if (metrics.pending_discharges > 3) {
-      recommendations.push(`${metrics.pending_discharges} patients ready for discharge - prioritize transport`);
+      recommendations.push(
+        `${metrics.pending_discharges} patients ready for discharge - prioritize transport`,
+      );
     }
 
     return recommendations;

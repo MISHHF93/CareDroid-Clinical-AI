@@ -5,6 +5,8 @@ import { Product } from '../product-catalog/entities/product.entity';
 import { User } from '../users/entities/user.entity';
 import { UserProfile } from '../users/entities/user-profile.entity';
 import { Organization } from '../workspaces/entities/organization.entity';
+import { UserWorkspaceState } from '../workspaces/entities/user-workspace-state.entity';
+import { WorkspaceMembership } from '../workspaces/entities/workspace-membership.entity';
 import { WorkspacesService } from '../workspaces/workspaces.service';
 import { EntitlementService } from './entitlement.service';
 import { PlatformAssetsService } from './platform-assets.service';
@@ -28,6 +30,8 @@ describe('PlatformContextService', () => {
   const profileRepository = { findOne: jest.fn() };
   const organizationRepository = { findOne: jest.fn() };
   const membershipRepository = { findOne: jest.fn() };
+  const workspaceMembershipRepository = { find: jest.fn() };
+  const workspaceStateRepository = { findOne: jest.fn() };
   const productRepository = { find: jest.fn() };
 
   let service: PlatformContextService;
@@ -42,6 +46,11 @@ describe('PlatformContextService', () => {
         { provide: getRepositoryToken(UserProfile), useValue: profileRepository },
         { provide: getRepositoryToken(Organization), useValue: organizationRepository },
         { provide: getRepositoryToken(OrganizationMembership), useValue: membershipRepository },
+        {
+          provide: getRepositoryToken(WorkspaceMembership),
+          useValue: workspaceMembershipRepository,
+        },
+        { provide: getRepositoryToken(UserWorkspaceState), useValue: workspaceStateRepository },
         { provide: getRepositoryToken(Product), useValue: productRepository },
       ],
     }).compile();
@@ -81,9 +90,21 @@ describe('PlatformContextService', () => {
         packIds: ['emergency-department-pack'],
       },
     ]);
-    workspacesService.listForUser.mockResolvedValue({
+    workspaceMembershipRepository.find.mockResolvedValue([
+      {
+        id: 'membership-1',
+        workspaceId: 'workspace-1',
+        userId: 'user-1',
+        role: 'admin',
+        permissions: ['VIEW_WORKSPACE'],
+        teams: [],
+        status: 'active',
+        workspace: { id: 'workspace-1', settings: { enabledToolIds: ['qsofa'] } },
+      },
+    ]);
+    workspaceStateRepository.findOne.mockResolvedValue({
       activeWorkspaceId: 'workspace-1',
-      workspaces: [{ id: 'workspace-1', settings: { enabledToolIds: ['qsofa'] } }],
+      recentWorkspaceIds: ['workspace-1'],
     });
     platformAssetsService.getOrganizationEntitlements.mockResolvedValue([
       { packId: 'core-platform' },

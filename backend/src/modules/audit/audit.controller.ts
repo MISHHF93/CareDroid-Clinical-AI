@@ -294,35 +294,4 @@ export class AuditController {
       );
     }
   }
-
-  /**
-   * Sync offline audit logs to server
-   */
-  @Post('sync')
-  async syncAuditLog(
-    @Body()
-    body: { action: string; resourceType?: string; resourceId?: string; timestamp?: string },
-    @Req() req: any,
-  ) {
-    const userId = req.user?.id || req.user?.userId;
-    const action = Object.values(AuditAction).includes(body.action as AuditAction)
-      ? (body.action as AuditAction)
-      : AuditAction.SECURITY_EVENT;
-
-    await this.auditService.log({
-      userId,
-      organizationId: req.tenantContext?.organizationId,
-      workspaceId: req.tenantContext?.workspaceId,
-      action,
-      resource: `${body.resourceType || 'client'}:${body.resourceId || 'unknown'}`,
-      ipAddress: req.ip || '0.0.0.0',
-      userAgent: req.headers['user-agent'] || 'offline-sync',
-      metadata: {
-        syncedAt: new Date().toISOString(),
-        originalTimestamp: body.timestamp,
-      },
-    });
-
-    return { success: true };
-  }
 }
