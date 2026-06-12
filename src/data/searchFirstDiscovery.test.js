@@ -35,8 +35,17 @@ describe('search-first discovery index', () => {
     );
   });
 
-  it('indexes assets, workflows, simulations, protocols, AI, operations, commercial capabilities, and workspaces', () => {
+  it('keeps default discovery scoped to active Emergency OS destinations', () => {
     const entries = buildSearchFirstDiscoveryEntries();
+    const paths = new Set(entries.map((entry) => entry.path));
+    const kinds = new Set(entries.map((entry) => entry.kind));
+
+    expect([...paths].every((path) => path.startsWith('/emergency/'))).toBe(true);
+    expect([...kinds]).toEqual(['destination']);
+  });
+
+  it('indexes assets, workflows, simulations, protocols, AI, operations, commercial capabilities, and workspaces in platform catalog mode', () => {
+    const entries = buildSearchFirstDiscoveryEntries({ includePlatformCatalog: true });
     const kinds = new Set(entries.map((entry) => entry.kind));
 
     expect([...kinds]).toEqual(
@@ -56,12 +65,12 @@ describe('search-first discovery index', () => {
   });
 
   it('finds workflow and simulation results by natural language query', () => {
-    expect(buildSearchFirstResults({ query: 'sepsis escalation workflow' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'sepsis escalation workflow', includePlatformCatalog: true })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'workflow', sourceId: 'sepsis-escalation' }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'sepsis deterioration simulation' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'sepsis deterioration simulation', includePlatformCatalog: true })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'simulation', sourceId: 'sepsis-deterioration' }),
       ])
@@ -69,8 +78,16 @@ describe('search-first discovery index', () => {
   });
 
   it('filters workspace-specific discovery results to active workspaces', () => {
-    const emergencyResults = buildSearchFirstResults({ query: 'emergency workspace', workspaceId: 'emergency' });
-    const iotResults = buildSearchFirstResults({ query: 'device telemetry', workspaceId: 'medical-iot' });
+    const emergencyResults = buildSearchFirstResults({
+      query: 'emergency workspace',
+      workspaceId: 'emergency',
+      includePlatformCatalog: true,
+    });
+    const iotResults = buildSearchFirstResults({
+      query: 'device telemetry',
+      workspaceId: 'medical-iot',
+      includePlatformCatalog: true,
+    });
 
     expect(emergencyResults).toEqual(
       expect.arrayContaining([
@@ -85,22 +102,22 @@ describe('search-first discovery index', () => {
   });
 
   it('finds protocols, AI agents, and automation templates from one search index', () => {
-    expect(buildSearchFirstResults({ query: 'sepsis management lactate pathway' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'sepsis management lactate pathway', includePlatformCatalog: true })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'protocol', sourceId: 'sepsis' }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'clinical copilot agent' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'clinical copilot agent', includePlatformCatalog: true })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'ai-agent', sourceId: 'agent-clinical-copilot' }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'fleet dispatch maintenance map' })).not.toEqual(
+    expect(buildSearchFirstResults({ query: 'fleet dispatch maintenance map', includePlatformCatalog: true })).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'operation', sourceId: 'fleet' }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'automated triage matrix vitals chief complaint' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'automated triage matrix vitals chief complaint', includePlatformCatalog: true })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'automation',
@@ -111,13 +128,13 @@ describe('search-first discovery index', () => {
     );
   });
 
-  it('indexes canonical navigation destinations so hidden routes are still findable', () => {
-    expect(buildSearchFirstResults({ query: 'global search' })).toEqual(
+  it('does not expose subsidiary navigation pages in the default Emergency OS search', () => {
+    expect(buildSearchFirstResults({ query: 'global search' })).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'search', path: '/search' }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'recommendations' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'recommendations' })).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'recommendations', path: '/recommendations' }),
       ])
@@ -132,12 +149,12 @@ describe('search-first discovery index', () => {
         query: 'billing usage subscription',
         navigationPermissions: ['MANAGE_SUBSCRIPTIONS'],
       })
-    ).toEqual(
+    ).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'billing', path: '/billing' }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'workflow mining journeys' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'workflow mining journeys' })).not.toEqual(
       expect.arrayContaining([
         expect.objectContaining({ kind: 'destination', sourceId: 'workflow-mining', path: '/workflow-mining' }),
       ])
@@ -145,7 +162,7 @@ describe('search-first discovery index', () => {
   });
 
   it('indexes commercial catalog capabilities and row-level launch targets', () => {
-    expect(buildSearchFirstResults({ query: 'emergency flow intelligence platform' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'emergency flow intelligence platform', includePlatformCatalog: true })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'commercial',
@@ -154,14 +171,14 @@ describe('search-first discovery index', () => {
         }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'ems handoff bed flow bottleneck' })[0]).toEqual(
+    expect(buildSearchFirstResults({ query: 'ems handoff bed flow bottleneck', includePlatformCatalog: true })[0]).toEqual(
       expect.objectContaining({
         kind: 'commercial',
         sourceId: 'specialty-emergency',
         path: '/specialties/emergency',
       })
     );
-    expect(buildSearchFirstResults({ query: 'fhir patient integration' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'fhir patient integration', includePlatformCatalog: true })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'commercial',
@@ -170,7 +187,7 @@ describe('search-first discovery index', () => {
         }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'hospital solution builder' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'hospital solution builder', includePlatformCatalog: true })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'commercial',
@@ -179,7 +196,7 @@ describe('search-first discovery index', () => {
         }),
       ])
     );
-    expect(buildSearchFirstResults({ query: 'automation analytics human overrides' })).toEqual(
+    expect(buildSearchFirstResults({ query: 'automation analytics human overrides', includePlatformCatalog: true })).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
           kind: 'commercial',

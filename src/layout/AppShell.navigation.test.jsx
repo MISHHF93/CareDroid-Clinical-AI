@@ -75,7 +75,7 @@ describe('AppShell navigation surfaces', () => {
 
   it('renders required header and content regions once', () => {
     expect(appShellJsx.match(/<header className="ed-os-header"/g)).toHaveLength(1);
-    expect(appShellJsx.match(/data-layout-role="MainContent"/g)).toHaveLength(1);
+    expect(appShellJsx.match(/data-layout-role={LAYOUT_SCROLL_CONTRACT.mainContentRole}/g)).toHaveLength(1);
     expect(appShellJsx.match(/className="ed-copilot-panel"/g)).toHaveLength(1);
     expect(appShellJsx).toContain('aria-label="Go to Emergency Whiteboard"');
     expect(appShellJsx).toContain("onClick={() => navigate('/emergency/whiteboard')}");

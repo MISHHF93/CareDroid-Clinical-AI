@@ -1,12 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ROUTE_RECORDS } from '../config/routes.config';
-import {
-  ADVANCED_SIDEBAR_NAV_ITEMS,
-  OPERATIONS_SIDEBAR_NAV_ITEMS,
-  PRIMARY_SIDEBAR_NAV_ITEMS,
-  QUICK_COMMAND_DESTINATION_ITEMS,
-  SOLUTIONS_SIDEBAR_NAV_ITEMS,
-} from '../config/navigation.config';
+import { QUICK_COMMAND_DESTINATION_ITEMS } from '../config/navigation.config';
 import {
   buildAssetInventoryProjection,
   buildNavigationMountProjection,
@@ -78,19 +72,12 @@ describe('mounted SaaS asset inventory projection', () => {
     );
   });
 
-  it('keeps sidebar exposure narrower than command launch destinations', () => {
+  it('keeps quick command destinations scoped to the active Emergency OS route surface', () => {
     const mountedNav = buildNavigationMountProjection();
-    const sidebarPaths = new Set(
-      [
-        ...PRIMARY_SIDEBAR_NAV_ITEMS,
-        ...SOLUTIONS_SIDEBAR_NAV_ITEMS,
-        ...OPERATIONS_SIDEBAR_NAV_ITEMS,
-        ...ADVANCED_SIDEBAR_NAV_ITEMS,
-      ].map((item) => item.path)
-    );
     const commandPaths = new Set(QUICK_COMMAND_DESTINATION_ITEMS.map((item) => item.path));
 
-    expect(commandPaths.size).toBeGreaterThan(sidebarPaths.size);
+    expect([...commandPaths].every((path) => path.startsWith('/emergency/'))).toBe(true);
+    expect(commandPaths.size).toBe(QUICK_COMMAND_DESTINATION_ITEMS.length);
     expect(new Set(mountedNav.map((item) => `${item.section}:${item.id}`)).size).toBe(
       mountedNav.length
     );

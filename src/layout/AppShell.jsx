@@ -50,6 +50,7 @@ import { buildStaffWorkloads, getStaffRebalanceSuggestion } from '../utils/staff
 import { pendingReminderCountForStaff } from '../utils/reassessmentScheduler';
 import { emergencyPermissionsForUser, emergencyRoleForUser } from '../utils/emergencyRolePermissions';
 import { APP_SHELL_NAV_ITEMS } from '../config/navigation.config';
+import { LAYOUT_SCROLL_CONTRACT } from '../config/layout.config';
 import './AppShell.css';
 
 const SIDEBAR_ICON_COMPONENTS = {
@@ -1916,8 +1917,8 @@ const AppShell = ({
 
         <div className="ed-os-shell__body">
           <main
-            className="ed-os-main"
-            data-layout-role="MainContent"
+            className="ed-os-main app-shell-main-content"
+            data-layout-role={LAYOUT_SCROLL_CONTRACT.mainContentRole}
             id="main-content"
             tabIndex={-1}
           >

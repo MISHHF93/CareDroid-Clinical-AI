@@ -714,24 +714,31 @@ export function buildSearchFirstDiscoveryEntries({
   assets,
   navigationPermissions = [],
   includeContextualDestinations = false,
+  includePlatformCatalog = false,
 } = {}) {
-  const entries = [
+  const activeEmergencyEntries = [
     ...emergencyOsDestinationEntries(),
-    ...workspaceEntries(),
-    ...dashboardEntries(),
     ...navigationDestinationEntries({ navigationPermissions, includeContextualDestinations }),
-    ...assetEntries(assets),
-    ...workflowEntries(),
-    ...automationEntries(),
-    ...simulationEntries(),
-    ...protocolEntries(),
-    ...aiModelEntries(),
-    ...marketplaceAgentEntries(),
-    ...workspaceAgentEntries(),
-    ...operationEntries(),
-    ...notificationEntries(),
-    ...commercialCapabilityEntries(),
-  ]
+  ];
+  const platformCatalogEntries = includePlatformCatalog
+    ? [
+        ...workspaceEntries(),
+        ...dashboardEntries(),
+        ...assetEntries(assets),
+        ...workflowEntries(),
+        ...automationEntries(),
+        ...simulationEntries(),
+        ...protocolEntries(),
+        ...aiModelEntries(),
+        ...marketplaceAgentEntries(),
+        ...workspaceAgentEntries(),
+        ...operationEntries(),
+        ...notificationEntries(),
+        ...commercialCapabilityEntries(),
+      ]
+    : [];
+
+  const entries = [...activeEmergencyEntries, ...platformCatalogEntries]
     .filter(hasActiveWorkspaceScope)
     .filter((entry) => !isFutureModuleRoute(entry.path));
 

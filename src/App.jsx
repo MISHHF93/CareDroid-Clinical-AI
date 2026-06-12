@@ -1234,6 +1234,11 @@ export function AppRoutes() {
       element: <LegacyProtectedRouteRedirect to={to} />,
       requiresAuth: true,
     })),
+    ...PROTECTED_ROUTE_ALIAS_REDIRECTS.map(({ path, to }) => ({
+      path,
+      element: <LegacyProtectedRouteRedirect to={to} />,
+      requiresAuth: true,
+    })),
     {
       path: '/workspace/:workspaceId',
       element: <WorkspaceRouteRedirect />,
